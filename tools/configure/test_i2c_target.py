@@ -7,11 +7,15 @@ import unittest
 
 from tools.configure import authored, bindings, factory
 from tools.configure import configure as gate
-from tools.configure.providers import maintained
+from tools.configure.tests.f4_fixture import provider
 from tools.configure.tests.native_fixture import native_fixture
 
 
 class I2cTargetConfigurationTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.provider = provider("STM32F407VET6")
+
     def setUp(self):
         temporary = tempfile.TemporaryDirectory(prefix="i2c target ")
         self.addCleanup(temporary.cleanup)
@@ -62,8 +66,9 @@ class I2cTargetConfigurationTests(unittest.TestCase):
                     item.options.own_address = 83
 
     def test_nondefault_profile_projects_the_same_apb_into_c_configuration(self):
-        from tools.configure.stm32f4.clocks import DEFAULT
-        parameters = {**DEFAULT, "pll_p": 4}
+        from tools.configure.tests.f4_fixture import provider
+        clock = provider("STM32F407VET6").domain_policies.clock
+        parameters = {**clock.data["default_parameters"], "pll_p": 4}
         choices = "\n[clock_parameters]\n" + "\n".join(
             name + " = " + (str(value).lower() if type(value) is bool else
                             '"' + value + '"' if isinstance(value, str) else
@@ -76,7 +81,7 @@ class I2cTargetConfigurationTests(unittest.TestCase):
     def test_constructor_has_direct_c_admit_prepare_close_and_no_algorithm(self):
         result = self.resolve()
         item, = result.controllers
-        construction = maintained("stm32f4").constructor(
+        construction = result.provider_context.provider.constructor(
             item, result, result.board_bindings, result.routes, result.devices)
         self.assertTrue(construction.retain_on_failed_init)
         self.assertEqual("nx_stm32_i2c_target_admit",
@@ -211,17 +216,17 @@ class I2cTargetConfigurationTests(unittest.TestCase):
         self.assertEqual(1023, schema["properties"]["own_address"]["maximum"])
         self.assertFalse(schema["additionalProperties"])
 
-    def test_provider_rejects_route_bytes_that_disagree_with_c_af4_facts(self):
+    def test_provider_rejects_malformed_logical_af4_wires(self):
         import copy
         route = next(row for row in json.loads((gate.ROOT /
             "soc/stm32/stm32f4/routes.json").read_text())["routes"]
             if row["id"] == "target-i2c1-pb6-pb7")
-        for field, value in (("af", 7), ("function", "sda"), ("pin", "PA6")):
+        for field, value in (("af", 7), ("function", "sda"), ("pin", "PB7")):
             changed = copy.deepcopy(route)
             changed["pins"][0][field] = value
             with self.subTest(field=field), self.assertRaisesRegex(
                     gate.ConfigurationError, "route|AF4|pad"):
-                maintained("stm32f4").validate_selection(
+                self.provider.validate_selection(
                     {"mode": "target-irq"}, changed)
 
 

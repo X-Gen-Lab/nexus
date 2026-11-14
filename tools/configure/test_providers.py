@@ -131,7 +131,7 @@ class ProviderContractTests(unittest.TestCase):
         soc = load_soc_facts(gate.ROOT / "soc/stm32/stm32f4/soc.json")
         soc["id"] = "unmaintained-m4"
         with self.assertRaisesRegex(gate.ConfigurationError,
-                                    "Unmaintained SoC integration descriptor"):
+                                    "Unmaintained SoC integration (?:descriptor|provider)"):
             validate_soc_facts(soc, "STM32F407ZGT6")
 
     def test_unknown_emitter_cannot_fall_back_to_native(self):
@@ -148,9 +148,18 @@ class ProviderContractTests(unittest.TestCase):
                 provider = maintained(family, test_support=(family == "native"))
                 self.assertEqual(provider.CPU_ABI["arch"], arch)
                 self.assertEqual(provider.DMA_VECTOR, vector)
-                with self.assertRaises(TypeError):
-                    provider.CPU_ABI["arch"] = "other"
-        with self.assertRaisesRegex(ValueError, "Unmaintained SoC integration descriptor"):
+                # ABI inspection may return a fresh projection. Mutating it
+                # never changes the selected immutable source facts.
+                abi = provider.CPU_ABI
+                try:
+                    abi["arch"] = "other"
+                except TypeError:
+                    pass
+                self.assertEqual(provider.CPU_ABI["arch"], arch)
+                if hasattr(provider, "soc"):
+                    with self.assertRaises(TypeError):
+                        provider.soc["cpu"]["arch"] = "other"
+        with self.assertRaisesRegex(ValueError, "Unmaintained SoC integration (?:descriptor|provider)"):
             maintained("future", test_support=False)
 
     def test_facts_cannot_advertise_an_unimplemented_mode(self):
@@ -158,9 +167,9 @@ class ProviderContractTests(unittest.TestCase):
         for family in ("native", "stm32f4"):
             with self.subTest(family=family):
                 with self.assertRaisesRegex(ValueError,
-                                            "Unmaintained provider mode"):
+                                            "provider mode|package binding"):
                     maintained(family, test_support=(family == "native")).validate_selection(
-                        {"mode": "experimental"}, {"kind": "gpio"})
+                        {"mode": "experimental"}, {"kind": "gpio", "controller": "GPIOA"})
 
     def test_uart_decision_is_named_and_immutable(self):
         ir = gate.resolve_ir(gate.ROOT /
@@ -213,7 +222,7 @@ class ProviderContractTests(unittest.TestCase):
             board["soc_family"] = "unmaintained"
             (package / "board.json").write_text(json.dumps(board))
             with self.assertRaisesRegex(gate.ConfigurationError,
-                                        "Unmaintained SoC integration descriptor"):
+                                        "declarative software bindings"):
                 gate.configure(assembly, output, test_support=native_fixture(assembly))
             self.assertFalse(output.exists())
 

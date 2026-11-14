@@ -1,37 +1,31 @@
-"""Exact F407 Host PHY/FIFO selection with explicit external electrical owner."""
+"""Selected Host PHY/FIFO capability and explicit external electrical owner."""
 from tools.configure.providers.common import fail, integer
-
-FS_PINS = (("PA11", "dm", 10), ("PA12", "dp", 10))
-HS_FS_PINS = (("PB14", "dm", 12), ("PB15", "dp", 12))
-ULPI_PINS = (("PA3", "d0", 10), ("PA5", "clk", 10),
-             ("PB0", "d1", 10), ("PB1", "d2", 10),
-             ("PB5", "d7", 10), ("PB10", "d3", 10),
-             ("PB11", "d4", 10), ("PB12", "d5", 10),
-             ("PB13", "d6", 10), ("PC0", "stp", 10),
-             ("PC2", "dir", 10), ("PC3", "nxt", 10))
-MODES = {"host-fs": ("OTG_FS", FS_PINS, 8, 320),
-         "host-hs-fs": ("OTG_HS", HS_FS_PINS, 12, 1024),
-         "host-hs-ulpi": ("OTG_HS", ULPI_PINS, 12, 1024)}
 FIELDS = frozenset(("channel_count", "rx_fifo_words",
                     "nonperiodic_fifo_words", "periodic_fifo_words", "engine",
                     "ulpi_clock_hz", "drain_timeout_us", "init_timeout_us",
                     "electrical_handover", "irq_priority"))
 
 
-def validate_clock(controller, frequency):
-    """RM0090 requires AHB above 14.2 MHz for FS and 30 MHz for HS."""
-    minimum = {"OTG_FS": 14200000, "OTG_HS": 30000000}.get(controller)
-    if minimum is None or frequency <= minimum:
+def validate_clock(controller, frequency, *, provider, kind=None, mode=None):
+    """Use the exact selected IP floor, independent of vendor/controller names."""
+    packet = getattr(provider, "PACKET", None)
+    if packet is None:
+        fail("USB clock requires a reviewed transport capability")
+    minimum = packet.clock_minimum(controller, kind=kind, mode=mode)
+    if frequency <= minimum:
         fail("USB actual AHB clock is below the selected core minimum")
 
 
 def validate_selection(selection, route, provider):
     """Reject a different PHY, powered-role inference or unsupported DMA path."""
-    if provider.PREFIX != "stm32" or selection["mode"] not in MODES:
-        fail("USB Host requires the maintained F407 HCD transport")
+    packet = getattr(provider, "PACKET", None)
+    capability = packet.admission("host", selection["mode"]) if packet is not None else None
+    if capability is None:
+        fail("USB Host requires a reviewed transport capability")
     if not FIELDS.issubset(selection):
         fail("USB Host requires explicit channels/FIFOs/DMA/power/IRQ/budgets")
-    controller, pins, channels, words = MODES[selection["mode"]]
+    controller, pins = capability["controller"], capability["pins"]
+    channels, words = capability["channel_count"], capability["fifo_words"]
     if (route["controller"] != controller or
             tuple((pin["pin"], pin["function"], pin["af"])
                   for pin in route["pins"]) != pins):
@@ -46,19 +40,19 @@ def validate_selection(selection, route, provider):
                     "USB Host pipe channel")
         if len(set(mapping)) != len(mapping):
             fail("USB Host pipe mapping repeats a physical channel")
-    integer(selection["rx_fifo_words"], 64, words, "USB Host RX FIFO")
-    integer(selection["nonperiodic_fifo_words"], 16, words,
+    minima = capability["fifo_minima"]
+    integer(selection["rx_fifo_words"], minima["rx"], words, "USB Host RX FIFO")
+    integer(selection["nonperiodic_fifo_words"], minima["nonperiodic"], words,
             "USB Host nonperiodic FIFO")
-    integer(selection["periodic_fifo_words"], 16, words,
+    integer(selection["periodic_fifo_words"], minima["periodic"], words,
             "USB Host periodic FIFO")
     if sum(selection[key] for key in ("rx_fifo_words",
            "nonperiodic_fifo_words", "periodic_fifo_words")) > (
-               words - (32 if selection["engine"] == "dma" else 0)):
+               words - (capability["dma_reserved_words"] if selection["engine"] == "dma" else 0)):
         fail("USB Host FIFOs exhaust the selected physical core")
-    if selection["engine"] not in {"pio", "dma"} or (
-            selection["engine"] == "dma" and controller == "OTG_FS"):
-        fail("USB Host DMA belongs only to the OTG_HS AHB master")
-    expected = 60000000 if selection["mode"] == "host-hs-ulpi" else 0
+    if selection["engine"] not in capability["engines"]:
+        fail("USB Host DMA/PIO transport is outside the reviewed capability")
+    expected = capability["ulpi_clock_hz"]
     integer(selection["ulpi_clock_hz"], expected, expected,
             "USB Host external ULPI clock")
     for key in ("drain_timeout_us", "init_timeout_us"):

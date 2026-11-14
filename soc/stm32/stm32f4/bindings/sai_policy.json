@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "bindings": [],
+  "domains": {
+    "sai": {
+      "mechanism": "free-frame-v1",
+      "controllers": {
+        "SAI1": {
+          "alternates": [
+            6
+          ],
+          "dma_roles": {
+            "A": [
+              "DMA2:stream1:channel0"
+            ],
+            "B": [
+              "DMA2:stream4:channel1"
+            ]
+          }
+        },
+        "SAI2": {
+          "alternates": [
+            10
+          ],
+          "dma_roles": {
+            "A": [
+              "DMA2:stream4:channel3"
+            ],
+            "B": [
+              "DMA2:stream6:channel3"
+            ]
+          }
+        }
+      },
+      "bounds": {
+        "slots": [
+          1,
+          16
+        ],
+        "frame_sync_bits": [
+          1,
+          128
+        ],
+        "first_bit_offset": [
+          0,
+          31
+        ],
+        "mckdiv": [
+          0,
+          15
+        ],
+        "max_bit_clock_hz": [
+          1,
+          24576000
+        ],
+        "poll_limit": [
+          1,
+          10000000
+        ]
+      },
+      "sample_bits": [
+        8,
+        10,
+        16,
+        20,
+        24,
+        32
+      ],
+      "slot_bits": [
+        8,
+        16,
+        32
+      ],
+      "frame_bits_max": 256,
+      "kernel": {
+        "plan": "pll_sai",
+        "output": "sai1",
+        "frequency": "kernel_hz"
+      },
+      "bus_clock": "apb2_hz",
+      "bus_margin": 2,
+      "frame_divider": 256,
+      "mclk_hz": [
+        2048000,
+        45000000
+      ]
+    }
+  }
+}

@@ -1,0 +1,1273 @@
+{
+  "schema_version": 1,
+  "custom_clock_profile": "custom",
+  "pinmux": {
+    "USART1": [
+      7
+    ],
+    "USART2": [
+      7
+    ],
+    "USART3": [
+      7
+    ],
+    "UART4": [
+      8
+    ],
+    "UART5": [
+      8
+    ],
+    "USART6": [
+      8
+    ],
+    "SPI1": [
+      5
+    ],
+    "SPI2": [
+      5
+    ],
+    "SPI3": [
+      6
+    ],
+    "I2C1": [
+      4
+    ],
+    "I2C2": [
+      4
+    ],
+    "I2C3": [
+      4
+    ]
+  },
+  "system": {
+    "oscillator_resources": {
+      "hse": [
+        "pin:PH0",
+        "pin:PH1"
+      ]
+    },
+    "timebase": {
+      "timer": "TIM2",
+      "irq": "TIM2_IRQn",
+      "gate": "RCC_APB1ENR_TIM2EN",
+      "reset": "RCC_APB1RSTR_TIM2RST",
+      "handler": "TIM2_IRQHandler",
+      "clock_domain": "apb1_timer",
+      "counter_bits": 32
+    }
+  },
+  "mode_exclusions": [
+    {
+      "device": "stm32f479",
+      "kind": "flash",
+      "option": "maintenance",
+      "equals": true,
+      "message": "F479 option maintenance has no reviewed OPTCR1 contract"
+    }
+  ],
+  "hardware": {
+    "controller_group": "rm0090-common",
+    "irq_device": "stm32f407",
+    "adc_channels": [
+      {
+        "controllers": [
+          "ADC1",
+          "ADC2"
+        ],
+        "pins": {
+          "PA0": 0,
+          "PA1": 1,
+          "PA2": 2,
+          "PA3": 3,
+          "PA4": 4,
+          "PA5": 5,
+          "PA6": 6,
+          "PA7": 7,
+          "PB0": 8,
+          "PB1": 9,
+          "PC0": 10,
+          "PC1": 11,
+          "PC2": 12,
+          "PC3": 13,
+          "PC4": 14,
+          "PC5": 15
+        }
+      },
+      {
+        "controllers": [
+          "ADC3"
+        ],
+        "pins": {
+          "PA0": 0,
+          "PA1": 1,
+          "PA2": 2,
+          "PA3": 3,
+          "PF6": 4,
+          "PF7": 5,
+          "PF8": 6,
+          "PF9": 7,
+          "PF10": 8,
+          "PF3": 9,
+          "PC0": 10,
+          "PC1": 11,
+          "PC2": 12,
+          "PC3": 13,
+          "PF4": 14,
+          "PF5": 15
+        }
+      }
+    ],
+    "adc_internal_channels": {
+      "ADC1": [
+        16,
+        17,
+        18
+      ]
+    },
+    "dac_channels": [
+      {
+        "controllers": [
+          "DAC"
+        ],
+        "pins": {
+          "PA4": 1,
+          "PA5": 2
+        }
+      }
+    ],
+    "pwm_timers": {
+      "TIM3": {
+        "apb": 1
+      },
+      "TIM4": {
+        "apb": 1
+      },
+      "TIM5": {
+        "apb": 1
+      },
+      "TIM9": {
+        "apb": 2
+      },
+      "TIM10": {
+        "apb": 2
+      },
+      "TIM11": {
+        "apb": 2
+      },
+      "TIM12": {
+        "apb": 1
+      },
+      "TIM13": {
+        "apb": 1
+      },
+      "TIM14": {
+        "apb": 1
+      }
+    },
+    "adc_triggers": {
+      "tim3-trgo": "TIM3",
+      "tim1-ch1": "TIM1",
+      "tim1-ch2": "TIM1",
+      "tim1-ch3": "TIM1",
+      "tim3-ch1": "TIM3",
+      "tim4-ch4": "TIM4",
+      "tim5-ch1": "TIM5",
+      "tim5-ch2": "TIM5",
+      "tim5-ch3": "TIM5",
+      "tim8-ch1": "TIM8",
+      "tim8-trgo": "TIM8"
+    },
+    "dac_dma_routes": {
+      "1": [
+        "DMA1:stream5:channel7"
+      ],
+      "2": [
+        "DMA1:stream6:channel7"
+      ],
+      "3": [
+        "DMA1:stream5:channel7"
+      ]
+    },
+    "controllers": [
+      {
+        "controller": "ADC123",
+        "route": "adc123-pa0-pa1-pa2-pa3",
+        "apb": 2
+      },
+      {
+        "controller": "USART1",
+        "route": "usart1-pa9-pa10"
+      },
+      {
+        "controller": "USART2",
+        "route": "usart2-pa2-pa3"
+      },
+      {
+        "controller": "USART3",
+        "route": "usart3-pb10-pb11"
+      },
+      {
+        "controller": "UART4",
+        "route": "uart4-pa0-pa1"
+      },
+      {
+        "controller": "UART5",
+        "route": "uart5-pc12-pd2"
+      },
+      {
+        "controller": "USART6",
+        "route": "usart6-pc6-pc7"
+      },
+      {
+        "controller": "SPI1",
+        "route": "spi1-pa5-pa6-pa7"
+      },
+      {
+        "controller": "SPI2",
+        "route": "spi2-pb13-pb14-pb15"
+      },
+      {
+        "controller": "SPI3",
+        "route": "spi3-pc10-pc11-pc12"
+      },
+      {
+        "controller": "I2C1",
+        "route": "i2c1-pb6-pb7",
+        "apb": 1
+      },
+      {
+        "controller": "I2C2",
+        "route": "i2c2-pb10-pb11",
+        "apb": 1
+      },
+      {
+        "controller": "I2C3",
+        "route": "i2c3-pa8-pc9",
+        "apb": 1
+      },
+      {
+        "controller": "ADC1",
+        "route": "adc1-ch0-pa0",
+        "apb": 2
+      },
+      {
+        "controller": "ADC2",
+        "route": "adc2-ch0-pa0",
+        "apb": 2
+      },
+      {
+        "controller": "ADC3",
+        "route": "adc3-ch0-pa0",
+        "apb": 2
+      }
+    ],
+    "secondary_controllers": [
+      "USART2",
+      "USART3",
+      "UART4",
+      "UART5",
+      "USART6",
+      "SPI2",
+      "SPI3",
+      "I2C3",
+      "I2C2"
+    ],
+    "dma_lanes": {
+      "dma:DMA1:stream0": {
+        "registers": "DMA1",
+        "stream": "DMA1_Stream0",
+        "irq": "DMA1_Stream0_IRQn",
+        "handler": "DMA1_Stream0_IRQHandler",
+        "flag_bank": "L",
+        "flag_shift": 0,
+        "status_member": "LISR",
+        "clear_member": "LIFCR"
+      },
+      "dma:DMA1:stream1": {
+        "registers": "DMA1",
+        "stream": "DMA1_Stream1",
+        "irq": "DMA1_Stream1_IRQn",
+        "handler": "DMA1_Stream1_IRQHandler",
+        "flag_bank": "L",
+        "flag_shift": 6,
+        "status_member": "LISR",
+        "clear_member": "LIFCR"
+      },
+      "dma:DMA1:stream2": {
+        "registers": "DMA1",
+        "stream": "DMA1_Stream2",
+        "irq": "DMA1_Stream2_IRQn",
+        "handler": "DMA1_Stream2_IRQHandler",
+        "flag_bank": "L",
+        "flag_shift": 16,
+        "status_member": "LISR",
+        "clear_member": "LIFCR"
+      },
+      "dma:DMA1:stream3": {
+        "registers": "DMA1",
+        "stream": "DMA1_Stream3",
+        "irq": "DMA1_Stream3_IRQn",
+        "handler": "DMA1_Stream3_IRQHandler",
+        "flag_bank": "L",
+        "flag_shift": 22,
+        "status_member": "LISR",
+        "clear_member": "LIFCR"
+      },
+      "dma:DMA1:stream4": {
+        "registers": "DMA1",
+        "stream": "DMA1_Stream4",
+        "irq": "DMA1_Stream4_IRQn",
+        "handler": "DMA1_Stream4_IRQHandler",
+        "flag_bank": "H",
+        "flag_shift": 0,
+        "status_member": "HISR",
+        "clear_member": "HIFCR"
+      },
+      "dma:DMA1:stream5": {
+        "registers": "DMA1",
+        "stream": "DMA1_Stream5",
+        "irq": "DMA1_Stream5_IRQn",
+        "handler": "DMA1_Stream5_IRQHandler",
+        "flag_bank": "H",
+        "flag_shift": 6,
+        "status_member": "HISR",
+        "clear_member": "HIFCR"
+      },
+      "dma:DMA1:stream6": {
+        "registers": "DMA1",
+        "stream": "DMA1_Stream6",
+        "irq": "DMA1_Stream6_IRQn",
+        "handler": "DMA1_Stream6_IRQHandler",
+        "flag_bank": "H",
+        "flag_shift": 16,
+        "status_member": "HISR",
+        "clear_member": "HIFCR"
+      },
+      "dma:DMA1:stream7": {
+        "registers": "DMA1",
+        "stream": "DMA1_Stream7",
+        "irq": "DMA1_Stream7_IRQn",
+        "handler": "DMA1_Stream7_IRQHandler",
+        "flag_bank": "H",
+        "flag_shift": 22,
+        "status_member": "HISR",
+        "clear_member": "HIFCR"
+      },
+      "dma:DMA2:stream0": {
+        "registers": "DMA2",
+        "stream": "DMA2_Stream0",
+        "irq": "DMA2_Stream0_IRQn",
+        "handler": "DMA2_Stream0_IRQHandler",
+        "flag_bank": "L",
+        "flag_shift": 0,
+        "status_member": "LISR",
+        "clear_member": "LIFCR"
+      },
+      "dma:DMA2:stream1": {
+        "registers": "DMA2",
+        "stream": "DMA2_Stream1",
+        "irq": "DMA2_Stream1_IRQn",
+        "handler": "DMA2_Stream1_IRQHandler",
+        "flag_bank": "L",
+        "flag_shift": 6,
+        "status_member": "LISR",
+        "clear_member": "LIFCR"
+      },
+      "dma:DMA2:stream2": {
+        "registers": "DMA2",
+        "stream": "DMA2_Stream2",
+        "irq": "DMA2_Stream2_IRQn",
+        "handler": "DMA2_Stream2_IRQHandler",
+        "flag_bank": "L",
+        "flag_shift": 16,
+        "status_member": "LISR",
+        "clear_member": "LIFCR"
+      },
+      "dma:DMA2:stream3": {
+        "registers": "DMA2",
+        "stream": "DMA2_Stream3",
+        "irq": "DMA2_Stream3_IRQn",
+        "handler": "DMA2_Stream3_IRQHandler",
+        "flag_bank": "L",
+        "flag_shift": 22,
+        "status_member": "LISR",
+        "clear_member": "LIFCR"
+      },
+      "dma:DMA2:stream4": {
+        "registers": "DMA2",
+        "stream": "DMA2_Stream4",
+        "irq": "DMA2_Stream4_IRQn",
+        "handler": "DMA2_Stream4_IRQHandler",
+        "flag_bank": "H",
+        "flag_shift": 0,
+        "status_member": "HISR",
+        "clear_member": "HIFCR"
+      },
+      "dma:DMA2:stream5": {
+        "registers": "DMA2",
+        "stream": "DMA2_Stream5",
+        "irq": "DMA2_Stream5_IRQn",
+        "handler": "DMA2_Stream5_IRQHandler",
+        "flag_bank": "H",
+        "flag_shift": 6,
+        "status_member": "HISR",
+        "clear_member": "HIFCR"
+      },
+      "dma:DMA2:stream6": {
+        "registers": "DMA2",
+        "stream": "DMA2_Stream6",
+        "irq": "DMA2_Stream6_IRQn",
+        "handler": "DMA2_Stream6_IRQHandler",
+        "flag_bank": "H",
+        "flag_shift": 16,
+        "status_member": "HISR",
+        "clear_member": "HIFCR"
+      },
+      "dma:DMA2:stream7": {
+        "registers": "DMA2",
+        "stream": "DMA2_Stream7",
+        "irq": "DMA2_Stream7_IRQn",
+        "handler": "DMA2_Stream7_IRQHandler",
+        "flag_bank": "H",
+        "flag_shift": 22,
+        "status_member": "HISR",
+        "clear_member": "HIFCR"
+      }
+    },
+    "protocol": "apb-numeric-stream-v1",
+    "channel_bounds": {
+      "adc": [
+        0,
+        15
+      ],
+      "adc_internal": [
+        16,
+        18
+      ],
+      "dac": [
+        1,
+        2
+      ],
+      "dac_masks": [
+        1,
+        3
+      ],
+      "pwm": [
+        1,
+        4
+      ],
+      "alternate": [
+        0,
+        15
+      ]
+    }
+  },
+  "software": {
+    "enum_abi": "short-enums",
+    "backends": [
+      "baremetal",
+      "freertos",
+      "threadx"
+    ],
+    "headers": [],
+    "bindings": [],
+    "freertos_port": "GCC/ARM_CM4F"
+  },
+  "pads": {
+    "PA0": {
+      "registers": "GPIOA",
+      "port_index": 0,
+      "number": 0
+    },
+    "PA1": {
+      "registers": "GPIOA",
+      "port_index": 0,
+      "number": 1
+    },
+    "PA2": {
+      "registers": "GPIOA",
+      "port_index": 0,
+      "number": 2
+    },
+    "PA3": {
+      "registers": "GPIOA",
+      "port_index": 0,
+      "number": 3
+    },
+    "PA4": {
+      "registers": "GPIOA",
+      "port_index": 0,
+      "number": 4
+    },
+    "PA5": {
+      "registers": "GPIOA",
+      "port_index": 0,
+      "number": 5
+    },
+    "PA6": {
+      "registers": "GPIOA",
+      "port_index": 0,
+      "number": 6
+    },
+    "PA7": {
+      "registers": "GPIOA",
+      "port_index": 0,
+      "number": 7
+    },
+    "PA8": {
+      "registers": "GPIOA",
+      "port_index": 0,
+      "number": 8
+    },
+    "PA9": {
+      "registers": "GPIOA",
+      "port_index": 0,
+      "number": 9
+    },
+    "PA10": {
+      "registers": "GPIOA",
+      "port_index": 0,
+      "number": 10
+    },
+    "PA11": {
+      "registers": "GPIOA",
+      "port_index": 0,
+      "number": 11
+    },
+    "PA12": {
+      "registers": "GPIOA",
+      "port_index": 0,
+      "number": 12
+    },
+    "PA13": {
+      "registers": "GPIOA",
+      "port_index": 0,
+      "number": 13
+    },
+    "PA14": {
+      "registers": "GPIOA",
+      "port_index": 0,
+      "number": 14
+    },
+    "PA15": {
+      "registers": "GPIOA",
+      "port_index": 0,
+      "number": 15
+    },
+    "PB0": {
+      "registers": "GPIOB",
+      "port_index": 1,
+      "number": 0
+    },
+    "PB1": {
+      "registers": "GPIOB",
+      "port_index": 1,
+      "number": 1
+    },
+    "PB2": {
+      "registers": "GPIOB",
+      "port_index": 1,
+      "number": 2
+    },
+    "PB3": {
+      "registers": "GPIOB",
+      "port_index": 1,
+      "number": 3
+    },
+    "PB4": {
+      "registers": "GPIOB",
+      "port_index": 1,
+      "number": 4
+    },
+    "PB5": {
+      "registers": "GPIOB",
+      "port_index": 1,
+      "number": 5
+    },
+    "PB6": {
+      "registers": "GPIOB",
+      "port_index": 1,
+      "number": 6
+    },
+    "PB7": {
+      "registers": "GPIOB",
+      "port_index": 1,
+      "number": 7
+    },
+    "PB8": {
+      "registers": "GPIOB",
+      "port_index": 1,
+      "number": 8
+    },
+    "PB9": {
+      "registers": "GPIOB",
+      "port_index": 1,
+      "number": 9
+    },
+    "PB10": {
+      "registers": "GPIOB",
+      "port_index": 1,
+      "number": 10
+    },
+    "PB11": {
+      "registers": "GPIOB",
+      "port_index": 1,
+      "number": 11
+    },
+    "PB12": {
+      "registers": "GPIOB",
+      "port_index": 1,
+      "number": 12
+    },
+    "PB13": {
+      "registers": "GPIOB",
+      "port_index": 1,
+      "number": 13
+    },
+    "PB14": {
+      "registers": "GPIOB",
+      "port_index": 1,
+      "number": 14
+    },
+    "PB15": {
+      "registers": "GPIOB",
+      "port_index": 1,
+      "number": 15
+    },
+    "PC0": {
+      "registers": "GPIOC",
+      "port_index": 2,
+      "number": 0
+    },
+    "PC1": {
+      "registers": "GPIOC",
+      "port_index": 2,
+      "number": 1
+    },
+    "PC2": {
+      "registers": "GPIOC",
+      "port_index": 2,
+      "number": 2
+    },
+    "PC3": {
+      "registers": "GPIOC",
+      "port_index": 2,
+      "number": 3
+    },
+    "PC4": {
+      "registers": "GPIOC",
+      "port_index": 2,
+      "number": 4
+    },
+    "PC5": {
+      "registers": "GPIOC",
+      "port_index": 2,
+      "number": 5
+    },
+    "PC6": {
+      "registers": "GPIOC",
+      "port_index": 2,
+      "number": 6
+    },
+    "PC7": {
+      "registers": "GPIOC",
+      "port_index": 2,
+      "number": 7
+    },
+    "PC8": {
+      "registers": "GPIOC",
+      "port_index": 2,
+      "number": 8
+    },
+    "PC9": {
+      "registers": "GPIOC",
+      "port_index": 2,
+      "number": 9
+    },
+    "PC10": {
+      "registers": "GPIOC",
+      "port_index": 2,
+      "number": 10
+    },
+    "PC11": {
+      "registers": "GPIOC",
+      "port_index": 2,
+      "number": 11
+    },
+    "PC12": {
+      "registers": "GPIOC",
+      "port_index": 2,
+      "number": 12
+    },
+    "PC13": {
+      "registers": "GPIOC",
+      "port_index": 2,
+      "number": 13
+    },
+    "PC14": {
+      "registers": "GPIOC",
+      "port_index": 2,
+      "number": 14
+    },
+    "PC15": {
+      "registers": "GPIOC",
+      "port_index": 2,
+      "number": 15
+    },
+    "PD0": {
+      "registers": "GPIOD",
+      "port_index": 3,
+      "number": 0
+    },
+    "PD1": {
+      "registers": "GPIOD",
+      "port_index": 3,
+      "number": 1
+    },
+    "PD2": {
+      "registers": "GPIOD",
+      "port_index": 3,
+      "number": 2
+    },
+    "PD3": {
+      "registers": "GPIOD",
+      "port_index": 3,
+      "number": 3
+    },
+    "PD4": {
+      "registers": "GPIOD",
+      "port_index": 3,
+      "number": 4
+    },
+    "PD5": {
+      "registers": "GPIOD",
+      "port_index": 3,
+      "number": 5
+    },
+    "PD6": {
+      "registers": "GPIOD",
+      "port_index": 3,
+      "number": 6
+    },
+    "PD7": {
+      "registers": "GPIOD",
+      "port_index": 3,
+      "number": 7
+    },
+    "PD8": {
+      "registers": "GPIOD",
+      "port_index": 3,
+      "number": 8
+    },
+    "PD9": {
+      "registers": "GPIOD",
+      "port_index": 3,
+      "number": 9
+    },
+    "PD10": {
+      "registers": "GPIOD",
+      "port_index": 3,
+      "number": 10
+    },
+    "PD11": {
+      "registers": "GPIOD",
+      "port_index": 3,
+      "number": 11
+    },
+    "PD12": {
+      "registers": "GPIOD",
+      "port_index": 3,
+      "number": 12
+    },
+    "PD13": {
+      "registers": "GPIOD",
+      "port_index": 3,
+      "number": 13
+    },
+    "PD14": {
+      "registers": "GPIOD",
+      "port_index": 3,
+      "number": 14
+    },
+    "PD15": {
+      "registers": "GPIOD",
+      "port_index": 3,
+      "number": 15
+    },
+    "PE0": {
+      "registers": "GPIOE",
+      "port_index": 4,
+      "number": 0
+    },
+    "PE1": {
+      "registers": "GPIOE",
+      "port_index": 4,
+      "number": 1
+    },
+    "PE2": {
+      "registers": "GPIOE",
+      "port_index": 4,
+      "number": 2
+    },
+    "PE3": {
+      "registers": "GPIOE",
+      "port_index": 4,
+      "number": 3
+    },
+    "PE4": {
+      "registers": "GPIOE",
+      "port_index": 4,
+      "number": 4
+    },
+    "PE5": {
+      "registers": "GPIOE",
+      "port_index": 4,
+      "number": 5
+    },
+    "PE6": {
+      "registers": "GPIOE",
+      "port_index": 4,
+      "number": 6
+    },
+    "PE7": {
+      "registers": "GPIOE",
+      "port_index": 4,
+      "number": 7
+    },
+    "PE8": {
+      "registers": "GPIOE",
+      "port_index": 4,
+      "number": 8
+    },
+    "PE9": {
+      "registers": "GPIOE",
+      "port_index": 4,
+      "number": 9
+    },
+    "PE10": {
+      "registers": "GPIOE",
+      "port_index": 4,
+      "number": 10
+    },
+    "PE11": {
+      "registers": "GPIOE",
+      "port_index": 4,
+      "number": 11
+    },
+    "PE12": {
+      "registers": "GPIOE",
+      "port_index": 4,
+      "number": 12
+    },
+    "PE13": {
+      "registers": "GPIOE",
+      "port_index": 4,
+      "number": 13
+    },
+    "PE14": {
+      "registers": "GPIOE",
+      "port_index": 4,
+      "number": 14
+    },
+    "PE15": {
+      "registers": "GPIOE",
+      "port_index": 4,
+      "number": 15
+    },
+    "PF0": {
+      "registers": "GPIOF",
+      "port_index": 5,
+      "number": 0
+    },
+    "PF1": {
+      "registers": "GPIOF",
+      "port_index": 5,
+      "number": 1
+    },
+    "PF2": {
+      "registers": "GPIOF",
+      "port_index": 5,
+      "number": 2
+    },
+    "PF3": {
+      "registers": "GPIOF",
+      "port_index": 5,
+      "number": 3
+    },
+    "PF4": {
+      "registers": "GPIOF",
+      "port_index": 5,
+      "number": 4
+    },
+    "PF5": {
+      "registers": "GPIOF",
+      "port_index": 5,
+      "number": 5
+    },
+    "PF6": {
+      "registers": "GPIOF",
+      "port_index": 5,
+      "number": 6
+    },
+    "PF7": {
+      "registers": "GPIOF",
+      "port_index": 5,
+      "number": 7
+    },
+    "PF8": {
+      "registers": "GPIOF",
+      "port_index": 5,
+      "number": 8
+    },
+    "PF9": {
+      "registers": "GPIOF",
+      "port_index": 5,
+      "number": 9
+    },
+    "PF10": {
+      "registers": "GPIOF",
+      "port_index": 5,
+      "number": 10
+    },
+    "PF11": {
+      "registers": "GPIOF",
+      "port_index": 5,
+      "number": 11
+    },
+    "PF12": {
+      "registers": "GPIOF",
+      "port_index": 5,
+      "number": 12
+    },
+    "PF13": {
+      "registers": "GPIOF",
+      "port_index": 5,
+      "number": 13
+    },
+    "PF14": {
+      "registers": "GPIOF",
+      "port_index": 5,
+      "number": 14
+    },
+    "PF15": {
+      "registers": "GPIOF",
+      "port_index": 5,
+      "number": 15
+    },
+    "PG0": {
+      "registers": "GPIOG",
+      "port_index": 6,
+      "number": 0
+    },
+    "PG1": {
+      "registers": "GPIOG",
+      "port_index": 6,
+      "number": 1
+    },
+    "PG2": {
+      "registers": "GPIOG",
+      "port_index": 6,
+      "number": 2
+    },
+    "PG3": {
+      "registers": "GPIOG",
+      "port_index": 6,
+      "number": 3
+    },
+    "PG4": {
+      "registers": "GPIOG",
+      "port_index": 6,
+      "number": 4
+    },
+    "PG5": {
+      "registers": "GPIOG",
+      "port_index": 6,
+      "number": 5
+    },
+    "PG6": {
+      "registers": "GPIOG",
+      "port_index": 6,
+      "number": 6
+    },
+    "PG7": {
+      "registers": "GPIOG",
+      "port_index": 6,
+      "number": 7
+    },
+    "PG8": {
+      "registers": "GPIOG",
+      "port_index": 6,
+      "number": 8
+    },
+    "PG9": {
+      "registers": "GPIOG",
+      "port_index": 6,
+      "number": 9
+    },
+    "PG10": {
+      "registers": "GPIOG",
+      "port_index": 6,
+      "number": 10
+    },
+    "PG11": {
+      "registers": "GPIOG",
+      "port_index": 6,
+      "number": 11
+    },
+    "PG12": {
+      "registers": "GPIOG",
+      "port_index": 6,
+      "number": 12
+    },
+    "PG13": {
+      "registers": "GPIOG",
+      "port_index": 6,
+      "number": 13
+    },
+    "PG14": {
+      "registers": "GPIOG",
+      "port_index": 6,
+      "number": 14
+    },
+    "PG15": {
+      "registers": "GPIOG",
+      "port_index": 6,
+      "number": 15
+    },
+    "PH0": {
+      "registers": "GPIOH",
+      "port_index": 7,
+      "number": 0
+    },
+    "PH1": {
+      "registers": "GPIOH",
+      "port_index": 7,
+      "number": 1
+    },
+    "PH2": {
+      "registers": "GPIOH",
+      "port_index": 7,
+      "number": 2
+    },
+    "PH3": {
+      "registers": "GPIOH",
+      "port_index": 7,
+      "number": 3
+    },
+    "PH4": {
+      "registers": "GPIOH",
+      "port_index": 7,
+      "number": 4
+    },
+    "PH5": {
+      "registers": "GPIOH",
+      "port_index": 7,
+      "number": 5
+    },
+    "PH6": {
+      "registers": "GPIOH",
+      "port_index": 7,
+      "number": 6
+    },
+    "PH7": {
+      "registers": "GPIOH",
+      "port_index": 7,
+      "number": 7
+    },
+    "PH8": {
+      "registers": "GPIOH",
+      "port_index": 7,
+      "number": 8
+    },
+    "PH9": {
+      "registers": "GPIOH",
+      "port_index": 7,
+      "number": 9
+    },
+    "PH10": {
+      "registers": "GPIOH",
+      "port_index": 7,
+      "number": 10
+    },
+    "PH11": {
+      "registers": "GPIOH",
+      "port_index": 7,
+      "number": 11
+    },
+    "PH12": {
+      "registers": "GPIOH",
+      "port_index": 7,
+      "number": 12
+    },
+    "PH13": {
+      "registers": "GPIOH",
+      "port_index": 7,
+      "number": 13
+    },
+    "PH14": {
+      "registers": "GPIOH",
+      "port_index": 7,
+      "number": 14
+    },
+    "PH15": {
+      "registers": "GPIOH",
+      "port_index": 7,
+      "number": 15
+    },
+    "PI0": {
+      "registers": "GPIOI",
+      "port_index": 8,
+      "number": 0
+    },
+    "PI1": {
+      "registers": "GPIOI",
+      "port_index": 8,
+      "number": 1
+    },
+    "PI2": {
+      "registers": "GPIOI",
+      "port_index": 8,
+      "number": 2
+    },
+    "PI3": {
+      "registers": "GPIOI",
+      "port_index": 8,
+      "number": 3
+    },
+    "PI4": {
+      "registers": "GPIOI",
+      "port_index": 8,
+      "number": 4
+    },
+    "PI5": {
+      "registers": "GPIOI",
+      "port_index": 8,
+      "number": 5
+    },
+    "PI6": {
+      "registers": "GPIOI",
+      "port_index": 8,
+      "number": 6
+    },
+    "PI7": {
+      "registers": "GPIOI",
+      "port_index": 8,
+      "number": 7
+    },
+    "PI8": {
+      "registers": "GPIOI",
+      "port_index": 8,
+      "number": 8
+    },
+    "PI9": {
+      "registers": "GPIOI",
+      "port_index": 8,
+      "number": 9
+    },
+    "PI10": {
+      "registers": "GPIOI",
+      "port_index": 8,
+      "number": 10
+    },
+    "PI11": {
+      "registers": "GPIOI",
+      "port_index": 8,
+      "number": 11
+    },
+    "PI12": {
+      "registers": "GPIOI",
+      "port_index": 8,
+      "number": 12
+    },
+    "PI13": {
+      "registers": "GPIOI",
+      "port_index": 8,
+      "number": 13
+    },
+    "PI14": {
+      "registers": "GPIOI",
+      "port_index": 8,
+      "number": 14
+    },
+    "PI15": {
+      "registers": "GPIOI",
+      "port_index": 8,
+      "number": 15
+    },
+    "PJ0": {
+      "registers": "GPIOJ",
+      "port_index": 9,
+      "number": 0
+    },
+    "PJ1": {
+      "registers": "GPIOJ",
+      "port_index": 9,
+      "number": 1
+    },
+    "PJ2": {
+      "registers": "GPIOJ",
+      "port_index": 9,
+      "number": 2
+    },
+    "PJ3": {
+      "registers": "GPIOJ",
+      "port_index": 9,
+      "number": 3
+    },
+    "PJ4": {
+      "registers": "GPIOJ",
+      "port_index": 9,
+      "number": 4
+    },
+    "PJ5": {
+      "registers": "GPIOJ",
+      "port_index": 9,
+      "number": 5
+    },
+    "PJ12": {
+      "registers": "GPIOJ",
+      "port_index": 9,
+      "number": 12
+    },
+    "PJ13": {
+      "registers": "GPIOJ",
+      "port_index": 9,
+      "number": 13
+    },
+    "PJ14": {
+      "registers": "GPIOJ",
+      "port_index": 9,
+      "number": 14
+    },
+    "PJ15": {
+      "registers": "GPIOJ",
+      "port_index": 9,
+      "number": 15
+    },
+    "PK3": {
+      "registers": "GPIOK",
+      "port_index": 10,
+      "number": 3
+    },
+    "PK4": {
+      "registers": "GPIOK",
+      "port_index": 10,
+      "number": 4
+    },
+    "PK5": {
+      "registers": "GPIOK",
+      "port_index": 10,
+      "number": 5
+    },
+    "PK6": {
+      "registers": "GPIOK",
+      "port_index": 10,
+      "number": 6
+    },
+    "PK7": {
+      "registers": "GPIOK",
+      "port_index": 10,
+      "number": 7
+    }
+  }
+}

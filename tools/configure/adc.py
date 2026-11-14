@@ -16,18 +16,15 @@ def validate_selection(selection, route, provider):
         integer(channel, 0, max((15, *internal)), "ADC channel")
     mapping = getattr(provider, "ADC_PIN_CHANNELS", None)
     if mapping is None:
-        expected = [int(pin["pin"][2:]) for pin in route["pins"]]
-    else:
-        expected = []
-        for pin in route["pins"]:
-            key = (route["controller"], pin["pin"])
-            if key not in mapping:
-                fail("ADC controller/pin lacks a reviewed channel mapping")
-            expected.append(mapping[key])
-        expected.extend(internal)
-    matches = (channels == expected if mapping is None
-               else set(channels).issubset(expected))
-    if not matches or not channels or len(channels) > 16:
+        fail("ADC controller/pin lacks a reviewed channel mapping")
+    expected = []
+    for pin in route["pins"]:
+        key = (route["controller"], pin["pin"])
+        if key not in mapping:
+            fail("ADC controller/pin lacks a reviewed channel mapping")
+        expected.append(mapping[key])
+    expected.extend(internal)
+    if not set(channels).issubset(expected) or not channels or len(channels) > 16:
         fail("ADC channel sequence differs from reviewed analog pins")
     samples = sequence(selection["sample_times"], "ADC sample_times")
     if len(samples) != len(channels):

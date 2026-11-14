@@ -1,0 +1,1353 @@
+{
+  "schema_version": 1,
+  "domains": {
+    "dac_triggers": {
+      "none": {
+        "kind": "none"
+      },
+      "software": {
+        "kind": "software"
+      },
+      "tim6-trgo": {
+        "kind": "timer",
+        "owner": "TIM6"
+      },
+      "tim7-trgo": {
+        "kind": "timer",
+        "owner": "TIM7"
+      },
+      "exti9": {
+        "kind": "external_event",
+        "owner": "EXTI9"
+      }
+    }
+  },
+  "bindings": [
+    {
+      "kind": "dac",
+      "mode": "direct",
+      "implementation": "dac",
+      "static_recipe": {
+        "state_type": "nx_stm32_dac_state_t",
+        "declarations": [
+          {
+            "role": "dac_config",
+            "type": "nx_stm32_dac_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "registers",
+                  {
+                    "symbol": "DAC"
+                  }
+                ],
+                [
+                  "channels",
+                  {
+                    "macro": "NX_STM32_DAC_CHANNEL_MASK",
+                    "args": [
+                      {
+                        "source": "item.options.channels.0"
+                      },
+                      {
+                        "source": "item.options.channels.1",
+                        "default": 0
+                      }
+                    ]
+                  }
+                ],
+                [
+                  "format",
+                  {
+                    "source": "item.options.format",
+                    "as": "symbol",
+                    "values": {
+                      "u8": "NX_DAC_FORMAT_U8",
+                      "u12-right": "NX_DAC_FORMAT_U12_RIGHT",
+                      "u12-left": "NX_DAC_FORMAT_U12_LEFT"
+                    }
+                  }
+                ],
+                [
+                  "mode",
+                  {
+                    "symbol": "NX_STM32_DAC_DIRECT"
+                  }
+                ],
+                [
+                  "trigger",
+                  {
+                    "source": "item.options.trigger",
+                    "as": "symbol",
+                    "values": {
+                      "none": "NX_STM32_DAC_TRIGGER_NONE",
+                      "software": "NX_STM32_DAC_TRIGGER_SOFTWARE",
+                      "tim6-trgo": "NX_STM32_DAC_TRIGGER_TIM6",
+                      "tim7-trgo": "NX_STM32_DAC_TRIGGER_TIM7",
+                      "exti9": "NX_STM32_DAC_TRIGGER_EXTI9"
+                    }
+                  }
+                ],
+                [
+                  "idle_codes",
+                  {
+                    "array": [
+                      {
+                        "macro": "NX_STM32_DAC_IDLE_CODE",
+                        "args": [
+                          1,
+                          {
+                            "source": "item.options.channels.0"
+                          },
+                          {
+                            "source": "item.options.channels.1",
+                            "default": 0
+                          },
+                          {
+                            "source": "item.options.idle_codes.0"
+                          },
+                          {
+                            "source": "item.options.idle_codes.1",
+                            "default": 0
+                          }
+                        ]
+                      },
+                      {
+                        "macro": "NX_STM32_DAC_IDLE_CODE",
+                        "args": [
+                          2,
+                          {
+                            "source": "item.options.channels.0"
+                          },
+                          {
+                            "source": "item.options.channels.1",
+                            "default": 0
+                          },
+                          {
+                            "source": "item.options.idle_codes.0"
+                          },
+                          {
+                            "source": "item.options.idle_codes.1",
+                            "default": 0
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                [
+                  "output_buffer",
+                  {
+                    "source": "item.options.output_buffer"
+                  }
+                ],
+                [
+                  "amplitude",
+                  {
+                    "source": "item.options.amplitude"
+                  }
+                ],
+                [
+                  "external",
+                  {
+                    "owner": {
+                      "source": "item.options.trigger_input",
+                      "role": "port"
+                    }
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "calls": {
+          "prepare": {
+            "function": "nx_stm32_dac_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "ref": "dac_config",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32_dac_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "retain_on_failed_init": true,
+        "ops": "nx_stm32_dac_ops"
+      },
+      "headers": [
+        "stm32f407_dac.h"
+      ]
+    },
+    {
+      "kind": "dac",
+      "mode": "triggered",
+      "implementation": "dac",
+      "static_recipe": {
+        "state_type": "nx_stm32_dac_state_t",
+        "declarations": [
+          {
+            "role": "dac_config",
+            "type": "nx_stm32_dac_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "registers",
+                  {
+                    "symbol": "DAC"
+                  }
+                ],
+                [
+                  "channels",
+                  {
+                    "macro": "NX_STM32_DAC_CHANNEL_MASK",
+                    "args": [
+                      {
+                        "source": "item.options.channels.0"
+                      },
+                      {
+                        "source": "item.options.channels.1",
+                        "default": 0
+                      }
+                    ]
+                  }
+                ],
+                [
+                  "format",
+                  {
+                    "source": "item.options.format",
+                    "as": "symbol",
+                    "values": {
+                      "u8": "NX_DAC_FORMAT_U8",
+                      "u12-right": "NX_DAC_FORMAT_U12_RIGHT",
+                      "u12-left": "NX_DAC_FORMAT_U12_LEFT"
+                    }
+                  }
+                ],
+                [
+                  "mode",
+                  {
+                    "symbol": "NX_STM32_DAC_TRIGGERED"
+                  }
+                ],
+                [
+                  "trigger",
+                  {
+                    "source": "item.options.trigger",
+                    "as": "symbol",
+                    "values": {
+                      "none": "NX_STM32_DAC_TRIGGER_NONE",
+                      "software": "NX_STM32_DAC_TRIGGER_SOFTWARE",
+                      "tim6-trgo": "NX_STM32_DAC_TRIGGER_TIM6",
+                      "tim7-trgo": "NX_STM32_DAC_TRIGGER_TIM7",
+                      "exti9": "NX_STM32_DAC_TRIGGER_EXTI9"
+                    }
+                  }
+                ],
+                [
+                  "idle_codes",
+                  {
+                    "array": [
+                      {
+                        "macro": "NX_STM32_DAC_IDLE_CODE",
+                        "args": [
+                          1,
+                          {
+                            "source": "item.options.channels.0"
+                          },
+                          {
+                            "source": "item.options.channels.1",
+                            "default": 0
+                          },
+                          {
+                            "source": "item.options.idle_codes.0"
+                          },
+                          {
+                            "source": "item.options.idle_codes.1",
+                            "default": 0
+                          }
+                        ]
+                      },
+                      {
+                        "macro": "NX_STM32_DAC_IDLE_CODE",
+                        "args": [
+                          2,
+                          {
+                            "source": "item.options.channels.0"
+                          },
+                          {
+                            "source": "item.options.channels.1",
+                            "default": 0
+                          },
+                          {
+                            "source": "item.options.idle_codes.0"
+                          },
+                          {
+                            "source": "item.options.idle_codes.1",
+                            "default": 0
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                [
+                  "output_buffer",
+                  {
+                    "source": "item.options.output_buffer"
+                  }
+                ],
+                [
+                  "amplitude",
+                  {
+                    "source": "item.options.amplitude"
+                  }
+                ],
+                [
+                  "external",
+                  {
+                    "owner": {
+                      "source": "item.options.trigger_input",
+                      "role": "port"
+                    }
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "calls": {
+          "prepare": {
+            "function": "nx_stm32_dac_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "ref": "dac_config",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32_dac_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "retain_on_failed_init": true,
+        "ops": "nx_stm32_dac_ops"
+      },
+      "headers": [
+        "stm32f407_dac.h"
+      ]
+    },
+    {
+      "kind": "dac",
+      "mode": "noise",
+      "implementation": "dac",
+      "static_recipe": {
+        "state_type": "nx_stm32_dac_state_t",
+        "declarations": [
+          {
+            "role": "dac_config",
+            "type": "nx_stm32_dac_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "registers",
+                  {
+                    "symbol": "DAC"
+                  }
+                ],
+                [
+                  "channels",
+                  {
+                    "macro": "NX_STM32_DAC_CHANNEL_MASK",
+                    "args": [
+                      {
+                        "source": "item.options.channels.0"
+                      },
+                      {
+                        "source": "item.options.channels.1",
+                        "default": 0
+                      }
+                    ]
+                  }
+                ],
+                [
+                  "format",
+                  {
+                    "source": "item.options.format",
+                    "as": "symbol",
+                    "values": {
+                      "u8": "NX_DAC_FORMAT_U8",
+                      "u12-right": "NX_DAC_FORMAT_U12_RIGHT",
+                      "u12-left": "NX_DAC_FORMAT_U12_LEFT"
+                    }
+                  }
+                ],
+                [
+                  "mode",
+                  {
+                    "symbol": "NX_STM32_DAC_NOISE"
+                  }
+                ],
+                [
+                  "trigger",
+                  {
+                    "source": "item.options.trigger",
+                    "as": "symbol",
+                    "values": {
+                      "none": "NX_STM32_DAC_TRIGGER_NONE",
+                      "software": "NX_STM32_DAC_TRIGGER_SOFTWARE",
+                      "tim6-trgo": "NX_STM32_DAC_TRIGGER_TIM6",
+                      "tim7-trgo": "NX_STM32_DAC_TRIGGER_TIM7",
+                      "exti9": "NX_STM32_DAC_TRIGGER_EXTI9"
+                    }
+                  }
+                ],
+                [
+                  "idle_codes",
+                  {
+                    "array": [
+                      {
+                        "macro": "NX_STM32_DAC_IDLE_CODE",
+                        "args": [
+                          1,
+                          {
+                            "source": "item.options.channels.0"
+                          },
+                          {
+                            "source": "item.options.channels.1",
+                            "default": 0
+                          },
+                          {
+                            "source": "item.options.idle_codes.0"
+                          },
+                          {
+                            "source": "item.options.idle_codes.1",
+                            "default": 0
+                          }
+                        ]
+                      },
+                      {
+                        "macro": "NX_STM32_DAC_IDLE_CODE",
+                        "args": [
+                          2,
+                          {
+                            "source": "item.options.channels.0"
+                          },
+                          {
+                            "source": "item.options.channels.1",
+                            "default": 0
+                          },
+                          {
+                            "source": "item.options.idle_codes.0"
+                          },
+                          {
+                            "source": "item.options.idle_codes.1",
+                            "default": 0
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                [
+                  "output_buffer",
+                  {
+                    "source": "item.options.output_buffer"
+                  }
+                ],
+                [
+                  "amplitude",
+                  {
+                    "source": "item.options.amplitude"
+                  }
+                ],
+                [
+                  "external",
+                  {
+                    "owner": {
+                      "source": "item.options.trigger_input",
+                      "role": "port"
+                    }
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "calls": {
+          "prepare": {
+            "function": "nx_stm32_dac_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "ref": "dac_config",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32_dac_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "retain_on_failed_init": true,
+        "ops": "nx_stm32_dac_ops"
+      },
+      "headers": [
+        "stm32f407_dac.h"
+      ]
+    },
+    {
+      "kind": "dac",
+      "mode": "triangle",
+      "implementation": "dac",
+      "static_recipe": {
+        "state_type": "nx_stm32_dac_state_t",
+        "declarations": [
+          {
+            "role": "dac_config",
+            "type": "nx_stm32_dac_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "registers",
+                  {
+                    "symbol": "DAC"
+                  }
+                ],
+                [
+                  "channels",
+                  {
+                    "macro": "NX_STM32_DAC_CHANNEL_MASK",
+                    "args": [
+                      {
+                        "source": "item.options.channels.0"
+                      },
+                      {
+                        "source": "item.options.channels.1",
+                        "default": 0
+                      }
+                    ]
+                  }
+                ],
+                [
+                  "format",
+                  {
+                    "source": "item.options.format",
+                    "as": "symbol",
+                    "values": {
+                      "u8": "NX_DAC_FORMAT_U8",
+                      "u12-right": "NX_DAC_FORMAT_U12_RIGHT",
+                      "u12-left": "NX_DAC_FORMAT_U12_LEFT"
+                    }
+                  }
+                ],
+                [
+                  "mode",
+                  {
+                    "symbol": "NX_STM32_DAC_TRIANGLE"
+                  }
+                ],
+                [
+                  "trigger",
+                  {
+                    "source": "item.options.trigger",
+                    "as": "symbol",
+                    "values": {
+                      "none": "NX_STM32_DAC_TRIGGER_NONE",
+                      "software": "NX_STM32_DAC_TRIGGER_SOFTWARE",
+                      "tim6-trgo": "NX_STM32_DAC_TRIGGER_TIM6",
+                      "tim7-trgo": "NX_STM32_DAC_TRIGGER_TIM7",
+                      "exti9": "NX_STM32_DAC_TRIGGER_EXTI9"
+                    }
+                  }
+                ],
+                [
+                  "idle_codes",
+                  {
+                    "array": [
+                      {
+                        "macro": "NX_STM32_DAC_IDLE_CODE",
+                        "args": [
+                          1,
+                          {
+                            "source": "item.options.channels.0"
+                          },
+                          {
+                            "source": "item.options.channels.1",
+                            "default": 0
+                          },
+                          {
+                            "source": "item.options.idle_codes.0"
+                          },
+                          {
+                            "source": "item.options.idle_codes.1",
+                            "default": 0
+                          }
+                        ]
+                      },
+                      {
+                        "macro": "NX_STM32_DAC_IDLE_CODE",
+                        "args": [
+                          2,
+                          {
+                            "source": "item.options.channels.0"
+                          },
+                          {
+                            "source": "item.options.channels.1",
+                            "default": 0
+                          },
+                          {
+                            "source": "item.options.idle_codes.0"
+                          },
+                          {
+                            "source": "item.options.idle_codes.1",
+                            "default": 0
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                [
+                  "output_buffer",
+                  {
+                    "source": "item.options.output_buffer"
+                  }
+                ],
+                [
+                  "amplitude",
+                  {
+                    "source": "item.options.amplitude"
+                  }
+                ],
+                [
+                  "external",
+                  {
+                    "owner": {
+                      "source": "item.options.trigger_input",
+                      "role": "port"
+                    }
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "calls": {
+          "prepare": {
+            "function": "nx_stm32_dac_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "ref": "dac_config",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32_dac_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "retain_on_failed_init": true,
+        "ops": "nx_stm32_dac_ops"
+      },
+      "headers": [
+        "stm32f407_dac.h"
+      ]
+    },
+    {
+      "kind": "dac",
+      "mode": "trigger-dma",
+      "implementation": "dac_dma",
+      "static_recipe": {
+        "state_type": "nx_stm32_dac_dma_state_t",
+        "declarations": [
+          {
+            "role": "dma_regions",
+            "type": "nx_dma_memory_region_t",
+            "const": true,
+            "count": {
+              "length": "selected.readable_regions",
+              "limit": 16
+            },
+            "value": {
+              "map": {
+                "source": "selected.readable_regions",
+                "limit": 16,
+                "value": {
+                  "record": [
+                    [
+                      "begin",
+                      {
+                        "source": "entry.begin"
+                      }
+                    ],
+                    [
+                      "size",
+                      {
+                        "source": "entry.size"
+                      }
+                    ],
+                    [
+                      "permissions",
+                      {
+                        "source": "entry.permissions",
+                        "as": "static"
+                      }
+                    ]
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "role": "dac_config",
+            "type": "nx_stm32_dac_dma_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "dac",
+                  {
+                    "record": [
+                      [
+                        "registers",
+                        {
+                          "symbol": "DAC"
+                        }
+                      ],
+                      [
+                        "channels",
+                        {
+                          "macro": "NX_STM32_DAC_CHANNEL_MASK",
+                          "args": [
+                            {
+                              "source": "item.options.channels.0"
+                            },
+                            {
+                              "source": "item.options.channels.1",
+                              "default": 0
+                            }
+                          ]
+                        }
+                      ],
+                      [
+                        "format",
+                        {
+                          "source": "item.options.format",
+                          "as": "symbol",
+                          "values": {
+                            "u8": "NX_DAC_FORMAT_U8",
+                            "u12-right": "NX_DAC_FORMAT_U12_RIGHT",
+                            "u12-left": "NX_DAC_FORMAT_U12_LEFT"
+                          }
+                        }
+                      ],
+                      [
+                        "mode",
+                        {
+                          "symbol": "NX_STM32_DAC_TRIGGERED"
+                        }
+                      ],
+                      [
+                        "trigger",
+                        {
+                          "source": "item.options.trigger",
+                          "as": "symbol",
+                          "values": {
+                            "none": "NX_STM32_DAC_TRIGGER_NONE",
+                            "software": "NX_STM32_DAC_TRIGGER_SOFTWARE",
+                            "tim6-trgo": "NX_STM32_DAC_TRIGGER_TIM6",
+                            "tim7-trgo": "NX_STM32_DAC_TRIGGER_TIM7",
+                            "exti9": "NX_STM32_DAC_TRIGGER_EXTI9"
+                          }
+                        }
+                      ],
+                      [
+                        "idle_codes",
+                        {
+                          "array": [
+                            {
+                              "macro": "NX_STM32_DAC_IDLE_CODE",
+                              "args": [
+                                1,
+                                {
+                                  "source": "item.options.channels.0"
+                                },
+                                {
+                                  "source": "item.options.channels.1",
+                                  "default": 0
+                                },
+                                {
+                                  "source": "item.options.idle_codes.0"
+                                },
+                                {
+                                  "source": "item.options.idle_codes.1",
+                                  "default": 0
+                                }
+                              ]
+                            },
+                            {
+                              "macro": "NX_STM32_DAC_IDLE_CODE",
+                              "args": [
+                                2,
+                                {
+                                  "source": "item.options.channels.0"
+                                },
+                                {
+                                  "source": "item.options.channels.1",
+                                  "default": 0
+                                },
+                                {
+                                  "source": "item.options.idle_codes.0"
+                                },
+                                {
+                                  "source": "item.options.idle_codes.1",
+                                  "default": 0
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ],
+                      [
+                        "output_buffer",
+                        {
+                          "source": "item.options.output_buffer"
+                        }
+                      ],
+                      [
+                        "amplitude",
+                        {
+                          "source": "item.options.amplitude"
+                        }
+                      ],
+                      [
+                        "external",
+                        {
+                          "owner": {
+                            "source": "item.options.trigger_input",
+                            "role": "port"
+                          }
+                        }
+                      ]
+                    ]
+                  }
+                ],
+                [
+                  "regions",
+                  {
+                    "ref": "dma_regions",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "region_count",
+                  {
+                    "length": "selected.readable_regions",
+                    "limit": 16
+                  }
+                ],
+                [
+                  "priority",
+                  {
+                    "source": "item.options.irq.priority"
+                  }
+                ],
+                [
+                  "kernel_bound",
+                  {
+                    "source": "item.options.irq.calls_os"
+                  }
+                ],
+                [
+                  "circular",
+                  false
+                ],
+                [
+                  "recovery_trigger",
+                  {
+                    "source": "item.options.recovery_trigger",
+                    "as": "symbol",
+                    "values": {
+                      "none": "NX_STM32_DAC_TRIGGER_NONE",
+                      "software": "NX_STM32_DAC_TRIGGER_SOFTWARE",
+                      "tim6-trgo": "NX_STM32_DAC_TRIGGER_TIM6",
+                      "tim7-trgo": "NX_STM32_DAC_TRIGGER_TIM7",
+                      "exti9": "NX_STM32_DAC_TRIGGER_EXTI9"
+                    },
+                    "default": {
+                      "symbol": "NX_STM32_DAC_TRIGGER_NONE"
+                    }
+                  }
+                ]
+              ]
+            }
+          },
+          {
+            "role": "dac_tx",
+            "type": "nx_dac_tx_port_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "ops",
+                  {
+                    "address": "nx_stm32_dac_dma_tx_ops"
+                  }
+                ],
+                [
+                  "context",
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "calls": {
+          "prepare": {
+            "function": "nx_stm32_dac_dma_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "ref": "dac_config",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32_dac_dma_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "retain_on_failed_init": true,
+        "irq": [
+          {
+            "name": {
+              "source": "selected.dma_bindings.0.handler",
+              "as": "symbol"
+            },
+            "calls": [
+              {
+                "function": "nx_stm32_dac_dma_irq",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  }
+                ]
+              }
+            ],
+            "barrier": "nx_arch_dsb"
+          },
+          {
+            "name": "TIM6_DAC_IRQHandler",
+            "calls": [
+              {
+                "function": "nx_stm32_dac_dma_irq",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  }
+                ]
+              }
+            ],
+            "barrier": "nx_arch_dsb"
+          }
+        ],
+        "ops": "nx_stm32_dac_dma_ops"
+      },
+      "headers": [
+        "stm32f407_dac.h",
+        "stm32f407_dac_dma.h"
+      ]
+    },
+    {
+      "kind": "dac",
+      "mode": "trigger-dma-circular",
+      "implementation": "dac_dma",
+      "static_recipe": {
+        "state_type": "nx_stm32_dac_dma_state_t",
+        "declarations": [
+          {
+            "role": "dma_regions",
+            "type": "nx_dma_memory_region_t",
+            "const": true,
+            "count": {
+              "length": "selected.readable_regions",
+              "limit": 16
+            },
+            "value": {
+              "map": {
+                "source": "selected.readable_regions",
+                "limit": 16,
+                "value": {
+                  "record": [
+                    [
+                      "begin",
+                      {
+                        "source": "entry.begin"
+                      }
+                    ],
+                    [
+                      "size",
+                      {
+                        "source": "entry.size"
+                      }
+                    ],
+                    [
+                      "permissions",
+                      {
+                        "source": "entry.permissions",
+                        "as": "static"
+                      }
+                    ]
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "role": "dac_config",
+            "type": "nx_stm32_dac_dma_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "dac",
+                  {
+                    "record": [
+                      [
+                        "registers",
+                        {
+                          "symbol": "DAC"
+                        }
+                      ],
+                      [
+                        "channels",
+                        {
+                          "macro": "NX_STM32_DAC_CHANNEL_MASK",
+                          "args": [
+                            {
+                              "source": "item.options.channels.0"
+                            },
+                            {
+                              "source": "item.options.channels.1",
+                              "default": 0
+                            }
+                          ]
+                        }
+                      ],
+                      [
+                        "format",
+                        {
+                          "source": "item.options.format",
+                          "as": "symbol",
+                          "values": {
+                            "u8": "NX_DAC_FORMAT_U8",
+                            "u12-right": "NX_DAC_FORMAT_U12_RIGHT",
+                            "u12-left": "NX_DAC_FORMAT_U12_LEFT"
+                          }
+                        }
+                      ],
+                      [
+                        "mode",
+                        {
+                          "symbol": "NX_STM32_DAC_TRIGGERED"
+                        }
+                      ],
+                      [
+                        "trigger",
+                        {
+                          "source": "item.options.trigger",
+                          "as": "symbol",
+                          "values": {
+                            "none": "NX_STM32_DAC_TRIGGER_NONE",
+                            "software": "NX_STM32_DAC_TRIGGER_SOFTWARE",
+                            "tim6-trgo": "NX_STM32_DAC_TRIGGER_TIM6",
+                            "tim7-trgo": "NX_STM32_DAC_TRIGGER_TIM7",
+                            "exti9": "NX_STM32_DAC_TRIGGER_EXTI9"
+                          }
+                        }
+                      ],
+                      [
+                        "idle_codes",
+                        {
+                          "array": [
+                            {
+                              "macro": "NX_STM32_DAC_IDLE_CODE",
+                              "args": [
+                                1,
+                                {
+                                  "source": "item.options.channels.0"
+                                },
+                                {
+                                  "source": "item.options.channels.1",
+                                  "default": 0
+                                },
+                                {
+                                  "source": "item.options.idle_codes.0"
+                                },
+                                {
+                                  "source": "item.options.idle_codes.1",
+                                  "default": 0
+                                }
+                              ]
+                            },
+                            {
+                              "macro": "NX_STM32_DAC_IDLE_CODE",
+                              "args": [
+                                2,
+                                {
+                                  "source": "item.options.channels.0"
+                                },
+                                {
+                                  "source": "item.options.channels.1",
+                                  "default": 0
+                                },
+                                {
+                                  "source": "item.options.idle_codes.0"
+                                },
+                                {
+                                  "source": "item.options.idle_codes.1",
+                                  "default": 0
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ],
+                      [
+                        "output_buffer",
+                        {
+                          "source": "item.options.output_buffer"
+                        }
+                      ],
+                      [
+                        "amplitude",
+                        {
+                          "source": "item.options.amplitude"
+                        }
+                      ],
+                      [
+                        "external",
+                        {
+                          "owner": {
+                            "source": "item.options.trigger_input",
+                            "role": "port"
+                          }
+                        }
+                      ]
+                    ]
+                  }
+                ],
+                [
+                  "regions",
+                  {
+                    "ref": "dma_regions",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "region_count",
+                  {
+                    "length": "selected.readable_regions",
+                    "limit": 16
+                  }
+                ],
+                [
+                  "priority",
+                  {
+                    "source": "item.options.irq.priority"
+                  }
+                ],
+                [
+                  "kernel_bound",
+                  {
+                    "source": "item.options.irq.calls_os"
+                  }
+                ],
+                [
+                  "circular",
+                  true
+                ],
+                [
+                  "recovery_trigger",
+                  {
+                    "source": "item.options.recovery_trigger",
+                    "as": "symbol",
+                    "values": {
+                      "none": "NX_STM32_DAC_TRIGGER_NONE",
+                      "software": "NX_STM32_DAC_TRIGGER_SOFTWARE",
+                      "tim6-trgo": "NX_STM32_DAC_TRIGGER_TIM6",
+                      "tim7-trgo": "NX_STM32_DAC_TRIGGER_TIM7",
+                      "exti9": "NX_STM32_DAC_TRIGGER_EXTI9"
+                    },
+                    "default": {
+                      "symbol": "NX_STM32_DAC_TRIGGER_NONE"
+                    }
+                  }
+                ]
+              ]
+            }
+          },
+          {
+            "role": "dac_tx",
+            "type": "nx_dac_tx_port_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "ops",
+                  {
+                    "address": "nx_stm32_dac_dma_tx_ops"
+                  }
+                ],
+                [
+                  "context",
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "calls": {
+          "prepare": {
+            "function": "nx_stm32_dac_dma_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "ref": "dac_config",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32_dac_dma_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "retain_on_failed_init": true,
+        "irq": [
+          {
+            "name": {
+              "source": "selected.dma_bindings.0.handler",
+              "as": "symbol"
+            },
+            "calls": [
+              {
+                "function": "nx_stm32_dac_dma_irq",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  }
+                ]
+              }
+            ],
+            "barrier": "nx_arch_dsb"
+          },
+          {
+            "name": "TIM6_DAC_IRQHandler",
+            "calls": [
+              {
+                "function": "nx_stm32_dac_dma_irq",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  }
+                ]
+              }
+            ],
+            "barrier": "nx_arch_dsb"
+          }
+        ],
+        "ops": "nx_stm32_dac_dma_ops"
+      },
+      "headers": [
+        "stm32f407_dac.h",
+        "stm32f407_dac_dma.h"
+      ]
+    }
+  ]
+}

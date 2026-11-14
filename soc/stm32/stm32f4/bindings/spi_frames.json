@@ -1,0 +1,392 @@
+{
+  "schema_version": 1,
+  "bindings": [
+    {
+      "kind": "spi",
+      "mode": "irq-frames",
+      "controllers": [
+        "SPI1",
+        "SPI2",
+        "SPI3"
+      ],
+      "implementation": "spi_frames",
+      "headers": [
+        "stm32f407_spi_frames.h",
+        "stm32f4_io_encoding.h"
+      ],
+      "static_recipe": {
+        "state_type": "nx_stm32_spi_frames_state_t",
+        "ops": "nx_stm32_spi_frames_ops",
+        "declarations": [
+          {
+            "role": "spi_frames_cold",
+            "type": "nx_stm32_spi_frames_cold_t",
+            "const": false
+          },
+          {
+            "role": "spi_frames_pin_state",
+            "type": "uint16_t",
+            "const": false,
+            "count": {
+              "length": "selected.pads",
+              "limit": 4
+            }
+          },
+          {
+            "role": "spi_frames_pins",
+            "type": "nx_stm32_spi_pin_config_t",
+            "const": true,
+            "value": {
+              "map": {
+                "source": "selected.pads",
+                "limit": 4,
+                "value": {
+                  "record": [
+                    [
+                      "registers",
+                      {
+                        "source": "entry.registers",
+                        "as": "symbol"
+                      }
+                    ],
+                    [
+                      "snapshot",
+                      {
+                        "ref": "spi_frames_pin_state",
+                        "as": "address",
+                        "index": {
+                          "source": "index",
+                          "as": "u32"
+                        }
+                      }
+                    ],
+                    [
+                      "port_index",
+                      {
+                        "source": "entry.port_index",
+                        "as": "u32"
+                      }
+                    ],
+                    [
+                      "pin",
+                      {
+                        "source": "entry.number",
+                        "as": "u32"
+                      }
+                    ],
+                    [
+                      "alternate",
+                      {
+                        "source": "entry.alternate",
+                        "as": "u32"
+                      }
+                    ]
+                  ]
+                }
+              }
+            },
+            "count": {
+              "length": "selected.pads",
+              "limit": 4
+            }
+          },
+          {
+            "role": "spi_frames_config",
+            "type": "nx_stm32_spi_frames_cold_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "engine",
+                  {
+                    "record": [
+                      [
+                        "registers",
+                        {
+                          "source": "item.controller",
+                          "as": "symbol"
+                        }
+                      ],
+                      [
+                        "rcc",
+                        {
+                          "symbol": "RCC"
+                        }
+                      ],
+                      [
+                        "nss_gpio",
+                        {
+                          "source": "selected.named_pads.nss.registers",
+                          "as": "symbol"
+                        }
+                      ],
+                      [
+                        "sck_gpio",
+                        {
+                          "source": "selected.named_pads.sck.registers",
+                          "as": "symbol"
+                        }
+                      ],
+                      [
+                        "nss_mask",
+                        {
+                          "macro": "NX_STM32_IO_PIN_MASK",
+                          "args": [
+                            {
+                              "source": "selected.named_pads.nss.number",
+                              "as": "u32"
+                            }
+                          ]
+                        }
+                      ],
+                      [
+                        "sck_mask",
+                        {
+                          "macro": "NX_STM32_IO_PIN_MASK",
+                          "args": [
+                            {
+                              "source": "selected.named_pads.sck.number",
+                              "as": "u32"
+                            }
+                          ]
+                        }
+                      ],
+                      [
+                        "clock_hz",
+                        {
+                          "source": "selected.clock_hz",
+                          "as": "u32"
+                        }
+                      ],
+                      [
+                        "maximum_hz",
+                        {
+                          "source": "item.options.max_hz",
+                          "as": "u32"
+                        }
+                      ],
+                      [
+                        "wire",
+                        {
+                          "record": [
+                            [
+                              "role",
+                              {
+                                "source": "item.options.frames.role",
+                                "as": "symbol",
+                                "values": {
+                                  "master": {
+                                    "symbol": "NX_SPI_FRAMES_MASTER"
+                                  },
+                                  "slave": {
+                                    "symbol": "NX_SPI_FRAMES_SLAVE"
+                                  }
+                                }
+                              }
+                            ],
+                            [
+                              "lines",
+                              {
+                                "source": "item.options.frames.lines",
+                                "as": "symbol",
+                                "values": {
+                                  "two-line": {
+                                    "symbol": "NX_SPI_FRAMES_TWO_LINE"
+                                  },
+                                  "receive-only": {
+                                    "symbol": "NX_SPI_FRAMES_RECEIVE_ONLY"
+                                  },
+                                  "one-wire": {
+                                    "symbol": "NX_SPI_FRAMES_ONE_WIRE"
+                                  }
+                                }
+                              }
+                            ],
+                            [
+                              "format",
+                              {
+                                "source": "item.options.frames.format",
+                                "as": "symbol",
+                                "values": {
+                                  "motorola": {
+                                    "symbol": "NX_SPI_FRAMES_MOTOROLA"
+                                  },
+                                  "ti": {
+                                    "symbol": "NX_SPI_FRAMES_TI"
+                                  }
+                                }
+                              }
+                            ],
+                            [
+                              "word_bits",
+                              {
+                                "source": "item.options.frames.word_bits",
+                                "as": "u32"
+                              }
+                            ],
+                            [
+                              "crc_polynomial",
+                              {
+                                "source": "item.options.frames.crc_polynomial",
+                                "as": "u32"
+                              }
+                            ],
+                            [
+                              "dummy",
+                              {
+                                "source": "item.options.frames.dummy",
+                                "as": "u32"
+                              }
+                            ],
+                            [
+                              "mode",
+                              {
+                                "source": "item.options.frames.mode",
+                                "as": "u32"
+                              }
+                            ],
+                            [
+                              "lsb_first",
+                              {
+                                "source": "item.options.frames.lsb_first",
+                                "as": "bool"
+                              }
+                            ],
+                            [
+                              "irq_latency_us",
+                              {
+                                "source": "item.options.frames.irq_latency_us",
+                                "as": "u32"
+                              }
+                            ]
+                          ]
+                        }
+                      ],
+                      [
+                        "irq",
+                        {
+                          "source": "selected.vector_bindings.0.irq",
+                          "as": "symbol"
+                        }
+                      ],
+                      [
+                        "priority",
+                        {
+                          "source": "selected.irq.priority",
+                          "as": "u32"
+                        }
+                      ]
+                    ]
+                  }
+                ],
+                [
+                  "pins",
+                  {
+                    "ref": "spi_frames_pins",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "pin_count",
+                  {
+                    "length": "selected.pads",
+                    "limit": 4
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "calls": {
+          "admit": [
+            {
+              "function": "nx_stm32_spi_frames_admit",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "ref": "spi_frames_config",
+                  "as": "address"
+                },
+                {
+                  "ref": "spi_frames_cold",
+                  "as": "address"
+                }
+              ]
+            }
+          ],
+          "prepare": {
+            "function": "nx_stm32_spi_frames_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "ref": "spi_frames_config",
+                "as": "address"
+              },
+              {
+                "ref": "spi_frames_cold",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32_spi_frames_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "ref": "spi_frames_config",
+                  "as": "address"
+                },
+                {
+                  "ref": "spi_frames_cold",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "irq": [
+          {
+            "map": {
+              "source": "selected.vector_bindings",
+              "limit": 8,
+              "value": {
+                "name": {
+                  "source": "entry.handler",
+                  "as": "symbol"
+                },
+                "calls": [
+                  {
+                    "function": "nx_stm32_spi_frames_irq",
+                    "args": [
+                      {
+                        "ref": "port",
+                        "as": "address"
+                      }
+                    ]
+                  }
+                ],
+                "barrier": "nx_arch_dsb"
+              }
+            }
+          }
+        ],
+        "pin_snapshots": {
+          "source": "selected.pads",
+          "key": "entry.identity",
+          "array_role": "spi_frames_pin_state",
+          "limit": 4
+        }
+      }
+    }
+  ]
+}

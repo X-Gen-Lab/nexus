@@ -24,6 +24,36 @@ from tools.configure.metadata import load_policy
 GIT_FIXTURE_OPTIONS = ("-c", "maintenance.auto=false", "-c", "gc.auto=0",
                        "-c", "maintenance.autoDetach=false",
                        "-c", "gc.autoDetach=false")
+
+
+def snapshot_package(repository, *, dependencies=None):
+    """Declare source ownership without claiming an executable MCU provider."""
+    manifest = "soc/snapshot_fixture/package.json"
+    policy = load_policy(ROOT)
+    policy["source_sdk"] = {**policy["source_sdk"],
+                            "default_package_manifests": [manifest]}
+    files = {
+        "dependencies/platform-compatibility.json": json.dumps(policy),
+        manifest: json.dumps({
+            "schema_version": 1, "interface_version": 1,
+            "id": "snapshot_fixture", "family": "snapshot_fixture",
+            "vendor": "fixture", "source_directory": ".",
+            "facts": {"soc": "soc.json", "routes": "routes.json"},
+            "dependencies": {} if dependencies is None else dependencies,
+            "cmake": {"entry": "CMakeLists.txt", "target": "snapshot_fixture"},
+            "exports": {"roots": ["."], "exclude": []},
+            "scope": "reference"}),
+        "soc/snapshot_fixture/soc.json": "{}\n",
+        "soc/snapshot_fixture/routes.json": "{}\n",
+        "soc/snapshot_fixture/CMakeLists.txt": "# Source-selection fixture only.\n",
+    }
+    for name, contents in files.items():
+        path = repository / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(contents)
+    return set(files)
+
+
 OFFICIAL_F4_VERIFIED_FILES = frozenset({
     "Inc/stm32f4xx_hal_cryp.h",
     "Inc/stm32f4xx_hal_dma2d.h",
@@ -200,10 +230,11 @@ class SourceSDKSelectionTests(unittest.TestCase):
                 target.parent.mkdir(parents=True, exist_ok=True)
                 target.write_bytes(payload)
                 exports[name] = hashlib.sha256(payload).hexdigest()
-            identity = {"schema": 2, "profile": source_sdk.source_profile(), "kind": "nexus-installed-source-sdk",
+            identity = {"schema": 3, "profile": source_sdk.source_profile(), "kind": "nexus-installed-source-sdk",
                 "source_revision": "a" * 40, "source_tree": "b" * 40,
                 "publishable": True, "source_dirty": False,
                 "files_sha256": files, "dependencies": [],
+                "source_exports": source_sdk.source_export_declaration(ROOT, files),
                 "reviewed_imports": [], "package_files_sha256": exports,
                 "toolchains_lock_sha256": files["dependencies/toolchains.lock.json"]}
 
@@ -292,7 +323,8 @@ class SourceSDKSelectionTests(unittest.TestCase):
 
     def test_selected_f407_audio_public_closure_is_required(self):
         required = {
-            "tools/configure/stm32f4/capture_audio.py",
+            "tools/configure/policies/capture_audio.py",
+            "soc/stm32/stm32f4/bindings/capture_audio_policy.json",
             "soc/stm32/stm32f4/drivers/audio.c",
             "soc/stm32/stm32f4/drivers/av.c",
             "soc/stm32/stm32f4/private/stm32f407_audio.h",
@@ -310,10 +342,9 @@ class SourceSDKSelectionTests(unittest.TestCase):
             with self.subTest(path=name):
                 self.assertTrue(source_sdk.selected(name),
                                 "Required audio closure omitted: " + name)
-        payload = source_sdk.provider_descriptors.maintained("stm32f4").owned_payload
-        hardware = required - {"tools/configure/stm32f4/capture_audio.py"}
-        self.assertTrue(hardware.issubset(set(payload)),
-                        sorted(hardware - set(payload)))
+        package = source_sdk.source_packages.load(ROOT / "soc/stm32/stm32f4/package.json")
+        hardware = {name for name in required if name.startswith("soc/stm32/stm32f4/")}
+        self.assertTrue(all(package.exports(ROOT / name) for name in hardware))
         retired = {
             "tools/configure/i2s2.py",
             "tools/configure/stm32f4/i2s2.py",
@@ -467,7 +498,7 @@ class SourceSDKSTM32OfficialSelectionTests(unittest.TestCase):
         required = {
             "dependencies/stm32f4-hal.lock.json",
             "tools/maintenance/stm32f4_hal_lock.py",
-            "cmake/platform/STM32Official.cmake",
+            "soc/stm32/stm32f4/cmake/STM32Official.cmake",
             "vendors/st/stm32f4_hal/LICENSE.md",
             "vendors/st/stm32f4_hal/Inc/stm32f4xx_ll_gpio.h",
             "vendors/st/stm32f4_hal/Inc/stm32f4xx_ll_usart.h",
@@ -484,7 +515,10 @@ class SourceSDKSTM32OfficialSelectionTests(unittest.TestCase):
         }
         self.assertTrue(required.issubset(set(source_sdk.required_files(ROOT))),
                         sorted(required - set(source_sdk.required_files(ROOT))))
-        self.assertIn("vendors/st/stm32f4_hal", source_sdk.REQUIRED_DEPENDENCIES)
+        selection = source_sdk.resolve_selection(ROOT)
+        self.assertIn("vendors/st/stm32f4_hal",
+                      source_sdk.runtime_dependency_closure(
+                          root=ROOT, selection=selection))
 
     def test_f4_sdk_redistributes_only_selected_graph_and_notice(self):
         selected = source_sdk.dependency_entries(ROOT, "vendors/st/stm32f4_hal")
@@ -715,6 +749,7 @@ class SourceSDKDevelopmentSnapshotTests(unittest.TestCase):
             key: value for key, value in os.environ.items()
             if not key.startswith("GIT_")}
         self.git("init", "--quiet")
+        self.package_files = snapshot_package(self.repository)
         self.write("core/committed.c", "int committed_source;\n")
         self.write("docs/committed.txt", "external documentation\n")
         self.git("add", ".")
@@ -747,7 +782,7 @@ class SourceSDKDevelopmentSnapshotTests(unittest.TestCase):
         before = self.git("write-tree")
         names = source_sdk.snapshot_files(
             self.repository, self.entries, development_fixture=True)
-        self.assertEqual(names, {
+        self.assertEqual(names, self.package_files | {
             "core/committed.c", "arch/arm/cortex_m/staged.c",
             "tools/configure/configure.py"})
         self.assertEqual(self.git("write-tree"), before)
@@ -755,7 +790,7 @@ class SourceSDKDevelopmentSnapshotTests(unittest.TestCase):
     def test_publishable_snapshot_uses_only_original_committed_blobs(self):
         names = source_sdk.snapshot_files(
             self.repository, self.entries, development_fixture=False)
-        self.assertEqual(names, {"core/committed.c"})
+        self.assertEqual(names, self.package_files | {"core/committed.c"})
         blobs = source_sdk.committed_blobs(
             self.repository, {name: self.entries[name] for name in names})
         self.assertEqual(blobs["core/committed.c"], b"int committed_source;\n")
@@ -1585,7 +1620,7 @@ class SourceSDKTests(unittest.TestCase):
         names = ["vendors/st/stm32f4_hal/" + name for name in lock["files"]]
         names.extend(("dependencies/stm32f4-hal.lock.json",
                       "tools/maintenance/stm32f4_hal_lock.py",
-                      "cmake/platform/STM32Official.cmake"))
+                      "soc/stm32/stm32f4/cmake/STM32Official.cmake"))
         for name in names:
             with self.subTest(name=name):
                 file = self.sdk / name
@@ -1845,7 +1880,10 @@ class SourceSDKTests(unittest.TestCase):
         self.run_ok(["git", "init", "--quiet", str(repo)])
         (repo / "README.md").write_text("source\n")
         (repo / ".gitmodules").write_bytes((ROOT / ".gitmodules").read_bytes())
-        self.run_ok(["git", "-C", str(repo), "add", "README.md", ".gitmodules"])
+        package_files = snapshot_package(repo, dependencies={
+            "hal_driver": "stm32f4_hal"})
+        self.run_ok(["git", "-C", str(repo), "add", "README.md", ".gitmodules",
+                     *sorted(package_files)])
         self.run_ok(["git", "-C", str(repo), "-c", "user.name=SDK test", "-c", "user.email=sdk-test@local.invalid",
                      "commit", "--quiet", "-m", "fixture baseline"])
         result = self.run_process([sys.executable, "-B", str(ROOT / "cmake/package/package_source_sdk.py"),

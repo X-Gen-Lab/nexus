@@ -44,6 +44,7 @@ class I2cDefaultLeaf : public testing::Test {
   protected:
     I2C_TypeDef registers{};
     uint32_t lines = 3U;
+    const nx_i2c_v1_lines_t line_config{{&lines, &lines}, {1U, 2U}};
     nx_i2c_v1_state_t state{};
     nx_i2c_v1_endpoint_t endpoint_state{&state, 0x50U, 7U};
     nx_i2c_port_t bus{&nx_i2c_v1_async_ops, &state};
@@ -54,8 +55,7 @@ class I2cDefaultLeaf : public testing::Test {
 
     void SetUp() override {
         state.registers = reinterpret_cast<volatile uint32_t*>(&registers);
-        state.line_inputs = &lines;
-        state.line_mask = 3U;
+        state.lines = &line_config;
 #if defined(STM32F103xB)
         state.peripheral_mhz = 8U;
 #else

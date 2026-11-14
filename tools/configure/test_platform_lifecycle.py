@@ -5,9 +5,21 @@ from unittest.mock import patch
 
 from tools.configure import bindings, configure, runtime_power
 from tools.configure.calls import DirectCall
-from tools.configure.providers import maintained
+from tools.configure.providers import for_selection
 from tools.configure.providers.common import ConfigurationError
 from tools.configure.tests.native_fixture import native_fixture
+
+
+class ConstructorView:
+    def __init__(self, provider, **changes):
+        self.provider = provider
+        self.changes = changes
+
+    def __getattr__(self, name):
+        return getattr(self.provider, name)
+
+    def constructor(self, *args):
+        return replace(self.provider.constructor(*args), **self.changes)
 
 
 class PlatformLifecycleEmissionTests(unittest.TestCase):
@@ -44,14 +56,16 @@ class PlatformLifecycleEmissionTests(unittest.TestCase):
     def test_retained_failure_policy_is_static_dispatch_metadata(self):
         result = self.resolve(
             "tests/support/native/assemblies/native-gpio.toml")
-        provider = maintained("native", test_support=True)
+        provider = for_selection(result)
         original = provider.constructor(
             result.controllers[0], result, result.board_bindings,
             result.routes, result.devices)
         for retained in (False, True):
             with self.subTest(retained=retained):
-                selected = replace(original, retain_on_failed_init=retained)
-                with patch.object(provider, "constructor", return_value=selected):
+                selected = ConstructorView(
+                    provider, retain_on_failed_init=retained)
+                with patch.object(bindings, "for_selection",
+                                  return_value=selected):
                     source = bindings.emit(result)[1]
                 self.assertIn("(nx_lifecycle_acquisition_t){ "
                               + original.initialize.render() + ", "
@@ -60,12 +74,9 @@ class PlatformLifecycleEmissionTests(unittest.TestCase):
     def test_admission_is_a_fixed_direct_call_in_its_physical_case(self):
         result = self.resolve(
             "tests/support/native/assemblies/native-gpio.toml")
-        provider = maintained("native", test_support=True)
-        original = provider.constructor(
-            result.controllers[0], result, result.board_bindings,
-            result.routes, result.devices)
-        selected = replace(original, admission=(DirectCall("nx_probe_admit"),))
-        with patch.object(provider, "constructor", return_value=selected):
+        selected = ConstructorView(
+            for_selection(result), admission=(DirectCall("nx_probe_admit"),))
+        with patch.object(bindings, "for_selection", return_value=selected):
             source = bindings.emit(result)[1]
         admission = source[source.index("nx_platform_admit(size_t index)"):]
         self.assertIn("case 0u:", admission)
@@ -75,12 +86,8 @@ class PlatformLifecycleEmissionTests(unittest.TestCase):
     def test_permanent_effects_are_a_plan_constant(self):
         result = self.resolve(
             "tests/support/native/assemblies/native-gpio.toml")
-        provider = maintained("native", test_support=True)
-        original = provider.constructor(
-            result.controllers[0], result, result.board_bindings,
-            result.routes, result.devices)
-        with patch.object(provider, "constructor", return_value=replace(
-                original, pre_c_effects=True)):
+        selected = ConstructorView(for_selection(result), pre_c_effects=True)
+        with patch.object(bindings, "for_selection", return_value=selected):
             source = bindings.emit(result)[1]
         self.assertIn(".permanent_effects = true", source)
         self.assertNotIn("remaining_effects |=", source)

@@ -27,10 +27,6 @@
 #define NX_ADV_DEFAULT_TIMER_WRITE 1
 #define NX_TIMER_WRITE(reg, value) ((reg) = (uint32_t)(value))
 #endif
-#ifndef NX_ADV_BREAK_MASK
-#define NX_ADV_DEFAULT_BREAK_MASK 1
-#define NX_ADV_BREAK_MASK         4096U
-#endif
 #include "stm32f407_timer_output.h"
 #ifndef NX_ADV_ACCESS_READY
 #define NX_ADV_DEFAULT_ACCESS_READY 1
@@ -96,9 +92,7 @@ nx_result_t NX_ADV_INITIALIZE(nx_advanced_pwm_controller_t* port,
     if (port == NULL || config == NULL ||
         advanced_overlap(port, sizeof(*port), config, sizeof(*config)) ||
         config->channel < 1U || config->channel > 3U ||
-        config->break_input == NULL ||
-        config->break_mask != NX_ADV_BREAK_MASK ||
-        !NX_ADV_INPUT_VALID(config->break_input) ||
+        config->break_input == NULL || !NX_ADV_INPUT_VALID(config) ||
         config->timer_hz != NX_ADV_HZ || config->tick_hz == 0U ||
         config->timer_hz % config->tick_hz != 0U ||
         config->timer_hz / config->tick_hz > 65536U ||
@@ -366,10 +360,6 @@ const nx_advanced_pwm_ops_t NX_ADV_OPS = {.set_duty = advanced_duty,
 #ifdef NX_ADV_DEFAULT_TIMER_WRITE
 #undef NX_TIMER_WRITE
 #undef NX_ADV_DEFAULT_TIMER_WRITE
-#endif
-#ifdef NX_ADV_DEFAULT_BREAK_MASK
-#undef NX_ADV_BREAK_MASK
-#undef NX_ADV_DEFAULT_BREAK_MASK
 #endif
 #ifdef NX_ADV_DEFAULT_ACCESS_READY
 #undef NX_ADV_ACCESS_READY

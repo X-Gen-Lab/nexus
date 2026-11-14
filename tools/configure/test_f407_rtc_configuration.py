@@ -10,7 +10,7 @@ from unittest.mock import patch
 
 from tools.configure import authored, bindings, factory, gpio_phase
 from tools.configure import configure as gate
-from tools.configure.providers import maintained
+from tools.configure.providers import for_selection
 
 
 BOARDS = ("stm32f407zg_qiming_core", "stm32f407zg_qiming_v41")
@@ -37,7 +37,7 @@ class F407RtcConfigurationTests(unittest.TestCase):
         return gate.resolve_ir(path, test_support=native_fixture(path))
 
     def construction(self, result):
-        return maintained("stm32f4").constructor(
+        return for_selection(result).constructor(
             result.controllers[0], result, result.board_bindings,
             result.routes, result.devices)
 
@@ -113,7 +113,8 @@ class F407RtcConfigurationTests(unittest.TestCase):
         self.assertIn(".policy = NX_STM32_RTC_ADOPT_RETAINED", source)
         self.assertIn(".allow_set = false, .has_initial = false", source)
         self.assertIn(".timeout_us = 2000000u, .poll_limit = 1000000u", source)
-        self.assertIn(".clock = { nx_stm32_rtc_clock_read, &g_nx_stm32_system }", source)
+        self.assertIn(".clock = { .read = nx_stm32_rtc_clock_read, "
+                      ".context = &g_nx_stm32_system }", source)
         self.assertIn("nx_stm32_rtc_prepare(&s_nx_port_calendar, &s_nx_rtc_config_calendar)", source)
         for forbidden in ("RTC->", "RCC->BDCR", "PWR->CR", "HAL_RTC_Init",
                           ".year =", "RTC_IRQHandler"):
@@ -129,7 +130,8 @@ class F407RtcConfigurationTests(unittest.TestCase):
         source = bindings.emit(result)[1]
         self.assertIn(".policy = NX_STM32_RTC_PROVISION_EMPTY", source)
         self.assertIn(".allow_set = false, .has_initial = true", source)
-        self.assertIn(".initial = { 0u, 2u, 29u, 2u, 12u, 34u, 56u }", source)
+        self.assertIn(".initial = { .year = 0u, .month = 2u, .day = 29u, "
+                      ".weekday = 2u, .hour = 12u, .minute = 34u, .second = 56u }", source)
         self.assertIn("nx_stm32_rtc_close(&s_nx_port_calendar)", source)
         self.assertNotIn("nx_rtc_port_stop(", source)
 

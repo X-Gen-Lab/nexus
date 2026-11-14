@@ -55,7 +55,7 @@ epoch 4 将 RS485 的 `direction` 改为 `const nx_gpio_signal_t*`，删除 adap
 迁移时选择新的 build 目录，重新生成 bundle，并用同一配置、工具链和 ABI 重编全部
 调用者、公共 face／ops、factory、provider 与组件。旧工程和构建输出分开保留，不能
 混入新的 CMake cache、生成头或目标文件。作者 TOML schema 2、typed IR 代际 5、
-factory 代际 5、resolved projection 1 与 SDK manifest schema 2 各自独立，版本号
+factory 代际 5、resolved projection 1 与 SDK manifest schema 3 各自独立，版本号
 相同也不能混用不同接口代际。按[现有产品升级步骤](../tutorials/source-sdk.md#upgrade-an-existing-product)
 验证所选 SDK 的精确源码身份，再执行产品自己的 Native 合同和选定 MCU 构建。
 

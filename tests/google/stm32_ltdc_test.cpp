@@ -23,6 +23,23 @@ extern "C" {
 #include <sys/mman.h>
 
 namespace {
+TEST(LtdcConstants, StaticTimingAndFormatsUseTheOfficialFieldLayout) {
+    constexpr LTDC_InitTypeDef timing = NX_STM32_LTDC_TIMING(
+        8U, 4U, 2U, 1U, 3U, 2U, 1U, 2U, LTDC_HSPOLARITY_AL, LTDC_VSPOLARITY_AH,
+        LTDC_DEPOLARITY_AL, LTDC_PCPOLARITY_IPC);
+    static_assert(timing.HorizontalSync == 1U && timing.TotalWidth == 13U,
+                  "Timing remains a C/C++ constant initializer");
+    EXPECT_EQ(1U, timing.VerticalSync);
+    EXPECT_EQ(2U, timing.AccumulatedHBP);
+    EXPECT_EQ(2U, timing.AccumulatedVBP);
+    EXPECT_EQ(10U, timing.AccumulatedActiveW);
+    EXPECT_EQ(6U, timing.AccumulatedActiveH);
+    EXPECT_EQ(8U, timing.TotalHeigh);
+    EXPECT_EQ(LTDC_VSPOLARITY_AH, timing.VSPolarity);
+    EXPECT_EQ(3U, NX_STM32_LTDC_FORMATS(NX_IMAGE_RGB565, NX_IMAGE_ARGB8888));
+    EXPECT_EQ(1U, NX_STM32_LTDC_FORMATS(NX_IMAGE_RGB565, NX_IMAGE_RGB565));
+}
+
 struct Hardware {
     RCC_TypeDef rcc{};
     GPIO_TypeDef gpio[9]{};

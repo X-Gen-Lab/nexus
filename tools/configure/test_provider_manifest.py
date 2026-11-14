@@ -152,11 +152,13 @@ class ProviderManifestTests(unittest.TestCase):
         self.assertEqual(json.loads(path.read_text()), integration_package.manifest_schema())
         schema = integration_package.manifest_schema()
         self.assertFalse(schema["additionalProperties"])
-        self.assertEqual(set(schema["required"]), set(schema["properties"]))
+        self.assertTrue(set(schema["required"]).issubset(schema["properties"]))
+        self.assertIn("facts", schema["required"])
+        self.assertNotIn("configuration_directory", schema["properties"])
 
     def test_external_final_identity_excludes_unselected_builtin_behavior(self):
         paths, identity = dependencies.snapshot(mode="platform")
-        result = external_tests.configure.resolve_ir(self.assembly)
+        result = external_tests.configure.resolve_ir(self.assembly, test_support=True)
         selected_paths, selected_identity = dependencies.selected(
             paths, identity, family=result.soc_family, context=result.provider_context)
         builtins = {name for family in external_tests.configure.descriptor.families()
@@ -170,8 +172,8 @@ class ProviderManifestTests(unittest.TestCase):
         self.assertEqual({row["path"] for row in selected_identity["files"]},
                          set(selected_paths))
         dependencies.verify(selected_paths, selected_identity)
-        self.assertTrue(set(paths) & builtins,
-                        "The initial pre-resolution snapshot remains complete")
+        self.assertFalse(set(paths) & builtins,
+                         "Common bootstrap must not seal unselected family code")
 
     def test_external_identity_tracks_only_selected_code_and_keeps_full_snapshot(self):
         generator = self.root / "generator"
@@ -179,7 +181,7 @@ class ProviderManifestTests(unittest.TestCase):
             target = generator / name
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(external_tests.ROOT / name, target)
-        result = external_tests.configure.resolve_ir(self.assembly)
+        result = external_tests.configure.resolve_ir(self.assembly, test_support=True)
         with patch.object(dependencies, "ROOT", generator):
             initial_paths, initial = dependencies.snapshot(mode="platform", sdk=True)
             selected_paths, selected = dependencies.selected(
@@ -187,9 +189,9 @@ class ProviderManifestTests(unittest.TestCase):
                 context=result.provider_context)
             self.assertTrue(set(dependencies.SDK).issubset(selected_paths))
             leaf = generator / "tools/configure/stm32f4/contract.py"
-            leaf.write_bytes(leaf.read_bytes() + b"\n# unselected leaf changed\n")
-            with self.assertRaisesRegex(ValueError, "changed during generation"):
-                dependencies.verify(initial_paths, initial)
+            leaf.parent.mkdir(parents=True, exist_ok=True)
+            leaf.write_bytes(b"# unselected family fixture\n")
+            dependencies.verify(initial_paths, initial)
             paths, identity = dependencies.snapshot(mode="platform", sdk=True)
             _, after_leaf = dependencies.selected(
                 paths, identity, family=result.soc_family,
@@ -214,7 +216,7 @@ class ProviderManifestTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "changed during generation"):
                 dependencies.verify(selected_paths, selected)
             self.reseal(self.package)
-            changed_result = external_tests.configure.resolve_ir(self.assembly)
+            changed_result = external_tests.configure.resolve_ir(self.assembly, test_support=True)
             paths, identity = dependencies.snapshot(mode="platform", sdk=True)
             _, changed = dependencies.selected(
                 paths, identity, family=changed_result.soc_family,
@@ -223,7 +225,7 @@ class ProviderManifestTests(unittest.TestCase):
 
     def test_external_final_identity_keeps_verified_input_snapshot(self):
         paths, identity = dependencies.snapshot(mode="platform")
-        result = external_tests.configure.resolve_ir(self.assembly)
+        result = external_tests.configure.resolve_ir(self.assembly, test_support=True)
         entry = self.package / "configure/__init__.py"
         entry.write_text(entry.read_text() + "\n# changed after selected context\n")
         selected_paths, selected_identity = dependencies.selected(

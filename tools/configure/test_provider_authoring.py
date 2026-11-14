@@ -29,7 +29,7 @@ class ExternalProviderAuthoringTests(unittest.TestCase):
         output, errors = io.StringIO(), io.StringIO()
         with redirect_stdout(output), redirect_stderr(errors):
             try:
-                status = configure.main(with_native_support(list(arguments)))
+                status = configure.main([*arguments, "--test-support"])
             except SystemExit as error:
                 status = error.code
         return status, output.getvalue(), errors.getvalue()

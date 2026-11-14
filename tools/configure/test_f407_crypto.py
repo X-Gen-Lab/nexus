@@ -6,6 +6,10 @@ import tempfile
 import unittest
 
 from tools.configure import bindings, configure as gate, factory
+from tools.configure.calls import Symbol
+from tools.configure.data_provider import DataProvider
+from tools.configure.providers import for_selection
+from tools.configure.static_ir import Flags
 
 
 class F407CryptoTests(unittest.TestCase):
@@ -49,9 +53,19 @@ class F407CryptoTests(unittest.TestCase):
                     self.assertIn(f".dma = &s_nx_crypto_dma_config_"
                                   f"{'encrypt' if kind == 'cipher' else 'digest'}",
                                   source)
-                self.assertIn("0x20000000u, 131072u", source)
-                self.assertIn("0x08000000u, 1048576u, NX_DMA_MEMORY_READ", source)
-                self.assertNotIn("0x10000000u", source)
+                for item in (cipher, digest):
+                    provider = for_selection(result)
+                    self.assertIsInstance(provider, DataProvider)
+                    construction = provider.constructor(item, result,
+                        result.board_bindings, result.routes, result.devices)
+                    regions = next(value for value in construction.static_declarations
+                                   if value.type_name == "nx_dma_memory_region_t")
+                    records = [dict(value.fields) for value in regions.initializer.values]
+                    self.assertEqual([(row["begin"], row["size"]) for row in records],
+                                     [(0x20000000, 131072), (0x08000000, 1048576)])
+                    self.assertEqual(records[0]["permissions"], Flags((
+                        Symbol("NX_DMA_MEMORY_READ"), Symbol("NX_DMA_MEMORY_WRITE"))))
+                    self.assertEqual(records[1]["permissions"], Symbol("NX_DMA_MEMORY_READ"))
                 for forbidden in ("HAL_DMA_", "HAL_CRYP_", "HAL_HASH_",
                                   "DMA2_Stream5_IRQHandler",
                                   "DMA2_Stream6_IRQHandler",

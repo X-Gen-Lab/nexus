@@ -9,6 +9,7 @@
 #include "nexus/io/dma.h"
 #include "nexus/io/image.h"
 #include "stm32f407_system.h"
+#include "stm32f4_graphics_clock.h"
 #include "stm32f4_graphics_memory.h"
 #if !defined(USE_HAL_DMA2D_REGISTER_CALLBACKS)
 #define USE_HAL_DMA2D_REGISTER_CALLBACKS 0U

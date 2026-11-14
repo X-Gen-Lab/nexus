@@ -39,6 +39,9 @@ C 合同使用 GoogleTest／GoogleMock，工具使用 Python unittest。
 提交检查读取完整暂存区，执行格式、注释、文档、工作流和行为检查。
 行为门禁只配置、构建一次，然后执行完整 Native GoogleTest 和受影响的完整工具域。
 构建和配置规则变更执行全部工具域；文档改动仍检查配置示例和双语完整性。
+SDK 打包器、验证器和 `cmake/package/verification/` 下 C／H／TOML／JSON 输入执行
+完整 testing 与 configure 域。CMake 规则、未知 cmake 路径或后缀，以及选域政策变更
+仍执行全部四域。权威选域逻辑在 `tools/testing/run_tool_tests.py`，不能临时缩小范围。
 
 ```sh
 python tools/dev/dev.py check --preset native-debug
@@ -52,6 +55,22 @@ Native 模式不重复执行与模式无关的工具测试。ARM 和迁移后的
 
 输出必须新鲜、非空，保留实际返回码。缺失工具、跳过用例和旧报告不能建立通过状态。
 最多使用分配的并发预算，避免多个构建同时占满内存。
+
+`dev.py configure` 只配置当前平台源码根，拒绝指向其他工程的 `-S`。外部产品使用
+其显式 CMake 命令，保持产品源码和平台托管构建的责任分开。
+
+## 并行构建的目录所有权
+
+托管 configure／build／test／check、TDD、Native runtime 和 matrix 共用每个规范
+构建目录的内核锁，直到所有阶段和报告发布完成。同目录的独立托管执行立即拒绝，不同目录
+可以并行；日志独立不替代构建目录互斥。
+
+POSIX 嵌套命令通过真实文件描述符继承并核对目录与文件身份；同线程组合可重入，
+其他线程不自动继承。异常或取消完成所属进程排空后，关闭最后一个描述符才释放锁。
+Windows 独立命令使用文件锁，嵌套托管执行明确要求 POSIX，不据此声明 Windows
+矩阵通过。继承描述符表示同一编排内的委托；父编排必须串行执行同目录子阶段，
+共享同一委托描述符的子进程之间不自动互斥。直接 CMake／Ninja／CTest 不参与该协议，
+调用者必须保证目录独占。
 
 ## 代码与审查
 

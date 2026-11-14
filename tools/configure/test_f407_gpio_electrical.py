@@ -7,8 +7,8 @@ import tempfile
 import unittest
 
 from tools.configure import bindings, configure as gate, experience
-from tools.configure.ir import freeze
-from tools.configure.stm32f4.bindings import shared_irq_definitions
+from tools.configure.data_provider import DataProvider
+from tools.configure.static_ir import Declaration, IrqConnection
 
 
 class F407GpioElectricalTests(unittest.TestCase):
@@ -150,14 +150,27 @@ class F407GpioElectricalTests(unittest.TestCase):
         self.assertIn(".pull = 1u", bindings.emit(result)[1])
 
     def test_each_exti_vector_group_has_one_exact_dispatcher(self):
-        result = gate.resolve_ir(self.assembly(kind="exti", mode="edge-event"), test_support=native_fixture(self.assembly(kind="exti", mode="edge-event")))
-        original, = result.controllers
-        selected = []
-        for line in (0, 3, 6, 9, 11, 15):
-            selected.append(dataclasses.replace(
-                original, id=f"edge{line}", controller=f"EXTI{line}",
-                pins=(freeze({"pin": f"PF{line}", "function": "input", "af": 0}),)))
-        source = "\n".join(shared_irq_definitions(selected))
+        path = self.assembly(kind="exti", mode="edge-event")
+        board_path = self.directory / "board.json"
+        board = json.loads(board_path.read_text())
+        lines = (0, 3, 6, 9, 11, 15)
+        board["bindings"] = [{"id": f"edge{line}", "controller": f"EXTI{line}",
+                              "route": f"exti{line}-pf{line}"} for line in lines]
+        board_path.write_text(json.dumps(board))
+        header = path.read_text().split("[exti.selected]", 1)[0]
+        path.write_text(header + "".join(
+            f'[exti.edge{line}]\nbinding="edge{line}"\nmode="edge-event"\n'
+            'edge="falling"\nevent_capacity=4\nirq.priority=5\n'
+            for line in lines))
+        result = gate.resolve_ir(path)
+        provider = result.provider_context.provider
+        self.assertIsInstance(provider, DataProvider)
+        nodes = provider.shared_irqs(result)
+        self.assertTrue(all(isinstance(node, (Declaration, IrqConnection))
+                            for node in nodes))
+        publishers = [node for node in nodes if isinstance(node, IrqConnection)]
+        self.assertEqual(len(publishers), 4)
+        source = "\n".join(line for node in nodes for line in node.render())
         for vector, mask in (("EXTI0", 1), ("EXTI3", 8),
                              ("EXTI9_5", (1 << 6) | (1 << 9)),
                              ("EXTI15_10", (1 << 11) | (1 << 15))):

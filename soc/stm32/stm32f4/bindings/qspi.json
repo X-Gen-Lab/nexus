@@ -1,0 +1,819 @@
+{
+  "schema_version": 1,
+  "bindings": [
+    {
+      "kind": "external_bus",
+      "mode": "qspi-indirect-sdr",
+      "controllers": [
+        "QUADSPI"
+      ],
+      "implementation": "qspi",
+      "headers": [
+        "stm32f4_qspi.h"
+      ],
+      "profile_headers": {
+        "cpu-map": [
+          "stm32f4_qspi_mapped.h"
+        ]
+      },
+      "profiles": {
+        "command": {
+          "state_type": "nx_stm32_qspi_t",
+          "ops": "nx_stm32_qspi_bus_ops",
+          "declarations": [
+            {
+              "role": "qspi_saved",
+              "type": "uint16_t",
+              "const": false,
+              "count": {
+                "length": "selected.pads",
+                "limit": 64
+              }
+            },
+            {
+              "role": "qspi_pins",
+              "type": "nx_stm32_platform_pin_config_t",
+              "const": true,
+              "value": {
+                "map": {
+                  "source": "selected.pads",
+                  "limit": 64,
+                  "value": {
+                    "record": [
+                      [
+                        "registers",
+                        {
+                          "source": "entry.registers",
+                          "as": "symbol"
+                        }
+                      ],
+                      [
+                        "snapshot",
+                        {
+                          "ref": "qspi_saved",
+                          "as": "address",
+                          "index": {
+                            "source": "index",
+                            "as": "u32"
+                          }
+                        }
+                      ],
+                      [
+                        "port_index",
+                        {
+                          "source": "entry.port_index"
+                        }
+                      ],
+                      [
+                        "pin",
+                        {
+                          "source": "entry.number"
+                        }
+                      ]
+                    ]
+                  }
+                }
+              },
+              "count": {
+                "length": "selected.pads",
+                "limit": 64
+              }
+            },
+            {
+              "role": "qspi_config",
+              "type": "nx_stm32_qspi_config_t",
+              "const": true,
+              "value": {
+                "record": [
+                  [
+                    "pins",
+                    {
+                      "ref": "qspi_pins",
+                      "as": "symbol"
+                    }
+                  ],
+                  [
+                    "pin_count",
+                    {
+                      "length": "selected.pads",
+                      "limit": 64
+                    }
+                  ],
+                  [
+                    "system",
+                    {
+                      "address": "g_nx_stm32_system"
+                    }
+                  ],
+                  [
+                    "dma",
+                    null
+                  ],
+                  [
+                    "hclk_hz",
+                    {
+                      "source": "selected.clock_inputs.core_hz"
+                    }
+                  ],
+                  [
+                    "read_budget_us",
+                    {
+                      "source": "selected_children.0.options.parameters.read_budget_us"
+                    }
+                  ],
+                  [
+                    "prepare_budget_us",
+                    {
+                      "source": "selected_children.0.options.parameters.prepare_budget_us"
+                    }
+                  ],
+                  [
+                    "stop_budget_us",
+                    {
+                      "source": "selected_children.0.options.parameters.stop_budget_us"
+                    }
+                  ],
+                  [
+                    "prescaler",
+                    {
+                      "source": "selected_children.0.options.parameters.prescaler"
+                    }
+                  ],
+                  [
+                    "cs_high_cycles",
+                    {
+                      "source": "selected_children.0.options.parameters.cs_high_cycles"
+                    }
+                  ]
+                ]
+              }
+            }
+          ],
+          "calls": {
+            "admit": [
+              {
+                "function": "nx_stm32_qspi_admit",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  },
+                  {
+                    "ref": "qspi_config",
+                    "as": "address"
+                  }
+                ]
+              }
+            ],
+            "prepare": {
+              "function": "nx_stm32_qspi_start",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "ref": "qspi_config",
+                  "as": "address"
+                }
+              ]
+            },
+            "close": [
+              {
+                "function": "nx_stm32_qspi_stop",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  }
+                ]
+              }
+            ]
+          },
+          "retain_on_failed_init": true,
+          "pin_snapshots": {
+            "source": "selected.pads",
+            "key": "entry.identity",
+            "array_role": "qspi_saved",
+            "limit": 64
+          },
+          "child_groups": {
+            "limit": 1,
+            "cases": {
+              "flash_async-endpoint": {
+                "parents": {
+                  "parent_port": "port"
+                },
+                "declarations": [
+                  {
+                    "role": "flash_readonly",
+                    "type": "nx_flash_port_t",
+                    "const": true,
+                    "value": {
+                      "record": [
+                        [
+                          "ops",
+                          {
+                            "address": "nx_stm32_qspi_flash_ops"
+                          }
+                        ],
+                        [
+                          "context",
+                          {
+                            "ref": "parent_port",
+                            "as": "address"
+                          }
+                        ]
+                      ]
+                    }
+                  }
+                ],
+                "face": {
+                  "type": "nx_flash_async_port_t",
+                  "ops": "nx_stm32_qspi_async_ops",
+                  "context": {
+                    "ref": "parent_port",
+                    "as": "address"
+                  }
+                },
+                "calls": {
+                  "prepare": [],
+                  "close": []
+                }
+              }
+            }
+          }
+        },
+        "cpu-map": {
+          "state_type": "nx_stm32_qspi_mapped_t",
+          "ops": "nx_stm32_qspi_bus_ops",
+          "declarations": [
+            {
+              "role": "mapped_owner",
+              "type": "nx_mapped_storage_owner_t",
+              "const": false
+            },
+            {
+              "role": "mapped_slots",
+              "type": "nx_mapped_storage_slot_t",
+              "const": false,
+              "count": {
+                "source": "selected_children.0.options.parameters.read_slots"
+              }
+            },
+            {
+              "role": "mapped_config",
+              "type": "nx_stm32_qspi_mapped_config_t",
+              "const": true,
+              "value": {
+                "record": [
+                  [
+                    "owner",
+                    {
+                      "ref": "mapped_owner",
+                      "as": "address"
+                    }
+                  ],
+                  [
+                    "slots",
+                    {
+                      "ref": "mapped_slots",
+                      "as": "symbol"
+                    }
+                  ],
+                  [
+                    "count",
+                    {
+                      "source": "selected_children.0.options.parameters.read_slots"
+                    }
+                  ]
+                ]
+              }
+            },
+            {
+              "role": "qspi_saved",
+              "type": "uint16_t",
+              "const": false,
+              "count": {
+                "length": "selected.pads",
+                "limit": 64
+              }
+            },
+            {
+              "role": "qspi_pins",
+              "type": "nx_stm32_platform_pin_config_t",
+              "const": true,
+              "value": {
+                "map": {
+                  "source": "selected.pads",
+                  "limit": 64,
+                  "value": {
+                    "record": [
+                      [
+                        "registers",
+                        {
+                          "source": "entry.registers",
+                          "as": "symbol"
+                        }
+                      ],
+                      [
+                        "snapshot",
+                        {
+                          "ref": "qspi_saved",
+                          "as": "address",
+                          "index": {
+                            "source": "index",
+                            "as": "u32"
+                          }
+                        }
+                      ],
+                      [
+                        "port_index",
+                        {
+                          "source": "entry.port_index"
+                        }
+                      ],
+                      [
+                        "pin",
+                        {
+                          "source": "entry.number"
+                        }
+                      ]
+                    ]
+                  }
+                }
+              },
+              "count": {
+                "length": "selected.pads",
+                "limit": 64
+              }
+            },
+            {
+              "role": "qspi_config",
+              "type": "nx_stm32_qspi_config_t",
+              "const": true,
+              "value": {
+                "record": [
+                  [
+                    "pins",
+                    {
+                      "ref": "qspi_pins",
+                      "as": "symbol"
+                    }
+                  ],
+                  [
+                    "pin_count",
+                    {
+                      "length": "selected.pads",
+                      "limit": 64
+                    }
+                  ],
+                  [
+                    "system",
+                    {
+                      "address": "g_nx_stm32_system"
+                    }
+                  ],
+                  [
+                    "dma",
+                    null
+                  ],
+                  [
+                    "hclk_hz",
+                    {
+                      "source": "selected.clock_inputs.core_hz"
+                    }
+                  ],
+                  [
+                    "mapping",
+                    {
+                      "ref": "mapped_config",
+                      "as": "address"
+                    }
+                  ],
+                  [
+                    "read_budget_us",
+                    {
+                      "source": "selected_children.0.options.parameters.read_budget_us"
+                    }
+                  ],
+                  [
+                    "prepare_budget_us",
+                    {
+                      "source": "selected_children.0.options.parameters.prepare_budget_us"
+                    }
+                  ],
+                  [
+                    "stop_budget_us",
+                    {
+                      "source": "selected_children.0.options.parameters.stop_budget_us"
+                    }
+                  ],
+                  [
+                    "prescaler",
+                    {
+                      "source": "selected_children.0.options.parameters.prescaler"
+                    }
+                  ],
+                  [
+                    "cs_high_cycles",
+                    {
+                      "source": "selected_children.0.options.parameters.cs_high_cycles"
+                    }
+                  ]
+                ]
+              }
+            }
+          ],
+          "calls": {
+            "admit": [
+              {
+                "function": "nx_stm32_qspi_admit",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address",
+                    "member": "controller"
+                  },
+                  {
+                    "ref": "qspi_config",
+                    "as": "address"
+                  }
+                ]
+              }
+            ],
+            "prepare": {
+              "function": "nx_stm32_qspi_start",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address",
+                  "member": "controller"
+                },
+                {
+                  "ref": "qspi_config",
+                  "as": "address"
+                }
+              ]
+            },
+            "close": [
+              {
+                "function": "nx_stm32_qspi_stop",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address",
+                    "member": "controller"
+                  }
+                ]
+              }
+            ]
+          },
+          "retain_on_failed_init": true,
+          "pin_snapshots": {
+            "source": "selected.pads",
+            "key": "entry.identity",
+            "array_role": "qspi_saved",
+            "limit": 64
+          },
+          "face_context": {
+            "ref": "port",
+            "as": "address"
+          },
+          "endpoint_faces": {
+            "limit": 1,
+            "cases": {
+              "mapped_storage-endpoint": {
+                "type": "nx_mapped_storage_port_t",
+                "ops": "nx_stm32_qspi_mapped_ops",
+                "context": {
+                  "ref": "parent_port",
+                  "as": "address"
+                },
+                "parents": {
+                  "parent_port": "port"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "kind": "external_bus",
+      "mode": "qspi-indirect-dma",
+      "controllers": [
+        "QUADSPI"
+      ],
+      "implementation": "qspi",
+      "headers": [
+        "stm32f4_qspi.h"
+      ],
+      "profiles": {
+        "command": {
+          "state_type": "nx_stm32_qspi_t",
+          "ops": "nx_stm32_qspi_bus_ops",
+          "declarations": [
+            {
+              "role": "dma_regions",
+              "type": "nx_dma_memory_region_t",
+              "const": true,
+              "value": {
+                "map": {
+                  "source": "selected.constants.external_bus.readable_regions",
+                  "limit": 16,
+                  "value": {
+                    "record": [
+                      [
+                        "begin",
+                        {
+                          "source": "entry.begin"
+                        }
+                      ],
+                      [
+                        "size",
+                        {
+                          "source": "entry.size"
+                        }
+                      ],
+                      [
+                        "permissions",
+                        {
+                          "source": "entry.permissions",
+                          "as": "static"
+                        }
+                      ]
+                    ]
+                  }
+                }
+              },
+              "count": {
+                "length": "selected.constants.external_bus.readable_regions",
+                "limit": 16
+              }
+            },
+            {
+              "role": "qspi_dma",
+              "type": "nx_stm32_qspi_dma_t",
+              "const": false
+            },
+            {
+              "role": "qspi_dma_config",
+              "type": "nx_stm32_qspi_dma_config_t",
+              "const": true,
+              "value": {
+                "record": [
+                  [
+                    "state",
+                    {
+                      "ref": "qspi_dma",
+                      "as": "address"
+                    }
+                  ],
+                  [
+                    "regions",
+                    {
+                      "ref": "dma_regions",
+                      "as": "symbol"
+                    }
+                  ],
+                  [
+                    "region_count",
+                    {
+                      "length": "selected.constants.external_bus.readable_regions",
+                      "limit": 16
+                    }
+                  ]
+                ]
+              }
+            },
+            {
+              "role": "qspi_saved",
+              "type": "uint16_t",
+              "const": false,
+              "count": {
+                "length": "selected.pads",
+                "limit": 64
+              }
+            },
+            {
+              "role": "qspi_pins",
+              "type": "nx_stm32_platform_pin_config_t",
+              "const": true,
+              "value": {
+                "map": {
+                  "source": "selected.pads",
+                  "limit": 64,
+                  "value": {
+                    "record": [
+                      [
+                        "registers",
+                        {
+                          "source": "entry.registers",
+                          "as": "symbol"
+                        }
+                      ],
+                      [
+                        "snapshot",
+                        {
+                          "ref": "qspi_saved",
+                          "as": "address",
+                          "index": {
+                            "source": "index",
+                            "as": "u32"
+                          }
+                        }
+                      ],
+                      [
+                        "port_index",
+                        {
+                          "source": "entry.port_index"
+                        }
+                      ],
+                      [
+                        "pin",
+                        {
+                          "source": "entry.number"
+                        }
+                      ]
+                    ]
+                  }
+                }
+              },
+              "count": {
+                "length": "selected.pads",
+                "limit": 64
+              }
+            },
+            {
+              "role": "qspi_config",
+              "type": "nx_stm32_qspi_config_t",
+              "const": true,
+              "value": {
+                "record": [
+                  [
+                    "pins",
+                    {
+                      "ref": "qspi_pins",
+                      "as": "symbol"
+                    }
+                  ],
+                  [
+                    "pin_count",
+                    {
+                      "length": "selected.pads",
+                      "limit": 64
+                    }
+                  ],
+                  [
+                    "system",
+                    {
+                      "address": "g_nx_stm32_system"
+                    }
+                  ],
+                  [
+                    "dma",
+                    {
+                      "ref": "qspi_dma_config",
+                      "as": "address"
+                    }
+                  ],
+                  [
+                    "hclk_hz",
+                    {
+                      "source": "selected.clock_inputs.core_hz"
+                    }
+                  ],
+                  [
+                    "read_budget_us",
+                    {
+                      "source": "selected_children.0.options.parameters.read_budget_us"
+                    }
+                  ],
+                  [
+                    "prepare_budget_us",
+                    {
+                      "source": "selected_children.0.options.parameters.prepare_budget_us"
+                    }
+                  ],
+                  [
+                    "stop_budget_us",
+                    {
+                      "source": "selected_children.0.options.parameters.stop_budget_us"
+                    }
+                  ],
+                  [
+                    "prescaler",
+                    {
+                      "source": "selected_children.0.options.parameters.prescaler"
+                    }
+                  ],
+                  [
+                    "cs_high_cycles",
+                    {
+                      "source": "selected_children.0.options.parameters.cs_high_cycles"
+                    }
+                  ]
+                ]
+              }
+            }
+          ],
+          "calls": {
+            "admit": [
+              {
+                "function": "nx_stm32_qspi_admit",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  },
+                  {
+                    "ref": "qspi_config",
+                    "as": "address"
+                  }
+                ]
+              }
+            ],
+            "prepare": {
+              "function": "nx_stm32_qspi_start",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "ref": "qspi_config",
+                  "as": "address"
+                }
+              ]
+            },
+            "close": [
+              {
+                "function": "nx_stm32_qspi_stop",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  }
+                ]
+              }
+            ]
+          },
+          "retain_on_failed_init": true,
+          "pin_snapshots": {
+            "source": "selected.pads",
+            "key": "entry.identity",
+            "array_role": "qspi_saved",
+            "limit": 64
+          },
+          "child_groups": {
+            "limit": 1,
+            "cases": {
+              "flash_async-endpoint": {
+                "parents": {
+                  "parent_port": "port"
+                },
+                "declarations": [
+                  {
+                    "role": "flash_readonly",
+                    "type": "nx_flash_port_t",
+                    "const": true,
+                    "value": {
+                      "record": [
+                        [
+                          "ops",
+                          {
+                            "address": "nx_stm32_qspi_flash_ops"
+                          }
+                        ],
+                        [
+                          "context",
+                          {
+                            "ref": "parent_port",
+                            "as": "address"
+                          }
+                        ]
+                      ]
+                    }
+                  }
+                ],
+                "face": {
+                  "type": "nx_flash_async_port_t",
+                  "ops": "nx_stm32_qspi_async_ops",
+                  "context": {
+                    "ref": "parent_port",
+                    "as": "address"
+                  }
+                },
+                "calls": {
+                  "prepare": [],
+                  "close": []
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

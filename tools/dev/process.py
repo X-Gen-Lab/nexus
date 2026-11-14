@@ -351,7 +351,8 @@ def _run(command, *, cwd, env, log, timeout, stage, state, input=None,
         raise ValueError("Execution requires a nonempty valid argument vector")
     if input is not None and not isinstance(input, bytes):
         raise ValueError("Execution input must be bytes")
-    env = execution_environment(env)
+    from tools.dev.build_lock import child_settings
+    env, lock_settings = child_settings(execution_environment(env))
     timeout = command_timeout(env) if timeout is None else float(timeout)
     if not 0 < timeout < float("inf"):
         raise ValueError("Command timeout must be finite and positive")
@@ -401,6 +402,7 @@ def _run(command, *, cwd, env, log, timeout, stage, state, input=None,
                 raise KeyboardInterrupt
             settings = ({"start_new_session": True} if os.name == "posix" else
                         {"creationflags": subprocess.CREATE_NEW_PROCESS_GROUP})
+            settings.update(lock_settings)
             process = subprocess.Popen(command, cwd=cwd, env=env,
                                        stdin=stdin, stdout=stdout,
                                        stderr=stderr, **settings)

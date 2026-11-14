@@ -27,7 +27,8 @@ python tools/dev/dev.py docs check --full \
 
 ## FIG-01 全平台分层与外部边界
 
-平台职责与产品外置；OS 和组件可选，逐边区分构建事实与日常调用。
+平台职责与产品外置；Platform 连接静态实例与共享 C 协调器，OS 和组件可选。
+逐边区分构建事实与日常调用，生成器不拥有驱动状态机。
 
 ![FIG-01：全平台分层与外部边界](platform-architecture.svg)
 
@@ -43,7 +44,9 @@ F407ZG 裸机 IRQ UART 的构建依赖；虚线为私有 include 或 OBJECT 注�
 
 ## FIG-03 配置与原子生成
 
-TOML、硬件事实、typed IR 和原子 bundle；失败不发布可用半成品。
+包声明、Board 与 TOML 沿同一输入快照进入通用政策与具名 IR，再形成有限静态连接
+和原子 bundle。包只选择 CMake 入口，CMake 拥有唯一 C 源码图；失败不继续使用旧
+输出或半成品。全部箭头表示构建期数据或产物依赖。
 
 ![FIG-03：配置与原子生成](configuration-generation.svg)
 
@@ -59,7 +62,9 @@ TOML、硬件事实、typed IR 和原子 bundle；失败不发布可用半成品
 
 ## FIG-05 显式启动停机与失败撤回
 
-图示显式冷态生命周期与具体 C owner 的清理责任；实际入口以当前 Core／F4 实现为准。
+运行期由共享 C 协调器先检查上下文，再完成全部 controller 准入，之后才取得
+System、共享资源与实例。共享资源／实例失败执行逆序回滚；System 启动结果分别
+报告 primary、cleanup 和残效。释放失败保留具体 owner 收条与存储，不能超时强收。
 
 ![FIG-05：显式启动停机与失败撤回](platform-lifecycle.svg)
 
@@ -91,7 +96,9 @@ TOML、硬件事实、typed IR 和原子 bundle；失败不发布可用半成品
 
 ## FIG-10 Source SDK独立消费
 
-所选 Source SDK 的导出、移动与独立消费；主机运行和 ARM 链接分别验证。
+schema3 按所选 `profile.packages` 与包导出归属收集源码，不从单个 ELF 推导 SDK。
+完整 prefix 可用于公开 GPIO 首工程或已有外部工程；实际编译仍由包内 CMake 负责。
+主机运行、ARM 链接与物理 HIL 分别判断，图不授予软件候选资格。
 
 ![FIG-10：Source SDK独立消费](source-sdk-consumer.svg)
 
@@ -165,7 +172,9 @@ TOML、硬件事实、typed IR 和原子 bundle；失败不发布可用半成品
 
 ## FIG-31 F4 源码归属与接口边界
 
-F4 私有实现、官方库、公共 I/O 与测试支撑的源码及调用边界。
+包内事实、binding、Board 和 TOML 由通用配置器生成静态实例与固定连接；F4 私有 C
+拥有硬件算法和官方库适配。虚线是构建／测试依赖，实线是公共 I/O 调用，不增加
+运行时转发层，也不把参考模型提升为生产或实板资格。
 
 ![FIG-31：F4 源码归属与接口边界](driver-source-ownership.svg)
 

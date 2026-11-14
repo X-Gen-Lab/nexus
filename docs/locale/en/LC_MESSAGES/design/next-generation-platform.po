@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 327aaa220b5c3dfa7a838004c74b7f163afcbecdc1ecad16960f34979561cb00\n"
+"X-Nexus-Source-SHA256: 289ba1ea865002108a3bd174d354379194cce34892b7ff4faf106a6ce5ed0b98\n"
 
 msgid "Nexus 下一代平台：从第一性原理设计"
 msgstr "Nexus next-generation platform: design from first principles"
@@ -30,6 +30,9 @@ msgstr ""
 "architecture](https://github.com/X-Gen-"
 "Lab/nexus/blob/83a27dfbee4e8fbf4d35875b1e9db85af7516eec/docs/archive/strategy/target-"
 "architecture.md) is migration context only."
+
+msgid "本文保留架构推导与历史33项清单的上下文。本轮工作以固定源码为基础，使用[A01–H06 接入重构任务](../delivery/architecture.md#本轮架构迭代任务)区分已有机制、实施增量和未完成任务；不以设计合同宣告整个平台已完成。新源码与产物建立独立资格，历史通过结果不能继承。"
+msgstr "This document preserves the architectural reasoning and historical 33-item plan. The current batch starts from fixed source and uses [A01–H06 integration refactor tasks](../delivery/architecture.md#本轮架构迭代任务) to separate existing mechanisms, implementation increments and unfinished tasks. A design contract does not declare the entire platform complete. New source and artifacts establish their own qualification without inheriting historical passes."
 
 msgid ""
 "用户明确要求代码格式和注释风格保持当前仓库规范。架构可以重构，排版、命名和Doxygen形式沿用现有配置及贡献/注释指南；通过完善合同内容提高可维护性。"
@@ -143,6 +146,9 @@ msgstr ""
 "cost. Premature DMA-buffer return, missing errors and unchecked bounds "
 "cannot buy better benchmark numbers."
 
+msgid "当前生产入口为 F4，精确器件和模式见[支持范围](../delivery/support.md)；四个 F407 Board 包与新增料号的软件参考分开。Native 是显式测试支撑，其他厂商 SDK 保留； 原跨系列计划不扩大当前支持。精确型号、路线、执行模式和证据分别管理。"
+msgstr "F4 is the production entry; see [support scope](../delivery/support.md) for exact devices and modes. Four F407 Board packages remain distinct from software references for added parts. Native is explicit test support, and other vendor SDKs remain. The earlier cross-series plan expands no current support. Exact parts, routes, modes and evidence are managed separately."
+
 msgid ""
 "现有 controller 支持、引脚资料和故障测试仅用于识别需求。新实现可以直接替换不良结构。暂无实板接入，首阶段交付软件和 HIL 工装准备。"
 msgstr ""
@@ -249,6 +255,10 @@ msgstr ""
 "executor](https://docs.embassy.dev/embassy-executor/). These guide "
 "architectural tradeoffs; formal dependencies still need pinned revisions and"
 " separate acceptance."
+
+msgid "首轮选择依据是F407VE／ZG、四个独立Board包、固定BOM和C产品接入：构建期描述硬件，链接期选择实现，运行期只维护实际执行与借用状态。工业控制中的高频固定输出与企业设备管理中的运行时发现不是相同问题，需要不同的成本模型。"
+msgstr "The first iteration was based on F407VE/ZG, four separate Board packages, fixed BOMs and C product integration: describe hardware at build time, select implementations at link time, and retain only actual execution and borrow state at runtime. Frequent fixed outputs in industrial control and runtime discovery in enterprise device management need different cost models."
+
 
 msgid "2. 默认运行模型：静态装配、固定绑定、最小驱动"
 msgstr ""
@@ -1865,12 +1875,3 @@ msgstr ""
 "Retain the state/evidence real problems need: fixed planning, genuine "
 "borrows, faults/draining, explicit contexts, actual memory/timing and "
 "repeatable engineering with external product boundaries."
-
-msgid "本文保留架构推导与历史33项清单的上下文。本轮工作以固定源码为基础，使用[WP01–WP12 与 IO01–IO20](../delivery/architecture.md#本轮架构迭代任务)区分已有机制、实施增量和未完成任务；不以设计合同宣告整个平台已完成。新源码与产物建立独立资格，历史通过结果不能继承。"
-msgstr "This page retains the architecture reasoning and historical 33-item checklist context. Starting from pinned source, the current iteration uses [WP01–WP12 and IO01–IO20](../delivery/architecture.md#本轮架构迭代任务) to distinguish existing mechanisms, implementation increments and unfinished tasks. A design contract does not declare the entire platform complete. New source and artifacts establish independent qualification; historical passing results do not transfer."
-
-msgid "当前生产入口为 F4，精确器件和模式见[支持范围](../delivery/support.md)；四个 F407 Board 包与新增料号的软件参考分开。Native 是显式测试支撑，其他厂商 SDK 保留； 原跨系列计划不扩大当前支持。精确型号、路线、执行模式和证据分别管理。"
-msgstr "F4 is the production entry; see [support scope](../delivery/support.md) for exact devices and modes. Four F407 Board packages remain distinct from software references for added parts. Native is explicit test support, and other vendor SDKs remain. The earlier cross-series plan expands no current support. Exact parts, routes, modes and evidence are managed separately."
-
-msgid "首轮选择依据是F407VE／ZG、四个独立Board包、固定BOM和C产品接入：构建期描述硬件，链接期选择实现，运行期只维护实际执行与借用状态。工业控制中的高频固定输出与企业设备管理中的运行时发现不是相同问题，需要不同的成本模型。"
-msgstr "The first iteration was based on F407VE/ZG, four separate Board packages, fixed BOMs and C product integration: describe hardware at build time, select implementations at link time, and retain only actual execution and borrow state at runtime. Frequent fixed outputs in industrial control and runtime discovery in enterprise device management need different cost models."

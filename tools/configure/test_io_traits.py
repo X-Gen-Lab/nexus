@@ -1,6 +1,7 @@
 """Selected metadata stays distinct from silicon and timing qualification."""
 from tools.configure.tests.native_fixture import native_fixture
 from dataclasses import FrozenInstanceError, replace
+from functools import cache
 import unittest
 
 from tools.configure import io_traits
@@ -8,18 +9,26 @@ from tools.configure import configure, factory
 from tools.configure.ir import ControllerIR
 
 
+@cache
+def selected_context(provider):
+    fixture = ("tests/support/native/assemblies/native-empty.toml"
+               if provider == "native" else
+               "tools/configure/assemblies/qiming-baremetal.toml")
+    return configure.resolve_ir(configure.ROOT / fixture,
+        test_support=provider == "native").provider_context
+
+
 def controller(kind, mode, provider='stm32f4', **options):
-    values = {"id": "selected", "kind": kind, "controller": "SELECTED",
+    # Pure metadata projections use an actual selected provider and peripheral
+    # identity; they do not establish a reviewed route or a constructed owner.
+    physical = {"uart": "USART1", "spi": "SPI1", "i2c": "I2C1",
+                "adc": "ADC1", "eth": "ETH", "gpio": "GPIOA"}
+    values = {"id": "selected", "kind": kind, "controller": physical[kind],
               "binding": "selected", "mode": mode,
               "pins": (), "route": "metadata-unit-fixture",
               "mask": 0, "initial": 0, **options}
     item = ControllerIR.create(values, provider)
-    if provider == "native":
-        fixture = configure.resolve_ir(configure.ROOT /
-            "tests/support/native/assemblies/native-empty.toml",
-            test_support=True)
-        item = replace(item, provider_context=fixture.provider_context)
-    return item
+    return replace(item, provider_context=selected_context(provider))
 
 
 class SelectedTraitsTests(unittest.TestCase):

@@ -13,6 +13,8 @@ import unittest
 
 import yaml
 
+from tools.dev.build_lock import LEASES
+
 ROOT = Path(__file__).resolve().parents[2]
 
 
@@ -712,6 +714,7 @@ class CTestAdmission(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix='nexus real ctest ') as temporary:
             root = Path(temporary)
             for relative in ('tools/dev/dev.py', 'tools/dev/process.py',
+                             'tools/dev/build_lock.py',
                              'tools/dev/presets.py', 'tools/dev/provenance.py',
                              'tools/evidence/common.py', 'tools/evidence/identity.py',
                              'scripts/validation/junit.py'):
@@ -732,7 +735,13 @@ class CTestAdmission(unittest.TestCase):
                 if kind == 'skip':
                     cmake += 'set_tests_properties(contract PROPERTIES SKIP_RETURN_CODE 7)\n'
             (root / 'CMakeLists.txt').write_text(cmake)
+            # This independent temporary build owns its own kernel lock. A
+            # raw subprocess closes parent descriptors, so do not retain claims
+            # to the outer gate's unrelated build lease.
+            environment = dict(os.environ)
+            environment.pop(LEASES, None)
             configured = subprocess.run(['cmake', '--preset', 'fixture'], cwd=root,
+                                        env=environment,
                                         capture_output=True, text=True, timeout=30)
             self.assertEqual(configured.returncode, 0, configured.stdout + configured.stderr)
             report = root / 'build/fixture/ctest-results.xml'
@@ -741,7 +750,8 @@ class CTestAdmission(unittest.TestCase):
             os.utime(report, (1, 1))
             result = subprocess.run([sys.executable, root / 'tools/dev/dev.py',
                                      'test', '--preset', 'fixture'], cwd=root,
-                                    capture_output=True, text=True, timeout=30)
+                                    env=environment, capture_output=True, text=True,
+                                    timeout=30)
             return result, report.read_text() if report.exists() else ''
 
     def test_real_success_requires_fresh_test_execution(self):

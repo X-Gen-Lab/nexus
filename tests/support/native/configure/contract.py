@@ -4,6 +4,14 @@ from types import MappingProxyType
 from tools.configure.providers import common
 from tools.configure.adc import RESOLUTION_BITS
 
+# Explicit coordinates for this host fixture, independent of production naming.
+PAD_FACTS = MappingProxyType({
+    name: MappingProxyType({"registers": "GPIOA", "port_index": 0, "number": number})
+    for name, number in (("PA0", 0), ("PA1", 1), ("PA2", 2), ("PA3", 3),
+                         ("PA4", 4), ("PA5", 5), ("PA6", 6), ("PA7", 7),
+                         ("PA8", 8), ("PA9", 9))})
+ADC_PIN_CHANNELS = MappingProxyType({("ADC0", "PA8"): 8, ("ADC0", "PA9"): 9})
+
 PARTS = MappingProxyType({
     "NATIVE_MODEL": common.PartPolicy("host-model"),
 })
@@ -68,9 +76,15 @@ def validate_selection(selection, route):
     elif kind == "spi":
         common.integer(selection.get("max_hz", 1000000), *LIMITS["spi_hz"],
                        "SPI max_hz")
+    elif kind == "adc":
+        expected = [ADC_PIN_CHANNELS[(route["controller"], pin["pin"])]
+                    for pin in route["pins"]]
+        if selection["channels"] != expected:
+            common.fail("Native ADC sequence must cover its exact model route")
 
 
-def mode_implementation(kind, mode):
+def mode_implementation(kind, mode, controller=None):
+    del controller
     implementation = _MODE_IMPLEMENTATIONS.get((kind, mode))
     if implementation is None:
         common.fail(f"Unmaintained provider mode: native/{kind}/{mode}")
@@ -104,7 +118,11 @@ def builtin_cs(controller):
 ADC_GROUP = None
 PWM_SHARED = None
 ENDPOINT_POLICY = common.EndpointPolicy(
-    spi_transaction=True, spi_dma=(None, "async-model"), model_async_echo=True)
+    spi_transaction=True, spi_dma=(None, "async-model"),
+    spi_transaction_ops=common.Symbol("nx_native_spi_transaction_ops"),
+    spi_dma_owner=(common.Symbol("nx_native_spi_dma_owner_contains"),
+                   common.Symbol("nx_native_spi_dma_owner_attach_wake")),
+    model_async_echo=True)
 TIMEBASE_ALARM = False
 validate_mode_context = common.validate_mode_context
 mode_fields = common.mode_fields

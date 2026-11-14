@@ -4,10 +4,11 @@ One selected assembly owns its filter domain, exact receive rings and pin leases
 The emitted C calls the real common controller directly; no runtime registry,
 forwarding face, protocol retry policy or inferred transceiver is introduced.
 """
+from collections.abc import Mapping
 from dataclasses import dataclass
 
-from tools.configure.providers import for_selection
 from tools.configure.providers.common import fail, integer, sequence
+from tools.configure.calls import Symbol
 
 FILTER_FIELDS = {"controller", "bank", "id", "mask", "format", "fifo",
                  "remote", "match_remote", "tag"}
@@ -20,51 +21,58 @@ OPERATIONS = {"normal": "NX_CAN_NORMAL", "loopback": "NX_CAN_LOOPBACK",
 
 @dataclass(frozen=True)
 class CanPolicy:
-    """Exact vector spelling and reviewed transmit ordering for one provider."""
+    """Reviewed bxCAN IRQ role order and optional transmit ordering."""
 
-    error_suffix: str
+    irq_roles: tuple[str, ...]
     fifo_order_supported: bool = True
 
 
-def _integration(result, prefix):
-    provider = for_selection(result)
-    policy = getattr(provider, "CAN_INTEGRATION", None)
-    if policy is None or provider.PREFIX != prefix:
-        fail("CAN binding differs from its exact selected provider")
-    return policy
-
-
 def fields(value, names, context, optional=()):
-    if (not isinstance(value, dict) or not set(names).issubset(value) or
+    if (not isinstance(value, Mapping) or not set(names).issubset(value) or
             set(value) - set(names) - set(optional)):
         fail(f"CAN {context}: exact fields required")
 
 
-def validate_soc(soc, provider):
-    names = getattr(provider, "CAN_CONTROLLERS", ())
+def domain_topology(soc):
+    """One authored filter domain; this bxCAN contract has at most two owners."""
     facts = soc.get("can_domain")
+    fields(facts, {"primary", "controllers", "filter_banks"}, "domain facts")
+    names = tuple(sequence(facts["controllers"], "CAN domain controllers"))
+    if (not 1 <= len(names) <= 2 or any(not isinstance(name, str) for name in names)
+            or len(set(names)) != len(names)):
+        fail("CAN filter domain requires one or two distinct controller owners")
+    for name in names:
+        Symbol(name)
+    if facts["primary"] != names[0]:
+        fail("CAN primary must be the first filter-domain controller")
+    # The public classic implementation uses one 32-bit bank activation mask.
+    # The concrete C owner independently checks its actual peripheral capacity.
+    banks = integer(facts["filter_banks"], 1, 32, "CAN filter bank count")
+    return names, banks
+
+
+def validate_soc(soc, provider):
     actual = {name for name, value in soc["controllers"].items()
               if value["kind"] == "can"}
-    if facts is None and not actual:
+    if soc.get("can_domain") is None and not actual:
         return
-    fields(facts, {"primary", "controllers", "filter_banks"}, "domain facts")
-    if (not names or actual != set(names) or facts["controllers"] != list(names)
-            or facts["primary"] != names[0] or
-            type(facts["filter_banks"]) is not int or facts["filter_banks"] != 28):
-        fail("CAN domain differs from maintained exact SoC topology")
+    names, _ = domain_topology(soc)
+    if actual != set(names) or names != provider.CAN_CONTROLLERS:
+        fail("CAN domain differs from the selected SoC topology")
     policy = getattr(provider, "CAN_INTEGRATION", None)
-    if policy is None:
-        fail("CAN facts have no reviewed provider integration")
-    for index, name in enumerate(names):
+    if policy is None or policy.irq_roles != ("tx", "rx0", "rx1", "error"):
+        fail("CAN facts require the reviewed bxCAN IRQ role order")
+    for name in names:
         item = soc["controllers"][name]
-        suffix = policy.error_suffix
-        vectors = [name + "_" + kind for kind in ("TX", "RX0", "RX1", suffix)]
-        numbers = list(range(19, 23) if index == 0 else range(63, 67))
-        if (item["modes"] != ["classic-irq"] or item["irq"] != vectors or
-                item.get("irq_numbers") != numbers or
+        vectors = sequence(item["irq"], "CAN controller IRQ roles")
+        # The selected catalog has already admitted enum names and numbers.
+        # Preserve that explicit role order; never derive vectors from a name.
+        if (item["modes"] != ["classic-irq"] or
+                len(vectors) != len(policy.irq_roles) or
+                len(set(vectors)) != len(vectors) or
                 type(item.get("clock_hz")) is not int or
                 item["clock_hz"] != provider.CAN_CLOCK_HZ):
-            fail(f"CAN resource/clock facts differ from maintained SDK: {name}")
+            fail(f"CAN resource/clock facts differ from its selected domain: {name}")
 
 
 def validate_selection(selection, provider, ram_size, *, clock_hz=None):
@@ -105,28 +113,33 @@ def resolve_domain(authored, selected, soc, provider, claim, claims):
     primary = claims.get("controller:" + soc["can_domain"]["primary"])
     if primary is not None and primary["mode"] == "reserved":
         fail("CAN primary filter register domain is reserved")
-    split = integer(authored["split"], 0, 28, "CAN filter split")
+    owners, bank_count = domain_topology(soc)
+    split = integer(authored["split"], 0, bank_count, "CAN filter split")
+    if len(owners) == 1 and split != bank_count:
+        fail("CAN single-owner filter split must include the complete bank domain")
     filters = sequence(authored["filters"], "CAN filters")
     if len(filters) > soc["can_domain"]["filter_banks"]:
         fail("CAN filter plan exceeds the physical bank domain")
     result = []
     banks = set()
     tags = set()
-    ordinals = [0, 0]
+    ordinals = [0] * len(owners)
     claim("can:filter-domain", "can-domain", "static-domain", soc["id"])
     for definition in filters:
         fields(definition, FILTER_FIELDS - {"tag"}, "filter", {"tag"})
         port = ports.get(definition["controller"])
         if port is None:
             fail("CAN filter references an unselected controller")
-        index = provider.CAN_CONTROLLERS.index(port["controller"])
+        if port["controller"] not in owners:
+            fail("CAN filter controller is outside its selected domain")
+        index = owners.index(port["controller"])
         ordinals[index] += 1
         tag = integer(definition.get("tag", ordinals[index]), 1, 65535,
                       "CAN filter tag")
         if (index, tag) in tags:
             fail("CAN filter tag is duplicated within its controller")
         tags.add((index, tag))
-        bank = integer(definition["bank"], 0, 27, "CAN filter bank")
+        bank = integer(definition["bank"], 0, bank_count - 1, "CAN filter bank")
         if bank in banks or (bank >= split if index == 0 else bank < split):
             fail("CAN filter bank is duplicated or belongs to another controller")
         banks.add(bank)
@@ -145,7 +158,7 @@ def resolve_domain(authored, selected, soc, provider, claim, claims):
     # RM0090 Fig343 numbers each FIFO independently, including inactive banks.
     # This provider programs selected banks as 32-bit mask filters and all
     # remaining banks as inactive 16-bit mask/FIFO0 filters (two positions).
-    for begin, end in ((0, split), (split, 28)):
+    for begin, end in ((0, split), (split, bank_count)):
         positions = [0, 0]
         for bank in range(begin, end):
             item = by_bank.get(bank)
@@ -156,32 +169,6 @@ def resolve_domain(authored, selected, soc, provider, claim, claims):
                 item["match_index"] = positions[fifo]
                 positions[fifo] += 1
     return {"split": split, "filters": result}
-
-
-def state_declarations(result, prefix):
-    domain = result.can_domain
-    if domain is None:
-        return []
-    _integration(result, prefix)
-    filters = domain.filters
-    lines = []
-    if filters:
-        lines += ["static const nx_can_filter_t s_nx_can_filters[] = {"]
-        for item in filters:
-            lines += ["    {", f"        .id = {item.id}u, .mask = {item.mask}u,",
-                      f"        .format = NX_CAN_{item.format.upper()},",
-                      f"        .tag = {item.tag}u, .bank = {item.bank}u,",
-                      f"        .controller = {item.controller_index}u,",
-                      f"        .fifo = {item.fifo}u,",
-                      f"        .match_index = {item.match_index}u,",
-                      f"        .remote = {str(item.remote).lower()},",
-                      f"        .match_remote = {str(item.match_remote).lower()}",
-                      "    },"]
-        lines.append("};")
-    lines += ["static nx_can_filter_domain_t s_nx_can_domain = {",
-              f"    .filters = {'s_nx_can_filters' if filters else 'NULL'},",
-              f"    .filter_count = {len(filters)}u, .split = {domain.split}u", "};"]
-    return lines
 
 
 def fd_editor_schema(schema, record):

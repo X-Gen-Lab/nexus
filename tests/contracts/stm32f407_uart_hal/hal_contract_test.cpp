@@ -210,8 +210,10 @@ class F407HalContract : public testing::Test {
         config.uart.baud = 115200U;
         config.uart.clock_hz = 84000000U;
         config.uart.priority = 5U;
-        config.resources = {DMA2, &region, 1U};
-        config.transmit = {DMA2_Stream7, DMA2_Stream7_IRQn, 7U, 4U};
+        config.resources = {
+            {DMA2, DMA2_Stream7, DMA2_Stream7_IRQn, 7U, 4U}, {}, &region, 1U};
+        config.resources.transmit = {DMA2, DMA2_Stream7, DMA2_Stream7_IRQn, 7U,
+                                     4U};
         RCC->APB2ENR = RCC_APB2ENR_USART1EN;
         RCC->AHB1ENR = RCC_AHB1ENR_DMA2EN;
         ASSERT_EQ(nx_stm32_uart_hal_initialize(&state, &config), NX_SUCCESS);
@@ -303,7 +305,10 @@ TEST_F(F407HalContract, TxOnlyConfigurationRejectsReceiveOrContinuousDma) {
         SCOPED_TRACE(receive);
         state = {};
         config.continuous = !receive;
-        config.receive = receive ? DMA2_Stream2 : nullptr;
+        config.resources.receive =
+            receive ? nx_stm32_dma_route_t{DMA2, DMA2_Stream2,
+                                           DMA2_Stream2_IRQn, 2U, 4U}
+                    : nx_stm32_dma_route_t{};
         EXPECT_EQ(NX_ERROR_UNSUPPORTED,
                   nx_stm32_uart_hal_initialize(&state, &config));
         if (state.uart.initialized) {
@@ -757,8 +762,8 @@ TEST_F(F407HalContract, NearestBaudDivisorIsReadyBeforeFirstUeOnApb1) {
     config.uart.baud = 921600U;
     vectors[0] = USART2_IRQn;
     vectors[1] = DMA1_Stream6_IRQn;
-    config.resources.dma = DMA1;
-    config.transmit = {DMA1_Stream6, DMA1_Stream6_IRQn, 6U, 4U};
+
+    config.resources.transmit = {DMA1, DMA1_Stream6, DMA1_Stream6_IRQn, 6U, 4U};
     RCC->APB1ENR = RCC_APB1ENR_USART2EN;
     RCC->AHB1ENR |= RCC_AHB1ENR_DMA1EN;
     s_uart_enables = 0U;
@@ -1072,7 +1077,7 @@ TEST_F(F407HalCold, GenericFramesStillRequireF407WordLengthAdmission) {
 }
 
 TEST_F(F407HalCold, UnsupportedDmaRouteRejectsBeforeEffects) {
-    config.transmit.channel = 3U;
+    config.resources.transmit.channel = 3U;
     EXPECT_EQ(nx_stm32_uart_hal_cold_prepare(&state, &config, &receipt),
               NX_ERROR_UNSUPPORTED);
     EXPECT_EQ(s_cold_writes, 0U);
@@ -1224,8 +1229,8 @@ TEST_F(F407HalCold, IndependentUsartOwnersKeepPrivateHandlesAndLeases) {
     other.uart.pins = other_pins;
     other.uart.vectors = other_vectors;
     other.uart.rx_storage = payload + 0x500U;
-    other.resources.dma = DMA1;
-    other.transmit = {DMA1_Stream6, DMA1_Stream6_IRQn, 6U, 4U};
+
+    other.resources.transmit = {DMA1, DMA1_Stream6, DMA1_Stream6_IRQn, 6U, 4U};
     RCC->AHB1ENR |= RCC_AHB1ENR_DMA1EN;
     nx_stm32_uart_cold_receipt_t second_receipt = {};
     ASSERT_EQ(nx_stm32_uart_hal_cold_prepare(&second, &other, &second_receipt),
@@ -1267,11 +1272,12 @@ class F4ExtraHal : public F407HalContract,
         other.uart.rx_storage = payload + 0x600U;
         other.uart.priority = 6U;
         other.uart.clock_hz = 42000000U;
-        other.resources.dma = DMA1;
+
         switch (GetParam()) {
             case 0U:
                 other.uart.registers = USART3;
-                other.transmit = {DMA1_Stream3, DMA1_Stream3_IRQn, 3U, 4U};
+                other.resources.transmit = {DMA1, DMA1_Stream3,
+                                            DMA1_Stream3_IRQn, 3U, 4U};
                 irqs[0] = USART3_IRQn;
                 pins[0] = {GPIOB, &snapshots[0], 1U, 10U};
                 pins[1] = {GPIOB, &snapshots[1], 1U, 11U};
@@ -1280,7 +1286,8 @@ class F4ExtraHal : public F407HalContract,
                 break;
             case 1U:
                 other.uart.registers = UART4;
-                other.transmit = {DMA1_Stream4, DMA1_Stream4_IRQn, 4U, 4U};
+                other.resources.transmit = {DMA1, DMA1_Stream4,
+                                            DMA1_Stream4_IRQn, 4U, 4U};
                 irqs[0] = UART4_IRQn;
                 pins[0] = {GPIOA, &snapshots[0], 0U, 0U};
                 pins[1] = {GPIOA, &snapshots[1], 0U, 1U};
@@ -1289,7 +1296,8 @@ class F4ExtraHal : public F407HalContract,
                 break;
             case 2U:
                 other.uart.registers = UART5;
-                other.transmit = {DMA1_Stream7, DMA1_Stream7_IRQn, 7U, 4U};
+                other.resources.transmit = {DMA1, DMA1_Stream7,
+                                            DMA1_Stream7_IRQn, 7U, 4U};
                 irqs[0] = UART5_IRQn;
                 pins[0] = {GPIOC, &snapshots[0], 2U, 12U};
                 pins[1] = {GPIOD, &snapshots[1], 3U, 2U};
@@ -1298,18 +1306,19 @@ class F4ExtraHal : public F407HalContract,
                 break;
             default:
                 other.uart.registers = USART6;
-                other.transmit = {DMA2_Stream6, DMA2_Stream6_IRQn, 6U, 5U};
+                other.resources.transmit = {DMA2, DMA2_Stream6,
+                                            DMA2_Stream6_IRQn, 6U, 5U};
                 irqs[0] = USART6_IRQn;
                 pins[0] = {GPIOC, &snapshots[0], 2U, 6U};
                 pins[1] = {GPIOC, &snapshots[1], 2U, 7U};
                 other.uart.clock_hz = 84000000U;
-                other.resources.dma = DMA2;
+
                 gate = RCC_APB2ENR_USART6EN;
                 shift = 16U;
                 apb2 = true;
                 break;
         }
-        irqs[1] = other.transmit.irq;
+        irqs[1] = other.resources.transmit.irq;
         RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN | RCC_AHB1ENR_GPIOBEN |
                         RCC_AHB1ENR_GPIOCEN | RCC_AHB1ENR_GPIODEN |
                         RCC_AHB1ENR_DMA1EN;
@@ -1366,16 +1375,18 @@ TEST_P(F4ExtraHal, MemoryCompletionKeepsRxAndTheBorrowUntilObservedWireTc) {
     ASSERT_EQ(NX_SUCCESS,
               nx_uart_tx_prepare(&transfer, payload + 32U, 4U, 1000U));
     ASSERT_EQ(NX_SUCCESS, nx_uart_port_submit(&second_port, &transfer));
-    EXPECT_EQ(other.transmit.channel,
-              (other.transmit.registers->CR & DMA_SxCR_CHSEL) >> 25U);
-    auto* flags = other.transmit.stream < 4U ? &other.resources.dma->LISR
-                                             : &other.resources.dma->HISR;
-    auto* clear = other.transmit.stream < 4U ? &other.resources.dma->LIFCR
-                                             : &other.resources.dma->HIFCR;
+    EXPECT_EQ(other.resources.transmit.channel,
+              (other.resources.transmit.stream->CR & DMA_SxCR_CHSEL) >> 25U);
+    auto* flags = other.resources.transmit.lane < 4U
+                      ? &other.resources.transmit.dma->LISR
+                      : &other.resources.transmit.dma->HISR;
+    auto* clear = other.resources.transmit.lane < 4U
+                      ? &other.resources.transmit.dma->LIFCR
+                      : &other.resources.transmit.dma->HIFCR;
     const uint32_t neighbour = 0x20U << (shift == 0U ? 6U : 0U);
     *flags = neighbour | (0x20U << shift);
-    other.transmit.registers->CR &= ~static_cast<uint32_t>(DMA_SxCR_EN);
-    other.transmit.registers->NDTR = 0U;
+    other.resources.transmit.stream->CR &= ~static_cast<uint32_t>(DMA_SxCR_EN);
+    other.resources.transmit.stream->NDTR = 0U;
     bool previous = nx_hal_test_isr(true);
     nx_stm32_uart_hal_dma_irq(&second);
     nx_hal_test_isr(previous);
@@ -1400,7 +1411,7 @@ TEST_P(F4ExtraHal, MemoryCompletionKeepsRxAndTheBorrowUntilObservedWireTc) {
     EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&transfer.base));
     EXPECT_EQ(NX_SUCCESS, transfer.base.result);
     EXPECT_EQ(4U, transfer.base.transferred);
-    EXPECT_EQ(0U, other.transmit.registers->M0AR);
+    EXPECT_EQ(0U, other.resources.transmit.stream->M0AR);
     EXPECT_EQ(NX_SUCCESS, nx_uart_port_stop(&second_port));
     EXPECT_TRUE(state.uart.initialized);
 }
@@ -1411,11 +1422,11 @@ TEST_P(F4ExtraHal, MissingClockAndWrongSelectorRejectWithoutAcquiringOwner) {
     EXPECT_EQ(nullptr, second.config);
     EXPECT_EQ(0U, other.uart.registers->CR1);
     Power();
-    other.transmit.channel ^= 1U;
+    other.resources.transmit.channel ^= 1U;
     EXPECT_EQ(NX_ERROR_UNSUPPORTED,
               nx_stm32_uart_hal_initialize(&second, &other));
     EXPECT_EQ(nullptr, second.config);
-    EXPECT_EQ(0U, other.transmit.registers->CR);
+    EXPECT_EQ(0U, other.resources.transmit.stream->CR);
     EXPECT_TRUE(state.uart.initialized);
 }
 

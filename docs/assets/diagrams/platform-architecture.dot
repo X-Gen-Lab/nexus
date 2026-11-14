@@ -1,5 +1,5 @@
 // FIG-01 current: source-backed, scoped engineering view.
-// Code basis: 0111c8d3b9c7b37d258b9c401070305b13b6f3a1.
+// Code basis: core/private/platform_lifecycle_impl.h; tools/configure/bindings.py; io/include/nexus/io.
 // Relations and qualification limits are documented in README.md.
 digraph PlatformArchitecture {
     graph [newrank=true, rankdir=TB, bgcolor="white", pad=0.28, nodesep=0.42,
@@ -24,8 +24,7 @@ Board / backend / 实例 / 资源预算\nexternal TOML assembly\nBoard / backend
         components [label="可选组件：owner / 器件 / 存储窄端口\noptional owner / device / storage ports", style="rounded,dashed,filled"];
         os [label="可选 OS：任务、等待与通知端口
 任务存储与内核启动由外部提供\noptional OS task / wait / notify\nexternal task storage and kernel start", style="rounded,dashed,filled"];
-        platform [label="Platform：生成的静态装配
-typed factory / start / stop\ngenerated static Platform assembly"];
+        platform [label="Platform：静态装配与共享 C 协调器\ntyped factory／显式 start／stop\nPlatform: static assembly and shared C coordinator\nTyped factory / explicit start / stop"];
         io [label="I/O：公共类型、只读 face、checked dispatch\npublic types / readonly faces / checks"];
         soc [label="SoC provider：控制器 / IRQ / DMA
 私有状态、时钟、timebase、内存事实\ncontroller / IRQ / DMA implementation\nprivate state, clock, timebase, memory"];

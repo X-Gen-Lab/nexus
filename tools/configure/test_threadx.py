@@ -6,6 +6,7 @@ import tempfile
 import unittest
 
 from tools.configure import cpu
+from tools.configure import configure as gate
 from tools.configure import kernel
 from tools.configure import runtime
 from tools.configure.test_cpu_profiles import facts, irq
@@ -166,11 +167,66 @@ class ThreadXPolicyTests(unittest.TestCase):
         for directory, family in (('native_reference', 'native'), ('stm32f407_qiming_v31', 'stm32f4'), ('stm32f407ve_sky_qingchun', 'stm32f4')):
             path = (ROOT / "tests/support/native/board/board.json"
                     if family == "native" else ROOT / "boards" / directory / "board.json")
-            board = json.loads(path.read_text())["id"]
-            module.validate_platform(board, family)
-        for board, family in (('custom_unknown', 'stm32f4'), ('stm32f407_qiming_v31', 'stm32f4')):
-            with self.subTest(board=board), self.assertRaisesRegex(ValueError, "ThreadX.*platform"):
-                module.validate_platform(board, family)
+            board = json.loads(path.read_text())
+            self.assertEqual(["threadx"], board["backend_support"])
+            module.validate_platform(board, self.profile(
+                "native" if family == "native" else "cortex-m4"))
+        for support in (None, [], ["freertos"]):
+            board = {"id": "arbitrary-reviewed-name"}
+            if support is not None:
+                board["backend_support"] = support
+            with self.subTest(support=support), self.assertRaisesRegex(
+                    ValueError, "ThreadX.*platform"):
+                module.validate_platform(board, self.profile())
+
+    def test_explicit_board_permission_is_independent_of_its_name(self):
+        module = importlib.import_module("tools.configure.threadx")
+        board = {"id": "another-reviewed-board", "soc_family": "another-family",
+                 "backend_support": ["threadx"]}
+        module.validate_platform(board, self.profile())
+        for profile in (cpu.resolve(facts("cortex-m4"), irq("cortex-m4"), "baremetal"),
+                        cpu.resolve(facts("cortex-m7"), irq("cortex-m7"), "baremetal")):
+            with self.subTest(arch=profile.arch), self.assertRaisesRegex(
+                    ValueError, "ThreadX.*port"):
+                module.validate_platform(board, profile)
+
+    def test_renamed_board_facts_are_consumed_by_the_production_resolver(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            package = root / "board"
+            package.mkdir()
+            board = json.loads((ROOT / "boards/stm32f407_qiming_v31/board.json").read_text())
+            board.update(id="renamed-reviewed-board", backend_support=["threadx"])
+            board_path = package / "board.json"
+            assembly = root / "assembly.toml"
+            assembly.write_text('schema=2\nboard_package="board"\nbackend="threadx"\n'
+                                'clock="hse8-pll168"\n[memory]\nmain_stack_bytes=2048\n')
+            board_path.write_text(json.dumps(board))
+            paths = {}
+            result = gate.resolve_ir(assembly, input_paths=paths)
+            self.assertEqual("renamed-reviewed-board", result.board)
+            self.assertEqual("cortex_m4/gnu", result.kernel.kernel_port)
+            self.assertIn(str(board_path.resolve()), paths.values())
+            del board["backend_support"]
+            board_path.write_text(json.dumps(board))
+            with self.assertRaisesRegex(ValueError, "ThreadX.*platform"):
+                gate.resolve_ir(assembly)
+
+    def test_board_backend_support_has_strict_array_schema(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            package = root / "board"
+            package.mkdir()
+            board = json.loads((ROOT / "boards/stm32f407_qiming_v31/board.json").read_text())
+            assembly = root / "assembly.toml"
+            assembly.write_text('schema=2\nboard_package="board"\nbackend="baremetal"\n'
+                                'clock="hse8-pll168"\n[memory]\nmain_stack_bytes=2048\n')
+            for support in ("threadx", ["threadx", "threadx"], ["unknown"], [True], None):
+                with self.subTest(support=support):
+                    board["backend_support"] = support
+                    (package / "board.json").write_text(json.dumps(board))
+                    with self.assertRaisesRegex(ValueError, "backend support"):
+                        gate.resolve_ir(assembly)
 
     def test_cpu_runtime_binds_host_policy_into_atomic_bundle(self):
         with tempfile.TemporaryDirectory() as directory:

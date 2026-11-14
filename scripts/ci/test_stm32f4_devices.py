@@ -258,7 +258,11 @@ class STM32F4PrivateHeaderCompileTests(unittest.TestCase):
                    "../drivers/usb_device.c", "../drivers/can.c")
         for index, header in enumerate(headers):
             with self.subTest(header=header):
-                self.compile(f"dispatch-{index}", f'#include "{header}"\n'
+                # This header-identity probe selects no runnable timer channels.
+                connections = ('#define NEXUS_STM32_CAPTURE_PINS(X)\n'
+                               '#define NEXUS_STM32_ADVANCED_PINS(X)\n'
+                               if header == "stm32f407_timer_pins.h" else '')
+                self.compile(f"dispatch-{index}", connections + f'#include "{header}"\n'
                              '#if !defined(__STM32F405xx_H) || '
                              'defined(__STM32F407xx_H)\n'
                              '#error "private include changed the device"\n'

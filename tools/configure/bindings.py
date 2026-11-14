@@ -1,6 +1,4 @@
 """Static faces and common lifecycle order; SoC modules emit hardware wiring."""
-import re
-
 from tools.configure.providers import for_selection
 from tools.configure.ir import ConfigurationIR
 from tools.configure.factory import (interface_type, public_include,
@@ -8,43 +6,61 @@ from tools.configure.factory import (interface_type, public_include,
 from tools.configure import gpio_phase
 from tools.configure import enhanced_endpoints
 from tools.configure import stream_profiles, uart_formats
-from tools.configure.calls import DirectCall, Symbol
+from tools.configure.calls import DirectCall, InitializeSequence, Symbol
 from tools.configure.providers.common import fail
+from tools.configure.static_ir import (ControllerPowerConnection, Declaration,
+                                      IrqConnection)
+
+
+def _render_static(nodes, *, model=False):
+    """Render finite assembly; legacy text is confined to explicit host models."""
+    source = []
+    for node in nodes:
+        if isinstance(node, (Declaration, InitializeSequence)):
+            source.extend(node.render())
+        elif model and isinstance(node, str):
+            source.append(node)
+        else:
+            fail("Production static assembly requires finite typed declarations")
+    return source
+
+
+def _power_connections(nodes):
+    """Keep indexed dispatch in one emitter; providers supply direct C calls."""
+    if not nodes:
+        return [], "NULL", "NULL"
+    if (any(not isinstance(node, ControllerPowerConnection) for node in nodes) or
+            len({node.index for node in nodes}) != len(nodes)):
+        fail("Controller power overrides require distinct typed connections")
+    source = [r'/** \brief Suspend explicit autonomous owners without replay. */',
+              'static nx_result_t nx_platform_suspend_controller(size_t index) {',
+              '    switch (index) {']
+    for node in nodes:
+        source += [f'    case {node.index}u:',
+                   '        return ' + node.suspend.render() + ';']
+    source += ['    default: return nx_platform_release(index);', '    }', '}',
+               r'/** \brief Revalidate retained owners; rebuild ordinary owners. */',
+               'static nx_lifecycle_acquisition_t nx_platform_resume_controller(size_t index) {',
+               '    switch (index) {']
+    for node in nodes:
+        source += [f'    case {node.index}u:',
+                   '        return (nx_lifecycle_acquisition_t){ ' +
+                   node.resume.render() + ', ' +
+                   str(node.retain_on_failed_resume).lower() + ' };']
+    source += ['    default: return nx_platform_acquire(index);', '    }', '}']
+    return source, "nx_platform_suspend_controller", "nx_platform_resume_controller"
 
 
 def symbol(name):
     return name.replace("-", "_")
 
 
-def _irq_exit_barriers(lines):
-    """Complete stores at generator-owned F4 exception-return connections.
-
-    ES0182 2.1.3 requires a DSB before exception return. These entries contain
-    only fixed calls and shared dispatch; early returns must be reviewed rather
-    than silently bypassing the connection's final barrier.
-    """
-    source = "\n".join(lines)
-    # Match Construction's comment/literal boundary, preserving every offset.
-    # Only the original source is emitted; quoted IRQ spellings remain data.
-    code = re.sub(r'/\*.*?\*/|//[^\n]*|"(?:\\.|[^"\\])*"|\'(?:\\.|[^\'\\])*\'',
-                  lambda match: " " * len(match.group()), source,
-                  flags=re.DOTALL)
-    entries = re.finditer(r"\bvoid\s+\w+_IRQHandler\s*"
-                          r"\(\s*void\s*\)\s*\{", code)
-    closes = []
-    for entry in entries:
-        depth, end = 1, entry.end()
-        while depth and end < len(code):
-            depth += (code[end] == "{") - (code[end] == "}")
-            end += 1
-        if depth:
-            fail("Generated F4 IRQ connection is not closed")
-        if re.search(r"\breturn\b", code[entry.end():end - 1]):
-            fail("Generated F4 IRQ connection cannot return before DSB")
-        closes.append(end - 1)
-    for end in reversed(closes):
-        source = source[:end] + "nx_arch_dsb(); " + source[end:]
-    return source.splitlines()
+def _static_connections(construction):
+    source = []
+    for connection in construction.irq_connections:
+        source.append(f"void {connection.name}(void);")
+        source.extend(connection.render())
+    return source
 
 
 def _sequence(calls, indent="        "):
@@ -73,7 +89,7 @@ def _platform_connections(result, provider):
                     if name != "resources_resume"))
         if any(not callable(getattr(provider, name, None)) for name in required):
             fail("Physical provider requires typed platform lifecycle hooks")
-        source.extend(provider.platform_declarations(result))
+        source.extend(_render_static(provider.platform_declarations(result)))
     for result_type, name, parameters in specifications:
         source += [r"/** \brief Fixed connection to the selected platform owner. */",
                    f"static {result_type} nx_platform_{name}({parameters}) {{"]
@@ -228,7 +244,8 @@ def emit(result):
             program_flags=geometry[1], static=False))
     source += ['static nx_platform_lifecycle_state_t s_nx_platform_lifecycle;',
                'static const uint8_t s_nx_platform_identity;']
-    source.extend(provider.state_declarations(result))
+    source.extend(_render_static(provider.state_declarations(result),
+                                 model=provider.MODEL))
     initialize = []
     admission = []
     initialization_indices = []
@@ -255,7 +272,10 @@ def emit(result):
                 initial = (" = " + construction.initial_state.render()
                            if construction.initial_state is not None else "")
                 source.append(f'static {construction.state_type} {physical}{initial};')
+                for declaration in construction.static_declarations:
+                    source.extend(declaration.render())
                 source.extend(construction.definitions)
+                source.extend(_static_connections(construction))
                 for sequence in construction.initialize_sequences:
                     source.extend(sequence.render())
                 admission.extend((selection_index, call.render())
@@ -273,21 +293,27 @@ def emit(result):
         pre_c_effects |= construction.pre_c_effects
         initial = (" = " + construction.initial_state.render()
                    if construction.initial_state is not None else "")
-        source += [f'static {construction.state_type} s_nx_port_{name}{initial};']
+        source += [f'static {construction.state_type} s_nx_port_{name}{initial};',
+                   f'static const {exported_type} s_nx_face_{name};']
         source.extend(construction.face_definitions)
-        face_context = construction.face_context or f"&s_nx_port_{name}"
-        source += [
-                   f'static const {exported_type} s_nx_face_{name} = {{',
-                   f'    &{provider.operations(item)}, {face_context}', '};',
-                   f'const {exported_type}* const nx_binding_{name} = &s_nx_face_{name};']
+        face_context = (construction.face_context.render()
+                        if construction.face_context is not None
+                        else f"&s_nx_port_{name}")
         if item.kind == "gpio" and getattr(item.options, "active_high", None) is not None:
             source += [
                 f'static const nx_gpio_signal_t s_nx_signal_{name} = {{',
                 f'    &s_nx_face_{name}, {item.options.mask}u, '
                 f'{str(item.options.active_high).lower()}', '};']
         source.extend(stream_profiles.emit_instance(item))
-        source.extend(provider.instance_declarations(item, result))
+        source.extend(_render_static(provider.instance_declarations(item, result),
+                                     model=provider.MODEL))
+        for declaration in construction.static_declarations:
+            source.extend(declaration.render())
         source.extend(construction.definitions)
+        source += [f'static const {exported_type} s_nx_face_{name} = {{',
+                   f'    &{provider.operations(item)}, {face_context}', '};',
+                   f'const {exported_type}* const nx_binding_{name} = &s_nx_face_{name};']
+        source.extend(_static_connections(construction))
         for sequence in construction.initialize_sequences:
             source.extend(sequence.render())
         admission.extend((selection_index, call.render())
@@ -305,10 +331,18 @@ def emit(result):
     for device in result.devices:
         class_name = enhanced_endpoints.class_name(device)
         header.append(f'extern const {interface_type(class_name, "endpoint")}* const nx_device_{symbol(device.id)};')
-    source.extend(provider.shared_irqs(result))
+    for item in provider.shared_irqs(result):
+        if isinstance(item, IrqConnection):
+            source.append(f"void {item.name}(void);")
+            source.extend(item.render())
+        elif isinstance(item, Declaration):
+            source.extend(item.render())
+        else:
+            source.append(item)
     # All constructor arrays precede their shared cold lease functions.
     # Reuse those static slots directly; no pointer registry is emitted.
-    source.extend(gpio_phase.declarations(result, pin_snapshots))
+    source.extend(_render_static(gpio_phase.declarations(result, pin_snapshots),
+                                 model=provider.MODEL))
     source.extend(_platform_connections(result, provider))
     source += [r'/** \brief Context is admitted, never established by bindings. */',
                'static nx_result_t nx_platform_context_check(void) {',
@@ -322,9 +356,9 @@ def emit(result):
                    '    ' + ', '.join(f'{index}u'
                                      for index in initialization_indices), '};']
     power_controllers = getattr(provider, "platform_power_controllers", None)
-    power_source, suspend_hook, resume_hook = (
+    power_source, suspend_hook, resume_hook = _power_connections(
         power_controllers(result, initialization_indices)
-        if power_controllers is not None else ([], "NULL", "NULL"))
+        if power_controllers is not None else ())
     source.extend(power_source)
     source += ['static const nx_platform_lifecycle_plan_t s_nx_platform_plan = {',
                f'    .controller_count = {len(initialize)}u,',
@@ -372,6 +406,4 @@ def emit(result):
                        '        &s_nx_platform_plan, &s_nx_platform_lifecycle, ' +
                        diagnostic + ', &s_nx_platform_identity);', '}']
     header += ['#ifdef __cplusplus', '}', '#endif', '#endif', '']
-    if result.soc_family == "stm32f4":
-        source = _irq_exit_barriers(source)
     return '\n'.join(header), '\n'.join(source) + '\n'

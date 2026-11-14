@@ -1,13 +1,27 @@
 """F407 clocks are calculated from one reviewed oscillator/PLL tuple."""
 import copy
+import shutil
+import subprocess
 import tempfile
 from pathlib import Path
 import unittest
 
-from tools.configure import stm32f4
+from tools.configure.tests.f4_fixture import provider
 
 
 class F407ClockTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.provider = provider("STM32F407VET6")
+
+    def test_clock_plan_retains_semantics_instead_of_c_register_encodings(self):
+        plan = self.provider.clock_plan("custom", self.parameters())
+        for field in ("pllcfgr", "cfgr", "sw"):
+            with self.subTest(field=field):
+                self.assertNotIn(field, plan["parameters"])
+        self.assertEqual(plan["parameters"]["sysclk_source"], "pll")
+        self.assertEqual(plan["parameters"]["apb1_div"], 4)
+
     def test_system_review_projects_exact_cuts_without_controller_approval(self):
         from tools.configure import configure, selected_contracts
         expected = (0x1001, 0x1003, 0x1007, 0x100F, 0x101F)
@@ -35,30 +49,30 @@ class F407ClockTests(unittest.TestCase):
         from types import SimpleNamespace
         parameters = {**self.parameters(), "source": "hse",
                       "input_hz": 8000000, "pll_m": 8}
-        plan = stm32f4.clock_plan("custom", parameters)
+        plan = self.provider.clock_plan("custom", parameters)
         for mode, controller in (("otg-fs", "OTG_FS"),
                 ("otg-hs-fs", "OTG_HS"), ("otg-hs-ulpi", "OTG_HS")):
             with self.subTest(mode=mode):
                 consumer = SimpleNamespace(kind="usb_device", mode=mode,
                                            controller=controller, options=None)
-                stm32f4.validate_clock_consumers(plan, (consumer,))
-                hsi = stm32f4.clock_plan("custom", self.parameters())
+                self.provider.validate_clock_consumers(plan, (consumer,))
+                hsi = self.provider.clock_plan("custom", self.parameters())
                 if mode != "otg-hs-ulpi":
                     with self.assertRaisesRegex(ValueError, "HSE crystal"):
-                        stm32f4.validate_clock_consumers(hsi, (consumer,))
+                        self.provider.validate_clock_consumers(hsi, (consumer,))
                 else:
                     parameters = {**self.parameters(), "pll_n": 288, "pll_q": 8}
-                    independent = stm32f4.clock_plan("custom", parameters)
+                    independent = self.provider.clock_plan("custom", parameters)
                     self.assertEqual(independent["domains"]["pll48"]["nominal_hz"], 36000000)
-                    stm32f4.validate_clock_consumers(independent, (consumer,))
+                    self.provider.validate_clock_consumers(independent, (consumer,))
 
     def test_clock_calculation_is_part_of_generator_freshness_identity(self):
         from tools.configure import dependencies
-        self.assertIn("tools/configure/stm32f4/clocks.py",
+        self.assertIn("tools/configure/domains/pll_mnpq.py",
                       dependencies.source_names("platform", "stm32f4"))
 
     def test_existing_profile_has_calculated_peripheral_domains(self):
-        plan = stm32f4.clock_plan("hse8-pll168", {
+        plan = self.provider.clock_plan("hse8-pll168", {
             "hse_hz": 8000000, "core_hz": 168000000,
             "apb1_hz": 42000000, "apb2_hz": 84000000})
         self.assertIsNotNone(plan)
@@ -67,7 +81,7 @@ class F407ClockTests(unittest.TestCase):
         self.assertEqual(plan["domains"]["adc"]["nominal_hz"], 21000000)
 
     def test_hsi_pll84_and_timer_multiplier_are_exact(self):
-        plan = stm32f4.clock_plan("custom", self.parameters())
+        plan = self.provider.clock_plan("custom", self.parameters())
         self.assertEqual(plan["domains"]["core"]["nominal_hz"], 84000000)
         self.assertEqual(plan["domains"]["apb1"]["nominal_hz"], 21000000)
         self.assertEqual(plan["domains"]["apb1_timer"]["nominal_hz"], 42000000)
@@ -79,12 +93,12 @@ class F407ClockTests(unittest.TestCase):
     def test_direct_input_does_not_claim_or_enable_an_unused_main_pll(self):
         parameters = self.parameters()
         parameters.update(sysclk_source="input", apb1_div=1, apb2_div=1)
-        plan = stm32f4.clock_plan("custom", parameters)
+        plan = self.provider.clock_plan("custom", parameters)
         self.assertEqual(plan["domains"]["sysclk"]["nominal_hz"], 16000000)
         self.assertEqual(plan["domains"]["core"]["nominal_hz"], 16000000)
         self.assertEqual(plan["domains"]["pll48"]["nominal_hz"], 0)
         self.assertFalse(plan["parameters"]["pll_enabled"])
-        self.assertEqual(plan["parameters"]["sw"], 0)
+        self.assertEqual(plan["parameters"]["sysclk_source"], "input")
 
     def test_direct_input_reserves_pll48_only_by_explicit_static_choice(self):
         from types import SimpleNamespace
@@ -92,17 +106,18 @@ class F407ClockTests(unittest.TestCase):
         block = SimpleNamespace(kind="block", mode="sdio-poll",
                                 controller="SDIO",
                                 options=SimpleNamespace(bus_width=4))
-        plan = stm32f4.clock_plan("custom", parameters)
+        plan = self.provider.clock_plan("custom", parameters)
         with self.assertRaises(ValueError):
-            stm32f4.validate_clock_consumers(plan, (block,))
+            self.provider.validate_clock_consumers(plan, (block,))
         parameters["pll48"] = True
-        plan = stm32f4.clock_plan("custom", parameters)
+        plan = self.provider.clock_plan("custom", parameters)
         self.assertTrue(plan["parameters"]["pll_enabled"])
         self.assertEqual(plan["domains"]["pll48"]["nominal_hz"], 48000000)
-        stm32f4.validate_clock_consumers(plan, (block,))
+        self.provider.validate_clock_consumers(plan, (block,))
         parameters.update(source="hse", input_hz=8000000, pll_m=8)
-        plan = stm32f4.clock_plan("custom", parameters)
-        self.assertEqual(plan["parameters"]["sw"], 1)
+        plan = self.provider.clock_plan("custom", parameters)
+        self.assertEqual(plan["parameters"]["sysclk_source"], "input")
+        self.assertEqual(plan["parameters"]["source"], "hse")
         self.assertEqual(plan["domains"]["core"]["nominal_hz"], 8000000)
 
     def test_sdio_width_uses_a_legal_divider_for_the_selected_pclk2(self):
@@ -118,14 +133,14 @@ class F407ClockTests(unittest.TestCase):
                                    controller="SDIO", options=SimpleNamespace(
                                        bus_width=width))
             with self.subTest(width=width):
-                stm32f4.validate_clock_consumers(
-                    stm32f4.clock_plan("custom", parameters), (item,))
+                self.provider.validate_clock_consumers(
+                    self.provider.clock_plan("custom", parameters), (item,))
         # At 62.5 kHz PCLK2 even the largest even divider violates RM0090.
         parameters.update(ahb_div=8, apb2_div=16)
         item.options.bus_width = 1
         with self.assertRaises(ValueError):
-            stm32f4.validate_clock_consumers(
-                stm32f4.clock_plan("custom", parameters), (item,))
+            self.provider.validate_clock_consumers(
+                self.provider.clock_plan("custom", parameters), (item,))
 
     def test_internal_usb_rejects_hsi_nominal_48_without_crystal_accuracy(self):
         from types import SimpleNamespace
@@ -141,20 +156,20 @@ class F407ClockTests(unittest.TestCase):
                     continue
                 item = SimpleNamespace(kind=kind, mode=mode,
                                        controller=controller, options=None)
-                plan = stm32f4.clock_plan("custom", parameters)
+                plan = self.provider.clock_plan("custom", parameters)
                 self.assertEqual(plan["domains"]["pll48"]["nominal_hz"],
                                  48000000)
                 with self.subTest(mode=mode, sysclk=sysclk_source):
                     with self.assertRaisesRegex(ValueError, "external HSE"):
-                        stm32f4.validate_clock_consumers(plan, (item,))
+                        self.provider.validate_clock_consumers(plan, (item,))
                 parameters.update(source="hse")
-                stm32f4.validate_clock_consumers(
-                    stm32f4.clock_plan("custom", parameters), (item,))
+                self.provider.validate_clock_consumers(
+                    self.provider.clock_plan("custom", parameters), (item,))
 
     def test_direct_input_rejects_unknown_source_and_untyped_pll_owner(self):
         for choice in ({"sysclk_source": "nearest"}, {"pll48": 1}):
             with self.subTest(choice=choice), self.assertRaises(ValueError):
-                stm32f4.clock_plan("custom", {**self.parameters(), **choice})
+                self.provider.clock_plan("custom", {**self.parameters(), **choice})
 
     def test_usb_consumes_its_exact_phy_clock_and_minimum_ahb_frequency(self):
         from types import SimpleNamespace
@@ -164,21 +179,21 @@ class F407ClockTests(unittest.TestCase):
         fs = SimpleNamespace(kind="usb_device", mode="device-fs",
                              controller="OTG_FS", options=None)
         with self.assertRaises(ValueError):
-            stm32f4.validate_clock_consumers(
-                stm32f4.clock_plan("custom", parameters), (fs,))
+            self.provider.validate_clock_consumers(
+                self.provider.clock_plan("custom", parameters), (fs,))
         parameters.update(pll_n=240, pll_q=5, ahb_div=1)
         ulpi = SimpleNamespace(kind="usb_host", mode="host-hs-ulpi",
                                controller="OTG_HS", options=None)
         with self.assertRaises(ValueError):
-            stm32f4.validate_clock_consumers(
-                stm32f4.clock_plan("custom", parameters), (ulpi,))
+            self.provider.validate_clock_consumers(
+                self.provider.clock_plan("custom", parameters), (ulpi,))
         parameters.update(pll_n=288, pll_q=8)
-        plan = stm32f4.clock_plan("custom", parameters)
+        plan = self.provider.clock_plan("custom", parameters)
         self.assertEqual(plan["domains"]["pll48"]["nominal_hz"], 36000000)
-        stm32f4.validate_clock_consumers(plan, (ulpi,))
+        self.provider.validate_clock_consumers(plan, (ulpi,))
         ulpi.controller = "OTG_FS"
         with self.assertRaises(ValueError):
-            stm32f4.validate_clock_consumers(plan, (ulpi,))
+            self.provider.validate_clock_consumers(plan, (ulpi,))
 
     def test_direct_input_pwm_uses_its_actual_timer_divider(self):
         from tools.configure import configure, bindings
@@ -201,12 +216,23 @@ class F407ClockTests(unittest.TestCase):
             result = configure.resolve_ir(path)
             self.assertEqual(result.controllers[0].integration.clock_hz,
                              16000000)
-            self.assertIn('.prescaler = 0u', bindings.emit(result)[1])
+            self.assertIn('.prescaler = NX_STM32_TIMER_PRESCALER(16000000u, '
+                          '16000000u)', bindings.emit(result)[1])
+            compiler = shutil.which("cc")
+            self.assertIsNotNone(compiler)
+            source = ('#include "stm32f4_timer_encoding.h"\n'
+                      '_Static_assert(NX_STM32_TIMER_PRESCALER('
+                      '16000000u, 16000000u) == 0u, "prescaler");\n')
+            completed = subprocess.run([compiler, "-std=c11", "-Wall", "-Wextra",
+                "-Werror", "-pedantic", "-fsyntax-only", "-x", "c", "-I",
+                str(configure.ROOT / "soc/stm32/stm32f4/private"), "-"],
+                input=source, capture_output=True, text=True)
+            self.assertEqual(completed.returncode, 0, completed.stderr)
 
     def test_bus_divide_one_does_not_double_timer(self):
         parameters = self.parameters()
         parameters.update(pll_p=8, apb1_div=1, apb2_div=1)
-        plan = stm32f4.clock_plan("custom", parameters)
+        plan = self.provider.clock_plan("custom", parameters)
         self.assertEqual(plan["domains"]["apb1_timer"]["nominal_hz"], 42000000)
 
     def test_rejects_fractional_unsafe_or_competing_facts(self):
@@ -216,13 +242,13 @@ class F407ClockTests(unittest.TestCase):
                        {"core_hz": 84000000}, {"pll_m": True}):
             parameters = {**self.parameters(), **change}
             with self.subTest(change=change), self.assertRaises(ValueError):
-                stm32f4.clock_plan("custom", parameters)
+                self.provider.clock_plan("custom", parameters)
 
     def test_css_requires_external_oscillator_and_keeps_48_dependency(self):
         parameters = self.parameters()
         parameters.update(source="hse", input_hz=8000000, pll_m=8, css=True)
         before = copy.deepcopy(parameters)
-        plan = stm32f4.clock_plan("custom", parameters)
+        plan = self.provider.clock_plan("custom", parameters)
         self.assertEqual(plan["domains"]["pll48"]["nominal_hz"], 48000000)
         self.assertTrue(plan["parameters"]["css"])
         self.assertEqual(parameters, before)
@@ -231,21 +257,21 @@ class F407ClockTests(unittest.TestCase):
         from types import SimpleNamespace
         parameters = {**self.parameters(), "sysclk_source": "input",
                       "apb1_div": 1, "apb2_div": 1}
-        selected = stm32f4.clock_plan("custom", parameters)
+        selected = self.provider.clock_plan("custom", parameters)
         for kind in ("eth", "eth_frames"):
             item = SimpleNamespace(kind=kind, mode="raw-mii", controller="ETH",
                                    options=None)
             with self.subTest(kind=kind), self.assertRaisesRegex(
                     ValueError, "Ethernet.*25"):
-                stm32f4.validate_clock_consumers(selected, (item,))
+                self.provider.validate_clock_consumers(selected, (item,))
 
     def test_selected_clock_consumers_reject_impossible_kernel_and_baud(self):
         from types import SimpleNamespace
-        validate = getattr(stm32f4, "validate_clock_consumers", None)
+        validate = getattr(self.provider, "validate_clock_consumers", None)
         self.assertTrue(callable(validate))
         parameters = self.parameters()
         parameters["pll_q"] = 8
-        plan = stm32f4.clock_plan("custom", parameters)
+        plan = self.provider.clock_plan("custom", parameters)
         for kind in ("usb_device", "usb_host", "block"):
             mode = "host-fs" if kind == "usb_host" else "device-fs"
             item = SimpleNamespace(kind=kind, mode=mode,
@@ -253,7 +279,7 @@ class F407ClockTests(unittest.TestCase):
             with self.subTest(kind=kind), self.assertRaises(ValueError):
                 validate(plan, (item,))
         parameters.update(pll_n=384, pll_p=8, apb1_div=16, apb2_div=16)
-        plan = stm32f4.clock_plan("custom", parameters)
+        plan = self.provider.clock_plan("custom", parameters)
         uart = SimpleNamespace(kind="uart", mode="irq-byte-event",
                                controller="USART1",
                                options=SimpleNamespace(baud=1000000))
@@ -261,7 +287,7 @@ class F407ClockTests(unittest.TestCase):
             validate(plan, (uart,))
         parameters.update(pll_n=192, pll_p=8, ahb_div=8, apb1_div=1,
                           apb2_div=4)
-        plan = stm32f4.clock_plan("custom", parameters)
+        plan = self.provider.clock_plan("custom", parameters)
         adc = SimpleNamespace(kind="adc", mode="single-shot",
                               controller="ADC1", options=None)
         with self.assertRaises(ValueError):
@@ -307,34 +333,35 @@ class F407ClockTests(unittest.TestCase):
                     apb1_hz=37500000, apb2_hz=75000000)
 
     def test_sdio375_profile_has_an_exact_separate_pllq_domain(self):
-        selected = stm32f4.clock_plan("hse8-pll150-sdio375",
+        selected = self.provider.clock_plan("hse8-pll150-sdio375",
                                      self.sdio375_summary())
         expected = {"core": 150000000, "apb1": 37500000,
                     "apb2": 75000000, "pll48": 75000000,
                     "apb1_timer": 75000000, "apb2_timer": 150000000}
         for name, hz in expected.items():
             self.assertEqual(selected["domains"][name]["nominal_hz"], hz)
-        self.assertEqual(selected["parameters"]["pllcfgr"], 0x04404b08)
+        self.assertEqual(selected["parameters"]["pll_n"], 300)
+        self.assertEqual(selected["parameters"]["pll_q"], 4)
         self.assertFalse(selected["physical_qualified"])
 
     def test_sdio375_profile_cannot_select_a_nearby_tuple(self):
         for change in ({"core_hz": 149000000}, {"apb1_hz": 42000000},
                        {"apb2_hz": 84000000}, {"hse_hz": 16000000}):
             with self.subTest(change=change), self.assertRaises(ValueError):
-                stm32f4.clock_plan("hse8-pll150-sdio375",
+                self.provider.clock_plan("hse8-pll150-sdio375",
                     {**self.sdio375_summary(), **change})
 
     def test_sdio375_is_an_explicit_high_speed_four_bit_memory_consumer(self):
         from types import SimpleNamespace
-        from tools.configure.stm32f4.clocks import _sdio_divider
-        selected = stm32f4.clock_plan("hse8-pll150-sdio375",
+        _sdio_divider = self.provider.domain_policies.clock._sdio_divider
+        selected = self.provider.clock_plan("hse8-pll150-sdio375",
                                      self.sdio375_summary())
         def block(protocol="sd-memory", speed="high-speed", width=4):
             return SimpleNamespace(kind="block", controller="SDIO",
                 mode="sdio-dma", options=SimpleNamespace(bus_width=width,
                     protocol=protocol, speed=speed))
         for protocol in ("sd-memory", "mmc"):
-            stm32f4.validate_clock_consumers(selected, (block(protocol),))
+            self.provider.validate_clock_consumers(selected, (block(protocol),))
         self.assertEqual(_sdio_divider(selected, 4, 2), 0)
         self.assertEqual(_sdio_divider(selected, 1, 188), 186)
         for bad in (block(speed="default"), block(width=8), block("sdio"),
@@ -342,10 +369,10 @@ class F407ClockTests(unittest.TestCase):
                     SimpleNamespace(kind="usb_device", controller="OTG_HS",
                                     mode="otg-hs-ulpi", options=None)):
             with self.subTest(consumer=bad), self.assertRaises(ValueError):
-                stm32f4.validate_clock_consumers(selected, (bad,))
-        custom = stm32f4.clock_plan("custom", self.sdio375_parameters())
+                self.provider.validate_clock_consumers(selected, (bad,))
+        custom = self.provider.clock_plan("custom", self.sdio375_parameters())
         with self.assertRaises(ValueError):
-            stm32f4.validate_clock_consumers(custom, (block(),))
+            self.provider.validate_clock_consumers(custom, (block(),))
 
     @staticmethod
     def parameters():

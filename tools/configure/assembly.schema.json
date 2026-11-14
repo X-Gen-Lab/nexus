@@ -978,22 +978,22 @@
               "x_clocks": {
                 "type": "integer",
                 "minimum": 0,
-                "maximum": 16383
+                "maximum": 4294967295
               },
               "y_lines": {
                 "type": "integer",
                 "minimum": 0,
-                "maximum": 16383
+                "maximum": 4294967295
               },
               "width_clocks": {
                 "type": "integer",
                 "minimum": 0,
-                "maximum": 16383
+                "maximum": 4294967295
               },
               "height_lines": {
                 "type": "integer",
                 "minimum": 0,
-                "maximum": 16383
+                "maximum": 4294967295
               }
             }
           },
@@ -1120,10 +1120,8 @@
       ],
       "properties": {
         "source": {
-          "enum": [
-            "hse",
-            "hsi"
-          ],
+          "type": "string",
+          "minLength": 1,
           "description": "Reviewed source supporting this declared constraint."
         },
         "input_hz": {
@@ -1141,12 +1139,7 @@
         },
         "pll_p": {
           "type": "integer",
-          "enum": [
-            2,
-            4,
-            6,
-            8
-          ]
+          "minimum": 1
         },
         "pll_q": {
           "type": "integer",
@@ -1154,46 +1147,19 @@
         },
         "ahb_div": {
           "type": "integer",
-          "enum": [
-            1,
-            2,
-            4,
-            8,
-            16,
-            64,
-            128,
-            256,
-            512
-          ]
+          "minimum": 1
         },
         "apb1_div": {
           "type": "integer",
-          "enum": [
-            1,
-            2,
-            4,
-            8,
-            16
-          ]
+          "minimum": 1
         },
         "apb2_div": {
           "type": "integer",
-          "enum": [
-            1,
-            2,
-            4,
-            8,
-            16
-          ]
+          "minimum": 1
         },
         "adc_div": {
           "type": "integer",
-          "enum": [
-            2,
-            4,
-            6,
-            8
-          ]
+          "minimum": 1
         },
         "supply_mv": {
           "type": "integer",
@@ -1221,17 +1187,11 @@
               "properties": {
                 "post_divider": {
                   "type": "integer",
-                  "enum": [
-                    2,
-                    4,
-                    8,
-                    16
-                  ]
+                  "minimum": 1
                 },
                 "r": {
                   "type": "integer",
-                  "minimum": 2,
-                  "maximum": 7
+                  "minimum": 1
                 }
               },
               "required": [
@@ -1242,58 +1202,22 @@
             },
             "m": {
               "type": "integer",
-              "minimum": 2,
-              "maximum": 63
+              "minimum": 1
             },
             "n": {
               "type": "integer",
-              "minimum": 50,
-              "maximum": 432
+              "minimum": 1
             },
             "sai1": {
               "type": "object",
               "properties": {
                 "post_divider": {
                   "type": "integer",
-                  "enum": [
-                    1,
-                    2,
-                    3,
-                    4,
-                    5,
-                    6,
-                    7,
-                    8,
-                    9,
-                    10,
-                    11,
-                    12,
-                    13,
-                    14,
-                    15,
-                    16,
-                    17,
-                    18,
-                    19,
-                    20,
-                    21,
-                    22,
-                    23,
-                    24,
-                    25,
-                    26,
-                    27,
-                    28,
-                    29,
-                    30,
-                    31,
-                    32
-                  ]
+                  "minimum": 1
                 },
                 "q": {
                   "type": "integer",
-                  "minimum": 2,
-                  "maximum": 15
+                  "minimum": 1
                 }
               },
               "required": [
@@ -1435,20 +1359,11 @@
           },
           "recovery_trigger": {
             "type": "string",
-            "enum": [
-              "tim6-trgo",
-              "tim7-trgo"
-            ]
+            "pattern": "^[a-z][a-z0-9_-]*$"
           },
           "trigger": {
             "type": "string",
-            "enum": [
-              "none",
-              "software",
-              "tim6-trgo",
-              "tim7-trgo",
-              "exti9"
-            ]
+            "pattern": "^[a-z][a-z0-9_-]*$"
           },
           "trigger_input": {
             "type": "string",

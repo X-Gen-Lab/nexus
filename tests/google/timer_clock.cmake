@@ -32,7 +32,8 @@ foreach(timer_clock pll84 hsi16)
     target_include_directories(${timer_clock_target} SYSTEM PRIVATE
         "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
     nexus_use_cmsis_core(${timer_clock_target})
-    target_compile_definitions(${timer_clock_target} PRIVATE STM32F407xx)
+    target_compile_definitions(${timer_clock_target} PRIVATE
+        STM32F407xx NX_TIMER_DIRECT_REFERENCE)
     target_compile_options(${timer_clock_target} PRIVATE
         "-include${CMAKE_CURRENT_SOURCE_DIR}/timer_clock_model.h")
     foreach(small_timer 9 10 11 12 13 14)

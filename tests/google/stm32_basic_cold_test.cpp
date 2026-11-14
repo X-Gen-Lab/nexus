@@ -7,6 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
+#include "stm32_adc_pad_fixture.h"
 #include "stm32f407_basic_cold.h"
 #include "stm32f407_control_cold.h"
 nx_stm32_system_t g_nx_stm32_system;

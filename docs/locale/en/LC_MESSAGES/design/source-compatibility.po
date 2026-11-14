@@ -1,6 +1,6 @@
-# Actual-POT messages; changed entries await independent semantic review.
+# Actual-POT messages; independent semantic review completed for this source.
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: e7f35bea2301ca3e175bcd267fb411c234a8f693e7e3f71ab9edb4b857596507\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 1e11ee9f47502e9b4a50db36a3cce62990f97d4b1a8580bfe15e22fa4c4a42f9\n"
 
 #: ../../../docs/design/source-compatibility.md:1
 msgid "源码版本、factory 代际与依赖维护"
@@ -135,10 +135,11 @@ msgstr "CPU software configuration cannot promote SoC/Board qualification"
 msgid "installed source SDK manifest"
 msgstr "installed source SDK manifest"
 
-#: ../../../docs/design/source-compatibility.md:0
-msgid "既有完整 file-map/源依赖/package-export 校验"
-msgstr ""
-"Existing complete file-map/source-dependency/package-export validation"
+msgid "`3`"
+msgstr "`3`"
+
+msgid "完整 file-map、源依赖、package-export 与包导出成员声明校验"
+msgstr "Complete file-map, source-dependency, package-export and package source-member declaration verification"
 
 #: ../../../docs/design/source-compatibility.md:25
 msgid ""
@@ -262,24 +263,8 @@ msgstr "ADC result migration introduced by epoch 2"
 msgid "epoch 2 已将 `nx_adc_group_request_t.frames` 改为显式 `output.frames`，并由 `results_kind` 区分 RAW 与 regular／injected paired 结果。原始字段访问必须迁移； 不保留 `frames` 影子、旧大小兼容或按运行态猜测结果布局。优先继续调用 `nx_adc_group_prepare()` 准备 raw 请求，由它设置 RAW discriminant；paired 结果使用 `nx_adc_group_prepare_results()`，请求、descriptor 与两个 span 共用一次借用生命周期。 直接读取 union 时必须先确认对应 `results_kind`，不能把 raw frame 指针当 descriptor。"
 msgstr "Epoch 2 moved `nx_adc_group_request_t.frames` to explicit `output.frames`, with `results_kind` distinguishing RAW from paired regular/injected results. Migrate direct field access; there is no shadow `frames` field, old-size compatibility or runtime layout inference. Prefer `nx_adc_group_prepare()` for raw requests so it installs the RAW discriminant. Paired results use `nx_adc_group_prepare_results()`; request, descriptor and both spans share one borrow lifetime. Check `results_kind` before reading the union, and never interpret a raw frame pointer as a descriptor."
 
-msgid ""
-"使用当前精确提交重新生成 bundle，并在同一配置和工具链下重新编译全部调用者、 公共 face／ops、factory、provider "
-"和组件；不得混用 epoch 1 header、旧对象或缓存。 该结果合同在 epoch 3 和 epoch 4 继续保留；从 epoch 1 "
-"迁移的调用者仍须完成 这一步。当前生成头、SDK 及维护消费者只认可 epoch 5；旧 epoch 1／2／3／4 明确拒绝， "
-"不自动迁移、降级或以 `--development-fixture` 放宽接口检查。外部产品的迁移步骤见 "
-"[迁移指南](../guides/migration.md)。manifest schema 2 与 interface epoch 5 "
-"是独立字段。"
-msgstr ""
-"Regenerate the bundle from the current exact commit, and rebuild all "
-"callers, public faces/ops, factories, providers and components with the "
-"same configuration and toolchain; do not mix epoch-1 headers, old objects"
-" or caches. This result contract remains in epochs 3 and 4; callers "
-"migrating from epoch 1 must still complete this step. Current generated "
-"headers, SDKs and maintained consumers admit only epoch 5; old epochs "
-"1/2/3/4 explicitly reject, without automatic migration, downgrade or "
-"relaxed interface checks through `--development-fixture`. See the "
-"[migration guide](../guides/migration.md) for external product migration "
-"steps. Manifest schema 2 and interface epoch 5 are independent fields."
+msgid "使用当前精确提交重新生成 bundle，并在同一配置和工具链下重新编译全部调用者、 公共 face／ops、factory、provider 和组件；不得混用 epoch 1 header、旧对象或缓存。 该结果合同在 epoch 3 和 epoch 4 继续保留；从 epoch 1 迁移的调用者仍须完成 这一步。当前生成头、SDK 及维护消费者只认可 epoch 5；旧 epoch 1／2／3／4 明确拒绝， 不自动迁移、降级或以 `--development-fixture` 放宽接口检查。外部产品的迁移步骤见 [迁移指南](../guides/migration.md)。当前 manifest schema 3 与 interface epoch 5 是独立字段。"
+msgstr "Regenerate the bundle with the exact current commit, then rebuild every caller, public face/ops, factory, provider and component using one configuration and toolchain. Do not mix epoch-1 headers, old objects or cached outputs. This result contract remains in epochs 3 and 4; callers migrating from epoch 1 still need this step. Current generated headers, SDKs and maintained consumers admit only epoch 5; epochs 1/2/3/4 reject explicitly without migration, downgrade or relaxed interface checks through `--development-fixture`. Product migration steps are in the [migration guide](../guides/migration.md). Current manifest schema 3 and interface epoch 5 are independent fields."
 
 #: docs/design/source-compatibility.md:0
 msgid "epoch 3 的领域接口迁移"
@@ -381,16 +366,8 @@ msgstr "Encoder TI input names and filter codes"
 msgid "使用逻辑 A／B 模式及滤波采样事实，不把它们当成精确机械消抖保证。"
 msgstr "Use logical A/B modes and filter sampling facts without interpreting them as exact mechanical debounce guarantees."
 
-msgid ""
-"使用同一精确提交重新生成配置和 factory，并重编所有调用者、provider、组件与 SDK 消费者。当前 TOML schema "
-"2、typed IR 源码代际 5、resolved projection 1 和 SDK manifest 2 "
-"保持各自原合同；源码代际提升不自动扩大芯片、模式或实板支持。"
-msgstr ""
-"Regenerate configuration and factory from the same exact commit, and "
-"rebuild all callers, providers, components and SDK consumers. Current "
-"TOML schema 2, typed IR source epoch 5, resolved projection 1 and SDK "
-"manifest 2 each retain their own contracts; raising the source epoch does"
-" not automatically expand chip, mode or physical Board support."
+msgid "使用同一精确提交重新生成配置和 factory，并重编所有调用者、provider、组件与 SDK 消费者。当前 TOML schema 2、typed IR 源码代际 5、resolved projection 1 和 SDK manifest 3 分别计代；源码代际或包格式变化不自动扩大芯片、模式或实板支持。"
+msgstr "Regenerate configuration and factory from the same exact commit and rebuild every caller, provider, component and SDK consumer. Authored TOML schema 2, typed IR source epoch 5, resolved projection 1 and SDK manifest 3 have independent generations. A source-interface or package-format change does not automatically expand chip, mode or physical support."
 
 msgid "epoch 4 的逻辑 signal 与 RS485 迁移"
 msgstr "Epoch-4 logical signal and RS485 migration"
@@ -509,17 +486,20 @@ msgstr ""
 msgid "映射存储 backend 的 `map` 改为返回 `nx_mapped_storage_map_result_t`，显式区分 结果与 `cleanup_required`。失败但需要清理时不发放可读 loan，owner 保留撤映责任。 `start` 接收原请求的绝对 deadline，不重启预算。首次构造仍使用 `init`；完整冷停 后使用 `nx_mapped_storage_owner_reopen()`，保留 slot／writer epoch 和耗尽状态， 不能重新初始化 owner 使旧 token 再次有效。自定义 backend 和静态集成须按新声明 重编，并先 join 原调用者与控制操作。"
 msgstr "A mapped-storage backend now returns `nx_mapped_storage_map_result_t` from `map`, explicitly separating the result from `cleanup_required`. Failure requiring cleanup grants no readable loan; the owner retains unmap responsibility. `start` receives the original request's absolute deadline without restarting the budget. Use `init` only for initial construction and `nx_mapped_storage_owner_reopen()` after complete cold shutdown, preserving slot/writer epochs and exhaustion. Do not reinitialize an owner to revive old tokens. Custom backends and static composition must recompile against the new declarations and first join prior callers and control operations."
 
-msgid ""
-"TOML schema 2、resolved projection 1 和 SDK manifest 2 保持原格式。typed IR 源码代际 "
-"5 对应本轮具名配置合同；版本号与前序快照相同也必须固定精确提交， 重新生成并重编全部源码。前述 epoch 2／3／4 "
-"的字段与所有权迁移继续适用。"
-msgstr ""
-"TOML schema 2, resolved projection 1 and SDK manifest 2 retain their "
-"existing formats. Typed IR source epoch 5 corresponds to the named "
-"configuration contract in this round; even with the same version as the "
-"preceding snapshot, pin the exact commit, regenerate and recompile all "
-"source. The epoch-2/3/4 field and ownership migrations above remain "
-"applicable."
+msgid "epoch 5 引入时使用 TOML schema 2、resolved projection 1 和 SDK manifest 2。当前 包格式独立演进为 schema 3，不改变 factory／typed IR 代际 5。版本号与前序快照 相同也必须固定精确提交，重新生成并重编全部源码；epoch 2／3／4 的迁移继续适用。"
+msgstr "Epoch 5 was introduced with TOML schema 2, resolved projection 1 and SDK manifest 2. The current package format evolves independently to schema 3 without changing factory/typed IR epoch 5. Even when the semantic version matches an earlier snapshot, pin the exact commit, regenerate and rebuild all source; epoch-2/3/4 migrations remain required."
+
+msgid "SDK manifest schema 3 的包导出归属"
+msgstr "Package export ownership in SDK manifest schema 3"
+
+msgid "当前 manifest 的 `source_exports` 记录本次实际导出的平台源码成员与包身份。 每个成员必须出现在 `files_sha256`；包声明文件也接受字节及派生一致性校验。包 声明生产导出范围，CMake 仍是源码编译图的唯一权威。导出范围不是某个固件 ELF 的编译闭包，消费者可以在包声明范围内重新装配。"
+msgstr "The current manifest's `source_exports` records the platform source members actually exported and package identities. Every member must appear in `files_sha256`; package declaration files also undergo byte and derived-consistency checks. Packages declare production export scope, while CMake remains the sole source compilation graph. Export scope is not one firmware ELF's compilation closure; consumers can reassemble within the declared package scope."
+
+msgid "SDK 的 `profile` 显式记录 `backend`、`components`、`host_support` 和 `packages`。 默认包只由兼容性 JSON 的 `source_sdk.default_package_manifests` 选择，新增家族 不自动扩展 SDK。导出其他包时重复使用 `--package <ID>`；安装验证使用冻结的 `profile.packages`，不把未选库存补入已安装包。"
+msgstr "The SDK `profile` explicitly records `backend`, `components`, `host_support` and `packages`. Only `source_sdk.default_package_manifests` in the compatibility JSON selects default packages; adding a family does not automatically expand the SDK. Repeat `--package <ID>` when exporting other packages. Installed verification uses frozen `profile.packages` rather than adding unselected inventory to an installed package."
+
+msgid "使用与 SDK 精确源码身份对应的 verifier。schema 3 验证器拒绝其他 manifest 格式， 不修改旧 SDK 字节或把旧包自动提升为新格式。旧包继续使用自己的固定源码与工具。 新导出仍需实际完整校验、重定位、消费和恢复；包声明存在不建立执行通过状态。"
+msgstr "Use the verifier matching the SDK's exact source identity. The schema-3 verifier rejects other manifest formats without changing old SDK bytes or automatically promoting an old package. Old packages retain their fixed source and tools. New exports still require actual complete verification, relocation, consumption and recovery; a package declaration does not establish an execution pass."
 
 #: ../../../docs/design/source-compatibility.md:62
 msgid "自动检查"

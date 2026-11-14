@@ -8,12 +8,75 @@ source_language: en
 (docs-tutorials-source-sdk)=
 # Build an independent Source SDK consumer
 
-Start a real external C11 application from a reviewed template, then build and
-run its Native model. This path needs Linux, Python 3.11+, CMake 3.31+, Ninja,
-a C compiler and Git. The product owns its assembly and application sources;
-Nexus owns reusable mechanisms. No MCU is flashed by this tutorial.
+Create a small external C11 GPIO consumer from the public platform, configure it
+and link its MCU image. This path needs a fixed public checkout or a verified
+Source SDK, Linux, Python 3.11+, CMake 3.31+, Ninja, Git and the locked ARM compiler.
+It does not need the private examples repository or optional middleware. Products
+own their assembly and application sources. No MCU is flashed or executed here.
 
-## Create and run an application
+## Public path: create the minimal GPIO consumer
+
+Obtain the [fixed public checkout](../guides/source-checkout.md). For SDK use,
+select a verified prefix containing the maintained STM32F4 package and set
+`NEXUS_SDK_PREFIX` to that prefix. Run from the public checkout root with the
+locked ARM compiler on `PATH`; choose a new output directory outside the checkout
+and SDK. The following exact route selects the reviewed Qiming V3.1 Board:
+
+```sh
+python tools/dev/dev.py create --public \
+    --board stm32f407_qiming_v31 --clock hse8-pll168 --gpio led0 \
+    --sdk-prefix "$NEXUS_SDK_PREFIX" --output /tmp/my-nexus-gpio
+```
+
+For source consumption, replace `--sdk-prefix "$NEXUS_SDK_PREFIX"` with
+`--source /absolute/path/to/nexus`; the two selectors are mutually exclusive.
+Without either selector, creation explicitly uses its current checkout. This
+public entry fixes C11 and baremetal; Board, clock and GPIO binding stay explicit.
+Inspect other Boards with the [binding query](../guides/developer-workflow.md)
+before choosing their reviewed facts. The creator does not infer pins, masks,
+LED polarity or a fallback route, and does not start a scheduler or Native model.
+
+Creation copies the maintained public consumer files and generates the product's
+`assembly.toml`, then runs the selected platform's own resolver. An installed SDK
+is verified first and must be publishable; development fixtures are rejected.
+An existing destination or invalid configuration rejects without overwriting
+product files. `.nexus-template.json` records `public-gpio`, selected source/SDK,
+copied file digests and actual configuration validation. These are creation
+results, not a successful compile or hardware result.
+
+Run the printed **configure** command, then the printed **build** command. The
+commands select the same source or SDK and use its ARM toolchain. A selected
+commit identity is pinned with `NEXUS_EXPECTED_SOURCE_REVISION`; paths with spaces
+remain quoted. `--json` returns command argument arrays: select them by command
+name and retain configure-before-build order rather than iterating JSON key order.
+The managed platform `dev.py configure` does not own this external project's
+source tree; use the emitted direct CMake commands.
+
+Success requires zero create, configure and build exits plus the generated ELF,
+BIN, map and resource report. The exact maintained input starts Platform, obtains
+`NX_GPIO_REF_STATUS` through strong factory, reads only the authorized snapshot
+and stops Platform:
+
+```{literalinclude} ../../cmake/package/verification/public_gpio/main.c
+:language: c
+:caption: Maintained public GPIO consumer copied by create --public; an MCU link does not execute it.
+```
+
+GPIO output configuration uses the Board's declared initial safe level; the
+consumer does not implement blinking or infer electrical behavior. If startup
+returns residual effects or stop fails, its error does not authorize reclaiming
+retained platform storage. Use the [ownership contract](../explanation/ownership.md)
+for recovery. This tutorial does not execute those hardware paths. Inspect the
+reported file/key/constraint on rejection; fix authored inputs and configure
+again rather than editing generated bindings. Keep product sources and remove
+only owned build outputs after retaining needed logs.
+
+The source route has actual create/configure/ARM-link regression coverage. An
+installed-prefix result requires its own fresh clean SDK verification and is
+not inherited from source tests. The full maintained consumer plan below is a
+separate platform-maintenance task; private application templates are optional.
+
+## Optional: create an application from private templates
 
 Obtain a verified Source SDK and the external
 [nexus-examples](https://github.com/X-Gen-Lab/nexus-examples) checkout. That
@@ -112,7 +175,7 @@ the new SDK, and a successful link does not qualify physical hardware.
 ## Source interface epoch 5
 
 The current `0.2.1` development snapshot uses factory/source interface epoch `5`;
-its installed SDK manifest uses schema `2` independently. Select the exact
+its installed SDK manifest uses schema `3` independently. Select the exact
 reviewed commit, regenerate and rebuild all callers, faces/ops, generated code,
 providers and components together. Current interface admission rejects epoch-1,
 epoch-2, epoch-3 and epoch-4 SDKs; old objects must be rebuilt. `--development-fixture` never bypasses interface
@@ -145,6 +208,36 @@ bundle and its consumers; changing only the pointer spelling cannot establish
 authorized pin ownership, safe initial levels or storage lifetime.
 
 ## Maintainer: verify the complete SDK consumer
+
+### Public verification of the complete maintained plan
+
+Obtain the [fixed public checkout](../guides/source-checkout.md) and a verified SDK
+containing the complete [maintained consumer profile](../../tools/maintenance/consumer_profiles.py).
+The small default bare-metal SDK intentionally omits optional suppliers and Native
+support; it cannot run that complete plan. This public path needs no access to the
+private examples repository. Set `NEXUS_SDK_PREFIX` to the installed prefix, put
+the locked ARM compiler on `PATH`, and select a new output directory outside the
+SDK. Run from the public checkout root:
+
+```sh
+python cmake/package/package_source_sdk.py \
+    --verify "$NEXUS_SDK_PREFIX/share/nexus/src"
+python cmake/package/verify_consumers.py \
+    --prefix "$NEXUS_SDK_PREFIX" --output /tmp/nexus-public-consumer-verification
+```
+
+Success requires zero exit codes and `verification.json` reporting the actual
+complete plan. Native consumers execute; MCU consumers produce ELF, BIN, map and
+resource reports without executing hardware. The verifier creates independent
+projects using the maintained CMake and public API inputs below. It does not need
+or copy a product application, and does not start a scheduler.
+
+A failed command retains its diagnostic. Check SDK profile, exact identity and
+tool availability before retrying; do not skip failed consumers or edit packaged
+bytes. The output directory is owned by the verifier and must not overlap the
+SDK. After retaining required reports, remove only the output you created. To
+supply an authored assembly and product sources, follow [Choose a product assembly](#choose-a-product-assembly).
+Private templates additionally require separate examples access.
 
 To verify the examples repository itself, use its maintained
 `scripts/local_ci.py` and bilingual `docs/local-ci.md` at the fixed examples
@@ -202,15 +295,16 @@ python tools/dev/dev.py prepare --scope sdk --backend freertos --host-support \
     --component mqtt --component mcuboot --component st-usb-device \
     --component st-usb-host --allow-network
 python cmake/package/package_source_sdk.py --source . --output /tmp/nexus-source-sdk \
-    --backend freertos --host-support --component network \
+    --package stm32f4 --backend freertos --host-support --component network \
     --component network-loaned-rx --component tls --component mqtt \
     --component mcuboot --component st-usb-device --component st-usb-host
 python cmake/package/package_source_sdk.py \
     --verify /tmp/nexus-source-sdk/share/nexus/src
 ```
 
-For a small bare-metal firmware package, omit those profile switches when
-exporting to a different prefix. The default intentionally has no Native models
+For a small bare-metal firmware package, keep the intended package selection and
+omit the optional backend/component/host-support switches when exporting to a
+different prefix. The default intentionally has no Native models
 or optional supplier payloads. Its package-integrity check remains valid, but the
 verifier for that complete maintained plan requires the full profile above. It never
 silently skips a consumer to admit a smaller package.
@@ -255,10 +349,14 @@ repository. They consume `Nexus::Platform` through `nexus_add_firmware()`; the
 helper does not generate an application or start a scheduler. Use the
 [assembly reference](../reference/configuration/assembly.md) to select reviewed
 bindings and the [factory explanation](../explanation/factory.md) to obtain faces.
-Public product examples live in
-[nexus-examples](https://github.com/X-Gen-Lab/nexus-examples).
+Extended application examples live in the private
+[nexus-examples](https://github.com/X-Gen-Lab/nexus-examples) repository and require
+separate access. The public consumer verification above does not depend on it.
 
 ![Source SDK preparation, relocation and independent consumer verification](../assets/diagrams/source-sdk-consumer.svg)
 
-FIG-10 shows the current software consumption flow. Runtime and MCU link evidence
-remain separate from [physical qualification](../reference/platforms/qualification.md).
+FIG-10 shows build-time consumption. Schema3 records selected packages and export
+ownership; CMake remains the sole compile target graph. A relocated complete
+prefix serves the public GPIO creator or an existing external project. Native
+execution, MCU linking and [physical qualification](../reference/platforms/qualification.md)
+have separate evidence; this flow does not qualify a software candidate.

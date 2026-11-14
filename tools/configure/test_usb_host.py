@@ -83,7 +83,7 @@ class UsbHostConfigurationTests(unittest.TestCase):
         output = self.root / "mapped"
         gate.configure(path, output, test_support=native_fixture(path))
         source = (output / "bindings.c").read_text()
-        self.assertIn("static const uint8_t s_nx_usb_pipe_channels_link[]", source)
+        self.assertIn("static const uint8_t s_nx_usb_pipe_channels_link[2]", source)
         self.assertIn(".pipe_channels = s_nx_usb_pipe_channels_link", source)
         path = self.assembly()
         gate.configure(path, output, test_support=native_fixture(path))
@@ -134,13 +134,15 @@ class UsbHostConfigurationTests(unittest.TestCase):
             self.resolve(path)
 
     def test_selected_ahb_floor_is_checked_independently_of_pll48(self):
+        from tools.configure.tests.f4_fixture import provider
+        selected = provider("STM32F407ZGT6")
         for controller, frequency in (("OTG_FS", 14000000),
                                       ("OTG_HS", 26000000),
                                       ("OTG_HS", 30000000)):
             with self.subTest(controller=controller, frequency=frequency), self.assertRaisesRegex(ValueError, "USB.*AHB"):
-                usb_host.validate_clock(controller, frequency)
-        usb_host.validate_clock("OTG_FS", 16000000)
-        usb_host.validate_clock("OTG_HS", 84000000)
+                usb_host.validate_clock(controller, frequency, provider=selected)
+        usb_host.validate_clock("OTG_FS", 16000000, provider=selected)
+        usb_host.validate_clock("OTG_HS", 84000000, provider=selected)
 
 
     def test_dma_registers_are_reserved_outside_authored_fifo_payloads(self):

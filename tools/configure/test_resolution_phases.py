@@ -7,12 +7,15 @@ import unittest
 
 from tools.configure import configure as gate
 from tools.configure.ir import freeze
-from tools.configure.providers import maintained
+from tools.configure.providers import for_selection
 
 
 class ResolutionPhaseTests(unittest.TestCase):
     def setUp(self):
-        self.provider = maintained('native', test_support=True)
+        self.result = gate.resolve_ir(
+            gate.ROOT / 'tests/support/native/assemblies/native-empty.toml',
+            test_support=True)
+        self.provider = for_selection(self.result)
         self.soc = gate.load(gate.ROOT / 'tests/support/native/soc.json')
         self.variant = self.soc['variants']['NATIVE_MODEL']
         self.assembly = gate.load_assembly(gate.ROOT /
@@ -78,13 +81,15 @@ class ResolutionPhaseTests(unittest.TestCase):
 
         selected = gate._resolve_source_dependencies(
             self.soc, self.provider, 'native', gate.ROOT, 'native', gate.load,
-            unexpected)
+            unexpected, context=self.result.provider_context)
         self.assertEqual(selected.dependencies, ())
         self.assertEqual(selected.inputs, ())
 
     def test_dependency_phase_passes_exact_git_pins_and_kernel_selection(self):
         soc = gate.load(gate.ROOT / 'soc/stm32/stm32f4/soc.json')
-        provider = maintained('stm32f4')
+        result = gate.resolve_ir(
+            gate.ROOT / 'tools/configure/assemblies/qiming-baremetal-empty.toml')
+        provider = for_selection(result)
         calls = []
 
         def resolve(relative, expected=None):
@@ -93,7 +98,7 @@ class ResolutionPhaseTests(unittest.TestCase):
 
         selected = gate._resolve_source_dependencies(
             soc, provider, 'stm32f4', gate.ROOT, 'freertos', gate.load,
-            resolve)
+            resolve, context=result.provider_context)
         pins = soc['source_lock']
         self.assertEqual(calls[-1], ('ext/freertos', None))
         self.assertEqual({pin for _, pin in calls[:-1]}, set(pins.values()))

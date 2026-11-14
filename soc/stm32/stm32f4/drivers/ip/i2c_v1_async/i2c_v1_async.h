@@ -21,6 +21,54 @@ static inline bool nx_i2c_v1_storage_outside(const void* storage, size_t bytes,
                             : first - second >= metadata_bytes);
 }
 
+/** \brief Readonly SCL/SDA sampling facts independent of controller identity.
+ * \note Inputs may share a bank; each mask selects exactly one physical pin.
+ *       The selected record outlives the controller and all borrowed requests.
+ */
+typedef struct nx_i2c_v1_lines {
+    const volatile uint32_t* inputs[2];
+    uint16_t masks[2];
+} nx_i2c_v1_lines_t;
+
+/** \brief Validate two distinct input bits without reading hardware. */
+static inline bool nx_i2c_v1_lines_valid(const nx_i2c_v1_lines_t* lines) {
+    if (lines == NULL)
+        return false;
+    for (size_t i = 0U; i < 2U; ++i) {
+        uint16_t mask = lines->masks[i];
+        if (lines->inputs[i] == NULL || mask == 0U ||
+            (mask & (mask - 1U)) != 0U)
+            return false;
+    }
+    return lines->inputs[0] != lines->inputs[1] ||
+           lines->masks[0] != lines->masks[1];
+}
+
+/** \brief Observe both released lines, using one read for a shared bank.
+ * \note The caller admits the unchanged line record before this observation.
+ *       Two GPIO banks do not promise a simultaneous hardware snapshot.
+ */
+static inline bool nx_i2c_v1_lines_high(const nx_i2c_v1_lines_t* lines) {
+    if (lines->inputs[0] == lines->inputs[1]) {
+        uint32_t mask = (uint32_t)lines->masks[0] | lines->masks[1];
+        return (*lines->inputs[0] & mask) == mask;
+    }
+    return (*lines->inputs[0] & lines->masks[0]) == lines->masks[0] &&
+           (*lines->inputs[1] & lines->masks[1]) == lines->masks[1];
+}
+
+/** \brief Keep immutable line metadata and sampled registers outside loans. */
+static inline bool nx_i2c_v1_lines_outside(const nx_i2c_v1_lines_t* lines,
+                                           const void* storage, size_t bytes) {
+    return nx_i2c_v1_storage_outside(storage, bytes, lines, sizeof(*lines)) &&
+           nx_i2c_v1_storage_outside(storage, bytes,
+                                     (const void*)(uintptr_t)lines->inputs[0],
+                                     sizeof(*lines->inputs[0])) &&
+           nx_i2c_v1_storage_outside(storage, bytes,
+                                     (const void*)(uintptr_t)lines->inputs[1],
+                                     sizeof(*lines->inputs[1]));
+}
+
 /** \brief Resolve clock counts under the authored nominal SCL maximum.
  * \param[in] mhz: Reviewed nominal whole-MHz PCLK, between 2 and 50.
  * \param[in] maximum_hz: Nonzero nominal SCL ceiling, at most 400 kHz.
@@ -95,6 +143,7 @@ typedef struct {
     volatile uint32_t* clear;
     uint32_t configuration;
     uint8_t flag_shift;
+    uint16_t publisher; /**< Opaque SoC publisher identity; unused by the IP. */
 } nx_i2c_v1_dma_engine_t;
 
 /** \brief Immutable exact route and visible memory, absent in IRQ mode. */
@@ -134,8 +183,7 @@ typedef enum {
 typedef struct {
     nx_time_us_t drain_deadline;
     volatile uint32_t* registers;
-    const volatile uint32_t* line_inputs;
-    uint32_t line_mask;
+    const nx_i2c_v1_lines_t* lines;
     const nx_i2c_v1_dma_t* dma;
     nx_i2c_request_t* active;
     const nx_irq_wake_t* wake;

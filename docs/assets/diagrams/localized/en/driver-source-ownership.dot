@@ -1,19 +1,24 @@
-// FIG-31 current: F4 source ownership; labels distinguish calls and build inputs.
+// Current scoped view. Build-time arrows and runtime calls are labeled explicitly.
+// Code basis: soc/stm32/stm32f4/CMakeLists.txt; tools/configure/data_provider.py; bindings.py; tests/support/native/CMakeLists.txt; io/include/nexus/io
 digraph F4SourceOwnership {
-  graph [rankdir=TB, bgcolor="white", pad=0.25, nodesep=0.35, ranksep=0.5, fontname="Noto Sans CJK SC", fontsize=15, labelloc=t, label="FIG-31 F4 source ownership and interface boundaries\nEach edge states compilation or calls; no software or HIL qualification"];
-  node [shape=box, style="rounded,filled", fillcolor="#eff6ff", color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC", fontsize=12, margin="0.16,0.10"];
-  edge [color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC", fontsize=11];
-  io [label="io/\nPublic types, requests and borrow contracts"];
-  f4 [label="soc/stm32/stm32f4/\nResources, lifecycle and official-library adaptation"];
-  ip [label="F4 drivers/ip/\nRetained private hardware implementations"];
-  vendor [label="vendors/st/ F4 HAL / Device\nKeep all inventoried sources; consume selected inputs"];
-  host [label="tests/support/native/\nExplicit test scope, not a production SoC"];
-  components [label="components/\nILI9341 / XPT2046 / W25 and peers"];
-  config [label="Board JSON + TOML\nFacts, modes and instance selection"];
-  io -> f4 [label="Runtime: ops(context)"];
-  f4 -> ip [label="Build: selected private sources", style=dashed];
-  f4 -> vendor [label="Build: private include / link", style=dashed];
-  host -> ip [label="Test: execute actual IP sources", style=dashed];
-  components -> io [label="Runtime: public narrow ports"];
-  config -> f4 [label="Build: generate static connections", style=dashed];
+    graph [label="FIG-31 F4 source ownership and interface boundaries\nEach edge distinguishes build inputs from calls; no qualification", rankdir=TB, bgcolor="white", pad=0.25, nodesep=0.35, ranksep=0.52, fontname="Noto Sans CJK SC", fontsize=15, labelloc=t];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff", color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC", fontsize=12, margin="0.16,0.10"];
+    edge [color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC", fontsize=11, arrowsize=0.8];
+    io [label="io/: public types, requests and borrow contracts"];
+    f4 [label="soc/stm32/stm32f4/\nController C, lifecycle and official SDK adaptation"];
+    ip [label="F4 drivers/ip/: private shared hardware algorithms"];
+    vendor [label="vendors/st/: F4 HAL / Device\nInventory retained; selected inputs consumed"];
+    host [label="tests/support/native/\nExplicit test scope, not a production SoC"];
+    components [label="components/: ILI9341 / XPT2046 / W25"];
+    facts [label="Package manifest / facts / bindings\nBoard JSON and external TOML", fillcolor="#f8fafc"];
+    config [label="tools/configure/: generic DataProvider\nDomain policies, named IR, bounded static assembly"];
+    assembly [label="Generated nexus_bindings.c\nStatic instances, faces and fixed lifecycle connections"];
+    components -> io [label="Runtime: public narrow-port access"];
+    io -> f4 [label="Runtime: ops(context)"];
+    f4 -> ip [label="Build: select private source", style=dashed];
+    f4 -> vendor [label="Build: private include / link", style=dashed];
+    host -> ip [label="Tests: execute real hardware algorithm C", style=dashed];
+    facts -> config [label="Build: one input snapshot", style=dashed];
+    config -> assembly [label="Build: emit bounded static connections", style=dashed];
+    assembly -> f4 [label="Build: private types, fixed C calls and links", style=dashed];
 }

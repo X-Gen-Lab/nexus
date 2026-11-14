@@ -50,7 +50,12 @@ class AdcContinuousConfigurationTests(unittest.TestCase):
                 source = (output / "bindings.c").read_text()
                 self.assertIn("nx_stm32_adc_continuous_prepare", source)
                 self.assertIn("nx_stm32_adc_stream_config_t", source)
-                self.assertIn("s_nx_adc_samples_samples[] = { 0u, 7u }", source)
+                from tools.configure.providers import for_selection
+                construction = for_selection(ir).constructor(
+                    adc, ir, ir.board_bindings, ir.routes, ir.devices)
+                samples = next(declaration for declaration in construction.static_declarations
+                               if declaration.name == "s_nx_adc_samples_samples")
+                self.assertEqual(samples.initializer.values, (0, 7))
                 self.assertIn("NX_IO_CAP_RX_DMA", source)
                 self.assertIn("NX_IO_CAP_BLOCK_STREAM", source)
 

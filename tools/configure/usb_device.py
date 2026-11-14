@@ -6,7 +6,6 @@ physical qualification. Selected endpoints are separate static typed identities.
 from dataclasses import dataclass
 
 from tools.configure.providers.common import fail, integer
-from tools.configure.usb_host import HS_FS_PINS, ULPI_PINS
 from tools.configure import usb_otg
 
 
@@ -62,16 +61,20 @@ def validate_selection(selection, route, provider, ram_size):
     remote = selection.get("remote_wakeup", False)
     if type(remote) is not bool:
         fail("USB remote_wakeup requires an explicit boolean")
-    if remote and provider.PREFIX != "stm32":
-        fail("USB remote_wakeup requires a reviewed STM32 Device owner")
+    packet = getattr(provider, "PACKET", None)
+    capability = packet.admission("device", selection["mode"]) if packet is not None else None
+    if remote and (capability is None or not capability["remote_wakeup"] or
+                   route["controller"] != capability["controller"]):
+        fail("USB remote_wakeup requires its reviewed Device owner capability")
     mode = usb_otg.device_mode(selection["mode"])
     hs = mode in {"device-hs-fs", "device-hs-ulpi"}
-    ulpi = mode == "device-hs-ulpi"
     usb_otg.validate_selection(selection, route, provider)
     engine = selection.get("engine", "pio")
-    if engine not in {"pio", "dma"} or (engine == "dma" and not hs):
-        fail("USB device AHB DMA requires the OTG_HS core")
-    integer(selection["rx_fifo_words"], 48, 1024 if hs else 256,
+    if engine not in {"pio", "dma"} or (engine == "dma" and not hs) or (
+            capability is not None and engine not in capability["engines"]):
+        fail("USB device AHB DMA requires its reviewed high-speed core transport")
+    bounds = capability["rx_fifo_words"] if capability is not None else (48, 256)
+    integer(selection["rx_fifo_words"], *bounds,
             "USB RX FIFO words")
     for key in ("poll_limit", "drain_timeout_us", "clock_timeout_us"):
         integer(selection[key], 1, context="USB " + key)
@@ -80,14 +83,13 @@ def validate_selection(selection, route, provider, ram_size):
     if selection["vbus_sensing"]:
         fail("USB VBUS electrical route is not reviewed for this binding")
     if hs:
-        expected = ULPI_PINS if ulpi else HS_FS_PINS
-        if (provider.PREFIX != "stm32" or route["controller"] != "OTG_HS" or
+        if (capability is None or route["controller"] != capability["controller"] or
                 tuple((pin["pin"], pin["function"], pin["af"])
-                      for pin in route["pins"]) != expected):
+                      for pin in route["pins"]) != capability["pins"]):
             fail("USB HS device requires its exact reviewed PHY pads")
         if selection.get("electrical_handover") != "external-owner":
             fail("USB HS device requires an external VBUS/PHY electrical owner")
-        frequency = 60000000 if ulpi else 0
+        frequency = capability["ulpi_clock_hz"]
         integer(selection.get("ulpi_clock_hz"), frequency, frequency,
                 "USB device external ULPI clock")
         return

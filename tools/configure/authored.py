@@ -361,34 +361,8 @@ def editor_schema():
     properties["factory"] = {
         "type": "object", "properties": {"capabilities": {"type": "boolean"}},
         "additionalProperties": False}
-    from tools.configure.stm32f4.clocks import DEFAULT, AHB, APB
-    clock_fields = {name: {"type": "integer", "minimum": 1}
-                    for name in DEFAULT}
-    clock_fields.update(source={"enum": ["hse", "hsi"]},
-                        css={"type": "boolean"})
-    clock_fields.update(sysclk_source={"enum": ["pll", "input"],
-                                      "default": "pll"},
-                        pll48={"type": "boolean", "default": False})
-    for name, values in (("pll_p", (2, 4, 6, 8)), ("ahb_div", AHB),
-                         ("apb1_div", APB), ("apb2_div", APB),
-                         ("adc_div", (2, 4, 6, 8))):
-        clock_fields[name] = {"type": "integer", "enum": list(values)}
-    auxiliary = record({"m", "n", "sai1", "ltdc"}, {"m", "n"})
-    auxiliary["properties"].update(
-        m={"type": "integer", "minimum": 2, "maximum": 63},
-        n={"type": "integer", "minimum": 50, "maximum": 432})
-    for output, divider, posts in (("sai1", "q", range(1, 33)),
-                                    ("ltdc", "r", (2, 4, 8, 16))):
-        shape = record({divider, "post_divider"}, {divider, "post_divider"})
-        shape["properties"][divider] = {
-            "type": "integer", "minimum": 2, "maximum": 15 if divider == "q" else 7}
-        shape["properties"]["post_divider"] = {"type": "integer", "enum": list(posts)}
-        auxiliary["properties"][output] = shape
-    auxiliary["anyOf"] = [{"required": ["sai1"]}, {"required": ["ltdc"]}]
-    clock_fields["pll_sai"] = auxiliary
-    properties["clock_parameters"] = {
-        "type": "object", "additionalProperties": False,
-        "required": list(DEFAULT), "properties": clock_fields}
+    from tools.configure.clocks import clock_parameters_schema
+    properties["clock_parameters"] = clock_parameters_schema(record)
     for kind, fields in INSTANCE_FIELDS.items():
         properties[kind] = {"type": "object", "additionalProperties": record(fields, {"binding", "mode"})}
         if kind == "block":
@@ -402,7 +376,7 @@ def editor_schema():
             for field in {"poll_limit", "burst_budget_hclk_cycles"} & shape.keys():
                 shape[field] = {"type": "integer", "minimum": 1}
         if kind in {"capture", "audio"}:
-            from tools.configure.stm32f4.capture_audio import editor_schema
+            from tools.configure.media_schema import editor_schema
             editor_schema(kind, properties[kind]["additionalProperties"])
         if kind == "i2c_target":
             from tools.configure import i2c_target

@@ -99,6 +99,28 @@ class I2cTargetCold : public testing::Test {
 };
 } /* namespace */
 
+TEST_F(I2cTargetCold, SelectedAlternatePadsRestoreWithoutOriginalBankLease) {
+    pins[0] = {GPIOF, &snapshots[0], 5U, 1U};
+    pins[1] = {GPIOF, &snapshots[1], 5U, 0U};
+    config.registers = I2C2;
+    GPIOF->IDR = 3U;
+    GPIOF->MODER = 0xFFFF0000U;
+    const uint32_t mode = GPIOF->MODER;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_i2c_target_admit(&state, &config, &receipt));
+    ASSERT_EQ(0U, writes);
+    ASSERT_NO_FATAL_FAILURE(Prepare());
+    EXPECT_EQ(RCC_AHB1ENR_GPIOFEN, RCC->AHB1ENR);
+    EXPECT_EQ(0U, GPIOB->MODER);
+    EXPECT_EQ(0U, I2C1->CR1);
+    EXPECT_NE(0U, I2C2->CR1 & I2C_CR1_PE);
+    EXPECT_EQ(4U, GPIOF->AFR[0] & 15U);
+    EXPECT_EQ(4U, (GPIOF->AFR[0] >> 4U) & 15U);
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_i2c_target_close(&state, &config, &receipt));
+    EXPECT_EQ(mode, GPIOF->MODER);
+    EXPECT_EQ(0U, RCC->AHB1ENR);
+    EXPECT_FALSE(receipt.owned);
+}
+
 TEST_F(I2cTargetCold, ReadonlyAdmissionPrecedesActualAddressAndStretchSetup) {
     ASSERT_EQ(NX_SUCCESS, nx_stm32_i2c_target_admit(&state, &config, &receipt));
     EXPECT_EQ(0U, writes);

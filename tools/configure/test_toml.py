@@ -46,9 +46,9 @@ flash_load_limit_bytes = 65536
         package = self.root / source_directory(family)
         package.mkdir(parents=True, exist_ok=True)
         for fact_path in maintained(family).fact_files:
-            filename = Path(fact_path).name
-            shutil.copyfile(gate.ROOT / source_directory(family) / filename,
-                            package / filename)
+            destination = self.root / fact_path
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(gate.ROOT / fact_path, destination)
         if family == "gd32f470":
             vendor = "vendors/gigadevice/gd32f4xx"
             if not (self.root / vendor).exists():
@@ -248,7 +248,9 @@ model_bytes=128
         self.assertIn("DMA2_Stream7_IRQHandler", generated)
         self.assertIn("static const nx_stm32_uart_dma_cold_config_t", generated)
         self.assertIn(".registers = USART1", generated)
-        self.assertIn(".transmit = { DMA2_Stream7, DMA2_Stream7_IRQn, 7u, 4u }", generated)
+        self.assertIn(".transmit = { .dma = DMA2, .stream = DMA2_Stream7, "
+                      ".irq = DMA2_Stream7_IRQn, .lane = 7u, .channel = 4u }",
+                      generated)
         self.assertNotIn("s_nx_port_uart1.uart.registers =", generated)
         self.assertNotIn("0x10000000u", generated)
 
@@ -285,9 +287,11 @@ model_bytes=128
         for text in ("nx_stm32_spi_dma_state_t", "nx_stm32_spi_dma_endpoint_state_t",
                      "nx_stm32_spi_dma_prepare", "&nx_stm32_spi_dma_endpoint_ops",
                      "nx_stm32_spi_dma_close",
-                     "void DMA2_Stream3_IRQHandler(void)", "void DMA2_Stream0_IRQHandler(void)",
-                     "nx_spi_port_stop(nx_binding_spi0)"):
+                     "void DMA2_Stream3_IRQHandler(void)",
+                     "void DMA2_Stream0_IRQHandler(void)"):
             self.assertIn(text, generated)
+        self.assertIn("nx_stm32_spi_dma_close(&s_nx_port_spi0, "
+                      "&s_nx_spi_config_spi0, &s_nx_spi_cold_spi0)", generated)
         claims = {claim.key for claim in gate.resolve_ir(self.assembly, test_support=True).claims}
         self.assertLessEqual({"dma:DMA2:stream3", "dma:DMA2:stream0"}, claims)
 
@@ -343,7 +347,7 @@ model_bytes=128
 
 
 
-    def test_fixed_dma_providers_reject_other_valid_physical_routes(self):
+    def test_dma_routes_reject_unavailable_physical_lanes(self):
         cases = (('stm32f4', 'stm32_assembly/zg-dma.toml', 'USART1'), ('stm32f4', 'stm32_assembly/zg-dma.toml', 'SPI1'), ('stm32f4', 'stm32_assembly/zg-blocks.toml', 'ADC1'))
         real_dependency = gate.dependency_identity
         # The temporary fact root reuses independently verified source SDKs.
@@ -362,12 +366,15 @@ model_bytes=128
                                           if item.controller == controller)
                     routes = json.loads((package / "routes.json").read_text())
                     route = next(route for route in routes["routes"] if route["id"] == selected_route)
-                    route["dma"] = [f"{dma.split(':')[0]}:stream{6-index}:{dma.rsplit(':', 1)[1]}"
-                                    for index, dma in enumerate(route["dma"])]
+                    route["dma"] = [dma.split(":")[0] + ":stream99:" +
+                                    dma.rsplit(":", 1)[1]
+                                    for dma in route["dma"]]
                     (package / "routes.json").write_text(json.dumps(routes))
                     for action in (lambda: gate.resolve_ir(assembly, self.root, test_support=native_fixture(assembly)),
                                    lambda: gate.configure(assembly, self.root / "rejected", self.root, test_support=native_fixture(assembly))):
-                        with self.assertRaisesRegex(gate.ConfigurationError, "DMA route differs from fixed provider"):
+                        with self.assertRaisesRegex(gate.ConfigurationError,
+                                "Hardware DMA route names an undeclared physical lane|"
+                                "DMA resource is outside provider topology"):
                             action()
                     self.assertFalse((self.root / "rejected" / "bindings.c").exists())
 
@@ -408,7 +415,25 @@ model_bytes=128
                     route = next(route for route in routes["routes"] if route["id"] == selected.route)
                     route["mode_resources"] = {"trigger-dma": ["controller:TIM4"]}
                     (package / "routes.json").write_text(json.dumps(routes))
-                    with self.assertRaisesRegex(gate.ConfigurationError, "ADC trigger resource belongs to the selected assembly"):
+                    result = gate.resolve_ir(assembly, self.root)
+                    selected = next(item for item in result.controllers
+                                    if item.kind == "adc")
+                    self.assertEqual(selected.options.trigger, "tim3-trgo")
+                    claims = {(claim.key, claim.owner) for claim in result.claims}
+                    self.assertLessEqual({("controller:TIM3", selected.id),
+                                          ("controller:TIM4", selected.id)}, claims)
+                    # The route may add constraints, but cannot replace the
+                    # selected trigger's ownership and hide a real conflict.
+                    board = json.loads((Path(normalized["board_package"]) /
+                                        "board.json").read_text())
+                    board["reserved_resources"].append("timer:TIM3")
+                    directory = self.root / "trigger-board"
+                    directory.mkdir()
+                    (directory / "board.json").write_text(json.dumps(board))
+                    normalized["board_package"] = str(directory)
+                    assembly.write_text(render_toml(normalized))
+                    with self.assertRaisesRegex(gate.ConfigurationError,
+                            "Resource conflict controller:TIM3"):
                         gate.resolve_ir(assembly, self.root, test_support=native_fixture(assembly))
 
 

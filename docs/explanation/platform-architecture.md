@@ -166,10 +166,13 @@ existing face. After explicit successful platform start, ordinary operations cal
 its shared ops table with its instance context. IRQ dispatch is fixed to provider
 instances and does not repeat factory lookup for every byte.
 
-The explicit F4 descriptor is `tools/configure/stm32f4_descriptor.py`; the
-centralized configuration adapter lives under `tools/configure/stm32f4/`. Production family enumeration contains only F4;
-Native uses an explicit test-support context. Descriptors identify inputs and
-selected code, without becoming a second source graph.
+The selected `package.json` identifies facts, bindings, build entry and export
+ownership. The generic DataProvider reads one input snapshot and emits finite
+static connections; production no longer imports F4 Python constructors or a
+family registry. Packages with resolved `production` scope enter the maintained
+family catalogue, currently F4. Native remains an explicit test-support fixture. Package
+selection does not create another C source graph or establish execution
+qualification.
 
 The constructor contract uses named immutable IR and direct calls for fixed
 connections. Vendor types and mutable Handles stay private. Generated definitions
@@ -182,11 +185,15 @@ under one owner. Other modes retain their explicit implementations. See the
 
 ![Current initialization, failure withdrawal and retained cleanup responsibility](../assets/diagrams/platform-lifecycle.svg)
 
-FIG-05 shows explicit startup and reverse cleanup. A static face can exist before
-start and after stop; its pointer is not a capability to execute cold hardware.
-Partial failure can retain irreversible watchdog effects or busy borrows. Products
-must inspect primary and cleanup outcomes, continue the real executor, and retain
-quarantined resources. Platform start never starts a scheduler.
+FIG-05 shows the shared C coordinator called by fixed static connections. During
+this startup, every controller admission precedes System/resource acquisition
+and controller writes. Shared-resource or instance failure triggers reverse
+rollback; System startup separately reports primary, cleanup and retained effects.
+A static face can exist before start and after stop; its pointer grants no
+permission to operate cold hardware. Partial failure can retain irreversible
+watchdog effects or busy borrows. Products inspect both results, continue the
+real executor and retain quarantined resources. Platform start never starts a
+scheduler.
 
 Physical Flash reports exact geometry and `program_flags`. An ECC fresh-erase
 requirement belongs to the caller's provenance contract: all-FF readback cannot

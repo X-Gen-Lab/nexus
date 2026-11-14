@@ -1,29 +1,43 @@
 """Exact UARTs keep APB, vector and DMA resource admission independent."""
 from tools.configure.tests.native_fixture import native_fixture
-from dataclasses import FrozenInstanceError
+from dataclasses import FrozenInstanceError, replace
 import json
 from pathlib import Path
 import tempfile
 import unittest
 
-from tools.configure.stm32f4 import preflight
+from tools.configure.policies.gpio_phase import GpioPhasePolicy
 from tools.configure import bindings, configure as gate
-from tools.configure.providers import hardware
+from tools.configure.tests.f4_fixture import provider
 
 
 class F407UartInstanceTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.hardware = provider("STM32F407VET6").hardware_facts
+
+    def binding(self, name):
+        return next(item for item in self.hardware.CONTROLLER_BINDINGS
+                    if item.controller == name)
+
+    def gpio_policy(self):
+        facts = gate.load(gate.ROOT / "soc/stm32/stm32f4/bindings/gpio_policy.json")
+        return GpioPhasePolicy.from_validated(facts["domains"]["gpio_phase"])
+
     def test_selected_uart_instances_have_exact_immutable_clock_and_irq(self):
+        policy = self.gpio_policy()
         for controller, apb, irq in (
                 ("USART3", 1, 39), ("UART4", 1, 52),
                 ("UART5", 1, 53), ("USART6", 2, 71)):
             with self.subTest(controller=controller):
-                selected = hardware.maintained('stm32f4', controller)
+                selected = self.binding(controller)
                 self.assertEqual(selected.kind, "uart")
                 self.assertEqual(selected.apb, apb)
                 self.assertEqual(selected.irqs, ((controller, irq),))
-                self.assertEqual(preflight._clock(controller),
-                    (f"RCC->APB{apb}ENR",
-                     f"RCC_APB{apb}ENR_{controller}EN"))
+                gate_field = policy.controller_gates[controller]
+                self.assertEqual(set(gate_field), {f"apb{apb}_clocks"})
+                self.assertEqual(tuple(mask.name for mask in gate_field[f"apb{apb}_clocks"]),
+                                 (f"RCC_APB{apb}ENR_{controller}EN",))
                 with self.assertRaises(FrozenInstanceError):
                     selected.apb = 3 - apb
 
@@ -38,7 +52,7 @@ class F407UartInstanceTests(unittest.TestCase):
                     routes = ((engine, rx, channel),)
                     if mode.startswith("dma-duplex"):
                         routes = ((engine, tx, channel),) + routes
-                    self.assertEqual(hardware.maintained('stm32f4', name).dma(mode),
+                    self.assertEqual(self.binding(name).dma(mode),
                                      routes)
 
     def test_all_six_finite_dma_transmitters_generate_their_exact_static_route(self):
@@ -81,7 +95,7 @@ class F407UartInstanceTests(unittest.TestCase):
                             source = bindings.emit(result)[1]
                             self.assertIn("nx_stm32_uart_hal_cold_prepare", source)
                             self.assertIn(f"DMA{engine}_Stream{stream}_IRQHandler", source)
-                            self.assertIn(f"{stream}u, {channel}u", source)
+                            self.assertIn(f".lane = {stream}u, .channel = {channel}u", source)
 
     def test_six_dma_receivers_generate_each_public_mode(self):
         source = gate.ROOT / "tests/contracts/multi_controller_assembly"
@@ -175,8 +189,12 @@ class F407UartInstanceTests(unittest.TestCase):
                                           generated)
 
     def test_unreviewed_uart_name_does_not_infer_a_clock_gate(self):
-        with self.assertRaisesRegex(ValueError, "Unmaintained controller"):
-            preflight._clock("UART7")
+        result = gate.resolve_ir(gate.ROOT /
+                                 "tools/configure/assemblies/qiming-baremetal.toml")
+        serial = next(item for item in result.controllers if item.kind == "uart")
+        result = replace(result, controllers=(replace(serial, controller="UART7"),))
+        with self.assertRaisesRegex(ValueError, "No reviewed cold gate"):
+            self.gpio_policy().admission_declarations(result, None, 0)
 
     def test_usart2_byte_events_are_selectable_without_dma_claims(self):
         with tempfile.TemporaryDirectory() as temporary:

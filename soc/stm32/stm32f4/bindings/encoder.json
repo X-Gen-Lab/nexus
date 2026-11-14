@@ -1,0 +1,131 @@
+{
+  "schema_version": 1,
+  "bindings": [
+    {
+      "kind": "encoder",
+      "mode": "quadrature",
+      "implementation": "encoder",
+      "static_recipe": {
+        "state_type": "nx_stm32_encoder_state_t",
+        "ops": "nx_stm32_encoder_ops",
+        "declarations": [
+          {
+            "role": "encoder_config",
+            "type": "nx_stm32_encoder_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "registers",
+                  {
+                    "source": "item.controller",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "mode",
+                  {
+                    "source": "item.options.counting",
+                    "as": "symbol",
+                    "values": {
+                      "x2-a": "NX_ENCODER_MODE_X2_A",
+                      "x2-b": "NX_ENCODER_MODE_X2_B",
+                      "x4": "NX_ENCODER_MODE_X4"
+                    }
+                  }
+                ],
+                [
+                  "filter_a",
+                  {
+                    "source": "item.options.filter_a"
+                  }
+                ],
+                [
+                  "filter_b",
+                  {
+                    "source": "item.options.filter_b"
+                  }
+                ],
+                [
+                  "invert_a",
+                  {
+                    "source": "item.options.invert_a"
+                  }
+                ],
+                [
+                  "invert_b",
+                  {
+                    "source": "item.options.invert_b"
+                  }
+                ],
+                [
+                  "pins",
+                  {
+                    "map": {
+                      "source": "selected.pads",
+                      "limit": 2,
+                      "value": {
+                        "record": [
+                          [
+                            "registers",
+                            {
+                              "source": "entry.registers",
+                              "as": "symbol"
+                            }
+                          ],
+                          [
+                            "port_index",
+                            {
+                              "source": "entry.port_index"
+                            }
+                          ],
+                          [
+                            "pin",
+                            {
+                              "source": "entry.number"
+                            }
+                          ]
+                        ]
+                      }
+                    }
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "calls": {
+          "admit": [],
+          "prepare": {
+            "function": "nx_stm32_encoder_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "ref": "encoder_config",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32_encoder_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "retain_on_failed_init": true
+      },
+      "headers": [
+        "stm32f4_encoder.h"
+      ]
+    }
+  ]
+}

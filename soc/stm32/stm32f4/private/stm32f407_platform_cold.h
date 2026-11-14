@@ -29,6 +29,48 @@ typedef struct {
     uint8_t pin;
 } nx_stm32_platform_pin_config_t;
 
+/** \brief Check GPIO identity without duplicating reviewed AF route tables.
+ * \note The resolver admits silicon/package/Board routes. Cold C checks the
+ *       selected storage and bank identities before using their gate indices.
+ */
+static inline bool
+nx_stm32_platform_pin_valid(const nx_stm32_platform_pin_config_t* pin) {
+    if (pin == NULL || pin->snapshot == NULL || pin->pin > 15U)
+        return false;
+    switch (pin->port_index) {
+        case 0U:
+            return pin->registers == GPIOA;
+        case 1U:
+            return pin->registers == GPIOB;
+        case 2U:
+            return pin->registers == GPIOC;
+        case 3U:
+            return pin->registers == GPIOD;
+#ifdef GPIOE
+        case 4U:
+            return pin->registers == GPIOE;
+#endif
+#ifdef GPIOF
+        case 5U:
+            return pin->registers == GPIOF;
+#endif
+#ifdef GPIOG
+        case 6U:
+            return pin->registers == GPIOG;
+#endif
+#ifdef GPIOH
+        case 7U:
+            return pin->registers == GPIOH;
+#endif
+#ifdef GPIOI
+        case 8U:
+            return pin->registers == GPIOI;
+#endif
+        default:
+            return false;
+    }
+}
+
 /** \brief Immutable physical selections, never an action or opcode stream.
  * \note GPIO/DMA and IRQ masks describe exact selected resources. No pointer
  *       in this record is a callback or an arbitrary writable register port.

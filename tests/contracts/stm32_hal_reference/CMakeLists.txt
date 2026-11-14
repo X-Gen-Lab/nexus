@@ -7,7 +7,7 @@ endif()
 get_filename_component(NEXUS_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../.."
     ABSOLUTE)
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
-include("${NEXUS_SOURCE_DIR}/cmake/platform/STM32Official.cmake")
+include("${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/cmake/STM32Official.cmake")
 include("${NEXUS_SOURCE_DIR}/cmake/platform/CMSISCore.cmake")
 set(official "${NEXUS_SOURCE_DIR}/vendors/st/stm32f4_hal")
 nexus_cmsis_core_include(cmsis)

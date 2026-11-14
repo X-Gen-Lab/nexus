@@ -1,6 +1,18 @@
 """Selected USB-specific ROM profiles, separate from generic packet limits."""
 
 from tools.configure import usb_otg
+from tools.configure.providers.common import fail
+
+
+def selected_usb_factory(item):
+    """Read the same selected binding used by immutable controller assembly."""
+    integration = item.integration
+    packet = (integration.constants.get("packet")
+              if integration is not None and integration.constants is not None else None)
+    selected = packet.usb_factory if packet is not None else None
+    if selected is None:
+        fail("USB factory requires reviewed callback and physical binding facts")
+    return selected
 
 
 def _profile(item, result, *, fallback=False):
@@ -22,21 +34,20 @@ def _profile(item, result, *, fallback=False):
         maximum = (min(options.max_packet,
                        1023 if options.transfer == "isochronous" else 64)
                    if fallback else options.max_packet)
-        lines.append(f'    {{ &s_nx_device_face_{endpoint}, {maximum}U, '
+        lines.append(f'    {{ &s_nx_device_{endpoint}, {maximum}U, '
                      f'{options.number}U, {str(options.direction == "in").lower()}, '
                      f'{transfer} }},')
-    hs = usb_otg.device_mode(item.mode) != "device-fs"
     ulpi = usb_otg.device_mode(item.mode) == "device-hs-ulpi"
-    frequency = "60000000U" if ulpi else "NX_USB_FS_PHY_CLOCK_HZ"
-    fifo = "1024U" if hs else "NX_USB_FS_FIFO_WORDS"
-    numbers = "6U" if hs else "NX_USB_FS_ENDPOINT_NUMBERS"
+    selected = selected_usb_factory(item)
+    frequency = str(selected.clock_hz) + "U"
+    fifo = str(selected.fifo_words) + "U"
+    numbers = str(selected.endpoint_numbers) + "U"
     speed = ("NX_USB_PROFILE_HIGH_SPEED" if ulpi and not fallback else
              "NX_USB_PROFILE_FULL_SPEED")
     phy = "NX_USB_PROFILE_EXTERNAL_ULPI" if ulpi else "NX_USB_PROFILE_INTERNAL_FS"
     engine = ("NX_USB_PROFILE_AHB_DMA" if item.options.engine == "dma"
               else "NX_USB_PROFILE_PIO")
-    setup_ops = ("nx_stm32_usb_otg_setup_decision_ops"
-                 if usb_otg.is_managed(item.mode) else "nx_usb_fs_setup_decision_ops")
+    setup_ops = selected.setup_ops
     lines += ['};', f'static const nx_usb_device_profile_t {identity} = {{',
               f'    &s_nx_face_{name}, {array}, {len(children)}U,',
               f'    {frequency}, {fifo}, {item.options.rx_fifo_words}U, {numbers},',
@@ -103,8 +114,7 @@ def emit_activation(result):
     source = []
     for item in controllers:
         name = item.id.replace("-", "_")
-        activation_ops = ("nx_stm32_usb_otg_activation_ops"
-                          if usb_otg.is_managed(item.mode) else "nx_usb_fs_activation_ops")
+        activation_ops = selected_usb_factory(item).activation_ops
         source += ['static const nx_usb_activation_port_t '
                    f's_nx_usb_activation_{name} = {{',
                    f'    &{activation_ops}, &s_nx_port_{name}', '};']

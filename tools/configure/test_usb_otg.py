@@ -7,6 +7,7 @@ import tempfile
 import unittest
 
 from tools.configure import configure as gate
+from tools.configure.providers import for_selection
 from tools.configure.tests.native_fixture import native_fixture
 
 
@@ -73,8 +74,15 @@ class UsbOtgConfigurationTests(unittest.TestCase):
             self.assertIn(symbol, source)
         self.assertIn("nx_factory_usb_otg", header)
         self.assertEqual(source.count("nx_stm32_usb_otg_irq("), 1)
-        snapshots = re.findall(r"static uint16_t (s_nx_\w+_pin_snapshots_fs)\[", source)
+        constructed = for_selection(ir).constructor(usb, ir, ir.board_bindings,
+                                                    ir.routes, ir.devices)
+        self.assertEqual(set(constructed.pin_snapshots),
+                         {pin["pin"] for pin in usb.pins})
+        snapshots = {value.split("[", 1)[0]
+                     for value in constructed.pin_snapshots.values()}
         self.assertEqual(len(snapshots), 1)
+        snapshot, = snapshots
+        self.assertEqual(source.count("static uint16_t " + snapshot + "["), 1)
         self.assertNotIn("malloc", source)
 
     def test_unknown_or_output_only_vbus_observation_rejects_before_emission(self):

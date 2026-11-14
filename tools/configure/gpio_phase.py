@@ -9,6 +9,8 @@ from collections.abc import Mapping
 
 from tools.configure.providers import for_selection
 from tools.configure.providers.common import fail, owned_claims
+from tools.configure.calls import Symbol
+from tools.configure.static_ir import ArrayElementAddress
 
 
 def selected_pins(result):
@@ -26,7 +28,9 @@ def selected_pins(result):
                     for pin in excluded)):
             fail("GPIO lease excluded pins must be unique selected pin claims")
         pins.difference_update(excluded)
-    return tuple(sorted(pins, key=lambda pin: (pin[1], int(pin[2:]))))
+    order = getattr(policy, "pin_order", None)
+    return tuple(sorted(pins, key=lambda pin: order(result, pin))
+                 if order is not None else sorted(pins))
 
 
 def applies(result):
@@ -36,13 +40,6 @@ def applies(result):
     requires_admission = getattr(policy, "requires_admission", None)
     return bool(selected_pins(result)) or (
         requires_admission is not None and requires_admission(result))
-
-
-def _banks(result):
-    banks = {}
-    for pin in selected_pins(result):
-        banks.setdefault(pin[1], []).append(int(pin[2:]))
-    return banks
 
 
 def add_snapshots(result, item, offered, snapshots):
@@ -60,25 +57,31 @@ def add_snapshots(result, item, offered, snapshots):
     for pin, slot in offered.items():
         if pin not in owned:
             fail("Cold snapshot refers to an unselected owner pin")
-        if (not isinstance(slot, str) or
-                re.fullmatch(r"s_nx_\w+\[\d+u?\]", slot) is None):
+        match = (re.fullmatch(r"(s_nx_\w+)\[(\d+)u?\]", slot)
+                 if isinstance(slot, str) else None)
+        if match is None:
             fail("Cold pin snapshot must name one static array slot")
-        if pin in snapshots or slot in snapshots.values():
+        name, index = match.groups()
+        reference = ArrayElementAddress(Symbol(name), int(index))
+        if pin in snapshots or reference in snapshots.values():
             fail("Cold pin snapshots require distinct owner slots")
-        snapshots[pin] = slot
+        snapshots[pin] = reference
 
 
 def declarations(result, existing_snapshots=None):
     if not applies(result):
         return []
     policy = for_selection(result).GPIO_PHASE
-    pins, banks = selected_pins(result), _banks(result)
+    pins = selected_pins(result)
     slots = dict(existing_snapshots or {})
     if set(slots) - set(pins):
         fail("Cold snapshot refers to an unselected pin")
+    if any(not isinstance(value, ArrayElementAddress) for value in slots.values()):
+        fail("Cold snapshot requires a typed static array reference")
+    if len(set(slots.values())) != len(slots):
+        fail("Cold pin snapshots require distinct owner slots")
     missing = [pin for pin in pins if pin not in slots]
-    slots.update({pin: f"s_nx_platform_pin_state[{index}u]"
+    slots.update({pin: ArrayElementAddress(Symbol("s_nx_platform_pin_state"), index)
                   for index, pin in enumerate(missing)})
-    source = ([f"static uint16_t s_nx_platform_pin_state[{len(missing)}u];"]
-              if missing else [])
-    return source + policy.static_declarations(result, pins, banks, slots)
+    source = [policy.snapshot_declaration(result, len(missing))] if missing else []
+    return source + policy.static_declarations(result, pins, slots)

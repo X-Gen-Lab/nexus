@@ -1,10 +1,7 @@
 """Nominal endpoint classes share controllers without interface casts."""
-from dataclasses import replace
-
 from tools.configure import selected_contracts
 from tools.configure.contracts import ENDPOINT_FIELDS
-from tools.configure.calls import Address, DirectCall, InitializeSequence
-from tools.configure.providers import maintained, for_selection
+from tools.configure.providers import for_selection
 from tools.configure.providers.common import fail, integer
 
 DRIVERS = selected_contracts.ENDPOINT_DRIVERS
@@ -21,73 +18,39 @@ def face_type(device):
     return "nx_" + selected.removesuffix("_device") + "_endpoint_t"
 
 
-def _spi_provider(family, *, dma):
-    provider = maintained(family) if isinstance(family, str) else for_selection(family)
+def _spi_provider(selection):
+    provider = for_selection(selection)
     policy = provider.ENDPOINT_POLICY
-    if not (policy.spi_dma is not None if dma else policy.spi_transaction):
-        fail("SPI transaction provider lacks an explicit table")
+    if policy.spi_dma is None:
+        fail("SPI DMA provider lacks an explicit owner policy")
     return provider
 
 
-def face(device, state, legacy_operations, family=None):
-    """Emit one immutable enhanced or legacy face around existing state."""
+def face(device, state, operations, selection):
+    """Emit a Native fixture face; production faces belong to static recipes."""
+    provider = for_selection(selection)
+    if not provider.MODEL:
+        fail("Direct endpoint face emission requires an explicit Native model")
     name = device.id.replace("-", "_")
     typename = face_type(device)
-    operations = legacy_operations
     if device.driver == "spi-dma-transaction":
         controller = device.controller.replace("-", "_")
         context = f"s_nx_sequence_endpoint_{name}"
         return [f"static nx_spi_dma_sequence_endpoint_t {context} = {{",
                 f"    &s_nx_sequence_{controller}, &{state}", "};",
-                f"static const {typename} s_nx_device_face_{name} = {{",
+                f"static const {typename} s_nx_device_{name} = {{",
                 f"    &nx_spi_dma_sequence_endpoint_ops, &{context}", "};",
                 f"const {typename}* const nx_device_{name} = "
-                f"&s_nx_device_face_{name};"]
+                f"&s_nx_device_{name};"]
     if device.driver == "spi-transaction":
-        provider = _spi_provider(family, dma=False)
-        operations = f"nx_{provider.PREFIX}_spi_transaction_ops"
-    return [f"static const {typename} s_nx_device_face_{name} = {{",
+        operations = provider.ENDPOINT_POLICY.spi_transaction_ops
+        if operations is None:
+            fail("Native SPI transaction requires explicit operations")
+        operations = operations.name
+    return [f"static const {typename} s_nx_device_{name} = {{",
             f"    &{operations}, &{state}", "};",
             f"const {typename}* const nx_device_{name} = "
-            f"&s_nx_device_face_{name};"]
-
-
-def dma_construction(item, construction, prefix):
-    """Select sequence state only for the nominal enhanced DMA interface.
-
-    The existing hardware constructor and IRQs keep the exact original engine
-    state. Only the public sequence face owns outer loans. The private engine
-    face is never exported by a factory or endpoint namespace.
-    """
-    if item.interface_kind != "spi_dma_transaction":
-        return construction
-    provider = _spi_provider(item, dma=True)
-    if prefix != provider.PREFIX:
-        fail("SPI sequence binding differs from its exact selected provider")
-    selected_contracts.describe(item)
-    name = item.id.replace("-", "_")
-    sequence = f"s_nx_sequence_{name}"
-    backend = f"nx_{provider.PREFIX}_spi_dma_sequence_backend"
-    prepare = InitializeSequence(f"prepare_sequence_{name}", (
-        construction.initialize,
-        DirectCall("nx_spi_dma_sequence_initialize", (
-            Address(sequence), Address(backend), Address(f"s_nx_port_{name}")))))
-    return replace(construction,
-                   initialize_sequences=construction.initialize_sequences + (prepare,),
-                   admission=construction.admission + (DirectCall(
-                       "nx_spi_dma_sequence_preflight", (
-                           Address(sequence), Address(backend),
-                           Address(f"s_nx_port_{name}"))),),
-                   initialize=DirectCall(f"prepare_sequence_{name}"),
-                   stop=tuple(DirectCall("nx_spi_dma_transaction_stop",
-                                         call.arguments)
-                              if call.function == "nx_spi_port_stop" else call
-                              for call in construction.stop),
-                   face_context="&" + sequence,
-                   face_definitions=(
-                       f"static nx_spi_dma_sequence_state_t {sequence} = {{",
-                       f"    .backend = &{backend}, .context = &s_nx_port_{name}",
-                       "};"), retain_on_failed_init=True)
+            f"&s_nx_device_{name};"]
 
 
 def emit_traits(result):
@@ -142,13 +105,13 @@ def emit_owner_factory(result):
     source = []
     for item in selected:
         name = item.id.replace("-", "_")
-        provider = _spi_provider(item, dma=True)
+        provider = _spi_provider(item)
         selected_contracts.describe(item)
-        prefix = provider.PREFIX
+        contains, attach_wake = provider.ENDPOINT_POLICY.spi_dma_owner
         source += [f'static const nx_spi_dma_owner_binding_t s_nx_spi_owner_{name} = {{',
                    f'    .port = &s_nx_face_{name},',
-                   f'    .contains = nx_{prefix}_spi_dma_owner_contains,',
-                   f'    .attach_wake = nx_{prefix}_spi_dma_owner_attach_wake',
+                   f'    .contains = {contains.name},',
+                   f'    .attach_wake = {attach_wake.name}',
                    '};']
     source += ['const nx_spi_dma_owner_binding_t* nx_factory_spi_dma_owner_binding(',
                '    nx_spi_dma_transaction_id_t id) {', '    switch (id) {']
@@ -245,8 +208,9 @@ def resolve_device(device, controller, provider, *, soc, clock_plan,
             if not binding or routes[binding["route"]]["kind"] != "gpio":
                 fail("SPI child CS lacks reviewed GPIO wiring")
             cs_pins = routes[binding["route"]]["pins"]
-            if (len(cs_pins) != 1 or binding.get("initial") !=
-                    1 << int(cs_pins[0]["pin"][2:])):
+            mask = binding["mask"]
+            if (len(cs_pins) != 1 or mask == 0 or mask & (mask - 1) or
+                    binding.get("initial") != mask):
                 fail("Active-low SPI CS must be one reviewed pin initially high")
             for pin in cs_pins:
                 if pin["pin"] in chip_selects:

@@ -457,6 +457,14 @@ TEST_F(Sai, MetadataQueriesNeverOverwriteTheCompleteSystemOwner) {
                                          &g_nx_stm32_system)));
     EXPECT_EQ(0, std::memcmp(&before, &g_nx_stm32_system, sizeof(before)));
 }
+
+TEST_F(Sai, SelectedMclkRoleCannotBeAcceptedByASlaveOwner) {
+    config.master = false;
+    config.mclk = true;
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED, nx_stm32_sai_admit(&state, &config));
+    EXPECT_EQ(0U, hw.writes);
+    EXPECT_FALSE(state.owned);
+}
 TEST_F(Sai, ReceivePayloadCannotBorrowTheSystemEvenInAnExplicitDmaDomain) {
     config.transmit = nullptr;
     config.receive = config.source = SAI1_Block_A;
@@ -605,6 +613,18 @@ TEST_F(Sai, UnsupportedGeometryAndDmaRouteRejectBeforeWrites) {
     EXPECT_EQ(NX_ERROR_INVALID, nx_stm32_sai_admit(&state, &config));
     config.active_slots = 3U;
     config.tx.channel = 1U;
+    EXPECT_EQ(NX_ERROR_INVALID, nx_stm32_sai_admit(&state, &config));
+    EXPECT_EQ(0U, hw.writes);
+    EXPECT_FALSE(state.owned);
+}
+TEST_F(Sai, DmaMetadataCannotJoinAnUnselectedLaneOrVector) {
+    config.tx.stream = DMA2_Stream3;
+    EXPECT_EQ(NX_ERROR_INVALID, nx_stm32_sai_admit(&state, &config));
+    config.tx.stream = DMA2_Stream1;
+    config.tx.irq = DMA2_Stream3_IRQn;
+    EXPECT_EQ(NX_ERROR_INVALID, nx_stm32_sai_admit(&state, &config));
+    config.tx.irq = DMA2_Stream1_IRQn;
+    config.tx.lane = 8U;
     EXPECT_EQ(NX_ERROR_INVALID, nx_stm32_sai_admit(&state, &config));
     EXPECT_EQ(0U, hw.writes);
     EXPECT_FALSE(state.owned);
@@ -890,6 +910,7 @@ TEST_F(Sai, NoDividerHasNoMclkAndPermitsAnExactNonPowerOfTwoFrame) {
 }
 TEST_F(Sai, CharacterizedMclkPreservesTheExactFractionAtAnotherKernel) {
     config.mckdiv = 1U;
+    config.mclk = true;
     pins[3] = {GPIOE, &snapshots[3], 4U, 2U, 6U};
     config.common.pin_count = 4U;
     Open();
@@ -1023,6 +1044,7 @@ TEST_F(Sai, OnlyAnActuallySelectedMclkPadUsesItsCharacterizedOutputRange) {
     EXPECT_EQ(NX_SUCCESS, nx_stm32_sai_admit(&state, &config));
     pins[3] = {GPIOE, &snapshots[3], 4U, 2U, 6U};
     config.common.pin_count = 4U;
+    config.mclk = true;
     EXPECT_EQ(NX_ERROR_UNSUPPORTED, nx_stm32_sai_admit(&state, &config));
     EXPECT_EQ(0U, hw.writes);
     EXPECT_FALSE(state.owned);

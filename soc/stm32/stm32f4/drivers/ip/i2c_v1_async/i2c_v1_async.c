@@ -71,8 +71,7 @@ _Static_assert(NX_I2C_BOUNDED_MAX_MESSAGES <= UINT8_MAX &&
 #define NX_I2C_V1_WRITE_DATA(state, value) ((state)->registers[DATA] = (value))
 #endif
 #ifndef NX_I2C_V1_LINES_HIGH
-#define NX_I2C_V1_LINES_HIGH(state)                                            \
-    ((*(state)->line_inputs & (state)->line_mask) == (state)->line_mask)
+#define NX_I2C_V1_LINES_HIGH(state) nx_i2c_v1_lines_high((state)->lines)
 #endif
 #ifndef NX_I2C_V1_ADDRESS_CLEARED
 #define NX_I2C_V1_ADDRESS_CLEARED(state) ((void)(state))
@@ -122,9 +121,7 @@ static bool storage_separate(const nx_i2c_v1_endpoint_t* endpoint,
         !nx_i2c_v1_storage_outside(storage, bytes,
                                    (const void*)(uintptr_t)state->registers,
                                    NX_I2C_V1_REGISTER_BYTES) ||
-        !nx_i2c_v1_storage_outside(storage, bytes,
-                                   (const void*)(uintptr_t)state->line_inputs,
-                                   sizeof(*state->line_inputs)) ||
+        !nx_i2c_v1_lines_outside(state->lines, storage, bytes) ||
         (state->wake != NULL &&
          !nx_i2c_v1_storage_outside(storage, bytes, state->wake,
                                     sizeof(*state->wake))))
@@ -388,9 +385,8 @@ static void program_profile(nx_i2c_v1_state_t* state, uint16_t ccr,
 /** \brief Initialize a selected mode; polling storage is wholly independent. */
 nx_result_t nx_i2c_v1_initialize(nx_i2c_v1_state_t* state) {
     if (state == NULL || state->registers == NULL ||
-        state->line_inputs == NULL || state->line_mask == 0U ||
-        (state->line_mask & ~UINT32_C(0xFFFF)) != 0U ||
-        state->peripheral_mhz < 2U || state->peripheral_mhz > 50U) {
+        !nx_i2c_v1_lines_valid(state->lines) || state->peripheral_mhz < 2U ||
+        state->peripheral_mhz > 50U) {
         return NX_ERROR_INVALID;
     }
     if (!nx_arch_is_privileged() || nx_arch_in_isr() ||

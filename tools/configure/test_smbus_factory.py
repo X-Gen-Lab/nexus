@@ -47,7 +47,7 @@ class SMBusFactoryTests(unittest.TestCase):
                 self.assertIn("nx_factory_smbus_binding_ref(", companion)
                 self.assertIn("static const nx_smbus_binding_t "
                               "s_nx_smbus_binding_sensor", source)
-                self.assertIn("&s_nx_device_face_sensor, &s_nx_face_bus, 80u",
+                self.assertIn("&s_nx_device_sensor, &s_nx_face_bus, 80u",
                               source)
                 self.assertIn("return &s_nx_smbus_binding_sensor;", source)
                 self.assertNotIn("components/smbus.h",

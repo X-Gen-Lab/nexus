@@ -1,0 +1,1225 @@
+{
+  "schema_version": 1,
+  "bindings": [
+    {
+      "kind": "audio",
+      "controllers": ["I2S2", "I2S3"],
+      "implementation": "audio",
+      "static_recipe": {
+        "state_type": "nx_stm32_audio_state_t",
+        "ops": "nx_stm32_audio_ops",
+        "declarations": [
+          {
+            "role": "av_saved",
+            "type": "uint16_t",
+            "const": false,
+            "count": {"length": "selected.pads", "limit": 32}
+          },
+          {
+            "role": "av_pins",
+            "type": "nx_stm32_av_pin_t",
+            "const": true,
+            "value": {
+              "map": {
+                "source": "selected.pads",
+                "limit": 32,
+                "value": {
+                  "record": [
+                    ["registers", {"source": "entry.registers", "as": "symbol"}],
+                    [
+                      "snapshot",
+                      {
+                        "ref": "av_saved",
+                        "as": "address",
+                        "index": {"source": "index", "as": "u32"}
+                      }
+                    ],
+                    ["bank", {"source": "entry.port_index"}],
+                    ["pin", {"source": "entry.number"}],
+                    ["af", {"source": "entry.alternate"}]
+                  ]
+                }
+              }
+            },
+            "count": {"length": "selected.pads", "limit": 32}
+          },
+          {
+            "role": "dma_regions",
+            "type": "nx_dma_memory_region_t",
+            "const": true,
+            "value": {
+              "map": {
+                "source": "selected.readable_regions",
+                "limit": 16,
+                "value": {
+                  "record": [
+                    ["begin", {"source": "entry.begin"}],
+                    ["size", {"source": "entry.size"}],
+                    ["permissions", {"source": "entry.permissions", "as": "static"}]
+                  ]
+                }
+              }
+            },
+            "count": {"length": "selected.readable_regions", "limit": 16}
+          },
+          {
+            "role": "config",
+            "type": "nx_stm32_audio_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "common",
+                  {
+                    "record": [
+                      ["pins", {"ref": "av_pins", "as": "symbol"}],
+                      ["pin_count", {"length": "selected.pads", "limit": 32}],
+                      ["regions", {"ref": "dma_regions", "as": "symbol"}],
+                      ["region_count", {"length": "selected.readable_regions", "limit": 16}],
+                      ["poll_limit", {"source": "item.options.poll_limit"}],
+                      ["priority", {"source": "item.options.irq.priority"}]
+                    ]
+                  }
+                ],
+                ["hclk_hz", {"symbol": "NEXUS_CORE_HZ"}],
+                ["pclk_hz", {"symbol": "NEXUS_APB1_HZ"}],
+                [
+                  "registers",
+                  {
+                    "source": "item.controller",
+                    "values": {"I2S2": {"symbol": "SPI2"}, "I2S3": {"symbol": "SPI3"}}
+                  }
+                ],
+                [
+                  "extension",
+                  {
+                    "source": "item.controller",
+                    "values": {"I2S2": {"symbol": "I2S2ext"}, "I2S3": {"symbol": "I2S3ext"}}
+                  }
+                ],
+                ["controller", {"source": "item.controller", "values": {"I2S2": 2, "I2S3": 3}}],
+                ["clock", {"address": "s_nx_audio_clock"}],
+                [
+                  "master",
+                  {"source": "item.mode", "values": {"master-tx": true, "slave-tx": false}}
+                ],
+                ["receive", false],
+                ["duplex", false],
+                [
+                  "standard",
+                  {
+                    "source": "item.options.standard",
+                    "values": {"philips": 0, "msb": 1, "lsb": 2, "pcm-short": 3, "pcm-long": 4}
+                  }
+                ],
+                ["sample_bits", {"source": "item.options.sample_bits"}],
+                ["slot_bits", {"source": "item.options.slot_bits"}],
+                ["mclk", {"source": "item.options.mclk"}],
+                ["cpol_high", {"source": "item.options.cpol_high"}],
+                ["pll_input_hz", {"source": "item.options.pll_input_hz"}],
+                ["pll_m", {"source": "item.options.pll_m"}],
+                ["pll_n", {"source": "item.options.pll_n"}],
+                ["pll_r", {"source": "item.options.pll_r"}],
+                ["pll_hse", {"source": "item.options.pll_hse"}],
+                ["divider", {"source": "item.options.divider"}],
+                ["odd", {"source": "item.options.odd"}],
+                [
+                  "actual_rate",
+                  {
+                    "record": [
+                      ["numerator_hz", {"source": "item.options.rate_numerator", "as": "u64"}],
+                      ["denominator", {"source": "item.options.rate_denominator", "as": "u64"}]
+                    ]
+                  }
+                ],
+                ["ws_gpio", {"source": "selected.pads.0.registers", "as": "symbol"}],
+                ["ws_pin", {"source": "selected.pads.0.number"}],
+                ["ck_gpio", {"source": "selected.pads.1.registers", "as": "symbol"}],
+                ["ck_pin", {"source": "selected.pads.1.number"}],
+                [
+                  "tx",
+                  {
+                    "record": [
+                      ["dma", {"source": "selected.dma_bindings.0.registers", "as": "symbol"}],
+                      ["stream", {"source": "selected.dma_bindings.0.stream", "as": "symbol"}],
+                      ["irq", {"source": "selected.dma_bindings.0.irq", "as": "symbol"}],
+                      ["lane", {"source": "selected.dma_bindings.0.lane"}],
+                      ["channel", {"source": "selected.dma_bindings.0.request"}]
+                    ]
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "calls": {
+          "prepare": {
+            "function": "nx_stm32_audio_prepare",
+            "args": [{"ref": "port", "as": "address"}, {"ref": "config", "as": "address"}]
+          },
+          "close": [{"function": "nx_stm32_audio_close", "args": [{"ref": "port", "as": "address"}]}],
+          "admit": [
+            {
+              "function": "nx_stm32_audio_admit",
+              "args": [{"ref": "port", "as": "address"}, {"ref": "config", "as": "address"}]
+            }
+          ]
+        },
+        "irq": [
+          {
+            "name": {"source": "selected.dma_bindings.0.handler", "as": "symbol"},
+            "calls": [
+              {
+                "function": "nx_stm32_audio_dma_irq",
+                "args": [{"ref": "port", "as": "address"}, false]
+              }
+            ],
+            "barrier": "nx_arch_dsb"
+          },
+          {
+            "name": {"source": "selected.vector_bindings.0.handler", "as": "symbol"},
+            "calls": [{"function": "nx_stm32_audio_irq", "args": [{"ref": "port", "as": "address"}]}],
+            "barrier": "nx_arch_dsb"
+          }
+        ],
+        "retain_on_failed_init": true,
+        "pin_snapshots": {"source": "selected.pads", "key": "entry.identity", "array_role": "av_saved", "limit": 32}
+      },
+      "modes": ["master-tx", "slave-tx"],
+      "headers": ["stm32f407_audio.h"]
+    },
+    {
+      "kind": "audio",
+      "controllers": ["I2S2", "I2S3"],
+      "implementation": "audio",
+      "static_recipe": {
+        "state_type": "nx_stm32_audio_state_t",
+        "ops": "nx_stm32_audio_ops",
+        "declarations": [
+          {
+            "role": "av_saved",
+            "type": "uint16_t",
+            "const": false,
+            "count": {"length": "selected.pads", "limit": 32}
+          },
+          {
+            "role": "av_pins",
+            "type": "nx_stm32_av_pin_t",
+            "const": true,
+            "value": {
+              "map": {
+                "source": "selected.pads",
+                "limit": 32,
+                "value": {
+                  "record": [
+                    ["registers", {"source": "entry.registers", "as": "symbol"}],
+                    [
+                      "snapshot",
+                      {
+                        "ref": "av_saved",
+                        "as": "address",
+                        "index": {"source": "index", "as": "u32"}
+                      }
+                    ],
+                    ["bank", {"source": "entry.port_index"}],
+                    ["pin", {"source": "entry.number"}],
+                    ["af", {"source": "entry.alternate"}]
+                  ]
+                }
+              }
+            },
+            "count": {"length": "selected.pads", "limit": 32}
+          },
+          {
+            "role": "dma_regions",
+            "type": "nx_dma_memory_region_t",
+            "const": true,
+            "value": {
+              "map": {
+                "source": "selected.readable_regions",
+                "limit": 16,
+                "value": {
+                  "record": [
+                    ["begin", {"source": "entry.begin"}],
+                    ["size", {"source": "entry.size"}],
+                    ["permissions", {"source": "entry.permissions", "as": "static"}]
+                  ]
+                }
+              }
+            },
+            "count": {"length": "selected.readable_regions", "limit": 16}
+          },
+          {
+            "role": "config",
+            "type": "nx_stm32_audio_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "common",
+                  {
+                    "record": [
+                      ["pins", {"ref": "av_pins", "as": "symbol"}],
+                      ["pin_count", {"length": "selected.pads", "limit": 32}],
+                      ["regions", {"ref": "dma_regions", "as": "symbol"}],
+                      ["region_count", {"length": "selected.readable_regions", "limit": 16}],
+                      ["poll_limit", {"source": "item.options.poll_limit"}],
+                      ["priority", {"source": "item.options.irq.priority"}]
+                    ]
+                  }
+                ],
+                ["hclk_hz", {"symbol": "NEXUS_CORE_HZ"}],
+                ["pclk_hz", {"symbol": "NEXUS_APB1_HZ"}],
+                [
+                  "registers",
+                  {
+                    "source": "item.controller",
+                    "values": {"I2S2": {"symbol": "SPI2"}, "I2S3": {"symbol": "SPI3"}}
+                  }
+                ],
+                [
+                  "extension",
+                  {
+                    "source": "item.controller",
+                    "values": {"I2S2": {"symbol": "I2S2ext"}, "I2S3": {"symbol": "I2S3ext"}}
+                  }
+                ],
+                ["controller", {"source": "item.controller", "values": {"I2S2": 2, "I2S3": 3}}],
+                ["clock", {"address": "s_nx_audio_clock"}],
+                [
+                  "master",
+                  {"source": "item.mode", "values": {"master-rx": true, "slave-rx": false}}
+                ],
+                ["receive", true],
+                ["duplex", false],
+                [
+                  "standard",
+                  {
+                    "source": "item.options.standard",
+                    "values": {"philips": 0, "msb": 1, "lsb": 2, "pcm-short": 3, "pcm-long": 4}
+                  }
+                ],
+                ["sample_bits", {"source": "item.options.sample_bits"}],
+                ["slot_bits", {"source": "item.options.slot_bits"}],
+                ["mclk", {"source": "item.options.mclk"}],
+                ["cpol_high", {"source": "item.options.cpol_high"}],
+                ["pll_input_hz", {"source": "item.options.pll_input_hz"}],
+                ["pll_m", {"source": "item.options.pll_m"}],
+                ["pll_n", {"source": "item.options.pll_n"}],
+                ["pll_r", {"source": "item.options.pll_r"}],
+                ["pll_hse", {"source": "item.options.pll_hse"}],
+                ["divider", {"source": "item.options.divider"}],
+                ["odd", {"source": "item.options.odd"}],
+                [
+                  "actual_rate",
+                  {
+                    "record": [
+                      ["numerator_hz", {"source": "item.options.rate_numerator", "as": "u64"}],
+                      ["denominator", {"source": "item.options.rate_denominator", "as": "u64"}]
+                    ]
+                  }
+                ],
+                ["ws_gpio", {"source": "selected.pads.0.registers", "as": "symbol"}],
+                ["ws_pin", {"source": "selected.pads.0.number"}],
+                ["ck_gpio", {"source": "selected.pads.1.registers", "as": "symbol"}],
+                ["ck_pin", {"source": "selected.pads.1.number"}],
+                [
+                  "rx",
+                  {
+                    "record": [
+                      ["dma", {"source": "selected.dma_bindings.0.registers", "as": "symbol"}],
+                      ["stream", {"source": "selected.dma_bindings.0.stream", "as": "symbol"}],
+                      ["irq", {"source": "selected.dma_bindings.0.irq", "as": "symbol"}],
+                      ["lane", {"source": "selected.dma_bindings.0.lane"}],
+                      ["channel", {"source": "selected.dma_bindings.0.request"}]
+                    ]
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "calls": {
+          "prepare": {
+            "function": "nx_stm32_audio_prepare",
+            "args": [{"ref": "port", "as": "address"}, {"ref": "config", "as": "address"}]
+          },
+          "close": [{"function": "nx_stm32_audio_close", "args": [{"ref": "port", "as": "address"}]}],
+          "admit": [
+            {
+              "function": "nx_stm32_audio_admit",
+              "args": [{"ref": "port", "as": "address"}, {"ref": "config", "as": "address"}]
+            }
+          ]
+        },
+        "irq": [
+          {
+            "name": {"source": "selected.dma_bindings.0.handler", "as": "symbol"},
+            "calls": [
+              {
+                "function": "nx_stm32_audio_dma_irq",
+                "args": [{"ref": "port", "as": "address"}, true]
+              }
+            ],
+            "barrier": "nx_arch_dsb"
+          },
+          {
+            "name": {"source": "selected.vector_bindings.0.handler", "as": "symbol"},
+            "calls": [{"function": "nx_stm32_audio_irq", "args": [{"ref": "port", "as": "address"}]}],
+            "barrier": "nx_arch_dsb"
+          }
+        ],
+        "retain_on_failed_init": true,
+        "pin_snapshots": {"source": "selected.pads", "key": "entry.identity", "array_role": "av_saved", "limit": 32}
+      },
+      "modes": ["master-rx", "slave-rx"],
+      "headers": ["stm32f407_audio.h"]
+    },
+    {
+      "kind": "audio",
+      "controllers": ["I2S2", "I2S3"],
+      "implementation": "audio",
+      "static_recipe": {
+        "state_type": "nx_stm32_audio_state_t",
+        "ops": "nx_stm32_audio_ops",
+        "declarations": [
+          {
+            "role": "av_saved",
+            "type": "uint16_t",
+            "const": false,
+            "count": {"length": "selected.pads", "limit": 32}
+          },
+          {
+            "role": "av_pins",
+            "type": "nx_stm32_av_pin_t",
+            "const": true,
+            "value": {
+              "map": {
+                "source": "selected.pads",
+                "limit": 32,
+                "value": {
+                  "record": [
+                    ["registers", {"source": "entry.registers", "as": "symbol"}],
+                    [
+                      "snapshot",
+                      {
+                        "ref": "av_saved",
+                        "as": "address",
+                        "index": {"source": "index", "as": "u32"}
+                      }
+                    ],
+                    ["bank", {"source": "entry.port_index"}],
+                    ["pin", {"source": "entry.number"}],
+                    ["af", {"source": "entry.alternate"}]
+                  ]
+                }
+              }
+            },
+            "count": {"length": "selected.pads", "limit": 32}
+          },
+          {
+            "role": "dma_regions",
+            "type": "nx_dma_memory_region_t",
+            "const": true,
+            "value": {
+              "map": {
+                "source": "selected.readable_regions",
+                "limit": 16,
+                "value": {
+                  "record": [
+                    ["begin", {"source": "entry.begin"}],
+                    ["size", {"source": "entry.size"}],
+                    ["permissions", {"source": "entry.permissions", "as": "static"}]
+                  ]
+                }
+              }
+            },
+            "count": {"length": "selected.readable_regions", "limit": 16}
+          },
+          {
+            "role": "config",
+            "type": "nx_stm32_audio_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "common",
+                  {
+                    "record": [
+                      ["pins", {"ref": "av_pins", "as": "symbol"}],
+                      ["pin_count", {"length": "selected.pads", "limit": 32}],
+                      ["regions", {"ref": "dma_regions", "as": "symbol"}],
+                      ["region_count", {"length": "selected.readable_regions", "limit": 16}],
+                      ["poll_limit", {"source": "item.options.poll_limit"}],
+                      ["priority", {"source": "item.options.irq.priority"}]
+                    ]
+                  }
+                ],
+                ["hclk_hz", {"symbol": "NEXUS_CORE_HZ"}],
+                ["pclk_hz", {"symbol": "NEXUS_APB1_HZ"}],
+                [
+                  "registers",
+                  {
+                    "source": "item.controller",
+                    "values": {"I2S2": {"symbol": "SPI2"}, "I2S3": {"symbol": "SPI3"}}
+                  }
+                ],
+                [
+                  "extension",
+                  {
+                    "source": "item.controller",
+                    "values": {"I2S2": {"symbol": "I2S2ext"}, "I2S3": {"symbol": "I2S3ext"}}
+                  }
+                ],
+                ["controller", {"source": "item.controller", "values": {"I2S2": 2, "I2S3": 3}}],
+                ["clock", {"address": "s_nx_audio_clock"}],
+                [
+                  "master",
+                  {"source": "item.mode", "values": {"master-duplex": true, "slave-duplex": false}}
+                ],
+                ["receive", false],
+                ["duplex", true],
+                [
+                  "standard",
+                  {
+                    "source": "item.options.standard",
+                    "values": {"philips": 0, "msb": 1, "lsb": 2, "pcm-short": 3, "pcm-long": 4}
+                  }
+                ],
+                ["sample_bits", {"source": "item.options.sample_bits"}],
+                ["slot_bits", {"source": "item.options.slot_bits"}],
+                ["mclk", {"source": "item.options.mclk"}],
+                ["cpol_high", {"source": "item.options.cpol_high"}],
+                ["pll_input_hz", {"source": "item.options.pll_input_hz"}],
+                ["pll_m", {"source": "item.options.pll_m"}],
+                ["pll_n", {"source": "item.options.pll_n"}],
+                ["pll_r", {"source": "item.options.pll_r"}],
+                ["pll_hse", {"source": "item.options.pll_hse"}],
+                ["divider", {"source": "item.options.divider"}],
+                ["odd", {"source": "item.options.odd"}],
+                [
+                  "actual_rate",
+                  {
+                    "record": [
+                      ["numerator_hz", {"source": "item.options.rate_numerator", "as": "u64"}],
+                      ["denominator", {"source": "item.options.rate_denominator", "as": "u64"}]
+                    ]
+                  }
+                ],
+                ["ws_gpio", {"source": "selected.pads.0.registers", "as": "symbol"}],
+                ["ws_pin", {"source": "selected.pads.0.number"}],
+                ["ck_gpio", {"source": "selected.pads.1.registers", "as": "symbol"}],
+                ["ck_pin", {"source": "selected.pads.1.number"}],
+                [
+                  "tx",
+                  {
+                    "record": [
+                      ["dma", {"source": "selected.dma_bindings.0.registers", "as": "symbol"}],
+                      ["stream", {"source": "selected.dma_bindings.0.stream", "as": "symbol"}],
+                      ["irq", {"source": "selected.dma_bindings.0.irq", "as": "symbol"}],
+                      ["lane", {"source": "selected.dma_bindings.0.lane"}],
+                      ["channel", {"source": "selected.dma_bindings.0.request"}]
+                    ]
+                  }
+                ],
+                [
+                  "rx",
+                  {
+                    "record": [
+                      ["dma", {"source": "selected.dma_bindings.1.registers", "as": "symbol"}],
+                      ["stream", {"source": "selected.dma_bindings.1.stream", "as": "symbol"}],
+                      ["irq", {"source": "selected.dma_bindings.1.irq", "as": "symbol"}],
+                      ["lane", {"source": "selected.dma_bindings.1.lane"}],
+                      ["channel", {"source": "selected.dma_bindings.1.request"}]
+                    ]
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "calls": {
+          "prepare": {
+            "function": "nx_stm32_audio_prepare",
+            "args": [{"ref": "port", "as": "address"}, {"ref": "config", "as": "address"}]
+          },
+          "close": [{"function": "nx_stm32_audio_close", "args": [{"ref": "port", "as": "address"}]}],
+          "admit": [
+            {
+              "function": "nx_stm32_audio_admit",
+              "args": [{"ref": "port", "as": "address"}, {"ref": "config", "as": "address"}]
+            }
+          ]
+        },
+        "irq": [
+          {
+            "name": {"source": "selected.dma_bindings.0.handler", "as": "symbol"},
+            "calls": [
+              {
+                "function": "nx_stm32_audio_dma_irq",
+                "args": [{"ref": "port", "as": "address"}, false]
+              }
+            ],
+            "barrier": "nx_arch_dsb"
+          },
+          {
+            "name": {"source": "selected.dma_bindings.1.handler", "as": "symbol"},
+            "calls": [
+              {
+                "function": "nx_stm32_audio_dma_irq",
+                "args": [{"ref": "port", "as": "address"}, true]
+              }
+            ],
+            "barrier": "nx_arch_dsb"
+          },
+          {
+            "name": {"source": "selected.vector_bindings.0.handler", "as": "symbol"},
+            "calls": [{"function": "nx_stm32_audio_irq", "args": [{"ref": "port", "as": "address"}]}],
+            "barrier": "nx_arch_dsb"
+          }
+        ],
+        "retain_on_failed_init": true,
+        "pin_snapshots": {"source": "selected.pads", "key": "entry.identity", "array_role": "av_saved", "limit": 32}
+      },
+      "modes": ["master-duplex", "slave-duplex"],
+      "headers": ["stm32f407_audio.h"]
+    },
+    {
+      "kind": "audio",
+      "controllers": ["I2S2", "I2S3"],
+      "implementation": "audio_blocks",
+      "static_recipe": {
+        "state_type": "nx_stm32_audio_blocks_state_t",
+        "ops": "nx_stm32_audio_blocks_ops",
+        "declarations": [
+          {
+            "role": "av_saved",
+            "type": "uint16_t",
+            "const": false,
+            "count": {"length": "selected.pads", "limit": 32}
+          },
+          {
+            "role": "av_pins",
+            "type": "nx_stm32_av_pin_t",
+            "const": true,
+            "value": {
+              "map": {
+                "source": "selected.pads",
+                "limit": 32,
+                "value": {
+                  "record": [
+                    ["registers", {"source": "entry.registers", "as": "symbol"}],
+                    [
+                      "snapshot",
+                      {
+                        "ref": "av_saved",
+                        "as": "address",
+                        "index": {"source": "index", "as": "u32"}
+                      }
+                    ],
+                    ["bank", {"source": "entry.port_index"}],
+                    ["pin", {"source": "entry.number"}],
+                    ["af", {"source": "entry.alternate"}]
+                  ]
+                }
+              }
+            },
+            "count": {"length": "selected.pads", "limit": 32}
+          },
+          {
+            "role": "dma_regions",
+            "type": "nx_dma_memory_region_t",
+            "const": true,
+            "value": {
+              "map": {
+                "source": "selected.readable_regions",
+                "limit": 16,
+                "value": {
+                  "record": [
+                    ["begin", {"source": "entry.begin"}],
+                    ["size", {"source": "entry.size"}],
+                    ["permissions", {"source": "entry.permissions", "as": "static"}]
+                  ]
+                }
+              }
+            },
+            "count": {"length": "selected.readable_regions", "limit": 16}
+          },
+          {
+            "role": "config",
+            "type": "nx_stm32_audio_blocks_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "audio",
+                  {
+                    "record": [
+                      [
+                        "common",
+                        {
+                          "record": [
+                            ["pins", {"ref": "av_pins", "as": "symbol"}],
+                            ["pin_count", {"length": "selected.pads", "limit": 32}],
+                            ["regions", {"ref": "dma_regions", "as": "symbol"}],
+                            ["region_count", {"length": "selected.readable_regions", "limit": 16}],
+                            ["poll_limit", {"source": "item.options.poll_limit"}],
+                            ["priority", {"source": "item.options.irq.priority"}]
+                          ]
+                        }
+                      ],
+                      ["hclk_hz", {"symbol": "NEXUS_CORE_HZ"}],
+                      ["pclk_hz", {"symbol": "NEXUS_APB1_HZ"}],
+                      [
+                        "registers",
+                        {
+                          "source": "item.controller",
+                          "values": {"I2S2": {"symbol": "SPI2"}, "I2S3": {"symbol": "SPI3"}}
+                        }
+                      ],
+                      [
+                        "extension",
+                        {
+                          "source": "item.controller",
+                          "values": {"I2S2": {"symbol": "I2S2ext"}, "I2S3": {"symbol": "I2S3ext"}}
+                        }
+                      ],
+                      [
+                        "controller",
+                        {"source": "item.controller", "values": {"I2S2": 2, "I2S3": 3}}
+                      ],
+                      ["clock", {"address": "s_nx_audio_clock"}],
+                      [
+                        "master",
+                        {
+                          "source": "item.mode",
+                          "values": {"master-tx-blocks": true, "slave-tx-blocks": false}
+                        }
+                      ],
+                      ["receive", false],
+                      ["duplex", false],
+                      [
+                        "standard",
+                        {
+                          "source": "item.options.standard",
+                          "values": {"philips": 0, "msb": 1, "lsb": 2, "pcm-short": 3, "pcm-long": 4}
+                        }
+                      ],
+                      ["sample_bits", {"source": "item.options.sample_bits"}],
+                      ["slot_bits", {"source": "item.options.slot_bits"}],
+                      ["mclk", {"source": "item.options.mclk"}],
+                      ["cpol_high", {"source": "item.options.cpol_high"}],
+                      ["pll_input_hz", {"source": "item.options.pll_input_hz"}],
+                      ["pll_m", {"source": "item.options.pll_m"}],
+                      ["pll_n", {"source": "item.options.pll_n"}],
+                      ["pll_r", {"source": "item.options.pll_r"}],
+                      ["pll_hse", {"source": "item.options.pll_hse"}],
+                      ["divider", {"source": "item.options.divider"}],
+                      ["odd", {"source": "item.options.odd"}],
+                      [
+                        "actual_rate",
+                        {
+                          "record": [
+                            ["numerator_hz", {"source": "item.options.rate_numerator", "as": "u64"}],
+                            [
+                              "denominator",
+                              {"source": "item.options.rate_denominator", "as": "u64"}
+                            ]
+                          ]
+                        }
+                      ],
+                      ["ws_gpio", {"source": "selected.pads.0.registers", "as": "symbol"}],
+                      ["ws_pin", {"source": "selected.pads.0.number"}],
+                      ["ck_gpio", {"source": "selected.pads.1.registers", "as": "symbol"}],
+                      ["ck_pin", {"source": "selected.pads.1.number"}],
+                      [
+                        "tx",
+                        {
+                          "record": [
+                            ["dma", {"source": "selected.dma_bindings.0.registers", "as": "symbol"}],
+                            ["stream", {"source": "selected.dma_bindings.0.stream", "as": "symbol"}],
+                            ["irq", {"source": "selected.dma_bindings.0.irq", "as": "symbol"}],
+                            ["lane", {"source": "selected.dma_bindings.0.lane"}],
+                            ["channel", {"source": "selected.dma_bindings.0.request"}]
+                          ]
+                        }
+                      ]
+                    ]
+                  }
+                ],
+                ["max_sample_rate_hz", {"source": "item.options.max_sample_rate_hz"}],
+                ["max_service_gap_us", {"source": "item.options.max_service_gap_us"}]
+              ]
+            }
+          }
+        ],
+        "calls": {
+          "prepare": {
+            "function": "nx_stm32_audio_blocks_prepare",
+            "args": [{"ref": "port", "as": "address"}, {"ref": "config", "as": "address"}]
+          },
+          "close": [{"function": "nx_stm32_audio_blocks_close", "args": [{"ref": "port", "as": "address"}]}],
+          "admit": [
+            {
+              "function": "nx_stm32_audio_blocks_admit",
+              "args": [{"ref": "port", "as": "address"}, {"ref": "config", "as": "address"}]
+            }
+          ]
+        },
+        "irq": [
+          {
+            "name": {"source": "selected.dma_bindings.0.handler", "as": "symbol"},
+            "calls": [
+              {
+                "function": "nx_stm32_audio_blocks_dma_irq",
+                "args": [{"ref": "port", "as": "address"}, false]
+              }
+            ],
+            "barrier": "nx_arch_dsb"
+          },
+          {
+            "name": {"source": "selected.vector_bindings.0.handler", "as": "symbol"},
+            "calls": [{"function": "nx_stm32_audio_blocks_irq", "args": [{"ref": "port", "as": "address"}]}],
+            "barrier": "nx_arch_dsb"
+          }
+        ],
+        "retain_on_failed_init": true,
+        "pin_snapshots": {"source": "selected.pads", "key": "entry.identity", "array_role": "av_saved", "limit": 32}
+      },
+      "modes": ["master-tx-blocks", "slave-tx-blocks"],
+      "headers": ["stm32f407_audio.h", "stm32f407_audio_blocks.h"]
+    },
+    {
+      "kind": "audio",
+      "controllers": ["I2S2", "I2S3"],
+      "implementation": "audio_blocks",
+      "static_recipe": {
+        "state_type": "nx_stm32_audio_blocks_state_t",
+        "ops": "nx_stm32_audio_blocks_ops",
+        "declarations": [
+          {
+            "role": "av_saved",
+            "type": "uint16_t",
+            "const": false,
+            "count": {"length": "selected.pads", "limit": 32}
+          },
+          {
+            "role": "av_pins",
+            "type": "nx_stm32_av_pin_t",
+            "const": true,
+            "value": {
+              "map": {
+                "source": "selected.pads",
+                "limit": 32,
+                "value": {
+                  "record": [
+                    ["registers", {"source": "entry.registers", "as": "symbol"}],
+                    [
+                      "snapshot",
+                      {
+                        "ref": "av_saved",
+                        "as": "address",
+                        "index": {"source": "index", "as": "u32"}
+                      }
+                    ],
+                    ["bank", {"source": "entry.port_index"}],
+                    ["pin", {"source": "entry.number"}],
+                    ["af", {"source": "entry.alternate"}]
+                  ]
+                }
+              }
+            },
+            "count": {"length": "selected.pads", "limit": 32}
+          },
+          {
+            "role": "dma_regions",
+            "type": "nx_dma_memory_region_t",
+            "const": true,
+            "value": {
+              "map": {
+                "source": "selected.readable_regions",
+                "limit": 16,
+                "value": {
+                  "record": [
+                    ["begin", {"source": "entry.begin"}],
+                    ["size", {"source": "entry.size"}],
+                    ["permissions", {"source": "entry.permissions", "as": "static"}]
+                  ]
+                }
+              }
+            },
+            "count": {"length": "selected.readable_regions", "limit": 16}
+          },
+          {
+            "role": "config",
+            "type": "nx_stm32_audio_blocks_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "audio",
+                  {
+                    "record": [
+                      [
+                        "common",
+                        {
+                          "record": [
+                            ["pins", {"ref": "av_pins", "as": "symbol"}],
+                            ["pin_count", {"length": "selected.pads", "limit": 32}],
+                            ["regions", {"ref": "dma_regions", "as": "symbol"}],
+                            ["region_count", {"length": "selected.readable_regions", "limit": 16}],
+                            ["poll_limit", {"source": "item.options.poll_limit"}],
+                            ["priority", {"source": "item.options.irq.priority"}]
+                          ]
+                        }
+                      ],
+                      ["hclk_hz", {"symbol": "NEXUS_CORE_HZ"}],
+                      ["pclk_hz", {"symbol": "NEXUS_APB1_HZ"}],
+                      [
+                        "registers",
+                        {
+                          "source": "item.controller",
+                          "values": {"I2S2": {"symbol": "SPI2"}, "I2S3": {"symbol": "SPI3"}}
+                        }
+                      ],
+                      [
+                        "extension",
+                        {
+                          "source": "item.controller",
+                          "values": {"I2S2": {"symbol": "I2S2ext"}, "I2S3": {"symbol": "I2S3ext"}}
+                        }
+                      ],
+                      [
+                        "controller",
+                        {"source": "item.controller", "values": {"I2S2": 2, "I2S3": 3}}
+                      ],
+                      ["clock", {"address": "s_nx_audio_clock"}],
+                      [
+                        "master",
+                        {
+                          "source": "item.mode",
+                          "values": {"master-rx-blocks": true, "slave-rx-blocks": false}
+                        }
+                      ],
+                      ["receive", true],
+                      ["duplex", false],
+                      [
+                        "standard",
+                        {
+                          "source": "item.options.standard",
+                          "values": {"philips": 0, "msb": 1, "lsb": 2, "pcm-short": 3, "pcm-long": 4}
+                        }
+                      ],
+                      ["sample_bits", {"source": "item.options.sample_bits"}],
+                      ["slot_bits", {"source": "item.options.slot_bits"}],
+                      ["mclk", {"source": "item.options.mclk"}],
+                      ["cpol_high", {"source": "item.options.cpol_high"}],
+                      ["pll_input_hz", {"source": "item.options.pll_input_hz"}],
+                      ["pll_m", {"source": "item.options.pll_m"}],
+                      ["pll_n", {"source": "item.options.pll_n"}],
+                      ["pll_r", {"source": "item.options.pll_r"}],
+                      ["pll_hse", {"source": "item.options.pll_hse"}],
+                      ["divider", {"source": "item.options.divider"}],
+                      ["odd", {"source": "item.options.odd"}],
+                      [
+                        "actual_rate",
+                        {
+                          "record": [
+                            ["numerator_hz", {"source": "item.options.rate_numerator", "as": "u64"}],
+                            [
+                              "denominator",
+                              {"source": "item.options.rate_denominator", "as": "u64"}
+                            ]
+                          ]
+                        }
+                      ],
+                      ["ws_gpio", {"source": "selected.pads.0.registers", "as": "symbol"}],
+                      ["ws_pin", {"source": "selected.pads.0.number"}],
+                      ["ck_gpio", {"source": "selected.pads.1.registers", "as": "symbol"}],
+                      ["ck_pin", {"source": "selected.pads.1.number"}],
+                      [
+                        "rx",
+                        {
+                          "record": [
+                            ["dma", {"source": "selected.dma_bindings.0.registers", "as": "symbol"}],
+                            ["stream", {"source": "selected.dma_bindings.0.stream", "as": "symbol"}],
+                            ["irq", {"source": "selected.dma_bindings.0.irq", "as": "symbol"}],
+                            ["lane", {"source": "selected.dma_bindings.0.lane"}],
+                            ["channel", {"source": "selected.dma_bindings.0.request"}]
+                          ]
+                        }
+                      ]
+                    ]
+                  }
+                ],
+                ["max_sample_rate_hz", {"source": "item.options.max_sample_rate_hz"}],
+                ["max_service_gap_us", {"source": "item.options.max_service_gap_us"}]
+              ]
+            }
+          }
+        ],
+        "calls": {
+          "prepare": {
+            "function": "nx_stm32_audio_blocks_prepare",
+            "args": [{"ref": "port", "as": "address"}, {"ref": "config", "as": "address"}]
+          },
+          "close": [{"function": "nx_stm32_audio_blocks_close", "args": [{"ref": "port", "as": "address"}]}],
+          "admit": [
+            {
+              "function": "nx_stm32_audio_blocks_admit",
+              "args": [{"ref": "port", "as": "address"}, {"ref": "config", "as": "address"}]
+            }
+          ]
+        },
+        "irq": [
+          {
+            "name": {"source": "selected.dma_bindings.0.handler", "as": "symbol"},
+            "calls": [
+              {
+                "function": "nx_stm32_audio_blocks_dma_irq",
+                "args": [{"ref": "port", "as": "address"}, true]
+              }
+            ],
+            "barrier": "nx_arch_dsb"
+          },
+          {
+            "name": {"source": "selected.vector_bindings.0.handler", "as": "symbol"},
+            "calls": [{"function": "nx_stm32_audio_blocks_irq", "args": [{"ref": "port", "as": "address"}]}],
+            "barrier": "nx_arch_dsb"
+          }
+        ],
+        "retain_on_failed_init": true,
+        "pin_snapshots": {"source": "selected.pads", "key": "entry.identity", "array_role": "av_saved", "limit": 32}
+      },
+      "modes": ["master-rx-blocks", "slave-rx-blocks"],
+      "headers": ["stm32f407_audio.h", "stm32f407_audio_blocks.h"]
+    },
+    {
+      "kind": "audio",
+      "controllers": ["I2S2", "I2S3"],
+      "implementation": "audio_blocks",
+      "static_recipe": {
+        "state_type": "nx_stm32_audio_blocks_state_t",
+        "ops": "nx_stm32_audio_blocks_ops",
+        "declarations": [
+          {
+            "role": "av_saved",
+            "type": "uint16_t",
+            "const": false,
+            "count": {"length": "selected.pads", "limit": 32}
+          },
+          {
+            "role": "av_pins",
+            "type": "nx_stm32_av_pin_t",
+            "const": true,
+            "value": {
+              "map": {
+                "source": "selected.pads",
+                "limit": 32,
+                "value": {
+                  "record": [
+                    ["registers", {"source": "entry.registers", "as": "symbol"}],
+                    [
+                      "snapshot",
+                      {
+                        "ref": "av_saved",
+                        "as": "address",
+                        "index": {"source": "index", "as": "u32"}
+                      }
+                    ],
+                    ["bank", {"source": "entry.port_index"}],
+                    ["pin", {"source": "entry.number"}],
+                    ["af", {"source": "entry.alternate"}]
+                  ]
+                }
+              }
+            },
+            "count": {"length": "selected.pads", "limit": 32}
+          },
+          {
+            "role": "dma_regions",
+            "type": "nx_dma_memory_region_t",
+            "const": true,
+            "value": {
+              "map": {
+                "source": "selected.readable_regions",
+                "limit": 16,
+                "value": {
+                  "record": [
+                    ["begin", {"source": "entry.begin"}],
+                    ["size", {"source": "entry.size"}],
+                    ["permissions", {"source": "entry.permissions", "as": "static"}]
+                  ]
+                }
+              }
+            },
+            "count": {"length": "selected.readable_regions", "limit": 16}
+          },
+          {
+            "role": "config",
+            "type": "nx_stm32_audio_blocks_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "audio",
+                  {
+                    "record": [
+                      [
+                        "common",
+                        {
+                          "record": [
+                            ["pins", {"ref": "av_pins", "as": "symbol"}],
+                            ["pin_count", {"length": "selected.pads", "limit": 32}],
+                            ["regions", {"ref": "dma_regions", "as": "symbol"}],
+                            ["region_count", {"length": "selected.readable_regions", "limit": 16}],
+                            ["poll_limit", {"source": "item.options.poll_limit"}],
+                            ["priority", {"source": "item.options.irq.priority"}]
+                          ]
+                        }
+                      ],
+                      ["hclk_hz", {"symbol": "NEXUS_CORE_HZ"}],
+                      ["pclk_hz", {"symbol": "NEXUS_APB1_HZ"}],
+                      [
+                        "registers",
+                        {
+                          "source": "item.controller",
+                          "values": {"I2S2": {"symbol": "SPI2"}, "I2S3": {"symbol": "SPI3"}}
+                        }
+                      ],
+                      [
+                        "extension",
+                        {
+                          "source": "item.controller",
+                          "values": {"I2S2": {"symbol": "I2S2ext"}, "I2S3": {"symbol": "I2S3ext"}}
+                        }
+                      ],
+                      [
+                        "controller",
+                        {"source": "item.controller", "values": {"I2S2": 2, "I2S3": 3}}
+                      ],
+                      ["clock", {"address": "s_nx_audio_clock"}],
+                      [
+                        "master",
+                        {
+                          "source": "item.mode",
+                          "values": {"master-duplex-blocks": true, "slave-duplex-blocks": false}
+                        }
+                      ],
+                      ["receive", false],
+                      ["duplex", true],
+                      [
+                        "standard",
+                        {
+                          "source": "item.options.standard",
+                          "values": {"philips": 0, "msb": 1, "lsb": 2, "pcm-short": 3, "pcm-long": 4}
+                        }
+                      ],
+                      ["sample_bits", {"source": "item.options.sample_bits"}],
+                      ["slot_bits", {"source": "item.options.slot_bits"}],
+                      ["mclk", {"source": "item.options.mclk"}],
+                      ["cpol_high", {"source": "item.options.cpol_high"}],
+                      ["pll_input_hz", {"source": "item.options.pll_input_hz"}],
+                      ["pll_m", {"source": "item.options.pll_m"}],
+                      ["pll_n", {"source": "item.options.pll_n"}],
+                      ["pll_r", {"source": "item.options.pll_r"}],
+                      ["pll_hse", {"source": "item.options.pll_hse"}],
+                      ["divider", {"source": "item.options.divider"}],
+                      ["odd", {"source": "item.options.odd"}],
+                      [
+                        "actual_rate",
+                        {
+                          "record": [
+                            ["numerator_hz", {"source": "item.options.rate_numerator", "as": "u64"}],
+                            [
+                              "denominator",
+                              {"source": "item.options.rate_denominator", "as": "u64"}
+                            ]
+                          ]
+                        }
+                      ],
+                      ["ws_gpio", {"source": "selected.pads.0.registers", "as": "symbol"}],
+                      ["ws_pin", {"source": "selected.pads.0.number"}],
+                      ["ck_gpio", {"source": "selected.pads.1.registers", "as": "symbol"}],
+                      ["ck_pin", {"source": "selected.pads.1.number"}],
+                      [
+                        "tx",
+                        {
+                          "record": [
+                            ["dma", {"source": "selected.dma_bindings.0.registers", "as": "symbol"}],
+                            ["stream", {"source": "selected.dma_bindings.0.stream", "as": "symbol"}],
+                            ["irq", {"source": "selected.dma_bindings.0.irq", "as": "symbol"}],
+                            ["lane", {"source": "selected.dma_bindings.0.lane"}],
+                            ["channel", {"source": "selected.dma_bindings.0.request"}]
+                          ]
+                        }
+                      ],
+                      [
+                        "rx",
+                        {
+                          "record": [
+                            ["dma", {"source": "selected.dma_bindings.1.registers", "as": "symbol"}],
+                            ["stream", {"source": "selected.dma_bindings.1.stream", "as": "symbol"}],
+                            ["irq", {"source": "selected.dma_bindings.1.irq", "as": "symbol"}],
+                            ["lane", {"source": "selected.dma_bindings.1.lane"}],
+                            ["channel", {"source": "selected.dma_bindings.1.request"}]
+                          ]
+                        }
+                      ]
+                    ]
+                  }
+                ],
+                ["max_sample_rate_hz", {"source": "item.options.max_sample_rate_hz"}],
+                ["max_service_gap_us", {"source": "item.options.max_service_gap_us"}]
+              ]
+            }
+          }
+        ],
+        "calls": {
+          "prepare": {
+            "function": "nx_stm32_audio_blocks_prepare",
+            "args": [{"ref": "port", "as": "address"}, {"ref": "config", "as": "address"}]
+          },
+          "close": [{"function": "nx_stm32_audio_blocks_close", "args": [{"ref": "port", "as": "address"}]}],
+          "admit": [
+            {
+              "function": "nx_stm32_audio_blocks_admit",
+              "args": [{"ref": "port", "as": "address"}, {"ref": "config", "as": "address"}]
+            }
+          ]
+        },
+        "irq": [
+          {
+            "name": {"source": "selected.dma_bindings.0.handler", "as": "symbol"},
+            "calls": [
+              {
+                "function": "nx_stm32_audio_blocks_dma_irq",
+                "args": [{"ref": "port", "as": "address"}, false]
+              }
+            ],
+            "barrier": "nx_arch_dsb"
+          },
+          {
+            "name": {"source": "selected.dma_bindings.1.handler", "as": "symbol"},
+            "calls": [
+              {
+                "function": "nx_stm32_audio_blocks_dma_irq",
+                "args": [{"ref": "port", "as": "address"}, true]
+              }
+            ],
+            "barrier": "nx_arch_dsb"
+          },
+          {
+            "name": {"source": "selected.vector_bindings.0.handler", "as": "symbol"},
+            "calls": [{"function": "nx_stm32_audio_blocks_irq", "args": [{"ref": "port", "as": "address"}]}],
+            "barrier": "nx_arch_dsb"
+          }
+        ],
+        "retain_on_failed_init": true,
+        "pin_snapshots": {"source": "selected.pads", "key": "entry.identity", "array_role": "av_saved", "limit": 32}
+      },
+      "modes": ["master-duplex-blocks", "slave-duplex-blocks"],
+      "headers": ["stm32f407_audio.h", "stm32f407_audio_blocks.h"]
+    }
+  ]
+}

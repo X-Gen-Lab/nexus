@@ -208,6 +208,9 @@ foreach(family_profile f407 f411 f446 f479)
     target_compile_definitions(${family_target} PRIVATE ${family_macro}
         NEXUS_STM32_MODEL NX_TEST_DEVICE=${family_device}
         NX_TEST_CUT=${family_cut} NX_TEST_FLASH_KIB=${family_kib})
+    if(family_profile STREQUAL "f407")
+        target_compile_definitions(${family_target} PRIVATE NX_TEST_SYSTEM_TIM5=1)
+    endif()
     target_compile_options(${family_target} PRIVATE
         "-include${CMAKE_CURRENT_SOURCE_DIR}/stm32_family_system_model.h")
     if(NOT family_profile STREQUAL "f407")

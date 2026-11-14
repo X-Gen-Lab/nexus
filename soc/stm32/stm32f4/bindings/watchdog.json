@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "bindings": [
+    {
+      "kind": "watchdog",
+      "mode": "independent",
+      "implementation": "watchdog",
+      "static_recipe": {
+        "state_type": "nx_stm32_watchdog_state_t",
+        "ops": "nx_stm32_watchdog_ops",
+        "declarations": [],
+        "calls": {
+          "admit": [],
+          "prepare": {
+            "function": "nx_stm32_watchdog_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              1000000
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32_watchdog_stop",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "retain_on_failed_init": false
+      },
+      "headers": [
+        "stm32f407_basic_cold.h"
+      ]
+    },
+    {
+      "kind": "watchdog",
+      "mode": "window",
+      "implementation": "window_watchdog",
+      "static_recipe": {
+        "state_type": "nx_stm32_window_watchdog_state_t",
+        "ops": "nx_stm32_window_watchdog_ops",
+        "declarations": [],
+        "calls": {
+          "admit": [
+            {
+              "function": "nx_stm32_window_watchdog_admit",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "source": "item.options.window_ticks"
+                }
+              ]
+            }
+          ],
+          "prepare": {
+            "function": "nx_stm32_window_watchdog_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "source": "item.options.window_ticks"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32_window_watchdog_stop",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "retain_on_failed_init": true
+      },
+      "headers": [
+        "stm32f407_basic_cold.h",
+        "stm32f407_window_watchdog.h"
+      ]
+    }
+  ]
+}

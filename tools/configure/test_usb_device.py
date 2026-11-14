@@ -167,7 +167,8 @@ class UsbConfigurationTests(unittest.TestCase):
         self.assertIn("const nx_usb_device_port_t* nx_factory_usb_device(", header)
         self.assertIn("const nx_usb_endpoint_port_t* nx_factory_usb_endpoint(", header)
         self.assertIn("&nx_usb_fs_device_ops, &s_nx_port_fs", source)
-        self.assertIn("&nx_usb_fs_endpoint_ops, &s_nx_usb_endpoints_fs[", source)
+        self.assertIn(".ops = &nx_usb_fs_endpoint_ops, "
+                      ".context = &s_nx_usb_endpoints_fs[", source)
         self.assertNotIn("malloc", source)
 
     def test_cold_failure_retains_typed_prepare_and_close_responsibility(self):

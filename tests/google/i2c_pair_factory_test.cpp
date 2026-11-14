@@ -340,7 +340,8 @@ TEST_F(I2CPairFactory, BothControllersUseExactPinsClockAndPublisherTuples) {
     for (unsigned i = 0U; i < 2U; ++i) {
         EXPECT_TRUE(states[i]->initialized);
         EXPECT_EQ(MHZ, states[i]->peripheral_mhz);
-        EXPECT_EQ(i == 0U ? 0xC0U : 0xC00U, states[i]->line_mask);
+        EXPECT_EQ(i == 0U ? 0xC0U : 0xC00U,
+                  (states[i]->lines->masks[0] | states[i]->lines->masks[1]));
 #ifndef NX_I2C_PAIR_IRQ
         EXPECT_NE(nullptr, states[i]->dma);
         EXPECT_EQ(i == 0U ? 1U : 7U,

@@ -91,23 +91,16 @@ class ConfigurationAdmissionTests(unittest.TestCase):
         self.assertIn('bindings.c', report['generated_files'])
         self.assertFalse((self.root / 'generated').exists())
 
-    def test_missing_selected_provider_entry_has_an_exact_cli_diagnostic(self):
+    def test_missing_explicit_host_fixture_is_an_environment_failure_without_fallback(self):
         missing = ModuleNotFoundError(
             "No module named 'tests.support.native.configure'",
             name='tests.support.native.configure')
-        with patch('tools.configure.providers.import_module',
-                        side_effect=missing):
-            status, out, err = self.command(
-                'provider-check', '--assembly', str(self.assembly),
-                '--diagnostics-json')
-        self.assertEqual(status, 1)
-        self.assertEqual(out, '')
-        diagnostic = json.loads(err)
-        self.assertEqual(diagnostic['code'], 'provider_module_missing')
-        self.assertEqual(diagnostic['family'], 'native')
-        self.assertEqual(diagnostic['module'], 'tests.support.native.configure')
-        self.assertEqual(diagnostic['source'],
-                         'tests/support/native/configure/__init__.py')
+        with patch('tools.configure.providers.import_module', side_effect=missing):
+            with self.assertRaises(ModuleNotFoundError) as rejected:
+                self.command('provider-check', '--assembly', str(self.assembly),
+                             '--diagnostics-json')
+        self.assertIs(rejected.exception, missing)
+
 
     def test_provider_internal_import_error_is_not_an_unmaintained_family(self):
         for error in (ModuleNotFoundError(

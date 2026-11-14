@@ -1,0 +1,491 @@
+{
+  "schema_version": 1,
+  "bindings": [
+    {
+      "kind": "timer_capture",
+      "mode": "edge-capture",
+      "implementation": "timer_capture",
+      "static_recipe": {
+        "state_type": "nx_timer_capture_controller_t",
+        "ops": {
+          "source": "item.controller",
+          "as": "symbol",
+          "values": {
+            "TIM1": "nx_stm32_tim1_timer_capture_ops",
+            "TIM3": "nx_stm32_tim3_timer_capture_ops",
+            "TIM4": "nx_stm32_timer_capture_ops",
+            "TIM5": "nx_stm32_tim5_timer_capture_ops",
+            "TIM8": "nx_stm32_tim8_timer_capture_ops",
+            "TIM9": "nx_stm32_tim9_timer_capture_ops",
+            "TIM10": "nx_stm32_tim10_timer_capture_ops",
+            "TIM11": "nx_stm32_tim11_timer_capture_ops",
+            "TIM12": "nx_stm32_tim12_timer_capture_ops",
+            "TIM13": "nx_stm32_tim13_timer_capture_ops",
+            "TIM14": "nx_stm32_tim14_timer_capture_ops"
+          }
+        },
+        "declarations": [
+          {
+            "role": "timer_pin_saved",
+            "type": "uint16_t",
+            "const": false,
+            "count": {
+              "length": "selected.pads",
+              "limit": 3
+            }
+          },
+          {
+            "role": "timer_cold",
+            "type": "nx_stm32_timer_cold_t",
+            "const": false
+          },
+          {
+            "role": "timer_config",
+            "type": "nx_stm32_capture_cold_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "snapshot",
+                  {
+                    "ref": "timer_pin_saved",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "registers",
+                  {
+                    "source": "item.controller",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "priority",
+                  {
+                    "source": "item.options.irq.priority"
+                  }
+                ],
+                [
+                  "kernel",
+                  {
+                    "source": "selected.kernel_bound"
+                  }
+                ],
+                [
+                  "timer",
+                  {
+                    "record": [
+                      [
+                        "timer_hz",
+                        {
+                          "source": "selected.clock_hz"
+                        }
+                      ],
+                      [
+                        "channel",
+                        {
+                          "source": "selected.constants.channel"
+                        }
+                      ],
+                      [
+                        "tick_hz",
+                        {
+                          "source": "item.options.tick_hz"
+                        }
+                      ],
+                      [
+                        "exclusive",
+                        true
+                      ],
+                      [
+                        "edge",
+                        {
+                          "source": "item.options.edge",
+                          "as": "symbol",
+                          "values": {
+                            "rising": "NX_TIMER_EDGE_RISING",
+                            "falling": "NX_TIMER_EDGE_FALLING",
+                            "both": "NX_TIMER_EDGE_BOTH"
+                          }
+                        }
+                      ],
+                      [
+                        "filter",
+                        {
+                          "source": "item.options.filter"
+                        }
+                      ]
+                    ]
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "calls": {
+          "prepare": {
+            "function": {
+              "source": "item.controller",
+              "as": "symbol",
+              "values": {
+                "TIM1": "nx_stm32_tim1_capture_cold_prepare",
+                "TIM3": "nx_stm32_tim3_capture_cold_prepare",
+                "TIM4": "nx_stm32_capture_cold_prepare",
+                "TIM5": "nx_stm32_tim5_capture_cold_prepare",
+                "TIM8": "nx_stm32_tim8_capture_cold_prepare",
+                "TIM9": "nx_stm32_tim9_capture_cold_prepare",
+                "TIM10": "nx_stm32_tim10_capture_cold_prepare",
+                "TIM11": "nx_stm32_tim11_capture_cold_prepare",
+                "TIM12": "nx_stm32_tim12_capture_cold_prepare",
+                "TIM13": "nx_stm32_tim13_capture_cold_prepare",
+                "TIM14": "nx_stm32_tim14_capture_cold_prepare"
+              }
+            },
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "ref": "timer_cold",
+                "as": "address"
+              },
+              {
+                "ref": "timer_config",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": {
+                "source": "item.controller",
+                "as": "symbol",
+                "values": {
+                  "TIM1": "nx_stm32_tim1_capture_cold_close",
+                  "TIM3": "nx_stm32_tim3_capture_cold_close",
+                  "TIM4": "nx_stm32_capture_cold_close",
+                  "TIM5": "nx_stm32_tim5_capture_cold_close",
+                  "TIM8": "nx_stm32_tim8_capture_cold_close",
+                  "TIM9": "nx_stm32_tim9_capture_cold_close",
+                  "TIM10": "nx_stm32_tim10_capture_cold_close",
+                  "TIM11": "nx_stm32_tim11_capture_cold_close",
+                  "TIM12": "nx_stm32_tim12_capture_cold_close",
+                  "TIM13": "nx_stm32_tim13_capture_cold_close",
+                  "TIM14": "nx_stm32_tim14_capture_cold_close"
+                }
+              },
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "ref": "timer_cold",
+                  "as": "address"
+                },
+                {
+                  "ref": "timer_config",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "irq": [
+          {
+            "name": {
+              "source": "item.controller",
+              "as": "symbol",
+              "values": {
+                "TIM1": "TIM1_CC_IRQHandler",
+                "TIM3": "TIM3_IRQHandler",
+                "TIM4": "TIM4_IRQHandler",
+                "TIM5": "TIM5_IRQHandler",
+                "TIM8": "TIM8_CC_IRQHandler",
+                "TIM9": "TIM1_BRK_TIM9_IRQHandler",
+                "TIM10": "TIM1_UP_TIM10_IRQHandler",
+                "TIM11": "TIM1_TRG_COM_TIM11_IRQHandler",
+                "TIM12": "TIM8_BRK_TIM12_IRQHandler",
+                "TIM13": "TIM8_UP_TIM13_IRQHandler",
+                "TIM14": "TIM8_TRG_COM_TIM14_IRQHandler"
+              }
+            },
+            "calls": [
+              {
+                "function": {
+                  "source": "item.controller",
+                  "as": "symbol",
+                  "values": {
+                    "TIM1": "nx_stm32_tim1_timer_capture_irq",
+                    "TIM3": "nx_stm32_tim3_timer_capture_irq",
+                    "TIM4": "nx_stm32_timer_capture_irq",
+                    "TIM5": "nx_stm32_tim5_timer_capture_irq",
+                    "TIM8": "nx_stm32_tim8_timer_capture_irq",
+                    "TIM9": "nx_stm32_tim9_timer_capture_irq",
+                    "TIM10": "nx_stm32_tim10_timer_capture_irq",
+                    "TIM11": "nx_stm32_tim11_timer_capture_irq",
+                    "TIM12": "nx_stm32_tim12_timer_capture_irq",
+                    "TIM13": "nx_stm32_tim13_timer_capture_irq",
+                    "TIM14": "nx_stm32_tim14_timer_capture_irq"
+                  }
+                },
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  }
+                ]
+              }
+            ],
+            "barrier": "nx_arch_dsb"
+          }
+        ],
+        "pin_snapshots": {
+          "source": "selected.pads",
+          "key": "entry.identity",
+          "array_role": "timer_pin_saved",
+          "limit": 3
+        },
+        "retain_on_failed_init": true
+      },
+      "headers": [
+        "stm32f407_timer_cold.h"
+      ]
+    },
+    {
+      "kind": "advanced_pwm",
+      "mode": "complementary-pwm",
+      "implementation": "advanced_pwm",
+      "static_recipe": {
+        "state_type": "nx_advanced_pwm_controller_t",
+        "ops": {
+          "source": "item.controller",
+          "as": "symbol",
+          "values": {
+            "TIM1": "nx_stm32_advanced_pwm_ops",
+            "TIM8": "nx_stm32_tim8_advanced_pwm_ops"
+          }
+        },
+        "declarations": [
+          {
+            "role": "timer_pin_saved",
+            "type": "uint16_t",
+            "const": false,
+            "count": {
+              "length": "selected.pads",
+              "limit": 3
+            }
+          },
+          {
+            "role": "timer_cold",
+            "type": "nx_stm32_timer_cold_t",
+            "const": false
+          },
+          {
+            "role": "timer_config",
+            "type": "nx_stm32_advanced_cold_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "snapshots",
+                  {
+                    "ref": "timer_pin_saved",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "priority",
+                  {
+                    "source": "item.options.irq.priority"
+                  }
+                ],
+                [
+                  "kernel",
+                  {
+                    "source": "selected.kernel_bound"
+                  }
+                ],
+                [
+                  "timer",
+                  {
+                    "record": [
+                      [
+                        "timer_hz",
+                        {
+                          "source": "selected.clock_hz"
+                        }
+                      ],
+                      [
+                        "channel",
+                        {
+                          "source": "selected.constants.channel"
+                        }
+                      ],
+                      [
+                        "tick_hz",
+                        {
+                          "source": "item.options.tick_hz"
+                        }
+                      ],
+                      [
+                        "exclusive",
+                        true
+                      ],
+                      [
+                        "break_input",
+                        {
+                          "pointer_member": {
+                            "base": {
+                              "source": "selected.pads.2.registers",
+                              "as": "symbol"
+                            },
+                            "member": "IDR"
+                          }
+                        }
+                      ],
+                      [
+                        "break_mask",
+                        {
+                          "source": "selected.pads.2.identity",
+                          "values": {
+                            "PB12": 4096,
+                            "PA6": 64
+                          }
+                        }
+                      ],
+                      [
+                        "period_ticks",
+                        {
+                          "source": "item.options.period_ticks"
+                        }
+                      ],
+                      [
+                        "deadtime_ticks",
+                        {
+                          "source": "item.options.deadtime_ticks"
+                        }
+                      ],
+                      [
+                        "break_active_high",
+                        {
+                          "source": "item.options.break_active_high"
+                        }
+                      ],
+                      [
+                        "idle_high",
+                        {
+                          "source": "item.options.idle_high"
+                        }
+                      ],
+                      [
+                        "idle_complement_high",
+                        {
+                          "source": "item.options.idle_complement_high"
+                        }
+                      ]
+                    ]
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "calls": {
+          "prepare": {
+            "function": {
+              "source": "item.controller",
+              "as": "symbol",
+              "values": {
+                "TIM1": "nx_stm32_advanced_cold_prepare",
+                "TIM8": "nx_stm32_tim8_advanced_cold_prepare"
+              }
+            },
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "ref": "timer_cold",
+                "as": "address"
+              },
+              {
+                "ref": "timer_config",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": {
+                "source": "item.controller",
+                "as": "symbol",
+                "values": {
+                  "TIM1": "nx_stm32_advanced_cold_close",
+                  "TIM8": "nx_stm32_tim8_advanced_cold_close"
+                }
+              },
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "ref": "timer_cold",
+                  "as": "address"
+                },
+                {
+                  "ref": "timer_config",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "irq": [
+          {
+            "name": {
+              "source": "item.controller",
+              "as": "symbol",
+              "values": {
+                "TIM1": "TIM1_BRK_TIM9_IRQHandler",
+                "TIM8": "TIM8_BRK_TIM12_IRQHandler"
+              }
+            },
+            "calls": [
+              {
+                "function": {
+                  "source": "item.controller",
+                  "as": "symbol",
+                  "values": {
+                    "TIM1": "nx_stm32_advanced_pwm_irq",
+                    "TIM8": "nx_stm32_tim8_advanced_pwm_irq"
+                  }
+                },
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  }
+                ]
+              }
+            ],
+            "barrier": "nx_arch_dsb"
+          }
+        ],
+        "pin_snapshots": {
+          "source": "selected.pads",
+          "key": "entry.identity",
+          "array_role": "timer_pin_saved",
+          "limit": 3
+        },
+        "retain_on_failed_init": true
+      },
+      "headers": [
+        "stm32f407_timer_cold.h"
+      ]
+    }
+  ]
+}

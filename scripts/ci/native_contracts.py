@@ -17,6 +17,7 @@ from scripts.ci.tdd_gate import (
 from scripts.validation.junit import prepare_report, validate_junit
 from tools.dev.presets import binary_directory
 from tools.dev import process
+from tools.dev.build_lock import build_lock
 
 
 def execute(command, env, log):
@@ -98,6 +99,91 @@ def ctest_names(plan, binaries, build):
     return set(names)
 
 
+def execute_native(args, build):
+    """Retain one build lease until all fresh runtime reports are published."""
+    output = build / "tdd"
+    output.mkdir(parents=True, exist_ok=True)
+    summary = output / "execution.json"
+    if args.observe_only and summary.exists():
+        summary.rename(output / (
+            "execution.before-observe-" + uuid.uuid4().hex + ".json"))
+    else:
+        summary.unlink(missing_ok=True)
+    google = output / "google"
+    if google.is_symlink():
+        raise ValueError("GoogleTest output directory must not "
+                         "be a symlink")
+    if not args.observe_only:
+        if google.exists():
+            shutil.rmtree(google)
+        google.mkdir()
+    report = build / "ctest-results.xml"
+    if not args.observe_only:
+        report.unlink(missing_ok=True)
+    env = environment()
+    binaries = google_binaries(build)
+    if not args.observe_only:
+        ctest = shutil.which("ctest", path=env["PATH"])
+        if not ctest:
+            raise ValueError("Missing maintained CTest executable")
+        plan = json.loads(execute(
+            [ctest, "--test-dir", str(build), "--show-only=json-v1"], env,
+            output / "ctest-plan.txt"))
+        planned = ctest_names(plan, binaries, build)
+    discovered = {}
+    for index, binary in enumerate(binaries):
+        listing = execute([str(binary), "--gtest_filter=*",
+                           "--gtest_list_tests"], env,
+                          output / f"discovery-{index}.txt")
+        discovered[binary] = discovered_cases(listing)
+    if args.observe_only:
+        print(f"Observed {sum(map(len, discovered.values()))} case names "
+              f"using case-list processes; no test cases executed; "
+              "qualification=false")
+        return 0
+    # CTest runs the complete runtime plan, including non-Google contracts.
+    # GoogleTest's directory output names each report after its executable.
+    env.update({"GTEST_OUTPUT": "xml:" + str(google) + "/",
+                "GTEST_REPEAT": "1", "GTEST_ALSO_RUN_DISABLED_TESTS": "1"})
+    started = prepare_report(report)
+    execute([ctest, "--preset", args.preset, "--output-on-failure",
+             "--no-tests=error", "--parallel", "1", "--output-junit",
+             str(report)], env, output / "ctest-execution.txt")
+    ctest_result = validate_junit(report, not_before_ns=started)
+    executed = {case["name"] for case in ctest_result["cases"]}
+    if (ctest_result["skipped"] or executed != planned
+            or ctest_result["tests"] != len(planned)):
+        raise ValueError("CTest execution differs from its complete plan")
+    expected_reports = {binary.name + ".xml" for binary in binaries}
+    if {path.name for path in google.iterdir()} != expected_reports:
+        raise ValueError("GoogleTest reports differ from "
+                         "the executable plan")
+    results = []
+    for binary in binaries:
+        evidence = validate_google_report(
+            google / (binary.name + ".xml"), not_before_ns=started,
+            expected_cases=len(discovered[binary]))
+        identities = {(case["classname"], case["name"])
+                      for case in evidence["cases"]}
+        if identities != discovered[binary]:
+            raise ValueError("GoogleTest execution differs from discovered "
+                             "case identities: " + binary.name)
+        results.append({"binary": binary.name, **evidence})
+    summary.write_text(json.dumps({
+        "schema": 1, "kind": "development-contract-execution",
+        "preset": args.preset, "passed": sum(r["passed"] for r in results),
+        "suites": results, "ctest": ctest_result,
+        "scope": "Single complete Native runtime CTest and case-level "
+                 "Google execution; mode-independent tools execute in "
+                 "separate complete domains, not inferred here; "
+                 "not historical TDD order or physical qualification",
+    }, indent=2) + "\n")
+    print(f"Executed {ctest_result['passed']} CTest entries and "
+          f"{sum(r['passed'] for r in results)} GoogleTest cases once; "
+          f"evidence: {summary}")
+    return 0
+
+
 def main(arguments=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--preset", required=True, choices=(
@@ -108,87 +194,8 @@ def main(arguments=None):
     args = parser.parse_args(arguments)
     try:
         build = selected_build(args.preset)
-        output = build / "tdd"
-        output.mkdir(parents=True, exist_ok=True)
-        summary = output / "execution.json"
-        if args.observe_only and summary.exists():
-            summary.rename(output / (
-                "execution.before-observe-" + uuid.uuid4().hex + ".json"))
-        else:
-            summary.unlink(missing_ok=True)
-        google = output / "google"
-        if google.is_symlink():
-            raise ValueError("GoogleTest output directory must not "
-                             "be a symlink")
-        if not args.observe_only:
-            if google.exists():
-                shutil.rmtree(google)
-            google.mkdir()
-        report = build / "ctest-results.xml"
-        if not args.observe_only:
-            report.unlink(missing_ok=True)
-        env = environment()
-        binaries = google_binaries(build)
-        if not args.observe_only:
-            ctest = shutil.which("ctest", path=env["PATH"])
-            if not ctest:
-                raise ValueError("Missing maintained CTest executable")
-            plan = json.loads(execute(
-                [ctest, "--test-dir", str(build), "--show-only=json-v1"], env,
-                output / "ctest-plan.txt"))
-            planned = ctest_names(plan, binaries, build)
-        discovered = {}
-        for index, binary in enumerate(binaries):
-            listing = execute([str(binary), "--gtest_filter=*",
-                               "--gtest_list_tests"], env,
-                              output / f"discovery-{index}.txt")
-            discovered[binary] = discovered_cases(listing)
-        if args.observe_only:
-            print(f"Observed {sum(map(len, discovered.values()))} case names "
-                  f"using case-list processes; no test cases executed; "
-                  "qualification=false")
-            return 0
-        # CTest runs the complete runtime plan, including non-Google contracts.
-        # GoogleTest's directory output names each report after its executable.
-        env.update({"GTEST_OUTPUT": "xml:" + str(google) + "/",
-                    "GTEST_REPEAT": "1", "GTEST_ALSO_RUN_DISABLED_TESTS": "1"})
-        started = prepare_report(report)
-        execute([ctest, "--preset", args.preset, "--output-on-failure",
-                 "--no-tests=error", "--parallel", "1", "--output-junit",
-                 str(report)], env, output / "ctest-execution.txt")
-        ctest_result = validate_junit(report, not_before_ns=started)
-        executed = {case["name"] for case in ctest_result["cases"]}
-        if (ctest_result["skipped"] or executed != planned
-                or ctest_result["tests"] != len(planned)):
-            raise ValueError("CTest execution differs from its complete plan")
-        expected_reports = {binary.name + ".xml" for binary in binaries}
-        if {path.name for path in google.iterdir()} != expected_reports:
-            raise ValueError("GoogleTest reports differ from "
-                             "the executable plan")
-        results = []
-        for binary in binaries:
-            evidence = validate_google_report(
-                google / (binary.name + ".xml"), not_before_ns=started,
-                expected_cases=len(discovered[binary]))
-            identities = {(case["classname"], case["name"])
-                          for case in evidence["cases"]}
-            if identities != discovered[binary]:
-                raise ValueError("GoogleTest execution differs from discovered "
-                                 "case identities: " + binary.name)
-            results.append({"binary": binary.name, **evidence})
-        summary.write_text(json.dumps({
-            "schema": 1, "kind": "development-contract-execution",
-            "preset": args.preset, "passed": sum(r["passed"] for r in results),
-            "suites": results, "ctest": ctest_result,
-            "scope": "Single complete Native runtime CTest and case-level "
-                     "Google execution; mode-independent tools execute in "
-                     "separate complete domains, not inferred here; "
-                     "not historical TDD order or physical qualification",
-        }, indent=2) + "\n")
-        print(f"Executed {ctest_result['passed']} CTest entries and "
-              f"{sum(r['passed'] for r in results)} GoogleTest cases once; "
-              f"evidence: {summary}")
-        return 0
+        with build_lock(build):
+            return execute_native(args, build)
     except (OSError, ValueError, KeyError, TypeError) as error:
         print(f"Native CI execution rejected: {error}", file=sys.stderr)
         return 1

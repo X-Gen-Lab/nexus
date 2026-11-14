@@ -1,4 +1,5 @@
 """Generate the actual reviewed constructors for deterministic register tests."""
+import json
 import sys
 from pathlib import Path
 
@@ -6,30 +7,46 @@ root = Path(sys.argv[1]).resolve()
 output = Path(sys.argv[2])
 sys.path.insert(0, str(root))
 from tools.configure.configure import resolve_ir  # noqa: E402
-from tools.configure.stm32f4 import emission  # noqa: E402
-from tools.configure.stm32f4.bindings import (  # noqa: E402
-    constructor, shared_irq_definitions,
-)
+from tools.configure.dependencies import source_names  # noqa: E402
+from tools.configure.providers import for_selection  # noqa: E402
+from tools.configure.static_ir import Declaration, IrqConnection  # noqa: E402
 
+inputs = {str(root / name) for name in source_names("platform", None)}
+inputs.add(str(Path(__file__).resolve()))
 lines = ["#ifndef NX_PLATFORM_REGISTER_WRITE",
          "#define NX_PLATFORM_REGISTER_WRITE(reg, value) ((reg) = (value))",
          "#endif"]
 for fixture in ("ve-exti.toml", "ve-pwm.toml", "ve-spi.toml", "ve-i2c.toml"):
-    result = resolve_ir(root / "tests/contracts/stm32_assembly" / fixture, root)
+    selected_inputs = {}
+    result = resolve_ir(root / "tests/contracts/stm32_assembly" / fixture, root,
+                        input_paths=selected_inputs)
+    inputs.update(selected_inputs.values())
+    provider = for_selection(result)
+    # These constructor fixtures select no ADC. Retain the production empty
+    # projection required by the shared cold-type header, not a private pad map.
+    lines += [line for line in provider.configuration_header(result)
+              if line.startswith("#define NEXUS_STM32_ADC_PINS(")]
     # Include exactly the private types selected by the production emitter;
     # runtime hooks belong to the firmware and are not part of this harness.
-    lines += [line for line in emission.includes(result)
+    lines += [line for line in provider.includes(result)
               if line.startswith('#include ')]
     for item in result.controllers:
-        generated = constructor(item, result, result.board_bindings,
-                                result.routes, result.devices)
+        generated = provider.constructor(item, result, result.board_bindings,
+                                         result.routes, result.devices)
         name = item.id.replace("-", "_")
-        lines.append(f"static {generated.state_type} s_nx_port_{name};")
-        if item.kind in {"spi", "i2c"}:
-            lines.append(f"static nx_stm32_{item.kind}_endpoint_state_t s_nx_endpoint_{name};")
+        initial = (" = " + generated.initial_state.render()
+                   if generated.initial_state is not None else "")
+        lines.append(f"static {generated.state_type} s_nx_port_{name}{initial};")
         if item.kind in {"pwm", "exti"}:
             kind = item.kind
-            lines.append(f"static const nx_{kind}_port_t s_nx_face_{name} = {{&nx_stm32_{kind}_ops, &s_nx_port_{name}}};")
+            lines.append(f"static const nx_{kind}_port_t s_nx_face_{name} = {{&{provider.operations(item)}, &s_nx_port_{name}}};")
+        for declaration in generated.static_declarations:
+            lines.extend(declaration.render())
+        for connection in generated.irq_connections:
+            lines.append(f"void {connection.name}(void);")
+            lines.extend(connection.render())
+        for sequence in generated.initialize_sequences:
+            lines.extend(sequence.render())
         lines += generated.definitions
         # This test-only facade follows the actual typed call slots, including
         # ordered multi-call cleanup. It is not a production compatibility API.
@@ -57,5 +74,12 @@ for fixture in ("ve-exti.toml", "ve-pwm.toml", "ve-spi.toml", "ve-i2c.toml"):
                 lines += [f"    status = {call.render()};",
                           "    if (status != NX_SUCCESS) { return status; }"]
         lines += ["    return NX_SUCCESS;", "}"]
-    lines += shared_irq_definitions(result.controllers)
+    for connection in provider.shared_irqs(result):
+        if isinstance(connection, IrqConnection):
+            lines.append(f"void {connection.name}(void);")
+        if not isinstance(connection, (Declaration, IrqConnection)):
+            raise TypeError("Register harness requires production typed assembly")
+        lines.extend(connection.render())
 output.write_text("\n".join(lines) + "\n", encoding="utf-8")
+output.with_suffix(".inputs.json").write_text(
+    json.dumps(sorted(inputs), indent=2) + "\n", encoding="utf-8")

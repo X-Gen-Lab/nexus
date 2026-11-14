@@ -192,7 +192,7 @@ class I2cAsyncConfigurationTests(unittest.TestCase):
 
     def test_nominal_projection_participates_in_generator_freshness(self):
         from tools.configure.dependencies import source_names
-        self.assertIn("tools/configure/stm32f4/i2c_timing.py",
+        self.assertIn("tools/configure/i2c_timing.py",
                       source_names("platform", "stm32f4"))
 
     def test_endpoint_width_is_an_exact_integer_and_native_stays_seven_bit(self):

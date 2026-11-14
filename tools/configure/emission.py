@@ -1,5 +1,7 @@
 """Compile/link bundle emission and shared private provider declarations."""
 import json
+from pathlib import Path
+import re
 
 
 def emit_bundle(result, output):
@@ -67,13 +69,28 @@ def emit_bundle(result, output):
                   if item.kind == "external_bus" and
                   item.driver != "mapped_storage-endpoint"})) + '")',
              'set(NEXUS_SELECTED_COMPONENTS "' + ';'.join(result.components) + '")']
+    package = context.package if context is not None else None
+    if package is not None:
+        cmake += [
+            f'set(NEXUS_SOC_PACKAGE_ID "{package.id}")',
+            f'set(NEXUS_SOC_PACKAGE_MANIFEST "{package.manifest_path.as_posix()}")',
+            f'set(NEXUS_SOC_CMAKE_ENTRY "{package.cmake_entry.as_posix()}")',
+            f'set(NEXUS_SOC_TARGET "{package.target}")']
+    else:
+        entry = (source if Path(source).is_absolute() else
+                 "${NEXUS_SOURCE_DIR}/" + source)
+        target = ("nexus_io_native" if selected.family == "native" else
+                  "nexus_soc_" + selected.family)
+        cmake += ['set(NEXUS_SOC_PACKAGE_ID "")',
+                  f'set(NEXUS_SOC_CMAKE_ENTRY "{entry}/CMakeLists.txt")',
+                  f'set(NEXUS_SOC_TARGET "{target}")']
     device = result.physical_part.device
     if device is not None:
         cmake += [f'set(NEXUS_STM32_DEVICE "{device.macro}")',
                   f'set(NEXUS_STM32_STARTUP "{device.startup}")']
     # Canonical source directories also serve selected host models. These
     # paths carry no translation-unit graph or additional support decisions.
-    sources = descriptor.families()
+    sources = descriptor.families() if for_selection(result).MODEL else (selected,)
     if selected.family not in {item.family for item in sources}:
         sources += (selected,)
     cmake += [f'set(NEXUS_SOC_SOURCE_{item.family} "${{NEXUS_SOURCE_DIR}}/' +
@@ -125,6 +142,11 @@ def emit_bundle(result, output):
                 header.append(f"#define {prefix}_{field.upper()} {value}u")
     header.extend(["#endif", ""])
     write("nexus_config.h", "\n".join(header))
+    names = tuple(re.match(r"set\((NEXUS_[A-Za-z0-9_]+)\s", line).group(1)
+                  for line in cmake)
+    if len(set(names)) != len(names):
+        raise ValueError("Duplicate generated build-selection variable")
+    cmake.append('set(NEXUS_SELECTION_VARIABLES "' + ';'.join(names) + '")')
     write("selection.cmake", "\n".join(cmake) + "\n")
     from tools.configure.bindings import emit
     from tools.configure.factory import emit as emit_factory, emit_strong, emit_smbus

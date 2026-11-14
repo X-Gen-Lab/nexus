@@ -25,8 +25,6 @@ foreach(adc_variant ve zg ve6 zg10)
     nexus_google_test(${adc_target} STM32F4_LL
         SOURCES stm32_adc_cold_factory_test.cpp "${adc_bundle}/bindings.c"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc_stream.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc_trigger.c"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio.c"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_cold.c"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_lifecycle.c"
@@ -40,18 +38,33 @@ foreach(adc_variant ve zg ve6 zg10)
     target_include_directories(${adc_target} SYSTEM PRIVATE
         "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
     target_compile_definitions(${adc_target} PRIVATE STM32F407xx
-        NX_TEST_ADC_BITS=${adc_bits}
+        NX_TEST_ADC_BITS=${adc_bits} NX_ADC_FACTORY_CONTRACT
         _init=nx_adc_cold_fixture_init _fini=nx_adc_cold_fixture_fini)
     target_compile_options(${adc_target} PRIVATE
         "-include${CMAKE_CURRENT_SOURCE_DIR}/stm32_adc_cold_model.h")
 endforeach()
 
-# Internal analog contracts run once for the shared F407 implementation.
-target_compile_definitions(nexus_stm32_adc_ve_cold_factory_test PRIVATE
-    NX_ADC_INTERNAL_CONTRACT)
-target_sources(nexus_stm32_adc_ve_cold_factory_test PRIVATE
-    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc_continuous.c"
-    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc_injected.c")
+# Direct mode, internal-source and multi-converter contracts run only once.
+# This independent model deliberately selects the reviewed full pad map;
+# assembled factories above retain their exact generated channel selection.
+nexus_google_test(nexus_stm32_adc_cold_direct_test STM32F4_LL
+    SOURCES stm32_adc_cold_direct_test.cpp
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc_stream.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc_trigger.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc_continuous.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc_injected.c"
+    LIBRARIES Nexus::IO
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
+        "${NEXUS_SOURCE_DIR}/arch/include"
+        "${NEXUS_SOURCE_DIR}/tests/support/f4_cpu")
+target_include_directories(nexus_stm32_adc_cold_direct_test SYSTEM PRIVATE
+    "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
+target_compile_definitions(nexus_stm32_adc_cold_direct_test PRIVATE
+    STM32F407xx NX_ADC_INTERNAL_CONTRACT)
+target_compile_options(nexus_stm32_adc_cold_direct_test PRIVATE
+    "-include${CMAKE_CURRENT_SOURCE_DIR}/stm32_adc_cold_direct_model.h")
 
 # Pinless ADC selection must retain resource admission before System.start.
 set(adc_internal_bundle "${CMAKE_CURRENT_BINARY_DIR}/f407-adc-internal")

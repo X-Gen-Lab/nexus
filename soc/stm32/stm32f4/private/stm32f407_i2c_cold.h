@@ -7,16 +7,14 @@
 #define NEXUS_STM32F407_I2C_COLD_H
 
 #include "stm32f407_i2c_async.h"
+#include "stm32f407_platform_cold.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /** \brief Exact pad and the existing Platform-owned snapshot slot. */
-typedef struct {
-    uint16_t* snapshot;
-    uint8_t pin;
-} nx_stm32_i2c_pin_config_t;
+typedef nx_stm32_platform_pin_config_t nx_stm32_i2c_pin_config_t;
 
 /** \brief Immutable selected controller, reviewed AF4 pads and publishers. */
 typedef struct {
@@ -27,6 +25,7 @@ typedef struct {
     uint8_t priority;
     bool asynchronous;
     uint32_t max_hz;
+    const nx_i2c_v1_lines_t* lines;
 } nx_stm32_i2c_config_t;
 
 /** \brief Semantic effects; clock bits preserve the original enabled state. */
@@ -35,7 +34,7 @@ enum {
     NX_STM32_I2C_COLD_PERIPHERAL_CLOCK = 1U << 1U,
     NX_STM32_I2C_COLD_VECTORS = 1U << 2U,
     NX_STM32_I2C_COLD_PREPARED = 1U << 3U,
-    NX_STM32_I2C_COLD_GPIO_CLOCK = 7U << 4U
+    NX_STM32_I2C_COLD_GPIO_CLOCK = 3U << 4U
 };
 
 /** \brief Retain exact publisher bytes and selected original gates in six
