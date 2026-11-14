@@ -6,9 +6,9 @@
  * \date            2026-11-11
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "drivers/audio/stm32f4_sai.h"
+#include "drivers/audio/stm32f4_sai_blocks.h"
 #include "stm32_sai_model.h"
-#include "stm32f4_sai.h"
-#include "stm32f4_sai_blocks.h"
 #include <array>
 #include <cstring>
 #include <gtest/gtest.h>

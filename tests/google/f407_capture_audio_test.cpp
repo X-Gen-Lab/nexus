@@ -8,9 +8,9 @@
  */
 #include "f407_capture_audio_model.h"
 extern "C" {
-#include "stm32f407_audio.h"
-#include "stm32f407_audio_blocks.h"
-#include "stm32f407_capture.h"
+#include "drivers/audio/stm32f407_audio.h"
+#include "drivers/audio/stm32f407_audio_blocks.h"
+#include "drivers/capture/stm32f407_capture.h"
 }
 #include <cstring>
 #include <gtest/gtest.h>
@@ -1911,7 +1911,7 @@ TEST_F(CaptureAudio, CaptureBlocksRejectDmaOverItsPinRestoreReceipt) {
 } /* namespace */
 
 extern "C" {
-#include "stm32f407_capture_frames.h"
+#include "drivers/capture/stm32f407_capture_frames.h"
 nx_result_t
 nx_stm32_capture_frames_admit(const nx_stm32_capture_frames_state_t*,
                               const nx_stm32_capture_config_t*)

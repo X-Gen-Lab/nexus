@@ -1,10 +1,10 @@
 # One complete program exercises both PVD modes and the shared EXTI path.
 nexus_google_test(nexus_stm32_pvd_test STM32F4_LL
     SOURCES stm32_pvd_test.cpp
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/pvd.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/exti.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/exti/pvd.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/exti/exti.c"
     LIBRARIES Nexus::IO
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
         "${NEXUS_SOURCE_DIR}/arch/include")
 target_include_directories(nexus_stm32_pvd_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"

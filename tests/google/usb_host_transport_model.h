@@ -5,7 +5,7 @@
  */
 #ifndef NEXUS_USB_HOST_TRANSPORT_MODEL_H
 #define NEXUS_USB_HOST_TRANSPORT_MODEL_H
-#include "stm32f407_usb_host.h"
+#include "drivers/usb/stm32f407_usb_host.h"
 #ifdef __cplusplus
 extern "C" {
 #endif

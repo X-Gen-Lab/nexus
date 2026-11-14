@@ -14,6 +14,8 @@ import unittest
 
 from tools.evidence.common import EvidenceError, file_identity
 from tools.measurement.retention import source_contracts
+from tools.testing.test_provider_retention import package_tree
+from tools.configure.packages import find as find_package
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -24,11 +26,20 @@ WRAPPER = '#define NX_PROBE_OPS nx_reviewed_probe_ops\n#include "probe_impl.h"\n
 TEMPLATE = 'const nx_probe_ops_t NX_PROBE_OPS = { .start = real_start, .stop = real_stop };\n'
 
 
+def owned_file(family, name):
+    package = find_package(ROOT, family)
+    matches = [path for directory in package.export_roots
+               for path in directory.rglob(name) if package.exports(path)]
+    if len(matches) != 1:
+        raise AssertionError("one owned provider source required: " + name)
+    return matches[0]
+
+
 class ProviderTemplateTests(unittest.TestCase):
     def tree(self, directory, wrapper=WRAPPER, template=TEMPLATE):
         root = Path(directory)
         public = root / "io/include/nexus/io/probe.h"
-        source = root / "soc/stm32/stm32f4/drivers/probe.c"
+        source = package_tree(root) / "drivers/port/probe.c"
         header = root / "io/private/probe_impl.h"
         for path, contents in ((public, PUBLIC), (source, wrapper), (header, template)):
             path.parent.mkdir(parents=True, exist_ok=True)
@@ -43,9 +54,9 @@ class ProviderTemplateTests(unittest.TestCase):
                 with self.subTest(family=family, name=name):
                     provider = providers[f"nx_{stem}_{name}_ops"]
                     self.assertEqual(provider["source"], file_identity(
-                        ROOT / source_directory(family) / "drivers" / (name + ".c")))
+                        owned_file(family, name + ".c")))
                     self.assertEqual(provider["template_source"], file_identity(
-                        ROOT / "soc/stm32/stm32f4/drivers/ip/advanced_timer" / template))
+                        owned_file(family, template)))
 
     def test_direct_projection_keeps_actual_translation_unit_identity(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -59,7 +70,7 @@ class ProviderTemplateTests(unittest.TestCase):
     def test_reviewed_driver_template_keeps_translation_unit_identity(self):
         with tempfile.TemporaryDirectory() as directory:
             root, source, header = self.tree(directory)
-            driver = root / "soc/stm32/stm32f4/drivers/ip/reviewed_ip/probe_impl.h"
+            driver = package_tree(root) / "drivers/port/reviewed/probe_impl.h"
             driver.parent.mkdir(parents=True)
             header.rename(driver)
             _, _, providers, _ = source_contracts(root)
@@ -73,7 +84,7 @@ class ProviderTemplateTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root, _, header = self.tree(directory)
             for ip in ("reviewed_ip", "another_ip"):
-                driver = root / "soc/stm32/stm32f4/drivers/ip" / ip / header.name
+                driver = package_tree(root) / "drivers/port" / ip / header.name
                 driver.parent.mkdir(parents=True)
                 driver.write_text(TEMPLATE)
             header.unlink()
@@ -83,7 +94,7 @@ class ProviderTemplateTests(unittest.TestCase):
     def test_reviewed_driver_template_rejects_local_shadow(self):
         with tempfile.TemporaryDirectory() as directory:
             root, source, header = self.tree(directory)
-            driver = root / "soc/stm32/stm32f4/drivers/ip/reviewed_ip/probe_impl.h"
+            driver = package_tree(root) / "drivers/port/reviewed/probe_impl.h"
             driver.parent.mkdir(parents=True)
             header.rename(driver)
             (source.parent / header.name).write_text(TEMPLATE)
@@ -152,6 +163,13 @@ class ProviderTemplateTests(unittest.TestCase):
             with self.assertRaisesRegex(EvidenceError, "ambiguous"):
                 source_contracts(root)
 
+    def test_public_include_cannot_shadow_an_owned_private_template(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root, _, _ = self.tree(directory)
+            (root / "io/include/nexus/io/probe_impl.h").write_text(TEMPLATE)
+            with self.assertRaisesRegex(EvidenceError, "ambiguous"):
+                source_contracts(root)
+
     def test_binding_after_include_is_not_an_actual_template_binding(self):
         with tempfile.TemporaryDirectory() as directory:
             root, _, _ = self.tree(directory, "\n".join(
@@ -162,7 +180,7 @@ class ProviderTemplateTests(unittest.TestCase):
     def test_shared_driver_header_cannot_shadow_a_private_template(self):
         with tempfile.TemporaryDirectory() as directory:
             root, _, _ = self.tree(directory)
-            shadow = root / "soc/stm32/stm32f4/drivers/ip/other_ip/probe_impl.h"
+            shadow = package_tree(root) / "drivers/port/other/probe_impl.h"
             shadow.parent.mkdir(parents=True)
             shadow.write_text(TEMPLATE)
             with self.assertRaisesRegex(EvidenceError, "ambiguous"):
@@ -265,7 +283,7 @@ class ProviderTemplateCompileTests(unittest.TestCase):
 
     def compile(self, selection, *, omit=None, append="", replace=None):
         family, stem, cpu, part, sdk, _, _, template = selection
-        original = ROOT / source_directory(family) / "drivers" / (stem + ".c")
+        original = owned_file(family, stem + ".c")
         source = original.read_text()
         if omit is not None:
             source, count = re.subn(
@@ -279,16 +297,16 @@ class ProviderTemplateCompileTests(unittest.TestCase):
                 "#define " + macro + " " + value + "\n", source,
                 flags=re.MULTILINE)
             self.assertEqual(count, 1)
-        include = '#include "' + template + '"'
-        self.assertEqual(source.count(include), 1)
+        directives = re.findall(r'^#include "(?:[^"\n]*/)?' +
+                                re.escape(template) + r'"$', source, re.MULTILINE)
+        self.assertEqual(len(directives), 1)
+        include = directives[0]
         source = source.replace(include, include + "\n" + append)
         probe = self.area / (family + "_" + stem + ".c")
         probe.write_text(source)
         output = probe.with_suffix(".o")
-        templates = tuple((ROOT / "soc/stm32/stm32f4/drivers/ip").glob("*/" + template))
-        self.assertEqual(len(templates), 1)
-        includes = [self.area, self.template_directory or templates[0].parent,
-                    ROOT / source_directory(family) / "private",
+        includes = [self.area, self.template_directory or owned_file(family, template).parent,
+                    ROOT / source_directory(family),
                     ROOT / "io/private",
                     ROOT / "core/include", ROOT / "io/include",
                     ROOT / "arch/include",

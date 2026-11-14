@@ -12,10 +12,12 @@ Nexus 是静态装配的 C11 通用嵌入式平台。当前生产入口是
 四个 F407 Board、软件参考和实际验证。产品任务、队列、私有 PCB、Flash 分区与
 恢复策略由外部工程拥有。Native 是显式测试支撑；未选厂商依赖保留但不进入默认闭包。
 
-本批软件范围是将现有支持目录承诺的装配与模式统一到声明式包、同快照事实、不可变 IR、有限静态 C 装配与包内 CMake。未选硬件模式、未知 PCB 条件及未维护的 IP 模型不因本次迁移获得支持或执行资格。
+前序接入批次将已维护装配与模式统一到声明式包、同快照事实、不可变 IR、有限静态
+C 装配与包内 CMake。本次整理 F4 的事实、系统、领域实现和官方库目录，并修正事实
+组合与包路径边界。未选模式、未知 PCB 和未维护 IP 不因此取得支持或执行资格。
 
-本批以 [`ba13686`](https://github.com/X-Gen-Lab/nexus/tree/ba13686b91c94d19ef11acf910653ee2fcc9aa8b)
-为源码基线；前序软件交付见 [PR #63](https://github.com/X-Gen-Lab/nexus/pull/63)。
+前序接入批次以 [`ba13686`](https://github.com/X-Gen-Lab/nexus/tree/ba13686b91c94d19ef11acf910653ee2fcc9aa8b)
+为源码基线；对应软件交付见 [PR #64](https://github.com/X-Gen-Lab/nexus/pull/64)。
 每项新结果必须绑定实际源码和配置，不能继承基线的测试或 SDK 资格。
 
 ![FIG-01：平台职责与外部产品边界](../assets/diagrams/platform-architecture.svg)
@@ -31,7 +33,8 @@ Nexus 是静态装配的 C11 通用嵌入式平台。当前生产入口是
 | `arch/arm/cortex_m/` | CPU 原语、中断状态保存恢复、屏障及明确可选能力 |
 | `io/` | 公共领域接口、单位、检查分派及硬件无关机制 |
 | `soc/stm32/stm32f4/` | 精确器件事实、时钟、启动、内存、IRQ／DMA、控制器与私有 SDK |
-| `soc/stm32/stm32f4/drivers/ip/` | 经核对可共享的 F4 私有硬件算法 |
+| `soc/stm32/stm32f4/drivers/<domain>/` | 相邻 binding、实例布局、硬件实现与按需选编的模式 |
+| `soc/stm32/stm32f4/drivers/ip/`、`private/` | 多模式共享算法与跨域合同；不集中领域私有状态 |
 | `boards/` | 晶振、接线、外部器件、安全电平与未知 PCB 条件 |
 | `os/` | 显式后端的等待、通知、任务、队列和存储合同 |
 | `components/` | 通过公共端口复用的协议、器件和 owner 机制 |
@@ -108,24 +111,24 @@ SoC／Board 事实、不可变 typed IR、原子 bundle 和 CMake 唯一目标�
 
 ### 接入包目录责任
 
-以下是目标维护边界，不要求为目录外观移动所有文件。事实可以保留原位；同 IP
-行为就近共享。包的 binding 与私有 C 类型一同维护，公共工具不复制私有布局。
-家族专属构建靠近 SoC，公开通用合同仍由 Core／Arch／I/O 拥有。
+F4 当前按以下责任维护：事实集中在 `facts/`，系统机制集中在 `system/`，每个领域的
+binding、实例布局与实现相邻。共享入口只保留真实跨模式或跨域内容；公开通用合同
+仍由 Core／Arch／I/O 拥有，官方启动汇编继续来自锁定厂商源码。
 
 ```text
 soc/<vendor>/<family>/
-  package.json             包入口、事实与导出归属
-  soc.json / devices.json  器件与控制器事实
-  routes.json              引脚、IRQ、DMA 与触发连接
-  references.json          资料和勘误范围
-  drivers/                 手写 C 硬件实现与相邻 binding
-  private/                 config、runtime、receipt 与 SDK 类型
-  cmake/                   家族选编与官方库配置
-  CMakeLists.txt           本包唯一源码目标定义
+  package.json
+  facts/
+  system/
+  drivers/<domain>/
+  drivers/ip/
+  private/
+  sdk/
+  CMakeLists.txt
 boards/<board>/
-  board.json               PCB、电气连接和外部器件
-  board_control.c          必要板级行为，按需存在
-tools/configure/           通用 schema、resolver、IR 与 emitter
+  board.json
+  board_control.c
+tools/configure/
 ```
 
 新增同 IP 器件不改变公共工具、通用 CMake 或 SDK exporter；改变公共操作语义才
@@ -158,7 +161,7 @@ HAL／LL 优先用于满足完整模式合同的硬件路径。直接访问限�
 receipt 和共享只读 ops 按真实需求分开，未选模式不分配对应最大状态和缓冲。
 性能与空间用实际 ELF、对象、反汇编及测量判断，不能由 inline 或接口形式推定最优。
 
-QuadSPI 当前是精确 W25Q128JV 集成。[独立协议事实](../../soc/stm32/stm32f4/private/w25q128jv.h)
+QuadSPI 当前是精确 W25Q128JV 集成。[独立协议事实](../../soc/stm32/stm32f4/drivers/memory/w25q128jv.h)
 与其 C 实现已提纯 JEDEC 身份、adopt、保护状态、页边界、几何与命令，不依赖
 控制器 SDK。STATUS → WREN → WEL → PULSE → WIP → VERIFY／WRDI 仍由该精确
 集成状态机推进；间接与映射共享一个 owner，保留 WIP、排空和失败责任。当前没有
@@ -181,6 +184,9 @@ GD32F470 仅作为显式启用的 GPIO／UART 软件参考，用于检验通用�
 物理 HIL 按用户要求暂缓，状态保留为 not_executed。软件结果不证明接线、时钟波形、IRQ 延迟、吞吐、功耗或断电保持；未选外设与模式继续遵循明确支持边界。
 
 ## 本轮架构迭代任务
+
+下表保留前序声明式接入批次的审查状态。本次 F4 目录重构另需实际验证事实组合、
+包路径边界、模型、ARM、SDK 消费与双语文档；下表的已验收状态不替代这些结果。
 
 以下 60 项是本页人工审查表，不是新的配置源、台账引擎或资格流程。状态区分
 合同已固定、实施中、已有实现但待集成验证与已验证。只有对应实现、消费者与实际

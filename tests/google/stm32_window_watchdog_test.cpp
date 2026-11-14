@@ -10,10 +10,10 @@
  *
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "drivers/watchdog/stm32f407_window_watchdog.h"
 #include "nexus/arch/arch.h"
 #include "nexus/core/platform_lifecycle.h"
 #include "nexus/soc/stm32f407_wwdg_ewi.h"
-#include "stm32f407_window_watchdog.h"
 extern "C" nx_result_t nx_stm32f407_wwdg_ewi_arm(nx_stm32f407_wwdg_ewi_t*,
                                                  const nx_watchdog_port_t*,
                                                  uint8_t) __attribute__((weak));

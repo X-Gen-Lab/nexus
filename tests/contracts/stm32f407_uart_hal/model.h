@@ -54,5 +54,5 @@ void nx_hal_model_priority_write(volatile uint8_t* reg, uint8_t value);
     nx_hal_model_cold_write(&(reg), (uint32_t)(value))
 #define NX_PLATFORM_PRIORITY_WRITE(reg, value)                                 \
     nx_hal_model_priority_write(&(reg), (uint8_t)(value))
-#include "stm32f407_hal_profile.h"
+#include "drivers/uart/stm32f407_hal_profile.h"
 #endif

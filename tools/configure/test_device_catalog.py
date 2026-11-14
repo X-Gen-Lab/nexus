@@ -9,10 +9,11 @@ from unittest.mock import patch
 
 from tools.configure import configure as gate
 from tools.configure.tests.f4_fixture import copy_package, load_f4_fixture
+from tools.configure.tests.device_fixture import load_authored_soc
 
 
-CATALOG = "soc/stm32/stm32f4/devices.json"
-SOC = "soc/stm32/stm32f4/soc.json"
+CATALOG = "soc/stm32/stm32f4/facts/devices.json"
+SOC = "soc/stm32/stm32f4/facts/soc.json"
 
 
 class DeviceCatalogConfigurationTests(unittest.TestCase):
@@ -89,7 +90,7 @@ class DeviceCatalogConfigurationTests(unittest.TestCase):
             (self.root / CATALOG).read_bytes()).hexdigest())
 
     def test_normalized_irq_requires_the_same_selected_catalog_record(self):
-        raw = gate.load(self.root / SOC)
+        raw = load_authored_soc(self.root / SOC)
         catalog = gate.load(self.root / CATALOG)
         selected = gate.catalog_soc_facts(raw, "STM32F407VET6", catalog)
         self.assertEqual(selected.device.external_irq_count, 82)

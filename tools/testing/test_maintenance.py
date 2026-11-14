@@ -51,7 +51,7 @@ const nx_uart_ops_t nx_sample_uart_ops = {0};
                     and row["mode"] == "dma-tx"]
         self.assertEqual(len(uart_dma), 1)
         self.assertEqual(uart_dma[0]["exports"],
-                         ["soc/stm32/stm32f4/drivers/uart_hal.c"])
+                         ["soc/stm32/stm32f4/drivers/uart/uart_hal.c"])
         self.assertTrue(uart_dma[0]["fixtures"])
         spi = next(row for row in rows if row["family"] == "stm32f4"
                    and row["controller"] == "SPI1" and row["mode"] == "dma")
@@ -60,10 +60,10 @@ const nx_uart_ops_t nx_sample_uart_ops = {0};
         nested = (
             ("DCMI", "capture", "jpeg-blocks",
              "tests/contracts/f407_capture_audio/jpeg_blocks/ve-jpeg-blocks.toml",
-             "soc/stm32/stm32f4/drivers/capture.c"),
+             "soc/stm32/stm32f4/drivers/capture/capture.c"),
             ("SPI1", "spi", "short-poll",
              "tests/contracts/io_storage_cost/spi_endpoints/endpoints-1.toml",
-             "soc/stm32/stm32f4/drivers/spi.c"))
+             "soc/stm32/stm32f4/drivers/spi/spi.c"))
         for controller, kind, mode, fixture, source in nested:
             with self.subTest(fixture=fixture):
                 selected = next(row for row in rows

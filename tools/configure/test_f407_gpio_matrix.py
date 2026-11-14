@@ -6,6 +6,7 @@ import unittest
 
 from tools.configure import bindings, configure as gate, device_view
 from tools.configure.tests.native_fixture import native_fixture
+from tools.configure.tests.device_fixture import load_authored_soc
 
 
 class F407GpioMatrixTests(unittest.TestCase):
@@ -42,7 +43,7 @@ class F407GpioMatrixTests(unittest.TestCase):
 
     def test_every_bonded_pad_has_gpio_and_matching_exti_routes(self):
         package = gate.ROOT / "soc/stm32/stm32f4"
-        soc, routes = gate.load(package / "soc.json"), gate.load(package / "routes.json")
+        soc, routes = load_authored_soc(package), gate.load(package / "facts/routes.json")
         parts = {"STM32F405ZGT6", "STM32F407VET6", "STM32F407ZGT6",
                  "STM32F415ZGT6", "STM32F417ZGT6"}
         profiles = device_view.controller_profiles(soc)

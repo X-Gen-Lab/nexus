@@ -11,8 +11,8 @@ extern "C" {
 #include "nexus/core/fault.h"
 #include "nexus/soc/stm32f407_supervision.h"
 #include "nexus/soc/stm32f4_power.h"
-#include "stm32f407_clock.h"
-#include "stm32f407_system.h"
+#include "system/stm32f407_clock.h"
+#include "system/stm32f407_system.h"
 nx_result_t nx_stm32_power_enter(nx_clock_barrier_t,
                                  const nx_stm32_power_options_t*,
                                  nx_stm32_stop_receipt_t*)

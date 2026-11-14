@@ -1,11 +1,11 @@
 # Real F479 controller and official LL; external MMIO/CPU/clock leaves only.
 nexus_google_test(nexus_stm32_sdram_test STM32F4_LL
     SOURCES stm32_sdram_test.cpp
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/fmc_sdram.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/memory/fmc_sdram.c"
         "${NEXUS_SOURCE_DIR}/vendors/st/stm32f4_hal/Src/stm32f4xx_ll_fmc.c"
     LIBRARIES Nexus::IO
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private/sdram_hal"
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/sdk/hal_config/sdram"
         "${NEXUS_SOURCE_DIR}/arch/include")
 set(sdram_model_config "${CMAKE_CURRENT_BINARY_DIR}/sdram-model-config")
 file(MAKE_DIRECTORY "${sdram_model_config}")

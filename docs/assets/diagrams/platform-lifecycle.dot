@@ -1,5 +1,5 @@
 // Current scoped view. Build-time arrows and runtime calls are labeled explicitly.
-// Code basis: core/private/platform_lifecycle_impl.h; tools/configure/bindings.py; soc/stm32/stm32f4/private/stm32f4_platform_lifecycle_impl.h
+// Code basis: core/private/platform_lifecycle_impl.h; tools/configure/bindings.py; soc/stm32/stm32f4/system/stm32f4_platform_lifecycle_impl.h
 digraph PlatformLifecycle {
     graph [label="FIG-05 静态连接调用共享 C 生命周期\n外部 privileged task owner 串行推进\nFIG-05 Static connections call the shared C lifecycle\nOne external privileged task owner advances serially", rankdir=TB, bgcolor="white", pad=0.25, nodesep=0.35, ranksep=0.52, fontname="Noto Sans CJK SC", fontsize=15, labelloc=t];
     node [shape=box, style="rounded,filled", fillcolor="#eff6ff", color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC", fontsize=12, margin="0.16,0.10"];

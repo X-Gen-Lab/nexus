@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 503642f522cd952479e8d7c000b7604861f54d8747171284213a206ecd4eb5b6\n"
+"X-Nexus-Source-SHA256: 2520523ab937dcfb597eacd783b3d2a7db41072f279b2b7ed9707836dd71a074\n"
 
 msgid "接入、资源装配与源码 SDK 合同"
 msgstr "Integration, resource assembly and source-SDK contract"
@@ -209,12 +209,6 @@ msgstr "SoC package"
 
 msgid "一个维护中的 SoC package 通常包含："
 msgstr "A maintained SoC package typically includes:"
-
-msgid "系列目录复用代码，`soc.json` 按精确订货号选择已审 device profile 和不重叠的 controller groups；物理事实与软件模式分开。`devices.json` 记录官方宏、startup、 IRQ enum／number／handler。型号、封装、Flash、SRAM 域和 IRQ 表不能被家族字符串 代替，厂商编译目录不扩大运行时模式支持。"
-msgstr "The series directory shares code. `soc.json` selects a reviewed device profile and disjoint controller groups by exact orderable part, separating physical facts from software modes. `devices.json` records official macros, startup and IRQ enums/numbers/handlers. A family string cannot replace part, package, Flash, SRAM-domain or IRQ facts. Vendor compile inventory does not expand runtime mode support."
-
-msgid "当前生产 SoC 入口只有 `soc/stm32/stm32f4/`，私有共享 IP 位于其 `drivers/ip/`。 Board／SoC 不放 Python 插件；声明式 package 由 `tools/configure/` 的通用 DataProvider、领域政策、typed IR 与有限静态节点解析，不再加载家族 Python 构造模块。顶层 `pads` 统一显式坐标；字段与同一快照合同见 [接入指南](../guides/provider-porting.md)。Native 仅在 `tests/support/native/`，必须显式启用测试 scope；不会进入生产支持枚举。 CPU 实现按 ISA 位于 `arch/arm/cortex_m/` 或 `arch/native/`，公共头路径保持稳定。 默认生成入口连接 Core 的手写 C 整平台生命周期和 F4 的 System／共享资源 C 协调器。 主机保留事实校验与有限静态连接，不维护寄存器级硬件算法或驱动状态机；固定生命周期 调用与通用错误传播仍由 typed 节点连接，只维护一套配置实现。实际生成 factory、 C 模型与 ARM 镜像分别验收，不能用目录调整或源码存在 宣布整条链路通过。"
-msgstr "The sole current production SoC entry is `soc/stm32/stm32f4/`; its private shared IP lives under `drivers/ip/`. Board/SoC contain no Python plugins. Generic DataProvider, domain policies, typed IR and bounded static nodes under `tools/configure/` parse declarative packages without loading family Python constructor modules. Top-level `pads` owns explicit coordinates; the [porting guide](../guides/provider-porting.md) defines fields and the shared snapshot contract. Native exists only under `tests/support/native/`, requires explicit test scope and does not enter production support enumeration. CPU implementations live by ISA under `arch/arm/cortex_m/` or `arch/native/`, with stable public header paths. Default generated entries connect Core's handwritten C whole-platform lifecycle and F4's System/shared-resource C coordinator. Host tools retain fact validation and bounded static connections, without register-level hardware algorithms or driver state machines. Typed nodes connect fixed lifecycle calls and common error propagation, retaining one configuration implementation. Actual generated factories, C models and ARM images have separate acceptance; directory movement or source presence does not establish success for the whole chain."
 
 msgid "4. 解析、生成与 CMake 装配"
 msgstr "4. Resolution, generation and CMake assembly"
@@ -800,14 +794,6 @@ msgstr ""
 "record exact part/package/density."
 
 msgid ""
-"定义 `soc.json` 的物理 memory、Flash geometry、clock 约束、IRQ 和 controller；最初只放入准备维护的"
-" reviewed routes。"
-msgstr ""
-"Define physical memory, Flash geometry, clock constraints, IRQs and "
-"controllers in `soc.json`. Initially include only reviewed routes intended "
-"for maintenance."
-
-msgid ""
 "实现 Arch 所需适配、reset/startup、clock、timebase、IRQ、linker 和最小 IO provider。SDK "
 "目标保持 PRIVATE，不暴露厂商结构体给外部 consumer。"
 msgstr ""
@@ -1145,3 +1131,12 @@ msgstr ""
 " combinations, needed controllers/drivers and reviewable artifacts. Complete"
 " pin databases, all SDK features, automatic topology solving and runtime "
 "discovery are not first-stage exit criteria."
+
+msgid "系列目录复用代码，`facts/soc.json` 按精确订货号选择已审 device profile 和不重叠的 controller groups；物理事实与软件模式分开。`facts/devices.json` 记录官方宏、startup、 IRQ enum／number／handler。型号、封装、Flash、SRAM 域和 IRQ 表不能被家族字符串 代替，厂商编译目录不扩大运行时模式支持。"
+msgstr "The series directory shares code. `facts/soc.json` selects a reviewed device profile and disjoint controller groups by exact orderable part, separating physical facts from software modes. `facts/devices.json` records official macros, startup and IRQ enums/numbers/handlers. A family string cannot replace part, package, Flash, SRAM-domain or IRQ facts. Vendor compile inventory does not expand runtime mode support."
+
+msgid "当前生产 SoC 入口只有 `soc/stm32/stm32f4/`；领域 binding、实例布局与实现相邻， 私有共享 IP 位于其 `drivers/ip/`，跨域共享合同与片段保留在 `private/`。 Board／SoC 不放 Python 插件；声明式 package 由 `tools/configure/` 的通用 DataProvider、领域政策、typed IR 与有限静态节点解析，不再加载家族 Python 构造模块。顶层 `pads` 统一显式坐标；字段与同一快照合同见 [接入指南](../guides/provider-porting.md)。Native 仅在 `tests/support/native/`，必须显式启用测试 scope；不会进入生产支持枚举。 CPU 实现按 ISA 位于 `arch/arm/cortex_m/` 或 `arch/native/`，公共头路径保持稳定。 默认生成入口连接 Core 的手写 C 整平台生命周期和 F4 的 System／共享资源 C 协调器。 主机保留事实校验与有限静态连接，不维护寄存器级硬件算法或驱动状态机；固定生命周期 调用与通用错误传播仍由 typed 节点连接，只维护一套配置实现。实际生成 factory、 C 模型与 ARM 镜像分别验收，不能用目录调整或源码存在 宣布整条链路通过。"
+msgstr "The sole current production SoC entry is `soc/stm32/stm32f4/`. Each domain keeps its bindings, instance layout and implementation together. Shared private IP lives under `drivers/ip/`; cross-domain contracts and fragments remain under `private/`. Board/SoC contain no Python plugins. Generic DataProvider, domain policies, typed IR and bounded static nodes under `tools/configure/` parse declarative packages without loading family Python constructor modules. Top-level `pads` owns explicit coordinates; the [porting guide](../guides/provider-porting.md) defines fields and the shared snapshot contract. Native exists only under `tests/support/native/`, requires explicit test scope and does not enter production support enumeration. CPU implementations live by ISA under `arch/arm/cortex_m/` or `arch/native/`, with stable public header paths. Default generated entries connect Core's handwritten C whole-platform lifecycle and F4's System/shared-resource C coordinator. Host tools retain fact validation and bounded static connections, without register-level hardware algorithms or driver state machines. Typed nodes connect fixed lifecycle calls and common error propagation, retaining one configuration implementation. Actual generated factories, C models and ARM images have separate acceptance; directory movement or source presence does not establish success for the whole chain."
+
+msgid "定义包内 `facts/` 的物理 memory、Flash geometry、clock 约束、IRQ 和 controller；最初只放入准备维护的 reviewed routes。"
+msgstr "Define physical memory, Flash geometry, clock constraints, IRQs and controllers in package-local `facts/`. Initially include only reviewed routes intended for maintenance."

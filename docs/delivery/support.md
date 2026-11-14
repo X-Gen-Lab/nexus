@@ -34,8 +34,8 @@ STM32F405ZGT6、F407VET6、F407ZGT6、F415ZGT6、F417ZGT6、F411RET6、F446ZET6
 | Native／CPU-only Runtime | Native 是显式 host-test scope；CPU-only Runtime 不提供 SoC 外设，二者都不是 PCB 资格 |
 
 引脚、AF、DMA、IRQ、Flash 几何和资源冲突只在
-[SoC 事实](../../soc/stm32/stm32f4/soc.json)、
-[路线](../../soc/stm32/stm32f4/routes.json)、[Board 包](../../boards/README.md)及
+[SoC 事实](../../soc/stm32/stm32f4/facts/soc.json)、
+[路线](../../soc/stm32/stm32f4/facts/routes.json)、[Board 包](../../boards/README.md)及
 实际 provider 中维护。本页不复制第二份 pin／DMA 表。软件 fixture 只声明测试路线；
 原理图、元件实装、跳线、电压和晶振事实仍须由精确 Board 授权。
 
@@ -79,7 +79,7 @@ F415／F417。F411、F446、F479 分别绑定独立 RM／ES profile；F446 的 P
 | SAI1／SAI2 | F446 的 SAI1／2、F479 的 SAI1：A／B master／slave × TX／RX／同步 duplex，有限与连续 `*-blocks`，8／10／16／20／24／32 有效位、至多 16 wire slots。显式 active mask 只为有效 slot 分配 FIFO 容器，保留原 wire 位置，不做重排。连续模式使用 caller block 存储、声明 SCK／service 上界，撤回目标后才发布 RX loan；缺块撤源、失败排空保留责任。master 消费唯一 System PLLSAI Q；slave 实际外部速率 unknown。无跨 SAI 同步、AC97／SPDIF 或物理时序保证 | [SAI 与布局](../design/f407-capture-audio.md) |
 | RTC／备份域 | `adopt-retained`／`provision-empty`、Alarm A request、Alarm B、wakeup、timestamp、tamper、校准、20 个 backup registers、4 KiB backup SRAM CPU lease 与显式 handoff。PC13 timestamp／tamper 需要 Board 明确授权 LSE bypass；四个现有 Board 的晶体配置不能据 API 存在推定支持。新增 F411／F446／F479 的晶体 LSE primary retained／provision 精确高频参考；F411 有 20 个 backup registers、无 backup SRAM，其 SRAM ops 为 NULL；F446／F479 保留 4 KiB lease。未增加这些料号的 bypass、periodic 或 RTOS 组合。不提供世纪／时区或保持性证明 | [RTC 合同](../design/f407-rtc.md) |
 | 内部 Flash／制造维护 | F407 VE／ZG 的精确 sector 几何及显式 OTP／option／RDP 维护；F479NI 的 2 MiB／24 sectors 只提供 poll-word 读写擦，bank2 逻辑编号映射 SNB16–27，拒绝交换映射、BFB2／PCROP 和未审 OPTCR1 维护。F479 按 ES0321 在 pulse 前关闭 DCEN，真实 idle 后 reset／restore；失败保留同一 owner。Flash pulse 不可中止，同 bank 执行可停顿；deadline 不撤销借用。不自动回滚、重放不可逆维护或以软件 reset 代替 POR | [物理存储与维护](../design/f407-storage.md) |
-| SDIO／MMC／I/O functions | SD memory／MMC polling、有限 IRQ／DMA；SDIO functions 使用独立 face 的 CMD5／52／53。单卡、3.3 V，SD／SDIO 为 1／4 位，MMC 可显式选择经版本和 SWITCH 检查的 8 位十引脚软件参考。memory 单块 CMD17／24，多块以一次 CMD18／25、CMD12 和 CMD13 READY 结束；combo 不同时维护 memory portion。默认速度使用精确 PLL48 与经 RM／勘误联合验证的分频；另选精确 F407 `hse8-pll150-sdio375`、裸机四位 SD／MMC 37.5 MHz 高速 SDR，须完成 SD CMD6 或 MMC HS52 协商。该 profile 不授予 USB／RNG 或低功耗；不提供其他高速组合、DDR／HS200 | [SDIO 合同](../../soc/stm32/stm32f4/private/sdio_hal/README.md) |
+| SDIO／MMC／I/O functions | SD memory／MMC polling、有限 IRQ／DMA；SDIO functions 使用独立 face 的 CMD5／52／53。单卡、3.3 V，SD／SDIO 为 1／4 位，MMC 可显式选择经版本和 SWITCH 检查的 8 位十引脚软件参考。memory 单块 CMD17／24，多块以一次 CMD18／25、CMD12 和 CMD13 READY 结束；combo 不同时维护 memory portion。默认速度使用精确 PLL48 与经 RM／勘误联合验证的分频；另选精确 F407 `hse8-pll150-sdio375`、裸机四位 SD／MMC 37.5 MHz 高速 SDR，须完成 SD CMD6 或 MMC HS52 协商。该 profile 不授予 USB／RNG 或低功耗；不提供其他高速组合、DDR／HS200 | [SDIO 合同](../../soc/stm32/stm32f4/sdk/hal_config/sdio/README.md) |
 | FSMC | 运行期 CPU window、永久 startup SRAM、parallel16，以及显式 PSRAM、有限 NOR program／erase、raw NAND／OOB／ECC 码；bank 与 mux／burst／WAIT 按封装和所选模式授权，无 FTL 或自动纠错 | [FSMC 合同](../design/f407-fsmc.md)、[存储边界](../design/f407-storage.md) |
 | FMC SDRAM | F479NI Bank1、8 MiB、16-bit、row12／column8；默认 CPU 数据窗口不授予 DMA。显式 `graphics-owned` 通过 `memory_window` 引用，仅给所选 LTDC 只读、DMA2D 读写区域，共同保留原始 bank lease 直至冷退出。两种模式均检查七组时序、上电／刷新／自刷新等待与原 System epoch；WFDIS 共享约束在取得 gate 后实际观察。不授予启动 RAM、XIP、自动 MPU 或实装 RAM 时序资格 | [FMC／外部存储](../design/f407-fsmc.md) |
 | QuadSPI／串行 NOR | F479NI＋W25Q128JV Flash1、24-bit SDR 1-1-1；PIO 读／program／4 KiB erase。可选 `qspi-indirect-dma` 仅把 page-program 的 payload 交给 DMA2 Stream7 Channel3，读／status／verify 保持 PIO；PIO 不分配 DMA 可变扩展。memory TC、QSPI idle、NOR WIP 与 SETTLED 分别证明；取消和失败排空保留贷款。公共 async stop 保留 PREPARED，Platform cold stop 才归还硬件。可选 W25Q128JVSIQ 六 pad、6Bh／8 dummy 的 1-1-4 quad read，与 program DMA 独立；接管须 QE=1、SUS=0，不写状态或恢复外来 suspend。间接 Flash 端点整个生命周期禁止访问 0x90000000 aperture。另选 `mapped_storage/nor-mapped-cpu` 仅与 PIO 控制器组合，静态分配 1..8 reader slots，只授权 live CPU loan 范围；无 Flash 旁路 face、DMA reader 或 XIP。最后释放失败只保留清理，不能继续读取；不提供 DDR／dual 或自动保护修改 | [间接 QuadSPI](../design/f407-fsmc.md) |
@@ -119,6 +119,6 @@ F415／F417。F411、F446、F479 分别绑定独立 RM／ES profile；F446 的 P
 当前 physical HIL 为 `not_executed`；未知 PCB、晶振精度、跳线、负载和波形保持未知。
 
 所有 vendor、子模块、锁与许可证保留。未选 SDK 不进入默认生产构建闭包；
-[器件目录](../../soc/stm32/stm32f4/devices.json)只描述官方宏、启动和 IRQ 编译事实。
+[器件目录](../../soc/stm32/stm32f4/facts/devices.json)只描述官方宏、启动和 IRQ 编译事实。
 历史范围见[固定重构前源码](https://github.com/X-Gen-Lab/nexus/tree/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18)，
 旧候选、计数和实板结果不重标为当前源码资格。

@@ -52,7 +52,7 @@ function(nexus_google_test name)
         # this directory never becomes a public consumer include.
         target_include_directories(${name} PRIVATE
             "${NEXUS_SOURCE_DIR}/io/private")
-        include("${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/cmake/STM32Official.cmake")
+        include("${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/sdk/STM32Official.cmake")
         nexus_stm32f4_official(${name})
     endif()
     set_property(TARGET ${name} PROPERTY NEXUS_GOOGLE_CONTRACT TRUE)
@@ -139,7 +139,7 @@ nexus_google_test(nexus_io_owner_diagnostic_pipeline_test
 nexus_google_test(nexus_silicon_admission_test
     SOURCES silicon_admission_test.cpp
     LIBRARIES Nexus::Core
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private")
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4")
 nexus_google_test(nexus_core_lifecycle_test SOURCES core_lifecycle_test.cpp
     LIBRARIES Nexus::Core)
 nexus_google_test(nexus_static_lifecycle_test SOURCES static_lifecycle_test.cpp
@@ -148,9 +148,9 @@ nexus_google_test(nexus_platform_lifecycle_test SOURCES platform_lifecycle_test.
     LIBRARIES Nexus::Core)
 nexus_google_test(nexus_stm32_platform_coordinator_test STM32F4_LL
     SOURCES stm32_platform_coordinator_test.cpp
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_coordinator.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_coordinator.c"
     LIBRARIES Nexus::IO
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
         "${NEXUS_SOURCE_DIR}/tests/support/f4_cpu"
         "${NEXUS_SOURCE_DIR}/arch/include")
 target_include_directories(nexus_stm32_platform_coordinator_test SYSTEM PRIVATE
@@ -232,9 +232,9 @@ nexus_google_test(nexus_native_factory_test SOURCES native_factory_test.cpp
     INCLUDES "${native_factory_generated}" "${NEXUS_SOURCE_DIR}/tests/support/native/drivers")
 
 nexus_google_test(nexus_stm32_uart_dma_test STM32F4_LL SOURCES stm32_uart_dma_test.cpp
-    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart/uart.c"
     LIBRARIES Nexus::NativeModel Nexus::Arch
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private")
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4")
 target_include_directories(nexus_stm32_uart_dma_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
     "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
@@ -243,9 +243,9 @@ target_compile_definitions(nexus_stm32_uart_dma_test PRIVATE
     NEXUS_STM32_MODEL STM32F407xx)
 
 nexus_google_test(nexus_irq_wake_stm32_test STM32F4_LL SOURCES irq_wake_stm32_test.cpp
-    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart/uart.c"
     LIBRARIES Nexus::NativeModel Nexus::Arch
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private")
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4")
 target_include_directories(nexus_irq_wake_stm32_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
     "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
@@ -254,8 +254,8 @@ target_compile_definitions(nexus_irq_wake_stm32_test PRIVATE
     NEXUS_STM32_MODEL STM32F407xx)
 
 target_sources(nexus_stm32_uart_dma_test PRIVATE
-    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_hardware.c"
-    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_dma.c")
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart/uart_hardware.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart/uart_dma.c")
 
 target_compile_options(nexus_stm32_uart_dma_test PRIVATE
     "-include${CMAKE_CURRENT_SOURCE_DIR}/stm32_uart_dma_model.h")
@@ -264,10 +264,10 @@ include("${CMAKE_CURRENT_SOURCE_DIR}/spi_dma_owner_factory.cmake")
 
 nexus_google_test(nexus_stm32_spi_dma_test STM32F4_LL
     SOURCES stm32_spi_dma_test.cpp
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/spi.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/spi/spi.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio/gpio.c"
     LIBRARIES Nexus::NativeModel Nexus::Arch
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private")
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4")
 target_include_directories(nexus_stm32_spi_dma_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
     "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
@@ -278,19 +278,19 @@ target_compile_options(nexus_stm32_spi_dma_test PRIVATE
     "-include${CMAKE_CURRENT_SOURCE_DIR}/stm32_dma_model.h")
 
 target_sources(nexus_stm32_spi_dma_test PRIVATE
-    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/spi_dma.c")
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/spi/spi_dma.c")
 target_include_directories(nexus_stm32_spi_dma_test PRIVATE
     "${NEXUS_SOURCE_DIR}/io/private")
 
 nexus_google_test(nexus_stm32_uart_receive_test STM32F4_LL
     SOURCES stm32_uart_receive_test.cpp
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_hardware.c"
-    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_dma.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_receive.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_duplex.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart/uart.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart/uart_hardware.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart/uart_dma.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart/uart_receive.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart/uart_duplex.c"
     LIBRARIES Nexus::NativeModel Nexus::Arch
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private")
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4")
 target_include_directories(nexus_stm32_uart_receive_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
     "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
@@ -302,9 +302,9 @@ target_compile_options(nexus_stm32_uart_receive_test PRIVATE
 
 nexus_google_test(nexus_stm32_uart_stream_test STM32F4_LL
     SOURCES stm32_uart_stream_test.cpp
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart/uart.c"
     LIBRARIES Nexus::NativeModel Nexus::Arch
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private")
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4")
 target_include_directories(nexus_stm32_uart_stream_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
     "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
@@ -313,13 +313,13 @@ target_compile_definitions(nexus_stm32_uart_stream_test PRIVATE
     NEXUS_STM32_MODEL STM32F407xx)
 
 target_sources(nexus_stm32_uart_stream_test PRIVATE
-    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_stream.c")
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart/uart_stream.c")
 
 nexus_google_test(nexus_stm32_adc_stream_test STM32F4_LL
     SOURCES stm32_adc_stream_test.cpp
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc/adc.c"
     LIBRARIES Nexus::NativeModel Nexus::Arch
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private")
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4")
 target_include_directories(nexus_stm32_adc_stream_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
     "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
@@ -330,18 +330,18 @@ target_compile_options(nexus_stm32_adc_stream_test PRIVATE
     "-include${CMAKE_CURRENT_SOURCE_DIR}/stm32_adc_stream_model.h")
 
 target_sources(nexus_stm32_adc_stream_test PRIVATE
-    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc_stream.c"
-    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc_trigger.c"
-    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc_continuous.c")
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc/adc_stream.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc/adc_trigger.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc/adc_continuous.c")
 
 nexus_google_test(nexus_stm32_i2c_register_test STM32F4_LL
     SOURCES i2c_register_test.cpp
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/i2c.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/i2c_cold.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/i2c/i2c.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/i2c/i2c_cold.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio/gpio.c"
         stm32_i2c_storage_model.c
     LIBRARIES Nexus::IO
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
         "${NEXUS_SOURCE_DIR}/arch/include")
 target_include_directories(nexus_stm32_i2c_register_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
@@ -362,14 +362,14 @@ foreach(i2c_family generic stm32)
         "-include${CMAKE_CURRENT_SOURCE_DIR}/i2c_async_register_model.h")
     if(i2c_family STREQUAL "stm32")
         target_sources(${i2c_target} PRIVATE
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/i2c_async.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/i2c_cold.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/i2c/i2c_async.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/i2c/i2c_cold.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio/gpio.c"
             stm32_i2c_storage_model.c)
-        include("${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/cmake/STM32Official.cmake")
+        include("${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/sdk/STM32Official.cmake")
         nexus_stm32f4_official(${i2c_target})
         target_include_directories(${i2c_target} PRIVATE
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private")
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4")
         target_include_directories(${i2c_target} SYSTEM PRIVATE
             "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
             "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
@@ -498,9 +498,9 @@ endif()
 
 # The private entropy health tests use real reviewed LL over a register model.
 nexus_google_test(nexus_entropy_test STM32F4_LL SOURCES entropy_test.cpp
-    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/entropy.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/entropy/entropy.c"
     LIBRARIES Nexus::IO Nexus::Arch
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/include")
 target_include_directories(nexus_entropy_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
@@ -514,9 +514,9 @@ foreach(entropy_profile RANGE 0 3)
     set(entropy_target "nexus_entropy_profile_${entropy_profile}_test")
     nexus_google_test(${entropy_target} STM32F4_LL
         SOURCES entropy_profile_test.cpp
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/entropy.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/entropy/entropy.c"
         LIBRARIES Nexus::IO Nexus::Arch
-        INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
+        INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/include")
     target_include_directories(${entropy_target} SYSTEM PRIVATE
         "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")

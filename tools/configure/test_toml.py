@@ -13,6 +13,7 @@ import unittest
 from unittest.mock import patch
 
 from tools.configure import configure as gate
+from tools.configure import packages
 
 
 class TomlConfigurationTests(unittest.TestCase):
@@ -364,12 +365,13 @@ model_bytes=128
                     ir = gate.resolve_ir(assembly, self.root, test_support=native_fixture(assembly))
                     selected_route = next(item.route for item in ir.controllers
                                           if item.controller == controller)
-                    routes = json.loads((package / "routes.json").read_text())
+                    routes_path = packages.load(package / "package.json").fact("routes")
+                    routes = json.loads(routes_path.read_text())
                     route = next(route for route in routes["routes"] if route["id"] == selected_route)
                     route["dma"] = [dma.split(":")[0] + ":stream99:" +
                                     dma.rsplit(":", 1)[1]
                                     for dma in route["dma"]]
-                    (package / "routes.json").write_text(json.dumps(routes))
+                    routes_path.write_text(json.dumps(routes))
                     for action in (lambda: gate.resolve_ir(assembly, self.root, test_support=native_fixture(assembly)),
                                    lambda: gate.configure(assembly, self.root / "rejected", self.root, test_support=native_fixture(assembly))):
                         with self.assertRaisesRegex(gate.ConfigurationError,
@@ -411,10 +413,11 @@ model_bytes=128
                     assembly.write_text(render_toml(normalized))
                     ir = gate.resolve_ir(assembly, self.root, test_support=native_fixture(assembly))
                     selected = next(item for item in ir.controllers if item.kind == "adc")
-                    routes = json.loads((package / "routes.json").read_text())
+                    routes_path = packages.load(package / "package.json").fact("routes")
+                    routes = json.loads(routes_path.read_text())
                     route = next(route for route in routes["routes"] if route["id"] == selected.route)
                     route["mode_resources"] = {"trigger-dma": ["controller:TIM4"]}
-                    (package / "routes.json").write_text(json.dumps(routes))
+                    routes_path.write_text(json.dumps(routes))
                     result = gate.resolve_ir(assembly, self.root)
                     selected = next(item for item in result.controllers
                                     if item.kind == "adc")

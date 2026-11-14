@@ -1696,6 +1696,7 @@ class PhysicalPartIR:
     flash: Mapping
     memory: tuple[Mapping, ...]
     device: VendorDeviceIR | None = None
+    capabilities: Mapping | None = None
 
 
 @dataclass(frozen=True)

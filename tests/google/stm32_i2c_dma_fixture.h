@@ -5,7 +5,7 @@
  */
 #ifndef NEXUS_STM32_I2C_DMA_FIXTURE_H
 #define NEXUS_STM32_I2C_DMA_FIXTURE_H
-#include "stm32f407_i2c_async.h"
+#include "drivers/i2c/stm32f407_i2c_async.h"
 
 static inline nx_i2c_v1_dma_engine_t I2CDmaEngine(DMA_Stream_TypeDef* stream,
                                                   uint8_t lane, uint8_t channel,

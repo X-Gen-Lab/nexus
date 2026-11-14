@@ -222,9 +222,9 @@ class SaiConfigurationTests(unittest.TestCase):
         result = self.fixture()
         sai, = result.controllers
         text = "\n".join(contract.includes(result))
-        self.assertIn('#include "stm32f4_sai.h"', text)
-        self.assertNotIn('"stm32f407_audio.h"', text)
-        self.assertNotIn('"stm32f407_audio_blocks.h"', text)
+        self.assertIn('#include "drivers/audio/stm32f4_sai.h"', text)
+        self.assertNotIn('"drivers/audio/stm32f407_audio.h"', text)
+        self.assertNotIn('"drivers/audio/stm32f407_audio_blocks.h"', text)
         self.assertEqual("sai", contract.mode_implementation(sai.kind, sai.mode, sai.controller))
         self.assertEqual("nx_stm32_sai_ops", contract.operations(sai))
 
@@ -238,9 +238,9 @@ class SaiConfigurationTests(unittest.TestCase):
     def test_mixed_audio_retains_one_i2s_owner_and_each_selected_backend(self):
         result = self.fixture(mixed=True)
         text = "\n".join(contract.includes(result))
-        self.assertIn('"stm32f4_sai.h"', text)
-        self.assertIn('"stm32f407_audio.h"', text)
-        self.assertIn('"stm32f407_audio_blocks.h"', text)
+        self.assertIn('"drivers/audio/stm32f4_sai.h"', text)
+        self.assertIn('"drivers/audio/stm32f407_audio.h"', text)
+        self.assertIn('"drivers/audio/stm32f407_audio_blocks.h"', text)
         state = "\n".join(line for node in contract.state_declarations(result)
                           for line in node.render())
         self.assertEqual(1, state.count("nx_stm32_audio_clock_t"))
@@ -347,8 +347,8 @@ class SaiConfigurationTests(unittest.TestCase):
         fields = CONTROLLER_CONTRACTS["audio"]
         self.assertFalse(FIELDS - fields.selected_fields)
         self.assertFalse(FIELDS - fields.authored_fields)
-        for path in ("soc/stm32/stm32f4/bindings/sai.json",
-                     "soc/stm32/stm32f4/bindings/sai_policy.json"):
+        for path in ("soc/stm32/stm32f4/drivers/audio/sai.binding.json",
+                     "soc/stm32/stm32f4/drivers/audio/sai_policy.binding.json"):
             self.assertIn(configure.ROOT / path, _F4.snapshots)
 
 

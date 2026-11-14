@@ -16,7 +16,7 @@ class WaveformPolicyTests(unittest.TestCase):
         return self.fixture.provider.WAVEFORM
 
     def facts(self):
-        path = self.fixture.package.source_directory / "bindings/waveform_policy.json"
+        path = self.fixture.package.source_directory / "drivers/timer/waveform_policy.binding.json"
         return json.loads(self.fixture.snapshots[path])["domains"]["waveform"]
 
     def selection(self, route):

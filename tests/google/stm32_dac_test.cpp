@@ -7,7 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
-#include "stm32f407_dac.h"
+#include "drivers/dac/stm32f407_dac.h"
 }
 #include <cstring>
 #include <gmock/gmock.h>

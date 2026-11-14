@@ -8,7 +8,8 @@
  */
 #include "nexus/arch/arch.h"
 extern "C" {
-#include "stm32f407_dma.h"
+#include "drivers/spi/dma.h"
+#include "system/stm32f407_system.h"
 nx_stm32_system_t g_nx_stm32_system;
 #define DMA_STATE    nx_stm32_spi_dma_state_t
 #define DEVICE_STATE nx_stm32_spi_dma_endpoint_state_t

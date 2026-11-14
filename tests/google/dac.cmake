@@ -7,12 +7,12 @@ file(CONFIGURE OUTPUT "${dac_dma_model_config}/nexus_config.h"
     CONTENT "#define NEXUS_IRQ_KERNEL_POLICY 2\n#define NEXUS_CPU_EXTERNAL_IRQ_COUNT 82\n#define NEXUS_IRQ_PRIORITY_BITS 4\n#define NEXUS_IRQ_SYSCALL_PRIORITY 5\n" @ONLY)
 nexus_google_test(nexus_stm32_dac_dma_test STM32F4_LL
     SOURCES stm32_dac_dma_test.cpp
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/exti_hardware.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/dac_dma.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/dac.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/exti/exti_hardware.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/dac/dac_dma.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/dac/dac.c"
     LIBRARIES Nexus::IODACTx Nexus::IODAC Nexus::IODMA Nexus::IOWake Nexus::Arch
     INCLUDES "${dac_dma_model_config}"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private")
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4")
 target_include_directories(nexus_stm32_dac_dma_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
 nexus_use_cmsis_core(nexus_stm32_dac_dma_test)
@@ -27,10 +27,10 @@ target_compile_options(nexus_stm32_dac_dma_test PRIVATE
     "-include${CMAKE_CURRENT_SOURCE_DIR}/stm32_dac_dma_model.h")
 nexus_google_test(nexus_stm32_dac_test STM32F4_LL
     SOURCES stm32_dac_test.cpp
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/exti_hardware.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/dac.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/exti/exti_hardware.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/dac/dac.c"
     LIBRARIES Nexus::IODAC Nexus::Arch
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private")
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4")
 target_include_directories(nexus_stm32_dac_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
 nexus_use_cmsis_core(nexus_stm32_dac_test)
@@ -54,15 +54,15 @@ foreach(dac_density ve zg)
     set(dac_target "nexus_stm32_dac_${dac_density}_factory_test")
     nexus_google_test(${dac_target} STM32F4_LL
         SOURCES stm32_dac_factory_test.cpp "${dac_bundle}/bindings.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/dac.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_cold.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_lifecycle.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_coordinator.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/system_lifecycle.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/dac/dac.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio/gpio.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_cold.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_lifecycle.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_coordinator.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/system_lifecycle.c"
         LIBRARIES Nexus::IO
         INCLUDES "${dac_bundle}"
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
             "${NEXUS_SOURCE_DIR}/arch/include"
             "${NEXUS_SOURCE_DIR}/tests/support/f4_cpu")
     target_include_directories(${dac_target} SYSTEM PRIVATE

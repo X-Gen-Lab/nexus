@@ -4,15 +4,16 @@ set(stm32_root "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4")
 set(stm32_device "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
 nexus_cmsis_core_include(stm32_cmsis)
 add_executable(contract_stm32_system_model
-    "${stm32_root}/system.c" "../stm32_system_test.c")
+    "${stm32_root}/system/clock.c" "${stm32_root}/system/startup.c"
+    "../stm32_system_test.c")
 add_executable(contract_stm32_io_model
-    "${stm32_root}/reset.c"
-    "${stm32_root}/drivers/gpio.c" "${stm32_root}/drivers/uart.c"
-    "${stm32_root}/drivers/spi.c" "${stm32_root}/drivers/i2c.c"
-    "${stm32_root}/drivers/i2c_cold.c"
-    "${stm32_root}/drivers/flash.c" "${stm32_root}/drivers/watchdog.c"
-    "${stm32_root}/drivers/exti.c" "${stm32_root}/drivers/timer.c"
-    "${stm32_root}/drivers/adc.c" "../stm32_io_test.c")
+    "${stm32_root}/system/reset.c"
+    "${stm32_root}/drivers/gpio/gpio.c" "${stm32_root}/drivers/uart/uart.c"
+    "${stm32_root}/drivers/spi/spi.c" "${stm32_root}/drivers/i2c/i2c.c"
+    "${stm32_root}/drivers/i2c/i2c_cold.c"
+    "${stm32_root}/drivers/flash/flash.c" "${stm32_root}/drivers/watchdog/watchdog.c"
+    "${stm32_root}/drivers/exti/exti.c" "${stm32_root}/drivers/timer/timer.c"
+    "${stm32_root}/drivers/adc/adc.c" "../stm32_io_test.c")
 execute_process(COMMAND "${Python3_EXECUTABLE}"
     "${CMAKE_CURRENT_SOURCE_DIR}/generate_constructors.py"
     "${NEXUS_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/stm32_constructors.h"
@@ -27,21 +28,21 @@ foreach(index RANGE 0 ${constructor_last})
     set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${input}")
 endforeach()
 add_executable(contract_stm32_constructor_model
-    "${stm32_root}/drivers/gpio.c" "${stm32_root}/drivers/exti.c"
-    "${stm32_root}/drivers/timer.c" "${stm32_root}/drivers/spi.c"
-    "${stm32_root}/drivers/i2c.c"
-    "${stm32_root}/drivers/i2c_cold.c"
+    "${stm32_root}/drivers/gpio/gpio.c" "${stm32_root}/drivers/exti/exti.c"
+    "${stm32_root}/drivers/timer/timer.c" "${stm32_root}/drivers/spi/spi.c"
+    "${stm32_root}/drivers/i2c/i2c.c"
+    "${stm32_root}/drivers/i2c/i2c_cold.c"
     "../stm32_constructor_test.c")
 target_include_directories(contract_stm32_constructor_model PRIVATE
     "${CMAKE_CURRENT_BINARY_DIR}")
 foreach(target contract_stm32_system_model contract_stm32_io_model
                contract_stm32_constructor_model)
-    include("${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/cmake/STM32Official.cmake")
+    include("${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/sdk/STM32Official.cmake")
     nexus_stm32f4_official(${target})
     target_compile_options(${target} PRIVATE
         "-include${NEXUS_SOURCE_DIR}/tests/google/stm32_official_model.h")
     target_include_directories(${target} PRIVATE
-        "${stm32_root}/private"
+        "${stm32_root}"
         "${stm32_root}/drivers/ip/i2c_v1_async"
         "${NEXUS_SOURCE_DIR}/io/private"
         "${NEXUS_SOURCE_DIR}/arch/include")

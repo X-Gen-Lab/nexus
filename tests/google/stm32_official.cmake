@@ -1,18 +1,19 @@
 # The production F407 entry points execute against official register structs.
 # Only silicon driver translation units receive the host CPU primitive port.
 # Shared targets may also contain GD CPU-model sources; their SDK stays isolated.
-foreach(driver gpio uart uart_dma spi spi_dma i2c timer watchdog adc adc_stream
-               adc_continuous)
+foreach(driver gpio/gpio uart/uart uart/uart_dma spi/spi spi/spi_dma i2c/i2c
+               timer/timer watchdog/watchdog adc/adc adc/adc_stream
+               adc/adc_continuous)
     set_property(SOURCE "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/${driver}.c"
         APPEND PROPERTY COMPILE_OPTIONS
         "-include${CMAKE_CURRENT_SOURCE_DIR}/stm32_official_model.h")
 endforeach()
 
 nexus_google_test(nexus_stm32_official_test STM32F4_LL SOURCES stm32_official_test.cpp
-    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio.c"
-    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio/gpio.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart/uart.c"
     LIBRARIES Nexus::NativeModel Nexus::Arch
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private")
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4")
 target_include_directories(nexus_stm32_official_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
     "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
@@ -21,9 +22,9 @@ target_compile_definitions(nexus_stm32_official_test PRIVATE
     NEXUS_STM32_MODEL STM32F407xx NX_STM32_GPIO_LATCH_MODEL)
 
 nexus_google_test(nexus_stm32_watchdog_test STM32F4_LL SOURCES stm32_watchdog_test.cpp
-    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/watchdog.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/watchdog/watchdog.c"
     LIBRARIES Nexus::IO Nexus::Arch
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private")
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4")
 target_include_directories(nexus_stm32_watchdog_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
     "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")

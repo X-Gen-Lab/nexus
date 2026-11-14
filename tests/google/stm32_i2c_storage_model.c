@@ -6,7 +6,7 @@
  * \date            2026-10-28
  * \copyright       Copyright (c) 2026 Nexus Team
  */
-#include "stm32f407_provider.h"
+#include "system/stm32f407_system.h"
 
 nx_stm32_system_t g_nx_stm32_system;
 #ifdef NEXUS_STM32_MODEL

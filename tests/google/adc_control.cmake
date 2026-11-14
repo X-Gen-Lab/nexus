@@ -3,13 +3,13 @@ nexus_google_test(nexus_adc_format_test SOURCES adc_format_test.cpp adc_group_te
     LIBRARIES Nexus::IO)
 nexus_google_test(nexus_stm32_adc_group_test STM32F4_LL
     SOURCES stm32_adc_group_test.cpp
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc_group.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc_group_blocks.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc_group_automatic.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc_trigger.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc/adc_group.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc/adc_group_blocks.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc/adc_group_automatic.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio/gpio.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc/adc_trigger.c"
     LIBRARIES Nexus::NativeModel Nexus::IO Nexus::Arch
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private")
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4")
 target_include_directories(nexus_stm32_adc_group_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
     "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")

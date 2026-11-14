@@ -21,7 +21,7 @@ class F407UartInstanceTests(unittest.TestCase):
                     if item.controller == name)
 
     def gpio_policy(self):
-        facts = gate.load(gate.ROOT / "soc/stm32/stm32f4/bindings/gpio_policy.json")
+        facts = gate.load(gate.ROOT / "soc/stm32/stm32f4/drivers/gpio/gpio_policy.binding.json")
         return GpioPhasePolicy.from_validated(facts["domains"]["gpio_phase"])
 
     def test_selected_uart_instances_have_exact_immutable_clock_and_irq(self):

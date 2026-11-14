@@ -11,7 +11,7 @@ from types import MappingProxyType
 from tools.configure.configure import _SnapshotReader, resolve_device_facts
 from tools.configure.data_provider import DataProvider
 from tools.configure.device_view import DeviceView
-from tools.configure.packages import Package, load
+from tools.configure.packages import Package, load, read_soc
 
 
 _ROOT = Path(__file__).resolve().parents[3]
@@ -32,11 +32,12 @@ def load_f4_fixture(part, root=_ROOT):
     """Construct one explicit exact-part view, without a cached fallback."""
     reader = _SnapshotReader({})
     package = load(Path(root) / "soc/stm32/stm32f4/package.json", read=reader)
-    selected = DataProvider.from_package(package, reader(package.fact("soc")),
+    soc = read_soc(package, read=reader)
+    selected = DataProvider.from_package(package, soc,
         reader(package.fact("bindings")), read=reader)
     for name in package.facts:
         reader(package.fact(name))
-    scoped = resolve_device_facts(reader(package.fact("soc")), part, selected,
+    scoped = resolve_device_facts(soc, part, selected,
         catalog=reader(package.fact("device_catalog")))
     return F4Fixture(part, package, scoped.provider, scoped.device,
                      MappingProxyType(dict(reader.snapshots)))

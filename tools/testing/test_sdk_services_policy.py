@@ -136,9 +136,10 @@ class SDKServicesPolicyTests(unittest.TestCase):
         generic = {"io/include/nexus/io/traits.h", "io/private/dispatch_checks.h",
                    *("io/src/api/" + name + ".c" for name in
                      ("capture", "timer_pulse", "timer_sequence"))}
-        private = {"soc/stm32/stm32f4/private/" + name + ".h" for name in (
-            "stm32f4_graphics_memory", "stm32f4_irq_wake", "stm32f4_uart",
-            "stm32f4_uart_format", "stm32f4_uart_wire_config")}
+        private = {"soc/stm32/stm32f4/" + name for name in (
+            "drivers/graphics/stm32f4_graphics_memory.h", "private/stm32f4_irq_wake.h",
+            "drivers/uart/instance.h", "drivers/uart/stm32f4_uart_format.h",
+            "drivers/uart/stm32f4_uart_wire_config.h")}
         self.assertLessEqual(generic | private, set(source_sdk.REQUIRED_FILES))
         package = source_sdk.source_packages.load(ROOT / "soc/stm32/stm32f4/package.json")
         self.assertTrue(all(package.exports(ROOT / name) for name in private))
@@ -312,11 +313,11 @@ class SDKServicesPolicyTests(unittest.TestCase):
         source_sdk = importlib.util.module_from_spec(specification)
         specification.loader.exec_module(source_sdk)
         owned = {
-            "soc/stm32/stm32f4/cmake/STM32QSPI.cmake",
-            "soc/stm32/stm32f4/drivers/qspi.c",
-            "soc/stm32/stm32f4/drivers/qspi_dma.c",
-            "soc/stm32/stm32f4/private/stm32f4_qspi.h",
-            "soc/stm32/stm32f4/private/qspi_hal/stm32f4xx_hal_conf.h",
+            "soc/stm32/stm32f4/sdk/STM32QSPI.cmake",
+            "soc/stm32/stm32f4/drivers/memory/qspi.c",
+            "soc/stm32/stm32f4/drivers/memory/qspi_dma.c",
+            "soc/stm32/stm32f4/drivers/memory/stm32f4_qspi.h",
+            "soc/stm32/stm32f4/sdk/hal_config/qspi/stm32f4xx_hal_conf.h",
         }
         reference = {"tests/contracts/stm32f4_qspi/" + name for name in (
             "consumer.c", "CMakeLists.txt", "f479ni-qspi.toml",
@@ -566,7 +567,7 @@ class SDKServicesPolicyTests(unittest.TestCase):
                 elif defect == "duplicate":
                     rows.append(dict(row))
                 elif defect == "private":
-                    private = sdk / "soc/stm32/stm32f4/private"
+                    private = sdk / "soc/stm32/stm32f4"
                     row["arguments"].append("-I" + str(private))
                 elif defect == "operand":
                     row["arguments"][-1] = str(source / "another.c")

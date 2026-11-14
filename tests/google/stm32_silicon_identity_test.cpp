@@ -7,7 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
-#include "stm32f4_platform_lifecycle_impl.h"
+#include "system/stm32f4_platform_lifecycle_impl.h"
 nx_stm32_system_t g_nx_stm32_system{};
 }
 #include <cstring>

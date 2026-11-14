@@ -27,17 +27,17 @@ foreach(i2c_pair_family stm32)
             SOURCES i2c_pair_factory_test.cpp
             "${i2c_pair_bundle}/bindings.c"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/i2c_v1_async/i2c_v1_async.c"
-            "${NEXUS_SOC_SOURCE_${i2c_pair_soc}}/drivers/i2c_async.c"
-            "${NEXUS_SOC_SOURCE_${i2c_pair_soc}}/drivers/gpio.c"
-            "${NEXUS_SOC_SOURCE_${i2c_pair_soc}}/drivers/platform_cold.c"
-            "${NEXUS_SOC_SOURCE_${i2c_pair_soc}}/drivers/platform_lifecycle.c"
-            "${NEXUS_SOC_SOURCE_${i2c_pair_soc}}/drivers/platform_coordinator.c"
-            "${NEXUS_SOC_SOURCE_${i2c_pair_soc}}/drivers/system_lifecycle.c"
+            "${NEXUS_SOC_SOURCE_${i2c_pair_soc}}/drivers/i2c/i2c_async.c"
+            "${NEXUS_SOC_SOURCE_${i2c_pair_soc}}/drivers/gpio/gpio.c"
+            "${NEXUS_SOC_SOURCE_${i2c_pair_soc}}/system/platform_cold.c"
+            "${NEXUS_SOC_SOURCE_${i2c_pair_soc}}/system/platform_lifecycle.c"
+            "${NEXUS_SOC_SOURCE_${i2c_pair_soc}}/system/platform_coordinator.c"
+            "${NEXUS_SOC_SOURCE_${i2c_pair_soc}}/system/system_lifecycle.c"
             LIBRARIES Nexus::IO Nexus::Arch
             INCLUDES "${i2c_pair_bundle}"
                 "${NEXUS_SOURCE_DIR}/tests/support/f4_cpu"
                 "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/i2c_v1_async"
-                                "${NEXUS_SOC_SOURCE_${i2c_pair_soc}}/private")
+                                "${NEXUS_SOC_SOURCE_${i2c_pair_soc}}")
         if(i2c_pair_mode STREQUAL "irq")
             target_compile_definitions(${i2c_pair_target} PRIVATE NX_I2C_PAIR_IRQ)
         endif()
@@ -46,7 +46,7 @@ foreach(i2c_pair_family stm32)
         target_compile_definitions(${i2c_pair_target} PRIVATE
             _init=nx_i2c_pair_fixture_init _fini=nx_i2c_pair_fixture_fini)
         target_sources(${i2c_pair_target} PRIVATE
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/i2c_cold.c")
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/i2c/i2c_cold.c")
         target_include_directories(${i2c_pair_target} SYSTEM PRIVATE
             "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
         target_compile_definitions(${i2c_pair_target} PRIVATE

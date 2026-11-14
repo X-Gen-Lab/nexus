@@ -7,9 +7,11 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
+#include "drivers/spi/dma.h"
+#include "nexus/core/time.h"
 #include "nexus/io/native/model.h"
 #include "spi_dma_sequence.h"
-#include "stm32f407_dma.h"
+#include "system/stm32f407_system.h"
 extern const nx_spi_dma_sequence_backend_t nx_stm32_spi_dma_sequence_backend;
 nx_stm32_system_t g_nx_stm32_system;
 GPIO_TypeDef g_nx_stm32_gpioa_model;

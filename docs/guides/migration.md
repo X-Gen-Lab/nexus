@@ -187,9 +187,11 @@ remain handwritten C. Revalidate selected modes and consumers instead of
 inheriting qualification from that source change. Native fixtures live under
 `tests/support/native/` and require explicit test support.
 
-Private F4 IP belongs to `soc/stm32/stm32f4/drivers/ip/`; there is no root MCU
-`drivers/` directory. Update private includes, configuration inputs, CMake source
-selection and SDK payload together. The [source map](../explanation/source-map.md)
+F4 facts now live in `facts/`, system mechanisms in `system/`, and bindings,
+instance layouts and C implementations in `drivers/<domain>/`. Shared private IP
+stays in `drivers/ip/`; official SDK selection and HAL configuration live in
+`sdk/`. Update private includes, manifest inputs, CMake source selection and SDK
+payload together. The [source map](../explanation/source-map.md)
 and [provider guide](provider-porting.md) describe current ownership. Original
 cross-family layouts remain traceable at the [fixed prior source](https://github.com/X-Gen-Lab/nexus/tree/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18).
 

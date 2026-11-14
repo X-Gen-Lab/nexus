@@ -42,7 +42,7 @@ lifecycle operation without resetting its state. A cold or stopped face remains
 valid and rejects data calls with STATE. Clock failure or an epoch change stops
 data publication while cleanup remains available.
 
-The [System contract](../../../soc/stm32/stm32f4/README-system-power.md) defines
+The [System contract](../../../soc/stm32/stm32f4/system/README.md) defines
 clock authority and recovery. RNG health checks and software models establish
 neither physical min-entropy nor HIL qualification.
 

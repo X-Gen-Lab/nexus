@@ -7,8 +7,8 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
-#include "stm32f407_clock.h"
-#include "stm32f407_i2c_target.h"
+#include "drivers/i2c/stm32f407_i2c_target.h"
+#include "system/stm32f407_clock.h"
 RCC_TypeDef nx_target_rcc;
 I2C_TypeDef nx_target_i2c[3];
 GPIO_TypeDef nx_target_gpio[9];

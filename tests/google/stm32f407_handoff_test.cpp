@@ -7,7 +7,7 @@
 #include "clock_domain_impl.h"
 #include "nexus/components/stm32f407_handoff.h"
 #include "stm32f407_handoff_model.h"
-#include "stm32f407_system.h"
+#include "system/stm32f407_system.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <map>

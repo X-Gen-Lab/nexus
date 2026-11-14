@@ -8,7 +8,7 @@
  */
 #include "nexus/arch/arch.h"
 extern "C" {
-#include "stm32f407_pvd.h"
+#include "drivers/exti/stm32f407_pvd.h"
 }
 #include <cstring>
 #include <gmock/gmock.h>

@@ -7,8 +7,8 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
+#include "drivers/usb/stm32f407_usb_host.h"
 #include "nexus/io/native/model.h"
-#include "stm32f407_usb_host.h"
 }
 #include <array>
 #include <cstring>

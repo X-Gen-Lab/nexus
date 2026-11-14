@@ -2,10 +2,10 @@
 # Author: Nexus Team
 nexus_google_test(nexus_f407_timer_waveform_test STM32F4_LL
     SOURCES f407_timer_waveform_test.cpp
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/av.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/timer_waveform.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/av/av.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/timer/timer_waveform.c"
     LIBRARIES Nexus::IO Nexus::Arch
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
         "${NEXUS_SOURCE_DIR}/tests/google")
 target_include_directories(nexus_f407_timer_waveform_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")

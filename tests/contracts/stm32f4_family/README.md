@@ -7,7 +7,7 @@ STM32F405ZGT6、F407ZGT6、F415ZGT6、F417ZGT6；`f411re.toml`、`f446ze.toml`�
 不描述实体 PCB，不替代 `boards/` 中四个 F407 开发板包。
 
 各装配仅选择内部时钟与 CRC，不选择外部振荡源或外设引脚。当前参数如下；完整
-静态元组以各 TOML 为准，[System 合同](../../../soc/stm32/stm32f4/README-system-power.md)
+静态元组以各 TOML 为准，[System 合同](../../../soc/stm32/stm32f4/system/README.md)
 说明供电、辅助 PLL、启动回读和退出责任。
 
 | TOML | SYSCLK／AHB | APB1／APB2 | 主 PLL M/N/P/Q | Flash wait states |

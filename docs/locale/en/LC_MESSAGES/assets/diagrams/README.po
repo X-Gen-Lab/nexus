@@ -1,12 +1,11 @@
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: bb0107f7ef8458b5f8503d07050984c26a59d90ab5a05e030820b1472137330e\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 313392fce86dd4e406b697864da24d0c287db14c325224512154b620e83d2b76\n"
 
 msgid "当前架构图册"
 msgstr "Current architecture diagrams"
 
 msgid "图源为可编辑 DOT，输出为本地 SVG；`labels.json` 维护同一拓扑的中英文标签。 实线和虚线以各边标签为准，不能把源码依赖理解为每次 I/O 的转发，也不能由图推导 软件候选、吞吐、低功耗或物理 HIL。当前 MCU 入口为 F4，精确器件与模式见 [支持范围](../../delivery/support.md)；图中参考装配不授权其他配置。"
 msgstr "Editable DOT sources produce local SVG files; `labels.json` maintains English and Chinese labels for the same topology. Edge labels define solid and dashed arrows. Source dependencies do not imply forwarding on every I/O call, and diagrams establish no software candidate, throughput, low-power or physical HIL result. The current MCU entry is F4; see [support scope](../../delivery/support.md) for exact devices and modes. A diagram reference assembly authorizes no other configuration."
-
 
 msgid "纯退役芯片图已退出当前图册，原图可从 [固定旧源码](https://github.com/X-Gen-Lab/nexus/tree/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18/docs/assets/diagrams) 追溯。机器身份与范围见 {download}`diagram-index.csv <diagram-index.csv>`，原始执行证据不重标。"
 msgstr "Diagrams dedicated to retired chips have left the current gallery. Their originals remain traceable at the [fixed prior source](https://github.com/X-Gen-Lab/nexus/tree/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18/docs/assets/diagrams). Machine identities and scope are in {download}`diagram-index.csv <diagram-index.csv>`; original execution evidence is not relabeled."
@@ -46,9 +45,6 @@ msgstr "{download}`Editable DOT <build-targets.dot>`."
 
 msgid "FIG-03 配置与原子生成"
 msgstr "FIG-03 Configuration and atomic generation"
-
-msgid "包声明、Board 与 TOML 沿同一输入快照进入通用政策与具名 IR，再形成有限静态连接 和原子 bundle。包只选择 CMake 入口，CMake 拥有唯一 C 源码图；失败不继续使用旧 输出或半成品。全部箭头表示构建期数据或产物依赖。"
-msgstr "Package declarations, Board and TOML pass through one input snapshot into generic policies and named IR, then form bounded static connections and an atomic bundle. A package selects the CMake entry; CMake owns the sole C source graph. Failures do not continue with stale or partial output. Every arrow denotes build-time data or artifact dependencies."
 
 msgid "![FIG-03：配置与原子生成](configuration-generation.svg)"
 msgstr "![FIG-03: Configuration and atomic generation](configuration-generation.svg)"
@@ -272,9 +268,6 @@ msgstr "{download}`Editable DOT <i3c-core-lifecycle.dot>`."
 msgid "FIG-31 F4 源码归属与接口边界"
 msgstr "FIG-31: F4 source ownership and interface boundaries"
 
-msgid "包内事实、binding、Board 和 TOML 由通用配置器生成静态实例与固定连接；F4 私有 C 拥有硬件算法和官方库适配。虚线是构建／测试依赖，实线是公共 I/O 调用，不增加 运行时转发层，也不把参考模型提升为生产或实板资格。"
-msgstr "The generic configuration tool turns package facts, bindings, Board and TOML into static instances and fixed connections. Private F4 C owns hardware algorithms and official SDK adaptation. Dashed edges mean build/test dependencies; solid edges mean public I/O calls. They add no runtime forwarding layer and do not promote reference models to production or physical qualification."
-
 msgid "![FIG-31：F4 源码归属与接口边界](driver-source-ownership.svg)"
 msgstr "![FIG-31: F4 source ownership and interface boundaries](driver-source-ownership.svg)"
 
@@ -301,3 +294,9 @@ msgstr "{download}`Editable DOT <lwip-tcp-tls-mqtt-host.dot>`."
 
 msgid "未注册的补充图保留自己的图内范围，仍参加成对输出和双语检查。当前结构的正文 以[架构](../../delivery/architecture.md)和[源码定位](../../explanation/source-map.md)为准。"
 msgstr "Unregistered supplemental diagrams keep their own stated scope and still undergo paired-output and bilingual checks. For the current structure, use [architecture](../../delivery/architecture.md) and the [source map](../../explanation/source-map.md)."
+
+msgid "包声明、Board 与 TOML 沿同一输入快照进入通用政策与具名 IR，再形成有限静态连接 和原子 bundle。包只选择 CMake 入口，CMake 拥有唯一 C 源码图；失败不继续使用旧 输出或半成品。F4 的 `facts/` 与相邻领域 binding 通过 manifest 显式选择，全部 箭头表示构建期数据或产物依赖。"
+msgstr "The package declaration, Board and TOML enter generic policies and named IR through one input snapshot, then form bounded static connections and an atomic bundle. The package only selects a CMake entry; CMake owns the sole C source graph. Failure never continues with stale or partial output. The manifest explicitly selects F4 facts under `facts/` and adjacent domain bindings. Every arrow denotes build-time data or artifact dependencies."
+
+msgid "包内 `facts/`、相邻 binding、Board 和 TOML 由通用配置器生成静态实例与固定连接。 `system/` 拥有系统与共享生命周期，`drivers/<domain>/` 拥有控制器行为，`sdk/` 选择私有官方库。虚线是构建／测试依赖，实线是公共 I/O 调用；图不增加运行时层， 也不把参考模型提升为生产或实板资格。"
+msgstr "The generic configurator turns package-local `facts/`, adjacent bindings, Board and TOML into static instances and fixed connections. `system/` owns system mechanisms and the shared lifecycle; `drivers/<domain>/` owns controller behavior; `sdk/` selects private official libraries. Dashed edges denote build/test dependencies and solid edges denote public I/O calls. The diagram adds no runtime layer and does not promote reference models to production or physical qualification."

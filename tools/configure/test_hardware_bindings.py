@@ -14,7 +14,8 @@ from tools.configure import configure, packages
 class SnapshotReader:
     def __init__(self, package):
         self.raw = {package.fact(name): package.fact(name).read_bytes()
-                    for name in ("bindings", "soc", "routes", "device_catalog")}
+                    for name in ("bindings", "soc", "routes", "device_catalog",
+                                 "controllers", "clocks") if name in package.facts}
         self.calls = []
 
     def __call__(self, path):
@@ -39,7 +40,8 @@ class CommonHardwareBindingTests(unittest.TestCase):
         package = packages.find(configure.ROOT, "stm32f4")
         reader = SnapshotReader(package)
         expected = {name: hashlib.sha256(reader.raw[package.fact(name)]).hexdigest()
-                    for name in ("bindings", "soc", "routes", "device_catalog")}
+                    for name in ("bindings", "soc", "routes", "device_catalog",
+                                 "controllers", "clocks") if name in package.facts}
         with patch.object(Path, "read_bytes", side_effect=AssertionError("unsealed read")):
             facts = module.load_hardware(package, read=reader)
         self.assertEqual(dict(facts.FACT_SHA256), expected)
@@ -59,7 +61,7 @@ class CommonHardwareBindingTests(unittest.TestCase):
         channels["PAD_X"] = 24
         del channels["PA0"]
         bindings["channel_bounds"]["adc"] = [0, 31]
-        controllers = documents[package.fact("soc")]["controller_groups"][
+        controllers = documents[package.fact("controllers")]["controller_groups"][
             bindings["controller_group"]]["controllers"]
         for name in bindings["adc_channels"][0]["controllers"]:
             controllers[name]["pins"] = ["PAD_X" if pin == "PA0" else pin

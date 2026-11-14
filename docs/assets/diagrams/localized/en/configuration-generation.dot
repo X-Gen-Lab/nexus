@@ -5,8 +5,8 @@ digraph ConfigurationGeneration {
     node [shape=box, style="rounded,filled", fillcolor="#eff6ff", color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC", fontsize=12, margin="0.16,0.10"];
     edge [color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC", fontsize=11, arrowsize=0.8];
     assembly [label="One authored TOML assembly", fillcolor="#f8fafc"];
-    package [label="package.json\nFacts, binding_files and build entry", fillcolor="#f8fafc"];
-    socFacts [label="SoC / CPU / routes / review facts", fillcolor="#f8fafc"];
+    package [label="package.json\nfacts/, adjacent bindings and build entry", fillcolor="#f8fafc"];
+    socFacts [label="facts/: devices / controllers / clocks / routes / references", fillcolor="#f8fafc"];
     boardFacts [label="Board wiring and electrical authorization", fillcolor="#f8fafc"];
     authored [label="Strict field checks\nFrozen AuthoredAssembly"];
     reader [label="One controlled snapshot of selected inputs\nByte identities and pre-publication recheck"];

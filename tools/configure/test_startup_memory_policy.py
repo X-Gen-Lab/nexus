@@ -12,11 +12,11 @@ from tools.configure.policies.external_bus import ExternalBusPolicy
 class StartupMemoryPolicyTests(unittest.TestCase):
     def facts(self):
         return configure.load(configure.ROOT /
-            "soc/stm32/stm32f4/bindings/startup_memory.json")["domains"]["startup_memory"]
+            "soc/stm32/stm32f4/private/bindings/startup_memory.json")["domains"]["startup_memory"]
 
     def external(self):
         return configure.load(configure.ROOT /
-            "soc/stm32/stm32f4/bindings/external_bus_policy.json")["domains"]["external_bus"]
+            "soc/stm32/stm32f4/drivers/memory/external_bus_policy.binding.json")["domains"]["external_bus"]
 
     def test_common_import_does_not_select_a_family(self):
         result = subprocess.run([sys.executable, "-c", (

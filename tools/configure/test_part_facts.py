@@ -1,5 +1,6 @@
 """Exact part policy and emitted physical geometry share validated facts."""
 from tools.configure.tests.device_fixture import (load_soc_facts,
+                                                   load_authored_soc,
                                                    validate_soc_facts)
 from tools.configure.tests.native_fixture import native_fixture
 import copy
@@ -31,10 +32,10 @@ class PartFactsTests(unittest.TestCase):
 
         # Change the author fact and resolve a new sealed selection. Replacing
         # only one downstream IR projection would leave its provider unchanged.
-        fixture.update("soc/stm32/stm32f4/soc.json", lambda soc: memory(soc, size=65536))
+        fixture.update("soc/stm32/stm32f4/facts/soc.json", lambda soc: memory(soc, size=65536))
         source = bindings.emit(fixture.resolve())[1]
         self.assertIn(".begin = 536870912u, .size = 65536u,", source)
-        fixture.update("soc/stm32/stm32f4/soc.json", lambda soc: memory(soc, dma=False))
+        fixture.update("soc/stm32/stm32f4/facts/soc.json", lambda soc: memory(soc, dma=False))
         with self.assertRaisesRegex(ValueError, "Ethernet.*memory"):
             bindings.emit(fixture.resolve())
 
@@ -51,7 +52,7 @@ class PartFactsTests(unittest.TestCase):
                 # This is data-schema admission, not a software support grant.
 
     def test_f407_package_and_ccm_facts_match_reviewed_ds8626_and_rm0090(self):
-        facts = load_soc_facts(gate.ROOT / "soc/stm32/stm32f4/soc.json")
+        facts = load_soc_facts(gate.ROOT / "soc/stm32/stm32f4/facts/soc.json")
         for part, package in (("STM32F407VET6", "LQFP100"),
                               ("STM32F407ZGT6", "LQFP144")):
             with self.subTest(part=part):
@@ -84,7 +85,7 @@ class PartFactsTests(unittest.TestCase):
                               (overlap, "Overlapping"),
                               (linker_domains, "default RAM")):
             with self.subTest(contract=mutate.__name__):
-                facts = load_soc_facts(gate.ROOT / "soc/stm32/stm32f4/soc.json")
+                facts = load_soc_facts(gate.ROOT / "soc/stm32/stm32f4/facts/soc.json")
                 mutate(facts["variants"]["STM32F407ZGT6"])
                 with self.assertRaisesRegex(ValueError, error):
                     validate_soc_facts(facts, "STM32F407VET6")
@@ -92,7 +93,7 @@ class PartFactsTests(unittest.TestCase):
     def test_full_variant_validation_preserves_selected_fact_identity(self):
         for provider in descriptor.families():
             path = gate.ROOT / provider.source_directory / "soc.json"
-            for part in gate.load(path)["variants"]:
+            for part in load_authored_soc(path)["variants"]:
                 with self.subTest(family=provider.family, part=part):
                     facts = load_soc_facts(path, part=part)
                     original = copy.deepcopy(facts)
@@ -103,7 +104,7 @@ class PartFactsTests(unittest.TestCase):
     def test_malformed_memory_entries_are_configuration_rejections(self):
         for selected in ("STM32F407VET6", "STM32F407ZGT6"):
             with self.subTest(selected=selected):
-                facts = load_soc_facts(gate.ROOT / "soc/stm32/stm32f4/soc.json")
+                facts = load_soc_facts(gate.ROOT / "soc/stm32/stm32f4/facts/soc.json")
                 facts["variants"]["STM32F407ZGT6"]["memory"] = [False]
                 with self.assertRaisesRegex(ValueError, "memory"):
                     validate_soc_facts(facts, selected)

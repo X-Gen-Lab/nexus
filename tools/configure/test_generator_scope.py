@@ -38,7 +38,8 @@ class GeneratorScopeTests(unittest.TestCase):
         self.assertFalse(any(name.startswith("tools/configure/stm32f4")
                              for name in names))
         inputs = {row["path"] for row in resolved.inputs}
-        for relative in ("package.json", "bindings.json", "bindings/uart.json"):
+        for relative in ("package.json", "facts/bindings.json", "facts/controllers.json",
+                         "facts/clocks.json", "drivers/uart/binding.json"):
             self.assertTrue(any(name.endswith("soc/stm32/stm32f4/" + relative)
                                 for name in inputs), relative)
 

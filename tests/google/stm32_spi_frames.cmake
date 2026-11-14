@@ -1,11 +1,11 @@
 # One exact production SPI frame owner against external CPU/MMIO boundaries.
 nexus_google_test(nexus_stm32_spi_frames_test STM32F4_LL
     SOURCES stm32_spi_frames_test.cpp
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/spi_frames.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/spi_frames_cold.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/spi/spi_frames.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/spi/spi_frames_cold.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio/gpio.c"
     LIBRARIES Nexus::IO Nexus::Arch
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private")
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4")
 target_include_directories(nexus_stm32_spi_frames_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
 nexus_use_cmsis_core(nexus_stm32_spi_frames_test)
@@ -29,16 +29,16 @@ endif()
 nexus_google_configuration_inputs("${spi_frames_bundle}")
 nexus_google_test(nexus_stm32_spi_frames_factory_test STM32F4_LL
     SOURCES stm32_spi_frames_factory_test.cpp "${spi_frames_bundle}/bindings.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/spi_frames.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/spi_frames_cold.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_cold.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_lifecycle.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_coordinator.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/system_lifecycle.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/spi/spi_frames.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/spi/spi_frames_cold.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio/gpio.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_cold.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_lifecycle.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_coordinator.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/system_lifecycle.c"
     LIBRARIES Nexus::IO
     INCLUDES "${spi_frames_bundle}"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
         "${NEXUS_SOURCE_DIR}/tests/support/f4_cpu"
         "${NEXUS_SOURCE_DIR}/arch/include")
 target_include_directories(nexus_stm32_spi_frames_factory_test SYSTEM PRIVATE

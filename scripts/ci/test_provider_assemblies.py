@@ -99,6 +99,39 @@ class USBRemoteCompileSelection(unittest.TestCase):
             gate.require_usb_remote_selection(self.resolved, [entry])
 
 
+class USBPackageSourceSelection(unittest.TestCase):
+    def test_usb_compile_audit_uses_declared_package_and_actual_ops_source(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            package = root / "soc/acme/reviewed"
+            source = package / "transports/controller.c"
+            source.parent.mkdir(parents=True)
+            for name in ("soc.json", "routes.json"):
+                (package / name).write_text("{}\n")
+            (package / "CMakeLists.txt").write_text("# Fixture entry.\n")
+            (package / "package.json").write_text(json.dumps({
+                "schema_version": 1, "interface_version": 1, "id": "reviewed",
+                "family": "stm32f4", "vendor": "acme", "source_directory": ".",
+                "facts": {"soc": "soc.json", "routes": "routes.json"},
+                "dependencies": {},
+                "cmake": {"entry": "CMakeLists.txt", "target": "reviewed_usb"},
+                "exports": {"roots": ["."], "exclude": []}}))
+            public = root / "io/include/nexus/io/usb.h"
+            public.parent.mkdir(parents=True)
+            public.write_text("typedef struct { int (*start)(void*); } "
+                "nx_usb_device_ops_t; typedef struct { "
+                "const nx_usb_device_ops_t* ops; void* context; } nx_usb_device_t;")
+            source.write_text("const nx_usb_device_ops_t nx_usb_fs_device_ops = "
+                              "{.start = actual_start};\n")
+            selected = {"soc_family": "stm32f4", "controllers": [
+                {"kind": "usb_device", "remote_wakeup": True}]}
+            entry = {"directory": str(root), "file": str(source),
+                "output": "CMakeFiles/reviewed_usb.dir/transports/controller.c.obj",
+                "arguments": ["cc", "-DNEXUS_STM32F4_USB_REMOTE_WAKEUP=1",
+                              "-c", str(source)]}
+            gate.require_usb_remote_selection(selected, [entry], root=root)
+
+
 class FixtureAdmission(unittest.TestCase):
     def test_unselected_inventory_does_not_mask_real_tool_admission(self):
         source = source_identity.observe_git_source(ROOT)

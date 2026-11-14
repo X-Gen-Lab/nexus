@@ -6,11 +6,11 @@
  * \date            2026-11-02
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "drivers/entropy/stm32f407_entropy.h"
 #include "nexus/arch/arch.h"
 #include "nexus/io/entropy.h"
-#include "stm32f407_clock.h"
-#include "stm32f407_entropy.h"
-#include "stm32f407_system.h"
+#include "system/stm32f407_clock.h"
+#include "system/stm32f407_system.h"
 #include <algorithm>
 #include <array>
 #include <cstring>

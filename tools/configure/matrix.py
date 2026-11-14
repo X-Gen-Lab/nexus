@@ -59,7 +59,7 @@ def package_views(root):
         # projecting any facts; a later change cannot acquire the old values.
         for path in package.inputs:
             reader.snapshot_bytes(path)
-        soc = reader(package.fact("soc"))
+        soc = packages.read_soc(package, read=reader)
         provider = DataProvider.from_package(package, soc,
             reader(package.fact("bindings")), read=reader)
         route_doc = reader(package.fact("routes"))

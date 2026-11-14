@@ -9,6 +9,7 @@
 #include "eth_frames_mac.h"
 #include "eth_clock.h"
 #include "eth_frames_validation.h"
+#include "nexus/arch/arch.h"
 #ifdef NX_ETH_FRAMES_NATIVE
 #include "ethernet_frames_access.h"
 #endif

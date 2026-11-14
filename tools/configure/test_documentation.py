@@ -60,7 +60,7 @@ class DocumentationConfigurationTests(unittest.TestCase):
                        "```toml\n[broken\n```\n")
 
     def test_runtime_uses_adjacent_inline_facts_and_actual_resolver(self):
-        facts = load_soc_facts(gate.ROOT / "soc/stm32/stm32f4/soc.json")
+        facts = load_soc_facts(gate.ROOT / "soc/stm32/stm32f4/facts/soc.json")
         package = {"schema_version": 1, "cpu": facts["cpu"],
                    "irq": facts["irq"], "clock_hz": 168000000}
         contents = ('```toml\nschema_version=1\ncpu_facts="cpu.json"\n'

@@ -105,7 +105,7 @@ P21/P15 是人工复用跳帽；不能虚构软件 standby GPIO，也不能把�
 当作实物跳帽证明。CAN1 与 USART1 RTS/CTS、USB FS 的 PA11/PA12 必须拒绝并选。
 天空星当前没有审阅的外接 CAN transceiver 路线，不猜 Board binding。
 
-F4 绑定位于 `soc/stm32/stm32f4/drivers/can.c`，控制器机制位于
+F4 绑定位于 `soc/stm32/stm32f4/drivers/can/can.c`，控制器机制位于
 `soc/stm32/stm32f4/drivers/ip/classic_can/`；真实硬件定义来自锁定的
 `vendors/st/cmsis_device_f4/`。Native 叶端口位于
 `tests/support/native/drivers/can*`。当前 GoogleTest/GoogleMock、配置／factory／

@@ -7,7 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
-#include "stm32f4_exti_hardware.h"
+#include "drivers/exti/stm32f4_exti_hardware.h"
 nx_result_t nx_stm32_exti_hardware_admit(const nx_stm32_exti_hardware_state_t*,
                                          const nx_stm32_exti_hardware_config_t*)
     __attribute__((weak));

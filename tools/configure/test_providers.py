@@ -128,7 +128,7 @@ class ProviderContractTests(unittest.TestCase):
             common.mode_traits("uart", "dma-unimplemented")
 
     def test_unknown_family_cannot_inherit_cortex_m4_abi(self):
-        soc = load_soc_facts(gate.ROOT / "soc/stm32/stm32f4/soc.json")
+        soc = load_soc_facts(gate.ROOT / "soc/stm32/stm32f4/facts/soc.json")
         soc["id"] = "unmaintained-m4"
         with self.assertRaisesRegex(gate.ConfigurationError,
                                     "Unmaintained SoC integration (?:descriptor|provider)"):

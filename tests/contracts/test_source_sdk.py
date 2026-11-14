@@ -324,11 +324,11 @@ class SourceSDKSelectionTests(unittest.TestCase):
     def test_selected_f407_audio_public_closure_is_required(self):
         required = {
             "tools/configure/policies/capture_audio.py",
-            "soc/stm32/stm32f4/bindings/capture_audio_policy.json",
-            "soc/stm32/stm32f4/drivers/audio.c",
-            "soc/stm32/stm32f4/drivers/av.c",
-            "soc/stm32/stm32f4/private/stm32f407_audio.h",
-            "soc/stm32/stm32f4/private/stm32f407_av.h",
+            "soc/stm32/stm32f4/private/bindings/capture_audio_policy.json",
+            "soc/stm32/stm32f4/drivers/audio/audio.c",
+            "soc/stm32/stm32f4/drivers/ip/av/av.c",
+            "soc/stm32/stm32f4/drivers/audio/stm32f407_audio.h",
+            "soc/stm32/stm32f4/drivers/ip/av/stm32f407_av.h",
             "tools/configure/assemblies/sky-i2s2-slave-tx.toml",
             "tools/configure/assemblies/qiming-i2s2-slave-tx.toml",
             "tools/configure/assemblies/f407-audio-reference/ve/board.json",
@@ -498,7 +498,7 @@ class SourceSDKSTM32OfficialSelectionTests(unittest.TestCase):
         required = {
             "dependencies/stm32f4-hal.lock.json",
             "tools/maintenance/stm32f4_hal_lock.py",
-            "soc/stm32/stm32f4/cmake/STM32Official.cmake",
+            "soc/stm32/stm32f4/sdk/STM32Official.cmake",
             "vendors/st/stm32f4_hal/LICENSE.md",
             "vendors/st/stm32f4_hal/Inc/stm32f4xx_ll_gpio.h",
             "vendors/st/stm32f4_hal/Inc/stm32f4xx_ll_usart.h",
@@ -507,11 +507,11 @@ class SourceSDKSTM32OfficialSelectionTests(unittest.TestCase):
             "vendors/st/stm32f4_hal/Inc/stm32f4xx_ll_tim.h",
             "vendors/st/stm32f4_hal/Inc/stm32f4xx_ll_iwdg.h",
             "vendors/st/stm32f4_hal/Inc/stm32f4xx_ll_i2c.h",
-            "soc/stm32/stm32f4/drivers/uart_hal.c",
-            "soc/stm32/stm32f4/private/stm32f407_uart_hal.h",
-            "soc/stm32/stm32f4/private/stm32f407_hal_atomic.h",
-            "soc/stm32/stm32f4/private/stm32f407_hal_profile.h",
-            "soc/stm32/stm32f4/private/hal/stm32f4xx_hal_conf.h",
+            "soc/stm32/stm32f4/drivers/uart/uart_hal.c",
+            "soc/stm32/stm32f4/drivers/uart/stm32f407_uart_hal.h",
+            "soc/stm32/stm32f4/drivers/uart/stm32f407_hal_atomic.h",
+            "soc/stm32/stm32f4/drivers/uart/stm32f407_hal_profile.h",
+            "soc/stm32/stm32f4/sdk/hal_config/uart/stm32f4xx_hal_conf.h",
         }
         self.assertTrue(required.issubset(set(source_sdk.required_files(ROOT))),
                         sorted(required - set(source_sdk.required_files(ROOT))))
@@ -1348,7 +1348,7 @@ class SourceSDKTests(unittest.TestCase):
                       (output / "selection.cmake").read_text())
         identity_path = self.sdk / source_sdk.MANIFEST
         identity = json.loads(identity_path.read_text())
-        name = "soc/stm32/stm32f4/memory_init.c"
+        name = "soc/stm32/stm32f4/system/memory.c"
         (self.sdk / name).unlink()
         identity["files_sha256"].pop(name)
         identity["snapshot_sha256"] = hashlib.sha256(json.dumps(
@@ -1474,15 +1474,15 @@ class SourceSDKTests(unittest.TestCase):
             'soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c',
             'soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.h',
             'io/include/nexus/io/mdio.h',
-            'soc/stm32/stm32f4/drivers/usb_device.c',
-            'soc/stm32/stm32f4/private/stm32f407_can.h',
+            'soc/stm32/stm32f4/drivers/usb/usb_device.c',
+            'soc/stm32/stm32f4/drivers/can/stm32f407_can.h',
             'soc/stm32/stm32f4/drivers/ip/classic_can/can_controller.c',
             'soc/stm32/stm32f4/drivers/ip/classic_can/can_controller.h',
             'io/include/nexus/io/advanced_pwm.h',
             'soc/stm32/stm32f4/drivers/ip/advanced_timer/timer_advanced_controller.h',
             'os/freertos/timebase_lowpower.c',
             'os/freertos/private/timebase_lowpower.h',
-            'soc/stm32/stm32f4/timebase_lowpower.c',
+            'soc/stm32/stm32f4/system/timebase_lowpower.c',
             'tools/configure/usb_device.py',
             'tools/configure/ethernet.py',
             'tools/configure/timer_advanced.py',
@@ -1495,8 +1495,8 @@ class SourceSDKTests(unittest.TestCase):
             'components/amp_ipc/include/nexus/components/amp_ipc_storage.h',
             'components/soc/stm32/stm32f407_handoff/CMakeLists.txt',
             'components/soc/stm32/stm32f407_handoff/include/nexus/components/stm32f407_handoff.h',
-            'soc/stm32/stm32f4/handoff.c',
-            'soc/stm32/stm32f4/private/stm32f407_handoff_hw.h',
+            'soc/stm32/stm32f4/system/handoff.c',
+            'soc/stm32/stm32f4/system/stm32f407_handoff_hw.h',
             'io/include/nexus/io/frame_stream.h',
             'io/src/mechanisms/frame_stream.c',
             'components/mapped_storage/CMakeLists.txt',
@@ -1505,10 +1505,10 @@ class SourceSDKTests(unittest.TestCase):
             'components/mapped_storage/include/nexus/components/mapped_storage.h',
             'components/user_io_broker/include/nexus/components/user_io_broker.h',
             'components/dp83848/include/nexus/dp83848/dp83848.h',
-            'soc/stm32/stm32f4/system.c',
-            'soc/stm32/stm32f4/drivers/platform_lifecycle.c',
-            'soc/stm32/stm32f4/drivers/system_lifecycle.c',
-            'soc/stm32/stm32f4/devices.json',
+            'soc/stm32/stm32f4/system/clock.c',
+            'soc/stm32/stm32f4/system/platform_lifecycle.c',
+            'soc/stm32/stm32f4/system/system_lifecycle.c',
+            'soc/stm32/stm32f4/facts/devices.json',
         )
         for name in names:
             with self.subTest(name=name):
@@ -1620,7 +1620,7 @@ class SourceSDKTests(unittest.TestCase):
         names = ["vendors/st/stm32f4_hal/" + name for name in lock["files"]]
         names.extend(("dependencies/stm32f4-hal.lock.json",
                       "tools/maintenance/stm32f4_hal_lock.py",
-                      "soc/stm32/stm32f4/cmake/STM32Official.cmake"))
+                      "soc/stm32/stm32f4/sdk/STM32Official.cmake"))
         for name in names:
             with self.subTest(name=name):
                 file = self.sdk / name

@@ -7,10 +7,10 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
+#include "drivers/i2c/stm32f407_i2c_target.h"
 #include "nexus_bindings.h"
 #include "nexus_factory.h"
-#include "stm32f407_clock.h"
-#include "stm32f407_i2c_target.h"
+#include "system/stm32f407_clock.h"
 nx_stm32_system_t g_nx_stm32_system;
 NVIC_Type g_f4_model_nvic;
 SCB_Type g_f4_model_scb;

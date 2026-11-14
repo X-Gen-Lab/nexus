@@ -43,7 +43,7 @@ class SDKPublicCompileInputTests(unittest.TestCase):
         (self.public / "nexus/components").mkdir(parents=True)
         (self.public.parent / "CMakeLists.txt").write_text(
             "# Maintained component exports its sibling include directory.\n")
-        self.private = self.sdk / "soc/stm32/stm32f4/private"
+        self.private = self.sdk / "soc/stm32/stm32f4"
         self.private.mkdir(parents=True)
         specification = importlib.util.spec_from_file_location(
             "include_boundary_consumer", ROOT / "cmake/package/verify_consumers.py")
@@ -159,7 +159,7 @@ class SDKPublicCompileInputTests(unittest.TestCase):
                  self.public.parent / "src/include",
                  self.public.parent / "other/include",
                  self.public / "../private",
-                 self.sdk / "components/../soc/stm32/stm32f4/private"]
+                 self.sdk / "components/../soc/stm32/stm32f4"]
         for option in ("-I", "-isystem", "-iquote", "-idirafter", "-include", "-imacros"):
             for path in paths:
                 for joined in (False, True):
@@ -620,10 +620,10 @@ class SDKConsumerParallelTests(unittest.TestCase):
                         {"file": str(source / "main.c"),
                          "directory": str(build),
                          "arguments": ["cc", "-I",
-                             str(self.sdk / "soc/stm32/stm32f4/private"),
+                             str(self.sdk / "soc/stm32/stm32f4"),
                              "-c", str(source / "main.c")],
                          "command": shlex.join(["cc", "-I",
-                             str(self.sdk / "soc/stm32/stm32f4/private"),
+                             str(self.sdk / "soc/stm32/stm32f4"),
                              "-c", str(source / "main.c")])},
                         {"file": str(source / "private_headers.c"),
                          "directory": str(build),
@@ -871,7 +871,7 @@ class SDKConsumerParallelTests(unittest.TestCase):
         self.assertEqual((source / "main.c").read_bytes(), canonical.read_bytes())
         project = (source / "CMakeLists.txt").read_text()
         self.assertNotIn("Nexus::F407I2S2SlaveTx", project)
-        self.assertIn("stm32f407_audio.h",
+        self.assertIn("drivers/audio/stm32f407_audio.h",
                       (source / "private_headers.c").read_text())
         self.assertIn("set(CMAKE_C_STANDARD 11)", project)
         self.assertIn("set(CMAKE_C_STANDARD_REQUIRED ON)", project)
@@ -1038,8 +1038,8 @@ class SDKConsumerParallelTests(unittest.TestCase):
             self.assertEqual(any("CMAKE_TOOLCHAIN_FILE" in arg for arg in command),
                              not native)
             private = (source / "private_headers.c").read_text()
-            for name in ("stm32f4xx.h", "stm32f407_provider.h",
-                         "stm32f407_eth_frames.h", "can_controller.h"):
+            for name in ("stm32f4xx.h", "private/stm32f407_provider.h",
+                         "drivers/ethernet/stm32f407_eth_frames.h", "can_controller.h"):
                 self.assertIn('__has_include("' + name + '")', private)
             self.assertNotIn(str(ROOT), (source / "CMakeLists.txt").read_text())
         self.assertEqual(inputs, set(expected))

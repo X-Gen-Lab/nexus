@@ -27,7 +27,7 @@ if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from tools.configure import cpu as cpu_profiles
-from tools.configure import bundle, dependencies, sdk, enhanced_endpoints
+from tools.configure import bundle, dependencies, sdk, enhanced_endpoints, packages
 from tools.configure import integration_package, adc, dac, device_view
 from tools.configure.calls import C_KEYWORDS as C11_KEYWORDS
 from tools.configure.ir import (
@@ -278,7 +278,13 @@ def contained_file(package, name):
 def _validate_physical_variant(value, provider, policy=None):
     """Validate each maintained part before any route can refer to its facts."""
     variant = obj(value, {"package", "flash", "memory"},
-                  {"pins", "pad_conditions", "device"}, "variant")
+                  {"pins", "pad_conditions", "device", "capabilities"}, "variant")
+    capabilities = variant.get("capabilities", {})
+    if not isinstance(capabilities, Mapping):
+        fail("Physical capabilities require named integer limits")
+    for name, limit in capabilities.items():
+        identity(name, "physical capability")
+        integer(limit, 0, UINT32_MAX, "physical capability limit")
     if "device" in variant:
         identity(variant["device"], "device catalog ID")
     if not provider.MODEL or "pins" in variant:
@@ -327,9 +333,6 @@ def validate_soc(soc, part, provider=None, *, catalog_device=None):
     if not isinstance(soc["variants"], dict) or part not in soc["variants"]:
         fail(f"Unmaintained exact part: {part}")
     provider = maintained(soc["id"]) if provider is None else provider
-    reference = getattr(provider, "FACT_REFERENCES", None)
-    if reference is not None and soc.get("references") != reference:
-        fail("SoC references differ from the maintained source index")
     # Routes can reference unselected packages too. Every physical contract must
     # be valid independently of which part this assembly happens to select.
     for exact, package in soc["variants"].items():
@@ -714,6 +717,12 @@ def reserved_claims(soc, board, provider):
     family = soc["id"]
     for resource in soc.get("reserved_resources", []):
         claim(resource, "soc-timebase", "reserved", family)
+    policy = getattr(provider, "binding_policy", None)
+    if policy is not None:
+        timebase = policy.timebase
+        for resource in ("timer:" + timebase.timer, "irq:" + timebase.irq):
+            if normalize_resource(resource) not in claims:
+                claim(resource, "soc-timebase", "reserved", family)
     for reserved in sequence(board["reserved_resources"], "reserved resources"):
         if isinstance(reserved, str):
             key = "pin:" + reserved if reserved in getattr(provider, "PAD_FACTS", {}) else reserved
@@ -1056,7 +1065,9 @@ def _resolve_facts(assembly, *, root, assembly_directory, read,
                   {"soc": "soc.json", "routes": "routes.json"})
     soc_path = contained_file(soc_dir, fact_paths["soc"])
     routes_path = contained_file(soc_dir, fact_paths["routes"])
-    soc, routes_doc = read(soc_path), read(routes_path)
+    soc = (packages.read_soc(context.package, read=read)
+           if context.package is not None else read(soc_path))
+    routes_doc = read(routes_path)
     catalog_path = None
     catalog = None
     catalog_name = (fact_paths.get("device_catalog") if context.package is not None
@@ -1085,10 +1096,12 @@ def _resolve_facts(assembly, *, root, assembly_directory, read,
     soc, device = selected.soc, selected.device
     reference_path = None
     references = None
-    if "references" in soc:
-        reference_path = contained_file(soc_dir, soc["references"])
-        references = fact_references.validate(read(reference_path), soc["variants"],
-            profiles=getattr(provider, "REFERENCE_PROFILES", None))
+    if context.package is not None:
+        reference_path = (context.package.fact("references")
+                          if "references" in context.package.facts else None)
+        references = fact_references.read_package(context.package, soc["variants"],
+                                                  provider, read=read)
+    if references is not None:
         review = fact_references.select_review(references,
                                                device.physical["device"])
         fact_references.admit_clock_policy(review, device.clock_policy,
@@ -1156,11 +1169,6 @@ def _resolve_device_graph(assembly, *, root, soc, board, routes, bindings,
     claims, claim_list, claim = resource_claims(provider)
     for record in reserved_claims(soc, board, provider):
         claim(**record)
-    if binding_policy is not None:
-        timebase = binding_policy.timebase
-        for resource in ("timer:" + timebase.timer, "irq:" + timebase.irq):
-            if normalize_resource(resource) not in claims:
-                claim(resource, "soc-timebase", "reserved", family)
     if (binding_policy is not None and clock_plan is not None and
             clock_plan.get("parameters") is not None):
         # The selected external oscillator owns its pads before System starts.
@@ -1525,7 +1533,7 @@ def _resolve(assembly_path, root=ROOT, *, input_paths=None, test_support=False):
                     if clock_plan is not None else None),
         physical_part=PhysicalPartIR(part, variant["package"],
             freeze(variant["flash"]), selected_memory.regions,
-            facts.device.vendor_device),
+            facts.device.vendor_device, freeze(variant.get("capabilities", {}))),
         clock=freeze(clock), clock_profile=assembly.clock_profile,
         layout=selected_layout.layout, board_bindings=freeze(bindings),
         routes=freeze(routes), platform_metadata=freeze(platform_metadata),

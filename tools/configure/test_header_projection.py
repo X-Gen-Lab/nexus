@@ -20,6 +20,21 @@ def facts():
 
 
 class HeaderProjectionTests(unittest.TestCase):
+    def test_selected_capture_requires_the_explicit_exact_part_limit(self):
+        value = facts()
+        value["physical_capabilities"] = {"capture": {
+            "field": "dcmi_bits", "macro": "SELECTED_CAMERA_BITS",
+            "values": [8, 10, 12, 14]}}
+        selected = HeaderProjection.from_validated(value)
+        result = SimpleNamespace(controllers=(SimpleNamespace(kind="capture"),),
+            clock_plan=None, physical_part=SimpleNamespace(memory=(),
+                capabilities={"dcmi_bits": 12}),
+            provider_context=SimpleNamespace(binding_policy=None))
+        self.assertIn("#define SELECTED_CAMERA_BITS 12u", selected.render(result, SimpleNamespace()))
+        result.physical_part.capabilities = {}
+        with self.assertRaisesRegex(ValueError, "capabilit|limit"):
+            selected.render(result, SimpleNamespace())
+
     def test_selected_timer_pad_uses_the_canonical_binding_not_pin_text(self):
         selected = HeaderProjection.from_validated(facts())
         route = SimpleNamespace(channel=2,
@@ -48,7 +63,7 @@ class HeaderProjectionTests(unittest.TestCase):
 
     def test_reviewed_clock_vectors_project_semantics_without_register_encoding(self):
         root = Path(__file__).resolve().parents[2]
-        base = root / "soc/stm32/stm32f4/bindings"
+        base = root / "soc/stm32/stm32f4/private/bindings"
         header = HeaderProjection.from_validated(json.loads(
             (base / "headers.json").read_text())["domains"]["headers"])
         clock_facts = json.loads((base / "domain_common.json").read_text())["domains"]["clock"]

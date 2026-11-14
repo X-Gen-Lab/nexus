@@ -8,7 +8,7 @@
  */
 #include "f407_timer_waveform_model.h"
 extern "C" {
-#include "stm32f407_timer_waveform.h"
+#include "drivers/timer/stm32f407_timer_waveform.h"
 }
 #include <cstring>
 #include <gtest/gtest.h>

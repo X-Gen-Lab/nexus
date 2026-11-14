@@ -1,9 +1,9 @@
 # One maintained whole program owns the new exact WWDG contract.
 nexus_google_test(nexus_stm32_window_watchdog_test STM32F4_LL
     SOURCES stm32_window_watchdog_test.cpp
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/window_watchdog.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/watchdog/window_watchdog.c"
     LIBRARIES Nexus::IO
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/include"
         "${NEXUS_SOURCE_DIR}/arch/include")
 target_include_directories(nexus_stm32_window_watchdog_test SYSTEM PRIVATE

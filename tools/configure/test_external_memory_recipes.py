@@ -12,6 +12,7 @@ from tools.configure.ir import (DmaMemoryBindingIR, EndpointIR, InterruptBinding
 from tools.configure.records import freeze
 from tools.configure.calls import Symbol
 from tools.configure.static_ir import Flags
+from tools.configure.tests.device_fixture import load_binding_facts
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -61,9 +62,9 @@ def projection(name, mode, endpoint_mode):
     child_values.update(id=child_id, driver=driver, mode=endpoint_mode)
     if name == "sdram":
         child_values["address"] = 0xc0000000
-    route = next(row for row in json.loads((ROOT / "soc/stm32/stm32f4/routes.json").read_text())["routes"]
+    route = next(row for row in json.loads((ROOT / "soc/stm32/stm32f4/facts/routes.json").read_text())["routes"]
                  if row["id"] == route_name)
-    facts = json.loads((ROOT / "soc/stm32/stm32f4/bindings.json").read_text())["pads"]
+    facts = json.loads((ROOT / "soc/stm32/stm32f4/facts/bindings.json").read_text())["pads"]
     pads = tuple(PadBindingIR(pin["pin"], facts[pin["pin"]]["registers"],
         facts[pin["pin"]]["port_index"], facts[pin["pin"]]["number"], pin["af"], pin["function"])
         for pin in route["pins"])
@@ -74,8 +75,10 @@ def projection(name, mode, endpoint_mode):
         freeze({"external_bus": {"readable_regions": memory}}), profile)
     controller = Controller(identifier, "external_bus", controller_name, mode, integration)
     child = EndpointIR.create(child_values, (controller,))
-    rows = json.loads((ROOT / "soc/stm32/stm32f4/bindings" / (name + ".json")).read_text())["bindings"]
-    row = next(row for row in rows if mode == row.get("mode") or mode in row.get("modes", ()))
+    rows = load_binding_facts(ROOT / "soc/stm32/stm32f4")["bindings"]
+    row = next(row for row in rows if row["kind"] == "external_bus" and
+               controller_name in row.get("controllers", ()) and
+               (mode == row.get("mode") or mode in row.get("modes", ())))
     selected = Binding.create(row).recipe
     built = selected.construct(controller, Configuration((controller,)), MappingProxyType({}),
                                MappingProxyType({}), (child,))
@@ -100,8 +103,8 @@ def graphics_projection(display, *, grant=False, single_format=False):
         values["memory_window"] = "ram"
     options = mode_options(values)
     route_name = "ltdc-rgb565-reference" if display else "dma2d-memory"
-    route = next(row for row in json.loads((ROOT / "soc/stm32/stm32f4/routes.json").read_text())["routes"] if row["id"] == route_name)
-    facts = json.loads((ROOT / "soc/stm32/stm32f4/bindings.json").read_text())["pads"]
+    route = next(row for row in json.loads((ROOT / "soc/stm32/stm32f4/facts/routes.json").read_text())["routes"] if row["id"] == route_name)
+    facts = json.loads((ROOT / "soc/stm32/stm32f4/facts/bindings.json").read_text())["pads"]
     pads = tuple(PadBindingIR(pin["pin"], facts[pin["pin"]]["registers"], facts[pin["pin"]]["port_index"],
         facts[pin["pin"]]["number"], pin["af"], pin["function"]) for pin in route["pins"])
     regions = (DmaMemoryBindingIR(0x20000000, 0x20000,
@@ -117,7 +120,7 @@ def graphics_projection(display, *, grant=False, single_format=False):
     item = Controller(identity, kind, "LTDC" if display else "DMA2D", values["mode"], integration, options)
     memory_owner = Controller("memory", "external_bus", "FMC", "sdram-controller", integration)
     configuration = Configuration((memory_owner, item) if grant else (item,))
-    rows = json.loads((ROOT / "soc/stm32/stm32f4/bindings/graphics.json").read_text())["bindings"]
+    rows = json.loads((ROOT / "soc/stm32/stm32f4/drivers/graphics/binding.json").read_text())["bindings"]
     row = next(row for row in rows if row["kind"] == kind)
     return Binding.create(row).recipe.construct(item, configuration, MappingProxyType({}), MappingProxyType({}), ())
 
@@ -152,7 +155,7 @@ def fsmc_projection(path, *, retained=()):
     document = tomllib.loads(path.read_text())
     board = json.loads((path.parent / document["board_package"] / "board.json").read_text())
     bindings = {row["id"]: row for row in board["bindings"]}
-    routes = {row["id"]: row for row in json.loads((ROOT / "soc/stm32/stm32f4/routes.json").read_text())["routes"]}
+    routes = {row["id"]: row for row in json.loads((ROOT / "soc/stm32/stm32f4/facts/routes.json").read_text())["routes"]}
     identity, selected = next(iter(document["external_bus"].items()))
     owner_values = {**selected, "id": identity, "kind": "external_bus", "controller": "FSMC",
                     "route": bindings[selected["binding"]]["route"]}
@@ -167,7 +170,7 @@ def fsmc_projection(path, *, retained=()):
             children.append(values)
     selected_policy.complete_controller(owner_values, children, bindings=bindings,
                                        routes=routes, claim=lambda *row: None)
-    facts = json.loads((ROOT / "soc/stm32/stm32f4/bindings.json").read_text())["pads"]
+    facts = json.loads((ROOT / "soc/stm32/stm32f4/facts/bindings.json").read_text())["pads"]
     pads = tuple(PadBindingIR(pin["pin"], facts[pin["pin"]]["registers"], facts[pin["pin"]]["port_index"],
         facts[pin["pin"]]["number"], pin["af"], pin["function"]) for pin in owner_values["pins"])
     integrated = Integration(pads, freeze({"core_hz": 168000000}), freeze({}), "default")
@@ -182,7 +185,7 @@ def fsmc_projection(path, *, retained=()):
                          execution_profile=selected_policy.endpoint_profile(owner, children))
     owner = replace(owner, integration=integrated)
     configuration = replace(configuration, controllers=(owner,))
-    rows = json.loads((ROOT / "soc/stm32/stm32f4/bindings/fsmc.json").read_text())["bindings"]
+    rows = json.loads((ROOT / "soc/stm32/stm32f4/drivers/memory/binding.json").read_text())["bindings"]
     row = next(row for row in rows if row.get("mode") == owner.mode)
     return Binding.create(row).recipe.construct(owner, configuration, MappingProxyType({}), MappingProxyType({}), children)
 
@@ -218,14 +221,14 @@ class ExternalMemoryRecipeTests(unittest.TestCase):
                 self.assertEqual(4, len(built.pin_snapshots))
 
     def test_command_profile_does_not_import_the_unselected_mapping_component(self):
-        rows = json.loads((ROOT / "soc/stm32/stm32f4/bindings/qspi.json").read_text())["bindings"]
+        rows = json.loads((ROOT / "soc/stm32/stm32f4/drivers/memory/qspi.binding.json").read_text())["bindings"]
         selected = Binding.create(next(row for row in rows if row["mode"] == "qspi-indirect-sdr"))
         command = selected.headers_for(Controller("serial", "external_bus", "QUADSPI",
             "qspi-indirect-sdr", Integration((), freeze({}), freeze({}), "command")))
         mapped = selected.headers_for(Controller("serial", "external_bus", "QUADSPI",
             "qspi-indirect-sdr", Integration((), freeze({}), freeze({}), "cpu-map")))
-        self.assertNotIn("stm32f4_qspi_mapped.h", command)
-        self.assertIn("stm32f4_qspi_mapped.h", mapped)
+        self.assertNotIn("drivers/memory/stm32f4_qspi_mapped.h", command)
+        self.assertIn("drivers/memory/stm32f4_qspi_mapped.h", mapped)
 
     def test_cpu_map_uses_composite_controller_and_exports_no_flash_bypass(self):
         built = projection("qspi", "qspi-indirect-sdr", "nor-mapped-cpu")
@@ -285,7 +288,7 @@ class FsmcRecipeTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             fixture = F407FSMCConfigurationTests(methodName="runTest")
             path = fixture.fixture(Path(temporary), sram=True, lcd=False, memory_mode="startup-memory")
-            routes = json.loads((ROOT / "soc/stm32/stm32f4/routes.json").read_text())["routes"]
+            routes = json.loads((ROOT / "soc/stm32/stm32f4/facts/routes.json").read_text())["routes"]
             retained = tuple(pin["pin"] for row in routes if row["id"] == "fsmc-ne3-is62wv51216" for pin in row["pins"])
             built = fsmc_projection(path, retained=retained)
             source = "\n".join(line for item in built.static_declarations for line in item.render())

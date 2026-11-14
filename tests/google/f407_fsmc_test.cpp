@@ -7,13 +7,13 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
+#include "drivers/memory/stm32f407_fsmc.h"
+#include "drivers/memory/stm32f407_fsmc_nand.h"
+#include "drivers/memory/stm32f407_fsmc_nor.h"
 #include "nexus/components/ili9341.h"
 #include "nexus/io/external_bus.h"
 #include "nexus/io/memory_window.h"
 #include "nexus/io/parallel16.h"
-#include "stm32f407_fsmc.h"
-#include "stm32f407_fsmc_nand.h"
-#include "stm32f407_fsmc_nor.h"
 }
 #include <algorithm>
 #include <array>

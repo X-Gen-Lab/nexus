@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parents[2]
 class CaptureAudioPolicyTests(unittest.TestCase):
     def policy(self, renamed=False):
         from tools.configure.policies.capture_audio import CaptureAudioPolicy
-        facts = json.loads((ROOT / "soc/stm32/stm32f4/bindings/capture_audio_policy.json").read_text())["domains"]["capture_audio"]
+        facts = json.loads((ROOT / "soc/stm32/stm32f4/private/bindings/capture_audio_policy.json").read_text())["domains"]["capture_audio"]
         if renamed:
             facts = copy.deepcopy(facts)
             facts["capture"]["controllers"] = ["CAMERA_PORT"]

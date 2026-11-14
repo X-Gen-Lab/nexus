@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "bindings": [
+    {
+      "kind": "entropy",
+      "mode": "rng-words",
+      "implementation": "entropy",
+      "static_recipe": {
+        "state_type": "nx_stm32f407_entropy_state_t",
+        "ops": "nx_stm32f407_entropy_ops",
+        "declarations": [],
+        "calls": {
+          "admit": [
+            {
+              "function": "nx_stm32f407_entropy_admit",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ],
+          "prepare": {
+            "function": "nx_stm32f407_entropy_start",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32f407_entropy_stop",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "retain_on_failed_init": true
+      },
+      "headers": [
+        "drivers/entropy/stm32f407_entropy.h"
+      ]
+    }
+  ]
+}

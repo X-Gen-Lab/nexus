@@ -7,7 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
-#include "stm32f407_provider.h"
+#include "drivers/uart/instance.h"
 }
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>

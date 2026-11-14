@@ -8,8 +8,8 @@
  */
 #include "eth_mac.h"
 #if defined(NX_ETH_TEST_STM32)
-#include "stm32f407_eth.h"
-#include "stm32f4_eth_facts.h"
+#include "drivers/ethernet/stm32f407_eth.h"
+#include "drivers/ethernet/stm32f4_eth_facts.h"
 #endif
 #if defined(NX_ETH_TEST_STM32)
 #include <sys/mman.h>

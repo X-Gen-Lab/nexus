@@ -8,7 +8,7 @@
  */
 #define NEXUS_STM32_MODEL
 #include "adapter.h"
-#include "stm32f407_dma.h"
+#include "drivers/uart/dma.h"
 const unsigned char size_hal_uart_handle[sizeof(UART_HandleTypeDef)] = {0};
 const unsigned char size_hal_dma_handle[sizeof(DMA_HandleTypeDef)] = {0};
 const unsigned char size_nexus_uart_state[sizeof(nx_stm32_uart_state_t)] = {0};

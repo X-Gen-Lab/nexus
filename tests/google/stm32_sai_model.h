@@ -67,8 +67,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#include "stm32f407_system.h"
 #include "stm32f4xx_hal.h"
+#include "system/stm32f407_system.h"
 uint32_t nx_sai_read(volatile uint32_t* reg);
 void nx_sai_write(volatile uint32_t* reg, uint32_t value);
 nx_time_us_t nx_sai_now(void);

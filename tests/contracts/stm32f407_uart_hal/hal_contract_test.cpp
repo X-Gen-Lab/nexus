@@ -11,8 +11,12 @@
 #include <new>
 #include <sys/mman.h>
 extern "C" {
+#include "drivers/gpio/pins.h"
+#include "drivers/uart/stm32f407_uart_hal.h"
+#include "nexus/arch/arch.h"
+#include "nexus/core/time.h"
 #include "nexus/io/uart.h"
-#include "stm32f407_uart_hal.h"
+#include "system/stm32f407_system.h"
 GPIO_TypeDef g_nx_stm32_gpioa_model = {};
 nx_stm32_system_t g_nx_stm32_system = {};
 alignas(16) uint8_t g_nx_stm32_scs_model[0x2000U] = {};

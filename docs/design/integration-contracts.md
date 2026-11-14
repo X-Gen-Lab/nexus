@@ -44,21 +44,23 @@ SoC provider 实现公共 IO/核心合同，并使用 Arch。器件 driver 使�
 
 ```text
 soc/<vendor>/<family>/
-  package.json             # 事实、构建与导出归属的显式入口
-  bindings.json / bindings/ # 公共能力、pad 坐标与有限静态连接
-  soc.json                 # 精确 SKU、内存、时钟与控制器事实
-  routes.json              # 已复核路由及模式的有限 allowlist
-  CMakeLists.txt           # 私有 SDK/provider 的显式目标依赖
-  private/                 # 私有 SDK 接口与硬件实现
-  ...                      # startup、controller、clock/IRQ、linker 实现
+  package.json
+  facts/
+  system/
+  drivers/<domain>/
+  drivers/ip/
+  private/
+  sdk/
+  CMakeLists.txt
 ```
 
-系列目录复用代码，`soc.json` 按精确订货号选择已审 device profile 和不重叠的
-controller groups；物理事实与软件模式分开。`devices.json` 记录官方宏、startup、
+系列目录复用代码，`facts/soc.json` 按精确订货号选择已审 device profile 和不重叠的
+controller groups；物理事实与软件模式分开。`facts/devices.json` 记录官方宏、startup、
 IRQ enum／number／handler。型号、封装、Flash、SRAM 域和 IRQ 表不能被家族字符串
 代替，厂商编译目录不扩大运行时模式支持。
 
-当前生产 SoC 入口只有 `soc/stm32/stm32f4/`，私有共享 IP 位于其 `drivers/ip/`。
+当前生产 SoC 入口只有 `soc/stm32/stm32f4/`；领域 binding、实例布局与实现相邻，
+私有共享 IP 位于其 `drivers/ip/`，跨域共享合同与片段保留在 `private/`。
 Board／SoC 不放 Python 插件；声明式 package 由 `tools/configure/` 的通用
 DataProvider、领域政策、typed IR 与有限静态节点解析，不再加载家族 Python
 构造模块。顶层 `pads` 统一显式坐标；字段与同一快照合同见
@@ -208,7 +210,7 @@ restart 都不能提前撤销请求 borrow；仅 acquire-observed SETTLED 允许
 
 1. 明确是已有 SoC 的新封装/密度，还是新的寄存器/clock/IRQ/DMA实现；不要仅按市场家族名分类。
 2. 锁定官方资料、勘误、SDK revision、许可和 import hash，记录精确 part/package/density。
-3. 定义 `soc.json` 的物理 memory、Flash geometry、clock 约束、IRQ 和 controller；最初只放入准备维护的 reviewed routes。
+3. 定义包内 `facts/` 的物理 memory、Flash geometry、clock 约束、IRQ 和 controller；最初只放入准备维护的 reviewed routes。
 4. 实现 Arch 所需适配、reset/startup、clock、timebase、IRQ、linker 和最小 IO provider。SDK 目标保持 PRIVATE，不暴露厂商结构体给外部 consumer。
 5. 先建立最小 ELF 链接 fixture，再完成裸机和 FreeRTOS port/config 的实际编译链接；对错误、资源终态和取消等有行为的路径建立必要模型证据。
 6. 新 controller/route/DMA 模式分别扩大矩阵。SDK 中存在但尚无 provider 的功能不成为可选维护能力。

@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parents[2]
 class SaiPolicyTests(unittest.TestCase):
     def policy(self):
         from tools.configure.policies.sai import SaiPolicy
-        facts = json.loads((ROOT / "soc/stm32/stm32f4/bindings/sai_policy.json").read_text())["domains"]["sai"]
+        facts = json.loads((ROOT / "soc/stm32/stm32f4/drivers/audio/sai_policy.binding.json").read_text())["domains"]["sai"]
         facts = copy.deepcopy(facts)
         facts["controllers"] = {"SERIAL_FRAME": facts["controllers"]["SAI1"]}
         facts["controllers"]["SERIAL_FRAME"]["dma_roles"]["A"] = ["DMA2:stream6:channel7"]

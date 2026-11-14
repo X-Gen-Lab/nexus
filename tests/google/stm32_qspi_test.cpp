@@ -7,9 +7,9 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
-#include "stm32f4_qspi.h"
+#include "drivers/memory/stm32f4_qspi.h"
 #if NEXUS_QSPI_CPU_MAP
-#include "stm32f4_qspi_mapped.h"
+#include "drivers/memory/stm32f4_qspi_mapped.h"
 #endif
 nx_stm32_system_t g_nx_stm32_system{};
 uint32_t SystemCoreClock = 16000000U;

@@ -7,7 +7,9 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
-#include "stm32f407_provider.h"
+#include "drivers/gpio/instance.h"
+#include "drivers/uart/instance.h"
+#include "system/stm32f407_system.h"
 
 nx_stm32_system_t g_nx_stm32_system;
 GPIO_TypeDef g_nx_stm32_gpioa_model;

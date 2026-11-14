@@ -220,12 +220,12 @@ class F407ClockTests(unittest.TestCase):
                           '16000000u)', bindings.emit(result)[1])
             compiler = shutil.which("cc")
             self.assertIsNotNone(compiler)
-            source = ('#include "stm32f4_timer_encoding.h"\n'
+            source = ('#include "drivers/timer/stm32f4_timer_encoding.h"\n'
                       '_Static_assert(NX_STM32_TIMER_PRESCALER('
                       '16000000u, 16000000u) == 0u, "prescaler");\n')
             completed = subprocess.run([compiler, "-std=c11", "-Wall", "-Wextra",
                 "-Werror", "-pedantic", "-fsyntax-only", "-x", "c", "-I",
-                str(configure.ROOT / "soc/stm32/stm32f4/private"), "-"],
+                str(configure.ROOT / "soc/stm32/stm32f4"), "-"],
                 input=source, capture_output=True, text=True)
             self.assertEqual(completed.returncode, 0, completed.stderr)
 

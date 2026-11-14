@@ -204,7 +204,7 @@ an accepted request and lets its consumer legally protect the reclaimed page;
 an old unprotected reader faults. This establishes that software boundary and
 does not substitute for physical DMA or complete concurrent-system qualification.
 
-The F407 binding is `soc/stm32/stm32f4/drivers/ethernet_frames.c`; the engine is
+The F407 binding is `soc/stm32/stm32f4/drivers/ethernet/ethernet_frames.c`; the engine is
 `soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c`. Current GoogleTest
 cases under `tests/google/ethernet_frames_*` cover public, engine, F407, Native
 and factory contracts. Factory tests exercise real System/GPIO/provider code

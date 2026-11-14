@@ -8,8 +8,13 @@
  */
 extern "C" {
 #include "stm32_adc_pad_fixture.h"
-#include "stm32f407_basic_cold.h"
-#include "stm32f407_control_cold.h"
+#include "system/stm32f407_system.h"
+
+#include "drivers/adc/cold.h"
+#include "drivers/flash/cold.h"
+#include "drivers/gpio/cold.h"
+#include "drivers/watchdog/cold.h"
+#include "nexus/core/time.h"
 nx_stm32_system_t g_nx_stm32_system;
 }
 #include <cstring>

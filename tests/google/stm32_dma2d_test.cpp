@@ -8,9 +8,9 @@
  */
 #include "stm32_dma2d_model.h"
 extern "C" {
-#include "stm32f407_system.h"
-#include "stm32f4_dma2d.h"
-#include "stm32f4_graphics_memory.h"
+#include "drivers/graphics/stm32f4_dma2d.h"
+#include "drivers/graphics/stm32f4_graphics_memory.h"
+#include "system/stm32f407_system.h"
 }
 #include <cstring>
 #include <gtest/gtest.h>

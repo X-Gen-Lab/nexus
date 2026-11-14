@@ -1,6 +1,6 @@
 # Execute the production pre-RAM-safe initializer; Google remains host-only.
 nexus_google_test(nexus_stm32_memory_test SOURCES stm32_memory_test.cpp
-    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/memory_init.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/memory.c"
     LIBRARIES Nexus::IO
     INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4")
 target_compile_definitions(nexus_stm32_memory_test PRIVATE
@@ -19,9 +19,10 @@ foreach(memory_variant default ccm invalid)
     file(CONFIGURE OUTPUT "${memory_model}/nexus_config.h"
         CONTENT "#define NEXUS_MEMORY_CCM ${memory_selected}\n" @ONLY)
     nexus_google_test(${memory_target} SOURCES stm32_memory_boot_test.cpp
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/clock.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/startup.c"
         INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
             "${NEXUS_SOURCE_DIR}/core/include"
             "${NEXUS_SOURCE_DIR}/arch/include")
     target_include_directories(${memory_target} BEFORE PRIVATE "${memory_model}")
@@ -39,7 +40,7 @@ foreach(memory_variant default ccm invalid)
         -Wl,-Ttext-segment=0x60000000)
     if(memory_selected)
         target_sources(${memory_target} PRIVATE
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/memory_init.c")
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/memory.c")
     endif()
     if(memory_variant STREQUAL "invalid")
         target_compile_definitions(${memory_target} PRIVATE

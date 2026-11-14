@@ -10,7 +10,7 @@ from tools.configure.package_policy import BindingPolicy
 
 class StaticBindingFactsTests(unittest.TestCase):
     def document(self):
-        return configure.load(configure.ROOT / "soc/stm32/stm32f4/bindings.json")
+        return configure.load(configure.ROOT / "soc/stm32/stm32f4/facts/bindings.json")
 
     def test_selected_pads_and_dma_retain_reviewed_c_leaf_identity(self):
         policy = BindingPolicy.from_validated(self.document())

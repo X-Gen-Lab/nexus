@@ -4,12 +4,13 @@ foreach(system_target nexus_stm32_system_transaction_test
                       nexus_stm32_system_hsi84_transaction_test)
 nexus_google_test(${system_target}
     SOURCES stm32_system_transaction_test.cpp
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/power.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/supervision.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/clock.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/startup.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/power.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/supervision.c"
         "${NEXUS_SOURCE_DIR}/components/clock_domain/src/clock_domain.c"
     LIBRARIES Nexus::Core
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
         "${NEXUS_SOURCE_DIR}/arch/include")
 target_include_directories(${system_target} PRIVATE
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/include"
@@ -40,9 +41,10 @@ foreach(ahb_div 2 4)
     set(ahb_target "nexus_stm32_ahb${ahb_div}_clock_test")
     nexus_google_test(${ahb_target}
         SOURCES stm32_ahb_clock_test.cpp
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/clock.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/startup.c"
         LIBRARIES Nexus::Core
-        INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
+        INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
             "${NEXUS_SOURCE_DIR}/arch/include")
     target_include_directories(${ahb_target} SYSTEM PRIVATE
         "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
@@ -59,9 +61,10 @@ foreach(sdio_high_speed 0 1)
     set(sdio_system_target "nexus_stm32_sdio_system_${sdio_high_speed}_test")
     nexus_google_test(${sdio_system_target}
         SOURCES stm32_sdio_system_test.cpp
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/clock.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/startup.c"
         LIBRARIES Nexus::Core
-        INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
+        INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/include"
             "${NEXUS_SOURCE_DIR}/components/clock_domain/include"
             "${NEXUS_SOURCE_DIR}/components/clock_domain/private"
@@ -69,7 +72,7 @@ foreach(sdio_high_speed 0 1)
             "${NEXUS_SOURCE_DIR}/io/include")
     if(sdio_high_speed)
         target_sources(${sdio_system_target} PRIVATE
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/power.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/power.c"
             "${NEXUS_SOURCE_DIR}/components/clock_domain/src/clock_domain.c")
     endif()
     target_include_directories(${sdio_system_target} SYSTEM PRIVATE
@@ -83,9 +86,10 @@ endforeach()
 
 nexus_google_test(nexus_stm32_silicon_identity_test
     SOURCES stm32_silicon_identity_test.cpp
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/clock.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/startup.c"
     LIBRARIES Nexus::IO Nexus::Arch
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private")
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4")
 target_include_directories(nexus_stm32_silicon_identity_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
 nexus_use_cmsis_core(nexus_stm32_silicon_identity_test)
@@ -110,12 +114,13 @@ foreach(power_rtc_part f407 f411 f446 f479)
     endif()
     nexus_google_test(${power_rtc_target} STM32F4_LL
         SOURCES power_rtc_integration_test.cpp f407_rtc_model.cpp
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/power.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/rtc.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/clock.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/startup.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/power.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/rtc/rtc.c"
             "${NEXUS_SOURCE_DIR}/components/clock_domain/src/clock_domain.c"
         LIBRARIES Nexus::IO
-        INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
+        INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/include"
             "${NEXUS_SOURCE_DIR}/components/clock_domain/include"
             "${NEXUS_SOURCE_DIR}/components/clock_domain/private"
@@ -149,9 +154,10 @@ foreach(input_profile hsi hse hsi_pll48 hse_pll48)
     set(input_target "nexus_stm32_input_${input_profile}_clock_test")
     nexus_google_test(${input_target}
         SOURCES stm32_input_clock_test.cpp
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/clock.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/startup.c"
         LIBRARIES Nexus::Core
-        INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
+        INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
             "${NEXUS_SOURCE_DIR}/arch/include")
     target_include_directories(${input_target} SYSTEM PRIVATE
         "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
@@ -199,9 +205,10 @@ foreach(family_profile f407 f411 f446 f479)
     set(family_target "nexus_stm32_${family_profile}_system_test")
     nexus_google_test(${family_target}
         SOURCES stm32_family_system_test.cpp
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/clock.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/startup.c"
         LIBRARIES Nexus::IO Nexus::Arch
-        INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private")
+        INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4")
     target_include_directories(${family_target} SYSTEM PRIVATE
         "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
     nexus_use_cmsis_core(${family_target})
@@ -217,11 +224,12 @@ foreach(family_profile f407 f411 f446 f479)
         set(high_target "nexus_stm32_${family_profile}_high_clock_test")
         nexus_google_test(${high_target}
             SOURCES stm32_high_clock_test.cpp
-                "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system.c"
-                "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/power.c"
+                "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/clock.c"
+                "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/startup.c"
+                "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/power.c"
                 "${NEXUS_SOURCE_DIR}/components/clock_domain/src/clock_domain.c"
             LIBRARIES Nexus::IO Nexus::Arch
-            INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
+            INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
                 "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/include"
                 "${NEXUS_SOURCE_DIR}/components/clock_domain/include"
                 "${NEXUS_SOURCE_DIR}/components/clock_domain/private")
@@ -255,9 +263,10 @@ foreach(aux_case f446_q f479_q f479_r f479_qr)
     set(aux_target "nexus_stm32_system_aux_${aux_case}_test")
     nexus_google_test(${aux_target}
         SOURCES stm32_sai_system_test.cpp
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/clock.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/startup.c"
         LIBRARIES Nexus::Core
-        INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
+        INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
             "${NEXUS_SOURCE_DIR}/arch/include")
     target_include_directories(${aux_target} SYSTEM PRIVATE
         "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"

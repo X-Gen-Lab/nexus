@@ -1,5 +1,5 @@
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 8ee64985e878d5a0148290a9e2a9fbbf3b66c8b612c8aebe73cbfefec1e6016c\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 1cf3e055c0689e847d667515be5dc094ef2734c4ab3d92e87238a4e94552ac8d\n"
 
 msgid "接入 MCU、IP 与静态实例"
 msgstr "Integrate an MCU, IP and static instances"
@@ -61,9 +61,6 @@ msgstr "Reusing an existing model for a new MCU does not require another configu
 msgid "包、事实与目录"
 msgstr "Packages, facts and directories"
 
-msgid "这是维护责任，不要求仅为外观移动文件。当前 F4 的事实保持原位；共享 IP 就近维护， 跨家族提取需要真实相同编程模型。运行调用不因目录划分增加转发，见 [源码归属图](../assets/diagrams/driver-source-ownership.svg)。"
-msgstr "These are maintenance responsibilities, not a requirement to move files for appearance. Current F4 facts remain in place; shared IP stays local, and cross-family extraction requires the same real programming model. Directory boundaries add no runtime forwarding; see the [source ownership diagram](../assets/diagrams/driver-source-ownership.svg)."
-
 msgid "package 字段"
 msgstr "Package field"
 
@@ -85,14 +82,8 @@ msgstr "Explicit identities; duplicate entries cannot override through search pr
 msgid "`source_directory`"
 msgstr "`source_directory`"
 
-msgid "相对 manifest 的所属源码目录"
-msgstr "Owned source directory relative to the manifest"
-
 msgid "`facts`"
 msgstr "`facts`"
-
-msgid "`soc`／`routes`；按选定 provider 另给 `device_catalog`／`references`／`review_profiles`／`bindings`"
-msgstr "`soc`/`routes`, plus `device_catalog`/`references`/`review_profiles`/`bindings` as required by the selected provider"
 
 msgid "`binding_files`"
 msgstr "`binding_files`"
@@ -127,17 +118,11 @@ msgstr "Production or reference; references explicitly require test support"
 msgid "生产校验由 [packages.py](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/packages.py)拥有， [编辑器 schema](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/soc-package.schema.json)从同一字段合同派生。 在仓库根执行下列只读命令可打印当前 JSON schema；输出不替代生产加载与资源校验。"
 msgstr "[packages.py](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/packages.py) owns production validation. The [editor schema](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/soc-package.schema.json) derives from the same field contract. From the repository root, this read-only command prints the current JSON schema; its output does not replace production loading and resource validation."
 
-msgid "manifest 的所有路径归属于声明包，拒绝越界与 symlink。选择声明式包不执行家族 Python 模块；CMake 与 C 仍是受信构建代码，哈希只绑定身份，不构成执行沙箱。"
-msgstr "Manifest paths belong to their declared package; escapes and symlinks reject. Selecting a declarative package executes no family Python module. CMake and C remain trusted build code; hashes bind identity rather than forming an execution sandbox."
-
 msgid "同一快照读取"
 msgstr "Read one snapshot"
 
 msgid "manifest、SoC、route、binding 主文件和每个 `binding_files` 都经同一受控 reader 读取并记录字节身份。重复读取不得换成另一代输入，生成结束前复核；资料、器件选择 和私有硬件投影不得绕过该快照重新打开文件并产生第二份决策。事实按 manifest 的 逻辑键读取，不要求文件必须叫 `soc.json` 或 `routes.json`。"
 msgstr "The manifest, SoC, routes, main binding file and every `binding_files` member pass through one controlled reader that records their byte identities. Repeated reads cannot switch input generations; inputs are checked again before generation completes. References, device selection and private hardware projections cannot bypass that snapshot by reopening files to make independent decisions. Facts are read by the manifest's logical keys; filenames need not be `soc.json` or `routes.json`."
-
-msgid "资料审核使用可选的 `facts.review_profiles`；DataProvider 经同一 reader 读取后构造 不可变 ProfileSet，显式持有手册、数据手册、勘误身份与适用范围。通用工具不内置 F4 的资料表，不默认选择某个勘误 profile。未声明审核资料的参考包不能因此取得资料 或执行资格；原始资料身份、软件模式与实际执行仍分别校验。"
-msgstr "Reference review uses optional `facts.review_profiles`. DataProvider reads it through the same reader to construct an immutable ProfileSet holding explicit manual, datasheet and errata identities and applicability. Common tools contain no built-in F4 reference table and select no errata profile by default. A reference package without declared review facts gains neither reference nor execution qualification from their absence. Original document identity, software modes and actual execution are still validated separately."
 
 msgid "binding 文件片段声明 `schema_version`、`bindings`，以及可选 `domains` 和 `static_fragments`。控制器 binding 有序加入；重复 domain key 拒绝，不能用后读覆盖 先读。文件拆分与下文 StaticFragments 的声明复用是两种机制，不能互相替代。"
 msgstr "Binding file fragments declare `schema_version`, `bindings` and optional `domains` and `static_fragments`. Controller bindings append in order; duplicate domain keys reject rather than allowing later reads to override earlier ones. Splitting input files and the StaticFragments declaration reuse below are different mechanisms, not substitutes."
@@ -264,3 +249,21 @@ msgstr "Accepted requests and buffers remain valid until acquire-observed SETTLE
 
 msgid "软件参考、配置成功、模型、ARM 链接、SDK 消费与实板分别验收。当前物理 HIL 为 `not_executed`；具体模式、剩余耦合和最终集成按当前任务保留，旧记录可从 [固定前序源码](https://github.com/X-Gen-Lab/nexus/tree/ba13686b91c94d19ef11acf910653ee2fcc9aa8b) 追溯，不继承其资格。"
 msgstr "Software references, successful configuration, models, ARM links, SDK consumption and hardware have separate acceptance. Physical HIL is currently `not_executed`. Individual modes, remaining coupling and final integration remain in the current tasks. Original records are traceable at the [fixed previous source](https://github.com/X-Gen-Lab/nexus/tree/ba13686b91c94d19ef11acf910653ee2fcc9aa8b), without inheriting its qualification."
+
+msgid "这是当前 F4 的维护布局。binding 与其私有 C 类型和实现相邻；只有真实共享的 合同、片段与算法保留共享入口。跨家族提取需要相同编程模型的证据。运行调用保持 公共 face 到具体 provider 的直接分派，见 [源码归属图](../assets/diagrams/driver-source-ownership.svg)。"
+msgstr "This is the current F4 maintenance layout. Bindings stay beside their private C types and implementations; shared entries retain only contracts, fragments and algorithms that are actually shared. Cross-family extraction requires evidence of the same programming model. Runtime calls retain direct dispatch from public faces to concrete providers; see the [source ownership diagram](../assets/diagrams/driver-source-ownership.svg)."
+
+msgid "`soc`／`routes`；按选定 provider 另给 `controllers`／`clocks`／`device_catalog`／`references`／`review_profiles`／`bindings`"
+msgstr "`soc`/`routes`, plus `controllers`/`clocks`/`device_catalog`/`references`/`review_profiles`/`bindings` as required by the selected provider"
+
+msgid "F4 的 `facts.soc` 保留身份、CPU、精确型号、device profile、封装／内存与供应依赖 身份；可选 `facts.controllers` 独占 `controller_groups`／`can_domain`，可选 `facts.clocks` 独占 `clock_profiles`。通用 `read_soc` 通过同一 reader 组合这些输入；base 与片段 重复声明同字段、片段未知字段或错误 schema 均拒绝。未声明片段的参考包仍可使用 内联事实。资料仅由 `facts.references` 选择；timebase 由 System binding 的角色 选择，Board 查询和生产解析使用同一资源预留结果，不再各自维护默认 timer。"
+msgstr "F4 `facts.soc` retains identity, CPU, exact parts, device profiles, package/memory facts and supplier dependency identity. Optional `facts.controllers` exclusively owns `controller_groups`/`can_domain`; optional `facts.clocks` exclusively owns `clock_profiles`. Generic `read_soc` composes these inputs through the same reader. Duplicate fields between the base and fragments, unknown fragment fields and invalid schemas are rejected. Reference packages without fragments may retain inline facts. Only `facts.references` selects reference documents. The System binding role selects the timebase; Board queries and production resolution use the same resource reservations instead of maintaining separate default timers."
+
+msgid "相对 `package.json` 所在目录解析的所属源码根"
+msgstr "The owning source root, resolved relative to the directory containing `package.json`"
+
+msgid "`facts`、`binding_files`、`cmake.entry` 和 `exports` 路径均相对已解析的 `source_directory`；加载器检查所属边界、文件类型与 symlink。选择声明式包不执行家族 Python 模块；CMake 与 C 仍是受信构建代码，哈希只绑定身份，不构成执行沙箱。"
+msgstr "`facts`, `binding_files`, `cmake.entry` and `exports` paths are relative to the resolved `source_directory`. The loader checks containment, file types and symlinks. Selecting a declarative package does not execute family Python modules. CMake and C remain trusted build code; hashes bind identity rather than provide an execution sandbox."
+
+msgid "生产 DataProvider 包必须同时声明 `facts.references` 与 `facts.review_profiles`； 只读取包元数据的 `packages.load` 不受此约束。DataProvider 经同一 reader 读取后构造 不可变 ProfileSet，显式持有手册、数据手册、勘误身份与适用范围。通用工具不内置 F4 的资料表，不默认选择某个勘误 profile。显式启用 test support 的 reference 包 可使用仅记录来源的 schema 1 资料，不取得生产资料或执行资格；原始资料身份、软件 模式与实际执行仍分别校验。"
+msgstr "Production DataProvider packages must declare both `facts.references` and `facts.review_profiles`; metadata-only `packages.load` is outside this requirement. DataProvider uses the same reader to construct an immutable ProfileSet holding explicit manual, datasheet and errata identities and applicability. Generic tools embed no F4 reference tables and select no errata profile by default. A reference package with test support explicitly enabled may use schema 1 documents that record provenance only, without establishing reviewed production reference facts or execution qualification. Original reference identities, software modes and actual execution remain separately validated."

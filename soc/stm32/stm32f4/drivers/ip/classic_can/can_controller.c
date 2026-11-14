@@ -7,6 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "can_controller.h"
+#include "nexus/arch/arch.h"
 
 /* STM32F407/GD32F470 SDK offsets/masks are asserted by each SoC binding. */
 enum {

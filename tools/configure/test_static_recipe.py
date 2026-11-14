@@ -361,7 +361,7 @@ class StaticRecipeTests(unittest.TestCase):
         compiler = shutil.which("cc")
         self.assertIsNotNone(compiler)
         root = Path(__file__).resolve().parents[2]
-        source = '''#include "stm32f4_dac_constants.h"
+        source = '''#include "drivers/dac/stm32f4_dac_constants.h"
 _Static_assert(NX_STM32_DAC_CHANNEL_MASK(1u, 0u) == 1u, "one");
 _Static_assert(NX_STM32_DAC_CHANNEL_MASK(2u, 0u) == 2u, "two");
 _Static_assert(NX_STM32_DAC_CHANNEL_MASK(1u, 2u) == 3u, "both");
@@ -374,7 +374,7 @@ int main(void) { return 0; }
             path, binary = Path(directory) / "constants.c", Path(directory) / "constants"
             path.write_text(source, encoding="utf-8")
             completed = subprocess.run([compiler, "-std=c11", "-Wall", "-Wextra",
-                "-Werror", "-pedantic", "-I", str(root / "soc/stm32/stm32f4/private"),
+                "-Werror", "-pedantic", "-I", str(root / "soc/stm32/stm32f4"),
                 str(path), "-o", str(binary)], capture_output=True, text=True)
             self.assertEqual(completed.returncode, 0, completed.stderr)
 
@@ -417,7 +417,7 @@ int main(void) { return 0; }
         preamble = '''#include <stdbool.h>
 #include <stdint.h>
 #include <stddef.h>
-#include "stm32f4_dac_constants.h"
+#include "drivers/dac/stm32f4_dac_constants.h"
 static int registers, s_nx_port_output;
 #define DAC (&registers)
 enum { NX_DAC_FORMAT_U8, NX_DAC_FORMAT_U12_RIGHT, NX_DAC_FORMAT_U12_LEFT };
@@ -452,7 +452,7 @@ static const int nx_stm32_dac_dma_tx_ops = 0;
             path, binary = Path(directory) / "dac.c", Path(directory) / "dac"
             path.write_text("\n".join(lines) + "\n", encoding="utf-8")
             completed = subprocess.run([compiler, "-std=c11", "-Wall", "-Wextra", "-Werror",
-                "-pedantic", "-I", str(root / "soc/stm32/stm32f4/private"),
+                "-pedantic", "-I", str(root / "soc/stm32/stm32f4"),
                 str(path), "-o", str(binary)], capture_output=True, text=True)
             self.assertEqual(completed.returncode, 0, completed.stderr)
             self.assertEqual(subprocess.run([str(binary)], check=False).returncode, 0)
@@ -461,7 +461,7 @@ static const int nx_stm32_dac_dma_tx_ops = 0;
         from tools.configure import configure
         compiler = shutil.which("cc")
         self.assertIsNotNone(compiler)
-        source = '''#include "stm32f4_timer_encoding.h"
+        source = '''#include "drivers/timer/stm32f4_timer_encoding.h"
 _Static_assert(NX_STM32_TIMER_CHANNEL_MASK(1u, 0u, 0u, 0u) == 1u, "single");
 _Static_assert(NX_STM32_TIMER_CHANNEL_MASK(1u, 2u, 3u, 4u) == 15u, "all");
 _Static_assert(NX_STM32_TIMER_CHANNEL_MASK(4u, 1u, 0u, 0u) == 9u, "sparse");
@@ -475,7 +475,7 @@ _Static_assert(NX_STM32_TIMER_IDLE_HIGH(32768u), "high");
             path.write_text(source, encoding="utf-8")
             completed = subprocess.run([compiler, "-std=c11", "-Wall", "-Wextra",
                 "-Werror", "-pedantic", "-fsyntax-only", "-I",
-                str(configure.ROOT / "soc/stm32/stm32f4/private"), str(path)],
+                str(configure.ROOT / "soc/stm32/stm32f4"), str(path)],
                 capture_output=True, text=True)
             self.assertEqual(completed.returncode, 0, completed.stderr)
 

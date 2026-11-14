@@ -96,19 +96,19 @@ ICRST／DCRST 表示外来操作，必须在解锁前拒绝。脉冲结束后，
 代码、常量、向量或中断访问正在写擦的 bank 时仍可能停顿；平台不自动搬移执行闭包
 到 RAM。deadline 不撤销物理脉冲，超时仍须等待实际 BSY 退出，再按真实清理结果
 归还责任。该模式的 C 路径和故障回归见
-[Flash provider](../../soc/stm32/stm32f4/drivers/flash.c) 与
+[Flash provider](../../soc/stm32/stm32f4/drivers/flash/flash.c) 与
 [双 bank 模型](../../tests/google/stm32_flash_bank_test.cpp)；它们不建立实板资格。
 
 ## 外部总线与介质
 
 现有 FSMC 的 NE3 SRAM、CPU 窗口、启动内存与 NE4 parallel16 合同见
-[模块 README](../../soc/stm32/stm32f4/private/fsmc_hal/README.md)。启动内存的永久
+[模块 README](../../soc/stm32/stm32f4/sdk/hal_config/fsmc/README.md)。启动内存的永久
 收条早于 Platform 运行，失败或停止均不能撤回承载全局对象的 bank、引脚和时钟。
 CPU 窗口本身不授予 DMA、堆、外部栈或执行权限。NOR/NAND 的芯片命令、页操作和
 板级时序必须由完整选中模式维护，不能由 async16 名称推导。
 
 SDIO 的有限 IRQ/DMA、CRC、取消、排空及拔卡责任见
-[SDIO 模块合同](../../soc/stm32/stm32f4/private/sdio_hal/README.md)。所有介质发现均为
+[SDIO 模块合同](../../soc/stm32/stm32f4/sdk/hal_config/sdio/README.md)。所有介质发现均为
 显式运行期动作；冷态启动和 factory 查询不替换卡片或运行产品文件系统。
 
 RX 使用 PFCTRL，NDTR 在启用后从 `0xffff` 计数；TX 使用 DMA-controller flow 与

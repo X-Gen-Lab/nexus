@@ -47,7 +47,7 @@ class Stm32ExtiGenerationTests(unittest.TestCase):
 
     def test_irq_and_ring_policy_are_immutable_selected_configuration(self):
         source = self.source()
-        self.assertIn('#include "stm32f407_control_cold.h"', source)
+        self.assertIn('#include "drivers/exti/cold.h"', source)
         for line in (5, 6):
             self.assertIn(f"static const nx_stm32_exti_config_t s_nx_control_config_edge{line}", source)
             self.assertIn(f".line = {line}u, .priority = 5u", source)

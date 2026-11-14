@@ -12,8 +12,10 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
+#include "drivers/i2c/instance.h"
 #include "i2c_v1_async.h"
-#include "stm32f407_provider.h"
+#include "nexus/arch/arch.h"
+#include "nexus/core/time.h"
 }
 #include <cstring>
 #include <gmock/gmock.h>

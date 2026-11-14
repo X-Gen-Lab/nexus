@@ -9,8 +9,8 @@
 #include "clock_domain_impl.h"
 #include "clock_sleep_soc_model.h"
 #include "nexus/arch/sleep.h"
-#include "stm32f407_sleep.h"
 #include "stm32f407xx.h"
+#include "system/stm32f407_sleep.h"
 #define SOC_SLEEP    nx_stm32f407_sleep
 #define PLL          RCC->PLLCFGR
 #define CONTROL      RCC->CR

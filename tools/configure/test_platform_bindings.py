@@ -14,7 +14,7 @@ class PlatformBindingTests(unittest.TestCase):
     def policy(self):
         module = importlib.import_module("tools.configure.platform_bindings")
         facts = configure.load(configure.ROOT /
-            "soc/stm32/stm32f4/bindings/platform.json")
+            "soc/stm32/stm32f4/private/bindings/platform.json")
         return module.PlatformBindings.from_validated(facts["domains"]["platform"])
 
     def test_common_import_selects_no_family_adapter(self):
@@ -54,7 +54,7 @@ class PlatformBindingTests(unittest.TestCase):
     def test_package_owns_c_symbols_without_exposing_configuration_objects(self):
         module = importlib.import_module("tools.configure.platform_bindings")
         facts = configure.load(configure.ROOT /
-            "soc/stm32/stm32f4/bindings/platform.json")["domains"]["platform"]
+            "soc/stm32/stm32f4/private/bindings/platform.json")["domains"]["platform"]
         changed = copy.deepcopy(facts)
         changed["calls"]["system_start"] = "reviewed_system_start"
         policy = module.PlatformBindings.from_validated(changed)

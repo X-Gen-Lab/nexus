@@ -15,14 +15,18 @@ ROOT = Path(__file__).resolve().parents[2]
 class ProviderSourceSelectionTests(unittest.TestCase):
     def private_sources(self, family, names):
         """Spell expected SoC-local sources without erasing their ownership."""
-        directory = Path(source_directory(family))
-        return {(directory / (name if name == "timebase.c" else
-                              "drivers/" + name)).as_posix() for name in names} | {
-            (directory / "drivers" / name).as_posix() for name in (
-                "platform_coordinator.c", "platform_lifecycle.c",
-                "system_lifecycle.c", "platform_cold.c",
-                "lifecycle_pins.c", "chip.c")} | {
-            (directory / name).as_posix() for name in ("reset.c", "supervision.c")}
+        from tools.configure.packages import find
+        package = find(ROOT, family)
+        expected = set(names) | {
+            "platform_coordinator.c", "platform_lifecycle.c", "system_lifecycle.c",
+            "platform_cold.c", "lifecycle_pins.c", "chip.c", "reset.c", "supervision.c"}
+        paths = set()
+        for name in expected:
+            matches = [path for directory in package.export_roots
+                       for path in directory.rglob(name) if package.exports(path)]
+            self.assertEqual(len(matches), 1, name)
+            paths.add(matches[0].relative_to(ROOT).as_posix())
+        return paths
 
     def configure_sources(self, family, controllers):
         """Inspect production targets without claiming an ARM link proof."""

@@ -1,6 +1,6 @@
 # Actual-POT delta independently reviewed against current source and contracts.
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 4d9c52f7df197ad4f6b9395f5dc3243f2945951520a2845be93fa6782dc4ba45\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 138192cb54c54ef6590853b16df4cc900e87c84fdc4345adf02d53ab43d29d15\n"
 
 msgid "![FIG-31：F4 源码归属与接口边界](../assets/diagrams/driver-source-ownership.svg)"
 msgstr "![FIG-31: F4 source ownership and interface boundaries](../assets/diagrams/driver-source-ownership.svg)"
@@ -10,7 +10,6 @@ msgstr "FIG-31: F4 source ownership and interface boundaries"
 
 msgid "STM32F4 DCMI、I2S2／3 与 SAI"
 msgstr "STM32F4 DCMI, I2S2/3 and SAI"
-
 
 msgid "普通消费者通过 `nx_capture_port_*` 与 `nx_audio_port_*` 操作已经绑定的接口，无需解引用可选方法表。公共入口保留原始 request、stream 和输出指针，具体 owner 继续检查私有配置及活动借用别名。缺失能力返回 `UNSUPPORTED`；公共检查不添加复制、队列或线程。停止生产者不撤销已经发布的消费者借用，service 返回值也不替代 request 的终态。"
 msgstr "Ordinary consumers use `nx_capture_port_*` and `nx_audio_port_*` on already bound faces without dereferencing optional method tables. Public entries preserve original request, stream and output pointers; the concrete owner still checks aliases with private configuration and live loans. Missing capabilities return `UNSUPPORTED`; public checks add no copy, queue or thread. Stopping a producer does not revoke published consumer loans, and a service result does not replace the request terminal state."

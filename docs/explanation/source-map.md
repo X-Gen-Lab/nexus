@@ -12,21 +12,23 @@ source_language: zh_CN
 参考分别说明。其他 SDK 原位保留，目录、实现、执行记录和物理资格不相互替代。
 
 ```text
-core/                         结果、时间、请求与整平台冷态协调
-arch/arm/cortex_m/            编译期 CPU 原语
-arch/native/                  主机测试 CPU 端口
-io/                           公共接口与硬件无关机制
-soc/stm32/stm32f4/             F4 系列唯一生产 provider
-  package.json                身份、事实、binding_files、构建入口与导出归属
-  bindings.json / bindings/    公共领域能力与私有静态绑定数据
-  drivers/ip/                 仍被 F4 使用的共享硬件实现
-  cmake/                      家族选编与官方库私有配置
-  private/                    厂商类型、Handle 与私有状态
-boards/                       四个现有 F407 板卡包
-components/                   可选器件、协议和公共机制
-tools/configure/              通用包／领域政策与有限静态装配
-tests/support/native/         显式主机测试模型与装配
-vendors/                      全部锁定来源；按实际选择消费
+core/
+arch/arm/cortex_m/
+arch/native/
+io/
+soc/stm32/stm32f4/
+  package.json
+  facts/
+  system/
+  drivers/<domain>/
+  drivers/ip/
+  private/
+  sdk/
+boards/
+components/
+tools/configure/
+tests/support/native/
+vendors/
 ```
 
 | 维护问题 | 权威入口 |
@@ -39,7 +41,7 @@ vendors/                      全部锁定来源；按实际选择消费
 | 等待、任务和内核责任 | [OS](../../os/README.md) |
 | 外部器件与可选机制 | [组件](../../components/README.md) |
 | 包、binding 与接入边界 | [接入指南](../guides/provider-porting.md)、[package loader](../../tools/configure/packages.py) |
-| 资料身份与已审适用范围 | 包内 `review_profiles.json`、[ProfileSet](../../tools/configure/reference_profiles.py) |
+| 资料身份与已审适用范围 | 包内 `facts/review_profiles.json`、[ProfileSet](../../tools/configure/reference_profiles.py) |
 | 领域与私有值 | [DomainPolicies](../../tools/configure/domain_policies.py)、[IR](../../tools/configure/ir.py) |
 | 静态对象与 IRQ／endpoint 连接 | [StaticRecipe／StaticObjects](../../tools/configure/static_recipe.py)、[SharedIrq](../../tools/configure/shared_irq.py)、[ChildGroups](../../tools/configure/static_endpoints.py) |
 | 单层声明和值片段 | [StaticFragments](../../tools/configure/static_fragments.py) |
@@ -61,7 +63,7 @@ SDK 只按选择的包导出归属收集源码。结构图见
 资格。主机 Python 不进入固件，硬件算法和执行顺序由 C 维护。
 
 Core `private/platform_lifecycle_impl.h` 维护整平台启动、停止、回滚与诊断，F4
-`private/stm32f4_platform_lifecycle_impl.h` 维护 System 与共享资源的 C 协调；各自的
+`system/stm32f4_platform_lifecycle_impl.h` 维护 System 与共享资源的 C 协调；各自的
 `.c` 公共入口复用同一实现，固定装配让编译器看到常量并裁剪分支。主机只维护
 一套配置实现，其代码不进入 MCU 镜像。实际生成 factory、模型与 ARM 产物
 各自验证，不能把源码移动视为整条链路已经验收。

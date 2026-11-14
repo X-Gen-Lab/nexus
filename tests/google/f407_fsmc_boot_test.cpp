@@ -7,7 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
-#include "stm32f407_fsmc.h"
+#include "drivers/memory/stm32f407_fsmc.h"
 }
 #include <algorithm>
 #include <array>

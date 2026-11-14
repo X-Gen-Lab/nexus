@@ -40,7 +40,7 @@ class ProviderPinlessLinkTests(unittest.TestCase):
                                  result.stdout + result.stderr)
             units = json.loads((build / "compile_commands.json").read_text())
             self.assertEqual(any(Path(unit["file"]).as_posix().endswith(
-                "/soc/stm32/stm32f4/drivers/gpio.c") for unit in units),
+                "/soc/stm32/stm32f4/drivers/gpio/gpio.c") for unit in units),
                 gpio_selected,
                 "Only selections with pads may compile the GPIO owner")
             elf = build / "bin/nexus_firmware.elf"

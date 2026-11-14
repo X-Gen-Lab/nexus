@@ -6,10 +6,10 @@ nexus_google_test(nexus_spi_transaction_test
 
 nexus_google_test(nexus_stm32_spi_transaction_test STM32F4_LL
     SOURCES spi_transaction_provider_test.cpp
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/spi.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/spi/spi.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio/gpio.c"
     LIBRARIES Nexus::NativeModel Nexus::Arch
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private")
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4")
 target_include_directories(nexus_stm32_spi_transaction_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
     "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
@@ -21,11 +21,11 @@ target_compile_options(nexus_stm32_spi_transaction_test PRIVATE
 
 nexus_google_test(nexus_stm32_spi_dma_sequence_test STM32F4_LL
     SOURCES spi_dma_sequence_provider_test.cpp
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/spi.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/spi_dma.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/spi/spi.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/spi/spi_dma.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio/gpio.c"
     LIBRARIES Nexus::NativeModel Nexus::Arch
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
         "${NEXUS_SOURCE_DIR}/io/private")
 target_include_directories(nexus_stm32_spi_dma_sequence_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"

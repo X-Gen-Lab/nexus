@@ -7,7 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
-#include "stm32f407_uart_receive.h"
+#include "drivers/uart/stm32f407_uart_receive.h"
 }
 #include "nexus/io/native/model.h"
 #include "nexus/io/uart_rs485.h"

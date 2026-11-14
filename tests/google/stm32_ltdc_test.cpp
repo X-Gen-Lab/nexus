@@ -12,9 +12,9 @@
 #pragma weak nx_graphics_reference_step
 #pragma weak nx_graphics_reference_stop
 extern "C" {
-#include "stm32f407_system.h"
-#include "stm32f4_graphics_memory.h"
-#include "stm32f4_ltdc.h"
+#include "drivers/graphics/stm32f4_graphics_memory.h"
+#include "drivers/graphics/stm32f4_ltdc.h"
+#include "system/stm32f407_system.h"
 }
 #include <array>
 #include <cstring>

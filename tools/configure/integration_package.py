@@ -360,7 +360,7 @@ def _select_data_package(path, *, family, test_support, read, owner_root=None):
         fail("Declarative package family differs from Board family")
     if package.scope == "reference" and not test_support:
         fail("Reference package requires explicit test support")
-    soc = read(package.fact("soc"))
+    soc = packages.read_soc(package, read=read)
     bindings = read(package.fact("bindings"))
     if "software" not in bindings:
         fail("Declarative package requires software binding records")

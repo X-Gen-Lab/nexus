@@ -6,8 +6,8 @@
 #ifndef NX_F407_SRAM_BOOT_MODEL_H
 #define NX_F407_SRAM_BOOT_MODEL_H
 #include "stm32_official_model.h"
-#include "stm32f407_sram_boot.h"
 #include "stm32f4xx_ll_fsmc.h"
+#include "system/stm32f407_sram_boot.h"
 #ifdef __cplusplus
 extern "C" {
 #endif

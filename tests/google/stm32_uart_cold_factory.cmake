@@ -17,39 +17,39 @@ foreach(cold_uart_mode irq irq-wire irq-words irq-blocks dma-tx rx-dma-idle
     endif()
     nexus_google_configuration_inputs("${cold_uart_bundle}")
     set(cold_uart_sources
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_hardware.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_cold.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_cold.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_lifecycle.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_coordinator.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/system_lifecycle.c")
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart/uart.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart/uart_hardware.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart/uart_cold.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio/gpio.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_cold.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_lifecycle.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_coordinator.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/system_lifecycle.c")
     if(cold_uart_mode STREQUAL "irq-wire")
-        list(APPEND cold_uart_sources "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_wire.c")
+        list(APPEND cold_uart_sources "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart/uart_wire.c")
     endif()
     set(cold_uart_rx 0)
     set(cold_uart_tx 0)
     set(cold_uart_hal FALSE)
     if(cold_uart_mode MATCHES "^(rx-dma|dma-duplex)")
         set(cold_uart_rx 1)
-        list(APPEND cold_uart_sources "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_receive.c")
+        list(APPEND cold_uart_sources "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart/uart_receive.c")
     endif()
     if(cold_uart_mode MATCHES "^(dma-tx|dma-duplex)")
         set(cold_uart_tx 1)
         if(cold_uart_mode STREQUAL "dma-tx")
             set(cold_uart_hal TRUE)
-            list(APPEND cold_uart_sources "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_hal.c")
+            list(APPEND cold_uart_sources "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart/uart_hal.c")
         else()
-            list(APPEND cold_uart_sources "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_dma.c")
+            list(APPEND cold_uart_sources "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart/uart_dma.c")
         endif()
     endif()
     if(cold_uart_mode MATCHES "^dma-duplex")
-        list(APPEND cold_uart_sources "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_duplex.c")
+        list(APPEND cold_uart_sources "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart/uart_duplex.c")
     elseif(cold_uart_mode STREQUAL "irq-words")
-        list(APPEND cold_uart_sources "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_word.c")
+        list(APPEND cold_uart_sources "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart/uart_word.c")
     elseif(cold_uart_mode STREQUAL "irq-blocks")
-        list(APPEND cold_uart_sources "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_stream.c")
+        list(APPEND cold_uart_sources "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart/uart_stream.c")
     endif()
     string(REPLACE "-" "_" cold_uart_label "${cold_uart_mode}")
     set(cold_uart_target "nexus_stm32_uart_${cold_uart_label}_cold_factory_test")
@@ -58,7 +58,7 @@ foreach(cold_uart_mode irq irq-wire irq-words irq-blocks dma-tx rx-dma-idle
             ${cold_uart_sources}
         LIBRARIES Nexus::IO
         INCLUDES "${cold_uart_bundle}"
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
             "${NEXUS_SOURCE_DIR}/arch/include")
     if(NOT cold_uart_hal)
         target_include_directories(${cold_uart_target} PRIVATE
@@ -114,17 +114,17 @@ endif()
 nexus_google_configuration_inputs("${qiming_uart_bundle}")
 nexus_google_test(nexus_stm32_qiming_multi_uart_cold_factory_test STM32F4_LL
     SOURCES stm32_uart_cold_factory_test.cpp "${qiming_uart_bundle}/bindings.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_hardware.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart_cold.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_cold.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_lifecycle.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_coordinator.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/system_lifecycle.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart/uart.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart/uart_hardware.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart/uart_cold.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio/gpio.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_cold.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_lifecycle.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_coordinator.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/system_lifecycle.c"
     LIBRARIES Nexus::IO
     INCLUDES "${qiming_uart_bundle}"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
         "${NEXUS_SOURCE_DIR}/arch/include"
         "${NEXUS_SOURCE_DIR}/tests/support/f4_cpu")
 target_include_directories(nexus_stm32_qiming_multi_uart_cold_factory_test

@@ -7,9 +7,9 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
-#include "stm32f407_clock.h"
-#include "stm32f407_system.h"
-#include "stm32f4_hash.h"
+#include "drivers/crypto/stm32f4_hash.h"
+#include "system/stm32f407_clock.h"
+#include "system/stm32f407_system.h"
 void nx_hal_test_cpu_reset(void);
 bool nx_hal_test_isr(bool value);
 void nx_hal_test_dsb_hook(void (*hook)(void));

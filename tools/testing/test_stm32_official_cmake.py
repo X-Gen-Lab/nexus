@@ -20,14 +20,17 @@ class STM32OfficialCMakeTests(unittest.TestCase):
         self.root = Path(self.temporary.name)
         (self.root / "empty.c").write_text("int official_fixture(void) { return 0; }\n")
 
-    def configure(self, statement, module_root=None, *, arm=False):
+    def configure(self, statement, module_root=None, *, arm=False, module=None):
         module_root = ROOT if module_root is None else module_root
+        module = (module_root / "soc/stm32/stm32f4/sdk/STM32Official.cmake"
+                  if module is None else module)
         (self.root / "CMakeLists.txt").write_text(
             'cmake_minimum_required(VERSION 3.31)\n'
             'project(official_ll_fixture C)\n'
             'set(CMAKE_EXPORT_COMPILE_COMMANDS ON)\n'
             f'set(Python3_EXECUTABLE "{sys.executable}")\n'
-            f'include("{module_root}/soc/stm32/stm32f4/cmake/STM32Official.cmake")\n'
+            f'set(NEXUS_SOURCE_DIR "{module_root}")\n'
+            f'include("{module}")\n'
             'add_library(provider STATIC empty.c)\n'
             'target_compile_definitions(provider PRIVATE STM32F407xx)\n' + statement)
         return subprocess.run([
@@ -39,9 +42,9 @@ class STM32OfficialCMakeTests(unittest.TestCase):
 
     def official_fixture(self, name="source"):
         fixture = self.root / name
-        (fixture / "soc/stm32/stm32f4/cmake").mkdir(parents=True)
-        shutil.copyfile(ROOT / "soc/stm32/stm32f4/cmake/STM32Official.cmake",
-                        fixture / "soc/stm32/stm32f4/cmake/STM32Official.cmake")
+        (fixture / "soc/stm32/stm32f4/sdk").mkdir(parents=True)
+        shutil.copyfile(ROOT / "soc/stm32/stm32f4/sdk/STM32Official.cmake",
+                        fixture / "soc/stm32/stm32f4/sdk/STM32Official.cmake")
         (fixture / "dependencies").mkdir()
         (fixture / "dependencies/stm32f4-hal.lock.json").write_text(
             '{"files":{"LICENSE.md":{"bytes":1,"sha256":"fixture"}}}\n')
@@ -163,6 +166,29 @@ class STM32OfficialCMakeTests(unittest.TestCase):
             capture_output=True, text=True, timeout=60)
         self.assertEqual(built.returncode, 0, built.stdout + built.stderr)
 
+    def test_relocated_package_uses_explicit_core_and_its_own_hal_profiles(self):
+        package = self.root / "external family package"
+        shutil.copytree(ROOT / "soc/stm32/stm32f4/sdk", package / "sdk")
+        result = self.configure(
+            'nexus_stm32f4_dma_hal(provider)\n'
+            'target_compile_options(provider_stm32_dma_hal PRIVATE '
+            '-mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard)\n'
+            'get_target_property(private provider_stm32_dma_hal '
+            'INCLUDE_DIRECTORIES)\n'
+            'file(WRITE "${CMAKE_BINARY_DIR}/relocated-includes" '
+            '"${private}")\n',
+            module=package / "sdk/STM32Official.cmake", arm=True)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        includes = (self.root / "build/relocated-includes").read_text().split(";")
+        self.assertIn(str(package / "sdk/hal_config/dma"), includes)
+        self.assertNotIn(str(ROOT / "soc/stm32/stm32f4/sdk/hal_config/dma"),
+                         includes)
+        built = subprocess.run([
+            shutil.which("cmake"), "--build", str(self.root / "build"),
+            "--target", "provider_stm32_dma_hal", "--parallel", "1"],
+            capture_output=True, text=True, timeout=60)
+        self.assertEqual(built.returncode, 0, built.stdout + built.stderr)
+
     def test_unknown_interface_and_extra_arguments_are_rejected(self):
         for statement in ('nexus_stm32f4_official(missing)\n',
                           'add_library(face INTERFACE)\n'
@@ -188,7 +214,7 @@ class STM32OfficialCMakeTests(unittest.TestCase):
             '"${private}\\n${public}\\n${sources}\\n${vendor}\\n${options}\\n${kind}\\n")\n')
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         lines = (self.root / "build/hal-properties").read_text().splitlines()
-        self.assertIn(str(ROOT / "soc/stm32/stm32f4/private/hal"),
+        self.assertIn(str(ROOT / "soc/stm32/stm32f4/sdk/hal_config/uart"),
                       lines[0].split(";"))
         self.assertEqual(lines[1], "public-NOTFOUND")
         self.assertEqual(lines[3].split(";"), [
@@ -196,7 +222,7 @@ class STM32OfficialCMakeTests(unittest.TestCase):
             for name in ("stm32f4xx_hal_uart.c",)])
         self.assertIn("$<TARGET_OBJECTS:provider_stm32f407_hal>", lines[2])
         self.assertIn("-include" + str(
-            ROOT / "soc/stm32/stm32f4/private/stm32f407_hal_profile.h"),
+            ROOT / "soc/stm32/stm32f4/drivers/uart/stm32f407_hal_profile.h"),
             lines[4].split(";"))
         self.assertEqual(lines[5], "OBJECT_LIBRARY")
 
@@ -233,15 +259,15 @@ class STM32OfficialCMakeTests(unittest.TestCase):
                 self.assertNotIn("uart_dma.c", drivers)
                 for entry in vendor:
                     if Path(entry["file"]).name == "stm32f4xx_hal_dma.c":
-                        self.assertIn("/private/dma_hal", entry["command"])
-                        self.assertNotIn("stm32f407_hal_profile.h", entry["command"])
+                        self.assertIn("/sdk/hal_config/dma", entry["command"])
+                        self.assertNotIn("drivers/uart/stm32f407_hal_profile.h", entry["command"])
                     elif Path(entry["file"]).name == "stm32f4xx_hal_rcc.c":
-                        self.assertIn("/private/rcc_hal", entry["command"])
-                        self.assertNotIn("stm32f407_hal_profile.h", entry["command"])
-                        self.assertNotIn("/private/hal ", entry["command"])
+                        self.assertIn("/sdk/hal_config/rcc", entry["command"])
+                        self.assertNotIn("drivers/uart/stm32f407_hal_profile.h", entry["command"])
+                        self.assertNotIn("/sdk/hal_config/uart ", entry["command"])
                     else:
-                        self.assertIn("stm32f407_hal_profile.h", entry["command"])
-                        self.assertIn("/private/hal", entry["command"])
+                        self.assertIn("drivers/uart/stm32f407_hal_profile.h", entry["command"])
+                        self.assertIn("/sdk/hal_config/uart", entry["command"])
 
     def test_real_crypto_dma_graph_keeps_each_selected_engine_independent(self):
         self.assertIsNotNone(shutil.which("arm-none-eabi-gcc"),
@@ -274,7 +300,7 @@ class STM32OfficialCMakeTests(unittest.TestCase):
                 dma = [entry for entry in commands if Path(entry["file"]).name ==
                        "stm32f4xx_hal_dma.c"]
                 self.assertEqual(len(dma), 1)
-                self.assertIn("/private/dma_hal", dma[0]["command"])
+                self.assertIn("/sdk/hal_config/dma", dma[0]["command"])
 
     def test_real_usb_products_select_remote_wakeup_only_inside_soc_target(self):
         fixtures = (
@@ -341,10 +367,10 @@ class STM32OfficialCMakeTests(unittest.TestCase):
                        if Path(entry["file"]).name == "stm32f4xx_hal_dma.c"]
                 self.assertEqual(len(dma), int(serial))
                 if serial:
-                    self.assertIn("/private/qspi_hal", qspi[0]["command"])
+                    self.assertIn("/sdk/hal_config/qspi", qspi[0]["command"])
                     self.assertIn("USE_HAL_QSPI_REGISTER_CALLBACKS=1U",
                                   qspi[0]["command"])
-                    self.assertIn("/private/dma_hal", dma[0]["command"])
+                    self.assertIn("/sdk/hal_config/dma", dma[0]["command"])
 
     def test_uart_and_repeated_dma_users_share_one_real_arm_object(self):
         result = self.configure(
@@ -359,8 +385,8 @@ class STM32OfficialCMakeTests(unittest.TestCase):
         dma = [entry for entry in commands
                if Path(entry["file"]).name == "stm32f4xx_hal_dma.c"]
         self.assertEqual(len(dma), 1)
-        self.assertIn("/private/dma_hal", dma[0]["command"])
-        self.assertNotIn("/private/hal ", dma[0]["command"])
+        self.assertIn("/sdk/hal_config/dma", dma[0]["command"])
+        self.assertNotIn("/sdk/hal_config/uart ", dma[0]["command"])
         built = subprocess.run([
             shutil.which("cmake"), "--build", str(self.root / "build"),
             "--target", "provider_stm32_dma_hal", "--parallel", "1"],
@@ -390,9 +416,9 @@ class STM32OfficialCMakeTests(unittest.TestCase):
         self.assertCountEqual([Path(entry["file"]).name for entry in selected],
                               ["stm32f4xx_hal_rcc.c", "stm32f4xx_hal_rcc_ex.c"])
         for entry in selected:
-            self.assertIn("/private/rcc_hal", entry["command"])
-            self.assertNotIn("stm32f407_hal_profile.h", entry["command"])
-            self.assertNotIn("/private/hal ", entry["command"])
+            self.assertIn("/sdk/hal_config/rcc", entry["command"])
+            self.assertNotIn("drivers/uart/stm32f407_hal_profile.h", entry["command"])
+            self.assertNotIn("/sdk/hal_config/uart ", entry["command"])
         public, sources = (self.root / "build/rcc-properties").read_text().splitlines()
         self.assertEqual("public-NOTFOUND", public)
         self.assertEqual(1, sources.count("TARGET_OBJECTS:provider_stm32_rcc_hal"))

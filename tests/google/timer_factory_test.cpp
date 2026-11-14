@@ -7,10 +7,14 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
+#include "drivers/gpio/instance.h"
+#include "drivers/gpio/pins.h"
+#include "drivers/timer/stm32f407_timer_cold.h"
+#include "drivers/timer/stm32f407_timer_hardware.h"
+#include "nexus/core/time.h"
 #include "nexus_bindings.h"
 #include "nexus_factory.h"
-#include "stm32f407_provider.h"
-#include "stm32f407_timer_cold.h"
+#include "system/stm32f407_system.h"
 #include "timer_advanced_controller.h"
 void TIM4_IRQHandler(void);
 void TIM1_BRK_TIM9_IRQHandler(void);

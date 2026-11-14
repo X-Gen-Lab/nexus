@@ -21,7 +21,7 @@ foreach(physical_family stm32)
         target_include_directories(${physical_object} PRIVATE
             "${NEXUS_SOURCE_DIR}/core/private"
             "${physical_bundle}" "${NEXUS_SOC_SOURCE_${physical_soc}}"
-            "${NEXUS_SOC_SOURCE_${physical_soc}}/private"
+            "${NEXUS_SOC_SOURCE_${physical_soc}}"
             "${NEXUS_SOURCE_DIR}/tests/support/f4_cpu")
         target_link_libraries(${physical_object} PRIVATE Nexus::IO Nexus::Arch)
         target_compile_definitions(${physical_object} PRIVATE
@@ -60,14 +60,14 @@ foreach(physical_family stm32)
     endforeach()
     nexus_google_test(${physical_target} ${physical_official}
         SOURCES physical_platform_factory_test.cpp
-        "${NEXUS_SOC_SOURCE_${physical_soc}}/drivers/gpio.c"
-        "${NEXUS_SOC_SOURCE_${physical_soc}}/drivers/platform_cold.c"
-        "${NEXUS_SOC_SOURCE_${physical_soc}}/drivers/platform_lifecycle.c"
-        "${NEXUS_SOC_SOURCE_${physical_soc}}/drivers/platform_coordinator.c"
-        "${NEXUS_SOC_SOURCE_${physical_soc}}/drivers/system_lifecycle.c"
+        "${NEXUS_SOC_SOURCE_${physical_soc}}/drivers/gpio/gpio.c"
+        "${NEXUS_SOC_SOURCE_${physical_soc}}/system/platform_cold.c"
+        "${NEXUS_SOC_SOURCE_${physical_soc}}/system/platform_lifecycle.c"
+        "${NEXUS_SOC_SOURCE_${physical_soc}}/system/platform_coordinator.c"
+        "${NEXUS_SOC_SOURCE_${physical_soc}}/system/system_lifecycle.c"
         LIBRARIES Nexus::IO Nexus::Arch
         INCLUDES "${physical_gpio_bundle}" "${NEXUS_SOC_SOURCE_${physical_soc}}"
-            "${NEXUS_SOC_SOURCE_${physical_soc}}/private"
+            "${NEXUS_SOC_SOURCE_${physical_soc}}"
             "${NEXUS_SOURCE_DIR}/tests/support/f4_cpu")
     target_sources(${physical_target} PRIVATE
         $<TARGET_OBJECTS:${physical_target}_empty>

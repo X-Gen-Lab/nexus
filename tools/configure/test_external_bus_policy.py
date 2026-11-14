@@ -151,7 +151,7 @@ class ExternalBusPolicyTests(unittest.TestCase):
         from tools.configure.tests.external_memory_fixture import policy
         root = Path(__file__).resolve().parents[2]
         routes = {row["id"]: row for row in json.loads(
-            (root / "soc/stm32/stm32f4/routes.json").read_text())["routes"]}
+            (root / "soc/stm32/stm32f4/facts/routes.json").read_text())["routes"]}
         paths = ("fsmc_assembly/ve-nand.toml", "fsmc_assembly/ve-nor.toml",
                  "fsmc_assembly/ve-psram.toml", "fsmc_assembly/zg-all.toml",
                  "stm32f4_sdram/f479ni-sdram.toml",

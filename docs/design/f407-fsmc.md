@@ -136,7 +136,7 @@ ES0321 §2.3.4 要求保持共享 `FMC_BCR1.WFDIS=0`。FMC gate 关闭时不能�
 后续命令与新借用再次检查。驱动不自动修改外来 WFDIS；已初始化后约束失效会阻止
 新借用和普通停止并保留 owner／gate。只有尚未发命令／借用的 phase0 冷拒绝，
 能够保持原 BCR1 不变并归还自己取得的 gate。实现见
-[SDRAM 私有合同](../../soc/stm32/stm32f4/private/stm32f4_sdram.h)。
+[SDRAM 私有合同](../../soc/stm32/stm32f4/drivers/memory/stm32f4_sdram.h)。
 
 ### 显式图形存储模式
 
@@ -256,7 +256,7 @@ ES0321 §2.4.5 进一步要求
 整个 provider 生命周期都禁止访问 `0x90000000` aperture，包括其它 CPU、IRQ、
 DMA 和调试访问；仅不返回 mapped pointer 不足以满足约束。精确物理验收保持
 `not_executed`，模型与 ARM 软件证据不替代电气／时序／实物验证。实现见
-[QuadSPI 私有合同](../../soc/stm32/stm32f4/private/stm32f4_qspi.h)。
+[QuadSPI 私有合同](../../soc/stm32/stm32f4/drivers/memory/stm32f4_qspi.h)。
 
 ## F479 CPU_READ 映射端点
 

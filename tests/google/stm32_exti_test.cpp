@@ -8,7 +8,8 @@
  */
 #include "stm32_exti_model.h"
 extern "C" {
-#include "stm32f407_provider.h"
+#include "drivers/exti/instance.h"
+#include "nexus/core/time.h"
 nx_time_us_t nx_time_now_us(void) {
     return 0U;
 }

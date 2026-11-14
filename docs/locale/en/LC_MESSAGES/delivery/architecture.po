@@ -1,6 +1,6 @@
-# Actual-POT messages; independent semantic review completed for this source.
+# Actual-POT messages.
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: db228e0013158c2c1f76a907ed90766fe212e94102463bec26f104ed786b5009\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 22924db6ea66a4cceafe5abc139a0bfa1e1eb3adacbdf6863b27182f6ec559a1\n"
 
 msgid "当前系统架构与接入重构"
 msgstr "Current system architecture and integration refactor"
@@ -49,12 +49,6 @@ msgstr "`soc/stm32/stm32f4/`"
 
 msgid "精确器件事实、时钟、启动、内存、IRQ／DMA、控制器与私有 SDK"
 msgstr "Exact device facts, clocks, startup, memory, IRQ/DMA, controllers and private SDK"
-
-msgid "`soc/stm32/stm32f4/drivers/ip/`"
-msgstr "`soc/stm32/stm32f4/drivers/ip/`"
-
-msgid "经核对可共享的 F4 私有硬件算法"
-msgstr "Reviewed shared private F4 hardware algorithms"
 
 msgid "`boards/`"
 msgstr "`boards/`"
@@ -242,9 +236,6 @@ msgstr "Directory changes follow responsibility. Current private F4 implementati
 msgid "接入包目录责任"
 msgstr "Integration package directory responsibilities"
 
-msgid "以下是目标维护边界，不要求为目录外观移动所有文件。事实可以保留原位；同 IP 行为就近共享。包的 binding 与私有 C 类型一同维护，公共工具不复制私有布局。 家族专属构建靠近 SoC，公开通用合同仍由 Core／Arch／I/O 拥有。"
-msgstr "These are target maintenance boundaries, not a requirement to move every file for appearance. Facts may remain in place; behavior for the same IP is shared locally. Package bindings are maintained beside private C types rather than copying private layouts into public tools. Family-specific build logic stays near the SoC; Core/Arch/I/O retain public common contracts."
-
 msgid "新增同 IP 器件不改变公共工具、通用 CMake 或 SDK exporter；改变公共操作语义才 演进领域合同。当前版本和 schema 由 [兼容性事实](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/dependencies/platform-compatibility.json)唯一维护，文档不建立 另一份版本策略。过渡路径只在对应模式迁移并验证后删除。"
 msgstr "Adding a device with the same IP does not change public tools, common CMake or the SDK exporter. Public operation semantics drive domain-contract evolution. [Compatibility facts](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/dependencies/platform-compatibility.json) uniquely own current versions and schemas; documentation does not establish another version policy. Delete a transition path only after its corresponding modes have migrated and passed verification."
 
@@ -266,8 +257,8 @@ msgstr "Shutdown first closes admission while retaining execution capacity for d
 msgid "HAL／LL 优先用于满足完整模式合同的硬件路径。直接访问限于明确 SDK 缺口、勘误、 原子合同或已证明预算；同一行为域不并存两个 transport owner。config、runtime、 receipt 和共享只读 ops 按真实需求分开，未选模式不分配对应最大状态和缓冲。 性能与空间用实际 ELF、对象、反汇编及测量判断，不能由 inline 或接口形式推定最优。"
 msgstr "Prefer HAL/LL for hardware paths satisfying the complete mode contract. Direct access requires an explicit SDK gap, erratum, atomic contract or demonstrated budget; one behavior domain must not have two transport owners. Config, runtime, receipts and shared read-only ops are separated by actual need. Unselected modes allocate neither maximum state nor buffers. Actual ELF, objects, disassembly and measurements determine performance and space, not inline spelling or interface form."
 
-msgid "QuadSPI 当前是精确 W25Q128JV 集成。[独立协议事实](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/private/w25q128jv.h) 与其 C 实现已提纯 JEDEC 身份、adopt、保护状态、页边界、几何与命令，不依赖 控制器 SDK。STATUS → WREN → WEL → PULSE → WIP → VERIFY／WRDI 仍由该精确 集成状态机推进；间接与映射共享一个 owner，保留 WIP、排空和失败责任。当前没有 第二种 NOR 消费者，不为其预建虚表，也不声明任意可替换 NOR backend 已全部解耦。"
-msgstr "QuadSPI currently integrates the exact W25Q128JV. The [independent protocol facts](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/private/w25q128jv.h) and their C implementation isolate JEDEC identity, adoption, protection status, page boundaries, geometry and commands without controller SDK dependencies. The exact integration state machine still advances STATUS → WREN → WEL → PULSE → WIP → VERIFY/WRDI. Indirect and mapped access share one owner, retaining WIP, drain and failure responsibilities. There is no second NOR consumer today; no speculative vtable is added, and arbitrary interchangeable NOR backends are not claimed to be fully decoupled."
+msgid "QuadSPI 当前是精确 W25Q128JV 集成。[独立协议事实](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/drivers/memory/w25q128jv.h) 与其 C 实现已提纯 JEDEC 身份、adopt、保护状态、页边界、几何与命令，不依赖 控制器 SDK。STATUS → WREN → WEL → PULSE → WIP → VERIFY／WRDI 仍由该精确 集成状态机推进；间接与映射共享一个 owner，保留 WIP、排空和失败责任。当前没有 第二种 NOR 消费者，不为其预建虚表，也不声明任意可替换 NOR backend 已全部解耦。"
+msgstr "QuadSPI currently integrates the exact W25Q128JV. The [independent protocol facts](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/drivers/memory/w25q128jv.h) and their C implementation isolate JEDEC identity, adoption, protection status, page boundaries, geometry and commands without controller SDK dependencies. The exact integration state machine still advances STATUS → WREN → WEL → PULSE → WIP → VERIFY/WRDI. Indirect and mapped access share one owner, retaining WIP, drain and failure responsibilities. There is no second NOR consumer today; no speculative vtable is added, and arbitrary interchangeable NOR backends are not claimed to be fully decoupled."
 
 msgid "本轮重构退出范围"
 msgstr "Exit scope for this refactoring"
@@ -677,9 +668,6 @@ msgstr "Verification and reading entries"
 msgid "[接入指南](../guides/provider-porting.md)区分新 Board、路线、料号、IP 与公共语义。 [工程手册](../design/engineering-handbook.md)维护 TDD、风格、测试保留与普通提交门禁； [SDK 教程](../tutorials/source-sdk.md)维护公开消费入口。硬件事实、模型行为、ARM 链接、SDK 消费和物理 HIL 分别验收。当前物理执行仍为 `not_executed`，见 [资格边界](qualification.md)。"
 msgstr "The [porting guide](../guides/provider-porting.md) distinguishes a new Board, route, part, IP and public semantics. The [engineering handbook](../design/engineering-handbook.md) owns TDD, style, test retention and ordinary commit gates. The [SDK tutorial](../tutorials/source-sdk.md) owns public consumption. Hardware facts, model behavior, ARM linking, SDK consumption and physical HIL are accepted separately. Physical execution remains `not_executed`; see [qualification boundaries](qualification.md)."
 
-msgid "本批软件范围是将现有支持目录承诺的装配与模式统一到声明式包、同快照事实、不可变 IR、有限静态 C 装配与包内 CMake。未选硬件模式、未知 PCB 条件及未维护的 IP 模型不因本次迁移获得支持或执行资格。"
-msgstr "This batch's software scope unifies assemblies and modes promised by the existing support catalogue through declarative packages, one fact snapshot, immutable IR, bounded static C assembly and package CMake. Unselected hardware modes, unknown PCB conditions and unmaintained IP models gain neither support nor execution qualification from this migration."
-
 msgid "软件实现、模型行为、ARM 链接、安装 SDK 消费与软件候选分别记录来源和范围。部分运行模式或静态分析通过，不替代最终完整门禁与独立消费者验收。实际结果沿现有交付入口关联，不建立第二套资格台账。"
 msgstr "Software implementation, model behavior, ARM linking, installed-SDK consumption and software candidates record their sources and scopes separately. Passing some runtime modes or static analysis does not replace the final complete gates and independent-consumer acceptance. Actual results link through the existing delivery entry rather than another qualification ledger."
 
@@ -701,11 +689,32 @@ msgstr "Content and bilingual text are reviewed; strict-build acceptance belongs
 msgid "GPIO／UART 参考软件范围已验收，不授予生产系列或实板资格。"
 msgstr "The GPIO/UART reference-software scope is accepted; this grants neither production-family support nor hardware qualification."
 
-msgid "本批以 [`ba13686`](https://github.com/X-Gen-Lab/nexus/tree/ba13686b91c94d19ef11acf910653ee2fcc9aa8b) 为源码基线；前序软件交付见 [PR #63](https://github.com/X-Gen-Lab/nexus/pull/63)。 每项新结果必须绑定实际源码和配置，不能继承基线的测试或 SDK 资格。"
-msgstr "This batch starts from [`ba13686`](https://github.com/X-Gen-Lab/nexus/tree/ba13686b91c94d19ef11acf910653ee2fcc9aa8b); [PR #63](https://github.com/X-Gen-Lab/nexus/pull/63) records the preceding software delivery. Every new result must identify its actual source and configuration; baseline test or SDK qualification is not inherited."
-
 msgid "图表示当前构建期输入和产物流，不表示运行期调用。现有 schema-2 TOML、只读 SoC／Board 事实、不可变 typed IR、原子 bundle 和 CMake 唯一目标图继续保留。 生产默认路径由声明式 package、通用 DataProvider、DomainPolicies、私有 `constants` 与有限 StaticRecipe 组成；旧 F4 家族 Python 构造模块已删除，不保留家族导入注册表。 事实与静态连接按同一快照解析，协议见[接入指南](../guides/provider-porting.md)。 验收范围与实际来源见[资格边界](qualification.md)；删除旧模块本身不授予软件资格。"
 msgstr "The diagram shows current build-time inputs and artifact flow, not runtime calls. Schema-2 TOML, read-only SoC/Board facts, immutable typed IR, atomic bundles and the sole CMake target graph remain. The production default consists of declarative packages, generic DataProvider, DomainPolicies, private `constants` and bounded StaticRecipe. The old F4 family Python constructor modules have been removed, with no family import registry retained. Facts and static connections resolve from one snapshot; the [porting guide](../guides/provider-porting.md) owns the protocol. See [qualification boundaries](qualification.md) for acceptance scope and actual source identities; deleting old modules alone grants no software qualification."
 
 msgid "本批要求所有当前承诺模式沿同一装配链迁移，保持公共合同、支持边界和消费者行为。 新增候选模式必须单独实现和验证，不能由头文件、接口或家族目录推定完成。 原有 WP01–WP12、IO01–IO20、R0–R13 与执行结果保留在 [固定基线架构页](https://github.com/X-Gen-Lab/nexus/blob/ba13686b91c94d19ef11acf910653ee2fcc9aa8b/docs/delivery/architecture.md)。 前序 [PR #62](https://github.com/X-Gen-Lab/nexus/pull/62) 和 [PR #63](https://github.com/X-Gen-Lab/nexus/pull/63) 各保留原源码与执行身份；旧计数 不重标为新提交的执行。物理 HIL 按用户要求暂缓；远端 CI 与本地软件门禁分别保留实际执行记录。"
 msgstr "This batch migrates every currently promised mode through the same assembly chain while preserving public contracts, support boundaries and consumer behavior. New candidate modes require separate implementation and verification; headers, interfaces or family directories do not establish completion. The original WP01–WP12, IO01–IO20, R0–R13 and results remain in the [fixed baseline architecture page](https://github.com/X-Gen-Lab/nexus/blob/ba13686b91c94d19ef11acf910653ee2fcc9aa8b/docs/delivery/architecture.md). Earlier [PR #62](https://github.com/X-Gen-Lab/nexus/pull/62) and [PR #63](https://github.com/X-Gen-Lab/nexus/pull/63) retain their actual source and execution identities; old counts are not relabeled as execution of a new commit. Physical HIL remains deferred at the user's request; remote CI and local software gates retain their respective actual execution records."
+
+msgid "前序接入批次将已维护装配与模式统一到声明式包、同快照事实、不可变 IR、有限静态 C 装配与包内 CMake。本次整理 F4 的事实、系统、领域实现和官方库目录，并修正事实 组合与包路径边界。未选模式、未知 PCB 和未维护 IP 不因此取得支持或执行资格。"
+msgstr "The preceding integration batch unified maintained assemblies and modes through declarative packages, same-snapshot facts, immutable IR, bounded static C assembly and package-local CMake. This change organizes F4 facts, system mechanisms, domain implementations and official libraries, and fixes fact composition and package path boundaries. Unselected modes, unknown PCBs and unmaintained IP gain no support or execution qualification."
+
+msgid "前序接入批次以 [`ba13686`](https://github.com/X-Gen-Lab/nexus/tree/ba13686b91c94d19ef11acf910653ee2fcc9aa8b) 为源码基线；对应软件交付见 [PR #64](https://github.com/X-Gen-Lab/nexus/pull/64)。 每项新结果必须绑定实际源码和配置，不能继承基线的测试或 SDK 资格。"
+msgstr "The preceding integration batch used [`ba13686`](https://github.com/X-Gen-Lab/nexus/tree/ba13686b91c94d19ef11acf910653ee2fcc9aa8b) as its source baseline; the corresponding software delivery is [PR #64](https://github.com/X-Gen-Lab/nexus/pull/64). Each new result must bind actual source and configuration rather than inherit baseline test or SDK qualification."
+
+msgid "`soc/stm32/stm32f4/drivers/<domain>/`"
+msgstr "`soc/stm32/stm32f4/drivers/<domain>/`"
+
+msgid "相邻 binding、实例布局、硬件实现与按需选编的模式"
+msgstr "Adjacent bindings, instance layouts, hardware implementations and modes selected as needed"
+
+msgid "`soc/stm32/stm32f4/drivers/ip/`、`private/`"
+msgstr "`soc/stm32/stm32f4/drivers/ip/`, `private/`"
+
+msgid "多模式共享算法与跨域合同；不集中领域私有状态"
+msgstr "Algorithms shared across modes and contracts shared across domains; domain-private state stays local"
+
+msgid "F4 当前按以下责任维护：事实集中在 `facts/`，系统机制集中在 `system/`，每个领域的 binding、实例布局与实现相邻。共享入口只保留真实跨模式或跨域内容；公开通用合同 仍由 Core／Arch／I/O 拥有，官方启动汇编继续来自锁定厂商源码。"
+msgstr "F4 now keeps facts under `facts/`, system mechanisms under `system/`, and each domain's bindings, instance layout and implementation together. Shared entries retain only content shared across modes or domains. Core/Arch/I/O still own public common contracts, and official startup assembly continues to come from locked vendor sources."
+
+msgid "下表保留前序声明式接入批次的审查状态。本次 F4 目录重构另需实际验证事实组合、 包路径边界、模型、ARM、SDK 消费与双语文档；下表的已验收状态不替代这些结果。"
+msgstr "The table retains review status from the preceding declarative integration batch. This F4 directory refactor separately requires actual verification of fact composition, package path boundaries, models, ARM, SDK consumption and bilingual documentation. The table's accepted statuses do not substitute for those results."

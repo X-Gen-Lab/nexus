@@ -56,4 +56,4 @@ cmake --build build/f411-power --target nexus_f4_power_consumer --parallel 1
 F446 PC13 wake 与晶体 LSE 冲突；此参考只使用 RTC wake。F411 没有 Backup SRAM。
 F479 的 RTC Standby 再次进入受 ES0321 §2.2.13 限制，保留 SBF/WUF 时只报告并拒绝，
 后续清 SBF 和系统复位必须由产品明确授权。其他模式与实板状态参见
-[System 与低功耗契约](../../../soc/stm32/stm32f4/README-system-power.md)。
+[System 与低功耗契约](../../../soc/stm32/stm32f4/system/README.md)。

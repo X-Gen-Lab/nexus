@@ -8,8 +8,8 @@ extern "C" {
 #include "nexus/components/clock_domain_owner.h"
 #include "nexus/core/fault.h"
 #include "nexus/soc/stm32f4_power.h"
-#include "stm32f407_clock.h"
-#include "stm32f407_system.h"
+#include "system/stm32f407_clock.h"
+#include "system/stm32f407_system.h"
 nx_stm32_system_t g_nx_stm32_system{};
 uint32_t nx_boot_cpacr;
 uint32_t nx_boot_mpu;

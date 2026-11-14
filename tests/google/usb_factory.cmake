@@ -39,22 +39,22 @@ foreach(usb_family stm32)
         nexus_google_configuration_inputs("${usb_bundle}")
         nexus_google_test(${usb_target} SOURCES ${usb_fixture_source}
             "${usb_bundle}/bindings.c"
-            "${NEXUS_SOC_SOURCE_${usb_soc}}/drivers/usb_device.c"
-            "${NEXUS_SOC_SOURCE_${usb_soc}}/usb_clock.c"
+            "${NEXUS_SOC_SOURCE_${usb_soc}}/drivers/usb/usb_device.c"
+            "${NEXUS_SOC_SOURCE_${usb_soc}}/drivers/usb/usb_clock.c"
             LIBRARIES Nexus::NativeModel Nexus::Arch
             INCLUDES "${usb_bundle}" "${NEXUS_SOURCE_DIR}/io/private"
                 "${NEXUS_SOURCE_DIR}/tests/support/native/drivers"
-                "${NEXUS_SOC_SOURCE_${usb_soc}}/private")
+                "${NEXUS_SOC_SOURCE_${usb_soc}}")
         target_compile_options(${usb_target} PRIVATE
             "-include${CMAKE_CURRENT_SOURCE_DIR}/usb_device_soc_model.h"
             "-include${CMAKE_CURRENT_SOURCE_DIR}/usb_factory_model.h")
         target_compile_definitions(${usb_target} PRIVATE
             _init=nx_usb_fixture_init _fini=nx_usb_fixture_fini)
         target_sources(${usb_target} PRIVATE
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_cold.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_lifecycle.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/platform_coordinator.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/system_lifecycle.c")
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_cold.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_lifecycle.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_coordinator.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/system_lifecycle.c")
         target_include_directories(${usb_target} SYSTEM PRIVATE
             "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
             "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")

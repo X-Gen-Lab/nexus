@@ -6,7 +6,7 @@ from tools.configure.policies.external_bus import ExternalBusPolicy
 
 def policy():
     root = Path(__file__).resolve().parents[3]
-    path = root / 'soc/stm32/stm32f4/bindings/external_bus_policy.json'
+    path = root / 'soc/stm32/stm32f4/drivers/memory/external_bus_policy.binding.json'
     return ExternalBusPolicy.from_validated(
         json.loads(path.read_text())['domains']['external_bus'])
 
@@ -20,5 +20,5 @@ def construct(item, result):
 
 def route_pins(identity):
     root = Path(__file__).resolve().parents[3]
-    document = json.loads((root / 'soc/stm32/stm32f4/routes.json').read_text())
+    document = json.loads((root / 'soc/stm32/stm32f4/facts/routes.json').read_text())
     return tuple(next(row for row in document['routes'] if row['id'] == identity)['pins'])

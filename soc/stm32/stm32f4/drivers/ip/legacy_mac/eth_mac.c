@@ -8,6 +8,7 @@
  */
 #include "eth_mac.h"
 #include "eth_clock.h"
+#include "nexus/arch/arch.h"
 #ifdef NX_ETH_NATIVE
 #include "ethernet_access.h"
 #endif

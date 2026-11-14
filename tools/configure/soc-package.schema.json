@@ -68,6 +68,22 @@
             "pattern": "(^|/)(\\.|\\.\\.)(/|$)"
           }
         },
+        "controllers": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^(?!/)(?!.*[\\\\;\"$\\r\\n])[^/]+(?:/[^/]+)*$",
+          "not": {
+            "pattern": "(^|/)(\\.|\\.\\.)(/|$)"
+          }
+        },
+        "clocks": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^(?!/)(?!.*[\\\\;\"$\\r\\n])[^/]+(?:/[^/]+)*$",
+          "not": {
+            "pattern": "(^|/)(\\.|\\.\\.)(/|$)"
+          }
+        },
         "routes": {
           "type": "string",
           "minLength": 1,

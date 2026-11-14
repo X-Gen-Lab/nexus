@@ -19,9 +19,9 @@ foreach(rtc_part f407 f411 f446 f479)
     endif()
     nexus_google_test(${rtc_target} STM32F4_LL
         SOURCES ${rtc_test_source} f407_rtc_model.cpp
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/rtc.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/rtc/rtc.c"
         LIBRARIES Nexus::IO
-        INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
+        INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
             "${NEXUS_SOURCE_DIR}/arch/include"
             "${NEXUS_SOURCE_DIR}/io/private"
             "${NEXUS_SOURCE_DIR}/tests/google")
@@ -40,5 +40,5 @@ foreach(rtc_part f407 f411 f446 f479)
     endif()
 endforeach()
 set_source_files_properties(
-    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/rtc.c" PROPERTIES
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/rtc/rtc.c" PROPERTIES
     COMPILE_OPTIONS "-include${NEXUS_SOURCE_DIR}/tests/google/f407_rtc_model.h")

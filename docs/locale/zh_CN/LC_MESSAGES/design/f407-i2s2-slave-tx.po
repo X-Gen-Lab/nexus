@@ -1,6 +1,6 @@
 # Current gettext translation draft; independent review pending.
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 0019665bff7326eb90f664a89adb71a3cd8111da6d74596645bb137c7f5b80a3\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: b47ec3fb5bd39eb9e1d908fc234f9d990be6ce20510796cc88e73ed571f4bcd0\n"
 
 msgid "Finite I2S2 slave TX on STM32F407"
 msgstr "STM32F407 上的有限 I2S2 从机发送"
@@ -59,8 +59,8 @@ msgstr "外部 CK／WS；此 slave 模式不取得 PLLI2S 或 MCLK"
 msgid "`nx_frame_layout_audio` can describe successive stereo frames as contiguous rows. The provider verifies that the row extent equals both `layout.bytes` and the complete consumer loan length. Layout describes storage; the static assembly selects wire format. No sample conversion is performed."
 msgstr "`nx_frame_layout_audio` 可将连续 stereo frames 描述为连续 rows。provider 校验 row extent 同时等于 `layout.bytes` 和完整消费者 loan 长度。layout 描述存储；静态装配选择线上格式。不执行采样格式转换。"
 
-msgid "Platform startup prepares the selected owner and installs its thin IRQ connections without starting DMA or I2SE. `nx_factory_audio(NX_AUDIO_ID_SOUND)` returns that existing immutable face. There is no caller-created hardware owner or additional initialization authority. The public path is exercised by the [SDK consumer](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/cmake/package/verification/io_evolution/consumers/f407-i2s2-slave-tx.c). The broader I2S2/I2S3 format, receive, duplex and master-clock contract is in [the F407 capture/audio implementation notes](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/capture_audio.md)."
-msgstr "Platform 启动准备所选 owner 并安装薄 IRQ 连接，不启动 DMA 或 I2SE。`nx_factory_audio(NX_AUDIO_ID_SOUND)` 返回已有不可变接口。没有由调用者另建的硬件 owner 或额外初始化权限。公共路径由 [SDK 消费者](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/cmake/package/verification/io_evolution/consumers/f407-i2s2-slave-tx.c)验证。更广的 I2S2／I2S3 格式、接收、duplex 和 master-clock 合同见 [F407 capture/audio 实现说明](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/capture_audio.md)。"
+msgid "Platform startup prepares the selected owner and installs its thin IRQ connections without starting DMA or I2SE. `nx_factory_audio(NX_AUDIO_ID_SOUND)` returns that existing immutable face. There is no caller-created hardware owner or additional initialization authority. The public path is exercised by the [SDK consumer](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/cmake/package/verification/io_evolution/consumers/f407-i2s2-slave-tx.c). The broader I2S2/I2S3 format, receive, duplex and master-clock contract is in [the F407 capture/audio implementation notes](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/drivers/ip/av/README.md)."
+msgstr "Platform 启动准备所选 owner 并安装薄 IRQ 连接，不启动 DMA 或 I2SE。`nx_factory_audio(NX_AUDIO_ID_SOUND)` 返回已有不可变接口。没有由调用者另建的硬件 owner 或额外初始化权限。公共路径由 [SDK 消费者](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/cmake/package/verification/io_evolution/consumers/f407-i2s2-slave-tx.c)验证。更广的 I2S2／I2S3 格式、接收、duplex 和 master-clock 合同见 [F407 capture/audio 实现说明](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/drivers/ip/av/README.md)。"
 
 msgid "Coordinate the external master"
 msgstr "协调外部 master"

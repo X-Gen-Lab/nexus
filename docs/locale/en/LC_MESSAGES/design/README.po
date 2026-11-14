@@ -1,13 +1,12 @@
 # Translation from the exact fresh8 gettext extraction; current delta independently reviewed.
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: a69df4d709eafa33fb0d347648d69356d90f5ff9001425c9704754150c0b6d73\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 2f4e79c3c2c9bde611750cea6805bbbd7d7e2fa705bb4b53be04887951446e1e\n"
 
 msgid "当前架构与工程合同"
 msgstr "Current architecture and engineering contracts"
 
 msgid "从本页选择要维护的合同：先核对[精确型号与模式](../delivery/support.md)、Board 和 资源责任，再进入对应源码。设计页、公共头和厂商 SDK 不单独建立新型号、软件候选 或物理资格；新增料号的内部 CRC 参考也不扩大 F407 专属模式的执行范围。 当前 physical HIL 为 `not_executed`。"
 msgstr "Choose a maintenance contract here after checking [exact devices and modes](../delivery/support.md), Board facts and resource ownership. Design pages, public headers and vendor SDKs alone do not establish new parts, software candidates or physical qualification. Internal-CRC references for added parts do not expand the execution scope of F407-specific modes. Physical HIL remains `not_executed`."
-
 
 msgid "平台与维护路径"
 msgstr "Platform and maintenance paths"
@@ -108,8 +107,8 @@ msgstr "[RTC and auxiliary sources](f407-rtc.md), [System/epoch restoration](f40
 msgid "物理存储与介质"
 msgstr "Physical storage and media"
 
-msgid "[内部 Flash／OTP／保护维护](f407-storage.md)、[SDIO memory／MMC／functions](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/private/sdio_hal/README.md)、[FSMC](f407-fsmc.md)"
-msgstr "[Internal Flash / OTP / protection maintenance](f407-storage.md), [SDIO memory / MMC / functions](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/private/sdio_hal/README.md), [FSMC](f407-fsmc.md)"
+msgid "[内部 Flash／OTP／保护维护](f407-storage.md)、[SDIO memory／MMC／functions](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/sdk/hal_config/sdio/README.md)、[FSMC](f407-fsmc.md)"
+msgstr "[Internal Flash / OTP / protection maintenance](f407-storage.md), [SDIO memory / MMC / functions](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/sdk/hal_config/sdio/README.md), [FSMC](f407-fsmc.md)"
 
 msgid "网络与 USB"
 msgstr "Networking and USB"

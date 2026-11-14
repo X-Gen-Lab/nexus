@@ -40,12 +40,13 @@ class HardwareFactAuthorTests(unittest.TestCase):
         package = fixture.package
         self.package = replace(package, source_directory=self.root)
         self.documents = {}
-        for name in ("bindings", "soc", "routes", "device_catalog"):
+        for name in ("bindings", "soc", "routes", "device_catalog", "controllers", "clocks"):
             self.documents[name] = json.loads(fixture.snapshots[package.fact(name)])
         self.write()
 
     def write(self):
         for name, document in self.documents.items():
+            self.package.fact(name).parent.mkdir(parents=True, exist_ok=True)
             self.package.fact(name).write_text(json.dumps(document) + "\n")
 
     def load(self):
@@ -70,7 +71,7 @@ class HardwareFactAuthorTests(unittest.TestCase):
              lambda h: h.PWM_PIN_CHANNELS[("TIM3", "PA6")], 2),
             ("uart_dma", lambda d: next(r for r in d["routes"]["routes"] if r["id"] == "usart1-pa9-pa10").update(dma=["DMA2:stream6:channel4"]),
              lambda h: next(b for b in h.CONTROLLER_BINDINGS if b.controller == "USART1").dma("dma-tx"), ((2, 6, 4),)),
-            ("secondary", lambda d: d["soc"]["controller_groups"]["rm0090-common"]["controllers"]["USART2"].update(clock_hz=40000000),
+            ("secondary", lambda d: d["controllers"]["controller_groups"]["rm0090-common"]["controllers"]["USART2"].update(clock_hz=40000000),
              lambda h: h.SECONDARY_FACTS["USART2"]["clock_hz"], 40000000),
         )
         for name, mutate, observe, expected in cases:

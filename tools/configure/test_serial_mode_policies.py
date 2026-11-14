@@ -70,7 +70,7 @@ class SerialModePolicies(unittest.TestCase):
             {"kind": "counter", "irq": []}, selected)["irq"], ["ADV"])
 
     def test_policy_rejects_unknown_serial_facts(self):
-        path = ROOT / "soc/stm32/stm32f4/bindings/selection_policy.json"
+        path = ROOT / "soc/stm32/stm32f4/private/bindings/selection_policy.json"
         facts = json.loads(path.read_text())["domains"]["selection"]
         facts["serial_modes"] = provider().SELECTION.data["serial_modes"]
         SelectionPolicy.from_validated(facts)

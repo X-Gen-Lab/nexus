@@ -11,6 +11,7 @@ from tools.configure.ir import (EndpointIR, IrqOptions, PadBindingIR,
 from tools.configure.policies.packet import PacketPolicy
 from tools.configure.static_fragments import StaticFragments
 from tools.configure.static_recipe import StaticRecipe
+from tools.configure.tests.device_fixture import load_binding_facts
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -65,7 +66,7 @@ class Result:
 
 class PacketStaticRecipesTests(unittest.TestCase):
     def document(self):
-        return json.loads((ROOT / "soc/stm32/stm32f4/bindings/packet.json").read_text())
+        return load_binding_facts(ROOT / "soc/stm32/stm32f4")
 
     def build(self, item, devices=(), owners=()):
         document = self.document()

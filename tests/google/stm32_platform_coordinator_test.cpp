@@ -7,8 +7,8 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
-#include "stm32f4_ethernet_cold.h"
-#include "stm32f4_platform_lifecycle.h"
+#include "drivers/ethernet/stm32f4_ethernet_cold.h"
+#include "system/stm32f4_platform_lifecycle.h"
 }
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
