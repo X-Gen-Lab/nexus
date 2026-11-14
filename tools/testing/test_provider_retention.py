@@ -937,6 +937,32 @@ class ArrayContextTests(unittest.TestCase):
         self.assertEqual(report['faces'][1]['context_offset'], 8)
         self.assertEqual(report['faces'][1]['context_element_bytes'], 8)
 
+    def test_uint_index_and_count_keep_exact_array_owner_checks(self):
+        for index_suffix, count_suffix in (('u', ''), ('U', 'u'), ('u', 'U')):
+            with self.subTest(index=index_suffix, count=count_suffix):
+                elf, bindings = self.fixture()
+                source = bindings.replace('[2];', '[2' + count_suffix + '];')
+                source = source.replace('&s_nx_device_sensor[1]',
+                    '&s_nx_device_sensor[1' + index_suffix + ']')
+                report = inspect_provider_retention(elf, source)
+                self.assertEqual(report['faces'][1]['context_index'], 1)
+                self.assertEqual(report['faces'][1]['context_offset'], 8)
+                struct.pack_into('<I', elf.data, 12, 0x20000020)
+                with self.assertRaisesRegex(EvidenceError, 'context pointer'):
+                    inspect_provider_retention(elf, source)
+
+    def test_uint_suffix_does_not_authorize_invalid_or_out_of_range_literals(self):
+        elf, bindings = self.fixture()
+        for value in ('01u', '0x1u', '-1u', '1UL', '1+0u', '4294967296u'):
+            source = bindings.replace('&s_nx_device_sensor[1]',
+                                      '&s_nx_device_sensor[' + value + ']')
+            with self.subTest(index=value), self.assertRaises(EvidenceError):
+                inspect_provider_retention(elf, source)
+        for value in ('00u', '0u', '4294967296u', '2UL', '2+0u'):
+            source = bindings.replace('[2];', '[' + value + '];')
+            with self.subTest(count=value), self.assertRaises(EvidenceError):
+                inspect_provider_retention(elf, source)
+
     def test_out_of_bounds_constant_index_is_rejected(self):
         elf, bindings = self.fixture(2)
         with self.assertRaisesRegex(EvidenceError, 'array index'):
@@ -1032,6 +1058,20 @@ class GeneratedFaceInitializerTests(unittest.TestCase):
              "nx_stm32_qspi_flash_ops", "s_nx_port_serial"),
             ("nx_flash_async_port_t", "s_nx_device_storage",
              "nx_stm32_qspi_async_ops", "s_nx_port_serial")})
+
+    def test_actual_usb_recipe_retains_all_uint_indexed_endpoint_faces(self):
+        from tools.configure import bindings, configure
+        result = configure.resolve_ir(configure.ROOT /
+            "tests/contracts/usb_assembly/stm32-ve.toml")
+        source = bindings.emit(result)[1]
+        selected = retention.selected_faces(source)
+        endpoints = {name: context for kind, name, _, context in selected
+                     if kind == "nx_usb_endpoint_port_t"}
+        self.assertEqual(endpoints, {
+            "s_nx_device_control_in": "s_nx_usb_endpoints_fs[0u]",
+            "s_nx_device_control_out": "s_nx_usb_endpoints_fs[1u]",
+            "s_nx_device_bulk_in": "s_nx_usb_endpoints_fs[2u]",
+            "s_nx_device_bulk_out": "s_nx_usb_endpoints_fs[3u]"})
 
     def test_designated_order_preserves_full_linked_table_and_owner_audit(self):
         for reverse in (False, True):

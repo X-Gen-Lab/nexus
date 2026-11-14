@@ -21,6 +21,7 @@ _STATIC_OBJECT = re.compile(
     r"\bstatic\s+const\s+(nx_\w+_t)\s+(s_nx_\w+)\s*([=;\[])"
 )
 _FACE_NAME = re.compile(r"s_nx_(?:(?:device_)?face_|flash_readonly_|device_)\w+\Z")
+_UNSIGNED_LITERAL = r"(?:0|[1-9][0-9]*)[uU]?"
 
 
 def face_declarations(bindings, *, face_types=None, root=ROOT):
@@ -69,7 +70,7 @@ def selected_faces(bindings, *, face_types=None, root=ROOT):
         operation = re.fullmatch(r"&(nx_\w+_ops)", operations)
         if (operation is None or re.fullmatch(
                 r"\(\s*void\s*\*\s*\)\s*&\w+|"
-                r"&\w+(?:\[(?:0|[1-9][0-9]*)\])?", context) is None):
+                r"&\w+(?:\[" + _UNSIGNED_LITERAL + r"\])?", context) is None):
             raise EvidenceError("unsupported generated face ops/context reference")
         defined.add(name)
         connections.append((kind, name, operation[1],
@@ -571,7 +572,8 @@ def context_object(elf, bindings, expression, *, root=ROOT):
     reference = re.fullmatch(r"\(\s*void\s*\*\s*\)\s*&(\w+)", expression)
     if reference is not None:
         return readonly_context(elf, bindings, reference[1], root)
-    match = re.fullmatch(r"(\w+)(?:\[([0-9]+)\])?", expression)
+    match = re.fullmatch(r"(\w+)(?:\[(" + _UNSIGNED_LITERAL + r")\])?",
+                         expression)
     if match is None:
         raise EvidenceError("unsupported context expression")
     name, index_text = match.groups()
@@ -582,10 +584,11 @@ def context_object(elf, bindings, expression, *, root=ROOT):
         return state["value"], {}
     declarations = re.findall(
         r"\bstatic\s+\w+\s+" + re.escape(name)
-        + r"\s*\[\s*(0|[1-9][0-9]*)\s*\]", bindings)
+        + r"\s*\[\s*(" + _UNSIGNED_LITERAL + r")\s*\]", bindings)
     if len(declarations) != 1:
         raise EvidenceError("missing or duplicate context array declaration")
-    count, index = int(declarations[0]), int(index_text)
+    count, index = (int(value.rstrip("uU"))
+                    for value in (declarations[0], index_text))
     if not 0 <= index < count <= 0xffffffff:
         raise EvidenceError("context array index exceeds declared bounds")
     if state["size"] % count or state["size"] // count == 0:
