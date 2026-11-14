@@ -8,6 +8,7 @@ import tempfile
 import unittest
 
 from tools.configure import bindings, configure, factory, io_traits, uart_formats
+from tools.configure.providers import for_selection
 
 
 class UARTFormatConfiguration(unittest.TestCase):
@@ -140,7 +141,11 @@ class UARTFormatConfiguration(unittest.TestCase):
                 self.assertIn(".format = &s_nx_uart_frame_", source)
                 self.assertIn(f"nx_{prefix}_uart_format_irq", source)
                 self.assertIn("NX_UART_PARITY_EVEN", source)
-                self.assertIn("NX_UART_STOP_2", source)
+                constructed = for_selection(result).constructor(item, result,
+                    result.board_bindings, result.routes, result.devices)
+                frame, = (node for node in constructed.static_declarations
+                          if node.type_name == "nx_uart_format_t")
+                self.assertEqual(dict(frame.initializer.fields)["stop"], 2)
 
     def test_nine_bit_uses_independent_word_state_and_factory(self):
         frame = 'data_bits=9\nparity="none"\nstop_bits=1\nflow="none"'
@@ -207,8 +212,7 @@ class UARTFormatConfiguration(unittest.TestCase):
                 item = next(item for item in result.controllers
                             if item.kind == "uart")
                 _, source = bindings.emit(result)
-                from tools.configure.providers import maintained
-                construction = maintained(result.soc_family).constructor(
+                construction = for_selection(result).constructor(
                     item, result, result.board_bindings, result.routes,
                     result.devices)
                 self.assertTrue(construction.retain_on_failed_init)

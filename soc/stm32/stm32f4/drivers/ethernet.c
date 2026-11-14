@@ -8,6 +8,7 @@
  */
 #include "stm32f407_clock.h"
 #include "stm32f407_eth.h"
+#include "stm32f4_eth_facts.h"
 #include <stddef.h>
 _Static_assert(offsetof(ETH_TypeDef, MACCR) == 0x0U, "ETH MACCR offset");
 _Static_assert(offsetof(ETH_TypeDef, MACFFR) == 0x4U, "ETH MACFFR offset");
@@ -128,24 +129,15 @@ nx_result_t nx_stm32_eth_initialize(nx_eth_mac_t* mac, nx_time_us_t deadline) {
         return NX_ERROR_CONTEXT;
     if (mac == NULL || mac->source.priority > 15U ||
         mac->irq_policy.priority_bits != __NVIC_PRIO_BITS ||
-        mac->irq_policy.external_irq_count != 82U)
+        mac->irq_policy.external_irq_count != NEXUS_CPU_EXTERNAL_IRQ_COUNT)
         return NX_ERROR_INVALID;
     if (mac->registers != ETH_BASE || mac->hclk_hz != NEXUS_CORE_HZ ||
         mac->source.irq_number != ETH_IRQn)
         return NX_ERROR_UNSUPPORTED;
-    if (mac->regions == NULL || mac->region_count == 0U ||
-        mac->region_count > SIZE_MAX / sizeof(*mac->regions) ||
-        (uintptr_t)mac->regions >
-            UINTPTR_MAX - mac->region_count * sizeof(*mac->regions))
-        return NX_ERROR_INVALID;
-    for (size_t i = 0U; i < mac->region_count; ++i) {
-        const nx_dma_memory_region_t* region = &mac->regions[i];
-        if (region->begin < UINT32_C(0x20000000) || region->size == 0U ||
-            region->size > 131072U ||
-            region->begin - UINT32_C(0x20000000) > 131072U - region->size ||
-            (region->permissions & ~3U) != 0U)
-            return NX_ERROR_PERMISSION;
-    }
+    nx_result_t memory =
+        nx_stm32_eth_regions_admit(mac->regions, mac->region_count);
+    if (memory != NX_SUCCESS)
+        return memory;
     if (!nx_stm32_clock_profile_matches(RCC, NULL) ||
         (RCC->AHB1ENR & (RCC_AHB1ENR_ETHMACEN | RCC_AHB1ENR_ETHMACTXEN |
                          RCC_AHB1ENR_ETHMACRXEN)) != UINT32_C(0x0E000000) ||

@@ -511,6 +511,18 @@ class SDKConsumerParallelTests(unittest.TestCase):
         self.failed_sdk = False
         self.selected_fault = None
 
+    def test_external_port_compiles_new_helper_without_name_registry(self):
+        source = self.directory / "fresh helper source"
+        source.mkdir()
+        (source / "main.c").write_text("int main(void) { return 0; }\n")
+        helper = source / "new_protocol_helper.c"
+        helper.write_text("void new_protocol_helper(void) {}\n")
+        build = self.directory / "fresh helper build"
+        self.external_process(["cmake", "-S", str(source), "-B", str(build)])
+        commands = json.loads((build / "compile_commands.json").read_text())
+        self.assertEqual({Path(entry["file"]) for entry in commands},
+                         {source / "main.c", helper})
+
     def external_process(self, command, **options):
         command = [str(argument) for argument in command]
         self.commands.append(command)
@@ -521,12 +533,12 @@ class SDKConsumerParallelTests(unittest.TestCase):
             build = Path(command[command.index("-B") + 1])
             build.mkdir(parents=True)
             (build / "resolved-sdk.txt").write_text(str(self.sdk))
-            products = [path for path in (source / "main.c", source / "main.cpp",
-                                         source / "private_headers.c",
-                                         source / "application.c",
-                                         source / "composition.c", source / "public_key.c",
-                                         source / "sustained_sequence.c")
-                        if path.exists()]
+            # Model the external compiler port independently of the verifier's
+            # canonical-source helper. New scenario C helpers need no second
+            # filename registry in this fixture.
+            products = sorted(source.rglob("*.c"))
+            if (source / "main.cpp").is_file():
+                products.append(source / "main.cpp")
             rows = [{"file": str(path), "directory": str(build),
                      "arguments": ["cc", "-c", str(path)],
                      "command": "cc -c " + shlex.quote(str(path))}

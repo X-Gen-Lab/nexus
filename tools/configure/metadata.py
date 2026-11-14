@@ -6,7 +6,7 @@ never resolves hardware, executes tools, migrates input or promises binary ABI.
 from __future__ import annotations
 import hashlib
 import json
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import re
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -83,10 +83,21 @@ def policy_contract(policy, expected_factory_epoch=None):
         raise ValueError("Canonical semantic version required")
     if type(policy["factory_abi_epoch"]) is not int or not 1 <= policy["factory_abi_epoch"] <= 0xffffffff:
         raise ValueError("Positive uint32 source factory epoch required")
-    if policy["source_sdk"] != {"delivery": "source_only",
-                                "version_matching": "exact",
-                                "binary_abi": "unsupported"}:
+    sdk = policy["source_sdk"]
+    fields(sdk, {"delivery", "version_matching", "binary_abi",
+                 "default_package_manifests"}, "source SDK policy")
+    if {key: sdk[key] for key in ("delivery", "version_matching", "binary_abi")} != {
+            "delivery": "source_only", "version_matching": "exact",
+            "binary_abi": "unsupported"}:
         raise ValueError("Source-only exact SDK policy cannot promise binary ABI")
+    manifests = sdk["default_package_manifests"]
+    if (not isinstance(manifests, list) or not manifests or
+            any(not isinstance(name, str) or not name.endswith("/package.json")
+                or "\\" in name or any(char in name for char in '\n\r;$"')
+                or PurePosixPath(name).is_absolute()
+                or any(part in {"", ".", ".."} for part in name.split("/"))
+                for name in manifests) or len(set(manifests)) != len(manifests)):
+        raise ValueError("Explicit unique source SDK package manifests required")
     fields(policy["schemas"], SCHEMA_NAMES, "schema epochs")
     for value in policy["schemas"].values():
         if type(value) is not int or not 1 <= value <= 0xffffffff:

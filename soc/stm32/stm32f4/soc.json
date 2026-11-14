@@ -1239,6 +1239,7 @@
   },
   "device_profiles": {
     "stm32f405": {
+      "part_prefix": "STM32F405",
       "controller_groups": [
         "rm0090-common",
         "crc-fixed-polynomial"
@@ -1246,6 +1247,7 @@
       "clock_policy": "rm0090-run"
     },
     "stm32f407": {
+      "part_prefix": "STM32F407",
       "controller_groups": [
         "rm0090-common",
         "ethernet-f4",
@@ -1255,6 +1257,7 @@
       "clock_policy": "rm0090-f407-run"
     },
     "stm32f415": {
+      "part_prefix": "STM32F415",
       "controller_groups": [
         "rm0090-common",
         "crc-fixed-polynomial",
@@ -1263,6 +1266,7 @@
       "clock_policy": "rm0090-run"
     },
     "stm32f417": {
+      "part_prefix": "STM32F417",
       "controller_groups": [
         "rm0090-common",
         "ethernet-f4",
@@ -1273,6 +1277,7 @@
       "clock_policy": "rm0090-run"
     },
     "stm32f411xe": {
+      "part_prefix": "STM32F411",
       "controller_groups": [
         "crc-fixed-polynomial",
         "rtc-reviewed-lse"
@@ -1280,6 +1285,7 @@
       "clock_policy": "rm0383-run"
     },
     "stm32f446": {
+      "part_prefix": "STM32F446",
       "controller_groups": [
         "crc-fixed-polynomial",
         "sai1-framed",
@@ -1289,6 +1295,7 @@
       "clock_policy": "rm0390-run"
     },
     "stm32f479": {
+      "part_prefix": "STM32F479",
       "controller_groups": [
         "crc-fixed-polynomial",
         "f479-fmc-sdram",
@@ -2046,7 +2053,9 @@
           "pins": [
             "PB10",
             "PB11",
-            "PB12"
+            "PB12",
+            "PF0",
+            "PF1"
           ],
           "clock_hz": 42000000,
           "max_hz": 400000,
@@ -2503,7 +2512,9 @@
             "PA3",
             "PA4",
             "PA0",
-            "PA1"
+            "PA1",
+            "PD5",
+            "PD6"
           ],
           "clock_hz": 42000000,
           "max_hz": 1000000

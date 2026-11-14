@@ -11,6 +11,7 @@ extern "C" {
 #include "nexus_factory_strong.h"
 #include "stm32f407_adc_group.h"
 #include "stm32f407_clock.h"
+#include "stm32f4_adc_pins.h"
 nx_stm32_system_t g_nx_stm32_system;
 NVIC_Type g_f4_model_nvic;
 SCB_Type g_f4_model_scb;
@@ -70,6 +71,13 @@ class AdcGroupFactory : public testing::Test {
         return nx_factory_adc_group_ref(NX_ADC_GROUP_REF_GROUP);
     }
 };
+
+TEST_F(AdcGroupFactory, UnselectedPadCannotBeAdmittedByTheCompiledAssembly) {
+    nx_stm32_adc_pad_t pad{GPIOA, 15U};
+    EXPECT_FALSE(nx_stm32_adc_pad(ADC3, 15U, &pad));
+    EXPECT_EQ(GPIOA, pad.gpio);
+    EXPECT_EQ(15U, pad.pin);
+}
 
 TEST_F(AdcGroupFactory, FactoryLookupIsPureBeforeColdStart) {
     const nx_adc_group_port_t* first = Port();

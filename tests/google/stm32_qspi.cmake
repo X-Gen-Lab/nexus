@@ -29,6 +29,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         nexus_google_test(${qspi_test} STM32F4_LL
             SOURCES stm32_qspi_test.cpp
                 "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/qspi.c"
+                "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/w25q128jv.c"
                 "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/qspi_dma.c"
             LIBRARIES Nexus::IO
             INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"

@@ -1,43 +1,45 @@
-// FIG-05 current: source-backed, scoped engineering view.
-// Code basis: 0111c8d3b9c7b37d258b9c401070305b13b6f3a1.
-// Relations and qualification limits are documented in README.md.
+// Current scoped view. Build-time arrows and runtime calls are labeled explicitly.
+// Code basis: core/private/platform_lifecycle_impl.h; tools/configure/bindings.py; soc/stm32/stm32f4/private/stm32f4_platform_lifecycle_impl.h
 digraph PlatformLifecycle {
-    graph [newrank=true, rankdir=TB, bgcolor="white", pad=0.28, nodesep=0.42,
-           ranksep=0.66, fontname="Noto Sans CJK SC", fontsize=15,
-           labelloc=t];
-    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
-          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
-          fontsize=13, margin="0.18,0.12"];
-    edge [color="#475569", fontcolor="#0f172a",
-          fontname="Noto Sans CJK SC", fontsize=11, arrowsize=0.8];
-
-    graph [label="FIG-05 Generated Platform explicit cold lifecycle\nOne external privileged task owner advances serially"];
-    cold [label="Cold object: no successful running permission", fillcolor="#f8fafc"];
-    context [label="Check context / started\nReject ISR and masks; physical implementation checks privilege"];
-    system [label="SoC start_system / start_resources\nExact cold clock, timebase, pin-lease prerequisites"];
-    instances [label="Initialize instances in declaration order\nCount potentially effectful attempts before calling for cleanup"];
+    graph [label="FIG-05 Static connections call the shared C lifecycle\nOne external privileged task owner advances serially", rankdir=TB, bgcolor="white", pad=0.25, nodesep=0.35, ranksep=0.52, fontname="Noto Sans CJK SC", fontsize=15, labelloc=t];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff", color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC", fontsize=12, margin="0.16,0.10"];
+    edge [color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC", fontsize=11, arrowsize=0.8];
+    cold [label="Cold objects: no permission for normal operation", fillcolor="#f8fafc"];
+    context [label="Check call context and existing state\nISR / mask / privilege / started"];
+    admit [label="Pure C admission of every controller\nBefore System/resource acquisition or controller writes"];
+    system [label="System start\nReturn primary / cleanup / remaining effects"];
+    resources [label="Acquire shared platform resources"];
+    instances [label="Prepare instances in declaration order\nInclude a failed instance in cleanup if it retained effects"];
     running [label="start primary=SUCCESS\nExternal application may operate; no scheduler start", fillcolor="#f0fdf4"];
-    quiesce [label="Externally close producers / direct writers first\nExecutor continues draining; join callers and observers"];
-    reverse [label="nx_platform_stop: stop initialized instances in reverse order\nDecrease initialized count only after each successful step"];
-    withdraw [label="Provider stop_system\nRestore owned pin / gate / timebase / cache effects"];
-    released [label="stop=SUCCESS: remaining effects released\nDoes not promise continued active product-safe output drive", fillcolor="#f0fdf4"];
-    primary [label="Initialization error: retain primary\nCall nx_platform_stop to collect cleanup outcome", fillcolor="#fff7ed"];
-    retained [label="BUSY / IO: retain uncleaned leases and storage\nMay be partially stopped; continue required service, then retry", fillcolor="#fff7ed"];
+    quiesce [label="Product closes producers / direct writers\nContinue draining; join users and observers"];
+    reverse [label="Release acquired instances in reverse order\nShrink the retained prefix only after success"];
+    releaseResources [label="Release shared platform resources"];
+    releaseSystem [label="Release owned System effects\nPreserve each owner's receipts"];
+    released [label="stop=SUCCESS: releasable effects are withdrawn\nNo promise to keep actively driving safe levels", fillcolor="#f0fdf4"];
+    primary [label="Preserve primary\nCore rolls back in reverse order and collects cleanup", fillcolor="#fff7ed"];
+    retained [label="Retain uncleaned leases and storage\nContinue required service, then retry stop", fillcolor="#fff7ed"];
+    rejected [label="Reject new operation\nPreserve the original lifecycle and effects", fillcolor="#fff7ed"];
     cold -> context [label="Explicit start"];
-    rejected [label="Rejected: preserve existing lifecycle and effects\nNo newly authorized operational calls", fillcolor="#fff7ed"];
     context -> rejected [label="Context / STATE error"];
-    context -> system [label="Prerequisites passed"];
-    system -> instances [label="Stage succeeded"];
-    system -> retained [label="Failure after acquiring effects"];
+    context -> admit [label="Valid context and cold state"];
+    admit -> rejected [label="Admission failed; no new hardware effects"];
+    admit -> system [label="All admission passed"];
+    system -> resources [label="System succeeded"];
+    system -> retained [label="Startup failed with effects retained"];
+    system -> cold [label="Startup failed with no new effects retained", constraint=false];
+    resources -> instances [label="Resources acquired"];
+    resources -> primary [label="Shared-resource acquisition failed"];
     instances -> running [label="All succeeded"];
-    instances -> primary [label="Any failure"];
-    primary -> reverse [label="Reverse cleanup including the effectful failed instance"];
+    instances -> primary [label="Instance acquisition failed"];
+    primary -> reverse [label="Reverse rollback"];
     running -> quiesce [label="Product decides to stop"];
-    quiesce -> reverse [label="Stop-call prerequisites satisfied"];
-    reverse -> withdraw [label="All instances released"];
-    reverse -> retained [label="First uncleaned effect encountered"];
-    withdraw -> released [label="Observe successful cleanup"];
-    withdraw -> retained [label="System cleanup failed"];
-    retained -> reverse [label="Retry the actual retained stage\nNo forced timeout reclamation", constraint=false];
-    released -> cold [label="New epoch / new lifecycle", constraint=false];
+    quiesce -> reverse [label="Stop preconditions satisfied"];
+    reverse -> releaseResources [label="All instances released"];
+    releaseResources -> releaseSystem [label="All shared resources released"];
+    releaseSystem -> released [label="Withdrawal observed complete"];
+    reverse -> retained [label="First instance release failed"];
+    releaseResources -> retained [label="Shared-resource release failed"];
+    releaseSystem -> retained [label="System release failed"];
+    retained -> reverse [label="Retry retained stages; no forced reclamation", constraint=false];
+    released -> cold [label="New lifecycle", constraint=false];
 }

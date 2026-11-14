@@ -35,7 +35,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${NEXUS_BINARY_DIR}/bin")
 set(NEXUS_ASSEMBLY_FILE "" CACHE FILEPATH "One external authored TOML assembly")
 if(NOT NEXUS_ASSEMBLY_FILE)
     message(FATAL_ERROR
-        "Select an STM32F4 assembly with a maintained preset or "
+        "Select a maintained assembly with a preset or "
         "NEXUS_ASSEMBLY_FILE; host models require NEXUS_TEST_SUPPORT")
 endif()
 foreach(legacy NEXUS_CONFIG_FILE NEXUS_PLATFORM NEXUS_OSAL_BACKEND
@@ -58,22 +58,26 @@ add_subdirectory(os)
 add_subdirectory(components EXCLUDE_FROM_ALL)
 include("${NEXUS_SOURCE_DIR}/cmake/platform/Components.cmake")
 nexus_resolve_components(nexus_component_targets ${NEXUS_SELECTED_COMPONENTS})
-if(NEXUS_SOC_FAMILY STREQUAL "native")
-    if(NOT NEXUS_TEST_SUPPORT)
-        message(FATAL_ERROR "Native models require NEXUS_TEST_SUPPORT")
-    endif()
-    add_subdirectory("${NEXUS_SOC_SOURCE_DIRECTORY}"
-        "${NEXUS_BINARY_DIR}/tests/support/native")
-    set(nexus_provider nexus_io_native)
-else()
-    if(NOT NEXUS_SOC_FAMILY STREQUAL "stm32f4" AND
-            NOT (NEXUS_TEST_SUPPORT AND NEXUS_CPU_ARCH STREQUAL "native"))
-        message(FATAL_ERROR "Only the STM32F4 production SoC is maintained")
-    endif()
-    add_subdirectory("${NEXUS_SOC_SOURCE_DIRECTORY}"
-        "${NEXUS_BINARY_DIR}/soc/${NEXUS_SOC_FAMILY}")
-    set(nexus_provider "nexus_soc_${NEXUS_SOC_FAMILY}")
+if(NEXUS_SOC_FAMILY STREQUAL "native" AND NOT NEXUS_TEST_SUPPORT)
+    message(FATAL_ERROR "Native models require NEXUS_TEST_SUPPORT")
 endif()
+if(NOT NEXUS_SOC_CMAKE_ENTRY OR NOT NEXUS_SOC_TARGET OR
+        NOT IS_ABSOLUTE "${NEXUS_SOC_CMAKE_ENTRY}" OR
+        NOT EXISTS "${NEXUS_SOC_CMAKE_ENTRY}")
+    message(FATAL_ERROR "Selected package requires a resolved CMake entry and target")
+endif()
+get_filename_component(nexus_provider_directory "${NEXUS_SOC_CMAKE_ENTRY}" DIRECTORY)
+get_filename_component(nexus_provider_entry "${NEXUS_SOC_CMAKE_ENTRY}" NAME)
+if(NOT nexus_provider_entry STREQUAL "CMakeLists.txt")
+    message(FATAL_ERROR "Selected package CMake entry must be CMakeLists.txt")
+endif()
+if(NEXUS_SOC_FAMILY STREQUAL "native")
+    set(nexus_provider_binary "${NEXUS_BINARY_DIR}/tests/support/native")
+else()
+    set(nexus_provider_binary "${NEXUS_BINARY_DIR}/soc/${NEXUS_SOC_FAMILY}")
+endif()
+add_subdirectory("${nexus_provider_directory}" "${nexus_provider_binary}")
+set(nexus_provider "${NEXUS_SOC_TARGET}")
 include("${NEXUS_SOURCE_DIR}/cmake/platform/Provider.cmake")
 nexus_validate_selected_provider("${nexus_provider}")
 add_library(nexus_platform STATIC "${NEXUS_CONFIG_DIR}/bindings.c")
@@ -82,9 +86,6 @@ target_include_directories(nexus_platform PUBLIC "${NEXUS_CONFIG_DIR}"
         "${NEXUS_SOURCE_DIR}/core/private")
 target_link_libraries(nexus_platform PUBLIC ${nexus_provider}
     PRIVATE nexus_build_options nexus_owned_warnings Nexus::Arch)
-if(NEXUS_QSPI_CPU_MAP)
-    target_link_libraries(nexus_platform PUBLIC Nexus::MappedStorage)
-endif()
 if("smbus" IN_LIST NEXUS_SELECTED_COMPONENTS)
     target_link_libraries(nexus_platform PRIVATE Nexus::SMBus)
 endif()
@@ -118,8 +119,6 @@ set_target_properties(nexus_platform PROPERTIES
     NEXUS_CONFIG_DIR "${NEXUS_CONFIG_DIR}"
     NEXUS_SOC_FAMILY "${NEXUS_SOC_FAMILY}"
     NEXUS_CPU_ARCH "${NEXUS_CPU_ARCH}"
-    NEXUS_STM32_DEVICE "${NEXUS_STM32_DEVICE}"
-    NEXUS_STM32_STARTUP "${NEXUS_STM32_STARTUP}"
     NEXUS_BACKEND "${NEXUS_BACKEND}"
     NEXUS_COMPONENT_TARGETS "${nexus_component_targets}"
     NEXUS_STARTUP_SOURCE "${NEXUS_STARTUP_SOURCE}"

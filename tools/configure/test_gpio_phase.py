@@ -10,7 +10,7 @@ from unittest.mock import patch
 
 from tools.configure.tests.assembly_fixture import render_toml
 from tools.configure import bindings, configure as gate, gpio_phase
-from tools.configure.providers import maintained
+from tools.configure.providers import for_selection
 
 
 class ColdPinStorageTests(unittest.TestCase):
@@ -26,7 +26,7 @@ class ColdPinStorageTests(unittest.TestCase):
                 source = bindings.emit(result)[1]
                 retained = re.findall(
                     r"static uint16_t s_nx_\w*pin_(?:state|saved|snapshots)"
-                    r"\w*\[(\d+)u?\];", source)
+                    r"\w*\[(\d+)u?\](?: = \{0\})?;", source)
                 self.assertEqual(sum(map(int, retained)),
                                  len(gpio_phase.selected_pins(result)))
                 self.assertNotIn("s_nx_platform_pin_state", source)
@@ -39,7 +39,7 @@ class ColdPinStorageTests(unittest.TestCase):
                 source = bindings.emit(result)[1]
                 retained = re.findall(
                     r"static uint16_t s_nx_\w*pin_(?:state|saved|snapshots)"
-                    r"\w*\[(\d+)u?\];", source)
+                    r"\w*\[(\d+)u?\](?: = \{0\})?;", source)
                 self.assertEqual(sum(map(int, retained)),
                                  len(gpio_phase.selected_pins(result)))
 
@@ -50,7 +50,7 @@ class ColdPinStorageTests(unittest.TestCase):
                 source = bindings.emit(result)[1]
                 retained = re.findall(
                     r"static uint16_t s_nx_\w*pin_(?:state|saved|snapshots)"
-                    r"\w*\[(\d+)u?\];", source)
+                    r"\w*\[(\d+)u?\](?: = \{0\})?;", source)
                 self.assertEqual(sum(map(int, retained)),
                                  len(gpio_phase.selected_pins(result)))
                 self.assertNotIn("s_nx_platform_pin_state", source)
@@ -77,15 +77,18 @@ class ColdPinStorageTests(unittest.TestCase):
     def test_constructor_cannot_lend_storage_for_an_unselected_physical_pin(self):
         result = self.resolve(
             "tests/contracts/multi_controller_assembly/stm32-ve.toml")
-        provider = maintained(result.soc_family)
-        constructor = provider.constructor
+        provider = for_selection(result)
 
-        def invalid_slots(*args):
-            construction = constructor(*args)
-            return replace(construction,
-                           pin_snapshots={"PH0": "unowned_storage[0]"})
+        class InvalidSnapshotView:
+            def __getattr__(self, name):
+                return getattr(provider, name)
 
-        with patch.object(provider, "constructor", side_effect=invalid_slots):
+            def constructor(self, *args):
+                return replace(provider.constructor(*args),
+                               pin_snapshots={"PH0": "unowned_storage[0]"})
+
+        with patch.object(bindings, "for_selection",
+                          return_value=InvalidSnapshotView()):
             with self.assertRaisesRegex(ValueError, "unselected.*pin|pin.*unselected"):
                 bindings.emit(result)
 

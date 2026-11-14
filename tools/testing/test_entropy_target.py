@@ -91,13 +91,15 @@ class EntropyTargetTests(unittest.TestCase):
         result = self.configure()
         self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertRegex(result.stdout + result.stderr,
-                         r"RNG\s+requires\s+selected\s+nominal\s+PLL48=48MHz")
+                         r"Entropy\s+requires\s+its\s+exact\s+selected"
+                         r"\s+nominal\s+kernel\s+clock")
 
     def test_active_main_pll_with_other_q_frequency_cannot_supply_rng(self):
         result = self.configure(sysclk_source="pll", pll_q=8)
         self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertRegex(result.stdout + result.stderr,
-                         r"RNG\s+requires\s+selected\s+nominal\s+PLL48=48MHz")
+                         r"Entropy\s+requires\s+its\s+exact\s+selected"
+                         r"\s+nominal\s+kernel\s+clock")
 
     def test_explicit_direct_hsi_pll48_is_a_valid_rng_clock_owner(self):
         result = self.configure(pll48=True)

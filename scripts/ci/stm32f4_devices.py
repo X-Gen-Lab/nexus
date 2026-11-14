@@ -84,9 +84,12 @@ def load_catalog(root, *, catalog_path=None):
         raise ValueError("SDK device compile catalog schema required")
     vendor_device_catalog(catalog)
     sdk = catalog["sdk"]
-    if (set(sdk) != {"directory", "commit", "core_directory", "core_commit"} or
+    if (set(sdk) != {"directory", "dependency", "commit", "core_directory",
+                     "core_dependency", "core_commit"} or
             sdk["directory"] != DEVICE_DIRECTORY.as_posix() or
+            sdk["dependency"] != "cmsis_device_f4" or
             sdk["core_directory"] != "vendors/arm/CMSIS_6" or
+            sdk["core_dependency"] != "cmsis_core" or
             sdk["core_commit"] != cmsis_core_probe.CORE_COMMIT):
         raise ValueError("reviewed F4 SDK source identity required")
     directory = root / DEVICE_DIRECTORY

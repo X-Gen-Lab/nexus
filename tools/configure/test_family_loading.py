@@ -9,6 +9,7 @@ import tempfile
 import unittest
 
 from tools.configure import configure
+from tools.configure.data_provider import DataProvider
 from tools.configure.providers import common, descriptor, maintained
 
 
@@ -19,7 +20,7 @@ PACKAGES = {
 }
 CONFIGURATIONS = {
     "native": "tests/support/native/configure",
-    "stm32f4": "tools/configure/stm32f4",
+    "stm32f4": "",
 }
 
 
@@ -72,14 +73,17 @@ class FamilyLoadingTests(unittest.TestCase):
                 self.assertEqual(item.configuration_directory,
                                  CONFIGURATIONS[family])
 
-    def test_all_families_load_only_their_registered_normal_package(self):
-        for family, (_, directory) in PACKAGES.items():
-            with self.subTest(family=family):
-                provider = maintained(family, test_support=(family == "native"))
-                self.assertEqual(provider.__name__,
-                                 CONFIGURATIONS[family].replace("/", "."))
-                self.assertEqual(Path(provider.__file__).resolve(),
-                                 ROOT / CONFIGURATIONS[family] / "__init__.py")
+    def test_production_uses_data_and_native_requires_explicit_test_support(self):
+        provider = maintained("stm32f4")
+        self.assertIs(type(provider), DataProvider)
+        self.assertEqual(provider.package.manifest_path,
+                         ROOT / "soc/stm32/stm32f4/package.json")
+        native = maintained("native", test_support=True)
+        self.assertEqual(native.__name__, "tests.support.native.configure")
+        self.assertEqual(Path(native.__file__).resolve(),
+                         ROOT / "tests/support/native/configure/__init__.py")
+        with self.assertRaises(common.ConfigurationError):
+            maintained("native")
 
     def test_selected_native_package_does_not_import_mcu_adapters(self):
         code = (

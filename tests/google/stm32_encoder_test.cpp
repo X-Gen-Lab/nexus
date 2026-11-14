@@ -30,7 +30,13 @@ class Stm32Encoder : public testing::Test {
     void* mapping = MAP_FAILED;
     alignas(nx_encoder_sample_t) nx_stm32_encoder_state_t state{};
     alignas(nx_encoder_sample_t) nx_stm32_encoder_config_t config{
-        TIM3, NX_ENCODER_MODE_X4, 3U, 7U, false, true};
+        TIM3,
+        NX_ENCODER_MODE_X4,
+        3U,
+        7U,
+        false,
+        true,
+        {{GPIOA, 0U, 6U}, {GPIOA, 0U, 7U}}};
     nx_encoder_t face{&nx_stm32_encoder_ops, &state};
     void SetUp() override {
         mapping =
@@ -83,6 +89,59 @@ extern "C" nx_time_us_t nx_time_now_us(void) {
     return 9000U;
 }
 
+TEST_F(Stm32Encoder, AlternateNonAdjacentInputsUseOnlyTheirConfiguredPads) {
+    config.registers = TIM1;
+    config.pins[0] = {GPIOE, 4U, 9U};
+    config.pins[1] = {GPIOE, 4U, 11U};
+    RCC->AHB1ENR = RCC_AHB1ENR_GPIOEEN;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_encoder_prepare(&state, &config));
+    for (unsigned pin : {9U, 11U}) {
+        EXPECT_EQ(2U, (GPIOE->MODER >> (pin * 2U)) & 3U);
+        EXPECT_EQ(1U, (GPIOE->AFR[pin / 8U] >> ((pin % 8U) * 4U)) & 15U);
+    }
+    EXPECT_EQ(0U, GPIOA->MODER);
+    EXPECT_EQ(0U, (GPIOE->MODER >> 20U) & 3U);
+    ASSERT_EQ(NX_SUCCESS, nx_encoder_start(&face));
+    TIM1->CNT = 123U;
+    nx_encoder_sample_t sample{};
+    ASSERT_EQ(NX_SUCCESS, nx_encoder_read(&face, &sample));
+    EXPECT_EQ(123U, sample.count);
+}
+
+TEST_F(Stm32Encoder, InputsOnDifferentPortsHaveIndependentClockAndPinChecks) {
+    config.pins[0] = {GPIOB, 1U, 4U};
+    config.pins[1] = {GPIOC, 2U, 7U};
+    EXPECT_EQ(NX_ERROR_STATE, nx_stm32_encoder_prepare(&state, &config));
+    EXPECT_EQ(0U, state.cold_effects);
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOCEN;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_encoder_prepare(&state, &config));
+    EXPECT_EQ(2U, (GPIOB->MODER >> 8U) & 3U);
+    EXPECT_EQ(2U, (GPIOC->MODER >> 14U) & 3U);
+    EXPECT_EQ(0U, GPIOA->MODER);
+    auto* result = reinterpret_cast<nx_encoder_sample_t*>(GPIOC);
+    EXPECT_EQ(NX_ERROR_INVALID, nx_encoder_read(&face, result));
+}
+
+TEST_F(Stm32Encoder, InvalidOrDuplicatePadMetadataRejectsBeforeClockEffects) {
+    const auto original = config;
+    for (unsigned fault = 0U; fault < 4U; ++fault) {
+        config = original;
+        if (fault == 0U)
+            config.pins[0].port_index = 1U;
+        if (fault == 1U)
+            config.pins[0].pin = 16U;
+        if (fault == 2U)
+            config.pins[0].registers = nullptr;
+        if (fault == 3U)
+            config.pins[1] = config.pins[0];
+        EXPECT_EQ(NX_ERROR_INVALID, nx_stm32_encoder_prepare(&state, &config));
+        EXPECT_EQ(RCC_APB1ENR_TIM7EN, RCC->APB1ENR);
+        EXPECT_EQ(nullptr, state.config);
+        EXPECT_EQ(0U, state.cold_effects);
+    }
+    config = original;
+}
+
 TEST_F(Stm32Encoder, ThreeWidthsAndCountingModesKeepRawPositionAcrossStop) {
     const struct {
         TIM_TypeDef* timer;
@@ -96,6 +155,12 @@ TEST_F(Stm32Encoder, ThreeWidthsAndCountingModesKeepRawPositionAcrossStop) {
         for (const auto mode :
              {NX_ENCODER_MODE_X2_A, NX_ENCODER_MODE_X2_B, NX_ENCODER_MODE_X4}) {
             config.registers = selected.timer;
+            const auto bank = static_cast<uint8_t>(
+                (reinterpret_cast<uintptr_t>(selected.gpio) - GPIOA_BASE) /
+                0x400U);
+            config.pins[0] = {selected.gpio, bank, selected.first_pin};
+            config.pins[1] = {selected.gpio, bank,
+                              static_cast<uint8_t>(selected.first_pin + 1U)};
             config.mode = mode;
             config.invert_a = mode == NX_ENCODER_MODE_X2_A;
             ASSERT_EQ(NX_SUCCESS, nx_stm32_encoder_prepare(&state, &config));
@@ -175,7 +240,13 @@ TEST_F(Stm32Encoder, AdvancedTimersKeepRawPositionAndUseTheirApb2FilterClock) {
              {NX_ENCODER_MODE_X2_A, NX_ENCODER_MODE_X2_B, NX_ENCODER_MODE_X4}) {
             SCOPED_TRACE(timer);
             SCOPED_TRACE(mode);
-            config = {timer, mode, 3U, 7U, false, true};
+            config = {timer, mode, 3U, 7U, false, true, {}};
+            config.pins[0] = timer == TIM1
+                                 ? nx_stm32_encoder_pin_t{GPIOA, 0U, 8U}
+                                 : nx_stm32_encoder_pin_t{GPIOC, 2U, 6U};
+            config.pins[1] = timer == TIM1
+                                 ? nx_stm32_encoder_pin_t{GPIOA, 0U, 9U}
+                                 : nx_stm32_encoder_pin_t{GPIOC, 2U, 7U};
             const nx_result_t prepared =
                 nx_stm32_encoder_prepare(&state, &config);
             EXPECT_EQ(NX_SUCCESS, prepared);
@@ -207,7 +278,11 @@ TEST_F(Stm32Encoder,
     RCC->AHB1ENR |= RCC_AHB1ENR_GPIOCEN;
     for (TIM_TypeDef* timer : {TIM1, TIM8}) {
         SCOPED_TRACE(timer);
-        config = {timer, NX_ENCODER_MODE_X4, 0U, 0U, false, false};
+        config = {timer, NX_ENCODER_MODE_X4, 0U, 0U, false, false, {}};
+        config.pins[0] = timer == TIM1 ? nx_stm32_encoder_pin_t{GPIOA, 0U, 8U}
+                                       : nx_stm32_encoder_pin_t{GPIOC, 2U, 6U};
+        config.pins[1] = timer == TIM1 ? nx_stm32_encoder_pin_t{GPIOA, 0U, 9U}
+                                       : nx_stm32_encoder_pin_t{GPIOC, 2U, 7U};
         const uint32_t gate =
             timer == TIM1 ? RCC_APB2ENR_TIM1EN : RCC_APB2ENR_TIM8EN;
         const unsigned peer = timer == TIM1 ? 24U : 43U;
@@ -254,8 +329,20 @@ TEST_F(Stm32Encoder, RefusedSourceWithdrawalKeepsSessionAndClockForRetry) {
 TEST_F(Stm32Encoder, LiveCountersAndShutdownKeepOtherInstancesIndependent) {
     nx_stm32_encoder_state_t peers[2]{};
     const nx_stm32_encoder_config_t configs[]{
-        {TIM4, NX_ENCODER_MODE_X2_A, 0U, 0U, false, false},
-        {TIM5, NX_ENCODER_MODE_X2_B, 1U, 2U, true, false}};
+        {TIM4,
+         NX_ENCODER_MODE_X2_A,
+         0U,
+         0U,
+         false,
+         false,
+         {{GPIOB, 1U, 6U}, {GPIOB, 1U, 7U}}},
+        {TIM5,
+         NX_ENCODER_MODE_X2_B,
+         1U,
+         2U,
+         true,
+         false,
+         {{GPIOA, 0U, 0U}, {GPIOA, 0U, 1U}}}};
     const nx_encoder_t faces[]{face,
                                {&nx_stm32_encoder_ops, &peers[0]},
                                {&nx_stm32_encoder_ops, &peers[1]}};
@@ -341,7 +428,13 @@ TEST_F(Stm32Encoder, ForeignClockControllerAndVectorAreNeverAdopted) {
 
 TEST_F(Stm32Encoder, UnsupportedInputsRejectBeforeAnyHardwareWrite) {
     for (unsigned invalid = 0U; invalid < 4U; ++invalid) {
-        config = {TIM3, NX_ENCODER_MODE_X4, 0U, 0U, false, false};
+        config = {TIM3,
+                  NX_ENCODER_MODE_X4,
+                  0U,
+                  0U,
+                  false,
+                  false,
+                  {{GPIOA, 0U, 6U}, {GPIOA, 0U, 7U}}};
         if (invalid == 0U)
             config.registers = TIM9;
         if (invalid == 1U)

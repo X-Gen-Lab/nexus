@@ -7,15 +7,15 @@ SECTIONS
   __nx_eth_frames_host_bss = .;
   .nx_eth_frames_tx 0x20001000 (NOLOAD) : ALIGN(32)
   {
-    KEEP(*(.bss.s_nx_eth_frames_tx_mac))
+    KEEP(*(.bss.s_nx_eth_tx_mac))
   }
   .nx_eth_frames_rx (NOLOAD) : ALIGN(32)
   {
-    KEEP(*(.bss.s_nx_eth_frames_rx_mac))
+    KEEP(*(.bss.s_nx_eth_rx_mac))
   }
   .nx_eth_frames_storage (NOLOAD) : ALIGN(32)
   {
-    KEEP(*(.bss.s_nx_eth_frames_storage_mac))
+    KEEP(*(.bss.s_nx_eth_storage_mac))
   }
   . = __nx_eth_frames_host_bss;
 }

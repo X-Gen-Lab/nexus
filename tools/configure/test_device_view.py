@@ -4,12 +4,16 @@ from dataclasses import FrozenInstanceError
 import unittest
 
 from tools.configure import configure as gate, dependencies
-from tools.configure.providers import maintained
+from tools.configure.tests.f4_fixture import provider
 from tools.configure.tests.device_fixture import (load_soc_facts,
                                                    validate_soc_facts)
 
 
 class DeviceViewTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.provider = provider("STM32F407VET6")
+
     def inputs(self):
         directory = gate.ROOT / "soc/stm32/stm32f4"
         return (gate.load(directory / "soc.json"),
@@ -17,7 +21,7 @@ class DeviceViewTests(unittest.TestCase):
 
     def resolve(self, soc, catalog, part="STM32F407VET6"):
         return gate.resolve_device_facts(
-            soc, part, maintained("stm32f4"), catalog=catalog)
+            soc, part, self.provider, catalog=catalog)
 
     def test_exact_part_keeps_its_geometry_and_one_device_profile(self):
         soc, catalog = self.inputs()
@@ -105,7 +109,7 @@ class DeviceViewTests(unittest.TestCase):
                          ("cpu-window", "graphics-owned"))
         routes = gate.resolve_routes(gate.load(gate.ROOT /
             "soc/stm32/stm32f4/routes.json"), selected.soc, view.part,
-            maintained("stm32f4"), controller_profiles=selected.controller_profiles)
+            self.provider, controller_profiles=selected.controller_profiles)
         route = routes["fmc-sdram-bank1-16"]
         self.assertEqual(route["variants"], ["STM32F479NIH6"])
         self.assertEqual(len(route["pins"]), 38)
@@ -126,7 +130,7 @@ class DeviceViewTests(unittest.TestCase):
         route["variants"].append("STM32F446ZET6")
         with self.assertRaisesRegex(ValueError, "maintained controller"):
             gate.resolve_routes(routes, selected.soc, selected.device.part,
-                maintained("stm32f4"), controller_profiles=selected.controller_profiles)
+                self.provider, controller_profiles=selected.controller_profiles)
 
     def test_catalog_backed_soc_rejects_a_second_global_controller_authority(self):
         soc, catalog = self.inputs()
@@ -229,7 +233,7 @@ class DeviceViewTests(unittest.TestCase):
                 soc = load_soc_facts(gate.ROOT / "soc/stm32/stm32f4/soc.json")
                 soc["controllers"][controller][field] = value
                 with self.assertRaisesRegex(ValueError, "IRQ"):
-                    validate_soc_facts(soc, "STM32F407VET6")
+                    validate_soc_facts(soc, "STM32F407VET6", self.provider.for_soc(soc))
 
 
 if __name__ == "__main__":

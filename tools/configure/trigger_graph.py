@@ -7,6 +7,7 @@ hardware, creates workers or converts event edges into software callbacks.
 
 from dataclasses import asdict, dataclass
 
+from tools.configure.calls import Symbol
 from tools.configure.resource_graph import fail, identifier, json_value, record
 
 
@@ -200,20 +201,27 @@ def resolve(nodes, edges, *, startup=(), loops=()):
                          tuple(startup_order), tuple(declarations))
 
 
-def resolve_fixed(selected, *, adc_triggers=None, adc_injected_triggers=None):
+def resolve_fixed(selected, *, adc_triggers=None, adc_injected_triggers=None,
+                  adc_group_converter=None):
     """Project only existing reviewed timer-triggered ADC modes.
 
 No additional selector is invented. Their providers already validate the exact
 timer and DMA route. Startup arms the DMA, then ADC, then the trigger; stop is
 the reverse provider-owned drain contract. This is metadata, not a new emitter.
+The selected group policy supplies its primary converter explicitly; a common
+controller name never implies a converter identity.
 """
     nodes, edges, startup = [], [], []
     for item in selected:
         if item["kind"] == "adc_group":
+            try:
+                converter = Symbol(adc_group_converter).name
+            except ValueError:
+                fail("ADC group trigger requires an explicit converter identity")
             owner = item["id"]
             trigger, adc = owner + ":trigger", owner + ":adc"
             nodes.append({"id": adc, "owner": owner,
-                          "clock_domain": "controller:ADC1",
+                          "clock_domain": "controller:" + converter,
                           "events": ["sample-ready"],
                           "actions": ["sample", "stop"],
                           "stop_actions": ["stop"]})
@@ -231,7 +239,8 @@ the reverse provider-owned drain contract. This is metadata, not a new emitter.
                               "stop_actions": ["stop"]})
                 edges.append({"source": trigger, "event": event,
                               "target": adc, "action": "sample",
-                              "route": timer + ":" + event + ":ADC1:" + item["mode"],
+                              "route": (timer + ":" + event + ":" + converter +
+                                        ":" + item["mode"]),
                               "cross_domain": True})
                 startup.append((adc, trigger))
             if item["mode"] == "regular-timer-injected-blocks":
@@ -244,7 +253,7 @@ the reverse provider-owned drain contract. This is metadata, not a new emitter.
                 injected = owner + ":injected"
                 pulse = owner + ":injected-trigger"
                 nodes += [{"id": injected, "owner": owner,
-                           "clock_domain": "controller:ADC1",
+                           "clock_domain": "controller:" + converter,
                            "events": ["sample-ready"], "actions": ["sample", "stop"],
                            "stop_actions": ["stop"]},
                           {"id": pulse, "owner": owner,
@@ -253,7 +262,8 @@ the reverse provider-owned drain contract. This is metadata, not a new emitter.
                            "stop_actions": ["stop"]}]
                 edges.append({"source": pulse, "event": event,
                               "target": injected, "action": "sample",
-                              "route": timer + ":" + event + ":ADC1:injected",
+                              "route": (timer + ":" + event + ":" + converter +
+                                        ":injected"),
                               "cross_domain": True})
                 startup.append((injected, pulse))
             if item["mode"] == "regular-auto-injected":
@@ -262,12 +272,12 @@ the reverse provider-owned drain contract. This is metadata, not a new emitter.
                 next(node for node in nodes if node["id"] == adc)["events"].append("sequence-complete")
                 injected = owner + ":injected"
                 nodes.append({"id": injected, "owner": owner,
-                              "clock_domain": "controller:ADC1",
+                              "clock_domain": "controller:" + converter,
                               "events": ["sample-ready"], "actions": ["sample", "stop"],
                               "stop_actions": ["stop"]})
                 edges.append({"source": adc, "event": "sequence-complete",
                               "target": injected, "action": "sample",
-                              "route": "ADC1:regular:JAUTO:injected",
+                              "route": converter + ":regular:JAUTO:injected",
                               "cross_domain": False})
                 startup.append((injected, adc))
             if item.get("dma"):

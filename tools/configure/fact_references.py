@@ -32,11 +32,11 @@ def audit_sources(value, context, required=True):
             fail("Reference audit " + context + ": relative source required")
 
 
-def software_audit(value, document):
+def software_audit(value, document, *, profiles):
     """A complete review records exclusions and constraints, never a pass bit."""
     fields(value, {"profile", "document_sha256", "revision_order",
                    "maintained_modes", "items"}, "audit profile")
-    profile = reference_profiles.select(value["profile"])
+    profile = profiles.select(value["profile"])
     if ((document["document_id"], document["revision"], document["sha256"]) !=
             (profile.document_id, profile.revision, profile.sha256) or
             value["document_sha256"] != document["sha256"]):
@@ -89,7 +89,7 @@ def select_review(data, device):
     return matches[0]
 
 
-def device_reviews(values, documents, variants):
+def device_reviews(values, documents, variants, *, profiles):
     """Bind each runtime device to one manual, errata and complete audit."""
     if not isinstance(values, list) or not values:
         fail("Reference device reviews require explicit disjoint groups")
@@ -114,7 +114,7 @@ def device_reviews(values, documents, variants):
         if (not isinstance(errata, str) or errata not in documents or
                 documents[errata]["kind"] != "errata"):
             fail("Reference device review must cite its indexed errata")
-        manual_profile = reference_profiles.manual(documents[manual])
+        manual_profile = profiles.manual(documents[manual])
         scope = {"status": "software_audited_with_constraints",
                  "silicon_revision": "not_observed",
                  "mode_workarounds": "audited_with_constraints",
@@ -122,7 +122,7 @@ def device_reviews(values, documents, variants):
         if any(value[key] != required for key, required in scope.items()):
             fail("Reference errata scope cannot establish physical qualification")
         text(value["identification"], "Reference silicon identification")
-        errata_profile = software_audit(value["software_audit"], documents[errata])
+        errata_profile = software_audit(value["software_audit"], documents[errata], profiles=profiles)
         if (not set(devices).issubset(manual_profile.devices) or
                 not set(devices).issubset(errata_profile.devices) or
                 documents[manual]["document_id"] != errata_profile.reference_manual):
@@ -139,8 +139,10 @@ def device_reviews(values, documents, variants):
         fail("Reference device reviews leave an unused manual or errata")
 
 
-def validate(data, variants):
+def validate(data, variants, *, profiles):
     """Validate source scope separately from physical silicon observations."""
+    if not isinstance(profiles, reference_profiles.ProfileSet):
+        fail("Reference validation requires an explicit selected profile set")
     fields(data, {"schema_version", "documents", "package_review",
                   "device_reviews", "limitations"}, "index")
     integer(data["schema_version"], 2, 2, "Reference schema")
@@ -189,7 +191,7 @@ def validate(data, variants):
                 len(set(parts)) != len(parts) or not set(parts).issubset(variants) or
                 reviewed_parts.intersection(parts)):
             fail("Reference package variants require disjoint maintained parts")
-        profile = reference_profiles.datasheet(documents[name])
+        profile = profiles.datasheet(documents[name])
         for part in parts:
             variant = variants[part]
             device = variant.get("device") if isinstance(variant, Mapping) else None
@@ -201,7 +203,7 @@ def validate(data, variants):
         text(package["scope"], "Reference package scope")
     if reviewed_parts != set(variants):
         fail("Reference package variants do not cover exact maintained parts")
-    device_reviews(data["device_reviews"], documents, variants)
+    device_reviews(data["device_reviews"], documents, variants, profiles=profiles)
     limits = data["limitations"]
     if not isinstance(limits, list) or not limits:
         fail("Reference review must retain its qualification limitations")
@@ -210,14 +212,14 @@ def validate(data, variants):
     return data
 
 
-def admit_selection(review, controllers, backend):
+def admit_selection(review, controllers, backend, *, profiles):
     """Admit actual selected modes and return their independently bound scope.
 
     The whole family inventory and the existence of an implementation cannot
     authorize an unreviewed peripheral, backend or different manual group.
     """
     audit = review["software_audit"]
-    profile = reference_profiles.select(audit["profile"])
+    profile = profiles.select(audit["profile"])
     if backend not in profile.backends:
         fail("Selected device has no reviewed backend in its software slice")
     modes = set(audit["maintained_modes"])
@@ -226,8 +228,8 @@ def admit_selection(review, controllers, backend):
     return profile
 
 
-def admit_clock_policy(review, policy):
+def admit_clock_policy(review, policy, *, profiles):
     """An authored profile name cannot substitute a different reviewed scope."""
-    selected = reference_profiles.select(review["software_audit"]["profile"])
+    selected = profiles.select(review["software_audit"]["profile"])
     if policy not in selected.clock_policies:
         fail("Selected device has no reviewed clock policy in its software slice")

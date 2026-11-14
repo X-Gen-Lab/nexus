@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "routes": [
+    {
+      "id": "gpio-pa4",
+      "variants": [
+        "GD32F470ZGT6"
+      ],
+      "controller": "GPIOA",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PA4",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output"
+      ],
+      "source": "GD32F470xx DS Rev2.2 Tables2-7..2-15; silicon software route only, no PCB wiring claim"
+    },
+    {
+      "id": "usart0-pa9-pa10",
+      "variants": [
+        "GD32F470ZGT6"
+      ],
+      "controller": "USART0",
+      "kind": "uart",
+      "pins": [
+        {
+          "pin": "PA9",
+          "function": "tx",
+          "af": 7
+        },
+        {
+          "pin": "PA10",
+          "function": "rx",
+          "af": 7
+        }
+      ],
+      "modes": [
+        "irq-byte-event"
+      ],
+      "source": "GD32F470xx DS Rev2.2 Tables2-7..2-15; PA9/PA10 AF7 USART0 software route, no PCB wiring claim"
+    }
+  ]
+}

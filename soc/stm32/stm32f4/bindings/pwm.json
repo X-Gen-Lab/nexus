@@ -1,0 +1,139 @@
+{
+  "schema_version": 1,
+  "bindings": [
+    {
+      "kind": "pwm",
+      "mode": "fixed-pwm",
+      "implementation": "pwm",
+      "headers": [
+        "stm32f407_control_cold.h",
+        "stm32f4_timer_encoding.h"
+      ],
+      "static_recipe": {
+        "state_type": "nx_stm32_pwm_state_t",
+        "ops": "nx_stm32_pwm_ops",
+        "declarations": [
+          {
+            "role": "idle",
+            "type": "nx_stm32_gpio_state_t",
+            "const": false
+          },
+          {
+            "role": "control_config",
+            "type": "nx_stm32_pwm_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "period_ticks",
+                  {
+                    "source": "item.options.period_ticks"
+                  }
+                ],
+                [
+                  "duty_ticks",
+                  {
+                    "source": "item.options.duty_ticks"
+                  }
+                ],
+                [
+                  "tick_hz",
+                  {
+                    "source": "item.options.tick_hz"
+                  }
+                ],
+                [
+                  "prescaler",
+                  {
+                    "macro": "NX_STM32_TIMER_PRESCALER",
+                    "args": [
+                      {
+                        "source": "selected.clock_hz"
+                      },
+                      {
+                        "source": "item.options.tick_hz"
+                      }
+                    ]
+                  }
+                ],
+                [
+                  "inactive_high",
+                  {
+                    "macro": "NX_STM32_TIMER_IDLE_HIGH",
+                    "args": [
+                      {
+                        "source": "item.route_initial",
+                        "default": 0
+                      }
+                    ]
+                  }
+                ],
+                [
+                  "registers",
+                  {
+                    "source": "item.controller",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "gpio",
+                  {
+                    "source": "selected.pads.0.registers",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "channel",
+                  {
+                    "source": "selected.constants.channel"
+                  }
+                ],
+                [
+                  "pin",
+                  {
+                    "source": "selected.pads.0.number"
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "calls": {
+          "prepare": {
+            "function": "nx_stm32_pwm_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "ref": "idle",
+                "as": "address"
+              },
+              {
+                "ref": "control_config",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32_pwm_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "ref": "idle",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "retain_on_failed_init": true
+      }
+    }
+  ]
+}

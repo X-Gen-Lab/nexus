@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "id": "stm32f407zg-uart-alternate-software-fixture",
+  "soc": "STM32F407ZGT6",
+  "soc_family": "stm32f4",
+  "source_revision": "DS8626-Rev12-RM0090-Rev22-alternate-serial-routes",
+  "physical_pcb_revision": null,
+  "clocks": {
+    "hse_hz": 8000000
+  },
+  "bindings": [
+    {
+      "id": "serial2",
+      "controller": "USART2",
+      "route": "usart2-pd5-pd6"
+    },
+    {
+      "id": "serial6",
+      "controller": "USART6",
+      "route": "usart6-pc6-pc7-dma-alternate"
+    },
+    {
+      "id": "spi1",
+      "controller": "SPI1",
+      "route": "spi1-pa5-pa6-pa7-dma-alternate"
+    },
+    {
+      "id": "cs0",
+      "controller": "GPIOA",
+      "route": "gpio-pa4",
+      "initial": 16
+    },
+    {
+      "id": "i2c2",
+      "controller": "I2C2",
+      "route": "i2c2-pf1-pf0"
+    },
+    {
+      "id": "target2",
+      "controller": "I2C2",
+      "route": "target-i2c2-pf1-pf0"
+    },
+    {
+      "id": "i2c2-dma",
+      "controller": "I2C2",
+      "route": "i2c2-pf1-pf0-dma-alternate"
+    }
+  ],
+  "reserved_resources": [],
+  "unknowns": [
+    "Software-only silicon route; no physical PCB connection, external device or HIL qualification is claimed."
+  ],
+  "provenance": [
+    {
+      "url": "https://www.st.com/resource/en/datasheet/stm32f407zg.pdf",
+      "scope": "DS8626 Rev12 Tables7/9 exact LQFP144 and selected USART2/USART6/SPI1/I2C2 AF pads; no physical PCB connection."
+    },
+    {
+      "url": "https://www.st.com/resource/en/reference_manual/dm00031020-stm32f405415-stm32f407417-stm32f427437-and-stm32f429439-advanced-armbased-32bit-mcus-stmicroelectronics.pdf",
+      "scope": "RM0090 Rev22 Tables43/44 DMA request mappings; software route reference only."
+    }
+  ]
+}

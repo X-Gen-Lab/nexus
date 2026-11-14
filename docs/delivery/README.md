@@ -7,7 +7,7 @@ source_language: zh_CN
 
 # 当前平台交付边界
 
-当前重构将生产 SoC 收敛为 STM32F4，现有 F407VE／ZG 及四个 Board 包迁入系列入口。
+当前重构将生产 SoC 收敛为 STM32F4，八个精确料号、七个器件视图和四个 F407 Board 包由系列入口维护。
 全部 vendor 来源保留；Native 移到显式测试支撑。应用任务、产品策略和私有 PCB
 继续由外部工程维护。
 
@@ -22,12 +22,12 @@ source_language: zh_CN
 | 入口 | 用途 |
 |---|---|
 | [当前架构](architecture.md) | 目录、依赖、运行路径和状态责任 |
-| [本轮架构任务](architecture.md#本轮架构迭代任务) | WP01–WP12 与 IO01–IO20 的既有基础、实施增量和退出条件 |
+| [本轮架构任务](architecture.md#本轮架构迭代任务) | A01–H06 的实现、待验收状态与退出条件 |
 | [精确支持](support.md) | 型号、板卡、模式与限制 |
 | [能力矩阵](capabilities.md) | 事实、路线、装配与实际生产定义关联 |
 | [源码定位](../explanation/source-map.md) | 各层权威入口与源码归属 |
 | [资格边界](../reference/platforms/qualification.md) | 模型、ARM、SDK、候选和物理验收分开 |
-| [当前软件增量与验收](https://github.com/X-Gen-Lab/nexus/pulls?q=is%3Apr+head%3Afeature%2Ff4-platform-completion) | 按该分支对应 PR 的实际源码 SHA、配置和执行回执读取本批结果，不转移历史资格 |
+| [前序固定软件交付](https://github.com/X-Gen-Lab/nexus/pull/63) | PR #63 的固定源码、配置和实际执行回执；不转移为后续源码资格 |
 | [前序固定基线](https://github.com/X-Gen-Lab/nexus/pull/62) | PR #62 的便携 I/O 重构、实际源码身份、普通门禁、SDK 与资源结果 |
 | [前序变更](https://github.com/X-Gen-Lab/nexus/pull/61) | PR #61 保留自己的源码与执行范围 |
 | [软件证据导航](https://github.com/X-Gen-Lab/nexus/blob/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18/docs/status/software-verification.md) | 按原源码与配置读取执行记录 |
@@ -36,10 +36,12 @@ source_language: zh_CN
 [GitHub Releases](https://github.com/X-Gen-Lab/nexus/releases)和其固定 manifest 为准。
 重构不移动旧标签，不重新标记旧产物。
 
-本轮架构迭代以固定源码
-[`a2b74d82`](https://github.com/X-Gen-Lab/nexus/tree/a2b74d826dc1545aa8f51b5fcbc05fcd1cc2c984)
-为既有基础。该版本已有的流式传输、恢复和勘误修正，与本轮工作包新增内容分别记录。
-本轮便携 I/O 的平台实现为
+当前接入重构以
+[`ba13686`](https://github.com/X-Gen-Lab/nexus/tree/ba13686b91c94d19ef11acf910653ee2fcc9aa8b)
+为源码基线；新实现和新执行通过[当前任务](architecture.md#本轮架构迭代任务)分别审查，
+不能从设计页的存在推定全部完成。
+
+以下是前序 PR #62 的冻结记录，不是当前重构的执行结果。前序便携 I/O 的平台实现为
 [`6b59f666`](https://github.com/X-Gen-Lab/nexus/tree/6b59f66628f0dbb415f6203ba917c1fe717bf3fd)，
 其 Debug、Release、ASAN+UBSAN 和 TSAN 各执行完整 329 个 CTest 项、5982 个
 GoogleTest 用例并通过。最终

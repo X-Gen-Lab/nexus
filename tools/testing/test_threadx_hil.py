@@ -66,6 +66,37 @@ class ThreadXHilTests(unittest.TestCase):
             with self.subTest(change=change), self.assertRaises(EvidenceError):
                 contract({**resolved_threadx(), **change})
 
+    def test_contract_uses_matched_board_facts_without_a_name_whitelist(self):
+        from tools.hil import threadx
+        original = threadx.load_json
+        resolved = resolved_threadx("additional-reviewed-board")
+
+        def reviewed(path):
+            board = original(path)
+            if board.get("id") == "stm32f407zg-qiming-v31":
+                board["id"] = resolved["board"]
+            return board
+
+        with patch.object(threadx, "load_json", side_effect=reviewed):
+            self.assertEqual(threadx.contract(resolved), expected_contract(resolved))
+
+    def test_matching_identity_still_requires_its_authored_threadx_permission(self):
+        from tools.hil import threadx
+        original = threadx.load_json
+        for support in (None, [], ["freertos"]):
+            def unauthorized(path):
+                board = original(path)
+                if board.get("id") == "stm32f407zg-qiming-v31":
+                    board.pop("backend_support", None)
+                    if support is not None:
+                        board["backend_support"] = support
+                return board
+
+            with self.subTest(support=support), \
+                    patch.object(threadx, "load_json", side_effect=unauthorized), \
+                    self.assertRaisesRegex(EvidenceError, "ThreadX platform"):
+                threadx.contract(resolved_threadx())
+
     def test_native_threadx_plan_remains_host_software_only(self):
         resolved = resolved_threadx("native-reference")
         facts = {**resolved["cpu"], "arch": "native", "float_abi": "native",

@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "id": "gd32f470zg-software-reference",
+  "soc": "GD32F470ZGT6",
+  "soc_family": "gd32f470_reference",
+  "source_revision": "software-reference-v1",
+  "physical_pcb_revision": null,
+  "clocks": {},
+  "bindings": [
+    {
+      "id": "status",
+      "controller": "GPIOA",
+      "route": "gpio-pa4",
+      "mask": 16,
+      "initial": 0
+    },
+    {
+      "id": "console",
+      "controller": "USART0",
+      "route": "usart0-pa9-pa10"
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14"
+  ],
+  "unknowns": [
+    "No PCB or external wiring qualification; GPIOA PA4 and USART0 PA9/PA10 are silicon-only software references",
+    "Clock is internal IRC16M; oscillator accuracy and UART baud tolerance are unmeasured"
+  ],
+  "provenance": []
+}

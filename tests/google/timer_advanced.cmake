@@ -30,3 +30,20 @@ foreach(timer_family stm32f4)
             "${NEXUS_SOC_SOURCE_${timer_family}}/drivers/timer_capture_tim${small_timer}.c")
     endforeach()
 endforeach()
+
+# Selected alternate pads exercise the same production cold and hot paths.
+nexus_google_test(nexus_stm32f4_timer_route_test STM32F4_LL
+    SOURCES stm32_timer_route_test.cpp
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/timer_capture.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/advanced_pwm.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio.c"
+    LIBRARIES Nexus::IO Nexus::Core
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private"
+        "${NEXUS_SOURCE_DIR}/arch/include" "${NEXUS_SOURCE_DIR}/io/private")
+target_compile_options(nexus_stm32f4_timer_route_test PRIVATE
+    "-include${CMAKE_CURRENT_SOURCE_DIR}/stm32_timer_route_model.h")
+target_include_directories(nexus_stm32f4_timer_route_test SYSTEM PRIVATE
+    "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
+    "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+nexus_use_cmsis_core(nexus_stm32f4_timer_route_test)
+target_compile_definitions(nexus_stm32f4_timer_route_test PRIVATE STM32F407xx)

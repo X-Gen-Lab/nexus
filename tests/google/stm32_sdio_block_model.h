@@ -5,9 +5,19 @@
  */
 #ifndef NEXUS_STM32_SDIO_BLOCK_MODEL_H
 #define NEXUS_STM32_SDIO_BLOCK_MODEL_H
+#include "nexus_config.h"
 #include "stm32_official_model.h"
 #include "stm32_platform_cold_model.h"
 #include "stm32f4xx_ll_sdmmc.h"
+
+/* These exact controller fixtures override the Native assembly's absent host
+ * controller. Each lane is a distinct maintained compiler context. */
+#undef NEXUS_STM32_SDIO_DMA_LANE
+#ifdef NX_SDIO_STREAM6_ONLY
+#define NEXUS_STM32_SDIO_DMA_LANE 6U
+#else
+#define NEXUS_STM32_SDIO_DMA_LANE 3U
+#endif
 
 #ifdef __cplusplus
 extern "C" {

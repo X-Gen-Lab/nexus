@@ -7,8 +7,7 @@ import unittest
 from unittest.mock import patch
 
 from tools.configure import configure as gate
-from tools.configure.providers import maintained
-from tools.configure.stm32f4 import clocks
+from tools.configure.tests.f4_fixture import copy_package, provider
 
 HSI = dict(source='hsi', input_hz=16000000, sysclk_source='input',
            pll48=False, pll_m=16, pll_n=336, pll_p=4, pll_q=7,
@@ -16,16 +15,19 @@ HSI = dict(source='hsi', input_hz=16000000, sysclk_source='input',
            supply_mv=3300, css=False)
 
 
-class DeviceClockPolicyTests(unittest.TestCase):
+class F4ClockFixture(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.provider = provider("STM32F407VET6")
+
+
+class DeviceClockPolicyTests(F4ClockFixture):
     def setUp(self):
         temporary = tempfile.TemporaryDirectory()
         self.addCleanup(temporary.cleanup)
         self.root = Path(temporary.name)
+        copy_package(self.root)
         for name in ('dependencies/platform-compatibility.json',
-                     'soc/stm32/stm32f4/soc.json',
-                     'soc/stm32/stm32f4/devices.json',
-                     'soc/stm32/stm32f4/routes.json',
-                     'soc/stm32/stm32f4/references.json',
                      'tests/contracts/stm32f4_family/f411re-board/board.json',
                      'tests/contracts/stm32f4_family/f446ze-board/board.json',
                      'tests/contracts/stm32f4_family/f479ni-board/board.json'):
@@ -110,15 +112,15 @@ class DeviceClockPolicyTests(unittest.TestCase):
                 self.resolve(HSI, board=board)
 
 
-class SelectedAuxiliaryPolicyTests(unittest.TestCase):
+class SelectedAuxiliaryPolicyTests(F4ClockFixture):
     def admit(self, name, *, shared=False, **changes):
         parameters = {**HSI, **changes}
         if shared:
             parameters.update(pll_m=10, pll_n=192, pll_q=5)
         parameters.setdefault("pll_sai", dict(
             m=10, n=192, sai1=dict(q=5, post_divider=5)))
-        plan = clocks.plan("custom", parameters)
-        maintained("stm32f4").validate_clock_policy(name, plan)
+        plan = self.provider.clock_plan("custom", parameters)
+        self.provider.validate_clock_policy(name, plan)
         return plan
 
     def test_exact_policies_admit_their_legal_independent_or_shared_input(self):
@@ -150,11 +152,11 @@ class SelectedAuxiliaryPolicyTests(unittest.TestCase):
                 self.admit(name)
 
 
-class SelectedHighSpeedClockTests(unittest.TestCase):
+class SelectedHighSpeedClockTests(F4ClockFixture):
     def selected(self, policy, **changes):
         parameters = dict(HSI, sysclk_source="pll", **changes)
-        result = clocks.plan("custom", parameters)
-        maintained("stm32f4").validate_clock_policy(policy, result)
+        result = self.provider.clock_plan("custom", parameters)
+        self.provider.validate_clock_policy(policy, result)
         return result
 
     def test_f411_hsi96_has_independent_legal_bus_and_48mhz_domains(self):
@@ -183,7 +185,7 @@ class SelectedHighSpeedClockTests(unittest.TestCase):
         item = SimpleNamespace(kind="usb_device", mode="device-fs",
                                controller="OTG_FS")
         with self.assertRaisesRegex(ValueError, "external HSE crystal"):
-            clocks.validate_consumers(result, [item])
+            self.provider.validate_clock_consumers(result, [item])
 
     def test_f479_hsi168_shares_nonunit_input_with_audio_and_ltdc(self):
         auxiliary = dict(m=10, n=192, sai1=dict(q=5, post_divider=5),
@@ -196,7 +198,7 @@ class SelectedHighSpeedClockTests(unittest.TestCase):
         self.assertEqual(result["pll_sai"]["sai1"]["kernel_hz"], 12288000)
         self.assertEqual(result["pll_sai"]["ltdc"]["pixel_hz"], 4800000)
         from types import SimpleNamespace
-        clocks.validate_consumers(result, (
+        self.provider.validate_clock_consumers(result, (
             SimpleNamespace(kind="audio", controller="SAI1", mode="master-tx"),
             SimpleNamespace(kind="display", controller="LTDC", mode="rgb-scanout")))
 

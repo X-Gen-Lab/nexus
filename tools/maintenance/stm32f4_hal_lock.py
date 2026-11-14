@@ -227,7 +227,7 @@ def _input_snapshot(source, lock_path, cmsis):
     source, cmsis = canonical_directory(source), canonical_directory(cmsis)
     sdk = source.parents[2]
     manifest = sdk / ".nexus-source-sdk.json"
-    required = {lock_path, ROOT / "cmake/platform/STM32Official.cmake"}
+    required = {lock_path, ROOT / "soc/stm32/stm32f4/cmake/STM32Official.cmake"}
     required.update(ROOT / name for name in
                     dependencies.source_names("platform", "stm32f4", sdk=True))
     paths = {*required, manifest}

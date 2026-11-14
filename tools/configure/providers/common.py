@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 import re
 from types import MappingProxyType
 
-from tools.configure.calls import DirectCall, InitializeSequence, Symbol
+from tools.configure.calls import Address, DirectCall, InitializeSequence, Symbol
 
 UINT32_MAX = (1 << 32) - 1
 
@@ -29,15 +29,35 @@ def fail(message, **details):
 
 
 def validate_vendor_device(value):
-    """Admit data identifiers only, never compiler flags or startup paths."""
+    """Admit an explicit compiler selector and one safe startup basename."""
     if (not isinstance(value, Mapping) or
             set(value) != {"macro", "startup"}):
         fail("Vendor device requires exact macro and startup fields")
-    macro, startup = value["macro"], value["startup"]
-    if (not isinstance(macro, str) or
-            re.fullmatch(r"STM32F4[A-Za-z0-9]+", macro) is None or
-            startup != "startup_" + macro.lower() + ".s"):
-        fail("Invalid STM32F4 vendor device identifiers")
+    _catalog_symbol(value["macro"], "Vendor device macro")
+    _catalog_path(value["startup"], "Vendor startup basename", basename=True)
+
+
+def _catalog_symbol(value, purpose):
+    try:
+        Symbol(value)
+    except ValueError:
+        fail(purpose + " requires an explicit C identifier")
+
+
+def _catalog_path(value, purpose, *, basename=False):
+    """Only canonical relative names can enter a source or SDK path."""
+    component = r"[A-Za-z0-9_][A-Za-z0-9_.-]*"
+    pattern = component if basename else component + r"(?:/" + component + r")*"
+    if not isinstance(value, str) or re.fullmatch(pattern, value) is None:
+        fail(purpose + " requires a safe canonical relative path")
+    return value
+
+
+def _catalog_identifier(value, purpose):
+    if (not isinstance(value, str) or
+            re.fullmatch(r"[A-Za-z0-9_][A-Za-z0-9_.-]*", value) is None):
+        fail(purpose + " requires an explicit metadata identifier")
+    return value
 
 
 @dataclass(frozen=True)
@@ -46,6 +66,27 @@ class VendorIrqBinding:
 
     number: int
     handler: str
+
+
+@dataclass(frozen=True)
+class VendorIrqResource:
+    """A canonical resource retains its actual SDK enum and startup entry."""
+
+    enum: str
+    number: int
+    handler: str
+
+
+def irq_resource_bindings(bindings):
+    """Index actual declarations by existing resource grammar, never guess."""
+    from tools.configure.resource_graph import normalize_resource
+    result = {}
+    for enum, binding in bindings.items():
+        name = normalize_resource("irq:" + enum)[4:]
+        if name in result:
+            fail("Catalog IRQ resource collision: " + name)
+        result[name] = VendorIrqResource(enum, binding.number, binding.handler)
+    return MappingProxyType(result)
 
 
 @dataclass(frozen=True)
@@ -66,17 +107,17 @@ def vendor_irq_bindings(value, count):
         fail("Vendor IRQ bindings require a nonempty reviewed enum map")
     bindings, numbers = {}, set()
     for name, item in value.items():
-        if (not isinstance(name, str) or
-                re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*_IRQn", name) is None or
-                not isinstance(item, Mapping) or set(item) != {"number", "handler"}):
+        _catalog_symbol(name, "Vendor IRQ enum")
+        if (not isinstance(item, Mapping) or set(item) != {"number", "handler"}):
             fail("Vendor IRQ binding requires exact enum, number and handler")
         number = integer(item["number"], 0, count - 1, "Vendor IRQ number")
         handler = item["handler"]
-        if (number in numbers or not isinstance(handler, str) or
-                re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*_IRQHandler", handler) is None):
+        _catalog_symbol(handler, "Vendor IRQ handler")
+        if number in numbers:
             fail("Vendor IRQ bindings require unique slots and exact handlers")
         numbers.add(number)
         bindings[name] = VendorIrqBinding(number, handler)
+    irq_resource_bindings(bindings)
     return MappingProxyType(bindings)
 
 
@@ -89,13 +130,16 @@ def vendor_device_catalog(value):
         fail("Vendor device catalog schema differs from the maintained contract")
     sdk = value["sdk"]
     if (not isinstance(sdk, Mapping) or
-            set(sdk) != {"directory", "commit", "core_directory", "core_commit"} or
-            sdk["directory"] != "vendors/st/cmsis_device_f4" or
-            sdk["core_directory"] != "vendors/arm/CMSIS_6" or
+            set(sdk) != {"directory", "dependency", "commit", "core_directory",
+                         "core_dependency", "core_commit"} or
             any(not isinstance(sdk[name], str) or
                 re.fullmatch(r"[0-9a-f]{40}", sdk[name]) is None
                 for name in ("commit", "core_commit"))):
         fail("Vendor device catalog requires exact source identities")
+    for name in ("directory", "core_directory"):
+        _catalog_path(sdk[name], "Catalog SDK directory")
+    for name in ("dependency", "core_dependency"):
+        _catalog_identifier(sdk[name], "Catalog SDK dependency alias")
     entries = {}
     macros = set()
     for row in sequence(value["devices"], "Vendor device catalog entries"):
@@ -105,29 +149,26 @@ def vendor_device_catalog(value):
                 set(row) - fields - {"irq_bindings"}):
             fail("Vendor device catalog requires exact entry fields")
         macro, identifier = row["define"], row["id"]
-        if (not isinstance(macro, str) or not isinstance(identifier, str) or
-                identifier != macro.lower().removesuffix("xx")):
-            fail("Vendor device catalog ID differs from its declared selector")
-        startup = "startup_" + macro.lower() + ".s"
+        _catalog_identifier(identifier, "Vendor device catalog ID")
+        _catalog_path(row["header"], "Catalog header")
+        _catalog_path(row["startup"], "Catalog startup")
+        startup = row["startup"].rsplit("/", 1)[-1]
         validate_vendor_device({"macro": macro, "startup": startup})
-        if (row["header"] != "Include/" + macro.lower() + ".h" or
-                row["startup"] != "Source/Templates/gcc/" + startup):
-            fail("Vendor device catalog header/startup identity mismatch")
         if identifier in entries or macro in macros:
             fail("Vendor device catalog contains duplicate device IDs or selectors")
         bits = integer(row["nvic_priority_bits"], 1, 8, "Catalog IRQ priority bits")
         count = integer(row["external_irq_count"], 1, 496, "Catalog external IRQ count")
         last = row["last_external_irq"]
         if (not isinstance(last, Mapping) or set(last) != {"name", "number"} or
-                not isinstance(last["name"], str) or
-                re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*_IRQn", last["name"]) is None or
                 type(last["number"]) is not int or last["number"] != count - 1):
             fail("Vendor device catalog has inconsistent last IRQ facts")
+        _catalog_symbol(last["name"], "Catalog last IRQ enum")
         timebases = row["timebase_presence"]
         if (not isinstance(timebases, Mapping) or
-                set(timebases) != {"TIM2", "TIM5", "LPTIM1"} or
                 any(type(flag) is not bool for flag in timebases.values())):
             fail("Vendor device catalog requires boolean timebase presence")
+        for name in timebases:
+            _catalog_identifier(name, "Catalog timebase")
         bindings = (vendor_irq_bindings(row["irq_bindings"], count)
                     if "irq_bindings" in row else MappingProxyType({}))
         entries[identifier] = VendorDeviceProfile(
@@ -136,13 +177,16 @@ def vendor_device_catalog(value):
     if not entries or not isinstance(value["inputs"], Mapping) or not value["inputs"]:
         fail("Vendor device catalog entries and input identities are required")
     for name, record in value["inputs"].items():
-        if (not isinstance(name, str) or "\\" in name or name.startswith("/") or
-                any(part in {"", ".", ".."} for part in name.split("/")) or
-                not isinstance(record, Mapping) or set(record) != {"bytes", "sha256"} or
+        _catalog_path(name, "Catalog input")
+        if (not isinstance(record, Mapping) or set(record) != {"bytes", "sha256"} or
                 type(record["bytes"]) is not int or record["bytes"] <= 0 or
                 not isinstance(record["sha256"], str) or
                 re.fullmatch(r"[0-9a-f]{64}", record["sha256"]) is None):
             fail("Vendor device catalog requires ordinary input identity records")
+    for row in value["devices"]:
+        for field in ("header", "startup"):
+            if row[field] not in value["inputs"]:
+                fail("Catalog " + field + " lacks its declared input identity")
     return MappingProxyType(entries)
 
 
@@ -190,9 +234,22 @@ class EndpointPolicy:
 
     spi_transaction: bool = False
     spi_dma: tuple[tuple[str, ...] | None, str] | None = None
+    spi_transaction_ops: Symbol | None = None
+    spi_dma_owner: tuple[Symbol, Symbol] | None = None
     model_async_echo: bool = False
     spi_lsb_first: bool = False
     i2c_ten_bit: bool = False
+
+    def __post_init__(self):
+        if (self.spi_transaction_ops is not None and
+                not isinstance(self.spi_transaction_ops, Symbol)):
+            fail("SPI transaction operations require an explicit Symbol")
+        if ((self.spi_dma is None) != (self.spi_dma_owner is None) or
+                self.spi_dma_owner is not None and (
+                    not isinstance(self.spi_dma_owner, tuple) or
+                    len(self.spi_dma_owner) != 2 or
+                    any(not isinstance(value, Symbol) for value in self.spi_dma_owner))):
+            fail("SPI DMA requires its explicit contains/attach_wake Symbol pair")
 
     def validate(self, device, controller):
         driver, kind, mode = (device["driver"], controller["kind"],
@@ -305,14 +362,24 @@ class Construction:
     retain_on_failed_init: bool
     exports: tuple[str, ...] = ()
     pin_snapshots: Mapping[str, str] = field(default_factory=dict)
-    face_context: str | None = None
+    face_context: Address | None = None
     face_definitions: tuple[str, ...] = ()
     admission: tuple[DirectCall, ...] = ()
     initialize_sequences: tuple[InitializeSequence, ...] = ()
     initial_state: Symbol | None = None
     pre_c_effects: bool = False
+    irq_connections: tuple = ()
+    static_declarations: tuple = ()
 
     def __post_init__(self):
+        from tools.configure.static_ir import Declaration, IrqConnection
+        for name, kind in (("irq_connections", IrqConnection),
+                           ("static_declarations", Declaration)):
+            values = getattr(self, name)
+            if (not isinstance(values, (tuple, list)) or
+                    any(not isinstance(value, kind) for value in values)):
+                fail("Construction " + name + " requires immutable typed nodes")
+            object.__setattr__(self, name, tuple(values))
         if (self.initial_state is not None and
                 not isinstance(self.initial_state, Symbol)):
             fail("Construction initial state requires a typed C initializer symbol")
@@ -346,10 +413,8 @@ class Construction:
         object.__setattr__(self, "stop", stops)
         if type(self.retain_on_failed_init) is not bool:
             fail("Construction requires boolean failed-init responsibility")
-        if (self.face_context is not None and
-                re.fullmatch(r"&[A-Za-z_][A-Za-z0-9_]*",
-                             self.face_context) is None):
-            fail("Construction face context requires an explicit static object")
+        if self.face_context is not None and not isinstance(self.face_context, Address):
+            fail("Construction face context requires a typed static object address")
         for name in ("definitions", "exports", "face_definitions"):
             values = tuple(getattr(self, name))
             if any(not isinstance(value, str) for value in values):

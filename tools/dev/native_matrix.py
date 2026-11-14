@@ -2,7 +2,7 @@
 
 import argparse
 from concurrent.futures import ThreadPoolExecutor
-from contextlib import ExitStack, contextmanager
+from contextlib import ExitStack
 import json
 import math
 import os
@@ -17,6 +17,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
 from tools.dev import process
+from tools.dev.build_lock import build_lock, child_settings
 from tools.dev.presets import Presets
 from tools.evidence.common import (atomic_json, file_identity, parse_json,
                                    regular_file, sha256_value)
@@ -51,39 +52,6 @@ def capacity():
         except (OSError, ValueError):
             pass
     return cpus, memory
-
-
-@contextmanager
-def build_lock(build):
-    """Reject other matrices; ordinary CLI callers still own directory exclusion."""
-    build.mkdir(parents=True, exist_ok=True)
-    path = build / ".nexus-build.lock"
-    if any(part.is_symlink() for part in (path, *path.parents)):
-        raise ValueError("Native build lock cannot contain a symlink")
-    with path.open("a+b") as stream:
-        try:
-            if os.name == "posix":
-                import fcntl
-                fcntl.flock(stream, fcntl.LOCK_EX | fcntl.LOCK_NB)
-            else:
-                import msvcrt
-                stream.seek(0)
-                if not stream.read(1):
-                    stream.write(b"\0")
-                    stream.flush()
-                stream.seek(0)
-                msvcrt.locking(stream.fileno(), msvcrt.LK_NBLCK, 1)
-        except OSError as error:
-            raise ValueError("Native build is already owned: " + str(build)
-                             ) from error
-        try:
-            yield
-        finally:
-            if os.name == "posix":
-                fcntl.flock(stream, fcntl.LOCK_UN)
-            else:
-                stream.seek(0)
-                msvcrt.locking(stream.fileno(), msvcrt.LK_UNLCK, 1)
 
 
 def selected_builds(presets, env):
@@ -246,6 +214,7 @@ def main(arguments=None):
         with ExitStack() as locks:
             for build in sorted(builds):
                 locks.enter_context(build_lock(build))
+            env, _ = child_settings(env)
             output.mkdir(parents=True)
             preflight = process.run(
                 [sys.executable, "tools/dev/dev.py", "doctor", "--target",

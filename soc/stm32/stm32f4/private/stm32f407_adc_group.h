@@ -8,6 +8,7 @@
 #include "nexus/io/adc_group.h"
 #include "nexus/io/dma.h"
 #include "stm32f407_provider.h"
+#include "stm32f4_adc_encoding.h"
 
 /** \brief The selected common sequencer; never inferred from sample count. */
 typedef enum {

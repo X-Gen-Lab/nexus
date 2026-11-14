@@ -1,5 +1,7 @@
 """Audit directly specialized provider tables from their actual source files."""
 from tools.configure.providers.descriptor import source_directory
+from tools.configure import configure
+from tools.configure.providers import for_selection
 
 from pathlib import Path
 import os
@@ -246,10 +248,14 @@ class ProviderTemplateCompileTests(unittest.TestCase):
         self.storage = tempfile.TemporaryDirectory(prefix="provider templates ")
         self.addCleanup(self.storage.cleanup)
         self.area = Path(self.storage.name)
+        selected = configure.resolve_ir(
+            ROOT / "tests/contracts/timer_assembly/stm32-ve.toml")
+        connections = for_selection(selected).configuration_header(selected)
         (self.area / "nexus_config.h").write_text(
-            "/* Reviewed hse8-pll168 symbol-only ARM fixture. */\n"
+            "/* Reviewed timer assembly connections for ARM specialization. */\n"
             "#define NEXUS_SOC_CACHE_MASK 0U\n"
-            "#define NEXUS_CORE_HZ 168000000U\n")
+            "#define NEXUS_CORE_HZ 168000000U\n"
+            + "\n".join(connections) + "\n")
         command = shlex.split(os.environ.get("NEXUS_ARM_GCC",
                                              "arm-none-eabi-gcc"))
         self.assertTrue(command, "Required ARM compiler command is empty")

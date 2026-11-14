@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "bindings": [],
+  "domains": {
+    "headers": {
+      "schema_version": 1,
+      "timebase_prefix": "NEXUS_STM32",
+      "pin_tables": {
+        "capture": "NEXUS_STM32_CAPTURE_PINS",
+        "advanced": "NEXUS_STM32_ADVANCED_PINS",
+        "adc": "NEXUS_STM32_ADC_PINS"
+      },
+      "dma_memory": {
+        "region": "sram",
+        "origin_macro": "NEXUS_STM32_DMA_SRAM_ORIGIN",
+        "size_macro": "NEXUS_STM32_DMA_SRAM_BYTES",
+        "block_mode": "sdio-dma",
+        "lane_macro": "NEXUS_STM32_SDIO_DMA_LANE"
+      },
+      "clock": {
+        "domain_macros": {
+          "pll_sysclk": "NEXUS_PLL_SYSCLK_HZ",
+          "apb1": "NEXUS_APB1_HZ",
+          "apb2": "NEXUS_APB2_HZ",
+          "adc": "NEXUS_ADC_HZ",
+          "apb1_timer": "NEXUS_APB1_TIMER_HZ",
+          "apb2_timer": "NEXUS_APB2_TIMER_HZ",
+          "sysclk": "NEXUS_SYSCLK_HZ",
+          "pll48": "NEXUS_PLL48_HZ"
+        },
+        "parameter_macros": {
+          "pll_m": "NEXUS_CLOCK_PLLM",
+          "pll_n": "NEXUS_CLOCK_PLLN",
+          "pll_p": "NEXUS_CLOCK_PLLP",
+          "pll_q": "NEXUS_CLOCK_PLLQ",
+          "ahb_div": "NEXUS_CLOCK_AHB_DIV",
+          "apb1_div": "NEXUS_CLOCK_APB1_DIV",
+          "apb2_div": "NEXUS_CLOCK_APB2_DIV",
+          "adc_div": "NEXUS_CLOCK_ADC_DIV",
+          "css": "NEXUS_CLOCK_CSS",
+          "pll_enabled": "NEXUS_CLOCK_PLL_ENABLED",
+          "flash_wait_states": "NEXUS_FLASH_WAIT_STATES"
+        },
+        "profile_flag": {
+          "macro": "NEXUS_CLOCK_SDIO_HS375",
+          "equals": "hse8-pll150-sdio375"
+        },
+        "system_source_flag": {
+          "macro": "NEXUS_CLOCK_SYSCLK_PLL",
+          "equals": "pll"
+        },
+        "input_source_flag": {
+          "macro": "NEXUS_CLOCK_SOURCE_HSE",
+          "equals": "hse"
+        },
+        "block_protocol_flags": {
+          "sd-memory": "NEXUS_STM32_SDIO_SD_HS",
+          "mmc": "NEXUS_STM32_SDIO_MMC_HS"
+        },
+        "auxiliary_prefix": "NEXUS_CLOCK_PLLSAI",
+        "auxiliary_controller_flags": {
+          "SAI2": "NEXUS_CLOCK_PLLSAI_SAI2_ENABLED"
+        }
+      }
+    }
+  }
+}

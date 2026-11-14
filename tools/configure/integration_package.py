@@ -39,7 +39,7 @@ _PATH_PATTERN = (r"^(?!/)(?!.*(?:^|/)\.{1,2}(?:/|$))"
 # Both the runtime scalar checks and editor projection consume this contract.
 # Containment, required entry files and actual hashes also require filesystem
 # validation; an editor schema never authorizes execution of package code.
-_MANIFEST_FIELDS = {
+_LEGACY_MANIFEST_FIELDS = {
     "schema_version": {"type": "integer", "const": 1},
     "interface_version": {"type": "integer", "const": INTERFACE_VERSION},
     "id": {"type": "string", "pattern": "^" + _IDENTIFIER.pattern + "$"},
@@ -56,14 +56,9 @@ _MANIFEST_FIELDS = {
 
 
 def manifest_schema():
-    """Project editing hints from the runtime manifest field contract."""
-    return {"$schema": "https://json-schema.org/draft/2020-12/schema",
-            "title": "Explicit Nexus SoC/provider package manifest",
-            "description": "Editing hints only; static file and input identity "
-                           "validation is required before trusted code loading.",
-            "type": "object", "additionalProperties": False,
-            "required": list(_MANIFEST_FIELDS),
-            "properties": json.loads(json.dumps(_MANIFEST_FIELDS))}
+    """Expose the production data-package schema; legacy plugins are test-only."""
+    from tools.configure.packages import manifest_schema as production_schema
+    return production_schema()
 
 
 @dataclass(frozen=True)
@@ -121,6 +116,9 @@ class ProviderContext:
     inputs: tuple[Path, ...] = ()
     identity: object = None
     input_digests: tuple[tuple[Path, str], ...] = ()
+    package: object = None
+    binding_policy: object = None
+    domain_policies: object = None
 
     @property
     def external(self):
@@ -286,9 +284,9 @@ def _load_provider(root, configuration, inputs, identity, digests):
 
 
 def _manifest_fields(manifest):
-    if not isinstance(manifest, dict) or set(manifest) != set(_MANIFEST_FIELDS):
+    if not isinstance(manifest, dict) or set(manifest) != set(_LEGACY_MANIFEST_FIELDS):
         fail("SoC package manifest has missing or unknown fields")
-    for name, rule in _MANIFEST_FIELDS.items():
+    for name, rule in _LEGACY_MANIFEST_FIELDS.items():
         value = manifest[name]
         expected = {"integer": int, "string": str, "object": dict}[rule["type"]]
         if type(value) is not expected:
@@ -353,16 +351,60 @@ def load_manifest(package_root, *, root=None):
     return record
 
 
-def select(value, *, family, root, assembly_directory, test_support=False):
+def _select_data_package(path, *, family, test_support, read, owner_root=None):
+    from tools.configure import packages
+    from tools.configure.data_provider import DataProvider
+    package = (path if isinstance(path, packages.Package) else
+               packages.load(path, read=read))
+    if package.family != family:
+        fail("Declarative package family differs from Board family")
+    if package.scope == "reference" and not test_support:
+        fail("Reference package requires explicit test support")
+    soc = read(package.fact("soc"))
+    bindings = read(package.fact("bindings"))
+    if "software" not in bindings:
+        fail("Declarative package requires software binding records")
+    directory = owner_root if owner_root is not None else package.manifest_path.parent
+    selected = descriptor.from_package(package, directory)
+    provider = DataProvider.from_package(package, soc, bindings, read=read)
+    identity = MappingProxyType({
+        "id": package.id, "family": package.family, "vendor": package.vendor,
+        "scope": package.scope, "interface_version": packages.INTERFACE_VERSION,
+        "manifest_sha256": package.manifest_sha256})
+    digests = tuple((item, hashlib.sha256(read.snapshot_bytes(item)).hexdigest())
+                    for item in package.inputs)
+    return ProviderContext(directory, selected, provider,
+        package.inputs, identity if owner_root is None else None, digests, package=package,
+        domain_policies=provider.domain_policies)
+
+
+def select(value, *, family, root, assembly_directory, test_support=False,
+           read=None):
     """Choose one explicit package; an external identity never shadows builtins."""
+    from tools.configure import packages
+    reader = read if read is not None else packages.FactReader()
     if family == "native" and not test_support:
         fail("Native host model requires explicit test support")
     if value is None:
-        selected = descriptor.maintained(family, test_support=test_support)
+        candidate = packages.find(root, family, read=reader)
+        if candidate is not None and "bindings" in candidate.facts:
+            bindings = reader(candidate.fact("bindings"))
+            if "software" in bindings:
+                return _select_data_package(candidate, family=family,
+                    test_support=test_support, read=reader, owner_root=Path(root).resolve())
+        if family != "native" or not test_support:
+            fail("Production SoC selection requires declarative software bindings")
+        selected = descriptor.maintained("native", test_support=True)
         return ProviderContext(root, selected,
-                               maintained(family, test_support=test_support))
+                               maintained("native", test_support=True))
     if not isinstance(value, str) or not value:
         fail("soc_package requires an explicit directory path")
+    candidate = directory(Path(assembly_directory) / value)
+    if (candidate / "package.json").is_file():
+        return _select_data_package(candidate / "package.json", family=family,
+                                    test_support=test_support, read=reader)
+    if not test_support:
+        fail("Production SoC packages require declarative package.json")
     manifest = load_manifest(value, root=assembly_directory)
     if manifest.family != family:
         fail("External SoC package differs from Board family")

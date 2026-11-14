@@ -3,6 +3,9 @@
   "id": "stm32f407zg-qiming-v31",
   "soc": "STM32F407ZGT6",
   "soc_family": "stm32f4",
+  "backend_support": [
+    "threadx"
+  ],
   "source_revision": "V3.1",
   "physical_pcb_revision": null,
   "clocks": {

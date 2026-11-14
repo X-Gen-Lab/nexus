@@ -33,10 +33,11 @@ RM0383／ES0287、RM0390／ES0298、RM0386／ES0321 的独立资料审核。ES01
 
 | 入口 | 责任 |
 | --- | --- |
-| `soc.json`、`routes.json`、`references.json` | 已维护精确型号、路线与资料来源 |
+| `soc.json`、`routes.json`、`references.json`、`review_profiles.json` | 已维护精确型号、路线、资料来源与独立审核范围 |
 | `devices.json` | 官方器件宏、启动文件、IRQ 与时基存在性的编译事实 |
-| 根目录 `tools/configure/stm32f4/` | 当前集中配置适配、静态存储与固定连接 |
-| `system.c` | 启动、所选静态时钟、TIM2 时间域与失败退出 |
+| `package.json`、`bindings.json`、`bindings/` | 事实入口、pad 坐标、领域能力、有限静态对象与固定连接 |
+| 根目录 `tools/configure/` | 通用 DataProvider、领域政策、不可变 IR 与静态生成；无家族导入注册表 |
+| `system.c` | 启动、所选静态时钟、显式 timebase 角色与失败退出 |
 | `private/stm32f4_platform_lifecycle_impl.h`、`drivers/platform_coordinator.c` | System 与共享资源的同源 C 协调实现及通用入口 |
 | `drivers/`、`private/` | 具体模式、实例状态、硬件生命周期与独立回读 |
 | `CMakeLists.txt` | 所选源码、官方库与私有编译依赖 |
@@ -61,6 +62,12 @@ F479 分别使用 DS10314、DS10693、DS11118。芯片、封装与所需 pad 分
 接线。System、预 C 内存与 handoff 使用所选硅片准入；资料、C 实现、模型、
 ARM／SDK 及物理资格分别判断。Board／SoC 没有 Python 插件，集中主机工具只校验
 并连接静态事实，硬件算法与生命周期由 C 维护。
+
+`package.json` 显式声明事实文件，不由公共工具猜文件名。`bindings.json` 顶层
+`pads` 是 pad 坐标的唯一来源，DataProvider 复用同一 BindingPolicy，禁止
+`hardware.pads` 的第二份坐标。`review_profiles.json` 经同一输入快照形成不可变
+ProfileSet；通用工具不内置 F4 的手册或勘误精确表。生产默认路径不再加载旧 F4
+Python 构造模块；各模式与 SDK 仍须本批最终集成验收。
 
 C 准入对 F405／F407／F415／F417 要求 DEV_ID=`0x413`，仅接纳已审 REV_ID
 `0x1001`、`0x1003`、`0x1007`、`0x100f`、`0x101f`。F411、F446、F479 的
@@ -89,8 +96,10 @@ PLLSAI 与主 PLL 共用 M，可同时提供 SAI1 的 Q 与 LTDC 的 R。F479 �
 高速参数保留既有 M10 辅助计划的 12.288 MHz 音频时钟与 4.8 MHz 像素时钟。
 这些输出由唯一 System 管理；高速参考不授予其他外设、180 MHz overdrive 或新料号
 STOP／Standby 支持。完整参数和失败顺序见下方 System 合同。下文未另说明的
-MHz 数字均是原 HSE8／PLL168 示例，实际 C 与生成常量使用所选计划。TIM2 始终整数分频为 1 MHz，通过 overflow IRQ 扩展 32-bit
-counter，IRQ 至少每 2^32 微秒服务一次，不占 RTOS SysTick。PLL48 与 USB 功能
+MHz 数字均是原 HSE8／PLL168 示例，实际 C 与生成常量使用所选计划。包内 timebase
+角色显式选择 timer，当前生产绑定为 TIM2；TIM5 仅有替代路径的模型验证，不扩大
+板卡资格。所选 timer 整数分频为 1 MHz，通过 overflow IRQ 扩展 32-bit counter，
+IRQ 至少每 2^32 微秒服务一次，不占 RTOS SysTick。PLL48 与 USB 功能
 owner 分开取得；没有消费者的直接输入 profile 不开启主 PLL。
 
 初始化分别记录 primary、cleanup、remaining effects；HSI 切换失败保留责任，
@@ -296,7 +305,7 @@ HAL DMA handler 每次进入都要求 EN 清除；HT-only 使用有界官方 ack
 错误撤回被拒时先 mask 此 vector，再交 task 推进 HAL，避免锁定 IRQ poll。
 排空／deinit 失败保留 request、pad、gate 和清理责任。私有 bounded atomic 与
 nearest-BRR 编译配置依赖受审单 CPU owner，不修改厂商源码。`HAL_GetTick` 使用既有
-TIM2 epoch，`SystemCoreClock` 在失败清理中追踪确认的 HCLK，不启动 HAL 或 SysTick。
+所选 timebase epoch，`SystemCoreClock` 在失败清理中追踪确认的 HCLK，不启动 HAL 或 SysTick。
 
 有限 UART／SPI DMA 只借用已审 DMA 可达域中的调用者 buffer，排除 CCM。DMA TC
 不能释放借用，还须 UART TC／SPI idle、memory channel disabled 和 IRQ detached。
@@ -384,7 +393,8 @@ TRGO 为 update；配置 UG 在开启 ADC EXTEN 之前完成，不取得输出 p
 TIM1／8 为 168 MHz，其余为 84 MHz；ADC clock 仍为 21 MHz。
 每个 ADC 独占所选 timer，三者使用不同 timer 时可独立运行；相同 timer 的其他
 personality 仍互斥。原配置选择存入 cold owner，在撤回失败后保留精确 timer 身份，
-重试不能误关原 TIM3 或另一个 timer。TIM2 保留 Core，EXTI11 暂未接入。
+重试不能误关原 TIM3 或另一个 timer。所选 Core timebase 不可重复取得，当前绑定为
+TIM2；EXTI11 暂未接入。
 软件参考为 `tests/contracts/multi_controller_assembly/*adc-timers*.toml`，不建立
 物理采样资格、PWM 相位关系或硬件同步多 ADC 支持。
 
@@ -430,7 +440,8 @@ TIM9／10／11 使用 APB2 timer，其他所列 timer 使用 APB1 timer，
 默认分别为 168／84 MHz。C 从 controller 身份派生 APB、AF 与 gate，不新增实例字段；配置生成只连接
 精确静态事实。所选 ADC trigger、PWM、capture 与 encoder 按同一 timer personality
 独占。TIM1／TIM8 advanced PWM
-分别保留 TIM9／TIM12 共享 vector。TIM2 保留给单调时钟，TIM6／7 为 DAC trigger。
+分别保留 TIM9／TIM12 共享 vector。Core 独占所选 timebase，当前为 TIM2；
+TIM6／7 为 DAC trigger。
 
 互补输出共用一套 C 算法，以两个编译期 wrapper 直接操作 TIM1／TIM8；CMake 只选中
 所需 controller 实现，不增加运行时设备派发。TIM1／TIM8 均可选择 CH1–3 的一组

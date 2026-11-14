@@ -3,11 +3,15 @@ from tools.configure.uart_formats import UartFormatPolicy
 from types import MappingProxyType
 from tools.configure.providers import common
 
+PAD_FACTS = MappingProxyType({
+    "PA0": MappingProxyType({"registers": "GPIOA", "port_index": 0, "number": 0}),
+    "PA3": MappingProxyType({"registers": "GPIOA", "port_index": 0, "number": 3}),
+})
+
 PARTS = MappingProxyType({
     "NATIVE_MODEL": common.PartPolicy("host-model"),
 })
-PUBLIC_FORMATS = frozenset(("uart", "spi", "i2c", "adc", "can",
-                            "eth", "eth_frames"))
+PUBLIC_FORMATS = frozenset()
 
 UART_FORMATS = UartFormatPolicy(words=("UART0",))
 
@@ -39,21 +43,11 @@ _MODE_IMPLEMENTATIONS = MappingProxyType({('gpio', 'output'): 'gpio', ('gpio', '
 
 def validate_selection(selection, route):
     """Validate limits of the implemented provider, not theoretical silicon."""
-    kind = route["kind"]
-    mode_implementation(kind, selection["mode"])
-    if kind == "uart":
-        common.integer(selection["baud"], *LIMITS["uart_baud"], "UART baud")
-    elif kind == "pwm":
-        tick = selection["tick_hz"]
-        clock = LIMITS["timer_hz"]
-        if clock % tick or not 1 <= clock // tick <= 65536:
-            common.fail("PWM tick_hz is not an exact maintained timer divider")
-    elif kind == "spi":
-        common.integer(selection.get("max_hz", 1000000), *LIMITS["spi_hz"],
-                       "SPI max_hz")
+    mode_implementation(route["kind"], selection["mode"], route["controller"])
 
 
-def mode_implementation(kind, mode):
+def mode_implementation(kind, mode, controller=None):
+    del controller
     implementation = _MODE_IMPLEMENTATIONS.get((kind, mode))
     if implementation is None:
         common.fail(f"Unmaintained provider mode: external_lifecycle_model/{kind}/{mode}")
@@ -61,9 +55,10 @@ def mode_implementation(kind, mode):
 
 
 def validate_dma(route, mode, normalize):
+    del normalize
     common.validate_dma(route, mode,
                         _FIXED_DMA.get((route["controller"], mode)),
-                        'native', normalize, None)
+                        'native')
 
 
 def dma_irq(dma):
@@ -86,8 +81,7 @@ def builtin_cs(controller):
 # Explicit software capabilities do not authorize an unreviewed route.
 ADC_GROUP = None
 PWM_SHARED = None
-ENDPOINT_POLICY = common.EndpointPolicy(
-    spi_transaction=True, spi_dma=(None, "async-model"), model_async_echo=True)
+ENDPOINT_POLICY = common.EndpointPolicy()
 TIMEBASE_ALARM = False
 validate_mode_context = common.validate_mode_context
 mode_fields = common.mode_fields

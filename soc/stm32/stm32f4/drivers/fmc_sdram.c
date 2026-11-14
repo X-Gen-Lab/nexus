@@ -59,7 +59,7 @@ static bool system_live(const nx_stm32_sdram_config_t* config) {
            system->timer_error == NX_SUCCESS && system->time_epoch != 0U &&
            system->core_hz == NEXUS_CORE_HZ && system->rcc == RCC &&
            system->flash == FLASH && system->power == PWR &&
-           system->timer == TIM2;
+           system->timer == NEXUS_STM32_TIMEBASE_TIMER;
 }
 static bool epoch_live(const nx_stm32_sdram_t* owner) {
     return system_live(owner->config) &&
@@ -95,7 +95,7 @@ static bool write_fifo_enabled(void) {
     return (READ_REG(FMC_Bank1->BTCR[0]) & FMC_BCR1_WFDIS) == 0U;
 }
 
-/** \brief This first reviewed route is Bank1, 16-bit, row12/column8. */
+/** \brief The selected Bank1 route provides 16 data and 12 address pads. */
 static nx_result_t pins_valid(const nx_stm32_sdram_t* owner,
                               const nx_stm32_sdram_config_t* config,
                               bool inspect_hardware) {
@@ -159,9 +159,10 @@ static bool timing_cycles(nx_stm32_sdram_minimum_t minimum, uint32_t hclk,
 }
 static bool plan(const nx_stm32_sdram_config_t* config,
                  FMC_SDRAM_TimingTypeDef* timing, uint32_t* refresh) {
-    if (config->row_bits != 12U || config->column_bits != 8U ||
-        config->internal_banks != 4U || config->width_bits != 16U ||
-        config->bytes != 0x800000U || config->cas < 1U || config->cas > 3U ||
+    if (config->row_bits < 11U || config->row_bits > 12U ||
+        config->column_bits < 8U || config->column_bits > 11U ||
+        (config->internal_banks != 2U && config->internal_banks != 4U) ||
+        config->width_bits != 16U || config->cas < 1U || config->cas > 3U ||
         (config->sdclk_div != 2U && config->sdclk_div != 3U) ||
         config->read_pipe > 2U || config->initial_refreshes == 0U ||
         config->initial_refreshes > 16U || config->refresh_window_us == 0U ||
@@ -170,6 +171,12 @@ static bool plan(const nx_stm32_sdram_config_t* config,
         config->prepare_budget_us > 1000000U || config->stop_budget_us == 0U ||
         config->stop_budget_us > 1000000U || config->hclk_hz == 0U ||
         config->hclk_hz > 180000000U)
+        return false;
+    /* Bounds above make the capacity shift exact and safe. Extra leased
+     * address/bank pads remain owned even when this geometry uses fewer. */
+    uint32_t bytes = (UINT32_C(1) << (config->row_bits + config->column_bits)) *
+                     config->internal_banks * 2U;
+    if (config->bytes != bytes)
         return false;
     const nx_stm32_sdram_timing_t* selected = &config->timing;
     if (!timing_cycles(selected->mrd, config->hclk_hz, config->sdclk_div,
@@ -519,10 +526,11 @@ nx_result_t nx_stm32_sdram_prepare(nx_stm32_sdram_t* owner,
         return result;
     FMC_SDRAM_InitTypeDef selected = {
         FMC_SDRAM_BANK1,
-        FMC_SDRAM_COLUMN_BITS_NUM_8,
-        FMC_SDRAM_ROW_BITS_NUM_12,
+        (uint32_t)(config->column_bits - 8U) << FMC_SDCR1_NC_Pos,
+        (uint32_t)(config->row_bits - 11U) << FMC_SDCR1_NR_Pos,
         FMC_SDRAM_MEM_BUS_WIDTH_16,
-        FMC_SDRAM_INTERN_BANKS_NUM_4,
+        config->internal_banks == 4U ? FMC_SDRAM_INTERN_BANKS_NUM_4
+                                     : FMC_SDRAM_INTERN_BANKS_NUM_2,
         (uint32_t)config->cas << FMC_SDCR1_CAS_Pos,
         FMC_SDRAM_WRITE_PROTECTION_DISABLE,
         (uint32_t)config->sdclk_div << FMC_SDCR1_SDCLK_Pos,

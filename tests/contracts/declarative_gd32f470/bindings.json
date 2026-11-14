@@ -1,0 +1,688 @@
+{
+  "schema_version": 1,
+  "custom_clock_profile": "custom",
+  "system": {
+    "oscillator_resources": {},
+    "timebase": {
+      "timer": "TIMER1",
+      "irq": "TIMER1_IRQn",
+      "gate": "RCU_APB1EN_TIMER1EN",
+      "reset": "RCU_APB1RST_TIMER1RST",
+      "handler": "TIMER1_IRQHandler",
+      "clock_domain": "apb1_timer",
+      "counter_bits": 32
+    }
+  },
+  "mode_exclusions": [],
+  "software": {
+    "enum_abi": "short-enums",
+    "backends": [
+      "baremetal"
+    ],
+    "headers": [
+      "gd32_reference.h"
+    ],
+    "bindings": [
+      {
+        "kind": "gpio",
+        "mode": "output",
+        "implementation": "gpio",
+        "state_type": "nx_gd32_gpio_state_t",
+        "config_type": "nx_gd32_gpio_config_t",
+        "ops": "nx_gd32_gpio_ops",
+        "prepare": "nx_gd32_gpio_prepare",
+        "close": "nx_gd32_gpio_close",
+        "fields": [
+          {
+            "name": "registers",
+            "source": "controller",
+            "type": "symbol"
+          },
+          {
+            "name": "mask",
+            "source": "options.mask",
+            "type": "u32"
+          },
+          {
+            "name": "initial",
+            "source": "options.initial",
+            "type": "u32"
+          }
+        ],
+        "admit": "nx_gd32_gpio_admit"
+      },
+      {
+        "kind": "uart",
+        "mode": "irq-byte-event",
+        "implementation": "uart",
+        "state_type": "nx_gd32_uart_state_t",
+        "config_type": "nx_gd32_uart_config_t",
+        "ops": "nx_gd32_uart_ops",
+        "prepare": "nx_gd32_uart_prepare",
+        "close": "nx_gd32_uart_close",
+        "irq": "nx_gd32_uart_irq",
+        "validator": "nx_gd32_uart_validate",
+        "storage": [
+          {
+            "name": "rx",
+            "type": "nx_uart_rx_event_t",
+            "count": "options.rx_capacity"
+          }
+        ],
+        "fields": [
+          {
+            "name": "registers",
+            "source": "controller",
+            "type": "symbol"
+          },
+          {
+            "name": "baud",
+            "source": "options.baud",
+            "type": "u32"
+          },
+          {
+            "name": "rx_storage",
+            "source": "storage.rx",
+            "type": "symbol"
+          },
+          {
+            "name": "rx_capacity",
+            "source": "options.rx_capacity",
+            "type": "u32"
+          },
+          {
+            "name": "priority",
+            "source": "options.irq.priority",
+            "type": "u32"
+          }
+        ],
+        "admit": "nx_gd32_uart_admit",
+        "limits": {
+          "baud": [
+            1200,
+            1000000
+          ]
+        }
+      }
+    ],
+    "platform": {
+      "system_start": "nx_gd32_system_start",
+      "resources_acquire": "nx_gd32_resources_acquire",
+      "resources_resume": "nx_gd32_resources_acquire",
+      "resources_release": "nx_gd32_resources_release",
+      "system_release": "nx_gd32_system_release"
+    }
+  },
+  "pads": {
+    "PA0": {
+      "registers": "GPIOA",
+      "port_index": 0,
+      "number": 0
+    },
+    "PA1": {
+      "registers": "GPIOA",
+      "port_index": 0,
+      "number": 1
+    },
+    "PA2": {
+      "registers": "GPIOA",
+      "port_index": 0,
+      "number": 2
+    },
+    "PA3": {
+      "registers": "GPIOA",
+      "port_index": 0,
+      "number": 3
+    },
+    "PA4": {
+      "registers": "GPIOA",
+      "port_index": 0,
+      "number": 4
+    },
+    "PA5": {
+      "registers": "GPIOA",
+      "port_index": 0,
+      "number": 5
+    },
+    "PA6": {
+      "registers": "GPIOA",
+      "port_index": 0,
+      "number": 6
+    },
+    "PA7": {
+      "registers": "GPIOA",
+      "port_index": 0,
+      "number": 7
+    },
+    "PA8": {
+      "registers": "GPIOA",
+      "port_index": 0,
+      "number": 8
+    },
+    "PA9": {
+      "registers": "GPIOA",
+      "port_index": 0,
+      "number": 9
+    },
+    "PA10": {
+      "registers": "GPIOA",
+      "port_index": 0,
+      "number": 10
+    },
+    "PA11": {
+      "registers": "GPIOA",
+      "port_index": 0,
+      "number": 11
+    },
+    "PA12": {
+      "registers": "GPIOA",
+      "port_index": 0,
+      "number": 12
+    },
+    "PA13": {
+      "registers": "GPIOA",
+      "port_index": 0,
+      "number": 13
+    },
+    "PA14": {
+      "registers": "GPIOA",
+      "port_index": 0,
+      "number": 14
+    },
+    "PA15": {
+      "registers": "GPIOA",
+      "port_index": 0,
+      "number": 15
+    },
+    "PB0": {
+      "registers": "GPIOB",
+      "port_index": 1,
+      "number": 0
+    },
+    "PB1": {
+      "registers": "GPIOB",
+      "port_index": 1,
+      "number": 1
+    },
+    "PB2": {
+      "registers": "GPIOB",
+      "port_index": 1,
+      "number": 2
+    },
+    "PB3": {
+      "registers": "GPIOB",
+      "port_index": 1,
+      "number": 3
+    },
+    "PB4": {
+      "registers": "GPIOB",
+      "port_index": 1,
+      "number": 4
+    },
+    "PB5": {
+      "registers": "GPIOB",
+      "port_index": 1,
+      "number": 5
+    },
+    "PB6": {
+      "registers": "GPIOB",
+      "port_index": 1,
+      "number": 6
+    },
+    "PB7": {
+      "registers": "GPIOB",
+      "port_index": 1,
+      "number": 7
+    },
+    "PB8": {
+      "registers": "GPIOB",
+      "port_index": 1,
+      "number": 8
+    },
+    "PB9": {
+      "registers": "GPIOB",
+      "port_index": 1,
+      "number": 9
+    },
+    "PB10": {
+      "registers": "GPIOB",
+      "port_index": 1,
+      "number": 10
+    },
+    "PB11": {
+      "registers": "GPIOB",
+      "port_index": 1,
+      "number": 11
+    },
+    "PB12": {
+      "registers": "GPIOB",
+      "port_index": 1,
+      "number": 12
+    },
+    "PB13": {
+      "registers": "GPIOB",
+      "port_index": 1,
+      "number": 13
+    },
+    "PB14": {
+      "registers": "GPIOB",
+      "port_index": 1,
+      "number": 14
+    },
+    "PB15": {
+      "registers": "GPIOB",
+      "port_index": 1,
+      "number": 15
+    },
+    "PC0": {
+      "registers": "GPIOC",
+      "port_index": 2,
+      "number": 0
+    },
+    "PC1": {
+      "registers": "GPIOC",
+      "port_index": 2,
+      "number": 1
+    },
+    "PC2": {
+      "registers": "GPIOC",
+      "port_index": 2,
+      "number": 2
+    },
+    "PC3": {
+      "registers": "GPIOC",
+      "port_index": 2,
+      "number": 3
+    },
+    "PC4": {
+      "registers": "GPIOC",
+      "port_index": 2,
+      "number": 4
+    },
+    "PC5": {
+      "registers": "GPIOC",
+      "port_index": 2,
+      "number": 5
+    },
+    "PC6": {
+      "registers": "GPIOC",
+      "port_index": 2,
+      "number": 6
+    },
+    "PC7": {
+      "registers": "GPIOC",
+      "port_index": 2,
+      "number": 7
+    },
+    "PC8": {
+      "registers": "GPIOC",
+      "port_index": 2,
+      "number": 8
+    },
+    "PC9": {
+      "registers": "GPIOC",
+      "port_index": 2,
+      "number": 9
+    },
+    "PC10": {
+      "registers": "GPIOC",
+      "port_index": 2,
+      "number": 10
+    },
+    "PC11": {
+      "registers": "GPIOC",
+      "port_index": 2,
+      "number": 11
+    },
+    "PC12": {
+      "registers": "GPIOC",
+      "port_index": 2,
+      "number": 12
+    },
+    "PC13": {
+      "registers": "GPIOC",
+      "port_index": 2,
+      "number": 13
+    },
+    "PC14": {
+      "registers": "GPIOC",
+      "port_index": 2,
+      "number": 14
+    },
+    "PC15": {
+      "registers": "GPIOC",
+      "port_index": 2,
+      "number": 15
+    },
+    "PD0": {
+      "registers": "GPIOD",
+      "port_index": 3,
+      "number": 0
+    },
+    "PD1": {
+      "registers": "GPIOD",
+      "port_index": 3,
+      "number": 1
+    },
+    "PD2": {
+      "registers": "GPIOD",
+      "port_index": 3,
+      "number": 2
+    },
+    "PD3": {
+      "registers": "GPIOD",
+      "port_index": 3,
+      "number": 3
+    },
+    "PD4": {
+      "registers": "GPIOD",
+      "port_index": 3,
+      "number": 4
+    },
+    "PD5": {
+      "registers": "GPIOD",
+      "port_index": 3,
+      "number": 5
+    },
+    "PD6": {
+      "registers": "GPIOD",
+      "port_index": 3,
+      "number": 6
+    },
+    "PD7": {
+      "registers": "GPIOD",
+      "port_index": 3,
+      "number": 7
+    },
+    "PD8": {
+      "registers": "GPIOD",
+      "port_index": 3,
+      "number": 8
+    },
+    "PD9": {
+      "registers": "GPIOD",
+      "port_index": 3,
+      "number": 9
+    },
+    "PD10": {
+      "registers": "GPIOD",
+      "port_index": 3,
+      "number": 10
+    },
+    "PD11": {
+      "registers": "GPIOD",
+      "port_index": 3,
+      "number": 11
+    },
+    "PD12": {
+      "registers": "GPIOD",
+      "port_index": 3,
+      "number": 12
+    },
+    "PD13": {
+      "registers": "GPIOD",
+      "port_index": 3,
+      "number": 13
+    },
+    "PD14": {
+      "registers": "GPIOD",
+      "port_index": 3,
+      "number": 14
+    },
+    "PD15": {
+      "registers": "GPIOD",
+      "port_index": 3,
+      "number": 15
+    },
+    "PE0": {
+      "registers": "GPIOE",
+      "port_index": 4,
+      "number": 0
+    },
+    "PE1": {
+      "registers": "GPIOE",
+      "port_index": 4,
+      "number": 1
+    },
+    "PE2": {
+      "registers": "GPIOE",
+      "port_index": 4,
+      "number": 2
+    },
+    "PE3": {
+      "registers": "GPIOE",
+      "port_index": 4,
+      "number": 3
+    },
+    "PE4": {
+      "registers": "GPIOE",
+      "port_index": 4,
+      "number": 4
+    },
+    "PE5": {
+      "registers": "GPIOE",
+      "port_index": 4,
+      "number": 5
+    },
+    "PE6": {
+      "registers": "GPIOE",
+      "port_index": 4,
+      "number": 6
+    },
+    "PE7": {
+      "registers": "GPIOE",
+      "port_index": 4,
+      "number": 7
+    },
+    "PE8": {
+      "registers": "GPIOE",
+      "port_index": 4,
+      "number": 8
+    },
+    "PE9": {
+      "registers": "GPIOE",
+      "port_index": 4,
+      "number": 9
+    },
+    "PE10": {
+      "registers": "GPIOE",
+      "port_index": 4,
+      "number": 10
+    },
+    "PE11": {
+      "registers": "GPIOE",
+      "port_index": 4,
+      "number": 11
+    },
+    "PE12": {
+      "registers": "GPIOE",
+      "port_index": 4,
+      "number": 12
+    },
+    "PE13": {
+      "registers": "GPIOE",
+      "port_index": 4,
+      "number": 13
+    },
+    "PE14": {
+      "registers": "GPIOE",
+      "port_index": 4,
+      "number": 14
+    },
+    "PE15": {
+      "registers": "GPIOE",
+      "port_index": 4,
+      "number": 15
+    },
+    "PF0": {
+      "registers": "GPIOF",
+      "port_index": 5,
+      "number": 0
+    },
+    "PF1": {
+      "registers": "GPIOF",
+      "port_index": 5,
+      "number": 1
+    },
+    "PF2": {
+      "registers": "GPIOF",
+      "port_index": 5,
+      "number": 2
+    },
+    "PF3": {
+      "registers": "GPIOF",
+      "port_index": 5,
+      "number": 3
+    },
+    "PF4": {
+      "registers": "GPIOF",
+      "port_index": 5,
+      "number": 4
+    },
+    "PF5": {
+      "registers": "GPIOF",
+      "port_index": 5,
+      "number": 5
+    },
+    "PF6": {
+      "registers": "GPIOF",
+      "port_index": 5,
+      "number": 6
+    },
+    "PF7": {
+      "registers": "GPIOF",
+      "port_index": 5,
+      "number": 7
+    },
+    "PF8": {
+      "registers": "GPIOF",
+      "port_index": 5,
+      "number": 8
+    },
+    "PF9": {
+      "registers": "GPIOF",
+      "port_index": 5,
+      "number": 9
+    },
+    "PF10": {
+      "registers": "GPIOF",
+      "port_index": 5,
+      "number": 10
+    },
+    "PF11": {
+      "registers": "GPIOF",
+      "port_index": 5,
+      "number": 11
+    },
+    "PF12": {
+      "registers": "GPIOF",
+      "port_index": 5,
+      "number": 12
+    },
+    "PF13": {
+      "registers": "GPIOF",
+      "port_index": 5,
+      "number": 13
+    },
+    "PF14": {
+      "registers": "GPIOF",
+      "port_index": 5,
+      "number": 14
+    },
+    "PF15": {
+      "registers": "GPIOF",
+      "port_index": 5,
+      "number": 15
+    },
+    "PG0": {
+      "registers": "GPIOG",
+      "port_index": 6,
+      "number": 0
+    },
+    "PG1": {
+      "registers": "GPIOG",
+      "port_index": 6,
+      "number": 1
+    },
+    "PG2": {
+      "registers": "GPIOG",
+      "port_index": 6,
+      "number": 2
+    },
+    "PG3": {
+      "registers": "GPIOG",
+      "port_index": 6,
+      "number": 3
+    },
+    "PG4": {
+      "registers": "GPIOG",
+      "port_index": 6,
+      "number": 4
+    },
+    "PG5": {
+      "registers": "GPIOG",
+      "port_index": 6,
+      "number": 5
+    },
+    "PG6": {
+      "registers": "GPIOG",
+      "port_index": 6,
+      "number": 6
+    },
+    "PG7": {
+      "registers": "GPIOG",
+      "port_index": 6,
+      "number": 7
+    },
+    "PG8": {
+      "registers": "GPIOG",
+      "port_index": 6,
+      "number": 8
+    },
+    "PG9": {
+      "registers": "GPIOG",
+      "port_index": 6,
+      "number": 9
+    },
+    "PG10": {
+      "registers": "GPIOG",
+      "port_index": 6,
+      "number": 10
+    },
+    "PG11": {
+      "registers": "GPIOG",
+      "port_index": 6,
+      "number": 11
+    },
+    "PG12": {
+      "registers": "GPIOG",
+      "port_index": 6,
+      "number": 12
+    },
+    "PG13": {
+      "registers": "GPIOG",
+      "port_index": 6,
+      "number": 13
+    },
+    "PG14": {
+      "registers": "GPIOG",
+      "port_index": 6,
+      "number": 14
+    },
+    "PG15": {
+      "registers": "GPIOG",
+      "port_index": 6,
+      "number": 15
+    },
+    "PH0": {
+      "registers": "GPIOH",
+      "port_index": 7,
+      "number": 0
+    },
+    "PH1": {
+      "registers": "GPIOH",
+      "port_index": 7,
+      "number": 1
+    }
+  }
+}

@@ -1,0 +1,885 @@
+{
+  "schema_version": 1,
+  "bindings": [
+    {
+      "kind": "adc",
+      "mode": "single-shot",
+      "implementation": "adc",
+      "headers": [
+        "stm32f407_control_cold.h",
+        "stm32f4_adc_encoding.h"
+      ],
+      "static_recipe": {
+        "state_type": "nx_stm32_adc_state_t",
+        "ops": "nx_stm32_adc_ops",
+        "declarations": [
+          {
+            "role": "adc_channels",
+            "type": "uint8_t",
+            "const": true,
+            "count": {
+              "length": "item.options.channels",
+              "limit": 16
+            },
+            "value": {
+              "map": {
+                "source": "item.options.channels",
+                "limit": 16,
+                "value": {
+                  "source": "entry",
+                  "as": "u32"
+                }
+              }
+            }
+          },
+          {
+            "role": "adc_samples",
+            "type": "uint8_t",
+            "const": true,
+            "count": {
+              "length": "item.options.sample_times",
+              "limit": 16
+            },
+            "value": {
+              "map": {
+                "source": "item.options.sample_times",
+                "limit": 16,
+                "value": {
+                  "source": "entry",
+                  "as": "u32"
+                }
+              }
+            }
+          },
+          {
+            "role": "control_config",
+            "type": "nx_stm32_adc_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "registers",
+                  {
+                    "source": "item.controller",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "channels",
+                  {
+                    "ref": "adc_channels",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "sample_times",
+                  {
+                    "ref": "adc_samples",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "channel_count",
+                  {
+                    "length": "item.options.channels",
+                    "limit": 16
+                  }
+                ],
+                [
+                  "reference_mv",
+                  {
+                    "source": "item.options.reference_mv"
+                  }
+                ],
+                [
+                  "resolution",
+                  {
+                    "macro": "NX_STM32_ADC_RESOLUTION_CODE",
+                    "args": [
+                      {
+                        "source": "item.options.resolution_bits"
+                      }
+                    ]
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "calls": {
+          "prepare": {
+            "function": "nx_stm32_adc_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "ref": "control_config",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32_adc_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "retain_on_failed_init": true
+      }
+    },
+    {
+      "kind": "adc",
+      "mode": "low-rate-scan",
+      "implementation": "adc",
+      "headers": [
+        "stm32f407_control_cold.h",
+        "stm32f4_adc_encoding.h"
+      ],
+      "static_recipe": {
+        "state_type": "nx_stm32_adc_state_t",
+        "ops": "nx_stm32_adc_ops",
+        "declarations": [
+          {
+            "role": "adc_channels",
+            "type": "uint8_t",
+            "const": true,
+            "count": {
+              "length": "item.options.channels",
+              "limit": 16
+            },
+            "value": {
+              "map": {
+                "source": "item.options.channels",
+                "limit": 16,
+                "value": {
+                  "source": "entry",
+                  "as": "u32"
+                }
+              }
+            }
+          },
+          {
+            "role": "adc_samples",
+            "type": "uint8_t",
+            "const": true,
+            "count": {
+              "length": "item.options.sample_times",
+              "limit": 16
+            },
+            "value": {
+              "map": {
+                "source": "item.options.sample_times",
+                "limit": 16,
+                "value": {
+                  "source": "entry",
+                  "as": "u32"
+                }
+              }
+            }
+          },
+          {
+            "role": "control_config",
+            "type": "nx_stm32_adc_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "registers",
+                  {
+                    "source": "item.controller",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "channels",
+                  {
+                    "ref": "adc_channels",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "sample_times",
+                  {
+                    "ref": "adc_samples",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "channel_count",
+                  {
+                    "length": "item.options.channels",
+                    "limit": 16
+                  }
+                ],
+                [
+                  "reference_mv",
+                  {
+                    "source": "item.options.reference_mv"
+                  }
+                ],
+                [
+                  "resolution",
+                  {
+                    "macro": "NX_STM32_ADC_RESOLUTION_CODE",
+                    "args": [
+                      {
+                        "source": "item.options.resolution_bits"
+                      }
+                    ]
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "calls": {
+          "prepare": {
+            "function": "nx_stm32_adc_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "ref": "control_config",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32_adc_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "retain_on_failed_init": true
+      }
+    },
+    {
+      "kind": "adc",
+      "mode": "injected-shot",
+      "implementation": "adc_injected",
+      "headers": [
+        "stm32f407_control_cold.h",
+        "stm32f4_adc_encoding.h"
+      ],
+      "static_recipe": {
+        "state_type": "nx_stm32_adc_state_t",
+        "ops": "nx_stm32_adc_injected_ops",
+        "declarations": [
+          {
+            "role": "adc_channels",
+            "type": "uint8_t",
+            "const": true,
+            "count": {
+              "length": "item.options.channels",
+              "limit": 16
+            },
+            "value": {
+              "map": {
+                "source": "item.options.channels",
+                "limit": 16,
+                "value": {
+                  "source": "entry",
+                  "as": "u32"
+                }
+              }
+            }
+          },
+          {
+            "role": "adc_samples",
+            "type": "uint8_t",
+            "const": true,
+            "count": {
+              "length": "item.options.sample_times",
+              "limit": 16
+            },
+            "value": {
+              "map": {
+                "source": "item.options.sample_times",
+                "limit": 16,
+                "value": {
+                  "source": "entry",
+                  "as": "u32"
+                }
+              }
+            }
+          },
+          {
+            "role": "control_config",
+            "type": "nx_stm32_adc_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "registers",
+                  {
+                    "source": "item.controller",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "channels",
+                  {
+                    "ref": "adc_channels",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "sample_times",
+                  {
+                    "ref": "adc_samples",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "channel_count",
+                  {
+                    "length": "item.options.channels",
+                    "limit": 16
+                  }
+                ],
+                [
+                  "reference_mv",
+                  {
+                    "source": "item.options.reference_mv"
+                  }
+                ],
+                [
+                  "resolution",
+                  {
+                    "macro": "NX_STM32_ADC_RESOLUTION_CODE",
+                    "args": [
+                      {
+                        "source": "item.options.resolution_bits"
+                      }
+                    ]
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "calls": {
+          "prepare": {
+            "function": "nx_stm32_adc_injected_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "ref": "control_config",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32_adc_injected_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "retain_on_failed_init": true
+      }
+    },
+    {
+      "kind": "adc",
+      "mode": "trigger-dma",
+      "implementation": "adc_stream",
+      "headers": [
+        "stm32f407_control_cold.h",
+        "stm32f4_adc_encoding.h"
+      ],
+      "static_recipe": {
+        "state_type": "nx_stm32_adc_stream_state_t",
+        "ops": "nx_stm32_adc_stream_ops",
+        "declarations": [
+          {
+            "role": "adc_channels",
+            "type": "uint8_t",
+            "const": true,
+            "count": {
+              "length": "item.options.channels",
+              "limit": 16
+            },
+            "value": {
+              "map": {
+                "source": "item.options.channels",
+                "limit": 16,
+                "value": {
+                  "source": "entry",
+                  "as": "u32"
+                }
+              }
+            }
+          },
+          {
+            "role": "adc_samples",
+            "type": "uint8_t",
+            "const": true,
+            "count": {
+              "length": "item.options.sample_times",
+              "limit": 16
+            },
+            "value": {
+              "map": {
+                "source": "item.options.sample_times",
+                "limit": 16,
+                "value": {
+                  "source": "entry",
+                  "as": "u32"
+                }
+              }
+            }
+          },
+          {
+            "role": "dma_regions",
+            "type": "nx_dma_memory_region_t",
+            "const": true,
+            "count": {
+              "length": "selected.memory_regions",
+              "limit": 16
+            },
+            "value": {
+              "map": {
+                "source": "selected.memory_regions",
+                "limit": 16,
+                "value": {
+                  "record": [
+                    [
+                      "begin",
+                      {
+                        "source": "entry.begin"
+                      }
+                    ],
+                    [
+                      "size",
+                      {
+                        "source": "entry.size"
+                      }
+                    ],
+                    [
+                      "permissions",
+                      {
+                        "source": "entry.permissions",
+                        "as": "static"
+                      }
+                    ]
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "role": "control_config",
+            "type": "nx_stm32_adc_stream_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "adc",
+                  {
+                    "record": [
+                      [
+                        "registers",
+                        {
+                          "source": "item.controller",
+                          "as": "symbol"
+                        }
+                      ],
+                      [
+                        "channels",
+                        {
+                          "ref": "adc_channels",
+                          "as": "symbol"
+                        }
+                      ],
+                      [
+                        "sample_times",
+                        {
+                          "ref": "adc_samples",
+                          "as": "symbol"
+                        }
+                      ],
+                      [
+                        "channel_count",
+                        {
+                          "length": "item.options.channels",
+                          "limit": 16
+                        }
+                      ],
+                      [
+                        "reference_mv",
+                        {
+                          "source": "item.options.reference_mv"
+                        }
+                      ],
+                      [
+                        "resolution",
+                        {
+                          "macro": "NX_STM32_ADC_RESOLUTION_CODE",
+                          "args": [
+                            {
+                              "source": "item.options.resolution_bits"
+                            }
+                          ]
+                        }
+                      ]
+                    ]
+                  }
+                ],
+                [
+                  "regions",
+                  {
+                    "ref": "dma_regions",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "region_count",
+                  {
+                    "length": "selected.memory_regions",
+                    "limit": 16
+                  }
+                ],
+                [
+                  "priority",
+                  {
+                    "source": "item.options.irq.priority"
+                  }
+                ],
+                [
+                  "trigger",
+                  {
+                    "source": "item.options.trigger",
+                    "as": "symbol",
+                    "values": {
+                      "tim3-trgo": "NX_STM32_ADC_TIM3_TRGO",
+                      "tim1-ch1": "NX_STM32_ADC_TIM1_CH1",
+                      "tim1-ch2": "NX_STM32_ADC_TIM1_CH2",
+                      "tim1-ch3": "NX_STM32_ADC_TIM1_CH3",
+                      "tim3-ch1": "NX_STM32_ADC_TIM3_CH1",
+                      "tim4-ch4": "NX_STM32_ADC_TIM4_CH4",
+                      "tim5-ch1": "NX_STM32_ADC_TIM5_CH1",
+                      "tim5-ch2": "NX_STM32_ADC_TIM5_CH2",
+                      "tim5-ch3": "NX_STM32_ADC_TIM5_CH3",
+                      "tim8-ch1": "NX_STM32_ADC_TIM8_CH1",
+                      "tim8-trgo": "NX_STM32_ADC_TIM8_TRGO"
+                    }
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "calls": {
+          "prepare": {
+            "function": "nx_stm32_adc_stream_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "ref": "control_config",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32_adc_stream_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "retain_on_failed_init": true,
+        "irq": [
+          {
+            "name": {
+              "source": "selected.dma_bindings.0.handler",
+              "as": "symbol"
+            },
+            "calls": [
+              {
+                "function": "nx_stm32_adc_stream_irq",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  }
+                ]
+              }
+            ],
+            "barrier": "nx_arch_dsb"
+          }
+        ]
+      }
+    },
+    {
+      "kind": "adc",
+      "mode": "trigger-dma-continuous",
+      "implementation": "adc_continuous",
+      "headers": [
+        "stm32f407_control_cold.h",
+        "stm32f4_adc_encoding.h"
+      ],
+      "static_recipe": {
+        "state_type": "nx_stm32_adc_continuous_state_t",
+        "ops": "nx_stm32_adc_continuous_ops",
+        "declarations": [
+          {
+            "role": "adc_channels",
+            "type": "uint8_t",
+            "const": true,
+            "count": {
+              "length": "item.options.channels",
+              "limit": 16
+            },
+            "value": {
+              "map": {
+                "source": "item.options.channels",
+                "limit": 16,
+                "value": {
+                  "source": "entry",
+                  "as": "u32"
+                }
+              }
+            }
+          },
+          {
+            "role": "adc_samples",
+            "type": "uint8_t",
+            "const": true,
+            "count": {
+              "length": "item.options.sample_times",
+              "limit": 16
+            },
+            "value": {
+              "map": {
+                "source": "item.options.sample_times",
+                "limit": 16,
+                "value": {
+                  "source": "entry",
+                  "as": "u32"
+                }
+              }
+            }
+          },
+          {
+            "role": "dma_regions",
+            "type": "nx_dma_memory_region_t",
+            "const": true,
+            "count": {
+              "length": "selected.memory_regions",
+              "limit": 16
+            },
+            "value": {
+              "map": {
+                "source": "selected.memory_regions",
+                "limit": 16,
+                "value": {
+                  "record": [
+                    [
+                      "begin",
+                      {
+                        "source": "entry.begin"
+                      }
+                    ],
+                    [
+                      "size",
+                      {
+                        "source": "entry.size"
+                      }
+                    ],
+                    [
+                      "permissions",
+                      {
+                        "source": "entry.permissions",
+                        "as": "static"
+                      }
+                    ]
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "role": "control_config",
+            "type": "nx_stm32_adc_stream_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "adc",
+                  {
+                    "record": [
+                      [
+                        "registers",
+                        {
+                          "source": "item.controller",
+                          "as": "symbol"
+                        }
+                      ],
+                      [
+                        "channels",
+                        {
+                          "ref": "adc_channels",
+                          "as": "symbol"
+                        }
+                      ],
+                      [
+                        "sample_times",
+                        {
+                          "ref": "adc_samples",
+                          "as": "symbol"
+                        }
+                      ],
+                      [
+                        "channel_count",
+                        {
+                          "length": "item.options.channels",
+                          "limit": 16
+                        }
+                      ],
+                      [
+                        "reference_mv",
+                        {
+                          "source": "item.options.reference_mv"
+                        }
+                      ],
+                      [
+                        "resolution",
+                        {
+                          "macro": "NX_STM32_ADC_RESOLUTION_CODE",
+                          "args": [
+                            {
+                              "source": "item.options.resolution_bits"
+                            }
+                          ]
+                        }
+                      ]
+                    ]
+                  }
+                ],
+                [
+                  "regions",
+                  {
+                    "ref": "dma_regions",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "region_count",
+                  {
+                    "length": "selected.memory_regions",
+                    "limit": 16
+                  }
+                ],
+                [
+                  "priority",
+                  {
+                    "source": "item.options.irq.priority"
+                  }
+                ],
+                [
+                  "trigger",
+                  {
+                    "source": "item.options.trigger",
+                    "as": "symbol",
+                    "values": {
+                      "tim3-trgo": "NX_STM32_ADC_TIM3_TRGO",
+                      "tim1-ch1": "NX_STM32_ADC_TIM1_CH1",
+                      "tim1-ch2": "NX_STM32_ADC_TIM1_CH2",
+                      "tim1-ch3": "NX_STM32_ADC_TIM1_CH3",
+                      "tim3-ch1": "NX_STM32_ADC_TIM3_CH1",
+                      "tim4-ch4": "NX_STM32_ADC_TIM4_CH4",
+                      "tim5-ch1": "NX_STM32_ADC_TIM5_CH1",
+                      "tim5-ch2": "NX_STM32_ADC_TIM5_CH2",
+                      "tim5-ch3": "NX_STM32_ADC_TIM5_CH3",
+                      "tim8-ch1": "NX_STM32_ADC_TIM8_CH1",
+                      "tim8-trgo": "NX_STM32_ADC_TIM8_TRGO"
+                    }
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "calls": {
+          "prepare": {
+            "function": "nx_stm32_adc_continuous_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "ref": "control_config",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32_adc_continuous_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "retain_on_failed_init": true,
+        "irq": [
+          {
+            "name": {
+              "source": "selected.dma_bindings.0.handler",
+              "as": "symbol"
+            },
+            "calls": [
+              {
+                "function": "nx_stm32_adc_continuous_irq",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  }
+                ]
+              }
+            ],
+            "barrier": "nx_arch_dsb"
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -10,6 +10,9 @@
 extern "C" {
 #endif
 #include "stm32f407_av.h"
+/** \brief Constant wire-frame size from admitted slot width and count. */
+#define NX_STM32_SAI_FRAME_BITS(slot_bits, slots) ((slot_bits) * (slots))
+
 /** \brief Complete selected free-protocol geometry; no live format changes.
  * \note SAI1 on exact F446/F479 uses external slave clocks or the selected
  *       System-owned PLLSAI Q kernel in master mode. active_slots is a nonzero
@@ -23,7 +26,7 @@ extern "C" {
  *       Slave mode requires no_divider=false and mckdiv=0. Master mckdiv=0
  *       divides by one, otherwise by2*mckdiv; no_divider bypasses this stage,
  *       suppresses MCLK and requires mckdiv=0. Every mode reserves APB2
- *       strictly above twice SCK. A selected PE2/PF7 MCLK pad requires the
+ *       strictly above twice SCK. A selected MCLK connection requires the
  *       shared 2.048..45 MHz characterized output range; an unselected
  *       MCLK pad does not impose a minimum frame rate. GPIO slew is10.
  *       No audio method changes RCC.
@@ -52,6 +55,7 @@ typedef struct {
     bool sample_rising;
     bool master;
     bool no_divider;
+    bool mclk;
     uint8_t mckdiv;
 } nx_stm32_sai_config_t;
 /** \brief Only a selected finite personality retains these exact loan fields.

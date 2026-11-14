@@ -16,6 +16,17 @@ from tools.configure import secondary_controllers
 
 
 class SecondaryControllerConfigurationTests(unittest.TestCase):
+    def test_spi_dma_resources_are_readonly_decoded_selected_routes(self):
+        from tools.configure import bindings
+        result = gate.resolve_ir(gate.ROOT /
+            "tests/contracts/multi_controller_assembly/stm32-zg.toml")
+        source = bindings.emit(result)[1]
+        self.assertIn(".resources = {", source)
+        self.assertIn(".transmit = {", source)
+        self.assertIn(".receive = {", source)
+        self.assertIn(".channel = 3u", source)
+        self.assertIn(".irq = DMA2_Stream3_IRQn", source)
+
     def setUp(self):
         temporary = tempfile.TemporaryDirectory()
         self.addCleanup(temporary.cleanup)
@@ -148,7 +159,8 @@ class SecondaryControllerConfigurationTests(unittest.TestCase):
                 self.assertTrue(result.devices[0].options.lsb_first)
                 output = self.directory / (mode + "-" + driver)
                 gate.configure(path, output)
-                self.assertIn('0u, true }', (output / 'bindings.c').read_text())
+                self.assertIn('.mode = 0u, .lsb_first = true',
+                              (output / 'bindings.c').read_text())
 
     def test_spi_bit_order_rejects_non_booleans_and_fixed_msb_drivers(self):
         for driver, value in (("spi-endpoint", "1"),
@@ -213,7 +225,11 @@ class SecondaryControllerConfigurationTests(unittest.TestCase):
                 output = self.directory / timer
                 gate.configure(path, output)
                 source = (output / 'bindings.c').read_text()
-                self.assertIn(f'.prescaler = {psc}u', source)
+                frequency = (psc + 1) * 1000000
+                self.assertEqual(result.controllers[0].integration.clock_hz,
+                                 frequency)
+                self.assertIn('.prescaler = NX_STM32_TIMER_PRESCALER('
+                              f'{frequency}u, 1000000u)', source)
                 self.assertIn(f'.registers = {timer}', source)
                 self.assertIn(f'RCC_APB{apb}ENR_{timer}EN', source)
 
@@ -282,7 +298,14 @@ class SecondaryControllerConfigurationTests(unittest.TestCase):
                     self.assertIn("void I2C3_EV_IRQHandler(void)", source)
                     self.assertIn("void I2C3_ER_IRQHandler(void)", source)
                 if mode == "dma-messages":
-                    self.assertIn("NX_STM32_I2C3_DMA(", source)
+                    self.assertIn("static const nx_i2c_v1_dma_t "
+                                  "s_nx_i2c_dma_third", source)
+                    self.assertIn(".tx = { .control = &DMA1_Stream4->CR", source)
+                    self.assertIn(".rx = { .control = &DMA1_Stream2->CR", source)
+                    self.assertIn("NX_STM32_I2C_DMA_CONFIGURATION(3u, true)",
+                                  source)
+                    self.assertIn("NX_STM32_I2C_DMA_CONFIGURATION(3u, false)",
+                                  source)
                     self.assertIn("void DMA1_Stream2_IRQHandler(void)", source)
                     self.assertIn("void DMA1_Stream4_IRQHandler(void)", source)
 
@@ -317,13 +340,14 @@ class SecondaryControllerConfigurationTests(unittest.TestCase):
             facts = load_soc_facts(gate.ROOT / directory / "soc.json")
             validate_soc_facts(facts, part)
             for field, changed in (("modes", ["irq-byte-event"]),
-                                   ("pins", ["PA0", "PA1"]),
+                                   ("pins", ["PA0", "PA0"]),
                                    ("irq", ["USART0_IRQn"]),
                                    ("clock_hz", 42000001)):
                 with self.subTest(part=part, field=field):
                     invalid = copy.deepcopy(facts)
                     invalid["controllers"][controller][field] = changed
                     diagnostic = ("Controller IRQ identity" if field == "irq"
+                                  else "pins: duplicate" if field == "pins"
                                   else "Secondary controller facts")
                     with self.assertRaisesRegex(
                             ValueError, diagnostic):
@@ -387,7 +411,8 @@ class SecondaryControllerConfigurationTests(unittest.TestCase):
                 else:
                     self.assertIn("nx_stm32_uart_hal_cold_prepare", source)
                     self.assertIn(
-                        ".transmit = { DMA1_Stream6, DMA1_Stream6_IRQn, 6u, 4u }",
+                        ".transmit = { .dma = DMA1, .stream = DMA1_Stream6, "
+                        ".irq = DMA1_Stream6_IRQn, .lane = 6u, .channel = 4u }",
                         source)
                 self.assertNotIn("malloc", source)
                 self.assertNotIn("strcmp", source)

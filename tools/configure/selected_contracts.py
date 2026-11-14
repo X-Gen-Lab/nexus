@@ -221,7 +221,7 @@ def describe(item, endpoint=None, *, public_class=None):
     does not establish a reviewed physical route or replace full resolution.
     """
     provider = for_selection(item)
-    provider.mode_implementation(item.kind, item.mode)
+    provider.mode_implementation(item.kind, item.mode, item.controller)
     shape = mode_traits(item.kind, item.mode)
     selected = (endpoint_class(endpoint) if endpoint is not None else
                 controller_class(item))

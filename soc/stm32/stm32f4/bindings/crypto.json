@@ -1,0 +1,845 @@
+{
+  "schema_version": 1,
+  "bindings": [
+    {
+      "kind": "cipher",
+      "mode": "irq-blocks",
+      "implementation": "cipher",
+      "static_recipe": {
+        "state_type": "nx_stm32f4_cipher_state_t",
+        "declarations": [
+          {
+            "role": "crypto_irq",
+            "type": "nx_stm32f4_crypto_irq_t",
+            "const": false
+          },
+          {
+            "role": "crypto_config",
+            "type": "nx_stm32f4_cipher_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "irq_policy",
+                  {
+                    "record": [
+                      [
+                        "kernel",
+                        {
+                          "source": "selected.kernel_policy",
+                          "as": "symbol"
+                        }
+                      ],
+                      [
+                        "external_irq_count",
+                        {
+                          "source": "selected.irq_profile.external_count"
+                        }
+                      ],
+                      [
+                        "priority_bits",
+                        {
+                          "source": "selected.irq_profile.priority_bits"
+                        }
+                      ],
+                      [
+                        "syscall_ceiling",
+                        {
+                          "source": "selected.irq_profile.syscall_priority",
+                          "default": 0
+                        }
+                      ]
+                    ]
+                  }
+                ],
+                [
+                  "dma",
+                  null
+                ]
+              ]
+            }
+          }
+        ],
+        "calls": {
+          "admit": [
+            {
+              "function": "nx_stm32f4_crypto_irq_admit",
+              "args": [
+                {
+                  "ref": "crypto_irq",
+                  "as": "address"
+                },
+                {
+                  "symbol": "CRYP_IRQn"
+                },
+                {
+                  "source": "item.options.irq.priority"
+                }
+              ]
+            },
+            {
+              "function": "nx_stm32f4_cipher_admit",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "ref": "crypto_config",
+                  "as": "address"
+                }
+              ]
+            }
+          ],
+          "prepare": {
+            "role": "crypto_start",
+            "sequence": [
+              {
+                "function": "nx_stm32f4_crypto_irq_acquire",
+                "args": [
+                  {
+                    "ref": "crypto_irq",
+                    "as": "address"
+                  },
+                  {
+                    "symbol": "CRYP_IRQn"
+                  },
+                  {
+                    "source": "item.options.irq.priority"
+                  }
+                ]
+              },
+              {
+                "function": "nx_stm32f4_cipher_start",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  },
+                  {
+                    "ref": "crypto_config",
+                    "as": "address"
+                  }
+                ]
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_cipher_port_stop",
+              "args": [
+                {
+                  "ref": "face",
+                  "as": "address"
+                }
+              ]
+            },
+            {
+              "function": "nx_stm32f4_crypto_irq_release",
+              "args": [
+                {
+                  "ref": "crypto_irq",
+                  "as": "address"
+                },
+                {
+                  "symbol": "CRYP_IRQn"
+                }
+              ]
+            }
+          ]
+        },
+        "irq": [
+          {
+            "name": "CRYP_IRQHandler",
+            "calls": [
+              {
+                "function": "nx_stm32f4_cipher_irq",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  }
+                ]
+              }
+            ],
+            "barrier": "nx_arch_dsb"
+          }
+        ],
+        "retain_on_failed_init": true,
+        "ops": "nx_stm32f4_cipher_ops"
+      },
+      "headers": [
+        "stm32f4_crypto_irq.h",
+        "stm32f4_cipher.h"
+      ]
+    },
+    {
+      "kind": "cipher",
+      "mode": "dma-blocks",
+      "implementation": "cipher",
+      "static_recipe": {
+        "state_type": "nx_stm32f4_cipher_state_t",
+        "declarations": [
+          {
+            "role": "dma_regions",
+            "type": "nx_dma_memory_region_t",
+            "const": true,
+            "value": {
+              "map": {
+                "source": "selected.readable_regions",
+                "limit": 16,
+                "value": {
+                  "record": [
+                    [
+                      "begin",
+                      {
+                        "source": "entry.begin"
+                      }
+                    ],
+                    [
+                      "size",
+                      {
+                        "source": "entry.size"
+                      }
+                    ],
+                    [
+                      "permissions",
+                      {
+                        "source": "entry.permissions",
+                        "as": "static"
+                      }
+                    ]
+                  ]
+                }
+              }
+            },
+            "count": {
+              "length": "selected.readable_regions",
+              "limit": 16
+            }
+          },
+          {
+            "role": "crypto_dma",
+            "type": "nx_stm32f4_cipher_dma_state_t",
+            "const": false
+          },
+          {
+            "role": "crypto_dma_config",
+            "type": "nx_stm32f4_cipher_dma_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "state",
+                  {
+                    "ref": "crypto_dma",
+                    "as": "address"
+                  }
+                ],
+                [
+                  "regions",
+                  {
+                    "ref": "dma_regions",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "region_count",
+                  {
+                    "length": "selected.readable_regions",
+                    "limit": 16
+                  }
+                ]
+              ]
+            }
+          },
+          {
+            "role": "crypto_irq",
+            "type": "nx_stm32f4_crypto_irq_t",
+            "const": false
+          },
+          {
+            "role": "crypto_config",
+            "type": "nx_stm32f4_cipher_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "irq_policy",
+                  {
+                    "record": [
+                      [
+                        "kernel",
+                        {
+                          "source": "selected.kernel_policy",
+                          "as": "symbol"
+                        }
+                      ],
+                      [
+                        "external_irq_count",
+                        {
+                          "source": "selected.irq_profile.external_count"
+                        }
+                      ],
+                      [
+                        "priority_bits",
+                        {
+                          "source": "selected.irq_profile.priority_bits"
+                        }
+                      ],
+                      [
+                        "syscall_ceiling",
+                        {
+                          "source": "selected.irq_profile.syscall_priority",
+                          "default": 0
+                        }
+                      ]
+                    ]
+                  }
+                ],
+                [
+                  "dma",
+                  {
+                    "ref": "crypto_dma_config",
+                    "as": "address"
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "calls": {
+          "admit": [
+            {
+              "function": "nx_stm32f4_crypto_irq_admit",
+              "args": [
+                {
+                  "ref": "crypto_irq",
+                  "as": "address"
+                },
+                {
+                  "symbol": "CRYP_IRQn"
+                },
+                {
+                  "source": "item.options.irq.priority"
+                }
+              ]
+            },
+            {
+              "function": "nx_stm32f4_cipher_admit",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "ref": "crypto_config",
+                  "as": "address"
+                }
+              ]
+            }
+          ],
+          "prepare": {
+            "role": "crypto_start",
+            "sequence": [
+              {
+                "function": "nx_stm32f4_crypto_irq_acquire",
+                "args": [
+                  {
+                    "ref": "crypto_irq",
+                    "as": "address"
+                  },
+                  {
+                    "symbol": "CRYP_IRQn"
+                  },
+                  {
+                    "source": "item.options.irq.priority"
+                  }
+                ]
+              },
+              {
+                "function": "nx_stm32f4_cipher_start",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  },
+                  {
+                    "ref": "crypto_config",
+                    "as": "address"
+                  }
+                ]
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_cipher_port_stop",
+              "args": [
+                {
+                  "ref": "face",
+                  "as": "address"
+                }
+              ]
+            },
+            {
+              "function": "nx_stm32f4_crypto_irq_release",
+              "args": [
+                {
+                  "ref": "crypto_irq",
+                  "as": "address"
+                },
+                {
+                  "symbol": "CRYP_IRQn"
+                }
+              ]
+            }
+          ]
+        },
+        "irq": [
+          {
+            "name": "CRYP_IRQHandler",
+            "calls": [
+              {
+                "function": "nx_stm32f4_cipher_irq",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  }
+                ]
+              }
+            ],
+            "barrier": "nx_arch_dsb"
+          }
+        ],
+        "retain_on_failed_init": true,
+        "ops": "nx_stm32f4_cipher_ops"
+      },
+      "headers": [
+        "stm32f4_crypto_irq.h",
+        "stm32f4_cipher.h"
+      ]
+    },
+    {
+      "kind": "hash",
+      "mode": "irq-blocks",
+      "implementation": "hash",
+      "static_recipe": {
+        "state_type": "nx_stm32f4_hash_state_t",
+        "declarations": [
+          {
+            "role": "crypto_irq",
+            "type": "nx_stm32f4_crypto_irq_t",
+            "const": false
+          },
+          {
+            "role": "crypto_config",
+            "type": "nx_stm32f4_hash_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "irq_policy",
+                  {
+                    "record": [
+                      [
+                        "kernel",
+                        {
+                          "source": "selected.kernel_policy",
+                          "as": "symbol"
+                        }
+                      ],
+                      [
+                        "external_irq_count",
+                        {
+                          "source": "selected.irq_profile.external_count"
+                        }
+                      ],
+                      [
+                        "priority_bits",
+                        {
+                          "source": "selected.irq_profile.priority_bits"
+                        }
+                      ],
+                      [
+                        "syscall_ceiling",
+                        {
+                          "source": "selected.irq_profile.syscall_priority",
+                          "default": 0
+                        }
+                      ]
+                    ]
+                  }
+                ],
+                [
+                  "dma",
+                  null
+                ]
+              ]
+            }
+          }
+        ],
+        "calls": {
+          "admit": [
+            {
+              "function": "nx_stm32f4_crypto_irq_admit",
+              "args": [
+                {
+                  "ref": "crypto_irq",
+                  "as": "address"
+                },
+                {
+                  "symbol": "HASH_RNG_IRQn"
+                },
+                {
+                  "source": "item.options.irq.priority"
+                }
+              ]
+            },
+            {
+              "function": "nx_stm32f4_hash_admit",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "ref": "crypto_config",
+                  "as": "address"
+                }
+              ]
+            }
+          ],
+          "prepare": {
+            "role": "crypto_start",
+            "sequence": [
+              {
+                "function": "nx_stm32f4_crypto_irq_acquire",
+                "args": [
+                  {
+                    "ref": "crypto_irq",
+                    "as": "address"
+                  },
+                  {
+                    "symbol": "HASH_RNG_IRQn"
+                  },
+                  {
+                    "source": "item.options.irq.priority"
+                  }
+                ]
+              },
+              {
+                "function": "nx_stm32f4_hash_start",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  },
+                  {
+                    "ref": "crypto_config",
+                    "as": "address"
+                  }
+                ]
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_hash_port_stop",
+              "args": [
+                {
+                  "ref": "face",
+                  "as": "address"
+                }
+              ]
+            },
+            {
+              "function": "nx_stm32f4_crypto_irq_release",
+              "args": [
+                {
+                  "ref": "crypto_irq",
+                  "as": "address"
+                },
+                {
+                  "symbol": "HASH_RNG_IRQn"
+                }
+              ]
+            }
+          ]
+        },
+        "irq": [
+          {
+            "name": "HASH_RNG_IRQHandler",
+            "calls": [
+              {
+                "function": "nx_stm32f4_hash_irq",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  }
+                ]
+              }
+            ],
+            "barrier": "nx_arch_dsb"
+          }
+        ],
+        "retain_on_failed_init": true,
+        "ops": "nx_stm32f4_hash_ops"
+      },
+      "headers": [
+        "stm32f4_crypto_irq.h",
+        "stm32f4_hash.h"
+      ]
+    },
+    {
+      "kind": "hash",
+      "mode": "dma-blocks",
+      "implementation": "hash",
+      "static_recipe": {
+        "state_type": "nx_stm32f4_hash_state_t",
+        "declarations": [
+          {
+            "role": "dma_regions",
+            "type": "nx_dma_memory_region_t",
+            "const": true,
+            "value": {
+              "map": {
+                "source": "selected.readable_regions",
+                "limit": 16,
+                "value": {
+                  "record": [
+                    [
+                      "begin",
+                      {
+                        "source": "entry.begin"
+                      }
+                    ],
+                    [
+                      "size",
+                      {
+                        "source": "entry.size"
+                      }
+                    ],
+                    [
+                      "permissions",
+                      {
+                        "source": "entry.permissions",
+                        "as": "static"
+                      }
+                    ]
+                  ]
+                }
+              }
+            },
+            "count": {
+              "length": "selected.readable_regions",
+              "limit": 16
+            }
+          },
+          {
+            "role": "crypto_dma",
+            "type": "nx_stm32f4_hash_dma_state_t",
+            "const": false
+          },
+          {
+            "role": "crypto_dma_config",
+            "type": "nx_stm32f4_hash_dma_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "state",
+                  {
+                    "ref": "crypto_dma",
+                    "as": "address"
+                  }
+                ],
+                [
+                  "regions",
+                  {
+                    "ref": "dma_regions",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "region_count",
+                  {
+                    "length": "selected.readable_regions",
+                    "limit": 16
+                  }
+                ]
+              ]
+            }
+          },
+          {
+            "role": "crypto_irq",
+            "type": "nx_stm32f4_crypto_irq_t",
+            "const": false
+          },
+          {
+            "role": "crypto_config",
+            "type": "nx_stm32f4_hash_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "irq_policy",
+                  {
+                    "record": [
+                      [
+                        "kernel",
+                        {
+                          "source": "selected.kernel_policy",
+                          "as": "symbol"
+                        }
+                      ],
+                      [
+                        "external_irq_count",
+                        {
+                          "source": "selected.irq_profile.external_count"
+                        }
+                      ],
+                      [
+                        "priority_bits",
+                        {
+                          "source": "selected.irq_profile.priority_bits"
+                        }
+                      ],
+                      [
+                        "syscall_ceiling",
+                        {
+                          "source": "selected.irq_profile.syscall_priority",
+                          "default": 0
+                        }
+                      ]
+                    ]
+                  }
+                ],
+                [
+                  "dma",
+                  {
+                    "ref": "crypto_dma_config",
+                    "as": "address"
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "calls": {
+          "admit": [
+            {
+              "function": "nx_stm32f4_crypto_irq_admit",
+              "args": [
+                {
+                  "ref": "crypto_irq",
+                  "as": "address"
+                },
+                {
+                  "symbol": "HASH_RNG_IRQn"
+                },
+                {
+                  "source": "item.options.irq.priority"
+                }
+              ]
+            },
+            {
+              "function": "nx_stm32f4_hash_admit",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "ref": "crypto_config",
+                  "as": "address"
+                }
+              ]
+            }
+          ],
+          "prepare": {
+            "role": "crypto_start",
+            "sequence": [
+              {
+                "function": "nx_stm32f4_crypto_irq_acquire",
+                "args": [
+                  {
+                    "ref": "crypto_irq",
+                    "as": "address"
+                  },
+                  {
+                    "symbol": "HASH_RNG_IRQn"
+                  },
+                  {
+                    "source": "item.options.irq.priority"
+                  }
+                ]
+              },
+              {
+                "function": "nx_stm32f4_hash_start",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  },
+                  {
+                    "ref": "crypto_config",
+                    "as": "address"
+                  }
+                ]
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_hash_port_stop",
+              "args": [
+                {
+                  "ref": "face",
+                  "as": "address"
+                }
+              ]
+            },
+            {
+              "function": "nx_stm32f4_crypto_irq_release",
+              "args": [
+                {
+                  "ref": "crypto_irq",
+                  "as": "address"
+                },
+                {
+                  "symbol": "HASH_RNG_IRQn"
+                }
+              ]
+            }
+          ]
+        },
+        "irq": [
+          {
+            "name": "HASH_RNG_IRQHandler",
+            "calls": [
+              {
+                "function": "nx_stm32f4_hash_irq",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  }
+                ]
+              }
+            ],
+            "barrier": "nx_arch_dsb"
+          }
+        ],
+        "retain_on_failed_init": true,
+        "ops": "nx_stm32f4_hash_ops"
+      },
+      "headers": [
+        "stm32f4_crypto_irq.h",
+        "stm32f4_hash.h"
+      ]
+    }
+  ]
+}

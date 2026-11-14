@@ -70,6 +70,52 @@ class ConfigurationExperienceTests(unittest.TestCase):
         after = sorted(str(path) for path in self.root.rglob("*"))
         self.assertEqual(before, after)
 
+    def test_board_backend_facts_share_query_and_resolution_validation(self):
+        path = self.root / "tests/support/native/board/board.json"
+        original = json.loads(path.read_text())
+        commands = (("list-bindings", "--board", "native_reference", "--json"),
+                    ("check", "--assembly", str(self.assembly)))
+        for support in (None, [], ["threadx"], ["native", "threadx"]):
+            facts = dict(original)
+            facts.pop("backend_support", None)
+            if support is not None:
+                facts["backend_support"] = support
+            path.write_text(json.dumps(facts))
+            for arguments in commands:
+                with self.subTest(support=support, command=arguments[0]):
+                    status, output, errors = self.command(*arguments)
+                    self.assertEqual(status, 0, errors)
+                    if arguments[0] == "list-bindings":
+                        self.assertIsNone(json.loads(output)["selection"]["backend"])
+        for support in (True, "threadx", {}, [[]], [1],
+                        ["unknown"], ["threadx", "threadx"]):
+            path.write_text(json.dumps({**original, "backend_support": support}))
+            for arguments in commands:
+                with self.subTest(support=support, command=arguments[0]):
+                    status, _, errors = self.command(*arguments)
+                    self.assertEqual(status, 1)
+                    self.assertIn("Board backend support", errors)
+                    source = path if arguments[0] == "list-bindings" else self.assembly
+                    self.assertIn(str(source), errors)
+
+    def test_board_schema_remains_closed_in_query_and_resolution(self):
+        path = self.root / "tests/support/native/board/board.json"
+        original = json.loads(path.read_text())
+        commands = (("list-bindings", "--board", "native_reference"),
+                    ("check", "--assembly", str(self.assembly)))
+        cases = (({**original, "schema_version": True}, "Board schema"),
+                 ({**original, "schema_version": "1"}, "Board schema"),
+                 ({**original, "schema_version": 2}, "Board schema"),
+                 ({**original, "arbitrary_policy": {}}, "arbitrary_policy"),
+                 (True, "Board"), ([], "Board"))
+        for facts, message in cases:
+            path.write_text(json.dumps(facts))
+            for arguments in commands:
+                with self.subTest(facts=facts, command=arguments[0]):
+                    status, _, errors = self.command(*arguments)
+                    self.assertEqual(status, 1)
+                    self.assertIn(message, errors)
+
     def test_binding_modes_project_implementation_and_execution_shape(self):
         status, output, errors = self.command(
             "list-bindings", "--board", "native_reference", "--kind", "uart",

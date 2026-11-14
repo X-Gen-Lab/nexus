@@ -142,15 +142,11 @@ class Stm32UartReceive : public testing::Test {
         state.uart.baud = 115200U;
         state.uart.profile = NX_UART_RX_BLOCKS;
         state.uart.irq = USART1_IRQn;
-        resources.dma = &dma;
+        resources.transmit = {&dma, &transmit, DMA2_Stream7_IRQn, 7U, 4U};
+        resources.receive = {&dma, &receive, DMA2_Stream2_IRQn, 2U, 4U};
         state.resources = &resources;
-        duplex.transmit.tx = &transmit;
         resources.regions = &region;
         resources.region_count = 1U;
-        duplex.transmit.stream = 7U;
-        duplex.transmit.channel = 4U;
-        duplex.transmit.dma_irq = DMA2_Stream7_IRQn;
-        state.receive = &receive;
         ASSERT_EQ(nx_stm32_uart_receive_initialize(&state, 84000000U),
                   NX_SUCCESS);
     }
@@ -193,7 +189,8 @@ TEST_F(Stm32UartReceive, StoppedOwnerRejectsBeforeReadingRetiredConfiguration) {
             if (mapping == MAP_FAILED)
                 _exit(4);
             auto* retained = new (mapping) nx_stm32_uart_dma_resources_t{};
-            retained->dma = &dma;
+            retained->transmit = resources.transmit;
+            retained->receive = resources.receive;
             retained->regions = &region;
             retained->region_count = 1U;
             state.resources = retained;
@@ -241,6 +238,27 @@ TEST_F(Stm32UartReceive, StartProgramsCallerBufferWithoutCpuPayloadCopy) {
     EXPECT_EQ(slots[0].state, NX_STREAM_SLOT_FILLING);
 }
 
+TEST_F(Stm32UartReceive, AlternateReceiveLaneUsesItsSelectedChannelAndFlags) {
+    uart.SR = USART_SR_TC;
+    ASSERT_EQ(NX_SUCCESS, nx_uart_port_stop(&port));
+    state.uart.irq = USART6_IRQn;
+    resources.receive = {&dma, &receive, DMA2_Stream2_IRQn, 2U, 5U};
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_uart_receive_initialize(&state, 84000000U));
+    ASSERT_EQ(NX_SUCCESS, nx_uart_port_rx_start(&port, &stream));
+    EXPECT_EQ(5U << DMA_SxCR_CHSEL_Pos, receive.CR & DMA_SxCR_CHSEL);
+    receive.NDTR = 0U;
+    dma.LISR = (0x20U << 16U) | 0x20U;
+    nx_stm32_uart_receive_dma_irq(&state);
+    nx_stream_block_t block{};
+    ASSERT_EQ(NX_SUCCESS, nx_stream_acquire(&stream, &block));
+    EXPECT_EQ(sizeof(payload[0]), block.length);
+    EXPECT_EQ(payload[0], block.data);
+    EXPECT_EQ(0x20U, dma.LISR);
+    EXPECT_EQ(NX_ERROR_BUSY, nx_uart_port_rx_stop(&port));
+    ASSERT_EQ(NX_SUCCESS, nx_stream_release(&stream, &block));
+    EXPECT_EQ(NX_SUCCESS, nx_uart_port_rx_stop(&port));
+}
+
 class OtherUartReceive : public Stm32UartReceive,
                          public testing::WithParamInterface<unsigned> {
   protected:
@@ -255,6 +273,13 @@ class OtherUartReceive : public Stm32UartReceive,
                                   UART5_IRQn, USART6_IRQn};
         const unsigned shifts[] = {6U, 6U, 16U, 0U, 6U};
         state.uart.irq = irqs[GetParam()];
+        const uint8_t lanes[] = {5U, 1U, 2U, 0U, 1U};
+        const IRQn_Type publishers[] = {DMA1_Stream5_IRQn, DMA1_Stream1_IRQn,
+                                        DMA1_Stream2_IRQn, DMA1_Stream0_IRQn,
+                                        DMA2_Stream1_IRQn};
+        resources.receive.lane = lanes[GetParam()];
+        resources.receive.irq = publishers[GetParam()];
+        resources.receive.channel = GetParam() == 4U ? 5U : 4U;
         shift = shifts[GetParam()];
         high = GetParam() == 0U;
         s_receive_shift = shift;
@@ -271,9 +296,9 @@ class OtherUartReceive : public Stm32UartReceive,
         const IRQn_Type irqs[] = {DMA1_Stream6_IRQn, DMA1_Stream3_IRQn,
                                   DMA1_Stream4_IRQn, DMA1_Stream7_IRQn,
                                   DMA2_Stream6_IRQn};
-        duplex.transmit.stream = (uint8_t)streams[GetParam()];
-        duplex.transmit.channel = GetParam() == 4U ? 5U : 4U;
-        duplex.transmit.dma_irq = irqs[GetParam()];
+        resources.transmit.lane = (uint8_t)streams[GetParam()];
+        resources.transmit.channel = GetParam() == 4U ? 5U : 4U;
+        resources.transmit.irq = irqs[GetParam()];
         ASSERT_EQ(NX_SUCCESS,
                   nx_stm32_uart_duplex_initialize(
                       &duplex, GetParam() == 4U ? 84000000U : 42000000U));
@@ -327,12 +352,12 @@ TEST_P(OtherUartReceive, DuplexUsesItsOwnTransmitSelectorAndBothDmaBanks) {
     nx_request_initialize(&request.base);
     ASSERT_EQ(NX_SUCCESS, nx_uart_tx_prepare(&request, payload[2], 4U, 1000U));
     ASSERT_EQ(NX_SUCCESS, nx_uart_port_submit(&both, &request));
-    EXPECT_EQ(duplex.transmit.channel,
+    EXPECT_EQ(resources.transmit.channel,
               (transmit.CR & DMA_SxCR_CHSEL) >> DMA_SxCR_CHSEL_Pos);
     transmit.CR &= ~static_cast<uint32_t>(DMA_SxCR_EN);
     transmit.NDTR = 0U;
     const unsigned tx_shift[] = {16U, 22U, 0U, 22U, 16U};
-    auto* flags = duplex.transmit.stream < 4U ? &dma.LISR : &dma.HISR;
+    auto* flags = resources.transmit.lane < 4U ? &dma.LISR : &dma.HISR;
     *flags = 0x20U << tx_shift[GetParam()];
     nx_stm32_uart_duplex_dma_irq(&duplex);
     nx_uart_port_service(&both);

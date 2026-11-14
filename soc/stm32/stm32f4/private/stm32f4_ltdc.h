@@ -8,6 +8,7 @@
 #include "nexus/arch/arch.h"
 #include "nexus/io/display.h"
 #include "stm32f407_system.h"
+#include "stm32f4_graphics_clock.h"
 #include "stm32f4_graphics_memory.h"
 #if !defined(USE_HAL_LTDC_REGISTER_CALLBACKS)
 #define USE_HAL_LTDC_REGISTER_CALLBACKS 0U
@@ -16,6 +17,8 @@
 #endif
 #include "stm32f4xx_hal_gpio.h"
 #include "stm32f4xx_hal_ltdc.h"
+
+#include "stm32f4_ltdc_constants.h"
 
 #ifndef NX_GFX_READ
 #define NX_GFX_READ(reg)         (*(reg))

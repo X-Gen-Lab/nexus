@@ -1,0 +1,297 @@
+{
+  "schema_version": 1,
+  "bindings": [
+    {
+      "kind": "i2c_target",
+      "modes": [
+        "target-irq",
+        "smbus-device"
+      ],
+      "controllers": [
+        "I2C1",
+        "I2C2",
+        "I2C3"
+      ],
+      "implementation": "i2c_target",
+      "headers": [
+        "stm32f407_i2c_target.h",
+        "stm32f4_io_encoding.h"
+      ],
+      "static_recipe": {
+        "state_type": "nx_stm32_i2c_target_state_t",
+        "ops": "nx_stm32_i2c_target_ops",
+        "declarations": [
+          {
+            "role": "i2c_target_pin_state",
+            "type": "uint16_t",
+            "const": false,
+            "count": {
+              "length": "selected.pads",
+              "limit": 3
+            }
+          },
+          {
+            "role": "i2c_target_pins",
+            "type": "nx_stm32_platform_pin_config_t",
+            "const": true,
+            "value": {
+              "map": {
+                "source": "selected.pads",
+                "limit": 3,
+                "value": {
+                  "record": [
+                    [
+                      "registers",
+                      {
+                        "source": "entry.registers",
+                        "as": "symbol"
+                      }
+                    ],
+                    [
+                      "snapshot",
+                      {
+                        "ref": "i2c_target_pin_state",
+                        "as": "address",
+                        "index": {
+                          "source": "index",
+                          "as": "u32"
+                        }
+                      }
+                    ],
+                    [
+                      "port_index",
+                      {
+                        "source": "entry.port_index",
+                        "as": "u32"
+                      }
+                    ],
+                    [
+                      "pin",
+                      {
+                        "source": "entry.number",
+                        "as": "u32"
+                      }
+                    ]
+                  ]
+                }
+              }
+            },
+            "count": {
+              "length": "selected.pads",
+              "limit": 3
+            }
+          },
+          {
+            "role": "i2c_target_cold",
+            "type": "nx_stm32_i2c_target_cold_t",
+            "const": false
+          },
+          {
+            "role": "i2c_target_config",
+            "type": "nx_stm32_i2c_target_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "registers",
+                  {
+                    "source": "item.controller",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "rcc",
+                  {
+                    "symbol": "RCC"
+                  }
+                ],
+                [
+                  "pins",
+                  {
+                    "ref": "i2c_target_pins",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "pin_count",
+                  {
+                    "length": "selected.pads",
+                    "limit": 3
+                  }
+                ],
+                [
+                  "clock_hz",
+                  {
+                    "source": "selected.clock_hz",
+                    "as": "u32"
+                  }
+                ],
+                [
+                  "maximum_hz",
+                  {
+                    "source": "item.options.max_hz",
+                    "as": "u32"
+                  }
+                ],
+                [
+                  "irq_latency_us",
+                  {
+                    "source": "item.options.irq_latency_us",
+                    "as": "u32"
+                  }
+                ],
+                [
+                  "own_address",
+                  {
+                    "source": "item.options.own_address",
+                    "as": "u32"
+                  }
+                ],
+                [
+                  "second_address",
+                  {
+                    "source": "item.options.second_address",
+                    "as": "u32"
+                  }
+                ],
+                [
+                  "priority",
+                  {
+                    "source": "selected.irq.priority",
+                    "as": "u32"
+                  }
+                ],
+                [
+                  "ten_bit",
+                  {
+                    "macro": "NX_STM32_I2C_ADDRESS_TEN_BIT",
+                    "args": [
+                      {
+                        "source": "item.options.address_bits",
+                        "as": "u32"
+                      }
+                    ]
+                  }
+                ],
+                [
+                  "smbus",
+                  {
+                    "source": "item.mode",
+                    "as": "bool",
+                    "values": {
+                      "target-irq": false,
+                      "smbus-device": true
+                    }
+                  }
+                ],
+                [
+                  "pec",
+                  {
+                    "source": "item.options.pec",
+                    "as": "bool"
+                  }
+                ],
+                [
+                  "alert",
+                  {
+                    "source": "item.options.alert",
+                    "as": "bool"
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "calls": {
+          "admit": [
+            {
+              "function": "nx_stm32_i2c_target_admit",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "ref": "i2c_target_config",
+                  "as": "address"
+                },
+                {
+                  "ref": "i2c_target_cold",
+                  "as": "address"
+                }
+              ]
+            }
+          ],
+          "prepare": {
+            "function": "nx_stm32_i2c_target_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "ref": "i2c_target_config",
+                "as": "address"
+              },
+              {
+                "ref": "i2c_target_cold",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32_i2c_target_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "ref": "i2c_target_config",
+                  "as": "address"
+                },
+                {
+                  "ref": "i2c_target_cold",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "irq": [
+          {
+            "map": {
+              "source": "selected.vector_bindings",
+              "limit": 8,
+              "value": {
+                "name": {
+                  "source": "entry.handler",
+                  "as": "symbol"
+                },
+                "calls": [
+                  {
+                    "function": "nx_stm32_i2c_target_irq",
+                    "args": [
+                      {
+                        "ref": "port",
+                        "as": "address"
+                      }
+                    ]
+                  }
+                ],
+                "barrier": "nx_arch_dsb"
+              }
+            }
+          }
+        ],
+        "pin_snapshots": {
+          "source": "selected.pads",
+          "key": "entry.identity",
+          "array_role": "i2c_target_pin_state",
+          "limit": 3
+        }
+      }
+    }
+  ]
+}

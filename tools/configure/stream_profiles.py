@@ -25,7 +25,7 @@ class StreamGeometry:
     counter_max: int
 
 
-def resolve(selection, kind, provider):
+def resolve(selection, kind, provider, *, controller=None):
     """Compute conservative capacity without inventing physical timing facts."""
     value = selection.get("stream")
     if value is None:
@@ -34,7 +34,7 @@ def resolve(selection, kind, provider):
     if (geometry is None or kind not in {"uart", "adc"} or
             not mode_traits(kind, selection["mode"]).continuous):
         fail("Stream profile requires a reviewed continuous provider mode")
-    provider.mode_implementation(kind, selection["mode"])
+    provider.mode_implementation(kind, selection["mode"], controller)
     if not isinstance(value, dict) or set(value) != FIELDS:
         fail("Stream profile requires exact rate/block/delay/policy/source "
              "fields; hardware geometry is provider-owned")

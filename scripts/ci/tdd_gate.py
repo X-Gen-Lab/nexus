@@ -16,6 +16,7 @@ from scripts.validation.junit import prepare_report, validate_junit
 from tools.dev.change_paths import behavioral
 from tools.dev.presets import binary_directory
 from tools.dev import process
+from tools.dev.build_lock import build_lock
 from tools.testing.run_tool_tests import SUITES as TOOL_SUITES, changed_suites
 
 
@@ -131,6 +132,71 @@ def discovered_count(output):
     return count
 
 
+def execute_gate(args, env, build, initial_tree=None):
+    """Keep configuration, tools and reports inside the same build lease."""
+    output = build / "tdd"
+    output.mkdir(parents=True, exist_ok=True)
+    summary = output / "execution.json"
+    summary.unlink(missing_ok=True)
+    python = sys.executable
+    scope = args.tools or ("all" if args.all else "changed")
+    suites = (TOOL_SUITES if scope == "all" else
+              changed_suites(staged_paths(ROOT) if args.staged else args.paths)
+              if scope == "changed" else ())
+    target = "contracts" if "testing" in suites or "ci" in suites else "native"
+    execute([python, "tools/dev/dev.py", "doctor", "--target", target],
+            env, output / "preflight-tools.txt")
+    execute([python, "tools/dev/dev.py", "configure", "--preset",
+             args.preset], env, output / "configure.txt")
+    execute([python, "tools/dev/dev.py", "build", "--preset", args.preset,
+             "--target", "nexus_google_contracts"], env,
+            output / "build.txt")
+    tool_results = []
+    # Keep the same complete selection, running cheap workflow/CI checks
+    # before configuration and SDK consumers so failures stop work early.
+    for suite in reversed(suites):
+        tool_report = output / f"tools-{suite}.json"
+        tool_report.unlink(missing_ok=True)
+        execute([python, "-B", "tools/testing/run_tool_tests.py", "--suite",
+                 suite, "--report", str(tool_report)], env,
+                output / f"tools-{suite}.txt")
+        tool_results.append(json.loads(tool_report.read_text()))
+    manifest = json.loads((build / "google-contracts.json").read_text())
+    if (manifest.get("schema") != 1 or not manifest.get("executables")
+            or len(manifest["executables"]) != len(set(manifest["executables"]))):
+        raise ValueError("Missing or duplicate GoogleTest executable plan")
+    results = []
+    for index, name in enumerate(manifest["executables"]):
+        binary = checked_binary(name, build)
+        listing = execute([str(binary), "--gtest_filter=*",
+                           "--gtest_list_tests"], env,
+                          output / f"discovery-{index}.txt")
+        count = discovered_count(listing)
+        report = output / f"google-{index}.xml"
+        started = prepare_report(report)
+        execute([str(binary), "--gtest_filter=*", "--gtest_repeat=1",
+                 "--gtest_also_run_disabled_tests",
+                 "--gtest_output=xml:" + str(report)], env,
+                output / f"execution-{index}.txt")
+        evidence = validate_google_report(report, not_before_ns=started,
+                                          expected_cases=count)
+        results.append({"binary": binary.name, **evidence})
+    if args.staged:
+        check_staged_snapshot(ROOT)
+        if staged_tree(ROOT) != initial_tree:
+            raise ValueError("Staged index changed during contract execution")
+    summary.write_text(json.dumps({
+        "schema": 1, "kind": "development-contract-execution",
+        "preset": args.preset, "passed": sum(r["passed"] for r in results),
+        "suites": results, "tool_suites": tool_results,
+        "scope": "Actual host execution; not proof of historical TDD order "
+                 "or physical hardware qualification",
+    }, indent=2) + "\n")
+    print(f"Executed {sum(r['passed'] for r in results)} GoogleTest cases; "
+          f"evidence: {summary}")
+    return 0
+
+
 def main(arguments=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--preset", default="native-debug")
@@ -146,6 +212,7 @@ def main(arguments=None):
                 and not any(map(relevant, staged_paths(ROOT)))):
             print("No staged behavioral changes require the GoogleTest gate")
             return 0
+        initial_tree = None
         if args.staged:
             initial_tree = staged_tree(ROOT)
             check_staged_snapshot(ROOT)
@@ -155,67 +222,8 @@ def main(arguments=None):
         build = binary_directory(ROOT, args.preset)
         if not build.is_relative_to(ROOT.resolve()):
             raise ValueError("Native build directory is outside the checkout")
-        output = build / "tdd"
-        output.mkdir(parents=True, exist_ok=True)
-        summary = output / "execution.json"
-        summary.unlink(missing_ok=True)
-        python = sys.executable
-        scope = args.tools or ("all" if args.all else "changed")
-        suites = (TOOL_SUITES if scope == "all" else
-                  changed_suites(staged_paths(ROOT) if args.staged else args.paths)
-                  if scope == "changed" else ())
-        target = "contracts" if "testing" in suites or "ci" in suites else "native"
-        execute([python, "tools/dev/dev.py", "doctor", "--target", target],
-                env, output / "preflight-tools.txt")
-        execute([python, "tools/dev/dev.py", "configure", "--preset",
-                 args.preset], env, output / "configure.txt")
-        execute([python, "tools/dev/dev.py", "build", "--preset", args.preset,
-                 "--target", "nexus_google_contracts"], env,
-                output / "build.txt")
-        tool_results = []
-        # Keep the same complete selection, running cheap workflow/CI checks
-        # before configuration and SDK consumers so failures stop work early.
-        for suite in reversed(suites):
-            tool_report = output / f"tools-{suite}.json"
-            tool_report.unlink(missing_ok=True)
-            execute([python, "-B", "tools/testing/run_tool_tests.py", "--suite",
-                     suite, "--report", str(tool_report)], env,
-                    output / f"tools-{suite}.txt")
-            tool_results.append(json.loads(tool_report.read_text()))
-        manifest = json.loads((build / "google-contracts.json").read_text())
-        if (manifest.get("schema") != 1 or not manifest.get("executables")
-                or len(manifest["executables"]) != len(set(manifest["executables"]))):
-            raise ValueError("Missing or duplicate GoogleTest executable plan")
-        results = []
-        for index, name in enumerate(manifest["executables"]):
-            binary = checked_binary(name, build)
-            listing = execute([str(binary), "--gtest_filter=*",
-                               "--gtest_list_tests"], env,
-                              output / f"discovery-{index}.txt")
-            count = discovered_count(listing)
-            report = output / f"google-{index}.xml"
-            started = prepare_report(report)
-            execute([str(binary), "--gtest_filter=*", "--gtest_repeat=1",
-                     "--gtest_also_run_disabled_tests",
-                     "--gtest_output=xml:" + str(report)], env,
-                    output / f"execution-{index}.txt")
-            evidence = validate_google_report(report, not_before_ns=started,
-                                              expected_cases=count)
-            results.append({"binary": binary.name, **evidence})
-        if args.staged:
-            check_staged_snapshot(ROOT)
-            if staged_tree(ROOT) != initial_tree:
-                raise ValueError("Staged index changed during contract execution")
-        summary.write_text(json.dumps({
-            "schema": 1, "kind": "development-contract-execution",
-            "preset": args.preset, "passed": sum(r["passed"] for r in results),
-            "suites": results, "tool_suites": tool_results,
-            "scope": "Actual host execution; not proof of historical TDD order "
-                     "or physical hardware qualification",
-        }, indent=2) + "\n")
-        print(f"Executed {sum(r['passed'] for r in results)} GoogleTest cases; "
-              f"evidence: {summary}")
-        return 0
+        with build_lock(build):
+            return execute_gate(args, env, build, initial_tree)
     except (OSError, ValueError, subprocess.CalledProcessError) as error:
         print(f"TDD gate rejected: {error}", file=sys.stderr)
         return 1

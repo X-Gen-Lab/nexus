@@ -4,10 +4,29 @@ from dataclasses import replace
 import unittest
 
 from tools.configure import configure as gate
-from tools.configure.providers import maintained
+from tools.configure.providers import for_selection
 
 
 class F407I2CColdTests(unittest.TestCase):
+    def test_line_inputs_and_pin_banks_are_explicit_static_configuration(self):
+        path = gate.ROOT / "tests/contracts/stm32_assembly/zg-i2c-dma.toml"
+        result = gate.resolve_ir(path)
+        provider = for_selection(result)
+        for item in result.controllers:
+            if item.kind != "i2c":
+                continue
+            selected = provider.constructor(
+                item, result, result.board_bindings, result.routes, result.devices)
+            source = "\n".join(line for node in selected.static_declarations
+                               for line in node.render())
+            name = item.id.replace("-", "_")
+            self.assertIn(f".lines = &s_nx_i2c_lines_{name}", source)
+            for pin in item.pins:
+                wire = pin["pin"]
+                self.assertIn(f"&GPIO{wire[1]}->IDR", source)
+                self.assertIn(f".registers = GPIO{wire[1]}", source)
+                self.assertIn(".snapshot = &s_nx_i2c_pin_state_", source)
+
     def test_all_maintained_i2c_shapes_call_c_lifecycle_and_reuse_snapshots(self):
         for relative in (
                 "stm32_assembly/ve-i2c.toml",
@@ -20,7 +39,7 @@ class F407I2CColdTests(unittest.TestCase):
                 result = gate.resolve_ir(gate.ROOT / "tests/contracts" /
                                          relative, test_support=native_fixture(gate.ROOT / "tests/contracts" /
                                          relative))
-                provider = maintained("stm32f4")
+                provider = for_selection(result)
                 for item in result.controllers:
                     if item.kind != "i2c":
                         continue
@@ -50,7 +69,7 @@ class F407I2CColdTests(unittest.TestCase):
         item = next(item for item in result.controllers if item.kind == "i2c")
         changed = replace(item, integration=None)
         with self.assertRaisesRegex(ValueError, "integration"):
-            maintained("stm32f4").constructor(
+            for_selection(result).constructor(
                 changed, result, result.board_bindings, result.routes,
                 result.devices)
 

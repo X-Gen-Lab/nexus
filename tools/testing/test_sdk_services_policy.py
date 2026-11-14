@@ -140,8 +140,8 @@ class SDKServicesPolicyTests(unittest.TestCase):
             "stm32f4_graphics_memory", "stm32f4_irq_wake", "stm32f4_uart",
             "stm32f4_uart_format", "stm32f4_uart_wire_config")}
         self.assertLessEqual(generic | private, set(source_sdk.REQUIRED_FILES))
-        self.assertLessEqual(private, set(source_sdk.provider_descriptors
-                                         .maintained("stm32f4").owned_payload))
+        package = source_sdk.source_packages.load(ROOT / "soc/stm32/stm32f4/package.json")
+        self.assertTrue(all(package.exports(ROOT / name) for name in private))
         for name in sorted(generic | private):
             with self.subTest(path=name):
                 self.assertTrue(source_sdk.selected(name))
@@ -312,7 +312,7 @@ class SDKServicesPolicyTests(unittest.TestCase):
         source_sdk = importlib.util.module_from_spec(specification)
         specification.loader.exec_module(source_sdk)
         owned = {
-            "cmake/platform/STM32QSPI.cmake",
+            "soc/stm32/stm32f4/cmake/STM32QSPI.cmake",
             "soc/stm32/stm32f4/drivers/qspi.c",
             "soc/stm32/stm32f4/drivers/qspi_dma.c",
             "soc/stm32/stm32f4/private/stm32f4_qspi.h",
@@ -323,8 +323,8 @@ class SDKServicesPolicyTests(unittest.TestCase):
             "f479ni-qspi-dma.toml", "f479ni-qspi-quad.toml",
             "f479ni-qspi-quad-dma.toml", "f479ni-qspi-board/board.json",
             "f479ni-qspi-quad-board/board.json")}
-        payload = source_sdk.provider_descriptors.maintained("stm32f4").owned_payload
-        self.assertLessEqual(owned, set(payload))
+        package = source_sdk.source_packages.load(ROOT / "soc/stm32/stm32f4/package.json")
+        self.assertTrue(all(package.exports(ROOT / name) for name in owned))
         self.assertLessEqual(owned | reference, set(source_sdk.REQUIRED_FILES))
         for name in sorted(owned | reference):
             with self.subTest(path=name):

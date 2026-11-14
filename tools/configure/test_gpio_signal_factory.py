@@ -59,6 +59,18 @@ class GpioSignalFactoryTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, "one authorized"):
                     gpio_electrical.require_selection({**selection, **change}, {})
 
+    def test_electrical_initial_uses_the_public_32bit_port_mask(self):
+        mask = 1 << 31
+        binding = {"id": "wide-port", "initial": mask,
+                   "electrical": {"mode": "output", "initial": mask}}
+        route = {"kind": "gpio", "modes": ["output"]}
+        result = gpio_electrical.validate_binding(binding, route, mask)
+        self.assertEqual(result.initial, mask)
+        for invalid in (1 << 32, mask | 1):
+            binding["electrical"]["initial"] = invalid
+            with self.subTest(initial=invalid), self.assertRaises(ValueError):
+                gpio_electrical.validate_binding(binding, route, mask)
+
     def test_nominal_signal_getter_compiles_and_rejects_uart_identity(self):
         result = self.resolve("active_high = false\n")
         (self.directory / "nexus_factory.h").write_text(factory.emit(result)[0])

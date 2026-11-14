@@ -47,7 +47,12 @@ function(nexus_google_test name)
     endif()
     target_include_directories(${name} PRIVATE ${ARG_INCLUDES})
     if(ARG_STM32F4_LL)
-        include("${NEXUS_SOURCE_DIR}/cmake/platform/STM32Official.cmake")
+        # Match the concrete SoC target's private I/O implementation dependency.
+        # Provider headers may expose private sequence state to their C models;
+        # this directory never becomes a public consumer include.
+        target_include_directories(${name} PRIVATE
+            "${NEXUS_SOURCE_DIR}/io/private")
+        include("${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/cmake/STM32Official.cmake")
         nexus_stm32f4_official(${name})
     endif()
     set_property(TARGET ${name} PROPERTY NEXUS_GOOGLE_CONTRACT TRUE)
@@ -361,7 +366,7 @@ foreach(i2c_family generic stm32)
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/i2c_cold.c"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio.c"
             stm32_i2c_storage_model.c)
-        include("${NEXUS_SOURCE_DIR}/cmake/platform/STM32Official.cmake")
+        include("${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/cmake/STM32Official.cmake")
         nexus_stm32f4_official(${i2c_target})
         target_include_directories(${i2c_target} PRIVATE
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/private")

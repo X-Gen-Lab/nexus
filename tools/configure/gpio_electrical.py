@@ -3,7 +3,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 
 from tools.configure.ir import Record
-from tools.configure.providers.common import fail, integer
+from tools.configure.providers.common import UINT32_MAX, fail, integer
 
 
 @dataclass(frozen=True)
@@ -46,7 +46,7 @@ def validate_binding(binding, route, mask):
                 definition[name] not in choices):
             fail(f"Board electrical {name} is unsupported")
     if "initial" in definition:
-        initial = integer(definition["initial"], 0, 65535,
+        initial = integer(definition["initial"], 0, UINT32_MAX,
                           "Board electrical initial")
         if initial & ~mask or initial != binding.get("initial", 0):
             fail("Board electrical initial differs from its exact binding")
@@ -80,7 +80,8 @@ def require_selection(selection, binding):
 
 
 def validate_speed(selection, route):
-    """Output slew is explicit; the backup-domain pads only support LOW."""
+    """Validate public slew intent; the selected package owns pad limits."""
+    del route
     if "speed" not in selection:
         return
     speed = selection["speed"]
@@ -89,6 +90,3 @@ def validate_speed(selection, route):
     if type(speed) is not str or speed not in {
             "low", "medium", "high", "very-high"}:
         fail("Unsupported GPIO speed")
-    if speed != "low" and any(
-            pin["pin"] in {"PC13", "PC14", "PC15"} for pin in route["pins"]):
-        fail("PC13/14/15 output speed requires low")

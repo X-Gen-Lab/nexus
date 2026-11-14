@@ -2,10 +2,13 @@
 import json
 from pathlib import Path
 import tempfile
+from types import SimpleNamespace
 import unittest
 
 from tools.configure import adc, bindings, configure as gate
-from tools.configure.stm32f4 import contract
+from tools.configure.tests.f4_fixture import provider as f4_provider
+
+contract = f4_provider("STM32F407ZGT6")
 
 
 class F407AdcChannelTests(unittest.TestCase):
@@ -22,6 +25,16 @@ class F407AdcChannelTests(unittest.TestCase):
                     "sample_times": list(samples or [7] * len(channels)),
                     "reference_mv": 3300}
         return selected, route
+
+    def test_missing_channel_facts_never_infer_a_channel_from_a_pad_name(self):
+        selected, route = self.selection(["PA7"], [7], mode="single-shot")
+        missing = SimpleNamespace(LIMITS={})
+        with self.assertRaisesRegex(ValueError, "reviewed channel mapping"):
+            adc.validate_selection(selected, route, missing)
+        explicit = SimpleNamespace(
+            LIMITS={}, ADC_PIN_CHANNELS={("ADC1", "AIN_AUX"): 7})
+        route["pins"] = [{"pin": "AIN_AUX"}]
+        adc.validate_selection(selected, route, explicit)
 
     def test_internal_adc1_sources_resolve_without_gpio_claims(self):
         selected, route = self.selection([], [16, 17, 18])

@@ -30,6 +30,29 @@
 #error "SDIO 37.5 MHz requires its exact F407 HSE8 PLL75 software profile"
 #endif
 
+/* One physical host has one authored lane per firmware. Static selection
+ * keeps CMSIS vector and LL stream operations constant-foldable; the readonly
+ * descriptor is independently admitted against this compiled connection. */
+#ifndef NEXUS_STM32_SDIO_DMA_LANE
+#error "SDIO requires its selected package DMA lane profile"
+#elif NEXUS_STM32_SDIO_DMA_LANE == 6U
+#define NX_SDIO_DMA_STREAM DMA2_Stream6
+#define NX_SDIO_DMA_LANE   LL_DMA_STREAM_6
+#define NX_SDIO_DMA_IRQ    DMA2_Stream6_IRQn
+#define NX_SDIO_DMA_STATUS DMA2->HISR
+#define NX_SDIO_DMA_CLEAR  DMA2->HIFCR
+#define NX_SDIO_DMA_SHIFT  16U
+#elif NEXUS_STM32_SDIO_DMA_LANE == 3U || NEXUS_STM32_SDIO_DMA_LANE == 0U
+#define NX_SDIO_DMA_STREAM DMA2_Stream3
+#define NX_SDIO_DMA_LANE   LL_DMA_STREAM_3
+#define NX_SDIO_DMA_IRQ    DMA2_Stream3_IRQn
+#define NX_SDIO_DMA_STATUS DMA2->LISR
+#define NX_SDIO_DMA_CLEAR  DMA2->LIFCR
+#define NX_SDIO_DMA_SHIFT  22U
+#else
+#error "SDIO DMA requires a reviewed DMA2 channel4 lane"
+#endif
+
 #ifndef NX_SDIO_READ
 #define NX_SDIO_READ(reg) (reg)
 #endif
@@ -61,6 +84,17 @@ static bool cpu_storage(const void* pointer, size_t size, size_t alignment) {
 /** \brief Wire width selects an exact static pad/snapshot extent. */
 static uint8_t pin_count(const nx_stm32_sdio_config_t* config) {
     return config->bus_width == 8U ? 10U : 6U;
+}
+
+/** \brief Admit the immutable lane without consulting or changing hardware. */
+static bool dma_route_valid(const nx_stm32_sdio_config_t* config) {
+    const nx_stm32_dma_route_t* dma = config->dma;
+    if (config->engine != NX_STM32_SDIO_DMA)
+        return dma == NULL;
+    return cpu_storage(dma, sizeof(*dma), _Alignof(nx_stm32_dma_route_t)) &&
+           dma->dma == DMA2 && dma->channel == 4U &&
+           dma->lane == NEXUS_STM32_SDIO_DMA_LANE &&
+           dma->stream == NX_SDIO_DMA_STREAM && dma->irq == NX_SDIO_DMA_IRQ;
 }
 
 static bool valid_config(const nx_stm32_sdio_config_t* config) {
@@ -98,6 +132,7 @@ static bool valid_config(const nx_stm32_sdio_config_t* config) {
              ? !cpu_storage(config->io, sizeof(*config->io),
                             _Alignof(nx_stm32_sdio_io_state_t))
              : config->io != NULL) ||
+        !dma_route_valid(config) ||
         (config->engine == NX_STM32_SDIO_DMA &&
          (config->dma_region_count == 0U || config->dma_region_count > 8U ||
           !cpu_storage(config->dma_regions,
@@ -594,7 +629,7 @@ static nx_result_t configured_clock(const nx_stm32_sdio_state_t* state,
         (state->config->async != NULL &&
          state->config->async->active != NULL) ||
         (state->config->engine == NX_STM32_SDIO_DMA &&
-         LL_DMA_IsEnabledStream(DMA2, LL_DMA_STREAM_3) != 0U))
+         LL_DMA_IsEnabledStream(DMA2, NX_SDIO_DMA_LANE) != 0U))
         return NX_ERROR_BUSY;
     const SDIO_InitTypeDef clock = {
         .ClockEdge = SDIO_CLOCK_EDGE_RISING,
@@ -1120,6 +1155,9 @@ static bool buffer_at(const nx_stm32_sdio_state_t* state, const void* data,
                   sizeof(*state->config->async))) ||
         (state->config->io != NULL && overlaps(start, bytes, state->config->io,
                                                sizeof(*state->config->io))) ||
+        (state->config->dma != NULL &&
+         overlaps(start, bytes, state->config->dma,
+                  sizeof(*state->config->dma))) ||
         (state->config->dma_region_count != 0U &&
          overlaps(start, bytes, state->config->dma_regions,
                   state->config->dma_region_count *
@@ -1332,21 +1370,21 @@ const nx_block_ops_t nx_stm32_sdio_ops = {
     .media_removed = media_removed,
 };
 
-#define NX_SDIO_DMA_FLAGS  (UINT32_C(0x3d) << 22U)
-#define NX_SDIO_DMA_ERRORS (UINT32_C(0x0d) << 22U)
-#define NX_SDIO_DMA_TC     (UINT32_C(1) << 27U)
+#define NX_SDIO_DMA_FLAGS  (UINT32_C(0x3d) << NX_SDIO_DMA_SHIFT)
+#define NX_SDIO_DMA_ERRORS (UINT32_C(0x0d) << NX_SDIO_DMA_SHIFT)
+#define NX_SDIO_DMA_TC     (UINT32_C(1) << (NX_SDIO_DMA_SHIFT + 5U))
 #define NX_SDIO_DMA_IRQS                                                       \
     (DMA_SxCR_TCIE | DMA_SxCR_HTIE | DMA_SxCR_TEIE | DMA_SxCR_DMEIE)
 
 /** \brief EN=0 alone does not join peripheral-to-memory FIFO writes. */
 static bool dma_fifo_empty(void) {
-    return (NX_SDIO_READ(DMA2_Stream3->FCR) & DMA_SxFCR_FS) ==
+    return (NX_SDIO_READ(NX_SDIO_DMA_STREAM->FCR) & DMA_SxFCR_FS) ==
            LL_DMA_FIFOSTATUS_EMPTY;
 }
 
 /** \brief Copied TX FIFO data remains a cold resource, never new payload. */
 static bool dma_fifo_available(void) {
-    return (NX_SDIO_READ(DMA2_Stream3->FCR) & DMA_SxFCR_DMDIS) == 0U ||
+    return (NX_SDIO_READ(NX_SDIO_DMA_STREAM->FCR) & DMA_SxFCR_DMDIS) == 0U ||
            dma_fifo_empty();
 }
 
@@ -1413,7 +1451,7 @@ static uint32_t
 dma_transferred_words(const nx_stm32_sdio_async_state_t* execution) {
     uint32_t initial =
         async_write(execution) ? async_bytes(execution) / 4U : UINT32_C(0xffff);
-    uint32_t remaining = NX_SDIO_READ(DMA2_Stream3->NDTR);
+    uint32_t remaining = NX_SDIO_READ(NX_SDIO_DMA_STREAM->NDTR);
     return remaining <= initial ? initial - remaining : UINT32_MAX;
 }
 
@@ -1429,19 +1467,20 @@ static void data_irq_quiet(const nx_stm32_sdio_state_t* state) {
 
 /** \brief Mask this stream's publishers without stopping its memory engine. */
 static bool dma_irqs_quiet(void) {
-    if ((NX_SDIO_READ(DMA2_Stream3->CR) & NX_SDIO_DMA_IRQS) == 0U &&
-        (NX_SDIO_READ(DMA2_Stream3->FCR) & DMA_SxFCR_FEIE) == 0U)
+    if ((NX_SDIO_READ(NX_SDIO_DMA_STREAM->CR) & NX_SDIO_DMA_IRQS) == 0U &&
+        (NX_SDIO_READ(NX_SDIO_DMA_STREAM->FCR) & DMA_SxFCR_FEIE) == 0U)
         return true;
-    LL_DMA_DisableIT_HT(DMA2, LL_DMA_STREAM_3);
-    LL_DMA_DisableIT_TC(DMA2, LL_DMA_STREAM_3);
-    LL_DMA_DisableIT_TE(DMA2, LL_DMA_STREAM_3);
-    LL_DMA_DisableIT_DME(DMA2, LL_DMA_STREAM_3);
-    LL_DMA_DisableIT_FE(DMA2, LL_DMA_STREAM_3);
+    LL_DMA_DisableIT_HT(DMA2, NX_SDIO_DMA_LANE);
+    LL_DMA_DisableIT_TC(DMA2, NX_SDIO_DMA_LANE);
+    LL_DMA_DisableIT_TE(DMA2, NX_SDIO_DMA_LANE);
+    LL_DMA_DisableIT_DME(DMA2, NX_SDIO_DMA_LANE);
+    LL_DMA_DisableIT_FE(DMA2, NX_SDIO_DMA_LANE);
     nx_arch_dsb();
-    bool quiet = (NX_SDIO_READ(DMA2_Stream3->CR) & NX_SDIO_DMA_IRQS) == 0U &&
-                 (NX_SDIO_READ(DMA2_Stream3->FCR) & DMA_SxFCR_FEIE) == 0U;
+    bool quiet =
+        (NX_SDIO_READ(NX_SDIO_DMA_STREAM->CR) & NX_SDIO_DMA_IRQS) == 0U &&
+        (NX_SDIO_READ(NX_SDIO_DMA_STREAM->FCR) & DMA_SxFCR_FEIE) == 0U;
     if (!quiet)
-        NVIC_DisableIRQ(DMA2_Stream3_IRQn);
+        NVIC_DisableIRQ(NX_SDIO_DMA_IRQ);
     return quiet;
 }
 
@@ -1468,12 +1507,13 @@ static bool dma_detach(const nx_stm32_sdio_state_t* state) {
         return true;
     nx_stm32_sdio_async_state_t* execution = state->config->async;
     bool irq_quiet = dma_irqs_quiet();
-    LL_DMA_DisableStream(DMA2, LL_DMA_STREAM_3);
+    LL_DMA_DisableStream(DMA2, NX_SDIO_DMA_LANE);
     nx_arch_dsb();
-    if (!irq_quiet || (NX_SDIO_READ(DMA2_Stream3->CR) & DMA_SxCR_EN) != 0U)
+    if (!irq_quiet ||
+        (NX_SDIO_READ(NX_SDIO_DMA_STREAM->CR) & DMA_SxCR_EN) != 0U)
         return false;
     if (execution->dma_started) {
-        uint32_t flags = NX_SDIO_READ(DMA2->LISR) & NX_SDIO_DMA_FLAGS;
+        uint32_t flags = NX_SDIO_READ(NX_SDIO_DMA_STATUS) & NX_SDIO_DMA_FLAGS;
         if ((flags & NX_SDIO_DMA_ERRORS) != 0U)
             execution->flags |= SDIO_STA_RXOVERR;
         if ((flags & NX_SDIO_DMA_TC) != 0U)
@@ -1487,24 +1527,25 @@ static bool dma_detach(const nx_stm32_sdio_state_t* state) {
             return false;
         execution->words = dma_transferred_words(execution);
     }
-    LL_DMA_SetMemoryAddress(DMA2, LL_DMA_STREAM_3, 0U);
-    LL_DMA_SetMemory1Address(DMA2, LL_DMA_STREAM_3, 0U);
-    LL_DMA_SetPeriphAddress(DMA2, LL_DMA_STREAM_3, 0U);
-    LL_DMA_SetDataLength(DMA2, LL_DMA_STREAM_3, 0U);
+    LL_DMA_SetMemoryAddress(DMA2, NX_SDIO_DMA_LANE, 0U);
+    LL_DMA_SetMemory1Address(DMA2, NX_SDIO_DMA_LANE, 0U);
+    LL_DMA_SetPeriphAddress(DMA2, NX_SDIO_DMA_LANE, 0U);
+    LL_DMA_SetDataLength(DMA2, NX_SDIO_DMA_LANE, 0U);
     if (execution->active != NULL &&
         (execution->draining || execution->dma_complete) &&
-        (NX_SDIO_READ(DMA2->LISR) & NX_SDIO_DMA_ERRORS) != 0U)
+        (NX_SDIO_READ(NX_SDIO_DMA_STATUS) & NX_SDIO_DMA_ERRORS) != 0U)
         execution->flags |= SDIO_STA_RXOVERR;
-    NX_SDIO_WRITE(DMA2->LIFCR, NX_SDIO_DMA_FLAGS);
-    NVIC_ClearPendingIRQ(DMA2_Stream3_IRQn);
+    NX_SDIO_WRITE(NX_SDIO_DMA_CLEAR, NX_SDIO_DMA_FLAGS);
+    NVIC_ClearPendingIRQ(NX_SDIO_DMA_IRQ);
     nx_arch_dsb();
-    bool detached = NX_SDIO_READ(DMA2_Stream3->M0AR) == 0U &&
-                    NX_SDIO_READ(DMA2_Stream3->M1AR) == 0U &&
-                    NX_SDIO_READ(DMA2_Stream3->PAR) == 0U &&
-                    NX_SDIO_READ(DMA2_Stream3->NDTR) == 0U &&
-                    (NX_SDIO_READ(DMA2->LISR) & NX_SDIO_DMA_FLAGS) == 0U &&
-                    NVIC_GetPendingIRQ(DMA2_Stream3_IRQn) == 0U &&
-                    NVIC_GetActive(DMA2_Stream3_IRQn) == 0U;
+    bool detached =
+        NX_SDIO_READ(NX_SDIO_DMA_STREAM->M0AR) == 0U &&
+        NX_SDIO_READ(NX_SDIO_DMA_STREAM->M1AR) == 0U &&
+        NX_SDIO_READ(NX_SDIO_DMA_STREAM->PAR) == 0U &&
+        NX_SDIO_READ(NX_SDIO_DMA_STREAM->NDTR) == 0U &&
+        (NX_SDIO_READ(NX_SDIO_DMA_STATUS) & NX_SDIO_DMA_FLAGS) == 0U &&
+        NVIC_GetPendingIRQ(NX_SDIO_DMA_IRQ) == 0U &&
+        NVIC_GetActive(NX_SDIO_DMA_IRQ) == 0U;
     if (detached)
         execution->dma_started = false;
     return detached;
@@ -1526,51 +1567,51 @@ static nx_result_t async_start_transfer(nx_stm32_sdio_state_t* state) {
     if (state->config->engine == NX_STM32_SDIO_DMA) {
         if (!dma_fifo_available() || !dma_detach(state))
             return NX_ERROR_IO;
-        LL_DMA_SetChannelSelection(DMA2, LL_DMA_STREAM_3, LL_DMA_CHANNEL_4);
+        LL_DMA_SetChannelSelection(DMA2, NX_SDIO_DMA_LANE, LL_DMA_CHANNEL_4);
         uint32_t flow = write ? LL_DMA_MODE_NORMAL : LL_DMA_MODE_PFCTRL;
         /* ConfigTransfer does not own DBM, CT or either burst field. A
          * retired stream profile must never introduce a second RAM target
          * or a longer burst into this finite single-buffer owner. */
-        LL_DMA_DisableDoubleBufferMode(DMA2, LL_DMA_STREAM_3);
-        LL_DMA_SetCurrentTargetMem(DMA2, LL_DMA_STREAM_3,
+        LL_DMA_DisableDoubleBufferMode(DMA2, NX_SDIO_DMA_LANE);
+        LL_DMA_SetCurrentTargetMem(DMA2, NX_SDIO_DMA_LANE,
                                    LL_DMA_CURRENTTARGETMEM0);
         LL_DMA_ConfigTransfer(
-            DMA2, LL_DMA_STREAM_3,
+            DMA2, NX_SDIO_DMA_LANE,
             (write ? LL_DMA_DIRECTION_MEMORY_TO_PERIPH
                    : LL_DMA_DIRECTION_PERIPH_TO_MEMORY) |
                 flow | LL_DMA_PERIPH_NOINCREMENT | LL_DMA_MEMORY_INCREMENT |
                 LL_DMA_PDATAALIGN_WORD | LL_DMA_MDATAALIGN_WORD |
                 LL_DMA_PRIORITY_HIGH);
-        LL_DMA_SetMemoryBurstxfer(DMA2, LL_DMA_STREAM_3, LL_DMA_MBURST_INC4);
-        LL_DMA_SetPeriphBurstxfer(DMA2, LL_DMA_STREAM_3, LL_DMA_PBURST_INC4);
+        LL_DMA_SetMemoryBurstxfer(DMA2, NX_SDIO_DMA_LANE, LL_DMA_MBURST_INC4);
+        LL_DMA_SetPeriphBurstxfer(DMA2, NX_SDIO_DMA_LANE, LL_DMA_PBURST_INC4);
         uint32_t profile = DMA_SxCR_CIRC | DMA_SxCR_PFCTRL | DMA_SxCR_DBM |
                            DMA_SxCR_CT | DMA_SxCR_MBURST | DMA_SxCR_PBURST;
-        if ((NX_SDIO_READ(DMA2_Stream3->CR) & profile) !=
+        if ((NX_SDIO_READ(NX_SDIO_DMA_STREAM->CR) & profile) !=
             (flow | LL_DMA_MBURST_INC4 | LL_DMA_PBURST_INC4))
             return NX_ERROR_IO;
-        LL_DMA_EnableFifoMode(DMA2, LL_DMA_STREAM_3);
-        LL_DMA_SetFIFOThreshold(DMA2, LL_DMA_STREAM_3,
+        LL_DMA_EnableFifoMode(DMA2, NX_SDIO_DMA_LANE);
+        LL_DMA_SetFIFOThreshold(DMA2, NX_SDIO_DMA_LANE,
                                 LL_DMA_FIFOTHRESHOLD_FULL);
-        LL_DMA_SetPeriphAddress(DMA2, LL_DMA_STREAM_3,
+        LL_DMA_SetPeriphAddress(DMA2, NX_SDIO_DMA_LANE,
                                 (uint32_t)(uintptr_t)&SDIO->FIFO);
-        LL_DMA_SetMemoryAddress(DMA2, LL_DMA_STREAM_3,
+        LL_DMA_SetMemoryAddress(DMA2, NX_SDIO_DMA_LANE,
                                 (uint32_t)(uintptr_t)data);
         /* TX uses DMA flow so its exact count also bounds source prefetch.
          * RX PFCTRL forces FFFF on EN; the software extent is independent. */
         if (write) {
             uint32_t words = async_bytes(execution) / 4U;
-            LL_DMA_SetDataLength(DMA2, LL_DMA_STREAM_3, words);
-            if (LL_DMA_GetDataLength(DMA2, LL_DMA_STREAM_3) != words)
+            LL_DMA_SetDataLength(DMA2, NX_SDIO_DMA_LANE, words);
+            if (LL_DMA_GetDataLength(DMA2, NX_SDIO_DMA_LANE) != words)
                 return NX_ERROR_IO;
         }
-        LL_DMA_EnableIT_TC(DMA2, LL_DMA_STREAM_3);
-        LL_DMA_EnableIT_TE(DMA2, LL_DMA_STREAM_3);
-        LL_DMA_EnableIT_DME(DMA2, LL_DMA_STREAM_3);
-        LL_DMA_EnableIT_FE(DMA2, LL_DMA_STREAM_3);
+        LL_DMA_EnableIT_TC(DMA2, NX_SDIO_DMA_LANE);
+        LL_DMA_EnableIT_TE(DMA2, NX_SDIO_DMA_LANE);
+        LL_DMA_EnableIT_DME(DMA2, NX_SDIO_DMA_LANE);
+        LL_DMA_EnableIT_FE(DMA2, NX_SDIO_DMA_LANE);
         execution->dma_started = true;
-        LL_DMA_EnableStream(DMA2, LL_DMA_STREAM_3);
+        LL_DMA_EnableStream(DMA2, NX_SDIO_DMA_LANE);
         nx_arch_dsb();
-        if (LL_DMA_IsEnabledStream(DMA2, LL_DMA_STREAM_3) == 0U)
+        if (LL_DMA_IsEnabledStream(DMA2, NX_SDIO_DMA_LANE) == 0U)
             return NX_ERROR_IO;
     }
     sdio_poll_t poll = {request->deadline, state->config->poll_budget, 0U};
@@ -1665,7 +1706,7 @@ static nx_result_t async_submit(void* context, nx_block_request_t* request) {
         return NX_ERROR_STATE;
     if (config->engine == NX_STM32_SDIO_DMA) {
         if ((NX_SDIO_READ(RCC->AHB1ENR) & RCC_AHB1ENR_DMA2EN) == 0U ||
-            LL_DMA_IsEnabledStream(DMA2, LL_DMA_STREAM_3) != 0U ||
+            LL_DMA_IsEnabledStream(DMA2, NX_SDIO_DMA_LANE) != 0U ||
             !dma_fifo_available())
             return NX_ERROR_BUSY;
         result = nx_dma_buffer_validate(
@@ -1725,7 +1766,7 @@ static void async_service(void* context) {
     bool dma_terminal = false;
     if (state->config->engine == NX_STM32_SDIO_DMA) {
         dma_terminal = execution->dma_complete &&
-                       LL_DMA_IsEnabledStream(DMA2, LL_DMA_STREAM_3) == 0U &&
+                       LL_DMA_IsEnabledStream(DMA2, NX_SDIO_DMA_LANE) == 0U &&
                        (write || dma_fifo_empty());
         memory_done = dma_terminal && dma_transferred_words(execution) ==
                                           async_bytes(execution) / 4U;
@@ -1837,12 +1878,12 @@ static void async_service(void* context) {
         if (NVIC_GetEnableIRQ(SDIO_IRQn) == 0U)
             NVIC_EnableIRQ(SDIO_IRQn);
         if (state->config->engine == NX_STM32_SDIO_DMA &&
-            NVIC_GetEnableIRQ(DMA2_Stream3_IRQn) == 0U)
-            NVIC_EnableIRQ(DMA2_Stream3_IRQn);
+            NVIC_GetEnableIRQ(NX_SDIO_DMA_IRQ) == 0U)
+            NVIC_EnableIRQ(NX_SDIO_DMA_IRQ);
         nx_arch_dsb();
         detached = NVIC_GetEnableIRQ(SDIO_IRQn) != 0U &&
                    (state->config->engine != NX_STM32_SDIO_DMA ||
-                    NVIC_GetEnableIRQ(DMA2_Stream3_IRQn) != 0U);
+                    NVIC_GetEnableIRQ(NX_SDIO_DMA_IRQ) != 0U);
     }
     if (detached && restore_mask != 0U) {
         /* Join the old data-vector epoch before arming an independent
@@ -2005,19 +2046,19 @@ void nx_stm32_sdio_dma_irq(nx_stm32_sdio_state_t* state) {
         return;
     nx_stm32_sdio_async_state_t* execution = state->config->async;
     if (!execution->draining &&
-        (NX_SDIO_READ(DMA2_Stream3->CR) &
+        (NX_SDIO_READ(NX_SDIO_DMA_STREAM->CR) &
          (DMA_SxCR_TCIE | DMA_SxCR_TEIE | DMA_SxCR_DMEIE)) == 0U &&
-        (NX_SDIO_READ(DMA2_Stream3->FCR) & DMA_SxFCR_FEIE) == 0U)
+        (NX_SDIO_READ(NX_SDIO_DMA_STREAM->FCR) & DMA_SxFCR_FEIE) == 0U)
         return;
-    uint32_t flags = NX_SDIO_READ(DMA2->LISR) & NX_SDIO_DMA_FLAGS;
+    uint32_t flags = NX_SDIO_READ(NX_SDIO_DMA_STATUS) & NX_SDIO_DMA_FLAGS;
     if ((flags & NX_SDIO_DMA_ERRORS) != 0U)
         execution->flags |= SDIO_STA_RXOVERR;
     if ((flags & NX_SDIO_DMA_TC) != 0U)
         execution->dma_complete = true;
-    NX_SDIO_WRITE(DMA2->LIFCR, flags);
+    NX_SDIO_WRITE(NX_SDIO_DMA_CLEAR, flags);
     nx_arch_dsb();
-    if ((NX_SDIO_READ(DMA2->LISR) & flags) != 0U)
-        NVIC_DisableIRQ(DMA2_Stream3_IRQn);
+    if ((NX_SDIO_READ(NX_SDIO_DMA_STATUS) & flags) != 0U)
+        NVIC_DisableIRQ(NX_SDIO_DMA_IRQ);
 }
 
 static nx_result_t io_check(nx_stm32_sdio_state_t* state, nx_time_us_t deadline,
@@ -2390,7 +2431,7 @@ static nx_result_t io_submit(void* context, nx_sdio_io_request_t* request) {
         if ((request->unit_bytes & 15U) != 0U)
             return NX_ERROR_UNSUPPORTED;
         if ((NX_SDIO_READ(RCC->AHB1ENR) & RCC_AHB1ENR_DMA2EN) == 0U ||
-            LL_DMA_IsEnabledStream(DMA2, LL_DMA_STREAM_3) != 0U ||
+            LL_DMA_IsEnabledStream(DMA2, NX_SDIO_DMA_LANE) != 0U ||
             !dma_fifo_available())
             return NX_ERROR_BUSY;
         result = nx_dma_buffer_validate(
@@ -2496,6 +2537,17 @@ static bool cold_disjoint(const nx_stm32_sdio_state_t* state,
                           const nx_stm32_sdio_receipt_t* receipt) {
     uintptr_t start = (uintptr_t)state;
     uintptr_t acquired = (uintptr_t)receipt;
+    if (config->dma != NULL &&
+        (overlaps(start, sizeof(*state), config->dma, sizeof(*config->dma)) ||
+         overlaps(acquired, sizeof(*receipt), config->dma,
+                  sizeof(*config->dma)) ||
+         (config->async != NULL &&
+          overlaps((uintptr_t)config->async, sizeof(*config->async),
+                   config->dma, sizeof(*config->dma))) ||
+         (config->io != NULL &&
+          overlaps((uintptr_t)config->io, sizeof(*config->io), config->dma,
+                   sizeof(*config->dma)))))
+        return false;
     if (config->io != NULL &&
         (overlaps((uintptr_t)config->io, sizeof(*config->io), state,
                   sizeof(*state)) ||
@@ -2538,6 +2590,9 @@ static bool cold_disjoint(const nx_stm32_sdio_state_t* state,
             overlaps(acquired, sizeof(*receipt), (void*)snapshot,
                      sizeof(uint16_t)) ||
             overlaps(snapshot, sizeof(uint16_t), config, sizeof(*config)) ||
+            (config->dma != NULL &&
+             overlaps(snapshot, sizeof(uint16_t), config->dma,
+                      sizeof(*config->dma))) ||
             overlaps(snapshot, sizeof(uint16_t), config->pins,
                      pin_count(config) * sizeof(*config->pins)) ||
             (config->io != NULL && overlaps(snapshot, sizeof(uint16_t),
@@ -2580,10 +2635,10 @@ nx_result_t nx_stm32_sdio_prepare(nx_stm32_sdio_state_t* state,
     if (config->engine == NX_STM32_SDIO_DMA) {
         if ((NX_SDIO_READ(RCC->AHB1ENR) & RCC_AHB1ENR_DMA2EN) == 0U)
             return NX_ERROR_STATE;
-        if (NVIC_GetEnableIRQ(DMA2_Stream3_IRQn) != 0U ||
-            NVIC_GetPendingIRQ(DMA2_Stream3_IRQn) != 0U ||
-            NVIC_GetActive(DMA2_Stream3_IRQn) != 0U ||
-            LL_DMA_IsEnabledStream(DMA2, LL_DMA_STREAM_3) != 0U ||
+        if (NVIC_GetEnableIRQ(NX_SDIO_DMA_IRQ) != 0U ||
+            NVIC_GetPendingIRQ(NX_SDIO_DMA_IRQ) != 0U ||
+            NVIC_GetActive(NX_SDIO_DMA_IRQ) != 0U ||
+            LL_DMA_IsEnabledStream(DMA2, NX_SDIO_DMA_LANE) != 0U ||
             !dma_fifo_available())
             return NX_ERROR_BUSY;
     }
@@ -2628,21 +2683,22 @@ nx_result_t nx_stm32_sdio_prepare(nx_stm32_sdio_state_t* state,
     }
     if (config->engine != NX_STM32_SDIO_POLL) {
         receipt->sdio_priority = (uint8_t)NVIC_GetPriority(SDIO_IRQn);
-        receipt->dma_priority = (uint8_t)NVIC_GetPriority(DMA2_Stream3_IRQn);
+        if (config->engine == NX_STM32_SDIO_DMA)
+            receipt->dma_priority = (uint8_t)NVIC_GetPriority(NX_SDIO_DMA_IRQ);
         receipt->vectors = true;
         NVIC_SetPriority(SDIO_IRQn, config->irq_priority);
         NVIC_EnableIRQ(SDIO_IRQn);
         if (config->engine == NX_STM32_SDIO_DMA) {
-            NX_SDIO_WRITE(DMA2->LIFCR, NX_SDIO_DMA_FLAGS);
-            NVIC_SetPriority(DMA2_Stream3_IRQn, config->irq_priority);
-            NVIC_EnableIRQ(DMA2_Stream3_IRQn);
+            NX_SDIO_WRITE(NX_SDIO_DMA_CLEAR, NX_SDIO_DMA_FLAGS);
+            NVIC_SetPriority(NX_SDIO_DMA_IRQ, config->irq_priority);
+            NVIC_EnableIRQ(NX_SDIO_DMA_IRQ);
         }
         nx_arch_dsb();
         if (NVIC_GetEnableIRQ(SDIO_IRQn) == 0U ||
             NVIC_GetPriority(SDIO_IRQn) != config->irq_priority ||
             (config->engine == NX_STM32_SDIO_DMA &&
-             (NVIC_GetEnableIRQ(DMA2_Stream3_IRQn) == 0U ||
-              NVIC_GetPriority(DMA2_Stream3_IRQn) != config->irq_priority)))
+             (NVIC_GetEnableIRQ(NX_SDIO_DMA_IRQ) == 0U ||
+              NVIC_GetPriority(NX_SDIO_DMA_IRQ) != config->irq_priority)))
             return NX_ERROR_IO;
     }
     state->infrastructure = true;
@@ -2699,8 +2755,8 @@ nx_result_t nx_stm32_sdio_close(nx_stm32_sdio_state_t* state,
         if (config->engine == NX_STM32_SDIO_DMA) {
             if (!dma_detach(state))
                 return NX_ERROR_IO;
-            NVIC_DisableIRQ(DMA2_Stream3_IRQn);
-            NVIC_ClearPendingIRQ(DMA2_Stream3_IRQn);
+            NVIC_DisableIRQ(NX_SDIO_DMA_IRQ);
+            NVIC_ClearPendingIRQ(NX_SDIO_DMA_IRQ);
         }
         nx_arch_dsb();
         if (NX_SDIO_READ(SDIO->MASK) != 0U ||
@@ -2708,13 +2764,13 @@ nx_result_t nx_stm32_sdio_close(nx_stm32_sdio_state_t* state,
             NVIC_GetPendingIRQ(SDIO_IRQn) != 0U ||
             NVIC_GetActive(SDIO_IRQn) != 0U ||
             (config->engine == NX_STM32_SDIO_DMA &&
-             (NVIC_GetEnableIRQ(DMA2_Stream3_IRQn) != 0U ||
-              NVIC_GetPendingIRQ(DMA2_Stream3_IRQn) != 0U ||
-              NVIC_GetActive(DMA2_Stream3_IRQn) != 0U)))
+             (NVIC_GetEnableIRQ(NX_SDIO_DMA_IRQ) != 0U ||
+              NVIC_GetPendingIRQ(NX_SDIO_DMA_IRQ) != 0U ||
+              NVIC_GetActive(NX_SDIO_DMA_IRQ) != 0U)))
             return NX_ERROR_IO;
         NVIC_SetPriority(SDIO_IRQn, receipt->sdio_priority);
         if (config->engine == NX_STM32_SDIO_DMA)
-            NVIC_SetPriority(DMA2_Stream3_IRQn, receipt->dma_priority);
+            NVIC_SetPriority(NX_SDIO_DMA_IRQ, receipt->dma_priority);
         receipt->vectors = false;
     }
     for (size_t i = pin_count(config); i != 0U; --i) {

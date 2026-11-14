@@ -6,6 +6,7 @@
  * \date            2026-10-09
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "i2c_v1_async.h"
 #include "stm32f407_provider.h"
 #include <assert.h>
 #include <stdio.h>
@@ -488,9 +489,10 @@ static void spi_test(void) {
 static void i2c_test(void) {
     I2C_TypeDef registers = {0};
     GPIO_TypeDef lines = {.IDR = (1U << 6U) | (1U << 7U)};
+    const nx_i2c_v1_lines_t line_config = {{&lines.IDR, &lines.IDR},
+                                           {1U << 6U, 1U << 7U}};
     nx_stm32_i2c_state_t port = {.registers = &registers,
-                                 .line_gpio = &lines,
-                                 .line_mask = (1U << 6U) | (1U << 7U),
+                                 .lines = &line_config,
                                  .peripheral_mhz = 42U,
                                  .rate_hz = 100000U};
     const nx_i2c_port_t port_api = {&nx_stm32_i2c_ops, &port};

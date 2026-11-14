@@ -13,6 +13,7 @@ nx_stm32_system_t g_nx_stm32_system;
 GPIO_TypeDef g_nx_stm32_gpioa_model;
 NVIC_Type g_nx_i2c_cold_nvic;
 }
+#include "stm32_i2c_dma_fixture.h"
 #include <cstring>
 #include <gtest/gtest.h>
 #include <sys/mman.h>
@@ -27,9 +28,11 @@ class I2CCold : public testing::Test {
   protected:
     void* peripherals = MAP_FAILED;
     uint16_t snapshots[2]{};
-    nx_stm32_i2c_pin_config_t pins[2]{{&snapshots[0], 6U}, {&snapshots[1], 7U}};
+    nx_stm32_i2c_pin_config_t pins[2]{{GPIOB, &snapshots[0], 1U, 6U},
+                                      {GPIOB, &snapshots[1], 1U, 7U}};
+    nx_i2c_v1_lines_t line_config{{&GPIOB->IDR, &GPIOB->IDR}, {64U, 128U}};
     nx_stm32_i2c_config_t config{I2C1, pins,  nullptr, NEXUS_APB1_HZ,
-                                 5U,   false, 100000U};
+                                 5U,   false, 100000U, &line_config};
     nx_stm32_i2c_cold_receipt_t receipt{};
     nx_stm32_i2c_state_t state{};
 
@@ -58,16 +61,31 @@ class I2CCold : public testing::Test {
             EXPECT_EQ(0, munmap(peripherals, 0x80000U));
         }
     }
+    void Lines() {
+        if (config.lines != &line_config)
+            return;
+        for (size_t i = 0U; i < 2U; ++i) {
+            line_config.inputs[i] = &pins[i].registers->IDR;
+            line_config.masks[i] = static_cast<uint16_t>(1U << pins[i].pin);
+        }
+    }
     nx_result_t Prepare() {
+        Lines();
         return nx_stm32_i2c_prepare(&state, &config, &receipt);
+    }
+    nx_result_t PrepareAsync(nx_i2c_v1_state_t* owner,
+                             nx_stm32_i2c_cold_receipt_t* acquired = nullptr) {
+        Lines();
+        return nx_stm32_i2c_async_prepare(
+            owner, &config, acquired == nullptr ? &receipt : acquired);
     }
     nx_result_t Close() {
         return nx_stm32_i2c_close(&state, &config, &receipt);
     }
     void Third() {
         config.registers = I2C3;
-        pins[0].pin = 8U;
-        pins[1].pin = 9U;
+        pins[0] = {GPIOA, &snapshots[0], 0U, 8U};
+        pins[1] = {GPIOC, &snapshots[1], 2U, 9U};
         GPIOA->IDR = 1U << 8U;
         GPIOC->IDR = 1U << 9U;
     }
@@ -82,12 +100,42 @@ TEST_F(I2CCold, StaticFactsRejectBeforeAnyHardwareEffect) {
     EXPECT_EQ(0U, receipt.effects & NX_STM32_I2C_COLD_OWNED);
 }
 
+TEST_F(I2CCold, SelectedAlternateBanksRestoreAndRecoverThroughOneLineBinding) {
+    pins[0] = {GPIOF, &snapshots[0], 5U, 1U};
+    pins[1] = {GPIOF, &snapshots[1], 5U, 0U};
+    static const nx_i2c_v1_lines_t lines{{&GPIOF->IDR, &GPIOF->IDR}, {2U, 1U}};
+    config.registers = I2C2;
+    config.lines = &lines;
+    GPIOF->IDR = 3U;
+    GPIOF->MODER = 0xFFFF0000U;
+    const uint32_t mode = GPIOF->MODER;
+    for (bool asynchronous : {false, true}) {
+        config.asynchronous = asynchronous;
+        nx_i2c_v1_state_t async{};
+        ASSERT_EQ(NX_SUCCESS, asynchronous ? PrepareAsync(&async) : Prepare());
+        EXPECT_EQ(RCC_AHB1ENR_GPIOFEN, RCC->AHB1ENR);
+        EXPECT_EQ(0U, GPIOB->MODER & 0xFU);
+        GPIOF->IDR &= ~UINT32_C(1);
+        const nx_i2c_port_t bus{&nx_i2c_v1_async_ops, &async};
+        EXPECT_EQ(NX_ERROR_IO, asynchronous ? nx_i2c_port_recover(&bus)
+                                            : nx_stm32_i2c_recover(&state));
+        GPIOF->IDR = 3U;
+        EXPECT_EQ(NX_SUCCESS, asynchronous ? nx_i2c_port_recover(&bus)
+                                           : nx_stm32_i2c_recover(&state));
+        ASSERT_EQ(NX_SUCCESS, asynchronous ? nx_stm32_i2c_async_close(
+                                                 &async, &config, &receipt)
+                                           : Close());
+        EXPECT_EQ(mode, GPIOF->MODER);
+        EXPECT_EQ(0U, RCC->AHB1ENR);
+        EXPECT_EQ(0U, receipt.effects);
+    }
+}
+
 TEST_F(I2CCold, FastProfileUsesEveryControllerAndRestoresItsColdResources) {
     const nx_dma_memory_region_t region{
         0x20000000U, 0x20000U, NX_DMA_MEMORY_READ | NX_DMA_MEMORY_WRITE};
-    const nx_i2c_v1_dma_t dma[] = {NX_STM32_I2C1_DMA(&region, 1U),
-                                   NX_STM32_I2C2_DMA(&region, 1U),
-                                   NX_STM32_I2C3_DMA(&region, 1U)};
+    const nx_i2c_v1_dma_t dma[] = {I2C1Dma(&region, 1U), I2C2Dma(&region, 1U),
+                                   I2C3Dma(&region, 1U)};
     I2C_TypeDef* const controllers[] = {I2C1, I2C2, I2C3};
     for (unsigned index = 0U; index < 3U; ++index) {
         for (unsigned mode = 0U; mode < 3U; ++mode) {
@@ -97,15 +145,22 @@ TEST_F(I2CCold, FastProfileUsesEveryControllerAndRestoresItsColdResources) {
             config.max_hz = 400000U;
             config.asynchronous = mode != 0U;
             config.dma = mode == 2U ? &dma[index] : nullptr;
-            pins[0].pin = index == 0U ? 6U : index == 1U ? 10U : 8U;
-            pins[1].pin = index == 0U ? 7U : index == 1U ? 11U : 9U;
+            pins[0] = {index == 2U ? GPIOA : GPIOB, &snapshots[0],
+                       static_cast<uint8_t>(index == 2U ? 0U : 1U),
+                       static_cast<uint8_t>(index == 0U   ? 6U
+                                            : index == 1U ? 10U
+                                                          : 8U)};
+            pins[1] = {index == 2U ? GPIOC : GPIOB, &snapshots[1],
+                       static_cast<uint8_t>(index == 2U ? 2U : 1U),
+                       static_cast<uint8_t>(index == 0U   ? 7U
+                                            : index == 1U ? 11U
+                                                          : 9U)};
             GPIOB->IDR |= (1U << pins[0].pin) | (1U << pins[1].pin);
             GPIOA->IDR = 1U << 8U;
             GPIOC->IDR = 1U << 9U;
             nx_i2c_v1_state_t async{};
-            ASSERT_EQ(NX_SUCCESS, mode == 0U ? Prepare()
-                                             : nx_stm32_i2c_async_prepare(
-                                                   &async, &config, &receipt));
+            ASSERT_EQ(NX_SUCCESS,
+                      mode == 0U ? Prepare() : PrepareAsync(&async));
             EXPECT_EQ(NEXUS_APB1_HZ == 21000000U ? 0x8012U : 0x8024U,
                       config.registers->CCR);
             EXPECT_EQ(NEXUS_APB1_HZ == 21000000U ? 7U : 13U,
@@ -128,6 +183,34 @@ TEST_F(I2CCold, FastProfileUsesEveryControllerAndRestoresItsColdResources) {
             EXPECT_EQ(0U, RCC->AHB1ENR);
         }
     }
+}
+
+TEST_F(I2CCold, AlternateDmaColdOwnerCapturesOnlySelectedPublishers) {
+    config.registers = I2C2;
+    config.asynchronous = true;
+    pins[0] = {GPIOF, &snapshots[0], 5U, 1U};
+    pins[1] = {GPIOF, &snapshots[1], 5U, 0U};
+    GPIOF->IDR = 3U;
+    const nx_dma_memory_region_t region{
+        0x20000000U, 1024U, NX_DMA_MEMORY_READ | NX_DMA_MEMORY_WRITE};
+    nx_i2c_v1_dma_t dma = I2C2Dma(&region, 1U);
+    dma.rx = I2CDmaEngine(DMA1_Stream3, 3U, 7U, DMA1_Stream3_IRQn, true);
+    config.dma = &dma;
+    NVIC_EnableIRQ(DMA1_Stream2_IRQn);
+    NVIC->IPR[DMA1_Stream2_IRQn] = 0x73U;
+    NVIC->IPR[DMA1_Stream3_IRQn] = 0x91U;
+    nx_i2c_v1_state_t async{};
+    ASSERT_EQ(NX_SUCCESS, PrepareAsync(&async));
+    EXPECT_EQ(1U, NVIC_GetEnableIRQ(DMA1_Stream3_IRQn));
+    EXPECT_EQ(0x50U, NVIC->IPR[DMA1_Stream3_IRQn]);
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_i2c_async_close(&async, &config, &receipt));
+    EXPECT_EQ(0U, NVIC_GetEnableIRQ(DMA1_Stream3_IRQn));
+    EXPECT_EQ(0x91U, NVIC->IPR[DMA1_Stream3_IRQn]);
+    EXPECT_EQ(1U, NVIC_GetEnableIRQ(DMA1_Stream2_IRQn));
+    EXPECT_EQ(0x73U, NVIC->IPR[DMA1_Stream2_IRQn]);
+    EXPECT_EQ(0U, receipt.effects);
+    EXPECT_EQ(0U, RCC->AHB1ENR);
+    EXPECT_EQ(0U, RCC->APB1ENR);
 }
 
 TEST_F(I2CCold, ContextRejectsBeforeClockOrPinChanges) {
@@ -180,8 +263,7 @@ TEST_F(I2CCold, SecondControllerGateEncodingPreservesEveryInitialState) {
         NVIC->IPR[I2C2_EV_IRQn] = 0x64U;
         NVIC->IPR[I2C2_ER_IRQn] = 0xA2U;
         nx_i2c_v1_state_t async{};
-        ASSERT_EQ(NX_SUCCESS,
-                  nx_stm32_i2c_async_prepare(&async, &config, &receipt));
+        ASSERT_EQ(NX_SUCCESS, PrepareAsync(&async));
         ASSERT_EQ(NX_SUCCESS,
                   nx_stm32_i2c_async_close(&async, &config, &receipt));
         EXPECT_EQ(gpio, RCC->AHB1ENR);
@@ -277,7 +359,7 @@ TEST_F(I2CCold, RejectedPollingPrepareCannotEraseAnotherColdOwner) {
     EXPECT_EQ(NX_ERROR_BUSY, nx_stm32_i2c_close(&state, &config, &rejected));
     EXPECT_EQ(original.registers, state.registers);
     EXPECT_EQ(original.initialized, state.initialized);
-    EXPECT_EQ(original.line_gpio, state.line_gpio);
+    EXPECT_EQ(original.lines, state.lines);
     EXPECT_EQ(cr1, I2C1->CR1);
     EXPECT_EQ(mode, GPIOB->MODER);
     ASSERT_EQ(NX_SUCCESS, Close());
@@ -286,21 +368,18 @@ TEST_F(I2CCold, RejectedPollingPrepareCannotEraseAnotherColdOwner) {
 TEST_F(I2CCold, RejectedAsyncPrepareCannotEraseAnotherColdOwner) {
     config.asynchronous = true;
     nx_i2c_v1_state_t owner{};
-    ASSERT_EQ(NX_SUCCESS,
-              nx_stm32_i2c_async_prepare(&owner, &config, &receipt));
+    ASSERT_EQ(NX_SUCCESS, PrepareAsync(&owner));
     const nx_i2c_v1_state_t original = owner;
     const uint32_t cr1 = I2C1->CR1;
     const uint32_t mode = GPIOB->MODER;
     const uint32_t vectors = NVIC->ISER[0];
     nx_stm32_i2c_cold_receipt_t rejected{};
-    EXPECT_EQ(NX_ERROR_BUSY,
-              nx_stm32_i2c_async_prepare(&owner, &config, &rejected));
+    EXPECT_EQ(NX_ERROR_BUSY, PrepareAsync(&owner, &rejected));
     EXPECT_EQ(NX_ERROR_BUSY,
               nx_stm32_i2c_async_close(&owner, &config, &rejected));
     EXPECT_EQ(original.registers, owner.registers);
     EXPECT_EQ(original.initialized, owner.initialized);
-    EXPECT_EQ(original.line_inputs, owner.line_inputs);
-    EXPECT_EQ(original.line_mask, owner.line_mask);
+    EXPECT_EQ(original.lines, owner.lines);
     EXPECT_EQ(cr1, I2C1->CR1);
     EXPECT_EQ(mode, GPIOB->MODER);
     EXPECT_EQ(vectors, NVIC->ISER[0]);
@@ -350,11 +429,10 @@ TEST_F(I2CCold, AsynchronousPrepareCloseRestoresPublisherPriorities) {
     nx_i2c_v1_state_t async{};
     NVIC->IPR[I2C1_EV_IRQn] = 0x73U;
     NVIC->IPR[I2C1_ER_IRQn] = 0x9FU;
-    ASSERT_EQ(NX_SUCCESS,
-              nx_stm32_i2c_async_prepare(&async, &config, &receipt));
+    ASSERT_EQ(NX_SUCCESS, PrepareAsync(&async));
     EXPECT_TRUE(async.initialized);
     EXPECT_EQ(reinterpret_cast<volatile uint32_t*>(I2C1), async.registers);
-    EXPECT_EQ(0xC0U, async.line_mask);
+    EXPECT_EQ(0xC0U, async.lines->masks[0] | async.lines->masks[1]);
     NVIC->IPR[I2C1_EV_IRQn] = 0x50U;
     NVIC->IPR[I2C1_ER_IRQn] = 0x50U;
     EXPECT_EQ(NX_SUCCESS, nx_stm32_i2c_async_close(&async, &config, &receipt));
@@ -367,8 +445,7 @@ TEST_F(I2CCold, AsynchronousPrepareCloseRestoresPublisherPriorities) {
 TEST_F(I2CCold, ActivePublisherDuringCloseRetainsPadsAndBothGates) {
     config.asynchronous = true;
     nx_i2c_v1_state_t async{};
-    ASSERT_EQ(NX_SUCCESS,
-              nx_stm32_i2c_async_prepare(&async, &config, &receipt));
+    ASSERT_EQ(NX_SUCCESS, PrepareAsync(&async));
     const auto mode = GPIOB->MODER;
     const unsigned irq = static_cast<unsigned>(I2C1_EV_IRQn);
     *const_cast<volatile uint32_t*>(&NVIC->IABR[irq / 32U]) = 1U << (irq % 32U);
@@ -388,8 +465,7 @@ TEST_F(I2CCold, PriorityRestoreRefusalRetainsAllOriginalPriorityBytes) {
     nx_i2c_v1_state_t async{};
     NVIC->IPR[I2C1_EV_IRQn] = 0x73U;
     NVIC->IPR[I2C1_ER_IRQn] = 0x9FU;
-    ASSERT_EQ(NX_SUCCESS,
-              nx_stm32_i2c_async_prepare(&async, &config, &receipt));
+    ASSERT_EQ(NX_SUCCESS, PrepareAsync(&async));
     const auto mode = GPIOB->MODER;
     refused_priority = static_cast<int>(I2C1_ER_IRQn);
     EXPECT_EQ(NX_ERROR_IO, nx_stm32_i2c_async_close(&async, &config, &receipt));
@@ -409,8 +485,7 @@ TEST_F(I2CCold, PendingPublisherRejectsWithoutAcquiringHardware) {
     nx_i2c_v1_state_t async{};
     NVIC->ISPR[(unsigned)I2C1_EV_IRQn / 32U] =
         1U << ((unsigned)I2C1_EV_IRQn % 32U);
-    EXPECT_EQ(NX_ERROR_BUSY,
-              nx_stm32_i2c_async_prepare(&async, &config, &receipt));
+    EXPECT_EQ(NX_ERROR_BUSY, PrepareAsync(&async));
     EXPECT_EQ(0U, RCC->AHB1ENR);
     EXPECT_EQ(0U, RCC->APB1ENR);
     EXPECT_EQ(0U, receipt.effects & NX_STM32_I2C_COLD_OWNED);
@@ -421,8 +496,7 @@ TEST_F(I2CCold, ActivePublisherRejectsWithoutErasingItsIndependentFact) {
     const unsigned irq = (unsigned)I2C1_EV_IRQn;
     *const_cast<volatile uint32_t*>(&NVIC->IABR[irq / 32U]) = 1U << (irq % 32U);
     nx_i2c_v1_state_t async{};
-    EXPECT_EQ(NX_ERROR_BUSY,
-              nx_stm32_i2c_async_prepare(&async, &config, &receipt));
+    EXPECT_EQ(NX_ERROR_BUSY, PrepareAsync(&async));
     EXPECT_EQ(1U, NVIC_GetActive(I2C1_EV_IRQn));
     EXPECT_EQ(0U, NVIC_GetPendingIRQ(I2C1_EV_IRQn));
     EXPECT_EQ(0U, NVIC_GetEnableIRQ(I2C1_EV_IRQn));
@@ -433,8 +507,7 @@ TEST_F(I2CCold, RefusedPublisherEnableDoesNotReportSuccessfulPrepare) {
     config.asynchronous = true;
     nx_i2c_v1_state_t async{};
     refused_irq = (int)I2C1_ER_IRQn;
-    EXPECT_EQ(NX_ERROR_IO,
-              nx_stm32_i2c_async_prepare(&async, &config, &receipt));
+    EXPECT_EQ(NX_ERROR_IO, PrepareAsync(&async));
     refused_irq = -1;
     EXPECT_EQ(NX_SUCCESS, nx_stm32_i2c_async_close(&async, &config, &receipt));
     EXPECT_EQ(0U, RCC->APB1ENR);
@@ -445,8 +518,7 @@ TEST_F(I2CCold, RefusedPublisherPriorityDoesNotReportSuccessfulPrepare) {
     config.asynchronous = true;
     nx_i2c_v1_state_t async{};
     refused_priority = (int)I2C1_ER_IRQn;
-    EXPECT_EQ(NX_ERROR_IO,
-              nx_stm32_i2c_async_prepare(&async, &config, &receipt));
+    EXPECT_EQ(NX_ERROR_IO, PrepareAsync(&async));
     refused_priority = -1;
     EXPECT_EQ(NX_SUCCESS, nx_stm32_i2c_async_close(&async, &config, &receipt));
     EXPECT_EQ(0U, RCC->APB1ENR);
@@ -458,8 +530,7 @@ TEST_F(I2CCold, BusyBusRollsBackAsynchronousAcquisition) {
     nx_i2c_v1_state_t async{};
     I2C1->SR2 = I2C_SR2_BUSY;
     auto original = GPIOB->MODER;
-    EXPECT_EQ(NX_ERROR_BUSY,
-              nx_stm32_i2c_async_prepare(&async, &config, &receipt));
+    EXPECT_EQ(NX_ERROR_BUSY, PrepareAsync(&async));
     EXPECT_EQ(original, GPIOB->MODER);
     EXPECT_EQ(0U, RCC->AHB1ENR);
     EXPECT_EQ(0U, RCC->APB1ENR);
@@ -470,13 +541,15 @@ TEST_F(I2CCold, BusyBusRollsBackAsynchronousAcquisition) {
 TEST_F(I2CCold, SecondControllerKeepsFirstControllerIndependent) {
     config.asynchronous = true;
     nx_i2c_v1_state_t first{};
-    ASSERT_EQ(NX_SUCCESS,
-              nx_stm32_i2c_async_prepare(&first, &config, &receipt));
+    ASSERT_EQ(NX_SUCCESS, PrepareAsync(&first));
     uint16_t other_snapshots[2]{};
-    nx_stm32_i2c_pin_config_t other_pins[2]{{&other_snapshots[0], 10U},
-                                            {&other_snapshots[1], 11U}};
+    nx_stm32_i2c_pin_config_t other_pins[2]{
+        {GPIOB, &other_snapshots[0], 1U, 10U},
+        {GPIOB, &other_snapshots[1], 1U, 11U}};
+    const nx_i2c_v1_lines_t other_lines{{&GPIOB->IDR, &GPIOB->IDR},
+                                        {1024U, 2048U}};
     nx_stm32_i2c_config_t other_config{I2C2, other_pins, nullptr, NEXUS_APB1_HZ,
-                                       5U,   true,       100000U};
+                                       5U,   true,       100000U, &other_lines};
     nx_stm32_i2c_cold_receipt_t other_receipt{};
     nx_i2c_v1_state_t second{};
     GPIOB->IDR |= 0xC00U;
@@ -493,19 +566,21 @@ TEST_F(I2CCold, SecondControllerKeepsFirstControllerIndependent) {
 TEST_F(I2CCold, SecondPollingKeepsLiveFirstOwnerThroughFailedGateRelease) {
     config.asynchronous = true;
     nx_i2c_v1_state_t first{};
-    ASSERT_EQ(NX_SUCCESS,
-              nx_stm32_i2c_async_prepare(&first, &config, &receipt));
+    ASSERT_EQ(NX_SUCCESS, PrepareAsync(&first));
     uint16_t saved[2]{};
-    const nx_stm32_i2c_pin_config_t other_pins[]{{&saved[0], 10U},
-                                                 {&saved[1], 11U}};
-    const nx_stm32_i2c_config_t selected{
-        I2C2, other_pins, nullptr, NEXUS_APB1_HZ, 5U, false, 100000U};
+    const nx_stm32_i2c_pin_config_t other_pins[]{{GPIOB, &saved[0], 1U, 10U},
+                                                 {GPIOB, &saved[1], 1U, 11U}};
+    const nx_i2c_v1_lines_t other_lines{{&GPIOB->IDR, &GPIOB->IDR},
+                                        {1024U, 2048U}};
+    const nx_stm32_i2c_config_t selected{I2C2,          other_pins,  nullptr,
+                                         NEXUS_APB1_HZ, 5U,          false,
+                                         100000U,       &other_lines};
     nx_stm32_i2c_state_t other{};
     nx_stm32_i2c_cold_receipt_t acquired{};
     GPIOB->IDR |= 0xC00U;
     ASSERT_EQ(NX_SUCCESS, nx_stm32_i2c_prepare(&other, &selected, &acquired));
     EXPECT_EQ(I2C2, other.registers);
-    EXPECT_EQ(0xC00U, other.line_mask);
+    EXPECT_EQ(0xC00U, other.lines->masks[0] | other.lines->masks[1]);
     refused = &RCC->APB1ENR;
     EXPECT_NE(NX_SUCCESS, nx_stm32_i2c_close(&other, &selected, &acquired));
     EXPECT_NE(0U, acquired.effects);
@@ -588,8 +663,7 @@ TEST_F(I2CCold, ThirdRecoveryObservesSclAndSdaOnTheirActualBanks) {
     ASSERT_EQ(NX_SUCCESS, Close());
     config.asynchronous = true;
     nx_i2c_v1_state_t async{};
-    ASSERT_EQ(NX_SUCCESS,
-              nx_stm32_i2c_async_prepare(&async, &config, &receipt));
+    ASSERT_EQ(NX_SUCCESS, PrepareAsync(&async));
     GPIOC->IDR &= ~(1U << 9U);
     EXPECT_EQ(NX_ERROR_IO, nx_i2c_v1_async_ops.recover(&async));
     GPIOC->IDR |= 1U << 9U;
@@ -605,27 +679,14 @@ TEST_F(I2CCold, ThirdDmaOwnsOnlyItsExactPublishersAndRestoresPriorities) {
     config.asynchronous = true;
     const nx_dma_memory_region_t region{
         0x20000000U, 1024U, NX_DMA_MEMORY_READ | NX_DMA_MEMORY_WRITE};
-    nx_i2c_v1_dma_t dma = NX_STM32_I2C2_DMA(&region, 1U);
-    dma.tx = {&DMA1_Stream4->CR,
-              &DMA1_Stream4->NDTR,
-              &DMA1_Stream4->PAR,
-              &DMA1_Stream4->M0AR,
-              &DMA1_Stream4->FCR,
-              &DMA1->HISR,
-              &DMA1->HIFCR,
-              (3U << 25U) | (1U << 16U) | DMA_SxCR_MINC | DMA_SxCR_DIR_0 |
-                  DMA_SxCR_TCIE | DMA_SxCR_TEIE | DMA_SxCR_DMEIE,
-              0U};
-    dma.rx.configuration = (3U << 25U) | (1U << 16U) | DMA_SxCR_MINC |
-                           DMA_SxCR_TCIE | DMA_SxCR_TEIE | DMA_SxCR_DMEIE;
+    nx_i2c_v1_dma_t dma = I2C3Dma(&region, 1U);
     config.dma = &dma;
     const IRQn_Type vectors[] = {I2C3_EV_IRQn, I2C3_ER_IRQn, DMA1_Stream2_IRQn,
                                  DMA1_Stream4_IRQn};
     for (size_t i = 0U; i < 4U; ++i)
         NVIC->IPR[vectors[i]] = (uint8_t)(0x91U + i);
     nx_i2c_v1_state_t async{};
-    ASSERT_EQ(NX_SUCCESS,
-              nx_stm32_i2c_async_prepare(&async, &config, &receipt));
+    ASSERT_EQ(NX_SUCCESS, PrepareAsync(&async));
     for (auto irq : vectors) {
         EXPECT_EQ(1U, NVIC_GetEnableIRQ(irq));
         EXPECT_EQ(0x50U, NVIC->IPR[irq]);
@@ -653,8 +714,7 @@ TEST_F(I2CCold, ThirdForeignPublisherRejectsBeforeClocksOrPads) {
                        : NVIC->ISPR;
             bank[index / 32U] = 1U << (index % 32U);
             nx_i2c_v1_state_t async{};
-            EXPECT_EQ(NX_ERROR_BUSY,
-                      nx_stm32_i2c_async_prepare(&async, &config, &receipt));
+            EXPECT_EQ(NX_ERROR_BUSY, PrepareAsync(&async));
             EXPECT_EQ(0U, receipt.effects);
             EXPECT_EQ(0U, RCC->AHB1ENR);
             EXPECT_EQ(0U, RCC->APB1ENR);

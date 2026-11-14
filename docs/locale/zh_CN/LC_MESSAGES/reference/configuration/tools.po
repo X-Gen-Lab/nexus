@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 3d9b127fb594ba7f213202ff30c75dd4dacaaec106ead6e86f41b7e0cdea2a67\n"
+"X-Nexus-Source-SHA256: aa827cf5bf633e7d8be89c53f2abf7af64c1e0d22fce1d0d46a4c719bbd1e127\n"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/tools.md:9
 msgid "Configuration, development and evidence tools"
@@ -224,3 +224,13 @@ msgid ""
 msgstr ""
 "新报告要求实际执行数量大于零，并保留原始日志。工具缺失、空 "
 "XML、只有跳过的运行、陈旧输出或输入变化都不能通过门禁。完整验收执行不得过滤或分片。开发子集保留有限范围，不能关闭完整候选退出条件。"
+
+
+msgid "Managed build-directory ownership"
+msgstr "托管构建目录所有权"
+
+msgid "Managed configure/build/test/check, TDD, Native runtime and matrix entries share one kernel lock per canonical build directory through all stages and report publication. An independent managed execution in that directory rejects immediately; separate build directories can run in parallel. Independent command logs do not make a shared build directory safe."
+msgstr "托管 configure／build／test／check、TDD、Native runtime 和 matrix 共用每个规范构建目录的内核锁，覆盖所有阶段及报告发布。同目录另一独立托管执行立即拒绝，不同构建目录可以并行。独立命令日志不能保证共享构建目录安全。"
+
+msgid "POSIX nested commands inherit real file descriptors after directory and file identity checks. Same-thread composition is reentrant; other threads do not automatically inherit ownership. Cancellation drains owned processes before the last descriptor releases the lock. Windows supports standalone file locks; nested managed execution explicitly requires POSIX descriptor inheritance. Descriptor inheritance delegates ownership within one orchestration. The parent must serialize child stages using the same build directory; children sharing one delegated descriptor are not mutually exclusive. Direct CMake, Ninja and CTest do not participate; keep those directories exclusive until direct commands finish. This coordination does not establish Windows matrix or firmware qualification."
+msgstr "POSIX 嵌套命令在核对目录与文件身份后继承真实文件描述符。同线程组合可重入，其他线程不自动继承所有权。取消先排空所属进程，再由最后一个描述符释放锁。Windows 支持独立文件锁，嵌套托管执行明确要求 POSIX 描述符继承。继承描述符表示同一编排内的委托；父编排必须串行执行同目录子阶段，共享同一委托描述符的子进程之间不自动互斥。直接 CMake、Ninja 和 CTest 不参与；直接命令完成前保持目录独占。这项协调不建立 Windows 矩阵或固件资格。"

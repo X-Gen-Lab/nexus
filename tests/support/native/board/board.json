@@ -3,6 +3,9 @@
   "id": "native-reference",
   "soc": "NATIVE_MODEL",
   "soc_family": "native",
+  "backend_support": [
+    "threadx"
+  ],
   "source_revision": "native-model-v1",
   "physical_pcb_revision": null,
   "clocks": {

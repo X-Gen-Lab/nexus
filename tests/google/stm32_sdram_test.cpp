@@ -183,9 +183,39 @@ TEST_F(SDRAM, OfficialCommandsObservePowerupThenPublishExactCpuWindow) {
     EXPECT_EQ(0x800000U, geometry.bytes);
     EXPECT_FALSE(geometry.startup_backing);
 }
+TEST_F(SDRAM, GeometrySelectsRowColumnBankEncodingAndLoanExtent) {
+    config.row_bits = 11U;
+    config.column_bits = 9U;
+    config.internal_banks = 2U;
+    config.bytes = 0x400000U;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_sdram_prepare(&owner, &config, 1000U));
+    EXPECT_EQ(FMC_SDRAM_COLUMN_BITS_NUM_9, FMC_Bank5_6->SDCR[0] & FMC_SDCR1_NC);
+    EXPECT_EQ(FMC_SDRAM_ROW_BITS_NUM_11, FMC_Bank5_6->SDCR[0] & FMC_SDCR1_NR);
+    EXPECT_EQ(FMC_SDRAM_INTERN_BANKS_NUM_2,
+              FMC_Bank5_6->SDCR[0] & FMC_SDCR1_NB);
+    nx_memory_window_geometry_t geometry{};
+    ASSERT_EQ(NX_SUCCESS, nx_memory_window_port_geometry(&window, &geometry));
+    EXPECT_EQ(config.bytes, geometry.bytes);
+    EXPECT_EQ(230U,
+              (FMC_Bank5_6->SDRTR & FMC_SDRTR_COUNT) >> FMC_SDRTR_COUNT_Pos);
+}
+
+TEST_F(SDRAM, ExistingAddressPadsAlsoSupportAConfiguredWiderColumn) {
+    config.column_bits = 10U;
+    config.bytes = 0x2000000U;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32_sdram_prepare(&owner, &config, 1000U));
+    EXPECT_EQ(FMC_SDRAM_COLUMN_BITS_NUM_10,
+              FMC_Bank5_6->SDCR[0] & FMC_SDCR1_NC);
+    nx_memory_window_lease_t lease{};
+    ASSERT_EQ(NX_SUCCESS, nx_memory_window_port_acquire(&window, &lease));
+    EXPECT_EQ(config.bytes, lease.bytes);
+    EXPECT_EQ(NX_SUCCESS,
+              nx_memory_window_port_release(&window, &lease, lease.epoch));
+}
+
 TEST_F(SDRAM, InvalidGeometryAndTimingHaveNoClockCommandOrRetainedOwner) {
     EXPECT_CALL(io, Command).Times(0);
-    for (unsigned fault = 0; fault < 4U; ++fault) {
+    for (unsigned fault = 0; fault < 8U; ++fault) {
         auto selected = config;
         if (fault == 0U)
             selected.bytes -= 2U;
@@ -195,6 +225,14 @@ TEST_F(SDRAM, InvalidGeometryAndTimingHaveNoClockCommandOrRetainedOwner) {
             selected.refresh_window_us = 100U;
         if (fault == 3U)
             selected.sdclk_div = 4U;
+        if (fault == 4U)
+            selected.row_bits = 13U;
+        if (fault == 5U)
+            selected.column_bits = 7U;
+        if (fault == 6U)
+            selected.internal_banks = 3U;
+        if (fault == 7U)
+            selected.width_bits = 32U;
         const auto before = owner;
         EXPECT_EQ(NX_ERROR_INVALID,
                   nx_stm32_sdram_prepare(&owner, &selected, 1000U));

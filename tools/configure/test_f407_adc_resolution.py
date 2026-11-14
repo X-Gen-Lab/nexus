@@ -1,6 +1,7 @@
 """F407 resolution is one typed choice shared by all regular ADC modes."""
 import json
 from pathlib import Path
+import subprocess
 import tempfile
 from types import SimpleNamespace
 import unittest
@@ -41,21 +42,34 @@ class F407AdcResolutionTests(unittest.TestCase):
             self.assertEqual(12, result.controllers[0].projection()[
                 "resolution_bits"])
 
-    def test_each_resolution_assembles_every_maintained_mode(self):
+    def test_resolutions_cover_each_mode_and_both_density_views(self):
+        # Resolution encoding is shared by these provider classes. Cross-check
+        # every bit count in C below instead of repeating a full Cartesian grid.
+        cases = (("single-shot", 12), ("low-rate-scan", 10),
+                 ("trigger-dma", 8), ("trigger-dma-continuous", 6))
         with tempfile.TemporaryDirectory() as temporary:
             for density in ("ve", "zg"):
-                for mode in ("single-shot", "low-rate-scan", "trigger-dma",
-                             "trigger-dma-continuous"):
-                    for bits in (6, 8, 10, 12):
-                        with self.subTest(density=density, mode=mode, bits=bits):
-                            result = self.resolve(Path(temporary), density,
-                                                  mode, bits)
-                            self.assertEqual(bits, result.controllers[0].options.
-                                             resolution_bits)
-                            self.assertEqual(bits, result.controllers[0].
-                                             projection()["resolution_bits"])
-                            self.assertIn(f".resolution = {(12 - bits) // 2}u",
-                                          bindings.emit(result)[1])
+                for mode, bits in cases:
+                    with self.subTest(density=density, mode=mode, bits=bits):
+                        result = self.resolve(Path(temporary), density, mode, bits)
+                        self.assertEqual(bits, result.controllers[0].options.
+                                         resolution_bits)
+                        self.assertEqual(bits, result.controllers[0].
+                                         projection()["resolution_bits"])
+                        self.assertIn(".resolution = NX_STM32_ADC_RESOLUTION_CODE("
+                                      + str(bits) + "u)", bindings.emit(result)[1])
+            path = Path(temporary) / "resolution.c"
+            header = gate.ROOT / "soc/stm32/stm32f4/private/stm32f4_adc_encoding.h"
+            checks = [f'_Static_assert(NX_STM32_ADC_RESOLUTION_CODE({bits}u) == '
+                      f'{code}u, "ADC resolution");'
+                      for bits, code in ((12, 0), (10, 1), (8, 2), (6, 3))]
+            path.write_text('#include "' + str(header) + '"\n' +
+                            "\n".join(checks) + "\n")
+            execution = subprocess.run(
+                ["cc", "-std=c11", "-Wall", "-Wextra", "-Werror", "-pedantic",
+                 "-c", str(path), "-o", str(Path(temporary) / "resolution.o")],
+                capture_output=True, text=True, check=False)
+            self.assertEqual(execution.returncode, 0, execution.stderr)
 
     def test_non_hardware_resolutions_are_rejected(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -93,7 +107,8 @@ class F407AdcResolutionTests(unittest.TestCase):
                              r"s_nx_adc_model_analog, 2u?, 6u?, 3300u?")
 
     def test_other_providers_require_an_explicit_resolution_declaration(self):
-        provider = SimpleNamespace(LIMITS={})
+        provider = SimpleNamespace(LIMITS={},
+                                   ADC_PIN_CHANNELS={("ADC0", "PA0"): 0})
         route = {"controller": "ADC0", "pins": [{"pin": "PA0"}]}
         selected = {"mode": "single-shot", "channels": [0],
                     "sample_times": [0], "reference_mv": 3300}

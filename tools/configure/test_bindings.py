@@ -39,11 +39,14 @@ class BindingIdentityTests(unittest.TestCase):
         return bindings.emit(result)[1]
 
     def assert_unique_storage(self, source):
-        # A C translation unit cannot define one private object twice. This
-        # checks the actual emitted declarations, including shared IRQ arrays.
+        # A readonly face may have one tentative declaration before auxiliary
+        # context storage, followed by its definition. Count only definitions
+        # (plus uninitialized mutable storage), never that legal forward edge.
         names = re.findall(
-            r"^static (?:const )?\w+(?:\* const)? (s_\w+)",
+            r"^static (?:(?:const )?\w+(?:\* const)? (s_\w+)(?=[^;\n]*=)|"
+            r"\w+ (s_\w+)(?=[^=\n]*;))",
             source, re.MULTILINE)
+        names = [left or right for left, right in names]
         self.assertEqual(len(names), len(set(names)), names)
 
     def add_gpio(self, data, identity):
@@ -78,8 +81,9 @@ class BindingIdentityTests(unittest.TestCase):
         source = self.source(data)
         self.assert_unique_storage(source)
         self.assertIn("static nx_stm32_gpio_state_t s_nx_port_sensor_cs;", source)
-        self.assertIn("static nx_stm32_gpio_state_t s_nx_cs_sensor;", source)
-        self.assertIn("{ &s_nx_endpoint_spi0, &s_nx_cs_sensor,", source)
+        self.assertIn("static nx_stm32_gpio_state_t s_nx_cs_sensor = {0};", source)
+        self.assertIn(".endpoint = &s_nx_endpoint_sensor, "
+                      ".chip_select = &s_nx_cs_sensor,", source)
         self.assertIn("nx_binding_sensor_cs = &s_nx_face_sensor_cs;", source)
 
     def test_gpio_identity_does_not_alias_pwm_or_adc_storage(self):
@@ -101,7 +105,7 @@ class BindingIdentityTests(unittest.TestCase):
         source = self.source(data)
         self.assert_unique_storage(source)
         self.assertIn("s_nx_port_exti9_5_lines", source)
-        self.assertIn("s_nx_irq_exti9_5_ports[]", source)
+        self.assertIn("s_nx_irq_EXTI9_5_IRQHandler_ports[2]", source)
         self.assertIn("{ &s_nx_port_edge5, &s_nx_port_edge6 }", source)
 
     def test_repeated_generation_is_identical_and_failure_invalidates(self):

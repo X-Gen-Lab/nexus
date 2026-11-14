@@ -203,10 +203,11 @@ class DeviceSDKPayloadTests(unittest.TestCase):
                 path.write_bytes(b"owned input\n")
                 files[name] = hashlib.sha256(path.read_bytes()).hexdigest()
             identity = {
-                "schema": 2, "profile": sdk.source_profile(host_support=True), "kind": "nexus-installed-source-sdk",
+                "schema": 3, "profile": sdk.source_profile(host_support=True), "kind": "nexus-installed-source-sdk",
                 "source_revision": "a" * 40, "source_tree": "b" * 40,
                 "publishable": False, "source_dirty": True,
                 "files_sha256": files, "dependencies": [],
+                "source_exports": sdk.source_export_declaration(ROOT, files),
                 "reviewed_imports": [],
                 "toolchains_lock_sha256": files["dependencies/toolchains.lock.json"],
                 "snapshot_sha256": "", "package_files_sha256": {},

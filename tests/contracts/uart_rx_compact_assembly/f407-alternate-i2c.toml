@@ -1,0 +1,22 @@
+# Alternate silicon resource fixture; no PCB or physical qualification.
+schema = 2
+board_package = "alternate-board"
+backend = "baremetal"
+clock = "hse8-pll168"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+flash_load_limit_bytes = 65536
+static_ram_limit_bytes = 32768
+libc_heap_bytes = 0
+
+[i2c.bus]
+binding = "i2c2"
+mode = "irq-messages"
+max_hz = 100000
+[i2c.bus.irq]
+priority = 5
+[i2c_device.sensor]
+controller = "bus"
+address = 80

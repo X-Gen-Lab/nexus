@@ -91,7 +91,7 @@ class EthernetFramesConfiguration(unittest.TestCase):
                 self.assertIn('NX_MDIO_ID_MAC', header)
                 self.assertIn('nexus/io/ethernet_frames.h', header)
                 self.assertIn('return nx_binding_mac;', source)
-                self.assertIn('return nx_binding_mac_mdio;', source)
+                self.assertIn('return g_nx_mdio_binding_mac;', source)
                 self.assertNotIn('initialize(', source)
                 self.assertNotIn('NX_PLATFORM_REGISTER_WRITE', source)
 
@@ -101,12 +101,14 @@ class EthernetFramesConfiguration(unittest.TestCase):
                 source = bindings.emit(self.resolve(family))[1]
                 for direction in ('tx', 'rx'):
                     self.assertIn('nx_eth_frames_descriptor_t '
-                                  's_nx_eth_frames_' + direction
+                                  's_nx_eth_' + direction
                                   + '_mac[8]', source)
-                self.assertIn('s_nx_eth_frames_storage_mac[8][256]', source)
+                self.assertIn('s_nx_eth_storage_mac[2048]', source)
+                self.assertIn('.rx_storage_bytes = 256u', source)
                 self.assertIn('nx_eth_frames_mac_t s_nx_port_mac;', source)
                 self.assertIn('&nx_eth_frames_mac_ops, &s_nx_port_mac', source)
-                self.assertIn('&nx_eth_frames_mdio_ops, &s_nx_port_mac', source)
+                self.assertIn('.ops = &nx_eth_frames_mdio_ops, '
+                              '.context = &s_nx_port_mac', source)
                 self.assertIn(f'nx_{prefix}_eth_frames_cold_prepare(', source)
                 self.assertIn(f'nx_{prefix}_eth_frames_cold_close(', source)
                 self.assertIn(f'static const nx_{prefix}_eth_frames_cold_config_t',

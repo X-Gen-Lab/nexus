@@ -98,6 +98,21 @@ class NativeMatrixTests(unittest.TestCase):
             self.assertEqual(json.loads(Path(receipt).read_text())
                              ["exit_code"], 0)
 
+    def test_managed_children_reenter_the_matrices_real_kernel_locks(self):
+        root = Path(__file__).resolve().parents[2]
+        for relative in ("tools/dev/dev.py", "scripts/ci/native_contracts.py"):
+            path = self.root / relative
+            source = path.read_text()
+            prefix = ("import pathlib,sys\n"
+                      f"sys.path.insert(0,{str(root)!r})\n"
+                      "from tools.dev.build_lock import build_lock\n"
+                      "if '--preset' in sys.argv:\n"
+                      "    preset=sys.argv[sys.argv.index('--preset')+1]\n"
+                      "    lease=build_lock(pathlib.Path.cwd()/'build'/preset)\n"
+                      "    lease.__enter__()\n")
+            path.write_text(prefix + source)
+        self.assertEqual(self.execute(), 0 if os.name == "posix" else 1)
+
     def test_finished_mode_is_snapshotted_before_another_cli_rewrites_its_reports(self):
         driver = self.root / "scripts/ci/native_contracts.py"
         driver.write_text(driver.read_text() +
@@ -205,8 +220,22 @@ class NativeMatrixTests(unittest.TestCase):
         self.assertFalse(self.output.exists())
 
     def test_busy_build_lock_rejects_before_any_child_is_launched(self):
-        with native_matrix.build_lock(self.root / "build/native-debug"):
+        entered, release = threading.Event(), threading.Event()
+
+        def owner():
+            with native_matrix.build_lock(self.root / "build/native-debug"):
+                entered.set()
+                release.wait(5)
+
+        thread = threading.Thread(target=owner)
+        thread.start()
+        self.assertTrue(entered.wait(5))
+        try:
             self.assertNotEqual(self.execute(), 0)
+        finally:
+            release.set()
+            thread.join(timeout=5)
+        self.assertFalse(thread.is_alive())
         self.assertFalse(self.output.exists())
 
     def test_existing_output_cannot_reuse_a_successful_matrix_report(self):

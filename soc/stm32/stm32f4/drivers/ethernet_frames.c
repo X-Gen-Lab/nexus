@@ -8,6 +8,7 @@
  */
 #include "stm32f407_clock.h"
 #include "stm32f407_eth_frames.h"
+#include "stm32f4_eth_facts.h"
 #include "stm32f4xx_hal_eth.h"
 #include <stddef.h>
 _Static_assert(offsetof(ETH_DMADescTypeDef, DESC7) == 28U,
@@ -68,25 +69,16 @@ nx_result_t nx_stm32_eth_frames_initialize(nx_eth_frames_mac_t* mac,
         return NX_ERROR_CONTEXT;
     if (mac == NULL || mac->source.priority > 15U ||
         mac->irq_policy.priority_bits != __NVIC_PRIO_BITS ||
-        mac->irq_policy.external_irq_count != 82U)
+        mac->irq_policy.external_irq_count != NEXUS_CPU_EXTERNAL_IRQ_COUNT)
         return NX_ERROR_INVALID;
-    if (mac->registers != UINT32_C(0x40028000) ||
-        mac->hclk_hz != NEXUS_CORE_HZ || mac->hclk_hz < 25000000U ||
-        mac->hclk_hz > 168000000U || mac->source.irq_number != ETH_IRQn)
+    if (mac->registers != ETH_BASE || mac->hclk_hz != NEXUS_CORE_HZ ||
+        mac->hclk_hz < 25000000U || mac->hclk_hz > 168000000U ||
+        mac->source.irq_number != ETH_IRQn)
         return NX_ERROR_UNSUPPORTED;
-    if (mac->regions == NULL || mac->region_count == 0U ||
-        mac->region_count > SIZE_MAX / sizeof(*mac->regions) ||
-        (uintptr_t)mac->regions >
-            UINTPTR_MAX - mac->region_count * sizeof(*mac->regions))
-        return NX_ERROR_INVALID;
-    for (size_t i = 0U; i < mac->region_count; ++i) {
-        const nx_dma_memory_region_t* region = &mac->regions[i];
-        if (region->begin < UINT32_C(0x20000000) || region->size == 0U ||
-            region->size > 131072U ||
-            region->begin - UINT32_C(0x20000000) > 131072U - region->size ||
-            (region->permissions & ~3U) != 0U)
-            return NX_ERROR_PERMISSION;
-    }
+    nx_result_t memory =
+        nx_stm32_eth_regions_admit(mac->regions, mac->region_count);
+    if (memory != NX_SUCCESS)
+        return memory;
     /* Platform leases the established high clock, pads and all four gates.
      * Requested SW is insufficient: fresh SWS/PLL/AHB facts must agree.
      * These cold reads precede every MAC/descriptor access and reset. */

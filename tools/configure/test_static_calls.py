@@ -1,5 +1,9 @@
 """Lifecycle call plans reject executable fragments before C rendering."""
 from dataclasses import FrozenInstanceError
+from pathlib import Path
+import shutil
+import subprocess
+import tempfile
 import unittest
 
 from tools.configure.calls import Address, DirectCall, Symbol
@@ -7,6 +11,34 @@ from tools.configure.providers.common import Construction
 
 
 class StaticCallTests(unittest.TestCase):
+    def test_fixed_array_addresses_and_explicit_constants_retain_c_types(self):
+        from tools.configure.static_ir import (ArrayElementAddress,
+            ConstantMacro, Flags, Signed32, Unsigned64)
+        call = DirectCall("check", (ArrayElementAddress(Symbol("storage"), 1),
+            Signed32(-1), Unsigned64(2**40),
+            ConstantMacro(Symbol("ENCODE"), (2,)),
+            Flags((Symbol("READ"), Symbol("WRITE")))))
+        compiler = shutil.which("cc")
+        self.assertIsNotNone(compiler, "A maintained C compiler is required")
+        source = """#include <stdint.h>
+enum { READ=1, WRITE=2 };
+#define ENCODE(value) ((value) << 4U)
+static uint32_t storage[] = {3, 7};
+static int check(uint32_t* value, int32_t irq, uint64_t wide,
+                 uint32_t encoded, unsigned flags) {
+    return !(*value == 7 && irq == -1 && wide == UINT64_C(1099511627776) &&
+             encoded == 32 && flags == 3);
+}
+int main(void) { return """ + call.render() + "; }\n"
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory)
+            (path / "calls.c").write_text(source)
+            compiled = subprocess.run([compiler, "-std=c11", "-Wall", "-Wextra",
+                "-Werror", "-pedantic", str(path / "calls.c"), "-o", str(path / "calls")],
+                capture_output=True, text=True)
+            self.assertEqual(compiled.returncode, 0, compiled.stderr)
+            self.assertEqual(subprocess.run([str(path / "calls")]).returncode, 0)
+
     def test_initialize_sequence_is_typed_frozen_and_short_circuits_in_order(self):
         from tools.configure.calls import InitializeSequence
         calls = [DirectCall("nx_engine_prepare", (Address("state"),)),

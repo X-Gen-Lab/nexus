@@ -1,42 +1,48 @@
-// FIG-03 current: build-time inputs and artifacts.
-// Code basis: tools/configure/authored.py, configure.py, ir.py and bindings.py.
-// Edges denote configuration/production flow, not runtime I/O.
-digraph configurationGeneration {
-    graph [label="FIG-03 当前配置与原子生成\nFIG-03 Current configuration and generation", fontname="Noto Sans CJK SC", fontsize=15, labelloc=t, rankdir=TB, bgcolor="white", pad=0.25, nodesep=0.30, ranksep=0.50];
-    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
-          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
-          fontsize=13, margin="0.16,0.10"];
-    edge [color="#475569", fontcolor="#0f172a",
-          fontname="Noto Sans CJK SC", fontsize=11, arrowsize=0.8];
-    assembly [label="一份 authored TOML\none authored TOML assembly", fillcolor="#f8fafc"];
-    socFacts [label="SoC / CPU / routes 事实\nSoC / CPU / route facts", fillcolor="#f8fafc"];
-    boardFacts [label="Board 接线与来源事实\nBoard wiring and provenance", fillcolor="#f8fafc"];
-    authored [label="严格 TOML 字段检查 → 冻结用户意图\nstrict TOML fields -> frozen AuthoredAssembly"];
-    resolver [label="严格解析：字段、模式、资源、输入身份\nstrict field / mode / resource / identity checks"];
-    typedIr [label="不可变具名 IR：每个决策只存一次\nimmutable named IR: each decision stored once"];
-    construction [label="SoC 构造：静态定义与冷态调用\nSoC Construction: static definitions and cold calls"];
-    bundle [label="事务生成与原子发布\ntransactional generation and atomic publish"];
-    outputs [label="静态实例 / factory / 配置 / 内存预算 / resolved.json\nstatic instances / factory / config / budgets / resolved.json"];
-    targets [label="CMake：唯一软件目标图\nCMake: sole software target graph"];
-    ninja [label="Ninja：编译、链接、资源检查\nNinja: compile / link / resource checks"];
-    firmware [label="ELF / BIN / map / 资源报告\nELF / BIN / map / resource reports", fillcolor="#f0fdf4"];
-    rejected [label="拒绝 / 生成失败\nrejected input or generation failure", fillcolor="#fff7ed"];
-    invalidated [label="owned bundle 失效，不暴露半成品\ninvalidate owned bundle, no partial outputs", fillcolor="#fff7ed"];
-    assembly -> authored [label="唯一装配入口\nsole assembly input"];
-    authored -> resolver [label="尚未准入的选择\nunresolved selections"];
-    socFacts -> resolver [label="芯片能力\nsilicon capability"];
-    boardFacts -> resolver [label="Board 授权\nBoard authorization"];
-    resolver -> typedIr [label="验证通过\nvalidated"];
-    typedIr -> construction [label="具名字段\nnamed fields"];
-    construction -> bundle [label="生成 binding C 字节\nrender binding C bytes"];
-    typedIr -> bundle [label="单向 JSON / 配置 / 内存投影\none-way JSON / config / memory projection"];
-    bundle -> outputs [label="成功发布\natomic publish"];
-    outputs -> targets [label="配置与生成源\nconfiguration and generated sources"];
-    targets -> ninja [label="执行目标图\nexecute target graph"];
-    ninja -> firmware [label="本次实际产物\nactual artifacts of this execution"];
-    authored -> rejected [label="语法 / 字段非法\ninvalid syntax / fields"];
-    construction -> rejected [label="生成失败\nemission failure"];
-    resolver -> rejected [label="非法 / 冲突 / 变化\ninvalid / conflict / input changed"];
-    bundle -> rejected [label="生成或发布失败\ngeneration or publish failure"];
-    rejected -> invalidated [label="仅清理拥有的输出\ninvalidate owned outputs only"];
+// Current scoped view. Build-time arrows and runtime calls are labeled explicitly.
+// Code basis: tools/configure/packages.py; data_provider.py; domain_policies.py; package_policy.py; ir.py; static_recipe.py; bundle.py; cmake/platform/Configure.cmake
+digraph ConfigurationGeneration {
+    graph [label="FIG-03 当前配置与原子生成：仅构建期数据流\nFIG-03 Current configuration and generation: build-time data flow only", rankdir=TB, bgcolor="white", pad=0.25, nodesep=0.35, ranksep=0.52, fontname="Noto Sans CJK SC", fontsize=15, labelloc=t];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff", color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC", fontsize=12, margin="0.16,0.10"];
+    edge [color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC", fontsize=11, arrowsize=0.8];
+    assembly [label="一份 authored TOML\nOne authored TOML assembly", fillcolor="#f8fafc"];
+    package [label="package.json\n事实、binding_files 与构建入口\npackage.json\nFacts, binding_files and build entry", fillcolor="#f8fafc"];
+    socFacts [label="SoC／CPU／route／审核资料\nSoC / CPU / routes / review facts", fillcolor="#f8fafc"];
+    boardFacts [label="Board 接线与电气授权\nBoard wiring and electrical authorization", fillcolor="#f8fafc"];
+    authored [label="严格字段检查\n冻结 AuthoredAssembly\nStrict field checks\nFrozen AuthoredAssembly"];
+    reader [label="所选输入：同一受控快照\n字节身份与发布前复核\nOne controlled snapshot of selected inputs\nByte identities and pre-publication recheck"];
+    policies [label="通用 DataProvider／领域与 IP 政策\nBindingPolicy 与私有 schema\nGeneric DataProvider / domain and IP policies\nBindingPolicy and private schemas"];
+    resolver [label="通用解析与资源决策\n模式、引用、冲突、预算\nGeneric resolution and resource decisions\nModes, references, conflicts, budgets"];
+    typedIr [label="不可变具名 IR\n共享 canonical 引用\nImmutable named IR\nShared canonical references"];
+    construction [label="有限静态装配\n对象、引用、固定调用与薄 IRQ\nBounded static assembly\nObjects, references, fixed calls and thin IRQ entries"];
+    bundle [label="事务生成与原子发布\nTransactional generation and atomic publication"];
+    outputs [label="静态 C／factory／配置／内存计划\nresolved.json：单向审计投影\nStatic C / factory / config / memory plan\nresolved.json: one-way audit projection"];
+    targets [label="包内 CMake：唯一 C 源码目标图\nPackage CMake: the sole C source target graph"];
+    ninja [label="Ninja：编译、链接与资源检查\nNinja: compilation, linking and resource checks"];
+    firmware [label="本次 ELF／BIN／map／资源报告\nThis execution: ELF / BIN / map / resource reports", fillcolor="#f0fdf4"];
+    rejected [label="输入、解析、生成或发布失败\nInput, resolution, generation or publication failure", fillcolor="#fff7ed"];
+    invalidated [label="仅使拥有的 bundle 失效\n不继续使用旧输出或半成品\nInvalidate only the owned bundle\nDo not reuse stale or partial output", fillcolor="#fff7ed"];
+    assembly -> authored [label="唯一装配入口\nSole assembly input"];
+    package -> reader [label="显式所选文件\nExplicit selected files"];
+    socFacts -> reader [label="声明的事实\nDeclared facts"];
+    boardFacts -> reader [label="授权条件\nAuthorization conditions"];
+    reader -> policies [label="同一代 binding 与事实\nBindings and facts from one generation"];
+    reader -> resolver [label="精确器件与 Board 事实\nExact device and Board facts"];
+    authored -> resolver [label="冻结用户选择\nFrozen user selections"];
+    policies -> resolver [label="已维护政策\nMaintained policies"];
+    resolver -> typedIr [label="验证通过\nValidated"];
+    typedIr -> construction [label="具名字段与固定引用\nNamed fields and fixed references"];
+    policies -> construction [label="所选 recipe／fragments\nSelected recipes / fragments"];
+    construction -> bundle [label="生成静态连接 C\nRender static connection C"];
+    typedIr -> bundle [label="单向配置与审计投影\nOne-way configuration and audit projections"];
+    bundle -> outputs [label="成功发布\nSuccessful publication"];
+    outputs -> targets [label="生成配置与源\nGenerated configuration and sources"];
+    package -> targets [label="仅选择构建入口；不另列 .c 图\nSelect build entry; no second .c graph", style=dashed];
+    targets -> ninja [label="执行唯一目标图\nExecute the sole target graph"];
+    ninja -> firmware [label="实际产物\nActual artifacts"];
+    authored -> rejected [label="非法字段\nInvalid fields"];
+    reader -> rejected [label="非法或变化的输入\nInvalid or changed input"];
+    resolver -> rejected [label="非法模式或冲突\nInvalid mode or conflict"];
+    construction -> rejected [label="非法静态连接\nInvalid static connection"];
+    bundle -> rejected [label="生成或发布失败\nGeneration or publication failure"];
+    rejected -> invalidated [label="清理本次拥有的输出\nInvalidate this attempt's owned output"];
 }

@@ -14,6 +14,11 @@ SUITES = {"testing": "tools/testing", "configure": "tools/configure",
 # Full CI additionally owns standalone SDK/build contracts and the kernel overlay.
 CI_SUITES = {**SUITES, "contracts": "tests/contracts",
              "freertos": "os/freertos"}
+SCOPE_POLICY = {"tools/testing/run_tool_tests.py", "tools/dev/change_paths.py",
+                "scripts/ci/tdd_gate.py"}
+SDK_TOOLS = {"cmake/package/package_source_sdk.py",
+             "cmake/package/verify_consumers.py"}
+SDK_FIXTURE_SUFFIXES = {".c", ".h", ".toml", ".json"}
 
 
 def changed_suites(names):
@@ -23,7 +28,15 @@ def changed_suites(names):
     for name in names:
         if not behavioral(name):
             continue
-        if name.startswith((".github/", "scripts/ci/")):
+        if name in SCOPE_POLICY:
+            return tuple(SUITES)
+        if (name in SDK_TOOLS or
+                (name.startswith("cmake/package/verification/")
+                 and Path(name).suffix in SDK_FIXTURE_SUFFIXES)):
+            # Both domains import canonical SDK consumers. Build rules and
+            # unknown fixture kinds retain the broad CMake policy below.
+            selected.update(("testing", "configure"))
+        elif name.startswith((".github/", "scripts/ci/")):
             selected.update(("ci", "workflows", "testing"))
         elif name.startswith("tools/configure/"):
             selected.update(("configure", "testing"))

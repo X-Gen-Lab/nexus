@@ -1,5 +1,5 @@
 // FIG-01 current: source-backed, scoped engineering view.
-// Code basis: 0111c8d3b9c7b37d258b9c401070305b13b6f3a1.
+// Code basis: core/private/platform_lifecycle_impl.h; tools/configure/bindings.py; io/include/nexus/io.
 // Relations and qualification limits are documented in README.md.
 digraph PlatformArchitecture {
     graph [newrank=true, rankdir=TB, bgcolor="white", pad=0.28, nodesep=0.42,
@@ -21,7 +21,7 @@ digraph PlatformArchitecture {
         label="Nexus: reusable mechanisms and maintained providers"; color="#64748b";
         components [label="Optional components: owner / device / storage ports", style="rounded,dashed,filled"];
         os [label="optional OS task / wait / notify\nexternal task storage and kernel start", style="rounded,dashed,filled"];
-        platform [label="Platform: generated static assembly\ntyped factory / start / stop"];
+        platform [label="Platform: static assembly and shared C coordinator\nTyped factory / explicit start / stop"];
         io [label="I/O: public types / readonly faces / checked dispatch"];
         soc [label="SoC provider: controller / IRQ / DMA implementation\nPrivate state, clock, timebase, memory facts"];
         arch [label="Arch: CPU primitives and explicit mechanisms\nmask / barrier / cache / MPU / SAU"];

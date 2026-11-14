@@ -19,7 +19,7 @@ foreach(i2c_multi_family stm32f4)
         "-include${CMAKE_CURRENT_SOURCE_DIR}/i2c_multi_controller_model.h")
     target_sources(${i2c_multi_target} PRIVATE
         stm32_i2c_storage_model.c)
-    include("${NEXUS_SOURCE_DIR}/cmake/platform/STM32Official.cmake")
+    include("${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/cmake/STM32Official.cmake")
     nexus_stm32f4_official(${i2c_multi_target})
     target_include_directories(${i2c_multi_target} SYSTEM PRIVATE
         "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
