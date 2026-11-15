@@ -36,7 +36,8 @@ def clean_environment():
     return environment
 
 
-def private_compile_inputs(entry, sdk, extra_private=()):
+def private_compile_inputs(entry, sdk, extra_private=(), *,
+                           composition_includes=()):
     """Audit actual compiler options against canonical Nexus source boundaries.
 
     Kernel PUBLIC headers remain valid. F407 SoC APIs live only below the
@@ -64,15 +65,21 @@ def private_compile_inputs(entry, sdk, extra_private=()):
         raise ValueError("Response compiler options require explicit expansion")
     arguments = list(arguments[1:])
     roots = {Path(sdk).resolve(), Path(__file__).resolve().parents[2]}
+    composition_includes = {Path(path) for path in composition_includes}
 
-    def private_path(value):
+    def private_path(value, *, include_directory=False):
         if not value or value.startswith(("=", "$SYSROOT")):
             raise ValueError("Include path requires explicit expansion")
         path = Path(value)
+        if composition_includes and not include_directory:
+            if not path.is_absolute() or path != path.resolve():
+                raise ValueError(
+                    "Forced composition input requires a canonical absolute path")
         if not path.is_absolute():
             if not entry.get("directory"):
                 raise ValueError("Relative include path requires compile directory")
             path = Path(entry["directory"]) / path
+        declared_path = path
         path = path.resolve()
         if any(path.is_relative_to(root.resolve()) for root in extra_private):
             return True
@@ -88,6 +95,12 @@ def private_compile_inputs(entry, sdk, extra_private=()):
                     parts[:4] != ("soc", "stm32", "stm32f4", "include")):
                 return True
             if parts[0] == "components":
+                # The canonical common-services composition owns this exact
+                # lwIP storage profile. Forced inputs and aliases stay private.
+                if (include_directory and path == declared_path and
+                        parts == ("components", "protocols", "network", "port")
+                        and path in composition_includes and path.is_dir()):
+                    return False
                 if len(parts) < 4 or parts[3] != "include":
                     return True
                 package = root.joinpath(*parts[:3])
@@ -130,7 +143,8 @@ def private_compile_inputs(entry, sdk, extra_private=()):
         for option in paths:
             if argument == option or argument.startswith(option):
                 value = operand() if argument == option else argument[len(option):]
-                if private_path(value):
+                if private_path(value, include_directory=option in {
+                        "-I", "-isystem", "-iquote", "-idirafter"}):
                     return True
                 break
     return False
@@ -999,9 +1013,15 @@ def check_service_image(sdk, source, build, specification, run_checked):
         owned.update({source / "main.c", source / "public_key.c"})
     public = [entry for entry in commands
               if Path(entry["file"]).resolve() in products]
+    composition_includes = ()
+    if specification.scenario == "common_services":
+        composition_includes = (
+            Path(sdk).resolve() / "components/protocols/network/port",)
     if (len(public) != len(products) or
             {Path(entry["file"]).resolve() for entry in public} != products or
-            any(private_compile_inputs(entry, sdk) for entry in public)):
+            any(private_compile_inputs(entry, sdk,
+                    composition_includes=composition_includes)
+                for entry in public)):
         raise ValueError("Service consumer private inputs leaked into product")
     if split:
         if sum(Path(entry["file"]).resolve() == source / "composition.c"

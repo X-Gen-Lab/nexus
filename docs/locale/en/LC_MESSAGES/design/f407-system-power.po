@@ -547,8 +547,8 @@ msgstr "Exact entry conditions"
 msgid "必须 PRIMASK=1、BASEPRI=FAULTMASK=0；没有 active FP／lazy preservation、MPU、 已启用／pending／active IRQ 或 SysTick。System 已停，使用 HSI16／reset buses， 没有 peripheral／DMA gates 或 busy Flash。普通 SystemInit 的完整 CP10／11 权限在没有活跃 FP owner 时可接纳；尾部以 DSB／ISB 禁用 CP10／11，随后替换 MSP 并跳转。"
 msgstr "PRIMASK must be 1 and BASEPRI=FAULTMASK=0, with no active FP/lazy preservation, MPU, enabled/pending/active IRQ or SysTick. System is stopped, HSI16 and reset buses are selected, and no peripheral/DMA gates or busy Flash remain. Complete CP10/11 permissions from ordinary SystemInit are accepted when no FP owner is active. The final sequence disables CP10/11 with DSB/ISB, then replaces MSP and branches."
 
-msgid "[FIG-05 Platform 生命周期](../../../../docs/assets/diagrams/platform-lifecycle.svg) 说明平台停止前的排空与失败保留；镜像交接还须满足本文的 masks、向量和存储前提。 图不表示通用 boot 或已执行物理交接。"
-msgstr "[FIG-05 Platform lifecycle](../../../../docs/assets/diagrams/platform-lifecycle.svg) explains draining before Platform stop and retained responsibility after failure. Image handoff also requires the masks, vector and storage prerequisites here. The diagram represents neither generic boot nor an executed physical handoff."
+msgid "[FIG-05 Platform 生命周期](/explanation/platform-architecture.md#lifecycle-and-failure-responsibility) 说明平台停止前的排空与失败保留；镜像交接还须满足本文的 masks、向量和存储前提。 图不表示通用 boot 或已执行物理交接。"
+msgstr "[FIG-05 Platform lifecycle](/explanation/platform-architecture.md#lifecycle-and-failure-responsibility) explains draining before Platform stop and retained responsibility after failure. Image handoff also requires the masks, vector and storage prerequisites here. The diagram represents neither generic boot nor an executed physical handoff."
 
 msgid "拒绝保留 masks 且不写 MMIO，但读取 SysTick CTRL 会消费 COUNTFLAG。off gate 只阻止执行，不能认证 controller 的潜在配置已清除；目标在开 gate 前 reset controllers。"
 msgstr "Rejection preserves masks and performs no writable MMIO, but reading SysTick CTRL consumes COUNTFLAG. An off gate only prevents execution; it does not prove that latent controller configuration has been cleared. The target resets controllers before enabling gates."
