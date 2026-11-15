@@ -41,7 +41,7 @@ qualification. Remove the tutorial directory only after retaining needed reports
 
 ## Follow the normal and rejected admission path
 
-```{literalinclude} ../../tests/google/native_async_test.cpp
+```{literalinclude} ../../tests/google/io/native_async_test.cpp
 :language: cpp
 :start-at: TEST_F(NativeAsync, SPIBorrowWaitsForWireCompletionAndOtherEndpointRejects)
 :end-before: TEST_F(NativeAsync, FixedDummyAndDiscardOnlyTouchTheirExplicitCells)
@@ -56,7 +56,7 @@ explicit; a waiting client cannot assume a hidden worker.
 
 ## Follow cancellation and failed drain
 
-```{literalinclude} ../../tests/google/native_async_test.cpp
+```{literalinclude} ../../tests/google/io/native_async_test.cpp
 :language: cpp
 :start-at: TEST_F(NativeAsync, SPIQuarantineRetainsBorrowAndStopUntilDrain)
 :end-before: TEST_F(NativeAsync, UARTIDLEBlocksStayImmutableAndLossPrecedesLaterData)

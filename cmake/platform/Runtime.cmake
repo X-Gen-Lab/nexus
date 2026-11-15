@@ -1,5 +1,6 @@
-# Reuse the production targets without inventing a SoC, Board or device factory.
+# Reuse production targets without a synthetic SoC, Board or device factory.
 include_guard(GLOBAL)
+include("${CMAKE_CURRENT_LIST_DIR}/Configure.cmake")
 
 function(nexus_add_runtime)
     set(runtime_assembly_count 0)
@@ -9,27 +10,33 @@ function(nexus_add_runtime)
         endif()
     endforeach()
     if(NOT runtime_assembly_count EQUAL 1)
-        message(FATAL_ERROR "nexus_add_runtime requires exactly one ASSEMBLY")
+        message(FATAL_ERROR
+            "nexus_add_runtime requires exactly one ASSEMBLY")
     endif()
     cmake_parse_arguments(RUNTIME "" "ASSEMBLY" "" ${ARGN})
     if(RUNTIME_UNPARSED_ARGUMENTS OR RUNTIME_KEYWORDS_MISSING_VALUES OR
             NOT RUNTIME_ASSEMBLY)
-        message(FATAL_ERROR "nexus_add_runtime requires ASSEMBLY and known arguments")
+        message(FATAL_ERROR
+            "nexus_add_runtime requires ASSEMBLY and known arguments")
     endif()
     if(TARGET Nexus::Config)
-        message(FATAL_ERROR "One build may contain only one resolved Nexus assembly")
+        message(FATAL_ERROR
+            "One build may contain only one resolved Nexus assembly")
     endif()
     foreach(override NEXUS_CPU_ARCH NEXUS_CPU_FPU NEXUS_FLOAT_ABI
             NEXUS_ENUM_ABI NEXUS_CPU_COMPILE_OPTIONS NEXUS_BACKEND
-            NEXUS_FREERTOS_PORT NEXUS_THREADX_PORT NEXUS_IRQ_PRIORITY_BITS NEXUS_OPTIMIZATION)
+            NEXUS_FREERTOS_PORT NEXUS_THREADX_PORT NEXUS_IRQ_PRIORITY_BITS
+            NEXUS_OPTIMIZATION)
         if(DEFINED CACHE{${override}})
-            message(FATAL_ERROR "${override} is not a runtime override; use ASSEMBLY")
+            message(FATAL_ERROR
+                "${override} is not a runtime override; use ASSEMBLY")
         endif()
     endforeach()
     get_cmake_property(runtime_cache_variables CACHE_VARIABLES)
     foreach(override IN LISTS runtime_cache_variables)
         if(override MATCHES "^NEXUS_(CPU|ARCH|IRQ|OS)_")
-            message(FATAL_ERROR "${override} is not a runtime override; use ASSEMBLY")
+            message(FATAL_ERROR
+                "${override} is not a runtime override; use ASSEMBLY")
         endif()
     endforeach()
     get_filename_component(NEXUS_SOURCE_DIR
@@ -51,22 +58,14 @@ function(nexus_add_runtime)
         RESULT_VARIABLE runtime_result OUTPUT_VARIABLE runtime_output
         ERROR_VARIABLE runtime_error)
     if(NOT runtime_result EQUAL 0)
-        message(FATAL_ERROR "CPU runtime rejected:\n${runtime_output}${runtime_error}")
+        message(FATAL_ERROR
+            "CPU runtime rejected:\n${runtime_output}${runtime_error}")
     endif()
     include("${NEXUS_CONFIG_DIR}/selection.cmake")
     # Both authored/fact inputs and generation code come from the resolver's
-    # exact sidecars. No runtime factory or translation-unit graph is emitted.
-    foreach(sidecar input_paths configuration_code_paths)
-        file(READ "${NEXUS_CONFIG_DIR}/${sidecar}.json" runtime_inputs)
-        string(JSON input_count LENGTH "${runtime_inputs}")
-        math(EXPR input_last "${input_count} - 1")
-        foreach(index RANGE 0 ${input_last})
-            string(JSON name MEMBER "${runtime_inputs}" ${index})
-            string(JSON path GET "${runtime_inputs}" "${name}")
-            set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
-                "${path}")
-        endforeach()
-    endforeach()
+    # exact sidecars. No factory or translation-unit graph is emitted.
+    _nexus_watch_configuration_inputs("${NEXUS_CONFIG_DIR}"
+        input_paths configuration_code_paths)
     include("${NEXUS_SOURCE_DIR}/cmake/platform/Options.cmake")
     # CPU-only assembly must not probe or define unrelated host OS support.
     set(_nexus_runtime_scope TRUE)
@@ -94,4 +93,5 @@ function(nexus_add_runtime)
     message(STATUS "Nexus CPU runtime: ${NEXUS_CPU_ARCH}/${NEXUS_BACKEND}")
 endfunction()
 
-include("${CMAKE_CURRENT_LIST_DIR}/../../os/freertos/secure/Integration.cmake")
+include(
+    "${CMAKE_CURRENT_LIST_DIR}/../../os/freertos/secure/Integration.cmake")

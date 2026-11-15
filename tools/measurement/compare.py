@@ -10,7 +10,6 @@ import re
 from pathlib import Path
 import shutil
 import subprocess
-import signal
 import time
 import sys
 import tomllib
@@ -18,7 +17,7 @@ import tomllib
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from tools.evidence.common import (EvidenceError, atomic_json, file_identity,
-    regular_file, command)
+    regular_file, command, kill_process_group)
 from tools.evidence.identity import git_source, resolved_identity
 from tools.measurement.resources import (measure, resolved_float_abi,
                                          validate_elf_configuration)
@@ -39,17 +38,8 @@ def run_logged(argv: list[str], log: Path, *, timeout_s: int = 900,
     started = time.monotonic()
     process = None
     def stop():
-        if process is None:
-            return
-        if os.name == "posix":
-            try:
-                os.killpg(process.pid, signal.SIGKILL)
-            except ProcessLookupError:
-                # The group already exited; the wait below still reaps the child.
-                pass
-        elif process.poll() is None:
-            process.kill()
-        process.wait(timeout=10)
+        if process is not None:
+            kill_process_group(process)
     try:
         with log.open("wb") as output:
             process = subprocess.Popen(argv, stdin=subprocess.DEVNULL, stdout=output,

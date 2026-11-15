@@ -11,7 +11,7 @@ source_language: en
 
 Use this explanation to integrate the Native raw-calendar RTC and finite-counter LPTIM through static typed factory lookup and explicit Platform lifecycle. One ordinary TOML assembly selects independent instances; public calls enter the matching provider directly. This Native host-model scope does not provide an MCU RTC/LPTIM driver, a product clock service or hardware low-power continuity.
 
-The public declarations in [rtc.h](../../io/include/nexus/io/rtc.h), [lptim.h](../../io/include/nexus/io/lptim.h) and the host-only [model controls](../../io/include/nexus/io/native/rtc_lptim_model.h) remain authoritative. This page explains ownership and use boundaries; it does not duplicate their complete return-value reference.
+The public declarations in [rtc.h](../../io/include/nexus/io/rtc.h), [lptim.h](../../io/include/nexus/io/lptim.h) and the host-only [model controls](../../tests/support/native/include/nexus/io/native/rtc_lptim_model.h) remain authoritative. This page explains ownership and use boundaries; it does not duplicate their complete return-value reference.
 
 ## Current implementation and planned integration
 

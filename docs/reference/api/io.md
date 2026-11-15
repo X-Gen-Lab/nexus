@@ -438,7 +438,7 @@ Platform lifecycle and clock prerequisites. Other retained SDKs do not grant an 
 
 ## model.h
 
-```{doxygenfile} io/include/nexus/io/native/model.h
+```{doxygenfile} tests/support/native/include/nexus/io/native/model.h
 :project: nexus
 ```
 
@@ -502,7 +502,7 @@ Platform lifecycle and clock prerequisites. Other retained SDKs do not grant an 
 
 ## rtc_lptim_model.h
 
-```{doxygenfile} io/include/nexus/io/native/rtc_lptim_model.h
+```{doxygenfile} tests/support/native/include/nexus/io/native/rtc_lptim_model.h
 :project: nexus
 ```
 
@@ -526,7 +526,7 @@ Platform lifecycle and clock prerequisites. Other retained SDKs do not grant an 
 
 ## spi_dma_model.h
 
-```{doxygenfile} io/include/nexus/io/native/spi_dma_model.h
+```{doxygenfile} tests/support/native/include/nexus/io/native/spi_dma_model.h
 :project: nexus
 ```
 

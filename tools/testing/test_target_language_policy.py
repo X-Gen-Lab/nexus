@@ -17,6 +17,51 @@ POLICY = ROOT / "cmake/platform/TargetPolicy.cmake"
 
 
 class TargetLanguagePolicyTests(unittest.TestCase):
+    def test_parent_usb_helpers_carry_exact_configured_target_policy(self):
+        with tempfile.TemporaryDirectory(prefix="nexus usb target policy ") as value:
+            directory = Path(value)
+            assembly = ROOT / "tests/support/native/assemblies/native-empty.toml"
+            (directory / "CMakeLists.txt").write_text(
+                "cmake_minimum_required(VERSION 3.31)\n"
+                "project(parent_usb_policy C ASM)\n"
+                f'set(NEXUS_ASSEMBLY_FILE "{assembly}" CACHE FILEPATH "")\n'
+                'set(NEXUS_BUILD_TESTS OFF CACHE BOOL "")\n'
+                'set(NEXUS_TEST_SUPPORT ON CACHE BOOL "")\n'
+                'set(NEXUS_BUILD_WORKLOAD OFF CACHE BOOL "")\n'
+                f'add_subdirectory("{ROOT}" nexus EXCLUDE_FROM_ALL)\n'
+                'get_target_property(config Nexus::Config ALIASED_TARGET)\n'
+                'set_property(TARGET ${config} PROPERTY NEXUS_LTO_REQUIRED ON)\n'
+                'set_property(TARGET ${config} PROPERTY '
+                'NEXUS_COMPILER_LAUNCHER "/reviewed/launcher")\n'
+                "set(CMAKE_C_STANDARD 99)\n"
+                "set(CMAKE_INTERPROCEDURAL_OPTIMIZATION OFF)\n"
+                "nexus_add_st_usb_host()\n"
+                "nexus_add_st_usb_device()\n"
+                "foreach(target IN ITEMS nexus_st_usb_host_core "
+                "nexus_st_usb_host nexus_st_usb_device_core nexus_st_usb_device)\n"
+                "  get_target_property(standard ${target} C_STANDARD)\n"
+                "  get_target_property(lto ${target} "
+                "INTERPROCEDURAL_OPTIMIZATION)\n"
+                "  get_target_property(launcher ${target} C_COMPILER_LAUNCHER)\n"
+                '  if(NOT standard STREQUAL "11" OR NOT lto OR '
+                'NOT launcher STREQUAL "/reviewed/launcher")\n'
+                '    message(FATAL_ERROR "USB helper lost target policy: '
+                '${target};${standard};${lto};${launcher}")\n'
+                "  endif()\n"
+                "endforeach()\n", encoding="utf-8")
+            environment = dict(os.environ)
+            environment["PYTHONDONTWRITEBYTECODE"] = "1"
+            environment["PATH"] = (str(ROOT / ".venv/bin") + os.pathsep +
+                                   environment.get("PATH", ""))
+            cmake = shutil.which("cmake", path=environment["PATH"])
+            self.assertIsNotNone(cmake, "Prepared CMake is required")
+            result = subprocess.run(
+                [cmake, "-S", str(directory), "-B", str(directory / "build"),
+                 "-G", "Ninja", "-DPython3_EXECUTABLE=" + sys.executable],
+                stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                env=environment, text=True, check=False, timeout=60)
+            self.assertEqual(result.returncode, 0, result.stdout)
+
     def test_parent_firmware_is_c11_and_cpp_boundary_remains_cpp17(self):
         with tempfile.TemporaryDirectory(
                 prefix="nexus parent language ") as value:

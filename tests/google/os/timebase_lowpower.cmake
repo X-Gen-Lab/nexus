@@ -1,0 +1,65 @@
+# Real optional timer protocol, with only external register/clock/kernel mocks.
+nexus_google_test(nexus_timebase_lowpower_test
+    SOURCES "${nexus_google_root}/os/timebase_lowpower_test.cpp" ../../os/freertos/timebase_lowpower.c
+    LIBRARIES Nexus::Core
+    INCLUDES "${nexus_google_root}/os/lowpower_profile" ../../os/freertos/private
+        ../../os/freertos/include ../../arch/include)
+target_include_directories(nexus_timebase_lowpower_test SYSTEM PRIVATE
+    "${PROJECT_SOURCE_DIR}/ext/freertos/include"
+    "${PROJECT_SOURCE_DIR}/ext/freertos/portable/ThirdParty/GCC/Posix")
+target_compile_options(nexus_timebase_lowpower_test PRIVATE
+    "-include${nexus_google_root}/os/timebase_lowpower_model.h")
+
+foreach(timebase_family stm32f4)
+    set(timebase_target "nexus_${timebase_family}_lowpower_test")
+    nexus_google_test(${timebase_target} SOURCES "${nexus_google_root}/os/timebase_soc_test.cpp"
+        "${NEXUS_SOC_SOURCE_${timebase_family}}/system/timebase_lowpower.c"
+        "${NEXUS_SOURCE_DIR}/os/freertos/timebase_lowpower.c"
+        LIBRARIES Nexus::Core
+        INCLUDES "${nexus_google_root}/os/timebase_soc_profile"
+            "${NEXUS_SOC_SOURCE_${timebase_family}}"
+            "${NEXUS_SOURCE_DIR}/os/freertos/private"
+            "${NEXUS_SOURCE_DIR}/os/freertos/include"
+            "${NEXUS_SOURCE_DIR}/arch/include")
+    target_include_directories(${timebase_target} SYSTEM PRIVATE
+        "${NEXUS_SOURCE_DIR}/ext/freertos/include"
+        "${NEXUS_SOURCE_DIR}/ext/freertos/portable/ThirdParty/GCC/Posix")
+    target_compile_options(${timebase_target} PRIVATE
+        "-include${nexus_google_root}/os/timebase_soc_model.h")
+    target_include_directories(${timebase_target} SYSTEM PRIVATE
+        "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
+        "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+    nexus_use_cmsis_core(${timebase_target})
+    target_compile_definitions(${timebase_target} PRIVATE STM32F407xx)
+endforeach()
+
+# Execute the selected binding with its real monotonic IRQ and release path.
+foreach(timebase_family stm32f4)
+    set(timebase_target "nexus_${timebase_family}_lowpower_integration_test")
+    set(timebase_clock_source system/clock.c)
+    nexus_google_test(${timebase_target} SOURCES "${nexus_google_root}/os/timebase_soc_integration_test.cpp"
+        "${NEXUS_SOC_SOURCE_${timebase_family}}/${timebase_clock_source}"
+        "${NEXUS_SOC_SOURCE_${timebase_family}}/system/startup.c"
+        "${NEXUS_SOC_SOURCE_${timebase_family}}/system/timebase_lowpower.c"
+        "${NEXUS_SOURCE_DIR}/os/freertos/timebase_lowpower.c"
+        LIBRARIES Nexus::Core
+        INCLUDES "${nexus_google_root}/os/timebase_soc_profile"
+            "${NEXUS_SOC_SOURCE_${timebase_family}}"
+            "${NEXUS_SOC_SOURCE_${timebase_family}}"
+            "${NEXUS_SOURCE_DIR}/os/freertos/private"
+            "${NEXUS_SOURCE_DIR}/os/freertos/include"
+            "${NEXUS_SOURCE_DIR}/arch/include")
+    target_include_directories(${timebase_target} SYSTEM PRIVATE
+        "${NEXUS_SOURCE_DIR}/ext/freertos/include"
+        "${NEXUS_SOURCE_DIR}/ext/freertos/portable/ThirdParty/GCC/Posix")
+    target_compile_definitions(${timebase_target} PRIVATE
+        NEXUS_TIMEBASE_LOWPOWER=1 NX_TIMEBASE_INTEGRATION NX_TEST_SYSTEM_TIM5=1)
+    target_compile_options(${timebase_target} PRIVATE
+        "-include${nexus_google_root}/os/timebase_soc_model.h")
+    target_include_directories(${timebase_target} SYSTEM PRIVATE
+        "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
+        "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+    nexus_use_cmsis_core(${timebase_target})
+    target_compile_definitions(${timebase_target} PRIVATE
+        STM32F407xx NEXUS_STM32_MODEL)
+endforeach()

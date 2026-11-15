@@ -29,7 +29,8 @@ stop_timeout_us = 1000000
 [block.sd0.irq]
 priority = 6
 
-# Selecting this face never invokes or authorizes a manufacturing action.
+# This combination also exports the internal Flash maintenance face.
+# Lookup neither writes Flash nor authorizes a manufacturing action.
 [flash.physical]
 binding = "flash0"
 mode = "poll-word"

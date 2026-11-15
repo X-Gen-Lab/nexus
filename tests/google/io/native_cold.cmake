@@ -1,0 +1,5 @@
+# Real C cold preparation; generated code contributes immutable connections.
+nexus_google_test(nexus_native_cold_test SOURCES "${nexus_google_root}/io/native_cold_test.cpp"
+    LIBRARIES Nexus::NativeModel
+    INCLUDES "${NEXUS_SOURCE_DIR}/tests/support/native/drivers"
+        "${NEXUS_SOURCE_DIR}/io/private")

@@ -1,9 +1,12 @@
 """Translated diagrams preserve topology and reject incomplete label maps."""
 
 import importlib
+import json
+import os
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 
 from tools.documentation import diagrams
 
@@ -68,18 +71,68 @@ class DiagramLocalizationTests(unittest.TestCase):
             page = root / "explanation/factory.md"
             page.parent.mkdir(parents=True)
             folder = root / "assets/diagrams"
-            target = folder / "localized/en/factory.svg"
+            folder.mkdir(parents=True)
+            output = Path(temporary) / "build/diagrams"
+            target = output / "en/factory.svg"
             target.parent.mkdir(parents=True)
             (folder / "labels.json").write_text("{}")
             target.write_text("svg")
             uri = "../assets/diagrams/factory.svg"
-            self.assertEqual(self.module.image_uri(uri, page, root, "en"),
-                             "/assets/diagrams/localized/en/factory.svg")
+            self.assertEqual(self.module.image_uri(
+                uri, page, root, "en", output=output),
+                os.path.relpath(target, page.parent))
             self.assertEqual(self.module.image_uri("https://example.com/factory.svg",
                                                   page, root, "en"),
                              "https://example.com/factory.svg")
             target.unlink()
             with self.assertRaisesRegex(ValueError, "missing"):
-                self.module.image_uri(uri, page, root, "en")
+                self.module.image_uri(uri, page, root, "en", output=output)
+    def test_label_check_does_not_require_generated_source_assets(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            folder = Path(temporary) / "diagrams"
+            folder.mkdir()
+            (folder / "flow.dot").write_text(self.source, encoding="utf-8")
+            (folder / "labels.json").write_text(json.dumps(self.mapping),
+                                                 encoding="utf-8")
+            self.assertEqual(self.module.check(folder),
+                             {"localized_diagrams": 2, "errors": []})
+            self.assertFalse((folder / "localized").exists())
+
+    def test_generation_cannot_write_localized_outputs_into_source(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            folder = Path(temporary) / "diagrams"
+            folder.mkdir()
+            with self.assertRaisesRegex(ValueError, "source"):
+                self.module.write(folder, env={}, output=folder / "localized")
+
+    def test_generation_cannot_overwrite_source_through_ancestor_output(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            folder = root / "en"
+            folder.mkdir()
+            source = folder / "flow.dot"
+            source.write_text(self.source, encoding="utf-8")
+            (folder / "labels.json").write_text(json.dumps(self.mapping),
+                                                 encoding="utf-8")
+            with patch.object(diagrams, "render", return_value=b"svg"):
+                with self.assertRaisesRegex(ValueError, "source"):
+                    self.module.write(folder, env={}, output=root,
+                                      languages=("en",))
+            self.assertEqual(source.read_text(encoding="utf-8"), self.source)
+
+    def test_generation_rejects_output_and_parent_symlinks(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            folder = root / "source"
+            folder.mkdir()
+            output = root / "build"
+            output.mkdir()
+            link = root / "linked"
+            link.symlink_to(output, target_is_directory=True)
+            for candidate in (link, link / "nested"):
+                with self.subTest(output=candidate):
+                    with self.assertRaisesRegex(ValueError, "symlink"):
+                        self.module.write(folder, env={}, output=candidate)
+
 if __name__ == "__main__":
     unittest.main()

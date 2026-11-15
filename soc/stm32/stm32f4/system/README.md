@@ -126,8 +126,10 @@ RCC 状态来掩盖 warm handoff；普通启动的只读 preflight 仍要求可�
 与 Flash 常量并 park，不依赖日志、scheduler 或 libc。
 
 普通 Platform 在取得引脚与时钟前读取实际 Flash 密度与完整 `DBGMCU_IDCODE`。
-DEV_ID 必须为 `0x413`，REV_ID 只接纳已审的 `0x1001`、`0x1003`、`0x1007`、
-`0x100F`、`0x101F`；未知、缺失及旧 A 标识不按“更新芯片”自动准入。
+F405／F407／F415／F417 的 DEV_ID 为 `0x413`，REV_ID 只接纳已审的
+`0x1001`、`0x1003`、`0x1007`、`0x100F`、`0x101F`。F411、F446、F479 分别
+按其独立 DEV／REV 规则准入，见[精确器件规则](../README.md#源码与状态归属)。
+未知、缺失及旧 A 标识不按“更新芯片”自动准入。
 DEV／密度不符返回 IO，未审 cut 返回 UNSUPPORTED，均不建立平台资源责任。
 同一纯只读 C 规则也用于 pre-C 外部 SRAM bootstrap 和受控镜像 handoff：
 前者在不可撤销内存／FSMC 设置前拒绝并 park，后者在最终转移前拒绝。

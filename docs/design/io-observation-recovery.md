@@ -59,7 +59,7 @@ owner 已关闭且 idle，仍不证明 UART/SPI 硬件已停止、IRQ 发布者�
 本组合不修改默认 request、slot、owner 或 provider 的字段，不增加默认队列、计数器、
 worker、vtable 或设备热路径调用；未选择观察时没有新增常驻成本。选择观察时，调用方
 承担已有 sidecar 与值副本存储，ABI 相关尺寸见本页存储表。组合回归位于
-`tests/google/io_owner_diagnostic_pipeline_test.cpp`：真实 Native UART/SPI 与既有 C
+`tests/google/io/io_owner_diagnostic_pipeline_test.cpp`：真实 Native UART/SPI 与既有 C
 executor 验证 active、quarantine、关闭/idle、unknown、同类实例隔离及排空后副本生存期。
 这些是四项 Google case，内部传输分支不是额外 case；模型执行不证明实板停机或时序。
 

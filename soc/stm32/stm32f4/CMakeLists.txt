@@ -25,7 +25,7 @@ target_include_directories(nexus_soc_stm32f4 PUBLIC "${CMAKE_CURRENT_LIST_DIR}/i
 set(stm32_ip_includes
     "${CMAKE_CURRENT_LIST_DIR}/drivers/ip/i2c_v1_async"
     "${CMAKE_CURRENT_LIST_DIR}/drivers/ip/classic_can"
-    "${CMAKE_CURRENT_LIST_DIR}/drivers/ip/fs_device_pio"
+    "${CMAKE_CURRENT_LIST_DIR}/drivers/ip/dwc_otg_device"
     "${CMAKE_CURRENT_LIST_DIR}/drivers/ip/legacy_mac"
     "${CMAKE_CURRENT_LIST_DIR}/drivers/ip/advanced_timer")
 target_include_directories(nexus_soc_stm32f4 PRIVATE ${stm32_ip_includes})

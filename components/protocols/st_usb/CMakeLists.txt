@@ -24,13 +24,13 @@ function(nexus_add_st_usb_host)
     add_library(nexus_st_usb_host_core STATIC
         "${vendor}/Src/usbh_core.c" "${vendor}/Src/usbh_ctlreq.c"
         "${vendor}/Src/usbh_ioreq.c" "${vendor}/Src/usbh_pipes.c")
+    nexus_apply_target_policy(nexus_st_usb_host_core)
     target_include_directories(nexus_st_usb_host_core PRIVATE "${private}")
     target_include_directories(nexus_st_usb_host_core SYSTEM PRIVATE "${vendor}/Inc")
-    target_compile_features(nexus_st_usb_host_core PRIVATE c_std_11)
-    set_target_properties(nexus_st_usb_host_core PROPERTIES C_EXTENSIONS OFF)
     target_link_libraries(nexus_st_usb_host_core PRIVATE nexus_build_options)
     add_library(nexus_st_usb_host STATIC
         "${source}/components/protocols/st_usb/src/usb_host_stack.c")
+    nexus_apply_target_policy(nexus_st_usb_host)
     target_include_directories(nexus_st_usb_host PRIVATE "${private}")
     target_include_directories(nexus_st_usb_host SYSTEM PRIVATE "${vendor}/Inc")
     target_link_libraries(nexus_st_usb_host PUBLIC Nexus::IOUSBHost

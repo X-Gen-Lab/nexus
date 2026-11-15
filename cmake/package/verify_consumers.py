@@ -23,7 +23,7 @@ from tools.evidence.common import file_identity, regular_file  # noqa: E402
 from tools.maintenance.consumer_profiles import (BASE_CONSUMERS, MODERN_CONSUMERS,
                                      SELECTED_CONSUMERS, SERVICE_CONSUMERS,
                                      ServiceConsumer, consumer_plan,
-                                     selected_domain)  # noqa: E402
+                                     selected_domain, NATIVE_TIME_SMOKES)  # noqa: E402
 
 
 
@@ -34,6 +34,23 @@ def clean_environment():
                  "CMAKE_INCLUDE_PATH", "CMAKE_LIBRARY_PATH", "LIBRARY_PATH"):
         environment.pop(name, None)
     return environment
+
+
+def native_model_composition(sdk, canonical):
+    """Admit only model controls and canonical inputs from a verified host SDK."""
+    sdk = Path(sdk)
+    identity = json.loads(regular_file(sdk / ".nexus-source-sdk.json").read_text())
+    if identity.get("profile", {}).get("host_support") is not True:
+        raise ValueError("Native model controls require explicit SDK host support")
+    files = identity.get("files_sha256", {})
+    directory = sdk / "tests/support/native/include"
+    controls = tuple(directory / "nexus/io/native" / name for name in
+                     ("model.h", "rtc_lptim_model.h", "spi_dma_model.h"))
+    for path in (*controls, *canonical):
+        path = regular_file(path)
+        if files.get(path.relative_to(sdk).as_posix()) != file_identity(path)["sha256"]:
+            raise ValueError("Native model canonical payload identity differs")
+    return (directory,)
 
 
 def private_compile_inputs(entry, sdk, extra_private=(), *,
@@ -88,6 +105,10 @@ def private_compile_inputs(entry, sdk, extra_private=(), *,
                 continue
             relative = path.relative_to(root)
             parts = relative.parts
+            if (include_directory and path == declared_path and
+                    path == Path(sdk).resolve() / "tests/support/native/include"
+                    and path in composition_includes and path.is_dir()):
+                return False
             if (not parts or parts[0] in {"drivers", "tests"} or
                     {"vendors", "private"}.intersection(parts)):
                 return True
@@ -175,7 +196,7 @@ def prepare_consumer(prefix, directory, name, run_checked, *, fixture=False,
         'add_executable(parent_plain parent.c)\n'
         'nexus_add_firmware(installed_c SOURCES main.c)\n'
         'nexus_add_firmware(installed_cpp SOURCES main.cpp LIBRARIES '
-        'Nexus::Log Nexus::BMP280 Nexus::Storage Nexus::MappedStorage Nexus::AMPIPC Nexus::I3CController Nexus::UserIoBroker'
+        'Nexus::Log Nexus::BMP280 Nexus::Storage Nexus::MappedStorage Nexus::AMPIPC Nexus::I3CController Nexus::UserIoBroker Nexus::UserIoAsync'
         + (' Nexus::STM32F407Handoff' if arm and chip == "stm32" else '') + ')\n'
         'target_compile_options(installed_cpp PRIVATE "$<$<COMPILE_LANGUAGE:CXX>:-fno-exceptions;-fno-rtti>")\n'
         'get_target_property(sdk_root Nexus::Config NEXUS_SOURCE_DIR)\n'
@@ -335,17 +356,14 @@ def prepare_service_consumer(prefix, directory, specification, run_checked, *,
     canonical_sources = service_sources(sdk, specification)
     for path in canonical_sources.values():
         regular_file(path)
+    model_controls = specification.name == "native mcuboot control"
+    if model_controls:
+        native_model_composition(sdk, (assembly, *canonical_sources.values()))
     source = directory / (specification.name + " source")
     build = directory / (specification.name + " build")
     source.mkdir()
     run_checked(["git", "init", "--quiet", str(source)])
-    if specification.domain == "external-package":
-        for name, path in external_package_sources(assembly.parent).items():
-            target = source / name
-            target.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copyfile(path, target)
-    else:
-        shutil.copyfile(assembly, source / "assembly.toml")
+    shutil.copyfile(assembly, source / "assembly.toml")
     for name, path in canonical_sources.items():
         target = source / name
         target.parent.mkdir(parents=True, exist_ok=True)
@@ -402,7 +420,8 @@ def prepare_service_consumer(prefix, directory, specification, run_checked, *,
             + 'nexus_apply_target_policy(installed_public)\n'
             + 'nexus_target_warnings(installed_public STRICT)\n'
             + 'nexus_add_firmware(installed_services SOURCES composition.c\n'
-            + f'  LIBRARIES installed_public {storage})\n')
+            + f'  LIBRARIES installed_public {storage}'
+            + (' Nexus::NativeModel' if model_controls else '') + ')\n')
     elif specification.scenario == "f4_power":
         selected_setup = (
             'nexus_add_stm32f4_sleep(selected_power)\n'
@@ -500,6 +519,10 @@ def prepare_selected_consumer(prefix, directory, name, assembly_name, smoke_name
     authored = tomllib.loads(assembly.read_text())
     if type(authored.get("schema")) is not int or authored["schema"] != 2:
         raise ValueError("Selected consumer requires assembly schema 2")
+    model_controls = smoke_name in NATIVE_TIME_SMOKES
+    if model_controls:
+        selected_domain((name, assembly_name, smoke_name))
+        native_model_composition(sdk, (assembly, smoke))
     source = directory / ("selected " + name + " source")
     build = directory / ("selected " + name + " build")
     source.mkdir()
@@ -513,7 +536,8 @@ def prepare_selected_consumer(prefix, directory, name, assembly_name, smoke_name
         'set(CMAKE_C_EXTENSIONS OFF)\n'
         'set(CMAKE_EXPORT_COMPILE_COMMANDS ON)\n'
         f'find_package(Nexus {version} EXACT CONFIG REQUIRED)\n'
-        'nexus_add_firmware(installed_selected SOURCES main.c private_headers.c)\n'
+        'nexus_add_firmware(installed_selected SOURCES main.c private_headers.c'
+        + (' LIBRARIES Nexus::NativeModel' if model_controls else '') + ')\n'
         'get_target_property(sdk_root Nexus::Config NEXUS_SOURCE_DIR)\n'
         'get_target_property(config_root Nexus::Platform NEXUS_CONFIG_DIR)\n'
         'file(WRITE "${CMAKE_BINARY_DIR}/resolved-sdk.txt" "${sdk_root}")\n'
@@ -567,6 +591,8 @@ def check_native_time_image(sdk, source, build, config, commands, run_checked):
         raise ValueError("Native consumer differs from the installed canonical C scenario")
     profile = matches[0]
     assembly = verification / ("native-time-" + profile + ".toml")
+    composition_includes = native_model_composition(
+        sdk, (assembly, verification / "consumers" / ("native-time-" + profile + ".c")))
     authored = tomllib.loads(assembly.read_text())
     expected = {(kind, name): item for kind in ("rtc", "lptim")
                 for name, item in authored.get(kind, {}).items()}
@@ -591,7 +617,8 @@ def check_native_time_image(sdk, source, build, config, commands, run_checked):
             selected = Path(entry["directory"]) / selected
         if selected.resolve() != file:
             raise ValueError("Native compile row source and -c argument disagree")
-        if file.parent == source and private_compile_inputs(entry, sdk):
+        if file.parent == source and private_compile_inputs(
+                entry, sdk, composition_includes=composition_includes):
             raise ValueError("Private Native state leaked into the public consumer")
     if sum(Path(entry["file"]).resolve() == config / "bindings.c" for entry in commands) != 1:
         raise ValueError("Native generated bindings have no unique compile row")
@@ -652,6 +679,14 @@ def check_selected_image(sdk, source, build, run_checked, *,
     """Bind selected artifacts to actual resources and the retained provider."""
     if (build / "resolved-sdk.txt").read_text() != str(sdk):
         raise ValueError("Selected consumer resolved another source SDK")
+    composition_includes = ()
+    if specification is not None and selected_domain(specification) == "native-time":
+        _, assembly, smoke = specification
+        canonical = sdk / "cmake/package/verification/io_evolution/consumers" / (smoke + ".c")
+        if (source / "main.c").read_bytes() != regular_file(canonical).read_bytes():
+            raise ValueError("Native consumer differs from the installed canonical C scenario")
+        composition_includes = native_model_composition(
+            sdk, (sdk / assembly, canonical))
     commands = json.loads((build / "compile_commands.json").read_text())
     products = [entry for entry in commands
                 if Path(entry["file"]).resolve() in
@@ -659,7 +694,9 @@ def check_selected_image(sdk, source, build, run_checked, *,
     if (len(products) != 2 or
             {Path(entry["file"]).name for entry in products} !=
             {"main.c", "private_headers.c"} or
-            any(private_compile_inputs(entry, sdk) for entry in products)):
+            any(private_compile_inputs(entry, sdk,
+                    composition_includes=composition_includes)
+                for entry in products)):
         raise ValueError("Selected consumer private inputs leaked into product")
     config = Path((build / "resolved-config.txt").read_text())
     resolved = json.loads((config / "resolved.json").read_text())
@@ -976,6 +1013,8 @@ def check_service_image(sdk, source, build, specification, run_checked):
             or any((source / name).read_bytes() != path.read_bytes()
                    for name, path in canonical_sources.items())):
         raise ValueError("Service consumer differs from the canonical scenario")
+    if specification.name == "native mcuboot control":
+        native_model_composition(sdk, (canonical, *canonical_sources.values()))
     inputs = {"assembly": source / "assembly.toml",
               "private_probe": source / "private_headers.c",
               "sdk_manifest": sdk / ".nexus-source-sdk.json",

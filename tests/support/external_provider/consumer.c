@@ -1,6 +1,6 @@
 /**
  * \file            consumer.c
- * \brief           C11 only installed SDK lifecycle acceptance reference
+ * \brief           C11 checkout-only external lifecycle acceptance fixture
  * \author          Nexus Team
  * \version         1.0.0
  * \date            2026-11-02

@@ -388,11 +388,11 @@
               "soc/stm32/stm32f4/drivers/crypto/crypto_irq.c"
             ],
             "regressions": [
-              "tools/configure/test_irq_errata.py",
+              "tools/configure/tests/test_irq_errata.py",
               "tests/contracts/stm32f4_crypto/cipher_test.cpp",
               "tests/contracts/stm32f4_crypto/hash_test.cpp",
               "tests/contracts/stm32f4_crypto/irq_test.cpp",
-              "tools/configure/test_f407_crypto.py"
+              "tools/configure/tests/test_f407_crypto.py"
             ]
           },
           {
@@ -410,11 +410,11 @@
               "soc/stm32/stm32f4/drivers/crypto/crypto_irq.c"
             ],
             "regressions": [
-              "tools/configure/test_irq_errata.py",
+              "tools/configure/tests/test_irq_errata.py",
               "tests/contracts/stm32f4_crypto/cipher_test.cpp",
               "tests/contracts/stm32f4_crypto/hash_test.cpp",
               "tests/contracts/stm32f4_crypto/irq_test.cpp",
-              "tools/configure/test_f407_crypto.py"
+              "tools/configure/tests/test_f407_crypto.py"
             ]
           },
           {
@@ -438,16 +438,16 @@
               "soc/stm32/stm32f4/drivers/capture/capture.c"
             ],
             "regressions": [
-              "tools/configure/test_irq_errata.py",
-              "tests/google/stm32_system_transaction_test.cpp",
-              "tests/google/timebase_soc_integration_test.cpp",
+              "tools/configure/tests/test_irq_errata.py",
+              "tests/google/soc/stm32_system_transaction_test.cpp",
+              "tests/google/os/timebase_soc_integration_test.cpp",
               "scripts/ci/test_os_threadx.py",
               "tests/contracts/stm32f4_crypto/cipher_test.cpp",
               "tests/contracts/stm32f4_crypto/hash_test.cpp",
               "tests/contracts/stm32f4_crypto/irq_test.cpp",
-              "tools/configure/test_f407_crypto.py",
-              "tests/google/f407_capture_audio_test.cpp",
-              "tools/configure/test_f407_capture_audio_configuration.py"
+              "tools/configure/tests/test_f407_crypto.py",
+              "tests/google/soc/f407_capture_audio_test.cpp",
+              "tools/configure/tests/test_f407_capture_audio_configuration.py"
             ]
           },
           {
@@ -463,9 +463,9 @@
               "soc/stm32/stm32f4/system/sram_boot.c"
             ],
             "regressions": [
-              "tests/google/stm32_basic_cold_test.cpp",
-              "tests/google/f407_sram_boot_test.cpp",
-              "tests/google/stm32f407_handoff_test.cpp"
+              "tests/google/soc/stm32_basic_cold_test.cpp",
+              "tests/google/soc/f407_sram_boot_test.cpp",
+              "tests/google/soc/stm32f407_handoff_test.cpp"
             ]
           },
           {
@@ -481,9 +481,9 @@
               "soc/stm32/stm32f4/system/sram_boot.c"
             ],
             "regressions": [
-              "tests/google/stm32_basic_cold_test.cpp",
-              "tests/google/f407_sram_boot_test.cpp",
-              "tests/google/stm32f407_handoff_test.cpp"
+              "tests/google/soc/stm32_basic_cold_test.cpp",
+              "tests/google/soc/f407_sram_boot_test.cpp",
+              "tests/google/soc/stm32f407_handoff_test.cpp"
             ]
           },
           {
@@ -498,8 +498,8 @@
               "soc/stm32/stm32f4/drivers/rtc/rtc.c"
             ],
             "regressions": [
-              "tests/google/power_rtc_integration_test.cpp",
-              "tests/google/timebase_lowpower_test.cpp"
+              "tests/google/soc/power_rtc_integration_test.cpp",
+              "tests/google/os/timebase_lowpower_test.cpp"
             ]
           },
           {
@@ -514,8 +514,8 @@
               "soc/stm32/stm32f4/drivers/rtc/rtc.c"
             ],
             "regressions": [
-              "tests/google/power_rtc_integration_test.cpp",
-              "tests/google/timebase_lowpower_test.cpp"
+              "tests/google/soc/power_rtc_integration_test.cpp",
+              "tests/google/os/timebase_lowpower_test.cpp"
             ]
           },
           {
@@ -530,8 +530,8 @@
               "soc/stm32/stm32f4/private/bindings/domain_common.json"
             ],
             "regressions": [
-              "tests/google/stm32_ahb_clock_test.cpp",
-              "tools/configure/test_f407_clocks.py"
+              "tests/google/soc/stm32_ahb_clock_test.cpp",
+              "tools/configure/tests/test_f407_clocks.py"
             ]
           },
           {
@@ -546,8 +546,8 @@
               "soc/stm32/stm32f4/drivers/rtc/rtc.c"
             ],
             "regressions": [
-              "tests/google/power_rtc_integration_test.cpp",
-              "tests/google/timebase_lowpower_test.cpp"
+              "tests/google/soc/power_rtc_integration_test.cpp",
+              "tests/google/os/timebase_lowpower_test.cpp"
             ]
           },
           {
@@ -590,8 +590,8 @@
               "docs/design/f407-storage.md"
             ],
             "regressions": [
-              "tests/google/flash_program_test.cpp",
-              "tests/google/flash_provenance_test.cpp"
+              "tests/google/io/flash_program_test.cpp",
+              "tests/google/io/flash_provenance_test.cpp"
             ]
           },
           {
@@ -607,9 +607,9 @@
               "soc/stm32/stm32f4/drivers/rtc/binding.json"
             ],
             "regressions": [
-              "tests/google/stm32_platform_cold_test.cpp",
-              "tests/google/stm32_basic_cold_test.cpp",
-              "tools/configure/test_f407_rtc_configuration.py"
+              "tests/google/soc/stm32_platform_cold_test.cpp",
+              "tests/google/soc/stm32_basic_cold_test.cpp",
+              "tools/configure/tests/test_f407_rtc_configuration.py"
             ]
           },
           {
@@ -624,8 +624,8 @@
               "soc/stm32/stm32f4/drivers/rtc/rtc.c"
             ],
             "regressions": [
-              "tests/google/power_rtc_integration_test.cpp",
-              "tests/google/timebase_lowpower_test.cpp"
+              "tests/google/soc/power_rtc_integration_test.cpp",
+              "tests/google/os/timebase_lowpower_test.cpp"
             ]
           },
           {
@@ -666,16 +666,16 @@
               "soc/stm32/stm32f4/drivers/crypto/crypto_dma.c"
             ],
             "regressions": [
-              "tests/google/stm32_platform_cold_test.cpp",
-              "tests/google/stm32_basic_cold_test.cpp",
-              "tools/configure/test_f407_rtc_configuration.py",
+              "tests/google/soc/stm32_platform_cold_test.cpp",
+              "tests/google/soc/stm32_basic_cold_test.cpp",
+              "tools/configure/tests/test_f407_rtc_configuration.py",
               "tests/contracts/stm32f4_crypto/cipher_test.cpp",
               "tests/contracts/stm32f4_crypto/hash_test.cpp",
               "tests/contracts/stm32f4_crypto/irq_test.cpp",
-              "tools/configure/test_f407_crypto.py",
-              "tests/google/f407_capture_audio_test.cpp",
-              "tests/google/stm32_adc_group_test.cpp",
-              "tools/configure/test_f407_capture_audio_configuration.py",
+              "tools/configure/tests/test_f407_crypto.py",
+              "tests/google/soc/f407_capture_audio_test.cpp",
+              "tests/google/soc/stm32_adc_group_test.cpp",
+              "tools/configure/tests/test_f407_capture_audio_configuration.py",
               "tools/testing/test_stm32_official_cmake.py"
             ]
           },
@@ -707,7 +707,7 @@
               "soc/stm32/stm32f4/drivers/adc/adc_group_blocks.c"
             ],
             "regressions": [
-              "tests/google/stm32_adc_group_test.cpp"
+              "tests/google/soc/stm32_adc_group_test.cpp"
             ]
           },
           {
@@ -735,8 +735,8 @@
               "docs/design/f407-rtc.md"
             ],
             "regressions": [
-              "tests/google/f407_rtc_test.cpp",
-              "tools/configure/test_f407_rtc_configuration.py"
+              "tests/google/soc/f407_rtc_test.cpp",
+              "tools/configure/tests/test_f407_rtc_configuration.py"
             ]
           },
           {
@@ -751,8 +751,8 @@
               "docs/design/f407-rtc.md"
             ],
             "regressions": [
-              "tests/google/f407_rtc_test.cpp",
-              "tools/configure/test_f407_rtc_configuration.py"
+              "tests/google/soc/f407_rtc_test.cpp",
+              "tools/configure/tests/test_f407_rtc_configuration.py"
             ]
           },
           {
@@ -776,13 +776,13 @@
               "soc/stm32/stm32f4/drivers/crypto/crypto_dma.c"
             ],
             "regressions": [
-              "tools/configure/test_f407_clocks.py",
-              "tests/google/stm32_adc_group_test.cpp",
-              "tests/google/f407_capture_audio_test.cpp",
-              "tools/configure/test_f407_capture_audio_configuration.py",
+              "tools/configure/tests/test_f407_clocks.py",
+              "tests/google/soc/stm32_adc_group_test.cpp",
+              "tests/google/soc/f407_capture_audio_test.cpp",
+              "tools/configure/tests/test_f407_capture_audio_configuration.py",
               "tests/contracts/stm32f4_crypto/cipher_test.cpp",
               "tests/contracts/stm32f4_crypto/hash_test.cpp",
-              "tools/configure/test_f407_crypto.py",
+              "tools/configure/tests/test_f407_crypto.py",
               "tools/testing/test_stm32_official_cmake.py"
             ]
           },
@@ -812,8 +812,8 @@
               "soc/stm32/stm32f4/drivers/memory/binding.json"
             ],
             "regressions": [
-              "tests/google/f407_fsmc_test.cpp",
-              "tests/google/f407_fsmc_boot_test.cpp"
+              "tests/google/soc/f407_fsmc_test.cpp",
+              "tests/google/soc/f407_fsmc_boot_test.cpp"
             ]
           },
           {
@@ -829,8 +829,8 @@
               "soc/stm32/stm32f4/drivers/memory/binding.json"
             ],
             "regressions": [
-              "tests/google/f407_fsmc_test.cpp",
-              "tests/google/f407_fsmc_boot_test.cpp"
+              "tests/google/soc/f407_fsmc_test.cpp",
+              "tests/google/soc/f407_fsmc_boot_test.cpp"
             ]
           },
           {
@@ -846,8 +846,8 @@
               "soc/stm32/stm32f4/drivers/memory/binding.json"
             ],
             "regressions": [
-              "tests/google/f407_fsmc_test.cpp",
-              "tests/google/f407_fsmc_boot_test.cpp"
+              "tests/google/soc/f407_fsmc_test.cpp",
+              "tests/google/soc/f407_fsmc_boot_test.cpp"
             ]
           },
           {
@@ -863,7 +863,7 @@
               "docs/design/f407-storage.md"
             ],
             "regressions": [
-              "tests/google/stm32_sdio_block_test.cpp"
+              "tests/google/soc/stm32_sdio_block_test.cpp"
             ]
           },
           {
@@ -879,7 +879,7 @@
               "docs/design/f407-storage.md"
             ],
             "regressions": [
-              "tests/google/stm32_sdio_block_test.cpp"
+              "tests/google/soc/stm32_sdio_block_test.cpp"
             ]
           },
           {
@@ -895,7 +895,7 @@
               "docs/design/f407-storage.md"
             ],
             "regressions": [
-              "tests/google/stm32_sdio_block_test.cpp"
+              "tests/google/soc/stm32_sdio_block_test.cpp"
             ]
           },
           {
@@ -911,7 +911,7 @@
               "docs/design/f407-storage.md"
             ],
             "regressions": [
-              "tests/google/stm32_sdio_block_test.cpp"
+              "tests/google/soc/stm32_sdio_block_test.cpp"
             ]
           },
           {
@@ -927,7 +927,7 @@
               "docs/design/f407-storage.md"
             ],
             "regressions": [
-              "tests/google/stm32_sdio_block_test.cpp"
+              "tests/google/soc/stm32_sdio_block_test.cpp"
             ]
           },
           {
@@ -943,7 +943,7 @@
               "docs/design/f407-storage.md"
             ],
             "regressions": [
-              "tests/google/stm32_sdio_block_test.cpp"
+              "tests/google/soc/stm32_sdio_block_test.cpp"
             ]
           },
           {
@@ -962,8 +962,8 @@
               "soc/stm32/stm32f4/drivers/adc/adc_group_automatic.c"
             ],
             "regressions": [
-              "tests/google/stm32_adc_cold_factory_test.cpp",
-              "tests/google/stm32_adc_group_test.cpp"
+              "tests/google/soc/stm32_adc_cold_factory_test.cpp",
+              "tests/google/soc/stm32_adc_group_test.cpp"
             ]
           },
           {
@@ -979,9 +979,9 @@
               "soc/stm32/stm32f4/drivers/exti/exti_hardware.c"
             ],
             "regressions": [
-              "tests/google/stm32_dac_dma_test.cpp",
-              "tests/google/stm32_dac_test.cpp",
-              "tools/configure/test_f407_dac_configuration.py"
+              "tests/google/soc/stm32_dac_dma_test.cpp",
+              "tests/google/soc/stm32_dac_test.cpp",
+              "tools/configure/tests/test_f407_dac_configuration.py"
             ]
           },
           {
@@ -996,8 +996,8 @@
               "soc/stm32/stm32f4/drivers/dac/dac.c"
             ],
             "regressions": [
-              "tests/google/stm32_dac_dma_test.cpp",
-              "tests/google/stm32_dac_test.cpp"
+              "tests/google/soc/stm32_dac_dma_test.cpp",
+              "tests/google/soc/stm32_dac_test.cpp"
             ]
           },
           {
@@ -1013,8 +1013,8 @@
               "soc/stm32/stm32f4/drivers/timer/waveform.binding.json"
             ],
             "regressions": [
-              "tests/google/f407_timer_waveform_test.cpp",
-              "tests/google/timer_advanced_test.cpp"
+              "tests/google/soc/f407_timer_waveform_test.cpp",
+              "tests/google/soc/timer_advanced_test.cpp"
             ]
           },
           {
@@ -1037,9 +1037,9 @@
               "soc/stm32/stm32f4/drivers/adc/adc_group_automatic.c"
             ],
             "regressions": [
-              "tests/google/f407_timer_waveform_test.cpp",
-              "tests/google/timer_advanced_test.cpp",
-              "tests/google/stm32_adc_group_test.cpp"
+              "tests/google/soc/f407_timer_waveform_test.cpp",
+              "tests/google/soc/timer_advanced_test.cpp",
+              "tests/google/soc/stm32_adc_group_test.cpp"
             ]
           },
           {
@@ -1069,8 +1069,8 @@
               "soc/stm32/stm32f4/drivers/timer/waveform.binding.json"
             ],
             "regressions": [
-              "tests/google/f407_timer_waveform_test.cpp",
-              "tests/google/timer_advanced_test.cpp"
+              "tests/google/soc/f407_timer_waveform_test.cpp",
+              "tests/google/soc/timer_advanced_test.cpp"
             ]
           },
           {
@@ -1086,8 +1086,8 @@
               "soc/stm32/stm32f4/system/power.c"
             ],
             "regressions": [
-              "tests/google/stm32_watchdog_test.cpp",
-              "tools/configure/test_f407_clocks.py"
+              "tests/google/soc/stm32_watchdog_test.cpp",
+              "tools/configure/tests/test_f407_clocks.py"
             ]
           },
           {
@@ -1103,8 +1103,8 @@
               "soc/stm32/stm32f4/system/power.c"
             ],
             "regressions": [
-              "tests/google/stm32_watchdog_test.cpp",
-              "tools/configure/test_f407_clocks.py"
+              "tests/google/soc/stm32_watchdog_test.cpp",
+              "tools/configure/tests/test_f407_clocks.py"
             ]
           },
           {
@@ -1120,8 +1120,8 @@
               "soc/stm32/stm32f4/system/power.c"
             ],
             "regressions": [
-              "tests/google/stm32_watchdog_test.cpp",
-              "tools/configure/test_f407_clocks.py"
+              "tests/google/soc/stm32_watchdog_test.cpp",
+              "tools/configure/tests/test_f407_clocks.py"
             ]
           },
           {
@@ -1137,8 +1137,8 @@
               "soc/stm32/stm32f4/system/power.c"
             ],
             "regressions": [
-              "tests/google/stm32_watchdog_test.cpp",
-              "tools/configure/test_f407_clocks.py"
+              "tests/google/soc/stm32_watchdog_test.cpp",
+              "tools/configure/tests/test_f407_clocks.py"
             ]
           },
           {
@@ -1153,8 +1153,8 @@
               "docs/design/f407-rtc.md"
             ],
             "regressions": [
-              "tests/google/f407_rtc_test.cpp",
-              "tools/configure/test_f407_rtc_configuration.py"
+              "tests/google/soc/f407_rtc_test.cpp",
+              "tools/configure/tests/test_f407_rtc_configuration.py"
             ]
           },
           {
@@ -1169,8 +1169,8 @@
               "docs/design/f407-rtc.md"
             ],
             "regressions": [
-              "tests/google/f407_rtc_test.cpp",
-              "tools/configure/test_f407_rtc_configuration.py"
+              "tests/google/soc/f407_rtc_test.cpp",
+              "tools/configure/tests/test_f407_rtc_configuration.py"
             ]
           },
           {
@@ -1185,8 +1185,8 @@
               "docs/design/f407-rtc.md"
             ],
             "regressions": [
-              "tests/google/f407_rtc_test.cpp",
-              "tools/configure/test_f407_rtc_configuration.py"
+              "tests/google/soc/f407_rtc_test.cpp",
+              "tools/configure/tests/test_f407_rtc_configuration.py"
             ]
           },
           {
@@ -1201,8 +1201,8 @@
               "docs/design/f407-rtc.md"
             ],
             "regressions": [
-              "tests/google/f407_rtc_test.cpp",
-              "tools/configure/test_f407_rtc_configuration.py"
+              "tests/google/soc/f407_rtc_test.cpp",
+              "tools/configure/tests/test_f407_rtc_configuration.py"
             ]
           },
           {
@@ -1217,8 +1217,8 @@
               "docs/design/f407-rtc.md"
             ],
             "regressions": [
-              "tests/google/f407_rtc_test.cpp",
-              "tools/configure/test_f407_rtc_configuration.py"
+              "tests/google/soc/f407_rtc_test.cpp",
+              "tools/configure/tests/test_f407_rtc_configuration.py"
             ]
           },
           {
@@ -1233,8 +1233,8 @@
               "docs/design/f407-rtc.md"
             ],
             "regressions": [
-              "tests/google/f407_rtc_test.cpp",
-              "tools/configure/test_f407_rtc_configuration.py"
+              "tests/google/soc/f407_rtc_test.cpp",
+              "tools/configure/tests/test_f407_rtc_configuration.py"
             ]
           },
           {
@@ -1249,8 +1249,8 @@
               "soc/stm32/stm32f4/drivers/ip/i2c_v1_async/i2c_v1_async.c"
             ],
             "regressions": [
-              "tests/google/i2c_register_test.cpp",
-              "tests/google/i2c_async_register_test.cpp"
+              "tests/google/soc/i2c_register_test.cpp",
+              "tests/google/soc/i2c_async_register_test.cpp"
             ]
           },
           {
@@ -1278,8 +1278,8 @@
               "soc/stm32/stm32f4/drivers/ip/i2c_v1_async/i2c_v1_async.c"
             ],
             "regressions": [
-              "tests/google/i2c_register_test.cpp",
-              "tests/google/i2c_async_register_test.cpp"
+              "tests/google/soc/i2c_register_test.cpp",
+              "tests/google/soc/i2c_async_register_test.cpp"
             ]
           },
           {
@@ -1295,8 +1295,8 @@
               "soc/stm32/stm32f4/drivers/ip/i2c_v1_async/i2c_v1_async.h"
             ],
             "regressions": [
-              "tests/google/i2c_register_test.cpp",
-              "tests/google/i2c_async_register_test.cpp"
+              "tests/google/soc/i2c_register_test.cpp",
+              "tests/google/soc/i2c_async_register_test.cpp"
             ]
           },
           {
@@ -1311,7 +1311,7 @@
               "docs/design/f407-i2c-target.md"
             ],
             "regressions": [
-              "tests/google/i2c_target_exchange_test.cpp"
+              "tests/google/soc/i2c_target_exchange_test.cpp"
             ]
           },
           {
@@ -1340,8 +1340,8 @@
               "docs/design/uart-wire-modes.md"
             ],
             "regressions": [
-              "tests/google/stm32_uart_wire_test.cpp",
-              "tests/google/uart_formats_provider_test.cpp"
+              "tests/google/soc/stm32_uart_wire_test.cpp",
+              "tests/google/io/uart_formats_provider_test.cpp"
             ]
           },
           {
@@ -1357,8 +1357,8 @@
               "docs/design/uart-wire-modes.md"
             ],
             "regressions": [
-              "tests/google/stm32_uart_wire_test.cpp",
-              "tests/google/uart_formats_provider_test.cpp"
+              "tests/google/soc/stm32_uart_wire_test.cpp",
+              "tests/google/io/uart_formats_provider_test.cpp"
             ]
           },
           {
@@ -1374,8 +1374,8 @@
               "docs/design/uart-wire-modes.md"
             ],
             "regressions": [
-              "tests/google/stm32_uart_wire_test.cpp",
-              "tests/google/uart_formats_provider_test.cpp"
+              "tests/google/soc/stm32_uart_wire_test.cpp",
+              "tests/google/io/uart_formats_provider_test.cpp"
             ]
           },
           {
@@ -1405,8 +1405,8 @@
               "docs/design/uart-wire-modes.md"
             ],
             "regressions": [
-              "tests/google/stm32_uart_wire_test.cpp",
-              "tests/google/uart_formats_provider_test.cpp"
+              "tests/google/soc/stm32_uart_wire_test.cpp",
+              "tests/google/io/uart_formats_provider_test.cpp"
             ]
           },
           {
@@ -1422,8 +1422,8 @@
               "docs/design/uart-wire-modes.md"
             ],
             "regressions": [
-              "tests/google/stm32_uart_wire_test.cpp",
-              "tests/google/uart_formats_provider_test.cpp"
+              "tests/google/soc/stm32_uart_wire_test.cpp",
+              "tests/google/io/uart_formats_provider_test.cpp"
             ]
           },
           {
@@ -1439,8 +1439,8 @@
               "docs/design/uart-wire-modes.md"
             ],
             "regressions": [
-              "tests/google/stm32_uart_wire_test.cpp",
-              "tests/google/uart_formats_provider_test.cpp"
+              "tests/google/soc/stm32_uart_wire_test.cpp",
+              "tests/google/io/uart_formats_provider_test.cpp"
             ]
           },
           {
@@ -1456,8 +1456,8 @@
               "docs/design/uart-wire-modes.md"
             ],
             "regressions": [
-              "tests/google/stm32_uart_wire_test.cpp",
-              "tests/google/uart_formats_provider_test.cpp"
+              "tests/google/soc/stm32_uart_wire_test.cpp",
+              "tests/google/io/uart_formats_provider_test.cpp"
             ]
           },
           {
@@ -1473,8 +1473,8 @@
               "docs/design/uart-wire-modes.md"
             ],
             "regressions": [
-              "tests/google/stm32_uart_wire_test.cpp",
-              "tests/google/uart_formats_provider_test.cpp"
+              "tests/google/soc/stm32_uart_wire_test.cpp",
+              "tests/google/io/uart_formats_provider_test.cpp"
             ]
           },
           {
@@ -1490,8 +1490,8 @@
               "docs/design/spi-frame-modes.md"
             ],
             "regressions": [
-              "tests/google/stm32_spi_frames_test.cpp",
-              "tools/configure/test_spi_frames_modes.py"
+              "tests/google/soc/stm32_spi_frames_test.cpp",
+              "tools/configure/tests/test_spi_frames_modes.py"
             ]
           },
           {
@@ -1507,8 +1507,8 @@
               "docs/design/spi-frame-modes.md"
             ],
             "regressions": [
-              "tests/google/stm32_spi_frames_test.cpp",
-              "tools/configure/test_spi_frames_modes.py"
+              "tests/google/soc/stm32_spi_frames_test.cpp",
+              "tools/configure/tests/test_spi_frames_modes.py"
             ]
           },
           {
@@ -1524,8 +1524,8 @@
               "docs/design/spi-frame-modes.md"
             ],
             "regressions": [
-              "tests/google/stm32_spi_frames_test.cpp",
-              "tools/configure/test_spi_frames_modes.py"
+              "tests/google/soc/stm32_spi_frames_test.cpp",
+              "tools/configure/tests/test_spi_frames_modes.py"
             ]
           },
           {
@@ -1555,8 +1555,8 @@
               "docs/design/spi-frame-modes.md"
             ],
             "regressions": [
-              "tests/google/stm32_spi_frames_test.cpp",
-              "tools/configure/test_spi_frames_modes.py"
+              "tests/google/soc/stm32_spi_frames_test.cpp",
+              "tools/configure/tests/test_spi_frames_modes.py"
             ]
           },
           {
@@ -1572,8 +1572,8 @@
               "soc/stm32/stm32f4/private/bindings/capture_audio_policy.json"
             ],
             "regressions": [
-              "tests/google/f407_capture_audio_test.cpp",
-              "tools/configure/test_f407_capture_audio_configuration.py"
+              "tests/google/soc/f407_capture_audio_test.cpp",
+              "tools/configure/tests/test_f407_capture_audio_configuration.py"
             ]
           },
           {
@@ -1589,8 +1589,8 @@
               "soc/stm32/stm32f4/private/bindings/capture_audio_policy.json"
             ],
             "regressions": [
-              "tests/google/f407_capture_audio_test.cpp",
-              "tools/configure/test_f407_capture_audio_configuration.py"
+              "tests/google/soc/f407_capture_audio_test.cpp",
+              "tools/configure/tests/test_f407_capture_audio_configuration.py"
             ]
           },
           {
@@ -1605,8 +1605,8 @@
               "soc/stm32/stm32f4/drivers/can/can.c"
             ],
             "regressions": [
-              "tests/google/can_controller_test.cpp",
-              "tests/google/can_soc_test.cpp"
+              "tests/google/soc/can_controller_test.cpp",
+              "tests/google/soc/can_soc_test.cpp"
             ]
           },
           {
@@ -1617,13 +1617,13 @@
             "condition": "An OTG_FS Device FIFO write is interrupted by accesses to endpoint-specific registers.",
             "handling": "PIO device FIFO writes and controller-state access occur under the same IRQ critical section and unique serialized owner. External direct OTG register access and reentrant class calls are forbidden while this owner is active.",
             "implementation": [
-              "soc/stm32/stm32f4/drivers/ip/fs_device_pio/usb_device_controller.c",
+              "soc/stm32/stm32f4/drivers/ip/dwc_otg_device/usb_device_controller.c",
               "soc/stm32/stm32f4/drivers/usb/usb_device.c",
               "docs/design/usb-device.md"
             ],
             "regressions": [
-              "tests/google/usb_device_test.cpp",
-              "tests/google/usb_device_soc_test.cpp"
+              "tests/google/io/usb_device_test.cpp",
+              "tests/google/soc/usb_device_soc_test.cpp"
             ]
           },
           {
@@ -1638,7 +1638,7 @@
               "docs/design/usb-device.md"
             ],
             "regressions": [
-              "tests/google/usb_host_hal_test.cpp"
+              "tests/google/soc/usb_host_hal_test.cpp"
             ]
           },
           {
@@ -1653,7 +1653,7 @@
               "docs/design/usb-device.md"
             ],
             "regressions": [
-              "tests/google/usb_host_hal_test.cpp"
+              "tests/google/soc/usb_host_hal_test.cpp"
             ]
           },
           {
@@ -1668,7 +1668,7 @@
               "docs/design/usb-device.md"
             ],
             "regressions": [
-              "tests/google/usb_host_hal_test.cpp"
+              "tests/google/soc/usb_host_hal_test.cpp"
             ]
           },
           {
@@ -1683,7 +1683,7 @@
               "docs/design/usb-device.md"
             ],
             "regressions": [
-              "tests/google/usb_host_hal_test.cpp"
+              "tests/google/soc/usb_host_hal_test.cpp"
             ]
           },
           {
@@ -1694,13 +1694,13 @@
             "condition": "Immediate DCFG DAD/PFIVL readback is not reliable after programming.",
             "handling": "Address state is retained in the controller owner and applied in its control-transfer phase; immediate DAD/PFIVL equality is not used as a device-address success oracle. Readback of unrelated core state does not prove these fields.",
             "implementation": [
-              "soc/stm32/stm32f4/drivers/ip/fs_device_pio/usb_device_controller.c",
+              "soc/stm32/stm32f4/drivers/ip/dwc_otg_device/usb_device_controller.c",
               "soc/stm32/stm32f4/drivers/usb/usb_device.c",
               "docs/design/usb-device.md"
             ],
             "regressions": [
-              "tests/google/usb_device_test.cpp",
-              "tests/google/usb_device_soc_test.cpp"
+              "tests/google/io/usb_device_test.cpp",
+              "tests/google/soc/usb_device_soc_test.cpp"
             ]
           },
           {
@@ -1711,13 +1711,13 @@
             "condition": "An OTG_HS Device FIFO write is interrupted by endpoint-register access.",
             "handling": "The shared device owner serializes HAL/PIO controller effects in IRQ critical sections; the selected HS DMA path additionally prevents this FIFO-write interleaving. DMA selection does not relax unique controller ownership or buffer reachability.",
             "implementation": [
-              "soc/stm32/stm32f4/drivers/ip/fs_device_pio/usb_device_controller.c",
+              "soc/stm32/stm32f4/drivers/ip/dwc_otg_device/usb_device_controller.c",
               "soc/stm32/stm32f4/drivers/usb/usb_device.c",
               "docs/design/usb-device.md"
             ],
             "regressions": [
-              "tests/google/usb_device_test.cpp",
-              "tests/google/usb_device_soc_test.cpp"
+              "tests/google/io/usb_device_test.cpp",
+              "tests/google/soc/usb_device_soc_test.cpp"
             ]
           },
           {
@@ -1732,7 +1732,7 @@
               "docs/design/usb-device.md"
             ],
             "regressions": [
-              "tests/google/usb_host_hal_test.cpp"
+              "tests/google/soc/usb_host_hal_test.cpp"
             ]
           },
           {
@@ -1748,8 +1748,8 @@
               "docs/design/ethernet-frames.md"
             ],
             "regressions": [
-              "tests/google/ethernet_raw_errata_test.cpp",
-              "tests/google/ethernet_frames_mac_test.cpp"
+              "tests/google/soc/ethernet_raw_errata_test.cpp",
+              "tests/google/soc/ethernet_frames_mac_test.cpp"
             ]
           },
           {
@@ -1765,8 +1765,8 @@
               "docs/design/ethernet-frames.md"
             ],
             "regressions": [
-              "tests/google/ethernet_raw_errata_test.cpp",
-              "tests/google/ethernet_frames_mac_test.cpp"
+              "tests/google/soc/ethernet_raw_errata_test.cpp",
+              "tests/google/soc/ethernet_frames_mac_test.cpp"
             ]
           },
           {
@@ -1782,8 +1782,8 @@
               "docs/design/ethernet-frames.md"
             ],
             "regressions": [
-              "tests/google/ethernet_raw_errata_test.cpp",
-              "tests/google/ethernet_frames_mac_test.cpp"
+              "tests/google/soc/ethernet_raw_errata_test.cpp",
+              "tests/google/soc/ethernet_frames_mac_test.cpp"
             ]
           },
           {
@@ -1799,8 +1799,8 @@
               "docs/design/ethernet-frames.md"
             ],
             "regressions": [
-              "tests/google/ethernet_raw_errata_test.cpp",
-              "tests/google/ethernet_frames_mac_test.cpp"
+              "tests/google/soc/ethernet_raw_errata_test.cpp",
+              "tests/google/soc/ethernet_frames_mac_test.cpp"
             ]
           },
           {
@@ -1816,8 +1816,8 @@
               "docs/design/ethernet-frames.md"
             ],
             "regressions": [
-              "tests/google/ethernet_raw_errata_test.cpp",
-              "tests/google/ethernet_frames_mac_test.cpp"
+              "tests/google/soc/ethernet_raw_errata_test.cpp",
+              "tests/google/soc/ethernet_frames_mac_test.cpp"
             ]
           },
           {
@@ -1833,8 +1833,8 @@
               "docs/design/ethernet-frames.md"
             ],
             "regressions": [
-              "tests/google/ethernet_raw_errata_test.cpp",
-              "tests/google/ethernet_frames_mac_test.cpp"
+              "tests/google/soc/ethernet_raw_errata_test.cpp",
+              "tests/google/soc/ethernet_frames_mac_test.cpp"
             ]
           },
           {
@@ -1850,8 +1850,8 @@
               "docs/design/ethernet-frames.md"
             ],
             "regressions": [
-              "tests/google/ethernet_raw_errata_test.cpp",
-              "tests/google/ethernet_frames_mac_test.cpp"
+              "tests/google/soc/ethernet_raw_errata_test.cpp",
+              "tests/google/soc/ethernet_frames_mac_test.cpp"
             ]
           },
           {
@@ -1881,8 +1881,8 @@
               "docs/design/ethernet-frames.md"
             ],
             "regressions": [
-              "tests/google/ethernet_raw_errata_test.cpp",
-              "tests/google/ethernet_frames_mac_test.cpp"
+              "tests/google/soc/ethernet_raw_errata_test.cpp",
+              "tests/google/soc/ethernet_frames_mac_test.cpp"
             ]
           },
           {
@@ -1898,8 +1898,8 @@
               "docs/design/ethernet-frames.md"
             ],
             "regressions": [
-              "tests/google/ethernet_raw_errata_test.cpp",
-              "tests/google/ethernet_frames_mac_test.cpp"
+              "tests/google/soc/ethernet_raw_errata_test.cpp",
+              "tests/google/soc/ethernet_frames_mac_test.cpp"
             ]
           },
           {
@@ -1915,8 +1915,8 @@
               "docs/design/ethernet-frames.md"
             ],
             "regressions": [
-              "tests/google/ethernet_raw_errata_test.cpp",
-              "tests/google/ethernet_frames_mac_test.cpp"
+              "tests/google/soc/ethernet_raw_errata_test.cpp",
+              "tests/google/soc/ethernet_frames_mac_test.cpp"
             ]
           },
           {
@@ -1932,8 +1932,8 @@
               "docs/design/ethernet-frames.md"
             ],
             "regressions": [
-              "tests/google/ethernet_raw_errata_test.cpp",
-              "tests/google/ethernet_frames_mac_test.cpp"
+              "tests/google/soc/ethernet_raw_errata_test.cpp",
+              "tests/google/soc/ethernet_frames_mac_test.cpp"
             ]
           }
         ]
@@ -1976,7 +1976,7 @@
               "tools/configure/bindings.py"
             ],
             "regressions": [
-              "tools/configure/test_irq_errata.py"
+              "tools/configure/tests/test_irq_errata.py"
             ]
           },
           {
@@ -1991,7 +1991,7 @@
               "tools/configure/bindings.py"
             ],
             "regressions": [
-              "tools/configure/test_irq_errata.py"
+              "tools/configure/tests/test_irq_errata.py"
             ]
           },
           {
@@ -2006,8 +2006,8 @@
               "tools/configure/bindings.py"
             ],
             "regressions": [
-              "tests/google/stm32_system_transaction_test.cpp",
-              "tools/configure/test_irq_errata.py"
+              "tests/google/soc/stm32_system_transaction_test.cpp",
+              "tools/configure/tests/test_irq_errata.py"
             ]
           },
           {
@@ -2025,11 +2025,11 @@
               "soc/stm32/stm32f4/system/stm32f4_power_traits.h"
             ],
             "regressions": [
-              "tools/configure/test_fact_references.py",
-              "tests/google/stm32_family_rtc_test.cpp",
-              "tests/google/power_rtc_integration_test.cpp",
-              "tests/google/stm32_high_clock_test.cpp",
-              "tools/configure/test_f4_rtc_configuration.py"
+              "tools/configure/tests/test_fact_references.py",
+              "tests/google/soc/stm32_family_rtc_test.cpp",
+              "tests/google/soc/power_rtc_integration_test.cpp",
+              "tests/google/soc/stm32_high_clock_test.cpp",
+              "tools/configure/tests/test_f4_rtc_configuration.py"
             ]
           },
           {
@@ -2047,11 +2047,11 @@
               "soc/stm32/stm32f4/system/stm32f4_power_traits.h"
             ],
             "regressions": [
-              "tools/configure/test_fact_references.py",
-              "tests/google/stm32_family_rtc_test.cpp",
-              "tests/google/power_rtc_integration_test.cpp",
-              "tests/google/stm32_high_clock_test.cpp",
-              "tools/configure/test_f4_rtc_configuration.py"
+              "tools/configure/tests/test_fact_references.py",
+              "tests/google/soc/stm32_family_rtc_test.cpp",
+              "tests/google/soc/power_rtc_integration_test.cpp",
+              "tests/google/soc/stm32_high_clock_test.cpp",
+              "tools/configure/tests/test_f4_rtc_configuration.py"
             ]
           },
           {
@@ -2066,9 +2066,9 @@
               "soc/stm32/stm32f4/system/clock.c"
             ],
             "regressions": [
-              "tools/configure/test_device_clocks.py",
-              "tests/google/stm32_family_system_test.cpp",
-              "tests/google/stm32_high_clock_test.cpp"
+              "tools/configure/tests/test_device_clocks.py",
+              "tests/google/soc/stm32_family_system_test.cpp",
+              "tests/google/soc/stm32_high_clock_test.cpp"
             ]
           },
           {
@@ -2086,11 +2086,11 @@
               "soc/stm32/stm32f4/system/stm32f4_power_traits.h"
             ],
             "regressions": [
-              "tools/configure/test_fact_references.py",
-              "tests/google/stm32_family_rtc_test.cpp",
-              "tests/google/power_rtc_integration_test.cpp",
-              "tests/google/stm32_high_clock_test.cpp",
-              "tools/configure/test_f4_rtc_configuration.py"
+              "tools/configure/tests/test_fact_references.py",
+              "tests/google/soc/stm32_family_rtc_test.cpp",
+              "tests/google/soc/power_rtc_integration_test.cpp",
+              "tests/google/soc/stm32_high_clock_test.cpp",
+              "tools/configure/tests/test_f4_rtc_configuration.py"
             ]
           },
           {
@@ -2118,7 +2118,7 @@
               "tools/configure/reference_profiles.py"
             ],
             "regressions": [
-              "tools/configure/test_fact_references.py"
+              "tools/configure/tests/test_fact_references.py"
             ]
           },
           {
@@ -2133,8 +2133,8 @@
               "soc/stm32/stm32f4/drivers/crc/crc.c"
             ],
             "regressions": [
-              "tests/google/stm32_family_system_test.cpp",
-              "tests/google/stm32_crc_test.cpp"
+              "tests/google/soc/stm32_family_system_test.cpp",
+              "tests/google/soc/stm32_crc_test.cpp"
             ]
           },
           {
@@ -2149,7 +2149,7 @@
               "tools/configure/reference_profiles.py"
             ],
             "regressions": [
-              "tools/configure/test_fact_references.py"
+              "tools/configure/tests/test_fact_references.py"
             ]
           },
           {
@@ -2167,11 +2167,11 @@
               "soc/stm32/stm32f4/system/stm32f4_power_traits.h"
             ],
             "regressions": [
-              "tools/configure/test_fact_references.py",
-              "tests/google/stm32_family_rtc_test.cpp",
-              "tests/google/power_rtc_integration_test.cpp",
-              "tests/google/stm32_high_clock_test.cpp",
-              "tools/configure/test_f4_rtc_configuration.py"
+              "tools/configure/tests/test_fact_references.py",
+              "tests/google/soc/stm32_family_rtc_test.cpp",
+              "tests/google/soc/power_rtc_integration_test.cpp",
+              "tests/google/soc/stm32_high_clock_test.cpp",
+              "tools/configure/tests/test_f4_rtc_configuration.py"
             ]
           },
           {
@@ -2189,11 +2189,11 @@
               "soc/stm32/stm32f4/system/stm32f4_power_traits.h"
             ],
             "regressions": [
-              "tools/configure/test_fact_references.py",
-              "tests/google/stm32_family_rtc_test.cpp",
-              "tests/google/power_rtc_integration_test.cpp",
-              "tests/google/stm32_high_clock_test.cpp",
-              "tools/configure/test_f4_rtc_configuration.py"
+              "tools/configure/tests/test_fact_references.py",
+              "tests/google/soc/stm32_family_rtc_test.cpp",
+              "tests/google/soc/power_rtc_integration_test.cpp",
+              "tests/google/soc/stm32_high_clock_test.cpp",
+              "tools/configure/tests/test_f4_rtc_configuration.py"
             ]
           },
           {
@@ -2208,7 +2208,7 @@
               "tools/configure/reference_profiles.py"
             ],
             "regressions": [
-              "tools/configure/test_fact_references.py"
+              "tools/configure/tests/test_fact_references.py"
             ]
           },
           {
@@ -2226,10 +2226,10 @@
               "soc/stm32/stm32f4/system/stm32f4_power_traits.h"
             ],
             "regressions": [
-              "tests/google/stm32_family_rtc_test.cpp",
-              "tests/google/power_rtc_integration_test.cpp",
-              "tests/google/stm32_high_clock_test.cpp",
-              "tools/configure/test_f4_rtc_configuration.py"
+              "tests/google/soc/stm32_family_rtc_test.cpp",
+              "tests/google/soc/power_rtc_integration_test.cpp",
+              "tests/google/soc/stm32_high_clock_test.cpp",
+              "tools/configure/tests/test_f4_rtc_configuration.py"
             ]
           },
           {
@@ -2260,10 +2260,10 @@
               "soc/stm32/stm32f4/system/stm32f4_power_traits.h"
             ],
             "regressions": [
-              "tests/google/stm32_family_rtc_test.cpp",
-              "tests/google/power_rtc_integration_test.cpp",
-              "tests/google/stm32_high_clock_test.cpp",
-              "tools/configure/test_f4_rtc_configuration.py"
+              "tests/google/soc/stm32_family_rtc_test.cpp",
+              "tests/google/soc/power_rtc_integration_test.cpp",
+              "tests/google/soc/stm32_high_clock_test.cpp",
+              "tools/configure/tests/test_f4_rtc_configuration.py"
             ]
           },
           {
@@ -2278,7 +2278,7 @@
               "tools/configure/reference_profiles.py"
             ],
             "regressions": [
-              "tools/configure/test_fact_references.py"
+              "tools/configure/tests/test_fact_references.py"
             ]
           },
           {
@@ -2292,7 +2292,7 @@
               "soc/stm32/stm32f4/system/clock.c"
             ],
             "regressions": [
-              "tests/google/stm32_family_system_test.cpp"
+              "tests/google/soc/stm32_family_system_test.cpp"
             ]
           },
           {
@@ -2308,10 +2308,10 @@
               "soc/stm32/stm32f4/system/stm32f4_power_traits.h"
             ],
             "regressions": [
-              "tests/google/stm32_family_rtc_test.cpp",
-              "tests/google/power_rtc_integration_test.cpp",
-              "tests/google/stm32_high_clock_test.cpp",
-              "tools/configure/test_f4_rtc_configuration.py"
+              "tests/google/soc/stm32_family_rtc_test.cpp",
+              "tests/google/soc/power_rtc_integration_test.cpp",
+              "tests/google/soc/stm32_high_clock_test.cpp",
+              "tools/configure/tests/test_f4_rtc_configuration.py"
             ]
           },
           {
@@ -2327,10 +2327,10 @@
               "soc/stm32/stm32f4/system/stm32f4_power_traits.h"
             ],
             "regressions": [
-              "tests/google/stm32_family_rtc_test.cpp",
-              "tests/google/power_rtc_integration_test.cpp",
-              "tests/google/stm32_high_clock_test.cpp",
-              "tools/configure/test_f4_rtc_configuration.py"
+              "tests/google/soc/stm32_family_rtc_test.cpp",
+              "tests/google/soc/power_rtc_integration_test.cpp",
+              "tests/google/soc/stm32_high_clock_test.cpp",
+              "tools/configure/tests/test_f4_rtc_configuration.py"
             ]
           },
           {
@@ -2346,10 +2346,10 @@
               "soc/stm32/stm32f4/system/stm32f4_power_traits.h"
             ],
             "regressions": [
-              "tests/google/stm32_family_rtc_test.cpp",
-              "tests/google/power_rtc_integration_test.cpp",
-              "tests/google/stm32_high_clock_test.cpp",
-              "tools/configure/test_f4_rtc_configuration.py"
+              "tests/google/soc/stm32_family_rtc_test.cpp",
+              "tests/google/soc/power_rtc_integration_test.cpp",
+              "tests/google/soc/stm32_high_clock_test.cpp",
+              "tools/configure/tests/test_f4_rtc_configuration.py"
             ]
           },
           {
@@ -2365,10 +2365,10 @@
               "soc/stm32/stm32f4/system/stm32f4_power_traits.h"
             ],
             "regressions": [
-              "tests/google/stm32_family_rtc_test.cpp",
-              "tests/google/power_rtc_integration_test.cpp",
-              "tests/google/stm32_high_clock_test.cpp",
-              "tools/configure/test_f4_rtc_configuration.py"
+              "tests/google/soc/stm32_family_rtc_test.cpp",
+              "tests/google/soc/power_rtc_integration_test.cpp",
+              "tests/google/soc/stm32_high_clock_test.cpp",
+              "tools/configure/tests/test_f4_rtc_configuration.py"
             ]
           },
           {
@@ -2384,10 +2384,10 @@
               "soc/stm32/stm32f4/system/stm32f4_power_traits.h"
             ],
             "regressions": [
-              "tests/google/stm32_family_rtc_test.cpp",
-              "tests/google/power_rtc_integration_test.cpp",
-              "tests/google/stm32_high_clock_test.cpp",
-              "tools/configure/test_f4_rtc_configuration.py"
+              "tests/google/soc/stm32_family_rtc_test.cpp",
+              "tests/google/soc/power_rtc_integration_test.cpp",
+              "tests/google/soc/stm32_high_clock_test.cpp",
+              "tools/configure/tests/test_f4_rtc_configuration.py"
             ]
           }
         ]
@@ -2441,7 +2441,7 @@
               "tools/configure/bindings.py"
             ],
             "regressions": [
-              "tools/configure/test_irq_errata.py"
+              "tools/configure/tests/test_irq_errata.py"
             ]
           },
           {
@@ -2456,7 +2456,7 @@
               "tools/configure/bindings.py"
             ],
             "regressions": [
-              "tools/configure/test_irq_errata.py"
+              "tools/configure/tests/test_irq_errata.py"
             ]
           },
           {
@@ -2472,9 +2472,9 @@
               "soc/stm32/stm32f4/drivers/audio/audio_sai.c"
             ],
             "regressions": [
-              "tests/google/stm32_system_transaction_test.cpp",
-              "tools/configure/test_irq_errata.py",
-              "tests/google/stm32_sai_test.cpp"
+              "tests/google/soc/stm32_system_transaction_test.cpp",
+              "tools/configure/tests/test_irq_errata.py",
+              "tests/google/soc/stm32_sai_test.cpp"
             ]
           },
           {
@@ -2492,11 +2492,11 @@
               "soc/stm32/stm32f4/system/stm32f4_power_traits.h"
             ],
             "regressions": [
-              "tools/configure/test_fact_references.py",
-              "tests/google/stm32_family_rtc_test.cpp",
-              "tests/google/power_rtc_integration_test.cpp",
-              "tests/google/stm32_high_clock_test.cpp",
-              "tools/configure/test_f4_rtc_configuration.py"
+              "tools/configure/tests/test_fact_references.py",
+              "tests/google/soc/stm32_family_rtc_test.cpp",
+              "tests/google/soc/power_rtc_integration_test.cpp",
+              "tests/google/soc/stm32_high_clock_test.cpp",
+              "tools/configure/tests/test_f4_rtc_configuration.py"
             ]
           },
           {
@@ -2514,11 +2514,11 @@
               "soc/stm32/stm32f4/system/stm32f4_power_traits.h"
             ],
             "regressions": [
-              "tools/configure/test_fact_references.py",
-              "tests/google/stm32_family_rtc_test.cpp",
-              "tests/google/power_rtc_integration_test.cpp",
-              "tests/google/stm32_high_clock_test.cpp",
-              "tools/configure/test_f4_rtc_configuration.py"
+              "tools/configure/tests/test_fact_references.py",
+              "tests/google/soc/stm32_family_rtc_test.cpp",
+              "tests/google/soc/power_rtc_integration_test.cpp",
+              "tests/google/soc/stm32_high_clock_test.cpp",
+              "tools/configure/tests/test_f4_rtc_configuration.py"
             ]
           },
           {
@@ -2533,9 +2533,9 @@
               "soc/stm32/stm32f4/system/clock.c"
             ],
             "regressions": [
-              "tools/configure/test_device_clocks.py",
-              "tests/google/stm32_family_system_test.cpp",
-              "tests/google/stm32_high_clock_test.cpp"
+              "tools/configure/tests/test_device_clocks.py",
+              "tests/google/soc/stm32_family_system_test.cpp",
+              "tests/google/soc/stm32_high_clock_test.cpp"
             ]
           },
           {
@@ -2553,11 +2553,11 @@
               "soc/stm32/stm32f4/system/stm32f4_power_traits.h"
             ],
             "regressions": [
-              "tools/configure/test_fact_references.py",
-              "tests/google/stm32_family_rtc_test.cpp",
-              "tests/google/power_rtc_integration_test.cpp",
-              "tests/google/stm32_high_clock_test.cpp",
-              "tools/configure/test_f4_rtc_configuration.py"
+              "tools/configure/tests/test_fact_references.py",
+              "tests/google/soc/stm32_family_rtc_test.cpp",
+              "tests/google/soc/power_rtc_integration_test.cpp",
+              "tests/google/soc/stm32_high_clock_test.cpp",
+              "tools/configure/tests/test_f4_rtc_configuration.py"
             ]
           },
           {
@@ -2585,7 +2585,7 @@
               "tools/configure/reference_profiles.py"
             ],
             "regressions": [
-              "tools/configure/test_fact_references.py"
+              "tools/configure/tests/test_fact_references.py"
             ]
           },
           {
@@ -2601,9 +2601,9 @@
               "soc/stm32/stm32f4/drivers/audio/audio_sai.c"
             ],
             "regressions": [
-              "tests/google/stm32_family_system_test.cpp",
-              "tests/google/stm32_crc_test.cpp",
-              "tests/google/stm32_sai_test.cpp"
+              "tests/google/soc/stm32_family_system_test.cpp",
+              "tests/google/soc/stm32_crc_test.cpp",
+              "tests/google/soc/stm32_sai_test.cpp"
             ]
           },
           {
@@ -2618,7 +2618,7 @@
               "tools/configure/reference_profiles.py"
             ],
             "regressions": [
-              "tools/configure/test_fact_references.py"
+              "tools/configure/tests/test_fact_references.py"
             ]
           },
           {
@@ -2636,11 +2636,11 @@
               "soc/stm32/stm32f4/system/stm32f4_power_traits.h"
             ],
             "regressions": [
-              "tools/configure/test_fact_references.py",
-              "tests/google/stm32_family_rtc_test.cpp",
-              "tests/google/power_rtc_integration_test.cpp",
-              "tests/google/stm32_high_clock_test.cpp",
-              "tools/configure/test_f4_rtc_configuration.py"
+              "tools/configure/tests/test_fact_references.py",
+              "tests/google/soc/stm32_family_rtc_test.cpp",
+              "tests/google/soc/power_rtc_integration_test.cpp",
+              "tests/google/soc/stm32_high_clock_test.cpp",
+              "tools/configure/tests/test_f4_rtc_configuration.py"
             ]
           },
           {
@@ -2658,11 +2658,11 @@
               "soc/stm32/stm32f4/system/stm32f4_power_traits.h"
             ],
             "regressions": [
-              "tools/configure/test_fact_references.py",
-              "tests/google/stm32_family_rtc_test.cpp",
-              "tests/google/power_rtc_integration_test.cpp",
-              "tests/google/stm32_high_clock_test.cpp",
-              "tools/configure/test_f4_rtc_configuration.py"
+              "tools/configure/tests/test_fact_references.py",
+              "tests/google/soc/stm32_family_rtc_test.cpp",
+              "tests/google/soc/power_rtc_integration_test.cpp",
+              "tests/google/soc/stm32_high_clock_test.cpp",
+              "tools/configure/tests/test_f4_rtc_configuration.py"
             ]
           },
           {
@@ -2680,10 +2680,10 @@
               "soc/stm32/stm32f4/system/stm32f4_power_traits.h"
             ],
             "regressions": [
-              "tests/google/stm32_family_rtc_test.cpp",
-              "tests/google/power_rtc_integration_test.cpp",
-              "tests/google/stm32_high_clock_test.cpp",
-              "tools/configure/test_f4_rtc_configuration.py"
+              "tests/google/soc/stm32_family_rtc_test.cpp",
+              "tests/google/soc/power_rtc_integration_test.cpp",
+              "tests/google/soc/stm32_high_clock_test.cpp",
+              "tools/configure/tests/test_f4_rtc_configuration.py"
             ]
           },
           {
@@ -2698,7 +2698,7 @@
               "tools/configure/reference_profiles.py"
             ],
             "regressions": [
-              "tools/configure/test_fact_references.py"
+              "tools/configure/tests/test_fact_references.py"
             ]
           },
           {
@@ -2712,7 +2712,7 @@
               "soc/stm32/stm32f4/system/clock.c"
             ],
             "regressions": [
-              "tests/google/stm32_family_system_test.cpp"
+              "tests/google/soc/stm32_family_system_test.cpp"
             ]
           },
           {
@@ -2728,10 +2728,10 @@
               "soc/stm32/stm32f4/system/stm32f4_power_traits.h"
             ],
             "regressions": [
-              "tests/google/stm32_family_rtc_test.cpp",
-              "tests/google/power_rtc_integration_test.cpp",
-              "tests/google/stm32_high_clock_test.cpp",
-              "tools/configure/test_f4_rtc_configuration.py"
+              "tests/google/soc/stm32_family_rtc_test.cpp",
+              "tests/google/soc/power_rtc_integration_test.cpp",
+              "tests/google/soc/stm32_high_clock_test.cpp",
+              "tools/configure/tests/test_f4_rtc_configuration.py"
             ]
           },
           {
@@ -2747,10 +2747,10 @@
               "soc/stm32/stm32f4/system/stm32f4_power_traits.h"
             ],
             "regressions": [
-              "tests/google/stm32_family_rtc_test.cpp",
-              "tests/google/power_rtc_integration_test.cpp",
-              "tests/google/stm32_high_clock_test.cpp",
-              "tools/configure/test_f4_rtc_configuration.py"
+              "tests/google/soc/stm32_family_rtc_test.cpp",
+              "tests/google/soc/power_rtc_integration_test.cpp",
+              "tests/google/soc/stm32_high_clock_test.cpp",
+              "tools/configure/tests/test_f4_rtc_configuration.py"
             ]
           },
           {
@@ -2766,10 +2766,10 @@
               "soc/stm32/stm32f4/system/stm32f4_power_traits.h"
             ],
             "regressions": [
-              "tests/google/stm32_family_rtc_test.cpp",
-              "tests/google/power_rtc_integration_test.cpp",
-              "tests/google/stm32_high_clock_test.cpp",
-              "tools/configure/test_f4_rtc_configuration.py"
+              "tests/google/soc/stm32_family_rtc_test.cpp",
+              "tests/google/soc/power_rtc_integration_test.cpp",
+              "tests/google/soc/stm32_high_clock_test.cpp",
+              "tools/configure/tests/test_f4_rtc_configuration.py"
             ]
           },
           {
@@ -2785,10 +2785,10 @@
               "soc/stm32/stm32f4/system/stm32f4_power_traits.h"
             ],
             "regressions": [
-              "tests/google/stm32_family_rtc_test.cpp",
-              "tests/google/power_rtc_integration_test.cpp",
-              "tests/google/stm32_high_clock_test.cpp",
-              "tools/configure/test_f4_rtc_configuration.py"
+              "tests/google/soc/stm32_family_rtc_test.cpp",
+              "tests/google/soc/power_rtc_integration_test.cpp",
+              "tests/google/soc/stm32_high_clock_test.cpp",
+              "tools/configure/tests/test_f4_rtc_configuration.py"
             ]
           },
           {
@@ -2804,10 +2804,10 @@
               "soc/stm32/stm32f4/system/stm32f4_power_traits.h"
             ],
             "regressions": [
-              "tests/google/stm32_family_rtc_test.cpp",
-              "tests/google/power_rtc_integration_test.cpp",
-              "tests/google/stm32_high_clock_test.cpp",
-              "tools/configure/test_f4_rtc_configuration.py"
+              "tests/google/soc/stm32_family_rtc_test.cpp",
+              "tests/google/soc/power_rtc_integration_test.cpp",
+              "tests/google/soc/stm32_high_clock_test.cpp",
+              "tools/configure/tests/test_f4_rtc_configuration.py"
             ]
           },
           {
@@ -2823,10 +2823,10 @@
               "soc/stm32/stm32f4/system/stm32f4_power_traits.h"
             ],
             "regressions": [
-              "tests/google/stm32_family_rtc_test.cpp",
-              "tests/google/power_rtc_integration_test.cpp",
-              "tests/google/stm32_high_clock_test.cpp",
-              "tools/configure/test_f4_rtc_configuration.py"
+              "tests/google/soc/stm32_family_rtc_test.cpp",
+              "tests/google/soc/power_rtc_integration_test.cpp",
+              "tests/google/soc/stm32_high_clock_test.cpp",
+              "tools/configure/tests/test_f4_rtc_configuration.py"
             ]
           }
         ]
@@ -2891,7 +2891,7 @@
               "tools/configure/bindings.py"
             ],
             "regressions": [
-              "tools/configure/test_irq_errata.py"
+              "tools/configure/tests/test_irq_errata.py"
             ]
           },
           {
@@ -2906,7 +2906,7 @@
               "tools/configure/bindings.py"
             ],
             "regressions": [
-              "tools/configure/test_irq_errata.py"
+              "tools/configure/tests/test_irq_errata.py"
             ]
           },
           {
@@ -2924,11 +2924,11 @@
               "soc/stm32/stm32f4/drivers/graphics/dma2d.c"
             ],
             "regressions": [
-              "tests/google/stm32_system_transaction_test.cpp",
-              "tools/configure/test_irq_errata.py",
-              "tests/google/stm32_sai_test.cpp",
-              "tests/google/stm32_ltdc_test.cpp",
-              "tests/google/stm32_dma2d_test.cpp"
+              "tests/google/soc/stm32_system_transaction_test.cpp",
+              "tools/configure/tests/test_irq_errata.py",
+              "tests/google/soc/stm32_sai_test.cpp",
+              "tests/google/soc/stm32_ltdc_test.cpp",
+              "tests/google/soc/stm32_dma2d_test.cpp"
             ]
           },
           {
@@ -2946,11 +2946,11 @@
               "soc/stm32/stm32f4/system/stm32f4_power_traits.h"
             ],
             "regressions": [
-              "tools/configure/test_fact_references.py",
-              "tests/google/stm32_family_rtc_test.cpp",
-              "tests/google/power_rtc_integration_test.cpp",
-              "tests/google/stm32_high_clock_test.cpp",
-              "tools/configure/test_f4_rtc_configuration.py"
+              "tools/configure/tests/test_fact_references.py",
+              "tests/google/soc/stm32_family_rtc_test.cpp",
+              "tests/google/soc/power_rtc_integration_test.cpp",
+              "tests/google/soc/stm32_high_clock_test.cpp",
+              "tools/configure/tests/test_f4_rtc_configuration.py"
             ]
           },
           {
@@ -2968,11 +2968,11 @@
               "soc/stm32/stm32f4/system/stm32f4_power_traits.h"
             ],
             "regressions": [
-              "tools/configure/test_fact_references.py",
-              "tests/google/stm32_family_rtc_test.cpp",
-              "tests/google/power_rtc_integration_test.cpp",
-              "tests/google/stm32_high_clock_test.cpp",
-              "tools/configure/test_f4_rtc_configuration.py"
+              "tools/configure/tests/test_fact_references.py",
+              "tests/google/soc/stm32_family_rtc_test.cpp",
+              "tests/google/soc/power_rtc_integration_test.cpp",
+              "tests/google/soc/stm32_high_clock_test.cpp",
+              "tools/configure/tests/test_f4_rtc_configuration.py"
             ]
           },
           {
@@ -2987,9 +2987,9 @@
               "soc/stm32/stm32f4/system/clock.c"
             ],
             "regressions": [
-              "tools/configure/test_device_clocks.py",
-              "tests/google/stm32_family_system_test.cpp",
-              "tests/google/stm32_high_clock_test.cpp"
+              "tools/configure/tests/test_device_clocks.py",
+              "tests/google/soc/stm32_family_system_test.cpp",
+              "tests/google/soc/stm32_high_clock_test.cpp"
             ]
           },
           {
@@ -3007,11 +3007,11 @@
               "soc/stm32/stm32f4/system/stm32f4_power_traits.h"
             ],
             "regressions": [
-              "tools/configure/test_fact_references.py",
-              "tests/google/stm32_family_rtc_test.cpp",
-              "tests/google/power_rtc_integration_test.cpp",
-              "tests/google/stm32_high_clock_test.cpp",
-              "tools/configure/test_f4_rtc_configuration.py"
+              "tools/configure/tests/test_fact_references.py",
+              "tests/google/soc/stm32_family_rtc_test.cpp",
+              "tests/google/soc/power_rtc_integration_test.cpp",
+              "tests/google/soc/stm32_high_clock_test.cpp",
+              "tools/configure/tests/test_f4_rtc_configuration.py"
             ]
           },
           {
@@ -3039,7 +3039,7 @@
               "tools/configure/reference_profiles.py"
             ],
             "regressions": [
-              "tools/configure/test_fact_references.py"
+              "tools/configure/tests/test_fact_references.py"
             ]
           },
           {
@@ -3059,13 +3059,13 @@
               "soc/stm32/stm32f4/drivers/memory/qspi.c"
             ],
             "regressions": [
-              "tests/google/stm32_family_system_test.cpp",
-              "tests/google/stm32_crc_test.cpp",
-              "tests/google/stm32_sdram_test.cpp",
-              "tests/google/stm32_sai_test.cpp",
-              "tests/google/stm32_ltdc_test.cpp",
-              "tests/google/stm32_dma2d_test.cpp",
-              "tests/google/stm32_qspi_test.cpp"
+              "tests/google/soc/stm32_family_system_test.cpp",
+              "tests/google/soc/stm32_crc_test.cpp",
+              "tests/google/soc/stm32_sdram_test.cpp",
+              "tests/google/soc/stm32_sai_test.cpp",
+              "tests/google/soc/stm32_ltdc_test.cpp",
+              "tests/google/soc/stm32_dma2d_test.cpp",
+              "tests/google/soc/stm32_qspi_test.cpp"
             ]
           },
           {
@@ -3080,7 +3080,7 @@
               "tools/configure/reference_profiles.py"
             ],
             "regressions": [
-              "tools/configure/test_fact_references.py"
+              "tools/configure/tests/test_fact_references.py"
             ]
           },
           {
@@ -3098,11 +3098,11 @@
               "soc/stm32/stm32f4/system/stm32f4_power_traits.h"
             ],
             "regressions": [
-              "tools/configure/test_fact_references.py",
-              "tests/google/stm32_family_rtc_test.cpp",
-              "tests/google/power_rtc_integration_test.cpp",
-              "tests/google/stm32_high_clock_test.cpp",
-              "tools/configure/test_f4_rtc_configuration.py"
+              "tools/configure/tests/test_fact_references.py",
+              "tests/google/soc/stm32_family_rtc_test.cpp",
+              "tests/google/soc/power_rtc_integration_test.cpp",
+              "tests/google/soc/stm32_high_clock_test.cpp",
+              "tools/configure/tests/test_f4_rtc_configuration.py"
             ]
           },
           {
@@ -3120,11 +3120,11 @@
               "soc/stm32/stm32f4/system/stm32f4_power_traits.h"
             ],
             "regressions": [
-              "tools/configure/test_fact_references.py",
-              "tests/google/stm32_family_rtc_test.cpp",
-              "tests/google/power_rtc_integration_test.cpp",
-              "tests/google/stm32_high_clock_test.cpp",
-              "tools/configure/test_f4_rtc_configuration.py"
+              "tools/configure/tests/test_fact_references.py",
+              "tests/google/soc/stm32_family_rtc_test.cpp",
+              "tests/google/soc/power_rtc_integration_test.cpp",
+              "tests/google/soc/stm32_high_clock_test.cpp",
+              "tools/configure/tests/test_f4_rtc_configuration.py"
             ]
           },
           {
@@ -3142,10 +3142,10 @@
               "soc/stm32/stm32f4/system/stm32f4_power_traits.h"
             ],
             "regressions": [
-              "tests/google/stm32_family_rtc_test.cpp",
-              "tests/google/power_rtc_integration_test.cpp",
-              "tests/google/stm32_high_clock_test.cpp",
-              "tools/configure/test_f4_rtc_configuration.py"
+              "tests/google/soc/stm32_family_rtc_test.cpp",
+              "tests/google/soc/power_rtc_integration_test.cpp",
+              "tests/google/soc/stm32_high_clock_test.cpp",
+              "tools/configure/tests/test_f4_rtc_configuration.py"
             ]
           },
           {
@@ -3160,8 +3160,8 @@
               "soc/stm32/stm32f4/drivers/flash/instance.h"
             ],
             "regressions": [
-              "tests/google/stm32_flash_bank_test.cpp",
-              "tools/configure/test_f479_flash.py"
+              "tests/google/soc/stm32_flash_bank_test.cpp",
+              "tools/configure/tests/test_f479_flash.py"
             ]
           },
           {
@@ -3179,11 +3179,11 @@
               "soc/stm32/stm32f4/system/stm32f4_power_traits.h"
             ],
             "regressions": [
-              "tools/configure/test_fact_references.py",
-              "tests/google/stm32_family_rtc_test.cpp",
-              "tests/google/power_rtc_integration_test.cpp",
-              "tests/google/stm32_high_clock_test.cpp",
-              "tools/configure/test_f4_rtc_configuration.py"
+              "tools/configure/tests/test_fact_references.py",
+              "tests/google/soc/stm32_family_rtc_test.cpp",
+              "tests/google/soc/power_rtc_integration_test.cpp",
+              "tests/google/soc/stm32_high_clock_test.cpp",
+              "tools/configure/tests/test_f4_rtc_configuration.py"
             ]
           },
           {
@@ -3198,7 +3198,7 @@
               "soc/stm32/stm32f4/drivers/memory/sdram.binding.json"
             ],
             "regressions": [
-              "tools/configure/test_device_view.py"
+              "tools/configure/tests/test_device_view.py"
             ]
           },
           {
@@ -3212,7 +3212,7 @@
               "soc/stm32/stm32f4/drivers/memory/fmc_sdram.c"
             ],
             "regressions": [
-              "tools/configure/test_fact_references.py"
+              "tools/configure/tests/test_fact_references.py"
             ]
           },
           {
@@ -3227,8 +3227,8 @@
               "soc/stm32/stm32f4/drivers/memory/fmc_sdram.c"
             ],
             "regressions": [
-              "tools/configure/test_device_view.py",
-              "tests/google/stm32_sdram_test.cpp"
+              "tools/configure/tests/test_device_view.py",
+              "tests/google/soc/stm32_sdram_test.cpp"
             ]
           },
           {
@@ -3243,8 +3243,8 @@
               "soc/stm32/stm32f4/drivers/memory/fmc_sdram.c"
             ],
             "regressions": [
-              "tools/configure/test_device_view.py",
-              "tests/google/stm32_sdram_test.cpp"
+              "tools/configure/tests/test_device_view.py",
+              "tests/google/soc/stm32_sdram_test.cpp"
             ]
           },
           {
@@ -3260,10 +3260,10 @@
               "soc/stm32/stm32f4/drivers/graphics/dma2d.c"
             ],
             "regressions": [
-              "tests/google/stm32_sdram_test.cpp",
-              "tests/google/stm32_ltdc_test.cpp",
-              "tests/google/stm32_dma2d_test.cpp",
-              "tools/configure/test_graphics_sdram.py"
+              "tests/google/soc/stm32_sdram_test.cpp",
+              "tests/google/soc/stm32_ltdc_test.cpp",
+              "tests/google/soc/stm32_dma2d_test.cpp",
+              "tools/configure/tests/test_graphics_sdram.py"
             ]
           },
           {
@@ -3278,8 +3278,8 @@
               "soc/stm32/stm32f4/drivers/memory/qspi.binding.json"
             ],
             "regressions": [
-              "tests/google/stm32_qspi_test.cpp",
-              "tools/configure/test_qspi.py"
+              "tests/google/soc/stm32_qspi_test.cpp",
+              "tools/configure/tests/test_qspi.py"
             ]
           },
           {
@@ -3294,8 +3294,8 @@
               "soc/stm32/stm32f4/drivers/memory/qspi.binding.json"
             ],
             "regressions": [
-              "tests/google/stm32_qspi_test.cpp",
-              "tools/configure/test_qspi.py"
+              "tests/google/soc/stm32_qspi_test.cpp",
+              "tools/configure/tests/test_qspi.py"
             ]
           },
           {
@@ -3310,8 +3310,8 @@
               "soc/stm32/stm32f4/drivers/memory/qspi.binding.json"
             ],
             "regressions": [
-              "tests/google/stm32_qspi_test.cpp",
-              "tools/configure/test_qspi.py"
+              "tests/google/soc/stm32_qspi_test.cpp",
+              "tools/configure/tests/test_qspi.py"
             ]
           },
           {
@@ -3326,8 +3326,8 @@
               "soc/stm32/stm32f4/drivers/memory/qspi.binding.json"
             ],
             "regressions": [
-              "tests/google/stm32_qspi_test.cpp",
-              "tools/configure/test_qspi.py"
+              "tests/google/soc/stm32_qspi_test.cpp",
+              "tools/configure/tests/test_qspi.py"
             ]
           },
           {
@@ -3342,8 +3342,8 @@
               "soc/stm32/stm32f4/drivers/memory/qspi.binding.json"
             ],
             "regressions": [
-              "tests/google/stm32_qspi_test.cpp",
-              "tools/configure/test_qspi.py"
+              "tests/google/soc/stm32_qspi_test.cpp",
+              "tools/configure/tests/test_qspi.py"
             ]
           },
           {
@@ -3357,7 +3357,7 @@
               "soc/stm32/stm32f4/system/clock.c"
             ],
             "regressions": [
-              "tests/google/stm32_family_system_test.cpp"
+              "tests/google/soc/stm32_family_system_test.cpp"
             ]
           },
           {
@@ -3373,10 +3373,10 @@
               "soc/stm32/stm32f4/system/stm32f4_power_traits.h"
             ],
             "regressions": [
-              "tests/google/stm32_family_rtc_test.cpp",
-              "tests/google/power_rtc_integration_test.cpp",
-              "tests/google/stm32_high_clock_test.cpp",
-              "tools/configure/test_f4_rtc_configuration.py"
+              "tests/google/soc/stm32_family_rtc_test.cpp",
+              "tests/google/soc/power_rtc_integration_test.cpp",
+              "tests/google/soc/stm32_high_clock_test.cpp",
+              "tools/configure/tests/test_f4_rtc_configuration.py"
             ]
           },
           {
@@ -3392,10 +3392,10 @@
               "soc/stm32/stm32f4/system/stm32f4_power_traits.h"
             ],
             "regressions": [
-              "tests/google/stm32_family_rtc_test.cpp",
-              "tests/google/power_rtc_integration_test.cpp",
-              "tests/google/stm32_high_clock_test.cpp",
-              "tools/configure/test_f4_rtc_configuration.py"
+              "tests/google/soc/stm32_family_rtc_test.cpp",
+              "tests/google/soc/power_rtc_integration_test.cpp",
+              "tests/google/soc/stm32_high_clock_test.cpp",
+              "tools/configure/tests/test_f4_rtc_configuration.py"
             ]
           },
           {
@@ -3411,10 +3411,10 @@
               "soc/stm32/stm32f4/system/stm32f4_power_traits.h"
             ],
             "regressions": [
-              "tests/google/stm32_family_rtc_test.cpp",
-              "tests/google/power_rtc_integration_test.cpp",
-              "tests/google/stm32_high_clock_test.cpp",
-              "tools/configure/test_f4_rtc_configuration.py"
+              "tests/google/soc/stm32_family_rtc_test.cpp",
+              "tests/google/soc/power_rtc_integration_test.cpp",
+              "tests/google/soc/stm32_high_clock_test.cpp",
+              "tools/configure/tests/test_f4_rtc_configuration.py"
             ]
           },
           {
@@ -3430,10 +3430,10 @@
               "soc/stm32/stm32f4/system/stm32f4_power_traits.h"
             ],
             "regressions": [
-              "tests/google/stm32_family_rtc_test.cpp",
-              "tests/google/power_rtc_integration_test.cpp",
-              "tests/google/stm32_high_clock_test.cpp",
-              "tools/configure/test_f4_rtc_configuration.py"
+              "tests/google/soc/stm32_family_rtc_test.cpp",
+              "tests/google/soc/power_rtc_integration_test.cpp",
+              "tests/google/soc/stm32_high_clock_test.cpp",
+              "tools/configure/tests/test_f4_rtc_configuration.py"
             ]
           },
           {
@@ -3449,10 +3449,10 @@
               "soc/stm32/stm32f4/system/stm32f4_power_traits.h"
             ],
             "regressions": [
-              "tests/google/stm32_family_rtc_test.cpp",
-              "tests/google/power_rtc_integration_test.cpp",
-              "tests/google/stm32_high_clock_test.cpp",
-              "tools/configure/test_f4_rtc_configuration.py"
+              "tests/google/soc/stm32_family_rtc_test.cpp",
+              "tests/google/soc/power_rtc_integration_test.cpp",
+              "tests/google/soc/stm32_high_clock_test.cpp",
+              "tools/configure/tests/test_f4_rtc_configuration.py"
             ]
           },
           {
@@ -3468,10 +3468,10 @@
               "soc/stm32/stm32f4/system/stm32f4_power_traits.h"
             ],
             "regressions": [
-              "tests/google/stm32_family_rtc_test.cpp",
-              "tests/google/power_rtc_integration_test.cpp",
-              "tests/google/stm32_high_clock_test.cpp",
-              "tools/configure/test_f4_rtc_configuration.py"
+              "tests/google/soc/stm32_family_rtc_test.cpp",
+              "tests/google/soc/power_rtc_integration_test.cpp",
+              "tests/google/soc/stm32_high_clock_test.cpp",
+              "tools/configure/tests/test_f4_rtc_configuration.py"
             ]
           }
         ]

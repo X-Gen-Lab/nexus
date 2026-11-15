@@ -42,7 +42,7 @@ RM0383／ES0287、RM0390／ES0298、RM0386／ES0321 的独立资料审核。ES01
 | `system/` | 启动、时钟、内存、电源、timebase 与共享平台生命周期 |
 | `drivers/<domain>/` | 相邻 binding、`instance.h`、私有状态与硬件 C 实现；模式按需选编 |
 | `drivers/ip/`、`private/` | 仍被多个模式或领域使用的私有算法与共享合同 |
-| `sdk/` | 官方库的私有 CMake 选择与 `hal_config/` |
+| [`sdk/`](sdk/README.md) | 官方库的私有 CMake 选择与隔离 HAL profile |
 | `CMakeLists.txt` | 本包唯一源码目标图 |
 
 ![FIG-31：共享 IP 与精确 SoC 的源码责任](../../../docs/assets/diagrams/driver-source-ownership.svg)
@@ -152,7 +152,8 @@ F407 cut 都是集成约束：当受影响 VDIV/VSQRT 条件可能出现时，�
 | F479 LTDC／DMA2D | [图形与归还合同](../../../docs/design/official-stm32-provider.md#f479-ltdc-scanout-and-dma2d-memory-operations) |
 | F415／F417 基础 CRYP／HASH | [官方 transport 与请求所有权](../../../docs/design/official-stm32-provider.md#responsibility-boundary) |
 | RTC／备份／自主唤醒 | [RTC](../../../docs/design/f407-rtc.md) |
-| Flash／OTP／Options、SD／MMC／SDIO | [物理存储](../../../docs/design/f407-storage.md) |
+| Flash／OTP／Options | [物理存储](../../../docs/design/f407-storage.md) |
+| SD／MMC／SDIO | [控制器](drivers/sdio/)、[传输合同](sdk/hal_config/sdio/README.md) |
 | SRAM／PSRAM／NOR／NAND／8080 | [FSMC](../../../docs/design/f407-fsmc.md) |
 | Ethernet 帧与时间戳 | [原始帧](../../../docs/design/ethernet.md)、[增强帧](../../../docs/design/ethernet-frames.md) |
 

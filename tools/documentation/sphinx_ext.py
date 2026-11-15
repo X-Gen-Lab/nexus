@@ -156,8 +156,7 @@ def rewrite_local_links(source: str, page: Path, source_root: Path,
             inside_docs = candidate.is_relative_to(source_root)
             archived = inside_docs and (candidate.is_relative_to(source_root / 'archive')
                           or candidate == source_root / 'README.md'
-                          or (candidate.is_relative_to(source_root / 'sphinx')
-                              and candidate.name != 'coding_standards.rst'))
+                          or candidate.is_relative_to(source_root / 'sphinx'))
             if not inside_docs or archived:
                 relative = quote(candidate.relative_to(repository).as_posix())
                 fragment = '#' + parsed.fragment if parsed.fragment else ''
@@ -309,6 +308,19 @@ def link_local_svg_images(app, doctree, docname: str) -> None:
         reference.append(image)
 
 
+def prepare_diagram_images(app) -> None:
+    """Render selected-language views into this build's private doctree area."""
+    if app.builder.format != 'html':
+        return
+    from tools.documentation import diagram_localization
+    folder = Path(app.srcdir) / 'assets/diagrams'
+    if ((folder / 'labels.json').is_file()
+            or (folder / 'diagram-index.csv').is_file()):
+        diagram_localization.write(
+            folder, env=os.environ, output=Path(app.doctreedir) / 'nexus-diagrams',
+            languages=(app.config.language,))
+
+
 def localize_diagram_images(app, doctree) -> None:
     """Resolve label variants before the ordinary Sphinx image collector."""
     if app.builder.format != 'html':
@@ -319,7 +331,8 @@ def localize_diagram_images(app, doctree) -> None:
         if image.source:
             image['uri'] = diagram_localization.image_uri(
                 image.get('uri', ''), Path(image.source), Path(app.srcdir),
-                app.config.language)
+                app.config.language,
+                output=Path(app.doctreedir) / 'nexus-diagrams')
 
 
 def wrap_html_tables(app, doctree, docname: str) -> None:
@@ -579,6 +592,7 @@ def setup(app) -> dict[str, object]:
     app.add_config_value('nexus_translation_root', os.environ.get('NEXUS_DOCS_TRANSLATION_ROOT'), 'env')
     app.add_config_value('nexus_gettext_root', os.environ.get('NEXUS_DOCS_GETTEXT_ROOT'), 'env')
     app.connect('config-inited', _configure)
+    app.connect('builder-inited', prepare_diagram_images)
     app.connect('source-read', _read_source)
     app.connect('include-read', normalize_included_read)
     app.connect('doctree-resolved', _bind_source_links)

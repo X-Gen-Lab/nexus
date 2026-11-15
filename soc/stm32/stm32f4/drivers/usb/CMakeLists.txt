@@ -7,7 +7,7 @@ if(usb_device_modes)
     target_sources(nexus_soc_stm32f4 PRIVATE
         "${CMAKE_CURRENT_LIST_DIR}/usb_device.c"
         "${CMAKE_CURRENT_LIST_DIR}/usb_clock.c"
-        "${CMAKE_CURRENT_LIST_DIR}/../ip/fs_device_pio/usb_device_controller.c")
+        "${CMAKE_CURRENT_LIST_DIR}/../ip/dwc_otg_device/usb_device_controller.c")
     if("device-hs-fs" IN_LIST usb_device_modes OR "device-hs-ulpi" IN_LIST usb_device_modes
             OR "otg-hs-fs" IN_LIST usb_device_modes OR "otg-hs-ulpi" IN_LIST usb_device_modes)
         target_sources(nexus_soc_stm32f4 PRIVATE "${CMAKE_CURRENT_LIST_DIR}/usb_hs_clock.c")

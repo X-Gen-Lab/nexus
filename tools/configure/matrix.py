@@ -165,24 +165,27 @@ def resolve_catalogue(root=configure.ROOT):
     contract = check_contracts(root)
     catalogue = json.loads((root / CATALOGUE).read_text(encoding="utf-8"))
     if (not isinstance(catalogue, dict) or set(catalogue) != {"schema_version", "assemblies"}
-            or type(catalogue["schema_version"]) is not int or catalogue["schema_version"] != 1):
+            or type(catalogue["schema_version"]) is not int or catalogue["schema_version"] != 2):
         raise ValueError("Invalid maintained assembly catalogue")
     entries = catalogue["assemblies"]
     if not isinstance(entries, list) or not entries:
         raise ValueError("Maintained assembly catalogue must be a nonempty array")
-    if any(not isinstance(name, str) or not re.fullmatch(r"[a-z0-9-]+\.toml", name)
+    pattern = (r"(?:tools/configure/assemblies|"
+               r"boards/[a-z0-9_]+/assemblies)/[a-z0-9-]+\.toml")
+    if any(not isinstance(name, str) or not re.fullmatch(pattern, name)
            for name in entries) or len(set(entries)) != len(entries):
         raise ValueError("Invalid or duplicate maintained assembly catalogue entry")
-    directory = root / "tools/configure/assemblies"
-    # This checks the reference set, not C sources. A new reference requires an
-    # explicit catalogue change so reviewers see its maintained scope.
-    actual = {path.name for path in directory.glob("*.toml")}
+    # This checks the reference set, not C sources. Keep each Board's authored
+    # references adjacent to its facts without an implicit registration path.
+    paths = [*(root / "tools/configure/assemblies").glob("*.toml"),
+             *(root / "boards").glob("*/assemblies/*.toml")]
+    actual = {path.relative_to(root).as_posix() for path in paths}
     if set(entries) != actual:
         raise ValueError("Assembly catalogue differs from maintained TOML references: " +
                          str(sorted(set(entries) ^ actual)))
     references = []
     for name in entries:
-        path = directory / name
+        path = root / name
         result = configure.resolve_ir(path, root)
         references.append({
             "assembly": path.relative_to(root).as_posix(),

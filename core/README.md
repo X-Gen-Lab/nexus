@@ -50,7 +50,7 @@ pre-C 永久 SRAM、不可逆 watchdog 和 RTC／备份域责任不能直接放�
 驱动责任记录另计。显式使用 `-fno-short-enums` 后状态为 20 字节，不能跨 ABI 混用。
 这些布局尺寸不代表最终链接 Flash 或实板执行时间。
 
-`tests/google/static_lifecycle_test.cpp` 使用 GoogleTest／GoogleMock 检查准入、
+`tests/google/io/static_lifecycle_test.cpp` 使用 GoogleTest／GoogleMock 检查准入、
 顺序、部分失败、责任保留、逆序重试、重复调用和独立实例。
 
 ## 整平台冷态协调
@@ -99,7 +99,7 @@ primary 和 cleanup 的 phase／位置独立，成功清空诊断。同步回调
 
 实际链接成本按所选 ABI 和装配测量，不能据此声明零 RAM 或更快的 I/O。
 该机制不分配内存、不查找设备、不启动 scheduler，也不转发正常 I/O。
-`tests/google/platform_lifecycle_test.cpp` 验证真实 C 的顺序、失败、重试和诊断；
+`tests/google/core/platform_lifecycle_test.cpp` 验证真实 C 的顺序、失败、重试和诊断；
 模型、ARM 产物与物理 HIL 各自提供对应范围的证据。
 
 ## 请求、唯一执行者与回收
@@ -131,7 +131,7 @@ SETTLED 实例代次；它无法发现适配器借用、控制命令或观察者
 拒绝且不改稳定槽位／输出。耗尽稳定槽位必须退休，旧命令仍可能访问时不能清零。
 替换存储或重启责任者前，先等待退出全部控制者／观察者并撤回旧引用。
 
-[UART／SPI 集成测试](../tests/google/io_owner_diagnostic_pipeline_test.cpp)
+[UART／SPI 集成测试](../tests/google/io/io_owner_diagnostic_pipeline_test.cpp)
 使用真实 Native 具体实现与责任者，验证排空失败、恢复结清、观察者拆除引用
 后才允许具体实现停止。`core_lifecycle_test.cpp` 检查完整合法迁移矩阵、
 准备拒绝、最后可用代次。C 合同的真实线程回归不靠唤醒提示观察发布；
@@ -199,7 +199,7 @@ release／acquire 协议。产品选择可写内存及保留条件。
 当前 SP 和独立预算的异常／上下文预留区。启动建立 MSP 涂色
 来源，辅助函数不推测。不得涂写仍在执行的栈，也不得为无界扫描长时间屏蔽 IRQ。
 成本受字节数约束；预留区或等于涂色的写入可能隐藏使用，结果不是已证明
-栈峰值。`tests/google/stack_observation_test.cpp` 覆盖边界、只读、
+栈峰值。`tests/google/io/stack_observation_test.cpp` 覆盖边界、只读、
 别名，OS 栈快照另行负责任务上下文规则。
 
 放置宏每个声明仅作用一个静态变量定义，且装配已选区域：

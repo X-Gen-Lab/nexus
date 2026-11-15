@@ -22,7 +22,8 @@ python cmake/package/package_source_sdk.py --source . --output /tmp/nexus-sdk
 
 包记录源码 commit／tree、每个文件摘要、所选依赖 commit／tree 和许可通知。
 受审导入仍按当前 provider 声明精确验证；当前 F4 使用锁定 Git 依赖，导入记录为空，
-不自动携带历史 GD32 源码或消费者。安装 CMake 在配置前验证全部字节；修改、缺失、
+不自动携带历史 GD32 源码或消费者。Native 模型控制头仅随显式 host 支撑导出，
+普通 MCU 包不携带这些测试端口。安装 CMake 在配置前验证全部字节；修改、缺失、
 额外或 symlink 文件拒绝。
 准备／校验不下载缺失依赖。dirty 源仅可用 `--development-fixture` 生成不可发布包，
 消费者需显式 `NEXUS_ALLOW_SOURCE_SDK_FIXTURE=ON`，不建立发行资格。
@@ -121,9 +122,9 @@ typed resolver／factory、维护 assembly 和来源 lock 属于 SDK；host goog
 ## 器件与执行窗口消费者
 
 当前版本化消费计划由 [consumer_profiles.py](../../tools/maintenance/consumer_profiles.py)
-唯一维护，枚举基础、所选模式及服务／器件／镜像／家族消费者。计划包括标准
-Native 外置 provider 生命周期工程；Native 是测试范围，ARM 消费者选择已声明的
-精确器件。每个源码／构建根和链接镜像都必须实际执行，计划结构本身不代表通过。
+唯一维护，枚举基础、所选模式及服务／器件／镜像／家族消费者。Native 消费者仅使用显式主机支撑；外置 provider 生命周期合同由完整检出的
+`tests/support/external_provider/` 维护，不属于安装 SDK 消费计划。ARM 消费者选择
+已声明的精确器件。每个源码／构建根和链接镜像都必须实际执行，计划结构本身不代表通过。
 家族消费者复用 `tests/contracts/stm32f4_family/` 的 HSI16／内部 CRC 装配与同一公共
 consumer，新 IP 使用其各自已维护的软件装配。F407 借用 RX、Native／F407 MCUboot
 Control 及独立 F407 完整引导镜像沿同一计划维护，不在本页复制消费者计数或版本号。

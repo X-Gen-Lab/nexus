@@ -1,7 +1,7 @@
 # F407 软件装配参考
 
 本目录只保留 F4 当前入口的 schema-2 TOML。产品在外部工程持有自己的装配、预算和
-策略；这些参考不是默认产品。生产系列为 `stm32f4`，精确实现限定 F407VE／ZG。
+策略；这些参考不是默认产品。这些中央参考选择 F407VE／ZG；完整器件与模式范围见支持入口。
 
 | 文件族 | 精确选择与用途 |
 | --- | --- |
@@ -25,5 +25,8 @@ cmake --preset stm32-qiming-baremetal
 
 从仓库根运行；实际固件还需准备锁定工具和所选 SDK。配置通过、ARM 链接与软件模型
 不证明供电、跳线、电平、负载、时序或物理 HIL。每份结果绑定精确源码与配置，旧候选
-不随重构迁移。机器目录见 `catalogue.json`，真实能力见
+不随重构迁移。唯一机器目录 `catalogue.json` 采用 schema 2、仓库根相对路径，同时收录本目录和
+各 `boards/<board>/assemblies/` 的 TOML。新增参考同步登记，
+`python -m tools.configure.matrix --check` 校验目录完整性和实际解析。
+真实能力见
 [派生矩阵](../../../docs/delivery/capabilities.md)。

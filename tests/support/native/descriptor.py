@@ -11,7 +11,7 @@ DESCRIPTOR = FamilyDescriptor(
         "tests/support/native/CMakeLists.txt",
         "io/include/nexus/io/rtc.h",
         "io/include/nexus/io/lptim.h",
-        "io/include/nexus/io/native/rtc_lptim_model.h",
+        "tests/support/native/include/nexus/io/native/rtc_lptim_model.h",
         "tests/support/native/drivers/rtc_lptim_provider.h",
         "tests/support/native/drivers/rtc_lptim.c",
         "io/private/rtc_lptim_internal.h",

@@ -142,7 +142,9 @@ QUARANTINED到结束必须有实际恢复/排空证明，不暗示每个provider
 
 ## 7. 图源、视觉和离线交付
 
-首批采用可编辑Graphviz DOT和本地SVG，图源与输出成对保存。Sphinx后续可用
+首批采用可编辑Graphviz DOT和本地SVG，canonical 图源与预览输出成对保存，中英文派生视图只生成到构建目录。站点由
+同一拓扑与 `labels.json` 生成所选语言 SVG，不在源码树重复维护语言 DOT／SVG。
+Sphinx后续可用
 内置graphviz扩展；新图链及工具锁仍按DOC-25/33实施。既有Mermaid作为迁移输入，
 不能另维护同一图的第二份权威源。需要时序专用工具时，以实际需求另行审查闭包。
 

@@ -1,0 +1,65 @@
+# Execute the actual atomic generated bundle and exact SDK timer providers.
+foreach(timer_family stm32)
+    set(timer_label "stm32-zg")
+    set(timer_soc "stm32f4")
+    set(timer_input "${NEXUS_SOURCE_DIR}/tests/contracts/timer_assembly/${timer_label}.toml")
+    set(timer_bundle "${CMAKE_CURRENT_BINARY_DIR}/timer-factory-${timer_family}")
+    execute_process(COMMAND "${Python3_EXECUTABLE}" -B
+        "${NEXUS_SOURCE_DIR}/tools/configure/configure.py" --test-support
+        --source-root "${NEXUS_SOURCE_DIR}" --assembly "${timer_input}"
+        --output "${timer_bundle}" RESULT_VARIABLE timer_generated
+        OUTPUT_VARIABLE timer_output ERROR_VARIABLE timer_error)
+    if(NOT timer_generated EQUAL 0)
+        message(FATAL_ERROR "Timer factory fixture rejected: ${timer_output}${timer_error}")
+    endif()
+    nexus_google_configuration_inputs("${timer_bundle}")
+    set(timer_target "nexus_${timer_family}_timer_factory_test")
+    nexus_google_test(${timer_target} SOURCES "${nexus_google_root}/soc/timer_factory_test.cpp"
+        "${timer_bundle}/bindings.c"
+        "${NEXUS_SOC_SOURCE_${timer_soc}}/drivers/timer/timer_capture.c"
+        "${NEXUS_SOC_SOURCE_${timer_soc}}/drivers/timer/timer_capture_tim3.c"
+        "${NEXUS_SOC_SOURCE_${timer_soc}}/drivers/timer/timer_capture_tim5.c"
+        "${NEXUS_SOC_SOURCE_${timer_soc}}/drivers/timer/advanced_pwm.c"
+        "${NEXUS_SOC_SOURCE_${timer_soc}}/drivers/timer/advanced_pwm_tim8.c"
+        LIBRARIES Nexus::IO Nexus::Arch
+        INCLUDES
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/advanced_timer" "${timer_bundle}" "${NEXUS_SOURCE_DIR}/io/private"
+            "${NEXUS_SOC_SOURCE_${timer_soc}}")
+    target_compile_options(${timer_target} PRIVATE
+        "-include${nexus_google_root}/soc/timer_factory_model.h")
+    target_compile_definitions(${timer_target} PRIVATE
+        _init=nx_timer_fixture_init _fini=nx_timer_fixture_fini)
+    target_sources(${timer_target} PRIVATE
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_cold.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_lifecycle.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_coordinator.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/system_lifecycle.c")
+    target_include_directories(${timer_target} SYSTEM PRIVATE
+        "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
+        "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+    nexus_use_cmsis_core(${timer_target})
+    target_compile_definitions(${timer_target} PRIVATE
+        STM32F407xx NX_TIMER_FACTORY_STM32)
+
+    # Mode-independent cold contracts select explicit reference pads once.
+    # No generated factory or Platform bindings enter this direct C harness.
+    set(timer_direct_target nexus_stm32_timer_cold_reference_test)
+    nexus_google_test(${timer_direct_target} SOURCES "${nexus_google_root}/soc/timer_factory_test.cpp"
+        "${NEXUS_SOC_SOURCE_${timer_soc}}/drivers/timer/timer_capture.c"
+        "${NEXUS_SOC_SOURCE_${timer_soc}}/drivers/timer/timer_capture_tim3.c"
+        "${NEXUS_SOC_SOURCE_${timer_soc}}/drivers/timer/timer_capture_tim5.c"
+        "${NEXUS_SOC_SOURCE_${timer_soc}}/drivers/timer/advanced_pwm.c"
+        "${NEXUS_SOC_SOURCE_${timer_soc}}/drivers/timer/advanced_pwm_tim8.c"
+        LIBRARIES Nexus::IO Nexus::Arch
+        INCLUDES
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/advanced_timer" "${timer_bundle}" "${NEXUS_SOURCE_DIR}/io/private"
+            "${NEXUS_SOC_SOURCE_${timer_soc}}")
+    target_compile_options(${timer_direct_target} PRIVATE
+        "-include${nexus_google_root}/soc/timer_factory_model.h")
+    target_include_directories(${timer_direct_target} SYSTEM PRIVATE
+        "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
+        "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+    nexus_use_cmsis_core(${timer_direct_target})
+    target_compile_definitions(${timer_direct_target} PRIVATE
+        STM32F407xx NX_TIMER_FACTORY_STM32 NX_TIMER_DIRECT_REFERENCE)
+endforeach()

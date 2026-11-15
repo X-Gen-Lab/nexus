@@ -73,8 +73,9 @@ drain proof.
 
 The [public protocol](../../components/runtime/user_io_broker/include/nexus/components/user_io_async.h)
 and [trusted construction](../../components/runtime/user_io_broker/include/nexus/components/user_io_async_storage.h)
-provide `construct`, `dispatch`, `close`, `reap` and `join`. The optional target
-does not create a factory, kernel task, queue, registry or lock. The caller
+provide `construct`, `dispatch`, `close`, `reap` and `join`. Select
+`Nexus::UserIoAsync` explicitly for copied UART TX; `Nexus::UserIoBroker` retains
+only the scalar GPIO path. The optional target does not create a factory, kernel task, queue, registry or lock. The caller
 supplies exact privileged cells and payload capacities, immutable policy/user
 windows, complete private-context extents and an already constructed exclusive
 BusOwner/UARTOwner/UART binding. The existing BusOwner remains the only FIFO.

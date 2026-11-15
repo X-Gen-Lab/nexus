@@ -105,8 +105,8 @@ The default-disabled option emits no diagnostic text or runtime lookup objects.
 Named ordinal constants alone occupy no runtime storage. See the actual
 [factory emitter](../../tools/configure/factory.py),
 [binding emitter](../../tools/configure/bindings.py),
-[configuration regressions](../../tools/configure/test_factory_diagnostics.py)
-and [generated Native factory tests](../../tests/google/native_factory_test.cpp).
+[configuration regressions](../../tools/configure/tests/test_factory_diagnostics.py)
+and [generated Native factory tests](../../tests/google/io/native_factory_test.cpp).
 These source/test locations are review entry points, not downloadable execution
 receipts or new-source software qualification.
 

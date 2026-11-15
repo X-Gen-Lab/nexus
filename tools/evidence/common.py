@@ -185,6 +185,24 @@ def command(argv: Any, substitutions: dict[str, str] | None = None) -> list[str]
     return expanded
 
 
+def kill_process_group(process, *, timeout: float = 10) -> None:
+    """Kill an owned command group and join its direct child.
+
+    Callers retain their admission, deadlines, output bounds and evidence format.
+    Linux descendant-freeze execution in tools.dev.process has a stronger,
+    separate identity contract and does not use this short-adapter primitive.
+    """
+    if os.name == "posix":
+        try:
+            os.killpg(process.pid, signal.SIGKILL)
+        except ProcessLookupError:
+            # The group can exit between observation and withdrawal.
+            pass
+    elif process.poll() is None:
+        process.kill()
+    process.wait(timeout=timeout)
+
+
 def run_adapter(argv: list[str], timeout_s: float, *, cwd: str | Path | None = None,
                 output_limit: int = 1024 * 1024, env: dict[str, str] | None = None) -> bytes:
     """Run trusted adapter argv without a shell and kill its process group on timeout.
@@ -215,23 +233,10 @@ def run_adapter(argv: list[str], timeout_s: float, *, cwd: str | Path | None = N
             try:
                 process.wait(timeout=0.5)
             except subprocess.TimeoutExpired:
-                if os.name == "posix":
-                    try:
-                        os.killpg(process.pid, signal.SIGKILL)
-                    except ProcessLookupError:
-                        # Termination completed before escalation; reap below.
-                        pass
-                else:
-                    process.kill()
-                process.wait(timeout=2)
+                kill_process_group(process, timeout=2)
             if os.name == "posix":
                 # The parent may exit on SIGTERM while a child ignores it.
-                # Hardware ownership must not outlive the failed command.
-                try:
-                    os.killpg(process.pid, signal.SIGKILL)
-                except ProcessLookupError:
-                    # Cleanup left no surviving process-group members.
-                    pass
+                kill_process_group(process, timeout=2)
 
         deadline = time.monotonic() + timeout_s
         try:
@@ -260,7 +265,7 @@ def run_adapter(argv: list[str], timeout_s: float, *, cwd: str | Path | None = N
             else:
                 # A successful parent must not leave a flasher or a serial
                 # reader running after hardware ownership is released.
-                os.killpg(process.pid, signal.SIGKILL)
+                kill_process_group(process, timeout=2)
                 raise EvidenceError("adapter left background processes; process group stopped")
         stdout.seek(0, os.SEEK_END)
         stderr.seek(0, os.SEEK_END)

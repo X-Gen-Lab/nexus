@@ -115,6 +115,26 @@ class DeveloperCommandTests(unittest.TestCase):
             self.assertIn("governance materials are not packaged",
                           output.getvalue())
 
+    def test_sdk_rejects_repository_only_commands_before_dispatch(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.sdk_fixture(directory)
+            for command in (["matrix"], ["docs", "check"],
+                            ["doctor", "--target", "docs"],
+                            ["doctor", "--target", "workflows"]):
+                with self.subTest(command=command), \
+                        patch.object(dev, "ROOT", root), \
+                        patch.object(source_sdk, "verify", return_value={
+                            "source_revision": "a" * 40}), \
+                        patch("tools.dev.native_matrix.main", return_value=0) \
+                        as matrix, \
+                        patch.object(dev, "execute", return_value=0) as execute, \
+                        redirect_stdout(io.StringIO()), \
+                        redirect_stderr(io.StringIO()) as errors:
+                    self.assertEqual(dev.main(command), 2)
+                    self.assertIn("development checkout", errors.getvalue())
+                    execute.assert_not_called()
+                    matrix.assert_not_called()
+
     def test_manifest_presence_cannot_bypass_full_sdk_verification(self):
         with tempfile.TemporaryDirectory() as directory:
             root = self.sdk_fixture(directory)

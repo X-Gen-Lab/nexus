@@ -9,7 +9,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
-SUITES = {"testing": "tools/testing", "configure": "tools/configure",
+SUITES = {"testing": "tools/testing", "configure": "tools/configure/tests",
           "ci": "scripts/ci", "workflows": ".github/workflows"}
 # Full CI additionally owns standalone SDK/build contracts and the kernel overlay.
 CI_SUITES = {**SUITES, "contracts": "tests/contracts",

@@ -7,7 +7,8 @@ source_language: zh_CN
 
 # 当前架构图册
 
-图源为可编辑 DOT，输出为本地 SVG；`labels.json` 维护同一拓扑的中英文标签。
+图源为可编辑 DOT，仓库保留一份预览 SVG；`labels.json` 维护同一拓扑的中英文标签。
+语言 DOT／SVG 由锁定工具生成到构建目录，站点离线包携带实际使用的本地 SVG。
 实线和虚线以各边标签为准，不能把源码依赖理解为每次 I/O 的转发，也不能由图推导
 软件候选、吞吐、低功耗或物理 HIL。当前 MCU 入口为 F4，精确器件与模式见
 [支持范围](../../delivery/support.md)；图中参考装配不授权其他配置。
@@ -20,9 +21,9 @@ source_language: zh_CN
 
 ```sh
 python -m tools.documentation.diagram_localization --write \
-  --tool-prefix /absolute/path/to/prepared-doc-tools
+  --tool-prefix /absolute/path/to/prepared-doc-tools --output build/diagram-locales
 python tools/dev/dev.py docs check --full \
-  --tool-prefix /absolute/path/to/prepared-doc-tools
+  --tool-prefix /absolute/path/to/prepared-doc-tools --output build/diagram-locales
 ```
 
 ## FIG-01 全平台分层与外部边界

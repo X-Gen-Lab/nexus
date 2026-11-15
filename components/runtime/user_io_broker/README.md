@@ -23,9 +23,12 @@ TrustZone、用户故障约束和内核 pinner 仍由集成内核提供。软件
 
 ## 复制 UART TX 的可选组合
 
-同一 target 还通过 `user_io_async.h` 与受信的调用者存储
+独立目标 `Nexus::UserIoAsync` 通过 `user_io_async.h` 与受信的调用者存储
 `user_io_async_storage.h` 提供显式复制 UART TX。它复用已有 BusOwner／UARTOwner
 队列，在接受前复制 user bytes，之后只持有特权存储。
+
+只选择 `Nexus::UserIoBroker` 不编译复制 TX 实现，也不选择 UARTOwner。两个目标
+共用公开 include 根，分别声明 GPIO 与 UART 的实际依赖，不引入聚合 I/O。
 
 只有精确的受信 session／slot／epoch、真实 provider drain 和 owner 发布者会合
 完成后才能消费结果。关闭后的 privileged reap 还要求实际 outer gateway 已排空；

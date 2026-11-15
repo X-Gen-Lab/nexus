@@ -1,5 +1,6 @@
 """Regression contracts for documentation identity and translation status."""
 import hashlib
+import json
 import tempfile
 import os
 import subprocess
@@ -340,7 +341,7 @@ class LocalSvgLinkTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             docs = root / 'docs'
-            for directory in ('guide', 'assets', 'other'):
+            for directory in ('guide', 'assets/diagrams', 'other'):
                 (docs / directory).mkdir(parents=True, exist_ok=True)
             (docs / 'conf.py').write_text(
                 'import sys, os\n' + f'sys.path.insert(0, {str(project)!r})\n'
@@ -350,12 +351,17 @@ class LocalSvgLinkTests(unittest.TestCase):
                 + "language = os.environ['NEXUS_DOCS_LANGUAGE']\n", encoding='utf-8')
             (docs / 'index.md').write_text('# SVG fixture\n\n```{toctree}\nguide/topic\n```\n')
             (docs / 'guide/topic.md').write_text(
-                '# Diagrams\n\n| Scope | Source |\n| --- | --- |\n| software | `0123456789abcdef0123456789abcdef01234567` |\n\n![First diagram](../assets/flow.svg)\n\n'
+                '# Diagrams\n\n| Scope | Source |\n| --- | --- |\n| software | `0123456789abcdef0123456789abcdef01234567` |\n\n![First diagram](../assets/diagrams/flow.svg)\n\n'
                 '![Second diagram](../other/flow.svg)\n\n'
-                '[![Original link](../assets/flow.svg)](https://example.invalid/explanation)\n')
+                '[![Original link](../other/flow.svg)](https://example.invalid/explanation)\n')
             svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><rect width="16" height="16" /></svg>'
-            for directory in ('assets', 'other'):
+            for directory in ('assets/diagrams', 'other'):
                 (docs / directory / 'flow.svg').write_text(svg)
+            (docs / 'assets/diagrams/flow.dot').write_text(
+                'digraph flow { a [label="Flow"]; }', encoding='utf-8')
+            (docs / 'assets/diagrams/labels.json').write_text(json.dumps({
+                'schema_version': 1, 'en': {'Flow': 'Flow English'},
+                'zh_CN': {'Flow': '中文流程'}}), encoding='utf-8')
             for arguments in (['init', '-q'], ['add', 'docs'],
                               ['-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.invalid',
                                'commit', '-q', '-m', 'test: SVG fixture']):
@@ -391,6 +397,12 @@ class LocalSvgLinkTests(unittest.TestCase):
                     self.assertTrue((page.parent / references[0]['href']).is_file())
                     self.assertIn('title', references[0])
                 self.assertEqual(len(parser.images), 3)
+                first = next(image for image, _ in parser.images
+                             if image['alt'] == 'First diagram')
+                generated = (page.parent / first['src']).read_text(encoding='utf-8')
+                self.assertIn('中文流程' if language == 'zh_CN' else 'Flow English',
+                              generated)
+                self.assertFalse((docs / 'assets/diagrams/localized').exists())
 
 
 class SphinxTranslationIntegrationTests(unittest.TestCase):

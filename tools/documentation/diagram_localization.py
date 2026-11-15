@@ -1,14 +1,15 @@
 """Derive locale-specific labels without changing a diagram's structure.
 
 Canonical DOT owns nodes, edges, scope and layout. The checked label map owns
-only the English and Chinese wording. Derived DOT/SVG pairs are local assets;
-missing labels or modified outputs fail admission rather than using a fallback.
+only the English and Chinese wording. Derived DOT/SVG pairs are build outputs; missing labels or modified generated
+outputs fail admission rather than using a fallback.
 """
 
 from __future__ import annotations
 
 import argparse
 import json
+import os
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
@@ -64,14 +65,28 @@ def read_mapping(folder):
     return mapping
 
 
-def check(folder, *, env=None, full=False):
-    """Verify the complete two-locale asset closure without writing anything."""
+def _output(folder, output):
+    output = Path(output).absolute()
+    if any(path.is_symlink() for path in (output, *output.parents)):
+        raise ValueError("localized diagram output symlink rejected")
+    source = Path(folder).resolve()
+    if (output.resolve().is_relative_to(source)
+            or source.is_relative_to(output.resolve())):
+        raise ValueError("localized diagram output cannot overlap source")
+    return output
+
+
+def check(folder, *, env=None, full=False, output=None):
+    """Check source labels offline; optionally verify a generated asset closure."""
     folder = Path(folder)
+    target_root = _output(folder, output) if output is not None else None
     policy = folder / "labels.json"
     if not policy.is_file():
-        missing = (policy.exists() or policy.is_symlink()
+        missing = ((folder / "diagram-index.csv").is_file()
+                   or policy.exists() or policy.is_symlink()
                    or (folder / "localized").exists()
-                   or (folder / "localized").is_symlink())
+                   or (folder / "localized").is_symlink()
+                   or (target_root is not None and target_root.exists()))
         return {"localized_diagrams": 0,
                 "errors": ["missing diagram label policy for localized assets"]
                 if missing else []}
@@ -80,52 +95,59 @@ def check(folder, *, env=None, full=False):
         mapping = read_mapping(folder)
     except (OSError, ValueError) as error:
         return {"localized_diagrams": 0, "errors": [str(error)]}
+    if (folder / "localized").exists():
+        errors.append("localized diagrams belong in build output, not source")
     expected = set()
     for source in sorted(folder.glob("*.dot")):
         for language in LANGUAGES:
-            target = folder / "localized" / language / source.name
-            output = target.with_suffix(".svg")
-            expected.update((target, output))
             try:
-                content = localize(source.read_text(), mapping, language)
+                content = localize(source.read_text(encoding="utf-8"),
+                                   mapping, language)
                 diagrams.validate_source(content)
-                if diagrams._regular(target).read_text() != content:
-                    raise ValueError("derived localized DOT differs: " + str(target))
-                actual = diagrams._regular(output).read_bytes()
-                diagrams.validate_svg(actual)
-                if full and diagrams.render(target, env) != actual:
-                    raise ValueError("stale localized SVG: " + str(output))
+                if target_root is not None:
+                    target = target_root / language / source.name
+                    svg = target.with_suffix(".svg")
+                    expected.update((target, svg))
+                    if diagrams._regular(target).read_text() != content:
+                        raise ValueError("derived localized DOT differs: " + str(target))
+                    actual = diagrams._regular(svg).read_bytes()
+                    diagrams.validate_svg(actual)
+                    if full and diagrams.render(target, env) != actual:
+                        raise ValueError("stale localized SVG: " + str(svg))
                 checked += 1
             except (OSError, ValueError) as error:
                 errors.append(str(error))
-    members = list((folder / "localized").rglob("*"))
-    if any(path.is_symlink() for path in members):
-        errors.append("localized diagram closure contains a symlink")
-    actual = {path for path in members if path.is_file()}
-    if actual != expected:
-        errors.append("localized diagram closure differs from canonical sources")
+    if target_root is not None:
+        members = list(target_root.rglob("*"))
+        if any(path.is_symlink() for path in members):
+            errors.append("localized diagram closure contains a symlink")
+        if {path for path in members if path.is_file()} != expected:
+            errors.append("localized diagram closure differs from canonical sources")
     return {"localized_diagrams": checked, "errors": errors}
 
 
-def write(folder, *, env):
-    """Explicitly generate the reviewed label variants with prepared tools."""
+def write(folder, *, env, output, languages=LANGUAGES):
+    """Generate language views outside authored sources using prepared tools."""
     folder = Path(folder)
+    target_root = _output(folder, output)
+    if not languages or any(language not in LANGUAGES for language in languages):
+        raise ValueError("unsupported diagram language")
     mapping = read_mapping(folder)
     for source in sorted(folder.glob("*.dot")):
-        for language in LANGUAGES:
-            target = folder / "localized" / language / source.name
+        for language in languages:
+            target = target_root / language / source.name
             if target.is_symlink() or any(path.is_symlink() for path in target.parents):
                 raise ValueError("localized diagram symlink path rejected")
             target.parent.mkdir(parents=True, exist_ok=True)
             target.write_text(localize(source.read_text(encoding="utf-8"), mapping,
                                        language), encoding="utf-8")
-            output = target.with_suffix(".svg")
-            if output.is_symlink():
+            svg = target.with_suffix(".svg")
+            if svg.is_symlink():
                 raise ValueError("localized SVG symlink rejected")
-            output.write_bytes(diagrams.render(target, env))
+            svg.write_bytes(diagrams.render(target, env))
 
 
-def image_uri(uri, page, source_root, language):
+def image_uri(uri, page, source_root, language, *, output=None):
     """Select a checked local locale asset before Sphinx collects images."""
     parsed = urlsplit(uri)
     folder = Path(source_root).resolve() / "assets/diagrams"
@@ -138,17 +160,21 @@ def image_uri(uri, page, source_root, language):
         return uri
     policy = folder / "labels.json"
     if not policy.is_file():
-        if (policy.exists() or policy.is_symlink()
+        if ((folder / "diagram-index.csv").is_file()
+                or policy.exists() or policy.is_symlink()
                 or (folder / "localized").exists()
-                or (folder / "localized").is_symlink()):
+                or (folder / "localized").is_symlink()
+                or (output is not None and Path(output).exists())):
             raise ValueError("missing diagram label policy for localized assets")
         return uri
     diagrams._regular(policy)
     if language not in LANGUAGES:
         raise ValueError("unsupported diagram language")
-    target = folder / "localized" / language / candidate.name
+    if output is None:
+        raise ValueError("localized diagram build output is required")
+    target = _output(folder, output) / language / candidate.name
     diagrams._regular(target)
-    return "/" + target.relative_to(Path(source_root).resolve()).as_posix()
+    return Path(os.path.relpath(target, Path(page).parent)).as_posix()
 
 
 def main():
@@ -157,9 +183,11 @@ def main():
                         default=Path("docs/assets/diagrams"))
     parser.add_argument("--tool-prefix", type=Path, required=True)
     parser.add_argument("--write", action="store_true", required=True)
+    parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     from tools.documentation import install
-    write(args.folder, env=install.environment(args.tool_prefix))
+    write(args.folder, env=install.environment(args.tool_prefix),
+          output=args.output)
 
 
 if __name__ == "__main__":

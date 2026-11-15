@@ -12,6 +12,10 @@
 默认关闭。维护中的 Native preset 显式声明测试用途；GoogleTest 保留
 Debug、Release、ASan 和 TSan 四种模式。
 
+模型事件注入与状态观察由显式 `Nexus::NativeModel` 目标提供，控制头位于
+`include/nexus/io/native/`。普通 Platform 消费者只取得已装配的公共接口；需要模型
+控制的测试另行链接该目标。Source SDK 通过 `--host-support` 携带这组测试接口。
+
 ```sh
 python tools/configure/configure.py check --test-support \
   --assembly tests/support/native/assemblies/native.toml

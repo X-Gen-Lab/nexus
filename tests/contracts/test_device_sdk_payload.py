@@ -17,12 +17,29 @@ from tools.configure.providers import descriptor
 
 
 class DeviceSDKPayloadTests(unittest.TestCase):
+    def native_sdk_identity(self, installed):
+        """Real host-control bytes/hash inputs for the external-format oracle."""
+        controls = Path("tests/support/native/include/nexus/io/native")
+        for name in ("model.h", "rtc_lptim_model.h", "spi_dma_model.h"):
+            target = installed / controls / name
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(ROOT / controls / name, target)
+        files = {path.relative_to(installed).as_posix():
+                 hashlib.sha256(path.read_bytes()).hexdigest()
+                 for path in installed.rglob("*") if path.is_file()
+                 and path.name != ".nexus-source-sdk.json"}
+        snapshot = hashlib.sha256(json.dumps(
+            files, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+        (installed / ".nexus-source-sdk.json").write_text(json.dumps({
+            "profile": {"host_support": True}, "files_sha256": files,
+            "snapshot_sha256": snapshot}))
+
     def test_shared_driver_sources_are_transportable_and_mandatory(self):
         root = "soc/stm32/stm32f4/drivers/ip/"
         required = {root + name for name in (
             "i2c_v1_async/i2c_v1_async.c", "i2c_v1_async/i2c_v1_async.h",
             "classic_can/can_controller.c", "classic_can/can_controller.h",
-            "fs_device_pio/usb_device_controller.c", "fs_device_pio/usb_device_controller.h",
+            "dwc_otg_device/usb_device_controller.c", "dwc_otg_device/usb_device_controller.h",
             "legacy_mac/eth_mac.c", "legacy_mac/eth_frames_mac.c",
             "advanced_timer/timer_capture_impl.h", "advanced_timer/advanced_pwm_impl.h")}
         self.assertLessEqual(required, set(sdk.REQUIRED_FILES))
@@ -36,7 +53,7 @@ class DeviceSDKPayloadTests(unittest.TestCase):
     def test_native_time_payload_and_selected_consumers_are_explicit(self):
         payload = {
             "io/include/nexus/io/rtc.h", "io/include/nexus/io/lptim.h",
-            "io/include/nexus/io/native/rtc_lptim_model.h",
+            "tests/support/native/include/nexus/io/native/rtc_lptim_model.h",
             "tests/support/native/drivers/rtc_lptim_provider.h", "tests/support/native/drivers/rtc_lptim.c",
             "io/private/rtc_lptim_internal.h", "io/src/api/rtc.c", "io/src/api/lptim.c",
             "tests/support/native/board/board.json",
@@ -67,6 +84,7 @@ class DeviceSDKPayloadTests(unittest.TestCase):
                     target = installed / relative
                     target.parent.mkdir(parents=True, exist_ok=True)
                     shutil.copyfile(ROOT / relative, target)
+                self.native_sdk_identity(installed)
                 source, _, command = consumers.prepare_selected_consumer(
                     prefix, root, "native time " + profile,
                     (canonical / ("native-time-" + profile + ".toml")).as_posix(),
@@ -117,8 +135,7 @@ class DeviceSDKPayloadTests(unittest.TestCase):
             "backend": "native", "soc_family": "native",
             "cpu": {"arch": "native"}, "controllers": controllers}))
         (config / "bindings.c").write_text("/* explicit unit format input */\n")
-        (installed / ".nexus-source-sdk.json").write_text(json.dumps({
-            "snapshot_sha256": "a" * 64}))
+        self.native_sdk_identity(installed)
         header = bytearray(64)
         header[:6] = b"\x7fELF\x02\x01"
         header[18:20] = (62).to_bytes(2, "little")

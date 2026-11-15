@@ -15,5 +15,5 @@ Preserve current formatting and comment conventions. New behavior uses real REDâ
 workflow
 documentation
 implementation-map
-../sphinx/development/coding_standards
+coding_standards
 ```

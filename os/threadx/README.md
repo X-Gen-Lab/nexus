@@ -2,8 +2,9 @@
 
 本后端使用官方 Eclipse ThreadX 内核。受审来源为 `v6.5.2.202603_rel`，
 提交 `93387b0a60382a29579bbad5045c68328e3751df`，保留原 MIT 许可。
-首批集成范围为 Linux GNU 端口，以及用于 STM32F407／GD32F470 的 Cortex-M4
-GNU 端口。当前适配器尚未实现其他 Cortex 配置组合、MPU／TrustZone 任务隔离、
+当前集成范围为 Linux GNU 宿主端口，以及 STM32F4 所选配置的 Cortex-M4
+GNU 端口。器件与模式以[平台支持](../../docs/delivery/support.md)为准。
+当前适配器尚未实现其他 Cortex 配置组合、MPU／TrustZone 任务隔离、
 无节拍空闲、直接通知槽位和运行中调度器停机；Arch、FreeRTOS 的支持范围独立维护。
 
 公共头 `nexus/os/threadx.h` 提供后端专属的静态服务，存储由调用者持有。
@@ -182,7 +183,7 @@ SDK 消费、最终干净源码 CI 和物理 HIL 各自验收；端口名称、�
 [ARM 矩阵门禁](../../scripts/ci/os_threadx.py)真实链接三板生产目标图和两种 IRQ
 策略，并独立执行缺外部 Tick 实现的负链接测试。它核对同地址强符号官方 PendSV
 别名、全部锁定已编译内核对象、解析后的策略、ELF 预算和精确证据身份。
-`tests/google/threadx.cmake` 选择独立真实 Linux 内核，八个可执行文件完整发现、
+`tests/google/os/threadx.cmake` 选择独立真实 Linux 内核，八个可执行文件完整发现、
 执行运行期／初始化／外部边界用例，并生成全新报告。Linux 信号合同还验证完整
 屏蔽状态恢复，以及等待前已真实排队的恢复信号。最终干净源码候选、SDK 与物理
 资格均独立于开发阶段执行。

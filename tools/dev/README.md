@@ -67,7 +67,8 @@ python tools/dev/dev.py support --assembly tools/configure/assemblies/qiming-bar
 python tools/dev/dev.py docs check
 ```
 
-文档命令和仓库检查需要完整开发仓库，不属于 Source SDK 的构建工具闭包。
+`matrix`、`docs`、`check` 和 `doctor --target docs|workflows` 需要完整开发仓库，
+不属于 Source SDK 的构建工具闭包；SDK 在加载仓库专用模块前明确拒绝这些命令。
 `check` 执行格式、维护约束和完整普通开发门禁。普通 commit hook 使用同一门禁，
 读取完整暂存区，运行全部 Native GoogleTest 与受影响的完整工具域。
 一次配置和构建足够；不重复执行已运行的工具域。完整 CI 还覆盖其他 Native 模式、

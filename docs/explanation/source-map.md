@@ -25,10 +25,18 @@ soc/stm32/stm32f4/
   private/
   sdk/
 boards/
-components/
-tools/configure/
-tests/support/native/
+components/{runtime,buses,devices,services,protocols}/
+os/{baremetal,freertos,threadx,native}/
+cmake/{platform,presets,toolchains,testing,package}/
+tools/{configure,dev,documentation,evidence,hil,maintenance,measurement,schemas,testing}/
+scripts/{ci,setup,tools,validation}/
+tests/{google,contracts,support,cmake,cmsis_host}/
+docs/{tutorials,guides,reference,explanation,development,design,delivery}/
+dependencies/
+ext/
 vendors/
+.github/
+.vscode/
 ```
 
 | 维护问题 | 权威入口 |
@@ -72,3 +80,18 @@ Native 必须显式启用测试 scope，不进入生产系列目录或能力聚�
 精确支持见[支持参考](../reference/platforms/support.md)。重构前的目录与执行范围可从
 [固定旧源码](https://github.com/X-Gen-Lab/nexus/tree/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18)
 追溯；旧记录保留原始身份，不建立本次重构的软件候选或实板资格。
+
+## 目录维护规则
+
+公共头位于所属模块的 `include/nexus/`，实现与内部合同分别放在 `src/` 和
+`private/`；只在实际规模需要时增加子目录，不要求每个叶子拥有相同空层级。
+新组件加入既有五类之一并显式登记 CMake；新增同类器件优先维护精确事实和复用 C。
+新增公共语义仍需同时审查接口、配置和验证，不假设任意硬件都能只填数据。
+
+`tools/` 维护可复用的主机能力，`scripts/` 提供安装和工程门禁入口，`.github/`
+编排相同工具，`.vscode/` 只引用受维护 preset。测试按被测领域组织，源码合同、
+独立 SDK 消费和物理观测各保留自己的准入；删除夹具须说明合同退役或独立替代证据。
+
+`dependencies/` 记录锁定身份和审核，`ext/` 保存通用依赖，`vendors/` 保存官方
+硬件依赖与未启用库存。供应方原目录和许可证不按 Nexus 风格重排。`.git/`、
+`.venv/` 与 `build/` 是本地状态；清理构建产物前保留仍需追溯的唯一原始记录。
