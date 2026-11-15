@@ -81,7 +81,7 @@ setup/hold timing and joined shutdown; the
 {ref}`RS485 contract <uart__rs485_8h>` defines the composition.
 IRQ timestamps and sampled GPIO levels remain observations, with the source
 quality defined by the selected provider and the
-[infrared contract](../../../components/infrared/README.md).
+[infrared contract](../../../components/devices/infrared/README.md).
 
 USB Device and Host use distinct packet faces. An explicitly managed OTG role
 owns the selected core/PHY and exposes the ready face for its current generation.

@@ -27,7 +27,7 @@ MCU 实板 HIL 保持 `not_executed`。
 | [Board](boards/README.md) | 精确料号、晶振、PCB 接线、电气条件及未知项 |
 | [I/O](io/README.md) | 公共接口、检查分派和硬件无关机制 |
 | [OS](os/README.md) | 可选裸机、FreeRTOS、ThreadX 与主机测试后端 |
-| [组件](components/README.md) | 通过窄端口访问设备的协议与可选机制 |
+| [组件](components/README.md) | runtime／buses／devices／services／protocols 五类可选机制 |
 | [工具](tools/README.md)／[CMake](cmake/README.md) | 配置、构建、测试与交付 |
 | [测试](tests/README.md) | 真实生产 C、工具边界、ARM 链接与独立 HIL 范围 |
 

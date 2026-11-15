@@ -210,7 +210,7 @@ class LwIPSourceLockTests(unittest.TestCase):
             'set(NEXUS_SOURCE_DIR "' + self.root.as_posix() + '")\n' +
             'set(Python3_EXECUTABLE "' + Path(sys.executable).as_posix() +
             '")\ninclude("' +
-            (lwip_lock.ROOT / "components/network/CMakeLists.txt").as_posix() +
+            (lwip_lock.ROOT / "components/protocols/network/CMakeLists.txt").as_posix() +
             '")\nnexus_add_lwip()\n')
         tool = shutil.which("cmake") or str(lwip_lock.ROOT / ".venv/bin/cmake")
         executed = subprocess.run([tool, "-S", str(self.root), "-B",

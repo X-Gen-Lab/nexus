@@ -242,7 +242,7 @@ class STM32F4PrivateHeaderCompileTests(unittest.TestCase):
                     ROOT / "tests/contracts/multi_controller",
                     ROOT / "core/include", ROOT / "arch/include",
                     ROOT / "io/include", ROOT / "io/private",
-                    ROOT / "components/usb_control/include",
+                    ROOT / "components/protocols/usb_control/include",
                     ROOT / "vendors/st/cmsis_device_f4/Include",
                     ROOT / "vendors/st/stm32f4_hal/Inc",
                     ROOT / "vendors/arm/CMSIS_6/CMSIS/Core/Include")

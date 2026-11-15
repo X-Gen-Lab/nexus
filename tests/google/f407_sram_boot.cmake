@@ -15,7 +15,7 @@ nexus_google_test(nexus_f407_sram_boot_test STM32F4_LL
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/sdk/hal_config/fsmc"
         "${NEXUS_SOURCE_DIR}/arch/include"
-        "${NEXUS_SOURCE_DIR}/components/ili9341/include"
+        "${NEXUS_SOURCE_DIR}/components/devices/ili9341/include"
         "${NEXUS_SOURCE_DIR}/tests/google")
 target_include_directories(nexus_f407_sram_boot_test BEFORE PRIVATE "${sram_model}")
 target_include_directories(nexus_f407_sram_boot_test SYSTEM PRIVATE

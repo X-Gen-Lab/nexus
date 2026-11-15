@@ -157,7 +157,7 @@ endif()
                          properties["SOURCES"])
         private_imports = {
             provider.as_posix(),
-            (ROOT / "components/clock_domain/private").as_posix(),
+            (ROOT / "components/runtime/clock_domain/private").as_posix(),
         }
         public_imports = {(provider / "include").as_posix()}
         sdk_imports = {

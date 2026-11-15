@@ -11,7 +11,7 @@ digraph F4SourceOwnership {
     sdk [label="F4 sdk/\n官方库构建选择与 hal_config"];
     vendor [label="vendors/st/：F4 HAL／Device\n保留库存，按选择消费"];
     host [label="tests/support/native/\n显式测试 scope，不是生产 SoC"];
-    components [label="components/：ILI9341／XPT2046／W25"];
+    components [label="components/devices/：ILI9341／XPT2046／W25"];
     facts [label="package.json、facts/ 与相邻 binding\nBoard JSON 与外部 TOML", fillcolor="#f8fafc"];
     config [label="tools/configure/：通用 DataProvider\n领域政策、具名 IR 与有限静态装配"];
     assembly [label="生成 nexus_bindings.c\n静态实例、face、固定生命周期连接"];

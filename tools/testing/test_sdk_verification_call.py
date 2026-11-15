@@ -39,12 +39,12 @@ class SDKPublicCompileInputTests(unittest.TestCase):
         self.sdk = self.root / "external soc/vendors tree/sdk"
         self.build = self.root / "product -DSTM32 name/build"
         self.build.mkdir(parents=True)
-        self.public = (self.sdk / "components/soc/stm32/stm32f407_handoff/include")
-        (self.public / "nexus/components").mkdir(parents=True)
+        self.public = (self.sdk / "soc/stm32/stm32f4/include")
+        (self.public / "nexus/soc").mkdir(parents=True)
         (self.public.parent / "CMakeLists.txt").write_text(
-            "# Maintained component exports its sibling include directory.\n")
+            "# Maintained SoC exports its sibling include directory.\n")
         self.private = self.sdk / "soc/stm32/stm32f4"
-        self.private.mkdir(parents=True)
+        self.private.mkdir(parents=True, exist_ok=True)
         specification = importlib.util.spec_from_file_location(
             "include_boundary_consumer", ROOT / "cmake/package/verify_consumers.py")
         self.consumer = importlib.util.module_from_spec(specification)
@@ -59,7 +59,7 @@ class SDKPublicCompileInputTests(unittest.TestCase):
         return self.consumer.private_compile_inputs(entry, self.sdk)
 
     def test_public_chip_include_and_kernel_exports_remain_public(self):
-        paths = [self.public, self.public / "nexus/components",
+        paths = [self.public, self.public / "nexus/soc",
                  self.sdk / "ext/freertos/include",
                  self.sdk / "ext/freertos/portable/GCC/ARM_CM4F",
                  self.sdk / "ext/threadx/common/inc",
@@ -85,7 +85,7 @@ class SDKPublicCompileInputTests(unittest.TestCase):
         environment = os.environ.copy()
         for key in ("CPATH", "C_INCLUDE_PATH", "CPLUS_INCLUDE_PATH"):
             environment.pop(key, None)
-        public = ROOT / "components/clock_domain/include"
+        public = ROOT / "components/runtime/clock_domain/include"
         core = ROOT / "core/include"
         for language, compiler, standard in (("c", "cc", "c11"),
                                               ("c++", "c++", "c++17")):
@@ -125,7 +125,7 @@ class SDKPublicCompileInputTests(unittest.TestCase):
 
     def test_f407_soc_public_export_keeps_alias_and_override_checks(self):
         public = self.sdk / "soc/stm32/stm32f4/include"
-        public.mkdir(parents=True)
+        public.mkdir(parents=True, exist_ok=True)
         relative = os.path.relpath(public, self.build)
         self.assertFalse(self.private_input(["-I", relative], command=True))
         alias = public / "alias"
@@ -202,15 +202,37 @@ class SDKPublicCompileInputTests(unittest.TestCase):
         entry["command"] = "cc -I" + shlex.quote(str(self.private))
         self.assertFalse(self.consumer.private_compile_inputs(entry, self.sdk))
 
-    def test_generic_component_public_exports_need_no_local_cmake_file(self):
-        for name in ("bus_owner", "bmp280", "log", "storage", "modbus"):
+    def test_categorized_component_public_exports_need_no_local_cmake_file(self):
+        packages = ("runtime/bus_owner", "devices/bmp280", "services/log",
+                    "services/storage", "protocols/modbus", "buses/onewire")
+        for name in packages:
             with self.subTest(component=name):
                 public = self.sdk / "components" / name / "include"
                 (public / "nexus/components").mkdir(parents=True)
                 self.assertFalse(self.private_input(["-I", public]))
+                self.assertFalse(self.private_input(
+                    ["-include", public / "nexus/components/probe.h"]))
+
+    def test_categorized_component_roots_and_implementation_are_private(self):
+        for name in ("runtime/bus_owner", "devices/bmp280", "services/log",
+                     "protocols/modbus", "buses/onewire"):
+            package = self.sdk / "components" / name
+            for path in (package.parent, package, package / "src",
+                         package / "port", package / "profile",
+                         package / "include-other", package / "src/include",
+                         package / "include/../src"):
+                for option in ("-I", "-isystem", "-include"):
+                    with self.subTest(component=name, path=path, option=option):
+                        self.assertTrue(self.private_input([option, path]))
+
+    def test_component_public_shape_requires_an_owned_include_tree(self):
+        for path in (self.sdk / "components/runtime/unowned/include",
+                     self.sdk / "components/runtime/unowned/include/nexus"):
+            with self.subTest(path=path):
+                self.assertTrue(self.private_input(["-I", path]))
 
     def test_nested_vendor_paths_are_sdk_private(self):
-        for path in (self.sdk / "components/log/vendors/include",
+        for path in (self.sdk / "components/services/log/vendors/include",
                      self.sdk / "io/include/vendors"):
             with self.subTest(path=path):
                 self.assertTrue(self.private_input(["-I", path]))
@@ -544,9 +566,9 @@ class SDKConsumerParallelTests(unittest.TestCase):
                      "command": "cc -c " + shlex.quote(str(path))}
                     for path in products]
             if self.selected_fault == "public_chip_include":
-                public = self.sdk / "components/soc/stm32/stm32f407_handoff/include"
-                (public / "nexus/components").mkdir(parents=True, exist_ok=True)
-                (public.parent / "CMakeLists.txt").write_text("# Public chip API.\n")
+                public = self.sdk / "soc/stm32/stm32f4/include"
+                (public / "nexus/soc").mkdir(parents=True, exist_ok=True)
+                (public.parent / "CMakeLists.txt").write_text("# Public SoC API.\n")
                 for row in rows:
                     row["arguments"].insert(1, "-I" + str(public))
                     row["command"] = shlex.join(row["arguments"])

@@ -1,5 +1,6 @@
 # System lifecycle objects live in the SoC archive. Reset/clock/runtime code
 # that must precede ordinary archives is exported separately to Firmware.cmake.
+include("${CMAKE_CURRENT_LIST_DIR}/Handoff.cmake")
 target_sources(nexus_soc_stm32f4 PRIVATE
     "${CMAKE_CURRENT_LIST_DIR}/reset.c"
     "${CMAKE_CURRENT_LIST_DIR}/supervision.c"
@@ -79,7 +80,7 @@ function(nexus_add_stm32f4_sleep target)
         nexus_build_options nexus_owned_warnings)
     target_include_directories(${target} PRIVATE
         "${sleep_package}"
-        "${sleep_source}/components/clock_domain/private")
+        "${sleep_source}/components/runtime/clock_domain/private")
     target_include_directories(${target} PUBLIC
         "${sleep_package}/include")
     target_include_directories(${target} SYSTEM PRIVATE

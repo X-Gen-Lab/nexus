@@ -155,10 +155,6 @@ class DomainBridge:
     def shares_irq(self, kind, key):
         return self._domains().shares_irq(kind, key)
 
-    def mode_fields(self, selection, route, *, clock_profile):
-        del selection, route, clock_profile
-        return {}
-
     def validate_controller_set(self, selected, *, clock_profile):
         del clock_profile
         domains = self._domains()

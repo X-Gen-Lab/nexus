@@ -95,11 +95,11 @@ class SDKDeviceImagePolicyTests(unittest.TestCase):
         return sdk, source, build, config, profile, calls, execute
 
     def test_device_payload_is_required_before_sdk_payload_reads(self):
-        required = {"components/tmp117/CMakeLists.txt",
-                    "components/tmp117/include/nexus/components/tmp117.h",
-                    "components/tmp117/include/nexus/components/tmp117_i2c.h",
-                    "components/tmp117/src/tmp117.c",
-                    "components/tmp117/src/i2c_transport.c"}
+        required = {"components/devices/tmp117/CMakeLists.txt",
+                    "components/devices/tmp117/include/nexus/components/tmp117.h",
+                    "components/devices/tmp117/include/nexus/components/tmp117_i2c.h",
+                    "components/devices/tmp117/src/tmp117.c",
+                    "components/devices/tmp117/src/i2c_transport.c"}
         self.assertLessEqual(required, set(self.packager.REQUIRED_FILES))
 
     def test_device_preparation_is_c11_public_and_selects_real_component(self):

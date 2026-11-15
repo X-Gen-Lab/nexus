@@ -1,6 +1,6 @@
 # Actual-POT messages; changed entries await independent semantic review.
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: b0364793458ae4591ccf00c08cfde29fb5e7850e8279c241da67b8d5c0430caf\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: ebbab11ce18861282ba325d79c7c27e7e2cd34d7d21ab4bea98dbfe9a6ad6422\n"
 
 msgid "当前精确支持范围"
 msgstr "Current exact support scope"
@@ -296,12 +296,8 @@ msgstr ""
 "includes command/count, and the outer borrow remains until the inner I2C "
 "drain and PEC settle"
 
-msgid ""
-"[SMBus 组件](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/components/smbus/README.md)"
-msgstr ""
-"[SMBus component](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
-"DOCUMENTATION-SOURCE/components/smbus/README.md)"
+msgid "[SMBus 组件](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/buses/smbus/README.md)"
+msgstr "[SMBus component](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/buses/smbus/README.md)"
 
 msgid "I2C target／SMBus"
 msgstr "I2C target/SMBus"

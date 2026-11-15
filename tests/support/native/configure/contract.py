@@ -125,7 +125,6 @@ ENDPOINT_POLICY = common.EndpointPolicy(
     model_async_echo=True)
 TIMEBASE_ALARM = False
 validate_mode_context = common.validate_mode_context
-mode_fields = common.mode_fields
 validate_controller_set = common.validate_controller_set
 validate_endpoint_clock = common.validate_endpoint_clock
 configuration_header = common.configuration_header

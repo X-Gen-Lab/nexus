@@ -78,7 +78,7 @@ class MCUbootConsumerTests(unittest.TestCase):
             'set(NEXUS_TEST_SUPPORT ON CACHE BOOL "Host test model")\n'
             f'set(NEXUS_ASSEMBLY_FILE "{PLATFORM}/tests/support/native/assemblies/native-empty.toml")\n'
             f'add_subdirectory("{PLATFORM}" nexus EXCLUDE_FROM_ALL)\n'
-            f'include("{ROOT}/components/mcuboot/CMakeLists.txt")\n'
+            f'include("{ROOT}/components/protocols/mcuboot/CMakeLists.txt")\n'
             'set(NEXUS_MCUBOOT_DEVELOPMENT ON)\n'
             f'set(NEXUS_MCUBOOT_SOURCE "{supplier or SUPPLIER}")\n' + body)
         (source / 'CMakeLists.txt').write_text(text)
@@ -165,7 +165,7 @@ class MCUbootConsumerTests(unittest.TestCase):
         self.assertIn('MCUboot source rejected', result.stdout + result.stderr)
 
     def tls_body(self):
-        return (f'include("{ROOT}/components/tls/CMakeLists.txt")\n'
+        return (f'include("{ROOT}/components/protocols/tls/CMakeLists.txt")\n'
                 'nexus_add_tls()\n')
 
     def test_supported_same_image_boot_and_tls_targets_are_incompatible(self):

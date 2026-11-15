@@ -24,10 +24,10 @@ consumer = load_module("i3c_sdk_consumers", "cmake/package/verify_consumers.py")
 class I3CSourceSDKTests(unittest.TestCase):
     def test_required_payload_contains_the_whole_optional_core(self):
         required = {
-            "components/i3c_controller/CMakeLists.txt",
-            "components/i3c_controller/src/i3c_controller.c",
-            "components/i3c_controller/include/nexus/components/i3c_controller.h",
-            "components/i3c_controller/include/nexus/components/i3c_controller_storage.h",
+            "components/buses/i3c_controller/CMakeLists.txt",
+            "components/buses/i3c_controller/src/i3c_controller.c",
+            "components/buses/i3c_controller/include/nexus/components/i3c_controller.h",
+            "components/buses/i3c_controller/include/nexus/components/i3c_controller_storage.h",
         }
         self.assertFalse(required - set(sdk.REQUIRED_FILES))
         self.assertTrue(all(sdk.selected(name) for name in required))

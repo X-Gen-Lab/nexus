@@ -25,7 +25,7 @@
         "core",
         "io",
         "os",
-        "components/storage",
+        "components/services/storage",
         "ownership-and-lifecycle-contracts"
       ],
       "backup_role": "bsp-ports",
@@ -33,7 +33,7 @@
         "/core/",
         "/io/",
         "/os/",
-        "/components/storage/"
+        "/components/services/storage/"
       ],
       "members": []
     },

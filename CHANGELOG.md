@@ -79,11 +79,11 @@ epoch `1` and authored assembly schema `2` remain separate, unchanged identities
   independent IRQ TX or explicitly select finite DMA TX with a shared UART owner.
 - U575 TZEN0 finite USART1 GPDMA hardware-chain TX and LPTIM2 RUN one-shot
   references. These do not enable autonomous STOP operation or arbitrary chains.
-- Selected U575 [retained-time and bounded Stop2](docs/design/u575-retained-time.md),
-  [finite SRAM4 LPDMA copy](docs/design/u575-stop2-copy.md) and
-  [single-tuple LPTIM1 LPBAM](docs/design/u575-lptim1-lpbam.md) software references;
+- Selected U575 [retained-time and bounded Stop2](https://github.com/X-Gen-Lab/nexus/blob/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18/docs/design/u575-retained-time.md),
+  [finite SRAM4 LPDMA copy](https://github.com/X-Gen-Lab/nexus/blob/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18/docs/design/u575-stop2-copy.md) and
+  [single-tuple LPTIM1 LPBAM](https://github.com/X-Gen-Lab/nexus/blob/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18/docs/design/u575-lptim1-lpbam.md) software references;
   these do not provide general LPBAM or complete low-power qualification.
-- Selected [U575 MPU GPIO WRITE](docs/design/u575-mpu-gpio.md) and
+- Selected [U575 MPU GPIO WRITE](https://github.com/X-Gen-Lab/nexus/blob/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18/docs/design/u575-mpu-gpio.md) and
   [F407 finite I2S2 slave TX](docs/design/f407-i2s2-slave-tx.md) components;
   physical isolation and external audio execution remain unqualified.
 - Pure caller-owned timestamp budget comparison with known uncertainty bounds
@@ -310,7 +310,7 @@ remaining acceptance, and [delivery](docs/delivery/README.md) for original recor
   - Removed `get_config()` and `set_config()` methods from all HAL interfaces
   - All static configuration must now be done at compile-time through Kconfig
   - Device-specific runtime parameters (SPI device config, I2C device address) are still supported
-  - See MIGRATION_GUIDE.md in `.kiro/specs/hal-config-removal/` for migration instructions
+  - See the [historical migration notes](https://github.com/X-Gen-Lab/nexus/blob/83a27dfbee4e8fbf4d35875b1e9db85af7516eec/CHANGELOG.md) for this retired configuration path
 
 ### Added
 
@@ -419,7 +419,7 @@ remaining acceptance, and [delivery](docs/delivery/README.md) for original recor
 ### Migration Notes
 - **Action Required**: Update all code using runtime configuration to use Kconfig
 - **Backward Compatibility**: Deprecated structures were marked with `NX_DEPRECATED` in previous versions
-- **Migration Path**: See `.kiro/specs/hal-config-removal/MIGRATION_GUIDE.md` for detailed instructions
+- **Migration Path**: See the [historical migration notes](https://github.com/X-Gen-Lab/nexus/blob/83a27dfbee4e8fbf4d35875b1e9db85af7516eec/CHANGELOG.md) for this retired configuration path
 - **Timeline**: This is a breaking change - update your code before upgrading
 
 ---

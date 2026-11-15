@@ -17,6 +17,7 @@ python tools/dev/dev.py test --preset native-debug
 不会自动暂存。保持现有四空格、80列和反斜杠 Doxygen 风格；声明说明上下文、
 所有权、deadline 和失败语义，实现注释解释不变量及硬件访问顺序。
 新建及修改文件按整文件严格检查，历史债务只允许减少。
+各语言的注释与分隔线分别遵守[现有代码规范](docs/sphinx/development/coding_standards.rst)。
 
 生命周期、IRQ、并发和持久化修改需真实故障回归。Native 模型、ARM 链接资源
 和物理 HIL 分别记录。没有实际设备执行时，不能把硬件资格标记为通过。

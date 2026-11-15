@@ -222,7 +222,7 @@ class ReviewOwnershipTests(unittest.TestCase):
         self.assertIn("/tests/ @test-quality-hil-0", text)
         self.assertLess(text.index("/** "), text.index("/core/ "))
         self.assertLess(text.index("/components/ "),
-                        text.index("/components/storage/ "))
+                        text.index("/components/services/storage/ "))
         self.assertTrue(text.endswith("\n"))
 
     def test_invalid_assignments_are_rejected(self):

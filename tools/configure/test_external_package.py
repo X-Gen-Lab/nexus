@@ -123,6 +123,18 @@ class ExternalPackageTests(unittest.TestCase):
         self.assertEqual(left.provider_context.directory, first_package)
         self.assertEqual(right.provider_context.directory, second_package)
 
+    def test_static_fields_resolve_without_an_extra_mode_projection_hook(self):
+        package, assembly = self.package()
+        entry = package / "configure/__init__.py"
+        entry.write_text(entry.read_text() +
+                         '\nglobals().pop("mode_fields", None)\n')
+        self.reseal(package)
+        result = configure.resolve_ir(assembly, test_support=True)
+        selected, = result.controllers
+        self.assertEqual((selected.id, selected.kind, selected.mode,
+                          selected.controller),
+                         ("indicator", "gpio", "output", "GPIOA"))
+
     def test_manifest_unknown_field_and_interface_version_reject(self):
         for change, message in (({"unknown": True}, "unknown"),
                                 ({"interface_version": 2}, "interface")):

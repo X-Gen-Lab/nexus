@@ -40,8 +40,8 @@ def private_compile_inputs(entry, sdk, extra_private=()):
     """Audit actual compiler options against canonical Nexus source boundaries.
 
     Kernel PUBLIC headers remain valid. F407 SoC APIs live only below the
-    maintained soc/stm32/stm32f4/include subtree. Chip component APIs live below
-    their declared package's include/nexus directory; package roots and
+    maintained soc/stm32/stm32f4/include subtree. Component APIs live below
+    their categorized package's include/nexus directory; package roots and
     implementation directories remain private.
     """
     arguments = entry.get("arguments")
@@ -87,14 +87,11 @@ def private_compile_inputs(entry, sdk, extra_private=()):
             if (parts[0] == "soc" and
                     parts[:4] != ("soc", "stm32", "stm32f4", "include")):
                 return True
-            if parts == ("components",):
-                return True
-            if parts[:2] == ("components", "soc"):
-                if len(parts) <= 4 or parts[4] != "include":
+            if parts[0] == "components":
+                if len(parts) < 4 or parts[3] != "include":
                     return True
-                package = root.joinpath(*parts[:4])
-                if (not (package / "CMakeLists.txt").is_file() or
-                        not (package / "include/nexus").is_dir()):
+                package = root.joinpath(*parts[:3])
+                if not (package / "include/nexus").is_dir():
                     return True
         return False
 
@@ -201,7 +198,7 @@ def prepare_consumer(prefix, directory, name, run_checked, *, fixture=False,
         '#include "nexus/components/amp_ipc_storage.h"\n'
         '#include "nexus/components/i3c_controller_storage.h"\n'
         '#include "nexus/components/user_io_async_storage.h"\n'
-        + ('#include "nexus/components/stm32f407_handoff.h"\n' if handoff else '')
+        + ('#include "nexus/soc/stm32f407_handoff.h"\n' if handoff else '')
         + '#include <cstring>\n' + code.replace(
             ' nx_platform_start_result_t result',
             ' nx_log_sink_port_t sink;\n std::memset(&sink, 0, sizeof(sink));\n'
@@ -912,7 +909,7 @@ def check_service_compiles(commands, public, sdk, resolved, specification):
     for entry in public:
         argv = entry.get("arguments") or shlex.split(entry["command"])
         # Public-only callers may not opt into either supplier's storage layout.
-        private = tuple(root / "components/mcuboot" / directory
+        private = tuple(root / "components/protocols/mcuboot" / directory
                         for root in (Path(sdk), Path(__file__).resolve().parents[2])
                         for directory in ("port", "profile"))
         private += tuple(root / "ext" for root in

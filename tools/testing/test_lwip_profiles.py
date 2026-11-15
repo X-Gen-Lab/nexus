@@ -9,7 +9,7 @@ import unittest
 
 
 ROOT = Path(__file__).resolve().parents[2]
-NETWORK_COMPONENT = ROOT / "components/network"
+NETWORK_COMPONENT = ROOT / "components/protocols/network"
 LWIP_SOURCE = ROOT / "ext/lwip"
 CMAKE_ARGUMENTS = ()
 

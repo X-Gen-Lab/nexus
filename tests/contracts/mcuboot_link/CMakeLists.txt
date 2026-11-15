@@ -12,7 +12,7 @@ add_subdirectory("${NEXUS_PLATFORM_ROOT}" nexus EXCLUDE_FROM_ALL)
 
 if(NOT NEXUS_MCUBOOT_COMPONENT_ROOT)
     set(NEXUS_MCUBOOT_COMPONENT_ROOT
-        "${NEXUS_PLATFORM_ROOT}/components/mcuboot")
+        "${NEXUS_PLATFORM_ROOT}/components/protocols/mcuboot")
 endif()
 set(port "${NEXUS_MCUBOOT_COMPONENT_ROOT}")
 include("${port}/CMakeLists.txt")

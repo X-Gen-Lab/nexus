@@ -1,9 +1,9 @@
 # Optional MCUboot contracts use the maintained Google registration and core graph.
 # Author: Nexus Team
-include("${CMAKE_CURRENT_LIST_DIR}/../../components/mcuboot/CMakeLists.txt")
+include("${CMAKE_CURRENT_LIST_DIR}/../../components/protocols/mcuboot/CMakeLists.txt")
 nexus_add_mcuboot_boot()
 set(mcuboot_contracts "${CMAKE_CURRENT_LIST_DIR}")
-set(mcuboot_component "${mcuboot_contracts}/../../components/mcuboot")
+set(mcuboot_component "${mcuboot_contracts}/../../components/protocols/mcuboot")
 
 nexus_google_test(nexus_mcuboot_flash_test
     SOURCES "${mcuboot_contracts}/flash_map_backend_test.cpp"

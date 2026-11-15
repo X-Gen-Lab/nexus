@@ -1,9 +1,9 @@
 # Actual broker and Native typed GPIO; only trusted kernel context is modeled.
 add_library(nexus_user_io_broker_test_provider STATIC
-    "${NEXUS_SOURCE_DIR}/components/user_io_broker/src/user_io_broker.c")
+    "${NEXUS_SOURCE_DIR}/components/runtime/user_io_broker/src/user_io_broker.c")
 target_include_directories(nexus_user_io_broker_test_provider PUBLIC
-    "${NEXUS_SOURCE_DIR}/components/user_io_broker/include"
-    "${NEXUS_SOURCE_DIR}/components/user_io_broker/private")
+    "${NEXUS_SOURCE_DIR}/components/runtime/user_io_broker/include"
+    "${NEXUS_SOURCE_DIR}/components/runtime/user_io_broker/private")
 target_link_libraries(nexus_user_io_broker_test_provider PUBLIC
     Nexus::Core Nexus::IO PRIVATE Nexus::Arch nexus_build_options
     nexus_owned_warnings)

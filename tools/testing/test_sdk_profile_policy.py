@@ -160,10 +160,10 @@ class SDKProfilePolicyTests(unittest.TestCase):
         expected = {'ext/mcuboot/' + name for name in lock['files']}
         expected.update({'dependencies/mcuboot.lock.json',
                          'tools/maintenance/mcuboot_lock.py',
-                         'components/mcuboot/CMakeLists.txt',
-                         'components/mcuboot/include/nexus/components/mcuboot_control.h',
-                         'components/mcuboot/port/flash_map_backend/flash_map_backend.h',
-                         'components/mcuboot/private/upstream_profile.cmake'})
+                         'components/protocols/mcuboot/CMakeLists.txt',
+                         'components/protocols/mcuboot/include/nexus/components/mcuboot_control.h',
+                         'components/protocols/mcuboot/port/flash_map_backend/flash_map_backend.h',
+                         'components/protocols/mcuboot/private/upstream_profile.cmake'})
         self.assertLessEqual(expected, set(self.packager.required_files(ROOT, self.packager.source_profile(
             components=('network', 'mcuboot')))))
 
@@ -250,9 +250,9 @@ class SDKProfilePolicyTests(unittest.TestCase):
         cases = [('f407 loaned rx', '-DNEXUS_LWIP_LOANED_RX=1'),
                  ('native mcuboot control', '-Iext/mcuboot/boot/bootutil/include'),
                  ('native mcuboot control',
-                  '-I' + str(ROOT / 'components/mcuboot/port')),
+                  '-I' + str(ROOT / 'components/protocols/mcuboot/port')),
                  ('f407 mcuboot boot',
-                  '-I' + str(ROOT / 'components/mcuboot/profile'))]
+                  '-I' + str(ROOT / 'components/protocols/mcuboot/profile'))]
         for name, leaked in cases:
             with self.subTest(name=name):
                 profile = self.profile(name)

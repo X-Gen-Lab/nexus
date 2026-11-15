@@ -121,7 +121,7 @@ class DormantNetworkTests(unittest.TestCase):
                      'add_library(Nexus::Config ALIAS nexus_config)',
                      'set_property(TARGET nexus_config PROPERTY NEXUS_SOURCE_DIR "' + ROOT.as_posix() + '")',
                      'set(NEXUS_LWIP_SOURCE "' + ((ROOT / 'ext/lwip') if present_supplier else (root / 'absent')).as_posix() + '")',
-                     'add_subdirectory("' + (ROOT / "components/network").as_posix() +
+                     'add_subdirectory("' + (ROOT / "components/protocols/network").as_posix() +
                      '" network)']
             if selected:
                 lines.append("nexus_add_lwip()")

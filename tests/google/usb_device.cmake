@@ -65,16 +65,16 @@ target_compile_definitions(nexus_stm32_usb_hs_cold_test PRIVATE STM32F407xx
 nexus_add_st_usb_host()
 nexus_google_test(nexus_st_usb_host_stack_test SOURCES st_usb_host_stack_test.cpp
     LIBRARIES Nexus::STUSBHost Nexus::NativeModel Nexus::Arch
-    INCLUDES "${NEXUS_SOURCE_DIR}/components/st_usb/private"
+    INCLUDES "${NEXUS_SOURCE_DIR}/components/protocols/st_usb/private"
         "${NEXUS_SOURCE_DIR}/vendors/st/usb_host/Core/Inc")
 include("${CMAKE_CURRENT_LIST_DIR}/st_usb_device.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/usb_otg.cmake")
 
 nexus_google_test(nexus_st_usb_host_delay_test
     SOURCES st_usb_host_delay_test.cpp
-        "${NEXUS_SOURCE_DIR}/components/st_usb/src/usb_host_stack.c"
+        "${NEXUS_SOURCE_DIR}/components/protocols/st_usb/src/usb_host_stack.c"
     LIBRARIES Nexus::IOUSBHost Nexus::Arch nexus_st_usb_host_core
-    INCLUDES "${NEXUS_SOURCE_DIR}/components/st_usb/private"
+    INCLUDES "${NEXUS_SOURCE_DIR}/components/protocols/st_usb/private"
         "${NEXUS_SOURCE_DIR}/vendors/st/usb_host/Core/Inc")
 target_compile_options(nexus_st_usb_host_delay_test PRIVATE
     "-include${CMAKE_CURRENT_LIST_DIR}/st_usb_host_delay_model.h")

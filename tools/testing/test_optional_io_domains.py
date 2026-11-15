@@ -101,7 +101,7 @@ class OptionalIODomainTests(unittest.TestCase):
     def prepare(self, root, kind):
         """Use production targets with GPIO selected and narrow Arch leaves."""
         component = (
-            f'add_subdirectory("{ROOT / "components/usb_control"}" usb)'
+            f'add_subdirectory("{ROOT / "components/protocols/usb_control"}" usb)'
             if kind == "usb" else "")
         target = ("Nexus::USBDescriptors" if kind == "usb"
                   else "Nexus::IOCycleProbe")

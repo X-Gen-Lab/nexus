@@ -70,11 +70,11 @@ Source SDK 预览发布准备。已发布的预览版及其不可变源码身份
   owner 的有限 DMA TX。
 - U575 TZEN0 有限 USART1 GPDMA 硬件链 TX 与 LPTIM2 RUN 单次计数参考；
   不开放自主 STOP 操作或任意链。
-- 所选 U575 [保留时间与有界 Stop2](docs/design/u575-retained-time.md)、
-  [有限 SRAM4 LPDMA 复制](docs/design/u575-stop2-copy.md)与
-  [单组 LPTIM1 LPBAM](docs/design/u575-lptim1-lpbam.md)软件参考；不提供通用
+- 所选 U575 [保留时间与有界 Stop2](https://github.com/X-Gen-Lab/nexus/blob/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18/docs/design/u575-retained-time.md)、
+  [有限 SRAM4 LPDMA 复制](https://github.com/X-Gen-Lab/nexus/blob/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18/docs/design/u575-stop2-copy.md)与
+  [单组 LPTIM1 LPBAM](https://github.com/X-Gen-Lab/nexus/blob/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18/docs/design/u575-lptim1-lpbam.md)软件参考；不提供通用
   LPBAM 或完整低功耗资格。
-- 所选 [U575 MPU GPIO WRITE](docs/design/u575-mpu-gpio.md)与
+- 所选 [U575 MPU GPIO WRITE](https://github.com/X-Gen-Lab/nexus/blob/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18/docs/design/u575-mpu-gpio.md)与
   [F407 有限 I2S2 slave TX](docs/design/f407-i2s2-slave-tx.md)组件；物理隔离与外部
   音频执行仍未取得资格。
 - 调用方独立拥有的时间戳预算比较，包含已知不确定度边界和独立的 WITHIN、
@@ -278,7 +278,7 @@ MCU 实板 HIL 保持 `not_executed`。源码分发、host 模型、ARM 链接�
   - 从所有 HAL 接口中移除 `get_config()` 和 `set_config()` 方法
   - 所有静态配置现在必须通过 Kconfig 在编译时完成
   - 仍然支持设备特定的运行时参数（SPI 设备配置、I2C 设备地址）
-  - 迁移说明请参见 `.kiro/specs/hal-config-removal/` 中的 MIGRATION_GUIDE.md
+  - 这条已退役配置路径的迁移说明见[固定历史记录](https://github.com/X-Gen-Lab/nexus/blob/83a27dfbee4e8fbf4d35875b1e9db85af7516eec/CHANGELOG_CN.md)
 
 ### 新增（续）
 
@@ -387,7 +387,7 @@ MCU 实板 HIL 保持 `not_executed`。源码分发、host 模型、ARM 链接�
 ### 迁移说明
 - **需要操作**：更新所有使用运行时配置的代码以使用 Kconfig
 - **向后兼容性**：已弃用的结构在之前的版本中标记为 `NX_DEPRECATED`
-- **迁移路径**：详细说明请参见 `.kiro/specs/hal-config-removal/MIGRATION_GUIDE.md`
+- **迁移路径**：这条已退役配置路径的说明见[固定历史记录](https://github.com/X-Gen-Lab/nexus/blob/83a27dfbee4e8fbf4d35875b1e9db85af7516eec/CHANGELOG_CN.md)
 - **时间线**：这是一个破坏性变更 - 升级前请更新您的代码
 
 ---

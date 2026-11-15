@@ -26,7 +26,6 @@ from .contract import (
     builtin_cs,
     configuration_header,
     dma_irq,
-    mode_fields,
     mode_implementation,
     shares_irq,
     validate_controller_set,

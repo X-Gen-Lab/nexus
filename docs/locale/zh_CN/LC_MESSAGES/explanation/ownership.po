@@ -1,6 +1,6 @@
 # Actual-POT messages; changed entries await independent semantic review.
 msgid ""
-msgstr "Project-Id-Version: Nexus source docs\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=1; plural=0;\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 08d4872b4f2cda4c673dcf74cb5020fd7d7db7891335d51b598ba81b235964af\n"
+msgstr "Project-Id-Version: Nexus source docs\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=1; plural=0;\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 88d4ecf8e6b29f95f93a0472eab218eb9b220f157c603892ce824a2b3f65bce0\n"
 
 msgid "Borrow, completion and observer lifetime"
 msgstr "借用、完成与观察者生命周期"
@@ -214,8 +214,8 @@ msgstr ""
 "远程控制使用稳定槽和单调递增 epoch。不得传递另一任务能够复用存储的裸指针。释放槽并准备下一请求前，必须解除控制/观察者引用并 join "
 "观察者。代次计数可检测过期身份，但自身不会 join 任务。"
 
-msgid "Mapped read loans are distinct from asynchronous request loans. A failed map can retain cleanup responsibility without granting any readable loan. Before the last release, join every CPU reader; a failed unmap retains the exact token only for cleanup retry and grants no renewed access. A writer's backend receives the original absolute deadline. After complete cold shutdown, explicit owner reopen preserves slot and writer epochs, including exhaustion; initialization must not revive old tokens. See the [mapped component contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/mapped_storage/README.md) for serialized execution and recovery responsibilities."
-msgstr "映射读取 loan 与异步请求 loan 不同。映射失败可以不授予任何可读 loan，同时保留清理责任。最后一次 release 前，必须 join 所有 CPU reader；撤映失败时保留精确 token 仅供重试清理，不允许恢复访问。writer 的 backend 接收原绝对 deadline。完整冷停后，显式 reopen owner 保留 slot 和 writer epoch，包括耗尽状态；初始化不能使旧 token 复活。串行执行和恢复责任见[映射组件合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/mapped_storage/README.md)。"
+msgid "Mapped read loans are distinct from asynchronous request loans. A failed map can retain cleanup responsibility without granting any readable loan. Before the last release, join every CPU reader; a failed unmap retains the exact token only for cleanup retry and grants no renewed access. A writer's backend receives the original absolute deadline. After complete cold shutdown, explicit owner reopen preserves slot and writer epochs, including exhaustion; initialization must not revive old tokens. See the [mapped component contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/services/mapped_storage/README.md) for serialized execution and recovery responsibilities."
+msgstr "映射读取 loan 与异步请求 loan 不同。映射失败可以不授予任何可读 loan，同时保留清理责任。最后一次 release 前，必须 join 所有 CPU reader；撤映失败时保留精确 token 仅供重试清理，不允许恢复访问。writer 的 backend 接收原绝对 deadline。完整冷停后，显式 reopen owner 保留 slot 和 writer epoch，包括耗尽状态；初始化不能使旧 token 复活。串行执行和恢复责任见[映射组件合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/services/mapped_storage/README.md)。"
 
 msgid ""
 "Continuous receive and ADC use explicit caller-owned block loans. A consumer"

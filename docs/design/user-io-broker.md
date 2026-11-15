@@ -71,8 +71,8 @@ drain proof.
 
 ## Copied asynchronous UART TX
 
-The [public protocol](../../components/user_io_broker/include/nexus/components/user_io_async.h)
-and [trusted construction](../../components/user_io_broker/include/nexus/components/user_io_async_storage.h)
+The [public protocol](../../components/runtime/user_io_broker/include/nexus/components/user_io_async.h)
+and [trusted construction](../../components/runtime/user_io_broker/include/nexus/components/user_io_async_storage.h)
 provide `construct`, `dispatch`, `close`, `reap` and `join`. The optional target
 does not create a factory, kernel task, queue, registry or lock. The caller
 supplies exact privileged cells and payload capacities, immutable policy/user
@@ -86,9 +86,9 @@ FIG-25 describes the current software mechanism, not an installed kernel gateway
 or physical isolation result. The trusted kernel supplies principal identity,
 fault-contained copies and an exclusive session/role authority. The external
 executor advances the existing owner; no gateway call services UART implicitly.
-The [implementation](../../components/user_io_broker/src/user_io_async.c),
-[BusOwner](../../components/bus_owner/include/nexus/components/bus_owner.h) and
-[UARTOwner](../../components/bus_owner/include/nexus/components/uart_owner.h)
+The [implementation](../../components/runtime/user_io_broker/src/user_io_async.c),
+[BusOwner](../../components/runtime/bus_owner/include/nexus/components/bus_owner.h) and
+[UARTOwner](../../components/runtime/bus_owner/include/nexus/components/uart_owner.h)
 define the figure's source and final-access boundaries.
 
 Construction checks all complete span arithmetic and known aliases before any

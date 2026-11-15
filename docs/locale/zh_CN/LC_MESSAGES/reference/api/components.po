@@ -6,7 +6,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: ddbfa67e5f04ad6ebdacb32c2c8d1d37f2283022d46a92ae15451d30b59184db\n"
+"X-Nexus-Source-SHA256: 7c85b17c378a55ebdad97eb26d71cc44243b4106239ce7b857ccf93fcce878c4\n"
 
 #: docs/reference/api/components.md:8
 msgid "Optional common components"
@@ -56,13 +56,8 @@ msgid "`at24c02.h`"
 msgstr "`at24c02.h`"
 
 #: docs/reference/api/components.md:0
-msgid ""
-"[Settled EEPROM access and write-cycle "
-"responsibility](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/components/at24c02/README.md)"
-msgstr ""
-"[同步 EEPROM 访问与写周期责任](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
-"DOCUMENTATION-SOURCE/components/at24c02/README.md)"
+msgid "[Settled EEPROM access and write-cycle responsibility](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/devices/at24c02/README.md)"
+msgstr "[同步 EEPROM 访问与写周期责任](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/devices/at24c02/README.md)"
 
 #: docs/reference/api/components.md:0
 msgid "`Nexus::SoftwareI2C`, `Nexus::SoftwareSCCB`"
@@ -73,12 +68,8 @@ msgid "`software_i2c.h`, `software_sccb.h`"
 msgstr "`software_i2c.h`, `software_sccb.h`"
 
 #: docs/reference/api/components.md:0
-msgid ""
-"[Separate GPIO I2C and SCCB protocols](https://github.com/X-Gen-"
-"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/software_i2c/README.md)"
-msgstr ""
-"[相互独立的 GPIO I2C 与 SCCB 协议](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
-"DOCUMENTATION-SOURCE/components/software_i2c/README.md)"
+msgid "[Separate GPIO I2C and SCCB protocols](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/buses/software_i2c/README.md)"
+msgstr "[相互独立的 GPIO I2C 与 SCCB 协议](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/buses/software_i2c/README.md)"
 
 msgid "`Nexus::SMBus`"
 msgstr "`Nexus::SMBus`"
@@ -86,13 +77,8 @@ msgstr "`Nexus::SMBus`"
 msgid "`smbus.h`"
 msgstr "`smbus.h`"
 
-msgid ""
-"[Bounded packet PEC over an existing asynchronous I2C "
-"endpoint](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/components/smbus/README.md)"
-msgstr ""
-"[现有异步 I2C 端点上的有界包 PEC](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
-"DOCUMENTATION-SOURCE/components/smbus/README.md)"
+msgid "[Bounded packet PEC over an existing asynchronous I2C endpoint](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/buses/smbus/README.md)"
+msgstr "[现有异步 I2C 端点上的有界包 PEC](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/buses/smbus/README.md)"
 
 #: docs/reference/api/components.md:0
 msgid "`Nexus::SoftwareSPI`"
@@ -103,12 +89,8 @@ msgid "`software_spi.h`"
 msgstr "`software_spi.h`"
 
 #: docs/reference/api/components.md:0
-msgid ""
-"[Bounded GPIO mode-zero SPI](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
-"DOCUMENTATION-SOURCE/components/software_spi/README.md)"
-msgstr ""
-"[有界 GPIO 模式零 SPI](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
-"DOCUMENTATION-SOURCE/components/software_spi/README.md)"
+msgid "[Bounded GPIO mode-zero SPI](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/buses/software_spi/README.md)"
+msgstr "[有界 GPIO 模式零 SPI](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/buses/software_spi/README.md)"
 
 #: docs/reference/api/components.md:0
 msgid "`Nexus::W25`"
@@ -119,13 +101,8 @@ msgid "`w25.h`"
 msgstr "`w25.h`"
 
 #: docs/reference/api/components.md:0
-msgid ""
-"[Explicit W25Q128JV profile and retained Flash "
-"completion](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/components/w25/README.md)"
-msgstr ""
-"[显式 W25Q128JV 配置与保留的 Flash 完成责任](https://github.com/X-Gen-"
-"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/w25/README.md)"
+msgid "[Explicit W25Q128JV profile and retained Flash completion](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/devices/w25/README.md)"
+msgstr "[显式 W25Q128JV 配置与保留的 Flash 完成责任](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/devices/w25/README.md)"
 
 #: docs/reference/api/components.md:0
 msgid "`Nexus::ILI9341`"
@@ -136,12 +113,8 @@ msgid "`ili9341.h`"
 msgstr "`ili9341.h`"
 
 #: docs/reference/api/components.md:0
-msgid ""
-"[Settled RGB565 command/data access](https://github.com/X-Gen-"
-"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/ili9341/README.md)"
-msgstr ""
-"[同步 RGB565 命令与数据访问](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
-"DOCUMENTATION-SOURCE/components/ili9341/README.md)"
+msgid "[Settled RGB565 command/data access](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/devices/ili9341/README.md)"
+msgstr "[同步 RGB565 命令与数据访问](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/devices/ili9341/README.md)"
 
 #: docs/reference/api/components.md:0
 msgid "`Nexus::XPT2046`"
@@ -152,12 +125,8 @@ msgid "`xpt2046.h`"
 msgstr "`xpt2046.h`"
 
 #: docs/reference/api/components.md:0
-msgid ""
-"[Raw touch samples with live pen observation](https://github.com/X-Gen-"
-"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/xpt2046/README.md)"
-msgstr ""
-"[带实时触笔观察的原始触摸样本](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/components/xpt2046/README.md)"
+msgid "[Raw touch samples with live pen observation](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/devices/xpt2046/README.md)"
+msgstr "[带实时触笔观察的原始触摸样本](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/devices/xpt2046/README.md)"
 
 #: docs/reference/api/components.md:0
 msgid "`Nexus::OneWire`"
@@ -168,13 +137,8 @@ msgid "`onewire.h`"
 msgstr "`onewire.h`"
 
 #: docs/reference/api/components.md:0
-msgid ""
-"[Bounded GPIO slots and failed-withdrawal "
-"ownership](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/components/onewire/README.md)"
-msgstr ""
-"[有界 GPIO 时隙与撤出失败后的所有权](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
-"DOCUMENTATION-SOURCE/components/onewire/README.md)"
+msgid "[Bounded GPIO slots and failed-withdrawal ownership](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/buses/onewire/README.md)"
+msgstr "[有界 GPIO 时隙与撤出失败后的所有权](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/buses/onewire/README.md)"
 
 #: docs/reference/api/components.md:0
 msgid "`Nexus::DS18B20`"
@@ -185,12 +149,8 @@ msgid "`ds18b20.h`"
 msgstr "`ds18b20.h`"
 
 #: docs/reference/api/components.md:0
-msgid ""
-"[External-VDD identity, conversion and CRC](https://github.com/X-Gen-"
-"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/ds18b20/README.md)"
-msgstr ""
-"[外部 VDD 供电下的身份、转换与 CRC](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
-"DOCUMENTATION-SOURCE/components/ds18b20/README.md)"
+msgid "[External-VDD identity, conversion and CRC](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/devices/ds18b20/README.md)"
+msgstr "[外部 VDD 供电下的身份、转换与 CRC](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/devices/ds18b20/README.md)"
 
 #: docs/reference/api/components.md:0
 msgid "`Nexus::Infrared`"
@@ -201,12 +161,8 @@ msgid "`infrared.h`"
 msgstr "`infrared.h`"
 
 #: docs/reference/api/components.md:0
-msgid ""
-"[Explicit NEC address and source-quality policies](https://github.com/X-Gen-"
-"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/infrared/README.md)"
-msgstr ""
-"[显式 NEC 地址与来源质量策略](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
-"DOCUMENTATION-SOURCE/components/infrared/README.md)"
+msgid "[Explicit NEC address and source-quality policies](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/devices/infrared/README.md)"
+msgstr "[显式 NEC 地址与来源质量策略](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/devices/infrared/README.md)"
 
 #: docs/reference/api/components.md:32
 msgid ""
@@ -2183,32 +2139,8 @@ msgstr ""
 "API 或二进制 ABI 承诺。产品显式调用 `nexus_add_tls()` 或 `nexus_add_coremqtt()` 创建选定目标。"
 
 #: docs/reference/api/components.md:177
-msgid ""
-"The TLS profile is one serialized TLS 1.2 client/PSA domain using ECDHE-ECDSA"
-" P-256 and AES-128-GCM/SHA-256. It requires explicit DER trust, trusted UTC "
-"and a reviewed entropy-quality assertion. Its 64 KiB caller arena and 512 B "
-"TX stage exclude session metadata, transport memory and stack. Join facade "
-"users, abort the session, then stop the runtime; failed or BUSY cleanup "
-"retains its resources. The MQTT 3.1.1 profile provides clean sessions and "
-"QoS0/1; callbacks borrow incoming views only until return. Explicit "
-"DISCONNECT and TLS close report local progress and do not replace lower-layer"
-" drain or peer acknowledgement. The component contracts detail "
-"[network](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/components/network/README.md), [TLS](https://github.com/X-Gen-"
-"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/tls/README.md) and "
-"[MQTT](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/components/mqtt/README.md) ownership and fixed profile limits."
-msgstr ""
-"TLS 配置是单一串行 TLS 1.2 客户端／PSA 域，使用 ECDHE-ECDSA P-256 和 "
-"AES-128-GCM/SHA-256。它要求显式 DER 信任材料、可信 UTC 和经过审查的熵质量声明。调用者提供的 64 KiB 内存区和 512 "
-"B TX 暂存区不包含会话元数据、传输存储和栈。先 join 全部接口使用者，再 abort 会话，然后停止 runtime；失败或 BUSY "
-"的清理仍保留资源。MQTT 3.1.1 配置提供 clean session 和 QoS0/1；回调仅在返回前借用传入视图。显式 DISCONNECT 和"
-" TLS close 表示本地推进，不替代下层排空或对端确认。[网络](https://github.com/X-Gen-"
-"Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/components/network/README.md)、[TLS](https://github.com/X-Gen-"
-"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/tls/README.md) 和 "
-"[MQTT](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/components/mqtt/README.md) 组件合同详细规定所有权及固定配置限制。"
+msgid "The TLS profile is one serialized TLS 1.2 client/PSA domain using ECDHE-ECDSA P-256 and AES-128-GCM/SHA-256. It requires explicit DER trust, trusted UTC and a reviewed entropy-quality assertion. Its 64 KiB caller arena and 512 B TX stage exclude session metadata, transport memory and stack. Join facade users, abort the session, then stop the runtime; failed or BUSY cleanup retains its resources. The MQTT 3.1.1 profile provides clean sessions and QoS0/1; callbacks borrow incoming views only until return. Explicit DISCONNECT and TLS close report local progress and do not replace lower-layer drain or peer acknowledgement. The component contracts detail [network](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/protocols/network/README.md), [TLS](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/protocols/tls/README.md) and [MQTT](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/protocols/mqtt/README.md) ownership and fixed profile limits."
+msgstr "TLS 配置是单一串行 TLS 1.2 客户端／PSA 域，使用 ECDHE-ECDSA P-256 和 AES-128-GCM/SHA-256。它要求显式 DER 信任材料、可信 UTC 和经过审查的熵质量声明。调用者提供的 64 KiB 内存区和 512 B TX 暂存区不包含会话元数据、传输存储和栈。先 join 全部接口使用者，再 abort 会话，然后停止 runtime；失败或 BUSY 的清理仍保留资源。MQTT 3.1.1 配置提供 clean session 和 QoS0/1；回调仅在返回前借用传入视图。显式 DISCONNECT 和 TLS close 表示本地推进，不替代下层排空或对端确认。[网络](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/protocols/network/README.md)、[TLS](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/protocols/tls/README.md) 和 [MQTT](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/protocols/mqtt/README.md) 组件合同详细规定所有权及固定配置限制。"
 
 #: docs/reference/api/components.md:190
 msgid ""
@@ -2449,29 +2381,8 @@ msgid ""
 msgstr "FIG-32：两条独立 TCP 传输与一条端到端 TLS 会话的软件主机数据流参考"
 
 #: docs/reference/api/components.md:293
-msgid ""
-"FIG-32 is a reference host-test data flow, not a product architecture or MCU "
-"network qualification. Solid bidirectional edges carry the same ciphertext "
-"over two independent TCP connections: software Ethernet frames between the "
-"Nexus client and a test-only lwIP peer, then a host socket between the "
-"transparent relay and local Mosquitto. The dashed edge identifies the one TLS"
-" session, which terminates at the Nexus TLS client and Mosquitto; the relay "
-"does not decrypt or terminate TLS. Each lwIP process owns its own serialized "
-"stack and clock. {download}`Editable DOT <../../assets/diagrams/lwip-tcp-tls-"
-"mqtt-host.dot>` and the [network contract](https://github.com/X-Gen-"
-"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/network/README.md) and "
-"[maintained relay fixture](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
-"DOCUMENTATION-SOURCE/tests/contracts/lwip_mqtt_interop/README.md) define this"
-" figure's source and lifetime boundaries."
-msgstr ""
-"FIG-32 描述主机测试的数据流参考，不是产品架构或 MCU 网络资格。双向实线在两条独立 TCP 连接上传送同一密文：Nexus 客户端与仅用于测试的"
-" lwIP 对端之间使用软件以太网帧，透明中继与本地 Mosquitto 之间使用主机 socket。虚线标出唯一的 TLS 会话，其端点是 Nexus "
-"TLS 客户端和 Mosquitto；中继不解密或终止 TLS。每个 lwIP 进程拥有各自的串行协议栈和时钟。{download}`可编辑 DOT "
-"<../../assets/diagrams/lwip-tcp-tls-mqtt-"
-"host.dot>`、[网络合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
-"DOCUMENTATION-SOURCE/components/network/README.md) "
-"以及[维护的中继工装](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/tests/contracts/lwip_mqtt_interop/README.md) 给出图的源码及生命周期边界。"
+msgid "FIG-32 is a reference host-test data flow, not a product architecture or MCU network qualification. Solid bidirectional edges carry the same ciphertext over two independent TCP connections: software Ethernet frames between the Nexus client and a test-only lwIP peer, then a host socket between the transparent relay and local Mosquitto. The dashed edge identifies the one TLS session, which terminates at the Nexus TLS client and Mosquitto; the relay does not decrypt or terminate TLS. Each lwIP process owns its own serialized stack and clock. {download}`Editable DOT <../../assets/diagrams/lwip-tcp-tls-mqtt-host.dot>` and the [network contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/protocols/network/README.md) and [maintained relay fixture](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/contracts/lwip_mqtt_interop/README.md) define this figure's source and lifetime boundaries."
+msgstr "FIG-32 描述主机测试的数据流参考，不是产品架构或 MCU 网络资格。双向实线在两条独立 TCP 连接上传送同一密文：Nexus 客户端与仅用于测试的 lwIP 对端之间使用软件以太网帧，透明中继与本地 Mosquitto 之间使用主机 socket。虚线标出唯一的 TLS 会话，其端点是 Nexus TLS 客户端和 Mosquitto；中继不解密或终止 TLS。每个 lwIP 进程拥有各自的串行协议栈和时钟。{download}`可编辑 DOT <../../assets/diagrams/lwip-tcp-tls-mqtt-host.dot>`、[网络合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/protocols/network/README.md) 以及[维护的中继工装](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/contracts/lwip_mqtt_interop/README.md) 给出图的源码及生命周期边界。"
 
 #: docs/reference/api/components.md:305
 msgid ""
@@ -4651,18 +4562,8 @@ msgstr ""
 msgid "smbus.h"
 msgstr "smbus.h"
 
-msgid ""
-"The optional component frames bounded packets over an already configured "
-"asynchronous I2C endpoint. Its generated companion reuses existing "
-"endpoint IDs; it does not qualify hardware SMBTYPE, timeout or ALERT "
-"operation. See the [component contract](https://github.com/X-Gen-"
-"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/smbus/README.md) for"
-" `nexus_smbus_factory.h`, static binding and borrowing lifetimes."
-msgstr ""
-"此可选组件在已配置的异步 I2C 端点上封装有界包。其生成的配套文件复用现有端点 ID；不认定硬件 SMBTYPE、超时或 ALERT "
-"操作的资格。有关 `nexus_smbus_factory.h`、静态绑定和借用寿命，参见[组件合同](https://github.com/X"
-"-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/components/smbus/README.md)。"
+msgid "The optional component frames bounded packets over an already configured asynchronous I2C endpoint. Its generated companion reuses existing endpoint IDs; it does not qualify hardware SMBTYPE, timeout or ALERT operation. See the [component contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/buses/smbus/README.md) for `nexus_smbus_factory.h`, static binding and borrowing lifetimes."
+msgstr "此可选组件在已配置的异步 I2C 端点上封装有界包。其生成的配套文件复用现有端点 ID；不认定硬件 SMBTYPE、超时或 ALERT 操作的资格。有关 `nexus_smbus_factory.h`、静态绑定和借用寿命，参见[组件合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/buses/smbus/README.md)。"
 
 msgid "Bounded packet PEC over one reviewed asynchronous I2C binding."
 msgstr "一个已审查异步 I2C 绑定上的有界包 PEC。"

@@ -76,7 +76,7 @@ application and bootloader as separate images. The generic C11 control target
 requests or queries trailer state; an explicit concrete Flash port uses
 caller-owned regions, a valid clock and one finite deadline for each operation.
 Only the separate boot image selects verification and overwrite-copy code. The
-[canonical MCUboot contract and ownership diagram](../../components/mcuboot/README.md)
+[canonical MCUboot contract and ownership diagram](../../components/protocols/mcuboot/README.md)
 own those dependencies and product reset/recovery duties. The selected profile
 provides permanent overwrite only; partial trailer writes leave product
 recovery responsibility and imply no rollback. The

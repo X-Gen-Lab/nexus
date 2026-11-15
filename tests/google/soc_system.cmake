@@ -8,14 +8,14 @@ nexus_google_test(${system_target}
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/startup.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/power.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/supervision.c"
-        "${NEXUS_SOURCE_DIR}/components/clock_domain/src/clock_domain.c"
+        "${NEXUS_SOURCE_DIR}/components/runtime/clock_domain/src/clock_domain.c"
     LIBRARIES Nexus::Core
     INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
         "${NEXUS_SOURCE_DIR}/arch/include")
 target_include_directories(${system_target} PRIVATE
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/include"
-    "${NEXUS_SOURCE_DIR}/components/clock_domain/include"
-        "${NEXUS_SOURCE_DIR}/components/clock_domain/private"
+    "${NEXUS_SOURCE_DIR}/components/runtime/clock_domain/include"
+        "${NEXUS_SOURCE_DIR}/components/runtime/clock_domain/private"
         "${NEXUS_SOURCE_DIR}/io/include")
 target_include_directories(${system_target} SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
@@ -66,14 +66,14 @@ foreach(sdio_high_speed 0 1)
         LIBRARIES Nexus::Core
         INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/include"
-            "${NEXUS_SOURCE_DIR}/components/clock_domain/include"
-            "${NEXUS_SOURCE_DIR}/components/clock_domain/private"
+            "${NEXUS_SOURCE_DIR}/components/runtime/clock_domain/include"
+            "${NEXUS_SOURCE_DIR}/components/runtime/clock_domain/private"
             "${NEXUS_SOURCE_DIR}/arch/include"
             "${NEXUS_SOURCE_DIR}/io/include")
     if(sdio_high_speed)
         target_sources(${sdio_system_target} PRIVATE
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/power.c"
-            "${NEXUS_SOURCE_DIR}/components/clock_domain/src/clock_domain.c")
+            "${NEXUS_SOURCE_DIR}/components/runtime/clock_domain/src/clock_domain.c")
     endif()
     target_include_directories(${sdio_system_target} SYSTEM PRIVATE
         "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
@@ -118,12 +118,12 @@ foreach(power_rtc_part f407 f411 f446 f479)
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/startup.c"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/power.c"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/rtc/rtc.c"
-            "${NEXUS_SOURCE_DIR}/components/clock_domain/src/clock_domain.c"
+            "${NEXUS_SOURCE_DIR}/components/runtime/clock_domain/src/clock_domain.c"
         LIBRARIES Nexus::IO
         INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/include"
-            "${NEXUS_SOURCE_DIR}/components/clock_domain/include"
-            "${NEXUS_SOURCE_DIR}/components/clock_domain/private"
+            "${NEXUS_SOURCE_DIR}/components/runtime/clock_domain/include"
+            "${NEXUS_SOURCE_DIR}/components/runtime/clock_domain/private"
             "${NEXUS_SOURCE_DIR}/arch/include"
             "${NEXUS_SOURCE_DIR}/io/private")
     target_include_directories(${power_rtc_target} SYSTEM PRIVATE
@@ -227,12 +227,12 @@ foreach(family_profile f407 f411 f446 f479)
                 "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/clock.c"
                 "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/startup.c"
                 "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/power.c"
-                "${NEXUS_SOURCE_DIR}/components/clock_domain/src/clock_domain.c"
+                "${NEXUS_SOURCE_DIR}/components/runtime/clock_domain/src/clock_domain.c"
             LIBRARIES Nexus::IO Nexus::Arch
             INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
                 "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/include"
-                "${NEXUS_SOURCE_DIR}/components/clock_domain/include"
-                "${NEXUS_SOURCE_DIR}/components/clock_domain/private")
+                "${NEXUS_SOURCE_DIR}/components/runtime/clock_domain/include"
+                "${NEXUS_SOURCE_DIR}/components/runtime/clock_domain/private")
         target_include_directories(${high_target} SYSTEM PRIVATE
             "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
         nexus_use_cmsis_core(${high_target})
