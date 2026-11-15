@@ -107,6 +107,10 @@ neither physical min-entropy nor HIL qualification.
 
 ## stm32f407_handoff.h
 
+The chip-specific entry is `nexus/soc/stm32f407_handoff.h`, owned by
+the [F4 System contract](../../../soc/stm32/stm32f4/system/README.md#f407-掩码状态下的镜像交接).
+Link `Nexus::STM32F407Handoff` explicitly in the selected F407 baremetal firmware.
+
 ```{doxygenfile} stm32f407_handoff.h
 :project: nexus
 ```
@@ -152,7 +156,7 @@ only Nexus types. `Nexus::MCUBootPort` is the separate, concrete Flash
 composition boundary; `Nexus::MCUBootBootStorage` belongs to a separately linked
 boot image. These targets are outside the default platform assembly.
 
-Use the [canonical MCUboot contract](../../../components/mcuboot/README.md) for
+Use the [canonical MCUboot contract](../../../components/protocols/mcuboot/README.md) for
 helper selection, the boot/application ownership diagram, finite operation and
 Flash-region lifetime, partial persistent writes and product recovery duties.
 The selected overwrite-only profile supports permanent requests; the control

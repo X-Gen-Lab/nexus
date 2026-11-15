@@ -174,7 +174,7 @@ class QspiAdmission(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             result = self.resolve(Path(temporary))
         header, _ = factory.emit(result)
-        self.assertNotIn("components/mapped_storage", header)
+        self.assertNotIn("components/services/mapped_storage", header)
         self.assertNotIn("nx_mapped_storage", header)
 
     def admit(self, value, hz=16000000):

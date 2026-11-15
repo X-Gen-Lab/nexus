@@ -7,7 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "nexus/arch/arch.h"
-#include "nexus/components/stm32f407_handoff.h"
+#include "nexus/soc/stm32f407_handoff.h"
 #include "nexus_bindings.h"
 
 /** \brief Link one real public lifecycle; never infer physical execution. */

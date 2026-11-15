@@ -1,6 +1,6 @@
 # Actual-POT messages; changed entries await independent semantic review.
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 383c82f3b5288742917b29b430bdde59b6b20bb34481e2a2c3b1f60f29919c5c\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: defc2d6b2164b458892a06cd57ff4863cd90cb0b9b8ecffe2fa4b2ebcb182fe0\n"
 
 msgid "Extension and lifecycle APIs"
 msgstr "扩展与生命周期 API"
@@ -719,8 +719,8 @@ msgstr "MCUboot 控制与显式 Flash 装配"
 msgid "`Nexus::MCUBootControl` exposes the stateless public control API below. It uses only Nexus types. `Nexus::MCUBootPort` is the separate, concrete Flash composition boundary; `Nexus::MCUBootBootStorage` belongs to a separately linked boot image. These targets are outside the default platform assembly."
 msgstr "`Nexus::MCUBootControl` 暴露下述无状态公共控制 API，仅使用 Nexus 类型。`Nexus::MCUBootPort` 是独立的具体 Flash 装配边界；`Nexus::MCUBootBootStorage` 属于独立链接的 boot 镜像。这些 target 均不属于默认平台装配。"
 
-msgid "Use the [canonical MCUboot contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/mcuboot/README.md) for helper selection, the boot/application ownership diagram, finite operation and Flash-region lifetime, partial persistent writes and product recovery duties. The selected overwrite-only profile supports permanent requests; the control API does not authenticate a candidate, reset hardware or provide rollback. Software models and linked-image budgets do not establish physical Flash, power-cut or HIL qualification."
-msgstr "helper 选择、boot／应用所有权图、有限 operation 与 Flash region 生命周期、部分持久写入和产品恢复责任，以 [MCUboot 权威合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/mcuboot/README.md)为准。所选覆盖配置支持永久更新请求；控制 API 不鉴别候选镜像、不复位硬件，也不提供回滚。软件模型与已链接镜像预算不建立物理 Flash、掉电或 HIL 资格。"
+msgid "Use the [canonical MCUboot contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/protocols/mcuboot/README.md) for helper selection, the boot/application ownership diagram, finite operation and Flash-region lifetime, partial persistent writes and product recovery duties. The selected overwrite-only profile supports permanent requests; the control API does not authenticate a candidate, reset hardware or provide rollback. Software models and linked-image budgets do not establish physical Flash, power-cut or HIL qualification."
+msgstr "helper 选择、boot／应用所有权图、有限 operation 与 Flash region 生命周期、部分持久写入和产品恢复责任，以 [MCUboot 权威合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/protocols/mcuboot/README.md)为准。所选覆盖配置支持永久更新请求；控制 API 不鉴别候选镜像、不复位硬件，也不提供回滚。软件模型与已链接镜像预算不建立物理 Flash、掉电或 HIL 资格。"
 
 msgid "mcuboot_control.h"
 msgstr "mcuboot_control.h"
@@ -763,3 +763,6 @@ msgstr "PERMANENT 请求更新；TEST 无访问即拒绝。"
 
 msgid "NX_SUCCESS after upstream completes and reports PERMANENT on readback, NX_ERROR_UNSUPPORTED for TEST, NX_ERROR_INVALID for an unknown request, NX_ERROR_STATE for another known readback action, or NX_ERROR_IO for an upstream error. An error can follow partial persistent trailer modification, including a pending TEST that cannot be silently promoted."
 msgstr "上游完成且读回报告 PERMANENT 后返回 NX_SUCCESS；TEST 返回 NX_ERROR_UNSUPPORTED，未知请求返回 NX_ERROR_INVALID，读回其他已知动作返回 NX_ERROR_STATE，上游错误返回 NX_ERROR_IO。部分持久 trailer 修改后仍可能返回错误，包括不能悄悄提升为永久更新的 pending TEST。"
+
+msgid "The chip-specific entry is `nexus/soc/stm32f407_handoff.h`, owned by the [F4 System contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/system/README.md#f407-掩码状态下的镜像交接). Link `Nexus::STM32F407Handoff` explicitly in the selected F407 baremetal firmware."
+msgstr "芯片专用入口为 `nexus/soc/stm32f407_handoff.h`，归 [F4 System 合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/system/README.md#f407-掩码状态下的镜像交接)所有。在选定的 F407 裸机固件中显式链接 `Nexus::STM32F407Handoff`。"

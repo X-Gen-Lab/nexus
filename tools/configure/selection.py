@@ -203,8 +203,6 @@ def normalize_controller(selection, route, binding, hardware, provider, *,
         if policy is None:
             fail("Selected provider has no timer waveform policy")
         result["waveform_resolution"] = policy.resolve_fields(selection, route, clock)
-    result.update(provider.mode_fields(
-        selection, route, clock_profile=clock_profile))
     if route["kind"] == "can_fd":
         result["message_ram_words"] = hardware["message_ram_words"]
     from tools.configure import gpio_electrical

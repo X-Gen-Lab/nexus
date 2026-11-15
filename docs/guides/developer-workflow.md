@@ -123,16 +123,18 @@ or corrupt loads are errors, not empty writable stores. After a mutating commit
 failure, reopen Storage and Settings to observe the surviving commit before
 retrying. Defaults, migration, authorization and Flash regions remain product
 policy. Read {ref}`settings.h <settings_8h>` and the
-[component contract](../../components/settings/README.md) for detailed ownership.
+[component contract](../../components/services/settings/README.md) for detailed ownership.
 
 The optional `Nexus::LwIP` target admits the organization-hosted `X-Gen-Lab/lwip`
-2.2.1 gitlink `77dcd25a` and its fixed source closure. It is excluded from the
-default build until explicitly selected. It uses `NO_SYS=1`: a product loop or
+2.2.1 source closure, with the exact curated revision defined by the network
+contract. Unselected assemblies do not load lwIP; an explicit network helper,
+target or component selects and validates it. It uses `NO_SYS=1`: a product loop or
 task advances one serialized owner, without an implicit RTOS stack port. It
 reuses Ethernet frame loans and bounded memory. The reviewed slice covers static
-IPv4/ARP/ICMP/UDP and limited TCP integration; complete TCP connection lifecycles,
-DHCP, DNS, IPv6, VLAN, TLS and MQTT remain separate exits. Read the
-[network integration contract](../../components/network/README.md) for source,
+IPv4/ARP/ICMP/UDP and bounded TCP connection lifecycles. Optional TLS and MQTT
+compose over the byte interface; DHCP, DNS, IPv6 and VLAN remain outside this
+profile. Read the
+[network integration contract](../../components/protocols/network/README.md) for source,
 SDK, clock, memory and stop prerequisites. Source admission and development SDK
 consumption do not establish a software candidate, full network-platform,
 ARM or physical acceptance.

@@ -69,7 +69,7 @@ add_subdirectory("{ROOT / 'io'}" io)
                 project += f'''
 function(nexus_apply_target_policy target)
 endfunction()
-add_subdirectory("{ROOT / 'components/tmp117'}" tmp117)
+add_subdirectory("{ROOT / 'components/devices/tmp117'}" tmp117)
 add_executable(consumer main.c)
 target_link_libraries(consumer PRIVATE Nexus::TMP117I2C)
 target_link_options(consumer PRIVATE -Wl,--gc-sections)

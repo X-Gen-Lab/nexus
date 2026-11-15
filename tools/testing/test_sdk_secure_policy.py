@@ -216,7 +216,7 @@ class SDKSecurePolicyTests(unittest.TestCase):
                     rows = [row for row in rows
                             if row["file"] != str(source / "composition.c")]
                 else:
-                    rows.append({"file": str(sdk / "components/tls/src/stray.cpp"),
+                    rows.append({"file": str(sdk / "components/protocols/tls/src/stray.cpp"),
                                  "arguments": ["c++", "-std=c++17", "-c", "stray.cpp"]})
                 database.write_text(json.dumps(rows))
                 with self.assertRaisesRegex(ValueError, "composition|C11"):

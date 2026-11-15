@@ -12,7 +12,7 @@ ExternalProject_Add(nexus_tls_host_peer
         "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
         "-DCMAKE_BUILD_TYPE=MinSizeRel"
         "-DNEXUS_MBEDTLS_SOURCE=${tls_test_source}"
-        "-DNEXUS_TLS_PROFILE_ROOT=${NEXUS_SOURCE_DIR}/components/tls/profile"
+        "-DNEXUS_TLS_PROFILE_ROOT=${NEXUS_SOURCE_DIR}/components/protocols/tls/profile"
     BUILD_COMMAND "${CMAKE_COMMAND}" --build <BINARY_DIR> --parallel 1
     BUILD_ALWAYS TRUE
     INSTALL_COMMAND ""

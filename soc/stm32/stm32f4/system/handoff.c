@@ -7,7 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "clock_domain_impl.h"
-#include "nexus/components/stm32f407_handoff.h"
+#include "nexus/soc/stm32f407_handoff.h"
 #include "private/stm32f407_silicon.h"
 #include "system/stm32f407_handoff_hw.h"
 #include "system/stm32f407_system.h"

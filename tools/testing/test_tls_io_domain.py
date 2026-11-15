@@ -69,7 +69,7 @@ add_library(Nexus::Config ALIAS nexus_config)
 set_property(TARGET nexus_config PROPERTY NEXUS_SOURCE_DIR "{ROOT}")
 set_property(TARGET nexus_config PROPERTY NEXUS_LTO_REQUIRED FALSE)
 include("{ROOT / 'cmake/platform/TargetPolicy.cmake'}")
-include("{ROOT / 'components/tls/CMakeLists.txt'}")
+include("{ROOT / 'components/protocols/tls/CMakeLists.txt'}")
 nexus_add_tls()
 add_executable(consumer main.c)
 ''').replace("Nexus::IOCycleProbe", "Nexus::TLSStorage")
@@ -100,7 +100,7 @@ add_executable(consumer main.c)
             self.assertEqual(result.returncode, 0, output)
         entries = json.loads((root / "build/compile_commands.json").read_text())
         paths = [Path(entry["file"]).resolve() for entry in entries]
-        for relative in ("components/tls/src/tls.c", "io/src/api/entropy.c",
+        for relative in ("components/protocols/tls/src/tls.c", "io/src/api/entropy.c",
                          "ext/mbedtls/library/ssl_tls.c",
                          "ext/mbedtls/tf-psa-crypto/core/psa_crypto.c"):
             self.assertEqual(paths.count(ROOT / relative), 1, relative)

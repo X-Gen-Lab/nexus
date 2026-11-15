@@ -99,7 +99,7 @@ class SMBusFactoryTests(unittest.TestCase):
                     command = [compiler, "-std=" + standard, "-Wall", "-Wextra",
                         "-Werror", "-pedantic", "-I" + str(output)]
                     for directory in ("core/include", "io/include",
-                                      "components/smbus/include"):
+                                      "components/buses/smbus/include"):
                         command.append("-I" + str(configure.ROOT / directory))
                     command += ["-c", str(source), "-o",
                                 str(self.directory / "consumer.o")]
@@ -124,9 +124,9 @@ class SMBusFactoryTests(unittest.TestCase):
         specification, = selected
         self.assertTrue(specification.arm)
         sources = verify_consumers.service_sources(configure.ROOT, specification)
-        names = {"components/smbus/CMakeLists.txt",
-                 "components/smbus/include/nexus/components/smbus.h",
-                 "components/smbus/src/smbus.c", "components/smbus/README.md",
+        names = {"components/buses/smbus/CMakeLists.txt",
+                 "components/buses/smbus/include/nexus/components/smbus.h",
+                 "components/buses/smbus/src/smbus.c", "components/buses/smbus/README.md",
                  "cmake/package/verification/smbus/f407.toml"}
         names.update(path.relative_to(configure.ROOT).as_posix()
                      for path in sources.values())

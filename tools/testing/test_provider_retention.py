@@ -166,7 +166,7 @@ class ComponentPublicContractsTests(unittest.TestCase):
     def tree(self, directory, *, tagged=False):
         root = Path(directory)
         base = root / "io/include/nexus/io/base.h"
-        header = root / "components/probe/include/nexus/components/probe.h"
+        header = root / "components/runtime/probe/include/nexus/components/probe.h"
         source = package_tree(root) / "drivers/port/probe.c"
         metadata = header.with_name("metadata.h")
         face = ("struct nx_component_probe { const nx_component_probe_ops_t* ops; "
@@ -235,7 +235,7 @@ class ComponentPublicContractsTests(unittest.TestCase):
         from tools.measurement.retention import component_owner_input_paths
         with tempfile.TemporaryDirectory() as directory:
             root, header, source, metadata = self.tree(directory)
-            nested = root / "components/soc/vendor/probe/include/nexus/components"
+            nested = root / "components/services/probe/include/nexus/components"
             nested.mkdir(parents=True)
             moved_header = nested / header.name
             header.rename(moved_header)

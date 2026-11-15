@@ -27,19 +27,18 @@ only shrink. Changed files receive strict whole-file checks.
 
 ```sh
 .venv/bin/python -m pre_commit run nexus-style --all-files --show-diff-on-failure
-.venv/bin/python -m unittest discover -s tools/configure -p 'test_*.py'
-doxygen Doxyfile
-.venv/bin/python -m sphinx -W --keep-going -b html docs/sphinx build/docs
+python tools/dev/dev.py docs check
 ```
 
 Choose validation for the behavior changed: lifecycle/IRQ/concurrency require
 fault and late-event regressions; storage requires interrupted writes; config
 requires rejection and resource-conflict cases. Compile reusable components for
-both MCU families. Native models, ARM linking and physical station execution
-have different scopes; record hardware tests as unexecuted until equipment runs.
+the maintained exact F4 configurations. Native models, ARM linking and physical
+station execution have different scopes; record hardware tests as unexecuted
+until equipment runs.
 
 PR descriptions explain the resulting behavior, actual validation and limits.
 Platform changes include exact part/board/backend/mode and raw evidence paths.
-CI enforces style, analyzers, host contracts, six ARM assemblies, tool boundaries
-and docs; review remains a maintainer responsibility. Repository protection and
-physical qualification are not implied by a workflow definition.
+CI enforces style, analyzers, host contracts, selected ARM assemblies, tool
+boundaries and docs; review remains a maintainer responsibility. Repository
+protection and physical qualification are not implied by a workflow definition.

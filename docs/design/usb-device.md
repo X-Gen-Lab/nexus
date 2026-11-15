@@ -504,7 +504,7 @@ C 准入时检查；外部 GPIO context 没有可知尺寸，由调用者保证�
 ## 按需官方 Core middleware
 
 `st-usb-device` 与 `st-usb-host` 只准备精确锁定的相应 middleware Core。
-`components/st_usb_device` 和 `components/st_usb` 使用调用者静态 state、slots、
+`components/protocols/st_usb_device` 和 `components/protocols/st_usb` 使用调用者静态 state、slots、
 staging、有限 deadline 和显式 Thread step。官方 Handle／class／descriptor 回调表
 留在私有接线边界，公共 I/O 不泄漏厂商类型；不选时不编译、不建立堆或后台任务。
 

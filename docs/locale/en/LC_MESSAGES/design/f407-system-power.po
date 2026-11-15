@@ -525,3 +525,42 @@ msgstr "Each read retains the official RNG's first-word discard, continuous equa
 
 msgid "`ClockPlanIR` 是唯一已选时钟计划。`nexus_config.h` 与 `system/stm32f407_clock.h` 的 `NEXUS_*_HZ`、PLL/CFGR、ADC divider 和 Flash wait-state 常量由该计划产生；UART/SPI/I2C/CAN、timer、ADC/DAC 与监督机制使用 同一实际频率合同。PLLI2S 与主 PLL 共享 source/M，音频 owner 独占自己的 N/R。 USB/SDIO 的已选 48 MHz 使用者必须具有精确名义 PLL48；具体尚未审核 custom profile 的 provider 继续显式拒绝。HSI 的名义值不建立 USB 精度或外部同步资格。"
 msgstr "`ClockPlanIR` is the sole selected clock plan. It generates `NEXUS_*_HZ`, PLL/CFGR, ADC-divider and Flash wait-state constants in `nexus_config.h` and `system/stm32f407_clock.h`. UART/SPI/I2C/CAN, timers, ADC/DAC and supervision use the same actual-frequency contract. PLLI2S shares source/M with the main PLL; the audio owner exclusively owns its N/R. Selected USB/SDIO 48 MHz consumers require exact nominal PLL48. Providers whose custom profiles remain unreviewed continue to reject them explicitly. Nominal HSI does not establish USB accuracy or external synchronization qualification."
+
+msgid "F407 掩码状态下的镜像交接"
+msgstr "F407 image handoff with interrupts masked"
+
+msgid "F4 System 提供 `Nexus::STM32F407Handoff`，仅在精确 STM32F407VET6／ZGT6 裸机 Platform assembly 中存在。通过 `nexus_add_firmware(... LIBRARIES ...)` 显式 链接；产品只包含 `nexus/soc/stm32f407_handoff.h`，vendor 寄存器和可变 准入存储保持私有。"
+msgstr "F4 System provides `Nexus::STM32F407Handoff` only for exact STM32F407VET6/ZGT6 baremetal Platform assemblies. Link it explicitly through `nexus_add_firmware(... LIBRARIES ...)`. Products include only `nexus/soc/stm32f407_handoff.h`; vendor registers and mutable admission storage remain private."
+
+msgid "责任域与交接流程"
+msgstr "Responsibility domain and handoff sequence"
+
+msgid "在准入用户前调用一次 `nx_stm32f407_handoff_initialize(capacity)`。稳定 getter `nx_stm32f407_handoff_domain()` 不初始化硬件或分配。显式登记每个 Platform／产品 executor、IRQ、DMA、notification 和 memory owner。关闭准入后，以真实 API 取消、 排空并 join，停止 Platform，随后才释放每个精确 lease。外来空 domain、过期 epoch 或 retained lease 都不能授权交接。domain 不自动知道未登记用户、另一 CPU 或总线主设备。"
+msgstr "Call `nx_stm32f407_handoff_initialize(capacity)` once before admitting users. The stable getter `nx_stm32f407_handoff_domain()` neither initializes hardware nor allocates. Explicitly enroll every Platform/product executor, IRQ, DMA, notification and memory owner. After closing admission, cancel, drain and join through the actual APIs, stop Platform, then release each exact lease. A foreign empty domain, stale epoch or retained lease cannot authorize handoff. The domain does not automatically know about unenrolled users, another CPU or bus masters."
+
+msgid "产品从 privileged MSP Thread 保存／屏蔽中断，调用 `nx_stm32f407_handoff(closed, physical_flash_vector)`。机制只做受限 handoff， 不认证镜像、不选择 boot／recovery 策略，也不预留 Flash 分区。"
+msgstr "The product saves and masks interrupts from privileged MSP Thread context, then calls `nx_stm32f407_handoff(closed, physical_flash_vector)`. The mechanism performs only a restricted handoff; it does not authenticate an image, select boot/recovery policy or reserve Flash regions."
+
+msgid "精确进入条件"
+msgstr "Exact entry conditions"
+
+msgid "必须 PRIMASK=1、BASEPRI=FAULTMASK=0；没有 active FP／lazy preservation、MPU、 已启用／pending／active IRQ 或 SysTick。System 已停，使用 HSI16／reset buses， 没有 peripheral／DMA gates 或 busy Flash。普通 SystemInit 的完整 CP10／11 权限在没有活跃 FP owner 时可接纳；尾部以 DSB／ISB 禁用 CP10／11，随后替换 MSP 并跳转。"
+msgstr "PRIMASK must be 1 and BASEPRI=FAULTMASK=0, with no active FP/lazy preservation, MPU, enabled/pending/active IRQ or SysTick. System is stopped, HSI16 and reset buses are selected, and no peripheral/DMA gates or busy Flash remain. Complete CP10/11 permissions from ordinary SystemInit are accepted when no FP owner is active. The final sequence disables CP10/11 with DSB/ISB, then replaces MSP and branches."
+
+msgid "[FIG-05 Platform 生命周期](/explanation/platform-architecture.md#lifecycle-and-failure-responsibility) 说明平台停止前的排空与失败保留；镜像交接还须满足本文的 masks、向量和存储前提。 图不表示通用 boot 或已执行物理交接。"
+msgstr "[FIG-05 Platform lifecycle](/explanation/platform-architecture.md#lifecycle-and-failure-responsibility) explains draining before Platform stop and retained responsibility after failure. Image handoff also requires the masks, vector and storage prerequisites here. The diagram represents neither generic boot nor an executed physical handoff."
+
+msgid "拒绝保留 masks 且不写 MMIO，但读取 SysTick CTRL 会消费 COUNTFLAG。off gate 只阻止执行，不能认证 controller 的潜在配置已清除；目标在开 gate 前 reset controllers。"
+msgstr "Rejection preserves masks and performs no writable MMIO, but reading SysTick CTRL consumes COUNTFLAG. An off gate only prevents execution; it does not prove that latent controller configuration has been cleared. The target resets controllers before enabling gates."
+
+msgid "完整 98 项 vector table 必须位于生成和物理观察一致的 512 KiB／1 MiB Flash 中， 并按 512 对齐。MSP 按 8 对齐且位于 `(0x20000000,0x20020000]`；Reset PC 为 Thumb，其首个 halfword 在物理 Flash 内。DEV_ID `0x413` 是共享器件组，F407／ 封装身份仍来自精确 part／PCB 来源，不能仅凭 device ID 证明。"
+msgstr "The complete 98-entry vector table must lie in 512 KiB/1 MiB Flash whose generated geometry matches physical observation, with 512-byte alignment. MSP is 8-byte aligned and lies in `(0x20000000,0x20020000]`; Reset PC is Thumb and its first halfword lies in physical Flash. DEV_ID `0x413` identifies a shared device group. F407/package identity still comes from exact part/PCB provenance and cannot be proved by device ID alone."
+
+msgid "成功后的状态与限制"
+msgstr "State and limits after success"
+
+msgid "成功交接永不返回。VTOR 指向已准入 Flash table，CONTROL=0、PSP=0、CP10／11 关闭、PRIMASK=1。主 SRAM 保留到目标 startup 自行 copy／clear。目标须接受 masked entry，仅在自己的状态 ready 后 unmask，不能复用源 deadline。调用者全程 排除 NMI／HardFault、debugger 和其他 masters。"
+msgstr "Successful handoff never returns. VTOR points to the admitted Flash table, CONTROL=0, PSP=0, CP10/11 are disabled and PRIMASK=1. Main SRAM is preserved until target startup copies/clears it. The target must accept masked entry, unmask only after its own state is ready, and never reuse source deadlines. The caller excludes NMI/HardFault, debuggers and other masters throughout."
+
+msgid "源码入口为 `../include/nexus/soc/stm32f407_handoff.h` 与 `handoff.c`，可选构建条件在 `Handoff.cmake`。机制仅提供 受限的软件交接，不建立完整镜像交接资格；不接管 live RTOS／kernel，不转移 active-FPU context，不支持 RAM／ROM vector、H743／Cache-on transition、通用 Cortex-M 或 实测交接。SOC-34 DVFS 与 IO-30 runtime clock 仍开放，固定频率 provider 不因此 变为 mutable-clock 合同。"
+msgstr "Source entry points are `../include/nexus/soc/stm32f407_handoff.h` and `handoff.c`; optional build conditions are in `Handoff.cmake`. The mechanism provides only restricted software handoff and does not establish complete image-handoff qualification. It does not take over a live RTOS/kernel, transfer active-FPU context, or support RAM/ROM vectors, H743/cache-on transitions, generic Cortex-M or measured physical handoff. SOC-34 DVFS and IO-30 runtime clock remain open; fixed-frequency providers do not thereby acquire a mutable-clock contract."

@@ -17,8 +17,6 @@ Code Formatting
 The project uses clang-format for automatic code formatting. Run ``clang-format``
 before committing code.
 
-See also: ``.kiro/steering/comment-standards.md`` for detailed comment guidelines.
-
 Indentation
 ~~~~~~~~~~~
 
@@ -166,6 +164,13 @@ existing template::
 
 **Important**: Do NOT use ``/*===...===*/`` style separators. Always use
 ``/*---...---*/`` for consistency.
+
+CMake Section Comments
+~~~~~~~~~~~~~~~~~~~~~~
+
+CMake section separator lines must be exactly 77 characters: ``#`` followed by
+76 hyphens or spaces. This rule is independent of the 79-character C/C++ section
+comments above.
 
 Inline Comments
 ~~~~~~~~~~~~~~~

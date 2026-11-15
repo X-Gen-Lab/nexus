@@ -290,11 +290,6 @@ def validate_mode_context(selection, route, *, backend, clock_profile,
     """Default families impose no additional mode/profile coupling here."""
 
 
-def mode_fields(selection, route, *, clock_profile):
-    """Families explicitly derive private hardware admission fields."""
-    return {}
-
-
 def validate_controller_set(selected, *, clock_profile):
     """Default families have no additional whole-selection constraints."""
 

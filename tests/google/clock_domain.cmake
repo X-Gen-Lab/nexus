@@ -1,9 +1,9 @@
 # Real optional domain mechanism; only external CPU context leaves are modeled.
 add_library(nexus_clock_domain_test_provider STATIC
-    "${NEXUS_SOURCE_DIR}/components/clock_domain/src/clock_domain.c")
+    "${NEXUS_SOURCE_DIR}/components/runtime/clock_domain/src/clock_domain.c")
 target_include_directories(nexus_clock_domain_test_provider PUBLIC
-    "${NEXUS_SOURCE_DIR}/components/clock_domain/include"
-    "${NEXUS_SOURCE_DIR}/components/clock_domain/private")
+    "${NEXUS_SOURCE_DIR}/components/runtime/clock_domain/include"
+    "${NEXUS_SOURCE_DIR}/components/runtime/clock_domain/private")
 target_link_libraries(nexus_clock_domain_test_provider PUBLIC Nexus::Core
     PRIVATE Nexus::Arch nexus_build_options nexus_owned_warnings)
 target_compile_definitions(nexus_clock_domain_test_provider PRIVATE

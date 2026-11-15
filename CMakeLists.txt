@@ -92,7 +92,7 @@ endif()
 if(NEXUS_RUNTIME_POWER)
     target_link_libraries(nexus_platform PUBLIC Nexus::ClockDomain)
     target_include_directories(nexus_platform PRIVATE
-        "${NEXUS_SOURCE_DIR}/components/clock_domain/private")
+        "${NEXUS_SOURCE_DIR}/components/runtime/clock_domain/private")
     list(APPEND nexus_component_targets Nexus::ClockDomain)
 endif()
 if(NEXUS_IO_CYCLE_PROBES)

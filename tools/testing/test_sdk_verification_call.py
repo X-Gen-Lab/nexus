@@ -39,27 +39,30 @@ class SDKPublicCompileInputTests(unittest.TestCase):
         self.sdk = self.root / "external soc/vendors tree/sdk"
         self.build = self.root / "product -DSTM32 name/build"
         self.build.mkdir(parents=True)
-        self.public = (self.sdk / "components/soc/stm32/stm32f407_handoff/include")
-        (self.public / "nexus/components").mkdir(parents=True)
+        self.public = (self.sdk / "soc/stm32/stm32f4/include")
+        (self.public / "nexus/soc").mkdir(parents=True)
         (self.public.parent / "CMakeLists.txt").write_text(
-            "# Maintained component exports its sibling include directory.\n")
+            "# Maintained SoC exports its sibling include directory.\n")
         self.private = self.sdk / "soc/stm32/stm32f4"
-        self.private.mkdir(parents=True)
+        self.private.mkdir(parents=True, exist_ok=True)
         specification = importlib.util.spec_from_file_location(
             "include_boundary_consumer", ROOT / "cmake/package/verify_consumers.py")
         self.consumer = importlib.util.module_from_spec(specification)
         specification.loader.exec_module(self.consumer)
 
-    def private_input(self, arguments, *, command=False):
+    def private_input(self, arguments, *, command=False,
+                      composition_includes=()):
         entry = {"file": str(self.build / "main.c"),
                  "directory": str(self.build)}
         argv = ["cc", *map(str, arguments), "-c", str(self.build / "main.c")]
         entry["command" if command else "arguments"] = (
             shlex.join(argv) if command else argv)
-        return self.consumer.private_compile_inputs(entry, self.sdk)
+        options = ({"composition_includes": composition_includes}
+                   if composition_includes else {})
+        return self.consumer.private_compile_inputs(entry, self.sdk, **options)
 
     def test_public_chip_include_and_kernel_exports_remain_public(self):
-        paths = [self.public, self.public / "nexus/components",
+        paths = [self.public, self.public / "nexus/soc",
                  self.sdk / "ext/freertos/include",
                  self.sdk / "ext/freertos/portable/GCC/ARM_CM4F",
                  self.sdk / "ext/threadx/common/inc",
@@ -85,7 +88,7 @@ class SDKPublicCompileInputTests(unittest.TestCase):
         environment = os.environ.copy()
         for key in ("CPATH", "C_INCLUDE_PATH", "CPLUS_INCLUDE_PATH"):
             environment.pop(key, None)
-        public = ROOT / "components/clock_domain/include"
+        public = ROOT / "components/runtime/clock_domain/include"
         core = ROOT / "core/include"
         for language, compiler, standard in (("c", "cc", "c11"),
                                               ("c++", "c++", "c++17")):
@@ -125,7 +128,7 @@ class SDKPublicCompileInputTests(unittest.TestCase):
 
     def test_f407_soc_public_export_keeps_alias_and_override_checks(self):
         public = self.sdk / "soc/stm32/stm32f4/include"
-        public.mkdir(parents=True)
+        public.mkdir(parents=True, exist_ok=True)
         relative = os.path.relpath(public, self.build)
         self.assertFalse(self.private_input(["-I", relative], command=True))
         alias = public / "alias"
@@ -202,15 +205,97 @@ class SDKPublicCompileInputTests(unittest.TestCase):
         entry["command"] = "cc -I" + shlex.quote(str(self.private))
         self.assertFalse(self.consumer.private_compile_inputs(entry, self.sdk))
 
-    def test_generic_component_public_exports_need_no_local_cmake_file(self):
-        for name in ("bus_owner", "bmp280", "log", "storage", "modbus"):
+    def test_categorized_component_public_exports_need_no_local_cmake_file(self):
+        packages = ("runtime/bus_owner", "devices/bmp280", "services/log",
+                    "services/storage", "protocols/modbus", "buses/onewire")
+        for name in packages:
             with self.subTest(component=name):
                 public = self.sdk / "components" / name / "include"
                 (public / "nexus/components").mkdir(parents=True)
                 self.assertFalse(self.private_input(["-I", public]))
+                self.assertFalse(self.private_input(
+                    ["-include", public / "nexus/components/probe.h"]))
+
+    def test_categorized_component_roots_and_implementation_are_private(self):
+        for name in ("runtime/bus_owner", "devices/bmp280", "services/log",
+                     "protocols/modbus", "buses/onewire"):
+            package = self.sdk / "components" / name
+            for path in (package.parent, package, package / "src",
+                         package / "port", package / "profile",
+                         package / "include-other", package / "src/include",
+                         package / "include/../src"):
+                for option in ("-I", "-isystem", "-include"):
+                    with self.subTest(component=name, path=path, option=option):
+                        self.assertTrue(self.private_input([option, path]))
+
+    def test_component_public_shape_requires_an_owned_include_tree(self):
+        for path in (self.sdk / "components/runtime/unowned/include",
+                     self.sdk / "components/runtime/unowned/include/nexus"):
+            with self.subTest(path=path):
+                self.assertTrue(self.private_input(["-I", path]))
+
+    def test_storage_composition_directory_is_exact_for_each_source_root(self):
+        sdk_port = self.sdk / "components/protocols/network/port"
+        sdk_port.mkdir(parents=True)
+        checkout_port = ROOT / "components/protocols/network/port"
+        for path, other in ((sdk_port, checkout_port),
+                            (checkout_port, sdk_port)):
+            for option in ("-I", "-isystem", "-iquote", "-idirafter"):
+                with self.subTest(path=path, option=option):
+                    self.assertTrue(self.private_input([option, path]))
+                    self.assertFalse(self.private_input(
+                        [option, path], composition_includes=(path,)))
+                    self.assertTrue(self.private_input(
+                        [option, path], composition_includes=(other,)))
+
+    def test_storage_composition_keeps_forced_and_private_inputs_rejected(self):
+        port = self.sdk / "components/protocols/network/port"
+        port.mkdir(parents=True)
+        alias = port.with_name("storage-alias")
+        alias.symlink_to(port, target_is_directory=True)
+        private_alias = port / "provider-alias"
+        private_alias.symlink_to(self.private, target_is_directory=True)
+        paths = (alias, private_alias, port / "../port", port / "../src",
+                 port / "nested", port / "lwipopts.h", port / "private",
+                 port / "vendors", port.parents[1] / "mqtt/port")
+        for path in paths:
+            with self.subTest(path=path):
+                self.assertTrue(self.private_input(
+                    ["-I", path], composition_includes=(port, path)))
+        for option in ("-include", "-imacros", "-include-pch"):
+            for path in (port, port / "lwipopts.h"):
+                with self.subTest(option=option, path=path):
+                    self.assertTrue(self.private_input(
+                        [option, path], composition_includes=(port,)))
+        self.assertTrue(self.private_input(
+            ["-I", port, "-DSTM32F407xx"], composition_includes=(port,)))
+        entry = {"file": str(self.build / "main.c"),
+                 "directory": str(self.build),
+                 "arguments": ["cc", "-I", str(port)]}
+        self.assertTrue(self.consumer.private_compile_inputs(
+            entry, self.sdk, extra_private=(port,),
+            composition_includes=(port,)))
+        for args in (["@opaque.rsp"], ["-Xclang", "-internal-isystem", port]):
+            with self.subTest(arguments=args), self.assertRaises(ValueError):
+                self.private_input(args, composition_includes=(port,))
+
+    def test_storage_composition_rejects_relative_forced_header_search(self):
+        port = self.sdk / "components/protocols/network/port"
+        port.mkdir(parents=True)
+        forwarded = (["-include", "lwipopts.h"],
+                     ["-imacros", "lwipopts.h"],
+                     ["-include-pch", "profile.pch"],
+                     ["-include", self.public / "../include/nexus/soc/probe.h"],
+                     ["-Wp,-include,lwipopts.h"],
+                     ["-Xpreprocessor", "-include", "-Xpreprocessor",
+                      "lwipopts.h"])
+        for options in forwarded:
+            with self.subTest(options=options), self.assertRaises(ValueError):
+                self.private_input(["-I", port, *options],
+                                   composition_includes=(port,))
 
     def test_nested_vendor_paths_are_sdk_private(self):
-        for path in (self.sdk / "components/log/vendors/include",
+        for path in (self.sdk / "components/services/log/vendors/include",
                      self.sdk / "io/include/vendors"):
             with self.subTest(path=path):
                 self.assertTrue(self.private_input(["-I", path]))
@@ -523,6 +608,62 @@ class SDKConsumerParallelTests(unittest.TestCase):
         self.assertEqual({Path(entry["file"]) for entry in commands},
                          {source / "main.c", helper})
 
+    def storage_composition_fixture(self, name, *, checkout_port=False):
+        profile = next(item for item in self.consumer.SERVICE_CONSUMERS
+                       if item.name == name)
+        output = self.directory / profile.domain
+        output.mkdir()
+        source, build, command = self.consumer.prepare_service_consumer(
+            self.prefix, output, profile, self.external_process,
+            expected_revision="a" * 40, fixture=True)
+        self.external_process(command)
+        port = (ROOT if checkout_port else self.sdk) / (
+            "components/protocols/network/port")
+        if not checkout_port:
+            port.mkdir(parents=True, exist_ok=True)
+        path = build / "compile_commands.json"
+        rows = json.loads(path.read_text())
+        for row in rows:
+            if Path(row["file"]).is_relative_to(source):
+                # The real Nexus::LwIPStorage compile row carries this exact
+                # directory. The canonical common consumer owns its netif.
+                row["arguments"][1:1] = ["-I", str(port)]
+                row["command"] = shlex.join(row["arguments"])
+        path.write_text(json.dumps(rows))
+        return source, build, profile
+
+    def test_canonical_common_services_admit_their_storage_composition(self):
+        for name in ("native services", "f407 services"):
+            with self.subTest(profile=name):
+                source, build, profile = self.storage_composition_fixture(name)
+                self.assertIn("Nexus::LwIPStorage",
+                              (source / "CMakeLists.txt").read_text())
+                report = self.consumer.check_service_image(
+                    self.sdk, source, build, profile, self.external_process)
+                self.assertEqual(report["status"], "passed")
+
+    def test_storage_composition_does_not_admit_other_service_scenarios(self):
+        source, build, profile = self.storage_composition_fixture("native tmp117")
+        with self.assertRaisesRegex(ValueError, "private inputs leaked"):
+            self.consumer.check_service_image(
+                self.sdk, source, build, profile, self.external_process)
+
+    def test_canonical_storage_composition_rejects_checkout_port_pollution(self):
+        source, build, profile = self.storage_composition_fixture(
+            "native services", checkout_port=True)
+        with self.assertRaisesRegex(ValueError, "private inputs leaked"):
+            self.consumer.check_service_image(
+                self.sdk, source, build, profile, self.external_process)
+
+    def test_storage_composition_still_requires_canonical_consumer_bytes(self):
+        source, build, profile = self.storage_composition_fixture(
+            "native services")
+        main = source / "main.c"
+        main.write_bytes(main.read_bytes() + b"\n/* altered composition */\n")
+        with self.assertRaisesRegex(ValueError, "canonical scenario"):
+            self.consumer.check_service_image(
+                self.sdk, source, build, profile, self.external_process)
+
     def external_process(self, command, **options):
         command = [str(argument) for argument in command]
         self.commands.append(command)
@@ -544,9 +685,9 @@ class SDKConsumerParallelTests(unittest.TestCase):
                      "command": "cc -c " + shlex.quote(str(path))}
                     for path in products]
             if self.selected_fault == "public_chip_include":
-                public = self.sdk / "components/soc/stm32/stm32f407_handoff/include"
-                (public / "nexus/components").mkdir(parents=True, exist_ok=True)
-                (public.parent / "CMakeLists.txt").write_text("# Public chip API.\n")
+                public = self.sdk / "soc/stm32/stm32f4/include"
+                (public / "nexus/soc").mkdir(parents=True, exist_ok=True)
+                (public.parent / "CMakeLists.txt").write_text("# Public SoC API.\n")
                 for row in rows:
                     row["arguments"].insert(1, "-I" + str(public))
                     row["command"] = shlex.join(row["arguments"])

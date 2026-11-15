@@ -63,24 +63,16 @@ class ComponentSelectionTests(unittest.TestCase):
         self.assertIn("Selected component target is unavailable: log",
                       result.stdout)
 
-    def test_chip_extensions_keep_existing_public_include_paths(self):
-        packages = ROOT / "components/soc/stm32"
+    def test_f407_handoff_compiles_from_the_soc_public_include(self):
         includes = [ROOT / layer / "include"
                     for layer in ("core", "io", "arch")]
-        includes.append(ROOT / "components/clock_domain/include")
-        # H747 exports Nexus::AMPIPC as a public dependency.
-        includes.append(ROOT / "components/amp_ipc/include")
-        headers = []
-        for package in sorted(path for path in packages.iterdir()
-                              if path.is_dir()):
-            includes.append(package / "include")
-            headers.extend((package / "include/nexus/components").glob("*.h"))
-        self.assertTrue(headers, "Chip extensions must retain public headers")
-        with tempfile.TemporaryDirectory(prefix="component headers ") as value:
+        includes.extend((ROOT / "components/runtime/clock_domain/include",
+                         ROOT / "soc/stm32/stm32f4/include"))
+        with tempfile.TemporaryDirectory(prefix="soc handoff header ") as value:
             source = Path(value) / "consumer.c"
-            source.write_text("".join(
-                f'#include "nexus/components/{header.name}"\n'
-                for header in sorted(headers)), encoding="utf-8")
+            source.write_text(
+                '#include "nexus/soc/stm32f407_handoff.h"\n',
+                encoding="utf-8")
             args = [shutil.which("cc") or "cc", "-std=c11", "-Werror",
                     "-fsyntax-only", str(source)]
             for directory in includes:

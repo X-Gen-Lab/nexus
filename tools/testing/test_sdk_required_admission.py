@@ -129,16 +129,16 @@ class SDKRequiredAdmissionTests(unittest.TestCase):
             "soc/stm32/stm32f4/drivers/timer/stm32f4_encoder.h",
             "soc/stm32/stm32f4/drivers/timer/stm32f407_timer_hardware.h",
             "soc/stm32/stm32f4/drivers/timer/encoder.binding.json",
-            "components/at24c02/src/at24c02.c",
-            "components/w25/src/w25.c",
-            "components/ili9341/src/ili9341.c",
-            "components/xpt2046/src/xpt2046.c",
-            "components/software_spi/src/software_spi.c",
-            "components/software_i2c/src/software_i2c.c",
-            "components/infrared/src/infrared.c",
-            "components/onewire/src/onewire.c",
-            "components/onewire/src/crc8.c",
-            "components/ds18b20/src/ds18b20.c")
+            "components/devices/at24c02/src/at24c02.c",
+            "components/devices/w25/src/w25.c",
+            "components/devices/ili9341/src/ili9341.c",
+            "components/devices/xpt2046/src/xpt2046.c",
+            "components/buses/software_spi/src/software_spi.c",
+            "components/buses/software_i2c/src/software_i2c.c",
+            "components/devices/infrared/src/infrared.c",
+            "components/buses/onewire/src/onewire.c",
+            "components/buses/onewire/src/crc8.c",
+            "components/devices/ds18b20/src/ds18b20.c")
         self.assertTrue(set(paths).issubset(self.sdk.REQUIRED_FILES),
                         "Qiming source SDK must close device dependencies")
         self.complete_required_map()

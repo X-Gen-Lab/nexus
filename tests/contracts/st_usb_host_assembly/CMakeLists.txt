@@ -12,7 +12,7 @@ set(NEXUS_BUILD_WORKLOAD OFF CACHE BOOL "Explicit private integration")
 add_subdirectory("${NEXUS_SOURCE_ROOT}" nexus-sdk)
 nexus_add_firmware(usb_host_stack_fixture SOURCES host_stack_main.c)
 target_include_directories(usb_host_stack_fixture PRIVATE
-    "${NEXUS_SOURCE_ROOT}/components/st_usb/private"
+    "${NEXUS_SOURCE_ROOT}/components/protocols/st_usb/private"
     "${NEXUS_SOURCE_ROOT}/soc/stm32/stm32f4")
 target_include_directories(usb_host_stack_fixture SYSTEM PRIVATE
     "${NEXUS_SOURCE_ROOT}/vendors/st/usb_host/Core/Inc"

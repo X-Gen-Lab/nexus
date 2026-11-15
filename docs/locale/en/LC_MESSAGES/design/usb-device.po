@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 3cb8ab6f94e8c704f4559ad00aae5cdb97f938d94e81c8fb0ae337eb0353c43c\n"
+"X-Nexus-Source-SHA256: d027c367de668fd22e2d51519d83d2e0fa9592efeea96d108a53b6b834b58021\n"
 
 #: docs/design/usb-device.md:1
 msgid "USB Device、Host 与显式角色所有权"
@@ -921,15 +921,8 @@ msgid "按需官方 Core middleware"
 msgstr "Optional official Core middleware"
 
 #: docs/design/usb-device.md:480
-msgid "`st-usb-device` 与 `st-usb-host` 只准备精确锁定的相应 middleware Core。 `components/st_usb_device` 和 `components/st_usb` 使用调用者静态 state、slots、 staging、有限 deadline 和显式 Thread step。官方 Handle／class／descriptor 回调表 留在私有接线边界，公共 I/O 不泄漏厂商类型；不选时不编译、不建立堆或后台任务。"
-msgstr ""
-"`st-usb-device` and `st-usb-host` prepare only their precisely pinned "
-"middleware Cores. `components/st_usb_device` and `components/st_usb` use "
-"caller-supplied static state, slots and staging, finite deadlines and "
-"explicit Thread steps. Official Handle/class/descriptor callback tables "
-"remain at the private wiring boundary; public I/O exposes no vendor types. "
-"Unselected components are not compiled and create neither a heap nor "
-"background tasks."
+msgid "`st-usb-device` 与 `st-usb-host` 只准备精确锁定的相应 middleware Core。 `components/protocols/st_usb_device` 和 `components/protocols/st_usb` 使用调用者静态 state、slots、 staging、有限 deadline 和显式 Thread step。官方 Handle／class／descriptor 回调表 留在私有接线边界，公共 I/O 不泄漏厂商类型；不选时不编译、不建立堆或后台任务。"
+msgstr "`st-usb-device` and `st-usb-host` prepare only their precisely pinned middleware Cores. `components/protocols/st_usb_device` and `components/protocols/st_usb` use caller-supplied static state, slots and staging, finite deadlines and explicit Thread steps. Official Handle/class/descriptor callback tables remain at the private wiring boundary; public I/O exposes no vendor types. Unselected components are not compiled and create neither a heap nor background tasks."
 
 msgid ""
 "Device Core 复用现有 epoch、activation 和真实 packet settlement。多包 DATA IN 在同 "

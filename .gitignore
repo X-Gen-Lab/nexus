@@ -10,7 +10,6 @@ nonexistent_build_dir/
 
 # IDE
 .idea/
-.kiro/
 *.swp
 *.swo
 *~

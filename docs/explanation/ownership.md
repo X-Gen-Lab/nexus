@@ -69,7 +69,7 @@ last release, join every CPU reader; a failed unmap retains the exact token only
 for cleanup retry and grants no renewed access. A writer's backend receives the
 original absolute deadline. After complete cold shutdown, explicit owner reopen
 preserves slot and writer epochs, including exhaustion; initialization must not
-revive old tokens. See the [mapped component contract](../../components/mapped_storage/README.md)
+revive old tokens. See the [mapped component contract](../../components/services/mapped_storage/README.md)
 for serialized execution and recovery responsibilities.
 
 Continuous receive and ADC use explicit caller-owned block loans. A consumer keeps

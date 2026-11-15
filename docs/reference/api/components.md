@@ -19,16 +19,16 @@ table is an API navigation aid.
 
 | Target | Public header under `nexus/components/` | Contract |
 | --- | --- | --- |
-| `Nexus::AT24C02` | `at24c02.h` | [Settled EEPROM access and write-cycle responsibility](../../../components/at24c02/README.md) |
-| `Nexus::SoftwareI2C`, `Nexus::SoftwareSCCB` | `software_i2c.h`, `software_sccb.h` | [Separate GPIO I2C and SCCB protocols](../../../components/software_i2c/README.md) |
-| `Nexus::SMBus` | `smbus.h` | [Bounded packet PEC over an existing asynchronous I2C endpoint](../../../components/smbus/README.md) |
-| `Nexus::SoftwareSPI` | `software_spi.h` | [Bounded GPIO mode-zero SPI](../../../components/software_spi/README.md) |
-| `Nexus::W25` | `w25.h` | [Explicit W25Q128JV profile and retained Flash completion](../../../components/w25/README.md) |
-| `Nexus::ILI9341` | `ili9341.h` | [Settled RGB565 command/data access](../../../components/ili9341/README.md) |
-| `Nexus::XPT2046` | `xpt2046.h` | [Raw touch samples with live pen observation](../../../components/xpt2046/README.md) |
-| `Nexus::OneWire` | `onewire.h` | [Bounded GPIO slots and failed-withdrawal ownership](../../../components/onewire/README.md) |
-| `Nexus::DS18B20` | `ds18b20.h` | [External-VDD identity, conversion and CRC](../../../components/ds18b20/README.md) |
-| `Nexus::Infrared` | `infrared.h` | [Explicit NEC address and source-quality policies](../../../components/infrared/README.md) |
+| `Nexus::AT24C02` | `at24c02.h` | [Settled EEPROM access and write-cycle responsibility](../../../components/devices/at24c02/README.md) |
+| `Nexus::SoftwareI2C`, `Nexus::SoftwareSCCB` | `software_i2c.h`, `software_sccb.h` | [Separate GPIO I2C and SCCB protocols](../../../components/buses/software_i2c/README.md) |
+| `Nexus::SMBus` | `smbus.h` | [Bounded packet PEC over an existing asynchronous I2C endpoint](../../../components/buses/smbus/README.md) |
+| `Nexus::SoftwareSPI` | `software_spi.h` | [Bounded GPIO mode-zero SPI](../../../components/buses/software_spi/README.md) |
+| `Nexus::W25` | `w25.h` | [Explicit W25Q128JV profile and retained Flash completion](../../../components/devices/w25/README.md) |
+| `Nexus::ILI9341` | `ili9341.h` | [Settled RGB565 command/data access](../../../components/devices/ili9341/README.md) |
+| `Nexus::XPT2046` | `xpt2046.h` | [Raw touch samples with live pen observation](../../../components/devices/xpt2046/README.md) |
+| `Nexus::OneWire` | `onewire.h` | [Bounded GPIO slots and failed-withdrawal ownership](../../../components/buses/onewire/README.md) |
+| `Nexus::DS18B20` | `ds18b20.h` | [External-VDD identity, conversion and CRC](../../../components/devices/ds18b20/README.md) |
+| `Nexus::Infrared` | `infrared.h` | [Explicit NEC address and source-quality policies](../../../components/devices/infrared/README.md) |
 
 Reference assemblies and software tests do not establish fitted-part identity,
 electrical timing, calibration or physical HIL. Panel, touch, sensor and decoded
@@ -39,7 +39,7 @@ policy, calibration, key mapping and recovery.
 
 ## at24c02.h
 
-```{doxygenfile} components/at24c02/include/nexus/components/at24c02.h
+```{doxygenfile} components/devices/at24c02/include/nexus/components/at24c02.h
 :project: nexus
 ```
 
@@ -47,7 +47,7 @@ policy, calibration, key mapping and recovery.
 
 ## software_i2c.h
 
-```{doxygenfile} components/software_i2c/include/nexus/components/software_i2c.h
+```{doxygenfile} components/buses/software_i2c/include/nexus/components/software_i2c.h
 :project: nexus
 ```
 
@@ -55,7 +55,7 @@ policy, calibration, key mapping and recovery.
 
 ## software_sccb.h
 
-```{doxygenfile} components/software_i2c/include/nexus/components/software_sccb.h
+```{doxygenfile} components/buses/software_i2c/include/nexus/components/software_sccb.h
 :project: nexus
 ```
 
@@ -63,7 +63,7 @@ policy, calibration, key mapping and recovery.
 
 ## software_spi.h
 
-```{doxygenfile} components/software_spi/include/nexus/components/software_spi.h
+```{doxygenfile} components/buses/software_spi/include/nexus/components/software_spi.h
 :project: nexus
 ```
 
@@ -71,7 +71,7 @@ policy, calibration, key mapping and recovery.
 
 ## w25.h
 
-```{doxygenfile} components/w25/include/nexus/components/w25.h
+```{doxygenfile} components/devices/w25/include/nexus/components/w25.h
 :project: nexus
 ```
 
@@ -79,7 +79,7 @@ policy, calibration, key mapping and recovery.
 
 ## ili9341.h
 
-```{doxygenfile} components/ili9341/include/nexus/components/ili9341.h
+```{doxygenfile} components/devices/ili9341/include/nexus/components/ili9341.h
 :project: nexus
 ```
 
@@ -87,7 +87,7 @@ policy, calibration, key mapping and recovery.
 
 ## xpt2046.h
 
-```{doxygenfile} components/xpt2046/include/nexus/components/xpt2046.h
+```{doxygenfile} components/devices/xpt2046/include/nexus/components/xpt2046.h
 :project: nexus
 ```
 
@@ -95,7 +95,7 @@ policy, calibration, key mapping and recovery.
 
 ## onewire.h
 
-```{doxygenfile} components/onewire/include/nexus/components/onewire.h
+```{doxygenfile} components/buses/onewire/include/nexus/components/onewire.h
 :project: nexus
 ```
 
@@ -103,7 +103,7 @@ policy, calibration, key mapping and recovery.
 
 ## ds18b20.h
 
-```{doxygenfile} components/ds18b20/include/nexus/components/ds18b20.h
+```{doxygenfile} components/devices/ds18b20/include/nexus/components/ds18b20.h
 :project: nexus
 ```
 
@@ -111,7 +111,7 @@ policy, calibration, key mapping and recovery.
 
 ## infrared.h
 
-```{doxygenfile} components/infrared/include/nexus/components/infrared.h
+```{doxygenfile} components/devices/infrared/include/nexus/components/infrared.h
 :project: nexus
 ```
 
@@ -184,9 +184,9 @@ retains its resources. The MQTT 3.1.1 profile provides clean sessions and QoS0/1
 callbacks borrow incoming views only until return. Explicit DISCONNECT and TLS
 close report local progress and do not replace lower-layer drain or peer
 acknowledgement. The component contracts detail
-[network](../../../components/network/README.md),
-[TLS](../../../components/tls/README.md) and
-[MQTT](../../../components/mqtt/README.md) ownership and fixed profile limits.
+[network](../../../components/protocols/network/README.md),
+[TLS](../../../components/protocols/tls/README.md) and
+[MQTT](../../../components/protocols/mqtt/README.md) ownership and fixed profile limits.
 
 For both Ethernet adapter profiles, successful link output reports frame
 admission. A failed SETTLED TX outcome remains observable once through
@@ -299,7 +299,7 @@ relay and local Mosquitto. The dashed edge identifies the one TLS session, which
 terminates at the Nexus TLS client and Mosquitto; the relay does not decrypt or
 terminate TLS. Each lwIP process owns its own serialized stack and clock.
 [Editable DOT](../../assets/diagrams/lwip-tcp-tls-mqtt-host.dot) and the
-[network contract](../../../components/network/README.md) and
+[network contract](../../../components/protocols/network/README.md) and
 [maintained relay fixture](../../../tests/contracts/lwip_mqtt_interop/README.md)
 define this figure's source and lifetime boundaries.
 
@@ -313,7 +313,7 @@ MCU entropy quality, measured resource peaks, installed SDK acceptance or HIL.
 
 ## byte_stream.h
 
-```{doxygenfile} components/network/include/nexus/network/byte_stream.h
+```{doxygenfile} components/protocols/network/include/nexus/network/byte_stream.h
 :project: nexus
 ```
 
@@ -321,7 +321,7 @@ MCU entropy quality, measured resource peaks, installed SDK acceptance or HIL.
 
 ## lwip_adapter.h
 
-```{doxygenfile} components/network/include/nexus/network/lwip_adapter.h
+```{doxygenfile} components/protocols/network/include/nexus/network/lwip_adapter.h
 :project: nexus
 ```
 
@@ -329,7 +329,7 @@ MCU entropy quality, measured resource peaks, installed SDK acceptance or HIL.
 
 ## lwip_loaned_rx.h
 
-```{doxygenfile} components/network/include/nexus/network/lwip_loaned_rx.h
+```{doxygenfile} components/protocols/network/include/nexus/network/lwip_loaned_rx.h
 :project: nexus
 ```
 
@@ -340,7 +340,7 @@ MCU entropy quality, measured resource peaks, installed SDK acceptance or HIL.
 This selected-profile header belongs only at static composition. Its fields
 describe retained frame and pbuf storage, not a mutable consumer interface.
 
-```{doxygenfile} components/network/include/nexus/network/lwip_loaned_rx_storage.h
+```{doxygenfile} components/protocols/network/include/nexus/network/lwip_loaned_rx_storage.h
 :project: nexus
 ```
 
@@ -348,7 +348,7 @@ describe retained frame and pbuf storage, not a mutable consumer interface.
 
 ## lwip_tcp.h
 
-```{doxygenfile} components/network/include/nexus/network/lwip_tcp.h
+```{doxygenfile} components/protocols/network/include/nexus/network/lwip_tcp.h
 :project: nexus
 ```
 
@@ -359,7 +359,7 @@ describe retained frame and pbuf storage, not a mutable consumer interface.
 This exact-profile header is for static composition. Its fields do not extend
 the generic client interface.
 
-```{doxygenfile} components/network/include/nexus/network/lwip_tcp_storage.h
+```{doxygenfile} components/protocols/network/include/nexus/network/lwip_tcp_storage.h
 :project: nexus
 ```
 
@@ -367,7 +367,7 @@ the generic client interface.
 
 ## tls.h
 
-```{doxygenfile} components/tls/include/nexus/tls/tls.h
+```{doxygenfile} components/protocols/tls/include/nexus/tls/tls.h
 :project: nexus
 ```
 
@@ -375,7 +375,7 @@ the generic client interface.
 
 ## client.h
 
-```{doxygenfile} components/mqtt/include/nexus/mqtt/client.h
+```{doxygenfile} components/protocols/mqtt/include/nexus/mqtt/client.h
 :project: nexus
 ```
 
@@ -528,7 +528,7 @@ controls.
 The optional component frames bounded packets over an already configured
 asynchronous I2C endpoint. Its generated companion reuses existing endpoint IDs;
 it does not qualify hardware SMBTYPE, timeout or ALERT operation.
-See the [component contract](../../../components/smbus/README.md) for
+See the [component contract](../../../components/buses/smbus/README.md) for
 `nexus_smbus_factory.h`, static binding and borrowing lifetimes.
 
 ```{doxygenfile} smbus.h
@@ -610,10 +610,11 @@ See the [component contract](../../../components/smbus/README.md) for
 (storage_8h)=
 
 (storage_2include_2nexus_2components_2storage_8h)=
+(services_2storage_2include_2nexus_2components_2storage_8h)=
 
 ## storage.h
 
-```{doxygenfile} components/storage/include/nexus/components/storage.h
+```{doxygenfile} components/services/storage/include/nexus/components/storage.h
 :project: nexus
 ```
 

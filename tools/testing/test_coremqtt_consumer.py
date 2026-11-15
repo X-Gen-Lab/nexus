@@ -99,7 +99,7 @@ class CoreMQTTConsumerTests(unittest.TestCase):
         generic = next(row for row in rows
                        if Path(row['file']) == source / 'generic.c')
         self.assertNotIn('/ext/coremqtt/', generic['command'])
-        self.assertNotIn('/components/mqtt/port', generic['command'])
+        self.assertNotIn('/components/protocols/mqtt/port', generic['command'])
         for name in ('generic', 'composition'):
             result = subprocess.run([str(build / name)], capture_output=True,
                 text=True, check=False, timeout=5)
@@ -112,7 +112,7 @@ class CoreMQTTConsumerTests(unittest.TestCase):
 
     def test_missing_assembly_identity_rejects_before_selecting_targets(self):
         _, _, result = self.configure(
-            f'include("{ROOT}/components/mqtt/CMakeLists.txt")\n'
+            f'include("{ROOT}/components/protocols/mqtt/CMakeLists.txt")\n'
             'nexus_add_coremqtt()\n', assembly=False)
         self.assertNotEqual(result.returncode, 0)
         self.assertIn('configured Nexus assembly', result.stdout + result.stderr)

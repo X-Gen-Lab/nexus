@@ -55,13 +55,24 @@ class ChangePathsTests(unittest.TestCase):
             "runtime/contracts/pyproject.toml", "runtime/contracts/poetry.lock",
             "runtime/contracts/uv.lock", ".clang-tidy", ".clang-format",
             ".clang-format-dirs", ".editorconfig", ".pre-commit-config.yaml",
-            ".kiro/steering/comment-standards.md",
             "docs/sphinx/development/coding_standards.rst",
             "CONTRIBUTING.md", "CONTRIBUTING_CN.md",
         )
         for path in paths:
             with self.subTest(path=path):
                 self.assertTrue(self.decisions([("modified", path)])["build-test"])
+
+    def test_comment_policy_uses_repository_standards(self):
+        from scripts.ci import style_gate
+        from tools.dev import change_paths
+
+        standard = "docs/sphinx/development/coding_standards.rst"
+        self.assertIn(standard, change_paths.BEHAVIOR_DOCUMENTS)
+        self.assertIn(standard, style_gate.CONTROL_FILES)
+        for paths in (change_paths.BEHAVIOR_DOCUMENTS,
+                      style_gate.CONTROL_FILES):
+            self.assertFalse(any(path.startswith(".kiro/") for path in paths))
+        self.assertTrue(self.decisions([("modified", standard)])["build-test"])
 
     def test_sdk_and_rtos_gitlink_updates_require_builds(self):
         for path in ("vendors/arm/CMSIS_6", "vendors/st/cmsis_device_f4",

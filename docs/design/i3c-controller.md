@@ -7,9 +7,9 @@ I3C hardware adapter. External C preparation and trusted wire, IRQ and all-targe
 address-reset proofs remain required by any future concrete port.
 
 The public contracts are
-[request and endpoint API](../../components/i3c_controller/include/nexus/components/i3c_controller.h)
+[request and endpoint API](../../components/buses/i3c_controller/include/nexus/components/i3c_controller.h)
 and
-[caller storage and port contract](../../components/i3c_controller/include/nexus/components/i3c_controller_storage.h).
+[caller storage and port contract](../../components/buses/i3c_controller/include/nexus/components/i3c_controller_storage.h).
 The caller supplies one controller object, a PID/address policy table, target
 state records, an event ring, request metadata, payloads, a monotonic clock and
 one immutable hardware operations table. There are no workers, object pools,
@@ -21,7 +21,7 @@ core, invoke application code or mutate retained core storage.
 (fig-26-i3c-core-lifecycle)=
 ![FIG-26: current bounded I3C core; labeled arrows separate synchronous port calls, borrowed request lifetime and required whole-bus proofs](../assets/diagrams/i3c-core-lifecycle.svg)
 
-FIG-26 describes the [current implementation](../../components/i3c_controller/src/i3c_controller.c).
+FIG-26 describes the [current implementation](../../components/buses/i3c_controller/src/i3c_controller.c).
 Solid arrows label software calls, copied observations or retained state; dashed
 arrows label required external proofs. The hardware port is an injected contract; no production MCU port is selected here. External preparation and whole-bus proofs remain explicit. There
 is one active request and no software transfer queue; bounded FIFO work belongs
