@@ -353,8 +353,7 @@
     "PB3/PB4 NOR pads conflict with full JTAG/SWO. Reviewed NOR selection requires SWD; PA13/PA14 remain reserved.",
     "Core P4 SWC/SWD labels differ from the U1 JTCK/JTMS labels; verify the CAD netlist or physical continuity.",
     "Both USB connectors share VCC5 without drawn source isolation; commissioning must select a reviewed power path.",
-    "ILI9341/XPT2046 identities are user-declared; actual fitting and remaining module types are unconfirmed. No advanced module is selected by default. SRAM/LCD bus owners, SDIO, RTC and other incomplete providers are not declared supported by these Board facts.",
-    "ILI9341/XPT2046 module identities are user-declared; actual connector continuity and fitting remain unverified. Display/touch options do not imply a delivered FSMC or complete device driver. GPIO touch PEN and EXTI PEN are alternative owners and cannot both be selected.",
+    "ILI9341/XPT2046 module identities are user-declared; actual connector continuity and fitting remain unverified. Display/touch options authorize wiring only; software mode support is maintained in the platform capability reference. GPIO touch PEN and EXTI PEN are alternative owners and cannot both be selected.",
     "FSMC NE3 is an explicitly declared IS62WV51216 1MiB reference. Exact fitted speed/voltage suffix, encoded bank timing and physical waveform need verification; no memory test or DMA reachability follows from a CPU window."
   ],
   "provenance": [

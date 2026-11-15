@@ -97,7 +97,7 @@ ICRST／DCRST 表示外来操作，必须在解锁前拒绝。脉冲结束后，
 到 RAM。deadline 不撤销物理脉冲，超时仍须等待实际 BSY 退出，再按真实清理结果
 归还责任。该模式的 C 路径和故障回归见
 [Flash provider](../../soc/stm32/stm32f4/drivers/flash/flash.c) 与
-[双 bank 模型](../../tests/google/stm32_flash_bank_test.cpp)；它们不建立实板资格。
+[双 bank 模型](../../tests/google/soc/stm32_flash_bank_test.cpp)；它们不建立实板资格。
 
 ## 外部总线与介质
 

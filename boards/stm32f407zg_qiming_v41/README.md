@@ -121,9 +121,37 @@ DP83848 振荡频率未给出，P5 MDIO 网名跨页拼写不同。RX_DV 是可�
 兼容性和导通尚须审查，本包不准入 V4.1 Ethernet binding。
 
 TF 插槽没有 MCU card-detect，SDIO 引脚与 camera／UART5 重叠。摄像头和完整音频
-仍需独立实现；模块排针不证明 OV2640、WM8978/VS1053、WiFi/Bluetooth、DS18B20、
+仍需精确模块、连接与受维护模式；模块排针不证明 OV2640、WM8978/VS1053、WiFi/Bluetooth、DS18B20、
 HS0038 的实际型号。USB_HS PB14/PB15 连接器只有无 ULPI 的内部 FS PHY 路径，不据此
 声明 480 Mbps 或 Host。
 
 HIL 为 `not_executed`。配置通过、模型和 ARM 链接不建立电气、波形、吞吐、功耗或
 复位资格。
+
+## 装配目录
+
+每份 TOML 显式选择本板、模式、资源和硬件条件；下表不是物理验收结果。
+
+| 配置 | 用途与前提 |
+| --- | --- |
+| [can-loopback.toml](assemblies/can-loopback.toml) | CAN1 内部回环；不证明外部收发器 |
+| [control-wires.toml](assemblies/control-wires.toml) | GPIO 控制线；不自动选择高级模块 |
+| [display-touch-sram.toml](assemblies/display-touch-sram.toml) | 显示／触摸＋显式实装 SRAM |
+| [display-touch.toml](assemblies/display-touch.toml) | ILI9341＋XPT2046；无外部 SRAM |
+| [eeprom.toml](assemblies/eeprom.toml) | AT24C02 与已审 I2C 连接 |
+| [minimal.toml](assemblies/minimal.toml) | LED／按键／USART1 最小装配 |
+| [rs485-transport.toml](assemblies/rs485-transport.toml) | UART2＋PG6 方向；显式 P15 |
+| [rtc-adopt.toml](assemblies/rtc-adopt.toml) | 接管外部已准备的 retained RTC |
+| [sdio-dma.toml](assemblies/sdio-dma.toml) | SD DMA＋内部 Flash maintenance face |
+| [sdio-functions.toml](assemblies/sdio-functions.toml) | SDIO I/O function；不发布扇区接口 |
+| [sdio-irq.toml](assemblies/sdio-irq.toml) | IRQ SD memory；显式插卡声明 |
+| [sdio.toml](assemblies/sdio.toml) | 轮询 SD memory；显式插卡声明 |
+| [sensor-wires.toml](assemblies/sensor-wires.toml) | 传感器／红外软件参考；不推断实装 |
+| [sram-startup.toml](assemblies/sram-startup.toml) | 预 C 外部 SRAM 放置；永久 bank 责任 |
+| [sram-window.toml](assemblies/sram-window.toml) | 运行期 SRAM CPU window |
+| [touch-nor.toml](assemblies/touch-nor.toml) | 触摸＋显式 NOR 实装与 SWD 选择 |
+| [usb-device.toml](assemblies/usb-device.toml) | USB FS Device；显式连接条件 |
+
+`sdio-dma.toml` 还显式导出内部 Flash maintenance face，是组合装配。
+查询该 face 不擦写 Flash，也不授权 Option Bytes 或制造操作；消费者另行决定是否
+使用它。只需要 SDIO 的工程可不选择该 face，不隐含任何产品分区。

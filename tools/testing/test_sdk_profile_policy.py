@@ -28,6 +28,26 @@ class SDKProfilePolicyTests(unittest.TestCase):
             spec.loader.exec_module(module)
             setattr(cls, name, module)
 
+    def test_native_controls_require_explicit_host_support_export(self):
+        controls = ('model.h', 'rtc_lptim_model.h', 'spi_dma_model.h')
+        for host_support in (False, True):
+            profile = self.packager.source_profile(host_support=host_support)
+            required = set(self.packager.required_files(ROOT, profile))
+            for header in controls:
+                name = 'tests/support/native/include/nexus/io/native/' + header
+                with self.subTest(host_support=host_support, header=header):
+                    self.assertEqual(self.packager.selected(
+                        name, root=ROOT, profile=profile), host_support)
+                    self.assertEqual(name in required, host_support)
+
+    def test_selected_payload_contains_only_maintained_smoke_consumers(self):
+        expected = {
+            'cmake/package/verification/io_evolution/consumers/' + item[2] + '.c'
+            for item in consumer_profiles.SELECTED_CONSUMERS}
+        actual = {name for name in self.packager.SDK_VERIFICATION_FILES
+                  if '/io_evolution/consumers/' in name}
+        self.assertEqual(actual, expected)
+
     def profile(self, name):
         return next(item for item in consumer_profiles.SERVICE_CONSUMERS
                     if item.name == name)
@@ -41,6 +61,13 @@ class SDKProfilePolicyTests(unittest.TestCase):
         (sdk / 'dependencies').mkdir()
         shutil.copyfile(ROOT / 'dependencies/platform-compatibility.json',
                         sdk / 'dependencies/platform-compatibility.json')
+        if name == 'native mcuboot control':
+            controls = Path('tests/support/native/include')
+            shutil.copytree(ROOT / controls, sdk / controls)
+            files = {path.relative_to(sdk).as_posix(): file_identity(path)['sha256']
+                     for path in sdk.rglob('*') if path.is_file()}
+            (sdk / '.nexus-source-sdk.json').write_text(json.dumps({
+                'profile': {'host_support': True}, 'files_sha256': files}))
         def execute(argv):
             return subprocess.run(argv, check=True, capture_output=True, text=True)
         source, build, command = self.consumers.prepare_service_consumer(
@@ -50,7 +77,8 @@ class SDKProfilePolicyTests(unittest.TestCase):
 
     def image_fixture(self, directory, name):
         sdk, source, build, _, profile = self.prepared(directory, name)
-        (sdk / '.nexus-source-sdk.json').write_text('{}\n')
+        if not (sdk / '.nexus-source-sdk.json').exists():
+            (sdk / '.nexus-source-sdk.json').write_text('{}\n')
         config = build / 'nexus-sdk/generated'
         config.mkdir(parents=True)
         (build / 'resolved-sdk.txt').write_text(str(sdk))
@@ -210,6 +238,36 @@ class SDKProfilePolicyTests(unittest.TestCase):
                               (source / 'private_headers.c').read_text())
                 self.assertTrue(profile.arm)
                 self.assertTrue(any('CMAKE_TOOLCHAIN_FILE' in x for x in command))
+
+    def test_native_control_explicitly_links_its_owned_model_target(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            _, source, _, _, _ = self.prepared(
+                Path(temporary), 'native mcuboot control')
+            self.assertIn('Nexus::NativeModel',
+                          (source / 'CMakeLists.txt').read_text())
+
+    def test_native_control_rejects_missing_host_support_or_changed_model(self):
+        for fault in ('host_support', 'model_header'):
+            with self.subTest(fault=fault), tempfile.TemporaryDirectory() as tmp:
+                directory = Path(tmp)
+                sdk, _, _, _, profile = self.prepared(
+                    directory, 'native mcuboot control')
+                if fault == 'host_support':
+                    manifest = sdk / '.nexus-source-sdk.json'
+                    identity = json.loads(manifest.read_text())
+                    identity['profile']['host_support'] = False
+                    manifest.write_text(json.dumps(identity))
+                else:
+                    model = sdk / 'tests/support/native/include/nexus/io/native/model.h'
+                    model.write_bytes(model.read_bytes() + b'\n/* changed */\n')
+                output = directory / 'second consumer'
+                output.mkdir()
+                with self.assertRaisesRegex(ValueError, 'Native model'):
+                    self.consumers.prepare_service_consumer(
+                        directory / 'prefix', output, profile,
+                        lambda argv: subprocess.run(
+                            argv, check=True, capture_output=True, text=True),
+                        fixture=True, expected_revision='a' * 40)
 
     def test_native_control_resolves_the_public_nor_model(self):
         assembly = (ROOT / 'cmake/package/verification/mcuboot_control' /

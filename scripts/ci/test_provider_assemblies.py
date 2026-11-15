@@ -31,7 +31,7 @@ class USBRemoteCompileSelection(unittest.TestCase):
     def setUp(self):
         self.macro = "NEXUS_STM32F4_USB_REMOTE_WAKEUP"
         self.device = ROOT / (
-            "soc/stm32/stm32f4/drivers/ip/fs_device_pio/usb_device_controller.c")
+            "soc/stm32/stm32f4/drivers/ip/dwc_otg_device/usb_device_controller.c")
         self.resolved = deepcopy(self.fixtures[1]["resolved"])
 
     def entry(self, flags=(), *, source=None, owner="nexus_soc_stm32f4"):
@@ -452,6 +452,27 @@ class ActualCommandRecording(unittest.TestCase):
             self.assertEqual(Path(recorder.commands[0]["stdout"]["path"]).read_bytes(),
                              b"started\n")
             self.assertNotEqual(recorder.commands[0]["returncode"], 0)
+
+    def test_unreaped_command_keeps_failed_withdrawal_and_raw_records(self):
+        with tempfile.TemporaryDirectory() as directory, \
+                unittest.mock.patch.object(gate.subprocess, "Popen") as spawn, \
+                unittest.mock.patch("tools.evidence.common.os.killpg"):
+            child = spawn.return_value
+            child.pid = 1234567
+            child.returncode = None
+            child.wait.side_effect = gate.subprocess.TimeoutExpired(
+                ["unreaped-tool"], 10)
+            recorder = gate.Recorder(Path(directory), ROOT, timeout=0.1)
+            with self.assertRaisesRegex(EvidenceError,
+                                        "withdrawal did not complete"):
+                recorder.execute(["unreaped-tool"], "unreaped")
+            record = recorder.commands[0]
+            self.assertIsNone(record["returncode"])
+            self.assertFalse(record["withdrawal_complete"])
+            self.assertIn("timed out", record["error"])
+            self.assertIn("ended_at", record)
+            self.assertTrue(Path(record["stdout"]["path"]).is_file())
+            self.assertTrue(Path(record["stderr"]["path"]).is_file())
 
     def test_command_environment_does_not_inherit_test_filters(self):
         with tempfile.TemporaryDirectory() as directory:

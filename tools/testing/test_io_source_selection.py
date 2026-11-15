@@ -45,7 +45,8 @@ class IOSourceSelectionTests(unittest.TestCase):
                         self.assertEqual(result.returncode, 0, result.stderr)
 
     def sources(self, kinds=(), *, family="stm32f4", components=(),
-                external_component=False, required_target=None):
+                external_component=False, required_target=None, broker=False,
+                network=False):
         with tempfile.TemporaryDirectory(prefix="nexus io sources ") as folder:
             root = Path(folder)
             project = f'''cmake_minimum_required(VERSION 3.31)
@@ -56,6 +57,7 @@ set(NEXUS_TEST_SUPPORT {"ON" if family == "native" else "OFF"})
 set(NEXUS_SELECTED_KINDS "{';'.join(kinds)}")
 set(NEXUS_SELECTED_COMPONENTS "{';'.join(components)}")
 add_library(nexus_core INTERFACE)
+add_library(Nexus::Core ALIAS nexus_core)
 add_library(nexus_arch INTERFACE)
 add_library(Nexus::Arch ALIAS nexus_arch)
 add_library(nexus_build_options INTERFACE)
@@ -64,6 +66,21 @@ target_include_directories(nexus_core INTERFACE "{ROOT / 'core/include'}")
 target_include_directories(nexus_arch INTERFACE "{ROOT / 'arch/include'}")
 target_compile_options(nexus_build_options INTERFACE -ffunction-sections)
 add_subdirectory("{ROOT / 'io'}" io)
+'''
+            if broker:
+                project += f'''
+add_library(nexus_os_wait INTERFACE)
+add_subdirectory("{ROOT / 'components/runtime/bus_owner'}" owner EXCLUDE_FROM_ALL)
+add_subdirectory("{ROOT / 'components/runtime/user_io_broker'}" broker EXCLUDE_FROM_ALL)
+'''
+            if network:
+                project += f'''
+add_library(nexus_abi_options INTERFACE)
+function(nexus_apply_target_policy target)
+endfunction()
+set(nexus_lwip_source "{ROOT / 'ext/lwip'}")
+include("{ROOT / 'components/protocols/network/Profiles.cmake'}")
+nexus_lwip_profile("" LwIP LwIPTCP FALSE)
 '''
             if external_component:
                 project += f'''
@@ -184,7 +201,27 @@ target_link_libraries(consumer PRIVATE {required_target})
         self.assertIn("src/mechanisms/frame_stream.c", sources)
 
     def test_explicit_component_accepts_a_caller_owned_provider(self):
-        self.sources(("gpio",), external_component=True)
+        self.assertEqual(self.sources(("gpio",), external_component=True), {
+            "src/api/i2c.c", "src/mechanisms/dma.c",
+            "src/mechanisms/i2c_bus_clear.c", "src/mechanisms/wake.c"})
+
+    def test_scalar_broker_does_not_select_uart_or_aggregate_io(self):
+        self.assertEqual(self.sources(("gpio", "uart"), broker=True,
+                                     required_target="Nexus::UserIoBroker"), {
+            "src/api/gpio.c", "src/api/pin_state.c"})
+
+    def test_async_broker_explicitly_selects_existing_uart_owner(self):
+        sources = self.sources(("gpio",), broker=True,
+                               required_target="Nexus::UserIoAsync")
+        self.assertIn("src/api/uart.c", sources)
+        self.assertIn("src/mechanisms/stream.c", sources)
+        self.assertNotIn("src/api/i2c.c", sources)
+
+    def test_tcp_keeps_ethernet_without_selected_uart(self):
+        sources = self.sources(("uart",), network=True,
+                               required_target="Nexus::LwIPTCP")
+        self.assertIn("src/api/ethernet_frames.c", sources)
+        self.assertNotIn("src/api/uart.c", sources)
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 # 文档构建配置入口
 
-本目录维护 Sphinx 配置、模板和共享代码风格源。正文根是 `docs/`；直接构建
+本目录维护 Sphinx 配置和模板。正文根是 `docs/`；直接构建
 `docs/sphinx` 会得到不同且不完整的页面集合。先按[源码取得指南](../guides/source-checkout.md)
 取得精确文档 revision，并初始化其锁定依赖。
 
@@ -37,4 +37,4 @@ HTML 不能挽救本次失败。清理前保存收条，仅移除自己创建且
 
 旧 HAL／OSAL／Kconfig 教程及翻译工具通过[固定历史 revision](../reference/history.md)
 保留，不描述当前支持。现有格式与反斜杠 Doxygen 规则仍由
-[代码标准](development/coding_standards.rst)维护。
+[代码标准](../development/coding_standards.rst)维护。

@@ -70,7 +70,7 @@ cancel、deadline 或 stop 不撤销 wire storage 借用。内层 QUARANTINED �
 
 ## 验证范围
 
-[GoogleTest／GoogleMock 合同](../../../tests/google/smbus_test.cpp) 执行生产 C，模拟
+[GoogleTest／GoogleMock 合同](../../../tests/google/components/smbus_test.cpp) 执行生产 C，模拟
 外部 I2C 和时钟，覆盖固定 PEC 向量、repeated START、错误、部分完成、取消、隔离、
 陈旧 generation 和回调重入。新目标的维护构建、ARM、SDK 和实板结果分别记录；源码
 或主机模型本身不建立硬件 SMBus 模式或物理资格，physical HIL 为 `not_executed`。

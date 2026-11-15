@@ -7,7 +7,7 @@ import subprocess
 import sys
 import unittest
 
-from tools.configure import test_external_package
+from tools.configure.tests import test_external_package
 
 
 ROOT = Path(__file__).resolve().parents[2]

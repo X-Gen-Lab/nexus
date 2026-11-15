@@ -561,11 +561,10 @@
     "PF6/PF7/PF8/PF9 directional keys lack drawn external pullups; select input and explicit internal pullup. The fifth center key is NRST, not another GPIO.",
     "Touch uses mixed PA5/PB1/PB2 GPIO, not a complete hardware SPI route. Audio control PC0/PC13 and camera control PD6/PD7 are not hardware I2C routes.",
     "USB_HS on PB14/PB15 uses an internal FS PHY path without ULPI; no 480 Mbps or USB host support is implied.",
-    "FSMC SRAM/LCD, SDIO, RTC, full audio and DCMI drivers remain separate implementation tasks, not support established by this Board package.",
-    "ILI9341/XPT2046 module identities are user-declared; actual connector continuity and fitting remain unverified. Display/touch options do not imply a delivered FSMC or complete device driver. GPIO touch PEN and EXTI PEN are alternative owners and cannot both be selected.",
+    "ILI9341/XPT2046 module identities are user-declared; actual connector continuity and fitting remain unverified. Display/touch options authorize wiring only; software mode support is maintained in the platform capability reference. GPIO touch PEN and EXTI PEN are alternative owners and cannot both be selected.",
     "Camera, WM8978/VS1053, WiFi/Bluetooth, DS18B20 and HS0038 module variants and fitting remain unverified.",
     "FSMC NE3 is an explicitly declared IS62WV51216 1MiB reference. Exact fitted speed/voltage suffix, encoded bank timing and physical waveform need verification; no memory test or DMA reachability follows from a CPU window.",
-    "Audio and camera choices currently select reviewed GPIO control wires only; they neither select a codec/sensor automatically nor establish I2S/DCMI software support or fitting. DS18B20 external VDD and HS0038/NEC are explicit software references, with no inferred remote model or parasite power support."
+    "Audio and camera choices currently select reviewed GPIO control wires only; they do not select a codec/sensor automatically; exact module variants, fitting, clock sources and continuity remain unverified. DS18B20 external VDD and HS0038/NEC are explicit software references, with no inferred remote model or parasite power support."
   ],
   "provenance": [
     {

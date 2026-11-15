@@ -360,9 +360,9 @@ PCB、codec、外部时钟、波形、FIFO 余量与持续负载仍须物理执�
 配 I2S2 duplex、ZG embedded RAW blocks 配 I2S3、ZG RAW14、JPEG 以及 I2S3 MCLK。
 `jpeg_blocks/ve-jpeg-blocks.toml` 复用 VE 软件路线，独立强类型消费者显式提供三个
 4096 B bank 并调用 start／service／acquire／release／stop；不增加其他有限夹具的 RAM。
-它们不修改公共 Board 的接线事实。`tools/configure/test_f407_capture_audio_configuration.py`
+它们不修改公共 Board 的接线事实。`tools/configure/tests/test_f407_capture_audio_configuration.py`
 检查严格字段、typed IR、真实 claims、pure factory 及固定生命周期连接。
-`tests/google/f407_capture_audio_test.cpp` 编译真实 C11 owner 和官方 DCMI cold Init，
+`tests/google/soc/f407_capture_audio_test.cpp` 编译真实 C11 owner 和官方 DCMI cold Init，
 只替换 CPU／MMIO 边界；失败 drain、迟到 IRQ、CT 歧义、欠替代 buffer、原始借用及
 多实例共享时钟均在同一个完整程序中执行。模型结果、ARM ELF 和 HIL 分别验收；
 本软件工作不执行 HIL。

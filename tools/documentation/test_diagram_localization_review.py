@@ -21,11 +21,12 @@ class DiagramLocalizationReviewTests(unittest.TestCase):
             "en": {"Retain borrowed storage": "Retain borrowed storage"},
             "zh_CN": {"Retain borrowed storage": "保留借用存储"},
         }
+        self.output = self.root / "build" / "diagrams"
         self.policy = self.folder / "labels.json"
         self.policy.write_text(json.dumps(self.mapping), encoding="utf-8")
         (self.folder / "flow.dot").write_text(self.source, encoding="utf-8")
         for language in diagram_localization.LANGUAGES:
-            target = self.folder / "localized" / language / "flow.dot"
+            target = self.output / language / "flow.dot"
             target.parent.mkdir(parents=True)
             target.write_text(diagram_localization.localize(
                 self.source, self.mapping, language), encoding="utf-8")
@@ -35,12 +36,12 @@ class DiagramLocalizationReviewTests(unittest.TestCase):
 
     def test_required_policy_cannot_disappear_while_variants_remain(self):
         self.policy.unlink()
-        self.assertTrue(diagram_localization.check(self.folder)["errors"])
+        self.assertTrue(diagram_localization.check(self.folder, output=self.output)["errors"])
 
     def test_dangling_policy_symlink_cannot_select_untranslated_fallback(self):
         self.policy.unlink()
         self.policy.symlink_to(self.root / "missing-policy.json")
-        self.assertTrue(diagram_localization.check(self.folder)["errors"])
+        self.assertTrue(diagram_localization.check(self.folder, output=self.output)["errors"])
 
     def test_nonempty_contract_label_cannot_be_translated_to_empty(self):
         self.mapping["en"]["Retain borrowed storage"] = ""
@@ -56,9 +57,9 @@ class DiagramLocalizationReviewTests(unittest.TestCase):
         outside = self.root / "outside"
         outside.mkdir()
         (outside / "hidden.svg").write_text("external", encoding="utf-8")
-        (self.folder / "localized" / "extra").symlink_to(outside,
+        (self.output / "extra").symlink_to(outside,
                                                        target_is_directory=True)
-        self.assertTrue(diagram_localization.check(self.folder)["errors"])
+        self.assertTrue(diagram_localization.check(self.folder, output=self.output)["errors"])
 
     def test_mapping_does_not_read_canonical_source_through_symlink(self):
         outside = self.root / "outside.dot"
@@ -77,7 +78,7 @@ class DiagramLocalizationReviewTests(unittest.TestCase):
         page = self.root / "explanation" / "factory.md"
         with self.assertRaises(ValueError):
             diagram_localization.image_uri("../assets/diagrams/flow.svg", page,
-                                           self.root, "en")
+                                           self.root, "en", output=self.output)
 
     def test_legacy_fixture_without_policy_or_variants_remains_supported(self):
         folder = self.root / "legacy"

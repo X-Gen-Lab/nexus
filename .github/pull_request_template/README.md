@@ -6,7 +6,7 @@
 `docs(delivery)`。
 
 评审核对[当前交付](../../docs/delivery/README.md)中的合同与证据，并遵守
-[代码规范](../../docs/sphinx/development/coding_standards.rst)。本地 commit hook
+[代码规范](../../docs/development/coding_standards.rst)。本地 commit hook
 与 CI 使用相同格式、注释规则；Native／模型执行、实际 ARM 链接、物理 HIL
 分别建立证据。
 

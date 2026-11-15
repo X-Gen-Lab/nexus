@@ -1,10 +1,13 @@
 """Real optional targets preserve generic headers and zero unselected cost."""
 from pathlib import Path
+import json
 import os
 import shutil
 import subprocess
 import tempfile
 import unittest
+
+from tools.measurement.elf import Elf32, image_window
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -137,7 +140,7 @@ class MCUbootConsumerTests(unittest.TestCase):
         build, result = self.configure(
             'nexus_add_mcuboot_boot()\nnexus_add_mcuboot_boot()\n'
             'nexus_add_firmware(boot SOURCES boot.c\n'
-            f' "{ROOT}/tests/contracts/mcuboot_link/public_key.c"\n'
+            f' "{ROOT}/cmake/package/verification/mcuboot_boot/public_key.c"\n'
             ' LIBRARIES Nexus::MCUBootBootStorage)\n')
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         result = subprocess.run([self.cmake, '--build', str(build), '--target',
@@ -149,6 +152,35 @@ class MCUbootConsumerTests(unittest.TestCase):
             env=self.environment, capture_output=True, text=True,
             check=False, timeout=30)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_explicit_primary_payload_assembly_reaches_its_linked_window(self):
+        reference = ROOT / 'tests/contracts/mcuboot_link'
+        build = self.root / 'payload build'
+        command = [self.cmake, '-S', str(reference), '-B', str(build),
+                   '-G', 'Ninja', f'-DNEXUS_PLATFORM_ROOT={PLATFORM}',
+                   f'-DNEXUS_ASSEMBLY_FILE={reference / "payload.toml"}',
+                   '-DCMAKE_TOOLCHAIN_FILE=' + str(
+                       PLATFORM / 'cmake/toolchains/arm-gcc.cmake')]
+        result = subprocess.run(command, env=self.environment,
+                                capture_output=True, text=True, timeout=90)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        resolved = json.loads((build / 'nexus/generated/resolved.json').read_text())
+        self.assertEqual(resolved['layout']['origin'], 0x08020000)
+        self.assertEqual(image_window(resolved)['origin'], 0x08020200)
+        result = subprocess.run([self.cmake, '--build', str(build), '--target',
+                                 'mcuboot_application_payload', '--parallel', '1'],
+                                env=self.environment, capture_output=True,
+                                text=True, timeout=180)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        image = build / 'bin/mcuboot_application_payload.elf'
+        elf = Elf32(image.read_bytes())
+        vector = next(item for item in elf.sections
+                      if item['name'] == '.isr_vector')
+        self.assertEqual(vector['address'], 0x08020200)
+        self.assertGreaterEqual(elf.entry & ~1, vector['address'])
+        self.assertLess(elf.entry & ~1, 0x08040000 - 1024)
+        resources = json.loads(image.with_suffix('.resources.json').read_text())
+        self.assertEqual(resources['status'], 'passed')
 
     def test_missing_source_rejects_before_vendor_target_configuration(self):
         build, result = self.configure('nexus_add_mcuboot_control()\n',

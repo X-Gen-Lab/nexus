@@ -45,13 +45,6 @@ provider/endpoint 状态、RX/事件/网络缓存，以及 FreeRTOS idle/timer �
 多个实例必须显式传入 `-DNEXUS_WORKLOAD_UART_ID=NX_UART_ID_<NAME>`，GPIO 同理。
 不存在或类别错误的 ID 在配置阶段失败。工装选择不会修改 TOML、制造别名或改变平台装配。
 
-`h743_flash_ram.py` 将选定 RAM 审计绑定到实际编译数据库及编译器生成的原始
-栈用量（`.su`）字节。可复现构建中，每个编译单元的精确 `-c` 输入和有序
-`-ffile-prefix-map`／`-fdebug-prefix-map` 参数只派生一个预期源码名称。
-最后匹配的映射只应用一次，不使用文件名或路径后缀放行。错误源码、有歧义的
-源码名称及未建模的路径选项均拒绝。原始源码与 `.su` 摘要保持不变，命令行
-审计失败时输出具体拒绝原因。这些检查不建立实板执行资格。
-
 ```sh
 python scripts/ci/os_resources.py --output /new/os-resource-observation \
     --core-arch-costs --native-commands build/native-debug/compile_commands.json
@@ -67,13 +60,11 @@ Core 实例的 ELF、map 和静态指令形状。Native 编译数据库提供维
 物理资格。输出目录必须为新目录。
 
 这些结果只证明链接后存储量。动态栈峰值、周期、中断延迟、电气行为和物理资格都需要
-各自真实执行的测量。观察记录不是软件候选或发布。三板 HIL 准备沿用 `tools/hil`
+各自真实执行的测量。观察记录不是软件候选或发布。四份 F407 板卡 HIL 工装准备沿用 `tools/hil`
 绑定精确构建的协议；设备未接入前，站点事实和数值预算继续保持未绑定。
 
-`retention.py` 默认必须验证生成的 factory 接口对象。仅四个精确的 U575 标准
-retained-time、Stop2、LPDMA-copy 和 LPTIM1-LPBAM consumer 可同时使用
-`--component-owner <smoke> --consumer <main.c>` 与 `--resolved`。角色由现有
-transport 元组、相同的标准 consumer 字节和装配摘要共同确定。检查从真实只读时钟与
-组件接口追踪到可写且不可执行的调用方存储，以及实际加载的代码和操作表。
-`linked_component_owner_retention` 报告只证明组件的链接关系与存储所有权，
-不证明 factory 保留、实际执行或 HIL；其他空装配仍拒绝，factory 接口检查保持严格。
+`retention.py` 默认验证生成的 factory 接口对象。仅精确的
+`f407-secure-services` 标准 consumer 支持 `--component-owner`；它同时要求
+`--consumer <application.c>` 与 `--resolved`，按维护的 consumer、装配及源码字节
+校验身份，再追踪真实接口、操作表与可写调用方存储。该分支不授权其他空装配。
+链接保留报告只证明当前 ELF 的代码与存储关系，不证明运行、物理 HIL 或发布资格。

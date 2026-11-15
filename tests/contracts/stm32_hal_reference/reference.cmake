@@ -36,7 +36,7 @@ function(nexus_stm32_hal_reference target)
         nexus_use_cmsis_core(${unit})
         nexus_use_cmsis_host_model(${unit})
         target_compile_options(${unit} PRIVATE
-            "-include${source}/tests/google/stm32_official_model.h"
+            "-include${source}/tests/google/soc/stm32_official_model.h"
             -ffunction-sections -fdata-sections)
     endforeach()
     # These are upstream 32-bit register addresses in an unchanged vendor file.

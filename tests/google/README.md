@@ -3,6 +3,10 @@
 测试编译真实Core／Arch／I/O／OS／provider／组件算法，只mock外部硬件、kernel边界
 或依赖端口。不要用一份测试内重新实现的状态机证明另一份实现正确。
 
+目录按被测责任分为 `core/`、`arch/`、`io/`、`os/`、`soc/` 和
+`components/`；`support/` 仅保存真实共享夹具。根 CMake 维持原目标与执行计划，
+各领域 `.cmake` 就近列出源码与私有依赖，不建立第二套测试注册机制。
+
 `.cmake`文件注册维护目标；`*_test.cpp`观察公共行为，`*_model.h`与配套port建立
 明确硬件边界。独立实例、拒绝无效果、取消、deadline、QUARANTINED、真实排空与
 最后SETTLED访问是主要合同。模型不能证明实物IRQ延迟／DMA吞吐／电气。

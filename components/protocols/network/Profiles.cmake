@@ -56,7 +56,7 @@ function(nexus_lwip_profile suffix adapter_alias tcp_alias loaned)
     nexus_apply_target_policy("${tcp}")
     target_include_directories("${tcp}" PUBLIC
         "${network_dir}/include")
-    target_link_libraries("${tcp}" PUBLIC Nexus::IO
+    target_link_libraries("${tcp}" PUBLIC nexus_io_contract
         PRIVATE "${adapter}" "${vendor}"
             nexus_build_options nexus_owned_warnings)
     add_library("Nexus::${tcp_alias}" ALIAS "${tcp}")

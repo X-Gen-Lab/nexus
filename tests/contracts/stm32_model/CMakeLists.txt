@@ -40,7 +40,7 @@ foreach(target contract_stm32_system_model contract_stm32_io_model
     include("${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/sdk/STM32Official.cmake")
     nexus_stm32f4_official(${target})
     target_compile_options(${target} PRIVATE
-        "-include${NEXUS_SOURCE_DIR}/tests/google/stm32_official_model.h")
+        "-include${NEXUS_SOURCE_DIR}/tests/google/soc/stm32_official_model.h")
     target_include_directories(${target} PRIVATE
         "${stm32_root}"
         "${stm32_root}/drivers/ip/i2c_v1_async"

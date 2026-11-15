@@ -18,6 +18,8 @@ if(UNIX AND NOT APPLE AND CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     endif()
 endif()
 
+set(nexus_google_root "${CMAKE_CURRENT_SOURCE_DIR}")
+
 add_custom_target(nexus_google_contracts)
 function(nexus_google_test name)
     cmake_parse_arguments(ARG "STM32F4_LL" "" "SOURCES;LIBRARIES;INCLUDES" ${ARGN})
@@ -30,12 +32,6 @@ function(nexus_google_test name)
                 "${NEXUS_SOURCE_DIR}/core/private")
         endif()
     endforeach()
-    target_include_directories(${name} PRIVATE
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/i2c_v1_async"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/classic_can"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/fs_device_pio"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/legacy_mac"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/advanced_timer")
     target_compile_features(${name} PRIVATE cxx_std_17)
     set_target_properties(${name} PROPERTIES CXX_EXTENSIONS OFF)
     target_link_libraries(${name} PRIVATE nexus_build_options nexus_owned_warnings
@@ -61,93 +57,93 @@ function(nexus_google_test name)
     set_tests_properties(${name} PROPERTIES TIMEOUT 30 LABELS "GoogleTest")
 endfunction()
 
-include("${CMAKE_CURRENT_SOURCE_DIR}/dac.cmake")
-include("${CMAKE_CURRENT_SOURCE_DIR}/crc.cmake")
-include("${CMAKE_CURRENT_SOURCE_DIR}/crypto.cmake")
-include("${CMAKE_CURRENT_SOURCE_DIR}/stm32_graphics.cmake")
-include("${CMAKE_CURRENT_SOURCE_DIR}/stm32_sai.cmake")
+include("${nexus_google_root}/soc/dac.cmake")
+include("${nexus_google_root}/soc/crc.cmake")
+include("${nexus_google_root}/soc/crypto.cmake")
+include("${nexus_google_root}/soc/stm32_graphics.cmake")
+include("${nexus_google_root}/soc/stm32_sai.cmake")
 
-include("${CMAKE_CURRENT_LIST_DIR}/native_cold.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/stm32_i2c_cold.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/i2c_target.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/stm32_platform_cold.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/stm32_static_lifecycle.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/stm32_i2c_poll_factory.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/stm32_control_factory.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/stm32_uart_cold_factory.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/stm32_basic_cold.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/stm32_adc_cold_factory.cmake")
-include("${CMAKE_CURRENT_SOURCE_DIR}/uart_formats.cmake")
-include("${CMAKE_CURRENT_SOURCE_DIR}/cycle_probe.cmake")
-include("${CMAKE_CURRENT_SOURCE_DIR}/adc_control.cmake")
-include("${CMAKE_CURRENT_SOURCE_DIR}/fdcan.cmake")
+include("${nexus_google_root}/io/native_cold.cmake")
+include("${nexus_google_root}/soc/stm32_i2c_cold.cmake")
+include("${nexus_google_root}/soc/i2c_target.cmake")
+include("${nexus_google_root}/soc/stm32_platform_cold.cmake")
+include("${nexus_google_root}/soc/stm32_static_lifecycle.cmake")
+include("${nexus_google_root}/soc/stm32_i2c_poll_factory.cmake")
+include("${nexus_google_root}/soc/stm32_control_factory.cmake")
+include("${nexus_google_root}/soc/stm32_uart_cold_factory.cmake")
+include("${nexus_google_root}/soc/stm32_basic_cold.cmake")
+include("${nexus_google_root}/soc/stm32_adc_cold_factory.cmake")
+include("${nexus_google_root}/io/uart_formats.cmake")
+include("${nexus_google_root}/arch/cycle_probe.cmake")
+include("${nexus_google_root}/soc/adc_control.cmake")
+include("${nexus_google_root}/io/fdcan.cmake")
 
-include("${CMAKE_CURRENT_SOURCE_DIR}/flash_program.cmake")
-include("${CMAKE_CURRENT_SOURCE_DIR}/qiming_touch.cmake")
-include("${CMAKE_CURRENT_SOURCE_DIR}/ili9341.cmake")
-include("${CMAKE_CURRENT_SOURCE_DIR}/external_bus_api.cmake")
-include("${CMAKE_CURRENT_SOURCE_DIR}/at24c02.cmake")
-include("${CMAKE_CURRENT_SOURCE_DIR}/w25.cmake")
-include("${CMAKE_CURRENT_SOURCE_DIR}/software_i2c.cmake")
-include("${CMAKE_CURRENT_SOURCE_DIR}/smbus.cmake")
-include("${CMAKE_CURRENT_SOURCE_DIR}/f407_fsmc.cmake")
-include("${CMAKE_CURRENT_SOURCE_DIR}/stm32_sdram.cmake")
-include("${CMAKE_CURRENT_SOURCE_DIR}/stm32_qspi.cmake")
-include("${CMAKE_CURRENT_SOURCE_DIR}/f407_rtc.cmake")
-include("${CMAKE_CURRENT_SOURCE_DIR}/stm32_sdio_block.cmake")
-include("${CMAKE_CURRENT_SOURCE_DIR}/f407_sram_boot.cmake")
-include("${CMAKE_CURRENT_SOURCE_DIR}/qiming_boot_platform.cmake")
-include("${CMAKE_CURRENT_SOURCE_DIR}/infrared.cmake")
-include("${CMAKE_CURRENT_SOURCE_DIR}/infrared_exti.cmake")
-include("${CMAKE_CURRENT_SOURCE_DIR}/onewire.cmake")
-include("${CMAKE_CURRENT_SOURCE_DIR}/ds18b20.cmake")
-include("${CMAKE_CURRENT_SOURCE_DIR}/qiming_rs485_factory.cmake")
+include("${nexus_google_root}/io/flash_program.cmake")
+include("${nexus_google_root}/soc/qiming_touch.cmake")
+include("${nexus_google_root}/components/ili9341.cmake")
+include("${nexus_google_root}/io/external_bus_api.cmake")
+include("${nexus_google_root}/components/at24c02.cmake")
+include("${nexus_google_root}/components/w25.cmake")
+include("${nexus_google_root}/components/software_i2c.cmake")
+include("${nexus_google_root}/components/smbus.cmake")
+include("${nexus_google_root}/soc/f407_fsmc.cmake")
+include("${nexus_google_root}/soc/stm32_sdram.cmake")
+include("${nexus_google_root}/soc/stm32_qspi.cmake")
+include("${nexus_google_root}/soc/f407_rtc.cmake")
+include("${nexus_google_root}/soc/stm32_sdio_block.cmake")
+include("${nexus_google_root}/soc/f407_sram_boot.cmake")
+include("${nexus_google_root}/soc/qiming_boot_platform.cmake")
+include("${nexus_google_root}/components/infrared.cmake")
+include("${nexus_google_root}/components/infrared_exti.cmake")
+include("${nexus_google_root}/components/onewire.cmake")
+include("${nexus_google_root}/components/ds18b20.cmake")
+include("${nexus_google_root}/soc/qiming_rs485_factory.cmake")
 
-nexus_google_test(nexus_owner_mock_test SOURCES owner_mock_test.cpp
+nexus_google_test(nexus_owner_mock_test SOURCES "${nexus_google_root}/io/owner_mock_test.cpp"
     LIBRARIES Nexus::BusOwner)
-nexus_google_test(nexus_realtime_metadata_test SOURCES realtime_metadata_test.cpp
+nexus_google_test(nexus_realtime_metadata_test SOURCES "${nexus_google_root}/core/realtime_metadata_test.cpp"
     LIBRARIES Nexus::BusOwner Nexus::IO Nexus::Arch)
-nexus_google_test(nexus_polymorphic_io_test SOURCES polymorphic_mock_test.cpp
+nexus_google_test(nexus_polymorphic_io_test SOURCES "${nexus_google_root}/core/polymorphic_mock_test.cpp"
     LIBRARIES Nexus::IO)
-nexus_google_test(nexus_uart_owner_mock_test SOURCES uart_owner_test.cpp
+nexus_google_test(nexus_uart_owner_mock_test SOURCES "${nexus_google_root}/io/uart_owner_test.cpp"
     LIBRARIES Nexus::UARTOwner)
-nexus_google_test(nexus_spi_async_owner_mock_test SOURCES spi_async_owner_test.cpp
+nexus_google_test(nexus_spi_async_owner_mock_test SOURCES "${nexus_google_root}/io/spi_async_owner_test.cpp"
     LIBRARIES Nexus::SPIAsyncOwner Nexus::SpiOwner)
 nexus_google_test(nexus_hardware_contract_test
-    SOURCES dma_test.cpp stream_test.cpp wake_test.cpp
+    SOURCES "${nexus_google_root}/io/dma_test.cpp" "${nexus_google_root}/io/stream_test.cpp" "${nexus_google_root}/os/wake_test.cpp"
     LIBRARIES Nexus::IO Nexus::Arch)
 nexus_google_test(nexus_i2c_bus_clear_test
-    SOURCES i2c_bus_clear_test.cpp
+    SOURCES "${nexus_google_root}/io/i2c_bus_clear_test.cpp"
     LIBRARIES Nexus::IO)
-nexus_google_test(nexus_uart_rs485_test SOURCES uart_rs485_test.cpp
+nexus_google_test(nexus_uart_rs485_test SOURCES "${nexus_google_root}/io/uart_rs485_test.cpp"
     LIBRARIES Nexus::NativeModel Nexus::Arch)
-nexus_google_test(nexus_bmp280_timing_test SOURCES bmp280_timing_test.cpp
+nexus_google_test(nexus_bmp280_timing_test SOURCES "${nexus_google_root}/components/bmp280_timing_test.cpp"
     LIBRARIES Nexus::BMP280)
-nexus_google_test(nexus_io_observer_test SOURCES io_observer_test.cpp
+nexus_google_test(nexus_io_observer_test SOURCES "${nexus_google_root}/io/io_observer_test.cpp"
     LIBRARIES Nexus::OwnerObserver Nexus::IO)
 nexus_google_test(nexus_io_observation_contract_test
-    SOURCES io_observation_contract_test.cpp
+    SOURCES "${nexus_google_root}/io/io_observation_contract_test.cpp"
     LIBRARIES Nexus::IO)
 nexus_google_test(nexus_io_diagnostic_test
-    SOURCES io_diagnostic_test.cpp
+    SOURCES "${nexus_google_root}/io/io_diagnostic_test.cpp"
     LIBRARIES Nexus::IO)
 nexus_google_test(nexus_io_owner_diagnostic_pipeline_test
-    SOURCES io_owner_diagnostic_pipeline_test.cpp
+    SOURCES "${nexus_google_root}/io/io_owner_diagnostic_pipeline_test.cpp"
     LIBRARIES Nexus::OwnerObserver Nexus::IO Nexus::UARTOwner
         Nexus::SPIAsyncOwner Nexus::NativeModel Nexus::Arch
     INCLUDES "${NEXUS_SOURCE_DIR}/tests/support/native/drivers")
 nexus_google_test(nexus_silicon_admission_test
-    SOURCES silicon_admission_test.cpp
+    SOURCES "${nexus_google_root}/soc/silicon_admission_test.cpp"
     LIBRARIES Nexus::Core
     INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4")
-nexus_google_test(nexus_core_lifecycle_test SOURCES core_lifecycle_test.cpp
+nexus_google_test(nexus_core_lifecycle_test SOURCES "${nexus_google_root}/core/core_lifecycle_test.cpp"
     LIBRARIES Nexus::Core)
-nexus_google_test(nexus_static_lifecycle_test SOURCES static_lifecycle_test.cpp
+nexus_google_test(nexus_static_lifecycle_test SOURCES "${nexus_google_root}/io/static_lifecycle_test.cpp"
     LIBRARIES Nexus::Core)
-nexus_google_test(nexus_platform_lifecycle_test SOURCES platform_lifecycle_test.cpp
+nexus_google_test(nexus_platform_lifecycle_test SOURCES "${nexus_google_root}/core/platform_lifecycle_test.cpp"
     LIBRARIES Nexus::Core)
 nexus_google_test(nexus_stm32_platform_coordinator_test STM32F4_LL
-    SOURCES stm32_platform_coordinator_test.cpp
+    SOURCES "${nexus_google_root}/soc/stm32_platform_coordinator_test.cpp"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_coordinator.c"
     LIBRARIES Nexus::IO
     INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
@@ -158,54 +154,54 @@ target_include_directories(nexus_stm32_platform_coordinator_test SYSTEM PRIVATE
 target_compile_definitions(nexus_stm32_platform_coordinator_test PRIVATE
     STM32F407xx)
 nexus_google_test(nexus_spi_dma_transaction_test
-    SOURCES spi_dma_transaction_test.cpp
+    SOURCES "${nexus_google_root}/io/spi_dma_transaction_test.cpp"
     LIBRARIES Nexus::NativeModel Nexus::Arch
     INCLUDES "${NEXUS_SOURCE_DIR}/io/private")
-nexus_google_test(nexus_io_state_machine_test SOURCES io_state_machine_test.cpp
+nexus_google_test(nexus_io_state_machine_test SOURCES "${nexus_google_root}/io/io_state_machine_test.cpp"
     LIBRARIES Nexus::OwnerObserver Nexus::IO Nexus::UARTOwner
         Nexus::SPIAsyncOwner Nexus::NativeModel
     INCLUDES "${NEXUS_SOURCE_DIR}/tests/support/native/drivers")
-nexus_google_test(nexus_stream_storage_test SOURCES stream_storage_test.cpp
+nexus_google_test(nexus_stream_storage_test SOURCES "${nexus_google_root}/io/stream_storage_test.cpp"
     LIBRARIES Nexus::IO Nexus::Arch)
-nexus_google_test(nexus_stream_profile_test SOURCES stream_profile_test.cpp
+nexus_google_test(nexus_stream_profile_test SOURCES "${nexus_google_root}/io/stream_profile_test.cpp"
     LIBRARIES Nexus::IO Nexus::Arch)
-nexus_google_test(nexus_spi_dma_owner_test SOURCES spi_dma_owner_test.cpp
+nexus_google_test(nexus_spi_dma_owner_test SOURCES "${nexus_google_root}/io/spi_dma_owner_test.cpp"
     LIBRARIES Nexus::SPIDMATransactionOwner Nexus::NativeModel Nexus::Arch)
 nexus_google_test(nexus_native_spi_dma_owner_test
-    SOURCES native_spi_dma_owner_test.cpp
+    SOURCES "${nexus_google_root}/io/native_spi_dma_owner_test.cpp"
         "${NEXUS_SOURCE_DIR}/tests/support/native/drivers/spi_dma_transaction.c"
     LIBRARIES Nexus::SPIDMATransactionOwner Nexus::NativeModel Nexus::Arch
     INCLUDES "${NEXUS_SOURCE_DIR}/tests/support/native/drivers"
         "${NEXUS_SOURCE_DIR}/io/private")
 target_compile_options(nexus_native_spi_dma_owner_test PRIVATE
-    "-include${CMAKE_CURRENT_SOURCE_DIR}/native_spi_dma_owner_model.h")
+    "-include${nexus_google_root}/io/native_spi_dma_owner_model.h")
 nexus_google_test(nexus_spi_dma_owner_wait_test
-    SOURCES spi_dma_owner_wait_test.cpp
+    SOURCES "${nexus_google_root}/io/spi_dma_owner_wait_test.cpp"
     LIBRARIES Nexus::SPIDMATransactionOwner Nexus::NativeModel Nexus::OSNative
         Nexus::OwnerObserver Threads::Threads Nexus::Arch
     INCLUDES "${NEXUS_SOURCE_DIR}/tests/support/native/drivers"
         "${NEXUS_SOURCE_DIR}/io/private")
-nexus_google_test(nexus_flash_provenance_test SOURCES flash_provenance_test.cpp
+nexus_google_test(nexus_flash_provenance_test SOURCES "${nexus_google_root}/io/flash_provenance_test.cpp"
     LIBRARIES Nexus::FlashStorage Nexus::NativeModel)
-nexus_google_test(nexus_tmp117_test SOURCES tmp117_test.cpp
-    LIBRARIES Nexus::TMP117I2C Nexus::BusOwner Nexus::Arch)
-nexus_google_test(nexus_settings_test SOURCES settings_test.cpp
+nexus_google_test(nexus_tmp117_test SOURCES "${nexus_google_root}/components/tmp117_test.cpp"
+    LIBRARIES Nexus::TMP117I2C Nexus::BusOwner Nexus::Arch Nexus::IO)
+nexus_google_test(nexus_settings_test SOURCES "${nexus_google_root}/components/settings_test.cpp"
     LIBRARIES Nexus::Settings)
-nexus_google_test(nexus_native_instances_test SOURCES native_instances_test.cpp
+nexus_google_test(nexus_native_instances_test SOURCES "${nexus_google_root}/io/native_instances_test.cpp"
     LIBRARIES Nexus::NativeModel
     INCLUDES "${NEXUS_SOURCE_DIR}/tests/support/native/drivers")
-nexus_google_test(nexus_native_async_test SOURCES native_async_test.cpp
+nexus_google_test(nexus_native_async_test SOURCES "${nexus_google_root}/io/native_async_test.cpp"
     LIBRARIES Nexus::NativeModel
     INCLUDES "${NEXUS_SOURCE_DIR}/tests/support/native/drivers")
-nexus_google_test(nexus_irq_wake_provider_test SOURCES irq_wake_test.cpp
+nexus_google_test(nexus_irq_wake_provider_test SOURCES "${nexus_google_root}/os/irq_wake_test.cpp"
     LIBRARIES Nexus::NativeModel
     INCLUDES "${NEXUS_SOURCE_DIR}/tests/support/native/drivers")
 
 nexus_google_test(nexus_freertos_services_kernel_test
-    SOURCES freertos_services_kernel_test.cpp freertos_stack_kernel_test.cpp
-        freertos_owner_endurance_test.cpp
+    SOURCES "${nexus_google_root}/os/freertos_services_kernel_test.cpp" "${nexus_google_root}/os/freertos_stack_kernel_test.cpp"
+        "${nexus_google_root}/os/freertos_owner_endurance_test.cpp"
         "${NEXUS_SOURCE_DIR}/os/freertos/stack_snapshot.c"
-    LIBRARIES contract_os_freertos_posix Nexus::UARTOwner
+    LIBRARIES contract_os_freertos_posix Nexus::UARTOwner Nexus::NativeModel
     INCLUDES "${NEXUS_SOURCE_DIR}/tests/support/native/drivers")
 
 # A second assembly is a separate image, never linked to the default platform.
@@ -226,12 +222,12 @@ if(NOT native_factory_result EQUAL 0)
         "${native_factory_output}${native_factory_error}")
 endif()
 nexus_google_configuration_inputs("${native_factory_generated}")
-nexus_google_test(nexus_native_factory_test SOURCES native_factory_test.cpp
+nexus_google_test(nexus_native_factory_test SOURCES "${nexus_google_root}/io/native_factory_test.cpp"
     "${native_factory_generated}/bindings.c"
     LIBRARIES Nexus::NativeModel Nexus::Arch
     INCLUDES "${native_factory_generated}" "${NEXUS_SOURCE_DIR}/tests/support/native/drivers")
 
-nexus_google_test(nexus_stm32_uart_dma_test STM32F4_LL SOURCES stm32_uart_dma_test.cpp
+nexus_google_test(nexus_stm32_uart_dma_test STM32F4_LL SOURCES "${nexus_google_root}/soc/stm32_uart_dma_test.cpp"
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart/uart.c"
     LIBRARIES Nexus::NativeModel Nexus::Arch
     INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4")
@@ -242,7 +238,7 @@ nexus_use_cmsis_core(nexus_stm32_uart_dma_test)
 target_compile_definitions(nexus_stm32_uart_dma_test PRIVATE
     NEXUS_STM32_MODEL STM32F407xx)
 
-nexus_google_test(nexus_irq_wake_stm32_test STM32F4_LL SOURCES irq_wake_stm32_test.cpp
+nexus_google_test(nexus_irq_wake_stm32_test STM32F4_LL SOURCES "${nexus_google_root}/os/irq_wake_stm32_test.cpp"
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart/uart.c"
     LIBRARIES Nexus::NativeModel Nexus::Arch
     INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4")
@@ -258,12 +254,12 @@ target_sources(nexus_stm32_uart_dma_test PRIVATE
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart/uart_dma.c")
 
 target_compile_options(nexus_stm32_uart_dma_test PRIVATE
-    "-include${CMAKE_CURRENT_SOURCE_DIR}/stm32_uart_dma_model.h")
-include("${CMAKE_CURRENT_SOURCE_DIR}/spi_transaction.cmake")
-include("${CMAKE_CURRENT_SOURCE_DIR}/spi_dma_owner_factory.cmake")
+    "-include${nexus_google_root}/soc/stm32_uart_dma_model.h")
+include("${nexus_google_root}/io/spi_transaction.cmake")
+include("${nexus_google_root}/io/spi_dma_owner_factory.cmake")
 
 nexus_google_test(nexus_stm32_spi_dma_test STM32F4_LL
-    SOURCES stm32_spi_dma_test.cpp
+    SOURCES "${nexus_google_root}/soc/stm32_spi_dma_test.cpp"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/spi/spi.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio/gpio.c"
     LIBRARIES Nexus::NativeModel Nexus::Arch
@@ -275,7 +271,7 @@ nexus_use_cmsis_core(nexus_stm32_spi_dma_test)
 target_compile_definitions(nexus_stm32_spi_dma_test PRIVATE
     NEXUS_STM32_MODEL STM32F407xx)
 target_compile_options(nexus_stm32_spi_dma_test PRIVATE
-    "-include${CMAKE_CURRENT_SOURCE_DIR}/stm32_dma_model.h")
+    "-include${nexus_google_root}/soc/stm32_dma_model.h")
 
 target_sources(nexus_stm32_spi_dma_test PRIVATE
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/spi/spi_dma.c")
@@ -283,7 +279,7 @@ target_include_directories(nexus_stm32_spi_dma_test PRIVATE
     "${NEXUS_SOURCE_DIR}/io/private")
 
 nexus_google_test(nexus_stm32_uart_receive_test STM32F4_LL
-    SOURCES stm32_uart_receive_test.cpp
+    SOURCES "${nexus_google_root}/soc/stm32_uart_receive_test.cpp"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart/uart.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart/uart_hardware.c"
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart/uart_dma.c"
@@ -298,10 +294,10 @@ nexus_use_cmsis_core(nexus_stm32_uart_receive_test)
 target_compile_definitions(nexus_stm32_uart_receive_test PRIVATE
     NEXUS_STM32_MODEL STM32F407xx)
 target_compile_options(nexus_stm32_uart_receive_test PRIVATE
-    "-include${CMAKE_CURRENT_SOURCE_DIR}/stm32_uart_receive_model.h")
+    "-include${nexus_google_root}/soc/stm32_uart_receive_model.h")
 
 nexus_google_test(nexus_stm32_uart_stream_test STM32F4_LL
-    SOURCES stm32_uart_stream_test.cpp
+    SOURCES "${nexus_google_root}/soc/stm32_uart_stream_test.cpp"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart/uart.c"
     LIBRARIES Nexus::NativeModel Nexus::Arch
     INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4")
@@ -316,7 +312,7 @@ target_sources(nexus_stm32_uart_stream_test PRIVATE
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart/uart_stream.c")
 
 nexus_google_test(nexus_stm32_adc_stream_test STM32F4_LL
-    SOURCES stm32_adc_stream_test.cpp
+    SOURCES "${nexus_google_root}/soc/stm32_adc_stream_test.cpp"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc/adc.c"
     LIBRARIES Nexus::NativeModel Nexus::Arch
     INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4")
@@ -327,7 +323,7 @@ nexus_use_cmsis_core(nexus_stm32_adc_stream_test)
 target_compile_definitions(nexus_stm32_adc_stream_test PRIVATE
     NEXUS_STM32_MODEL STM32F407xx)
 target_compile_options(nexus_stm32_adc_stream_test PRIVATE
-    "-include${CMAKE_CURRENT_SOURCE_DIR}/stm32_adc_stream_model.h")
+    "-include${nexus_google_root}/soc/stm32_adc_stream_model.h")
 
 target_sources(nexus_stm32_adc_stream_test PRIVATE
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc/adc_stream.c"
@@ -335,13 +331,14 @@ target_sources(nexus_stm32_adc_stream_test PRIVATE
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/adc/adc_continuous.c")
 
 nexus_google_test(nexus_stm32_i2c_register_test STM32F4_LL
-    SOURCES i2c_register_test.cpp
+    SOURCES "${nexus_google_root}/soc/i2c_register_test.cpp"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/i2c/i2c.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/i2c/i2c_cold.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio/gpio.c"
-        stm32_i2c_storage_model.c
+        "${nexus_google_root}/soc/stm32_i2c_storage_model.c"
     LIBRARIES Nexus::IO
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
+    INCLUDES
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/i2c_v1_async" "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
         "${NEXUS_SOURCE_DIR}/arch/include")
 target_include_directories(nexus_stm32_i2c_register_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
@@ -350,22 +347,22 @@ nexus_use_cmsis_core(nexus_stm32_i2c_register_test)
 target_compile_definitions(nexus_stm32_i2c_register_test PRIVATE
     NEXUS_STM32_MODEL STM32F407xx NEXUS_I2C_STM32_TEST)
 target_compile_options(nexus_stm32_i2c_register_test PRIVATE
-    "$<$<COMPILE_LANGUAGE:C>:-include${CMAKE_CURRENT_SOURCE_DIR}/i2c_register_model.h>")
+    "$<$<COMPILE_LANGUAGE:C>:-include${nexus_google_root}/soc/i2c_register_model.h>")
 
 foreach(i2c_family generic stm32)
     set(i2c_target "nexus_${i2c_family}_i2c_async_test")
-    nexus_google_test(${i2c_target} SOURCES i2c_async_register_test.cpp
+    nexus_google_test(${i2c_target} SOURCES "${nexus_google_root}/soc/i2c_async_register_test.cpp"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/i2c_v1_async/i2c_v1_async.c"
         LIBRARIES Nexus::IO Nexus::Arch
         INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/i2c_v1_async")
     target_compile_options(${i2c_target} PRIVATE
-        "-include${CMAKE_CURRENT_SOURCE_DIR}/i2c_async_register_model.h")
+        "-include${nexus_google_root}/soc/i2c_async_register_model.h")
     if(i2c_family STREQUAL "stm32")
         target_sources(${i2c_target} PRIVATE
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/i2c/i2c_async.c"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/i2c/i2c_cold.c"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio/gpio.c"
-            stm32_i2c_storage_model.c)
+            "${nexus_google_root}/soc/stm32_i2c_storage_model.c")
         include("${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/sdk/STM32Official.cmake")
         nexus_stm32f4_official(${i2c_target})
         target_include_directories(${i2c_target} PRIVATE
@@ -379,103 +376,103 @@ foreach(i2c_family generic stm32)
     endif()
 endforeach()
 
-include(arch_cortex.cmake)
-include(arch_native.cmake)
-include(atomic_tests.cmake)
-include(arch_cache.cmake)
-include(arch_cache_control.cmake)
-include(arch_mpu.cmake)
-include(arch_security.cmake)
-include(arch_nonsecure.cmake)
-include(arch_native_mechanism.cmake)
-include(freertos_context.cmake)
-include(freertos_prestart.cmake)
-include(os_wait.cmake)
-nexus_google_test(nexus_wait_select_test SOURCES wait_select_test.cpp
+include("${nexus_google_root}/arch/arch_cortex.cmake")
+include("${nexus_google_root}/arch/arch_native.cmake")
+include("${nexus_google_root}/core/atomic_tests.cmake")
+include("${nexus_google_root}/arch/arch_cache.cmake")
+include("${nexus_google_root}/arch/arch_cache_control.cmake")
+include("${nexus_google_root}/arch/arch_mpu.cmake")
+include("${nexus_google_root}/arch/arch_security.cmake")
+include("${nexus_google_root}/arch/arch_nonsecure.cmake")
+include("${nexus_google_root}/arch/arch_native_mechanism.cmake")
+include("${nexus_google_root}/os/freertos_context.cmake")
+include("${nexus_google_root}/os/freertos_prestart.cmake")
+include("${nexus_google_root}/os/os_wait.cmake")
+nexus_google_test(nexus_wait_select_test SOURCES "${nexus_google_root}/os/wait_select_test.cpp"
     LIBRARIES Nexus::OSWait)
-include(os_optional.cmake)
-include(os_secure.cmake)
-include(freertos_mpu.cmake)
-include(stm32_memory.cmake)
+include("${nexus_google_root}/os/os_optional.cmake")
+include("${nexus_google_root}/os/os_secure.cmake")
+include("${nexus_google_root}/os/freertos_mpu.cmake")
+include("${nexus_google_root}/soc/stm32_memory.cmake")
 
 include(plan.cmake)
 
-include(usb_clock.cmake)
+include("${nexus_google_root}/soc/usb_clock.cmake")
 
-include(stack_observation.cmake)
+include("${nexus_google_root}/io/stack_observation.cmake")
 
-include(can_factory.cmake)
+include("${nexus_google_root}/soc/can_factory.cmake")
 
-include(can_runtime.cmake)
-include(ethernet.cmake)
-include(usb_device.cmake)
-include(timer_advanced.cmake)
-include(timer_clock.cmake)
+include("${nexus_google_root}/soc/can_runtime.cmake")
+include("${nexus_google_root}/io/ethernet.cmake")
+include("${nexus_google_root}/io/usb_device.cmake")
+include("${nexus_google_root}/soc/timer_advanced.cmake")
+include("${nexus_google_root}/soc/timer_clock.cmake")
 
-include(timer_factory.cmake)
+include("${nexus_google_root}/soc/timer_factory.cmake")
 
-include(multi_controller_factory.cmake)
-include(spi_sequence_factory.cmake)
+include("${nexus_google_root}/soc/multi_controller_factory.cmake")
+include("${nexus_google_root}/soc/spi_sequence_factory.cmake")
 
-include(i2c_pair_factory.cmake)
+include("${nexus_google_root}/soc/i2c_pair_factory.cmake")
 
-include(physical_platform_factory.cmake)
-include(timebase_lowpower.cmake)
+include("${nexus_google_root}/soc/physical_platform_factory.cmake")
+include("${nexus_google_root}/os/timebase_lowpower.cmake")
 
-include(usb_factory.cmake)
+include("${nexus_google_root}/soc/usb_factory.cmake")
 
-include(clock_domain.cmake)
+include("${nexus_google_root}/components/clock_domain.cmake")
 
-include(threadx.cmake)
+include("${nexus_google_root}/os/threadx.cmake")
 
-include(i2c_multi_controller.cmake)
+include("${nexus_google_root}/soc/i2c_multi_controller.cmake")
 
-include(user_io_broker.cmake)
-include(user_io_async.cmake)
+include("${nexus_google_root}/components/user_io_broker.cmake")
+include("${nexus_google_root}/components/user_io_async.cmake")
 
-include(failstop.cmake)
+include("${nexus_google_root}/io/failstop.cmake")
 
-include(ethernet_factory.cmake)
+include("${nexus_google_root}/soc/ethernet_factory.cmake")
 
-include(dma_multi_controller.cmake)
+include("${nexus_google_root}/soc/dma_multi_controller.cmake")
 
-include(soc_system.cmake)
-include(stm32_exti.cmake)
-include(stm32_official.cmake)
-include(stm32_uart_hal.cmake)
-include(legacy_watchdog.cmake)
-include(stm32_window_watchdog.cmake)
-include(stm32_pvd.cmake)
-include(ethernet_raw_errata.cmake)
-include(ethernet_frames.cmake)
-include(ethernet_frames_factory.cmake)
+include("${nexus_google_root}/soc/soc_system.cmake")
+include("${nexus_google_root}/soc/stm32_exti.cmake")
+include("${nexus_google_root}/soc/stm32_official.cmake")
+include("${nexus_google_root}/soc/stm32_uart_hal.cmake")
+include("${nexus_google_root}/soc/legacy_watchdog.cmake")
+include("${nexus_google_root}/soc/stm32_window_watchdog.cmake")
+include("${nexus_google_root}/soc/stm32_pvd.cmake")
+include("${nexus_google_root}/soc/ethernet_raw_errata.cmake")
+include("${nexus_google_root}/soc/ethernet_frames.cmake")
+include("${nexus_google_root}/soc/ethernet_frames_factory.cmake")
 
-include("${CMAKE_CURRENT_SOURCE_DIR}/rtc_lptim.cmake")
+include("${nexus_google_root}/io/rtc_lptim.cmake")
 
-include("${CMAKE_CURRENT_SOURCE_DIR}/mapped_storage.cmake")
-include(amp_ipc.cmake)
-include(stm32f407_handoff.cmake)
-include(frame_stream.cmake)
+include("${nexus_google_root}/components/mapped_storage.cmake")
+include("${nexus_google_root}/components/amp_ipc.cmake")
+include("${nexus_google_root}/soc/stm32f407_handoff.cmake")
+include("${nexus_google_root}/io/frame_stream.cmake")
 
-include(i3c_controller.cmake)
+include("${nexus_google_root}/io/i3c_controller.cmake")
 
-include(official_leaf_probes.cmake)
+include("${nexus_google_root}/soc/official_leaf_probes.cmake")
 
 if(TARGET Nexus::LwIP)
     nexus_google_test(nexus_network_lwip_test
-        SOURCES network_lwip_test.cpp LIBRARIES Nexus::LwIPStorage)
+        SOURCES "${nexus_google_root}/components/network_lwip_test.cpp" LIBRARIES Nexus::LwIPStorage)
 endif()
 
 # Actual raw TCP peers own separate lwIP global states on the maintained host.
 if(TARGET Nexus::LwIP AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
     nexus_google_test(nexus_network_tcp_pair_test
-        SOURCES network_tcp_pair_test.cpp
+        SOURCES "${nexus_google_root}/components/network_tcp_pair_test.cpp"
         LIBRARIES Nexus::LwIPStorage)
     set_tests_properties(nexus_network_tcp_pair_test PROPERTIES TIMEOUT 30)
 endif()
 if(TARGET Nexus::LwIPTCPStorage AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
     nexus_google_test(nexus_network_tcp_stream_test
-        SOURCES network_tcp_stream_test.cpp
+        SOURCES "${nexus_google_root}/components/network_tcp_stream_test.cpp"
         LIBRARIES Nexus::LwIPTCPStorage)
     target_link_options(nexus_network_tcp_stream_test PRIVATE
         "LINKER:--wrap=tcp_output" "LINKER:--wrap=tcp_close")
@@ -485,11 +482,11 @@ endif()
 # A selected RX payload-loan profile is a separate static stack domain.
 if(TARGET Nexus::LwIPLoanedRXStorage AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
     nexus_google_test(nexus_network_lwip_loaned_test
-        SOURCES network_lwip_loaned_test.cpp LIBRARIES Nexus::LwIPLoanedRXStorage)
+        SOURCES "${nexus_google_root}/components/network_lwip_loaned_test.cpp" LIBRARIES Nexus::LwIPLoanedRXStorage)
 endif()
 if(TARGET Nexus::LwIPTCPLoanedRXStorage AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
     nexus_google_test(nexus_network_tcp_loaned_stream_test
-        SOURCES network_tcp_stream_test.cpp
+        SOURCES "${nexus_google_root}/components/network_tcp_stream_test.cpp"
         LIBRARIES Nexus::LwIPTCPLoanedRXStorage)
     target_link_options(nexus_network_tcp_loaned_stream_test PRIVATE
         "LINKER:--wrap=tcp_output" "LINKER:--wrap=tcp_close")
@@ -497,7 +494,7 @@ if(TARGET Nexus::LwIPTCPLoanedRXStorage AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
 endif()
 
 # The private entropy health tests use real reviewed LL over a register model.
-nexus_google_test(nexus_entropy_test STM32F4_LL SOURCES entropy_test.cpp
+nexus_google_test(nexus_entropy_test STM32F4_LL SOURCES "${nexus_google_root}/soc/entropy_test.cpp"
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/entropy/entropy.c"
     LIBRARIES Nexus::IO Nexus::Arch
     INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
@@ -508,12 +505,12 @@ nexus_use_cmsis_core(nexus_entropy_test)
 target_compile_definitions(nexus_entropy_test PRIVATE STM32F407xx
     NEXUS_STM32_MODEL)
 target_compile_options(nexus_entropy_test PRIVATE
-    "-include${CMAKE_CURRENT_SOURCE_DIR}/entropy_model.h")
+    "-include${nexus_google_root}/soc/entropy_model.h")
 
 foreach(entropy_profile RANGE 0 3)
     set(entropy_target "nexus_entropy_profile_${entropy_profile}_test")
     nexus_google_test(${entropy_target} STM32F4_LL
-        SOURCES entropy_profile_test.cpp
+        SOURCES "${nexus_google_root}/soc/entropy_profile_test.cpp"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/entropy/entropy.c"
         LIBRARIES Nexus::IO Nexus::Arch
         INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
@@ -524,14 +521,14 @@ foreach(entropy_profile RANGE 0 3)
     target_compile_definitions(${entropy_target} PRIVATE STM32F407xx
         NEXUS_STM32_MODEL NX_ENTROPY_PROFILE=${entropy_profile})
     target_compile_options(${entropy_target} PRIVATE
-        "-include${CMAKE_CURRENT_SOURCE_DIR}/entropy_profile_model.h")
+        "-include${nexus_google_root}/soc/entropy_profile_model.h")
 endforeach()
 
-include(tls_client.cmake)
+include("${nexus_google_root}/components/tls_client.cmake")
 
 nexus_add_coremqtt()
 nexus_google_test(nexus_mqtt_client_test
-    SOURCES mqtt_client_test.cpp LIBRARIES Nexus::CoreMQTTStorage)
+    SOURCES "${nexus_google_root}/components/mqtt_client_test.cpp" LIBRARIES Nexus::CoreMQTTStorage)
 
 # Compile the opt-in broker client without running Docker in ordinary hooks.
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
@@ -564,7 +561,7 @@ endif()
 
 # The reviewed full boot model uses the supplier's ordinary Linux test port.
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    include("${CMAKE_CURRENT_SOURCE_DIR}/mcuboot.cmake")
+    include("${nexus_google_root}/components/mcuboot.cmake")
 endif()
 
 # One external BSRR/ODR model, shared by every maintained STM32 SPI context.
@@ -576,13 +573,13 @@ foreach(spi_latch_target IN ITEMS
         nexus_stm32_spi_sequence_factory_test
         nexus_stm32_spi_transaction_test nexus_stm32_static_lifecycle_test
         nexus_stm32f4_spi_multi_controller_test)
-    target_sources(${spi_latch_target} PRIVATE stm32_spi_cs_model.c)
+    target_sources(${spi_latch_target} PRIVATE "${nexus_google_root}/soc/stm32_spi_cs_model.c")
     target_compile_options(${spi_latch_target} PRIVATE
-        "-include${CMAKE_CURRENT_SOURCE_DIR}/stm32_spi_cs_model.h")
+        "-include${nexus_google_root}/soc/stm32_spi_cs_model.h")
 endforeach()
 
-include(f407_capture_audio.cmake)
-include("${CMAKE_CURRENT_SOURCE_DIR}/stm32_spi_frames.cmake")
+include("${nexus_google_root}/soc/f407_capture_audio.cmake")
+include("${nexus_google_root}/soc/stm32_spi_frames.cmake")
 
-include(entropy_factory.cmake)
-include(f407_timer_waveform.cmake)
+include("${nexus_google_root}/soc/entropy_factory.cmake")
+include("${nexus_google_root}/soc/f407_timer_waveform.cmake")

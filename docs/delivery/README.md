@@ -27,6 +27,9 @@ source_language: zh_CN
 | [能力矩阵](capabilities.md) | 事实、路线、装配与实际生产定义关联 |
 | [源码定位](../explanation/source-map.md) | 各层权威入口与源码归属 |
 | [资格边界](../reference/platforms/qualification.md) | 模型、ARM、SDK、候选和物理验收分开 |
+| [目录与组件组织基线](https://github.com/X-Gen-Lab/nexus/tree/f5f15a33def6b989fe4651bfe497e12b414dded0) | PR #65／#66 合入后的固定源码：F4 包职责、组件五类组织与 SDK 组合边界；执行范围分别读取原 PR |
+| [F4 包目录整合](https://github.com/X-Gen-Lab/nexus/pull/65) | facts、System、领域／共享 IP 和私有 SDK 的源码归属 |
+| [组件分类与 SDK 边界](https://github.com/X-Gen-Lab/nexus/pull/66) | 31 个组件、handoff 归回 System、退役脚手架清理及精确 SDK 组合 |
 | [前序固定软件交付](https://github.com/X-Gen-Lab/nexus/pull/63) | PR #63 的固定源码、配置和实际执行回执；不转移为后续源码资格 |
 | [前序固定基线](https://github.com/X-Gen-Lab/nexus/pull/62) | PR #62 的便携 I/O 重构、实际源码身份、普通门禁、SDK 与资源结果 |
 | [前序变更](https://github.com/X-Gen-Lab/nexus/pull/61) | PR #61 保留自己的源码与执行范围 |
@@ -36,7 +39,7 @@ source_language: zh_CN
 [GitHub Releases](https://github.com/X-Gen-Lab/nexus/releases)和其固定 manifest 为准。
 重构不移动旧标签，不重新标记旧产物。
 
-当前接入重构以
+声明式接入阶段以
 [`ba13686`](https://github.com/X-Gen-Lab/nexus/tree/ba13686b91c94d19ef11acf910653ee2fcc9aa8b)
 为源码基线；新实现和新执行通过[当前任务](architecture.md#本轮架构迭代任务)分别审查，
 不能从设计页的存在推定全部完成。

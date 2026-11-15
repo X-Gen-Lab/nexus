@@ -19,7 +19,7 @@ class FactorySymbolsTests(unittest.TestCase):
             script = directory / "check.cmake"
             script.write_text(
                 'cmake_minimum_required(VERSION 3.31)\n'
-                f'include("{ROOT.as_posix()}/tests/google/factory_symbols.cmake")\n'
+                f'include("{ROOT.as_posix()}/tests/google/support/factory_symbols.cmake")\n'
                 f'nexus_google_factory_symbols(actual "{header.as_posix()}")\n'
                 f'if(NOT actual STREQUAL "{expected or ""}")\n'
                 'message(FATAL_ERROR "Incorrect recognized factory identity")\n'

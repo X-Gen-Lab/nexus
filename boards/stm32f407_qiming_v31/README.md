@@ -21,3 +21,11 @@
 SPI／I2C／RS485、外部 Flash 实装、PWM、ADC 和 EXTI 外部接线没有由本包选择。
 不承诺工业执行器输出或产品存储安全。实板、启动、UART 波形、复位电平及负载行为
 均未执行测试；软件链接和模型证据只建立对应软件范围。
+
+## 软件装配
+
+裸机／FreeRTOS 与空／GPIO／UART 参考见[中央参考目录](../../tools/configure/assemblies/README.md)。
+装配、晶振和 backend 都显式选择；参考不默认启动应用或建立物理资格。
+
+`board.json` 另保留 CAN1 PA11/PA12、CAN2 PB12/PB13 软件 pad 路线。
+收发器实装、终端和跳线尚未确认，不能据此声明物理 CAN 支持。

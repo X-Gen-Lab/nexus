@@ -3,7 +3,7 @@
 本目录将直接 I/O 组合成多 task producer、单 executor 的有界队列。`Nexus::BusOwner`
 提供通用 metadata 机制，`Nexus::SpiOwner`、`Nexus::SPIAsyncOwner`、
 `Nexus::SPIDMATransactionOwner` 与 `Nexus::UARTOwner` 连接具体传输。target 在
-[组件 CMake](../../CMakeLists.txt)中定义，没有默认任务、最大池或全局设备查找。
+[本目录 CMake](CMakeLists.txt)中定义，没有默认任务、最大池或全局设备查找。
 
 ## 架构与资源
 

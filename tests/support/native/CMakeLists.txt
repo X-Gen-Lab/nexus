@@ -10,11 +10,13 @@ add_library(nexus_io_native STATIC
 target_link_libraries(nexus_io_native PUBLIC nexus_io nexus_arch
     PRIVATE nexus_build_options nexus_owned_warnings)
 target_include_directories(nexus_io_native PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/include"
     "${NEXUS_SOURCE_DIR}/io/private")
 set(native_ip "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip")
 set(native_ip_includes "${native_ip}/classic_can"
-    "${native_ip}/legacy_mac" "${native_ip}/fs_device_pio")
-set(NEXUS_SYSTEM_PRIVATE_INCLUDES ${native_ip_includes} PARENT_SCOPE)
+    "${native_ip}/legacy_mac" "${native_ip}/dwc_otg_device")
+set(NEXUS_SYSTEM_PRIVATE_INCLUDES ${native_ip_includes}
+    "${CMAKE_CURRENT_SOURCE_DIR}/include" PARENT_SCOPE)
 target_include_directories(nexus_io_native PRIVATE ${native_ip_includes})
 add_library(nexus_can_native_engine OBJECT
     "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/classic_can/can_controller.c")
@@ -53,7 +55,7 @@ target_compile_definitions(nexus_eth_frames_native_engine PRIVATE
 target_sources(nexus_io_native PRIVATE
     $<TARGET_OBJECTS:nexus_eth_frames_native_engine>)
 add_library(nexus_usb_native_engine OBJECT
-    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/fs_device_pio/usb_device_controller.c")
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/dwc_otg_device/usb_device_controller.c")
 target_include_directories(nexus_usb_native_engine PRIVATE
     "${NEXUS_SOURCE_DIR}/io/private"
     "${CMAKE_CURRENT_SOURCE_DIR}/drivers")
@@ -67,4 +69,9 @@ target_compile_options(nexus_usb_native_engine PRIVATE
 target_compile_definitions(nexus_usb_native_engine PRIVATE
     NEXUS_STM32F4_USB_REMOTE_WAKEUP=1)
 target_sources(nexus_io_native PRIVATE $<TARGET_OBJECTS:nexus_usb_native_engine>)
-add_library(Nexus::NativeModel ALIAS nexus_io_native)
+# Model controls are an explicit host-test dependency, never Platform usage.
+add_library(nexus_native_model INTERFACE)
+target_link_libraries(nexus_native_model INTERFACE nexus_io_native)
+target_include_directories(nexus_native_model INTERFACE
+    "${CMAKE_CURRENT_SOURCE_DIR}/include")
+add_library(Nexus::NativeModel ALIAS nexus_native_model)

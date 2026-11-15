@@ -55,7 +55,7 @@ class ChangePathsTests(unittest.TestCase):
             "runtime/contracts/pyproject.toml", "runtime/contracts/poetry.lock",
             "runtime/contracts/uv.lock", ".clang-tidy", ".clang-format",
             ".clang-format-dirs", ".editorconfig", ".pre-commit-config.yaml",
-            "docs/sphinx/development/coding_standards.rst",
+            "docs/development/coding_standards.rst",
             "CONTRIBUTING.md", "CONTRIBUTING_CN.md",
         )
         for path in paths:
@@ -66,7 +66,7 @@ class ChangePathsTests(unittest.TestCase):
         from scripts.ci import style_gate
         from tools.dev import change_paths
 
-        standard = "docs/sphinx/development/coding_standards.rst"
+        standard = "docs/development/coding_standards.rst"
         self.assertIn(standard, change_paths.BEHAVIOR_DOCUMENTS)
         self.assertIn(standard, style_gate.CONTROL_FILES)
         for paths in (change_paths.BEHAVIOR_DOCUMENTS,

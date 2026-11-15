@@ -95,6 +95,17 @@ def workspace_identity():
     return None
 
 
+def require_checkout(action):
+    """Reject repository-only commands before loading unavailable SDK modules."""
+    manifest = ROOT / ".nexus-source-sdk.json"
+    if manifest.exists() or manifest.is_symlink():
+        workspace_identity()
+    elif (ROOT / ".git").exists():
+        return
+    raise ValueError(action + " requires a development checkout with "
+                     "repository tests and governance materials")
+
+
 def capture_provenance(action, preset, environment, native, receipt, command,
                        *, build=None):
     """Bind successful native commands to observed bytes, never qualification."""
@@ -128,6 +139,8 @@ def doctor(environment, native):
                                  "docs", "workflows"),
                         default="tools")
     args, remaining = parser.parse_known_args(native)
+    if args.target in ("workflows", "docs"):
+        require_checkout("doctor --target " + args.target)
     if args.target == "workflows":
         return execute([sys.executable, "scripts/ci/lint_workflows.py",
                         "--doctor"] + remaining, environment)
@@ -306,6 +319,8 @@ def main(argv=None):
     parser.add_argument("--preset")
     args, native = parser.parse_known_args(argv)
     try:
+        if args.action in ("matrix", "docs", "check"):
+            require_checkout(args.action)
         if args.action == "matrix":
             if args.preset is not None:
                 raise ValueError("matrix selects --presets, not --preset")
@@ -356,9 +371,6 @@ def main(argv=None):
         if args.action == "check":
             if native:
                 raise ValueError("check accepts no native CMake arguments")
-            if workspace_identity() is not None:
-                raise ValueError("check requires a development checkout with "
-                                 "repository tests and governance materials")
         presets = Presets(ROOT, environment)
         build = command_build(args, native, presets)
         selected_test = (presets.selected("test", args.preset)

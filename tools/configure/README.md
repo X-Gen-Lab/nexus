@@ -125,3 +125,16 @@ Board／SoC 不含 Python 插件。完整配置生成由集中 Python 工具承�
 
 修改行为先执行真实 RED，再验证 GREEN；C 合同使用 GoogleTest／GoogleMock。
 生成文本检查、完整 ARM 链接、SDK 消费和物理 HIL 各自证明不同范围，当前 HIL 未执行。
+
+## 测试位置
+
+生产配置模块留在本目录及 `domains/`、`policies/`、`providers/`；配置行为回归与
+共享 fixture 统一放在 `tests/`，通过完整 configure 工具域执行：
+
+```sh
+python tools/testing/run_tool_tests.py --suite configure \
+  --report build/quality/configure-tests.json
+```
+
+该工具域执行全部配置回归，不能用发现数量或上一次成功报告代替实际执行。
+测试模块不进入普通 Source SDK 的生产配置工具闭包。

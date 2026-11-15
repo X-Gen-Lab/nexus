@@ -22,8 +22,8 @@ class PackageBuildBridgeTests(unittest.TestCase):
                 "out.mkdir(parents=True, exist_ok=True)\n"
                 f"(out / 'selection.cmake').write_text({selection!r})\n"
                 f"(out / 'configuration_code_paths.json').write_text({json.dumps({'resolver': str(resolver)})!r})\n"
-                "(out / 'input_paths.json').write_text('{}')\n")
-            (source / "assembly.toml").write_text("schema_version = 2\n")
+                f"(out / 'input_paths.json').write_text({json.dumps({'assembly': str(source / 'assembly.toml')})!r})\n")
+            (source / "assembly.toml").write_text("schema = 2\n")
             (source / "CMakeLists.txt").write_text(
                 "cmake_minimum_required(VERSION 3.31)\n"
                 "project(package_bridge NONE)\n"

@@ -1,6 +1,6 @@
-# Actual-POT messages; independent semantic review completed for this source.
+# Actual-POT messages; reviewed against this canonical source.
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: d005ce82126bb5dcd9b67a84e811722ba0717ef84a5adc086528545e8a9de98e\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 0194677cb6a478cd0692bd7ae6642ee5f2c8de621a1c63ed153043c0f4f57f30\n"
 
 msgid "当前平台交付边界"
 msgstr "Current platform delivery boundaries"
@@ -56,6 +56,24 @@ msgstr "[Qualification boundaries](../reference/platforms/qualification.md)"
 msgid "模型、ARM、SDK、候选和物理验收分开"
 msgstr "Separate model, ARM, SDK, candidate and physical acceptance"
 
+msgid "[目录与组件组织基线](https://github.com/X-Gen-Lab/nexus/tree/f5f15a33def6b989fe4651bfe497e12b414dded0)"
+msgstr "[Directory and component baseline](https://github.com/X-Gen-Lab/nexus/tree/f5f15a33def6b989fe4651bfe497e12b414dded0)"
+
+msgid "PR #65／#66 合入后的固定源码：F4 包职责、组件五类组织与 SDK 组合边界；执行范围分别读取原 PR"
+msgstr "Fixed source after PR #65/#66: F4 package responsibilities, five component categories and SDK composition boundaries; read each original PR for its execution scope"
+
+msgid "[F4 包目录整合](https://github.com/X-Gen-Lab/nexus/pull/65)"
+msgstr "[F4 package organization](https://github.com/X-Gen-Lab/nexus/pull/65)"
+
+msgid "facts、System、领域／共享 IP 和私有 SDK 的源码归属"
+msgstr "Source ownership of facts, System, domain/shared IP and private SDK"
+
+msgid "[组件分类与 SDK 边界](https://github.com/X-Gen-Lab/nexus/pull/66)"
+msgstr "[Component categories and SDK boundaries](https://github.com/X-Gen-Lab/nexus/pull/66)"
+
+msgid "31 个组件、handoff 归回 System、退役脚手架清理及精确 SDK 组合"
+msgstr "31 components, handoff returned to System, obsolete scaffolding removed and exact SDK composition"
+
 msgid "[前序固定软件交付](https://github.com/X-Gen-Lab/nexus/pull/63)"
 msgstr "[Preceding fixed software delivery](https://github.com/X-Gen-Lab/nexus/pull/63)"
 
@@ -83,8 +101,8 @@ msgstr "Read execution records against their original source and configuration"
 msgid "当前源码版本号保持 0.2.1；已发布版本仍以 [GitHub Releases](https://github.com/X-Gen-Lab/nexus/releases)和其固定 manifest 为准。 重构不移动旧标签，不重新标记旧产物。"
 msgstr "The current source version remains 0.2.1. Published versions are defined by [GitHub Releases](https://github.com/X-Gen-Lab/nexus/releases) and their fixed manifests. The refactor does not move existing tags or relabel old artifacts."
 
-msgid "当前接入重构以 [`ba13686`](https://github.com/X-Gen-Lab/nexus/tree/ba13686b91c94d19ef11acf910653ee2fcc9aa8b) 为源码基线；新实现和新执行通过[当前任务](architecture.md#本轮架构迭代任务)分别审查， 不能从设计页的存在推定全部完成。"
-msgstr "The current integration refactor starts from [`ba13686`](https://github.com/X-Gen-Lab/nexus/tree/ba13686b91c94d19ef11acf910653ee2fcc9aa8b). [Current tasks](architecture.md#本轮架构迭代任务) review new implementation and execution separately; the existence of a design page does not establish completion."
+msgid "声明式接入阶段以 [`ba13686`](https://github.com/X-Gen-Lab/nexus/tree/ba13686b91c94d19ef11acf910653ee2fcc9aa8b) 为源码基线；新实现和新执行通过[当前任务](architecture.md#本轮架构迭代任务)分别审查， 不能从设计页的存在推定全部完成。"
+msgstr "The declarative integration phase used [`ba13686`](https://github.com/X-Gen-Lab/nexus/tree/ba13686b91c94d19ef11acf910653ee2fcc9aa8b) as its source baseline. Review new implementation and execution separately through the [current tasks](architecture.md#本轮架构迭代任务); the existence of a design page does not imply completion."
 
 msgid "以下是前序 PR #62 的冻结记录，不是当前重构的执行结果。前序便携 I/O 的平台实现为 [`6b59f666`](https://github.com/X-Gen-Lab/nexus/tree/6b59f66628f0dbb415f6203ba917c1fe717bf3fd)， 其 Debug、Release、ASAN+UBSAN 和 TSAN 各执行完整 329 个 CTest 项、5982 个 GoogleTest 用例并通过。最终 [`4bf4b5a2`](https://github.com/X-Gen-Lab/nexus/tree/4bf4b5a258b3120c24f6d834545ac3f300ce801b) 仅继续迁移 TMP117 SDK 调用者；编译输入审计确认该文件不属于上述四种 Native 程序的输入，没有把前次运行写成该提交重新执行。"
 msgstr "The following is the frozen record of preceding PR #62, not execution of the current refactor. Its portable I/O platform implementation is [`6b59f666`](https://github.com/X-Gen-Lab/nexus/tree/6b59f66628f0dbb415f6203ba917c1fe717bf3fd). Debug, Release, ASAN+UBSAN and TSAN each executed and passed the complete 329 CTest items and 5982 GoogleTest cases. Final [`4bf4b5a2`](https://github.com/X-Gen-Lab/nexus/tree/4bf4b5a258b3120c24f6d834545ac3f300ce801b) only migrates the TMP117 SDK caller. The compile-input audit confirms that file is not an input of those four Native programs; the earlier execution is not described as a rerun on that commit."

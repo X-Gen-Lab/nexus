@@ -1,10 +1,45 @@
+# Register exact resolver file catalogs for production and model builds.
+function(_nexus_watch_configuration_inputs bundle)
+    foreach(catalog IN LISTS ARGN)
+        file(READ "${bundle}/${catalog}.json" inputs)
+        string(JSON kind TYPE "${inputs}")
+        if(NOT kind STREQUAL "OBJECT")
+            message(FATAL_ERROR
+                "Configuration input catalog must be an object: ${catalog}")
+        endif()
+        string(JSON count LENGTH "${inputs}")
+        if(count EQUAL 0)
+            message(FATAL_ERROR
+                "Configuration input catalog must be nonempty: ${catalog}")
+        endif()
+        math(EXPR last "${count} - 1")
+        foreach(index RANGE 0 ${last})
+            string(JSON label MEMBER "${inputs}" ${index})
+            string(JSON kind TYPE "${inputs}" "${label}")
+            if(NOT kind STREQUAL "STRING")
+                message(FATAL_ERROR
+                    "Configuration input path must be a string: ${label}")
+            endif()
+            string(JSON path GET "${inputs}" "${label}")
+            if(NOT IS_ABSOLUTE "${path}" OR NOT EXISTS "${path}" OR
+                    IS_DIRECTORY "${path}")
+                message(FATAL_ERROR
+                    "Configuration input must be an existing absolute file: "
+                    "${path}")
+            endif()
+            set_property(DIRECTORY APPEND PROPERTY
+                CMAKE_CONFIGURE_DEPENDS "${path}")
+        endforeach()
+    endforeach()
+endfunction()
+
 # A failing configuration removes the previous owned generated bundle.
 function(nexus_resolve_assembly)
     get_cmake_property(assembly_cache_variables CACHE_VARIABLES)
     foreach(override IN LISTS assembly_cache_variables)
         if(override MATCHES "^NEXUS_(CPU|ARCH|IRQ|OS)_")
-            message(FATAL_ERROR
-                "${override} is not a platform override; use NEXUS_ASSEMBLY_FILE")
+            message(FATAL_ERROR "${override} is not a platform override; "
+                "use NEXUS_ASSEMBLY_FILE")
         endif()
     endforeach()
     get_filename_component(assembly "${NEXUS_ASSEMBLY_FILE}" ABSOLUTE
@@ -24,17 +59,10 @@ function(nexus_resolve_assembly)
     endif()
     include("${bundle}/selection.cmake")
     # Register the resolver's exact configuration-code contract. This tracks
-    # Python generation inputs only; CMake still owns production source targets.
-    file(READ "${bundle}/configuration_code_paths.json" configuration_code)
-    string(JSON code_count LENGTH "${configuration_code}")
-    math(EXPR code_last "${code_count} - 1")
-    foreach(index RANGE 0 ${code_last})
-        string(JSON name MEMBER "${configuration_code}" ${index})
-        string(JSON path GET "${configuration_code}" "${name}")
-        set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${path}")
-    endforeach()
-    # The resolver owns this list. Package-private selections cross the bridge
-    # without adding MCU or peripheral names to this common build function.
+    # These are generation inputs; CMake owns production source targets.
+    _nexus_watch_configuration_inputs("${bundle}" configuration_code_paths)
+    # The resolver owns this list. Package-private selections do not add
+    # MCU or peripheral names to this common build function.
     if(NOT NEXUS_SELECTION_VARIABLES)
         message(FATAL_ERROR "Missing resolver selection contract")
     endif()
@@ -43,28 +71,22 @@ function(nexus_resolve_assembly)
     list(REMOVE_DUPLICATES selection_variables)
     list(LENGTH selection_variables unique_count)
     if(NOT selected_count EQUAL unique_count)
-        message(FATAL_ERROR "Duplicate variable in resolver selection contract")
+        message(FATAL_ERROR
+            "Duplicate variable in resolver selection contract")
     endif()
     foreach(value IN LISTS selection_variables)
-        if(NOT value MATCHES "^NEXUS_[A-Za-z0-9_]+$" OR NOT DEFINED "${value}")
-            message(FATAL_ERROR "Invalid resolver selection contract: ${value}")
+        if(NOT value MATCHES "^NEXUS_[A-Za-z0-9_]+$" OR
+                NOT DEFINED "${value}")
+            message(FATAL_ERROR
+                "Invalid resolver selection contract: ${value}")
         endif()
         set(${value} "${${value}}" PARENT_SCOPE)
     endforeach()
     set(NEXUS_SELECTION_VARIABLES "${selection_variables}" PARENT_SCOPE)
     set(NEXUS_CONFIG_DIR "${bundle}" PARENT_SCOPE)
-    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${assembly}")
+    set_property(DIRECTORY APPEND PROPERTY
+        CMAKE_CONFIGURE_DEPENDS "${assembly}")
     # Every authored and fact input comes from the same resolver snapshot.
     # CMake consumes identities; it never parses or normalizes authored TOML.
-    file(READ "${bundle}/input_paths.json" input_paths)
-    string(JSON count LENGTH "${input_paths}")
-    if(count GREATER 0)
-        math(EXPR last "${count} - 1")
-        foreach(index RANGE 0 ${last})
-            string(JSON name MEMBER "${input_paths}" ${index})
-            string(JSON input GET "${input_paths}" "${name}")
-            set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
-                "${input}")
-        endforeach()
-    endif()
+    _nexus_watch_configuration_inputs("${bundle}" input_paths)
 endfunction()

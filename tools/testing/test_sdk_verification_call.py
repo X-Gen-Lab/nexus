@@ -25,6 +25,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
 from tools.dev import process as maintained_process
+from tools.evidence.common import file_identity
 
 ACTUAL_PROCESS_RUN = maintained_process.run
 
@@ -233,6 +234,25 @@ class SDKPublicCompileInputTests(unittest.TestCase):
                      self.sdk / "components/runtime/unowned/include/nexus"):
             with self.subTest(path=path):
                 self.assertTrue(self.private_input(["-I", path]))
+
+    def test_native_model_include_requires_exact_explicit_composition(self):
+        model = self.sdk / 'tests/support/native/include'
+        model.mkdir(parents=True)
+        self.assertTrue(self.private_input(['-I', model]))
+        self.assertFalse(self.private_input(
+            ['-I', model], composition_includes=(model,)))
+        alias = model.with_name('model-alias')
+        alias.symlink_to(model, target_is_directory=True)
+        for path in (model / '../include', alias, model / 'nexus',
+                     model / '../drivers', ROOT / 'tests/support/native/include'):
+            with self.subTest(path=path):
+                self.assertTrue(self.private_input(
+                    ['-I', path], composition_includes=(model, path)))
+        for option in ('-include', '-imacros', '-include-pch'):
+            with self.subTest(option=option):
+                self.assertTrue(self.private_input(
+                    [option, model / 'nexus/io/native/model.h'],
+                    composition_includes=(model,)))
 
     def test_storage_composition_directory_is_exact_for_each_source_root(self):
         sdk_port = self.sdk / "components/protocols/network/port"
@@ -591,6 +611,14 @@ class SDKConsumerParallelTests(unittest.TestCase):
             ROOT / "cmake/package/verify_consumers.py")
         self.consumer = importlib.util.module_from_spec(specification)
         specification.loader.exec_module(self.consumer)
+        controls = Path('tests/support/native/include')
+        shutil.copytree(ROOT / controls, self.sdk / controls)
+        identity_path = self.sdk / '.nexus-source-sdk.json'
+        identity = json.loads(identity_path.read_text())
+        identity.update(profile={'host_support': True}, files_sha256={
+            path.relative_to(self.sdk).as_posix(): file_identity(path)['sha256']
+            for path in self.sdk.rglob('*') if path.is_file() and path != identity_path})
+        identity_path.write_text(json.dumps(identity))
         self.commands = []
         self.failed_build = False
         self.failed_sdk = False
@@ -732,6 +760,12 @@ class SDKConsumerParallelTests(unittest.TestCase):
                              "directory": str(build),
                              "arguments": ["cc", "-c", str(config / "bindings.c")],
                              "command": "cc -c " + shlex.quote(str(config / "bindings.c"))})
+                if self.selected_fault == 'native_model_include':
+                    for row in rows:
+                        if Path(row['file']).parent == source:
+                            row['arguments'].insert(1, '-I' + str(
+                                self.sdk / 'tests/support/native/include'))
+                            row['command'] = shlex.join(row['arguments'])
                 if self.selected_fault == "native_private_include":
                     rows[0]["arguments"].insert(1, "-I" + str(self.sdk / "tests/support/native/drivers"))
                     rows[0]["command"] = shlex.join(rows[0]["arguments"])
@@ -1275,6 +1309,22 @@ class SDKConsumerParallelTests(unittest.TestCase):
         self.assertEqual(status, 0, report)
         self.assertEqual(report["status"], "passed")
         self.assert_complete_matrix()
+
+    def test_canonical_native_model_composition_preserves_full_sdk_plan(self):
+        self.selected_fault = 'native_model_include'
+        status, report = self.execute(('--parallel', '1'))
+        self.assertEqual(status, 0, report)
+        self.assert_complete_matrix()
+
+    def test_only_selected_native_time_targets_link_model_controls(self):
+        self.output.mkdir()
+        for item in self.consumer.SELECTED_CONSUMERS:
+            source, _, _ = self.consumer.prepare_selected_consumer(
+                self.prefix, self.output, *item, self.external_process,
+                expected_revision='a' * 40)
+            self.assertEqual('Nexus::NativeModel' in
+                             (source / 'CMakeLists.txt').read_text(),
+                             item[2] in {'native-time-pair', 'native-time-empty'})
 
     def test_native_runtime_nm_private_state_and_missing_owner_fail_closed(self):
         for fault in ("native_runtime", "native_nm", "native_private_include",

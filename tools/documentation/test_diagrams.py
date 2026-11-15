@@ -1,6 +1,7 @@
 """Contract tests for safe, deterministic diagram generation and verification."""
 
 import csv
+import json
 import os
 from pathlib import Path
 import sys
@@ -33,6 +34,11 @@ class DiagramContractTests(unittest.TestCase):
         self.environment["dot"] = str(self.tool)
         self.write_tool(SVG)
         self.registry()
+        labels = {label: label for label in diagrams.LABEL.findall(
+            self.source.read_text(encoding="utf-8"))}
+        (self.folder / "labels.json").write_text(json.dumps({
+            "schema_version": 1, "en": labels, "zh_CN": labels}),
+            encoding="utf-8")
 
     def write_tool(self, output, status=0):
         self.tool.write_text('#!' + sys.executable + '\nimport sys\n'
@@ -51,6 +57,13 @@ class DiagramContractTests(unittest.TestCase):
 
     def render(self):
         return diagrams.render(self.source, self.environment)
+
+    def test_registered_source_requires_label_policy_without_generated_outputs(self):
+        self.source.with_suffix(".svg").write_bytes(self.render())
+        (self.folder / "labels.json").unlink()
+        report = diagrams.check(self.root)
+        self.assertTrue(any("label policy" in error for error in report["errors"]))
+        self.assertFalse((self.folder / "localized").exists())
 
     def test_render_adds_accessible_identity_and_all_labels(self):
         tree = ET.fromstring(self.render())

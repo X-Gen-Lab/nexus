@@ -16,7 +16,6 @@ from pathlib import Path
 import re
 import shlex
 import shutil
-import signal
 import subprocess
 import sys
 import tomllib
@@ -31,7 +30,7 @@ from tools.configure.configure import resolve_ir
 from tools.configure.packages import find as find_package
 from tools.dev import process as execution
 from tools.evidence.common import (EvidenceError, atomic_json, load_json,
-                                   regular_file)
+                                   regular_file, kill_process_group)
 from tools.evidence import identity as source_identity
 from tools.evidence.identity import (resolved_identity,
                                      resolved_input_files)
@@ -161,20 +160,21 @@ class Recorder:
                 try:
                     record["returncode"] = process.wait(timeout=self.timeout)
                 except subprocess.TimeoutExpired:
-                    if os.name == "posix":
-                        os.killpg(process.pid, signal.SIGKILL)
-                    else:
-                        process.kill()
-                    record["returncode"] = process.wait()
                     error = "command timed out"
+                    kill_process_group(process)
+                    record["returncode"] = process.returncode
                 if os.name == "posix":
                     try:
                         os.killpg(process.pid, 0)
                     except ProcessLookupError:
                         pass
                     else:
-                        os.killpg(process.pid, signal.SIGKILL)
                         error = error or "command left background artifact writers"
+                        kill_process_group(process)
+            except subprocess.TimeoutExpired:
+                error = ((error + "; ") if error else "") + (
+                    "command withdrawal did not complete")
+                record["withdrawal_complete"] = False
             except OSError as exception:
                 error = "command execution failed: " + str(exception)
         record["ended_at"] = datetime.now(timezone.utc).isoformat()

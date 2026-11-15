@@ -7,17 +7,16 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(NEXUS_ASSEMBLY_FILE "${CMAKE_CURRENT_SOURCE_DIR}/assembly.toml")
 set(NEXUS_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(NEXUS_BUILD_WORKLOAD OFF CACHE BOOL "" FORCE)
-if(DEFINED NEXUS_REFERENCE_PLATFORM_SOURCE)
-    # Repository integration tests explicitly select a checkout; no fallback.
-    add_subdirectory("${NEXUS_REFERENCE_PLATFORM_SOURCE}" nexus-platform)
-else()
-    find_package(Nexus 0.2.1 EXACT CONFIG REQUIRED)
+if(NOT DEFINED NEXUS_REFERENCE_PLATFORM_SOURCE)
+    message(FATAL_ERROR "Explicit Nexus source checkout is required")
 endif()
+add_subdirectory("${NEXUS_REFERENCE_PLATFORM_SOURCE}" nexus-platform)
+get_target_property(reference_sdk Nexus::Config NEXUS_SOURCE_DIR)
 nexus_add_firmware(external_lifecycle_consumer SOURCES consumer.c)
 target_include_directories(external_lifecycle_consumer PRIVATE
-    "${CMAKE_CURRENT_SOURCE_DIR}/provider/include")
+    "${CMAKE_CURRENT_SOURCE_DIR}/provider/include"
+    "${reference_sdk}/tests/support/native/include")
 nexus_target_warnings(external_lifecycle_consumer STRICT)
-get_target_property(reference_sdk Nexus::Config NEXUS_SOURCE_DIR)
 get_target_property(reference_config Nexus::Platform NEXUS_CONFIG_DIR)
 file(WRITE "${CMAKE_BINARY_DIR}/resolved-sdk.txt" "${reference_sdk}")
 file(WRITE "${CMAKE_BINARY_DIR}/resolved-config.txt" "${reference_config}")
@@ -32,7 +31,8 @@ if(EXTERNAL_LIFECYCLE_HOST_TESTS)
     add_subdirectory("${NEXUS_REFERENCE_GOOGLETEST_SOURCE}" host-googletest)
     add_executable(external_lifecycle_contract_test lifecycle_test.cpp)
     target_include_directories(external_lifecycle_contract_test PRIVATE
-        "${CMAKE_CURRENT_SOURCE_DIR}/provider/include")
+        "${CMAKE_CURRENT_SOURCE_DIR}/provider/include"
+        "${reference_sdk}/tests/support/native/include")
     target_compile_features(external_lifecycle_contract_test PRIVATE cxx_std_17)
     target_link_libraries(external_lifecycle_contract_test PRIVATE
         Nexus::Platform GTest::gtest_main)

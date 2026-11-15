@@ -10,7 +10,7 @@ import sys
 BEHAVIOR_DOCUMENTS = {
     "AGENTS.md",
     "CONTRIBUTING.md", "CONTRIBUTING_CN.md",
-    "docs/sphinx/development/coding_standards.rst",
+    "docs/development/coding_standards.rst",
 }
 
 

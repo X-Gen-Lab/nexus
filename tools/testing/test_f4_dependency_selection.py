@@ -40,6 +40,12 @@ class SelectedDependencyTests(unittest.TestCase):
 
 
 class PresetDependencySelectionTests(unittest.TestCase):
+    def test_retired_candidate_dependency_scope_is_rejected(self):
+        from tools.dev.dependencies import required_submodules
+        from tools.evidence.common import EvidenceError
+        with self.assertRaisesRegex(EvidenceError, "unsupported dependency scope"):
+            required_submodules("candidate", "stm32f4")
+
     def test_native_test_dependencies_do_not_prepare_retired_sdk_inventory(self):
         from tools.dev.dependencies import required_submodules
         selected = required_submodules("native", "native", "native")

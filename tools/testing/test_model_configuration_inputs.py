@@ -61,6 +61,24 @@ class ModelConfigurationInputsTests(unittest.TestCase):
                     self.assertIn("no work to do", self.execute(root, *command))
                     self.assertEqual(stable, marker.stat().st_mtime_ns)
 
+    def test_production_watch_rejects_malformed_catalog_before_registration(self):
+        for invalid in ('[]', '{}', '{"input": false}',
+                        '{"input": "relative.py"}'):
+            with self.subTest(invalid=invalid):
+                with tempfile.TemporaryDirectory(prefix="nexus-input-admission-") as name:
+                    root = Path(name)
+                    (root / "input_paths.json").write_text(invalid)
+                    helper = ROOT / "cmake/platform/Configure.cmake"
+                    (root / "CMakeLists.txt").write_text(
+                        'cmake_minimum_required(VERSION 3.31)\n'
+                        'project(ProductionInputs LANGUAGES NONE)\n'
+                        'include("' + helper.as_posix() + '")\n'
+                        '_nexus_watch_configuration_inputs('
+                        '"${CMAKE_CURRENT_SOURCE_DIR}" input_paths)\n')
+                    self.execute(root, "cmake", "-S", str(root), "-B",
+                                 str(root / "build"), "-G", "Ninja",
+                                 success=False)
+
     def test_missing_or_invalid_catalog_cannot_silently_drop_dependencies(self):
         for invalid in (None, "{", "[]", "{}", '{"input": false}'):
             with self.subTest(invalid=invalid):

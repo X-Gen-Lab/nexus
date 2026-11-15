@@ -18,3 +18,8 @@ PA9/PA10 AF7，MCU 侧为 3.3 V 逻辑。青春版调试排针未实装，HIL �
 
 实际时钟、选装器件、复位电平、UART／IRQ 和负载运行尚未执行；软件证据只覆盖
 编译／模型，不能建立物理资格。
+
+## 软件装配
+
+裸机／FreeRTOS 与空／GPIO／UART 参考见[中央参考目录](../../tools/configure/assemblies/README.md)。
+装配、晶振和 backend 都显式选择；参考不默认启动应用或建立物理资格。

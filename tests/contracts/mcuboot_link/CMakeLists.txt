@@ -4,7 +4,14 @@
 cmake_minimum_required(VERSION 3.31)
 project(NexusMCUbootReference C ASM)
 if(NOT DEFINED NEXUS_PLATFORM_ROOT)
-    message(FATAL_ERROR "Explicit Nexus and pinned MCUboot sources are required")
+    message(FATAL_ERROR
+        "Explicit Nexus and pinned MCUboot sources are required")
+endif()
+# Source tests and installed SDK consumers use these same authored inputs.
+set(reference
+    "${NEXUS_PLATFORM_ROOT}/cmake/package/verification/mcuboot_boot")
+if(NOT DEFINED NEXUS_ASSEMBLY_FILE)
+    set(NEXUS_ASSEMBLY_FILE "${reference}/assembly.toml")
 endif()
 set(NEXUS_BUILD_TESTS OFF CACHE BOOL "")
 set(NEXUS_BUILD_WORKLOAD OFF CACHE BOOL "")
@@ -17,10 +24,11 @@ endif()
 set(port "${NEXUS_MCUBOOT_COMPONENT_ROOT}")
 include("${port}/CMakeLists.txt")
 nexus_add_mcuboot_boot()
-get_target_property(MCUBOOT_SOURCE_ROOT Nexus::MCUBootControl NEXUS_MCUBOOT_SOURCE)
+get_target_property(MCUBOOT_SOURCE_ROOT Nexus::MCUBootControl
+    NEXUS_MCUBOOT_SOURCE)
 
 # Both linker ownership and C region data come from this one layout document.
-file(READ "${CMAKE_CURRENT_SOURCE_DIR}/layout.json" layout)
+file(READ "${reference}/layout.json" layout)
 string(JSON count LENGTH "${layout}" regions)
 math(EXPR last "${count} - 1")
 set(regions "/* Static product reference facts from layout.json. */\n")
@@ -30,15 +38,17 @@ foreach(index RANGE 0 ${last})
         string(JSON origin GET "${layout}" regions ${index} origin)
         string(JSON size GET "${layout}" regions ${index} size)
         string(TOUPPER "${id}" role)
-        string(APPEND regions "#define REFERENCE_${role}_ORIGIN ${origin}U\n")
+        string(APPEND regions
+            "#define REFERENCE_${role}_ORIGIN ${origin}U\n")
         string(APPEND regions "#define REFERENCE_${role}_SIZE ${size}U\n")
     endif()
 endforeach()
 file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/reference_regions.h" "${regions}")
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
-    "${CMAKE_CURRENT_SOURCE_DIR}/layout.json")
+    "${reference}/layout.json")
 
-nexus_add_firmware(mcuboot_reference SOURCES main.c public_key.c
+nexus_add_firmware(mcuboot_reference SOURCES main.c
+    "${reference}/public_key.c"
     LIBRARIES Nexus::MCUBootBootStorage)
 nexus_target_warnings(mcuboot_reference STRICT)
 target_include_directories(mcuboot_reference PRIVATE

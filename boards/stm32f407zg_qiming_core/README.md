@@ -122,3 +122,20 @@ MPU placement 和 startup LTO；可选 CCM 只沿既有路径初始化一次。
 
 HIL 为 `not_executed`；配置通过或 ARM 链接不证明波形、吞吐、功耗、复位、保留或
 器件实装行为。
+
+## 装配目录
+
+每份 TOML 显式选择本板、模式、资源和硬件条件；下表不是物理验收结果。
+
+| 配置 | 用途与前提 |
+| --- | --- |
+| [can-loopback.toml](assemblies/can-loopback.toml) | CAN1 内部回环；不证明外部收发器 |
+| [display-touch-sram.toml](assemblies/display-touch-sram.toml) | 显示／触摸＋显式实装 SRAM |
+| [display-touch.toml](assemblies/display-touch.toml) | ILI9341＋XPT2046；无外部 SRAM |
+| [eeprom.toml](assemblies/eeprom.toml) | AT24C02 与已审 I2C 连接 |
+| [minimal.toml](assemblies/minimal.toml) | LED／按键／USART1 最小装配 |
+| [rtc-adopt.toml](assemblies/rtc-adopt.toml) | 接管外部已准备的 retained RTC |
+| [sram-startup.toml](assemblies/sram-startup.toml) | 预 C 外部 SRAM 放置；永久 bank 责任 |
+| [sram-window.toml](assemblies/sram-window.toml) | 运行期 SRAM CPU window |
+| [touch-nor.toml](assemblies/touch-nor.toml) | 触摸＋显式 NOR 实装与 SWD 选择 |
+| [usb-device.toml](assemblies/usb-device.toml) | USB FS Device；显式连接条件 |

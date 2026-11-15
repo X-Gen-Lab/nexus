@@ -219,6 +219,9 @@ class GoogleTestSubmoduleTests(unittest.TestCase):
         shutil.copy2(ROOT / "cmake/testing/GoogleTest.cmake", helper)
         shutil.copy2(ROOT / "cmake/testing/GeneratedConfiguration.cmake",
                      helper.with_name("GeneratedConfiguration.cmake"))
+        configuration = self.root / "cmake/platform/Configure.cmake"
+        configuration.parent.mkdir(parents=True)
+        shutil.copy2(ROOT / "cmake/platform/Configure.cmake", configuration)
         verifier = self.root / "tools/maintenance/googletest_lock.py"
         verifier.parent.mkdir(parents=True)
         shutil.copy2(ROOT / "tools/maintenance/googletest_lock.py", verifier)

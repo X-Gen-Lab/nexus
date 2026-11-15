@@ -37,14 +37,14 @@ def required_submodules(scope: str, family: str | None = None,
                         components=(), host_support=False, root=None) -> tuple[str, ...]:
     """Prepare production choices or the explicit maintained host test graph."""
     if type(host_support) is not bool or (
-            host_support and scope not in {"sdk", "candidate"}):
+            host_support and scope != "sdk"):
         raise EvidenceError("host support is an explicit SDK source profile")
     if scope == "native":
         if family not in (None, "native"):
             raise EvidenceError("Native tests cannot select a hardware family")
         return tuple(item.path for item in ALL_SOURCE_DEPENDENCIES
                      if item.scope in {"runtime", "host-test"})
-    if scope not in {"arm", "sdk", "candidate"}:
+    if scope not in {"arm", "sdk"}:
         raise EvidenceError("unsupported dependency scope")
     root = ROOT if root is None else Path(root)
     try:
@@ -873,8 +873,7 @@ def main(argv=None) -> int:
     actions = parser.add_subparsers(dest="operation", required=True)
     child = actions.add_parser("prepare")
     child.add_argument("--root", type=Path, default=ROOT)
-    child.add_argument("--scope", choices=("native", "arm", "sdk", "candidate",
-                                           "preset"), required=True)
+    child.add_argument("--scope", choices=("native", "arm", "sdk", "preset"), required=True)
     child.add_argument("--preset")
     child.add_argument("--family", help="exact family declared by the selected source")
     child.add_argument("--backend", choices=("baremetal", "freertos", "threadx"))

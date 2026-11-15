@@ -24,6 +24,10 @@ Queue ABI 或最大存储池。
 | `freertos/mpu/`、`freertos/secure/` | 显式可选 MPU／分域安全配置组合 |
 | `threadx/` | 真实 ThreadX Linux／M4 的明确适配范围 |
 
+公共等待、诊断和裸机／Native 静态库只在明确依赖时编译。各后端就近维护配置头、
+审核补丁和主机准备工具；`prepare_*.py` 校验来源并在构建目录生成移植覆盖层，
+不进入固件、不修改 vendor。现有配置目录随对应端口维护，不增加另一套配置入口。
+
 通知只是提示，调用者通过登记等待／复查观察权威请求判定条件。
 内核 ISR 操作验证选定系统调用上限。Native 任务返回结束 pthread；
 FreeRTOS 适配层发布完成后挂起，待外部删除；ThreadX 适配层

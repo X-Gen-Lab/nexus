@@ -24,13 +24,13 @@ function(nexus_add_st_usb_device)
     add_library(nexus_st_usb_device_core STATIC
         "${vendor}/Src/usbd_core.c" "${vendor}/Src/usbd_ctlreq.c"
         "${vendor}/Src/usbd_ioreq.c")
+    nexus_apply_target_policy(nexus_st_usb_device_core)
     target_include_directories(nexus_st_usb_device_core PRIVATE "${private}")
     target_include_directories(nexus_st_usb_device_core SYSTEM PRIVATE "${vendor}/Inc")
-    target_compile_features(nexus_st_usb_device_core PRIVATE c_std_11)
-    set_target_properties(nexus_st_usb_device_core PROPERTIES C_EXTENSIONS OFF)
     target_link_libraries(nexus_st_usb_device_core PRIVATE nexus_build_options)
     add_library(nexus_st_usb_device STATIC
         "${source}/components/protocols/st_usb_device/src/usb_device_stack.c")
+    nexus_apply_target_policy(nexus_st_usb_device)
     target_include_directories(nexus_st_usb_device PRIVATE "${private}")
     target_include_directories(nexus_st_usb_device SYSTEM PRIVATE "${vendor}/Inc")
     target_link_libraries(nexus_st_usb_device PUBLIC Nexus::IOUSBDevice
