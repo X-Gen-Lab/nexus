@@ -1,45 +1,32 @@
-# 维护中的 STM32 SDK
+# STM32 厂商依赖
 
-当前五个 STM32 SoC 接入为 F103、F407、G474、H743 与 U575。每个接入保留
-独立锁定的官方 CMSIS Device 和 HAL/LL 子模块；具体型号、外设模式和硬件边界
-以各 `soc/stm32/<family>/README.md` 与当前支持矩阵为准，不表示整个系列均受支持。
+当前生产 SoC 入口为 [STM32F4 系列支持包](../../soc/stm32/stm32f4/README.md)。
+Device 与 HAL／LL 由系列 SDK 适配私有选择；精确料号、模式与 Board 支持以
+[当前支持范围](../../docs/delivery/support.md)为准。
 
-| Nexus family | Device 仓库目录 | HAL/LL 仓库目录 |
+## 保留的源码库存
+
+| 系列 | Device 目录 | HAL／LL 目录 |
 | --- | --- | --- |
-| F103 | `cmsis_device_f1` | `stm32f1_hal` |
-| F407 | `cmsis_device_f4` | `stm32f4_hal` |
-| G474 | `cmsis_device_g4` | `stm32g4_hal` |
-| H743 | `cmsis_device_h7` | `stm32h7_hal` |
-| U575 | `cmsis_device_u5` | `stm32u5_hal` |
+| F1 | `cmsis_device_f1` | `stm32f1_hal` |
+| F4 | `cmsis_device_f4` | `stm32f4_hal` |
+| G4 | `cmsis_device_g4` | `stm32g4_hal` |
+| H5 | `cmsis_device_h5` | `stm32h5_hal` |
+| H7 | `cmsis_device_h7` | `stm32h7_hal` |
+| U5 | `cmsis_device_u5` | `stm32u5_hal` |
 
-H563 I3C 软件参考另使用 `cmsis_device_h5` 与 `stm32h5_hal` 的精确依赖，
-不建立完整 H5 SoC／Board 接入；具体边界见
-[SoC 扩展](../../components/soc/README.md)。
+库存目录不建立对应系列的生产支持。H5 的 I3C 软件参考边界见
+[I3C controller 合同](../../docs/design/i3c-controller.md)。CPU Core 使用独立锁定的
+`vendors/arm/CMSIS_6`；版本、上游字段和许可证见[厂商版本](../VERSIONS.md)。
 
-共同 CPU 头迁移为 `vendors/arm/CMSIS_6` 的官方 v6.4.0 pin；Device、startup
-与 HAL/LL 的原 gitlink 保持。版本、PDSC 原始字段及许可证边界见
-[供应商版本](../VERSIONS.md)。CMake 内部 `nexus_cmsis_core` 与
-`nexus_use_cmsis_core(target)` 维护统一 include 来源；普通应用不链接这个内部目标，
-也不把厂商类型写入公共 Nexus 接口。它与公共 `Nexus::Core` 中性机制不是同一层。
+## 集成边界
 
-Board 的只读 `board.json` 拥有已审接线及未知 PCB 事实；SoC facts、startup、
-系统时钟和 controller provider 位于 `soc/stm32/<family>/`。现有 typed I/O 的
-具体 I2C 模式、恢复责任与电气验证须按所选 family 合同解释，不能从一个 SDK
-目录或公共接口声明推导其他系列的支持。
+按[开发工作流](../../docs/guides/developer-workflow.md)准备所选依赖；配置与编译
+不自动联网补取。未选择的库存不进入默认准备、校验、编译或 Source SDK。
+原始 SDK 字节、gitlink、行尾、版权与许可证保持；PCB 接线写在 Board，硬件适配
+写在 F4 支持包，产品任务与策略由外部工程维护。
 
-在仓库根初始化提交锁定的依赖：
-
-```sh
-git submodule update --init --recursive
-```
-
-缺失必要头或不同内容身份会拒绝配置／SDK 消费，配置不联网补取依赖。保留原
-供应商字节、行尾与版权通知；板级接线和产品逻辑写在 Nexus adapter 或外部工程。
-Core 升级的实际 include 闭包、ARM 链接、设备契约与移位 SDK 消费分别验收，
-不继承旧源码的成功结果，不建立新的实板资格。
-
-普通固件通过 `Nexus::Platform`、typed factory 与 `nexus_add_firmware()` 消费
-平台；SDK headers 与 provider storage 保持实现私有。产品任务、worker、布局、
-Flash 分区和恢复策略由外部应用维护。精确范围见
-[当前支持](../../docs/delivery/support.md)与
-[官方驱动合同](../../docs/design/official-stm32-provider.md)。
+厂商 Handle、寄存器与 provider 存储保持私有。普通固件通过 `Nexus::Platform`、
+typed factory 和 `nexus_add_firmware()` 消费 Nexus 接口。具体选择与退出要求见
+[官方驱动合同](../../docs/design/official-stm32-provider.md)；源码库存、ARM 链接与
+物理验收分别提供证据。

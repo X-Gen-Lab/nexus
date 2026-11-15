@@ -28,7 +28,8 @@ python3 scripts/ci/verify_vendor_source.py --root vendors/gigadevice/gd32f4xx
 
 保留的 STM32F103、F407、G474、H743、U575 与 GD32F303、F470 来源曾通过共享
 `arm/CMSIS_6` 的显式 Core 探针；这不建立七个 family 的当前生产支持。当前生产
-仅维护 STM32F4 的精确 F407VE／ZG 实现，其他来源作为库存保留。具体 Device、IRQ、
+维护 [STM32F4 系列支持包](../soc/stm32/stm32f4/README.md)，精确器件与模式以
+[支持范围](../docs/delivery/support.md)为准；其他来源作为库存保留。具体 Device、IRQ、
 startup 和 HAL／LL 仍来自各自锁定来源；Core 迁移不自动启用芯片、外设或安全域。
 精确版本、上游 pack 字段和许可证身份见 [VERSIONS.md](VERSIONS.md)。
 
@@ -52,8 +53,8 @@ CMSIS-Driver、DSP 或 NN。保留某个头不等于平台已支持其描述的�
 python -B tools/maintenance/cmsis_core_probe.py --output /tmp/nexus-cmsis-core-probe
 ```
 
-`--compiler` 与 `--cxx` 可显式指定安装路径。探针对七个 family 编译 16 个 C11／C++17
-单元，包括 U575 独立 Secure／NonSecure 上下文；启用 `CMSIS_DISABLE_DEPRECATED=1`，
+`--compiler` 与 `--cxx` 可显式指定安装路径。探针按工具内维护的 F4 profile 执行
+C11／C++17 检查，启用 `CMSIS_DISABLE_DEPRECATED=1`，
 保存包含 SYSTEM 头的完整 `-MD` 依赖，并拒绝版本宏相同的外来 Core 路径。
 `report.json` 记录编译器、对象、依赖和命令收条。缺工具、编译失败、错误闭包均为失败，
 不作 skip。这里的 C++17 用于消费头检查，不改变固件 C11 语言边界，也不建立完整链接
@@ -71,9 +72,11 @@ Board 接线写入 Nexus adapter 或外部工程，不修改导入文件；配�
 厂商代码不因进入本仓库而改用 MIT 许可。普通公共接口不传播厂商 Handle，显式 SDK
 bring-up 依赖也不改变该边界；SDK、实际固件和物理验证分别验收。
 
-ST USB 中间件当前只登记源码库存，不进入默认准备、校验、编译或 Source SDK
-负载，也不由此提供 Host／HS／class stack。两份 source lock 记录官方提交、tree、
-完整文件摘要、许可和既有 HAL／CMSIS／Cube 配对：
+ST USB 中间件由显式选择的
+[Device 组件](../components/protocols/st_usb_device/README.md)与
+[Host 组件](../components/protocols/st_usb/README.md)按需接入；支持模式、静态存储、
+控制器 ownership 与完整退出以相应合同为准。未选择时不进入默认准备、校验、编译
+或 Source SDK。两份 source lock 记录官方提交、tree、完整文件摘要、许可和既有
+HAL／CMSIS／Cube 配对：
 [Device](../dependencies/stm32-usb-device.lock.json)、
-[Host](../dependencies/stm32-usb-host.lock.json)。后续适配保留一个控制器状态 owner、
-调用方静态存储和完整排空，不使用厂商模板中的隐式 heap 或全局单实例池。
+[Host](../dependencies/stm32-usb-host.lock.json)。
