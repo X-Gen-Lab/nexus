@@ -10,6 +10,36 @@ from scripts.ci import stm32_memory as memory_matrix, memory_budget
 
 
 class MemoryMatrixTests(unittest.TestCase):
+    def test_startup_identity_matches_the_current_production_source(self):
+        source = (memory_matrix.ROOT /
+                  'soc/stm32/stm32f4/system/startup.c')
+        selected = {'file': str(source)}
+        entries = [{'file': '/unrelated/startup.c'},
+                   {'file': str(source.with_name('system.c'))}, selected]
+        self.assertEqual(memory_matrix.source_entries(entries, source),
+                         [selected])
+
+    def test_memory_helper_identity_matches_the_current_production_source(self):
+        source = (memory_matrix.ROOT /
+                  'soc/stm32/stm32f4/system/memory.c')
+        selected = {'file': str(source)}
+        entries = [{'file': '/unrelated/memory.c'},
+                   {'file': str(source.with_name('memory_init.c'))}, selected]
+        self.assertEqual(memory_matrix.source_entries(entries, source),
+                         [selected])
+        self.assertEqual(memory_matrix.source_entries(entries[:-1], source), [])
+        self.assertEqual(memory_matrix.source_entries(entries + [selected],
+                         source), [selected, selected])
+
+    def test_relative_compile_source_uses_its_compile_directory(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            source = directory / 'startup.c'
+            selected = {'directory': str(directory / 'build'),
+                        'file': '../startup.c'}
+            self.assertEqual(memory_matrix.source_entries([selected], source),
+                             [selected])
+
     def test_preprocessing_does_not_overwrite_actual_build_depfiles(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

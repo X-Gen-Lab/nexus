@@ -61,7 +61,7 @@ static inline bool nx_stm32_advanced_break_valid(const TIM_TypeDef* timer,
                                                  uint8_t channel,
                                                  const volatile uint32_t* input,
                                                  uint32_t mask) {
-    nx_stm32_timer_pin_t pad;
+    nx_stm32_timer_pin_t pad = {NULL, 0U, 0U};
     return nx_stm32_advanced_pin(timer, channel, 2U, &pad) &&
            input == &pad.gpio->IDR && mask == (UINT32_C(1) << pad.pin);
 }
@@ -78,7 +78,7 @@ static inline bool nx_stm32_timer_pin_ready(const nx_stm32_timer_pin_t* pad,
 /** \brief Task admission checks the same capture route used by cold setup. */
 static inline bool nx_stm32_capture_pins_ready(const TIM_TypeDef* timer,
                                                uint8_t channel) {
-    nx_stm32_timer_pin_t pad;
+    nx_stm32_timer_pin_t pad = {NULL, 0U, 0U};
     return nx_stm32_capture_pin(timer, channel, &pad) &&
            nx_stm32_timer_pin_ready(&pad, nx_stm32_timer_af(timer));
 }
@@ -88,7 +88,7 @@ static inline bool nx_stm32_capture_pins_ready(const TIM_TypeDef* timer,
 static inline bool nx_stm32_advanced_pins_ready(const TIM_TypeDef* timer,
                                                 uint8_t channel) {
     for (unsigned index = 0U; index < 3U; ++index) {
-        nx_stm32_timer_pin_t pad;
+        nx_stm32_timer_pin_t pad = {NULL, 0U, 0U};
         if (!nx_stm32_advanced_pin(timer, channel, index, &pad) ||
             !nx_stm32_timer_pin_ready(&pad, timer == TIM1 ? 1U : 3U))
             return false;

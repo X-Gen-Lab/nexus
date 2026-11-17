@@ -59,10 +59,13 @@ class ArtifactBuildTests(unittest.TestCase):
                 'CONTENT "$<TARGET_PROPERTY:platform_sleep,'
                 'INTERPROCEDURAL_OPTIMIZATION>\\n")\n')
             commands = []
+            environment = dict(os.environ)
+            environment.pop("PYTHONPATH", None)
 
             def run(*arguments, success=True):
                 completed = subprocess.run(arguments, capture_output=True,
-                                           text=True, timeout=180, check=False)
+                                           text=True, timeout=180, check=False,
+                                           env=environment)
                 commands.append({"argv": list(arguments),
                                  "returncode": completed.returncode,
                                  "stdout": completed.stdout,
@@ -77,6 +80,11 @@ class ArtifactBuildTests(unittest.TestCase):
 
             run(cmake, "-S", str(source), "-B", str(build), "-G", "Ninja",
                 f"-DCMAKE_TOOLCHAIN_FILE={ROOT}/cmake/toolchains/arm-gcc.cmake")
+            catalog = build / "nexus-owned/generated/configuration_code_paths.json"
+            for relative, original in json.loads(catalog.read_text()).items():
+                destination = checker / relative
+                destination.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(original, destination)
 
             def compile_application(*, success=True):
                 return run(cmake, "--build", str(build), "--target", "app",
@@ -100,7 +108,8 @@ class ArtifactBuildTests(unittest.TestCase):
                 self.assertTrue(artifact.is_file())
                 self.assertEqual(hashlib.sha256(artifacts[0].read_bytes()).hexdigest(),
                                  elf_digest)
-            for module in modules:
+            for module in (*modules, "tools/configure/configure.py",
+                           "tools/configure/emission.py"):
                 with (checker / module).open("a") as file:
                     file.write("\n# Incremental contract input mutation.\n")
                 checked = compile_application()

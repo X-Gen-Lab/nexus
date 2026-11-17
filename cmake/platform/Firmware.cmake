@@ -79,6 +79,17 @@ function(nexus_add_firmware target)
         # A direct --target firmware must enforce its budget as well. Declaring
         # byproducts makes Ninja restore removed artifacts, while LINK_DEPENDS
         # rechecks modified inputs and checker code through that same rule.
+        set(checker_catalog "${NEXUS_CONFIG_DIR}/configuration_code_paths.json")
+        file(READ "${checker_catalog}" checker_code)
+        string(JSON checker_count LENGTH "${checker_code}")
+        set(checker_modules)
+        if(checker_count GREATER 0)
+            math(EXPR checker_last "${checker_count} - 1")
+            foreach(index RANGE 0 ${checker_last})
+                string(JSON module MEMBER "${checker_code}" ${index})
+                list(APPEND checker_modules "${NEXUS_SOURCE_DIR}/${module}")
+            endforeach()
+        endif()
         set_property(TARGET ${target} APPEND PROPERTY LINK_DEPENDS
             "${NEXUS_CONFIG_DIR}/memory.ld"
             "${NEXUS_CONFIG_DIR}/resolved.json"
@@ -88,7 +99,7 @@ function(nexus_add_firmware target)
             "${NEXUS_SOURCE_DIR}/tools/measurement/elf.py"
             "${NEXUS_SOURCE_DIR}/tools/evidence/common.py"
             "${NEXUS_SOURCE_DIR}/tools/evidence/identity.py"
-            "${NEXUS_SOURCE_DIR}/tools/configure/memory.py")
+            "${checker_catalog}" ${checker_modules})
         add_custom_command(TARGET ${target} POST_BUILD
             BYPRODUCTS "${binary}" "${map}" "${resources}"
             COMMAND "${CMAKE_OBJCOPY}" -O binary "$<TARGET_FILE:${target}>"
