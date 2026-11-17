@@ -29,14 +29,21 @@ nexus_io_domain(adc_format ALIAS IOADCFormat
     SOURCES src/mechanisms/adc_format.c)
 nexus_io_domain(gpio ALIAS IOGPIO SOURCES src/api/gpio.c src/api/pin_state.c)
 nexus_io_domain(uart ALIAS IOUART
-    SOURCES src/api/uart.c src/api/uart_word.c src/mechanisms/uart_rs485.c
-        src/mechanisms/stream_profile.c
-    DEPENDS nexus_io_stream_profile_storage nexus_io_gpio)
+    SOURCES src/api/uart.c src/api/uart_format.c
+    DEPENDS nexus_io_wake)
+nexus_io_domain(uart_word ALIAS IOUARTWord SOURCES src/api/uart_word.c
+    DEPENDS nexus_io_uart)
+nexus_io_domain(uart_stream ALIAS IOUARTStream
+    SOURCES src/mechanisms/stream_profile.c
+    DEPENDS nexus_io_uart nexus_io_stream_profile_storage)
+nexus_io_domain(uart_rs485 ALIAS IOUARTRS485
+    SOURCES src/mechanisms/uart_rs485.c
+    DEPENDS nexus_io_uart nexus_io_gpio)
 nexus_io_domain(spi ALIAS IOSPI
     SOURCES src/api/spi.c src/api/spi_frames.c src/mechanisms/spi_dma_owner_binding.c
         src/mechanisms/spi_dma_sequence.c src/mechanisms/spi_dma_transaction.c
         src/mechanisms/spi_transaction.c
-    DEPENDS nexus_io_stream)
+    DEPENDS nexus_io_wake)
 nexus_io_domain(i2c ALIAS IOI2C
     SOURCES src/api/i2c.c src/mechanisms/i2c_bus_clear.c
     DEPENDS nexus_io_dma nexus_io_wake)
@@ -70,8 +77,10 @@ nexus_io_domain(dac_tx ALIAS IODACTx SOURCES src/api/dac_tx.c
     DEPENDS nexus_io_dma nexus_io_wake)
 nexus_io_domain(adc ALIAS IOADC
     SOURCES src/api/adc.c src/mechanisms/adc_observer.c
-        src/mechanisms/adc_stream_profile.c
-    DEPENDS nexus_io_stream_profile_storage nexus_io_adc_format)
+    DEPENDS nexus_io_adc_format)
+nexus_io_domain(adc_stream ALIAS IOADCStream
+    SOURCES src/mechanisms/adc_stream_profile.c
+    DEPENDS nexus_io_adc nexus_io_stream_profile_storage)
 nexus_io_domain(can ALIAS IOCAN SOURCES src/api/can.c DEPENDS nexus_io_wake)
 nexus_io_domain(usb_device ALIAS IOUSBDevice
     SOURCES src/api/usb_device.c src/mechanisms/usb_profile.c
@@ -117,8 +126,30 @@ add_library(nexus_io STATIC
 target_link_libraries(nexus_io PUBLIC nexus_io_contract
     PRIVATE nexus_build_options nexus_owned_warnings Nexus::Arch)
 set(_nexus_io_domains ${NEXUS_SELECTED_KINDS})
-if("dac" IN_LIST _nexus_io_domains)
+if("uart" IN_LIST _nexus_io_domains OR "adc" IN_LIST _nexus_io_domains OR
+        "dac" IN_LIST _nexus_io_domains)
     include("${NEXUS_SOURCE_DIR}/cmake/platform/ControllerModes.cmake")
+endif()
+if("uart" IN_LIST _nexus_io_domains)
+    nexus_controller_modes(uart_modes uart)
+    if("irq-words" IN_LIST uart_modes)
+        list(APPEND _nexus_io_domains uart_word)
+    endif()
+    set(uart_stream_modes irq-blocks rx-dma-idle rx-dma-continuous
+        dma-duplex dma-duplex-continuous)
+    foreach(mode IN LISTS uart_modes)
+        if(mode IN_LIST uart_stream_modes)
+            list(APPEND _nexus_io_domains uart_stream)
+        endif()
+    endforeach()
+endif()
+if("adc" IN_LIST _nexus_io_domains)
+    nexus_controller_modes(adc_modes adc)
+    if("trigger-dma" IN_LIST adc_modes OR "trigger-dma-continuous" IN_LIST adc_modes)
+        list(APPEND _nexus_io_domains adc_stream)
+    endif()
+endif()
+if("dac" IN_LIST _nexus_io_domains)
     nexus_controller_modes(dac_modes dac)
     if("trigger-dma" IN_LIST dac_modes OR "trigger-dma-circular" IN_LIST dac_modes)
         list(APPEND _nexus_io_domains dac_tx)
@@ -127,12 +158,15 @@ endif()
 # Runtime and Native admit caller-defined providers, independently of Board facts.
 if(_nexus_runtime_scope OR NOT DEFINED NEXUS_SOC_FAMILY OR
         NEXUS_SOC_FAMILY STREQUAL "native")
-    set(_nexus_io_domains gpio uart spi i2c i2c_target flash watchdog exti pwm adc dac dac_tx crc cipher hash display image can
+    set(_nexus_io_domains gpio uart uart_word uart_stream uart_rs485
+        spi i2c i2c_target flash watchdog exti pwm adc adc_stream dac dac_tx
+        crc cipher hash display image can
         usb_device usb_host eth eth_frames timer_capture advanced_pwm pwm_group encoder
         pwm_adc can_fd adc_group rtc lptim entropy block external_bus
         parallel16 memory_window flash_async nand capture audio
         timer_pulse timer_sequence)
 endif()
+list(REMOVE_DUPLICATES _nexus_io_domains)
 foreach(domain IN LISTS _nexus_io_domains)
     if(NOT TARGET nexus_io_${domain})
         message(FATAL_ERROR "No I/O source contract for selected kind ${domain}")
@@ -143,6 +177,6 @@ add_library(Nexus::IO ALIAS nexus_io)
 add_library(nexus_io_cycle_probe STATIC EXCLUDE_FROM_ALL
     src/mechanisms/cycle_probe.c)
 target_link_libraries(nexus_io_cycle_probe PUBLIC nexus_io
-    nexus_io_uart nexus_io_spi
+    nexus_io_uart_word nexus_io_spi
     PRIVATE nexus_arch nexus_build_options nexus_owned_warnings)
 add_library(Nexus::IOCycleProbe ALIAS nexus_io_cycle_probe)

@@ -13,7 +13,8 @@ import subprocess
 import sys
 
 from tools.evidence.common import (EvidenceError, digest, file_identity, load_json,
-                                   stream_digest, git_observation_environment)
+                                   stream_digest, git_observation_environment,
+                                   sha256_value)
 
 
 def canonical_digest(value: dict) -> str:
@@ -152,16 +153,56 @@ def verify_source(source: dict, *, clean: bool = False) -> None:
 
 
 def resolved_identity(path: Path) -> tuple[dict, dict]:
-    """One resolved file is the configuration authority, not a second config."""
+    """Verify a complete digest or the exact selected projection of its inputs."""
+    artifact = file_identity(path)
     resolved = load_json(path)
-    if type(resolved.get("schema_version")) is not int or resolved["schema_version"] != 1:
+    version = resolved.get("schema_version")
+    if type(version) is not int or version not in {1, 2}:
         raise EvidenceError("unsupported resolved schema")
-    claimed = resolved.get("configuration_sha256")
-    canonical = {key: value for key, value in resolved.items()
-                 if key != "configuration_sha256"}
-    if claimed != canonical_digest(canonical):
-        raise EvidenceError("resolved canonical configuration digest mismatch")
-    return resolved, file_identity(path)
+    if version == 2:
+        sha256_value(resolved.get("configuration_sha256"))
+        _verify_selected_projection(path, resolved)
+    else:
+        claimed = resolved.get("configuration_sha256")
+        canonical = {key: value for key, value in resolved.items()
+                     if key != "configuration_sha256"}
+        if claimed != canonical_digest(canonical):
+            raise EvidenceError("resolved canonical configuration digest mismatch")
+    if file_identity(path) != artifact:
+        raise EvidenceError("resolved artifact changed during verification")
+    return resolved, artifact
+
+
+def _verify_selected_projection(path: Path, resolved: dict) -> None:
+    """Retain full configuration identity without trusting edited output fields."""
+    from tools.configure import configure, emission, metadata
+
+    navigation = file_identity(path.parent / "input_paths.json")
+    files = resolved_input_files(path, resolved)
+    inputs = {item["label"]: Path(item["file"]["path"]) for item in files}
+    if metadata.POLICY not in inputs:
+        raise EvidenceError("resolved configuration policy input missing")
+    root = inputs[metadata.POLICY].parent.parent
+    for label, assembly in inputs.items():
+        if Path(label).suffix != ".toml":
+            continue
+        try:
+            intent = configure.load_assembly(assembly, root, test_support=True)
+            selected = configure.resolve_ir(
+                assembly, root,
+                test_support=intent.backend == "native" and
+                intent.soc_package is None, allow_legacy_provider=False)
+        except (OSError, ValueError, TypeError, KeyError):
+            continue
+        if selected.configuration_sha256 == resolved["configuration_sha256"]:
+            if emission.resolved_projection(selected) != resolved:
+                raise EvidenceError("resolved selected projection mismatch")
+            if resolved_input_files(path, resolved) != files:
+                raise EvidenceError("configuration input navigation changed")
+            if file_identity(path.parent / "input_paths.json") != navigation:
+                raise EvidenceError("configuration input navigation changed")
+            return
+    raise EvidenceError("resolved declared configuration digest mismatch")
 
 
 def check_identity(identity: dict, path: Path) -> None:

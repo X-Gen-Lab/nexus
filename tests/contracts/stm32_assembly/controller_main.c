@@ -23,7 +23,7 @@
 
 /* Volatile-qualified face fields force real ROM reads. Their relocations keep
  * concrete ops and all non-NULL methods alive through section GC, independently
- * of controller/device names. Empty generated classes add no runtime work.
+ * of controller/device names. Only selected generated classes are retained.
  */
 #define NX_FIXTURE_RETAIN_FACES(name, type, count)                             \
     do {                                                                       \
@@ -45,19 +45,41 @@ int main(void) {
     if (result.primary != NX_SUCCESS) {
         return 1;
     }
+#if defined(NX_FACTORY_HAS_GPIO)
     NX_FIXTURE_RETAIN_FACES(gpio, nx_gpio_port_t, NX_GPIO_ID_COUNT);
+#endif
+#if defined(NX_FACTORY_HAS_UART)
     NX_FIXTURE_RETAIN_FACES(uart, nx_uart_port_t, NX_UART_ID_COUNT);
+#endif
+#if defined(NX_FACTORY_HAS_SPI)
     NX_FIXTURE_RETAIN_FACES(spi, nx_spi_port_t, NX_SPI_ID_COUNT);
+#endif
+#if defined(NX_FACTORY_HAS_I2C)
     NX_FIXTURE_RETAIN_FACES(i2c, nx_i2c_port_t, NX_I2C_ID_COUNT);
+#endif
+#if defined(NX_FACTORY_HAS_FLASH)
     NX_FIXTURE_RETAIN_FACES(flash, nx_flash_port_t, NX_FLASH_ID_COUNT);
+#endif
+#if defined(NX_FACTORY_HAS_WATCHDOG)
     NX_FIXTURE_RETAIN_FACES(watchdog, nx_watchdog_port_t, NX_WATCHDOG_ID_COUNT);
+#endif
+#if defined(NX_FACTORY_HAS_EXTI)
     NX_FIXTURE_RETAIN_FACES(exti, nx_exti_port_t, NX_EXTI_ID_COUNT);
+#endif
+#if defined(NX_FACTORY_HAS_PWM)
     NX_FIXTURE_RETAIN_FACES(pwm, nx_pwm_port_t, NX_PWM_ID_COUNT);
+#endif
+#if defined(NX_FACTORY_HAS_ADC)
     NX_FIXTURE_RETAIN_FACES(adc, nx_adc_port_t, NX_ADC_ID_COUNT);
+#endif
+#if defined(NX_FACTORY_HAS_SPI_DEVICE)
     NX_FIXTURE_RETAIN_FACES(spi_device, nx_spi_endpoint_t,
                             NX_SPI_DEVICE_ID_COUNT);
+#endif
+#if defined(NX_FACTORY_HAS_I2C_DEVICE)
     NX_FIXTURE_RETAIN_FACES(i2c_device, nx_i2c_endpoint_t,
                             NX_I2C_DEVICE_ID_COUNT);
+#endif
     for (;;) {
     }
 }

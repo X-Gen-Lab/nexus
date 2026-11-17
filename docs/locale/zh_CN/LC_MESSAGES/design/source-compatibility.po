@@ -1,6 +1,6 @@
-# Actual-POT messages; independent semantic review completed for this source.
+# Actual-POT messages; independently reviewed against this canonical source.
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 1e11ee9f47502e9b4a50db36a3cce62990f97d4b1a8580bfe15e22fa4c4a42f9\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: e1f96f2824e14f562f9e57ce38b90674018b633cac99d22d74a75b70f5d336ee\n"
 
 #: ../../../docs/design/source-compatibility.md:1
 msgid "源码版本、factory 代际与依赖维护"
@@ -58,8 +58,8 @@ msgstr "唯一人工维护值来自兼容性 JSON；CMake、生成头文件和�
 msgid "`factory_abi_epoch`"
 msgstr "`factory_abi_epoch`"
 
-msgid "`5`"
-msgstr "`5`"
+msgid "`6`"
+msgstr "`6`"
 
 #: ../../../docs/design/source-compatibility.md:0
 msgid "当前唯一认可的生成源码接口代际；不是 binary ABI 保证"
@@ -93,8 +93,8 @@ msgstr "简化的 TOML 选择面；不改变 Board/SoC 事实"
 msgid "resolved JSON projection / typed IR"
 msgstr "resolved JSON 投影／typed IR"
 
-msgid "`1` / `5`"
-msgstr "`1` / `5`"
+msgid "`2` / `5`"
+msgstr "`2` / `5`"
 
 #: ../../../docs/design/source-compatibility.md:0
 msgid "单向 JSON 输出格式与私有 Python 类型化源码接口分别计代"
@@ -145,33 +145,11 @@ msgid "历史候选封存格式保留在其固定源码中；当前平台不提�
 msgstr ""
 "历史候选封存格式保留在其固定源码中；当前平台不提供候选封存或 legacy replay 入口。阅读原始报告不改变本次源码或产物的验收状态。"
 
-msgid ""
-"类型化源码接口第 5 代只接受严格 TOML 解析后的不可变装配对象；生产 resolver、 factory 和 emitter "
-"使用具名字段，不提供字典接口或 schema-1 JSON 装配兼容。 `resolved.json` 仍是第 1 "
-"版单向输出，用于审计和独立产物检查，不是可信配置入口。 `source_epoch` 当前为 5，是 Python 类级源码合同，不写入 "
-"JSON，也不增加 MCU 状态。维护工具直接观察实际 IR 类的声明，核对策略中的 typed IR 代际；公共 C factory "
-"的源码代际也由同一策略校验。"
-msgstr ""
-"类型化源码接口第 5 代只接受严格 TOML 解析后的不可变装配对象；生产 resolver、 factory 和 emitter "
-"使用具名字段，不提供字典接口或 schema-1 JSON 装配兼容。 `resolved.json` 仍是第 1 "
-"版单向输出，用于审计和独立产物检查，不是可信配置入口。 `source_epoch` 当前为 5，是 Python 类级源码合同，不写入 "
-"JSON，也不增加 MCU 状态。维护工具直接观察实际 IR 类的声明，核对策略中的 typed IR 代际；公共 C factory "
-"的源码代际也由同一策略校验。"
+msgid "类型化源码接口第 5 代只接受严格 TOML 解析后的不可变装配对象；生产 resolver、 factory 和 emitter 使用具名字段，不提供字典接口或 schema-1 JSON 装配兼容。 完整 `to_dict()` 仍是 schema-1 审计投影；生成文件 `resolved.json` 使用 schema 2， 只保存有效配置、已选路线和 Board binding、资源、预算及输入身份。完整 IR 与候选 事实继续用于校验和查询；生成文件不是可信配置入口。 `source_epoch` 当前为 5，是 Python 类级源码合同，不写入 JSON，也不增加 MCU 状态。维护工具直接观察实际 IR 类的声明，核对策略中的 typed IR 代际；公共 C factory 的源码代际也由同一策略校验。"
+msgstr "类型化源码接口第 5 代只接受严格 TOML 解析后的不可变装配对象；生产 resolver、 factory 和 emitter 使用具名字段，不提供字典接口或 schema-1 JSON 装配兼容。 完整 `to_dict()` 仍是 schema-1 审计投影；生成文件 `resolved.json` 使用 schema 2， 只保存有效配置、已选路线和 Board binding、资源、预算及输入身份。完整 IR 与候选 事实继续用于校验和查询；生成文件不是可信配置入口。 `source_epoch` 当前为 5，是 Python 类级源码合同，不写入 JSON，也不增加 MCU 状态。维护工具直接观察实际 IR 类的声明，核对策略中的 typed IR 代际；公共 C factory 的源码代际也由同一策略校验。"
 
-msgid ""
-"当前 `0.2.1` 用于开发与软件候选准备；版本值本身不表示已公开发行或已通过候选验收。 既有 `v0.2.0` "
-"及其他标签保留原始源码身份，不移动标签。前序公共 traits、独立 SDIO 请求及领域语义迁移引入 epoch `3`；本轮逻辑 GPIO "
-"signal 与 RS485 配置迁移 将 factory／source interface epoch 提升为 "
-"`4`；当前家族电源接口及密码查询迁移 继续提升为 `5`。semantic version 仍是开发快照 `0.2.1`，exact 匹配和 "
-"authored schema `2` 不变。相同版本号不能让旧 epoch `1`／`2`／`3`／`4` SDK "
-"通过当前代际检查，版本值也不把旧 SDK／候选资格转移到新源码。 新候选仍须独立绑定实际 clean source、配置、依赖、工具与执行证据。"
-msgstr ""
-"当前 `0.2.1` 用于开发与软件候选准备；版本值本身不表示已公开发行或已通过候选验收。 既有 `v0.2.0` "
-"及其他标签保留原始源码身份，不移动标签。前序公共 traits、独立 SDIO 请求及领域语义迁移引入 epoch `3`；本轮逻辑 GPIO "
-"signal 与 RS485 配置迁移 将 factory／source interface epoch 提升为 "
-"`4`；当前家族电源接口及密码查询迁移 继续提升为 `5`。semantic version 仍是开发快照 `0.2.1`，exact 匹配和 "
-"authored schema `2` 不变。相同版本号不能让旧 epoch `1`／`2`／`3`／`4` SDK "
-"通过当前代际检查，版本值也不把旧 SDK／候选资格转移到新源码。 新候选仍须独立绑定实际 clean source、配置、依赖、工具与执行证据。"
+msgid "当前 `0.2.1` 用于开发与软件候选准备；版本值本身不表示已公开发行或已通过候选验收。 既有 `v0.2.0` 及其他标签保留原始源码身份，不移动标签。前序公共 traits、独立 SDIO 请求及领域语义迁移引入 epoch `3`；本轮逻辑 GPIO signal 与 RS485 配置迁移 将 factory／source interface epoch 提升为 `4`；当前家族电源接口及密码查询迁移 继续提升为 `5`；本轮按需 factory 将公共生成接口提升为 `6`，typed IR 仍为 `5`。 semantic version 仍是开发快照 `0.2.1`，exact 匹配和 authored schema `2` 不变。 相同版本号不能让旧 epoch `1`／`2`／`3`／`4`／`5` SDK 通过当前代际检查，版本值也不把旧 SDK／候选资格转移到新源码。 新候选仍须独立绑定实际 clean source、配置、依赖、工具与执行证据。"
+msgstr "当前 `0.2.1` 用于开发与软件候选准备；版本值本身不表示已公开发行或已通过候选验收。 既有 `v0.2.0` 及其他标签保留原始源码身份，不移动标签。前序公共 traits、独立 SDIO 请求及领域语义迁移引入 epoch `3`；本轮逻辑 GPIO signal 与 RS485 配置迁移 将 factory／source interface epoch 提升为 `4`；当前家族电源接口及密码查询迁移 继续提升为 `5`；本轮按需 factory 将公共生成接口提升为 `6`，typed IR 仍为 `5`。 semantic version 仍是开发快照 `0.2.1`，exact 匹配和 authored schema `2` 不变。 相同版本号不能让旧 epoch `1`／`2`／`3`／`4`／`5` SDK 通过当前代际检查，版本值也不把旧 SDK／候选资格转移到新源码。 新候选仍须独立绑定实际 clean source、配置、依赖、工具与执行证据。"
 
 #: ../../../docs/design/source-compatibility.md:44
 msgid ""
@@ -187,18 +165,8 @@ msgstr ""
 "Lab/nexus/blob/8e147fc2c812d81ab6596e0d1a6bc8908d30ac18/docs/status/release-0.1.0.md)，准确"
 " source／tree 以其发行 manifest 为准。既有 tag、发行附件和证据保持原始身份，不随当前开发版本改写。"
 
-msgid ""
-"factory 的 compact ID 只在该生成 bundle 内有意义。它返回既有静态 readonly face， "
-"不分配、不初始化硬件。重新排序实例或改变配置可能改变 ID；不能把 ID 持久化后 拿到另一 bundle "
-"使用。`factory_abi_epoch` 命名保留 ABI 字样，但目前只标记生成 源码接口代际：消费者、factory header、公共 "
-"face 和实现必须重新编译。当前 epoch 为 5；指定 0、旧值 1／2／3／4、未来值、非整数或找不到策略时必须拒绝，不能当成兼容 "
-"fallback。"
-msgstr ""
-"factory 的 compact ID 只在该生成 bundle 内有意义。它返回既有静态 readonly face， "
-"不分配、不初始化硬件。重新排序实例或改变配置可能改变 ID；不能把 ID 持久化后 拿到另一 bundle "
-"使用。`factory_abi_epoch` 命名保留 ABI 字样，但目前只标记生成 源码接口代际：消费者、factory header、公共 "
-"face 和实现必须重新编译。当前 epoch 为 5；指定 0、旧值 1／2／3／4、未来值、非整数或找不到策略时必须拒绝，不能当成兼容 "
-"fallback。"
+msgid "factory 的 compact ID 只在该生成 bundle 内有意义。它返回既有静态 readonly face， 不分配、不初始化硬件。重新排序实例或改变配置可能改变 ID；不能把 ID 持久化后 拿到另一 bundle 使用。`factory_abi_epoch` 命名保留 ABI 字样，但目前只标记生成 源码接口代际：消费者、factory header、公共 face 和实现必须重新编译。当前 epoch 为 6；指定 0、旧值 1／2／3／4／5、未来值、非整数或找不到策略时必须拒绝，不能当成兼容 fallback。"
+msgstr "factory 的 compact ID 只在该生成 bundle 内有意义。它返回既有静态 readonly face， 不分配、不初始化硬件。重新排序实例或改变配置可能改变 ID；不能把 ID 持久化后 拿到另一 bundle 使用。`factory_abi_epoch` 命名保留 ABI 字样，但目前只标记生成 源码接口代际：消费者、factory header、公共 face 和实现必须重新编译。当前 epoch 为 6；指定 0、旧值 1／2／3／4／5、未来值、非整数或找不到策略时必须拒绝，不能当成兼容 fallback。"
 
 #: ../../../docs/design/source-compatibility.md:56
 msgid ""
@@ -220,8 +188,8 @@ msgstr "epoch 2 引入的 ADC 结果迁移"
 msgid "epoch 2 已将 `nx_adc_group_request_t.frames` 改为显式 `output.frames`，并由 `results_kind` 区分 RAW 与 regular／injected paired 结果。原始字段访问必须迁移； 不保留 `frames` 影子、旧大小兼容或按运行态猜测结果布局。优先继续调用 `nx_adc_group_prepare()` 准备 raw 请求，由它设置 RAW discriminant；paired 结果使用 `nx_adc_group_prepare_results()`，请求、descriptor 与两个 span 共用一次借用生命周期。 直接读取 union 时必须先确认对应 `results_kind`，不能把 raw frame 指针当 descriptor。"
 msgstr "epoch 2 已将 `nx_adc_group_request_t.frames` 改为显式 `output.frames`，并由 `results_kind` 区分 RAW 与 regular／injected paired 结果。原始字段访问必须迁移； 不保留 `frames` 影子、旧大小兼容或按运行态猜测结果布局。优先继续调用 `nx_adc_group_prepare()` 准备 raw 请求，由它设置 RAW discriminant；paired 结果使用 `nx_adc_group_prepare_results()`，请求、descriptor 与两个 span 共用一次借用生命周期。 直接读取 union 时必须先确认对应 `results_kind`，不能把 raw frame 指针当 descriptor。"
 
-msgid "使用当前精确提交重新生成 bundle，并在同一配置和工具链下重新编译全部调用者、 公共 face／ops、factory、provider 和组件；不得混用 epoch 1 header、旧对象或缓存。 该结果合同在 epoch 3 和 epoch 4 继续保留；从 epoch 1 迁移的调用者仍须完成 这一步。当前生成头、SDK 及维护消费者只认可 epoch 5；旧 epoch 1／2／3／4 明确拒绝， 不自动迁移、降级或以 `--development-fixture` 放宽接口检查。外部产品的迁移步骤见 [迁移指南](../guides/migration.md)。当前 manifest schema 3 与 interface epoch 5 是独立字段。"
-msgstr "使用当前精确提交重新生成 bundle，并在同一配置和工具链下重新编译全部调用者、 公共 face／ops、factory、provider 和组件；不得混用 epoch 1 header、旧对象或缓存。 该结果合同在 epoch 3 和 epoch 4 继续保留；从 epoch 1 迁移的调用者仍须完成 这一步。当前生成头、SDK 及维护消费者只认可 epoch 5；旧 epoch 1／2／3／4 明确拒绝， 不自动迁移、降级或以 `--development-fixture` 放宽接口检查。外部产品的迁移步骤见 [迁移指南](../guides/migration.md)。当前 manifest schema 3 与 interface epoch 5 是独立字段。"
+msgid "使用当前精确提交重新生成 bundle，并在同一配置和工具链下重新编译全部调用者、 公共 face／ops、factory、provider 和组件；不得混用 epoch 1 header、旧对象或缓存。 该结果合同在 epoch 3 和 epoch 4 继续保留；从 epoch 1 迁移的调用者仍须完成 这一步。当前生成头、SDK 及维护消费者只认可 epoch 6；旧 epoch 1／2／3／4／5 明确拒绝， 不自动迁移、降级或以 `--development-fixture` 放宽接口检查。外部产品的迁移步骤见 [迁移指南](../guides/migration.md)。当前 manifest schema 3 与 factory interface epoch 6 是独立字段。"
+msgstr "使用当前精确提交重新生成 bundle，并在同一配置和工具链下重新编译全部调用者、 公共 face／ops、factory、provider 和组件；不得混用 epoch 1 header、旧对象或缓存。 该结果合同在 epoch 3 和 epoch 4 继续保留；从 epoch 1 迁移的调用者仍须完成 这一步。当前生成头、SDK 及维护消费者只认可 epoch 6；旧 epoch 1／2／3／4／5 明确拒绝， 不自动迁移、降级或以 `--development-fixture` 放宽接口检查。外部产品的迁移步骤见 [迁移指南](../guides/migration.md)。当前 manifest schema 3 与 factory interface epoch 6 是独立字段。"
 
 #: docs/design/source-compatibility.md:0
 msgid "epoch 3 的领域接口迁移"
@@ -323,8 +291,8 @@ msgstr "Encoder TI 输入名与滤波编码"
 msgid "使用逻辑 A／B 模式及滤波采样事实，不把它们当成精确机械消抖保证。"
 msgstr "使用逻辑 A／B 模式及滤波采样事实，不把它们当成精确机械消抖保证。"
 
-msgid "使用同一精确提交重新生成配置和 factory，并重编所有调用者、provider、组件与 SDK 消费者。当前 TOML schema 2、typed IR 源码代际 5、resolved projection 1 和 SDK manifest 3 分别计代；源码代际或包格式变化不自动扩大芯片、模式或实板支持。"
-msgstr "使用同一精确提交重新生成配置和 factory，并重编所有调用者、provider、组件与 SDK 消费者。当前 TOML schema 2、typed IR 源码代际 5、resolved projection 1 和 SDK manifest 3 分别计代；源码代际或包格式变化不自动扩大芯片、模式或实板支持。"
+msgid "使用同一精确提交重新生成配置和 factory，并重编所有调用者、provider、组件与 SDK 消费者。当前 TOML schema 2、typed IR 源码代际 5、resolved projection 2 和 SDK manifest 3 分别计代；源码代际或包格式变化不自动扩大芯片、模式或实板支持。"
+msgstr "使用同一精确提交重新生成配置和 factory，并重编所有调用者、provider、组件与 SDK 消费者。当前 TOML schema 2、typed IR 源码代际 5、resolved projection 2 和 SDK manifest 3 分别计代；源码代际或包格式变化不自动扩大芯片、模式或实板支持。"
 
 msgid "epoch 4 的逻辑 signal 与 RS485 迁移"
 msgstr "epoch 4 的逻辑 signal 与 RS485 迁移"
@@ -416,8 +384,20 @@ msgstr ""
 msgid "映射存储 backend 的 `map` 改为返回 `nx_mapped_storage_map_result_t`，显式区分 结果与 `cleanup_required`。失败但需要清理时不发放可读 loan，owner 保留撤映责任。 `start` 接收原请求的绝对 deadline，不重启预算。首次构造仍使用 `init`；完整冷停 后使用 `nx_mapped_storage_owner_reopen()`，保留 slot／writer epoch 和耗尽状态， 不能重新初始化 owner 使旧 token 再次有效。自定义 backend 和静态集成须按新声明 重编，并先 join 原调用者与控制操作。"
 msgstr "映射存储 backend 的 `map` 改为返回 `nx_mapped_storage_map_result_t`，显式区分 结果与 `cleanup_required`。失败但需要清理时不发放可读 loan，owner 保留撤映责任。 `start` 接收原请求的绝对 deadline，不重启预算。首次构造仍使用 `init`；完整冷停 后使用 `nx_mapped_storage_owner_reopen()`，保留 slot／writer epoch 和耗尽状态， 不能重新初始化 owner 使旧 token 再次有效。自定义 backend 和静态集成须按新声明 重编，并先 join 原调用者与控制操作。"
 
-msgid "epoch 5 引入时使用 TOML schema 2、resolved projection 1 和 SDK manifest 2。当前 包格式独立演进为 schema 3，不改变 factory／typed IR 代际 5。版本号与前序快照 相同也必须固定精确提交，重新生成并重编全部源码；epoch 2／3／4 的迁移继续适用。"
-msgstr "epoch 5 引入时使用 TOML schema 2、resolved projection 1 和 SDK manifest 2。当前 包格式独立演进为 schema 3，不改变 factory／typed IR 代际 5。版本号与前序快照 相同也必须固定精确提交，重新生成并重编全部源码；epoch 2／3／4 的迁移继续适用。"
+msgid "epoch 5 引入时使用 TOML schema 2、resolved projection 1 和 SDK manifest 2。当前 包格式独立演进为 schema 3；factory 代际 6 与 typed IR 代际 5 分别维护。版本号与前序 快照相同也必须固定精确提交，重新生成并重编全部源码；epoch 2／3／4 的迁移继续适用。"
+msgstr "epoch 5 引入时使用 TOML schema 2、resolved projection 1 和 SDK manifest 2。当前 包格式独立演进为 schema 3；factory 代际 6 与 typed IR 代际 5 分别维护。版本号与前序 快照相同也必须固定精确提交，重新生成并重编全部源码；epoch 2／3／4 的迁移继续适用。"
+
+msgid "epoch 6 的按需 factory 与已选产物迁移"
+msgstr "epoch 6 的按需 factory 与已选产物迁移"
+
+msgid "未选类别不再生成 ID 类型、COUNT、getter、strong wrapper 或 capability getter。 已选类别定义 `NX_FACTORY_HAS_<CLASS>` 为 1；可选装配用 `defined` 判断，不能把 enum 形式的 COUNT 当预处理条件。移除调用空 getter 探测未选类别的代码；业务组件由应用 注入公共端口。已选类别的非法 ID 仍返回 NULL，可选 signal、validator 等仍按原合同 返回不支持结果。控制器与端点保持独立身份。"
+msgstr "未选类别不再生成 ID 类型、COUNT、getter、strong wrapper 或 capability getter。 已选类别定义 `NX_FACTORY_HAS_<CLASS>` 为 1；可选装配用 `defined` 判断，不能把 enum 形式的 COUNT 当预处理条件。移除调用空 getter 探测未选类别的代码；业务组件由应用 注入公共端口。已选类别的非法 ID 仍返回 NULL，可选 signal、validator 等仍按原合同 返回不支持结果。控制器与端点保持独立身份。"
+
+msgid "UART 基础与 word、stream、RS485 目标分开。App 自行组合适配器时显式链接对应 目标，生产装配按已选模式连接必要扩展。Native 与 CPU Runtime 仍允许自定义 provider。 本轮不改变请求借用、排空、IRQ 或生命周期合同。"
+msgstr "UART 基础与 word、stream、RS485 目标分开。App 自行组合适配器时显式链接对应 目标，生产装配按已选模式连接必要扩展。Native 与 CPU Runtime 仍允许自定义 provider。 本轮不改变请求借用、排空、IRQ 或生命周期合同。"
+
+msgid "生成文件 `resolved.json` 的 schema 2 省去未选候选路线，只保留有效配置与输入身份。 完整 typed IR 和其 schema-1 审计投影继续负责校验与配置摘要；query 读取受摘要约束的 完整事实。更新产物消费者后重新生成 SDK、资源报告与文件哈希，不沿用旧成功报告。 TOML schema 2、typed IR 代际 5 与 SDK manifest 3 保持各自合同。"
+msgstr "生成文件 `resolved.json` 的 schema 2 省去未选候选路线，只保留有效配置与输入身份。 完整 typed IR 和其 schema-1 审计投影继续负责校验与配置摘要；query 读取受摘要约束的 完整事实。更新产物消费者后重新生成 SDK、资源报告与文件哈希，不沿用旧成功报告。 TOML schema 2、typed IR 代际 5 与 SDK manifest 3 保持各自合同。"
 
 msgid "SDK manifest schema 3 的包导出归属"
 msgstr "SDK manifest schema 3 的包导出归属"

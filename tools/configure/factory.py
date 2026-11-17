@@ -12,7 +12,7 @@ from tools.configure import stream_profiles, uart_formats, usb_profiles
 from tools.configure.calls import Symbol
 from tools.configure import usb_otg
 
-FACTORY_ABI_EPOCH = 5
+FACTORY_ABI_EPOCH = 6
 
 KINDS = CONTROLLER_KINDS
 
@@ -70,7 +70,7 @@ def _typed(result):
 
 
 def classes(result):
-    """Keep controller and endpoint namespaces independent in every view."""
+    """Project selected controller and endpoint namespaces in stable order."""
     result = _typed(result)
     records = [(kind, "port", [item for item in result.controllers
                               if controller_class(item) == kind])
@@ -98,7 +98,7 @@ def classes(result):
             records.append((name, "endpoint", instances))
     records.append(("mdio", "port", [item for item in result.controllers
                                     if item.kind in {"eth", "eth_frames"}]))
-    return records
+    return [record for record in records if record[2]]
 
 
 def controller_class(item):
@@ -178,7 +178,8 @@ def _block_async_factory(result):
 
 def _gpio_signal_factory(result):
     """A logical signal borrows one authorized face, without mutable state."""
-    instances = [item for item in result.controllers if item.kind == "gpio"]
+    instances = [item for item in result.controllers
+                 if controller_class(item) == "gpio"]
     if not instances:
         return [], []
     header = [r'/** \brief Pure optional signal lookup; polarity is authored. */',
@@ -307,7 +308,8 @@ def emit(result):
         prefix = "NX_" + class_name.upper() + "_ID_"
         return_type = "const " + interface_type(class_name, shape) + "*"
         argument = f"nx_{class_name}_id_t id"
-        header += [f"typedef uint16_t nx_{class_name}_id_t;", "enum {"]
+        header += [f"#define NX_FACTORY_HAS_{class_name.upper()} 1",
+                   f"typedef uint16_t nx_{class_name}_id_t;", "enum {"]
         for index, instance in enumerate(instances):
             header.append(f'    {prefix}{symbol(instance.id).upper()} = {index},')
         header += [f"    {prefix}COUNT = {len(instances)}", "};",
@@ -456,7 +458,7 @@ def emit_strong(result):
                    'static inline const nx_usb_otg_port_t*',
                    'nx_factory_usb_otg_ref(nx_usb_device_ref_t id) {',
                    '    return nx_factory_usb_otg(id.value);', '}']
-    if any(item.kind == "gpio" for item in result.controllers):
+    if any(controller_class(item) == "gpio" for item in result.controllers):
         header += [
             r'/** \brief Pure optional logical signal on the same GPIO ref. */',
             'static inline const nx_gpio_signal_t*',
@@ -507,7 +509,8 @@ def emit_strong(result):
 def emit_smbus(result):
     """An opt-in component companion reuses immutable I2C endpoint facts."""
     result = _typed(result)
-    if "smbus" not in result.components:
+    if ("smbus" not in result.components or
+            not any(name == "i2c_device" for name, _, _ in classes(result))):
         return "", ""
     from tools.configure.providers.common import mode_traits
     controllers = {item.id: item for item in result.controllers}

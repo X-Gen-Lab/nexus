@@ -19,10 +19,13 @@ class SMBusFactoryTests(unittest.TestCase):
             'board_package = "zg_board"',
             f'board_package = "{fixture / "zg_board"}"')
 
-    def resolve(self, selected=True, mode="irq-messages", extra=""):
+    def resolve(self, selected=True, mode="irq-messages", extra="",
+                *, with_controller=True):
         text = self.text.replace('schema = 2', 'schema = 2\n' +
             ('components = ["smbus"]' if selected else 'components = []'))
         text = text.replace('mode = "irq-messages"', f'mode = "{mode}"')
+        if not with_controller:
+            text = text.split("\n[i2c.", 1)[0]
         if mode == "poll-messages":
             text = text.replace('[i2c.bus.irq]\npriority = 5\n'
                                 'calls_os = false\n', '')
@@ -59,6 +62,12 @@ class SMBusFactoryTests(unittest.TestCase):
         output = self.emit(self.resolve(selected=False))
         self.assertFalse((output / "nexus_smbus_factory.h").exists())
         self.assertNotIn("smbus", (output / "bindings.c").read_text())
+
+    def test_component_without_endpoints_emits_no_factory(self):
+        output = self.emit(self.resolve(with_controller=False))
+        self.assertFalse((output / "nexus_smbus_factory.h").exists())
+        self.assertNotIn("nx_factory_smbus_binding",
+                         (output / "bindings.c").read_text())
 
     def test_polling_and_ten_bit_endpoints_never_gain_a_pec_binding(self):
         for mode, extra in (("poll-messages", ""),

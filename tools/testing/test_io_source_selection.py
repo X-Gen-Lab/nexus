@@ -1,4 +1,5 @@
 """Inspect the real I/O target without compiling an unrelated device domain."""
+import json
 import os
 from pathlib import Path
 import shlex
@@ -46,12 +47,16 @@ class IOSourceSelectionTests(unittest.TestCase):
 
     def sources(self, kinds=(), *, family="stm32f4", components=(),
                 external_component=False, required_target=None, broker=False,
-                network=False):
+                network=False, modes=("irq-byte-event",), build=False):
         with tempfile.TemporaryDirectory(prefix="nexus io sources ") as folder:
             root = Path(folder)
             project = f'''cmake_minimum_required(VERSION 3.31)
 project(io_source_contract LANGUAGES C)
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(NEXUS_SOURCE_DIR "{ROOT}")
+set(NEXUS_CONFIG_DIR "{root / 'config'}")
 set(NEXUS_SOC_FAMILY "{family}")
 set(NEXUS_TEST_SUPPORT {"ON" if family == "native" else "OFF"})
 set(NEXUS_SELECTED_KINDS "{';'.join(kinds)}")
@@ -67,6 +72,12 @@ target_include_directories(nexus_arch INTERFACE "{ROOT / 'arch/include'}")
 target_compile_options(nexus_build_options INTERFACE -ffunction-sections)
 add_subdirectory("{ROOT / 'io'}" io)
 '''
+            (root / "config").mkdir()
+            (root / "config/resolved.json").write_text(json.dumps({
+                "controllers": [{"kind": kind, "mode": mode,
+                                 "controller": "fixture"}
+                                for kind in kinds for mode in modes],
+            }))
             if broker:
                 project += f'''
 add_library(nexus_os_wait INTERFACE)
@@ -157,14 +168,26 @@ target_link_libraries(consumer PRIVATE {required_target})
                 [ninja, "-C", str(root / "build"), "-t", "commands", target],
                 env=environment, capture_output=True, text=True, timeout=30)
             self.assertEqual(result.returncode, 0, result.stderr)
+            command_output = result.stdout
+            if build:
+                result = subprocess.run(
+                    [cmake, "--build", str(root / "build"), "--target", target,
+                     "--parallel", "2"], env=environment,
+                    capture_output=True, text=True, timeout=60)
+                self.assertEqual(result.returncode, 0,
+                                 result.stdout + result.stderr)
             sources = set()
-            for line in result.stdout.splitlines():
+            for line in command_output.splitlines():
                 arguments = shlex.split(line)
                 if "-c" not in arguments:
                     continue
                 source = Path(arguments[arguments.index("-c") + 1])
                 if source.is_relative_to(ROOT / "io"):
                     sources.add(source.relative_to(ROOT / "io").as_posix())
+                    if build:
+                        self.assertIn("-o", arguments)
+                        self.assertTrue((root / "build" / arguments[
+                            arguments.index("-o") + 1]).is_file(), source)
             return sources
 
     def test_empty_platform_has_no_device_api_or_transport_mechanism(self):
@@ -176,17 +199,54 @@ target_link_libraries(consumer PRIVATE {required_target})
             "src/api/gpio.c", "src/api/pin_state.c",
             "src/mechanisms/diagnostic.c", "src/mechanisms/observation.c"})
 
-    def test_uart_retains_stream_word_and_rs485_gpio_dependencies(self):
-        sources = self.sources(("uart",))
-        self.assertLessEqual({"src/api/uart.c", "src/api/uart_word.c",
-                         "src/mechanisms/stream_profile.c",
-                         "src/mechanisms/dma.c"}, sources)
-        self.assertEqual({name for name in sources if name.startswith("src/api/")},
-                         {"src/api/uart.c", "src/api/uart_word.c",
-                          "src/api/gpio.c", "src/api/pin_state.c"})
-        self.assertNotIn("src/mechanisms/spi_dma_sequence.c", sources)
+    def test_irq_uart_builds_only_byte_api_format_and_wake(self):
+        self.assertEqual(self.sources(("uart",), build=True), {
+            "src/api/uart.c", "src/api/uart_format.c",
+            "src/mechanisms/wake.c", "src/mechanisms/diagnostic.c",
+            "src/mechanisms/observation.c"})
+
+    def test_word_uart_builds_its_own_api_without_stream_or_rs485(self):
+        sources = self.sources(("uart",), modes=("irq-words",), build=True)
+        self.assertIn("src/api/uart_word.c", sources)
+        self.assertIn("src/api/uart_format.c", sources)
+        self.assertNotIn("src/mechanisms/stream.c", sources)
+        self.assertNotIn("src/mechanisms/uart_rs485.c", sources)
+
+    def test_block_uart_keeps_stream_without_rs485_or_word(self):
+        sources = self.sources(("uart",), modes=("irq-blocks",), build=True)
+        self.assertIn("src/mechanisms/stream.c", sources)
+        self.assertIn("src/mechanisms/stream_profile.c", sources)
+        self.assertNotIn("src/api/uart_word.c", sources)
+        self.assertNotIn("src/mechanisms/uart_rs485.c", sources)
+
+    def test_explicit_rs485_target_needs_no_selected_uart(self):
+        sources = self.sources(("gpio",), required_target="Nexus::IOUARTRS485",
+                               build=True)
+        self.assertIn("src/mechanisms/uart_rs485.c", sources)
+        self.assertIn("src/api/gpio.c", sources)
+        self.assertIn("src/api/uart.c", sources)
+        self.assertNotIn("src/api/uart_word.c", sources)
+        self.assertNotIn("src/mechanisms/stream.c", sources)
+
+    def test_spi_builds_without_unrelated_stream_storage(self):
+        sources = self.sources(("spi",), modes=("short-poll",), build=True)
+        self.assertIn("src/api/spi.c", sources)
+        self.assertNotIn("src/mechanisms/stream.c", sources)
+        self.assertNotIn("src/mechanisms/frame_stream.c", sources)
+        self.assertNotIn("src/mechanisms/dma.c", sources)
+
+    def test_scalar_adc_builds_without_stream_storage(self):
+        sources = self.sources(("adc",), modes=("low-rate-scan",), build=True)
+        self.assertIn("src/api/adc.c", sources)
+        self.assertIn("src/mechanisms/adc_format.c", sources)
+        self.assertNotIn("src/mechanisms/stream.c", sources)
         self.assertNotIn("src/mechanisms/adc_stream_profile.c", sources)
-        self.assertNotIn("src/mechanisms/adc_format.c", sources)
+
+    def test_adc_blocks_keep_stream_profile_storage(self):
+        sources = self.sources(("adc",), modes=("trigger-dma",), build=True)
+        self.assertIn("src/mechanisms/stream.c", sources)
+        self.assertIn("src/mechanisms/adc_stream_profile.c", sources)
+        self.assertNotIn("src/mechanisms/stream_profile.c", sources)
 
     def test_explicit_target_keeps_its_public_io_dependency(self):
         sources = self.sources(required_target="Nexus::IOFlash")
@@ -214,7 +274,7 @@ target_link_libraries(consumer PRIVATE {required_target})
         sources = self.sources(("gpio",), broker=True,
                                required_target="Nexus::UserIoAsync")
         self.assertIn("src/api/uart.c", sources)
-        self.assertIn("src/mechanisms/stream.c", sources)
+        self.assertNotIn("src/mechanisms/stream.c", sources)
         self.assertNotIn("src/api/i2c.c", sources)
 
     def test_tcp_keeps_ethernet_without_selected_uart(self):

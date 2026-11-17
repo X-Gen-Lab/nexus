@@ -1,7 +1,7 @@
 """Compile selected factory headers without unrelated public I/O headers."""
 from tools.configure.tests.native_fixture import canonical_assembly
 from pathlib import Path
-from dataclasses import FrozenInstanceError
+from dataclasses import FrozenInstanceError, replace
 import re
 import subprocess
 import tempfile
@@ -47,19 +47,33 @@ class FactoryIncludeTests(unittest.TestCase):
     def test_empty_factory_has_no_full_io_dependency(self):
         self.generate("native-empty.toml")
         self.assertEqual(self.public_dependencies(), {"fwd.h"})
+        for name in ("nexus_factory.h", "nexus_factory_strong.h"):
+            header = (self.output / name).read_text()
+            self.assertNotIn("nx_gpio_id_t", header)
+            self.assertNotIn("nx_gpio_ref_t", header)
+            self.assertNotIn("nx_factory_usb_activation(", header)
+            self.assertNotIn("NX_FACTORY_HAS_", header)
 
-    def test_selected_gpio_keeps_full_api_and_empty_getter_identities(self):
+    def test_selected_gpio_keeps_only_its_factory_identity(self):
         self.generate("native-gpio.toml")
         self.assertEqual(self.public_dependencies(), {"fwd.h", "gpio.h"})
-        contents = ('#include "nexus_factory.h"\n'
+        contents = ('#include "nexus_factory_strong.h"\n'
+                    '#if !defined(NX_FACTORY_HAS_GPIO) || '
+                    'NX_FACTORY_HAS_GPIO != 1\n#error missing GPIO\n#endif\n'
+                    '#if defined(NX_FACTORY_HAS_UART)\n'
+                    '#error unexpected UART\n#endif\n'
                     'const nx_gpio_port_t* gpio(void) {\n'
-                    '    return nx_factory_gpio(NX_GPIO_ID_LED0);\n}\n'
-                    'const nx_uart_port_t* absent(void) {\n'
-                    '    return nx_factory_uart(NX_UART_ID_COUNT);\n}\n')
+                    '    return nx_factory_gpio_ref(NX_GPIO_REF_LED0);\n}\n')
         for compiler, standard in (("cc", "c11"), ("c++", "c++17")):
             with self.subTest(compiler=compiler):
                 result = self.compile(compiler, standard, contents)
                 self.assertEqual(result.returncode, 0, result.stderr)
+                missing = self.compile(
+                    compiler, standard, '#include "nexus_factory.h"\n'
+                    'const nx_uart_port_t* absent(void) {\n'
+                    '    return nx_factory_uart(NX_UART_ID_COUNT);\n}\n')
+                self.assertNotEqual(missing.returncode, 0)
+                self.assertIn("NX_UART_ID_COUNT", missing.stderr)
 
     def test_mixed_selected_interfaces_compile_with_nominal_references(self):
         assembly = self.root / "assembly.toml"
@@ -86,14 +100,37 @@ class FactoryIncludeTests(unittest.TestCase):
                          {"fwd.h", "uart.h", "stream.h", "wake.h",
                           "observation.h", "traits.h"})
 
-    def test_empty_getters_execute_without_complete_interface_definitions(self):
-        self.generate("native-empty.toml")
-        assembly = configure.ROOT / "tests/support/native/assemblies/native-empty.toml"
+    def test_stateful_pad_identity_does_not_require_an_ordinary_gpio_class(self):
+        assembly = canonical_assembly(configure.ROOT, "native-gpio.toml")
+        result = configure.resolve_ir(assembly, test_support=True)
+        controller = replace(result.controllers[0], mode="named-states")
+        result = replace(result, controllers=(controller,))
+        header, _ = factory.emit(result)
+        self.assertNotIn("nx_gpio_id_t", header)
+        self.output.mkdir()
+        (self.output / "nexus_factory.h").write_text(header)
+        (self.output / "nexus_factory_strong.h").write_text(
+            factory.emit_strong(result))
+        contents = ('#include "nexus_factory_strong.h"\n'
+                    'const nx_pin_state_port_t* pad(void) {\n'
+                    '    return nx_factory_pin_state_ref(NX_PIN_STATE_REF_LED0);\n'
+                    '}\n')
+        for compiler, standard in (("cc", "c11"), ("c++", "c++17")):
+            with self.subTest(compiler=compiler):
+                execution = self.compile(compiler, standard, contents)
+                self.assertEqual(execution.returncode, 0, execution.stderr)
+
+    def test_selected_getter_preserves_invalid_id_and_optional_signal(self):
+        self.generate("native-gpio.toml")
+        assembly = configure.ROOT / "tests/support/native/assemblies/native-gpio.toml"
         _, getters = factory.emit(configure.resolve_ir(assembly, test_support=True))
         contents = ('#include "nexus_factory_strong.h"\n#include <assert.h>\n'
+                    'static const nx_gpio_port_t face = {NULL, NULL};\n'
+                    'const nx_gpio_port_t* const nx_binding_led0 = &face;\n'
                     + getters + '\nint main(void) {\n'
+                    'assert(nx_factory_gpio_ref(NX_GPIO_REF_LED0) == &face);\n'
                     'assert(nx_factory_gpio(NX_GPIO_ID_COUNT) == NULL);\n'
-                    'assert(nx_factory_usb_activation(NX_USB_DEVICE_ID_COUNT) '
+                    'assert(nx_factory_gpio_signal_ref(NX_GPIO_REF_LED0) '
                     '== NULL);\nreturn 0;\n}\n')
         for compiler, standard in (("cc", "c11"), ("c++", "c++17")):
             with self.subTest(compiler=compiler):
@@ -114,7 +151,8 @@ class FactoryIncludeTests(unittest.TestCase):
 
     def test_shared_arm_retain_fixtures_compile_with_empty_selection(self):
         self.generate("native-empty.toml")
-        for name in ('io_evolution_assembly', 'stm32_assembly'):
+        for name in ('io_evolution_assembly', 'stm32_assembly',
+                     'timer_assembly'):
             with self.subTest(fixture=name):
                 source = (configure.ROOT / "tests/contracts" / name /
                           "controller_main.c")
@@ -128,9 +166,10 @@ class FactoryIncludeTests(unittest.TestCase):
                   'const nx_spi_port_t* spi(void) {\n'
                   '    return nx_factory_spi(NX_SPI_ID_SPI0);\n}\n'
                   'const nx_uart_port_t* optional_uart(void) {\n'
+                  '#if defined(NX_FACTORY_HAS_UART)\n'
                   '    for (nx_uart_id_t id = 0U; id != NX_UART_ID_COUNT; ++id) {\n'
                   '        return nx_factory_uart(id);\n'
-                  '    }\n    return NULL;\n}\n')
+                  '    }\n#endif\n    return NULL;\n}\n')
         result = self.compile("cc", "c11", source)
         self.assertEqual(result.returncode, 0, result.stderr)
 

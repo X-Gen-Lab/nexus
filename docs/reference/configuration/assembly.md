@@ -16,8 +16,9 @@ are rejected as inputs, not retained as an alternate authoring interface.
 
 The parser creates immutable `AuthoredAssembly` intent. Production consumers use
 `resolve_ir()` and named immutable `ConfigurationIR` decisions; only audit and
-artifact-boundary consumers request `to_dict()`. Typed source epoch 5 and the
-schema-1 JSON output projection are separate contracts. The
+artifact-boundary consumers request `to_dict()`. Typed source epoch 5, its complete
+schema-1 audit projection and the selected schema-2 `resolved.json` file are
+separate contracts. The
 [source compatibility policy](../../design/source-compatibility.md) owns their
 version declarations; neither introduces firmware metadata or runtime dispatch.
 
@@ -61,7 +62,19 @@ include it and use nominal references such as `NX_UART_REF_UART0` with
 `factory.strong` is not a supported field and rejects as unknown. The optional
 `capabilities = true` selection emits immutable mode metadata separately from
 the interface faces. Factory getters return existing static objects and do not
-start hardware.
+start hardware. Only selected classes have factory IDs and getters. Optional
+application composition can test `NX_FACTORY_HAS_<CLASS>` with `defined`; absent
+classes leave that macro undefined. Invalid IDs of a selected class still return
+NULL, and optional extensions retain their own unsupported-mode contracts.
+
+The generated schema-2 `resolved.json` records effective controllers, endpoints,
+selected routes and Board bindings, resources, memory, budgets and input identities.
+It omits the unused candidate route catalogue. `fact_references` identifies the
+original fact files by path and SHA-256 instead of embedding complete device-review
+catalogues. The resolver still validates the complete facts, and its configuration
+digest remains based on the complete typed IR projection. `list-bindings` and `explain` use the full validated IR; candidate
+queries check the fact bytes against the recorded input hashes. Do not hand-edit
+this output or treat it as a second authored configuration.
 
 ## Logical GPIO signals
 

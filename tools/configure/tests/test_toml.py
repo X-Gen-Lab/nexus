@@ -150,12 +150,12 @@ priority=5
         self.assertNotIn("initialize", factory)
         self.assertNotIn("malloc", factory)
 
-    def test_generated_factory_empty_class_is_defined(self):
+    def test_generated_factory_omits_unselected_classes(self):
         self.resolve()
         output = self.root / "bundle"
         gate.configure(self.assembly, output, self.root, test_support=True)
-        self.assertIn("NX_UART_ID_COUNT = 0", (output / "nexus_factory.h").read_text())
-        self.assertIn("nx_factory_uart", (output / "bindings.c").read_text())
+        self.assertNotIn("nx_uart_id_t", (output / "nexus_factory.h").read_text())
+        self.assertNotIn("nx_factory_uart", (output / "bindings.c").read_text())
 
     def test_virtual_spi_endpoints_have_explicit_independent_ids(self):
         ir = self.resolve("""
@@ -465,6 +465,7 @@ model_bytes=128
         output = self.root / "bundle"
         gate.configure(self.assembly, output, self.root, test_support=True)
         emitted = json.loads((output / "resolved.json").read_text())
-        self.assertEqual(emitted, ir.to_dict())
+        self.assertEqual(emitted["controllers"], ir.to_dict()["controllers"])
+        self.assertEqual(emitted["inputs"], ir.to_dict()["inputs"])
         self.assertEqual(emitted["configuration_sha256"],
                          ir.configuration_sha256)

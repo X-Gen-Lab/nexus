@@ -86,6 +86,17 @@ def class_epoch(tree, class_name, field):
     return one(values, class_name + "." + field + " schema epoch")
 
 
+def module_epoch(tree, name):
+    """Observe a generated-file contract separately from the in-memory IR."""
+    values = [node.value.value for node in tree.body
+              if isinstance(node, ast.Assign) and
+              any(isinstance(target, ast.Name) and target.id == name
+                  for target in node.targets) and
+              isinstance(node.value, ast.Constant) and
+              type(node.value.value) is int]
+    return one(values, name + " epoch")
+
+
 def guard_schema(tree, variable):
     values = []
     for node in ast.walk(tree):
@@ -146,6 +157,7 @@ def observe(root=ROOT):
     authored = ast.parse(source("tools/configure/authored.py"))
     configured = ast.parse(source("tools/configure/configure.py"))
     typed = ast.parse(source("tools/configure/ir.py"))
+    emission = ast.parse(source("tools/configure/emission.py"))
     runtime = ast.parse(source("tools/configure/runtime.py"))
     package = ast.parse(source("cmake/package/package_source_sdk.py"))
     factory = ast.parse(source("tools/configure/factory.py"))
@@ -154,8 +166,8 @@ def observe(root=ROOT):
     if editor["properties"]["schema"]["const"] != author_epoch:
         raise ValueError("Editor schema differs from actual authoring validator")
     schemas = {"assembly_authoring": author_epoch,
-               "assembly_projection": class_epoch(
-                   typed, "ConfigurationIR", "schema_version"),
+               "assembly_projection": module_epoch(
+                   emission, "RESOLVED_SCHEMA_VERSION"),
                "typed_ir": class_epoch(
                    typed, "ConfigurationIR", "source_epoch"),
                "board": integer_call(configured, "Board schema"),
@@ -177,12 +189,7 @@ def observe(root=ROOT):
             data = parse_json(source(path.relative_to(root)))
             if type(data.get("schema_version")) is not int or data["schema_version"] != schemas[name]:
                 raise ValueError(f"Actual {name} fact schema differs: {path}")
-    factory_epochs = [node.value.value for node in factory.body
-                      if isinstance(node, ast.Assign) and
-                      any(isinstance(target, ast.Name) and target.id == "FACTORY_ABI_EPOCH"
-                          for target in node.targets) and
-                      isinstance(node.value, ast.Constant) and type(node.value.value) is int]
-    factory_epoch = one(factory_epochs, "supported source factory epoch")
+    factory_epoch = module_epoch(factory, "FACTORY_ABI_EPOCH")
     template = source("cmake/package/NexusConfigVersion.cmake.in")
     return {"semantic_version": version, "factory_abi_epoch": factory_epoch, "schemas": schemas,
             "source_sdk_exact_only": package_exact_text(template, version), "inputs": inputs}

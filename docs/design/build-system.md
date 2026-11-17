@@ -24,6 +24,29 @@ package also declares Source SDK export ownership. Board and SoC contain no
 Python plugins; production uses the generic DataProvider rather than family
 constructor imports. Package enumeration does not select C source units.
 
+Physical Platform targets connect selected modes to their necessary public I/O
+and private provider targets. `Nexus::IOUART` supplies byte UART, shared format
+validation and necessary wake support; `Nexus::IOUARTWord`,
+`Nexus::IOUARTStream` and `Nexus::IOUARTRS485` supply explicit extensions. An
+application using RS485 links its target even when its adapter is assembled
+outside TOML. Native and CPU Runtime retain caller-defined provider composition.
+Headers and compile database entries do not prove that a target was built;
+inspect the actual command closure, objects and linked sections.
+
+SPI public helpers require wake support, while selected SoC DMA modes connect
+the DMA target explicitly. `Nexus::IOADCStream` separates ADC stream-profile
+code and dependencies from the base ADC domain; selected ADC stream modes connect
+that target. ADC-group block modes connect the shared stream/DMA targets as needed.
+Block and USB keep shared DMA validation dependencies
+where their actual paths require them. Splitting follows function references and
+working consumer builds, not filenames alone.
+
+The generated schema-2 `resolved.json` contains effective selections and their
+input identities, while complete candidate facts remain in the resolver and
+query path. This reduces output duplication without introducing a second
+configuration authority or source graph. Generation size, actual compilation
+work and final Flash/RAM costs are separate measurements.
+
 The selected provider supplies its actual private include directories through
 the existing `NEXUS_SYSTEM_PRIVATE_INCLUDES` connection. Root CMake consumes that
 declaration with PRIVATE scope; it no longer owns a fixed list of F4 IP paths.

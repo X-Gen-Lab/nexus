@@ -28,8 +28,10 @@ the production instance-generation mechanism.
 
 `nexus_factory.h` is generated for each Platform assembly, so its IDs are not a universal
 header or persistent numbering scheme. Default IDs are compact `uint16_t` aliases
-with named constants. COUNT, invalid and unselected entries return NULL.
-A chip capability record does not grant Board routing or physical qualification.
+with named constants. Only classes with selected instances have ID types, named
+constants and getters. Their COUNT and invalid IDs return NULL. An absent class
+has no factory API; a chip capability record does not grant Board routing or
+physical qualification.
 
 ## Choose strong references for new products
 
@@ -38,7 +40,7 @@ include it and use the class-specific `NX_*_REF_*` constants with
 `nx_factory_*_ref()` getters. These wrappers return the same static faces and
 add no global storage, hardware access or configuration key.
 
-The four external starter templates and the primary public SDK consumers use
+The maintained external starter templates and primary public SDK consumers use
 these strong references by default. `configure.py explain --assembly <input>`
 shows the exact include, return type, reference constant and getter derived from
 the same factory projection. Physical controller names do not determine the
@@ -69,9 +71,30 @@ COUNT constants and lifecycle controller ordinals retain their distinct
 counting/diagnostic purposes; they are not class-specific device references.
 
 The factory header includes complete public APIs only for selected interface
-classes and preserves forward declarations for unselected getters. Include a
-specific public I/O header explicitly when code needs that API or its complete
-face layout; an empty getter still returns NULL.
+classes. Ordinary getters, strong references and optional capability getters
+share that same class selection. Include a specific public I/O header explicitly
+when code needs its API or complete face layout. No zero-instance class creates
+an empty getter or wrapper type.
+
+For each selected class, the header defines `NX_FACTORY_HAS_<CLASS>` as `1`,
+for example `NX_FACTORY_HAS_UART`. An absent class leaves that macro undefined.
+Use `#if defined(NX_FACTORY_HAS_UART)` only in optional application composition;
+COUNT is an enum value, not a preprocessor presence test. A presence macro says
+that this assembly has the class, not that a named business role, every mode or
+physical qualification exists. Components still receive public faces as inputs
+and do not depend on generated factory headers.
+
+Optional interfaces of a selected class retain their query contracts. A GPIO
+without authored polarity can return NULL for its logical signal; a DAC without
+a selected transfer extension can return NULL for that extension. Removing an
+unselected class does not turn unsupported optional operations into mandatory
+ones. An empty assembly retains platform lifecycle and timebase responsibilities,
+but no user peripheral state or buffers.
+
+These changes reduce generated text and compilation work. Unreferenced getters
+were already removable by MCU section garbage collection; generated file sizes
+are not Flash or RAM measurements. Compare selected objects and final ELF images
+separately before claiming resource savings.
 
 (factory-controller-diagnostics)=
 ## Map lifecycle diagnostics to the assembly

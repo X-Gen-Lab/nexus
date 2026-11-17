@@ -12,85 +12,67 @@
 static const void* volatile s_observed_identity;
 static volatile uint16_t s_identity_count;
 
+/** \brief Retain only identities present in this assembly. */
+#define NX_FIXTURE_RETAIN_IDENTITIES(name, count)                              \
+    do {                                                                       \
+        s_identity_count = (count);                                            \
+        for (uint16_t id = 0U; id < s_identity_count; ++id) {                  \
+            s_observed_identity = nx_factory_##name(id);                       \
+        }                                                                      \
+    } while (0)
+
 int main(void) {
-    s_identity_count = NX_UART_ID_COUNT;
-    for (uint16_t id = 0U; id < s_identity_count; ++id) {
-        s_observed_identity = nx_factory_uart(id);
-    }
-#ifdef NX_FIXTURE_UART_WORD
-    s_identity_count = NX_UART_WORD_ID_COUNT;
-    for (uint16_t id = 0U; id < s_identity_count; ++id) {
-        s_observed_identity = nx_factory_uart_word(id);
-    }
+#if defined(NX_FACTORY_HAS_UART)
+    NX_FIXTURE_RETAIN_IDENTITIES(uart, NX_UART_ID_COUNT);
 #endif
-    s_identity_count = NX_SPI_ID_COUNT;
-    for (uint16_t id = 0U; id < s_identity_count; ++id) {
-        s_observed_identity = nx_factory_spi(id);
-    }
-    s_identity_count = NX_I2C_ID_COUNT;
-    for (uint16_t id = 0U; id < s_identity_count; ++id) {
-        s_observed_identity = nx_factory_i2c(id);
-    }
-    s_identity_count = NX_PWM_ID_COUNT;
-    for (uint16_t id = 0U; id < s_identity_count; ++id) {
-        s_observed_identity = nx_factory_pwm(id);
-    }
-    s_identity_count = NX_ADC_ID_COUNT;
-    for (uint16_t id = 0U; id < s_identity_count; ++id) {
-        s_observed_identity = nx_factory_adc(id);
-    }
-    s_identity_count = NX_WATCHDOG_ID_COUNT;
-    for (uint16_t id = 0U; id < s_identity_count; ++id) {
-        s_observed_identity = nx_factory_watchdog(id);
-    }
-    if (NX_EXTI_ID_COUNT != 0U) {
-        s_identity_count = NX_EXTI_ID_COUNT;
-        for (uint16_t id = 0U; id < s_identity_count; ++id) {
-            s_observed_identity = nx_factory_exti(id);
-        }
-    }
-    if (NX_ADVANCED_PWM_ID_COUNT != 0U) {
-        s_identity_count = NX_ADVANCED_PWM_ID_COUNT;
-        for (uint16_t id = 0U; id < s_identity_count; ++id) {
-            s_observed_identity = nx_factory_advanced_pwm(id);
-        }
-    }
-    if (NX_TIMER_CAPTURE_ID_COUNT != 0U) {
-        s_identity_count = NX_TIMER_CAPTURE_ID_COUNT;
-        for (uint16_t id = 0U; id < s_identity_count; ++id) {
-            s_observed_identity = nx_factory_timer_capture(id);
-        }
-    }
-#ifdef NX_FIXTURE_ENCODER
-    s_identity_count = NX_ENCODER_ID_COUNT;
-    for (uint16_t id = 0U; id < s_identity_count; ++id) {
-        s_observed_identity = nx_factory_encoder(id);
-    }
+#if defined(NX_FACTORY_HAS_UART_WORD)
+    NX_FIXTURE_RETAIN_IDENTITIES(uart_word, NX_UART_WORD_ID_COUNT);
 #endif
-    s_identity_count = NX_SPI_DEVICE_ID_COUNT;
-    for (uint16_t id = 0U; id < s_identity_count; ++id) {
-        s_observed_identity = nx_factory_spi_device(id);
-    }
-#ifdef NX_FIXTURE_SPI_TRANSACTION
-    s_identity_count = NX_SPI_TRANSACTION_DEVICE_ID_COUNT;
-    for (uint16_t id = 0U; id < s_identity_count; ++id) {
-        s_observed_identity = nx_factory_spi_transaction_device(id);
-    }
+#if defined(NX_FACTORY_HAS_SPI)
+    NX_FIXTURE_RETAIN_IDENTITIES(spi, NX_SPI_ID_COUNT);
 #endif
-#ifdef NX_FIXTURE_SPI_DMA_TRANSACTION
-    s_identity_count = NX_SPI_DMA_TRANSACTION_ID_COUNT;
-    for (uint16_t id = 0U; id < s_identity_count; ++id) {
-        s_observed_identity = nx_factory_spi_dma_transaction(id);
-    }
-    s_identity_count = NX_SPI_DMA_TRANSACTION_DEVICE_ID_COUNT;
-    for (uint16_t id = 0U; id < s_identity_count; ++id) {
-        s_observed_identity = nx_factory_spi_dma_transaction_device(id);
-    }
+#if defined(NX_FACTORY_HAS_I2C)
+    NX_FIXTURE_RETAIN_IDENTITIES(i2c, NX_I2C_ID_COUNT);
 #endif
-    s_identity_count = NX_I2C_DEVICE_ID_COUNT;
-    for (uint16_t id = 0U; id < s_identity_count; ++id) {
-        s_observed_identity = nx_factory_i2c_device(id);
-    }
+#if defined(NX_FACTORY_HAS_PWM)
+    NX_FIXTURE_RETAIN_IDENTITIES(pwm, NX_PWM_ID_COUNT);
+#endif
+#if defined(NX_FACTORY_HAS_ADC)
+    NX_FIXTURE_RETAIN_IDENTITIES(adc, NX_ADC_ID_COUNT);
+#endif
+#if defined(NX_FACTORY_HAS_WATCHDOG)
+    NX_FIXTURE_RETAIN_IDENTITIES(watchdog, NX_WATCHDOG_ID_COUNT);
+#endif
+#if defined(NX_FACTORY_HAS_EXTI)
+    NX_FIXTURE_RETAIN_IDENTITIES(exti, NX_EXTI_ID_COUNT);
+#endif
+#if defined(NX_FACTORY_HAS_ADVANCED_PWM)
+    NX_FIXTURE_RETAIN_IDENTITIES(advanced_pwm, NX_ADVANCED_PWM_ID_COUNT);
+#endif
+#if defined(NX_FACTORY_HAS_TIMER_CAPTURE)
+    NX_FIXTURE_RETAIN_IDENTITIES(timer_capture, NX_TIMER_CAPTURE_ID_COUNT);
+#endif
+#if defined(NX_FACTORY_HAS_ENCODER)
+    NX_FIXTURE_RETAIN_IDENTITIES(encoder, NX_ENCODER_ID_COUNT);
+#endif
+#if defined(NX_FACTORY_HAS_SPI_DEVICE)
+    NX_FIXTURE_RETAIN_IDENTITIES(spi_device, NX_SPI_DEVICE_ID_COUNT);
+#endif
+#if defined(NX_FACTORY_HAS_SPI_TRANSACTION_DEVICE)
+    NX_FIXTURE_RETAIN_IDENTITIES(spi_transaction_device,
+                                 NX_SPI_TRANSACTION_DEVICE_ID_COUNT);
+#endif
+#if defined(NX_FACTORY_HAS_SPI_DMA_TRANSACTION)
+    NX_FIXTURE_RETAIN_IDENTITIES(spi_dma_transaction,
+                                 NX_SPI_DMA_TRANSACTION_ID_COUNT);
+#endif
+#if defined(NX_FACTORY_HAS_SPI_DMA_TRANSACTION_DEVICE)
+    NX_FIXTURE_RETAIN_IDENTITIES(spi_dma_transaction_device,
+                                 NX_SPI_DMA_TRANSACTION_DEVICE_ID_COUNT);
+#endif
+#if defined(NX_FACTORY_HAS_I2C_DEVICE)
+    NX_FIXTURE_RETAIN_IDENTITIES(i2c_device, NX_I2C_DEVICE_ID_COUNT);
+#endif
     /* These source-reviewed pad fixtures establish software assembly only.
      * No bytes are sent and no PCB wiring or observed device is claimed.
      */

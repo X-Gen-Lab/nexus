@@ -218,7 +218,9 @@ def prepare_consumer(prefix, directory, name, run_checked, *, fixture=False,
             '#if __has_include("private/stm32f407_provider.h") || __has_include("gd32f470_provider.h")\n'
             '#error Concrete provider leaked into product source\n#endif\n'
             'int main(void) {\n'
+            '#if defined(NX_FACTORY_HAS_GPIO)\n'
             ' if (nx_factory_gpio_ref(NX_GPIO_REF_COUNT) != 0) return 7;\n'
+            '#endif\n'
             ' nx_platform_start_result_t result = nx_platform_start();\n'
             ' if (result.primary != NX_SUCCESS) return 1;\n'
             ' return nx_platform_stop() == NX_SUCCESS ? 0 : 2;\n}\n')

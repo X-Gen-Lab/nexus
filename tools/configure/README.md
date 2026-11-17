@@ -104,12 +104,17 @@ python -m tools.configure.packages --schema
 | 根目录 `soc/stm32/stm32f4/` | 实际硬件 C、生命周期、时钟、IRQ／DMA 与私有 SDK |
 | `assemblies/` | 受维护 F407 软件参考，不是产品策略 |
 
-生产输入是 schema-2 TOML 与只读事实；`resolved.json` 仅为 typed IR 的单向审计
-投影，不接受手写或再次导入。器件编译目录与 F407 物理事实分别管理，不从官方宏
-推定运行时模式或 Board 接线。CMake 是唯一源码依赖图。
+生产输入是 schema-2 TOML 与只读事实。完整 typed IR 及其 schema-1 审计投影用于
+校验、摘要和查询；生成的 `resolved.json` 使用 schema 2，只保存有效配置、已选
+路线／Board binding、资源、预算和输入身份，不重复未选候选目录。二者均不接受手写
+或再次导入。查询仍使用完整已验证事实，并核对输入哈希。器件编译目录与 F407
+物理事实分别管理，不从官方宏推定运行时模式或 Board 接线。CMake 是唯一源码依赖图。
 
 构建按选中实例定容，不创建最大对象池、运行时设备注册表或默认 worker。factory
-查询只返回已有 face；日常 I/O 直接调用共享只读 ops 和实例 context。应用拥有
+只为有实例的类别生成 ID、getter 和强类型包装；该类别定义 `NX_FACTORY_HAS_<CLASS>`，
+未选类别不定义。装配代码用 `defined` 判断可选类别，组件继续接收公共端口参数。
+已选类别的非法 ID 与可选扩展仍按合同返回 NULL。查询只返回已有 face；日常 I/O
+直接调用共享只读 ops 和实例 context。应用拥有
 调度、service、buffer 和关闭；ACCEPTED 借用直到 acquire 观察 SETTLED，失败排空
 保留责任。
 

@@ -8,7 +8,7 @@ set(NEXUS_BUILD_TESTS OFF CACHE BOOL "No host framework in ARM consumer")
 set(NEXUS_BUILD_WORKLOAD OFF CACHE BOOL "Explicit public composition fixture")
 add_subdirectory("${NEXUS_SOURCE_ROOT}" nexus-sdk)
 nexus_add_firmware(qiming_rs485_controller_fixture SOURCES controller_main.c
-    LIBRARIES Nexus::IOUART Nexus::IOGPIO)
+    LIBRARIES Nexus::IOUARTRS485)
 nexus_target_warnings(qiming_rs485_controller_fixture STRICT)
 find_package(Python3 3.11 REQUIRED COMPONENTS Interpreter)
 get_target_property(fixture_config Nexus::Platform NEXUS_CONFIG_DIR)

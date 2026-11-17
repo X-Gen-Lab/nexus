@@ -58,7 +58,7 @@
 
 /* Volatile-qualified face fields force real ROM reads. Their relocations keep
  * concrete ops and all non-NULL methods alive through section GC, independently
- * of controller/device names. Empty generated classes add no runtime work.
+ * of controller/device names. Only selected generated classes are retained.
  */
 #define NX_FIXTURE_RETAIN_FACES(name, type, count)                             \
     do {                                                                       \
@@ -80,53 +80,87 @@ int main(void) {
     if (result.primary != NX_SUCCESS) {
         return 1;
     }
+#if defined(NX_FACTORY_HAS_GPIO)
     NX_FIXTURE_RETAIN_FACES(gpio, nx_gpio_port_t, NX_GPIO_ID_COUNT);
+#endif
+#if defined(NX_FACTORY_HAS_UART)
     NX_FIXTURE_RETAIN_FACES(uart, nx_uart_port_t, NX_UART_ID_COUNT);
+#endif
+#if defined(NX_FACTORY_HAS_SPI)
     NX_FIXTURE_RETAIN_FACES(spi, nx_spi_port_t, NX_SPI_ID_COUNT);
+#endif
+#if defined(NX_FACTORY_HAS_I2C)
     NX_FIXTURE_RETAIN_FACES(i2c, nx_i2c_port_t, NX_I2C_ID_COUNT);
+#endif
+#if defined(NX_FACTORY_HAS_FLASH)
     NX_FIXTURE_RETAIN_FACES(flash, nx_flash_port_t, NX_FLASH_ID_COUNT);
+#endif
+#if defined(NX_FACTORY_HAS_WATCHDOG)
     NX_FIXTURE_RETAIN_FACES(watchdog, nx_watchdog_port_t, NX_WATCHDOG_ID_COUNT);
+#endif
+#if defined(NX_FACTORY_HAS_EXTI)
     NX_FIXTURE_RETAIN_FACES(exti, nx_exti_port_t, NX_EXTI_ID_COUNT);
+#endif
+#if defined(NX_FACTORY_HAS_PWM)
     NX_FIXTURE_RETAIN_FACES(pwm, nx_pwm_port_t, NX_PWM_ID_COUNT);
+#endif
+#if defined(NX_FACTORY_HAS_ADC)
     NX_FIXTURE_RETAIN_FACES(adc, nx_adc_port_t, NX_ADC_ID_COUNT);
+#endif
+#if defined(NX_FACTORY_HAS_PWM_GROUP)
     NX_FIXTURE_RETAIN_FACES(pwm_group, nx_pwm_group_t, NX_PWM_GROUP_ID_COUNT);
+#endif
+#if defined(NX_FACTORY_HAS_TIMER_CAPTURE)
     NX_FIXTURE_RETAIN_FACES(timer_capture, nx_timer_capture_t,
                             NX_TIMER_CAPTURE_ID_COUNT);
+#endif
+#if defined(NX_FACTORY_HAS_ENCODER)
     NX_FIXTURE_RETAIN_FACES(encoder, nx_encoder_t, NX_ENCODER_ID_COUNT);
-#if defined(NX_FIXTURE_ADC_GROUP)
+#endif
+#if defined(NX_FACTORY_HAS_ADC_GROUP)
     NX_FIXTURE_RETAIN_FACES(adc_group, nx_adc_group_port_t,
                             NX_ADC_GROUP_ID_COUNT);
 #endif
-#if defined(NX_FIXTURE_ETH_FRAMES)
+#if defined(NX_FACTORY_HAS_ETH_FRAMES)
     NX_FIXTURE_RETAIN_FACES(eth_frames, nx_eth_frames_port_t,
                             NX_ETH_FRAMES_ID_COUNT);
+#endif
+#if defined(NX_FACTORY_HAS_MDIO)
     NX_FIXTURE_RETAIN_FACES(mdio, nx_mdio_port_t, NX_MDIO_ID_COUNT);
 #endif
-#if defined(NX_FIXTURE_PWM_ADC)
+#if defined(NX_FACTORY_HAS_PWM_ADC)
     NX_FIXTURE_RETAIN_FACES(pwm_adc, nx_pwm_adc_t, NX_PWM_ADC_ID_COUNT);
 #endif
-#if defined(NX_FIXTURE_CAN_FD)
+#if defined(NX_FACTORY_HAS_CAN_FD)
     NX_FIXTURE_RETAIN_FACES(can_fd, nx_can_fd_port_t, NX_CAN_FD_ID_COUNT);
 #endif
+#if defined(NX_FACTORY_HAS_SPI_DEVICE)
     NX_FIXTURE_RETAIN_FACES(spi_device, nx_spi_endpoint_t,
                             NX_SPI_DEVICE_ID_COUNT);
+#endif
+#if defined(NX_FACTORY_HAS_I2C_DEVICE)
     NX_FIXTURE_RETAIN_FACES(i2c_device, nx_i2c_endpoint_t,
                             NX_I2C_DEVICE_ID_COUNT);
-#if defined(NX_FIXTURE_UART_WORD)
+#endif
+#if defined(NX_FACTORY_HAS_UART_WORD)
     NX_FIXTURE_RETAIN_FACES(uart_word, nx_uart_word_port_t,
                             NX_UART_WORD_ID_COUNT);
 #endif
-#if defined(NX_FIXTURE_SPI_TRANSACTION)
+#if defined(NX_FACTORY_HAS_SPI_TRANSACTION_DEVICE)
     NX_FIXTURE_RETAIN_FACES(spi_transaction_device,
                             nx_spi_transaction_endpoint_t,
                             NX_SPI_TRANSACTION_DEVICE_ID_COUNT);
 #endif
 #if defined(NX_FIXTURE_SPI_DMA_TRANSACTION)
+#if defined(NX_FACTORY_HAS_SPI_DMA_TRANSACTION)
     NX_FIXTURE_RETAIN_FACES(spi_dma_transaction, nx_spi_dma_transaction_port_t,
                             NX_SPI_DMA_TRANSACTION_ID_COUNT);
+#endif
+#if defined(NX_FACTORY_HAS_SPI_DMA_TRANSACTION_DEVICE)
     NX_FIXTURE_RETAIN_FACES(spi_dma_transaction_device,
                             nx_spi_dma_transaction_endpoint_t,
                             NX_SPI_DMA_TRANSACTION_DEVICE_ID_COUNT);
+#endif
     for (size_t index = 0; index < NX_SPI_DMA_TRANSACTION_ID_COUNT; ++index) {
         const volatile nx_spi_dma_owner_binding_t* owner =
             nx_factory_spi_dma_owner_binding(
