@@ -4,6 +4,7 @@ import importlib.util
 import json
 from pathlib import Path
 import shutil
+import subprocess
 import tempfile
 import unittest
 
@@ -37,7 +38,7 @@ class SDKFactoryTemplateTests(unittest.TestCase):
                     code = (source / filename).read_text()
                     self.assertIn('#include "nexus_factory_strong.h"', code)
                     self.assertIn("nx_factory_gpio_ref(NX_GPIO_REF_COUNT)", code)
-                    self.assertIn('#if NEXUS_FACTORY_ABI_EPOCH != 5U', code)
+                    self.assertIn('#if NEXUS_FACTORY_ABI_EPOCH != 6U', code)
 
     def test_explicit_version_still_binds_the_installed_policy_epoch(self):
         policy = (self.prefix / "share/nexus/src/dependencies"
@@ -51,6 +52,24 @@ class SDKFactoryTemplateTests(unittest.TestCase):
         self.assertIn('#if NEXUS_FACTORY_ABI_EPOCH != 7U',
                       (source / "main.c").read_text())
 
+    def test_base_consumer_compiles_without_a_gpio_factory(self):
+        from tools.configure import configure
+
+        generated = self.root / "generated"
+        configure.configure(
+            ROOT / "tests/support/native/assemblies/native-empty.toml",
+            generated, test_support=True)
+        source, _, _ = CONSUMERS.prepare_consumer(
+            self.prefix, self.root, "empty", lambda _: None)
+        command = ["cc", "-std=c11", "-Wall", "-Wextra", "-Werror",
+                   "-pedantic", "-I" + str(generated)]
+        command.extend("-I" + str(ROOT / layer / "include")
+                       for layer in ("core", "io", "arch"))
+        result = subprocess.run(
+            command + ["-c", str(source / "main.c"), "-o",
+                       str(self.root / "consumer.o")],
+            capture_output=True, text=True, check=False)
+        self.assertEqual(result.returncode, 0, result.stderr)
 
 
 if __name__ == "__main__":

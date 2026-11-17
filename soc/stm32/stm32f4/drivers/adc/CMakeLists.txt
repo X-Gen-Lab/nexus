@@ -17,12 +17,14 @@ endif()
 nexus_controller_modes(adc_group_modes adc_group)
 if(adc_group_modes)
     set(stm32_gpio_helpers ON)
+    target_link_libraries(nexus_soc_stm32f4 PRIVATE Nexus::IODMA)
     target_sources(nexus_soc_stm32f4 PRIVATE
         "${CMAKE_CURRENT_LIST_DIR}/adc_group.c" "${CMAKE_CURRENT_LIST_DIR}/adc_trigger.c")
     if("regular-blocks" IN_LIST adc_group_modes
             OR "regular-software-injected-blocks" IN_LIST adc_group_modes
             OR "regular-timer-injected-blocks" IN_LIST adc_group_modes
             OR "regular-auto-injected" IN_LIST adc_group_modes)
+        target_link_libraries(nexus_soc_stm32f4 PRIVATE Nexus::IOStream)
         target_sources(nexus_soc_stm32f4 PRIVATE "${CMAKE_CURRENT_LIST_DIR}/adc_group_blocks.c")
     endif()
     if("regular-auto-injected" IN_LIST adc_group_modes)

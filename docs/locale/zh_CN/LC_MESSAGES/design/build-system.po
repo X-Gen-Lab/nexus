@@ -1,13 +1,6 @@
-#
+# Actual-POT messages; independently reviewed against this canonical source.
 msgid ""
-msgstr ""
-"Project-Id-Version: Nexus source documentation\n"
-"Language: zh_CN\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: ee1c2f468ffbde08ea555652b7bfa3f3158a15296d2de4c2f4ef69d82de4f9cd\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 8a6c0c913a0409ecc1a85382da642ab59738b851a925c169eb731198c827f28a\n"
 
 #: ../../../docs/design/build-system.md:1
 msgid "Build system maintenance contract"
@@ -50,6 +43,15 @@ msgstr ""
 
 msgid "CMake owns source lists and target dependencies. The resolver emits selected facts and its configuration-code dependencies, never a parallel software build graph. The selected `package.json`, its declared facts and binding files, and the generic configuration-code closure are explicit generation inputs. The package also declares Source SDK export ownership. Board and SoC contain no Python plugins; production uses the generic DataProvider rather than family constructor imports. Package enumeration does not select C source units."
 msgstr "CMake 拥有源码列表和目标依赖。resolver 输出所选事实及其配置代码依赖，不建立第二张软件构建图。所选 `package.json`、声明的事实与 binding 文件、通用配置代码闭包都是明确的生成输入。package 也声明 Source SDK 导出归属。Board 和 SoC 不含 Python 插件；生产配置使用通用 DataProvider，不再导入家族构造模块。枚举包不选择 C 源码单元。"
+
+msgid "Physical Platform targets connect selected modes to their necessary public I/O and private provider targets. `Nexus::IOUART` supplies byte UART, shared format validation and necessary wake support; `Nexus::IOUARTWord`, `Nexus::IOUARTStream` and `Nexus::IOUARTRS485` supply explicit extensions. An application using RS485 links its target even when its adapter is assembled outside TOML. Native and CPU Runtime retain caller-defined provider composition. Headers and compile database entries do not prove that a target was built; inspect the actual command closure, objects and linked sections."
+msgstr "物理 Platform 目标把已选模式连接到必要的公共 I/O 与私有 provider 目标。`Nexus::IOUART` 提供 byte UART、共享格式校验和必要 wake 支撑；`Nexus::IOUARTWord`、`Nexus::IOUARTStream` 与 `Nexus::IOUARTRS485` 提供显式扩展。使用 RS485 的应用即使在 TOML 外装配适配器，也应链接对应目标。Native 和 CPU Runtime 保留调用者自定义 provider 的组合能力。头文件和编译数据库条目不证明目标已构建；应检查实际命令闭包、对象和链接段。"
+
+msgid "SPI public helpers require wake support, while selected SoC DMA modes connect the DMA target explicitly. `Nexus::IOADCStream` separates ADC stream-profile code and dependencies from the base ADC domain; selected ADC stream modes connect that target. ADC-group block modes connect the shared stream/DMA targets as needed. Block and USB keep shared DMA validation dependencies where their actual paths require them. Splitting follows function references and working consumer builds, not filenames alone."
+msgstr "SPI 公共辅助需要 wake 支撑，所选 SoC DMA 模式显式连接 DMA 目标。`Nexus::IOADCStream` 将 ADC stream-profile 代码及依赖从基础 ADC 域分开；已选 ADC 流模式连接此目标；ADC-group 的 block 模式按需连接共享 stream／DMA 目标。Block 与 USB 的实际路径需要共享 DMA 校验时继续保留相应依赖。拆分依据函数引用和实际消费者构建，不能只看文件名。"
+
+msgid "The generated schema-2 `resolved.json` contains effective selections and their input identities, while complete candidate facts remain in the resolver and query path. This reduces output duplication without introducing a second configuration authority or source graph. Generation size, actual compilation work and final Flash/RAM costs are separate measurements."
+msgstr "生成的 schema-2 `resolved.json` 保存有效选择及其输入身份，完整候选事实仍在 resolver 与查询路径中。这减少重复输出，不引入第二套配置权威或源码图。生成体积、实际编译工作和最终 Flash/RAM 成本是各自独立的测量。"
 
 msgid "The selected provider supplies its actual private include directories through the existing `NEXUS_SYSTEM_PRIVATE_INCLUDES` connection. Root CMake consumes that declaration with PRIVATE scope; it no longer owns a fixed list of F4 IP paths. External provider bindings therefore do not automatically inherit F4 private headers. Mode/IP selection and supplier sources remain in the one CMake graph; this connection adds no registry or second build framework. Private compile templates validate required specialization bindings and preserve wrapper-owned macro scope; CMake still selects and checks each actual translation unit. ABI, optimization, diagnostics and firmware link policy have explicit target boundaries. The firmware target guarantees its declared delivery outputs and resource check. External application warnings are a consumer policy."
 msgstr "所选 provider 通过已有 `NEXUS_SYSTEM_PRIVATE_INCLUDES` 连接提供实际私有 include 目录。根 CMake 以 PRIVATE 范围消费该声明，不再维护固定 F4 IP 路径清单；外置 provider 绑定因而不再自动继承 F4 私有头。模式／IP 与供应方源码仍由唯一 CMake 图选择；该连接不增加 registry 或第二个构建框架。私有编译模板检查必要的特化绑定并保留 wrapper 所有的宏范围；每个实际编译单元仍由 CMake 选择和检查。ABI、优化、诊断和固件链接策略有明确目标边界。固件目标保证声明的交付输出和资源检查，外部应用 warning 属于消费者策略。"

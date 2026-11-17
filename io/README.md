@@ -32,6 +32,14 @@ I/O 为应用和组件提供公共 C11 类型，为 SoC 的具体实现规定操
 
 组件目标自己声明 I/O 域依赖。如 `Nexus::TMP117I2C` 链接
 `Nexus::IOI2C`，外部资源责任者可提供端点，无需在装配中虚构物理控制器。
+`Nexus::IOUART` 提供普通 UART、共享格式校验及必要 wake；word、连续流和 RS485
+分别由 `Nexus::IOUARTWord`、`Nexus::IOUARTStream`、`Nexus::IOUARTRS485` 显式提供。
+生产装配按实际模式连接扩展；App 自行装配 RS485 时显式链接适配目标。Native／Runtime
+仍允许调用者提供实现，不因缺少 TOML 物理实例而丢失公共接口。
+SPI 公共辅助只依赖必要 wake，所选 SoC DMA 模式显式连接 DMA；ADC 的流 profile 与
+依赖由 `Nexus::IOADCStream` 提供，所选 ADC 流模式连接该目标；ADC-group 的 block
+模式按需连接共享 stream／DMA 目标。Block／USB 实际路径共用的 DMA 校验依赖继续
+保留；拆分以真实调用和消费者构建为依据。
 域静态库在选择或链接前排除构建，共享机制只编译一次；可选目标
 仍可能出现在 `compile_commands.json`，实际选中的 Ninja 命令闭包和一次新构建
 才能证明编译了什么。
@@ -46,8 +54,10 @@ I/O 为应用和组件提供公共 C11 类型，为 SoC 的具体实现规定操
 直接调用。缺失可选方法返回 `NX_ERROR_UNSUPPORTED`。不同具体实现／
 模式表共存，不替换公共符号；IRQ 固定绑定实例，不逐字节查 factory。
 
-factory 查询函数返回已有身份。查找、Platform 启动、请求准入、
-推进服务、恢复、停止分开。SPI／I2C 控制器与端点身份独立，新产品
+factory 只为所选类别生成 ID、getter 与强类型包装，`NX_FACTORY_HAS_<CLASS>`
+存在时表示当前装配有该类别；不表示全部模式或某个业务角色存在。已选类别的无效 ID
+及可选扩展继续按各自合同返回 NULL。查询函数返回已有身份。查找、Platform 启动、
+请求准入、推进服务、恢复、停止分开。SPI／I2C 控制器与端点身份独立，新产品
 用强类型引用头文件；见[factory 合同](../docs/explanation/factory.md)。
 
 RS485 集成优先用同一强类型 UART 引用取得 `nx_factory_uart_tx_binding_ref()`，
@@ -87,7 +97,7 @@ I2C 使用 `nx_i2c_limits_t` 描述所选 provider profile，不另建无实现�
 factory 仅在明确选择 metadata 时生成所选常量与 lookup；未选择不增加该实例数据。
 组件可注入同类型 const 描述，无需包含生成器私有头。不可变能力不表示运行 ready、
 不替代提交准入，也不证明物理资格；未知限额不是无限。详见
-[源码迁移](../docs/guides/migration.md#rebuild-for-source-interface-epoch-5)。
+[源码迁移](../docs/guides/migration.md#rebuild-for-source-interface-epoch-6)。
 
 ## SPI 轮询准入
 

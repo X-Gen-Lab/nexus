@@ -21,8 +21,13 @@ class OptionalFactoryTests(unittest.TestCase):
                          "tests/support/native/assemblies/native-gpio.toml").read_text()
         self.output = self.root / "bundle"
 
-    def generate(self, policy=""):
-        self.assembly.write_text(self.contents + policy)
+    def generate(self, policy="", *, with_uart=False):
+        contents = self.contents
+        if with_uart:
+            uart = (gate.ROOT /
+                    "tests/support/native/assemblies/native-uart.toml").read_text()
+            contents += "\n" + uart[uart.index("[uart."):]
+        self.assembly.write_text(contents + policy)
         return gate.configure(self.assembly, self.output, test_support=True)
 
     def compile(self, compiler, standard, expression, *,
@@ -43,15 +48,17 @@ class OptionalFactoryTests(unittest.TestCase):
             capture_output=True, text=True, check=False)
 
     def test_nominal_ids_compile_in_c11_and_cpp17_and_reject_other_classes(self):
-        self.generate()
+        self.generate(with_uart=True)
         for compiler, standard in (("cc", "c11"), ("c++", "c++17")):
             with self.subTest(compiler=compiler):
                 valid = self.compile(compiler, standard, "NX_GPIO_REF_LED0")
                 self.assertEqual(valid.returncode, 0, valid.stderr)
-                for expression in ("NX_UART_REF_COUNT", "NX_GPIO_ID_LED0"):
+                for expression in ("NX_UART_REF_UART0", "NX_GPIO_ID_LED0"):
                     invalid = self.compile(compiler, standard, expression)
                     self.assertNotEqual(invalid.returncode, 0)
                     self.assertNotIn("No such file", invalid.stderr)
+                    if expression == "NX_UART_REF_UART0":
+                        self.assertIn("nx_uart_ref_t", invalid.stderr)
 
     def test_optional_header_adds_no_global_objects(self):
         self.generate()
@@ -61,7 +68,7 @@ class OptionalFactoryTests(unittest.TestCase):
         self.assertNotIn("malloc", header)
 
     def test_capability_lookup_rejects_other_nominal_classes(self):
-        self.generate("\n[factory]\ncapabilities = true\n")
+        self.generate("\n[factory]\ncapabilities = true\n", with_uart=True)
         for compiler, standard in (("cc", "c11"), ("c++", "c++17")):
             with self.subTest(compiler=compiler):
                 arguments = {"getter": "nx_factory_gpio_capability_ref",
@@ -69,11 +76,13 @@ class OptionalFactoryTests(unittest.TestCase):
                 valid = self.compile(compiler, standard, "NX_GPIO_REF_LED0",
                                      **arguments)
                 self.assertEqual(valid.returncode, 0, valid.stderr)
-                for expression in ("NX_UART_REF_COUNT", "NX_GPIO_ID_LED0"):
+                for expression in ("NX_UART_REF_UART0", "NX_GPIO_ID_LED0"):
                     invalid = self.compile(compiler, standard, expression,
                                            **arguments)
                     self.assertNotEqual(invalid.returncode, 0)
                     self.assertNotIn("No such file", invalid.stderr)
+                    if expression == "NX_UART_REF_UART0":
+                        self.assertIn("nx_uart_ref_t", invalid.stderr)
 
     def test_default_factory_has_no_capability_descriptors(self):
         result = self.generate()

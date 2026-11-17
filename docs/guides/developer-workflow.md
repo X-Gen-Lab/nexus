@@ -40,6 +40,16 @@ product tree preserves this relationship. The reviewed Board package remains
 separate from the product assembly; use the [Board porting guide](board-porting.md)
 for package contents and provider boundaries.
 
+Start from the matching external starter when you need a complete application.
+The maintained [assembly schema](../../tools/configure/assembly.schema.json)
+provides editor field hints; `check` remains the acceptance authority. Instance
+names such as `console` are application roles, while `binding = "uart1"` selects
+a reviewed Board resource. The UART recipe `mode = "irq"` with
+`rx.format = "events"` resolves to the canonical `irq-byte-event` mode shown by
+queries. A capacity of 32 means 32 events, not 32 bytes; element size depends on
+the selected interface and ABI. Review the effective configuration and actual
+linked storage after changing capacities.
+
 The explanation lists public faces, modes, clock, resources, memory domains,
 declared budgets and execution duties. `list-bindings --json` includes
 `mode_contracts`, resource claims, `fact_sources` and `limitations`. A binding is

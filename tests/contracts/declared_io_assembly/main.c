@@ -40,23 +40,23 @@ int main(void) {
     if (result.primary != NX_SUCCESS) {
         return 1;
     }
-#ifdef NX_DECLARED_GPIO
+#if defined(NX_FACTORY_HAS_GPIO)
     NX_DECLARED_RETAIN_FACES(gpio, nx_gpio_port_t, NX_GPIO_ID_COUNT);
 #endif
-#ifdef NX_DECLARED_EXTI
+#if defined(NX_FACTORY_HAS_EXTI)
     NX_DECLARED_RETAIN_FACES(exti, nx_exti_port_t, NX_EXTI_ID_COUNT);
 #endif
-#ifdef NX_DECLARED_UART
+#if defined(NX_FACTORY_HAS_UART)
     NX_DECLARED_RETAIN_FACES(uart, nx_uart_port_t, NX_UART_ID_COUNT);
 #endif
-#ifdef NX_DECLARED_UART_WORD
+#if defined(NX_FACTORY_HAS_UART_WORD)
     NX_DECLARED_RETAIN_FACES(uart_word, nx_uart_word_port_t,
                              NX_UART_WORD_ID_COUNT);
 #endif
-#ifdef NX_DECLARED_ADC
+#if defined(NX_FACTORY_HAS_ADC)
     NX_DECLARED_RETAIN_FACES(adc, nx_adc_port_t, NX_ADC_ID_COUNT);
 #endif
-#ifdef NX_DECLARED_CAN
+#if defined(NX_FACTORY_HAS_CAN)
     NX_DECLARED_RETAIN_FACES(can, nx_can_port_t, NX_CAN_ID_COUNT);
 #endif
     for (;;) {

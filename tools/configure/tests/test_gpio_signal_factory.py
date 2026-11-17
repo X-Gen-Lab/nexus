@@ -16,9 +16,14 @@ class GpioSignalFactoryTests(unittest.TestCase):
         self.text = (configure.ROOT /
                      "tests/support/native/assemblies/native-gpio.toml").read_text()
 
-    def resolve(self, option=""):
+    def resolve(self, option="", *, with_uart=False):
         path = self.directory / "assembly.toml"
-        path.write_text(self.text + option, encoding="utf-8")
+        contents = self.text + option
+        if with_uart:
+            uart = (configure.ROOT /
+                    "tests/support/native/assemblies/native-uart.toml").read_text()
+            contents += "\n" + uart[uart.index("[uart."):]
+        path.write_text(contents, encoding="utf-8")
         return configure.resolve_ir(path, test_support=True)
 
     def test_polarity_is_immutable_and_emits_only_a_readonly_binding(self):
@@ -72,14 +77,14 @@ class GpioSignalFactoryTests(unittest.TestCase):
                 gpio_electrical.validate_binding(binding, route, mask)
 
     def test_nominal_signal_getter_compiles_and_rejects_uart_identity(self):
-        result = self.resolve("active_high = false\n")
+        result = self.resolve("active_high = false\n", with_uart=True)
         (self.directory / "nexus_factory.h").write_text(factory.emit(result)[0])
         (self.directory / "nexus_factory_strong.h").write_text(
             factory.emit_strong(result))
         for compiler, standard, extension in (("cc", "c11", "c"),
                                                ("c++", "c++17", "cpp")):
             for identity, accepted in (("NX_GPIO_REF_LED0", True),
-                                       ("NX_UART_REF_COUNT", False)):
+                                       ("NX_UART_REF_UART0", False)):
                 with self.subTest(compiler=compiler, identity=identity):
                     path = self.directory / ("consumer." + extension)
                     path.write_text('#include "nexus_factory_strong.h"\n'
@@ -96,6 +101,8 @@ class GpioSignalFactoryTests(unittest.TestCase):
                                                text=True, check=False)
                     self.assertEqual(execution.returncode == 0, accepted,
                                      execution.stderr)
+                    if not accepted:
+                        self.assertIn("nx_uart_ref_t", execution.stderr)
 
 
 if __name__ == "__main__":

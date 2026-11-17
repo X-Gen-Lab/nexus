@@ -14,10 +14,10 @@ provider、生成 bindings 和调用者；当前不交付稳定二进制 ABI。�
 | 项目 | 当前值 | 合同 |
 |---|---|---|
 | 平台 semantic version | `0.2.1` | 唯一人工维护值来自兼容性 JSON；CMake、生成头文件和包元数据派生并保持一致 |
-| `factory_abi_epoch` | `5` | 当前唯一认可的生成源码接口代际；不是 binary ABI 保证 |
+| `factory_abi_epoch` | `6` | 当前唯一认可的生成源码接口代际；不是 binary ABI 保证 |
 | source SDK | `source_only` / `exact` | CMake package 只接受相同完整版本，拒绝 ranges |
 | authored assembly | `2` | 简化的 TOML 选择面；不改变 Board/SoC 事实 |
-| resolved JSON projection / typed IR | `1` / `5` | 单向 JSON 输出格式与私有 Python 类型化源码接口分别计代 |
+| resolved JSON projection / typed IR | `2` / `5` | 单向 JSON 输出格式与私有 Python 类型化源码接口分别计代 |
 | Board / SoC / routes | `1` / `1` / `1` | 物理事实文件及生产 validator 必须一致 |
 | CPU runtime assembly / facts / resolved | `1` / `1` / `1` | CPU 软件配置，不能升格 SoC/Board 资格 |
 | installed source SDK manifest | `3` | 完整 file-map、源依赖、package-export 与包导出成员声明校验 |
@@ -32,7 +32,9 @@ provider、生成 bindings 和调用者；当前不交付稳定二进制 ABI。�
 
 类型化源码接口第 5 代只接受严格 TOML 解析后的不可变装配对象；生产 resolver、
 factory 和 emitter 使用具名字段，不提供字典接口或 schema-1 JSON 装配兼容。
-`resolved.json` 仍是第 1 版单向输出，用于审计和独立产物检查，不是可信配置入口。
+完整 `to_dict()` 仍是 schema-1 审计投影；生成文件 `resolved.json` 使用 schema 2，
+只保存有效配置、已选路线和 Board binding、资源、预算及输入身份。完整 IR 与候选
+事实继续用于校验和查询；生成文件不是可信配置入口。
 `source_epoch` 当前为 5，是 Python 类级源码合同，不写入 JSON，也不增加 MCU
 状态。维护工具直接观察实际 IR 类的声明，核对策略中的 typed IR 代际；公共 C
 factory 的源码代际也由同一策略校验。
@@ -41,9 +43,9 @@ factory 的源码代际也由同一策略校验。
 既有 `v0.2.0` 及其他标签保留原始源码身份，不移动标签。前序公共 traits、独立
 SDIO 请求及领域语义迁移引入 epoch `3`；本轮逻辑 GPIO signal 与 RS485 配置迁移
 将 factory／source interface epoch 提升为 `4`；当前家族电源接口及密码查询迁移
-继续提升为 `5`。semantic version 仍是开发快照
-`0.2.1`，exact 匹配和 authored schema `2` 不变。相同版本号不能让旧 epoch
-`1`／`2`／`3`／`4` SDK 通过当前代际检查，版本值也不把旧
+继续提升为 `5`；本轮按需 factory 将公共生成接口提升为 `6`，typed IR 仍为 `5`。
+semantic version 仍是开发快照 `0.2.1`，exact 匹配和 authored schema `2` 不变。
+相同版本号不能让旧 epoch `1`／`2`／`3`／`4`／`5` SDK 通过当前代际检查，版本值也不把旧
 SDK／候选资格转移到新源码。
 新候选仍须独立绑定实际 clean source、配置、依赖、工具与执行证据。
 
@@ -57,7 +59,7 @@ factory 的 compact ID 只在该生成 bundle 内有意义。它返回既有静�
 不分配、不初始化硬件。重新排序实例或改变配置可能改变 ID；不能把 ID 持久化后
 拿到另一 bundle 使用。`factory_abi_epoch` 命名保留 ABI 字样，但目前只标记生成
 源码接口代际：消费者、factory header、公共 face 和实现必须重新编译。当前 epoch
-为 5；指定 0、旧值 1／2／3／4、未来值、非整数或找不到策略时必须拒绝，不能当成兼容 fallback。
+为 6；指定 0、旧值 1／2／3／4／5、未来值、非整数或找不到策略时必须拒绝，不能当成兼容 fallback。
 
 生成配置须把策略原字节加入既有 inputs/snapshots/hash 闭包，并从唯一 loader
 生成 `NEXUS_PLATFORM_VERSION` 和 `NEXUS_FACTORY_ABI_EPOCH`。这些是编译期常量，
@@ -77,10 +79,10 @@ epoch 2 已将 `nx_adc_group_request_t.frames` 改为显式 `output.frames`，�
 使用当前精确提交重新生成 bundle，并在同一配置和工具链下重新编译全部调用者、
 公共 face／ops、factory、provider 和组件；不得混用 epoch 1 header、旧对象或缓存。
 该结果合同在 epoch 3 和 epoch 4 继续保留；从 epoch 1 迁移的调用者仍须完成
-这一步。当前生成头、SDK 及维护消费者只认可 epoch 5；旧 epoch 1／2／3／4 明确拒绝，
+这一步。当前生成头、SDK 及维护消费者只认可 epoch 6；旧 epoch 1／2／3／4／5 明确拒绝，
 不自动迁移、降级或以
 `--development-fixture` 放宽接口检查。外部产品的迁移步骤见
-[迁移指南](../guides/migration.md)。当前 manifest schema 3 与 interface epoch 5 是独立字段。
+[迁移指南](../guides/migration.md)。当前 manifest schema 3 与 factory interface epoch 6 是独立字段。
 
 ## epoch 3 的领域接口迁移
 
@@ -124,7 +126,7 @@ Flash 制造选项的 `brownout_level` 原始字段改为 `nx_flash_brownout_t b
 | Encoder TI 输入名与滤波编码 | 使用逻辑 A／B 模式及滤波采样事实，不把它们当成精确机械消抖保证。 |
 
 使用同一精确提交重新生成配置和 factory，并重编所有调用者、provider、组件与
-SDK 消费者。当前 TOML schema 2、typed IR 源码代际 5、resolved projection 1 和 SDK
+SDK 消费者。当前 TOML schema 2、typed IR 源码代际 5、resolved projection 2 和 SDK
 manifest 3 分别计代；源码代际或包格式变化不自动扩大芯片、模式或实板支持。
 
 ## epoch 4 的逻辑 signal 与 RS485 迁移
@@ -179,8 +181,25 @@ System profile、RTC 来源、外来电源状态和 errata 仍分别校验。
 重编，并先 join 原调用者与控制操作。
 
 epoch 5 引入时使用 TOML schema 2、resolved projection 1 和 SDK manifest 2。当前
-包格式独立演进为 schema 3，不改变 factory／typed IR 代际 5。版本号与前序快照
-相同也必须固定精确提交，重新生成并重编全部源码；epoch 2／3／4 的迁移继续适用。
+包格式独立演进为 schema 3；factory 代际 6 与 typed IR 代际 5 分别维护。版本号与前序
+快照相同也必须固定精确提交，重新生成并重编全部源码；epoch 2／3／4 的迁移继续适用。
+
+## epoch 6 的按需 factory 与已选产物迁移
+
+未选类别不再生成 ID 类型、COUNT、getter、strong wrapper 或 capability getter。
+已选类别定义 `NX_FACTORY_HAS_<CLASS>` 为 1；可选装配用 `defined` 判断，不能把 enum
+形式的 COUNT 当预处理条件。移除调用空 getter 探测未选类别的代码；业务组件由应用
+注入公共端口。已选类别的非法 ID 仍返回 NULL，可选 signal、validator 等仍按原合同
+返回不支持结果。控制器与端点保持独立身份。
+
+UART 基础与 word、stream、RS485 目标分开。App 自行组合适配器时显式链接对应
+目标，生产装配按已选模式连接必要扩展。Native 与 CPU Runtime 仍允许自定义 provider。
+本轮不改变请求借用、排空、IRQ 或生命周期合同。
+
+生成文件 `resolved.json` 的 schema 2 省去未选候选路线，只保留有效配置与输入身份。
+完整 typed IR 和其 schema-1 审计投影继续负责校验与配置摘要；query 读取受摘要约束的
+完整事实。更新产物消费者后重新生成 SDK、资源报告与文件哈希，不沿用旧成功报告。
+TOML schema 2、typed IR 代际 5 与 SDK manifest 3 保持各自合同。
 
 ## SDK manifest schema 3 的包导出归属
 
@@ -204,7 +223,7 @@ SDK 的 `profile` 显式记录 `backend`、`components`、`host_support` 和 `pa
 PATH="$(pwd)/.venv/bin:$PATH" .venv/bin/python \
     tools/maintenance/compatibility.py
 PATH="$(pwd)/.venv/bin:$PATH" .venv/bin/python \
-    tools/maintenance/compatibility.py --expected-factory-epoch 5 \
+    tools/maintenance/compatibility.py --expected-factory-epoch 6 \
     --generated build/native-debug/generated/nexus_config.h
 PATH="$(pwd)/.venv/bin:$PATH" .venv/bin/python \
     tools/maintenance/compatibility.py --sdk /abs/prefix/share/nexus/src

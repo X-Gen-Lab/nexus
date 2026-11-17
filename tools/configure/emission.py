@@ -4,6 +4,38 @@ from pathlib import Path
 import re
 
 
+RESOLVED_SCHEMA_VERSION = 2
+
+
+def resolved_projection(result):
+    """Project selected facts; full IR still owns validation and identity."""
+    from tools.configure.ir import thaw
+
+    names = {item.binding for item in result.controllers}
+    for item in result.devices:
+        for field in ("binding", "cs_binding"):
+            name = getattr(item.options, field, None)
+            if name is not None:
+                names.add(name)
+    bindings = {name: result.board_bindings[name] for name in sorted(names)}
+    routes = ({item.route for item in result.controllers} |
+              {item["route"] for item in bindings.values()})
+    projection = result.projection()
+    projection.update(
+        schema_version=RESOLVED_SCHEMA_VERSION,
+        board_bindings=bindings,
+        routes={name: result.routes[name] for name in sorted(routes)})
+    if result.fact_references is not None:
+        context = result.provider_context
+        path = context.package.fact("references")
+        label = path.relative_to(context.directory).as_posix()
+        if context.external:
+            label = "soc-package/" + context.identity["id"] + "/" + label
+        source = next(item for item in result.inputs if item["path"] == label)
+        projection["fact_references"] = {"source": source}
+    return thaw(projection)
+
+
 def emit_bundle(result, output):
     """Emit compile/link inputs from resolved IR; CMake retains the code graph.
 
@@ -18,7 +50,7 @@ def emit_bundle(result, output):
     if not isinstance(result, ConfigurationIR):
         raise TypeError("Bundle emission requires ConfigurationIR")
     write = lambda name, data: (output / name).write_text(data, encoding="utf-8")
-    write("resolved.json", json.dumps(result.to_dict(), indent=2,
+    write("resolved.json", json.dumps(resolved_projection(result), indent=2,
                                       sort_keys=True) + "\n")
     profile, policy = result.cpu_profile, result.kernel
     header = ["/* Generated from the sole resolved configuration. */",

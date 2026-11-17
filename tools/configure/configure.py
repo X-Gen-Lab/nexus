@@ -1036,7 +1036,8 @@ class _FactResolution:
 
 
 def _resolve_facts(assembly, *, root, assembly_directory, read,
-                    test_support=False, snapshots=None) -> _FactResolution:
+                    test_support=False, snapshots=None,
+                    allow_legacy_provider=True) -> _FactResolution:
     """Select and admit one Board/SoC package before execution choices.
 
     JSON facts remain read-only leaves. Their input paths stay with the single
@@ -1049,7 +1050,8 @@ def _resolve_facts(assembly, *, root, assembly_directory, read,
     family = identity(board["soc_family"], "SoC family")
     context = integration_package.select(
         assembly.soc_package, family=family, root=root,
-        assembly_directory=assembly_directory, test_support=test_support, read=read)
+        assembly_directory=assembly_directory, test_support=test_support, read=read,
+        allow_legacy_provider=allow_legacy_provider)
     if context.package is not None:
         context = replace(context, binding_policy=context.provider.binding_policy,
                           domain_policies=context.provider.domain_policies)
@@ -1396,7 +1398,8 @@ def _resolve_device_graph(assembly, *, root, soc, board, routes, bindings,
         inputs=())
 
 
-def _resolve(assembly_path, root=ROOT, *, input_paths=None, test_support=False):
+def _resolve(assembly_path, root=ROOT, *, input_paths=None, test_support=False,
+             allow_legacy_provider=True):
     """Validate all input facts before producing the sole resolved decision."""
     root = root.resolve()
     verified_sdk = sdk.verify(root)
@@ -1422,7 +1425,8 @@ def _resolve(assembly_path, root=ROOT, *, input_paths=None, test_support=False):
         fail("Factory capabilities must be boolean")
     facts = _resolve_facts(assembly, root=root,
                            assembly_directory=assembly_path.parent, read=read,
-                           test_support=test_support, snapshots=snapshots)
+                           test_support=test_support, snapshots=snapshots,
+                           allow_legacy_provider=allow_legacy_provider)
     board, soc, routes = facts.board, facts.soc, facts.routes
     family, part, provider = facts.family, facts.part, facts.provider
     variant, references = facts.variant, facts.references
@@ -1570,11 +1574,12 @@ normalize_resource = resource_graph.normalize_resource
 
 
 def resolve_ir(assembly_path, root=ROOT, *, input_paths=None,
-               test_support=False):
-    """Return the immutable typed resolution consumed by every emitter."""
+               test_support=False, allow_legacy_provider=True):
+    """Resolve immutable IR; artifact verification disables legacy host code."""
     try:
         return _resolve(assembly_path, root, input_paths=input_paths,
-                        test_support=test_support)
+                        test_support=test_support,
+                        allow_legacy_provider=allow_legacy_provider)
     except ValueError as error:
         details = error.details if isinstance(error, ConfigurationError) else {}
         raise ConfigurationError(f"{assembly_path}: {error}", **details) from error

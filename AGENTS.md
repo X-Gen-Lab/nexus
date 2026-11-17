@@ -2,10 +2,10 @@
 
 Nexus owns reusable embedded mechanisms. Applications, product roles, protocol
 register policy, workers, private PCB data, Flash reservations and recovery policy
-belong in external repositories. Application examples live in the private
-X-Gen-Lab/nexus-examples repository; access to Nexus does not grant access to it.
-Public platform evidence and authenticated examples evidence keep separate
-publication boundaries.
+belong in external repositories. Application examples live in the public
+X-Gen-Lab/nexus-examples repository. Proprietary products, credentials and private
+PCB data stay in their owning repositories; public examples do not authorize
+publishing those inputs or their execution artifacts.
 
 Codex owns all platform maintenance domains under the checked agent-managed
 policy. Named people are not required. Preserve automated gates and independent

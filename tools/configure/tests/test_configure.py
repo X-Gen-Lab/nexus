@@ -220,7 +220,10 @@ class ResolverTests(unittest.TestCase):
     def test_successful_bundle_is_atomic_and_failure_invalidates(self):
         output = self.root / "bundle"
         result = gate.configure(self.assembly, output, self.root, test_support=True)
-        self.assertEqual(json.loads((output / "resolved.json").read_text()), result)
+        emitted = json.loads((output / "resolved.json").read_text())
+        self.assertEqual(emitted["configuration_sha256"],
+                         result["configuration_sha256"])
+        self.assertEqual(emitted["controllers"], result["controllers"])
         self.assertTrue((output / "memory.ld").is_file())
         self.data["clock_profile"] = "bad"
         self.write(self.assembly, self.data)

@@ -47,13 +47,13 @@ python tools/configure/configure.py check \
 python tools/configure/configure.py generate \
     --assembly tools/configure/assemblies/qiming-baremetal-uart.toml \
     --output /tmp/nexus-migration-config
-python tools/maintenance/compatibility.py --expected-factory-epoch 5 \
+python tools/maintenance/compatibility.py --expected-factory-epoch 6 \
     --generated /tmp/nexus-migration-config/nexus_config.h
 ```
 
 Use a new output path you own, and stop if any command returns nonzero. Successful
 resolution reports the selected part, Board, backend and configuration digest;
-the compatibility check must accept epoch 5. Inspect `resolved.json`,
+the compatibility check must accept epoch 6. Inspect `resolved.json`,
 `nexus_config.h`, `nexus_factory.h`, `nexus_factory_strong.h` and
 `nexus_bindings.h`. The version macros checked by `--generated` are in
 `nexus_config.h`. These commands validate and generate configuration; they do not
@@ -88,23 +88,44 @@ link the exact MCU configuration with the locked compiler. Retain evidence for
 the migrated source and configuration. Old HAL/OSAL documentation remains historical;
 a redirect does not make an old API contract equivalent to a new one.
 
-## Rebuild for source interface epoch 5
+## Rebuild for source interface epoch 6
 
 The current development snapshot keeps semantic version `0.2.1` and uses
-factory/source interface epoch `5`. Pin its exact commit, regenerate the bundle
+factory interface epoch `6`. Pin its exact commit, regenerate the bundle
 and rebuild every caller, public face/ops, generated factory, provider and
 component with one configuration and toolchain. Current interface admission
-rejects epoch-1 through epoch-4 SDKs. Select a new build directory so old CMake caches,
+rejects epoch-1 through epoch-5 SDKs. Select a new build directory so old CMake caches,
 generated headers and objects cannot enter the new application. Keep the old
 build separate until the migrated consumer passes its required checks. No stable
 binary ABI is supplied. A development-fixture opt-in does not relax interface
 checks. Existing tags are unchanged.
 
 The version fields remain independent: authored TOML schema `2`, typed IR source
-epoch `5`, factory/source interface epoch `5`, resolved JSON projection `1` and
+epoch `5`, factory interface epoch `6`, generated resolved JSON projection `2` and
 installed SDK manifest schema `3`. A matching semantic version or manifest schema
-does not establish matching interface generation.
+does not establish matching interface generation. The complete typed IR audit
+projection remains schema 1 and continues to define the configuration digest.
 
+Epoch 6 removes factory types, COUNT values and getters for unselected classes.
+For optional application composition, test `defined(NX_FACTORY_HAS_UART)` before
+using UART factory names; the macro is absent when the class is unselected.
+Do not call empty getters to discover configuration. Invalid IDs of a selected
+class still return NULL, and its optional signal or validator queries retain
+their own contracts. Keep components independent of generated headers by
+injecting public faces from the application.
+
+Link `Nexus::IOUARTWord`, `Nexus::IOUARTStream` or `Nexus::IOUARTRS485` explicitly
+when the application composes those extensions; `Nexus::IOUART` supplies the
+basic interface, shared format checks and necessary wake support. Physical
+assemblies connect their selected modes automatically. Native and CPU Runtime
+still admit caller-defined providers. Read schema-2 `resolved.json` as selected
+output; use `list-bindings` for the full candidate catalogue. Regenerate SDK and
+resource reports so their hashes identify the new outputs. See the
+[epoch-6 contract](../design/source-compatibility.md#epoch-6-的按需-factory-与已选产物迁移).
+
+## Rebuild for source interface epoch 5
+
+The earlier epoch-5 changes remain required when upgrading those callers.
 Epoch 5 replaces the F407-named power integration header with
 `nexus/soc/stm32f4_power.h` and family power entry points. Hash constraints now
 report input/key length multiples separately from address alignment. Rebuild all

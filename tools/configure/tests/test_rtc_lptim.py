@@ -95,12 +95,12 @@ class NativeTimeAssemblyTests(unittest.TestCase):
         self.assertIn('#include "nexus/io/traits.h"', header)
         self.assertIn("NX_IO_CAP_MODEL, 65536U, 0U", source)
 
-    def test_empty_keeps_only_zero_count_stubs_and_no_selected_clock(self):
+    def test_empty_omits_factory_classes_and_selected_clock(self):
         result = self.resolve(self.empty)
         header, factory_source = factory.emit(result)
         _, source = bindings.emit(result)
-        self.assertIn("NX_RTC_ID_COUNT = 0", header)
-        self.assertIn("NX_LPTIM_ID_COUNT = 0", header)
+        self.assertNotIn("nx_rtc_id_t", header)
+        self.assertNotIn("nx_lptim_id_t", header)
         for forbidden in ["nx_native_rtc_ops", "nx_native_lptim_ops",
                           "nx_native_time_clock", "nx_time_now_us()",
                           "nx_native_rtc_state_t", "nx_native_lptim_state_t"]:

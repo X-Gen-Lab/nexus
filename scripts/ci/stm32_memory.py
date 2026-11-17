@@ -111,6 +111,19 @@ def preprocessing_command(entry):
     return result + ["-E", "-P"]
 
 
+def source_entries(entries, source):
+    """Select the exact production unit, resolving compile-relative paths."""
+    expected = source.resolve()
+    selected = []
+    for entry in entries:
+        path = Path(entry["file"])
+        if not path.is_absolute():
+            path = Path(entry["directory"]) / path
+        if path.resolve() == expected:
+            selected.append(entry)
+    return selected
+
+
 def verify_inputs(inputs):
     for identity in inputs:
         if arch_compile.digest(Path(identity["path"])) != identity:
@@ -171,13 +184,12 @@ def run(root, compiler, output, parallel=2):
             metrics = validate_layout(Elf32(elf_path.read_bytes()), resolved,
                                       budget, part, selected)
             entries = json.loads((build / "compile_commands.json").read_text())
-            helpers = [item for item in entries if
-                       Path(item["file"]).name == "memory_init.c"]
+            system_directory = root / "soc/stm32/stm32f4/system"
+            helpers = source_entries(entries, system_directory / "memory.c")
             if len(helpers) != int(selected):
                 raise ValueError("Default or selected helper graph differs")
             if not selected:
-                system = [item for item in entries if
-                          Path(item["file"]).name == "system.c"]
+                system = source_entries(entries, system_directory / "startup.c")
                 if len(system) != 1:
                     raise ValueError("Default SystemInit identity ambiguous")
                 expanded = recorder.execute(

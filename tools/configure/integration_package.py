@@ -379,7 +379,7 @@ def _select_data_package(path, *, family, test_support, read, owner_root=None):
 
 
 def select(value, *, family, root, assembly_directory, test_support=False,
-           read=None):
+           read=None, allow_legacy_provider=True):
     """Choose one explicit package; an external identity never shadows builtins."""
     from tools.configure import packages
     reader = read if read is not None else packages.FactReader()
@@ -403,7 +403,7 @@ def select(value, *, family, root, assembly_directory, test_support=False,
     if (candidate / "package.json").is_file():
         return _select_data_package(candidate / "package.json", family=family,
                                     test_support=test_support, read=reader)
-    if not test_support:
+    if not test_support or not allow_legacy_provider:
         fail("Production SoC packages require declarative package.json")
     manifest = load_manifest(value, root=assembly_directory)
     if manifest.family != family:

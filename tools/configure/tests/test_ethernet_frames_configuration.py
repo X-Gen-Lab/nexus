@@ -87,7 +87,7 @@ class EthernetFramesConfiguration(unittest.TestCase):
                 self.assertIn('const nx_eth_frames_port_t* '
                               'nx_factory_eth_frames(', header)
                 self.assertIn('NX_ETH_FRAMES_ID_MAC', header)
-                self.assertIn('NX_ETH_ID_COUNT = 0', header)
+                self.assertNotIn('nx_eth_id_t', header)
                 self.assertIn('NX_MDIO_ID_MAC', header)
                 self.assertIn('nexus/io/ethernet_frames.h', header)
                 self.assertIn('return nx_binding_mac;', source)

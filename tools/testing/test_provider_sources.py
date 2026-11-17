@@ -51,6 +51,8 @@ set(NEXUS_SOURCE_DIR "{sdk_root.as_posix()}")
 set(NEXUS_CONFIG_DIR "{generated.as_posix()}")
 add_library(nexus_io INTERFACE)
 add_library(Nexus::IOGPIO ALIAS nexus_io)
+add_library(Nexus::IODMA ALIAS nexus_io)
+add_library(Nexus::IOStream ALIAS nexus_io)
 add_library(nexus_arch INTERFACE)
 add_library(Nexus::Arch ALIAS nexus_arch)
 add_library(nexus_build_options INTERFACE)
@@ -58,6 +60,9 @@ add_library(nexus_owned_warnings INTERFACE)
 set(NEXUS_STM32_DEVICE STM32F407xx)
 set(NEXUS_STM32_STARTUP startup_stm32f407xx.s)
 add_subdirectory("{(ROOT / source_directory(family)).as_posix()}" soc)
+get_target_property(provider_dependencies nexus_soc_stm32f4 LINK_LIBRARIES)
+file(WRITE "${{CMAKE_CURRENT_BINARY_DIR}}/provider-dependencies.txt"
+    "${{provider_dependencies}}")
 ''')
             cmake = shutil.which("cmake")
             if cmake is None:
@@ -68,6 +73,9 @@ add_subdirectory("{(ROOT / source_directory(family)).as_posix()}" soc)
             )
             self.assertEqual(result.returncode, 0,
                              result.stdout + result.stderr)
+            if ("uart", "dma-tx") in controllers:
+                dependencies = (source / "build/provider-dependencies.txt").read_text()
+                self.assertIn("Nexus::IODMA", dependencies.split(";"))
             database = source / "build" / "compile_commands.json"
             if not database.exists():
                 return set(), set()

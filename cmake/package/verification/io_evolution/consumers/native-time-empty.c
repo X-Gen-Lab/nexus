@@ -19,20 +19,15 @@
 int main(void);
 
 int main(void) {
-    _Static_assert(NX_RTC_ID_COUNT == 0, "No selected RTC state");
-    _Static_assert(NX_LPTIM_ID_COUNT == 0, "No selected LPTIM state");
+#if defined(NX_FACTORY_HAS_RTC) || defined(NX_FACTORY_HAS_LPTIM)
+#error Empty assembly must not expose time-device factory classes
+#endif
     CHECK(nx_native_clock_configure(true, 19) == NX_SUCCESS);
-    CHECK(nx_factory_rtc_ref(NX_RTC_REF_COUNT) == NULL);
-    CHECK(nx_factory_lptim_ref(NX_LPTIM_REF_COUNT) == NULL);
-    CHECK(nx_factory_rtc_capability_ref(NX_RTC_REF_COUNT) == NULL);
-    CHECK(nx_factory_lptim_capability_ref(NX_LPTIM_REF_COUNT) == NULL);
     CHECK(nx_time_now_us() == 19U);
     for (unsigned cycle = 0; cycle < 2; ++cycle) {
         nx_platform_start_result_t start = nx_platform_start();
         CHECK(start.primary == NX_SUCCESS && start.cleanup == NX_SUCCESS &&
               start.remaining_effects == 0U);
-        CHECK(nx_factory_rtc_ref(NX_RTC_REF_COUNT) == NULL &&
-              nx_factory_lptim_ref(NX_LPTIM_REF_COUNT) == NULL);
         CHECK(nx_time_now_us() == 19U);
         CHECK(nx_platform_stop() == NX_SUCCESS);
         CHECK(nx_platform_stop() == NX_SUCCESS);
