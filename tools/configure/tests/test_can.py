@@ -137,15 +137,6 @@ class CanConfigurationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'CAN'):
             gate.resolve_ir(path, test_support=native_fixture(path))
 
-    def test_derived_capability_uses_actual_common_io_operations_source(self):
-        from tools.maintenance import capabilities
-        rows = capabilities.collect(gate.ROOT)
-        selected = [row for row in rows if row["kind"] == "can"]
-        self.assertEqual(len(selected), 2)
-        for row in selected:
-            self.assertEqual(row["exports"], ["soc/stm32/stm32f4/drivers/ip/classic_can/can_controller.c"])
-            self.assertTrue(row["fixtures"])
-
     def test_no_can_configuration_produces_no_domain_state_or_driver_calls(self):
         output = self.root / 'empty'
         gate.configure(gate.ROOT / 'tools/configure/assemblies/qiming-baremetal.toml', output, test_support=native_fixture(gate.ROOT / 'tools/configure/assemblies/qiming-baremetal.toml'))

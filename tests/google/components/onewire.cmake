@@ -6,4 +6,5 @@ nexus_google_test(nexus_onewire_test
         "${NEXUS_SOURCE_DIR}/components/devices/ds18b20/src/ds18b20.c"
     INCLUDES "${NEXUS_SOURCE_DIR}/components/buses/onewire/include"
         "${NEXUS_SOURCE_DIR}/components/devices/ds18b20/include"
-    LIBRARIES Nexus::IO)
+    LIBRARIES Nexus::IO
+)

@@ -4,8 +4,11 @@ project(nexus_stm32_hal_reference LANGUAGES C CXX)
 if(NOT CMAKE_SYSTEM_NAME STREQUAL "Linux" OR CMAKE_CROSSCOMPILING)
     message(FATAL_ERROR "The HAL register reference requires a Linux host")
 endif()
-get_filename_component(NEXUS_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../.."
-    ABSOLUTE)
+get_filename_component(
+    NEXUS_SOURCE_DIR
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../.."
+    ABSOLUTE
+)
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
 include("${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/sdk/STM32Official.cmake")
 include("${NEXUS_SOURCE_DIR}/cmake/platform/CMSISCore.cmake")
@@ -30,15 +33,31 @@ if(NOT NEXUS_REFERENCE_SANITIZER MATCHES "^(none|address|thread)$")
     message(FATAL_ERROR "Unknown reference sanitizer")
 endif()
 if(NOT NEXUS_REFERENCE_SANITIZER STREQUAL "none")
-    foreach(target nexus_stm32_hal_reference_vendor nexus_stm32_hal_reference
-                   gtest gmock gmock_main)
-        target_compile_options(${target} PRIVATE
-            "-fsanitize=${NEXUS_REFERENCE_SANITIZER}" -fno-omit-frame-pointer)
+    foreach(
+        target
+        nexus_stm32_hal_reference_vendor
+        nexus_stm32_hal_reference
+        gtest
+        gmock
+        gmock_main
+    )
+        target_compile_options(
+            ${target}
+            PRIVATE
+                "-fsanitize=${NEXUS_REFERENCE_SANITIZER}"
+                -fno-omit-frame-pointer
+        )
     endforeach()
-    target_link_options(nexus_stm32_hal_reference PRIVATE
-        "-fsanitize=${NEXUS_REFERENCE_SANITIZER}")
+    target_link_options(
+        nexus_stm32_hal_reference
+        PRIVATE "-fsanitize=${NEXUS_REFERENCE_SANITIZER}"
+    )
 endif()
 enable_testing()
-add_test(NAME nexus_stm32_hal_reference COMMAND nexus_stm32_hal_reference
-    "--gtest_output=xml:${CMAKE_BINARY_DIR}/reference.xml")
+add_test(
+    NAME nexus_stm32_hal_reference
+    COMMAND
+        nexus_stm32_hal_reference
+        "--gtest_output=xml:${CMAKE_BINARY_DIR}/reference.xml"
+)
 set_tests_properties(nexus_stm32_hal_reference PROPERTIES TIMEOUT 30)

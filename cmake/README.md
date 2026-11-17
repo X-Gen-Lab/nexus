@@ -3,6 +3,16 @@
 CMake 维护唯一源码和链接依赖图。`NEXUS_ASSEMBLY_FILE` 选择 TOML 装配，生成结果
 只提供严格解析的选择、静态连接、布局与输入身份，不维护另一套源码列表。
 
+自有 CMake 使用锁定的 gersemi，四空格、80 列，章节横线保持 77 字符。
+短文件优先用空行，不为缩短根文件增加转发层。格式检查不修改或暂存文件：
+
+```sh
+python scripts/tools/cmake_format.py --check
+python scripts/tools/cmake_format.py
+```
+
+第二条命令显式格式化自有文件；vendor、依赖和构建输出不参与。普通提交使用同一检查。
+
 当前生产 provider 为 `nexus_soc_stm32f4`，具体实现由精确器件和模式事实限定。器件宏与
 startup 从型号事实导出；官方 HAL／LL、Device 和 Handle 保持私有。未选模块不参与
 编译，section GC 再移除未引用函数，两者分别验证。

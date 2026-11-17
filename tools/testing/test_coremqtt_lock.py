@@ -169,31 +169,6 @@ class CoreMQTTGitAndSDKTests(unittest.TestCase):
                         .issubset(sdk.required_files(ROOT, sdk.source_profile(
                             components=("mqtt",)))))
 
-    def test_inventory_retains_the_official_parent_and_current_closed_sources(self):
-        from tools.maintenance import dependency_proposals as proposals
-        names = ('dependencies/toolchains.lock.json',
-            'dependencies/actions.lock.json', 'dependencies/environment.lock.json',
-            'dependencies/development-tools.txt', 'dependencies/environment-tools.txt',
-            'vendors/gigadevice/gd32f4xx/source.lock.json')
-        for name in names:
-            destination = self.root / name
-            destination.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copyfile(ROOT / name, destination)
-        shutil.copytree(ROOT / 'vendors/gigadevice/gd32f4xx/LICENSES',
-                        self.root / 'vendors/gigadevice/gd32f4xx/LICENSES')
-        self.git(self.root, 'add', 'dependencies', 'vendors')
-        self.git(self.root, 'commit', '--quiet', '-m', 'Inventory observations')
-        item = catalogue.dependency('coremqtt')
-        with patch.object(catalogue, 'ALL_DEPENDENCIES', (item,)), \
-                patch.object(proposals, 'ALL_DEPENDENCIES', (item,)):
-            report = proposals.inventory(self.root)
-        actual = next(row for row in report['dependencies']
-                      if row['id'] == 'coremqtt')
-        self.assertEqual(actual['revision'], self.module.COMMIT)
-        self.assertEqual(actual['upstream_revision'], self.lock['upstream_commit'])
-        paths = {row['path'] for row in actual['identities']}
-        self.assertTrue({str(self.source / name) for name in self.lock['files']}
-                        .issubset(paths))
 
 
 if __name__ == '__main__':

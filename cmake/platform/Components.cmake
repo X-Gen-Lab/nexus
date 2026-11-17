@@ -25,7 +25,8 @@ function(_nexus_component_bindings output)
         "mcuboot=Nexus::MCUBootControl"
         "st-usb-host=Nexus::STUSBHost"
         "st-usb-device=Nexus::STUSBDevice"
-        PARENT_SCOPE)
+        PARENT_SCOPE
+    )
 endfunction()
 
 function(nexus_component_choices output)
@@ -69,8 +70,10 @@ function(nexus_resolve_components output)
             nexus_add_st_usb_device()
         endif()
         if(NOT TARGET "${target}")
-            message(FATAL_ERROR
-                "Selected component target is unavailable: ${component}")
+            message(
+                FATAL_ERROR
+                "Selected component target is unavailable: ${component}"
+            )
         endif()
         list(APPEND selected "${target}")
     endforeach()

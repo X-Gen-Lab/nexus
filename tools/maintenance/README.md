@@ -6,10 +6,13 @@
 ```sh
 python tools/maintenance/capabilities.py --check
 python tools/maintenance/compatibility.py
-python tools/maintenance/ownership.py
 ```
 
 `capabilities.py --assembly <assembly.toml>` 调用真实 resolver，输出器件、板卡、
 后端、模式、资源 owner 和明确限制。配置通过不代表模型、链接或 HIL 已执行。
 `consumer_profiles.py` 是真实 SDK 消费者配置的唯一列表，由消费者验证器复用。
 来源检查工具验证 gitlink、源码和许可证，不下载或自动修改来源锁。
+
+全局能力与派生文档在 testing 域检查一次；`--check` 留作显式维护入口。
+不模拟人员席位，也不生成依赖升级建议台账。依赖变更通过普通 PR，执行相关来源锁、
+许可证、编译与 SDK 消费者检查；未选库存不进入普通构建。

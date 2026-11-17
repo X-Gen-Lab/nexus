@@ -2,6 +2,7 @@
   "direct_requirements": {
     "clang-format": "14.0.6",
     "cmake": "3.31.6",
+    "gersemi": "0.29.2",
     "ninja": "1.13.2",
     "pre-commit": "4.3.0",
     "pyyaml": "6.0.3",
@@ -45,6 +46,13 @@
       "sha256": "3f4a557945a7b0f95efeb1f432267affe5d45ac8ddde2aed1b97ebb62382c089",
       "size": 132460,
       "version": "4.1.1"
+    },
+    {
+      "filename": "gersemi-0.29.2-cp312-cp312-manylinux_2_28_x86_64.whl",
+      "name": "gersemi",
+      "sha256": "45fff157fa8bd6920d043aed45f6d8d6ac5bf7b986d042bae6bfed896c888ecd",
+      "size": 2860215,
+      "version": "0.29.2"
     },
     {
       "filename": "identify-2.6.20-py2.py3-none-any.whl",

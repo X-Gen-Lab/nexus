@@ -172,6 +172,21 @@ CMake section separator lines must be exactly 77 characters: ``#`` followed by
 76 hyphens or spaces. This rule is independent of the 79-character C/C++ section
 comments above.
 
+Use the following template only for substantial top-level sections; short files
+and function bodies normally need blank lines and concise responsibility comments::
+
+    #----------------------------------------------------------------------------
+    # Sources
+    #----------------------------------------------------------------------------
+
+Use four-space indentation and an 80-column target. Keep short calls on one line
+and group long argument lists by responsibility. Quote paths while preserving
+intentional list expansion, generator expressions and static-library link order.
+Declare ``PUBLIC``, ``PRIVATE`` and ``INTERFACE`` dependencies explicitly; vendor
+headers and implementation definitions remain private. Use the locked formatter
+for owned CMake files, never for vendor sources. Commit checks report differences
+without rewriting or staging files.
+
 Inline Comments
 ~~~~~~~~~~~~~~~
 

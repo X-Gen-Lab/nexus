@@ -3,13 +3,11 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import math
 from pathlib import Path
 
-from tools.evidence.common import (
-    file_identity, load_json, regular_file, sha256_value, stream_digest)
+from tools.evidence.common import load_json
 
 MAXIMUM_RECEIPTS = 10000
 OUTCOMES = {"completed", "timed_out", "cancelled", "launch_failed", "running"}
@@ -56,25 +54,6 @@ def _receipts(paths):
     if len(candidates) > MAXIMUM_RECEIPTS:
         raise ValueError("Too many attempt receipts")
     return sorted(candidates)
-
-
-def _raw(identity):
-    if (not isinstance(identity, dict)
-            or set(identity) != {"path", "bytes", "sha256"}):
-        raise ValueError("Receipt raw output identity is incomplete")
-    size = identity["bytes"]
-    if type(size) is not int or size < 0:
-        raise ValueError("Receipt raw output size is invalid")
-    sha256_value(identity["sha256"])
-    path = regular_file(identity["path"], nonempty=False)
-    if path.stat().st_size != size:
-        raise ValueError("Receipt raw output identity changed")
-    digest = hashlib.sha256()
-    with path.open("rb") as stream:
-        for block in iter(lambda: stream.read(128 * 1024), b""):
-            digest.update(block)
-    if digest.hexdigest() != identity["sha256"]:
-        raise ValueError("Receipt raw output identity changed")
 
 
 def _resource_usage(value):
@@ -132,8 +111,6 @@ def summarize(paths):
                         "launch_failed": 127}
             if outcome in expected and code != expected[outcome]:
                 raise ValueError("Receipt outcome and exit code disagree")
-            for key in ("stdout", "stderr"):
-                _raw(data.get(key))
             intervals.append((start, finish))
         phase = _phase(command)
         entry = phases.setdefault(phase, {"attempts": 0, "seconds": 0.0,
@@ -159,7 +136,7 @@ def summarize(paths):
     return {
         "schema": 1, "kind": "development_receipt_costs",
         "qualification": False,
-        "scope": ("selected host attempts only; "
+        "scope": ("selected receipt values only; raw outputs are not verified; "
                   "running costs and unobserved stages unknown"),
         "attempt_count": len(attempts), "outcomes": outcomes,
         "incomplete_attempts": outcomes.get("running", 0),

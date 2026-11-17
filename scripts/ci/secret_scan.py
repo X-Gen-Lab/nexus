@@ -56,8 +56,8 @@ def validate_policy(policy):
         if not isinstance(policy[key], str) or not HEX64.fullmatch(policy[key]):
             raise ValueError("Exact scanner identity required")
     reviewed = policy["reviewed_unknowns"]
-    if not isinstance(reviewed, list) or not reviewed:
-        raise ValueError("Explicit reviewed unknowns required")
+    if not isinstance(reviewed, list):
+        raise ValueError("Reviewed unknowns must be an explicit list")
     seen = set()
     for item in reviewed:
         fields(item, ("detector", "detector_type", "source_type", "path",

@@ -75,29 +75,5 @@ class TimerCapabilityObserverTests(unittest.TestCase):
             'const nx_gpio_ops_t NX_TABLE_OPS = {0};\n')
         self.assertEqual(capabilities.source_ops(self.source, self.root), set())
 
-    def test_actual_selected_timer_faces_use_real_public_types(self):
-        rows = capabilities.collect(configure.ROOT)
-        selected = [row for row in rows if row["kind"] in {"timer_capture", "advanced_pwm"}]
-        expected = {
-            ('stm32f4', f"TIM{number}", "timer_capture", "edge-capture")
-            for number in (1, 3, 4, 5, 8, 9, 10, 11, 12, 13, 14)
-        } | {
-            ('stm32f4', "TIM1", "advanced_pwm", "complementary-pwm"),
-            ('stm32f4', "TIM8", "advanced_pwm", "complementary-pwm"),
-        }
-        self.assertEqual({(row["family"], row["controller"], row["kind"],
-                           row["mode"]) for row in selected}, expected)
-        for row in selected:
-            self.assertTrue(row["fixtures"])
-            name = ('timer_capture_'+row['controller'].lower()
-                    if row['kind'] == 'timer_capture' and row['controller'] != 'TIM4'
-                    else 'advanced_pwm_tim8'
-                    if row['kind'] == 'advanced_pwm' and row['controller'] == 'TIM8'
-                    else row['kind'])
-            self.assertEqual(row["exports"],
-                             [f"{source_directory(row['family'])}/drivers/timer/{name}.c"])
-            self.assertFalse(row["boards"])
-
-
 if __name__ == "__main__":
     unittest.main()

@@ -1,6 +1,17 @@
 # Each host image compiles the production primitive algorithm. Register and
 # instruction mocks remain test-only; these models do not execute an ARM CPU.
-foreach(profile m0 m0plus m3 m4 m7 m23 m33 m55 m85)
+foreach(
+    profile
+    m0
+    m0plus
+    m3
+    m4
+    m7
+    m23
+    m33
+    m55
+    m85
+)
     set(priority_mask 1)
     set(dwt_cyccnt 0)
     if(profile STREQUAL "m0" OR profile STREQUAL "m0plus")
@@ -25,9 +36,14 @@ foreach(profile m0 m0plus m3 m4 m7 m23 m33 m55 m85)
     nexus_google_test(${name} SOURCES "${nexus_google_root}/arch/arch_cortex_test.cpp"
         "${NEXUS_SOURCE_DIR}/arch/arm/cortex_m/nx_arch_cortex_m.c"
         INCLUDES "${NEXUS_SOURCE_DIR}/arch/include"
-            "${nexus_google_root}/arch")
-    target_compile_definitions(${name} PRIVATE NEXUS_ARCH_CORTEX_M_MODEL
-        ${architecture_macro}=1
-        NEXUS_ARCH_TEST_PRIORITY_MASK=${priority_mask}
-        NEXUS_ARCH_HAS_DWT_CYCCNT=${dwt_cyccnt})
+            "${nexus_google_root}/arch"
+    )
+    target_compile_definitions(
+        ${name}
+        PRIVATE
+            NEXUS_ARCH_CORTEX_M_MODEL
+            ${architecture_macro}=1
+            NEXUS_ARCH_TEST_PRIORITY_MASK=${priority_mask}
+            NEXUS_ARCH_HAS_DWT_CYCCNT=${dwt_cyccnt}
+    )
 endforeach()

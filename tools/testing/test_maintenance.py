@@ -1,27 +1,16 @@
-"""Maintained support text and review assignments reject stale declarations."""
+"""One global support scan checks facts, exports and derived documentation."""
 
-import copy
-from contextlib import redirect_stderr, redirect_stdout
-import io
-import json
 from pathlib import Path
-import tempfile
 import tomllib
 import unittest
 
-from tools.maintenance import capabilities, ownership
+from scripts.ci import provider_assemblies
+from tools.maintenance import capabilities
 
 ROOT = Path(__file__).resolve().parents[2]
 
 
-class CapabilityDocumentationTests(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.matrix = capabilities.collect(ROOT)
-
-    def setUp(self):
-        self.rows = copy.deepcopy(self.matrix)
-
+class CapabilityUnitTests(unittest.TestCase):
     def test_generated_block_requires_exact_content_and_single_markers(self):
         expected = "| UART | dma-tx |\n"
         document = ("intro\n" + capabilities.START + "\n" + expected
@@ -42,6 +31,12 @@ const nx_uart_ops_t nx_sample_uart_ops = {0};
 '''
         self.assertEqual(capabilities.ops_definitions(source),
                          {"nx_sample_uart_ops_extra", "nx_sample_uart_ops"})
+
+
+class CapabilityDocumentationTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.rows = capabilities.collect(ROOT)
 
     def test_current_matrix_uses_actual_resolver_and_preserves_scope(self):
         rows = self.rows
@@ -78,11 +73,61 @@ const nx_uart_ops_t nx_sample_uart_ops = {0};
         selected = [row for row in rows if row["family"] == "stm32f4"
                     and row["kind"] == "i2c" and row["exports"]
                     and row["mode"] in {"irq-messages", "dma-messages"}]
-        self.assertTrue(selected)
+        self.assertEqual({row["mode"] for row in selected},
+                         {"irq-messages", "dma-messages"})
         for row in selected:
             with self.subTest(mode=row["mode"]):
                 self.assertEqual(row["exports"],
                                  ["soc/stm32/stm32f4/drivers/ip/i2c_v1_async/i2c_v1_async.c"])
+
+    def test_can_exports_use_the_shared_production_controller(self):
+        selected = [row for row in self.rows if row["kind"] == "can"]
+        self.assertEqual(len(selected), 2)
+        for row in selected:
+            with self.subTest(controller=row["controller"]):
+                self.assertEqual(row["exports"], [
+                    "soc/stm32/stm32f4/drivers/ip/classic_can/can_controller.c"])
+                self.assertTrue(row["fixtures"])
+
+    def test_selected_timer_faces_preserve_exact_modes_and_source_paths(self):
+        selected = [row for row in self.rows
+                    if row["kind"] in {"timer_capture", "advanced_pwm"}]
+        expected = {
+            ("stm32f4", f"TIM{number}", "timer_capture", "edge-capture")
+            for number in (1, 3, 4, 5, 8, 9, 10, 11, 12, 13, 14)
+        } | {
+            ("stm32f4", "TIM1", "advanced_pwm", "complementary-pwm"),
+            ("stm32f4", "TIM8", "advanced_pwm", "complementary-pwm"),
+        }
+        self.assertEqual({(row["family"], row["controller"], row["kind"],
+                           row["mode"]) for row in selected}, expected)
+        for row in selected:
+            with self.subTest(controller=row["controller"], kind=row["kind"]):
+                self.assertTrue(row["fixtures"])
+                if row["kind"] == "timer_capture" and row["controller"] != "TIM4":
+                    name = "timer_capture_" + row["controller"].lower()
+                elif row["kind"] == "advanced_pwm" and row["controller"] == "TIM8":
+                    name = "advanced_pwm_tim8"
+                else:
+                    name = row["kind"]
+                self.assertEqual(row["exports"], [
+                    f"soc/stm32/stm32f4/drivers/timer/{name}.c"])
+                self.assertFalse(row["boards"])
+
+    def test_declared_fixtures_share_the_resolved_capability_index(self):
+        directory = ROOT / "tests/contracts/declared_io_assembly"
+        fixtures = sorted(directory.glob("*.toml"))
+        self.assertTrue(fixtures)
+        indexed = {(row["family"], row["controller"], row["mode"]): row
+                   for row in self.rows}
+        for row in provider_assemblies.validate_fixtures(ROOT, fixtures):
+            relative = Path(row["assembly"]).relative_to(ROOT).as_posix()
+            for item in row["resolved"]["controllers"]:
+                key = (row["resolved"]["soc_family"], item["controller"],
+                       item["mode"])
+                with self.subTest(selection=key, fixture=relative):
+                    self.assertIn(relative, indexed[key]["fixtures"])
+                    self.assertTrue(indexed[key]["exports"])
 
     def test_native_models_require_explicit_scope_outside_production_matrix(self):
         rows = self.rows
@@ -137,152 +182,6 @@ const nx_uart_ops_t nx_sample_uart_ops = {0};
                     self.assertIn(relative, selected[0]["fixtures"])
                     self.assertTrue(selected[0]["exports"])
 
-
-
-class AgentMaintenanceTests(unittest.TestCase):
-    def setUp(self):
-        self.document = json.loads(
-            (ROOT / ".github/maintainer-roles.json").read_text())
-        self.document["assignment_status"] = "agent_managed"
-        self.document["maintenance"] = {
-            "mode": "agent_managed",
-            "owner": "codex",
-            "review_policy": "agent_review_and_automated_gates",
-            "required_checks": ["format", "comments", "tdd",
-                                "host-contracts", "arm-builds",
-                                "resource-budgets", "sdk-consumers",
-                                "evidence-identity"],
-        }
-        for role in self.document["roles"]:
-            role["members"] = []
-
-    def test_agent_responsibilities_do_not_require_named_people(self):
-        report = ownership.validate(self.document, require_assigned=True)
-        self.assertEqual(report["status"], "agent_managed")
-        self.assertEqual(report["responsible_agent"], "codex")
-        self.assertEqual(report["unassigned_roles"], [])
-        self.assertFalse(report["named_members_required"])
-        self.assertFalse(report["independent_human_review_verified"])
-        self.assertFalse(report["branch_protection_verified"])
-
-    def test_agent_policy_cannot_fabricate_codeowners(self):
-        with self.assertRaisesRegex(ValueError, "GitHub accounts"):
-            ownership.render(self.document)
-
-    def test_agent_policy_requires_real_execution_gate_names(self):
-        for mutation in ("missing-check", "duplicate-check", "unknown-owner",
-                         "human-account", "unknown-field"):
-            document = copy.deepcopy(self.document)
-            if mutation == "missing-check":
-                document["maintenance"]["required_checks"].remove("tdd")
-            elif mutation == "duplicate-check":
-                document["maintenance"]["required_checks"].append("tdd")
-            elif mutation == "unknown-owner":
-                document["maintenance"]["owner"] = "@fake-person"
-            elif mutation == "human-account":
-                document["roles"][0]["members"] = ["@fake-person"]
-            else:
-                document["maintenance"]["branch_protection_verified"] = True
-            with self.subTest(mutation=mutation), self.assertRaises(ValueError):
-                ownership.validate(document, require_assigned=True)
-
-
-class ReviewOwnershipTests(unittest.TestCase):
-    def setUp(self):
-        path = ROOT / ".github/maintainer-roles.json"
-        self.document = json.loads(path.read_text())
-        self.document.pop("maintenance", None)
-        self.document["assignment_status"] = (
-            "roles_defined_named_team_assignment_pending")
-        for role in self.document["roles"]:
-            role["members"] = []
-
-    def test_template_is_valid_but_not_an_assigned_team(self):
-        report = ownership.validate(self.document)
-        self.assertEqual(report["seats"], 10)
-        self.assertEqual(report["status"], "pending")
-        with self.assertRaisesRegex(ValueError, "unassigned"):
-            ownership.validate(self.document, require_assigned=True)
-
-    def assigned(self):
-        document = copy.deepcopy(self.document)
-        document["assignment_status"] = "assigned"
-        for role in document["roles"]:
-            role["members"] = [f"@test-{role['id']}-{index}"
-                               for index in range(role["seats"])]
-        return document
-
-    def test_assigned_team_generates_complete_review_output(self):
-        document = self.assigned()
-        report = ownership.validate(document, require_assigned=True)
-        self.assertEqual(report["status"], "assigned")
-        text = ownership.render(document)
-        self.assertIn("/core/ @test-core-interfaces-0", text)
-        self.assertIn("/soc/ @test-bsp-ports-0", text)
-        self.assertIn("/tests/ @test-quality-hil-0", text)
-        self.assertLess(text.index("/** "), text.index("/core/ "))
-        self.assertLess(text.index("/components/ "),
-                        text.index("/components/services/storage/ "))
-        self.assertTrue(text.endswith("\n"))
-
-    def test_invalid_assignments_are_rejected(self):
-        for mutation in ("duplicate-role", "unknown-backup", "malformed-member",
-                         "wrong-seats", "unknown-key", "duplicate-member"):
-            document = self.assigned()
-            if mutation == "duplicate-role":
-                document["roles"][1]["id"] = document["roles"][0]["id"]
-            elif mutation == "unknown-backup":
-                document["roles"][0]["backup_role"] = "missing"
-            elif mutation == "malformed-member":
-                document["roles"][0]["members"] = ["@bad account"]
-            elif mutation == "wrong-seats":
-                document["roles"][0]["seats"] = 2
-            elif mutation == "unknown-key":
-                document["branch_protection_enabled"] = True
-            else:
-                account = document["roles"][0]["members"][0]
-                document["roles"][1]["members"][0] = account
-            with self.subTest(mutation=mutation), self.assertRaises(ValueError):
-                ownership.validate(document, require_assigned=True)
-
-    def test_pending_team_cannot_publish_an_ownership_file(self):
-        with tempfile.TemporaryDirectory() as directory:
-            output = Path(directory) / "CODEOWNERS"
-            with self.assertRaisesRegex(ValueError, "unassigned"):
-                ownership.write(self.document, output)
-            self.assertFalse(output.exists())
-
-    def test_malformed_lists_and_conflicting_paths_are_rejected(self):
-        for mutation in ("nested-member", "duplicate-path", "boolean-schema",
-                         "invalid-backup", "missing-note"):
-            document = self.assigned()
-            if mutation == "nested-member":
-                document["roles"][0]["members"] = [{}]
-            elif mutation == "duplicate-path":
-                document["roles"][1]["review_paths"] = \
-                    document["roles"][0]["review_paths"]
-            elif mutation == "boolean-schema":
-                document["schema_version"] = True
-            elif mutation == "invalid-backup":
-                document["roles"][0]["backup_role"] = []
-            else:
-                document["note"] = ""
-            with self.subTest(mutation=mutation), self.assertRaises(ValueError):
-                ownership.validate(document, require_assigned=True)
-
-    def test_cli_rejects_duplicate_json_keys_without_publication(self):
-        document = json.dumps(self.assigned()).replace(
-            '"schema_version": 1',
-            '"schema_version": 2, "schema_version": 1', 1)
-        with tempfile.TemporaryDirectory() as directory:
-            source = Path(directory) / "team.json"
-            output = Path(directory) / "CODEOWNERS"
-            source.write_text(document)
-            with redirect_stderr(io.StringIO()), redirect_stdout(io.StringIO()):
-                result = ownership.main(["--input", str(source),
-                                         "--output", str(output)])
-            self.assertEqual(result, 1)
-            self.assertFalse(output.exists())
 
 
 if __name__ == "__main__":

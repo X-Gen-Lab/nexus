@@ -9,15 +9,24 @@ foreach(clock_family stm32f4)
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/dwc_otg_device" "${NEXUS_SOC_SOURCE_${clock_family}}"
             "${NEXUS_SOURCE_DIR}/arch/include"
             "${NEXUS_SOURCE_DIR}/io/include"
-            "${NEXUS_SOURCE_DIR}/io/private")
-    target_compile_options(${clock_target} PRIVATE
-        "-include${nexus_google_root}/soc/usb_clock_model.h")
-    target_include_directories(${clock_target} SYSTEM PRIVATE
-        "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
-        "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+            "${NEXUS_SOURCE_DIR}/io/private"
+    )
+    target_compile_options(
+        ${clock_target}
+        PRIVATE "-include${nexus_google_root}/soc/usb_clock_model.h"
+    )
+    target_include_directories(
+        ${clock_target}
+        SYSTEM
+        PRIVATE
+            "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
+            "${NEXUS_CMSIS_CORE_INCLUDE_DIR}"
+    )
     nexus_use_cmsis_core(${clock_target})
-    target_compile_definitions(${clock_target} PRIVATE STM32F407xx
-        NEXUS_STM32F4_USB_REMOTE_WAKEUP=1)
+    target_compile_definitions(
+        ${clock_target}
+        PRIVATE STM32F407xx NEXUS_STM32F4_USB_REMOTE_WAKEUP=1
+    )
 endforeach()
 nexus_google_test(nexus_stm32f4_usb_hs_clock_test
     SOURCES "${nexus_google_root}/soc/usb_hs_clock_test.cpp"
@@ -25,22 +34,34 @@ nexus_google_test(nexus_stm32f4_usb_hs_clock_test
     LIBRARIES Nexus::Core
     INCLUDES
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/dwc_otg_device" "${NEXUS_SOC_SOURCE_stm32f4}"
-        "${NEXUS_SOURCE_DIR}/io/include" "${NEXUS_SOURCE_DIR}/arch/include")
-target_compile_options(nexus_stm32f4_usb_hs_clock_test PRIVATE
-    "-include${nexus_google_root}/soc/usb_clock_model.h")
-target_include_directories(nexus_stm32f4_usb_hs_clock_test SYSTEM PRIVATE
-    "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
+        "${NEXUS_SOURCE_DIR}/io/include" "${NEXUS_SOURCE_DIR}/arch/include"
+)
+target_compile_options(
+    nexus_stm32f4_usb_hs_clock_test
+    PRIVATE "-include${nexus_google_root}/soc/usb_clock_model.h"
+)
+target_include_directories(
+    nexus_stm32f4_usb_hs_clock_test
+    SYSTEM
+    PRIVATE "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
+)
 nexus_use_cmsis_core(nexus_stm32f4_usb_hs_clock_test)
-target_compile_definitions(nexus_stm32f4_usb_hs_clock_test PRIVATE STM32F407xx
-    NEXUS_STM32F4_USB_REMOTE_WAKEUP=1)
+target_compile_definitions(
+    nexus_stm32f4_usb_hs_clock_test
+    PRIVATE STM32F407xx NEXUS_STM32F4_USB_REMOTE_WAKEUP=1
+)
 
 nexus_google_test(nexus_stm32_usb_hal_time_test
     SOURCES "${nexus_google_root}/soc/usb_hal_time_test.cpp"
         "${NEXUS_SOC_SOURCE_stm32f4}/drivers/usb/usb_hal_time.c"
     LIBRARIES Nexus::Core
     INCLUDES "${NEXUS_SOC_SOURCE_stm32f4}"
-        "${NEXUS_SOURCE_DIR}/arch/include" "${NEXUS_SOURCE_DIR}/io/include")
-target_include_directories(nexus_stm32_usb_hal_time_test SYSTEM PRIVATE
-    "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
+        "${NEXUS_SOURCE_DIR}/arch/include" "${NEXUS_SOURCE_DIR}/io/include"
+)
+target_include_directories(
+    nexus_stm32_usb_hal_time_test
+    SYSTEM
+    PRIVATE "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
+)
 nexus_use_cmsis_core(nexus_stm32_usb_hal_time_test)
 target_compile_definitions(nexus_stm32_usb_hal_time_test PRIVATE STM32F407xx)

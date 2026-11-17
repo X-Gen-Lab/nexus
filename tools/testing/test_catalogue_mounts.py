@@ -12,6 +12,9 @@ from tools.maintenance import source_catalogue as catalogue
 
 class ReviewedMountTests(unittest.TestCase):
     def setUp(self):
+        # Load production verifier identities before installing a synthetic
+        # catalogue. Their module constants belong to the real source graph.
+        self.sdk = self.sdk_module()
         self.temporary = tempfile.TemporaryDirectory(prefix="catalogue mounts ")
         self.addCleanup(self.temporary.cleanup)
         self.area = Path(self.temporary.name)
@@ -207,6 +210,8 @@ class ReviewedMountTests(unittest.TestCase):
             (str(root / "ext/mbedtls/tf-psa-crypto"), ["framework"])])
 
     def sdk_module(self):
+        if hasattr(self, "sdk"):
+            return self.sdk
         import importlib.util
         path = Path(__file__).resolve().parents[2] / "cmake/package/package_source_sdk.py"
         specification = importlib.util.spec_from_file_location("catalogue_mount_sdk", path)
@@ -222,21 +227,6 @@ class ReviewedMountTests(unittest.TestCase):
         return {item.path: item for item in catalogue.ALL_DEPENDENCIES
                 if item.scope == "runtime"}
 
-    def inventory_metadata(self, root):
-        import shutil
-        source = Path(__file__).resolve().parents[2]
-        names = ("dependencies/toolchains.lock.json", "dependencies/actions.lock.json",
-                 "dependencies/environment.lock.json", "dependencies/development-tools.txt",
-                 "dependencies/environment-tools.txt",
-                 "vendors/gigadevice/gd32f4xx/source.lock.json")
-        for name in names:
-            target = root / name
-            target.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copyfile(source / name, target)
-        shutil.copytree(source / "vendors/gigadevice/gd32f4xx/LICENSES",
-                        root / "vendors/gigadevice/gd32f4xx/LICENSES")
-        self.git(root, "add", "dependencies", "vendors")
-        self.commit(root, "inventory auxiliary metadata")
 
     def commit_crypto_chain(self, root):
         crypto = root / self.crypto_source.path
@@ -248,10 +238,8 @@ class ReviewedMountTests(unittest.TestCase):
                  self.git(tls, "rev-parse", "HEAD"), "ext/mbedtls")
         self.commit(root, "selected platform parent")
 
-    def test_sdk_and_inventory_keep_both_framework_mounts(self):
-        from tools.maintenance import dependency_proposals as proposals
+    def test_sdk_keeps_both_framework_mounts(self):
         root, entries = self.prepared_root()
-        self.inventory_metadata(root)
         sdk = self.sdk_module()
         with patch.object(sdk, "runtime_dependency_closure",
                           side_effect=self.selected_sdk_sources):
@@ -262,18 +250,11 @@ class ReviewedMountTests(unittest.TestCase):
         alias = next(record for record in records if record["path"] == entries[-1].path)
         self.assertEqual((canonical["commit"], canonical["tree"]),
                          (alias["commit"], alias["tree"]))
-        with patch.object(proposals, "ALL_DEPENDENCIES", entries):
-            observed = proposals.inventory(root)
-        mounted = [record for record in observed["dependencies"] if "path" in record]
-        self.assertEqual({record["path"] for record in mounted}, {item.path for item in entries})
-        self.assertEqual(len(mounted), 4)
 
     def test_unknown_leaf_declaration_and_gitlink_reject_in_every_observer(self):
         import shutil
         from tools.dev import dependencies
-        from tools.maintenance import dependency_proposals as proposals
         root, entries = self.prepared_root()
-        self.inventory_metadata(root)
         selected = entries[:-1]
         crypto = root / self.crypto_source.path
         self.git(crypto, "update-index", "--force-remove", "framework")
@@ -284,12 +265,10 @@ class ReviewedMountTests(unittest.TestCase):
         self.commit_crypto_chain(root)
         sdk = self.sdk_module()
         with patch.object(catalogue, "ALL_DEPENDENCIES", selected), patch.object(
-                proposals, "ALL_DEPENDENCIES", selected), patch.object(
                 sdk, "runtime_dependency_closure",
                 side_effect=self.selected_sdk_sources):
             self.assertEqual(dependencies.prepare(root, "native")["status"], "verified")
             sdk.dependency_records(root, sdk.tree_entries(root))
-            proposals.inventory(root)
             # A tracked link is not permission to retrieve an unreviewed module.
             self.git(crypto, "update-index", "--add", "--cacheinfo", "160000",
                      self.pin, "unknown-driver")
@@ -297,8 +276,7 @@ class ReviewedMountTests(unittest.TestCase):
             self.commit_crypto_chain(root)
             observers = (
                 ("prepare", lambda: dependencies.prepare(root, "native")),
-                ("sdk", lambda: sdk.dependency_records(root, sdk.tree_entries(root))),
-                ("inventory", lambda: proposals.inventory(root)))
+                ("sdk", lambda: sdk.dependency_records(root, sdk.tree_entries(root))))
             for name, observe in observers:
                 with self.subTest(graph="bare unknown link", observer=name), self.assertRaises(ValueError):
                     observe()
@@ -324,9 +302,7 @@ class ReviewedMountTests(unittest.TestCase):
 
     def test_all_selected_observers_reject_alias_pin_with_identical_tree(self):
         from tools.dev import dependencies
-        from tools.maintenance import dependency_proposals as proposals
         root, entries = self.prepared_root()
-        self.inventory_metadata(root)
         alias = root / entries[-1].path
         self.git(alias, "-c", "user.name=Fixture", "-c",
                  "user.email=fixture@example.invalid", "commit", "-q",
@@ -344,9 +320,6 @@ class ReviewedMountTests(unittest.TestCase):
                           side_effect=self.selected_sdk_sources):
             with self.assertRaisesRegex(ValueError, "alias"):
                 sdk.dependency_records(root, sdk.tree_entries(root))
-        with patch.object(proposals, "ALL_DEPENDENCIES", entries):
-            with self.assertRaisesRegex(ValueError, "alias"):
-                proposals.inventory(root)
 
     def test_sdk_root_gitlinks_are_exact_even_for_unpackaged_host_sources(self):
         root, entries = self.prepared_root()

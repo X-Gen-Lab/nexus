@@ -13,9 +13,12 @@ endif()
 add_subdirectory("${NEXUS_REFERENCE_PLATFORM_SOURCE}" nexus-platform)
 get_target_property(reference_sdk Nexus::Config NEXUS_SOURCE_DIR)
 nexus_add_firmware(external_lifecycle_consumer SOURCES consumer.c)
-target_include_directories(external_lifecycle_consumer PRIVATE
-    "${CMAKE_CURRENT_SOURCE_DIR}/provider/include"
-    "${reference_sdk}/tests/support/native/include")
+target_include_directories(
+    external_lifecycle_consumer
+    PRIVATE
+        "${CMAKE_CURRENT_SOURCE_DIR}/provider/include"
+        "${reference_sdk}/tests/support/native/include"
+)
 nexus_target_warnings(external_lifecycle_consumer STRICT)
 get_target_property(reference_config Nexus::Platform NEXUS_CONFIG_DIR)
 file(WRITE "${CMAKE_BINARY_DIR}/resolved-sdk.txt" "${reference_sdk}")
@@ -23,21 +26,32 @@ file(WRITE "${CMAKE_BINARY_DIR}/resolved-config.txt" "${reference_config}")
 option(EXTERNAL_LIFECYCLE_HOST_TESTS "Build host-only GoogleTest contracts" OFF)
 if(EXTERNAL_LIFECYCLE_HOST_TESTS)
     if(NOT IS_DIRECTORY "${NEXUS_REFERENCE_GOOGLETEST_SOURCE}")
-        message(FATAL_ERROR "Host tests require the explicit pinned GoogleTest source")
+        message(
+            FATAL_ERROR
+            "Host tests require the explicit pinned GoogleTest source"
+        )
     endif()
     enable_language(CXX)
     set(CMAKE_CXX_EXTENSIONS OFF)
     set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
     add_subdirectory("${NEXUS_REFERENCE_GOOGLETEST_SOURCE}" host-googletest)
     add_executable(external_lifecycle_contract_test lifecycle_test.cpp)
-    target_include_directories(external_lifecycle_contract_test PRIVATE
-        "${CMAKE_CURRENT_SOURCE_DIR}/provider/include"
-        "${reference_sdk}/tests/support/native/include")
+    target_include_directories(
+        external_lifecycle_contract_test
+        PRIVATE
+            "${CMAKE_CURRENT_SOURCE_DIR}/provider/include"
+            "${reference_sdk}/tests/support/native/include"
+    )
     target_compile_features(external_lifecycle_contract_test PRIVATE cxx_std_17)
-    target_link_libraries(external_lifecycle_contract_test PRIVATE
-        Nexus::Platform GTest::gtest_main)
+    target_link_libraries(
+        external_lifecycle_contract_test
+        PRIVATE Nexus::Platform GTest::gtest_main
+    )
     nexus_apply_target_policy(external_lifecycle_contract_test)
     nexus_target_warnings(external_lifecycle_contract_test STRICT)
     enable_testing()
-    add_test(NAME external_lifecycle_contract COMMAND external_lifecycle_contract_test)
+    add_test(
+        NAME external_lifecycle_contract
+        COMMAND external_lifecycle_contract_test
+    )
 endif()

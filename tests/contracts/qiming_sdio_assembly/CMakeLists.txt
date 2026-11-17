@@ -11,13 +11,20 @@ nexus_add_firmware(qiming_sdio_controller_fixture SOURCES controller_main.c)
 nexus_target_warnings(qiming_sdio_controller_fixture STRICT)
 find_package(Python3 3.11 REQUIRED COMPONENTS Interpreter)
 get_target_property(fixture_config Nexus::Platform NEXUS_CONFIG_DIR)
-set_property(TARGET qiming_sdio_controller_fixture APPEND PROPERTY LINK_DEPENDS
-    "${NEXUS_SOURCE_ROOT}/tools/measurement/retention.py")
-add_custom_command(TARGET qiming_sdio_controller_fixture POST_BUILD
-    COMMAND "${Python3_EXECUTABLE}" -B
-        "${NEXUS_SOURCE_ROOT}/tools/measurement/retention.py"
-        --elf "$<TARGET_FILE:qiming_sdio_controller_fixture>"
-        --bindings "${fixture_config}/bindings.c"
-        --resolved "${fixture_config}/resolved.json"
-        --output "${CMAKE_CURRENT_BINARY_DIR}/bin/provider-retention.json"
-    VERBATIM)
+set_property(
+    TARGET qiming_sdio_controller_fixture
+    APPEND
+    PROPERTY LINK_DEPENDS "${NEXUS_SOURCE_ROOT}/tools/measurement/retention.py"
+)
+add_custom_command(
+    TARGET qiming_sdio_controller_fixture
+    POST_BUILD
+    COMMAND
+        "${Python3_EXECUTABLE}" -B
+        "${NEXUS_SOURCE_ROOT}/tools/measurement/retention.py" --elf
+        "$<TARGET_FILE:qiming_sdio_controller_fixture>" --bindings
+        "${fixture_config}/bindings.c" --resolved
+        "${fixture_config}/resolved.json" --output
+        "${CMAKE_CURRENT_BINARY_DIR}/bin/provider-retention.json"
+    VERBATIM
+)

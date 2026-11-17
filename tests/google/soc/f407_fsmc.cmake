@@ -10,17 +10,28 @@ nexus_google_test(nexus_f407_fsmc_test STM32F4_LL
     LIBRARIES Nexus::IO Nexus::ILI9341
     INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/sdk/hal_config/fsmc"
-        "${NEXUS_SOURCE_DIR}/arch/include")
-target_include_directories(nexus_f407_fsmc_test SYSTEM PRIVATE
-    "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
+        "${NEXUS_SOURCE_DIR}/arch/include"
+)
+target_include_directories(
+    nexus_f407_fsmc_test
+    SYSTEM
+    PRIVATE "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
+)
 nexus_use_cmsis_core(nexus_f407_fsmc_test)
-target_compile_definitions(nexus_f407_fsmc_test PRIVATE STM32F407xx NEXUS_STM32_FSMC_MODEL=1
-    nx_arch_is_privileged=nx_fsmc_privileged
-    nx_arch_in_isr=nx_fsmc_in_isr
-    nx_arch_irq_is_masked=nx_fsmc_masked
-    nx_arch_dsb=nx_fsmc_dsb)
-target_compile_options(nexus_f407_fsmc_test PRIVATE
-    "-include${nexus_google_root}/soc/f407_fsmc_model.h")
+target_compile_definitions(
+    nexus_f407_fsmc_test
+    PRIVATE
+        STM32F407xx
+        NEXUS_STM32_FSMC_MODEL=1
+        nx_arch_is_privileged=nx_fsmc_privileged
+        nx_arch_in_isr=nx_fsmc_in_isr
+        nx_arch_irq_is_masked=nx_fsmc_masked
+        nx_arch_dsb=nx_fsmc_dsb
+)
+target_compile_options(
+    nexus_f407_fsmc_test
+    PRIVATE "-include${nexus_google_root}/soc/f407_fsmc_model.h"
+)
 
 # Real reset proof and runtime adoption share the same modeled external ports.
 nexus_google_test(nexus_f407_fsmc_boot_test STM32F4_LL
@@ -33,18 +44,29 @@ nexus_google_test(nexus_f407_fsmc_boot_test STM32F4_LL
     LIBRARIES Nexus::IO
     INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/sdk/hal_config/fsmc"
-        "${NEXUS_SOURCE_DIR}/arch/include")
-target_include_directories(nexus_f407_fsmc_boot_test SYSTEM PRIVATE
-    "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
+        "${NEXUS_SOURCE_DIR}/arch/include"
+)
+target_include_directories(
+    nexus_f407_fsmc_boot_test
+    SYSTEM
+    PRIVATE "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
+)
 nexus_use_cmsis_core(nexus_f407_fsmc_boot_test)
-target_compile_definitions(nexus_f407_fsmc_boot_test PRIVATE STM32F407xx NEXUS_STM32_FSMC_MODEL=1
-    NEXUS_STM32_MEMORY_MODEL=1
-    nx_arch_is_privileged=nx_fsmc_privileged
-    nx_arch_in_isr=nx_fsmc_in_isr
-    nx_arch_irq_is_masked=nx_fsmc_masked
-    nx_arch_dsb=nx_fsmc_dsb)
-target_compile_options(nexus_f407_fsmc_boot_test PRIVATE
-    "-include${nexus_google_root}/soc/f407_fsmc_boot_model.h")
+target_compile_definitions(
+    nexus_f407_fsmc_boot_test
+    PRIVATE
+        STM32F407xx
+        NEXUS_STM32_FSMC_MODEL=1
+        NEXUS_STM32_MEMORY_MODEL=1
+        nx_arch_is_privileged=nx_fsmc_privileged
+        nx_arch_in_isr=nx_fsmc_in_isr
+        nx_arch_irq_is_masked=nx_fsmc_masked
+        nx_arch_dsb=nx_fsmc_dsb
+)
+target_compile_options(
+    nexus_f407_fsmc_boot_test
+    PRIVATE "-include${nexus_google_root}/soc/f407_fsmc_boot_model.h"
+)
 
 target_compile_definitions(nexus_f407_fsmc_test PRIVATE NEXUS_STM32_FSMC_NAND=1)
 target_compile_options(nexus_f407_fsmc_test PRIVATE -ffunction-sections)

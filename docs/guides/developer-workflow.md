@@ -105,22 +105,18 @@ CLI argument syntax errors retain argparse diagnostics and exit code 2.
 
 ## Inspect actual build outputs
 
-After a successful build, inspect its captured outputs without guessing which
-ELF belongs to the selected configuration. Replace the path below with that
-build's actual `quality/build-provenance.json`:
+Ordinary builds print their actual log and output paths without creating a
+second artifact index. When preparing an image for identified device operations,
+record its provenance explicitly:
 
 ```sh
-python tools/dev/dev.py artifacts \
-    --provenance build/my-board/quality/build-provenance.json \
-    --json /tmp/nexus-artifacts-001.json
+python tools/dev/dev.py build --preset stm32-qiming-baremetal --record-provenance
 ```
 
-The command verifies the provenance and resolved identity before listing source,
-configuration, artifact roles and the original command receipt. Missing, changed,
-stale or mismatched inputs reject rather than becoming a successful artifact
-view. The optional JSON path must be new. Inspection neither builds nor accesses
-equipment, and does not grant the current checkout, software or hardware a new
-qualification.
+The resulting `quality/build-provenance.json` binds the ELF, resolved configuration
+and actual command receipt. Flash/debug admission still rejects changed or
+mismatched image inputs. Recording provenance neither operates equipment nor
+establishes physical qualification.
 
 ## Use optional Settings and networking mechanisms
 

@@ -6,15 +6,27 @@ foreach(multi_family stm32)
     set(multi_soc stm32f4)
     set(multi_uart_tx uart_hal)
     set(multi_model "${nexus_google_root}/soc/multi_controller_hal_model.h")
-    set(multi_input "${NEXUS_SOURCE_DIR}/tests/contracts/multi_controller_assembly/${multi_label}.toml")
-    set(multi_bundle "${CMAKE_CURRENT_BINARY_DIR}/multi-controller-factory-${multi_family}")
-    execute_process(COMMAND "${Python3_EXECUTABLE}" -B
-        "${NEXUS_SOURCE_DIR}/tools/configure/configure.py" --test-support
-        --source-root "${NEXUS_SOURCE_DIR}" --assembly "${multi_input}"
-        --output "${multi_bundle}" RESULT_VARIABLE multi_generated
-        OUTPUT_VARIABLE multi_output ERROR_VARIABLE multi_error)
+    set(multi_input
+        "${NEXUS_SOURCE_DIR}/tests/contracts/multi_controller_assembly/${multi_label}.toml"
+    )
+    set(multi_bundle
+        "${CMAKE_CURRENT_BINARY_DIR}/multi-controller-factory-${multi_family}"
+    )
+    execute_process(
+        COMMAND
+            "${Python3_EXECUTABLE}" -B
+            "${NEXUS_SOURCE_DIR}/tools/configure/configure.py" --test-support
+            --source-root "${NEXUS_SOURCE_DIR}" --assembly "${multi_input}"
+            --output "${multi_bundle}"
+        RESULT_VARIABLE multi_generated
+        OUTPUT_VARIABLE multi_output
+        ERROR_VARIABLE multi_error
+    )
     if(NOT multi_generated EQUAL 0)
-        message(FATAL_ERROR "Five-controller factory rejected: ${multi_output}${multi_error}")
+        message(
+            FATAL_ERROR
+            "Five-controller factory rejected: ${multi_output}${multi_error}"
+        )
     endif()
     nexus_google_configuration_inputs("${multi_bundle}")
     set(multi_target "nexus_${multi_family}_multi_controller_factory_test")
@@ -32,70 +44,117 @@ foreach(multi_family stm32)
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/i2c_v1_async"
             "${NEXUS_SOC_SOURCE_${multi_soc}}"
             "${NEXUS_SOC_SOURCE_${multi_soc}}"
-            "${NEXUS_SOURCE_DIR}/tests/support/f4_cpu")
-    target_sources(${multi_target} PRIVATE
-        "${NEXUS_SOC_SOURCE_${multi_soc}}/drivers/i2c/i2c_cold.c")
-    target_compile_options(${multi_target} PRIVATE
-        "-include${multi_model}"
-        "$<$<COMPILE_LANGUAGE:C>:-Wno-int-to-pointer-cast>")
-    target_compile_definitions(${multi_target} PRIVATE
-        STM32F407xx NX_MULTI_FACTORY_STM32
-        _init=nx_multi_fixture_init _fini=nx_multi_fixture_fini)
+            "${NEXUS_SOURCE_DIR}/tests/support/f4_cpu"
+    )
+    target_sources(
+        ${multi_target}
+        PRIVATE "${NEXUS_SOC_SOURCE_${multi_soc}}/drivers/i2c/i2c_cold.c"
+    )
+    target_compile_options(
+        ${multi_target}
+        PRIVATE
+            "-include${multi_model}"
+            "$<$<COMPILE_LANGUAGE:C>:-Wno-int-to-pointer-cast>"
+    )
+    target_compile_definitions(
+        ${multi_target}
+        PRIVATE
+            STM32F407xx
+            NX_MULTI_FACTORY_STM32
+            _init=nx_multi_fixture_init
+            _fini=nx_multi_fixture_fini
+    )
     # Keep real GPIO methods; only the external cold pin/clock ports are modeled.
     set(multi_gpio "${multi_target}_gpio")
-    add_library(${multi_gpio} OBJECT
-        "${NEXUS_SOC_SOURCE_${multi_soc}}/drivers/gpio/gpio.c")
+    add_library(
+        ${multi_gpio}
+        OBJECT
+        "${NEXUS_SOC_SOURCE_${multi_soc}}/drivers/gpio/gpio.c"
+    )
     target_link_libraries(${multi_gpio} PRIVATE Nexus::IO Nexus::Arch)
-    target_include_directories(${multi_gpio} PRIVATE
-        "${multi_bundle}" "${NEXUS_SOC_SOURCE_${multi_soc}}"
-        "${NEXUS_SOC_SOURCE_${multi_soc}}"
-        "${NEXUS_SOURCE_DIR}/tests/support/f4_cpu")
-    target_compile_options(${multi_gpio} PRIVATE
-        "-include${nexus_google_root}/soc/multi_controller_factory_model.h"
-        "$<$<COMPILE_LANGUAGE:C>:-Wno-int-to-pointer-cast>")
+    target_include_directories(
+        ${multi_gpio}
+        PRIVATE
+            "${multi_bundle}"
+            "${NEXUS_SOC_SOURCE_${multi_soc}}"
+            "${NEXUS_SOC_SOURCE_${multi_soc}}"
+            "${NEXUS_SOURCE_DIR}/tests/support/f4_cpu"
+    )
+    target_compile_options(
+        ${multi_gpio}
+        PRIVATE
+            "-include${nexus_google_root}/soc/multi_controller_factory_model.h"
+            "$<$<COMPILE_LANGUAGE:C>:-Wno-int-to-pointer-cast>"
+    )
     if(TARGET nexus_build_options)
-        target_link_libraries(${multi_gpio} PRIVATE
-            nexus_build_options nexus_owned_warnings)
+        target_link_libraries(
+            ${multi_gpio}
+            PRIVATE nexus_build_options nexus_owned_warnings
+        )
     endif()
     target_sources(${multi_target} PRIVATE $<TARGET_OBJECTS:${multi_gpio}>)
-    target_sources(${multi_target} PRIVATE
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_cold.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_lifecycle.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_coordinator.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/system_lifecycle.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart/uart_hardware.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart/uart_cold.c")
+    target_sources(
+        ${multi_target}
+        PRIVATE
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_cold.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_lifecycle.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_coordinator.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/system_lifecycle.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart/uart_hardware.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart/uart_cold.c"
+    )
     include("${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/sdk/STM32Official.cmake")
     nexus_stm32f4_official(${multi_gpio})
     nexus_stm32f407_uart_hal(${multi_target})
     target_link_options(${multi_target} PRIVATE "-Wl,--gc-sections")
     set(multi_hal "${multi_target}_stm32f407_hal")
     target_compile_definitions(${multi_hal} PRIVATE NX_MULTI_FACTORY_STM32)
-    target_compile_options(${multi_hal} BEFORE PRIVATE
-        "-include${multi_model}")
+    target_compile_options(${multi_hal} BEFORE PRIVATE "-include${multi_model}")
     # CMSIS declarations precede the model, which precedes the profile.
     nexus_use_cmsis_host_model(${multi_hal})
-    target_include_directories(${multi_target} SYSTEM PRIVATE
-        "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
-    target_include_directories(${multi_gpio} SYSTEM PRIVATE
-        "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
-    target_compile_definitions(${multi_gpio} PRIVATE
-        STM32F407xx NX_MULTI_FACTORY_STM32
-        nx_stm32_gpio_clock_enable=nx_multi_actual_gpio_clock_enable
-        nx_stm32_pin_capture=nx_multi_actual_pin_capture
-        nx_stm32_pin_configure=nx_multi_actual_pin_configure
-        nx_stm32_pin_restore=nx_multi_actual_pin_restore)
+    target_include_directories(
+        ${multi_target}
+        SYSTEM
+        PRIVATE "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
+    )
+    target_include_directories(
+        ${multi_gpio}
+        SYSTEM
+        PRIVATE "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
+    )
+    target_compile_definitions(
+        ${multi_gpio}
+        PRIVATE
+            STM32F407xx
+            NX_MULTI_FACTORY_STM32
+            nx_stm32_gpio_clock_enable=nx_multi_actual_gpio_clock_enable
+            nx_stm32_pin_capture=nx_multi_actual_pin_capture
+            nx_stm32_pin_configure=nx_multi_actual_pin_configure
+            nx_stm32_pin_restore=nx_multi_actual_pin_restore
+    )
 
     # Exercise legacy single-controller cold failure through the public entry.
-    set(single_input "${NEXUS_SOURCE_DIR}/tests/contracts/stm32_assembly/zg-spi.toml")
-    set(single_bundle "${CMAKE_CURRENT_BINARY_DIR}/single-spi-factory-${multi_family}")
-    execute_process(COMMAND "${Python3_EXECUTABLE}" -B
-        "${NEXUS_SOURCE_DIR}/tools/configure/configure.py" --test-support
-        --source-root "${NEXUS_SOURCE_DIR}" --assembly "${single_input}"
-        --output "${single_bundle}" RESULT_VARIABLE single_generated
-        OUTPUT_VARIABLE single_output ERROR_VARIABLE single_error)
+    set(single_input
+        "${NEXUS_SOURCE_DIR}/tests/contracts/stm32_assembly/zg-spi.toml"
+    )
+    set(single_bundle
+        "${CMAKE_CURRENT_BINARY_DIR}/single-spi-factory-${multi_family}"
+    )
+    execute_process(
+        COMMAND
+            "${Python3_EXECUTABLE}" -B
+            "${NEXUS_SOURCE_DIR}/tools/configure/configure.py" --test-support
+            --source-root "${NEXUS_SOURCE_DIR}" --assembly "${single_input}"
+            --output "${single_bundle}"
+        RESULT_VARIABLE single_generated
+        OUTPUT_VARIABLE single_output
+        ERROR_VARIABLE single_error
+    )
     if(NOT single_generated EQUAL 0)
-        message(FATAL_ERROR "Single-SPI factory rejected: ${single_output}${single_error}")
+        message(
+            FATAL_ERROR
+            "Single-SPI factory rejected: ${single_output}${single_error}"
+        )
     endif()
     nexus_google_configuration_inputs("${single_bundle}")
     set(single_target "nexus_${multi_family}_single_spi_factory_test")
@@ -110,15 +169,28 @@ foreach(multi_family stm32)
         LIBRARIES Nexus::IO Nexus::Arch
         INCLUDES "${single_bundle}" "${NEXUS_SOC_SOURCE_${multi_soc}}"
             "${NEXUS_SOC_SOURCE_${multi_soc}}"
-            "${NEXUS_SOURCE_DIR}/tests/support/f4_cpu")
+            "${NEXUS_SOURCE_DIR}/tests/support/f4_cpu"
+    )
     target_sources(${single_target} PRIVATE $<TARGET_OBJECTS:${multi_gpio}>)
-    target_compile_options(${single_target} PRIVATE
-        "-include${nexus_google_root}/soc/multi_controller_factory_model.h"
-        "$<$<COMPILE_LANGUAGE:C>:-Wno-int-to-pointer-cast>")
-    target_compile_definitions(${single_target} PRIVATE
-        _init=nx_single_spi_fixture_init _fini=nx_single_spi_fixture_fini)
-    target_include_directories(${single_target} SYSTEM PRIVATE
-        "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
-    target_compile_definitions(${single_target} PRIVATE
-        STM32F407xx NX_MULTI_FACTORY_STM32)
+    target_compile_options(
+        ${single_target}
+        PRIVATE
+            "-include${nexus_google_root}/soc/multi_controller_factory_model.h"
+            "$<$<COMPILE_LANGUAGE:C>:-Wno-int-to-pointer-cast>"
+    )
+    target_compile_definitions(
+        ${single_target}
+        PRIVATE
+            _init=nx_single_spi_fixture_init
+            _fini=nx_single_spi_fixture_fini
+    )
+    target_include_directories(
+        ${single_target}
+        SYSTEM
+        PRIVATE "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
+    )
+    target_compile_definitions(
+        ${single_target}
+        PRIVATE STM32F407xx NX_MULTI_FACTORY_STM32
+    )
 endforeach()

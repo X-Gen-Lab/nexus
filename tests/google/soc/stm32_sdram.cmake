@@ -6,10 +6,13 @@ nexus_google_test(nexus_stm32_sdram_test STM32F4_LL
     LIBRARIES Nexus::IO
     INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/sdk/hal_config/sdram"
-        "${NEXUS_SOURCE_DIR}/arch/include")
+        "${NEXUS_SOURCE_DIR}/arch/include"
+)
 set(sdram_model_config "${CMAKE_CURRENT_BINARY_DIR}/sdram-model-config")
 file(MAKE_DIRECTORY "${sdram_model_config}")
-file(WRITE "${sdram_model_config}/nexus_config.h" [=[
+file(
+    WRITE "${sdram_model_config}/nexus_config.h"
+    [=[
 #ifndef NEXUS_SDRAM_MODEL_CONFIG_H
 #define NEXUS_SDRAM_MODEL_CONFIG_H
 #define NEXUS_IRQ_KERNEL_POLICY 0U
@@ -37,16 +40,31 @@ file(WRITE "${sdram_model_config}/nexus_config.h" [=[
 #define NEXUS_ADC_HZ 4000000U
 #define NEXUS_PLL48_HZ 0U
 #endif
-]=])
-target_include_directories(nexus_stm32_sdram_test BEFORE PRIVATE "${sdram_model_config}")
-target_include_directories(nexus_stm32_sdram_test SYSTEM PRIVATE
-    "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
+]=]
+)
+target_include_directories(
+    nexus_stm32_sdram_test
+    BEFORE
+    PRIVATE "${sdram_model_config}"
+)
+target_include_directories(
+    nexus_stm32_sdram_test
+    SYSTEM
+    PRIVATE "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
+)
 nexus_use_cmsis_core(nexus_stm32_sdram_test)
-target_compile_definitions(nexus_stm32_sdram_test PRIVATE
-    STM32F479xx NEXUS_STM32_SDRAM_MODEL=1 NX_STM32_SDRAM_GRAPHICS=1
-    nx_arch_is_privileged=nx_sdram_privileged
-    nx_arch_in_isr=nx_sdram_in_isr
-    nx_arch_irq_is_masked=nx_sdram_masked
-    nx_arch_dsb=nx_sdram_dsb)
-target_compile_options(nexus_stm32_sdram_test PRIVATE
-    "-include${nexus_google_root}/soc/stm32_sdram_model.h")
+target_compile_definitions(
+    nexus_stm32_sdram_test
+    PRIVATE
+        STM32F479xx
+        NEXUS_STM32_SDRAM_MODEL=1
+        NX_STM32_SDRAM_GRAPHICS=1
+        nx_arch_is_privileged=nx_sdram_privileged
+        nx_arch_in_isr=nx_sdram_in_isr
+        nx_arch_irq_is_masked=nx_sdram_masked
+        nx_arch_dsb=nx_sdram_dsb
+)
+target_compile_options(
+    nexus_stm32_sdram_test
+    PRIVATE "-include${nexus_google_root}/soc/stm32_sdram_model.h"
+)

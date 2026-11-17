@@ -7,10 +7,16 @@ foreach(name nexus_os_secure_context_test nexus_os_secure_fp_context_test)
             "${nexus_google_root}/os"
             "${NEXUS_SOURCE_DIR}/os/freertos/include"
             "${NEXUS_SOURCE_DIR}/arch/include"
-            "${NEXUS_SOURCE_DIR}/core/include")
-    target_include_directories(${name} SYSTEM PRIVATE
-        "${NEXUS_SOURCE_DIR}/ext/freertos/portable/GCC/ARM_CM33/secure")
+            "${NEXUS_SOURCE_DIR}/core/include"
+    )
+    target_include_directories(
+        ${name}
+        SYSTEM
+        PRIVATE "${NEXUS_SOURCE_DIR}/ext/freertos/portable/GCC/ARM_CM33/secure"
+    )
     target_compile_definitions(${name} PRIVATE NEXUS_FREERTOS_SECURE_MODEL)
 endforeach()
-target_compile_definitions(nexus_os_secure_fp_context_test PRIVATE
-    NEXUS_SECURE_TEST_FP_BANK=1)
+target_compile_definitions(
+    nexus_os_secure_fp_context_test
+    PRIVATE NEXUS_SECURE_TEST_FP_BANK=1
+)

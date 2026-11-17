@@ -820,9 +820,9 @@ class DeveloperWorkflowTests(unittest.TestCase):
             with patch.object(dev, "ROOT", root), \
                     patch.object(dev, "execute", side_effect=interleaved), \
                     ThreadPoolExecutor(max_workers=2) as pool:
-                first = pool.submit(dev.main, ["configure", "--preset", "a"])
+                first = pool.submit(dev.main, ["configure", "--record-provenance", "--preset", "a"])
                 self.assertTrue(first_completed.wait(5))
-                second = pool.submit(dev.main, ["configure", "--preset", "b"])
+                second = pool.submit(dev.main, ["configure", "--record-provenance", "--preset", "b"])
                 self.assertEqual(second.result(timeout=5), 0)
                 self.assertEqual(first.result(timeout=5), 0)
             receipts = []
@@ -876,7 +876,7 @@ class DeveloperWorkflowTests(unittest.TestCase):
                 output = io.StringIO()
                 with patch.object(dev, "ROOT", root), \
                         redirect_stdout(output), redirect_stderr(output):
-                    result = dev.main([action, "--preset", "fixture"])
+                    result = dev.main([action, "--record-provenance", "--preset", "fixture"])
                 self.assertEqual(result, 0, output.getvalue())
                 report = root / "build/fixture/quality" / (action + "-provenance.json")
                 record = json.loads(report.read_text())
@@ -885,7 +885,17 @@ class DeveloperWorkflowTests(unittest.TestCase):
                 self.assertEqual(record["status"], "identities_recorded")
                 self.assertIn("plan, not per-object execution", record["scope"])
 
-    def test_configure_and_build_automatically_capture_actual_command_provenance(self):
+    def test_ordinary_build_does_not_capture_full_provenance(self):
+        from tools.dev import dev, provenance
+        with self.dispatch_workspace(), patch.object(
+                dev, "execute", return_value=0), patch.object(
+                dev, "executable", return_value="cmake"), patch.object(
+                provenance, "capture") as capture:
+            for action in ("configure", "build"):
+                self.assertEqual(dev.main([action]), 0)
+        capture.assert_not_called()
+
+    def test_configure_and_build_explicitly_capture_actual_command_provenance(self):
         from tools.dev import dev, provenance
         with self.dispatch_workspace() as root:
             for action in ("configure", "build"):
@@ -894,7 +904,7 @@ class DeveloperWorkflowTests(unittest.TestCase):
                             0, root / "build/quality/own/receipt.json")), \
                             patch.object(dev, "executable", return_value="cmake"), \
                             patch.object(provenance, "capture", return_value={}) as capture:
-                        result = dev.main([action, "--preset", "native-debug"])
+                        result = dev.main([action, "--record-provenance", "--preset", "native-debug"])
                     self.assertEqual(result, 0)
                     capture.assert_called_once_with(root,
                         root / "build/native-debug",
@@ -910,7 +920,7 @@ class DeveloperWorkflowTests(unittest.TestCase):
                     0, root / "build/quality/own/receipt.json")), \
                     patch.object(dev, "executable", return_value="cmake"), \
                     patch.object(provenance, "capture", return_value={}) as capture:
-                self.assertEqual(dev.main(["configure", "-B", "build/override"]), 0)
+                self.assertEqual(dev.main(["configure", "--record-provenance", "-B", "build/override"]), 0)
             self.assertEqual(capture.call_args.args[1], root / "build/override")
 
     def test_failed_command_never_captures_success_and_capture_failure_is_reported(self):
@@ -933,7 +943,7 @@ class DeveloperWorkflowTests(unittest.TestCase):
                     patch.object(dev, "executable", return_value="cmake"), \
                     patch.object(provenance, "capture", side_effect=ValueError("changed output")), \
                     redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
-                result = dev.main(["configure", "--preset", "cfg"])
+                result = dev.main(["configure", "--record-provenance", "--preset", "cfg"])
             self.assertEqual(result, 2)
             failure = root / "build/quality/developer-provenance-failures"
             receipts = list(failure.glob("*.json"))

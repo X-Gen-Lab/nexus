@@ -119,9 +119,26 @@ mutations of the same build tree. Full gate discovery, actual exits, output
 identities and failure/cancellation retention remain mandatory.
 
 The commit gate configures and builds once for unchanged staged inputs, then runs
-all Native GoogleTest cases and affected complete tool domains. Build/configuration
-policy changes run every tool domain. Complete CI runs the four Native modes and
-all maintained tool domains separately, without repeating tool tests per mode.
+all Native GoogleTest cases and complete affected tool modules. Known firmware
+implementation changes need no auxiliary domain. Headers and declarative facts
+select configuration contracts and the single global support check. Changed test
+modules run in full; known tool implementations use maintained module mappings.
+Unknown paths or missing known coverage retain full domains. Commit reports state
+`commit-tools` and `qualification=false`; they do not claim full-domain acceptance
+or filter cases inside selected modules.
+
+Before merge or delivery, independently execute the complete tool domains,
+relevant ARM links and Source SDK consumers. `--all` and `--tools all` always run
+the four full domains; `dev.py check` is the full integration entry. Complete CI
+also runs all four Native modes, without repeating tool tests per mode or the
+full Native execution in the tool job. A quick commit does not replace these
+results, and successful qualification reports are never cached.
+
+`doctor` only diagnoses the selected environment and tool versions. Ordinary
+configure/build commands keep process logs and actual exits; add `--record-provenance`
+explicitly when preparing an identified image for device operations. The testing
+domain checks the global capability matrix and derived documentation once.
+Local peripheral tests use their own inputs instead of scanning every assembly.
 
 Before deleting a test, identify its behavioral obligation and independent
 remaining coverage. Remove only an obsolete behavior or a demonstrated duplicate

@@ -1,5 +1,7 @@
 """Source provenance, approved transport and recursive scope stay distinct."""
 from dataclasses import FrozenInstanceError, replace
+import hashlib
+import json
 from pathlib import Path
 import unittest
 from unittest.mock import patch
@@ -10,6 +12,44 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class SourceCatalogueTests(unittest.TestCase):
+
+    def test_selected_sources_keep_their_reviewed_origin_and_license(self):
+        # Admission remains in the selected dependency's verifier. The catalogue
+        # must connect that lock and its notice without a second report engine.
+        selected = (*catalogue.SOURCE_DEPENDENCIES,
+                    *catalogue.HOST_TEST_DEPENDENCIES)
+        for item in selected:
+            with self.subTest(dependency=item.identifier):
+                notice = ROOT / item.path / item.notice
+                self.assertTrue(notice.is_file())
+                self.assertFalse(notice.is_symlink())
+                self.assertTrue(notice.read_bytes())
+                if item.source_lock is None:
+                    continue
+                lock = json.loads((ROOT / item.source_lock).read_text())
+                record = lock.get('repositories', {}).get(
+                    item.alias_of or item.identifier, lock)
+                self.assertRegex(record['commit'], r'^[0-9a-f]{40}$')
+                for key in ('repository', 'upstream_url', 'url'):
+                    if key in record:
+                        self.assertEqual(record[key], item.upstream_url)
+                if 'fetch_url' in record:
+                    self.assertEqual(record['fetch_url'], item.fetch_url)
+                license = record['license']
+                if isinstance(license, dict):
+                    self.assertEqual(license['path'], item.notice)
+                    self.assertTrue(license['expression'])
+                else:
+                    self.assertIsInstance(license, str)
+                    self.assertTrue(license)
+                expected = record.get('files', {}).get(item.notice)
+                if expected is None and isinstance(license, dict):
+                    expected = license
+                if expected is not None:
+                    sha256 = (expected['sha256']
+                              if isinstance(expected, dict) else expected)
+                    self.assertEqual(hashlib.sha256(notice.read_bytes()).hexdigest(),
+                                     sha256)
 
 
     def test_runtime_scope_excludes_google_and_keeps_nested_sources_explicit(self):

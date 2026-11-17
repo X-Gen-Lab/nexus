@@ -3,13 +3,15 @@
 nexus_google_test(nexus_audio_layout_test
     SOURCES "${nexus_google_root}/io/audio_layout_test.cpp" "${NEXUS_SOURCE_DIR}/io/src/api/audio.c"
     LIBRARIES Nexus::IOAudio Nexus::IOStream
-    INCLUDES "${NEXUS_SOURCE_DIR}/io/private")
+    INCLUDES "${NEXUS_SOURCE_DIR}/io/private"
+)
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     foreach(slice slave master fraction)
         set(sai_test "nexus_stm32_sai_${slice}_test")
         set(sai_model "${nexus_google_root}/soc/stm32_sai_model.h")
         set(sai_profile
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/sdk/hal_config/sai")
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/sdk/hal_config/sai"
+        )
         set(sai_definitions STM32F446xx NEXUS_STM32_MODEL=1)
         if(NOT slice STREQUAL "slave")
             list(APPEND sai_definitions NX_SAI_MASTER_TEST=1)
@@ -24,31 +26,59 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
                 "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/av/av.c"
             LIBRARIES Nexus::IOAudio Nexus::IOStream Nexus::Arch
             INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
-                "${sai_profile}" "${nexus_google_root}/soc")
+                "${sai_profile}" "${nexus_google_root}/soc"
+        )
         set(sai_hal "${sai_test}_hal")
-        add_library(${sai_hal} OBJECT
-            "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Source/Templates/system_stm32f4xx.c")
-        foreach(module sai sai_ex dma rcc rcc_ex)
-            target_sources(${sai_hal} PRIVATE
-                "${NEXUS_SOURCE_DIR}/vendors/st/stm32f4_hal/Src/stm32f4xx_hal_${module}.c")
+        add_library(
+            ${sai_hal}
+            OBJECT
+            "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Source/Templates/system_stm32f4xx.c"
+        )
+        foreach(
+            module
+            sai
+            sai_ex
+            dma
+            rcc
+            rcc_ex
+        )
+            target_sources(
+                ${sai_hal}
+                PRIVATE
+                    "${NEXUS_SOURCE_DIR}/vendors/st/stm32f4_hal/Src/stm32f4xx_hal_${module}.c"
+            )
         endforeach()
         nexus_stm32f4_official(${sai_hal})
-        target_include_directories(${sai_hal} PRIVATE
-            "${sai_profile}" "${nexus_google_root}/soc"
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
-            "${NEXUS_SOURCE_DIR}/arch/include")
+        target_include_directories(
+            ${sai_hal}
+            PRIVATE
+                "${sai_profile}"
+                "${nexus_google_root}/soc"
+                "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
+                "${NEXUS_SOURCE_DIR}/arch/include"
+        )
         target_compile_features(${sai_hal} PRIVATE c_std_11)
         set_target_properties(${sai_hal} PROPERTIES C_EXTENSIONS OFF)
-        target_link_libraries(${sai_hal} PRIVATE nexus_build_options
-            nexus_io_contract)
+        target_link_libraries(
+            ${sai_hal}
+            PRIVATE nexus_build_options nexus_io_contract
+        )
         nexus_use_cmsis_host_model(${sai_hal})
         foreach(target ${sai_test} ${sai_hal})
-            target_include_directories(${target} SYSTEM PRIVATE
-                "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
+            target_include_directories(
+                ${target}
+                SYSTEM
+                PRIVATE "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
+            )
             nexus_use_cmsis_core(${target})
             target_compile_definitions(${target} PRIVATE ${sai_definitions})
-            target_compile_options(${target} PRIVATE
-                "-include${sai_model}" -ffunction-sections -fdata-sections)
+            target_compile_options(
+                ${target}
+                PRIVATE
+                    "-include${sai_model}"
+                    -ffunction-sections
+                    -fdata-sections
+            )
         endforeach()
         target_link_options(${sai_test} PRIVATE -Wl,--gc-sections)
         target_sources(${sai_test} PRIVATE $<TARGET_OBJECTS:${sai_hal}>)

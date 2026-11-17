@@ -5,7 +5,11 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 if(NOT NEXUS_ASSEMBLY_FILE)
     message(FATAL_ERROR "Select exactly one F407 memory fixture TOML")
 endif()
-get_filename_component(nexus_source "${CMAKE_CURRENT_LIST_DIR}/../../.." ABSOLUTE)
+get_filename_component(
+    nexus_source
+    "${CMAKE_CURRENT_LIST_DIR}/../../.."
+    ABSOLUTE
+)
 set(NEXUS_BUILD_TESTS OFF CACHE BOOL "No host framework in firmware" FORCE)
 set(NEXUS_BUILD_WORKLOAD OFF CACHE BOOL "Consumer owns its fixture" FORCE)
 add_subdirectory("${nexus_source}" nexus EXCLUDE_FROM_ALL)

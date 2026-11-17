@@ -9,18 +9,31 @@ foreach(i2c_pair_family stm32)
         set(i2c_pair_target "nexus_${i2c_pair_family}_i2c_pair_factory_test")
         if(i2c_pair_mode STREQUAL "irq")
             set(i2c_pair_variant "i2c-pair-irq")
-            set(i2c_pair_target "nexus_${i2c_pair_family}_i2c_pair_irq_factory_test")
+            set(i2c_pair_target
+                "nexus_${i2c_pair_family}_i2c_pair_irq_factory_test"
+            )
         endif()
         set(i2c_pair_input
-            "${NEXUS_SOURCE_DIR}/tests/contracts/multi_controller_assembly/${i2c_pair_label}-${i2c_pair_variant}.toml")
-        set(i2c_pair_bundle "${CMAKE_CURRENT_BINARY_DIR}/i2c-pair-${i2c_pair_family}-${i2c_pair_mode}")
-        execute_process(COMMAND "${Python3_EXECUTABLE}" -B
-            "${NEXUS_SOURCE_DIR}/tools/configure/configure.py" --test-support
-            --source-root "${NEXUS_SOURCE_DIR}" --assembly "${i2c_pair_input}"
-            --output "${i2c_pair_bundle}" RESULT_VARIABLE i2c_pair_generated
-            OUTPUT_VARIABLE i2c_pair_output ERROR_VARIABLE i2c_pair_error)
+            "${NEXUS_SOURCE_DIR}/tests/contracts/multi_controller_assembly/${i2c_pair_label}-${i2c_pair_variant}.toml"
+        )
+        set(i2c_pair_bundle
+            "${CMAKE_CURRENT_BINARY_DIR}/i2c-pair-${i2c_pair_family}-${i2c_pair_mode}"
+        )
+        execute_process(
+            COMMAND
+                "${Python3_EXECUTABLE}" -B
+                "${NEXUS_SOURCE_DIR}/tools/configure/configure.py"
+                --test-support --source-root "${NEXUS_SOURCE_DIR}" --assembly
+                "${i2c_pair_input}" --output "${i2c_pair_bundle}"
+            RESULT_VARIABLE i2c_pair_generated
+            OUTPUT_VARIABLE i2c_pair_output
+            ERROR_VARIABLE i2c_pair_error
+        )
         if(NOT i2c_pair_generated EQUAL 0)
-            message(FATAL_ERROR "I2C-pair factory rejected: ${i2c_pair_output}${i2c_pair_error}")
+            message(
+                FATAL_ERROR
+                "I2C-pair factory rejected: ${i2c_pair_output}${i2c_pair_error}"
+            )
         endif()
         nexus_google_configuration_inputs("${i2c_pair_bundle}")
         nexus_google_test(${i2c_pair_target} ${i2c_pair_official}
@@ -37,19 +50,37 @@ foreach(i2c_pair_family stm32)
             INCLUDES "${i2c_pair_bundle}"
                 "${NEXUS_SOURCE_DIR}/tests/support/f4_cpu"
                 "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/i2c_v1_async"
-                                "${NEXUS_SOC_SOURCE_${i2c_pair_soc}}")
+                                "${NEXUS_SOC_SOURCE_${i2c_pair_soc}}"
+        )
         if(i2c_pair_mode STREQUAL "irq")
-            target_compile_definitions(${i2c_pair_target} PRIVATE NX_I2C_PAIR_IRQ)
+            target_compile_definitions(
+                ${i2c_pair_target}
+                PRIVATE NX_I2C_PAIR_IRQ
+            )
         endif()
-        target_compile_options(${i2c_pair_target} PRIVATE
-            "-include${nexus_google_root}/soc/i2c_pair_factory_model.h")
-        target_compile_definitions(${i2c_pair_target} PRIVATE
-            _init=nx_i2c_pair_fixture_init _fini=nx_i2c_pair_fixture_fini)
-        target_sources(${i2c_pair_target} PRIVATE
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/i2c/i2c_cold.c")
-        target_include_directories(${i2c_pair_target} SYSTEM PRIVATE
-            "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
-        target_compile_definitions(${i2c_pair_target} PRIVATE
-            STM32F407xx NX_I2C_PAIR_STM32)
+        target_compile_options(
+            ${i2c_pair_target}
+            PRIVATE "-include${nexus_google_root}/soc/i2c_pair_factory_model.h"
+        )
+        target_compile_definitions(
+            ${i2c_pair_target}
+            PRIVATE
+                _init=nx_i2c_pair_fixture_init
+                _fini=nx_i2c_pair_fixture_fini
+        )
+        target_sources(
+            ${i2c_pair_target}
+            PRIVATE
+                "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/i2c/i2c_cold.c"
+        )
+        target_include_directories(
+            ${i2c_pair_target}
+            SYSTEM
+            PRIVATE "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
+        )
+        target_compile_definitions(
+            ${i2c_pair_target}
+            PRIVATE STM32F407xx NX_I2C_PAIR_STM32
+        )
     endforeach()
 endforeach()

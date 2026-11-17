@@ -2,22 +2,32 @@
 nexus_google_test(nexus_spi_transaction_test
     SOURCES "${nexus_google_root}/io/spi_transaction_test.cpp"
     LIBRARIES Nexus::NativeModel Nexus::Arch
-    INCLUDES "${NEXUS_SOURCE_DIR}/tests/support/native/drivers")
+    INCLUDES "${NEXUS_SOURCE_DIR}/tests/support/native/drivers"
+)
 
 nexus_google_test(nexus_stm32_spi_transaction_test STM32F4_LL
     SOURCES "${nexus_google_root}/io/spi_transaction_provider_test.cpp"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/spi/spi.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio/gpio.c"
     LIBRARIES Nexus::NativeModel Nexus::Arch
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4")
-target_include_directories(nexus_stm32_spi_transaction_test SYSTEM PRIVATE
-    "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
-    "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
+)
+target_include_directories(
+    nexus_stm32_spi_transaction_test
+    SYSTEM
+    PRIVATE
+        "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
+        "${NEXUS_CMSIS_CORE_INCLUDE_DIR}"
+)
 nexus_use_cmsis_core(nexus_stm32_spi_transaction_test)
-target_compile_definitions(nexus_stm32_spi_transaction_test PRIVATE
-    NEXUS_STM32_MODEL STM32F407xx NX_SPI_TRANSACTION_STM32)
-target_compile_options(nexus_stm32_spi_transaction_test PRIVATE
-    "-include${nexus_google_root}/soc/spi_transaction_model.h")
+target_compile_definitions(
+    nexus_stm32_spi_transaction_test
+    PRIVATE NEXUS_STM32_MODEL STM32F407xx NX_SPI_TRANSACTION_STM32
+)
+target_compile_options(
+    nexus_stm32_spi_transaction_test
+    PRIVATE "-include${nexus_google_root}/soc/spi_transaction_model.h"
+)
 
 nexus_google_test(nexus_stm32_spi_dma_sequence_test STM32F4_LL
     SOURCES "${nexus_google_root}/io/spi_dma_sequence_provider_test.cpp"
@@ -26,23 +36,35 @@ nexus_google_test(nexus_stm32_spi_dma_sequence_test STM32F4_LL
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio/gpio.c"
     LIBRARIES Nexus::NativeModel Nexus::Arch
     INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
-        "${NEXUS_SOURCE_DIR}/io/private")
-target_include_directories(nexus_stm32_spi_dma_sequence_test SYSTEM PRIVATE
-    "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
-    "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+        "${NEXUS_SOURCE_DIR}/io/private"
+)
+target_include_directories(
+    nexus_stm32_spi_dma_sequence_test
+    SYSTEM
+    PRIVATE
+        "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
+        "${NEXUS_CMSIS_CORE_INCLUDE_DIR}"
+)
 nexus_use_cmsis_core(nexus_stm32_spi_dma_sequence_test)
-target_compile_definitions(nexus_stm32_spi_dma_sequence_test PRIVATE
-    NEXUS_STM32_MODEL STM32F407xx NX_SPI_TRANSACTION_STM32)
-target_compile_options(nexus_stm32_spi_dma_sequence_test PRIVATE
-    "-include${nexus_google_root}/soc/spi_dma_sequence_model.h")
+target_compile_definitions(
+    nexus_stm32_spi_dma_sequence_test
+    PRIVATE NEXUS_STM32_MODEL STM32F407xx NX_SPI_TRANSACTION_STM32
+)
+target_compile_options(
+    nexus_stm32_spi_dma_sequence_test
+    PRIVATE "-include${nexus_google_root}/soc/spi_dma_sequence_model.h"
+)
 
 # Owner contracts reuse each family's exact provider graph and register model.
 function(nexus_spi_dma_owner_contract name reference)
     get_property(sources TARGET ${reference} PROPERTY SOURCES)
     get_property(libraries TARGET ${reference} PROPERTY LINK_LIBRARIES)
     get_property(includes TARGET ${reference} PROPERTY INCLUDE_DIRECTORIES)
-    get_property(system_includes TARGET ${reference}
-        PROPERTY SYSTEM_INCLUDE_DIRECTORIES)
+    get_property(
+        system_includes
+        TARGET ${reference}
+        PROPERTY SYSTEM_INCLUDE_DIRECTORIES
+    )
     get_property(definitions TARGET ${reference} PROPERTY COMPILE_DEFINITIONS)
     get_property(options TARGET ${reference} PROPERTY COMPILE_OPTIONS)
     set(owned_includes)
@@ -57,12 +79,19 @@ function(nexus_spi_dma_owner_contract name reference)
     endforeach()
     nexus_google_test(${name} SOURCES ${sources}
         LIBRARIES ${libraries} Nexus::SPIDMATransactionOwner
-        INCLUDES ${owned_includes})
-    target_include_directories(${name} SYSTEM PRIVATE
-        ${system_includes} ${sdk_includes})
-    target_compile_definitions(${name} PRIVATE
-        ${definitions} NX_SPI_DMA_OWNER_TEST)
+        INCLUDES ${owned_includes}
+    )
+    target_include_directories(
+        ${name}
+        SYSTEM
+        PRIVATE ${system_includes} ${sdk_includes}
+    )
+    target_compile_definitions(
+        ${name}
+        PRIVATE ${definitions} NX_SPI_DMA_OWNER_TEST
+    )
     target_compile_options(${name} PRIVATE ${options})
 endfunction()
 nexus_spi_dma_owner_contract(nexus_stm32_spi_dma_owner_test
-    nexus_stm32_spi_dma_sequence_test)
+    nexus_stm32_spi_dma_sequence_test
+)

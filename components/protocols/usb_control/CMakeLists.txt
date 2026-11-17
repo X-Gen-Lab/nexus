@@ -1,28 +1,48 @@
 # Optional pure descriptor validation and caller-owned EP0 orchestration.
 add_library(nexus_usb_descriptors STATIC src/usb_descriptors.c)
-target_include_directories(nexus_usb_descriptors PUBLIC
-    "${CMAKE_CURRENT_SOURCE_DIR}/include")
-target_link_libraries(nexus_usb_descriptors PUBLIC Nexus::IOUSBDevice
-    PRIVATE nexus_build_options nexus_owned_warnings)
+target_include_directories(
+    nexus_usb_descriptors
+    PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include"
+)
+target_link_libraries(
+    nexus_usb_descriptors
+    PUBLIC Nexus::IOUSBDevice
+    PRIVATE nexus_build_options nexus_owned_warnings
+)
 add_library(Nexus::USBDescriptors ALIAS nexus_usb_descriptors)
 add_library(nexus_usb_control STATIC src/usb_control.c)
-target_include_directories(nexus_usb_control PUBLIC
-    "${CMAKE_CURRENT_SOURCE_DIR}/include")
-target_link_libraries(nexus_usb_control PUBLIC Nexus::IOUSBDevice
-    PRIVATE Nexus::Arch nexus_build_options nexus_owned_warnings)
+target_include_directories(
+    nexus_usb_control
+    PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include"
+)
+target_link_libraries(
+    nexus_usb_control
+    PUBLIC Nexus::IOUSBDevice
+    PRIVATE Nexus::Arch nexus_build_options nexus_owned_warnings
+)
 add_library(Nexus::USBControl ALIAS nexus_usb_control)
 
 # Explicit optional ACM control intent; unreferenced archive retains no instance.
 add_library(nexus_usb_acm STATIC src/usb_acm.c)
-target_include_directories(nexus_usb_acm PUBLIC
-    "${CMAKE_CURRENT_SOURCE_DIR}/include")
-target_link_libraries(nexus_usb_acm PUBLIC Nexus::USBControl
-    PRIVATE Nexus::Arch nexus_build_options nexus_owned_warnings)
+target_include_directories(
+    nexus_usb_acm
+    PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include"
+)
+target_link_libraries(
+    nexus_usb_acm
+    PUBLIC Nexus::USBControl
+    PRIVATE Nexus::Arch nexus_build_options nexus_owned_warnings
+)
 add_library(Nexus::USBACM ALIAS nexus_usb_acm)
 
 add_library(nexus_usb_role STATIC src/usb_role.c)
-target_include_directories(nexus_usb_role PUBLIC
-    "${CMAKE_CURRENT_SOURCE_DIR}/include")
-target_link_libraries(nexus_usb_role PUBLIC Nexus::Core
-    PRIVATE Nexus::Arch nexus_build_options nexus_owned_warnings)
+target_include_directories(
+    nexus_usb_role
+    PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include"
+)
+target_link_libraries(
+    nexus_usb_role
+    PUBLIC Nexus::Core
+    PRIVATE Nexus::Arch nexus_build_options nexus_owned_warnings
+)
 add_library(Nexus::USBRole ALIAS nexus_usb_role)

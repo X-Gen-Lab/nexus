@@ -10,8 +10,10 @@ function(nexus_stm32f4_crypto_hal target)
         nexus_controller_modes(modes "${kind}")
         if("dma-blocks" IN_LIST modes)
             string(TOUPPER "${kind}" upper_kind)
-            target_compile_definitions("${target}" PRIVATE
-                "NEXUS_STM32_${upper_kind}_DMA=1")
+            target_compile_definitions(
+                "${target}"
+                PRIVATE "NEXUS_STM32_${upper_kind}_DMA=1"
+            )
             set(dma ON)
         endif()
     endforeach()
@@ -21,12 +23,16 @@ function(nexus_stm32f4_crypto_hal target)
         nexus_stm32f4_dma_hal("${target}")
     endif()
     if("cipher" IN_LIST NEXUS_SELECTED_KINDS)
-        list(APPEND sources
-            "${source}/vendors/st/stm32f4_hal/Src/stm32f4xx_hal_cryp.c")
+        list(
+            APPEND sources
+            "${source}/vendors/st/stm32f4_hal/Src/stm32f4xx_hal_cryp.c"
+        )
     endif()
     if("hash" IN_LIST NEXUS_SELECTED_KINDS)
-        list(APPEND sources
-            "${source}/vendors/st/stm32f4_hal/Src/stm32f4xx_hal_hash.c")
+        list(
+            APPEND sources
+            "${source}/vendors/st/stm32f4_hal/Src/stm32f4xx_hal_hash.c"
+        )
     endif()
     if(NOT sources)
         message(FATAL_ERROR "Crypto HAL requires a selected engine")
@@ -40,14 +46,21 @@ function(nexus_stm32f4_crypto_hal target)
     if(dma)
         target_compile_definitions("${vendor}" PRIVATE NEXUS_STM32_CRYPTO_DMA=1)
     endif()
-    target_include_directories("${vendor}" PRIVATE
-        "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/hal_config/crypto")
-    target_include_directories("${vendor}" SYSTEM PRIVATE
-        "${source}/vendors/st/cmsis_device_f4/Include")
+    target_include_directories(
+        "${vendor}"
+        PRIVATE "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/hal_config/crypto"
+    )
+    target_include_directories(
+        "${vendor}"
+        SYSTEM
+        PRIVATE "${source}/vendors/st/cmsis_device_f4/Include"
+    )
     include("${source}/cmake/platform/CMSISCore.cmake")
     nexus_use_cmsis_core("${vendor}")
     target_link_libraries("${vendor}" PRIVATE nexus_build_options Nexus::Arch)
-    target_compile_options("${vendor}" PRIVATE
-        -ffunction-sections -fdata-sections)
+    target_compile_options(
+        "${vendor}"
+        PRIVATE -ffunction-sections -fdata-sections
+    )
     target_sources("${target}" PRIVATE "$<TARGET_OBJECTS:${vendor}>")
 endfunction()

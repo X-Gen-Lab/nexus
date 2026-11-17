@@ -16,6 +16,54 @@ from tools.testing import run_tool_tests
 
 
 class ToolRunnerTests(unittest.TestCase):
+    def test_module_paths_reject_globs_and_case_selections(self):
+        for name in ("tools/testing/test_[a].py", "tools/testing/test_a?.py",
+                     "tools/testing/test_a*.py", "tools/testing/test_a.py::Case"):
+            with self.subTest(path=name):
+                self.assertIsNone(run_tool_tests.module_domain(name))
+
+    def test_commit_files_run_the_complete_module_without_other_modules(self):
+        with tempfile.TemporaryDirectory(prefix="commit tools ") as name:
+            root = Path(name)
+            directory = root / "tools/testing"
+            directory.mkdir(parents=True)
+            selected = directory / "test_selected.py"
+            selected.write_text(
+                "import unittest\nclass Selected(unittest.TestCase):\n"
+                "    def test_first(self): pass\n"
+                "    def test_second(self): pass\n")
+            (directory / "test_unselected.py").write_text(
+                "raise RuntimeError('unselected module must not load')\n")
+            runner = directory / "run_tool_tests.py"
+            shutil.copyfile(ROOT / "tools/testing/run_tool_tests.py", runner)
+            report = root / "commit.json"
+            command = [sys.executable, "-B", str(runner), "--suite", "testing",
+                       "--files", "tools/testing/test_selected.py",
+                       "--report", str(report)]
+            result = subprocess.run(command, capture_output=True, text=True,
+                                    timeout=30, check=False)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            record = json.loads(report.read_text())
+            self.assertEqual(record["executed"], 2)
+            self.assertEqual(record["scope"], "commit-tools")
+            self.assertFalse(record["qualification"])
+            self.assertEqual(record["files"], ["tools/testing/test_selected.py"])
+            (directory / "test_glob_a.py").write_text(selected.read_text())
+            (directory / "test_glob_[a].py").write_text(
+                "raise RuntimeError('literal glob module must not execute')\n")
+            invalid = list(command)
+            invalid[invalid.index("--files") + 1] = "tools/testing/test_glob_[a].py"
+            result = subprocess.run(invalid, capture_output=True, text=True,
+                                    timeout=30, check=False)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertFalse(report.exists())
+            selected.write_text(selected.read_text().replace(
+                "def test_second(self): pass", "def test_second(self): self.fail('changed')"))
+            result = subprocess.run(command, capture_output=True, text=True,
+                                    timeout=30, check=False)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertFalse(report.exists())
+
     def test_documentation_directory_uses_complete_execution_admission(self):
         fixture = unittest.TestSuite([unittest.FunctionTestCase(lambda: None)])
         with patch("unittest.TestLoader.discover", return_value=fixture) as discover, \
@@ -73,11 +121,17 @@ class ToolRunnerTests(unittest.TestCase):
                                        text=True, timeout=30, check=False)
             self.assertEqual(completed.returncode, 0,
                              completed.stdout + completed.stderr)
-            self.assertEqual(json.loads(report.read_text()), {
+            record = json.loads(report.read_text())
+            slowest = record.pop("slowest_tests")
+            self.assertEqual(len(slowest), 1)
+            self.assertIn("test_complete", slowest[0]["test"])
+            self.assertGreaterEqual(slowest[0]["duration_seconds"], 0)
+            self.assertEqual(record, {
                 "suite": "freertos", "discovered": 1, "executed": 1,
                 "skipped": 0, "failures": 0, "errors": 0,
                 "expected_failures": 0, "unexpected_successes": 0,
-                "status": "passed"})
+                "status": "passed", "scope": "full-tool-domain",
+                "qualification": False})
 
     def test_ci_only_domain_skip_cannot_reuse_a_previous_success(self):
         def skipped():
@@ -104,6 +158,35 @@ class ToolRunnerTests(unittest.TestCase):
         self.assertEqual(record["executed"], 2)
         self.assertEqual(record["discovered"], 2)
         self.assertEqual(record["status"], "passed")
+
+    def test_slowest_cases_use_actual_result_durations_and_keep_only_ten(self):
+        cases = [unittest.FunctionTestCase(lambda: None,
+                                           description=f"case-{index}")
+                 for index in range(12)]
+        times = [value for index in range(12) for value in (0, index + 1)]
+        with patch.object(run_tool_tests, "perf_counter", side_effect=times,
+                          create=True):
+            record = self.run_fixture(unittest.TestSuite(cases))
+        self.assertEqual([item["duration_seconds"]
+                          for item in record["slowest_tests"]],
+                         list(range(12, 2, -1)))
+        self.assertTrue(all(item["test"] for item in record["slowest_tests"]))
+
+    def test_class_setup_error_retains_empty_durations_and_actual_failure(self):
+        class BrokenSetup(unittest.TestCase):
+            @classmethod
+            def setUpClass(cls):
+                raise RuntimeError("actual class setup failed")
+
+            def test_unreached(self):
+                self.fail("class setup failed before this case")
+
+        with self.assertRaises(ValueError) as caught:
+            self.run_fixture(unittest.TestSuite([BrokenSetup("test_unreached")]))
+        record = json.loads(str(caught.exception).split(": ", 1)[1])
+        self.assertEqual(record["executed"], 0)
+        self.assertEqual(record["errors"], 1)
+        self.assertEqual(record["slowest_tests"], [])
 
     def assert_first_failure_stops_later_case(self, kind):
         with tempfile.TemporaryDirectory() as name:
@@ -174,6 +257,80 @@ class ToolRunnerTests(unittest.TestCase):
 
 
 class ChangedDomainTests(unittest.TestCase):
+    def test_commit_plan_selects_modules_for_build_and_policy_changes(self):
+        plan = run_tool_tests.commit_tool_plan([
+            "AGENTS.md", ".pre-commit-config.yaml", ".gersemirc",
+            "dependencies/environment.lock.json",
+            "dependencies/python-tools-linux-cp312.lock.json",
+            "cmake/platform/SDK.cmake", "tools/dev/timings.py",
+            "tools/testing/test_dev_timings.py"])
+        self.assertTrue(plan)
+        self.assertTrue(all(files for files in plan.values()))
+        self.assertIn("tools/testing/test_tool_runner.py", plan["testing"])
+        self.assertIn("tools/testing/test_dev_timings.py", plan["testing"])
+        self.assertIn("tools/testing/test_cmake_helpers.py", plan["testing"])
+        self.assertIn("scripts/ci/test_install_dev_tools.py", plan["ci"])
+        self.assertLess(sum(map(len, plan.values())), 20)
+
+    def test_commit_facts_use_one_global_module_and_schema_contracts(self):
+        plan = run_tool_tests.commit_tool_plan([
+            "io/include/nexus/io/gpio.h", "soc/stm32/stm32f4/facts/devices.json",
+            "boards/stm32f407zg_qiming_v41/board.json"])
+        self.assertEqual(plan["testing"], ("tools/testing/test_maintenance.py",))
+        self.assertIn("tools/configure/tests/test_toml.py", plan["configure"])
+        self.assertIn("tools/configure/tests/test_static_ir.py", plan["configure"])
+
+    def test_commit_unknown_and_vendor_lock_changes_keep_full_domains(self):
+        for name in ("future/build-policy.bin", "tools/future_policy.py",
+                     "future/custom.cmake", "future/dev.py", "cmake/future-policy.cmake",
+                     "vendors/library/CMakeLists.txt",
+                     ".github/workflows/future-input.dat",
+                     "dependencies/stm32f4-hal.lock.json"):
+            with self.subTest(path=name):
+                plan = run_tool_tests.commit_tool_plan([name])
+                self.assertTrue(plan)
+                self.assertTrue(all(files is None for files in plan.values()))
+
+    def test_unknown_namespace_does_not_borrow_another_tools_named_test(self):
+        with tempfile.TemporaryDirectory() as name:
+            root = Path(name)
+            source = root / "tools/future/dev.py"
+            source.parent.mkdir(parents=True)
+            source.write_text("# Unreviewed tool namespace.\n")
+            tests = root / "tools/testing"
+            tests.mkdir(parents=True)
+            (tests / "test_dev.py").write_text("# Covers tools/dev/dev.py.\n")
+            with patch.object(run_tool_tests, "ROOT", root):
+                self.assertEqual(run_tool_tests.commit_tool_plan([
+                    "tools/future/dev.py"]), {"testing": None})
+
+    def test_unknown_existing_test_json_keeps_full_domain(self):
+        with tempfile.TemporaryDirectory() as name:
+            root = Path(name)
+            source = root / "tests/future.json"
+            source.parent.mkdir(parents=True)
+            source.write_text("{}\n")
+            for name in run_tool_tests.FACT_TESTS:
+                module = root / name
+                module.parent.mkdir(parents=True, exist_ok=True)
+                module.write_text("# Maintained module fixture.\n")
+            with patch.object(run_tool_tests, "ROOT", root):
+                self.assertEqual(run_tool_tests.commit_tool_plan([
+                    "tests/future.json"]), {"testing": None, "configure": None})
+
+    def test_external_provider_descriptor_uses_its_package_contract(self):
+        plan = run_tool_tests.commit_tool_plan([
+            "tests/support/external_provider/provider/nexus-soc.json"])
+        self.assertEqual(plan, {"configure": (
+            "tools/configure/tests/test_external_package.py",)})
+
+    def test_production_board_facts_keep_the_small_complete_module_plan(self):
+        plan = run_tool_tests.commit_tool_plan([
+            "boards/stm32f407zg_qiming_v41/board.json"])
+        self.assertEqual(plan["testing"], ("tools/testing/test_maintenance.py",))
+        self.assertTrue(plan["configure"])
+        self.assertNotIn(None, plan.values())
+
     def test_sdk_code_and_known_fixture_inputs_select_both_complete_domains(self):
         for name in ("cmake/package/package_source_sdk.py",
                      "cmake/package/verify_consumers.py",
@@ -222,11 +379,45 @@ class ChangedDomainTests(unittest.TestCase):
     def test_workflow_readme_does_not_expand_a_production_change(self):
         self.assertEqual(run_tool_tests.changed_suites([
             ".github/workflows/README.md", "core/src/time.c"]),
-            ("testing",))
+            ())
+
+    def test_firmware_sources_do_not_select_tool_domains(self):
+        for name in ("core/src/time.c", "arch/arm/cortex_m/interrupt.S",
+                     "os/freertos/mutex.c", "io/src/gpio.c",
+                     "soc/stm32/stm32f4/drivers/uart/uart_hal.c",
+                     "boards/stm32f407zg-qiming-v41/board.c",
+                     "components/services/storage/storage.c",
+                     "tests/contracts/test_gpio.cpp"):
+            with self.subTest(path=name):
+                self.assertEqual(run_tool_tests.changed_suites([name]), ())
+
+    def test_headers_and_package_data_keep_configuration_boundaries(self):
+        for name in ("core/include/nexus/core/result.h",
+                     "io/include/nexus/io/gpio.h",
+                     "soc/stm32/stm32f4/drivers/uart/binding.json",
+                     "boards/stm32f407zg-qiming-v41/board.json",
+                     "tests/contracts/uart/assembly.toml"):
+            with self.subTest(path=name):
+                self.assertEqual(run_tool_tests.changed_suites([name]),
+                                 ("testing", "configure"))
+
+    def test_unknown_firmware_and_external_inputs_keep_all_domains(self):
+        for name in ("soc/stm32/stm32f4/future-policy.py",
+                     "core/new-build-input.dat", "new-provider/driver.c"):
+            with self.subTest(path=name):
+                self.assertEqual(run_tool_tests.changed_suites([name]),
+                                 tuple(run_tool_tests.SUITES))
+
+    def test_tool_changes_and_mixed_paths_keep_the_affected_domain_union(self):
+        self.assertEqual(run_tool_tests.changed_suites([
+            "core/src/time.c", "tools/dev/presets.py"]), ("testing",))
+        self.assertEqual(run_tool_tests.changed_suites([
+            "io/src/gpio.c", "tools/configure/bindings.py"]),
+            ("testing", "configure"))
 
     def test_complete_domains_follow_actual_changes_and_deletions(self):
         self.assertEqual(run_tool_tests.changed_suites(["soc/stm32/driver.c"]),
-                         ("testing",))
+                         ())
         self.assertEqual(run_tool_tests.changed_suites([
             "tools/configure/removed.py", "README.md"]),
             ("testing", "configure"))

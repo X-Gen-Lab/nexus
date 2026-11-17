@@ -48,7 +48,7 @@ except ImportError as error:
     raise SDKError(message) from error
 
 ROOT_FILES = {"CMakeLists.txt", "LICENSE", "README.md", "AGENTS.md", ".gitmodules",
-              ".clang-format", ".editorconfig", ".clang-format-dirs"}
+              ".clang-format", ".editorconfig", ".clang-format-dirs", ".gersemirc"}
 ROOT_DIRS = {"arch", "boards", "cmake", "dependencies", "core", "io", "os",
              "components", "tools", "scripts", "soc"}
 CMSIS_CORE_DIRECTORY = "vendors/arm/CMSIS_6"
@@ -166,7 +166,6 @@ SDK_TOOL_FILES = (
     'scripts/ci/verify_vendor_source.py',
     'scripts/validation/junit.py',
     'tools/__init__.py',
-    'tools/dev/artifacts.py',
     'tools/dev/build_lock.py',
     'tools/dev/cache.py',
     'tools/dev/change_paths.py',

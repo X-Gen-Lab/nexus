@@ -38,8 +38,6 @@ jobs:
             --commit-msg-filename "$RUNNER_TEMP/nexus-commit-message"
       - name: Check the complete staged workflow DSL offline
         run: .venv/bin/python scripts/ci/lint_workflows.py --staged
-      - name: Test commit automation boundaries
-        run: .venv/bin/python -m unittest scripts.ci.test_format_tool scripts.ci.test_comment_style scripts.ci.test_install_dev_tools scripts.ci.test_style_gate scripts.ci.test_commit_message scripts.ci.test_lint_workflows
       - name: Obtain the trusted comparison commit
         shell: bash
         run: |
@@ -108,8 +106,6 @@ jobs:
           sudo apt-get "${options[@]}" install -y clang-tidy-14 cppcheck
       - name: Configure actual compilation database
         run: .venv/bin/python tools/dev/dev.py configure --preset native-debug
-      - name: Test analyzer execution policy
-        run: .venv/bin/python -m unittest discover -s scripts/ci -p 'test_quality_tools.py' -v
       - name: Run required clang analyzer
         run: .venv/bin/python scripts/ci/quality_tools.py tidy --build-dir build/native-debug --tool clang-tidy-14 --parallel 2 --report build/quality/clang-tidy.txt
       - name: Run required cppcheck

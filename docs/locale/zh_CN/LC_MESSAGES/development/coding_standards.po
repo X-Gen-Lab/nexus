@@ -6,7 +6,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 1f94b0af7233aa125c7fa5cbbc2cf4dd35f2266553352923fd1089e4b8acc23c\n"
+"X-Nexus-Source-SHA256: ac6dee85384131d37eaedf5009563b5cf92c89365b98267ef549121ea36eae72\n"
 
 msgid "Coding Standards"
 msgstr "代码规范"
@@ -256,3 +256,9 @@ msgid ""
 "Selected analyzer checks do not establish MISRA certification or industrial "
 "functional-safety qualification."
 msgstr "选定分析器检查不建立 MISRA 认证或工业功能安全资格。"
+
+msgid "Use four-space indentation and an 80-column target. Keep short calls on one line and group long argument lists by responsibility. Quote paths while preserving intentional list expansion, generator expressions and static-library link order. Declare ``PUBLIC``, ``PRIVATE`` and ``INTERFACE`` dependencies explicitly; vendor headers and implementation definitions remain private. Use the locked formatter for owned CMake files, never for vendor sources. Commit checks report differences without rewriting or staging files."
+msgstr "使用四空格缩进，以 80 列为行宽目标。短调用保持单行，长参数列表按职责分组。路径加引号，同时保留有意的列表展开、生成器表达式和静态库链接顺序。明确声明 ``PUBLIC``、``PRIVATE`` 和 ``INTERFACE`` 依赖；厂商头和实现宏定义保持私有。自有 CMake 文件使用锁定的格式工具，不格式化厂商源码。提交检查只报告差异，不改写文件或自动暂存。"
+
+msgid "Use the following template only for substantial top-level sections; short files and function bodies normally need blank lines and concise responsibility comments::"
+msgstr "仅在较大的顶层逻辑分区中使用以下模板；短文件和函数体通常使用空行与简洁的职责注释即可::"

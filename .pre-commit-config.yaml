@@ -6,6 +6,11 @@ repos:
     hooks:
       - id: nexus-style
         name: Nexus format, comment and text checks
+        additional_dependencies: &workflow_python
+          - pre-commit==4.3.0
+          - clang-format==14.0.6
+          - gersemi==0.29.2
+          - PyYAML==6.0.3
         entry: python scripts/ci/style_gate.py --staged --report build/quality/style-gate.json
         language: python
         stages: [pre-commit]
@@ -29,10 +34,7 @@ repos:
         name: Nexus offline staged GitHub Actions DSL lint
         entry: python scripts/ci/lint_workflows.py --staged
         language: python
-        additional_dependencies: &workflow_python
-          - pre-commit==4.3.0
-          - clang-format==14.0.6
-          - PyYAML==6.0.3
+        additional_dependencies: *workflow_python
         stages: [pre-commit]
         pass_filenames: false
         always_run: true

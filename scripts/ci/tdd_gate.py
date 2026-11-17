@@ -17,7 +17,9 @@ from tools.dev.change_paths import behavioral
 from tools.dev.presets import binary_directory
 from tools.dev import process
 from tools.dev.build_lock import build_lock
-from tools.testing.run_tool_tests import SUITES as TOOL_SUITES, changed_suites
+from tools.testing.run_tool_tests import (
+    SUITES as TOOL_SUITES, changed_suites, commit_tool_plan,
+)
 
 
 def validate_google_report(report, *, not_before_ns=None, expected_cases=None):
@@ -139,11 +141,14 @@ def execute_gate(args, env, build, initial_tree=None):
     summary = output / "execution.json"
     summary.unlink(missing_ok=True)
     python = sys.executable
-    scope = args.tools or ("all" if args.all else "changed")
-    suites = (TOOL_SUITES if scope == "all" else
-              changed_suites(staged_paths(ROOT) if args.staged else args.paths)
-              if scope == "changed" else ())
-    target = "contracts" if "testing" in suites or "ci" in suites else "native"
+    scope = "all" if args.all else args.tools or (
+        "commit" if args.staged else "changed")
+    paths = staged_paths(ROOT) if args.staged else args.paths
+    plan = (commit_tool_plan(paths) if scope == "commit" else
+            dict.fromkeys(TOOL_SUITES if scope == "all" else
+                          changed_suites(paths) if scope == "changed" else ()))
+    suites = tuple(plan)
+    target = "contracts" if set(suites) - {"workflows"} else "native"
     execute([python, "tools/dev/dev.py", "doctor", "--target", target],
             env, output / "preflight-tools.txt")
     execute([python, "tools/dev/dev.py", "configure", "--preset",
@@ -155,11 +160,15 @@ def execute_gate(args, env, build, initial_tree=None):
     # Keep the same complete selection, running cheap workflow/CI checks
     # before configuration and SDK consumers so failures stop work early.
     for suite in reversed(suites):
-        tool_report = output / f"tools-{suite}.json"
+        files = plan[suite]
+        suffix = "-commit" if files is not None else ""
+        tool_report = output / f"tools-{suite}{suffix}.json"
         tool_report.unlink(missing_ok=True)
-        execute([python, "-B", "tools/testing/run_tool_tests.py", "--suite",
-                 suite, "--report", str(tool_report)], env,
-                output / f"tools-{suite}.txt")
+        command = [python, "-B", "tools/testing/run_tool_tests.py", "--suite",
+                   suite, "--report", str(tool_report)]
+        if files is not None:
+            command += ["--files", *files]
+        execute(command, env, output / f"tools-{suite}{suffix}.txt")
         tool_results.append(json.loads(tool_report.read_text()))
     manifest = json.loads((build / "google-contracts.json").read_text())
     if (manifest.get("schema") != 1 or not manifest.get("executables")
@@ -189,8 +198,10 @@ def execute_gate(args, env, build, initial_tree=None):
         "schema": 1, "kind": "development-contract-execution",
         "preset": args.preset, "passed": sum(r["passed"] for r in results),
         "suites": results, "tool_suites": tool_results,
-        "scope": "Actual host execution; not proof of historical TDD order "
-                 "or physical hardware qualification",
+        "scope": "commit-tools" if scope == "commit" else scope,
+        "qualification": False,
+        "description": "Actual host execution; not proof of historical TDD order "
+                       "or physical hardware qualification",
     }, indent=2) + "\n")
     print(f"Executed {sum(r['passed'] for r in results)} GoogleTest cases; "
           f"evidence: {summary}")
@@ -202,13 +213,13 @@ def main(arguments=None):
     parser.add_argument("--preset", default="native-debug")
     parser.add_argument("--staged", action="store_true")
     parser.add_argument("--all", action="store_true")
-    parser.add_argument("--tools", choices=("all", "changed", "none"),
+    parser.add_argument("--tools", choices=("all", "commit", "changed", "none"),
                         help="Explicit tool-domain scope; GoogleTest always runs in full")
     parser.add_argument("paths", nargs="*")
     args = parser.parse_args(arguments)
     try:
         env = environment()
-        if (args.staged and not args.all
+        if (args.staged and not args.all and args.tools != "all"
                 and not any(map(relevant, staged_paths(ROOT)))):
             print("No staged behavioral changes require the GoogleTest gate")
             return 0

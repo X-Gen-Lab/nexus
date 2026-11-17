@@ -143,36 +143,6 @@ class MbedTLSActualGitTests(unittest.TestCase):
         self.assertEqual(result['verified_files'], 386)
         self.assertFalse(result['software_qualified'])
 
-    def test_inventory_observes_all_four_real_mounts_through_one_source_lock(self):
-        from tools.maintenance import dependency_proposals as proposals
-        auxiliary = ('dependencies/toolchains.lock.json',
-            'dependencies/actions.lock.json', 'dependencies/environment.lock.json',
-            'dependencies/development-tools.txt', 'dependencies/environment-tools.txt',
-            'vendors/gigadevice/gd32f4xx/source.lock.json')
-        for name in auxiliary:
-            destination = self.root / name
-            destination.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copyfile(ROOT / name, destination)
-        shutil.copytree(ROOT / 'vendors/gigadevice/gd32f4xx/LICENSES',
-                        self.root / 'vendors/gigadevice/gd32f4xx/LICENSES')
-        self.git(self.root, 'add', 'dependencies', 'vendors')
-        self.git(self.root, 'commit', '--quiet', '-m', 'Inventory inputs')
-        # Scope this real Git fixture to TLS, without replacing any verifier.
-        mounts = self.module.mounts()
-        with patch.object(catalogue, 'ALL_DEPENDENCIES', mounts), \
-                patch.object(proposals, 'ALL_DEPENDENCIES', mounts):
-            result = proposals.inventory(self.root)
-        observed = [row for row in result['dependencies'] if 'path' in row]
-        self.assertEqual({row['path'] for row in observed},
-                         {item.path for item in mounts})
-        for row in observed:
-            record = self.module.record(self.lock, row['path'])
-            self.assertEqual(row['revision'], record['commit'])
-            self.assertEqual(row['upstream_revision'], record['upstream_commit'])
-            identities = {item['path'] for item in row['identities']}
-            self.assertIn(str(self.lock_path), identities)
-            self.assertTrue({str(self.root / row['path'] / name)
-                             for name in record['files']}.issubset(identities))
 
     def test_changed_parent_index_and_wrong_org_origin_reject(self):
         self.git(self.root, 'update-index', '--cacheinfo', '160000',

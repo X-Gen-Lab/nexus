@@ -1,14 +1,24 @@
 # Exact generated single-shot ADC and fixed PWM lifecycle with real providers.
 foreach(control_kind adc pwm exti)
-    set(control_bundle "${CMAKE_CURRENT_BINARY_DIR}/f407-control-${control_kind}")
-    execute_process(COMMAND "${Python3_EXECUTABLE}" -B
-        "${NEXUS_SOURCE_DIR}/tools/configure/configure.py" --test-support
-        --source-root "${NEXUS_SOURCE_DIR}" --assembly
-        "${NEXUS_SOURCE_DIR}/tests/contracts/stm32_assembly/zg-${control_kind}.toml"
-        --output "${control_bundle}" RESULT_VARIABLE control_generated
-        OUTPUT_VARIABLE control_output ERROR_VARIABLE control_error)
+    set(control_bundle
+        "${CMAKE_CURRENT_BINARY_DIR}/f407-control-${control_kind}"
+    )
+    execute_process(
+        COMMAND
+            "${Python3_EXECUTABLE}" -B
+            "${NEXUS_SOURCE_DIR}/tools/configure/configure.py" --test-support
+            --source-root "${NEXUS_SOURCE_DIR}" --assembly
+            "${NEXUS_SOURCE_DIR}/tests/contracts/stm32_assembly/zg-${control_kind}.toml"
+            --output "${control_bundle}"
+        RESULT_VARIABLE control_generated
+        OUTPUT_VARIABLE control_output
+        ERROR_VARIABLE control_error
+    )
     if(NOT control_generated EQUAL 0)
-        message(FATAL_ERROR "F407 control factory rejected: ${control_output}${control_error}")
+        message(
+            FATAL_ERROR
+            "F407 control factory rejected: ${control_output}${control_error}"
+        )
     endif()
     nexus_google_configuration_inputs("${control_bundle}")
     if(control_kind STREQUAL "pwm")
@@ -29,18 +39,29 @@ foreach(control_kind adc pwm exti)
         INCLUDES "${control_bundle}"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
             "${NEXUS_SOURCE_DIR}/tests/support/f4_cpu"
-            "${NEXUS_SOURCE_DIR}/arch/include")
-    target_include_directories(${control_target} SYSTEM PRIVATE
-        "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
-    target_compile_definitions(${control_target} PRIVATE STM32F407xx
-        _init=nx_control_fixture_init _fini=nx_control_fixture_fini)
+            "${NEXUS_SOURCE_DIR}/arch/include"
+    )
+    target_include_directories(
+        ${control_target}
+        SYSTEM
+        PRIVATE "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
+    )
+    target_compile_definitions(
+        ${control_target}
+        PRIVATE
+            STM32F407xx
+            _init=nx_control_fixture_init
+            _fini=nx_control_fixture_fini
+    )
     if(control_kind STREQUAL "pwm")
         target_compile_definitions(${control_target} PRIVATE NX_CONTROL_PWM)
     elseif(control_kind STREQUAL "exti")
         target_compile_definitions(${control_target} PRIVATE NX_CONTROL_EXTI)
     endif()
-    target_compile_options(${control_target} PRIVATE
-        "-include${nexus_google_root}/soc/stm32_control_cold_model.h")
+    target_compile_options(
+        ${control_target}
+        PRIVATE "-include${nexus_google_root}/soc/stm32_control_cold_model.h"
+    )
 endforeach()
 
 # One real raw encoder implementation, shared across timer widths and modes.
@@ -50,11 +71,19 @@ nexus_google_test(nexus_stm32_encoder_test STM32F4_LL
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio/gpio.c"
     LIBRARIES Nexus::IO Nexus::Arch
     INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
-        "${NEXUS_SOURCE_DIR}/tests/support/f4_cpu")
-target_include_directories(nexus_stm32_encoder_test SYSTEM PRIVATE
-    "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
-target_compile_definitions(nexus_stm32_encoder_test PRIVATE STM32F407xx
-    nx_arch_is_privileged=nx_encoder_model_privileged
-    nx_arch_in_isr=nx_encoder_model_isr
-    nx_arch_irq_is_masked=nx_encoder_model_masked
-    nx_arch_dsb=nx_encoder_model_dsb)
+        "${NEXUS_SOURCE_DIR}/tests/support/f4_cpu"
+)
+target_include_directories(
+    nexus_stm32_encoder_test
+    SYSTEM
+    PRIVATE "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
+)
+target_compile_definitions(
+    nexus_stm32_encoder_test
+    PRIVATE
+        STM32F407xx
+        nx_arch_is_privileged=nx_encoder_model_privileged
+        nx_arch_in_isr=nx_encoder_model_isr
+        nx_arch_irq_is_masked=nx_encoder_model_masked
+        nx_arch_dsb=nx_encoder_model_dsb
+)

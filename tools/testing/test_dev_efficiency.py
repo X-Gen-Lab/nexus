@@ -92,6 +92,13 @@ class DeveloperFeedbackTests(unittest.TestCase):
                     expected = (action, *expected)
                 self.assertEqual(arguments, expected)
 
+    def test_device_provenance_path_is_forwarded_to_device_parser(self):
+        with patch.object(device, "main", return_value=9) as execute:
+            self.assertEqual(dev.main([
+                "flash", "--provenance", "/tmp/build-provenance.json"]), 9)
+        execute.assert_called_once_with(
+            "flash", ["--provenance", "/tmp/build-provenance.json"])
+
     def test_one_preset_snapshot_keeps_mapping_and_filter_consistent(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

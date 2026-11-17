@@ -17,10 +17,10 @@ import venv
 
 
 ROOT = Path(__file__).resolve().parents[2]
-PACKAGES = ("pre-commit", "clang-format")
+PACKAGES = ("pre-commit", "clang-format", "gersemi")
 LOCK_NAME = "dependencies/development-tools.txt"
 PIN_PATTERN = re.compile(
-    r"(pre-commit|clang-format)=="
+    r"(pre-commit|clang-format|gersemi)=="
     r"((?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*))"
 )
 PROBE = """
@@ -29,7 +29,7 @@ import json
 import sys
 
 versions = {}
-for name in ('pre-commit', 'clang-format'):
+for name in ('pre-commit', 'clang-format', 'gersemi'):
     try:
         versions[name] = importlib.metadata.version(name)
     except importlib.metadata.PackageNotFoundError:
@@ -154,6 +154,9 @@ def verify_tools(python, formatter, pins, root):
     pre_commit = run([python, "-I", "-m", "pre_commit", "--version"], root, capture=True)
     if pre_commit.stdout.strip() != f"pre-commit {pins['pre-commit']}":
         raise InstallError("pre-commit CLI version does not match the development tool lock")
+    cmake_formatter = run([python, "-I", "-m", "gersemi", "--version"], root, capture=True)
+    if cmake_formatter.stdout.splitlines()[0] != f"gersemi {pins['gersemi']}":
+        raise InstallError("gersemi CLI version does not match the development tool lock")
     if not formatter.is_file():
         raise InstallError(f"Locked clang-format executable is missing: {formatter}")
     result = run([formatter, "--version"], root, capture=True)

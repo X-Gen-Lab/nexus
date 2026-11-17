@@ -10,14 +10,14 @@ import re
 from pathlib import Path
 import shutil
 import subprocess
-import time
 import sys
 import tomllib
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from tools.evidence.common import (EvidenceError, atomic_json, file_identity,
-    regular_file, command, kill_process_group)
+    regular_file, command)
+from tools.dev import process
 from tools.evidence.identity import git_source, resolved_identity
 from tools.measurement.resources import (measure, resolved_float_abi,
                                          validate_elf_configuration)
@@ -30,63 +30,35 @@ OPTIMIZATIONS = ("O2", "Os", "O3", "O2-lto", "Os-lto", "O3-lto")
 
 def run_logged(argv: list[str], log: Path, *, timeout_s: int = 900,
                cwd: Path | None = None) -> dict:
-    """Retain actual stdout/stderr and nonzero status, including tool failure."""
+    """Retain stdout then stderr bytes, without cross-stream ordering.
+
+    The executor's text view is for display; the measurement log copies its raw
+    members. Empty output retains the existing diagnostic placeholder.
+    """
     command(argv)
     if type(timeout_s) is not int or not 0 < timeout_s <= 1800:
         raise EvidenceError("invalid build command timeout")
-    log.parent.mkdir(parents=True, exist_ok=True)
-    started = time.monotonic()
-    process = None
-    def stop():
-        if process is not None:
-            kill_process_group(process)
-    try:
-        with log.open("wb") as output:
-            process = subprocess.Popen(argv, stdin=subprocess.DEVNULL, stdout=output,
-                stderr=subprocess.STDOUT, start_new_session=os.name == "posix",
-                cwd=cwd)
-            while process.poll() is None:
-                if time.monotonic() - started >= timeout_s:
-                    raise subprocess.TimeoutExpired(argv, timeout_s)
-                if os.fstat(output.fileno()).st_size > 32 * 1024 * 1024:
-                    raise EvidenceError("command raw log exceeded 32 MiB bound")
-                try:
-                    process.wait(timeout=0.05)
-                except subprocess.TimeoutExpired:
-                    # Polling continues to enforce the deadline and log-size bound.
-                    pass
-            if os.fstat(output.fileno()).st_size > 32 * 1024 * 1024:
-                raise EvidenceError("command raw log exceeded 32 MiB bound")
-        exit_code = process.returncode
-        failure = None
-        if os.name == "posix":
-            try:
-                os.killpg(process.pid, 0)
-            except ProcessLookupError:
-                # No group remains after parent exit, so there is no orphan to kill.
-                pass
-            else:
-                stop()
-                exit_code, failure = 125, "command left background processes"
-    except subprocess.TimeoutExpired:
-        stop()
-        exit_code, failure = 124, "build command timed out"
-    except EvidenceError as error:
-        stop()
-        exit_code, failure = 125, str(error)
-    except OSError as error:
-        stop()
-        log.write_text("adapter executable unavailable\n")
-        exit_code, failure = 127, str(error)
-    except BaseException:
-        # Cancellation must not leave a compiler or hardware adapter running.
-        stop()
-        raise
-    # A success with no output still has a nonempty command execution record.
+    result = process.run(argv, cwd=cwd or Path.cwd(), env=os.environ.copy(),
+                         log=log, timeout=timeout_s, input=b"",
+                         stage="resource-measurement",
+                         max_output_bytes=32 * 1024 * 1024,
+                         reject_background=True)
+    record = json.loads(result.receipt_path.read_text())
+    if record["outcome"] == "cancelled":
+        raise KeyboardInterrupt
+    failure = {"timed_out": "build command timed out",
+               "launch_failed": "adapter executable unavailable"}.get(
+                   record["outcome"])
+    if result.failure is not None:
+        failure = result.failure
+    with log.open("wb") as output:
+        for channel in ("stdout", "stderr"):
+            with Path(record[channel]["path"]).open("rb") as raw:
+                shutil.copyfileobj(raw, output, length=128 * 1024)
     if not log.stat().st_size:
         log.write_text("command produced no stdout/stderr\n")
-    return {"argv": argv, "exit_code": exit_code, "failure": failure,
-            "elapsed_s": time.monotonic() - started, "raw": file_identity(log)}
+    return {"argv": argv, "exit_code": result.returncode, "failure": failure,
+            "elapsed_s": record["duration_seconds"], "raw": file_identity(log)}
 
 
 

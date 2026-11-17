@@ -2,24 +2,46 @@
 # Optional wait helpers and explicit per-backend storage.
 # Author: Nexus Team
 add_library(nexus_os_wait STATIC EXCLUDE_FROM_ALL wait.c)
-target_include_directories(nexus_os_wait PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
-target_link_libraries(nexus_os_wait PUBLIC nexus_core PRIVATE nexus_owned_warnings nexus_build_options)
+target_include_directories(
+    nexus_os_wait
+    PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include"
+)
+target_link_libraries(
+    nexus_os_wait
+    PUBLIC nexus_core
+    PRIVATE nexus_owned_warnings nexus_build_options
+)
 
 add_library(nexus_os_diagnostic STATIC EXCLUDE_FROM_ALL diagnostic.c)
-target_include_directories(nexus_os_diagnostic PUBLIC
-    "${CMAKE_CURRENT_SOURCE_DIR}/include")
-target_link_libraries(nexus_os_diagnostic PUBLIC nexus_core
-    PRIVATE nexus_arch nexus_owned_warnings nexus_build_options)
+target_include_directories(
+    nexus_os_diagnostic
+    PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include"
+)
+target_link_libraries(
+    nexus_os_diagnostic
+    PUBLIC nexus_core
+    PRIVATE nexus_arch nexus_owned_warnings nexus_build_options
+)
 
 add_library(nexus_os_baremetal STATIC EXCLUDE_FROM_ALL baremetal/notify.c)
-target_link_libraries(nexus_os_baremetal PUBLIC nexus_os_wait
-    PRIVATE nexus_arch nexus_owned_warnings nexus_build_options)
+target_link_libraries(
+    nexus_os_baremetal
+    PUBLIC nexus_os_wait
+    PRIVATE nexus_arch nexus_owned_warnings nexus_build_options
+)
 
 if(NEXUS_CPU_ARCH STREQUAL "native" AND NOT _nexus_runtime_scope)
     find_package(Threads REQUIRED)
     add_library(nexus_os_native STATIC EXCLUDE_FROM_ALL native/native.c)
-    target_include_directories(nexus_os_native PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/native/include")
-    target_link_libraries(nexus_os_native PUBLIC nexus_os_wait Threads::Threads PRIVATE nexus_owned_warnings nexus_build_options)
+    target_include_directories(
+        nexus_os_native
+        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/native/include"
+    )
+    target_link_libraries(
+        nexus_os_native
+        PUBLIC nexus_os_wait Threads::Threads
+        PRIVATE nexus_owned_warnings nexus_build_options
+    )
 endif()
 
 if(NEXUS_BACKEND STREQUAL "freertos" AND NOT NEXUS_CPU_ARCH STREQUAL "native")

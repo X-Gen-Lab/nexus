@@ -68,15 +68,6 @@ def execute(command, environment, *, cancel_event=None):
 
 
 
-def maintenance_checks(environment):
-    for script in ("capabilities.py", "ownership.py"):
-        result = execute([sys.executable, "tools/maintenance/" + script],
-                         environment)
-        if result:
-            return result
-    return 0
-
-
 def workspace_identity():
     """A manifest triggers complete verification, never a check bypass."""
     manifest = ROOT / ".nexus-source-sdk.json"
@@ -205,7 +196,7 @@ def doctor(environment, native):
         print("Tool diagnosis only: repository review/documentation "
               "governance materials are not packaged")
         return 0
-    return maintenance_checks(environment)
+    return 0
 
 
 def command_build(args, native, presets):
@@ -248,9 +239,6 @@ def managed_action(args, native, environment, build, selected_test=None):
         result = execute([sys.executable, "scripts/ci/style_gate.py",
                           "--all", "--report",
                           "build/quality/style-gate.json"], environment)
-        if result:
-            return result
-        result = maintenance_checks(environment)
         if result:
             return result
         return execute([sys.executable, "scripts/ci/tdd_gate.py", "--all",
@@ -301,7 +289,7 @@ def managed_action(args, native, environment, build, selected_test=None):
               "uses check")
         return 0
     result = execute(command + native, environment)
-    if result == 0:
+    if result == 0 and args.record_provenance:
         capture_provenance(args.action, args.preset, environment, native,
                            getattr(result, "receipt_path", None),
                            command + native, build=build)
@@ -314,11 +302,16 @@ def main(argv=None):
                                           "check", "doctor", "prepare",
                                           "cache", "docs",
                                           "create", "flash", "debug", "monitor",
-                                          "timings", "artifacts", "support",
+                                          "timings", "support",
                                           "matrix"))
     parser.add_argument("--preset")
+    parser.add_argument("--record-provenance", action="store_true",
+                        help="record verified configure/build identity for "
+                             "device operations or delivery")
     args, native = parser.parse_known_args(argv)
     try:
+        if args.record_provenance and args.action not in ("configure", "build"):
+            raise ValueError("--record-provenance requires configure or build")
         if args.action in ("matrix", "docs", "check"):
             require_checkout(args.action)
         if args.action == "matrix":
@@ -331,12 +324,6 @@ def main(argv=None):
                 raise ValueError("support requires an exact --assembly; --preset is not evidence")
             from tools.maintenance import capabilities
             return capabilities.main(native, support_command=True)
-        if args.action == "artifacts":
-            if args.preset is not None:
-                raise ValueError("artifacts requires actual --provenance; "
-                                 "--preset does not identify a build")
-            from tools.dev import artifacts
-            return artifacts.main(native)
         args.preset = args.preset or "native-debug"
         environment = process.execution_environment(os.environ)
         # Prefer the pinned local tools without requiring shell activation.

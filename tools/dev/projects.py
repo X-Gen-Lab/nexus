@@ -19,6 +19,7 @@ from tools.evidence.common import (
 )
 
 ROOT = Path(__file__).resolve().parents[2]
+STYLE_FILES = (".editorconfig", ".clang-format", ".gersemirc")
 MAXIMUM_FILE_BYTES = 4 * 1024 * 1024
 MAXIMUM_PROJECT_BYTES = 16 * 1024 * 1024
 
@@ -205,6 +206,20 @@ def _owned_output(output, identity):
 def _publish(output, payload, source_root, selected_platform, source_snapshot,
              result, *, test_support, source_check=None):
     """Share one resolver, copy verification and owned-output rollback path."""
+    payload = dict(payload)
+    result["files"] = dict(result["files"])
+    source_snapshot = list(source_snapshot)
+    for name in STYLE_FILES:
+        if name in payload:
+            raise ValueError("Template must inherit platform style files")
+        record = file_identity(_path(source_root / name))
+        if record["size"] > MAXIMUM_FILE_BYTES:
+            raise ValueError("Platform style file exceeds the file bound")
+        source_snapshot.append(record)
+        payload[name] = Path(record["path"]).read_bytes()
+        result["files"][name] = record["sha256"]
+    if sum(map(len, payload.values())) > MAXIMUM_PROJECT_BYTES:
+        raise ValueError("Project exceeds the project storage bound")
     interpreter = Path(sys.executable).resolve()
     interpreter_identity = file_identity(interpreter)
     # mkdir is exclusive, including when another process creates output late.
