@@ -15,6 +15,10 @@ python tools/dev/dev.py test --preset native-debug
 `doctor --target arm` 检查锁定的 ARM 编译器；`contracts` 同时检查 Native 和 ARM。
 CMake 的原生参数可以直接透传。并发受进程分配预算约束。
 
+同一台主机并行运行多个独立入口时，由启动方划分 `NEXUS_BUILD_JOBS` 总预算。
+交互构建、性能采样与完整 SDK 发布各自计时；性能采样在声明的固定资源条件下运行。
+正式发布在最终源码冻结后执行一次完整资格，局部开发使用相关目标与提交检查范围。
+
 每条实际子命令的日志保存在独立的
 `build/quality/developer-commands/<执行标识>/command.txt`，终端显示其路径。
 `build/quality/developer-command.command.json` 是原子更新的最近一次完成结果入口，

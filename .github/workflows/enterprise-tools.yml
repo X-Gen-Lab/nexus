@@ -17,6 +17,8 @@ jobs:
     runs-on: ubuntu-24.04
     # Allow real SDK builds, the complete test plan and evidence uploads.
     timeout-minutes: 60
+    env:
+      NEXUS_BUILD_JOBS: '4'
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:

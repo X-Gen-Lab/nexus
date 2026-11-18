@@ -16,6 +16,14 @@ from tools.testing import run_tool_tests
 
 
 class ToolRunnerTests(unittest.TestCase):
+    def copy_cli(self, root):
+        for name in ("testing/run_tool_tests.py", "testing/module_workers.py",
+                     "dev/process.py", "dev/build_lock.py"):
+            target = root / "tools" / name
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(ROOT / "tools" / name, target)
+        return root / "tools/testing/run_tool_tests.py"
+
     def test_module_paths_reject_globs_and_case_selections(self):
         for name in ("tools/testing/test_[a].py", "tools/testing/test_a?.py",
                      "tools/testing/test_a*.py", "tools/testing/test_a.py::Case"):
@@ -34,8 +42,7 @@ class ToolRunnerTests(unittest.TestCase):
                 "    def test_second(self): pass\n")
             (directory / "test_unselected.py").write_text(
                 "raise RuntimeError('unselected module must not load')\n")
-            runner = directory / "run_tool_tests.py"
-            shutil.copyfile(ROOT / "tools/testing/run_tool_tests.py", runner)
+            runner = self.copy_cli(root)
             report = root / "commit.json"
             command = [sys.executable, "-B", str(runner), "--suite", "testing",
                        "--files", "tools/testing/test_selected.py",
@@ -110,9 +117,7 @@ class ToolRunnerTests(unittest.TestCase):
                 "class Domain(unittest.TestCase):\n"
                 "    def test_complete(self):\n"
                 "        self.assertEqual(2 + 2, 4)\n")
-            runner = root / "tools/testing/run_tool_tests.py"
-            runner.parent.mkdir(parents=True)
-            shutil.copyfile(ROOT / "tools/testing/run_tool_tests.py", runner)
+            runner = self.copy_cli(root)
             report = root / "execution.json"
             report.write_text('{"stale": true}\n')
             command = [sys.executable, "-B", str(runner), "--suite",
@@ -122,6 +127,9 @@ class ToolRunnerTests(unittest.TestCase):
             self.assertEqual(completed.returncode, 0,
                              completed.stdout + completed.stderr)
             record = json.loads(report.read_text())
+            self.assertEqual(record.pop("workers"), 1)
+            self.assertEqual(set(record.pop("modules")),
+                             {"os/freertos/test_fixture.py"})
             slowest = record.pop("slowest_tests")
             self.assertEqual(len(slowest), 1)
             self.assertIn("test_complete", slowest[0]["test"])
@@ -134,18 +142,23 @@ class ToolRunnerTests(unittest.TestCase):
                 "qualification": False})
 
     def test_ci_only_domain_skip_cannot_reuse_a_previous_success(self):
-        def skipped():
-            raise unittest.SkipTest("fixture")
-
-        tests = unittest.TestSuite([unittest.FunctionTestCase(skipped)])
         with tempfile.TemporaryDirectory() as name:
-            report = Path(name) / "execution.json"
+            root = Path(name)
+            tests = root / "os/freertos"
+            tests.mkdir(parents=True)
+            (tests / "test_fixture.py").write_text(
+                "import unittest\n"
+                "class Domain(unittest.TestCase):\n"
+                "    @unittest.skip('fixture')\n"
+                "    def test_skipped(self): pass\n")
+            runner = self.copy_cli(root)
+            report = root / "execution.json"
             report.write_text('{"status": "passed"}\n')
-            with patch("unittest.TestLoader.discover", return_value=tests), \
-                    redirect_stderr(io.StringIO()):
-                result = run_tool_tests.main([
-                    "--suite", "contracts", "--report", str(report)])
-            self.assertEqual(result, 1)
+            result = subprocess.run(
+                [sys.executable, "-B", str(runner), "--suite", "freertos",
+                 "--report", str(report)], capture_output=True, text=True,
+                timeout=30, check=False)
+            self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
             self.assertFalse(report.exists())
 
     def test_actual_execution_reports_nonzero_count(self):
@@ -257,6 +270,12 @@ class ToolRunnerTests(unittest.TestCase):
 
 
 class ChangedDomainTests(unittest.TestCase):
+    def test_commit_message_checker_selects_its_complete_test_module(self):
+        self.assertEqual(run_tool_tests.commit_tool_plan([
+            "scripts/ci/check_commit_message.py",
+            "scripts/ci/test_commit_message.py"]),
+            {"ci": ("scripts/ci/test_commit_message.py",)})
+
     def test_commit_plan_selects_modules_for_build_and_policy_changes(self):
         plan = run_tool_tests.commit_tool_plan([
             "AGENTS.md", ".pre-commit-config.yaml", ".gersemirc",

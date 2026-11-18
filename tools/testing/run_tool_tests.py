@@ -57,6 +57,7 @@ COMMIT_ALIASES = {
     "AGENTS.md": POLICY_TESTS + INSTALLER_TESTS,
     ".pre-commit-config.yaml": POLICY_TESTS + INSTALLER_TESTS,
     ".gersemirc": INSTALLER_TESTS,
+    "scripts/ci/check_commit_message.py": ("scripts/ci/test_commit_message.py",),
     ".editorconfig": ("scripts/ci/test_format_tool.py",
                        "scripts/ci/test_cmake_format.py"),
     ".github/security/trufflehog.json": ("tools/testing/test_secret_scan.py",),
@@ -293,11 +294,10 @@ def main(arguments=None):
     args = parser.parse_args(arguments)
     args.report.unlink(missing_ok=True)
     try:
-        if args.jobs is None:
-            record = execute(args.suite, files=args.files)
-        else:
-            from tools.testing.module_workers import run
-            record = run(args.suite, args.files, args.jobs)
+        from tools.dev.process import parallel_jobs
+        from tools.testing.module_workers import run
+        jobs = parallel_jobs(os.environ, requested=args.jobs)
+        record = run(args.suite, args.files, jobs)
         args.report.parent.mkdir(parents=True, exist_ok=True)
         args.report.write_text(json.dumps(record, indent=2) + "\n")
     except (ValueError, OSError) as error:
