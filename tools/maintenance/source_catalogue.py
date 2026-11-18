@@ -29,6 +29,7 @@ class SourceDependency:
     parent: str | None = None
     submodule_name: str | None = None
     alias_of: str | None = None
+    paired_driver_checker: str | None = None
 
 
 ALL_DEPENDENCIES = (
@@ -55,7 +56,8 @@ ALL_DEPENDENCIES = (
     SourceDependency("stm32f4_hal", "vendors/st/stm32f4_hal",
         "https://github.com/STMicroelectronics/stm32f4xx-hal-driver.git",
         "https://github.com/X-Gen-Lab/stm32f4xx-hal-driver.git",
-        "runtime", "LICENSE.md", "dependencies/stm32f4-hal.lock.json"),
+        "runtime", "LICENSE.md", "dependencies/stm32f4-hal.lock.json",
+        paired_driver_checker="stm32f4_hal_lock"),
     SourceDependency("stm32_usb_device", "vendors/st/usb_device",
         "https://github.com/STMicroelectronics/stm32-mw-usb-device.git",
         "https://github.com/X-Gen-Lab/stm32-mw-usb-device.git",

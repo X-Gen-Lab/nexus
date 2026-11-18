@@ -82,7 +82,7 @@ add_subdirectory(io)
 add_subdirectory(os)
 add_subdirectory(components EXCLUDE_FROM_ALL)
 include("${NEXUS_SOURCE_DIR}/cmake/platform/Components.cmake")
-nexus_resolve_components(nexus_component_targets ${NEXUS_SELECTED_COMPONENTS})
+nexus_resolve_components(NEXUS_COMPONENT_TARGETS ${NEXUS_SELECTED_COMPONENTS})
 if(NEXUS_SOC_FAMILY STREQUAL "native" AND NOT NEXUS_TEST_SUPPORT)
     message(FATAL_ERROR "Native models require NEXUS_TEST_SUPPORT")
 endif()
@@ -135,7 +135,7 @@ if(NEXUS_RUNTIME_POWER)
         nexus_platform
         PRIVATE "${NEXUS_SOURCE_DIR}/components/runtime/clock_domain/private"
     )
-    list(APPEND nexus_component_targets Nexus::ClockDomain)
+    list(APPEND NEXUS_COMPONENT_TARGETS Nexus::ClockDomain)
 endif()
 if(NEXUS_IO_CYCLE_PROBES)
     target_link_libraries(nexus_platform PRIVATE Nexus::IOCycleProbe)
@@ -163,21 +163,10 @@ if(NEXUS_SYSTEM_COMPILE_DEFINITIONS)
         PRIVATE ${NEXUS_SYSTEM_COMPILE_DEFINITIONS}
     )
 endif()
-set_target_properties(
-    nexus_platform
-    PROPERTIES
-        NEXUS_SOURCE_DIR "${NEXUS_SOURCE_DIR}"
-        NEXUS_CONFIG_DIR "${NEXUS_CONFIG_DIR}"
-        NEXUS_SOC_FAMILY "${NEXUS_SOC_FAMILY}"
-        NEXUS_CPU_ARCH "${NEXUS_CPU_ARCH}"
-        NEXUS_BACKEND "${NEXUS_BACKEND}"
-        NEXUS_COMPONENT_TARGETS "${nexus_component_targets}"
-        NEXUS_STARTUP_SOURCE "${NEXUS_STARTUP_SOURCE}"
-        NEXUS_SYSTEM_SOURCE "${NEXUS_SYSTEM_SOURCE}"
-        NEXUS_SYSTEM_PRIVATE_INCLUDES "${NEXUS_SYSTEM_PRIVATE_INCLUDES}"
-        NEXUS_SYSTEM_VENDOR_INCLUDES "${NEXUS_SYSTEM_VENDOR_INCLUDES}"
-        NEXUS_SYSTEM_COMPILE_DEFINITIONS "${NEXUS_SYSTEM_COMPILE_DEFINITIONS}"
-)
+_nexus_firmware_properties(required optional)
+foreach(property IN LISTS required optional)
+    set_property(TARGET nexus_platform PROPERTY ${property} "${${property}}")
+endforeach()
 if(NEXUS_SOC_FAMILY STREQUAL "native")
     target_include_directories(
         nexus_platform
@@ -198,55 +187,13 @@ option(
     "Build a minimal developer linkage workload"
     ${PROJECT_IS_TOP_LEVEL}
 )
-set(NEXUS_WORKLOAD
-    "empty"
-    CACHE STRING
-    "Minimal resource fixture: empty/gpio/uart/spi"
-)
 if(NEXUS_BUILD_TESTS AND NEXUS_SOC_FAMILY STREQUAL "native")
     enable_testing()
     add_subdirectory(tests/contracts)
 endif()
 if(NEXUS_BUILD_WORKLOAD)
-    nexus_add_firmware(nexus_firmware
-        SOURCES "${NEXUS_SOURCE_DIR}/tools/measurement/workload.c"
-    )
-    nexus_target_warnings(nexus_firmware STRICT)
-    if(NOT NEXUS_WORKLOAD MATCHES "^(empty|gpio|uart|spi)$")
-        message(FATAL_ERROR "Unknown minimal workload ${NEXUS_WORKLOAD}")
-    endif()
-    target_compile_definitions(
-        nexus_firmware
-        PRIVATE "NEXUS_WORKLOAD_${NEXUS_WORKLOAD}=1"
-    )
-    if(NEXUS_WORKLOAD MATCHES "^(gpio|uart)$")
-        include("${NEXUS_SOURCE_DIR}/cmake/platform/Workload.cmake")
-        string(TOUPPER "${NEXUS_WORKLOAD}" workload_kind)
-        set(NEXUS_WORKLOAD_${workload_kind}_ID
-            ""
-            CACHE STRING
-            "Assembly-local typed factory ID used only by the workload"
-        )
-        nexus_workload_identity("${NEXUS_CONFIG_DIR}" "${workload_kind}"
-            "${NEXUS_WORKLOAD_${workload_kind}_ID}" workload_identity
-        )
-        target_compile_definitions(
-            nexus_firmware
-            PRIVATE "NEXUS_WORKLOAD_${workload_kind}_ID=${workload_identity}"
-        )
-        if(NEXUS_WORKLOAD STREQUAL "gpio")
-            string(
-                REGEX REPLACE "^NX_GPIO_ID_"
-                ""
-                workload_gpio
-                "${workload_identity}"
-            )
-            target_compile_definitions(
-                nexus_firmware
-                PRIVATE "NEXUS_WORKLOAD_GPIO_MASK=NEXUS_${workload_gpio}_MASK"
-            )
-        endif()
-    endif()
+    include("${NEXUS_SOURCE_DIR}/cmake/platform/Workload.cmake")
+    nexus_add_workload()
 endif()
 if(NEXUS_IO_EVOLUTION_FIXTURE)
     include(

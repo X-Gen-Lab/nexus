@@ -73,6 +73,63 @@
             14
           ]
         }
+      },
+      "features": {
+        "usb_remote_wakeup": {
+          "source": "option",
+          "owners": [
+            "usb_device"
+          ],
+          "flag": "remote_wakeup"
+        },
+        "rtc_periodic_wakeup": {
+          "source": "option",
+          "owners": [
+            "rtc"
+          ],
+          "flag": "periodic_wakeup"
+        },
+        "sdram_graphics": {
+          "source": "endpoint",
+          "owners": [
+            "memory_window-endpoint"
+          ],
+          "modes": [
+            "graphics-owned"
+          ]
+        },
+        "qspi_program_dma": {
+          "source": "controller",
+          "owners": [
+            "external_bus"
+          ],
+          "modes": [
+            "qspi-indirect-dma"
+          ],
+          "macro": "NEXUS_QSPI_PROGRAM_DMA"
+        },
+        "qspi_cpu_map": {
+          "source": "endpoint",
+          "owners": [
+            "mapped_storage-endpoint"
+          ],
+          "modes": [
+            "nor-mapped-cpu"
+          ],
+          "macro": "NEXUS_QSPI_CPU_MAP"
+        },
+        "qspi_quad_read": {
+          "source": "endpoint",
+          "owners": [
+            "flash_async-endpoint",
+            "mapped_storage-endpoint"
+          ],
+          "modes": [
+            "nor-indirect-quad-read",
+            "nor-mapped-cpu"
+          ],
+          "macro": "NEXUS_QSPI_QUAD_READ"
+        }
       }
     }
   }

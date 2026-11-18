@@ -14,6 +14,17 @@ from tools.testing import test_hil_workloads
 
 
 class SocHilTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        fixture = cls()
+        cls.addClassCleanup(fixture.doCleanups)
+        fixture.setUp()
+        cls.captured = fixture.capture_record()
+        cls.capture_admission = fixture.admission
+        attempt = Path(cls.captured["capture"]["path"]).parent
+        cls.capture_files = {path: path.read_bytes()
+                             for path in attempt.rglob("*") if path.is_file()}
+
     def setUp(self):
         self.directory = tempfile.TemporaryDirectory()
         self.addCleanup(self.directory.cleanup)
@@ -64,6 +75,15 @@ class SocHilTests(unittest.TestCase):
                            for name, (unit, rule) in definition["metrics"].items()}}
 
     def record(self):
+        # Records bind absolute paths and content identities. Restore exactly
+        # the captured bytes before each independent parser fault injection.
+        for path, contents in self.capture_files.items():
+            path.write_bytes(contents)
+        self.admission = copy.deepcopy(self.capture_admission)
+        self.mock_admit.return_value = copy.deepcopy(self.admission)
+        return copy.deepcopy(self.captured)
+
+    def capture_record(self):
         protocol = self.protocol()
         protocol_path = self.root / "protocol.json"
         atomic_json(protocol_path, protocol)

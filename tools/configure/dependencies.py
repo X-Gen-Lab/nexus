@@ -37,7 +37,6 @@ SDK = (
     "tools/evidence/common.py",
     "tools/maintenance/cmsis_device_lock.py",
     "tools/maintenance/freertos_transport.py",
-    "tools/maintenance/stm32f4_hal_lock.py",
     "tools/maintenance/st_usb_lock.py",
     "tools/maintenance/threadx_lock.py",
     "scripts/ci/vendor_import_identity.py", "scripts/ci/verify_vendor_source.py",
@@ -76,10 +75,18 @@ def _identity(mode, records):
             "sha256": digest, "files": records}
 
 
+def _packaged_checkers():
+    from tools.maintenance.source_catalogue import ALL_DEPENDENCIES
+    return tuple("tools/maintenance/" + item.paired_driver_checker + ".py"
+                 for item in ALL_DEPENDENCIES if item.paired_driver_checker)
+
+
 def snapshot(*, mode, family=None, sdk=False, test_support=False):
     """Bind common code and only the explicitly selected legacy adapter."""
-    paths = {name: str(ROOT / name) for name in source_names(
-        mode, family, sdk=sdk, test_support=test_support)}
+    names = source_names(mode, family, sdk=sdk, test_support=test_support)
+    if sdk:
+        names.extend(name for name in _packaged_checkers() if (ROOT / name).is_file())
+    paths = {name: str(ROOT / name) for name in sorted(names)}
     records = [{"path": name,
                 "sha256": hashlib.sha256(Path(path).read_bytes()).hexdigest()}
                for name, path in paths.items()]
@@ -124,6 +131,8 @@ def selected(paths, identity, *, family, context=None):
                          test_support=(family == "native" and
                                        context is not None and
                                        not context.external))
+    if "cmake/package/package_source_sdk.py" in paths:
+        names = sorted(set(names).union(name for name in _packaged_checkers() if name in paths))
     records = {record["path"]: record for record in identity["files"]}
     if not set(names).issubset(records):
         raise ValueError("Configuration code dependency closure changed during resolution")

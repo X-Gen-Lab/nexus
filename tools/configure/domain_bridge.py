@@ -196,6 +196,10 @@ class DomainBridge:
         policy = self._domains().SELECTION
         return policy.selected_format(item, shape) if policy is not None else {}
 
+    def build_features(self, result):
+        header = self._domains().HEADER
+        return header.features(result) if header is not None else ()
+
     def configuration_header(self, result):
         header = self._domains().HEADER
         return header.render(result, self) if header is not None else []

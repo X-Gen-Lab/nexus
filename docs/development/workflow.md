@@ -66,6 +66,8 @@ Automation proves execution, while retained development logs document historical
 RED/GREEN order. Pure prose or diagram edits need corresponding document checks
 and semantic review rather than mirrored implementation tests.
 
+The commit gate writes its selected hardware assemblies and expansion reasons to `build/native-debug/tdd/arm-selection.json` for the default preset. It builds the ordinary firmware target and records checked ELF identities in `execution.json`. A private C edit can reuse a verified compiler dependency record. Missing information expands the hardware check. The examples build entry and the Native gate reuse a warm Ninja tree with matching configuration inputs. Set `NEXUS_TOOL_JOBS` within `NEXUS_BUILD_JOBS` to run independent tool modules concurrently.
+
 ## Run local validation when Actions is unavailable
 
 Use the same maintained entry points as CI. The complete TDD gate above runs

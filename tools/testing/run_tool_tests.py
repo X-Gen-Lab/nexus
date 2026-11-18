@@ -3,6 +3,7 @@
 
 import argparse
 import json
+import os
 from pathlib import Path
 import sys
 from time import perf_counter
@@ -31,9 +32,7 @@ INSTALLER_TESTS = ("scripts/ci/test_install_dev_tools.py",
 CMAKE_TESTS = ("tools/testing/test_cmake_helpers.py",
                "tools/testing/test_io_source_selection.py",
                "tools/configure/tests/test_incremental_consumer.py")
-FACT_TESTS = ("tools/testing/test_maintenance.py",
-              "tools/configure/tests/test_toml.py",
-              "tools/configure/tests/test_static_ir.py",
+FACT_TESTS = ("tools/testing/test_build_impact.py",
               "tools/configure/tests/test_resource_graph.py")
 DEVELOPMENT_INPUTS = {
     "dependencies/environment.lock.json", "dependencies/environment-tools.txt",
@@ -65,9 +64,17 @@ COMMIT_ALIASES = {
                          "tools/testing/test_dev_efficiency.py",
                          "tools/testing/test_build_workflow.py"),
     "tools/dev/process.py": ("tools/testing/test_build_workflow.py",
-                             "tools/testing/test_process_resources.py"),
+                             "tools/testing/test_process_resources.py",
+                             "tools/testing/test_module_workers.py"),
+    "tools/testing/run_tool_tests.py": POLICY_TESTS + ("tools/testing/test_module_workers.py",),
+    "cmake/package/verify_consumers.py": ("tools/testing/test_sdk_verification_call.py",),
     "tools/dev/timings.py": ("tools/testing/test_dev_timings.py",),
     "tools/dev/projects.py": ("tools/testing/test_dev_projects.py",),
+    "tools/measurement/resources.py": ("tests/contracts/test_build_artifacts.py",
+                                       "tests/contracts/test_measurement_resources.py"),
+    "tools/measurement/elf.py": ("tests/contracts/test_build_artifacts.py",
+                                 "tests/contracts/test_measurement_resources.py",
+                                 "tests/contracts/test_image_artifacts.py"),
     "tools/measurement/compare.py": ("tests/contracts/test_measurement_compare.py",),
     "tools/maintenance/capabilities.py": ("tools/testing/test_maintenance.py",),
     "tests/support/external_provider/provider/nexus-soc.json": (
@@ -156,6 +163,10 @@ def commit_tool_plan(names):
             continue
         files = COMMIT_ALIASES.get(name)
         domain = module_domain(name)
+        if files is None and name.startswith((
+                "components/devices/tmp117/src/", "cmake/package/verification/device_tmp117/",
+                "cmake/package/verification/image_window/")):
+            files = ("tools/testing/test_sdk_device_image_policy.py",)
         if files is None and domain is not None:
             if add((name,)):
                 continue
@@ -196,11 +207,14 @@ def commit_tool_plan(names):
 class TimedResult(unittest.TextTestResult):
     """Retain ten observed case durations in the existing unittest result."""
 
-    def __init__(self, *arguments, **keywords):
+    def __init__(self, *arguments, record_cases=False, **keywords):
         super().__init__(*arguments, **keywords)
         self.slowest_tests = []
+        self.case_ids = [] if record_cases else None
 
     def startTest(self, test):
+        if self.case_ids is not None:
+            self.case_ids.append(test.id())
         super().startTest(test)
         self._started = perf_counter()
 
@@ -220,7 +234,8 @@ def execute(suite, files=None):
     return execute_directory(ROOT / CI_SUITES[suite], suite, files=files)
 
 
-def execute_directory(directory, suite, *, files=None):
+def execute_directory(directory, suite, *, files=None, record_cases=False,
+                      allow_empty_module=False):
     """Use the same admission for documentation's separate locked environment."""
     loader = unittest.TestLoader()
     if files is None:
@@ -234,10 +249,13 @@ def execute_directory(directory, suite, *, files=None):
         tests = unittest.TestSuite(loader.discover(
             str(directory), pattern=Path(name).name) for name in selected)
     expected = tests.countTestCases()
-    if expected == 0:
+    if expected == 0 and not allow_empty_module:
         raise ValueError("Tool suite discovers zero tests")
+    def result_class(*args, **kwargs):
+        return TimedResult(*args, record_cases=record_cases, **kwargs)
+
     result = unittest.TextTestRunner(verbosity=1, failfast=True,
-                                     resultclass=TimedResult).run(tests)
+                                     resultclass=result_class).run(tests)
     record = {"suite": suite, "discovered": expected,
               "executed": result.testsRun, "skipped": len(result.skipped),
               "failures": len(result.failures), "errors": len(result.errors),
@@ -251,6 +269,8 @@ def execute_directory(directory, suite, *, files=None):
     if (not result.wasSuccessful() or result.testsRun != expected
             or result.skipped or result.expectedFailures):
         raise ValueError("Tool suite did not completely pass: " + json.dumps(record))
+    if record_cases:
+        record["case_ids"] = result.case_ids
     return {**record, "status": "passed"}
 
 
@@ -260,10 +280,16 @@ def main(arguments=None):
     parser.add_argument("--report", type=Path, required=True)
     parser.add_argument("--files", nargs="+",
                         help="run complete named modules as commit-tools")
+    parser.add_argument("--jobs", type=int, default=os.getenv("NEXUS_TOOL_JOBS"),
+                        help="maximum isolated module workers within the build budget")
     args = parser.parse_args(arguments)
     args.report.unlink(missing_ok=True)
     try:
-        record = execute(args.suite, files=args.files)
+        if args.jobs is None:
+            record = execute(args.suite, files=args.files)
+        else:
+            from tools.testing.module_workers import run
+            record = run(args.suite, args.files, args.jobs)
         args.report.parent.mkdir(parents=True, exist_ok=True)
         args.report.write_text(json.dumps(record, indent=2) + "\n")
     except (ValueError, OSError) as error:

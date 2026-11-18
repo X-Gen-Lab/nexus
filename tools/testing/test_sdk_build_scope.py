@@ -49,14 +49,11 @@ class SDKBuildScopeTests(unittest.TestCase):
         # not accidentally satisfy imports from the installed developer CLI.
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            names = subprocess.check_output(
-                ["git", "ls-files", "-z"], cwd=ROOT).decode().split("\0")
-            for name in names:
-                source = ROOT / name
-                if name and source.is_file() and self.selected(name):
-                    target = root / name
-                    target.parent.mkdir(parents=True, exist_ok=True)
-                    shutil.copyfile(source, target)
+            entries, _ = SDK.dependency_snapshot(ROOT, development_fixture=True)
+            for name in SDK.owned_source_files(ROOT, entries):
+                target = root / name
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(ROOT / name, target)
             code = """import sys
 sys.path.insert(0, sys.argv[1])
 from tools.dev import device, dependencies

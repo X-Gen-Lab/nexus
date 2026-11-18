@@ -32,7 +32,7 @@ repos:
         require_serial: true
       - id: nexus-workflow-lint
         name: Nexus offline staged GitHub Actions DSL lint
-        entry: python scripts/ci/lint_workflows.py --staged
+        entry: python scripts/ci/lint_workflows.py --staged --when-changed
         language: python
         additional_dependencies: *workflow_python
         stages: [pre-commit]

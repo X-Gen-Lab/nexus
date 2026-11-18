@@ -40,6 +40,10 @@ CPU affinity／Linux cgroup 限额。并行模式平分预算，例如 4 个 job
 属于并发准入估计，不是操作系统施加的内存上限。可用内存无法确定时须选择
 `--parallel-modes 1`。
 
+普通 TDD 门禁在锁内识别已配置的 Native 目录。相同 preset、工具链与缓存复用
+Ninja 图，源码、头和配置文件的变化由原生依赖处理。构建身份变化或第一次运行时
+重新 configure。每次门禁仍重新执行合同并生成本次测试报告。
+
 各预设必须使用互不包含的独立构建目录。`configure`、`build`、`test`、`check`、
 TDD、Native runtime 和矩阵使用相同的 `.nexus-build.lock` 内核锁；组合命令持锁至
 全部阶段和报告发布结束。同目录的其他托管执行立即拒绝，不同目录可以并行。

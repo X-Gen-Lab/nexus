@@ -1009,6 +1009,40 @@ class SDKConsumerParallelTests(unittest.TestCase):
                          retained)
         self.assertEqual(len(commands), len(retained))
 
+    def test_named_consumers_keep_plan_order_and_verify_sdk_after_use(self):
+        status, report = self.execute(("--consumer", "f407 tmp117",
+                                       "--consumer", "native tmp117"))
+        self.assertEqual(status, 0)
+        self.assertEqual(report["scope"], "selected-consumers")
+        self.assertEqual([item["name"] for item in report["consumers"]],
+                         ["native tmp117", "f407 tmp117"])
+        self.assertEqual(len(self.builds()), 2)
+        self.assertIn("--verify", self.commands[0])
+        self.assertIn("--verify", self.commands[-1])
+
+    def test_unknown_consumer_never_starts_external_commands(self):
+        with self.assertRaisesRegex(ValueError, "Unknown SDK consumer"):
+            self.consumer.select_consumers(self.consumer.consumer_plan(), ["absent"])
+        self.assertFalse(self.commands)
+
+    def test_changed_device_chooses_actual_native_and_arm_consumers(self):
+        changed = "components/devices/tmp117/src/tmp117.c"
+        status, report = self.execute(("--changed-path", changed))
+        self.assertEqual(status, 0)
+        self.assertEqual([item["name"] for item in report["consumers"]],
+                         ["native tmp117", "f407 tmp117"])
+        self.assertEqual(report["scope"], "selected-consumers")
+        full, reason = self.consumer.consumers_for_changes(self.consumer.consumer_plan(),
+                                                           [changed, "dependencies/sdk.lock.json"])
+        self.assertEqual(full, self.consumer.consumer_plan())
+        self.assertIn("dependencies/sdk.lock.json", reason)
+
+    def test_device_public_abi_change_expands_to_complete_sdk(self):
+        path = "components/devices/tmp117/include/nexus/components/tmp117.h"
+        full, reason = self.consumer.consumers_for_changes(self.consumer.consumer_plan(), [path])
+        self.assertEqual(full, self.consumer.consumer_plan())
+        self.assertIn(path, reason)
+
     def test_verifier_uses_one_consumer_plan_without_a_copy(self):
         from tools.maintenance import consumer_profiles
         for name in ("BASE_CONSUMERS", "MODERN_CONSUMERS", "SELECTED_CONSUMERS",
@@ -1573,10 +1607,15 @@ finally:
             if mode == 'two-failures' and result.returncode in (42, 43):
                 completed_failures.wait(timeout=5)
             return result
+        # Real processes exercise scheduling, cleanup and image retention.
+        # The separate matrix tests already execute every consumer declaration.
+        entries = self.fixture.consumer.consumer_plan()[:3]
         with mock_patch.object(subprocess, 'run',
                                side_effect=external), \
                 mock_patch.object(maintained_process, 'run',
                                   side_effect=external), \
+                mock_patch.object(self.fixture.consumer, 'consumer_plan',
+                                  return_value=entries), \
                 mock_patch.dict(os.environ, {'NEXUS_BUILD_JOBS': '99',
                     'CMAKE_BUILD_PARALLEL_LEVEL': '99'}), \
                 contextlib.redirect_stderr(io.StringIO()):
@@ -1592,7 +1631,8 @@ finally:
     def assert_complete_execution(self, jobs):
         status, report = self.real_execute(jobs=jobs)
         self.assertEqual(status, 0, report)
-        self.fixture.assert_complete_matrix()
+        self.assertEqual({Path(command[2]).name for command in self.fixture.builds()},
+                         {"native build", "stm32 build", "selected f407 frames build"})
         active, peak = set(), 0
         for event in sorted(self.events(), key=lambda row: row['time_ns']):
             self.assertEqual(event['nexus_jobs'], '1')
@@ -1608,16 +1648,15 @@ finally:
         self.assertEqual(report['status'], 'passed')
         self.assertEqual(report['parallel_jobs'], jobs)
         self.assertEqual(report['consumer_workers'], jobs)
-        self.assertEqual(len(report['consumers']),
-                         len(self.fixture.consumer.consumer_plan()))
+        self.assertEqual(len(report['consumers']), 3)
         self.assertTrue(all(row['status'] == 'passed'
                             for row in report['consumers']))
         self.assertEqual([row['name'] for row in report['selected_images']],
-                         [name for name, _, _ in
-                          self.fixture.consumer.SELECTED_CONSUMERS])
+                         ['f407 frames'])
         keys = [(row['consumer_index'], row['phase_index'])
                 for row in report['commands']]
-        self.assertEqual(keys, sorted(keys))
+        self.assertEqual((keys[0][0], keys[-1][0]), (0, 0))
+        self.assertEqual(keys[1:-1], sorted(keys[1:-1]))
         self.assertEqual(len(keys), len(set(keys)))
         logs = [row['log'] for row in report['commands']]
         self.assertEqual(len(logs), len(set(logs)))

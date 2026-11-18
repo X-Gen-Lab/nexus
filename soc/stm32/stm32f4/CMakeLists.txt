@@ -4,18 +4,22 @@ include("${NEXUS_SOURCE_DIR}/cmake/platform/ControllerModes.cmake")
 set(stm32_package_dir "${CMAKE_CURRENT_LIST_DIR}")
 set(stm32_device "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4")
 nexus_cmsis_core_include(stm32_cmsis)
-if(NOT NEXUS_STM32_DEVICE OR NOT NEXUS_STM32_STARTUP)
+set(NEXUS_STM32_DEVICE "${NEXUS_VENDOR_DEVICE_DEFINE}")
+if(
+    NOT NEXUS_STM32_DEVICE
+    OR NOT NEXUS_VENDOR_DEVICE_HEADER
+    OR NOT NEXUS_VENDOR_DEVICE_STARTUP
+)
     message(
         FATAL_ERROR
         "STM32F4 requires resolved exact device and startup facts"
     )
 endif()
-string(TOLOWER "${NEXUS_STM32_DEVICE}" stm32_device_header)
 foreach(
     required
-    "${stm32_device}/Include/${stm32_device_header}.h"
+    "${stm32_device}/${NEXUS_VENDOR_DEVICE_HEADER}"
     "${stm32_cmsis}/core_cm4.h"
-    "${stm32_device}/Source/Templates/gcc/${NEXUS_STM32_STARTUP}"
+    "${stm32_device}/${NEXUS_VENDOR_DEVICE_STARTUP}"
 )
     if(NOT EXISTS "${required}")
         message(

@@ -95,6 +95,7 @@ class VendorDeviceProfile:
 
     identifier: str
     macro: str
+    header: str
     startup: str
     priority_bits: int
     external_irq_count: int
@@ -172,7 +173,7 @@ def vendor_device_catalog(value):
         bindings = (vendor_irq_bindings(row["irq_bindings"], count)
                     if "irq_bindings" in row else MappingProxyType({}))
         entries[identifier] = VendorDeviceProfile(
-            identifier, macro, startup, bits, count, bindings)
+            identifier, macro, row["header"], row["startup"], bits, count, bindings)
         macros.add(macro)
     if not entries or not isinstance(value["inputs"], Mapping) or not value["inputs"]:
         fail("Vendor device catalog entries and input identities are required")

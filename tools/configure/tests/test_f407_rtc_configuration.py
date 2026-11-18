@@ -85,7 +85,7 @@ class F407RtcConfigurationTests(unittest.TestCase):
         path.write_text(self.text(extra="periodic_wakeup = true\n"))
         output = self.directory / "periodic"
         gate.configure(path, output, test_support=native_fixture(path))
-        self.assertIn("set(NEXUS_RTC_PERIODIC_WAKEUP ON)",
+        self.assertIn("set(NEXUS_FEATURE_RTC_PERIODIC_WAKEUP ON)",
                       (output / "selection.cmake").read_text())
         self.assertTrue(gate.resolve_ir(
             path, test_support=native_fixture(path)).controllers[0].options.periodic_wakeup)

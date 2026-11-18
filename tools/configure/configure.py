@@ -645,7 +645,7 @@ def bind_input_identities(inputs, root, snapshots, input_paths, context=None):
         else:
             label = (path.relative_to(root).as_posix() if path.is_relative_to(root)
                      else "external/" + path.name)
-        contents = snapshots.get(path, path.read_bytes())
+        contents = snapshots[path] if path in snapshots else path.read_bytes()
         expected = hashlib.sha256(contents).hexdigest()
         if (context is not None and context.package is not None and
                 path == context.package.manifest_path and
@@ -990,7 +990,8 @@ def resolve_device_facts(soc, part, provider, *, catalog=None):
     if scope is not None:
         provider = scope(soc)
     validate_soc(soc, part, provider, catalog_device=catalog_device)
-    vendor_device = (VendorDeviceIR(catalog_device.macro, catalog_device.startup)
+    vendor_device = (VendorDeviceIR(catalog_device.macro, catalog_device.header,
+                                   catalog_device.startup)
                      if catalog_device is not None else None)
     profiles = freeze(profiles)
     if profiles:

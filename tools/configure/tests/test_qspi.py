@@ -119,7 +119,7 @@ class QspiAdmission(unittest.TestCase):
                 emission.emit_bundle(result, bundle)
                 self.assertIn("#define NEXUS_QSPI_QUAD_READ 1",
                               (bundle / "nexus_config.h").read_text())
-                self.assertIn("set(NEXUS_QSPI_QUAD_READ ON)",
+                self.assertIn("set(NEXUS_FEATURE_QSPI_QUAD_READ ON)",
                               (bundle / "selection.cmake").read_text())
                 self.assertIn("return &s_nx_flash_readonly_storage;",
                               (bundle / "bindings.c").read_text())
@@ -151,7 +151,7 @@ class QspiAdmission(unittest.TestCase):
             emission.emit_bundle(result, bundle)
             selection = (bundle / "selection.cmake").read_text()
             self.assertIn('set(NEXUS_SELECTED_KINDS "external_bus")', selection)
-            self.assertIn("set(NEXUS_QSPI_CPU_MAP ON)", selection)
+            self.assertIn("set(NEXUS_FEATURE_QSPI_CPU_MAP ON)", selection)
 
     def test_mapping_rejects_bad_slots_dma_and_flash_personalities(self):
         original = configure.ROOT / "tests/contracts/stm32f4_qspi/f479ni-qspi-map.toml"

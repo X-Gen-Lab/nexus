@@ -52,7 +52,7 @@ endif()
 if(stm32_usb_host_hal)
     nexus_stm32f407_usb_hal(nexus_soc_stm32f4 HOST)
 endif()
-if(NEXUS_USB_REMOTE_WAKEUP)
+if(NEXUS_FEATURE_USB_REMOTE_WAKEUP)
     target_compile_definitions(
         nexus_soc_stm32f4
         PRIVATE NEXUS_STM32F4_USB_REMOTE_WAKEUP=1

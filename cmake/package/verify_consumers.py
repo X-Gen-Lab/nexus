@@ -1256,6 +1256,49 @@ class ConsumerCommandError(ValueError):
         super().__init__(f"Consumer command failed; see {output / record['log']}")
 
 
+def consumer_name(kind, specification):
+    """Use the same public name for selection and execution reports."""
+    if kind == "services":
+        return specification.name
+    if kind == "modern":
+        return specification[0] + " " + specification[1]
+    if kind == "selected":
+        return "selected " + specification[0]
+    return specification[0]
+
+
+def select_consumers(plan, names):
+    """Filter the maintained plan in canonical order before touching output."""
+    if not names:
+        return plan
+    wanted = set(names)
+    unknown = wanted - {consumer_name(*item) for item in plan}
+    if unknown:
+        raise ValueError("Unknown SDK consumer: " + ", ".join(sorted(unknown)))
+    return tuple(item for item in plan if consumer_name(*item) in wanted)
+
+
+def consumers_for_changes(plan, paths):
+    """Known fixture owners narrow the SDK plan; shared inputs expand it."""
+    from tools.dev.change_paths import classify
+    classify(paths)
+    names = set()
+    for path in paths:
+        parts = PurePosixPath(path).parts
+        if parts[:3] == ("cmake", "package", "verification") and len(parts) >= 5:
+            scenario = parts[3]
+        elif parts[:4] == ("components", "devices", "tmp117", "src"):
+            scenario = "device_tmp117"
+        else:
+            return plan, "full SDK plan for " + path
+        matched = {spec.name for kind, spec in plan
+                   if kind == "services" and spec.scenario == scenario}
+        if not matched:
+            return plan, "full SDK plan for " + path
+        names.update(matched)
+    return select_consumers(plan, names), "changed SDK consumer inputs"
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--prefix", required=True, type=Path)
@@ -1264,8 +1307,19 @@ def main(argv=None):
                         help="Total concurrent consumer jobs; default inherits "
                              "NEXUS_BUILD_JOBS/CMAKE_BUILD_PARALLEL_LEVEL or 2; "
                              "each child build uses one job")
+    selection = parser.add_mutually_exclusive_group()
+    selection.add_argument("--changed-path", action="append", metavar="PATH",
+                           help="select consumers by changed input; repeat for both rename sides")
+    selection.add_argument("--consumer", action="append", metavar="NAME",
+                        help="select a named consumer; repeat for multiple chains")
     args = parser.parse_args(argv)
     try:
+        full_plan = consumer_plan()
+        if args.changed_path:
+            plan, selection_reason = consumers_for_changes(full_plan, args.changed_path)
+        else:
+            plan = select_consumers(full_plan, args.consumer)
+            selection_reason = "explicit consumer name" if args.consumer else "complete plan"
         args.parallel = process.parallel_jobs(os.environ, requested=args.parallel)
     except ValueError as error:
         parser.error(str(error))
@@ -1275,7 +1329,9 @@ def main(argv=None):
               "prefix": str(prefix), "status": "failed",
               "physical_status": "not_executed", "commands": records,
               "selected_images": [], "service_images": [],
-              "parallel_jobs": args.parallel}
+              "parallel_jobs": args.parallel,
+              "scope": "selected-consumers" if args.consumer or len(plan) < len(full_plan) else "full-consumers",
+              "selection_reason": selection_reason}
     output_prepared = False
     cancel = threading.Event()
     failure_lock = threading.Lock()
@@ -1341,9 +1397,10 @@ def main(argv=None):
             "owned SDK consumer verification\n")
         output_prepared = True
         sdk = prefix / "share/nexus/src"
-        command_runner(0, records)([
-            sys.executable, "-B", str(sdk / "cmake/package/package_source_sdk.py"),
-            "--verify", str(sdk)])
+        verify_sdk = [sys.executable, "-B",
+                      str(sdk / "cmake/package/package_source_sdk.py"),
+                      "--verify", str(sdk)]
+        command_runner(0, records)(verify_sdk)
         identity = json.loads((sdk / ".nexus-source-sdk.json").read_text())
         if identity["publishable"] is not True or identity["source_dirty"]:
             raise ValueError(
@@ -1351,8 +1408,6 @@ def main(argv=None):
                 "source SDK")
         report["source_revision"] = identity["source_revision"]
         report["source_tree"] = identity["source_tree"]
-        # The maintained transport tuples remain the sole plan authority.
-        plan = consumer_plan()
         results = [None] * len(plan)
         local_records = [[] for _ in plan]
         workers = min(args.parallel, len(plan))
@@ -1360,10 +1415,7 @@ def main(argv=None):
 
         def work(position):
             kind, specification = plan[position]
-            name = (specification.name if kind == "services" else
-                    specification[0] + " " + specification[1]
-                    if kind == "modern" else
-                    ("selected " if kind == "selected" else "") + specification[0])
+            name = consumer_name(kind, specification)
             outcome = {"consumer_index": position + 1, "name": name,
                        "status": "cancelled"}
             try:
@@ -1456,6 +1508,7 @@ def main(argv=None):
         if len(results) != len(plan) or any(
                 item is None or item["status"] != "passed" for item in results):
             raise ValueError("Consumer plan was not completely joined and verified")
+        command_runner(0, records)(verify_sdk)
         report["status"] = "passed"
     except Exception as error:
         if not failures:

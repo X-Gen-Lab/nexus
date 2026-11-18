@@ -7,7 +7,7 @@ source_language: zh_CN
 
 # 构建系统架构审查与重构方案
 
-本方案供应用开发者、SoC 接入者和构建维护者审查。审查基线是 Nexus 提交 `5e0b512c`。建议保留 CMake 3.31、Ninja、静态实例和现有应用入口，依次改进配置数据交接、增量失效和新 MCU 接入。下文的 BR1–BR7 是待实施工作，B01–B11 已规定验证流程和时间目标。[现行构建合同与验证计划](build-system.md#verification-plan-for-additional-mcu-families)
+本方案供应用开发者、SoC 接入者和构建维护者审查。审查基线是 Nexus 提交 `5e0b512c`。建议保留 CMake 3.31、Ninja、静态实例和现有应用入口，依次改进配置数据交接、增量失效和新 MCU 接入。下文的 BR1–BR7 给出实施范围与验收条件，B01–B11 规定验证流程和时间目标。[现行构建合同与验证计划](build-system.md#verification-plan-for-additional-mcu-families)
 
 ## 从应用配置到可烧录镜像
 

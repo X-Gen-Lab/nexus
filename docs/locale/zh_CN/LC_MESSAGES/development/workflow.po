@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: b0e66fac6aac492484f795029eb2187fdf209e3c26b906db38e737ed94b819a0\n"
+"X-Nexus-Source-SHA256: de658e41b3f7d5ca1ca1bb53e262100f3dd2c86ddc1503243d55914c6bea5a14\n"
 
 #: ../../../docs/development/workflow.md:9
 msgid "Develop with TDD and normal commit gates"
@@ -268,3 +268,6 @@ msgstr "合并或交付前，独立执行完整工具域、相关 ARM 链接和 
 
 msgid "The commit gate configures and builds once for unchanged staged inputs, then runs all Native GoogleTest cases and complete affected tool modules. Known firmware implementation changes need no auxiliary domain. Headers and declarative facts select configuration contracts and the single global support check. Changed test modules run in full; known tool implementations use maintained module mappings. Unknown paths or missing known coverage retain full domains. Commit reports state `commit-tools` and `qualification=false`; they do not claim full-domain acceptance or filter cases inside selected modules."
 msgstr "提交门禁针对未改变的暂存输入仅配置、构建一次，然后执行全部 Native GoogleTest 用例和受影响的完整工具测试模块。已知的固件实现改动无需辅助工具域。公共头和声明事实选择配置合同与一次全局支持检查。已修改的测试模块完整运行；已知工具实现使用维护的模块映射。未知路径或缺少已知覆盖时保留完整域。提交报告标记 `commit-tools` 和 `qualification=false`，不声称完整域验收通过，也不筛选已选模块内的用例。"
+
+msgid "The commit gate writes its selected hardware assemblies and expansion reasons to `build/native-debug/tdd/arm-selection.json` for the default preset. It builds the ordinary firmware target and records checked ELF identities in `execution.json`. A private C edit can reuse a verified compiler dependency record. Missing information expands the hardware check. The examples build entry and the Native gate reuse a warm Ninja tree with matching configuration inputs. Set `NEXUS_TOOL_JOBS` within `NEXUS_BUILD_JOBS` to run independent tool modules concurrently."
+msgstr "默认 preset 的提交门禁将选中的硬件装配和扩大范围的原因写入 `build/native-debug/tdd/arm-selection.json`，构建常规固件目标，并在 `execution.json` 中记录已校验 ELF 的身份。修改私有 C 源码时可以复用经过验证的编译依赖记录。缺少信息时扩大硬件检查范围。示例构建入口与 Native 门禁在配置输入匹配时复用已预热的 Ninja 目录。设置不超过 `NEXUS_BUILD_JOBS` 的 `NEXUS_TOOL_JOBS` 可以并发运行独立工具模块。"

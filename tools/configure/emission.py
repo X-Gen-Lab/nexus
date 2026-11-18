@@ -25,8 +25,17 @@ def resolved_projection(result):
         schema_version=RESOLVED_SCHEMA_VERSION,
         board_bindings=bindings,
         routes={name: result.routes[name] for name in sorted(routes)})
+    context = result.provider_context
+    policy = context.binding_policy if context else None
+    if result.cpu_profile.arch.startswith("cortex-m") and policy and policy.irq_facts:
+        claimed = {claim.key[4:] for claim in result.claims
+                   if claim.key.startswith("irq:")}
+        # Core exceptions belong to Arch/OS. The device catalog numbers
+        # external interrupts relative to the end of the core vector table.
+        projection["cortex_m_irq_vectors"] = {
+            binding.handler: binding.number
+            for name, binding in policy.irq_facts.items() if name in claimed}
     if result.fact_references is not None:
-        context = result.provider_context
         path = context.package.fact("references")
         label = path.relative_to(context.directory).as_posix()
         if context.external:
@@ -34,6 +43,17 @@ def resolved_projection(result):
         source = next(item for item in result.inputs if item["path"] == label)
         projection["fact_references"] = {"source": source}
     return thaw(projection)
+
+
+def controller_selection(controllers):
+    """Serialize the three validated identifiers used by CMake to select IP."""
+    rows = []
+    for item in controllers:
+        fields = (item.kind, item.controller, item.mode)
+        if not all(re.fullmatch(r"[A-Za-z0-9_.-]+", token) for token in fields):
+            raise ValueError(f"Invalid controller selection identifiers: {fields!r}")
+        rows.append("/".join(fields))
+    return ";".join(dict.fromkeys(rows))
 
 
 def emit_bundle(result, output):
@@ -74,7 +94,8 @@ def emit_bundle(result, output):
                    "#define NX_IO_CYCLE_PROBES 1", "#endif"]
     if result.clock["source"] == "hse":
         header.insert(7, f'#define NEXUS_HSE_HZ {result.clock["input_hz"]}u')
-    header.extend(for_selection(result).configuration_header(result))
+    provider = for_selection(result)
+    header.extend(provider.configuration_header(result))
     context = result.provider_context
     selected = (context.descriptor if context is not None else
                 descriptor.maintained(result.soc_family))
@@ -95,12 +116,15 @@ def emit_bundle(result, output):
              *memory_regions.selection_lines(result),
              f'set(NEXUS_CONFIG_SHA256 "{result.configuration_sha256}")',
              f'set(NEXUS_OPTIMIZATION "{result.optimization}")',
+             f'set(NEXUS_SELECTED_CONTROLLERS "{controller_selection(result.controllers)}")',
              'set(NEXUS_SELECTED_KINDS "' + ';'.join(sorted(
                  {item.kind for item in result.controllers} |
                  {item.driver.removesuffix("-endpoint") for item in result.devices
                   if item.kind == "external_bus" and
                   item.driver != "mapped_storage-endpoint"})) + '")',
              'set(NEXUS_SELECTED_COMPONENTS "' + ';'.join(result.components) + '")']
+    if context is None or not context.external or provider.MODEL:
+        cmake.append("set(NEXUS_DISCOVER_SOC_PACKAGES ON)")
     package = context.package if context is not None else None
     if package is not None:
         cmake += [
@@ -118,11 +142,12 @@ def emit_bundle(result, output):
                   f'set(NEXUS_SOC_TARGET "{target}")']
     device = result.physical_part.device
     if device is not None:
-        cmake += [f'set(NEXUS_STM32_DEVICE "{device.macro}")',
-                  f'set(NEXUS_STM32_STARTUP "{device.startup}")']
+        cmake += [f'set(NEXUS_VENDOR_DEVICE_DEFINE "{device.macro}")',
+                  f'set(NEXUS_VENDOR_DEVICE_HEADER "{device.header}")',
+                  f'set(NEXUS_VENDOR_DEVICE_STARTUP "{device.startup}")']
     # Canonical source directories also serve selected host models. These
     # paths carry no translation-unit graph or additional support decisions.
-    sources = descriptor.families() if for_selection(result).MODEL else (selected,)
+    sources = descriptor.families() if provider.MODEL else (selected,)
     if selected.family not in {item.family for item in sources}:
         sources += (selected,)
     cmake += [f'set(NEXUS_SOC_SOURCE_{item.family} "${{NEXUS_SOURCE_DIR}}/' +
@@ -131,35 +156,12 @@ def emit_bundle(result, output):
         'NEXUS_SOC_SOURCE_' + item.family for item in sources) + '")']
     cmake.append('set(NEXUS_RUNTIME_POWER "' + ("ON" if result.runtime_power is not None else "OFF") + '")')
     cmake.append("set(NEXUS_IO_CYCLE_PROBES " + ("ON" if probes else "OFF") + ")")
-    remote_wakeup = any(item.kind == "usb_device" and
-                        item.options.remote_wakeup for item in result.controllers)
-    cmake.append("set(NEXUS_USB_REMOTE_WAKEUP " +
-                 ("ON" if remote_wakeup else "OFF") + ")")
-    periodic_wakeup = any(item.kind == "rtc" and
-                          getattr(item.options, "periodic_wakeup", False)
-                          for item in result.controllers)
-    cmake.append("set(NEXUS_RTC_PERIODIC_WAKEUP " +
-                 ("ON" if periodic_wakeup else "OFF") + ")")
-    graphics_memory = any(item.driver == "memory_window-endpoint" and
-                          item.options.mode == "graphics-owned"
-                          for item in result.devices)
-    cmake.append("set(NEXUS_SDRAM_GRAPHICS " +
-                 ("ON" if graphics_memory else "OFF") + ")")
-    qspi_dma = any(item.kind == "external_bus" and
-                   item.mode == "qspi-indirect-dma"
-                   for item in result.controllers)
-    header.append(f"#define NEXUS_QSPI_PROGRAM_DMA {int(qspi_dma)}")
-    qspi_map = any(item.driver == "mapped_storage-endpoint"
-                   for item in result.devices)
-    header.append(f"#define NEXUS_QSPI_CPU_MAP {int(qspi_map)}")
-    cmake.append("set(NEXUS_QSPI_CPU_MAP " +
-                 ("ON" if qspi_map else "OFF") + ")")
-    qspi_quad = any(item.driver in {"flash_async-endpoint", "mapped_storage-endpoint"} and
-                    item.options.mode in {"nor-indirect-quad-read", "nor-mapped-cpu"}
-                    for item in result.devices)
-    header.append(f"#define NEXUS_QSPI_QUAD_READ {int(qspi_quad)}")
-    cmake.append("set(NEXUS_QSPI_QUAD_READ " +
-                 ("ON" if qspi_quad else "OFF") + ")")
+    features = getattr(provider, "build_features", None)
+    if features is not None:
+        for name, enabled, macro in features(result):
+            cmake.append(f"set(NEXUS_FEATURE_{name.upper()} {'ON' if enabled else 'OFF'})")
+            if macro is not None:
+                header.append(f"#define {macro} {int(enabled)}")
     for selection in result.controllers:
         prefix = "NEXUS_" + selection.id.replace("-", "_").upper()
         header.append(f"#define {prefix}_SELECTED 1")

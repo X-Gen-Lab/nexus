@@ -85,7 +85,7 @@ class GraphicsSdramConfigurationTests(unittest.TestCase):
         output = self.directory / "bundle"
         output.mkdir()
         emission.emit_bundle(result, output)
-        self.assertIn("set(NEXUS_SDRAM_GRAPHICS ON)",
+        self.assertIn("set(NEXUS_FEATURE_SDRAM_GRAPHICS ON)",
                       (output / "selection.cmake").read_text())
 
     def test_grant_is_local_to_the_explicit_engine_and_optional_by_default(self):
@@ -105,7 +105,7 @@ class GraphicsSdramConfigurationTests(unittest.TestCase):
         output = self.directory / "default"
         output.mkdir()
         emission.emit_bundle(default, output)
-        self.assertIn("set(NEXUS_SDRAM_GRAPHICS OFF)",
+        self.assertIn("set(NEXUS_FEATURE_SDRAM_GRAPHICS OFF)",
                       (output / "selection.cmake").read_text())
 
     def test_cpu_window_unknown_endpoint_and_unconsumed_mode_are_rejected(self):

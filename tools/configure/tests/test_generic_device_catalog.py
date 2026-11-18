@@ -36,7 +36,7 @@ class GenericDeviceCatalogTests(unittest.TestCase):
     def test_non_st_identifiers_and_explicit_paths_do_not_inherit_f4_naming(self):
         selected = vendor_device_catalog(catalog())["chip-alpha"]
         self.assertEqual(selected.macro, "ACME_CHIP_A")
-        self.assertEqual(selected.startup, "reset_entry.S")
+        self.assertEqual(selected.startup, "boot/reset_entry.S")
         self.assertEqual(selected.irq_bindings["IRQ_FIRST"].handler, "enter_serial")
         value = configure.catalog_soc_facts(soc(), "SAMPLE_A100", catalog())
         self.assertEqual(value.device.identifier, "chip-alpha")

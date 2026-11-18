@@ -218,6 +218,20 @@ def measure_data(elf: Elf32, resolved: dict, budget: dict) -> tuple[dict, list]:
         if (vector["size"] > image["vector_alignment"] or
                 elf.symbol(image["vector_symbol"]) != vector["address"]):
             raise EvidenceError("startup vector table differs from reviewed image")
+    if "cortex_m_irq_vectors" in resolved:
+        count = resolved["irq"]["external_count"]
+        if type(count) is not int or count < 0 or vector["size"] != 4 * (16 + count):
+            raise EvidenceError("linked startup vector count differs from the selected device")
+        bindings = resolved["cortex_m_irq_vectors"]
+        if not isinstance(bindings, dict):
+            raise EvidenceError("invalid selected startup IRQ bindings")
+        for handler, number in bindings.items():
+            if type(number) is not int or not 0 <= number < count:
+                raise EvidenceError("selected startup IRQ slot outside the device table")
+            offset = vector["offset"] + 4 * (16 + number)
+            word, = struct.unpack_from("<I", elf.data, offset)
+            if word != elf.symbols.get(handler):
+                raise EvidenceError(f"linked startup IRQ slot {number} differs from {handler}")
     stack, reset = struct.unpack_from("<II", elf.data, vector["offset"])
     if stack != elf.symbol("__nx_msp_end") or reset != elf.entry or reset != elf.symbol("Reset_Handler"):
         raise EvidenceError("physical reset vector differs from linked startup/MSP")

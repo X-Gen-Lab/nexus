@@ -7,6 +7,7 @@
 #define NEXUS_STM32F4_ADC_PINS_H
 #include "drivers/adc/instance.h"
 #include "drivers/gpio/pins.h"
+#include "nexus_config.h"
 
 /** \brief One DS8626 external analog input, without acquiring a resource. */
 typedef struct {

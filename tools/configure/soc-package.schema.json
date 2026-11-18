@@ -205,6 +205,25 @@
               "pattern": "(^|/)(\\.|\\.\\.)(/|$)"
             }
           }
+        },
+        "verification_files": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "allOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^(?!/)(?!.*[\\\\;\"$\\r\\n])[^/]+(?:/[^/]+)*$",
+                "not": {
+                  "pattern": "(^|/)(\\.|\\.\\.)(/|$)"
+                }
+              },
+              {
+                "pattern": "^tests/contracts/"
+              }
+            ]
+          }
         }
       }
     },

@@ -28,6 +28,9 @@ class GateFixture(unittest.TestCase):
         (self.build / "google-contracts.json").write_text(json.dumps({
             "schema": 1, "executables": [str(self.binary)]
         }))
+        # This fixture exercises orchestration with external commands replaced.
+        self.enterContext(patch.object(tdd_gate, "affected_arm_links",
+                                       return_value={"assemblies": [], "links": []}))
         self.events = []
 
     def execute(self, command, _environment, log):

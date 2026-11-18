@@ -2,6 +2,27 @@
 include("${CMAKE_CURRENT_LIST_DIR}/TargetPolicy.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/Configure.cmake")
 
+# The selected platform publishes these properties across consumer directories.
+function(_nexus_firmware_properties required optional)
+    set(${required}
+        NEXUS_SOURCE_DIR
+        NEXUS_CONFIG_DIR
+        NEXUS_SOC_FAMILY
+        NEXUS_CPU_ARCH
+        NEXUS_BACKEND
+        PARENT_SCOPE
+    )
+    set(${optional}
+        NEXUS_COMPONENT_TARGETS
+        NEXUS_STARTUP_SOURCE
+        NEXUS_SYSTEM_SOURCE
+        NEXUS_SYSTEM_PRIVATE_INCLUDES
+        NEXUS_SYSTEM_VENDOR_INCLUDES
+        NEXUS_SYSTEM_COMPILE_DEFINITIONS
+        PARENT_SCOPE
+    )
+endfunction()
+
 function(nexus_add_firmware target)
     foreach(keyword SOURCES LIBRARIES)
         set(keyword_count 0)
@@ -40,34 +61,10 @@ function(nexus_add_firmware target)
         message(FATAL_ERROR "Firmware target ${target} already exists")
     endif()
     nexus_require_build_generator()
-    foreach(
-        property
-        NEXUS_SOURCE_DIR
-        NEXUS_CONFIG_DIR
-        NEXUS_SOC_FAMILY
-        NEXUS_CPU_ARCH
-        NEXUS_BACKEND
-        NEXUS_COMPONENT_TARGETS
-        NEXUS_STARTUP_SOURCE
-        NEXUS_SYSTEM_SOURCE
-        NEXUS_SYSTEM_PRIVATE_INCLUDES
-        NEXUS_SYSTEM_VENDOR_INCLUDES
-        NEXUS_SYSTEM_COMPILE_DEFINITIONS
-    )
-        get_target_property(${property} Nexus::Platform ${property})
-        if("${${property}}" MATCHES "-NOTFOUND$")
-            set(${property} "")
-        endif()
-    endforeach()
-    foreach(
-        property
-        NEXUS_SOURCE_DIR
-        NEXUS_CONFIG_DIR
-        NEXUS_SOC_FAMILY
-        NEXUS_CPU_ARCH
-        NEXUS_BACKEND
-    )
-        if(NOT ${property})
+    _nexus_firmware_properties(required optional)
+    foreach(property IN LISTS required optional)
+        get_property(${property} TARGET Nexus::Platform PROPERTY ${property})
+        if(property IN_LIST required AND NOT ${property})
             message(FATAL_ERROR "Nexus::Platform is missing ${property}")
         endif()
     endforeach()
@@ -135,9 +132,8 @@ function(nexus_add_firmware target)
                 "-Wl,-Map,${map}"
                 "-Wl,--fatal-warnings"
         )
-        # A direct --target firmware must enforce its budget as well. Declaring
-        # byproducts makes Ninja restore removed artifacts, while LINK_DEPENDS
-        # rechecks modified inputs and checker code through that same rule.
+        # The checker reconstructs the selection with the same Python modules
+        # as the resolver. Changes to these inputs need a fresh measurement.
         set(checker_catalog "${NEXUS_CONFIG_DIR}/configuration_code_paths.json")
         _nexus_read_configuration_catalog("${checker_catalog}" checker_modules checker_labels)
         # A consumer may select a relocated checker tree for artifact contracts.
@@ -151,21 +147,51 @@ function(nexus_add_firmware target)
             endif()
         endforeach()
         list(REMOVE_DUPLICATES checker_modules)
+        set(stamp
+            "${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${target}.budget-inputs"
+        )
+        set(checker "${NEXUS_SOURCE_DIR}/tools/measurement/resources.py")
+        set(image "$<TARGET_FILE_DIR:${target}>/$<TARGET_FILE_NAME:${target}>")
+        set(recheck "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/RecheckFirmware.cmake")
+        set(check_arguments
+            -B
+            "${checker}"
+            --elf
+            "${image}"
+            --resolved
+            "${NEXUS_CONFIG_DIR}/resolved.json"
+            --require-cpu
+            --budget
+            "${NEXUS_CONFIG_DIR}/resource-budget.json"
+            --report
+            "${resources}"
+        )
+        add_custom_command(
+            OUTPUT "${stamp}"
+            COMMAND
+                "${CMAKE_COMMAND}" "-Dstamp=${stamp}" "-Dimage=${image}"
+                "-Dcommand=${Python3_EXECUTABLE};${check_arguments}" -P
+                "${recheck}"
+            DEPENDS
+                "${recheck}"
+                "${checker}"
+                "${NEXUS_CONFIG_DIR}/resolved.json"
+                "${NEXUS_CONFIG_DIR}/input_paths.json"
+                "${NEXUS_CONFIG_DIR}/resource-budget.json"
+                "${NEXUS_SOURCE_DIR}/tools/measurement/elf.py"
+                "${NEXUS_SOURCE_DIR}/tools/evidence/common.py"
+                "${NEXUS_SOURCE_DIR}/tools/evidence/identity.py"
+                "${checker_catalog}"
+                ${checker_modules}
+            COMMENT "Checking firmware budget inputs for ${target}"
+            VERBATIM
+        )
+        add_custom_target(${target}_nexus_budget_inputs DEPENDS "${stamp}")
+        add_dependencies(${target} ${target}_nexus_budget_inputs)
         set_property(
             TARGET ${target}
             APPEND
-            PROPERTY
-                LINK_DEPENDS
-                    "${NEXUS_CONFIG_DIR}/memory.ld"
-                    "${NEXUS_CONFIG_DIR}/resolved.json"
-                    "${NEXUS_CONFIG_DIR}/input_paths.json"
-                    "${NEXUS_CONFIG_DIR}/resource-budget.json"
-                    "${NEXUS_SOURCE_DIR}/tools/measurement/resources.py"
-                    "${NEXUS_SOURCE_DIR}/tools/measurement/elf.py"
-                    "${NEXUS_SOURCE_DIR}/tools/evidence/common.py"
-                    "${NEXUS_SOURCE_DIR}/tools/evidence/identity.py"
-                    "${checker_catalog}"
-                    ${checker_modules}
+            PROPERTY LINK_DEPENDS "${NEXUS_CONFIG_DIR}/memory.ld" "${stamp}"
         )
         add_custom_command(
             TARGET ${target}
@@ -174,13 +200,7 @@ function(nexus_add_firmware target)
             COMMAND
                 "${CMAKE_OBJCOPY}" -O binary "$<TARGET_FILE:${target}>"
                 "${binary}"
-            COMMAND
-                "${Python3_EXECUTABLE}" -B
-                "${NEXUS_SOURCE_DIR}/tools/measurement/resources.py" --elf
-                "$<TARGET_FILE:${target}>" --resolved
-                "${NEXUS_CONFIG_DIR}/resolved.json" --require-cpu --budget
-                "${NEXUS_CONFIG_DIR}/resource-budget.json" --report
-                "${resources}"
+            COMMAND "${Python3_EXECUTABLE}" ${check_arguments}
             VERBATIM
         )
     endif()

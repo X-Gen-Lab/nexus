@@ -59,6 +59,10 @@ class SDKRequiredAdmissionTests(unittest.TestCase):
         # Selection metadata is real payload: the installed verifier must not
         # discover packages from its importing maintainer checkout.
         selection = self.sdk.resolve_selection(ROOT, self.identity["profile"])
+        # Selected device files have published hashes checked before ordinary
+        # payload reads. The manifest can carry those identities without
+        # materializing vendor bytes in this early rejection fixture.
+        self.files.update(selection.device_inputs)
         for package in selection.packages:
             for source in package.inputs:
                 name = source.relative_to(ROOT).as_posix()
@@ -96,6 +100,15 @@ class SDKRequiredAdmissionTests(unittest.TestCase):
                                     "file identity changed: ordinary.c"):
             self.sdk.verify(self.root)
 
+
+    def test_complete_required_map_still_checks_vendor_catalog_identities(self):
+        self.complete_required_map()
+        startup = "vendors/st/cmsis_device_f4/Source/Templates/gcc/startup_stm32f446xx.s"
+        self.files[startup] = self.sdk.digest(b"unexpected device startup")
+        self.write_manifest()
+        with self.assertRaisesRegex(self.sdk.SDKError,
+                                    "differs from its lock: .*startup_stm32f446xx"):
+            self.sdk.verify(self.root)
 
     def test_qiming_device_omissions_reject_before_payload_reads(self):
         paths = (
