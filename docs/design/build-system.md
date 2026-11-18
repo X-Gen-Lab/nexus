@@ -148,11 +148,12 @@ records and the final-source software gates in the
 [result index](https://github.com/X-Gen-Lab/nexus/blob/83a27dfbee4e8fbf4d35875b1e9db85af7516eec/docs/delivery/build-system-results.json). Historical measurements
 retain their source and exact selections instead of inheriting a later HEAD.
 
-Automatic developer provenance binds a unique immutable command-attempt receipt
-and checks its command and working directory. Current contract tests verify
-that association. Candidate-plan executions below are historical records; their
-retired orchestration is not a current acceptance mechanism. A shared latest
-report name cannot substitute for an exact attempt.
+Ordinary configure/build commands keep process logs and actual exits without
+creating a complete provenance archive. Explicit `--record-provenance` binds an image to
+its command-attempt receipt, source and configuration for device operations.
+Device admission still verifies that identity. Candidate-plan executions below
+are historical records; their retired orchestration is not a current acceptance
+mechanism. A shared latest report name cannot substitute for an exact attempt.
 
 BLD-18 retains full SDK byte checks at each consumption boundary after
 measurement, with no parent marker or persistent verification bypass. BLD-31

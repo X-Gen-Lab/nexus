@@ -127,6 +127,8 @@ class ProjectCreationTests(unittest.TestCase):
             f'"soc_family": {family!r}, "backend": "native", '
             f'"cpu": {{"arch": {(arch or ("native" if family == "native" else "cortex-m4"))!r}}}}}))\n'
             + mutation)
+        for name in (".editorconfig", ".clang-format", ".gersemirc"):
+            shutil.copyfile(ROOT / name, source / name)
         toolchain = source / "cmake/toolchains/arm-gcc.cmake"
         toolchain.parent.mkdir(parents=True)
         toolchain.write_text("# Independent test toolchain selection only.\n")
@@ -152,6 +154,27 @@ class ProjectCreationTests(unittest.TestCase):
         self.assertEqual(result["validation"]["argv"][1:3], ["-I", "-B"])
         self.assertTrue(result["validation"]["interpreter"]["sha256"])
         self.assertFalse(result["qualification"])
+
+    def test_created_project_inherits_selected_platform_style_and_hashes(self):
+        from tools.dev import projects
+        source = self.selected_source()
+        (source / ".editorconfig").write_text("root = true\n[*]\nindent_size = 4\n")
+        result = projects.create(self.repo, self.revision, "native", self.output,
+                                 source_root=source, test_support=True)
+        for name in (".editorconfig", ".clang-format", ".gersemirc"):
+            self.assertEqual((self.output / name).read_bytes(),
+                             (source / name).read_bytes())
+            self.assertEqual(result["files"][name], hashlib.sha256(
+                (source / name).read_bytes()).hexdigest())
+
+    def test_selected_style_change_during_resolution_rolls_back(self):
+        from tools.dev import projects
+        source = self.selected_source(mutation=(
+            '(root / ".editorconfig").write_text("changed\\n")\n'))
+        with self.assertRaisesRegex(ValueError, "changed"):
+            projects.create(self.repo, self.revision, "native", self.output,
+                            source_root=source, test_support=True)
+        self.assertFalse(self.output.exists())
 
     def test_selected_mcu_source_uses_its_toolchain_without_native_run(self):
         from tools.dev import projects

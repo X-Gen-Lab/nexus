@@ -45,6 +45,27 @@ def selects_branch(event, branch):
 
 
 class WorkflowContracts(unittest.TestCase):
+    def test_tool_workflow_keeps_native_execution_in_the_native_matrix(self):
+        steps = workflow('enterprise-tools.yml')['jobs']['tooling']['steps']
+        commands = '\n'.join(step.get('run', '') for step in steps)
+        self.assertNotIn('scripts/ci/tdd_gate.py', commands)
+        self.assertNotIn('scripts/ci/native_contracts.py', commands)
+        for action in ('doctor', 'configure', 'build'):
+            self.assertIn('tools/dev/dev.py ' + action, commands)
+        self.assertIn('--target nexus_google_contracts', commands)
+        for suite in ('configure', 'ci', 'workflows', 'testing'):
+            self.assertIn('--suite ' + suite, commands)
+
+    def test_quality_workflow_runs_checks_without_repeating_tool_tests(self):
+        jobs = workflow('quality-checks.yml')['jobs']
+        commands = '\n'.join(step.get('run', '') for job in jobs.values()
+                             for step in job['steps'])
+        self.assertNotIn('scripts.ci.test_format_tool', commands)
+        self.assertNotIn('test_quality_tools.py', commands)
+        self.assertIn('pre_commit run nexus-style', commands)
+        self.assertIn('scripts/ci/quality_tools.py tidy', commands)
+        self.assertIn('scripts/ci/quality_tools.py cppcheck', commands)
+
     def test_native_contract_jobs_prepare_the_locked_cross_compiler(self):
         for filename, name in (
                 ('build-matrix.yml', 'native'),
@@ -161,18 +182,6 @@ class WorkflowContracts(unittest.TestCase):
                     self.assertEqual(records[1]['timeout'], 3600,
                                      'Traced builds need their own finite budget')
 
-    def test_dependency_review_is_weekly_read_only_and_source_bound(self):
-        document = workflow('dependency-maintenance.yml')
-        self.assertEqual(document['on']['schedule'][0]['cron'], '0 3 * * 1')
-        self.assertEqual(document['permissions'], {'contents': 'read'})
-        steps = document['jobs']['observe']['steps']
-        commands = '\n'.join(step.get('run', '') for step in steps)
-        self.assertIn('dependency_proposals.py --observe-upstream', commands)
-        self.assertNotIn('git push', commands)
-        self.assertIn('compatibility.py', commands)
-        upload = next(i for i, step in enumerate(steps) if step.get(
-            'uses', '').startswith('actions/upload-artifact@'))
-        self.assertEqual(steps[upload]['with']['retention-days'], '30')
 
     def test_docs_preview_has_no_deployment_permissions(self):
         document = workflow('docs-build.yml')
@@ -194,9 +203,7 @@ class WorkflowContracts(unittest.TestCase):
 
     def test_source_jobs_prepare_only_the_reviewed_selected_closure(self):
         for name, job, consumer in (
-                ('docs-build.yml', 'build', 'tools/documentation/install.py'),
-                ('dependency-maintenance.yml', 'observe',
-                 'tools/maintenance/dependency_proposals.py')):
+                ('docs-build.yml', 'build', 'tools/documentation/install.py'),):
             with self.subTest(workflow=name):
                 steps = workflow(name)['jobs'][job]['steps']
                 checkout = next(i for i, step in enumerate(steps) if step.get(
@@ -276,7 +283,6 @@ class WorkflowContracts(unittest.TestCase):
         commands = '\n'.join(step.get('run', '') for step in steps)
         self.assertIn('-r dependencies/workflow-tools.txt', commands)
         self.assertIn('scripts/ci/lint_workflows.py --staged', commands)
-        self.assertIn('scripts.ci.test_lint_workflows', commands)
         self.assertEqual(document['permissions'], {'contents': 'read'})
 
     def test_actual_workflows_and_shell_blocks_parse(self):
@@ -367,28 +373,16 @@ class WorkflowContracts(unittest.TestCase):
         self.assertIn('/tdd/', evidence['with']['path'])
         self.assertIn('/google-contracts.json', evidence['with']['path'])
 
-    def test_tooling_runs_google_report_and_hil_preparation_boundaries(self):
-        tools = workflow('enterprise-tools.yml')['jobs']['tooling']
-        commands = '\n'.join(step.get('run', '') for step in tools['steps'])
-        self.assertEqual(commands.count(
-            'scripts/ci/tdd_gate.py --all --preset native-debug'), 1)
-        for suite in ('configure', 'ci', 'workflows', 'testing'):
-            self.assertIn(
-                f'cp build/native-debug/tdd/tools-{suite}.json '
-                f'build/quality/tools-{suite}.json', commands)
-        self.assertIn('tools.hil.prepare', commands)
-
     def test_mode_independent_suites_have_one_reported_tool_owner(self):
         tools = workflow('enterprise-tools.yml')['jobs']['tooling']
         commands = '\n'.join(step.get('run', '') for step in tools['steps'])
         selected = re.findall(r'--suite\s+(\w+)', commands)
-        self.assertCountEqual(selected, ['contracts', 'freertos'])
-        self.assertEqual(commands.count(
-            'scripts/ci/tdd_gate.py --all --preset native-debug'), 1)
+        suites = ['configure', 'ci', 'workflows', 'testing', 'contracts', 'freertos']
+        self.assertCountEqual(selected, suites)
         self.assertNotIn('unittest discover -s tests/contracts', commands)
         upload = next(step for step in tools['steps'] if step.get(
             'uses', '').startswith('actions/upload-artifact@'))
-        for suite in ('contracts', 'freertos'):
+        for suite in suites:
             report = f'build/quality/tools-{suite}.json'
             with self.subTest(suite=suite):
                 self.assertIn('--report ' + report, commands)

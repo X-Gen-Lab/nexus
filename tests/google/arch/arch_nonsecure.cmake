@@ -1,5 +1,12 @@
 # Execute actual permission-admission code at the external CMSE boundary.
-foreach(profile native single nonsecure secure secure-no-sau)
+foreach(
+    profile
+    native
+    single
+    nonsecure
+    secure
+    secure-no-sau
+)
     set(security_state 0)
     set(sau 0)
     set(cmse 0)
@@ -20,10 +27,18 @@ foreach(profile native single nonsecure secure secure-no-sau)
         "${nexus_google_root}/arch/arch_nonsecure_probe.c"
         "${NEXUS_SOURCE_DIR}/arch/arm/cortex_m/nx_arch_nonsecure.c"
         INCLUDES "${NEXUS_SOURCE_DIR}/arch/include"
-            "${nexus_google_root}/arch")
-    target_compile_definitions(${name} PRIVATE NEXUS_ARCH_MECHANISM_MODEL
-        NEXUS_ARCH_DCACHE_LINE_BYTES=0 NEXUS_ARCH_ICACHE_LINE_BYTES=0
-        NEXUS_ARCH_MPU_VERSION=0 NEXUS_ARCH_SECURITY_STATE=${security_state}
-        NEXUS_ARCH_HAS_SAU=${sau} NEXUS_ARCH_HAS_DWT_CYCCNT=0
-        __ARM_FEATURE_CMSE=${cmse})
+            "${nexus_google_root}/arch"
+    )
+    target_compile_definitions(
+        ${name}
+        PRIVATE
+            NEXUS_ARCH_MECHANISM_MODEL
+            NEXUS_ARCH_DCACHE_LINE_BYTES=0
+            NEXUS_ARCH_ICACHE_LINE_BYTES=0
+            NEXUS_ARCH_MPU_VERSION=0
+            NEXUS_ARCH_SECURITY_STATE=${security_state}
+            NEXUS_ARCH_HAS_SAU=${sau}
+            NEXUS_ARCH_HAS_DWT_CYCCNT=0
+            __ARM_FEATURE_CMSE=${cmse}
+    )
 endforeach()

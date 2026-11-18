@@ -5,7 +5,10 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 if(NOT NEXUS_SOURCE_ROOT OR NOT NEXUS_ASSEMBLY_FILE)
-    message(FATAL_ERROR "Capture/audio fixture needs an explicit source and TOML")
+    message(
+        FATAL_ERROR
+        "Capture/audio fixture needs an explicit source and TOML"
+    )
 endif()
 set(NEXUS_BUILD_TESTS OFF CACHE BOOL "No host tests in ARM link fixture")
 set(NEXUS_BUILD_WORKLOAD OFF CACHE BOOL "External explicit fixture main")

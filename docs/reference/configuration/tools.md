@@ -24,7 +24,7 @@ executing these tools; a default-branch clone may not contain the documented ent
 | `tools/dev/dev.py doctor/check` | Tool availability and repository checks | A platform candidate |
 | `tools/configure/configure.py` | init/list-bindings/check/explain/diff/generate/provider-check | PCB electrical truth |
 | `tools/maintenance/capabilities.py --assembly` | Exact resolved selection and separate validation stages | Model, ARM, SDK or physical execution |
-| `scripts/ci/tdd_gate.py` | Actual full tool and GoogleTest/GoogleMock execution | Historical RED order or HIL |
+| `scripts/ci/tdd_gate.py` | Complete GoogleTest/GoogleMock and affected tool modules for commits; `--all` selects all full domains | Historical RED order or HIL |
 | `cmake/package/package_source_sdk.py` | Package or verify exact source bytes | MCU execution or release promotion |
 | `cmake/package/verify_consumers.py` | Relocated public consumer compile/run/link | Hardware timing |
 | `tools/measurement/` | Actual ELF resource, layout and retention checks | Measured stack peaks or WCET |

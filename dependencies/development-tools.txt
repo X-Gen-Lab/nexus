@@ -1,3 +1,4 @@
 # Commit automation tools; exact versions are shared by local installation and CI.
 pre-commit==4.3.0
 clang-format==14.0.6
+gersemi==0.29.2

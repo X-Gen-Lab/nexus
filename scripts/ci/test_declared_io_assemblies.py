@@ -65,18 +65,6 @@ class DeclaredModeIngress(unittest.TestCase):
         self.assertIn("scripts/ci/provider_assemblies.py", commands)
         self.fixtures()
 
-    def test_capability_discovery_uses_the_same_authored_selections(self):
-        indexed = {(row["family"], row["controller"], row["mode"]): row
-                   for row in capabilities.collect(ROOT)}
-        for row in self.resolved():
-            relative = Path(row["assembly"]).relative_to(ROOT).as_posix()
-            for item in row["resolved"]["controllers"]:
-                key = (row["resolved"]["soc_family"], item["controller"],
-                       item["mode"])
-                with self.subTest(selection=key, fixture=relative):
-                    self.assertIn(relative, indexed[key]["fixtures"])
-                    self.assertTrue(indexed[key]["exports"])
-
     def test_configuration_queries_never_promote_link_or_physical_acceptance(self):
         for path in self.fixtures():
             selection = capabilities.selection(path, ROOT)

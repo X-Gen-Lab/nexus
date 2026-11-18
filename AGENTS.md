@@ -7,8 +7,8 @@ X-Gen-Lab/nexus-examples repository. Proprietary products, credentials and priva
 PCB data stay in their owning repositories; public examples do not authorize
 publishing those inputs or their execution artifacts.
 
-Codex owns all platform maintenance domains under the checked agent-managed
-policy. Named people are not required. Preserve automated gates and independent
+Codex owns platform maintenance. Named people and simulated team seats are not
+required. Preserve automated gates and independent
 agent review for high-risk changes; never invent GitHub CODEOWNERS accounts or
 claim remote branch protection from a local policy file.
 
@@ -118,7 +118,10 @@ use `.venv/Scripts/python.exe`). This installs pre-commit and commit-msg hooks;
 no hook bypass or automatic staging is allowed. CI uses the same checks.
 
 Use `python tools/dev/dev.py configure|build|test --preset <name>`; native CMake
-arguments pass through. `doctor` checks tools and `check` runs repository gates.
+arguments pass through. `doctor` only diagnoses the selected tools and environment;
+it never scans all assemblies or runs maintenance tests. `check` runs full
+repository gates once. Ordinary configure/build keeps process logs and exit codes;
+use `--record-provenance` explicitly when preparing an identified image for device use.
 Managed `dev.py configure` owns this platform checkout; it rejects a different
 `-S` source root. External product projects use their explicit CMake commands.
 Fresh JUnit, nonzero tests and actual return codes are required. Missing tools,
@@ -159,21 +162,31 @@ rewriting the earlier chronology.
 
 `python scripts/ci/tdd_gate.py --all --preset native-debug` builds and runs
 all offline GoogleTest/GoogleMock contracts and the four complete tool domains.
-The gate checks locked tools required by the selected domains (Native plus ARM
-for tool fixtures), configures once and builds once before test
-execution. It never reuses successful reports. The ordinary commit hook selects
-complete affected tool domains from the complete staged index, including deleted
-paths; it always runs the full Native GoogleTest plan for behavioral changes.
-Broad build/configuration-policy changes select all four tool domains.
-The SDK packager/verifier and C/H/TOML/JSON inputs under
-`cmake/package/verification/` select the complete testing and configure domains;
-CMake build rules, unknown CMake paths or fixture suffixes, and domain-selection
-policy changes retain all four domains. `tools/testing/run_tool_tests.py` owns
-this explicit conservative selection; do not infer a smaller scope ad hoc.
-`--tools none` is available for an explicitly separate Native CI execution only;
-the commit hook uses the ordinary changed-domain policy. Independent CI owns the
-retained tool suites and all four Native runtime modes. Do not disable tests,
-use runtime filters/shards, or bypass hooks to create acceptance evidence.
+The gate checks the selected locked tools, configures once and builds once.
+It never reuses successful test reports. The ordinary commit hook reads the
+complete staged index, including deletions, and executes the full Native
+GoogleTest plan plus complete affected tool modules. Module planning is an
+explicit commit scope, not a filtered full-domain qualification: reports declare
+`commit-tools` and `qualification=false`. Changed test modules run in full;
+known implementation paths use the maintained module mappings. Firmware C
+changes need no auxiliary domain. Headers and declarative facts select their
+configuration contracts and the single global support scan. Unknown behavioral
+inputs or missing known coverage conservatively select full domains.
+
+`tools/testing/run_tool_tests.py` owns this plan. Do not infer a smaller scope
+ad hoc or filter cases inside selected modules. `--all` and `--tools all` always
+execute the four complete tool domains. `dev.py check` is the full integration
+entry, not the ordinary commit scope. Before merge or delivery, run full domains,
+relevant ARM links and independent SDK consumers against their actual inputs;
+a quick commit pass cannot establish those results. `--tools none` is reserved
+for an explicitly separate Native execution, never a hook bypass.
+
+Independent CI owns all four Native runtime modes and the retained full tool
+suites. The tool job prepares its compiler/generated inputs without repeating
+the Native job's full GoogleTest execution. The testing domain owns one global
+capability/documentation scan; local peripheral tests do not repeat it. Never
+cache successful qualification, disable required cases or use runtime filters
+or shards to claim full acceptance.
 
 The hook rejects differing unstaged/untracked behavior before and after execution
 and requires an unchanged Git index tree. Record actual RED/GREEN commands and

@@ -1,6 +1,6 @@
 # Actual-POT messages; independently reviewed against this canonical source.
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: e1f96f2824e14f562f9e57ce38b90674018b633cac99d22d74a75b70f5d336ee\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 40ed0792eb8b5bf41805eef2fc0f0c33b02fb51371da2ced639be18409b719c5\n"
 
 #: ../../../docs/design/source-compatibility.md:1
 msgid "源码版本、factory 代际与依赖维护"
@@ -677,199 +677,47 @@ msgstr ""
 "offline package rather than hiding a temporary source change inside a normal"
 " build."
 
-#: ../../../docs/design/source-compatibility.md:153
-msgid "Codex 的每周依赖流程"
-msgstr "Codex weekly dependency process"
+msgid "ARM 与资源"
+msgstr "ARM and resources"
 
-#: ../../../docs/design/source-compatibility.md:155
-msgid ""
-"`tools/maintenance/dependency_proposals.py` 默认只观察当前实际 Gitlink、锁、归档和 "
-"许可证字节，网络读取为零。它覆盖 FreeRTOS、CMSIS、STM32 CMSIS、GD32 import、 GoogleTest、ARM "
-"工具链、开发环境/Python 工具锁和 GitHub Actions 的确切 pins。 某项发行物还需审查许可证时，会明确记录 "
-"required，不从版本名猜许可。"
-msgstr ""
-"`tools/maintenance/dependency_proposals.py` defaults to observing actual "
-"Gitlinks, locks, archives and license bytes with zero network reads. It "
-"covers exact FreeRTOS, CMSIS, STM32 CMSIS, GD32 import, GoogleTest, ARM-"
-"toolchain, development/Python-tool and GitHub Actions pins. Releases needing"
-" license review explicitly record required rather than inferring licenses "
-"from version names."
+msgid "SDK"
+msgstr "SDK"
 
-#: ../../../docs/design/source-compatibility.md:168
-msgid ""
-"显式 upstream 模式只查询目录中官方 `upstream_url` 的 heads/tags，组织 fork 的 `fetch_url` "
-"不替代版本来源。普通依赖的 `upstream_revision` 等于所选 Gitlink； FreeRTOS 地址迁移提交分别记录 "
-"`selected_revision` 与官方 `upstream_base`， "
-"避免把组织提交误判为官方缺失版本。真正升级官方基线后，新的组织集成提交也必须 重新准备并审查。使用无 shell、禁止 credential "
-"helper/交互/global config 的 `git ls-remote`；每个请求最长 10 秒， stdout/stderr 总捕获上限 1"
-" MiB，refs 最多 8192 条。复用已有有界 subprocess capture/kill/reap 机制，不执行 HIL admission"
-" 或设备动作。输出目录必须新建且无 symlink；源码内只允许 build 目录。原始 stream、argv、实际退出码、时间和工具/ 响应 SHA"
-" 均保留。网络、超时、输出或格式失败为 `not_observed`；没有 Git publication 的 "
-"GD32/工具链/环境项需单独审查发行来源，不能伪造版本观察成功。观察 refs 不是 选择最新可靠版本或批准升级。周度 workflow "
-"的实际运行状态需另看 GitHub 证据。"
-msgstr ""
-"Explicit upstream mode queries heads/tags only from the catalogue's official"
-" `upstream_url`; an organization fork's `fetch_url` does not replace the "
-"version source. For ordinary dependencies, `upstream_revision` equals the "
-"selected Gitlink. A FreeRTOS URL-migration commit records "
-"`selected_revision` separately from its official `upstream_base`, avoiding a"
-" false report that the organization commit is missing upstream. After an "
-"actual official-baseline upgrade, a new organization integration commit must"
-" also be prepared and reviewed. The tool invokes `git ls-remote` without a "
-"shell, credential helpers, interaction or global configuration. Each request"
-" is limited to 10 seconds, 1 MiB of combined stdout/stderr capture and 8192 "
-"refs. It reuses the existing bounded subprocess capture/kill/reap mechanism "
-"and performs no HIL admission or device actions. The output directory must "
-"be new and free of symlinks; within the source tree, only build directories "
-"are allowed. Original streams, argv, actual exit codes, timings and "
-"tool/response hashes are retained. Network, timeout, output or format "
-"failures remain `not_observed`. GD32/toolchain/environment entries without "
-"Git publication need separate release-source review; successful version "
-"observation must not be fabricated. Observing refs neither selects the "
-"newest reliable version nor approves an upgrade. Actual weekly workflow "
-"execution requires separate GitHub evidence."
+msgid "代码审查"
+msgstr "Code review"
 
-#: ../../../docs/design/source-compatibility.md:181
-msgid ""
-"candidate plan 使用严格 JSON：`schema_version=1`、已观察的 `dependency`、明确 "
-"`proposed_revision`、不带凭据/query 的公共 HTTPS `source_url`、实际非空 archive "
-"identity、声明的 license expression 和 notices identities，以及可选的 `evidence` 映射。每个 "
-"identity 都是绝对 `path`、完整 `sha256` 和真实 `size`。Git 来源必须是 完整 40 位 commit，不能用 "
-"main/latest；license 内容必须独立审查，声明不是许可 批准。archive 是否来自该 commit、是否完整包含声明 notice "
-"和所有变更也在独立 来源/许可证 review 中验证，工具不会从任意用户提供的 notice 推断这些事实。"
-msgstr ""
-"Candidate plans use strict JSON: `schema_version=1`, observed `dependency`, "
-"explicit `proposed_revision`, public HTTPS `source_url` without "
-"credentials/query, actual nonempty archive identity, declared license "
-"expression and notices identities, and optional `evidence` mapping. Each "
-"identity includes absolute `path`, full `sha256` and actual `size`. Git "
-"provenance needs a full 40-character commit, never main/latest. License "
-"content needs independent review; declarations are not approval. Independent"
-" provenance/license review also checks whether archives match commits and "
-"completely contain notices and changes; tools infer none of these facts from"
-" arbitrary user-provided notices."
+msgid "依赖升级与审查"
+msgstr "Dependency upgrades and review"
 
-#: ../../../docs/design/source-compatibility.md:0
-msgid "必需 gate"
-msgstr "Required gate"
+msgid "依赖升级通过普通 PR，不再维护每周建议报告、候选计划或另一套任务台账。审查官方来源、 精确 revision、组织补丁和许可证，再一起更新 gitlink、来源锁与必要的外部 SDK pin。 官方基线与组织集成提交分别记录，不从 fork 分支名推断官方版本，也不自动选择 latest。"
+msgstr "Dependency upgrades use ordinary PRs rather than weekly proposal reports, candidate plans or another task ledger. Review the official source, exact revision, organization patches and licenses, then update the gitlink, source locks and any required external SDK pins together. Record the official baseline and organization integration commit separately; do not infer the official version from a fork branch name or automatically select latest."
 
-#: ../../../docs/design/source-compatibility.md:0
-msgid "验收范围"
-msgstr "Acceptance scope"
+msgid "受影响精确器件的编译、链接、ABI 和 ELF 预算"
+msgstr "Compilation, linking, ABI and ELF budgets for affected exact parts"
 
-#: ../../../docs/design/source-compatibility.md:0
-msgid "license_review"
-msgstr "license_review"
+msgid "受影响装配、资源冲突、真实 C 合同及 Native 模式"
+msgstr "Affected assemblies, resource conflicts, actual C contracts and Native modes"
 
-#: ../../../docs/design/source-compatibility.md:0
-msgid "来源/archive/commit、全部再分发文件、许可/notice 变更，由独立 Codex review 复核"
-msgstr ""
-"Independent Codex review of provenance/archive/commit, all redistributed "
-"files and license/notice changes"
+msgid "实际验收范围"
+msgstr "Actual acceptance scope"
 
-#: ../../../docs/design/source-compatibility.md:0
-msgid "configuration"
-msgstr "configuration"
+msgid "来源与许可"
+msgstr "Source and licensing"
 
-#: ../../../docs/design/source-compatibility.md:0
-msgid "全配置/内核边界、单一输入闭包、schema/epoch 与生成一致性"
-msgstr ""
-"All configuration/kernel boundaries, single input closure, schema/epoch and "
-"generation consistency"
+msgid "格式、注释、静态分析及必要的独立风险审查"
+msgstr "Formatting, comments, static analysis and necessary independent risk review"
 
-#: ../../../docs/design/source-compatibility.md:0
-msgid "host_models"
-msgstr "host_models"
+msgid "检查"
+msgstr "Check"
 
-#: ../../../docs/design/source-compatibility.md:0
-msgid ""
-"pinned GoogleTest/GoogleMock 全发现执行、工具/CTest、维护的 Native sanitizer profiles"
-msgstr ""
-"Complete discovered pinned GoogleTest/GoogleMock execution, tools/CTest and "
-"maintained Native sanitizer profiles"
+msgid "检查使用现有维护和构建入口，不为升级生成第二套资格状态。保留实际命令、退出码和 来源身份；旧报告不能证明新 revision。普通配置、构建和提交不自动联网或改写来源锁。 没有实板时，受升级影响的电气、IRQ／DMA 时序、低功耗和长期负载保持未验证。"
+msgstr "Checks use existing maintenance and build entry points without generating a second qualification state for upgrades. Preserve actual commands, exit codes and source identities; old reports cannot qualify a new revision. Ordinary configuration, builds and commits neither access the network automatically nor rewrite source locks. Without hardware, affected electrical behavior, IRQ/DMA timing, low power and sustained load remain unverified."
 
-#: ../../../docs/design/source-compatibility.md:0
-msgid "cortex_runtime"
-msgstr "cortex_runtime"
+msgid "精确源码、gitlink、锁、再分发 notice 和许可证变更"
+msgstr "Exact source, gitlink, locks, redistributed notices and license changes"
 
-#: ../../../docs/design/source-compatibility.md:0
-msgid "当前 CPU/ISA/FP/MVE/ABI runtime、受维护 MPU 与 Secure/NS 软件矩阵"
-msgstr ""
-"Current CPU/ISA/FP/MVE/ABI runtimes and maintained MPU/Secure/NS software "
-"matrix"
+msgid "精确源码闭包、搬移、篡改拒绝与独立消费者"
+msgstr "Exact source closure, relocation, tamper rejection and independent consumers"
 
-#: ../../../docs/design/source-compatibility.md:0
-msgid "board_arm"
-msgstr "board_arm"
-
-#: ../../../docs/design/source-compatibility.md:0
-msgid "三块精确 Board × baremetal/FreeRTOS，受影响的外部 examples"
-msgstr ""
-"Three exact Boards × baremetal/FreeRTOS and affected external examples"
-
-#: ../../../docs/design/source-compatibility.md:0
-msgid "resource_budgets"
-msgstr "resource_budgets"
-
-#: ../../../docs/design/source-compatibility.md:0
-msgid "每个新 ELF 独立预算、同 fixture 前后成本、各 RAM 域和 reservation"
-msgstr ""
-"Each new ELF's independent budget, same-fixture before/after costs, RAM "
-"domains and reservations"
-
-#: ../../../docs/design/source-compatibility.md:0
-msgid "installed_sdk"
-msgstr "installed_sdk"
-
-#: ../../../docs/design/source-compatibility.md:0
-msgid "clean exact source SDK、版本/epoch 拒绝、实际独立消费者"
-msgstr ""
-"Clean exact source SDK, version/epoch rejection and real independent "
-"consumers"
-
-#: ../../../docs/design/source-compatibility.md:0
-msgid "offline_reproduction"
-msgstr "offline_reproduction"
-
-#: ../../../docs/design/source-compatibility.md:0
-msgid "绑定环境内两次 fresh network-disabled 构建及同一 ELF/BIN/map bytes"
-msgstr ""
-"Two fresh network-disabled builds in the bound environment with identical "
-"ELF/BIN/map bytes"
-
-#: ../../../docs/design/source-compatibility.md:0
-msgid "static_analysis"
-msgstr "static_analysis"
-
-#: ../../../docs/design/source-compatibility.md:0
-msgid "owned ClangTidy/Cppcheck、格式/注释、原始失败与明确 vendor 审查边界"
-msgstr ""
-"Owned ClangTidy/Cppcheck, formatting/comments, raw failures and explicit "
-"vendor-review boundaries"
-
-#: ../../../docs/design/source-compatibility.md:201
-msgid ""
-"工具只形成 proposal。缺证据为 `not_executed`；提供真实 file identities 也只变成 "
-"`referenced_unreviewed`。即使引用 JSON 自称 passed，工具也不升级资格，不执行其 命令、不修改 "
-"Gitlink/lock、不创建自动升级 commit。现有正式 validators 必须对 升级的 exact clean 源、完整 scope "
-"和同一 artifact 独立执行。随后通过正常 staged review、hooks 和 CI 原子更新源码 Gitlink/厂商 "
-"import、锁、许可和外部 SDK pin。"
-msgstr ""
-"The tool produces proposals only. Missing evidence is `not_executed`; real "
-"file identities become only `referenced_unreviewed`. Even referenced JSON "
-"claiming passed cannot promote qualification, run its commands, modify "
-"Gitlinks/locks or create automatic upgrade commits. Existing formal "
-"validators independently execute exact upgraded clean sources, full scopes "
-"and the same artifacts. Normal staged review, hooks and CI then atomically "
-"update source Gitlinks/vendor imports, locks, licensing and external SDK "
-"pins."
-
-#: ../../../docs/design/source-compatibility.md:207
-msgid ""
-"没有实板时，受升级影响的电气、IRQ/DMA timing、低功耗和长期负载仍是物理 pending。 一次 upstream request、一个模型"
-" pass 或之前版本的软件候选都不能代替本次验收。"
-msgstr ""
-"Without boards, affected electrical behavior, IRQ/DMA timing, low power and "
-"long-running load remain physically pending. An upstream request, one model "
-"pass or a previous version's software candidate cannot replace acceptance "
-"for this upgrade."
+msgid "配置与行为"
+msgstr "Configuration and behavior"

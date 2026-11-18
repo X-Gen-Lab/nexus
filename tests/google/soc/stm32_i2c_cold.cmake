@@ -14,14 +14,24 @@ foreach(clock default pll84)
         LIBRARIES Nexus::IO
         INCLUDES
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/i2c_v1_async" "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
-            "${NEXUS_SOURCE_DIR}/arch/include")
-    target_include_directories(${i2c_cold_target} SYSTEM PRIVATE
-        "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
+            "${NEXUS_SOURCE_DIR}/arch/include"
+    )
+    target_include_directories(
+        ${i2c_cold_target}
+        SYSTEM
+        PRIVATE "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
+    )
     nexus_use_cmsis_core(${i2c_cold_target})
-    target_compile_definitions(${i2c_cold_target} PRIVATE
-        STM32F407xx NX_I2C_V1_PORT_HEADER="drivers/i2c/stm32f407_i2c_port.h")
-    target_compile_options(${i2c_cold_target} PRIVATE
-        "-include${nexus_google_root}/soc/stm32_i2c_cold_model.h")
+    target_compile_definitions(
+        ${i2c_cold_target}
+        PRIVATE
+            STM32F407xx
+            NX_I2C_V1_PORT_HEADER="drivers/i2c/stm32f407_i2c_port.h"
+    )
+    target_compile_options(
+        ${i2c_cold_target}
+        PRIVATE "-include${nexus_google_root}/soc/stm32_i2c_cold_model.h"
+    )
 
     if(clock STREQUAL "pll84")
         target_compile_definitions(${i2c_cold_target} PRIVATE NX_I2C_CLOCK_21)

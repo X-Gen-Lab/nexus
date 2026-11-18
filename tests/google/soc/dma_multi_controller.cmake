@@ -1,6 +1,8 @@
 # Real F4 finite-DMA providers share only an external CPU/time fixture.
 foreach(dma_multi_kind uart spi)
-    set(dma_multi_target "nexus_stm32f4_${dma_multi_kind}_multi_controller_test")
+    set(dma_multi_target
+        "nexus_stm32f4_${dma_multi_kind}_multi_controller_test"
+    )
     nexus_google_test(${dma_multi_target} STM32F4_LL
         SOURCES "${nexus_google_root}/soc/${dma_multi_kind}_multi_controller_test.cpp"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/${dma_multi_kind}/${dma_multi_kind}.c"
@@ -10,20 +12,36 @@ foreach(dma_multi_kind uart spi)
         INCLUDES "${NEXUS_SOURCE_DIR}/tests/contracts/dma_multi_controller"
             "${NEXUS_SOURCE_DIR}/tests/support/f4_cpu"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
-            "${NEXUS_SOURCE_DIR}/arch/include")
+            "${NEXUS_SOURCE_DIR}/arch/include"
+    )
     if(dma_multi_kind STREQUAL "spi")
-        target_sources(${dma_multi_target} PRIVATE
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio/gpio.c")
-        target_include_directories(${dma_multi_target} PRIVATE
-            "${NEXUS_SOURCE_DIR}/io/private")
+        target_sources(
+            ${dma_multi_target}
+            PRIVATE "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio/gpio.c"
+        )
+        target_include_directories(
+            ${dma_multi_target}
+            PRIVATE "${NEXUS_SOURCE_DIR}/io/private"
+        )
     else()
-        target_sources(${dma_multi_target} PRIVATE
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart/uart_hardware.c")
+        target_sources(
+            ${dma_multi_target}
+            PRIVATE
+                "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart/uart_hardware.c"
+        )
     endif()
-    target_compile_options(${dma_multi_target} PRIVATE
-        "-include${nexus_google_root}/soc/${dma_multi_kind}_multi_controller_model.h")
-    target_include_directories(${dma_multi_target} SYSTEM PRIVATE
-        "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
-    target_compile_definitions(${dma_multi_target} PRIVATE
-        STM32F407xx NX_DMA_MULTI_STM32)
+    target_compile_options(
+        ${dma_multi_target}
+        PRIVATE
+            "-include${nexus_google_root}/soc/${dma_multi_kind}_multi_controller_model.h"
+    )
+    target_include_directories(
+        ${dma_multi_target}
+        SYSTEM
+        PRIVATE "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
+    )
+    target_compile_definitions(
+        ${dma_multi_target}
+        PRIVATE STM32F407xx NX_DMA_MULTI_STM32
+    )
 endforeach()

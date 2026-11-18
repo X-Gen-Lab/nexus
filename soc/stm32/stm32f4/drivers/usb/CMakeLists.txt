@@ -4,31 +4,57 @@ nexus_controller_modes(usb_host_modes usb_host)
 set(stm32_usb_host_hal OFF)
 if(usb_device_modes)
     set(stm32_gpio_helpers ON)
-    target_sources(nexus_soc_stm32f4 PRIVATE
-        "${CMAKE_CURRENT_LIST_DIR}/usb_device.c"
-        "${CMAKE_CURRENT_LIST_DIR}/usb_clock.c"
-        "${CMAKE_CURRENT_LIST_DIR}/../ip/dwc_otg_device/usb_device_controller.c")
-    if("device-hs-fs" IN_LIST usb_device_modes OR "device-hs-ulpi" IN_LIST usb_device_modes
-            OR "otg-hs-fs" IN_LIST usb_device_modes OR "otg-hs-ulpi" IN_LIST usb_device_modes)
-        target_sources(nexus_soc_stm32f4 PRIVATE "${CMAKE_CURRENT_LIST_DIR}/usb_hs_clock.c")
+    target_sources(
+        nexus_soc_stm32f4
+        PRIVATE
+            "${CMAKE_CURRENT_LIST_DIR}/usb_device.c"
+            "${CMAKE_CURRENT_LIST_DIR}/usb_clock.c"
+            "${CMAKE_CURRENT_LIST_DIR}/../ip/dwc_otg_device/usb_device_controller.c"
+    )
+    if(
+        "device-hs-fs" IN_LIST usb_device_modes
+        OR "device-hs-ulpi" IN_LIST usb_device_modes
+        OR "otg-hs-fs" IN_LIST usb_device_modes
+        OR "otg-hs-ulpi" IN_LIST usb_device_modes
+    )
+        target_sources(
+            nexus_soc_stm32f4
+            PRIVATE "${CMAKE_CURRENT_LIST_DIR}/usb_hs_clock.c"
+        )
     endif()
-    if("otg-fs" IN_LIST usb_device_modes OR "otg-hs-fs" IN_LIST usb_device_modes
-            OR "otg-hs-ulpi" IN_LIST usb_device_modes)
+    if(
+        "otg-fs" IN_LIST usb_device_modes
+        OR "otg-hs-fs" IN_LIST usb_device_modes
+        OR "otg-hs-ulpi" IN_LIST usb_device_modes
+    )
         set(stm32_usb_host_hal ON)
-        target_sources(nexus_soc_stm32f4 PRIVATE
-            "${CMAKE_CURRENT_LIST_DIR}/usb_otg.c" "${CMAKE_CURRENT_LIST_DIR}/usb_host.c"
-            "${CMAKE_CURRENT_LIST_DIR}/usb_hs_clock.c")
-        target_link_libraries(nexus_soc_stm32f4 PUBLIC Nexus::IOUSBOTG Nexus::USBRole)
+        target_sources(
+            nexus_soc_stm32f4
+            PRIVATE
+                "${CMAKE_CURRENT_LIST_DIR}/usb_otg.c"
+                "${CMAKE_CURRENT_LIST_DIR}/usb_host.c"
+                "${CMAKE_CURRENT_LIST_DIR}/usb_hs_clock.c"
+        )
+        target_link_libraries(
+            nexus_soc_stm32f4
+            PUBLIC Nexus::IOUSBOTG Nexus::USBRole
+        )
     endif()
 endif()
 if(usb_host_modes)
     set(stm32_gpio_helpers ON)
     set(stm32_usb_host_hal ON)
-    target_sources(nexus_soc_stm32f4 PRIVATE "${CMAKE_CURRENT_LIST_DIR}/usb_host.c")
+    target_sources(
+        nexus_soc_stm32f4
+        PRIVATE "${CMAKE_CURRENT_LIST_DIR}/usb_host.c"
+    )
 endif()
 if(stm32_usb_host_hal)
     nexus_stm32f407_usb_hal(nexus_soc_stm32f4 HOST)
 endif()
 if(NEXUS_USB_REMOTE_WAKEUP)
-    target_compile_definitions(nexus_soc_stm32f4 PRIVATE NEXUS_STM32F4_USB_REMOTE_WAKEUP=1)
+    target_compile_definitions(
+        nexus_soc_stm32f4
+        PRIVATE NEXUS_STM32F4_USB_REMOTE_WAKEUP=1
+    )
 endif()

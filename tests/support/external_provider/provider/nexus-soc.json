@@ -8,7 +8,7 @@
     "configure/contract.py": "139c59e8c6caaaa2357f1e3cc62c96eef5b6bd48dd9a1d07cf75c9ddfc81a70a",
     "configure/emission.py": "f04042742a7c3fa5b719f55a5dc5e6534245527fe8d89af9500f31a989deb5fb",
     "include/nexus_reference/lifecycle_probe.h": "c325da2330d85997bddfcc6122b4fa5cbfb8f441b26da47d26d453831c6901ed",
-    "soc/CMakeLists.txt": "aa979a66577768244b56d02a5f614acfc52af7fd5e1f2c98fb7c17dd5e096074",
+    "soc/CMakeLists.txt": "635957fb0bdcd61d88c20c2afb14a72c83637c2ea4844583ac8ea93fd093e3b9",
     "soc/lifecycle_adapter.c": "00641f5e1da4d8d43c374ed5e6d5847767bcbc82ee9817427041383bfa91a4bf",
     "soc/lifecycle_adapter.h": "91713b5dbcbba0ceac379a9e40ee3804f2a9b1e61b963795b6d27d48059e18a4",
     "soc/routes.json": "0d6871a67065449f76f4b28398798a721005d27f5abefe8770b038392d0e7d45",

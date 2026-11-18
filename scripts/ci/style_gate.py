@@ -15,6 +15,7 @@ sys.path.insert(0, str(ROOT / "scripts/ci"))
 sys.path.insert(0, str(ROOT / "scripts/tools"))
 sys.path.insert(0, str(ROOT / "scripts/setup"))
 import format as formatting
+import cmake_format
 import comment_style
 import install_dev_tools
 
@@ -22,7 +23,8 @@ BASELINE_PATH = "dependencies/style-baseline.json"
 # This is the reviewed pre-automation source, not an adjustable debt budget.
 BOOTSTRAP_SOURCE = "b68922d1b29291734a2b056f3b8229a0bebd654c"
 CONTROL_FILES = {
-    ".clang-format", ".clang-format-dirs", ".editorconfig",
+    ".clang-format", ".clang-format-dirs", ".editorconfig", ".gersemirc",
+    "scripts/tools/cmake_format.py",
     ".pre-commit-config.yaml", BASELINE_PATH,
     "dependencies/development-tools.txt", "scripts/tools/format.py",
     "scripts/ci/style_gate.py", "scripts/ci/comment_style.py",
@@ -250,7 +252,10 @@ def run_checks(root, filenames, *, all_files=False, base_ref="HEAD", staged=Fals
             and not formatting.should_exclude(path, root, excludes)
         ):
             raise ValueError(f"Unclassified source must be added to the owned manifest: {name}")
-    errors = []
+    cmake_selected = sorted(name for name in (tracked if full else names)
+                            if cmake_format.owned_file(name)
+                            and (root / name).is_file())
+    errors = cmake_format.check_files(root, [root / name for name in cmake_selected])
     records = []
     for name in sorted(selected):
         path = owned[name]
@@ -298,6 +303,7 @@ def run_checks(root, filenames, *, all_files=False, base_ref="HEAD", staged=Fals
         "input_files": sorted(names),
         "selected_files": sorted(selected | text_names),
         "source_files_checked": len(selected), "text_files_selected": len(text_names),
+        "cmake_files_checked": len(cmake_selected),
         "legacy_format_files": sum(item["legacy_format_debt"] for item in records),
         "legacy_comment_files": sum(bool(item["comment_rules"]) for item in records),
         "tool_version": version.strip(), "records": records, "errors": errors,

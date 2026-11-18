@@ -11,13 +11,25 @@ foreach(density 524288 1048576)
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
             "${NEXUS_SOURCE_DIR}/arch/include"
             "${NEXUS_SOURCE_DIR}/core/include"
-            "${nexus_google_root}/soc")
-    target_include_directories(${name} SYSTEM PRIVATE
-        "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
-        "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+            "${nexus_google_root}/soc"
+    )
+    target_include_directories(
+        ${name}
+        SYSTEM
+        PRIVATE
+            "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
+            "${NEXUS_CMSIS_CORE_INCLUDE_DIR}"
+    )
     nexus_use_cmsis_core(${name})
-    target_compile_definitions(${name} PRIVATE STM32F407xx
-        NX_F407_HANDOFF_MODEL NX_F407_HANDOFF_FLASH_BYTES=${density})
-    target_compile_options(${name} PRIVATE
-        "$<$<COMPILE_LANGUAGE:C>:-fexceptions>")
+    target_compile_definitions(
+        ${name}
+        PRIVATE
+            STM32F407xx
+            NX_F407_HANDOFF_MODEL
+            NX_F407_HANDOFF_FLASH_BYTES=${density}
+    )
+    target_compile_options(
+        ${name}
+        PRIVATE "$<$<COMPILE_LANGUAGE:C>:-fexceptions>"
+    )
 endforeach()

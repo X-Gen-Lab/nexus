@@ -5,26 +5,43 @@ nexus_google_test(nexus_stm32_spi_frames_test STM32F4_LL
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/spi/spi_frames_cold.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio/gpio.c"
     LIBRARIES Nexus::IO Nexus::Arch
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4")
-target_include_directories(nexus_stm32_spi_frames_test SYSTEM PRIVATE
-    "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
+)
+target_include_directories(
+    nexus_stm32_spi_frames_test
+    SYSTEM
+    PRIVATE "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
+)
 nexus_use_cmsis_core(nexus_stm32_spi_frames_test)
-target_compile_definitions(nexus_stm32_spi_frames_test PRIVATE
-    NEXUS_STM32_MODEL STM32F407xx)
-target_compile_options(nexus_stm32_spi_frames_test PRIVATE
-    "-include${nexus_google_root}/soc/stm32_spi_frames_model.h"
-    "$<$<COMPILE_LANGUAGE:C>:-include${nexus_google_root}/soc/stm32_official_model.h>")
+target_compile_definitions(
+    nexus_stm32_spi_frames_test
+    PRIVATE NEXUS_STM32_MODEL STM32F407xx
+)
+target_compile_options(
+    nexus_stm32_spi_frames_test
+    PRIVATE
+        "-include${nexus_google_root}/soc/stm32_spi_frames_model.h"
+        "$<$<COMPILE_LANGUAGE:C>:-include${nexus_google_root}/soc/stm32_official_model.h>"
+)
 
 # The generated three-instance factory executes the same C hardware owners.
 set(spi_frames_bundle "${CMAKE_CURRENT_BINARY_DIR}/f407-spi-frames-factory")
-execute_process(COMMAND "${Python3_EXECUTABLE}" -B
-    "${NEXUS_SOURCE_DIR}/tools/configure/configure.py" --test-support
-    --source-root "${NEXUS_SOURCE_DIR}" --assembly
-    "${NEXUS_SOURCE_DIR}/tests/contracts/spi_frames_assembly/three-frames-ve.toml"
-    --output "${spi_frames_bundle}" RESULT_VARIABLE spi_frames_generated
-    OUTPUT_VARIABLE spi_frames_output ERROR_VARIABLE spi_frames_error)
+execute_process(
+    COMMAND
+        "${Python3_EXECUTABLE}" -B
+        "${NEXUS_SOURCE_DIR}/tools/configure/configure.py" --test-support
+        --source-root "${NEXUS_SOURCE_DIR}" --assembly
+        "${NEXUS_SOURCE_DIR}/tests/contracts/spi_frames_assembly/three-frames-ve.toml"
+        --output "${spi_frames_bundle}"
+    RESULT_VARIABLE spi_frames_generated
+    OUTPUT_VARIABLE spi_frames_output
+    ERROR_VARIABLE spi_frames_error
+)
 if(NOT spi_frames_generated EQUAL 0)
-    message(FATAL_ERROR "SPI frames factory rejected: ${spi_frames_output}${spi_frames_error}")
+    message(
+        FATAL_ERROR
+        "SPI frames factory rejected: ${spi_frames_output}${spi_frames_error}"
+    )
 endif()
 nexus_google_configuration_inputs("${spi_frames_bundle}")
 nexus_google_test(nexus_stm32_spi_frames_factory_test STM32F4_LL
@@ -40,10 +57,21 @@ nexus_google_test(nexus_stm32_spi_frames_factory_test STM32F4_LL
     INCLUDES "${spi_frames_bundle}"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
         "${NEXUS_SOURCE_DIR}/tests/support/f4_cpu"
-        "${NEXUS_SOURCE_DIR}/arch/include")
-target_include_directories(nexus_stm32_spi_frames_factory_test SYSTEM PRIVATE
-    "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
-target_compile_definitions(nexus_stm32_spi_frames_factory_test PRIVATE STM32F407xx
-    _init=nx_spi_frames_fixture_init _fini=nx_spi_frames_fixture_fini)
-target_compile_options(nexus_stm32_spi_frames_factory_test PRIVATE
-    "-include${nexus_google_root}/soc/stm32_spi_frames_factory_model.h")
+        "${NEXUS_SOURCE_DIR}/arch/include"
+)
+target_include_directories(
+    nexus_stm32_spi_frames_factory_test
+    SYSTEM
+    PRIVATE "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
+)
+target_compile_definitions(
+    nexus_stm32_spi_frames_factory_test
+    PRIVATE
+        STM32F407xx
+        _init=nx_spi_frames_fixture_init
+        _fini=nx_spi_frames_fixture_fini
+)
+target_compile_options(
+    nexus_stm32_spi_frames_factory_test
+    PRIVATE "-include${nexus_google_root}/soc/stm32_spi_frames_factory_model.h"
+)

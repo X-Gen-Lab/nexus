@@ -1,7 +1,7 @@
 ## Problem and resulting behavior
 
-Describe the concrete trigger, failure and resulting behavior. Link the requirement
-or NG task and the accountable role from `.github/maintainer-roles.json`.
+Describe the concrete trigger, failure and resulting behavior. Identify the
+affected platform layer and any independent review needed for high-risk changes.
 
 ## Contract and scope
 

@@ -203,6 +203,14 @@ def _terminate(process):
     if Path("/proc/self/stat").is_file() and os.name == "posix":
         identity = _linux_process(process.pid)
         known = {} if identity is None else {process.pid: identity}
+        if identity is None:
+            # An exited leader can leave its still-owned group executable.
+            with os.scandir("/proc") as entries:
+                for entry in entries:
+                    member = (_linux_process(int(entry.name))
+                              if entry.name.isdecimal() else None)
+                    if member is not None and member["group"] == process.pid:
+                        known[member["pid"]] = member
         stable = _linux_freeze(known)
         _linux_signal(known, signal.SIGKILL)
         try:
@@ -278,7 +286,19 @@ def _write_json(path, record):
         temporary.unlink(missing_ok=True)
 
 
-def _wait(process, timeout, cancel_event):
+class _ExecutionRejected(Exception):
+    """A completed command violated its caller's explicit execution bounds."""
+
+
+def _output_bound(outputs, maximum):
+    if maximum is not None and sum(os.fstat(stream.fileno()).st_size
+                                   for stream in outputs) > maximum:
+        raise _ExecutionRejected("command raw log exceeded "
+                                 + str(maximum // (1024 * 1024))
+                                 + " MiB bound")
+
+
+def _wait(process, timeout, cancel_event, outputs, maximum):
     """Wait for our exact child; Linux reports its kernel resource accounting.
 
     wait4 includes descendants only when the child has reaped them. Its maximum
@@ -290,6 +310,7 @@ def _wait(process, timeout, cancel_event):
     while True:
         if cancel_event is not None and cancel_event.is_set():
             raise KeyboardInterrupt
+        _output_bound(outputs, maximum)
         remaining = deadline - time.monotonic()
         if remaining <= 0:
             raise subprocess.TimeoutExpired(process.args, timeout)
@@ -314,7 +335,8 @@ def _wait(process, timeout, cancel_event):
 
 
 def run(command, *, cwd, env, log=None, timeout=None, stage="command",
-        input=None, cancel_event=None):
+        input=None, cancel_event=None, max_output_bytes=None,
+        reject_background=False):
     """Execute with cancellation deferred until cleanup and receipts finish."""
     state = {"withdrawing": False}
     previous = {}
@@ -332,14 +354,16 @@ def run(command, *, cwd, env, log=None, timeout=None, stage="command",
     try:
         return _run(command, cwd=cwd, env=env, log=log, timeout=timeout,
                     stage=stage, state=state, input=input,
-                    cancel_event=cancel_event)
+                    cancel_event=cancel_event,
+                    max_output_bytes=max_output_bytes,
+                    reject_background=reject_background)
     finally:
         for signum, handler in previous.items():
             signal.signal(signum, handler)
 
 
 def _run(command, *, cwd, env, log, timeout, stage, state, input=None,
-         cancel_event=None):
+         cancel_event=None, max_output_bytes=None, reject_background=False):
     """Return actual results and preserve every failure across later retries.
 
     A timeout returns 124 after process-tree withdrawal; cancellation returns
@@ -349,6 +373,8 @@ def _run(command, *, cwd, env, log, timeout, stage, state, input=None,
     command = [os.fspath(item) for item in command]
     if not command or any("\0" in item for item in command):
         raise ValueError("Execution requires a nonempty valid argument vector")
+    if max_output_bytes is not None:
+        max_output_bytes = positive_integer(max_output_bytes, "output limit")
     if input is not None and not isinstance(input, bytes):
         raise ValueError("Execution input must be bytes")
     from tools.dev.build_lock import child_settings
@@ -375,7 +401,7 @@ def _run(command, *, cwd, env, log, timeout, stage, state, input=None,
         stdin_path.write_bytes(input)
     started_ns, started = time.time_ns(), time.monotonic()
     outcome, returncode, process = "completed", 127, None
-    resource_usage = None
+    resource_usage, failure = None, None
     withdrawn = []
     withdrawal_stable = True
     started_record = {
@@ -406,7 +432,21 @@ def _run(command, *, cwd, env, log, timeout, stage, state, input=None,
             process = subprocess.Popen(command, cwd=cwd, env=env,
                                        stdin=stdin, stdout=stdout,
                                        stderr=stderr, **settings)
-            returncode, resource_usage = _wait(process, timeout, cancel_event)
+            returncode, resource_usage = _wait(
+                process, timeout, cancel_event, (stdout, stderr),
+                max_output_bytes)
+            _output_bound((stdout, stderr), max_output_bytes)
+            if reject_background and os.name == "posix":
+                try:
+                    os.killpg(process.pid, 0)
+                except ProcessLookupError:
+                    pass
+                else:
+                    raise _ExecutionRejected("command left background processes")
+        except _ExecutionRejected as error:
+            returncode, failure, resource_usage = 125, str(error), None
+            state["withdrawing"] = True
+            withdrawn, withdrawal_stable = _terminate(process)
         except subprocess.TimeoutExpired:
             outcome, returncode = "timed_out", 124
             state["withdrawing"] = True
@@ -438,6 +478,8 @@ def _run(command, *, cwd, env, log, timeout, stage, state, input=None,
         "resource_usage": resource_usage,
         "stdout": _identity(stdout_path), "stderr": _identity(stderr_path),
     }
+    if failure is not None:
+        record["failure"] = failure
     if stdin_path is not None:
         record["stdin"] = _identity(stdin_path)
     _write_json(attempt / "receipt.json", record)
@@ -453,4 +495,5 @@ def _run(command, *, cwd, env, log, timeout, stage, state, input=None,
         temporary.cleanup()
     result = subprocess.CompletedProcess(command, returncode, out, err)
     result.receipt_path = attempt / "receipt.json" if log is not None else None
+    result.failure = failure
     return result

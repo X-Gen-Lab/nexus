@@ -1,14 +1,21 @@
 # Strict generated factory declarations; unknown return contracts fail closed.
 function(nexus_google_factory_symbols output header_path)
     if(NOT ARGC EQUAL 2 OR NOT EXISTS "${header_path}")
-        message(FATAL_ERROR "Factory symbols require an existing generated header")
+        message(
+            FATAL_ERROR
+            "Factory symbols require an existing generated header"
+        )
     endif()
     file(READ "${header_path}" factory_header)
     set(factory_pattern
-        "(const (nx_[a-z0-9_]+_t|char)[*]|nx_uart_tx_validate_fn) (nx_factory_[a-z0-9_]+)[(]")
+        "(const (nx_[a-z0-9_]+_t|char)[*]|nx_uart_tx_validate_fn) (nx_factory_[a-z0-9_]+)[(]"
+    )
     string(REGEX MATCHALL "${factory_pattern}" declarations "${factory_header}")
-    string(REGEX MATCHALL "nx_factory_[A-Za-z0-9_]+[ \t\r\n]*[(]"
-        references "${factory_header}")
+    string(
+        REGEX MATCHALL "nx_factory_[A-Za-z0-9_]+[ \t\r\n]*[(]"
+        references
+        "${factory_header}"
+    )
     list(LENGTH declarations declaration_count)
     list(LENGTH references reference_count)
     if(declaration_count EQUAL 0 OR NOT declaration_count EQUAL reference_count)

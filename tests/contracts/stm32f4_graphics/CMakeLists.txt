@@ -11,19 +11,26 @@ set(consumer_sources "${CMAKE_CURRENT_LIST_DIR}/consumer.c")
 get_filename_component(reference_name "${NEXUS_ASSEMBLY_FILE}" NAME)
 # Only the reviewed RGB565 composition owns two fixed-format framebuffers.
 if(reference_name STREQUAL "combined.toml")
-    set(consumer_sources "${CMAKE_CURRENT_LIST_DIR}/sustained_consumer.c"
-        "${CMAKE_CURRENT_LIST_DIR}/sustained_sequence.c")
+    set(consumer_sources
+        "${CMAKE_CURRENT_LIST_DIR}/sustained_consumer.c"
+        "${CMAKE_CURRENT_LIST_DIR}/sustained_sequence.c"
+    )
 endif()
 nexus_add_firmware(nexus_f4_graphics_consumer
-    SOURCES ${consumer_sources})
+    SOURCES ${consumer_sources}
+)
 nexus_target_warnings(nexus_f4_graphics_consumer STRICT)
 find_package(Python3 3.11 REQUIRED COMPONENTS Interpreter)
 get_target_property(graphics_config Nexus::Platform NEXUS_CONFIG_DIR)
 # The original provider gate independently verifies these real linked methods.
-add_custom_command(TARGET nexus_f4_graphics_consumer POST_BUILD
-    COMMAND "${Python3_EXECUTABLE}" -B
-        "${NEXUS_SOURCE_ROOT}/tools/measurement/retention.py"
-        --elf "$<TARGET_FILE:nexus_f4_graphics_consumer>"
-        --bindings "${graphics_config}/bindings.c"
-        --output "${CMAKE_CURRENT_BINARY_DIR}/bin/provider-retention.json"
-    VERBATIM)
+add_custom_command(
+    TARGET nexus_f4_graphics_consumer
+    POST_BUILD
+    COMMAND
+        "${Python3_EXECUTABLE}" -B
+        "${NEXUS_SOURCE_ROOT}/tools/measurement/retention.py" --elf
+        "$<TARGET_FILE:nexus_f4_graphics_consumer>" --bindings
+        "${graphics_config}/bindings.c" --output
+        "${CMAKE_CURRENT_BINARY_DIR}/bin/provider-retention.json"
+    VERBATIM
+)

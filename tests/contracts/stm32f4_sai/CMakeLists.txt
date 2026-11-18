@@ -15,14 +15,19 @@ if("${audio_modes}" MATCHES "-blocks")
     set(consumer "blocks_consumer.c")
 endif()
 nexus_add_firmware(nexus_f4_sai_consumer
-    SOURCES "${CMAKE_CURRENT_LIST_DIR}/${consumer}")
+    SOURCES "${CMAKE_CURRENT_LIST_DIR}/${consumer}"
+)
 nexus_target_warnings(nexus_f4_sai_consumer STRICT)
 find_package(Python3 3.11 REQUIRED COMPONENTS Interpreter)
 # The original provider gate independently verifies these real linked methods.
-add_custom_command(TARGET nexus_f4_sai_consumer POST_BUILD
-    COMMAND "${Python3_EXECUTABLE}" -B
-        "${NEXUS_SOURCE_ROOT}/tools/measurement/retention.py"
-        --elf "$<TARGET_FILE:nexus_f4_sai_consumer>"
-        --bindings "${sai_config}/bindings.c"
-        --output "${CMAKE_CURRENT_BINARY_DIR}/bin/provider-retention.json"
-    VERBATIM)
+add_custom_command(
+    TARGET nexus_f4_sai_consumer
+    POST_BUILD
+    COMMAND
+        "${Python3_EXECUTABLE}" -B
+        "${NEXUS_SOURCE_ROOT}/tools/measurement/retention.py" --elf
+        "$<TARGET_FILE:nexus_f4_sai_consumer>" --bindings
+        "${sai_config}/bindings.c" --output
+        "${CMAKE_CURRENT_BINARY_DIR}/bin/provider-retention.json"
+    VERBATIM
+)

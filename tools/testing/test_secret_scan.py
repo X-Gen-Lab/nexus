@@ -7,23 +7,53 @@ from pathlib import Path
 import subprocess
 import tempfile
 import unittest
-from urllib.parse import urlsplit, urlunsplit
 
 from scripts.ci import secret_scan
 
 ROOT = Path(__file__).resolve().parents[2]
-SOURCE_PATH = "tools/testing/test_dependency_proposals.py"
+SOURCE_PATH = "tools/testing/test_secret_scan_fixture.py"
 
 
 class SecretScanTests(unittest.TestCase):
+    def test_empty_exception_policy_keeps_all_candidates_blocking(self):
+        policy = self.policy | {"reviewed_unknowns": []}
+        self.assertEqual(secret_scan.evaluate(
+            b"", b"", 0, self.root, policy)["status"], "passed")
+        candidate = json.dumps(self.candidate()).encode()
+        self.assertEqual(secret_scan.evaluate(
+            candidate, b"", 183, self.root, policy)["blocking_count"], 1)
+
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory()
         self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name)
         self.policy = json.loads((ROOT / ".github/security/trufflehog.json").read_text())
-        # Tests work in shallow CI checkouts while still committing the actual
-        # reviewed source into a real isolated Git repository.
-        self.source = (ROOT / SOURCE_PATH).read_bytes()
+        # A small local source fixture exercises exact context admission without
+        # retaining retired tools or credential-like strings in this repository.
+        self.source = (
+            "class Fixture:\n"
+            "    def test_first_reviewed_context(self):\n"
+            "        with self.assertRaises(ValueError):\n"
+            "            reject_first()\n"
+            "\n"
+            "    def test_second_reviewed_context(self):\n"
+            "        with self.assertRaises(ValueError):\n"
+            "            reject_second()\n"
+        ).encode()
+        lines = self.source.decode().splitlines(keepends=True)
+        self.policy["reviewed_unknowns"] = []
+        for node in ast.walk(ast.parse(self.source)):
+            if not isinstance(node, ast.FunctionDef):
+                continue
+            context = "".join(lines[node.lineno - 1:node.end_lineno]).encode()
+            raw = "synthetic-scanner-fixture-" + node.name
+            self.policy["reviewed_unknowns"].append({
+                "detector": "URI", "detector_type": 17, "source_type": 16,
+                "path": SOURCE_PATH, "function": node.name,
+                "raw_sha256": hashlib.sha256(raw.encode()).hexdigest(),
+                "context_sha256": hashlib.sha256(context).hexdigest(),
+                "reason": "Local synthetic context-admission fixture",
+            })
         destination = self.root / SOURCE_PATH
         destination.parent.mkdir(parents=True)
         destination.write_bytes(self.source)
@@ -43,11 +73,7 @@ class SecretScanTests(unittest.TestCase):
         node = next(n for n in ast.walk(ast.parse(self.source))
                     if isinstance(n, ast.FunctionDef)
                     and n.name == reviewed["function"])
-        literal = next(n.value for n in ast.walk(node)
-                       if isinstance(n, ast.Constant) and isinstance(n.value, str)
-                       and n.value.startswith("https:") and "@" in n.value)
-        url = urlsplit(literal)
-        raw = urlunsplit((url.scheme, url.netloc, "", "", ""))
+        raw = "synthetic-scanner-fixture-" + node.name
         self.assertEqual(hashlib.sha256(raw.encode()).hexdigest(),
                          reviewed["raw_sha256"])
         return {"DetectorName": "URI", "DetectorType": 17, "SourceType": 16,

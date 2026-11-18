@@ -5,6 +5,10 @@ nexus_google_test(nexus_st_usb_device_stack_test
     LIBRARIES Nexus::STUSBDevice Nexus::NativeModel Nexus::Arch
     INCLUDES
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/dwc_otg_device" "${NEXUS_SOURCE_DIR}/components/protocols/st_usb_device/private"
-        "${NEXUS_SOURCE_DIR}/tests/support/native/drivers")
-target_include_directories(nexus_st_usb_device_stack_test SYSTEM PRIVATE
-    "${NEXUS_SOURCE_DIR}/vendors/st/usb_device/Core/Inc")
+        "${NEXUS_SOURCE_DIR}/tests/support/native/drivers"
+)
+target_include_directories(
+    nexus_st_usb_device_stack_test
+    SYSTEM
+    PRIVATE "${NEXUS_SOURCE_DIR}/vendors/st/usb_device/Core/Inc"
+)

@@ -308,59 +308,20 @@ python tools/dev/dev.py prepare --preset stm32-qiming-baremetal --allow-network
 需要另存依赖 Git 对象，或保留可验证的完整源码 SDK，并实际验证异地恢复。服务
 不可用时消费已批准的离线包，不把临时换源隐藏在普通构建中。
 
-## Codex 的每周依赖流程
+## 依赖升级与审查
 
-`tools/maintenance/dependency_proposals.py` 默认只观察当前实际 Gitlink、锁、归档和
-许可证字节，网络读取为零。它覆盖 FreeRTOS、CMSIS、STM32 CMSIS、GD32 import、
-GoogleTest、ARM 工具链、开发环境/Python 工具锁和 GitHub Actions 的确切 pins。
-某项发行物还需审查许可证时，会明确记录 required，不从版本名猜许可。
+依赖升级通过普通 PR，不再维护每周建议报告、候选计划或另一套任务台账。审查官方来源、
+精确 revision、组织补丁和许可证，再一起更新 gitlink、来源锁与必要的外部 SDK pin。
+官方基线与组织集成提交分别记录，不从 fork 分支名推断官方版本，也不自动选择 latest。
 
-```sh
-.venv/bin/python tools/maintenance/dependency_proposals.py
-.venv/bin/python tools/maintenance/dependency_proposals.py \
-    --observe-upstream --upstream-output build/maintenance/upstream-fresh
-.venv/bin/python tools/maintenance/dependency_proposals.py \
-    --plan /abs/candidate-proposal.json
-```
-
-显式 upstream 模式只查询目录中官方 `upstream_url` 的 heads/tags，组织 fork 的
-`fetch_url` 不替代版本来源。普通依赖的 `upstream_revision` 等于所选 Gitlink；
-FreeRTOS 地址迁移提交分别记录 `selected_revision` 与官方 `upstream_base`，
-避免把组织提交误判为官方缺失版本。真正升级官方基线后，新的组织集成提交也必须
-重新准备并审查。使用无 shell、禁止 credential helper/交互/global config 的
-`git ls-remote`；每个请求最长 10 秒，
-stdout/stderr 总捕获上限 1 MiB，refs 最多 8192 条。复用已有有界 subprocess
-capture/kill/reap 机制，不执行 HIL admission 或设备动作。输出目录必须新建且无
-symlink；源码内只允许 build 目录。原始 stream、argv、实际退出码、时间和工具/
-响应 SHA 均保留。网络、超时、输出或格式失败为 `not_observed`；没有 Git publication
-的 GD32/工具链/环境项需单独审查发行来源，不能伪造版本观察成功。观察 refs 不是
-选择最新可靠版本或批准升级。周度 workflow 的实际运行状态需另看 GitHub 证据。
-
-candidate plan 使用严格 JSON：`schema_version=1`、已观察的 `dependency`、明确
-`proposed_revision`、不带凭据/query 的公共 HTTPS `source_url`、实际非空 archive
-identity、声明的 license expression 和 notices identities，以及可选的 `evidence`
-映射。每个 identity 都是绝对 `path`、完整 `sha256` 和真实 `size`。Git 来源必须是
-完整 40 位 commit，不能用 main/latest；license 内容必须独立审查，声明不是许可
-批准。archive 是否来自该 commit、是否完整包含声明 notice 和所有变更也在独立
-来源/许可证 review 中验证，工具不会从任意用户提供的 notice 推断这些事实。
-
-| 必需 gate | 验收范围 |
+| 检查 | 实际验收范围 |
 |---|---|
-| license_review | 来源/archive/commit、全部再分发文件、许可/notice 变更，由独立 Codex review 复核 |
-| configuration | 全配置/内核边界、单一输入闭包、schema/epoch 与生成一致性 |
-| host_models | pinned GoogleTest/GoogleMock 全发现执行、工具/CTest、维护的 Native sanitizer profiles |
-| cortex_runtime | 当前 CPU/ISA/FP/MVE/ABI runtime、受维护 MPU 与 Secure/NS 软件矩阵 |
-| board_arm | 三块精确 Board × baremetal/FreeRTOS，受影响的外部 examples |
-| resource_budgets | 每个新 ELF 独立预算、同 fixture 前后成本、各 RAM 域和 reservation |
-| installed_sdk | clean exact source SDK、版本/epoch 拒绝、实际独立消费者 |
-| offline_reproduction | 绑定环境内两次 fresh network-disabled 构建及同一 ELF/BIN/map bytes |
-| static_analysis | owned ClangTidy/Cppcheck、格式/注释、原始失败与明确 vendor 审查边界 |
+| 来源与许可 | 精确源码、gitlink、锁、再分发 notice 和许可证变更 |
+| 配置与行为 | 受影响装配、资源冲突、真实 C 合同及 Native 模式 |
+| ARM 与资源 | 受影响精确器件的编译、链接、ABI 和 ELF 预算 |
+| SDK | 精确源码闭包、搬移、篡改拒绝与独立消费者 |
+| 代码审查 | 格式、注释、静态分析及必要的独立风险审查 |
 
-工具只形成 proposal。缺证据为 `not_executed`；提供真实 file identities 也只变成
-`referenced_unreviewed`。即使引用 JSON 自称 passed，工具也不升级资格，不执行其
-命令、不修改 Gitlink/lock、不创建自动升级 commit。现有正式 validators 必须对
-升级的 exact clean 源、完整 scope 和同一 artifact 独立执行。随后通过正常 staged
-review、hooks 和 CI 原子更新源码 Gitlink/厂商 import、锁、许可和外部 SDK pin。
-
-没有实板时，受升级影响的电气、IRQ/DMA timing、低功耗和长期负载仍是物理 pending。
-一次 upstream request、一个模型 pass 或之前版本的软件候选都不能代替本次验收。
+检查使用现有维护和构建入口，不为升级生成第二套资格状态。保留实际命令、退出码和
+来源身份；旧报告不能证明新 revision。普通配置、构建和提交不自动联网或改写来源锁。
+没有实板时，受升级影响的电气、IRQ／DMA 时序、低功耗和长期负载保持未验证。

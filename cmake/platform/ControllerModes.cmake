@@ -7,18 +7,33 @@ function(nexus_controller_values output kind field)
     if(count GREATER 0)
         math(EXPR last "${count} - 1")
         foreach(index RANGE 0 ${last})
-            string(JSON selected_kind GET "${resolved}"
-                controllers ${index} kind)
+            string(
+                JSON selected_kind
+                GET "${resolved}"
+                controllers
+                ${index}
+                kind
+            )
             if(selected_kind STREQUAL kind)
                 if(controller)
-                    string(JSON selected_controller GET "${resolved}"
-                        controllers ${index} controller)
+                    string(
+                        JSON selected_controller
+                        GET "${resolved}"
+                        controllers
+                        ${index}
+                        controller
+                    )
                     if(NOT selected_controller STREQUAL controller)
                         continue()
                     endif()
                 endif()
-                string(JSON value GET "${resolved}"
-                    controllers ${index} "${field}")
+                string(
+                    JSON value
+                    GET "${resolved}"
+                    controllers
+                    ${index}
+                    "${field}"
+                )
                 list(APPEND values "${value}")
             endif()
         endforeach()

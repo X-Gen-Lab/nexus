@@ -69,12 +69,15 @@ python tools/dev/dev.py docs check
 
 `matrix`、`docs`、`check` 和 `doctor --target docs|workflows` 需要完整开发仓库，
 不属于 Source SDK 的构建工具闭包；SDK 在加载仓库专用模块前明确拒绝这些命令。
-`check` 执行格式、维护约束和完整普通开发门禁。普通 commit hook 使用同一门禁，
-读取完整暂存区，运行全部 Native GoogleTest 与受影响的完整工具域。
-一次配置和构建足够；不重复执行已运行的工具域。完整 CI 还覆盖其他 Native 模式、
+`doctor` 只诊断所选工具和环境，不扫描全平台能力。`check` 执行格式与完整开发门禁。
+普通 commit hook 读取完整暂存区，运行全部 Native GoogleTest；普通固件实现改动不触发
+整套辅助工具域，公共头、声明事实和工具改动选择完整的相关测试模块，未知输入保守执行完整域。
+快速提交报告明确标记有限 scope，不能替代完整验收。合并前用 `check` 或 `--all` 执行
+完整工具域，独立执行其他 Native 模式、
 ARM 链接和独立 Source SDK 消费者。GoogleTest／GoogleMock 仅链接到主机测试。
 
-`create` 创建外部工程；`artifacts` 读取实际构建来源；`timings` 汇总原始执行耗时。
+`create` 创建外部工程；`timings` 直接汇总已有执行记录。普通 configure／build 不自动
+生成完整来源归档；需用于设备操作的精确映像身份时显式传入 `--record-provenance`。
 `flash`、`debug`、`monitor` 默认准备可审查的操作，通过各自显式执行选项接入设备。
 设备身份、探针、串口和映像必须匹配；规划或链接不能建立物理 HIL 通过状态。
 

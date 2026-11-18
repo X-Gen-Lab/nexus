@@ -8,6 +8,7 @@ set(NEXUS_BUILD_TESTS OFF CACHE BOOL "No host framework in firmware")
 set(NEXUS_BUILD_WORKLOAD OFF CACHE BOOL "Explicit NAND consumer")
 add_subdirectory("${NEXUS_SOURCE_ROOT}" nexus-sdk)
 nexus_add_firmware(fsmc_nand_fixture
-    SOURCES "${NEXUS_SOURCE_ROOT}/tests/contracts/fsmc_reference.c")
+    SOURCES "${NEXUS_SOURCE_ROOT}/tests/contracts/fsmc_reference.c"
+)
 target_compile_definitions(fsmc_nand_fixture PRIVATE NX_REFERENCE_NAND=1)
 nexus_target_warnings(fsmc_nand_fixture STRICT)

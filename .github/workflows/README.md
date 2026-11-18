@@ -11,15 +11,19 @@
 | quality-checks.yml | 与 hook 共用格式和注释规则；在真实编译数据库上运行静态分析 |
 | docs-build.yml | 锁定工具、文档测试、Doxygen 和严格中英文站点构建 |
 | security.yml | 依赖审计、CodeQL 和秘密扫描 |
-| dependency-maintenance.yml | 定期只读观察上游版本、来源及兼容性，不自动升级 |
 
 Native 的 Debug、Release、ASan／UBSan、TSan 各执行完整 CTest 计划一次。
 GoogleTest 报告必须与未过滤的发现结果逐例匹配，缺失、陈旧、跳过和失败均拒绝。
 与编译模式无关的 Python 工具测试只由独立工具 job 执行一次。
 
 普通 commit hook 读取完整暂存区，先检查所需工具，配置和构建一次，再执行完整
-Native GoogleTest 和受影响的完整工具域。构建或配置策略变更执行所有工具域。
+Native GoogleTest。普通固件实现不触发整套辅助工具域；公共头、声明事实和工具改动
+选择完整相关测试模块，未知或缺少已知覆盖时保守执行完整域。提交报告不代表完整资格；
+合并前通过 `--all` 独立执行完整工具矩阵、相关 ARM 与 SDK 验证。
 CI 的完整 Native runtime 另由 `scripts/ci/native_contracts.py` 校验。
+工具 job 只准备实际编译和生成输入，不重复完整 Native 执行；全局能力与文档一致性
+检查只在 testing 域执行一次。依赖升级走普通 PR 和现有来源锁、许可证、消费者验证，
+不再维护自动建议报告和虚构人员席位配置。
 
 ARM 装配通过 `provider_assemblies.py` 检查实际来源、链接和预算。
 `declared_io_assembly` 与 I/O evolution 的精确配置保留真实编译入口。

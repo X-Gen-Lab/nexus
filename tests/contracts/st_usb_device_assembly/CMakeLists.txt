@@ -11,8 +11,13 @@ set(NEXUS_BUILD_TESTS OFF CACHE BOOL "ARM link fixture")
 set(NEXUS_BUILD_WORKLOAD OFF CACHE BOOL "Explicit private integration")
 add_subdirectory("${NEXUS_SOURCE_ROOT}" nexus-sdk)
 nexus_add_firmware(usb_device_stack_fixture SOURCES device_stack_main.c)
-target_include_directories(usb_device_stack_fixture PRIVATE
-    "${NEXUS_SOURCE_ROOT}/components/protocols/st_usb_device/private")
-target_include_directories(usb_device_stack_fixture SYSTEM PRIVATE
-    "${NEXUS_SOURCE_ROOT}/vendors/st/usb_device/Core/Inc")
+target_include_directories(
+    usb_device_stack_fixture
+    PRIVATE "${NEXUS_SOURCE_ROOT}/components/protocols/st_usb_device/private"
+)
+target_include_directories(
+    usb_device_stack_fixture
+    SYSTEM
+    PRIVATE "${NEXUS_SOURCE_ROOT}/vendors/st/usb_device/Core/Inc"
+)
 nexus_target_warnings(usb_device_stack_fixture STRICT)

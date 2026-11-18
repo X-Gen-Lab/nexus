@@ -18,17 +18,35 @@ foreach(timer_family stm32f4)
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/advanced_timer" "${NEXUS_SOC_SOURCE_${timer_family}}"
             "${NEXUS_SOURCE_DIR}/arch/include"
             "${NEXUS_SOURCE_DIR}/io/include"
-            "${NEXUS_SOURCE_DIR}/io/private")
-    target_compile_options(${timer_target} PRIVATE
-        "-include${nexus_google_root}/soc/timer_advanced_model.h")
-    target_include_directories(${timer_target} SYSTEM PRIVATE
-        "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
-        "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+            "${NEXUS_SOURCE_DIR}/io/private"
+    )
+    target_compile_options(
+        ${timer_target}
+        PRIVATE "-include${nexus_google_root}/soc/timer_advanced_model.h"
+    )
+    target_include_directories(
+        ${timer_target}
+        SYSTEM
+        PRIVATE
+            "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
+            "${NEXUS_CMSIS_CORE_INCLUDE_DIR}"
+    )
     nexus_use_cmsis_core(${timer_target})
     target_compile_definitions(${timer_target} PRIVATE STM32F407xx)
-    foreach(small_timer 9 10 11 12 13 14)
-        target_sources(${timer_target} PRIVATE
-            "${NEXUS_SOC_SOURCE_${timer_family}}/drivers/timer/timer_capture_tim${small_timer}.c")
+    foreach(
+        small_timer
+        9
+        10
+        11
+        12
+        13
+        14
+    )
+        target_sources(
+            ${timer_target}
+            PRIVATE
+                "${NEXUS_SOC_SOURCE_${timer_family}}/drivers/timer/timer_capture_tim${small_timer}.c"
+        )
     endforeach()
 endforeach()
 
@@ -41,11 +59,18 @@ nexus_google_test(nexus_stm32f4_timer_route_test STM32F4_LL
     LIBRARIES Nexus::IO Nexus::Core
     INCLUDES
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/advanced_timer" "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
-        "${NEXUS_SOURCE_DIR}/arch/include" "${NEXUS_SOURCE_DIR}/io/private")
-target_compile_options(nexus_stm32f4_timer_route_test PRIVATE
-    "-include${nexus_google_root}/soc/stm32_timer_route_model.h")
-target_include_directories(nexus_stm32f4_timer_route_test SYSTEM PRIVATE
-    "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
-    "${NEXUS_CMSIS_CORE_INCLUDE_DIR}")
+        "${NEXUS_SOURCE_DIR}/arch/include" "${NEXUS_SOURCE_DIR}/io/private"
+)
+target_compile_options(
+    nexus_stm32f4_timer_route_test
+    PRIVATE "-include${nexus_google_root}/soc/stm32_timer_route_model.h"
+)
+target_include_directories(
+    nexus_stm32f4_timer_route_test
+    SYSTEM
+    PRIVATE
+        "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
+        "${NEXUS_CMSIS_CORE_INCLUDE_DIR}"
+)
 nexus_use_cmsis_core(nexus_stm32f4_timer_route_test)
 target_compile_definitions(nexus_stm32f4_timer_route_test PRIVATE STM32F407xx)

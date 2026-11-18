@@ -11,13 +11,20 @@ nexus_add_firmware(mmc_width_fixture SOURCES main.c)
 nexus_target_warnings(mmc_width_fixture STRICT)
 find_package(Python3 3.11 REQUIRED COMPONENTS Interpreter)
 get_target_property(fixture_config Nexus::Platform NEXUS_CONFIG_DIR)
-set_property(TARGET mmc_width_fixture APPEND PROPERTY LINK_DEPENDS
-    "${NEXUS_SOURCE_ROOT}/tools/measurement/retention.py")
-add_custom_command(TARGET mmc_width_fixture POST_BUILD
-    COMMAND "${Python3_EXECUTABLE}" -B
-        "${NEXUS_SOURCE_ROOT}/tools/measurement/retention.py"
-        --elf "$<TARGET_FILE:mmc_width_fixture>"
-        --bindings "${fixture_config}/bindings.c"
-        --resolved "${fixture_config}/resolved.json"
-        --output "${CMAKE_CURRENT_BINARY_DIR}/bin/provider-retention.json"
-    VERBATIM)
+set_property(
+    TARGET mmc_width_fixture
+    APPEND
+    PROPERTY LINK_DEPENDS "${NEXUS_SOURCE_ROOT}/tools/measurement/retention.py"
+)
+add_custom_command(
+    TARGET mmc_width_fixture
+    POST_BUILD
+    COMMAND
+        "${Python3_EXECUTABLE}" -B
+        "${NEXUS_SOURCE_ROOT}/tools/measurement/retention.py" --elf
+        "$<TARGET_FILE:mmc_width_fixture>" --bindings
+        "${fixture_config}/bindings.c" --resolved
+        "${fixture_config}/resolved.json" --output
+        "${CMAKE_CURRENT_BINARY_DIR}/bin/provider-retention.json"
+    VERBATIM
+)

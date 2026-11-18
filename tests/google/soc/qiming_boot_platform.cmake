@@ -1,31 +1,47 @@
 # Real generated C keeps the permanent SRAM owner before runtime construction.
 set(boot_platform_bundle "${CMAKE_CURRENT_BINARY_DIR}/qiming-boot-platform")
-execute_process(COMMAND "${Python3_EXECUTABLE}" -B
-    "${NEXUS_SOURCE_DIR}/tools/configure/configure.py" --test-support
-    --source-root "${NEXUS_SOURCE_DIR}"
-    --assembly "${NEXUS_SOURCE_DIR}/boards/stm32f407zg_qiming_v41/assemblies/sram-startup.toml"
-    --output "${boot_platform_bundle}"
+execute_process(
+    COMMAND
+        "${Python3_EXECUTABLE}" -B
+        "${NEXUS_SOURCE_DIR}/tools/configure/configure.py" --test-support
+        --source-root "${NEXUS_SOURCE_DIR}" --assembly
+        "${NEXUS_SOURCE_DIR}/boards/stm32f407zg_qiming_v41/assemblies/sram-startup.toml"
+        --output "${boot_platform_bundle}"
     RESULT_VARIABLE boot_platform_generated
-    OUTPUT_VARIABLE boot_platform_output ERROR_VARIABLE boot_platform_error)
+    OUTPUT_VARIABLE boot_platform_output
+    ERROR_VARIABLE boot_platform_error
+)
 if(NOT boot_platform_generated EQUAL 0)
-    message(FATAL_ERROR "Boot Platform fixture rejected: ${boot_platform_output}${boot_platform_error}")
+    message(
+        FATAL_ERROR
+        "Boot Platform fixture rejected: ${boot_platform_output}${boot_platform_error}"
+    )
 endif()
 nexus_google_configuration_inputs("${boot_platform_bundle}")
 # The reset-proof boundary is mocked; host address placeholders provide the
 # generated plan's linker names without claiming physical Flash/RAM placement.
-file(STRINGS "${boot_platform_bundle}/bindings.c" boot_platform_linker_rows
-    REGEX "^extern uint8_t [A-Za-z_][A-Za-z0-9_]*;$")
+file(
+    STRINGS "${boot_platform_bundle}/bindings.c"
+    boot_platform_linker_rows
+    REGEX "^extern uint8_t [A-Za-z_][A-Za-z0-9_]*;$"
+)
 set(boot_platform_linker_source "#include <stdint.h>\n")
 foreach(row IN LISTS boot_platform_linker_rows)
     string(REGEX REPLACE "^extern " "" definition "${row}")
     string(APPEND boot_platform_linker_source "${definition}\n")
 endforeach()
-string(APPEND boot_platform_linker_source
-    "const uint32_t g_pfnVectors[] = {0U};\n")
+string(
+    APPEND boot_platform_linker_source
+    "const uint32_t g_pfnVectors[] = {0U};\n"
+)
 # Model-only symbols do not belong to the atomically published product bundle.
 set(boot_platform_model "${CMAKE_CURRENT_BINARY_DIR}/qiming-boot-model")
-file(CONFIGURE OUTPUT "${boot_platform_model}/host-linker-symbols.c"
-    CONTENT "${boot_platform_linker_source}" @ONLY)
+file(
+    CONFIGURE
+    OUTPUT "${boot_platform_model}/host-linker-symbols.c"
+    CONTENT "${boot_platform_linker_source}"
+    @ONLY
+)
 nexus_google_test(nexus_qiming_boot_platform_test STM32F4_LL
     SOURCES "${nexus_google_root}/soc/qiming_boot_platform_test.cpp"
         "${boot_platform_bundle}/bindings.c"
@@ -43,11 +59,22 @@ nexus_google_test(nexus_qiming_boot_platform_test STM32F4_LL
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/sdk/hal_config/fsmc"
         "${NEXUS_SOURCE_DIR}/arch/include"
-        "${nexus_google_root}/soc")
-target_include_directories(nexus_qiming_boot_platform_test SYSTEM PRIVATE
-    "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
+        "${nexus_google_root}/soc"
+)
+target_include_directories(
+    nexus_qiming_boot_platform_test
+    SYSTEM
+    PRIVATE "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
+)
 nexus_use_cmsis_core(nexus_qiming_boot_platform_test)
-target_compile_definitions(nexus_qiming_boot_platform_test PRIVATE STM32F407xx
-    _init=nx_qiming_boot_fixture_init _fini=nx_qiming_boot_fixture_fini)
-target_compile_options(nexus_qiming_boot_platform_test PRIVATE
-    "-include${nexus_google_root}/soc/qiming_boot_platform_model.h")
+target_compile_definitions(
+    nexus_qiming_boot_platform_test
+    PRIVATE
+        STM32F407xx
+        _init=nx_qiming_boot_fixture_init
+        _fini=nx_qiming_boot_fixture_fini
+)
+target_compile_options(
+    nexus_qiming_boot_platform_test
+    PRIVATE "-include${nexus_google_root}/soc/qiming_boot_platform_model.h"
+)

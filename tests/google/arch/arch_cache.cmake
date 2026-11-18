@@ -14,10 +14,17 @@ foreach(profile none data instruction both)
         SOURCES "${nexus_google_root}/arch/arch_cache_test.cpp"
         "${NEXUS_SOURCE_DIR}/arch/arm/cortex_m/nx_arch_cache.c"
         INCLUDES "${NEXUS_SOURCE_DIR}/arch/include"
-            "${nexus_google_root}/arch")
-    target_compile_definitions(${name} PRIVATE NEXUS_ARCH_MECHANISM_MODEL
-        NEXUS_ARCH_DCACHE_LINE_BYTES=${data_line}
-        NEXUS_ARCH_ICACHE_LINE_BYTES=${instruction_line}
-        NEXUS_ARCH_MPU_VERSION=0 NEXUS_ARCH_SECURITY_STATE=0
-        NEXUS_ARCH_HAS_SAU=0 NEXUS_ARCH_HAS_DWT_CYCCNT=0)
+            "${nexus_google_root}/arch"
+    )
+    target_compile_definitions(
+        ${name}
+        PRIVATE
+            NEXUS_ARCH_MECHANISM_MODEL
+            NEXUS_ARCH_DCACHE_LINE_BYTES=${data_line}
+            NEXUS_ARCH_ICACHE_LINE_BYTES=${instruction_line}
+            NEXUS_ARCH_MPU_VERSION=0
+            NEXUS_ARCH_SECURITY_STATE=0
+            NEXUS_ARCH_HAS_SAU=0
+            NEXUS_ARCH_HAS_DWT_CYCCNT=0
+    )
 endforeach()

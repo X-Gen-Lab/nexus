@@ -3,6 +3,7 @@ from tools.configure.tests.native_fixture import native_fixture
 import copy
 import json
 from pathlib import Path
+import re
 import tempfile
 import shutil
 from unittest.mock import patch
@@ -268,7 +269,10 @@ class CompatibilityTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "version.cmake.in"
             source = (ROOT / "cmake/package/NexusConfigVersion.cmake.in").read_text()
-            path.write_text(source.replace('NOT PACKAGE_FIND_VERSION_RANGE AND ', ''))
+            changed, count = re.subn(
+                r'\bNOT\s+PACKAGE_FIND_VERSION_RANGE\s+AND\s+', '', source)
+            self.assertEqual(count, 1, "Expected one version-range guard mutation")
+            path.write_text(changed)
             with self.assertRaisesRegex(ValueError, "exact"):
                 compatibility.package_exact(path, self.version)
 

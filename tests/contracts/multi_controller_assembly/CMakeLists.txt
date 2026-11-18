@@ -2,7 +2,10 @@ cmake_minimum_required(VERSION 3.31)
 project(multi_controller_provider_link_fixture LANGUAGES C ASM)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 if(NOT NEXUS_SOURCE_ROOT OR NOT NEXUS_ASSEMBLY_FILE)
-    message(FATAL_ERROR "Controller fixture needs source root and one explicit assembly")
+    message(
+        FATAL_ERROR
+        "Controller fixture needs source root and one explicit assembly"
+    )
 endif()
 set(NEXUS_BUILD_TESTS OFF CACHE BOOL "No host tests in ARM fixture")
 set(NEXUS_BUILD_WORKLOAD OFF CACHE BOOL "External explicit fixture main")
@@ -16,11 +19,23 @@ string(JSON fixture_device_count LENGTH "${fixture_resolved}" devices)
 if(fixture_device_count GREATER 0)
     math(EXPR fixture_device_last "${fixture_device_count} - 1")
     foreach(index RANGE 0 ${fixture_device_last})
-        string(JSON fixture_driver GET "${fixture_resolved}" devices ${index} driver)
+        string(
+            JSON fixture_driver
+            GET "${fixture_resolved}"
+            devices
+            ${index}
+            driver
+        )
         if(fixture_driver STREQUAL "spi-transaction")
-            target_compile_definitions(multi_controller_fixture PRIVATE NX_FIXTURE_SPI_TRANSACTION)
+            target_compile_definitions(
+                multi_controller_fixture
+                PRIVATE NX_FIXTURE_SPI_TRANSACTION
+            )
         elseif(fixture_driver STREQUAL "spi-dma-transaction")
-            target_compile_definitions(multi_controller_fixture PRIVATE NX_FIXTURE_SPI_DMA_TRANSACTION)
+            target_compile_definitions(
+                multi_controller_fixture
+                PRIVATE NX_FIXTURE_SPI_DMA_TRANSACTION
+            )
         endif()
     endforeach()
 endif()
@@ -28,18 +43,34 @@ string(JSON fixture_controller_count LENGTH "${fixture_resolved}" controllers)
 if(fixture_controller_count GREATER 0)
     math(EXPR fixture_controller_last "${fixture_controller_count} - 1")
     foreach(index RANGE 0 ${fixture_controller_last})
-        string(JSON fixture_mode GET "${fixture_resolved}" controllers ${index} mode)
+        string(
+            JSON fixture_mode
+            GET "${fixture_resolved}"
+            controllers
+            ${index}
+            mode
+        )
         if(fixture_mode STREQUAL "irq-words")
-            target_compile_definitions(multi_controller_fixture PRIVATE NX_FIXTURE_UART_WORD)
+            target_compile_definitions(
+                multi_controller_fixture
+                PRIVATE NX_FIXTURE_UART_WORD
+            )
         elseif(fixture_mode STREQUAL "quadrature")
-            target_compile_definitions(multi_controller_fixture PRIVATE NX_FIXTURE_ENCODER)
+            target_compile_definitions(
+                multi_controller_fixture
+                PRIVATE NX_FIXTURE_ENCODER
+            )
         endif()
     endforeach()
 endif()
-add_custom_command(TARGET multi_controller_fixture POST_BUILD
-    COMMAND "${Python3_EXECUTABLE}" -B
-        "${NEXUS_SOURCE_ROOT}/tools/measurement/retention.py"
-        --elf "$<TARGET_FILE:multi_controller_fixture>"
-        --bindings "${fixture_config}/bindings.c"
-        --output "${CMAKE_CURRENT_BINARY_DIR}/bin/provider-retention.json"
-    VERBATIM)
+add_custom_command(
+    TARGET multi_controller_fixture
+    POST_BUILD
+    COMMAND
+        "${Python3_EXECUTABLE}" -B
+        "${NEXUS_SOURCE_ROOT}/tools/measurement/retention.py" --elf
+        "$<TARGET_FILE:multi_controller_fixture>" --bindings
+        "${fixture_config}/bindings.c" --output
+        "${CMAKE_CURRENT_BINARY_DIR}/bin/provider-retention.json"
+    VERBATIM
+)

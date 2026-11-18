@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 00324222ed51afe19250a18cbe9183c0e11b47fb0da9103a4e512aa481f44bd2\n"
+"X-Nexus-Source-SHA256: b0e66fac6aac492484f795029eb2187fdf209e3c26b906db38e737ed94b819a0\n"
 
 #: ../../../docs/development/workflow.md:9
 msgid "Develop with TDD and normal commit gates"
@@ -218,17 +218,6 @@ msgstr ""
 "根据可用 RAM 与磁盘显式选择有限编译并发预算，不能只看 CPU "
 "数量。复用已验证的源码／工具准备与正常增量构建；按正常规则使改变的配置、依赖和生成输入失效。不得缓存验收报告、恢复不相容的对象或同时修改同一构建树。完整门禁发现、实际退出码、输出身份及失败／取消保留仍为必需。"
 
-#: ../../../docs/development/workflow.md:121
-msgid ""
-"The commit gate configures and builds once for unchanged staged inputs, then"
-" runs all Native GoogleTest cases and affected complete tool domains. "
-"Build/configuration policy changes run every tool domain. Complete CI runs "
-"the four Native modes and all maintained tool domains separately, without "
-"repeating tool tests per mode."
-msgstr ""
-"提交门禁对未变更的暂存输入只配置、构建一次，然后执行全部 Native GoogleTest "
-"和受影响的完整工具域。构建或配置策略变更执行所有工具域。完整 CI 将四种 Native 模式和所有维护中的工具域分开执行，避免逐模式重复工具测试。"
-
 #: ../../../docs/development/workflow.md:126
 msgid ""
 "Before deleting a test, identify its behavioral obligation and independent "
@@ -270,3 +259,12 @@ msgid ""
 msgstr ""
 "每次使用 Conventional Commits 提交一个可评审变更。将接口／配置变化与图示、示例、翻译和执行范围一起评审。产品、执行任务、私有 "
 "PCB 和恢复策略保留在 Nexus 外。记录实际源码／配置／工具／ELF 身份与物理待执行项；成功 commit 或 CI 不将结果升级为产品发行。"
+
+msgid "`doctor` only diagnoses the selected environment and tool versions. Ordinary configure/build commands keep process logs and actual exits; add `--record-provenance` explicitly when preparing an identified image for device operations. The testing domain checks the global capability matrix and derived documentation once. Local peripheral tests use their own inputs instead of scanning every assembly."
+msgstr "`doctor` 只诊断所选环境和工具版本。普通 configure／build 命令保留进程日志和真实退出码；为设备操作准备具备明确身份的映像时，显式添加 `--record-provenance`。testing 域统一检查一次全局能力矩阵与派生文档。局部外设测试使用自身输入，不扫描全部装配。"
+
+msgid "Before merge or delivery, independently execute the complete tool domains, relevant ARM links and Source SDK consumers. `--all` and `--tools all` always run the four full domains; `dev.py check` is the full integration entry. Complete CI also runs all four Native modes, without repeating tool tests per mode or the full Native execution in the tool job. A quick commit does not replace these results, and successful qualification reports are never cached."
+msgstr "合并或交付前，独立执行完整工具域、相关 ARM 链接和 Source SDK 消费者。`--all` 与 `--tools all` 始终运行四个完整域；`dev.py check` 是完整集成入口。完整 CI 还执行全部四种 Native 模式，不按模式重复工具测试，也不在工具作业中重复完整 Native 执行。快速提交不能替代这些结果，不缓存成功的资格报告。"
+
+msgid "The commit gate configures and builds once for unchanged staged inputs, then runs all Native GoogleTest cases and complete affected tool modules. Known firmware implementation changes need no auxiliary domain. Headers and declarative facts select configuration contracts and the single global support check. Changed test modules run in full; known tool implementations use maintained module mappings. Unknown paths or missing known coverage retain full domains. Commit reports state `commit-tools` and `qualification=false`; they do not claim full-domain acceptance or filter cases inside selected modules."
+msgstr "提交门禁针对未改变的暂存输入仅配置、构建一次，然后执行全部 Native GoogleTest 用例和受影响的完整工具测试模块。已知的固件实现改动无需辅助工具域。公共头和声明事实选择配置合同与一次全局支持检查。已修改的测试模块完整运行；已知工具实现使用维护的模块映射。未知路径或缺少已知覆盖时保留完整域。提交报告标记 `commit-tools` 和 `qualification=false`，不声称完整域验收通过，也不筛选已选模块内的用例。"

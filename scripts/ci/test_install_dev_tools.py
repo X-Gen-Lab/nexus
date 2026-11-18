@@ -25,14 +25,15 @@ class InstallDevToolsTests(unittest.TestCase):
         self.lock = self.root / INSTALLER.LOCK_NAME
         self.lock.parent.mkdir()
         # Versions deliberately differ from the repository's initial lock.
-        self.pins = {"pre-commit": "5.2.1", "clang-format": "19.3.2"}
-        self.lock.write_text("# Tool pins\npre-commit==5.2.1\nclang-format==19.3.2\n", encoding="utf-8")
+        self.pins = {"pre-commit": "5.2.1", "clang-format": "19.3.2", "gersemi": "0.29.2"}
+        self.lock.write_text("# Tool pins\npre-commit==5.2.1\nclang-format==19.3.2\ngersemi==0.29.2\n", encoding="utf-8")
         self.installed = dict(self.pins)
         self.hooks_path = None
         self.python_version = [3, 11, 1]
         self.prefix = self.root / ".venv"
         self.formatter_version = self.pins["clang-format"]
         self.pre_commit_version = self.pins["pre-commit"]
+        self.gersemi_version = self.pins["gersemi"]
         self.fail_pip = False
         self.fail_pre_commit = False
         self.update_after_pip = True
@@ -75,6 +76,8 @@ class InstallDevToolsTests(unittest.TestCase):
             if self.fail_pre_commit:
                 raise subprocess.CalledProcessError(1, command, stderr="missing dependency")
             return subprocess.CompletedProcess(command, 0, f"pre-commit {self.pre_commit_version}\n", "")
+        if "gersemi" in command and "--version" in command:
+            return subprocess.CompletedProcess(command, 0, f"gersemi {self.gersemi_version}\n", "")
         if command[-1] == "--version":
             return subprocess.CompletedProcess(command, 0, f"clang-format version {self.formatter_version}\n", "")
         if "pre_commit" in command and "install" in command:
@@ -94,7 +97,7 @@ class InstallDevToolsTests(unittest.TestCase):
 
     def test_lock_versions_are_authoritative_and_allow_comments(self):
         self.lock.write_text(
-            "# Locked\n\npre-commit==5.2.1 # reviewed\nclang-format==19.3.2\n",
+            "# Locked\n\npre-commit==5.2.1 # reviewed\nclang-format==19.3.2\ngersemi==0.29.2\n",
             encoding="utf-8",
         )
         self.assertEqual(INSTALLER.read_lock(self.lock), self.pins)
@@ -167,7 +170,7 @@ class InstallDevToolsTests(unittest.TestCase):
         self.assertEqual((result, error), (0, ""))
         self.assertFalse(any(call[0] == "git" for call in self.calls))
         self.assertFalse(any("--install-hooks" in call for call in self.calls))
-        self.assertEqual(sum(call[-1] == "--version" for call in self.calls), 2)
+        self.assertEqual(sum(call[-1] == "--version" for call in self.calls), 3)
         self.assertIn("hook installation skipped", output)
 
     def test_skip_hooks_prepares_locked_actionlint_after_python_tools(self):
@@ -251,6 +254,12 @@ class InstallDevToolsTests(unittest.TestCase):
         self.assertEqual(result, 1)
         self.assertIn("package download failed", error)
         self.assertFalse(any("--install-hooks" in call for call in self.calls))
+
+    def test_cmake_formatter_cli_must_match_the_lock(self):
+        self.gersemi_version = "0.0.1"
+        result, _, _, error = self.invoke(["--skip-hooks"])
+        self.assertEqual(result, 1)
+        self.assertIn("gersemi", error)
 
     def test_host_python_too_old_fails_before_commands(self):
         with patch.object(INSTALLER.sys, "version_info", (3, 9, 20)):

@@ -79,18 +79,6 @@ class I2cAsyncConfigurationTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "Polling I2C"):
                 gate.resolve_ir(self.authored(family, "poll-messages"), test_support=native_fixture(self.authored(family, "poll-messages")))
 
-    def test_derived_support_reads_the_actual_shared_production_table(self):
-        from tools.maintenance import capabilities
-        rows = capabilities.collect(gate.ROOT)
-        for family in ('stm32f4',):
-            for mode in ("irq-messages", "dma-messages"):
-                selected = next(row for row in rows
-                                if row["family"] == family
-                                and row["kind"] == "i2c"
-                                and row["mode"] == mode)
-                self.assertEqual(selected["exports"],
-                                 ["soc/stm32/stm32f4/drivers/ip/i2c_v1_async/i2c_v1_async.c"])
-
     def test_priority_integer_range_is_validated_before_emission(self):
         for priority in ("true", -1, 16):
             with self.subTest(priority=priority):

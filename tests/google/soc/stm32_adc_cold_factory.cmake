@@ -7,19 +7,27 @@ foreach(adc_variant ve zg ve6 zg10)
     if(adc_variant MATCHES "([0-9]+)$")
         set(adc_bits "${CMAKE_MATCH_1}")
         file(READ "${adc_input}" adc_assembly)
-        string(REPLACE "board_package = \"${adc_density}_board\""
+        string(
+            REPLACE "board_package = \"${adc_density}_board\""
             "board_package = \"${adc_fixture}/${adc_density}_board\""
-            adc_assembly "${adc_assembly}")
+            adc_assembly
+            "${adc_assembly}"
+        )
         string(APPEND adc_assembly "\nresolution_bits = ${adc_bits}\n")
-        set(adc_input "${CMAKE_CURRENT_BINARY_DIR}/adc-factory-inputs/${adc_variant}.toml")
+        set(adc_input
+            "${CMAKE_CURRENT_BINARY_DIR}/adc-factory-inputs/${adc_variant}.toml"
+        )
         file(CONFIGURE OUTPUT "${adc_input}" CONTENT "${adc_assembly}" @ONLY)
     endif()
     set(adc_bundle "${CMAKE_CURRENT_BINARY_DIR}/f407-adc-${adc_variant}")
-    execute_process(COMMAND "${Python3_EXECUTABLE}" -B
-        "${NEXUS_SOURCE_DIR}/tools/configure/configure.py"
-        --source-root "${NEXUS_SOURCE_DIR}"
-        --assembly "${adc_input}"
-        --output "${adc_bundle}" COMMAND_ERROR_IS_FATAL ANY)
+    execute_process(
+        COMMAND
+            "${Python3_EXECUTABLE}" -B
+            "${NEXUS_SOURCE_DIR}/tools/configure/configure.py" --source-root
+            "${NEXUS_SOURCE_DIR}" --assembly "${adc_input}" --output
+            "${adc_bundle}"
+        COMMAND_ERROR_IS_FATAL ANY
+    )
     nexus_google_configuration_inputs("${adc_bundle}")
     set(adc_target "nexus_stm32_adc_${adc_variant}_cold_factory_test")
     nexus_google_test(${adc_target} STM32F4_LL
@@ -34,14 +42,26 @@ foreach(adc_variant ve zg ve6 zg10)
         INCLUDES "${adc_bundle}"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
             "${NEXUS_SOURCE_DIR}/arch/include"
-            "${NEXUS_SOURCE_DIR}/tests/support/f4_cpu")
-    target_include_directories(${adc_target} SYSTEM PRIVATE
-        "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
-    target_compile_definitions(${adc_target} PRIVATE STM32F407xx
-        NX_TEST_ADC_BITS=${adc_bits} NX_ADC_FACTORY_CONTRACT
-        _init=nx_adc_cold_fixture_init _fini=nx_adc_cold_fixture_fini)
-    target_compile_options(${adc_target} PRIVATE
-        "-include${nexus_google_root}/soc/stm32_adc_cold_model.h")
+            "${NEXUS_SOURCE_DIR}/tests/support/f4_cpu"
+    )
+    target_include_directories(
+        ${adc_target}
+        SYSTEM
+        PRIVATE "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
+    )
+    target_compile_definitions(
+        ${adc_target}
+        PRIVATE
+            STM32F407xx
+            NX_TEST_ADC_BITS=${adc_bits}
+            NX_ADC_FACTORY_CONTRACT
+            _init=nx_adc_cold_fixture_init
+            _fini=nx_adc_cold_fixture_fini
+    )
+    target_compile_options(
+        ${adc_target}
+        PRIVATE "-include${nexus_google_root}/soc/stm32_adc_cold_model.h"
+    )
 endforeach()
 
 # Direct mode, internal-source and multi-converter contracts run only once.
@@ -58,21 +78,33 @@ nexus_google_test(nexus_stm32_adc_cold_direct_test STM32F4_LL
     LIBRARIES Nexus::IO
     INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
         "${NEXUS_SOURCE_DIR}/arch/include"
-        "${NEXUS_SOURCE_DIR}/tests/support/f4_cpu")
-target_include_directories(nexus_stm32_adc_cold_direct_test SYSTEM PRIVATE
-    "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
-target_compile_definitions(nexus_stm32_adc_cold_direct_test PRIVATE
-    STM32F407xx NX_ADC_INTERNAL_CONTRACT)
-target_compile_options(nexus_stm32_adc_cold_direct_test PRIVATE
-    "-include${nexus_google_root}/soc/stm32_adc_cold_direct_model.h")
+        "${NEXUS_SOURCE_DIR}/tests/support/f4_cpu"
+)
+target_include_directories(
+    nexus_stm32_adc_cold_direct_test
+    SYSTEM
+    PRIVATE "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
+)
+target_compile_definitions(
+    nexus_stm32_adc_cold_direct_test
+    PRIVATE STM32F407xx NX_ADC_INTERNAL_CONTRACT
+)
+target_compile_options(
+    nexus_stm32_adc_cold_direct_test
+    PRIVATE "-include${nexus_google_root}/soc/stm32_adc_cold_direct_model.h"
+)
 
 # Pinless ADC selection must retain resource admission before System.start.
 set(adc_internal_bundle "${CMAKE_CURRENT_BINARY_DIR}/f407-adc-internal")
-execute_process(COMMAND "${Python3_EXECUTABLE}" -B
-    "${NEXUS_SOURCE_DIR}/tools/configure/configure.py"
-    --source-root "${NEXUS_SOURCE_DIR}"
-    --assembly "${NEXUS_SOURCE_DIR}/tests/contracts/multi_controller_assembly/stm32-ve-adc-internal-baremetal.toml"
-    --output "${adc_internal_bundle}" COMMAND_ERROR_IS_FATAL ANY)
+execute_process(
+    COMMAND
+        "${Python3_EXECUTABLE}" -B
+        "${NEXUS_SOURCE_DIR}/tools/configure/configure.py" --source-root
+        "${NEXUS_SOURCE_DIR}" --assembly
+        "${NEXUS_SOURCE_DIR}/tests/contracts/multi_controller_assembly/stm32-ve-adc-internal-baremetal.toml"
+        --output "${adc_internal_bundle}"
+    COMMAND_ERROR_IS_FATAL ANY
+)
 nexus_google_configuration_inputs("${adc_internal_bundle}")
 nexus_google_test(nexus_stm32_adc_internal_cold_factory_test STM32F4_LL
     SOURCES "${nexus_google_root}/soc/stm32_adc_internal_factory_test.cpp"
@@ -89,10 +121,21 @@ nexus_google_test(nexus_stm32_adc_internal_cold_factory_test STM32F4_LL
     INCLUDES "${adc_internal_bundle}"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
         "${NEXUS_SOURCE_DIR}/arch/include"
-        "${NEXUS_SOURCE_DIR}/tests/support/f4_cpu")
-target_include_directories(nexus_stm32_adc_internal_cold_factory_test
-    SYSTEM PRIVATE "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
-target_compile_definitions(nexus_stm32_adc_internal_cold_factory_test PRIVATE
-    STM32F407xx _init=nx_adc_cold_fixture_init _fini=nx_adc_cold_fixture_fini)
-target_compile_options(nexus_stm32_adc_internal_cold_factory_test PRIVATE
-    "-include${nexus_google_root}/soc/stm32_adc_cold_model.h")
+        "${NEXUS_SOURCE_DIR}/tests/support/f4_cpu"
+)
+target_include_directories(
+    nexus_stm32_adc_internal_cold_factory_test
+    SYSTEM
+    PRIVATE "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
+)
+target_compile_definitions(
+    nexus_stm32_adc_internal_cold_factory_test
+    PRIVATE
+        STM32F407xx
+        _init=nx_adc_cold_fixture_init
+        _fini=nx_adc_cold_fixture_fini
+)
+target_compile_options(
+    nexus_stm32_adc_internal_cold_factory_test
+    PRIVATE "-include${nexus_google_root}/soc/stm32_adc_cold_model.h"
+)

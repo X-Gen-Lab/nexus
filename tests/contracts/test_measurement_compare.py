@@ -185,6 +185,29 @@ class MeasurementCommandTests(unittest.TestCase):
             self.assertIn("actual failure", Path(report["raw"]["path"]).read_text())
 
 
+    def test_raw_log_preserves_binary_stdout_and_stderr_bytes(self):
+        with tempfile.TemporaryDirectory() as directory:
+            report = run_logged([
+                sys.executable, "-c", "import os; "
+                "os.write(1, bytes([255, 0])); os.write(2, bytes([254]))"
+            ], Path(directory) / "binary.log")
+            self.assertEqual(report["exit_code"], 0)
+            self.assertEqual(Path(report["raw"]["path"]).read_bytes(),
+                             bytes([255, 0, 254]))
+
+    def test_normal_exit_codes_do_not_become_execution_control_failures(self):
+        with tempfile.TemporaryDirectory() as directory:
+            for code in (124, 127, 130):
+                with self.subTest(code=code):
+                    try:
+                        report = run_logged([
+                            sys.executable, "-c", f"raise SystemExit({code})"
+                        ], Path(directory) / f"exit-{code}.log")
+                    except KeyboardInterrupt:
+                        self.fail("Normal child exit was classified as cancellation")
+                    self.assertEqual(report["exit_code"], code)
+                    self.assertIsNone(report["failure"])
+
     def test_missing_external_tool_is_nonzero(self):
         with tempfile.TemporaryDirectory() as directory:
             report = run_logged(["/does/not/exist"], Path(directory) / "raw.log")

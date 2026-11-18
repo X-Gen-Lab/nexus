@@ -63,6 +63,17 @@ class TextHygieneTests(unittest.TestCase):
             "notes.txt: use LF line endings",
         ])
 
+    def test_python_text_is_compiled_without_execution(self):
+        self.path = self.path.with_suffix(".py")
+        self.path.write_text('raise RuntimeError("must not execute")\n')
+        self.assertEqual(gate.check_text(self.path, "notes.py"), [])
+        for text in ('/* invalid Python */\n', 'return 1\n'):
+            with self.subTest(text=text):
+                self.path.write_text(text)
+                errors = gate.check_text(self.path, "notes.py")
+                self.assertEqual(len(errors), 1)
+                self.assertTrue(errors[0].startswith("notes.py:1:"))
+
 
 class OrdinaryHookOrderingTests(unittest.TestCase):
     def setUp(self):
@@ -145,9 +156,10 @@ class StyleGateTests(unittest.TestCase):
         self.addCleanup(self.directory.cleanup)
         self.root = Path(self.directory.name)
         for name in (
-            ".clang-format", ".pre-commit-config.yaml", "dependencies/development-tools.txt",
+            ".clang-format", ".gersemirc", ".pre-commit-config.yaml", "dependencies/development-tools.txt",
             "scripts/ci/style_gate.py", "scripts/ci/comment_style.py",
             "scripts/ci/check_commit_message.py", "scripts/tools/format.py",
+            "scripts/tools/cmake_format.py",
             "scripts/setup/install_dev_tools.py",
             "tools/documentation/cli.py", "tools/documentation/check.py",
             "tools/dev/process.py", "tools/evidence/identity.py",

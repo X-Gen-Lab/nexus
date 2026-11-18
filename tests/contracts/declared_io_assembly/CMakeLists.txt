@@ -11,13 +11,20 @@ nexus_add_firmware(declared_io_fixture SOURCES main.c)
 get_target_property(fixture_config Nexus::Platform NEXUS_CONFIG_DIR)
 find_package(Python3 3.11 REQUIRED COMPONENTS Interpreter)
 # Linked methods and their actual provider bytes are checked after section GC.
-set_property(TARGET declared_io_fixture APPEND PROPERTY LINK_DEPENDS
-    "${NEXUS_SOURCE_ROOT}/tools/measurement/retention.py")
-add_custom_command(TARGET declared_io_fixture POST_BUILD
-    COMMAND "${Python3_EXECUTABLE}" -B
-        "${NEXUS_SOURCE_ROOT}/tools/measurement/retention.py"
-        --elf "$<TARGET_FILE:declared_io_fixture>"
-        --bindings "${fixture_config}/bindings.c"
-        --resolved "${fixture_config}/resolved.json"
-        --output "${CMAKE_CURRENT_BINARY_DIR}/bin/provider-retention.json"
-    VERBATIM)
+set_property(
+    TARGET declared_io_fixture
+    APPEND
+    PROPERTY LINK_DEPENDS "${NEXUS_SOURCE_ROOT}/tools/measurement/retention.py"
+)
+add_custom_command(
+    TARGET declared_io_fixture
+    POST_BUILD
+    COMMAND
+        "${Python3_EXECUTABLE}" -B
+        "${NEXUS_SOURCE_ROOT}/tools/measurement/retention.py" --elf
+        "$<TARGET_FILE:declared_io_fixture>" --bindings
+        "${fixture_config}/bindings.c" --resolved
+        "${fixture_config}/resolved.json" --output
+        "${CMAKE_CURRENT_BINARY_DIR}/bin/provider-retention.json"
+    VERBATIM
+)

@@ -104,7 +104,7 @@ class ContractDoctorProfileTests(unittest.TestCase):
                              None if name == missing else "/locked/" + name), \
                 patch.object(dev.subprocess, "run", side_effect=probe), \
                 patch.object(dev, "maintenance_checks",
-                             return_value=0) as checks, \
+                             return_value=0, create=True) as checks, \
                 redirect_stdout(output), redirect_stderr(output):
             status = dev.main(["doctor", "--target", "contracts"])
         return status, output.getvalue(), checks
@@ -114,7 +114,7 @@ class ContractDoctorProfileTests(unittest.TestCase):
         self.assertEqual(status, 0, output)
         self.assertEqual([Path(command[0]).name for command in self.commands],
                          ["cmake", "ninja", "gcc", "g++", "arm-none-eabi-gcc"])
-        checks.assert_called_once()
+        self.assertEqual(checks.call_count, 0)
         self.assertFalse(any("docker" in word for command in self.commands
                              for word in command))
 
@@ -126,7 +126,7 @@ class ContractDoctorProfileTests(unittest.TestCase):
         self.assertEqual(self.commands, [])
         checks.assert_not_called()
 
-    def test_every_native_and_arm_compiler_is_required_before_maintenance(self):
+    def test_every_native_and_arm_compiler_is_required_before_contracts(self):
         for name in ("gcc", "g++", "arm-none-eabi-gcc"):
             with self.subTest(missing=name):
                 status, output, checks = self.doctor(missing=name)
@@ -135,7 +135,7 @@ class ContractDoctorProfileTests(unittest.TestCase):
                               output)
                 checks.assert_not_called()
 
-    def test_wrong_compiler_version_cannot_start_maintenance_or_suites(self):
+    def test_wrong_compiler_version_stops_before_suites(self):
         for name in ("gcc", "g++", "arm-none-eabi-gcc"):
             with self.subTest(wrong=name):
                 status, output, checks = self.doctor(wrong=name)

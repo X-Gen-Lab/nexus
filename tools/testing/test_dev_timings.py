@@ -61,11 +61,13 @@ class DeveloperTimingTests(unittest.TestCase):
         self.assertEqual(result["attempt_count"], 1)
         self.assertEqual(result["cumulative_attempt_seconds"], 1)
 
-    def test_changed_raw_output_rejects_summary(self):
+    def test_summary_does_not_read_or_verify_raw_output(self):
         path = self.receipt("test", 0, 1)
         path.with_name("stdout.txt").write_bytes(b"changed")
-        with self.assertRaisesRegex(ValueError, "raw|identity"):
-            self.summary()
+        path.with_name("stderr.txt").unlink()
+        result = self.summary()
+        self.assertEqual(result["attempt_count"], 1)
+        self.assertFalse(result["qualification"])
 
     def test_parent_alias_is_one_attempt_without_hiding_symlink_components(self):
         path = self.receipt("test", 0, 1_000_000_000)
