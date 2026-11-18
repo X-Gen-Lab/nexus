@@ -2,12 +2,15 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 
 try:
     from . import arch_compile
 except ImportError:
     import arch_compile
+
+from tools.evidence.common import file_identity, fields, sha256_value
 
 
 def rejected(recorder, argv, label, diagnostic):
@@ -54,6 +57,18 @@ def check_budget_overflow(report, region):
         raise ValueError("Wrong actual authored per-domain budget overflow")
 
 
+def withdrawn_elf(elf, identity):
+    """Keep the measured image identity after the firmware target withdraws it."""
+    if any(os.path.lexists(elf.with_suffix(ext)) for ext in (".elf", ".bin", ".map")):
+        raise ValueError("Rejected firmware outputs remain published")
+    fields(identity, {"path", "size", "sha256"})
+    if (identity["path"] != str(elf) or type(identity["size"]) is not int
+            or identity["size"] <= 0):
+        raise ValueError("Wrong measured firmware identity")
+    return {"path": str(elf), "bytes": identity["size"],
+            "sha256": sha256_value(identity["sha256"])}
+
+
 def write_budget_assembly(template, output, region):
     """Change the reviewed authored limit, never the derived JSON authority."""
     template, output = Path(template), Path(output)
@@ -85,13 +100,17 @@ def execute_budget_overflow(root, recorder, tools, fixture, template, output,
     report_path = elf.with_suffix(".resources.json")
     generated = build / "nexus/generated"
     resolved_path = generated / "resolved.json"
+    budget_path = generated / "resource-budget.json"
     resolved = json.loads(resolved_path.read_text())
-    if (not elf.is_file() or
-            resolved["memory_budgets"]["regions"][region]["limit_bytes"] != 32):
-        raise ValueError("Authored overrun did not reach actual ELF measurement")
-    check_budget_overflow(json.loads(report_path.read_text()), region)
+    report = json.loads(report_path.read_text())
+    if (resolved["memory_budgets"]["regions"][region]["limit_bytes"] != 32 or
+            report.get("resolved") != file_identity(resolved_path) or
+            report.get("budget") != file_identity(budget_path)):
+        raise ValueError("Measured overrun differs from the authored budget inputs")
+    check_budget_overflow(report, region)
     return {"kind": "authored_budget_overflow", "region": region,
         "command": command, "assembly": arch_compile.digest(assembly),
-        "elf": arch_compile.digest(elf), "report": arch_compile.digest(report_path),
+        "elf": withdrawn_elf(elf, report.get("elf")), "elf_status": "withdrawn",
+        "report": arch_compile.digest(report_path),
         "resolved": arch_compile.digest(resolved_path),
-        "budget": arch_compile.digest(generated / "resource-budget.json")}
+        "budget": arch_compile.digest(budget_path)}
