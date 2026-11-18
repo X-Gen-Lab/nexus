@@ -79,12 +79,22 @@ class WorkflowContracts(unittest.TestCase):
                                  'Native Host C contracts compile real ARM objects')
 
 
-    def test_production_arm_jobs_are_within_current_f4_support(self):
+    def test_production_arm_jobs_are_selected_from_reviewed_presets(self):
         jobs = workflow('build-matrix.yml')['jobs']
-        selected = jobs['arm']['strategy']['matrix']['preset']
-        self.assertTrue(selected)
-        self.assertTrue(all(name.startswith(('stm32-qiming-', 'stm32-sky-'))
-                            for name in selected))
+        self.assertIn('fromJSON(needs.reference-plan.outputs.matrix)',
+                      jobs['arm']['strategy']['matrix'])
+        self.assertIn('scripts/ci/reference_matrix.py', str(jobs['reference-plan']))
+        arm = jobs['arm']
+        self.assertEqual(arm['env']['BUILD_DIR'], '${{ matrix.build_dir }}')
+        check = next(step['run'] for step in arm['steps']
+                     if 'tools/measurement/resources.py' in step.get('run', ''))
+        prepare = next(step['run'] for step in arm['steps']
+                       if 'tools/hil/prepare.py' in step.get('run', ''))
+        upload = next(step['with']['path'] for step in arm['steps']
+                      if 'actions/upload-artifact' in step.get('uses', ''))
+        self.assertIn('"$BUILD_DIR/bin/nexus_firmware.elf"', check)
+        self.assertIn('"$BUILD_DIR/generated/resolved.json"', prepare)
+        self.assertIn('${{ matrix.build_dir }}/bin/', upload)
         fixtures = jobs['controller-routes']['strategy']['matrix']['fixture']
         for name in fixtures:
             with self.subTest(fixture=name):
@@ -264,7 +274,7 @@ class WorkflowContracts(unittest.TestCase):
                  for hook in repo['hooks']}
         hook = hooks['nexus-workflow-lint']
         self.assertEqual(hook['entry'],
-                         'python scripts/ci/lint_workflows.py --staged')
+                         'python scripts/ci/lint_workflows.py --staged --when-changed')
         self.assertEqual(hook['additional_dependencies'],
                          hooks['nexus-tdd-gate']['additional_dependencies'])
         expected = []
@@ -302,9 +312,50 @@ class WorkflowContracts(unittest.TestCase):
                         count += 1
         self.assertGreater(count, 20)
 
+    def test_reference_uses_declared_output_and_public_board_fixture_identity(self):
+        from scripts.ci.reference_matrix import reference_matrix
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            config = root / 'cmake/presets/references.json'
+            config.parent.mkdir(parents=True)
+            (root / 'CMakePresets.json').write_text(json.dumps({
+                'version': 6, 'include': ['cmake/presets/references.json']}))
+            cfg = {'name': 'sample-board', 'generator': 'Ninja',
+                   'binaryDir': '${sourceDir}/out/arm proof',
+                   'cacheVariables': {'NEXUS_ASSEMBLY_FILE': '${sourceDir}/app.toml'}}
+            config.write_text(json.dumps({'version': 6,
+                'vendor': {'nexus/reference-jobs': True}, 'configurePresets': [cfg]}))
+            foreign = root / 'fixtures/boards/same-name'
+            foreign.mkdir(parents=True)
+            (foreign / 'board.json').write_text('{"id":"different","soc":"part-B"}')
+            fixture = root / 'tools/hil/fixtures/same-name.json'
+            fixture.parent.mkdir(parents=True)
+            fixture.write_text('{"board":"public","part":"part-A"}')
+            authored = root / 'app.toml'
+            authored.write_text('board_package = "fixtures/boards/same-name"')
+            expected = {'preset': 'sample-board', 'build_dir': 'out/arm proof', 'fixture': ''}
+            self.assertEqual(reference_matrix(root)['include'], [expected])
+            public = root / 'boards/same-name'
+            public.mkdir(parents=True)
+            (public / 'board.json').write_text('{"id":"public","soc":"part-A"}')
+            authored.write_text('board = "same-name"')
+            expected['fixture'] = 'tools/hil/fixtures/same-name.json'
+            self.assertEqual(reference_matrix(root)['include'], [expected])
+            fixture.write_text('{"board":"public","part":"part-B"}')
+            with self.assertRaisesRegex(ValueError, 'fixture'):
+                reference_matrix(root)
+            cfg['binaryDir'] = '${sourceDir}/../outside'
+            config.write_text(json.dumps({'version': 6,
+                'vendor': {'nexus/reference-jobs': True}, 'configurePresets': [cfg]}))
+            with self.assertRaisesRegex(ValueError, 'directory'):
+                reference_matrix(root)
+
     def test_f4_board_backend_link_profiles_have_actual_presets(self):
         jobs = workflow('build-matrix.yml')['jobs']
-        selected = set(jobs['arm']['strategy']['matrix']['preset'])
+        from scripts.ci.reference_matrix import reference_matrix
+        rows = reference_matrix(ROOT)['include']
+        selected = {row['preset'] for row in rows}
+        self.assertTrue(all((ROOT / row['fixture']).is_file() for row in rows))
         self.assertEqual(selected, {
             'stm32-qiming-baremetal', 'stm32-qiming-freertos',
             'stm32-sky-baremetal', 'stm32-sky-freertos'})

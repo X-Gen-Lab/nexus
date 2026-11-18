@@ -6,11 +6,13 @@ macros and conditions used here are checked; unsupported syntax is rejected.
 """
 
 import copy
+import hashlib
 import json
 import os
 from pathlib import Path
 import platform
 import re
+import tempfile
 
 KINDS = ("configure", "build", "test")
 MAP_FIELDS = {"cacheVariables", "environment"}
@@ -256,6 +258,61 @@ def selected_configure(root, name, *, kind="configure", environment=None):
             raise ValueError("Selected preset requires configurePreset")
         selected = presets.selected("configure", configure)
     return selected
+
+
+def configure_if_needed(root, preset, environment, configure, *, sdk=None):
+    """Under the build lease, configure a new or changed Ninja tree once."""
+    build = Path(preset["binaryDir"])
+    cache = build / "CMakeCache.txt"
+    stamp = build / ".nexus-configure-state"
+    graph = build / "build.ninja"
+    toolchain = preset.get("toolchainFile") or environment.get("CMAKE_TOOLCHAIN_FILE")
+    toolchain_path = build / toolchain if toolchain else None
+    if toolchain_path and not toolchain_path.is_file():
+        toolchain_path = Path(root) / toolchain
+    # CMake initializes these values on the first configure. A changed preset,
+    # SDK, compiler selection or initial flags must also remove stale cache keys.
+    inputs = {"root": str(Path(root).resolve()), "preset": preset,
+              "sdk": str(sdk) if sdk else None,
+              "env": {key: environment.get(key) for key in
+                      ("PATH", "CC", "CXX", "ASM", "CFLAGS", "CXXFLAGS",
+                       "ASMFLAGS", "LDFLAGS", "CMAKE_PREFIX_PATH",
+                       "CMAKE_TOOLCHAIN_FILE", "CMAKE_GENERATOR")},
+              "toolchain": (hashlib.sha256(toolchain_path.read_bytes()).hexdigest()
+                            if toolchain_path and toolchain_path.is_file() else None)}
+    selection = hashlib.sha256(json.dumps(inputs, sort_keys=True).encode()).hexdigest()
+
+    def state():
+        content = cache.read_bytes()
+        fingerprint = hashlib.sha256(content)
+        for key, value in re.findall(r"^(CMAKE_\w+):[A-Z_]+=([^\r\n]+)\r?$",
+                                     content.decode(errors="replace"), re.MULTILINE):
+            if key == "CMAKE_HOME_DIRECTORY" and Path(value).resolve() != Path(root).resolve():
+                raise ValueError("Build tree belongs to another source; use a separate directory")
+            if key in ("CMAKE_C_COMPILER", "CMAKE_CXX_COMPILER", "CMAKE_ASM_COMPILER",
+                       "CMAKE_MAKE_PROGRAM", "CMAKE_COMMAND"):
+                tool = Path(value)
+                if tool.is_file():
+                    info = tool.stat()
+                    fingerprint.update(repr((str(tool.resolve()), info.st_size,
+                                             info.st_mtime_ns, info.st_ctime_ns)).encode())
+        return selection + " " + fingerprint.hexdigest()
+
+    # The source SDK verifies its payload on every explicit consumption.
+    installed = bool(sdk and (Path(sdk) / ".nexus-source-sdk.json").is_file())
+    expected = state() if cache.is_file() else None
+    matched = (expected is not None and graph.is_file() and stamp.is_file()
+               and stamp.read_bytes() == expected.encode())
+    if matched and not installed:
+        return 0
+    stamp.unlink(missing_ok=True)
+    result = configure(["--fresh"] if expected and not matched else [])
+    if result or not (cache.is_file() and graph.is_file()):
+        return result
+    with tempfile.NamedTemporaryFile(dir=build, mode="w", delete=False) as stream:
+        stream.write(state())
+    Path(stream.name).replace(stamp)
+    return 0
 
 
 def binary_directory(root, name, *, kind="configure", environment=None):

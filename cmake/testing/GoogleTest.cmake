@@ -19,11 +19,17 @@ macro(nexus_host_google_test)
     set(_nexus_google_verifier
         "${_nexus_google_source}/tools/maintenance/googletest_lock.py"
     )
+    set(_nexus_google_check
+        "${Python3_EXECUTABLE}"
+        -B
+        "${_nexus_google_verifier}"
+        --source
+        "${_nexus_google_source}/ext/googletest"
+        --lock
+        "${_nexus_google_lock}"
+    )
     execute_process(
-        COMMAND
-            "${Python3_EXECUTABLE}" -B "${_nexus_google_verifier}" --source
-            "${_nexus_google_source}/ext/googletest" --lock
-            "${_nexus_google_lock}"
+        COMMAND ${_nexus_google_check}
         RESULT_VARIABLE _nexus_google_result
         OUTPUT_VARIABLE _nexus_google_identity
         ERROR_VARIABLE _nexus_google_error
@@ -98,4 +104,17 @@ macro(nexus_host_google_test)
         "${CMAKE_BINARY_DIR}/_deps/google-build"
         EXCLUDE_FROM_ALL
     )
+    # The active parent index can change on each Git invocation. Check the
+    # selected gitlink and source before building any framework consumer.
+    add_custom_target(
+        nexus_check_google_source
+        COMMAND ${_nexus_google_check} --quiet
+        COMMENT "Checking pinned GoogleTest sources"
+        VERBATIM
+    )
+    foreach(_nexus_google_lib IN ITEMS gtest gtest_main gmock gmock_main)
+        if(TARGET ${_nexus_google_lib})
+            add_dependencies(${_nexus_google_lib} nexus_check_google_source)
+        endif()
+    endforeach()
 endmacro()

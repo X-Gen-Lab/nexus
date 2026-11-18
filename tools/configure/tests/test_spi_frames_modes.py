@@ -64,9 +64,10 @@ class SpiFramesModes(unittest.TestCase):
                             self.assertIn("nx_stm32_spi_frames_admit", generated)
                             self.assertIn(controller + "_IRQHandler", generated)
                             self.assertIn("NX_SPI_FRAMES_" + role.upper(), generated)
-                            self.assertIn("nx_factory_spi_frames", factory.emit(result)[0])
-                            self.assertNotIn("NX_SPI_ID_SERIAL", factory.emit(result)[0])
-                            self.assertIn("NX_SPI_FRAMES_ID_SERIAL", factory.emit(result)[0])
+                            header = factory.emit(result)[0]
+                            self.assertIn("nx_factory_spi_frames", header)
+                            self.assertNotIn("NX_SPI_ID_SERIAL", header)
+                            self.assertIn("NX_SPI_FRAMES_ID_SERIAL", header)
                             traits = selected_contracts.describe(item)
                             self.assertEqual(traits.max_transfer_units, "UINT16_MAX")
                             self.assertEqual(traits.unit, "words")

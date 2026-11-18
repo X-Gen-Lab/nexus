@@ -20,6 +20,13 @@ python cmake/package/package_source_sdk.py --source . --output /tmp/nexus-sdk
 其他包时，重复传入 `--package <包 ID>`。选版、依赖与导出均针对 `--source` 指定的
 输入根，安装验证使用 manifest 中记录的 `profile.packages`，不发现额外库存。
 
+每个选中家族的 `package.json` 在 `exports.verification_files` 列出随包交付的
+独立合同样本。该列表接受 `tests/contracts/` 下的精确文件。SDK 按所选包取并集。
+家族声明 `facts.device_catalog` 时，打包器从目录内的供应商别名、路径和文件锁取得
+必备器件头与启动文件。增加同 IP 料号时维护家族事实；补充新的公开消费样本时，
+把样本加入该包的导出清单。可在搬迁后的 SDK 中用精确料号链接一个应用，再在独立
+副本中删掉该料号的启动文件执行 `--verify`，核验正常路径和失败诊断。
+
 包记录源码 commit／tree、每个文件摘要、所选依赖 commit／tree 和许可通知。
 受审导入仍按当前 provider 声明精确验证；当前 F4 使用锁定 Git 依赖，导入记录为空，
 不自动携带历史 GD32 源码或消费者。Native 模型控制头仅随显式 host 支撑导出，
@@ -163,3 +170,20 @@ MCUboot CLI 先调用完整 SDK 验证器，局部源码 hash 检查不能单独
 ARM 继续检查实际 C11／CPU／
 枚举参数并拒绝链接 libc heap／C++ 运行时；Native heap 仍未评估。必须实际执行
 当前完整计划后才能形成软件资格。
+
+在干净的已提交检出上，本地和 CI 共用同一个按变更验证入口。指定两次提交的比较基线后，它选择工作、导出当前 HEAD、搬迁到独立路径，核对源码 SHA，再运行真实消费者。普通、无关的 MCU 私有 C 修改沿用 ARM 门禁。
+
+```sh
+python scripts/ci/sdk_consumers.py --base origin/main --plan
+python scripts/ci/sdk_consumers.py --base origin/main --output build/quality/sdk-consumers
+python scripts/ci/sdk_consumers.py --all --output build/quality/sdk-consumers-full
+```
+
+按需验证独立消费者时，使用已导出并搬迁的 SDK 和独立输出目录。下面的命令会按现有消费计划运行 Native 和 F407 两条 TMP117 链，并在消费前后校验 SDK 完整性。每个变更路径可重复提供，重命名需包含两侧。公共输入、未知变更或依赖锁改动会扩大到完整计划。
+
+```sh
+python cmake/package/verify_consumers.py --prefix "$sdk" --output "$reports" \
+    --changed-path components/devices/tmp117/src/tmp117.c
+```
+
+也可以重复传入 `--consumer "native tmp117"` 和 `--consumer "f407 tmp117"` 指定名称。未给出筛选参数时执行全部消费者，`verification.json` 中的 `scope` 与 `selection_reason` 记录实际执行范围和原因。

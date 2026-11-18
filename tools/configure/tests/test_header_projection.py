@@ -20,6 +20,23 @@ def facts():
 
 
 class HeaderProjectionTests(unittest.TestCase):
+    def test_package_features_drive_private_modes_and_shared_header_values(self):
+        value = facts()
+        value["features"] = {"fifo": {"source": "controller", "owners": ["uart"],
+            "modes": ["fifo"], "macro": "SAMPLE_FIFO"},
+            "shared_bus": {"source": "endpoint", "owners": ["sample-device"],
+                           "modes": ["loan", "stream"]},
+            "wake": {"source": "option", "owners": ["uart"], "flag": "wake"}}
+        result = SimpleNamespace(controllers=(SimpleNamespace(kind="uart",
+            mode="fifo", options=SimpleNamespace(wake=False)),), devices=(
+            SimpleNamespace(driver="sample-device", options=SimpleNamespace(mode="loan")),))
+        flags = HeaderProjection.from_validated(value).features(result)
+        self.assertEqual(flags, (("fifo", True, "SAMPLE_FIFO"),
+                                 ("shared_bus", True, None), ("wake", False, None)))
+        value["features"]["bad;name"] = value["features"]["fifo"]
+        with self.assertRaises(ValueError):
+            HeaderProjection.from_validated(value)
+
     def test_selected_capture_requires_the_explicit_exact_part_limit(self):
         value = facts()
         value["physical_capabilities"] = {"capture": {

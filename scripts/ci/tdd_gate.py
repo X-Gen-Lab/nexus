@@ -14,9 +14,10 @@ sys.path.insert(0, str(ROOT))
 
 from scripts.validation.junit import prepare_report, validate_junit
 from tools.dev.change_paths import behavioral
-from tools.dev.presets import binary_directory
+from tools.dev.presets import configure_if_needed, selected_configure
 from tools.dev import process
 from tools.dev.build_lock import build_lock
+from tools.testing.arm_links import affected_arm_links
 from tools.testing.run_tool_tests import (
     SUITES as TOOL_SUITES, changed_suites, commit_tool_plan,
 )
@@ -105,14 +106,15 @@ def checked_binary(name, build):
     return path
 
 
-def execute(command, env, log):
+def execute(command, env, log, *, cancel_event=None):
     """Record the real subprocess result without accepting console success text."""
     print("+ " + " ".join(map(str, command)), flush=True)
     default_timeout = 60 if log.stem.startswith("discovery-") else 1800
     if log.stem.startswith("execution-"):
         default_timeout = 300
     result = process.run(command, cwd=ROOT, env=env, log=log,
-                         stage=log.stem,
+                         stage=log.stem, cancel_event=cancel_event,
+                         reject_background=cancel_event is not None,
                          timeout=process.command_timeout(env, default_timeout))
     if result.returncode:
         raise ValueError(f"Command failed ({result.returncode}); see {log}")
@@ -134,7 +136,7 @@ def discovered_count(output):
     return count
 
 
-def execute_gate(args, env, build, initial_tree=None):
+def execute_gate(args, env, build, initial_tree=None, *, preset):
     """Keep configuration, tools and reports inside the same build lease."""
     output = build / "tdd"
     output.mkdir(parents=True, exist_ok=True)
@@ -151,11 +153,22 @@ def execute_gate(args, env, build, initial_tree=None):
     target = "contracts" if set(suites) - {"workflows"} else "native"
     execute([python, "tools/dev/dev.py", "doctor", "--target", target],
             env, output / "preflight-tools.txt")
-    execute([python, "tools/dev/dev.py", "configure", "--preset",
-             args.preset], env, output / "configure.txt")
+    configure_log = output / "configure.txt"
+    configure_log.unlink(missing_ok=True)
+
+    def configure(options):
+        execute([python, "tools/dev/dev.py", "configure", "--preset",
+                 args.preset, *options], env, configure_log)
+        return 0
+
+    configure_if_needed(ROOT, preset, env, configure)
     execute([python, "tools/dev/dev.py", "build", "--preset", args.preset,
              "--target", "nexus_google_contracts"], env,
             output / "build.txt")
+    tool_env = env.copy()
+    tool_env.pop("NEXUS_TOOL_NATIVE_DATABASE", None)
+    if args.preset == "native-debug":
+        tool_env["NEXUS_TOOL_NATIVE_DATABASE"] = str(build / "compile_commands.json")
     tool_results = []
     # Keep the same complete selection, running cheap workflow/CI checks
     # before configuration and SDK consumers so failures stop work early.
@@ -168,8 +181,10 @@ def execute_gate(args, env, build, initial_tree=None):
                    suite, "--report", str(tool_report)]
         if files is not None:
             command += ["--files", *files]
-        execute(command, env, output / f"tools-{suite}{suffix}.txt")
+        execute(command, tool_env, output / f"tools-{suite}{suffix}.txt")
         tool_results.append(json.loads(tool_report.read_text()))
+    hardware = (affected_arm_links(ROOT, paths, env, output, execute, tree=initial_tree)
+                if scope == "commit" else None)
     manifest = json.loads((build / "google-contracts.json").read_text())
     if (manifest.get("schema") != 1 or not manifest.get("executables")
             or len(manifest["executables"]) != len(set(manifest["executables"]))):
@@ -197,7 +212,7 @@ def execute_gate(args, env, build, initial_tree=None):
     summary.write_text(json.dumps({
         "schema": 1, "kind": "development-contract-execution",
         "preset": args.preset, "passed": sum(r["passed"] for r in results),
-        "suites": results, "tool_suites": tool_results,
+        "suites": results, "tool_suites": tool_results, "hardware": hardware,
         "scope": "commit-tools" if scope == "commit" else scope,
         "qualification": False,
         "description": "Actual host execution; not proof of historical TDD order "
@@ -230,11 +245,12 @@ def main(arguments=None):
         if args.preset not in ("native-debug", "native-release", "native-asan",
                                "native-tsan", "native-step-debug"):
             raise ValueError("TDD contracts require a maintained Native preset")
-        build = binary_directory(ROOT, args.preset)
+        preset = selected_configure(ROOT, args.preset, environment=env)
+        build = Path(preset["binaryDir"])
         if not build.is_relative_to(ROOT.resolve()):
             raise ValueError("Native build directory is outside the checkout")
         with build_lock(build):
-            return execute_gate(args, env, build, initial_tree)
+            return execute_gate(args, env, build, initial_tree, preset=preset)
     except (OSError, ValueError, subprocess.CalledProcessError) as error:
         print(f"TDD gate rejected: {error}", file=sys.stderr)
         return 1

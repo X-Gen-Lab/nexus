@@ -34,7 +34,7 @@ class ImageArtifactTests(unittest.TestCase):
             self.root = Path(temporary.name)
 
     def fixture(self, *, offset=0x20000, size=0x20000, outside=None,
-                family="stm32f4", vector_prefix=False):
+                family="stm32f4", vector_prefix=False, irq_slot=None, irq_count=1):
         compiler = os.environ.get("NEXUS_ARM_GCC") or shutil.which("arm-none-eabi-gcc")
         self.assertIsNotNone(compiler, "Prepared ARM compiler required")
         path = self.root / "image"
@@ -51,6 +51,13 @@ class ImageArtifactTests(unittest.TestCase):
             "origin": resolved["flash"]["origin"] + offset, "size": size}
         source = path / "image.c"
         text = source.read_text().replace("vectors[]", "g_pfnVectors[]")
+        if irq_slot is not None:
+            resolved["irq"] = {"external_count": irq_count}
+            resolved["cortex_m_irq_vectors"] = {"Reviewed_IRQHandler": 0}
+            text = text.replace("void Reset_Handler(void);",
+                "void Reset_Handler(void);\nvoid Reviewed_IRQHandler(void) {}")
+            text = text.replace("&__nx_msp_end, Reset_Handler}",
+                f"&__nx_msp_end, Reset_Handler, [16] = {irq_slot}}}")
         if vector_prefix:
             text = text.replace(
                 "const void* const g_pfnVectors[]",
@@ -135,6 +142,22 @@ class ImageArtifactTests(unittest.TestCase):
         self.assertNotEqual(linked.symbol("g_pfnVectors"), vectors["address"])
         with self.assertRaisesRegex(EvidenceError, "startup vector"):
             resources.measure(elf, config, budget)
+
+    def test_exact_startup_table_span_and_selected_irq_handler(self):
+        base = self.root
+        for index, (slot, count, message) in enumerate((
+                ("Reviewed_IRQHandler", 1, None),
+                ("Reviewed_IRQHandler", 2, "startup vector count"),
+                ("Reset_Handler", 1, "startup IRQ slot"))):
+            with self.subTest(slot=slot, count=count):
+                self.root = base / str(index)
+                self.root.mkdir()
+                elf, config, budget, _ = self.fixture(irq_slot=slot, irq_count=count)
+                if message is None:
+                    self.assertEqual(resources.measure(elf, config, budget)["status"], "passed")
+                else:
+                    with self.assertRaisesRegex(EvidenceError, message):
+                        resources.measure(elf, config, budget)
 
     def test_unreviewed_family_cannot_gain_offset_support_from_artifact_metadata(self):
         elf, config, budget, _ = self.fixture(family="stm32f103")

@@ -1,53 +1,45 @@
-# Query validated resolved facts only. Source ownership stays in SoC CMake.
-function(nexus_controller_values output kind field)
-    set(controller "${ARGV3}")
-    file(READ "${NEXUS_CONFIG_DIR}/resolved.json" resolved)
-    string(JSON count LENGTH "${resolved}" controllers)
-    set(values)
-    if(count GREATER 0)
-        math(EXPR last "${count} - 1")
-        foreach(index RANGE 0 ${last})
-            string(
-                JSON selected_kind
-                GET "${resolved}"
-                controllers
-                ${index}
-                kind
-            )
-            if(selected_kind STREQUAL kind)
-                if(controller)
-                    string(
-                        JSON selected_controller
-                        GET "${resolved}"
-                        controllers
-                        ${index}
-                        controller
-                    )
-                    if(NOT selected_controller STREQUAL controller)
-                        continue()
-                    endif()
-                endif()
-                string(
-                    JSON value
-                    GET "${resolved}"
-                    controllers
-                    ${index}
-                    "${field}"
-                )
-                list(APPEND values "${value}")
-            endif()
-        endforeach()
+# Index the selection once on the target shared by providers and consumers.
+include_guard(GLOBAL)
+block()
+    foreach(row IN LISTS NEXUS_SELECTED_CONTROLLERS)
+        string(REPLACE "/" ";" fields "${row}")
+        list(GET fields 0 kind)
+        list(GET fields 1 controller)
+        list(GET fields 2 mode)
+        set_property(
+            TARGET nexus_build_options
+            APPEND
+            PROPERTY "NEXUS_CONTROLLERS/${kind}" "${controller}"
+        )
+        set_property(
+            TARGET nexus_build_options
+            APPEND
+            PROPERTY "NEXUS_MODES/${kind}" "${mode}"
+        )
+        set_property(
+            TARGET nexus_build_options
+            APPEND
+            PROPERTY "NEXUS_MODES/${kind}/${controller}" "${mode}"
+        )
+    endforeach()
+endblock()
+
+function(nexus_controller_modes output kind)
+    set(key "NEXUS_MODES/${kind}")
+    if(NOT "${ARGV2}" STREQUAL "")
+        string(APPEND key "/${ARGV2}")
     endif()
+    get_property(values TARGET nexus_build_options PROPERTY "${key}")
     list(REMOVE_DUPLICATES values)
     set(${output} "${values}" PARENT_SCOPE)
 endfunction()
 
-function(nexus_controller_modes output kind)
-    nexus_controller_values(values "${kind}" mode "${ARGV2}")
-    set(${output} "${values}" PARENT_SCOPE)
-endfunction()
-
 function(nexus_controller_names output kind)
-    nexus_controller_values(values "${kind}" controller)
+    get_property(
+        values
+        TARGET nexus_build_options
+        PROPERTY "NEXUS_CONTROLLERS/${kind}"
+    )
+    list(REMOVE_DUPLICATES values)
     set(${output} "${values}" PARENT_SCOPE)
 endfunction()

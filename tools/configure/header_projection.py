@@ -37,13 +37,40 @@ class HeaderProjection:
     @classmethod
     def from_validated(cls, value):
         _fields(value, {"schema_version", "timebase_prefix", "pin_tables", "dma_memory"},
-                {"clock", "physical_capabilities"})
+                {"clock", "physical_capabilities", "features"})
         if type(value["schema_version"]) is not int or value["schema_version"] != 1:
             fail("Unsupported header projection schema")
         Symbol(value["timebase_prefix"])
         _fields(value["pin_tables"], {"capture", "advanced", "adc"})
         for name in value["pin_tables"].values():
             Symbol(name)
+        features = value.get("features", {})
+        if not isinstance(features, Mapping):
+            fail("Build features require named selections")
+        symbols = set()
+        for name, feature in features.items():
+            Symbol(name)
+            if name != name.lower():
+                fail("Build feature IDs require lowercase identifiers")
+            source = feature.get("source") if isinstance(feature, Mapping) else None
+            if source not in ("controller", "endpoint", "option"):
+                fail("Build feature requires a controller, endpoint or option")
+            _fields(feature, {"source", "owners", "flag" if source == "option" else "modes"},
+                    {"macro"})
+            for field in (("owners",) if source == "option" else ("owners", "modes")):
+                items = feature[field]
+                if (not isinstance(items, list) or not items or
+                        any(not isinstance(item, str) or not item for item in items)
+                        or len(set(items)) != len(items)):
+                    fail("Build feature requires distinct owners and modes")
+            if source == "option":
+                Symbol(feature["flag"])
+            if "macro" in feature:
+                macro = feature["macro"]
+                Symbol(macro)
+                if macro in symbols:
+                    fail("Build features repeat a configuration macro")
+                symbols.add(macro)
         capabilities = value.get("physical_capabilities", {})
         if not isinstance(capabilities, Mapping):
             fail("Physical capability projection requires named controller kinds")
@@ -86,6 +113,25 @@ class HeaderProjection:
                     fail("Header clock selector requires one scalar name")
             Symbol(clock["auxiliary_prefix"])
         return cls(freeze(value))
+
+    def features(self, result):
+        """Project only named build capabilities declared by this package."""
+        flags = []
+        for name, feature in sorted(self.data.get("features", {}).items()):
+            owners = feature["owners"]
+            if feature["source"] == "endpoint":
+                enabled = any(item.driver in owners and
+                    getattr(item.options, "mode", None) in feature["modes"]
+                    for item in result.devices)
+            elif feature["source"] == "controller":
+                enabled = any(item.kind in owners and item.mode in feature["modes"]
+                              for item in result.controllers)
+            else:
+                enabled = any(item.kind in owners and
+                    getattr(item.options, feature["flag"], None) is True
+                    for item in result.controllers)
+            flags.append((name, enabled, feature.get("macro")))
+        return tuple(flags)
 
     def render(self, result, provider):
         lines = []

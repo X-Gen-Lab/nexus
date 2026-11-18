@@ -71,6 +71,15 @@ def selected(name):
              path.suffix in (".yml", ".yaml")))
 
 
+def changed_inputs(root):
+    """Select the full-index linter for edits on either side of a rename."""
+    changed = git(root, "diff", "--cached", "--no-renames", "--name-only", "-z")
+    policy = {".pre-commit-config.yaml", "scripts/ci/lint_workflows.py",
+              "tools/dev/dependencies.py", "dependencies/development-tools.txt"}
+    names = (os.fsdecode(name) for name in changed.split(b"\0") if name)
+    return any(selected(name) or name in policy for name in names)
+
+
 def capture(root, records):
     inputs, aliases = {}, {}
     expanded = 0
@@ -283,6 +292,8 @@ def main(arguments=None):
     mode = parser.add_mutually_exclusive_group(required=True)
     mode.add_argument("--staged", action="store_true")
     mode.add_argument("--doctor", action="store_true")
+    parser.add_argument("--when-changed", action="store_true",
+                        help="skip full staged lint for unrelated commit inputs")
     parser.add_argument("--root", type=Path, default=ROOT)
     parser.add_argument("--tool-prefix", type=Path)
     parser.add_argument("--log", type=Path,
@@ -290,6 +301,11 @@ def main(arguments=None):
     args = parser.parse_args(arguments)
     prefix = args.tool_prefix or args.root / ".venv/nexus-actionlint"
     try:
+        if args.when_changed and not args.staged:
+            parser.error("--when-changed requires --staged")
+        if args.when_changed and not changed_inputs(args.root):
+            print("No staged workflow inputs require lint")
+            return 0
         if args.doctor:
             executable = dependencies.verify_actionlint(
                 prefix, args.root / dependencies.ACTIONLINT_LOCK)

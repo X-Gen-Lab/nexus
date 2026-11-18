@@ -12,16 +12,14 @@ from tools.configure.providers import for_selection
 
 
 class Stm32ExtiGenerationTests(unittest.TestCase):
-    def result(self):
-        return gate.resolve_ir(gate.ROOT /
-                               "tests/contracts/stm32_assembly/ve-exti.toml", test_support=native_fixture(gate.ROOT /
-                               "tests/contracts/stm32_assembly/ve-exti.toml"))
-
-    def source(self):
-        return bindings.emit(self.result())[1]
+    @classmethod
+    def setUpClass(cls):
+        assembly = gate.ROOT / "tests/contracts/stm32_assembly/ve-exti.toml"
+        cls.result = gate.resolve_ir(assembly, test_support=native_fixture(assembly))
+        cls.source = bindings.emit(cls.result)[1]
 
     def test_each_failed_init_retains_its_typed_hardware_owner(self):
-        source = self.source()
+        source = self.source
         for number, name in ((1, "edge5"), (2, "edge6")):
             call = (f"nx_stm32_exti_prepare(&s_nx_port_{name}, "
                     f"&s_nx_control_config_{name})")
@@ -31,7 +29,7 @@ class Stm32ExtiGenerationTests(unittest.TestCase):
             self.assertIn(f"nx_stm32_exti_close(&s_nx_port_{name})", source)
 
     def test_partial_effect_construction_retains_the_exact_c_cleanup(self):
-        result = self.result()
+        result = self.result
         provider = for_selection(result)
         for item in result.controllers:
             constructed = provider.constructor(
@@ -46,7 +44,7 @@ class Stm32ExtiGenerationTests(unittest.TestCase):
                 self.assertNotIn(behavior, definitions)
 
     def test_irq_and_ring_policy_are_immutable_selected_configuration(self):
-        source = self.source()
+        source = self.source
         self.assertIn('#include "drivers/exti/cold.h"', source)
         for line in (5, 6):
             self.assertIn(f"static const nx_stm32_exti_config_t s_nx_control_config_edge{line}", source)
@@ -56,8 +54,8 @@ class Stm32ExtiGenerationTests(unittest.TestCase):
         self.assertNotIn("NVIC_SetPriority", source)
 
     def test_shared_vector_is_selected_and_admitted_before_system_start(self):
-        source = self.source()
-        result = self.result()
+        source = self.source
+        result = self.result
         declarations = gpio_phase.declarations(result)
         config = next(node for node in declarations if node.name == "s_nx_platform_config")
         masks = dict(config.initializer.fields)["irq_masks"].values

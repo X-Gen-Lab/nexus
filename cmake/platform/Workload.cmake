@@ -48,3 +48,49 @@ function(nexus_workload_identity generated kind selected output)
     endif()
     set(${output} "${selected}" PARENT_SCOPE)
 endfunction()
+
+function(nexus_add_workload)
+    set(NEXUS_WORKLOAD
+        "empty"
+        CACHE STRING
+        "Minimal resource fixture: empty/gpio/uart/spi"
+    )
+    nexus_add_firmware(nexus_firmware
+        SOURCES "${NEXUS_SOURCE_DIR}/tools/measurement/workload.c"
+    )
+    nexus_target_warnings(nexus_firmware STRICT)
+    if(NOT NEXUS_WORKLOAD MATCHES "^(empty|gpio|uart|spi)$")
+        message(FATAL_ERROR "Unknown minimal workload ${NEXUS_WORKLOAD}")
+    endif()
+    target_compile_definitions(
+        nexus_firmware
+        PRIVATE "NEXUS_WORKLOAD_${NEXUS_WORKLOAD}=1"
+    )
+    if(NEXUS_WORKLOAD MATCHES "^(gpio|uart)$")
+        string(TOUPPER "${NEXUS_WORKLOAD}" workload_kind)
+        set(NEXUS_WORKLOAD_${workload_kind}_ID
+            ""
+            CACHE STRING
+            "Assembly-local typed factory ID used only by the workload"
+        )
+        nexus_workload_identity("${NEXUS_CONFIG_DIR}" "${workload_kind}"
+            "${NEXUS_WORKLOAD_${workload_kind}_ID}" workload_identity
+        )
+        target_compile_definitions(
+            nexus_firmware
+            PRIVATE "NEXUS_WORKLOAD_${workload_kind}_ID=${workload_identity}"
+        )
+        if(NEXUS_WORKLOAD STREQUAL "gpio")
+            string(
+                REGEX REPLACE "^NX_GPIO_ID_"
+                ""
+                workload_gpio
+                "${workload_identity}"
+            )
+            target_compile_definitions(
+                nexus_firmware
+                PRIVATE "NEXUS_WORKLOAD_GPIO_MASK=NEXUS_${workload_gpio}_MASK"
+            )
+        endif()
+    endif()
+endfunction()

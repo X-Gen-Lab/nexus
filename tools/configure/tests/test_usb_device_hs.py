@@ -121,7 +121,7 @@ class UsbHsDeviceConfigurationTests(unittest.TestCase):
         gate.configure(path, output, test_support=native_fixture(path))
         source = (output / "bindings.c").read_text()
         self.assertNotIn("static nx_usb_remote_runtime_t", source)
-        self.assertIn("set(NEXUS_USB_REMOTE_WAKEUP OFF)",
+        self.assertIn("set(NEXUS_FEATURE_USB_REMOTE_WAKEUP OFF)",
                       (output / "selection.cmake").read_text())
 
     def test_remote_wakeup_selects_one_static_runtime_for_fs_and_hs(self):
@@ -145,7 +145,7 @@ class UsbHsDeviceConfigurationTests(unittest.TestCase):
                 source = (output / "bindings.c").read_text()
                 self.assertEqual(source.count("static nx_usb_remote_runtime_t"), 1)
                 self.assertIn(".remote = &s_nx_usb_remote_fs", source)
-                self.assertIn("set(NEXUS_USB_REMOTE_WAKEUP ON)",
+                self.assertIn("set(NEXUS_FEATURE_USB_REMOTE_WAKEUP ON)",
                               (output / "selection.cmake").read_text())
                 self.assertNotIn("malloc", source)
 

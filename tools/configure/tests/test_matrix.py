@@ -83,14 +83,6 @@ class MaintainedMatrixTests(unittest.TestCase):
             self.assertEqual(item["physical_status"], "not_executed")
             self.assertEqual(item["scope"], "public_reference")
             self.assertEqual(len(item["configuration_sha256"]), 64)
-
-
-
-
-
-
-    def test_catalogue_includes_each_public_board_reference(self):
-        result = matrix.resolve_catalogue()
         selected = {item["assembly"] for item in result["references"]}
         authored = {
             path.relative_to(configure.ROOT).as_posix()

@@ -1680,11 +1680,8 @@ class VendorDeviceIR:
     """Exact vendor compile and startup selection from physical part facts."""
 
     macro: str
+    header: str
     startup: str
-
-    @classmethod
-    def from_validated(cls, value):
-        return cls(value["macro"], value["startup"])
 
 
 @dataclass(frozen=True)

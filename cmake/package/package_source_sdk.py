@@ -7,9 +7,12 @@ ABI. This package is an unsigned source snapshot, not a promoted release.
 import argparse
 from dataclasses import dataclass
 import hashlib
+from importlib import import_module
 import json
 import os
 from pathlib import Path, PurePosixPath
+from collections.abc import Mapping
+from types import MappingProxyType
 import re
 import shutil
 import subprocess
@@ -31,7 +34,7 @@ try:
         verify_gitlinks,
     )
     from tools.maintenance import (
-        cmsis_device_lock, stm32f4_hal_lock,
+        cmsis_device_lock,
         threadx_lock, freertos_transport, lwip_lock, mbedtls_lock,
         coremqtt_lock, mcuboot_lock, st_usb_lock,
     )
@@ -58,7 +61,6 @@ CMSIS_CORE_REQUIRED_HEADERS = (
     "core_cm85.h", "cmsis_compiler.h", "cmsis_gcc.h", "cmsis_version.h",
     "m-profile/armv7m_mpu.h", "m-profile/armv8m_mpu.h",
     "m-profile/armv7m_cachel1.h", "m-profile/cmsis_gcc_m.h", "tz_context.h")
-OFFICIAL_DRIVERS = (stm32f4_hal_lock,)
 FREERTOS_REQUIRED_FILES = (
     'ext/freertos/.gitmodules',
     'ext/freertos/LICENSE.md',
@@ -190,8 +192,8 @@ SDK_TOOL_FILES = (
     'tools/maintenance/mcuboot_lock.py',
     'tools/maintenance/source_catalogue.py',
     'tools/maintenance/st_usb_lock.py',
-    'tools/maintenance/stm32f4_hal_lock.py',
     'tools/maintenance/threadx_lock.py',
+    'tools/measurement/build_resources.py',
     'tools/measurement/elf.py',
     'tools/measurement/resources.py',
     'tools/measurement/retention.py',
@@ -319,61 +321,6 @@ _HOST_VERIFICATION_FILES = tuple(name for name in SDK_VERIFICATION_FILES
 HOST_SUPPORT_FILES = tuple(dict.fromkeys((*HOST_SUPPORT_FILES,
                                           *_HOST_VERIFICATION_FILES)))
 
-# Reviewed software consumers have an explicit scope, separate from the
-# production package roots and host test support.
-F4_FAMILY_VERIFICATION_FILES = (
-    "tests/contracts/crc_assembly/consumer.c",
-    "tests/contracts/stm32f4_family/CMakeLists.txt",
-    *(f"tests/contracts/stm32f4_family/f{chip}zg.toml"
-      for chip in ("405", "407", "415", "417")),
-    *(f"tests/contracts/stm32f4_family/f{chip}zg-board/board.json"
-      for chip in ("405", "407", "415", "417")),
-    *(f"tests/contracts/stm32f4_family/{stem}.toml"
-      for stem in ("f411re", "f446ze", "f479ni")),
-    *(f"tests/contracts/stm32f4_family/{stem}-board/board.json"
-      for stem in ("f411re", "f446ze", "f479ni")),
-    *(f"tests/contracts/stm32f4_power/{name}"
-      for name in ("consumer.c", "CMakeLists.txt", "README.md",
-          *(f"{part}-{mode}.toml" for part in ("f411re", "f446ze", "f479ni")
-            for mode in ("adopt-retained", "provision-empty")),
-          *(f"{part}-board/board.json" for part in ("f411re", "f446ze", "f479ni")))),
-    *(f"tests/contracts/stm32f4_crypto/{name}"
-      for name in ("consumer.c", "CMakeLists.txt", "f415zg.toml", "f417zg.toml",
-                   "f415zg-dma.toml", "f417zg-dma.toml",
-                   "f415zg-board/board.json", "f417zg-board/board.json")),
-    *(f"tests/contracts/stm32f4_sdram/{name}"
-      for name in ("consumer.c", "CMakeLists.txt", "f479ni-sdram.toml",
-                   "f479ni-sdram-board/board.json")),
-    *(f"tests/contracts/stm32f4_qspi/{name}"
-      for name in ("consumer.c", "CMakeLists.txt", "f479ni-qspi.toml",
-                   "f479ni-qspi-dma.toml", "f479ni-qspi-quad.toml",
-                   "f479ni-qspi-quad-dma.toml", "f479ni-qspi-board/board.json",
-                   "f479ni-qspi-quad-board/board.json",
-                   "mapped_consumer.c", "f479ni-qspi-map.toml",
-                   "f479ni-qspi-map-board/board.json")),
-    *(f"tests/contracts/stm32f4_sdio_hs/{name}"
-      for name in ("consumer.c", "CMakeLists.txt", "sd37-dma.toml",
-                   "mmc37-irq.toml", "board/board.json")),
-    *(f"tests/contracts/f407_capture_audio/{name}"
-      for name in ("CMakeLists.txt", "frame_session.c", "controller_main.c",
-                   "ve-frames-raw.toml", "ve_board/board.json")),
-    *(f"tests/contracts/stm32f4_graphics/{name}"
-      for name in ("consumer.c", "CMakeLists.txt", "combined.toml",
-                   "dual-rgb888.toml", "image-only.toml", "board/board.json",
-                   "sustained_consumer.c", "sustained_sequence.c",
-                   "sustained_sequence.h")),
-    *(f"tests/contracts/stm32f4_graphics_sdram/{name}"
-      for name in ("CMakeLists.txt", "combined.toml", "board/board.json")),
-    *(f"tests/contracts/stm32f4_sai/{name}"
-      for name in ("consumer.c", "blocks_consumer.c", "CMakeLists.txt", "README.md",
-                   "f446ze-master.toml", "f446ze-slave.toml",
-                   "f479ni-master.toml", "f479ni-slave.toml",
-                   "f446ze-sai2-master-blocks.toml",
-                   "f446ze-sai2-slave-blocks.toml",
-                   "f479ni-sparse-master-blocks.toml",
-                   "f479ni-sparse-slave-blocks.toml",
-                   "f446ze-board/board.json", "f479ni-board/board.json")),
-)
 @dataclass(frozen=True)
 class SourceSelection:
     """One input-root selection with frozen package metadata and file receipts."""
@@ -386,6 +333,7 @@ class SourceSelection:
     inputs: tuple
     semantic_version: str | None
     configuration_files: frozenset
+    device_inputs: Mapping
 
     @property
     def profile(self):
@@ -472,12 +420,28 @@ def resolve_selection(root, profile=None, *, backend="baremetal", components=(),
     except ValueError as error:
         raise SDKError("Invalid source SDK selection: " + str(error)) from error
     inputs = dict(policy_inputs)
+    device_inputs = {}
     for package in chosen:
-        # Only the manifest controls SDK selection. Facts and CMake source
-        # bytes are copied from the source tree and independently verified.
-        for path in (package.manifest_path, package.fact("soc")):
+        paths = [package.manifest_path, package.fact("soc")]
+        catalog_path = (package.fact("device_catalog")
+                        if "device_catalog" in package.facts else None)
+        if catalog_path is not None:
+            paths.append(catalog_path)
+        for path in paths:
             name = path.relative_to(root).as_posix()
-            _, receipt = stable_file(root, name)
+            raw, receipt = stable_file(root, name)
+            if path == catalog_path:
+                from tools.configure.providers.common import vendor_device_catalog
+                catalog = parse_json(raw)
+                vendor_device_catalog(catalog)
+                supplier = catalog["sdk"]
+                selected_id = dict(package.dependencies).get(supplier["dependency"])
+                if selected_id is None or dependency(selected_id).path != supplier["directory"]:
+                    raise SDKError("Device catalog supplier differs from its package")
+                for relative, expected in catalog["inputs"].items():
+                    member = supplier["directory"] + "/" + relative
+                    if device_inputs.setdefault(member, expected["sha256"]) != expected["sha256"]:
+                        raise SDKError("Conflicting device catalogs for " + member)
             if path == package.manifest_path and receipt[0] != package.manifest_sha256:
                 raise SDKError("Package manifest changed during selection")
             if path == package.fact("soc") and receipt[0] != package.source_fact_sha256:
@@ -502,9 +466,13 @@ def resolve_selection(root, profile=None, *, backend="baremetal", components=(),
         # without loading any maintained provider or enumerating families.
         configuration_files.update(configuration_dependencies.source_names(
             "platform", package.family, sdk=True))
+        for _, identifier in package.dependencies:
+            checker = dependency(identifier).paired_driver_checker
+            if checker is not None:
+                configuration_files.add("tools/maintenance/" + checker + ".py")
     selection = SourceSelection(root, backend, tuple(sorted(components)), host_support,
                                 chosen, tuple(sorted(inputs.items())), semantic_version,
-                                frozenset(configuration_files))
+                                frozenset(configuration_files), MappingProxyType(device_inputs))
     if profile is not None and selection.profile != profile:
         raise SDKError("Source SDK dependency selection is not canonical")
     return selection
@@ -521,23 +489,27 @@ def checked_profile(value, *, root=SOURCE_ROOT):
     return resolve_selection(root, value).profile
 
 
+def paired_driver_checker(item):
+    """Only the reviewed supplier catalogue designates a paired HAL verifier."""
+    try:
+        return import_module("tools.maintenance." + item.paired_driver_checker)
+    except ImportError as error:
+        raise SDKError("Missing required paired driver checker for " + item.path) from error
+
+
 def dependency_required_files(root, profile, *, selection=None):
     """Derive supplier payload requirements from the same reviewed locks."""
-    names = set()
+    selection = resolve_selection(root, profile) if selection is None else selection
+    names = set(selection.device_inputs)
     for path, item in runtime_dependency_closure(
             profile, root=root, selection=selection).items():
         names.add(path + "/" + item.notice)
         if path == CMSIS_CORE_DIRECTORY:
             names.update(path + "/CMSIS/Core/Include/" + name
                          for name in CMSIS_CORE_REQUIRED_HEADERS)
-        elif path == "vendors/st/cmsis_device_f4":
-            names.update(path + "/" + name for name in (
-                "Include/stm32f4xx.h", "Include/stm32f407xx.h",
-                "Include/system_stm32f4xx.h",
-                "Source/Templates/gcc/startup_stm32f407xx.s"))
-        elif path == stm32f4_hal_lock.DIRECTORY:
-            lock = parse_json(regular(root, stm32f4_hal_lock.LOCK_NAME).read_bytes())
-            names.update(path + "/" + name for name in stm32f4_hal_lock.contract(lock))
+        elif item.paired_driver_checker is not None:
+            lock = parse_json(regular(root, item.source_lock).read_bytes())
+            names.update(path + "/" + name for name in paired_driver_checker(item).contract(lock))
         elif path in {"vendors/st/usb_host", "vendors/st/usb_device"}:
             lock = parse_json(regular(root, item.source_lock).read_bytes())
             names.update(path + "/" + name for name in lock["files"])
@@ -570,7 +542,8 @@ def required_files(root, profile=None, *, selection=None):
         members = tuple(name for name, _ in selection.inputs) + tuple(
             path.relative_to(root).as_posix() for package in selection.packages
             for path in package.inputs)
-    return tuple(sorted(set(members) | selection.configuration_files | set(SDK_TOOL_FILES) |
+    contracts = {name for package in selection.packages for name in package.verification_files}
+    return tuple(sorted(set(members) | contracts | selection.configuration_files | set(SDK_TOOL_FILES) |
         set(ROOT_FILES) | set(HOST_SUPPORT_FILES if selection.host_support else ()) |
         set(dependency_required_files(root, selection.profile, selection=selection))))
 
@@ -692,10 +665,11 @@ def verify_preparation_snapshot(root, revision, index, *, selection=None, files=
             raise SDKError("Source input changed while preparing the package: " + name)
 
 
-def dependency_entries(root, dependency):
+def dependency_entries(root, path):
     """Redistribute only the locked source closure for reviewed imports."""
-    entries = tree_entries(root / dependency)
-    if dependency == CMSIS_CORE_DIRECTORY:
+    item = dependency(path)
+    entries = tree_entries(root / path)
+    if path == CMSIS_CORE_DIRECTORY:
         prefix = "CMSIS/Core/Include/"
         required = {prefix + name for name in CMSIS_CORE_REQUIRED_HEADERS}
         required.add("LICENSE")
@@ -708,50 +682,48 @@ def dependency_entries(root, dependency):
         if any(mode not in ("100644", "100755") or kind != "blob"
                for mode, kind, _ in entries.values()):
             raise SDKError("CMSIS Core payload must contain regular tracked files")
-    elif dependency == "ext/threadx":
+    elif path == "ext/threadx":
         raw, _ = snapshot(root / "dependencies/threadx.lock.json")
         lock = parse_json(raw)
         names = threadx_lock.contract(lock) | {lock["license"]["path"]}
         if not names.issubset(entries):
             raise SDKError("ThreadX committed source graph is incomplete")
         entries = {name: entries[name] for name in names}
-    elif dependency == "ext/lwip":
+    elif path == "ext/lwip":
         raw, _ = snapshot(root / "dependencies/lwip.lock.json")
         names = set(lwip_lock.contract(parse_json(raw))["files"])
         if not names.issubset(entries):
             raise SDKError("lwIP committed source graph is incomplete")
         entries = {name: entries[name] for name in names}
-    elif dependency == "ext/mcuboot":
+    elif path == "ext/mcuboot":
         raw, _ = snapshot(root / "dependencies/mcuboot.lock.json")
         names = set(mcuboot_lock.contract(parse_json(raw))["files"])
         if not names.issubset(entries):
             raise SDKError("MCUboot committed source graph is incomplete")
         entries = {name: entries[name] for name in names}
-    elif dependency == "ext/coremqtt":
+    elif path == "ext/coremqtt":
         raw, _ = snapshot(root / "dependencies/coremqtt.lock.json")
         names = set(coremqtt_lock.contract(parse_json(raw))["files"])
         if not names.issubset(entries):
             raise SDKError("coreMQTT committed source graph is incomplete")
         entries = {name: entries[name] for name in names}
-    elif dependency in {item.path for item in mbedtls_lock.mounts()}:
+    elif path in {item.path for item in mbedtls_lock.mounts()}:
         lock = mbedtls_lock.load_lock(root / mbedtls_lock.LOCK_NAME)
-        names = set(mbedtls_lock.record(lock, dependency)["files"])
+        names = set(mbedtls_lock.record(lock, path)["files"])
         if not names.issubset(entries):
             raise SDKError("TLS committed static source closure is incomplete")
         entries = {name: entries[name] for name in names}
-    elif dependency in {official.DIRECTORY for official in OFFICIAL_DRIVERS}:
-        official = next(official for official in OFFICIAL_DRIVERS
-                        if official.DIRECTORY == dependency)
-        raw, _ = snapshot(root / official.LOCK_NAME)
-        names = official.contract(parse_json(raw))
+    elif item.paired_driver_checker is not None:
+        raw, _ = snapshot(root / item.source_lock)
+        names = paired_driver_checker(item).contract(parse_json(raw))
         if not names.issubset(entries):
             raise SDKError("Official committed source graph is incomplete: "
-                           + dependency)
+                           + path)
         entries = {name: entries[name] for name in names}
     else:
         selected_names = set()
         for part, review in cmsis_device_lock.REVIEWED_DEVICES.items():
-            if dependency != review["directory"]:
+            if path != review["directory"]:
                 continue
             raw, _ = snapshot(root / review["lock_name"])
             lock = parse_json(raw)
@@ -769,7 +741,7 @@ def _selected(name, root, profile, packages, configuration_files):
            PurePosixPath(name).is_relative_to(PurePosixPath(package.import_lock).parent)
            for package in packages):
         return True
-    if name in F4_FAMILY_VERIFICATION_FILES:
+    if any(name in package.verification_files for package in packages):
         return True
     if name in HOST_SUPPORT_FILES or name.startswith("tests/"):
         return profile["host_support"] and name in HOST_SUPPORT_FILES
@@ -852,8 +824,11 @@ def check_source_exports(value, files):
 def check_selected_source_scope(selection, members, files):
     """Keep unselected SoC sources and undeclared platform files out of SDKs."""
     members = set(members)
+    contracts = {name for package in selection.packages for name in package.verification_files}
     for name in files:
         safe_relative(name)
+        if name.startswith("tests/contracts/") and name not in contracts:
+            raise SDKError("Unselected package contract in SDK: " + name)
         if not name.startswith(("vendors/", "ext/")) and name not in members:
             raise SDKError("Unlisted platform source payload in SDK: " + name)
         if (name.startswith("soc/") and name != "soc/README.md" and
@@ -1081,9 +1056,11 @@ def verify_selected_dependencies(root, records, *, source_sdk=False):
         if (records[path]["commit"], records[path]["tree"]) != (
                 identity["commit"], identity["tree"]):
             raise SDKError("ST USB package identity differs from reviewed source")
-    for official in OFFICIAL_DRIVERS:
-        if official.DIRECTORY not in records:
+    for path in records:
+        item = dependency(path)
+        if item.paired_driver_checker is None:
             continue
+        official = paired_driver_checker(item)
         arguments = ({"packaged_commit": records[official.DIRECTORY]["commit"],
                       "packaged_cmsis_commit": records[official.CMSIS_DIRECTORY]["commit"]}
                      if source_sdk else {})
@@ -1238,8 +1215,12 @@ def verify(root):
         package_records=identity["source_exports"]["packages"])
     profile = selection.profile
     check_selected_source_scope(selection, identity["source_exports"]["members"], files)
-    if any(name not in files for name in required_files(root, profile, selection=selection)):
-        raise SDKError("Installed source SDK is missing required sources/licenses")
+    for name in required_files(root, profile, selection=selection):
+        if name not in files:
+            raise SDKError("Installed source SDK is missing required sources/licenses: " + name)
+    for name, expected in selection.device_inputs.items():
+        if files.get(name) != expected:
+            raise SDKError("Catalogued vendor device file differs from its lock: " + name)
     for name, expected in files.items():
         if not isinstance(expected, str) or not HEX64.fullmatch(expected):
             raise SDKError("Invalid source SDK file digest")
@@ -1325,10 +1306,6 @@ def verify(root):
                          if path.is_file() or path.is_symlink()}
         if actual_import != expected:
             raise SDKError("Source SDK contains files outside the reviewed import")
-    for name in required_files(root, profile, selection=selection):
-        if name not in files:
-            raise SDKError("Installed source SDK is missing required "
-                           "sources/licenses: " + name)
     for name, receipt in selection.inputs:
         if stable_file(root, name)[1] != receipt:
             raise SDKError("Source SDK package metadata changed during verification")
@@ -1418,7 +1395,8 @@ def _required_source_members(root, *, selection=None):
     if (root / "soc/README.md").is_file():
         entries["soc/README.md"] = ("100644", "blob", "")
     # Verification sources intentionally live outside production roots.
-    for name in (*SDK_VERIFICATION_FILES, *F4_FAMILY_VERIFICATION_FILES):
+    for name in (*SDK_VERIFICATION_FILES, *(file for package in selection.packages
+                                           for file in package.verification_files)):
         if (root / name).is_file():
             entries[name] = ("100644", "blob", "")
     return owned_source_files(root, entries, selection=selection)

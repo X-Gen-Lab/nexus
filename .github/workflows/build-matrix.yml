@@ -197,18 +197,26 @@ jobs:
       # CPU software fixtures establish linkage and ownership. Physical fault
       # injection, SAU/IDAU wiring and isolation remain station qualification.
 
+  reference-plan:
+    name: Firmware reference presets
+    runs-on: ubuntu-24.04
+    outputs:
+      matrix: ${{ steps.references.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - id: references
+        run: python3 scripts/ci/reference_matrix.py >> "$GITHUB_OUTPUT"
+
   arm:
     name: ARM link and budgets (${{ matrix.preset }})
+    needs: reference-plan
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     strategy:
       fail-fast: false
-      matrix:
-        preset:
-          - stm32-qiming-baremetal
-          - stm32-qiming-freertos
-          - stm32-sky-baremetal
-          - stm32-sky-freertos
+      matrix: ${{ fromJSON(needs.reference-plan.outputs.matrix) }}
+    env:
+      BUILD_DIR: ${{ matrix.build_dir }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -229,23 +237,19 @@ jobs:
       - name: Verify physical memory and configuration identity
         run: >-
           .venv/bin/python tools/measurement/resources.py
-          --elf build/${{ matrix.preset }}/bin/nexus_firmware.elf
-          --resolved build/${{ matrix.preset }}/generated/resolved.json
-          --budget build/${{ matrix.preset }}/generated/resource-budget.json
-          --report build/${{ matrix.preset }}/resource-report.json
+          --elf "$BUILD_DIR/bin/nexus_firmware.elf"
+          --resolved "$BUILD_DIR/generated/resolved.json"
+          --budget "$BUILD_DIR/generated/resource-budget.json"
+          --report "$BUILD_DIR/resource-report.json"
       - name: Prepare the unbound physical station work plan
+        if: matrix.fixture != ''
         env:
-          PRESET: ${{ matrix.preset }}
+          FIXTURE: ${{ matrix.fixture }}
         run: |
-          case "$PRESET" in
-            stm32-qiming-*) fixture=stm32f407_qiming_v31 ;;
-            stm32-sky-*) fixture=stm32f407ve_sky_qingchun ;;
-            *) exit 1 ;;
-          esac
           .venv/bin/python -B tools/hil/prepare.py \
-            --fixture "tools/hil/fixtures/$fixture.json" \
-            --resolved "build/$PRESET/generated/resolved.json" \
-            --report "build/$PRESET/hil-preparation.json"
+            --fixture "$FIXTURE" \
+            --resolved "$BUILD_DIR/generated/resolved.json" \
+            --report "$BUILD_DIR/hil-preparation.json"
       - name: Preserve linked software evidence
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -253,11 +257,11 @@ jobs:
           name: software-${{ matrix.preset }}
           path: |
             build/setup-dependencies.json
-            build/${{ matrix.preset }}/bin/
-            build/${{ matrix.preset }}/generated/
-            build/${{ matrix.preset }}/compile_commands.json
-            build/${{ matrix.preset }}/resource-report.json
-            build/${{ matrix.preset }}/hil-preparation.json
+            ${{ matrix.build_dir }}/bin/
+            ${{ matrix.build_dir }}/generated/
+            ${{ matrix.build_dir }}/compile_commands.json
+            ${{ matrix.build_dir }}/resource-report.json
+            ${{ matrix.build_dir }}/hil-preparation.json
           retention-days: 30
           include-hidden-files: true
           if-no-files-found: error

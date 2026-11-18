@@ -145,6 +145,16 @@ class WorkflowLintTests(unittest.TestCase):
         with self.assertRaisesRegex(LINT.WorkflowError, pattern):
             self.lint()
 
+    def test_ordinary_commit_triggers_only_for_real_workflow_inputs(self):
+        self.assertTrue(LINT.changed_inputs(self.root))  # first commit
+        self.git("-c", "user.name=Fixture", "-c", "user.email=test@example.invalid",
+                 "commit", "-qm", "initial workflow")
+        self.write("board.c", "int board;\n")
+        self.git("add", "board.c")
+        self.assertFalse(LINT.changed_inputs(self.root))
+        self.git("rm", ".github/workflows/check.yml")
+        self.assertTrue(LINT.changed_inputs(self.root))
+
     def test_valid_full_index_ignores_bad_unstaged_workflow(self):
         self.write(".github/workflows/check.yml", BAD)
         self.assertEqual(self.lint(), 0)

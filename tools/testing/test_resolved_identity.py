@@ -55,6 +55,30 @@ class ResolvedIdentityTests(unittest.TestCase):
                 resolved_identity(self.path)
         resolve.assert_not_called()
 
+    def test_arm_reference_requires_caller_opt_in_and_the_selected_declarative_package(self):
+        from tools.measurement import build_resources
+
+        package = configure.ROOT / "tests/contracts/declarative_gd32f470"
+        output = self.root / "reference"
+        configure.configure(package / "gpio-only.toml", output, test_support=True)
+        path = output / "resolved.json"
+        with self.assertRaises(EvidenceError):
+            resolved_identity(path)
+        selected, _ = resolved_identity(path, allow_reference=True)
+        with self.assertRaises(EvidenceError):
+            build_resources.bind(path, allow_reference=False)
+        anchor = build_resources.bind(path, allow_reference=True)
+        self.assertEqual(build_resources.from_graph(path, anchor, allow_reference=True)[0],
+                         selected)
+        with self.assertRaises(EvidenceError):
+            build_resources.from_graph(path, anchor, allow_reference=False)
+        self.assertEqual(selected["soc_package"]["scope"], "reference")
+        self.assertEqual(selected["soc_package"]["id"], "gd32f470_reference")
+        selected["soc_package"]["scope"] = "production"
+        path.write_text(json.dumps(selected))
+        with self.assertRaisesRegex(EvidenceError, "projection"):
+            resolved_identity(path, allow_reference=True)
+
     def test_output_cannot_enable_legacy_provider_execution(self):
         from tools.configure.tests.test_external_package import ExternalPackageTests
 
@@ -70,8 +94,9 @@ class ResolvedIdentityTests(unittest.TestCase):
         path.write_text(json.dumps(selected))
         with patch.object(integration_package, "_load_provider",
                           side_effect=AssertionError("legacy provider executed")) as load:
-            with self.assertRaises(EvidenceError):
-                resolved_identity(path)
+            for allow_reference in (False, True):
+                with self.assertRaises(EvidenceError):
+                    resolved_identity(path, allow_reference=allow_reference)
         load.assert_not_called()
 
     def test_builtin_native_with_external_json_board_remains_supported(self):

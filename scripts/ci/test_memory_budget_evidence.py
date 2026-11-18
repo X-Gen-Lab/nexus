@@ -86,6 +86,24 @@ class MemoryBudgetEvidenceTests(unittest.TestCase):
                 with self.subTest(region=region, changed=changed), self.assertRaises(ValueError):
                     self.gate().check_budget_overflow(changed, region)
 
+    def test_withdrawn_firmware_uses_only_the_measured_image_identity(self):
+        with tempfile.TemporaryDirectory() as name:
+            elf = Path(name) / 'firmware.elf'
+            identity = {'path': str(elf), 'size': 4096, 'sha256': 'a' * 64}
+            self.assertEqual(self.gate().withdrawn_elf(elf, identity),
+                             {'path': str(elf), 'bytes': 4096, 'sha256': 'a' * 64})
+            for changed in ({**identity, 'path': str(elf.with_name('other.elf'))},
+                            {**identity, 'size': True}, {**identity, 'size': 0},
+                            {**identity, 'sha256': 'invalid'}, {}):
+                with self.subTest(identity=changed), self.assertRaises(ValueError):
+                    self.gate().withdrawn_elf(elf, changed)
+            for suffix in ('.elf', '.bin', '.map'):
+                retained = elf.with_suffix(suffix)
+                retained.touch()
+                with self.subTest(retained=retained), self.assertRaises(ValueError):
+                    self.gate().withdrawn_elf(elf, identity)
+                retained.unlink()
+
     def test_small_limit_is_authored_toml_and_preserves_other_regions(self):
         with tempfile.TemporaryDirectory() as name:
             output = Path(name)

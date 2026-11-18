@@ -8,6 +8,7 @@ import shlex
 from pathlib import Path
 import shutil
 import subprocess
+import sys
 import tempfile
 import unittest
 
@@ -37,6 +38,39 @@ class BuildSystemTests(unittest.TestCase):
             self.assertNotEqual(completed.returncode, 0,
                                 completed.stdout + completed.stderr)
         return completed
+
+    def test_warm_build_tracks_soc_manifests_but_not_unselected_facts(self):
+        # Drive the production package lookup and CMake watcher in a small
+        # configure-only project; facts of unselected families stay private.
+        project = self.source
+        package = project / "soc/test/other"
+        package.mkdir(parents=True)
+        manifest = package / "package.json"
+        marker = project / "configure-count"
+        module = ROOT / "cmake/platform/Configure.cmake"
+        (project / "CMakeLists.txt").write_text(
+            'cmake_minimum_required(VERSION 3.31)\nproject(catalog NONE)\n'
+            f'include("{module.as_posix()}")\n'
+            '_nexus_watch_soc_manifests("${CMAKE_SOURCE_DIR}")\n'
+            f'execute_process(COMMAND "{sys.executable}" -B -c '
+            f'"import sys; sys.path.insert(0,r\'{ROOT.as_posix()}\'); '
+            f'from tools.configure import packages; packages.find(r\'{project.as_posix()}\','
+            f'\'selected\')" COMMAND_ERROR_IS_FATAL ANY)\n'
+            f'file(APPEND "{marker.as_posix()}" "x")\n')
+        self.run_command("cmake", "-S", str(project), "-B", str(self.build), "-G", "Ninja")
+        command = ("cmake", "--build", str(self.build))
+        self.run_command(*command)
+        manifest.write_text('{"family":"other"}')
+        self.run_command(*command)
+        self.assertEqual(marker.read_text(), "xx")
+        (package / "routes.json").write_text("{}")
+        self.run_command(*command)
+        self.assertEqual(marker.read_text(), "xx")
+        manifest.write_text('{"family":"selected"}')
+        self.run_command(*command, success=False)
+        manifest.unlink()
+        self.run_command(*command)
+        self.assertEqual(marker.read_text(), "xxx")
 
     def fixture(self, *, optimization="Os", extra="", source=None):
         """Separate the Nexus directory from the public helper's call site."""
@@ -96,6 +130,19 @@ class BuildSystemTests(unittest.TestCase):
         commands = json.loads((self.build / "compile_commands.json").read_text())
         return next(entry["command"] for entry in commands
                     if entry["file"].endswith("main.cpp"))
+
+    def test_arm_toolchain_loads_without_optional_cpp_or_size(self):
+        # Model a C-only installation: the selected C/ASM tools are already known.
+        script = self.source / "toolchain-probe.cmake"
+        script.write_text(
+            'cmake_minimum_required(VERSION 3.31)\n'
+            'foreach(tool CMAKE_C_COMPILER CMAKE_ASM_COMPILER CMAKE_AR CMAKE_OBJCOPY)\n'
+            '  set(${tool} "${CMAKE_COMMAND}")\n'
+            'endforeach()\n'
+            'set(CMAKE_FIND_USE_CMAKE_SYSTEM_PATH FALSE)\n'
+            'set(CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH FALSE)\n'
+            f'include("{ROOT.as_posix()}/cmake/toolchains/arm-gcc.cmake")\n')
+        self.run_command(self.cmake, "-P", str(script))
 
     def test_lto_policy_crosses_public_helper_directory_and_runs_cpp(self):
         self.fixture(optimization="Os-lto")

@@ -1,5 +1,4 @@
 """Inspect the real I/O target without compiling an unrelated device domain."""
-import json
 import os
 from pathlib import Path
 import shlex
@@ -50,17 +49,19 @@ class IOSourceSelectionTests(unittest.TestCase):
                 network=False, modes=("irq-byte-event",), build=False):
         with tempfile.TemporaryDirectory(prefix="nexus io sources ") as folder:
             root = Path(folder)
+            controllers = ";".join(f"{kind}/fixture/{mode}"
+                                   for kind in kinds for mode in modes)
             project = f'''cmake_minimum_required(VERSION 3.31)
 project(io_source_contract LANGUAGES C)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(NEXUS_SOURCE_DIR "{ROOT}")
-set(NEXUS_CONFIG_DIR "{root / 'config'}")
 set(NEXUS_SOC_FAMILY "{family}")
 set(NEXUS_TEST_SUPPORT {"ON" if family == "native" else "OFF"})
 set(NEXUS_SELECTED_KINDS "{';'.join(kinds)}")
 set(NEXUS_SELECTED_COMPONENTS "{';'.join(components)}")
+set(NEXUS_SELECTED_CONTROLLERS "{controllers}")
 add_library(nexus_core INTERFACE)
 add_library(Nexus::Core ALIAS nexus_core)
 add_library(nexus_arch INTERFACE)
@@ -72,12 +73,6 @@ target_include_directories(nexus_arch INTERFACE "{ROOT / 'arch/include'}")
 target_compile_options(nexus_build_options INTERFACE -ffunction-sections)
 add_subdirectory("{ROOT / 'io'}" io)
 '''
-            (root / "config").mkdir()
-            (root / "config/resolved.json").write_text(json.dumps({
-                "controllers": [{"kind": kind, "mode": mode,
-                                 "controller": "fixture"}
-                                for kind in kinds for mode in modes],
-            }))
             if broker:
                 project += f'''
 add_library(nexus_os_wait INTERFACE)

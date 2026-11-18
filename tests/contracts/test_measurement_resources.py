@@ -6,6 +6,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 from tools.evidence.common import EvidenceError, atomic_json
 from tools.measurement.elf import Elf32, interval_bytes
@@ -14,6 +15,55 @@ from tests.contracts.test_evidence_support import link_fixture
 
 
 class ResourceValidationTests(unittest.TestCase):
+    def test_build_graph_binds_projection_navigation_code_and_actual_inputs(self):
+        from tools.configure import configure
+        from tools.measurement import build_resources
+
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            assembly = root / "app.toml"
+            assembly.write_bytes((configure.ROOT / "tools/configure/assemblies/"
+                                  "qiming-baremetal-empty.toml").read_bytes())
+            generated = root / "generated"
+            configure.configure(assembly, generated)
+            resolved = generated / "resolved.json"
+            anchor = build_resources.bind(resolved, allow_reference=False)
+            with patch.object(configure, "resolve_ir", side_effect=AssertionError(
+                    "a source-only relink must not replay the resolver")):
+                observed, identity, inputs = build_resources.from_graph(resolved, anchor,
+                    allow_reference=False)
+                self.assertEqual(observed, json.loads(resolved.read_bytes()))
+                self.assertEqual(identity["path"], str(resolved))
+                self.assertIn(str(assembly), [item["file"]["path"] for item in inputs])
+                for target in (resolved, generated / "input_paths.json",
+                               generated / "configuration_code_paths.json",
+                               generated / "generator-identity.json", assembly):
+                    with self.subTest(path=target):
+                        previous = target.read_bytes()
+                        target.write_bytes(previous + b"\n")
+                        with self.assertRaises(ValueError):
+                            build_resources.from_graph(resolved, anchor, allow_reference=False)
+                        target.write_bytes(previous)
+                with self.assertRaises(ValueError):
+                    build_resources.from_graph(resolved, anchor, allow_reference=True)
+            paths = generated / "configuration_code_paths.json"
+            identity = generated / "generator-identity.json"
+            catalog = json.loads(paths.read_text())
+            fake = root / "replacement.py"
+            name = "tools/configure/domains/pll_mnpq.py"
+            fake.write_bytes(Path(catalog[name]).read_bytes())
+            catalog[name] = str(fake)
+            paths.write_text(json.dumps(catalog))
+            with self.assertRaisesRegex(ValueError, "selected sources"):
+                build_resources.bind(resolved, allow_reference=False)
+            del catalog[name]
+            paths.write_text(json.dumps(catalog))
+            code = json.loads(identity.read_bytes())
+            code["files"] = [item for item in code["files"] if item["path"] != name]
+            identity.write_text(json.dumps(code))
+            with self.assertRaisesRegex(ValueError, "selected sources"):
+                build_resources.bind(resolved, allow_reference=False)
+
     def test_interval_union_prevents_duplicate_stack_cost(self):
         self.assertEqual(interval_bytes([(0, 100), (60, 90), (90, 200)]), 200)
 

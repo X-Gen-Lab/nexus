@@ -38,9 +38,18 @@ class SelectedProjectionTests(unittest.TestCase):
                                   "fact_references"}:
             self.assertEqual(emitted[name], full[name], name)
 
+    def test_external_vector_projection_keeps_kernel_exceptions_separate(self):
+        selected, emitted = self.emit(
+            "tests/contracts/gpio_exti_assembly/zg-freertos.toml")
+        self.assertIn("irq:SysTick", {claim.key for claim in selected.claims})
+        self.assertNotIn("SysTick_Handler", emitted["cortex_m_irq_vectors"])
+        self.assertIn("TIM2_IRQHandler", emitted["cortex_m_irq_vectors"])
+
     def test_controller_artifact_keeps_only_its_selected_binding_and_route(self):
         selected, emitted = self.emit(
             "tools/configure/assemblies/qiming-baremetal-uart.toml")
+        self.assertEqual(emitted["cortex_m_irq_vectors"], {
+            "TIM2_IRQHandler": 28, "USART1_IRQHandler": 37})
         self.assertEqual(set(emitted["board_bindings"]), {"uart1"})
         self.assertEqual(set(emitted["routes"]), {"usart1-pa9-pa10"})
         self.assertEqual(emitted["controllers"], selected.to_dict()["controllers"])

@@ -68,6 +68,31 @@ class SDKExportOwnershipTests(unittest.TestCase):
         self.assertEqual(self.sdk.owned_source_files(
             self.root, entries, profile=profile), ())
 
+    def test_device_inputs_follow_the_selected_package_catalog(self):
+        profile = self.sdk.source_profile(root=ROOT)
+        required = self.sdk.dependency_required_files(ROOT, profile)
+        self.assertIn("vendors/st/cmsis_device_f4/Include/stm32f446xx.h", required)
+        self.assertIn("vendors/st/cmsis_device_f4/Source/Templates/gcc/"
+                      "startup_stm32f446xx.s", required)
+
+    def test_unrelated_package_does_not_export_f4_verification_fixtures(self):
+        self.default_scope()
+        self.assertFalse(self.sdk.selected(
+            "tests/contracts/stm32f4_family/f479ni.toml", root=self.root))
+
+    def test_installed_contracts_must_belong_to_a_selected_package(self):
+        self.default_scope()
+        selected = self.sdk.resolve_selection(self.root)
+        foreign = "tests/contracts/stm32f4_family/f446ze.toml"
+        with self.assertRaisesRegex(self.sdk.SDKError, "Unselected.*contract"):
+            self.sdk.check_selected_source_scope(selected, (foreign,), {foreign: "digest"})
+
+    def test_paired_hal_checker_follows_its_selected_supplier(self):
+        self.default_scope()
+        checker = "tools/maintenance/stm32f4_hal_lock.py"
+        self.assertFalse(self.sdk.selected(checker, root=self.root))
+        self.assertTrue(self.sdk.selected(checker, root=ROOT))
+
     def test_explicit_package_selection_does_not_pull_default_suppliers(self):
         self.default_scope()
         self.second_package()

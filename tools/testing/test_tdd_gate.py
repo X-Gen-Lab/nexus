@@ -74,6 +74,58 @@ class TDDBinaryPlanBoundaryTests(unittest.TestCase):
         self.assertEqual(record["passed"], 1)
         self.assertEqual(record["tool_suites"], [])
 
+    def test_warm_tree_skips_configure_but_runs_contracts_again(self):
+        commands = []
+
+        def execute(command, environment, log):
+            commands.append(command)
+            if "configure" in command:
+                entry = "CMAKE_HOME_DIRECTORY:INTERNAL=" + str(self.fixture.root) + "\n"
+                tool = self.fixture.root / "compiler-wrapper"
+                if tool.exists():
+                    entry += f"CMAKE_C_COMPILER:FILEPATH={tool}\n"
+                (self.fixture.build / "CMakeCache.txt").write_bytes(
+                    entry.replace("\n", "\r\n").encode())
+                (self.fixture.build / "build.ninja").write_text("# fixture\n")
+            return self.fixture.execute(command, environment, log)
+
+        def run():
+            commands.clear()
+            status, output = self.fixture.run_gate(
+                execute=execute, arguments=["core/src/time.c"])
+            self.assertEqual(status, 0, output)
+            self.assertTrue(any("--gtest_list_tests" in cmd for cmd in commands))
+            return sum("configure" in cmd for cmd in commands)
+
+        self.assertEqual(run(), 1)
+        self.assertEqual(run(), 0)
+        cache = self.fixture.build / "CMakeCache.txt"
+        tool = self.fixture.root / "compiler-wrapper"
+        tool.write_text("first implementation")
+        with cache.open("a") as output:
+            output.write(f"CMAKE_C_COMPILER:FILEPATH={tool}\n")
+        self.assertEqual(run(), 1)
+        self.assertEqual(run(), 0)
+        tool.write_text("different implementation at the same path")
+        self.assertEqual(run(), 1)
+        (self.fixture.build / "build.ninja").unlink()
+        self.assertEqual(run(), 1)
+
+    def test_foreign_build_tree_is_rejected_before_cmake_fresh(self):
+        cache = self.fixture.build / "CMakeCache.txt"
+        original = "CMAKE_HOME_DIRECTORY:INTERNAL=/different/source\n"
+        cache.write_text(original)
+        commands = []
+
+        def execute(cmd, env, log):
+            commands.append(cmd)
+            return self.fixture.execute(cmd, env, log)
+
+        status, detail = self.fixture.run_gate(execute=execute)
+        self.assertEqual(status, 1, detail)
+        self.assertFalse(any("configure" in cmd for cmd in commands))
+        self.assertEqual(cache.read_text(), original)
+
     def test_explicit_all_keeps_every_tool_domain(self):
         commands = []
 

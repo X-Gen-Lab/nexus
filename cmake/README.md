@@ -37,7 +37,11 @@ nexus_add_firmware(firmware SOURCES main.c LIBRARIES Nexus::Log)
 ```
 
 固件入口装入精确 startup、system、linker 和 ABI，不启动 scheduler 或产品 worker。
-应用负责任务、stack／TCB、队列、Flash 区域与停机顺序。
+应用负责任务、stack／TCB、队列、Flash 区域与停机顺序。每个固件的私有启动对象
+继承该调用目录的编译设置。同一装配可以在不同目录构建多个镜像。
+
+ARM 工具链在应用启用 CXX 时解析交叉 C++ 编译器。纯 C/ASM 工程可以使用
+仅安装 C 编译器与所需 binutils 的环境；使用 size 的度量入口自行定位该工具。
 
 | 位置 | 责任 |
 |---|---|

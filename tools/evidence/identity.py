@@ -152,7 +152,7 @@ def verify_source(source: dict, *, clean: bool = False) -> None:
         raise EvidenceError("dirty source cannot qualify a software candidate")
 
 
-def resolved_identity(path: Path) -> tuple[dict, dict]:
+def resolved_identity(path: Path, *, allow_reference: bool = False) -> tuple[dict, dict]:
     """Verify a complete digest or the exact selected projection of its inputs."""
     artifact = file_identity(path)
     resolved = load_json(path)
@@ -161,7 +161,7 @@ def resolved_identity(path: Path) -> tuple[dict, dict]:
         raise EvidenceError("unsupported resolved schema")
     if version == 2:
         sha256_value(resolved.get("configuration_sha256"))
-        _verify_selected_projection(path, resolved)
+        _verify_selected_projection(path, resolved, allow_reference)
     else:
         claimed = resolved.get("configuration_sha256")
         canonical = {key: value for key, value in resolved.items()
@@ -173,7 +173,7 @@ def resolved_identity(path: Path) -> tuple[dict, dict]:
     return resolved, artifact
 
 
-def _verify_selected_projection(path: Path, resolved: dict) -> None:
+def _verify_selected_projection(path: Path, resolved: dict, allow_reference: bool) -> None:
     """Retain full configuration identity without trusting edited output fields."""
     from tools.configure import configure, emission, metadata
 
@@ -188,10 +188,13 @@ def _verify_selected_projection(path: Path, resolved: dict) -> None:
             continue
         try:
             intent = configure.load_assembly(assembly, root, test_support=True)
-            selected = configure.resolve_ir(
-                assembly, root,
-                test_support=intent.backend == "native" and
-                intent.soc_package is None, allow_legacy_provider=False)
+            support = intent.backend == "native" and intent.soc_package is None
+            if allow_reference and intent.backend != "native" and intent.soc_package:
+                manifest = (assembly.parent / intent.soc_package / "package.json").resolve()
+                support = (manifest in inputs.values() and
+                           load_json(manifest).get("scope") == "reference")
+            selected = configure.resolve_ir(assembly, root, test_support=support,
+                                            allow_legacy_provider=False)
         except (OSError, ValueError, TypeError, KeyError):
             continue
         if selected.configuration_sha256 == resolved["configuration_sha256"]:

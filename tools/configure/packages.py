@@ -46,7 +46,9 @@ def _manifest_contract():
             "required": ["roots", "exclude"], "properties": {
                 "roots": {"type": "array", "minItems": 1, "uniqueItems": True,
                           "items": root},
-                "exclude": {"type": "array", "uniqueItems": True, "items": relative}}}),
+                "exclude": {"type": "array", "uniqueItems": True, "items": relative},
+                "verification_files": {"type": "array", "uniqueItems": True,
+                    "items": {"allOf": [relative, {"pattern": "^tests/contracts/"}]}}}}),
         "scope": (False, {"type": "string", "enum": ["production", "reference"]}),
         "binding_files": (False, {"type": "array", "uniqueItems": True,
                                   "items": relative}),
@@ -156,6 +158,8 @@ class Package:
     scope: str = "production"
     binding_files: tuple[Path, ...] = ()
 
+    verification_files: frozenset[str] = frozenset()
+
     def fact(self, name):
         """Return an already validated fact file, without importing its data."""
         return self.source_directory / self.facts[name]
@@ -227,7 +231,7 @@ def load(path, *, read=None):
     if not isinstance(target, str) or _C_IDENTIFIER.fullmatch(target) is None:
         fail("Declarative package CMake target must be an ordinary identifier")
     cmake_entry = _contained(source, entry)
-    exports = _record(value["exports"], {"roots", "exclude"})
+    exports = _record(value["exports"], {"roots", "exclude"}, {"verification_files"})
     if (not isinstance(exports["roots"], list) or not exports["roots"] or
             not isinstance(exports["exclude"], list)):
         fail("Declarative package exports require roots and explicit exclusions")
@@ -237,6 +241,13 @@ def load(path, *, read=None):
                      for name in exports["exclude"])
     if len(set(roots)) != len(roots) or len(set(excludes)) != len(excludes):
         fail("Duplicate declarative package export scope")
+    files = exports.get("verification_files", [])
+    if not isinstance(files, list):
+        fail("Package verification exports require a list of contract files")
+    verification_files = frozenset(_relative(name).as_posix() for name in files)
+    if (len(files) != len(verification_files) or
+            any(not name.startswith("tests/contracts/") for name in verification_files)):
+        fail("Package verification exports must be unique contract files")
     if path.read_bytes() != raw:
         fail("Declarative package changed during metadata loading")
     scope = value.get("scope", "production")
@@ -253,7 +264,8 @@ def load(path, *, read=None):
     return Package(path, *identifiers, source, MappingProxyType(dict(facts)),
                    selected, cmake_entry, target, roots, excludes,
                    hashlib.sha256(raw).hexdigest(), import_lock,
-                   hashlib.sha256(source_raw).hexdigest(), scope, binding_files)
+                   hashlib.sha256(source_raw).hexdigest(), scope, binding_files,
+                   verification_files)
 
 
 def read_soc(package, *, read=None):

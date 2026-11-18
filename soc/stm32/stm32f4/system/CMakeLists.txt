@@ -13,7 +13,7 @@ target_sources(
         "${CMAKE_CURRENT_LIST_DIR}/platform_cold.c"
 )
 set(NEXUS_STARTUP_SOURCE
-    "${stm32_device}/Source/Templates/gcc/${NEXUS_STM32_STARTUP}"
+    "${stm32_device}/${NEXUS_VENDOR_DEVICE_STARTUP}"
     PARENT_SCOPE
 )
 set(stm32_system_includes

@@ -52,6 +52,18 @@ function(_nexus_watch_configuration_inputs bundle)
     endforeach()
 endfunction()
 
+# Package discovery inspects immediate family manifests. Only selected package
+# inputs contribute facts, C sources and firmware dependencies.
+function(_nexus_watch_soc_manifests source)
+    file(
+        GLOB manifests
+        LIST_DIRECTORIES FALSE
+        CONFIGURE_DEPENDS
+        "${source}/soc/*/*/package.json"
+    )
+    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${manifests})
+endfunction()
+
 # A failing configuration removes the previous owned generated bundle.
 function(nexus_resolve_assembly)
     get_cmake_property(assembly_cache_variables CACHE_VARIABLES)
@@ -89,6 +101,9 @@ function(nexus_resolve_assembly)
         message(FATAL_ERROR "Configuration rejected: ${output}${error}")
     endif()
     include("${bundle}/selection.cmake")
+    if(NEXUS_DISCOVER_SOC_PACKAGES)
+        _nexus_watch_soc_manifests("${NEXUS_SOURCE_DIR}")
+    endif()
     # Register the resolver's exact configuration-code contract. This tracks
     # These are generation inputs; CMake owns production source targets.
     _nexus_watch_configuration_inputs("${bundle}" configuration_code_paths)

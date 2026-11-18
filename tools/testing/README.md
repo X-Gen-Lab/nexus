@@ -9,6 +9,8 @@ python tools/testing/run_tool_tests.py --suite testing --report build/quality/to
 
 普通固件实现提交执行完整 Native GoogleTest，不触发整套辅助工具域。公共头、声明事实
 和工具改动按 `run_tool_tests.py` 选择完整相关测试模块；未知或缺少已知覆盖则执行完整域。
+板级电气合同的完整测试模块在 `tools/configure/tests/__init__.py` 的
+`BOARD_FACT_CONTRACTS` 声明所用板级事实文件。新增专属合同只需在测试侧登记。
 提交范围标记 `commit-tools`、`qualification=false`；完整 `--all` 验收在合并前独立执行。
 完整 CI 分别运行 testing、configure、ci、
 workflows、contracts、freertos。工具测试不按 Native 编译模式重复。
@@ -16,3 +18,10 @@ workflows、contracts、freertos。工具测试不按 Native 编译模式重复�
 新增工具行为先记录 RED 再实现 GREEN。纯粹删除废弃功能不新增镜像式测试。
 testing 域集中执行一次全局能力和派生文档检查；局部外设测试不重复扫描整个平台。
 报告包含最慢用例摘要，用于定位实际成本，不以测试数量作为优化目标。
+
+需要隔离并行执行完整模块时，给同一命令传入 `--jobs N`，或为本次门禁设置
+`NEXUS_TOOL_JOBS=N`。执行器遵循调用方的 `NEXUS_BUILD_JOBS` 或
+`CMAKE_BUILD_PARALLEL_LEVEL` 配额，把剩余编译任务分配给各个 worker。
+每个模块使用独立 Python 进程；报告的 `modules` 含各模块实际用例标识的
+SHA-256，可用 `--jobs 1` 与并行结果对照。超时、信号或模块失败会撤回已启动的
+子进程并使本次执行失败。共享构建目录的写入必须由所属构建入口取得目录锁。

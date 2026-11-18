@@ -272,13 +272,12 @@ class ChangedDomainTests(unittest.TestCase):
         self.assertIn("scripts/ci/test_install_dev_tools.py", plan["ci"])
         self.assertLess(sum(map(len, plan.values())), 20)
 
-    def test_commit_facts_use_one_global_module_and_schema_contracts(self):
+    def test_commit_facts_use_selected_assemblies_and_resource_contracts(self):
         plan = run_tool_tests.commit_tool_plan([
             "io/include/nexus/io/gpio.h", "soc/stm32/stm32f4/facts/devices.json",
             "boards/stm32f407zg_qiming_v41/board.json"])
-        self.assertEqual(plan["testing"], ("tools/testing/test_maintenance.py",))
-        self.assertIn("tools/configure/tests/test_toml.py", plan["configure"])
-        self.assertIn("tools/configure/tests/test_static_ir.py", plan["configure"])
+        self.assertEqual(plan["testing"], ("tools/testing/test_build_impact.py",))
+        self.assertIn("tools/configure/tests/test_resource_graph.py", plan["configure"])
 
     def test_commit_unknown_and_vendor_lock_changes_keep_full_domains(self):
         for name in ("future/build-policy.bin", "tools/future_policy.py",
@@ -324,12 +323,39 @@ class ChangedDomainTests(unittest.TestCase):
         self.assertEqual(plan, {"configure": (
             "tools/configure/tests/test_external_package.py",)})
 
-    def test_production_board_facts_keep_the_small_complete_module_plan(self):
+    def test_board_wiring_selects_its_declared_electrical_contract(self):
+        contract = "tools/configure/tests/test_qiming_board_facts.py"
+        for board in ("stm32f407zg_qiming_core", "stm32f407zg_qiming_v41",
+                      "stm32f407ve_sky_qingchun"):
+            with self.subTest(board=board):
+                plan = run_tool_tests.commit_tool_plan([f"boards/{board}/board.json"])
+                self.assertEqual(plan["testing"], ("tools/testing/test_build_impact.py",))
+                self.assertEqual(contract in plan["configure"], "qiming" in board)
+                self.assertNotIn(None, plan.values())
+
+    def test_build_helpers_run_their_actual_firmware_and_workflow_contracts(self):
+        budgets = {"tests/contracts/test_build_artifacts.py",
+                   "tests/contracts/test_measurement_resources.py"}
+        cases = {
+            "tools/measurement/resources.py": ("contracts", budgets),
+            "tools/measurement/build_resources.py": ("contracts", budgets),
+            "tools/measurement/elf.py": ("contracts", budgets | {
+                "tests/contracts/test_image_artifacts.py"}),
+            "scripts/ci/reference_matrix.py": ("workflows", {
+                ".github/workflows/test_platform_ci.py"}),
+            "tools/testing/arm_links.py": ("testing", {
+                "tools/testing/test_affected_arm_links.py", "tools/testing/test_tdd_gate.py"}),
+        }
+        for path, (domain, modules) in cases.items():
+            with self.subTest(path=path):
+                self.assertEqual(run_tool_tests.commit_tool_plan([path]),
+                                 {domain: tuple(sorted(modules))})
+
+    def test_sdk_device_fixture_avoids_unrelated_global_checks(self):
         plan = run_tool_tests.commit_tool_plan([
-            "boards/stm32f407zg_qiming_v41/board.json"])
-        self.assertEqual(plan["testing"], ("tools/testing/test_maintenance.py",))
-        self.assertTrue(plan["configure"])
-        self.assertNotIn(None, plan.values())
+            "cmake/package/verification/device_tmp117/f407.toml",
+            "components/devices/tmp117/src/i2c_transport.c"])
+        self.assertEqual(plan, {"testing": ("tools/testing/test_sdk_device_image_policy.py",)})
 
     def test_sdk_code_and_known_fixture_inputs_select_both_complete_domains(self):
         for name in ("cmake/package/package_source_sdk.py",

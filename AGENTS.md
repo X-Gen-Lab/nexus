@@ -168,10 +168,12 @@ complete staged index, including deletions, and executes the full Native
 GoogleTest plan plus complete affected tool modules. Module planning is an
 explicit commit scope, not a filtered full-domain qualification: reports declare
 `commit-tools` and `qualification=false`. Changed test modules run in full;
-known implementation paths use the maintained module mappings. Firmware C
-changes need no auxiliary domain. Headers and declarative facts select their
-configuration contracts and the single global support scan. Unknown behavioral
-inputs or missing known coverage conservatively select full domains.
+known implementation paths use the maintained module mappings. Physical
+changes also run the firmware target for the assemblies selected from the
+base and staged hardware inputs. The gate records its selection, fallback
+reasons and checked image identities. A missing or stale target dependency
+record expands hardware coverage. The complete support scan runs in integration.
+Unknown behavioral inputs or missing module coverage retain the broader scope.
 
 `tools/testing/run_tool_tests.py` owns this plan. Do not infer a smaller scope
 ad hoc or filter cases inside selected modules. `--all` and `--tools all` always

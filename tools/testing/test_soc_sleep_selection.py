@@ -32,15 +32,12 @@ class SocSleepSelectionTests(unittest.TestCase):
             source = Path(name)
             port = source / "sdk-port"
             port.mkdir()
-            generated = source / "generated"
-            generated.mkdir()
-            (generated / "resolved.json").write_text(
-                json.dumps({"controllers": []}), encoding="utf-8")
             (port / "CMakeLists.txt").write_text(f'''\
 set(NEXUS_SOURCE_DIR "{ROOT.as_posix()}")
-set(NEXUS_CONFIG_DIR "{generated.as_posix()}")
-set(NEXUS_STM32_DEVICE {device})
-set(NEXUS_STM32_STARTUP startup_stm32f407xx.s)
+set(NEXUS_SELECTED_CONTROLLERS "")
+set(NEXUS_VENDOR_DEVICE_DEFINE {device})
+set(NEXUS_VENDOR_DEVICE_HEADER Include/{device.lower()}.h)
+set(NEXUS_VENDOR_DEVICE_STARTUP Source/Templates/gcc/startup_stm32f407xx.s)
 set(Python3_EXECUTABLE "{Path(sys.executable).as_posix()}")
 include("{(ROOT / 'cmake/platform/TargetPolicy.cmake').as_posix()}")
 add_library(Nexus::Config ALIAS nexus_build_options)

@@ -32,13 +32,9 @@ class ProviderSourceSelectionTests(unittest.TestCase):
         """Inspect production targets without claiming an ARM link proof."""
         with tempfile.TemporaryDirectory() as temporary:
             source = Path(temporary)
-            generated = source / "generated"
-            generated.mkdir()
-            (generated / "resolved.json").write_text(json.dumps({
-                "controllers": [{"kind": item[0], "mode": item[1],
-                                 **({'controller': item[2]} if len(item) == 3 else {})}
-                                for item in controllers],
-            }))
+            selected = ";".join(
+                f"{kind}/{physical[0] if physical else 'fixture'}/{mode}"
+                for kind, mode, *physical in controllers)
             # Every family consumes its actual locked SDK and real CMake
             # integration. Configuration inspects selection, not ARM behavior.
             sdk_root = ROOT
@@ -48,7 +44,7 @@ project(provider_source_contract LANGUAGES C ASM)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(Python3_EXECUTABLE "{sys.executable}")
 set(NEXUS_SOURCE_DIR "{sdk_root.as_posix()}")
-set(NEXUS_CONFIG_DIR "{generated.as_posix()}")
+set(NEXUS_SELECTED_CONTROLLERS "{selected}")
 add_library(nexus_io INTERFACE)
 add_library(Nexus::IOGPIO ALIAS nexus_io)
 add_library(Nexus::IODMA ALIAS nexus_io)
@@ -57,8 +53,9 @@ add_library(nexus_arch INTERFACE)
 add_library(Nexus::Arch ALIAS nexus_arch)
 add_library(nexus_build_options INTERFACE)
 add_library(nexus_owned_warnings INTERFACE)
-set(NEXUS_STM32_DEVICE STM32F407xx)
-set(NEXUS_STM32_STARTUP startup_stm32f407xx.s)
+set(NEXUS_VENDOR_DEVICE_DEFINE STM32F407xx)
+set(NEXUS_VENDOR_DEVICE_HEADER Include/stm32f407xx.h)
+set(NEXUS_VENDOR_DEVICE_STARTUP Source/Templates/gcc/startup_stm32f407xx.s)
 add_subdirectory("{(ROOT / source_directory(family)).as_posix()}" soc)
 get_target_property(provider_dependencies nexus_soc_stm32f4 LINK_LIBRARIES)
 file(WRITE "${{CMAKE_CURRENT_BINARY_DIR}}/provider-dependencies.txt"

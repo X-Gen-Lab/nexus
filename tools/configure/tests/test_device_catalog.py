@@ -52,7 +52,8 @@ class DeviceCatalogConfigurationTests(unittest.TestCase):
         paths = {}
         result = self.resolve(input_paths=paths)
         self.assertEqual(result.physical_part.device.macro, "STM32F407xx")
-        self.assertEqual(result.physical_part.device.startup, "startup_stm32f407xx.s")
+        self.assertEqual(result.physical_part.device.startup,
+                         "Source/Templates/gcc/startup_stm32f407xx.s")
         self.assertEqual(result.cpu_profile.irq.external_count, 82)
         self.assertIn(CATALOG, paths)
         records = {item["path"]: item["sha256"] for item in result.inputs}

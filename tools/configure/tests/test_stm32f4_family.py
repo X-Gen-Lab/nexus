@@ -56,10 +56,12 @@ class Stm32F4FamilyTests(unittest.TestCase):
                 self.assertEqual(selection["NEXUS_SOC_SOURCE_DIRECTORY"],
                                  "soc/stm32/stm32f4")
                 self.assertEqual(selection["NEXUS_EXACT_PART"], part)
-                self.assertEqual(selection["NEXUS_STM32_DEVICE"],
+                self.assertEqual(selection["NEXUS_VENDOR_DEVICE_DEFINE"],
                                  "STM32F407xx")
-                self.assertEqual(selection["NEXUS_STM32_STARTUP"],
-                                 "startup_stm32f407xx.s")
+                self.assertEqual(selection["NEXUS_VENDOR_DEVICE_STARTUP"],
+                                 "Source/Templates/gcc/startup_stm32f407xx.s")
+                self.assertEqual(selection["NEXUS_VENDOR_DEVICE_HEADER"],
+                                 "Include/stm32f407xx.h")
 
     def test_series_selection_keeps_density_specific_flash_geometry(self):
         for density, size, sectors in (("ve", 524288, 8),

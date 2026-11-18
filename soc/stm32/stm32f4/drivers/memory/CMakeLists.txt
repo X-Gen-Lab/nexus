@@ -52,7 +52,7 @@ if("nand" IN_LIST NEXUS_SELECTED_KINDS)
         PRIVATE "${CMAKE_CURRENT_LIST_DIR}/fsmc_nand.c"
     )
 endif()
-if(NEXUS_QSPI_CPU_MAP)
+if(NEXUS_FEATURE_QSPI_CPU_MAP)
     target_sources(
         nexus_soc_stm32f4
         PRIVATE "${CMAKE_CURRENT_LIST_DIR}/qspi_mapped.c"
@@ -64,10 +64,10 @@ if(NEXUS_QSPI_CPU_MAP)
     )
     target_compile_definitions(nexus_soc_stm32f4 PRIVATE NEXUS_QSPI_CPU_MAP=1)
 endif()
-if(NEXUS_QSPI_QUAD_READ)
+if(NEXUS_FEATURE_QSPI_QUAD_READ)
     target_compile_definitions(nexus_soc_stm32f4 PRIVATE NEXUS_QSPI_QUAD_READ=1)
 endif()
-if(NEXUS_SDRAM_GRAPHICS)
+if(NEXUS_FEATURE_SDRAM_GRAPHICS)
     target_compile_definitions(
         nexus_soc_stm32f4
         PRIVATE NX_STM32_SDRAM_GRAPHICS=1

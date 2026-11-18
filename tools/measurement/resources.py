@@ -218,6 +218,20 @@ def measure_data(elf: Elf32, resolved: dict, budget: dict) -> tuple[dict, list]:
         if (vector["size"] > image["vector_alignment"] or
                 elf.symbol(image["vector_symbol"]) != vector["address"]):
             raise EvidenceError("startup vector table differs from reviewed image")
+    if "cortex_m_irq_vectors" in resolved:
+        count = resolved["irq"]["external_count"]
+        if type(count) is not int or count < 0 or vector["size"] != 4 * (16 + count):
+            raise EvidenceError("linked startup vector count differs from the selected device")
+        bindings = resolved["cortex_m_irq_vectors"]
+        if not isinstance(bindings, dict):
+            raise EvidenceError("invalid selected startup IRQ bindings")
+        for handler, number in bindings.items():
+            if type(number) is not int or not 0 <= number < count:
+                raise EvidenceError("selected startup IRQ slot outside the device table")
+            offset = vector["offset"] + 4 * (16 + number)
+            word, = struct.unpack_from("<I", elf.data, offset)
+            if word != elf.symbols.get(handler):
+                raise EvidenceError(f"linked startup IRQ slot {number} differs from {handler}")
     stack, reset = struct.unpack_from("<II", elf.data, vector["offset"])
     if stack != elf.symbol("__nx_msp_end") or reset != elf.entry or reset != elf.symbol("Reset_Handler"):
         raise EvidenceError("physical reset vector differs from linked startup/MSP")
@@ -238,12 +252,17 @@ def measure_data(elf: Elf32, resolved: dict, budget: dict) -> tuple[dict, list]:
     return metrics, violations
 
 
+def configuration_inputs(path, *, allow_reference):
+    resolved, config = resolved_identity(path, allow_reference=allow_reference)
+    return resolved, config, resolved_input_files(path, resolved)
+
+
 def measure(elf_path: Path, resolved_path: Path, budget_path: Path, *,
-            float_abi: str | None = None, require_cpu: bool = False) -> dict:
-    resolved, config = resolved_identity(resolved_path)
+            float_abi: str | None = None, require_cpu: bool = False,
+            allow_reference: bool = False, read_inputs=configuration_inputs) -> dict:
+    resolved, config, input_files = read_inputs(resolved_path, allow_reference=allow_reference)
     abi = resolved_float_abi(resolved, float_abi=float_abi,
                              require_cpu=require_cpu)
-    input_files = resolved_input_files(resolved_path, resolved)
     metrics, violations = measure_data(Elf32(regular_file(elf_path).read_bytes(),
                                            float_abi=abi),
                                        resolved, load_json(budget_path))
@@ -257,16 +276,18 @@ def measure(elf_path: Path, resolved_path: Path, budget_path: Path, *,
             "metrics": metrics, "violations": violations}
 
 
-def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
+def main(argv=None, *, read_inputs=configuration_inputs) -> int:
+    parser = argparse.ArgumentParser(description=__doc__, allow_abbrev=False)
     for name in ("elf", "resolved", "budget", "report"):
         parser.add_argument("--" + name, type=Path, required=True)
     parser.add_argument("--require-cpu", action="store_true",
                         help="require current resolved CPU metadata; no legacy hard-only scope")
+    parser.add_argument("--allow-reference", action="store_true",
+                        help="allow replay of the assembly-selected declarative ARM reference package")
     parser.add_argument("--float-abi", choices=("hard", "soft"),
                         help="assert ELF calling convention against CPU; softfp uses soft")
     parser.add_argument("--source", type=Path, default=Path(__file__).resolve().parents[2])
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     protected = {args.elf.resolve(), args.resolved.resolve(), args.budget.resolve()}
     try:
         protected.update(input_protection_paths(args.resolved))
@@ -276,7 +297,8 @@ def main() -> int:
         parser.exit(1, "report cannot overwrite a measured input\n")
     try:
         report = measure(args.elf, args.resolved, args.budget,
-                         float_abi=args.float_abi, require_cpu=args.require_cpu)
+                         float_abi=args.float_abi, require_cpu=args.require_cpu,
+                         allow_reference=args.allow_reference, read_inputs=read_inputs)
     except (EvidenceError, OSError, KeyError, TypeError) as error:
         report = {"schema_version": 1, "kind": "elf_resource_budget",
                   "status": "failed", "failure": str(error)}

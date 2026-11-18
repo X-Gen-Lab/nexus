@@ -55,13 +55,24 @@ class F4SourceSDKScopeTests(unittest.TestCase):
                 "vendors/arm/CMSIS_6", "vendors/st/cmsis_device_f4",
                 "vendors/st/stm32f4_hal"})
             files = set(identity["files_sha256"])
-            public_consumers = {path for path in sdk.F4_FAMILY_VERIFICATION_FILES
-                                if path.startswith("tests/")}
+            manifest = json.loads((ROOT / "soc/stm32/stm32f4/package.json").read_bytes())
+            public_consumers = set(manifest["exports"]["verification_files"])
             self.assertEqual({path for path in files if path.startswith("tests/")},
                              public_consumers)
             forbidden = ("ext/tomlc99/", "ext/cjson/", "ext/googletest/",
                          "tests/google/", "tests/support/", "tests/cmsis_host/")
             self.assertFalse(any(path.startswith(forbidden) for path in files))
+            # A self-consistent file map must still contain every catalogued
+            # startup, including the parts beyond the first F407 reference.
+            startup = "vendors/st/cmsis_device_f4/Source/Templates/gcc/startup_stm32f446xx.s"
+            (root / startup).unlink()
+            del identity["files_sha256"][startup]
+            identity["snapshot_sha256"] = sdk.digest(json.dumps(
+                identity["files_sha256"], sort_keys=True, separators=(",", ":")).encode())
+            (root / sdk.MANIFEST).write_text(json.dumps(identity))
+            with self.assertRaisesRegex(sdk.SDKError, "missing required.*startup_stm32f446xx"):
+                sdk.verify(root)
+
 
 
     def test_rehashed_unselected_vendor_payload_is_rejected(self):

@@ -182,13 +182,16 @@ class CMSISHostModelTests(unittest.TestCase):
         self.assertIn("host-only concrete target", result.stdout + result.stderr)
 
     def test_actual_native_fixture_contexts_keep_core_and_shim_private(self):
-        build = self.root / "actual Native models"
-        result = subprocess.run([
-            shutil.which("cmake") or "cmake", "--preset", "native-debug",
-            "-B", str(build)], cwd=ROOT, capture_output=True, text=True,
-            timeout=90)
-        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        commands = json.loads((build / "compile_commands.json").read_text())
+        database = os.environ.get("NEXUS_TOOL_NATIVE_DATABASE")
+        if database is None:
+            build = self.root / "actual Native models"
+            result = subprocess.run([
+                shutil.which("cmake") or "cmake", "--preset", "native-debug",
+                "-B", str(build)], cwd=ROOT, capture_output=True, text=True,
+                timeout=90)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            database = build / "compile_commands.json"
+        commands = json.loads(Path(database).read_text())
         selected = 0
         native = 0
         mocked = 0

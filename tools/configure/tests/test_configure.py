@@ -1,10 +1,12 @@
 """Behavioral rejection, identity and atomic-generation tests for the resolver."""
 from tools.configure.tests.native_fixture import native_fixture
 import json
+import os
 from pathlib import Path
 import shutil
 import tempfile
 import unittest
+from unittest.mock import patch
 
 from tools.configure.tests.assembly_fixture import render_toml
 from tools.configure import configure as gate
@@ -30,6 +32,19 @@ class ResolverTests(unittest.TestCase):
         self.board_path = self.root / "tests/support/native/board/board.json"
         self.soc_path = self.root / "tests/support/native/soc.json"
         self.routes_path = self.root / "tests/support/native/routes.json"
+
+    def test_sealed_snapshot_is_read_once_for_final_integrity_check(self):
+        path = self.board_path
+        snapshot = path.read_bytes()
+        with patch.object(Path, "read_bytes", autospec=True,
+                          side_effect=Path.read_bytes) as read:
+            gate.bind_input_identities([path], self.root, {path: snapshot}, {})
+            self.assertEqual(read.call_count, 1)
+        timestamp = path.stat().st_mtime_ns
+        path.write_bytes(snapshot + b" ")
+        os.utime(path, ns=(timestamp, timestamp))
+        with self.assertRaisesRegex(gate.ConfigurationError, "changed during"):
+            gate.bind_input_identities([path], self.root, {path: snapshot}, {})
 
     def write(self, path, data):
         path.write_text(render_toml(data, kinds={"led0": "gpio",
