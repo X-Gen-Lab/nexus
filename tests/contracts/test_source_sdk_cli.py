@@ -32,9 +32,13 @@ class SourceSDKCLIBytecodeTests(unittest.TestCase):
         shutil.copytree(ROOT / "dependencies", self.sources / "dependencies")
         from tools.configure.metadata import load_policy
         from tools.configure.packages import load
+        from tools.configure.dependencies import source_names
         for name in load_policy(ROOT)["source_sdk"]["default_package_manifests"]:
             package = load(ROOT / name)
-            for source in package.inputs:
+            data = [ROOT / name for name in source_names(
+                "platform", package.family, sdk=True)
+                if Path(name).suffix != ".py"]
+            for source in (*package.inputs, *data):
                 target = self.sources / source.relative_to(ROOT)
                 target.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copyfile(source, target)

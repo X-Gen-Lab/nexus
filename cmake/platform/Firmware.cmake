@@ -10,17 +10,10 @@ function(_nexus_firmware_properties required optional)
         NEXUS_SOC_FAMILY
         NEXUS_CPU_ARCH
         NEXUS_BACKEND
+        NEXUS_PROVIDER_TARGET
         PARENT_SCOPE
     )
-    set(${optional}
-        NEXUS_COMPONENT_TARGETS
-        NEXUS_STARTUP_SOURCE
-        NEXUS_SYSTEM_SOURCE
-        NEXUS_SYSTEM_PRIVATE_INCLUDES
-        NEXUS_SYSTEM_VENDOR_INCLUDES
-        NEXUS_SYSTEM_COMPILE_DEFINITIONS
-        PARENT_SCOPE
-    )
+    set(${optional} NEXUS_COMPONENT_TARGETS PARENT_SCOPE)
 endfunction()
 
 # Bind the configuration once per platform. The independent measurement CLI
@@ -122,7 +115,7 @@ function(nexus_add_firmware target)
     endforeach()
     find_package(Python3 3.11 REQUIRED COMPONENTS Interpreter)
     add_executable(${target} ${ARG_SOURCES})
-    nexus_apply_target_policy(${target})
+    nexus_apply_firmware_policy(${target})
     set_target_properties(
         ${target}
         PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/bin"
@@ -133,42 +126,40 @@ function(nexus_add_firmware target)
             Nexus::Platform
             nexus_build_options
             Nexus::Arch
-            "nexus_os_${NEXUS_BACKEND}"
+            Nexus::OS
             ${NEXUS_COMPONENT_TARGETS}
             ${ARG_LIBRARIES}
     )
     if(NOT NEXUS_CPU_ARCH STREQUAL "native")
-        # Compile startup/system in their own private include/definition scope.
-        # Product source files see only typed public Nexus interfaces.
-        set(startup_target "${target}_nexus_startup")
-        add_library(
-            ${startup_target}
-            OBJECT
-            "${NEXUS_STARTUP_SOURCE}"
-            ${NEXUS_SYSTEM_SOURCE}
+        # Each image compiles the provider's startup in the caller's scope.
+        # Private vendor requirements never become application usage requirements.
+        get_property(
+            startup_sources
+            TARGET "${NEXUS_PROVIDER_TARGET}"
+            PROPERTY NEXUS_STARTUP_SOURCES
         )
+        get_property(
+            startup_usage
+            TARGET "${NEXUS_PROVIDER_TARGET}"
+            PROPERTY NEXUS_STARTUP_USAGE_TARGET
+        )
+        if(NOT startup_sources OR NOT TARGET "${startup_usage}")
+            message(
+                FATAL_ERROR
+                "Selected provider has no validated startup contract"
+            )
+        endif()
+        set(startup_target "${target}_nexus_startup")
+        add_library(${startup_target} OBJECT ${startup_sources})
         nexus_apply_target_policy(${startup_target})
         target_link_libraries(
             ${startup_target}
             PRIVATE
+                "${startup_usage}"
                 Nexus::IO
                 Nexus::Arch
                 nexus_build_options
                 nexus_owned_warnings
-        )
-        target_include_directories(
-            ${startup_target}
-            PRIVATE ${NEXUS_SYSTEM_PRIVATE_INCLUDES}
-        )
-        target_include_directories(
-            ${startup_target}
-            SYSTEM
-            PRIVATE ${NEXUS_SYSTEM_VENDOR_INCLUDES}
-        )
-        nexus_use_cmsis_core(${startup_target})
-        target_compile_definitions(
-            ${startup_target}
-            PRIVATE ${NEXUS_SYSTEM_COMPILE_DEFINITIONS}
         )
         target_sources(${target} PRIVATE $<TARGET_OBJECTS:${startup_target}>)
         set_target_properties(${target} PROPERTIES SUFFIX ".elf")

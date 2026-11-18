@@ -1,5 +1,6 @@
 """Behavioral rejection, identity and atomic-generation tests for the resolver."""
 from tools.configure.tests.native_fixture import native_fixture
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -18,6 +19,7 @@ class ResolverTests(unittest.TestCase):
         self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name)
         for name in ("dependencies/platform-compatibility.json",
+                     "components/catalog.json",
                      "tests/support/native/soc.json", "tests/support/native/routes.json",
                      "tests/support/native/board/board.json"):
             destination = self.root / name
@@ -73,7 +75,16 @@ class ResolverTests(unittest.TestCase):
         self.assertEqual(result.part, "NATIVE_MODEL")
         self.assertFalse(result.physical_qualified)
         self.assertEqual(result.controllers, ())
-        self.assertEqual(len(result.inputs), 5)
+        expected = {
+            "assembly.toml", "components/catalog.json",
+            "dependencies/platform-compatibility.json",
+            "tests/support/native/board/board.json",
+            "tests/support/native/routes.json", "tests/support/native/soc.json",
+        }
+        self.assertEqual(
+            tuple((record["path"], record["sha256"]) for record in result.inputs),
+            tuple(sorted((name, hashlib.sha256(
+                (self.root / name).read_bytes()).hexdigest()) for name in expected)))
         self.assertNotIn("tasks", result.to_dict())
 
     def test_duplicate_json_keys_rejected(self):

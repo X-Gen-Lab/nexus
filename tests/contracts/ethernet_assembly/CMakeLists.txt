@@ -7,9 +7,14 @@ if(NOT NEXUS_SOURCE_ROOT OR NOT NEXUS_ASSEMBLY_FILE)
         "Ethernet fixture needs source root and one explicit assembly"
     )
 endif()
-set(NEXUS_BUILD_TESTS OFF CACHE BOOL "No host tests in ARM fixture")
-set(NEXUS_BUILD_WORKLOAD OFF CACHE BOOL "External explicit fixture main")
-add_subdirectory("${NEXUS_SOURCE_ROOT}" nexus-sdk)
+find_package(
+    Nexus
+    CONFIG
+    REQUIRED
+    PATHS "${NEXUS_SOURCE_ROOT}/cmake"
+    NO_DEFAULT_PATH
+)
+nexus_add_platform(ASSEMBLY "${NEXUS_ASSEMBLY_FILE}")
 nexus_add_firmware(ethernet_controller_fixture SOURCES controller_main.c)
 find_package(Python3 3.11 REQUIRED COMPONENTS Interpreter)
 get_target_property(fixture_config Nexus::Platform NEXUS_CONFIG_DIR)

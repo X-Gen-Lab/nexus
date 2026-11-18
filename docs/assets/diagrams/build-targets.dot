@@ -1,5 +1,5 @@
 // FIG-02 reference: source-backed, scoped engineering view.
-// Code basis: 0111c8d3b9c7b37d258b9c401070305b13b6f3a1.
+// Code basis: cmake/platform/CMakeLists.txt; Firmware.cmake; Options.cmake; soc/stm32/stm32f4/CMakeLists.txt.
 // Relations and qualification limits are documented in README.md.
 digraph BuildTargets {
     graph [newrank=true, rankdir=TB, bgcolor="white", pad=0.28, nodesep=0.42,
@@ -24,26 +24,32 @@ generated bindings.c"];
     io [label="Nexus::IO"];
     arch [label="Nexus::Arch"];
     core [label="Nexus::Core"];
-    bare [label="Nexus::OSBaremetal"];
+    bare [label="Nexus::OS = Nexus::OSBaremetal"];
     wait [label="Nexus::OSWait"];
-    abi [label="nexus_abi_options
+    abi [label="Nexus::ABI
 由冻结 CPU profile 决定"];
     config [label="Nexus::Config
 生成 include / ABI / 构建策略"];
-    sdk [label="F4 LL headers + CMSIS Device / Core
-SYSTEM PRIVATE include", fillcolor="#fefce8"];
+    startup_usage [label="nexus_stm32f4_startup_usage
+私有启动与绑定编译要求"];
+    image_policy [label="nexus_firmware_options
+最终运行库与链接策略"];
+    sdk [label="F4 HAL / LL + CMSIS Device / Core
+仅平台内部编译可见", fillcolor="#fefce8"];
     firmware -> platform [label="PRIVATE link"];
     firmware -> arch [label="PRIVATE link"];
     firmware -> bare [label="PRIVATE：选定后端"];
     firmware -> config [label="PRIVATE link"];
+    firmware -> image_policy [label="PRIVATE link"];
     firmware -> startup [label="OBJECT 注入", style=dashed];
     platform -> soc [label="PUBLIC link"];
     platform -> arch [label="PRIVATE link"];
-    platform -> sdk [label="PRIVATE include", style=dashed];
+    platform -> startup_usage [label="PRIVATE link"];
     soc -> io [label="PUBLIC link"];
     soc -> arch [label="PRIVATE link"];
     soc -> sdk [label="PRIVATE include", style=dashed];
-    startup -> sdk [label="PRIVATE include", style=dashed];
+    startup -> startup_usage [label="PRIVATE link"];
+    startup_usage -> sdk [label="INTERFACE include", style=dashed];
     startup -> io [label="PRIVATE link"];
     startup -> arch [label="PRIVATE link"];
     io -> core [label="PUBLIC link"];

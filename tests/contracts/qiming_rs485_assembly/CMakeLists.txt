@@ -4,9 +4,14 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 if(NOT NEXUS_SOURCE_ROOT OR NOT NEXUS_ASSEMBLY_FILE)
     message(FATAL_ERROR "RS485 fixture requires source root and exact assembly")
 endif()
-set(NEXUS_BUILD_TESTS OFF CACHE BOOL "No host framework in ARM consumer")
-set(NEXUS_BUILD_WORKLOAD OFF CACHE BOOL "Explicit public composition fixture")
-add_subdirectory("${NEXUS_SOURCE_ROOT}" nexus-sdk)
+find_package(
+    Nexus
+    CONFIG
+    REQUIRED
+    PATHS "${NEXUS_SOURCE_ROOT}/cmake"
+    NO_DEFAULT_PATH
+)
+nexus_add_platform(ASSEMBLY "${NEXUS_ASSEMBLY_FILE}")
 nexus_add_firmware(qiming_rs485_controller_fixture SOURCES controller_main.c
     LIBRARIES Nexus::IOUARTRS485
 )

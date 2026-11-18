@@ -1,7 +1,7 @@
 # Selected spi sources and private dependencies.
 nexus_controller_modes(spi_modes spi)
 if(spi_modes)
-    set(stm32_gpio_helpers ON)
+    nexus_stm32f4_gpio(nexus_soc_stm32f4)
     if("short-poll" IN_LIST spi_modes OR "dma" IN_LIST spi_modes)
         target_sources(
             nexus_soc_stm32f4

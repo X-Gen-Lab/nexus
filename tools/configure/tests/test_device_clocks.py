@@ -28,6 +28,7 @@ class DeviceClockPolicyTests(F4ClockFixture):
         self.root = Path(temporary.name)
         copy_package(self.root)
         for name in ('dependencies/platform-compatibility.json',
+                     "components/catalog.json",
                      'tests/contracts/stm32f4_family/f411re-board/board.json',
                      'tests/contracts/stm32f4_family/f446ze-board/board.json',
                      'tests/contracts/stm32f4_family/f479ni-board/board.json'):

@@ -12,3 +12,10 @@ target_link_libraries(
     PRIVATE Nexus::Arch nexus_build_options nexus_owned_warnings
 )
 add_library(Nexus::SMBus ALIAS nexus_smbus)
+
+# Generated SMBus faces use the same public component contract.
+set_property(
+    TARGET nexus_smbus
+    PROPERTY NEXUS_BINDINGS_USAGE_TARGET Nexus::SMBus
+)
+set_property(TARGET nexus_smbus PROPERTY NEXUS_BINDINGS_API_TARGET Nexus::SMBus)

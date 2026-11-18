@@ -62,7 +62,7 @@ class CoreMQTTConsumerTests(unittest.TestCase):
                 'set(NEXUS_BUILD_WORKLOAD OFF CACHE BOOL "Host workload")\n'
                 'set(NEXUS_TEST_SUPPORT ON CACHE BOOL "Host test model")\n'
                 f'set(NEXUS_ASSEMBLY_FILE "{ROOT}/tests/support/native/assemblies/native-gpio.toml")\n'
-                f'add_subdirectory("{ROOT}" nexus EXCLUDE_FROM_ALL)\n')
+                f'find_package(Nexus CONFIG REQUIRED PATHS "{ROOT}/cmake" NO_DEFAULT_PATH)\nnexus_add_platform(ASSEMBLY "${{NEXUS_ASSEMBLY_FILE}}")\n')
         (source / 'CMakeLists.txt').write_text(
             'cmake_minimum_required(VERSION 3.31)\n'
             'project(mqtt_product LANGUAGES C ASM)\n'

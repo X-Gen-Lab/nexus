@@ -46,6 +46,24 @@ function(nexus_apply_target_policy target)
     )
 endfunction()
 
+function(nexus_apply_firmware_policy target)
+    if(NOT TARGET "${target}" OR NOT TARGET nexus_firmware_options)
+        message(FATAL_ERROR "Firmware policy requires a configured target")
+    endif()
+    get_target_property(kind "${target}" TYPE)
+    get_target_property(imported "${target}" IMPORTED)
+    if(imported OR NOT kind STREQUAL "EXECUTABLE")
+        message(FATAL_ERROR "Firmware policy requires a local executable")
+    endif()
+    nexus_apply_target_policy("${target}")
+    # Runtime specs and reset entry policy belong to the final image. Ordinary
+    # libraries expose ABI requirements without selecting a firmware runtime.
+    target_link_libraries(
+        "${target}"
+        PRIVATE nexus_build_options nexus_firmware_options
+    )
+endfunction()
+
 function(nexus_target_warnings target)
     cmake_parse_arguments(WARN "STRICT" "" "" ${ARGN})
     if(WARN_UNPARSED_ARGUMENTS OR NOT WARN_STRICT)

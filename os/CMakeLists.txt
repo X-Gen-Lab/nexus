@@ -64,3 +64,6 @@ endif()
 if(TARGET nexus_os_threadx)
     add_library(Nexus::OSThreadX ALIAS nexus_os_threadx)
 endif()
+
+# Consumers use the selected backend without depending on internal target names.
+add_library(Nexus::OS ALIAS nexus_os_${NEXUS_BACKEND})

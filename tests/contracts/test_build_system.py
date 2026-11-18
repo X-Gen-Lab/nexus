@@ -94,6 +94,8 @@ class BuildSystemTests(unittest.TestCase):
             'add_library(nexus_arch INTERFACE)\n'
             'add_library(Nexus::Arch ALIAS nexus_arch)\n'
             'add_library(nexus_os_baremetal INTERFACE)\n'
+            'add_library(Nexus::OS ALIAS nexus_os_baremetal)\n'
+            'add_library(nexus_provider INTERFACE)\n'
             'add_library(nexus_platform STATIC owned.c)\n'
             'target_link_libraries(nexus_platform PRIVATE nexus_build_options '
             'nexus_owned_warnings)\n'
@@ -102,6 +104,7 @@ class BuildSystemTests(unittest.TestCase):
             ' NEXUS_CONFIG_DIR "${NEXUS_CONFIG_DIR}"\n'
             ' NEXUS_SOC_FAMILY native NEXUS_CPU_ARCH native\n'
             ' NEXUS_BACKEND baremetal\n'
+            ' NEXUS_PROVIDER_TARGET nexus_provider\n'
             ' NEXUS_COMPONENT_TARGETS "")\n'
             'add_library(Nexus::Platform ALIAS nexus_platform)\n')
         (self.source / "main.cpp").write_text(source or (
@@ -173,7 +176,9 @@ class BuildSystemTests(unittest.TestCase):
             'set(NEXUS_BUILD_TESTS OFF)\n'
             'set(NEXUS_TEST_SUPPORT ON)\n'
             'set(NEXUS_BUILD_WORKLOAD OFF)\n'
-            f'add_subdirectory("{ROOT.as_posix()}" nexus-sdk)\n'
+            f'find_package(Nexus CONFIG REQUIRED PATHS "{ROOT.as_posix()}/cmake"\n'
+            '    NO_DEFAULT_PATH)\n'
+            'nexus_add_platform(ASSEMBLY "${NEXUS_ASSEMBLY_FILE}")\n'
             'nexus_add_tls()\n'
             'if(DEFINED CMAKE_POLICY_DEFAULT_CMP0069)\n'
             '  message(FATAL_ERROR "TLS leaked a supplier policy default")\n'
@@ -489,19 +494,20 @@ class BuildSystemTests(unittest.TestCase):
         result = self.configure(success=False)
         self.assertIn("Source SDK", result.stdout + result.stderr)
 
-    def test_direct_sdk_entry_verifies_bytes_before_configuration_modules(self):
+    def test_source_package_verifies_bytes_before_configuration_modules(self):
         sdk = self.source / "invalid sdk"
         (sdk / "cmake/package").mkdir(parents=True)
         (sdk / "cmake/platform").mkdir(parents=True)
         (sdk / ".nexus-source-sdk.json").write_text("{}\n")
-        for name in ("CMakeLists.txt", "cmake/platform/SDK.cmake",
+        for name in ("cmake/NexusConfig.cmake", "cmake/platform/SDK.cmake",
                      "cmake/platform/TargetPolicy.cmake",
                      "cmake/package/package_source_sdk.py"):
             shutil.copyfile(ROOT / name, sdk / name)
         (self.source / "CMakeLists.txt").write_text(
             'cmake_minimum_required(VERSION 3.31)\nproject(consumer C)\n'
             f'set(NEXUS_ASSEMBLY_FILE "{self.source.as_posix()}/missing.toml")\n'
-            f'add_subdirectory("{sdk.as_posix()}" nexus-sdk)\n')
+            f'find_package(Nexus CONFIG REQUIRED PATHS "{sdk.as_posix()}/cmake"\n'
+            '    NO_DEFAULT_PATH)\n')
         result = self.configure(success=False)
         self.assertIn("Source SDK identity failed", result.stdout + result.stderr)
 

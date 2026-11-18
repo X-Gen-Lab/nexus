@@ -10,9 +10,14 @@ if(NOT NEXUS_SOURCE_ROOT OR NOT NEXUS_ASSEMBLY_FILE)
         "USB fixture needs source root and one explicit assembly"
     )
 endif()
-set(NEXUS_BUILD_TESTS OFF CACHE BOOL "No host tests in ARM fixture")
-set(NEXUS_BUILD_WORKLOAD OFF CACHE BOOL "External explicit fixture main")
-add_subdirectory("${NEXUS_SOURCE_ROOT}" nexus-sdk)
+find_package(
+    Nexus
+    CONFIG
+    REQUIRED
+    PATHS "${NEXUS_SOURCE_ROOT}/cmake"
+    NO_DEFAULT_PATH
+)
+nexus_add_platform(ASSEMBLY "${NEXUS_ASSEMBLY_FILE}")
 nexus_add_firmware(usb_controller_fixture SOURCES controller_main.c)
 target_link_libraries(
     usb_controller_fixture

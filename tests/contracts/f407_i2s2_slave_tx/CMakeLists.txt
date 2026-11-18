@@ -6,7 +6,14 @@ if(NOT NEXUS_SOURCE_ROOT OR NOT NEXUS_ASSEMBLY_FILE)
         "Explicit Nexus source and authored assembly are required"
     )
 endif()
-add_subdirectory("${NEXUS_SOURCE_ROOT}" nexus)
+find_package(
+    Nexus
+    CONFIG
+    REQUIRED
+    PATHS "${NEXUS_SOURCE_ROOT}/cmake"
+    NO_DEFAULT_PATH
+)
+nexus_add_platform(ASSEMBLY "${NEXUS_ASSEMBLY_FILE}")
 nexus_add_firmware(f407_i2s2_public
     SOURCES "${NEXUS_SOURCE_ROOT}/cmake/package/verification/io_evolution/consumers/f407-i2s2-slave-tx.c"
     LIBRARIES Nexus::IO

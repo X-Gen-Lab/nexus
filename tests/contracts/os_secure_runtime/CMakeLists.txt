@@ -6,19 +6,26 @@ if(NOT NEXUS_RUNTIME_ASSEMBLY)
     message(FATAL_ERROR "An explicit software-reference assembly is required")
 endif()
 if(NEXUS_SOURCE_SDK_PREFIX)
-    find_package(Nexus REQUIRED COMPONENTS Runtime)
+    find_package(Nexus CONFIG REQUIRED)
 else()
     get_filename_component(
         nexus_source
         "${CMAKE_CURRENT_LIST_DIR}/../../.."
         ABSOLUTE
     )
-    include("${nexus_source}/cmake/platform/Runtime.cmake")
+    find_package(
+        Nexus
+        CONFIG
+        REQUIRED
+        PATHS "${nexus_source}/cmake"
+        NO_DEFAULT_PATH
+    )
 endif()
 nexus_add_runtime(ASSEMBLY "${NEXUS_RUNTIME_ASSEMBLY}")
 if(NEXUS_SECURE_STAGE STREQUAL "secure")
     nexus_enable_secure_context()
     add_executable(nexus_secure_contract secure.c)
+    nexus_apply_firmware_policy(nexus_secure_contract)
     target_link_libraries(
         nexus_secure_contract
         PRIVATE Nexus::SecureContext Nexus::Runtime
@@ -39,6 +46,7 @@ elseif(NEXUS_SECURE_STAGE STREQUAL "nonsecure")
         )
     endif()
     add_executable(nexus_nonsecure_contract nonsecure.c)
+    nexus_apply_firmware_policy(nexus_nonsecure_contract)
     target_link_libraries(
         nexus_nonsecure_contract
         PRIVATE Nexus::Runtime "${NEXUS_SECURE_IMPORT_LIBRARY}"

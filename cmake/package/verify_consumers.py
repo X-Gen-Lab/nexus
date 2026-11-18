@@ -192,6 +192,7 @@ def prepare_consumer(prefix, directory, name, run_checked, *, fixture=False,
         'project(installed_source_consumer LANGUAGES C CXX ASM)\n'
         'set(CMAKE_EXPORT_COMPILE_COMMANDS ON)\n'
         f'find_package(Nexus {version} EXACT CONFIG REQUIRED)\n'
+        'nexus_add_platform(ASSEMBLY "${NEXUS_ASSEMBLY_FILE}")\n'
         'find_package(Nexus CONFIG REQUIRED)\n'
         'add_executable(parent_plain parent.c)\n'
         'nexus_add_firmware(installed_c SOURCES main.c)\n'
@@ -464,6 +465,7 @@ def prepare_service_consumer(prefix, directory, specification, run_checked, *,
         'set(CMAKE_C_EXTENSIONS OFF)\n'
         'set(CMAKE_EXPORT_COMPILE_COMMANDS ON)\n'
         f'find_package(Nexus {version} EXACT CONFIG REQUIRED)\n'
+        'nexus_add_platform(ASSEMBLY "${NEXUS_ASSEMBLY_FILE}")\n'
         + ('nexus_add_lwip()\n' if secure or specification.scenario in {
             'common_services', 'loaned_rx'} else '')
         + ('nexus_add_tls()\n'
@@ -538,6 +540,7 @@ def prepare_selected_consumer(prefix, directory, name, assembly_name, smoke_name
         'set(CMAKE_C_EXTENSIONS OFF)\n'
         'set(CMAKE_EXPORT_COMPILE_COMMANDS ON)\n'
         f'find_package(Nexus {version} EXACT CONFIG REQUIRED)\n'
+        'nexus_add_platform(ASSEMBLY "${NEXUS_ASSEMBLY_FILE}")\n'
         'nexus_add_firmware(installed_selected SOURCES main.c private_headers.c'
         + (' LIBRARIES Nexus::NativeModel' if model_controls else '') + ')\n'
         'get_target_property(sdk_root Nexus::Config NEXUS_SOURCE_DIR)\n'
@@ -1027,7 +1030,7 @@ def check_service_image(sdk, source, build, specification, run_checked):
     else:
         inputs["public_source"] = source / "main.c"
     config = Path((build / "resolved-config.txt").read_text())
-    if config != build / "nexus-sdk/generated":
+    if config != build / "nexus/generated":
         raise ValueError("Service configuration directory is not canonical")
     inputs.update(resolved=config / "resolved.json", bindings=config / "bindings.c")
     resolved = json.loads((config / "resolved.json").read_text())

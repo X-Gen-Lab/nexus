@@ -46,7 +46,8 @@ class IOSourceSelectionTests(unittest.TestCase):
 
     def sources(self, kinds=(), *, family="stm32f4", components=(),
                 external_component=False, required_target=None, broker=False,
-                network=False, modes=("irq-byte-event",), build=False):
+                network=False, modes=("irq-byte-event",), extra_domains=(),
+                build=False):
         with tempfile.TemporaryDirectory(prefix="nexus io sources ") as folder:
             root = Path(folder)
             controllers = ";".join(f"{kind}/fixture/{mode}"
@@ -60,6 +61,7 @@ set(NEXUS_SOURCE_DIR "{ROOT}")
 set(NEXUS_SOC_FAMILY "{family}")
 set(NEXUS_TEST_SUPPORT {"ON" if family == "native" else "OFF"})
 set(NEXUS_SELECTED_KINDS "{';'.join(kinds)}")
+set(NEXUS_REQUIRED_IO_DOMAINS "{';'.join((*kinds, *extra_domains))}")
 set(NEXUS_SELECTED_COMPONENTS "{';'.join(components)}")
 set(NEXUS_SELECTED_CONTROLLERS "{controllers}")
 add_library(nexus_core INTERFACE)
@@ -167,7 +169,7 @@ target_link_libraries(consumer PRIVATE {required_target})
             if build:
                 result = subprocess.run(
                     [cmake, "--build", str(root / "build"), "--target", target,
-                     "--parallel", "2"], env=environment,
+                     "--parallel", "1"], env=environment,
                     capture_output=True, text=True, timeout=60)
                 self.assertEqual(result.returncode, 0,
                                  result.stdout + result.stderr)
@@ -201,18 +203,26 @@ target_link_libraries(consumer PRIVATE {required_target})
             "src/mechanisms/observation.c"})
 
     def test_word_uart_builds_its_own_api_without_stream_or_rs485(self):
-        sources = self.sources(("uart",), modes=("irq-words",), build=True)
+        sources = self.sources(("uart",), modes=("irq-words",),
+                               extra_domains=("uart_word",), build=True)
         self.assertIn("src/api/uart_word.c", sources)
         self.assertIn("src/api/uart_format.c", sources)
         self.assertNotIn("src/mechanisms/stream.c", sources)
         self.assertNotIn("src/mechanisms/uart_rs485.c", sources)
 
     def test_block_uart_keeps_stream_without_rs485_or_word(self):
-        sources = self.sources(("uart",), modes=("irq-blocks",), build=True)
+        sources = self.sources(("uart",), modes=("irq-blocks",),
+                               extra_domains=("uart_stream",), build=True)
         self.assertIn("src/mechanisms/stream.c", sources)
         self.assertIn("src/mechanisms/stream_profile.c", sources)
         self.assertNotIn("src/api/uart_word.c", sources)
         self.assertNotIn("src/mechanisms/uart_rs485.c", sources)
+
+    def test_required_domains_are_independent_of_provider_mode_names(self):
+        sources = self.sources(("uart",), modes=("irq-blocks",),
+                               extra_domains=("uart_word",), build=True)
+        self.assertIn("src/api/uart_word.c", sources)
+        self.assertNotIn("src/mechanisms/stream.c", sources)
 
     def test_explicit_rs485_target_needs_no_selected_uart(self):
         sources = self.sources(("gpio",), required_target="Nexus::IOUARTRS485",
@@ -238,7 +248,8 @@ target_link_libraries(consumer PRIVATE {required_target})
         self.assertNotIn("src/mechanisms/adc_stream_profile.c", sources)
 
     def test_adc_blocks_keep_stream_profile_storage(self):
-        sources = self.sources(("adc",), modes=("trigger-dma",), build=True)
+        sources = self.sources(("adc",), modes=("trigger-dma",),
+                               extra_domains=("adc_stream",), build=True)
         self.assertIn("src/mechanisms/stream.c", sources)
         self.assertIn("src/mechanisms/adc_stream_profile.c", sources)
         self.assertNotIn("src/mechanisms/stream_profile.c", sources)

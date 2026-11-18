@@ -177,6 +177,32 @@ RCC PLL／分频编码、ADC 分辨率、SAI 帧长度和 LTDC 累加时序在�
 位定义形成初始化常量。配置政策先验证合法范围，C 编译器再处理编码；这些常量表达式
 不访问寄存器，不增加运行时解释器。实际寄存器顺序、等待与失败仍由 C owner 负责。
 
+## Provider 构建合同
+
+公共装配按 `package.json` 的 `cmake.entry` 和 `cmake.target` 载入所选包，不增加 MCU
+名字分支。生产 SoC 接入使用以下固定字段，公共入口验证类型、路径和所属范围：
+
+| 属性 | 责任 |
+| --- | --- |
+| `NEXUS_STARTUP_SOURCES` | 启动与 System 源绝对路径列表 |
+| `NEXUS_STARTUP_USAGE_TARGET` | Provider 拥有的 INTERFACE 启动编译要求目标 |
+| `NEXUS_PROVIDER_TARGET` | 由 `Nexus::Platform` 保存的实际 Provider 引用 |
+
+启动 usage 声明私有 Device／HAL include、器件宏、配置头和必要依赖。Firmware 为每个
+镜像单独创建 startup OBJECT，并私有消费该 usage；应用源码不因此看到厂商头或器件
+宏。Provider 不通过父作用域回传供根入口搬运的 include／define 列表，也不将厂商
+启动源作为公共 `INTERFACE_SOURCES` 注入应用。保持启动对象与弱符号的正确链接顺序。
+
+包内驱动直接声明 SDK、DMA 与公共机制需求，System 明确声明自身启动环境；禁止驱动
+修改兄弟模块随后读取的开关。F4 保留主要 archive，不按外设机械拆库。HAL 对象复用
+必须核对实际器件、ABI、配置头和回调定义，不能仅根据源码文件名相同就共用。
+
+应用先 `find_package(Nexus CONFIG REQUIRED)`，再显式
+`nexus_add_platform(ASSEMBLY ...)`。发现不创建装配，源码与安装 SDK 进入同一生产图；
+`Nexus::ABI` 与 `Nexus::OS` 提供稳定使用要求。新 part／Board 复用已有能力时不改
+公共配置调度器；新公共语义或架构按其实际合同扩展。完整边界见
+[构建架构](../design/build-architecture.md)。
+
 ## 构建、SDK 与验收
 
 ![FIG-03：配置输入、静态装配与目标构建](../assets/diagrams/configuration-generation.svg)

@@ -1,7 +1,7 @@
 # Selected uart sources and private dependencies.
 nexus_controller_modes(uart_modes uart)
 if(uart_modes)
-    set(stm32_gpio_helpers ON)
+    nexus_stm32f4_gpio(nexus_soc_stm32f4)
     target_sources(
         nexus_soc_stm32f4
         PRIVATE
@@ -23,7 +23,10 @@ if(uart_modes)
         )
     endif()
     if("dma-tx" IN_LIST uart_modes)
-        set(stm32_uart_hal ON)
+        target_include_directories(
+            nexus_stm32f4_startup_usage
+            INTERFACE "${stm32_package_dir}/sdk/hal_config/uart"
+        )
         target_link_libraries(nexus_soc_stm32f4 PRIVATE Nexus::IODMA)
         target_sources(
             nexus_soc_stm32f4

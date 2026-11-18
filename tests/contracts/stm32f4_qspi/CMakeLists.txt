@@ -4,9 +4,14 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 if(NOT IS_DIRECTORY "${NEXUS_SOURCE_ROOT}/io")
     message(FATAL_ERROR "Select a Nexus checkout or verified Source SDK")
 endif()
-set(NEXUS_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-set(NEXUS_BUILD_WORKLOAD OFF CACHE BOOL "" FORCE)
-add_subdirectory("${NEXUS_SOURCE_ROOT}" nexus-sdk)
+find_package(
+    Nexus
+    CONFIG
+    REQUIRED
+    PATHS "${NEXUS_SOURCE_ROOT}/cmake"
+    NO_DEFAULT_PATH
+)
+nexus_add_platform(ASSEMBLY "${NEXUS_ASSEMBLY_FILE}")
 get_filename_component(reference_name "${NEXUS_ASSEMBLY_FILE}" NAME)
 set(consumer "consumer.c")
 if(reference_name STREQUAL "f479ni-qspi-map.toml")

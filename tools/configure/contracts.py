@@ -3,13 +3,10 @@ from dataclasses import dataclass
 from types import MappingProxyType
 
 
-COMPONENTS = frozenset({
-    "owner-observer", "bus-owner", "spi-owner", "spi-async-owner", "spi-dma-owner",
-    "uart-owner", "bmp280", "bmp280-spi", "log", "storage",
-    "flash-storage", "modbus-rtu", "settings", "smbus",
-    "network", "network-loaned-rx", "tls", "mqtt", "mcuboot",
-    "st-usb-host", "st-usb-device",
-})
+from tools.configure.component_catalog import load as load_components
+
+
+COMPONENTS = frozenset(load_components())
 
 
 @dataclass(frozen=True)

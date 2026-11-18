@@ -73,6 +73,17 @@ They do not establish current support or qualification.
   Unknown PCB revisions and electrical facts stay explicit. Do not invent wiring.
 - Startup does not start a scheduler. Applications own tasks, wait adapters,
   queue depths, stack/TCB storage and their shutdown sequence.
+- External CMake consumers discover Nexus with `find_package(Nexus CONFIG
+  REQUIRED)` and explicitly call `nexus_add_platform(ASSEMBLY ...)`, or the
+  mutually exclusive `nexus_add_runtime(ASSEMBLY ...)`. Discovery verifies the
+  selected source and loads APIs without creating an assembly. Source checkouts
+  and installed SDKs use one private production graph. Products do not force
+  platform test/workload switches. Select the toolchain before `project()`.
+  A build directory has one toolchain and assembly; multiple images from that
+  assembly keep separate startup OBJECT targets. Provider targets publish
+  `NEXUS_STARTUP_SOURCES` and `NEXUS_STARTUP_USAGE_TARGET`; Platform references
+  the provider through `NEXUS_PROVIDER_TARGET`. Vendor startup requirements
+  stay private. `Nexus::ABI` and the selected `Nexus::OS` are stable usage targets.
 
 ## Ownership and correctness
 

@@ -51,7 +51,9 @@ class EntropyTargetTests(unittest.TestCase):
                 'set(NEXUS_BUILD_WORKLOAD OFF CACHE BOOL "")\n'
                 'set(CMAKE_EXPORT_COMPILE_COMMANDS ON)\n'
                 f'set(NEXUS_ASSEMBLY_FILE "{assembly}")\n'
-                f'add_subdirectory("{ROOT}" nexus-sdk)\n'
+                f'find_package(Nexus CONFIG REQUIRED PATHS "{ROOT}/cmake" NO_DEFAULT_PATH)\nnexus_add_platform(ASSEMBLY "${{NEXUS_ASSEMBLY_FILE}}")\n'
+                'get_target_property(generated Nexus::Config NEXUS_CONFIG_DIR)\n'
+                'file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/config-dir.txt" "${generated}")\n'
                 + ('nexus_add_firmware(app SOURCES main.c)\n' if build else ''))
             result = subprocess.run(
                 ["cmake", "-S", str(source), "-B", str(source / "binary"),
@@ -65,7 +67,8 @@ class EntropyTargetTests(unittest.TestCase):
                    if Path(item["file"]).resolve() ==
                    ROOT / "soc/stm32/stm32f4/drivers/entropy/entropy.c"]
             self.assertEqual(len(rng), 1 if selected else 0)
-            generated = (source / "binary/nexus-sdk/generated/bindings.c").read_text()
+            generated_dir = Path((source / "binary/config-dir.txt").read_text())
+            generated = (generated_dir / "bindings.c").read_text()
             self.assertEqual("nx_stm32f407_entropy_ops" in generated, selected)
             self.assertNotIn("entropy_instance", generated)
             if not build:
@@ -73,7 +76,7 @@ class EntropyTargetTests(unittest.TestCase):
             environment = dict(os.environ)
             # An outer build_slot owns this complete compiler-using module.
             result = subprocess.run(
-                ["cmake", "--build", str(source / "binary"), "--parallel", "2",
+                ["cmake", "--build", str(source / "binary"), "--parallel", "1",
                  "--target", "app"], capture_output=True, text=True,
                 env=environment, check=False, timeout=180)
             if result.returncode == 0:

@@ -47,7 +47,6 @@
     "External application\\nScheduling / shutdown owner": "External application\nScheduling / shutdown owner",
     "External serialized executor + storage\\nAuthored PID/address policy; request + payload\\nExplicit service / events / reset / stop": "External serialized executor + storage\nAuthored PID/address policy; request + payload\nExplicit service / events / reset / stop",
     "External serialized task executor": "External serialized task executor",
-    "F4 LL headers + CMSIS Device / Core\nSYSTEM PRIVATE include": "F4 LL headers + CMSIS Device / Core\nSYSTEM PRIVATE include",
     "F4 drivers/<domain>/\\nbinding、instance.h 与控制器 C\\nF4 drivers/<domain>/\\nBindings, instance.h and controller C": "F4 drivers/<domain>/\nBindings, instance.h and controller C",
     "F4 drivers/ip/ 与 private/\\n共享硬件算法、跨域合同与片段\\nF4 drivers/ip/ and private/\\nShared algorithms, cross-domain contracts and fragments": "F4 drivers/ip/ and private/\nShared algorithms, cross-domain contracts and fragments",
     "F4 sdk/\\n官方库构建选择与 hal_config\\nF4 sdk/\\nOfficial source selection and hal_config": "F4 sdk/\nOfficial source selection and hal_config",
@@ -101,7 +100,6 @@
     "Nexus::Config\n生成 include / ABI / 构建策略": "Nexus::Config\ngenerated includes / ABI / build policy",
     "Nexus::Core": "Nexus::Core",
     "Nexus::IO": "Nexus::IO",
-    "Nexus::OSBaremetal": "Nexus::OSBaremetal",
     "Nexus::OSWait": "Nexus::OSWait",
     "Nexus::Platform\ngenerated bindings.c": "Nexus::Platform\ngenerated bindings.c",
     "Nexus::Platform：当前 F4 + Board 装配\n已迁入 F407VE / F407ZG；其他 F4 需独立验证\n设备 ops / IRQ / clock / DMA 与资源另行接入": "Nexus::Platform: current F4 + Board assembly\nF407VE / F407ZG migrated; other F4 parts need validation\nDevice ops / IRQ / clock / DMA and resources are separate",
@@ -257,7 +255,6 @@
     "lifecycle rule": "lifecycle rule",
     "live/tentative addresses or fault forbid final stop": "live/tentative addresses or fault forbid final stop",
     "looks up a typed identity": "looks up a typed identity",
-    "nexus_abi_options\n由冻结 CPU profile 决定": "nexus_abi_options\nselected by the frozen CPU profile",
     "nexus_add_firmware() 与包内 CMake\\n唯一编译目标图；私有 SDK 头不泄漏\\nnexus_add_firmware() and package CMake\\nSole compile target graph; private SDK headers stay private": "nexus_add_firmware() and package CMake\nSole compile target graph; private SDK headers stay private",
     "nexus_soc_stm32f4\n所选 GPIO / UART 驱动": "nexus_soc_stm32f4\nselected GPIO / UART drivers",
     "nx_wait_until：Task / 单 waiter\\nnx_wait_until: task, one waiter": "nx_wait_until: task, one waiter",
@@ -593,7 +590,13 @@
     "驱动选定硬件模式": "Drive selected hardware mode",
     "验证失败\\nVerification failed": "Verification failed",
     "验证证据": "Verify evidence",
-    "验证通过\\nValidated": "Validated"
+    "验证通过\\nValidated": "Validated",
+    "Nexus::OS = Nexus::OSBaremetal": "Nexus::OS = Nexus::OSBaremetal",
+    "Nexus::ABI\n由冻结 CPU profile 决定": "Nexus::ABI\nFrom the frozen CPU profile",
+    "nexus_stm32f4_startup_usage\n私有启动与绑定编译要求": "nexus_stm32f4_startup_usage\nPrivate startup and binding requirements",
+    "nexus_firmware_options\n最终运行库与链接策略": "nexus_firmware_options\nFinal runtime libraries and link policy",
+    "F4 HAL / LL + CMSIS Device / Core\n仅平台内部编译可见": "F4 HAL / LL + CMSIS Device / Core\nPlatform-internal compilation only",
+    "INTERFACE include": "INTERFACE include"
   },
   "zh_CN": {
     "": "",
@@ -642,7 +645,6 @@
     "External application\\nScheduling / shutdown owner": "外部应用\n调度 / 停机所有者",
     "External serialized executor + storage\\nAuthored PID/address policy; request + payload\\nExplicit service / events / reset / stop": "外部串行 executor + 存储\n调用方 PID/address 策略；request + payload\n显式 service／event／reset／stop",
     "External serialized task executor": "外部串行任务执行者",
-    "F4 LL headers + CMSIS Device / Core\nSYSTEM PRIVATE include": "F4 LL 头 + CMSIS Device / Core\nSYSTEM PRIVATE include",
     "F4 drivers/<domain>/\\nbinding、instance.h 与控制器 C\\nF4 drivers/<domain>/\\nBindings, instance.h and controller C": "F4 drivers/<domain>/\nbinding、instance.h 与控制器 C",
     "F4 drivers/ip/ 与 private/\\n共享硬件算法、跨域合同与片段\\nF4 drivers/ip/ and private/\\nShared algorithms, cross-domain contracts and fragments": "F4 drivers/ip/ 与 private/\n共享硬件算法、跨域合同与片段",
     "F4 sdk/\\n官方库构建选择与 hal_config\\nF4 sdk/\\nOfficial source selection and hal_config": "F4 sdk/\n官方库构建选择与 hal_config",
@@ -696,7 +698,6 @@
     "Nexus::Config\n生成 include / ABI / 构建策略": "Nexus::Config\n生成 include / ABI / 构建策略",
     "Nexus::Core": "Nexus::Core",
     "Nexus::IO": "Nexus::IO",
-    "Nexus::OSBaremetal": "Nexus::OSBaremetal",
     "Nexus::OSWait": "Nexus::OSWait",
     "Nexus::Platform\ngenerated bindings.c": "Nexus::Platform\ngenerated bindings.c",
     "Nexus::Platform：当前 F4 + Board 装配\n已迁入 F407VE / F407ZG；其他 F4 需独立验证\n设备 ops / IRQ / clock / DMA 与资源另行接入": "Nexus::Platform：当前 F4 + Board 装配\n已迁入 F407VE / F407ZG；其他 F4 需独立验证\n设备 ops / IRQ / clock / DMA 与资源另行接入",
@@ -852,7 +853,6 @@
     "lifecycle rule": "生命周期规则",
     "live/tentative addresses or fault forbid final stop": "活动／tentative 地址或 fault 禁止最终 stop",
     "looks up a typed identity": "查找 typed 身份",
-    "nexus_abi_options\n由冻结 CPU profile 决定": "nexus_abi_options\n由冻结 CPU profile 决定",
     "nexus_add_firmware() 与包内 CMake\\n唯一编译目标图；私有 SDK 头不泄漏\\nnexus_add_firmware() and package CMake\\nSole compile target graph; private SDK headers stay private": "nexus_add_firmware() 与包内 CMake\n唯一编译目标图；私有 SDK 头不泄漏",
     "nexus_soc_stm32f4\n所选 GPIO / UART 驱动": "nexus_soc_stm32f4\n所选 GPIO / UART 驱动",
     "nx_wait_until：Task / 单 waiter\\nnx_wait_until: task, one waiter": "nx_wait_until：Task / 单 waiter",
@@ -1188,6 +1188,12 @@
     "驱动选定硬件模式": "驱动选定硬件模式",
     "验证失败\\nVerification failed": "验证失败",
     "验证证据": "验证证据",
-    "验证通过\\nValidated": "验证通过"
+    "验证通过\\nValidated": "验证通过",
+    "Nexus::OS = Nexus::OSBaremetal": "Nexus::OS = Nexus::OSBaremetal",
+    "Nexus::ABI\n由冻结 CPU profile 决定": "Nexus::ABI\n由冻结 CPU profile 决定",
+    "nexus_stm32f4_startup_usage\n私有启动与绑定编译要求": "nexus_stm32f4_startup_usage\n私有启动与绑定编译要求",
+    "nexus_firmware_options\n最终运行库与链接策略": "nexus_firmware_options\n最终运行库与链接策略",
+    "F4 HAL / LL + CMSIS Device / Core\n仅平台内部编译可见": "F4 HAL / LL + CMSIS Device / Core\n仅平台内部编译可见",
+    "INTERFACE include": "INTERFACE include"
   }
 }

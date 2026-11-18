@@ -201,6 +201,7 @@ class Binding:
     headers: tuple[str, ...] = ()
     shared_irq: object | None = None
     profile_headers: Mapping | None = None
+    io_domains: tuple[str, ...] = ()
 
     @classmethod
     def create(cls, value, *, fragments=None):
@@ -210,7 +211,7 @@ class Binding:
             common.fail("Binding declares exactly one mode or modes list")
         mode_field = "mode" if "mode" in value else "modes"
         required.add(mode_field)
-        optional = {"validator", "limits", "controllers", "headers", "shared_irq", "profile_headers"}
+        optional = {"validator", "limits", "controllers", "headers", "shared_irq", "profile_headers", "io_domains"}
         if "static_recipe" in value:
             _fields(value, required | {"static_recipe"}, optional)
             from tools.configure.static_recipe import StaticRecipe
@@ -241,6 +242,12 @@ class Binding:
             common.fail("Binding controllers require distinct explicit symbols")
         for controller in controllers:
             Symbol(controller)
+        io_domains = value.get("io_domains", ())
+        if (not isinstance(io_domains, (tuple, list)) or any(
+                not isinstance(name, str) or
+                re.fullmatch(r"[a-z][a-z0-9_]*", name) is None
+                for name in io_domains) or len(set(io_domains)) != len(io_domains)):
+            common.fail("Binding I/O domains require distinct public identifiers")
         raw_fields, raw_storage = value.get("fields", []), value.get("storage", [])
         if not isinstance(raw_fields, list) or not isinstance(raw_storage, list):
             common.fail("Binding fields and storage require ordered lists")
@@ -274,7 +281,8 @@ class Binding:
             value.get("config_type"), value.get("ops"), value.get("prepare"),
             value.get("close"), fields, storage, value.get("irq"),
             value.get("validator"), freeze(limits), value.get("admit"), recipe,
-            tuple(controllers), _headers(value.get("headers", [])), shared, profile_headers)
+            tuple(controllers), _headers(value.get("headers", [])), shared, profile_headers,
+            tuple(io_domains))
 
     def headers_for(self, item):
         headers = self.headers
@@ -426,6 +434,10 @@ class DataProvider(DomainBridge):
         if len(candidates) != 1 or controller is None and candidates[0].controllers:
             common.fail("Controller is required for unique package binding selection")
         return candidates[0]
+
+    def io_domains(self, item):
+        """Expose selected public API needs; CMake still owns source dependencies."""
+        return self.binding(item.kind, item.mode, item.controller).io_domains
 
     def mode_implementation(self, kind, mode, controller=None):
         if any(value.kind == kind and mode in value.modes for value in self.bindings):

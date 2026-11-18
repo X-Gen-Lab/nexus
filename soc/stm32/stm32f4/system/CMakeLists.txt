@@ -12,40 +12,6 @@ target_sources(
         "${CMAKE_CURRENT_LIST_DIR}/lifecycle_pins.c"
         "${CMAKE_CURRENT_LIST_DIR}/platform_cold.c"
 )
-set(NEXUS_STARTUP_SOURCE
-    "${stm32_device}/${NEXUS_VENDOR_DEVICE_STARTUP}"
-    PARENT_SCOPE
-)
-set(stm32_system_includes
-    "${stm32_package_dir}"
-    "${stm32_device}/Include"
-    "${stm32_cmsis}"
-    ${stm32_ip_includes}
-)
-if(stm32_uart_hal)
-    list(
-        APPEND stm32_system_includes
-        "${stm32_package_dir}/sdk/hal_config/uart"
-        "${NEXUS_SOURCE_DIR}/vendors/st/stm32f4_hal/Inc"
-    )
-endif()
-if(
-    stm32_usb_host_hal
-    OR stm32_sai_hal
-    OR "qspi-indirect-sdr" IN_LIST stm32_external_bus_modes
-    OR "qspi-indirect-dma" IN_LIST stm32_external_bus_modes
-    OR "cipher" IN_LIST NEXUS_SELECTED_KINDS
-    OR "hash" IN_LIST NEXUS_SELECTED_KINDS
-    OR "display" IN_LIST NEXUS_SELECTED_KINDS
-    OR "image" IN_LIST NEXUS_SELECTED_KINDS
-)
-    list(
-        APPEND stm32_system_includes
-        "${NEXUS_SOURCE_DIR}/vendors/st/stm32f4_hal/Inc"
-    )
-endif()
-set(NEXUS_SYSTEM_PRIVATE_INCLUDES ${stm32_system_includes} PARENT_SCOPE)
-set(NEXUS_SYSTEM_COMPILE_DEFINITIONS ${NEXUS_STM32_DEVICE} PARENT_SCOPE)
 set(stm32_system_sources
     "${stm32_package_dir}/system/clock.c"
     "${stm32_package_dir}/system/startup.c"
@@ -55,7 +21,8 @@ if(NEXUS_MEMORY_CCM OR NEXUS_MEMORY_ADDSRAM)
     list(APPEND stm32_system_sources "${stm32_package_dir}/system/memory.c")
 endif()
 if(NEXUS_MEMORY_ADDSRAM)
-    if(NOT stm32_external_bus_modes)
+    nexus_controller_modes(startup_memory_modes external_bus)
+    if(NOT startup_memory_modes)
         message(
             FATAL_ERROR
             "F407 startup SRAM requires its selected FSMC owner"
@@ -66,12 +33,14 @@ if(NEXUS_MEMORY_ADDSRAM)
         PRIVATE "${stm32_package_dir}/drivers/memory/fsmc_boot.c"
     )
     list(APPEND stm32_system_sources "${stm32_package_dir}/system/sram_boot.c")
-    set(NEXUS_SYSTEM_VENDOR_INCLUDES
-        "${NEXUS_SOURCE_DIR}/vendors/st/stm32f4_hal/Inc"
-        PARENT_SCOPE
-    )
 endif()
-set(NEXUS_SYSTEM_SOURCE ${stm32_system_sources} PARENT_SCOPE)
+set_property(
+    TARGET nexus_soc_stm32f4
+    PROPERTY
+        NEXUS_STARTUP_SOURCES
+            "${stm32_device}/${NEXUS_VENDOR_DEVICE_STARTUP}"
+            ${stm32_system_sources}
+)
 
 # Fixed clock profile sleep is an explicitly selected caller-owned component.
 function(nexus_add_stm32f4_sleep target)
@@ -172,9 +141,8 @@ if(NEXUS_OS_TIMEBASE_LOWPOWER)
         nexus_soc_stm32f4
         INTERFACE $<TARGET_OBJECTS:nx_stm32f407_lowpower_binding>
     )
-    set(NEXUS_SYSTEM_COMPILE_DEFINITIONS
-        ${NEXUS_STM32_DEVICE}
-        NEXUS_TIMEBASE_LOWPOWER=1
-        PARENT_SCOPE
+    target_compile_definitions(
+        nexus_stm32f4_startup_usage
+        INTERFACE NEXUS_TIMEBASE_LOWPOWER=1
     )
 endif()

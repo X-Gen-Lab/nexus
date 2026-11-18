@@ -1,7 +1,7 @@
 # Selected adc sources and private dependencies.
 nexus_controller_modes(adc_modes adc)
 if(adc_modes)
-    set(stm32_gpio_helpers ON)
+    nexus_stm32f4_gpio(nexus_soc_stm32f4)
     target_sources(nexus_soc_stm32f4 PRIVATE "${CMAKE_CURRENT_LIST_DIR}/adc.c")
     if("injected-shot" IN_LIST adc_modes)
         target_sources(
@@ -29,7 +29,7 @@ if(adc_modes)
 endif()
 nexus_controller_modes(adc_group_modes adc_group)
 if(adc_group_modes)
-    set(stm32_gpio_helpers ON)
+    nexus_stm32f4_gpio(nexus_soc_stm32f4)
     target_link_libraries(nexus_soc_stm32f4 PRIVATE Nexus::IODMA)
     target_sources(
         nexus_soc_stm32f4

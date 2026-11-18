@@ -640,7 +640,10 @@
             "barrier": "nx_arch_dsb"
           }
         ]
-      }
+      },
+      "io_domains": [
+        "adc_stream"
+      ]
     },
     {
       "kind": "adc",
@@ -879,7 +882,10 @@
             "barrier": "nx_arch_dsb"
           }
         ]
-      }
+      },
+      "io_domains": [
+        "adc_stream"
+      ]
     }
   ]
 }

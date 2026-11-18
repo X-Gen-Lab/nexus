@@ -53,7 +53,9 @@ class ArtifactBuildTests(unittest.TestCase):
                 'set(NEXUS_BUILD_TESTS OFF CACHE BOOL "")\n'
                 'set(NEXUS_BUILD_WORKLOAD OFF CACHE BOOL "")\n'
                 f'set(NEXUS_ASSEMBLY_FILE "{assembly.as_posix()}")\n'
-                f'add_subdirectory("{ROOT.as_posix()}" nexus-owned)\n'
+                f'find_package(Nexus CONFIG REQUIRED PATHS "{ROOT.as_posix()}/cmake" NO_DEFAULT_PATH)\nnexus_add_platform(ASSEMBLY "${{NEXUS_ASSEMBLY_FILE}}")\n'
+                'get_target_property(config Nexus::Platform NEXUS_CONFIG_DIR)\n'
+                'file(WRITE "${CMAKE_BINARY_DIR}/config-dir.txt" "${config}")\n'
                 'nexus_add_stm32f4_sleep(platform_sleep)\n'
                 'nexus_add_firmware(graph_app SOURCES main.c LIBRARIES platform_sleep)\n'
                 f'set_property(TARGET nexus_platform PROPERTY NEXUS_SOURCE_DIR '
@@ -84,7 +86,9 @@ class ArtifactBuildTests(unittest.TestCase):
 
             run(cmake, "-S", str(source), "-B", str(build), "-G", "Ninja",
                 f"-DCMAKE_TOOLCHAIN_FILE={ROOT}/cmake/toolchains/arm-gcc.cmake")
-            catalog = build / "nexus-owned/generated/configuration_code_paths.json"
+            config = Path((build / "config-dir.txt").read_text())
+            self.assertTrue(config.is_relative_to(build))
+            catalog = config / "configuration_code_paths.json"
             for relative, original in json.loads(catalog.read_text()).items():
                 destination = checker / relative
                 destination.parent.mkdir(parents=True, exist_ok=True)
@@ -92,7 +96,7 @@ class ArtifactBuildTests(unittest.TestCase):
 
             def compile_application(*, success=True):
                 return run(cmake, "--build", str(build), "--target", "app",
-                           "--parallel", "2", success=success)
+                           "--parallel", "1", success=success)
 
             compile_application()
             artifacts = [build / "bin" / ("app" + suffix)
@@ -110,7 +114,7 @@ class ArtifactBuildTests(unittest.TestCase):
                 rebuilt = compile_application()
                 self.assertEqual(rebuilt.stdout.count("Building C object"), 1)
                 self.assertIn("Linking C executable", rebuilt.stdout)
-            linker = build / "nexus-owned/generated/memory.ld"
+            linker = config / "memory.ld"
             linker.write_text(linker.read_text() + "\n/* linker change */\n")
             self.assertIn("Linking C executable", compile_application().stdout)
             for artifact in artifacts[1:]:
@@ -129,7 +133,7 @@ class ArtifactBuildTests(unittest.TestCase):
                 self.assertNotIn("Linking C executable", checked.stdout, module)
                 self.assertEqual(hashlib.sha256(artifacts[0].read_bytes()).hexdigest(),
                                  elf_digest)
-            budget = build / "nexus-owned/generated/resource-budget.json"
+            budget = config / "resource-budget.json"
             original_budget = budget.read_bytes()
             changed = json.loads(original_budget)
             changed["flash_loaded_max"] = 0
@@ -166,7 +170,7 @@ class ArtifactBuildTests(unittest.TestCase):
             assembly.write_text(assembly.read_text().replace(
                 'board = "stm32f407_qiming_v31"', 'board_package = "board"'))
             compile_application()
-            inputs = build / "nexus-owned/generated/input_paths.json"
+            inputs = config / "input_paths.json"
             self.assertIn(str(board), json.loads(inputs.read_text()).values())
             board.write_text("{invalid")
             compile_application(success=False)
@@ -178,9 +182,9 @@ class ArtifactBuildTests(unittest.TestCase):
             # command, even if a modified projection retained its Ninja mtime.
             def graph_build(success=True):
                 return run(cmake, "--build", str(build), "--target", "graph_app",
-                           "--parallel", "2", success=success)
+                           "--parallel", "1", success=success)
             graph_build()
-            generated = build / "nexus-owned/generated/resolved.json"
+            generated = config / "resolved.json"
             original, times = generated.read_bytes(), generated.stat()
             generated.write_bytes(original + b"\n")
             os.utime(generated, ns=(times.st_atime_ns, times.st_mtime_ns))

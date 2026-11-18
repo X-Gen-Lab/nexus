@@ -4,13 +4,17 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(NEXUS_ASSEMBLY_FILE "${CMAKE_CURRENT_SOURCE_DIR}/assembly.toml")
-set(NEXUS_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-set(NEXUS_BUILD_WORKLOAD OFF CACHE BOOL "" FORCE)
 if(NOT DEFINED NEXUS_REFERENCE_PLATFORM_SOURCE)
     message(FATAL_ERROR "Explicit Nexus source checkout is required")
 endif()
-add_subdirectory("${NEXUS_REFERENCE_PLATFORM_SOURCE}" nexus-platform)
+find_package(
+    Nexus
+    CONFIG
+    REQUIRED
+    PATHS "${NEXUS_REFERENCE_PLATFORM_SOURCE}/cmake"
+    NO_DEFAULT_PATH
+)
+nexus_add_platform(ASSEMBLY "${CMAKE_CURRENT_SOURCE_DIR}/assembly.toml")
 get_target_property(reference_sdk Nexus::Config NEXUS_SOURCE_DIR)
 nexus_add_firmware(external_lifecycle_consumer SOURCES consumer.c)
 target_include_directories(

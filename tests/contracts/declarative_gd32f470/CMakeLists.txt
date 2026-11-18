@@ -126,16 +126,28 @@ else()
         INTERFACE Nexus::IO Nexus::Arch nexus_gd32_reference_spl
     )
 endif()
-set(NEXUS_STARTUP_SOURCE
-    "${gd_sdk}/CMSIS/GD/GD32F4xx/Source/GCC/startup_gd32f450_470.S"
-    PARENT_SCOPE
+add_library(nexus_gd32_reference_startup_usage INTERFACE)
+target_include_directories(
+    nexus_gd32_reference_startup_usage
+    INTERFACE "${gd_private}"
 )
-set(NEXUS_SYSTEM_SOURCE "${gd_private}/system.c" PARENT_SCOPE)
-set(NEXUS_SYSTEM_PRIVATE_INCLUDES "${gd_private}" PARENT_SCOPE)
-set(NEXUS_SYSTEM_VENDOR_INCLUDES "${gd_vendor_includes}" PARENT_SCOPE)
-set(NEXUS_SYSTEM_COMPILE_DEFINITIONS
-    GD32F470
-    "NX_GD32_GPIO_SELECTED=${gd_gpio_selected}"
-    "NX_GD32_UART_SELECTED=${gd_uart_selected}"
-    PARENT_SCOPE
+target_include_directories(
+    nexus_gd32_reference_startup_usage
+    SYSTEM
+    INTERFACE ${gd_vendor_includes}
+)
+nexus_use_cmsis_core(nexus_gd32_reference_startup_usage)
+target_compile_definitions(
+    nexus_gd32_reference_startup_usage
+    INTERFACE
+        GD32F470
+        "NX_GD32_GPIO_SELECTED=${gd_gpio_selected}"
+        "NX_GD32_UART_SELECTED=${gd_uart_selected}"
+)
+set_target_properties(
+    nexus_soc_gd32f470_reference
+    PROPERTIES
+        NEXUS_STARTUP_USAGE_TARGET nexus_gd32_reference_startup_usage
+        NEXUS_STARTUP_SOURCES
+            "${gd_sdk}/CMSIS/GD/GD32F4xx/Source/GCC/startup_gd32f450_470.S;${gd_private}/system.c"
 )

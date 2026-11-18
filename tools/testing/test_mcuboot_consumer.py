@@ -80,7 +80,7 @@ class MCUbootConsumerTests(unittest.TestCase):
             'set(NEXUS_BUILD_WORKLOAD OFF CACHE BOOL "")\n'
             'set(NEXUS_TEST_SUPPORT ON CACHE BOOL "Host test model")\n'
             f'set(NEXUS_ASSEMBLY_FILE "{PLATFORM}/tests/support/native/assemblies/native-empty.toml")\n'
-            f'add_subdirectory("{PLATFORM}" nexus EXCLUDE_FROM_ALL)\n'
+            f'find_package(Nexus CONFIG REQUIRED PATHS "{PLATFORM}/cmake" NO_DEFAULT_PATH)\nnexus_add_platform(ASSEMBLY "${{NEXUS_ASSEMBLY_FILE}}")\n'
             f'include("{ROOT}/components/protocols/mcuboot/CMakeLists.txt")\n'
             'set(NEXUS_MCUBOOT_DEVELOPMENT ON)\n'
             f'set(NEXUS_MCUBOOT_SOURCE "{supplier or SUPPLIER}")\n' + body)

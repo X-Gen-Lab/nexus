@@ -7,6 +7,7 @@ import tomllib
 
 ROOT = Path(__file__).resolve().parents[2]
 COMMON = (
+    "component_catalog",
     "__init__", "bundle", "dependencies", "contracts", "sdk", "cpu", "kernel", "metadata", "factory", "ir", "records",
     "providers/__init__", "providers/common", "calls",
     "resource_graph", "trigger_graph", "dma_topology", "io_traits",
@@ -58,6 +59,7 @@ def source_names(mode, family, *, sdk=False, external=False,
         raise ValueError("Unknown configuration-code dependency scope")
     names = ["tools/configure/" + name + ".py" for name in COMMON]
     names.append("tools/__init__.py")
+    names.append("components/catalog.json")
     if mode == "platform" or sdk:
         names.append("tools/maintenance/source_catalogue.py")
     # Snapshot unknown selections conservatively. Only the validated resolved

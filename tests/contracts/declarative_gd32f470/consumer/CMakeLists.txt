@@ -6,8 +6,6 @@ set(NEXUS_ASSEMBLY_FILE
     ""
 )
 set(NEXUS_TEST_SUPPORT ON CACHE BOOL "" FORCE)
-set(NEXUS_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-set(NEXUS_BUILD_WORKLOAD OFF CACHE BOOL "" FORCE)
 if(NEXUS_INSTALLED_PREFIX)
     if(NOT NEXUS_EXPECTED_SOURCE_REVISION)
         message(
@@ -32,7 +30,14 @@ else()
         "${CMAKE_CURRENT_LIST_DIR}/../../../.."
         ABSOLUTE
     )
-    add_subdirectory("${NEXUS_SOURCE_ROOT}" nexus-sdk)
+    find_package(
+        Nexus
+        CONFIG
+        REQUIRED
+        PATHS "${NEXUS_SOURCE_ROOT}/cmake"
+        NO_DEFAULT_PATH
+    )
 endif()
+nexus_add_platform(ASSEMBLY "${NEXUS_ASSEMBLY_FILE}")
 nexus_add_firmware(nexus_gd32_reference_consumer SOURCES main.c)
 nexus_target_warnings(nexus_gd32_reference_consumer STRICT)

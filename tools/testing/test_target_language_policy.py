@@ -28,7 +28,7 @@ class TargetLanguagePolicyTests(unittest.TestCase):
                 'set(NEXUS_BUILD_TESTS OFF CACHE BOOL "")\n'
                 'set(NEXUS_TEST_SUPPORT ON CACHE BOOL "")\n'
                 'set(NEXUS_BUILD_WORKLOAD OFF CACHE BOOL "")\n'
-                f'add_subdirectory("{ROOT}" nexus EXCLUDE_FROM_ALL)\n'
+                f'find_package(Nexus CONFIG REQUIRED PATHS "{ROOT}/cmake" NO_DEFAULT_PATH)\nnexus_add_platform(ASSEMBLY "${{NEXUS_ASSEMBLY_FILE}}")\n'
                 'get_target_property(config Nexus::Config ALIASED_TARGET)\n'
                 'set_property(TARGET ${config} PROPERTY NEXUS_LTO_REQUIRED ON)\n'
                 'set_property(TARGET ${config} PROPERTY '
@@ -78,7 +78,7 @@ class TargetLanguagePolicyTests(unittest.TestCase):
                 'set(NEXUS_TEST_SUPPORT ON CACHE BOOL "")\n'
                 'set(NEXUS_BUILD_WORKLOAD OFF CACHE BOOL "")\n'
                 "set(CMAKE_EXPORT_COMPILE_COMMANDS ON)\n"
-                f'add_subdirectory("{PLATFORM_ROOT}" nexus EXCLUDE_FROM_ALL)\n'
+                f'find_package(Nexus CONFIG REQUIRED PATHS "{PLATFORM_ROOT}/cmake" NO_DEFAULT_PATH)\nnexus_add_platform(ASSEMBLY "${{NEXUS_ASSEMBLY_FILE}}")\n'
                 f'include("{POLICY}")\n'
                 "if(DEFINED CMAKE_C_STANDARD)\n"
                 '  message(FATAL_ERROR "Parent global C standard leaked")\n'

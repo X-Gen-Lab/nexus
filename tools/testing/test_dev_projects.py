@@ -145,7 +145,7 @@ class ProjectCreationTests(unittest.TestCase):
                          str(source / "tools/configure/configure.py"))
         self.assertEqual(result["selected_platform"]["source_root"], str(source))
         self.assertEqual(result["expected_platform"]["commit"], "a" * 40)
-        self.assertIn("-DNEXUS_SOURCE=" + str(source),
+        self.assertIn("-DNexus_DIR=" + str(source / "cmake"),
                       result["commands"]["configure"])
         self.assertNotIn("-DCMAKE_TOOLCHAIN_FILE=", " ".join(
             result["commands"]["configure"]))
@@ -332,7 +332,7 @@ class ProjectCreationTests(unittest.TestCase):
         self.assertTrue((source / "verified.json").is_file())
         self.assertEqual(result["selected_platform"]["kind"], "source")
         self.assertEqual(result["selected_platform"]["source_revision"], "d" * 40)
-        self.assertIn("-DNEXUS_SOURCE=" + str(source),
+        self.assertIn("-DNexus_DIR=" + str(source / "cmake"),
                       result["commands"]["configure"])
 
     def test_source_and_sdk_conflict_is_rejected_before_creation(self):

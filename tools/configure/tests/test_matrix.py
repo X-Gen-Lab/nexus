@@ -18,19 +18,27 @@ class MaintainedMatrixTests(unittest.TestCase):
         self.assertEqual(contract["components"], sorted(matrix.COMPONENTS))
         self.assertEqual(contract["families"], ["stm32f4"])
 
-    def test_cmake_component_mapping_drift_is_rejected(self):
-        name = "cmake/platform/Components.cmake"
-        original = (configure.ROOT / name).read_text(encoding="utf-8")
-        for index, altered in enumerate((
-                original.replace('"log=Nexus::Log"', ''),
-                original.replace('"log=Nexus::Log"',
-                                 '"unknown=Nexus::Log"'))):
+    def test_shared_component_catalogue_drift_is_rejected(self):
+        name = "components/catalog.json"
+        original = json.loads((configure.ROOT / name).read_text())
+        entries = original["components"]
+        variants = (
+            [row for row in entries if row["id"] != "log"],
+            [dict(row, id="unknown") if row["id"] == "log" else row
+             for row in entries],
+        )
+        for index, altered in enumerate(variants):
             with self.subTest(mapping=index):
                 with tempfile.TemporaryDirectory() as directory:
                     root = Path(directory)
                     path = root / name
                     path.parent.mkdir(parents=True)
-                    path.write_text(altered, encoding="utf-8")
+                    path.write_text(json.dumps({"schema_version": 1,
+                                                "components": altered}))
+                    module = root / "cmake/platform/Components.cmake"
+                    module.parent.mkdir(parents=True)
+                    module.write_bytes((configure.ROOT /
+                                        "cmake/platform/Components.cmake").read_bytes())
                     with self.assertRaisesRegex(ValueError, "components"):
                         matrix.check_contracts(root)
 

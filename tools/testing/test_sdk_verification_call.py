@@ -366,10 +366,15 @@ class SDKVerificationCallTests(unittest.TestCase):
         self.source = self.prefix / "share/nexus/src"
         self.package = self.prefix / "lib/cmake/Nexus"
         self.package.mkdir(parents=True)
-        entry = self.source / "cmake/package/platform/CMakeLists.txt"
-        entry.parent.mkdir(parents=True)
-        shutil.copyfile(ROOT / "cmake/package/platform/CMakeLists.txt", entry)
+        (self.source / "cmake/package").mkdir(parents=True)
         (self.source / "cmake/platform").mkdir(parents=True)
+        for name in ("cmake/Nexus.cmake", "cmake/platform/Firmware.cmake",
+                     "cmake/platform/Runtime.cmake", "cmake/platform/Configure.cmake",
+                     "cmake/platform/TargetPolicy.cmake",
+                     "os/freertos/secure/Integration.cmake"):
+            target = self.source / name
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(ROOT / name, target)
         (self.source / ".nexus-source-sdk.json").write_text(json.dumps(
             {"source_revision": "fixture", "publishable": True}) + "\n")
         (self.source / "payload").write_text("approved")
@@ -383,9 +388,7 @@ class SDKVerificationCallTests(unittest.TestCase):
             "print((root/'.nexus-source-sdk.json').read_text())\n")
         shutil.copyfile(ROOT / "cmake/platform/SDK.cmake",
                         self.source / "cmake/platform/SDK.cmake")
-        (self.source / "CMakeLists.txt").write_text(
-            'set(NEXUS_SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}")\n'
-            'include("${NEXUS_SOURCE_DIR}/cmake/platform/SDK.cmake")\n'
+        (self.source / "cmake/platform/CMakeLists.txt").write_text(
             'add_library(nexus_config INTERFACE)\n'
             'add_library(Nexus::Config ALIAS nexus_config)\n'
             'set_target_properties(nexus_config PROPERTIES NEXUS_SOURCE_DIR '
@@ -463,6 +466,14 @@ class SDKVerificationCallTests(unittest.TestCase):
         self.assertIn("actual payload changed", result.stdout + result.stderr)
         self.assertEqual((self.source.parent / "count").read_text(), "2")
 
+    def test_dangling_manifest_is_rejected_as_an_incomplete_sdk(self):
+        marker = self.source / ".nexus-source-sdk.json"
+        marker.unlink()
+        marker.symlink_to("missing-manifest")
+        result = self.direct_configure()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("Source SDK identity failed", result.stdout + result.stderr)
+
     def test_cache_and_parent_variables_cannot_claim_private_entry(self):
         (self.source / "payload").write_text("changed")
         result = self.direct_configure(before=(
@@ -474,8 +485,10 @@ class SDKVerificationCallTests(unittest.TestCase):
         self.assertIn("actual payload changed", result.stdout + result.stderr)
         self.assertEqual((self.source.parent / "count").read_text(), "1")
 
-    def test_platform_import_verifies_once_before_composing_its_targets(self):
-        result = self.configure()
+    def test_discovery_verifies_without_creating_assembly_targets(self):
+        result = self.configure(
+            'if(TARGET Nexus::Config)\n'
+            'message(FATAL_ERROR "Discovery created assembly")\nendif()\n')
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertEqual((self.source.parent / "count").read_text(), "1")
 
@@ -509,11 +522,21 @@ class SDKVerificationCallTests(unittest.TestCase):
         self.assertIn("actual payload changed", result.stdout + result.stderr)
         self.assertEqual((self.source.parent / "count").read_text(), "2")
 
-    def test_private_child_cannot_import_platform_independently(self):
-        result = self.direct_configure(after=(
-            f'add_subdirectory("{self.source}/cmake/package/platform" sdk)\n'))
+    def test_platform_admission_rechecks_changes_made_after_find(self):
+        result = self.configure(
+            f'file(WRITE "{self.source}/payload" "changed")\n'
+            'nexus_add_platform(ASSEMBLY assembly.toml)\n')
         self.assertNotEqual(result.returncode, 0)
-        self.assertIn("_nexus_import_verified_platform", result.stderr)
+        self.assertIn("actual payload changed", result.stdout + result.stderr)
+        self.assertEqual((self.source.parent / "count").read_text(), "2")
+
+    def test_explicit_platform_constructs_after_fresh_admission(self):
+        result = self.configure(
+            'nexus_add_platform(ASSEMBLY assembly.toml)\n'
+            'if(NOT TARGET Nexus::Config)\n'
+            'message(FATAL_ERROR "Explicit assembly missing")\nendif()\n')
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual((self.source.parent / "count").read_text(), "2")
 
     def test_second_prefix_is_verified_before_rejecting_mixed_sources(self):
         other = self.root / "second prefix"
@@ -868,7 +891,7 @@ class SDKConsumerParallelTests(unittest.TestCase):
             (build / "compile_commands.json").write_text(json.dumps(rows))
             service = next((profile for profile in self.consumer.SERVICE_CONSUMERS
                             if source.name == profile.name + " source"), None)
-            config = build / ("nexus-sdk/generated" if service is not None else
+            config = build / ("nexus/generated" if service is not None else
                               "configuration")
             config.mkdir(parents=True)
             (config / "bindings.c").write_text("/* external CMake fixture */")

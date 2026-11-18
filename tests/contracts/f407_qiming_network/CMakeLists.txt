@@ -13,9 +13,14 @@ if(NOT NEXUS_REFERENCE_ROOT)
     )
 endif()
 set(NEXUS_ASSEMBLY_FILE "${CMAKE_CURRENT_LIST_DIR}/assembly.toml")
-set(NEXUS_BUILD_TESTS OFF)
-set(NEXUS_BUILD_WORKLOAD OFF)
-add_subdirectory("${NEXUS_REFERENCE_ROOT}" nexus)
+find_package(
+    Nexus
+    CONFIG
+    REQUIRED
+    PATHS "${NEXUS_REFERENCE_ROOT}/cmake"
+    NO_DEFAULT_PATH
+)
+nexus_add_platform(ASSEMBLY "${NEXUS_ASSEMBLY_FILE}")
 nexus_add_lwip()
 nexus_add_tls()
 nexus_add_coremqtt()

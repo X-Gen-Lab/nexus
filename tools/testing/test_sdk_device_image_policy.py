@@ -54,7 +54,7 @@ class SDKDeviceImagePolicyTests(unittest.TestCase):
 
     def image_fixture(self, name):
         sdk, source, build, command, profile = self.prepared(name)
-        config = build / "nexus-sdk/generated"
+        config = build / "nexus/generated"
         config.mkdir(parents=True)
         (build / "resolved-sdk.txt").write_text(str(sdk))
         (build / "resolved-config.txt").write_text(str(config))

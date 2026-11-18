@@ -31,11 +31,8 @@ class CreatedProjectConsumptionTests(unittest.TestCase):
                 'cmake_minimum_required(VERSION 3.31)\n'
                 'project(public_created_project LANGUAGES C ASM)\n'
                 'set(CMAKE_EXPORT_COMPILE_COMMANDS ON)\n'
-                'set(NEXUS_ASSEMBLY_FILE "${CMAKE_CURRENT_SOURCE_DIR}/assembly.toml" '
-                'CACHE FILEPATH "Product assembly")\n'
-                'set(NEXUS_BUILD_TESTS OFF CACHE BOOL "Host tests" FORCE)\n'
-                'set(NEXUS_BUILD_WORKLOAD OFF CACHE BOOL "Workload" FORCE)\n'
-                'add_subdirectory("${NEXUS_SOURCE}" platform EXCLUDE_FROM_ALL)\n'
+                'find_package(Nexus CONFIG REQUIRED)\n'
+                'nexus_add_platform(ASSEMBLY "${CMAKE_CURRENT_SOURCE_DIR}/assembly.toml")\n'
                 'nexus_add_firmware(public_application SOURCES main.c)\n'
                 'enable_testing()\n'
                 'add_test(NAME public_created_project COMMAND public_application)\n'
@@ -116,7 +113,10 @@ class CreatedProjectConsumptionTests(unittest.TestCase):
                                  self.output, source_root=ROOT, test_support=True)
         commands = result["commands"]
         self.assertEqual(set(commands), {"configure", "build", "test"})
-        self.assertIn("-DNEXUS_SOURCE=" + str(ROOT), commands["configure"])
+        self.assertIn("-DNexus_DIR=" + str(ROOT / "cmake"), commands["configure"])
+        self.assertFalse(any(argument.startswith(("-DNEXUS_SOURCE=",
+                            "-DNEXUS_BUILD_TESTS=", "-DNEXUS_BUILD_WORKLOAD="))
+                             for argument in commands["configure"]))
         self.assertFalse(result["qualification"])
         for phase in ("configure", "build", "test"):
             execution = self.run_checked(commands[phase])

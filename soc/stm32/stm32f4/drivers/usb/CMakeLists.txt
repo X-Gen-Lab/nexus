@@ -3,7 +3,7 @@ nexus_controller_modes(usb_device_modes usb_device)
 nexus_controller_modes(usb_host_modes usb_host)
 set(stm32_usb_host_hal OFF)
 if(usb_device_modes)
-    set(stm32_gpio_helpers ON)
+    nexus_stm32f4_gpio(nexus_soc_stm32f4)
     target_sources(
         nexus_soc_stm32f4
         PRIVATE
@@ -42,7 +42,7 @@ if(usb_device_modes)
     endif()
 endif()
 if(usb_host_modes)
-    set(stm32_gpio_helpers ON)
+    nexus_stm32f4_gpio(nexus_soc_stm32f4)
     set(stm32_usb_host_hal ON)
     target_sources(
         nexus_soc_stm32f4

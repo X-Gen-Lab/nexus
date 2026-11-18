@@ -21,9 +21,15 @@ target_link_libraries(
     PUBLIC Nexus::IO Nexus::Arch
     PRIVATE nexus_build_options nexus_owned_warnings
 )
-set(NEXUS_SYSTEM_PRIVATE_INCLUDES
-    "${CMAKE_CURRENT_SOURCE_DIR}"
-    "${NEXUS_SOURCE_DIR}/tests/support/native/drivers"
-    "${NEXUS_SOURCE_DIR}/tests/support/native/include"
-    PARENT_SCOPE
+add_library(nexus_external_startup_usage INTERFACE)
+target_include_directories(
+    nexus_external_startup_usage
+    INTERFACE
+        "${CMAKE_CURRENT_SOURCE_DIR}"
+        "${NEXUS_SOURCE_DIR}/tests/support/native/drivers"
+        "${NEXUS_SOURCE_DIR}/tests/support/native/include"
+)
+set_property(
+    TARGET nexus_soc_external_lifecycle_model
+    PROPERTY NEXUS_STARTUP_USAGE_TARGET nexus_external_startup_usage
 )

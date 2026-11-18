@@ -431,7 +431,7 @@ class SDKServicesPolicyTests(unittest.TestCase):
             expected_revision="a" * 40, fixture=True)
         sdk = prefix / "share/nexus/src"
         (sdk / ".nexus-source-sdk.json").write_text("{}\n")
-        config = build / "nexus-sdk/generated"
+        config = build / "nexus/generated"
         config.mkdir(parents=True)
         (build / "resolved-sdk.txt").write_text(str(sdk))
         (build / "resolved-config.txt").write_text(str(config))

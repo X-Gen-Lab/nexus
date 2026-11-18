@@ -11,8 +11,37 @@ source_language: en
 Create a small external C11 GPIO consumer from the public platform, configure it
 and link its MCU image. This path needs a fixed public checkout or a verified
 Source SDK, Linux, Python 3.11+, CMake 3.31+, Ninja, Git and the locked ARM compiler.
-It does not need the private examples repository or optional middleware. Products
+It does not need the examples repository or optional middleware. Products
 own their assembly and application sources. No MCU is flashed or executed here.
+
+## Discover the SDK, create the platform, build an image
+
+Choose the compiler toolchain and `Nexus_DIR` before CMake configures the
+application. For an installed SDK use `<prefix>/lib/cmake/Nexus`; for a source
+checkout use `<source>/cmake`. Both expose the same public build API:
+
+```cmake
+cmake_minimum_required(VERSION 3.31)
+project(controller LANGUAGES C ASM)
+find_package(Nexus CONFIG REQUIRED)
+nexus_add_platform(ASSEMBLY "${CMAKE_CURRENT_SOURCE_DIR}/assembly.toml")
+nexus_add_firmware(controller SOURCES src/main.c)
+```
+
+Package discovery verifies identity and loads functions without resolving an
+assembly or creating production targets. Platform creation explicitly owns one
+assembly in a private build scope. A second creation or conflicting SDK source
+is an error. Changes to installed SDK bytes after discovery must still be
+rejected at subsequent consumption. Do not override platform development-test
+or workload switches in the application.
+
+A build directory has one toolchain and assembly. Several images may use that
+assembly, each with its own private startup objects and artifact checks. Use
+separate build directories for different assemblies. The toolchain must be
+selected before `project()`; platform creation validates CPU and ABI requirements
+without switching compilers. Application libraries use ordinary CMake targets,
+public I/O targets, `Nexus::ABI` and the selected `Nexus::OS`. Vendor headers and
+device macros remain private. See the [build architecture](../design/build-architecture.md).
 
 ## Public path: create the minimal GPIO consumer
 
@@ -74,15 +103,15 @@ only owned build outputs after retaining needed logs.
 The source route has actual create/configure/ARM-link regression coverage. An
 installed-prefix result requires its own fresh clean SDK verification and is
 not inherited from source tests. The full maintained consumer plan below is a
-separate platform-maintenance task; private application templates are optional.
+separate platform-maintenance task; versioned application templates are optional.
 
-## Optional: create an application from private templates
+## Optional: create an application from versioned templates
 
 Obtain a verified Source SDK and the external
 [nexus-examples](https://github.com/X-Gen-Lab/nexus-examples) checkout. That
-repository is private and requires its own GitHub access; public Nexus or SDK
-access does not grant template access. The independent SDK verification below
-does not require that private repository. Set
+repository owns the versioned application templates separately from the
+platform. The independent SDK verification below does not require the examples
+checkout. Set
 `NEXUS_SDK_PREFIX` to the installed SDK prefix, `NEXUS_EXAMPLES_DIR` to that
 checkout and `NEXUS_EXAMPLES_REVISION` to the exact 40-character examples commit
 recorded with the chosen platform delivery. Set `NEXUS_EXPECTED_REVISION` to
@@ -125,8 +154,8 @@ references, provides request storage, observes settlement and stops the platform
 A timeout is an error, not permission to release outstanding storage.
 
 For a development checkout, select `--source /absolute/path/to/nexus` instead of
-`--sdk-prefix`. The emitted configure command selects that same checkout through
-`NEXUS_SOURCE`; it does not qualify an installed SDK. The two source selectors
+`--sdk-prefix`. The emitted configure command selects that same checkout through its source
+package entry; it does not qualify an installed SDK. The two source selectors
 are mutually exclusive. Without either selector, creation uses its current
 checkout explicitly. Select a `qiming` or `sky` template whose pinned manifest
 selects a maintained F407 part and Board. The emitted MCU configure command includes the selected platform's
@@ -223,7 +252,7 @@ Obtain the [fixed public checkout](../guides/source-checkout.md) and a verified 
 containing the complete [maintained consumer profile](../../tools/maintenance/consumer_profiles.py).
 The small default bare-metal SDK intentionally omits optional suppliers and Native
 support; it cannot run that complete plan. This public path needs no access to the
-private examples repository. Set `NEXUS_SDK_PREFIX` to the installed prefix, put
+examples repository. Set `NEXUS_SDK_PREFIX` to the installed prefix, put
 the locked ARM compiler on `PATH`, and select a new output directory outside the
 SDK. Run from the public checkout root:
 
@@ -357,9 +386,9 @@ repository. They consume `Nexus::Platform` through `nexus_add_firmware()`; the
 helper does not generate an application or start a scheduler. Use the
 [assembly reference](../reference/configuration/assembly.md) to select reviewed
 bindings and the [factory explanation](../explanation/factory.md) to obtain faces.
-Extended application examples live in the private
-[nexus-examples](https://github.com/X-Gen-Lab/nexus-examples) repository and require
-separate access. The public consumer verification above does not depend on it.
+Extended application examples live in the separate
+[nexus-examples](https://github.com/X-Gen-Lab/nexus-examples) repository. The public
+consumer verification above does not depend on that checkout.
 
 ![Source SDK preparation, relocation and independent consumer verification](../assets/diagrams/source-sdk-consumer.svg)
 
