@@ -6,6 +6,7 @@ executes the declared graph. Products own application sources and composition.
 
 See the [verification plan for additional MCU families](#verification-plan-for-additional-mcu-families)
 for proposed changes to commit checks, MCU onboarding and release verification.
+The [build architecture review](build-architecture.md) traces the firmware target and gives the CMake refactoring sequence.
 
 The [48-item execution ledger](https://github.com/X-Gen-Lab/nexus/blob/83a27dfbee4e8fbf4d35875b1e9db85af7516eec/docs/design/build-system-execution.csv) preserves the requested
 exit conditions. Implementation, executed software verification, environment

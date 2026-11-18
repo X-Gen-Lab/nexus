@@ -1,6 +1,6 @@
 # Actual-POT messages; independently reviewed against this canonical source.
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: ba4136e4d6b80f0be66622ac498ef77d3924151b8e37a10f97b4649426375318\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: cd67822bfad728ed685e1b126bd49344fb4866e3f4ce9c61677714830932e9a5\n"
 
 #: ../../../docs/design/build-system.md:1
 msgid "Build system maintenance contract"
@@ -469,8 +469,8 @@ msgid "Ordinary configure/build commands keep process logs and actual exits with
 msgstr "普通 configure／build 命令保留进程日志和真实退出码，不生成完整 provenance 归档。显式指定 `--record-provenance`，才为设备操作把映像绑定到命令执行回执、源码和配置。设备准入仍验证该身份。下文候选计划的执行属于历史记录，已退役的编排不再作为当前验收机制。共享的最近报告名称不能替代精确执行记录。"
 
 #: ../../../workspace/nexus/docs/design/build-system.md:7
-msgid "See the [verification plan for additional MCU families](#verification-plan-for-additional-mcu-families) for proposed changes to commit checks, MCU onboarding and release verification."
-msgstr "[新增 MCU 家族的验证方案](#verification-plan-for-additional-mcu-families)列出了提交检查、MCU 接入和发布验证范围的拟议改动。"
+msgid "See the [verification plan for additional MCU families](#verification-plan-for-additional-mcu-families) for proposed changes to commit checks, MCU onboarding and release verification. The [build architecture review](build-architecture.md) traces the firmware target and gives the CMake refactoring sequence."
+msgstr "[新增 MCU 家族的验证方案](#verification-plan-for-additional-mcu-families)列出了提交检查、MCU 接入和发布验证范围的拟议改动。[构建架构审查](build-architecture.md)说明固件目标的形成过程与 CMake 重构顺序。"
 
 #: ../../../workspace/nexus/docs/design/build-system.md:189
 msgid "Verification plan for additional MCU families"
