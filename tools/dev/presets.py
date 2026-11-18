@@ -270,10 +270,17 @@ def configure_if_needed(root, preset, environment, configure, *, sdk=None):
     toolchain_path = build / toolchain if toolchain else None
     if toolchain_path and not toolchain_path.is_file():
         toolchain_path = Path(root) / toolchain
+    # Admission checks current bytes independently of CMake's graph freshness.
+    # A failed proof must leave the previous cache and configure stamp intact.
+    sdk_identity = None
+    if sdk:
+        from tools.configure import sdk as source_sdk
+        sdk_identity = source_sdk.verify(Path(sdk))
     # CMake initializes these values on the first configure. A changed preset,
     # SDK, compiler selection or initial flags must also remove stale cache keys.
     inputs = {"root": str(Path(root).resolve()), "preset": preset,
               "sdk": str(sdk) if sdk else None,
+              "sdk_identity": sdk_identity,
               "env": {key: environment.get(key) for key in
                       ("PATH", "CC", "CXX", "ASM", "CFLAGS", "CXXFLAGS",
                        "ASMFLAGS", "LDFLAGS", "CMAKE_PREFIX_PATH",
@@ -298,12 +305,10 @@ def configure_if_needed(root, preset, environment, configure, *, sdk=None):
                                              info.st_mtime_ns, info.st_ctime_ns)).encode())
         return selection + " " + fingerprint.hexdigest()
 
-    # The source SDK verifies its payload on every explicit consumption.
-    installed = bool(sdk and (Path(sdk) / ".nexus-source-sdk.json").is_file())
     expected = state() if cache.is_file() else None
     matched = (expected is not None and graph.is_file() and stamp.is_file()
                and stamp.read_bytes() == expected.encode())
-    if matched and not installed:
+    if matched:
         return 0
     stamp.unlink(missing_ok=True)
     result = configure(["--fresh"] if expected and not matched else [])

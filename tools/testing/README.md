@@ -19,9 +19,13 @@ workflows、contracts、freertos。工具测试不按 Native 编译模式重复�
 testing 域集中执行一次全局能力和派生文档检查；局部外设测试不重复扫描整个平台。
 报告包含最慢用例摘要，用于定位实际成本，不以测试数量作为优化目标。
 
-需要隔离并行执行完整模块时，给同一命令传入 `--jobs N`，或为本次门禁设置
-`NEXUS_TOOL_JOBS=N`。执行器遵循调用方的 `NEXUS_BUILD_JOBS` 或
-`CMAKE_BUILD_PARALLEL_LEVEL` 配额，把剩余编译任务分配给各个 worker。
+完整模块默认在独立进程中执行，worker 数继承调用方的 `NEXUS_BUILD_JOBS` 或
+`CMAKE_BUILD_PARALLEL_LEVEL`；独立调用未提供预算时使用 2 个槽。
+`--jobs N` 或 `NEXUS_TOOL_JOBS=N` 可限制本次工具并发，执行器按总预算分配各
+worker 的编译槽。`--jobs 1` 保留单 worker 对照入口。
 每个模块使用独立 Python 进程；报告的 `modules` 含各模块实际用例标识的
 SHA-256，可用 `--jobs 1` 与并行结果对照。超时、信号或模块失败会撤回已启动的
 子进程并使本次执行失败。共享构建目录的写入必须由所属构建入口取得目录锁。
+
+已知工具实现与测试名称不对应时，在现有 `COMMIT_ALIASES` 登记完整模块。
+普通固件提交按实际依赖选择检查；工具自身或未知覆盖的变更扩大到适用完整域。

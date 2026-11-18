@@ -15,6 +15,10 @@ python tools/dev/dev.py test --preset native-debug
 `doctor --target arm` 检查锁定的 ARM 编译器；`contracts` 同时检查 Native 和 ARM。
 CMake 的原生参数可以直接透传。并发受进程分配预算约束。
 
+同一台主机并行运行多个独立入口时，由启动方划分 `NEXUS_BUILD_JOBS` 总预算。
+交互构建、性能采样与完整 SDK 发布各自计时；性能采样在声明的固定资源条件下运行。
+正式发布在最终源码冻结后执行一次完整资格，局部开发使用相关目标与提交检查范围。
+
 每条实际子命令的日志保存在独立的
 `build/quality/developer-commands/<执行标识>/command.txt`，终端显示其路径。
 `build/quality/developer-command.command.json` 是原子更新的最近一次完成结果入口，
@@ -43,6 +47,10 @@ CPU affinity／Linux cgroup 限额。并行模式平分预算，例如 4 个 job
 普通 TDD 门禁在锁内识别已配置的 Native 目录。相同 preset、工具链与缓存复用
 Ninja 图，源码、头和配置文件的变化由原生依赖处理。构建身份变化或第一次运行时
 重新 configure。每次门禁仍重新执行合同并生成本次测试报告。
+
+外部应用显式消费 Source SDK 时先验证整包。验证通过且配置身份相同，复用既有
+Ninja 图；SDK、preset、工具链或缓存身份变化时重新配置。验证失败保留原缓存和
+配置记录，便于修复后使用同一入口重试。
 
 各预设必须使用互不包含的独立构建目录。`configure`、`build`、`test`、`check`、
 TDD、Native runtime 和矩阵使用相同的 `.nexus-build.lock` 内核锁；组合命令持锁至

@@ -8,15 +8,17 @@ import tomllib
 ROOT = Path(__file__).resolve().parents[2]
 COMMON = (
     "__init__", "bundle", "dependencies", "contracts", "sdk", "cpu", "kernel", "metadata", "factory", "ir", "records",
-    "threadx", "lowpower", "providers/__init__", "providers/common",
-    "providers/descriptor", "calls", "packages", "package_policy", "static_ir",
-    "data_provider", "static_recipe", "static_endpoints", "static_fragments", "shared_irq", "domain_policies", "domain_bridge", "header_projection",
+    "providers/__init__", "providers/common", "calls",
     "resource_graph", "trigger_graph", "dma_topology", "io_traits",
-    "selected_contracts", "integration_package",
+    "selected_contracts",
     "enhanced_endpoints", "uart_formats", "stream_profiles", "usb_profiles",
     "usb_host", "usb_otg",
 )
 PLATFORM = (
+    "providers/descriptor", "packages", "package_policy", "static_ir",
+    "data_provider", "static_recipe", "static_endpoints", "static_fragments",
+    "shared_irq", "domain_policies", "domain_bridge", "header_projection",
+    "integration_package",
     "configure", "selection", "onboarding", "authored", "bindings", "emission", "experience", "can", "memory",
     "usb_device", "ethernet", "timer_advanced", "secondary_controllers", "coupled_io",
     "fact_references", "reference_profiles", "device_view", "clocks", "physical_facts", "gpio_phase",
@@ -34,9 +36,15 @@ PLATFORM = (
 
 SDK = (
     "cmake/package/package_source_sdk.py",
+    "tools/configure/packages.py", "tools/configure/providers/descriptor.py",
+    "tools/dev/dependencies.py",
     "tools/evidence/common.py",
     "tools/maintenance/cmsis_device_lock.py",
+    "tools/maintenance/coremqtt_lock.py",
     "tools/maintenance/freertos_transport.py",
+    "tools/maintenance/lwip_lock.py",
+    "tools/maintenance/mbedtls_lock.py",
+    "tools/maintenance/mcuboot_lock.py",
     "tools/maintenance/st_usb_lock.py",
     "tools/maintenance/threadx_lock.py",
     "scripts/ci/vendor_import_identity.py", "scripts/ci/verify_vendor_source.py",
@@ -44,12 +52,20 @@ SDK = (
 
 
 def source_names(mode, family, *, sdk=False, external=False,
-                 test_support=False):
+                 test_support=False, backend=None):
     """Return declared generator inputs for freshness and SDK admission."""
     if mode not in {"platform", "runtime"}:
         raise ValueError("Unknown configuration-code dependency scope")
     names = ["tools/configure/" + name + ".py" for name in COMMON]
-    names.extend(("tools/__init__.py", "tools/maintenance/source_catalogue.py"))
+    names.append("tools/__init__.py")
+    if mode == "platform" or sdk:
+        names.append("tools/maintenance/source_catalogue.py")
+    # Snapshot unknown selections conservatively. Only the validated resolved
+    # backend may narrow the final identity; selection never skips validation.
+    if backend not in {"baremetal", "native", "freertos"}:
+        names.append("tools/configure/threadx.py")
+    if backend not in {"baremetal", "native", "threadx"}:
+        names.append("tools/configure/lowpower.py")
     if sdk:
         names.extend(SDK)
     if mode == "runtime":
@@ -81,9 +97,10 @@ def _packaged_checkers():
                  for item in ALL_DEPENDENCIES if item.paired_driver_checker)
 
 
-def snapshot(*, mode, family=None, sdk=False, test_support=False):
+def snapshot(*, mode, family=None, sdk=False, test_support=False, backend=None):
     """Bind common code and only the explicitly selected legacy adapter."""
-    names = source_names(mode, family, sdk=sdk, test_support=test_support)
+    names = source_names(mode, family, sdk=sdk, test_support=test_support,
+                         backend=backend)
     if sdk:
         names.extend(name for name in _packaged_checkers() if (ROOT / name).is_file())
     paths = {name: str(ROOT / name) for name in sorted(names)}
@@ -121,11 +138,12 @@ def family_hint(assembly, root, *, test_support=False):
     return "native" if family == "native" and test_support else None
 
 
-def selected(paths, identity, *, family, context=None):
-    """Retain the pre-resolution bytes of the selected family, never rehash."""
+def selected(paths, identity, *, family=None, context=None, backend=None):
+    """Retain pre-resolution bytes of the resolved scope, never rehash."""
     scope = (None if context is not None and context.package is not None and
              not context.descriptor.configuration_directory else family)
-    names = source_names("platform", scope,
+    mode = identity["scope"]
+    names = source_names(mode, scope, backend=backend,
                          sdk="cmake/package/package_source_sdk.py" in paths,
                          external=context is not None and context.external,
                          test_support=(family == "native" and
@@ -145,7 +163,7 @@ def selected(paths, identity, *, family, context=None):
                 selected_paths[name] = str(path)
                 selected_records.append({"path": name,
                     "sha256": digest})
-    return selected_paths, _identity("platform", selected_records)
+    return selected_paths, _identity(mode, selected_records)
 
 
 def emit(output, paths, identity):

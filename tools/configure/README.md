@@ -122,6 +122,13 @@ python -m tools.configure.packages --schema
 事实、活动生成器或其输入。输入摘要与公共生成机制在执行前记录；生产包不加载
 外部 Python 插件，包内 CMake 仍是受信构建代码，哈希保证身份，不是执行沙箱。
 
+`configuration_code_paths.json` 与 `generator-identity.json` 记录实际配置代码的
+失效范围。CPU runtime 不依赖平台装配专用引擎；已验证的非 ThreadX 后端不包含
+ThreadX 策略模块，非 FreeRTOS 后端不包含其 lowpower 策略叶子模块。
+仍无条件导入的 factory／I/O 公共模块与 SDK 校验器的导入闭包
+继续记录。解析前保守保存代码快照，解析后只选择原始摘要，发布前再次验证，
+不重算来接纳执行中的修改。范围收窄不跳过未选领域的未知字段、非法策略或事实校验。
+
 Board／SoC 不含 Python 插件。完整配置生成由集中 Python 工具承担，
 固件硬件算法和生命周期直接使用 C。配置工具不进入 MCU 镜像。详细合同见
 [当前架构](../../docs/delivery/architecture.md)、

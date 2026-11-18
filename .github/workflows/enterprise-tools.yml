@@ -17,6 +17,8 @@ jobs:
     runs-on: ubuntu-24.04
     # Allow real SDK builds, the complete test plan and evidence uploads.
     timeout-minutes: 60
+    env:
+      NEXUS_BUILD_JOBS: '4'
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -66,13 +68,14 @@ jobs:
         run: |
           .venv/bin/python tools/dev/dev.py doctor --target contracts
           .venv/bin/python tools/dev/dev.py configure --preset native-debug
-          .venv/bin/python tools/dev/dev.py build --preset native-debug --target nexus_google_contracts --parallel 4
       - name: Execute each tool domain once
         run: |
           .venv/bin/python -B tools/testing/run_tool_tests.py --suite workflows --report build/quality/tools-workflows.json
           .venv/bin/python -B tools/testing/run_tool_tests.py --suite ci --report build/quality/tools-ci.json
           .venv/bin/python -B tools/testing/run_tool_tests.py --suite configure --report build/quality/tools-configure.json
           .venv/bin/python -B tools/testing/run_tool_tests.py --suite testing --report build/quality/tools-testing.json
+        env:
+          NEXUS_TOOL_NATIVE_DATABASE: ${{ github.workspace }}/build/native-debug/compile_commands.json
       - name: Check declared source compatibility
         run: |
           .venv/bin/python tools/maintenance/compatibility.py

@@ -8,7 +8,6 @@ from types import MappingProxyType
 
 from tools.configure.ir import KernelProfileIR
 from tools.configure.providers.common import fail, integer
-from tools.configure import lowpower
 
 
 _STANDARD = {"tick_source": "systick", "tick_hz": 1000,
@@ -60,6 +59,7 @@ def resolve(choices, cpu, clock_hz):
         if choices is not None:
             fail("OS policy requires the FreeRTOS backend")
         return None
+    from tools.configure import lowpower
     if choices is None:
         choices = {}
     if not isinstance(choices, dict):
@@ -201,6 +201,7 @@ def selection_lines(kernel):
 
 def editor_schema():
     """Describe the same bounded choices used by the resolver."""
+    from tools.configure import lowpower
     properties = {name: {"type": "boolean"} for name in sorted(BOOL_FIELDS)}
     for name, low, high in (("tick_hz", 1, 1000000),
                             ("max_priorities", 1, 32),

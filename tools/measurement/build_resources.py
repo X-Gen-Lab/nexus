@@ -46,7 +46,8 @@ def bind(path, *, allow_reference):
     paths = check_generator(path)
     # A rewritten generator receipt cannot remove or redirect private sources.
     owned, _ = dependencies.snapshot(mode="platform", family=selected["soc_family"],
-        sdk=sdk.installed(ROOT), test_support=selected["soc_family"] == "native")
+        sdk=sdk.installed(ROOT), test_support=selected["soc_family"] == "native",
+        backend=selected["backend"])
     declared = {item["file"]["path"] for item in resolved_input_files(path, selected)}
     if (any(paths.get(label) != origin for label, origin in owned.items()) or
             any(not label.startswith("soc-package/") or paths[label] not in declared

@@ -123,7 +123,7 @@ if(NEXUS_COMPILER_CACHE)
         ABSOLUTE
     )
     if(NOT NEXUS_COMPILER_CACHE_DIR)
-        set(NEXUS_COMPILER_CACHE_DIR "${policy_dir}/compiler-cache")
+        set(NEXUS_COMPILER_CACHE_DIR "${CMAKE_SOURCE_DIR}/build/compiler-cache")
     endif()
     get_filename_component(
         NEXUS_COMPILER_CACHE_DIR
@@ -138,7 +138,6 @@ if(NEXUS_COMPILER_CACHE)
             CMAKE_CONFIGURE_DEPENDS
                 "${NEXUS_SOURCE_DIR}/tools/dev/cache.py"
                 "${NEXUS_SOURCE_DIR}/tools/evidence/common.py"
-                "${NEXUS_SOURCE_DIR}/dependencies/environment.lock.json"
                 "${NEXUS_SOURCE_DIR}/dependencies/toolchains.lock.json"
                 "${NEXUS_SOURCE_DIR}/dependencies/platform-compatibility.json"
     )
@@ -146,11 +145,8 @@ if(NEXUS_COMPILER_CACHE)
     set(cache_arguments
         --compiler
         "${cache_compiler}"
-        "--flag=${NEXUS_OPTIMIZATION}"
-        --dependency
-        "${NEXUS_CONFIG_DIR}/resolved.json"
-        --dependency
-        "${NEXUS_SOURCE_DIR}/dependencies/environment.lock.json"
+        "--flag=cpu=${NEXUS_CPU_ARCH}"
+        "--flag=enum-abi=${NEXUS_ENUM_ABI}"
         --dependency
         "${NEXUS_SOURCE_DIR}/dependencies/toolchains.lock.json"
         --dependency

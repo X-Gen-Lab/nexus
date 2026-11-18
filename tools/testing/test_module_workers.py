@@ -38,14 +38,16 @@ class ToolWorkersTests(unittest.TestCase):
             "    def test_behavior(self):\n" +
             "".join("        " + line + "\n" for line in body.splitlines()))
 
-    def start(self, workers, timeout="10", allocation=None, files=()):
+    def start(self, workers, timeout="10", allocation=None, files=(), explicit=True):
         env = dict(os.environ)
         env.pop("NEXUS_BUILD_LEASES", None)
+        env.pop("NEXUS_TOOL_JOBS", None)
         env.update(NEXUS_COMMAND_TIMEOUT=timeout, NEXUS_BUILD_JOBS=str(workers if allocation is None else allocation))
         self.report.write_text("stale result")
         return subprocess.Popen([sys.executable, "-B",
             str(self.directory / "run_tool_tests.py"), "--suite", "testing",
-            "--report", str(self.report), "--jobs", str(workers),
+            "--report", str(self.report),
+            *(["--jobs", str(workers)] if explicit else []),
             *(["--files", *files] if files else [])],
             cwd=self.root, env=env, stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT, text=True)
@@ -53,6 +55,19 @@ class ToolWorkersTests(unittest.TestCase):
     def finish(self, proc):
         output, _ = proc.communicate(timeout=20)
         return proc.returncode, output
+
+    def test_default_workers_inherit_the_callers_build_budget(self):
+        for name in ("first", "second"):
+            self.module(name, """
+Path(f'{__name__}.budget').write_text(os.environ.get('NEXUS_BUILD_JOBS', ''))
+""")
+        status, log = self.finish(self.start(2, explicit=False))
+        self.assertEqual(status, 0, log)
+        record = json.loads(self.report.read_text())
+        self.assertEqual(record.get("workers"), 2)
+        self.assertEqual(record["executed"], 2)
+        for budget in self.root.glob("*.budget"):
+            self.assertEqual(budget.read_text(), "1")
 
     def test_workers_preserve_complete_serial_case_sets_and_split_budget(self):
         for name in ("first", "second"):

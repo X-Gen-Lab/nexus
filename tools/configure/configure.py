@@ -38,7 +38,7 @@ from tools.configure import resource_graph, trigger_graph, dma_topology, board_h
 from tools.configure.contracts import (
     COMPONENTS, CONTROLLER_KINDS, CONTROLLER_SELECTION_FIELDS,
     ENDPOINT_SELECTION_FIELDS)
-from tools.configure import kernel, memory as memory_regions, metadata, factory, can, threadx, usb_device, ethernet, timer_advanced, secondary_controllers, fact_references, clocks, physical_facts
+from tools.configure import kernel, memory as memory_regions, metadata, factory, can, usb_device, ethernet, timer_advanced, secondary_controllers, fact_references, clocks, physical_facts
 from tools.configure.providers import descriptor, maintained
 from tools.configure.selection import (
     validate_clock_profiles, validate_interrupt_profile,
@@ -1441,6 +1441,7 @@ def _resolve(assembly_path, root=ROOT, *, input_paths=None, test_support=False,
     cpu_profile = cpu_profiles.resolve(facts.device.cpu, facts.device.irq, backend,
                                        enum_abi=provider.ENUM_ABI)
     if backend == "threadx":
+        from tools.configure import threadx
         threadx.validate_platform(board, cpu_profile)
     validate_interrupt_profile(cpu_profile, provider)
     if assembly.clock_parameters is not None:
@@ -1659,7 +1660,7 @@ def configure(assembly, output, root=ROOT, *, test_support=False):
         dependencies.verify(initial_code_paths, initial_code_identity)
         code_paths, code_identity = dependencies.selected(
             initial_code_paths, initial_code_identity, family=result.soc_family,
-            context=result.provider_context)
+            context=result.provider_context, backend=result.backend)
         generate(result, temporary)
         (temporary / "input_paths.json").write_text(
             json.dumps(input_paths, indent=2, sort_keys=True) + "\n", encoding="utf-8")
