@@ -193,6 +193,7 @@ SDK_TOOL_FILES = (
     'tools/maintenance/source_catalogue.py',
     'tools/maintenance/st_usb_lock.py',
     'tools/maintenance/threadx_lock.py',
+    'tools/measurement/build_resources.py',
     'tools/measurement/elf.py',
     'tools/measurement/resources.py',
     'tools/measurement/retention.py',

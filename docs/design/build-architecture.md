@@ -7,7 +7,7 @@ source_language: zh_CN
 
 # 构建系统架构审查与重构方案
 
-本方案供应用开发者、SoC 接入者和构建维护者审查。审查基线是 Nexus 提交 `5e0b512c`。建议保留 CMake 3.31、Ninja、静态实例和现有应用入口，依次改进配置数据交接、增量失效和新 MCU 接入。下文的 BR1–BR7 给出实施范围与验收条件，B01–B11 规定验证流程和时间目标。[现行构建合同与验证计划](build-system.md#verification-plan-for-additional-mcu-families)
+本文说明应用如何生成固件、家族包如何接入器件，以及构建系统如何判断哪些工作需要重做。实现说明对应本次重构；计时表保留审查基线 `5e0b512c`，文末 28 项保留原计划与验收条件。日常反馈与完整交付分别按 B01–B11 验证。[构建合同与验证计划](build-system.md#verification-plan-for-additional-mcu-families)
 
 ## 从应用配置到可烧录镜像
 
@@ -22,12 +22,16 @@ source_language: zh_CN
 
 ```cmake
 find_package(Nexus CONFIG REQUIRED)
-nexus_add_firmware(app SOURCES src/main.c)
+nexus_add_firmware(app SOURCES main.c)
 ```
 
-## 实测成本与优化顺序
+**首次构建与热构建。** 准备锁定依赖和 ARM 工具链后，在平台仓库根目录运行 `cmake --preset stm32-qiming-baremetal`，再运行 `cmake --build --preset stm32-qiming-baremetal --target nexus_firmware`。之后修改源码或原地修改 assembly，只需重跑第二条命令。Ninja 会按输入变化重新配置、编译或链接。产物位于 `build/stm32-qiming-baremetal/bin/`。[环境准备](../guides/source-checkout.md) · [板卡 preset](../../cmake/presets/stm32.json)
 
-在独立构建目录运行 `stm32-qiming-baremetal` preset，以两个并行任务构建 `nexus_firmware`。首次 configure 针对 ControllerModes 开启了 CMake trace。下表是同一工作区的一次观察，包含主机缓存和跟踪开销。时间用于定位方向，后续产品验收应使用相同环境、无跟踪的重复样本。
+**外部应用。** 按教程生成最小 GPIO 工程，选择本地源码或已安装 SDK，然后执行模板输出的 CMake 命令。应用拥有 `assembly.toml` 和 `main.c`；更新时沿用应用自己的构建目录。[可执行的外部应用教程](../tutorials/source-sdk.md#public-path-create-the-minimal-gpio-consumer)
+
+## 历史基线与实测成本
+
+以下测量来自重构前的 `5e0b512c`。在独立构建目录用两个并行任务构建 `stm32-qiming-baremetal` 的 `nexus_firmware`，首次配置开启 ControllerModes 的 CMake trace。表中墙钟时间包含主机缓存和跟踪开销。
 
 | 观察项 | 实测 | 工程含义 |
 | --- | --- | --- |
@@ -40,19 +44,19 @@ nexus_add_firmware(app SOURCES src/main.c)
 
 相邻已验证基线的完整本地门禁耗时 30 分 04 秒，其中辅助工具约 28 分 45 秒。此处的 F407 构建只针对一个固件，两者的目标集合不同。日常驱动反馈 3 分钟、板卡反馈 5 分钟属于验证流水线的 P95 目标。配置优化的收益按 configure 时间、重配次数、编译及链接边数分别报告。[计时范围、工具分解及验收条件](build-system.md#verification-plan-for-additional-mcu-families)
 
-## 目标架构与修改边界
+## 当前架构与修改边界
 
-**选择事实只传一次。** 当前 F4 CMake 包含多个 IP 片段，`nexus_controller_values` 每次调用均读取 JSON 并遍历控制器。建议把构图实际消费的类别、控制器和模式按需投影进已有 `selection.cmake`，从同一 IR 一次生成。用经校验的标识、稳定顺序、空集和正确的 CMake 列表转义覆盖用户输入。CMake 继续拥有源码、目标、可见性与链接边。审查工具继续使用 `resolved.json`。先迁移 UART 与 SPI，核对编译命令和镜像，再迁移余下调用者。[现有查询](../../cmake/platform/ControllerModes.cmake) · [F4 构图入口](../../soc/stm32/stm32f4/CMakeLists.txt)
+**控制器选择。** resolver 从同一类型化 IR 生成 `selection.cmake`。其中 `NEXUS_SELECTED_CONTROLLERS` 按类别、物理控制器、模式编码；CMake 只索引一次，驱动按类别或指定控制器查询。空选择产生空列表。家族 CMake 决定编入哪些源码，`resolved.json` 供审查和产物校验。启明 F407 对照中，ControllerModes 的 JSON 读取从 35 次降为 0，44 条编译边和 ELF、BIN、map、资源报告逐字节一致。三次无跟踪热配置的中位数从 3.332 秒降至 2.723 秒。[生成投影](../../tools/configure/emission.py) · [模式查询](../../cmake/platform/ControllerModes.cmake) · [F4 构图入口](../../soc/stm32/stm32f4/CMakeLists.txt)
 
-**让构建合同可见。** 根入口当前将 11 个环境和启动属性发布给固件函数，消费端再分别读取并检查其中 5 个必需属性。应在现有模块中集中定义这项内部合同，区分通用必需项、物理目标必需项及可选项。API、编译定义与头目录按实际消费者使用 PUBLIC、PRIVATE 或 INTERFACE。厂商头和启动宏只进入需要它们的目标。验证直接属性之外，还应实际编译外部消费者，以检查经依赖传递的使用要求。[目标发布端](../../CMakeLists.txt) · [固件消费端](../../cmake/platform/Firmware.cmake)
+**平台与固件目标。** `Firmware.cmake` 集中定义 5 个必需属性和 6 个可选属性，平台发布端与固件消费端共用同一份清单。物理 provider 另检查启动输入、源文件和包含目录。外部应用通过 `nexus_add_firmware` 使用公共目标；厂商头和启动宏仅在需要的目标上生效。[固件属性合同](../../cmake/platform/Firmware.cmake) · [平台发布端](../../CMakeLists.txt) · [provider 校验](../../cmake/platform/Provider.cmake)
 
-**把失效范围交给真正的输入。** Board、芯片事实、binding 或解析器变化应重新求解；生成内容相同则保持文件时间戳。普通 C 变更使用编译器 depfile。链接脚本或实际对象变化触发链接。预算与检查器变化必须重新验证产物。当前固件把配置实现文件也列为链接依赖，直接删去依赖会让部分检查丢失。应先用产物缺失、预算缩紧、解析器改动但生成内容相同、链接脚本实际变化四种情形验证，再缩小依赖。工作区与外部示例的热构建均应保留路径切换、失败恢复及并发隔离。[固件依赖和产物](../../cmake/platform/Firmware.cmake) · [当前门禁入口](../../scripts/ci/tdd_gate.py)
+**增量与预算。** CMake 跟踪板卡、器件事实和解析器输入；生成内容相同的文件保留时间戳。Ninja 用 depfile 确定受 C 或头文件修改影响的对象。对象或链接脚本变化会重新链接。预算或检查器变化时先复查已有 ELF；通过时复用镜像，失败时由实际链接和链接后预算检查给出最终结果。直接构建同一固件目标也会重建缺失的 BIN、map 或资源报告。[固件图](../../cmake/platform/Firmware.cmake) · [已有 ELF 复查](../../cmake/platform/RecheckFirmware.cmake) · [挂钩入口](../../scripts/ci/tdd_gate.py)
 
-**让新增 MCU 的修改留在所属包。** 同家族同 IP 的新型号通常增加型号、封装、内存、路由、启动与 SDK 身份；复用家族 CMake 和驱动。新 IP 在所属家族增加驱动、binding、局部选编和合同测试。新厂商包提供自己的 facts、provider 目标、startup 和 SDK 清单。新架构或 ABI 才涉及 Arch 或工具链扩展。当前生成器存在 STM32 专用选项，SDK 的必备文件检查还直接列出 F407 头及启动文件。把这些假设移入选中包的元数据，以另一款 F4 和外置 provider 分别检验同家族与跨包接入成本。[生成器](../../tools/configure/emission.py) · [SDK 打包与校验](../../cmake/package/package_source_sdk.py) · [provider 接入](../guides/provider-porting.md)
+**新增 MCU 或板卡。** 同一家族复用同一 IP 时，先在包中登记精确型号、封装、内存、引脚路由以及厂商头和启动文件，再用板卡 assembly 解析、交叉链接并从搬迁的 SDK 构建外部应用。STM32F4 的器件目录提供精确厂商路径；家族 CMake 和 SDK 校验器消费包声明。只换 PCB 接线时修改 Board；新 IP 由家族补驱动与 binding，新架构或 ABI 再扩展 Arch 或工具链。[接入步骤](../guides/provider-porting.md) · [F4 包入口](../../soc/stm32/stm32f4/package.json) · [精确器件目录](../../soc/stm32/stm32f4/facts/devices.json) · [SDK 打包](../../cmake/package/package_source_sdk.py)
 
-**简化入口和组件登记。** 根文件保留配置、层级、provider、平台和可选开发入口。工作负载、度量或测试接线移回已有的 Workload 或 tests 所属位置。组件公共标识属于配置合同，标识到目标的映射和依赖属于 CMake。标准 CMake 调用保留在所属叶目录。组件目录使用 EXCLUDE_FROM_ALL 仍会被配置，应先计时，再决定是否延迟加载，并验证手动链接公共组件的现有用法。[组件装配](../../cmake/platform/Components.cmake) · [组件入口](../../components/CMakeLists.txt) · [工作负载](../../cmake/platform/Workload.cmake)
+**根入口与组件。** 根 CMake 装配平台层级与 provider，按开关加入工作负载和测试。Workload 模块持有工作负载接线，组件叶目录持有目标和依赖，外部应用仍可显式链接公共组件。实测最小配置中加载组件目录三次耗时 14–17 毫秒，本轮保留直接加载。每个固件单独拥有启动对象、链接和预算验收，以支持同目录多个固件目标。[组件装配](../../cmake/platform/Components.cmake) · [组件入口](../../components/CMakeLists.txt) · [工作负载](../../cmake/platform/Workload.cmake)
 
-以下是目标职责布局，绝大多数目录已存在。日常接入按修改的责任定位文件。应用作者只需学习 preset、TOML 与固件函数；平台维护者才需要进入后面的工具和模块。
+下表按维护职责定位代码。应用开发者主要使用 preset、TOML 和固件函数，移植者按变化所属层修改。
 
 | 目录 | 维护职责 |
 | --- | --- |
@@ -70,7 +74,7 @@ nexus_add_firmware(app SOURCES src/main.c)
 - **ESP-IDF** 让组件区分公开和私有依赖，能从消费端判断哪些头及编译要求应传递。Nexus 可直接用 CMake 目标表达同一原则，把厂商 includes、HAL 定义与启动参数留在 provider 内。验证用最小外部应用，直接检查其编译命令和包含可见性。[ESP-IDF v5.4.2 组件依赖](https://github.com/espressif/esp-idf/blob/v5.4.2/docs/en/api-guides/build-system.rst#L448-L474)
 - **CMake 与 Ninja** 分别提供工具链边界、重新配置依赖、输出与副产物规则，以及目标增量执行。Nexus 的脚本负责准备环境、选择测试、报告结果。热路径优先调用已配置的目标，保持原生命令和应用 API 相同的产物保证。[CMake 3.31 工具链](https://cmake.org/cmake/help/v3.31/manual/cmake-toolchains.7.html#cross-compiling) · [重新配置依赖](https://cmake.org/cmake/help/v3.31/prop_dir/CMAKE_CONFIGURE_DEPENDS.html) · [产物声明](https://cmake.org/cmake/help/v3.31/command/add_custom_command.html) · [Ninja 1.12.1 依赖](https://github.com/ninja-build/ninja/blob/v1.12.1/doc/manual.asciidoc#L638-L659)
 
-## 迭代任务与验收
+## 原计划的工作包与验收条件
 
 1. **BR1，基线与回归样本。** 构建维护者先冻结一组小样本，包括 F407 裸机、同板 RTOS、Native、独立 CPU Runtime 和搬迁后的 Source SDK。记录 revision、工具版本、并行度及冷热条件，分别测 configure、首次构建、无修改、单 C 文件和只改 TOML。沿用 B01 的报告；以 Ninja 实际执行、map、Flash/RAM 和产物身份建立比较基准。
 2. **BR2，收敛根入口与目标合同。** 在 BR1 后提取工作负载和测试装配，集中生产与消费端共同使用的属性；保留原生 preset、目标别名和应用函数。用真实消费者覆盖缺 startup、缺必需目标、应用请求 C++、Native 及 Runtime。编译器和工具按启用语言或实际度量需求查找。退出条件是等价配置的 ABI、向量、段布局和资源预算一致，应用编译命令不暴露厂商私有目录。
@@ -84,7 +88,7 @@ nexus_add_firmware(app SOURCES src/main.c)
 
 ## 可独立验收的任务清单
 
-以下 28 项细化 BR1–BR7。首批交付 BR1 和 BR4.1，配置维护者同时推进 BR3，验证维护者同步推进 BR7.1–BR7.3。BR7.3 的影响范围切换依赖 BR7.1。BR5.2 的正式切换依赖 BR7.1 和 BR7.4，BR5.3 的完整验收还需 BR7.3。相邻任务可合为一次提交，每次提交都要保留可运行的入口与适用的失败用例。
+以下 28 项记录原计划的顺序、依赖和退出条件，可用于复核交付。基线测量与上文的当前实现分别记录；任务中的将来时和基线数字保留立项时的含义。时间目标需由对应场景的重复样本验收。
 
 ### BR1 建立可比较的起点
 

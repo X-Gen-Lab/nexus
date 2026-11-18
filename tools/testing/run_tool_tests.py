@@ -32,6 +32,8 @@ INSTALLER_TESTS = ("scripts/ci/test_install_dev_tools.py",
 CMAKE_TESTS = ("tools/testing/test_cmake_helpers.py",
                "tools/testing/test_io_source_selection.py",
                "tools/configure/tests/test_incremental_consumer.py")
+FIRMWARE_RESOURCE_TESTS = ("tests/contracts/test_build_artifacts.py",
+                           "tests/contracts/test_measurement_resources.py")
 FACT_TESTS = ("tools/testing/test_build_impact.py",
               "tools/configure/tests/test_resource_graph.py")
 DEVELOPMENT_INPUTS = {
@@ -70,11 +72,12 @@ COMMIT_ALIASES = {
     "cmake/package/verify_consumers.py": ("tools/testing/test_sdk_verification_call.py",),
     "tools/dev/timings.py": ("tools/testing/test_dev_timings.py",),
     "tools/dev/projects.py": ("tools/testing/test_dev_projects.py",),
-    "tools/measurement/resources.py": ("tests/contracts/test_build_artifacts.py",
-                                       "tests/contracts/test_measurement_resources.py"),
-    "tools/measurement/elf.py": ("tests/contracts/test_build_artifacts.py",
-                                 "tests/contracts/test_measurement_resources.py",
-                                 "tests/contracts/test_image_artifacts.py"),
+    **dict.fromkeys(("tools/measurement/resources.py", "tools/measurement/build_resources.py"),
+                    FIRMWARE_RESOURCE_TESTS),
+    "tools/measurement/elf.py": FIRMWARE_RESOURCE_TESTS + ("tests/contracts/test_image_artifacts.py",),
+    "tools/testing/arm_links.py": ("tools/testing/test_affected_arm_links.py",
+                                  "tools/testing/test_tdd_gate.py"),
+    "scripts/ci/reference_matrix.py": (".github/workflows/test_platform_ci.py",),
     "tools/measurement/compare.py": ("tests/contracts/test_measurement_compare.py",),
     "tools/maintenance/capabilities.py": ("tools/testing/test_maintenance.py",),
     "tests/support/external_provider/provider/nexus-soc.json": (
@@ -187,6 +190,11 @@ def commit_tool_plan(names):
                     suffix in {".json", ".toml"} and
                     name.startswith(("soc/", "boards/", "tests/support/native/"))):
                 files = FACT_TESTS
+                if name.startswith("boards/"):
+                    from tools.configure.tests import BOARD_FACT_CONTRACTS
+                    files += tuple(f"{SUITES['configure']}/{module}"
+                                   for module, inputs in BOARD_FACT_CONTRACTS.items()
+                                   if name in inputs)
         if (files is None and name.startswith(".github/workflows/")
                 and Path(name).suffix in {".yml", ".yaml"}):
             files = (".github/workflows/test_platform_ci.py",

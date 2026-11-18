@@ -23,6 +23,58 @@ function(_nexus_firmware_properties required optional)
     )
 endfunction()
 
+# Bind the configuration once per platform. The independent measurement CLI
+# keeps replaying authoring, including when a consumer replaces the checker.
+function(_nexus_firmware_checker output support)
+    set(checker "${NEXUS_SOURCE_DIR}/tools/measurement/resources.py")
+    cmake_path(GET CMAKE_CURRENT_FUNCTION_LIST_DIR PARENT_PATH cmake_dir)
+    cmake_path(GET cmake_dir PARENT_PATH owner)
+    if(
+        NOT NEXUS_SOURCE_DIR STREQUAL owner
+        OR EXISTS "${NEXUS_SOURCE_DIR}/.nexus-source-sdk.json"
+    )
+        set(${output} "${checker}" PARENT_SCOPE)
+        return()
+    endif()
+    set(driver "${NEXUS_SOURCE_DIR}/tools/measurement/build_resources.py")
+    get_property(
+        anchor
+        TARGET Nexus::Platform
+        PROPERTY NEXUS_FIRMWARE_PROJECTION
+    )
+    if(NOT anchor)
+        set_property(
+            DIRECTORY
+            APPEND
+            PROPERTY
+                CMAKE_CONFIGURE_DEPENDS
+                    "${driver}"
+                    "${checker}"
+                    "${NEXUS_SOURCE_DIR}/tools/measurement/elf.py"
+                    "${NEXUS_SOURCE_DIR}/tools/evidence/common.py"
+                    "${NEXUS_SOURCE_DIR}/tools/evidence/identity.py"
+        )
+        set(options)
+        if(support)
+            list(APPEND options --allow-reference)
+        endif()
+        execute_process(
+            COMMAND
+                "${Python3_EXECUTABLE}" -B "${driver}" --bind
+                "${NEXUS_CONFIG_DIR}/resolved.json" ${options}
+            COMMAND_ERROR_IS_FATAL ANY
+            OUTPUT_VARIABLE anchor
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+        )
+        get_target_property(platform Nexus::Platform ALIASED_TARGET)
+        set_property(
+            TARGET "${platform}"
+            PROPERTY NEXUS_FIRMWARE_PROJECTION "${anchor}"
+        )
+    endif()
+    set(${output} "${driver};${anchor}" PARENT_SCOPE)
+endfunction()
+
 function(nexus_add_firmware target)
     foreach(keyword SOURCES LIBRARIES)
         set(keyword_count 0)
@@ -153,9 +205,15 @@ function(nexus_add_firmware target)
         set(checker "${NEXUS_SOURCE_DIR}/tools/measurement/resources.py")
         set(image "$<TARGET_FILE_DIR:${target}>/$<TARGET_FILE_NAME:${target}>")
         set(recheck "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/RecheckFirmware.cmake")
+        get_property(
+            test_support
+            TARGET Nexus::Config
+            PROPERTY NEXUS_TEST_SUPPORT
+        )
+        _nexus_firmware_checker(checker_command "${test_support}")
         set(check_arguments
             -B
-            "${checker}"
+            ${checker_command}
             --elf
             "${image}"
             --resolved
@@ -166,6 +224,9 @@ function(nexus_add_firmware target)
             --report
             "${resources}"
         )
+        if(test_support)
+            list(APPEND check_arguments --allow-reference)
+        endif()
         add_custom_command(
             OUTPUT "${stamp}"
             COMMAND
@@ -177,6 +238,7 @@ function(nexus_add_firmware target)
                 "${checker}"
                 "${NEXUS_CONFIG_DIR}/resolved.json"
                 "${NEXUS_CONFIG_DIR}/input_paths.json"
+                "${NEXUS_CONFIG_DIR}/generator-identity.json"
                 "${NEXUS_CONFIG_DIR}/resource-budget.json"
                 "${NEXUS_SOURCE_DIR}/tools/measurement/elf.py"
                 "${NEXUS_SOURCE_DIR}/tools/evidence/common.py"
@@ -188,19 +250,35 @@ function(nexus_add_firmware target)
         )
         add_custom_target(${target}_nexus_budget_inputs DEPENDS "${stamp}")
         add_dependencies(${target} ${target}_nexus_budget_inputs)
+        set(finalize
+            "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/FinalizeFirmware.cmake"
+        )
         set_property(
             TARGET ${target}
             APPEND
-            PROPERTY LINK_DEPENDS "${NEXUS_CONFIG_DIR}/memory.ld" "${stamp}"
+            PROPERTY
+                LINK_DEPENDS
+                    "${NEXUS_CONFIG_DIR}/memory.ld"
+                    "${stamp}"
+                    "${finalize}"
+        )
+        # A terminated link cannot retain its previous publishable byproducts.
+        add_custom_command(
+            TARGET ${target}
+            PRE_LINK
+            COMMAND "${CMAKE_COMMAND}" -E rm -f "${binary}" "${resources}"
+            VERBATIM
         )
         add_custom_command(
             TARGET ${target}
             POST_BUILD
             BYPRODUCTS "${binary}" "${map}" "${resources}"
             COMMAND
-                "${CMAKE_OBJCOPY}" -O binary "$<TARGET_FILE:${target}>"
-                "${binary}"
-            COMMAND "${Python3_EXECUTABLE}" ${check_arguments}
+                "${CMAKE_COMMAND}" "-Dimage=${image}" "-Dbinary=${binary}"
+                "-Dmap=${map}" "-Dreport=${resources}"
+                "-Dobjcopy=${CMAKE_OBJCOPY}"
+                "-Dcommand=${Python3_EXECUTABLE};${check_arguments}" -P
+                "${finalize}"
             VERBATIM
         )
     endif()

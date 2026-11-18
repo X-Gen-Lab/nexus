@@ -7,6 +7,7 @@ from pathlib import Path
 import subprocess
 import tempfile
 import unittest
+from unittest.mock import patch
 
 from tools.testing import build_impact
 
@@ -91,6 +92,38 @@ class HardwareImpactTests(unittest.TestCase):
         self.assertEqual(selected["assemblies"], [assembly])
         self.assertTrue(selected["fallbacks"])
 
+    def test_new_family_keeps_f4_negative_receipts_and_unknown_additions_expire_them(self):
+        uart = "soc/st/f4/drivers/uart.c"
+        self.write(uart, "int uart;\n")
+        self.assembly("alpha-uart", "alpha")
+        self.git("add", ".")
+        self.git("commit", "-qm", "F4 UART and empty assemblies")
+        tree = self.git("rev-parse", "HEAD^{tree}")
+        empty = "tools/configure/assemblies/alpha.toml"
+        selected = "tools/configure/assemblies/alpha-uart.toml"
+        for assembly, inputs in ((empty, [empty]), (selected, [selected, uart])):
+            graph = build_impact._receipt_path(self.root, assembly)
+            graph.parent.mkdir(parents=True)
+            graph.write_text(json.dumps({
+                "tree": tree, "schema": 1, "assembly": assembly, "inputs": inputs,
+                "sha256": hashlib.sha256("\0".join(inputs).encode()).hexdigest(),
+            }))
+        self.write("soc/other/f3/package.json", '{"family":"f3"}')
+        self.write("soc/other/f3/CMakeLists.txt", "# independently selected\n")
+        self.write("soc/other/f3/driver.c", "int other;\n")
+        self.write("boards/gamma/board.json", '{"soc":"f3-part","soc_family":"f3"}')
+        self.write("boards/gamma/init.c", "int board;\n")
+        self.assembly("gamma", "gamma")
+        self.git("add", ".")
+        self.git("commit", "-qm", "Register independent family, board and assembly")
+        self.write(uart, "int uart = 1;\n")
+        self.assertEqual(build_impact.plan_hardware(self.root, [uart])["assemblies"], [selected])
+        self.write("core/pin_binding.h", "#define PIN 1\n")
+        self.git("add", "core")
+        self.git("commit", "-qm", "A new shared header may change include lookup")
+        self.assertEqual(build_impact.plan_hardware(self.root, [uart])["assemblies"],
+                         [selected, empty])
+
     def test_new_manifest_with_duplicate_family_fails_catalogue_validation(self):
         self.write("soc/other/conflict/package.json",
                    '{"family":"f4","scope":"production"}')
@@ -129,11 +162,25 @@ class HardwareImpactTests(unittest.TestCase):
         (directory / "generated").mkdir()
         for name in ("input_paths", "configuration_code_paths"):
             (directory / "generated" / (name + ".json")).write_text("{}")
+        alias = directory / "header-link"
+        alias.symlink_to(self.root / header)
+        (directory / "generated/input_paths.json").write_text(json.dumps({
+            "header": str(self.root / header), "alias": alias.name,
+            "unowned": str(Path("/usr/include")), "generated": "CMakeCache.txt"}))
         self.git("add", ".")
         tree = self.git("write-tree")
         subprocess.run([ninja, "nexus_firmware"], cwd=directory,
                        capture_output=True, check=True)
-        self.assertTrue(build_impact.record_hardware_inputs(self.root, assembly, directory, tree))
+        resolutions = []
+        resolve = Path.resolve
+
+        def measured(path, *args, **kwargs):
+            resolutions.append(path)
+            return resolve(path, *args, **kwargs)
+
+        with patch.object(Path, "resolve", measured):
+            self.assertTrue(build_impact.record_hardware_inputs(self.root, assembly, directory, tree))
+        self.assertEqual(resolutions.count(self.root / header), 1)
         actual = json.loads((directory / "nexus-target-inputs.json").read_bytes())["inputs"]
         self.assertEqual(actual, sorted((source, header)))
         (directory / ".ninja_deps").unlink()

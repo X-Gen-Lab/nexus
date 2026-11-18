@@ -9,6 +9,8 @@ python tools/testing/run_tool_tests.py --suite testing --report build/quality/to
 
 普通固件实现提交执行完整 Native GoogleTest，不触发整套辅助工具域。公共头、声明事实
 和工具改动按 `run_tool_tests.py` 选择完整相关测试模块；未知或缺少已知覆盖则执行完整域。
+板级电气合同的完整测试模块在 `tools/configure/tests/__init__.py` 的
+`BOARD_FACT_CONTRACTS` 声明所用板级事实文件。新增专属合同只需在测试侧登记。
 提交范围标记 `commit-tools`、`qualification=false`；完整 `--all` 验收在合并前独立执行。
 完整 CI 分别运行 testing、configure、ci、
 workflows、contracts、freertos。工具测试不按 Native 编译模式重复。

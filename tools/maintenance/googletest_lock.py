@@ -119,16 +119,12 @@ def verify(source, lock_path):
             git(source, "config", "--get-all", "remote.origin.url") != approved_fetch or
             git(source, "status", "--porcelain", "--untracked-files=all")):
         raise ValueError("GoogleTest source identity changed during verification")
-    parent_index = Path(git(root, "rev-parse", "--git-path", "index",
-                            parent_index=True))
-    if not parent_index.is_absolute():
-        parent_index = root / parent_index
     # Track identity-bearing files, never a directory changed by index.lock.
     # Exact optional-file probes also observe a packed branch gaining a loose
     # ref, or a checkout marker changing between directory and gitfile forms.
     probes = [*cmsis_device_lock.git_identity_inputs(source, observe=git),
               root / ".git"]
-    inputs = [parent_index, *[path for path in probes if path.is_file()]]
+    inputs = [path for path in probes if path.is_file()]
     return {"commit": lock["commit"], "version": lock["version"],
             "source_kind": "git_submodule", "license": lock["license"],
             "configure_inputs": [str(regular(path).resolve()) for path in inputs],
@@ -140,6 +136,8 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source", required=True, type=Path)
     parser.add_argument("--lock", required=True, type=Path)
+    parser.add_argument("--quiet", action="store_true",
+                        help="verify without emitting configuration metadata")
     args = parser.parse_args(argv)
     try:
         result = verify(args.source, args.lock)
@@ -147,7 +145,8 @@ def main(argv=None):
             subprocess.SubprocessError) as error:
         print("GoogleTest source rejected: " + str(error), file=sys.stderr)
         return 1
-    print(json.dumps(result, sort_keys=True))
+    if not args.quiet:
+        print(json.dumps(result, sort_keys=True))
     return 0
 
 

@@ -57,9 +57,11 @@ class GoogleTestSubmoduleTests(unittest.TestCase):
         self.git(self.root, "commit", "--quiet", "-m", "parent fixture")
         self.git(self.root, "submodule", "absorbgitdirs", "ext/googletest")
 
-    def git(self, directory, *arguments):
+    def git(self, directory, *arguments, index=None):
         environment = {key: value for key, value in os.environ.items()
                        if not key.startswith("GIT_")}
+        if index is not None:
+            environment["GIT_INDEX_FILE"] = str(index)
         environment.update({"GIT_AUTHOR_NAME": "GoogleTest fixture",
             "GIT_AUTHOR_EMAIL": "fixture@example.invalid",
             "GIT_COMMITTER_NAME": "GoogleTest fixture",
@@ -360,6 +362,33 @@ class GoogleTestSubmoduleTests(unittest.TestCase):
         rejected = self.build()
         self.assertNotEqual(rejected.returncode, 0, rejected.stdout + rejected.stderr)
         self.assertIn("checkout origin differs", rejected.stdout + rejected.stderr)
+
+    def test_staging_an_unrelated_file_preserves_the_native_build_graph(self):
+        configured = self.configure(ninja=True)
+        self.assertEqual(configured.returncode, 0, configured.stderr)
+        self.assertEqual(self.build().returncode, 0)
+        (self.root / "driver.c").write_text("int unrelated;\n")
+        self.git(self.root, "add", "driver.c")
+        built = self.build()
+        self.assertEqual(built.returncode, 0, built.stdout + built.stderr)
+        self.assertEqual(self.configure_count(), 1, built.stdout + built.stderr)
+
+    def test_warm_build_checks_active_parent_index_and_unstaged_dependency_edits(self):
+        configured = self.configure(ninja=True)
+        self.assertEqual(configured.returncode, 0, configured.stderr)
+        self.assertEqual(self.build().returncode, 0)
+        alternate = self.root / "alternate-index"
+        shutil.copyfile(self.root / ".git/index", alternate)
+        self.git(self.root, "update-index", "--cacheinfo", "160000", "a" * 40,
+                 "ext/googletest", index=alternate)
+        with patch.dict(os.environ, {"GIT_INDEX_FILE": str(alternate)}):
+            result = self.build()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("parent index gitlink differs", result.stdout + result.stderr)
+        (self.source / "LICENSE").write_text("unreviewed source edit\n")
+        result = self.build()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("checkout is dirty", result.stdout + result.stderr)
 
     def test_parent_index_gitlink_change_reruns_source_admission(self):
         result = self.configure(ninja=True)

@@ -168,17 +168,44 @@ def _receipt_path(root, assembly):
     return root / "build/affected-arm" / PurePosixPath(assembly).with_suffix("") / _GRAPH
 
 
-def _unrelated(path, status, inputs, board):
+def _added_package_inputs(root, previous, changes, inventory):
+    """Identify new, disjoint package directories and their explicitly authored consumers."""
+    added = {name for name, status in changes if status == "A"}
+    packages = {row["package"] for row in inventory.values() if row["package"]}
+    roots = {package: package for package in packages
+             if package + "/package.json" in added and not any(
+                 package.startswith(other + "/") for other in packages if other != package)}
+    if not roots:
+        return {}
+    boards = {str(PurePosixPath(row["board"]).parent): row["package"]
+              for row in inventory.values() if row["package"] in roots and
+              row["board"] in added and row["board"].startswith("boards/")}
+    directories = roots | boards
+    # A newly added manifest in an already shared directory cannot establish isolation.
+    existing = {os.fsdecode(name) for name in _git(
+        root, "ls-tree", "-z", "--name-only", previous, "--", *directories).split(b"\0") if name}
+    packages = set(roots) - existing
+    owned = {name: row["package"] for name, row in inventory.items()
+             if name in added and row["package"] in packages}
+    for directory, package in directories.items():
+        if directory not in existing and package in packages:
+            owned.update((name, package) for name in added if name.startswith(directory + "/"))
+    return owned
+
+
+def _unrelated(path, status, inputs, context, added_owner):
     if path in inputs:
         return False
+    if added_owner and context["package"] and added_owner != context["package"]:
+        return True
     if path.startswith("docs/") or PurePosixPath(path).suffix in {".md", ".rst"}:
         return True
-    if path.startswith("boards/") and path != board:
+    if status != "D" and path.startswith("boards/") and path != context["board"]:
         return PurePosixPath(path).suffix in {".toml", ".json"}
     return status == "M" and PurePosixPath(path).suffix.lower() in _SOURCE_SUFFIXES
 
 
-def _dependencies(root, assembly, tree, differences, board):
+def _dependencies(root, assembly, tree, differences, inventory):
     try:
         record = json.loads(_receipt_path(root, assembly).read_bytes())
         inputs = record["inputs"]
@@ -192,10 +219,13 @@ def _dependencies(root, assembly, tree, differences, board):
                 if previous not in differences:
                     raw = _git(root, "diff", "--no-renames", "--name-status", "-z",
                                previous, tree, "--").split(b"\0")[:-1]
-                    differences[previous] = [(os.fsdecode(name), status.decode())
-                                             for status, name in zip(raw[::2], raw[1::2])]
-                if not all(_unrelated(path, status, inputs, board)
-                           for path, status in differences[previous]):
+                    changes = [(os.fsdecode(name), status.decode())
+                               for status, name in zip(raw[::2], raw[1::2])]
+                    differences[previous] = (changes, _added_package_inputs(
+                        root, previous, changes, inventory))
+                changes, owners = differences[previous]
+                if not all(_unrelated(path, status, inputs, inventory[assembly], owners.get(path))
+                           for path, status in changes):
                     return None
             return inputs
     except (FileNotFoundError, KeyError, TypeError, ValueError, subprocess.CalledProcessError):
@@ -252,8 +282,7 @@ def plan_hardware(root, paths, *, base="HEAD"):
             elif shared or (owner and any(owner == row["package"] for row in contexts)):
                 if source and same_graph:
                     if assembly not in graph:
-                        graph[assembly] = _dependencies(root, assembly, tree, differences,
-                                                        new[assembly]["board"])
+                        graph[assembly] = _dependencies(root, assembly, tree, differences, old)
                     if graph[assembly] is not None:
                         if path not in graph[assembly]:
                             continue
@@ -288,18 +317,13 @@ def record_hardware_inputs(root, assembly, build, tree):
         return subprocess.check_output([ninja[1], "-t", *args], cwd=build,
                                        text=True, timeout=60)
 
-    inputs, objects = set(), set()
-
-    def add(value):
-        file = (build / value).resolve()
-        if file.is_relative_to(root) and not file.is_relative_to(root / "build"):
-            inputs.add(file.relative_to(root).as_posix())
+    spellings, objects = set(), set()
 
     for command in tool("commands", "nexus_firmware").splitlines():
         argv = shlex.split(command)
         if "-c" in argv and "-o" in argv:
             objects.add(argv[argv.index("-o") + 1])
-            add(argv[argv.index("-c") + 1])
+            spellings.add(argv[argv.index("-c") + 1])
     if not objects:
         return False
     found = set()
@@ -307,7 +331,7 @@ def record_hardware_inputs(root, assembly, build, tree):
         if not line:
             continue
         if line.startswith("    "):
-            add(line[4:])
+            spellings.add(line[4:])
         else:
             output, marker, details = line.partition(": #deps ")
             if not marker or not details.endswith("(VALID)"):
@@ -318,9 +342,12 @@ def record_hardware_inputs(root, assembly, build, tree):
     # Configuration facts may live outside the board tree. A subsequent change
     # to any of them invalidates negative compiler evidence for this image.
     for manifest in ("input_paths", "configuration_code_paths"):
-        for value in json.loads((build / "generated" / (manifest + ".json")).read_text()).values():
-            add(value)
-    ordered = sorted(inputs)
+        spellings.update(json.loads((build / "generated" / (manifest + ".json")).read_text()).values())
+    # Most translation units share CMSIS and generated headers. Resolve each
+    # spelling once; distinct relative paths and symlinks retain their meaning.
+    files = {(build / value).resolve() for value in spellings}
+    ordered = sorted(file.relative_to(root).as_posix() for file in files
+                     if file.is_relative_to(root) and not file.is_relative_to(root / "build"))
     data = {"schema": 1, "tree": tree, "assembly": assembly, "inputs": ordered,
             "sha256": hashlib.sha256("\0".join(ordered).encode()).hexdigest()}
     with tempfile.NamedTemporaryFile(mode="w", dir=build, delete=False) as output:

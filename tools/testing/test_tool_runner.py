@@ -323,18 +323,33 @@ class ChangedDomainTests(unittest.TestCase):
         self.assertEqual(plan, {"configure": (
             "tools/configure/tests/test_external_package.py",)})
 
-    def test_production_board_facts_keep_the_small_complete_module_plan(self):
-        plan = run_tool_tests.commit_tool_plan([
-            "boards/stm32f407zg_qiming_v41/board.json"])
-        self.assertEqual(plan["testing"], ("tools/testing/test_build_impact.py",))
-        self.assertTrue(plan["configure"])
-        self.assertNotIn(None, plan.values())
+    def test_board_wiring_selects_its_declared_electrical_contract(self):
+        contract = "tools/configure/tests/test_qiming_board_facts.py"
+        for board in ("stm32f407zg_qiming_core", "stm32f407zg_qiming_v41",
+                      "stm32f407ve_sky_qingchun"):
+            with self.subTest(board=board):
+                plan = run_tool_tests.commit_tool_plan([f"boards/{board}/board.json"])
+                self.assertEqual(plan["testing"], ("tools/testing/test_build_impact.py",))
+                self.assertEqual(contract in plan["configure"], "qiming" in board)
+                self.assertNotIn(None, plan.values())
 
-    def test_actual_arm_checker_change_runs_direct_firmware_and_elf_contracts(self):
-        for path in ("tools/measurement/resources.py", "tools/measurement/elf.py"):
-            plan = run_tool_tests.commit_tool_plan([path])
-            self.assertIn("tests/contracts/test_build_artifacts.py", plan["contracts"])
-            self.assertIn("tests/contracts/test_measurement_resources.py", plan["contracts"])
+    def test_build_helpers_run_their_actual_firmware_and_workflow_contracts(self):
+        budgets = {"tests/contracts/test_build_artifacts.py",
+                   "tests/contracts/test_measurement_resources.py"}
+        cases = {
+            "tools/measurement/resources.py": ("contracts", budgets),
+            "tools/measurement/build_resources.py": ("contracts", budgets),
+            "tools/measurement/elf.py": ("contracts", budgets | {
+                "tests/contracts/test_image_artifacts.py"}),
+            "scripts/ci/reference_matrix.py": ("workflows", {
+                ".github/workflows/test_platform_ci.py"}),
+            "tools/testing/arm_links.py": ("testing", {
+                "tools/testing/test_affected_arm_links.py", "tools/testing/test_tdd_gate.py"}),
+        }
+        for path, (domain, modules) in cases.items():
+            with self.subTest(path=path):
+                self.assertEqual(run_tool_tests.commit_tool_plan([path]),
+                                 {domain: tuple(sorted(modules))})
 
     def test_sdk_device_fixture_avoids_unrelated_global_checks(self):
         plan = run_tool_tests.commit_tool_plan([

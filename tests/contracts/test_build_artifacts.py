@@ -55,6 +55,7 @@ class ArtifactBuildTests(unittest.TestCase):
                 f'set(NEXUS_ASSEMBLY_FILE "{assembly.as_posix()}")\n'
                 f'add_subdirectory("{ROOT.as_posix()}" nexus-owned)\n'
                 'nexus_add_stm32f4_sleep(platform_sleep)\n'
+                'nexus_add_firmware(graph_app SOURCES main.c LIBRARIES platform_sleep)\n'
                 f'set_property(TARGET nexus_platform PROPERTY NEXUS_SOURCE_DIR '
                 f'"{checker.as_posix()}")\n'
                 'nexus_add_firmware(app SOURCES main.c LIBRARIES platform_sleep)\n'
@@ -136,8 +137,10 @@ class ArtifactBuildTests(unittest.TestCase):
             failed = compile_application(success=False)
             self.assertIn("ELF budget: failed", failed.stdout)
             self.assertEqual(json.loads(artifacts[-1].read_text())["status"], "failed")
+            for artifact in artifacts[:-1]:
+                self.assertFalse(artifact.exists(), f"Rejected image still published: {artifact}")
             budget.write_bytes(original_budget)
-            compile_application()
+            self.assertIn("Linking C executable", compile_application().stdout)
             final_report = json.loads(artifacts[-1].read_text())
             self.assertEqual(final_report["status"], "passed")
             compile_commands = json.loads((build / "compile_commands.json").read_text())
@@ -171,6 +174,23 @@ class ArtifactBuildTests(unittest.TestCase):
             compile_application(success=False)
             board.write_bytes(board_bytes)
             compile_application()
+            # An ordinary relink checks the static identity in the generated
+            # command, even if a modified projection retained its Ninja mtime.
+            def graph_build(success=True):
+                return run(cmake, "--build", str(build), "--target", "graph_app",
+                           "--parallel", "2", success=success)
+            graph_build()
+            generated = build / "nexus-owned/generated/resolved.json"
+            original, times = generated.read_bytes(), generated.stat()
+            generated.write_bytes(original + b"\n")
+            os.utime(generated, ns=(times.st_atime_ns, times.st_mtime_ns))
+            header.write_text(header.read_text() + "\n/* relink application */\n")
+            graph_build(success=False)
+            graph_report = build / "bin/graph_app.resources.json"
+            self.assertIn("projection", json.loads(graph_report.read_bytes())["failure"])
+            self.assertFalse((build / "bin/graph_app.elf").exists())
+            generated.write_bytes(original)
+            self.assertIn("ELF budget: passed", graph_build().stdout)
             destination = os.environ.get("NEXUS_BUILD_CONTRACT_EVIDENCE_DIR")
             if destination:
                 output = Path(destination)
