@@ -1,6 +1,6 @@
 # Actual-POT messages; independently reviewed against this canonical source.
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: c1d210e3bc024652681472b35ee8c895a95f04ca5bcf5cf1fad07d734806cf6a\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: ba4136e4d6b80f0be66622ac498ef77d3924151b8e37a10f97b4649426375318\n"
 
 #: ../../../docs/design/build-system.md:1
 msgid "Build system maintenance contract"
@@ -467,3 +467,247 @@ msgstr ""
 
 msgid "Ordinary configure/build commands keep process logs and actual exits without creating a complete provenance archive. Explicit `--record-provenance` binds an image to its command-attempt receipt, source and configuration for device operations. Device admission still verifies that identity. Candidate-plan executions below are historical records; their retired orchestration is not a current acceptance mechanism. A shared latest report name cannot substitute for an exact attempt."
 msgstr "普通 configure／build 命令保留进程日志和真实退出码，不生成完整 provenance 归档。显式指定 `--record-provenance`，才为设备操作把映像绑定到命令执行回执、源码和配置。设备准入仍验证该身份。下文候选计划的执行属于历史记录，已退役的编排不再作为当前验收机制。共享的最近报告名称不能替代精确执行记录。"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:7
+msgid "See the [verification plan for additional MCU families](#verification-plan-for-additional-mcu-families) for proposed changes to commit checks, MCU onboarding and release verification."
+msgstr "[新增 MCU 家族的验证方案](#verification-plan-for-additional-mcu-families)列出了提交检查、MCU 接入和发布验证范围的拟议改动。"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:189
+msgid "Verification plan for additional MCU families"
+msgstr "新增 MCU 家族的验证方案"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:191
+msgid "This proposal starts at platform revision `a06bb94`. The active production package is STM32F4, with eight exact parts and four public boards. Each task below is open. Current commit and delivery rules apply until the corresponding policy, implementation and checks land together."
+msgstr "本方案以平台提交 `a06bb94` 为基线。当前生产包为 STM32F4，覆盖 8 个精确料号和 4 块公开板卡。以下任务均待实施。在相应策略、实现与检查一同合入之前，继续执行现有的提交和交付规则。"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:196
+msgid "Baseline and objectives"
+msgstr "基线与目标"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:198
+msgid "The recorded local gate took 30 min 04 s, including 28 min 45 s for four tool domains and about 18 s for Native GoogleTest discovery, execution and results. A separate diagnostic executed all 347 tool modules and 3,796 cases in 9 min 02 s with four workers. It consumed 2,096 CPU seconds. F4 peripheral tests, production build graphs and models, and SDK consumers used 513, 393 and 366 CPU seconds respectively. The original gate also shared the machine with other jobs. Use end-to-end wall time to evaluate developer latency and CPU time to identify repeated work."
+msgstr "已记录的本地门禁耗时 30 分 04 秒，其中四个工具域共 28 分 45 秒，Native GoogleTest 的发现、执行和结果记录约 18 秒。另一次诊断用 4 个 worker 执行了全部 347 个工具模块、3,796 个用例，墙钟耗时 9 分 02 秒，消耗 2,096 CPU 秒。其中 F4 外设测试占 513 CPU 秒，生产构建图与模型占 393 CPU 秒，SDK 消费者占 366 CPU 秒。原门禁运行时，机器上也有其他作业。以端到端墙钟时间衡量开发者的等待时间，以 CPU 时间定位重复工作。"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:207
+msgid "Proposed warm targets are p95 at or below 180 s for a driver implementation commit and 300 s for a single board change including its ARM link. Full SDK verification is independently budgeted. The recorded 51 consumers took 22 min 38 s with two workers. Adding an unrelated family should add no family tool modules, ARM targets or SDK consumers to an ordinary existing board commit. Full Native behavior tests still run on behavioral commits; measure their growth separately as families gain host models."
+msgstr "热构建的拟定目标是：驱动实现提交的 p95 不超过 180 秒，单板改动（含 ARM 链接）的 p95 不超过 300 秒。完整 SDK 验证单独计时；已有记录中，2 个 worker 验证 51 个消费者共用 22 分 38 秒。接入无关家族后，已有板卡的常规提交不应因此增加家族工具模块、ARM 目标或 SDK 消费者。行为改动仍执行完整 Native 行为测试；随着各家族增加主机模型，该部分耗时单独跟踪。"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:215
+msgid "How a changed input selects work"
+msgstr "如何根据输入变更选择验证工作"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:217
+msgid "Use the complete Git change, including both sides of renames, with the existing tool planner. Discover packages from manifests, boards from their declared family and exact part, and assemblies from their authored board selection. Invert the resolver's input lists for maintained assemblies. Translate local paths to package-relative identities. Use CMake targets, compiler header dependencies and the SDK consumer plan for software edges. Selection runs on the host; firmware continues to use static C instances and typed factories."
+msgstr "沿用现有工具选择器，读取完整的 Git 变更，包括重命名前后的路径。根据清单发现包，根据声明的家族和精确料号识别板卡，根据装配配置中填写的板卡识别装配。将解析器为受维护装配列出的输入反向索引，按包内相对路径标识本地文件。软件依赖来自 CMake 目标、编译器头文件依赖和 SDK 消费者计划。选择工作在主机上执行；固件继续使用静态 C 实例和类型化工厂。"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:0
+msgid "Changed input"
+msgstr "变更输入"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:0
+msgid "Smallest useful check"
+msgstr "最小有效检查"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:0
+msgid "Expand selection when"
+msgstr "需要扩大范围的情况"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:0
+msgid "Private driver source or header"
+msgstr "驱动私有源文件或头文件"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:0
+msgid "Full Native behavior plus an exact-part ARM link for affected hardware paths"
+msgstr "执行完整 Native 行为测试，并针对受影响的硬件路径链接精确料号的 ARM 目标"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:0
+msgid "A shared implementation or header reaches several packages or distinct compiler contexts"
+msgstr "共享实现或头文件影响多个包或不同的编译上下文"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:0
+msgid "Board pin, clock or connection"
+msgstr "板级引脚、时钟或连接"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:0
+msgid "Resolve every maintained assembly using that board, check resources and link the affected configurations represented by distinct hardware or backend paths"
+msgstr "解析使用该板卡的所有受维护装配，检查资源，并为涉及不同硬件路径或后端的受影响配置分别执行链接"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:0
+msgid "A shared clock, board dependency or ABI changes"
+msgstr "共享时钟、板卡依赖或 ABI 发生变化"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:0
+msgid "Part, route, IRQ, DMA or errata fact"
+msgstr "料号、路由、IRQ、DMA 或勘误事实"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:0
+msgid "Check exact parts and controllers that consume the fact, including an illegal route or conflict and a representative ARM link"
+msgstr "检查使用该事实的精确料号和控制器，覆盖非法路由或资源冲突，并链接一个有代表性的 ARM 目标"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:0
+msgid "A shared fact file has no verified per-record dependencies; check its family"
+msgstr "共享事实文件缺少经验证的逐条依赖关系，此时检查所属家族"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:0
+msgid "Public I/O contract or common generator"
+msgstr "公共 I/O 契约或通用生成器"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:0
+msgid "Check all consuming implementations, a generated factory and an external application build"
+msgstr "检查所有依赖它的实现、一个生成的工厂，并构建一个外部应用"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:0
+msgid "ABI, schema or common output semantics can affect multiple families"
+msgstr "ABI、schema 或公共生成结果的语义可能影响多个家族"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:0
+msgid "SDK fixture or export policy"
+msgstr "SDK 测试夹具或导出策略"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:0
+msgid "Run that named consumer on its relevant backends; export, relocate and consume a minimal SDK when packaging changes"
+msgstr "在相关后端执行指定消费者；打包发生变化时，导出并整体搬移最小 SDK，再用它构建消费者"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:0
+msgid "Dependency locks, toolchain, export ownership or public ABI affect a wider closure"
+msgstr "依赖锁、工具链、导出文件归属或公共 ABI 影响更大的依赖范围"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:0
+msgid "Workflow or tool rule"
+msgstr "工作流或工具规则"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:0
+msgid "Run the changed complete tool module and exercise its real entry point"
+msgstr "执行受改动影响的完整工具测试模块，并验证其真实入口"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:0
+msgid "Shared selection policy or an unknown dependency requires broader coverage"
+msgstr "共享的选择策略或未知依赖要求更广的覆盖"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:234
+msgid "Take the union of consumers in the base and proposed trees. A new board has no prior dependency record. Resolve its assemblies from the proposed tree. For a deleted board, use the previous tree to find references and require their removal or migration. A new manifest or conflicting package identity triggers catalogue validation. Missing depfiles, stale inputs or unclassified changes expand to the owning family or tool domain. A shared change with unknown owners goes to full verification. Record the selected assemblies, targets, consumers and reason for every expansion in the existing reports."
+msgstr "取基线版本和拟议版本两棵源码树中消费者的并集。新增板卡没有历史依赖记录，应在拟议版本中解析其装配。删除板卡时，从先前版本查出引用并要求删除或迁移。新增清单或包标识冲突时，验证包目录。若编译器依赖文件缺失、输入过期或变更无法分类，扩大到所属家族或工具域。共享改动无法确定归属时执行完整验证。在现有报告中记录所选装配、目标、消费者和每次扩大范围的原因。"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:243
+msgid "Onboarding a board, part, IP or family"
+msgstr "板卡、料号、IP 与家族的接入"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:0
+msgid "Contribution"
+msgstr "接入类型"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:0
+msgid "Package and board work"
+msgstr "包与板卡工作"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:0
+msgid "Evidence required before declaring support"
+msgstr "声明支持前需要的证据"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:0
+msgid "New PCB with an existing part"
+msgstr "已有料号的新 PCB"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:0
+msgid "Add board facts and reference assemblies with the crystal, pins, external devices and PCB revision"
+msgstr "添加板卡事实和参考装配，说明晶振、引脚、外接器件和 PCB 修订版"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:0
+msgid "Resolve the board, reject an invalid connection, link a reference image and record physical status"
+msgstr "解析板卡配置，验证错误接线会被拒绝，链接一个参考镜像，并记录实板验证状态"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:0
+msgid "New exact part using reviewed F4 IP"
+msgstr "使用已有审核 F4 外设 IP 的新料号"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:0
+msgid "Extend the selected family facts, package/pad map, clock and memory limits, revision/errata and reviewed routes. Bind existing C drivers where their contracts apply"
+msgstr "补充所属家族的器件事实、封装与焊盘映射、时钟和内存限制、修订与勘误以及已审核路由。契约适用时绑定现有 C 驱动"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:0
+msgid "Check an allowed and an absent peripheral or pad, compile with the exact device header and startup vector, and verify the ELF memory map"
+msgstr "验证一种可用外设或焊盘，以及一种不可用的情况。使用精确器件头文件和启动向量编译，并核对 ELF 内存布局"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:0
+msgid "New IP revision or controller architecture"
+msgstr "新 IP 修订版或新的控制器架构"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:0
+msgid "Add a package-private C adapter or specialization and declarative binding. Verify reset, IRQ, DMA, stop, error and ownership semantics. Extend the common schema only for a new hardware concept"
+msgstr "在包内添加私有 C 适配器或特化实现及声明式绑定。验证复位、IRQ、DMA、停止、错误处理和所有权语义。只有遇到此前无法表达的硬件概念时才扩展公共 schema"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:0
+msgid "Run shared I/O contracts and IP-specific failures, inspect the selected source graph, link an exact target and compare Flash and RAM for the corresponding assembly"
+msgstr "执行共享 I/O 契约和 IP 特有的故障用例，检查实际选中的源码图，链接精确目标，并比较对应装配的 Flash 与 RAM 占用"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:0
+msgid "New family from the same or another vendor"
+msgstr "同一厂商或另一厂商的新家族"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:0
+msgid "Add `soc/<vendor>/<family>/package.json` with facts, bindings, startup/system sources, CMake target and SDK export ownership. Lock the required official dependencies. Add an exact-part reference board or an explicitly marked software fixture"
+msgstr "添加 `soc/<vendor>/<family>/package.json`，提供事实、绑定、启动与系统源码、CMake 目标和 SDK 导出文件归属。锁定必需的官方依赖。添加精确料号的参考板卡或明确标为软件参考的夹具"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:0
+msgid "Verify the toolchain ABI, vector and linker map, clock/reset, memory and DMA reachability, one real I/O operation in a software model where available, an ARM link for Cortex-M and an external SDK consumer"
+msgstr "验证工具链 ABI、向量与链接布局、时钟与复位、内存和 DMA 可达性。有软件模型时执行一次真实 I/O 操作；对 Cortex-M 链接 ARM 目标，并用外部工程验证 SDK"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:252
+msgid "Reuse an IP implementation across vendors only after checking the IP revision, register semantics, clock/reset, interrupts, DMA and errata for both parts. For example, a DMA channel or request multiplexer needs its own representation when an F4 stream description cannot express the hardware. Keep board and SoC packages declarative with C hardware behavior. Onboarding a board or a part using existing concepts should require zero model-name branches in common Python, CMake or CI. Runtime configuration adds no discovery table or heap. Host, linked, SDK-consumed and physically tested support each keep their own status, with the exact mode and board revision."
+msgstr "跨厂商复用 IP 实现前，核对两颗芯片的 IP 修订、寄存器语义、时钟与复位、中断、DMA 和勘误。例如，若 F4 stream 描述无法表达硬件的 DMA 通道或请求多路复用器，应采用相应的数据表示。板卡和 SoC 包用声明数据描述事实，用 C 实现硬件行为。接入采用现有概念的板卡或料号时，公共 Python、CMake 和 CI 中新增的型号分支数应为零。运行时配置不增加发现表或堆分配。对主机验证、目标链接、SDK 消费和实板验证分别记录状态，并注明确切模式与板卡修订版。"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:262
+msgid "Implementation tasks and exit conditions"
+msgstr "实施任务与验收条件"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:264
+msgid "**B01. Establish the baseline.** Build/release owns the timing sample. Keep the 347-module inventory, per-module CPU and wall time, selection reasons and the 50-commit replay with the source identity. Replay found 37 commits selecting both heavy domains. Use this corpus as a comparison input and include small driver, board and SDK edits in the live benchmark."
+msgstr "**B01. 建立基线。** 构建与发布维护负责计时样本。保存 347 个模块的清单、各模块 CPU 时间和墙钟时间、选择原因，以及带源码身份的 50 次提交回放。回放中有 37 次同时选择了两个耗时最大的域。将这批样本作为比较输入，并在实际基准中纳入小范围驱动、板卡和 SDK 改动。"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:269
+msgid "**B02. Select by dependency.** After B01, update the existing planner in `tools/testing/run_tool_tests.py` and its Git change inputs. Implement board-to-assembly and private-source/header-to-target selection first. Exercise a shared IP, a public header, an added manifest, a rename and a missing depfile. Require the same result after relocation; print the fallback reason for every ambiguous case."
+msgstr "**B02. 按依赖选择检查。** B01 完成后，更新 `tools/testing/run_tool_tests.py` 中的现有选择器及其 Git 变更输入。先实现由板卡选装配、由私有源码或头文件选目标。覆盖共享 IP、公共头、新增清单、重命名和依赖文件缺失。源码树搬移前后选择结果应一致，每个无法确定归属的情况都要输出回退原因。"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:281
+msgid "**B04. Replace commit-time global scans.** After B02, use the affected board and family assemblies for commit checks. Keep one full capability matrix check in integration. Change one Qiming pin, then one shared F4 route and then remove a selected board. Verify the expected expansion, conflict diagnostics, selected ARM images and absence of unrelated board links."
+msgstr "**B04. 替换提交阶段的全局扫描。** B02 完成后，提交检查只使用受影响板卡和家族的装配，集成阶段保留一次完整能力矩阵检查。依次修改一个启明板引脚、一条共享 F4 路由，再删除一块已选板卡。验证范围按预期扩大，冲突诊断和所选 ARM 镜像正确，无关板卡不会参与链接。"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:292
+msgid "**B06. Reduce tool fixture cost.** Test owners use a single SDK file selection before the isolated import, an exact compilation database for CMSIS and small real child processes for worker limits and cancellation. Generate one baseline simulated HIL record and isolate each mutation. Retain real timeout/cleanup, module isolation and compile-flag assertions. Delete a weaker test after its stronger replacement is selected for the same change and detects the original fault."
+msgstr "**B06. 降低工具夹具成本。** 测试维护在隔离导入前只执行一次 SDK 文件选择，CMSIS 检查使用精确匹配的编译数据库，并用小型真实子进程验证 worker 上限与取消行为。生成一次基准模拟 HIL 记录，各种修改使用独立副本。保留真实超时与清理、模块隔离和编译标志断言。只有当更强的测试会被相同改动选中，且能检出原故障时，才删除较弱的测试。"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:305
+msgid "**B08. Remove per-family assumptions.** After B02 and B07, derive active vendor payload, startup/header selection and reference ARM jobs from package ownership and reviewed assemblies. Audit existing F4-specific packaging and workflow lists before switching their consumers. Compare F4 payloads and ARM job membership before and after. An unselected vendor tree must stay out of preparation and the exported SDK."
+msgstr "**B08. 去除对特定家族的固定假设。** B02 和 B07 完成后，根据包的归属声明及已审核装配，确定有效厂商文件、启动文件和器件头，以及参考 ARM 作业。切换调用方前，审查现有 F4 专用打包与工作流列表。对比变更前后的 F4 导出内容和 ARM 作业集合。准备依赖与导出 SDK 时均须排除未选厂商目录。"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:319
+msgid "**B10. Introduce bounded parallel execution.** After B05 and B06, run complete independent modules with one host-wide worker budget. Serialize mutations of each build directory and keep per-run outputs. Compare the discovered and executed module/case sets with the serial run and inject a worker failure and cancellation. Publish a full result only after all required work and cleanup succeed."
+msgstr "**B10. 引入有界并行。** B05 和 B06 完成后，在整台主机统一的 worker 预算内执行完整、相互独立的模块。对同一构建目录的修改串行处理，每次运行独立保存输出。与串行运行对比发现和实际执行的模块及用例集合，并注入 worker 故障和取消。所有必需工作和清理均成功后，才发布完整结果。"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:334
+msgid "Start with F4 hardening. Evaluate a distinct STM32 family and then a second vendor using the same onboarding criteria when their exact parts, packages and references are selected. Record those ports separately from the F4 work; a package isolation fixture provides host evidence only."
+msgstr "先完善 F4。确定了精确料号、封装和参考资料后，再按相同接入标准依次评估另一个 STM32 家族和第二家厂商。新接入的状态与 F4 工作分别记录；包隔离夹具只提供主机侧证据。"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:339
+msgid "For the latency decision, time every hook from entry to exit on the same host and toolchain. Collect at least 30 warm observations per change class; publish sample count, median, nearest-rank p95, maximum, fallback frequency and CPU budget. Include fallbacks in their original class. Report clean builds separately. Compare retained negative tests, ARM links and relocated consumers at the same revision before adopting the narrower policy. A reproducible failure, incomplete selection or missed performance target keeps the task open."
+msgstr "评估延迟时，在同一台主机、同一套工具链上记录每个 hook 从进入到退出的耗时。每类改动至少收集 30 个热构建样本，公布样本量、中位数、按最近秩法计算的 p95、最大值、回退频率和 CPU 预算。回退样本计入其原改动类别。冷构建单独报告。采用更窄的策略前，在同一版本比较保留的负例、ARM 链接和搬移后的消费者结果。若故障可复现、选择不完整或性能目标未达成，相应任务继续保持未完成状态。"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:275
+msgid "**B03. Use incremental CMake.** Build tooling may work alongside B02. Reuse a warm Ninja tree for the same source directory, preset, toolchain and cache options across ordinary C edits. Cold or changed identities reconfigure explicitly. Test a C-only edit, a changed/deleted fact, a changed preset and an added input. The affected build must regenerate or reject invalid input; a C-only edit should not resolve unrelated assemblies."
+msgstr "**B03. 使用增量 CMake。** 构建工具工作可与 B02 并行。源码目录、预设、工具链和缓存选项相同的普通 C 改动，复用已配置的 Ninja 构建树。首次构建或这些身份变化时显式配置。测试仅修改 C 实现、修改或删除事实、改变预设、新增输入。受影响的构建必须重新生成或拒绝无效输入；仅改 C 实现时不应解析无关装配。"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:286
+msgid "**B05. Eliminate repeated resolution.** Configuration owners share immutable normal fixtures for EXTI and catalogue checks, generate each SPI factory once per input and avoid rereading an existing byte snapshot. Keep final input integrity checks. Exercise a same-timestamp content change, a pin conflict and interrupted publication. Reuse a parsed package only within a batch and only for matching content, root and package scope. Enumerate cheap rules for pads, clocks and IRQ/DMA routes. Run the full generation and link path for each distinct binding, ABI or IP behavior, including controllers competing for a shared resource. A wrong route or missing owner must still fail."
+msgstr "**B05. 消除重复解析。** 配置维护为 EXTI 和目录检查共享只读的正常输入夹具，每份输入只生成一次 SPI 工厂，已有字节快照时避免重复读取。保留最终输入完整性检查。覆盖时间戳相同但内容已变、引脚冲突和发布中断。已解析的包只允许在同一批处理中复用，且内容、根目录和包作用域必须一致。对焊盘、时钟和 IRQ/DMA 路由做低成本的规则穷举。针对每种不同的绑定、ABI 或 IP 行为执行完整生成与链接，覆盖控制器争用同一资源的情况。错误路由或缺失所有者必须仍会导致失败。"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:303
+msgid "**B07. Select SDK consumers.** After B02, extend `cmake/package/verify_consumers.py` to select names from its existing plan. Unknown names fail. Test a TMP117 edit against its Native and F407 consumers and verify both consumer chains use the relocated SDK. In full mode keep every declared consumer and the post-consumption integrity check. Tag selected reports with their actual scope."
+msgstr "**B07. 定向选择 SDK 消费者。** B02 完成后，扩展 `cmake/package/verify_consumers.py`，按名称从现有计划中选择消费者。未知名称必须报错。修改 TMP117，运行对应 Native 和 F407 消费者，并确认两条消费链都使用搬移后的 SDK。完整模式保留全部声明消费者及消费后的完整性检查。定向报告标明实际执行范围。"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:315
+msgid "**B09. Prove extension cost.** After B04 and B08, run two public F407 boards and the F411, F446 and F479 software references under `tests/contracts/stm32f4_family`. Use `tests/support/external_provider` for host package isolation and name collisions. This is the F4 rollout checkpoint. For each future production family, repeat the exact-part ARM and relocated SDK checks with its own dependencies before admitting that family. Track common files changed, family exceptions, selected jobs and firmware size. An F4-only commit must select the same hardware targets and link the same resources before and after an unrelated package is added."
+msgstr "**B09. 验证扩展成本。** B04 和 B08 完成后，运行两块公开 F407 板及 `tests/contracts/stm32f4_family` 中的 F411、F446 和 F479 软件参考。使用 `tests/support/external_provider` 验证主机侧包隔离与名称冲突。上述检查是 F4 推行新策略的验收点。以后每个生产家族在准入前，都须使用自己的依赖重做精确料号的 ARM 链接和 SDK 搬移消费检查。记录修改的公共文件、家族特例、所选作业及固件大小。新增无关包前后，仅涉及 F4 的提交必须选择相同的硬件目标并链接相同的资源。"
+
+#: ../../../workspace/nexus/docs/design/build-system.md:330
+msgid "**B11. Roll out the policy.** After B03, B04, B07 and the F4 checkpoint of B09, compare proposed selection with full integration on the same revision. Enable parallel execution separately after B10 passes. Inject an invalid board pin, a missing shared-header dependency, a wrong DMA route, a stale SDK export and a wrong startup vector. Each applicable fast path must detect the fault or expand to a check that does. Update `AGENTS.md`, the developer workflow, CI job conditions and result checks together. Revert the affected selection rule to its broader scope if a required failure is missed."
+msgstr "**B11. 推行新策略。** B03、B04、B07 及 B09 的 F4 验收点完成后，在同一版本对比拟议的定向选择与全量集成。B10 通过后再单独启用并行执行。分别注入无效板卡引脚、共享头文件依赖缺失、错误 DMA 路由、过期 SDK 导出和错误启动向量。适用的快速路径应能检出相应故障，或扩大到能检出故障的检查。同步更新 `AGENTS.md`、开发工作流、CI 作业条件和结果检查。如有必检故障漏报，应将对应选择规则退回更广范围。"
