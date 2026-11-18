@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "components": [
+    {
+      "id": "bus-owner",
+      "entry": "",
+      "target": "Nexus::BusOwner"
+    },
+    {
+      "id": "spi-owner",
+      "entry": "",
+      "target": "Nexus::SpiOwner"
+    },
+    {
+      "id": "spi-async-owner",
+      "entry": "",
+      "target": "Nexus::SPIAsyncOwner"
+    },
+    {
+      "id": "spi-dma-owner",
+      "entry": "",
+      "target": "Nexus::SPIDMATransactionOwner"
+    },
+    {
+      "id": "uart-owner",
+      "entry": "",
+      "target": "Nexus::UARTOwner"
+    },
+    {
+      "id": "owner-observer",
+      "entry": "",
+      "target": "Nexus::OwnerObserver"
+    },
+    {
+      "id": "bmp280",
+      "entry": "",
+      "target": "Nexus::BMP280"
+    },
+    {
+      "id": "bmp280-spi",
+      "entry": "",
+      "target": "Nexus::BMP280SPI"
+    },
+    {
+      "id": "log",
+      "entry": "",
+      "target": "Nexus::Log"
+    },
+    {
+      "id": "storage",
+      "entry": "",
+      "target": "Nexus::Storage"
+    },
+    {
+      "id": "settings",
+      "entry": "",
+      "target": "Nexus::Settings"
+    },
+    {
+      "id": "smbus",
+      "entry": "",
+      "target": "Nexus::SMBus"
+    },
+    {
+      "id": "flash-storage",
+      "entry": "",
+      "target": "Nexus::FlashStorage"
+    },
+    {
+      "id": "modbus-rtu",
+      "entry": "",
+      "target": "Nexus::ModbusRTU"
+    },
+    {
+      "id": "network",
+      "entry": "components/protocols/network/Select.cmake",
+      "target": "Nexus::LwIP"
+    },
+    {
+      "id": "network-loaned-rx",
+      "entry": "components/protocols/network/Select.cmake",
+      "target": "Nexus::LwIPLoanedRX"
+    },
+    {
+      "id": "tls",
+      "entry": "components/protocols/tls/Select.cmake",
+      "target": "Nexus::TLS"
+    },
+    {
+      "id": "mqtt",
+      "entry": "components/protocols/mqtt/Select.cmake",
+      "target": "Nexus::CoreMQTT"
+    },
+    {
+      "id": "mcuboot",
+      "entry": "components/protocols/mcuboot/Select.cmake",
+      "target": "Nexus::MCUBootControl"
+    },
+    {
+      "id": "st-usb-host",
+      "entry": "components/protocols/st_usb/Select.cmake",
+      "target": "Nexus::STUSBHost"
+    },
+    {
+      "id": "st-usb-device",
+      "entry": "components/protocols/st_usb_device/Select.cmake",
+      "target": "Nexus::STUSBDevice"
+    }
+  ]
+}

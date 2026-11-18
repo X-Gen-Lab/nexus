@@ -12,3 +12,13 @@ target_link_libraries(
     PRIVATE Nexus::Arch nexus_build_options nexus_owned_warnings
 )
 add_library(Nexus::ClockDomain ALIAS nexus_clock_domain)
+
+# Selected generated power coordination receives private access only here.
+if(NEXUS_RUNTIME_POWER)
+    target_link_libraries(nexus_component_api INTERFACE Nexus::ClockDomain)
+    target_link_libraries(nexus_component_bindings INTERFACE Nexus::ClockDomain)
+    target_include_directories(
+        nexus_component_bindings
+        INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/private"
+    )
+endif()

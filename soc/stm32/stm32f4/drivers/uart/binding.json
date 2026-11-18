@@ -917,7 +917,10 @@
             "limit": 4
           }
         }
-      }
+      },
+      "io_domains": [
+        "uart_stream"
+      ]
     },
     {
       "kind": "uart",
@@ -1056,7 +1059,10 @@
             "limit": 4
           }
         }
-      }
+      },
+      "io_domains": [
+        "uart_stream"
+      ]
     },
     {
       "kind": "uart",
@@ -1262,7 +1268,10 @@
             "limit": 4
           }
         }
-      }
+      },
+      "io_domains": [
+        "uart_word"
+      ]
     },
     {
       "kind": "uart",
@@ -1358,7 +1367,10 @@
             "limit": 4
           }
         }
-      }
+      },
+      "io_domains": [
+        "uart_stream"
+      ]
     }
   ],
   "static_fragments": {

@@ -1,6 +1,6 @@
 # Actual-POT messages; reviewed against this canonical source.
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: a7d3f3d82ee537e3bc763324fb1289fa4701d32a22a8867a45c25941621fbc10\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 71e54f4aeb9ab161220601e97c64c5a8625a2e68961beec9bbf9a37bcb73bdf8\n"
 
 msgid "当前架构图册"
 msgstr "Current architecture diagrams"
@@ -32,8 +32,8 @@ msgstr "{download}`Editable DOT <platform-architecture.dot>`."
 msgid "FIG-02 选定编译目标依赖"
 msgstr "FIG-02 Selected compile-target dependencies"
 
-msgid "F407ZG 裸机 IRQ UART 的构建依赖；虚线为私有 include 或 OBJECT 注入。"
-msgstr "Build dependencies for F407ZG baremetal IRQ UART; dashed edges indicate private includes or OBJECT injection."
+msgid "F407ZG 裸机 IRQ UART 的构建依赖；虚线为 include 使用要求或 OBJECT 注入。"
+msgstr "Build dependencies of the F407ZG baremetal IRQ UART reference; dashed edges denote include usage requirements or OBJECT injection."
 
 msgid "![FIG-02：选定编译目标依赖](build-targets.svg)"
 msgstr "![FIG-02: Selected build-target dependencies](build-targets.svg)"

@@ -1,12 +1,20 @@
+---
+id: design.build-system
+type: reference
+audience: maintainer
+source_language: en
+---
+
 # Build system maintenance contract
 
 Nexus uses one authored TOML assembly, a validated immutable configuration IR,
 static instances and typed factory, and one CMake software target graph. Ninja
 executes the declared graph. Products own application sources and composition.
 
-See the [verification plan for additional MCU families](#verification-plan-for-additional-mcu-families)
-for proposed changes to commit checks, MCU onboarding and release verification.
-The [build architecture review](build-architecture.md) traces the firmware target and gives the CMake refactoring sequence.
+The [build architecture](build-architecture.md) defines the public API, layer
+ownership and the current B1–B9 implementation tasks. The [MCU onboarding
+boundary](#verification-plan-for-additional-mcu-families) distinguishes a new
+board, part, IP and family without duplicating that task list.
 
 The [48-item execution ledger](https://github.com/X-Gen-Lab/nexus/blob/83a27dfbee4e8fbf4d35875b1e9db85af7516eec/docs/design/build-system-execution.csv) preserves the requested
 exit conditions. Implementation, executed software verification, environment
@@ -51,17 +59,33 @@ query path. This reduces output duplication without introducing a second
 configuration authority or source graph. Generation size, actual compilation
 work and final Flash/RAM costs are separate measurements.
 
-The selected provider supplies its actual private include directories through
-the existing `NEXUS_SYSTEM_PRIVATE_INCLUDES` connection. Root CMake consumes that
-declaration with PRIVATE scope; it no longer owns a fixed list of F4 IP paths.
-External provider bindings therefore do not automatically inherit F4 private
-headers. Mode/IP selection and supplier sources remain in the one CMake graph;
-this connection adds no registry or second build framework. Private compile templates
-validate required specialization bindings and preserve wrapper-owned macro scope;
-CMake still selects and checks each actual translation unit.
-ABI, optimization, diagnostics and firmware link policy have explicit
-target boundaries. The firmware target guarantees its declared delivery outputs
-and resource check. External application warnings are a consumer policy.
+SDK discovery and platform creation are separate operations. `find_package(Nexus
+CONFIG REQUIRED)` verifies the selected source identity, checks the package
+version and loads public functions without resolving an assembly or creating
+production targets. `nexus_add_platform(ASSEMBLY ...)` explicitly creates the one
+platform. A second assembly or a conflicting SDK source is rejected. The source
+checkout and installed SDK invoke the same private production target graph.
+A product does not override platform test or workload defaults.
+
+The selected provider publishes `NEXUS_STARTUP_SOURCES` and
+`NEXUS_STARTUP_USAGE_TARGET` on its target. `Nexus::Platform` references it with
+`NEXUS_PROVIDER_TARGET`. Firmware creates a separate startup OBJECT for each
+image and privately consumes that provider-owned usage target. Vendor includes,
+device defines and HAL configuration do not propagate to application sources.
+The root does not copy provider-private startup fields between directory scopes.
+
+`Nexus::ABI` carries binary compatibility requirements, and `Nexus::OS` names the
+selected backend. Optimization, IPO and compiler launchers apply to actual
+compilation targets. Runtime specs, `-nostartfiles`, the linker script and final
+artifact rules belong to the image. Product warnings remain an explicit consumer
+policy. Actual compiler and linker commands establish these boundaries.
+
+An installed SDK can change after discovery. A later platform or Runtime
+creation must still detect changed bytes, conflicting revisions and disallowed
+development fixtures. Verification may be reused only within its synchronous
+consumption boundary, never through a persistent success flag. The firmware
+target guarantees declared outputs and its resource check; failure or
+cancellation cannot leave stale BIN or resource reports as this attempt's result.
 
 Developer presets and native CMake/CTest remain the normal build interface.
 Focused tests are development feedback. Commit gates and formal qualifications
@@ -189,164 +213,35 @@ remains `not_executed` throughout this build-system maintenance work.
 
 ## Verification plan for additional MCU families
 
-This proposal starts at platform revision `a06bb94`. The active production
-package is STM32F4, with eight exact parts and four public boards. Each task
-below is open. Current commit and delivery rules apply until the corresponding
-policy, implementation and checks land together.
+The active production package remains STM32F4. The [current build task
+list](build-architecture.md#本轮任务与退出条件) owns the B1–B9 refactor and exit
+conditions. Earlier B01–B11 plans and timing observations remain available at the
+[fixed pre-refactor source](https://github.com/X-Gen-Lab/nexus/blob/bfde3b9ace6cbb3f3b7344dcd779532b5ef4ba40/docs/design/build-system.md).
+They do not establish current source qualification or new latency results.
 
-### Baseline and objectives
-
-The recorded local gate took 30 min 04 s, including 28 min 45 s for four tool
-domains and about 18 s for Native GoogleTest discovery, execution and results.
-A separate diagnostic executed all 347 tool modules and 3,796 cases in 9 min
-02 s with four workers. It consumed 2,096 CPU seconds. F4 peripheral tests,
-production build graphs and models, and SDK consumers used 513, 393 and 366
-CPU seconds respectively. The original gate also shared the machine with
-other jobs. Use end-to-end wall time to evaluate developer latency and CPU
-time to identify repeated work.
-
-Proposed warm targets are p95 at or below 180 s for a driver implementation
-commit and 300 s for a single board change including its ARM link. Full SDK
-verification is independently budgeted. The recorded 51 consumers took
-22 min 38 s with two workers. Adding an unrelated family should add no family
-tool modules, ARM targets or SDK consumers to an ordinary existing board
-commit. Full Native behavior tests still run on behavioral commits; measure
-their growth separately as families gain host models.
-
-### How a changed input selects work
-
-Use the complete Git change, including both sides of renames, with the existing
-tool planner. Discover packages from manifests, boards from their declared
-family and exact part, and assemblies from their authored board selection.
-Invert the resolver's input lists for maintained assemblies. Translate local
-paths to package-relative identities. Use CMake targets, compiler header
-dependencies and the SDK consumer plan for software edges. Selection runs on
-the host; firmware continues to use static C instances and typed factories.
-
-| Changed input | Smallest useful check | Expand selection when |
+| Contribution | Owning changes | Required observations |
 | --- | --- | --- |
-| Private driver source or header | Full Native behavior plus an exact-part ARM link for affected hardware paths | A shared implementation or header reaches several packages or distinct compiler contexts |
-| Board pin, clock or connection | Resolve every maintained assembly using that board, check resources and link the affected configurations represented by distinct hardware or backend paths | A shared clock, board dependency or ABI changes |
-| Part, route, IRQ, DMA or errata fact | Check exact parts and controllers that consume the fact, including an illegal route or conflict and a representative ARM link | A shared fact file has no verified per-record dependencies; check its family |
-| Public I/O contract or common generator | Check all consuming implementations, a generated factory and an external application build | ABI, schema or common output semantics can affect multiple families |
-| SDK fixture or export policy | Run that named consumer on its relevant backends; export, relocate and consume a minimal SDK when packaging changes | Dependency locks, toolchain, export ownership or public ABI affect a wider closure |
-| Workflow or tool rule | Run the changed complete tool module and exercise its real entry point | Shared selection policy or an unknown dependency requires broader coverage |
+| Existing part, new PCB | Board facts, wiring and authored assembly | Resolve legal and conflicting connections, link the image and record physical status |
+| Reviewed IP, new exact part | Family device, package, memory, clock, route and errata facts | Exact header and startup vector, absent peripheral rejection, ABI and memory map |
+| Existing semantics, new IP | Package-private C, binding and local CMake | Shared API contract plus IP-specific reset, IRQ, DMA, stop and failure behavior |
+| New family or vendor | SoC package, startup contract, drivers, official dependencies and SDK ownership | Exact-part link, private SDK scope, a real external consumer and explicit physical status |
+| New architecture or public semantics | Corresponding Arch, toolchain or public contract | Compiler/ABI and behavioral validation of the newly introduced concept |
 
-Take the union of consumers in the base and proposed trees. A new board has no
-prior dependency record. Resolve its assemblies from the proposed tree. For a
-deleted board, use the previous tree to find references and require their
-removal or migration. A new manifest or conflicting package identity triggers
-catalogue validation. Missing depfiles, stale inputs or unclassified changes
-expand to the owning family or tool domain. A shared change with unknown
-owners goes to full verification. Record the selected assemblies, targets,
-consumers and reason for every expansion in the existing reports.
+Reuse of known capabilities should add no MCU-name branches to the common
+resolver or build dispatcher. A new architecture, clock topology or DMA model
+requires its own reviewed contract when existing concepts cannot express it.
+CMake continues to own all translation units and software edges. Board and SoC
+packages remain declarative facts plus C hardware behavior.
 
-### Onboarding a board, part, IP or family
+Compare a representative source consumer, relocated and read-only SDK consumer,
+CPU Runtime, and maintained F4 targets. Inspect compiler/linker commands, per-image
+startup isolation, selected units, vectors, sections and budgets. An external
+provider fixture demonstrates the integration contract without granting that
+family production or physical support.
 
-| Contribution | Package and board work | Evidence required before declaring support |
-| --- | --- | --- |
-| New PCB with an existing part | Add board facts and reference assemblies with the crystal, pins, external devices and PCB revision | Resolve the board, reject an invalid connection, link a reference image and record physical status |
-| New exact part using reviewed F4 IP | Extend the selected family facts, package/pad map, clock and memory limits, revision/errata and reviewed routes. Bind existing C drivers where their contracts apply | Check an allowed and an absent peripheral or pad, compile with the exact device header and startup vector, and verify the ELF memory map |
-| New IP revision or controller architecture | Add a package-private C adapter or specialization and declarative binding. Verify reset, IRQ, DMA, stop, error and ownership semantics. Extend the common schema only for a new hardware concept | Run shared I/O contracts and IP-specific failures, inspect the selected source graph, link an exact target and compare Flash and RAM for the corresponding assembly |
-| New family from the same or another vendor | Add `soc/<vendor>/<family>/package.json` with facts, bindings, startup/system sources, CMake target and SDK export ownership. Lock the required official dependencies. Add an exact-part reference board or an explicitly marked software fixture | Verify the toolchain ABI, vector and linker map, clock/reset, memory and DMA reachability, one real I/O operation in a software model where available, an ARM link for Cortex-M and an external SDK consumer |
-
-Reuse an IP implementation across vendors only after checking the IP revision,
-register semantics, clock/reset, interrupts, DMA and errata for both parts.
-For example, a DMA channel or request multiplexer needs its own representation
-when an F4 stream description cannot express the hardware. Keep board and SoC
-packages declarative with C hardware behavior. Onboarding a board or a part
-using existing concepts should require zero model-name branches in common
-Python, CMake or CI. Runtime configuration adds no discovery table or heap.
-Host, linked, SDK-consumed and physically tested support each keep their own
-status, with the exact mode and board revision.
-
-### Implementation tasks and exit conditions
-
-1. **B01. Establish the baseline.** Build/release owns the timing sample. Keep
-   the 347-module inventory, per-module CPU and wall time, selection reasons
-   and the 50-commit replay with the source identity. Replay found 37 commits
-   selecting both heavy domains. Use this corpus as a comparison input and
-   include small driver, board and SDK edits in the live benchmark.
-2. **B02. Select by dependency.** After B01, update the existing planner in
-   `tools/testing/run_tool_tests.py` and its Git change inputs. Implement
-   board-to-assembly and private-source/header-to-target selection first.
-   Exercise a shared IP, a public header, an added manifest, a rename and a
-   missing depfile. Require the same result after relocation; print the fallback
-   reason for every ambiguous case.
-3. **B03. Use incremental CMake.** Build tooling may work alongside B02.
-   Reuse a warm Ninja tree for the same source directory, preset, toolchain
-   and cache options across ordinary C edits. Cold or changed identities reconfigure explicitly. Test a C-only
-   edit, a changed/deleted fact, a changed preset and an added input. The
-   affected build must regenerate or reject invalid input; a C-only edit
-   should not resolve unrelated assemblies.
-4. **B04. Replace commit-time global scans.** After B02, use the affected
-   board and family assemblies for commit checks. Keep one full capability
-   matrix check in integration. Change one Qiming pin, then one shared F4 route
-   and then remove a selected board. Verify the expected expansion, conflict
-   diagnostics, selected ARM images and absence of unrelated board links.
-5. **B05. Eliminate repeated resolution.** Configuration owners share
-   immutable normal fixtures for EXTI and catalogue checks, generate each SPI
-   factory once per input and avoid rereading an existing byte snapshot.
-   Keep final input integrity checks. Exercise a same-timestamp content change,
-   a pin conflict and interrupted publication. Reuse a parsed package only
-   within a batch and only for matching content, root and package scope.
-   Enumerate cheap rules for pads, clocks and IRQ/DMA routes. Run the full
-   generation and link path for each distinct binding, ABI or IP behavior,
-   including controllers competing for a shared resource. A wrong route or
-   missing owner must still fail.
-6. **B06. Reduce tool fixture cost.** Test owners use a single SDK file
-   selection before the isolated import, an exact compilation database for
-   CMSIS and small real child processes for worker limits and cancellation.
-   Generate one baseline simulated HIL record and isolate each mutation.
-   Retain real timeout/cleanup, module isolation and compile-flag assertions.
-   Delete a weaker test after its stronger replacement is selected for the
-   same change and detects the original fault.
-7. **B07. Select SDK consumers.** After B02, extend
-   `cmake/package/verify_consumers.py` to select names from its existing plan.
-   Unknown names fail. Test a TMP117 edit against its Native and F407 consumers
-   and verify both consumer chains use the relocated SDK. In full mode keep every
-   declared consumer and the post-consumption integrity check. Tag selected
-   reports with their actual scope.
-8. **B08. Remove per-family assumptions.** After B02 and B07, derive active
-   vendor payload, startup/header selection and reference ARM jobs from package
-   ownership and reviewed assemblies. Audit existing F4-specific packaging
-   and workflow lists before switching their consumers. Compare F4 payloads
-   and ARM job membership before and after. An unselected vendor tree must
-   stay out of preparation and the exported SDK.
-9. **B09. Prove extension cost.** After B04 and B08, run two public F407 boards
-   and the F411, F446 and F479 software references under
-   `tests/contracts/stm32f4_family`. Use `tests/support/external_provider`
-   for host package isolation and name collisions. This is the F4 rollout
-   checkpoint. For each future production family, repeat the exact-part ARM
-   and relocated SDK checks with its own dependencies before admitting that
-   family. Track common files changed, family exceptions, selected jobs and
-   firmware size. An F4-only commit must select the same hardware targets
-   and link the same resources before and after an unrelated package is added.
-10. **B10. Introduce bounded parallel execution.** After B05 and B06, run
-    complete independent modules with one host-wide worker budget. Serialize
-    mutations of each build directory and keep per-run outputs. Compare the
-    discovered and executed module/case sets with the serial run and inject
-    a worker failure and cancellation. Publish a full result only after all
-    required work and cleanup succeed.
-11. **B11. Roll out the policy.** After B03, B04, B07 and the F4 checkpoint of
-    B09, compare proposed selection with full integration on the same revision.
-    Enable parallel execution separately after B10 passes.
-    Inject an invalid board pin, a missing shared-header dependency, a wrong
-    DMA route, a stale SDK export and a wrong startup vector. Each applicable
-    fast path must detect the fault or expand to a check that does. Update
-    `AGENTS.md`, the developer workflow, CI job conditions and result checks
-    together. Revert the affected selection rule to its broader scope if a
-    required failure is missed.
-
-Start with F4 hardening. Evaluate a distinct STM32 family and then a second
-vendor using the same onboarding criteria when their exact parts, packages and
-references are selected. Record those ports separately from the F4 work; a
-package isolation fixture provides host evidence only.
-
-For the latency decision, time every hook from entry to exit on the same host
-and toolchain. Collect at least 30 warm observations per change class; publish
-sample count, median, nearest-rank p95, maximum, fallback frequency and CPU
-budget. Include fallbacks in their original class. Report clean builds
-separately. Compare retained negative tests, ARM links and relocated consumers
-at the same revision before adopting the narrower policy. A reproducible
-failure, incomplete selection or missed performance target keeps the task open.
+Preserve no-change incremental builds, fact-triggered reconfiguration, budget
+rejection, missing-output recovery and failure withdrawal. Time configure,
+compilation, linking and validation separately under a declared worker budget.
+Use focused complete regressions during implementation and the required final
+integration once against the frozen source; no successful test report is cached.
+Physical HIL remains `not_executed` until equipment executes its own checks.

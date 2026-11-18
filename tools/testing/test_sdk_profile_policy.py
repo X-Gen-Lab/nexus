@@ -79,7 +79,7 @@ class SDKProfilePolicyTests(unittest.TestCase):
         sdk, source, build, _, profile = self.prepared(directory, name)
         if not (sdk / '.nexus-source-sdk.json').exists():
             (sdk / '.nexus-source-sdk.json').write_text('{}\n')
-        config = build / 'nexus-sdk/generated'
+        config = build / 'nexus/generated'
         config.mkdir(parents=True)
         (build / 'resolved-sdk.txt').write_text(str(sdk))
         (build / 'resolved-config.txt').write_text(str(config))

@@ -63,9 +63,44 @@ nexus_use_cmsis_core(nexus_soc_stm32f4)
 target_compile_definitions(nexus_soc_stm32f4 PRIVATE ${NEXUS_STM32_DEVICE})
 include("${CMAKE_CURRENT_LIST_DIR}/sdk/CMakeLists.txt")
 nexus_stm32f4_official(nexus_soc_stm32f4)
-set(stm32_gpio_helpers OFF)
-set(stm32_uart_hal OFF)
-set(stm32_sai_hal OFF)
+# Startup and bindings consume this private contract, never application sources.
+add_library(nexus_stm32f4_startup_usage INTERFACE)
+target_include_directories(
+    nexus_stm32f4_startup_usage
+    INTERFACE "${stm32_package_dir}" ${stm32_ip_includes}
+)
+target_include_directories(
+    nexus_stm32f4_startup_usage
+    SYSTEM
+    INTERFACE
+        "${stm32_device}/Include"
+        "${NEXUS_SOURCE_DIR}/vendors/st/stm32f4_hal/Inc"
+)
+target_compile_definitions(
+    nexus_stm32f4_startup_usage
+    INTERFACE ${NEXUS_STM32_DEVICE}
+)
+nexus_use_cmsis_core(nexus_stm32f4_startup_usage)
+set_property(
+    TARGET nexus_soc_stm32f4
+    PROPERTY NEXUS_STARTUP_USAGE_TARGET nexus_stm32f4_startup_usage
+)
+
+# Shared implementation is selected by its users, independently of module order.
+function(nexus_stm32f4_gpio target)
+    get_property(
+        selected
+        TARGET "${target}"
+        PROPERTY NEXUS_STM32F4_GPIO_SELECTED
+    )
+    if(NOT selected)
+        target_sources(
+            "${target}"
+            PRIVATE "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/drivers/gpio/gpio.c"
+        )
+        set_property(TARGET "${target}" PROPERTY NEXUS_STM32F4_GPIO_SELECTED ON)
+    endif()
+endfunction()
 foreach(
     module
     identity
@@ -94,10 +129,4 @@ foreach(
 )
     include("${CMAKE_CURRENT_LIST_DIR}/drivers/${module}/CMakeLists.txt")
 endforeach()
-if(stm32_gpio_helpers)
-    target_sources(
-        nexus_soc_stm32f4
-        PRIVATE "${CMAKE_CURRENT_LIST_DIR}/drivers/gpio/gpio.c"
-    )
-endif()
 include("${CMAKE_CURRENT_LIST_DIR}/system/CMakeLists.txt")

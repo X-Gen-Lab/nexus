@@ -1883,6 +1883,20 @@ class ConfigurationIR(Record):
                 self.memory_budget.image_suffix_bytes)
 
     @property
+    def required_io_domains(self):
+        """Project selected public APIs without exposing provider mode names."""
+        from tools.configure.providers import for_selection
+        domains = {item.kind for item in self.controllers}
+        domains.update(item.driver.removesuffix("-endpoint") for item in self.devices
+            if item.kind == "external_bus" and
+            item.driver != "mapped_storage-endpoint")
+        requirements = getattr(for_selection(self), "io_domains", None)
+        if requirements is not None:
+            for item in self.controllers:
+                domains.update(requirements(item))
+        return tuple(sorted(domains))
+
+    @property
     def claims(self):
         return self.resource_plan.claims
 

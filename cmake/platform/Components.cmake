@@ -1,73 +1,101 @@
-# CMake owns the explicit component target map; authored input owns selection.
+# Shared data names the leaf entry; each component owns its software targets.
 # Author: Nexus Team
 include_guard(GLOBAL)
 
-function(_nexus_component_bindings output)
-    set(${output}
-        "bus-owner=Nexus::BusOwner"
-        "spi-owner=Nexus::SpiOwner"
-        "spi-async-owner=Nexus::SPIAsyncOwner"
-        "spi-dma-owner=Nexus::SPIDMATransactionOwner"
-        "uart-owner=Nexus::UARTOwner"
-        "owner-observer=Nexus::OwnerObserver"
-        "bmp280=Nexus::BMP280"
-        "bmp280-spi=Nexus::BMP280SPI"
-        "log=Nexus::Log"
-        "storage=Nexus::Storage"
-        "settings=Nexus::Settings"
-        "smbus=Nexus::SMBus"
-        "flash-storage=Nexus::FlashStorage"
-        "modbus-rtu=Nexus::ModbusRTU"
-        "network=Nexus::LwIP"
-        "network-loaned-rx=Nexus::LwIPLoanedRX"
-        "tls=Nexus::TLS"
-        "mqtt=Nexus::CoreMQTT"
-        "mcuboot=Nexus::MCUBootControl"
-        "st-usb-host=Nexus::STUSBHost"
-        "st-usb-device=Nexus::STUSBDevice"
-        PARENT_SCOPE
+function(_nexus_component_catalog output)
+    get_filename_component(
+        root
+        "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../.."
+        ABSOLUTE
     )
+    set(catalog "${root}/components/catalog.json")
+    file(READ "${catalog}" document)
+    string(JSON version GET "${document}" schema_version)
+    string(JSON kind TYPE "${document}" components)
+    if(NOT version STREQUAL "1" OR NOT kind STREQUAL "ARRAY")
+        message(FATAL_ERROR "Invalid component catalogue")
+    endif()
+    if(NOT CMAKE_SCRIPT_MODE_FILE)
+        set_property(
+            DIRECTORY
+            APPEND
+            PROPERTY CMAKE_CONFIGURE_DEPENDS "${catalog}"
+        )
+    endif()
+    set(${output} "${document}" PARENT_SCOPE)
 endfunction()
 
-function(nexus_component_choices output)
-    _nexus_component_bindings(bindings)
+function(_nexus_component_names output document)
+    string(JSON count LENGTH "${document}" components)
     set(choices)
-    foreach(binding IN LISTS bindings)
-        string(REPLACE "=" ";" pair "${binding}")
-        list(GET pair 0 name)
-        list(APPEND choices "${name}")
-    endforeach()
+    if(count GREATER 0)
+        math(EXPR last "${count} - 1")
+        foreach(index RANGE 0 ${last})
+            string(JSON name GET "${document}" components ${index} id)
+            list(FIND choices "${name}" duplicate)
+            if(NOT duplicate LESS 0)
+                message(FATAL_ERROR "Duplicate component catalogue ID: ${name}")
+            endif()
+            list(APPEND choices "${name}")
+        endforeach()
+    endif()
     set(${output} "${choices}" PARENT_SCOPE)
 endfunction()
 
+function(nexus_component_choices output)
+    _nexus_component_catalog(document)
+    _nexus_component_names(choices "${document}")
+    set(${output} "${choices}" PARENT_SCOPE)
+endfunction()
+
+# Generated public headers and private binding implementations have distinct
+# usage scopes. Leaf targets declare only the contracts they actually require.
+function(_nexus_component_usage component target property aggregate)
+    get_property(usage TARGET "${target}" PROPERTY "${property}")
+    if(NOT usage)
+        return()
+    endif()
+    if(NOT TARGET "${usage}" OR NOT TARGET "${aggregate}")
+        message(
+            FATAL_ERROR
+            "Selected component binding usage is unavailable: ${component}"
+        )
+    endif()
+    get_property(
+        existing
+        TARGET "${aggregate}"
+        PROPERTY INTERFACE_LINK_LIBRARIES
+    )
+    if(NOT usage IN_LIST existing)
+        target_link_libraries("${aggregate}" INTERFACE "${usage}")
+    endif()
+endfunction()
+
 function(nexus_resolve_components output)
-    _nexus_component_bindings(bindings)
+    _nexus_component_catalog(document)
+    _nexus_component_names(choices "${document}")
+    get_filename_component(
+        root
+        "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../.."
+        ABSOLUTE
+    )
     set(selected)
     foreach(component IN LISTS ARGN)
-        set(target "")
-        foreach(binding IN LISTS bindings)
-            string(REPLACE "=" ";" pair "${binding}")
-            list(GET pair 0 name)
-            if(name STREQUAL component)
-                list(GET pair 1 target)
-                break()
-            endif()
-        endforeach()
-        if(NOT target)
+        list(FIND choices "${component}" index)
+        if(index LESS 0)
             message(FATAL_ERROR "No owned target for component ${component}")
         endif()
-        if(component MATCHES "^network")
-            nexus_add_lwip()
-        elseif(component STREQUAL "tls")
-            nexus_add_tls()
-        elseif(component STREQUAL "mqtt")
-            nexus_add_coremqtt()
-        elseif(component STREQUAL "mcuboot")
-            nexus_add_mcuboot_control()
-        elseif(component STREQUAL "st-usb-host")
-            nexus_add_st_usb_host()
-        elseif(component STREQUAL "st-usb-device")
-            nexus_add_st_usb_device()
+        string(JSON target GET "${document}" components ${index} target)
+        string(JSON entry GET "${document}" components ${index} entry)
+        if(entry AND NOT TARGET "${target}")
+            if(
+                NOT entry
+                    MATCHES
+                    "^components/([A-Za-z0-9_]+/)+[A-Za-z0-9_]+\\.cmake$"
+            )
+                message(FATAL_ERROR "Invalid component catalogue leaf path")
+            endif()
+            include("${root}/${entry}")
         endif()
         if(NOT TARGET "${target}")
             message(
@@ -75,6 +103,12 @@ function(nexus_resolve_components output)
                 "Selected component target is unavailable: ${component}"
             )
         endif()
+        _nexus_component_usage("${component}" "${target}"
+            NEXUS_BINDINGS_USAGE_TARGET nexus_component_bindings
+        )
+        _nexus_component_usage("${component}" "${target}"
+            NEXUS_BINDINGS_API_TARGET nexus_component_api
+        )
         list(APPEND selected "${target}")
     endforeach()
     set(${output} "${selected}" PARENT_SCOPE)

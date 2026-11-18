@@ -59,7 +59,7 @@ def capture(root: Path, build: Path, command_receipt: Path, *, action: str,
         inputs.append(compile_commands)
     generated = []
     for directory in (build / "generated", build / "nexus/generated",
-                      build / "nexus-runtime/generated", build / "nexus-sdk/generated"):
+                      build / "nexus-runtime/generated"):
         for name in ("resolved.json", "generator-identity.json", "nexus_config.h",
                      "nexus_factory.h", "bindings.c", "memory.ld"):
             path = directory / name

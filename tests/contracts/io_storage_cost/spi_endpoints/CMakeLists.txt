@@ -12,9 +12,14 @@ set(NEXUS_ASSEMBLY_FILE
     "Exact software fixture configuration"
     FORCE
 )
-set(NEXUS_BUILD_TESTS OFF CACHE BOOL "Firmware allocation fixture" FORCE)
-set(NEXUS_BUILD_WORKLOAD OFF CACHE BOOL "Explicit fixture consumer" FORCE)
-add_subdirectory("${NEXUS_SOURCE_ROOT}" nexus-sdk EXCLUDE_FROM_ALL)
+find_package(
+    Nexus
+    CONFIG
+    REQUIRED
+    PATHS "${NEXUS_SOURCE_ROOT}/cmake"
+    NO_DEFAULT_PATH
+)
+nexus_add_platform(ASSEMBLY "${NEXUS_ASSEMBLY_FILE}")
 nexus_add_firmware(endpoint_cost SOURCES main.c)
 target_compile_definitions(
     endpoint_cost

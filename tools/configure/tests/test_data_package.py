@@ -111,6 +111,9 @@ class DataPackageTests(unittest.TestCase):
         (source / "dependencies").mkdir()
         shutil.copyfile(configure.ROOT / "dependencies/platform-compatibility.json",
                         source / "dependencies/platform-compatibility.json")
+        (source / "components").mkdir()
+        shutil.copyfile(configure.ROOT / "components/catalog.json",
+                        source / "components/catalog.json")
         result = configure.resolve_ir(assembly, source, test_support=True)
         self.assertEqual(result.soc_family, "gd32f470_reference")
         self.assertFalse(result.provider_context.external)

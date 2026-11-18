@@ -10,9 +10,14 @@ if(NOT NEXUS_SOURCE_ROOT OR NOT NEXUS_ASSEMBLY_FILE)
         "Capture/audio fixture needs an explicit source and TOML"
     )
 endif()
-set(NEXUS_BUILD_TESTS OFF CACHE BOOL "No host tests in ARM link fixture")
-set(NEXUS_BUILD_WORKLOAD OFF CACHE BOOL "External explicit fixture main")
-add_subdirectory("${NEXUS_SOURCE_ROOT}" nexus-sdk)
+find_package(
+    Nexus
+    CONFIG
+    REQUIRED
+    PATHS "${NEXUS_SOURCE_ROOT}/cmake"
+    NO_DEFAULT_PATH
+)
+nexus_add_platform(ASSEMBLY "${NEXUS_ASSEMBLY_FILE}")
 nexus_controller_modes(capture_modes capture)
 set(consumer controller_main.c)
 if("${capture_modes}" MATCHES "frames-")

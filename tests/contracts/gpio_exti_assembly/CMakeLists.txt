@@ -1,9 +1,14 @@
 cmake_minimum_required(VERSION 3.31)
 project(gpio_exti_provider_contract LANGUAGES C ASM)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(NEXUS_BUILD_TESTS OFF CACHE BOOL "No host tests in ARM consumer")
-set(NEXUS_BUILD_WORKLOAD OFF CACHE BOOL "Explicit public consumer main")
-add_subdirectory("${NEXUS_SOURCE_ROOT}" nexus-sdk)
+find_package(
+    Nexus
+    CONFIG
+    REQUIRED
+    PATHS "${NEXUS_SOURCE_ROOT}/cmake"
+    NO_DEFAULT_PATH
+)
+nexus_add_platform(ASSEMBLY "${NEXUS_ASSEMBLY_FILE}")
 nexus_add_firmware(gpio_exti_contract SOURCES main.c)
 nexus_target_warnings(gpio_exti_contract STRICT)
 find_package(Python3 3.11 REQUIRED COMPONENTS Interpreter)

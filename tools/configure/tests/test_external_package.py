@@ -362,6 +362,9 @@ class ExternalPackageTests(unittest.TestCase):
         (platform / "dependencies").mkdir(parents=True)
         shutil.copyfile(ROOT / "dependencies/platform-compatibility.json",
                         platform / "dependencies/platform-compatibility.json")
+        (platform / "components").mkdir()
+        shutil.copyfile(ROOT / "components/catalog.json",
+                        platform / "components/catalog.json")
         self.root = parent / "a-product"
         self.root.mkdir()
         _, assembly = self.package()

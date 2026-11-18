@@ -174,50 +174,6 @@ target_link_libraries(
     PUBLIC nexus_io_contract
     PRIVATE nexus_build_options nexus_owned_warnings Nexus::Arch
 )
-set(_nexus_io_domains ${NEXUS_SELECTED_KINDS})
-if(
-    "uart" IN_LIST _nexus_io_domains
-    OR "adc" IN_LIST _nexus_io_domains
-    OR "dac" IN_LIST _nexus_io_domains
-)
-    include("${NEXUS_SOURCE_DIR}/cmake/platform/ControllerModes.cmake")
-endif()
-if("uart" IN_LIST _nexus_io_domains)
-    nexus_controller_modes(uart_modes uart)
-    if("irq-words" IN_LIST uart_modes)
-        list(APPEND _nexus_io_domains uart_word)
-    endif()
-    set(uart_stream_modes
-        irq-blocks
-        rx-dma-idle
-        rx-dma-continuous
-        dma-duplex
-        dma-duplex-continuous
-    )
-    foreach(mode IN LISTS uart_modes)
-        if(mode IN_LIST uart_stream_modes)
-            list(APPEND _nexus_io_domains uart_stream)
-        endif()
-    endforeach()
-endif()
-if("adc" IN_LIST _nexus_io_domains)
-    nexus_controller_modes(adc_modes adc)
-    if(
-        "trigger-dma" IN_LIST adc_modes
-        OR "trigger-dma-continuous" IN_LIST adc_modes
-    )
-        list(APPEND _nexus_io_domains adc_stream)
-    endif()
-endif()
-if("dac" IN_LIST _nexus_io_domains)
-    nexus_controller_modes(dac_modes dac)
-    if(
-        "trigger-dma" IN_LIST dac_modes
-        OR "trigger-dma-circular" IN_LIST dac_modes
-    )
-        list(APPEND _nexus_io_domains dac_tx)
-    endif()
-endif()
 # Runtime and Native admit caller-defined providers, independently of Board facts.
 if(
     _nexus_runtime_scope
@@ -272,13 +228,18 @@ if(
         timer_pulse
         timer_sequence
     )
+else()
+    if(NOT DEFINED NEXUS_REQUIRED_IO_DOMAINS)
+        message(FATAL_ERROR "Missing resolved public I/O requirements")
+    endif()
+    set(_nexus_io_domains ${NEXUS_REQUIRED_IO_DOMAINS})
 endif()
 list(REMOVE_DUPLICATES _nexus_io_domains)
 foreach(domain IN LISTS _nexus_io_domains)
     if(NOT TARGET nexus_io_${domain})
         message(
             FATAL_ERROR
-            "No I/O source contract for selected kind ${domain}"
+            "No I/O source contract for required domain ${domain}"
         )
     endif()
     target_link_libraries(nexus_io PUBLIC nexus_io_${domain})

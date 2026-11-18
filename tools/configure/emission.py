@@ -122,6 +122,8 @@ def emit_bundle(result, output):
                  {item.driver.removesuffix("-endpoint") for item in result.devices
                   if item.kind == "external_bus" and
                   item.driver != "mapped_storage-endpoint"})) + '")',
+             'set(NEXUS_REQUIRED_IO_DOMAINS "' +
+             ';'.join(result.required_io_domains) + '")',
              'set(NEXUS_SELECTED_COMPONENTS "' + ';'.join(result.components) + '")']
     if context is None or not context.external or provider.MODEL:
         cmake.append("set(NEXUS_DISCOVER_SOC_PACKAGES ON)")

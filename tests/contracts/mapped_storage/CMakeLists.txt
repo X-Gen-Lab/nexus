@@ -6,9 +6,14 @@ get_filename_component(
     "${CMAKE_CURRENT_LIST_DIR}/../../.."
     ABSOLUTE
 )
-set(NEXUS_BUILD_TESTS OFF CACHE BOOL "Build host tests")
-set(NEXUS_BUILD_WORKLOAD OFF CACHE BOOL "Build workloads")
-add_subdirectory("${nexus_source}" nexus EXCLUDE_FROM_ALL)
+find_package(
+    Nexus
+    CONFIG
+    REQUIRED
+    PATHS "${nexus_source}/cmake"
+    NO_DEFAULT_PATH
+)
+nexus_add_platform(ASSEMBLY "${NEXUS_ASSEMBLY_FILE}")
 nexus_add_firmware(mapped_storage_cost SOURCES probe.c
     LIBRARIES Nexus::MappedStorage
 )

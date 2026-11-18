@@ -141,9 +141,8 @@ def _selection(source_root, sdk_prefix, interpreter):
 def _commands(output, source, selected, resolved, *, test_support):
     build = output / "build"
     configure = ["cmake", "-S", str(output), "-B", str(build), "-G", "Ninja",
-                 "-DCMAKE_BUILD_TYPE=Debug", "-DNEXUS_BUILD_TESTS=OFF",
-                 "-DNEXUS_BUILD_WORKLOAD=OFF"]
-    configure.append("-DNEXUS_SOURCE=" + str(source) if selected["kind"] == "source"
+                 "-DCMAKE_BUILD_TYPE=Debug"]
+    configure.append("-DNexus_DIR=" + str(source / "cmake") if selected["kind"] == "source"
                      else "-DNexus_DIR=" + str(Path(selected["sdk_prefix"]) /
                                               "lib/cmake/Nexus"))
     if "source_revision" in selected:

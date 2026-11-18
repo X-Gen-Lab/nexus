@@ -10,9 +10,16 @@ get_filename_component(
     "${CMAKE_CURRENT_LIST_DIR}/../../.."
     ABSOLUTE
 )
-include("${nexus_source}/cmake/platform/Runtime.cmake")
+find_package(
+    Nexus
+    CONFIG
+    REQUIRED
+    PATHS "${nexus_source}/cmake"
+    NO_DEFAULT_PATH
+)
 nexus_add_runtime(ASSEMBLY "${NEXUS_RUNTIME_ASSEMBLY}")
 add_executable(nexus_os_kernel_profile main.c)
+nexus_apply_firmware_policy(nexus_os_kernel_profile)
 # Runtime keeps resolved CMake facts in its construction scope. The consumer
 # explicitly selects this optional component; disabled C paths retain no ring.
 target_link_libraries(

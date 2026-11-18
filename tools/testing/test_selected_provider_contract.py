@@ -46,11 +46,14 @@ class SelectedProviderContractTests(unittest.TestCase):
     def test_missing_private_include_rejects_without_a_firmware_target(self):
         process, _ = self.configure_package(
             "add_library(nexus_soc_partner_model INTERFACE)\n"
-            'set(NEXUS_SYSTEM_PRIVATE_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/missing"\n'
-            "    PARENT_SCOPE)\n")
+            "add_library(startup_usage INTERFACE)\n"
+            'target_include_directories(startup_usage INTERFACE '
+            '"${CMAKE_CURRENT_SOURCE_DIR}/missing")\n'
+            "set_property(TARGET nexus_soc_partner_model PROPERTY "
+            "NEXUS_STARTUP_USAGE_TARGET startup_usage)\n")
         self.assertNotEqual(process.returncode, 0,
                             "Missing selected provider include was accepted")
-        self.assertIn("NEXUS_SYSTEM_PRIVATE_INCLUDES",
+        self.assertIn("startup include",
                       process.stdout + process.stderr)
 
     def test_imported_and_nonlibrary_provider_targets_reject(self):
@@ -72,10 +75,10 @@ class SelectedProviderContractTests(unittest.TestCase):
             "add_library(nexus_soc_partner_model INTERFACE)\n"
             "set(NEXUS_CPU_ARCH cortex-m4 PARENT_SCOPE)\n")
         for field, statement in (
-                ("NEXUS_STARTUP_SOURCE", ""),
-                ("NEXUS_SYSTEM_SOURCE",
-                 'set(NEXUS_STARTUP_SOURCE "${CMAKE_CURRENT_LIST_FILE}" '
-                 "PARENT_SCOPE)\n")):
+                ("NEXUS_STARTUP_SOURCES", ""),
+                ("NEXUS_STARTUP_USAGE_TARGET",
+                 'set_property(TARGET nexus_soc_partner_model PROPERTY '
+                 'NEXUS_STARTUP_SOURCES "${CMAKE_CURRENT_LIST_FILE}")\n')):
             with self.subTest(field=field):
                 process, _ = self.configure_package(prefix + statement)
                 self.assertNotEqual(process.returncode, 0)
@@ -83,26 +86,23 @@ class SelectedProviderContractTests(unittest.TestCase):
                               process.stdout + process.stderr)
 
     def test_provided_startup_system_and_vendor_inputs_are_checked_for_native(self):
-        for field, suffix in (
-                ("NEXUS_STARTUP_SOURCE", "missing.s"),
-                ("NEXUS_SYSTEM_SOURCE", "missing.c"),
-                ("NEXUS_SYSTEM_VENDOR_INCLUDES", "missing")):
+        for suffix in ("missing.s", "missing.c"):
+            field = "NEXUS_STARTUP_SOURCES"
             with self.subTest(field=field):
                 process, _ = self.configure_package(
                     "add_library(nexus_soc_partner_model INTERFACE)\n"
-                    f'set({field} "${{CMAKE_CURRENT_SOURCE_DIR}}/{suffix}" '
-                    "PARENT_SCOPE)\n")
+                    f'set_property(TARGET nexus_soc_partner_model PROPERTY '
+                    f'{field} "${{CMAKE_CURRENT_SOURCE_DIR}}/{suffix}")\n')
                 self.assertNotEqual(process.returncode, 0)
                 self.assertIn("Selected provider " + field,
                               process.stdout + process.stderr)
 
     def test_declared_private_or_vendor_direct_exports_reject_for_mcu(self):
-        for field, exported in (
-                ("NEXUS_SYSTEM_PRIVATE_INCLUDES", "${CMAKE_CURRENT_SOURCE_DIR}"),
-                ("NEXUS_SYSTEM_VENDOR_INCLUDES",
-                 "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"),
-                ("NEXUS_SYSTEM_PRIVATE_INCLUDES",
-                 "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR};${CMAKE_CURRENT_SOURCE_DIR}>")):
+        for exported in (
+                "${CMAKE_CURRENT_SOURCE_DIR}",
+                "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>",
+                "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR};${CMAKE_CURRENT_SOURCE_DIR}>"):
+            field = "startup include"
             with self.subTest(field=field, exported=exported):
                 process, _ = self.configure_package(
                     'file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/provider.c" '
@@ -110,9 +110,12 @@ class SelectedProviderContractTests(unittest.TestCase):
                     'add_library(nexus_soc_partner_model STATIC '
                     '"${CMAKE_CURRENT_BINARY_DIR}/provider.c")\n'
                     'set(NEXUS_CPU_ARCH cortex-m4 PARENT_SCOPE)\n'
-                    'set(NEXUS_STARTUP_SOURCE "${CMAKE_CURRENT_LIST_FILE}" PARENT_SCOPE)\n'
-                    'set(NEXUS_SYSTEM_SOURCE "${CMAKE_CURRENT_LIST_FILE}" PARENT_SCOPE)\n'
-                    f'set({field} "${{CMAKE_CURRENT_SOURCE_DIR}}" PARENT_SCOPE)\n'
+                    'add_library(startup_usage INTERFACE)\n'
+                    'target_include_directories(startup_usage INTERFACE '
+                    '"${CMAKE_CURRENT_SOURCE_DIR}")\n'
+                    'set_target_properties(nexus_soc_partner_model PROPERTIES '
+                    'NEXUS_STARTUP_SOURCES "${CMAKE_CURRENT_LIST_FILE}" '
+                    'NEXUS_STARTUP_USAGE_TARGET startup_usage)\n'
                     'target_include_directories(nexus_soc_partner_model PUBLIC '
                     f'"{exported}")\n')
                 self.assertNotEqual(process.returncode, 0,
@@ -126,13 +129,28 @@ class SelectedProviderContractTests(unittest.TestCase):
             '"int provider_private_scope(void) { return 0; }\\n")\n'
             'add_library(nexus_soc_partner_model STATIC '
             '"${CMAKE_CURRENT_BINARY_DIR}/provider.c")\n'
-            'set(NEXUS_SYSTEM_PRIVATE_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}" PARENT_SCOPE)\n'
-            'set(NEXUS_SYSTEM_VENDOR_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/../configure" '
-            'PARENT_SCOPE)\n'
+            'add_library(startup_usage INTERFACE)\n'
+            'target_include_directories(startup_usage INTERFACE '
+            '"${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/../configure")\n'
+            'set_property(TARGET nexus_soc_partner_model PROPERTY '
+            'NEXUS_STARTUP_USAGE_TARGET startup_usage)\n'
             'target_include_directories(nexus_soc_partner_model '
             'PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/../configure" '
             'PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>")\n')
         self.assertEqual(process.returncode, 0, process.stdout + process.stderr)
+
+    def test_startup_usage_requires_a_local_interface_target(self):
+        for declaration in (
+                "", "add_custom_target(startup_usage)\n",
+                "add_library(startup_usage INTERFACE IMPORTED GLOBAL)\n"):
+            with self.subTest(declaration=declaration):
+                process, _ = self.configure_package(
+                    "add_library(nexus_soc_partner_model INTERFACE)\n"
+                    + declaration
+                    + "set_property(TARGET nexus_soc_partner_model PROPERTY "
+                    "NEXUS_STARTUP_USAGE_TARGET startup_usage)\n")
+                self.assertNotEqual(process.returncode, 0)
+                self.assertIn("startup usage target", process.stdout + process.stderr)
 
     def test_local_compiled_alias_inherits_exact_selected_target_policy(self):
         process, build = self.configure_package('''\

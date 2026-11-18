@@ -1151,6 +1151,7 @@ class SourceSDKTests(unittest.TestCase):
         project_build = self.directory / "policy source project"
         self.run_ok(["cmake", "-S", str(self.sdk), "-B", str(project_build),
                      "-G", "Ninja", "-DNEXUS_BUILD_TESTS=OFF",
+                     "-DNEXUS_ALLOW_SOURCE_SDK_FIXTURE=ON",
                      "-DNEXUS_BUILD_WORKLOAD=OFF", "-DNEXUS_TEST_SUPPORT=ON",
                      "-DNEXUS_ASSEMBLY_FILE=" + str(self.sdk /
                      "tests/support/native/assemblies/native.toml")])
@@ -1217,6 +1218,7 @@ class SourceSDKTests(unittest.TestCase):
             'project(installed_threadx_consumer LANGUAGES C ASM)\n'
             'set(CMAKE_EXPORT_COMPILE_COMMANDS ON)\n'
             f'find_package(Nexus {load_policy(self.sdk)["semantic_version"]} EXACT CONFIG REQUIRED)\n'
+            'nexus_add_platform(ASSEMBLY "${NEXUS_ASSEMBLY_FILE}")\n'
             'nexus_add_firmware(installed_threadx SOURCES main.c '
             'LIBRARIES Nexus::OSThreadX)\n'
             'get_target_property(sdk_root Nexus::Config NEXUS_SOURCE_DIR)\n'

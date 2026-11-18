@@ -1,26 +1,44 @@
 # Source SDK only: the consumer owns one assembly and its toolchain/ABI.
 # Parent variables and cache entries cannot establish byte verification.
-# Only the package's synchronous private child already verified this snapshot.
-# Read the directory property so command-line hints cannot impersonate it.
-get_property(_sdk_entry DIRECTORY PROPERTY SOURCE_DIR)
+# Every explicit consumption boundary verifies current source bytes.
 if(
     EXISTS "${NEXUS_SOURCE_DIR}/.nexus-source-sdk.json"
-    AND NOT (
-        _sdk_entry STREQUAL "${NEXUS_SOURCE_DIR}/cmake/package/platform"
-        AND CMAKE_PARENT_LIST_FILE STREQUAL "${NEXUS_SOURCE_DIR}/CMakeLists.txt"
-    )
+    OR IS_SYMLINK "${NEXUS_SOURCE_DIR}/.nexus-source-sdk.json"
 )
     execute_process(
         COMMAND
             "${Python3_EXECUTABLE}" -B
             "${NEXUS_SOURCE_DIR}/cmake/package/package_source_sdk.py" --verify
             "${NEXUS_SOURCE_DIR}"
-        RESULT_VARIABLE sdk_result
-        ERROR_VARIABLE sdk_error
-        OUTPUT_QUIET
+        RESULT_VARIABLE admission_result
+        OUTPUT_VARIABLE admission
+        ERROR_VARIABLE admission_error
     )
-    if(NOT sdk_result EQUAL 0)
-        message(FATAL_ERROR "Source SDK identity failed: ${sdk_error}")
+    if(NOT admission_result EQUAL 0)
+        message(FATAL_ERROR "Source SDK identity failed: ${admission_error}")
+    endif()
+    string(JSON publishable GET "${admission}" publishable)
+    string(JSON revision GET "${admission}" source_revision)
+    if(NOT publishable AND NOT NEXUS_ALLOW_SOURCE_SDK_FIXTURE)
+        message(
+            FATAL_ERROR
+            "This source SDK is a nonpublishable development fixture"
+        )
+    endif()
+    if(
+        NEXUS_EXPECTED_SOURCE_REVISION
+        AND NOT NEXUS_EXPECTED_SOURCE_REVISION STREQUAL revision
+    )
+        message(
+            FATAL_ERROR
+            "Installed Nexus source revision differs from the consumer's expected revision"
+        )
+    endif()
+    if(NEXUS_BUILD_TESTS OR NEXUS_BUILD_WORKLOAD)
+        message(
+            FATAL_ERROR
+            "The installed source SDK excludes development tests/contracts and their dependencies; validate the complete pinned checkout separately"
+        )
     endif()
     # Publish the verified source scope for direct and package consumers.
     get_property(sdk_existing_source GLOBAL PROPERTY NEXUS_SOURCE_SDK_SOURCE)

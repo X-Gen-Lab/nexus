@@ -9,11 +9,6 @@ set(NEXUS_ASSEMBLY_FILE
     "This consumer owns its assembly"
 )
 
-if(NEXUS_SOURCE)
-    set(NEXUS_BUILD_TESTS OFF CACHE BOOL "Platform development tests" FORCE)
-    set(NEXUS_BUILD_WORKLOAD OFF CACHE BOOL "Platform workload" FORCE)
-    add_subdirectory("${NEXUS_SOURCE}" nexus EXCLUDE_FROM_ALL)
-else()
-    find_package(Nexus CONFIG REQUIRED)
-endif()
+find_package(Nexus CONFIG REQUIRED)
+nexus_add_platform(ASSEMBLY "${NEXUS_ASSEMBLY_FILE}")
 nexus_add_firmware(nexus_public_gpio SOURCES main.c)

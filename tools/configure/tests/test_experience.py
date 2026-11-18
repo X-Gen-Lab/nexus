@@ -20,6 +20,7 @@ class ConfigurationExperienceTests(unittest.TestCase):
         self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name)
         for name in ("dependencies/platform-compatibility.json",
+                     "components/catalog.json",
                      "tests/support/native/soc.json", "tests/support/native/routes.json",
                      "tests/support/native/board/board.json"):
             target = self.root / name

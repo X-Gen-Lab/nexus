@@ -29,8 +29,9 @@ class ReleaseVersionTests(unittest.TestCase):
             shutil.copyfile(ROOT / "tools/configure/metadata.py", metadata)
             # Execute the production bootstrap through project(), independently
             # of hardware resolution and the rest of the source target graph.
-            bootstrap = (ROOT / "CMakeLists.txt").read_text().split(
-                "# A consumer selects one assembly;", 1)[0]
+            bootstrap, entry, _ = (ROOT / "CMakeLists.txt").read_text().partition(
+                'include("${NEXUS_SOURCE_DIR}/cmake/Nexus.cmake")')
+            self.assertTrue(entry, "The production graph entry must be explicit")
             (directory / "CMakeLists.txt").write_text(
                 bootstrap + '\nfile(WRITE "${CMAKE_BINARY_DIR}/version.txt" '
                 '"${CMAKE_PROJECT_VERSION}")\n')

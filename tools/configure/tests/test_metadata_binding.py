@@ -15,7 +15,8 @@ class MetadataBindingTests(unittest.TestCase):
         self.directory = tempfile.TemporaryDirectory()
         self.addCleanup(self.directory.cleanup)
         self.root = Path(self.directory.name)
-        for name in (metadata.POLICY, "tests/support/native/soc.json", "tests/support/native/routes.json",
+        for name in (metadata.POLICY, "components/catalog.json",
+                     "tests/support/native/soc.json", "tests/support/native/routes.json",
                      "tests/support/native/board/board.json"):
             target = self.root / name
             target.parent.mkdir(parents=True, exist_ok=True)

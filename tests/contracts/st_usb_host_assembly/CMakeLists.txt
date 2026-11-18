@@ -7,9 +7,14 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 if(NOT NEXUS_SOURCE_ROOT OR NOT NEXUS_ASSEMBLY_FILE)
     message(FATAL_ERROR "Host middleware fixture requires source and assembly")
 endif()
-set(NEXUS_BUILD_TESTS OFF CACHE BOOL "ARM link fixture")
-set(NEXUS_BUILD_WORKLOAD OFF CACHE BOOL "Explicit private integration")
-add_subdirectory("${NEXUS_SOURCE_ROOT}" nexus-sdk)
+find_package(
+    Nexus
+    CONFIG
+    REQUIRED
+    PATHS "${NEXUS_SOURCE_ROOT}/cmake"
+    NO_DEFAULT_PATH
+)
+nexus_add_platform(ASSEMBLY "${NEXUS_ASSEMBLY_FILE}")
 nexus_add_firmware(usb_host_stack_fixture SOURCES host_stack_main.c)
 target_include_directories(
     usb_host_stack_fixture

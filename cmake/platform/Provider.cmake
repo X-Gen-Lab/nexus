@@ -19,51 +19,69 @@ function(nexus_validate_selected_provider target)
             "interface library: ${target}"
         )
     endif()
-    # Native models have no mandatory device startup or system translation unit.
-    # Every supplied path still belongs to the selected build input contract.
-    if(NOT NEXUS_CPU_ARCH STREQUAL "native")
-        foreach(required NEXUS_STARTUP_SOURCE NEXUS_SYSTEM_SOURCE)
-            if(NOT ${required})
-                message(FATAL_ERROR "Selected provider is missing ${required}")
-            endif()
-        endforeach()
-    endif()
-    foreach(property NEXUS_STARTUP_SOURCE NEXUS_SYSTEM_SOURCE)
-        foreach(source IN LISTS ${property})
-            if(
-                NOT IS_ABSOLUTE "${source}"
-                OR NOT EXISTS "${source}"
-                OR IS_DIRECTORY "${source}"
-            )
-                message(
-                    FATAL_ERROR
-                    "Selected provider ${property} requires an existing "
-                    "absolute file: ${source}"
-                )
-            endif()
-        endforeach()
+    foreach(property NEXUS_STARTUP_SOURCES NEXUS_STARTUP_USAGE_TARGET)
+        get_property(${property} TARGET "${target}" PROPERTY "${property}")
+        if(NOT NEXUS_CPU_ARCH STREQUAL "native" AND NOT ${property})
+            message(FATAL_ERROR "Selected provider is missing ${property}")
+        endif()
     endforeach()
-    foreach(property NEXUS_SYSTEM_PRIVATE_INCLUDES NEXUS_SYSTEM_VENDOR_INCLUDES)
-        foreach(directory IN LISTS ${property})
+    foreach(source IN LISTS NEXUS_STARTUP_SOURCES)
+        if(
+            NOT IS_ABSOLUTE "${source}"
+            OR NOT EXISTS "${source}"
+            OR IS_DIRECTORY "${source}"
+        )
+            message(
+                FATAL_ERROR
+                "Selected provider NEXUS_STARTUP_SOURCES requires an existing "
+                "absolute file: ${source}"
+            )
+        endif()
+    endforeach()
+    set(private_includes)
+    if(NEXUS_STARTUP_USAGE_TARGET)
+        if(NOT TARGET "${NEXUS_STARTUP_USAGE_TARGET}")
+            message(
+                FATAL_ERROR
+                "Selected provider startup usage target is missing"
+            )
+        endif()
+        get_target_property(usage_kind "${NEXUS_STARTUP_USAGE_TARGET}" TYPE)
+        get_target_property(
+            usage_imported
+            "${NEXUS_STARTUP_USAGE_TARGET}"
+            IMPORTED
+        )
+        if(usage_imported OR NOT usage_kind STREQUAL "INTERFACE_LIBRARY")
+            message(
+                FATAL_ERROR
+                "Selected provider startup usage target must be a local interface library"
+            )
+        endif()
+        get_property(
+            private_includes
+            TARGET "${NEXUS_STARTUP_USAGE_TARGET}"
+            PROPERTY INTERFACE_INCLUDE_DIRECTORIES
+        )
+        foreach(directory IN LISTS private_includes)
             if(
                 NOT IS_ABSOLUTE "${directory}"
                 OR NOT IS_DIRECTORY "${directory}"
             )
                 message(
                     FATAL_ERROR
-                    "Selected provider ${property} requires an existing "
+                    "Selected provider startup include requires an existing "
                     "absolute directory: ${directory}"
                 )
             endif()
         endforeach()
-    endforeach()
-    # Check direct include exports and ordinary BUILD_INTERFACE path lists.
-    # Nested generator expressions and transitive dependency usage requirements
-    # remain outside this declaration check; actual consumers test header scope.
-    get_target_property(
+    endif()
+    # Check direct exports and ordinary BUILD_INTERFACE lists. Transitive and
+    # nested generator expressions remain covered by actual consumer builds.
+    get_property(
         public_includes
-        "${target}"
-        INTERFACE_INCLUDE_DIRECTORIES
+        TARGET "${target}"
+        PROPERTY INTERFACE_INCLUDE_DIRECTORIES
     )
     string(
         REGEX REPLACE "\\$<BUILD_INTERFACE:([^<>]*)>"
@@ -76,21 +94,14 @@ function(nexus_validate_selected_provider target)
             continue()
         endif()
         file(REAL_PATH "${public_include}" public_directory)
-        foreach(
-            property
-            NEXUS_SYSTEM_PRIVATE_INCLUDES
-            NEXUS_SYSTEM_VENDOR_INCLUDES
-        )
-            foreach(directory IN LISTS ${property})
-                file(REAL_PATH "${directory}" private_directory)
-                if(public_directory STREQUAL private_directory)
-                    message(
-                        FATAL_ERROR
-                        "Selected provider publicly exports ${property}: "
-                        "${directory}"
-                    )
-                endif()
-            endforeach()
+        foreach(directory IN LISTS private_includes)
+            file(REAL_PATH "${directory}" private_directory)
+            if(public_directory STREQUAL private_directory)
+                message(
+                    FATAL_ERROR
+                    "Selected provider publicly exports startup include: ${directory}"
+                )
+            endif()
         endforeach()
     endforeach()
     if(NOT kind STREQUAL "INTERFACE_LIBRARY")

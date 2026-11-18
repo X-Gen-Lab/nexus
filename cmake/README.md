@@ -1,7 +1,8 @@
 # 构建目标与静态固件组合
 
-CMake 维护唯一源码和链接依赖图。`NEXUS_ASSEMBLY_FILE` 选择 TOML 装配，生成结果
-只提供严格解析的选择、静态连接、布局与输入身份，不维护另一套源码列表。
+CMake 维护唯一源码和链接依赖图。包发现验证 SDK 并提供 API，应用显式调用
+`nexus_add_platform(ASSEMBLY ...)` 选择 TOML；生成结果只提供选择、静态连接、布局
+与输入身份。根工程的 `NEXUS_ASSEMBLY_FILE` 仅用于维护 preset，不是外部应用的隐式入口。
 
 自有 CMake 使用锁定的 gersemi，四空格、80 列，章节横线保持 77 字符。
 短文件优先用空行，不为缩短根文件增加转发层。格式检查不修改或暂存文件：
@@ -29,12 +30,19 @@ CMSIS 与 SDK 输入，并保存由 SHA256 绑定的唯一 pending 快照；全�
 ```cmake
 cmake_minimum_required(VERSION 3.31)
 project(firmware C ASM)
-set(NEXUS_ASSEMBLY_FILE "${CMAKE_CURRENT_SOURCE_DIR}/assembly.toml")
-set(NEXUS_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-set(NEXUS_BUILD_WORKLOAD OFF CACHE BOOL "" FORCE)
-add_subdirectory(external/nexus nexus-owned)
+find_package(Nexus CONFIG REQUIRED)
+nexus_add_platform(ASSEMBLY "${CMAKE_CURRENT_SOURCE_DIR}/assembly.toml")
 nexus_add_firmware(firmware SOURCES main.c LIBRARIES Nexus::Log)
 ```
+
+源码 checkout 将 `Nexus_DIR` 指向其 `cmake/`，安装 SDK 指向 prefix 下的
+`lib/cmake/Nexus/`；工具链必须在 `project()` 前选择。包发现不创建生产目标，
+第二次创建装配明确拒绝。源码与安装包共同进入私有的唯一生产图。
+
+Provider target 发布 `NEXUS_STARTUP_SOURCES` 与 `NEXUS_STARTUP_USAGE_TARGET`，
+`Nexus::Platform` 的 `NEXUS_PROVIDER_TARGET` 指向它。固件入口创建每镜像独立的
+启动 OBJECT，私有消费启动编译要求；不把厂商头和宏传播给应用。`Nexus::ABI` 提供
+二进制要求，`Nexus::OS` 表示所选后端，最终运行库与链接策略只附着 image。
 
 固件入口装入精确 startup、system、linker 和 ABI，不启动 scheduler 或产品 worker。
 应用负责任务、stack／TCB、队列、Flash 区域与停机顺序。每个固件的私有启动对象
@@ -52,7 +60,9 @@ ARM 工具链在应用启用 CXX 时解析交叉 C++ 编译器。纯 C/ASM 工�
 
 | 位置 | 责任 |
 |---|---|
-| `platform/` | 装配、目标策略、ABI、固件与 CPU runtime |
+| `Nexus.cmake` | 无装配副作用的公共 API |
+| `platform/CMakeLists.txt` | 源码与安装 SDK 共用的私有生产图 |
+| `platform/*.cmake` | 装配、目标策略、ABI、Provider、固件与 CPU runtime |
 | `package/` | 可移位源码 SDK、导出和实际消费验证 |
 | `presets/` | F4 工程与显式主机测试 preset |
 | `toolchains/` | 编译器选择；CPU 事实仍由严格配置决定 |
@@ -66,3 +76,6 @@ Source SDK 是源码快照，按已选闭包提供实现和精确可选 host-sup
 `tests/` 或所有 vendor。完整源码模式命令、移动验证与资格见
 [SDK 教程](../docs/tutorials/source-sdk.md)；当前结构见
 [架构](../docs/delivery/architecture.md)。
+
+当前接入边界、B1–B9 任务及实际验证范围见
+[构建架构](../docs/design/build-architecture.md)。

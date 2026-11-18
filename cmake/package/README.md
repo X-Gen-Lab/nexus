@@ -9,9 +9,11 @@ source interface epoch 与 assembly schema 分别计代，均读取上述兼容�
 
 ## 打包与消费
 
-`find_package(Nexus)` 完整验证所选安装包后，在同一次同步导入中装配平台目标。
-后续独立导入、直接 SDK 入口与 Runtime 创建分别校验当前输入。应用构建工具也会
-先验证 SDK，再判断现有 Ninja 图是否可复用；输入身份相同的热构建保留生成文件。
+`find_package(Nexus)` 完整验证所选安装包并加载公共 API，不解析装配或创建生产目标。
+应用随后显式调用 `nexus_add_platform(ASSEMBLY ...)`，源码与安装包进入同一私有生产图。
+发现与创建是独立消费边界，后续创建仍检查当前字节；重复发现、Runtime 和直接 SDK
+入口也保留各自身份检查。应用构建工具先验证 SDK，再判断既有 Ninja 图是否可复用。
+输入身份相同的热构建保留生成文件，不用持久成功标记跳过完整性检查。
 
 从已初始化、干净、已提交检出执行：
 
@@ -44,8 +46,8 @@ python cmake/package/package_source_sdk.py --source . --output /tmp/nexus-sdk
 ```cmake
 cmake_minimum_required(VERSION 3.31)
 project(my_device LANGUAGES C ASM)
-set(NEXUS_ASSEMBLY_FILE "${CMAKE_CURRENT_SOURCE_DIR}/assembly.toml")
 find_package(Nexus 0.2.1 EXACT CONFIG REQUIRED)
+nexus_add_platform(ASSEMBLY "${CMAKE_CURRENT_SOURCE_DIR}/assembly.toml")
 nexus_add_firmware(my_device SOURCES main.c)
 ```
 
@@ -60,7 +62,17 @@ cmake --build build
 Board 相对路径相对于装配，即使位于 SDK 外；`NEXUS_EXPECTED_SOURCE_REVISION`
 可固定消费方已审版本。Native 使用 host 编译器，不传 ARM toolchain。
 
+源码 checkout 使用其 `cmake/` 作为 `Nexus_DIR`，安装 SDK 使用 prefix 下的
+`lib/cmake/Nexus/`。工具链在 `project()` 前选定，每个构建目录只有一套装配和工具链。
+应用不强制关闭平台测试或 workload，也不维护两条源码／安装 SDK 装配路径。
+
 `Nexus::Core`／`Arch`／`IO`／`Platform` 与可选组件、OS target 各自导出依赖。
+`Nexus::ABI` 表示二进制要求，`Nexus::OS` 表示所选后端。Provider 私有启动 usage
+由每镜像独立 startup OBJECT 消费，不向应用传播厂商头和器件宏。
+CPU Runtime 通过 `nexus_add_runtime(ASSEMBLY ...)` 显式创建；应用拥有启动与链接，
+MCU 自建 executable 须调用 `nexus_apply_firmware_policy(target)` 再链接
+`Nexus::Runtime`。其独立责任见[构建架构](../../docs/design/build-architecture.md)。
+
 `nexus_add_firmware` 链接显式源码、选定组件、startup、生成绑定与 linker 输入，
 不创建 main／任务／scheduler。应用调用 `nx_platform_start`，使用生成
 `nexus_factory_strong.h`，例如 `nx_factory_gpio_ref(NX_GPIO_REF_LED0)`。

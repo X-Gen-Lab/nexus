@@ -10,9 +10,16 @@ get_filename_component(
     "${CMAKE_CURRENT_LIST_DIR}/../../.."
     ABSOLUTE
 )
-include("${nexus_source}/cmake/platform/Runtime.cmake")
+find_package(
+    Nexus
+    CONFIG
+    REQUIRED
+    PATHS "${nexus_source}/cmake"
+    NO_DEFAULT_PATH
+)
 nexus_add_runtime(ASSEMBLY "${NEXUS_RUNTIME_ASSEMBLY}")
 add_executable(nexus_os_resources main.c)
+nexus_apply_firmware_policy(nexus_os_resources)
 target_link_libraries(nexus_os_resources PRIVATE Nexus::Runtime)
 target_link_options(
     nexus_os_resources
@@ -32,6 +39,7 @@ if(NEXUS_CORE_ARCH_COSTS)
     foreach(instances 0 1 2 4)
         set(probe "nexus_core_arch_cost_${instances}")
         add_executable("${probe}" core_arch_probe.c)
+        nexus_apply_firmware_policy("${probe}")
         target_compile_definitions(
             "${probe}"
             PRIVATE "NX_COST_INSTANCES=${instances}"

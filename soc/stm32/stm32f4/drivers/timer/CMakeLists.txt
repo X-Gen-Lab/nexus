@@ -1,7 +1,7 @@
 # Selected timer sources and private dependencies.
 nexus_controller_modes(pwm_modes pwm)
 if(pwm_modes)
-    set(stm32_gpio_helpers ON)
+    nexus_stm32f4_gpio(nexus_soc_stm32f4)
     target_sources(
         nexus_soc_stm32f4
         PRIVATE "${CMAKE_CURRENT_LIST_DIR}/timer.c"
@@ -9,7 +9,7 @@ if(pwm_modes)
 endif()
 nexus_controller_modes(encoder_modes encoder)
 if(encoder_modes)
-    set(stm32_gpio_helpers ON)
+    nexus_stm32f4_gpio(nexus_soc_stm32f4)
     target_sources(
         nexus_soc_stm32f4
         PRIVATE "${CMAKE_CURRENT_LIST_DIR}/encoder.c"
@@ -17,7 +17,7 @@ if(encoder_modes)
 endif()
 nexus_controller_names(advanced_timers advanced_pwm)
 foreach(timer IN LISTS advanced_timers)
-    set(stm32_gpio_helpers ON)
+    nexus_stm32f4_gpio(nexus_soc_stm32f4)
     if(timer STREQUAL "TIM1")
         target_sources(
             nexus_soc_stm32f4
@@ -34,7 +34,7 @@ foreach(timer IN LISTS advanced_timers)
 endforeach()
 nexus_controller_names(capture_timers timer_capture)
 foreach(timer IN LISTS capture_timers)
-    set(stm32_gpio_helpers ON)
+    nexus_stm32f4_gpio(nexus_soc_stm32f4)
     if(timer STREQUAL "TIM4")
         target_sources(
             nexus_soc_stm32f4
@@ -54,7 +54,7 @@ endforeach()
 foreach(kind pwm_group timer_pulse timer_sequence)
     nexus_controller_modes(waveform_modes "${kind}")
     if(waveform_modes)
-        set(stm32_gpio_helpers ON)
+        nexus_stm32f4_gpio(nexus_soc_stm32f4)
         target_sources(
             nexus_soc_stm32f4
             PRIVATE

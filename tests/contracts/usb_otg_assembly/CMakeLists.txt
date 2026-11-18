@@ -10,9 +10,14 @@ if(NOT NEXUS_SOURCE_ROOT OR NOT NEXUS_ASSEMBLY_FILE)
         "OTG fixture needs source root and one explicit assembly"
     )
 endif()
-set(NEXUS_BUILD_TESTS OFF CACHE BOOL "ARM software reference")
-set(NEXUS_BUILD_WORKLOAD OFF CACHE BOOL "Explicit external caller")
-add_subdirectory("${NEXUS_SOURCE_ROOT}" nexus-sdk)
+find_package(
+    Nexus
+    CONFIG
+    REQUIRED
+    PATHS "${NEXUS_SOURCE_ROOT}/cmake"
+    NO_DEFAULT_PATH
+)
+nexus_add_platform(ASSEMBLY "${NEXUS_ASSEMBLY_FILE}")
 nexus_add_firmware(usb_otg_fixture SOURCES otg_main.c)
 nexus_target_warnings(usb_otg_fixture STRICT)
 find_package(Python3 3.11 REQUIRED COMPONENTS Interpreter)

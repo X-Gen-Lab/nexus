@@ -1,7 +1,7 @@
 # Selected i2c sources and private dependencies.
 nexus_controller_modes(i2c_modes i2c)
 if(i2c_modes)
-    set(stm32_gpio_helpers ON)
+    nexus_stm32f4_gpio(nexus_soc_stm32f4)
     target_sources(
         nexus_soc_stm32f4
         PRIVATE
@@ -23,7 +23,7 @@ if(i2c_modes)
 endif()
 nexus_controller_modes(i2c_target_modes i2c_target)
 if(i2c_target_modes)
-    set(stm32_gpio_helpers ON)
+    nexus_stm32f4_gpio(nexus_soc_stm32f4)
     target_sources(
         nexus_soc_stm32f4
         PRIVATE "${CMAKE_CURRENT_LIST_DIR}/i2c_target.c"

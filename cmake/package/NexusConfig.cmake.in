@@ -46,29 +46,10 @@ if(NEXUS_BUILD_TESTS OR NEXUS_BUILD_WORKLOAD)
         "The installed source SDK excludes development tests/contracts and their dependencies; validate the complete pinned checkout separately"
     )
 endif()
-set(NEXUS_BUILD_TESTS OFF CACHE BOOL "Build Nexus host tests")
-set(NEXUS_BUILD_WORKLOAD OFF CACHE BOOL "Build Nexus developer workloads")
 set(Nexus_SOURCE_DIR "${_nexus_sdk_source}")
 set(Nexus_SOURCE_REVISION "${_nexus_sdk_revision}")
 set(Nexus_VERSION "@NEXUS_SDK_VERSION@")
 set(Nexus_TOOLCHAIN_DIR "${_nexus_sdk_source}/cmake/toolchains")
-set(_nexus_sdk_mode "platform")
-if(Nexus_FIND_COMPONENTS)
-    if(NOT Nexus_FIND_COMPONENTS STREQUAL "Runtime")
-        message(
-            FATAL_ERROR
-            "The only optional Nexus package component is Runtime"
-        )
-    endif()
-    set(_nexus_sdk_mode "runtime")
-endif()
-get_property(_nexus_existing_mode GLOBAL PROPERTY NEXUS_SOURCE_SDK_MODE)
-if(_nexus_existing_mode AND NOT _nexus_existing_mode STREQUAL _nexus_sdk_mode)
-    message(
-        FATAL_ERROR
-        "One build cannot mix Nexus Runtime and Platform package modes"
-    )
-endif()
 get_property(_nexus_existing_source GLOBAL PROPERTY NEXUS_SOURCE_SDK_SOURCE)
 if(
     _nexus_existing_source
@@ -79,35 +60,26 @@ if(
         "One build may contain only one resolved Nexus source SDK"
     )
 endif()
-set_property(GLOBAL PROPERTY NEXUS_SOURCE_SDK_MODE "${_nexus_sdk_mode}")
 set_property(GLOBAL PROPERTY NEXUS_SOURCE_SDK_SOURCE "${_nexus_sdk_source}")
-if(TARGET Nexus::Config)
-    get_target_property(_nexus_existing_source Nexus::Config NEXUS_SOURCE_DIR)
-    if(NOT _nexus_existing_source STREQUAL _nexus_sdk_source)
+get_property(_nexus_existing_package GLOBAL PROPERTY NEXUS_PACKAGE_SOURCE)
+if(
+    _nexus_existing_package
+    AND NOT _nexus_existing_package STREQUAL _nexus_sdk_source
+)
+    message(
+        FATAL_ERROR
+        "One build may contain only one resolved Nexus source SDK"
+    )
+endif()
+set_property(GLOBAL PROPERTY NEXUS_PACKAGE_SOURCE "${_nexus_sdk_source}")
+if(Nexus_FIND_COMPONENTS)
+    if(NOT Nexus_FIND_COMPONENTS STREQUAL "Runtime")
         message(
             FATAL_ERROR
-            "One build may contain only one resolved Nexus source SDK"
+            "The only optional Nexus package component is Runtime"
         )
     endif()
-    if(_nexus_sdk_mode STREQUAL "runtime")
-        set(Nexus_Runtime_FOUND TRUE)
-    endif()
-    set(Nexus_FOUND TRUE)
-    return()
-endif()
-if(_nexus_sdk_mode STREQUAL "runtime")
-    include("${_nexus_sdk_source}/cmake/platform/Runtime.cmake")
     set(Nexus_Runtime_FOUND TRUE)
-    set(Nexus_FOUND TRUE)
-    return()
 endif()
-# Compose the verified graph in its own directory scope, synchronously.
-function(_nexus_import_verified_platform)
-    include("${Nexus_SOURCE_DIR}/CMakeLists.txt")
-endfunction()
-add_subdirectory(
-    "${_nexus_sdk_source}/cmake/package/platform"
-    "${CMAKE_CURRENT_BINARY_DIR}/nexus-sdk"
-    EXCLUDE_FROM_ALL
-)
+include("${_nexus_sdk_source}/cmake/Nexus.cmake")
 set(Nexus_FOUND TRUE)

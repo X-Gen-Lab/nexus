@@ -35,6 +35,7 @@ from tools.configure.ir import (
     EndpointIR, FactoryOptions, FlashRegionIR, MemoryBudgetIR, PhysicalPartIR, PwmSharedOwnerIR,
     RuntimePowerIR, VendorDeviceIR, freeze, thaw)
 from tools.configure import resource_graph, trigger_graph, dma_topology, board_hardware, gpio_electrical
+from tools.configure import component_catalog
 from tools.configure.contracts import (
     COMPONENTS, CONTROLLER_KINDS, CONTROLLER_SELECTION_FIELDS,
     ENDPOINT_SELECTION_FIELDS)
@@ -669,7 +670,7 @@ def bind_input_identities(inputs, root, snapshots, input_paths, context=None):
     return sorted(records, key=lambda record: record["path"])
 
 
-def resolve_components(assembly):
+def resolve_components(assembly, *, choices=COMPONENTS):
     """Validate component intent; CMake chooses its source targets."""
     components = sequence(list(assembly.components) if
                           isinstance(assembly.components, tuple) else
@@ -678,7 +679,7 @@ def resolve_components(assembly):
         text(component, "component")
     unique(components, "components")
     for component in components:
-        if component not in COMPONENTS:
+        if component not in choices:
             fail(f"Unknown maintained component: {component}")
     if any(device["driver"] == "bmp280" for device in assembly.devices):
         if "bmp280-spi" not in components:
@@ -1415,6 +1416,8 @@ def _resolve(assembly_path, root=ROOT, *, input_paths=None, test_support=False,
     read = _SnapshotReader(snapshots)
     assembly_path = assembly_path.resolve()
     policy_path = contained_file(root, metadata.POLICY)
+    catalogue_path = contained_file(root, component_catalog.CATALOG)
+    component_entries = component_catalog.parse(read(catalogue_path))
     platform_metadata = metadata.policy_contract(
         read(policy_path), expected_factory_epoch=factory.FACTORY_ABI_EPOCH)
     assembly = load_assembly(assembly_path, root, snapshots,
@@ -1509,7 +1512,7 @@ def _resolve(assembly_path, root=ROOT, *, input_paths=None, test_support=False,
         selected_memory.budget, device_graph.devices,
         assembly=assembly, variant=variant)
         if external_memory_policy is not None else ())
-    inputs = [assembly_path, *facts.inputs, policy_path]
+    inputs = [assembly_path, *facts.inputs, policy_path, catalogue_path]
     inputs.extend(device_graph.inputs)
     selected_layout = _resolve_flash_layout(
         assembly.layout, assembly_path.parent, variant["flash"], read,
@@ -1525,7 +1528,7 @@ def _resolve(assembly_path, root=ROOT, *, input_paths=None, test_support=False,
     inputs.extend(selected_sources.inputs)
     records = bind_input_identities(inputs, root, snapshots, input_paths,
                                     facts.provider_context)
-    components = resolve_components(assembly)
+    components = resolve_components(assembly, choices=component_entries)
     resolved = ConfigurationIR(
         board=board["id"], soc_family=family,
         cpu_profile=cpu_profile, kernel=kernel_profile,

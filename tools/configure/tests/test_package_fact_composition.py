@@ -19,6 +19,7 @@ class PackageFactCompositionTests(unittest.TestCase):
         self.manifest_path = self.owner / "package.json"
         self.manifest = json.loads(self.manifest_path.read_text())
         for relative in ("dependencies/platform-compatibility.json",
+                         "components/catalog.json",
                          "boards/stm32f407ve_sky_qingchun/board.json"):
             target = self.root / relative
             target.parent.mkdir(parents=True, exist_ok=True)

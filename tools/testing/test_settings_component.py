@@ -33,7 +33,7 @@ class SettingsComponentTests(unittest.TestCase):
                 'project(settings_consumer C)\n'
                 'set(NEXUS_TEST_SUPPORT ON CACHE BOOL "Test model" FORCE)\n'
                 f'set(NEXUS_ASSEMBLY_FILE "{assembly.as_posix()}")\n'
-                f'add_subdirectory("{ROOT.as_posix()}" nexus)\n'
+                f'find_package(Nexus CONFIG REQUIRED PATHS "{ROOT.as_posix()}/cmake" NO_DEFAULT_PATH)\nnexus_add_platform(ASSEMBLY "${{NEXUS_ASSEMBLY_FILE}}")\n'
                 'nexus_add_firmware(settings_consumer SOURCES main.c)\n',
                 encoding="utf-8")
             cmake = shutil.which("cmake")

@@ -1,7 +1,7 @@
 # Selected memory sources and private dependencies.
 nexus_controller_modes(stm32_external_bus_modes external_bus)
 if(stm32_external_bus_modes)
-    set(stm32_gpio_helpers ON)
+    nexus_stm32f4_gpio(nexus_soc_stm32f4)
 endif()
 if(
     "qspi-indirect-sdr" IN_LIST stm32_external_bus_modes

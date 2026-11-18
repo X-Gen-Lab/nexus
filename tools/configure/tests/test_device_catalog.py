@@ -23,6 +23,7 @@ class DeviceCatalogConfigurationTests(unittest.TestCase):
         self.root = Path(self.temporary.name)
         copy_package(self.root)
         for name in ("dependencies/platform-compatibility.json",
+                     "components/catalog.json",
                      "boards/stm32f407ve_sky_qingchun/board.json"):
             path = self.root / name
             path.parent.mkdir(parents=True, exist_ok=True)

@@ -1,5 +1,6 @@
 # Reuse production targets without a synthetic SoC, Board or device factory.
 include_guard(GLOBAL)
+include("${CMAKE_CURRENT_LIST_DIR}/../Nexus.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/Configure.cmake")
 
 function(nexus_add_runtime)
@@ -107,20 +108,7 @@ function(nexus_add_runtime)
     set(NEXUS_TEST_SUPPORT OFF)
     set(_nexus_runtime_scope TRUE)
     include("${NEXUS_SOURCE_DIR}/cmake/platform/Options.cmake")
-    foreach(
-        layer
-        core
-        arch
-        io
-        os
-        components
-    )
-        add_subdirectory(
-            "${NEXUS_SOURCE_DIR}/${layer}"
-            "${NEXUS_BINARY_DIR}/${layer}"
-            EXCLUDE_FROM_ALL
-        )
-    endforeach()
+    _nexus_add_common_targets()
     add_library(nexus_runtime INTERFACE)
     target_link_libraries(
         nexus_runtime

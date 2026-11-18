@@ -1026,6 +1026,9 @@
       "headers": [
         "drivers/dac/stm32f407_dac.h",
         "drivers/dac/stm32f407_dac_dma.h"
+      ],
+      "io_domains": [
+        "dac_tx"
       ]
     },
     {
@@ -1347,6 +1350,9 @@
       "headers": [
         "drivers/dac/stm32f407_dac.h",
         "drivers/dac/stm32f407_dac_dma.h"
+      ],
+      "io_domains": [
+        "dac_tx"
       ]
     }
   ]

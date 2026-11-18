@@ -4,9 +4,14 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 if(NOT NEXUS_SOURCE_ROOT OR NOT NEXUS_ASSEMBLY_FILE)
     message(FATAL_ERROR "SDIO fixture needs explicit source root and assembly")
 endif()
-set(NEXUS_BUILD_TESTS OFF CACHE BOOL "No host test framework in firmware")
-set(NEXUS_BUILD_WORKLOAD OFF CACHE BOOL "Explicit read-only SDIO consumer")
-add_subdirectory("${NEXUS_SOURCE_ROOT}" nexus-sdk)
+find_package(
+    Nexus
+    CONFIG
+    REQUIRED
+    PATHS "${NEXUS_SOURCE_ROOT}/cmake"
+    NO_DEFAULT_PATH
+)
+nexus_add_platform(ASSEMBLY "${NEXUS_ASSEMBLY_FILE}")
 nexus_add_firmware(qiming_sdio_controller_fixture SOURCES controller_main.c)
 nexus_target_warnings(qiming_sdio_controller_fixture STRICT)
 find_package(Python3 3.11 REQUIRED COMPONENTS Interpreter)

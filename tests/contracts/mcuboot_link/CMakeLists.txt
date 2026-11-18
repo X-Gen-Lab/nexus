@@ -14,9 +14,14 @@ set(reference "${NEXUS_PLATFORM_ROOT}/cmake/package/verification/mcuboot_boot")
 if(NOT DEFINED NEXUS_ASSEMBLY_FILE)
     set(NEXUS_ASSEMBLY_FILE "${reference}/assembly.toml")
 endif()
-set(NEXUS_BUILD_TESTS OFF CACHE BOOL "")
-set(NEXUS_BUILD_WORKLOAD OFF CACHE BOOL "")
-add_subdirectory("${NEXUS_PLATFORM_ROOT}" nexus EXCLUDE_FROM_ALL)
+find_package(
+    Nexus
+    CONFIG
+    REQUIRED
+    PATHS "${NEXUS_PLATFORM_ROOT}/cmake"
+    NO_DEFAULT_PATH
+)
+nexus_add_platform(ASSEMBLY "${NEXUS_ASSEMBLY_FILE}")
 
 if(NOT NEXUS_MCUBOOT_COMPONENT_ROOT)
     set(NEXUS_MCUBOOT_COMPONENT_ROOT

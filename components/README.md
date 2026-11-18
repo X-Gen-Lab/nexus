@@ -26,10 +26,19 @@
 
 ## 选择、存储与执行
 
-CMake 管理组件源码依赖。已有 assembly component 列表、显式 `LIBRARIES` 和
-中间件创建 helper 各有维护范围，不能假定所有 target 都能在 TOML 中选择。
-未引用的组件代码不进入固件镜像。普通未选网络装配不加载 lwIP 源码闭包；显式
-选择网络 helper、target 或相应组件时，才验证并装配锁定的供应方依赖。
+CMake 管理组件源码依赖。普通库在所属分类与叶目录定义 target，应用使用
+`target_link_libraries()` 或固件 `LIBRARIES` 直接消费，无需加入 TOML 枚举。
+需要装配选择的组件由 [catalog.json](catalog.json) 唯一登记 `id`、`entry` 与 `target`；
+配置校验和公共 CMake 同时消费该数据。`entry` 为空表示目标已由轻量目录定义，非空
+指向组件自己的 `Select.cmake`。叶入口创建目标并声明软件依赖，catalog 不列源码图。
+
+绑定 C 所需的私有编译要求由组件 target 的 `NEXUS_BINDINGS_USAGE_TARGET` 指向独立
+usage target，装配私下汇合到 `nexus_component_bindings`。生成的公共头需要组件类型时，
+叶目标通过 `NEXUS_BINDINGS_API_TARGET` 声明公共依赖，汇合到
+`nexus_component_api` 并随 Platform 传递。应用自建库只依赖 Platform 就能使用其生成
+头，组件私有头和宏仍不传给应用。公共根入口不按 SMBus、网络或 TLS 名称判断创建行为。
+轻量目录保留显式加载，未引用代码
+不进入镜像；选中中间件后才验证和装配锁定供应商，未选库存不初始化。
 
 基础组件不创建堆、工作线程或最大对象池。可选 lwIP 使用明确池，TLS 可在调用者提供
 的 arena 中子分配；必须按所选 profile 预算，不能将全部中间件统称为内部无分配。

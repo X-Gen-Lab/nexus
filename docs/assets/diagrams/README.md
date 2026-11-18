@@ -37,7 +37,7 @@ python tools/dev/dev.py docs check --full \
 
 ## FIG-02 选定编译目标依赖
 
-F407ZG 裸机 IRQ UART 的构建依赖；虚线为私有 include 或 OBJECT 注入。
+F407ZG 裸机 IRQ UART 的构建依赖；虚线为 include 使用要求或 OBJECT 注入。
 
 ![FIG-02：选定编译目标依赖](build-targets.svg)
 

@@ -26,6 +26,8 @@ set_target_properties(
         NEXUS_TEST_SUPPORT "${_nexus_test_support}"
 )
 add_library(nexus_abi_options INTERFACE)
+add_library(Nexus::ABI ALIAS nexus_abi_options)
+add_library(nexus_firmware_options INTERFACE)
 add_library(nexus_owned_warnings INTERFACE)
 add_library(nexus_sanitizer_options INTERFACE)
 target_link_libraries(nexus_build_options INTERFACE nexus_sanitizer_options)
@@ -217,7 +219,7 @@ if(cpu)
     target_link_options(nexus_abi_options INTERFACE ${cpu})
     target_link_libraries(nexus_build_options INTERFACE nexus_abi_options)
     target_link_options(
-        nexus_build_options
+        nexus_firmware_options
         INTERFACE
             --specs=nano.specs
             --specs=nosys.specs

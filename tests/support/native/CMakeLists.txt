@@ -40,10 +40,17 @@ set(native_ip_includes
     "${native_ip}/legacy_mac"
     "${native_ip}/dwc_otg_device"
 )
-set(NEXUS_SYSTEM_PRIVATE_INCLUDES
-    ${native_ip_includes}
-    "${CMAKE_CURRENT_SOURCE_DIR}/include"
-    PARENT_SCOPE
+add_library(nexus_native_startup_usage INTERFACE)
+target_include_directories(
+    nexus_native_startup_usage
+    INTERFACE
+        ${native_ip_includes}
+        "${CMAKE_CURRENT_SOURCE_DIR}/include"
+        "${CMAKE_CURRENT_SOURCE_DIR}/drivers"
+)
+set_property(
+    TARGET nexus_io_native
+    PROPERTY NEXUS_STARTUP_USAGE_TARGET nexus_native_startup_usage
 )
 target_include_directories(nexus_io_native PRIVATE ${native_ip_includes})
 add_library(

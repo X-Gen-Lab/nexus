@@ -124,7 +124,7 @@ def native_facts():
             "clock_hz": soc["clock_profiles"]["model"]["core_hz"]}
 
 
-def prepare_consumer(directory, entry, call=None):
+def prepare_consumer(directory, entry, call=None, *, languages="C CXX"):
     """Author only CPU facts and Runtime choices, with no Board or instances."""
     source = directory / "consumer source"
     build = directory / "consumer build"
@@ -137,7 +137,7 @@ def prepare_consumer(directory, entry, call=None):
         call = 'nexus_add_runtime(ASSEMBLY "runtime.toml")\n'
     (source / "CMakeLists.txt").write_text(
         "cmake_minimum_required(VERSION 3.31)\n"
-        "project(runtime_consumer LANGUAGES C CXX)\n"
+        f"project(runtime_consumer LANGUAGES {languages})\n"
         "set(CMAKE_C_STANDARD 11)\nset(CMAKE_C_STANDARD_REQUIRED ON)\n"
         "set(CMAKE_C_EXTENSIONS OFF)\nset(CMAKE_CXX_STANDARD 17)\n"
         "set(CMAKE_CXX_STANDARD_REQUIRED ON)\n"
@@ -153,6 +153,7 @@ def prepare_consumer(directory, entry, call=None):
           'file(WRITE "${CMAKE_BINARY_DIR}/runtime-config-dir.txt" "${bundle}")\n'
           "foreach(language c cpp)\n"
           "    add_executable(app_${language} main.${language})\n"
+          "    nexus_apply_firmware_policy(app_${language})\n"
           "    target_link_libraries(app_${language} PRIVATE Nexus::Runtime)\n"
           "endforeach()\n")
     for extension in ("c", "cpp"):
@@ -200,7 +201,9 @@ class RuntimeCMakeTests(RuntimeConsumerAssertions, unittest.TestCase):
         self.temporary = tempfile.TemporaryDirectory(prefix="nexus CPU runtime ")
         self.addCleanup(self.temporary.cleanup)
         self.directory = Path(self.temporary.name)
-        self.entry = f'include("{ROOT}/cmake/platform/Runtime.cmake")\n'
+        self.entry = (
+            f'find_package(Nexus CONFIG REQUIRED PATHS "{ROOT}/cmake" '
+            'NO_DEFAULT_PATH)\n')
 
     def consumer(self, call=None):
         return prepare_consumer(self.directory, self.entry, call)
@@ -314,7 +317,7 @@ class RuntimeInstalledSDKTests(RuntimeConsumerAssertions, unittest.TestCase):
                 "--development-fixture", "--host-support", "--backend", "freertos"])
         original.rename(cls.prefix)
         cls.sdk = cls.prefix / "share/nexus/src"
-        cls.entry = "find_package(Nexus COMPONENTS Runtime REQUIRED)\n"
+        cls.entry = "find_package(Nexus CONFIG REQUIRED)\n"
 
     def setUp(self):
         self.consumer_directory = self.directory / self._testMethodName
@@ -335,10 +338,9 @@ class RuntimeInstalledSDKTests(RuntimeConsumerAssertions, unittest.TestCase):
         self.assert_builds_and_runs(build)
         self.assert_public_graph(build, original_source=ROOT)
         bundle = Path((build / "runtime-config-dir.txt").read_text())
-        self.assertEqual(bundle.parent.parent, build)
-        self.assertFalse((build / "nexus-sdk").exists())
+        self.assertTrue(bundle.is_relative_to(build))
 
-    def test_same_runtime_package_mode_is_idempotent_before_and_after_assembly(self):
+    def test_discovery_is_idempotent_before_and_after_runtime_assembly(self):
         source, build = prepare_consumer(
             self.consumer_directory, self.entry + self.entry,
             'nexus_add_runtime(ASSEMBLY "runtime.toml")\n' + self.entry)
@@ -355,11 +357,11 @@ class RuntimeInstalledSDKTests(RuntimeConsumerAssertions, unittest.TestCase):
         (source / "CMakeLists.txt").write_text(
             "cmake_minimum_required(VERSION 3.31)\n"
             "project(two_sdk_sources LANGUAGES C)\n"
-            'find_package(Nexus COMPONENTS Runtime REQUIRED PATHS '
+            'find_package(Nexus CONFIG REQUIRED PATHS '
             f'"{self.prefix}" NO_DEFAULT_PATH)\n'
             f'set(Nexus_DIR "{second}/lib/cmake/Nexus" CACHE PATH '
             '"second SDK source" FORCE)\n'
-            "find_package(Nexus COMPONENTS Runtime REQUIRED)\n"
+            "find_package(Nexus CONFIG REQUIRED)\n"
             'file(WRITE "${CMAKE_BINARY_DIR}/second-source.txt" '
             '"${Nexus_SOURCE_DIR}")\n')
         result = self.configure(source, build,
@@ -424,7 +426,8 @@ class RuntimeInstalledSDKTests(RuntimeConsumerAssertions, unittest.TestCase):
                         encoded.encode()).hexdigest()
                     identity.write_text(json.dumps(manifest) + "\n")
                     source, build = prepare_consumer(
-                        self.consumer_directory / str(index), self.entry)
+                        self.consumer_directory / str(index), self.entry,
+                        languages="NONE")
                     result = self.sdk_configure(source, build)
                     self.assertNotEqual(result.returncode, 0)
                     self.assertIn("missing required sources/licenses",
@@ -490,25 +493,32 @@ class RuntimeInstalledSDKTests(RuntimeConsumerAssertions, unittest.TestCase):
         source = self.consumer_directory / "mode consumer source"
         build = self.consumer_directory / "mode consumer build"
         source.mkdir(parents=True)
+        (source / "cpu.json").write_text(json.dumps(native_facts()) + "\n")
+        (source / "runtime.toml").write_text(
+            'schema_version = 1\ncpu_facts = "cpu.json"\n'
+            'backend = "baremetal"\noptimization = "O2"\n')
+        (source / "platform.toml").write_bytes(
+            (ROOT / "tests/support/native/assemblies/native-empty.toml").read_bytes())
         entries = {
-            "Runtime": "find_package(Nexus COMPONENTS Runtime REQUIRED)\n",
-            "Platform": "find_package(Nexus REQUIRED)\n"}
+            "Runtime": 'nexus_add_runtime(ASSEMBLY "runtime.toml")\n',
+            "Platform": 'nexus_add_platform(ASSEMBLY "platform.toml")\n'}
         (source / "CMakeLists.txt").write_text(
             "cmake_minimum_required(VERSION 3.31)\n"
             "project(mixed_modes LANGUAGES C)\n"
+            "find_package(Nexus CONFIG REQUIRED)\n"
             + entries[first] + entries[second])
         result = self.configure(
             source, build, f"-DCMAKE_PREFIX_PATH={self.prefix}",
             "-DNEXUS_ALLOW_SOURCE_SDK_FIXTURE=ON",
-            f"-DNEXUS_ASSEMBLY_FILE={self.sdk}/tests/support/native/assemblies/native.toml",
             "-DNEXUS_TEST_SUPPORT=ON")
         self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
-        self.assertIn("mode", result.stdout + result.stderr)
+        self.assertIn("only one resolved Nexus assembly",
+                      " ".join((result.stdout + result.stderr).split()))
 
-    def test_runtime_then_platform_package_modes_cannot_mix(self):
+    def test_runtime_then_platform_assemblies_cannot_mix(self):
         self.assert_package_modes_rejected("Runtime", "Platform")
 
-    def test_platform_then_runtime_package_modes_cannot_mix(self):
+    def test_platform_then_runtime_assemblies_cannot_mix(self):
         self.assert_package_modes_rejected("Platform", "Runtime")
 
 

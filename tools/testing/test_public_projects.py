@@ -52,7 +52,9 @@ class PublicProjectTests(unittest.TestCase):
         self.assertIn("NX_GPIO_REF_STATUS", (self.output / "main.c").read_text())
         self.assertNotIn("test", result["commands"])
         command = result["commands"]["configure"]
-        self.assertIn("-DNEXUS_SOURCE=" + str(source), command)
+        self.assertIn("-DNexus_DIR=" + str(source / "cmake"), command)
+        self.assertFalse(any(argument.startswith("-DNEXUS_SOURCE=")
+                             for argument in command))
         self.assertIn("-DCMAKE_TOOLCHAIN_FILE=" +
                       str(source / "cmake/toolchains/arm-gcc.cmake"), command)
         self.assertNotIn("-DNEXUS_TEST_SUPPORT=ON", command)

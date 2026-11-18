@@ -21,11 +21,10 @@ class IncrementalConsumerTests(unittest.TestCase):
             (root / "CMakeLists.txt").write_text(
                 'cmake_minimum_required(VERSION 3.31)\n'
                 'project(NexusIncremental LANGUAGES C ASM)\n'
-                'set(NEXUS_BUILD_TESTS OFF CACHE BOOL "")\n'
                 'set(NEXUS_TEST_SUPPORT ON CACHE BOOL "")\n'
-                'set(NEXUS_BUILD_WORKLOAD OFF CACHE BOOL "")\n'
-                'set(NEXUS_ASSEMBLY_FILE "${CMAKE_CURRENT_SOURCE_DIR}/assembly.toml")\n'
-                'add_subdirectory("' + configure.ROOT.as_posix() + '" nexus)\n'
+                'find_package(Nexus CONFIG REQUIRED PATHS "' +
+                (configure.ROOT / "cmake").as_posix() + '" NO_DEFAULT_PATH)\n'
+                'nexus_add_platform(ASSEMBLY "${CMAKE_CURRENT_SOURCE_DIR}/assembly.toml")\n'
                 'nexus_add_firmware(sample SOURCES main.c)\n')
             build = root / "build"
             commands = []
@@ -38,7 +37,7 @@ class IncrementalConsumerTests(unittest.TestCase):
                 return result.stdout + result.stderr
             configure_command = ["cmake", "-S", str(root), "-B", str(build),
                                  "-G", "Ninja", "-DCMAKE_BUILD_TYPE=Debug"]
-            build_command = ["cmake", "--build", str(build), "--parallel", "2"]
+            build_command = ["cmake", "--build", str(build), "--parallel", "1"]
             execute(configure_command)
             execute(build_command)
             self.assertIn("no work to do", execute(build_command))

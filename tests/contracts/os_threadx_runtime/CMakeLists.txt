@@ -7,9 +7,14 @@ get_filename_component(
     "${CMAKE_CURRENT_LIST_DIR}/../../.."
     ABSOLUTE
 )
-set(NEXUS_BUILD_TESTS OFF CACHE BOOL "No firmware host tests" FORCE)
-set(NEXUS_BUILD_WORKLOAD OFF CACHE BOOL "Explicit contract image only" FORCE)
-add_subdirectory("${nexus_source}" nexus EXCLUDE_FROM_ALL)
+find_package(
+    Nexus
+    CONFIG
+    REQUIRED
+    PATHS "${nexus_source}/cmake"
+    NO_DEFAULT_PATH
+)
+nexus_add_platform(ASSEMBLY "${NEXUS_ASSEMBLY_FILE}")
 set(sources main.c)
 if(NEXUS_THREADX_CONTRACT_EXTERNAL_HOOK)
     list(APPEND sources external_tick.c)
