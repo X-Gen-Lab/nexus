@@ -10,6 +10,9 @@ HEADER = re.compile(
     r"^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)"
     r"(?:\([A-Za-z0-9_./-]+\))?!?: \S.*$"
 )
+PULL_REQUEST_MERGE = re.compile(
+    r"Merge pull request #[1-9][0-9]* from [A-Za-z0-9_.-]+/\S+"
+)
 
 
 def valid_message(message):
@@ -18,8 +21,9 @@ def valid_message(message):
     if not lines:
         return False
     header = lines[0]
-    return bool(HEADER.fullmatch(header)) or header.startswith(
-        ("Merge branch '", "Merge remote-tracking branch '", 'Revert "')
+    return bool(HEADER.fullmatch(header) or PULL_REQUEST_MERGE.fullmatch(header)
+                or header.startswith(
+                    ("Merge branch '", "Merge remote-tracking branch '", 'Revert "'))
     )
 
 
