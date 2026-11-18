@@ -19,6 +19,7 @@ uint32_t nx_boot_mpu;
 uint32_t nx_boot_vtor;
 uint32_t nx_system_rng_control;
 }
+#include <cerrno>
 #include <cstdlib>
 #include <cstring>
 #include <gmock/gmock.h>
@@ -100,14 +101,18 @@ class EthernetFramesFactory : public testing::Test {
             mmap(reinterpret_cast<void*>(mmio_base), 0x80000U,
                  PROT_READ | PROT_WRITE,
                  MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED_NOREPLACE, -1, 0);
-        ASSERT_EQ(reinterpret_cast<void*>(mmio_base), mapping);
+        const int mmio_errno = errno;
+        ASSERT_EQ(reinterpret_cast<void*>(mmio_base), mapping)
+            << "MMIO mmap errno " << mmio_errno;
         /* The generated descriptor and RX arrays live in a separate NOLOAD
          * ELF SRAM section. This mapping supplies only caller TX payload. */
         packets =
             mmap(reinterpret_cast<void*>(packet_base), packet_bytes,
                  PROT_READ | PROT_WRITE,
                  MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED_NOREPLACE, -1, 0);
-        ASSERT_EQ(reinterpret_cast<void*>(packet_base), packets);
+        const int packet_errno = errno;
+        ASSERT_EQ(reinterpret_cast<void*>(packet_base), packets)
+            << "packet mmap errno " << packet_errno;
         std::memset(NVIC, 0, sizeof(*NVIC));
         nx_boot_cpacr = 0x00f00000U;
         nx_boot_mpu = 0U;
@@ -124,6 +129,7 @@ class EthernetFramesFactory : public testing::Test {
         face = nx_factory_eth_frames(NX_ETH_FRAMES_ID_MAC);
         ASSERT_NE(nullptr, face);
         mac = static_cast<nx_eth_frames_mac_t*>(face->context);
+        ASSERT_NE(nullptr, mac);
         auto* head = static_cast<uint8_t*>(packets);
         auto* tail = head + 256U;
         head[12] = 0x81U;
@@ -148,7 +154,7 @@ class EthernetFramesFactory : public testing::Test {
         }
         return result;
     }
-    void TearDown() override {
+    void CloseOwner() {
         oracle.hold_hse = oracle.hold_mac_reset = false;
         if (loan_held) {
             EXPECT_EQ(NX_SUCCESS, nx_eth_frames_port_release(face, &held));
@@ -175,7 +181,13 @@ class EthernetFramesFactory : public testing::Test {
                 << "Owner still retains shared clock or caller storage";
             std::abort();
         }
+    }
+    void TearDown() override {
+        if (face != nullptr && mac != nullptr) {
+            CloseOwner();
+        }
         hardware = nullptr;
+        mac = nullptr;
         if (packets != nullptr && packets != MAP_FAILED) {
             munmap(packets, packet_bytes);
         }

@@ -53,9 +53,13 @@ foreach(eth_frames_family stm32)
             _init=nx_eth_frames_fixture_init
             _fini=nx_eth_frames_fixture_fini
     )
+    # Keep the host image and randomized heap above both modeled MCU windows.
     target_link_options(
         ${eth_frames_target}
-        PRIVATE -no-pie "-Wl,-T,${nexus_google_root}/soc/eth_frames_host_dma.ld"
+        PRIVATE
+            -no-pie
+            -Wl,-Ttext-segment=0x60000000
+            "-Wl,-T,${nexus_google_root}/soc/eth_frames_host_dma.ld"
     )
     set_property(
         TARGET ${eth_frames_target}
