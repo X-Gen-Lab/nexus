@@ -9,6 +9,10 @@ source interface epoch 与 assembly schema 分别计代，均读取上述兼容�
 
 ## 打包与消费
 
+`find_package(Nexus)` 完整验证所选安装包后，在同一次同步导入中装配平台目标。
+后续独立导入、直接 SDK 入口与 Runtime 创建分别校验当前输入。应用构建工具也会
+先验证 SDK，再判断现有 Ninja 图是否可复用；输入身份相同的热构建保留生成文件。
+
 从已初始化、干净、已提交检出执行：
 
 ```sh

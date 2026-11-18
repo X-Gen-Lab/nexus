@@ -101,8 +101,12 @@ if(_nexus_sdk_mode STREQUAL "runtime")
     set(Nexus_FOUND TRUE)
     return()
 endif()
+# Compose the verified graph in its own directory scope, synchronously.
+function(_nexus_import_verified_platform)
+    include("${Nexus_SOURCE_DIR}/CMakeLists.txt")
+endfunction()
 add_subdirectory(
-    "${_nexus_sdk_source}"
+    "${_nexus_sdk_source}/cmake/package/platform"
     "${CMAKE_CURRENT_BINARY_DIR}/nexus-sdk"
     EXCLUDE_FROM_ALL
 )

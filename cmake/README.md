@@ -40,6 +40,13 @@ nexus_add_firmware(firmware SOURCES main.c LIBRARIES Nexus::Log)
 应用负责任务、stack／TCB、队列、Flash 区域与停机顺序。每个固件的私有启动对象
 继承该调用目录的编译设置。同一装配可以在不同目录构建多个镜像。
 
+开发编译缓存由 `NEXUS_COMPILER_CACHE=ON` 显式启用，默认仍为关闭。同一消费工程的
+构建目录共用顶层源码目录下的 `build/compiler-cache`；安装的 SDK 源码保持只读。
+可用 `NEXUS_COMPILER_CACHE_DIR` 指定其他位置。
+namespace 绑定实际编译器内容、CPU／enum ABI、工具链与平台兼容策略；配置路由和
+优化选项变化由 ccache 的逐命令、源码和头文件哈希处理。缓存保留严格 compilercheck、
+空 sloppiness 和 `HASHDIR=true`；不同生成头路径或调试工作目录仍可能需要重新编译。
+
 ARM 工具链在应用启用 CXX 时解析交叉 C++ 编译器。纯 C/ASM 工程可以使用
 仅安装 C 编译器与所需 binutils 的环境；使用 size 的度量入口自行定位该工具。
 

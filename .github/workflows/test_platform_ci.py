@@ -50,11 +50,54 @@ class WorkflowContracts(unittest.TestCase):
         commands = '\n'.join(step.get('run', '') for step in steps)
         self.assertNotIn('scripts/ci/tdd_gate.py', commands)
         self.assertNotIn('scripts/ci/native_contracts.py', commands)
-        for action in ('doctor', 'configure', 'build'):
+        for action in ('doctor', 'configure'):
             self.assertIn('tools/dev/dev.py ' + action, commands)
-        self.assertIn('--target nexus_google_contracts', commands)
+        self.assertNotIn('tools/dev/dev.py build', commands)
+        execute = next(step for step in steps
+                       if '--suite testing' in step.get('run', ''))
+        self.assertEqual(execute.get('env', {}).get('NEXUS_TOOL_NATIVE_DATABASE'),
+                         '${{ github.workspace }}/build/native-debug/compile_commands.json')
         for suite in ('configure', 'ci', 'workflows', 'testing'):
             self.assertIn('--suite ' + suite, commands)
+
+    def test_tool_fixture_preparation_stops_at_configure_and_propagates_failures(self):
+        steps = workflow('enterprise-tools.yml')['jobs']['tooling']['steps']
+        preparation = next(step for step in steps if step.get('name') ==
+                           'Prepare the actual compiler and generated inputs for tool fixtures')
+        spy = ('#!' + sys.executable + '\n'
+            'import json,os,sys\nfrom pathlib import Path\n'
+            'args=sys.argv[1:]\n'
+            'with open(os.environ["PREPARE_CALLS"],"a") as output:\n'
+            '    output.write(json.dumps(args)+"\\n")\n'
+            'if args[1]==os.environ["PREPARE_FAILURE"]:raise SystemExit(37)\n'
+            'if args[1]=="configure":\n'
+            '    database=Path("build/native-debug/compile_commands.json")\n'
+            '    database.parent.mkdir(parents=True)\n'
+            '    database.write_text("[{}]\\n")\n')
+        expected = [
+            ['tools/dev/dev.py', 'doctor', '--target', 'contracts'],
+            ['tools/dev/dev.py', 'configure', '--preset', 'native-debug']]
+        for failure, count in (('', 2), ('doctor', 1), ('configure', 2)):
+            with self.subTest(failure=failure), tempfile.TemporaryDirectory() as name:
+                root = Path(name) / 'repository with spaces'
+                executable = root / '.venv/bin/python'
+                executable.parent.mkdir(parents=True)
+                executable.write_text(spy)
+                executable.chmod(0o700)
+                calls = root / 'prepare-calls.jsonl'
+                result = subprocess.run(
+                    ['bash', '-euo', 'pipefail', '-c', preparation['run']],
+                    cwd=root, env={**os.environ, 'PREPARE_CALLS': str(calls),
+                                   'PREPARE_FAILURE': failure},
+                    capture_output=True, text=True, timeout=10)
+                self.assertEqual(result.returncode, 37 if failure else 0,
+                                 result.stdout + result.stderr)
+                self.assertEqual([json.loads(line)
+                                  for line in calls.read_text().splitlines()],
+                                 expected[:count])
+                self.assertEqual((root / 'build/native-debug/compile_commands.json').is_file(),
+                                 not failure)
+                self.assertFalse((root / 'build/native-debug/bin').exists())
 
     def test_quality_workflow_runs_checks_without_repeating_tool_tests(self):
         jobs = workflow('quality-checks.yml')['jobs']

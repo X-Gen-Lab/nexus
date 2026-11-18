@@ -1,10 +1,15 @@
-"""CPU-only assembly admission and atomic bundle regressions."""
+"""CPU runtime admission, input scopes and atomic bundle regressions."""
 import json
 from pathlib import Path
+import shutil
+import subprocess
+import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
-from tools.configure import runtime
+from tools.configure import configure, dependencies, runtime
+from tools.configure.tests.test_cpu_profiles import facts, irq
 
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -162,6 +167,290 @@ class RuntimeAssemblyTests(unittest.TestCase):
         self.assertFalse((self.output / "bindings.c").exists())
         self.assertFalse((self.output / "memory.ld").exists())
         self.assertFalse((self.output / "nexus_factory.h").exists())
+
+
+PLATFORM_ONLY = (
+    "providers/descriptor", "packages", "package_policy", "static_ir",
+    "data_provider", "static_recipe", "static_endpoints", "static_fragments",
+    "shared_irq", "domain_policies", "domain_bridge", "header_projection",
+    "integration_package",
+)
+
+
+class ConfigurationInputScopeTests(unittest.TestCase):
+    def setUp(self):
+        self.temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temporary.cleanup)
+        self.directory = Path(self.temporary.name)
+        soc = json.loads((ROOT / "tests/support/native/soc.json").read_text())
+        self.hardware = {
+            "schema_version": 1, "cpu": soc["cpu"], "irq": soc["irq"],
+            "clock_hz": 1000000}
+        self.runtime_assembly = self.directory / "runtime.toml"
+        self.platform_assembly = self.directory / "platform.toml"
+        self.platform_assembly.write_text(
+            'schema = 2\nboard = "native_reference"\nbackend = "native"\n'
+            'clock = "model"\n[memory]\nmain_stack_bytes = 2048\n')
+
+    def write_runtime(self, backend):
+        hardware = (dict(self.hardware, cpu=facts("cortex-m4"), irq=irq("cortex-m4"))
+                    if backend == "freertos" else self.hardware)
+        (self.directory / "cpu.json").write_text(json.dumps(hardware))
+        self.runtime_assembly.write_text(
+            'schema_version = 1\ncpu_facts = "cpu.json"\n'
+            f'backend = "{backend}"\noptimization = "Os"\n')
+
+    def identity(self, mode, backend="baremetal"):
+        output = self.directory / (mode + "-bundle")
+        if mode == "runtime":
+            self.write_runtime(backend)
+            runtime.configure(self.runtime_assembly, output)
+        else:
+            configure.configure(self.platform_assembly, output, test_support=True)
+        return json.loads((output / "generator-identity.json").read_text())
+
+    def mirror_sources(self):
+        mirror = self.directory / "generator"
+        paths, _ = dependencies.snapshot(mode="platform", family="native",
+                                         test_support=True)
+        paths.update(dependencies.snapshot(mode="runtime")[0])
+        for name, source in paths.items():
+            target = mirror / name
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(source, target)
+        return mirror
+
+    def test_runtime_omits_platform_assembly_code_but_retains_imported_factory_code(self):
+        names = {row["path"] for row in self.identity("runtime")["files"]}
+        for module in PLATFORM_ONLY:
+            self.assertNotIn("tools/configure/" + module + ".py", names)
+        for module in ("factory", "usb_otg", "usb_host", "stream_profiles",
+                       "uart_formats", "contracts", "calls"):
+            self.assertIn("tools/configure/" + module + ".py", names)
+
+    def test_threadx_code_is_selected_only_for_its_backend(self):
+        path = "tools/configure/threadx.py"
+        for mode, backend in (("runtime", "baremetal"), ("platform", "native")):
+            with self.subTest(mode=mode):
+                names = {row["path"] for row in self.identity(mode, backend)["files"]}
+                self.assertNotIn(path, names)
+        names = {row["path"] for row in self.identity("runtime", "threadx")["files"]}
+        self.assertIn(path, names)
+
+    def test_unselected_code_edit_does_not_change_runtime_generator_identity(self):
+        mirror = self.mirror_sources()
+        with patch.object(dependencies, "ROOT", mirror):
+            before_runtime = self.identity("runtime")
+            before_platform = self.identity("platform")
+            source = mirror / "tools/configure/data_provider.py"
+            source.write_bytes(source.read_bytes() + b"\n# platform engine edit\n")
+            self.assertEqual(before_runtime, self.identity("runtime"))
+            self.assertNotEqual(before_platform, self.identity("platform"))
+
+    def test_threadx_edit_changes_only_selected_backend_identity(self):
+        mirror = self.mirror_sources()
+        with patch.object(dependencies, "ROOT", mirror):
+            before_native = self.identity("platform")
+            before_runtime = self.identity("runtime")
+            before_threadx = self.identity("runtime", "threadx")
+            source = mirror / "tools/configure/threadx.py"
+            source.write_bytes(source.read_bytes() + b"\n# ThreadX policy edit\n")
+            self.assertEqual(before_native, self.identity("platform"))
+            self.assertEqual(before_runtime, self.identity("runtime"))
+            self.assertNotEqual(before_threadx, self.identity("runtime", "threadx"))
+
+    def test_lowpower_code_is_only_an_input_of_the_freertos_backend(self):
+        mirror = self.mirror_sources()
+        with patch.object(dependencies, "ROOT", mirror):
+            before = {backend: self.identity("runtime", backend)
+                      for backend in ("baremetal", "freertos", "threadx")}
+            before_platform = self.identity("platform")
+            for backend, identity in before.items():
+                names = {row["path"] for row in identity["files"]}
+                self.assertEqual("tools/configure/lowpower.py" in names,
+                                 backend == "freertos")
+            source = mirror / "tools/configure/lowpower.py"
+            source.write_bytes(source.read_bytes() + b"\n# FreeRTOS policy edit\n")
+            self.assertEqual(before_platform, self.identity("platform"))
+            for backend, identity in before.items():
+                changed = self.identity("runtime", backend)
+                if backend == "freertos":
+                    self.assertNotEqual(identity, changed)
+                else:
+                    self.assertEqual(identity, changed)
+
+    def test_selected_backend_code_edit_during_resolution_withdraws_old_bundle(self):
+        mirror = self.mirror_sources()
+        original = runtime.resolve
+        with patch.object(dependencies, "ROOT", mirror):
+            for backend, module in (("baremetal", "factory"),
+                                    ("freertos", "lowpower"), ("threadx", "threadx")):
+                with self.subTest(backend=backend):
+                    self.identity("runtime", backend)
+
+                    def changing(*args, **kwargs):
+                        result = original(*args, **kwargs)
+                        source = mirror / ("tools/configure/" + module + ".py")
+                        source.write_bytes(source.read_bytes() + b"\n# concurrent edit\n")
+                        return result
+
+                    with patch.object(runtime, "resolve", side_effect=changing):
+                        with self.assertRaisesRegex(ValueError, "code changed"):
+                            runtime.configure(self.runtime_assembly,
+                                              self.directory / "runtime-bundle")
+                    self.assertFalse((self.directory / "runtime-bundle").exists())
+
+    def test_fresh_process_seals_every_executed_configuration_module(self):
+        script = """
+import importlib, json, sys
+from pathlib import Path
+mode, backend, assembly, output, root = sys.argv[1:]
+root = Path(root)
+module = importlib.import_module('tools.configure.' + mode)
+arguments = ['--assembly', assembly, '--output', output]
+if mode == 'configure':
+    arguments.append('--test-support')
+assert module.main(arguments) == 0
+paths = json.loads((Path(output) / 'configuration_code_paths.json').read_text())
+loaded = {Path(item.__file__).resolve().relative_to(root).as_posix()
+          for item in list(sys.modules.values())
+          if getattr(item, '__file__', None)
+          and Path(item.__file__).resolve().is_relative_to(root)
+          and not Path(item.__file__).resolve().is_relative_to(Path(sys.prefix).resolve())
+          and Path(item.__file__).suffix == '.py'}
+missing = loaded - paths.keys()
+assert not missing, sorted(missing)
+if backend != 'threadx':
+    assert 'tools.configure.threadx' not in sys.modules
+if backend != 'freertos':
+    assert 'tools.configure.lowpower' not in sys.modules
+"""
+        for mode, backend in (("runtime", "baremetal"), ("runtime", "freertos"),
+                              ("runtime", "threadx"),
+                              ("configure", "native")):
+            with self.subTest(mode=mode, backend=backend):
+                self.write_runtime(backend)
+                assembly = (self.runtime_assembly if mode == "runtime" else
+                            self.platform_assembly)
+                command = subprocess.run([
+                    sys.executable, "-B", "-c", script, mode, backend, str(assembly),
+                    str(self.directory / (mode + backend)), str(ROOT)],
+                    cwd=ROOT, capture_output=True, text=True, timeout=30)
+                self.assertEqual(command.returncode, 0, command.stdout + command.stderr)
+
+    def test_sdk_runtime_keeps_the_imported_package_verifier_closure(self):
+        names = dependencies.source_names("runtime", None, sdk=True)
+        for path in ("tools/configure/packages.py",
+                     "tools/configure/providers/descriptor.py",
+                     "tools/dev/dependencies.py"):
+            self.assertIn(path, names)
+        script = """
+import importlib.util, sys
+from pathlib import Path
+from tools.configure import dependencies, runtime
+root = Path.cwd()
+spec = importlib.util.spec_from_file_location(
+    'sdk_verifier', root / 'cmake/package/package_source_sdk.py')
+spec.loader.exec_module(importlib.util.module_from_spec(spec))
+paths, _ = dependencies.snapshot(mode='runtime', sdk=True)
+loaded = {Path(item.__file__).resolve().relative_to(root).as_posix()
+          for item in list(sys.modules.values())
+          if getattr(item, '__file__', None)
+          and Path(item.__file__).resolve().is_relative_to(root)
+          and not Path(item.__file__).resolve().is_relative_to(Path(sys.prefix).resolve())
+          and Path(item.__file__).suffix == '.py'}
+assert not loaded - paths.keys(), sorted(loaded - paths.keys())
+"""
+        command = subprocess.run([sys.executable, "-B", "-c", script],
+                                 cwd=ROOT, capture_output=True, text=True, timeout=30)
+        self.assertEqual(command.returncode, 0, command.stdout + command.stderr)
+
+    def test_unknown_backend_scope_keeps_conservative_policy_inputs(self):
+        for backend in (None, "future-backend"):
+            with self.subTest(backend=backend):
+                self.assertIn("tools/configure/threadx.py",
+                    dependencies.source_names("runtime", None, backend=backend))
+                self.assertIn("tools/configure/lowpower.py",
+                    dependencies.source_names("runtime", None, backend=backend))
+
+    def test_narrowed_platform_receipt_preserves_strict_graph_binding(self):
+        from tools.evidence.identity import resolved_identity
+        from tools.measurement import build_resources
+
+        self.identity("platform")
+        output = self.directory / "platform-bundle"
+        path = output / "resolved.json"
+        selected, _ = resolved_identity(path)
+        self.assertEqual(selected["backend"], "native")
+        anchor = build_resources.bind(path, allow_reference=False)
+        with patch.object(configure, "resolve_ir", side_effect=AssertionError(
+                "A bound source-only relink must not replay the resolver")):
+            self.assertEqual(build_resources.from_graph(path, anchor,
+                             allow_reference=False)[0], selected)
+        paths = output / "configuration_code_paths.json"
+        identity = output / "generator-identity.json"
+        catalog, code = json.loads(paths.read_text()), json.loads(identity.read_text())
+        name = "tools/configure/factory.py"
+        replacement = self.directory / "replacement.py"
+        replacement.write_bytes(Path(catalog[name]).read_bytes())
+        catalog[name] = str(replacement)
+        paths.write_text(json.dumps(catalog))
+        with self.assertRaisesRegex(ValueError, "selected sources"):
+            build_resources.bind(path, allow_reference=False)
+        del catalog[name]
+        paths.write_text(json.dumps(catalog))
+        code["files"] = [row for row in code["files"] if row["path"] != name]
+        identity.write_text(json.dumps(code))
+        with self.assertRaisesRegex(ValueError, "selected sources"):
+            build_resources.bind(path, allow_reference=False)
+
+    def test_narrowed_runtime_receipts_retain_independent_resolved_identity(self):
+        from tools.evidence.identity import resolved_identity
+
+        for backend in ("baremetal", "freertos", "threadx"):
+            with self.subTest(backend=backend):
+                code = self.identity("runtime", backend)
+                path = self.directory / "runtime-bundle/resolved-cpu.json"
+                selected, _ = resolved_identity(path)
+                self.assertEqual(selected["cpu_profile"]["backend"], backend)
+                self.assertEqual(code["scope"], "runtime")
+                selected["cpu_profile"]["backend"] = "changed-backend"
+                path.write_text(json.dumps(selected))
+                with self.assertRaisesRegex(ValueError, "digest mismatch"):
+                    resolved_identity(path)
+
+    def test_narrowed_platform_receipt_rejects_rewritten_resolved_backend(self):
+        from tools.evidence.identity import resolved_identity
+
+        self.identity("platform")
+        path = self.directory / "platform-bundle/resolved.json"
+        selected, _ = resolved_identity(path)
+        selected["backend"] = "threadx"
+        path.write_text(json.dumps(selected))
+        with self.assertRaisesRegex(ValueError, "projection"):
+            resolved_identity(path)
+
+    def test_unselected_domain_input_still_rejects_and_withdraws_old_bundle(self):
+        self.identity("platform")
+        self.platform_assembly.write_text(self.platform_assembly.read_text() +
+            '[usb_host.unselected]\nbinding = "missing"\nmode = "invalid"\n'
+            'hidden_policy = true\n')
+        with self.assertRaisesRegex(ValueError, "unknown"):
+            configure.configure(self.platform_assembly,
+                                self.directory / "platform-bundle", test_support=True)
+        self.assertFalse((self.directory / "platform-bundle").exists())
+        for backend, fields, error in (
+                ("baremetal", "tick_hz = 1000", "OS policy requires"),
+                ("freertos", 'interrupt_mask = "primask"', "unknown"),
+                ("threadx", 'lowpower_port = "timebase"', "unknown")):
+            with self.subTest(backend=backend):
+                self.identity("runtime", backend)
+                self.runtime_assembly.write_text(self.runtime_assembly.read_text() +
+                                                 "[os]\n" + fields + "\n")
+                with self.assertRaisesRegex(ValueError, error):
+                    runtime.configure(self.runtime_assembly,
+                                      self.directory / "runtime-bundle")
+                self.assertFalse((self.directory / "runtime-bundle").exists())
 
 
 if __name__ == "__main__":

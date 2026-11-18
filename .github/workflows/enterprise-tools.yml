@@ -68,13 +68,14 @@ jobs:
         run: |
           .venv/bin/python tools/dev/dev.py doctor --target contracts
           .venv/bin/python tools/dev/dev.py configure --preset native-debug
-          .venv/bin/python tools/dev/dev.py build --preset native-debug --target nexus_google_contracts --parallel 4
       - name: Execute each tool domain once
         run: |
           .venv/bin/python -B tools/testing/run_tool_tests.py --suite workflows --report build/quality/tools-workflows.json
           .venv/bin/python -B tools/testing/run_tool_tests.py --suite ci --report build/quality/tools-ci.json
           .venv/bin/python -B tools/testing/run_tool_tests.py --suite configure --report build/quality/tools-configure.json
           .venv/bin/python -B tools/testing/run_tool_tests.py --suite testing --report build/quality/tools-testing.json
+        env:
+          NEXUS_TOOL_NATIVE_DATABASE: ${{ github.workspace }}/build/native-debug/compile_commands.json
       - name: Check declared source compatibility
         run: |
           .venv/bin/python tools/maintenance/compatibility.py

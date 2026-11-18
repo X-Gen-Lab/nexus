@@ -148,10 +148,12 @@ def configure(assembly, output):
             raise RuntimeError(message)
         with bundle.transaction(output, ".nexus-runtime-bundle",
                                 inputs=inputs, fail=fail) as temporary:
-            code_paths, code_identity = dependencies.snapshot(
+            initial_code_paths, initial_code_identity = dependencies.snapshot(
                 mode="runtime", sdk=sdk.installed(ROOT))
             result = resolve(assembly)
-            dependencies.verify(code_paths, code_identity)
+            dependencies.verify(initial_code_paths, initial_code_identity)
+            code_paths, code_identity = dependencies.selected(
+                initial_code_paths, initial_code_identity, backend=result.backend)
             emitted = cpu.emit_profile(result.profile, temporary,
                                    clock_hz=result.clock_hz,
                                    optimization=result.optimization,
@@ -171,7 +173,7 @@ def configure(assembly, output):
             for source, snapshot in result.snapshots.items():
                 if _path(source).read_bytes() != snapshot:
                     raise RuntimeError("Runtime inputs changed during generation")
-            dependencies.verify(code_paths, code_identity)
+            dependencies.verify(initial_code_paths, initial_code_identity)
         return result
     except (OSError, ValueError, TypeError, KeyError) as error:
         if isinstance(error, RuntimeError):

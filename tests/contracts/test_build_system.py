@@ -318,8 +318,17 @@ class BuildSystemTests(unittest.TestCase):
         self.configure()
         self.assertEqual((self.build / "policy.txt").read_text().strip(), "OFF")
 
-    def test_optional_cache_launcher_crosses_directories_with_strict_environment(self):
+    def cache_fixture(self):
         self.fixture()
+        platform = self.source / "platform/CMakeLists.txt"
+        platform.write_text(platform.read_text().replace(
+            'set(NEXUS_CONFIG_DIR "${CMAKE_CURRENT_SOURCE_DIR}/generated")',
+            'set(NEXUS_CONFIG_DIR "${CMAKE_CURRENT_BINARY_DIR}/generated")\n'
+            'file(MAKE_DIRECTORY "${NEXUS_CONFIG_DIR}")\n'
+            'foreach(name nexus_config.h resolved.json)\n'
+            ' configure_file("${CMAKE_CURRENT_SOURCE_DIR}/generated/${name}"\n'
+            '  "${NEXUS_CONFIG_DIR}/${name}" COPYONLY)\n'
+            'endforeach()'))
         tools = self.source / "mock tools"
         tools.mkdir()
         launcher = tools / "ccache"
@@ -327,7 +336,7 @@ class BuildSystemTests(unittest.TestCase):
         launcher.write_text(
             '#!/usr/bin/env python3\n'
             'import json, os, subprocess, sys\n'
-            'keys = ("CCACHE_NAMESPACE", "CCACHE_COMPILERCHECK", '
+            'keys = ("CCACHE_DIR", "CCACHE_NAMESPACE", "CCACHE_COMPILERCHECK", '
             '"CCACHE_SLOPPINESS", "CCACHE_HASHDIR")\n'
             'values = {key: os.environ.get(key) for key in keys}\n'
             'assert len(values["CCACHE_NAMESPACE"]) == 64\n'
@@ -340,6 +349,14 @@ class BuildSystemTests(unittest.TestCase):
             'raise SystemExit(subprocess.run(sys.argv[1:]).returncode)\n')
         launcher.chmod(0o755)
         self.environment["PATH"] = str(tools) + os.pathsep + self.environment["PATH"]
+        return log
+
+    def cache_environment(self):
+        return json.loads((self.build / "platform/build-policy/"
+                           "compiler-cache-environment.json").read_text())
+
+    def test_optional_cache_launcher_crosses_directories_with_strict_environment(self):
+        log = self.cache_fixture()
         self.configure(arguments=("-DNEXUS_COMPILER_CACHE=ON",))
         self.build_application()
         invocations = [json.loads(line) for line in log.read_text().splitlines()]
@@ -347,6 +364,81 @@ class BuildSystemTests(unittest.TestCase):
                             for item in invocations))
         self.assertTrue(any("owned.c" in " ".join(item["argv"])
                             for item in invocations))
+
+    def test_optional_cache_survives_binary_directory_changes(self):
+        self.cache_fixture()
+        self.configure(arguments=("-DNEXUS_COMPILER_CACHE=ON",))
+        first = self.cache_environment()
+        self.build = Path(self.temporary.name) / "second build with spaces"
+        self.configure(arguments=("-DNEXUS_COMPILER_CACHE=ON",))
+        second = self.cache_environment()
+        self.assertEqual(first["CCACHE_DIR"], second["CCACHE_DIR"])
+        self.assertEqual(Path(first["CCACHE_DIR"]), self.source / "build/compiler-cache")
+        self.assertEqual(first["CCACHE_NAMESPACE"], second["CCACHE_NAMESPACE"])
+
+    def test_optional_cache_keeps_read_only_sdk_source_unchanged(self):
+        self.cache_fixture()
+        sdk = Path(self.temporary.name) / "read only SDK source"
+        for name in ("tools/__init__.py", "cmake/platform/Options.cmake",
+                     "cmake/platform/TargetPolicy.cmake", "tools/dev/cache.py",
+                     "tools/evidence/common.py", "dependencies/toolchains.lock.json",
+                     "dependencies/platform-compatibility.json"):
+            target = sdk / name
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(ROOT / name, target)
+        platform = self.source / "platform/CMakeLists.txt"
+        platform.write_text(platform.read_text().replace(
+            f'set(NEXUS_SOURCE_DIR "{ROOT.as_posix()}")',
+            f'set(NEXUS_SOURCE_DIR "{sdk.as_posix()}")').replace(
+                f'include("{ROOT.as_posix()}/cmake/platform/Options.cmake")',
+                f'include("{sdk.as_posix()}/cmake/platform/Options.cmake")'))
+        paths = [sdk, *sdk.rglob("*")]
+        before = {path.relative_to(sdk): path.read_bytes() if path.is_file() else None
+                  for path in paths}
+
+        def make_writable():
+            for path in paths:
+                path.chmod(0o755 if path.is_dir() else 0o644)
+
+        self.addCleanup(make_writable)
+        for path in paths:
+            path.chmod(0o555 if path.is_dir() else 0o444)
+        self.configure(arguments=("-DNEXUS_COMPILER_CACHE=ON",))
+        self.build_application()
+        self.assertEqual(Path(self.cache_environment()["CCACHE_DIR"]),
+                         self.source / "build/compiler-cache")
+        self.assertEqual(before, {
+            path.relative_to(sdk): path.read_bytes() if path.is_file() else None
+            for path in [sdk, *sdk.rglob("*")]})
+
+    def test_optional_cache_route_change_keeps_namespace(self):
+        self.cache_fixture()
+        self.configure(arguments=("-DNEXUS_COMPILER_CACHE=ON",))
+        first = self.cache_environment()
+        resolved = self.source / "platform/generated/resolved.json"
+        resolved.write_text('{"fixture": "another route"}\n')
+        self.configure(arguments=("-DNEXUS_COMPILER_CACHE=ON",))
+        self.assertEqual(first["CCACHE_NAMESPACE"],
+                         self.cache_environment()["CCACHE_NAMESPACE"])
+
+    def test_optional_cache_compile_flags_do_not_split_namespace(self):
+        self.cache_fixture()
+        self.configure(arguments=("-DNEXUS_COMPILER_CACHE=ON",))
+        first = self.cache_environment()
+        platform = self.source / "platform/CMakeLists.txt"
+        platform.write_text(platform.read_text().replace(
+            'set(NEXUS_OPTIMIZATION "Os")', 'set(NEXUS_OPTIMIZATION "O2")'))
+        self.configure(arguments=("-DNEXUS_COMPILER_CACHE=ON",))
+        self.assertEqual(first["CCACHE_NAMESPACE"],
+                         self.cache_environment()["CCACHE_NAMESPACE"])
+        self.assertIn("-O2", self.application_compile_command())
+
+    def test_optional_cache_keeps_explicit_directory_override(self):
+        self.cache_fixture()
+        directory = Path(self.temporary.name) / "explicit cache with spaces"
+        self.configure(arguments=("-DNEXUS_COMPILER_CACHE=ON",
+                                  f"-DNEXUS_COMPILER_CACHE_DIR={directory}"))
+        self.assertEqual(Path(self.cache_environment()["CCACHE_DIR"]), directory)
 
     def test_firmware_requires_platform_before_reading_properties(self):
         (self.source / "main.c").write_text("int main(void) { return 0; }\n")

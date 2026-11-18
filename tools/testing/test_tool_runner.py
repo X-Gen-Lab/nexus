@@ -276,6 +276,13 @@ class ChangedDomainTests(unittest.TestCase):
             "scripts/ci/test_commit_message.py"]),
             {"ci": ("scripts/ci/test_commit_message.py",)})
 
+    def test_preset_helper_selects_its_consumer_and_build_contracts(self):
+        self.assertEqual(run_tool_tests.commit_tool_plan([
+            "tools/dev/presets.py"]), {"testing": (
+                "tools/testing/test_build_workflow.py",
+                "tools/testing/test_sdk_verification_call.py",
+                "tools/testing/test_tdd_gate.py")})
+
     def test_commit_plan_selects_modules_for_build_and_policy_changes(self):
         plan = run_tool_tests.commit_tool_plan([
             "AGENTS.md", ".pre-commit-config.yaml", ".gersemirc",

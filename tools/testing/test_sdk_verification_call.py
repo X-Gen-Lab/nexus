@@ -366,7 +366,9 @@ class SDKVerificationCallTests(unittest.TestCase):
         self.source = self.prefix / "share/nexus/src"
         self.package = self.prefix / "lib/cmake/Nexus"
         self.package.mkdir(parents=True)
-        (self.source / "cmake/package").mkdir(parents=True)
+        entry = self.source / "cmake/package/platform/CMakeLists.txt"
+        entry.parent.mkdir(parents=True)
+        shutil.copyfile(ROOT / "cmake/package/platform/CMakeLists.txt", entry)
         (self.source / "cmake/platform").mkdir(parents=True)
         (self.source / ".nexus-source-sdk.json").write_text(json.dumps(
             {"source_revision": "fixture", "publishable": True}) + "\n")
@@ -378,16 +380,16 @@ class SDKVerificationCallTests(unittest.TestCase):
             "count.write_text(str(int(count.read_text())+1) if count.exists() else '1')\n"
             "if (root/'payload').read_text() != 'approved':\n"
             "    sys.exit('actual payload changed')\n"
-            "print(json.dumps({'source_revision':'fixture','publishable':True}))\n")
+            "print((root/'.nexus-source-sdk.json').read_text())\n")
         shutil.copyfile(ROOT / "cmake/platform/SDK.cmake",
                         self.source / "cmake/platform/SDK.cmake")
         (self.source / "CMakeLists.txt").write_text(
-            'set(NEXUS_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")\n'
-            'include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/platform/SDK.cmake")\n'
+            'set(NEXUS_SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}")\n'
+            'include("${NEXUS_SOURCE_DIR}/cmake/platform/SDK.cmake")\n'
             'add_library(nexus_config INTERFACE)\n'
             'add_library(Nexus::Config ALIAS nexus_config)\n'
             'set_target_properties(nexus_config PROPERTIES NEXUS_SOURCE_DIR '
-            '"${CMAKE_CURRENT_SOURCE_DIR}")\n')
+            '"${NEXUS_SOURCE_DIR}")\n')
         template = (ROOT / "cmake/package/NexusConfig.cmake.in").read_text()
         (self.package / "NexusConfig.cmake").write_text(
             template.replace("@NEXUS_SDK_VERSION@", "1.0.0"))
@@ -395,13 +397,13 @@ class SDKVerificationCallTests(unittest.TestCase):
     def tearDown(self):
         self.temporary.cleanup()
 
-    def configure(self, extra=""):
+    def configure(self, extra="", *, components="", before=""):
         (self.root / "CMakeLists.txt").write_text(
             'cmake_minimum_required(VERSION 3.31)\n'
             'project(verify_call NONE)\n'
             f'set(Python3_EXECUTABLE "{sys.executable}")\n'
-            f'set(Nexus_DIR "{self.package}")\n'
-            'find_package(Nexus CONFIG REQUIRED)\n' + extra)
+            f'set(Nexus_DIR "{self.package}")\n' + before +
+            f'find_package(Nexus CONFIG REQUIRED {components})\n' + extra)
         return subprocess.run([shutil.which("cmake"), "-S", str(self.root),
                                "-B", str(self.root / "build"), "-G", "Ninja"],
                               capture_output=True, text=True, timeout=30,
@@ -453,10 +455,29 @@ class SDKVerificationCallTests(unittest.TestCase):
         self.assertFalse((self.root / "direct-build/after-admission.txt").exists())
         self.assertEqual((self.source.parent / "count").read_text(), "1")
 
-    def test_package_and_provider_entries_each_verify(self):
+    def test_direct_entry_rechecks_after_previous_include(self):
+        result = self.direct_configure(after=(
+            f'file(WRITE "{self.source}/payload" "changed")\n'
+            f'include("{self.source}/cmake/platform/SDK.cmake")\n'))
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("actual payload changed", result.stdout + result.stderr)
+        self.assertEqual((self.source.parent / "count").read_text(), "2")
+
+    def test_cache_and_parent_variables_cannot_claim_private_entry(self):
+        (self.source / "payload").write_text("changed")
+        result = self.direct_configure(before=(
+            f'set(_sdk_entry "{self.source}/cmake/package/platform" CACHE PATH "")\n'
+            f'set(CMAKE_CURRENT_SOURCE_DIR "{self.source}/cmake/package/platform")\n'
+            f'set(CMAKE_PARENT_LIST_FILE "{self.source}/CMakeLists.txt")\n'
+            'set(NEXUS_SOURCE_SDK_VERIFIED TRUE CACHE BOOL "")\n'))
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("actual payload changed", result.stdout + result.stderr)
+        self.assertEqual((self.source.parent / "count").read_text(), "1")
+
+    def test_platform_import_verifies_once_before_composing_its_targets(self):
         result = self.configure()
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        self.assertEqual((self.source.parent / "count").read_text(), "2")
+        self.assertEqual((self.source.parent / "count").read_text(), "1")
 
     def test_repeated_find_and_later_sdk_include_each_verify_again(self):
         result = self.configure(
@@ -464,7 +485,7 @@ class SDKVerificationCallTests(unittest.TestCase):
             f'set(NEXUS_SOURCE_DIR "{self.source}")\n'
             f'include("{self.source}/cmake/platform/SDK.cmake")\n')
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        self.assertEqual((self.source.parent / "count").read_text(), "4")
+        self.assertEqual((self.source.parent / "count").read_text(), "3")
 
     def test_modified_payload_rejected_by_next_find_even_same_manifest(self):
         result = self.configure(
@@ -472,7 +493,132 @@ class SDKVerificationCallTests(unittest.TestCase):
             'find_package(Nexus CONFIG REQUIRED)\n')
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("actual payload changed", result.stdout + result.stderr)
-        self.assertEqual((self.source.parent / "count").read_text(), "3")
+        self.assertEqual((self.source.parent / "count").read_text(), "2")
+
+    def test_runtime_admission_rechecks_changes_made_after_find(self):
+        for name in ("cmake/platform/Runtime.cmake", "cmake/platform/Configure.cmake",
+                     "os/freertos/secure/Integration.cmake"):
+            target = self.source / name
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(ROOT / name, target)
+        result = self.configure(
+            f'file(WRITE "{self.source}/payload" "changed")\n'
+            'nexus_add_runtime(ASSEMBLY runtime.toml)\n',
+            components="COMPONENTS Runtime")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("actual payload changed", result.stdout + result.stderr)
+        self.assertEqual((self.source.parent / "count").read_text(), "2")
+
+    def test_private_child_cannot_import_platform_independently(self):
+        result = self.direct_configure(after=(
+            f'add_subdirectory("{self.source}/cmake/package/platform" sdk)\n'))
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("_nexus_import_verified_platform", result.stderr)
+
+    def test_second_prefix_is_verified_before_rejecting_mixed_sources(self):
+        other = self.root / "second prefix"
+        shutil.copytree(self.prefix, other)
+        result = self.configure(
+            f'set(Nexus_DIR "{other}/lib/cmake/Nexus")\n'
+            'find_package(Nexus CONFIG REQUIRED)\n')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("only one resolved Nexus source SDK", result.stdout + result.stderr)
+        self.assertEqual((self.source.parent / "count").read_text(), "1")
+        self.assertEqual((other / "share/nexus/count").read_text(), "1")
+
+    def test_fixture_requires_explicit_permission_after_full_verification(self):
+        (self.source / ".nexus-source-sdk.json").write_text(json.dumps(
+            {"source_revision": "fixture", "publishable": False}) + "\n")
+        result = self.configure()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("nonpublishable development fixture", result.stdout + result.stderr)
+        self.assertEqual((self.source.parent / "count").read_text(), "1")
+        result = self.configure(before='set(NEXUS_ALLOW_SOURCE_SDK_FIXTURE ON)\n')
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual((self.source.parent / "count").read_text(), "2")
+
+
+class SDKIncrementalConfigureTests(unittest.TestCase):
+    """SDK admission stays fresh while unchanged Ninja trees retain their files."""
+
+    def setUp(self):
+        from tools.configure import sdk
+        from tools.dev.presets import configure_if_needed
+        self.temporary = tempfile.TemporaryDirectory(prefix="SDK hot tree ")
+        self.addCleanup(self.temporary.cleanup)
+        self.root = Path(self.temporary.name)
+        self.source = self.root / "installed SDK"
+        self.source.mkdir()
+        (self.source / ".nexus-source-sdk.json").write_text("{}\n")
+        (self.source / "payload").write_text("approved")
+        self.build = self.root / "build"
+        self.preset = {"binaryDir": str(self.build), "generator": "Ninja"}
+        self.configure_if_needed = configure_if_needed
+        self.sdk_api = sdk
+        self.selection = {"snapshot_sha256": "first", "publishable": True}
+        self.commands = []
+        (self.root / "CMakeLists.txt").write_text(
+            'cmake_minimum_required(VERSION 3.31)\n'
+            'project(sdk_hot_tree NONE)\n'
+            'file(APPEND "${CMAKE_BINARY_DIR}/configure-count" "one\\n")\n'
+            'file(WRITE "${CMAKE_BINARY_DIR}/generated.h" "/* generated */\\n")\n')
+
+    def configure(self, options):
+        self.commands.append(options)
+        result = subprocess.run([shutil.which("cmake"), *options,
+                                 "-S", str(self.root), "-B", str(self.build),
+                                 "-G", "Ninja"], capture_output=True, text=True,
+                                timeout=30, check=False)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        return result.returncode
+
+    def prepare(self, source=None):
+        return self.configure_if_needed(self.root, self.preset, os.environ.copy(),
+                                        self.configure, sdk=source or self.source)
+
+    def test_unchanged_sdk_is_verified_without_rewriting_ninja_or_generated_files(self):
+        with mock_patch.object(self.sdk_api, "verify", return_value=self.selection) as verify:
+            self.assertEqual(self.prepare(), 0)
+            paths = [self.build / name for name in
+                     ("build.ninja", "CMakeCache.txt", "generated.h",
+                      "configure-count", ".nexus-configure-state")]
+            before = [(path.read_bytes(), path.stat().st_mtime_ns) for path in paths]
+            self.assertEqual(self.prepare(), 0)
+            self.assertEqual(verify.call_count, 2)
+            self.assertEqual(verify.call_args.args, (self.source,))
+        self.assertEqual(self.commands, [[]])
+        self.assertEqual([(path.read_bytes(), path.stat().st_mtime_ns)
+                          for path in paths], before)
+
+    def test_failed_sdk_admission_cannot_reconfigure_or_replace_warm_state(self):
+        with mock_patch.object(self.sdk_api, "verify", return_value=self.selection):
+            self.assertEqual(self.prepare(), 0)
+        stamp = self.build / ".nexus-configure-state"
+        before = stamp.read_bytes(), stamp.stat().st_mtime_ns
+        with mock_patch.object(self.sdk_api, "verify", side_effect=ValueError("changed payload")):
+            with self.assertRaisesRegex(ValueError, "changed payload"):
+                self.prepare()
+        self.assertEqual(self.commands, [[]])
+        self.assertEqual((stamp.read_bytes(), stamp.stat().st_mtime_ns), before)
+
+    def test_changed_verified_snapshot_or_sdk_path_reconfigures_fresh(self):
+        with mock_patch.object(self.sdk_api, "verify", return_value=self.selection):
+            self.assertEqual(self.prepare(), 0)
+            self.selection["snapshot_sha256"] = "second"
+            self.assertEqual(self.prepare(), 0)
+            other = self.root / "another SDK"
+            shutil.copytree(self.source, other)
+            self.assertEqual(self.prepare(other), 0)
+        self.assertEqual(self.commands, [[], ["--fresh"], ["--fresh"]])
+
+    def test_dangling_sdk_marker_is_rejected_before_initial_configure(self):
+        marker = self.source / ".nexus-source-sdk.json"
+        marker.unlink()
+        marker.symlink_to("missing-manifest")
+        with self.assertRaises(ValueError):
+            self.prepare()
+        self.assertEqual(self.commands, [])
+
 
 
 class SDKConsumerOutputAdmissionTests(unittest.TestCase):

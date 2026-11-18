@@ -48,6 +48,10 @@ CPU affinity／Linux cgroup 限额。并行模式平分预算，例如 4 个 job
 Ninja 图，源码、头和配置文件的变化由原生依赖处理。构建身份变化或第一次运行时
 重新 configure。每次门禁仍重新执行合同并生成本次测试报告。
 
+外部应用显式消费 Source SDK 时先验证整包。验证通过且配置身份相同，复用既有
+Ninja 图；SDK、preset、工具链或缓存身份变化时重新配置。验证失败保留原缓存和
+配置记录，便于修复后使用同一入口重试。
+
 各预设必须使用互不包含的独立构建目录。`configure`、`build`、`test`、`check`、
 TDD、Native runtime 和矩阵使用相同的 `.nexus-build.lock` 内核锁；组合命令持锁至
 全部阶段和报告发布结束。同目录的其他托管执行立即拒绝，不同目录可以并行。
