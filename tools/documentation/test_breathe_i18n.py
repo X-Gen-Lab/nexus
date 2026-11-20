@@ -3,6 +3,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import pickle
 import subprocess
 import sys
 import tempfile
@@ -182,6 +183,184 @@ class BreatheDetailIntegrationTests(unittest.TestCase):
                                          'data-nexus-translation-status="reviewed"' in html})
                     self.assertNotIn(original.removeprefix('[in] '), html)
             self.assertIn('contract_submit', html)
+
+
+class BreatheIncrementalTests(unittest.TestCase):
+    def fixture(self, root):
+        project = Path(__file__).resolve().parents[2]
+        docs, xml = root / 'docs', root / 'xml'
+        docs.mkdir()
+        xml.mkdir()
+        (root / '.gitignore').write_text('/build/\n')
+        (docs / 'conf.py').write_text(
+            'import sys\n' + f'sys.path.insert(0, {str(project)!r})\n'
+            + "extensions = ['myst_parser', 'breathe', 'tools.documentation.sphinx_ext']\n"
+            + "source_suffix = {'.md': 'markdown'}\nroot_doc = 'index'\n"
+            + "project = 'Incremental API fixture'\nhtml_theme = 'alabaster'\n"
+            + "language = 'en'\ngettext_compact = False\n"
+            + f"breathe_projects = {{'nexus': {str(xml)!r}}}\n"
+            + "breathe_default_project = 'nexus'\n"
+            + "breathe_domain_by_extension = {'h': 'c'}\n")
+        prefix = ('---\nid: {name}\ntype: reference\naudience: consumer\n'
+                  'source_language: en\n---\n# {name}\n\n')
+        (docs / 'index.md').write_text(prefix.format(name='index')
+            + '```{toctree}\nalpha\nbeta\n```\n')
+        compounds = []
+        for name in ('alpha', 'beta'):
+            compounds.append(INDEX_XML.split('<doxygenindex', 1)[1]
+                .split('>', 1)[1].split('</doxygenindex>', 1)[0]
+                .replace('contract', name))
+            (xml / (name + '_8h.xml')).write_text(
+                COMPOUND_XML.replace('contract', name))
+            (docs / (name + '.md')).write_text(prefix.format(name=name)
+                + '```{doxygenfile} ' + name + '.h\n:project: nexus\n```\n')
+        (xml / 'index.xml').write_text(
+            '<?xml version="1.0"?><doxygenindex version="1.13.2">'
+            + ''.join(compounds) + '</doxygenindex>')
+        for args in (['init', '-q'], ['add', '.'],
+                     ['-c', 'user.name=Fixture', '-c',
+                      'user.email=fixture@example.invalid', 'commit', '-q',
+                      '-m', 'test: incremental API fixture']):
+            subprocess.run(['git', '-C', str(root), *args], check=True,
+                           capture_output=True)
+        # Keep presentation-only dirty state constant while editing API bytes.
+        (root / '.gitignore').write_text('/build/\n# Author workspace.\n')
+        environment = {key: value for key, value in os.environ.items()
+                       if not key.startswith('NEXUS_DOCS_')}
+        return docs, xml, environment
+
+    def build(self, root, docs, environment, *, status=0):
+        result = subprocess.run([sys.executable, '-B', '-m', 'sphinx', '-W',
+            '--keep-going', '-d', str(root / 'build/doctrees'), '-b', 'html',
+            str(docs), str(root / 'build/site')], env=environment,
+            capture_output=True, text=True, timeout=90)
+        self.assertEqual(result.returncode, status, result.stdout + result.stderr)
+        return result
+
+    def test_file_directive_does_not_depend_on_unrelated_file_compounds(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            docs, xml, environment = self.fixture(root)
+            self.build(root, docs, environment)
+            with (root / 'build/doctrees/environment.pickle').open('rb') as stream:
+                env = pickle.load(stream)
+            alpha = env.breathe_file_state[str(xml / 'alpha_8h.xml')][1]
+            beta = env.breathe_file_state[str(xml / 'beta_8h.xml')][1]
+            self.assertEqual(alpha, {'alpha'})
+            self.assertEqual(beta, {'beta'})
+
+    def test_same_mtime_xml_edit_refreshes_only_its_actual_page(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            docs, xml, environment = self.fixture(root)
+            self.build(root, docs, environment)
+            beta = root / 'build/site/beta.html'
+            beta_details = beta.stat()
+            source = xml / 'alpha_8h.xml'
+            details = source.stat()
+            source.write_text(source.read_text().replace(
+                'Accept one complete request.', 'Accept two complete request.'))
+            os.utime(source, ns=(details.st_atime_ns, details.st_mtime_ns))
+            self.build(root, docs, environment)
+            self.assertIn('Accept two complete request.',
+                          (root / 'build/site/alpha.html').read_text())
+            self.assertNotIn('Accept one complete request.',
+                             (root / 'build/site/alpha.html').read_text())
+            self.assertEqual(beta.stat().st_mtime_ns, beta_details.st_mtime_ns)
+
+    def test_new_commit_updates_links_without_reparsing_the_source(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            docs, xml, environment = self.fixture(root)
+            header = root / 'public.h'
+            header.write_text('/* Public source. */\n')
+            page = docs / 'alpha.md'
+            page.write_text(page.read_text() + '\n[Source](../public.h)\n')
+            self.build(root, docs, environment)
+            subprocess.run(['git', '-C', str(root), '-c', 'user.name=Fixture',
+                '-c', 'user.email=fixture@example.invalid', 'commit', '-q',
+                '--allow-empty', '-m', 'test: new source identity'], check=True,
+                capture_output=True)
+            revision = subprocess.check_output(['git', '-C', str(root),
+                'rev-parse', 'HEAD'], text=True).strip()
+            result = self.build(root, docs, environment)
+            self.assertIn('0 added, 0 changed, 0 removed', result.stdout)
+            content = (root / 'build/site/alpha.html').read_text()
+            self.assertIn('/blob/' + revision + '/public.h', content)
+            self.assertIn('>' + revision[:12] + '</a>', content)
+
+    def test_static_asset_bytes_refresh_without_source_reparse(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            docs, xml, environment = self.fixture(root)
+            config = docs / 'conf.py'
+            config.write_text(config.read_text()
+                + "html_static_path = ['static']\nhtml_css_files = ['local.css']\n")
+            style = docs / 'static/local.css'
+            style.parent.mkdir()
+            style.write_text('body { color: red; }\n')
+            self.build(root, docs, environment)
+            details = style.stat()
+            style.write_text('body { color: tan; }\n')
+            os.utime(style, ns=(details.st_atime_ns, details.st_mtime_ns))
+            environment['NEXUS_DOCS_CHANGED_INPUTS'] = '["docs/static/local.css"]'
+            result = self.build(root, docs, environment)
+            self.assertIn('0 added, 0 changed, 0 removed', result.stdout)
+            self.assertEqual((root / 'build/site/_static/local.css').read_bytes(),
+                             style.read_bytes())
+
+    def test_file_lookup_keeps_path_matching_and_ambiguous_name_diagnostics(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            docs, xml, environment = self.fixture(root)
+            source = xml / 'alpha_8h.xml'
+            source.write_text(source.read_text().replace('file="alpha.h"',
+                                                         'file="left/alpha.h"'))
+            (xml / 'right_8h.xml').write_text(COMPOUND_XML.replace(
+                'contract', 'right').replace('file="right.h"',
+                                             'file="right/alpha.h"'))
+            index = xml / 'index.xml'
+            index.write_text(index.read_text().replace('</doxygenindex>',
+                '<compound refid="right_8h" kind="file"><name>alpha.h</name>'
+                '</compound></doxygenindex>'))
+            alpha, beta = docs / 'alpha.md', docs / 'beta.md'
+            alpha.write_text(alpha.read_text().replace('doxygenfile} alpha.h',
+                                                       'doxygenfile} left/alpha.h'))
+            beta.write_text(beta.read_text().replace('doxygenfile} beta.h',
+                                                     'doxygenfile} right/alpha.h'))
+            self.build(root, docs, environment)
+            self.assertIn('right_submit', (root / 'build/site/beta.html').read_text())
+            beta.write_text(beta.read_text().replace('doxygenfile} right/alpha.h',
+                                                     'doxygenfile} alpha.h'))
+            result = self.build(root, docs, environment, status=1)
+            self.assertIn('Found multiple matches for file',
+                          result.stdout + result.stderr)
+
+    def test_file_renderer_retains_its_transitive_struct_xml_dependency(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            docs, xml, environment = self.fixture(root)
+            source = xml / 'alpha_8h.xml'
+            source.write_text(source.read_text().replace('<sectiondef kind="func">',
+                '<innerclass refid="shared" prot="public">shared</innerclass>'
+                '<sectiondef kind="func">'))
+            index = xml / 'index.xml'
+            index.write_text(index.read_text().replace('</doxygenindex>',
+                '<compound refid="shared" kind="struct"><name>shared</name>'
+                '</compound></doxygenindex>'))
+            shared = xml / 'shared.xml'
+            shared.write_text('<?xml version="1.0"?><doxygen version="1.13.2">'
+                '<compounddef id="shared" kind="struct" language="C">'
+                '<compoundname>shared</compoundname><briefdescription>'
+                '<para>Shared ownership counter.</para></briefdescription>'
+                '<detaileddescription/><location file="alpha.h" line="1"/>'
+                '</compounddef></doxygen>')
+            self.build(root, docs, environment)
+            with (root / 'build/doctrees/environment.pickle').open('rb') as stream:
+                env = pickle.load(stream)
+            self.assertEqual(env.breathe_file_state[str(shared)][1], {'alpha'})
+            self.assertIn('Shared ownership counter.',
+                          (root / 'build/site/alpha.html').read_text())
 
 
 if __name__ == '__main__':

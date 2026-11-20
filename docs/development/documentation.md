@@ -55,12 +55,49 @@ build/docs-tools/venv/bin/python tools/dev/dev.py docs serve \
 当前术语见[术语表](../locale/terminology.csv)。banner 区分 original、reviewed、
 stale、missing；预览回退到原文时保留真实语言，旧 MO 不维持已撤销的审查状态。
 
+## 示例：修改一段正文并更新译文
+
+以中文原文 `docs/guides/troubleshooting.md` 为例，从完整仓库根操作。先修改原文，
+将对向 PO 的 `X-Nexus-Reviewed` 改为 `false`，再执行上面的 preview 构建。
+本次真实消息位于
+`build/documentation-preview/work/gettext/guides/troubleshooting.pot`；作者译文位于
+`docs/locale/en/LC_MESSAGES/guides/troubleshooting.po`。不要编辑生成的 MO 或 HTML。
+
+按 POT 更新这一份 PO：保留未变消息的有效译文，删除已退役消息，补齐新增或修改
+消息的 `msgstr`，去掉已完成审查的 fuzzy 标记。`msgid` 必须使用 POT 的实际值，
+不能为了沿用旧译文改写原消息。代码、链接目标、单位与规范强度保持一致。
+
+内容冻结后计算原文的摘要：
+
+```sh
+build/docs-tools/venv/bin/python - <<'PY'
+from hashlib import sha256
+from pathlib import Path
+
+print(sha256(Path("docs/guides/troubleshooting.md").read_bytes()).hexdigest())
+PY
+```
+
+把输出写入 PO 的 `X-Nexus-Source-SHA256`，保持 `Language: en` 与 UTF-8。
+独立审查者核对原文、完整消息集和译文后，才将 `X-Nexus-Reviewed` 改为 `true`；
+之后原文再变化，须重新计算并审查。只有更新 header 不能建立译文已审状态。
+被 include 的内容改变时也要检查新 POT，不能只比较父 Markdown 的摘要。
+
+重新运行 `docs check`，再执行下面的双语 verify，检查两个语言页面及其链接。
+`check` 的源身份检查不能代替 verify 对本次真实 POT 的完整比较。
+
 ## 完整验证
 
 ```sh
 build/docs-tools/venv/bin/python tools/dev/dev.py docs build \
   --tool-prefix build/docs-tools --mode verify --language all \
   --output build/documentation
+```
+
+修改文档工具行为时，另外执行完整文档工具测试；纯正文和译文修改使用内容检查、
+双语构建与语义审查，不重复执行工具行为测试：
+
+```sh
 build/docs-tools/venv/bin/python tools/dev/dev.py docs test \
   --tool-prefix build/docs-tools --report build/docs-tests.json
 ```

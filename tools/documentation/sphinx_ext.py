@@ -226,6 +226,8 @@ def source_inputs_outdated(app, env, added, changed, removed):
     result = []
     for docname in sorted(env.found_docs):
         paths = {Path(env.doc2path(docname, base=True)).resolve()}
+        paths.add(repository / 'docs/locale' / app.config.language
+                  / 'LC_MESSAGES' / (docname + '.po'))
         for value in env.dependencies.get(docname, ()):
             dependency = Path(value)
             paths.add((dependency if dependency.is_absolute()
@@ -233,6 +235,41 @@ def source_inputs_outdated(app, env, added, changed, removed):
         if paths.intersection(inputs):
             result.append(docname)
     return result
+
+
+def breathe_inputs_outdated(app, env, added, changed, removed):
+    """Observe actual Breathe XML bytes, including edits with equal mtimes."""
+    del app, added, changed
+    prior = getattr(env, 'nexus_breathe_digests', {})
+    affected = set()
+    for filename, (_mtime, docnames) in getattr(env, 'breathe_file_state', {}).items():
+        path = Path(filename)
+        current = hashlib.sha256(path.read_bytes()).hexdigest() if path.is_file() else None
+        if prior.get(filename) != current:
+            affected.update(docnames)
+    return sorted(affected - removed)
+
+
+def update_output_identity(app, env):
+    """Persist XML identities and rewrite presentation without reparsing it."""
+    env.nexus_breathe_digests = {
+        filename: hashlib.sha256(Path(filename).read_bytes()).hexdigest()
+        for filename in getattr(env, 'breathe_file_state', {})}
+    current = (app.config.nexus_revision, app.config.nexus_code_revision,
+               app.config.nexus_source_dirty, app.config.nexus_available_languages)
+    previous = getattr(env, 'nexus_output_identity', None)
+    env.nexus_output_identity = current
+    if app.builder.format == 'html':
+        repository = Path(app.srcdir).resolve().parent
+        static_roots = [(Path(app.confdir) / path).resolve()
+                        for path in app.config.html_static_path]
+        assets_changed = any((repository / name).resolve().is_relative_to(path)
+            for name in app.config.nexus_changed_inputs for path in static_roots)
+        if current != previous or assets_changed:
+            # Sphinx otherwise skips copy_static_files when no document is
+            # outdated. Rewriting HTML also refreshes its asset hash URLs.
+            return sorted(env.found_docs)
+    return []
 
 
 def _configure(app, config) -> None:
@@ -626,7 +663,8 @@ def normalize_included_references(app, doctree) -> None:
                 download.extend(child.deepcopy() for child in node.children)
                 node.replace_self(download)
                 continue
-        uri = f'{_SOURCE_URL}/{app.config.nexus_revision}/{quote(candidate.relative_to(repository).as_posix())}'
+        uri = (f'{_SOURCE_URL}/NEXUS-DOCUMENTATION-SOURCE/'
+               + quote(candidate.relative_to(repository).as_posix()))
         if parsed.fragment:
             uri += '#' + parsed.fragment
         reference = nodes.reference('', '', refuri=uri)
@@ -641,11 +679,11 @@ def setup(app) -> dict[str, object]:
         from tools.documentation.breathe_i18n import SourcedDoxygenFileDirective
         app.add_directive('doxygenfile', SourcedDoxygenFileDirective, override=True)
     app.add_search_language(NexusChineseSearch)
-    app.add_config_value('nexus_source_dirty', False, 'env')
+    app.add_config_value('nexus_source_dirty', False, '')
     app.add_config_value('nexus_available_languages', os.environ.get('NEXUS_DOCS_LANGUAGES'),
-                         'env', types=(str, tuple, type(None)))
-    app.add_config_value('nexus_revision', os.environ.get('NEXUS_DOCS_REVISION'), 'env')
-    app.add_config_value('nexus_code_revision', os.environ.get('NEXUS_DOCS_CODE_REVISION'), 'env')
+                         '', types=(str, tuple, type(None)))
+    app.add_config_value('nexus_revision', os.environ.get('NEXUS_DOCS_REVISION'), '')
+    app.add_config_value('nexus_code_revision', os.environ.get('NEXUS_DOCS_CODE_REVISION'), '')
     app.add_config_value('nexus_translation_root', os.environ.get('NEXUS_DOCS_TRANSLATION_ROOT'), 'env')
     app.add_config_value('nexus_gettext_root', os.environ.get('NEXUS_DOCS_GETTEXT_ROOT'), 'env')
     app.add_config_value('nexus_mode', os.environ.get('NEXUS_DOCS_MODE', 'preview'), 'env')
@@ -658,6 +696,8 @@ def setup(app) -> dict[str, object]:
     app.connect('builder-inited', prepare_diagram_images)
     app.connect('source-read', _read_source)
     app.connect('env-get-outdated', source_inputs_outdated)
+    app.connect('env-get-outdated', breathe_inputs_outdated)
+    app.connect('env-updated', update_output_identity)
     app.connect('include-read', normalize_included_read)
     app.connect('doctree-resolved', _bind_source_links)
     app.connect('doctree-resolved', link_local_svg_images)
@@ -670,5 +710,5 @@ def setup(app) -> dict[str, object]:
     app.connect('config-inited', configure_search)
     app.connect('doctree-read', normalize_included_references, priority=100)
     app.connect('doctree-read', localize_diagram_images, priority=400)
-    return {'version': '2.0', 'env_version': 2,
+    return {'version': '2.1', 'env_version': 3,
             'parallel_read_safe': False, 'parallel_write_safe': True}

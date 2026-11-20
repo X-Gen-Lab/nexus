@@ -51,3 +51,27 @@ jobs:
           if-no-files-found: error
           include-hidden-files: true
           retention-days: 14
+      - name: Preserve failed documentation diagnostics
+        if: failure()
+        continue-on-error: true
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: documentation-failure-diagnostics
+          path: |
+            build/documentation/documentation-build.json
+            build/documentation/last-published.json
+            build/documentation/work/source-check.json
+            build/documentation/work/*.command.json
+            build/documentation/work/*.log
+            build/documentation/work/*.attempts/*/receipt.json
+            build/documentation/work/*.attempts/*/stdout.txt
+            build/documentation/work/*.attempts/*/stderr.txt
+            build/documentation-attempts/**/tests.command.json
+            build/documentation-attempts/**/tests.log
+            build/documentation-attempts/**/receipt.json
+            build/documentation-attempts/**/stdout.txt
+            build/documentation-attempts/**/stderr.txt
+            build/dependencies/docs-build-preparation.json
+            build/quality/docs-tests.json
+          if-no-files-found: ignore
+          retention-days: 14

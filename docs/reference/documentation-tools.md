@@ -49,11 +49,17 @@ python3.12 tools/documentation/install.py \
 | `docs build --mode preview --language zh_CN` | 当前写作预览，保留缺译与原文回退状态 |
 | `docs build --mode verify --language all` | 公开 API、当前消息与两语言完整性验证 |
 | `docs test` | 运行文档工具的实际测试，拒绝空、跳过或陈旧结果 |
-| `docs serve --build <output>` | 只服务已完成且身份有效的当前输出 |
+| `docs serve --build <output>` | 浏览最后完整发布的视图，标明最新构建状态 |
 
 正文根固定为 `docs/`。生成 XML、POT、翻译 stage、语言 HTML 和收条放在拥有的输出
 目录，不能写回作者 PO。配置、公共头、工具锁或翻译改变时按真实输入使阶段缓存失效。
 公开头未改变时可复用验证过字节身份的 API 中间产物，不复用前次成功报告。
+
+构建先在 `work/site` 完成候选，再通过短发布锁切换 `site`。HTTP 请求在同一锁下
+取得完整视图，发送已打开的文件内容时不持发布锁。`documentation-build.json` 记录最新
+构建尝试，`last-published.json` 记录最后完整发布的来源和文件身份。
+重建或失败时，`serve` 可以继续显示上版，但页面会标明当前状态和上版提交；这不改变
+本次失败的退出码，也不产生新的验证通过。首次构建未完成或发布身份不一致时拒绝服务。
 
 ## 浏览、搜索与许可
 

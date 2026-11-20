@@ -7,13 +7,13 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 8790ae8846fe851f5fb7640d4324515f66762e36beb87689b38af7fdb44a86dc\n"
+"X-Nexus-Source-SHA256: 905123a61a5101e6cfc24b2be4aa0dc9f49fa94b5ff268ece6f5f20b827e6267\n"
 
-#: ../../../../../../docs/development/documentation.md:8
+#: ../../../../../workspace/nexus/docs/development/documentation.md:8
 msgid "编写、翻译和验证文档"
 msgstr "Write, translate and validate documentation"
 
-#: ../../../../../../docs/development/documentation.md:10
+#: ../../../../../workspace/nexus/docs/development/documentation.md:10
 msgid ""
 "每页只维护一份权威正文。先确定读者要完成的事，再选择教程、任务指南、参考或 "
 "原理解释。内容与图示规范见[文档标准](../reference/contracts/documentation-standards.md) "
@@ -25,11 +25,11 @@ msgstr ""
 "standard](../reference/contracts/documentation-standards.md) and [page "
 "templates](../reference/contracts/documentation-templates.md)."
 
-#: ../../../../../../docs/development/documentation.md:14
+#: ../../../../../workspace/nexus/docs/development/documentation.md:14
 msgid "编写正文"
 msgstr "Write the body"
 
-#: ../../../../../../docs/development/documentation.md:16
+#: ../../../../../workspace/nexus/docs/development/documentation.md:16
 msgid ""
 "开头说明结果、前提和适用范围。命令写明工作目录、所需工具、完整输入、预期输出 及失败处理。当前实现、目标设计、软件参考和实际执行分别表达；历史记录用固定"
 " 源码链接读取，不把旧计数写进当前操作步骤。"
@@ -40,7 +40,7 @@ msgstr ""
 "software references and actual execution. Read historical records through "
 "fixed source links; do not put old counts into current operating steps."
 
-#: ../../../../../../docs/development/documentation.md:20
+#: ../../../../../workspace/nexus/docs/development/documentation.md:20
 msgid ""
 "每页 front matter 明确 `id`、`type`、`audience`、`source_language`。新教程引用维护的 真实 "
 "fixture 或固定外部消费者；源码拥有的输入优先 literalinclude，片段说明缺少 什么。普通文档构建不执行任意 Markdown "
@@ -53,7 +53,7 @@ msgstr ""
 " do not execute arbitrary Markdown commands, fetch latest source or operate "
 "hardware."
 
-#: ../../../../../../docs/development/documentation.md:24
+#: ../../../../../workspace/nexus/docs/development/documentation.md:24
 msgid ""
 "图示有明确范围、图注、替代文字和箭头语义。修改编辑源后更新本地 SVG，并检查 "
 "文字、交叉线、窄屏、缩放及离线显示。绘制流程见[图示参考](../reference/diagrams.md)。"
@@ -63,11 +63,11 @@ msgstr ""
 "crossings, narrow screens, zoom and offline display. See the [diagram "
 "reference](../reference/diagrams.md) for the authoring process."
 
-#: ../../../../../../docs/development/documentation.md:27
+#: ../../../../../workspace/nexus/docs/development/documentation.md:27
 msgid "准备工具与预览"
 msgstr "Prepare tools and preview"
 
-#: ../../../../../../docs/development/documentation.md:29
+#: ../../../../../workspace/nexus/docs/development/documentation.md:29
 msgid ""
 "正文根是 `docs/`，`docs/sphinx/` 只维护配置和模板。按 [工具参考](../reference/documentation-"
 "tools.md)显式准备一次锁定工具，然后从仓库根执行："
@@ -77,7 +77,7 @@ msgstr ""
 "reference](../reference/documentation-tools.md), then run from the "
 "repository root:"
 
-#: ../../../../../../docs/development/documentation.md:41
+#: ../../../../../workspace/nexus/docs/development/documentation.md:41
 msgid ""
 "预览为日常写作提供实际语言状态，不充当完整双语验收。commit 检查只检查完整 staged 文档输入及需要的配置，既不联网安装工具，也不自动 "
 "stage 修复。"
@@ -87,11 +87,11 @@ msgstr ""
 "staged documentation inputs and required configuration only. They neither "
 "install tools over the network nor automatically stage fixes."
 
-#: ../../../../../../docs/development/documentation.md:44
+#: ../../../../../workspace/nexus/docs/development/documentation.md:44
 msgid "翻译当前正文"
 msgstr "Translate the current body"
 
-#: ../../../../../../docs/development/documentation.md:46
+#: ../../../../../workspace/nexus/docs/development/documentation.md:46
 msgid ""
 "`source_language` 表示 canonical 正文语言，不是读者选择的站点语言。相反语言采用 "
 "`docs/locale/<language>/LC_MESSAGES/<docname>.po`；同语言使用原文。代码符号、TOML 键、 "
@@ -104,7 +104,7 @@ msgstr ""
 "evidence values unchanged. Translation must not change obligation strength "
 "or borrow-ending conditions."
 
-#: ../../../../../../docs/development/documentation.md:50
+#: ../../../../../workspace/nexus/docs/development/documentation.md:50
 msgid ""
 "从锁定工具本次实际提取的 POT 审查消息，不手写第二份消息清单。PO header 记录 `Language`、UTF-8、`X-Nexus-"
 "Source-SHA256` 和独立语义审查后的 `X-Nexus-Reviewed: true`。每个实际 msgid 恰好出现一次、译文非空、无 "
@@ -118,7 +118,7 @@ msgstr ""
 "digests must match. Changes to included READMEs are also inputs; changing "
 "only a header does not produce a new translation."
 
-#: ../../../../../../docs/development/documentation.md:55
+#: ../../../../../workspace/nexus/docs/development/documentation.md:55
 msgid ""
 "当前术语见{download}`术语表 <../locale/terminology.csv>`。banner 区分 "
 "original、reviewed、 stale、missing；预览回退到原文时保留真实语言，旧 MO 不维持已撤销的审查状态。"
@@ -128,11 +128,77 @@ msgstr ""
 "stale and missing states. A preview fallback retains its actual language; "
 "old MO files do not preserve revoked review status."
 
-#: ../../../../../../docs/development/documentation.md:58
+#: ../../../../../workspace/nexus/docs/development/documentation.md:58
+msgid "示例：修改一段正文并更新译文"
+msgstr "Example: edit a paragraph and update its translation"
+
+#: ../../../../../workspace/nexus/docs/development/documentation.md:60
+msgid ""
+"以中文原文 `docs/guides/troubleshooting.md` 为例，从完整仓库根操作。先修改原文， 将对向 PO 的 `X-Nexus-"
+"Reviewed` 改为 `false`，再执行上面的 preview 构建。 本次真实消息位于 `build/documentation-"
+"preview/work/gettext/guides/troubleshooting.pot`；作者译文位于 "
+"`docs/locale/en/LC_MESSAGES/guides/troubleshooting.po`。不要编辑生成的 MO 或 HTML。"
+msgstr ""
+"Use the Chinese canonical page `docs/guides/troubleshooting.md` as an "
+"example, working from the full repository root. Edit the original, set "
+"`X-Nexus-Reviewed` to `false` in the opposite-language PO, then run the "
+"preview build above. Its actual messages are in `build/documentation-"
+"preview/work/gettext/guides/troubleshooting.pot`; the authored translation "
+"is in `docs/locale/en/LC_MESSAGES/guides/troubleshooting.po`. Do not edit "
+"generated MO or HTML files."
+
+#: ../../../../../workspace/nexus/docs/development/documentation.md:66
+msgid ""
+"按 POT 更新这一份 PO：保留未变消息的有效译文，删除已退役消息，补齐新增或修改 消息的 `msgstr`，去掉已完成审查的 fuzzy "
+"标记。`msgid` 必须使用 POT 的实际值， 不能为了沿用旧译文改写原消息。代码、链接目标、单位与规范强度保持一致。"
+msgstr ""
+"Update this PO from the POT: retain valid translations of unchanged "
+"messages, remove retired messages, complete the `msgstr` for added or "
+"changed messages, and remove fuzzy flags after reviewing those entries. Each"
+" `msgid` must use the actual POT value; do not rewrite the original message "
+"to keep an old translation. Preserve code, link targets, units and normative"
+" strength."
+
+#: ../../../../../workspace/nexus/docs/development/documentation.md:70
+msgid "内容冻结后计算原文的摘要："
+msgstr "After freezing the content, calculate the canonical source digest:"
+
+#: ../../../../../workspace/nexus/docs/development/documentation.md:81
+msgid ""
+"把输出写入 PO 的 `X-Nexus-Source-SHA256`，保持 `Language: en` 与 UTF-8。 "
+"独立审查者核对原文、完整消息集和译文后，才将 `X-Nexus-Reviewed` 改为 `true`； 之后原文再变化，须重新计算并审查。只有更新 "
+"header 不能建立译文已审状态。 被 include 的内容改变时也要检查新 POT，不能只比较父 Markdown 的摘要。"
+msgstr ""
+"Write the output into the PO header `X-Nexus-Source-SHA256`, retaining "
+"`Language: en` and UTF-8. Set `X-Nexus-Reviewed` to `true` only after an "
+"independent reviewer has checked the original, the complete message set and "
+"the translation. Further canonical edits require a new digest and review. "
+"Updating the header alone does not establish reviewed translation status. "
+"Changes to included content also require checking the new POT; comparing "
+"only the parent Markdown digest is insufficient."
+
+#: ../../../../../workspace/nexus/docs/development/documentation.md:86
+msgid ""
+"重新运行 `docs check`，再执行下面的双语 verify，检查两个语言页面及其链接。 `check` 的源身份检查不能代替 verify "
+"对本次真实 POT 的完整比较。"
+msgstr ""
+"Run `docs check` again, then the bilingual verify build below, and inspect "
+"both language pages and their links. The source identity check in `check` "
+"does not replace the complete comparison against the actual POT in verify."
+
+#: ../../../../../workspace/nexus/docs/development/documentation.md:89
 msgid "完整验证"
 msgstr "Complete validation"
 
-#: ../../../../../../docs/development/documentation.md:68
+#: ../../../../../workspace/nexus/docs/development/documentation.md:97
+msgid "修改文档工具行为时，另外执行完整文档工具测试；纯正文和译文修改使用内容检查、 双语构建与语义审查，不重复执行工具行为测试："
+msgstr ""
+"When changing documentation tool behavior, also run the complete "
+"documentation tool suite. For prose and translation changes, use content "
+"checks, a bilingual build and semantic review without repeating tool "
+"behavior tests:"
+
+#: ../../../../../workspace/nexus/docs/development/documentation.md:105
 msgid ""
 "verify 要求当前消息、公开 API、链接、图和两语言完整。按字节身份验证的阶段输入及 产物可复用，成功报告不能缓存为新验收。读取本次退出码与 "
 "`documentation-build.json`；旧 HTML 不挽救当前失败。"
@@ -143,7 +209,7 @@ msgstr ""
 " exit code and `documentation-build.json`. Old HTML does not rescue a "
 "current failure."
 
-#: ../../../../../../docs/development/documentation.md:72
+#: ../../../../../workspace/nexus/docs/development/documentation.md:109
 msgid ""
 "审查正文语义、示例和译文后，更新导航与删除入口的当前引用。文档来源、描述的源码、 已验证软件和实际硬件记录分别保持身份；本地 HTML 构建不代表部署或"
 " MCU 验收。"

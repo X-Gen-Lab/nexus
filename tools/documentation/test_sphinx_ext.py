@@ -26,7 +26,7 @@ class CurrentSourceContractTests(unittest.TestCase):
             docs.mkdir()
             app = SimpleNamespace(srcdir=str(docs), config=SimpleNamespace(
                 nexus_changed_inputs=("core/README.md",),
-                nexus_rebuild_all=False))
+                nexus_rebuild_all=False, language='en'))
             env = SimpleNamespace(found_docs={"index", "guide"},
                 doc2path=lambda name, base: str(docs / (name + ".md")),
                 dependencies={"index": {"../core/README.md"}, "guide": set()})
@@ -38,6 +38,23 @@ class CurrentSourceContractTests(unittest.TestCase):
             app.config.nexus_rebuild_all = True
             self.assertEqual(sphinx_ext.source_inputs_outdated(
                 app, env, set(), set(), set()), ["guide", "index"])
+
+    def test_catalog_changes_invalidate_only_their_page_and_requested_locale(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            docs = root / 'docs'
+            docs.mkdir()
+            app = SimpleNamespace(srcdir=str(docs), config=SimpleNamespace(
+                nexus_changed_inputs=('docs/locale/zh_CN/LC_MESSAGES/guide.po',),
+                nexus_rebuild_all=False, language='zh_CN'))
+            env = SimpleNamespace(found_docs={'index', 'guide'},
+                doc2path=lambda name, base: str(docs / (name + '.md')),
+                dependencies={})
+            self.assertEqual(sphinx_ext.source_inputs_outdated(
+                app, env, set(), set(), set()), ['guide'])
+            app.config.language = 'en'
+            self.assertEqual(sphinx_ext.source_inputs_outdated(
+                app, env, set(), set(), set()), [])
 
 
 class DocumentationSourceTests(unittest.TestCase):
@@ -350,6 +367,34 @@ class ReviewedLocaleStageTests(unittest.TestCase):
 
 
 class IncludedReferenceTests(unittest.TestCase):
+    def test_external_include_link_keeps_a_revision_placeholder_until_output(self):
+        from docutils import nodes
+        from sphinx import addnodes
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            origin = root / 'io/README.md'
+            origin.parent.mkdir()
+            origin.write_text('# I/O\n')
+            header = root / 'core/request.h'
+            header.parent.mkdir()
+            header.write_text('/* Header. */\n')
+            tree = nodes.document('', '')
+            ref = addnodes.pending_xref('', reftype='myst',
+                reftarget='../core/request.h', refdoc='index', refdomain=None,
+                refexplicit=True)
+            ref.source = str(origin)
+            ref += nodes.inline('', 'request')
+            tree += ref
+            app = SimpleNamespace(srcdir=str(root / 'docs'),
+                env=SimpleNamespace(found_docs={'index'}),
+                config=SimpleNamespace(nexus_revision='a' * 40))
+            sphinx_ext.normalize_included_references(app, tree)
+            self.assertIn('/NEXUS-DOCUMENTATION-SOURCE/',
+                          tree.children[0]['refuri'])
+            app.config.nexus_revision = 'b' * 40
+            sphinx_ext._bind_source_links(app, tree, 'index')
+            self.assertIn('/' + 'b' * 40 + '/', tree.children[0]['refuri'])
+
     def test_included_document_and_data_links_use_their_real_source_directory(self):
         from docutils import nodes
         from sphinx import addnodes

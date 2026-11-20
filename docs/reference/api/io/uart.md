@@ -18,9 +18,9 @@ UART reference. Its `nx_uart_tx_binding_t` pairs the transport and exact-context
 validator; unsupported modes and invalid IDs return two null fields. Lookup
 neither admits a transfer nor authenticates an instance. The caller owns DE,
 setup/hold timing and joined shutdown; the {doc}`RS485 contract
-</reference/api/io/uart>` defines the composition. IRQ timestamps and sampled
-GPIO levels remain observations, with the source quality defined by the selected
-provider and the [infrared
+</reference/contracts/io/uart-dma-rs485>` defines the composition. IRQ timestamps
+and sampled GPIO levels remain observations, with the source quality defined by
+the selected provider and the [infrared
 contract](../../../../components/devices/infrared/README.md).
 
 ## Public declarations

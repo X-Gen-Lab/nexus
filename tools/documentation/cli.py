@@ -2,8 +2,7 @@
 """One documentation entry point for checks, strict builds and verified delivery."""
 
 import argparse
-from functools import partial
-from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
+from http.server import ThreadingHTTPServer
 import json
 import os
 from pathlib import Path
@@ -14,7 +13,7 @@ import uuid
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 from tools.dev import process
-from tools.documentation import check
+from tools.documentation import check, publication
 from tools.documentation import build as builder
 from tools.documentation.build import prepare_output, record as _record, build
 
@@ -159,26 +158,29 @@ def serve_output(root, destination):
     path = destination / builder.REPORT
     if not path.is_file() or path.is_symlink():
         raise ValueError("serve requires a completed documentation build")
-    value = json.loads(path.read_text())
-    if not isinstance(value, dict):
-        raise ValueError("documentation build report must be an object")
-    modes = {"preview": "ready", "verify": "passed"}
-    languages = value.get("languages")
-    if (value.get("schema_version") != builder.SCHEMA
-            or value.get("kind") != "nexus_documentation_build"
-            or value.get("mode") not in modes
-            or value.get("status") != modes[value["mode"]]
-            or not isinstance(languages, list) or not languages
-            or len(languages) != len(set(languages))
-            or any(language not in {"en", "zh_CN"} for language in languages)
-            or value.get("scope") != ("all" if set(languages) == {"en", "zh_CN"}
-                                      else "locale:" + languages[0])):
-        raise ValueError("serve requires a complete current mode/scope result")
-    site = destination / "site"
-    if (not (site / "index.html").is_file()
-            or builder.inventory(site) != value.get("files")):
-        raise ValueError("documentation site differs from its build result")
-    return site
+    with publication.lock(destination):
+        value = publication.read(destination)
+        publication.attempt(destination, value)
+        if not isinstance(value, dict):
+            raise ValueError("documentation build report must be an object")
+        modes = {"preview": "ready", "verify": "passed"}
+        languages = value.get("languages")
+        if (value.get("schema_version") != builder.SCHEMA
+                or value.get("kind") != "nexus_documentation_build"
+                or value.get("mode") not in modes
+                or value.get("status") != modes[value["mode"]]
+                or not isinstance(languages, list) or not languages
+                or any(not isinstance(language, str) or
+                       language not in {"en", "zh_CN"} for language in languages)
+                or len(languages) != len(set(languages))
+                or value.get("scope") != ("all" if set(languages) == {"en", "zh_CN"}
+                                          else "locale:" + languages[0])):
+            raise ValueError("serve requires a complete current mode/scope result")
+        site = destination / "site"
+        if (not (site / "index.html").is_file()
+                or builder.inventory(site) != value.get("files")):
+            raise ValueError("documentation site differs from its build result")
+        return site
 
 
 def main(arguments=None, *, root=ROOT):
@@ -250,8 +252,8 @@ def main(arguments=None, *, root=ROOT):
             build(root, args.output, mode=args.mode, language=args.language,
                   tool_prefix=args.tool_prefix, timeout=args.timeout)
         elif args.action == "serve":
-            site = serve_output(root, args.build)
-            handler = partial(SimpleHTTPRequestHandler, directory=str(site))
+            serve_output(root, args.build)
+            handler = publication.handler(args.build)
             server = ThreadingHTTPServer((args.host, args.port), handler)
             print(f"Documentation: http://{args.host}:{server.server_port}", flush=True)
             try:

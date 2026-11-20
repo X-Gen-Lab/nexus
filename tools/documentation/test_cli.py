@@ -200,10 +200,15 @@ class DocumentationCommandTests(unittest.TestCase):
         cli.prepare_output(self.root, output)
         (output / "site").mkdir()
         (output / "site/index.html").write_text("verified site")
-        (output / "documentation-build.json").write_text(json.dumps({
+        identifier = cli.publication.mark(output / "site")
+        metadata = {
             "schema_version": 2, "kind": "nexus_documentation_build",
             "mode": "verify", "status": "passed", "scope": "locale:en",
-            "languages": ["en"], "files": cli.builder.inventory(output / "site")}))
+            "languages": ["en"], "publication_id": identifier,
+            "source": {"commit": "a" * 40},
+            "files": cli.builder.inventory(output / "site")}
+        cli._record(output / "documentation-build.json", metadata)
+        cli._record(output / "last-published.json", metadata)
         closed = []
 
         def interrupt():

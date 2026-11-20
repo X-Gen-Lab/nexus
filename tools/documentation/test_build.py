@@ -131,6 +131,194 @@ class BuildTests(unittest.TestCase):
         self.assertTrue(all(stage.startswith("documentation-html-")
                             for stage, _args in self.commands))
 
+    def test_success_report_contains_actual_stage_timings(self):
+        result = self.invoke()
+        timings = result["timings_seconds"]
+        self.assertTrue({"tools_inputs", "source_checks", "messages", "translations",
+                         "diagrams", "html", "publication_inputs",
+                         "prepublication_total"}
+                        <= timings.keys())
+        self.assertTrue(all(isinstance(value, float) and value >= 0
+                            for value in timings.values()))
+
+    def test_preview_assets_catalogs_and_unrendered_facts_keep_message_inputs(self):
+        inputs = ("docs/assets/styles/site.css",
+                  "docs/locale/zh_CN/LC_MESSAGES/index.po",
+                  "soc/stm32/stm32f4/facts/unrendered.json")
+        for name in inputs:
+            path = self.root / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text("first input\n")
+        self.invoke(mode="preview")
+        for name in inputs:
+            with self.subTest(name=name):
+                (self.root / name).write_text("changed input\n")
+                self.commands.clear()
+                result = self.invoke(mode="preview")
+                self.assertTrue(result.get("api_cache_hit", False))
+                self.assertTrue(result.get("gettext_cache_hit", False))
+                self.assertEqual(self.environments["documentation-html-en"][
+                    "NEXUS_DOCS_REBUILD_ALL"], "0")
+                self.assertTrue(all(stage.startswith("documentation-html-")
+                                    for stage, _ in self.commands))
+
+    def test_image_only_edit_does_not_regenerate_messages(self):
+        (self.root / "docs/index.md").write_text(
+            PAGE + "\n![Flow](assets/diagrams/flow.svg)\n")
+        svg = self.root / "docs/assets/diagrams/flow.svg"
+        svg.write_text("<svg>first</svg>\n")
+        self.invoke(mode="preview")
+        svg.write_text("<svg>changed</svg>\n")
+        self.commands.clear()
+        result = self.invoke(mode="preview")
+        self.assertTrue(result.get("api_cache_hit", False))
+        self.assertTrue(result.get("gettext_cache_hit", False))
+        self.assertFalse(result.get("diagram_cache_hit", False))
+        self.assertEqual(self.environments["documentation-html-en"][
+            "NEXUS_DOCS_REBUILD_ALL"], "0")
+
+    def test_image_also_used_as_literal_input_still_invalidates_messages(self):
+        (self.root / "docs/index.md").write_text(PAGE
+            + "\n![Flow](assets/diagrams/flow.svg)\n\n"
+            + "```{literalinclude} assets/diagrams/flow.svg\n:language: xml\n```\n")
+        svg = self.root / "docs/assets/diagrams/flow.svg"
+        svg.write_text("<svg>first</svg>\n")
+        self.invoke(mode="preview")
+        svg.write_text("<svg>changed</svg>\n")
+        result = self.invoke(mode="preview")
+        self.assertFalse(result.get("gettext_cache_hit", False))
+
+    def test_orchestration_edit_keeps_gettext_and_html_parsing_state(self):
+        wrapper = self.root / "tools/documentation/cli.py"
+        wrapper.parent.mkdir(parents=True)
+        wrapper.write_text("# invocation only\n")
+        self.invoke(mode="preview")
+        before = next(args[args.index("-d") + 1] for stage, args in self.commands
+                      if stage == "documentation-html-en")
+        wrapper.write_text("# changed invocation only\n")
+        self.commands.clear()
+        result = self.invoke(mode="preview")
+        self.assertTrue(result.get("api_cache_hit", False))
+        self.assertTrue(result.get("gettext_cache_hit", False))
+        after = next(args[args.index("-d") + 1] for stage, args in self.commands
+                     if stage == "documentation-html-en")
+        self.assertEqual(after, before)
+
+    def test_rendering_implementation_edit_invalidates_messages_not_xml(self):
+        renderer = self.root / "tools/documentation/sphinx_ext.py"
+        renderer.parent.mkdir(parents=True)
+        renderer.write_text("# first renderer\n")
+        self.invoke(mode="preview")
+        renderer.write_text("# changed renderer\n")
+        self.commands.clear()
+        result = self.invoke(mode="preview")
+        self.assertTrue(result.get("api_cache_hit", False))
+        self.assertIn("documentation-gettext", [stage for stage, _ in self.commands])
+        self.assertEqual(self.environments["documentation-html-en"][
+            "NEXUS_DOCS_REBUILD_ALL"], "1")
+
+    def test_actual_doxygen_overrides_participate_in_the_api_cache_key(self):
+        self.invoke(mode="preview")
+        options = ("GENERATE_HTML = NO", "GENERATE_XML = YES",
+                   "OPTIMIZE_OUTPUT_FOR_C = NO")
+        configs = []
+        def inspect_config(command, **kwargs):
+            if kwargs["stage"] == "documentation-doxygen":
+                configs.append(Path(command[-1]).read_text())
+            return self.command(command, **kwargs)
+        self.port.side_effect = inspect_config
+        with patch.object(build, "_DOXYGEN_OPTIONS", options, create=True):
+            result = self.invoke(mode="preview")
+        self.assertFalse(result.get("api_cache_hit", False))
+        self.assertEqual(len(configs), 1)
+        self.assertIn("OPTIMIZE_OUTPUT_FOR_C = NO", configs[0])
+
+    def test_render_environment_changes_invalidate_cached_inputs(self):
+        self.invoke(mode="preview")
+        altered = install.ToolContext(self.context.identity_json,
+            self.context.variables + (("SOURCE_DATE_EPOCH", "0"),))
+        with patch.object(install, "context", return_value=altered):
+            result = self.invoke(mode="preview")
+        self.assertFalse(result.get("api_cache_hit", False))
+        self.assertFalse(result.get("gettext_cache_hit", False))
+
+    def test_job_budget_changes_do_not_invalidate_cached_inputs(self):
+        self.invoke(mode="preview")
+        altered = install.ToolContext(self.context.identity_json,
+            (("NEXUS_BUILD_JOBS", "1"),))
+        with patch.object(install, "context", return_value=altered):
+            result = self.invoke(mode="preview")
+        self.assertTrue(result.get("api_cache_hit", False))
+        self.assertTrue(result.get("gettext_cache_hit", False))
+
+    def test_unknown_rendering_implementation_still_requests_full_reparse(self):
+        renderer = self.root / "tools/documentation/new_renderer.py"
+        renderer.parent.mkdir(parents=True)
+        renderer.write_text("# first unknown implementation\n")
+        self.invoke(mode="preview")
+        renderer.write_text("# changed unknown implementation\n")
+        self.invoke(mode="preview")
+        self.assertEqual(self.environments["documentation-html-en"][
+            "NEXUS_DOCS_REBUILD_ALL"], "1")
+
+    def test_new_commit_changes_source_links_without_discarding_html_parsing(self):
+        self.invoke(mode="preview")
+        before = next(args[args.index("-d") + 1] for stage, args in self.commands
+                      if stage == "documentation-html-en")
+        self.source = {**self.source, "commit": "3" * 40}
+        with patch.object(build, "observe_git_source", return_value=self.source):
+            self.commands.clear()
+            result = self.invoke(mode="preview")
+        self.assertTrue(result["api_cache_hit"])
+        self.assertTrue(result["gettext_cache_hit"])
+        after = next(args[args.index("-d") + 1] for stage, args in self.commands
+                     if stage == "documentation-html-en")
+        self.assertEqual(after, before)
+        self.assertEqual(self.environments["documentation-html-en"][
+            "NEXUS_DOCS_REVISION"], "3" * 40)
+
+    def test_new_api_generation_preserves_unchanged_xml_mtimes(self):
+        self.invoke(mode="preview")
+        old = self.output / "cache/api/payload/xml/index.xml"
+        before = old.stat().st_mtime_ns
+        (self.root / "core/include/api.h").write_text("void changed_api(void);\n")
+        observed = []
+        def inspect_generation(command, **kwargs):
+            if kwargs["stage"] == "documentation-gettext":
+                xml = self.output / "work/api/xml/index.xml"
+                observed.append(xml.stat().st_mtime_ns)
+            return self.command(command, **kwargs)
+        self.port.side_effect = inspect_generation
+        self.commands.clear()
+        result = self.invoke(mode="preview")
+        self.assertFalse(result.get("api_cache_hit", False))
+        self.assertIn("documentation-doxygen", [stage for stage, _ in self.commands])
+        self.assertEqual(observed, [before])
+        self.assertEqual(self.environments["documentation-html-en"][
+            "NEXUS_DOCS_REBUILD_ALL"], "0")
+
+    def test_changed_xml_file_set_gets_fresh_breathe_environments(self):
+        header = self.root / "core/include/api.h"
+        def different_compound(command, **kwargs):
+            result = self.command(command, **kwargs)
+            if kwargs["stage"] == "documentation-doxygen":
+                name = "after.xml" if "changed" in header.read_text() else "before.xml"
+                folder = Path(kwargs["env"]["NEXUS_DOCS_DOXYGEN_XML"])
+                (folder / name).write_text("<compound/>\n")
+            return result
+        self.port.side_effect = different_compound
+        self.invoke(mode="preview")
+        before = {stage: args[args.index("-d") + 1] for stage, args in self.commands
+                  if stage in {"documentation-gettext", "documentation-html-en"}}
+        header.write_text("void changed_api(void);\n")
+        self.commands.clear()
+        self.invoke(mode="preview")
+        after = {stage: args[args.index("-d") + 1] for stage, args in self.commands
+                 if stage in {"documentation-gettext", "documentation-html-en"}}
+        self.assertEqual(before.keys(), after.keys())
+        for stage in before:
+            self.assertNotEqual(before[stage], after[stage])
+
     def test_same_mtime_changed_content_invalidates_preview(self):
         self.invoke(mode="preview")
         source = self.root / "docs/index.md"
@@ -239,17 +427,29 @@ class BuildTests(unittest.TestCase):
         self.port.side_effect = original
         self.invoke(mode="preview")
 
-    def test_failed_command_clears_current_view_and_records_failure(self):
+    def test_failed_command_preserves_published_view_and_records_failure(self):
         self.invoke()
+        previous = (self.output / "site/en/index.html").read_bytes()
         self.port.side_effect = lambda *args, **kwargs: SimpleNamespace(
             returncode=7, stdout="", stderr="failed", receipt_path="actual-receipt")
         with self.assertRaisesRegex(ValueError, "doxygen failed with exit 7"):
             self.invoke()
-        self.assertEqual(list((self.output / "site").iterdir()), [])
+        self.assertEqual((self.output / "site/en/index.html").read_bytes(), previous)
         result = json.loads((self.output / build.REPORT).read_text())
         self.assertEqual(result["status"], "failed")
-        with self.assertRaises(ValueError):
-            cli.serve_output(self.root, self.output)
+        self.assertEqual(cli.serve_output(self.root, self.output), self.output / "site")
+
+    def test_html_generation_keeps_previous_view_until_publication(self):
+        self.invoke()
+        previous = (self.output / "site/en/index.html").read_bytes()
+        observed = []
+        def while_generating(command, **kwargs):
+            if kwargs["stage"].startswith("documentation-html-"):
+                observed.append((self.output / "site/en/index.html").read_bytes())
+            return self.command(command, **kwargs)
+        self.port.side_effect = while_generating
+        self.invoke()
+        self.assertEqual(observed, [previous, previous])
 
     def test_serve_rejects_a_site_root_replaced_by_a_symlink(self):
         self.invoke()
