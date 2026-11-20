@@ -1,0 +1,65 @@
+name: Documentation Publication
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  reject-branch:
+    name: Reject publication outside main
+    if: github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    permissions: {}
+    steps:
+      - name: Require the publication branch
+        run: |
+          echo "::error::Select the main branch to publish documentation."
+          exit 1
+
+  build:
+    name: Verify the manual publication
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    uses: ./.github/workflows/docs-build.yml
+    permissions:
+      contents: read
+    with:
+      emit_pages: true
+
+  deploy:
+    name: Deploy the verified site
+    needs: build
+    if: >-
+      always() && !cancelled() && github.ref == 'refs/heads/main'
+      && ((github.event_name == 'push' && needs.build.result == 'skipped')
+      || (github.event_name == 'workflow_dispatch' && needs.build.result == 'success'))
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    concurrency:
+      group: github-pages
+      cancel-in-progress: false
+    steps:
+      - name: Require the current main source
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          latest_sha="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq '.object.sha')"
+          if [ "$latest_sha" != "$GITHUB_SHA" ]; then
+            echo "::error::Documentation source is no longer main; rebuild before publishing."
+            exit 1
+          fi
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
+        with:
+          artifact_name: github-pages

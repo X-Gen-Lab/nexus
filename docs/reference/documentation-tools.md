@@ -75,5 +75,17 @@ python3.12 tools/documentation/install.py \
 工具升级先审查上游变化与许可，再更新唯一锁与要求，执行在线准备、独立离线恢复、
 相应工具测试、双语验证和图形检查。工具版本号本身不是成功证据。
 
-CI 使用只读仓库权限和同一入口；上传结果不表示已部署网站。具体写作与翻译流程见
-[文档维护](../development/documentation.md)。
+## CI 与网站发布
+
+CI 文档验证使用只读仓库权限，准备正文中配置示例实际需要的依赖，并通过同一入口
+完成严格双语构建。普通 `documentation` 制品包含离线站点与执行报告；上传制品
+不表示网站已部署。`publication.py` 负责本地完整站点切换。
+
+可信 `main` push 在文档验证和 `CI Status` 成功后，通过 `docs-publish.yml` 复用同次
+运行的 Pages 专用制品部署。只有部署 job 具有 `pages: write` 和 `id-token: write`，
+PR 构建保持只读且不发布。在 `main` 手动运行该工作流时，只执行一次严格双语构建
+再部署，不启动平台测试矩阵；网站根为 `site/`，不包含构建工作目录与执行报告。
+
+[在线文档](https://x-gen-lab.github.io/nexus/)发布后，核对中英文页面、搜索与静态资源，
+以及页面绑定的源码提交。构建通过、离线包与公网验收分别记录。
+具体写作与翻译流程见[文档维护](../development/documentation.md)。

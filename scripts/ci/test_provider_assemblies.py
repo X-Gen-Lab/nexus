@@ -15,11 +15,63 @@ import unittest.mock
 from scripts.ci import provider_assemblies as gate
 from tools.evidence.common import EvidenceError
 from tools.evidence import identity as source_identity
+from tools.evidence.common import file_identity
 from tools.configure import configure
 
 
 ROOT = Path(__file__).resolve().parents[2]
 USB = ROOT / "tests/contracts/usb_assembly/stm32-zg.toml"
+
+
+class LinkedBundleAdmission(unittest.TestCase):
+    def setUp(self):
+        temporary = self.enterContext(tempfile.TemporaryDirectory())
+        self.root = Path(temporary)
+        self.build = self.root / "build"
+        self.generated = self.build / "nexus/generated"
+        assembly = ROOT / "tools/configure/assemblies/qiming-baremetal-empty.toml"
+        self.resolved = configure.configure(assembly, self.generated)
+        self.elf = self.build / "bin/fixture.elf"
+        self.elf.parent.mkdir()
+        self.elf.write_bytes(b"ELF is measured at the independent tool boundary")
+        self.report = {"resolved": file_identity(self.generated / "resolved.json")}
+        self.measure = self.enterContext(unittest.mock.patch.object(
+            gate.resources, "measure", side_effect=RuntimeError("measurement reached")))
+
+    def inspect(self):
+        self.elf.with_suffix(".resources.json").write_text(json.dumps(self.report))
+        return gate.inspect(self.build, {"resolved": self.resolved}, Path("cc"))
+
+    def test_current_bundle_is_selected_from_the_postlink_identity(self):
+        with self.assertRaisesRegex(RuntimeError, "measurement reached"):
+            self.inspect()
+        self.measure.assert_called_once_with(
+            self.elf, self.generated / "resolved.json",
+            self.generated / "resource-budget.json", require_cpu=True)
+
+    def test_stale_postlink_identity_cannot_reach_measurement(self):
+        original = deepcopy(self.report)
+        for field, value in (("sha256", "0" * 64), ("size", 1)):
+            with self.subTest(field=field):
+                self.report = deepcopy(original)
+                self.report["resolved"][field] = value
+                with self.assertRaisesRegex(EvidenceError, "artifact identity changed"):
+                    self.inspect()
+                self.measure.assert_not_called()
+
+    def test_report_cannot_select_a_foreign_or_aliased_bundle(self):
+        original = deepcopy(self.report)
+        foreign = self.root / "resolved.json"
+        foreign.write_bytes((self.generated / "resolved.json").read_bytes())
+        paths = (str(foreign), "nexus/generated/resolved.json",
+                 str(self.generated / ".." / "generated/resolved.json"))
+        for path in paths:
+            with self.subTest(path=path):
+                self.report = deepcopy(original)
+                self.report["resolved"]["path"] = path
+                with self.assertRaisesRegex(EvidenceError, "inside the selected build"):
+                    self.inspect()
+                self.measure.assert_not_called()
 
 
 class USBRemoteCompileSelection(unittest.TestCase):

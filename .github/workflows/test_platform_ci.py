@@ -273,28 +273,38 @@ class WorkflowContracts(unittest.TestCase):
                 preparation = [(i, step['run']) for i, step in enumerate(steps)
                                if 'tools/dev/dependencies.py prepare'
                                in step.get('run', '')]
-                self.assertEqual(len(preparation), 1)
-                position, command = preparation[0]
-                arguments = shlex.split(command.replace('\\\n', ' '))
-                self.assertEqual(arguments[:4], [
-                    'python3', '-B', 'tools/dev/dependencies.py', 'prepare'])
-                self.assertEqual(arguments[arguments.index('--scope') + 1],
-                                 'preset')
-                self.assertEqual(arguments[arguments.index('--preset') + 1],
-                                 'stm32-qiming-baremetal')
-                self.assertIn('--allow-network', arguments)
-                report = arguments[arguments.index('--report') + 1]
-                self.assertTrue(report.startswith('build/'))
-                self.assertLess(checkout, position)
-                self.assertLess(position, next(i for i, step in enumerate(steps)
-                                if consumer in step.get('run', '')))
+                self.assertEqual(len(preparation), 2)
+                from tools.dev.dependencies import required_submodules
+                backends, reports, selected = set(), [], set()
+                for position, command in preparation:
+                    arguments = shlex.split(command.replace('\\\n', ' '))
+                    self.assertEqual(arguments[:4], [
+                        'python3', '-B', 'tools/dev/dependencies.py', 'prepare'])
+                    self.assertEqual(arguments[arguments.index('--scope') + 1], 'arm')
+                    self.assertEqual(arguments[arguments.index('--family') + 1],
+                                     'stm32f4')
+                    backend = arguments[arguments.index('--backend') + 1]
+                    backends.add(backend)
+                    selected.update(required_submodules('arm', 'stm32f4', backend))
+                    self.assertIn('--allow-network', arguments)
+                    report = arguments[arguments.index('--report') + 1]
+                    self.assertTrue(report.startswith('build/'))
+                    reports.append(report)
+                    self.assertLess(checkout, position)
+                    self.assertLess(position, next(i for i, step in enumerate(steps)
+                                    if consumer in step.get('run', '')))
+                self.assertEqual(backends, {'freertos', 'threadx'})
+                self.assertTrue({'ext/freertos', 'ext/threadx'} <= selected)
+                self.assertNotIn('ext/googletest', selected)
+                self.assertFalse(any('/stm32h7' in path for path in selected))
                 self.assertFalse(any('--recursive' in step.get('run', '')
                                      for step in steps))
                 upload = next(step['with']['path'] for step in steps if step.get(
                     'uses', '').startswith('actions/upload-artifact@'))
                 paths = upload.splitlines()
-                self.assertTrue(any(report == path or report.startswith(
-                    path.rstrip('/') + '/') for path in paths))
+                for report in reports:
+                    self.assertTrue(any(Path(report).match(path) or report.startswith(
+                        path.rstrip('/') + '/') for path in paths))
 
     def test_docs_commands_reuse_the_prepared_nondefault_tool_prefix(self):
         steps = workflow('docs-build.yml')['jobs']['build']['steps']
@@ -313,7 +323,97 @@ class WorkflowContracts(unittest.TestCase):
                 self.assertIn('--tool-prefix', arguments)
                 self.assertEqual(arguments[arguments.index('--tool-prefix') + 1],
                                  prefix)
-        self.assertFalse(any('pages' in step.get('uses', '') for step in steps))
+        self.assertFalse(any('deploy-pages' in step.get('uses', '') for step in steps))
+
+    def test_pages_publication_reuses_successful_trusted_builds(self):
+        document = workflow('docs-build.yml')
+        option = document['on']['workflow_call']['inputs']['emit_pages']
+        self.assertEqual(option['type'], 'boolean')
+        self.assertEqual(option['default'], 'false')
+        steps = document['jobs']['build']['steps']
+        upload = next(step for step in steps if step.get('uses', '').startswith(
+            'actions/upload-pages-artifact@'))
+        trusted = "github.ref == 'refs/heads/main'"
+        self.assertEqual(upload['if'], "success() && inputs.emit_pages && " + trusted
+                         + " && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')")
+        self.assertEqual(upload['with']['path'], 'build/documentation/site')
+        self.assertEqual(upload['with']['name'], 'github-pages')
+        ci = workflow('ci.yml')['jobs']
+        self.assertEqual(ci['docs']['with']['emit_pages'],
+                         "${{ github.event_name == 'push' && " + trusted + " }}")
+        caller = ci['publish-docs']
+        self.assertEqual(set(caller['needs']), {'docs', 'status-check'})
+        self.assertEqual(caller['if'], "github.event_name == 'push' && " + trusted)
+        self.assertEqual(caller['uses'], './.github/workflows/docs-publish.yml')
+        self.assertEqual(caller['permissions'],
+                         {'contents': 'read', 'pages': 'write', 'id-token': 'write'})
+        self.assertNotIn('publish-docs', ci['status-check']['needs'])
+        publish = workflow('docs-publish.yml')
+        self.assertEqual(set(publish['on']), {'workflow_call', 'workflow_dispatch'})
+        self.assertEqual(publish['permissions'], {'contents': 'read'})
+        reject = publish['jobs']['reject-branch']
+        self.assertEqual(reject['if'], "github.event_name == 'workflow_dispatch' && "
+                         "github.ref != 'refs/heads/main'")
+        self.assertEqual(reject['permissions'], {})
+        rejected = subprocess.run(['bash', '-euo', 'pipefail', '-c',
+                                  reject['steps'][0]['run']],
+                                 capture_output=True, text=True, timeout=10)
+        self.assertNotEqual(rejected.returncode, 0)
+        self.assertIn('::error::', rejected.stdout)
+        build = publish['jobs']['build']
+        self.assertEqual(build['if'], "github.event_name == 'workflow_dispatch' && " + trusted)
+        self.assertEqual(build['uses'], './.github/workflows/docs-build.yml')
+        self.assertEqual(build['with']['emit_pages'], 'true')
+        self.assertEqual(build['permissions'], {'contents': 'read'})
+        deploy = publish['jobs']['deploy']
+        self.assertEqual(deploy['needs'], 'build')
+        self.assertEqual(deploy['if'], "always() && !cancelled() && " + trusted
+            + " && ((github.event_name == 'push' && needs.build.result == 'skipped')"
+            + " || (github.event_name == 'workflow_dispatch' && needs.build.result == 'success'))")
+        self.assertEqual(deploy['permissions'],
+                         {'contents': 'read', 'pages': 'write', 'id-token': 'write'})
+        self.assertEqual(deploy['environment']['name'], 'github-pages')
+        self.assertEqual(deploy['concurrency'],
+                         {'group': 'github-pages', 'cancel-in-progress': 'false'})
+        self.assertEqual(len(deploy['steps']), 2)
+        self.assertTrue(deploy['steps'][-1]['uses'].startswith('actions/deploy-pages@'))
+        self.assertEqual(deploy['steps'][-1]['with']['artifact_name'], 'github-pages')
+
+    def test_pages_deployment_rejects_stale_source_and_api_failure(self):
+        deploy = workflow('docs-publish.yml')['jobs']['deploy']
+        guard = next(step for step in deploy['steps']
+                     if step.get('name') == 'Require the current main source')
+        self.assertIs(deploy['steps'][0], guard)
+        self.assertEqual(guard['env'], {'GH_TOKEN': '${{ github.token }}'})
+        spy = ('#!' + sys.executable + '\n'
+            'import json,os,sys\n'
+            'with open(os.environ["GH_CALLS"],"w") as output:\n'
+            '    json.dump(sys.argv[1:],output)\n'
+            'if os.environ["GH_MODE"]=="api-failure":raise SystemExit(37)\n'
+            'print(os.environ["GH_MAIN_SHA"])\n')
+        for mode, latest, expected in (('current', 'a' * 40, 0),
+                                      ('stale', 'b' * 40, 1),
+                                      ('api-failure', 'a' * 40, 37)):
+            with self.subTest(mode=mode), tempfile.TemporaryDirectory() as name:
+                root = Path(name) / 'repository with spaces'
+                root.mkdir()
+                executable = root / 'gh'
+                executable.write_text(spy)
+                executable.chmod(0o700)
+                calls = root / 'calls.json'
+                result = subprocess.run(['bash', '-euo', 'pipefail', '-c', guard['run']],
+                    cwd=root, env={**os.environ, 'PATH': str(root) + os.pathsep +
+                        os.environ.get('PATH', ''), 'GH_CALLS': str(calls),
+                        'GH_MODE': mode, 'GH_MAIN_SHA': latest,
+                        'GITHUB_REPOSITORY': 'X-Gen-Lab/nexus', 'GITHUB_SHA': 'a' * 40},
+                    capture_output=True, text=True, timeout=10)
+                self.assertEqual(result.returncode, expected,
+                                 result.stdout + result.stderr)
+                self.assertEqual(json.loads(calls.read_text()),
+                    ['api', 'repos/X-Gen-Lab/nexus/git/ref/heads/main',
+                     '--jq', '.object.sha'])
+                if mode == 'stale':
+                    self.assertIn('::error::', result.stdout)
 
     def test_docs_failures_preserve_diagnostics_without_generated_payloads(self):
         steps = workflow('docs-build.yml')['jobs']['build']['steps']
@@ -339,7 +439,8 @@ class WorkflowContracts(unittest.TestCase):
             'build/documentation-attempts/one/tests.attempts/two/receipt.json',
             'build/documentation-attempts/one/tests.attempts/two/stdout.txt',
             'build/documentation-attempts/one/tests.attempts/two/stderr.txt',
-            'build/dependencies/docs-build-preparation.json',
+            'build/dependencies/docs-build-freertos.json',
+            'build/dependencies/docs-build-threadx.json',
             'build/quality/docs-tests.json',
         }
         excluded = {

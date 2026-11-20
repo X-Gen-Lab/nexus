@@ -30,7 +30,8 @@ from tools.configure.configure import resolve_ir
 from tools.configure.packages import find as find_package
 from tools.dev import process as execution
 from tools.evidence.common import (EvidenceError, atomic_json, load_json,
-                                   regular_file, kill_process_group)
+                                   regular_file, kill_process_group,
+                                   verify_file_identity)
 from tools.evidence import identity as source_identity
 from tools.evidence.identity import (resolved_identity,
                                      resolved_input_files)
@@ -280,7 +281,15 @@ def require_usb_remote_selection(resolved, entries, *, root=ROOT):
 def inspect(build, fixture, compiler, *, root=ROOT):
     """Recompute budget and retention, binding the real generated bundle/ELF."""
     elf_path = one((build / "bin").glob("*.elf"), "firmware ELF")
-    resolved_path = one(build.glob("nexus-sdk/generated/resolved.json"), "resolved bundle")
+    original = load_json(elf_path.with_suffix(".resources.json"))
+    identity = original.get("resolved")
+    if not isinstance(identity, dict) or not isinstance(identity.get("path"), str):
+        raise EvidenceError("post-link report has no resolved bundle identity")
+    resolved_path = Path(identity["path"])
+    if (not resolved_path.is_absolute() or ".." in resolved_path.parts
+            or not resolved_path.is_relative_to(build.absolute())):
+        raise EvidenceError("resolved bundle must be inside the selected build")
+    resolved_path = verify_file_identity(identity)
     resolved, _ = resolved_identity(resolved_path)
     require_configuration(fixture["resolved"], resolved)
     inputs = resolved_input_files(resolved_path, resolved)
@@ -292,7 +301,6 @@ def inspect(build, fixture, compiler, *, root=ROOT):
     measured = resources.measure(elf_path, resolved_path, budget_path,
                                  require_cpu=True)
     require_budget(measured)
-    original = load_json(elf_path.with_suffix(".resources.json"))
     if original != measured:
         raise EvidenceError("post-link budget report is stale or differs from actual ELF")
     abi = resources.resolved_float_abi(resolved, require_cpu=True)

@@ -2,6 +2,11 @@ name: Documentation Build
 
 on:
   workflow_call:
+    inputs:
+      emit_pages:
+        description: Upload a Pages artifact after trusted main verification
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -20,10 +25,16 @@ jobs:
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: '3.12.14'
-      - name: Prepare the selected F4 documentation source closure
+      - name: Prepare the documented F4 and FreeRTOS source closure
         run: >-
-          python3 -B tools/dev/dependencies.py prepare --scope preset
-          --preset stm32-qiming-baremetal --allow-network --report build/dependencies/docs-build-preparation.json
+          python3 -B tools/dev/dependencies.py prepare --scope arm
+          --family stm32f4 --backend freertos --allow-network
+          --report build/dependencies/docs-build-freertos.json
+      - name: Prepare the documented ThreadX source closure
+        run: >-
+          python3 -B tools/dev/dependencies.py prepare --scope arm
+          --family stm32f4 --backend threadx --allow-network
+          --report build/dependencies/docs-build-threadx.json
       - name: Prepare the complete hash-locked documentation closure
         run: >-
           python3 tools/documentation/install.py
@@ -46,11 +57,20 @@ jobs:
           path: |
             build/documentation/site/
             build/documentation/documentation-build.json
-            build/dependencies/docs-build-preparation.json
+            build/dependencies/docs-build-*.json
             build/quality/docs-tests.json
           if-no-files-found: error
           include-hidden-files: true
           retention-days: 14
+      - name: Upload the verified Pages site
+        if: >-
+          success() && inputs.emit_pages && github.ref == 'refs/heads/main'
+          && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          name: github-pages
+          path: build/documentation/site
+          retention-days: 1
       - name: Preserve failed documentation diagnostics
         if: failure()
         continue-on-error: true
@@ -71,7 +91,7 @@ jobs:
             build/documentation-attempts/**/receipt.json
             build/documentation-attempts/**/stdout.txt
             build/documentation-attempts/**/stderr.txt
-            build/dependencies/docs-build-preparation.json
+            build/dependencies/docs-build-*.json
             build/quality/docs-tests.json
           if-no-files-found: ignore
           retention-days: 14

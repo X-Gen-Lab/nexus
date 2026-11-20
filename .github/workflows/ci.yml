@@ -60,8 +60,20 @@ jobs:
     needs: changes
     if: needs.changes.outputs.docs == 'true' || needs.changes.outputs.code == 'true' || needs.changes.outputs.workflows == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     uses: ./.github/workflows/docs-build.yml
+    with:
+      emit_pages: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     permissions:
       contents: read
+
+  publish-docs:
+    name: Publish Documentation
+    needs: [docs, status-check]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    uses: ./.github/workflows/docs-publish.yml
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
 
   status-check:
     name: CI Status
