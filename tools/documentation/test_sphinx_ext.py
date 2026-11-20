@@ -8,6 +8,7 @@ import sys
 import unittest
 from pathlib import Path
 from types import SimpleNamespace
+from unittest.mock import patch
 
 from tools.documentation import sphinx_ext
 
@@ -55,6 +56,139 @@ class CurrentSourceContractTests(unittest.TestCase):
             app.config.language = 'en'
             self.assertEqual(sphinx_ext.source_inputs_outdated(
                 app, env, set(), set(), set()), [])
+
+
+class SourceDirtyObservationTests(unittest.TestCase):
+    def configure(self, root):
+        config = SimpleNamespace(nexus_revision=None, nexus_code_revision=None,
+            language='en', nexus_available_languages='en',
+            nexus_translation_root=None, nexus_mode='preview',
+            nexus_changed_inputs='[]', nexus_rebuild_all='0',
+            nexus_gettext_root=None)
+        app = SimpleNamespace(srcdir=str(root / 'docs'),
+                              doctreedir=str(root / 'doctrees'))
+        with patch.object(sphinx_ext, '_revision', return_value='a' * 40):
+            sphinx_ext._configure(app, config)
+        return config
+
+    def test_parent_dirty_observation_is_strict_and_avoids_another_git_status(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            for flag in ('0', '1'):
+                with self.subTest(flag=flag), patch.dict(os.environ,
+                        {'NEXUS_DOCS_SOURCE_DIRTY': flag}), patch.object(
+                        sphinx_ext.subprocess, 'check_output',
+                        side_effect=AssertionError('duplicate source observation')):
+                    config = self.configure(Path(temporary))
+                    self.assertEqual(config.nexus_source_dirty, flag == '1')
+
+    def test_independent_sphinx_observes_git_when_no_parent_flag_is_supplied(self):
+        with tempfile.TemporaryDirectory() as temporary, patch.dict(os.environ):
+            os.environ.pop('NEXUS_DOCS_SOURCE_DIRTY', None)
+            with patch.object(sphinx_ext.subprocess, 'check_output',
+                              return_value=' M source.c\n') as observed:
+                self.assertTrue(self.configure(Path(temporary)).nexus_source_dirty)
+            self.assertEqual(observed.call_count, 1)
+            self.assertIn('status', observed.call_args.args[0])
+
+    def test_invalid_parent_flags_are_rejected(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            for flag in ('', 'false', 'true', '2'):
+                with self.subTest(flag=flag), patch.dict(os.environ,
+                        {'NEXUS_DOCS_SOURCE_DIRTY': flag}), patch.object(
+                        sphinx_ext.subprocess, 'check_output', return_value=''):
+                    with self.assertRaisesRegex(ValueError, 'source-dirty'):
+                        self.configure(Path(temporary))
+
+
+class PreviewGettextTests(unittest.TestCase):
+    def fixture(self, root, names):
+        project = Path(__file__).resolve().parents[2]
+        docs = root / 'docs'
+        docs.mkdir()
+        (root / '.gitignore').write_text('/build/\n')
+        (docs / 'conf.py').write_text(
+            'import sys, json\nfrom pathlib import Path\n'
+            + f'sys.path.insert(0, {str(project)!r})\n'
+            + "extensions = ['myst_parser', 'tools.documentation.sphinx_ext']\n"
+            + "source_suffix = {'.md': 'markdown'}\nroot_doc = 'index'\n"
+            + "project = 'Preview catalog fixture'\nlanguage = 'en'\n"
+            + "gettext_compact = False\nexclude_patterns = ['locale/**']\n"
+            + "def setup(app):\n"
+            + "    written = []\n"
+            + "    app.connect('doctree-resolved', lambda app, tree, name: written.append(name))\n"
+            + "    app.connect('build-finished', lambda app, error: "
+              "Path(app.outdir, 'written.json').write_text(json.dumps(written)))\n")
+        for name in ('index', *names):
+            page = docs / (name + '.md')
+            page.parent.mkdir(parents=True, exist_ok=True)
+            page.write_text('---\nid: ' + name.replace('/', '.')
+                + '\ntype: reference\naudience: consumer\nsource_language: en\n'
+                + '---\n# Page ' + name + '\n\nCanonical message ' + name + '.\n')
+        index = docs / 'index.md'
+        index.write_text(index.read_text()
+            + '\n```{toctree}\n' + '\n'.join(names) + '\n```\n')
+        for arguments in (['init', '-q'], ['add', '.'],
+                ['-c', 'user.name=Fixture', '-c',
+                 'user.email=fixture@example.invalid', 'commit', '-q',
+                 '-m', 'test: preview catalog fixture']):
+            subprocess.run(['git', '-C', str(root), *arguments], check=True,
+                           capture_output=True)
+        # Keep dirty presentation identical before and after author edits.
+        (root / '.gitignore').write_text('/build/\n# Author workspace.\n')
+        return {key: value for key, value in os.environ.items()
+                if not key.startswith('NEXUS_DOCS_')}
+
+    def build(self, root, environment, *, mode='preview', compact=False):
+        output = root / 'build/messages'
+        result = subprocess.run([sys.executable, '-B', '-m', 'sphinx', '-W',
+            '--keep-going', '-d', str(root / 'build/doctrees'), '-b', 'gettext',
+            '-D', 'gettext_compact=' + ('1' if compact else '0'),
+            str(root / 'docs'), str(output)],
+            env=environment | {'NEXUS_DOCS_MODE': mode},
+            capture_output=True, text=True, timeout=90)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        return set(json.loads((output / 'written.json').read_text()))
+
+    def test_preview_keeps_complete_124_catalogs_and_resolves_only_actual_changes(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            names = [f'p{index:03}' for index in range(1, 124)]
+            environment = self.fixture(root, names)
+            self.assertEqual(len(self.build(root, environment)), 124)
+            source = root / 'docs/p001.md'
+            details = source.stat()
+            source.write_text(source.read_text().replace('Canonical message',
+                                                         'Updated message'))
+            os.utime(source, ns=(details.st_atime_ns, details.st_mtime_ns))
+            environment['NEXUS_DOCS_CHANGED_INPUTS'] = '["docs/p001.md"]'
+            self.assertEqual(self.build(root, environment), {'index', 'p001'})
+            output = root / 'build/messages'
+            self.assertEqual(len(list(output.rglob('*.pot'))), 124)
+            self.assertIn('Updated message p001.',
+                          sphinx_ext.read_catalog(output / 'p001.pot')[1])
+            (output / 'p002.pot').unlink()
+            environment['NEXUS_DOCS_CHANGED_INPUTS'] = '[]'
+            self.assertEqual(self.build(root, environment), {'index', 'p002'})
+            self.assertEqual(len(list(output.rglob('*.pot'))), 124)
+            self.assertIn('Canonical message p002.',
+                          sphinx_ext.read_catalog(output / 'p002.pot')[1])
+            self.build(root, environment, mode='verify')
+            self.assertEqual(len(self.build(root, environment, mode='verify')), 124)
+
+    def test_compact_catalogs_keep_official_complete_domain_collection(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            environment = self.fixture(root, ['guide/one', 'guide/two'])
+            self.build(root, environment, compact=True)
+            source = root / 'docs/guide/one.md'
+            source.write_text(source.read_text().replace('Canonical message',
+                                                         'Updated message'))
+            environment['NEXUS_DOCS_CHANGED_INPUTS'] = '["docs/guide/one.md"]'
+            self.assertEqual(self.build(root, environment, compact=True),
+                             {'index', 'guide/one', 'guide/two'})
+            messages = sphinx_ext.read_catalog(root / 'build/messages/guide.pot')[1]
+            self.assertIn('Updated message guide/one.', messages)
+            self.assertIn('Canonical message guide/two.', messages)
 
 
 class DocumentationSourceTests(unittest.TestCase):
@@ -313,16 +447,24 @@ class ReviewedLocaleStageTests(unittest.TestCase):
             subprocess.run(['git', '-C', str(self.root)] + arguments,
                            check=True, capture_output=True)
 
-    def configure(self):
+    def configure(self, *, builder='html'):
         config = SimpleNamespace(nexus_revision=None, nexus_code_revision=None,
             language='zh_CN', nexus_available_languages='en,zh_CN',
             nexus_translation_root=None, nexus_mode='preview',
             nexus_changed_inputs='[]', nexus_rebuild_all='0',
             nexus_gettext_root=str(self.pot.parent))
         app = SimpleNamespace(srcdir=str(self.docs),
-                              doctreedir=str(self.root / 'doctrees'))
+            doctreedir=str(self.root / 'doctrees'), config=config,
+            builder=SimpleNamespace(name=builder))
         sphinx_ext._configure(app, config)
+        sphinx_ext.stage_reviewed_locale(app)
         return Path(config.locale_dirs[0]) / 'zh_CN/LC_MESSAGES/index.po'
+
+    def test_gettext_does_not_inspect_or_stage_translation_catalogs(self):
+        with patch.object(sphinx_ext, 'translation_status',
+                          side_effect=AssertionError('gettext audited translations')):
+            staged = self.configure(builder='gettext')
+        self.assertFalse(staged.exists())
 
     def test_unchanged_reviewed_catalog_keeps_staged_mtime_and_compiled_mo(self):
         staged = self.configure()

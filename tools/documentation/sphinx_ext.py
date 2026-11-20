@@ -276,9 +276,12 @@ def _configure(app, config) -> None:
     repository = Path(app.srcdir).parent.resolve()
     config.nexus_revision = _revision(repository, config.nexus_revision)
     config.nexus_code_revision = _revision(repository, config.nexus_code_revision or config.nexus_revision)
-    config.nexus_source_dirty = bool(subprocess.check_output(
-        ['git', '-C', str(repository), 'status', '--porcelain=v1', '--untracked-files=normal'],
-        text=True).strip())
+    dirty = os.environ.get('NEXUS_DOCS_SOURCE_DIRTY')
+    if dirty not in (None, '0', '1'):
+        raise ValueError('documentation source-dirty flag must be 0 or 1')
+    config.nexus_source_dirty = (dirty == '1' if dirty is not None else
+        bool(subprocess.check_output(['git', '-C', str(repository), 'status',
+            '--porcelain=v1', '--untracked-files=normal'], text=True).strip()))
     config.nexus_available_languages = available_languages(
         config.language, config.nexus_available_languages)
     config.nexus_translation_root = str(Path(config.nexus_translation_root or
@@ -295,9 +298,18 @@ def _configure(app, config) -> None:
     if config.nexus_rebuild_all not in ('0', '1'):
         raise ValueError('documentation rebuild-all must be 0 or 1')
     config.nexus_rebuild_all = config.nexus_rebuild_all == '1'
+    stage = Path(app.doctreedir) / 'nexus-reviewed-locale' / config.language
+    config.locale_dirs = [str(stage)]
+
+
+def stage_reviewed_locale(app) -> None:
+    """Stage reviewed translations only after the selected builder is known."""
+    if app.builder.name == 'gettext':
+        return
+    config = app.config
     # Sphinx only sees complete reviewed catalogs. Incomplete/stale translations
     # would otherwise create mixed-language prose despite a fallback banner.
-    stage = Path(app.doctreedir) / 'nexus-reviewed-locale' / config.language
+    stage = Path(config.locale_dirs[0])
     selected = set()
     originals = Path(config.nexus_translation_root) / config.language / 'LC_MESSAGES'
     if config.nexus_gettext_root and originals.exists():
@@ -328,7 +340,6 @@ def _configure(app, config) -> None:
     for compiled in stage.rglob('*.mo'):
         if compiled.with_suffix('.po') not in selected:
             compiled.unlink()
-    config.locale_dirs = [str(stage)]
 
 
 def _read_source(app, docname: str, source: list[str]) -> None:
@@ -674,7 +685,20 @@ def normalize_included_references(app, doctree) -> None:
 
 def setup(app) -> dict[str, object]:
     """Register only deterministic source and HTML transformations."""
+    from sphinx.builders.gettext import MessageCatalogBuilder
     from tools.documentation.search_language import NexusChineseSearch
+
+    class PreviewMessageCatalogBuilder(MessageCatalogBuilder):
+        def get_outdated_docs(self):
+            if (self.config.nexus_mode != 'preview'
+                    or self.config.gettext_compact is not False):
+                return super().get_outdated_docs()
+            # Sphinx unions actual source/dependency updates with these missing
+            # outputs. Per-page domains safely retain all unchanged catalogs.
+            return {name for name in self.env.found_docs
+                    if not (Path(self.outdir) / (name + '.pot')).is_file()}
+
+    app.add_builder(PreviewMessageCatalogBuilder, override=True)
     if 'breathe' in getattr(app, 'extensions', {}):
         from tools.documentation.breathe_i18n import SourcedDoxygenFileDirective
         app.add_directive('doxygenfile', SourcedDoxygenFileDirective, override=True)
@@ -693,6 +717,7 @@ def setup(app) -> dict[str, object]:
     app.add_config_value('nexus_rebuild_all', os.environ.get('NEXUS_DOCS_REBUILD_ALL', '0'), '',
                          types=(str, bool))
     app.connect('config-inited', _configure)
+    app.connect('builder-inited', stage_reviewed_locale)
     app.connect('builder-inited', prepare_diagram_images)
     app.connect('source-read', _read_source)
     app.connect('env-get-outdated', source_inputs_outdated)

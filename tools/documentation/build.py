@@ -232,9 +232,50 @@ def _preserve_xml_times(current, previous):
 
 
 def _xml_shape(api):
-    """A removed XML file must not reach Breathe's old mtime observer."""
-    return _hash([path.relative_to(api).as_posix()
-                  for path in sorted((api / "xml").rglob("*.xml"))])
+    """Structural changes require fresh global C references and XML observers."""
+    return _hash({"files": [path.relative_to(api).as_posix()
+                            for path in sorted((api / "xml").rglob("*.xml"))],
+                  "index": _file_hash(api / "xml/index.xml")})
+
+
+def _admit(root, work, tool_prefix, *, parallel):
+    """Only tool observation overlaps; source checks follow their own snapshot."""
+    def tools():
+        started = time.perf_counter()
+        context = install.context(tool_prefix)
+        return context, time.perf_counter() - started
+
+    def source():
+        started = time.perf_counter()
+        identity, observed = observe_git_source(root), inputs(root)
+        parser = _parser_inputs(observed)
+        rendered = {path.relative_to(root).as_posix()
+                    for path in (*check.sources(root), *check.dependencies(root))}
+        snapshot_seconds = time.perf_counter() - started
+        started = time.perf_counter()
+        report = check.scan(root)
+        record(work / "source-check.json", report)
+        return ((identity, observed, parser, rendered, report), snapshot_seconds,
+                time.perf_counter() - started)
+
+    started = time.perf_counter()
+    if parallel:
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            futures = (pool.submit(tools), pool.submit(source))
+            results, errors = [], []
+            for future in futures:
+                try:
+                    results.append(future.result())
+                except BaseException as error:
+                    errors.append(error)
+            if errors:
+                raise errors[0]
+    else:
+        results = (tools(), source())
+    (context, tool_seconds), (state, snapshot_seconds, check_seconds) = results
+    return context, state, {"tools_verification": tool_seconds,
+        "source_snapshot": snapshot_seconds, "source_checks": check_seconds,
+        "admission_wall": time.perf_counter() - started}
 
 
 def _doxygen_config(root, api):
@@ -263,6 +304,7 @@ def _environment(context, root, source, mode, languages, xml, gettext):
     environment.update({"NEXUS_DOCS_MODE": mode,
         "NEXUS_DOCS_REVISION": source["commit"],
         "NEXUS_DOCS_CODE_REVISION": source["commit"],
+        "NEXUS_DOCS_SOURCE_DIRTY": "1" if source["dirty"] else "0",
         "NEXUS_DOCS_LANGUAGES": ",".join(dict.fromkeys(("en", *languages))),
         "NEXUS_DOCS_LANGUAGE": "en", "NEXUS_DOCS_DOXYGEN_XML": str(xml),
         "NEXUS_DOCS_GETTEXT_ROOT": str(gettext),
@@ -352,19 +394,16 @@ def build(root, destination, *, mode="verify", language="all", tool_prefix=None,
             site.mkdir()
             metadata["publication_id"] = publication.mark(site)
             cache.mkdir(exist_ok=True)
-            stage = time.perf_counter()
-            context = install.context(tool_prefix)
-            source, observed = observe_git_source(root), inputs(root)
+            context, source_state, admission = _admit(root, work, tool_prefix,
+                parallel=mode == "preview" and process.parallel_jobs(os.environ) > 1)
+            source, observed, parser, rendered, report = source_state
+            timings.update(admission)
             metadata.update(source=source, source_hash=_hash(observed), tools=context.identity)
             environment = context.environment()
             environment_key = _hash({name: value for name, value in environment.items()
                 if name in _RENDER_ENVIRONMENT or name.startswith("LC_")})
             metadata["render_environment_sha256"] = environment_key
             execution_key = {"tools": context.identity, "environment": environment_key}
-            parser = _parser_inputs(observed)
-            rendered = {path.relative_to(root).as_posix()
-                        for path in (*check.sources(root), *check.dependencies(root))}
-            timings["tools_inputs"] = time.perf_counter() - stage
             prior = {}
             state = cache / "inputs.json"
             if mode == "preview" and state.is_file():
@@ -382,14 +421,12 @@ def build(root, destination, *, mode="verify", language="all", tool_prefix=None,
                              if observed.get(name) != prior.get(name))
             rebuild_all = _rebuild_all(changed, parser, rendered, prior=prior)
             stage = time.perf_counter()
-            report = check.scan(root)
-            record(work / "source-check.json", report)
             if report["errors"]:
                 raise ValueError("documentation source check failed: " + "\n".join(report["errors"]))
             diagram_report = diagrams.check(root, env=environment, full=mode == "verify")
             if diagram_report["errors"]:
                 raise ValueError("diagram verification failed: " + "\n".join(diagram_report["errors"]))
-            timings["source_checks"] = time.perf_counter() - stage
+            timings["source_checks"] += time.perf_counter() - stage
             stage = time.perf_counter()
             parser_key = _hash({"execution": execution_key, "implementation": parser})
             api_names = {n: h for n, h in observed.items()

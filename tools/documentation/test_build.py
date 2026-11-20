@@ -119,6 +119,79 @@ class BuildTests(unittest.TestCase):
             self.assertEqual(environment["NEXUS_DOCS_TRANSLATION_ROOT"],
                              str(self.root / "docs/locale"))
 
+    def test_observed_dirty_state_overrides_the_host_flag(self):
+        hostile = install.ToolContext(self.context.identity_json,
+            self.context.variables + (("NEXUS_DOCS_SOURCE_DIRTY", "1"),))
+        with patch.object(install, "context", return_value=hostile):
+            self.invoke()
+        for environment in self.environments.values():
+            self.assertEqual(environment["NEXUS_DOCS_SOURCE_DIRTY"], "0")
+
+    def test_preview_overlaps_tools_with_a_snapshot_before_source_checks(self):
+        tools_started, snapshot_done, checked = (threading.Event() for _ in range(3))
+        def prepare(_prefix):
+            tools_started.set()
+            self.assertTrue(checked.wait(timeout=3))
+            return self.context
+        def observe(_root):
+            snapshot_done.set()
+            return self.source
+        def scan(_root):
+            self.assertTrue(snapshot_done.is_set())
+            self.assertTrue(tools_started.wait(timeout=3))
+            checked.set()
+            return {"errors": []}
+        import os
+        with patch.dict(os.environ, {"NEXUS_BUILD_JOBS": "2"}), \
+                patch.object(install, "context", side_effect=prepare), \
+                patch.object(build, "observe_git_source", side_effect=observe), \
+                patch.object(build.check, "scan", side_effect=scan):
+            result = self.invoke(mode="preview")
+        self.assertEqual(result["status"], "ready")
+        self.assertTrue(checked.is_set())
+
+    def test_preview_tool_failure_waits_for_source_check_and_preserves_view(self):
+        self.invoke(mode="preview")
+        previous = (self.output / "site/en/index.html").read_bytes()
+        checked = threading.Event()
+        def prepare(_prefix):
+            self.assertTrue(checked.wait(timeout=3))
+            raise ValueError("tool tuple failed")
+        def scan(_root):
+            checked.set()
+            return {"errors": []}
+        import os
+        with patch.dict(os.environ, {"NEXUS_BUILD_JOBS": "2"}), \
+                patch.object(install, "context", side_effect=prepare), \
+                patch.object(build.check, "scan", side_effect=scan):
+            with self.assertRaisesRegex(ValueError, "tool tuple failed"):
+                self.invoke(mode="preview")
+        self.assertTrue(checked.is_set())
+        self.assertEqual((self.output / "site/en/index.html").read_bytes(), previous)
+        self.assertEqual(json.loads((self.output / build.REPORT).read_text())["status"],
+                         "failed")
+
+    def test_verify_and_single_job_preview_keep_serial_admission_order(self):
+        import os
+        for mode in ("verify", "preview"):
+            order = []
+            def prepare(_prefix):
+                order.append("tools")
+                return self.context
+            def observe(_root):
+                order.append("snapshot")
+                return self.source
+            def scan(_root):
+                order.append("source-check")
+                return {"errors": []}
+            with self.subTest(mode=mode), \
+                    patch.dict(os.environ, {"NEXUS_BUILD_JOBS": "1"}), \
+                    patch.object(install, "context", side_effect=prepare), \
+                    patch.object(build, "observe_git_source", side_effect=observe), \
+                    patch.object(build.check, "scan", side_effect=scan):
+                self.invoke(mode=mode)
+                self.assertEqual(order[:3], ["tools", "snapshot", "source-check"])
+
     def test_preview_warm_reuses_inputs_but_executes_html_again(self):
         self.invoke(mode="preview")
         self.commands.clear()
@@ -134,7 +207,8 @@ class BuildTests(unittest.TestCase):
     def test_success_report_contains_actual_stage_timings(self):
         result = self.invoke()
         timings = result["timings_seconds"]
-        self.assertTrue({"tools_inputs", "source_checks", "messages", "translations",
+        self.assertTrue({"tools_verification", "source_snapshot", "source_checks",
+                         "admission_wall", "messages", "translations",
                          "diagrams", "html", "publication_inputs",
                          "prepublication_total"}
                         <= timings.keys())
@@ -307,6 +381,28 @@ class BuildTests(unittest.TestCase):
                 (folder / name).write_text("<compound/>\n")
             return result
         self.port.side_effect = different_compound
+        self.invoke(mode="preview")
+        before = {stage: args[args.index("-d") + 1] for stage, args in self.commands
+                  if stage in {"documentation-gettext", "documentation-html-en"}}
+        header.write_text("void changed_api(void);\n")
+        self.commands.clear()
+        self.invoke(mode="preview")
+        after = {stage: args[args.index("-d") + 1] for stage, args in self.commands
+                 if stage in {"documentation-gettext", "documentation-html-en"}}
+        self.assertEqual(before.keys(), after.keys())
+        for stage in before:
+            self.assertNotEqual(before[stage], after[stage])
+
+    def test_changed_index_gets_fresh_breathe_environments_with_the_same_xml_set(self):
+        header = self.root / "core/include/api.h"
+        def different_index(command, **kwargs):
+            result = self.command(command, **kwargs)
+            if kwargs["stage"] == "documentation-doxygen":
+                index = Path(kwargs["env"]["NEXUS_DOCS_DOXYGEN_XML"]) / "index.xml"
+                name = "changed_api" if "changed" in header.read_text() else "api"
+                index.write_text('<doxygenindex><name>' + name + '</name></doxygenindex>\n')
+            return result
+        self.port.side_effect = different_index
         self.invoke(mode="preview")
         before = {stage: args[args.index("-d") + 1] for stage, args in self.commands
                   if stage in {"documentation-gettext", "documentation-html-en"}}
