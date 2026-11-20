@@ -171,6 +171,15 @@ class BuildTests(unittest.TestCase):
         self.assertEqual(json.loads((self.output / build.REPORT).read_text())["status"],
                          "failed")
 
+    def test_parallel_admission_preserves_control_after_a_tool_failure(self):
+        for control in (KeyboardInterrupt(), SystemExit(23)):
+            with self.subTest(control=type(control).__name__), \
+                    patch.object(install, "context", side_effect=ValueError("tools failed")), \
+                    patch.object(build, "observe_git_source", side_effect=control):
+                with self.assertRaises(type(control)) as caught:
+                    build._admit(self.root, self.output, self.prefix, parallel=True)
+                self.assertIs(caught.exception, control)
+
     def test_verify_and_single_job_preview_keep_serial_admission_order(self):
         import os
         for mode in ("verify", "preview"):
@@ -207,11 +216,10 @@ class BuildTests(unittest.TestCase):
     def test_success_report_contains_actual_stage_timings(self):
         result = self.invoke()
         timings = result["timings_seconds"]
-        self.assertTrue({"tools_verification", "source_snapshot", "source_checks",
-                         "admission_wall", "messages", "translations",
-                         "diagrams", "html", "publication_inputs",
-                         "prepublication_total"}
-                        <= timings.keys())
+        self.assertLessEqual({"tools_verification", "source_snapshot", "source_checks",
+                              "admission_wall", "messages", "translations",
+                              "diagrams", "html", "publication_inputs",
+                              "prepublication_total"}, timings.keys())
         self.assertTrue(all(isinstance(value, float) and value >= 0
                             for value in timings.values()))
 

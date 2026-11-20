@@ -266,7 +266,7 @@ def _admit(root, work, tool_prefix, *, parallel):
             for future in futures:
                 try:
                     results.append(future.result())
-                except BaseException as error:
+                except Exception as error:
                     errors.append(error)
             if errors:
                 raise errors[0]
