@@ -57,6 +57,14 @@ div.bodywrapper,
     margin: 0;
 }
 
+/* Words and inline code keep natural widths inside the horizontal rail. */
+.nexus-table-scroll table,
+.nexus-table-scroll table code.literal,
+.nexus-table-scroll table code.literal span.pre {
+    overflow-wrap: normal;
+    word-break: normal;
+}
+
 .nexus-table-scroll:focus-visible {
     outline: 2px solid currentColor;
     outline-offset: -2px;
