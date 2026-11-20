@@ -1,0 +1,1054 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 9727b5540385ccbad992a39664c59436efcba8bb78cdd5db1131191c98c42881\n"
+
+#: ../../../../../../docs/reference/contracts/integration.md:9
+msgid "接入与静态装配合同"
+msgstr "Integration and static assembly contracts"
+
+#: ../../../../../../docs/reference/contracts/integration.md:11
+msgid "接口和资源规则由本页维护；按步骤接入Board、SoC、IP或组件请使用对应操作指南。"
+msgstr ""
+"This page owns interface and resource rules; use the corresponding guides "
+"for step-by-step Board, SoC, IP, or component integration."
+
+#: ../../../../../../docs/reference/contracts/integration.md:13
+msgid "1. 第一原则与工具边界"
+msgstr "1. First principles and tool boundaries"
+
+#: ../../../../../../docs/reference/contracts/integration.md:15
+msgid "接入不是把所有硬件描述转换为一个运行时设备树。它是提交有限事实、选择已维护能力、检查资源，再显式装配静态对象。"
+msgstr ""
+"Integration does not turn every hardware description into a runtime device "
+"tree. It submits bounded facts, selects maintained capabilities, checks "
+"resources and explicitly assembles static objects."
+
+#: ../../../../../../docs/reference/contracts/integration.md:17
+msgid ""
+"使用 C11、CMake、Ninja、TOML 装配输入、JSON 硬件事实和一个窄 Python 校验/生成工具。核心默认不需要 "
+"heap、运行时字符串查找、自动探测或后台 worker。"
+msgstr ""
+"Use C11, CMake, Ninja, TOML assembly inputs, JSON hardware facts and a "
+"narrow Python validator/generator. The default core needs no heap, runtime "
+"string lookup, discovery or background workers."
+
+#: ../../../../../../docs/reference/contracts/integration.md:18
+msgid ""
+"默认入口是外部工程的 `assembly.toml`。硬件输入分为 SoC、Board、assembly 三类，一次验证建立冻结 typed "
+"IR；`resolved.json` 是其单向审计投影。"
+msgstr ""
+"The default entry is `assembly.toml` in an external project. Hardware inputs"
+" comprise SoC, Board and assembly facts. One validation establishes frozen "
+"typed IR; `resolved.json` is its one-way audit projection."
+
+#: ../../../../../../docs/reference/contracts/integration.md:19
+msgid "CMake 仍是代码目标和代码依赖的权威。生成器不生成组件依赖图、业务线程、产品 main 或调度策略。"
+msgstr ""
+"CMake remains authoritative for code targets and dependencies. Generators "
+"produce no component dependency graph, business threads, product main or "
+"scheduling policy."
+
+#: ../../../../../../docs/reference/contracts/integration.md:20
+msgid ""
+"实例选择使用 TOML schema 2，SoC/Board 事实保持 JSON。工具只解析这一个装配输入；Kconfig、CMake cache "
+"和旧生成头不形成平行配置权威。"
+msgstr ""
+"Instance selection uses TOML schema 2; SoC/Board facts remain JSON. Tools "
+"parse only that assembly input; Kconfig, CMake cache and old generated "
+"headers do not become parallel authorities."
+
+#: ../../../../../../docs/reference/contracts/integration.md:21
+msgid ""
+"目录可采用 `core/ arch/ soc/ io/ os/ components/ tools/ tests/`；Board 可位于独立 "
+"package。层名说明职责，不要求每个层、端口或对象成为一个独立 translation unit。"
+msgstr ""
+"Directories may use `core/ arch/ soc/ io/ os/ components/ tools/ tests/`; a "
+"Board may reside in an independent package. Layer names define "
+"responsibilities, without requiring every layer, port or object to become a "
+"separate translation unit."
+
+#: ../../../../../../docs/reference/contracts/integration.md:22
+msgid "未维护的能力不因 SDK 有宏、路由表有 AF 值、同系列有示例而自动可用。新路由、新 DMA 模式、新控制器分别接入。"
+msgstr ""
+"Unmaintained capabilities do not become available merely because the SDK has"
+" a macro, a route table has an AF value or another family member has an "
+"example. Integrate new routes, DMA modes and controllers separately."
+
+#: ../../../../../../docs/reference/contracts/integration.md:24
+msgid "2. 各类接入拥有的事实"
+msgstr "2. Facts owned by each integration category"
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "类别"
+msgstr "Category"
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "拥有的事实和实现"
+msgstr "Owned facts and implementation"
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "明确不拥有"
+msgstr "Explicitly not owned"
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "CPU / Arch"
+msgstr "CPU / Arch"
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "指令集、异常上下文、屏障、原子/临界区、FPU 上下文和 ABI 约定"
+msgstr ""
+"Instruction set, exception context, barriers, atomics/critical sections, FPU"
+" context and ABI conventions."
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "具体 PCB、具体控制器 IRQ/DMA、产品设备"
+msgstr "Specific PCBs, controller IRQ/DMA assignments or product devices."
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "SoC"
+msgstr "SoC"
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "精确料号/封装/密度、内存域、控制器、时钟约束、IRQ/EXTI、DMA、pin/AF 路由、Flash 几何、私有 SDK"
+msgstr ""
+"Exact part/package/density, memory domains, controllers, clock constraints, "
+"IRQ/EXTI, DMA, pin/AF routes, Flash geometry and private SDK."
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "Board 接线、应用 role、产品分区"
+msgstr "Board wiring, application roles or product partitions."
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "Board"
+msgstr "Board"
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "PCB/source revision、晶振、电气电平、焊接器件、连接器、跳线条件、初始安全电平和复核接线"
+msgstr ""
+"PCB/source revisions, oscillators, electrical levels, fitted devices, "
+"connectors, jumper conditions, initial safe levels and reviewed wiring."
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "改写芯片密度、选主传感器、创建业务任务"
+msgstr ""
+"Overriding chip density, selecting the primary sensor or creating business "
+"tasks."
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "外部器件 driver"
+msgstr "External device driver"
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "器件命令/寄存器、转换算法、初始化顺序、器件时序要求和错误语义"
+msgstr ""
+"Device commands/registers, conversion algorithms, initialization order, "
+"timing requirements and error semantics."
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "默认 GPIO、默认总线编号、产品采样策略"
+msgstr "Default GPIOs, default bus numbers or product sampling policy."
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "协议核心"
+msgstr "protocol core"
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "帧格式、解析/编码、有界状态机和协议时间规则"
+msgstr ""
+"Frame formats, parsing/encoding, bounded state machines and protocol timing "
+"rules."
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "默认 UART、RS485 DE 引脚、线程、客户业务"
+msgstr "Default UARTs, RS485 DE pins, threads or customer business logic."
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "组件"
+msgstr "component"
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "可复用算法或服务、窄端口、明确容量和执行上下文"
+msgstr ""
+"Reusable algorithms/services, narrow ports, explicit capacity and execution "
+"context."
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "隐式创建 worker、自动找依赖、固定产品存储"
+msgstr ""
+"Implicit workers, automatic dependency discovery or fixed product storage."
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "产品／应用"
+msgstr "product / application"
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "main、workers、应用 role、私有协议、配置策略、分区、升级/健康/制造策略"
+msgstr ""
+"main, workers, application roles, private protocols, configuration policy, "
+"partitions and update/health/manufacturing policy."
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "让通用平台反向依赖其源码"
+msgstr "Making the shared platform depend on product source."
+
+#: ../../../../../../docs/reference/contracts/integration.md:36
+msgid ""
+"SoC provider 实现公共 IO/核心合同，并使用 Arch。器件 driver 使用总线、GPIO、时间等窄端口；协议 core 不依赖 "
+"Board 或 OS；组件 adapter 才连接 IO/OS。外部 assembly 连接各实现。Board 声明板载器件的事实，不因此成为器件 "
+"driver 的所有者。"
+msgstr ""
+"SoC providers implement public I/O/core contracts and use Arch. Device "
+"drivers use narrow bus/GPIO/time ports; protocol cores depend on neither "
+"Board nor OS; component adapters connect I/O/OS. External assemblies wire "
+"implementations together. Declaring onboard devices does not make the Board "
+"the device-driver owner."
+
+#: ../../../../../../docs/reference/contracts/integration.md:38
+msgid ""
+"厂商 SDK、内核实现头和可变 controller 状态保持私有；公共接口不透出其结构体。STM32 与 GD32 "
+"的相似名称不能证明寄存器兼容或驱动可以直接复用。"
+msgstr ""
+"Vendor SDKs, kernel implementation headers and mutable controller state stay"
+" private; public interfaces do not expose their structures. Similar "
+"STM32/GD32 names do not prove register compatibility or direct driver reuse."
+
+#: ../../../../../../docs/reference/contracts/integration.md:40
+msgid "3. 三类输入及少量文件模板"
+msgstr "3. Three input categories and small file templates"
+
+#: ../../../../../../docs/reference/contracts/integration.md:42
+msgid "SoC 包"
+msgstr "SoC package"
+
+#: ../../../../../../docs/reference/contracts/integration.md:44
+msgid "一个维护中的 SoC package 通常包含："
+msgstr "A maintained SoC package typically includes:"
+
+#: ../../../../../../docs/reference/contracts/integration.md:58
+msgid ""
+"系列目录复用代码，`facts/soc.json` 按精确订货号选择已审 device profile 和不重叠的 controller "
+"groups；物理事实与软件模式分开。`facts/devices.json` 记录官方宏、startup、 IRQ "
+"enum／number／handler。型号、封装、Flash、SRAM 域和 IRQ 表不能被家族字符串 代替，厂商编译目录不扩大运行时模式支持。"
+msgstr ""
+"The series directory shares code. `facts/soc.json` selects a reviewed device"
+" profile and disjoint controller groups by exact orderable part, separating "
+"physical facts from software modes. `facts/devices.json` records official "
+"macros, startup and IRQ enums/numbers/handlers. A family string cannot "
+"replace part, package, Flash, SRAM-domain or IRQ facts. Vendor compile "
+"inventory does not expand runtime mode support."
+
+#: ../../../../../../docs/reference/contracts/integration.md:63
+msgid ""
+"当前生产 SoC 入口只有 `soc/stm32/stm32f4/`；领域 binding、实例布局与实现相邻， 私有共享 IP 位于其 "
+"`drivers/ip/`，跨域共享合同与片段保留在 `private/`。 Board／SoC 不放 Python 插件；声明式 package 由 "
+"`tools/configure/` 的通用 DataProvider、领域政策、typed IR 与有限静态节点解析，不再加载家族 Python "
+"构造模块。顶层 `pads` 统一显式坐标；字段与同一快照合同见 [接入指南](../../guides/provider-"
+"porting.md)。Native 仅在 `tests/support/native/`，必须显式启用测试 scope；不会进入生产支持枚举。 CPU"
+" 实现按 ISA 位于 `arch/arm/cortex_m/` 或 `arch/native/`，公共头路径保持稳定。 默认生成入口连接 Core "
+"的手写 C 整平台生命周期和 F4 的 System／共享资源 C 协调器。 "
+"主机保留事实校验与有限静态连接，不维护寄存器级硬件算法或驱动状态机；固定生命周期 调用与通用错误传播仍由 typed "
+"节点连接，只维护一套配置实现。实际生成 factory、 C 模型与 ARM 镜像分别验收，不能用目录调整或源码存在 宣布整条链路通过。"
+msgstr ""
+"The sole current production SoC entry is `soc/stm32/stm32f4/`. Each domain "
+"keeps its bindings, instance layout and implementation together. Shared "
+"private IP lives under `drivers/ip/`; cross-domain contracts and fragments "
+"remain under `private/`. Board/SoC contain no Python plugins. Generic "
+"DataProvider, domain policies, typed IR and bounded static nodes under "
+"`tools/configure/` parse declarative packages without loading family Python "
+"constructor modules. Top-level `pads` owns explicit coordinates; the "
+"[porting guide](../../guides/provider-porting.md) defines fields and the "
+"shared snapshot contract. Native exists only under `tests/support/native/`, "
+"requires explicit test scope and does not enter production support "
+"enumeration. CPU implementations live by ISA under `arch/arm/cortex_m/` or "
+"`arch/native/`, with stable public header paths. Default generated entries "
+"connect Core's handwritten C whole-platform lifecycle and F4's "
+"System/shared-resource C coordinator. Host tools retain fact validation and "
+"bounded static connections, without register-level hardware algorithms or "
+"driver state machines. Typed nodes connect fixed lifecycle calls and common "
+"error propagation, retaining one configuration implementation. Actual "
+"generated factories, C models and ARM images have separate acceptance; "
+"directory movement or source presence does not establish success for the "
+"whole chain."
+
+#: ../../../../../../docs/reference/contracts/integration.md:77
+msgid "4. 解析、生成与 CMake 装配"
+msgstr "4. Resolution, generation and CMake assembly"
+
+#: ../../../../../../docs/reference/contracts/integration.md:79
+msgid "配置过程必须按固定顺序执行："
+msgstr "Configuration must follow this fixed order:"
+
+#: ../../../../../../docs/reference/contracts/integration.md:81
+msgid "读取 assembly，定位唯一 Board，按其精确料号定位 SoC；检查 schema、版本和依赖锁。"
+msgstr ""
+"Read the assembly, locate one Board and its exact SoC part, then check "
+"schemas, versions and dependency locks."
+
+#: ../../../../../../docs/reference/contracts/integration.md:82
+msgid "经同一受控快照读取 package 声明的事实与 binding 文件，校验包边界、资料中的已知／未知条件；展开选中的静态声明与器件。"
+msgstr ""
+"Read package-declared facts and binding files through one controlled "
+"snapshot. Check containment and known/unknown reference conditions, then "
+"expand selected static declarations and devices."
+
+#: ../../../../../../docs/reference/contracts/integration.md:83
+msgid "建立资源占用表，检查模式能力、冲突、clock、IRQ、memory、ABI 和 layout。"
+msgstr ""
+"Build resource claims; check mode capabilities, conflicts, clocks, IRQs, "
+"memory, ABI and layout."
+
+#: ../../../../../../docs/reference/contracts/integration.md:84
+msgid "原子写入单份 `resolved.json`，记录所有决定、拒绝项和输入摘要。"
+msgstr ""
+"Atomically write one `resolved.json` recording decisions, rejections and "
+"input digests."
+
+#: ../../../../../../docs/reference/contracts/integration.md:85
+msgid "从该 IR 导出硬件配置头、只读资源表及 linker 输入；CMake 读取必要选项并按自己声明的目标依赖编译。"
+msgstr ""
+"Derive hardware headers, read-only resource tables and linker inputs from "
+"IR; CMake reads necessary selections and builds its declared dependencies."
+
+#: ../../../../../../docs/reference/contracts/integration.md:86
+msgid "对实际 ELF/map/BIN 验证 vector、startup、handler、区域容量和产物身份；结果成为证据，不能反向冒充硬件资格。"
+msgstr ""
+"Verify vectors, startup, handlers, region capacities and artifact identity "
+"in actual ELF/map/BIN outputs. Results become evidence without posing as "
+"hardware qualification."
+
+#: ../../../../../../docs/reference/contracts/integration.md:88
+msgid ""
+"`resolved.json` 保存 schema、选中 package/料号/后端、有效选项、clock/memory/ABI、资源 "
+"claims、已选器件、证据限制和输入 hash。它不是 CMake target 依赖图，也不包含平台猜测的业务线程、role 或领域策略。"
+msgstr ""
+"`resolved.json` retains schema, packages/parts/backends, effective options, "
+"clock/memory/ABI, resource claims, devices, limitations and input hashes. It"
+" is neither a CMake dependency graph nor guessed business threads, roles or "
+"domain policy."
+
+#: ../../../../../../docs/reference/contracts/integration.md:90
+msgid ""
+"派生输出都来自该 IR。不得存在 `.config`、旧生成头、独立 Board 默认宏等回退真相。生成失败使本次配置失效，不得继续使用上次成功生成的 "
+"bundle；先写临时目录，完整成功后切换。不同 Board/backend/profile 使用独立 build root。"
+msgstr ""
+"All derived outputs come from that IR. No `.config`, old headers or separate"
+" Board default macros become fallback authorities. Failed generation "
+"invalidates configuration; never consume the prior bundle. Write to a "
+"temporary directory and switch only after complete success. Separate "
+"Board/backend/profile combinations use separate roots."
+
+#: ../../../../../../docs/reference/contracts/integration.md:92
+msgid ""
+"CMake 的每个库显式声明自己的代码依赖、公共头与私有 SDK 编译面。assembly 选择硬件实例和模式，不能替代 "
+"`target_link_libraries()`。生成器不扫描任意业务源码推断需要什么组件，也不自动链接所有 driver。若代码目标要求的能力与 "
+"resolved 配置矛盾，配置应失败。"
+msgstr ""
+"Each CMake library declares code dependencies, public headers and private "
+"SDK compile surfaces explicitly. Assembly selects hardware instances/modes "
+"without replacing `target_link_libraries()`. Generators neither infer "
+"component needs from arbitrary business source nor link all drivers. Target "
+"capability requirements contradicting resolved configuration must fail."
+
+#: ../../../../../../docs/reference/contracts/integration.md:94
+msgid ""
+"静态硬件 descriptors 可以由工具生成；可变上下文和真正的构造/init 仍有显式所属实现。产品 main "
+"负责所需组件和器件的初始化顺序以及调度启动。平台不因一个器件节点出现就创建采样任务。"
+msgstr ""
+"Tools may generate static descriptors; mutable contexts and actual "
+"construction/init still have explicit implementation owners. Product main "
+"owns component/device initialization order and scheduler start. A device "
+"node does not create a sampling task."
+
+#: ../../../../../../docs/reference/contracts/integration.md:96
+msgid "5. 资源占用与编译前检查"
+msgstr "5. Resource ownership and precompile checks"
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "资源"
+msgstr "Resource"
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "必须检查的条件"
+msgstr "Required checks"
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "pin（引脚）"
+msgstr "pin"
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "精确封装具有该 pin；route 在 reviewed allowlist；AF/方向/电气约束满足；SWD、板载器件与选中功能不冲突"
+msgstr ""
+"The exact package has the pin; routes are allowlisted and reviewed; "
+"AF/direction/electrical constraints hold; SWD, onboard devices and selected "
+"functions do not conflict."
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "controller（控制器）"
+msgstr "controller"
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "provider 实现所选模式；物理 controller 单一拥有；共享总线由同一个 owner 派生 child"
+msgstr ""
+"The provider implements the selected mode; one owner holds the physical "
+"controller; shared-bus children derive from that owner."
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "SPI child（子端点）"
+msgstr "SPI child"
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "CS 独立；mode/频率/word width 可在已维护配置中满足；串行仲裁明确"
+msgstr ""
+"Separate CS lines; mode, frequency and word width must fit maintained "
+"configurations; explicit serialized arbitration."
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "I2C child（子端点）"
+msgstr "I2C child"
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "地址和 mux 层级合法；地址冲突拒绝；controller 与 mux 模式均已实现"
+msgstr ""
+"Legal addresses/mux levels; conflicting addresses rejected; controller and "
+"mux modes both implemented."
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "DMA"
+msgstr "DMA"
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid ""
+"按实际 DMA controller/stream/channel/request 模型检查；所选 route 合法；独占资源互斥；模式已有实现"
+msgstr ""
+"Validate the actual DMA controller/stream/channel/request model, legal "
+"routes, exclusive-resource conflicts and implemented modes."
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "IRQ"
+msgstr "IRQ"
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "每个 vector 有唯一 provider 或显式有界 dispatcher；优先级、grouping、OS 调用权限吻合"
+msgstr ""
+"Each vector has one provider or explicit bounded dispatcher; priority, "
+"grouping and kernel-call permissions agree."
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "EXTI"
+msgstr "EXTI"
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "检查 line/port mux 独占、边沿模式、共享 vector、事件容量和优先级，不能只看 pin 名"
+msgstr ""
+"Check exclusive line/port muxing, edges, shared vectors, event capacity and "
+"priority rather than only pin names."
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "timer/PWM（定时器／PWM）"
+msgstr "timer/PWM"
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid ""
+"检查 timer/channel、timebase、共享 PSC/ARR/base mode 和 trigger；同 timer 的 channel "
+"不视为独立时基"
+msgstr ""
+"Check timer/channel, timebase, shared PSC/ARR/base mode and triggers. "
+"Channels on one timer are not independent timebases."
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "ADC"
+msgstr "ADC"
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "检查 channel、sample time、sequence、trigger、参考电压条件和具体采样模式；DMA/stream 单独维护"
+msgstr ""
+"Check channels, sampling time, sequences, triggers, reference-voltage "
+"conditions and exact sampling modes; maintain DMA/stream separately."
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "watchdog（看门狗）"
+msgstr "watchdog"
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "检查已维护 IWDG 范围、LSI 误差及启用不可逆效果；feed/健康政策仍归外部产品"
+msgstr ""
+"Check maintained IWDG range, LSI error and irreversible enabling. "
+"Feeding/health policy remains external."
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "clock（时钟）"
+msgstr "clock"
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "晶振、PLL、总线、Flash wait state、外设频率和后端 timebase 约束满足已维护 profile"
+msgstr ""
+"Oscillators, PLLs, buses, Flash wait states, peripheral frequencies and "
+"backend timebase meet maintained profiles."
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "memory（内存）"
+msgstr "memory"
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "精确物理域、DMA 可达性、alignment、栈/池/队列预算、layout/erase block 边界和镜像容量"
+msgstr ""
+"Exact physical domains, DMA reachability, alignment, stack/pool/queue "
+"budgets, layout/erase boundaries and image capacity."
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "ABI"
+msgstr "ABI"
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "CPU/Thumb/FPU/float ABI 一致；FreeRTOS port 正确；精确型号宏来自有效配置"
+msgstr ""
+"Consistent CPU/Thumb/FPU/float ABI, correct FreeRTOS port and exact-part "
+"macros from resolved configuration."
+
+#: ../../../../../../docs/reference/contracts/integration.md:114
+msgid ""
+"resource claim 必须指出实体资源键、owner、使用模式和来源。错误例如“DMA1 stream X 同时由 A 和 B "
+"声明”，而不是只报“配置不合法”。工具只检查显式选择，不自动寻找另一个 DMA stream、改 pin 或降低 clock。"
+msgstr ""
+"Resource claims must identify physical resource keys, owners, modes and "
+"origins. Diagnostics say “DMA1 stream X is claimed by A and B”, not merely "
+"“invalid configuration”. Tools validate explicit choices without finding "
+"alternate streams, changing pins or lowering clocks."
+
+#: ../../../../../../docs/reference/contracts/integration.md:116
+msgid ""
+"SPI/I2C bus 共享不等于重复声明 controller。总线由单一 provider 管理，child 只持有其有界引用；SPI CS 或 "
+"I2C 同层地址重复要拒绝。直接单执行者调用与显式queue/service "
+"adapter分别声明：共享路径只有adapter执行者推进controller，client等待不接管执行。短锁只保护提交/控制元数据，不跨DMA生命周期持有task"
+" mutex，器件driver不隐式依赖kernel锁。"
+msgstr ""
+"Sharing SPI/I2C buses does not mean declaring controllers twice. One "
+"provider manages the bus; children retain bounded references. Duplicate SPI "
+"CS or same-level I2C addresses fail. Direct single-executor calls and "
+"explicit queue/service adapters are distinct: only the adapter executor "
+"advances shared controllers; waiting clients do not take over. Short locks "
+"protect admission/control metadata, never hold task mutexes across DMA "
+"lifetimes. Device drivers do not implicitly require kernel locks."
+
+#: ../../../../../../docs/reference/contracts/integration.md:118
+msgid ""
+"真实共享 IRQ 允许使用 SoC 声明的静态 dispatcher，检查 handler 清单和有界执行条件；不允许两个强符号争抢 "
+"vector，也不引入任意运行时注册。IRQ body 的响应/结算与 task/worker 的后续处理分别有所属者。"
+msgstr ""
+"Real shared IRQs may use SoC-declared static dispatchers with checked "
+"handler lists and bounded execution. Two strong symbols cannot compete for "
+"one vector; arbitrary runtime registration is excluded. IRQ "
+"response/settlement and subsequent task/worker processing have separate "
+"owners."
+
+#: ../../../../../../docs/reference/contracts/integration.md:120
+msgid ""
+"FreeRTOS 保留 SysTick/PendSV/SVC 等被其 port 使用的资源。IRQ priority grouping "
+"统一配置；调用内核的 ISR 必须满足该 port 的 syscall priority 规则，高优先级 ISR 禁止使用相应 OS API。备用 "
+"timebase 若占用 timer，也进入同一资源表。"
+msgstr ""
+"FreeRTOS reserves port resources including SysTick/PendSV/SVC. Configure "
+"priority grouping consistently; kernel-calling ISRs must meet the port’s "
+"syscall-priority rules, while higher-priority ISRs cannot use those OS APIs."
+" Alternate timer timebases enter the same claims table."
+
+#: ../../../../../../docs/reference/contracts/integration.md:122
+msgid "clock、memory 与 ABI 的具体边界"
+msgstr "Specific clock, memory and ABI boundaries"
+
+#: ../../../../../../docs/reference/contracts/integration.md:124
+msgid ""
+"Board 提供实际 HSE/LSE、电气条件和必要跳线事实；SoC 提供合法约束与已维护 profile；assembly 选择 "
+"profile。controller 不独立重配全局 clock，driver 不重复设置 NVIC grouping。没有实现动态 clock "
+"切换时，运行期要求切换直接报告不支持。"
+msgstr ""
+"Boards supply actual HSE/LSE, electrical and jumper facts; SoCs supply legal"
+" constraints and maintained profiles; assemblies choose profiles. "
+"Controllers do not reconfigure global clocks independently; drivers do not "
+"reset NVIC grouping. Without implemented dynamic-clock switching, runtime "
+"switch requests return unsupported."
+
+#: ../../../../../../docs/reference/contracts/integration.md:126
+msgid ""
+"各 SRAM 域分别声明地址、大小、初始化方式、DMA 可达性和用途限制。不能把 STM32 CCM 当作默认 DMA SRAM，也不能把全部物理 "
+"SRAM 合成一个未经维护的 linker heap。初始阶段只启用已实现且已检查的域，其余域保持未维护。"
+msgstr ""
+"Declare each SRAM domain’s address, size, initialization, DMA reachability "
+"and usage restrictions separately. STM32 CCM is not default DMA SRAM; all "
+"physical SRAM cannot become one unmaintained linker heap. Initially enable "
+"only implemented, checked domains; others remain unmaintained."
+
+#: ../../../../../../docs/reference/contracts/integration.md:128
+msgid ""
+"静态 DMA buffer 可用 linker section、alignment 和 map "
+"检查；调用者动态传入的指针仍须在执行时验证可达域与对齐。编译检查不能替代 borrow/settlement 生命周期。内存预算区分 "
+"MSP、任务栈、OS 对象、IO buffer、组件 workspace 和可选 libc heap。"
+msgstr ""
+"Linker sections, alignment and maps validate static DMA buffers; runtime "
+"validation still checks caller-provided pointers for reachability/alignment."
+" Compile checks cannot replace borrowing/settlement lifetimes. Budgets "
+"distinguish MSP, task stacks, OS objects, I/O buffers, component workspaces "
+"and optional libc heaps."
+
+#: ../../../../../../docs/reference/contracts/integration.md:130
+msgid ""
+"Flash 布局使用精确料号的 erase geometry，拒绝越界、重叠、重复 ID 和不满足擦除边界的 region，并且只允许一个 "
+"image。`resolved.flash` 保留完整物理几何，`resolved.layout` 选择链接镜像窗口；窗口不创建 Flash ACL "
+"或产品写权限。所选 STM32F407VET6/ZGT6 支持经过审查的偏移镜像、512 字节向量对齐、实际 vendor vector symbol "
+"和配套 startup/ELF/BIN 检查。准确字段和边界见[装配参考](../configuration/assembly.md#physical-"
+"flash-and-the-selected-image)。"
+msgstr ""
+"Flash layouts use exact-part erase geometry and reject overflow, overlap, "
+"duplicate IDs and non-erase-aligned regions, selecting only one image. "
+"`resolved.flash` retains complete physical geometry, while `resolved.layout`"
+" selects a linked image window; a window creates no Flash ACL or product "
+"write permission. Selected STM32F407VET6/ZGT6 support reviewed offset "
+"images, 512-byte vector alignment, actual vendor vector symbols and matching"
+" startup/ELF/BIN checks. See the [assembly "
+"reference](../configuration/assembly.md#physical-flash-and-the-selected-"
+"image) for exact fields and boundaries."
+
+#: ../../../../../../docs/reference/contracts/integration.md:132
+msgid ""
+"偏移链接只建立软件镜像边界。外部产品仍须提供进入 Reset_Handler 的有效启动路径、初始机器状态、认证、激活及恢复政策。现有 F407 "
+"running-image handoff 保留 PRIMASK=1，startup 不主动解除屏蔽；裸机或 FreeRTOS "
+"链接结果不建立通用运行态交接或 FreeRTOS handoff 资格。"
+msgstr ""
+"Offset linking establishes a software image boundary only. External products"
+" still supply a valid boot path to Reset_Handler, initial machine state, "
+"authentication, activation and recovery policy. The existing F407 running-"
+"image handoff retains PRIMASK=1 and startup does not unmask it; baremetal or"
+" FreeRTOS links do not establish general running-image transfer or FreeRTOS "
+"handoff qualification."
+
+#: ../../../../../../docs/reference/contracts/integration.md:134
+msgid ""
+"CPU 编译选项、FPU 启用、异常上下文和 kernel port 必须一致。工具链及所有预编译输入的 ABI 记录到身份中。当前推荐源码 "
+"SDK；不默认承诺不同 compiler/version/flags 之间的 installed binary ABI。"
+msgstr ""
+"CPU flags, FPU enabling, exception contexts and kernel ports must agree. "
+"Record toolchain and all precompiled-input ABIs in identity. Source SDKs are"
+" recommended; installed-binary ABI compatibility across "
+"compilers/versions/flags is not promised by default."
+
+#: ../../../../../../docs/reference/contracts/integration.md:136
+msgid "可由哪些阶段证明"
+msgstr "What each stage can establish"
+
+#: ../../../../../../docs/reference/contracts/integration.md:138
+msgid ""
+"生成前检查负责事实一致性和资源冲突；C11 `_Static_assert` 与类型系统负责容量、类型、常量关系；linker/map/ELF "
+"检查负责镜像布局、符号、handler 和对象保留。物理波形、电气电平、clock 偏差、IRQ latency、DMA 终态和长期负载需要实板证据。"
+msgstr ""
+"Pregeneration validates fact consistency and conflicts. C11 `_Static_assert`"
+" and types establish capacity/type/constant relationships. Linker/map/ELF "
+"checks establish layouts, symbols, handlers and retention. Waveforms, "
+"electrical levels, clock error, IRQ latency, DMA terminal states and "
+"sustained loads need physical evidence."
+
+#: ../../../../../../docs/reference/contracts/integration.md:140
+msgid "6. 实例名、应用 role 与静态成本"
+msgstr "6. Instance names, application roles and static cost"
+
+#: ../../../../../../docs/reference/contracts/integration.md:142
+msgid ""
+"`USART1` 是 SoC controller 名；`j1_uart`、`bme280_ext0` 是 assembly "
+"的稳定实例名；`console`、`ambient_sensor` 是外部应用 role。Board 只提供物理资源，不决定哪个器件是产品的主传感器。"
+msgstr ""
+"`USART1` names a SoC controller; `j1_uart` and `bme280_ext0` are stable "
+"assembly instance names; `console` and `ambient_sensor` are external "
+"application roles. Boards supply physical resources without selecting the "
+"product’s primary sensor."
+
+#: ../../../../../../docs/reference/contracts/integration.md:144
+msgid ""
+"role 映射和约束属于外部 consumer。它可在自己的构建步骤中读取 resolved 信息，检查 role 所需接口并生成类型化 alias "
+"或访问器；平台不自动生成产品 role 政策。更换 physical binding 后，应用继续引用 role，而不是在业务源码里寻找具体 "
+"UART/GPIO 编号。"
+msgstr ""
+"External consumers own role mappings/constraints. Their build steps may read"
+" resolved information, validate required interfaces and generate typed "
+"aliases/accessors. The platform generates no product role policy. After "
+"rebinding hardware, applications still use roles rather than searching "
+"business source for UART/GPIO numbers."
+
+#: ../../../../../../docs/reference/contracts/integration.md:146
+msgid ""
+"普通数据路径不需要运行时字符串查找。只读 wiring 放 Flash；必要 context、pool、queue 和 buffer 静态分配。role"
+" alias 可编译为直接符号，通用 driver 只在需要窄端口时保留一层函数指针。不要为每个层名建立一层对象或虚调用。"
+msgstr ""
+"Ordinary data paths need no runtime string lookup. Read-only wiring resides "
+"in Flash; required contexts, pools, queues and buffers are static. Role "
+"aliases can compile to direct symbols; generic drivers retain one function-"
+"pointer layer only where narrow ports require it. Layer names do not justify"
+" extra objects or virtual calls."
+
+#: ../../../../../../docs/reference/contracts/integration.md:148
+msgid "已实现的静态实例与 typed factory"
+msgstr "Implemented static instances and typed factories"
+
+#: ../../../../../../docs/reference/contracts/integration.md:150
+msgid ""
+"factory 保留取得 typed 多态接口对象的架构骨架。生成器建立静态对象， factory "
+"只返回已存在的身份，不创建、初始化、锁定或重配设备。公开 `nx_factory_uart(nx_uart_id_t)` 等类型化 getter；ID "
+"是 `uint16_t` 和对应的 具名常量，越界、COUNT 和未选中类别返回 NULL。ID 只在当前 assembly 内有效， "
+"不作为持久化格式或跨版本二进制 ABI。"
+msgstr ""
+"Factories preserve the typed polymorphic-interface architecture. Generators "
+"create static objects; factories return existing identities without "
+"creating, initializing, locking or reconfiguring devices. Typed getters "
+"include `nx_factory_uart(nx_uart_id_t)`. IDs are `uint16_t` with named "
+"constants; out-of-range, COUNT and unselected categories return NULL. IDs "
+"are assembly-local, not persistent formats or cross-version binary ABIs."
+
+#: ../../../../../../docs/reference/contracts/integration.md:156
+msgid ""
+"每个公开 face 是只读的 `{ const ops*, void* context }`；32 位目标包含两个 指针，具体 Flash/RAM "
+"成本由实际链接产物审核。每个 provider/mode 共享一张 `const ops`，可变状态和容量精确的数组独立拥有。方法接收实际 "
+"context， 不会把共享 ops 对象当作实例。IRQ 静态进入具体 provider，不要求逐字节经过 虚调用。Native "
+"多实例同样生成独立状态，单例只保留为明确的测试 fixture。"
+msgstr ""
+"Each public face is read-only `{ const ops*, void* context }`: two pointers "
+"on 32-bit targets, with actual Flash/RAM audited from linked outputs. Each "
+"provider/mode shares `const ops`; mutable state and exact-capacity arrays "
+"are separate. Methods receive instance context, never treating shared ops as"
+" an instance. IRQs statically enter providers without per-byte virtual "
+"dispatch. Native instances also have separate generated state; singleton "
+"fixtures are explicitly test-only."
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "对象"
+msgstr "Object"
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "已实现的静态生成责任"
+msgstr "Implemented static generation responsibility"
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "controller port（控制器端口）"
+msgstr "controller port"
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "独占控制器的一份必要状态和一个只读公共 face"
+msgstr ""
+"One necessary exclusive-controller state and one read-only public face."
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "GPIO view（GPIO 视图）"
+msgstr "GPIO view"
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "独立授权 mask 和方向；共享 GPIO 基座的不同 pin 分别校验"
+msgstr ""
+"Separate authorized masks/directions; validate different pins sharing the "
+"GPIO base independently."
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "bus endpoint（总线端点）"
+msgstr "bus endpoint"
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "SPI CS 或 I2C 地址各自拥有 face 和私有配置，不借第一项设备身份"
+msgstr ""
+"Each SPI CS or I2C address has its own face/private configuration, without "
+"borrowing the first device’s identity."
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "mode storage（模式存储）"
+msgstr "mode storage"
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "只分配所选 UART/EXTI profile、容量和显式 Native register model"
+msgstr ""
+"Allocate only selected UART/EXTI profiles, capacities and explicit Native "
+"register models."
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "typed factory（类型化工厂）"
+msgstr "typed factory"
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "纯静态 switch；无注册、字符串查找、heap、hidden worker"
+msgstr ""
+"Pure static switch; no registration, string lookup, heap or hidden workers."
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "ops（操作表）"
+msgstr "ops"
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "同 provider/mode 共享只读表；不同实现保持相同公共接口布局"
+msgstr ""
+"Instances of the same provider/mode share a read-only table; different "
+"implementations keep the same public interface layout."
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "IRQ wiring（中断接线）"
+msgstr "IRQ wiring"
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "固定实例直接分发；真实共享 EXTI 使用有界静态 dispatcher"
+msgstr ""
+"Fixed instances dispatch directly; genuinely shared EXTI uses bounded static"
+" dispatchers."
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "startup（启动）"
+msgstr "startup"
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "显式串行调用与逆序清理，BUSY 保留进度和所有被借用的存储"
+msgstr ""
+"Explicit serial calls and reverse cleanup; BUSY retains progress and all "
+"borrowed storage."
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "外部 composition 提供存储、窄端口和调度，不自动生成业务实例"
+msgstr ""
+"External composition provides storage, narrow ports and scheduling without "
+"generated business instances."
+
+#: ../../../../../../docs/reference/contracts/integration.md:174
+msgid ""
+"`nx_binding_<bus>` 和 `nx_factory_spi/i2c` 都返回真实 controller port； "
+"`nx_device_<child>` 和 `nx_factory_spi_device/i2c_device` 返回具体 endpoint。 公共 "
+"I2C recovery 因此始终可取得 bus 身份。应用不能再把 bus alias 当作 第一项 endpoint。poll 与 async "
+"mode 的资源和能力分别实现，不由 getter 隐式改变。"
+msgstr ""
+"`nx_binding_<bus>` and `nx_factory_spi/i2c` return actual controller ports; "
+"`nx_device_<child>` and `nx_factory_spi_device/i2c_device` return endpoints."
+" Public I2C recovery therefore always has bus identity. Applications cannot "
+"treat bus aliases as the first endpoint. Polling and asynchronous modes "
+"implement resources/capabilities separately; getters never switch modes "
+"implicitly."
+
+#: ../../../../../../docs/reference/contracts/integration.md:180
+msgid ""
+"装配写 TOML schema 2；`authored.py` 的同一字段模型提供严格解析和 editor schema。冻结的 "
+"`ControllerIR/EndpointIR/MemoryBudgetIR/ConfigurationIR` 直接供 emitter "
+"使用，`resolved.json` 是这个决策的序列化。 `configure.py init/list-"
+"bindings/check/explain/generate` 均使用同一解析器。 CMake 从 resolver 的 input paths "
+"加入精确重配置依赖，不重解析 TOML。"
+msgstr ""
+"Assemblies use TOML schema 2; one `authored.py` field model provides strict "
+"parsing and editor schemas. Frozen "
+"`ControllerIR/EndpointIR/MemoryBudgetIR/ConfigurationIR` feeds emitters "
+"directly; `resolved.json` serializes the decisions. `configure.py init/list-"
+"bindings/check/explain/generate` share the resolver. CMake adds exact "
+"reconfiguration dependencies from resolver input paths without reparsing "
+"TOML."
+
+#: ../../../../../../docs/reference/contracts/integration.md:186
+msgid ""
+"STM32 USART1 `dma-tx` 使用固定 DMA2 stream7 channel4，RX 保持独立 IRQ ring。 DMA "
+"可达域与动态指针校验、memory-engine detach、UART TC wire drain 分别验证； 不能把 NDTR=0 "
+"当作串口完成。不同 selector 对同一个 physical stream 仍冲突。 其它硬件 DMA/stream "
+"模式只按各自代码、模型、链接和物理证据声明支持。"
+msgstr ""
+"STM32 USART1 `dma-tx` uses fixed DMA2 stream7 channel4; RX retains its "
+"separate IRQ ring. DMA domains/runtime pointer validation, memory-engine "
+"detach and UART TC wire draining are verified separately; NDTR=0 is not UART"
+" completion. Different selectors for one physical stream still conflict. "
+"Other DMA/stream modes claim support only within their own "
+"code/model/link/physical evidence."
+
+#: ../../../../../../docs/reference/contracts/integration.md:191
+msgid ""
+"得到静态 face 不改变启动状态，也不授予并发执行权。取消、timeout、stop 和 restart 都不能提前撤销请求 borrow；仅 "
+"acquire-observed SETTLED 允许回收。 共享路径由显式 owner 执行者推进，产品拥有任务与 recovery policy。"
+msgstr ""
+"Obtaining a static face neither changes startup state nor grants concurrent "
+"execution rights. Cancel, timeout, stop and restart cannot revoke request "
+"borrows early; only acquire-observed SETTLED permits reclamation. Explicit "
+"owner executors advance shared paths; products own tasks and recovery "
+"policy."
+
+#: ../../../../../../docs/reference/contracts/integration.md:195
+msgid ""
+"源码 SDK 包含公共接口、严格配置工具和精确依赖身份。代码/注释保持当前格式； 行为改动使用先失败后实现的 TDD，主机 "
+"GoogleTest/GoogleMock 与生产 C11 驱动 分开链接。源码 SDK 的普通固件不包含测试框架。"
+msgstr ""
+"Source SDKs contain public interfaces, strict configuration tools and exact "
+"dependency identities. Code/comments preserve current style. Behavior "
+"changes use failing-tests-first TDD; host GoogleTest/GoogleMock links "
+"separately from production C11 drivers. Ordinary SDK firmware contains no "
+"testing framework."
+
+#: ../../../../../../docs/reference/contracts/integration.md:199
+msgid "12. 版本、路径、摘要与产物身份"
+msgstr "12. Versions, paths, digests and artifact identity"
+
+#: ../../../../../../docs/reference/contracts/integration.md:201
+msgid ""
+"SoC/Board/assembly/resolved 分别有明确 schema version；未知 "
+"version、未知字段或矛盾值拒绝，不静默忽略。确需扩展时使用受控 namespace，不能隐藏有效编译选项。"
+msgstr ""
+"SoC/Board/assembly/resolved inputs have explicit schema versions. Reject "
+"unknown versions/fields and contradictions rather than silently ignoring "
+"them. Necessary extensions use controlled namespaces without hiding "
+"effective compile options."
+
+#: ../../../../../../docs/reference/contracts/integration.md:202
+msgid "package 记录 API/contract version、精确依赖 revision 和来源；schema 兼容不等于硬件或行为兼容。"
+msgstr ""
+"Packages record API/contract versions, exact dependency revisions and "
+"origins. Schema compatibility does not establish hardware or behavioral "
+"compatibility."
+
+#: ../../../../../../docs/reference/contracts/integration.md:203
+msgid ""
+"相对路径以拥有该 manifest 的目录为基准。Board source 必须落在自己的 package 内；拒绝 `..`、symlink "
+"逃逸和未声明 source。SDK 自身路径不能误用 consumer ancestor 的 Git 身份。"
+msgstr ""
+"Relative paths are anchored to their owning manifests. Board source stays "
+"inside its package; reject `..`, symlink escapes and undeclared source. SDK "
+"paths must not inherit consumer-ancestor Git identity accidentally."
+
+#: ../../../../../../docs/reference/contracts/integration.md:204
+msgid ""
+"所有影响构建的输入均声明并 hash，包括 route 数据、Board hooks、layout、vendor import、代码依赖 "
+"lock、工具链和编译选项。hash 原始字节用于输入身份，规范化 resolved JSON 用于有效配置身份；算法和格式有版本。"
+msgstr ""
+"Declare and hash all build-affecting inputs: routes, Board hooks, layouts, "
+"vendor imports, dependency locks, toolchains and compile options. Raw-byte "
+"hashes identify inputs; normalized resolved JSON identifies effective "
+"configuration. Algorithms/formats are versioned."
+
+#: ../../../../../../docs/reference/contracts/integration.md:205
+msgid "解析或构建过程中不偷偷联网更新依赖。目录内新增但未声明的有效 source 必须被拒绝或重新加入清单，不能绕过身份校验。"
+msgstr ""
+"Do not update dependencies over the network secretly during "
+"resolution/build. New effective sources not declared in manifests must fail "
+"or be added explicitly; directory additions cannot bypass identity checks."
+
+#: ../../../../../../docs/reference/contracts/integration.md:206
+msgid "外部产品身份与平台身份分开。平台提供料号/Board/config 等中性信息，不拥有产品名、SKU 或制造政策。"
+msgstr ""
+"Product and platform identities are separate. Platforms supply neutral "
+"part/Board/configuration facts without owning product names, SKUs or "
+"manufacturing policy."
+
+#: ../../../../../../docs/reference/contracts/integration.md:207
+msgid ""
+"产物清单绑定平台及 consumer revision、依赖、工具链、SoC/Board/assembly/resolved/layout "
+"hash，以及 ELF/BIN/map digest 和证据范围。"
+msgstr ""
+"Artifact manifests bind platform/consumer revisions, dependencies, "
+"toolchains, SoC/Board/assembly/resolved/layout hashes, ELF/BIN/map digests "
+"and evidence scope."
+
+#: ../../../../../../docs/reference/contracts/integration.md:208
+msgid ""
+"dirty 开发构建可显式允许，但标记 `publishable=false`；缺输入、hash 不一致、旧证据或 snapshot "
+"不能升级为发布资格。"
+msgstr ""
+"Dirty development builds may be explicitly allowed but are marked "
+"`publishable=false`. Missing inputs, hash mismatches, stale evidence and "
+"snapshots cannot gain release qualification."
+
+#: ../../../../../../docs/reference/contracts/integration.md:210
+msgid "13. 支持 tuple 与支持等级"
+msgstr "13. Support tuples and evidence levels"
+
+#: ../../../../../../docs/reference/contracts/integration.md:212
+msgid "支持最小单元为："
+msgstr "The minimum support unit is:"
+
+#: ../../../../../../docs/reference/contracts/integration.md:221
+msgid ""
+"Board 名只是检索入口，不是整板所有外设都受支持的承诺。一个 UART IRQ tuple 的结果不能证明同 Board 的 SPI "
+"DMA、I2C、RS485或另一个 backend。"
+msgstr ""
+"Board names are lookup aids, not promises for all onboard peripherals. UART "
+"IRQ tuple results do not qualify SPI DMA, I2C, RS485 or another backend on "
+"that Board."
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "记录项"
+msgstr "Record"
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "可证明范围"
+msgstr "Established scope"
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "不证明"
+msgstr "Not established"
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "D：描述复核"
+msgstr "D: description review"
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "指定资料中的料号、接线、route 已审阅"
+msgstr "Part, wiring and routes reviewed in named source documents."
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "真实 fitted part、PCB、线路可用"
+msgstr "Actual fitted parts, PCBs or usable wiring."
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "C：编译/链接"
+msgstr "C: compile/link"
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "指定工具链下真实 ARM ELF、布局和装配通过"
+msgstr ""
+"Actual ARM ELF, layout and assembly pass with the specified toolchain."
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "硬件已运行、时序正确"
+msgstr "Hardware execution or correct timing."
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "M：模型行为"
+msgstr "M: model behavior"
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "指定 source/config 的 host/fake 行为通过"
+msgstr "Host/fake behavior passes for exact source/configuration."
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "电气、IRQ/DMA 实际终态"
+msgstr "Electrical behavior or actual IRQ/DMA terminal states."
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "H：物理路径"
+msgstr "H: physical paths"
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "指定 PCB、route、mode 的真实测量"
+msgstr "Actual measurements for exact PCB, route and mode."
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "任意负载、其他外设或整产品资格"
+msgstr "Arbitrary loads, other peripherals or complete-product qualification."
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "Q：产品负载资格"
+msgstr "Q: product workload qualification"
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "指定 workload、预算和产品策略下验收"
+msgstr "Acceptance under named workloads, budgets and product policy."
+
+#: ../../../../../../docs/reference/contracts/integration.md:0
+msgid "其他产品、无限支持期限或 LTS"
+msgstr "Other products, unlimited support windows or LTS."
+
+#: ../../../../../../docs/reference/contracts/integration.md:231
+msgid ""
+"这些是分列证据维度，而不是以模型结果替代编译或硬件的单一等级。C/M/H/Q 缺项必须明确写未执行；日志、工件、source/config "
+"和预算绑定到同一个 tuple。"
+msgstr ""
+"These are separate evidence dimensions, not one hierarchy letting models "
+"replace compilation/hardware. Missing C/M/H/Q evidence is explicitly not "
+"executed. Logs, artifacts, source/configuration and budgets bind the same "
+"tuple."

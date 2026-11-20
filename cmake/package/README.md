@@ -71,7 +71,7 @@ Board 相对路径相对于装配，即使位于 SDK 外；`NEXUS_EXPECTED_SOURC
 由每镜像独立 startup OBJECT 消费，不向应用传播厂商头和器件宏。
 CPU Runtime 通过 `nexus_add_runtime(ASSEMBLY ...)` 显式创建；应用拥有启动与链接，
 MCU 自建 executable 须调用 `nexus_apply_firmware_policy(target)` 再链接
-`Nexus::Runtime`。其独立责任见[构建架构](../../docs/design/build-architecture.md)。
+`Nexus::Runtime`。其独立责任见[构建架构](../../docs/explanation/build-model.md)。
 
 `nexus_add_firmware` 链接显式源码、选定组件、startup、生成绑定与 linker 输入，
 不创建 main／任务／scheduler。应用调用 `nx_platform_start`，使用生成
@@ -105,8 +105,8 @@ runtime 策略，已测路径例如 `-fno-exceptions -fno-rtti`。
 当前开发快照的语义版本、factory／source interface epoch 和 SDK manifest 格式
 均从 `dependencies/platform-compatibility.json` 读取。各协议分别计代，消费者要求
 精确源码一致；全部调用者、face／ops、factory 和 provider 必须使用该源码重新编译。
-历史字段迁移见[迁移指南](../../docs/guides/migration.md)，当前边界见
-[源码兼容性合同](../../docs/design/source-compatibility.md)。
+当前消费步骤见[SDK 使用](../../docs/guides/use-source-sdk.md)，格式和准入条件见
+[SDK 格式合同](../../docs/reference/contracts/sdk-format.md)。
 
 SDK manifest 的 `source_exports.members` 保存从选中包导出范围与精确源树派生的
 文件成员；`source_exports.packages` 标识相应包 manifest。它们不另建 CMake 源码图，
@@ -118,7 +118,7 @@ SDK manifest 的 `source_exports.members` 保存从选中包导出范围与精�
 发行自动化验证已有可发布 prefix，不使用开发 opt-in：
 
 上方默认导出是精简裸机包。[完整维护消费者计划](../../tools/maintenance/consumer_profiles.py)
-还需要显式 host 支撑、FreeRTOS 与所选网络／安全／USB 供应方；按[Source SDK 教程](../../docs/tutorials/source-sdk.md)
+还需要显式 host 支撑、FreeRTOS 与所选网络／安全／USB 供应方；按[Source SDK 教程](../../docs/guides/use-source-sdk.md)
 准备并导出完整 profile，再执行以下验证。验证器不会跳过缺失消费者来接纳精简包。
 
 ```sh

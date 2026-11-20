@@ -587,7 +587,7 @@
             "handling": "Before any option unlock, an actual BOR change reads the live HPRE and rejects values above DIV2. Unchanged BOR and unrelated options do not require invented history. No automatic clock retuning occurs inside Flash maintenance.",
             "implementation": [
               "soc/stm32/stm32f4/drivers/flash/flash.c",
-              "docs/design/f407-storage.md"
+              "docs/reference/contracts/io/f4-flash-storage.md"
             ],
             "regressions": [
               "tests/google/io/flash_program_test.cpp",
@@ -719,7 +719,7 @@
             "handling": "Generic maintenance rejects irreversible RDP2 promotion. Ordinary Flash capability is not an MPU/security boundary; a separate manufacturing/security design must protect sensitive sectors and OPTCR and audit ISR privilege. Do not claim RDP2 makes WRP immutable.",
             "implementation": [
               "soc/stm32/stm32f4/drivers/flash/flash.c",
-              "docs/design/f407-storage.md"
+              "docs/reference/contracts/io/f4-flash-storage.md"
             ],
             "regressions": []
           },
@@ -732,7 +732,7 @@
             "handling": "RTC preparation and close use PWR_CR readback after DBP writes before any backup-domain access or lease release. Failed visibility keeps the same pending responsibility; no optimistic software flag substitutes for readback.",
             "implementation": [
               "soc/stm32/stm32f4/drivers/rtc/rtc.c",
-              "docs/design/f407-rtc.md"
+              "docs/reference/contracts/io/f407-rtc.md"
             ],
             "regressions": [
               "tests/google/soc/f407_rtc_test.cpp",
@@ -748,7 +748,7 @@
             "handling": "Crystal RTC statically claims PC13, provisions it analog before LSEON, rejects foreign pulls/locks/driver and adopts only an already quiet pad. Generic GPIO/EXTI refuses live crystal ownership. Crystal timestamp/tamper is rejected. Quiet-pad responsibility remains with persistent oscillator handoff; a separately authored 32768-Hz bypass Board enables the PC13 capture path without inventing existing-board wiring.",
             "implementation": [
               "soc/stm32/stm32f4/drivers/rtc/rtc.c",
-              "docs/design/f407-rtc.md"
+              "docs/reference/contracts/io/f407-rtc.md"
             ],
             "regressions": [
               "tests/google/soc/f407_rtc_test.cpp",
@@ -765,7 +765,7 @@
             "implementation": [
               "soc/stm32/stm32f4/facts/bindings.json",
               "io/src/mechanisms/dma.c",
-              "docs/design/multiple-dma-controllers.md",
+              "docs/reference/contracts/platform/dma-resources.md",
               "soc/stm32/stm32f4/drivers/adc/adc_group_blocks.c",
               "soc/stm32/stm32f4/drivers/adc/adc_group.c",
               "soc/stm32/stm32f4/drivers/capture/capture.c",
@@ -795,7 +795,7 @@
             "handling": "Adopt-retained requires externally established trusted backup provenance, not just INITS or a valid-looking BCD value. Products must satisfy the documented below-100-mV/200-ms power decay or intentionally erase the backup domain after a qualifying POR. The generic owner never destroys retained state automatically to hide an unknown supply history.",
             "implementation": [
               "soc/stm32/stm32f4/drivers/rtc/rtc.c",
-              "docs/design/f407-rtc.md"
+              "docs/reference/contracts/io/f407-rtc.md"
             ],
             "regressions": []
           },
@@ -860,7 +860,7 @@
             "implementation": [
               "soc/stm32/stm32f4/drivers/sdio/sdio.c",
               "soc/stm32/stm32f4/drivers/sdio/binding.json",
-              "docs/design/f407-storage.md"
+              "docs/reference/contracts/io/f4-flash-storage.md"
             ],
             "regressions": [
               "tests/google/soc/stm32_sdio_block_test.cpp"
@@ -876,7 +876,7 @@
             "implementation": [
               "soc/stm32/stm32f4/drivers/sdio/sdio.c",
               "soc/stm32/stm32f4/drivers/sdio/binding.json",
-              "docs/design/f407-storage.md"
+              "docs/reference/contracts/io/f4-flash-storage.md"
             ],
             "regressions": [
               "tests/google/soc/stm32_sdio_block_test.cpp"
@@ -892,7 +892,7 @@
             "implementation": [
               "soc/stm32/stm32f4/drivers/sdio/sdio.c",
               "soc/stm32/stm32f4/drivers/sdio/binding.json",
-              "docs/design/f407-storage.md"
+              "docs/reference/contracts/io/f4-flash-storage.md"
             ],
             "regressions": [
               "tests/google/soc/stm32_sdio_block_test.cpp"
@@ -908,7 +908,7 @@
             "implementation": [
               "soc/stm32/stm32f4/drivers/sdio/sdio.c",
               "soc/stm32/stm32f4/drivers/sdio/binding.json",
-              "docs/design/f407-storage.md"
+              "docs/reference/contracts/io/f4-flash-storage.md"
             ],
             "regressions": [
               "tests/google/soc/stm32_sdio_block_test.cpp"
@@ -924,7 +924,7 @@
             "implementation": [
               "soc/stm32/stm32f4/drivers/sdio/sdio.c",
               "soc/stm32/stm32f4/drivers/sdio/binding.json",
-              "docs/design/f407-storage.md"
+              "docs/reference/contracts/io/f4-flash-storage.md"
             ],
             "regressions": [
               "tests/google/soc/stm32_sdio_block_test.cpp"
@@ -940,7 +940,7 @@
             "implementation": [
               "soc/stm32/stm32f4/drivers/sdio/sdio.c",
               "soc/stm32/stm32f4/drivers/sdio/binding.json",
-              "docs/design/f407-storage.md"
+              "docs/reference/contracts/io/f4-flash-storage.md"
             ],
             "regressions": [
               "tests/google/soc/stm32_sdio_block_test.cpp"
@@ -1150,7 +1150,7 @@
             "handling": "Capture admission rejects filter0 falling-edge tamper before any MMIO effect. Rising-edge and filtered level detection remain available only with an explicitly authored bypass source and handed-off PC13; no synthetic safe erase or event suppression is invented.",
             "implementation": [
               "soc/stm32/stm32f4/drivers/rtc/rtc.c",
-              "docs/design/f407-rtc.md"
+              "docs/reference/contracts/io/f407-rtc.md"
             ],
             "regressions": [
               "tests/google/soc/f407_rtc_test.cpp",
@@ -1166,7 +1166,7 @@
             "handling": "Normal calendar reads require BYPSHAD and two equal complete SSR/TR/DR observations within a finite retry budget. Failed coherence returns BUSY without publishing a mixed snapshot.",
             "implementation": [
               "soc/stm32/stm32f4/drivers/rtc/rtc.c",
-              "docs/design/f407-rtc.md"
+              "docs/reference/contracts/io/f407-rtc.md"
             ],
             "regressions": [
               "tests/google/soc/f407_rtc_test.cpp",
@@ -1182,7 +1182,7 @@
             "handling": "The maintained RTC runtime uses polling and explicit EXTI event routes with RTC NVIC interrupts quiet; it does not expose the affected shared interrupt ISR. Standby acknowledges authorized observed source flags separately and does not pretend to implement an AlarmA/B interrupt multiplexer.",
             "implementation": [
               "soc/stm32/stm32f4/drivers/rtc/rtc.c",
-              "docs/design/f407-rtc.md"
+              "docs/reference/contracts/io/f407-rtc.md"
             ],
             "regressions": [
               "tests/google/soc/f407_rtc_test.cpp",
@@ -1198,7 +1198,7 @@
             "handling": "Both calendar writes and coarse calibration use synchronize_init: clear BYPSHAD, clear RSF, wait actual RSF within the existing finite budget and restore the original bypass personality before entering INIT. Timeout never publishes a new setting domain; a partial calendar operation retains tainted ownership.",
             "implementation": [
               "soc/stm32/stm32f4/drivers/rtc/rtc.c",
-              "docs/design/f407-rtc.md"
+              "docs/reference/contracts/io/f407-rtc.md"
             ],
             "regressions": [
               "tests/google/soc/f407_rtc_test.cpp",
@@ -1214,7 +1214,7 @@
             "handling": "Current public AlarmA/B patterns are whole-second fields and program the subsecond alarm mask to zero. Subsecond values in raw timestamps are not a claim of subsecond alarm support.",
             "implementation": [
               "soc/stm32/stm32f4/drivers/rtc/rtc.c",
-              "docs/design/f407-rtc.md"
+              "docs/reference/contracts/io/f407-rtc.md"
             ],
             "regressions": [
               "tests/google/soc/f407_rtc_test.cpp",
@@ -1230,7 +1230,7 @@
             "handling": "Falling edge is refused because disabling is unsafe under 2.9.1. Rising edge enables detection then reads actual PC13 IDR through an effective GPIOC gate; an analog pad, active input or gate failure returns IO and retains the armed source while blocking backup writes. Standby source reenable obeys the same check; filtered level detection is independent.",
             "implementation": [
               "soc/stm32/stm32f4/drivers/rtc/rtc.c",
-              "docs/design/f407-rtc.md"
+              "docs/reference/contracts/io/f407-rtc.md"
             ],
             "regressions": [
               "tests/google/soc/f407_rtc_test.cpp",
@@ -1262,7 +1262,7 @@
             "handling": "The smbus-device provider exposes transport/PEC and alert signaling, not unconditional SMBus2.0 conformance. The product must validate writes at a higher layer using alert/ARA/host-notify or an equivalent explicit acknowledgement. PEC success alone is not application-command acceptance.",
             "implementation": [
               "soc/stm32/stm32f4/drivers/i2c/i2c_target.c",
-              "docs/design/f407-i2c-target.md"
+              "soc/stm32/stm32f4/drivers/i2c/README-target.md"
             ],
             "regressions": []
           },
@@ -1308,7 +1308,7 @@
             "handling": "The target owner fixes clock stretching enabled, rejects foreign NOSTRETCH controls and feeds each held slot without speculative prefetch. No nonstretch target transmit mode is claimed.",
             "implementation": [
               "soc/stm32/stm32f4/drivers/i2c/i2c_target.c",
-              "docs/design/f407-i2c-target.md"
+              "soc/stm32/stm32f4/drivers/i2c/README-target.md"
             ],
             "regressions": [
               "tests/google/soc/i2c_target_exchange_test.cpp"
@@ -1323,7 +1323,7 @@
             "handling": "Board electrical acceptance must establish supply, pull-ups and measured rise time. At3.3-V MCU supply the bus must not exceed5.14 V under this limitation, and all datasheet absolute limits still apply. Neither a TOML max_hz nor a digital register model measures these voltages.",
             "implementation": [
               "soc/stm32/stm32f4/drivers/i2c/i2c_target.c",
-              "docs/design/f407-i2c-target.md"
+              "soc/stm32/stm32f4/drivers/i2c/README-target.md"
             ],
             "regressions": []
           },
@@ -1337,7 +1337,7 @@
             "implementation": [
               "soc/stm32/stm32f4/drivers/uart/uart.c",
               "soc/stm32/stm32f4/drivers/uart/uart_cold.c",
-              "docs/design/uart-wire-modes.md"
+              "docs/reference/contracts/io/f407-uart-wire-modes.md"
             ],
             "regressions": [
               "tests/google/soc/stm32_uart_wire_test.cpp",
@@ -1354,7 +1354,7 @@
             "implementation": [
               "soc/stm32/stm32f4/drivers/uart/uart.c",
               "soc/stm32/stm32f4/drivers/uart/uart_cold.c",
-              "docs/design/uart-wire-modes.md"
+              "docs/reference/contracts/io/f407-uart-wire-modes.md"
             ],
             "regressions": [
               "tests/google/soc/stm32_uart_wire_test.cpp",
@@ -1371,7 +1371,7 @@
             "implementation": [
               "soc/stm32/stm32f4/drivers/uart/uart.c",
               "soc/stm32/stm32f4/drivers/uart/uart_cold.c",
-              "docs/design/uart-wire-modes.md"
+              "docs/reference/contracts/io/f407-uart-wire-modes.md"
             ],
             "regressions": [
               "tests/google/soc/stm32_uart_wire_test.cpp",
@@ -1388,7 +1388,7 @@
             "implementation": [
               "soc/stm32/stm32f4/drivers/uart/uart.c",
               "soc/stm32/stm32f4/drivers/uart/uart_cold.c",
-              "docs/design/uart-wire-modes.md"
+              "docs/reference/contracts/io/f407-uart-wire-modes.md"
             ],
             "regressions": []
           },
@@ -1402,7 +1402,7 @@
             "implementation": [
               "soc/stm32/stm32f4/drivers/uart/uart.c",
               "soc/stm32/stm32f4/drivers/uart/uart_cold.c",
-              "docs/design/uart-wire-modes.md"
+              "docs/reference/contracts/io/f407-uart-wire-modes.md"
             ],
             "regressions": [
               "tests/google/soc/stm32_uart_wire_test.cpp",
@@ -1419,7 +1419,7 @@
             "implementation": [
               "soc/stm32/stm32f4/drivers/uart/uart.c",
               "soc/stm32/stm32f4/drivers/uart/uart_cold.c",
-              "docs/design/uart-wire-modes.md"
+              "docs/reference/contracts/io/f407-uart-wire-modes.md"
             ],
             "regressions": [
               "tests/google/soc/stm32_uart_wire_test.cpp",
@@ -1436,7 +1436,7 @@
             "implementation": [
               "soc/stm32/stm32f4/drivers/uart/uart.c",
               "soc/stm32/stm32f4/drivers/uart/uart_cold.c",
-              "docs/design/uart-wire-modes.md"
+              "docs/reference/contracts/io/f407-uart-wire-modes.md"
             ],
             "regressions": [
               "tests/google/soc/stm32_uart_wire_test.cpp",
@@ -1453,7 +1453,7 @@
             "implementation": [
               "soc/stm32/stm32f4/drivers/uart/uart.c",
               "soc/stm32/stm32f4/drivers/uart/uart_cold.c",
-              "docs/design/uart-wire-modes.md"
+              "docs/reference/contracts/io/f407-uart-wire-modes.md"
             ],
             "regressions": [
               "tests/google/soc/stm32_uart_wire_test.cpp",
@@ -1470,7 +1470,7 @@
             "implementation": [
               "soc/stm32/stm32f4/drivers/uart/uart.c",
               "soc/stm32/stm32f4/drivers/uart/uart_cold.c",
-              "docs/design/uart-wire-modes.md"
+              "docs/reference/contracts/io/f407-uart-wire-modes.md"
             ],
             "regressions": [
               "tests/google/soc/stm32_uart_wire_test.cpp",
@@ -1487,7 +1487,7 @@
             "implementation": [
               "soc/stm32/stm32f4/drivers/spi/spi_frames.c",
               "soc/stm32/stm32f4/drivers/spi/spi_frames.binding.json",
-              "docs/design/spi-frame-modes.md"
+              "docs/reference/contracts/io/f407-spi-frames.md"
             ],
             "regressions": [
               "tests/google/soc/stm32_spi_frames_test.cpp",
@@ -1504,7 +1504,7 @@
             "implementation": [
               "soc/stm32/stm32f4/drivers/spi/spi_frames.c",
               "soc/stm32/stm32f4/drivers/spi/spi_frames.binding.json",
-              "docs/design/spi-frame-modes.md"
+              "docs/reference/contracts/io/f407-spi-frames.md"
             ],
             "regressions": [
               "tests/google/soc/stm32_spi_frames_test.cpp",
@@ -1521,7 +1521,7 @@
             "implementation": [
               "soc/stm32/stm32f4/drivers/spi/spi_frames.c",
               "soc/stm32/stm32f4/drivers/spi/spi_frames.binding.json",
-              "docs/design/spi-frame-modes.md"
+              "docs/reference/contracts/io/f407-spi-frames.md"
             ],
             "regressions": [
               "tests/google/soc/stm32_spi_frames_test.cpp",
@@ -1538,7 +1538,7 @@
             "implementation": [
               "soc/stm32/stm32f4/drivers/spi/spi_frames.c",
               "soc/stm32/stm32f4/drivers/spi/spi_frames.binding.json",
-              "docs/design/spi-frame-modes.md"
+              "docs/reference/contracts/io/f407-spi-frames.md"
             ],
             "regressions": []
           },
@@ -1552,7 +1552,7 @@
             "implementation": [
               "soc/stm32/stm32f4/drivers/spi/spi_frames.c",
               "soc/stm32/stm32f4/drivers/spi/spi_frames.binding.json",
-              "docs/design/spi-frame-modes.md"
+              "docs/reference/contracts/io/f407-spi-frames.md"
             ],
             "regressions": [
               "tests/google/soc/stm32_spi_frames_test.cpp",
@@ -1619,7 +1619,7 @@
             "implementation": [
               "soc/stm32/stm32f4/drivers/ip/dwc_otg_device/usb_device_controller.c",
               "soc/stm32/stm32f4/drivers/usb/usb_device.c",
-              "docs/design/usb-device.md"
+              "docs/reference/contracts/io/usb-lifecycle.md"
             ],
             "regressions": [
               "tests/google/io/usb_device_test.cpp",
@@ -1635,7 +1635,7 @@
             "handling": "The maintained host contract supports direct root-port peers only; hub/split-transaction topology is not exposed. No capacitance workaround or universal hub support is claimed.",
             "implementation": [
               "soc/stm32/stm32f4/drivers/usb/usb_host.c",
-              "docs/design/usb-device.md"
+              "docs/reference/contracts/io/usb-lifecycle.md"
             ],
             "regressions": [
               "tests/google/soc/usb_host_hal_test.cpp"
@@ -1650,7 +1650,7 @@
             "handling": "HAL host initialization reserves RxFIFO space beyond two maximum packets plus status, and the serialized channel owner bounds halt/drain. No exact-one-packet FIFO profile is admitted.",
             "implementation": [
               "soc/stm32/stm32f4/drivers/usb/usb_host.c",
-              "docs/design/usb-device.md"
+              "docs/reference/contracts/io/usb-lifecycle.md"
             ],
             "regressions": [
               "tests/google/soc/usb_host_hal_test.cpp"
@@ -1665,7 +1665,7 @@
             "handling": "Host initialization always assigns nonperiodic and periodic TxFIFO space as well as RxFIFO; IN-only channel use cannot remove those shared FIFO reservations.",
             "implementation": [
               "soc/stm32/stm32f4/drivers/usb/usb_host.c",
-              "docs/design/usb-device.md"
+              "docs/reference/contracts/io/usb-lifecycle.md"
             ],
             "regressions": [
               "tests/google/soc/usb_host_hal_test.cpp"
@@ -1680,7 +1680,7 @@
             "handling": "The owner keeps the transfer active through bounded channel halt, observing actual enable/count state and using bounded controller recovery when CHH cannot be obtained; it does not settle a request solely because HAL_HC_Halt returned. No guaranteed immediate-CHH behavior is assumed.",
             "implementation": [
               "soc/stm32/stm32f4/drivers/usb/usb_host.c",
-              "docs/design/usb-device.md"
+              "docs/reference/contracts/io/usb-lifecycle.md"
             ],
             "regressions": [
               "tests/google/soc/usb_host_hal_test.cpp"
@@ -1696,7 +1696,7 @@
             "implementation": [
               "soc/stm32/stm32f4/drivers/ip/dwc_otg_device/usb_device_controller.c",
               "soc/stm32/stm32f4/drivers/usb/usb_device.c",
-              "docs/design/usb-device.md"
+              "docs/reference/contracts/io/usb-lifecycle.md"
             ],
             "regressions": [
               "tests/google/io/usb_device_test.cpp",
@@ -1713,7 +1713,7 @@
             "implementation": [
               "soc/stm32/stm32f4/drivers/ip/dwc_otg_device/usb_device_controller.c",
               "soc/stm32/stm32f4/drivers/usb/usb_device.c",
-              "docs/design/usb-device.md"
+              "docs/reference/contracts/io/usb-lifecycle.md"
             ],
             "regressions": [
               "tests/google/io/usb_device_test.cpp",
@@ -1729,7 +1729,7 @@
             "handling": "HS-FS and HS-ULPI software references retain the same direct-root-only host topology restriction; an external hub stack cannot inherit the current support claim.",
             "implementation": [
               "soc/stm32/stm32f4/drivers/usb/usb_host.c",
-              "docs/design/usb-device.md"
+              "docs/reference/contracts/io/usb-lifecycle.md"
             ],
             "regressions": [
               "tests/google/soc/usb_host_hal_test.cpp"
@@ -1745,7 +1745,7 @@
             "implementation": [
               "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c",
               "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c",
-              "docs/design/ethernet-frames.md"
+              "docs/reference/contracts/io/ethernet-frames.md"
             ],
             "regressions": [
               "tests/google/soc/ethernet_raw_errata_test.cpp",
@@ -1762,7 +1762,7 @@
             "implementation": [
               "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c",
               "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c",
-              "docs/design/ethernet-frames.md"
+              "docs/reference/contracts/io/ethernet-frames.md"
             ],
             "regressions": [
               "tests/google/soc/ethernet_raw_errata_test.cpp",
@@ -1779,7 +1779,7 @@
             "implementation": [
               "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c",
               "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c",
-              "docs/design/ethernet-frames.md"
+              "docs/reference/contracts/io/ethernet-frames.md"
             ],
             "regressions": [
               "tests/google/soc/ethernet_raw_errata_test.cpp",
@@ -1796,7 +1796,7 @@
             "implementation": [
               "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c",
               "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c",
-              "docs/design/ethernet-frames.md"
+              "docs/reference/contracts/io/ethernet-frames.md"
             ],
             "regressions": [
               "tests/google/soc/ethernet_raw_errata_test.cpp",
@@ -1813,7 +1813,7 @@
             "implementation": [
               "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c",
               "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c",
-              "docs/design/ethernet-frames.md"
+              "docs/reference/contracts/io/ethernet-frames.md"
             ],
             "regressions": [
               "tests/google/soc/ethernet_raw_errata_test.cpp",
@@ -1830,7 +1830,7 @@
             "implementation": [
               "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c",
               "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c",
-              "docs/design/ethernet-frames.md"
+              "docs/reference/contracts/io/ethernet-frames.md"
             ],
             "regressions": [
               "tests/google/soc/ethernet_raw_errata_test.cpp",
@@ -1847,7 +1847,7 @@
             "implementation": [
               "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c",
               "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c",
-              "docs/design/ethernet-frames.md"
+              "docs/reference/contracts/io/ethernet-frames.md"
             ],
             "regressions": [
               "tests/google/soc/ethernet_raw_errata_test.cpp",
@@ -1864,7 +1864,7 @@
             "implementation": [
               "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c",
               "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c",
-              "docs/design/ethernet-frames.md"
+              "docs/reference/contracts/io/ethernet-frames.md"
             ],
             "regressions": []
           },
@@ -1878,7 +1878,7 @@
             "implementation": [
               "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c",
               "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c",
-              "docs/design/ethernet-frames.md"
+              "docs/reference/contracts/io/ethernet-frames.md"
             ],
             "regressions": [
               "tests/google/soc/ethernet_raw_errata_test.cpp",
@@ -1895,7 +1895,7 @@
             "implementation": [
               "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c",
               "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c",
-              "docs/design/ethernet-frames.md"
+              "docs/reference/contracts/io/ethernet-frames.md"
             ],
             "regressions": [
               "tests/google/soc/ethernet_raw_errata_test.cpp",
@@ -1912,7 +1912,7 @@
             "implementation": [
               "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c",
               "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c",
-              "docs/design/ethernet-frames.md"
+              "docs/reference/contracts/io/ethernet-frames.md"
             ],
             "regressions": [
               "tests/google/soc/ethernet_raw_errata_test.cpp",
@@ -1929,7 +1929,7 @@
             "implementation": [
               "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c",
               "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c",
-              "docs/design/ethernet-frames.md"
+              "docs/reference/contracts/io/ethernet-frames.md"
             ],
             "regressions": [
               "tests/google/soc/ethernet_raw_errata_test.cpp",

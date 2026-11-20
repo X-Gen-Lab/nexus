@@ -39,6 +39,6 @@ PRIMASK、BASEPRI、FAULTMASK 清零；启动前规范屏蔽状态是独立例�
 
 [FIG-08：等待、唤醒与退出](../../docs/assets/diagrams/wait-wake-shutdown.svg)
 说明公共流程，[OS 总览](../README.md)列出精确 CPU／后端差异，
-[OS 交付](../../docs/delivery/os.md)保留实际执行范围。真实宿主内核、寄存器模型
+[OS 交付](../../docs/reference/contracts/os/execution.md)保留实际执行范围。真实宿主内核、寄存器模型
 和 ARM 链接各自建立不同证据；FP／MVE 切换、栈峰值、IRQ 延迟和睡眠时序仍须
 实板 HIL。

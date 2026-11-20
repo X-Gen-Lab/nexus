@@ -1,0 +1,420 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 2ab8f8e7cea09d4192b762758340a10563efe932a06a1ed4d45d25b4b4059484\n"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:10
+msgid "GPIO, pin state and external events"
+msgstr "GPIO、引脚状态与外部事件"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:12
+msgid ""
+"Use the selected GPIO and EXTI faces for authorized pin access and copied "
+"event observations. The selected Board owns wiring and electrical "
+"authorization; a sampled level or IRQ timestamp retains its declared "
+"observation quality."
+msgstr ""
+"使用所选 GPIO 和 EXTI 接口访问获授权引脚并读取复制的事件观测。选定 Board 负责接线及电气授权；采样电平或 IRQ "
+"时间戳保持其声明的观测质量。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:16
+msgid "Public declarations"
+msgstr "公共声明"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:18
+msgid "exti.h"
+msgstr "exti.h"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:20
+msgid "Static EXTI line bindings, bounded event storage and drain."
+msgstr "静态 EXTI 线路绑定、有界事件存储与排空。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:20
+#: ../../../../../../docs/reference/api/io/gpio.md:26
+#: ../../../../../../docs/reference/api/io/gpio.md:32
+msgid "Author  Nexus Team"
+msgstr "作者  Nexus Team"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:20
+#: ../../../../../../docs/reference/api/io/gpio.md:26
+#: ../../../../../../docs/reference/api/io/gpio.md:32
+msgid "Nexus Team"
+msgstr "Nexus Team"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:20
+msgid "Defines"
+msgstr "宏定义"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:20
+#: ../../../../../../docs/reference/api/io/gpio.md:32
+msgid "Enums"
+msgstr "枚举"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:20
+#: ../../../../../../docs/reference/api/io/gpio.md:32
+msgid "Values:"
+msgstr "取值："
+
+#: ../../../../../../docs/reference/api/io/gpio.md:20
+#: ../../../../../../docs/reference/api/io/gpio.md:26
+#: ../../../../../../docs/reference/api/io/gpio.md:32
+msgid "Functions"
+msgstr "函数"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:20
+msgid "Read queued EXTI events from an exact static line binding."
+msgstr "从准确静态线路绑定读取排队 EXTI 事件。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:0
+msgid "Parameters"
+msgstr "参数"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:20
+msgid "[inout] One consumer; bounded configured IRQ-producer storage."
+msgstr "[inout] 一个消费者；按配置有界的 IRQ 生产者存储。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:20
+msgid "[out] Caller destination, never retained."
+msgstr "[out] 调用方目的存储，绝不保留引用。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:20
+msgid "[in] Destination event count."
+msgstr "[in] 目的事件数量。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:20
+msgid "[out] Copied events; loss is observable via event flags."
+msgstr "[out] 已复制事件；可通过事件标志观察丢失。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:0
+msgid "Returns"
+msgstr "返回值"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:20
+msgid "Success, EMPTY or INVALID. No debounce policy or callbacks."
+msgstr "成功、EMPTY 或 INVALID。不提供消抖策略或回调。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:20
+msgid "Observe this line's raw logical signal without events."
+msgstr "观察此线路的原始逻辑信号，不消耗事件。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:20
+msgid ""
+"Bounded task/IRQ observation, no waiting or callback. GPIO sources report "
+"the physical pad; internal sources report their documented raw output, "
+"independent of edge or active polarity. No event is consumed and no pending "
+"bit cleared. Output must be disjoint from faces, operations, provider "
+"storage and MMIO. Direct hardware providers may require privilege. Failed "
+"stop retains the source until proven cleanup; successful stop ends level "
+"access. A missing optional method does not synthesize a level from the event"
+" queue."
+msgstr ""
+"在任务或 IRQ 中执行有界观察，不等待或回调。GPIO 源报告物理引脚，内部源报告其文档规定的原始输出，不受边沿或有效极性影响。不消耗事件或清除 "
+"pending。输出必须与接口、操作表、provider 存储和 MMIO 分离。直接硬件 provider "
+"可要求特权。停止失败保留信号源直至证明清理完成；停止成功后不能再查询电平。缺少可选方法时不从事件队列合成电平。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:20
+msgid "[in] Initialized exact line; serialized against stop/rebind."
+msgstr "[in] 已初始化的精确线路；与 stop/rebind 串行执行。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:20
+msgid "[out] Caller-owned sample, unchanged on error, never retained."
+msgstr "[out] 调用方持有的样本，错误时不变，且不保留引用。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:20
+msgid "Success or INVALID, STATE, CONTEXT or UNSUPPORTED."
+msgstr "Success 或 INVALID、STATE、CONTEXT、UNSUPPORTED。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:20
+msgid "Disable the line source, clear pending and drain its handler."
+msgstr "禁用线路源、清除 pending 并排空处理函数。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:20
+msgid ""
+"Failed withdrawal may already have disabled part of the source. Retry and "
+"observe success before reclaiming event or wake storage. Face and state "
+"remain live while a shared dispatch domain still refers to them."
+msgstr "撤回失败时，可能已经禁用了部分源。回收事件或 wake 存储前须重试并观察到成功。共享派发域仍引用接口或状态期间，二者均须保持存活。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:20
+msgid "[inout] Execution owner; consumer/writers must quiesce first."
+msgstr "[inout] 执行所有者；消费者及写入者必须先静止。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:20
+msgid ""
+"Success proves no remaining accesses to event storage; BUSY or IO retains "
+"storage, wake targets and cleanup responsibility. Shared vectors preserve "
+"other lines."
+msgstr "成功证明不再访问事件存储；BUSY 或 IO 保留存储、wake 目标及清理责任。共享向量保留其他线路。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:20
+msgid "Attach or detach an explicit event/loss IRQ wake target."
+msgstr "附加或解除显式事件／丢失 IRQ 唤醒目标。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:20
+msgid ""
+"Runtime integrators bind the configured kernel policy here; ordinary event "
+"consumers do not choose interrupt priorities. Actual shared-vector priority "
+"must satisfy the target. Stop and join publishers before freeing old target "
+"storage. Wake callbacks observe already-latched event or loss facts."
+msgstr ""
+"运行时集成者在此绑定已配置的内核策略；普通事件消费者不选择中断优先级。实际共享向量优先级必须满足 target。释放旧 target "
+"存储前，停止并等待发布者退出。Wake callback 观察已经锁存的事件或丢失事实。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:20
+msgid "[in] Initialized line, controlled by one task executor."
+msgstr "[in] 已初始化的 line，由一个任务执行者控制。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:20
+msgid "[in] Immutable live target, or NULL to detach."
+msgstr "[in] 不可变且存活的目标；NULL 表示分离。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:20
+msgid ""
+"[in] Optional additional unshifted kernel-safe priority floor; cannot weaken"
+" generated policy. PRIMASK kernel targets require zero. Ignored without "
+"kernel calls."
+msgstr "[in] 可选的额外未移位内核安全优先级数值下限；不得削弱生成策略。PRIMASK 内核目标要求为零。不调用内核时忽略。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:20
+msgid "Success or CONTEXT/STATE/PERMISSION/UNSUPPORTED."
+msgstr "成功或 CONTEXT/STATE/PERMISSION/UNSUPPORTED。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:20
+msgid "Facts from one bound input source, without physical IDs."
+msgstr "来自一个已绑定输入源的事实，不包含物理 ID。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:20
+msgid ""
+"LOSS is an independent boundary after older buffered facts and before later "
+"facts. Its edge is invalid; its timestamp is detection/report time, never a "
+"reconstructed missing edge. For COALESCED facts, edge may derive from the "
+"sampled raw source after an IRQ and does not represent complete edge "
+"history. The face identifies the source; queue consumers do not interpret "
+"physical EXTI line or IRQ numbers. Timestamp precision and coalescing remain"
+" provider-specific."
+msgstr ""
+"LOSS 是较早缓冲事实之后、较晚事实之前的独立边界。其 edge 无效，时间戳是检测／报告时间，不是重建的缺失边沿。COALESCED 事实的 "
+"edge 可以来自 IRQ 后采样的原始源，不代表完整边沿历史。face 标识数据源；队列消费者不解释物理 EXTI line 或 IRQ "
+"号。时间戳精度与合并行为仍由 provider 定义。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:20
+#: ../../../../../../docs/reference/api/io/gpio.md:26
+#: ../../../../../../docs/reference/api/io/gpio.md:32
+msgid "Public Members"
+msgstr "公共成员"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:20
+#: ../../../../../../docs/reference/api/io/gpio.md:26
+msgid "Shared read-only methods using one provider state."
+msgstr "使用同一个提供者状态的共享只读方法。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:20
+#: ../../../../../../docs/reference/api/io/gpio.md:26
+msgid ""
+"Methods follow each public operation's ownership contract. Missing optional "
+"methods report UNSUPPORTED."
+msgstr "各方法遵循对应公共操作的所有权合同。缺失的可选方法返回 UNSUPPORTED。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:20
+#: ../../../../../../docs/reference/api/io/gpio.md:26
+msgid "Immutable interface pointing to caller-owned state."
+msgstr "指向调用者自有状态的不可变接口。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:20
+#: ../../../../../../docs/reference/api/io/gpio.md:26
+msgid ""
+"Face and state outlive callers, IRQs and retained borrows. Factory lookup "
+"neither initializes nor acquires hardware."
+msgstr "接口和状态的生命周期覆盖调用方、IRQ 及保留的借用。工厂查找既不初始化，也不取得硬件。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:24
+msgid "gpio.h"
+msgstr "gpio.h"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:26
+msgid "Fixed GPIO authorization masks and bounded port operations."
+msgstr "固定 GPIO 授权掩码与有界端口操作。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:26
+msgid "Set one logical signal to its requested active or inactive state."
+msgstr "将一个逻辑信号设为请求的有效或无效状态。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:26
+msgid ""
+"Same bounded Task/IRQ and serialized-writer contract as port write. No "
+"storage is retained; the underlying provider checks output mode and write "
+"authorization. A malformed mask rejects before dispatch."
+msgstr ""
+"与 port write 使用相同的有界 Task／IRQ 和串行 writer 合同。不保留存储；底层 provider 检查输出模式与写授权。非法 "
+"mask 在派发前拒绝。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:26
+msgid "[in] Immutable single-pin binding and live initialized port."
+msgstr "[in] 不可变单引脚绑定与活跃且已初始化的 port。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:26
+msgid "[in] Logical activity, independent of electrical polarity."
+msgstr "[in] 逻辑有效状态，独立于电气极性。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:26
+msgid "SUCCESS or the port error; malformed binding returns INVALID."
+msgstr "SUCCESS 或 port 错误；不合法绑定返回 INVALID。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:26
+msgid "Sample a logical input without exposing its physical pin mask."
+msgstr "采样逻辑输入，不暴露物理引脚 mask。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:26
+msgid ""
+"Bounded Task/IRQ call; no retained storage or debounce policy. Output is "
+"disjoint from the binding, face and all provider control storage."
+msgstr "有界 Task／IRQ 调用；不保留存储，也不执行消抖策略。输出须与绑定、face 和全部 provider 控制存储分离。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:26
+msgid "[out] Separate writable result, unchanged on error."
+msgstr "[out] 独立可写结果，出错时不变。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:26
+msgid "SUCCESS or the port error; malformed arguments return INVALID."
+msgstr "SUCCESS 或 port 错误；不合法参数返回 INVALID。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:26
+msgid "Atomically set/reset one port's authorized output mask."
+msgstr "原子设置／复位一个端口的授权输出掩码。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:26
+msgid ""
+"Task/IRQ bounded, no wait. One serialized writer owns the binding. Stop/mode"
+" changes require writers and IRQ quiescence."
+msgstr "任务/IRQ 中均有界且不等待。一个串行化写入者拥有此绑定。停止或切换模式前必须使写入者及 IRQ 静默。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:26
+msgid "[in] Fixed initialized binding, no registry or OS lock."
+msgstr "[in] 固定且已初始化的绑定，无注册表或 OS 锁。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:26
+msgid "[in] Authorized bits to set."
+msgstr "[in] 获授权的置位位集。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:26
+msgid "[in] Authorized bits to reset; disjoint from set_mask."
+msgstr "[in] 获授权的复位位集；须与 set_mask 不相交。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:26
+msgid "NX_SUCCESS or INVALID/PERMISSION before any register write."
+msgstr "返回 NX_SUCCESS，或在任何寄存器写入前返回 INVALID/PERMISSION。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:26
+msgid "Read one input snapshot restricted to the binding mask."
+msgstr "读取受绑定掩码限制的单次输入快照。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:26
+msgid "[in] Fixed initialized binding."
+msgstr "[in] 固定且已初始化的绑定。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:26
+msgid "[out] Masked input snapshot; unchanged on error."
+msgstr "[out] 掩码处理后的输入快照；错误时保持不变。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:26
+msgid "NX_SUCCESS or NX_ERROR_INVALID. No cross-port simultaneity."
+msgstr "返回 NX_SUCCESS 或 NX_ERROR_INVALID。不保证跨端口同时采样。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:26
+msgid "Toggle authorized outputs under the single-writer contract."
+msgstr "在单写者合同下翻转授权输出。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:26
+msgid "Read-modify-write is not atomic against unrelated writes."
+msgstr "相对于无关写入，读改写不是原子操作。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:26
+msgid "[in] Fixed output binding with a serialized writer."
+msgstr "[in] 具有串行化写入者的固定输出绑定。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:26
+msgid "[in] Authorized subset to toggle."
+msgstr "[in] 获授权、需要翻转的子集。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:26
+msgid "NX_SUCCESS or INVALID/PERMISSION before register writes."
+msgstr "返回 NX_SUCCESS，或在寄存器写入前返回 INVALID/PERMISSION。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:26
+msgid "Immutable logical signal binding supplied by static integration."
+msgstr "由静态集成提供的不可变逻辑 signal 绑定。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:26
+msgid ""
+"One nonzero mask bit names the authorized pin. Consumers use logical "
+"activity; physical polarity stays in this binding. Binding and port outlive "
+"calls; this adds no mutable state, lock or resource ownership. Generated "
+"signals prove the bit belongs to their selected GPIO view. A manually "
+"constructed signal must satisfy the same authorization precondition. A port "
+"read returns only its authorized snapshot and cannot distinguish an "
+"unauthorized bit from a low physical input. Logical inactivity does not "
+"imply electrical input/high impedance; software wire protocols keep their "
+"physical-level contracts."
+msgstr ""
+"一个非零 mask bit 指定已授权 pin。消费者使用逻辑活动状态，物理极性保留在绑定中。绑定和 port "
+"的生命周期覆盖调用；不增加可变状态、锁或资源所有权。生成的 signal 保证该 bit 属于所选 GPIO 视图；手工 signal "
+"必须满足相同授权前提。port read 只返回已授权快照，无法区分未授权 bit 与低物理输入。逻辑 inactive "
+"不意味着电气输入／高阻态，软件总线协议继续使用物理电平合同。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:30
+msgid "pin_state.h"
+msgstr "pin_state.h"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:32
+msgid "Explicit static default and sleep pad states."
+msgstr "显式静态默认态与睡眠态引脚配置。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:32
+msgid "Only explicitly authored GPIO states; no implicit power policy."
+msgstr "仅支持显式编写的 GPIO 状态；不隐含电源策略。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:32
+msgid "Select one explicitly supported GPIO state without waiting."
+msgstr "选择一个明确支持的 GPIO 状态，无需等待。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:32
+msgid ""
+"Serialized same-CPU privileged Thread with incoming masks clear. No ISR/NMI,"
+" competing pad/RCC owner, AF switching, clock transition, wake or retention "
+"policy. Partial failure retains the lease; retry an explicit supported "
+"target or let the owner perform checked cleanup. This does not prove "
+"physical transients, external bias or PCB safety."
+msgstr ""
+"在同一 CPU 的特权 Thread 上下文中串行调用，进入时中断屏蔽位须已清除。不得从 ISR/NMI 调用，不得有其他 pad/RCC "
+"所有者竞争；不支持 AF "
+"切换、时钟转换、唤醒或保持策略。部分失败仍保留租约；可重试一个明确支持的目标，或由所有者执行受检查的清理。这不证明物理瞬态、外部偏置或 PCB 安全。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:32
+msgid "[in] Exclusive static pad/gate lease, with all writers quiescent."
+msgstr "[in] 静态独占 pad/gate 租约，所有写者均已静止。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:32
+msgid "[in] Default or sleep; neither name implies electrical safety."
+msgstr "[in] 默认态或睡眠态；两种名称均不代表电气安全。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:32
+msgid ""
+"SUCCESS after actual target readback, or INVALID/UNSUPPORTED/ "
+"CONTEXT/STATE/BUSY/IO while preserving provider ownership."
+msgstr ""
+"实际读回目标状态后返回 SUCCESS；或在保留 provider 所有权的同时返回 INVALID/UNSUPPORTED/ "
+"CONTEXT/STATE/BUSY/IO。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:32
+msgid "One statically owned provider; no discovery or per-register dispatch."
+msgstr "一个静态拥有的 provider；不执行发现，也不按寄存器分派。"
+
+#: ../../../../../../docs/reference/api/io/gpio.md:32
+msgid "Immutable face; provider storage and plans outlive every use."
+msgstr "不可变公共接口对象；provider 存储与计划的生命周期须覆盖每次使用。"

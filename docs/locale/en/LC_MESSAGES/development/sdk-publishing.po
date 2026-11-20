@@ -1,0 +1,120 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 682cfb74dcf7549d1705c3b9126568894d892c9a1e374de8ff86a10970984b2d\n"
+
+#: ../../../../../../docs/development/sdk-publishing.md:8
+msgid "导出与验收 Source SDK"
+msgstr "Export and qualify a Source SDK"
+
+#: ../../../../../../docs/development/sdk-publishing.md:10
+msgid ""
+"本页面向维护者。普通应用从已选源码或 SDK 消费，不执行整套 SDK 发布验证。 先冻结干净、已提交的平台源码，再选择 "
+"package、后端和可选组件。"
+msgstr ""
+"This page is for maintainers. Ordinary applications consume selected source "
+"or an SDK; they do not run the complete SDK release validation. First freeze"
+" clean, committed platform source, then select the package, backend and "
+"optional components."
+
+#: ../../../../../../docs/development/sdk-publishing.md:13
+msgid "选择交付范围"
+msgstr "Select the delivery scope"
+
+#: ../../../../../../docs/development/sdk-publishing.md:15
+msgid ""
+"默认导出是精简 F4 裸机源码包；Native 模型和中间件须明确选入。包内容来源于 package 导出声明、选中依赖和许可记录，CMake "
+"继续拥有源码／链接图。 完整维护消费者计划还需要 FreeRTOS、Native 和下列组件；从平台根执行："
+msgstr ""
+"The default export is a small F4 baremetal source package; Native models and"
+" middleware require explicit selection. Package contents come from package "
+"export declarations, selected dependencies and license records. CMake "
+"continues to own the source and link graph. The complete maintainer consumer"
+" plan also needs FreeRTOS, Native and the following components. Run from the"
+" platform root:"
+
+#: ../../../../../../docs/development/sdk-publishing.md:31
+msgid ""
+"输出路径必须属于本次任务且尚未存在。制作器核对 clean source、gitlink、选中递归 依赖与许可，记录精确 source "
+"revision／tree。默认包不能借完整计划的名义跳过缺失 消费者；小型包的完整性与其产品消费范围分别验收。"
+msgstr ""
+"The output path must belong to this task and must not already exist. The "
+"packager checks clean source, gitlinks, selected recursive dependencies and "
+"licenses, and records the exact source revision and tree. A default package "
+"cannot claim the complete plan while omitting missing consumers. Package "
+"integrity and the product scope of a smaller package are validated "
+"separately."
+
+#: ../../../../../../docs/development/sdk-publishing.md:35
+msgid "搬迁并执行实际消费者"
+msgstr "Relocate and execute real consumers"
+
+#: ../../../../../../docs/development/sdk-publishing.md:48
+msgid ""
+"当前完整计划由 `tools/maintenance/consumer_profiles.py` 维护。读取新生成的 "
+"`verification.json`、每条命令退出码、Native 运行结果、MCU ELF／BIN／map 和 资源报告。`--parallel` "
+"是该调用的总 worker 预算；同时执行其他工作时由协调者 分配预算。不要缓存成功报告、过滤完整验收或把缺失执行补成通过。"
+msgstr ""
+"The current complete plan is maintained in "
+"`tools/maintenance/consumer_profiles.py`. Read the newly generated "
+"`verification.json`, every command exit code, Native execution results, MCU "
+"ELF/BIN/map files and resource reports. `--parallel` is the total worker "
+"budget for this invocation; the coordinator allocates that budget when other"
+" work runs concurrently. Do not cache success reports, filter complete "
+"acceptance or mark missing executions as passed."
+
+#: ../../../../../../docs/development/sdk-publishing.md:53
+msgid ""
+"SDK prefix 与验证输出必须是独立、无 symlink 别名的规范路径，不互相包含。路径 拒绝不清除无关目录；已接纳的验证器只管理自己的输出。"
+msgstr ""
+"The SDK prefix and verification output must be separate canonical paths, "
+"without symlink aliases or containment in either direction. Rejecting a path"
+" does not remove unrelated directories; an admitted verifier manages only "
+"its own output."
+
+#: ../../../../../../docs/development/sdk-publishing.md:56
+msgid "发布收条"
+msgstr "Release receipt"
+
+#: ../../../../../../docs/development/sdk-publishing.md:58
+msgid ""
+"收条至少关联平台 source revision／tree、profile、依赖、manifest、实际消费者范围、 "
+"命令与退出码、产物及失败原件。消费前后完整性须一致；制作可下载归档时再验证 归档成员及校验和。软件结果、文档来源、版本标签和物理记录保持各自身份。"
+msgstr ""
+"The receipt must associate at least the platform source revision and tree, "
+"profile, dependencies, manifest, actual consumer scope, commands and exit "
+"codes, artifacts, and original failure records. Integrity must remain "
+"unchanged before and after consumption. When creating a downloadable "
+"archive, also verify its members and checksums. Software results, "
+"documentation sources, version tags and physical records retain separate "
+"identities."
+
+#: ../../../../../../docs/development/sdk-publishing.md:62
+msgid ""
+"维护源码不得依赖开发 fixture opt-in 获得正式包资格。`--development-fixture` 生成的包为 "
+"nonpublishable；许可、来源、接口代际等错误不因 opt-in 放宽。 签名密钥、产品分区、制造数据和产品发布审批留在所属外部工程。"
+msgstr ""
+"Maintained source must not depend on a development-fixture opt-in to qualify"
+" a formal package. Packages created with `--development-fixture` are "
+"nonpublishable; opt-in does not relax license, provenance or interface-epoch"
+" errors. Signing keys, product partitions, manufacturing data and product "
+"release approval remain in their external projects."
+
+#: ../../../../../../docs/development/sdk-publishing.md:66
+msgid ""
+"示例仓先更新对应 gitlink、依赖锁、schema 与模板摘要，再执行其正常门禁。平台与 示例的提交分别记录。验收工具与公开 API 见 "
+"[文档与维护工具参考](../reference/documentation-tools.md)，实际消费见 [使用 Source "
+"SDK](../guides/use-source-sdk.md)。"
+msgstr ""
+"In the examples repository, update the relevant gitlink, dependency lock, "
+"schema and template digests before executing its normal gates. Record "
+"platform and examples commits separately. See [documentation and maintenance"
+" tools](../reference/documentation-tools.md) for validation tools and public"
+" APIs, and [use a Source SDK](../guides/use-source-sdk.md) for application "
+"consumption."

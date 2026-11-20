@@ -21,7 +21,7 @@
 宏。具体 C 文件和 HAL 仍由各驱动目录中的 CMake 选编。
 
 公共接口在 `io/`，厂商类型与可变状态私有。各料号按
-[精确支持](../../../docs/delivery/support.md)选择当前软件模式和验证范围；Board
+[精确支持](../../../docs/reference/platforms/support.md)选择当前软件模式和验证范围；Board
 只授权已审接线，产品策略在外部。事实库存不等于每个料号的全部外设均已适配。
 
 本页的 `docs/`、`tests/` 和软件参考链接以完整 checkout 为上下文。Source SDK
@@ -60,7 +60,7 @@ RM0383／ES0287、RM0390／ES0298、RM0386／ES0321 的独立资料审核。ES01
 F405／F407／F415／F417 的 67 项基础事实共享维护，ETH／DCMI 由 F407／F417 选择；
 F415／F417 的基础 CRYP／HASH 分别选择 `irq-blocks` 或 `dma-blocks`，共用原有
 typed factory 和 controller owner；DMA 扩展状态只在选中时分配。精确通道、整字约束、
-停止与密钥清理见[基础加密 transport 合同](../../../docs/design/official-stm32-provider.md#f415f417-basic-crypto-transports)。F479 的增强
+停止与密钥清理见[基础加密 transport 合同](../../../docs/reference/contracts/stm32-provider.md#f415f417-basic-crypto-transports)。F479 的增强
 加密 IP 继续保留在厂商库存，未由基础实现授予模式。F411／F446／F479 选择各自
 经过审核的 controller groups，不继承上述全部基础外设。
 
@@ -128,7 +128,7 @@ STM32F4 HAL Driver 为私有实现提供所选 HAL／LL；完整模式由唯一�
 SAI、LTDC／DMA2D 和基础 CRYP／HASH 的所选模式复用经审阅的官方路径；其他模式
 根据其取消、排空和 erratum 合同选用 LL 或局部 C。
 不调用全局 HAL 初始化，不启动 HAL SysTick，也不由官方函数存在推导 Nexus 支持。
-[官方驱动合同](../../../docs/design/official-stm32-provider.md)规定完整模式的
+[官方驱动合同](../../../docs/reference/contracts/stm32-provider.md)规定完整模式的
 所有权、时间、成本和交付边界。
 
 `SystemInit` 开启 CP10/CP11，此 hard-float 平台不关闭 lazy FP context。FreeRTOS
@@ -137,31 +137,31 @@ F407 cut 都是集成约束：当受影响 VDIV/VSQRT 条件可能出现时，�
 返回之外必须执行超过两条指令。须沿生成尾分支进入真实 callee，不能计算不可达填充
 或 literal。外部 handler 同样遵守，修改编译器／优化／handler 后重新检查实际 image。
 平台不会绕过内核 ABI 修改 FPCCR，详见
-[短 ISR 合同](../../../docs/design/official-stm32-provider.md#cortex-m4f-short-isr-constraint)。
+[短 ISR 合同](../../../docs/reference/contracts/stm32-provider.md#cortex-m4f-short-isr-constraint)。
 
 ## 模式和维护入口
 
-唯一当前模式矩阵见[精确支持](../../../docs/delivery/support.md)，机器生成的
-路线／装配／生产源码关联见[能力矩阵](../../../docs/delivery/capabilities.md)。
+唯一当前模式矩阵见[精确支持](../../../docs/reference/platforms/support.md)，机器生成的
+路线／装配／生产源码关联见[能力矩阵](../../../docs/reference/platforms/capabilities.md)。
 本页保留原有基础驱动的硬件顺序；扩展模式的权威合同就近维护，不复制第二份列表。
 
 | 模块 | 具体合同 |
 | --- | --- |
 | System／内存／监督／低功耗 | [System](system/README.md) |
-| UART 协议与收发 | [USART 线模式](../../../docs/design/uart-wire-modes.md)、[UART DMA](../../../docs/design/uart-dma-rs485.md) |
-| SPI master／slave、TI、CRC | [帧事务](../../../docs/design/spi-frame-modes.md) |
+| UART 协议与收发 | [USART 线模式](../../../docs/reference/contracts/io/f407-uart-wire-modes.md)、[UART DMA](../../../docs/reference/contracts/io/uart-dma-rs485.md) |
+| SPI master／slave、TI、CRC | [帧事务](../../../docs/reference/contracts/io/f407-spi-frames.md) |
 | I2C target／SMBus device | [有限 target 交换](drivers/i2c/README-target.md) |
 | 多通道 PWM／单脉冲／DMA 序列 | [定时器波形](drivers/timer/README-waveform.md) |
-| USB Device／Host／显式 OTG | [USB](../../../docs/design/usb-device.md) |
-| 同步／交错／注入多 ADC | [ADC group](../../../docs/design/f407-adc-groups.md) |
+| USB Device／Host／显式 OTG | [USB](../../../docs/reference/contracts/io/usb-lifecycle.md) |
+| 同步／交错／注入多 ADC | [ADC group](../../../docs/reference/contracts/io/f407-adc-groups.md) |
 | DCMI 与 I2S2／3 | [capture／audio](drivers/ip/av/README.md) |
-| F479 LTDC／DMA2D | [图形与归还合同](../../../docs/design/official-stm32-provider.md#f479-ltdc-scanout-and-dma2d-memory-operations) |
-| F415／F417 基础 CRYP／HASH | [官方 transport 与请求所有权](../../../docs/design/official-stm32-provider.md#responsibility-boundary) |
-| RTC／备份／自主唤醒 | [RTC](../../../docs/design/f407-rtc.md) |
-| Flash／OTP／Options | [物理存储](../../../docs/design/f407-storage.md) |
+| F479 LTDC／DMA2D | [图形与归还合同](../../../docs/reference/contracts/stm32-provider.md#f479-ltdc-scanout-and-dma2d-memory-operations) |
+| F415／F417 基础 CRYP／HASH | [官方 transport 与请求所有权](../../../docs/reference/contracts/stm32-provider.md#responsibility-boundary) |
+| RTC／备份／自主唤醒 | [RTC](../../../docs/reference/contracts/io/f407-rtc.md) |
+| Flash／OTP／Options | [物理存储](../../../docs/reference/contracts/io/f4-flash-storage.md) |
 | SD／MMC／SDIO | [控制器](drivers/sdio/)、[传输合同](sdk/hal_config/sdio/README.md) |
-| SRAM／PSRAM／NOR／NAND／8080 | [FSMC](../../../docs/design/f407-fsmc.md) |
-| Ethernet 帧与时间戳 | [原始帧](../../../docs/design/ethernet.md)、[增强帧](../../../docs/design/ethernet-frames.md) |
+| SRAM／PSRAM／NOR／NAND／8080 | [FSMC](../../../docs/reference/contracts/io/f4-external-memory.md) |
+| Ethernet 帧与时间戳 | [原始帧](../../../docs/reference/contracts/io/ethernet-mac.md)、[增强帧](../../../docs/reference/contracts/io/ethernet-frames.md) |
 
 IWDG 数据手册 17–47 kHz 是 VDD=3 V、TA=-40..105 °C 条件下的表征；当前没有
 声明满足条件的 operating profile，不能直接据此保证时限。名义配置可成功，但启用后
@@ -174,7 +174,7 @@ IWDG 数据手册 17–47 kHz 是 VDD=3 V、TA=-40..105 °C 条件下的表征�
 
 已选 erase-aligned offset image 有明确 startup／vector／linker／ELF/BIN 检查，
 不包含 boot 认证、激活或运行镜像 handoff 资格。精确 mode／Board／生产源码见
-[派生矩阵](../../../docs/delivery/capabilities.md)。
+[派生矩阵](../../../docs/reference/platforms/capabilities.md)。
 
 ## 窗口看门狗与复位来源
 
@@ -391,7 +391,7 @@ gate、临时观察 gate、TIM3 和 DMA IRQ 分开记录责任，复用现有状
 `tests/contracts/adc_external_assembly/` 提供两种密度的软件参考装配，使用三个
 GPIO bank 的 16-rank 反向序列，以及 VE／ZG 的三转换器独立实例装配；不代表实际
 板卡接线。本节为独立转换器模式；同步／交错／注入组使用
-[ADC group](../../../docs/design/f407-adc-groups.md) 的唯一组 owner，不能和
+[ADC group](../../../docs/reference/contracts/io/f407-adc-groups.md) 的唯一组 owner，不能和
 独立 ADC 实例同时取得同一个转换器。ADC1／2／3 分别使用
 DMA2 stream4 channel0／stream2 channel1／stream1 channel2，复用有限和连续 C
 实现与只读 ops。静态 `trigger` 可选择 TIM1 CH1–3、TIM3 CH1／TRGO、TIM4 CH4、
@@ -457,7 +457,7 @@ TIM6／7 为 DAC trigger。
 互补输出共用一套 C 算法，以两个编译期 wrapper 直接操作 TIM1／TIM8；CMake 只选中
 所需 controller 实现，不增加运行时设备派发。TIM1／TIM8 均可选择 CH1–3 的一组
 互补输出，使用所选 APB2 timer clock，默认为 168 MHz；通道路线见
-[定时器合同](../../../docs/design/timer-advanced.md)。
+[定时器合同](../../../docs/reference/contracts/io/timer-advanced.md)。
 break IRQ 分别为 TIM1_BRK_TIM9／TIM8_BRK_TIM12，后者的 TIM12 peer gate 属于
 APB1，TIM8 gate 属于 APB2。资源冲突在配置期拒绝，冷态也检查实际 peer gate。
 
@@ -617,7 +617,7 @@ ACCEPTED 后，先在旧 DMA、IRQ 和地址均退出时安装声明的 idle，�
 发出硬件触发并观察 UDR，随后撤回 DMAEN／输出／clock，重新配置 DAC、DMA 和
 trigger。恢复可能在波形计时开始前转换 idle，并短暂关闭输出；这些转换不计入
 payload 进度。两次请求之间不承诺持续电压保持、无毛刺或连续模拟波形。软件模型
-与 ARM 链接不建立 silicon workaround 或模拟负载资格，详见[官方库与恢复边界](../../../docs/design/official-stm32-provider.md#f407-dac-dma-restart-boundary)。
+与 ARM 链接不建立 silicon workaround 或模拟负载资格，详见[官方库与恢复边界](../../../docs/reference/contracts/stm32-provider.md#f407-dac-dma-restart-boundary)。
 
 只有显式受控恢复阶段诱发的内部 UDR 归属恢复，不计 payload，也不单独把已经
 到期的 TIMEOUT 改成 IO。正常运行的真实欠载仍须显式 stop 恢复；W1C 清零失败或
@@ -665,7 +665,7 @@ DMA2D 不占外部引脚或 DMA1／2 stream。System 是 PLLSAI 的唯一 owner�
 没有 GUI、默认 framebuffer、CPU 像素 fallback 或后台任务。
 
 详细时钟、资源、失败保留和模式边界见
-[官方 F4 transport 与 graphics 合同](../../../docs/design/official-stm32-provider.md#f479-ltdc-scanout-and-dma2d-memory-operations)。
+[官方 F4 transport 与 graphics 合同](../../../docs/reference/contracts/stm32-provider.md#f479-ltdc-scanout-and-dma2d-memory-operations)。
 软件参考不等于实际屏幕、PCB、FMC DMA 可达性、总线带宽或 HIL 资格。
 
 ## 冷态取得、逆序撤回与验证

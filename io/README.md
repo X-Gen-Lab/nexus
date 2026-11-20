@@ -2,15 +2,15 @@
 
 I/O 为应用和组件提供公共 C11 类型，为 SoC 的具体实现规定操作、借用与退出
 合同。公共类型不含厂商 Handle 或寄存器布局。实际模式和受审路线以
-[能力矩阵](../docs/delivery/capabilities.md)为准；公共头存在不代表每颗芯片实现
+[能力矩阵](../docs/reference/platforms/capabilities.md)为准；公共头存在不代表每颗芯片实现
 全部操作，也不授权未知 PCB 接线。
 
 ![FIG-04：factory 与静态实例](../docs/assets/diagrams/factory-instances.svg)
 
 该图是精确参考装配，区分已有接口对象、共享方法表与独立上下文；查找不启动
 硬件。当前通用装配与执行另见
-[FIG-16](../docs/design/io-evolution.md)，范围与图例见
-[图册](../docs/assets/diagrams/README.md)。
+[FIG-16](../docs/explanation/io-model.md)，范围与图例见
+[图册](../docs/reference/diagrams.md)。
 
 ## 目录和构建边界
 
@@ -66,7 +66,7 @@ RS485 集成优先用同一强类型 UART 引用取得 `nx_factory_uart_tx_bindi
 不操作硬件、不准入传输；callback 不是实例认证。调用者独占 TX，并提供稳定
 adapter／配置、GPIO 方向绑定、极性及建立／保持时间；不新增隐藏 owner 或任务。
 RS485 的方向字段接收只读 `nx_gpio_signal_t*`，极性与单 bit 只由信号绑定保存；
-完整接入与停止合同见 [RS485 电气适配](../docs/design/uart-dma-rs485.md#rtscts-与-rs485)。
+完整接入与停止合同见 [RS485 电气适配](../docs/reference/contracts/io/uart-dma-rs485.md#rtscts-与-rs485)。
 
 ## 逻辑 GPIO 与公共 traits
 
@@ -97,7 +97,7 @@ I2C 使用 `nx_i2c_limits_t` 描述所选 provider profile，不另建无实现�
 factory 仅在明确选择 metadata 时生成所选常量与 lookup；未选择不增加该实例数据。
 组件可注入同类型 const 描述，无需包含生成器私有头。不可变能力不表示运行 ready、
 不替代提交准入，也不证明物理资格；未知限额不是无限。详见
-[源码迁移](../docs/guides/migration.md#rebuild-for-source-interface-epoch-6)。
+[SDK 使用与重新编译](../docs/guides/use-source-sdk.md)。
 
 ## SPI 轮询准入
 
@@ -134,7 +134,7 @@ F479 SDRAM 另有显式 `graphics-owned` 模式，所选 LTDC／DMA2D 通过
 `memory_window` 引用取得各自的只读／读写区域；同一私有 bank lease 保留到所有
 图形控制器真正完成硬件与 IRQ 冷退出。该模式不发放公共 CPU 借用，SETTLED
 本身不归还 bank；配合式准入不提供 MPU 隔离。精确时钟、容量与带宽边界见
-[FSMC／FMC 合同](../docs/design/f407-fsmc.md#显式图形存储模式)。
+[FSMC／FMC 合同](../docs/reference/contracts/io/f4-external-memory.md#显式图形存储模式)。
 
 ## 借用、进度与排空
 
@@ -149,7 +149,7 @@ DMA 内存完成、线上完成、请求结清是独立事实。
 具体实现检查精确可达性、选定域、Cache 所有权和真实
 撤销。有限与连续传输各有明确的借用、重新武装接收和背压合同。默认没有
 强制 OS 锁、隐藏驱动任务、通用缓冲区池；精确范围见
-[DMA／stream 合同](../docs/design/io-evolution.md)。
+[DMA／stream 合同](../docs/explanation/io-model.md)。
 
 流的 reserve／publish／acquire／release／abort／stop 操作只访问与块数无关的
 固定数量的元数据。停止时检查未归还计数，不在屏蔽 IRQ 的区间扫描或撤销已借用块。冷态
@@ -171,7 +171,7 @@ DMA 内存完成、线上完成、请求结清是独立事实。
 流的未归还计数包括生产者、待消费和消费者持有的借用，普通游标的
 忙不描述私有预提交游标；未知保留，零发现项不证明健康。
 
-可选 [USB activation](../docs/design/usb-device.md)保留独立不可变接口对象和
+可选 [USB activation](../docs/reference/contracts/io/usb-lifecycle.md)保留独立不可变接口对象和
 既有上下文。非零端点设置方法是有界控制器动作；外部
 Chapter 9 策略拥有配置、回滚、普通数据包准入。不增加
 默认工作线程或配置事务，公共声明保留上下文、部分效果

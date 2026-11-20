@@ -1,0 +1,1101 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 0b4f0eea32a180cba24b5c4a1fffb2c040cb7636cd7a7cb2b75ab3a192d1411a\n"
+
+#: ../../../../../../docs/reference/api/io/network.md:10
+msgid "CAN, Ethernet frames and MDIO"
+msgstr "CAN、以太网帧与 MDIO"
+
+#: ../../../../../../docs/reference/api/io/network.md:12
+msgid ""
+"These interfaces expose bounded bus frames, MAC observations and PHY "
+"register access. They do not create a protocol stack or establish Board "
+"wiring, PHY timing or physical network performance."
+msgstr "这些接口提供有界总线帧、MAC 观测及 PHY 寄存器访问，不创建协议栈，也不证明板级接线、PHY 时序或物理网络性能。"
+
+#: ../../../../../../docs/reference/api/io/network.md:16
+msgid "Public declarations"
+msgstr "公共声明"
+
+#: ../../../../../../docs/reference/api/io/network.md:18
+msgid "can.h"
+msgstr "can.h"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+msgid "Classic CAN value frames and caller-owned TX requests."
+msgstr "Classic CAN 值帧与调用者拥有的 TX 请求。"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+#: ../../../../../../docs/reference/api/io/network.md:26
+#: ../../../../../../docs/reference/api/io/network.md:32
+#: ../../../../../../docs/reference/api/io/network.md:38
+#: ../../../../../../docs/reference/api/io/network.md:44
+msgid "Author  Nexus Team"
+msgstr "作者  Nexus Team"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+#: ../../../../../../docs/reference/api/io/network.md:26
+#: ../../../../../../docs/reference/api/io/network.md:32
+#: ../../../../../../docs/reference/api/io/network.md:38
+#: ../../../../../../docs/reference/api/io/network.md:44
+msgid "Nexus Team"
+msgstr "Nexus Team"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+#: ../../../../../../docs/reference/api/io/network.md:26
+#: ../../../../../../docs/reference/api/io/network.md:32
+#: ../../../../../../docs/reference/api/io/network.md:38
+msgid "Defines"
+msgstr "宏定义"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+msgid "Typedefs"
+msgstr "类型定义"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+msgid "Protocol error category stored in one byte, never a silicon code."
+msgstr "以一字节存储的协议错误类别，不是芯片编码。"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+msgid ""
+"BIT_RECESSIVE/DOMINANT name the level the transmitter intended. UNKNOWN "
+"means no classified observation is available. These categories do not "
+"identify the affected frame or prove a current bus condition."
+msgstr ""
+"BIT_RECESSIVE／DOMINANT 表示发送者原本要发送的电平。UNKNOWN "
+"表示没有可分类观测。这些类别不标识受影响帧，也不证明总线当前状态。"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+#: ../../../../../../docs/reference/api/io/network.md:26
+#: ../../../../../../docs/reference/api/io/network.md:38
+msgid "Enums"
+msgstr "枚举"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+#: ../../../../../../docs/reference/api/io/network.md:26
+#: ../../../../../../docs/reference/api/io/network.md:38
+msgid "Values:"
+msgstr "取值："
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+#: ../../../../../../docs/reference/api/io/network.md:26
+#: ../../../../../../docs/reference/api/io/network.md:32
+#: ../../../../../../docs/reference/api/io/network.md:38
+#: ../../../../../../docs/reference/api/io/network.md:44
+msgid "Functions"
+msgstr "函数"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+msgid "Validate and copy a classic frame into unborrowed request storage."
+msgstr "验证并复制经典帧到未被借用的请求存储。"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+msgid "Task owner only; failure retains no reference and changes no frame."
+msgstr "仅限任务所有者；失败时不保留引用，也不更改帧。"
+
+#: ../../../../../../docs/reference/api/io/network.md:0
+msgid "Parameters"
+msgstr "参数"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+#: ../../../../../../docs/reference/api/io/network.md:26
+#: ../../../../../../docs/reference/api/io/network.md:32
+msgid "[inout] Initialized READY or consumed SETTLED storage."
+msgstr "[inout] 已初始化为 READY 或已消费的 SETTLED 存储。"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+msgid "[in] Value copied here; remote data bytes are ignored."
+msgstr "[in] 在此复制的值；忽略 remote 帧数据字节。"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+#: ../../../../../../docs/reference/api/io/network.md:26
+msgid "[in] Absolute provider-clock deadline, including admission."
+msgstr "[in] provider 时钟中的绝对 deadline，包含准入时间。"
+
+#: ../../../../../../docs/reference/api/io/network.md:0
+msgid "Returns"
+msgstr "返回值"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+msgid "Success, INVALID for nonclassic frame, STATE while borrowed."
+msgstr "成功；非经典帧返回 INVALID；借用期间返回 STATE。"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+msgid "Admit one frame within the selected provider's finite TX capacity."
+msgstr "在所选 provider 的有限 TX 容量内接纳一帧。"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+msgid ""
+"Serialized privileged task owner, incoming IRQ masks clear. REJECTED retains"
+" nothing. Success requires proven on-wire completion and withdrawal of all "
+"hardware references before settlement."
+msgstr ""
+"由串行特权任务 owner 调用，进入时 IRQ 须已处于未屏蔽状态。REJECTED "
+"不保留任何引用。成功要求先证明线上完成并撤回全部硬件引用，再结清请求。"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+msgid "[in] Stable immutable face and private storage."
+msgstr "[in] 稳定且不可变的接口及私有存储。"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+msgid "[inout] READY value request, kept alive until SETTLED."
+msgstr "[inout] READY 值请求，保持存活直到 SETTLED。"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+msgid "Success means ACCEPTED, not on-wire completion; other results reject."
+msgstr "成功表示 ACCEPTED，不表示已完成线上发送；其他结果均为拒绝。"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+msgid "Request abort without revoking a borrowed request."
+msgstr "请求中止，不撤销请求借用。"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+msgid ""
+"Abort may race real transmission; observed TXOK remains SUCCESS. Failed "
+"abort remains QUARANTINED and must keep storage alive."
+msgstr "中止可能与真实发送竞争；已观察到 TXOK 时仍为 SUCCESS。中止失败保持 QUARANTINED，必须保持存储存活。"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+msgid "[in] Stable face owned by the serialized task executor."
+msgstr "[in] 由串行任务执行者拥有的稳定接口。"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+msgid "[inout] Live request previously accepted by this instance."
+msgstr "[inout] 先前由本实例接受且仍存活的请求。"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+msgid "Success requests drain; STATE for an unrelated request."
+msgstr "成功表示请求排空；无关请求返回 STATE。"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+msgid "Process latched completions and absolute timeout/drain deadlines."
+msgstr "处理锁存完成状态与绝对超时／排空截止时间。"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+msgid ""
+"Provider-bounded work, no worker, blocking or replay. Final request outcomes"
+" are read after SETTLED, independently of service success."
+msgstr ""
+"工作量由 provider 限定，没有 worker、阻塞或重放。请求最终结果在 SETTLED 后读取，与 service 调用成功分别判断。"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+msgid "[in] Serialized task-owner face with incoming masks clear."
+msgstr "[in] 串行任务所有者接口，进入时屏蔽位须清零。"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+msgid "Success, STATE before start, CONTEXT for an illegal caller."
+msgstr "成功；启动前返回 STATE；非法调用者返回 CONTEXT。"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+msgid "Consume value events without overwriting earlier unconsumed facts."
+msgstr "消费值事件，不覆盖此前尚未消费的事实。"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+msgid ""
+"Each bounded record copy has a short metadata exclusion; pending loss is "
+"ordered after older records and before future frames."
+msgstr "每次有界记录复制均以短临界区排除元数据并发访问；待发布的丢失边界排在较旧记录之后、后续帧之前。"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+msgid "[in] Stable instance; one task consumer owns this operation."
+msgstr "[in] 稳定实例；此操作由一个任务消费者拥有。"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+msgid "[out] Caller capacity; no retained output reference."
+msgstr "[out] 调用方容量；不保留输出引用。"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+msgid "[in] Nonzero number of event records."
+msgstr "[in] 非零的事件记录数量。"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+msgid "[out] Number copied; EMPTY means zero available."
+msgstr "[out] 已复制数量；EMPTY 表示没有可用记录。"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+msgid "Success, EMPTY, INVALID or CONTEXT."
+msgstr "成功、EMPTY、INVALID 或 CONTEXT。"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+msgid "Copy authoritative error/admission state, even when RX is full."
+msgstr "即使 RX 已满，仍复制权威错误／准入状态。"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+msgid "Task-only, bounded; bus-off is latched until explicit recovery."
+msgstr "仅限任务上下文，工作量有界；bus-off 被锁存，直到显式恢复。"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+msgid "[in] Live instance and storage."
+msgstr "[in] 存活的实例和存储。"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+msgid "[out] Unretained value output."
+msgstr "[out] 不保留引用的值输出。"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+msgid "Success, INVALID or CONTEXT."
+msgstr "成功、INVALID 或 CONTEXT。"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+msgid "Close admission, abort TX and detach IRQ/RX publishers."
+msgstr "关闭准入、中止 TX、撤离 IRQ/RX 发布者。"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+msgid ""
+"Never resets the shared primary controller to release a peer's loan. Retry "
+"after progress. Success ends provider access to RX/wake storage."
+msgstr "绝不会为释放另一个所有者的借用而复位共享主控制器。推进后重试。成功表示 provider 不再访问 RX 或 wake 存储。"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+msgid "[in] Serialized owner; external observers must also join."
+msgstr "[in] 串行化的所有者；还须等待外部观察者退出。"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+msgid "Success after hardware drain; BUSY retains requests/ring/wake loans."
+msgstr "硬件排空后成功；BUSY 保留请求、环及 wake 借用。"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+msgid "Explicitly reenter initialization after bus-off and complete drain."
+msgstr "bus-off 且完整排空之后，显式重新进入初始化。"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+msgid "No automatic recovery or retransmission; domain/filter identity stays."
+msgstr "无自动恢复或重传；域及 filter 标识保持不变。"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+msgid "[in] Started owner with no active/quarantined TX slots."
+msgstr "[in] 已启动的所有者，且不存在 active 或 quarantined TX slot。"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+msgid "Success after bounded hardware acknowledgement, BUSY while borrowed."
+msgstr "有界硬件确认后成功；借用期间返回 BUSY。"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+msgid "Borrow an optional wake target after checking all four actual IRQs."
+msgstr "检查全部四个实际 IRQ 后，借用可选唤醒目标。"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+msgid ""
+"No implicit OS policy; NULL detaches. Wake is only a hint. The sink must "
+"support both task service/cancel and configurable IRQ contexts."
+msgstr ""
+"无隐式 OS 策略；NULL 表示分离。wake 仅为提示。sink 必须同时支持任务中的 service/cancel 及可配置 IRQ 上下文。"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+msgid "[in] Serialized task owner, started and masks clear."
+msgstr "[in] 串行任务所有者，已启动且屏蔽位清零。"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+msgid "[in] Immutable target kept alive until successful stop/detach."
+msgstr "[in] 不可变目标，保持存活直到成功停止或分离。"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+#: ../../../../../../docs/reference/api/io/network.md:26
+msgid "[in] Additional numerical BASEPRI ceiling."
+msgstr "[in] 附加的 BASEPRI 数值阈值。"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+msgid ""
+"Success, BUSY while an earlier publisher is live, PERMISSION, INVALID or "
+"CONTEXT, with no new borrow on failure."
+msgstr "成功；较早发布者仍存活时返回 BUSY；或返回 PERMISSION、INVALID、CONTEXT。失败时不产生新借用。"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+msgid "Classic 2.0A/B value frame; DLC is always 0..8, never CAN FD."
+msgstr "经典 2.0A/B 值帧；DLC 始终为 0..8，绝不是 CAN FD。"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+#: ../../../../../../docs/reference/api/io/network.md:26
+#: ../../../../../../docs/reference/api/io/network.md:32
+#: ../../../../../../docs/reference/api/io/network.md:38
+#: ../../../../../../docs/reference/api/io/network.md:44
+msgid "Public Members"
+msgstr "公共成员"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+msgid "Caller-owned frame copied at prepare; base must first be initialized."
+msgstr "调用者拥有的帧在 prepare 时复制；必须先初始化 base。"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+msgid "Value receive fact or ordered loss boundary."
+msgstr "值接收事实或有序丢失边界。"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+msgid ""
+"Timestamp is IRQ acquisition/report time, not hardware SOF. Hardware overrun"
+" proves only a lower bound. Raw DLC 9..15 is normalized to 8. filter_tag is "
+"the selected logical rule, independent of physical filters/FIFOs. Zero with "
+"FILTER_UNKNOWN means no rule can be identified; it never authorizes policy "
+"based on an invented match."
+msgstr ""
+"时间戳是 IRQ 获取／报告时刻，不是硬件 SOF。硬件 overrun 只证明丢失下界。原始 DLC 9..15 归一化为 8。filter_tag "
+"表示所选逻辑规则，独立于物理过滤器／FIFO。零与 FILTER_UNKNOWN 共同表示无法识别规则，不允许根据虚构匹配执行策略。"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+msgid "Latched controller state, independent of receive-ring fullness."
+msgstr "锁存控制器状态，与接收环是否已满无关。"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+msgid "Shared immutable operations; execution owner serializes task methods."
+msgstr "共享不可变操作；执行所有者串行执行 Task 方法。"
+
+#: ../../../../../../docs/reference/api/io/network.md:20
+msgid "Immutable face; lookup does not allocate, start or acquire hardware."
+msgstr "不可变接口面；查找不分配、不启动、不取得硬件。"
+
+#: ../../../../../../docs/reference/api/io/network.md:24
+msgid "can_fd.h"
+msgstr "can_fd.h"
+
+#: ../../../../../../docs/reference/api/io/network.md:26
+msgid "Optional CAN FD value ports and retained hardware requests."
+msgstr "可选 CAN FD 值接口与持续借用的硬件请求。"
+
+#: ../../../../../../docs/reference/api/io/network.md:26
+msgid "Exact wire format; the classic interface remains independent."
+msgstr "精确的线上格式；经典 CAN 接口保持独立。"
+
+#: ../../../../../../docs/reference/api/io/network.md:26
+msgid "Validate and copy an exact frame into unborrowed request storage."
+msgstr "验证精确帧并复制到尚未借用的请求存储。"
+
+#: ../../../../../../docs/reference/api/io/network.md:26
+msgid "Serialized task owner. Failure changes no frame and creates no loan."
+msgstr "串行任务所有者。失败时不更改帧，也不建立借用。"
+
+#: ../../../../../../docs/reference/api/io/network.md:26
+msgid "[in] Whole value copied without retaining this address."
+msgstr "[in] 复制完整值，不保留此地址。"
+
+#: ../../../../../../docs/reference/api/io/network.md:26
+msgid "Success, INVALID for a malformed frame, STATE while borrowed."
+msgstr "成功；帧格式错误时返回 INVALID；借用期间返回 STATE。"
+
+#: ../../../../../../docs/reference/api/io/network.md:26
+msgid "Admit one exact value into a physical hardware transmit element."
+msgstr "将一个精确值准入物理硬件发送元素。"
+
+#: ../../../../../../docs/reference/api/io/network.md:26
+msgid ""
+"Serialized privileged task, incoming masks clear. No software FIFO ordering "
+"is implied by admission; a hardware queue arbitrates by ID."
+msgstr "串行化的特权任务，进入时屏蔽位须清零。准入不隐含软件 FIFO 顺序；硬件队列按 ID 仲裁。"
+
+#: ../../../../../../docs/reference/api/io/network.md:26
+msgid "[in] Stable immutable selected controller face."
+msgstr "[in] 稳定且不可变的选中控制器接口。"
+
+#: ../../../../../../docs/reference/api/io/network.md:26
+msgid "[inout] READY request retained until acquire SETTLED."
+msgstr "[inout] READY 请求，保留至以 acquire 语义观察到 SETTLED。"
+
+#: ../../../../../../docs/reference/api/io/network.md:26
+msgid "SUCCESS means ACCEPTED; every failure rejects without effects."
+msgstr "SUCCESS 表示 ACCEPTED；所有失败均无效果地拒绝。"
+
+#: ../../../../../../docs/reference/api/io/network.md:26
+msgid "Request cancellation while preserving the accepted storage loan."
+msgstr "请求取消，同时保留已接受的存储借用。"
+
+#: ../../../../../../docs/reference/api/io/network.md:26
+msgid ""
+"Physical transmission may win cancellation and remain SUCCESS. "
+"Timeout/cancel do not release storage. Failed drain is QUARANTINED."
+msgstr "物理发送可能先于取消完成，此时仍为 SUCCESS。超时或取消不会释放存储。排空失败为 QUARANTINED。"
+
+#: ../../../../../../docs/reference/api/io/network.md:26
+msgid "[in] Selected face owned by the sole task executor."
+msgstr "[in] 由唯一任务执行者拥有的选中接口。"
+
+#: ../../../../../../docs/reference/api/io/network.md:26
+msgid "[inout] Exact request previously accepted by this instance."
+msgstr "[inout] 先前由本实例接受的精确请求。"
+
+#: ../../../../../../docs/reference/api/io/network.md:26
+msgid "Success requests drain, STATE rejects an unrelated request."
+msgstr "成功表示请求排空；STATE 表示拒绝无关请求。"
+
+#: ../../../../../../docs/reference/api/io/network.md:26
+msgid "Process bounded hardware facts and absolute deadline progress."
+msgstr "处理有界的硬件事实与绝对截止时间进展。"
+
+#: ../../../../../../docs/reference/api/io/network.md:26
+msgid "No hidden worker, retry or blocking wait. Wake remains only a hint."
+msgstr "无隐藏 worker、重试或阻塞等待。wake 仍仅为提示。"
+
+#: ../../../../../../docs/reference/api/io/network.md:26
+msgid "[in] Serialized privileged task face, incoming masks clear."
+msgstr "[in] 串行化的特权任务接口，进入时屏蔽位须清零。"
+
+#: ../../../../../../docs/reference/api/io/network.md:26
+msgid "Success, STATE while unavailable, CONTEXT for an illegal caller."
+msgstr "成功；不可用时返回 STATE；非法调用者返回 CONTEXT。"
+
+#: ../../../../../../docs/reference/api/io/network.md:26
+msgid "Copy ordered value events into unretained caller output storage."
+msgstr "将有序值事件复制到不会被持续借用的调用者输出存储。"
+
+#: ../../../../../../docs/reference/api/io/network.md:26
+msgid ""
+"Earlier retained records precede a pending loss boundary. Neither full "
+"receive storage nor a failed hint may erase protocol state."
+msgstr "较早保留的记录排在待发布的丢失边界之前。接收存储已满或提示失败，都不得抹除协议状态。"
+
+#: ../../../../../../docs/reference/api/io/network.md:26
+msgid "[in] Stable instance with one task consumer."
+msgstr "[in] 稳定实例，由一个任务消费者使用。"
+
+#: ../../../../../../docs/reference/api/io/network.md:26
+msgid "[out] Writable output, disjoint from all borrowed storage."
+msgstr "[out] 可写输出，必须与全部借用存储不重叠。"
+
+#: ../../../../../../docs/reference/api/io/network.md:26
+msgid "[in] Positive number of complete output event records."
+msgstr "[in] 正的完整输出事件记录数。"
+
+#: ../../../../../../docs/reference/api/io/network.md:26
+msgid "[out] Unretained number copied, disjoint from events."
+msgstr "[out] 不保留引用的已复制数量，与 events 不重叠。"
+
+#: ../../../../../../docs/reference/api/io/network.md:26
+msgid "Success, EMPTY with zero copied, INVALID, STATE or CONTEXT."
+msgstr "成功；EMPTY 表示复制数量为零；或返回 INVALID、STATE、CONTEXT。"
+
+#: ../../../../../../docs/reference/api/io/network.md:26
+msgid "Copy authoritative latched protocol and ownership state."
+msgstr "复制权威的锁存协议状态与所有权状态。"
+
+#: ../../../../../../docs/reference/api/io/network.md:26
+msgid "Task-only; a full event ring does not hide bus-off or error state."
+msgstr "仅限任务上下文；事件环已满不会隐藏 bus-off 或错误状态。"
+
+#: ../../../../../../docs/reference/api/io/network.md:26
+msgid "[in] Stable selected instance, including after successful stop."
+msgstr "[in] 稳定的选中实例，包括成功停止之后。"
+
+#: ../../../../../../docs/reference/api/io/network.md:26
+msgid "[out] Writable value, disjoint from all borrowed controls."
+msgstr "[out] 可写值，与全部已借用控制对象不重叠。"
+
+#: ../../../../../../docs/reference/api/io/network.md:26
+msgid "Success, INVALID or CONTEXT. Output is never retained."
+msgstr "成功、INVALID 或 CONTEXT。绝不保留输出。"
+
+#: ../../../../../../docs/reference/api/io/network.md:26
+msgid "Close admission, drain transmit loans and withdraw IRQ publishers."
+msgstr "关闭准入、排空发送借用并撤离 IRQ 发布者。"
+
+#: ../../../../../../docs/reference/api/io/network.md:26
+msgid ""
+"Never reset a shared peripheral domain to revoke another owner. Retry after "
+"physical progress. Stop success is not observer join."
+msgstr "绝不可复位共享外设域来撤销另一所有者。物理推进后重试。停止成功不代表观察者已退出。"
+
+#: ../../../../../../docs/reference/api/io/network.md:26
+msgid "[in] Sole task owner; separate observers must also join."
+msgstr "[in] 唯一任务所有者；还须另行等待独立观察者退出。"
+
+#: ../../../../../../docs/reference/api/io/network.md:26
+msgid "Success releases provider loans; failure retains incomplete leases."
+msgstr "成功释放 provider 借用；失败保留尚未完成的租约。"
+
+#: ../../../../../../docs/reference/api/io/network.md:26
+msgid "Recover the same hardware identity after complete transmit drain."
+msgstr "完整排空发送后，恢复同一硬件身份。"
+
+#: ../../../../../../docs/reference/api/io/network.md:26
+msgid "Explicit recovery never replays a frame or reassigns shared RAM."
+msgstr "显式恢复绝不重放帧，也不重新分配共享 RAM。"
+
+#: ../../../../../../docs/reference/api/io/network.md:26
+msgid "[in] Started task owner with no pending or quarantined request."
+msgstr "[in] 已启动的任务所有者，且没有 pending 或 quarantined 请求。"
+
+#: ../../../../../../docs/reference/api/io/network.md:26
+msgid "Success after bounded acknowledgement, BUSY while borrowed."
+msgstr "有界确认后成功；借用期间返回 BUSY。"
+
+#: ../../../../../../docs/reference/api/io/network.md:26
+msgid "Borrow a wake sink after validating the actual enabled IRQ source."
+msgstr "验证实际启用的 IRQ 源后借用唤醒接收端。"
+
+#: ../../../../../../docs/reference/api/io/network.md:26
+msgid ""
+"NULL detaches. Rejection preserves the earlier sink. Notification must be "
+"bounded and legal in both task and configurable IRQ contexts."
+msgstr "NULL 表示分离。拒绝时保留先前的 sink。通知必须有界，并在任务及可配置 IRQ 上下文中均合法。"
+
+#: ../../../../../../docs/reference/api/io/network.md:26
+msgid "[in] Sole task owner, started and incoming masks clear."
+msgstr "[in] 唯一任务所有者，已启动且进入时屏蔽位清零。"
+
+#: ../../../../../../docs/reference/api/io/network.md:26
+msgid "[in] Immutable sink retained through successful detach/stop."
+msgstr "[in] 不可变 sink，保留直到成功分离或停止。"
+
+#: ../../../../../../docs/reference/api/io/network.md:26
+msgid "Success, BUSY while publishing, PERMISSION, INVALID or CONTEXT."
+msgstr "成功；发布期间返回 BUSY；或返回 PERMISSION、INVALID、CONTEXT。"
+
+#: ../../../../../../docs/reference/api/io/network.md:26
+msgid "Value frame with an exact byte length, never raw or shifted DLC."
+msgstr "具有精确字节长度的值帧，不使用原始或移位后的 DLC。"
+
+#: ../../../../../../docs/reference/api/io/network.md:26
+msgid ""
+"FD admits0..8/12/16/20/24/32/48/64 bytes; no rounding or padding on wire. FD"
+" remote frames and classic BRS are invalid. A provider may reject a valid "
+"value when its selected hardware mode lacks that form."
+msgstr ""
+"FD 接受 0..8/12/16/20/24/32/48/64 字节；在线上不向上取整或填充。FD remote 帧及经典帧 BRS "
+"无效。选中硬件模式不支持某种形式时，provider 可以拒绝该形式的合法值。"
+
+#: ../../../../../../docs/reference/api/io/network.md:26
+msgid "Prepare copies a complete value; accepted request stays borrowed."
+msgstr "准备操作复制完整值；被接受的请求保持借用。"
+
+#: ../../../../../../docs/reference/api/io/network.md:26
+msgid "Acquired value event, including observed transmitter ESI."
+msgstr "已取得的值事件，包含观察到的发送者 ESI。"
+
+#: ../../../../../../docs/reference/api/io/network.md:26
+msgid ""
+"acquired_us is provider acquisition time, never SOF. A disabled hardware "
+"counter reports raw0 plus TIMESTAMP_UNAVAILABLE. filter is the hardware "
+"index within the frame format's filter list. Hardware loss proves a lower "
+"bound; classic DLC9..15 normalizes to8 with a flag. hardware_timestamp, fifo"
+" and filter are explicit native diagnostics. The raw counter has no portable"
+" frequency/domain/wrap contract; use a separately reviewed provider "
+"extension before interpreting its elapsed time. It is not an "
+"nx_io_timestamp_t or a portable SOF measurement."
+msgstr ""
+"acquired_us 是 provider 获取时间，不是 SOF。硬件计数器禁用时报告 raw0 与 "
+"TIMESTAMP_UNAVAILABLE。filter 是对应帧格式 filter 列表中的硬件索引。硬件丢失只证明下界；经典 DLC9..15 "
+"归一化为 8 并带标志。hardware_timestamp、fifo 与 filter "
+"是显式原生诊断。原始计数器没有可移植频率／域／回绕合同；解释其经过时间前必须使用独立受审 provider 扩展。它不是 "
+"nx_io_timestamp_t，也不是可移植 SOF 测量。"
+
+#: ../../../../../../docs/reference/api/io/network.md:26
+msgid "Immutable mask filter; no product register or protocol policy."
+msgstr "不可变掩码过滤器；不包含产品寄存器或协议策略。"
+
+#: ../../../../../../docs/reference/api/io/network.md:26
+msgid "Latched protocol state; payload length never describes a frame count."
+msgstr "锁存协议状态；载荷长度不表示帧数量。"
+
+#: ../../../../../../docs/reference/api/io/network.md:30
+msgid "ethernet.h"
+msgstr "ethernet.h"
+
+#: ../../../../../../docs/reference/api/io/network.md:32
+msgid "Caller-owned untagged Ethernet II frames and receive loans."
+msgstr "调用者拥有的无标签 Ethernet II 帧与接收借用。"
+
+#: ../../../../../../docs/reference/api/io/network.md:32
+msgid "Prepare an initialized, unborrowed request and its immutable frame."
+msgstr "准备已初始化、未借用的请求及不可变帧。"
+
+#: ../../../../../../docs/reference/api/io/network.md:32
+msgid ""
+"Task owner. Ethernet II only, 14..1514 bytes excluding FCS; no VLAN or "
+"length-coded 802.3. Failure changes no request or payload."
+msgstr ""
+"任务所有者。仅支持 Ethernet II，不含 FCS 时为 14..1514 字节；不支持 VLAN 或以长度编码的 802.3。失败时不修改请求或"
+" payload。"
+
+#: ../../../../../../docs/reference/api/io/network.md:32
+msgid "[in] Immutable contiguous Ethernet II frame."
+msgstr "[in] 不可变、连续的 Ethernet II 帧。"
+
+#: ../../../../../../docs/reference/api/io/network.md:32
+msgid "[in] Bytes excluding FCS, from 14 through 1514."
+msgstr "[in] 不含 FCS 的字节数，范围为 14..1514。"
+
+#: ../../../../../../docs/reference/api/io/network.md:32
+msgid "[in] Absolute provider-clock deadline or NEVER."
+msgstr "[in] provider 时钟中的绝对 deadline，或 NEVER。"
+
+#: ../../../../../../docs/reference/api/io/network.md:32
+msgid "Success, INVALID for frame/overlap, STATE while borrowed."
+msgstr "成功；帧或重叠问题返回 INVALID；借用期间返回 STATE。"
+
+#: ../../../../../../docs/reference/api/io/network.md:32
+msgid "Admit one frame into caller-owned hardware descriptors."
+msgstr "将一个帧准入到调用者拥有的硬件描述符。"
+
+#: ../../../../../../docs/reference/api/io/network.md:32
+msgid ""
+"Privileged serialized task, masks clear. SUCCESS is ACCEPTED. Borrow "
+"includes request and frame until acquire-observed SETTLED. Completion "
+"reports MAC wire status, never delivery to another application."
+msgstr ""
+"串行化的特权任务，屏蔽位清零。SUCCESS 表示 ACCEPTED。借用包含请求和帧，直到以 acquire 语义观察到 SETTLED。完成报告 "
+"MAC 线上状态，绝不表示另一应用已收到数据。"
+
+#: ../../../../../../docs/reference/api/io/network.md:32
+msgid "[in] Stable face and live private assembly."
+msgstr "[in] 稳定接口及存活的私有装配。"
+
+#: ../../../../../../docs/reference/api/io/network.md:32
+msgid "[inout] Prepared storage borrowed on acceptance."
+msgstr "[inout] 已准备的存储，在接受时借用。"
+
+#: ../../../../../../docs/reference/api/io/network.md:32
+msgid "Success means ACCEPTED; BUSY/STATE/IO/invalid inputs reject."
+msgstr "成功表示 ACCEPTED；BUSY/STATE/IO 或无效输入均为拒绝。"
+
+#: ../../../../../../docs/reference/api/io/network.md:32
+msgid "Close TX admission and drain the shared TX engine without replay."
+msgstr "关闭 TX 准入并排空共享 TX 引擎，不重放传输。"
+
+#: ../../../../../../docs/reference/api/io/network.md:32
+msgid ""
+"Task owner. Cancel is controller-wide: other pending TX requests also become"
+" CANCELLED. It never revokes a borrow. Stuck sources quarantine. Apply a "
+"confirmed link again after successful drain to reopen TX."
+msgstr ""
+"任务所有者。取消作用于整个控制器：其他待处理 TX 请求也变为 "
+"CANCELLED。绝不撤销借用。源卡住时进入隔离。成功排空后，重新应用已确认的链路事实，才重新开放 TX。"
+
+#: ../../../../../../docs/reference/api/io/network.md:32
+msgid "[in] Serialized task-owner face."
+msgstr "[in] 串行任务所有者接口。"
+
+#: ../../../../../../docs/reference/api/io/network.md:32
+msgid "[inout] Live request accepted by this instance."
+msgstr "[inout] 由本实例接受且仍存活的请求。"
+
+#: ../../../../../../docs/reference/api/io/network.md:32
+msgid "Success requests drain; STATE for a foreign request."
+msgstr "成功表示请求排空；外来请求返回 STATE。"
+
+#: ../../../../../../docs/reference/api/io/network.md:32
+msgid "Task-owner bounded progress; no worker, lock, pool or wait."
+msgstr "Task 所有者有界推进；不含执行任务、锁、池或等待。"
+
+#: ../../../../../../docs/reference/api/io/network.md:32
+msgid "[in] Serialized task-owner face and live storage."
+msgstr "[in] 串行任务所有者接口及存活的存储。"
+
+#: ../../../../../../docs/reference/api/io/network.md:32
+msgid "Success, STATE before startup, or invalid context/input."
+msgstr "成功；启动前返回 STATE；或返回无效上下文或输入错误。"
+
+#: ../../../../../../docs/reference/api/io/network.md:32
+msgid "Task-consumer complete-frame loan; EMPTY creates no borrow."
+msgstr "Task 消费者取得完整帧借用；EMPTY 不产生借用。"
+
+#: ../../../../../../docs/reference/api/io/network.md:32
+msgid "[in] Stable started instance and one consumer."
+msgstr "[in] 稳定且已启动的实例，以及一个消费者。"
+
+#: ../../../../../../docs/reference/api/io/network.md:32
+msgid "[out] Exact immutable frame loan, not output storage borrow."
+msgstr "[out] 精确且不可变的帧借用，而非对输出存储的借用。"
+
+#: ../../../../../../docs/reference/api/io/network.md:32
+msgid "Success, EMPTY without a loan, or invalid state/context."
+msgstr "成功；EMPTY 表示未取得借用；或返回无效状态或上下文错误。"
+
+#: ../../../../../../docs/reference/api/io/network.md:32
+msgid "Final consumer access; stale, foreign and double releases reject."
+msgstr "消费者最后一次访问；拒绝过期、外来及重复释放。"
+
+#: ../../../../../../docs/reference/api/io/network.md:32
+msgid "A held descriptor is never rearmed, even at ring wrap or stop."
+msgstr "已持有的描述符绝不重新 arm，即使环回绕或停止时也不例外。"
+
+#: ../../../../../../docs/reference/api/io/network.md:32
+msgid "[in] The same provider identity as acquisition."
+msgstr "[in] 与取得借用时相同的 provider 标识。"
+
+#: ../../../../../../docs/reference/api/io/network.md:32
+msgid "[in] Exact acquired token after final consumer access."
+msgstr "[in] 消费者最后一次访问结束后的精确已取得 token。"
+
+#: ../../../../../../docs/reference/api/io/network.md:32
+msgid "Success, STATE for an altered token, or invalid input/context."
+msgstr "成功；token 被修改时返回 STATE；或返回无效输入或上下文错误。"
+
+#: ../../../../../../docs/reference/api/io/network.md:32
+msgid "Copy latched instance/link/error facts; output is not retained."
+msgstr "复制锁存的实例／链路／错误事实；不保留输出。"
+
+#: ../../../../../../docs/reference/api/io/network.md:32
+msgid "[in] Stable private instance."
+msgstr "[in] 稳定的私有实例。"
+
+#: ../../../../../../docs/reference/api/io/network.md:32
+msgid "[out] Unretained output, separate from all provider storage."
+msgstr "[out] 不保留引用的输出，与全部 provider 存储分离。"
+
+#: ../../../../../../docs/reference/api/io/network.md:32
+msgid "Success, INVALID for output alias, or CONTEXT."
+msgstr "成功；输出别名返回 INVALID；或返回 CONTEXT。"
+
+#: ../../../../../../docs/reference/api/io/network.md:32
+msgid "Apply external PHY observations, not auto-negotiate or invent link."
+msgstr "应用外部 PHY 观察，不自动协商或虚构链路。"
+
+#: ../../../../../../docs/reference/api/io/network.md:32
+msgid ""
+"Task owner; changing speed/duplex first requires explicit link-down and "
+"observed idle TX/RX engines and FIFOs. BUSY keeps the old mode. Reapplying "
+"an unchanged up fact is idempotent. Link-down closes admission and drains "
+"pending TX with IO; later up requires real quiescence. This is not a PHY "
+"power/reset/electrical proof."
+msgstr ""
+"任务所有者；更改速率或双工模式前，必须显式 link-down，并观察到 TX/RX 引擎及 FIFO 空闲。BUSY 保留旧模式。重新应用未改变的 "
+"up 事实是幂等操作。link-down 关闭准入，以 IO 排空待处理 TX；后续 up 要求真实静止。这不构成 PHY 电源、复位或电气证明。"
+
+#: ../../../../../../docs/reference/api/io/network.md:32
+msgid "[in] Observed up/speed/duplex fact, never a guess."
+msgstr "[in] 已观察的 up、速率及双工事实，绝非猜测。"
+
+#: ../../../../../../docs/reference/api/io/network.md:32
+msgid "Success, BUSY until real drain, or STATE/IO/context error."
+msgstr "成功；真实排空前返回 BUSY；或返回 STATE/IO/上下文错误。"
+
+#: ../../../../../../docs/reference/api/io/network.md:32
+msgid "Close admission and withdraw MAC/DMA/IRQ sources with readback."
+msgstr "关闭准入，通过读回确认撤离 MAC/DMA/IRQ 源。"
+
+#: ../../../../../../docs/reference/api/io/network.md:32
+msgid ""
+"Task owner. Closing rejects new RX loans; existing loans still release. BUSY"
+" retains hardware/storage/wake ownership; timeout quarantines pending TX. "
+"Held RX loans remain valid and must be released before SUCCESS. Caller joins"
+" IRQ/consumers before reclaiming storage."
+msgstr ""
+"任务所有者。关闭时拒绝新的 RX 借用；既有借用仍可释放。BUSY 保留硬件、存储及 wake 所有权；超时隔离待处理 TX。已持有的 RX "
+"借用仍有效，必须在 SUCCESS 前释放。调用方回收存储前，须等待 IRQ 及消费者退出。"
+
+#: ../../../../../../docs/reference/api/io/network.md:32
+msgid "[in] Live face and all storage, including held loans."
+msgstr "[in] 存活的接口和全部存储，包含已持有借用。"
+
+#: ../../../../../../docs/reference/api/io/network.md:32
+msgid "Success releases sources; BUSY/IO retain remaining ownership."
+msgstr "成功释放各源；BUSY/IO 保留剩余所有权。"
+
+#: ../../../../../../docs/reference/api/io/network.md:32
+msgid "Bind an optional borrowed hint after actual IRQ-policy validation."
+msgstr "验证实际 IRQ 策略后绑定可选借用提示。"
+
+#: ../../../../../../docs/reference/api/io/network.md:32
+msgid ""
+"Task owner with no pending TX; notify is bounded and legal in IRQ. Service "
+"does not invoke the IRQ hint from a task. Detach after stop."
+msgstr ""
+"没有待处理 TX 的任务所有者；notify 必须有界，并在 IRQ 中合法。service 不会在任务中调用 IRQ 提示。停止后再分离。"
+
+#: ../../../../../../docs/reference/api/io/network.md:32
+msgid "[in] Started serialized task-owner face."
+msgstr "[in] 已启动的串行任务所有者接口。"
+
+#: ../../../../../../docs/reference/api/io/network.md:32
+msgid "[in] Borrowed IRQ hint; NULL requests detach."
+msgstr "[in] 借用的 IRQ 提示；NULL 表示请求分离。"
+
+#: ../../../../../../docs/reference/api/io/network.md:32
+msgid "[in] Exact configured unshifted syscall ceiling."
+msgstr "[in] 精确配置的未移位 syscall 数值阈值。"
+
+#: ../../../../../../docs/reference/api/io/network.md:32
+msgid "Success, BUSY while publishers live, or policy/context error."
+msgstr "成功；发布者存活时返回 BUSY；或返回策略或上下文错误。"
+
+#: ../../../../../../docs/reference/api/io/network.md:32
+msgid "Caller-owned immutable contiguous frame, excluding its hardware FCS."
+msgstr "调用者拥有的不可变连续帧，不含硬件 FCS。"
+
+#: ../../../../../../docs/reference/api/io/network.md:32
+msgid "Observed PHY fact, supplied explicitly by the external link owner."
+msgstr "观察到的 PHY 事实，由外部链路所有者显式供给。"
+
+#: ../../../../../../docs/reference/api/io/network.md:32
+msgid "Complete immutable frame; release requires this exact incarnation."
+msgstr "完整不可变帧；释放必须匹配准确实例世代。"
+
+#: ../../../../../../docs/reference/api/io/network.md:32
+msgid ""
+"data excludes FCS; storage stays live until matching release. Copying a "
+"token does not create a second loan. Timestamp is acquisition, not SOF."
+msgstr "data 不含 FCS；存储保持存活直到匹配的 release。复制 token 不会建立第二个借用。时间戳为取得时间，不是 SOF。"
+
+#: ../../../../../../docs/reference/api/io/network.md:32
+msgid "Latched facts survive receive backpressure and failed wake hints."
+msgstr "锁存事实不因接收背压或唤醒提示失败而丢失。"
+
+#: ../../../../../../docs/reference/api/io/network.md:36
+msgid "ethernet_frames.h"
+msgstr "ethernet_frames.h"
+
+#: ../../../../../../docs/reference/api/io/network.md:38
+msgid "Optional scatter-gather frame and MAC-clock loans."
+msgstr "可选的 scatter-gather 帧及 MAC 时钟借用。"
+
+#: ../../../../../../docs/reference/api/io/network.md:38
+msgid "Physical qualification is separate from software validation."
+msgstr "实物资格验证与软件验证彼此独立。"
+
+#: ../../../../../../docs/reference/api/io/network.md:38
+msgid "Capture diagnostics; UNKNOWN stamp remains unusable measurement."
+msgstr "捕获诊断；UNKNOWN 时间戳仍不能用于测量。"
+
+#: ../../../../../../docs/reference/api/io/network.md:38
+msgid "Explicit hardware TX checksum insertion; not an arbitrary CRC."
+msgstr "显式硬件 TX checksum 插入，不是任意 CRC。"
+
+#: ../../../../../../docs/reference/api/io/network.md:38
+msgid "Protocol and checksum results, independent of descriptor encoding."
+msgstr "协议与校验结果，独立于描述符编码。"
+
+#: ../../../../../../docs/reference/api/io/network.md:38
+msgid ""
+"AVAILABLE means the selected provider obtained a valid observation. CHECKED "
+"means the named checksum was examined; absence of its ERROR then reports "
+"success for that checksum only. IPv6 has no header checksum. BYPASSED never "
+"grants CHECKED or ERROR facts. Protocol tags alone grant no checksum "
+"assurance. Missing or malformed observations report zero; consumers still "
+"own complete protocol admission."
+msgstr ""
+"AVAILABLE 表示所选 provider 得到有效观测。CHECKED 表示已检查对应校验和；此时没有其 ERROR 仅说明该项校验成功。IPv6"
+" 没有头部校验和。BYPASSED 不授予 CHECKED 或 ERROR "
+"事实。单独的协议标签不提供校验保证。观测缺失或不合法时报告零；消费者仍负责完整协议准入。"
+
+#: ../../../../../../docs/reference/api/io/network.md:38
+msgid "Prepare unborrowed request storage without hardware effects."
+msgstr "准备尚未借用的请求存储，不产生硬件效果。"
+
+#: ../../../../../../docs/reference/api/io/network.md:38
+msgid ""
+"Serialized task owner. Validate nonempty fragments, overflow and the "
+"complete Ethernet II header across fragments; permit one in-band C-tag. "
+"Untagged length is 14..1514, tagged 18..1518, excluding FCS. Hardware "
+"inserts padding/FCS. Length-coded 802.3, QinQ and 0x88A8 reject. Failure "
+"preserves request and retains no references. Deadline is an absolute "
+"monotonic provider time, distinct from the PTP clock domain. Preparation "
+"selects CHECKSUM_NONE. Before submission the READY owner may explicitly "
+"choose checksum insertion on a provider that selects offload. IP_HEADER "
+"computes only the IP header. PAYLOAD requires the caller's pseudo-header "
+"checksum seed; FULL includes hardware pseudo header calculation. Hardware "
+"recognizes only its documented IPv4/IPv6 and TCP/UDP/ICMP formats; the "
+"caller owns packet contents and protocol policy. No software checksum "
+"fallback or packet repair is provided."
+msgstr ""
+"串行化任务所有者。验证非空 fragment、溢出和跨 fragment 的完整 Ethernet II header；允许一个带内 C-tag。不含 "
+"FCS 时，无 tag 长度为 14..1514，有 tag 为 18..1518。硬件插入 padding／FCS。按长度编码的 802.3、QinQ"
+" 和 0x88A8 拒绝。失败保持请求不变，不保留引用。Deadline 使用 provider 的绝对单调时间，与 PTP 时钟域不同。Prepare"
+" 选择 CHECKSUM_NONE。提交前，READY owner 可在已选择 offload 的 provider 上显式选择 checksum "
+"插入。IP_HEADER 只计算 IP header。PAYLOAD 需要调用者提供伪首部 checksum seed；FULL "
+"包含硬件伪首部计算。硬件只识别手册规定的 IPv4／IPv6 与 TCP／UDP／ICMP 格式；调用者负责报文内容和协议策略。不提供软件 "
+"checksum fallback 或报文修复。"
+
+#: ../../../../../../docs/reference/api/io/network.md:38
+msgid "ACCEPT one complete frame after all storage and slots are validated."
+msgstr "验证全部存储与槽后，才 ACCEPT 一个完整帧。"
+
+#: ../../../../../../docs/reference/api/io/network.md:38
+msgid ""
+"Task owner, privileged/unmasked; no pool, heap, worker or OS lock. REJECTED "
+"retains no references or OWN effects. ACCEPTED borrows request, fragment "
+"array and every payload until acquire-observed SETTLED. One returned "
+"descriptor does not prove wire completion. transferred is whole frame bytes "
+"on proven MAC success, otherwise zero."
+msgstr ""
+"特权且未屏蔽中断的任务所有者；无池、堆、worker 或 OS 锁。REJECTED 不保留引用或 OWN 效果。ACCEPTED "
+"借用请求、fragment 数组及每段 payload，直到以 acquire 语义观察到 SETTLED。归还一个描述符不证明线上发送完成。仅在已证明"
+" MAC 成功时，transferred 才为完整帧字节数，否则为零。"
+
+#: ../../../../../../docs/reference/api/io/network.md:38
+msgid "Request controller-wide TX withdrawal without replay."
+msgstr "请求控制器范围内的 TX 撤离，不重放。"
+
+#: ../../../../../../docs/reference/api/io/network.md:38
+msgid ""
+"Other pending TX are cancelled too; observed completed wire success can win."
+" No cancellation revokes a borrow. Missing drain proof keeps QUARANTINED "
+"loans. This does not reset the shared MAC/PTP/RX owner."
+msgstr ""
+"其他待处理 TX 也会取消；已观察到的线上发送成功可以优先成立。取消绝不撤销借用。缺少排空证明时保留 QUARANTINED 借用。不会复位共享的 "
+"MAC/PTP/RX 所有者。"
+
+#: ../../../../../../docs/reference/api/io/network.md:38
+msgid "Bounded task progress; IRQ handles at most one descriptor per side."
+msgstr "有界的任务进展；IRQ 每次在每个方向上最多处理一个描述符。"
+
+#: ../../../../../../docs/reference/api/io/network.md:38
+msgid "Acquire one complete frame with whole-frame capacity admission."
+msgstr "按完整帧容量准入，取得一个完整帧。"
+
+#: ../../../../../../docs/reference/api/io/network.md:38
+msgid ""
+"One task consumer. EMPTY creates no loan; OVERFLOW for too few views leaves "
+"the complete frame queued and all outputs unchanged. Stop closes new "
+"acquisitions. Held descriptors are never rearmed at wrap or stop."
+msgstr ""
+"一个任务消费者。EMPTY 不建立借用；views 太少时返回 "
+"OVERFLOW，完整帧仍留在队列中，全部输出不变。停止关闭新取得操作。已持有描述符在回绕或停止时均不重新 arm。"
+
+#: ../../../../../../docs/reference/api/io/network.md:38
+msgid "Final consumer access; stale/altered/foreign/double release rejects."
+msgstr "消费者的最终访问；拒绝过期、被修改、外来或重复释放。"
+
+#: ../../../../../../docs/reference/api/io/network.md:38
+msgid "Copy latched facts to unretained output disjoint from every loan."
+msgstr "将锁存事实复制到不保留的输出；输出与全部借用存储不重叠。"
+
+#: ../../../../../../docs/reference/api/io/network.md:38
+msgid "Read a coherent current hardware counter in its own domain."
+msgstr "在硬件计数器自身时钟域中读取一致的当前计数。"
+
+#: ../../../../../../docs/reference/api/io/network.md:38
+msgid ""
+"No clock synchronization, UTC mapping, acquired-time fallback or PHY "
+"compensation. source is SERVICE_OBSERVATION, not an SFD event. The owner "
+"extends seconds wrap and rejects regression, overflow and ambiguous gaps; "
+"ticks are nanoseconds with rate1e9 and unknown uncertainty."
+msgstr ""
+"既不提供时钟同步、UTC 映射或 PHY 补偿，也不以取得时间作为回退值。source 为 SERVICE_OBSERVATION，不是 SFD "
+"事件。所有者扩展秒回绕，拒绝回退、溢出及有歧义的间隔；ticks 为纳秒，rate 为 1e9，不确定度未知。"
+
+#: ../../../../../../docs/reference/api/io/network.md:38
+msgid "Apply explicit external PHY observation after real TX/RX quiet."
+msgstr "在真实 TX/RX 静默后应用显式的外部 PHY 观察。"
+
+#: ../../../../../../docs/reference/api/io/network.md:38
+msgid "Close admission and prove DMA/MAC/IRQ withdrawal before release."
+msgstr "关闭准入，证明 DMA/MAC/IRQ 已撤离后才释放。"
+
+#: ../../../../../../docs/reference/api/io/network.md:38
+msgid ""
+"Held RX and captured publishers retain ownership. Any failure keeps "
+"unfinished leases. Do not flush a nonempty TX FIFO to fake quiet. Caller "
+"joins all external producers/consumers/observers separately."
+msgstr ""
+"已持有的 RX 借用及已取得引用的发布者保留所有权。任何失败均保留未完成租约。不得冲洗非空 TX FIFO "
+"来伪造静止。调用方还须分别等待全部外部生产者、消费者及观察者退出。"
+
+#: ../../../../../../docs/reference/api/io/network.md:38
+msgid "Explicit recovery by the exclusive MAC owner after failed drain."
+msgstr "排空失败后，由独占 MAC 所有者显式恢复。"
+
+#: ../../../../../../docs/reference/api/io/network.md:38
+msgid ""
+"Task owner; finite absolute deadline. Held RX or captured publishers return "
+"BUSY without reset. Reset acknowledgement is mandatory before detached "
+"pending TX can settle with their locked terminal cause; never report wire "
+"success without its actual status. No auto replay. Reset invalidates the old"
+" hardware clock epoch and records an RX gap. Source failure/timeout retains "
+"QUARANTINED loans and recovery responsibility."
+msgstr ""
+"任务所有者；使用有限绝对 deadline。存在已持有 RX 借用或已取得引用的发布者时，返回 BUSY 且不复位。已分离的待处理 TX "
+"以其锁定的终结原因结算前，必须确认复位；没有实际状态时绝不报告线上成功。无自动重放。复位使旧硬件时钟 epoch 失效，并记录 RX "
+"间隙。源失败或超时保留 QUARANTINED 借用及恢复责任。"
+
+#: ../../../../../../docs/reference/api/io/network.md:38
+msgid "Optional borrowed IRQ hint; validate actual priority, detach/join."
+msgstr "可选的借用 IRQ 提示；验证实际优先级，撤离引用并等待发布者退出。"
+
+#: ../../../../../../docs/reference/api/io/network.md:38
+msgid "Immutable TX fragment; its bytes remain borrowed until SETTLED."
+msgstr "不可变的 TX 片段；其字节持续借用至 SETTLED。"
+
+#: ../../../../../../docs/reference/api/io/network.md:38
+msgid "Single in-band 0x8100 C-tag; TCI is host-order, with PCP/DEI/VID."
+msgstr "单个带内 0x8100 C-tag；TCI 使用主机字节序，含 PCP/DEI/VID。"
+
+#: ../../../../../../docs/reference/api/io/network.md:38
+msgid "One whole L2 frame, excluding preamble, hardware pad and hardware FCS."
+msgstr "一个完整 L2 帧，不含前导码、硬件填充和硬件 FCS。"
+
+#: ../../../../../../docs/reference/api/io/network.md:38
+msgid ""
+"The fragment array and every fragment remain borrowed after ACCEPTED. "
+"Requested TX capture is optional: wire success may have an unavailable or "
+"corrupt stamp. Read stamp only after acquire-observed SETTLED."
+msgstr ""
+"ACCEPTED 后，fragment 数组及每个 fragment 均保持借用。请求 TX "
+"捕获是可选的：即使线上成功，时间戳仍可能不可用或损坏。仅在以 acquire 语义观察到 SETTLED 后读取时间戳。"
+
+#: ../../../../../../docs/reference/api/io/network.md:38
+msgid "One complete receive loan over all descriptors of one frame."
+msgstr "一个帧全部描述符上的完整接收借用。"
+
+#: ../../../../../../docs/reference/api/io/network.md:38
+msgid ""
+"Output fragment views exclude FCS, even when FCS spans two buffers. The "
+"views array is an unretained output. Its underlying bytes stay immutable "
+"until exact release. Copying this token creates no loan."
+msgstr ""
+"输出 fragment views 不包含 FCS，即使 FCS 跨越两个缓冲区。views 数组是不保留引用的输出；底层字节在精确 release "
+"前保持不可变。复制此 token 不建立借用。"
+
+#: ../../../../../../docs/reference/api/io/network.md:38
+msgid "Latched engine facts and selected clock epoch, not protocol state."
+msgstr "锁存的引擎事实与选定时钟 epoch，不是协议状态。"
+
+#: ../../../../../../docs/reference/api/io/network.md:42
+msgid "mdio.h"
+msgstr "mdio.h"
+
+#: ../../../../../../docs/reference/api/io/network.md:44
+msgid "Narrow Clause22 station management with absolute deadlines."
+msgstr "使用绝对截止时间的窄接口 Clause22 站点管理。"
+
+#: ../../../../../../docs/reference/api/io/network.md:44
+msgid "Read one Clause22 PHY register without retaining output storage."
+msgstr "读取一个 Clause22 PHY 寄存器，不保留输出存储。"
+
+#: ../../../../../../docs/reference/api/io/network.md:44
+msgid ""
+"Serialized privileged task, incoming masks clear; finite absolute deadline "
+"in the provider clock. Address and register are 0..31. BUSY rejects before "
+"new MMIO effects; timeout does not pretend busy cleared."
+msgstr ""
+"串行化的特权任务调用，进入时中断屏蔽均清除；deadline 是 provider 时钟域中的有限绝对时间。地址和寄存器均为 0..31。BUSY "
+"在产生新 MMIO 效果前拒绝；超时不伪称 busy 已清除。"
+
+#: ../../../../../../docs/reference/api/io/network.md:44
+msgid "[in] Stable face and caller-owned execution context."
+msgstr "[in] 稳定的接口及调用方持有的执行上下文。"
+
+#: ../../../../../../docs/reference/api/io/network.md:44
+msgid "[in] Clause22 PHY address, from 0 through 31."
+msgstr "[in] Clause22 PHY 地址，0..31。"
+
+#: ../../../../../../docs/reference/api/io/network.md:44
+msgid "[in] Clause22 register address, from 0 through 31."
+msgstr "[in] Clause22 寄存器地址，0..31。"
+
+#: ../../../../../../docs/reference/api/io/network.md:44
+msgid "[out] Written only after timely observed completion."
+msgstr "[out] 仅在及时观察到完成后写入。"
+
+#: ../../../../../../docs/reference/api/io/network.md:44
+msgid "[in] Finite absolute provider-clock deadline."
+msgstr "[in] provider 时钟域中的有限绝对 deadline。"
+
+#: ../../../../../../docs/reference/api/io/network.md:44
+msgid "Success, BUSY without a new command, or timeout/input/context error."
+msgstr "成功、不发出新命令的 BUSY，或超时/输入/上下文错误。"
+
+#: ../../../../../../docs/reference/api/io/network.md:44
+msgid "Write one Clause22 PHY register, not a PHY-specific policy sequence."
+msgstr "写入一个 Clause22 PHY 寄存器，不实现特定 PHY 策略序列。"
+
+#: ../../../../../../docs/reference/api/io/network.md:44
+msgid "Same task/deadline rules as read. No IRQ-masked busy wait or fallback."
+msgstr "与 read 相同的任务/deadline 规则。不在屏蔽 IRQ 时忙等，也不回退。"
+
+#: ../../../../../../docs/reference/api/io/network.md:44
+msgid "[in] Exact 16-bit register value."
+msgstr "[in] 精确的 16 位寄存器值。"

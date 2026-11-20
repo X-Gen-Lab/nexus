@@ -1,8 +1,7 @@
 // FIG-21. Current: selected Native typed assembly and explicit lifecycle.
-// Dashed cluster/edge: future physical RTC/LPTIM adaptation only.
 // Private start is explicit; no public start, IRQ, hardware driver or scheduler is invented.
 digraph rtcLptimLifecycle {
-    graph [label="FIG-21 Native RTC/LPTIM: assembly and final access\nSolid: current Native; dashed: future hardware target", rankdir=TB, labelloc=t, fontname="Noto Sans CJK SC", fontsize=16, bgcolor="white", pad=0.25, nodesep=0.4, ranksep=0.55];
+    graph [label="FIG-21 Native RTC/LPTIM：装配与最终访问\n当前主机测试合同；不授予物理 provider 或 HIL 资格", rankdir=TB, labelloc=t, fontname="Noto Sans CJK SC", fontsize=16, bgcolor="white", pad=0.25, nodesep=0.4, ranksep=0.55];
     node [shape=box, style="rounded,filled", fillcolor="#eff6ff", color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC", fontsize=12, margin="0.14,0.10"];
     edge [color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC", fontsize=10, arrowsize=0.75];
     subgraph clusterCurrent {
@@ -66,9 +65,4 @@ digraph rtcLptimLifecycle {
     platform -> owner [label="first preparation: construct once", constraint=false];
     platform -> reopen [label="later preparation: private start of constructed owner", constraint=false];
     platform -> stop [label="public port stop; retain failed cleanup", constraint=false];
-    subgraph clusterHardwareTarget {
-        label="TARGET: this asynchronous RTC/LPTIM hardware contract"; style=dashed; color="#64748b";
-    hardware [label="Physical asynchronous RTC / LPTIM provider\nclock / backup reset / IRQ / STOP / VBAT\nNative does not grant hardware or HIL qualification", fillcolor="#f8fafc"];
-    }
-    hardware -> face [label="future provider must meet the public contract", style=dashed, constraint=false];
 }

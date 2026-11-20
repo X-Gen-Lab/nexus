@@ -52,33 +52,22 @@ class ChineseLanguageTests(unittest.TestCase):
 
 
 class NativeChineseIndexTests(unittest.TestCase):
-    def build(self, root, language='zh_CN', legacy=False):
+    def build(self, root, language='zh_CN', changed_inputs=()):
         project = Path(__file__).resolve().parents[2]
         docs = root / 'docs'
         docs.mkdir(exist_ok=True)
-        wrapper = root / 'fixture_extension.py'
-        wrapper.write_text(
-            'from tools.documentation import sphinx_ext\n'
-            + 'def setup(app):\n    result = sphinx_ext.setup(app)\n'
-            + ('    from sphinx.search.zh import SearchChinese\n'
-               '    class Legacy(SearchChinese):\n'
-               '        lang = "zh_CN"\n'
-               '    app.add_search_language(Legacy)\n'
-               '    result.pop("env_version", None)\n' if legacy else '')
-            + '    return result\n', encoding='utf-8')
         (docs / 'conf.py').write_text(
             'import sys\n' + f'sys.path.insert(0, {str(project)!r})\n'
-            + f'sys.path.insert(0, {str(root)!r})\n'
-            + "extensions = ['myst_parser', 'fixture_extension']\n"
+            + "extensions = ['myst_parser', 'tools.documentation.sphinx_ext']\n"
             + "source_suffix = {'.md': 'markdown'}\nroot_doc = 'index'\n"
             + "project = 'Native search fixture'\nhtml_theme = 'alabaster'\n"
             + f'language = {language!r}\n', encoding='utf-8')
         index = docs / 'index.md'
         if not index.exists():
             (root / '.gitignore').write_text(
-                'fixture_extension.py\nhtml/\n__pycache__/\n', encoding='utf-8')
+                'html/\n__pycache__/\n', encoding='utf-8')
             index.write_text(
-                '---\nsource_language: zh_CN\n---\n\n# 工厂\n\n'
+                '---\nid: fixture\ntype: reference\naudience: consumer\nsource_language: zh_CN\n---\n\n# 工厂\n\n'
                 + '借用与排空。HAL nx_uart_read。𠮷野。\n', encoding='utf-8')
             for command in (['init', '-q'], ['add', '.'],
                             ['-c', 'user.name=Fixture',
@@ -90,6 +79,9 @@ class NativeChineseIndexTests(unittest.TestCase):
         for name in list(environment):
             if name.startswith('NEXUS_DOCS_'):
                 environment.pop(name)
+        import json
+        environment['NEXUS_DOCS_CHANGED_INPUTS'] = json.dumps(list(changed_inputs))
+        (root / 'preview-marker.txt').write_text('Keep preview dirty state stable.\n')
         result = subprocess.run(
             [sys.executable, '-m', 'sphinx', '-n', '-W', '-b', 'html',
              str(docs), str(root / 'html')], env=environment,
@@ -105,13 +97,21 @@ class NativeChineseIndexTests(unittest.TestCase):
             self.assertIn('nx_uart_read', index['terms'])
             self.assertTrue(any('𠮷野' in term for term in index['terms']))
 
-    def test_public_env_version_rebuilds_legacy_frozen_index_without_E(self):
+    def test_same_mtime_current_source_edit_invalidates_search_cache(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            legacy = self.build(root, legacy=True)
-            self.assertFalse(any('借用' in term for term in legacy['terms']))
-            current = self.build(root)
-            self.assertTrue(any('借用' in term for term in current['terms']))
+            original = self.build(root, changed_inputs=("docs/index.md",))
+            self.assertTrue(any("借用" in term for term in original["terms"]))
+            page = root / "docs/index.md"
+            metadata = page.stat()
+            page.write_text(page.read_text().replace("借用", "恢复"))
+            os.utime(page, ns=(metadata.st_atime_ns, metadata.st_mtime_ns))
+            updated = self.build(root, changed_inputs=("docs/index.md",))
+            self.assertTrue(any("恢复" in term for term in updated["terms"]))
+            # Sphinx retains empty dictionary keys after pruning. An empty
+            # posting cannot match a document; scalar 0 is a real posting.
+            self.assertTrue(all(postings == [] for term, postings
+                                in updated["terms"].items() if "借用" in term))
 
     def test_english_locale_uses_original_porter_index(self):
         with tempfile.TemporaryDirectory() as temporary:

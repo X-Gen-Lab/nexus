@@ -110,7 +110,7 @@ class DocumentationInstallTests(unittest.TestCase):
         payload.parent.mkdir()
         payload.write_bytes(b"original")
         receipt = {"files": {"bin/tool": hashlib.sha256(b"original")
-                             .hexdigest()}}
+                             .hexdigest()}, "links": {}}
         install.verify_installed(prefix, receipt)
         payload.write_bytes(b"changed")
         with self.assertRaisesRegex(ValueError, "installed"):
@@ -121,7 +121,7 @@ class DocumentationInstallTests(unittest.TestCase):
         prefix.mkdir()
         (prefix / "locked.py").write_bytes(b"original")
         receipt = {"files": {"locked.py": hashlib.sha256(b"original")
-                             .hexdigest()}}
+                             .hexdigest()}, "links": {}}
         (prefix / "extra.py").write_bytes(b"unlocked")
         with self.assertRaisesRegex(ValueError, "inventory"):
             install.verify_installed(prefix, receipt)
@@ -156,21 +156,27 @@ class DocumentationInstallTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "shared license"):
             install.collect_common_licenses(native, output)
 
-    def test_legacy_python_wrapper_uses_one_cli_and_retains_failure(self):
-        wrapper = ROOT / "scripts/tools/docs.py"
-        fake = self.folder / "fake"
-        fake.write_text("#!/bin/sh\nexit 7\n")
-        fake.chmod(0o755)
-        specification = __import__("importlib.util", fromlist=["util"])
-        spec = specification.spec_from_file_location("legacy_docs", wrapper)
-        module = specification.module_from_spec(spec)
-        spec.loader.exec_module(module)
-        with patch.object(module.subprocess, "call", return_value=7) as call:
-            self.assertEqual(module.main(["--target", "all"]), 7)
-        arguments = call.call_args.args[0]
-        self.assertEqual(arguments[1], str(ROOT / "tools/dev/dev.py"))
-        self.assertEqual(arguments[2:4], ["docs", "build"])
-        self.assertNotIn("doxygen", arguments)
+
+
+class CurrentToolIdentityTests(unittest.TestCase):
+    def setUp(self):
+        self.temporary = tempfile.TemporaryDirectory(prefix="docs tool identity ")
+        self.addCleanup(self.temporary.cleanup)
+        self.prefix = Path(self.temporary.name)
+        (self.prefix / "tool").write_bytes(b"reviewed")
+        self.receipt = {"files": {"tool": hashlib.sha256(b"reviewed").hexdigest()},
+                        "links": {}}
+
+    def test_installed_payload_is_hashed_once(self):
+        with patch.object(install, "digest", wraps=install.digest) as digest:
+            install.verify_installed(self.prefix, self.receipt)
+        self.assertEqual([call.args[0] for call in digest.call_args_list],
+                         [self.prefix / "tool"])
+
+    def test_missing_current_link_inventory_is_rejected(self):
+        self.receipt.pop("links")
+        with self.assertRaisesRegex(ValueError, "link|receipt"):
+            install.verify_installed(self.prefix, self.receipt)
 
 
 if __name__ == "__main__":

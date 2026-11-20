@@ -1,7 +1,6 @@
 """The docs command preserves failures and only owns its explicit output."""
 
 from contextlib import redirect_stderr, redirect_stdout
-import csv
 import io
 import json
 from pathlib import Path
@@ -13,6 +12,7 @@ import unittest
 from unittest.mock import patch
 
 from tools.documentation import cli, install
+from tools.documentation.test_build import PAGE
 from tools.dev import dev
 
 
@@ -22,7 +22,9 @@ class DocumentationCommandTests(unittest.TestCase):
         self.addCleanup(self.directory.cleanup)
         self.root = Path(self.directory.name)
         (self.root / "docs").mkdir()
-        (self.root / "docs/index.md").write_text("# Start\n")
+        (self.root / "docs/index.md").write_text(PAGE)
+        self.enterContext(patch.object(cli.check, "validate_translations",
+            return_value={"errors": [], "records": [], "status": "passed"}))
 
     def test_valid_source_check_creates_explicit_report(self):
         report = self.root / "build/result.json"
@@ -32,7 +34,7 @@ class DocumentationCommandTests(unittest.TestCase):
         self.assertIn('"status": "passed"', report.read_text())
 
     def test_bad_source_returns_failure_with_diagnostics(self):
-        (self.root / "docs/index.md").write_text("# Start\n[bad](absent.md)\n")
+        (self.root / "docs/index.md").write_text(PAGE + "[bad](absent.md)\n")
         output = io.StringIO()
         with redirect_stdout(io.StringIO()), redirect_stderr(output):
             result = cli.main(["check"], root=self.root)
@@ -59,12 +61,12 @@ class DocumentationCommandTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "symlink"):
             cli.prepare_output(self.root, destination)
 
-    def test_owned_output_reuse_removes_stale_success(self):
+    def test_admission_preserves_current_view_until_writer_has_lock(self):
         destination = self.root / "build/output"
         cli.prepare_output(self.root, destination)
         (destination / "documentation-build.json").write_text('{"status":"passed"}')
         cli.prepare_output(self.root, destination)
-        self.assertFalse((destination / "documentation-build.json").exists())
+        self.assertTrue((destination / "documentation-build.json").exists())
 
     def test_owned_output_reuse_cannot_remove_rendered_inputs(self):
         destination = self.root / "build/output"
@@ -73,7 +75,7 @@ class DocumentationCommandTests(unittest.TestCase):
         original = "int retained_rendered_input;\n"
         included.write_text(original)
         (self.root / "docs/index.md").write_text(
-            "# Start\n\n```{literalinclude} ../build/output/consumer.c\n```\n")
+            PAGE + "\n```{literalinclude} ../build/output/consumer.c\n```\n")
         with self.assertRaisesRegex(ValueError, "input"):
             cli.prepare_output(self.root, destination)
         self.assertEqual(included.read_text(), original)
@@ -105,7 +107,7 @@ class DocumentationCommandTests(unittest.TestCase):
         import subprocess
         subprocess.run(["git", "init", "-q", str(self.root)], check=True)
         subprocess.run(["git", "-C", str(self.root), "add", "docs"], check=True)
-        (self.root / "docs/index.md").write_text("# Changed outside index\n")
+        (self.root / "docs/index.md").write_text(PAGE + "changed outside index\n")
         with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
             result = cli.main(["check", "--staged"], root=self.root)
         self.assertNotEqual(result, 0)
@@ -127,12 +129,10 @@ class DocumentationCommandTests(unittest.TestCase):
     def test_staged_check_rejects_configuration_code_outside_the_index(self):
         subprocess.run(["git", "init", "-q", str(self.root)], check=True)
         paths = (
-            "tools/configure/providers/common.py",
-            "tools/__init__.py", "soc/__init__.py",
-            "soc/native/__init__.py", "soc/native/configure/bindings.py",
-            "soc/stm32/__init__.py", "soc/stm32/stm32g474/__init__.py",
-            "soc/stm32/stm32g474/configure/coupled.py",
-            "soc/gd32/gd32f303/configure/contract.py")
+            "tools/configure/configure.c",
+            "tools/__init__.py",
+            "soc/stm32/stm32f4/facts/devices.json",
+            "soc/stm32/stm32f4/drivers/uart/binding.json")
         for relative in paths:
             source = self.root / relative
             source.parent.mkdir(parents=True, exist_ok=True)
@@ -151,7 +151,7 @@ class DocumentationCommandTests(unittest.TestCase):
 
     def test_staged_check_rejects_missing_and_untracked_soc_adapter(self):
         subprocess.run(["git", "init", "-q", str(self.root)], check=True)
-        relative = "soc/native/configure/emission.py"
+        relative = "soc/stm32/stm32f4/facts/controllers.json"
         source = self.root / relative
         source.parent.mkdir(parents=True)
         source.write_text("reviewed = True\n")
@@ -162,7 +162,7 @@ class DocumentationCommandTests(unittest.TestCase):
         self.assertNotEqual(result, 0)
         self.assertIn(relative, errors)
         source.write_text("reviewed = True\n")
-        new_relative = "soc/native/configure/new_helper.py"
+        new_relative = "soc/stm32/stm32f4/facts/routes.json"
         (self.root / new_relative).write_text("unreviewed = True\n")
         result, errors = self.run_staged_check()
         self.assertNotEqual(result, 0)
@@ -185,20 +185,30 @@ class DocumentationCommandTests(unittest.TestCase):
             result = cli.main(["check", "--staged"], root=self.root)
         self.assertNotEqual(result, 0)
 
-    def test_preview_requires_a_successful_build(self):
+    def test_serve_requires_a_current_build(self):
         output = self.root / "build/documentation"
         output.mkdir(parents=True)
         (output / "documentation-build.json").write_text('{"status":"failed"}')
         with patch.object(cli, "ThreadingHTTPServer") as server, \
                 redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
-            result = cli.main(["preview", "--build", str(output)], root=self.root)
+            result = cli.main(["serve", "--build", str(output)], root=self.root)
         self.assertNotEqual(result, 0)
         server.assert_not_called()
 
-    def test_preview_interrupt_closes_server_and_returns_success(self):
+    def test_serve_interrupt_closes_server_and_returns_success(self):
         output = self.root / "build/documentation"
-        output.mkdir(parents=True)
-        (output / "documentation-build.json").write_text('{"status":"passed"}')
+        cli.prepare_output(self.root, output)
+        (output / "site").mkdir()
+        (output / "site/index.html").write_text("verified site")
+        identifier = cli.publication.mark(output / "site")
+        metadata = {
+            "schema_version": 2, "kind": "nexus_documentation_build",
+            "mode": "verify", "status": "passed", "scope": "locale:en",
+            "languages": ["en"], "publication_id": identifier,
+            "source": {"commit": "a" * 40},
+            "files": cli.builder.inventory(output / "site")}
+        cli._record(output / "documentation-build.json", metadata)
+        cli._record(output / "last-published.json", metadata)
         closed = []
 
         def interrupt():
@@ -208,7 +218,7 @@ class DocumentationCommandTests(unittest.TestCase):
                                  server_close=lambda: closed.append(True))
         with patch.object(cli, "ThreadingHTTPServer", return_value=server), \
                 redirect_stdout(io.StringIO()):
-            result = cli.main(["preview", "--build", str(output)], root=self.root)
+            result = cli.main(["serve", "--build", str(output)], root=self.root)
         self.assertEqual(result, 0)
         self.assertEqual(closed, [True])
 
@@ -227,7 +237,7 @@ class DocumentationCommandTests(unittest.TestCase):
     def staged_include(self, *, target="tests/consumer.c", stage_target=False):
         """Exercise Git admission using a real include outside fixed roots."""
         page = self.root / "docs/index.md"
-        page.write_text("# Start\n\n```{literalinclude} ../" + target
+        page.write_text(PAGE + "\n```{literalinclude} ../" + target
                         + "\n```\n")
         included = self.root / target
         included.parent.mkdir(parents=True, exist_ok=True)
@@ -268,7 +278,7 @@ class DocumentationCommandTests(unittest.TestCase):
     def test_report_cannot_create_a_missing_rendered_build_input(self):
         target = self.root / "build/input.json"
         (self.root / "docs/index.md").write_text(
-            "# Start\n\n```{literalinclude} ../build/input.json\n```\n")
+            PAGE + "\n```{literalinclude} ../build/input.json\n```\n")
         with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
             result = cli.main(["check", "--report", str(target)], root=self.root)
         self.assertEqual(result, 2)
@@ -280,7 +290,7 @@ class DocumentationCommandTests(unittest.TestCase):
             result = cli.main(["check", "--report", str(report)], root=self.root)
         self.assertEqual(result, 0)
         (self.root / "docs/index.md").write_text(
-            "# Start\n\n```{literalinclude} ../tests/absent.c\n```\n")
+            PAGE + "\n```{literalinclude} ../tests/absent.c\n```\n")
         with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
             result = cli.main(["check", "--report", str(report)], root=self.root)
         self.assertEqual(result, 1)
@@ -303,7 +313,7 @@ class DocumentationCommandTests(unittest.TestCase):
                                        stage_target=True)
         included.write_text("```{literalinclude} private/consumer.c\n```\n")
         (self.root / "docs/index.md").write_text(
-            "# Start\n\n```{include} ../examples/included.md\n```\n")
+            PAGE + "\n```{include} ../examples/included.md\n```\n")
         child = included.parent / "private/consumer.c"
         child.parent.mkdir()
         child.write_text("int consumer(void) { return 0; }\n")
@@ -313,28 +323,10 @@ class DocumentationCommandTests(unittest.TestCase):
         self.assertNotEqual(result, 0)
         self.assertIn("examples/private/consumer.c", errors)
 
-    def test_staged_rst_include_uses_parent_syntax_for_text_fragment(self):
-        (self.root / "docs/index.md").write_text(
-            "# Start\n\n```{toctree}\npage\n```\n")
-        (self.root / "docs/page.rst").write_text(
-            "Page\n====\n\n.. include:: ../examples/fragment.txt\n")
-        fragment = self.root / "examples/fragment.txt"
-        fragment.parent.mkdir()
-        fragment.write_text(".. literalinclude:: private/consumer.c\n")
-        consumer = fragment.parent / "private/consumer.c"
-        consumer.parent.mkdir()
-        consumer.write_text("int consumer(void) { return 0; }\n")
-        subprocess.run(["git", "init", "-q", str(self.root)], check=True)
-        subprocess.run(["git", "-C", str(self.root), "add", "docs",
-                        "examples/fragment.txt"], check=True)
-        result, errors = self.run_staged_check()
-        self.assertNotEqual(result, 0)
-        self.assertIn("examples/private/consumer.c", errors)
-
     def test_staged_check_rejects_untracked_markdown_image_dependency(self):
         image = self.staged_include(target="examples/image.png")
         (self.root / "docs/index.md").write_text(
-            "# Start\n\n![example](../examples/image.png)\n")
+            PAGE + "\n![example](../examples/image.png)\n")
         subprocess.run(["git", "-C", str(self.root), "add", "docs"], check=True)
         result, errors = self.run_staged_check()
         self.assertNotEqual(result, 0)
@@ -372,18 +364,6 @@ class DocumentationCommandTests(unittest.TestCase):
         self.assertNotEqual(result, 0)
 
 
-    def test_generated_svg_normalization_preserves_local_elements(self):
-        folder = self.root / "output"
-        folder.mkdir()
-        image = folder / "doxygen.svg"
-        image.write_text('<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" '
-                         '"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">'
-                         '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10">'
-                         '<path id="local" d="M 0 0"/></svg>')
-        cli.normalize_generated_svg(folder)
-        self.assertNotIn(b"<!DOCTYPE", image.read_bytes())
-        self.assertIn(b'id="local"', image.read_bytes())
-
 
 class DocumentationTestEnvironmentTests(unittest.TestCase):
     """The entry point admits a verified tuple before running the whole suite."""
@@ -393,7 +373,7 @@ class DocumentationTestEnvironmentTests(unittest.TestCase):
         self.addCleanup(self.directory.cleanup)
         self.root = Path(self.directory.name) / "source"
         (self.root / "docs").mkdir(parents=True)
-        (self.root / "docs/index.md").write_text("# Start\n")
+        (self.root / "docs/index.md").write_text(PAGE)
         self.prefix = Path(self.directory.name) / "locked tools with spaces"
         self.report = self.root / "build/result.json"
         self.record = {"suite": "documentation", "discovered": 3,
@@ -572,128 +552,44 @@ class DocumentationTestEnvironmentTests(unittest.TestCase):
         self.assertFalse(self.report.exists())
 
 
-class DocumentationWorkspaceTests(unittest.TestCase):
-    """External output owns its work files and failure evidence together."""
-
+class CurrentDocumentationContractTests(unittest.TestCase):
     def setUp(self):
-        self.directory = tempfile.TemporaryDirectory()
-        self.addCleanup(self.directory.cleanup)
-        self.base = Path(self.directory.name)
-        self.root = self.base / "source"
-        (self.root / "docs").mkdir(parents=True)
-        (self.root / "docs/index.md").write_text("# Start" + chr(10))
-        (self.root / "dependencies").mkdir()
-        (self.root / "dependencies/platform-compatibility.json").write_text(
-            json.dumps({"semantic_version": "fixture"}))
-        self.prefix = self.base / "locked tools"
-        self.external = self.base / "delivery/site"
-        self.enterContext(patch.object(install, "environment", return_value={}))
-        self.enterContext(patch.object(install, "diagnose", return_value={
-            "prefix": str(self.prefix)}))
-        self.enterContext(patch.object(cli, "observe_git_source", return_value={
-            "commit": "fixture", "dirty": False}))
-        self.enterContext(patch.object(cli.check, "scan", return_value={
-            "errors": []}))
-        self.diagrams = self.enterContext(patch(
-            "tools.documentation.diagrams.check", return_value={"errors": []}))
-        self.run = self.enterContext(patch.object(
-            cli.process, "run", side_effect=self.failed_command))
+        self.temporary = tempfile.TemporaryDirectory(prefix="current docs contract ")
+        self.addCleanup(self.temporary.cleanup)
+        self.root = Path(self.temporary.name)
+        (self.root / "docs").mkdir()
+        (self.root / "docs/index.md").write_text(
+            "---\nid: home\ntype: reference\naudience: consumer\n"
+            "source_language: en\n---\n\n# Start\n")
 
-    def failed_command(self, command, **kwargs):
-        """Keep the actual workspace argument at the external command port."""
-        del command
-        log = kwargs["log"]
-        log.write_text("fixture doxygen failure" + chr(10))
-        receipt = log.with_suffix(".receipt.json")
-        receipt.write_text(json.dumps({"exit_code": 7}))
-        self.receipt = receipt
-        return SimpleNamespace(returncode=7, stdout="", stderr="",
-                               receipt_path=receipt)
+    def test_old_preview_command_is_rejected(self):
+        with redirect_stderr(io.StringIO()), self.assertRaises(SystemExit) as error:
+            cli.main(["preview"], root=self.root)
+        self.assertEqual(error.exception.code, 2)
 
-    def failed_build(self, destination):
-        with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
-            with self.assertRaisesRegex(ValueError, "doxygen failed.*7"):
-                cli.build(self.root, destination, tool_prefix=self.prefix)
+    def test_build_defaults_to_verify_mode(self):
+        with patch.object(cli, "build", return_value={} ) as build:
+            self.assertEqual(cli.main(["build"], root=self.root), 0)
+        self.assertEqual(build.call_args.kwargs["mode"], "verify")
 
+    def test_reusing_owned_workspace_preserves_kernel_lock_inode(self):
+        output = self.root / "build/docs"
+        cli.prepare_output(self.root, output)
+        lock = output / ".nexus-build.lock"
+        lock.write_bytes(b"")
+        identity = (lock.stat().st_dev, lock.stat().st_ino)
+        cli.prepare_output(self.root, output)
+        self.assertEqual((lock.stat().st_dev, lock.stat().st_ino), identity)
 
-
-
-    def test_external_build_does_not_write_source_build_directory(self):
-        self.failed_build(self.external)
-        self.assertFalse((self.root / "build").exists())
-        self.run.assert_called_once()
-
-    def test_external_failure_receipt_and_raw_stay_beside_output(self):
-        self.failed_build(self.external)
-        expected = self.external.parent / "documentation-attempts"
-        self.assertTrue(self.receipt.is_relative_to(expected))
-        self.assertTrue(self.receipt.is_file())
-        workspaces = list(expected.iterdir())
-        self.assertEqual(len(workspaces), 1)
-        failure = workspaces[0] / "documentation-build-failure.json"
-        record = json.loads(failure.read_text())
-        self.assertEqual(record["status"], "failed")
-        self.assertIn(str(self.receipt), record["error"])
-        self.assertTrue((workspaces[0] / "doxygen.log").is_file())
-        self.assertFalse((self.external / "documentation-build.json").exists())
-
-    def test_workspace_sibling_symlink_is_rejected_before_command(self):
-        actual = self.base / "unrelated"
-        actual.mkdir()
-        sentinel = actual / "keep.txt"
-        sentinel.write_text("untouched")
-        self.external.parent.mkdir()
-        (self.external.parent / "documentation-attempts").symlink_to(
-            actual, target_is_directory=True)
-        with self.assertRaisesRegex(ValueError, "workspace.*symlink"):
-            cli.build(self.root, self.external, tool_prefix=self.prefix)
-        self.run.assert_not_called()
-        self.assertEqual(sentinel.read_text(), "untouched")
-        self.assertEqual(list(actual.iterdir()), [sentinel])
-        self.assertFalse((self.root / "build").exists())
-
-    def test_default_output_keeps_original_build_workspace_location(self):
-        destination = self.root / "build/documentation"
-        self.failed_build(destination)
-        expected = self.root / "build/documentation-attempts"
-        self.assertTrue(self.receipt.is_relative_to(expected))
-        self.assertEqual(len(list(expected.iterdir())), 1)
-
-    def test_chinese_output_keeps_canonical_gettext_and_chinese_html(self):
-        (self.root / "docs/assets/diagrams").mkdir(parents=True)
-        (self.root / "LICENSE").write_text("fixture source license" + chr(10))
-        (self.prefix / "licenses").mkdir(parents=True)
-        observations = {}
-
-        def successful_command(command, **kwargs):
-            log = kwargs["log"]
-            log.write_text("fixture command success" + chr(10))
-            receipt = log.with_suffix(".receipt.json")
-            receipt.write_text(json.dumps({"exit_code": 0}))
-            # Copy the environment at the external port before later stages
-            # change the same mutable mapping for their selected output.
-            observations[kwargs["stage"]] = (list(command), dict(kwargs["env"]))
-            if kwargs["stage"] == "documentation-doxygen":
-                (log.parent / "api/html").mkdir(parents=True)
-            return SimpleNamespace(returncode=0, stdout="", stderr="",
-                                   receipt_path=receipt)
-
-        self.run.side_effect = successful_command
-        with patch.object(cli.check, "validate_translations", return_value={
-                "status": "passed", "errors": [], "records": []}), \
-                redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
-            metadata = cli.build(self.root, self.external, language="zh_CN",
-                                 tool_prefix=self.prefix)
-        _, extraction = observations["documentation-gettext"]
-        command, rendering = observations["documentation-html-zh_CN"]
-        self.assertEqual(extraction["NEXUS_DOCS_LANGUAGE"], "en")
-        self.assertEqual(set(extraction["NEXUS_DOCS_LANGUAGES"].split(",")),
-                         {"en", "zh_CN"})
-        self.assertEqual(rendering["NEXUS_DOCS_LANGUAGE"], "zh_CN")
-        self.assertEqual(rendering["NEXUS_DOCS_LANGUAGES"], "zh_CN")
-        self.assertIn("language=zh_CN", command)
-        self.assertEqual(metadata["languages"], ["zh_CN"])
-        self.assertNotIn("documentation-html-en", observations)
+    def test_staged_sources_read_git_objects_as_one_batch(self):
+        subprocess.run(["git", "init", "-q", str(self.root)], check=True)
+        subprocess.run(["git", "-C", str(self.root), "add", "docs"], check=True)
+        with patch.object(cli.subprocess, "run", wraps=subprocess.run) as run:
+            cli._staged_sources(self.root)
+        commands = [call.args[0] for call in run.call_args_list]
+        self.assertFalse(any(command[:2] == ["git", "show"] for command in commands))
+        self.assertEqual(sum(command[:3] == ["git", "cat-file", "--batch"]
+                             for command in commands), 1)
 
 
 if __name__ == "__main__":

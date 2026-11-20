@@ -1,0 +1,22 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: dec685f297b712eb6d1fd56d4d22cffacdf1dfbe19e2f4d2641b24ca1567c4db\n"
+
+#: ../../../../../../docs/reference/contracts/core/index.md:9
+msgid "Core合同"
+msgstr "Core contracts"
+
+#: ../../../../../../docs/reference/contracts/core/index.md:11
+msgid ""
+"请求的公共借用与完成语义见[所有权解释](../../../explanation/ownership.md)和所属API；下列页面维护额外的可选机制。"
+msgstr ""
+"Public request-borrowing and completion semantics are defined in the "
+"[ownership explanation](../../../explanation/ownership.md) and the relevant "
+"API; the following pages maintain additional optional mechanisms."

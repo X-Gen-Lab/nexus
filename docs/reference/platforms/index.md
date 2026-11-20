@@ -2,16 +2,19 @@
 id: reference.platforms.index
 type: reference
 audience: consumer
-source_language: en
+source_language: zh_CN
 ---
 
-# Platforms and qualification
+(reference.platforms.index)=
+# 平台、能力与验证
 
-Read the support scope and exact evidence identity separately. A documented capability is not a current-source software candidate or a physical result.
+先查精确料号、Board 和模式，再解析自己的完整配置。能力描述、接口实现、板级授权和实际执行分别回答不同问题。
 
 ```{toctree}
 :maxdepth: 2
 
 support
+capabilities
+cortex-m
 qualification
 ```

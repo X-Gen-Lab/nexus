@@ -1,0 +1,109 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 59b149177f138a96625924bf9f2d8d7f6f0ce18c4f3c89aa65bb39f45d05b408\n"
+
+#: ../../../../../../docs/guides/os-backend-porting.md:8
+msgid "维护或接入 OS 后端"
+msgstr "Maintain or integrate an OS backend"
+
+#: ../../../../../../docs/guides/os-backend-porting.md:10
+msgid ""
+"已有后端先从 TOML 选择，不为每块板复制 OSAL。新后端必须实现明确的任务、同步、 时间和生命周期合同；不能仅增加 backend "
+"名字就宣称支持。"
+msgstr ""
+"Select an existing backend through TOML; do not copy OSAL per Board. A new "
+"backend must implement explicit task, synchronization, time and lifecycle "
+"contracts. Adding a backend name alone does not establish support."
+
+#: ../../../../../../docs/guides/os-backend-porting.md:13
+msgid "确定所需子集"
+msgstr "Determine the required subset"
+
+#: ../../../../../../docs/guides/os-backend-porting.md:15
+msgid ""
+"先列调用方实际需要的静态任务、队列、通知、等待和时间能力。未实现能力明确拒绝； ThreadX 的 Native／M4 子集不继承 FreeRTOS 的"
+" tickless、隔离或端口范围。 CPU 原语、SoC 时钟与 OS 内核职责分别维护。"
+msgstr ""
+"First list the static task, queue, notification, wait and time capabilities "
+"actually needed by callers. Reject unimplemented capabilities explicitly. "
+"The Native/M4 ThreadX subset does not inherit FreeRTOS tickless, isolation "
+"or port scope. Maintain CPU primitives, SoC clocks and OS kernel "
+"responsibilities separately."
+
+#: ../../../../../../docs/guides/os-backend-porting.md:19
+msgid "以一条实际路径接入"
+msgstr "Integrate one actual path"
+
+#: ../../../../../../docs/guides/os-backend-porting.md:21
+msgid "锁定内核、端口、许可证与编译上下文，在 `os/<backend>/` 实现窄 adapter。"
+msgstr ""
+"Pin the kernel, port, license and compilation context, and implement a "
+"narrow adapter in `os/<backend>/`."
+
+#: ../../../../../../docs/guides/os-backend-porting.md:22
+msgid "明确调用者提供的 stack、TCB、队列和控制状态，固定返回、等待、关闭与 join。"
+msgstr ""
+"Specify caller-provided stacks, TCBs, queues and control state, and define "
+"return, wait, close and join behavior."
+
+#: ../../../../../../docs/guides/os-backend-porting.md:23
+msgid "实现同一绝对单调 deadline 和最终谓词观察，拒绝非法 ISR 调用和优先级。"
+msgstr ""
+"Implement the same absolute monotonic deadline and final predicate "
+"observation; reject invalid ISR calls and priorities."
+
+#: ../../../../../../docs/guides/os-backend-porting.md:24
+msgid "验证真实任务执行、部分创建失败、通知竞争、超时、关闭和失败排空。"
+msgstr ""
+"Validate actual task execution, partial-creation failures, notification "
+"races, timeouts, close and failed drain."
+
+#: ../../../../../../docs/guides/os-backend-porting.md:25
+msgid "编译所维护的 CPU／ABI 组合，再单独记录 MCU 上下文、栈峰值和时序实测。"
+msgstr ""
+"Compile maintained CPU/ABI combinations, then separately record MCU context,"
+" stack peaks and measured timing."
+
+#: ../../../../../../docs/guides/os-backend-porting.md:27
+msgid ""
+"应用拥有 scheduler 启动和产品 worker。Platform start 不进入内核；任务入口返回 或通知到达不授权回收 "
+"stack／TCB。内核仍使用的 Tick、时钟和 IRQ 必须保留。"
+msgstr ""
+"The application owns scheduler startup and product workers. Platform start "
+"does not enter the kernel. Task-entry return or notification arrival does "
+"not authorize stack/TCB reclamation. Tick, clock and IRQ infrastructure "
+"still used by the kernel must be retained."
+
+#: ../../../../../../docs/guides/os-backend-porting.md:30
+msgid "与配置和构建组合"
+msgstr "Compose with configuration and builds"
+
+#: ../../../../../../docs/guides/os-backend-porting.md:32
+msgid ""
+"后端的能力与策略字段进入公开合同和 typed IR，实际 CMake 目标发布为所选 "
+"`Nexus::OS`。新增后端同时维护兼容性事实、依赖选择、生成、Source SDK profile 和实际消费者，不创建第二套实例或源码图。"
+msgstr ""
+"Backend capability and policy fields enter public contracts and typed IR. "
+"The selected actual CMake target is published as `Nexus::OS`. A new backend "
+"also maintains compatibility facts, dependency selection, generation, Source"
+" SDK profiles and real consumers. Do not create another instance or source "
+"graph."
+
+#: ../../../../../../docs/guides/os-backend-porting.md:36
+msgid ""
+"详细 port、IRQ ceiling、Tick 和错误语义集中在 "
+"[后端集成合同](../reference/contracts/os/backend-integration.md)。应用停机见 [OS 停止](os-"
+"shutdown.md)，生产变更按[开发流程](../development/workflow.md)执行。"
+msgstr ""
+"Detailed port, IRQ-ceiling, Tick and error semantics are centralized in the "
+"[backend integration contract](../reference/contracts/os/backend-"
+"integration.md). See [OS shutdown](os-shutdown.md) for application shutdown "
+"and follow the [development workflow](../development/workflow.md) for "
+"production changes."

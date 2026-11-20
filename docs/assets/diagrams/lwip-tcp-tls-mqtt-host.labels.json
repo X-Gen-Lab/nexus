@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "en": {
+    "FIG-32 Reference software-host interoperability": "FIG-32 Reference software-host interoperability",
+    "Local Mosquitto\\nTLS and MQTT endpoint": "Local Mosquitto\nTLS and MQTT endpoint",
+    "Nexus client process\\nMQTT / TLS client\\nreadonly byte face / TCP / lwIP\\none serialized stack owner": "Nexus client process\nMQTT / TLS client\nreadonly byte face / TCP / lwIP\none serialized stack owner",
+    "One end-to-end TLS session\\nrelay does not terminate TLS": "One end-to-end TLS session\nrelay does not terminate TLS",
+    "TCP A\\nsoftware Ethernet frame ports": "TCP A\nsoftware Ethernet frame ports",
+    "TCP B\\nhost socket bytes": "TCP B\nhost socket bytes",
+    "Test-only peer process\\nlwIP raw TCP peer\\ntransparent ciphertext relay\\nPOSIX socket / separate stack owner": "Test-only peer process\nlwIP raw TCP peer\ntransparent ciphertext relay\nPOSIX socket / separate stack owner"
+  },
+  "zh_CN": {
+    "FIG-32 Reference software-host interoperability": "FIG-32 软件主机互通参考",
+    "Local Mosquitto\\nTLS and MQTT endpoint": "本地 Mosquitto\nTLS 与 MQTT 端点",
+    "Nexus client process\\nMQTT / TLS client\\nreadonly byte face / TCP / lwIP\\none serialized stack owner": "Nexus 客户端进程\nMQTT／TLS 客户端\n只读字节接口／TCP／lwIP\n单一串行协议栈所有者",
+    "One end-to-end TLS session\\nrelay does not terminate TLS": "一条端到端 TLS 会话\n中继不终止 TLS",
+    "TCP A\\nsoftware Ethernet frame ports": "TCP A\n软件以太网帧接口",
+    "TCP B\\nhost socket bytes": "TCP B\n主机 socket 字节",
+    "Test-only peer process\\nlwIP raw TCP peer\\ntransparent ciphertext relay\\nPOSIX socket / separate stack owner": "仅测试的对端进程\nlwIP 原始 TCP 对端\n透明密文中继\nPOSIX socket／独立协议栈所有者"
+  }
+}

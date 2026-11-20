@@ -39,10 +39,10 @@ class ThemeLocaleTests(unittest.TestCase):
                     title = '平台使用说明' if language == 'zh_CN' else 'Platform guide'
                     next_title = '下一项任务' if language == 'zh_CN' else 'Next task'
                     (docs / 'index.md').write_text(
-                        '---\nsource_language: ' + language + '\n---\n\n# '
+                        '---\nid: fixture\ntype: reference\naudience: consumer\nsource_language: ' + language + '\n---\n\n# '
                         + title + '\n\n```{toctree}\nnext\n```\n', encoding='utf-8')
                     (docs / 'next.md').write_text(
-                        '---\nsource_language: ' + language + '\n---\n\n# '
+                        '---\nid: fixture\ntype: reference\naudience: consumer\nsource_language: ' + language + '\n---\n\n# '
                         + next_title + '\n\n' + title + '.\n', encoding='utf-8')
                     for arguments in (['init', '-q'], ['add', 'docs'],
                                       ['-c', 'user.name=Fixture',
@@ -51,10 +51,9 @@ class ThemeLocaleTests(unittest.TestCase):
                         subprocess.run(['git', '-C', str(root)] + arguments,
                                        check=True, capture_output=True)
                     environment = os.environ.copy()
-                    for name in ('NEXUS_DOCS_REVISION', 'NEXUS_DOCS_CODE_REVISION',
-                                 'NEXUS_DOCS_TRANSLATION_ROOT', 'NEXUS_DOCS_GETTEXT_ROOT',
-                                 'NEXUS_DOCS_LANGUAGES', 'NEXUS_DOCS_DOXYGEN_XML'):
-                        environment.pop(name, None)
+                    for name in tuple(environment):
+                        if name.startswith("NEXUS_DOCS_"):
+                            environment.pop(name)
                     environment['NEXUS_DOCS_LANGUAGE'] = language
                     output = root / 'html'
                     result = subprocess.run(
@@ -63,6 +62,9 @@ class ThemeLocaleTests(unittest.TestCase):
                         env=environment, capture_output=True, text=True)
                     self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
                     rendered = (output / 'next.html').read_text(encoding='utf-8')
+                    self.assertIn('class="nexus-language-switch"', rendered)
+                    self.assertIn('id="nexus-content"', rendered)
+                    self.assertIn('class="nexus-skip-link"', rendered)
                     parser = VisibleText()
                     parser.feed(rendered)
                     text = parser.text()

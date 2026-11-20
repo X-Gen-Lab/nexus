@@ -1,0 +1,131 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 514923b07160c80d136fcddab507bcb174f432d4c7d3ea0a9baa607096496b3d\n"
+
+#: ../../../../../../docs/guides/use-source-sdk.md:8
+msgid "使用 Source SDK 与升级工程"
+msgstr "Use a Source SDK and upgrade a project"
+
+#: ../../../../../../docs/guides/use-source-sdk.md:10
+msgid ""
+"Source SDK 是带选中源码、依赖、许可和 CMake 元数据的可搬移包。应用在自己的 配置下重新编译，不混用其他配置的对象文件。SDK "
+"的制作和平台完整消费者验证由 [维护者发布流程](../development/sdk-publishing.md)负责。"
+msgstr ""
+"A Source SDK is a relocatable package of selected source, dependencies, "
+"licenses and CMake metadata. Applications compile it again for their own "
+"configuration; do not mix object files from other configurations. SDK "
+"creation and complete platform consumer validation belong to the [maintainer"
+" release workflow](../development/sdk-publishing.md)."
+
+#: ../../../../../../docs/guides/use-source-sdk.md:14
+msgid "选择并验证包"
+msgstr "Select and verify a package"
+
+#: ../../../../../../docs/guides/use-source-sdk.md:16
+msgid "从所选交付记录取得 SDK、校验和及完整源码提交。将整个 prefix 移到使用位置， 设置其路径与期望提交："
+msgstr ""
+"Obtain the SDK, checksum and full source commit from the selected delivery "
+"record. Move the entire prefix to its consumption location and set its path "
+"and expected commit:"
+
+#: ../../../../../../docs/guides/use-source-sdk.md:26
+msgid ""
+"校验必须成功。缺失、多出、修改或 symlink 的 payload 都会拒绝。正式消费使用 可发布包；开发 fixture 明确是另一范围，不用 "
+"opt-in 掩盖身份或接口不匹配。 包已包含所选依赖，不再在 prefix 内执行源码子模块准备或安装工具。"
+msgstr ""
+"Verification must succeed. Missing, additional, modified or symlinked "
+"payload entries are rejected. Formal consumption uses a publishable package;"
+" a development fixture is a separate explicit scope, and opt-in must not "
+"conceal identity or interface mismatches. The package already contains "
+"selected dependencies; do not prepare source submodules or install tools "
+"inside the prefix."
+
+#: ../../../../../../docs/guides/use-source-sdk.md:30
+msgid "配置现有应用"
+msgstr "Configure an existing application"
+
+#: ../../../../../../docs/guides/use-source-sdk.md:32
+msgid "应用保留自己的 CMake、TOML 和 C 源。从应用目录选择独立输出目录："
+msgstr ""
+"Keep the application CMake, TOML and C sources. From the application "
+"directory, select a separate output directory:"
+
+#: ../../../../../../docs/guides/use-source-sdk.md:43
+msgid ""
+"这条命令适用于带 Native 测试的应用，SDK 须包含 `host-support`。ARM 应用使用 另一个构建目录，并在 configure "
+"时增加 prefix 内的 `share/nexus/src/cmake/toolchains/arm-gcc.cmake`；不需要 Native "
+"时省略 `NEXUS_TEST_SUPPORT`。应用的三个 CMake 调用见[CMake 接入](cmake-consumption.md)。"
+msgstr ""
+"This command applies to an application with Native tests, and the SDK must "
+"include `host-support`. For an ARM application, use another build directory "
+"and add the prefix-local `share/nexus/src/cmake/toolchains/arm-gcc.cmake` "
+"during configuration. Omit `NEXUS_TEST_SUPPORT` when Native is not required."
+" See [CMake integration](cmake-consumption.md) for the three application "
+"calls."
+
+#: ../../../../../../docs/guides/use-source-sdk.md:48
+msgid ""
+"成功出口由应用确定：Native 实际运行与 fresh 测试报告，或 ARM 镜像、向量与资源 报告。配置和链接成功不包含 MCU "
+"实际执行结论。消费后再次运行完整 prefix 校验。"
+msgstr ""
+"The application defines success: actual Native execution and fresh test "
+"reports, or ARM images, vectors and resource reports. Successful "
+"configuration and linking do not establish execution on an MCU. After "
+"consumption, verify the complete prefix again."
+
+#: ../../../../../../docs/guides/use-source-sdk.md:51
+msgid "升级已有工程"
+msgstr "Upgrade an existing project"
+
+#: ../../../../../../docs/guides/use-source-sdk.md:53
+msgid "保留应用源与 `.nexus-template.json`，取得下一份 SDK 及精确提交。"
+msgstr ""
+"Keep application sources and `.nexus-template.json`; obtain the next SDK and"
+" exact commit."
+
+#: ../../../../../../docs/guides/use-source-sdk.md:54
+msgid "阅读对应变更和[源码接口兼容性](../reference/contracts/sdk-format.md)。"
+msgstr ""
+"Read the relevant changes and [source-interface "
+"compatibility](../reference/contracts/sdk-format.md)."
+
+#: ../../../../../../docs/guides/use-source-sdk.md:55
+msgid "在新构建目录切换 `Nexus_DIR` 和期望提交，重新生成并编译全部相关对象。"
+msgstr ""
+"In a new build directory, change `Nexus_DIR` and the expected revision, "
+"regenerate and compile all relevant objects."
+
+#: ../../../../../../docs/guides/use-source-sdk.md:56
+msgid "执行产品需要的 Native、ARM 和硬件检查，再更新产品依赖锁。"
+msgstr ""
+"Execute the Native, ARM and hardware checks required by the product before "
+"updating its dependency lock."
+
+#: ../../../../../../docs/guides/use-source-sdk.md:58
+msgid ""
+"模板来源记录描述工程最初从哪里创建，不会自动改成新 SDK 身份。平台版本、factory 接口代际、TOML schema、typed IR 与 "
+"SDK manifest schema 各自负责不同合同；相同 版本号不能替代精确提交，也不能证明二进制兼容。"
+msgstr ""
+"Template provenance records where the project was originally created; it "
+"does not automatically become the new SDK identity. Platform version, "
+"factory interface epoch, TOML schema, typed IR and SDK manifest schema "
+"govern separate contracts. An identical version string cannot replace an "
+"exact commit or establish binary compatibility."
+
+#: ../../../../../../docs/guides/use-source-sdk.md:62
+msgid ""
+"原 Kconfig／宏实例、旧请求字段与目录迁移只按匹配版本的固定记录读取。当前工程用 TOML、强类型 factory "
+"和显式生命周期；不要在未知字段后回退到旧配置或生成文件。 常见失败见[排错指南](troubleshooting.md)。"
+msgstr ""
+"Read original Kconfig/macro instances, old request fields and directory "
+"migrations only in matching, fixed-version records. Current projects use "
+"TOML, strong typed factories and explicit lifecycle. Do not fall back to old"
+" configuration or generated files after an unknown-field error. See "
+"[troubleshooting](troubleshooting.md) for common failures."

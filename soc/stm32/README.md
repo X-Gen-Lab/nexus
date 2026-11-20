@@ -6,4 +6,4 @@ Device F4。其他 STM32 SDK 保留在 `vendors/st/`，不代表仍有生产 pro
 同系列型号共享源码，通过精确料号与受审 profile 在构建期选择差异；不复制每型号
 驱动，也不在日常 I/O 按 chip ID 动态选择平台。F4 的 `facts/` 记录精确器件与模式，
 `system/`、`drivers/` 与 `sdk/` 分别维护系统行为、控制器实现和官方库构建。
-体系和证据边界见 [SoC](../README.md) 与[精确支持](../../docs/delivery/support.md)。
+体系和证据边界见 [SoC](../README.md) 与[精确支持](../../docs/reference/platforms/support.md)。

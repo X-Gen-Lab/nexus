@@ -23,6 +23,6 @@ SoC 适配层提供真实寄存器和时钟事实、IRQ／DMA 绑定及受审硅
 
 IRQ 记录有界硬件事实，任务侧推进服务继续处理截止时间、线上完成和撤源。最终
 引用撤销后才发布 SETTLED，QUARANTINED 保留全部未结束借用。具体限额和物理范围
-见[执行预算](../../docs/design/soc-execution-budgets.md)、公共操作合同与各控制器
+见[执行预算](../../docs/reference/contracts/platform/execution-budgets.md)、公共操作合同与各控制器
 设计说明。[FIG-31：驱动源码归属](../../docs/assets/diagrams/driver-source-ownership.svg)
 描述构建归属，不表示额外运行时转发层。

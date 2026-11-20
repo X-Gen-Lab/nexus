@@ -1,11 +1,11 @@
 ---
-id: docs-explanation-factory
+id: explanation.factory
 type: explanation
 audience: consumer
 source_language: en
 ---
 
-(docs-explanation-factory)=
+(explanation.factory)=
 # Typed factory, static instances and polymorphic faces
 
 The current platform keeps typed factory lookup and C polymorphism. Configuration
@@ -96,7 +96,6 @@ were already removable by MCU section garbage collection; generated file sizes
 are not Flash or RAM measurements. Compare selected objects and final ELF images
 separately before claiming resource savings.
 
-(factory-controller-diagnostics)=
 ## Map lifecycle diagnostics to the assembly
 
 Generated `nexus_bindings.h` names every resolved controller position with
@@ -164,6 +163,6 @@ python tools/configure/configure.py check --test-support \
 The [async tutorial](../tutorials/async-io.md) runs the complete generated factory
 binary. It verifies cold lookup, distinct contexts with shared ops, bus/endpoint
 identity, invalid IDs, stop/restart and retained quarantine. The authority for
-these interfaces is the [integration contract](../design/integration-contracts.md)
+these interfaces is the [integration contract](../reference/contracts/integration.md)
 and generated/public headers; this page explains the design rather than duplicating
 function declarations.

@@ -1,0 +1,1913 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 2547201633fcc8bbf25681571d195e309b2de6eaf36a9ab618adf3eeec131ce3\n"
+
+#: ../../../../../../docs/reference/api/io/execution.md:10
+msgid "Borrowing, streams, progress and observations"
+msgstr "借用、流、推进与观测"
+
+#: ../../../../../../docs/reference/api/io/execution.md:12
+msgid ""
+"Accepted requests and buffers remain borrowed until acquire-observed "
+"SETTLED. Cancellation, deadline expiry and DMA completion do not revoke a "
+"borrow. Applications own progress, waiting and joined shutdown; diagnostics "
+"report observations rather than creating a worker."
+msgstr ""
+"已接受的请求和缓冲区在以 acquire 语义观测到 SETTLED 前持续借用。取消、截止时间到期和 DMA "
+"完成均不撤销借用。应用负责推进、等待及完成 join 的停机；诊断只报告观测，不创建工作线程。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:17
+msgid ""
+"A valid request snapshot has a nonzero epoch and finite `observed_at`; its "
+"`deadline` may be `NX_DEADLINE_NEVER` to mean no deadline. SERVICE facts "
+"require finite `last_service_at` and `observed_at` in the same monotonic "
+"domain, and a finite positive `maximum_service_gap_us`. Unknown groups stay "
+"unknown."
+msgstr ""
+"有效 request 快照具有非零 epoch 和有限 `observed_at`；其 `deadline` 可以为 "
+"`NX_DEADLINE_NEVER`，表示无期限。SERVICE 事实要求 `last_service_at` 与 `observed_at` "
+"在同一单调时钟域中且均为有限值，`maximum_service_gap_us` 为有限正值。未知事实组保持未知。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:22
+msgid ""
+"Selected readonly facts use stable public domain types. Optional factory "
+"lookups return concrete records; manually supplied providers can supply the "
+"same types. Read these constraints when binding a component, then retain the"
+" selected provider's normal admission checks. A record does not establish "
+"readiness, resource ownership, measured timing or physical qualification. "
+"Unknown bounds never mean unlimited support. Generic capabilities use "
+"`nx_io_capability_t` and `NX_IO_CAP_*`; enhanced SPI endpoints use "
+"transaction traits, while I2C uses explicit `nx_i2c_limits_t` provider "
+"profiles."
+msgstr ""
+"所选只读事实使用稳定公共领域类型。可选 factory 查询返回具体记录；手工提供的 provider "
+"可使用同样类型。绑定组件时读取这些约束，执行时仍保留所选 provider 正常准入检查。记录不证明 "
+"ready、资源所有权、实测时序或物理资格。未知限额不表示无限支持。通用 capability 使用 `nx_io_capability_t` 和 "
+"`NX_IO_CAP_*`；增强 SPI endpoint 使用事务 traits，I2C 使用明确的 `nx_i2c_limits_t` "
+"provider profile。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:31
+msgid "Public declarations"
+msgstr "公共声明"
+
+#: ../../../../../../docs/reference/api/io/execution.md:33
+msgid "cycle_probe.h"
+msgstr "cycle_probe.h"
+
+#: ../../../../../../docs/reference/api/io/execution.md:35
+msgid "Opt-in raw cycle observations without elapsed-time claims."
+msgstr "显式选用的原始周期观察，不作经过时间承诺。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:35
+#: ../../../../../../docs/reference/api/io/execution.md:41
+#: ../../../../../../docs/reference/api/io/execution.md:47
+#: ../../../../../../docs/reference/api/io/execution.md:53
+#: ../../../../../../docs/reference/api/io/execution.md:59
+#: ../../../../../../docs/reference/api/io/execution.md:65
+#: ../../../../../../docs/reference/api/io/execution.md:71
+#: ../../../../../../docs/reference/api/io/execution.md:77
+#: ../../../../../../docs/reference/api/io/execution.md:83
+#: ../../../../../../docs/reference/api/io/execution.md:89
+#: ../../../../../../docs/reference/api/io/execution.md:95
+msgid "Author  Nexus Team"
+msgstr "作者  Nexus Team"
+
+#: ../../../../../../docs/reference/api/io/execution.md:35
+#: ../../../../../../docs/reference/api/io/execution.md:41
+#: ../../../../../../docs/reference/api/io/execution.md:47
+#: ../../../../../../docs/reference/api/io/execution.md:53
+#: ../../../../../../docs/reference/api/io/execution.md:59
+#: ../../../../../../docs/reference/api/io/execution.md:65
+#: ../../../../../../docs/reference/api/io/execution.md:71
+#: ../../../../../../docs/reference/api/io/execution.md:77
+#: ../../../../../../docs/reference/api/io/execution.md:83
+#: ../../../../../../docs/reference/api/io/execution.md:89
+#: ../../../../../../docs/reference/api/io/execution.md:95
+msgid "Nexus Team"
+msgstr "Nexus Team"
+
+#: ../../../../../../docs/reference/api/io/execution.md:35
+#: ../../../../../../docs/reference/api/io/execution.md:41
+#: ../../../../../../docs/reference/api/io/execution.md:47
+#: ../../../../../../docs/reference/api/io/execution.md:53
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "Defines"
+msgstr "宏定义"
+
+#: ../../../../../../docs/reference/api/io/execution.md:35
+#: ../../../../../../docs/reference/api/io/execution.md:41
+#: ../../../../../../docs/reference/api/io/execution.md:47
+#: ../../../../../../docs/reference/api/io/execution.md:53
+#: ../../../../../../docs/reference/api/io/execution.md:65
+#: ../../../../../../docs/reference/api/io/execution.md:71
+#: ../../../../../../docs/reference/api/io/execution.md:77
+#: ../../../../../../docs/reference/api/io/execution.md:83
+#: ../../../../../../docs/reference/api/io/execution.md:89
+msgid "Functions"
+msgstr "函数"
+
+#: ../../../../../../docs/reference/api/io/execution.md:35
+msgid "Start one raw observation without enabling or resetting DWT."
+msgstr "开始一次原始观察，不启用或复位 DWT。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:35
+msgid ""
+"Configurable IRQ or unique task executor. Probe failure must never prevent "
+"real I/O dispatch, cancellation, service or retained drain."
+msgstr "可配置 IRQ 或唯一任务执行者。probe 失败绝不可阻止真实 I/O 派发、取消、service 或保留责任的排空。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:0
+msgid "Parameters"
+msgstr "参数"
+
+#: ../../../../../../docs/reference/api/io/execution.md:35
+msgid "[inout] Live, exclusive zero/previously completed sidecar."
+msgstr "[inout] 存活且独占、为零或先前已完成的 sidecar。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:35
+msgid "[inout] Zero/inactive token distinct from the complete probe."
+msgstr "[inout] 为零或非活动的 token，必须与完整 probe 不重叠。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:0
+msgid "Returns"
+msgstr "返回值"
+
+#: ../../../../../../docs/reference/api/io/execution.md:35
+msgid ""
+"SUCCESS even if the counter is unavailable; INVALID/STATE/BUSY rejects "
+"before counter access. Same-probe reentry is counted."
+msgstr "即使计数器不可用仍返回 SUCCESS；INVALID/STATE/BUSY 在访问计数器前拒绝。统计同一 probe 的重入。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:35
+msgid "Finish the exact token, publish raw facts and remove its reference."
+msgstr "结束对应令牌，发布原始事实并移除其引用。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:35
+msgid "No elapsed or budget validity is inferred from two counter values."
+msgstr "不得仅从两个计数器值推导有效的 elapsed 或预算结论。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:35
+msgid "[inout] Same stable sidecar supplied to begin."
+msgstr "[inout] 与 begin 使用的同一个稳定 sidecar。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:35
+msgid "[inout] Exact still-active token; not concurrently modified."
+msgstr "[inout] 精确且仍活动的 token；不得并发修改。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:35
+msgid "SUCCESS, INVALID or STATE with another/inactive token."
+msgstr "返回 SUCCESS 或 INVALID；使用其他或非活动 token 时返回 STATE。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:35
+msgid "Copy bounded IRQ statistics under saved local interrupt exclusion."
+msgstr "保存并恢复本地中断排除状态，在保护期间复制有界 IRQ 统计。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:35
+msgid ""
+"Privileged task only. Incoming masks are restored. For a task service "
+"producer, use its same executor or join it before sampling; IRQ masks do not"
+" join a different preempted task. This is not SMP exclusion. No provider, "
+"payload, request or counter is accessed under the mask."
+msgstr ""
+"仅限特权任务。恢复进入时的屏蔽状态。对于任务 service 生产者，采样须使用同一执行者，或先等待生产者退出；IRQ "
+"屏蔽不会等待另一个被抢占任务退出。这不是 SMP 排他。屏蔽期间不访问 provider、payload、request 或计数器。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:35
+msgid "[in] Stable same-CPU sidecar and live producer binding."
+msgstr "[in] 稳定、位于同一 CPU 的 sidecar 及存活的生产者绑定。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:35
+msgid "[out] Distinct aligned copied result, unchanged on rejection."
+msgstr "[out] 独立且已对齐的复制结果；拒绝时不变。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:35
+msgid "SUCCESS, INVALID or CONTEXT for ISR/unprivileged callers."
+msgstr "返回 SUCCESS 或 INVALID；ISR 或非特权调用者返回 CONTEXT。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:35
+msgid "Dispatch exactly one word service step with optional raw observation."
+msgstr "仅派发一个字服务步骤，可选记录原始观察。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:35
+msgid ""
+"No additional ops table, worker, request or payload reference. Invalid "
+"observation never prevents dispatch. Caller proves complete private state, "
+"borrowed descriptors and buffers disjoint from observation storage; this API"
+" knows only face/method spans and context identity."
+msgstr ""
+"无额外 ops 表、worker、请求或 payload 引用。无效观察绝不阻止派发。调用方须证明完整私有状态、借用描述符及缓冲区均与观察存储不重叠；此"
+" API 只知道接口或方法范围及 context 标识。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:35
+msgid "[in] Original stable face, methods and unique task executor."
+msgstr "[in] 原有稳定接口、方法及唯一任务执行者。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:35
+msgid "[inout] Optional live sidecar, or NULL to omit observation."
+msgstr "[inout] 可选的存活 sidecar；NULL 表示省略观察。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:35
+msgid "SUCCESS proves dispatch only; INVALID/UNSUPPORTED describes the face."
+msgstr "SUCCESS 仅证明派发；INVALID/UNSUPPORTED 描述接口情况。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:35
+msgid "Dispatch exactly one whole-CS DMA service step with raw observation."
+msgstr "仅派发一个完整 CS 区间的 DMA 服务步骤，并记录原始观察。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:35
+msgid ""
+"Same disjointness/executor rules as the word wrapper. No diagnostic failure "
+"releases a QUARANTINED loan or changes settlement authority."
+msgstr "不重叠及执行者规则与 word wrapper 相同。诊断失败不会释放 QUARANTINED 借用，也不改变结算决定权。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:35
+msgid "[in] Original enhanced controller and its unique task executor."
+msgstr "[in] 原有增强控制器及其唯一任务执行者。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:35
+msgid "[inout] Optional stable disjoint sidecar, or NULL."
+msgstr "[inout] 可选、稳定且不重叠的 sidecar，或 NULL。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:35
+msgid "SUCCESS after dispatch, INVALID or UNSUPPORTED for an invalid face."
+msgstr "派发后返回 SUCCESS；无效接口返回 INVALID 或 UNSUPPORTED。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:35
+msgid "Copied raw counter facts; readable does not mean elapsed is known."
+msgstr "复制的原始计数器事实；可读不表示经过时间已知。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:35
+msgid ""
+"A pair is a modulo-2^32 residue, including preemption and probe cost. "
+"Neither wrap count, reset, rate nor epoch continuity is established. "
+"elapsed_known is always false. No field establishes a passed budget, IRQ "
+"arrival latency, exclusive CPU time or a physical WCET bound. attempts "
+"includes a currently active attempt; other totals describe completed "
+"attempts. Totals saturate rather than wrap."
+msgstr ""
+"一对值是模 2^32 的余数，包含抢占及 probe 开销。不建立回绕次数、复位、频率或 epoch 连续性。elapsed_known 始终为 "
+"false。没有任何字段证明预算已满足、IRQ 到达延迟、独占 CPU 时间或物理 WCET 上界。attempts "
+"包含当前活动尝试；其他总计描述已完成尝试。总计采用饱和而非回绕。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:35
+#: ../../../../../../docs/reference/api/io/execution.md:41
+#: ../../../../../../docs/reference/api/io/execution.md:47
+#: ../../../../../../docs/reference/api/io/execution.md:53
+#: ../../../../../../docs/reference/api/io/execution.md:65
+#: ../../../../../../docs/reference/api/io/execution.md:71
+#: ../../../../../../docs/reference/api/io/execution.md:77
+#: ../../../../../../docs/reference/api/io/execution.md:83
+#: ../../../../../../docs/reference/api/io/execution.md:89
+#: ../../../../../../docs/reference/api/io/execution.md:95
+msgid "Public Members"
+msgstr "公共成员"
+
+#: ../../../../../../docs/reference/api/io/execution.md:35
+msgid "Optional zero-initialized sidecar; no default provider state grows."
+msgstr "可选的零初始化附属状态；默认提供者状态不增加。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:35
+msgid ""
+"One physical vector or one unique task executor writes each sidecar. "
+"Different nested vectors require distinct sidecars. NMI, HardFault, other "
+"cores and other security states must not access this storage. Reset/reclaim "
+"only after all producers, tokens and readers have joined."
+msgstr ""
+"每个 sidecar 由一个物理向量或一个唯一任务执行者写入。不同嵌套向量必须使用不同 "
+"sidecar。NMI、HardFault、其他核及其他安全状态不得访问此存储。只有全部生产者、token 和读者退出后，才能复位或回收。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:35
+msgid "Zero-initialized stack token; do not copy or rebind while active."
+msgstr "零初始化栈令牌；活动期间不得复制或重新绑定。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:39
+msgid "diagnostic.h"
+msgstr "diagnostic.h"
+
+#: ../../../../../../docs/reference/api/io/execution.md:41
+msgid "Explicit copied facts explain pending I/O without recovery."
+msgstr "显式复制事实解释待处理 I/O，不执行恢复。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:41
+msgid "Classify supplied observations without touching live I/O."
+msgstr "分类给定观察，不访问实际 I/O。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:41
+msgid ""
+"Task/IRQ bounded fixed work, no MMIO, locks, allocation, service or "
+"recovery. Deadline and quarantine never revoke an accepted borrow. Callers "
+"must still drain controls and join observers before storage reuse."
+msgstr ""
+"任务／IRQ 中执行固定有界工作，不访问 MMIO、不加锁、不分配、不执行 service 或恢复。deadline 与 quarantine "
+"从不撤销已接受的借用。重用存储前，调用者仍必须排空控制路径并 join observer。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:41
+msgid "[in] Stable aligned copies; no pointer is retained."
+msgstr "[in] 稳定且对齐的副本；不保留指针。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:41
+msgid "[out] Aligned output distinct from every input span."
+msgstr "[out] 已对齐输出，与全部输入区间分离。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:41
+msgid ""
+"SUCCESS, INVALID for malformed facts/alias, STATE for reversed service time."
+" Rejection leaves output unchanged."
+msgstr "返回 SUCCESS；事实格式错误或发生别名时返回 INVALID；service 时间倒退时返回 STATE。拒绝保持输出不变。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:41
+msgid "Optional stable reason key for exactly one finding bit."
+msgstr "可选的稳定原因 key，仅接受一个 finding 位。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:41
+msgid "Task/IRQ constant work, no formatting or allocation."
+msgstr "任务／IRQ 中执行固定工作量，不格式化或分配。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:41
+msgid "[in] One NX_IO_DIAG flag, never a combined mask."
+msgstr "[in] 一个 NX_IO_DIAG 标志，不能是组合掩码。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:41
+msgid "Immutable static text, or NULL for zero/unknown/many bits."
+msgstr "返回不可变静态文本；零、未知位或多个位返回 NULL。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:41
+msgid "Stable caller copies, with independently known fact groups."
+msgstr "稳定的调用者副本，各事实组独立声明已知。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:41
+msgid ""
+"request/stream may be NULL; their presence establishes the corresponding "
+"group. known accepts only LIFECYCLE, OWNER, SERVICE and OBSERVERS. Zero-"
+"initialized unknown values never establish readiness, health or a missed "
+"service. OWNER fields may come from an owner observer only when its "
+"diagnostic_result succeeded. They describe admission and pending work, not "
+"the cause of a BUSY service result. SERVICE timestamps use the same "
+"monotonic domain; both are finite and maximum_service_gap_us is a finite "
+"positive declared budget. This helper reads no clock itself. Copies remain "
+"stable throughout this call. Observations need not be simultaneous across "
+"devices."
+msgstr ""
+"request／stream 可以为 NULL；存在时对应事实组即已知。known 仅接受 LIFECYCLE、OWNER、SERVICE 和 "
+"OBSERVERS。置零的未知值不能建立 ready、健康或漏调 service 的事实。OWNER 字段只有在 owner observer 的 "
+"diagnostic_result 成功时才能来自该观察；它们描述准入与待处理工作，不解释 service 返回 BUSY 的原因。SERVICE "
+"时间戳使用同一单调时钟域，两者均为有限值，maximum_service_gap_us "
+"是声明的有限正预算。该函数不自行读取时钟。副本在本次调用期间保持稳定；不同设备的观察不必同时发生。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:41
+msgid "Independent findings and unavailable fact groups."
+msgstr "独立 finding 与不可用事实组。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:41
+msgid ""
+"Zero findings is not a health certificate. SETTLED does not establish "
+"successful I/O or joined observers. Outstanding stream blocks include "
+"producer, ready and consumer loans; cursor busy describes only the ordinary "
+"stream cursor. Loss is pending stream metadata in this snapshot, not a "
+"cumulative total; publication moves it into a later block."
+msgstr ""
+"零 finding 不是健康证明。SETTLED 不建立 I/O 成功或 observer 已 join 的事实。未结清 stream "
+"块包含生产者、ready 和消费者借用；cursor busy 仅描述普通 stream cursor。Loss 是此快照尚未发布的 stream "
+"元数据，不是累计总数；发布会把它转移到之后的块中。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:45
+msgid "dma.h"
+msgstr "dma.h"
+
+#: ../../../../../../docs/reference/api/io/execution.md:47
+msgid "Explicit DMA memory domains, physical streams and drain facts."
+msgstr "显式 DMA 内存域、物理流与排空事实。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:47
+#: ../../../../../../docs/reference/api/io/execution.md:53
+#: ../../../../../../docs/reference/api/io/execution.md:65
+#: ../../../../../../docs/reference/api/io/execution.md:71
+#: ../../../../../../docs/reference/api/io/execution.md:89
+#: ../../../../../../docs/reference/api/io/execution.md:95
+msgid "Enums"
+msgstr "枚举"
+
+#: ../../../../../../docs/reference/api/io/execution.md:47
+msgid "Transfer direction determines device access to caller memory."
+msgstr "传输方向决定设备对调用者内存的访问。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:47
+#: ../../../../../../docs/reference/api/io/execution.md:53
+#: ../../../../../../docs/reference/api/io/execution.md:65
+#: ../../../../../../docs/reference/api/io/execution.md:71
+#: ../../../../../../docs/reference/api/io/execution.md:89
+#: ../../../../../../docs/reference/api/io/execution.md:95
+msgid "Values:"
+msgstr "取值："
+
+#: ../../../../../../docs/reference/api/io/execution.md:47
+msgid "Validate an entire buffer within one explicit memory domain."
+msgstr "验证整个缓冲区位于一个显式内存域内。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:47
+msgid "Bounded task/IRQ check, no MMIO, allocation or side effects."
+msgstr "任务或 IRQ 中的有界检查，无 MMIO、分配或副作用。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:47
+msgid "[in] Immutable SoC domains kept alive for this call."
+msgstr "[in] 不可变的 SoC 域，在此调用期间保持存活。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:47
+msgid "[in] Positive number of domains."
+msgstr "[in] 正的域数量。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:47
+msgid "[in] Nonempty caller buffer; never borrowed by this helper."
+msgstr "[in] 调用方的非空缓冲区；此 helper 绝不借用它。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:47
+msgid "[in] Positive byte length, including all DMA accesses."
+msgstr "[in] 正字节长度，包含所有 DMA 访问。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:47
+msgid "[in] Nonzero power-of-two transfer alignment."
+msgstr "[in] 非零且为 2 的幂的传输对齐。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:47
+msgid "[in] Device reads or writes the supplied memory."
+msgstr "[in] 设备读取或写入所提供的内存。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:47
+msgid ""
+"Success, INVALID for malformed ranges/alignment or PERMISSION for a range "
+"outside the required DMA domain."
+msgstr "成功；范围或对齐格式错误返回 INVALID；范围不在所需 DMA 域内返回 PERMISSION。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:47
+msgid "Check an explicit owned reservation and its DMA payload."
+msgstr "检查显式拥有的 reservation 及其 DMA payload。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:47
+msgid ""
+"Bounded task/IRQ validation, no allocation/cache operation. Callers "
+"exclusively own all lines and padding until drain and acquire-observed "
+"SETTLED. This validates geometry only; it cannot prove ownership or replace "
+"provider admission, actual cache geometry, mode-specific length checks or "
+"cache maintenance. Cancellation never releases that obligation."
+msgstr ""
+"任务／IRQ 中进行有界验证，不分配或操作 cache。调用者独占全部 cache line 和填充区域，直到排空并 acquire 观察到 "
+"SETTLED。此处仅验证几何，不能证明所有权，也不能替代 provider 准入、真实 cache 几何、模式长度检查或 cache "
+"维护。取消不解除该义务。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:47
+msgid "[in] Immutable reviewed SoC DMA domains, not retained."
+msgstr "[in] 不可变且已复核的 SoC DMA 域，不保留。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:47
+msgid "[in] Positive domain count."
+msgstr "[in] 正的域数量。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:47
+msgid "[in] Caller-owned reservation, distinct from live loans."
+msgstr "[in] 调用者拥有的 reservation，与实际存活的借用区间分离。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:47
+msgid "[in] Whole reservation bytes, including owned padding."
+msgstr "[in] 完整 reservation 字节数，包含自有填充区域。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:47
+msgid "[in] Positive payload size, at most capacity."
+msgstr "[in] 正的 payload 长度，不超过 capacity。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:47
+msgid ""
+"[in] Zero for no cache constraint, otherwise a reviewed power-of-two line "
+"size; address and capacity must be exact multiples. The helper never rounds "
+"ranges."
+msgstr ""
+"[in] 零表示无 cache 约束；否则为已复核、二次幂的 cache line 大小，地址和 capacity "
+"必须是其整数倍。辅助函数从不对区间取整。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:47
+msgid "[in] Device access permission for the whole storage."
+msgstr "[in] 完整存储的设备访问权限。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:47
+msgid "SUCCESS, INVALID or PERMISSION; no memory access or borrow."
+msgstr "返回 SUCCESS、INVALID 或 PERMISSION；不访问或借用内存。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:47
+msgid "Reject duplicate physical streams in an assembled resource set."
+msgstr "拒绝装配资源集合中重复的物理流。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:47
+msgid ""
+"Cold conflict check; the selected SoC must validate all identities against "
+"its actual topology before using them. This helper does not infer silicon "
+"support or allocate."
+msgstr "冷态冲突检查；选中 SoC 在使用前必须依据真实拓扑验证全部标识。此 helper 不推断芯片支持，也不分配。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:47
+msgid "[in] Immutable resource list, not retained."
+msgstr "[in] 不可变资源列表，不保留引用。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:47
+msgid "[in] Resource count; zero allows a NULL list."
+msgstr "[in] 资源数量；为零时允许 NULL 列表。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:47
+msgid ""
+"Success, INVALID for a NULL nonempty list or reserved zero controller, BUSY "
+"for a duplicate physical engine."
+msgstr "成功；非空列表为 NULL 或使用保留的零控制器时返回 INVALID；物理引擎重复时返回 BUSY。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:47
+msgid "Require engine, IRQ and peripheral drain independently."
+msgstr "分别要求 DMA 引擎、IRQ 与外设排空。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:47
+msgid ""
+"The provider must observe actual registers and ordering before setting these"
+" facts. This helper does not stop hardware."
+msgstr "provider 必须先观察实际寄存器及顺序，才能设置这些事实。此 helper 不会停止硬件。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:47
+msgid "[in] Provider observations; not retained."
+msgstr "[in] provider 的观察结果；不保留引用。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:47
+msgid ""
+"Success only when all sources are detached and idle, BUSY while any source "
+"remains, INVALID for impossible counters."
+msgstr "仅在全部源已分离且空闲时成功；任何源仍存在时返回 BUSY；不可能的计数器值返回 INVALID。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:47
+msgid "Reviewed DMA-visible memory interval, never CPU accessibility."
+msgstr "已审查的 DMA 可见内存区间，不等同于 CPU 可访问性。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:47
+msgid ""
+"begin plus size must not wrap. Cache maintenance remains a provider "
+"responsibility on cached architectures."
+msgstr "begin 加 size 不得回绕。在带缓存的架构上，缓存维护仍是 provider 的责任。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:47
+msgid "Opaque physical engine and request selector identities."
+msgstr "不透明物理引擎与请求选择器身份。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:47
+msgid ""
+"Controller zero is reserved as invalid. Other values have provider-defined "
+"meanings; the SoC validates its topology. Two selectors on the same "
+"controller/stream conflict."
+msgstr ""
+"控制器零保留为无效值。其他值的含义由 provider 定义；SoC 验证自身拓扑。同一 controller/stream 上的两个 selector"
+" 相互冲突。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:47
+msgid "Independent facts required before memory borrow release."
+msgstr "释放内存借用前必须独立满足的事实。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:47
+msgid ""
+"remaining describes DMA memory transfers, not wire bytes. A zero counter "
+"never establishes peripheral_idle."
+msgstr "remaining 描述 DMA 内存传输，不是线上字节。计数器为零绝不证明 peripheral_idle。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:51
+msgid "frame_stream.h"
+msgstr "frame_stream.h"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid "Complete framed blocks and strided DMA consumer loans."
+msgstr "完整 framed block 与带 stride 的 DMA consumer 借用。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+#: ../../../../../../docs/reference/api/io/execution.md:59
+msgid "Typedefs"
+msgstr "类型定义"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid "Immutable consumer block retained through final DMA access."
+msgstr "不可变 consumer block 保留到最后一次 DMA 访问。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid ""
+"Zero-initialize before first acquisition. Keep this exact control live and "
+"exclusively owned until release; copied tokens never authorize earlier reuse"
+" or another instance."
+msgstr "首次取得前置零初始化。本精确控制对象须持续有效并被独占，直到 release；复制的 token 从不授权提前复用或用于其他实例。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid "Memory representations; these values never configure a wire."
+msgstr "存储表示；这些值从不配置线路。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid "Serial framing whose complete units determine block geometry."
+msgstr "以完整单元确定 block geometry 的串行帧格式。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid "Position of useful sample bits in each stored slot container."
+msgstr "每个已存储 slot 容器中有效 sample 位的位置。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid "Compute complete audio storage without touching payload."
+msgstr "计算完整音频存储，不访问 payload。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid ""
+"Task/IRQ bounded pure calculation. No format conversion, serializer "
+"configuration or codec negotiation is performed."
+msgstr "任务／IRQ 中的有界纯计算。不进行格式转换、串行器配置或 codec 协商。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid "[in] Explicit framing, sample and stored slot geometry."
+msgstr "[in] 显式 framing、sample 与已存储 slot geometry。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid "[out] Separate fresh output, unchanged on rejection."
+msgstr "[out] 独立的新输出；拒绝时保持不变。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid ""
+"SUCCESS, INVALID for incompatible framing or EXHAUSTED on arithmetic "
+"overflow; never retains an input or allocates."
+msgstr "SUCCESS；不兼容 framing 返回 INVALID，算术溢出返回 EXHAUSTED；从不保留输入或分配存储。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid "Check and copy planar/strided frame geometry."
+msgstr "检查并复制平面／stride frame geometry。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid ""
+"Bounded pure calculation. Pixel/color meanings remain with the selected "
+"camera/display/DMA adapter."
+msgstr "有界纯计算。Pixel／color 的含义由所选 camera／display／DMA adapter 定义。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid "[in] 1..NX_FRAME_MAX_PLANES immutable plane descriptions."
+msgstr "[in] 1..NX_FRAME_MAX_PLANES 个不可变 plane 描述。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid "[in] Exact plane count, not a runtime pool maximum."
+msgstr "[in] 精确 plane 数，不是运行期 pool 上限。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid "[out] Fresh output, unchanged on every rejection."
+msgstr "[out] 新输出；所有拒绝都保持不变。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid ""
+"SUCCESS, INVALID for empty/overlapping/short-stride planes, or EXHAUSTED on "
+"byte arithmetic overflow."
+msgstr "SUCCESS；空 plane、重叠或 stride 太短返回 INVALID，字节算术溢出返回 EXHAUSTED。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid "Cold-bind a complete-frame layout to an existing queue."
+msgstr "将完整 frame 布局冷态绑定到既有队列。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid ""
+"Task-only cold assembly, O(n squared) storage checks. No hardware or DMA-"
+"domain admission is inferred. Keep all queue/control/payload storage live "
+"through final stop."
+msgstr ""
+"仅任务上下文的冷态装配，以 O(n²) 检查存储。不据此推断硬件或 DMA 域准入。全部 queue／control／payload "
+"存储须持续有效，直到最终 stop。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid "[out] Fresh control disjoint from queue and payloads."
+msgstr "[out] 与 queue 和 payload 分离的新控制对象。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid "[inout] Initialized unborrowed queue with all slots free."
+msgstr "[inout] 已初始化、未被借用且全部 slot 空闲的 queue。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid "[in] Checked complete-frame geometry, copied on success."
+msgstr "[in] 已检查的完整 frame geometry，成功时复制。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid ""
+"SUCCESS, INVALID for aliases/short buffers/bad layout, BUSY for outstanding "
+"blocks or STATE while stopping."
+msgstr "SUCCESS；重叠、缓冲区短或布局错误返回 INVALID；未结束的 block 返回 BUSY，正在 stop 返回 STATE。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid "Publish one complete frame after final producer access."
+msgstr "在 producer 最终访问之后发布一个完整 frame。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid ""
+"Bounded task/IRQ metadata. Reserve/prepost/abort still use the existing "
+"stream; publication always has exact frame size."
+msgstr ""
+"任务／IRQ 中的有界 metadata 操作。Reserve／prepost／abort 仍使用既有 stream；发布始终具有精确 frame "
+"大小。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid "[inout] Exclusive serialized producer binding."
+msgstr "[inout] 独占串行化 producer binding。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid "[in] Existing stream producer loan, detached from all DMA."
+msgstr "[in] 既有 stream producer 借用，已从所有 DMA 分离。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid "[in] Existing observed stream boundary flags."
+msgstr "[in] 已观察到的既有 stream 边界 flags。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid "Existing stream result; rejection retains the fill loan."
+msgstr "既有 stream 结果；拒绝保留 fill 借用。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid "Publish one complete frame from the existing posted FIFO."
+msgstr "从既有 posted FIFO 发布一个完整 frame。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid "Bounded task/IRQ metadata; preserves pending and FIFO counts."
+msgstr "任务／IRQ 中的有界 metadata 操作；保留 pending 与 FIFO 计数。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid "[inout] Same producer binding and complete-frame layout."
+msgstr "[inout] 同一 producer binding 和完整 frame 布局。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid "[inout] Existing posted producer bound to this stream."
+msgstr "[inout] 已绑定此 stream 的既有 posted producer。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid "[in] Oldest pending loan, absent from all hardware targets."
+msgstr "[in] 最旧的 pending 借用，已不在任何硬件 target 中。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid "[in] Observed existing stream boundary flags."
+msgstr "[in] 已观察到的既有 stream 边界 flags。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid "Existing posted-publication result, INVALID for foreign pool."
+msgstr "既有 posted 发布结果；外部 pool 返回 INVALID。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid "Acquire the next complete immutable DMA consumer loan."
+msgstr "取得下一个完整且不可变的 DMA consumer 借用。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid ""
+"Task/IRQ; output disjointness scans the fixed pool in O(n) before the O(1) "
+"guarded queue operation. Output cannot alias queue controls or any full-"
+"capacity pool payload. EMPTY creates no loan and never repeats a previous "
+"frame. Caller owns silence/blanking/stop policy. Do not use retries as "
+"additional observed boundaries."
+msgstr ""
+"任务／IRQ 上下文；先以 O(n) 扫描固定 pool 检查输出是否分离，再执行有保护的 O(1) queue 操作。输出不能与 queue "
+"control 或任何 pool payload 的完整容量范围重叠。EMPTY 不建立借用，也从不重复上一 "
+"frame。调用者负责静音／blanking／stop 策略。不能把重试当作额外观察到的边界。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid ""
+"[inout] Same serialized consumer, one call per observed output boundary when"
+" using underrun accounting."
+msgstr "[inout] 同一串行化 consumer；使用 underrun 计数时，每个观察到的输出边界调用一次。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid "[inout] Zero or previously released control, unchanged on error."
+msgstr "[inout] 置零或已 release 的控制对象；错误时保持不变。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid ""
+"SUCCESS, EMPTY with saturating underrun count, BUSY for a live loan, INVALID"
+" for output alias or STATE for an incomplete queued block."
+msgstr ""
+"SUCCESS；EMPTY 同时饱和累计 underrun；活跃借用返回 BUSY，输出重叠返回 INVALID，队列 block 不完整返回 "
+"STATE。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid "Derive a strided byte rectangle from a live frame loan."
+msgstr "从活跃 frame 借用派生带 stride 的字节矩形。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid ""
+"Task/IRQ; an O(n) immutable-pool output check precedes the O(1) guarded view"
+" calculation. Output cannot alias the loan, queue controls or any full-"
+"capacity pool payload. The adapter checks pixel alignment, resource and DMA "
+"domain."
+msgstr ""
+"任务／IRQ 上下文；先以 O(n) 在不可变 pool 中检查输出，再执行有保护的 O(1) view 计算。输出不能与借用、queue "
+"control 或任何 pool payload 的完整容量范围重叠。Adapter 检查 pixel 对齐、资源及 DMA 域。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid "[in] Exact live immutable DMA consumer loan."
+msgstr "[in] 精确、活跃且不可变的 DMA consumer 借用。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid "[in] Plane index in the bound layout."
+msgstr "[in] 已绑定布局中的 plane 索引。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid "[in] Byte column within a row, not a pixel count."
+msgstr "[in] 行内字节列，不是 pixel 数。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid "[in] First complete row."
+msgstr "[in] 第一个完整行。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid "[in] Positive bytes per selected row."
+msgstr "[in] 每个所选行的正字节数。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid "[in] Positive selected row count."
+msgstr "[in] 正的所选行数。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid "[out] Fresh output unchanged on failure."
+msgstr "[out] 新输出；失败时保持不变。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid ""
+"SUCCESS, INVALID for out-of-plane rectangles or STATE for stale/foreign "
+"loans; no DMA access begins here."
+msgstr "SUCCESS；越出 plane 的矩形返回 INVALID，过期／外部借用返回 STATE；这里不启动 DMA 访问。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid "Release only after the adapter proves final DMA access."
+msgstr "只有 adapter 证明最终 DMA 访问后才能 release。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid ""
+"Bounded task/IRQ metadata. Timeout/cancel is not quiescence; failed drain "
+"retains the queue borrow, including during stop. This helper checks proof "
+"facts and does not stop hardware."
+msgstr ""
+"任务／IRQ 中的有界 metadata 操作。超时／取消不证明静止；排空失败保留 queue 借用，stop 期间也一样。此 helper "
+"检查证明事实，不停止硬件。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid "[inout] Original owner; another instance cannot release."
+msgstr "[inout] 原所有者；其他实例不能 release。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid "[inout] Exact acquired control, cleared only on success."
+msgstr "[inout] 精确的已取得控制对象；仅成功时清除。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid ""
+"[in] Actual provider observations of engine, IRQ and peripheral quiescence; "
+"counter completion alone is not proof."
+msgstr "[in] Provider 对 engine、IRQ 和外设静止的真实观察；单独的计数器完成不是证明。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid ""
+"SUCCESS, BUSY while any source remains, STATE for stale or foreign tokens, "
+"or INVALID for impossible drain counters."
+msgstr "SUCCESS；仍有来源时为 BUSY；过期或外部 token 为 STATE，不可能的 drain 计数为 INVALID。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid "Immutable audio memory format, independent of codec policy."
+msgstr "不可变音频存储格式，独立于 codec 策略。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid ""
+"slots counts wire slots; slot_bits is the stored container width. I2S stores"
+" both 16/32-bit slots even when only one is active. SAI has 1..32 wire slots"
+" and stores only enabled active_slots samples in ascending slot order, in "
+"8/16/32-bit containers. PDM has 1..8 byte-interleaved lanes; each byte holds"
+" eight successive bits of one lane, so frames must divide by eight. PDM "
+"active_slots selects valid lanes without compacting storage. Sample byte "
+"order is explicitly declared."
+msgstr ""
+"slots 计算 wire slots，slot_bits 是存储容器宽度。I2S 即使只有一个 slot 有效也存储两个 16/32-bit "
+"slot。SAI 有 1..32 个 wire slots，只按递增 slot 顺序将已启用 active_slots 样本存入 8/16/32-bit"
+" 容器。PDM 有 1..8 条字节交错 lane；每字节包含一条 lane 的连续八个位，因此 frames 必须能被八整除。PDM "
+"active_slots 选择有效 lane，但不压缩存储。样本字节序显式声明。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid "One plane; the last row needs no trailing stride padding."
+msgstr "一个 plane；最后一行不需要尾部 stride padding。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid ""
+"row_bytes/stride are bytes, rows is a complete line count. A plane occupies "
+"(rows - 1) * stride + row_bytes bytes."
+msgstr ""
+"row_bytes／stride 以字节计，rows 是完整行数。一个 plane 占用 (rows - 1) * stride + row_bytes"
+" 字节。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid "Immutable frame geometry copied into a bound stream."
+msgstr "复制进已绑定 stream 的不可变 frame geometry。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid ""
+"Plane intervals, including inter-row padding, cannot overlap. bytes is the "
+"exact maximum plane end, not summed row bytes. Audio formats are separate "
+"immutable caller metadata; this layout represents their checked complete-"
+"unit storage."
+msgstr ""
+"Plane 区间含行间 padding，不能重叠。bytes 是精确的最大 plane 末端，不是各行字节数之和。Audio format "
+"是独立且不可变的调用者 metadata；此布局表示经检查的完整单元存储。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid "Caller-owned binding; the existing stream owns every queue."
+msgstr "调用者持有的 binding；既有 stream 拥有每个 queue。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid ""
+"Initialize before publication. One serialized producer and consumer use "
+"framed publish/acquire exclusively until stop. Hardware, queue capacity and "
+"synchronization remain explicit."
+msgstr ""
+"发布前初始化。一个串行化 producer 和 consumer 仅使用 framed publish／acquire，直到 stop。硬件、queue"
+" 容量和同步均须显式提供。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:53
+msgid "Checked 2D byte rectangle for an explicit DMA adapter."
+msgstr "供显式 DMA adapter 使用的已检查 2D 字节矩形。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:57
+msgid "fwd.h"
+msgstr "fwd.h"
+
+#: ../../../../../../docs/reference/api/io/execution.md:59
+msgid "Lightweight identities for typed I/O faces."
+msgstr "类型化 I/O face 的轻量身份。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:59
+msgid ""
+"Include the matching public header before accessing its layout, operations, "
+"requests or value types. Forward identities neither construct nor acquire "
+"any device."
+msgstr "访问其布局、操作、请求或值类型前，须包含对应公共头文件。前置身份既不构造也不取得任何设备。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:59
+msgid "Opaque identity; complete contracts live in its public header."
+msgstr "不透明身份；完整合同位于其公共头文件。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:63
+msgid "observation.h"
+msgstr "observation.h"
+
+#: ../../../../../../docs/reference/api/io/execution.md:65
+msgid "Explicit timestamp provenance and checked service dispatch."
+msgstr "显式时间戳来源与经过检查的服务派发。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:65
+msgid "Observation location; software time never implies hardware SOF."
+msgstr "观察位置；软件时间不表示硬件 SOF。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:65
+msgid "A timing bound can straddle a budget without proving either side."
+msgstr "时序界限可能跨越预算，无法证明满足预算或超出预算。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:65
+msgid "Compare two explicitly related observed events."
+msgstr "比较两个关系已明确的观察事件。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:65
+msgid ""
+"Task/IRQ pure constant work; no clock, hardware, allocation, lock or "
+"reference retention. Inputs may coincide. The caller proves event pairing "
+"and timestamp provenance. Different explicit source kinds may be compared to"
+" observe delivery latency, without relabeling either observation."
+msgstr ""
+"任务/IRQ "
+"中均为纯操作且工作量恒定；不读取时钟、不访问硬件、不分配、不加锁，也不保留引用。输入可以重合。调用方负责证明事件配对及时间戳来源。可以比较不同的显式来源种类以观察交付时延，但不得重新标记任一观察。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:65
+msgid "[in] Stable aligned first fact, not concurrently modified."
+msgstr "[in] 稳定、已对齐且未被并发修改的首个事实。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:65
+msgid "[in] Stable last fact in the same domain, epoch and rate."
+msgstr "[in] 同一时间域、epoch 和速率中稳定的末个事实。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:65
+msgid "[out] Distinct aligned result, unchanged on rejection."
+msgstr "[out] 独立且已对齐的结果，拒绝时保持不变。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:65
+msgid ""
+"SUCCESS, INVALID for malformed/misaligned/overlapping storage, UNSUPPORTED "
+"for UNKNOWN source, STATE for incompatible domains or reversed ticks, "
+"EXHAUSTED for bound overflow."
+msgstr ""
+"SUCCESS；存储参数无效、未对齐或重叠时返回 INVALID；来源为 UNKNOWN 时返回 UNSUPPORTED；时钟域不兼容或 ticks "
+"逆序时返回 STATE；边界溢出时返回 EXHAUSTED。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:65
+msgid "Compare a complete timing-error interval with a budget."
+msgstr "将完整时序误差区间与预算比较。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:65
+msgid ""
+"Pure O(1) Task/IRQ work with no clock access or retention. WITHIN requires "
+"upper <= maximum; EXCEEDED requires lower > maximum. An overlapping or "
+"unknown error interval gives UNKNOWN. SUCCESS alone does not mean within "
+"budget. The existing timestamp-owner/provenance contract applies: this does "
+"not extend raw DWT, validate epoch continuity, synchronize sampling, "
+"establish IRQ arrival or prove WCET."
+msgstr ""
+"纯 O(1) Task／IRQ 操作，不访问时钟、不保留引用。WITHIN 要求 upper <= maximum；EXCEEDED 要求 lower "
+"> maximum。当 lower <= maximum < upper，或误差界未知时，结果为 UNKNOWN。SUCCESS "
+"本身不表示满足预算。既有时间戳 owner／来源合同仍适用：本函数不扩展原始 DWT、不验证 epoch 连续性、不同步采样、不建立 IRQ "
+"到达时刻，也不证明 WCET。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:65
+msgid "[in] Stable aligned extended timestamp, causally paired."
+msgstr "[in] 稳定且对齐的扩展时间戳，须与另一事实构成因果配对。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:65
+msgid "[in] Stable aligned fact in the same domain/epoch/rate."
+msgstr "[in] 同一 domain／epoch／rate 内稳定且对齐的事实。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:65
+msgid "[in] Inclusive maximum, in the stated tick units."
+msgstr "[in] 包含边界的最大值，单位为声明的 tick。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:65
+msgid ""
+"SUCCESS, INVALID/UNSUPPORTED/STATE as elapsed, or EXHAUSTED when the "
+"uncertainty sum or upper bound cannot fit."
+msgstr ""
+"与 elapsed 相同的 SUCCESS、INVALID／UNSUPPORTED／STATE；不确定度之和或上界不可表示时返回 EXHAUSTED。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:65
+msgid "Dispatch the selected UART service or explain its absence."
+msgstr "派发选定的 UART 服务，或说明服务缺失。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:65
+msgid ""
+"Same context, serialization and lifetime rules as ordinary service. SUCCESS "
+"proves dispatch only, not progress, health, settlement or permission to "
+"reclaim storage. This reads no request and adds no state, lock or hidden "
+"worker."
+msgstr ""
+"与普通 service 采用相同的上下文、串行化和生命周期规则。SUCCESS "
+"仅证明已派发，不证明进展、健康、结清或允许回收存储。不读取请求，不增加状态、锁或隐藏 worker。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:65
+msgid "[in] Live immutable face and initialized provider state."
+msgstr "[in] 仍然有效的不可变接口及已初始化的 provider 状态。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:65
+msgid ""
+"SUCCESS after one dispatch, INVALID for malformed face, UNSUPPORTED when no "
+"service method exists."
+msgstr "一次派发后返回 SUCCESS；接口格式无效返回 INVALID，没有 service 方法返回 UNSUPPORTED。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:65
+msgid "Dispatch the selected SPI service or explain its absence."
+msgstr "派发选定的 SPI 服务，或说明服务缺失。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:65
+msgid ""
+"Same context and owner rules as nx_spi_port_service; SUCCESS establishes "
+"dispatch only, never settlement."
+msgstr "与 nx_spi_port_service 采用相同的上下文和所有者规则；SUCCESS 仅证明已派发，绝不代表结清。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:65
+msgid "SUCCESS after dispatch, INVALID or UNSUPPORTED."
+msgstr "派发后返回 SUCCESS，或返回 INVALID/UNSUPPORTED。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:65
+msgid "Dispatch the selected I2C service or explain its absence."
+msgstr "派发选定的 I2C 服务，或说明服务缺失。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:65
+msgid ""
+"Same context and owner rules as nx_i2c_port_service; SUCCESS establishes "
+"dispatch only, never settlement."
+msgstr "与 nx_i2c_port_service 采用相同的上下文和所有者规则；SUCCESS 仅证明已派发，绝不代表结清。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:65
+msgid "Explicit, caller-supplied time fact without clock access."
+msgstr "由调用者明确提供的时间事实，不访问时钟。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:65
+msgid ""
+"ticks is extended, monotonically increasing within one nonzero domain/epoch."
+" Its owner extends counter wrap and changes epoch on reset, discontinuity or"
+" rate change. Domain and epoch are assembly-local identities, not clocks "
+"synchronized across cores, security domains or devices. UNKNOWN carries no "
+"usable measurement. Frequency is exact stated ticks/second, not measured "
+"accuracy. A known zero uncertainty states zero error; unknown uncertainty "
+"has a separate flag. These facts do not establish physical precision, causal"
+" pairing or event identity by themselves."
+msgstr ""
+"ticks 是扩展计数，在一个非零 domain/epoch 中单调递增。其所有者扩展计数器回绕，并在复位、不连续或速率变化时改变 "
+"epoch。domain 和 epoch 是装配内身份，不表示跨核、安全域或设备同步的时钟。UNKNOWN 不提供可用测量。频率是精确声明的 "
+"ticks/second，而非实测精度。已知且为零的不确定度表示零误差；未知不确定度使用独立标志。这些事实本身不能建立物理精度、因果配对或事件身份。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:65
+msgid "Delta in one common clock domain, with stated error bound."
+msgstr "同一时钟域内的差值，带明确的误差界。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:65
+msgid ""
+"When uncertainty_known is false, uncertainty_ticks is zero and describes no "
+"error bound. No conversion, rounding or synchronization across clocks is "
+"implicit."
+msgstr ""
+"uncertainty_known 为 false 时，uncertainty_ticks 为零，不描述任何误差界限。不隐含时间转换、舍入或跨时钟同步。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:65
+msgid "Inclusive interval and budget comparison in the stated tick domain."
+msgstr "在声明的 tick 域内比较包含边界的区间与预算。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:65
+msgid ""
+"lower/upper are usable only when delta.uncertainty_known is true. Otherwise "
+"both are zero and verdict is UNKNOWN, never an exact zero."
+msgstr ""
+"仅当 delta.uncertainty_known 为 true 时 lower／upper 才可使用。否则两者均为零，verdict 为 "
+"UNKNOWN，绝不表示精确的零。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:69
+msgid "stream.h"
+msgstr "stream.h"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "Bounded caller-owned blocks with explicit producer/consumer loans."
+msgstr "调用者拥有的有界块与显式生产者／消费者借用。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "Initialize an unborrowed stream and exact supplied block array."
+msgstr "初始化未借用的 stream 与准确供给的块数组。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid ""
+"Task-only cold assembly. This helper does not validate DMA domains; the "
+"hardware provider must validate every block."
+msgstr "仅限任务上下文的冷装配。本辅助函数不验证 DMA 内存域；硬件 provider 必须验证每个块。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "[out] Fresh storage, not visible to any producer/consumer."
+msgstr "[out] 全新存储，尚未向任何生产者或消费者公开。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "[inout] Buffers distinct from all control and slot metadata."
+msgstr "[inout] 与全部控制及槽元数据分离的缓冲。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "[in] Positive exact block count, not a maximum pool size."
+msgstr "[in] 正数精确块数，不是缓冲池最大数量。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "Success or INVALID; never allocates or retains bad inputs."
+msgstr "成功或 INVALID；不分配，也不保留无效输入。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "Reserve the next free block for one serialized producer."
+msgstr "为一个串行生产者预留下一个空闲块。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid ""
+"Bounded task/IRQ metadata operation; payload writes occur outside the short "
+"interrupt mask, within the returned loan."
+msgstr "任务/IRQ 中的有界元数据操作；载荷写入在短暂中断屏蔽区之外、返回的借用范围内执行。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "[inout] Live initialized stream with one producer."
+msgstr "[inout] 已初始化的活动流，只有一个生产者。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "[out] Producer loan valid until publish or proved abort."
+msgstr "[out] 生产者借用，在 publish 或经证明的 abort 前有效。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid ""
+"Success, OVERFLOW without overwrite, STATE while stopping or EXHAUSTED when "
+"the monotonic loan identity cannot advance."
+msgstr "成功；OVERFLOW 不覆盖数据；停止时返回 STATE；单调借用身份无法递增时返回 EXHAUSTED。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "Query the next physical slot without creating a loan or loss."
+msgstr "查询下一个物理槽，不产生借用或丢失。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid ""
+"Task/IRQ bounded hint. A producer still calls reserve before accessing "
+"payload; another context must not race admission."
+msgstr "任务/IRQ 中的有界提示。生产者仍须先调用 reserve 才能访问载荷；其他上下文不得与准入并发竞争。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "[in] Live initialized stream with one serialized producer."
+msgstr "[in] 已初始化的活动流，只有一个串行化生产者。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "True only when admission is open and the next slot is free."
+msgstr "仅在准入开放且下一个槽空闲时返回 true。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "Latch explicitly observed dropped producer boundaries."
+msgstr "锁存明确观察到的生产者丢弃边界。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid ""
+"Task/IRQ bounded. Saturates at UINT32_MAX; the next published block carries "
+"LOSS independently of its useful payload length."
+msgstr "任务/IRQ 中的有界操作。在 UINT32_MAX 饱和；下一个发布块携带 LOSS，与其有效载荷长度无关。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "[inout] Live stream controlled by the serialized producer."
+msgstr "[inout] 由串行化生产者控制的活动流。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "[in] Positive lost block/boundary count, never guessed bytes."
+msgstr "[in] 丢失块或边界的正数数量，不能猜测字节数。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "Publish a complete block after all hardware writes detached."
+msgstr "全部硬件写引用撤离后，发布完整块。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid ""
+"Task/IRQ bounded. A DMA half/full flag is insufficient if the engine can "
+"still write the published block. Consumer-visible block bytes stay immutable"
+" until the consumer releases them."
+msgstr ""
+"任务/IRQ 中的有界操作。如果引擎仍能写入所发布的块，DMA 半完成/全完成标志就不足以证明可发布。消费者可见的块字节在消费者释放前保持不可变。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "[inout] Same serialized producer as reserve."
+msgstr "[inout] 与 reserve 相同的串行化生产者。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "[in] Current producer loan, not retained after publication."
+msgstr "[in] 当前生产者借用；发布后不再保留该令牌引用。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "[in] Positive produced bytes within the reserved capacity."
+msgstr "[in] 预留容量范围内的正数已生产字节数。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "[in] IDLE/TRIGGER boundaries observed by the provider."
+msgstr "[in] provider 实际观测到的 IDLE/TRIGGER 边界。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "Success, INVALID or STATE; failure retains producer ownership."
+msgstr "成功、INVALID 或 STATE；失败时保留生产者所有权。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "Acquire the next ready block for one serialized consumer."
+msgstr "一个串行消费者取得下一个就绪块。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid ""
+"Task/IRQ bounded metadata; consumer processing happens outside the mask. "
+"Release may occur out of order without overwrite."
+msgstr "任务/IRQ 中的有界元数据操作；消费者在屏蔽区外处理载荷。可乱序释放，且不会覆盖仍被持有的数据。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "[inout] Live stream; consumer may drain during stop."
+msgstr "[inout] 活动流；停止过程中消费者仍可排空。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "[out] Immutable consumer loan with exact incarnation token."
+msgstr "[out] 带精确代次令牌的不可变消费者借用。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "Success, EMPTY or INVALID; empty creates no loan."
+msgstr "成功、EMPTY 或 INVALID；空流不建立借用。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "Release only the matching consumer incarnation after final use."
+msgstr "最终使用之后，仅释放匹配的消费者实例世代。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "Task/IRQ bounded; release is the consumer's final block access."
+msgstr "任务/IRQ 中的有界操作；release 是消费者对该块的最后一次访问。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "[inout] Same consumer owner; no remaining observers of block."
+msgstr "[inout] 同一消费者所有者；不再有该块的剩余观测者。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "[in] Exact acquired token, never a reconstructed pointer."
+msgstr "[in] 精确的已获取令牌，不能重新拼装指针代替。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "Success, STATE for stale/double release or INVALID."
+msgstr "成功；过期或重复释放返回 STATE；也可能返回 INVALID。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "Abort a producer loan only after memory write sources detach."
+msgstr "仅内存写入源撤离之后中止生产者借用。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "Cancellation/deadline alone never establishes quiescence."
+msgstr "仅取消或达到时限不能证明已静止。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "[inout] Same producer owner as reserve."
+msgstr "[inout] 与 reserve 相同的生产者所有者。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "[in] Current exact loan."
+msgstr "[in] 当前的精确借用。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "[in] True only after provider proves DMA/IRQ stopped."
+msgstr "[in] 仅在 provider 证明 DMA/IRQ 已停止后才为 true。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "Success, BUSY without proven drain, STATE for a stale token."
+msgstr "成功；排空未获证明时为 BUSY；令牌过期时为 STATE。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "Close producer admission while retaining every outstanding loan."
+msgstr "关闭生产者准入，保留每一个未结清借用。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid ""
+"Task/IRQ constant metadata work independent of block count. This operation "
+"does not stop hardware or revoke loans."
+msgstr "任务/IRQ 中的常量元数据工作量，与块数无关。本操作不停止硬件，也不撤销借用。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "[inout] Live control kept alive until final successful stop."
+msgstr "[inout] 活动控制对象，须保持有效直到最后一次 stop 成功。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid ""
+"Success only when all blocks are free, BUSY until producers detach and "
+"consumers drain/release, INVALID for bad control."
+msgstr "仅在全部块空闲时成功；生产者引用撤离且消费者排空并释放之前返回 BUSY；控制对象无效时返回 INVALID。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "Bind a posted producer to a quiescent initialized stream."
+msgstr "将预提交生产者绑定到静止、已初始化的 stream。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid ""
+"Task-only cold binding. Caller owns exclusive producer rights and retains "
+"control until all pending fills and IRQs drain."
+msgstr "仅限任务上下文的冷绑定。调用方拥有排他生产者权限，并保留控制对象直到全部待填充操作及 IRQ 排空。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "[out] Separate caller control, not aliased with buffers"
+msgstr "[out] 独立的调用方控制对象，不得与缓冲建立别名"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "[inout] Admission open, no outstanding producer/consumer loans"
+msgstr "[inout] 准入已开放，且无未归还的生产者或消费者借用"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "SUCCESS, INVALID, BUSY or STATE; rejected output is untouched"
+msgstr "SUCCESS、INVALID、BUSY 或 STATE；拒绝时输出不变"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "Query the next preposted slot without a loan or guessed loss."
+msgstr "查询下一个预提交槽，不产生借用或猜测丢失。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "Bounded task/IRQ hint; still reserve before writing payload."
+msgstr "任务/IRQ 中的有界提示；写入载荷前仍须 reserve。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "[in] Same exclusive serialized producer"
+msgstr "[in] 同一排他且串行化的生产者"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "True when the next reservation can succeed"
+msgstr "下次预留可以成功时返回 true"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "Reserve a future fill without making earlier blocks ready."
+msgstr "预留未来填充，不提前使更早的块就绪。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid ""
+"O(1) task/IRQ. Failure leaves output and loss counters intact; only "
+"explicitly observed boundaries justify note_loss."
+msgstr "任务/IRQ 中为 O(1)。失败时输出和丢失计数不变；仅显式观测到边界后才可调用 note_loss。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "[inout] Live posted producer"
+msgstr "[inout] 活动的预提交生产者"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "[out] Exact pending loan until FIFO publish or LIFO abort"
+msgstr "[out] 精确的待完成借用，在 FIFO 发布或 LIFO 中止前有效"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "SUCCESS, OVERFLOW, STATE, EXHAUSTED or INVALID"
+msgstr "SUCCESS、OVERFLOW、STATE、EXHAUSTED 或 INVALID"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "Publish only the oldest pending detached producer loan."
+msgstr "仅发布最早 pending 且已撤离引用的生产者借用。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "O(1) task/IRQ. Consumer acquire/release use the original stream."
+msgstr "任务/IRQ 中为 O(1)。消费者通过原有流执行 acquire/release。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "[inout] Same exclusive producer as reserve"
+msgstr "[inout] 与 reserve 相同的排他生产者"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "[in] Exact oldest token, absent from every hardware target"
+msgstr "[in] 精确的最旧令牌，已从全部硬件目标中撤离"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "[in] Positive valid bytes at most the block capacity"
+msgstr "[in] 正数有效字节数，最多为块容量"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "[in] Observed IDLE/TRIGGER/ERROR boundary facts"
+msgstr "[in] 实际观测到的 IDLE/TRIGGER/ERROR 边界事实"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "SUCCESS, INVALID or STATE; rejection retains the loan"
+msgstr "SUCCESS、INVALID 或 STATE；拒绝时保留借用"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "Cancel the newest pending fill after proof of memory drain."
+msgstr "证明内存排空后，取消最新 pending 填充。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid ""
+"O(1) task/IRQ. Does not advance consumer or published cursor; no FREE hole "
+"appears ahead of future publication. Stopping closes admission but still "
+"permits proved tail rollback."
+msgstr ""
+"任务/IRQ 中为 O(1)。不推进消费者或已发布游标，不会在后续发布位置前产生 FREE 空洞。停止会关闭准入，但仍允许经证明的尾部回滚。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "[inout] Same producer; rollback is strictly LIFO"
+msgstr "[inout] 同一生产者；回滚严格遵循 LIFO"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "[in] Exact newest pending token"
+msgstr "[in] 精确的最新待完成令牌"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "[in] Source detached, no remaining writes"
+msgstr "[in] 源已撤离，不再有剩余写入"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "SUCCESS, BUSY, STATE or INVALID; failure retains the loan"
+msgstr "SUCCESS、BUSY、STATE 或 INVALID；失败时保留借用"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "Caller-owned block metadata; initialize data and capacity only."
+msgstr "调用者拥有的块元数据；仅初始化 data 与 capacity。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "Storage remains live through producer and consumer quiescence."
+msgstr "存储须保持有效，直到生产者和消费者均已静止。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "Caller-owned stream control, initialized before publication."
+msgstr "调用者拥有的 stream 控制，必须先初始化再发布。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid ""
+"outstanding counts nonfree blocks, including filling, ready and borrowed "
+"states. Only stream operations mutate it."
+msgstr "outstanding 统计非空闲块，包括填充中、就绪和已借用状态。仅流操作可修改该计数。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "Mutable producer loan; hardware must stop before abort or publish."
+msgstr "可变生产者借用；中止或发布前必须停止硬件。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "Optional caller-owned preposted producer; no default cost."
+msgstr "调用者显式选择的预提交生产者，不产生默认成本。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid ""
+"One serialized producer owns this control and the stream. Do not mix "
+"ordinary reserve/publish/abort with a live posted producer. Two hardware "
+"targets remain FILLING until detached. Publication is FIFO; rollback is LIFO"
+" to avoid consumer holes."
+msgstr ""
+"一个串行化生产者拥有本控制对象及流。预提交生产者活动期间，不得混用普通 reserve/publish/abort。两个硬件目标在引用撤离前保持 "
+"FILLING。发布遵循 FIFO，回滚遵循 LIFO，以免在消费者路径中留下空洞。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:71
+msgid "Immutable consumer loan, valid until matching release succeeds."
+msgstr "不可变消费者借用，直到匹配释放成功之前均有效。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:75
+msgid "stream_budget.h"
+msgstr "stream_budget.h"
+
+#: ../../../../../../docs/reference/api/io/execution.md:77
+msgid "Optional constant-work snapshot and checked cold sizing."
+msgstr "可选恒定工作量快照与经过检查的冷态容量计算。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:77
+msgid "Snapshot maintained metadata under one short IRQ guard."
+msgstr "在一个短 IRQ 临界区内快照维护的元数据。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:77
+msgid ""
+"Task/IRQ fixed work, no slot scan or payload access. Caller keeps all "
+"storage alive; no observer reference is retained. next_free is the ordinary "
+"stream cursor, not the private preposted cursor. Output is distinct from "
+"every payload."
+msgstr ""
+"任务/IRQ 中的固定工作量，不扫描槽，也不访问载荷。调用方须保持全部存储有效；不保留观测者引用。next_free "
+"是普通流游标，不是私有预提交游标。输出与全部载荷分离。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:77
+msgid "[in] Live initialized storage, no concurrent destruction."
+msgstr "[in] 已初始化的活动存储，不得并发销毁。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:77
+msgid "[out] Distinct output, unchanged on rejected metadata/alias."
+msgstr "[out] 独立输出；元数据或别名检查拒绝时保持不变。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:77
+msgid "SUCCESS, INVALID or STATE for inconsistent control facts."
+msgstr "SUCCESS；控制事实不一致时返回 INVALID 或 STATE。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:77
+msgid "Checked cold calculation, no stream mutation or allocation."
+msgstr "经过检查的冷态计算，不修改 stream 或分配存储。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:77
+msgid ""
+"required = targets + spares + ceil(rate*release_delay / "
+"(block_units*1000000)); payload is required*block*unit_bytes. Finite math is"
+" conservative under the declared FIFO frontier release bound; out-of-order "
+"release may still block the next cursor. Latency requires target_delay_us < "
+"floor(units_per_block*1000000/units_per_second). This creates no "
+"backpressure or hardware qualification."
+msgstr ""
+"required = targets + spares + ceil(rate*release_delay / "
+"(block_units*1000000))；载荷大小为 required*block*unit_bytes。在所声明的 FIFO "
+"队首释放延迟界限下，此有限算术计算是保守的；乱序释放仍可能阻塞下一个游标。延迟要求 target_delay_us < "
+"floor(units_per_block*1000000/units_per_second)。本计算不建立背压，也不构成硬件资格证明。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:77
+msgid "[in] Explicit rate, longest release delay and pipeline."
+msgstr "[in] 显式速率、最长释放延迟和流水线配置。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:77
+msgid "[out] Distinct output, unchanged on error or overflow."
+msgstr "[out] 独立输出；错误或溢出时保持不变。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:77
+msgid "SUCCESS, INVALID or EXHAUSTED for arithmetic overflow."
+msgstr "SUCCESS、INVALID；算术溢出时返回 EXHAUSTED。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:77
+msgid "O(1) aggregate facts; free total does not imply cursor is free."
+msgstr "O(1) 汇总事实；总空闲容量不证明游标位置空闲。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:77
+msgid "Explicit engineering assumptions, no inferred hardware rate."
+msgstr "显式工程假设，不推断硬件速率。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:77
+msgid ""
+"release_delay includes queue/consumer delay until release of each published "
+"FIFO frontier. units convert to bytes using unit_bytes. targets/spares are "
+"actual selected hardware loans. All quantities are positive except "
+"delay/targets/spares."
+msgstr ""
+"release_delay 包含每个已发布 FIFO 队首块直到释放为止的排队和消费者延迟。通过 unit_bytes "
+"将单位转换为字节。targets/spares 是实际选择的硬件借用。除 delay/targets/spares 外，全部量均为正数。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:77
+msgid "Conservative declared-assumption budget; never physical evidence."
+msgstr "依据声明假设得到的保守预算，绝不作为物理证据。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:81
+msgid "stream_profile.h"
+msgstr "stream_profile.h"
+
+#: ../../../../../../docs/reference/api/io/execution.md:83
+msgid "Optional readonly continuous-stream cold admission profiles."
+msgstr "可选只读的连续流冷准入配置。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:83
+msgid "Validate an actual pool before the bound UART may borrow it."
+msgstr "绑定的 UART 借用缓冲池之前验证实际缓冲池。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:83
+msgid ""
+"Caller joins all pool users before this cold pool check. Failure before "
+"provider dispatch creates no borrow, epoch change or hardware effect. Rate, "
+"FIFO-frontier hold and IRQ latency remain declared assumptions, never "
+"measurements. This creates no external UART flow control or losslessness. "
+"Underlying unprofiled APIs retain their explicit contracts."
+msgstr ""
+"调用方须在此次冷缓冲池检查前等待全部池用户退出。在 provider 派发前失败，不会建立借用、改变 epoch 或产生硬件副作用。速率、FIFO "
+"队首持有时间及 IRQ 延迟始终是声明的假设，不是量测。本操作不建立外部 UART 流控，也不保证无丢失。底层未使用 profile 的 API "
+"保留其显式契约。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:83
+msgid "[in] Stable readonly reviewed binding and assumptions."
+msgstr "[in] 稳定、只读且已经审核的绑定与假设。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:83
+msgid ""
+"[inout] Initialized unborrowed pool with exact declared count and equal "
+"declared byte capacities, kept live through the original provider's stop and"
+" all consumer releases."
+msgstr ""
+"[inout] 已初始化且尚未借出的缓冲池，块数及各块字节容量与声明精确一致；须保持有效，直到原 provider 停止且全部消费者释放借用。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:83
+msgid ""
+"INVALID for mismatched geometry/alias, STATE for stopping metadata, BUSY for"
+" existing loans, CONTEXT outside an unmasked task, EXHAUSTED for "
+"overflow/insufficient budget, UNSUPPORTED for target latency; otherwise "
+"provider result."
+msgstr ""
+"几何或别名不匹配时为 INVALID；停止中的元数据返回 STATE；已有借用时为 BUSY；不在中断未屏蔽任务上下文中时为 "
+"CONTEXT；溢出或预算不足时为 EXHAUSTED；目标延迟不满足要求时为 UNSUPPORTED；其余情况返回 provider 结果。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:83
+msgid "Validate pool and whole-scan rate before ADC admission."
+msgstr "ADC 准入之前验证缓冲池与完整扫描速率。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:83
+msgid ""
+"ADC stopping its trigger creates a sampling gap. No budget makes that pause "
+"preserve wall-clock samples or prove the future consumer/IRQ bounds. No "
+"observer/queue is created."
+msgstr ""
+"ADC 停止触发会产生采样缺口。任何预算都不能使这一暂停保留按实际时间连续发生的采样，也不能证明未来消费者或 IRQ 的界限。不会创建观测者或队列。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:83
+msgid "[in] Stable readonly binding to the selected ADC face."
+msgstr "[in] 到所选 ADC 接口的稳定只读绑定。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:83
+msgid "[inout] Initialized unborrowed exact pool, as for UART."
+msgstr "[inout] 已初始化且未借出的精确缓冲池，要求同 UART。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:83
+msgid ""
+"[in] Positive nominal complete scans per second, no greater than the "
+"declared production-rate upper bound."
+msgstr "[in] 每秒完整扫描的正数标称次数，不大于所声明的生产速率上界。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:83
+msgid ""
+"Cold-check errors as for UART, or the original info/start result. Provider "
+"scan, timer, DMA/cache and alias checks still apply; no rejected operation "
+"retains new references."
+msgstr ""
+"冷检查错误同 UART，否则返回原 info/start 结果。provider 的扫描、定时器、DMA/cache "
+"及别名检查仍然适用；任何被拒绝的操作都不保留新引用。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:83
+msgid "Selected UART face and immutable byte-stream assumptions."
+msgstr "选定的 UART 接口与不可变的字节流假设。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:83
+msgid ""
+"Reviewed assembly binds the actual continuous provider. Two hardware targets"
+" and one replacement are required. A profile never allocates or owns the "
+"caller's pool. The normal byte face and provider state retain their layouts."
+" Cold admission rechecks payload disjointness in O(n^2); no additional check"
+" enters the IRQ or steady I/O path."
+msgstr ""
+"已审核的装配绑定实际连续 provider。要求两个硬件目标及一个替补块。profile 不分配也不拥有调用方的缓冲池。普通字节接口及 provider"
+" 状态布局保持不变。冷准入以 O(n^2) 重新检查载荷互不重叠；IRQ 或稳定 I/O 路径不增加额外检查。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:83
+msgid "Selected ADC face and complete-scan stream assumptions."
+msgstr "选定的 ADC 接口与完整扫描流假设。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:83
+msgid ""
+"One unit is a complete selected scan, stored as one uint16_t per channel. "
+"Resolution bits never replace storage width. Geometry and rates are reviewed"
+" assembly inputs; they establish neither sample accuracy nor an aperture "
+"time."
+msgstr ""
+"一个单位是一轮完整的所选扫描，每通道存储一个 "
+"uint16_t。分辨率位数不能替代存储位宽。几何和速率是已审核的装配输入，不能据此证明采样准确度或孔径时刻。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:87
+msgid "wake.h"
+msgstr "wake.h"
+
+#: ../../../../../../docs/reference/api/io/execution.md:89
+msgid "Explicit borrowed IRQ wake target and syscall-ceiling check."
+msgstr "显式借用 IRQ 唤醒目标与系统调用阈值检查。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:89
+msgid "Explicit kernel interrupt-mask policy, independent of any RTOS."
+msgstr "显式内核中断屏蔽策略，独立于任何 RTOS。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:89
+msgid "Validate actual IRQ facts against an explicit kernel policy."
+msgstr "依据显式内核策略验证实际 IRQ 事实。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:89
+msgid ""
+"Cold check without attachment or callback effects. No kernel target is "
+"accepted by NONE. PRIMASK permits every valid configurable IRQ with its "
+"fixed zero priority group. Kernel-calling BASEPRI targets require the "
+"maintained preemption grouping and a numerical priority at least the "
+"ceiling. Nonkernel hints do not impose kernel grouping. Binding does not "
+"authorize future CPU-context violations."
+msgstr ""
+"无绑定或回调副作用的冷检查。NONE 不接受任何会调用内核的目标。PRIMASK 在固定为零的优先级分组下允许全部有效可配置 IRQ。会调用内核的 "
+"BASEPRI 目标要求已维护的抢占分组，且优先级数值不小于阈值。非内核提示不强制内核分组。绑定不授权后续违反 CPU 上下文要求的操作。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:89
+msgid "[in] Optional immutable target; NULL disables notification."
+msgstr "[in] 可选不可变目标；NULL 禁用通知。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:89
+msgid "[in] Immutable validated CPU and kernel configuration."
+msgstr "[in] 已验证的不可变 CPU 和内核配置。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:89
+msgid "[in] External IRQ number, unshifted priority and group."
+msgstr "[in] 外部 IRQ 编号、未移位的优先级及分组。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:89
+msgid ""
+"Success, INVALID for malformed facts/target, PERMISSION for a kernel-calling"
+" target in an unsafe interrupt domain."
+msgstr "成功；事实或目标格式错误时返回 INVALID；会调用内核的目标处于不安全中断域时返回 PERMISSION。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:89
+msgid "Deliver one bounded hint after authoritative state is latched."
+msgstr "权威状态锁存后发送一个有界提示。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:89
+msgid ""
+"Task/IRQ as allowed by the target, no hidden task or retry. A failed wake "
+"does not revoke state or request ownership."
+msgstr "按目标允许的任务/IRQ 上下文执行，无隐藏任务或重试。wake 失败不撤销状态，也不撤销请求所有权。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:89
+msgid "[in] Previously validated live target or NULL."
+msgstr "[in] 先前已验证的活动目标或 NULL。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:89
+msgid "Callback result, success for NULL, INVALID for a bad target."
+msgstr "回调结果；NULL 返回成功；无效目标返回 INVALID。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:89
+msgid "Optional immutable wake target borrowed by an IRQ provider."
+msgstr "IRQ 提供者借用的可选不可变唤醒目标。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:89
+msgid ""
+"notify runs in publisher context and must be bounded and legal in that IRQ. "
+"Storage and context outlive all publishers. Stop and join publishers before "
+"destroying the sink. A wake is only a hint; latched RX/request predicates "
+"stay authoritative."
+msgstr ""
+"notify 在发布者上下文中运行，必须有界且在该 IRQ 中合法。存储及 context "
+"须比全部发布者存活更久。销毁接收器前，须停止并等待发布者退出。wake 仅为提示；已锁存的 RX/请求谓词仍为权威依据。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:89
+msgid "Immutable CPU and kernel facts for cold wake binding."
+msgstr "用于冷态唤醒绑定的不可变 CPU 与内核事实。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:89
+msgid ""
+"NONE and PRIMASK require a zero syscall ceiling. BASEPRI requires a nonzero "
+"unshifted ceiling. Configuration owns these facts; a wake target cannot "
+"weaken them."
+msgstr ""
+"NONE 和 PRIMASK 要求 syscall 阈值为零。BASEPRI 要求非零且未移位的阈值。配置拥有这些事实；wake 目标不能放宽它们。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:89
+msgid "Actual publisher facts read before attaching any borrowed sink."
+msgstr "附加任何被借用的接收端之前读取实际发布者事实。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:93
+msgid "traits.h"
+msgstr "traits.h"
+
+#: ../../../../../../docs/reference/api/io/execution.md:95
+msgid "Public readonly traits of a selected I/O implementation."
+msgstr "所选 I/O 实现的公共只读 traits。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:95
+msgid "Selected execution features, without physical qualification."
+msgstr "所选执行特性，不建立物理资格。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:95
+msgid "Abort effects never release borrowed request or payload storage."
+msgstr "abort 作用不释放借用中的 request 或 payload 存储。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:95
+msgid "Selected receive mechanism, without a throughput guarantee."
+msgstr "所选接收机制，不提供吞吐保证。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:95
+msgid "Provider owns actual DMA admission and cache maintenance."
+msgstr "provider 负责实际 DMA 准入与 Cache 维护。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:95
+msgid "Readonly transfer bounds of one selected implementation."
+msgstr "所选具体实现的只读传输限额。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:95
+msgid ""
+"Zero bounds mean unspecified, never unlimited. The typed interface defines "
+"transfer units; zero unit_bytes means no fixed byte width. For Flash, "
+"unit_bytes constrains destination offset and length while buffer_alignment "
+"describes the caller's storage. Board wiring, memory domains, current state "
+"and deadlines remain separate contracts."
+msgstr ""
+"限额为零表示未指定，不表示无限。强类型接口定义传输单位；unit_bytes 为零表示无固定字节宽度。对于 Flash，unit_bytes "
+"约束目标偏移与长度，buffer_alignment 描述调用者存储。Board 接线、内存域、当前状态与 deadline 仍分别遵循各自合同。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:95
+msgid "Selected SPI transaction bounds in numeric words, not bytes."
+msgstr "所选 SPI 事务限额，单位为数值 word，不是字节。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:95
+msgid ""
+"Bit N of supported_word_bits permits N-bit words. Zero length bounds are "
+"unspecified. These facts do not replace provider admission."
+msgstr ""
+"supported_word_bits 的 bit N 允许 N-bit word。零长度限额表示未指定。这些事实不替代 provider 准入。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:95
+msgid "Readonly uart facts for one selected implementation."
+msgstr "所选具体实现的只读 uart 事实。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:95
+msgid ""
+"Facts do not establish readiness, measured timing or physical qualification."
+" Cache line bytes describe the selected provider policy, not whether cache "
+"is enabled. UNKNOWN is not an unlimited guarantee. Parity zero means none; "
+"stop_half_bits counts half-bit periods."
+msgstr ""
+"这些事实不证明 ready、实测时序或物理资格。Cache line 字节数描述所选 provider 策略，不表示 Cache 已启用。UNKNOWN"
+" 不提供无限保证。parity 为零表示无校验；stop_half_bits 以半 bit 周期计数。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:95
+msgid "Readonly spi facts for one selected implementation."
+msgstr "所选具体实现的只读 spi 事实。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:95
+msgid ""
+"Facts do not establish readiness, measured timing or physical qualification."
+" Cache line bytes describe the selected provider policy, not whether cache "
+"is enabled. UNKNOWN is not an unlimited guarantee. configured_max_hz is a "
+"requested ceiling, not a measured SCK rate."
+msgstr ""
+"这些事实不证明 ready、实测时序或物理资格。Cache line 字节数描述所选 provider 策略，不表示 Cache 已启用。UNKNOWN"
+" 不提供无限保证。configured_max_hz 是请求上限，不是实测 SCK 速率。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:95
+msgid "Readonly i2c facts for one selected implementation."
+msgstr "所选具体实现的只读 i2c 事实。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:95
+msgid ""
+"Facts do not establish readiness, measured timing or physical qualification."
+" Cache line bytes describe the selected provider policy, not whether cache "
+"is enabled. UNKNOWN is not an unlimited guarantee. address_bits zero means "
+"endpoint-selected width. nominal_hz is the selected divider result; zero "
+"means no known physical rate."
+msgstr ""
+"这些事实不证明 ready、实测时序或物理资格。Cache line 字节数描述所选 provider 策略，不表示 Cache 已启用。UNKNOWN"
+" 不提供无限保证。address_bits 为零表示由 endpoint 选择位宽。nominal_hz 是所选分频结果；零表示没有已知物理速率。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:95
+msgid "Readonly adc facts for one selected implementation."
+msgstr "所选具体实现的只读 adc 事实。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:95
+msgid ""
+"Facts do not establish readiness, measured timing or physical qualification."
+" Cache line bytes describe the selected provider policy, not whether cache "
+"is enabled. UNKNOWN is not an unlimited guarantee. Storage width is distinct"
+" from effective conversion resolution."
+msgstr ""
+"这些事实不证明 ready、实测时序或物理资格。Cache line 字节数描述所选 provider 策略，不表示 Cache 已启用。UNKNOWN"
+" 不提供无限保证。存储位宽与有效转换分辨率分别表达。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:95
+msgid "Readonly can facts for one selected implementation."
+msgstr "所选具体实现的只读 can 事实。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:95
+msgid ""
+"Facts do not establish readiness, measured timing or physical qualification."
+" Cache line bytes describe the selected provider policy, not whether cache "
+"is enabled. UNKNOWN is not an unlimited guarantee."
+msgstr ""
+"这些事实不证明 ready、实测时序或物理资格。Cache line 字节数描述所选 provider 策略，不表示 Cache 已启用。UNKNOWN"
+" 不提供无限保证。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:95
+msgid "Readonly eth facts for one selected implementation."
+msgstr "所选具体实现的只读 eth 事实。"
+
+#: ../../../../../../docs/reference/api/io/execution.md:95
+msgid "Readonly eth_frames facts for one selected implementation."
+msgstr "所选具体实现的只读 eth_frames 事实。"

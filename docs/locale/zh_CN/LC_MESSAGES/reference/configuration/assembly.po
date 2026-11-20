@@ -1,151 +1,165 @@
-# Actual-POT messages; independently reviewed against this canonical source.
+#
 msgid ""
-msgstr "Project-Id-Version: Nexus source docs\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=1; plural=0;\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 69596f9a929ba77a56a41fa7119d9233496ebf0887680e3abcb0af444df40d47\n"
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 57805f8dbae10803b29ab76e77bf9316c30973e9113aafc12f183536caa310d6\n"
 
-#: docs/reference/configuration/assembly.md:9
+#: ../../../../../../docs/reference/configuration/assembly.md:9
 msgid "Assembly input and rejected selections"
 msgstr "装配输入与拒绝规则"
 
-#: docs/reference/configuration/assembly.md:11
+#: ../../../../../../docs/reference/configuration/assembly.md:11
 msgid ""
 "The authored configuration authority is one schema-2 TOML assembly. SoC and "
 "Board facts remain maintained JSON; `resolved.json` is output, not an "
-"authored alternative. CMake owns software dependencies. Failed TOML "
-"resolution never falls back to Kconfig, cache variables, schema-1 JSON or "
-"old generated headers. Legacy JSON assemblies are rejected as inputs, not "
-"retained as an alternate authoring interface."
+"authored alternative. CMake owns software dependencies. Unknown fields, "
+"unsupported modes and resource conflicts reject before publication. Legacy "
+"JSON assemblies are not accepted."
 msgstr ""
-"人工编写的配置权威是一份 schema-2 TOML assembly。SoC 和 Board facts 仍为维护的 "
-"JSON；`resolved.json` 是输出，不是另一种人工编写入口。CMake 拥有软件依赖。TOML 解析失败不会回退到 "
-"Kconfig、cache 变量、schema-1 JSON 或旧生成头文件。旧 JSON 装配作为输入会被拒绝，不保留为另一种编写接口。"
+"手工配置的权威输入是单份 schema-2 TOML assembly。SoC 和 Board 事实由 JSON 维护；`resolved.json` "
+"是输出，不能作为另一种手工输入。CMake 负责软件依赖。未知字段、不支持模式及资源冲突在发布前拒绝。不接受旧 JSON assembly。"
 
-msgid "The parser creates immutable `AuthoredAssembly` intent. Production consumers use `resolve_ir()` and named immutable `ConfigurationIR` decisions; only audit and artifact-boundary consumers request `to_dict()`. Typed source epoch 5, its complete schema-1 audit projection and the selected schema-2 `resolved.json` file are separate contracts. The [source compatibility policy](../../design/source-compatibility.md) owns their version declarations; neither introduces firmware metadata or runtime dispatch."
-msgstr "解析器创建不可变的 `AuthoredAssembly` 意图。生产消费者使用 `resolve_ir()` 和具名不可变 `ConfigurationIR` 决策；只有审计与产物边界消费者请求 `to_dict()`。typed source epoch 5、完整 schema-1 审计投影以及已选 schema-2 `resolved.json` 文件是各自独立的合同。[源码兼容策略](../../design/source-compatibility.md)拥有它们的版本声明；这些版本不引入固件 metadata 或运行时分派。"
+#: ../../../../../../docs/reference/configuration/assembly.md:16
+msgid ""
+"The parser creates immutable `AuthoredAssembly` intent. Production consumers"
+" use `resolve_ir()` and named immutable `ConfigurationIR` decisions. Audit "
+"JSON is a one-way projection. Format versions are defined by the [SDK format"
+" contract](../contracts/sdk-format.md); they add no firmware metadata or "
+"runtime dispatch."
+msgstr ""
+"解析器创建不可变的 `AuthoredAssembly` 意图。生产消费者使用 `resolve_ir()` 和具名不可变的 "
+"`ConfigurationIR` 决策。审计 JSON 是单向投影。格式版本由 [SDK 格式合同](../contracts/sdk-"
+"format.md) 定义；不增加固件元数据或运行时分发。"
 
-#: docs/reference/configuration/assembly.md:24
+#: ../../../../../../docs/reference/configuration/assembly.md:22
 msgid ""
 "Before running the resolver, prepare the [fixed source and recursive "
 "dependencies](../../guides/source-checkout.md)."
 msgstr "运行解析器前，先准备[固定源码与递归依赖](../../guides/source-checkout.md)。"
 
-#: docs/reference/configuration/assembly.md:27
+#: ../../../../../../docs/reference/configuration/assembly.md:25
 msgid "Complete maintained input"
 msgstr "完整维护输入"
 
-#: docs/reference/configuration/assembly.md:29
+#: ../../../../../../docs/reference/configuration/assembly.md:27
 msgid "Complete F407ZG UART assembly, parsed by the production resolver."
 msgstr "完整 F407ZG UART 装配，由生产 resolver 解析。"
 
-#: docs/reference/configuration/assembly.md:29
+#: ../../../../../../docs/reference/configuration/assembly.md:27
 msgid "Selection"
 msgstr "选择"
 
-#: docs/reference/configuration/assembly.md:29
+#: ../../../../../../docs/reference/configuration/assembly.md:27
 msgid "Meaning and rejection boundary"
 msgstr "含义与拒绝边界"
 
-#: docs/reference/configuration/assembly.md:29
+#: ../../../../../../docs/reference/configuration/assembly.md:27
 msgid "`schema = 2`"
 msgstr "`schema = 2`"
 
-#: docs/reference/configuration/assembly.md:29
+#: ../../../../../../docs/reference/configuration/assembly.md:27
 msgid "Authored TOML generation; unknown keys reject"
 msgstr "人工编写的 TOML 生成；未知键拒绝"
 
-#: docs/reference/configuration/assembly.md:29
+#: ../../../../../../docs/reference/configuration/assembly.md:27
 msgid "`board`"
 msgstr "`board`"
 
-#: docs/reference/configuration/assembly.md:29
+#: ../../../../../../docs/reference/configuration/assembly.md:27
 msgid "Maintained immediate child of `boards/`; exactly one Board selector"
 msgstr "`boards/` 的维护中直接子目录；必须恰好选择一个 Board"
 
-#: docs/reference/configuration/assembly.md:29
+#: ../../../../../../docs/reference/configuration/assembly.md:27
 msgid "`board_package`"
 msgstr "`board_package`"
 
-#: docs/reference/configuration/assembly.md:29
+#: ../../../../../../docs/reference/configuration/assembly.md:27
 msgid "External package path relative to the assembly; alternative to `board`"
 msgstr "相对装配定位的外部包路径；与 `board` 二选一"
 
-#: docs/reference/configuration/assembly.md:29
+#: ../../../../../../docs/reference/configuration/assembly.md:27
 msgid "`backend`"
 msgstr "`backend`"
 
-#: docs/reference/configuration/assembly.md:29
+#: ../../../../../../docs/reference/configuration/assembly.md:27
 msgid ""
 "Explicit `native`, `baremetal`, `freertos` or supported `threadx` subset"
 msgstr "显式 `native`、`baremetal`、`freertos` 或受支持 `threadx` 子集"
 
-#: docs/reference/configuration/assembly.md:29
+#: ../../../../../../docs/reference/configuration/assembly.md:27
 msgid "`clock`"
 msgstr "`clock`"
 
-#: docs/reference/configuration/assembly.md:29
+#: ../../../../../../docs/reference/configuration/assembly.md:27
 msgid "Maintained exact profile matching Board and SoC facts"
 msgstr "匹配 Board 与 SoC 事实的维护中精确配置"
 
-#: docs/reference/configuration/assembly.md:29
+#: ../../../../../../docs/reference/configuration/assembly.md:27
 msgid "`optimization`"
 msgstr "`optimization`"
 
-#: docs/reference/configuration/assembly.md:29
+#: ../../../../../../docs/reference/configuration/assembly.md:27
 msgid ""
 "Maintained optimization/debug/LTO profile; no arbitrary compiler override"
 msgstr "维护中的优化/调试/LTO 配置；不接受任意编译器覆盖"
 
-#: docs/reference/configuration/assembly.md:29
+#: ../../../../../../docs/reference/configuration/assembly.md:27
 msgid "`[memory]`"
 msgstr "`[memory]`"
 
-#: docs/reference/configuration/assembly.md:29
+#: ../../../../../../docs/reference/configuration/assembly.md:27
 msgid "Byte budgets plus optional executable-image prefix/suffix reservations"
 msgstr "字节预算，以及可选的执行镜像前缀与尾部保留量"
 
-#: docs/reference/configuration/assembly.md:29
+#: ../../../../../../docs/reference/configuration/assembly.md:27
 msgid "`layout`"
 msgstr "`layout`"
 
-#: docs/reference/configuration/assembly.md:29
+#: ../../../../../../docs/reference/configuration/assembly.md:27
 msgid ""
 "Optional schema-1 physical Flash-owner JSON path relative to the assembly; "
 "exactly one image"
 msgstr "可选的 schema-1 物理 Flash 擦除区 JSON 路径，相对装配定位；恰好一个 image 区"
 
-#: docs/reference/configuration/assembly.md:29
+#: ../../../../../../docs/reference/configuration/assembly.md:27
 msgid "`[factory]`"
 msgstr "`[factory]`"
 
-#: docs/reference/configuration/assembly.md:29
+#: ../../../../../../docs/reference/configuration/assembly.md:27
 msgid "Optional capability metadata; only `capabilities` is accepted"
 msgstr "可选能力元数据；仅接受 `capabilities`"
 
-#: docs/reference/configuration/assembly.md:29
+#: ../../../../../../docs/reference/configuration/assembly.md:27
 msgid "Kind instance table"
 msgstr "类别实例表"
 
-#: docs/reference/configuration/assembly.md:29
+#: ../../../../../../docs/reference/configuration/assembly.md:27
 msgid "Stable authored name, reviewed binding, mode and bounded options"
 msgstr "稳定人工编写的名称、复核绑定、模式与有界选项"
 
-#: docs/reference/configuration/assembly.md:29
+#: ../../../../../../docs/reference/configuration/assembly.md:27
 msgid "SPI/I2C device table"
 msgstr "SPI/I2C 器件表"
 
-#: docs/reference/configuration/assembly.md:29
+#: ../../../../../../docs/reference/configuration/assembly.md:27
 msgid "Separate endpoint identity tied to an existing controller"
 msgstr "关联已有控制器的独立端点身份"
 
-#: docs/reference/configuration/assembly.md:29
+#: ../../../../../../docs/reference/configuration/assembly.md:27
 msgid "`[abi]`"
 msgstr "`[abi]`"
 
-#: docs/reference/configuration/assembly.md:29
+#: ../../../../../../docs/reference/configuration/assembly.md:27
 msgid ""
 "Assert reviewed CPU architecture/FPU/float ABI; cannot invent chip features"
 msgstr "断言复核 CPU architecture/FPU/float ABI；不能虚构芯片特性"
 
-#: docs/reference/configuration/assembly.md:49
+#: ../../../../../../docs/reference/configuration/assembly.md:47
 msgid ""
 "Resource checks cover actual pin/AF, controller, IRQ ceiling, shared "
 "timer/timebase, physical DMA controller/stream, clock, exact memory domain, "
@@ -156,50 +170,58 @@ msgstr ""
 "资源检查覆盖实际引脚／AF、控制器、IRQ 系统调用优先级阈值、共享定时器／时间基准、物理 DMA "
 "控制器／流、时钟、准确内存域、模式及端点身份。即使选择项语法合法，仍可能因提供者未实现该路由而被拒绝。解析器绝不静默改变引脚、模式或时钟。"
 
-#: docs/reference/configuration/assembly.md:54
+#: ../../../../../../docs/reference/configuration/assembly.md:52
 msgid ""
-"See the [configuration and ownership guide](../../guides/developer-"
-"workflow.md) for Board-first queries, validated profiles, human summaries "
-"and effective diffs. `explain` defaults to human-readable output; automation"
-" must select `--json`."
+"See the [configuration and ownership guide](../../guides/app-"
+"configuration.md) for Board-first queries, validated profiles, human "
+"summaries and effective diffs. `explain` defaults to human-readable output; "
+"automation must select `--json`."
 msgstr ""
-"[配置与所有权指南](../../guides/developer-workflow.md)说明从 Board 查询、经验证的 "
+"[配置与所有权指南](../../guides/app-configuration.md)说明从 Board 查询、经验证的 "
 "profile、人读摘要及有效差异。`explain` 默认输出人读内容；自动化必须选择 `--json`。"
 
-msgid "Every generated bundle contains `nexus_factory_strong.h`. Application code can include it and use nominal references such as `NX_UART_REF_UART0` with `nx_factory_uart_ref`; no `[factory]` selection enables that header. `factory.strong` is not a supported field and rejects as unknown. The optional `capabilities = true` selection emits immutable mode metadata separately from the interface faces. Factory getters return existing static objects and do not start hardware. Only selected classes have factory IDs and getters. Optional application composition can test `NX_FACTORY_HAS_<CLASS>` with `defined`; absent classes leave that macro undefined. Invalid IDs of a selected class still return NULL, and optional extensions retain their own unsupported-mode contracts."
-msgstr "每份生成 bundle 都包含 `nexus_factory_strong.h`。应用代码可包含该头，并把 `NX_UART_REF_UART0` 等具名引用传给 `nx_factory_uart_ref`；无需任何 `[factory]` 选择启用该头。`factory.strong` 不是受支持字段，会按未知字段拒绝。可选的 `capabilities = true` 独立于接口面生成不可变模式 metadata。factory getter 返回已有静态对象，不启动硬件。只有已选类别才有 factory ID 和 getter。应用的可选装配可以用 `defined` 检查 `NX_FACTORY_HAS_<CLASS>`；未选类别不定义该宏。已选类别的非法 ID 仍返回 NULL，可选扩展继续保留各自的不支持模式合同。"
+#: ../../../../../../docs/reference/configuration/assembly.md:56
+msgid ""
+"Every selected Platform emits static factory interfaces; their exact "
+"selection, strong-reference API and audit records are described in "
+"[generated outputs](generated-output.md). Getters never start hardware. "
+"`factory.strong` is not a supported input field. `[factory]` accepts only "
+"`capabilities`, which selects optional immutable metadata."
+msgstr ""
+"每个选定 Platform 都生成静态 factory 接口；其精确选择、强类型引用 API 及审计记录见[生成输出](generated-"
+"output.md)。getter 不启动硬件。`factory.strong` 不是受支持输入字段。`[factory]` 仅接受 "
+"`capabilities`，用于选择可选不可变元数据。"
 
-msgid "The generated schema-2 `resolved.json` records effective controllers, endpoints, selected routes and Board bindings, resources, memory, budgets and input identities. It omits the unused candidate route catalogue. `fact_references` identifies the original fact files by path and SHA-256 instead of embedding complete device-review catalogues. The resolver still validates the complete facts, and its configuration digest remains based on the complete typed IR projection. `list-bindings` and `explain` use the full validated IR; candidate queries check the fact bytes against the recorded input hashes. Do not hand-edit this output or treat it as a second authored configuration."
-msgstr "生成的 schema-2 `resolved.json` 记录有效控制器、端点、已选路线和 Board binding、资源、内存、预算及输入身份，不包含未选的候选路线目录。`fact_references` 通过路径和 SHA-256 标识原事实文件，不嵌入完整器件审查目录。resolver 仍校验完整事实，配置摘要仍根据完整 typed IR 投影计算。`list-bindings` 与 `explain` 使用完整已验证 IR；候选查询核对事实字节与已记录输入哈希。不得手写此输出或把它当成第二份 authored 配置。"
-
+#: ../../../../../../docs/reference/configuration/assembly.md:62
 msgid "Logical GPIO signals"
 msgstr "逻辑 GPIO 信号"
 
+#: ../../../../../../docs/reference/configuration/assembly.md:64
 msgid ""
 "On an authorized single-pin `gpio` input or output, the optional boolean "
 "`active_high` selects an immutable logical signal in addition to the "
-"existing port face. Omit it to retain only the physical-level port. "
-"Unknown values and multi-bit masks reject; no polarity is inferred from "
-"the Board's initial level."
+"existing port face. Omit it to retain only the physical-level port. Unknown "
+"values and multi-bit masks reject; no polarity is inferred from the Board's "
+"initial level."
 msgstr ""
 "在已授权的单 pin `gpio` 输入或输出上，可选布尔值 `active_high` 会在已有 port face 之外选择一个不可变逻辑 "
 "signal。省略时只保留物理电平 port。未知值和多 bit mask 拒绝；不会从 Board 初始电平推导极性。"
 
+#: ../../../../../../docs/reference/configuration/assembly.md:69
 msgid ""
-"The following fragment belongs in an independently complete assembly "
-"whose Board authorizes the output binding `rs485-de`; it declares no new "
-"wiring."
+"The following fragment belongs in an independently complete assembly whose "
+"Board authorizes the output binding `rs485-de`; it declares no new wiring."
 msgstr "以下片段属于一个独立完整、且 Board 已授权输出绑定 `rs485-de` 的装配；它不声明新的接线。"
 
+#: ../../../../../../docs/reference/configuration/assembly.md:80
 msgid ""
 "Include `nexus_factory_strong.h` and obtain the binding with "
-"`nx_factory_gpio_signal_ref(NX_GPIO_REF_DIRECTION)`. Check for NULL "
-"before use; undeclared signals and invalid IDs return NULL. The getter "
-"neither initializes hardware nor changes the physical safe level. A "
-"signal reuses its authorized port and shared ops, with no mutable state, "
-"per-pin vtable or new owner. The RS485 adapter accepts this binding as "
-"`direction`; software wire protocols keep their physical-level and open-"
-"drain contracts."
+"`nx_factory_gpio_signal_ref(NX_GPIO_REF_DIRECTION)`. Check for NULL before "
+"use; undeclared signals and invalid IDs return NULL. The getter neither "
+"initializes hardware nor changes the physical safe level. A signal reuses "
+"its authorized port and shared ops, with no mutable state, per-pin vtable or"
+" new owner. The RS485 adapter accepts this binding as `direction`; software "
+"wire protocols keep their physical-level and open-drain contracts."
 msgstr ""
 "包含 `nexus_factory_strong.h`，通过 "
 "`nx_factory_gpio_signal_ref(NX_GPIO_REF_DIRECTION)` 获取绑定。使用前检查 NULL；未声明的 "
@@ -207,11 +229,11 @@ msgstr ""
 "ops，不增加可变状态、每 pin vtable 或新 owner。RS485 adapter 的 `direction` "
 "接受这个绑定；软件总线协议继续使用物理电平及开漏合同。"
 
-#: docs/reference/configuration/assembly.md:66
+#: ../../../../../../docs/reference/configuration/assembly.md:88
 msgid "I2C endpoint address width"
 msgstr "I2C 端点寻址宽度"
 
-#: docs/reference/configuration/assembly.md:68
+#: ../../../../../../docs/reference/configuration/assembly.md:90
 msgid ""
 "An `i2c_device` has `address_bits = 7` by default, with an address from 8 to"
 " 119. Reviewed STM32F407 polling, IRQ and DMA message providers also accept "
@@ -228,7 +250,7 @@ msgstr ""
 "schema 字段而获得 10-bit 支持。宽度归各 endpoint 所有时，controller metadata 使用 "
 "`address_bits = 0`；endpoint selected contract 返回 7 或 10。"
 
-#: docs/reference/configuration/assembly.md:76
+#: ../../../../../../docs/reference/configuration/assembly.md:98
 msgid ""
 "A 10-bit read includes its own repeated START before the read header. ES0182"
 " Rev19 section 2.10.4 therefore restricts the maintained F407 10-bit profile"
@@ -243,9 +265,11 @@ msgstr ""
 "`max_hz > 100000`。必须显式修改默认 100 kHz profile；42 MHz PCLK "
 "不豁免该勘误。固件也会在借用存储或启动硬件之前检查实际 CCR。人工配置的上限与 ARM 链接检查不建立实际上升时间、目标器件或总线时序资格。"
 
+#: ../../../../../../docs/reference/configuration/assembly.md:106
 msgid "ADC raw resolution and scan timing"
 msgstr "ADC 原始分辨率与扫描时序"
 
+#: ../../../../../../docs/reference/configuration/assembly.md:108
 msgid ""
 "For the maintained F407 ADC1 modes, `resolution_bits` selects 6, 8, 10 or 12"
 " bits. Omitting it produces an explicit 12-bit decision in the immutable IR "
@@ -256,12 +280,14 @@ msgstr ""
 "已维护的 F407 ADC1 模式通过 `resolution_bits` 选择 6、8、10 或 12 位。省略时，不可变 IR "
 "与解析后的审计输出明确记录为 12 位。布尔值、字符串及其他整数均拒绝。provider 必须声明支持所选分辨率，配置字段本身不会授予其他器件相应能力。"
 
+#: ../../../../../../docs/reference/configuration/assembly.md:114
 msgid ""
 "The following fragment belongs in an assembly whose Board explicitly "
 "authorizes the `analog` ADC binding. It is not a complete assembly or a PCB "
 "wiring claim."
 msgstr "以下片段应放入 Board 明确授权了 `analog` ADC 绑定的装配中；它不是完整装配，也不声明 PCB 接线。"
 
+#: ../../../../../../docs/reference/configuration/assembly.md:128
 msgid ""
 "Polling, finite trigger DMA and continuous trigger DMA share the selected "
 "raw format. According to RM0090 Rev22 §13.7, one rank costs its selected "
@@ -273,6 +299,7 @@ msgstr ""
 "poll、有限触发 DMA 和连续触发 DMA 共用所选原始格式。依据 RM0090 Rev22 §13.7，每 rank 的耗时为所选采样周期加 "
 "12、10、8 或 6 个转换周期。速率准入和连续序列元数据使用完整扫描成本。定时器分频也必须精确，降低分辨率不会静默修改请求的触发速率。"
 
+#: ../../../../../../docs/reference/configuration/assembly.md:134
 msgid ""
 "DMA still transfers halfwords, and each sample remains a right-aligned "
 "native `uint16_t` raw count. Block capacities and lengths remain byte counts"
@@ -284,11 +311,11 @@ msgstr ""
 "DMA 仍传输 halfword，每个样本仍是右对齐的本机 `uint16_t` 原始计数。块容量与长度仍以字节计，必须包含整数个完整 scan。6 "
 "位或 8 位转换不引入压缩字节格式或额外缓冲区。这些软件事实不建立模拟精度、有效分辨率、采样孔径时间戳或实际吞吐资格。"
 
-#: docs/reference/configuration/assembly.md:66
+#: ../../../../../../docs/reference/configuration/assembly.md:141
 msgid "Physical Flash and the selected image"
 msgstr "物理 Flash 与所选镜像"
 
-#: docs/reference/configuration/assembly.md:68
+#: ../../../../../../docs/reference/configuration/assembly.md:143
 msgid ""
 "`flash` in the resolved output describes the complete physical device, "
 "including its exact erase and programming geometry. `layout` selects the "
@@ -300,7 +327,7 @@ msgstr ""
 "解析输出中的 `flash` 描述完整物理器件，包括精确的擦除与编程几何。`layout` 选择包含可执行镜像的物理擦除区。未编写 `layout` "
 "时，该区域为完整物理 Flash。可写区域和恢复仍由产品负责；此选择不提供 Flash 访问控制或写保护。"
 
-#: docs/reference/configuration/assembly.md:74
+#: ../../../../../../docs/reference/configuration/assembly.md:149
 msgid ""
 "A `layout` JSON file has `schema_version = 1` and `regions`. Each region has"
 " an `id`, integer `origin`, positive `size` and `kind` (`image` or `data`). "
@@ -314,11 +341,11 @@ msgstr ""
 "region 必须互不重叠、位于物理 Flash 内，并从其精确擦除边界开始、结束。这是辅助 layout 输入；schema-1 JSON "
 "装配仍然拒绝。"
 
-#: docs/reference/configuration/assembly.md:80
+#: ../../../../../../docs/reference/configuration/assembly.md:155
 msgid "Executable prefix and suffix"
 msgstr "执行区的前缀与尾部保留量"
 
-#: docs/reference/configuration/assembly.md:82
+#: ../../../../../../docs/reference/configuration/assembly.md:157
 msgid ""
 "The optional `[memory]` fields reserve bytes inside the selected physical "
 "owner. Both fields are unsigned 32-bit byte counts with a default of zero. "
@@ -330,31 +357,31 @@ msgstr ""
 "可选的 `[memory]` 字段在选定物理擦除区内部保留字节。两个字段均为无符号 32 位字节数，默认值为零。布尔值、浮点数、负数以及大于 "
 "`4294967295` 的值均拒绝。零值字段不写入解析投影。零值保留现有默认布局、链接地址和预算；源码变更仍会改变源码与配置身份。"
 
-#: docs/reference/configuration/assembly.md:29
+#: ../../../../../../docs/reference/configuration/assembly.md:27
 msgid "Field"
 msgstr "字段"
 
-#: docs/reference/configuration/assembly.md:29
+#: ../../../../../../docs/reference/configuration/assembly.md:27
 msgid "Meaning"
 msgstr "含义"
 
-#: docs/reference/configuration/assembly.md:29
+#: ../../../../../../docs/reference/configuration/assembly.md:27
 msgid "`image_prefix_bytes`"
 msgstr "`image_prefix_bytes`"
 
-#: docs/reference/configuration/assembly.md:29
+#: ../../../../../../docs/reference/configuration/assembly.md:27
 msgid "Reserved bytes before the executable vector table"
 msgstr "可执行向量表之前保留的字节数"
 
-#: docs/reference/configuration/assembly.md:29
+#: ../../../../../../docs/reference/configuration/assembly.md:27
 msgid "`image_suffix_bytes`"
 msgstr "`image_suffix_bytes`"
 
-#: docs/reference/configuration/assembly.md:29
+#: ../../../../../../docs/reference/configuration/assembly.md:27
 msgid "Reserved bytes after the executable load window"
 msgstr "执行加载窗口之后保留的字节数"
 
-#: docs/reference/configuration/assembly.md:94
+#: ../../../../../../docs/reference/configuration/assembly.md:169
 msgid ""
 "`ConfigurationIR` derives the executable origin and size from its immutable "
 "`FlashRegionIR` owner and `MemoryBudgetIR` reservations. `PhysicalPartIR` "
@@ -366,7 +393,7 @@ msgstr ""
 "保留量派生执行起点与大小。`PhysicalPartIR` 仍是物理几何的唯一权威；JSON `layout` "
 "投影保留该几何用于审计。用户不另行编写执行地址，也不通过 CMake 覆盖地址。"
 
-#: docs/reference/configuration/assembly.md:107
+#: ../../../../../../docs/reference/configuration/assembly.md:182
 msgid ""
 "The physical owner remains erase-aligned and nonoverlapping. Its executable "
 "window need not start on an erase boundary. The prefix plus suffix must be "
@@ -380,7 +407,7 @@ msgstr ""
 " `flash_load_limit_bytes` 不得超过执行区大小；默认 Flash 预算采用执行区大小。前缀与尾部的保留字节不计为实际 ELF "
 "LOAD 字节，也不改变物理 Flash API。"
 
-#: docs/reference/configuration/assembly.md:115
+#: ../../../../../../docs/reference/configuration/assembly.md:190
 msgid ""
 "The reviewed offset and nonzero-reservation profiles are STM32F407VET6 and "
 "STM32F407ZGT6. They require complete physical erase geometry and a 512-byte-"
@@ -394,7 +421,7 @@ msgstr ""
 "字节对齐的可执行向量基址，即使物理所有者从复位地址开始也不例外。其他 SoC 与外部 provider 包不会因这些字段获得前缀/后缀支持。受维护 "
 "profile 负责精确对齐及其实际厂商向量符号；手写输入或产物元数据不能赋予其他启动代码该能力。"
 
-#: docs/reference/configuration/assembly.md:123
+#: ../../../../../../docs/reference/configuration/assembly.md:198
 msgid ""
 "For example, this complete layout file selects the final 384 KiB of Sky "
 "STM32F407VET6 Flash. Select it with the assembly's `layout` path. The "
@@ -404,21 +431,20 @@ msgstr ""
 "例如，这个完整 layout 文件选择天空星 STM32F407VET6 Flash 的最后 384 KiB。通过装配的 `layout` "
 "路径选择它。十进制 origin 对应 `0x08020000`；省略的前 128 KiB 不是另一个所选镜像，也不会因本 layout 而获得写保护。"
 
-#: docs/reference/configuration/assembly.md:142
+#: ../../../../../../docs/reference/configuration/assembly.md:217
 msgid ""
 "For an offset image or nonzero reservations, generated linker checks require"
 " `.isr_vector` at the derived executable origin, correct alignment, a "
 "nonempty table no larger than 512 bytes, and the actual vendor symbol at the"
-" section base: `g_pfnVectors` for F407 or `__gVectors` for GD470. The "
-"reviewed startup sets VTOR from that linked symbol with the required "
-"barriers. Default zero-reservation reset-address linking keeps its existing "
-"semantics."
+" section base: `g_pfnVectors` for the reviewed F407 startup. The reviewed "
+"startup sets VTOR from that linked symbol with the required barriers. "
+"Default zero-reservation reset-address linking keeps its existing semantics."
 msgstr ""
-"对于偏移镜像或非零保留量，生成的链接检查要求 `.isr_vector` 位于派生的执行起点、满足对齐、向量表非空且不超过 512 "
-"字节，并要求真实厂商符号位于该 section 起点：F407 为 `g_pfnVectors`，GD470 为 "
-"`__gVectors`。已复核的启动代码由该链接符号设置 VTOR，并执行所需屏障。默认零保留量、复位地址链接保持原有语义。"
+"偏移镜像或非零预留时，生成的链接检查要求 `.isr_vector` 位于推导出的可执行起点、正确对齐、表非空且不超过 512 "
+"字节，并要求实际厂商符号位于该节起点：已审查 F407 启动采用 `g_pfnVectors`。已审查启动依据该链接符号设置 "
+"VTOR，并执行所需屏障。默认无预留、复位地址链接保留现有语义。"
 
-#: docs/reference/configuration/assembly.md:149
+#: ../../../../../../docs/reference/configuration/assembly.md:224
 msgid ""
 "ELF LOAD bounds, Flash capacity and footprint use the derived executable "
 "window. The resource checker independently validates the physical owner, "
@@ -432,7 +458,7 @@ msgstr ""
 "Flash LOAD 范围是否符合该窗口。ELF-to-BIN 检查从执行起点重建字节，不添加前缀或尾部内容。物理擦除/编程事实和 RAM "
 "预算保持不变；解释擦除几何应使用 `flash`，不能以 `layout.origin` 重新编号。"
 
-#: docs/reference/configuration/assembly.md:156
+#: ../../../../../../docs/reference/configuration/assembly.md:231
 msgid ""
 "The complete [public image-window reference](https://github.com/X-Gen-"
 "Lab/nexus/blob/NEXUS-DOCUMENTATION-"
@@ -449,13 +475,13 @@ msgstr ""
 "0x0803fc00)` 执行区，共 129,536 字节，用于向量表与执行 LOAD。该参考通过安装 SDK 链接真实已复核的启动代码；声明的 "
 "2,048 字节 MSP 并非实测堆栈峰值。"
 
-#: docs/reference/configuration/assembly.md:163
+#: ../../../../../../docs/reference/configuration/assembly.md:238
 msgid ""
 "Complete F407 assembly with explicit byte reservations; layout.json is part "
 "of the linked public reference."
 msgstr "带显式字节保留量的完整 F407 装配；layout.json 位于链接的公开参考中。"
 
-#: docs/reference/configuration/assembly.md:168
+#: ../../../../../../docs/reference/configuration/assembly.md:243
 msgid ""
 "A prefix reservation does not create an image header. A suffix reservation "
 "does not create a trailer, activation marker or rollback record. Products "
@@ -466,7 +492,7 @@ msgstr ""
 "前缀保留量不会生成镜像头。尾部保留量不会生成 trailer、激活标记或回滚记录。元数据格式、密钥、Flash "
 "权限与恢复策略均由产品提供。平台不会构建引导器，也不负责认证、安装、激活或引导此镜像。"
 
-#: docs/reference/configuration/assembly.md:173
+#: ../../../../../../docs/reference/configuration/assembly.md:248
 msgid ""
 "An offset executable still needs a product-owned boot path that reaches its "
 "vendor reset entry with valid initial machine state. Linking, vector checks "
@@ -482,39 +508,28 @@ msgstr ""
 "链接只证明各自构建范围。尤其是现有 F407 handoff 保留 PRIMASK=1，startup 不主动解除屏蔽；偏移链接不能建立 "
 "FreeRTOS handoff 资格。"
 
-#: docs/reference/configuration/assembly.md:181
-msgid "Inspect and generate"
-msgstr "检查并生成"
+#: ../../../../../../docs/reference/configuration/assembly.md:256
+msgid "Resolve the selected input"
+msgstr "解析选定输入"
 
-#: docs/reference/configuration/assembly.md:183
-msgid "Run from the repository root, using a new output you own:"
-msgstr "从仓库根目录执行，使用自己拥有的新输出："
-
-#: docs/reference/configuration/assembly.md:192
+#: ../../../../../../docs/reference/configuration/assembly.md:258
 msgid ""
-"`check` and `explain` do not generate output. `generate` publishes one "
-"atomic owned bundle; failure invalidates its owned output without replacing "
-"unrelated data. Inspect `resolved.json`, input identities, generated "
-"`nexus_config.h`, bindings, factory, linker memory and budgets. Changing "
-"declared inputs requires a fresh resolution; separate Board/backend "
-"combinations use separate build roots."
+"Use the [application configuration guide](../../guides/app-configuration.md)"
+" for check, explain and generation steps. Each Board/backend combination "
+"owns a separate output and build directory. Failed generation invalidates "
+"only its owned output; audit files never become author input."
 msgstr ""
-"`check` 与 `explain` 不生成输出。`generate` 发布一个原子自有 bundle；失败使其自有输出失效，不替换无关数据。检查 "
-"`resolved.json`、输入身份、生成的 "
-"`nexus_config.h`、绑定、factory、链接器内存和预算。声明输入变化要求重新解析；不同 Board/backend "
-"组合使用独立构建根目录。"
+"检查、说明和生成步骤见[应用配置指南](../../guides/app-configuration.md)。每种 "
+"Board／后端组合拥有独立输出及构建目录。生成失败仅使其拥有的输出失效；审计文件绝不成为手工输入。"
 
-#: docs/reference/configuration/assembly.md:198
+#: ../../../../../../docs/reference/configuration/assembly.md:263
 msgid ""
-"CPU-only Runtime has a separate authored runtime TOML using the shared CPU "
-"resolver. It emits Core/Arch/optional OS policy, no "
-"SoC/Board/startup/factory. Do not use it to claim a full device platform. "
-"The [build contract](../../design/build-system.md), [integration "
-"contract](../../design/integration-contracts.md) and production field "
-"model/schema own detailed accepted fields; editor completion does not "
-"establish hardware capability."
+"CPU-only Runtime uses its own TOML with the shared CPU resolver. It selects "
+"Core/Arch/optional OS policy without SoC, Board, startup or factory. Its "
+"field model does not grant a complete device platform. See the [build "
+"contract](../contracts/build-system.md) and [integration "
+"contract](../contracts/integration.md)."
 msgstr ""
-"CPU-only Runtime 使用独立人工编写的 runtime TOML 和共享 CPU 解析器。它只生成 Core/Arch/可选 OS "
-"策略，不生成 SoC/Board/startup/factory。不得据此声明完整设备平台。[构建合同](../../design/build-"
-"system.md)、[接入合同](../../design/integration-contracts.md)和生产字段模型／schema "
-"拥有详细合法字段；编辑器补全不建立硬件能力。"
+"CPU-only Runtime 使用独立 TOML 及共享 CPU resolver，选择 Core／Arch／可选 OS 策略，不包含 "
+"SoC、Board、启动或 factory。其字段模型不授予完整设备平台。见[构建合同](../contracts/build-"
+"system.md)及[集成合同](../contracts/integration.md)。"

@@ -75,7 +75,8 @@ class DiagramLocalizationTests(unittest.TestCase):
             output = Path(temporary) / "build/diagrams"
             target = output / "en/factory.svg"
             target.parent.mkdir(parents=True)
-            (folder / "labels.json").write_text("{}")
+            (folder / "factory.dot").write_text(self.source, encoding="utf-8")
+            (folder / "factory.labels.json").write_text(json.dumps(self.mapping), encoding="utf-8")
             target.write_text("svg")
             uri = "../assets/diagrams/factory.svg"
             self.assertEqual(self.module.image_uri(
@@ -92,7 +93,7 @@ class DiagramLocalizationTests(unittest.TestCase):
             folder = Path(temporary) / "diagrams"
             folder.mkdir()
             (folder / "flow.dot").write_text(self.source, encoding="utf-8")
-            (folder / "labels.json").write_text(json.dumps(self.mapping),
+            (folder / "flow.labels.json").write_text(json.dumps(self.mapping),
                                                  encoding="utf-8")
             self.assertEqual(self.module.check(folder),
                              {"localized_diagrams": 2, "errors": []})
@@ -112,7 +113,7 @@ class DiagramLocalizationTests(unittest.TestCase):
             folder.mkdir()
             source = folder / "flow.dot"
             source.write_text(self.source, encoding="utf-8")
-            (folder / "labels.json").write_text(json.dumps(self.mapping),
+            (folder / "flow.labels.json").write_text(json.dumps(self.mapping),
                                                  encoding="utf-8")
             with patch.object(diagrams, "render", return_value=b"svg"):
                 with self.assertRaisesRegex(ValueError, "source"):
@@ -133,6 +134,41 @@ class DiagramLocalizationTests(unittest.TestCase):
                 with self.subTest(output=candidate):
                     with self.assertRaisesRegex(ValueError, "symlink"):
                         self.module.write(folder, env={}, output=candidate)
+
+    def test_each_diagram_requires_its_own_exact_label_set(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            folder = Path(temporary)
+            source = folder / "flow.dot"
+            source.write_text(self.source, encoding="utf-8")
+            policy = folder / "flow.labels.json"
+            policy.write_text(json.dumps(self.mapping), encoding="utf-8")
+            self.assertEqual(self.module.read_mapping(source), self.mapping)
+            self.mapping["en"]["unrelated"] = "Other diagram"
+            policy.write_text(json.dumps(self.mapping), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "label"):
+                self.module.read_mapping(source)
+
+    def test_selected_language_is_generated_once_and_checked_as_complete(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            folder = root / "sources"
+            folder.mkdir()
+            (folder / "flow.dot").write_text(self.source, encoding="utf-8")
+            (folder / "flow.labels.json").write_text(json.dumps(self.mapping), encoding="utf-8")
+            output = root / "generated"
+            svg = b'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1"/>'
+            with patch.object(diagrams, "render", return_value=svg) as render:
+                self.module.write(folder, env={}, output=output, languages=("en",))
+                self.assertEqual(render.call_count, 1)
+            self.assertEqual(self.module.check(folder, output=output, languages=("en",)),
+                             {"localized_diagrams": 1, "errors": []})
+            self.assertFalse((output / "zh_CN").exists())
+
+    def test_duplicate_languages_cannot_repeat_asset_generation(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            with self.assertRaisesRegex(ValueError, "language"):
+                self.module.write(Path(temporary) / "source", env={},
+                                  output=Path(temporary) / "out", languages=("en", "en"))
 
 if __name__ == "__main__":
     unittest.main()

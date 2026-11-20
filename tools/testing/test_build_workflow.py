@@ -973,8 +973,7 @@ class DeveloperWorkflowTests(unittest.TestCase):
             result = dev.main(["prepare", "--scope", "arm", "--family", "stm32f4"])
         self.assertEqual(result, 7)
         self.assertEqual(execute.call_args.args[0], [sys.executable,
-            "tools/dev/dependencies.py", "prepare", "--preset", "native-debug",
-            "--scope", "arm",
+            "tools/dev/dependencies.py", "prepare", "--scope", "arm",
             "--family", "stm32f4"])
         with patch.object(dev, "execute", return_value=0) as execute:
             self.assertEqual(dev.main(["prepare", "--preset",

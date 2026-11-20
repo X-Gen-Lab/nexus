@@ -9,7 +9,10 @@ from tools.documentation import sphinx_ext
 
 
 class IdentityLocaleTests(unittest.TestCase):
-    def render(self, language, *, dirty=False, source="# Factory\n"):
+    def render(self, language, *, dirty=False, source=None):
+        if source is None:
+            source = ("---\nid: factory\ntype: reference\naudience: consumer\n"
+                      "source_language: en\n---\n# Factory\n")
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             page = root / "docs/factory.md"
@@ -24,6 +27,7 @@ class IdentityLocaleTests(unittest.TestCase):
                     nexus_translation_root=str(page.parent / "locale"),
                     nexus_revision="a" * 40, nexus_code_revision="b" * 40,
                     nexus_source_dirty=dirty,
+                    nexus_mode='preview',
                     nexus_available_languages=("en", "zh_CN")),
             )
             context = {"body": "<p>Original content.</p>"}
@@ -44,12 +48,24 @@ class IdentityLocaleTests(unittest.TestCase):
         self.assertIn('lang="en" aria-label="Document identity"', body)
         self.assertIn("Document source", body)
         self.assertIn('data-nexus-translation-status="original"', body)
-        self.assertIn("English", self.render("zh_CN"))
-        self.assertIn("中文", body)
 
     def test_dirty_preview_is_localized_and_visible(self):
         self.assertIn("工作目录有改动；仅供预览", self.render("zh_CN", dirty=True))
         self.assertIn("working tree modified; preview only", self.render("en", dirty=True))
+
+    def test_clean_preview_still_reports_unverified_documentation(self):
+        self.assertIn('data-nexus-documentation-mode="preview"', self.render('en'))
+        self.assertIn('not verified documentation', self.render('en'))
+
+    def test_search_and_nested_pages_share_same_page_language_switches(self):
+        app = SimpleNamespace(config=SimpleNamespace(language='en',
+            nexus_available_languages=('en', 'zh_CN')))
+        for page, expected in (('search', '../zh_CN/search.html'),
+                               ('guide/task', '../../zh_CN/guide/task.html')):
+            with self.subTest(page=page):
+                context = {}
+                sphinx_ext.theme_locale_context(app, page, 'page.html', context, None)
+                self.assertEqual(context['nexus_language_links'][1]['href'], expected)
 
 
 if __name__ == "__main__":

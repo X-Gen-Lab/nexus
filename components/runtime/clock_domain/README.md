@@ -23,4 +23,4 @@ token 必须保持存活和不变，直到该原对象成功释放；复制字�
 
 `close` 不取消 I/O，`quiescent` 不证明未登记 consumer 已停止。本组件不停止 Tick、
 修改 PLL、重置 deadline 域或替 OS 作决策。调用与失败责任见
-[时钟域和睡眠合同](../../../docs/design/clock-domain-sleep.md)。
+[时钟域和睡眠合同](../../../docs/reference/contracts/platform/clock-domain.md)。

@@ -1,0 +1,128 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 1c674d5df611fdcce0da5a4cc7ee74da3b9983218be4d88a3f31434759b3ef16\n"
+
+#: ../../../../../../docs/guides/app-configuration.md:8
+msgid "配置应用与增加 I/O"
+msgstr "Configure an application and add I/O"
+
+#: ../../../../../../docs/guides/app-configuration.md:10
+msgid ""
+"应用只维护一份 schema-2 `assembly.toml`。它选择 Board、后端、时钟、组件、实例及 预算；SoC／Board JSON "
+"维护硬件事实，生成的 `resolved.json` 用于检查结果。"
+msgstr ""
+"An application maintains one schema-2 `assembly.toml`. It selects the Board,"
+" backend, clock, components, instances and budgets. SoC/Board JSON maintains"
+" hardware facts; the generated `resolved.json` exposes the result for "
+"inspection."
+
+#: ../../../../../../docs/guides/app-configuration.md:13
+msgid "先查询，再填写"
+msgstr "Query before authoring"
+
+#: ../../../../../../docs/guides/app-configuration.md:15
+msgid "以启明 V3.1 的 UART 为例，设置 `NEXUS_SOURCE` 为当前平台路径，再查询："
+msgstr ""
+"For the Qiming V3.1 UART, set `NEXUS_SOURCE` to the current platform path, "
+"then query:"
+
+#: ../../../../../../docs/guides/app-configuration.md:22
+msgid ""
+"`console` 是应用自定的逻辑名字，`uart1` 是 Board 提供的 binding，USART1 是实际 "
+"控制器。查询给出候选模式、资源、来源和限制；后端、时钟及全部实例仍须一起校验。"
+msgstr ""
+"`console` is an application-defined logical name, `uart1` is a Board "
+"binding, and USART1 is the physical controller. The query reports candidate "
+"modes, resources, sources and limits. The backend, clock and all instances "
+"still require validation together."
+
+#: ../../../../../../docs/guides/app-configuration.md:25
+msgid "已有工程从对应模板修改 `assembly.toml`。没有配置时，可创建一份独立 UART 配置："
+msgstr ""
+"For an existing project, edit the `assembly.toml` from its matching "
+"template. If no configuration exists, create an independent UART "
+"configuration:"
+
+#: ../../../../../../docs/guides/app-configuration.md:34
+msgid ""
+"`init` 拒绝覆盖已有文件。`empty`、`gpio`、`uart` 是有限起始配置，不自动增加任务、 调度器或产品恢复策略。先阅读生成的 "
+"TOML，再采用其中的容量和优先级。"
+msgstr ""
+"`init` refuses to overwrite an existing file. `empty`, `gpio` and `uart` are"
+" bounded starting configurations; they do not add tasks, a scheduler or "
+"product recovery policy. Read the generated TOML before adopting its "
+"capacities and priorities."
+
+#: ../../../../../../docs/guides/app-configuration.md:37
+msgid "检查有效配置"
+msgstr "Check the effective configuration"
+
+#: ../../../../../../docs/guides/app-configuration.md:46
+msgid ""
+"`mode = \"irq\"` 与 `rx.format = \"events\"` 对应查询中的 `irq-byte-event`。 "
+"`rx.capacity = 32` 表示 32 个事件，不是 32 字节。`explain` 显示最终接口、引脚、 "
+"时钟、IRQ／DMA、内存域、容量和执行责任；编辑器 schema 仅提供字段提示。"
+msgstr ""
+"`mode = \"irq\"` and `rx.format = \"events\"` correspond to `irq-byte-event`"
+" in the query. `rx.capacity = 32` means 32 events, not 32 bytes. `explain` "
+"reports final interfaces, pins, clocks, IRQ/DMA, memory domains, capacities "
+"and execution responsibilities. The editor schema provides field hints only."
+
+#: ../../../../../../docs/guides/app-configuration.md:50
+msgid "修改后可比较两份有效配置："
+msgstr "After a change, compare two valid configurations:"
+
+#: ../../../../../../docs/guides/app-configuration.md:57
+msgid ""
+"两份输入都须有效。重点看 factory ID、公开接口、传输、执行和存储变化。调整实例 顺序可能改变紧凑 ID，不将它们持久化后跨 bundle "
+"使用。"
+msgstr ""
+"Both inputs must be valid. Inspect changes to factory IDs, public "
+"interfaces, transfer, execution and storage. Reordering instances may change"
+" compact IDs; do not persist them for use across bundles."
+
+#: ../../../../../../docs/guides/app-configuration.md:60
+msgid "使用所选接口"
+msgstr "Use the selected interface"
+
+#: ../../../../../../docs/guides/app-configuration.md:62
+msgid ""
+"生成 bundle 自带 `nexus_factory_strong.h`。`uart.console` 使用 "
+"`nx_factory_uart_ref(NX_UART_REF_CONSOLE)`；获取只返回既有静态对象，不启动硬件。 先成功启动 "
+"Platform，再按该模式提供 service、请求与缓冲存储。"
+msgstr ""
+"The generated bundle includes `nexus_factory_strong.h`. For `uart.console`, "
+"use `nx_factory_uart_ref(NX_UART_REF_CONSOLE)`. Acquisition returns an "
+"existing static object; it does not start hardware. Start Platform "
+"successfully before supplying the service, request and buffer storage "
+"required by the selected mode."
+
+#: ../../../../../../docs/guides/app-configuration.md:66
+msgid ""
+"只选择的类别才有 factory getter。可选组合用 `defined(NX_FACTORY_HAS_UART)` 判断 "
+"是否存在；`factory.strong` 不是配置字段。`factory.capabilities` 只选择独立能力元数据。"
+msgstr ""
+"Only selected categories have factory getters. For optional combinations, "
+"use `defined(NX_FACTORY_HAS_UART)` to test their presence. `factory.strong` "
+"is not a configuration field. `factory.capabilities` selects only separate "
+"capability metadata."
+
+#: ../../../../../../docs/guides/app-configuration.md:69
+msgid ""
+"Native 配置查询需显式 `--test-support`。私有 Board 使用 `--board-package` 创建， 其相对路径随 "
+"TOML／产品目录移动。完整字段和单位见 [TOML 参考](../reference/configuration/assembly.md)，执行规则见"
+" [I/O 执行](io-execution.md)，错误定位见[排错](troubleshooting.md)。"
+msgstr ""
+"Native configuration queries require explicit `--test-support`. Use "
+"`--board-package` when creating a private Board configuration; its relative "
+"path moves with the TOML/product directory. See the [TOML "
+"reference](../reference/configuration/assembly.md) for all fields and units,"
+" [I/O execution](io-execution.md) for execution rules, and "
+"[troubleshooting](troubleshooting.md) for diagnostics."

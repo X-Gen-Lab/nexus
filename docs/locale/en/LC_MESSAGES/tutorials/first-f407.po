@@ -1,0 +1,102 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 4b78711dd0aeceffe2b14c9df6a7d2b70b2c80a9da0cf01d490a45b193b0cee1\n"
+
+#: ../../../../../../docs/tutorials/first-f407.md:8
+msgid "构建第一个 STM32F407 镜像"
+msgstr "Build the first STM32F407 image"
+
+#: ../../../../../../docs/tutorials/first-f407.md:10
+msgid ""
+"本教程使用启明 STM32F407ZGT6 V3.1 的裸机模板，构建 GPIO／UART 问候应用。 完整料号、Board "
+"与时钟选择均来自维护模板。本教程的成功出口是镜像及资源报告； 实际下载与串口观测另行进入板卡流程。"
+msgstr ""
+"This tutorial uses the Qiming STM32F407ZGT6 V3.1 baremetal template to build"
+" a GPIO/UART greeting application. The maintained template supplies the full"
+" part, Board and clock selection. Success means an image and resource "
+"report; flashing and serial observation belong to the Board workflow."
+
+#: ../../../../../../docs/tutorials/first-f407.md:14
+msgid "准备源码、工具与所选依赖"
+msgstr "Prepare source, tools and selected dependencies"
+
+#: ../../../../../../docs/tutorials/first-f407.md:16
+msgid ""
+"按[源码指南](../guides/source-checkout.md)取得平台及示例。需要 Python 3.11+、 CMake "
+"3.31+、Ninja，以及平台锁定的 ARM GCC；编译器目录加入 `PATH`。"
+msgstr ""
+"Obtain the platform and examples using the [source guide](../guides/source-"
+"checkout.md). You need Python 3.11+, CMake 3.31+, Ninja and the platform-"
+"pinned ARM GCC, with its compiler directory on `PATH`."
+
+#: ../../../../../../docs/tutorials/first-f407.md:28
+msgid ""
+"该准备入口读取精确 preset／TOML，裸机最小路径只选择 CMSIS Core、Device F4 和 HAL F4。GoogleTest、完整 "
+"Native 维护图和未选中间件不属于这条消费路径。"
+msgstr ""
+"This preparation entry reads the exact preset/TOML. The minimal baremetal "
+"path selects only CMSIS Core, Device F4 and HAL F4. GoogleTest, the full "
+"Native maintenance graph and unselected middleware are outside this consumer"
+" path."
+
+#: ../../../../../../docs/tutorials/first-f407.md:31
+msgid "创建并构建"
+msgstr "Create and build"
+
+#: ../../../../../../docs/tutorials/first-f407.md:33
+msgid "`PRODUCT_DIR` 必须尚不存在。先从固定提交创建 `qiming` 模板："
+msgstr ""
+"`PRODUCT_DIR` must not already exist. First create the `qiming` template "
+"from a fixed commit:"
+
+#: ../../../../../../docs/tutorials/first-f407.md:45
+msgid ""
+"模板选择 `stm32f407_qiming_v31`、`hse8-pll168`、状态 GPIO 和 USART1。 应用角色为 "
+"`status`、`console`，通过生成的强类型 factory 取得既有接口。 成功时固件目标生成 ELF、BIN、map 与 "
+"`*.resources.json`；资源报告应为通过， 且 part、Board 和配置输入与所选 TOML 一致。"
+msgstr ""
+"The template selects `stm32f407_qiming_v31`, `hse8-pll168`, a status GPIO "
+"and USART1. Application roles are `status` and `console`, acquired through "
+"the generated strong typed factory. On success, the firmware target produces"
+" ELF, BIN, map and `*.resources.json`. The resource report must pass, and "
+"its part, Board and configuration inputs must match the selected TOML."
+
+#: ../../../../../../docs/tutorials/first-f407.md:50
+msgid "核对与后续操作"
+msgstr "Check results and continue"
+
+#: ../../../../../../docs/tutorials/first-f407.md:52
+msgid ""
+"阅读生成工程的 README 和对应 Board README。UART 预期为 115200 baud、发送 `Nexus starter "
+"ready`；这些是应用意图，尚未实测的 PCB 跳线、时钟、电平与真实 串口输出仍保持未知。当前实板 HIL 状态是 `not_executed`。"
+msgstr ""
+"Read the generated project README and matching Board README. UART intent is "
+"115200 baud and `Nexus starter ready` output. These are application "
+"intentions; unmeasured PCB jumpers, clocks, levels and actual serial output "
+"remain unknown. The current physical HIL status is `not_executed`."
+
+#: ../../../../../../docs/tutorials/first-f407.md:56
+msgid ""
+"其他维护模板为 `sky`、`qiming-core`、`qiming-v41`。切换模板时同时核对完整料号、 晶振、Board 绑定与实际 "
+"PCB，不只改 CMake 名字。不同装配使用独立构建目录。"
+msgstr ""
+"Other maintained templates are `sky`, `qiming-core` and `qiming-v41`. When "
+"changing templates, check the full part, oscillator, Board bindings and "
+"actual PCB together; do not merely rename the CMake project. Use separate "
+"build directories for different assemblies."
+
+#: ../../../../../../docs/tutorials/first-f407.md:59
+msgid ""
+"修改配置见[应用配置](../guides/app-configuration.md)，新 PCB 见 [Board "
+"接入](../guides/board-porting.md)，常见失败见 [排错指南](../guides/troubleshooting.md)。"
+msgstr ""
+"See [application configuration](../guides/app-configuration.md) for changes,"
+" [Board porting](../guides/board-porting.md) for a new PCB, and "
+"[troubleshooting](../guides/troubleshooting.md) for common failures."

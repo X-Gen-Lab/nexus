@@ -1,17 +1,17 @@
 ---
-id: docs-explanation-ownership
+id: explanation.ownership
 type: explanation
 audience: consumer
 source_language: en
 ---
 
-(docs-explanation-ownership)=
+(explanation.ownership)=
 # Borrow, completion and observer lifetime
 
 The caller owns request and buffer storage. Accepted asynchronous I/O borrows it;
 rejection does not. Cancellation, a deadline or a failed stop cannot revoke that
 borrow. This separation prevents IRQ/DMA or an executor from accessing recycled
-memory. The [lifecycle contract](../design/next-generation-platform.md)
+memory. The [lifecycle contract](design-principles.md)
 and public operation declarations define exact context and result behavior.
 
 | Event | Storage consequence |
@@ -76,7 +76,7 @@ Continuous receive and ADC use explicit caller-owned block loans. A consumer kee
 a block immutable until matching release. The producer needs a replacement target
 before publishing an old hardware bank. No replacement means visible stop/backpressure;
 it must never overwrite a consumer. Stop waits for filling, ready and borrowed
-blocks, not just active DMA. [The stream contract](../design/io-observation-recovery.md)
+blocks, not just active DMA. [The stream contract](../reference/contracts/io/observation-recovery.md)
 records what loss counters and software timestamps do and do not prove.
 
 ![Current continuous block producer, replacement and loan drain](../assets/diagrams/continuous-stream.svg)

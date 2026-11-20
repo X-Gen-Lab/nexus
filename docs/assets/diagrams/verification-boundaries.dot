@@ -1,0 +1,30 @@
+// FIG-12: current independent documentation, SDK and HIL boundaries.
+// Code basis: tools/documentation/cli.py; cmake/package; tools/hil.
+digraph ValidationBoundaries {
+    graph [rankdir=TB, bgcolor="white", pad=0.28, nodesep=0.42,
+           ranksep=0.58, fontname="Noto Sans CJK SC", fontsize=15];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
+          color="#475569", fontname="Noto Sans CJK SC", fontsize=13];
+    edge [color="#475569", fontname="Noto Sans CJK SC", fontsize=11];
+    graph [label="FIG-12 文档、SDK 与实板验证边界\nFIG-12 Documentation, SDK and physical validation boundaries"];
+    source [label="精确源码、配置与锁定依赖\nExact source, configuration and locked dependencies"];
+    docs [label="cli.py check / test / build\n当前正文、翻译、图与 API\ncli.py check / test / build\nCurrent prose, translations, diagrams and API"];
+    html [label="严格双语 HTML 与实际构建报告\n只建立文档构建结果\nStrict bilingual HTML and actual build report\nDocumentation build scope only"];
+    sdk [label="package_source_sdk.py\n完整 prefix、依赖与许可证\npackage_source_sdk.py\nComplete prefix, dependencies and licenses"];
+    consumers [label="verify_consumers.py\n独立配置、编译、运行或链接\nverify_consumers.py\nIndependent configure, build, execution or linking"];
+    image [label="真实 ARM 镜像与配置身份\nActual ARM image and configuration identity"];
+    station [label="HIL 工装与真实 station\nPCB、探针、串口与供电\nHIL tooling and an actual station\nPCB, probe, serial and power"];
+    hardware [label="实际刷写与测量才建立物理结果\n未接入设备：not_executed\nPhysical results require actual flashing and measurement\nEquipment unavailable: not_executed"];
+    records [label="分别保留原始命令、退出码和报告\n无自动部署或产品发布"];
+    source -> docs [label="文档输入\nDocumentation inputs"];
+    docs -> html [label="实际构建\nActual build"];
+    source -> sdk [label="所选源码闭包\nSelected source closure"];
+    sdk -> consumers [label="完整性核验后的消费\nConsume after integrity verification"];
+    consumers -> image [label="实际生成的镜像\nActually linked image"];
+    image -> station [label="同一镜像与配置\nSame image and configuration"];
+    station -> hardware [label="需要设备实际执行\nRequires equipment execution"];
+    html -> records [label="文档记录\nDocumentation record"];
+    consumers -> records [label="SDK 消费记录\nSDK consumer record"];
+    hardware -> records [label="实板记录\nPhysical record"];
+    { rank=same; docs; sdk; }
+}

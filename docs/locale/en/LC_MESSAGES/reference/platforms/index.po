@@ -1,0 +1,21 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 4f6bdaf070820555ebc20c48de8386c8f8682cedecca60214b0cc17532138fb1\n"
+
+#: ../../../../../../docs/reference/platforms/index.md:9
+msgid "平台、能力与验证"
+msgstr "Platforms, capabilities and validation"
+
+#: ../../../../../../docs/reference/platforms/index.md:11
+msgid "先查精确料号、Board 和模式，再解析自己的完整配置。能力描述、接口实现、板级授权和实际执行分别回答不同问题。"
+msgstr ""
+"Check the exact part, Board and mode before resolving your complete "
+"configuration. Capability descriptions, interface implementations, Board "
+"authorization and actual execution answer distinct questions."

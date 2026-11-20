@@ -13,7 +13,7 @@ The platform supplies measurement and HIL tooling; products choose workloads,
 electrical limits, safe outputs and release policy. No Board is physically qualified
 until real equipment executes its reviewed scope.
 
-Prepare the [fixed source and recursive dependencies](source-checkout.md), then
+Retrieve the [fixed source](source-checkout.md), then prepare selected dependencies and
 the locked toolchain for the exact selected assembly.
 
 ## Measure an exact image
@@ -24,8 +24,8 @@ resource reports, not estimates derived from object counts. Separate Flash LOAD,
 Flash footprint, each physical RAM reservation, MSP, task stack/TCB, queue and I/O
 buffers. Stack capacity is not a measured stack high-water value.
 
-The [build contract](../design/build-system.md) owns resource checks.
-Use maintained `tools/measurement/` gates; [execution budgets](../design/soc-execution-budgets.md)
+The [build contract](../reference/contracts/build-system.md) owns resource checks.
+Use maintained `tools/measurement/` gates; [execution budgets](../reference/contracts/platform/execution-budgets.md)
 state scope. A speed claim needs units, clock, input size, load, sampling method
 and uncertainty. DWT 32-bit snapshots require a bounded wrap interval; host arrival
 timestamps do not establish MCU cycles or IRQ latency.
@@ -60,6 +60,7 @@ First configure and build the selected maintained assembly. For the Qiming
 baremetal reference, these repository-root commands consume its actual output:
 
 ```sh
+python tools/dev/dev.py prepare --scope preset --preset stm32-qiming-baremetal --allow-network
 python tools/dev/dev.py configure --preset stm32-qiming-baremetal
 python tools/dev/dev.py build --preset stm32-qiming-baremetal --parallel 4
 python tools/hil/prepare.py     --fixture tools/hil/fixtures/stm32f407_qiming_v31.json     --resolved build/stm32-qiming-baremetal/generated/resolved.json     --report /tmp/nexus-hil-preparation.json

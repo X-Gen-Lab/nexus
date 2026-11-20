@@ -1,0 +1,21 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: d5f65c07e8eb3964b249fe29ad340eb3a67fe00ea098adb9c4bf5dfcf9328854\n"
+
+#: ../../../../../../docs/reference/contracts/io/index.md:9
+msgid "I/O合同"
+msgstr "I/O contracts"
+
+#: ../../../../../../docs/reference/contracts/io/index.md:11
+msgid "每页限定于声明的模式、器件和软件参考，不从目录或厂商库推导完整支持。"
+msgstr ""
+"Each page is limited to its declared modes, devices, and software "
+"references. Directory names and vendor libraries do not imply complete "
+"support."

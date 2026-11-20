@@ -1,0 +1,22 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 0f1bc7e8b57f87391894700eaf3533c710b7dc63e6d6a4feba91c5629c5bdab5\n"
+
+#: ../../../../../../docs/explanation/index.md:9
+msgid "理解平台"
+msgstr "Understand the platform"
+
+#: ../../../../../../docs/explanation/index.md:11
+msgid "先理解状态、资源和责任，再选择具体接口。图中的依赖、调用、生成和所有权分别标注，架构分层不要求日常 I/O 逐层转发。"
+msgstr ""
+"Understand state, resources and responsibilities before choosing an "
+"interface. Diagrams distinguish dependencies, calls, generation and "
+"ownership. Architectural layers do not require ordinary I/O to forward "
+"through every layer."

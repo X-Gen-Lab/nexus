@@ -1,0 +1,727 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: fc858ae8d8ad7e46433038c83a1bdda36bfeb3662debf50af1bd03fc7e36a53c\n"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:10
+msgid "Copied I/O mediation and AMP IPC contracts"
+msgstr "复制式 I/O 中介与 AMP IPC 合同"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:12
+msgid ""
+"Copied mediation and AMP IPC require explicit authority, storage, executor "
+"and final-access proofs. These common mechanisms do not install an SVC "
+"gateway, enable TrustZone or supply a production multicore provider."
+msgstr ""
+"复制式中介和 AMP IPC 需要显式权限、存储、执行器及最终访问证明。这些公共机制不安装 SVC 网关、不启用 TrustZone，也不提供生产多核 "
+"provider。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:16
+msgid "Public declarations"
+msgstr "公共声明"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:18
+msgid "user_io_broker.h"
+msgstr "user_io_broker.h"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:20
+msgid "Narrow kernel-invoked user GPIO message contract."
+msgstr "由内核调用的窄接口用户 GPIO 消息合同。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:20
+msgid ""
+"Author  Nexus Team   Version  1.0.0   Date  2026-10-11   Copyright  "
+"Copyright (c) 2026 Nexus Team"
+msgstr ""
+"作者  Nexus Team   版本  1.0.0   日期  2026-10-11   版权  Copyright (c) 2026 Nexus "
+"Team"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:20
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:26
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:32
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:38
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:44
+msgid "Nexus Team"
+msgstr "Nexus Team"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:20
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:26
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:32
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:38
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:44
+msgid "1.0.0"
+msgstr "1.0.0"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:20
+msgid "2026-10-11"
+msgstr "2026-10-11"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:20
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:26
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:32
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:38
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:44
+msgid "Copyright (c) 2026 Nexus Team"
+msgstr "Copyright (c) 2026 Nexus Team"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:20
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:26
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:38
+msgid "Typedefs"
+msgstr "类型定义"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:20
+msgid "Broker and persistent kernel call storage stay provider private."
+msgstr "broker 与持久内核调用存储保持提供者私有。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:20
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:26
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:38
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:44
+msgid "Enums"
+msgstr "枚举"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:20
+msgid "Only scalar GPIO operations are admitted by this message ABI."
+msgstr "此消息 ABI 仅允许标量 GPIO 操作。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:20
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:26
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:38
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:44
+msgid "Values:"
+msgstr "取值："
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:20
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:26
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:32
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:38
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:44
+msgid "Functions"
+msgstr "函数"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:20
+msgid "Execute one scalar GPIO message through a trusted gateway."
+msgstr "通过可信网关执行一个标量 GPIO 消息。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:20
+msgid ""
+"Kernel-invoked privileged Thread with incoming masks clear, one serialized "
+"broker executor. Principal comes from the configured trusted kernel identity"
+" port. Pin both validated memory ranges before any GPIO call; snapshot input"
+" once, copy an initialized reply. Kernel call storage is zero-initialized "
+"outside user RAM and must outlive retained pins. No OS SVC/MPU/TZ wiring or "
+"user privilege elevation is provided by this component."
+msgstr ""
+"由内核调用的特权 Thread，进入时屏蔽状态必须清除，只有一个串行 broker 执行者。principal 来自配置的可信内核身份接口。在调用任何 "
+"GPIO 前，必须固定两个已经验证的内存区间；输入只快照一次，复制已初始化的回复。内核调用存储在用户 RAM "
+"外零初始化，其寿命必须覆盖保留的固定区间。该组件不提供 OS SVC/MPU/TZ 接线，也不提升用户权限。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:0
+msgid "Returns"
+msgstr "返回值"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:20
+msgid ""
+"REJECTED has accepted=false, no pin/effect. ACCEPTED may already be detached"
+" or retain cleanup after a failure."
+msgstr ""
+"REJECTED 表示 accepted=false，不保留固定区间，也不产生效果。ACCEPTED 可能已经分离，也可能在失败后继续保留清理责任。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:20
+msgid "Retry retained cleanup without reading users or replaying IO."
+msgstr "重试保留的清理，不读取用户存储或重放 I/O。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:20
+msgid ""
+"Same privileged serialized kernel owner, incoming masks clear. Successful "
+"unpin follows actual provider/observer drain; a failed unpin keeps memory, "
+"call slot and identity retained. Does not imply that a previously performed "
+"GPIO write can be reversed."
+msgstr ""
+"同一特权串行内核所有者，进入时屏蔽状态必须清除。只有实际排空提供者和观测者后才能成功解除固定；解除固定失败时，内存、调用槽及身份继续保留。这不表示可以逆转先前已执行的"
+" GPIO 写入。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:20
+msgid "Untrusted copied message; identity never comes from users."
+msgstr "来自不可信方的已复制消息；身份绝不取自用户输入。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:20
+msgid ""
+"No arbitrary port, MMIO, callback, slot or principal pointer. reserved words"
+" must be zero. WRITE has read_mask=0 and disjoint set/reset masks. READ has "
+"zero set/reset masks and a positive authorized read_mask. Caller keeps "
+"storage immutable until the gateway completes or retains its pin."
+msgstr ""
+"不接受任意接口、MMIO、回调、槽或 principal 指针。reserved 字必须为零。WRITE 要求 read_mask=0，且 "
+"set/reset 掩码不重叠。READ 要求 set/reset 掩码为零，并使用非零且已授权的 "
+"read_mask。网关完成前，或固定区间仍保留期间，调用者必须保持存储不可变。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:20
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:26
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:32
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:38
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:44
+msgid "Public Members"
+msgstr "公共成员"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:20
+msgid "Fully initialized copied result; value is zero for errors/WRITE."
+msgstr "完整初始化的复制结果；错误或 WRITE 时 value 为零。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:20
+msgid "Distinguish admission, cleanup retention and possible effect."
+msgstr "区分准入、保留清理责任与可能发生的效果。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:20
+msgid ""
+"accepted means at least one memory pin was acquired. On retained=true the "
+"exact kernel call slot and user address space remain borrowed. "
+"device_effect_possible is set before a WRITE provider call; an error cannot "
+"authorize replay. result describes admission/device execution; "
+"cleanup_result separately describes the most recent release attempt. This is"
+" software responsibility, not physical pin evidence."
+msgstr ""
+"accepted 表示至少成功固定了一个内存区间。retained=true "
+"时，精确的内核调用槽及用户地址空间继续被借用。device_effect_possible 在调用 WRITE "
+"提供者前置位；出错不能授权重放。result 描述准入及器件执行结果；cleanup_result "
+"独立描述最近一次释放尝试。这是软件责任，不是物理引脚证据。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:24
+msgid "amp_ipc.h"
+msgstr "amp_ipc.h"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:26
+msgid "Bounded epoch-safe unidirectional shared-memory loans."
+msgstr "有界、以 epoch 防止旧身份复用的单向共享内存借用。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:26
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:32
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:38
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:44
+msgid ""
+"Author  Nexus Team   Version  1.0.0   Date  2026-10-20   Copyright  "
+"Copyright (c) 2026 Nexus Team"
+msgstr ""
+"作者  Nexus Team   版本  1.0.0   日期  2026-10-20   版权  Copyright (c) 2026 Nexus "
+"Team"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:26
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:32
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:38
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:44
+msgid "2026-10-20"
+msgstr "2026-10-20"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:26
+msgid "Defines"
+msgstr "宏定义"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:26
+msgid "Explicit port-isolation unit; supported cache granules divide 64."
+msgstr "显式端口隔离单元；支持的缓存粒度须能整除 64。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:26
+msgid "Publish one complete-cache-line payload span without copying."
+msgstr "发布一个覆盖完整缓存行的载荷范围，不进行复制。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:26
+msgid ""
+"Serialized owner Thread only, same rule for every API below. No waits, "
+"allocation, scheduler, ISR or implicit worker. Outputs must not overlap any "
+"live instance/lane storage. Producer must finish DMA/other writers before "
+"this call."
+msgstr ""
+"仅供串行所有者 Thread 调用；下方全部 API 均遵守相同规则。不等待，不分配内存，不创建调度器、ISR "
+"或隐式工作线程。输出不得与任何活动实例或通道存储重叠。生产者须在调用前结束 DMA 及其他写入者的访问。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:26
+msgid ""
+"SUCCESS transfers a read-only borrow until exact ACK poll or successful "
+"reset_join. Rejection retains nothing and does not publish. EXHAUSTED means "
+"no reusable slot identity."
+msgstr ""
+"SUCCESS 转移只读借用，直至轮询到精确 ACK 或 reset_join 成功。拒绝不保留内容，也不发布。EXHAUSTED "
+"表示没有可复用的时隙身份。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:26
+msgid "Acquire-observe an exact ACK; BUSY/IO/STATE retain the sender borrow."
+msgstr "以 acquire 语义观察精确 ACK；BUSY/IO/STATE 均保留发送方借用。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:26
+msgid "Acquire one offer after descriptor/payload invalidation succeeds."
+msgstr "描述符及载荷失效操作成功后，获取一个发布项。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:26
+msgid "Join the caller view, then publish its exact ACK."
+msgstr "让调用方视图的全部使用者会合退出，再发布该视图的精确 ACK。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:26
+msgid ""
+"Valid ticket invocation permanently joins local readers. IO or STATE retains"
+" endpoint/slot storage; retry finish or use reset_join after closing. Stale "
+"tickets change nothing."
+msgstr ""
+"使用有效票据调用即不可撤销地确认本地读取者已会合退出。IO 或 STATE 保留端点和时隙存储；可重试 finish，或关闭后使用 "
+"reset_join。陈旧票据不改变任何状态。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:26
+msgid "Close admission; outstanding send/receive loans remain retained."
+msgstr "关闭准入；未完成的发送和接收借用仍被保留。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:26
+msgid "Join a closed endpoint after all exact ACKs/local returns."
+msgstr "全部精确 ACK 及本地归还完成后，让已关闭端点会合退出。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:26
+msgid ""
+"BUSY, IO or STATE retain the unique owner. Success performs its final access"
+" and unclaims the role. Storage cannot be reconstructed: boot/sequence "
+"identities never reset here."
+msgstr "BUSY、IO 或 STATE 保留唯一所有者。成功执行最后访问并释放该角色声明。不得重构存储：此处从不重置启动及序列身份。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:26
+msgid "Join after an explicit old-peer stop proof."
+msgstr "在取得显式旧对端停止证明后会合退出。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:26
+msgid ""
+"Closed endpoint required; receiver views must have been consumed by finish "
+"first. Failed proof retains ALL sender loans and ownership. Success retires "
+"this endpoint; any replacement uses a strictly newer nonzero boot epoch from"
+" the external boot owner, never rollover/reuse."
+msgstr ""
+"要求端点已关闭；接收者视图必须先由 finish "
+"消费。证明失败保留发送方的全部借用及所有权。成功后此端点退役；任何替代端点均须使用外部启动所有者提供的、严格更新的非零启动 epoch，绝不回绕或复用。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:26
+msgid "One writer's isolated publication word; accesses use the port only."
+msgstr "一个写入者的隔离发布字；仅通过端口访问。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:26
+msgid "Shared descriptor; offsets refer to the configured payload window."
+msgstr "共享描述符；偏移量相对于已配置的载荷窗口。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:26
+msgid "Caller-owned shared slot with disjoint writer cache lines."
+msgstr "调用方拥有的共享时隙，各写入者的缓存行互不重叠。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:26
+msgid ""
+"Sender alone writes offer/published; receiver alone writes "
+"receipt/acknowledged. All four units must be reachable by both CPUs. Cold "
+"initialization precedes either endpoint."
+msgstr ""
+"仅发送方写 offer/published；仅接收方写 receipt/acknowledged。两个 CPU "
+"均须能访问这四个单元。任一端点启动前须完成冷初始化。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:26
+msgid "Hardware/ownership boundary supplied by the integration."
+msgstr "集成方提供的硬件与所有权边界。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:26
+msgid ""
+"Every callback is synchronous, bounded and non-reentrant. claim grants the "
+"unique role owner of this exact lane and atomically rejects a reused/non-"
+"increasing local boot epoch, even after ordinary join. Its authoritative "
+"hardware boot owner preserves this history across CPU resets; exhaustion "
+"fails closed. Rejection has no effects. unclaim follows final join only and "
+"never erases boot identity history. clean/invalidate cover exact complete "
+"isolated cache lines, finish their architectural barriers, and may fail. A "
+"failed clean MUST NOT publish a control word. acquire/release are infallible"
+" atomic 32-bit coherent control operations: the port owns any control-cache "
+"maintenance. They must order descriptor/payload access across both CPUs and "
+"bus fabric. stopped proves the named old peer CPU, DMA, IRQ and all "
+"observers can never access the lane or payload again. The context binds the "
+"exact physical lane and peer execution epoch covered by stopped. An epoch "
+"observation, cancel, deadline or elapsed timeout never supplies this proof. "
+"No existing single-core SoC supplies it."
+msgstr ""
+"每个回调均同步、有界且不可重入。claim 授予此精确通道的唯一角色所有者，并以原子方式拒绝复用或未递增的本地启动 epoch，即使普通 join "
+"已完成也不例外。其权威硬件启动所有者跨 CPU 复位保留此历史；耗尽时关闭接纳。拒绝不产生效果。unclaim "
+"仅发生于最终会合退出后，且从不清除启动身份历史。clean/invalidate 覆盖精确、完整且隔离的缓存行，完成其架构屏障，并可能失败。clean "
+"失败绝不能发布控制字。acquire/release 是不会失败的原子 32 位一致性控制操作：端口负责全部控制缓存维护。它们须跨两个 CPU "
+"和总线互连，对描述符及载荷访问建立顺序。stopped 证明指定的旧对端 CPU、DMA、IRQ 及全部观察者从此再也不能访问通道或载荷。上下文绑定 "
+"stopped 所覆盖的精确物理通道和对端执行 epoch。epoch 观测、取消、期限或已流逝的超时都不能提供此证明。现有单核 SoC "
+"均不提供该证明。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:26
+msgid "Instance/boot/slot identity; endpoint outlives every ticket copy."
+msgstr "实例、启动及时隙身份；端点须比每一份票据副本存活更久。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:26
+msgid "Receiver's borrowed read-only shared span."
+msgstr "接收者借用的只读共享范围。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:26
+msgid ""
+"Caller must join every local reader before finish. A valid finish invocation"
+" consumes the caller view even when link acknowledgement fails; endpoint "
+"storage remains retained."
+msgstr ""
+"调用方须在 finish 前让每个本地读取者会合退出。有效 finish 调用会消费调用方视图，即使链路确认失败也不例外；端点存储仍被保留。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:26
+msgid "Stable close identity; endpoint lives longer than all control copies."
+msgstr "稳定的关闭身份；端点须比全部控制对象副本存活更久。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:30
+msgid "amp_ipc_storage.h"
+msgstr "amp_ipc_storage.h"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:32
+msgid "Caller-owned endpoint configuration and retained loan state."
+msgstr "调用方拥有的端点配置及保留借用状态。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:32
+msgid "Claim and bind unused zero-initialized endpoint storage."
+msgstr "声明并绑定未使用、已清零初始化的端点存储。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:32
+msgid ""
+"Serialized privileged owner Thread, before publication. Validates disjoint "
+"spans and exact boot epochs before claim. Rejected construction has no "
+"references or shared effects. The port must independently enforce unique "
+"hardware/role ownership; this component contains no global registry."
+msgstr ""
+"由串行特权所有者 Thread 在发布前调用。claim 前校验范围互不重叠及精确启动 "
+"epoch。构造拒绝不保留引用，也不产生共享效果。端口须独立强制唯一硬件及角色所有权；此组件不含全局注册表。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:32
+msgid "Zero-initialized local state; no sharing with another endpoint."
+msgstr "已清零初始化的本地状态；不与其他端点共享。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:32
+msgid "One unidirectional lane and exact caller-owned storage."
+msgstr "一条单向通道及精确的调用方存储。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:32
+msgid ""
+"Both boot words are externally published, monotonic nonzero epochs. Never "
+"republish an old boot identity, including after a whole-device reset. The "
+"boot owner must fail closed on exhaustion. Initial shared records/words are "
+"zeroed or retained from older epochs, never edited while live. Wire and boot"
+" words occupy separate complete 64-byte units. All shared spans align to "
+"granule (power of two, 1..64). Payload size is a positive multiple of "
+"granule. Configuration, callbacks and all supplied storage outlive final "
+"join."
+msgstr ""
+"两个启动字均为外部发布、单调且非零的 "
+"epoch。绝不重新发布旧启动身份，整机复位后也不例外。启动所有者须在耗尽时关闭接纳。初始共享记录及控制字须已清零，或保留自更早 "
+"epoch；活动期间不得编辑。协议控制字和启动字分别占用独立、完整的 64 字节单元。全部共享范围按 granule 对齐，granule 为 "
+"1..64 之间的二次幂。载荷大小是 granule 的正整数倍。配置、回调及全部传入存储均须保持存活，直至最终会合退出。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:36
+msgid "user_io_async.h"
+msgstr "user_io_async.h"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:38
+msgid "Bounded copied UART user mediation."
+msgstr "有界复制式 UART 用户代理。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:38
+msgid "Authenticate and copy one bounded user gateway transaction."
+msgstr "认证并复制一次有界用户网关事务。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:38
+msgid ""
+"Privileged unmasked Thread, one serialized gateway executor. Authenticate "
+"the current principal on every call. The trusted copy port supplies fault "
+"containment and mapping stability; range checks alone prove neither. The "
+"caller separately drives the existing BusOwner/UARTOwner; this call never "
+"services it. CANCEL only requests its drain. CONSUME requires acquire "
+"SETTLED and the existing owner's idle/join barrier, copies the reply first, "
+"then wipes bytes/releases the exact cell. Failed reply copy, cancellation or"
+" quarantine never releases an accepted cell. No SVC/CMSE entry or NS RTOS is"
+" provided."
+msgstr ""
+"特权、未屏蔽中断的 "
+"Thread，由唯一网关执行者串行调用。每次调用均认证当前主体。可信复制端口提供故障隔离和映射稳定性；仅范围检查不能证明两者。调用方另外推进既有 "
+"BusOwner/UARTOwner；本调用从不执行其 service。CANCEL 仅请求其排空。CONSUME 要求以 acquire 观察 "
+"SETTLED 及既有所有者的空闲／汇合屏障，先复制回复，再擦除字节并释放精确单元。回复复制失败、取消或隔离都不释放已接受单元。不提供 SVC/CMSE"
+" 入口或 NS RTOS。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:0
+msgid "Parameters"
+msgstr "参数"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:38
+msgid "[inout] Trusted privileged binding and exact copied slots."
+msgstr "[inout] 可信特权绑定及精确复制槽位。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:38
+msgid "[in] Transient full readable user header, copied once."
+msgstr "[in] 临时完整可读的用户头部，仅复制一次。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:38
+msgid "[in] Transient readable SUBMIT bytes; NULL otherwise."
+msgstr "[in] 临时可读的 SUBMIT 字节；其他情况为 NULL。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:38
+msgid "[out] Transient disjoint full writable user reply."
+msgstr "[out] 临时、互不重叠且完整可写的用户回复。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:38
+msgid ""
+"SUCCESS after reply copy; identity/span/protocol/copy/control errors "
+"otherwise. No user address survives any return. A reply-copy error can "
+"follow acceptance: POLL the proposed slot/epoch; duplicate SUBMIT cannot "
+"replay or replace it."
+msgstr ""
+"回复复制后返回 SUCCESS；否则返回身份、跨度、协议、复制或控制错误。任何返回后均不保留用户地址。接受后仍可能发生回复复制错误：以 POLL "
+"查询所提出的槽位／纪元；重复 SUBMIT 不得重放或替换它。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:38
+msgid "Close copied admission and cancel this binding's live work."
+msgstr "关闭复制接纳并取消此绑定的活动工作。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:38
+msgid ""
+"Trusted privileged management, not a user gateway action. Same serialized "
+"lifecycle executor as dispatch/join, except synchronous identity/copy "
+"callbacks may request close. This is not a general concurrent cross-task "
+"control API. Close is permanent; it does not close the underlying owner. No "
+"worker or provider service runs here. Keep driving the owner and "
+"authenticate POLL/CONSUME through normal dispatch. Identity/copy callbacks "
+"may request close, never recursively dispatch or reconstruct. All bound "
+"storage stays live."
+msgstr ""
+"可信特权管理操作，不是用户网关动作。与 dispatch/join 使用同一串行生命周期执行者，但同步身份／复制回调可以请求 "
+"close。这不是通用的跨任务并发控制 API。关闭是永久的，但不关闭底层所有者。此处不运行工作线程或提供者 "
+"service。须继续推进所有者，并通过常规 dispatch 认证 POLL/CONSUME。身份／复制回调可以请求 close，但不得递归 "
+"dispatch 或重新构造。全部绑定存储保持存活。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:38
+msgid "Privileged retirement after permanently lost user mappings."
+msgstr "用户映射永久丢失后的特权回收。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:38
+msgid ""
+"Same trusted serialized management as close/join; never an untrusted wire "
+"action. The kernel decides when cleanup is authorized. First close/cancel "
+"and separately drive the real owner. Every retained exact cell must acquire "
+"SETTLED and the owner must be idle. The trusted drained proof then fences "
+"future gateway entries and joins all outer observers while retaining the "
+"role. Only then are all copied payloads wiped and cells retired without user"
+" copyout. Pending, quarantined or unjoined work retains every cell "
+"unchanged. Success is idempotent and permanently rejects dispatch. It does "
+"not release the role: successful join is still required before reclaiming "
+"any bound storage. No forced borrow revocation, process-liveness policy or "
+"provider service is supplied."
+msgstr ""
+"与 close/join 使用相同的可信串行管理；绝不是不可信的传输动作。由内核决定何时授权清理。先 "
+"close/cancel，再另行推进真实所有者。每个保留的精确单元都必须以 acquire 观察 SETTLED，且所有者必须空闲。随后可信 "
+"drained "
+"证明阻止未来网关入口并汇合全部外部观察者，同时保留角色。只有此后才能擦除全部复制载荷并回收单元，无需向用户复制输出。待处理、隔离或未汇合的工作保留每个单元不变。成功具有幂等性，并永久拒绝"
+" dispatch。它不释放角色：回收任何绑定存储前仍须成功 join。不提供强制撤销借用、进程存活策略或提供者 service。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:38
+msgid "Join closed/consumed cells, owner and trusted gateway role."
+msgstr "汇合已关闭／已消费单元、所有者及可信网关角色。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:38
+msgid ""
+"Trusted serialized management. No reinitialization/reopen, hidden provider "
+"stop or identity registry is created. A successful join permits a fresh "
+"object with a larger claimed session; never reset or reconstruct this live "
+"object."
+msgstr ""
+"可信串行管理。不创建重新初始化／重新打开、隐式提供者停止或身份注册表。成功 join 后，可由新对象申领更大的会话；不得重置或重新构造此活动对象。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:38
+msgid ""
+"SUCCESS only after no gateway/copy, copied cell or owner publisher remains "
+"and the trusted role release proves outer gateway observers joined; "
+"BUSY/error retains role and storage."
+msgstr ""
+"仅在不再存在网关／复制、复制单元或所有者发布者，且可信角色释放证明外部网关观察者已汇合后返回 SUCCESS；BUSY 或错误均保留角色与存储。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:38
+msgid ""
+"Twelve scalar local C gateway words; no principal, address or callback."
+msgstr "十二个本地 C 网关标量字；不含主体、地址或回调。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:38
+msgid ""
+"SUBMIT proposes the exact next nonzero 64-bit epoch for an explicit slot "
+"within the exact claimed nonzero session and supplies positive length plus "
+"an absolute deadline in the existing owner's clock domain. Other actions use"
+" the accepted exact epoch and zero length/deadline words. device must match "
+"the immutable trusted binding; reserved=0. Word pairs encode low then high "
+"halves, independently of the compiler enum, pointer and uint64_t alignment "
+"ABI. These are local C gateway records; an integrating kernel owns byte "
+"order and any transport serialization."
+msgstr ""
+"SUBMIT 在精确已申领的非零会话内，为显式槽位提出精确下一个非零 64 "
+"位纪元，并提供正数长度及既有所有者时钟域中的绝对截止时间。其他动作使用精确已接受纪元，长度／截止时间字均为零。device "
+"必须匹配不可变可信绑定；reserved=0。字对按低半部、高半部编码，不依赖编译器枚举、指针或 uint64_t 的对齐 ABI。这些是本地 C "
+"网关记录；字节序及任何传输序列化均由集成内核负责。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:38
+msgid "Ten initialized scalar words; no privileged pointer."
+msgstr "十个已初始化标量字；不含特权指针。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:38
+msgid ""
+"state is a Core nx_request_state_t value encoded as uint32_t. Only SETTLED "
+"has a final result/count; other results are BUSY with count zero. accepted=1"
+" denotes the retained copied cell, including a terminal error when the "
+"existing owner rejects admission. No hardware effect follows from acceptance"
+" alone."
+msgstr ""
+"state 为编码成 uint32_t 的 Core nx_request_state_t 值。仅 SETTLED 具有最终结果／计数；其他结果为 "
+"BUSY，计数为零。accepted=1 表示保留的复制单元，包括既有所有者拒绝接纳时的终结错误。仅接受本身不产生硬件效果。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:42
+msgid "user_io_async_storage.h"
+msgstr "user_io_async_storage.h"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:44
+msgid "Trusted kernel assembly for exact copied UART user cells."
+msgstr "针对精确复制 UART 用户单元的可信内核装配。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:44
+msgid "Nominal copy permissions; actual access still requires trusted copy."
+msgstr "名义复制权限；实际访问仍须经过可信复制。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:44
+msgid "Cold construct one exact copied mediation over a real owner."
+msgstr "在真实所有者之上初始构造精确复制代理。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:44
+msgid ""
+"Privileged unmasked Thread with owner idle and no concurrent users. Cold O(n"
+" squared) alias checks reject all known mutable cell/payload/control "
+"overlaps and user-RAM aliases. Admission checks fixed region extents and "
+"copies at most the selected exact payload budget; no queue or worker is "
+"added. Keep policy, cells, owner, provider and all contexts stable through "
+"permanent close, consumption and successful join. Pure cold checks precede a"
+" constructing reservation and the trusted role claim; no fallible step "
+"follows successful claim. Fresh objects require a larger externally claimed "
+"session; this object cannot be reconstructed to reset its epochs."
+msgstr ""
+"特权、未屏蔽中断的 Thread，所有者空闲且没有并发使用者。初始 O(n squared) 别名检查拒绝全部已知可变单元／载荷／控制重叠及用户 RAM"
+" "
+"别名。接纳检查固定区域范围，复制量不超过所选精确载荷预算；不增加队列或工作线程。策略、单元、所有者、提供者及全部上下文须在永久关闭、消费直至成功汇合期间保持稳定。纯初始检查先于构造保留及可信角色申领；成功申领后不再有可失败步骤。新对象须从外部申领更大的会话；不得重新构造此对象以重置纪元。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:44
+msgid "[out] Fresh zero privileged storage, initialized once."
+msgstr "[out] 全新零初始化的特权存储，仅初始化一次。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:44
+msgid "[inout] Exact caller-owned cells/payloads, no maximum pool."
+msgstr "[inout] 调用方拥有的精确单元／载荷，不设最大存储池。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:44
+msgid "[in] Positive cell count representable in a scalar slot ID."
+msgstr "[in] 能以标量槽位 ID 表示的正数单元数量。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:44
+msgid "[in] Immutable trusted principal/grant/copy/owner binding."
+msgstr "[in] 不可变可信主体／授权／复制／所有者绑定。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:44
+msgid ""
+"SUCCESS or INVALID/STATE/CONTEXT/BUSY/EXHAUSTED, or trusted claim error "
+"without new retained users or hardware effects; every rejected output "
+"remains unchanged."
+msgstr ""
+"SUCCESS 或 "
+"INVALID/STATE/CONTEXT/BUSY/EXHAUSTED，或可信申领错误；不新增保留的用户引用或硬件效果；拒绝时每个输出均保持不变。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:44
+msgid "Nominal actual user RAM; trusted copy still enforces real access."
+msgstr "名义上的实际用户 RAM；真实访问仍由可信复制强制检查。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:44
+msgid "Bounded trusted kernel identity and fault-contained copies."
+msgstr "有界可信内核身份及具有故障隔离的复制。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:44
+msgid ""
+"identity authenticates the current entry, never user input. Copy operations "
+"guarantee complete checked CPU access and mapping/process lifetime for the "
+"callback duration. Neither success nor error retains a user address, kernel "
+"scratch pointer, mapping or observer after return. Errors may have partially"
+" copied bytes; the copied payload cell is wiped on rejection, and reply "
+"failure is recoverable through exact slot/epoch. No callback blocks, "
+"dispatches recursively, or substitutes a permission observation for fault-"
+"safe copying. Identity/copy callbacks may close this mediation. A new "
+"kernel/CMSE wrapper must actually establish these preconditions; this "
+"component does not.              claim is a trusted exclusive role authority"
+" for the actual              owner/controller binding. It rejects a second "
+"live role even              with a larger session, and rejects reused/non-"
+"increasing              nonzero sessions from persistent, nonwrapping "
+"history across              fresh storage, process/device reset and "
+"reconstruction.              Failed claim retains no reference/effect. "
+"Successful claim              permanently consumes that session and retains "
+"the exact role              until release. release SUCCESS proves outer "
+"gateway/transport observers joined and detaches all authority references; "
+"failure retains the original role unchanged. drained SUCCESS permanently "
+"fences future outer gateway entry and joins all gateway/transport observers,"
+" while the exact role remains claimed. Failed drained preserves the role and"
+" every cell unchanged. It must not modify bound configuration, cell "
+"identities or requests. Claim, release and drained are bounded and cannot "
+"recursively construct, dispatch, close, reap or join. Context/history must "
+"remain live; no source code implements this kernel authority, physical "
+"isolation, storage partition or recovery policy. Alternate wrappers of one "
+"controller are not distinct roles."
+msgstr ""
+"identity 认证当前入口，绝不接受用户提供的身份。复制操作保证在回调期间完成全部经检查的 CPU "
+"访问，并保证映射／进程生命周期。无论成功或错误，返回后均不保留用户地址、内核临时指针、映射或观察者。错误可能发生在部分字节已复制之后；拒绝时擦除复制载荷单元，回复失败可通过精确槽位／纪元恢复。任何回调都不得阻塞、递归"
+" dispatch，或以权限观察替代故障安全复制。身份／复制回调可以关闭此代理。新的内核／CMSE "
+"包装层必须真正建立这些前提；本组件不提供它们。claim "
+"是针对实际所有者／控制器绑定的可信独占角色授权者。即使会话更大，也拒绝第二个活动角色；并依据跨新存储、进程／器件复位及重构保留的持久、不回绕历史，拒绝复用或不递增的非零会话。失败申领不保留任何引用或效果。成功申领永久消耗该会话，并保留精确角色直至释放。release"
+" 返回 SUCCESS 证明外部网关／传输观察者已汇合，并分离全部授权引用；失败时原角色保持不变。drained 返回 SUCCESS "
+"永久阻止未来外部网关入口，并汇合全部网关／传输观察者，同时精确角色仍被申领。drained "
+"失败保留角色及每个单元不变。它不得修改绑定配置、单元身份或请求。claim、release 和 drained 有界，且不得递归 "
+"construct、dispatch、close、reap 或 "
+"join。上下文／历史必须保持存活；源码不实现此内核授权、物理隔离、存储分区或恢复策略。同一控制器的不同包装不构成不同角色。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:44
+msgid "Immutable trusted one-principal/one-device/one-owner grant."
+msgstr "不可变可信的单主体／单设备／单所有者授权。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:44
+msgid ""
+"This is kernel configuration, never copied from users. owner/executor/port "
+"must be the already constructed exact BusOwner + UARTOwner bridge, with no "
+"other direct producers or external request/payload observers. Completion "
+"callbacks are not installed. All callback contexts remain privileged; "
+"explicit extents cover their complete live controls. Guard, clock and wake "
+"contexts may be the same trusted object. The caller owns actual UART "
+"startup, hardware attribution, executor scheduling, clock/deadline domain "
+"and final stop."
+msgstr ""
+"这是内核配置，绝不从用户复制。owner/executor/port 必须是已构造的精确 BusOwner + UARTOwner "
+"桥接，不得有其他直接生产者或外部请求／载荷观察者。不安装完成回调。全部回调上下文保持在特权内存中；显式范围覆盖其完整活动控制。保护、时钟及唤醒上下文可以是同一可信对象。调用方负责实际"
+" UART 启动、硬件归属、执行者调度、时钟／截止时间域及最终停止。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:44
+msgid "Exact privileged cell; initialize only data and capacity."
+msgstr "精确特权单元；仅初始化 data 和 capacity。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:44
+msgid ""
+"All other fields start zero and are mechanism-private after construction. "
+"data is independent writable privileged RAM, capacity is its exact positive "
+"byte budget, at most UINT32_MAX. No user pointer is ever assigned here. Core"
+" identity epochs never wrap and survive consume/close; never copy or reset a"
+" live cell. UARTOwner borrows operation/payload until real provider final "
+"access, then user-result retention lasts until successful reply copy plus "
+"joined CONSUME, or trusted joined reap. Epoch history survives both paths."
+msgstr ""
+"其他字段初始均为零，构造后为机制私有。data 是独立可写特权 RAM；capacity 是精确正数字节预算，最大为 "
+"UINT32_MAX。此处绝不赋入用户指针。Core 身份纪元从不回绕，并在 consume/close "
+"后保留；不得复制或重置活动单元。UARTOwner 借用操作／载荷直至真实提供者的最后访问，此后用户结果保留至回复复制成功且 CONSUME "
+"已汇合，或可信 reap 已汇合。两条路径均保留纪元历史。"
+
+#: ../../../../../../docs/reference/api/components/runtime/isolation-ipc.md:44
+msgid "Caller-owned trusted control; initialize once, never reset epochs."
+msgstr "调用方拥有的可信控制；仅初始化一次，不得重置纪元。"

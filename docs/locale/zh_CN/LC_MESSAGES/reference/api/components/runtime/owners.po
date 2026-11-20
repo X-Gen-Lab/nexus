@@ -1,0 +1,614 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 5d2f2ff68ad12648c6da3fee3d7828cb70f906c0548bfd8fdf51771946bc9e5b\n"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:10
+msgid "Serialized owners and final-access observers"
+msgstr "串行化所有者与最终访问观察者"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:12
+msgid ""
+"Owners serialize selected I/O operations using caller-owned bounded storage."
+" Final request access, owner idleness, observer withdrawal and external "
+"executor joins are separate shutdown conditions."
+msgstr ""
+"所有者通过调用者拥有的有界存储串行化所选 I/O 操作。请求最终访问、所有者空闲、观察者撤回以及外部执行器 join，是相互独立的停机条件。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:16
+msgid "Public declarations"
+msgstr "公共声明"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:18
+msgid "bus_owner.h"
+msgstr "bus_owner.h"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:20
+msgid "Explicit bounded multi-producer, single-executor adapter."
+msgstr "显式、有界的多生产者、单执行者适配器。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:20
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:26
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:32
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:38
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:44
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:50
+msgid "Author  Nexus Team"
+msgstr "作者  Nexus Team"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:20
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:26
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:32
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:38
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:44
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:50
+msgid "Nexus Team"
+msgstr "Nexus Team"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:20
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:26
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:32
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:38
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:44
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:50
+msgid "Functions"
+msgstr "函数"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:20
+msgid "Initialize unused owner/slot storage."
+msgstr "初始化尚未使用的 owner／slot 存储。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:20
+msgid "Startup context; no task, worker, timer or heap is created."
+msgstr "启动上下文；不创建任务、工作线程、定时器或堆。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:0
+msgid "Parameters"
+msgstr "参数"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:20
+msgid "[out] Unused caller-owned adapter storage"
+msgstr "[out] 尚未使用且由调用者拥有的适配器存储"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:20
+msgid "[in] Exact queue capacity, no maximum pool"
+msgstr "[in] 精确队列容量，不使用最大容量池"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:20
+msgid "[in] Number of slots, greater than zero"
+msgstr "[in] 槽数量，必须大于零"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:20
+msgid "[in] Live short exclusion port"
+msgstr "[in] 保持有效的短临界区接口"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:20
+msgid "[in] Single real execution port"
+msgstr "[in] 单个真实执行接口"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:20
+msgid "[in] Same monotonic domain as request deadlines"
+msgstr "[in] 与请求截止时间相同的单调时钟域"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:20
+msgid "[in] Optional static executor notification, or NULL"
+msgstr "[in] 可选的静态执行者通知，或 NULL"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:0
+msgid "Returns"
+msgstr "返回值"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:20
+msgid "SUCCESS or INVALID"
+msgstr "SUCCESS 或 INVALID"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:20
+msgid "Establish the chain's unique admission."
+msgstr "建立请求链唯一的准入判定。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:20
+msgid ""
+"Task multi-producer context. Free-slot admission and FIFO insertion use "
+"constant metadata work under the guard. An exhausted epoch permanently "
+"retires its slot. Deadline includes queue residence. Caller must not modify "
+"request, operation or buffers after admission. A notification error after "
+"admission cannot change SUCCESS to rejection; executor must recheck/pump "
+"periodically."
+msgstr ""
+"任务中的多生产者上下文。空槽准入和 FIFO 入队在保护域内只执行常量规模的元数据操作。epoch "
+"耗尽的槽永久退役。截止时间包含排队驻留。准入后调用者不得修改请求、操作或缓冲。准入后的通知错误不能将 SUCCESS "
+"改为拒绝；执行者必须定期重新检查并推进。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:20
+msgid "[inout] Live accepting adapter"
+msgstr "[inout] 有效且接受准入的适配器"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:20
+msgid "[inout] Prepared READY storage, retained until SETTLED"
+msgstr "[inout] 已准备为 READY 的存储，持续保留至 SETTLED"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:20
+msgid "[in] Executor-specific descriptor and payload storage"
+msgstr "[in] 特定执行者使用的描述符及载荷存储"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:20
+msgid "[in] Optional static caller wake port, or NULL"
+msgstr "[in] 可选的静态调用者唤醒接口，或 NULL"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:20
+msgid "[out] Stable cancellation identity, valid on SUCCESS"
+msgstr "[out] 稳定的取消身份，在 SUCCESS 时有效"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:20
+msgid "SUCCESS means ACCEPTED; rejection retains zero references"
+msgstr "SUCCESS 表示 ACCEPTED；拒绝时不保留任何引用"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:20
+msgid "Submit cancellation through stable adapter storage."
+msgstr "通过稳定适配器存储提交取消。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:20
+msgid ""
+"Task multi-producer context. No request pointer is accepted. Queued "
+"cancellation settles without starting. Active cancellation drains "
+"cooperatively; an irreversible operation may already have transferred data."
+msgstr ""
+"任务中的多生产者上下文。不接受请求指针。排队中的取消在不启动操作的情况下结清。活动操作的取消通过协作排空推进；不可逆操作可能已经传输了数据。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:20
+msgid "[inout] Live adapter"
+msgstr "[inout] 有效的适配器"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:20
+msgid "[in] Previously accepted slot/epoch"
+msgstr "[in] 先前接受的槽及 epoch"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:20
+msgid "SUCCESS when marked, STATE for stale/released identity"
+msgstr "标记成功时为 SUCCESS；身份过期或已释放时为 STATE"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:20
+msgid "Advance at most one bounded execution step."
+msgstr "至多推进一个有界执行步骤。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:20
+msgid ""
+"Task/explicit loop only. Consumers never service through wait. Keep calling "
+"during stop until idle; no callback creates a worker."
+msgstr "仅限任务或显式循环。消费者不得通过等待操作执行服务。停止期间持续调用至空闲；回调不会创建工作线程。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:20
+msgid "[inout] Live adapter, called by its unique executor"
+msgstr "[inout] 有效的适配器，由其唯一执行者调用"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:20
+msgid ""
+"SUCCESS for progress/idle, BUSY for provider wait/contention, or provider "
+"error while retaining ownership for continued recovery"
+msgstr "取得进展或空闲时为 SUCCESS；等待提供者或存在争用时为 BUSY；也可能返回提供者错误，同时保留所有权以继续恢复"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:20
+msgid "Close admission and request every accepted operation to stop."
+msgstr "关闭准入，并请求每个已接受操作停止。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:20
+msgid ""
+"Task context. Executor must keep servicing/draining while producers "
+"wait/join. Stop is not settlement or storage reclamation."
+msgstr "任务上下文。生产者等待或汇合期间，执行者必须持续服务并排空。停止不表示已结清，也不表示可以回收存储。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:20
+msgid "Test whether execution and completion publication have exited."
+msgstr "检查执行及完成发布是否都已退出。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:20
+msgid ""
+"Join producers and any wake publishers before reclaiming owner, slots, guard"
+" or notifications. No future submit/cancel is permitted."
+msgstr "回收所有者、槽、保护接口或通知存储前，必须等待生产者和所有唤醒发布者退出。此后不得再次 submit 或 cancel。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:20
+msgid "True if no queue/active/service publisher remains"
+msgstr "队列、活动操作和服务发布者均不存在时为 true"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:20
+msgid "Explicit bounded metadata exclusion port."
+msgstr "显式、有界元数据排斥端口。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:20
+msgid ""
+"Task producer calls only. enter/leave must serialize all producers and the "
+"executor. Never hold this guard over start/service/cancel, waiting, payload "
+"copies or notification callbacks. State restores incoming interrupt mask "
+"when an architecture guard is used. Port storage stays live."
+msgstr ""
+"仅由任务生产者调用。enter/leave 必须串行化全部生产者与执行者。不得在 "
+"start/service/cancel、等待、载荷复制或通知回调期间持有该保护。使用架构保护时，状态会恢复进入时的中断屏蔽。接口存储必须保持有效。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:20
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:26
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:32
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:38
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:44
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:50
+msgid "Public Members"
+msgstr "公共成员"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:20
+msgid "One real execution owner, injected without OS dependency."
+msgstr "真实且唯一的执行所有者，注入时不依赖 OS。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:20
+msgid ""
+"start SUCCESS borrows operation until service SUCCESS. BUSY or any start "
+"error retains zero operation references/hardware effects; an error after "
+"partial start must instead accept and report through service. service "
+"SUCCESS proves all hardware/IRQ/deferred accesses stopped, writes final "
+"result/count, and releases the operation. BUSY still borrows. Other service "
+"errors retain ownership and require continued recovery/service. cancel "
+"requests drain; it never by itself releases operation. Callbacks run only in"
+" the externally scheduled executor, outside adapter metadata guard."
+msgstr ""
+"start 返回 SUCCESS 后开始借用 operation，直到 service 返回 SUCCESS。BUSY 或任何 start "
+"错误都必须不保留 operation 引用／硬件效果；部分启动后发生的错误必须改为接受操作，再通过 service 报告。service 返回 "
+"SUCCESS 必须证明全部硬件／IRQ／延后访问已停止，写入最终 result/count，并释放 operation。BUSY 仍保留借用。其他 "
+"service 错误保留所有权，并要求继续恢复／service。cancel 请求排空，绝不单独释放 "
+"operation。回调只在外部调度的执行者中运行，且必须位于适配器元数据临界区之外。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:20
+msgid ""
+"terminal_authority selects providers that observe deadlines and latch their "
+"first terminal hardware fact themselves. Their final result survives late "
+"cancellation/publication. Other executors use adapter deadline/cancellation "
+"results. Queued deadlines always belong to the adapter."
+msgstr ""
+"terminal_authority "
+"选择自行观察截止时间并锁存首个终止硬件事实的提供者。其最终结果不会被晚到的取消或发布覆盖。其他执行者使用适配器的截止时间和取消结果。排队请求的截止时间始终由适配器负责。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:20
+msgid "Stable control identity; never dereference a stale request pointer."
+msgstr "稳定控制身份；绝不解引用过期请求指针。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:20
+msgid ""
+"Exact caller-owned slot, linked in either the free or FIFO chain; initialize"
+" only with owner init."
+msgstr "调用者拥有的准确槽，连接在空闲链或 FIFO 链中；只能通过 owner init 初始化。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:20
+msgid "Explicit adapter state; external application supplies all storage."
+msgstr "显式适配器状态；全部存储由外部应用供给。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:24
+msgid "owner_observer.h"
+msgstr "owner_observer.h"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:26
+msgid "Explicit owner progress diagnostics without default state."
+msgstr "显式 owner 推进诊断，不含默认状态。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:26
+msgid "Bind an initialized exact owner without creating work."
+msgstr "绑定已初始化的准确 owner，不创建工作。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:26
+msgid "[inout] Fresh zero/detached sidecar, distinct from owner."
+msgstr "[inout] 新的零初始化或已分离附属状态，与所有者分开存储。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:26
+msgid "[inout] Initialized stable owner, no concurrent lifecycle."
+msgstr "[inout] 已初始化的稳定所有者，不存在并发生命周期操作。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:26
+msgid "SUCCESS or INVALID/STATE, no service or borrow on rejection."
+msgstr "SUCCESS 或 INVALID/STATE；拒绝时不执行服务，也不建立借用。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:26
+msgid "Execute exactly one real service step and copy diagnostics."
+msgstr "准确执行一次真实 service 步骤并复制诊断。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:26
+msgid ""
+"Clock reversal never blocks drain or rewrites its result. Snapshot uses the "
+"existing guard outside hardware service. No callback, slot scan or worker "
+"occurs under that guard. Quarantine and elapsed deadlines never release a "
+"loan. Output also excludes accepted descriptors and payloads. Only the "
+"owner/slot control spans are checked here."
+msgstr ""
+"时钟倒退不会阻止排空或重写结果。快照在硬件服务之外使用现有保护。该保护内不执行回调、槽扫描或工作线程。隔离状态和已到期截止时间都不会释放借用。输出还必须避开已接受的描述符及载荷。这里只检查所有者和槽控制对象的存储区间。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:26
+msgid "[inout] Bound sidecar on the unique executor."
+msgstr "[inout] 由唯一执行者使用的已绑定附属状态。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:26
+msgid "[in] Monotonic timestamp, independent of service result."
+msgstr "[in] 单调时间戳，与服务结果独立。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:26
+msgid "[out] Distinct stable output, no retained references."
+msgstr "[out] 独立且稳定的输出，不保留引用。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:26
+msgid "Actual service result; invalid bindings reject beforehand."
+msgstr "实际服务结果；无效绑定在执行前拒绝。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:26
+msgid "Drop only the observation binding, no owner/loan teardown."
+msgstr "仅撤销观察绑定，不拆除 owner 或借用。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:26
+msgid "[inout] Caller-serialized sidecar, no remaining readers."
+msgstr "[inout] 由调用者串行使用的附属状态，不再存在读取者。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:26
+msgid "Copied service facts without request, payload or slot references."
+msgstr "已复制的 service 事实，不含 request、payload 或 slot 引用。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:26
+msgid "Opt-in caller sidecar; no pointer added to default owner."
+msgstr "调用者显式选择的附加状态；不向默认 owner 增加指针。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:26
+msgid ""
+"Exact owner, slots and guard remain live until detach and all observer calls"
+" exit. The same unique owner executor calls this wrapper; producer calls "
+"retain the owner guard. Never reinitialize/replace the bound owner "
+"underneath it."
+msgstr ""
+"精确的所有者、槽和保护接口必须保持有效，直到分离完成且全部观测者调用退出。同一唯一所有者执行者调用该包装接口；生产者调用继续使用所有者保护。不得在绑定期间重新初始化或替换底层所有者。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:30
+msgid "spi_async_owner.h"
+msgstr "spi_async_owner.h"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:32
+msgid "Optional finite async SPI executor for one explicit bus."
+msgstr "一个显式总线的可选有限异步 SPI 执行者。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:32
+msgid "Bind one async-capable bus to an explicit owner executor."
+msgstr "将具备异步能力的总线绑定到显式 owner 执行者。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:32
+msgid ""
+"Startup/task context. Operations use nx_spi_owner_operation_t endpoints on "
+"this bus only; membership is checked before admission. No polling fallback "
+"is selected. Controller and executor remain live through drain, control "
+"acknowledgement and observer exit. QUARANTINED retains both buffer loans. "
+"Hardware stop and IRQ/notification destruction are explicit external steps "
+"after owner shutdown, not part of this bind."
+msgstr ""
+"启动或任务上下文。操作仅使用本总线上的 nx_spi_owner_operation_t "
+"端点；准入前检查成员关系。不选择轮询回退。控制器和执行者必须保持有效，直到排空、控制确认及观测者退出全部完成。QUARANTINED "
+"保留两项缓冲借用。所有者关闭后，硬件停止及 IRQ/通知销毁仍是外部显式步骤，不属于此次绑定。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:32
+msgid "[out] Fresh storage with no previous outstanding loans."
+msgstr "[out] 新存储，不存在先前尚未结束的借用。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:32
+msgid ""
+"[in] Initialized controller exclusively owned by this executor; direct "
+"clients and other owners must quiesce."
+msgstr "[in] 已初始化且由该执行者独占拥有的控制器；直接客户端和其他所有者必须静默。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:32
+msgid "Valid executor port, or a zero port for incomplete methods."
+msgstr "有效的执行接口；方法不完整时返回全零接口。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:32
+msgid "Exact async storage independent of the polling adapter."
+msgstr "独立于轮询适配器的准确异步存储。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:32
+msgid ""
+"inner is a private publication object. Its borrow must end before the outer "
+"owner publishes SETTLED. No queue, payload copy, allocation or hidden worker"
+" is created."
+msgstr "inner 是私有发布对象。外层所有者发布 SETTLED 前，必须先结束其借用。不创建队列、不复制载荷，也不分配或创建隐藏工作线程。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:36
+msgid "spi_owner.h"
+msgstr "spi_owner.h"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:38
+msgid "Explicit polling SPI executor for the bounded owner adapter."
+msgstr "有界 owner 适配器的显式轮询 SPI 执行者。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:38
+msgid "Bind an explicit synchronous SPI execution adapter."
+msgstr "绑定显式同步 SPI 执行适配器。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:38
+msgid ""
+"start executes a real CPU-active polling transaction and releases all IO "
+"buffers before returning. Owner service later publishes its caller-owned "
+"request. Polling cannot be preempted by another task's cancel; once the "
+"polling call returns, its result is final despite later cancellation or "
+"publication delay. Do not claim IRQ/DMA mode or low-CPU asynchronous "
+"hardware execution. Endpoints must prove their controller identity before "
+"any wire effect; distinct chip selects on this controller remain valid. The "
+"controller and executor outlive owner shutdown and all observers."
+msgstr ""
+"start 执行真实的 CPU 主动轮询事务，并在返回前释放全部 I/O 缓冲。所有者的 service 随后才发布调用者拥有的请求。另一任务的 "
+"cancel 不能抢占轮询；轮询调用返回后，即使取消或发布延迟随后到来，其结果仍为最终结果。不得宣称 IRQ/DMA 模式或低 CPU "
+"占用的异步硬件执行。产生任何线上效果前，端点必须证明其控制器身份；同一控制器上的不同片选仍然有效。控制器和执行者的寿命必须覆盖所有者关闭及全部观测者。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:38
+msgid "[out] Fresh storage with no outstanding operation"
+msgstr "[out] 新存储，不存在尚未结束的操作"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:38
+msgid "[in] Controller exclusively serviced by this owner"
+msgstr "[in] 仅由该所有者服务的控制器"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:38
+msgid "Port for nx_bus_owner_init, or a zero port for invalid input"
+msgstr "供 nx_bus_owner_init 使用的接口；输入无效时为全零接口"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:38
+msgid "Caller-owned SPI transaction descriptor, borrowed until SETTLED."
+msgstr "调用者拥有的 SPI 事务描述符，借用保持到 SETTLED。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:38
+msgid "Exact polling executor storage; no payload copy or queue."
+msgstr "准确轮询执行者存储，不复制载荷或设置队列。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:42
+msgid "uart_owner.h"
+msgstr "uart_owner.h"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:44
+msgid "Explicit IRQ UART executor with private provider settlement."
+msgstr "显式 IRQ UART 执行者与私有提供者请求结清。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:44
+msgid "Bind a UART controller to one explicit service executor."
+msgstr "将 UART 控制器绑定到一个显式 service 执行者。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:44
+msgid ""
+"Startup/task context. Controller and executor remain alive through owner "
+"stop/drain and external observer quiescence. Direct UART users must not "
+"share this controller. Queued time belongs to the bus owner; after start the"
+" UART's first terminal TC/error/cancel/deadline fact is authoritative. "
+"cancel observes provider completion/deadline before asking it to abort. "
+"Failed drain keeps both requests QUARANTINED; service must continue during "
+"recovery. Outer SETTLED never precedes inner acquire-observed SETTLED and "
+"pointer detach. The application separately stops hardware and RX consumers "
+"only after all owner operations and controls quiesce."
+msgstr ""
+"启动或任务上下文。控制器和执行者保持有效，直到所有者停止、排空及外部观测者静默。直接 UART "
+"使用者不得共享该控制器。排队时间由总线所有者负责；启动后，以 UART 首次观察到的终止 TC、错误、取消或截止时间事实为准。cancel "
+"先观察提供者完成或截止时间，再请求中止。排空失败时，两个请求均保持 QUARANTINED；恢复期间必须持续 service。外层 SETTLED "
+"绝不能早于以 acquire 语义观察到的内层 SETTLED 及指针分离。只有全部所有者操作和控制均静默后，应用才分别停止硬件及 RX 消费者。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:44
+msgid "[inout] Unused caller-owned storage, no concurrent calls"
+msgstr "[inout] 尚未使用且由调用者拥有的存储，不存在并发调用"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:44
+msgid "[inout] Initialized UART exclusively owned by this executor"
+msgstr "[inout] 已初始化且由该执行者独占拥有的 UART"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:44
+msgid "Port for nx_bus_owner_init, or an invalid zero port for NULL"
+msgstr "供 nx_bus_owner_init 使用的接口；NULL 输入时为无效的全零接口"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:44
+msgid "Caller-owned TX payload descriptor borrowed until outer SETTLED."
+msgstr "调用者拥有的 TX 载荷描述符，借用保持到外层 SETTLED。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:44
+msgid "One executor's exact private provider request."
+msgstr "一个执行者准确且私有的提供者请求。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:44
+msgid ""
+"inner is a separate publication object, not another outer queue or caller "
+"admission. Only this executor accesses it; producers retain their outer "
+"request and payload until the bus owner publishes outer SETTLED. No buffer "
+"copy, heap, worker or pool. Never pass inner to application observers."
+msgstr ""
+"inner 是独立的发布对象，不是另一个外层队列或调用者准入。只有该执行者访问 inner；总线所有者发布外层 SETTLED "
+"前，生产者持续保留外层请求及载荷。不复制缓冲，不使用堆、工作线程或池。绝不将 inner 交给应用观测者。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:48
+msgid "spi_dma_owner.h"
+msgstr "spi_dma_owner.h"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:50
+msgid "Optional typed whole-CS SPI executor for bounded BusOwner."
+msgstr "面向有界 BusOwner 的可选类型化完整片选区间 SPI 执行器。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:50
+msgid "Bind a fresh executor without opening hardware or admission."
+msgstr "绑定新执行器，不开启硬件或准入。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:50
+msgid ""
+"Task-only, all lifecycle users joined before replacement. Uses original "
+"FIFO/slots/epochs; final provider terminal result survives late "
+"cancellation. Continue unique executor service during stop and quarantine. "
+"Hardware stop, publisher join and observer join remain explicit external "
+"steps."
+msgstr ""
+"仅供任务调用；替换前须让全部生命周期使用者完成会合退出。沿用原始 FIFO、时隙和 "
+"epoch；提供方最终终止结果不受晚到取消影响。停止和隔离期间继续由唯一执行器推进。硬件停止、发布者会合退出和观察者会合退出仍是显式外部步骤。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:50
+msgid "[inout] Zero fresh storage, distinct from capability/face."
+msgstr "[inout] 已清零的新存储，与能力对象及接口对象均不重叠。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:50
+msgid "[in] Initialized bus exclusively serviced by this owner."
+msgstr "[in] 已初始化且仅由此所有者推进的总线。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:50
+msgid "Executor for nx_bus_owner_init, zero port on invalid input."
+msgstr "供 nx_bus_owner_init 使用的执行器；输入无效时返回全零端口。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:50
+msgid "Check typed storage, then use bounded owner admission."
+msgstr "检查类型化存储，再使用有界所有者准入。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:50
+msgid ""
+"The request has an absolute deadline including queue time. Task multi-"
+"producer checks run outside the metadata guard. There is no capacity scan, "
+"allocation, OS lock or worker. One operation has one CS interval with "
+"allowed SCK gaps. Schedule bounded service even when hints fail. Waiters "
+"never service the shared controller. Queued provider failures settle later "
+"without converting admission into rejection."
+msgstr ""
+"请求使用包含排队时间的绝对期限。任务级多生产者检查在元数据保护区外执行。不扫描容量，不分配内存，也不创建 OS 锁或工作线程。一次操作对应一个 CS "
+"区间，允许其中出现 SCK "
+"间隙。即使提示通知失败，也须调度有界推进。等待者从不推进共享控制器。已排队请求的提供方失败随后结算，不把已接受准入改判为拒绝。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:50
+msgid "[inout] Owner with this exact typed executor."
+msgstr "[inout] 装配此精确类型化执行器的所有者。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:50
+msgid "[inout] Prepared READY outer request."
+msgstr "[inout] 已准备好的 READY 外层请求。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:50
+msgid "[in] Immutable chain through outer SETTLED."
+msgstr "[in] 不可变链，保持至外层请求进入 SETTLED。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:50
+msgid "[in] Optional static caller hint, or NULL."
+msgstr "[in] 可选的静态调用方提示端口，或 NULL。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:50
+msgid "[out] Stable slot/epoch identity on SUCCESS."
+msgstr "[out] SUCCESS 时返回稳定的时隙/epoch 身份。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:50
+msgid "SUCCESS means ACCEPTED; failure retains nothing."
+msgstr "SUCCESS 表示 ACCEPTED；失败不保留任何内容。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:50
+msgid "Caller-owned queued and active SPI chain."
+msgstr "调用方拥有的已排队或活动 SPI 链。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:50
+msgid ""
+"The outer deadline includes queue residence. The chain, descriptors and all "
+"TX/RX or fixed cells stay borrowed until acquire-observed outer SETTLED. "
+"Counts and results use words."
+msgstr ""
+"外层期限包含排队停留时间。链、描述符以及全部 TX/RX 缓冲区或固定存储单元保持被借用，直至以 acquire 语义观察到外层 "
+"SETTLED。计数和结果以字为单位。"
+
+#: ../../../../../../docs/reference/api/components/runtime/owners.md:50
+msgid "Selected-only exact metadata; no queue, payload copy or worker."
+msgstr "仅为所选实例提供的精确元数据；不添加队列、载荷复制或工作线程。"

@@ -1,6 +1,6 @@
 // FIG-15 reference: source-backed, scoped engineering view.
-// Code basis: 0111c8d3b9c7b37d258b9c401070305b13b6f3a1.
-// Relations and qualification limits are documented in README.md.
+// Code basis: io/src/mechanisms/stream.c; soc/stm32/stm32f4/drivers/uart.
+// Relations and qualification limits: docs/reference/diagrams.md.
 digraph ContinuousStream {
     graph [newrank=true, rankdir=TB, bgcolor="white", pad=0.28, nodesep=0.42,
            ranksep=0.66, fontname="Noto Sans CJK SC", fontsize=15,

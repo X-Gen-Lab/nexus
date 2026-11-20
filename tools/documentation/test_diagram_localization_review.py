@@ -22,7 +22,7 @@ class DiagramLocalizationReviewTests(unittest.TestCase):
             "zh_CN": {"Retain borrowed storage": "保留借用存储"},
         }
         self.output = self.root / "build" / "diagrams"
-        self.policy = self.folder / "labels.json"
+        self.policy = self.folder / "flow.labels.json"
         self.policy.write_text(json.dumps(self.mapping), encoding="utf-8")
         (self.folder / "flow.dot").write_text(self.source, encoding="utf-8")
         for language in diagram_localization.LANGUAGES:
@@ -68,24 +68,23 @@ class DiagramLocalizationReviewTests(unittest.TestCase):
         canonical.unlink()
         canonical.symlink_to(outside)
         with self.assertRaises(ValueError):
-            diagram_localization.read_mapping(self.folder)
+            diagram_localization.read_mapping(self.folder / "flow.dot")
 
     def test_image_selector_cannot_hide_missing_policy_for_existing_variants(self):
         folder = self.root / "assets" / "diagrams"
         folder.parent.mkdir()
         self.folder.rename(folder)
-        (folder / "labels.json").unlink()
+        (folder / "flow.labels.json").unlink()
         page = self.root / "explanation" / "factory.md"
         with self.assertRaises(ValueError):
             diagram_localization.image_uri("../assets/diagrams/flow.svg", page,
                                            self.root, "en", output=self.output)
 
-    def test_legacy_fixture_without_policy_or_variants_remains_supported(self):
+    def test_untranslated_source_without_variants_is_rejected(self):
         folder = self.root / "legacy"
         folder.mkdir()
         (folder / "plain.dot").write_text('digraph plain {}', encoding="utf-8")
-        self.assertEqual(diagram_localization.check(folder),
-                         {"localized_diagrams": 0, "errors": []})
+        self.assertTrue(diagram_localization.check(folder)["errors"])
 
     def test_original_empty_layout_label_remains_explicitly_allowed(self):
         source = 'digraph layout { graph [label=""]; }'
@@ -93,6 +92,23 @@ class DiagramLocalizationReviewTests(unittest.TestCase):
         self.assertEqual(diagram_localization.localize(source, mapping, "en"),
                          source)
 
+
+    def test_orphan_policy_is_rejected(self):
+        (self.folder / "orphan.labels.json").write_text(json.dumps(self.mapping), encoding="utf-8")
+        self.assertTrue(diagram_localization.check(self.folder)["errors"])
+
+    def test_global_policy_cannot_substitute_for_per_diagram_contract(self):
+        self.policy.rename(self.folder / "labels.json")
+        self.assertTrue(diagram_localization.check(self.folder)["errors"])
+
+    def test_selector_has_no_untranslated_fallback_without_any_policy(self):
+        folder = self.root / "assets/diagrams"
+        folder.mkdir(parents=True)
+        (folder / "plain.svg").write_text("svg")
+        with self.assertRaises(ValueError):
+            diagram_localization.image_uri("../assets/diagrams/plain.svg",
+                                           self.root / "explanation/plain.md",
+                                           self.root, "en", output=self.output)
 
 if __name__ == "__main__":
     unittest.main()

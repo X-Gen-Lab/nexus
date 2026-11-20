@@ -18,10 +18,10 @@ from urllib.parse import quote, unquote, urlsplit
 
 LANGUAGES = ('en', 'zh_CN')
 _SOURCE_URL = 'https://github.com/X-Gen-Lab/nexus/blob'
-_LINK = re.compile(r'(?<!!)\[([^\]\n]+)\]\(([^\s)]+)\)')
+_LINK = re.compile(r'(?<!!)\[([^\]]+)\]\(([^\s)]+)\)')
 _INLINE_TOKEN = re.compile(
     r'(?P<code>(?<!`)(?P<ticks>`+)(?!`).*?(?<!`)(?P=ticks)(?!`))|'
-    + _LINK.pattern)
+    + _LINK.pattern, re.DOTALL)
 _RAW_SUFFIXES = {'.csv', '.json', '.dot', '.txt', '.po', '.pot', '.toml'}
 
 
@@ -38,19 +38,9 @@ def available_languages(requested: str, declaration: str | None = None) -> tuple
 
 
 def source_language(source: str) -> str:
-    """Return the authored language, never the configured output locale."""
-    metadata = re.match(r'\A---\s*\n(.*?)\n---\s*\n', source, re.DOTALL)
-    if metadata:
-        value = re.search(r'^source_language:\s*[\'"]?([^\s\'"]+)',
-                          metadata.group(1), re.MULTILINE)
-        if value:
-            if value.group(1) not in LANGUAGES:
-                raise ValueError('source_language must be en or zh_CN')
-            return value.group(1)
-    # Legacy pages have no language metadata. Their visible prose establishes
-    # the original language; new task pages explicitly declare it.
-    prose = re.sub(r'```.*?```|~~~.*?~~~|`[^`]*`', '', source, flags=re.DOTALL)
-    return 'zh_CN' if re.search(r'[\u3400-\u9fff]', prose) else 'en'
+    """Read the explicit canonical language, never infer it from prose."""
+    from tools.documentation.check import metadata
+    return metadata(source)['source_language']
 
 
 def read_catalog(path: Path) -> tuple[dict[str, str], dict[str, str], bool]:
@@ -103,14 +93,17 @@ def translation_status(source: str, docname: str, requested: str,
     result = {'source_language': original, 'requested_language': requested,
               'actual_language': original, 'status': 'original'}
     path = locale_root / requested / 'LC_MESSAGES' / f'{docname}.po'
-    # A mixed-language canonical contract can have a reviewed catalog for its
-    # declared source locale too. Do not discard those normalized paragraphs.
     if original == requested and not path.is_file():
         return result
+    if original == requested:
+        return {**result, 'status': 'invalid', 'reason': 'same-language catalog rejected'}
     result['status'] = 'missing'
     if not path.is_file():
         return result
-    metadata, messages, fuzzy = read_catalog(path)
+    try:
+        metadata, messages, fuzzy = read_catalog(path)
+    except (OSError, UnicodeError, ValueError):
+        return {**result, 'status': 'invalid', 'reason': 'malformed translation catalog'}
     digest = hashlib.sha256(source.encode('utf-8')).hexdigest()
     if metadata.get('X-Nexus-Source-SHA256') != digest or fuzzy:
         result['status'] = 'stale'
@@ -125,62 +118,68 @@ def translation_status(source: str, docname: str, requested: str,
     return result
 
 
+
 def rewrite_local_links(source: str, page: Path, source_root: Path,
                         repository: Path, revision: str, *,
                         document_root_links: bool = False) -> str:
-    """Bind out-of-tree source links and keep raw data as offline downloads."""
+    """Bind local prose links while preserving inline and fenced code bytes."""
     fenced = False
     marker = ''
-    result = []
+    result, pending = [], []
+    def replace(match: re.Match[str]) -> str:
+        label, target = match.groups()
+        if "\n" in label:
+            label = " ".join(label.split())
+        parsed = urlsplit(target)
+        if parsed.scheme or parsed.netloc or not parsed.path:
+            return match.group(0)
+        candidate = (page.parent / unquote(parsed.path)).resolve()
+        if not candidate.exists() or not candidate.is_relative_to(repository):
+            return match.group(0)
+        inside_docs = candidate.is_relative_to(source_root)
+        if not inside_docs:
+            relative = quote(candidate.relative_to(repository).as_posix())
+            fragment = '#' + parsed.fragment if parsed.fragment else ''
+            base = _SOURCE_URL.replace('/blob', '/tree') if candidate.is_dir() else _SOURCE_URL
+            return f'[{label}]({base}/{revision}/{relative}{fragment})'
+        # Keep in-document code labels until role quoting supports them.
+        if '`' in label:
+            return match.group(0)
+        if candidate.suffix in _RAW_SUFFIXES:
+            path = ('/' + quote(candidate.relative_to(source_root).as_posix())
+                    if document_root_links else parsed.path)
+            return '{download}`' + label + ' <' + path + '>`'
+        if document_root_links and candidate.suffix == '.md':
+            path = '/' + quote(candidate.relative_to(source_root).as_posix())
+            fragment = '#' + parsed.fragment if parsed.fragment else ''
+            return f'[{label}]({path}{fragment})'
+        return match.group(0)
+
+    def replace_token(match: re.Match[str]) -> str:
+        if match.group('code') is not None:
+            return match.group(0)
+        return _LINK.sub(replace, match.group(0))
+
+
+    def flush():
+        if pending:
+            result.append(_INLINE_TOKEN.sub(replace_token, ''.join(pending)))
+            pending.clear()
+
     for line in source.splitlines(keepends=True):
         opening = re.match(r'^\s*(`{3,}|~{3,})', line)
         if opening:
             if not fenced:
+                flush()
                 fenced, marker = True, opening.group(1)[0]
             elif opening.group(1)[0] == marker:
                 fenced = False
             result.append(line)
-            continue
-        if fenced:
+        elif fenced:
             result.append(line)
-            continue
-
-        def replace(match: re.Match[str]) -> str:
-            label, target = match.groups()
-            parsed = urlsplit(target)
-            if parsed.scheme or parsed.netloc or not parsed.path:
-                return match.group(0)
-            candidate = (page.parent / unquote(parsed.path)).resolve()
-            if not candidate.exists() or not candidate.is_relative_to(repository):
-                return match.group(0)
-            inside_docs = candidate.is_relative_to(source_root)
-            archived = inside_docs and (candidate.is_relative_to(source_root / 'archive')
-                          or candidate == source_root / 'README.md'
-                          or candidate.is_relative_to(source_root / 'sphinx'))
-            if not inside_docs or archived:
-                relative = quote(candidate.relative_to(repository).as_posix())
-                fragment = '#' + parsed.fragment if parsed.fragment else ''
-                base = _SOURCE_URL.replace('/blob', '/tree') if candidate.is_dir() else _SOURCE_URL
-                return f'[{label}]({base}/{revision}/{relative}{fragment})'
-            # Keep in-document code labels until role quoting supports them.
-            if '`' in label:
-                return match.group(0)
-            if candidate.suffix in _RAW_SUFFIXES:
-                path = ('/' + quote(candidate.relative_to(source_root).as_posix())
-                        if document_root_links else parsed.path)
-                return '{download}`' + label + ' <' + path + '>`'
-            if document_root_links and candidate.suffix in ('.md', '.rst'):
-                path = '/' + quote(candidate.relative_to(source_root).as_posix())
-                fragment = '#' + parsed.fragment if parsed.fragment else ''
-                return f'[{label}]({path}{fragment})'
-            return match.group(0)
-
-        def replace_token(match: re.Match[str]) -> str:
-            if match.group('code') is not None:
-                return match.group(0)
-            return _LINK.sub(replace, match.group(0))
-
-        result.append(_INLINE_TOKEN.sub(replace_token, line))
+        else:
+            pending.append(line)
+    flush()
     return ''.join(result)
 
 
@@ -204,7 +203,7 @@ def _required_messages(app, docname: str) -> tuple[str, ...] | None:
     pot = Path(app.config.nexus_gettext_root) / f'{docname}.pot'
     if not pot.is_file():
         return None
-    return tuple(read_catalog(pot)[1])
+    return tuple(read_catalog(pot)[1]) or None
 
 
 def _state(app, docname: str, source: str) -> dict[str, str]:
@@ -216,47 +215,146 @@ def _state(app, docname: str, source: str) -> dict[str, str]:
     return state
 
 
+def source_inputs_outdated(app, env, added, changed, removed):
+    """Invalidate changed source bytes even when filesystem mtimes are equal."""
+    del added, changed, removed
+    if app.config.nexus_rebuild_all:
+        return sorted(env.found_docs)
+    repository = Path(app.srcdir).resolve().parent
+    inputs = {(repository / value).resolve()
+              for value in app.config.nexus_changed_inputs}
+    result = []
+    for docname in sorted(env.found_docs):
+        paths = {Path(env.doc2path(docname, base=True)).resolve()}
+        paths.add(repository / 'docs/locale' / app.config.language
+                  / 'LC_MESSAGES' / (docname + '.po'))
+        for value in env.dependencies.get(docname, ()):
+            dependency = Path(value)
+            paths.add((dependency if dependency.is_absolute()
+                       else Path(app.srcdir) / dependency).resolve())
+        if paths.intersection(inputs):
+            result.append(docname)
+    return result
+
+
+def breathe_inputs_outdated(app, env, added, changed, removed):
+    """Observe actual Breathe XML bytes, including edits with equal mtimes."""
+    del app, added, changed
+    prior = getattr(env, 'nexus_breathe_digests', {})
+    affected = set()
+    for filename, (_mtime, docnames) in getattr(env, 'breathe_file_state', {}).items():
+        path = Path(filename)
+        current = hashlib.sha256(path.read_bytes()).hexdigest() if path.is_file() else None
+        if prior.get(filename) != current:
+            affected.update(docnames)
+    return sorted(affected - removed)
+
+
+def update_output_identity(app, env):
+    """Persist XML identities and rewrite presentation without reparsing it."""
+    env.nexus_breathe_digests = {
+        filename: hashlib.sha256(Path(filename).read_bytes()).hexdigest()
+        for filename in getattr(env, 'breathe_file_state', {})}
+    current = (app.config.nexus_revision, app.config.nexus_code_revision,
+               app.config.nexus_source_dirty, app.config.nexus_available_languages)
+    previous = getattr(env, 'nexus_output_identity', None)
+    env.nexus_output_identity = current
+    if app.builder.format == 'html':
+        repository = Path(app.srcdir).resolve().parent
+        static_roots = [(Path(app.confdir) / path).resolve()
+                        for path in app.config.html_static_path]
+        assets_changed = any((repository / name).resolve().is_relative_to(path)
+            for name in app.config.nexus_changed_inputs for path in static_roots)
+        if current != previous or assets_changed:
+            # Sphinx otherwise skips copy_static_files when no document is
+            # outdated. Rewriting HTML also refreshes its asset hash URLs.
+            return sorted(env.found_docs)
+    return []
+
+
 def _configure(app, config) -> None:
     repository = Path(app.srcdir).parent.resolve()
     config.nexus_revision = _revision(repository, config.nexus_revision)
     config.nexus_code_revision = _revision(repository, config.nexus_code_revision or config.nexus_revision)
-    config.nexus_source_dirty = bool(subprocess.check_output(
-        ['git', '-C', str(repository), 'status', '--porcelain=v1', '--untracked-files=normal'],
-        text=True).strip())
+    dirty = os.environ.get('NEXUS_DOCS_SOURCE_DIRTY')
+    if dirty not in (None, '0', '1'):
+        raise ValueError('documentation source-dirty flag must be 0 or 1')
+    config.nexus_source_dirty = (dirty == '1' if dirty is not None else
+        bool(subprocess.check_output(['git', '-C', str(repository), 'status',
+            '--porcelain=v1', '--untracked-files=normal'], text=True).strip()))
     config.nexus_available_languages = available_languages(
         config.language, config.nexus_available_languages)
     config.nexus_translation_root = str(Path(config.nexus_translation_root or
                                              Path(app.srcdir) / 'locale').resolve())
+    if config.nexus_mode not in ('preview', 'verify'):
+        raise ValueError('documentation mode must be preview or verify')
+    inputs = json.loads(config.nexus_changed_inputs or '[]')
+    if (not isinstance(inputs, list) or any(not isinstance(value, str) or not value
+            or '\\' in value or Path(value).is_absolute()
+            or any(part in ('', '.', '..') for part in value.split('/'))
+            for value in inputs)):
+        raise ValueError('changed documentation inputs must be repository-relative paths')
+    config.nexus_changed_inputs = tuple(inputs)
+    if config.nexus_rebuild_all not in ('0', '1'):
+        raise ValueError('documentation rebuild-all must be 0 or 1')
+    config.nexus_rebuild_all = config.nexus_rebuild_all == '1'
+    stage = Path(app.doctreedir) / 'nexus-reviewed-locale' / config.language
+    config.locale_dirs = [str(stage)]
+
+
+def stage_reviewed_locale(app) -> None:
+    """Stage reviewed translations only after the selected builder is known."""
+    if app.builder.name == 'gettext':
+        return
+    config = app.config
     # Sphinx only sees complete reviewed catalogs. Incomplete/stale translations
     # would otherwise create mixed-language prose despite a fallback banner.
-    stage = Path(app.doctreedir) / 'nexus-reviewed-locale'
-    if stage.exists():
-        shutil.rmtree(stage)
+    stage = Path(config.locale_dirs[0])
+    selected = set()
     originals = Path(config.nexus_translation_root) / config.language / 'LC_MESSAGES'
     if config.nexus_gettext_root and originals.exists():
         for catalog in sorted(originals.rglob('*.po')):
             docname = catalog.relative_to(originals).with_suffix('').as_posix()
-            source = next((Path(app.srcdir) / (docname + suffix)
-                           for suffix in ('.md', '.rst')
-                           if (Path(app.srcdir) / (docname + suffix)).is_file()), None)
+            source = Path(app.srcdir) / (docname + '.md')
             pot = Path(config.nexus_gettext_root) / f'{docname}.pot'
-            if source is None or not pot.is_file():
+            if not source.is_file() or not pot.is_file():
+                continue
+            required = tuple(read_catalog(pot)[1])
+            if not required:
                 continue
             state = translation_status(source.read_text(encoding='utf-8'), docname,
                                        config.language, Path(config.nexus_translation_root),
-                                       tuple(read_catalog(pot)[1]))
+                                       required)
             if state['status'] == 'reviewed':
                 target = stage / config.language / 'LC_MESSAGES' / f'{docname}.po'
+                selected.add(target)
                 target.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copyfile(catalog, target)
-    config.locale_dirs = [str(stage)]
+                if not target.is_file() or target.read_bytes() != catalog.read_bytes():
+                    target.with_suffix('.mo').unlink(missing_ok=True)
+                    shutil.copyfile(catalog, target)
+    # Preserve warm PO/MO timestamps only while their exact reviewed bytes
+    # remain selected. Revocation must never leave a usable compiled fallback.
+    for previous in stage.rglob('*.po'):
+        if previous not in selected:
+            previous.unlink()
+    for compiled in stage.rglob('*.mo'):
+        if compiled.with_suffix('.po') not in selected:
+            compiled.unlink()
 
 
 def _read_source(app, docname: str, source: list[str]) -> None:
     page = _source_file(app, docname)
-    if page.suffix == '.md':
-        source[0] = rewrite_local_links(source[0], page, Path(app.srcdir).resolve(),
-                                        Path(app.srcdir).parent.resolve(), 'NEXUS-DOCUMENTATION-SOURCE')
+    if page.suffix != '.md':
+        raise ValueError('Documentation sources must be Markdown')
+    source_language(source[0])
+    if app.builder.format == 'html' and app.config.nexus_mode == 'verify':
+        if not _required_messages(app, docname):
+            raise ValueError('verify requires actual nonempty gettext output: ' + docname)
+        state = _state(app, docname, source[0])
+        if state['status'] not in ('original', 'reviewed'):
+            raise ValueError('verify translation ' + docname + ': ' + state['status'])
+    source[0] = rewrite_local_links(source[0], page, Path(app.srcdir).resolve(),
+                                  Path(app.srcdir).parent.resolve(), 'NEXUS-DOCUMENTATION-SOURCE')
 
 
 def normalize_included_read(app, relative_path: Path, parent_docname: str,
@@ -309,16 +407,12 @@ def link_local_svg_images(app, doctree, docname: str) -> None:
 
 
 def prepare_diagram_images(app) -> None:
-    """Render selected-language views into this build's private doctree area."""
+    """Consume the CLI's generated graph assets without invoking a renderer."""
     if app.builder.format != 'html':
         return
-    from tools.documentation import diagram_localization
     folder = Path(app.srcdir) / 'assets/diagrams'
-    if ((folder / 'labels.json').is_file()
-            or (folder / 'diagram-index.csv').is_file()):
-        diagram_localization.write(
-            folder, env=os.environ, output=Path(app.doctreedir) / 'nexus-diagrams',
-            languages=(app.config.language,))
+    if (folder / 'diagram-index.csv').is_file() and not app.config.nexus_diagram_root:
+        raise ValueError('NEXUS_DOCS_DIAGRAM_ROOT must provide generated diagram assets')
 
 
 def localize_diagram_images(app, doctree) -> None:
@@ -332,7 +426,8 @@ def localize_diagram_images(app, doctree) -> None:
             image['uri'] = diagram_localization.image_uri(
                 image.get('uri', ''), Path(image.source), Path(app.srcdir),
                 app.config.language,
-                output=Path(app.doctreedir) / 'nexus-diagrams')
+                output=(Path(app.config.nexus_diagram_root)
+                        if app.config.nexus_diagram_root else None))
 
 
 def wrap_html_tables(app, doctree, docname: str) -> None:
@@ -354,20 +449,10 @@ def wrap_html_tables(app, doctree, docname: str) -> None:
 
 
 def search_page_type(source: str, docname: str) -> str:
-    """Use the authored role; legacy paths have a conservative scope default."""
-    metadata = re.match(r'\A---\s*\n(.*?)\n---\s*\n', source, re.DOTALL)
-    if metadata:
-        declared = re.search(r'^type:\s*[\'"]?([^\s\'"]+)',
-                             metadata.group(1), re.MULTILINE)
-        if declared:
-            value = declared.group(1)
-            if value not in ('tutorial', 'how-to', 'reference', 'explanation', 'status'):
-                raise ValueError('search page_type must use a maintained content role')
-            return value
-    scope = docname.split('/', 1)[0]
-    return {'tutorials': 'tutorial', 'guides': 'how-to', 'development': 'how-to',
-            'design': 'explanation', 'explanation': 'explanation',
-            'delivery': 'status', 'status': 'status'}.get(scope, 'reference')
+    """Use the explicit authored role, independent of directory names."""
+    del docname
+    from tools.documentation.check import metadata
+    return metadata(source)['type']
 
 
 def search_excerpt(doctree, limit: int = 12000) -> str:
@@ -442,10 +527,19 @@ def theme_locale_context(app, pagename: str, template: str,
     """Supply ordinary theme labels without changing brands or upstream credits."""
     context['nexus_theme_ui'] = (
         {'related': '相关主题', 'overview': '文档总览', 'previous': '上一页',
-         'next': '下一页', 'powered_by': '技术支持：'}
+         'next': '下一页', 'powered_by': '技术支持：',
+         'skip': '跳到正文', 'languages': '页面语言'}
         if app.config.language == 'zh_CN' else
         {'related': 'Related Topics', 'overview': 'Documentation overview',
-         'previous': 'Previous', 'next': 'Next', 'powered_by': 'Powered by '})
+         'previous': 'Previous', 'next': 'Next', 'powered_by': 'Powered by ',
+         'skip': 'Skip to content', 'languages': 'Page language'})
+    context['nexus_language_links'] = [
+        {'language': language.replace('_', '-'),
+         'name': 'English' if language == 'en' else '简体中文',
+         'href': ('../' * (pagename.count('/') + 1) + language
+                  + '/' + quote(pagename) + '.html')
+                 if language != app.config.language else None}
+        for language in app.config.nexus_available_languages]
 
 
 def collect_search_record(app, pagename: str, template: str,
@@ -458,7 +552,8 @@ def collect_search_record(app, pagename: str, template: str,
     source = _source_file(app, pagename).read_text(encoding='utf-8')
     record = search_record(pagename, app.builder.get_target_uri(pagename),
                            source, doctree, _state(app, pagename, source))
-    destination = Path(app.doctreedir) / 'nexus-search-records' / (pagename + '.json')
+    destination = (Path(app.doctreedir) / 'nexus-search-records'
+                   / app.config.language / (pagename + '.json'))
     destination.parent.mkdir(parents=True, exist_ok=True)
     destination.write_text(json.dumps(record, ensure_ascii=False) + '\n', encoding='utf-8')
 
@@ -469,13 +564,19 @@ def write_search_data(app, exception) -> None:
         return
     records = {}
     for docname in sorted(app.env.found_docs):
-        path = Path(app.doctreedir) / 'nexus-search-records' / (docname + '.json')
+        path = (Path(app.doctreedir) / 'nexus-search-records'
+                / app.config.language / (docname + '.json'))
         if not path.is_file():
             raise ValueError('missing generated search metadata for ' + docname)
-        records[app.builder.get_target_uri(docname)] = json.loads(path.read_text(encoding='utf-8'))
+        record = json.loads(path.read_text(encoding='utf-8'))
+        if (not isinstance(record, dict)
+                or record.get('requested_language') != app.config.language):
+            raise ValueError('generated search metadata belongs to another language')
+        records[app.builder.get_target_uri(docname)] = record
     payload = {'schema_version': 1, 'version': app.config.release,
                'revision': app.config.nexus_revision,
-               'requested_language': app.config.language, 'records': records}
+               'requested_language': app.config.language,
+               'mode': app.config.nexus_mode, 'records': records}
     destination = Path(app.outdir) / '_static'
     destination.mkdir(parents=True, exist_ok=True)
     (destination / 'nexus-search-data.js').write_text(search_data_script(payload), encoding='utf-8')
@@ -490,12 +591,6 @@ def _page_context(app, pagename: str, template: str, context: dict, doctree) -> 
     state = _state(app, pagename, path.read_text(encoding='utf-8'))
     relative = path.relative_to(Path(app.srcdir).parent).as_posix()
     link = f'{_SOURCE_URL}/{app.config.nexus_revision}/{quote(relative)}'
-    other = 'en' if app.config.language == 'zh_CN' else 'zh_CN'
-    switch = '../' * (pagename.count('/') + 1) + other + '/' + pagename + '.html'
-    language_name = 'English' if other == 'en' else '中文'
-    switch_link = (f'<a href="{switch}" lang="{other.replace("_", "-")}">'
-                   f'{language_name}</a>. '
-                   if other in app.config.nexus_available_languages else '')
     chinese = app.config.language == 'zh_CN'
     labels = (('文档身份', '文档源码', '代码引用', '源语言', '请求语言',
                '实际语言', '翻译状态') if chinese else
@@ -504,7 +599,7 @@ def _page_context(app, pagename: str, template: str, context: dict, doctree) -> 
     preview = ('工作目录有改动；仅供预览' if chinese else
                'working tree modified; preview only')
     dirty = ' (' + preview + ')' if app.config.nexus_source_dirty else ''
-    status_label = ({'original': '原文', 'reviewed': '已审查',
+    status_label = ({'original': '原文', 'reviewed': '已审查', 'invalid': '无效翻译目录',
                      'missing': '缺少译文', 'stale': '译文过期'}[state['status']]
                     if chinese else state['status'])
     qualification = (
@@ -521,19 +616,29 @@ def _page_context(app, pagename: str, template: str, context: dict, doctree) -> 
     attributes = attributes.replace('data-nexus-status=',
                                     'data-nexus-translation-status=')
     banner = (
-        '<aside class="nexus-page-identity" lang="'
+        '<details class="nexus-page-identity" lang="'
         + app.config.language.replace('_', '-') + '" aria-label="' + labels[0]
-        + '" ' + attributes + '><p>' + labels[1] + ': <a href="'
+        + '" ' + attributes + ' data-nexus-documentation-mode="'
+        + app.config.nexus_mode + '"><summary>' + labels[0]
+        + '</summary><p>' + labels[1] + ': <a href="'
         + html.escape(link) + '">' + app.config.nexus_revision[:12]
         + '</a>' + dirty + '; ' + labels[2] + ': '
-        + app.config.nexus_code_revision[:12] + '. ' + switch_link
+        + app.config.nexus_code_revision[:12] + '. '
         + labels[3] + ': ' + state['source_language'] + '; '
         + labels[4] + ': ' + state['requested_language'] + '; '
         + labels[5] + ': ' + state['actual_language'] + '; '
         + labels[6] + ': <strong>' + status_label + '</strong>.</p><p>'
-        + qualification + '</p></aside>')
+        + qualification + '</p></details>')
+    notice = ''
+    if app.config.nexus_mode == 'preview' or state['status'] not in ('original', 'reviewed'):
+        message = ('预览：未通过完整文档验证。' if chinese
+                   else 'Preview: not verified documentation.')
+        if state['status'] not in ('original', 'reviewed'):
+            message += (' 当前显示源语言内容：' if chinese
+                        else ' Showing canonical content in: ') + state['actual_language'] + '.'
+        notice = '<p class="nexus-preview-warning" role="status">' + message + '</p>'
     actual = state['actual_language'].replace('_', '-')
-    context['body'] = (banner + f'<div class="nexus-canonical-content" lang="{actual}">'
+    context['body'] = (notice + banner + f'<div class="nexus-canonical-content" lang="{actual}">'
                        + context.get('body', '') + '</div>')
 
 
@@ -569,7 +674,8 @@ def normalize_included_references(app, doctree) -> None:
                 download.extend(child.deepcopy() for child in node.children)
                 node.replace_self(download)
                 continue
-        uri = f'{_SOURCE_URL}/{app.config.nexus_revision}/{quote(candidate.relative_to(repository).as_posix())}'
+        uri = (f'{_SOURCE_URL}/NEXUS-DOCUMENTATION-SOURCE/'
+               + quote(candidate.relative_to(repository).as_posix()))
         if parsed.fragment:
             uri += '#' + parsed.fragment
         reference = nodes.reference('', '', refuri=uri)
@@ -579,21 +685,44 @@ def normalize_included_references(app, doctree) -> None:
 
 def setup(app) -> dict[str, object]:
     """Register only deterministic source and HTML transformations."""
+    from sphinx.builders.gettext import MessageCatalogBuilder
     from tools.documentation.search_language import NexusChineseSearch
+
+    class PreviewMessageCatalogBuilder(MessageCatalogBuilder):
+        def get_outdated_docs(self):
+            if (self.config.nexus_mode != 'preview'
+                    or self.config.gettext_compact is not False):
+                return super().get_outdated_docs()
+            # Sphinx unions actual source/dependency updates with these missing
+            # outputs. Per-page domains safely retain all unchanged catalogs.
+            return {name for name in self.env.found_docs
+                    if not (Path(self.outdir) / (name + '.pot')).is_file()}
+
+    app.add_builder(PreviewMessageCatalogBuilder, override=True)
     if 'breathe' in getattr(app, 'extensions', {}):
         from tools.documentation.breathe_i18n import SourcedDoxygenFileDirective
         app.add_directive('doxygenfile', SourcedDoxygenFileDirective, override=True)
     app.add_search_language(NexusChineseSearch)
-    app.add_config_value('nexus_source_dirty', False, 'env')
+    app.add_config_value('nexus_source_dirty', False, '')
     app.add_config_value('nexus_available_languages', os.environ.get('NEXUS_DOCS_LANGUAGES'),
-                         'env', types=(str, tuple, type(None)))
-    app.add_config_value('nexus_revision', os.environ.get('NEXUS_DOCS_REVISION'), 'env')
-    app.add_config_value('nexus_code_revision', os.environ.get('NEXUS_DOCS_CODE_REVISION'), 'env')
+                         '', types=(str, tuple, type(None)))
+    app.add_config_value('nexus_revision', os.environ.get('NEXUS_DOCS_REVISION'), '')
+    app.add_config_value('nexus_code_revision', os.environ.get('NEXUS_DOCS_CODE_REVISION'), '')
     app.add_config_value('nexus_translation_root', os.environ.get('NEXUS_DOCS_TRANSLATION_ROOT'), 'env')
     app.add_config_value('nexus_gettext_root', os.environ.get('NEXUS_DOCS_GETTEXT_ROOT'), 'env')
+    app.add_config_value('nexus_mode', os.environ.get('NEXUS_DOCS_MODE', 'preview'), 'env')
+    app.add_config_value('nexus_diagram_root', os.environ.get('NEXUS_DOCS_DIAGRAM_ROOT'), 'env')
+    app.add_config_value('nexus_changed_inputs', os.environ.get('NEXUS_DOCS_CHANGED_INPUTS'), '',
+                         types=(str, tuple, type(None)))
+    app.add_config_value('nexus_rebuild_all', os.environ.get('NEXUS_DOCS_REBUILD_ALL', '0'), '',
+                         types=(str, bool))
     app.connect('config-inited', _configure)
+    app.connect('builder-inited', stage_reviewed_locale)
     app.connect('builder-inited', prepare_diagram_images)
     app.connect('source-read', _read_source)
+    app.connect('env-get-outdated', source_inputs_outdated)
+    app.connect('env-get-outdated', breathe_inputs_outdated)
+    app.connect('env-updated', update_output_identity)
     app.connect('include-read', normalize_included_read)
     app.connect('doctree-resolved', _bind_source_links)
     app.connect('doctree-resolved', link_local_svg_images)
@@ -606,5 +735,5 @@ def setup(app) -> dict[str, object]:
     app.connect('config-inited', configure_search)
     app.connect('doctree-read', normalize_included_references, priority=100)
     app.connect('doctree-read', localize_diagram_images, priority=400)
-    return {'version': '1.0', 'env_version': 1,
+    return {'version': '2.1', 'env_version': 3,
             'parallel_read_safe': False, 'parallel_write_safe': True}

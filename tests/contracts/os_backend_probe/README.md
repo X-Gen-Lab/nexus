@@ -1,6 +1,6 @@
 # OS 后端接入探针
 
-`native.json` 是[后端接入合同](../../../docs/design/os-backend-integration.md)的可执行
+`native.json` 是[后端接入合同](../../../docs/reference/contracts/os/backend-integration.md)的可执行
 示例，选择已有真实 Native GoogleTest，不声明新 kernel，不做运行时后端注册。
 从仓库根先正常 configure，再用全新输出运行：
 

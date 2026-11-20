@@ -1,7 +1,7 @@
 blank_issues_enabled: false
 contact_links:
-  - name: Current platform contracts and delivery
-    url: https://github.com/X-Gen-Lab/nexus/tree/main/docs/delivery
+  - name: Current platform documentation
+    url: https://github.com/X-Gen-Lab/nexus/blob/main/docs/index.md
     about: Review current implementation scope and software versus physical qualification.
   - name: Security advisory
     url: https://github.com/X-Gen-Lab/nexus/security/advisories/new

@@ -1,0 +1,964 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 3f51cd39172f8656524e47ed6c56e2b59f5d32fec8cc093ea08f6ba26e2e9f86\n"
+
+#: ../../../../../../docs/reference/api/io/media.md:10
+msgid "Audio, image capture and display faces"
+msgstr "音频、图像采集与显示接口"
+
+#: ../../../../../../docs/reference/api/io/media.md:12
+msgid ""
+"Frames, audio samples, image operations and display commands retain their "
+"declared geometry and storage ownership. A completed memory transfer is not "
+"by itself a complete frame, wire transfer or safe display-buffer release."
+msgstr "帧、音频采样、图像操作及显示命令保持声明的几何及存储所有权。内存传输完成本身不代表完整帧、线缆传输完成或显示缓冲区可安全释放。"
+
+#: ../../../../../../docs/reference/api/io/media.md:16
+msgid "Public declarations"
+msgstr "公共声明"
+
+#: ../../../../../../docs/reference/api/io/media.md:18
+msgid "audio.h"
+msgstr "audio.h"
+
+#: ../../../../../../docs/reference/api/io/media.md:20
+msgid "Finite and continuous I2S transmit/receive DMA loans."
+msgstr "有限与连续 I2S 发送／接收 DMA 借用。"
+
+#: ../../../../../../docs/reference/api/io/media.md:20
+#: ../../../../../../docs/reference/api/io/media.md:26
+#: ../../../../../../docs/reference/api/io/media.md:32
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid "Author  Nexus Team"
+msgstr "作者  Nexus Team"
+
+#: ../../../../../../docs/reference/api/io/media.md:20
+#: ../../../../../../docs/reference/api/io/media.md:26
+#: ../../../../../../docs/reference/api/io/media.md:32
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid "Nexus Team"
+msgstr "Nexus Team"
+
+#: ../../../../../../docs/reference/api/io/media.md:20
+#: ../../../../../../docs/reference/api/io/media.md:26
+msgid "Typedefs"
+msgstr "类型定义"
+
+#: ../../../../../../docs/reference/api/io/media.md:20
+#: ../../../../../../docs/reference/api/io/media.md:26
+msgid "Same immutable typed controller face for direct operation use."
+msgstr "供直接操作使用的同一不可变 typed controller face。"
+
+#: ../../../../../../docs/reference/api/io/media.md:20
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid "Enums"
+msgstr "枚举"
+
+#: ../../../../../../docs/reference/api/io/media.md:20
+msgid "Byte/halfword ordering of one stored sample, not wire bit order."
+msgstr "一个存储采样值的字节／半字顺序，不是线上的位序。"
+
+#: ../../../../../../docs/reference/api/io/media.md:20
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid "Values:"
+msgstr "取值："
+
+#: ../../../../../../docs/reference/api/io/media.md:20
+#: ../../../../../../docs/reference/api/io/media.md:26
+#: ../../../../../../docs/reference/api/io/media.md:32
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid "Functions"
+msgstr "函数"
+
+#: ../../../../../../docs/reference/api/io/media.md:20
+msgid "Admit one finite audio block without converting its stored samples."
+msgstr "接纳一个有限音频块，不转换其中的存储样本。"
+
+#: ../../../../../../docs/reference/api/io/media.md:20
+#: ../../../../../../docs/reference/api/io/media.md:26
+msgid ""
+"The selected owner defines context and timing. Dispatch retains no "
+"references, starts no worker and never revokes a live borrow. Provider "
+"admission still checks private state and payload aliases. The original "
+"argument reaches that owner without a temporary or format conversion."
+msgstr ""
+"所选 owner 定义上下文与时序。分派本身不保留引用、不启动 worker，也不撤销活跃借用。provider 准入仍检查私有状态与 payload "
+"别名。原始参数直接传到该 owner，不建立临时对象或转换格式。"
+
+#: ../../../../../../docs/reference/api/io/media.md:0
+msgid "Parameters"
+msgstr "参数"
+
+#: ../../../../../../docs/reference/api/io/media.md:20
+#: ../../../../../../docs/reference/api/io/media.md:26
+msgid "[in] Stable face under the selected serialized execution contract."
+msgstr "[in] 遵循所选串行执行合同的稳定 face。"
+
+#: ../../../../../../docs/reference/api/io/media.md:20
+#: ../../../../../../docs/reference/api/io/media.md:26
+msgid "[inout] Original stable storage under the operation loan contract."
+msgstr "[inout] 遵循操作借用合同的原始稳定存储。"
+
+#: ../../../../../../docs/reference/api/io/media.md:0
+msgid "Returns"
+msgstr "返回值"
+
+#: ../../../../../../docs/reference/api/io/media.md:20
+#: ../../../../../../docs/reference/api/io/media.md:26
+msgid ""
+"Provider result, INVALID for malformed public objects, or UNSUPPORTED when "
+"this selected operation is absent."
+msgstr "provider 结果；公共对象不合法时为 INVALID，所选操作不存在时为 UNSUPPORTED。"
+
+#: ../../../../../../docs/reference/api/io/media.md:20
+msgid ""
+"Advance bounded completion and withdrawal; final results belong to requests."
+msgstr "有界推进完成与撤回；最终结果由请求提供。"
+
+#: ../../../../../../docs/reference/api/io/media.md:20
+msgid "Request finite-block withdrawal without revoking any outstanding loan."
+msgstr "请求撤回有限块，不撤销任何未归还借用。"
+
+#: ../../../../../../docs/reference/api/io/media.md:20
+msgid ""
+"Join finite or continuous producers; consumer RX loans remain independent."
+msgstr "等待有限或连续生产者退出；消费者 RX 借用仍独立管理。"
+
+#: ../../../../../../docs/reference/api/io/media.md:20
+msgid "Copy the exact nominal rate; an external unknown rate remains unknown."
+msgstr "复制精确的名义速率；未知外部速率保持未知。"
+
+#: ../../../../../../docs/reference/api/io/media.md:20
+msgid ""
+"[out] Independent output, changed only as the provider contract permits."
+msgstr "[out] 独立输出，仅按 provider 合同允许的方式修改。"
+
+#: ../../../../../../docs/reference/api/io/media.md:20
+msgid "Admit a continuous caller-owned session without hidden replenishment."
+msgstr "接纳调用者拥有的连续会话，不会隐式补充缓冲。"
+
+#: ../../../../../../docs/reference/api/io/media.md:20
+msgid "Copy exact storage layout without converting or borrowing payloads."
+msgstr "复制精确存储布局，不转换或借用 payload。"
+
+#: ../../../../../../docs/reference/api/io/media.md:20
+msgid "One finite block in the statically selected serial audio format."
+msgstr "静态所选串行音频格式中的一个有限 block。"
+
+#: ../../../../../../docs/reference/api/io/media.md:20
+msgid ""
+"Initialize/prepare base first. TX takes one exact immutable frame consumer "
+"loan; RX takes one FILLING loan from an idle framed stream. Full duplex "
+"requires both and equal complete frame storage lengths. Unselected "
+"directions must be NULL. Format conversion is never done. Storage is queried"
+" from the selected prepared owner with layout. The I2S provider uses one "
+"little endian halfword per 16-bit slot; I2S 24/32 bit samples use HIGH "
+"halfword then LOW halfword, in DMA order. For 24 bit data the low halfword "
+"has eight trailing padding bits. This is a sequence of halfwords, not native"
+" little endian uint32 PCM. SAI stores each sample in one native little "
+"endian 8/16/32-bit right-aligned container, with no implicit I2S halfword "
+"conversion. The I2S/left/right justified blocks contain both channel slots; "
+"PCM blocks contain complete single channel synchronization periods. Data "
+"length determines stored halfwords; wire padding is not stored. I2S finite "
+"master RX requires at least two stored halfwords. ACCEPTED borrows this "
+"request and both controls until SETTLED. Only proved serializer, DMA, IRQ "
+"and address withdrawal returns TX or publishes RX. Error/cancel reports zero"
+" and aborts RX after drain. An external slave clock that stops while a word "
+"remains can prevent drain indefinitely; timeout and failed stop NEVER revoke"
+" the loan."
+msgstr ""
+"先初始化／准备 base。TX 取得一个精确且不可变的帧消费者借用；RX 从空闲的帧流取得一个 FILLING "
+"借用。全双工要求同时提供二者，且完整帧的存储长度相等。未选方向必须为 NULL。绝不进行格式转换。通过 layout "
+"向选定且已准备的所有者查询存储格式。I2S 具体实现的每个 16 位槽使用一个小端半字；24／32 位 I2S 采样按 DMA 顺序先存 HIGH "
+"半字，再存 LOW 半字。24 位数据的低半字末尾有八个填充位。这是半字序列，不是本机小端 uint32 PCM。SAI "
+"将每个采样存入一个本机小端、右对齐的 8／16／32 位容器，不隐式转换 I2S 半字。I2S／左对齐／右对齐数据块包含两个通道槽；PCM "
+"数据块包含完整的单通道同步周期。数据长度决定所存半字数；不存储线上填充位。有限 I2S master RX 至少需要两个存储半字。ACCEPTED "
+"借用本请求及两个控制对象，直到 SETTLED。只有证明串行器、DMA、IRQ 及地址引用已撤回，才归还 TX 或发布 "
+"RX。错误／取消报告零，且在排空后中止 RX。字尚未传完时，外部 slave 时钟停止可能使排空无限期无法完成；超时和停机失败绝不撤销借用。"
+
+#: ../../../../../../docs/reference/api/io/media.md:20
+#: ../../../../../../docs/reference/api/io/media.md:26
+#: ../../../../../../docs/reference/api/io/media.md:32
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid "Public Members"
+msgstr "公共成员"
+
+#: ../../../../../../docs/reference/api/io/media.md:20
+msgid "Continuous fixed-size blocks with a caller-owned session lifetime."
+msgstr "调用者拥有会话生命周期的连续固定大小块。"
+
+#: ../../../../../../docs/reference/api/io/media.md:20
+msgid ""
+"TX is a stream of READY immutable blocks; RX starts with FREE blocks. Each "
+"selected direction supplies a distinct stream. DMA borrows two blocks per "
+"direction; the next replacement must be available before the hardware "
+"returns to the old bank. Published RX and returned TX blocks are detached "
+"from every DMA address before consumer access. Unselected directions are "
+"NULL. block_bytes is a positive whole audio frame count, identical for both "
+"directions. No silence, sample repeat, conversion, allocation or hidden "
+"replenishment is provided. Initialize/prepare base first. The session and "
+"producer/consumer rights remain borrowed through acquire-observed SETTLED. "
+"Consumer loans from completed RX blocks remain valid after session stop and "
+"must be joined separately before reclaiming the stream or buffers. Stop "
+"discards the uncompleted hardware blocks but preserves previously published "
+"RX. transferred counts detached RX bytes when RX is selected, otherwise "
+"detached TX bytes; it describes a prefix even on error/cancel, never the "
+"number of physical wire frames. NX_DEADLINE_NEVER is permitted."
+msgstr ""
+"TX 是由 READY 不可变块组成的 stream；RX 从 FREE 块开始。每个选中方向提供独立的 stream。DMA "
+"在每个方向借用两个块；硬件回到旧 bank 前必须准备好下一个替代块。已发布的 RX 块和已归还的 TX 块在消费者访问前均已脱离全部 DMA "
+"地址。未选方向为 NULL。block_bytes 为正数个完整音频 frame "
+"的存储字节数，两个方向相同。不提供补静音、样本重播、转换、分配或隐式补充。先初始化／prepare base。直到以 acquire 语义观察到 "
+"SETTLED，会话及 producer／consumer 权限始终被借用。已完成 RX 块的 consumer 借用在会话停止后继续有效，必须独立 "
+"join 后才能回收 stream 或 buffers。stop 丢弃尚未完成的硬件块，保留之前发布的 RX。选择 RX 时，transferred "
+"统计已脱离 DMA 的 RX 字节；否则统计已脱离 DMA 的 TX 字节。即使错误／取消也表示已完成前缀，绝不是实际 wire frame 数。允许 "
+"NX_DEADLINE_NEVER。"
+
+#: ../../../../../../docs/reference/api/io/media.md:20
+msgid "Exact rational nominal rate; external slave rate is unknown (0/0)."
+msgstr "精确有理数 nominal rate；外部 slave rate 未知，为 0/0。"
+
+#: ../../../../../../docs/reference/api/io/media.md:20
+msgid "This is prescaler arithmetic, not a physical clock measurement."
+msgstr "这是预分频算术，不是物理时钟测量。"
+
+#: ../../../../../../docs/reference/api/io/media.md:20
+msgid "Exact selected storage; wire padding is never silently stored."
+msgstr "精确的选定存储布局；绝不静默存储线上填充位。"
+
+#: ../../../../../../docs/reference/api/io/media.md:20
+msgid ""
+"container_bits is the DMA storage width, not the wire slot width. "
+"sample_alignment names useful bits within that container, not address "
+"alignment. HIGH_HALFWORD_FIRST stores two little endian halfwords, the most "
+"significant one first. I2S24 therefore reports container32, MSB alignment "
+"and HIGH_HALFWORD_FIRST; SAI24 reports container32, LSB alignment and "
+"LITTLE_ENDIAN. slots is 1..16 wire slots per frame; active_slots is their "
+"mask. Sparse SAI frames store only enabled slots in increasing wire-slot "
+"order, with no inactive-slot padding. The hardware FIFO supplies that order;"
+" no software conversion is done."
+msgstr ""
+"container_bits 是 DMA 存储宽度，不是 wire slot 宽度。sample_alignment "
+"表示容器内有效位的位置，不是地址对齐。HIGH_HALFWORD_FIRST 将两个小端半字按最高有效半字在前存储。因此 I2S24 报告 "
+"container32、MSB 对齐与 HIGH_HALFWORD_FIRST；SAI24 报告 container32、LSB 对齐与 "
+"LITTLE_ENDIAN。slots 是每帧 1..16 个 wire slots，active_slots 是对应 mask。稀疏 SAI "
+"帧只按递增 wire-slot 顺序存储已启用 slot，不为 inactive slot 填充。该顺序由硬件 FIFO 提供，不进行软件转换。"
+
+#: ../../../../../../docs/reference/api/io/media.md:20
+msgid "Allocation-free serialized owner, driven by explicit service."
+msgstr "不分配存储的串行化 owner，由显式 service 推进。"
+
+#: ../../../../../../docs/reference/api/io/media.md:20
+msgid ""
+"Platform prepare acquires the selected source, transport and clock "
+"resources. Factory lookup never opens hardware. Start external slave clocks "
+"only after acquire-observed ACTIVE; frame synchronization must remain at the"
+" selected idle boundary during preparation. ACTIVE proves the selected "
+"provider's startup preparation, not physical timing. Caller controls "
+"external electrical timing and stop/drain clocks. IRQs latch "
+"errors/completion, with no task creation. One privileged unmasked task "
+"serializes methods and resource lifecycle; explicit service progresses "
+"operations. Late IRQs cannot settle an old loan. stop cancels and joins the "
+"current block; failed drain retains full request/loan/resource storage. "
+"Platform close prevents further admission before attempting resource "
+"release. Join this owner before Platform stop or clock changes."
+msgstr ""
+"Platform prepare 取得所选数据源、传输与时钟资源。factory 查询不打开硬件。只有通过 acquire 观察到 ACTIVE "
+"后才能启动外部 slave 时钟；准备期间帧同步必须保持所选 idle 边界。ACTIVE 证明所选 provider "
+"已完成启动准备，不证明物理时序。调用者控制外部电气时序及停止／排空所需时钟。IRQ "
+"锁存错误与完成，不创建任务。一个特权且未屏蔽中断的任务串行执行方法与资源生命周期；显式 service 推进操作。迟到 IRQ 不能结清旧借用。stop"
+" 取消并等待当前块退出；排空失败保留完整 request／loan／resource 存储。Platform close "
+"在尝试归还资源前禁止继续准入。Platform stop 或改变时钟前必须等待该 owner 退出。"
+
+#: ../../../../../../docs/reference/api/io/media.md:20
+msgid "Optional continuous personality; NULL for a finite controller."
+msgstr "可选连续模式角色；有限控制器为 NULL。"
+
+#: ../../../../../../docs/reference/api/io/media.md:20
+msgid ""
+"SUCCESS accepts the full session, including a drained immediate failure. "
+"Rejection retains no session or stream references."
+msgstr "SUCCESS 表示接受完整会话，也包括立即失败但已排空的情况。拒绝不保留会话或 stream 引用。"
+
+#: ../../../../../../docs/reference/api/io/media.md:20
+msgid "Optional read-only layout of the selected prepared owner."
+msgstr "选定且已准备的所有者可选提供的只读布局。"
+
+#: ../../../../../../docs/reference/api/io/media.md:20
+msgid "Immutable controller identity; vendor Handles remain private."
+msgstr "不可变 controller 身份；厂商 Handle 保持私有。"
+
+#: ../../../../../../docs/reference/api/io/media.md:24
+msgid "capture.h"
+msgstr "capture.h"
+
+#: ../../../../../../docs/reference/api/io/media.md:26
+msgid "Explicit camera snapshots and opaque storage block streams."
+msgstr "显式相机 snapshot 与不解析内容的存储块流。"
+
+#: ../../../../../../docs/reference/api/io/media.md:26
+msgid "Admit one snapshot using the selected source and storage contract."
+msgstr "按所选数据源与存储合同接纳一张快照。"
+
+#: ../../../../../../docs/reference/api/io/media.md:26
+msgid "Start an opaque block session using caller-owned stream storage."
+msgstr "使用调用者拥有的 stream 存储启动不透明数据块会话。"
+
+#: ../../../../../../docs/reference/api/io/media.md:26
+msgid ""
+"Advance bounded source progress and withdrawal without a hidden worker."
+msgstr "有界推进数据源与撤回，不创建隐藏 worker。"
+
+#: ../../../../../../docs/reference/api/io/media.md:26
+msgid "Request snapshot withdrawal without revoking its producer loans."
+msgstr "请求撤回快照，不撤销其生产者借用。"
+
+#: ../../../../../../docs/reference/api/io/media.md:26
+msgid "Join the producer; published consumer blocks keep independent loans."
+msgstr "等待生产者退出；已发布的消费者数据块保持独立借用。"
+
+#: ../../../../../../docs/reference/api/io/media.md:26
+msgid ""
+"Attempt exclusive recovery; successful recovery requires Platform restart."
+msgstr "尝试独占恢复；恢复成功后仍须重启 Platform。"
+
+#: ../../../../../../docs/reference/api/io/media.md:26
+msgid "Admit finite complete snapshots with the selected inter-frame gaps."
+msgstr "按所选帧间间隙接纳有限完整快照。"
+
+#: ../../../../../../docs/reference/api/io/media.md:26
+msgid "One capture; every output is borrowed through observed SETTLED."
+msgstr "一次捕获；每个输出持续被借用，直到观察到 SETTLED。"
+
+#: ../../../../../../docs/reference/api/io/media.md:26
+msgid ""
+"Initialize/prepare base before submission. destination is an open, idle "
+"producer stream. For RAW, raw_frame binds that same stream to one contiguous"
+" complete image layout of exactly storage_bytes. For JPEG, raw_frame is NULL"
+" and storage_bytes is the writable capacity. Storage is a positive multiple "
+"of four, including owned tail padding. SUCCESS transfers the exact RAW "
+"storage length, or the JPEG DMA word prefix after FRAME, source/FIFO/bus and"
+" both IRQs actually drain. A JPEG prefix includes hardware zero padding in "
+"its final word; its length NEVER identifies JPEG codestream bytes. The "
+"caller parses JPEG. Errors publish no image and report zero bytes. Failed "
+"drain retains request, destination, frame metadata and every FILLING "
+"producer loan."
+msgstr ""
+"提交前初始化／prepare base。destination 是已打开且空闲的 producer stream。RAW 模式下，raw_frame "
+"将同一 stream 绑定到一个连续、完整且恰好为 storage_bytes 的图像布局。JPEG 模式下 raw_frame 为 "
+"NULL，storage_bytes 是可写容量。存储必须是正的四字节倍数，含归本 owner 所有的尾部 padding。SUCCESS 表示精确的 "
+"RAW 存储长度，或在 FRAME、来源／FIFO／总线和两个 IRQ 确实排空后返回的 JPEG DMA word 前缀。JPEG "
+"前缀末字含硬件零填充；其长度从不表示 JPEG 码流字节数。调用者解析 "
+"JPEG。错误不发布图像，报告零字节。排空失败保留请求、destination、frame metadata 及每个 FILLING producer "
+"借用。"
+
+#: ../../../../../../docs/reference/api/io/media.md:26
+msgid "A finite series of complete snapshot frames with explicit gaps."
+msgstr "由完整快照帧组成的有限序列，帧间空隙明确。"
+
+#: ../../../../../../docs/reference/api/io/media.md:26
+msgid ""
+"base.transferred counts successfully published whole frames, including a "
+"valid prefix on failure. storage_bytes is each RAW exact frame size or each "
+"JPEG capacity; JPEG words include hardware padding, not an exact codestream "
+"length. frame_count and deadline are positive/finite. Each frame fully joins"
+" source/FIFO/DMA/IRQs/addresses before publish and rearm. Finite snapshots "
+"allow gaps; they do not promise gapless continuous frames. Missing free "
+"slots leaves the source off while the session deadline continues. Stop "
+"cancels and joins this session; it cannot revoke READY/BORROWED consumer "
+"frames, which retain their independent loans."
+msgstr ""
+"base.transferred 统计成功发布的完整帧，失败时也包含有效前缀。storage_bytes 是每个 RAW 帧的精确大小或每个 JPEG "
+"帧的容量；JPEG 字包含硬件 padding，不是精确码流长度。frame_count 为正且 deadline 有限。每帧发布与重新武装前完整等待 "
+"source／FIFO／DMA／IRQ／address 退出。有限快照允许间隙，不承诺无间隙连续帧。缺少 FREE slot 时保持数据源关闭，会话 "
+"deadline 继续。Stop 取消并等待该会话退出，不能撤销 READY／BORROWED 消费者帧；它们保持独立借用。"
+
+#: ../../../../../../docs/reference/api/io/media.md:26
+msgid "Selected camera operation; no sensor, clock or codec policy."
+msgstr "所选 camera 操作；不提供 sensor、clock 或 codec 策略。"
+
+#: ../../../../../../docs/reference/api/io/media.md:26
+msgid ""
+"One privileged serialized task owns every operation. IRQ entries only latch "
+"hardware observations in provider state. The caller continues service; no "
+"hidden worker or scheduler is created. Platform prepare acquires resources. "
+"stop joins the current capture source, FIFO, DMA, IRQs and addresses; "
+"Platform close releases the selected resources and closes further controller"
+" admission. BUSY/IO preserves all loans and cleanup receipts. Repeated "
+"service/stop is required when an external sensor delays CAPTURE exit until "
+"frame end. recover may reset only the exclusively owned capture peripheral "
+"after observing disabled DMA and detached IRQs; it never resets shared DMA. "
+"Recovery invalidates format configuration. Join and restart Platform before "
+"submitting a new capture after a successful recovery. Blocks are RAW storage"
+" chunks or native 32-bit JPEG storage words, NOT images or an exact frame "
+"counter. JPEG words may include frame-end zero padding; block length is "
+"never a JPEG codestream byte length. No frame-boundary flags or parser are "
+"supplied for continuous blocks. Missing replacement or ambiguous DMA bank "
+"progress halts with LOSS; READY/BORROWED blocks are never reused. Stop does "
+"not revoke consumer blocks, which remain with the original stream until "
+"explicitly freed. Stop this owner before stopping/reclocking its Platform "
+"time domain."
+msgstr ""
+"一个特权串行化任务拥有全部操作。IRQ 入口只在 provider 状态中锁存硬件观察。调用者继续 service，不创建隐藏 worker "
+"或调度器。Platform prepare 取得资源。stop join 当前捕获来源、FIFO、DMA、IRQ 和地址；Platform close "
+"归还所选资源并关闭后续 controller 准入。BUSY／IO 保留全部借用和清理收条。若外部 sensor 将 CAPTURE "
+"退出推迟到帧结束，必须反复 service／stop。recover 仅在观察到 DMA 已禁用且 IRQ 已分离后，才能复位独占的 capture "
+"外设；绝不复位共享 DMA。恢复使格式配置失效。成功恢复后，提交下一次捕获前必须先 join 并重启 Platform。Block 是 RAW "
+"存储块，或本机格式的 32 位 JPEG 存储字，不是图像，也不是精确帧计数。JPEG 字可能包含帧末尾的补零；块长度绝不代表 JPEG "
+"码流的字节长度。连续块不提供帧边界标志或解析器。缺少替换块或 DMA bank 进展有歧义时，以 LOSS 停止；READY／BORROWED "
+"块从不复用。Stop 不撤销 consumer block，块仍归原 stream，直到显式释放。在停止／重配 Platform "
+"时间域时钟之前，先停止本 owner。"
+
+#: ../../../../../../docs/reference/api/io/media.md:26
+msgid "Immutable selected controller face; context outlives every loan."
+msgstr "不可变的所选 controller face；context 比每次借用活得更久。"
+
+#: ../../../../../../docs/reference/api/io/media.md:30
+msgid "display.h"
+msgstr "display.h"
+
+#: ../../../../../../docs/reference/api/io/media.md:32
+msgid "Explicit scanout frame lifetime and retirement proof."
+msgstr "显式扫描输出帧生命周期及安全撤回证明。"
+
+#: ../../../../../../docs/reference/api/io/media.md:32
+msgid "Read selected constraints without MMIO effects or borrowing."
+msgstr "读取选定约束，不产生 MMIO 效果或借用。"
+
+#: ../../../../../../docs/reference/api/io/media.md:32
+msgid "A supported format does not prove panel, bandwidth or HIL results."
+msgstr "支持某种格式不证明面板、带宽或 HIL 结果。"
+
+#: ../../../../../../docs/reference/api/io/media.md:32
+msgid "[in] Stable selected face, serialized Task use."
+msgstr "[in] 稳定的选定接口，在任务中串行调用。"
+
+#: ../../../../../../docs/reference/api/io/media.md:32
+msgid "[in] Exact hardware layer identity, never an inferred default."
+msgstr "[in] 精确的硬件图层身份，绝不推断默认值。"
+
+#: ../../../../../../docs/reference/api/io/media.md:32
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid "[out] Independent output, unchanged on rejection."
+msgstr "[out] 独立输出；拒绝时保持不变。"
+
+#: ../../../../../../docs/reference/api/io/media.md:32
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid "SUCCESS, INVALID, UNSUPPORTED or provider error."
+msgstr "SUCCESS、INVALID、UNSUPPORTED 或具体实现错误。"
+
+#: ../../../../../../docs/reference/api/io/media.md:32
+msgid "Copy a display tuple into unborrowed request storage."
+msgstr "将显示参数元组复制到未被借用的请求存储。"
+
+#: ../../../../../../docs/reference/api/io/media.md:32
+msgid ""
+"Deadline is not silently reinterpreted as a latch-only deadline. All frame "
+"bytes are disjoint from the whole request and full private "
+"config/state/resource facts. No pixel bytes are read or copied here."
+msgstr "绝不静默将截止时间重新解释为仅约束锁存的截止时间。所有帧字节均须与整个请求、完整私有配置／状态／资源事实分离。此处不读取或复制像素字节。"
+
+#: ../../../../../../docs/reference/api/io/media.md:32
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid "[inout] Initialized READY or consumed SETTLED descriptor."
+msgstr "[inout] 已初始化的 READY 或已消费的 SETTLED 描述符。"
+
+#: ../../../../../../docs/reference/api/io/media.md:32
+msgid "[in] Value copied; this metadata object is not retained."
+msgstr "[in] 复制值，不保留此元数据对象。"
+
+#: ../../../../../../docs/reference/api/io/media.md:32
+msgid ""
+"[in] Core absolute deadline for the whole frame lifetime; NX_DEADLINE_NEVER "
+"explicitly permits persistent scanout."
+msgstr "[in] 覆盖完整帧生命周期的 Core 绝对截止时间；NX_DEADLINE_NEVER 显式允许持续扫描输出。"
+
+#: ../../../../../../docs/reference/api/io/media.md:32
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid "SUCCESS or INVALID/STATE/EXHAUSTED, unchanged on rejection."
+msgstr "SUCCESS 或 INVALID／STATE／EXHAUSTED；拒绝时保持不变。"
+
+#: ../../../../../../docs/reference/api/io/media.md:32
+msgid "Accept an initial frame or one pending replacement."
+msgstr "接受初始帧或一个待替换帧。"
+
+#: ../../../../../../docs/reference/api/io/media.md:32
+msgid ""
+"Rejection keeps request/frame unchanged and has no residual effect. "
+"Active/pending requests and their full frame spans are mutually disjoint; no"
+" in-place redraw. All required clock domains must remain alive throughout "
+"register access, scanout and retirement. Products own panel timing and "
+"wiring."
+msgstr ""
+"拒绝时请求／帧保持不变，不保留残余效果。活动／待提交请求及各自完整帧区间必须相互分离；不允许原位重绘。寄存器访问、扫描输出和撤回全程，所有必需时钟域必须持续有效。产品负责面板时序与接线。"
+
+#: ../../../../../../docs/reference/api/io/media.md:32
+msgid "[in] Privileged, IRQ-unmasked controller owner."
+msgstr "[in] 特权且未屏蔽 IRQ 的控制器所有者。"
+
+#: ../../../../../../docs/reference/api/io/media.md:32
+msgid "[inout] READY tuple and stable immutable frame storage."
+msgstr "[inout] READY 元组与稳定、不可变的帧存储。"
+
+#: ../../../../../../docs/reference/api/io/media.md:32
+msgid "SUCCESS means ACCEPTED; BUSY if the one pending slot is occupied."
+msgstr "SUCCESS 表示 ACCEPTED；唯一的待提交槽位被占用时返回 BUSY。"
+
+#: ../../../../../../docs/reference/api/io/media.md:32
+msgid "Advance verified latching, replacement and finite retirement."
+msgstr "推进经验证的锁存、替换及有限撤回。"
+
+#: ../../../../../../docs/reference/api/io/media.md:32
+msgid ""
+"IRQ can capture documented commit, matching active addresses and actual "
+"blanking for the current stage. Task revalidates its exact stage/withdrawal "
+"mask, current state and clock epoch before joining sources and publishing "
+"SETTLED. A wake/reload hint alone is no proof. A missed reload window can "
+"use bounded hardware line IRQ retries; normal operation does not require a "
+"high-frequency polling task. GCR readback, HAL_OK or DSB alone does not "
+"prove old bus reads ended. Clock loss can stall MMIO itself; deadlines do "
+"not interrupt a stalled bus transaction. A failed proof retains both frame "
+"loans."
+msgstr ""
+"IRQ 可以采集文档规定的提交事实、与当前阶段匹配的活动地址及实际消隐。任务在 join 各源并发布 SETTLED "
+"前，重新验证精确阶段／撤回掩码、当前状态和时钟 epoch。单独的 wake／重载提示不是证明。错过重载窗口后，可通过有界的硬件行 IRQ "
+"重试；正常运行不要求高频轮询任务。仅 GCR 读回、HAL_OK 或 DSB 不能证明旧总线读取已结束。时钟丢失可能使 MMIO "
+"本身停滞；截止时间无法中断停滞的总线事务。证明失败时保留两份帧借用。"
+
+#: ../../../../../../docs/reference/api/io/media.md:32
+msgid "[in] Same serialized privileged unmasked Task executor."
+msgstr "[in] 同一个串行、特权且未屏蔽 IRQ 的任务执行者。"
+
+#: ../../../../../../docs/reference/api/io/media.md:32
+msgid "SUCCESS after progress; BUSY/IO may retain quarantined frame loans."
+msgstr "推进后返回 SUCCESS；BUSY／IO 可能保留隔离中的帧借用。"
+
+#: ../../../../../../docs/reference/api/io/media.md:32
+msgid "Request retirement without revoking an active or pending frame."
+msgstr "请求撤回，不撤销活动帧或待提交帧的借用。"
+
+#: ../../../../../../docs/reference/api/io/media.md:32
+msgid "Pending/visible status does not permit reuse; continue service."
+msgstr "待提交／可见状态不允许复用；须继续推进 service。"
+
+#: ../../../../../../docs/reference/api/io/media.md:32
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid "[in] Same serialized owner."
+msgstr "[in] 同一个串行所有者。"
+
+#: ../../../../../../docs/reference/api/io/media.md:32
+msgid "[inout] Exact accepted request, kept alive through settlement."
+msgstr "[inout] 精确的已接受请求，持续有效直到结清。"
+
+#: ../../../../../../docs/reference/api/io/media.md:32
+msgid "SUCCESS requests retirement; STATE means another request."
+msgstr "SUCCESS 表示请求撤回；STATE 表示属于另一个请求。"
+
+#: ../../../../../../docs/reference/api/io/media.md:32
+msgid "Copy current observations without advancing hardware."
+msgstr "复制当前观察值，不推进硬件。"
+
+#: ../../../../../../docs/reference/api/io/media.md:32
+msgid ""
+"Task-only; provider synchronizes the copy against IRQ publication. No "
+"allocation, callbacks or physical timing guarantee."
+msgstr "仅限任务；具体实现须使副本与 IRQ 发布同步。不分配、不回调，也不保证物理时序。"
+
+#: ../../../../../../docs/reference/api/io/media.md:32
+msgid "[in] Same serialized Task owner; no concurrent public control."
+msgstr "[in] 同一个串行任务所有者；不得并发执行公共控制。"
+
+#: ../../../../../../docs/reference/api/io/media.md:32
+msgid "[in] Exact hardware layer whose active frame is observed."
+msgstr "[in] 被观察活动帧所属的精确硬件图层。"
+
+#: ../../../../../../docs/reference/api/io/media.md:32
+msgid "[out] Output disjoint from all loans and private storage."
+msgstr "[out] 输出须与所有借用及私有存储分离。"
+
+#: ../../../../../../docs/reference/api/io/media.md:32
+msgid "SUCCESS, INVALID, STATE or provider error; unchanged on rejection."
+msgstr "SUCCESS、INVALID、STATE 或具体实现错误；拒绝时保持不变。"
+
+#: ../../../../../../docs/reference/api/io/media.md:32
+msgid "Close the whole controller and retire all its selected layer loans."
+msgstr "关闭整个控制器，撤回所有选定图层的借用。"
+
+#: ../../../../../../docs/reference/api/io/media.md:32
+msgid ""
+"A failed clock, reload or register proof never permits reuse. A reset bit "
+"readback does not independently establish outstanding-bus drain. Successful "
+"repeated stop must not access returned configuration. An independent layer "
+"cancellation preserves its peer; stop is controller-scoped and cannot return"
+" resources while any peer lives."
+msgstr ""
+"时钟、重载或寄存器证明失败绝不允许复用。复位位读回不能独立证明尚未完成的总线操作已排空。重复成功 stop "
+"不得访问已归还的配置。独立取消一个图层时保留另一图层；stop 作用于整个控制器，只要任何图层仍活跃就不能归还资源。"
+
+#: ../../../../../../docs/reference/api/io/media.md:32
+msgid "[in] Controller face; all layer producers/observers joined."
+msgstr "[in] 控制器接口；所有图层的生产者／观察者均已完成 join。"
+
+#: ../../../../../../docs/reference/api/io/media.md:32
+msgid ""
+"SUCCESS only after all scanout/bus/IRQ/publisher references exit; BUSY/IO "
+"retains the cold receipt, request and frame responsibilities."
+msgstr "只有所有扫描输出／总线／IRQ／发布者引用均退出后，才返回 SUCCESS；BUSY／IO 保留冷态责任记录、请求和帧责任。"
+
+#: ../../../../../../docs/reference/api/io/media.md:32
+msgid "Bind an optional hint using the existing backend IRQ policy."
+msgstr "使用既有后端 IRQ 策略绑定可选提示。"
+
+#: ../../../../../../docs/reference/api/io/media.md:32
+msgid ""
+"Request predicates remain authoritative. Retain sink/context until both "
+"interrupt sources and all publishers have been joined."
+msgstr "请求判定条件仍是权威依据。须保留 sink／context，直到中断源及全部发布者均已完成 join。"
+
+#: ../../../../../../docs/reference/api/io/media.md:32
+msgid "[in] Live serialized owner with no accepted frame."
+msgstr "[in] 有效的串行所有者，且没有已接受帧。"
+
+#: ../../../../../../docs/reference/api/io/media.md:32
+msgid "[in] Stable hint or NULL to detach."
+msgstr "[in] 稳定提示，或用 NULL 拆除绑定。"
+
+#: ../../../../../../docs/reference/api/io/media.md:32
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid "[in] Must match the selected backend policy."
+msgstr "[in] 必须匹配所选后端策略。"
+
+#: ../../../../../../docs/reference/api/io/media.md:32
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid "SUCCESS or INVALID/CONTEXT/STATE/BUSY/UNSUPPORTED."
+msgstr "SUCCESS 或 INVALID／CONTEXT／STATE／BUSY／UNSUPPORTED。"
+
+#: ../../../../../../docs/reference/api/io/media.md:32
+msgid "Readonly constraints for one explicitly queried layer."
+msgstr "显式查询的某一图层的只读约束。"
+
+#: ../../../../../../docs/reference/api/io/media.md:32
+msgid ""
+"Width/height describe the Board-authorized output window; panel timing, "
+"pixel clock, RGB route, enable/reset/backlight and power policy are not "
+"inferred by this API. Format mask uses (1U << nx_image_format_t)."
+msgstr ""
+"宽／高描述 Board 授权的输出窗口；本 API 不推断面板时序、像素时钟、RGB 路由、使能／复位／背光或电源策略。格式掩码使用 (1U << "
+"nx_image_format_t)。"
+
+#: ../../../../../../docs/reference/api/io/media.md:32
+msgid "Scanout value copied at prepare; frame storage stays caller-owned."
+msgstr "prepare 时复制扫描输出参数值；帧存储仍由调用者持有。"
+
+#: ../../../../../../docs/reference/api/io/media.md:32
+msgid ""
+"The view is a complete one-plane byte rectangle, not a copied image. "
+"Rows/row_bytes match the selected window and pixel format; stride is bytes. "
+"span_bytes includes every actual read and declared padding. Retain any "
+"originating consumer loan and follow its own release contract. SETTLED ends "
+"this provider borrow; it does not fabricate engine-disabled proof for "
+"another adapter. A view creates no pool or stream ownership."
+msgstr ""
+"此视图是完整的单平面字节矩形，不是复制的图像。Rows／row_bytes 须匹配所选窗口与像素格式；stride 以字节为单位。span_bytes "
+"包括每个实际读取字节与声明的填充。须保留源头的消费者借用并遵守其独立释放合同。SETTLED "
+"结束本具体实现的借用，不为另一个适配器虚构引擎已禁用的证明。视图不创建池，也不取得数据流所有权。"
+
+#: ../../../../../../docs/reference/api/io/media.md:32
+msgid "A frame remains borrowed while scanout may still read it."
+msgstr "只要扫描输出仍可能读取帧，该帧就保持借用。"
+
+#: ../../../../../../docs/reference/api/io/media.md:32
+msgid ""
+"ACCEPTED retains descriptor and full frame span until acquire- observed "
+"SETTLED after verified replacement or full stop. VISIBLE, VSYNC, a CPU DSB "
+"or a queued shadow reload is not SETTLED. Retiring SUCCESS means a "
+"previously visible frame was safely replaced, not a count of displayed "
+"pixels or frames; transferred is always zero. Cancel/timeout/stop initiates "
+"retirement and can finish after the request deadline. Failed withdrawal "
+"retains QUARANTINED and the loan."
+msgstr ""
+"ACCEPTED 保留描述符和完整帧区间，直到验证已替换或完整停机后，以 acquire 观察到 SETTLED。VISIBLE、VSYNC、CPU "
+"DSB 或排队的影子寄存器重载均不等于 SETTLED。撤回时的 SUCCESS "
+"表示先前可见的帧已被安全替换，不计数显示像素或帧；transferred 始终为零。取消／超时／停机启动撤回，可以在请求截止时间之后完成。撤回失败保留 "
+"QUARANTINED 及借用。"
+
+#: ../../../../../../docs/reference/api/io/media.md:32
+msgid "Readonly current observations, not a frame counter or an event queue."
+msgstr "当前只读观察值，不是帧计数器或事件队列。"
+
+#: ../../../../../../docs/reference/api/io/media.md:32
+msgid ""
+"No field grants storage reuse. visible describes the active frame; a pending"
+" replacement is a separate loan. first_failure is latched by the provider; "
+"no physical presentation time is inferred."
+msgstr ""
+"任何字段都不授予复用存储的权限。visible 描述当前活动帧；待替换帧是另一份借用。first_failure 由具体实现锁存；不推断物理呈现时间。"
+
+#: ../../../../../../docs/reference/api/io/media.md:32
+msgid "Shared immutable methods; one controller owns scanout and errors."
+msgstr "共享不可变方法；一个控制器统一拥有扫描输出与错误处理。"
+
+#: ../../../../../../docs/reference/api/io/media.md:32
+msgid ""
+"Each selected layer has one active request. All faces of the same controller"
+" share at most one pending hardware commit, with no extra queue or buffers. "
+"One controller face selects a layer explicitly at query/snapshot or in the "
+"operation; layers never own another clock, IRQ or reset transport."
+msgstr ""
+"每个选定图层有一个活动请求。同一控制器的所有接口共用至多一个待提交硬件变更，不另设队列或缓冲区。一个控制器接口在 query／snapshot "
+"或操作中显式选择图层；图层绝不另行拥有时钟、IRQ 或复位传输实现。"
+
+#: ../../../../../../docs/reference/api/io/media.md:32
+msgid "Stable controller face; lookup never starts scanout or a scheduler."
+msgstr "稳定的控制器接口；查询绝不启动扫描输出或调度器。"
+
+#: ../../../../../../docs/reference/api/io/media.md:36
+msgid "image.h"
+msgstr "image.h"
+
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid "Explicit single-shot image-memory operations and loans."
+msgstr "显式单次图像内存操作及借用。"
+
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid "Memory values, independent of RGB wiring or panel color policy."
+msgstr "内存值，独立于 RGB 接线或面板颜色策略。"
+
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid ""
+"RGB565 stores native uint16_t values; ARGB8888 stores native uint32_t "
+"0xAARRGGBB values. A provider explicitly admits each operation/format. No "
+"byte-order conversion, gamma or premultiplication is implicit."
+msgstr ""
+"RGB565 存储本机 uint16_t 值；ARGB8888 存储本机 uint32_t 的 0xAARRGGBB "
+"值。具体实现须显式准入每种操作／格式。不隐含字节序转换、gamma 或预乘。"
+
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid "One selected hardware task, not a software fallback pipeline."
+msgstr "一个选定的硬件操作，不是软件回退流水线。"
+
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid "Explicit blend alpha source; no implicit premultiplication."
+msgstr "显式混合 alpha 来源；不隐含预乘。"
+
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid "Query one exact operation/format combination without a borrow."
+msgstr "查询一个精确操作／格式组合，不产生借用。"
+
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid ""
+"No fallback, worker or allocation. A known enum is not support. Geometry "
+"limits do not authorize every scalar alpha combination; admission separately"
+" checks a provider's parameter-proven alpha rule."
+msgstr ""
+"没有回退、worker 或分配。枚举值已知不表示支持。几何限制不授予所有标量 alpha 组合；准入还须独立检查具体实现通过参数证明的 alpha "
+"规则。"
+
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid "[in] Stable face and live owner storage, serialized Task use."
+msgstr "[in] 稳定接口及有效所有者存储，在任务中串行调用。"
+
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid "[in] Selected fill/copy/convert/blend operation."
+msgstr "[in] 选定的 fill／copy／convert／blend 操作。"
+
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid "[in] Foreground memory format; ignored for FILL."
+msgstr "[in] 前景内存格式；FILL 忽略此项。"
+
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid "[in] Background format; used only for BLEND."
+msgstr "[in] 背景格式；仅 BLEND 使用。"
+
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid "[in] Output memory format."
+msgstr "[in] 输出内存格式。"
+
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid "Prepare a one-shot value tuple without reading any image bytes."
+msgstr "准备单次值元组，不读取任何图像字节。"
+
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid ""
+"Every referenced capacity is disjoint from the whole request. "
+"Source/destination overlap is rejected; this is not memmove. Provider "
+"admission also proves separation from full private state/config, "
+"resource/region facts and optional wake storage. No hidden padding."
+msgstr ""
+"每个引用的容量范围均须与整个请求分离。拒绝源／目标重叠；本操作不是 memmove。具体实现准入还须证明它们与完整私有状态／配置、资源／区域事实及可选 "
+"wake 存储分离。不隐含填充。"
+
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid "[in] Copied value; its object is not retained."
+msgstr "[in] 复制值，不保留该对象。"
+
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid "[in] Finite absolute deadline in the live Core domain."
+msgstr "[in] 活跃 Core 域中的有限绝对截止时间。"
+
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid "Admit one image operation without a queue or hidden task."
+msgstr "准入一个图像操作，不提供队列或隐藏任务。"
+
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid "Rejection has no retained references or residual hardware effects."
+msgstr "拒绝时不保留引用，也不留下硬件效果。"
+
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid "[in] Initialized privileged, IRQ-unmasked serialized owner."
+msgstr "[in] 已初始化、特权且未屏蔽 IRQ 的串行所有者。"
+
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid "[inout] READY tuple with stable referenced capacities."
+msgstr "[inout] READY 元组及其引用的稳定容量范围。"
+
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid "SUCCESS means ACCEPTED, including a later settled start failure."
+msgstr "SUCCESS 表示 ACCEPTED，包括之后结清的启动失败。"
+
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid "Make bounded progress and preserve first terminal cause."
+msgstr "有界推进，并保留最先确定的终止原因。"
+
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid ""
+"IRQ callbacks only latch facts and signal an optional bounded hint. Transfer"
+" complete or HAL_READY alone is not a withdrawal proof."
+msgstr "IRQ 回调只锁存事实并发送可选的有界提示。传输完成或 HAL_READY 本身不能证明撤回完成。"
+
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid "[in] Same privileged unmasked executor, no callback reentry."
+msgstr "[in] 同一个特权且未屏蔽 IRQ 的执行者，不得通过回调重入。"
+
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid "SUCCESS after progress; BUSY/IO may retain quarantined storage."
+msgstr "推进后返回 SUCCESS；BUSY／IO 可能保留隔离中的存储。"
+
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid "Request cancellation without revoking image loans."
+msgstr "请求取消，不撤销图像借用。"
+
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid "Continue service through engine/IRQ/address/bus withdrawal."
+msgstr "引擎／IRQ／地址／总线撤回期间，继续推进 service。"
+
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid "[inout] Exact accepted descriptor, still kept alive."
+msgstr "[inout] 精确的已接受描述符，仍须保持有效。"
+
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid "SUCCESS requests cancel; STATE means another request."
+msgstr "SUCCESS 表示请求取消；STATE 表示属于另一个请求。"
+
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid "Seal admission and join the active transfer before resource return."
+msgstr "封闭新准入，归还资源前等待活跃传输完成 join。"
+
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid ""
+"Late IRQ cannot access request/config after successful stop. Repeat stop is "
+"idempotent and cannot dereference returned configuration."
+msgstr "成功停机后，迟到 IRQ 无法访问请求／配置。重复 stop 幂等，不能解引用已归还的配置。"
+
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid "[in] Same owner with external producers/observers quiesced."
+msgstr "[in] 同一个所有者，外部生产者／观察者已停止活动。"
+
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid "SUCCESS only after final withdrawal; BUSY/IO retains responsibility."
+msgstr "仅在最终撤回完成后返回 SUCCESS；BUSY／IO 保留责任。"
+
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid "Attach an optional hint under existing IRQ-ceiling policy."
+msgstr "按既有 IRQ 上限策略挂接可选提示。"
+
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid "Join source and publishers before reclaiming target/context."
+msgstr "回收 target／context 前，须完成源和发布者的 join。"
+
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid "[in] Live serialized owner without active work."
+msgstr "[in] 有效的串行所有者，且没有活跃操作。"
+
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid "[in] Stable hint or NULL to detach; no request-state authority."
+msgstr "[in] 稳定提示，或用 NULL 拆除绑定；不作为请求状态的权威依据。"
+
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid "Immutable source storage and complete row stride in bytes."
+msgstr "不可变源存储，以及以字节为单位的完整行步长。"
+
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid ""
+"Capacity is caller-owned readable extent, including any declared padding. No"
+" access outside capacity or hidden readable padding is permitted. The "
+"request borrows this complete declared span."
+msgstr ""
+"Capacity 是调用者持有的可读范围，包含声明的填充。禁止越过 capacity 访问，也不允许隐含额外可读填充。请求借用完整的声明区间。"
+
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid "Writable destination, distinct from the const source type."
+msgstr "可写目标，与 const 源类型明确区分。"
+
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid "Value tuple; referenced byte spans are not copied."
+msgstr "值元组；不复制其引用的字节区间。"
+
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid ""
+"Width/height are pixels/rows. Every stride and extent is checked; no "
+"clipping, rotation, scaling or framebuffer allocation is implicit. FILL has "
+"zero source spans; fill_value is encoded in destination format (RGB565 uses "
+"the low16 bits). COPY/CONVERT use foreground only; BLEND uses both sources "
+"with straight per-pixel alpha multiplied by the explicit constant for "
+"MULTIPLY, or replaced by it for REPLACE. Unused source metadata, constants "
+"and alpha modes are zero. Direct565-to8888 conversion replicates channel "
+"MSBs into added low bits and adds opaque alpha; conversion to565 keeps "
+"channel MSBs. For ARGB output, RGB bits at resulting alpha0 have no defined "
+"value. Blend to565 may require a parameter-proven positive input alpha; no "
+"provider scans source pixels to guess whether output can be0. Unsupported "
+"combinations reject."
+msgstr ""
+"宽／高分别以像素／行为单位。检查每个步长与范围；不隐含裁剪、旋转、缩放或帧缓冲分配。FILL 没有源区间；fill_value "
+"按目标格式编码（RGB565 使用低 16 位）。COPY／CONVERT 仅使用前景；BLEND 使用两个源，对非预乘的逐像素 alpha 执行 "
+"MULTIPLY 时乘以显式常量，执行 REPLACE 时替换为该常量。未用源元数据、常量及 alpha 模式均为零。直接从 565 转为 8888 "
+"时，将通道最高有效位复制到新增低位，并添加不透明 alpha；转为 565 时保留通道最高有效位。ARGB 输出最终 alpha 为零时，RGB "
+"位的值未定义。混合到 565 可能要求参数能够证明输入 alpha 为正；具体实现不会扫描源像素来猜测输出是否可能为零。不支持的组合直接拒绝。"
+
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid "Selected limits; operation/format query is side-effect-free."
+msgstr "选定限制；操作／格式查询无副作用。"
+
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid "One operation retained through actual final memory access."
+msgstr "一个操作持续保留，直到实际最后一次内存访问完成。"
+
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid ""
+"Initialize base before first preparation. ACCEPTED retains request and all "
+"source/destination capacities through acquire-observed SETTLED. SUCCESS "
+"reports width*height*destination-bytes-per-pixel, excluding stride padding. "
+"Error reports zero valid bytes, even when a partial destination was "
+"modified; no rollback copy is supplied. Cancel/timeout only start "
+"withdrawal. Refused engine/IRQ/address or bus withdrawal keeps QUARANTINED "
+"and every borrowed span."
+msgstr ""
+"首次准备前初始化 base。ACCEPTED 保留请求及所有源／目标容量范围，直到以 acquire 观察到 SETTLED。SUCCESS 报告 "
+"width*height*destination-bytes-per-"
+"pixel，不含行步长填充。发生错误时报告零个有效字节，即使目标已有部分改写；不提供回滚副本。取消／超时只启动撤回。引擎／IRQ／地址或总线撤回被拒绝时，继续保留"
+" QUARANTINED 及每个已借用区间。"
+
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid "Shared immutable operations, one serialized privileged owner."
+msgstr "共享不可变操作，由一个特权所有者串行执行。"
+
+#: ../../../../../../docs/reference/api/io/media.md:38
+msgid "Stable controller identity; factory lookup has no hardware effect."
+msgstr "稳定控制器身份；factory 查询不产生硬件效果。"

@@ -1,0 +1,213 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: b7898679b0450f8df56645a8b76a64e7f8f65d8f8670a6dbe61c9006794ab1ac\n"
+
+#: ../../../../../../docs/guides/troubleshooting.md:8
+msgid "按失败阶段定位问题"
+msgstr "Locate failures by stage"
+
+#: ../../../../../../docs/guides/troubleshooting.md:10
+msgid "先保留完整命令、第一条错误和实际日志路径，再按失败阶段检查。修改作者输入后 重跑对应命令；生成文件和旧通过报告不用于修复输入。"
+msgstr ""
+"First retain the complete command, the first error and actual log paths, "
+"then inspect the failing stage. After editing author inputs, rerun the "
+"relevant command. Generated files and old success reports do not repair an "
+"input."
+
+#: ../../../../../../docs/guides/troubleshooting.md:0
+msgid "阶段与现象"
+msgstr "Stage and symptom"
+
+#: ../../../../../../docs/guides/troubleshooting.md:0
+msgid "检查与处理"
+msgstr "Checks and action"
+
+#: ../../../../../../docs/guides/troubleshooting.md:0
+msgid "成功判据"
+msgstr "Success criterion"
+
+#: ../../../../../../docs/guides/troubleshooting.md:0
+msgid "找不到 Nexus package"
+msgstr "Nexus package not found"
+
+#: ../../../../../../docs/guides/troubleshooting.md:0
+msgid "源码选 `<nexus>/cmake`，安装包选 `<prefix>/lib/cmake/Nexus`；核对 `Nexus_DIR`"
+msgstr ""
+"For source, select `<nexus>/cmake`; for an installed package, select "
+"`<prefix>/lib/cmake/Nexus`. Check `Nexus_DIR`."
+
+#: ../../../../../../docs/guides/troubleshooting.md:0
+msgid "同一工程找到所选来源"
+msgstr "The project finds the selected source"
+
+#: ../../../../../../docs/guides/troubleshooting.md:0
+msgid "工具链或 ABI 冲突"
+msgstr "Toolchain or ABI conflict"
+
+#: ../../../../../../docs/guides/troubleshooting.md:0
+msgid "工具链在 `project()` 前选定；换工具链、装配或 SDK 时使用新 builddir"
+msgstr ""
+"Select the toolchain before `project()`; use a new build directory when "
+"changing the toolchain, assembly or SDK."
+
+#: ../../../../../../docs/guides/troubleshooting.md:0
+msgid "实际编译器、CPU／FPU／ABI 与所选事实一致"
+msgstr "The actual compiler, CPU/FPU and ABI match the selected facts"
+
+#: ../../../../../../docs/guides/troubleshooting.md:0
+msgid "缺少锁定依赖"
+msgstr "Missing pinned dependency"
+
+#: ../../../../../../docs/guides/troubleshooting.md:0
+msgid "源码执行所选 preset／assembly 的 prepare；只有显式 `--allow-network` 允许获取"
+msgstr ""
+"For source, prepare the selected preset/assembly. Only explicit `--allow-"
+"network` permits fetching."
+
+#: ../../../../../../docs/guides/troubleshooting.md:0
+msgid "选中闭包的 pin、来源、许可和工作区检查通过"
+msgstr ""
+"Pins, provenance, licenses and worktrees pass checks for the selected "
+"closure"
+
+#: ../../../../../../docs/guides/troubleshooting.md:0
+msgid "Native 被拒绝"
+msgstr "Native rejected"
+
+#: ../../../../../../docs/guides/troubleshooting.md:0
+msgid "模型解析和创建明确加 `--test-support`，CMake 明确 `NEXUS_TEST_SUPPORT=ON`"
+msgstr ""
+"Explicitly use `--test-support` for model resolution and creation, and "
+"`NEXUS_TEST_SUPPORT=ON` for CMake."
+
+#: ../../../../../../docs/guides/troubleshooting.md:0
+msgid "模型仅在该测试支撑范围启用"
+msgstr "The model is enabled only within the explicit test-support scope"
+
+#: ../../../../../../docs/guides/troubleshooting.md:0
+msgid "TOML 未知字段或 binding"
+msgstr "Unknown TOML field or binding"
+
+#: ../../../../../../docs/guides/troubleshooting.md:0
+msgid "用同一平台的 schema、`list-bindings` 和当前 Board 查询；修正作者字段"
+msgstr ""
+"Use the schema and `list-bindings` from the same platform with the current "
+"Board; correct author fields."
+
+#: ../../../../../../docs/guides/troubleshooting.md:0
+msgid "`check` 接受完整装配"
+msgstr "`check` accepts the complete assembly"
+
+#: ../../../../../../docs/guides/troubleshooting.md:0
+msgid "pin／DMA／IRQ／时钟冲突"
+msgstr "Pin/DMA/IRQ/clock conflict"
+
+#: ../../../../../../docs/guides/troubleshooting.md:0
+msgid "根据诊断的资源和两个 owner 调整真实配置，不静默换路线"
+msgstr ""
+"Adjust the actual configuration using the diagnosed resource and both "
+"owners; do not silently change routes."
+
+#: ../../../../../../docs/guides/troubleshooting.md:0
+msgid "`explain` 展示预期资源及容量"
+msgstr "`explain` reports the expected resources and capacities"
+
+#: ../../../../../../docs/guides/troubleshooting.md:0
+msgid "SDK identity／epoch 不匹配"
+msgstr "SDK identity/epoch mismatch"
+
+#: ../../../../../../docs/guides/troubleshooting.md:0
+msgid "核对 SDK 完整提交、manifest、接口代际和应用锁；重新取得正确包"
+msgstr ""
+"Check the full SDK commit, manifest, interface epoch and application lock; "
+"obtain the correct package again."
+
+#: ../../../../../../docs/guides/troubleshooting.md:0
+msgid "完整性校验及期望提交接纳"
+msgstr "Integrity verification and expected revision are accepted"
+
+#: ../../../../../../docs/guides/troubleshooting.md:0
+msgid "构建目录 busy"
+msgstr "Build directory busy"
+
+#: ../../../../../../docs/guides/troubleshooting.md:0
+msgid "等待该目录的真实持有者结束，或选择独立目录；不删除运行中的锁文件"
+msgstr ""
+"Wait for its actual owner to finish or choose a separate directory. Do not "
+"delete an active lock file."
+
+#: ../../../../../../docs/guides/troubleshooting.md:0
+msgid "一个构建目录只有一个写入者"
+msgstr "Each build directory has one writer"
+
+#: ../../../../../../docs/guides/troubleshooting.md:0
+msgid "请求超时或 stop BUSY"
+msgstr "Request timeout or stop BUSY"
+
+#: ../../../../../../docs/guides/troubleshooting.md:0
+msgid "保持被借用存储，继续既定 service／排空并检查 owner 状态"
+msgstr ""
+"Retain borrowed storage, continue the defined service/drain path and inspect"
+" owner state."
+
+#: ../../../../../../docs/guides/troubleshooting.md:0
+msgid "真正结清、归还及 join 完成"
+msgstr "Actual settlement, return and join are complete"
+
+#: ../../../../../../docs/guides/troubleshooting.md:25
+msgid "定位配置字段"
+msgstr "Locate a configuration field"
+
+#: ../../../../../../docs/guides/troubleshooting.md:27
+msgid "以自己的 `assembly.toml` 为输入，路径相对当前工作目录："
+msgstr ""
+"Use your own `assembly.toml`; paths are relative to the current working "
+"directory:"
+
+#: ../../../../../../docs/guides/troubleshooting.md:36
+msgid ""
+"Native 输入同时加 `--test-support`。结构化拒绝写到标准错误，退出码为 1；命令行 语法错误使用 argparse 诊断和退出码 "
+"2。记录中的文件、键、资源、owner、mode 和 source 用来定位作者输入；`explain` 只在有效配置上提供结果，不自动修复拒绝项。"
+msgstr ""
+"Add `--test-support` for Native inputs. Structured rejection is written to "
+"standard error with exit code 1; command-line syntax errors use argparse "
+"diagnostics and exit code 2. File, key, resource, owner, mode and source "
+"fields identify the author input. `explain` provides results only for valid "
+"configurations; it does not automatically repair rejected inputs."
+
+#: ../../../../../../docs/guides/troubleshooting.md:40
+msgid "区分问题的责任"
+msgstr "Identify responsibility"
+
+#: ../../../../../../docs/guides/troubleshooting.md:42
+msgid ""
+"平台维护者处理公共机制、SoC／provider、配置合同和 SDK 导出。产品处理板级事实、 "
+"任务、缓冲、分区、授权与恢复；设备现场处理探针、供电、晶振、接线和观测。 Native 模型不接主机串口，软件 Board 的硅片路线也不代替实际 "
+"PCB 连通性。"
+msgstr ""
+"Platform maintainers own public mechanisms, SoC/providers, configuration "
+"contracts and SDK export. Products own Board facts, tasks, buffers, "
+"partitions, authorization and recovery. Device operations own probes, power,"
+" oscillators, wiring and observations. Native models do not connect to host "
+"serial ports, and software Board silicon routes do not establish actual PCB "
+"continuity."
+
+#: ../../../../../../docs/guides/troubleshooting.md:46
+msgid ""
+"提交问题时附精确源码或 SDK 提交、Board／part／backend、最小 TOML、实际命令、 错误和相关产物身份。移除凭据与私有 PCB "
+"数据；不要用另一份 SDK 的成功结果替代 当前失败。所有权细节见[I/O 执行](io-execution.md)，物理检查见 [性能与 "
+"HIL](performance-hil.md)。"
+msgstr ""
+"When reporting an issue, include the exact source or SDK commit, "
+"Board/part/backend, minimal TOML, actual command, error and relevant "
+"artifact identities. Remove credentials and private PCB data. Do not "
+"substitute success from another SDK for the current failure. See [I/O "
+"execution](io-execution.md) for ownership and [performance and "
+"HIL](performance-hil.md) for physical checks."

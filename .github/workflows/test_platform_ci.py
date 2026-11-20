@@ -236,7 +236,7 @@ class WorkflowContracts(unittest.TestCase):
                                      'Traced builds need their own finite budget')
 
 
-    def test_docs_preview_has_no_deployment_permissions(self):
+    def test_docs_validation_has_no_deployment_permissions(self):
         document = workflow('docs-build.yml')
         self.assertEqual(document['permissions'], {'contents': 'read'})
         caller = workflow('ci.yml')['jobs']['docs']
@@ -250,9 +250,17 @@ class WorkflowContracts(unittest.TestCase):
         commands = '\n'.join(step.get('run', '') for step in steps)
         self.assertIn('tools/documentation/install.py', commands)
         self.assertIn('tools/documentation/cli.py test', commands)
-        self.assertIn('tools/documentation/cli.py check', commands)
+        self.assertNotIn('tools/documentation/cli.py check', commands)
+        self.assertIn('--mode verify', commands)
+        self.assertIn('--language all', commands)
+        self.assertNotIn('--scope native', commands)
         self.assertIn('tools/documentation/cli.py build', commands)
         self.assertNotIn('sudo apt-get', commands)
+        upload = next(step['with']['path'] for step in steps if step.get(
+            'uses', '').startswith('actions/upload-artifact@')).splitlines()
+        self.assertIn('build/documentation/site/', upload)
+        self.assertIn('build/documentation/documentation-build.json', upload)
+        self.assertNotIn('build/documentation/', upload)
 
     def test_source_jobs_prepare_only_the_reviewed_selected_closure(self):
         for name, job, consumer in (
@@ -271,7 +279,9 @@ class WorkflowContracts(unittest.TestCase):
                 self.assertEqual(arguments[:4], [
                     'python3', '-B', 'tools/dev/dependencies.py', 'prepare'])
                 self.assertEqual(arguments[arguments.index('--scope') + 1],
-                                 'native')
+                                 'preset')
+                self.assertEqual(arguments[arguments.index('--preset') + 1],
+                                 'stm32-qiming-baremetal')
                 self.assertIn('--allow-network', arguments)
                 report = arguments[arguments.index('--report') + 1]
                 self.assertTrue(report.startswith('build/'))
@@ -293,7 +303,7 @@ class WorkflowContracts(unittest.TestCase):
         prepared_arguments = shlex.split(prepared.replace('\\\n', ' '))
         prefix = prepared_arguments[prepared_arguments.index('--prefix') + 1]
         self.assertEqual(prefix, '$RUNNER_TEMP/nexus-docs-tools')
-        for action in ('check', 'test', 'build'):
+        for action in ('test', 'build'):
             with self.subTest(action=action):
                 execute = next(step['run'] for step in steps
                                if 'tools/documentation/cli.py ' + action
@@ -304,6 +314,51 @@ class WorkflowContracts(unittest.TestCase):
                 self.assertEqual(arguments[arguments.index('--tool-prefix') + 1],
                                  prefix)
         self.assertFalse(any('pages' in step.get('uses', '') for step in steps))
+
+    def test_docs_failures_preserve_diagnostics_without_generated_payloads(self):
+        steps = workflow('docs-build.yml')['jobs']['build']['steps']
+        upload = next((step for step in steps if step.get('with', {}).get(
+            'name') == 'documentation-failure-diagnostics'), None)
+        self.assertIsNotNone(upload, 'Failed builds need their original receipts')
+        self.assertEqual(upload.get('if'), 'failure()')
+        self.assertEqual(upload.get('continue-on-error'), 'true')
+        self.assertTrue(upload.get('uses', '').startswith('actions/upload-artifact@'))
+        self.assertEqual(upload['with']['if-no-files-found'], 'ignore')
+        patterns = upload['with']['path'].splitlines()
+        required = {
+            'build/documentation/documentation-build.json',
+            'build/documentation/last-published.json',
+            'build/documentation/work/source-check.json',
+            'build/documentation/work/html-en.command.json',
+            'build/documentation/work/html-en.log',
+            'build/documentation/work/html-en.attempts/one/receipt.json',
+            'build/documentation/work/html-en.attempts/one/stdout.txt',
+            'build/documentation/work/html-en.attempts/one/stderr.txt',
+            'build/documentation-attempts/one/tests.command.json',
+            'build/documentation-attempts/one/tests.log',
+            'build/documentation-attempts/one/tests.attempts/two/receipt.json',
+            'build/documentation-attempts/one/tests.attempts/two/stdout.txt',
+            'build/documentation-attempts/one/tests.attempts/two/stderr.txt',
+            'build/dependencies/docs-build-preparation.json',
+            'build/quality/docs-tests.json',
+        }
+        excluded = {
+            'build/documentation/site/en/index.html',
+            'build/documentation/cache/html/environment.pickle',
+            'build/documentation/work/api/xml/index.xml',
+            'build/documentation/work/gettext-work/doctrees/index.doctree',
+            'build/documentation/work/gettext/index.pot',
+        }
+        with tempfile.TemporaryDirectory() as name:
+            root = Path(name)
+            for relative in required | excluded:
+                path = root / relative
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text('diagnostic fixture\n')
+            selected = {path.relative_to(root).as_posix()
+                        for pattern in patterns for path in root.glob(pattern)
+                        if path.is_file()}
+        self.assertEqual(selected, required)
 
 
 

@@ -1,0 +1,829 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 781604bf90c474a40ebaa6ee2b558d482d7aa5a88bf39197e24e7ef2a65d22e9\n"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:10
+msgid "USB control and CDC composition"
+msgstr "USB 控制与 CDC 装配"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:12
+msgid ""
+"These helpers compose explicit control requests, descriptors, CDC traffic "
+"and role changes over selected USB faces. They do not discover hardware, "
+"authorize VBUS wiring or create a scheduler."
+msgstr "这些辅助机制在选定 USB 接口上组合显式控制请求、描述符、CDC 流量和角色切换，不发现硬件、不授权 VBUS 接线，也不创建调度器。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:16
+msgid "Public declarations"
+msgstr "公共声明"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:18
+msgid "usb_acm.h"
+msgstr "usb_acm.h"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:20
+msgid "Optional caller-owned CDC ACM control subset."
+msgstr "由调用者拥有存储的可选 CDC ACM 控制子集。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:20
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:32
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:38
+msgid "Author  Nexus Team"
+msgstr "作者  Nexus Team"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:20
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:32
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:38
+msgid "Nexus Team"
+msgstr "Nexus Team"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:20
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:38
+msgid "Enums"
+msgstr "枚举"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:20
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:38
+msgid "Values:"
+msgstr "取值："
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:20
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:32
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:38
+msgid "Functions"
+msgstr "函数"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:20
+msgid "Bind one explicit communication interface and initial state."
+msgstr "绑定一个显式通信接口及初始状态。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:20
+msgid ""
+"Same privileged unmasked serialized task as USBControl; no ISR, callback or "
+"second-task reentry. The external dispatcher gives this adapter exclusive "
+"EP0 use while active. Interface descriptors, class capabilities and "
+"configuration readiness are external; initialization does not validate class"
+" bytes."
+msgstr ""
+"与 USBControl 使用同一个串行执行的特权 Task，进入时 IRQ 未屏蔽；不允许 ISR、callback 或第二个 Task "
+"重入。外部分派器在适配器活动期间将 EP0 使用权独占交给它。接口描述符、类能力和配置就绪状态由外部负责；初始化不校验类描述符字节。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:0
+msgid "Parameters"
+msgstr "参数"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:20
+msgid "[inout] Naturally aligned zero-initialized caller storage."
+msgstr "[inout] 自然对齐、零初始化的调用者存储。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:20
+msgid ""
+"[in] Immutable selected USB profile with a guarded SETUP rejection port, "
+"disjoint from acm."
+msgstr "[in] 不可变的选定 USB profile，包含按 epoch 防护的 SETUP 拒绝端口，且不与 acm 重叠。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:20
+msgid "[in] Exact externally described ACM interface."
+msgstr "[in] 与外部描述准确对应的 ACM 接口。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:20
+msgid "[in] Disjoint naturally aligned initial software intent."
+msgstr "[in] 不重叠、自然对齐的初始软件意图。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:0
+msgid "Returns"
+msgstr "返回值"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:20
+msgid "SUCCESS, INVALID, STATE or CONTEXT; no hardware is started."
+msgstr "SUCCESS、INVALID、STATE 或 CONTEXT；不启动硬件。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:20
+msgid "Dispatch the current software-published SETUP to the subset."
+msgstr "将当前已由软件发布的 SETUP 分派到此子集。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:20
+msgid ""
+"Exact class/interface direction, wIndex, wValue and wLength are checked. "
+"GET_LINE_CODING returns seven committed bytes. SET_LINE_CODING receives "
+"exactly seven bytes but waits for explicit approval. Control-line/break "
+"requests wait before starting STATUS. Invalid/unknown dispatch deliberately "
+"has the documented STALL effect, but retains no new loan. Route "
+"standard/other-class requests externally before calling."
+msgstr ""
+"严格校验 class/interface 的方向、wIndex、wValue 和 wLength。GET_LINE_CODING "
+"返回七个已提交的字节。SET_LINE_CODING 接收恰好七字节，但等待显式审批。control-line/break 请求等待审批后才启动 "
+"STATUS。非法或未知请求的分派按合同显式执行 STALL，但不新增借用。调用前须由外部先路由标准请求及其他类请求。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:20
+msgid "[inout] Bound inactive adapter; no other EP0 packet user."
+msgstr "[inout] 已绑定且非活动的适配器；没有其他 EP0 packet 使用者。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:20
+msgid "[in] Exact nonzero published SETUP identity."
+msgstr "[in] 准确的、非零的已发布 SETUP 身份。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:20
+msgid ""
+"[in] One independent absolute deadline for all stages and external approval;"
+" NEVER permits an indefinite wait."
+msgstr "[in] 所有阶段及外部审批共用一个独立的绝对 deadline；NEVER 允许无限等待。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:20
+msgid ""
+"SUCCESS accepts the operation; BUSY/STATE/TIMEOUT reject without a new loan."
+" Unknown requests return UNSUPPORTED and malformed fields INVALID after "
+"guarded STALL succeeds; otherwise the guarded rejection error is returned."
+msgstr ""
+"SUCCESS 表示接受操作；BUSY/STATE/TIMEOUT 表示拒绝且不新增借用。按 epoch 防护的 STALL 成功后，未知请求返回 "
+"UNSUPPORTED，字段格式错误返回 INVALID；否则返回防护拒绝操作的实际错误。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:20
+msgid "Advance USBControl once and fold only acquired completion."
+msgstr "推进 USBControl 一步，仅归并已 acquire 观察到的完成。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:20
+msgid ""
+"At most one underlying USBControl step, with its one service, one state read"
+" and one packet action bounds. No loop drains a transaction. Continue after "
+"cancel/supersession/timeouts. OUT0 quarantine still needs explicit external "
+"device-owner stop, then further steps. Never auto-stop the controller. Only "
+"approved outer acquire SUCCESS commits intent: it proves the matching STATUS"
+" packet's real ACK. A later SETUP/reset, closing or failed state read cannot"
+" revoke an ACK already acquired by the packetizer. Supersession before ACK "
+"aborts and drains without commit. Resetting class state after a completed "
+"command is separate external owner policy. Software epoch checks do not "
+"promise atomicity with uncollected physical SETUP packets."
+msgstr ""
+"最多推进一次底层 USBControl，遵守其一次 service、一次 state 读取及一次 packet "
+"动作的上限。不在循环中排空整笔事务。取消、替换或超时后仍须继续推进。OUT0 隔离仍需外部 device owner 显式 stop，然后继续 "
+"step。不得自动停止 controller。只有已批准的 outer 经 acquire 观察到 SUCCESS 才提交意图：它证明对应 STATUS"
+" 包已获真实 ACK。后来的 SETUP/reset、closing 或 state 读取失败不能撤销 packetizer 已 acquire "
+"观察到的 ACK。ACK 前的替换会中止并排空，不提交。命令完成后重置类状态属于外部 owner 的独立策略。软件 epoch 检查不保证与尚未由 "
+"IRQ 采集的物理 SETUP 包原子同步。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:20
+msgid "[inout] Same executor; keep all storage while active."
+msgstr "[inout] 同一执行者；活动期间保留全部存储。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:20
+msgid "Progress/provider result; an error never revokes a loan."
+msgstr "推进／provider 结果；错误绝不撤销借用。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:20
+msgid "Copy staged intent for external validation/authorization."
+msgstr "复制暂存的意图，供外部校验及授权。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:20
+msgid ""
+"Wire format allows nonzero rate, stop bits 0..2, parity 0..4 and data bits "
+"5/6/7/8/16. External hardware/policy may support fewer values. This value "
+"may become stale; approve rechecks the software epoch. Inspecting is not "
+"approval."
+msgstr ""
+"线上格式允许非零 rate、stop bits 为 0..2、parity 为 0..4，以及 data bits 为 "
+"5/6/7/8/16。外部硬件或策略可只支持其中一部分值。该值可能已过时；approve 会重新核对软件 epoch。检查不等于批准。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:20
+msgid "[in] Same task; SET_LINE_CODING must be DATA_READY."
+msgstr "[in] 同一 Task；SET_LINE_CODING 必须处于 DATA_READY。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:20
+msgid ""
+"[out] Disjoint naturally aligned value output; unchanged on rejection. No "
+"pointer into the borrowed payload escapes."
+msgstr "[out] 不重叠、自然对齐的值输出；拒绝时保持不变。不向外提供指向被借用 payload 的指针。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:20
+msgid ""
+"SUCCESS, STATE, INVALID or CONTEXT. INVALID on a malformed or short line-"
+"coding DATA stage; owner can reject explicitly."
+msgstr ""
+"SUCCESS、STATE、INVALID 或 CONTEXT。线编码 DATA 阶段格式错误或短于要求时返回 INVALID；owner 可显式拒绝。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:20
+msgid "Authorize staged intent before STATUS, or reject this epoch."
+msgstr "在 STATUS 前授权暂存意图，或拒绝此 epoch。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:20
+msgid ""
+"Approval must not apply UART/physical lines. After a newer committed_epoch "
+"appears, the external owner applies the copied intent and owns application "
+"failures/recovery. No callback runs here. SEND_BREAK records 0 (stop), "
+"0xffff (indefinite), or a finite millisecond intent, without timer, "
+"automatic expiry or assertion that physical break occurred."
+msgstr ""
+"审批不得应用 UART 参数或物理线路。出现更新的 committed_epoch 后，由外部 owner "
+"应用复制出的意图，并负责应用失败及恢复。此处不运行 callback。SEND_BREAK 记录 "
+"0（停止）、0xffff（无限期）或有限毫秒时长的意图，不创建计时器、不自动到期，也不声称物理 break 已发生。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:20
+msgid "[inout] Same active adapter and serialized task executor."
+msgstr "[inout] 同一个活动适配器及串行 Task 执行者。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:20
+msgid "[in] Exact operation identity."
+msgstr "[in] 准确的操作身份。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:20
+msgid "[in] True authorizes only; false requests guarded STALL."
+msgstr "[in] true 仅授权；false 请求按 epoch 防护的 STALL。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:20
+msgid ""
+"SUCCESS changes authorization; other results retain live loans and do not "
+"authorize a change. Malformed line coding cannot be approved; false is still"
+" allowed at DATA_READY."
+msgstr ""
+"SUCCESS 改变授权；其他结果保留活动借用且不授权变更。格式错误的线编码不能获批；在 DATA_READY 仍允许传入 false 拒绝。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:20
+msgid "Cancel one active identity, preserving all admitted storage."
+msgstr "取消一个活动身份，保留全部已准入存储。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:20
+msgid "[inout] Same executor, retained through actual drain."
+msgstr "[inout] 同一执行者，保留至实际排空。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:20
+msgid "[in] Exact active identity."
+msgstr "[in] 准确的活动身份。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:20
+msgid ""
+"SUCCESS requests drain or discards unadmitted zero-data intent; STATE for "
+"stale identity. Cancellation only requests drain. A matching STATUS ACK "
+"acquired before or during cancellation still wins at the packetizer; step "
+"commits the approved original epoch on acquire outer SUCCESS without later "
+"epoch revocation."
+msgstr ""
+"SUCCESS 请求排空，或丢弃尚未准入的零数据意图；身份过期返回 STATE。取消仅请求排空。在取消前或取消期间 acquire 到的匹配 "
+"STATUS ACK 仍由 packetizer 优先处理；step 在 acquire 返回 outer SUCCESS 时提交已批准的原 epoch"
+" 意图，后续 epoch 不撤销该提交。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:20
+msgid "Copy current software intent and the last observed outcome."
+msgstr "复制当前软件意图及最近观察到的结果。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:20
+msgid ""
+"A committed_epoch update is a software notification, not an event queue or "
+"physical apply acknowledgement. Poll after each step before dispatching the "
+"next operation if every committed change must be consumed. GET never changes"
+" it."
+msgstr ""
+"committed_epoch 的更新是软件通知，不是事件队列或物理应用确认。若必须消费每次已提交的变更，应在每次 step "
+"后、分派下一操作前轮询。GET 不改变它。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:20
+msgid "[in] Same executor; this does not refresh device state."
+msgstr "[in] 同一执行者；不刷新 device state。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:20
+msgid ""
+"[out] Disjoint naturally aligned value output, unchanged on error. result is"
+" the adapter outcome, wire_result the outer transport outcome (STATE if no "
+"outer was admitted)."
+msgstr ""
+"[out] 不重叠、自然对齐的值输出，错误时保持不变。result 是适配器结果，wire_result 是 outer 传输结果（未准入 outer "
+"时为 STATE）。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:20
+msgid "SUCCESS, INVALID or CONTEXT; no loan is released."
+msgstr "SUCCESS、INVALID 或 CONTEXT；不返还借用。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:20
+msgid "CDC wire values, not a claim that a UART supports every value."
+msgstr "CDC 线上取值，不表示 UART 支持每个值。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:20
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:32
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:38
+msgid "Public Members"
+msgstr "公共成员"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:20
+msgid "Last acknowledged software intent; physical application is external."
+msgstr "最近已获 ACK 的软件意图；物理应用由外部负责。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:20
+msgid "Value copy for external authorization, never a mutable DATA view."
+msgstr "供外部授权的值副本，绝不是可修改的 DATA 视图。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:20
+msgid "Fixed caller storage; fields are private while bound."
+msgstr "固定的调用者存储；绑定期间字段为私有。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:20
+msgid ""
+"Metadata require natural C alignment and nonwrapping extents; wire bytes "
+"require only byte alignment. Bind once from zero initialization. Never "
+"zero/rebind to revoke a loan. The profile, faces and this complete context "
+"outlive every packet/outer loan and separate observer. No dynamic "
+"allocation, per-instance operation table, worker or default instance exists."
+" Provider faces retain shared readonly ops."
+msgstr ""
+"元数据须满足其 C 类型的自然对齐，地址范围不得回绕；wire bytes "
+"只需字节对齐。由零初始化存储绑定一次。不得通过清零或重新绑定撤销借用。profile、face 及此完整 context 的生命周期须覆盖每个 "
+"packet/outer 借用与独立 observer。不使用动态分配、逐实例方法表、worker 或默认实例。provider face 仍共享只读 "
+"ops。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:24
+msgid "usb_control.h"
+msgstr "usb_control.h"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid "Caller-owned single-executor EP0 packetizer."
+msgstr "由调用者拥有的单执行者 EP0 分包器。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid ""
+"Bind zero-initialized caller storage to a stable validated ROM profile."
+msgstr "将调用者零初始化的存储绑定到稳定且已校验的 ROM profile。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid ""
+"Every function except preparation uses one serialized privileged task "
+"executor with IRQ masks clear. No callback, second task or ISR may reenter. "
+"The owner gives this adapter exclusive EP0 packet use; it retains external "
+"event-ring and explicit device recovery policy. No controller/endpoint reset"
+" invalidates a loan. A successful bind owns no provider references until "
+"begin."
+msgstr ""
+"除准备函数外，所有函数都由同一个串行化特权 Task 执行者调用，且进入时 IRQ masks 必须 clear。callback、第二个 Task 或"
+" ISR 均不得重入。owner 授予该适配器 EP0 包的独占使用权，仍负责外部 event-ring 管理及显式 device "
+"恢复策略。controller／endpoint reset 均不能使借用失效。绑定成功后，在 begin 前不持有 provider 引用。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid "[inout] Zero-initialized storage, disjoint from the profile."
+msgstr "[inout] 已零初始化、且与 profile 不重叠的存储。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid "[in] Immutable facts and faces outliving every adapter loan."
+msgstr "[in] 不可变的事实与接口面，其生命周期覆盖每一项 adapter 借用。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid "Success or rejection; no hardware, task or allocation is created."
+msgstr "成功或拒绝；不启动硬件，不创建 Task，也不分配内存。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid "Prepare a reply without borrowing or reading immutable IN bytes."
+msgstr "准备回复，不建立借用，也不读取不可变的 IN 字节。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid ""
+"Task-only preparation; bytes stay alive until the admitted outer acquire "
+"SETTLED. A short full-MPS reply emits an acknowledged DATA ZLP."
+msgstr ""
+"仅限 Task 的准备操作；字节必须保持有效，直到以 acquire 语义观察到已准入 outer 的 SETTLED。短于请求且恰好落在 MPS "
+"边界的回复会发出须获 ACK 的 DATA ZLP。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid "[inout] Initialized READY or consumed SETTLED storage."
+msgstr "[inout] 已初始化为 READY，或已消费 SETTLED 结果的存储。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid "[in] Immutable external descriptor/reply; NULL only if empty."
+msgstr "[in] 不可变的外部 descriptor／reply；仅长度为空时允许 NULL。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid "[in] Available bytes; reply is clipped to SETUP wLength."
+msgstr "[in] 可用字节数；回复截断至 SETUP wLength。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid "[in] Nonzero SETUP identity."
+msgstr "[in] 非零 SETUP 身份。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid "[in] Absolute independent monotonic deadline for all stages."
+msgstr "[in] 覆盖所有阶段的独立绝对单调 deadline。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid "Success, INVALID or STATE; rejection retains no references."
+msgstr "成功、INVALID 或 STATE；拒绝时不保留任何引用。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid "Prepare caller storage for OUT DATA requiring explicit approval."
+msgstr "为需要显式审批的 OUT DATA 准备调用者存储。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid ""
+"Task-only. Accepted bytes remain borrowed through STATUS or actual drain. "
+"DATA_READY grants only the documented const inspection view."
+msgstr ""
+"仅限 Task。已接受的字节持续被借用，直至 STATUS 完成或实际排空结束。DATA_READY 仅授予文档规定的 const 检查视图。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid "[inout] Initialized unborrowed request."
+msgstr "[inout] 已初始化且未被借用的请求。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid "[out] Stable writable payload, no early writes at preparation."
+msgstr "[out] 稳定的可写 payload；准备期间不提前写入。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid "[in] Must cover matching SETUP wLength at admission."
+msgstr "[in] 准入时必须覆盖匹配 SETUP 的 wLength。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid "[in] Absolute independent deadline, including policy delay."
+msgstr "[in] 独立的绝对 deadline，包含策略处理延迟。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid "Success, INVALID or STATE; no loan before successful begin."
+msgstr "成功、INVALID 或 STATE；begin 成功前不建立借用。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid "Prepare only the zero-data request's status-IN reply."
+msgstr "仅准备零数据请求的 status-IN 回复。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid ""
+"Task-only. External standard-request policy must stage SET_ADDRESS itself "
+"and inspect authoritative address/closing state after wire ACK."
+msgstr "仅限 Task。外部标准请求策略必须自行暂存 SET_ADDRESS，并在线上 ACK 后检查权威 address／closing 状态。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid "[in] Nonzero matching SETUP identity."
+msgstr "[in] 非零且匹配的 SETUP 身份。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid "[in] Absolute independent deadline."
+msgstr "[in] 独立的绝对 deadline。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid "Success, INVALID or STATE; no transfer is started."
+msgstr "成功、INVALID 或 STATE；不启动传输。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid "Admit one explicit reply to the current authoritative SETUP epoch."
+msgstr "为当前权威 SETUP epoch 准入一个显式回复。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid ""
+"No packet is submitted by admission. Payload, request, profile and adapter "
+"remain alive until acquire-observed outer SETTLED. Never call "
+"prepare/reinitialize to revoke a loan. Epochs do not repeat. Products stage "
+"SET_ADDRESS explicitly; transport success means wire ACK only."
+msgstr ""
+"准入本身不提交包。payload、request、profile 和 adapter 必须保持有效，直到以 acquire 语义观察到 outer "
+"SETTLED。绝不能通过调用 prepare／重新初始化撤销借用。epoch 不重复。产品显式暂存 SET_ADDRESS；传输成功仅表示线上 "
+"ACK。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid "[inout] Bound single-executor adapter; no other live reply."
+msgstr "[inout] 已绑定的单执行者 adapter；不存在其他活动回复。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid ""
+"[inout] READY metadata and disjoint payload. OUT capacity must cover "
+"wLength; IN sends min(length,wLength), including required ZLP."
+msgstr ""
+"[inout] READY 元数据及与其不重叠的 payload。OUT 容量必须覆盖 wLength；IN 发送 "
+"min(length,wLength)，包含必要的 ZLP。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid "Success means ACCEPTED; every failure retains no request or payload."
+msgstr "成功表示 ACCEPTED；任何失败均不保留 request 或 payload。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid "Poll once, submit at most two packets or cancel one loan."
+msgstr "poll 一次，至多提交两个 packet 或取消一个 loan。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid ""
+"No queue or worker. All packet deadlines use the outer independent absolute "
+"monotonic deadline. Poll while borrowed, even after cancel, reset, SETUP "
+"supersession or device stop. Cancel/drain/quarantine retain descriptor bytes"
+" and outer context. OUT0 quarantine exposes NEEDS_DEVICE_STOP; only the "
+"external controller owner may authorize stop. This adapter never stops the "
+"shared controller automatically. Control DATA IN prearms one zero-length "
+"STATUS OUT before exposing its first IN packet. A STATUS ACK fixes the wire "
+"outcome, but both accepted directions must join before outer SETTLED. "
+"Acquired packet facts are folded before observing newer controller epochs."
+msgstr ""
+"没有队列或 worker。所有 packet 使用 outer 独立绝对单调 deadline。借用期间持续 poll，包括 "
+"cancel、reset、新 SETUP 替代或设备停止后。取消、排空或隔离保留描述符字节和 outer context。OUT0 隔离暴露 "
+"NEEDS_DEVICE_STOP，仅外部 controller owner 可授权 stop；adapter 不自动停止共享 "
+"controller。control DATA IN 在暴露首个 IN packet 前，先预置一个零长 STATUS OUT。STATUS ACK "
+"确定线上结果，但两个已接纳方向都 join 后才发布 outer SETTLED。先汇总已 acquire 的 packet 事实，再观察更新的 "
+"controller epoch。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid "[inout] Same serialized executor and lifetime as begin."
+msgstr "[inout] 同一个串行化执行者；沿用 begin 的生命周期要求。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid "Success or provider error; an error never revokes accepted storage."
+msgstr "成功或 provider 错误；错误绝不撤销已接受的存储借用。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid "Request cancellation without revoking the old packet or outer loan."
+msgstr "请求取消，但不撤销旧 packet 或 outer 借用。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid ""
+"An already acquired STATUS ACK wins. The next step issues at most one packet"
+" cancel; continue polling and retain quarantine until actual source "
+"withdrawal. OUT0 recovery may need explicit device-owner stop."
+msgstr ""
+"已以 acquire 语义获取的 STATUS ACK 优先。下一步至多发出一次 packet cancel；须继续 poll，并保留 "
+"quarantine，直到实际撤回源。OUT0 恢复可能需要 device owner 显式执行 stop。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid "[inout] Same serialized privileged task executor."
+msgstr "[inout] 同一个串行化特权 Task 执行者。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid "[inout] Exact active outer request, kept alive until SETTLED."
+msgstr "[inout] 精确的活动 outer request，保持有效直至 SETTLED。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid "[in] Exact active SETUP identity; no cross-task raw pointer use."
+msgstr "[in] 精确的活动 SETUP 身份；不得跨 Task 使用原始指针。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid "Success requests drain; STATE rejects stale identity without effects."
+msgstr "成功时请求排空；STATE 无效果地拒绝过期身份。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid "Inspect completed OUT DATA before the external policy approves STATUS."
+msgstr "在外部策略批准 STATUS 前检查已完成的 OUT DATA。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid ""
+"The view expires at the next same-owner adapter call. No mutation, free, "
+"cross-task access or implicit status acknowledgement is allowed."
+msgstr "视图在同一 owner 下一次调用 adapter 时失效。不得修改、释放或跨 Task 访问，也不隐含 status 确认。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid "[in] DATA_READY with no provider packet references."
+msgstr "[in] 处于 DATA_READY，且不存在 provider packet 引用。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid "[out] Disjoint value output, unchanged on rejection."
+msgstr "[out] 不重叠的值输出；拒绝时保持原值。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid "Success grants a const inspection view only; outer borrow continues."
+msgstr "成功仅授予 const 检查视图；outer 借用继续。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid "Approve OUT policy before STATUS IN, or reject with a bounded STALL."
+msgstr "在 STATUS IN 前批准 OUT 策略，或以有界 STALL 拒绝。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid ""
+"Bytes, class dispatch, configuration readiness and recovery policy are "
+"external. No CDC/HID stack is supplied. A guarded decision excludes an "
+"already software-published replacement SETUP. Physical bus packets not yet "
+"collected by IRQ are outside that software epoch boundary. Cancellation "
+"drains before the outer loan ends."
+msgstr ""
+"字节、class 分派、configuration 就绪条件及恢复策略由外部负责。不提供 CDC／HID 栈。guard "
+"保护的决定排除已由软件发布的替代 SETUP；尚未被 IRQ 采集的物理总线包不属于该软件 epoch 边界。取消须先排空，再结束 outer 借用。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid "[inout] DATA_READY same-owner adapter."
+msgstr "[inout] 处于 DATA_READY、由同一 owner 管理的 adapter。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid "[in] Exact active SETUP epoch, checked against fresh state."
+msgstr "[in] 精确的活动 SETUP epoch，须根据新获取的状态检查。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid "[in] True permits status; false stalls the old transaction."
+msgstr "[in] true 允许 status；false 对旧事务执行 STALL。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid "Success changes policy only; the next step performs packet/STALL."
+msgstr "成功仅改变策略；下一次 step 才执行 packet／STALL。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid "Copy the last acquired authoritative state and adapter phase."
+msgstr "复制最近一次已获取的权威状态及 adapter 阶段。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid ""
+"Call step to refresh controller state. Wire success does not imply "
+"address/configuration readiness. Snapshots never release a loan."
+msgstr ""
+"调用 step 刷新 controller 状态。线上成功不表示 address／configuration 已就绪。snapshot 绝不释放借用。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid "[in] Same single task executor; no provider operation occurs."
+msgstr "[in] 同一个单 Task 执行者；不执行 provider 操作。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid "Success, INVALID or CONTEXT."
+msgstr "成功、INVALID 或 CONTEXT。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid "Adapter-private fields, caller-owned and fixed capacity."
+msgstr "由调用者拥有、容量固定的 adapter 私有字段。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:26
+msgid ""
+"Public context/request/output metadata require natural C alignment and "
+"nonwrapping extents. Misalignment is INVALID before typed access. Pointers "
+"still require documented readable/writable storage: numeric checks cannot "
+"validate arbitrary address maps or opaque private provider contexts."
+msgstr ""
+"公共 context／request／output 元数据须按 C 类型自然对齐，且存储范围不得回绕。在 typed 访问前，未对齐地址即被判定为 "
+"INVALID。指针仍必须指向文档规定的可读／可写存储：数值检查无法验证任意地址映射或不透明的 provider 私有 context。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:30
+msgid "usb_descriptors.h"
+msgstr "usb_descriptors.h"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:32
+msgid "Bounded descriptor views; product bytes stay external."
+msgstr "有界描述符视图；产品描述符字节仍由外部提供。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:32
+msgid "Validate complete device, configuration or string descriptor bytes."
+msgstr "校验完整的 device、configuration 或 string 描述符字节。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:32
+msgid ""
+"Configuration views require alternate zero, endpoint plans matching selected"
+" bulk, interrupt or ISO ports, consistent totals and unique interface "
+"numbers. ISO bInterval is 1..16, an exponent of FS frames or HS microframes;"
+" ISO synchronization/usage encodings remain class policy after reserved-"
+"value validation. Only one transaction is selected; HS high-bandwidth "
+"multipliers return UNSUPPORTED. Interrupt bInterval in external descriptor "
+"bytes is a 1..255 linear count of 1 ms frames at FS, or a 1..16 exponent of "
+"125 us microframes at HS. Bulk bInterval is not interpreted; no polling is "
+"scheduled. Class-specific subordinate bytes are bounds-checked but not "
+"decoded. Class dispatch, VID/PID, strings, policy, CDC/HID and descriptor "
+"lookup remain external. Success is structural validation, not enumeration or"
+" physical qualification. To send bytes, preserve their lifetime through the "
+"control adapter's acquire-observed outer SETTLED. The view struct requires "
+"natural C alignment; rejection is not an arbitrary address probe. Descriptor"
+" bytes need only byte alignment and remain externally readable."
+msgstr ""
+"configuration 视图要求 alternate zero、与选定 bulk、interrupt 或 ISO 端口匹配的 endpoint "
+"计划、一致的总长度及唯一的 interface 编号。ISO bInterval 为 1..16，表示 FS frame 或 HS microframe"
+" 的指数；ISO 同步／用途编码在保留值校验后仍属 class 策略。每次仅选择一个 transaction；HS 高带宽 multiplier 返回 "
+"UNSUPPORTED。外部 descriptor 字节中的 interrupt bInterval 在 FS 为 1..255 的线性计数，单位为 1"
+" ms frame；在 HS 为 1..16 的指数编码，单位为 125 µs microframe。bulk bInterval "
+"不作解析，也不调度轮询。class-specific 从属字节仅检查边界，不作解码。class 分派、VID/PID、字符串、策略、CDC/HID 及 "
+"descriptor 查找仍由外部负责。成功仅表示结构校验通过，不表示枚举或物理资格。发送字节时，必须保持其有效，直到以 acquire 语义观察到 "
+"control adapter 的 outer SETTLED。view 结构体须按 C "
+"类型自然对齐；拒绝机制不能用于探测任意地址。descriptor 字节仅需 byte alignment，且须保持外部可读。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:32
+msgid "[in] Immutable exact selected FS/HS endpoint facts."
+msgstr "[in] 选定 FS/HS endpoint 的不可变精确事实。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:32
+msgid "[in] Complete external descriptor; never copied/retained."
+msgstr "[in] 完整的外部 descriptor；绝不复制或保留。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:32
+msgid "Success, INVALID or UNSUPPORTED, with no hardware or output effects."
+msgstr "成功、INVALID 或 UNSUPPORTED；不产生硬件或输出效果。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:36
+msgid "usb_role.h"
+msgstr "usb_role.h"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:38
+msgid "Explicit USB role withdrawal and VBUS handover."
+msgstr "显式 USB 角色撤回与 VBUS 交接。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:38
+msgid "Bind an idle role owner without touching hardware or power."
+msgstr "绑定空闲角色 owner，不操作硬件或电源。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:38
+msgid "Task-only. Initialization must never replace a live owner."
+msgstr "仅限任务调用。初始化不得替换仍在使用的 owner。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:38
+msgid "[out] Fresh unpublished storage, disjoint from config/context."
+msgstr "[out] 尚未发布的新存储，与 config/context 不重叠。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:38
+msgid "[in] Immutable complete backend and allowed-role facts."
+msgstr "[in] 不可变的完整 backend 与允许角色事实。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:38
+msgid "SUCCESS or INVALID; failure leaves output unchanged."
+msgstr "SUCCESS 或 INVALID；失败时输出不变。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:38
+msgid "Request a role transaction, retaining the old transport until drained."
+msgstr "请求一次角色切换事务，保留旧 transport 直到排空。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:38
+msgid ""
+"REJECTED creates no effects. Call service until phase becomes zero. Source "
+"power is never enabled while VBUS is already externally present."
+msgstr ""
+"REJECTED 不产生影响。持续调用 service，直到 phase 为零。实际 VBUS 已由外部供电时，绝不启用 source power。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:38
+msgid "[inout] Initialized single task owner."
+msgstr "[inout] 已初始化、由单一任务串行操作的 owner。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:38
+msgid "[in] Explicit OFF, DEVICE or HOST; no policy is inferred."
+msgstr "[in] 显式 OFF、DEVICE 或 HOST；不推断策略。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:38
+msgid "[in] Finite absolute Core deadline for the complete handover."
+msgstr "[in] 覆盖完整交接过程的有限、绝对 Core deadline。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:38
+msgid "SUCCESS accepts the transition; BUSY retains the current transition."
+msgstr "SUCCESS 表示接受切换；BUSY 保留当前切换。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:38
+msgid "Cancel activation and finish OFF through the same drain barriers."
+msgstr "取消激活，通过同一排空屏障完成 OFF。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:38
+msgid ""
+"Service remains required. Its final result is CANCELLED, or an earlier "
+"failure. A failed stop still prevents source-off and replacement start."
+msgstr ""
+"仍须调用 service。最终结果为 CANCELLED，或更早发生的失败。stop 失败仍会阻止 source-off 和替代 transport "
+"启动。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:38
+msgid "[inout] Same serialized owner, including a pending transition."
+msgstr "[inout] 同一个串行化 owner，包括尚未结束的切换。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:38
+msgid "[in] Fresh finite absolute deadline for retained cleanup."
+msgstr "[in] 用于保留责任清理的新有限、绝对 deadline。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:38
+msgid "SUCCESS accepts cleanup; it never revokes a transport or packet."
+msgstr "SUCCESS 表示接受清理；不会撤销 transport 或 packet 的所有权。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:38
+msgid "Advance one bounded handover step, including failed-start cleanup."
+msgstr "推进一个有界交接步骤，包括启动失败后的清理。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:38
+msgid ""
+"stop failure never permits power withdrawal or a replacement start. Timeout "
+"cancels activation but does not revoke transport ownership. HOST withdrawal "
+"observes actual VBUS discharge before DEVICE activation. DEVICE activation "
+"waits for externally supplied VBUS. No sleeps occur."
+msgstr ""
+"stop 失败绝不允许撤回电源或启动替代 transport。超时取消激活，但不撤销 transport 所有权。HOST 撤回后，必须观察实际 "
+"VBUS 放电完成，才可激活 DEVICE。DEVICE 激活等待外部供应的 VBUS。不调用 sleep。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:38
+msgid "[inout] Same owner with backend/config storage still alive."
+msgstr "[inout] 同一个 owner；backend/config 存储仍保持有效。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:38
+msgid "BUSY while work remains; final SUCCESS or original transition error."
+msgstr "工作尚未完成时为 BUSY；最终返回 SUCCESS 或原始切换错误。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:38
+msgid "One controller transport owner and its reviewed power switch."
+msgstr "一个控制器 transport owner 及其已审查的电源开关。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:38
+msgid ""
+"All operations use the same serialized unmasked privileged task. stop "
+"succeeds only after every transfer, IRQ and callback has joined. start "
+"failure may retain effects: stop must remain callable. source reports "
+"success only after the switch command has been read back. present reads "
+"actual VBUS, independently of the requested switch state."
+msgstr ""
+"所有操作由同一个串行化、未屏蔽 IRQ 的特权任务执行。stop 仅在所有传输、IRQ 和 callback 均已 join 后成功。start "
+"失败可能保留影响，stop 必须仍可调用。source 仅在开关命令读回确认后报告成功。present 读取实际 VBUS，与所请求的开关状态无关。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:38
+msgid "Caller-owned transaction state; initialize once before publication."
+msgstr "调用方拥有的事务状态；在发布前仅初始化一次。"
+
+#: ../../../../../../docs/reference/api/components/protocols/usb.md:38
+msgid ""
+"Config and backend context outlive successful OFF completion. Fields are "
+"modified only by these methods. The same serialized owner may read "
+"active/target/result and phase (zero means transaction complete). No "
+"allocation, ID-pin policy, SRP/HNP, background executor or automatic role "
+"selection is supplied."
+msgstr ""
+"Config 与 backend context 的生命周期必须覆盖并超过 OFF 成功完成时点。字段仅由这些方法修改。同一个串行化 owner 可读取"
+" active/target/result 及 phase（零表示事务完成）。不提供分配、ID-pin 策略、SRP/HNP、后台执行者或自动角色选择。"

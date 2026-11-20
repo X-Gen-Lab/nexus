@@ -1,0 +1,360 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 0afbd401129bf495a3312d55f592a775979d8ca797a68d15e0f01269733641d6\n"
+
+#: ../../../../../../docs/reference/contracts/build-system.md:9
+msgid "构建与镜像合同"
+msgstr "Build and image contracts"
+
+#: ../../../../../../docs/reference/contracts/build-system.md:11
+msgid "一份作者 TOML、一个不可变配置 IR、一个静态 bundle 与一个 CMake 软件图共同描述所选平台。产品源码与组合由外部工程拥有。"
+msgstr ""
+"One authored TOML file, one immutable configuration IR, one static bundle, "
+"and one CMake software graph describe the selected platform. External "
+"projects own product source and composition."
+
+#: ../../../../../../docs/reference/contracts/build-system.md:13
+msgid "输入与发布"
+msgstr "Inputs and publication"
+
+#: ../../../../../../docs/reference/contracts/build-system.md:15
+msgid ""
+"配置是单写者事务：先保护作者输入、事实和配置代码，再变更拥有的输出。拒绝或中断不得把上一份输出暴露为当前配置。相同生成内容保留字节和时间戳；配置摘要不替代编译器或生成器源码身份。"
+msgstr ""
+"Configuration is a single-writer transaction: protect authored inputs, "
+"facts, and configuration code before modifying owned outputs. Rejection or "
+"interruption must not expose the previous output as the current "
+"configuration. Identical generated content retains its bytes and timestamps;"
+" a configuration digest does not replace compiler or generator source "
+"identity."
+
+#: ../../../../../../docs/reference/contracts/build-system.md:17
+msgid ""
+"CMake 拥有源文件列表和 target 依赖。包、事实、binding、公共配置代码闭包与组件登记都是明确输入。包导出声明只定义 Source "
+"SDK 的生产归属，不建立第二份编译图。"
+msgstr ""
+"CMake owns source lists and target dependencies. Packages, facts, bindings, "
+"the common configuration-code closure, and component registration are "
+"explicit inputs. Package export declarations define production ownership for"
+" the Source SDK; they do not establish a second compilation graph."
+
+#: ../../../../../../docs/reference/contracts/build-system.md:19
+msgid "公开接入"
+msgstr "Public integration entry points"
+
+#: ../../../../../../docs/reference/contracts/build-system.md:0
+msgid "API/目标"
+msgstr "API/target"
+
+#: ../../../../../../docs/reference/contracts/build-system.md:0
+msgid "合同"
+msgstr "Contract"
+
+#: ../../../../../../docs/reference/contracts/build-system.md:0
+msgid "`find_package(Nexus CONFIG REQUIRED)`"
+msgstr "`find_package(Nexus CONFIG REQUIRED)`"
+
+#: ../../../../../../docs/reference/contracts/build-system.md:0
+msgid "验证所选来源并加载函数；请求版本时仅接受精确匹配；不创建装配"
+msgstr ""
+"Validate the selected source and load functions; accept only an exact match "
+"when a version is requested; do not create an assembly"
+
+#: ../../../../../../docs/reference/contracts/build-system.md:0
+msgid "`nexus_add_platform(ASSEMBLY ...)`"
+msgstr "`nexus_add_platform(ASSEMBLY ...)`"
+
+#: ../../../../../../docs/reference/contracts/build-system.md:0
+msgid "显式建立唯一完整平台"
+msgstr "Explicitly create the single complete platform"
+
+#: ../../../../../../docs/reference/contracts/build-system.md:0
+msgid "`nexus_add_runtime(ASSEMBLY ...)`"
+msgstr "`nexus_add_runtime(ASSEMBLY ...)`"
+
+#: ../../../../../../docs/reference/contracts/build-system.md:0
+msgid "显式建立 CPU Runtime 库；与 Platform 互斥"
+msgstr ""
+"Explicitly create a CPU Runtime library; mutually exclusive with Platform"
+
+#: ../../../../../../docs/reference/contracts/build-system.md:0
+msgid "`nexus_add_firmware()`"
+msgstr "`nexus_add_firmware()`"
+
+#: ../../../../../../docs/reference/contracts/build-system.md:0
+msgid "为该装配创建镜像、启动对象和产物规则"
+msgstr "Create an image, startup objects, and artifact rules for the assembly"
+
+#: ../../../../../../docs/reference/contracts/build-system.md:0
+msgid "`nexus_apply_firmware_policy(target)`"
+msgstr "`nexus_apply_firmware_policy(target)`"
+
+#: ../../../../../../docs/reference/contracts/build-system.md:0
+msgid "Runtime 自建 executable 显式采用最终镜像策略"
+msgstr ""
+"Explicitly apply final-image policy to an executable created by a Runtime "
+"consumer"
+
+#: ../../../../../../docs/reference/contracts/build-system.md:0
+msgid "`Nexus::ABI`、`Nexus::OS`"
+msgstr "`Nexus::ABI`, `Nexus::OS`"
+
+#: ../../../../../../docs/reference/contracts/build-system.md:0
+msgid "分别表示二进制使用要求和所选 OS 后端"
+msgstr ""
+"Represent binary usage requirements and the selected OS backend, "
+"respectively"
+
+#: ../../../../../../docs/reference/contracts/build-system.md:30
+msgid ""
+"源码和安装 SDK 通过同一私有生产图接入。一个构建目录只允许一个工具链和装配。工具链先于 "
+"`project()`；创建平台不能切换编译器。应用不设置平台开发测试或 workload 开关。"
+msgstr ""
+"Source checkouts and installed SDKs use the same private production graph. A"
+" build directory permits only one toolchain and one assembly. Select the "
+"toolchain before `project()`; platform creation cannot switch compilers. "
+"Applications do not set platform development-test or workload switches."
+
+#: ../../../../../../docs/reference/contracts/build-system.md:32
+msgid ""
+"SDK 创建后仍可被修改，后续消费边界必须检出变更、来源冲突、expected revision 不符和不允许的开发 "
+"fixture。同步边界内可复用已完成工作；持久成功标志、时间戳或父目录 marker 不能替代字节验证。"
+msgstr ""
+"An SDK can still be modified after creation. Subsequent consumption "
+"boundaries must detect changes, source conflicts, expected revision "
+"mismatches, and disallowed development fixtures. Completed work may be "
+"reused within a synchronous boundary; persistent success markers, "
+"timestamps, and parent-directory markers cannot replace byte verification."
+
+#: ../../../../../../docs/reference/contracts/build-system.md:34
+msgid "启动、策略与私有要求"
+msgstr "Startup, policy, and private requirements"
+
+#: ../../../../../../docs/reference/contracts/build-system.md:36
+msgid ""
+"Provider target 发布绝对启动源路径 `NEXUS_STARTUP_SOURCES` 与目标 "
+"`NEXUS_STARTUP_USAGE_TARGET`。Platform 的 `NEXUS_PROVIDER_TARGET` 只引用真实 "
+"provider。每个镜像各建 startup OBJECT，厂商头、器件宏和 HAL 配置保持私有。"
+msgstr ""
+"The provider target publishes absolute startup-source paths through "
+"`NEXUS_STARTUP_SOURCES` and the target `NEXUS_STARTUP_USAGE_TARGET`. "
+"Platform's `NEXUS_PROVIDER_TARGET` refers only to the actual provider. Each "
+"image creates its own startup OBJECT target; vendor headers, device macros, "
+"and HAL configuration remain private."
+
+#: ../../../../../../docs/reference/contracts/build-system.md:38
+msgid ""
+"CPU/FP/enum ABI 对相互链接对象一致。优化、IPO 与 compiler launcher "
+"作用于实际编译目标；自有严格诊断与厂商代码分开。运行库、`-nostartfiles`、链接脚本和最终产物规则归 "
+"image，不能由公共平台接口泄漏给无关消费者。"
+msgstr ""
+"CPU/FP/enum ABI settings must agree across linked objects. Optimization, "
+"IPO, and compiler launchers apply to the targets that actually compile "
+"sources; strict diagnostics for owned code remain separate from vendor code."
+" Runtime libraries, `-nostartfiles`, linker scripts, and final-artifact "
+"rules belong to the image and must not leak through public platform "
+"interfaces to unrelated consumers."
+
+#: ../../../../../../docs/reference/contracts/build-system.md:40
+msgid ""
+"组件目录拥有自身创建行为。单一登记给出逻辑 ID、入口和 target；绑定公共 API 与私有实现使用要求分别连接。普通组件不为链接目标再创造 "
+"TOML 开关。"
+msgstr ""
+"Each component directory owns its creation behavior. A single registration "
+"supplies the logical ID, entry point, and target; public API bindings and "
+"private implementation usage requirements are connected separately. Ordinary"
+" components do not introduce additional TOML switches for link targets."
+
+#: ../../../../../../docs/reference/contracts/build-system.md:42
+msgid "公共 I/O 需求"
+msgstr "Common I/O requirements"
+
+#: ../../../../../../docs/reference/contracts/build-system.md:44
+msgid ""
+"通用 I/O 只消费 `NEXUS_REQUIRED_IO_DOMAINS`。具体模式映射由包 binding 和 typed IR "
+"负责，不能给通用图增加 MCU 名称或厂商模式字符串。"
+msgstr ""
+"Common I/O consumes only `NEXUS_REQUIRED_IO_DOMAINS`. Package bindings and "
+"the typed IR own specific mode mappings; MCU names and vendor mode strings "
+"must not be added to the common graph."
+
+#: ../../../../../../docs/reference/contracts/build-system.md:46
+msgid ""
+"`Nexus::IOUART` 提供基础字节 UART、格式检查和必要 wake；word、stream、RS485 为显式扩展。应用在 TOML "
+"外装配 RS485 adapter 时也链接其目标。SPI helper 和已选 DMA 路径分别连接真实依赖；ADC stream/group "
+"只选相应机制。按真实函数引用与消费者选编，不按文件名猜测。"
+msgstr ""
+"`Nexus::IOUART` provides basic byte UART, format validation, and necessary "
+"wake support; word, stream, and RS485 support are explicit extensions. "
+"Applications that assemble an RS485 adapter outside TOML must also link its "
+"target. SPI helpers and selected DMA paths each link their actual "
+"dependencies; ADC stream/group support selects only the corresponding "
+"mechanisms. Select compilation from actual function references and "
+"consumers, not filename guesses."
+
+#: ../../../../../../docs/reference/contracts/build-system.md:48
+msgid "增量与产物失效"
+msgstr "Incremental builds and artifact invalidation"
+
+#: ../../../../../../docs/reference/contracts/build-system.md:0
+msgid "变化/事件"
+msgstr "Change/event"
+
+#: ../../../../../../docs/reference/contracts/build-system.md:0
+msgid "要求"
+msgstr "Requirement"
+
+#: ../../../../../../docs/reference/contracts/build-system.md:0
+msgid "应用或平台 C 修改"
+msgstr "Application or platform C changes"
+
+#: ../../../../../../docs/reference/contracts/build-system.md:0
+msgid "只重编真实编译依赖"
+msgstr "Recompile only actual compilation dependencies"
+
+#: ../../../../../../docs/reference/contracts/build-system.md:0
+msgid "TOML/选中事实/生成器修改"
+msgstr "TOML, selected facts, or generator changes"
+
+#: ../../../../../../docs/reference/contracts/build-system.md:0
+msgid "重新配置并拒绝陈旧 bundle"
+msgstr "Reconfigure and reject a stale bundle"
+
+#: ../../../../../../docs/reference/contracts/build-system.md:0
+msgid "生成内容相同"
+msgstr "Generated content is unchanged"
+
+#: ../../../../../../docs/reference/contracts/build-system.md:0
+msgid "保留文件时间戳，避免无关编译"
+msgstr "Preserve file timestamps to avoid unrelated compilation"
+
+#: ../../../../../../docs/reference/contracts/build-system.md:0
+msgid "预算或检查器修改"
+msgstr "Budget or checker changes"
+
+#: ../../../../../../docs/reference/contracts/build-system.md:0
+msgid "重新检查已有 ELF"
+msgstr "Check the existing ELF again"
+
+#: ../../../../../../docs/reference/contracts/build-system.md:0
+msgid "布局修改"
+msgstr "Layout changes"
+
+#: ../../../../../../docs/reference/contracts/build-system.md:0
+msgid "触发链接与资源检查"
+msgstr "Trigger linking and resource checks"
+
+#: ../../../../../../docs/reference/contracts/build-system.md:0
+msgid "BIN/map/资源报告缺失"
+msgstr "BIN/map/resource report is missing"
+
+#: ../../../../../../docs/reference/contracts/build-system.md:0
+msgid "原固件 target 恢复声明产物"
+msgstr "The original firmware target restores declared artifacts"
+
+#: ../../../../../../docs/reference/contracts/build-system.md:0
+msgid "配置/链接失败或取消"
+msgstr "Configuration or linking fails or is cancelled"
+
+#: ../../../../../../docs/reference/contracts/build-system.md:0
+msgid "撤销该次拥有的无效输出，保留真实诊断"
+msgstr ""
+"Withdraw invalid outputs owned by that invocation and preserve actual "
+"diagnostics"
+
+#: ../../../../../../docs/reference/contracts/build-system.md:60
+msgid ""
+"Ninja 单配置是维护的构建方式。Multi-Config 明确拒绝；其他生成器、Windows/macOS "
+"路径或不同工具分发不因代码存在获得集成通过结论。"
+msgstr ""
+"Single-configuration Ninja is the maintained build configuration. Multi-"
+"Config is explicitly rejected. The presence of code for other generators, "
+"Windows/macOS paths, or other tool distributions does not establish "
+"successful integration."
+
+#: ../../../../../../docs/reference/contracts/build-system.md:62
+msgid "命令与目录所有权"
+msgstr "Commands and directory ownership"
+
+#: ../../../../../../docs/reference/contracts/build-system.md:64
+msgid ""
+"完整 checkout 根使用 `python tools/dev/dev.py configure|build|test --preset "
+"<name>`。普通命令保留实际退出与过程日志；明确需要镜像来源绑定时选择 `--record-provenance`。"
+msgstr ""
+"From a complete checkout root, use `python tools/dev/dev.py "
+"configure|build|test --preset <name>`. Ordinary commands preserve actual "
+"exit codes and process logs; select `--record-provenance` when image source "
+"binding is explicitly required."
+
+#: ../../../../../../docs/reference/contracts/build-system.md:66
+msgid ""
+"受控入口持有 canonical build directory 的同一 kernel "
+"lock，覆盖配置、构建、测试及报告发布。同目录独立调用拒绝，不同目录可在总预算内并行。POSIX 嵌套委派实际 "
+"descriptor；同线程可重入，其他线程不自动继承。共享一个委派 descriptor 的子阶段由父进程串行协调。Windows "
+"嵌套受控执行明确拒绝；直接 CMake/Ninja/CTest 由调用者保证目录独占。"
+msgstr ""
+"Controlled entry points hold the same kernel lock for the canonical build "
+"directory across configuration, building, testing, and report publication. "
+"Independent invocations for the same directory are rejected; different "
+"directories may run concurrently within the total budget. POSIX nested "
+"execution delegates the actual descriptor. The same thread can reenter; "
+"other threads do not inherit ownership automatically. The parent process "
+"serially coordinates child stages sharing one delegated descriptor. "
+"Controlled nested execution on Windows is explicitly rejected; callers "
+"invoking CMake/Ninja/CTest directly must ensure exclusive directory "
+"ownership."
+
+#: ../../../../../../docs/reference/contracts/build-system.md:68
+msgid ""
+"进程执行有有限并发与deadline。取消先停止并 join 所拥有的进程，再释放目录锁。工具准备可以明确联网；正常配置、构建与门禁不隐式下载依赖。"
+msgstr ""
+"Process execution has bounded concurrency and deadlines. Cancellation stops "
+"and joins owned processes before releasing the directory lock. Tool "
+"preparation may explicitly use the network; normal configuration, building, "
+"and gates never download dependencies implicitly."
+
+#: ../../../../../../docs/reference/contracts/build-system.md:70
+msgid "验证要求"
+msgstr "Verification requirements"
+
+#: ../../../../../../docs/reference/contracts/build-system.md:72
+msgid ""
+"C/C++ 行为使用实际 GoogleTest/GoogleMock；主机工具使用 "
+"unittest。构建图和策略修复需要真实小消费者及产物观察。固件仍为 C11，主机测试 runtime 不进入固件。"
+msgstr ""
+"C/C++ behavior is tested with actual GoogleTest/GoogleMock; host tools use "
+"unittest. Build-graph and policy fixes require real small consumers and "
+"artifact observations. Firmware remains C11; the host test runtime does not "
+"enter firmware."
+
+#: ../../../../../../docs/reference/contracts/build-system.md:74
+msgid ""
+"新 Board 验证接线和装配冲突；同 IP 新料号验证器件头、启动向量、缺失外设拒绝、ABI 与内存；新 IP 增加专有 "
+"reset/IRQ/DMA/停止失败验证；新家族验证启动合同、私有 SDK、精确器件和外部消费者。已知模型复用不得向公共解析器或图调度器增加 MCU "
+"名称分支。"
+msgstr ""
+"A new Board verifies wiring and assembly conflicts. A new part using the "
+"same IP verifies device headers, startup vectors, rejection of absent "
+"peripherals, ABI, and memory. New IP adds its own reset/IRQ/DMA/stop-failure"
+" verification. A new family verifies the startup contract, private SDK, "
+"exact devices, and external consumers. Reusing a known model must not add "
+"MCU-name branches to the common parser or graph scheduler."
+
+#: ../../../../../../docs/reference/contracts/build-system.md:76
+msgid ""
+"验证分别覆盖源码消费者、搬迁只读 SDK、CPU Runtime、所选 F4 目标及 C/C++ 边界；检查实际命令、startup "
+"隔离、sections 和资源。重现性结论需要两个新目录、相同源码/工具字节和禁网条件下的实际构建比较，compiler cache 不能替代该结论。"
+msgstr ""
+"Verification separately covers source consumers, a relocated read-only SDK, "
+"CPU Runtime, selected F4 targets, and C/C++ boundaries; it inspects actual "
+"commands, startup isolation, sections, and resources. A reproducibility "
+"conclusion requires actual build comparisons in two fresh directories with "
+"identical source/tool bytes and networking disabled; a compiler cache cannot"
+" replace that evidence."

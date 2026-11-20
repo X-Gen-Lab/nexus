@@ -1,8 +1,8 @@
 // FIG-25 current optional copied-UART mechanism, not an installed gateway.
-// Basis: user_io_async.h/.c, existing BusOwner/UARTOwner and Core request.
+// Basis: components/runtime/user_io_broker; components/runtime/bus_owner; core.
 // Every visible edge names copying, a borrow, execution or required proof.
 digraph copiedUserIo {
-    graph [label="FIG-25 Copied UART TX: current software ownership\nActual kernel entry / NS RTOS / HIL and full IO-39/SOC-36 exits remain open",
+    graph [label="FIG-25 复制 UART TX：当前软件所有权\n需要受信权限端口；不表示已安装 SVC／NS 网关",
            rankdir=TB, labelloc=t, fontname="Noto Sans CJK SC", fontsize=16,
            bgcolor="white", pad=0.25, nodesep=0.4, ranksep=0.65];
     node [shape=box, style="rounded,filled", fillcolor="#eff6ff",

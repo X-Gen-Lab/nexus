@@ -72,7 +72,7 @@ ISR 耗时，也不代表满足生产 IRQ 预算。主机模型不能模拟 CPU 
 本评估 adapter 不成为第二个生产 transport，不提供运行时切换开关。窄模式可适配
 不能推导全部生产 mode、NVIC／抢占排空、并行 RX、板级 clock、IRQ 预算和物理验收。
 当前正式 F407 `dma-tx` 的独立 HAL 集成与其他 LL／直接访问模式以
-[官方驱动合同](../../../docs/design/official-stm32-provider.md)为准；推广仍需完整
+[官方驱动合同](../../../docs/reference/contracts/stm32-provider.md)为准；推广仍需完整
 生命周期和等价链接成本，不能仅凭 HAL 或寄存器代码偏好决定。
 
 独立 `nexus_gd32_official_gpio_test` 通过真实 GD32F470 provider 执行锁定的

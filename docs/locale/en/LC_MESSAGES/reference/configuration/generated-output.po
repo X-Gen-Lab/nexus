@@ -1,0 +1,163 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: c76b804c9254cc213a28708b187c7b94ad7e67d272935f3042099d4199889b9f\n"
+
+#: ../../../../../../docs/reference/configuration/generated-output.md:9
+msgid "生成 bundle 与读取方式"
+msgstr "Generated bundles and how to read them"
+
+#: ../../../../../../docs/reference/configuration/generated-output.md:11
+msgid ""
+"同一不可变 IR 原子产生静态连接和审查数据。应用只修改作者 TOML、Board/SoC事实或实现源码，不手工修补 generated 目录。"
+msgstr ""
+"The same immutable IR atomically produces static connections and review "
+"data. Applications change authored TOML, Board/SoC facts or implementation "
+"sources, never patch the generated directory by hand."
+
+#: ../../../../../../docs/reference/configuration/generated-output.md:13
+msgid "![配置与产物](../../assets/diagrams/configuration-generation.svg)"
+msgstr ""
+"![Configuration and artifacts](../../assets/diagrams/configuration-"
+"generation.svg)"
+
+#: ../../../../../../docs/reference/configuration/generated-output.md:13
+msgid "配置与产物"
+msgstr "Configuration and artifacts"
+
+#: ../../../../../../docs/reference/configuration/generated-output.md:0
+msgid "产物"
+msgstr "Artifact"
+
+#: ../../../../../../docs/reference/configuration/generated-output.md:0
+msgid "用途"
+msgstr "Purpose"
+
+#: ../../../../../../docs/reference/configuration/generated-output.md:0
+msgid "`nexus_config.h`"
+msgstr "`nexus_config.h`"
+
+#: ../../../../../../docs/reference/configuration/generated-output.md:0
+msgid "当前生成格式、接口代际与选中配置的编译期声明"
+msgstr ""
+"Compile-time declarations of the current generated format, interface "
+"generation and selected configuration"
+
+#: ../../../../../../docs/reference/configuration/generated-output.md:0
+msgid "`nexus_bindings.h`、`bindings.c`"
+msgstr "`nexus_bindings.h`, `bindings.c`"
+
+#: ../../../../../../docs/reference/configuration/generated-output.md:0
+msgid "固定静态对象和生命周期连接"
+msgstr "Fixed static objects and lifecycle connections"
+
+#: ../../../../../../docs/reference/configuration/generated-output.md:0
+msgid "`nexus_factory.h`"
+msgstr "`nexus_factory.h`"
+
+#: ../../../../../../docs/reference/configuration/generated-output.md:0
+msgid "已选类别的紧凑 ID 与 getter"
+msgstr "Compact IDs and getters for selected classes"
+
+#: ../../../../../../docs/reference/configuration/generated-output.md:0
+msgid "`nexus_factory_strong.h`"
+msgstr "`nexus_factory_strong.h`"
+
+#: ../../../../../../docs/reference/configuration/generated-output.md:0
+msgid "类别独立的名义引用与强类型 getter"
+msgstr "Class-specific nominal references and strong getters"
+
+#: ../../../../../../docs/reference/configuration/generated-output.md:0
+msgid "领域生成头"
+msgstr "Domain-generated headers"
+
+#: ../../../../../../docs/reference/configuration/generated-output.md:0
+msgid "所选组件/可选领域的明确公共接口"
+msgstr "Explicit public interfaces of selected components/optional domains"
+
+#: ../../../../../../docs/reference/configuration/generated-output.md:0
+msgid "`resolved.json`"
+msgstr "`resolved.json`"
+
+#: ../../../../../../docs/reference/configuration/generated-output.md:0
+msgid "有效控制器、端点、已选route、资源、预算与输入身份"
+msgstr ""
+"Effective controllers, endpoints, selected routes, resources, budgets and "
+"input identities"
+
+#: ../../../../../../docs/reference/configuration/generated-output.md:0
+msgid "`resource-budget.json` 与布局输出"
+msgstr "`resource-budget.json` and layout outputs"
+
+#: ../../../../../../docs/reference/configuration/generated-output.md:0
+msgid "最终镜像资源检查的输入"
+msgstr "Inputs to final image resource checks"
+
+#: ../../../../../../docs/reference/configuration/generated-output.md:25
+msgid ""
+"未选类别不生成相应 getter/ID。factory 不分配、不启动设备；先检查 getter "
+"返回，再按平台生命周期使用接口。CMake自动传递已选公共生成头的需要，组件实现私有要求不进入应用头闭包。"
+msgstr ""
+"Unselected classes emit no corresponding getters or IDs. The factory neither"
+" allocates nor starts devices; check getter results before using interfaces "
+"according to the platform lifecycle. CMake automatically propagates selected"
+" public generated-header requirements; private implementation requirements "
+"of components do not enter the application's header closure."
+
+#: ../../../../../../docs/reference/configuration/generated-output.md:27
+msgid "输出身份"
+msgstr "Output identity"
+
+#: ../../../../../../docs/reference/configuration/generated-output.md:29
+msgid ""
+"`resolved.json` "
+"是当前格式的单向输出，省略未选候选路线。`fact_references`用路径和SHA-256引用原始事实，完整IR仍用于校验与候选查询。配置摘要基于完整有效决策；JSON不是可信输入，原始事实摘要不能替代编译器或代码身份。"
+msgstr ""
+"`resolved.json` is a one-way output in the current format and omits "
+"unselected candidate routes. `fact_references` identifies original facts by "
+"path and SHA-256; complete IR still serves validation and candidate queries."
+" The configuration digest covers all effective decisions. JSON is not "
+"trusted input, and original fact digests do not replace compiler or code "
+"identities."
+
+#: ../../../../../../docs/reference/configuration/generated-output.md:31
+msgid ""
+"SDK解析与checkout可能有不同输入来源和配置摘要。审查真实输入，不删除身份字段来强行匹配。当前格式值见[SDK与格式合同](../contracts/sdk-"
+"format.md)。"
+msgstr ""
+"SDK resolution and checkouts may have different input sources and "
+"configuration digests. Review actual inputs; do not delete identity fields "
+"to force a match. See the [SDK and format contract](../contracts/sdk-"
+"format.md) for current format values."
+
+#: ../../../../../../docs/reference/configuration/generated-output.md:33
+msgid "生成、失败与增量"
+msgstr "Generation, failure and incrementality"
+
+#: ../../../../../../docs/reference/configuration/generated-output.md:35
+msgid ""
+"从所选源码根使用配置CLI的 `check`、`explain` 和 "
+"`generate`，传入自己的完整assembly与拥有的输出目录；命令参数见[工具参考](tools.md)。生成成功不等于编译或硬件执行成功。"
+msgstr ""
+"Run the configuration CLI's `check`, `explain` and `generate` from the "
+"selected source root with your complete assembly and an output directory you"
+" own. See [tool reference](tools.md) for arguments. Successful generation "
+"does not imply successful compilation or hardware execution."
+
+#: ../../../../../../docs/reference/configuration/generated-output.md:37
+msgid ""
+"拒绝或中断使该次输出失效，不能继续消费旧头或bindings。相同生成内容保留时间戳；TOML、所选事实或生成器改变由构建图重新配置。ELF、BIN、map和资源报告分别由固件target维护，见[构建合同](../contracts/build-"
+"system.md)。"
+msgstr ""
+"Rejection or interruption invalidates that execution's output; old headers "
+"or bindings must not be consumed. Identical generated content retains "
+"timestamps. TOML, selected fact or generator changes trigger reconfiguration"
+" through the build graph. The firmware target separately maintains ELF, BIN,"
+" map and resource reports; see the [build contract](../contracts/build-"
+"system.md)."

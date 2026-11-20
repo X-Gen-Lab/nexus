@@ -13,6 +13,6 @@ Incorrect statement and proposed correction:
 Source or executed evidence supporting it:
 
 Current docs start at [docs/index.md](../../docs/index.md), with contracts in
-docs/design and current scope in docs/delivery. Historical contracts and results
-retain their [original source identity](https://github.com/X-Gen-Lab/nexus/tree/83a27dfbee4e8fbf4d35875b1e9db85af7516eec);
-they do not qualify the current architecture.
+docs/reference/contracts and current support in docs/reference/platforms.
+Provide the affected source revision and current behavior; a previous result
+does not qualify a changed implementation.

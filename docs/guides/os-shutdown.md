@@ -11,7 +11,7 @@ source_language: en
 Use this guide for applications selecting an optional Native, FreeRTOS or ThreadX
 adapter. The application owns tasks, stacks, notifications, queues and execution
 progress. Baremetal has no scheduler. Platform start never starts a kernel.
-The [OS contract](../design/os-contracts.md) remains authoritative.
+The [OS contract](../reference/contracts/os/execution.md) remains authoritative.
 
 ## Avoid lost completion and unbounded waits
 

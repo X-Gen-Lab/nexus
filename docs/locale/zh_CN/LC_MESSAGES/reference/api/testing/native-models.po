@@ -1,0 +1,715 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 97d822a7c8ff6148cc89a28a6a07e504d27667446e1938464a8eb6c0d662b93b\n"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:10
+msgid "Native I/O model controls"
+msgstr "Native I/O 模型控制"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:12
+msgid ""
+"These interfaces explicitly advance or inspect host-only models. They "
+"establish software behavior and failure paths, not MCU discovery, electrical"
+" behavior or physical qualification."
+msgstr "这些接口显式推进或检查仅主机模型，建立软件行为及失败路径证据，不代表 MCU 发现、电气行为或物理验收。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:16
+msgid "Public declarations"
+msgstr "公共声明"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:18
+msgid "model.h"
+msgstr "model.h"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "Explicit host-model fixtures; no physical MCU qualification."
+msgstr "显式主机模型夹具，不建立物理 MCU 资格。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+#: ../../../../../../docs/reference/api/testing/native-models.md:26
+#: ../../../../../../docs/reference/api/testing/native-models.md:32
+#: ../../../../../../docs/reference/api/testing/native-models.md:38
+msgid "Author  Nexus Team"
+msgstr "作者  Nexus Team"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+#: ../../../../../../docs/reference/api/testing/native-models.md:26
+#: ../../../../../../docs/reference/api/testing/native-models.md:32
+#: ../../../../../../docs/reference/api/testing/native-models.md:38
+msgid "Nexus Team"
+msgstr "Nexus Team"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+#: ../../../../../../docs/reference/api/testing/native-models.md:26
+#: ../../../../../../docs/reference/api/testing/native-models.md:32
+#: ../../../../../../docs/reference/api/testing/native-models.md:38
+msgid "Functions"
+msgstr "函数"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "Switch host model to a deterministic clock domain."
+msgstr "将主机模型切换到确定性时钟域。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:0
+msgid "Parameters"
+msgstr "参数"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "[in] True selects manual clock, false real monotonic."
+msgstr "[in] true 选择手动时钟，false 选择真实单调时间。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "[in] Initial manual microsecond value, below UINT64_MAX."
+msgstr "[in] 手动时钟的初始微秒值，须小于 UINT64_MAX。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:0
+msgid "Returns"
+msgstr "返回值"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid ""
+"Success or INVALID. Caller must first settle every request; switching "
+"creates a new domain and invalidates old deadlines."
+msgstr "成功或 INVALID。调用方必须先结清所有请求；切换会创建新时间域，使旧 deadline 失效。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "Advance deterministic time without an implicit hardware IRQ."
+msgstr "推进确定性时间，不隐式触发硬件 IRQ。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "[in] Positive or zero microsecond increment."
+msgstr "[in] 非负微秒增量。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "Success, STATE outside manual mode or EXHAUSTED on overflow."
+msgstr "成功；非手动模式返回 STATE，溢出返回 EXHAUSTED。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "Configure the fixed GPIO model after writer quiescence."
+msgstr "写者静止后配置固定 GPIO 模型。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "[in] Authorized input/output bit mask."
+msgstr "[in] 获授权的输入/输出位掩码。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "[in] Initial output snapshot within mask."
+msgstr "[in] 位于掩码范围内的初始输出快照。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "Success or INVALID; no fake Board/electrical qualification."
+msgstr "成功或 INVALID；不虚构 Board/电气资格。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "Inject one GPIO input snapshot in the deterministic model."
+msgstr "在确定性模型中注入一个 GPIO 输入快照。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "[in] Physical-port snapshot; read masks unauthorized bits."
+msgstr "[in] 物理端口快照；读取时屏蔽未授权位。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "Observe output state for a host behavioral assertion."
+msgstr "观察输出状态，用于主机行为断言。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "Model output snapshot; no measured waveform semantics."
+msgstr "模型输出快照；不具有实测波形语义。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "Configure exact RX/TX fixture capacities on the fixed UART."
+msgstr "在固定 UART 上配置准确的 RX/TX 夹具容量。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "[in] Caller-owned selected-profile storage description."
+msgstr "[in] 调用方持有的选中配置存储描述。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "Success, INVALID or BUSY if an active request remains."
+msgstr "成功、INVALID，或因仍有活跃请求而返回 BUSY。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "Validate exact Native TX context for selected RS485 binding."
+msgstr "为选定 RS485 绑定验证准确 Native TX 上下文。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "Task-only; no model IRQ, admission, GPIO or state mutation."
+msgstr "仅限任务上下文；不产生模型 IRQ、准入、GPIO 或状态修改。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "[in] Configured Native UART face's exact context."
+msgstr "[in] 已配置 Native UART 接口的精确上下文。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "[in] Live READY/QUEUED descriptor, never retained."
+msgstr "[in] 仍然有效的 READY/QUEUED 描述符，不予保留。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "Same pure rejectable checks as Native submit/start."
+msgstr "执行与 Native submit/start 相同的纯检查，且可拒绝。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "Copy explicit IRQ facts into a quiescent host UART model."
+msgstr "将显式 IRQ 事实复制到静止的主机 UART 模型。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid ""
+"Task-only cold configuration; caller has stopped publishers. No active "
+"request, stream or attached wake may remain. Default preparation explicitly "
+"models BASEPRI/four-bit IRQs; this entry can model Baseline without "
+"inventing a SoC/Board."
+msgstr ""
+"仅限任务上下文的冷态配置；调用方已停止发布者。不得残留活跃请求、stream 或已绑定的 wake。默认准备过程显式模拟 BASEPRI/四位 "
+"IRQ；此入口可以模拟 Baseline，不虚构 SoC/Board。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "[in] Configured Native UART face with no IRQ users."
+msgstr "[in] 没有 IRQ 使用者的已配置 Native UART 接口。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "[in] Immutable CPU/kernel facts copied during this call."
+msgstr "[in] 在本次调用中复制的不可变 CPU/内核事实。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "[in] Actual modeled publisher facts copied during call."
+msgstr "[in] 在本次调用中复制的实际模型发布者事实。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "Success, INVALID, CONTEXT, STATE or BUSY before side effects."
+msgstr "成功，或在产生效果前返回 INVALID、CONTEXT、STATE 或 BUSY。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "Execute one deterministic TX IRQ byte/TC event."
+msgstr "执行一个确定性 TX IRQ 字节／TC 事件。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "No actual hardware IRQ, latency or wire timing is simulated."
+msgstr "不模拟实际硬件 IRQ、时延或线上时序。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "Inject one RX IRQ fact into bounded selected-profile storage."
+msgstr "将一个 RX IRQ 事实注入有界、选定配置的存储。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "[in] Received byte; ignored for NO_BYTE status facts."
+msgstr "[in] 接收到的字节；NO_BYTE 状态事实时忽略此值。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "[in] NX_UART_EVENT_* error facts; zero for normal reception."
+msgstr "[in] NX_UART_EVENT_* 错误事实；正常接收为零。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "Success, OVERFLOW or STATE if disabled."
+msgstr "成功、OVERFLOW，或禁用时返回 STATE。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "Configure start failure or inability to prove hardware drain."
+msgstr "配置启动失败或无法证明硬件排空。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "[in] Fail after direct admission, not as rejection."
+msgstr "[in] 直接准入后失败，不作为拒绝。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "[in] Retain QUARANTINED request until explicitly released."
+msgstr "[in] 保留 QUARANTINED 请求，直到显式解除。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "Observe captured TX bytes."
+msgstr "观察捕获的 TX 字节。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "Number captured in caller-owned tx_log."
+msgstr "捕获到调用方持有的 tx_log 中的数量。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "Configure a fixed SPI echo or register-file model."
+msgstr "配置固定 SPI 回显或寄存器文件模型。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "[inout] Optional caller-owned register bytes; NULL is echo."
+msgstr "[inout] 可选的调用方持有的寄存器字节；NULL 表示回显。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "[in] Register capacity; zero only for echo mode."
+msgstr "[in] 寄存器容量；仅回显模式允许为零。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "Success or INVALID; fixture has one serialized executor."
+msgstr "成功或 INVALID；夹具只有一个串行化执行者。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "Inject bounded SPI partial failure or controller occupancy."
+msgstr "注入有界 SPI 部分失败或控制器占用。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "[in] Byte index to fail at, SIZE_MAX disables fault."
+msgstr "[in] 发生失败的字节索引；SIZE_MAX 禁用故障。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "[in] True rejects transactions without CS/buffer access."
+msgstr "[in] true 表示不访问 CS/缓冲区即拒绝事务。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "Check the modeled CS level after a transaction."
+msgstr "事务结束后检查模型 CS 电平。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "True while model transaction owns active CS."
+msgstr "模型事务持有活跃 CS 时为真。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "Configure one 7-bit-address register-file I2C model."
+msgstr "配置一个 7 位地址的寄存器文件 I2C 模型。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "[inout] Caller-owned register bytes retained by fixture."
+msgstr "[inout] 由调用方持有、夹具保留的寄存器字节。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "[in] Positive register capacity, at most 256."
+msgstr "[in] 正的寄存器容量，最多 256。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "[in] Valid nonreserved 7-bit address."
+msgstr "[in] 有效且非保留的 7 位地址。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "Success or INVALID."
+msgstr "成功或 INVALID。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "Inject NACK, arbitration loss or a stuck bus."
+msgstr "注入 NACK、仲裁丢失或总线卡死。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "[in] Success disables fault; NACK/ARBITRATION/IO supported."
+msgstr "[in] Success 禁用故障；支持 NACK/ARBITRATION/IO。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "[in] True makes explicit recovery fail until released."
+msgstr "[in] true 使显式恢复持续失败，直到解除。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "Configure physical-geometry RAM model, clearly nonpersistent."
+msgstr "配置物理几何 RAM 模型，明确不具备持久性。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "[inout] Caller-owned geometry-sized bytes; erased to 0xff."
+msgstr "[inout] 调用方持有、大小符合几何信息的字节存储；擦除为 0xff。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid ""
+"[in] Caller-owned immutable contiguous sector geometry with program_flags = "
+"0. This NOR model does not implement hidden ECC erase-history requirements."
+msgstr "[in] 调用方持有的不可变连续扇区几何，program_flags = 0。此 NOR 模型不实现隐藏 ECC 擦除历史要求。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid ""
+"Success, INVALID geometry or UNSUPPORTED program flags; no heap, product "
+"reserve or persistence."
+msgstr "成功、因几何无效而返回 INVALID，或因编程标志不支持而返回 UNSUPPORTED；没有堆、产品预留或持久化。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "Inject program/erase failure after complete modeled pulses."
+msgstr "完整模型脉冲之后注入编程／擦除失败。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "[in] Complete pulses allowed; SIZE_MAX disables fault."
+msgstr "[in] 允许完成的完整脉冲数；SIZE_MAX 禁用故障。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "Reset the watchdog fixture as a simulated new boot."
+msgstr "复位看门狗夹具，模拟新一次启动。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "Test-only; production IWDG cannot be disabled by this action."
+msgstr "仅用于测试；此操作不能禁用真实 IWDG。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "[in] Latched reset cause mask."
+msgstr "[in] 锁存的复位原因掩码。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "Observe expiration of the enabled deterministic IWDG."
+msgstr "观察已启用确定性 IWDG 的到期。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "True once its nominal model deadline expires; latches IWDG."
+msgstr "标称模型 deadline 到期后为真，并锁存 IWDG。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "Configure exact storage for one static EXTI line."
+msgstr "为一个静态 EXTI 线路配置准确存储。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "[in] Zero through fifteen."
+msgstr "[in] 0..15。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "[in] RISING/FALLING/BOTH selection."
+msgstr "[in] RISING/FALLING/BOTH 选择。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "[inout] Fixture-owned queue storage."
+msgstr "[inout] 夹具持有的队列存储。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "[in] Positive event capacity."
+msgstr "[in] 正的事件容量。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "Success or INVALID; quiesce producer/consumer before reset."
+msgstr "成功或 INVALID；复位前须使生产者/消费者静默。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "Inject a timestamped selected edge fact."
+msgstr "注入一个带时间戳的选定边沿事实。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "[in] Configured static line."
+msgstr "[in] 已配置的静态线。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "[in] RISING or FALLING occurrence."
+msgstr "[in] RISING 或 FALLING 事件。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "Success, INVALID/STATE/OVERFLOW; loss remains observable."
+msgstr "成功，或 INVALID/STATE/OVERFLOW；丢失仍可被观察。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "Configure fixed PWM model timer facts after writer quiescence."
+msgstr "写者静止后配置固定 PWM 模型定时器事实。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "[in] Positive post-prescaler frequency."
+msgstr "[in] 预分频后的正频率。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "[in] Fixed shared-base positive period."
+msgstr "[in] 固定共享时基的正周期。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "Configure fixed ADC raw-count sequence and format."
+msgstr "配置固定 ADC 原始计数序列与格式。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "[in] Fixture-owned nominal sample sequence."
+msgstr "[in] 夹具持有的标称样本序列。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "[in] Positive channel count."
+msgstr "[in] 正的通道数。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "[in] One through sixteen."
+msgstr "[in] 1..16。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "[in] Positive nominal reference voltage."
+msgstr "[in] 正的标称参考电压。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "Inject ADC failure after a prefix of complete samples."
+msgstr "若干完整样本之后注入 ADC 失败。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "[in] Complete samples allowed; SIZE_MAX disables."
+msgstr "[in] 允许完成的完整样本数；SIZE_MAX 禁用故障。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "Operate on the selected Native model face only."
+msgstr "仅操作选定的 Native 模型接口面。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid ""
+"Null or foreign-provider faces return INVALID for status operations, "
+"zero/false for observations, and have no effect for injections. Referenced "
+"fixture storage remains owned by the caller; reconfiguration requires writer"
+" and IRQ quiescence and never revokes a live UART borrow."
+msgstr ""
+"对于空接口或其他 provider 的接口，状态操作返回 "
+"INVALID，观察返回零/false，注入无效果。所引用的夹具存储仍由调用方持有；重新配置要求写入者和 IRQ 静默，绝不撤销活跃 UART 借用。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "Choose explicit or automatic modeled SPI IRQ stepping."
+msgstr "选择显式或自动模型 SPI IRQ 推进。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid ""
+"Quiesce the controller first. Automatic service advances at most one byte or"
+" a separate final idle fact per call; this does not model physical DMA or "
+"wire timing."
+msgstr "先使控制器静默。自动 service 每次调用至多推进一个字节或一个独立的最终空闲事实；不模拟物理 DMA 或线上时序。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "Inject one bounded SPI byte/idle event on the exact Native bus."
+msgstr "在准确 Native 总线上注入一个有界 SPI 字节／空闲事件。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "Inject inability to prove SPI hardware drain."
+msgstr "注入无法证明 SPI 硬件排空的失败。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid ""
+"Retained requests become QUARANTINED until hold is released and the executor"
+" services the bus again. No loan is revoked."
+msgstr "保留请求转为 QUARANTINED，直到解除 hold，且执行者再次 service 总线。不撤销任何借用。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "Inject UART IDLE and publish its current valid byte prefix."
+msgstr "注入 UART IDLE，并发布当前有效字节前缀。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid ""
+"Success, EMPTY without a prefix, STATE outside a running block stream, BUSY "
+"while its modeled writer is active, or INVALID for a foreign provider. No "
+"producer loan is revoked."
+msgstr ""
+"成功、无前缀时返回 EMPTY、未运行块流时返回 STATE、模型写入者活跃时返回 BUSY，或其他 provider 返回 "
+"INVALID。不撤销生产者借用。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "Inject one ADC timer-trigger scan into a free selected block."
+msgstr "向选定空闲块注入一次 ADC 定时器触发扫描。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid ""
+"Each success publishes one interleaved raw-count scan; partial failed scans "
+"are detached and never published."
+msgstr "每次成功发布一次交错排列的原始计数扫描；失败的部分扫描先分离，绝不发布。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid ""
+"Success, OVERFLOW while a required block remains held, IO for a failed scan,"
+" STATE after stop, or INVALID for a foreign provider. No hardware cadence or"
+" analog accuracy is claimed."
+msgstr ""
+"成功、必需 block 仍被持有时返回 OVERFLOW、扫描失败返回 IO、停止后返回 STATE，或其他 provider 返回 "
+"INVALID。不声称硬件节拍或模拟精度。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "Variables"
+msgstr "变量"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid "Fixed model bindings; no allocation, lookup, probe or construction."
+msgstr "固定模型绑定；不分配、不查找、不探测、不构造。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+msgid ""
+"UART storage belongs to the fixture until port stop and IRQ quiescence."
+msgstr "UART 存储归夹具所有，直到端口停止且 IRQ 静止。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:20
+#: ../../../../../../docs/reference/api/testing/native-models.md:38
+msgid "Public Members"
+msgstr "公共成员"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:24
+msgid "rtc_lptim_model.h"
+msgstr "rtc_lptim_model.h"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:26
+msgid "Explicit host source progression and withdrawal faults."
+msgstr "显式主机请求源推进与撤源故障。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:26
+msgid "Advance a set raw calendar by bounded explicit source seconds."
+msgstr "按有界的显式请求源秒数推进已设置的原始日历。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:26
+msgid ""
+"Constant bounded work, at most one date carry. A closed set calendar may "
+"advance; this does not reopen admission or prove backup retention. Does not "
+"read/advance Core clock, publish, settle or change terminal cause. Source "
+"changes are not an IRQ, worker or hardware qualification."
+msgstr ""
+"工作量固定且有界，最多进位一天。已关闭但已设置的日历仍可推进；这不重新开放准入，也不证明备份保持。不读取／推进 Core "
+"时钟，不发布、不结清，也不改变终止原因。请求源变化不是 IRQ、worker 或硬件验证资格。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:26
+msgid "[in] Exact Native RTC face, serialized with every public call."
+msgstr "[in] 精确的 Native RTC 接口面，与每个公共调用串行执行。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:26
+msgid "[in] 0..86400; zero never creates an event."
+msgstr "[in] 0..86400；零绝不创建事件。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:26
+msgid "SUCCESS, STATE if unset/unconstructed, INVALID or UNSUPPORTED."
+msgstr "SUCCESS、未设置／未构造时的 STATE、INVALID 或 UNSUPPORTED。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:26
+msgid "Inject/remove the external inability to withdraw an armed source."
+msgstr "注入／解除无法撤回已 armed 请求源的外部条件。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:26
+msgid "[in] Exact Native RTC face on the same serialized owner."
+msgstr "[in] 同一个串行 owner 上精确的 Native RTC 接口面。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:26
+msgid "[in] True prevents withdrawal; false only removes the fault."
+msgstr "[in] true 阻止撤源；false 只解除故障。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:26
+msgid "SUCCESS or INVALID/STATE/UNSUPPORTED; never settles a request."
+msgstr "SUCCESS 或 INVALID/STATE/UNSUPPORTED；绝不结清请求。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:26
+msgid "Advance a finite source, saturating at its exact shot limit."
+msgstr "推进有限请求源，并在精确计数上限处饱和。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:26
+msgid ""
+"At full65536 the sampled 16-bit counter is zero; pending completion is "
+"independent. Held withdrawal permits final progress beyond cancel/time "
+"observation. Does not touch the request, terminal cause or Core clock."
+msgstr ""
+"达到完整的 65536 tick 时，采样的 16 位计数器为零；pending 完成标志与之独立。撤源被 hold "
+"阻止时，进度可在观察到取消／时间条件后继续推进。不访问请求、终止原因或 Core 时钟。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:26
+msgid "[in] Exact Native LPTIM face, serialized with all public calls."
+msgstr "[in] 精确的 Native LPTIM 接口面，与全部公共调用串行执行。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:26
+msgid "[in] 0..65536 source ticks; idle/unarmed does not accumulate."
+msgstr "[in] 0..65536 个请求源 tick；空闲／未 armed 时不累计。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:26
+msgid "SUCCESS or INVALID/STATE/UNSUPPORTED."
+msgstr "SUCCESS 或 INVALID/STATE/UNSUPPORTED。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:26
+msgid "Inject/remove withdrawal hold; real public service still drains."
+msgstr "注入／解除撤源 hold；仍由真实公共 service 执行排空。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:26
+msgid "[in] Exact Native LPTIM face on the serialized executor."
+msgstr "[in] 串行执行者上精确的 Native LPTIM 接口面。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:26
+msgid "[in] False does not clear provider references or publish results."
+msgstr "[in] false 不清除 provider 引用，也不发布结果。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:30
+msgid "spi_dma_model.h"
+msgstr "spi_dma_model.h"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:32
+msgid "Explicit Native segmented wire and drain fault controls."
+msgstr "显式 Native 分段传输与排空故障控制。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:32
+msgid "Move one modeled wire word or observe its final idle event."
+msgstr "推进一个模型传输字，或观察最终空闲事件。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:32
+msgid ""
+"Caller-scheduled task/model IRQ; no hidden worker. Facts latch before a "
+"bounded hint. Never invoke after publisher join. A stopped owner cannot "
+"drive a successor's model."
+msgstr ""
+"由调用方安排任务/模型 IRQ；没有隐藏 worker。有界提示之前先锁存事实。发布者汇合后绝不再调用。已停止的所有者不能驱动后继实例的模型。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:32
+msgid "[in] Exact live Native enhanced controller."
+msgstr "[in] 精确、仍然有效的 Native 增强控制器。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:32
+msgid "Select optional single-step progress during task service."
+msgstr "选择在任务服务期间进行可选的单步推进。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:32
+msgid ""
+"Task-only. Explicit stepping remains available. This model does not "
+"establish physical IRQ/DMA timing or HIL."
+msgstr "仅限任务上下文。仍可显式逐步推进。此模型不建立物理 IRQ/DMA 时序或 HIL。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:32
+msgid "[in] Exact live Native enhanced controller, quiescent."
+msgstr "[in] 精确、仍然有效且已静默的 Native 增强控制器。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:32
+msgid "[in] True for one modeled step per service."
+msgstr "[in] true 表示每次 service 推进一个模型步骤。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:32
+msgid "SUCCESS, INVALID, STATE, CONTEXT or BUSY while borrowed."
+msgstr "返回 SUCCESS、INVALID、STATE、CONTEXT，或因借用未结束而返回 BUSY。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:32
+msgid "Inject or remove inability to prove physical model drain."
+msgstr "注入或解除无法证明模型物理排空的故障。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:32
+msgid ""
+"Task-only, allowed while borrowed. Removing the fault does not settle; "
+"continue model stepping and unique service."
+msgstr "仅限任务上下文，借用期间允许调用。移除故障不等于结清；继续推进模型并由唯一执行者 service。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:32
+msgid "[in] Keep all request/CS loans while true."
+msgstr "[in] 为 true 时保留全部请求/CS 借用。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:32
+msgid "SUCCESS, INVALID, STATE or CONTEXT."
+msgstr "返回 SUCCESS、INVALID、STATE 或 CONTEXT。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:32
+msgid "Fail a phase before the selected zero-based wire word."
+msgstr "在选定的零基传输字之前使阶段失败。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:32
+msgid "Task-only model input; no replay or early loan release."
+msgstr "仅限任务上下文的模型输入；不重放，也不提前释放借用。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:32
+msgid "[in] SIZE_MAX disables the injected fault."
+msgstr "[in] SIZE_MAX 禁用注入故障。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:36
+msgid "native_mapped_storage.h"
+msgstr "native_mapped_storage.h"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:38
+msgid "Caller-owned coherent Native NOR model with bounded steps."
+msgstr "调用方拥有的一致性 Native NOR 模型，每步工作量有界。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:38
+msgid "Construct an unused Native backend without modifying backing bytes."
+msgstr "构造未使用的 Native 后端，不修改底层存储字节。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:38
+msgid ""
+"SUCCESS or INVALID. Only CPU_READ is supported; XIP and DMA tags reject. "
+"Native coherent memory needs no cache maintenance. The portable owner still "
+"excludes mappings from every modeled mutation and drain."
+msgstr ""
+"返回 SUCCESS 或 INVALID。仅支持 CPU_READ；XIP 和 DMA 标记均拒绝。Native "
+"一致性内存无需缓存维护。可移植所有者仍保证映射与每一次建模修改及排空互斥。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:38
+msgid "Independent Native backend state; never a physical Flash substitute."
+msgstr "独立的 Native 后端状态，从不替代物理 Flash。"
+
+#: ../../../../../../docs/reference/api/testing/native-models.md:38
+msgid ""
+"The model preserves supplied bytes, programs only 1-to-0, and erases to "
+"0xff. One service changes at most quantum bytes. No implicit file, heap, "
+"thread, DMA, executable aperture or durability claim exists. fault_after "
+"bounds mutated bytes; SIZE_MAX disables the fault. hold_drain models live "
+"retained sources and drain_error models failure to prove source withdrawal."
+msgstr ""
+"模型保留传入的字节，仅允许从 1 编程为 0，并擦除为 0xff。一次推进最多修改 quantum 个字节。不隐式创建文件、堆、线程、DMA "
+"或可执行映射窗口，也不声称具有持久性。fault_after 限制已修改字节数；SIZE_MAX 禁用该故障。hold_drain "
+"模拟尚存的保留访问源，drain_error 模拟无法证明访问源已撤回的失败。"

@@ -19,7 +19,7 @@ principal／device／mask 策略接纳一条消息。组件不预建实例、最
 
 本机制不提供 user-mode 入口或权限提升。FreeRTOS SVC 路由、任务身份、实际 MPU／
 TrustZone、用户故障约束和内核 pinner 仍由集成内核提供。软件测试不建立物理隔离或
-电气资格。完整权威说明见[用户 I/O 代理合同](../../../docs/design/user-io-broker.md)。
+电气资格。完整权威说明见[用户 I/O 代理合同](../../../docs/reference/contracts/os/user-io-broker.md)。
 
 ## 复制 UART TX 的可选组合
 

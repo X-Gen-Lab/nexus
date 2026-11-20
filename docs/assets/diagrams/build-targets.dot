@@ -1,6 +1,6 @@
 // FIG-02 reference: source-backed, scoped engineering view.
 // Code basis: cmake/platform/CMakeLists.txt; Firmware.cmake; Options.cmake; soc/stm32/stm32f4/CMakeLists.txt.
-// Relations and qualification limits are documented in README.md.
+// Relations and qualification limits: docs/reference/diagrams.md.
 digraph BuildTargets {
     graph [newrank=true, rankdir=TB, bgcolor="white", pad=0.28, nodesep=0.42,
            ranksep=0.66, fontname="Noto Sans CJK SC", fontsize=15,

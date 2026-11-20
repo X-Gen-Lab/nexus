@@ -1,0 +1,170 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 8771c0b3cb85410ccc8189d41eaf69030b27ed168b1d1e6cf417a68c327cd8fc\n"
+
+#: ../../../../../../docs/explanation/design-principles.md:9
+msgid "为什么选择静态、明确的边界"
+msgstr "Why use static, explicit boundaries"
+
+#: ../../../../../../docs/explanation/design-principles.md:11
+msgid ""
+"MCU 的 CPU 时间、RAM、Flash、带宽与电源都有界；外设和执行者会并发，IRQ/DMA "
+"也可能晚于函数返回。设计首先保证正确性与硬约束，再比较已声明成本。"
+msgstr ""
+"MCU CPU time, RAM, Flash, bandwidth and power are bounded. Peripherals and "
+"executors operate concurrently, and IRQ/DMA activity may outlive a function "
+"call. The design first establishes correctness and hard constraints, then "
+"compares declared costs."
+
+#: ../../../../../../docs/explanation/design-principles.md:13
+msgid "构建期决定固定事实"
+msgstr "Decide fixed facts at build time"
+
+#: ../../../../../../docs/explanation/design-principles.md:15
+msgid ""
+"一个固件通常面向一种精确芯片与 PCB。CPU、路由、时钟、DMA、容量和软件选择在构建期确定，运行期维护真实操作状态。TOML "
+"只表达产品选择；SoC/Board 拥有事实；C 实现拥有行为；CMake 拥有依赖图。"
+msgstr ""
+"Firmware usually targets one exact chip and PCB. CPU, routes, clocks, DMA, "
+"capacities and software selections are decided at build time; runtime "
+"maintains actual operation state. TOML expresses product choices; SoC/Board "
+"own facts; C implementations own behavior; CMake owns the dependency graph."
+
+#: ../../../../../../docs/explanation/design-principles.md:17
+msgid "![构建期输入与产物](../assets/diagrams/configuration-generation.svg)"
+msgstr ""
+"![Build-time inputs and outputs](../assets/diagrams/configuration-"
+"generation.svg)"
+
+#: ../../../../../../docs/explanation/design-principles.md:17
+msgid "构建期输入与产物"
+msgstr "Build-time inputs and outputs"
+
+#: ../../../../../../docs/explanation/design-principles.md:19
+msgid ""
+"同 IP 增加料号或路线优先扩展数据。新硬件 IP 沿用已有语义时新增私有 C、binding 与局部 "
+"CMake；新的公共语义才演进相应领域合同。配置器不加入厂家名称或寄存器编码分支。"
+msgstr ""
+"Prefer data changes when adding a part or route with the same IP. New "
+"hardware IP using existing semantics adds private C, bindings and local "
+"CMake. New public semantics evolve the relevant domain contract. The "
+"configurator does not add branches for vendor names or register encodings."
+
+#: ../../../../../../docs/explanation/design-principles.md:21
+msgid "按实际需要承担资源"
+msgstr "Pay only for required resources"
+
+#: ../../../../../../docs/explanation/design-principles.md:23
+msgid ""
+"静态实例只保留选定模式的 config、runtime、request、stream "
+"和回执。只读方法表共享，容量、字节单位、对齐与寿命可审查。未选择异步、owner 或 OS 的同步实例不预留它们的最大状态。"
+msgstr ""
+"Static instances retain only the selected mode's config, runtime, requests, "
+"streams and receipts. Read-only operations tables are shared; capacities, "
+"byte units, alignment and lifetimes remain reviewable. Synchronous instances"
+" that do not select asynchronous operations, owners or an OS do not reserve "
+"their maximum state."
+
+#: ../../../../../../docs/explanation/design-principles.md:25
+msgid ""
+"不以提前交还 DMA buffer、少读 volatile、遗漏屏障或省略错误退出换取性能。优化需要等价配置下的 "
+"ELF、反汇编或测量。间接调用能否消除、CPU 利用率和栈峰值都需要实际证据。"
+msgstr ""
+"Do not gain performance by returning DMA buffers early, omitting volatile "
+"reads, dropping barriers or skipping error withdrawal. Optimizations require"
+" ELF, disassembly or measurements under equivalent configurations. "
+"Eliminated indirect calls, CPU utilization and peak stack use all require "
+"actual evidence."
+
+#: ../../../../../../docs/explanation/design-principles.md:27
+msgid "窄接口保持可替换"
+msgstr "Keep narrow interfaces substitutable"
+
+#: ../../../../../../docs/explanation/design-principles.md:29
+msgid ""
+"公共 face 只有领域操作和实例 context。Provider 维持相同单位、错误、借用、完成与失败责任；厂商 "
+"Handle、寄存器编码和可变状态留私有。控制器与子端点分别拥有身份，不能用第一个子设备冒充整个总线。"
+msgstr ""
+"A public face exposes only domain operations and instance context. Providers"
+" preserve units, errors, borrowing, completion and failure responsibilities;"
+" vendor Handles, register encodings and mutable state remain private. "
+"Controllers and child endpoints have distinct identities; the first child "
+"device cannot stand in for the entire bus."
+
+#: ../../../../../../docs/explanation/design-principles.md:31
+msgid ""
+"单一职责体现为事实、校验、C "
+"行为、执行和产品策略分别维护。开闭原则依据真实变化点；接口隔离不要求构造统一设备基类或所有内核对象的共同表示。依赖倒置通过窄端口和显式注入实现。"
+msgstr ""
+"Single responsibility separates facts, validation, C behavior, execution and"
+" product policy. The open/closed principle follows real variation points. "
+"Interface segregation does not require a universal device base type or a "
+"common representation of every kernel object. Narrow ports and explicit "
+"injection implement dependency inversion."
+
+#: ../../../../../../docs/explanation/design-principles.md:33
+msgid "执行和退出都明确"
+msgstr "Make execution and withdrawal explicit"
+
+#: ../../../../../../docs/explanation/design-principles.md:35
+msgid ""
+"平台不创建默认 worker、不替产品启动 scheduler。应用指定唯一执行者，持续 service，提供绝对同域 deadline、请求和 "
+"buffer。停止先关准入，再撤回硬件引用、排空并 join；首次撤回失败保留剩余责任。"
+msgstr ""
+"The platform creates no default worker and does not start the product "
+"scheduler. The application supplies a sole executor, continued service, "
+"absolute deadlines in one domain, requests and buffers. Shutdown closes "
+"admission before withdrawing hardware references, draining and joining. The "
+"first withdrawal failure retains all remaining responsibilities."
+
+#: ../../../../../../docs/explanation/design-principles.md:37
+msgid "![平台启动和撤回](../assets/diagrams/platform-lifecycle.svg)"
+msgstr ""
+"![Platform startup and withdrawal](../assets/diagrams/platform-"
+"lifecycle.svg)"
+
+#: ../../../../../../docs/explanation/design-principles.md:37
+msgid "平台启动和撤回"
+msgstr "Platform startup and withdrawal"
+
+#: ../../../../../../docs/explanation/design-principles.md:39
+msgid ""
+"ACCEPTED 与 SETTLED 是借用边界，不是普通函数返回状态。cancel、timeout、DMA TC 或诊断 detach "
+"均不撤销借用。QUARANTINED 状态继续拥有必要存储与恢复责任。"
+msgstr ""
+"ACCEPTED and SETTLED define borrowing boundaries, not ordinary function-"
+"return states. Cancellation, timeout, DMA TC and diagnostic detach never "
+"revoke a borrow. QUARANTINED retains the required storage and recovery "
+"responsibilities."
+
+#: ../../../../../../docs/explanation/design-principles.md:41
+msgid "维护成本也是设计成本"
+msgstr "Maintenance cost is a design cost"
+
+#: ../../../../../../docs/explanation/design-principles.md:43
+msgid ""
+"一个事实只有一个作者来源。公开签名由头文件生成，示例引用维护中的真实文件；目录 README "
+"解释自身责任。不要为了统一外观增加转发层、重复状态或第二份源码图。"
+msgstr ""
+"Each fact has one authoring authority. Public signatures are generated from "
+"headers; examples reference actual maintained files; directory READMEs "
+"explain local responsibilities. Do not add forwarding layers, duplicated "
+"state or another source graph merely to make structures look uniform."
+
+#: ../../../../../../docs/explanation/design-principles.md:45
+msgid ""
+"同资源和工作负载下比较成本，按独立实现类保留关键回归。真实 RED–GREEN、源码和配置身份、原始失败与独立评审共同支撑维护。软件行为、ARM "
+"链接、SDK 消费和物理 HIL 是不同范围。"
+msgstr ""
+"Compare costs under the same resources and workload, and retain critical "
+"regressions per independent implementation class. Actual RED–GREEN, source "
+"and configuration identities, original failures and independent review "
+"support maintenance. Software behavior, ARM linking, SDK consumption and "
+"physical HIL have distinct scopes."

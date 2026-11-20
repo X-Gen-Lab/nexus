@@ -1,19 +1,25 @@
 ---
 id: development.index
 type: reference
-audience: consumer
-source_language: en
+audience: maintainer
+source_language: zh_CN
 ---
 
-# Maintaining Nexus
+# 维护平台与文档
 
-Preserve current formatting and comment conventions. New behavior uses real RED–GREEN execution; documentation checks and firmware qualification have separate scopes.
+平台贡献保留既有 C11、格式与注释合同，新行为执行真实 RED／GREEN。
+按当前任务进入工具、依赖、SDK 或文档流程。
 
 ```{toctree}
-:maxdepth: 2
+:maxdepth: 1
 
 workflow
+coding-standards
+source-map
+dependencies
+sdk-publishing
 documentation
-implementation-map
-coding_standards
 ```
+
+只开发外部应用时先看[应用指南](../guides/index.md)；公共状态与字段见
+[参考合同](../reference/contracts/index.md)。

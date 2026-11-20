@@ -61,7 +61,7 @@ COMMIT_ALIASES = {
     ".editorconfig": ("scripts/ci/test_format_tool.py",
                        "scripts/ci/test_cmake_format.py"),
     ".github/security/trufflehog.json": ("tools/testing/test_secret_scan.py",),
-    "docs/development/coding_standards.rst": (
+    "docs/development/coding-standards.md": (
         "scripts/ci/test_comment_style.py", "scripts/ci/test_cmake_format.py"),
     "tools/dev/dev.py": ("tools/testing/test_dev.py",
                          "tools/testing/test_dev_efficiency.py",

@@ -38,5 +38,5 @@ PROGRAM／ERASE 使用 Core 请求发布合同。准入在读输入或触碰硬�
 这是 coherent CPU 模型，拒绝 XIP／DMA reader tag，不提供持久化或物理存储驱动。
 
 具体物理 provider 的器件、factory／资源装配和 reader tag 以
-[精确支持](../../../docs/delivery/support.md)为准。CPU 映射不授权 DMA reader、XIP、
+[精确支持](../../../docs/reference/platforms/support.md)为准。CPU 映射不授权 DMA reader、XIP、
 其他总线 master 或未知 Board 接线；实际时序与 HIL 仍分别验收。

@@ -1,26 +1,23 @@
 ---
-id: docs-reference-configuration-assembly
+id: reference.configuration.assembly
 type: reference
 audience: consumer
 source_language: en
 ---
 
-(docs-reference-configuration-assembly)=
+(reference.configuration.assembly)=
 # Assembly input and rejected selections
 
 The authored configuration authority is one schema-2 TOML assembly. SoC and Board
 facts remain maintained JSON; `resolved.json` is output, not an authored alternative.
-CMake owns software dependencies. Failed TOML resolution never falls back to Kconfig,
-cache variables, schema-1 JSON or old generated headers. Legacy JSON assemblies
-are rejected as inputs, not retained as an alternate authoring interface.
+CMake owns software dependencies. Unknown fields, unsupported modes and resource conflicts reject before publication.
+Legacy JSON assemblies are not accepted.
 
 The parser creates immutable `AuthoredAssembly` intent. Production consumers use
-`resolve_ir()` and named immutable `ConfigurationIR` decisions; only audit and
-artifact-boundary consumers request `to_dict()`. Typed source epoch 5, its complete
-schema-1 audit projection and the selected schema-2 `resolved.json` file are
-separate contracts. The
-[source compatibility policy](../../design/source-compatibility.md) owns their
-version declarations; neither introduces firmware metadata or runtime dispatch.
+`resolve_ir()` and named immutable `ConfigurationIR` decisions. Audit JSON is a
+one-way projection. Format versions are defined by the
+[SDK format contract](../contracts/sdk-format.md); they add no
+firmware metadata or runtime dispatch.
 
 Before running the resolver, prepare the
 [fixed source and recursive dependencies](../../guides/source-checkout.md).
@@ -52,29 +49,15 @@ physical DMA controller/stream, clock, exact memory domain, mode and endpoint id
 A syntactically valid selector can still reject because that provider does not
 implement the route. The resolver never silently changes pins, modes or clock.
 
-See the [configuration and ownership guide](../../guides/developer-workflow.md)
+See the [configuration and ownership guide](../../guides/app-configuration.md)
 for Board-first queries, validated profiles, human summaries and effective diffs.
 `explain` defaults to human-readable output; automation must select `--json`.
 
-Every generated bundle contains `nexus_factory_strong.h`. Application code can
-include it and use nominal references such as `NX_UART_REF_UART0` with
-`nx_factory_uart_ref`; no `[factory]` selection enables that header.
-`factory.strong` is not a supported field and rejects as unknown. The optional
-`capabilities = true` selection emits immutable mode metadata separately from
-the interface faces. Factory getters return existing static objects and do not
-start hardware. Only selected classes have factory IDs and getters. Optional
-application composition can test `NX_FACTORY_HAS_<CLASS>` with `defined`; absent
-classes leave that macro undefined. Invalid IDs of a selected class still return
-NULL, and optional extensions retain their own unsupported-mode contracts.
-
-The generated schema-2 `resolved.json` records effective controllers, endpoints,
-selected routes and Board bindings, resources, memory, budgets and input identities.
-It omits the unused candidate route catalogue. `fact_references` identifies the
-original fact files by path and SHA-256 instead of embedding complete device-review
-catalogues. The resolver still validates the complete facts, and its configuration
-digest remains based on the complete typed IR projection. `list-bindings` and `explain` use the full validated IR; candidate
-queries check the fact bytes against the recorded input hashes. Do not hand-edit
-this output or treat it as a second authored configuration.
+Every selected Platform emits static factory interfaces; their exact selection,
+strong-reference API and audit records are described in
+[generated outputs](generated-output.md). Getters never start hardware.
+`factory.strong` is not a supported input field. `[factory]` accepts only
+`capabilities`, which selects optional immutable metadata.
 
 ## Logical GPIO signals
 
@@ -234,7 +217,7 @@ and is not protected from writes by this layout.
 For an offset image or nonzero reservations, generated linker checks require
 `.isr_vector` at the derived executable origin, correct alignment, a nonempty
 table no larger than 512 bytes, and the actual vendor symbol at the section
-base: `g_pfnVectors` for F407 or `__gVectors` for GD470. The reviewed startup sets
+base: `g_pfnVectors` for the reviewed F407 startup. The reviewed startup sets
 VTOR from that linked symbol with the required barriers. Default zero-reservation
 reset-address linking keeps its existing semantics.
 
@@ -270,26 +253,15 @@ image handoff. Baremetal or FreeRTOS links prove their build scope only. In
 particular, the existing F407 handoff retains PRIMASK=1 and startup does not
 unmask it; no FreeRTOS handoff qualification follows from an offset link.
 
-## Inspect and generate
+## Resolve the selected input
 
-Run from the repository root, using a new output you own:
+Use the [application configuration guide](../../guides/app-configuration.md)
+for check, explain and generation steps. Each Board/backend combination owns a
+separate output and build directory. Failed generation invalidates only its owned
+output; audit files never become author input.
 
-```sh
-python tools/configure/configure.py list-bindings     --assembly tools/configure/assemblies/qiming-baremetal-uart.toml
-python tools/configure/configure.py check     --assembly tools/configure/assemblies/qiming-baremetal-uart.toml
-python tools/configure/configure.py explain     --assembly tools/configure/assemblies/qiming-baremetal-uart.toml
-python tools/configure/configure.py generate     --assembly tools/configure/assemblies/qiming-baremetal-uart.toml     --output /tmp/nexus-native-config
-```
-
-`check` and `explain` do not generate output. `generate` publishes one atomic owned
-bundle; failure invalidates its owned output without replacing unrelated data.
-Inspect `resolved.json`, input identities, generated `nexus_config.h`, bindings,
-factory, linker memory and budgets. Changing declared inputs requires a fresh
-resolution; separate Board/backend combinations use separate build roots.
-
-CPU-only Runtime has a separate authored runtime TOML using the shared CPU resolver.
-It emits Core/Arch/optional OS policy, no SoC/Board/startup/factory. Do not use it to
-claim a full device platform. The [build contract](../../design/build-system.md),
-[integration contract](../../design/integration-contracts.md) and production field
-model/schema own detailed accepted fields; editor completion does not establish
-hardware capability.
+CPU-only Runtime uses its own TOML with the shared CPU resolver. It selects
+Core/Arch/optional OS policy without SoC, Board, startup or factory. Its field
+model does not grant a complete device platform. See the
+[build contract](../contracts/build-system.md) and
+[integration contract](../contracts/integration.md).

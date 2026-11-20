@@ -34,21 +34,24 @@ RUNTIME_MODULES = tuple(dependency.path for dependency in SOURCE_DEPENDENCIES)
 
 def required_submodules(scope: str, family: str | None = None,
                         backend: str = "baremetal", *,
-                        components=(), host_support=False, root=None) -> tuple[str, ...]:
+                        components=(), host_support=False, test_support=False,
+                        root=None) -> tuple[str, ...]:
     """Prepare production choices or the explicit maintained host test graph."""
     if type(host_support) is not bool or (
             host_support and scope != "sdk"):
         raise EvidenceError("host support is an explicit SDK source profile")
+    if type(test_support) is not bool or (test_support and scope != "assembly"):
+        raise EvidenceError("test support is an explicit application model choice")
     if scope == "native":
         if family not in (None, "native"):
             raise EvidenceError("Native tests cannot select a hardware family")
         return tuple(item.path for item in ALL_SOURCE_DEPENDENCIES
                      if item.scope in {"runtime", "host-test"})
-    if scope not in {"arm", "sdk"}:
+    if scope not in {"arm", "sdk", "assembly"}:
         raise EvidenceError("unsupported dependency scope")
     root = ROOT if root is None else Path(root)
     try:
-        if family is None and scope != "arm":
+        if family is None and scope == "sdk":
             from tools.configure.metadata import load_policy
             from tools.configure.packages import load
             defaults = load_policy(root)["source_sdk"]["default_package_manifests"]
@@ -56,7 +59,8 @@ def required_submodules(scope: str, family: str | None = None,
                 raise ValueError("Select one explicit dependency family")
             family = load(root / defaults[0]).family
         return tuple(item.path for item in source_catalogue.runtime_selection(
-            family, backend=backend, components=components, root=root))
+            family, backend=backend, components=components, root=root,
+            test_support=(family == "native" and test_support)))
     except (OSError, ValueError) as error:
         raise EvidenceError("unsupported dependency scope/family/backend") from error
 
@@ -325,13 +329,14 @@ def _available_sources(root: Path, records):
 
 def prepare(root: Path, scope: str, *, family: str | None = None,
             backend: str = "baremetal", components=(),
-            host_support: bool = False,
+            host_support: bool = False, test_support: bool = False,
             allow_network: bool = False) -> dict:
     root = Path(root).absolute()
     selected = required_submodules(scope, family, backend, components=components,
-                                  host_support=host_support, root=root)
+                                  host_support=host_support,
+                                  test_support=test_support, root=root)
     closure = _inspect_sources(root, selected, migrating=allow_network)
-    if allow_network:
+    if allow_network and selected:
         _available_sources(root, closure)
         advertised = {record["path"] for record in closure}
         _git(root, "submodule", "sync", "--", *selected)
@@ -372,25 +377,13 @@ def prepare(root: Path, scope: str, *, family: str | None = None,
             "status": "verified"}
 
 
-def preset_selection(root: Path, preset: str) -> dict:
-    """Use the maintained preset resolver; source selection remains TOML-owned."""
-    from tools.dev.presets import selected_configure
+def assembly_selection(root: Path, assembly: Path, *,
+                       test_support: bool = False) -> dict:
+    """Select dependency identity from authored inputs, without building code."""
     from tools.evidence.common import identifier
-    selected = selected_configure(root, preset)
-    values = selected.get("cacheVariables", {})
-    assembly = values.get("NEXUS_ASSEMBLY_FILE")
-    if isinstance(assembly, dict):
-        assembly = assembly.get("value")
-    if not isinstance(assembly, str):
-        raise EvidenceError("dependency preset must select its authored assembly")
-    path = Path(assembly)
-    if not path.is_absolute():
-        path = root / path
-    test_support = values.get("NEXUS_TEST_SUPPORT", False)
-    if isinstance(test_support, dict):
-        test_support = test_support.get("value")
-    test_support = test_support is True or (
-        isinstance(test_support, str) and test_support.upper() in {"ON", "TRUE", "1"})
+    if type(test_support) is not bool:
+        raise EvidenceError("test support must be boolean")
+    path = Path(assembly).absolute()
     authored = tomllib.loads(regular_file(path).read_text())
     if "board" in authored and "board_package" in authored:
         raise EvidenceError("assembly must choose Board identity or package, not both")
@@ -406,7 +399,8 @@ def preset_selection(root: Path, preset: str) -> dict:
         board = identifier(authored.get("board"), "assembly Board")
         if board == "native_reference":
             if not test_support:
-                raise EvidenceError("Native Board requires NEXUS_TEST_SUPPORT")
+                raise EvidenceError("Native Board requires test support "
+                                    "(NEXUS_TEST_SUPPORT / --test-support)")
             board_path = root / "tests/support/native/board/board.json"
         else:
             board_path = root / "boards" / board / "board.json"
@@ -415,15 +409,51 @@ def preset_selection(root: Path, preset: str) -> dict:
     backend = authored.get("backend")
     if family == "native":
         if not test_support:
-            raise EvidenceError("Native Board requires NEXUS_TEST_SUPPORT")
+            raise EvidenceError("Native Board requires test support "
+                                "(NEXUS_TEST_SUPPORT / --test-support)")
         scope = "native"
     else:
         scope = "arm"
     components = list(authored.get("components", ()))
-    required_submodules(scope, family, backend, components=components, root=root)
-    return {"components": components, "test_support": test_support,"scope": scope, "family": family, "backend": backend,
-            "preset": preset, "assembly": file_identity(path),
+    return {"components": components, "test_support": test_support,
+            "scope": scope, "family": family, "backend": backend,
+            "assembly": file_identity(path),
             "board": file_identity(board_path)}
+
+
+def preset_selection(root: Path, preset: str) -> dict:
+    """Keep Native maintenance presets on their complete host-test graph."""
+    from tools.dev.presets import selected_configure
+    values = selected_configure(root, preset).get("cacheVariables", {})
+    assembly = values.get("NEXUS_ASSEMBLY_FILE")
+    if isinstance(assembly, dict):
+        assembly = assembly.get("value")
+    if not isinstance(assembly, str):
+        raise EvidenceError("dependency preset must select its authored assembly")
+    path = Path(assembly)
+    if not path.is_absolute():
+        path = root / path
+    support = values.get("NEXUS_TEST_SUPPORT", False)
+    if isinstance(support, dict):
+        support = support.get("value")
+    support = support is True or (isinstance(support, str) and
+                                 support.upper() in {"ON", "TRUE", "1"})
+    selection = assembly_selection(root, path, test_support=support)
+    required_submodules(selection["scope"], selection["family"],
+                        selection["backend"], components=selection["components"],
+                        root=root)
+    return {**selection, "preset": preset}
+
+
+def prepare_assembly(root: Path, assembly: Path, *, test_support: bool = False,
+                     allow_network: bool = False) -> dict:
+    """Prepare one consumer, without selecting the platform maintenance graph."""
+    selection = assembly_selection(root, assembly, test_support=test_support)
+    return {**prepare(root, "assembly", family=selection["family"],
+                      backend=selection["backend"],
+                      components=selection["components"],
+                      test_support=test_support, allow_network=allow_network),
+            **selection, "scope": "assembly"}
 
 
 def prepare_preset(root: Path, preset: str, *, allow_network: bool = False) -> dict:
@@ -873,8 +903,10 @@ def main(argv=None) -> int:
     actions = parser.add_subparsers(dest="operation", required=True)
     child = actions.add_parser("prepare")
     child.add_argument("--root", type=Path, default=ROOT)
-    child.add_argument("--scope", choices=("native", "arm", "sdk", "preset"), required=True)
+    child.add_argument("--scope", choices=("native", "arm", "sdk", "preset", "assembly"), required=True)
     child.add_argument("--preset")
+    child.add_argument("--assembly", type=Path)
+    child.add_argument("--test-support", action="store_true")
     child.add_argument("--family", help="exact family declared by the selected source")
     child.add_argument("--backend", choices=("baremetal", "freertos", "threadx"))
     child.add_argument("--component", action="append", default=[])
@@ -903,7 +935,19 @@ def main(argv=None) -> int:
     args = parser.parse_args(argv)
     try:
         if args.operation == "prepare":
-            if args.scope == "preset":
+            if args.scope == "assembly":
+                if args.assembly is None:
+                    parser.error("assembly preparation requires --assembly")
+                if (args.preset is not None or args.family is not None or
+                        args.backend is not None or args.component or
+                        args.host_support):
+                    parser.error("assembly preparation selects its source profile from its assembly")
+                result = prepare_assembly(args.root, args.assembly,
+                    test_support=args.test_support,
+                    allow_network=args.allow_network)
+            elif args.assembly is not None or args.test_support:
+                parser.error("--assembly and --test-support require --scope assembly")
+            elif args.scope == "preset":
                 if args.preset is None:
                     parser.error("preset preparation requires --preset")
                 if (args.family is not None or args.backend is not None or

@@ -1,82 +1,47 @@
 ---
-id: docs-tutorials-async-io
+id: tutorials.async-io
 type: tutorial
 audience: consumer
-source_language: en
+source_language: zh_CN
 ---
 
-(docs-tutorials-async-io)=
-# Observe rejection, borrow, cancellation and drain
+# 沿一次 UART 请求理解借用
 
-Run this host tutorial to observe the real public SPI API against a Native provider.
-It demonstrates software ownership and failure paths, not physical DMA timing.
-The complete executable fixture is the maintained GoogleTest target; its model
-controls stand in for external IRQ and wire progress only. GoogleTest/GoogleMock
-and C++17 are host-only; production firmware remains C11.
+先完成[Native 应用](first-native.md)。本教程使用同一份已运行的 `main.c`，
+沿问候消息检查有限请求的准备、接纳、结清和停止，不建立第二份模拟驱动。
 
-First obtain the [fixed source and recursive dependencies](../guides/source-checkout.md).
-Keep the source revision with your fresh execution reports.
+## 找到真实请求与存储
 
-## Build and run the complete fixtures
+打开生成工程的 `main.c`。`s_request` 和 `s_message` 为静态对象，
+`send_greeting` 使用绝对 deadline 准备请求，经 `nx_uart_port_submit` 提交，
+再由同一个执行者调用 `nx_uart_port_service`。
 
-From the repository root, with host tools and pinned dependencies available:
+准备失败或提交被拒绝时，请求未开始借用。提交成功后，循环持续观察
+`NX_REQUEST_SETTLED`，不会在 deadline 到达时立即退出并复用存储。
+应用随后读取最终结果与已传输数量，只有结清或拒绝后才调用平台停止。
 
-```sh
-python tools/dev/dev.py configure --preset native-debug
-python tools/dev/dev.py build --preset native-debug --parallel 4     --target nexus_native_async_test nexus_native_factory_test nexus_uart_owner_mock_test
-```
+## 执行并检查顺序
 
-Run each binary without a filter and retain fresh XML in a new directory:
+设置 `PRODUCT_DIR` 为之前创建的工程路径，再运行：
 
 ```sh
-mkdir -p /tmp/nexus-io-tutorial
-build/native-debug/bin/nexus_native_async_test     --gtest_output=xml:/tmp/nexus-io-tutorial/async.xml
-build/native-debug/bin/nexus_native_factory_test     --gtest_output=xml:/tmp/nexus-io-tutorial/factory.xml
-build/native-debug/bin/nexus_uart_owner_mock_test     --gtest_output=xml:/tmp/nexus-io-tutorial/owner.xml
+cmake --build "$PRODUCT_DIR/build" --parallel 2
+ctest --test-dir "$PRODUCT_DIR/build" --output-on-failure --no-tests=error
 ```
 
-All three commands must exit zero and report passing, nonzero test counts. These
-complete target executions are a tutorial scope, not the all-target commit TDD
-qualification. Remove the tutorial directory only after retaining needed reports.
+`starter_application` 应通过。核对源代码中的顺序：启动 Platform、取得
+`NX_UART_REF_CONSOLE`、准备和提交、持续 service、观察结清、读取结果、停止。
+factory 获取本身不分配或初始化硬件。
 
-## Follow the normal and rejected admission path
+## 把规则带到自己的应用
 
-```{literalinclude} ../../tests/google/io/native_async_test.cpp
-:language: cpp
-:start-at: TEST_F(NativeAsync, SPIBorrowWaitsForWireCompletionAndOtherEndpointRejects)
-:end-before: TEST_F(NativeAsync, FixedDummyAndDiscardOnlyTouchTheirExplicitCells)
-:caption: Complete maintained test: same-controller rejection and wire completion.
-```
+换成通知或等待适配时，保留同一个绝对 deadline 和最终请求谓词。通知是提示，
+不是完成本身。多个 producer 需要明确 owner；不要阻塞唯一能推进请求的执行者。
 
-The first endpoint accepts its request. The caller keeps the request and buffers
-alive. The second endpoint returns `NX_ERROR_BUSY` while its request stays READY;
-that rejection retains no borrow. Stepping payload transfer does not publish
-SETTLED before the simulated wire-completion step. Service and IRQ progress remain
-explicit; a waiting client cannot assume a hidden worker.
+取消、超时和 `QUARANTINED` 不结束借用。失败排空时保留请求、payload 和有关
+控制／观察者状态，按实际 owner 继续处理。并非所有等待都能证明有限停机。
 
-## Follow cancellation and failed drain
-
-```{literalinclude} ../../tests/google/io/native_async_test.cpp
-:language: cpp
-:start-at: TEST_F(NativeAsync, SPIQuarantineRetainsBorrowAndStopUntilDrain)
-:end-before: TEST_F(NativeAsync, UARTIDLEBlocksStayImmutableAndLossPrecedesLaterData)
-:caption: Complete maintained cancellation fixture; held drain retains the borrow.
-```
-
-Cancel requests termination. With drain deliberately held, the request becomes
-QUARANTINED, stop returns BUSY and prepare rejects reuse. The model then supplies
-actual drain progress; service publishes SETTLED and result observation exposes
-the cancelled result and transferred prefix. Removing the model hold is a test
-control, not a generic production recovery API.
-
-The generated factory fixture also tests platform stop with a quarantined UART
-borrow. The UART owner fixture checks rejected submissions and retained payload
-against GoogleMock dependency ports. Read [ownership](../explanation/ownership.md)
-before copying request storage into an application.
-
-![Request admission, drain, quarantine and final settlement](../assets/diagrams/request-lifecycle.svg)
-
-FIG-06 expresses current Core helper transitions with provider proof obligations.
-The [I/O lifecycle matrix](https://github.com/X-Gen-Lab/nexus/blob/83a27dfbee4e8fbf4d35875b1e9db85af7516eec/docs/design/io-lifecycle-matrix.md) limits
-what these models establish. IRQ hints, stable slot epochs, observer detach and
-join require the [OS shutdown guide](../guides/os-shutdown.md).
+当前模式与限制见[支持参考](../reference/platforms/support.md)，完整规则见
+[I/O 执行](../guides/io-execution.md)和[所有权](../explanation/ownership.md)。
+实现维护者可进一步查看 `tests/google/io/native_async_test.cpp` 的拒绝、取消和
+结清回归；这些回归不替代真实 DMA／线路时序测量。

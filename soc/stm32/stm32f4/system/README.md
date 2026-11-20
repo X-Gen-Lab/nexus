@@ -320,7 +320,7 @@ executor、IRQ、DMA、notification 和 memory owner。关闭准入后，以真�
 权限在没有活跃 FP owner 时可接纳；尾部以 DSB／ISB 禁用 CP10／11，随后替换 MSP
 并跳转。
 
-[FIG-05 Platform 生命周期](../../../../docs/explanation/platform-architecture.md#lifecycle-and-failure-responsibility)
+[FIG-05 Platform 生命周期](../../../../docs/explanation/platform-architecture.md#启动失败与停机)
 说明平台停止前的排空与失败保留；镜像交接还须满足本文的 masks、向量和存储前提。
 图不表示通用 boot 或已执行物理交接。
 

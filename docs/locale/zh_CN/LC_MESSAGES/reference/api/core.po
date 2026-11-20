@@ -1,459 +1,42 @@
+#
 msgid ""
-msgstr "Project-Id-Version: Nexus documentation\nLanguage: zh_CN\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Source-SHA256: 78ed21136b8eecb64162fa8b7b792e80930c4c78b19e0d24f3cb4123ae88c9fb\nX-Nexus-Reviewed: true\n"
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: db8ef307c52ea3a863f211b0d6ffa4494b14473addcfcb6a0ff54f49ba048fb7\n"
 
+#: ../../../../../../docs/reference/api/core.md:8
 msgid "Core: requests, status and time"
 msgstr "Core：请求、状态与时间"
 
-msgid "These declarations come from public header files. Selection, lifecycle, supported execution modes and physical authorization remain bounded by the corresponding design and support records."
+#: ../../../../../../docs/reference/api/core.md:10
+msgid ""
+"These declarations come from public header files. Selection, lifecycle, "
+"supported execution modes and physical authorization remain bounded by the "
+"corresponding design and support records."
 msgstr "这些声明来自公共头文件。选择、生命周期、支持的执行模式和物理资源授权范围仍以对应设计及支持记录为准。"
 
-msgid "fault.h"
-msgstr "fault.h"
-
-msgid "Bounded observation before retaining platform fail-stop."
-msgstr "在平台保持故障停止之前执行有界观察。"
-
-msgid "Author  Nexus Team"
-msgstr "作者  Nexus Team"
-
-msgid "Enums"
-msgstr "枚举"
-
-msgid "Fault origin, without any product safety or recovery decision."
-msgstr "故障来源，不包含任何产品安全或恢复决策。"
-
-msgid "Values:"
-msgstr "取值："
-
-msgid "Functions"
-msgstr "函数"
-
-msgid "Observe a terminal fault before the caller retains effects."
-msgstr "在调用者保留效果之前观察终止故障。"
-
-msgid "Parameters"
-msgstr "参数"
-
-msgid "memory.h"
-msgstr "memory.h"
-
-msgid "Variable-only placement in explicitly selected data regions."
-msgstr "仅将变量放入显式选定的数据区域。"
-
-msgid "Defines"
-msgstr "宏定义"
-
-msgid "Place static storage in an authored optional memory region."
-msgstr "将静态存储放入配置声明的可选内存区域。"
-
-msgid "request.h"
-msgstr "request.h"
-
-msgid "Caller-owned admission, borrow, settlement and stable cancellation."
-msgstr "调用者拥有的准入、借用、结清与稳定取消机制。"
-
-msgid "Request state; only READY and SETTLED have no provider borrow."
-msgstr "请求状态；只有 READY 和 SETTLED 不存在提供者借用。"
-
-msgid "Initialize fresh unborrowed request storage."
-msgstr "初始化全新且未被借用的请求存储。"
-
-msgid "Prepare a READY or consumed SETTLED request."
-msgstr "准备处于 READY 或结果已消费的 SETTLED 请求。"
-
-msgid "Returns"
-msgstr "返回值"
-
-msgid "Read request state with acquire ordering."
-msgstr "以 acquire 顺序读取请求状态。"
-
-msgid "Establish the chain's unique admission and provider borrow."
-msgstr "建立请求链唯一的准入判定和提供者借用。"
-
-msgid "Advance an already admitted request without readmission."
-msgstr "推进已准入的请求，不重复准入。"
-
-msgid "Release-publish SETTLED as the final provider access."
-msgstr "作为提供者最后一次访问，以 release 顺序发布 SETTLED。"
-
-msgid "Copy the unique settled result after acquire publication."
-msgstr "在 acquire 观察发布之后，复制唯一的最终结果。"
-
-msgid "Bind a stable slot to a new request incarnation."
-msgstr "将稳定槽绑定到新的请求实例世代。"
-
-msgid "Resolve cancellation using stable storage before dereference."
-msgstr "在解引用之前，通过稳定存储解析取消请求。"
-
-msgid "Drop a slot reference only after settlement and control drain."
-msgstr "仅在请求结清且控制引用排空之后撤销槽引用。"
-
-msgid "Caller-owned request metadata, without payload or callbacks."
-msgstr "调用者拥有的请求元数据，不含载荷或回调。"
-
-msgid "Public Members"
-msgstr "公共成员"
-
-msgid "Adapter-owned stable cancellation identity."
-msgstr "适配器拥有的稳定取消身份。"
-
-msgid "request_observer.h"
-msgstr "request_observer.h"
-
-msgid "Optional stable-identity request observation without locks."
-msgstr "可选、无锁、基于稳定身份的请求观察。"
-
-msgid "Bind the exact live incarnation without storing its pointer."
-msgstr "绑定准确且存活的实例世代，不存储其指针。"
-
-msgid "Copy state and acquire-observed final result for exact epoch."
-msgstr "复制准确 epoch 的状态，以及以 acquire 观察的最终结果。"
-
-msgid "Remove only this sidecar reference, leaving loans untouched."
-msgstr "仅移除此附加观察引用，不改变借用。"
-
-msgid "Copied facts; result/count are valid only when settled is true."
-msgstr "已复制的事实；仅 settled 为 true 时 result/count 有效。"
-
-msgid "Caller-owned optional sidecar, fresh zero storage before bind."
-msgstr "调用者拥有的可选附加状态，绑定之前必须使用全新清零存储。"
-
-msgid "stack_observation.h"
-msgstr "stack_observation.h"
-
-msgid "Bounded read-only observation of caller-painted stack spans."
-msgstr "对调用者涂色的栈范围作有界只读观察。"
-
-msgid "Read a bounded low-address paint prefix without mutation."
-msgstr "读取有界的低地址涂色前缀，不修改存储。"
-
-msgid "Byte-prefix paint observations, not an exact physical stack peak."
-msgstr "字节前缀涂色观察，不是准确的物理栈峰值。"
-
-msgid "status.h"
-msgstr "status.h"
-
-msgid "Small vendor-independent result vocabulary."
-msgstr "精简且独立于厂商的结果集合。"
-
-msgid "Operation result; success at submission means admission only."
-msgstr "操作结果；提交时成功只表示已准入。"
-
-msgid "time.h"
-msgstr "time.h"
-
-msgid "Absolute monotonic microsecond deadlines and wrap extension."
-msgstr "绝对单调微秒截止时间与回绕扩展。"
-
-msgid "Typedefs"
-msgstr "类型定义"
-
-msgid "Microseconds in one boot/clock domain; no wall-clock semantics."
-msgstr "同一启动／时钟域内的微秒数，不具有墙上时钟语义。"
-
-msgid "Read the selected provider's monotonic clock."
-msgstr "读取选定提供者的单调时钟。"
-
-msgid "Test an absolute deadline against a clock snapshot."
-msgstr "依据时钟快照检查绝对截止时间。"
-
-msgid "Add a duration without wrapping the monotonic domain."
-msgstr "增加持续时间，不使单调时间域回绕。"
-
-msgid "Initialize counter extension and its clock domain."
-msgstr "初始化计数扩展及其时钟域。"
-
-msgid "Extend a wrapping counter and convert to microseconds."
-msgstr "扩展回绕计数器并换算为微秒。"
-
-msgid "An explicitly injected clock; its context outlives all borrowers."
-msgstr "显式注入的时钟；其上下文必须在所有借用者退出前保持有效。"
-
-msgid "State for extending one 32-bit free-running hardware counter."
-msgstr "用于扩展一个 32 位自由运行硬件计数器的状态。"
-
-msgid "Nexus Team"
-msgstr "Nexus Team"
-
-msgid "The weak default returns and has no state or side effects. A product may supply one strong implementation, bounded and allocation-free in every calling task/ISR/masked context. No functioning kernel, clock, stack, transport or peripheral may be assumed after corruption. This is best-effort observation, not stack repair, safe outputs or reset proof. The hook must not acquire OS locks, reenter the provider, change incoming masks, mutate accepted requests or release retained storage. If it returns, the terminal caller still parks. A product may perform a separately reviewed non-returning recovery action. No retained event, registry or worker is implicit."
-msgstr "默认弱实现直接返回，不保存状态，也不产生副作用。产品可提供一个强实现，但在每种调用它的任务／ISR／已屏蔽上下文中都必须有界且不分配内存。发生损坏后，不得假定内核、时钟、栈、传输或外设仍正常。这里只提供尽力而为的观察，不修复栈，也不证明安全输出或复位。hook 不得取得 OS 锁、重入 provider、改变传入屏蔽、修改已接受的请求或释放保留的存储。若 hook 返回，终止路径的调用方仍将停驻。产品可执行另行审查且不返回的恢复操作。不隐式保留事件、注册表或 worker。"
-
-msgid "[in] Actual reporting path, not a severity assessment."
-msgstr "[in] 实际报告路径，不表示严重程度评估。"
-
-msgid "[in] Observed failure, never permission to reclaim loans."
-msgstr "[in] 观察到的故障，绝不授予回收借用的权限。"
-
-msgid "[in] Static source literal or NULL; do not retain or read untrusted dynamic memory. No task name is dereferenced."
-msgstr "[in] 静态源码字符串字面量或 NULL；不得保留或读取不可信动态内存。不解引用任务名。"
-
-msgid "[in] Diagnostic location, zero when unavailable."
-msgstr "[in] 诊断位置；不可用时为零。"
-
-
-msgid "Task-only. Never use initialization to revoke a live borrow."
-msgstr "仅限任务上下文。绝不能通过初始化撤销存续的借用。"
-
-msgid "[out] Fresh storage, not visible to a provider/observer."
-msgstr "[out] 全新存储，尚不对 provider／观察者可见。"
-
-msgid "Single owner, task-only; failure creates no borrow."
-msgstr "唯一所有者，仅限任务上下文；失败不产生借用。"
-
-msgid "[inout] Storage with no remaining observers or adapter loans."
-msgstr "[inout] 不再有观察者或适配器借用的存储。"
-
-msgid "[in] Absolute transfer deadline, including queue time."
-msgstr "[in] 包含排队时间的绝对传输 deadline。"
-
-msgid "NX_SUCCESS; invalid pointer or borrowed state is rejected."
-msgstr "成功返回 NX_SUCCESS；拒绝无效指针或已借用状态。"
-
-msgid "Task/IRQ bounded; SETTLED guarantees provider's final access has occurred, not that separate adapter observers exited."
-msgstr "任务／IRQ 中的有界操作；SETTLED 保证 provider 的最终访问已经发生，不保证独立的适配器观察者已经退出。"
-
-msgid "[in] Initialized storage kept alive by the caller."
-msgstr "[in] 由调用者保持存续的已初始化存储。"
-
-msgid "Current state, or QUARANTINED for NULL."
-msgstr "当前状态；NULL 返回 QUARANTINED。"
-
-msgid "One serialized execution owner; validate hardware/buffers first. Multi-producer adapters hold their metadata guard across admission; concurrent admissions are unsupported."
-msgstr "只允许一个串行化的执行所有者；先验证硬件／缓冲区。多生产者适配器须在整个准入期间持有元数据保护；不支持并发准入。"
-
-msgid "[inout] READY request; caller owns storage until SETTLED."
-msgstr "[inout] READY 请求；调用者须保持存储，直到 SETTLED。"
-
-msgid "[in] QUEUED for adapter or ACTIVE for direct provider."
-msgstr "[in] 适配器使用 QUEUED；直接 provider 使用 ACTIVE。"
-
-msgid "NX_SUCCESS means ACCEPTED. Any failure means REJECTED with zero retained references, payload access or residual effects."
-msgstr "NX_SUCCESS 表示 ACCEPTED。任何失败均表示 REJECTED，且不保留引用、不访问载荷，也不遗留效果。"
-
-msgid "Execution owner; short task/IRQ metadata operation."
-msgstr "执行所有者调用；任务／IRQ 中的短元数据操作。"
-
-msgid "[inout] Admitted request owned by the executor."
-msgstr "[inout] 已获准入、由执行器拥有的请求。"
-
-msgid "[in] ACTIVE, DRAINING or QUARANTINED."
-msgstr "[in] ACTIVE、DRAINING 或 QUARANTINED。"
-
-msgid "NX_SUCCESS or NX_ERROR_STATE for an illegal transition."
-msgstr "成功返回 NX_SUCCESS；非法转换返回 NX_ERROR_STATE。"
-
-msgid "Detach active/queued references and capture any static wake target first. No hardware/IRQ/deferred observer may access request or payload afterwards. Cancel/timeout alone do not satisfy this requirement. A failed drain stays QUARANTINED."
-msgstr "先撤离 active/queued 引用，并捕获所有静态唤醒目标。此后任何硬件／IRQ／延后观察者都不得再访问请求或载荷。仅取消／超时不能满足此条件。排空失败时继续保持 QUARANTINED。"
-
-msgid "[inout] Borrowed storage after all sources have drained."
-msgstr "[inout] 所有源均已排空后的借用存储。"
-
-msgid "[in] Final transfer result, not admission status."
-msgstr "[in] 最终传输结果，不是准入状态。"
-
-msgid "[in] Valid transferred bytes/samples."
-msgstr "[in] 有效传输的字节／样本数。"
-
-msgid "[in] Live request storage with no concurrent reuse."
-msgstr "[in] 存续的请求存储，且不得并发复用。"
-
-msgid "NX_SUCCESS, NX_ERROR_BUSY while borrowed or invalid arguments."
-msgstr "成功返回 NX_SUCCESS；仍在借用时返回 NX_ERROR_BUSY；参数无效时拒绝。"
-
-msgid "[in] Live storage to bind; binding itself is not admission."
-msgstr "[in] 待绑定的存续存储；绑定本身不表示准入。"
-
-msgid "[out] Nonzero identity for later control commands."
-msgstr "[out] 用于后续控制命令的非零身份标识。"
-
-msgid "NX_SUCCESS, BUSY, INVALID or EXHAUSTED; no identity repeats."
-msgstr "返回 NX_SUCCESS、BUSY、INVALID 或 EXHAUSTED；身份标识绝不重复。"
-
-msgid "[in] Stable slot protected by adapter synchronization."
-msgstr "[in] 由适配器同步保护的稳定槽。"
-
-msgid "[in] Incarnation named by the command."
-msgstr "[in] 命令所指定的实例代次。"
-
-msgid "Live request only for a matching bound incarnation; else NULL."
-msgstr "仅在已绑定的实例代次匹配时返回存续请求；否则返回 NULL。"
-
-msgid "[inout] Stable slot whose commands/observers have exited."
-msgstr "[inout] 相关命令／观察者均已退出的稳定槽。"
-
-msgid "[in] Incarnation to release."
-msgstr "[in] 要释放的实例代次。"
-
-msgid "NX_SUCCESS, STATE for stale identity, BUSY while borrowed."
-msgstr "成功返回 NX_SUCCESS；身份标识过期返回 STATE；仍有借用返回 BUSY。"
-
-msgid "Fields are private to helpers/providers while borrowed. Initialize before first use. One owner prepares/submits and consumes results. GCC/Clang lock-free 32-bit atomic access publishes state; fields are read only after acquire SETTLED."
-msgstr "借用期间字段只由 helper/provider 私有访问。首次使用前先初始化。由同一所有者准备／提交并消费结果。通过 GCC/Clang 无锁的 32 位原子访问发布状态；只有以 acquire 语义观察到 SETTLED 后才读取字段。"
-
-msgid "The slot, not a possibly freed request, is targeted by cross- task commands. Serialize bind/lookup/release in the adapter. Keep slot and command storage until command acknowledgement; epoch exhaustion rejects rebinding rather than reusing IDs."
-msgstr "跨任务命令针对槽，而不针对可能已释放的请求。在适配器中串行化 bind/lookup/release。保留槽与命令存储，直到命令获确认；epoch 耗尽时拒绝重新绑定，不复用 ID。"
-
-msgid "[inout] Fresh zero/detached sidecar, distinct control."
-msgstr "[inout] 全新且已零初始化，或已撤离的 sidecar；控制存储须独立。"
-
-msgid "[in] Stable caller slot, protected by caller exclusion."
-msgstr "[in] 由调用者互斥保护的稳定调用者槽。"
-
-msgid "[in] Nonzero exact slot incarnation, never regenerated."
-msgstr "[in] 非零且精确的槽实例代次，绝不重新生成。"
-
-msgid "SUCCESS or INVALID/STATE, no retained reference on rejection."
-msgstr "返回 SUCCESS 或 INVALID/STATE；拒绝时不保留引用。"
-
-msgid "Borrowed state exposes no speculative result/count. NULL slot, stale epoch and overlap reject before request access. This neither services hardware nor interprets deadline as borrow release. Caller guarantees binding storage lifetime. Output is disjoint from the complete descriptor and borrowed buffers; only the common request span is checked here."
-msgstr "借用状态不暴露推测的结果／计数。NULL 槽、过期 epoch 和重叠均在访问请求前拒绝。它既不推进硬件，也不把 deadline 解释为借用释放。调用者保证绑定存储的生命周期。输出须与完整描述符及已借用缓冲区不重叠；这里只检查公共 request 跨度。"
-
-msgid "[inout] Bound sidecar under caller serialization."
-msgstr "[inout] 由调用者串行化保护的已绑定 sidecar。"
-
-msgid "[in] Same monotonic domain as the request deadline."
-msgstr "[in] 与请求 deadline 相同的单调时间域。"
-
-msgid "[out] Distinct output, unchanged on error."
-msgstr "[out] 独立输出；错误时保持不变。"
-
-msgid "Caller-serialized; allowed while request is quarantined. It is not request settlement, slot release or destruction."
-msgstr "由调用者串行化；请求处于 QUARANTINED 时也允许调用。它不表示请求结算、槽释放或销毁。"
-
-msgid "[inout] Live sidecar after all its readers have exited."
-msgstr "[inout] 所有读取者均已退出后的存续 sidecar。"
-
-msgid "One serialized observer; no Arch/OS/SoC dependency or lock. Caller excludes slot bind/release, request prepare/reuse and concurrent observer calls during sample. Stable slot stays alive until detach; observing never acquires/releases a loan."
-msgstr "只允许一个串行化观察者；不依赖 Arch/OS/SoC，也不使用锁。采样期间调用者须排除槽 bind/release、请求 prepare/reuse 及并发观察调用。稳定槽须存续至 detach；观察绝不取得或释放借用。"
-
-msgid "Caller ensures this region is quiescent and painting had no live frames. No Arch/OS dependency or internal mask occurs. Work is at most bytes reads. Unwritten reservations or writes equal to paint can hide usage; this is not overflow detection. MSP qualification needs independently established boot paint and a quiescent sampling point. The span excludes current SP, all active frames and exception-stack reservation. It never paints or claims to read the physical MSP register."
-msgstr "调用者须保证该区域静默，且填充标记时没有活动栈帧。不依赖 Arch/OS，也不在内部屏蔽中断。工作量最多为 bytes 次读取。未被写入的保留区，或恰好等于填充值的写入，可能掩盖实际使用；这不是溢出检测。MSP 资格需要独立确认启动时填充标记的来源，以及静默的采样点。该跨度须排除当前 SP、全部活动栈帧及异常栈保留区。它既不填充栈，也不声称读取物理 MSP 寄存器。"
-
-msgid "[in] Live downward-growing stack region, caller-provenance."
-msgstr "[in] 调用者证明来源的、存续且向下增长的栈区域。"
-
-msgid "[in] Original positive painted region capacity in bytes."
-msgstr "[in] 原始已填充标记区域的正容量，单位为字节。"
-
-msgid "[in] Exact fill used before the region became active."
-msgstr "[in] 区域启用前使用的精确填充值。"
-
-msgid "[out] Distinct output, unchanged on invalid span or alias."
-msgstr "[out] 独立输出；跨度或别名无效时保持不变。"
-
-msgid "SUCCESS or INVALID, without allocation or retained pointers."
-msgstr "返回 SUCCESS 或 INVALID，不分配内存，也不保留指针。"
-
-msgid "Physical providers require successful platform startup and a privileged task/configurable IRQ; NMI/HardFault callers are unsupported. No OS, allocation or wait. Physical clocks return zero outside a successfully started live epoch; zero alone cannot prove readiness. Startup status is authoritative. All consumers join before clock withdrawal. Stop/restart or a clock change invalidates every old deadline, even if a new epoch has the same numerical value. UINT64_MAX is reserved; clock exhaustion requires controlled restart. An observed hardware overflow acknowledgement failure ends the live epoch and is terminal, even when finite source isolation succeeds. The provider retains ownership, masks interrupts, calls nx_fault_observe and parks if the observer returns. It never resumes deadline consumers with invalid zero time. Observation neither releases loans nor proves safe outputs; products own separately reviewed non-returning recovery. Ordinary shutdown still requires every consumer and optional low-power owner joined first."
-msgstr "物理 provider 要求平台已成功启动，调用者为特权任务／可配置 IRQ；不支持 NMI/HardFault 调用者。不调用 OS、不分配内存，也不等待。物理时钟在已成功启动且仍存续的 epoch 之外返回零；仅凭零不能证明就绪，启动状态才是权威。撤销时钟前须等待全部消费者退出。停止／重启或时钟变化会使全部旧 deadline 失效，即使新 epoch 的数值相同。UINT64_MAX 为保留值；时钟耗尽要求受控重启。若观察到硬件溢出确认失败，即使已成功隔离有限源，也会终止当前 epoch，并进入不可继续的终态。provider 保留所有权、屏蔽中断、调用 nx_fault_observe；若观察者返回则停驻。它绝不会以无效的零时间恢复 deadline 消费者。观察既不释放借用，也不证明安全输出；产品负责另行审查且不返回的恢复路径。普通关闭仍须先等待所有消费者及可选低功耗所有者退出。"
-
-msgid "Microseconds since domain initialization."
-msgstr "自时间域初始化以来的微秒数。"
-
-msgid "[in] Absolute time or NX_DEADLINE_NEVER."
-msgstr "[in] 绝对时间或 NX_DEADLINE_NEVER。"
-
-msgid "[in] Snapshot in the same clock domain."
-msgstr "[in] 同一时钟域中的快照。"
-
-msgid "True when a finite deadline has expired, including equality."
-msgstr "有限 deadline 已到期时为 true，包含恰好相等的情况。"
-
-msgid "[in] Current finite time."
-msgstr "[in] 当前有限时间。"
-
-msgid "[in] Relative duration in microseconds."
-msgstr "[in] 相对时长，单位为微秒。"
-
-msgid "Absolute deadline, saturating at NX_DEADLINE_NEVER."
-msgstr "绝对 deadline，饱和于 NX_DEADLINE_NEVER。"
-
-msgid "Single execution owner. Reset creates a new clock domain; do not reuse outstanding deadlines after reset/clock change."
-msgstr "唯一执行所有者。复位会建立新的时钟域；复位／时钟变化后不得复用尚未完成的 deadline。"
-
-msgid "[out] Caller-owned extension state."
-msgstr "[out] 调用者拥有的扩展状态。"
-
-msgid "[in] First hardware snapshot."
-msgstr "[in] 第一次硬件快照。"
-
-msgid "[in] Nonzero stable counter frequency."
-msgstr "[in] 非零且稳定的计数器频率。"
-
-msgid "NX_SUCCESS, or NX_ERROR_INVALID for invalid arguments."
-msgstr "成功返回 NX_SUCCESS；参数无效返回 NX_ERROR_INVALID。"
-
-msgid "[inout] Initialized, single-owner extension state."
-msgstr "[inout] 已初始化、仅有一个所有者的扩展状态。"
-
-msgid "[in] Current counter snapshot."
-msgstr "[in] 当前计数器快照。"
-
-msgid "SUCCESS, STATE for stale/released identity, INVALID for invalid arguments or IO for reversed time. Counters saturate without epoch reuse."
-msgstr "成功返回 SUCCESS；身份标识过期／已释放返回 STATE；参数无效返回 INVALID；时间倒退返回 IO；计数器饱和，不复用 epoch。"
-
-msgid "Use these attributes on variable definitions, before the type, one variable per declaration. They are not function or instruction attributes. Each use has an independent input section for garbage collection of unused storage. DATA copies its initializer from Flash at reset. BSS is zeroed at reset. NOINIT is neither copied nor cleared; initialize it before reading. Power-loss retention is not promised. BSS/NOINIT reject nonzero initializers. Storage is word aligned and subject to explicit ELF budgets. Unselected use is a compile error. TCM is CPU-only data: never DMA or executable storage. CCM is also CPU-only data; placement never grants bus-master access. ADDSRAM DMA requires provider address, alignment and ownership validation. Ordinary storage, the main MSP and unselected images keep their existing layout. U575 SRAM4 selection also prepares reset-owned PWR/SRAM4/LPDMA run gates; autonomous operation and DMA borrow admission require their own provider."
-msgstr "这些属性用于变量定义，置于类型之前，每个声明只定义一个变量；它们不是函数或指令属性。每次使用都有独立的输入 section，便于回收未使用存储。DATA 在复位时从 Flash 复制初始值；BSS 在复位时清零；NOINIT 既不复制也不清零，读取前必须初始化。不承诺掉电保持。BSS/NOINIT 拒绝非零初始值。存储按字对齐，并受显式 ELF 预算约束。未选入时使用会触发编译错误。TCM 仅用于 CPU 数据，绝不能用作 DMA 或可执行存储。CCM 同样仅用于 CPU 数据，放置在其中不授予总线主设备访问权限。ADDSRAM DMA 仍须由 provider 验证地址、对齐和所有权。普通存储、主 MSP 及未选入的镜像保留现有布局。U575 SRAM4 选择还会准备由复位流程拥有的 PWR/SRAM4/LPDMA 运行门控；自主运行及 DMA 借用接纳仍需各自的 provider。"
-
-msgid "Outputs are separate writable objects, disjoint from the complete request and each other. They remain unchanged on rejection. The caller establishes these spans; this hot helper validates NULL arguments and the settled predicate, not arbitrary storage provenance."
-msgstr "输出为独立可写对象，与完整请求及彼此均不重叠。拒绝时保持不变。调用者确立这些范围；此热路径 helper 验证 NULL 参数和已结清谓词，不验证任意存储来源。"
-
-msgid "[out] Distinct final operation result."
-msgstr "[out] 独立的最终操作结果。"
-
-msgid "[out] Distinct valid byte/sample count."
-msgstr "[out] 独立的有效字节／样本数。"
-
-msgid "Zero-initialize only before first publication. After the last usable UINT64_MAX epoch, retire this slot. Replacing its storage requires every old command and observer joined; clearing a live epoch is not retirement."
-msgstr "只在首次发布之前零初始化。最后可用 UINT64_MAX epoch 之后，退役此 slot。替换其存储要求所有旧命令和观察者均已 join；清除仍存活的 epoch 并非退役。"
-
-msgid "[inout] Initialized, unbound adapter-owned stable slot."
-msgstr "[inout] 已初始化且未绑定的适配器所属稳定 slot。"
-
-msgid "Construct a finite deadline without selecting infinite wait."
-msgstr "构造有限 deadline，不选择无限等待。"
-
-msgid "Bounded task/IRQ arithmetic, without reads of a clock, allocation or retained references. Clock readiness and domain lifetime remain the caller's responsibility. Use nx_deadline_after only when saturation to an infinite wait is intentional."
-msgstr "有界的任务／IRQ 算术，不读取时钟、不分配，也不保留引用。时钟就绪和域生命周期仍由调用者负责。仅在明确希望饱和为无限等待时使用 nx_deadline_after。"
-
-msgid "[in] Current finite time in the consumer's clock domain."
-msgstr "[in] 消费者时钟域中的当前有限时间。"
-
-msgid "[in] Relative duration in microseconds; zero is valid."
-msgstr "[in] 相对时长，单位微秒；零合法。"
-
-msgid "[out] Finite result, unchanged on failure."
-msgstr "[out] 有限结果，失败时保持不变。"
-
-msgid "SUCCESS; INVALID for NULL output or nonfinite now; EXHAUSTED when the sum reaches NX_DEADLINE_NEVER or would overflow."
-msgstr "SUCCESS；输出为 NULL 或 now 非有限时返回 INVALID；和达到 NX_DEADLINE_NEVER 或将溢出时返回 EXHAUSTED。"
-
-msgid "Observe strictly before 2^32 ticks elapse, even when idle. Multiple missed wraps cannot be detected from two snapshots, nor can one complete wrap at equal snapshots. Counter must continue through waits; frequency cannot change. No concurrent initialize/reset or observation."
-msgstr "必须在 2^32 个 tick 经过之前严格提前观察，即使空闲时也如此。两个快照无法检测漏过的多次回绕，也无法检测快照相等时恰好完整回绕一次。等待期间计数器必须持续运行，频率不得改变。不得并发初始化／复位或观察。"
-
-msgid "[out] Distinct extended elapsed microseconds."
-msgstr "[out] 独立的扩展后经过时间，单位微秒。"
-
-msgid "SUCCESS, INVALID for NULL/overlapping output, STATE for an uninitialized clock, or EXHAUSTED. Failure changes neither extension state nor output."
-msgstr "SUCCESS；输出为 NULL／重叠时返回 INVALID；时钟未初始化时返回 STATE；或返回 EXHAUSTED。失败不改变扩展状态或输出。"
-
-#: docs/reference/api/core.md:12
+#: ../../../../../../docs/reference/api/core.md:14
 msgid "Cold lifecycle entry points"
 msgstr "冷态生命周期入口"
 
-#: docs/reference/api/core.md:0
+#: ../../../../../../docs/reference/api/core.md:0
 msgid "Scope"
 msgstr "范围"
 
-#: docs/reference/api/core.md:0
+#: ../../../../../../docs/reference/api/core.md:0
 msgid "Public entry and contract"
 msgstr "公共入口与合同"
 
-#: docs/reference/api/core.md:0
+#: ../../../../../../docs/reference/api/core.md:0
 msgid "Reversible resource transactions"
 msgstr "可撤销资源事务"
 
-#: docs/reference/api/core.md:0
+#: ../../../../../../docs/reference/api/core.md:0
 msgid ""
 "[`lifecycle.h`](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/core/include/nexus/core/lifecycle.h): `nx_lifecycle_start/stop` "
@@ -463,11 +46,11 @@ msgstr ""
 "SOURCE/core/include/nexus/core/lifecycle.h)：`nx_lifecycle_start/stop` "
 "对静态资源计划执行准入，并重试保留的逆序清理责任。"
 
-#: docs/reference/api/core.md:0
+#: ../../../../../../docs/reference/api/core.md:0
 msgid "Complete platform coordination"
 msgstr "整平台协调"
 
-#: docs/reference/api/core.md:0
+#: ../../../../../../docs/reference/api/core.md:0
 msgid ""
 "[`platform_lifecycle.h`](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
 "DOCUMENTATION-SOURCE/core/include/nexus/core/platform_lifecycle.h): "
@@ -480,7 +63,7 @@ msgstr ""
 "SOURCE/core/include/nexus/core/platform_lifecycle.h)：`nx_platform_lifecycle_start/stop`"
 " 协调 System、共享资源和物理 controller，提供独立的 primary／cleanup 结果与可选调用期诊断。"
 
-#: docs/reference/api/core.md:19
+#: ../../../../../../docs/reference/api/core.md:21
 msgid ""
 "The [Core contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
 "DOCUMENTATION-SOURCE/core/README.md) explains both mechanisms and their "
@@ -495,3 +78,1251 @@ msgstr ""
 "SOURCE/core/README.md)说明两种机制及其失败边界。调用者提供首次清零的状态，保持 plan 与 owner "
 "收条存活，串行执行生命周期调用，并在 stop 前等待退出使用者。factory 查询与正常 I/O 不经过这两个生命周期引擎。完整类型、回调要求和 "
 "C／C++ 声明由链接的公共头定义；这两种机制均不启动 scheduler，也不建立物理支持。"
+
+#: ../../../../../../docs/reference/api/core.md:30
+msgid "fault.h"
+msgstr "fault.h"
+
+#: ../../../../../../docs/reference/api/core.md:32
+msgid "Bounded observation before retaining platform fail-stop."
+msgstr "在平台保持故障停止之前执行有界观察。"
+
+#: ../../../../../../docs/reference/api/core.md:32
+#: ../../../../../../docs/reference/api/core.md:40
+#: ../../../../../../docs/reference/api/core.md:48
+#: ../../../../../../docs/reference/api/core.md:56
+#: ../../../../../../docs/reference/api/core.md:64
+#: ../../../../../../docs/reference/api/core.md:72
+#: ../../../../../../docs/reference/api/core.md:80
+#: ../../../../../../docs/reference/api/core.md:87
+msgid "Author  Nexus Team"
+msgstr "作者  Nexus Team"
+
+#: ../../../../../../docs/reference/api/core.md:32
+#: ../../../../../../docs/reference/api/core.md:40
+#: ../../../../../../docs/reference/api/core.md:48
+#: ../../../../../../docs/reference/api/core.md:56
+#: ../../../../../../docs/reference/api/core.md:64
+#: ../../../../../../docs/reference/api/core.md:72
+#: ../../../../../../docs/reference/api/core.md:80
+#: ../../../../../../docs/reference/api/core.md:87
+#: ../../../../../../docs/reference/api/core.md:93
+#: ../../../../../../docs/reference/api/core.md:99
+msgid "Nexus Team"
+msgstr "Nexus Team"
+
+#: ../../../../../../docs/reference/api/core.md:32
+#: ../../../../../../docs/reference/api/core.md:48
+#: ../../../../../../docs/reference/api/core.md:72
+#: ../../../../../../docs/reference/api/core.md:87
+#: ../../../../../../docs/reference/api/core.md:93
+#: ../../../../../../docs/reference/api/core.md:99
+msgid "Enums"
+msgstr "枚举"
+
+#: ../../../../../../docs/reference/api/core.md:32
+msgid "Fault origin, without any product safety or recovery decision."
+msgstr "故障来源，不包含任何产品安全或恢复决策。"
+
+#: ../../../../../../docs/reference/api/core.md:32
+#: ../../../../../../docs/reference/api/core.md:48
+#: ../../../../../../docs/reference/api/core.md:72
+#: ../../../../../../docs/reference/api/core.md:87
+#: ../../../../../../docs/reference/api/core.md:93
+#: ../../../../../../docs/reference/api/core.md:99
+msgid "Values:"
+msgstr "取值："
+
+#: ../../../../../../docs/reference/api/core.md:32
+#: ../../../../../../docs/reference/api/core.md:48
+#: ../../../../../../docs/reference/api/core.md:56
+#: ../../../../../../docs/reference/api/core.md:64
+#: ../../../../../../docs/reference/api/core.md:80
+#: ../../../../../../docs/reference/api/core.md:87
+#: ../../../../../../docs/reference/api/core.md:93
+#: ../../../../../../docs/reference/api/core.md:99
+msgid "Functions"
+msgstr "函数"
+
+#: ../../../../../../docs/reference/api/core.md:32
+msgid "Observe a terminal fault before the caller retains effects."
+msgstr "在调用者保留效果之前观察终止故障。"
+
+#: ../../../../../../docs/reference/api/core.md:32
+msgid ""
+"The weak default returns and has no state or side effects. A product may "
+"supply one strong implementation, bounded and allocation-free in every "
+"calling task/ISR/masked context. No functioning kernel, clock, stack, "
+"transport or peripheral may be assumed after corruption. This is best-effort"
+" observation, not stack repair, safe outputs or reset proof. The hook must "
+"not acquire OS locks, reenter the provider, change incoming masks, mutate "
+"accepted requests or release retained storage. If it returns, the terminal "
+"caller still parks. A product may perform a separately reviewed non-"
+"returning recovery action. No retained event, registry or worker is "
+"implicit."
+msgstr ""
+"默认弱实现直接返回，不保存状态，也不产生副作用。产品可提供一个强实现，但在每种调用它的任务／ISR／已屏蔽上下文中都必须有界且不分配内存。发生损坏后，不得假定内核、时钟、栈、传输或外设仍正常。这里只提供尽力而为的观察，不修复栈，也不证明安全输出或复位。hook"
+" 不得取得 OS 锁、重入 provider、改变传入屏蔽、修改已接受的请求或释放保留的存储。若 hook "
+"返回，终止路径的调用方仍将停驻。产品可执行另行审查且不返回的恢复操作。不隐式保留事件、注册表或 worker。"
+
+#: ../../../../../../docs/reference/api/core.md:0
+msgid "Parameters"
+msgstr "参数"
+
+#: ../../../../../../docs/reference/api/core.md:32
+msgid "[in] Actual reporting path, not a severity assessment."
+msgstr "[in] 实际报告路径，不表示严重程度评估。"
+
+#: ../../../../../../docs/reference/api/core.md:32
+msgid "[in] Observed failure, never permission to reclaim loans."
+msgstr "[in] 观察到的故障，绝不授予回收借用的权限。"
+
+#: ../../../../../../docs/reference/api/core.md:32
+msgid ""
+"[in] Static source literal or NULL; do not retain or read untrusted dynamic "
+"memory. No task name is dereferenced."
+msgstr "[in] 静态源码字符串字面量或 NULL；不得保留或读取不可信动态内存。不解引用任务名。"
+
+#: ../../../../../../docs/reference/api/core.md:32
+msgid "[in] Diagnostic location, zero when unavailable."
+msgstr "[in] 诊断位置；不可用时为零。"
+
+#: ../../../../../../docs/reference/api/core.md:38
+msgid "memory.h"
+msgstr "memory.h"
+
+#: ../../../../../../docs/reference/api/core.md:40
+msgid "Variable-only placement in explicitly selected data regions."
+msgstr "仅将变量放入显式选定的数据区域。"
+
+#: ../../../../../../docs/reference/api/core.md:40
+#: ../../../../../../docs/reference/api/core.md:80
+msgid "Defines"
+msgstr "宏定义"
+
+#: ../../../../../../docs/reference/api/core.md:40
+msgid "Place static storage in an authored optional memory region."
+msgstr "将静态存储放入配置声明的可选内存区域。"
+
+#: ../../../../../../docs/reference/api/core.md:40
+msgid ""
+"Use these attributes on variable definitions, before the type, one variable "
+"per declaration. They are not function or instruction attributes. Each use "
+"has an independent input section for garbage collection of unused storage. "
+"DATA copies its initializer from Flash at reset. BSS is zeroed at reset. "
+"NOINIT is neither copied nor cleared; initialize it before reading. Power-"
+"loss retention is not promised. BSS/NOINIT reject nonzero initializers. "
+"Storage is word aligned and subject to explicit ELF budgets. Unselected use "
+"is a compile error. TCM is CPU-only data: never DMA or executable storage. "
+"CCM is also CPU-only data; placement never grants bus-master access. ADDSRAM"
+" DMA requires provider address, alignment and ownership validation. Ordinary"
+" storage, the main MSP and unselected images keep their existing layout. "
+"U575 SRAM4 selection also prepares reset-owned PWR/SRAM4/LPDMA run gates; "
+"autonomous operation and DMA borrow admission require their own provider."
+msgstr ""
+"这些属性用于变量定义，置于类型之前，每个声明只定义一个变量；它们不是函数或指令属性。每次使用都有独立的输入 section，便于回收未使用存储。DATA"
+" 在复位时从 Flash 复制初始值；BSS 在复位时清零；NOINIT 既不复制也不清零，读取前必须初始化。不承诺掉电保持。BSS/NOINIT "
+"拒绝非零初始值。存储按字对齐，并受显式 ELF 预算约束。未选入时使用会触发编译错误。TCM 仅用于 CPU 数据，绝不能用作 DMA "
+"或可执行存储。CCM 同样仅用于 CPU 数据，放置在其中不授予总线主设备访问权限。ADDSRAM DMA 仍须由 provider "
+"验证地址、对齐和所有权。普通存储、主 MSP 及未选入的镜像保留现有布局。U575 SRAM4 选择还会准备由复位流程拥有的 "
+"PWR/SRAM4/LPDMA 运行门控；自主运行及 DMA 借用接纳仍需各自的 provider。"
+
+#: ../../../../../../docs/reference/api/core.md:46
+msgid "request.h"
+msgstr "request.h"
+
+#: ../../../../../../docs/reference/api/core.md:48
+msgid "Caller-owned admission, borrow, settlement and stable cancellation."
+msgstr "调用者拥有的准入、借用、结清与稳定取消机制。"
+
+#: ../../../../../../docs/reference/api/core.md:48
+msgid "Request state; only READY and SETTLED have no provider borrow."
+msgstr "请求状态；只有 READY 和 SETTLED 不存在提供者借用。"
+
+#: ../../../../../../docs/reference/api/core.md:48
+msgid "Initialize fresh unborrowed request storage."
+msgstr "初始化全新且未被借用的请求存储。"
+
+#: ../../../../../../docs/reference/api/core.md:48
+msgid "Task-only. Never use initialization to revoke a live borrow."
+msgstr "仅限任务上下文。绝不能通过初始化撤销存续的借用。"
+
+#: ../../../../../../docs/reference/api/core.md:48
+msgid "[out] Fresh storage, not visible to a provider/observer."
+msgstr "[out] 全新存储，尚不对 provider／观察者可见。"
+
+#: ../../../../../../docs/reference/api/core.md:48
+msgid "Prepare a READY or consumed SETTLED request."
+msgstr "准备处于 READY 或结果已消费的 SETTLED 请求。"
+
+#: ../../../../../../docs/reference/api/core.md:48
+msgid "Single owner, task-only; failure creates no borrow."
+msgstr "唯一所有者，仅限任务上下文；失败不产生借用。"
+
+#: ../../../../../../docs/reference/api/core.md:48
+msgid "[inout] Storage with no remaining observers or adapter loans."
+msgstr "[inout] 不再有观察者或适配器借用的存储。"
+
+#: ../../../../../../docs/reference/api/core.md:48
+msgid "[in] Absolute transfer deadline, including queue time."
+msgstr "[in] 包含排队时间的绝对传输 deadline。"
+
+#: ../../../../../../docs/reference/api/core.md:0
+msgid "Returns"
+msgstr "返回值"
+
+#: ../../../../../../docs/reference/api/core.md:48
+msgid "NX_SUCCESS; invalid pointer or borrowed state is rejected."
+msgstr "成功返回 NX_SUCCESS；拒绝无效指针或已借用状态。"
+
+#: ../../../../../../docs/reference/api/core.md:48
+msgid "Read request state with acquire ordering."
+msgstr "以 acquire 顺序读取请求状态。"
+
+#: ../../../../../../docs/reference/api/core.md:48
+msgid ""
+"Task/IRQ bounded; SETTLED guarantees provider's final access has occurred, "
+"not that separate adapter observers exited."
+msgstr "任务／IRQ 中的有界操作；SETTLED 保证 provider 的最终访问已经发生，不保证独立的适配器观察者已经退出。"
+
+#: ../../../../../../docs/reference/api/core.md:48
+msgid "[in] Initialized storage kept alive by the caller."
+msgstr "[in] 由调用者保持存续的已初始化存储。"
+
+#: ../../../../../../docs/reference/api/core.md:48
+msgid "Current state, or QUARANTINED for NULL."
+msgstr "当前状态；NULL 返回 QUARANTINED。"
+
+#: ../../../../../../docs/reference/api/core.md:48
+msgid "Establish the chain's unique admission and provider borrow."
+msgstr "建立请求链唯一的准入判定和提供者借用。"
+
+#: ../../../../../../docs/reference/api/core.md:48
+msgid ""
+"One serialized execution owner; validate hardware/buffers first. Multi-"
+"producer adapters hold their metadata guard across admission; concurrent "
+"admissions are unsupported."
+msgstr "只允许一个串行化的执行所有者；先验证硬件／缓冲区。多生产者适配器须在整个准入期间持有元数据保护；不支持并发准入。"
+
+#: ../../../../../../docs/reference/api/core.md:48
+msgid "[inout] READY request; caller owns storage until SETTLED."
+msgstr "[inout] READY 请求；调用者须保持存储，直到 SETTLED。"
+
+#: ../../../../../../docs/reference/api/core.md:48
+msgid "[in] QUEUED for adapter or ACTIVE for direct provider."
+msgstr "[in] 适配器使用 QUEUED；直接 provider 使用 ACTIVE。"
+
+#: ../../../../../../docs/reference/api/core.md:48
+msgid ""
+"NX_SUCCESS means ACCEPTED. Any failure means REJECTED with zero retained "
+"references, payload access or residual effects."
+msgstr "NX_SUCCESS 表示 ACCEPTED。任何失败均表示 REJECTED，且不保留引用、不访问载荷，也不遗留效果。"
+
+#: ../../../../../../docs/reference/api/core.md:48
+msgid "Advance an already admitted request without readmission."
+msgstr "推进已准入的请求，不重复准入。"
+
+#: ../../../../../../docs/reference/api/core.md:48
+msgid "Execution owner; short task/IRQ metadata operation."
+msgstr "执行所有者调用；任务／IRQ 中的短元数据操作。"
+
+#: ../../../../../../docs/reference/api/core.md:48
+msgid "[inout] Admitted request owned by the executor."
+msgstr "[inout] 已获准入、由执行器拥有的请求。"
+
+#: ../../../../../../docs/reference/api/core.md:48
+msgid "[in] ACTIVE, DRAINING or QUARANTINED."
+msgstr "[in] ACTIVE、DRAINING 或 QUARANTINED。"
+
+#: ../../../../../../docs/reference/api/core.md:48
+msgid "NX_SUCCESS or NX_ERROR_STATE for an illegal transition."
+msgstr "成功返回 NX_SUCCESS；非法转换返回 NX_ERROR_STATE。"
+
+#: ../../../../../../docs/reference/api/core.md:48
+msgid "Release-publish SETTLED as the final provider access."
+msgstr "作为提供者最后一次访问，以 release 顺序发布 SETTLED。"
+
+#: ../../../../../../docs/reference/api/core.md:48
+msgid ""
+"Detach active/queued references and capture any static wake target first. No"
+" hardware/IRQ/deferred observer may access request or payload afterwards. "
+"Cancel/timeout alone do not satisfy this requirement. A failed drain stays "
+"QUARANTINED."
+msgstr ""
+"先撤离 active/queued "
+"引用，并捕获所有静态唤醒目标。此后任何硬件／IRQ／延后观察者都不得再访问请求或载荷。仅取消／超时不能满足此条件。排空失败时继续保持 "
+"QUARANTINED。"
+
+#: ../../../../../../docs/reference/api/core.md:48
+msgid "[inout] Borrowed storage after all sources have drained."
+msgstr "[inout] 所有源均已排空后的借用存储。"
+
+#: ../../../../../../docs/reference/api/core.md:48
+msgid "[in] Final transfer result, not admission status."
+msgstr "[in] 最终传输结果，不是准入状态。"
+
+#: ../../../../../../docs/reference/api/core.md:48
+msgid "[in] Valid transferred bytes/samples."
+msgstr "[in] 有效传输的字节／样本数。"
+
+#: ../../../../../../docs/reference/api/core.md:48
+msgid "Copy the unique settled result after acquire publication."
+msgstr "在 acquire 观察发布之后，复制唯一的最终结果。"
+
+#: ../../../../../../docs/reference/api/core.md:48
+msgid ""
+"Outputs are separate writable objects, disjoint from the complete request "
+"and each other. They remain unchanged on rejection. The caller establishes "
+"these spans; this hot helper validates NULL arguments and the settled "
+"predicate, not arbitrary storage provenance."
+msgstr ""
+"输出为独立可写对象，与完整请求及彼此均不重叠。拒绝时保持不变。调用者确立这些范围；此热路径 helper 验证 NULL "
+"参数和已结清谓词，不验证任意存储来源。"
+
+#: ../../../../../../docs/reference/api/core.md:48
+msgid "[in] Live request storage with no concurrent reuse."
+msgstr "[in] 存续的请求存储，且不得并发复用。"
+
+#: ../../../../../../docs/reference/api/core.md:48
+msgid "[out] Distinct final operation result."
+msgstr "[out] 独立的最终操作结果。"
+
+#: ../../../../../../docs/reference/api/core.md:48
+msgid "[out] Distinct valid byte/sample count."
+msgstr "[out] 独立的有效字节／样本数。"
+
+#: ../../../../../../docs/reference/api/core.md:48
+msgid "NX_SUCCESS, NX_ERROR_BUSY while borrowed or invalid arguments."
+msgstr "成功返回 NX_SUCCESS；仍在借用时返回 NX_ERROR_BUSY；参数无效时拒绝。"
+
+#: ../../../../../../docs/reference/api/core.md:48
+msgid "Bind a stable slot to a new request incarnation."
+msgstr "将稳定槽绑定到新的请求实例世代。"
+
+#: ../../../../../../docs/reference/api/core.md:48
+msgid ""
+"Zero-initialize only before first publication. After the last usable "
+"UINT64_MAX epoch, retire this slot. Replacing its storage requires every old"
+" command and observer joined; clearing a live epoch is not retirement."
+msgstr ""
+"只在首次发布之前零初始化。最后可用 UINT64_MAX epoch 之后，退役此 slot。替换其存储要求所有旧命令和观察者均已 "
+"join；清除仍存活的 epoch 并非退役。"
+
+#: ../../../../../../docs/reference/api/core.md:48
+msgid "[inout] Initialized, unbound adapter-owned stable slot."
+msgstr "[inout] 已初始化且未绑定的适配器所属稳定 slot。"
+
+#: ../../../../../../docs/reference/api/core.md:48
+msgid "[in] Live storage to bind; binding itself is not admission."
+msgstr "[in] 待绑定的存续存储；绑定本身不表示准入。"
+
+#: ../../../../../../docs/reference/api/core.md:48
+msgid "[out] Nonzero identity for later control commands."
+msgstr "[out] 用于后续控制命令的非零身份标识。"
+
+#: ../../../../../../docs/reference/api/core.md:48
+msgid "NX_SUCCESS, BUSY, INVALID or EXHAUSTED; no identity repeats."
+msgstr "返回 NX_SUCCESS、BUSY、INVALID 或 EXHAUSTED；身份标识绝不重复。"
+
+#: ../../../../../../docs/reference/api/core.md:48
+msgid "Resolve cancellation using stable storage before dereference."
+msgstr "在解引用之前，通过稳定存储解析取消请求。"
+
+#: ../../../../../../docs/reference/api/core.md:48
+msgid "[in] Stable slot protected by adapter synchronization."
+msgstr "[in] 由适配器同步保护的稳定槽。"
+
+#: ../../../../../../docs/reference/api/core.md:48
+msgid "[in] Incarnation named by the command."
+msgstr "[in] 命令所指定的实例代次。"
+
+#: ../../../../../../docs/reference/api/core.md:48
+msgid "Live request only for a matching bound incarnation; else NULL."
+msgstr "仅在已绑定的实例代次匹配时返回存续请求；否则返回 NULL。"
+
+#: ../../../../../../docs/reference/api/core.md:48
+msgid "Drop a slot reference only after settlement and control drain."
+msgstr "仅在请求结清且控制引用排空之后撤销槽引用。"
+
+#: ../../../../../../docs/reference/api/core.md:48
+msgid "[inout] Stable slot whose commands/observers have exited."
+msgstr "[inout] 相关命令／观察者均已退出的稳定槽。"
+
+#: ../../../../../../docs/reference/api/core.md:48
+msgid "[in] Incarnation to release."
+msgstr "[in] 要释放的实例代次。"
+
+#: ../../../../../../docs/reference/api/core.md:48
+msgid "NX_SUCCESS, STATE for stale identity, BUSY while borrowed."
+msgstr "成功返回 NX_SUCCESS；身份标识过期返回 STATE；仍有借用返回 BUSY。"
+
+#: ../../../../../../docs/reference/api/core.md:48
+msgid "Caller-owned request metadata, without payload or callbacks."
+msgstr "调用者拥有的请求元数据，不含载荷或回调。"
+
+#: ../../../../../../docs/reference/api/core.md:48
+msgid ""
+"Fields are private to helpers/providers while borrowed. Initialize before "
+"first use. One owner prepares/submits and consumes results. GCC/Clang lock-"
+"free 32-bit atomic access publishes state; fields are read only after "
+"acquire SETTLED."
+msgstr ""
+"借用期间字段只由 helper/provider 私有访问。首次使用前先初始化。由同一所有者准备／提交并消费结果。通过 GCC/Clang 无锁的 32"
+" 位原子访问发布状态；只有以 acquire 语义观察到 SETTLED 后才读取字段。"
+
+#: ../../../../../../docs/reference/api/core.md:48
+#: ../../../../../../docs/reference/api/core.md:56
+#: ../../../../../../docs/reference/api/core.md:64
+#: ../../../../../../docs/reference/api/core.md:80
+#: ../../../../../../docs/reference/api/core.md:87
+#: ../../../../../../docs/reference/api/core.md:93
+#: ../../../../../../docs/reference/api/core.md:99
+msgid "Public Members"
+msgstr "公共成员"
+
+#: ../../../../../../docs/reference/api/core.md:48
+msgid "Adapter-owned stable cancellation identity."
+msgstr "适配器拥有的稳定取消身份。"
+
+#: ../../../../../../docs/reference/api/core.md:48
+msgid ""
+"The slot, not a possibly freed request, is targeted by cross- task commands."
+" Serialize bind/lookup/release in the adapter. Keep slot and command storage"
+" until command acknowledgement; epoch exhaustion rejects rebinding rather "
+"than reusing IDs."
+msgstr ""
+"跨任务命令针对槽，而不针对可能已释放的请求。在适配器中串行化 bind/lookup/release。保留槽与命令存储，直到命令获确认；epoch "
+"耗尽时拒绝重新绑定，不复用 ID。"
+
+#: ../../../../../../docs/reference/api/core.md:54
+msgid "request_observer.h"
+msgstr "request_observer.h"
+
+#: ../../../../../../docs/reference/api/core.md:56
+msgid "Optional stable-identity request observation without locks."
+msgstr "可选、无锁、基于稳定身份的请求观察。"
+
+#: ../../../../../../docs/reference/api/core.md:56
+msgid "Bind the exact live incarnation without storing its pointer."
+msgstr "绑定准确且存活的实例世代，不存储其指针。"
+
+#: ../../../../../../docs/reference/api/core.md:56
+msgid "[inout] Fresh zero/detached sidecar, distinct control."
+msgstr "[inout] 全新且已零初始化，或已撤离的 sidecar；控制存储须独立。"
+
+#: ../../../../../../docs/reference/api/core.md:56
+msgid "[in] Stable caller slot, protected by caller exclusion."
+msgstr "[in] 由调用者互斥保护的稳定调用者槽。"
+
+#: ../../../../../../docs/reference/api/core.md:56
+msgid "[in] Nonzero exact slot incarnation, never regenerated."
+msgstr "[in] 非零且精确的槽实例代次，绝不重新生成。"
+
+#: ../../../../../../docs/reference/api/core.md:56
+msgid "SUCCESS or INVALID/STATE, no retained reference on rejection."
+msgstr "返回 SUCCESS 或 INVALID/STATE；拒绝时不保留引用。"
+
+#: ../../../../../../docs/reference/api/core.md:56
+msgid "Copy state and acquire-observed final result for exact epoch."
+msgstr "复制准确 epoch 的状态，以及以 acquire 观察的最终结果。"
+
+#: ../../../../../../docs/reference/api/core.md:56
+msgid ""
+"Borrowed state exposes no speculative result/count. NULL slot, stale epoch "
+"and overlap reject before request access. This neither services hardware nor"
+" interprets deadline as borrow release. Caller guarantees binding storage "
+"lifetime. Output is disjoint from the complete descriptor and borrowed "
+"buffers; only the common request span is checked here."
+msgstr ""
+"借用状态不暴露推测的结果／计数。NULL 槽、过期 epoch 和重叠均在访问请求前拒绝。它既不推进硬件，也不把 deadline "
+"解释为借用释放。调用者保证绑定存储的生命周期。输出须与完整描述符及已借用缓冲区不重叠；这里只检查公共 request 跨度。"
+
+#: ../../../../../../docs/reference/api/core.md:56
+msgid "[inout] Bound sidecar under caller serialization."
+msgstr "[inout] 由调用者串行化保护的已绑定 sidecar。"
+
+#: ../../../../../../docs/reference/api/core.md:56
+msgid "[in] Same monotonic domain as the request deadline."
+msgstr "[in] 与请求 deadline 相同的单调时间域。"
+
+#: ../../../../../../docs/reference/api/core.md:56
+msgid "[out] Distinct output, unchanged on error."
+msgstr "[out] 独立输出；错误时保持不变。"
+
+#: ../../../../../../docs/reference/api/core.md:56
+msgid ""
+"SUCCESS, STATE for stale/released identity, INVALID for invalid arguments or"
+" IO for reversed time. Counters saturate without epoch reuse."
+msgstr ""
+"成功返回 SUCCESS；身份标识过期／已释放返回 STATE；参数无效返回 INVALID；时间倒退返回 IO；计数器饱和，不复用 epoch。"
+
+#: ../../../../../../docs/reference/api/core.md:56
+msgid "Remove only this sidecar reference, leaving loans untouched."
+msgstr "仅移除此附加观察引用，不改变借用。"
+
+#: ../../../../../../docs/reference/api/core.md:56
+msgid ""
+"Caller-serialized; allowed while request is quarantined. It is not request "
+"settlement, slot release or destruction."
+msgstr "由调用者串行化；请求处于 QUARANTINED 时也允许调用。它不表示请求结算、槽释放或销毁。"
+
+#: ../../../../../../docs/reference/api/core.md:56
+msgid "[inout] Live sidecar after all its readers have exited."
+msgstr "[inout] 所有读取者均已退出后的存续 sidecar。"
+
+#: ../../../../../../docs/reference/api/core.md:56
+msgid "Copied facts; result/count are valid only when settled is true."
+msgstr "已复制的事实；仅 settled 为 true 时 result/count 有效。"
+
+#: ../../../../../../docs/reference/api/core.md:56
+msgid "Caller-owned optional sidecar, fresh zero storage before bind."
+msgstr "调用者拥有的可选附加状态，绑定之前必须使用全新清零存储。"
+
+#: ../../../../../../docs/reference/api/core.md:56
+msgid ""
+"One serialized observer; no Arch/OS/SoC dependency or lock. Caller excludes "
+"slot bind/release, request prepare/reuse and concurrent observer calls "
+"during sample. Stable slot stays alive until detach; observing never "
+"acquires/releases a loan."
+msgstr ""
+"只允许一个串行化观察者；不依赖 Arch/OS/SoC，也不使用锁。采样期间调用者须排除槽 bind/release、请求 prepare/reuse "
+"及并发观察调用。稳定槽须存续至 detach；观察绝不取得或释放借用。"
+
+#: ../../../../../../docs/reference/api/core.md:62
+msgid "stack_observation.h"
+msgstr "stack_observation.h"
+
+#: ../../../../../../docs/reference/api/core.md:64
+msgid "Bounded read-only observation of caller-painted stack spans."
+msgstr "对调用者涂色的栈范围作有界只读观察。"
+
+#: ../../../../../../docs/reference/api/core.md:64
+msgid "Read a bounded low-address paint prefix without mutation."
+msgstr "读取有界的低地址涂色前缀，不修改存储。"
+
+#: ../../../../../../docs/reference/api/core.md:64
+msgid ""
+"Caller ensures this region is quiescent and painting had no live frames. No "
+"Arch/OS dependency or internal mask occurs. Work is at most bytes reads. "
+"Unwritten reservations or writes equal to paint can hide usage; this is not "
+"overflow detection. MSP qualification needs independently established boot "
+"paint and a quiescent sampling point. The span excludes current SP, all "
+"active frames and exception-stack reservation. It never paints or claims to "
+"read the physical MSP register."
+msgstr ""
+"调用者须保证该区域静默，且填充标记时没有活动栈帧。不依赖 Arch/OS，也不在内部屏蔽中断。工作量最多为 bytes "
+"次读取。未被写入的保留区，或恰好等于填充值的写入，可能掩盖实际使用；这不是溢出检测。MSP "
+"资格需要独立确认启动时填充标记的来源，以及静默的采样点。该跨度须排除当前 SP、全部活动栈帧及异常栈保留区。它既不填充栈，也不声称读取物理 MSP "
+"寄存器。"
+
+#: ../../../../../../docs/reference/api/core.md:64
+msgid "[in] Live downward-growing stack region, caller-provenance."
+msgstr "[in] 调用者证明来源的、存续且向下增长的栈区域。"
+
+#: ../../../../../../docs/reference/api/core.md:64
+msgid "[in] Original positive painted region capacity in bytes."
+msgstr "[in] 原始已填充标记区域的正容量，单位为字节。"
+
+#: ../../../../../../docs/reference/api/core.md:64
+msgid "[in] Exact fill used before the region became active."
+msgstr "[in] 区域启用前使用的精确填充值。"
+
+#: ../../../../../../docs/reference/api/core.md:64
+msgid "[out] Distinct output, unchanged on invalid span or alias."
+msgstr "[out] 独立输出；跨度或别名无效时保持不变。"
+
+#: ../../../../../../docs/reference/api/core.md:64
+msgid "SUCCESS or INVALID, without allocation or retained pointers."
+msgstr "返回 SUCCESS 或 INVALID，不分配内存，也不保留指针。"
+
+#: ../../../../../../docs/reference/api/core.md:64
+msgid "Byte-prefix paint observations, not an exact physical stack peak."
+msgstr "字节前缀涂色观察，不是准确的物理栈峰值。"
+
+#: ../../../../../../docs/reference/api/core.md:70
+msgid "status.h"
+msgstr "status.h"
+
+#: ../../../../../../docs/reference/api/core.md:72
+msgid "Small vendor-independent result vocabulary."
+msgstr "精简且独立于厂商的结果集合。"
+
+#: ../../../../../../docs/reference/api/core.md:72
+msgid "Operation result; success at submission means admission only."
+msgstr "操作结果；提交时成功只表示已准入。"
+
+#: ../../../../../../docs/reference/api/core.md:78
+msgid "time.h"
+msgstr "time.h"
+
+#: ../../../../../../docs/reference/api/core.md:80
+msgid "Absolute monotonic microsecond deadlines and wrap extension."
+msgstr "绝对单调微秒截止时间与回绕扩展。"
+
+#: ../../../../../../docs/reference/api/core.md:80
+msgid "Typedefs"
+msgstr "类型定义"
+
+#: ../../../../../../docs/reference/api/core.md:80
+msgid "Microseconds in one boot/clock domain; no wall-clock semantics."
+msgstr "同一启动／时钟域内的微秒数，不具有墙上时钟语义。"
+
+#: ../../../../../../docs/reference/api/core.md:80
+msgid "Read the selected provider's monotonic clock."
+msgstr "读取选定提供者的单调时钟。"
+
+#: ../../../../../../docs/reference/api/core.md:80
+msgid ""
+"Physical providers require successful platform startup and a privileged "
+"task/configurable IRQ; NMI/HardFault callers are unsupported. No OS, "
+"allocation or wait. Physical clocks return zero outside a successfully "
+"started live epoch; zero alone cannot prove readiness. Startup status is "
+"authoritative. All consumers join before clock withdrawal. Stop/restart or a"
+" clock change invalidates every old deadline, even if a new epoch has the "
+"same numerical value. UINT64_MAX is reserved; clock exhaustion requires "
+"controlled restart. An observed hardware overflow acknowledgement failure "
+"ends the live epoch and is terminal, even when finite source isolation "
+"succeeds. The provider retains ownership, masks interrupts, calls "
+"nx_fault_observe and parks if the observer returns. It never resumes "
+"deadline consumers with invalid zero time. Observation neither releases "
+"loans nor proves safe outputs; products own separately reviewed non-"
+"returning recovery. Ordinary shutdown still requires every consumer and "
+"optional low-power owner joined first."
+msgstr ""
+"物理 provider 要求平台已成功启动，调用者为特权任务／可配置 IRQ；不支持 NMI/HardFault 调用者。不调用 "
+"OS、不分配内存，也不等待。物理时钟在已成功启动且仍存续的 epoch "
+"之外返回零；仅凭零不能证明就绪，启动状态才是权威。撤销时钟前须等待全部消费者退出。停止／重启或时钟变化会使全部旧 deadline 失效，即使新 "
+"epoch 的数值相同。UINT64_MAX 为保留值；时钟耗尽要求受控重启。若观察到硬件溢出确认失败，即使已成功隔离有限源，也会终止当前 "
+"epoch，并进入不可继续的终态。provider 保留所有权、屏蔽中断、调用 "
+"nx_fault_observe；若观察者返回则停驻。它绝不会以无效的零时间恢复 deadline "
+"消费者。观察既不释放借用，也不证明安全输出；产品负责另行审查且不返回的恢复路径。普通关闭仍须先等待所有消费者及可选低功耗所有者退出。"
+
+#: ../../../../../../docs/reference/api/core.md:80
+msgid "Microseconds since domain initialization."
+msgstr "自时间域初始化以来的微秒数。"
+
+#: ../../../../../../docs/reference/api/core.md:80
+msgid "Test an absolute deadline against a clock snapshot."
+msgstr "依据时钟快照检查绝对截止时间。"
+
+#: ../../../../../../docs/reference/api/core.md:80
+msgid "[in] Absolute time or NX_DEADLINE_NEVER."
+msgstr "[in] 绝对时间或 NX_DEADLINE_NEVER。"
+
+#: ../../../../../../docs/reference/api/core.md:80
+msgid "[in] Snapshot in the same clock domain."
+msgstr "[in] 同一时钟域中的快照。"
+
+#: ../../../../../../docs/reference/api/core.md:80
+msgid "True when a finite deadline has expired, including equality."
+msgstr "有限 deadline 已到期时为 true，包含恰好相等的情况。"
+
+#: ../../../../../../docs/reference/api/core.md:80
+msgid "Add a duration without wrapping the monotonic domain."
+msgstr "增加持续时间，不使单调时间域回绕。"
+
+#: ../../../../../../docs/reference/api/core.md:80
+msgid "[in] Current finite time."
+msgstr "[in] 当前有限时间。"
+
+#: ../../../../../../docs/reference/api/core.md:80
+msgid "[in] Relative duration in microseconds."
+msgstr "[in] 相对时长，单位为微秒。"
+
+#: ../../../../../../docs/reference/api/core.md:80
+msgid "Absolute deadline, saturating at NX_DEADLINE_NEVER."
+msgstr "绝对 deadline，饱和于 NX_DEADLINE_NEVER。"
+
+#: ../../../../../../docs/reference/api/core.md:80
+msgid "Construct a finite deadline without selecting infinite wait."
+msgstr "构造有限 deadline，不选择无限等待。"
+
+#: ../../../../../../docs/reference/api/core.md:80
+msgid ""
+"Bounded task/IRQ arithmetic, without reads of a clock, allocation or "
+"retained references. Clock readiness and domain lifetime remain the caller's"
+" responsibility. Use nx_deadline_after only when saturation to an infinite "
+"wait is intentional."
+msgstr ""
+"有界的任务／IRQ 算术，不读取时钟、不分配，也不保留引用。时钟就绪和域生命周期仍由调用者负责。仅在明确希望饱和为无限等待时使用 "
+"nx_deadline_after。"
+
+#: ../../../../../../docs/reference/api/core.md:80
+msgid "[in] Current finite time in the consumer's clock domain."
+msgstr "[in] 消费者时钟域中的当前有限时间。"
+
+#: ../../../../../../docs/reference/api/core.md:80
+msgid "[in] Relative duration in microseconds; zero is valid."
+msgstr "[in] 相对时长，单位微秒；零合法。"
+
+#: ../../../../../../docs/reference/api/core.md:80
+msgid "[out] Finite result, unchanged on failure."
+msgstr "[out] 有限结果，失败时保持不变。"
+
+#: ../../../../../../docs/reference/api/core.md:80
+msgid ""
+"SUCCESS; INVALID for NULL output or nonfinite now; EXHAUSTED when the sum "
+"reaches NX_DEADLINE_NEVER or would overflow."
+msgstr ""
+"SUCCESS；输出为 NULL 或 now 非有限时返回 INVALID；和达到 NX_DEADLINE_NEVER 或将溢出时返回 "
+"EXHAUSTED。"
+
+#: ../../../../../../docs/reference/api/core.md:80
+msgid "Initialize counter extension and its clock domain."
+msgstr "初始化计数扩展及其时钟域。"
+
+#: ../../../../../../docs/reference/api/core.md:80
+msgid ""
+"Single execution owner. Reset creates a new clock domain; do not reuse "
+"outstanding deadlines after reset/clock change."
+msgstr "唯一执行所有者。复位会建立新的时钟域；复位／时钟变化后不得复用尚未完成的 deadline。"
+
+#: ../../../../../../docs/reference/api/core.md:80
+msgid "[out] Caller-owned extension state."
+msgstr "[out] 调用者拥有的扩展状态。"
+
+#: ../../../../../../docs/reference/api/core.md:80
+msgid "[in] First hardware snapshot."
+msgstr "[in] 第一次硬件快照。"
+
+#: ../../../../../../docs/reference/api/core.md:80
+msgid "[in] Nonzero stable counter frequency."
+msgstr "[in] 非零且稳定的计数器频率。"
+
+#: ../../../../../../docs/reference/api/core.md:80
+msgid "NX_SUCCESS, or NX_ERROR_INVALID for invalid arguments."
+msgstr "成功返回 NX_SUCCESS；参数无效返回 NX_ERROR_INVALID。"
+
+#: ../../../../../../docs/reference/api/core.md:80
+msgid "Extend a wrapping counter and convert to microseconds."
+msgstr "扩展回绕计数器并换算为微秒。"
+
+#: ../../../../../../docs/reference/api/core.md:80
+msgid ""
+"Observe strictly before 2^32 ticks elapse, even when idle. Multiple missed "
+"wraps cannot be detected from two snapshots, nor can one complete wrap at "
+"equal snapshots. Counter must continue through waits; frequency cannot "
+"change. No concurrent initialize/reset or observation."
+msgstr ""
+"必须在 2^32 个 tick "
+"经过之前严格提前观察，即使空闲时也如此。两个快照无法检测漏过的多次回绕，也无法检测快照相等时恰好完整回绕一次。等待期间计数器必须持续运行，频率不得改变。不得并发初始化／复位或观察。"
+
+#: ../../../../../../docs/reference/api/core.md:80
+msgid "[inout] Initialized, single-owner extension state."
+msgstr "[inout] 已初始化、仅有一个所有者的扩展状态。"
+
+#: ../../../../../../docs/reference/api/core.md:80
+msgid "[in] Current counter snapshot."
+msgstr "[in] 当前计数器快照。"
+
+#: ../../../../../../docs/reference/api/core.md:80
+msgid "[out] Distinct extended elapsed microseconds."
+msgstr "[out] 独立的扩展后经过时间，单位微秒。"
+
+#: ../../../../../../docs/reference/api/core.md:80
+msgid ""
+"SUCCESS, INVALID for NULL/overlapping output, STATE for an uninitialized "
+"clock, or EXHAUSTED. Failure changes neither extension state nor output."
+msgstr ""
+"SUCCESS；输出为 NULL／重叠时返回 INVALID；时钟未初始化时返回 STATE；或返回 EXHAUSTED。失败不改变扩展状态或输出。"
+
+#: ../../../../../../docs/reference/api/core.md:80
+msgid "An explicitly injected clock; its context outlives all borrowers."
+msgstr "显式注入的时钟；其上下文必须在所有借用者退出前保持有效。"
+
+#: ../../../../../../docs/reference/api/core.md:80
+msgid "State for extending one 32-bit free-running hardware counter."
+msgstr "用于扩展一个 32 位自由运行硬件计数器的状态。"
+
+#: ../../../../../../docs/reference/api/core.md:85
+msgid "silicon.h"
+msgstr "silicon.h"
+
+#: ../../../../../../docs/reference/api/core.md:87
+msgid "Explicit cold observed-silicon software admission."
+msgstr "显式冷态已观测硅片的软件准入。"
+
+#: ../../../../../../docs/reference/api/core.md:87
+msgid "Software review state, never physical qualification."
+msgstr "软件审查状态，绝不代表物理验收。"
+
+#: ../../../../../../docs/reference/api/core.md:87
+msgid "Only REVIEWED and BLOCKED are valid authored rule values."
+msgstr "手工规则只允许 REVIEWED 和 BLOCKED 两种值。"
+
+#: ../../../../../../docs/reference/api/core.md:87
+msgid "Read one explicit source before acquiring I/O resources."
+msgstr "获取 I/O 资源前读取一个显式来源。"
+
+#: ../../../../../../docs/reference/api/core.md:87
+msgid ""
+"Cold caller-serialized Thread context, O(rule_count) policy validation. "
+"Malformed inputs reject before read. Source failure leaves output untouched."
+" A completed comparison copies its rejection reason too; that never "
+"authorizes startup. No reset, scheduling, clocks, IRQs or factory operations"
+" are performed. Default platform behavior does not invoke this optional "
+"explicit preflight."
+msgstr ""
+"仅在调用者串行化的冷态 Thread 上下文运行，策略校验复杂度为 "
+"O(rule_count)。无效输入在读取前拒绝。来源失败时输出保持不变。已完成的比较也会复制拒绝原因；这不授予启动权限。不执行复位、调度、时钟、IRQ"
+" 或 factory 操作。平台默认行为不调用此可选显式预检。"
+
+#: ../../../../../../docs/reference/api/core.md:87
+msgid "[in] Stable source and context, no concurrent teardown."
+msgstr "[in] 稳定的来源及上下文，不允许并发销毁。"
+
+#: ../../../../../../docs/reference/api/core.md:87
+msgid "[in] Readonly policy/rules, stable during this call."
+msgstr "[in] 只读策略／规则，在调用期间保持稳定。"
+
+#: ../../../../../../docs/reference/api/core.md:87
+msgid ""
+"[out] Distinct aligned output; never aliases source context, complete "
+"policy/rules or MMIO. No reference is retained."
+msgstr "[out] 独立且对齐的输出；不得与来源上下文、完整策略／规则或 MMIO 重叠。不保留任何引用。"
+
+#: ../../../../../../docs/reference/api/core.md:87
+msgid ""
+"SUCCESS for admitted software policy, UNSUPPORTED for unknown/missing "
+"revision, PERMISSION for blocked/missing workarounds, IO for group/density "
+"mismatch, INVALID for malformed inputs; source errors propagate unchanged."
+msgstr ""
+"软件策略准入返回 SUCCESS；版本未知／缺失返回 UNSUPPORTED；被阻止／缺少规避措施返回 PERMISSION；器件组／容量不匹配返回 "
+"IO；输入无效返回 INVALID；来源错误原样传播。"
+
+#: ../../../../../../docs/reference/api/core.md:87
+msgid "Observed silicon facts, without package or Board claims."
+msgstr "已观测硅片事实，不包含封装或板卡声明。"
+
+#: ../../../../../../docs/reference/api/core.md:87
+msgid ""
+"Device group and Flash density cannot identify an exact orderable part or "
+"package. Assembly and physical inspection supply those independent facts. A "
+"missing revision has a separate flag; numerical zero can be a real revision "
+"ID."
+msgstr ""
+"器件组和 Flash 容量无法确定精确可订购料号或封装。这些独立事实由 assembly 和物理检查提供。版本缺失使用单独标志表示；数值零可能是真实版本"
+" ID。"
+
+#: ../../../../../../docs/reference/api/core.md:87
+msgid "One reviewed exact revision and its mode-specific workarounds."
+msgstr "一个已审查的精确版本及其模式相关规避措施。"
+
+#: ../../../../../../docs/reference/api/core.md:87
+msgid "Caller-selected immutable software review policy."
+msgstr "调用者选择的不可变软件审查策略。"
+
+#: ../../../../../../docs/reference/api/core.md:87
+msgid ""
+"Rules have strictly increasing revision IDs. Nonempty rules require a "
+"nonzero SHA256 identifying their reviewed source record. This helper does "
+"not authenticate that record or infer that required workarounds were "
+"implemented; reviewed build/configuration facts supply the applied mask. "
+"allow_unreviewed permits an explicitly observed unknown revision only. It "
+"cannot override blocked revisions, a missing observation, mismatched "
+"density/group or required workarounds. Empty rules describe no reviewed "
+"revisions. No hardware test status is established by this policy."
+msgstr ""
+"规则的版本 ID 必须严格递增。非空规则须有非零 "
+"SHA256，标识已审查的来源记录。此辅助机制不认证记录，也不推断所需规避措施是否实现；已审查的构建／配置事实提供已应用掩码。allow_unreviewed"
+" 仅允许显式观测到的未知版本，不能覆盖被阻止版本、缺失观测、容量／器件组不匹配或所需规避措施。空规则表示没有已审查版本。此策略不建立任何硬件测试状态。"
+
+#: ../../../../../../docs/reference/api/core.md:87
+msgid "Explicit cold source; no discovery, effects or retained loan."
+msgstr "显式冷态来源；不发现设备、不产生副作用、不保留借用。"
+
+#: ../../../../../../docs/reference/api/core.md:87
+msgid ""
+"read executes once in caller context and copies facts into distinct "
+"temporary output. The caller establishes legal MMIO, privilege, security and"
+" cold Thread context first. A source must be bounded, allocation-free, read-"
+"only, and return its actual access result. It must not enable clocks, repair"
+" option bytes or retain output/context references."
+msgstr ""
+"read 在调用者上下文执行一次，将事实复制到独立临时输出。调用者先确保 MMIO、权限、安全域和冷态 Thread "
+"上下文合法。来源必须有界、无分配、只读，并返回实际访问结果，不得启用时钟、修复 option bytes 或保留输出／上下文引用。"
+
+#: ../../../../../../docs/reference/api/core.md:87
+msgid "Copied comparison facts; admitted is software permission only."
+msgstr "复制的比较事实；admitted 仅表示软件许可。"
+
+#: ../../../../../../docs/reference/api/core.md:91
+msgid "lifecycle.h"
+msgstr "lifecycle.h"
+
+#: ../../../../../../docs/reference/api/core.md:93
+msgid "Static, caller-owned cold resource transactions."
+msgstr "静态、由调用者拥有的冷态资源事务。"
+
+#: ../../../../../../docs/reference/api/core.md:93
+#: ../../../../../../docs/reference/api/core.md:99
+msgid ""
+"Author  Nexus Team   Version  1.0.0   Date  2026-11-07   Copyright  "
+"Copyright (c) 2026 Nexus Team"
+msgstr ""
+"作者  Nexus Team   版本  1.0.0   日期  2026-11-07   版权  Copyright (c) 2026 Nexus "
+"Team"
+
+#: ../../../../../../docs/reference/api/core.md:93
+#: ../../../../../../docs/reference/api/core.md:99
+msgid "1.0.0"
+msgstr "1.0.0"
+
+#: ../../../../../../docs/reference/api/core.md:93
+#: ../../../../../../docs/reference/api/core.md:99
+msgid "2026-11-07"
+msgstr "2026-11-07"
+
+#: ../../../../../../docs/reference/api/core.md:93
+#: ../../../../../../docs/reference/api/core.md:99
+msgid "Copyright (c) 2026 Nexus Team"
+msgstr "Copyright (c) 2026 Nexus Team"
+
+#: ../../../../../../docs/reference/api/core.md:93
+msgid "Context admission reason; callbacks never establish context."
+msgstr "上下文准入原因；回调不负责建立上下文。"
+
+#: ../../../../../../docs/reference/api/core.md:93
+msgid "Public observation of a serialized transaction, never a lock."
+msgstr "串行化事务的公共观测，不是锁。"
+
+#: ../../../../../../docs/reference/api/core.md:93
+msgid "Admit every entry before acquiring in fixed order."
+msgstr "按固定顺序获取资源前，对全部条目执行准入。"
+
+#: ../../../../../../docs/reference/api/core.md:93
+msgid ""
+"Caller-serialized cold context only. No heap, registry, graph resolution or "
+"I/O forwarding. Invalid table bindings reject before callbacks. A failed "
+"admission has no effects. Failed acquisition releases the retained current "
+"step and previous steps in reverse order. First release failure stops "
+"rollback and preserves the remaining cursor. Reentry returns BUSY. "
+"ACTIVE/DRAINING start returns STATE. Caller proves aligned disjoint storage "
+"and callback safety. Permanent pre-C memory owners, watchdogs and RTC/backup"
+" domains stay outside this reversible plan."
+msgstr ""
+"仅限调用者串行化的冷态上下文。无堆、注册表、图解析或 I/O "
+"转发。无效表绑定在回调前拒绝。准入失败不产生副作用。获取失败时，逆序释放当前保留步骤及此前步骤。首次释放失败即停止回滚，保留剩余游标。重入返回 "
+"BUSY。ACTIVE／DRAINING 状态启动返回 STATE。调用者须证明存储对齐、互不重叠及回调安全。永久 pre-C 内存所有者、看门狗和 "
+"RTC／备份域不属于此可逆计划。"
+
+#: ../../../../../../docs/reference/api/core.md:93
+msgid "[in] Explicit valid plan; an empty plan is permitted."
+msgstr "[in] 显式有效计划；允许空计划。"
+
+#: ../../../../../../docs/reference/api/core.md:93
+msgid "[inout] Fresh zero state or completely released engine."
+msgstr "[inout] 新的全零状态或已完全释放的引擎。"
+
+#: ../../../../../../docs/reference/api/core.md:93
+msgid "Start result; state.cleanup separately holds cleanup status."
+msgstr "启动结果；state.cleanup 单独保存清理状态。"
+
+#: ../../../../../../docs/reference/api/core.md:93
+msgid "Release the remaining prefix in reverse order, with retry."
+msgstr "逆序释放剩余前缀，支持重试。"
+
+#: ../../../../../../docs/reference/api/core.md:93
+msgid ""
+"Complete release returns IDLE; repeated idle stop succeeds without "
+"callbacks. A refused context or release preserves remaining responsibility. "
+"Already released later entries are never released again. A different live "
+"plan is rejected. Engine state is neither thread-safe nor interrupt-safe."
+msgstr ""
+"完全释放后返回 "
+"IDLE；空闲状态重复停止成功且不调用回调。上下文拒绝或释放失败时保留剩余责任。已释放的后续条目不会再次释放。拒绝使用另一份活动计划。引擎状态既非线程安全，也非中断安全。"
+
+#: ../../../../../../docs/reference/api/core.md:93
+msgid "[in] Exact plan used by the live engine."
+msgstr "[in] 活动引擎实际使用的精确计划。"
+
+#: ../../../../../../docs/reference/api/core.md:93
+msgid "[inout] Same live storage; never reset to escape a failure."
+msgstr "[inout] 同一活动存储；不得重置以逃避失败。"
+
+#: ../../../../../../docs/reference/api/core.md:93
+msgid "Cleanup result; state.primary is preserved independently."
+msgstr "清理结果；独立保留 state.primary。"
+
+#: ../../../../../../docs/reference/api/core.md:93
+msgid "Actual acquisition outcome and failed-step responsibility."
+msgstr "实际获取结果及失败步骤的责任。"
+
+#: ../../../../../../docs/reference/api/core.md:93
+msgid ""
+"A successful acquisition always receives one release call. On failure, "
+"retained means the current step still requires release, including a failed "
+"write with uncertain readback. The driver owns its concrete receipt in entry"
+" state."
+msgstr ""
+"每次获取成功都对应一次释放调用。获取失败时 retained 表示当前步骤仍须释放，包括写入失败且回读不确定的情况。驱动在条目状态中拥有具体回执。"
+
+#: ../../../../../../docs/reference/api/core.md:93
+msgid "One resource's effect-free admission and reversible work."
+msgstr "单个资源的无副作用准入及可逆操作。"
+
+#: ../../../../../../docs/reference/api/core.md:93
+msgid ""
+"admit validates without writes or retained references. acquire reports "
+"actual partial responsibility on failure. release returns SUCCESS only when "
+"that step has no remaining responsibility; failure preserves its receipt for"
+" retry. Successful acquire may perform no writes; its release then performs "
+"no work according to its concrete receipt."
+msgstr ""
+"admit 校验时不写入、不保留引用。acquire 在失败时报告实际部分责任。release 仅在该步骤不再承担任何责任时返回 "
+"SUCCESS；失败须保留回执供重试。acquire 成功时也可能没有写入；其 release 按具体回执不执行操作。"
+
+#: ../../../../../../docs/reference/api/core.md:93
+msgid "Readonly binding; opaque state/config may be NULL if ops allow it."
+msgstr "只读绑定；若 ops 允许，不透明 state／config 可为 NULL。"
+
+#: ../../../../../../docs/reference/api/core.md:93
+msgid "Fixed dependency order and explicit context admission."
+msgstr "固定依赖顺序及显式上下文准入。"
+
+#: ../../../../../../docs/reference/api/core.md:93
+msgid ""
+"All entries, ops, config and context remain immutable and alive until "
+"complete release. Entry state remains alive and exclusively owned. "
+"context_check is bounded and effect-free; START admission also covers "
+"immediate failure rollback. STOP admission runs on each explicit non-idle "
+"stop attempt."
+msgstr ""
+"所有条目、ops、config 及 context 在完全释放前保持不可变且有效。条目状态保持有效并由单一所有者独占。context_check "
+"有界且无副作用；START 准入也涵盖获取失败后的即时回滚。每次显式非空闲停止尝试均执行 STOP 准入。"
+
+#: ../../../../../../docs/reference/api/core.md:93
+msgid "Zero-initialized caller-owned engine state."
+msgstr "全零初始化、由调用者拥有的引擎状态。"
+
+#: ../../../../../../docs/reference/api/core.md:93
+msgid ""
+"Fields are readonly to callers after first use. cursor is the unreleased "
+"prefix, not a hardware receipt. primary keeps the most recent start failure;"
+" cleanup keeps the latest cleanup result independently. No config pointer is"
+" copied into RAM beyond bound plan identity. Separate live engines must own "
+"disjoint entry state and hardware responsibility."
+msgstr ""
+"首次使用后，调用者只读这些字段。cursor 表示尚未释放的前缀，不是硬件回执。primary 保存最近一次启动失败；cleanup "
+"独立保存最近清理结果。RAM 中除绑定计划身份外不复制配置指针。不同活动引擎的条目状态和硬件责任必须互不重叠。"
+
+#: ../../../../../../docs/reference/api/core.md:97
+msgid "platform_lifecycle.h"
+msgstr "platform_lifecycle.h"
+
+#: ../../../../../../docs/reference/api/core.md:99
+msgid "Static platform coordination and call-scoped diagnostics."
+msgstr "静态平台协调与调用期诊断。"
+
+#: ../../../../../../docs/reference/api/core.md:99
+msgid "Cold lifecycle stage; errors remain in the normal result."
+msgstr "冷态生命周期阶段；错误仍由正常返回结果报告。"
+
+#: ../../../../../../docs/reference/api/core.md:99
+msgid "A drain failure remains distinct from a completed suspension."
+msgstr "排空失败与已完成挂起保持区分。"
+
+#: ../../../../../../docs/reference/api/core.md:99
+msgid "Start the selected system, resources and physical owners."
+msgstr "启动选定系统、资源及物理所有者。"
+
+#: ../../../../../../docs/reference/api/core.md:99
+msgid ""
+"Caller-serialized cold context only. Context is checked before effects and "
+"again before immediate rollback. Failed initialization withdraws the "
+"retained prefix in reverse order, stopping at the first refusal. Start of a "
+"live platform returns STATE; synchronous reentry returns BUSY without "
+"changing the supplied diagnostic output. No allocation, discovery, scheduler"
+" or I/O forwarding."
+msgstr ""
+"仅限调用者串行化的冷态上下文。产生副作用前和立即回滚前均检查上下文。初始化失败时逆序撤回保留前缀，首次拒绝即停止。活动平台再次启动返回 "
+"STATE；同步重入返回 BUSY，且不修改传入的诊断输出。无分配、发现、调度器或 I/O 转发。"
+
+#: ../../../../../../docs/reference/api/core.md:99
+msgid "[in] Immutable typed dispatch and resolved ordinals."
+msgstr "[in] 不可变的类型化分发及已解析序号。"
+
+#: ../../../../../../docs/reference/api/core.md:99
+msgid "[inout] Caller-owned zero or completely released storage."
+msgstr "[inout] 调用者拥有的全零或已完全释放存储。"
+
+#: ../../../../../../docs/reference/api/core.md:99
+msgid "[out] Optional call-scoped metadata; never retained."
+msgstr "[out] 可选调用期元数据；不保留。"
+
+#: ../../../../../../docs/reference/api/core.md:99
+msgid "Primary result, independent cleanup result and effects."
+msgstr "主结果、独立清理结果及副作用。"
+
+#: ../../../../../../docs/reference/api/core.md:99
+msgid "Retry remaining controllers, shared resources and system."
+msgstr "重试剩余控制器、共享资源及系统的释放。"
+
+#: ../../../../../../docs/reference/api/core.md:99
+msgid ""
+"Join direct writers, IRQ consumers and borrowers first. Continue service "
+"before retrying BUSY. A failure retains the remaining prefix and system; "
+"already released later controllers are not repeated. Even idle stop checks "
+"context and permanent resource guards. Synchronous reentry returns BUSY "
+"without writing diagnostic. Caller serialization and each owner's "
+"context/deadline contracts remain mandatory."
+msgstr ""
+"先 join 直接写入者、IRQ 消费者和借用者。返回 BUSY "
+"后，重试前继续推进服务。失败时保留剩余前缀及系统；已释放的后续控制器不会重复释放。即使空闲停止也检查上下文和永久资源守卫。同步重入返回 "
+"BUSY，不写诊断。调用者串行化及各所有者的上下文／截止时间合同始终必须满足。"
+
+#: ../../../../../../docs/reference/api/core.md:99
+msgid "[in] Exact live plan, or the original idle platform plan."
+msgstr "[in] 精确活动计划，或原空闲平台计划。"
+
+#: ../../../../../../docs/reference/api/core.md:99
+msgid "[inout] Same storage and retained concrete owner receipts."
+msgstr "[inout] 同一存储及保留的具体所有者回执。"
+
+#: ../../../../../../docs/reference/api/core.md:99
+msgid "[out] Optional call-scoped output; never retained."
+msgstr "[out] 可选调用期输出；不保留。"
+
+#: ../../../../../../docs/reference/api/core.md:99
+msgid "SUCCESS only after all dedicated owners prove withdrawal."
+msgstr "仅在全部专属所有者证明已撤回后返回 SUCCESS。"
+
+#: ../../../../../../docs/reference/api/core.md:99
+msgid "Drain controllers and shared resources while retaining System."
+msgstr "排空控制器和共享资源，同时保留 System。"
+
+#: ../../../../../../docs/reference/api/core.md:99
+msgid ""
+"Joins every application borrower first. Optional suspend hooks keep "
+"independent autonomous domains; absent hooks use ordinary release. This does"
+" not enter sleep, alter time, feed watchdogs or cancel loans. A suspended "
+"plan remains bound and cannot be replaced or fully stopped until resume "
+"reestablishes the retained owners. Reentry returns BUSY."
+msgstr ""
+"先 join 全部应用借用者。可选挂起 hook 保留独立自治域；缺少 hook "
+"时使用普通释放。此操作不进入睡眠、不改变时间、不喂看门狗，也不取消借用。挂起计划仍保持绑定；在 resume "
+"重建保留所有者前，不得替换计划或完全停止。重入返回 BUSY。"
+
+#: ../../../../../../docs/reference/api/core.md:99
+msgid "[in] Same immutable plan that established the live platform."
+msgstr "[in] 建立活动平台时使用的同一不可变计划。"
+
+#: ../../../../../../docs/reference/api/core.md:99
+msgid "[inout] Exact retained owner, serialized by the caller."
+msgstr "[inout] 精确保留的所有者，由调用者串行化。"
+
+#: ../../../../../../docs/reference/api/core.md:99
+msgid "[out] Optional call-scoped phase/ordinal, never retained."
+msgstr "[out] 可选调用期阶段／序号，不保留。"
+
+#: ../../../../../../docs/reference/api/core.md:99
+msgid ""
+"SUCCESS only after complete drain; BUSY/IO keeps the remaining prefix and "
+"System. Resume is refused until suspension completes."
+msgstr "仅在完全排空后返回 SUCCESS；BUSY／IO 保留剩余前缀及 System。挂起完成前拒绝恢复。"
+
+#: ../../../../../../docs/reference/api/core.md:99
+msgid "Rebuild the same static cold controllers after System restoration."
+msgstr "System 恢复后重建同一组静态冷态控制器。"
+
+#: ../../../../../../docs/reference/api/core.md:99
+msgid ""
+"Does not invoke system_start, start a scheduler or replay requests. The SoC "
+"power owner establishes the replacement time epoch first. Each concrete "
+"cold/resume owner performs its real hardware admission; resources_resume "
+"reacquires shared pins/resources before controllers. Missing optional hooks "
+"use ordinary acquire/resources_acquire. Product code explicitly "
+"bridges/replaces deadlines and resubmits work."
+msgstr ""
+"不调用 system_start、不启动调度器，也不重放请求。SoC "
+"电源所有者先建立新时间纪元。各具体冷态／恢复所有者执行真实硬件准入；resources_resume 在控制器之前重新获取共享引脚／资源。缺少可选 "
+"hook 时采用普通 acquire／resources_acquire。产品代码显式桥接或替换截止时间并重新提交工作。"
+
+#: ../../../../../../docs/reference/api/core.md:99
+msgid "[in] Same immutable static connections, with System already live."
+msgstr "[in] 同一不可变静态连接，System 已经处于活动状态。"
+
+#: ../../../../../../docs/reference/api/core.md:99
+msgid ""
+"[inout] Successfully suspended owner, not a partially drained or ordinary "
+"stopped platform."
+msgstr "[inout] 已成功挂起的所有者，不得是部分排空或普通已停止的平台。"
+
+#: ../../../../../../docs/reference/api/core.md:99
+msgid "[out] Optional call-scoped primary/cleanup metadata."
+msgstr "[out] 可选调用期主结果／清理元数据。"
+
+#: ../../../../../../docs/reference/api/core.md:99
+msgid ""
+"Primary/cleanup result; System remains retained even after a clean resume "
+"rollback. Failed drain leaves SUSPENDING and blocks retry."
+msgstr "主结果／清理结果；即使恢复回滚成功，仍保留 System。排空失败保持 SUSPENDING 并阻止重试。"
+
+#: ../../../../../../docs/reference/api/core.md:99
+msgid "Independent startup and cleanup results, retained effects."
+msgstr "独立的启动和清理结果，以及保留副作用。"
+
+#: ../../../../../../docs/reference/api/core.md:99
+msgid ""
+"remaining_effects describes still-owned platform effects, including an "
+"already-live platform after a refused restart; it is not a count of effects "
+"newly acquired by this call. Dedicated system nonzero effect masks remain "
+"intact. The coordinator uses bit zero as a generic responsibility flag."
+msgstr ""
+"remaining_effects "
+"描述平台仍拥有的副作用，包括重启遭拒后仍活动的平台；它不表示本次调用新获取的副作用数量。专属系统的非零副作用掩码保持完整。协调器用第零位作通用责任标志。"
+
+#: ../../../../../../docs/reference/api/core.md:99
+msgid "Caller-owned metadata, accessed only during this call."
+msgstr "调用者拥有的元数据，仅在本次调用期间访问。"
+
+#: ../../../../../../docs/reference/api/core.md:99
+msgid ""
+"Controller indices are resolved controller positions, not typed factory IDs."
+" SIZE_MAX means no controller. Success clears every field. Cleanup never "
+"replaces primary facts."
+msgstr ""
+"控制器索引表示解析后的控制器位置，不是强类型 factory ID。SIZE_MAX 表示没有控制器。成功时清零全部字段。清理结果绝不覆盖主结果事实。"
+
+#: ../../../../../../docs/reference/api/core.md:99
+msgid "Fixed platform connections, without per-controller state."
+msgstr "固定平台连接，不含逐控制器状态。"
+
+#: ../../../../../../docs/reference/api/core.md:99
+msgid ""
+"Callbacks dispatch exact typed owners; no runtime lookup, register "
+"interpreter or generic action stream is involved. Every admission finishes "
+"before system_start. A successful system_start establishes the system "
+"boundary; a failed one reports its own cleanup and retained effects. "
+"Resources may retain effects after failed acquisition and always receive "
+"release before the system. resources_release also checks permanent pre-C "
+"owners, even when no controller started. Controller acquire reports failed-"
+"step responsibility; release succeeds only after the concrete receipt is "
+"clear. Permanent SRAM, RTC and watchdog policy remains in those dedicated C "
+"owners. permanent_effects marks pre-C effects on every failed start, "
+"including context rejection. At most UINT16_MAX physical controllers are "
+"permitted; larger plans reject before any owner callback."
+msgstr ""
+"回调直接分发到精确类型的所有者；不涉及运行时查找、寄存器解释器或通用动作流。全部准入在 system_start 前完成。system_start "
+"成功建立系统边界；失败则报告自身清理结果和保留副作用。资源获取失败后可能仍保留副作用，且总在系统前执行资源释放。resources_release "
+"即使没有控制器启动，也检查永久 pre-C 所有者。控制器 acquire 报告失败步骤责任；只有具体回执清空后 release 才成功。永久 "
+"SRAM、RTC 及看门狗策略保留在其专属 C 所有者中。permanent_effects 在每次启动失败时标出 pre-C "
+"副作用，包括上下文拒绝。物理控制器最多 UINT16_MAX 个；超出时在任何所有者回调前拒绝。"
+
+#: ../../../../../../docs/reference/api/core.md:99
+msgid "Zero-initialized storage for one serialized platform."
+msgstr "单个串行化平台使用的全零初始化存储。"
+
+#: ../../../../../../docs/reference/api/core.md:99
+msgid ""
+"Fields are readonly to callers. initialized is the remaining physical-"
+"controller prefix; dedicated owners retain their own receipts. bound is an "
+"opaque identity that forbids changing a live plan. operating rejects "
+"synchronous callback reentry; it is not a task lock. Plan, static "
+"connections and owner storage remain alive and unchanged until complete "
+"withdrawal. Separate platforms must own disjoint hardware and mutable owner "
+"storage."
+msgstr ""
+"调用者只读这些字段。initialized 表示剩余物理控制器前缀；专属所有者各自保留回执。bound "
+"为不透明身份，禁止更改活动计划。operating "
+"拒绝同步回调重入，不是任务锁。计划、静态连接及所有者存储在完全撤回前保持有效且不变。不同平台必须拥有互不重叠的硬件及可变所有者存储。"

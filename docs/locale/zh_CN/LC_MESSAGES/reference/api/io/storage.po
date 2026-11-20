@@ -1,0 +1,2100 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: f8b2117c8ac9bb801c1b40b33473e05ee4c90151a2404589dde41262ff317601\n"
+
+#: ../../../../../../docs/reference/api/io/storage.md:10
+msgid "Block media, Flash and memory access"
+msgstr "块介质、Flash 与内存访问"
+
+#: ../../../../../../docs/reference/api/io/storage.md:12
+msgid ""
+"Block sessions, SDIO functions, Flash maintenance and memory-window access "
+"are distinct capabilities. Products own partitions, media policy, recovery "
+"and permanent startup reservations."
+msgstr "块会话、SDIO function、Flash 维护和内存窗口访问是独立能力。产品负责分区、介质策略、恢复及永久启动预留。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:16
+msgid ""
+"Media activation, function selection, memory-window leases and permanent "
+"startup backing are distinct operations. A block session does not turn an "
+"SDIO function into sector media. A CPU-window lease grants only its declared"
+" bank access; startup backing remains held while its static objects exist. "
+"See [physical storage](../../contracts/io/f4-flash-storage.md) and "
+"[FSMC](../../contracts/io/f4-external-memory.md) before selecting those "
+"interfaces."
+msgstr ""
+"介质激活、function 选择、存储窗口 lease 与永久启动后备存储是不同操作。块会话不把 SDIO function 转为扇区介质。CPU "
+"window lease 只授予声明的 bank "
+"访问；启动后备存储在静态对象存续期间始终被持有。选择这些接口前先读[物理存储](../../contracts/io/f4-flash-"
+"storage.md)与 [FSMC](../../contracts/io/f4-external-memory.md) 合同。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:23
+msgid "Public declarations"
+msgstr "公共声明"
+
+#: ../../../../../../docs/reference/api/io/storage.md:25
+msgid "block.h"
+msgstr "block.h"
+
+#: ../../../../../../docs/reference/api/io/storage.md:27
+msgid "Synchronous sector I/O with explicit partial progress."
+msgstr "具有显式部分进度的同步扇区 I/O。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:27
+#: ../../../../../../docs/reference/api/io/storage.md:33
+#: ../../../../../../docs/reference/api/io/storage.md:39
+#: ../../../../../../docs/reference/api/io/storage.md:45
+#: ../../../../../../docs/reference/api/io/storage.md:51
+#: ../../../../../../docs/reference/api/io/storage.md:57
+#: ../../../../../../docs/reference/api/io/storage.md:63
+#: ../../../../../../docs/reference/api/io/storage.md:69
+#: ../../../../../../docs/reference/api/io/storage.md:75
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "Author  Nexus Team"
+msgstr "作者  Nexus Team"
+
+#: ../../../../../../docs/reference/api/io/storage.md:27
+#: ../../../../../../docs/reference/api/io/storage.md:33
+#: ../../../../../../docs/reference/api/io/storage.md:39
+#: ../../../../../../docs/reference/api/io/storage.md:45
+#: ../../../../../../docs/reference/api/io/storage.md:51
+#: ../../../../../../docs/reference/api/io/storage.md:57
+#: ../../../../../../docs/reference/api/io/storage.md:63
+#: ../../../../../../docs/reference/api/io/storage.md:69
+#: ../../../../../../docs/reference/api/io/storage.md:75
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "Nexus Team"
+msgstr "Nexus Team"
+
+#: ../../../../../../docs/reference/api/io/storage.md:27
+#: ../../../../../../docs/reference/api/io/storage.md:39
+#: ../../../../../../docs/reference/api/io/storage.md:57
+#: ../../../../../../docs/reference/api/io/storage.md:63
+#: ../../../../../../docs/reference/api/io/storage.md:69
+#: ../../../../../../docs/reference/api/io/storage.md:75
+msgid "Enums"
+msgstr "枚举"
+
+#: ../../../../../../docs/reference/api/io/storage.md:27
+msgid "Availability never substitutes for physical card-detect evidence."
+msgstr "可用状态不能代替物理卡检测证据。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:27
+#: ../../../../../../docs/reference/api/io/storage.md:39
+#: ../../../../../../docs/reference/api/io/storage.md:57
+#: ../../../../../../docs/reference/api/io/storage.md:63
+#: ../../../../../../docs/reference/api/io/storage.md:69
+#: ../../../../../../docs/reference/api/io/storage.md:75
+msgid "Values:"
+msgstr "取值："
+
+#: ../../../../../../docs/reference/api/io/storage.md:27
+#: ../../../../../../docs/reference/api/io/storage.md:33
+#: ../../../../../../docs/reference/api/io/storage.md:39
+#: ../../../../../../docs/reference/api/io/storage.md:45
+#: ../../../../../../docs/reference/api/io/storage.md:51
+#: ../../../../../../docs/reference/api/io/storage.md:57
+#: ../../../../../../docs/reference/api/io/storage.md:63
+#: ../../../../../../docs/reference/api/io/storage.md:69
+#: ../../../../../../docs/reference/api/io/storage.md:75
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "Functions"
+msgstr "函数"
+
+#: ../../../../../../docs/reference/api/io/storage.md:27
+msgid "Query admitted media geometry without starting an operation."
+msgstr "查询已准入的介质几何，不启动操作。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:0
+msgid "Parameters"
+msgstr "参数"
+
+#: ../../../../../../docs/reference/api/io/storage.md:27
+msgid "[in] Initialized exact media session, serialized by its owner."
+msgstr "[in] 已初始化的精确介质会话，由其所有者串行执行。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:0
+msgid "Returns"
+msgstr "返回值"
+
+#: ../../../../../../docs/reference/api/io/storage.md:27
+msgid "Geometry valid until session stop/reinitialization, or NULL."
+msgstr "几何有效至会话停机或重新初始化；也可能返回 NULL。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:27
+msgid "Observe the owner state without asserting physical card presence."
+msgstr "观察所有者状态，不断言物理卡存在。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:27
+msgid "[in] Selected face under the same serialized owner."
+msgstr "[in] 同一串行所有者管理的选定接口。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:27
+msgid "Actual state, or UNAVAILABLE for an invalid/missing state method."
+msgstr "实际状态；状态方法无效或缺失时返回 UNAVAILABLE。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:27
+msgid "Explicitly discover one card after infrastructure cold preparation."
+msgstr "在基础设施冷态准备完成后显式发现一张卡。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:27
+msgid ""
+"Factory lookup and Platform startup never discover or replace media. "
+"Geometry is unavailable before activation. A different card requires "
+"explicit stop and activation; errors never silently reprobe a socket."
+msgstr "Factory 查找和 Platform 启动不发现或更换介质。激活前几何不可用。更换卡需要显式停机再激活；发生错误时不静默重新探测卡座。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:27
+msgid "[inout] Same serialized Thread owner; no existing live session."
+msgstr "[inout] 同一串行 Thread 所有者；不存在既有有效会话。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:27
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "[in] Finite absolute provider-clock deadline."
+msgstr "[in] provider 时钟域中的有限绝对 deadline。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:27
+msgid ""
+"Success after exact card identification and geometry admission; failure "
+"retains any unproved controller/session cleanup owner."
+msgstr "精确卡身份和几何准入后成功；失败保留任何尚未证明完成的控制器/会话清理责任。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:27
+msgid "Read whole sectors synchronously with a finite absolute deadline."
+msgstr "在有限绝对截止时间内同步读取完整扇区。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:27
+msgid ""
+"No data pointer remains borrowed after return in this synchronous profile. "
+"Media/controller uncertainty may independently retain their owner, pins and "
+"gates and make stop refuse. No DMA is implied."
+msgstr ""
+"在此同步配置中，返回后不保留任何数据指针借用。介质或控制器状态不确定可独立保留其所有者、引脚和时钟门责任，并使停机拒绝。不隐含 DMA 能力。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:27
+msgid "[inout] Single privileged Thread owner; no ISR or reentrancy."
+msgstr "[inout] 单个特权 Thread 所有者；禁止 ISR 或重入。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:27
+msgid "[in] Logical sector index, never a byte address."
+msgstr "[in] 逻辑扇区索引，不是字节地址。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:27
+msgid "[out] Aligned caller storage, disjoint from provider/MMIO."
+msgstr "[out] 对齐的调用方存储，与 provider/MMIO 分离。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:27
+msgid "[in] Accessible bytes, at least blocks times block_bytes."
+msgstr "[in] 可访问字节数，至少为 blocks 乘以 block_bytes。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:27
+msgid "[in] Positive bounded count accepted by the selected provider."
+msgstr "[in] 所选 provider 接受的正数有界计数。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:27
+msgid ""
+"Status and confirmed whole-block prefix; current failed block may have "
+"changed. REJECTED parameters have zero hardware effects."
+msgstr "状态与已确认的完整块前缀；当前失败块可能已经改变。REJECTED 参数不产生硬件效果。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:27
+msgid "Write sectors; memory completion alone never proves media ready."
+msgstr "写入扇区；内存访问完成本身不证明介质就绪。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:27
+msgid ""
+"Return ends CPU buffer access but not uncertain media programming; UNCERTAIN"
+" retains controller responsibility. No atomicity, power-loss recovery or "
+"durability beyond the selected protocol is promised."
+msgstr ""
+"返回结束 CPU 缓冲区访问，但不结束尚未确定的介质编程；UNCERTAIN 保留控制器责任。不承诺原子性、掉电恢复或超出所选协议的持久性。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:27
+msgid "[inout] Single Thread owner with an admitted writable session."
+msgstr "[inout] 单个 Thread 所有者，具有已准入的可写会话。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:27
+msgid "[in] Logical sector index, checked before command writes."
+msgstr "[in] 逻辑扇区索引，在命令写入前检查。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:27
+msgid "[in] Aligned immutable caller storage until this call returns."
+msgstr "[in] 对齐且不可变的调用方存储，持续有效至本次调用返回。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:27
+msgid "[in] Accessible source bytes, at least the selected extent."
+msgstr "[in] 可访问源字节数，至少覆盖所选范围。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:27
+msgid "[in] Positive bounded count; no erase or product policy."
+msgstr "[in] 正数有界计数；不包含擦除或产品策略。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:27
+msgid ""
+"Status and whole blocks confirmed after card programming readiness. A failed"
+" current block may already have modified media."
+msgstr "状态与卡编程就绪后确认的完整块。当前失败块可能已修改介质。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:27
+msgid "Observe protocol readiness without replaying a prior failed write."
+msgstr "观察协议就绪状态，不重放先前失败的写入。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:27
+msgid "[inout] Same initialized media session and serialized owner."
+msgstr "[inout] 同一已初始化介质会话和串行所有者。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:27
+msgid ""
+"Success only after proved host/media readiness; failure retains uncertainty "
+"and never upgrades a prior transfer outcome."
+msgstr "只有证明主机/介质就绪后才成功；失败保留不确定状态，绝不提升先前传输结果。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:27
+msgid "Quiesce a session; a timeout never authorizes clock/pad withdrawal."
+msgstr "使会话静止；超时不授权撤出时钟或引脚。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:27
+msgid "[inout] Same owner, live through a refused stop/retry."
+msgstr "[inout] 同一所有者，在停机拒绝和重试期间持续有效。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:27
+msgid ""
+"Success after actual publisher/media withdrawal, or failure with provider "
+"cleanup responsibility retained. Platform cold close owns subsequent pad and"
+" gate restoration."
+msgstr "实际发布方/介质撤出后成功；失败则保留 provider 清理责任。Platform 冷态关闭负责随后恢复引脚和时钟门。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:27
+msgid "Record externally established physical removal of this exact card."
+msgstr "记录由外部确认的这张精确卡的物理移除。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:27
+msgid ""
+"Board owns detect and debounce. A timeout does not prove removal. Call after"
+" synchronous I/O has returned, or under the asynchronous owner's execution "
+"serialization. Outstanding borrows remain live. Explicit stop then "
+"activation is required before a replacement card."
+msgstr ""
+"Board 负责 detect 与消抖。超时不证明移除。应在同步 I/O 返回后调用，或遵循异步 owner "
+"的执行串行化。未结束的借用继续有效。更换卡之前必须显式 stop，再 activation。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:27
+msgid "[in] Same serialized privileged unmasked Thread owner."
+msgstr "[in] 同一串行化、特权且未屏蔽中断的 Thread 模式所有者。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:27
+msgid "Success invalidates geometry and begins any required host drain."
+msgstr "成功使 geometry 失效，并开始所需的 host 排空。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:27
+msgid "Media geometry remains immutable during one initialized session."
+msgstr "一个已初始化会话内的介质几何保持不可变。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:27
+#: ../../../../../../docs/reference/api/io/storage.md:33
+#: ../../../../../../docs/reference/api/io/storage.md:39
+#: ../../../../../../docs/reference/api/io/storage.md:45
+#: ../../../../../../docs/reference/api/io/storage.md:51
+#: ../../../../../../docs/reference/api/io/storage.md:57
+#: ../../../../../../docs/reference/api/io/storage.md:63
+#: ../../../../../../docs/reference/api/io/storage.md:69
+#: ../../../../../../docs/reference/api/io/storage.md:75
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "Public Members"
+msgstr "公共成员"
+
+#: ../../../../../../docs/reference/api/io/storage.md:27
+msgid "Confirmed whole-block prefix; failed block bytes are unspecified."
+msgstr "已确认的完整块前缀；失败块中的字节未指定。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:27
+msgid "Shared readonly methods for one serialized execution owner."
+msgstr "单个串行执行所有者的共享只读方法。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:27
+msgid "Immutable face; lookup never starts clocks or accesses media."
+msgstr "不可变接口；查找不启动时钟或访问介质。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:31
+msgid "block_async.h"
+msgstr "block_async.h"
+
+#: ../../../../../../docs/reference/api/io/storage.md:33
+msgid "Finite block borrows with explicit IRQ and DMA drain."
+msgstr "具有显式 IRQ 与 DMA 排空的有限块借用。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:33
+msgid "Prepare a finite block receive with writable caller storage."
+msgstr "使用调用者可写存储准备有限块接收。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:33
+msgid ""
+"Task-only preparation creates no hardware effect or provider borrow. Caller "
+"storage, format and alignment still require actual admission."
+msgstr "仅限任务的准备不产生硬件作用或 provider 借用。调用者存储、格式与对齐仍须通过实际准入。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:33
+msgid "[inout] Initialized READY or consumed SETTLED descriptor."
+msgstr "[inout] 已初始化的 READY 或已消费的 SETTLED 描述符。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:33
+msgid "[in] Logical first block; complete range must not wrap."
+msgstr "[in] 起始逻辑块；完整范围不得回绕。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:33
+msgid "[out] Writable payload; prepare establishes no provider borrow."
+msgstr "[out] 可写 payload；准备阶段不建立 provider 借用。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:33
+msgid "[in] Positive actual capacity, checked by the provider."
+msgstr "[in] 正的实际容量，由 provider 检查。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:33
+msgid "[in] Positive requested count; geometry is provider-owned."
+msgstr "[in] 请求的正数量；几何由 provider 拥有。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:33
+msgid "[in] Finite absolute transfer deadline, including queue time."
+msgstr "[in] 包含排队时间的有限、绝对传输 deadline。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:33
+msgid "SUCCESS, INVALID or STATE; failure leaves the descriptor unchanged."
+msgstr "SUCCESS、INVALID 或 STATE；失败保持描述符不变。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:33
+msgid "Prepare a finite block write from immutable caller storage."
+msgstr "从调用者不可变存储准备有限块写入。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:33
+msgid ""
+"No allocation, payload copy or provider borrow. Prepare again to change "
+"direction; toggling write alone does not select another union member."
+msgstr ""
+"不分配、不复制 payload、不建立 provider 借用。改变方向时重新 prepare；仅翻转 write 不会选择另一 union 成员。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:33
+msgid "[in] Immutable source, kept alive through eventual settlement."
+msgstr "[in] 不可变源，保持有效直到最终结清。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:33
+msgid "[in] Positive actual readable capacity, provider-checked."
+msgstr "[in] 正的实际可读容量，由 provider 检查。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:33
+msgid "Read the selected payload address without granting write access."
+msgstr "读取所选 payload 地址，不授予可写访问。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:33
+msgid ""
+"Pure bounded task/IRQ view. A provider writes only buffer.rx after "
+"validating the receive direction; TX storage remains immutable."
+msgstr "纯、有界的 task／IRQ 视图。provider 验证接收方向后仅写入 buffer.rx；TX 存储保持不可变。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:33
+msgid "[in] Nonnull live descriptor with a correctly selected member."
+msgstr "[in] 非 NULL 的活跃描述符，已正确选择成员。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:33
+msgid "Payload address; no bounds, state or hardware check is performed."
+msgstr "payload 地址；不执行边界、状态或硬件检查。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:33
+msgid "Admit a complete finite block request without allocation or workers."
+msgstr "接纳完整的有限块请求，不分配存储或创建 worker。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:33
+msgid ""
+"Initialize base, then use nx_block_read_prepare/write_prepare. Keep the "
+"matching buffer member and direction immutable through SETTLED. The complete"
+" descriptor and payload remain borrowed. IRQ/DMA completion alone never "
+"releases them. The ordinary face owns explicit activation, sync and stop of "
+"the same media session."
+msgstr ""
+"初始化 base，再使用 nx_block_read_prepare／write_prepare。匹配的 buffer 成员与方向保持不可变，直到 "
+"SETTLED。完整描述符和 payload 持续借用；单独 IRQ／DMA 完成不会释放它们。普通 face 负责同一介质会话的显式 "
+"activation、sync 与 stop。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:33
+msgid "[in] Single privileged unmasked Thread execution owner."
+msgstr "[in] 唯一的特权、未屏蔽中断的 Thread 模式执行所有者。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:33
+msgid "[inout] READY descriptor, finite deadline and aligned span."
+msgstr "[inout] READY 描述符、有限 deadline 与对齐 span。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:33
+msgid "SUCCESS means ACCEPTED; rejection retains nothing and has no effect."
+msgstr "SUCCESS 表示 ACCEPTED；拒绝不保留任何引用，也不产生效果。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:33
+msgid "Request cancellation while retaining every borrowed reference."
+msgstr "请求取消，同时保留每个借用引用。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:33
+msgid ""
+"Cross-task controls use external stable slots and epochs. This call does not"
+" cancel a physical card programming pulse or release storage."
+msgstr "跨任务控制使用外部稳定 slot 与 epoch。本调用不取消物理卡的编程脉冲，也不释放存储。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:33
+msgid "[in] Same serialized execution owner as submit/service."
+msgstr "[in] 与 submit/service 相同的串行化执行所有者。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:33
+msgid "[inout] Exact live descriptor, never a stale pointer."
+msgstr "[inout] 精确的活跃描述符，不能是过期指针。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:33
+msgid "SUCCESS begins drain; STATE for another request."
+msgstr "SUCCESS 开始排空；其他请求返回 STATE。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:33
+msgid "Advance card readiness, deadlines and final source withdrawal."
+msgstr "推进卡就绪、deadline 和最终来源撤回。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:33
+msgid ""
+"No worker is created. Failed drain leaves QUARANTINED storage live; later "
+"service can retry the same cleanup. SETTLED is final access."
+msgstr "不创建 worker。排空失败时 QUARANTINED 存储继续有效，后续 service 可重试同一清理。SETTLED 是最终访问。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:33
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "[in] Same privileged unmasked Thread executor."
+msgstr "[in] 同一特权、未屏蔽中断的 Thread 模式执行者。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:33
+msgid "Report externally established physical removal of this exact card."
+msgstr "报告由外部确认的这张精确卡的物理移除。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:33
+msgid ""
+"This is not a presence probe or debounce policy. Remove invalidates "
+"geometry; no replacement is admitted until explicit stop/activation. Removal"
+" never revokes an outstanding payload borrow."
+msgstr ""
+"这不是存在性探测或消抖策略。Remove 使 geometry 失效；显式 stop/activation 之前不接纳替换卡。移除从不撤销未结束的 "
+"payload 借用。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:33
+msgid "[in] Same serialized Thread owner, after Board detect evidence."
+msgstr "[in] 同一串行化 Thread 模式所有者，已有 Board detect 证据。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:33
+msgid "SUCCESS records removal and begins any needed host drain."
+msgstr "SUCCESS 记录移除并开始所需的 host 排空。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:33
+msgid "Stable caller descriptor and payload stay borrowed until SETTLED."
+msgstr "调用者的稳定描述符和 payload 持续被借用，直到 SETTLED。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:33
+msgid "Optional finite transport shares the ordinary block session."
+msgstr "可选有限传输共享普通 block 会话。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:33
+msgid "Immutable identity; queries and lookup never start media."
+msgstr "不可变身份；查询和 lookup 从不启动介质。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:37
+msgid "external_bus.h"
+msgstr "external_bus.h"
+
+#: ../../../../../../docs/reference/api/io/storage.md:39
+msgid "Explicit shared external-controller lifecycle face."
+msgstr "显式共享外部控制器生命周期接口。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:39
+msgid "Software ownership phase; it never proves physical device fitting."
+msgstr "软件所有权阶段，不证明物理器件实装。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:39
+msgid "Observe the selected bus owner's software phase."
+msgstr "观察所选总线所有者的软件阶段。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:39
+msgid ""
+"No preparation, device discovery or bank acquisition is implicit. PREPARED "
+"is not physical clock or timing proof."
+msgstr "不隐式准备、发现设备或取得 Bank。PREPARED 不证明物理时钟或时序。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:39
+msgid "[in] Stable face under the same serialized task executor"
+msgstr "[in] 同一串行任务执行者管理的稳定接口"
+
+#: ../../../../../../docs/reference/api/io/storage.md:39
+msgid "Actual ownership phase, UNAVAILABLE for a missing method"
+msgstr "实际所有权阶段；缺少方法时返回 UNAVAILABLE"
+
+#: ../../../../../../docs/reference/api/io/storage.md:39
+msgid "Withdraw selected banks and only the acquired bus effects."
+msgstr "撤出所选 Bank 以及仅已取得的总线效果。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:39
+msgid ""
+"All endpoint consumers and CPU users must join first. Timeout never revokes "
+"a derived pointer. Cold Platform release restores the shared pad lease only "
+"afterward."
+msgstr "必须先汇合所有端点消费者和 CPU 使用者。超时不撤销派生指针。之后才由 Platform 冷态释放恢复共享引脚租约。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:39
+msgid "[in] Same exclusive controller owner, storage still alive"
+msgstr "[in] 同一独占控制器所有者，存储仍有效"
+
+#: ../../../../../../docs/reference/api/io/storage.md:39
+msgid ""
+"SUCCESS after complete withdrawal, BUSY while a bank loan remains, or exact "
+"error retaining unfinished responsibility"
+msgstr "完整撤出后返回 SUCCESS；Bank 借用仍存在时返回 BUSY，或返回保留未完成责任的精确错误"
+
+#: ../../../../../../docs/reference/api/io/storage.md:39
+msgid "One readonly method table; callbacks receive the actual bus owner."
+msgstr "单个只读方法表；回调接收实际总线所有者。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:39
+msgid "Immutable controller face, distinct from every child bank endpoint."
+msgstr "不可变控制器接口，与每个子 Bank 端点区分。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:43
+msgid "parallel16.h"
+msgstr "parallel16.h"
+
+#: ../../../../../../docs/reference/api/io/storage.md:45
+msgid "Settled 16-bit command and data endpoint."
+msgstr "同步 16 位命令与数据端点。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:45
+msgid "Send one complete command-register word."
+msgstr "发送一个完整命令寄存器字。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:45
+msgid ""
+"Partial device effects can survive a failure. No reset, command replay, "
+"worker, DMA or GPIO control is implied."
+msgstr "失败后可能保留部分设备效果。不隐含复位、命令重放、工作线程、DMA 或 GPIO 控制。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:45
+msgid "[in] Live exact bank under its serialized owner"
+msgstr "[in] 由串行所有者管理的有效精确 Bank"
+
+#: ../../../../../../docs/reference/api/io/storage.md:45
+msgid "[in] Native command word, not a byte-count address"
+msgstr "[in] 本机命令字，不是按字节计数的地址"
+
+#: ../../../../../../docs/reference/api/io/storage.md:45
+msgid "[in] Finite absolute provider-clock deadline"
+msgstr "[in] provider 时钟域中的有限绝对 deadline"
+
+#: ../../../../../../docs/reference/api/io/storage.md:45
+msgid "SUCCESS, INVALID, UNSUPPORTED or provider failure"
+msgstr "SUCCESS、INVALID、UNSUPPORTED 或 provider 失败"
+
+#: ../../../../../../docs/reference/api/io/storage.md:45
+msgid "Write one settled data-register word sequence."
+msgstr "写入一段已完成的数据寄存器字序列。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:45
+msgid ""
+"Every return ends buffer access. It does not revoke the bank lease or prove "
+"physical panel state. Consumer and bus lifecycle must join before shared "
+"infrastructure withdrawal."
+msgstr "每次返回都结束缓冲区访问，但不撤销 Bank 租约或证明物理面板状态。撤出共享基础设施前必须汇合消费者和总线生命周期。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:45
+msgid "[in] Same live bank and task executor"
+msgstr "[in] 同一有效 Bank 和任务执行者"
+
+#: ../../../../../../docs/reference/api/io/storage.md:45
+msgid "[in] Aligned immutable span, disjoint from known controls"
+msgstr "[in] 对齐的不可变区间，与已知控制对象分离"
+
+#: ../../../../../../docs/reference/api/io/storage.md:45
+msgid "[in] Positive word count within the selected mode bound"
+msgstr "[in] 所选模式边界内的正数字数"
+
+#: ../../../../../../docs/reference/api/io/storage.md:45
+msgid "[out] Distinct exact completed word prefix"
+msgstr "[out] 分离的精确已完成字前缀"
+
+#: ../../../../../../docs/reference/api/io/storage.md:45
+msgid "[in] One finite absolute deadline for the sequence"
+msgstr "[in] 整段序列共用的单个有限绝对截止时间"
+
+#: ../../../../../../docs/reference/api/io/storage.md:45
+msgid ""
+"SUCCESS only for count words; provider error may report a shorter prefix. "
+"Parameter rejection preserves output."
+msgstr "只有完成 count 个字才返回 SUCCESS；provider 错误可报告较短前缀。参数拒绝保留输出。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:45
+msgid "Read one settled data-register word sequence."
+msgstr "读取一段已完成的数据寄存器字序列。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:45
+msgid ""
+"Dummy-read/command sequencing belongs to the device protocol. This endpoint "
+"never interprets a controller ID."
+msgstr "空读与命令顺序属于设备协议。此端点不解释控制器 ID。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:45
+msgid "[out] Aligned writable storage, disjoint from controls"
+msgstr "[out] 对齐的可写存储，与控制对象分离"
+
+#: ../../../../../../docs/reference/api/io/storage.md:45
+msgid "[in] Positive selected word count"
+msgstr "[in] 选定的正数字数"
+
+#: ../../../../../../docs/reference/api/io/storage.md:45
+msgid ""
+"SUCCESS only for count words; failed-prefix bytes outside transferred are "
+"unspecified. Parameter rejection preserves transferred and performs no "
+"access."
+msgstr ""
+"只有完成 count 个字才返回 SUCCESS；transferred 以外失败前缀中的字节未指定。参数拒绝保留 transferred "
+"且不执行访问。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:45
+msgid "Shared immutable methods for one 16-bit parallel endpoint."
+msgstr "单个 16 位并行端点的共享不可变方法。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:45
+msgid ""
+"Words are native halfwords; the selected physical route fixes command/data "
+"addresses and electrical bus timing. Methods use one serialized task "
+"executor and one finite absolute clock domain. No span survives a return, "
+"including failure. SUCCESS requires the whole requested word prefix."
+msgstr ""
+"字是本机半字；所选物理路线固定命令/数据地址和电气总线时序。方法使用单个串行任务执行者和单个有限绝对时钟域。每次返回都不保留任何区间，包括失败。SUCCESS"
+" 要求完成请求的全部字前缀。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:45
+msgid "Stable readonly face; lookup acquires no bus or bank lease."
+msgstr "稳定只读接口；查找不取得总线或 Bank 租约。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:49
+msgid "memory_window.h"
+msgstr "memory_window.h"
+
+#: ../../../../../../docs/reference/api/io/storage.md:51
+msgid "Exact caller-owned CPU memory-window leases."
+msgstr "由调用方持有的精确 CPU 内存窗口租约。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:51
+msgid "Borrow one complete admitted CPU memory window."
+msgstr "借用一个完整且已准入的 CPU 内存窗口。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:51
+msgid ""
+"CPU accessibility is not physical retention or timing qualification. No heap"
+" pool or automatic SRAM test exists."
+msgstr "CPU 可访问性不等于物理保持或时序资格。不提供堆池或自动 SRAM 测试。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:51
+msgid "[in] Live selected bank under one serialized task owner"
+msgstr "[in] 单个串行任务所有者管理的有效选定 Bank"
+
+#: ../../../../../../docs/reference/api/io/storage.md:51
+msgid "[inout] Fresh zero stable disjoint caller storage"
+msgstr "[inout] 新鲜、清零、稳定且分离的调用方存储"
+
+#: ../../../../../../docs/reference/api/io/storage.md:51
+msgid ""
+"SUCCESS with exact address/bytes/epoch, or rejection with lease and hardware"
+" unchanged"
+msgstr "SUCCESS 并提供精确 address/bytes/epoch；或拒绝且租约与硬件不变"
+
+#: ../../../../../../docs/reference/api/io/storage.md:51
+msgid "Release the original loan after all direct users joined."
+msgstr "所有直接使用者汇合后归还原始借用。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:51
+msgid ""
+"The provider enforces identity and orders prior CPU access before later bank"
+" withdrawal. It cannot detect a caller violating the join precondition by "
+"reusing a raw pointer."
+msgstr ""
+"provider 强制身份匹配，并将先前 CPU 访问排序在随后 Bank 撤出之前。它无法检测调用方通过复用原始指针违反汇合前置条件的行为。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:51
+msgid "[in] Exact same bank identity that granted the loan"
+msgstr "[in] 授予借用的完全相同 Bank 身份"
+
+#: ../../../../../../docs/reference/api/io/storage.md:51
+msgid "[inout] Original stable lease storage, never a copied token"
+msgstr "[inout] 原始稳定租约存储，不能使用复制的令牌"
+
+#: ../../../../../../docs/reference/api/io/storage.md:51
+msgid "[in] Generation captured on the original acquisition"
+msgstr "[in] 原始取得时捕获的代次"
+
+#: ../../../../../../docs/reference/api/io/storage.md:51
+msgid ""
+"SUCCESS or exact stale/foreign/release rejection; failed release retains the"
+" original responsibility"
+msgstr "SUCCESS 或精确的过期、外来或归还拒绝；归还失败保留原始责任"
+
+#: ../../../../../../docs/reference/api/io/storage.md:51
+msgid "Read selected bank geometry without acquiring a loan."
+msgstr "读取选定 Bank 几何，不取得借用。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:51
+msgid ""
+"This performs no memory test or implied initialization. startup_backing "
+"never grants an exclusive whole-bank loan."
+msgstr "不执行内存测试或隐式初始化。startup_backing 不授予独占整 Bank 借用。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:51
+msgid "[in] Stable selected face under its serialized owner."
+msgstr "[in] 由串行所有者管理的稳定选定接口。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:51
+msgid ""
+"[out] Distinct aligned caller output, preserved on input rejection; provider"
+" errors may leave it unchanged."
+msgstr "[out] 分离且对齐的调用方输出，输入拒绝时保持不变；provider 错误可能保留其原值。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:51
+msgid ""
+"SUCCESS with readonly facts, STATE before facts exist, UNSUPPORTED for a "
+"missing method or exact provider failure."
+msgstr ""
+"SUCCESS 并提供只读事实；事实尚不存在时返回 STATE，缺少方法时返回 UNSUPPORTED，或返回精确 provider 失败。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:51
+msgid "Stable exclusive direct-access loan; zero before acquire."
+msgstr "稳定的独占直接访问借用；取得前清零。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:51
+msgid ""
+"Do not copy a live lease or alter fields. owner is opaque provider identity,"
+" not a public device pointer. CPU accesses use address directly without per-"
+"load dispatch. This first profile permits CPU data read/write only; it does "
+"not grant DMA, executable, allocator or C-runtime startup backing. Join all "
+"derived pointer users before release. A timeout or lost pointer never proves"
+" that those users have stopped."
+msgstr ""
+"不得复制有效租约或修改字段。owner 是不透明的 provider 身份，不是公共设备指针。CPU 直接使用 address "
+"访问，每次加载不经分派。首个配置只允许 CPU 数据读写，不授予 DMA、执行、分配器或 C "
+"运行时启动支撑能力。释放前必须汇合所有派生指针使用者。超时或指针丢失不证明这些使用者已经停止。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:51
+msgid "Readonly physical geometry, never permission to use bytes."
+msgstr "只读物理几何，不授予字节使用权限。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:51
+msgid ""
+"startup_backing marks memory with live startup objects. A whole-bank runtime"
+" loan is unsupported for that profile. Geometry does not authorize DMA, "
+"probing or allocation."
+msgstr "startup_backing 标识具有有效启动对象的内存。此配置不支持整 Bank 运行时借用。几何不授权 DMA、探测或分配。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:51
+msgid "Immutable methods for one exact selected memory bank."
+msgstr "单个精确选定内存 Bank 的不可变方法。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:51
+msgid "Immutable face; lookup does not acquire, clear or test memory."
+msgstr "不可变接口；查找不取得、清除或测试内存。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:55
+msgid "flash.h"
+msgstr "flash.h"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "Full physical Flash geometry and explicit bounded regions."
+msgstr "完整物理 Flash 几何与显式有界区域。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "Physical programming requirements beyond unit alignment."
+msgstr "超出单元对齐要求的物理编程约束。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "Check complete immutable spans and derive their sector count."
+msgstr "检查完整不可变区间，并推导其扇区数。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "No MMIO, allocation, mapping permission or physical qualification."
+msgstr "不进行 MMIO、分配，不授予映射权限或物理资格。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "[in] Stable readable geometry and complete readable spans."
+msgstr "[in] 稳定可读的几何与完整可读区间。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "[out] Aligned stable output disjoint from geometry and spans."
+msgstr "[out] 对齐且稳定的输出，与几何及区间描述分离。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "SUCCESS; INVALID leaves output and all inputs unchanged."
+msgstr "成功返回 SUCCESS；INVALID 时输出和所有输入均保持不变。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "Resolve a logical sector ordinal to a physical relative value."
+msgstr "将逻辑扇区序号解析为物理相对值。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "No pointer into provider metadata is returned."
+msgstr "不返回指向具体实现元数据的指针。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "[in] Stable immutable complete physical description."
+msgstr "[in] 稳定、不可变且完整的物理描述。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "[in] Zero-based sector index, strictly below derived count."
+msgstr "[in] 从零开始的扇区索引，严格小于推导所得数量。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "[out] Aligned output disjoint from geometry and spans."
+msgstr "[out] 对齐输出，与几何及区间描述分离。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "Find an exact sector start without rounding a physical offset."
+msgstr "查找精确的扇区起点，不对物理偏移取整。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "[in] Exact sector start; physical end is not a sector."
+msgstr "[in] 精确扇区起点；物理存储末端不属于扇区。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "Query exact physical Flash geometry without side effects."
+msgstr "无副作用地查询准确物理 Flash 几何。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "[in] Selected exact-density physical Flash provider."
+msgstr "[in] 选中的精确密度物理 Flash provider。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "Immutable geometry, or NULL for invalid port."
+msgstr "不可变几何信息；端口无效时返回 NULL。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "Read bounded physical Flash without retaining destination."
+msgstr "有界读取物理 Flash，不保留目标存储。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "[in] Fixed provider; no concurrent erase/program."
+msgstr "[in] 固定 provider；不得并发擦除或编程。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "[in] Physical relative offset."
+msgstr "[in] 物理相对偏移。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "[out] Destination not retained beyond return."
+msgstr "[out] 目标存储；返回后不再保留。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "[in] Byte count; zero permitted with NULL data."
+msgstr "[in] 字节数；为零时允许 data 为 NULL。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "Success or INVALID; no access on rejected range/overflow."
+msgstr "成功或 INVALID；范围被拒绝或发生回绕时不进行访问。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "Program aligned physical Flash and settle all hardware pulses."
+msgstr "对齐编程物理 Flash，并结清全部硬件脉冲。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid ""
+"Task-only CPU-active operation. Product owns execution-from- Flash stall, "
+"watchdog and power-loss policy. No RAM fake on MCU."
+msgstr ""
+"仅限任务上下文、由 CPU 主动执行的操作。从 Flash 执行时的停顿、看门狗和掉电策略由产品负责。MCU 上不以 RAM 模拟 Flash。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid ""
+"With NX_FLASH_PROGRAM_REQUIRES_FRESH_ERASE, each programmed unit needs a "
+"successful erase and no later program pulse. Reading all 0xff cannot prove "
+"this on ECC Flash. A failed or interrupted pulse consumes its unit until the"
+" next successful sector erase. The caller owns this provenance; providers "
+"keep no implicit erase-history bitmap."
+msgstr ""
+"使用 NX_FLASH_PROGRAM_REQUIRES_FRESH_ERASE 时，每个待编程单元必须经过成功擦除，且擦除后尚未经历任何编程脉冲。在带"
+" ECC 的 Flash 上，读到全 0xff "
+"不能证明这一点。失败或中断的脉冲会消耗该单元，直到下次成功擦除所属扇区。调用方负责此来源证明；provider 不维护隐式擦除历史位图。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid ""
+"All-0xff input units must not issue a program pulse. A provider may reject a"
+" visibly non-erased destination."
+msgstr "输入全为 0xff 的单元不得触发编程脉冲。provider 可以拒绝从可见内容判断尚未擦除的目标。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "[inout] Single execution owner with valid voltage/clock policy."
+msgstr "[inout] 具有有效电压/时钟策略的唯一执行所有者。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "[in] Program-unit aligned physical offset."
+msgstr "[in] 按编程单元对齐的物理偏移。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "[in] Aligned-length input retained only until return."
+msgstr "[in] 长度已对齐的输入，仅借用到返回。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "[in] Positive program-unit multiple."
+msgstr "[in] 正的编程单元整数倍。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "[in] Absolute deadline checked between hardware pulses."
+msgstr "[in] 在硬件脉冲之间检查的绝对 deadline。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid ""
+"Success or INVALID/TIMEOUT/IO. Return proves no remaining buffer/hardware "
+"access; an active pulse cannot be preempted."
+msgstr "成功或 INVALID/TIMEOUT/IO。返回证明已无缓冲区或硬件访问；已开始的脉冲不能被抢占。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "Erase a whole physical sector range with pulse settlement."
+msgstr "擦除完整物理扇区范围，并结清脉冲。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "[inout] Single execution owner."
+msgstr "[inout] 唯一执行所有者。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "[in] Exact sector-start physical offset."
+msgstr "[in] 精确位于扇区起点的物理偏移。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "[in] Positive sum of whole sectors."
+msgstr "[in] 若干完整扇区长度之和，且为正值。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "[in] Absolute deadline checked between erase pulses."
+msgstr "[in] 在擦除脉冲之间检查的绝对 deadline。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid ""
+"Success or INVALID/TIMEOUT/IO; partial erase is possible on timeout/error. "
+"Return waits for current pulse to become idle."
+msgstr "成功或 INVALID/TIMEOUT/IO；超时或错误可能只完成部分擦除。返回前等待当前脉冲进入空闲。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "Retry retained physical cleanup without another pulse."
+msgstr "重试保留的物理清理责任，不再启动操作脉冲。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid ""
+"Privileged unmasked Thread on MCU. This bounded attempt never waits for a "
+"busy pulse, replays data, rolls back an irreversible effect or substitutes "
+"for a required POR. Preserve the owner until recovery succeeds. Recovery "
+"does not turn the original failed operation into success."
+msgstr ""
+"MCU 上由特权且未屏蔽 IRQ 的 Thread 执行。这次有界尝试不等待 busy 脉冲结束，不重放数据、不回滚不可逆效果，也不能替代所需 "
+"POR。恢复成功前保留 owner。恢复不会把原失败操作改记为成功。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "[in] Same serialized owner as the failed operation."
+msgstr "[in] 与失败操作相同的串行 owner。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid ""
+"SUCCESS after actual cleanup; BUSY while hardware remains active, IO while "
+"cleanup is refused, or UNSUPPORTED when this optional provider operation is "
+"absent."
+msgstr ""
+"实际清理完成后返回 SUCCESS；硬件仍活动时返回 BUSY，拒绝清理时返回 IO；提供者未实现该可选操作时返回 UNSUPPORTED。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "Validate region bounds against physical geometry."
+msgstr "根据物理几何验证区域边界。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "[in] Explicit caller-owned region description."
+msgstr "[in] 调用方显式持有的区域描述。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "Success or INVALID; erase geometry is checked per operation."
+msgstr "成功或 INVALID；每次操作分别检查擦除几何。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "Read within an explicit physical region."
+msgstr "在显式物理区域内读取。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "[in] Valid region."
+msgstr "[in] 有效区域。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "[in] Region-relative byte offset."
+msgstr "[in] 相对于区域的字节偏移。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "[out] Destination buffer."
+msgstr "[out] 目标缓冲区。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "[in] Byte count."
+msgstr "[in] 字节数。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "Success or INVALID without access outside the region."
+msgstr "成功或 INVALID，不访问区域以外的地址。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "Program within an explicitly writable physical region."
+msgstr "在显式可写物理区域内编程。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "[in] Valid writable region."
+msgstr "[in] 有效且可写的区域。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "[in] Region-relative aligned offset."
+msgstr "[in] 相对于区域的已对齐偏移。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "[in] Input buffer; borrowed until return only."
+msgstr "[in] 输入缓冲区；仅借用到返回。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "[in] Aligned positive length."
+msgstr "[in] 已对齐的正长度。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "[in] Absolute pulse deadline."
+msgstr "[in] 绝对脉冲 deadline。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "Success, INVALID/PERMISSION or underlying pulse result."
+msgstr "成功、INVALID/PERMISSION 或底层脉冲操作的结果。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "Erase whole physical sectors within a writable region."
+msgstr "在可写区域内擦除完整物理扇区。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "[in] Explicit valid writable region."
+msgstr "[in] 显式有效且可写的区域。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "[in] Region-relative sector boundary."
+msgstr "[in] 相对于区域的扇区边界。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "[in] Sum of whole sector lengths."
+msgstr "[in] 完整扇区长度之和。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "Erase sector geometry, with offset relative to full physical Flash."
+msgstr "擦除扇区几何，偏移相对于完整物理 Flash。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "Consecutive equal erase sectors, relative to one physical device."
+msgstr "相对于同一物理器件的连续等大擦除扇区。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid ""
+"Positive erase_bytes/count; ordered spans exactly cover size with no gaps, "
+"overlap, overflow or CPU mapping/partition authorization."
+msgstr "erase_bytes／count 为正；有序区间必须恰好覆盖 size，不得有空隙、重叠或溢出，也不授予 CPU 映射／分区权限。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "Read-only physical geometry; platform reserves no product storage."
+msgstr "只读物理几何；平台不预留产品存储。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid ""
+"program_flags states additional unit requirements. Zero does not waive the "
+"selected provider's programming rules."
+msgstr "program_flags 声明额外的单元要求。零值不免除所选 provider 的编程规则。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid ""
+"base_address is descriptive metadata, not a CPU mapping or permission to "
+"dereference Flash. All I/O offsets remain relative to this physical device; "
+"products own regions."
+msgstr ""
+"base_address 是描述性元数据，不是 CPU 映射，也不授予解引用 Flash 的权限。所有 I/O "
+"偏移始终相对于此物理器件；产品负责定义区域。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "Explicit consumer-selected bounds; no implicit product partition."
+msgstr "消费者显式选择的边界，不含隐式产品分区。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "Shared read-only methods using one provider state."
+msgstr "使用同一个提供者状态的共享只读方法。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid ""
+"Methods follow each public operation's ownership contract. Missing optional "
+"methods report UNSUPPORTED."
+msgstr "各方法遵循对应公共操作的所有权合同。缺失的可选方法返回 UNSUPPORTED。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid "Immutable interface pointing to caller-owned state."
+msgstr "指向调用者自有状态的不可变接口。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:57
+msgid ""
+"Face and state outlive callers, IRQs and retained borrows. Factory lookup "
+"neither initializes nor acquires hardware."
+msgstr "接口和状态的生命周期覆盖调用方、IRQ 及保留的借用。工厂查找既不初始化，也不取得硬件。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:61
+msgid "flash_async.h"
+msgstr "flash_async.h"
+
+#: ../../../../../../docs/reference/api/io/storage.md:63
+msgid "Optional finite physical Flash pulses with retained drain."
+msgstr "可选的有限物理 Flash 脉冲与保留的排空责任。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:63
+msgid "Explicit finite program or whole-sector erase operation."
+msgstr "显式有限 program 或完整 sector erase 操作。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:63
+msgid "Prepare a finite request without accessing payload or hardware."
+msgstr "准备有限请求，不访问 payload 或硬件。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:63
+msgid "Join all previous observers before reuse; no allocation occurs."
+msgstr "复用前先完成所有旧观察者的 join；不分配存储。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:63
+msgid "[inout] Initialized READY or consumed SETTLED storage."
+msgstr "[inout] 已初始化为 READY 或已消费的 SETTLED 存储。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:63
+msgid "[in] Explicit program or erase."
+msgstr "[in] 显式 program 或 erase。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:63
+msgid "[in] Physical byte offset; provider checks geometry."
+msgstr "[in] 物理字节 offset；provider 检查 geometry。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:63
+msgid "[in] Program input, NULL for erase; disjoint from request."
+msgstr "[in] Program 输入，erase 时为 NULL；与请求分离。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:63
+msgid "[in] Positive byte count; provider checks alignment/sectors."
+msgstr "[in] 正字节数；provider 检查对齐／sector。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:63
+#: ../../../../../../docs/reference/api/io/storage.md:75
+msgid "[in] Finite absolute Core monotonic deadline."
+msgstr "[in] 有限的绝对 Core 单调 deadline。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:63
+msgid "SUCCESS or INVALID/STATE with request unchanged on rejection."
+msgstr "SUCCESS，或 INVALID／STATE；拒绝时请求保持不变。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:63
+msgid "Admit one finite operation, retaining storage only on SUCCESS."
+msgstr "接纳一次有限操作，仅在 SUCCESS 时保留存储。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:63
+msgid ""
+"Rejection creates no borrow or new hardware effect. SETTLED proves the pulse"
+" idle and final provider access. Deadline is not drain."
+msgstr "拒绝不建立借用，也不产生新硬件效果。SETTLED 证明脉冲已空闲且 provider 已完成最终访问。Deadline 不是排空。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:63
+msgid "[in] Live selected same-Flash face, serialized task context."
+msgstr "[in] 活跃、已选择且对应同一 Flash 的 face，串行化任务上下文。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:63
+msgid "[inout] Exact READY descriptor and immutable input."
+msgstr "[inout] 精确 READY 描述符和不可变输入。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:63
+#: ../../../../../../docs/reference/api/io/storage.md:75
+msgid "SUCCESS means ACCEPTED, including immediate settled failure."
+msgstr "SUCCESS 表示 ACCEPTED，包括立即 SETTLED 的失败。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:63
+msgid "Prevent further pulses while allowing the current pulse to drain."
+msgstr "禁止后续脉冲，同时允许当前脉冲排空。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:63
+msgid "First observed terminal cause wins; storage stays borrowed until idle."
+msgstr "首个观察到的终止原因锁定；存储持续被借用，直到空闲。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:63
+msgid "[in] Same serialized owner as submit."
+msgstr "[in] 与 submit 相同的串行化所有者。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:63
+msgid "[inout] Exact live accepted descriptor."
+msgstr "[inout] 精确的活跃已接纳描述符。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:63
+msgid "SUCCESS starts cancellation; it does not imply settlement."
+msgstr "SUCCESS 开始取消，不表示已经 SETTLED。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:63
+msgid "Make bounded pulse/drain progress without sleeping or rearming."
+msgstr "有界推进脉冲／排空，不休眠或重新 arm。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:63
+msgid "Caller schedules service; there is no hidden IRQ, worker or queue."
+msgstr "调用者调度 service；没有隐藏 IRQ、worker 或队列。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:63
+msgid "[in] Same privileged serialized task owner."
+msgstr "[in] 同一特权串行化任务所有者。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:63
+msgid ""
+"SUCCESS after progress/settlement; BUSY while draining or IO with retained "
+"QUARANTINED storage when hardware cannot prove idle."
+msgstr "进展／SETTLED 后为 SUCCESS；排空期间为 BUSY，硬件无法证明空闲时为 IO，并保留 QUARANTINED 存储。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:63
+msgid "Seal admission and cancel/drain any current finite operation."
+msgstr "封闭准入，取消／排空当前有限操作。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:63
+msgid ""
+"This does not close the physical bank. Cold close is a separate platform "
+"operation and cannot withdraw a busy physical pulse."
+msgstr "这不关闭物理 bank。Cold close 是独立的平台操作，不能撤回忙碌的物理脉冲。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:63
+msgid "SUCCESS only after request detach; BUSY/IO retains all responsibility."
+msgstr "只有请求分离后才 SUCCESS；BUSY／IO 保留全部责任。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:63
+msgid "Caller-owned finite operation; base.transferred counts bytes."
+msgstr "调用者持有的有限操作；base.transferred 以字节计数。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:63
+msgid ""
+"Request and program input remain immutable/borrowed until observed SETTLED, "
+"including cancellation, deadline and hardware faults. A pulse cannot be "
+"cancelled. Partial success is the completed prefix only; interrupted/failed "
+"physical units require caller recovery policy."
+msgstr ""
+"请求与 program 输入保持不可变并持续被借用，直到观察到 SETTLED；取消、deadline "
+"和硬件故障也遵循此规则。脉冲不能取消。部分成功只表示已完成前缀；中断／失败的物理单元需要调用者的恢复策略。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:63
+msgid "Static methods of the same physical Flash owner, no queue/worker."
+msgstr "同一物理 Flash owner 的静态方法，不创建队列／worker。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:63
+msgid "Immutable optional face; synchronous Flash contract is unchanged."
+msgstr "不可变可选 face；同步 Flash 合同保持原样。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:63
+msgid ""
+"One privileged task serializes this face, the associated Flash face and cold"
+" lifecycle. Configuration/state/faces outlive every retained request. "
+"Factory lookup neither initializes nor acquires hardware."
+msgstr ""
+"一个特权任务串行化本 face、相关 Flash face 与 cold lifecycle。配置／状态／face "
+"比每个保留请求活得更久。Factory 查询既不初始化，也不取得硬件。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:67
+msgid "flash_maintenance.h"
+msgstr "flash_maintenance.h"
+
+#: ../../../../../../docs/reference/api/io/storage.md:69
+msgid "Explicit physical OTP and option maintenance contract."
+msgstr "显式物理 OTP 与 option 维护合同。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:69
+msgid "Typedefs"
+msgstr "类型定义"
+
+#: ../../../../../../docs/reference/api/io/storage.md:69
+msgid "Fixed-width intended-supply profile, never a register encoding."
+msgstr "固定宽度的预期供电 profile，不是寄存器编码。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:69
+msgid "Destructive effects must each be acknowledged by the caller."
+msgstr "每种破坏性效果都必须由调用者逐项确认。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:69
+msgid "Protection levels are semantic values, never vendor encodings."
+msgstr "保护等级是语义值，绝不是厂商编码。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:69
+msgid "Named brownout supply profiles; providers declare supported choices."
+msgstr "具名 brownout 供电 profile；provider 声明支持的选项。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:69
+msgid ""
+"Supply names describe intended operating profiles, not exact reset "
+"thresholds or measured voltages. Device limits and tolerances remain "
+"authoritative; a provider rejects choices it cannot implement. UNKNOWN is an"
+" unset selection and is always rejected before effects."
+msgstr ""
+"供电名称描述预期工作 profile，不代表精确复位阈值或实测电压。器件限值与容差仍是权威；provider 拒绝无法实现的选项。UNKNOWN "
+"表示尚未选择，始终在产生作用前拒绝。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:69
+msgid "Copy physical maintenance state without retaining output storage."
+msgstr "复制物理维护状态，不保留输出存储。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:69
+msgid "Privileged unmasked Thread, serialized with all Flash operations."
+msgstr "特权、未屏蔽中断的 Thread 模式，与全部 Flash 操作串行化。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:69
+msgid "[in] Same exclusive owner as the ordinary Flash face."
+msgstr "[in] 与普通 Flash face 相同的独占所有者。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:69
+msgid "[out] Caller storage valid until this synchronous return."
+msgstr "[out] 调用者存储，在本同步调用返回前有效。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:69
+msgid "Actual facts, or invalid/context/busy/unsupported status."
+msgstr "真实事实，或 invalid／context／busy／unsupported 状态。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:69
+msgid "Read OTP data without exposing lock bytes as writable storage."
+msgstr "读取 OTP 数据，不把 lock 字节暴露为可写存储。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:69
+msgid "[in] Same serialized physical owner."
+msgstr "[in] 同一串行化物理所有者。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:69
+msgid "[in] Byte offset inside the exact OTP data geometry."
+msgstr "[in] 精确 OTP 数据 geometry 内的字节 offset。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:69
+msgid "[out] Caller storage borrowed only during this call."
+msgstr "[out] 调用者存储只在本调用期间被借用。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:69
+msgid "[in] Entire extent, checked without wrap or rounding."
+msgstr "[in] 完整范围，检查不回绕、不取整。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:69
+msgid "Success or rejection before data access."
+msgstr "成功，或在数据访问之前拒绝。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:69
+msgid "Program one-way OTP bits; partial irreversible progress is possible."
+msgstr "编程只能单向改变的 OTP 位；可能产生部分不可逆进展。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:69
+msgid ""
+"No erase exists. Timeout cannot abort a pulse. Single-bank Flash fetches and"
+" interrupts may stall; deadlines are not latency bounds. Effect declarations"
+" are not authentication or permission from tests."
+msgstr ""
+"不存在 erase。超时不能中止脉冲。单 bank Flash 取指及中断可能停顿；deadline "
+"不是延迟上界。效果声明不是认证，也不是测试授予的权限。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:69
+msgid "[in] Exclusive privileged unmasked Thread owner."
+msgstr "[in] 独占、特权且未屏蔽中断的 Thread 模式所有者。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:69
+msgid "[in] Provider-aligned OTP data offset."
+msgstr "[in] 按 provider 要求对齐的 OTP 数据 offset。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:69
+msgid "[in] Stable source until synchronous return; never aliases OTP."
+msgstr "[in] 同步返回前稳定的来源；绝不与 OTP 重叠。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:69
+msgid "[in] Positive aligned complete extent."
+msgstr "[in] 正的、对齐且完整的范围。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:69
+msgid "[in] Explicit OTP_PROGRAM effect declaration."
+msgstr "[in] 显式 OTP_PROGRAM 效果声明。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:69
+msgid "[in] Finite absolute monotonic deadline."
+msgstr "[in] 有限的绝对单调 deadline。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:69
+msgid "Success or error after the last started physical pulse settles."
+msgstr "最后一个已启动的物理脉冲静止后返回成功或错误。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:69
+msgid "Permanently lock one exact OTP block with no automatic reset."
+msgstr "永久锁定一个精确 OTP block，不自动复位。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:69
+msgid "[in] Physical block index, never a main-array sector."
+msgstr "[in] 物理 block 索引，绝不是主阵列 sector。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:69
+msgid "[in] Explicit OTP_LOCK effect declaration."
+msgstr "[in] 显式 OTP_LOCK 效果声明。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:69
+msgid "Settled status; lock is irreversible even on a late timeout."
+msgstr "脉冲静止后的状态；即使最终超时，锁定仍不可逆。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:69
+msgid "Program a complete option image; activation requires external POR."
+msgstr "编程完整 option image；激活需要外部 POR。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:69
+msgid ""
+"Protected to open erases all user Flash and backup SRAM. The caller must "
+"execute that transition from independent RAM, with its vectors, code, "
+"constants, stack and return destination surviving mass erase. Level two "
+"permanently disables debug and further option changes. No automatic reset, "
+"power cycle, product policy or authentication."
+msgstr ""
+"从受保护转为开放会擦除全部用户 Flash 和 backup SRAM。调用者必须从独立 RAM "
+"执行该转换，vector、代码、常量、栈及返回目标均须在整阵列擦除后仍然有效。Level two 永久禁用 debug 及后续 option "
+"更改。不提供自动复位、电源循环、产品策略或认证。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:69
+msgid "[in] Exclusive privileged unmasked Thread maintenance owner."
+msgstr "[in] 独占、特权且未屏蔽中断的 Thread 模式维护所有者。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:69
+msgid "[in] Stable complete options copied during this call."
+msgstr "[in] 稳定的完整 options，在本调用期间复制。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:69
+msgid ""
+"[in] OPTIONS plus MASS_ERASE for protected to open, or PERMANENT for "
+"irreversible level two."
+msgstr "[in] 从受保护转为开放须声明 OPTIONS 加 MASS_ERASE；不可逆 level two 须声明 PERMANENT。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:69
+msgid "Settled status; a timeout never rolls back programmed options."
+msgstr "脉冲静止后的状态；超时从不回滚已编程 options。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:69
+msgid "Complete desired physical options; no product layout is implied."
+msgstr "完整的目标物理 options；不隐含产品布局。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:69
+msgid "Explicit intended-supply profile."
+msgstr "显式预期供电 profile。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:69
+msgid "Copied hardware facts; options take effect only after POR."
+msgstr "复制的硬件事实；options 仅在 POR 后生效。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:69
+msgid "Exact maintenance actions share the ordinary physical owner."
+msgstr "精确维护操作共享普通物理所有者。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:69
+msgid "Immutable optional face, absent unless explicitly assembled."
+msgstr "不可变可选 face，只有显式装配才存在。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:73
+msgid "nand.h"
+msgstr "nand.h"
+
+#: ../../../../../../docs/reference/api/io/storage.md:75
+msgid "Finite raw NAND page/OOB operations and hardware ECC codes."
+msgstr "有限 raw NAND page／OOB 操作和硬件 ECC 码。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:75
+msgid "Explicit opaque ECC encoding identity, not a portable decoder."
+msgstr "显式不透明 ECC 编码身份，不是可移植解码器。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:75
+msgid "Raw one-page, OOB-only, whole-block erase or device reset."
+msgstr "Raw 单 page、仅 OOB、完整 block erase 或器件 reset。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:75
+msgid "Query explicit raw geometry without starting device operations."
+msgstr "查询显式 raw geometry，不启动器件操作。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:75
+msgid "No ID inference or bad-block scan is performed."
+msgstr "不按 ID 推断，也不执行坏块扫描。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:75
+msgid "[in] Stable selected serialized face."
+msgstr "[in] 稳定、已选择且串行化的 face。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:75
+msgid "Immutable facts or NULL before successful prepare/invalid face."
+msgstr "不可变事实；成功 prepare 之前或 face 无效时为 NULL。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:75
+msgid "Read up to eight ID bytes while idle, retaining no output."
+msgstr "空闲时最多读取八个 ID 字节，不保留输出。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:75
+msgid "Read-ID does not authorize a geometry or command-set substitution."
+msgstr "Read-ID 不授权替换 geometry 或 command set。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:75
+msgid "[in] Idle selected privileged task owner."
+msgstr "[in] 空闲、已选择的特权任务所有者。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:75
+msgid "[out] Distinct writable internal output."
+msgstr "[out] 独立、可写的内部存储输出。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:75
+msgid "[in] Positive 1..8 raw signature bytes."
+msgstr "[in] 正的 1..8 个原始签名字节。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:75
+msgid "SUCCESS, BUSY, INVALID or hardware error; no product identification."
+msgstr "SUCCESS、BUSY、INVALID 或硬件错误；不进行产品识别。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:75
+msgid "Read semantic device status while no finite request owns the bus."
+msgstr "在没有有限请求拥有总线时读取语义化器件状态。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:75
+msgid "A status read alone never revokes any request or bank lease."
+msgstr "单独读取状态从不撤销请求或 bank lease。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:75
+msgid "[out] Disjoint ready/failure/protection snapshot."
+msgstr "[out] 独立的 ready／failure／protection 快照。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:75
+msgid "SUCCESS or exact rejected/hardware result, no retained output."
+msgstr "SUCCESS 或精确的拒绝／硬件结果，不保留输出。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:75
+msgid "Query the selected ECC container and step without device commands."
+msgstr "查询所选 ECC 容器与 step，不发送器件命令。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:75
+msgid ""
+"This identifies existing raw code output, not a decoder, OOB layout, "
+"guaranteed correction strength or physical media qualification."
+msgstr "这标识既有 raw code 输出，不提供解码器、OOB 布局、纠错强度保证或物理介质资格。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:75
+msgid "[in] Idle prepared selected owner, serialized with lifecycle."
+msgstr "[in] 已准备且 idle 的所选 owner，与生命周期串行执行。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:75
+msgid "[out] Disjoint caller output, unchanged on rejection."
+msgstr "[out] 独立调用者输出，拒绝时不变。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:75
+msgid ""
+"SUCCESS, UNSUPPORTED for absent format metadata, or the provider's "
+"lifecycle/context/bus error. No storage is retained or allocated."
+msgstr "SUCCESS、缺少格式元数据时的 UNSUPPORTED，或 provider 的生命周期／上下文／总线错误。不保留或分配存储。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:75
+msgid "Prepare metadata without touching page/OOB or hardware."
+msgstr "准备 metadata，不访问 page／OOB 或硬件。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:75
+msgid ""
+"Caller joins previous observers and fills every operation field before "
+"submission; provider checks complete spans/geometry before admission."
+msgstr "调用者须在提交前 join 旧观察者并填写全部操作字段；provider 在准入前检查完整 span／geometry。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:75
+msgid ""
+"[inout] Initialized READY or consumed SETTLED storage; "
+"operation/page/buffers are caller-filled afterward."
+msgstr "[inout] 已初始化的 READY 或已消费的 SETTLED 存储；operation／page／buffer 随后由调用者填写。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:75
+msgid "SUCCESS or INVALID/STATE; failure leaves descriptor unchanged."
+msgstr "SUCCESS 或 INVALID／STATE；失败保持描述符不变。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:75
+msgid "Admit exactly one finite raw operation with borrowed spans."
+msgstr "以借用 span 接纳恰好一次有限 raw 操作。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:75
+msgid ""
+"Rejection retains nothing and issues no command. A deadline cannot revoke "
+"program/erase/reset or unsettled ECC hardware accesses."
+msgstr "拒绝不保留任何引用，也不发出命令。Deadline 不能撤销 program／erase／reset 或尚未静止的 ECC 硬件访问。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:75
+msgid "[in] Live selected privileged serialized task owner."
+msgstr "[in] 活跃、已选择的特权串行化任务所有者。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:75
+msgid "[inout] Exact READY immutable descriptor and spans."
+msgstr "[inout] 精确的 READY 不可变描述符及 span。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:75
+msgid "Stop further data/pulses and drain the currently accepted operation."
+msgstr "停止后续数据／脉冲，并排空当前已接纳操作。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:75
+msgid "A partial program-data load is reset and that reset must become ready."
+msgstr "部分 program 数据装载会触发 reset，且该 reset 必须变为 ready。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:75
+msgid "[in] Same serialized privileged task owner."
+msgstr "[in] 同一个串行化特权任务所有者。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:75
+msgid "[inout] Exact current live descriptor."
+msgstr "[inout] 精确的当前活跃描述符。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:75
+msgid "SUCCESS starts cancellation; SETTLED alone releases borrows."
+msgstr "SUCCESS 开始取消；只有 SETTLED 才释放借用。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:75
+msgid "Make bounded command, up to 32 bus units, ECC or ready progress."
+msgstr "有界推进 command、最多 32 个 bus unit、ECC 或 ready 状态。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:75
+msgid "Caller schedules service; no sleeping, replay or implicit rearm."
+msgstr "调用者调度 service；不休眠、重放或隐式重新 arm。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:75
+msgid ""
+"SUCCESS after progress/settlement; BUSY during device/ECC drain; IO with "
+"retained QUARANTINED storage on missing hardware."
+msgstr "进展／SETTLED 后为 SUCCESS；器件／ECC 排空期间为 BUSY；缺失硬件时为 IO，并保留 QUARANTINED 存储。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:75
+msgid "Seal admission and cancel/drain the current request."
+msgstr "封闭准入，取消／排空当前请求。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:75
+msgid "Cold bank close is separate and refuses any pending device operation."
+msgstr "Cold bank close 是独立操作，任何器件操作未结束时都会拒绝。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:75
+msgid "SUCCESS after final request detach; BUSY/IO retains bank and borrow."
+msgstr "最终分离请求后才 SUCCESS；BUSY／IO 保留 bank 与借用。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:75
+msgid "Explicit device geometry in bytes, independent of bus word width."
+msgstr "显式器件 geometry，以字节表示，独立于总线字宽。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:75
+msgid ""
+"Selected software facts, not discovered good-block capacity. No bad block "
+"policy, ECC correction/placement, FTL or filesystem is supplied."
+msgstr "所选软件事实，不是探测到的好块容量。不提供坏块策略、ECC 纠正／放置、FTL 或文件系统。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:75
+msgid "Device status with protocol bit positions confined to the provider."
+msgstr "器件状态的协议位位置保留在 provider 中。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:75
+msgid ""
+"failed reports the device's failure latch; it does not identify a page or "
+"classify bit errors. Ready alone never releases a live loan."
+msgstr "failed 报告器件失败锁存状态，不标识具体页或分类 bit 错误。单独 ready 不释放活跃借用。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:75
+msgid "Selected ECC step and output container without correction policy."
+msgstr "所选 ECC step 与输出容器，不包含纠错策略。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:75
+msgid ""
+"step_bytes is main data covered by one code. code_bytes describes storage, "
+"not meaningful parity bits. STM32_FSMC_RAW32 is one numeric uint32_t per "
+"step, not a serialized byte sequence or a standard codec. Placement, "
+"comparison, correction and bad-block policy stay external."
+msgstr ""
+"step_bytes 是一个 code 覆盖的主数据量。code_bytes 描述存储，不表示有效 parity bit "
+"数。STM32_FSMC_RAW32 是每 step 一个数值 uint32_t，不是序列化字节序列或标准 "
+"codec。放置、比较、纠错与坏块策略留在外部。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:75
+msgid "Finite raw request, no implicit bad-block or OOB interpretation."
+msgstr "有限 raw 请求，不隐含坏块或 OOB 解释。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:75
+msgid ""
+"page identifies an absolute physical page, including bad blocks. "
+"READ/PROGRAM_PAGE requires exactly page_bytes; optional OOB is exactly "
+"oob_bytes. OOB-only uses data=NULL and exact OOB. Erase names the first page"
+" of a block. Reset has no buffers/page. Optional ECC output has one uint32_t"
+" per main-data chunk; raw codes have no placement/correction policy. READ "
+"destinations, PROGRAM sources and ECC codes are borrowed through acquire-"
+"observed SETTLED. Cancellation cannot abort a pulse. base.transferred is "
+"complete main+OOB bytes on SUCCESS, zero on error; failed read storage can "
+"contain unqualified partial data."
+msgstr ""
+"page 指定绝对物理 page，包含坏块。READ／PROGRAM_PAGE 要求恰好 page_bytes；可选 OOB 必须恰好为 "
+"oob_bytes。仅 OOB 操作使用 data=NULL 和精确 OOB。Erase 指定 block 的首 page。Reset 不使用 "
+"buffer／page。可选 ECC 输出为每个主数据 chunk 一个 uint32_t；raw code 不附带放置／纠错策略。READ "
+"目标、PROGRAM 来源和 ECC code 持续被借用，直到通过 acquire 观察到 SETTLED。取消不能中止脉冲。SUCCESS 时 "
+"base.transferred 为完整主数据加 OOB 字节数，错误时为零；失败的 read 存储可能含未获准使用的部分数据。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:75
+msgid "Same static physical owner, called by one privileged task."
+msgstr "同一静态物理所有者，由一个特权任务调用。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:75
+msgid "Immutable raw face; factory returns existing identity only."
+msgstr "不可变 raw face；factory 只返回既有身份。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:75
+msgid ""
+"State/facts/faces outlive all calls and retained requests. No hidden "
+"worker/queue/heap/IRQ exists. Calls are serialized with cold lifecycle."
+msgstr ""
+"状态／事实／face 比全部调用和保留请求活得更久。没有隐藏 worker／queue／heap／IRQ。调用与 cold lifecycle 串行化。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:79
+msgid "sdio_io.h"
+msgstr "sdio_io.h"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "Typed SDIO function control and finite CMD53 borrows."
+msgstr "Typed SDIO function 控制与有限 CMD53 借用。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "Activate the selected SDIO function-card session."
+msgstr "激活所选 SDIO function 卡会话。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid ""
+"Uses the same physical owner as all function operations. No block geometry, "
+"implicit fallback or worker is created. A failed activation can retain "
+"protocol effects; stop must establish session withdrawal."
+msgstr ""
+"与全部 function 操作使用同一物理 owner。不创建块设备几何、隐式 fallback 或 worker。激活失败可保留协议作用，stop "
+"必须证明会话已经撤回。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "[in] Prepared stopped host under one serialized task owner."
+msgstr "[in] 已准备且停止的 host，由一个串行任务 owner 管理。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "[in] Finite absolute host-clock deadline."
+msgstr "[in] 有限、绝对的 host-clock deadline。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "SUCCESS after discovery, or the actual admission/protocol error."
+msgstr "探测完成后为 SUCCESS，或实际准入／协议错误。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "Stop function activity and return the prepared host to idle."
+msgstr "停止 function 活动，使已准备 host 回到 idle。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid ""
+"Cancel and service active requests first. Success ends the card session, not"
+" Platform ownership of pins, IRQs or clocks. A failed stop retains the same "
+"host and protocol recovery responsibility."
+msgstr ""
+"先取消并 service 活跃请求。成功结束卡会话，不结束 Platform 对引脚、IRQ 或时钟的所有权。stop 失败保留同一 host "
+"与协议恢复责任。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "[in] Same session owner; join requests before stopping."
+msgstr "[in] 同一会话 owner；停止前等待请求退出。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "[in] Finite absolute host-clock deadline including shutdown."
+msgstr "[in] 包含关闭的有限、绝对 host-clock deadline。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "SUCCESS after withdrawal; BUSY retains any outstanding request."
+msgstr "撤回后为 SUCCESS；BUSY 保留所有未结束请求。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "Query host limits without discovering or activating a card."
+msgstr "查询主机限制，不探测或激活卡片。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid ""
+"No MMIO, time access, allocation or borrow. Query before transfers; an "
+"outstanding request makes this output operation BUSY. Success describes the "
+"selected implementation, not a live card or hardware qualification. The same"
+" host validates every submitted request."
+msgstr ""
+"不访问 MMIO 或时间，不分配，也不借用。应在传输前查询；存在未结束的请求时，该输出操作返回 "
+"BUSY。成功只描述所选实现，不证明卡片活跃或硬件资格。同一主机仍验证每个提交请求。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "[in] Prepared host under one serialized task owner."
+msgstr "[in] 已准备的主机，由一个串行任务 owner 管理。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "[out] Aligned distinct writable output, unchanged on rejection."
+msgstr "[out] 对齐、独立且可写的输出，拒绝时保持不变。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "SUCCESS, INVALID, STATE, CONTEXT, BUSY or UNSUPPORTED."
+msgstr "SUCCESS、INVALID、STATE、CONTEXT、BUSY 或 UNSUPPORTED。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "Read bounded CCCR/FBR facts and CIS pointers into a copied snapshot."
+msgstr "读取有界 CCCR／FBR 事实和 CIS pointer，复制到 snapshot。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid ""
+"All control calls require one privileged unmasked Thread executor. Domain "
+"activation/stop owns this same physical host. No function-specific register "
+"policy, CIS tuple interpretation or worker."
+msgstr ""
+"全部控制调用需要一个特权且未屏蔽中断的 Thread 执行者。领域 activation／stop 拥有同一物理 host。不实现 function "
+"专属寄存器策略、CIS tuple 解释或 worker。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "[in] Explicitly activated SDIO I/O session, same host owner."
+msgstr "[in] 已显式激活的 SDIO I/O 会话，同一 host owner。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "[out] Distinct caller storage, retained only during this call."
+msgstr "[out] 独立调用者存储，只在本调用期间保留。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "Success or actual control/protocol error, never invented functions."
+msgstr "成功或真实 control／protocol 错误，从不虚构 function。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "Change IOEx and wait for the exact function's IORx transition."
+msgstr "更改 IOEx，并等待精确 function 的 IORx 转换。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "[in] Same serialized idle session, no borrowed request."
+msgstr "[in] 同一串行化空闲会话，没有被借用的请求。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "[in] Discovered function number one through seven."
+msgstr "[in] 已探测到的 1..7 function 编号。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "[in] Explicit requested function state."
+msgstr "[in] 显式请求的 function 状态。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "Actual ready outcome; a timeout can leave the function enabled."
+msgstr "真实 ready 结果；超时可能仍留下已启用 function。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "Program and verify the function FBR's explicit power-of-two size."
+msgstr "编程并验证 function FBR 的显式二次幂大小。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "[in] Same serialized idle session."
+msgstr "[in] 同一串行化空闲会话。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "[in] Discovered nonzero function number."
+msgstr "[in] 已探测到的非零 function 编号。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "[in] Exact block bytes, 1..2048, with no rounding."
+msgstr "[in] 精确 block 字节数，1..2048，不取整。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "Success or error; a partial two-byte write is not atomic."
+msgstr "成功或错误；两字节写入可能只完成一部分，不具原子性。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "Read one CMD52 register byte, including function-zero CCCR/FBR/CIS."
+msgstr "读取一个 CMD52 寄存器字节，包含 function-zero CCCR／FBR／CIS。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "[in] Zero through the discovered function count."
+msgstr "[in] 从零到已探测 function 总数。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "[in] Exact 17-bit function-local address."
+msgstr "[in] 精确的 17-bit function 局部地址。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "[out] Stable distinct byte, borrowed only during this call."
+msgstr "[out] 稳定且独立的 byte，只在本调用期间被借用。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "Strict R5/CRC/timeout outcome; failure may retain host uncertainty."
+msgstr "严格的 R5／CRC／timeout 结果；失败可保留 host 不确定状态。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "Write one enabled function's register without implicit readback."
+msgstr "写入一个已启用 function 的寄存器，不隐式回读。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid ""
+"CCCR/FBR configuration stays with the typed host operations. Device "
+"interrupt acknowledgement belongs to the relevant function driver."
+msgstr ""
+"CCCR／FBR 配置由 typed host 操作负责。器件 interrupt acknowledgement 属于对应 function "
+"driver。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "[in] Enabled nonzero function; function-zero writes refused."
+msgstr "[in] 已启用的非零 function；拒绝 function-zero 写入。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "[in] Exact 17-bit function-local register address."
+msgstr "[in] 精确的 17-bit function 局部寄存器地址。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "[in] Explicit device-register value, not a host command."
+msgstr "[in] 显式器件寄存器值，不是 host 命令。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "Actual R5 status; write side effects are not rolled back on timeout."
+msgstr "真实 R5 状态；超时不回滚写入的副作用。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "Set IENx and explicitly arm the selected host interrupt hint."
+msgstr "设置 IENx，并显式 arm 所选 host interrupt hint。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid ""
+"IRQ latches a hint and masks its level source. Read pending, service device "
+"registers, then explicitly rearm; no OS callback or worker. Successful data "
+"completion preserves an unconsumed arm. Error, cancellation and sync require"
+" an explicit new arm."
+msgstr ""
+"IRQ 锁存 hint 并屏蔽其电平来源。读取 pending、处理器件寄存器后，显式重新 arm；没有 OS callback 或 "
+"worker。成功的数据完成保留尚未消费的 arm。错误、取消和 sync 都要求显式再次 arm。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "[in] Same serialized idle host owner."
+msgstr "[in] 同一串行化空闲 host owner。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "[in] Function bits one through seven; zero disables all."
+msgstr "[in] Function 的 bit1..7；零禁用全部。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "Actual programming outcome, with master enable derived from mask."
+msgstr "真实编程结果，master enable 从 mask 派生。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "Read authoritative CCCR pending function bits without acknowledging."
+msgstr "读取权威 CCCR pending function 位，不进行确认。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "[out] Copied pending bits, unchanged on rejection/error."
+msgstr "[out] 复制的 pending 位；拒绝／错误时保持不变。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "Actual CMD52 outcome; host IRQ status is only a hint."
+msgstr "真实 CMD52 结果；host IRQ 状态仅是 hint。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "Admit a finite byte/block CMD53 sequence to the same host executor."
+msgstr "向同一 host 执行者接纳有限 byte／block CMD53 序列。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid ""
+"Service advances polling, IRQ or DMA selection without a worker. The "
+"selected host validates buffer and unit constraints before acceptance; no "
+"bounce allocation or implicit mode fallback occurs. Cancellation and timeout"
+" retain all borrows until actual drain and SETTLED. Whole confirmed units "
+"form the transferred byte prefix."
+msgstr ""
+"Service 推进所选 polling、IRQ 或 DMA，不创建 worker。所选 host "
+"在接纳前验证缓冲区与单元约束；不分配中转缓冲区，也不隐式回退模式。取消和超时保留全部借用，直到实际排空并 "
+"SETTLED。只有已确认的完整单元构成已传输字节前缀。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "[in] Activated single-owner session, no other live transfer."
+msgstr "[in] 已激活的单 owner 会话，没有其他活跃传输。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "[inout] Complete READY enclosing descriptor and payload."
+msgstr "[inout] 完整 READY 外层描述符和 payload。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "SUCCESS means ACCEPTED; rejection retains no reference or effect."
+msgstr "SUCCESS 表示 ACCEPTED；拒绝不保留引用或效果。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "Begin cancellation without reclaiming the enclosing request."
+msgstr "开始取消，不回收外层请求。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "[in] Same serialized execution owner."
+msgstr "[in] 同一串行化执行所有者。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "[inout] Exact live stable request, not a stale pointer."
+msgstr "[inout] 精确、活跃且稳定的请求，不能是过期指针。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "SUCCESS begins drain; STATE for a different request."
+msgstr "SUCCESS 开始排空；不同请求为 STATE。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "Advance the selected engine, deadline and complete withdrawal."
+msgstr "推进所选 engine、deadline 和完整撤回。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "QUARANTINED borrows remain live; later service may retry cleanup."
+msgstr "QUARANTINED 借用继续有效；后续 service 可重试清理。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "Explicitly abort any uncertain function transfer and prove readiness."
+msgstr "显式 abort 不确定的 function 传输，并证明 ready。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid ""
+"Leaves the host function-interrupt hint disarmed. Explicitly rearm after "
+"device-register recovery; sync never replays device payloads."
+msgstr ""
+"保持 host function-interrupt hint 为未 arm。器件寄存器恢复后须显式重新 arm；sync 从不重放器件 "
+"payload。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "[in] Same host, no request borrow, no implicit replay/reprobe."
+msgstr "[in] 同一 host，没有 request 借用；不隐式重放或重新探测。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "Success after host drain and actual CCCR function-ready evidence."
+msgstr "Host 排空并有真实 CCCR function-ready 证据后才成功。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "Copied function facts; device-specific CIS tuples belong to drivers."
+msgstr "复制的 function 事实；器件专属 CIS tuple 由 driver 解释。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "Exact discovered card session, never inferred from an SDIO route."
+msgstr "精确探测到的 card 会话，从不根据 SDIO route 推断。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "Copied selected-host transfer limits, independent of card readiness."
+msgstr "复制的所选主机传输限制，与卡片就绪状态无关。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid ""
+"Positive alignment and unit_bytes_multiple apply to every payload and unit. "
+"max_blocks bounds block mode; byte mode contains one unit of at most 512 "
+"bytes. The function's configured FBR size must also match. These facts grant"
+" neither memory access nor initialization authority."
+msgstr ""
+"正的对齐值与 unit_bytes_multiple 分别约束所有 payload 和单元。max_blocks 限制块模式；字节模式只有一个至多 "
+"512 字节的单元。还必须匹配该 function 配置的 FBR 大小。这些事实不授予内存访问或初始化权限。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "One finite function-addressed SDIO byte or block request."
+msgstr "一个以 function 地址为目标的有限 SDIO 字节或块请求。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid ""
+"Initialize and prepare base; configure data, data_bytes, blocks and write. "
+"In byte mode blocks is one and unit_bytes is 1..512. In block mode "
+"unit_bytes matches the explicitly configured FBR size and blocks is positive"
+" and provider-bounded. The complete descriptor and payload remain borrowed "
+"until acquire-observed base SETTLED. Buffer alignment, supported unit sizes "
+"and transfer limits belong to the selected host; submission never rounds, "
+"allocates or substitutes a transfer mode."
+msgstr ""
+"初始化并 prepare base，再配置 data、data_bytes、blocks 与 write。字节模式下 blocks "
+"为一，unit_bytes 为 1..512。块模式下 unit_bytes 匹配显式配置的 FBR 大小，blocks 为正且受 provider "
+"上限约束。完整描述符和 payload 持续被借用，直到通过 acquire 观察到 base "
+"SETTLED。缓冲区对齐、支持的单元大小与传输上限由所选 host 决定；提交不会取整、分配或替换传输模式。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "One shared host owner controls standard functions one through seven."
+msgstr "一个共享 host owner 控制标准 function 1..7。"
+
+#: ../../../../../../docs/reference/api/io/storage.md:81
+msgid "Immutable optional face; uses the same physical block controller ID."
+msgstr "不可变可选 face；使用同一物理 block controller ID。"

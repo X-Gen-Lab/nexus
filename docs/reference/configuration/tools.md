@@ -1,11 +1,11 @@
 ---
-id: docs-reference-configuration-tools
+id: reference.configuration.tools
 type: reference
 audience: consumer
 source_language: en
 ---
 
-(docs-reference-configuration-tools)=
+(reference.configuration.tools)=
 # Configuration, development and evidence tools
 
 Tools preserve actual process exits and input identities. A prepared plan is not
@@ -31,8 +31,8 @@ executing these tools; a default-branch clone may not contain the documented ent
 | `tools/hil/` | Preparation, admission, capture and raw validation by distinct commands | Physical cases never executed |
 | `tools/evidence/` | Bind executed scope, environment and actual artifact bytes | Product signature or safety certification |
 
-Use [the SDK tutorial](../../tutorials/source-sdk.md),
-[configuration and ownership guide](../../guides/developer-workflow.md),
+Use [the SDK tutorial](../../tutorials/first-native.md),
+[configuration and ownership guide](../../guides/app-configuration.md),
 [assembly reference](assembly.md), [TDD workflow](../../development/workflow.md)
 and [performance/HIL guide](../../guides/performance-hil.md) for complete tasks.
 Detailed flags come from each maintained CLI `--help`; do not maintain a second

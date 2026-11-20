@@ -1,0 +1,709 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: ed05116575af7b5bfb44413f2c6c81b6d35c1acacb4eae65ba2035b155232359\n"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:10
+msgid "STM32F4 system integration"
+msgstr "STM32F4 系统集成"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:12
+msgid ""
+"These headers are exact STM32F4 system composition contracts rather than "
+"portable I/O faces. Follow each header's part, privilege, clock, memory and "
+"retained-resource requirements; public visibility does not extend it to "
+"another device."
+msgstr ""
+"这些头文件是精确 STM32F4 系统装配合同，不是可移植 I/O "
+"接口。须遵循各头文件的料号、权限、时钟、内存及保留资源要求；公共可见性不将其扩展到其他器件。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:17
+msgid "Selected F407 entropy owner"
+msgstr "所选 F407 熵源 owner"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:19
+msgid "Select the chip's one internal RNG through the authored assembly:"
+msgstr "通过 authored assembly 选择芯片内唯一的 RNG："
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:28
+msgid ""
+"The Board supplies the pinless `rng` binding. Configuration requires the "
+"selected nominal PLL48 domain to be exactly 48 MHz, including an explicit "
+"`pll48 = true` reservation when SYSCLK uses a direct input. The generated "
+"`nx_factory_entropy(NX_ENTROPY_ID_RANDOM)` returns an existing readonly "
+"{doc}`entropy face </reference/api/io/system>` without starting hardware. No"
+" separate CMake constructor, public mutable owner or second clock "
+"configuration is used."
+msgstr ""
+"Board 提供无引脚的 `rng` binding。配置要求所选标称 PLL48 域恰好为 48 MHz；SYSCLK 使用直接输入时，还须显式预留 "
+"`pll48 = true`。生成的 `nx_factory_entropy(NX_ENTROPY_ID_RANDOM)` 返回已有只读{doc}`熵源"
+" face </reference/api/io/system>`，不启动硬件。不使用独立 CMake 构造器、公开可变 owner 或第二套时钟配置。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:36
+msgid ""
+"Readonly admission rejects foreign enabled RNG or IRQ state before System "
+"clock effects. Platform prepares the same private RNG owner after System "
+"startup, withdraws it before clock shutdown or suspend, and prepares it "
+"again in the new epoch on resume. The existing C implementation checks the "
+"actual RCC/Flash plan and retains its acquired gate and enable effects "
+"through cleanup. Join every entropy, TLS and network consumer before "
+"serialized privileged Platform suspend or stop. Failed withdrawal retains "
+"that owner and cleanup responsibility; retry the lifecycle operation without"
+" resetting its state. A cold or stopped face remains valid and rejects data "
+"calls with STATE. Clock failure or an epoch change stops data publication "
+"while cleanup remains available."
+msgstr ""
+"只读 admission 在 System 时钟产生影响前拒绝外来已使能的 RNG 或 IRQ 状态。Platform 在 System "
+"启动后准备同一个私有 RNG owner，在时钟关闭或 suspend 前撤回，并在 resume 的新 epoch 中重新准备。已有 C 实现核对实际"
+" RCC/Flash 计划，并在清理期间保留已取得 gate 和 enable 影响的责任。在串行化、特权 Platform suspend 或 "
+"stop 前，必须 join 所有熵源、TLS 和网络消费者。撤回失败保留 owner 和清理责任；重试生命周期操作时不可重置其状态。冷态或已停止的 "
+"face 仍有效，数据调用返回 STATE。时钟故障或 epoch 改变后停止数据发布，清理仍可执行。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:47
+msgid ""
+"The [System contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-SOURCE/soc/stm32/stm32f4/system/README.md) defines clock "
+"authority and recovery. RNG health checks and software models establish "
+"neither physical min-entropy nor HIL qualification."
+msgstr ""
+"[System 合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/soc/stm32/stm32f4/system/README.md)定义时钟权威与恢复。RNG 健康检查和软件模型均不能证明物理最小熵或"
+" HIL 资格。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:51
+msgid ""
+"The chip-specific entry is `nexus/soc/stm32f407_handoff.h`, owned by the [F4"
+" System contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-SOURCE/soc/stm32/stm32f4/system/README.md#f407-掩码状态下的镜像交接). "
+"Link `Nexus::STM32F407Handoff` explicitly in the selected F407 baremetal "
+"firmware."
+msgstr ""
+"芯片专用入口为 `nexus/soc/stm32f407_handoff.h`，归 [F4 System "
+"合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/soc/stm32/stm32f4/system/README.md#f407-掩码状态下的镜像交接)所有。在选定的 F407 "
+"裸机固件中显式链接 `Nexus::STM32F407Handoff`。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:54
+msgid "Public declarations"
+msgstr "公共声明"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:56
+msgid "stm32f407_handoff.h"
+msgstr "stm32f407_handoff.h"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:58
+msgid "Exact F407 Flash-image transfer after explicit owner drain."
+msgstr "显式所有者排空后的精确 F407 Flash 映像移交。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:58
+msgid "Author  Nexus Team"
+msgstr "作者  Nexus Team"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:58
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:70
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+msgid "Nexus Team"
+msgstr "Nexus Team"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:58
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:70
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+msgid "Functions"
+msgstr "函数"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:58
+msgid "Construct the single static F407 handoff admission domain."
+msgstr "构造唯一的静态 F407 移交准入域。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:58
+msgid ""
+"Serialized privileged Thread, once before any consumer. No heap, hardware "
+"writes, discovery or implicit startup. The caller enrolls every "
+"platform/product execution, IRQ, DMA, observer and memory owner that can "
+"outlive entry. Release a lease only after its actual join/drain."
+msgstr ""
+"由串行特权 Thread "
+"在任何消费者启动前调用一次。不使用堆，不写硬件，不执行发现或隐式启动。调用方须登记每个可能在入口之后仍存活的平台或产品执行者、IRQ、DMA、观察者及内存所有者。租约仅在其实际会合退出或排空后释放。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:0
+msgid "Parameters"
+msgstr "参数"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:58
+msgid "[in] Positive bound on enrolled live tokens."
+msgstr "[in] 已登记活动令牌数的正数上限。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:0
+msgid "Returns"
+msgstr "返回值"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:58
+msgid "SUCCESS, INVALID, CONTEXT or STATE; never resets an epoch."
+msgstr "返回 SUCCESS、INVALID、CONTEXT 或 STATE；从不重置 epoch。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:58
+msgid "Return the existing single static admission domain."
+msgstr "返回既有的唯一静态准入域。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:58
+msgid "Pure lookup; does not initialize, acquire or touch hardware."
+msgstr "纯查询；不初始化、不获取租约，也不访问硬件。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:58
+msgid "Stable object identity, including before initialization."
+msgstr "稳定对象身份，初始化前亦有效。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:58
+msgid "Validate stopped F407 state and tail-transfer to Flash."
+msgstr "校验已停止的 F407 状态，并以尾跳转移交至 Flash。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:58
+msgid ""
+"Selected STM32F407VET6/ZGT6 baremetal images only. Caller is privileged "
+"Thread on MSP, PRIMASK=1, other masks clear. No scheduler may have started. "
+"Stop the actual Platform, join all users and keep admission closed. An "
+"unrelated empty domain cannot authorize transfer. Rejects active FP/lazy "
+"preservation, partial CP10/11 permissions, MPU, ART, SysTick, "
+"enabled/pending/active IRQs, non-HSI16/reset buses, peripheral/DMA gates, "
+"busy Flash and retained System effects. Ordinary inactive CP10/11 "
+"permissions from SystemInit are supported. Actual DEV_ID must be 0x413 with "
+"a reviewed REV_ID; an unknown cut returns UNSUPPORTED before transfer. Main "
+"SRAM is preserved; MSP is 8-aligned in (0x20000000,0x20020000]. All 98 "
+"vectors fit exact observed and generated Flash geometry. Reset PC is Thumb "
+"with its first halfword in Flash. Success sets VTOR, disables CP10/11, sets "
+"CONTROL=0, PSP=0 and MSP, then branches to PC with PRIMASK=1. This is a "
+"masked handoff entry. No RAM copy/clear, image authentication/selection, "
+"device drain, clock change or physical qualification occurs. Target owns RAM"
+" startup and resets controllers before enabling gates. No old deadline "
+"survives transfer. Exclude NMI/HardFault, debugger, DMA and other bus "
+"masters. Enrollment is caller policy; Platform and product owners are never "
+"enrolled automatically. Rejection preserves masks and performs no writable "
+"MMIO. Reading SysTick CTRL consumes COUNTFLAG even if rejected."
+msgstr ""
+"仅支持所选 STM32F407VET6/ZGT6 裸机映像。调用方须为使用 MSP 的特权 "
+"Thread，PRIMASK=1，其他屏蔽寄存器为零。不得已启动调度器。停止实际 "
+"Platform，让全部使用者会合退出，并保持准入关闭。无关的空域不能授权移交。活动浮点状态或延迟保存、CP10/11 "
+"权限不完整、MPU、ART、SysTick、已启用或挂起或活动的 IRQ、非 HSI16 时钟或非复位总线配置、外设或 DMA 门控、忙碌 Flash "
+"及残留 System 效果均导致拒绝。支持 SystemInit 设置的普通未激活 CP10/11 权限。实际 DEV_ID 必须为 0x413，且 "
+"REV_ID 属于已审核范围；未知硅片修订在移交前返回 UNSUPPORTED。保留主 SRAM；MSP 须按 8 字节对齐，且位于 "
+"(0x20000000,0x20020000]。全部 98 个向量须满足实际观察及生成配置确定的精确 Flash 几何范围。复位 PC 须为 "
+"Thumb，且首个半字位于 Flash。成功时设置 VTOR、禁用 CP10/11、设置 CONTROL=0、PSP=0 和 MSP，然后在 "
+"PRIMASK=1 下跳转到 PC。这是保持中断屏蔽的移交入口。不复制或清除 "
+"RAM，不认证或选择映像，不排空器件，不改变时钟，也不进行物理资格验证。目标映像负责 RAM "
+"启动，并在启用门控前复位控制器。任何旧期限在移交后均不再有效。外部须排除 NMI/HardFault、调试器、DMA "
+"及其他总线主设备。登记属于调用方策略；Platform 和产品所有者从不自动登记。拒绝时保留中断屏蔽状态，且不执行可写 MMIO 操作。即使拒绝，读取 "
+"SysTick CTRL 也会消耗 COUNTFLAG。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:58
+msgid "[in] Closed, drained barrier from this exact domain."
+msgstr "[in] 来自此精确域、已关闭且已排空的屏障。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:58
+msgid "[in] 512-aligned physical Flash vector address."
+msgstr "[in] 按 512 字节对齐的物理 Flash 向量地址。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:58
+msgid "Error before transfer; success never returns."
+msgstr "移交前可能返回错误；成功时永不返回。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:62
+msgid "stm32f407_supervision.h"
+msgstr "stm32f407_supervision.h"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+msgid "Explicit reset, first-fault retention and trace controls."
+msgstr "显式复位、首故障保留与 trace 控制。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:70
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+msgid ""
+"Author  Nexus Team   Version  1.0.0   Date  2026-11-10   Copyright  "
+"Copyright (c) 2026 Nexus Team"
+msgstr ""
+"作者  Nexus Team   版本  1.0.0   日期  2026-11-10   版权  Copyright (c) 2026 Nexus "
+"Team"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:70
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+msgid "1.0.0"
+msgstr "1.0.0"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:70
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+msgid "2026-11-10"
+msgstr "2026-11-10"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:70
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+msgid "Copyright (c) 2026 Nexus Team"
+msgstr "Copyright (c) 2026 Nexus Team"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+msgid "Publish one bounded first-fault snapshot without allocation or locks."
+msgstr "无分配、无锁地发布一份有界首故障快照。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+msgid ""
+"Privileged Thread/IRQ/NMI/fault. Does not walk an untrusted stack or infer "
+"the FPU/extended frame layout. Caller accounts for EXC_RETURN, stack limits "
+"and stacking errors before supplying frame. No tick, transport, observer, "
+"reset, cleanup or persistence write is invoked."
+msgstr ""
+"限特权 Thread／IRQ／NMI／fault 上下文。不遍历不可信栈，不推断 FPU／扩展帧布局。调用者在提供 frame 前处理 "
+"EXC_RETURN、栈限制及压栈错误。不调用 tick、传输、观察者、复位、清理或持久化写入。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+msgid "[inout] Distinct static zero storage; retained after capture."
+msgstr "[inout] 独立的静态全零存储；捕获后保持保留。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+msgid "[in] Product-selected raw diagnostic value, never policy."
+msgstr "[in] 产品选择的原始诊断值，不代表策略。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+msgid "[in] Raw fault entry EXC_RETURN, not dereferenced."
+msgstr "[in] 故障入口的原始 EXC_RETURN，不解引用。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+msgid "[in] Optional caller-validated accessible basic frame or NULL."
+msgstr "[in] 可选、经调用者验证可访问的基本帧，或 NULL。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+msgid "SUCCESS, BUSY for an earlier/nested capture, INVALID/CONTEXT."
+msgstr "SUCCESS；已有／嵌套捕获返回 BUSY；或 INVALID／CONTEXT。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+msgid "Copy an acquire-published immutable first-fault record."
+msgstr "复制以 release 发布、由 acquire 读取的不可变首故障记录。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+msgid ""
+"Bounded, no MMIO and no clock dependency. Checksum detects simple "
+"corruption; it does not authenticate a record or promise retention."
+msgstr "有界，无 MMIO 及时钟依赖。校验和检测简单损坏，不认证记录，也不保证保留性。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+msgid "[in] Retained provider-owned snapshot, never concurrently reset."
+msgstr "[in] 保留的 provider 所有快照，不得并发重置。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+msgid "[out] Distinct complete call-owned record."
+msgstr "[out] 独立完整、由调用者在本次调用拥有的记录。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+msgid "SUCCESS or INVALID/STATE/IO, leaving output unchanged on failure."
+msgstr "SUCCESS 或 INVALID／STATE／IO；失败时输出不变。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+msgid "Explicitly acknowledge all raw RCC reset flags after capture."
+msgstr "捕获后显式确认全部原始 RCC 复位标志。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+msgid ""
+"Serialized privileged Thread; RMVF clears the complete flag group. No "
+"selective clear or automatic acknowledgement is invented."
+msgstr "串行化的特权 Thread 上下文；RMVF 清除整组标志。不虚构选择性清除或自动确认。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+msgid ""
+"SUCCESS, CONTEXT, STATE before startup capture, or IO. The captured "
+"nx_reset_cause stays unchanged across STOP or a clock restart."
+msgstr ""
+"SUCCESS、CONTEXT、启动捕获前的 STATE，或 IO。捕获的 nx_reset_cause 在 STOP 或时钟重启后保持不变。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+msgid "Request a system reset and retain masks if hardware has not reset."
+msgstr "请求系统复位；硬件尚未复位时保持中断掩码。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+msgid ""
+"Explicit privileged product action, Thread or exception context. Preserves "
+"AIRCR priority grouping, writes the required key, issues barriers and parks "
+"until reset. Does not reclaim borrows, imply a successful reset, change "
+"backup policy or write a retention record."
+msgstr ""
+"产品显式授权的特权动作，限 Thread 或异常上下文。保留 AIRCR "
+"优先级分组，写入所需密钥，执行屏障并停驻直到复位。不回收借用、不暗示复位成功、不改变备份策略，也不写保留记录。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+msgid "Enable or disable DWT cycle tracing after explicit product selection."
+msgstr "产品显式选择后启用或禁用 DWT 周期跟踪。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+msgid ""
+"Serialized privileged Thread owns debugger/DWT access. No SWO pin, ITM "
+"transport or wall-clock source is selected. CYCCNT halts in STOP and changes"
+" rate with HCLK; modulo deltas require less than one wrap."
+msgstr ""
+"串行化的特权 Thread 拥有调试器／DWT 访问权。不选择 SWO 引脚、ITM 传输或墙上时钟源。CYCCNT 在 STOP 停止，速率随 "
+"HCLK 变化；模差计算要求间隔少于一次回绕。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+msgid "[in] Selected CYCCNT state; disabling leaves shared TRCENA on."
+msgstr "[in] 选定 CYCCNT 状态；禁用时保持共享 TRCENA 开启。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+msgid "[in] Explicitly reset CYCCNT, only when enabling."
+msgstr "[in] 显式重置 CYCCNT，仅在启用时允许。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+msgid "[out] Distinct call-owned actual enabled/cycle/frequency state."
+msgstr "[out] 独立调用期输出，反映实际启用／周期／频率状态。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+msgid "SUCCESS or INVALID/CONTEXT/UNSUPPORTED/IO before false success."
+msgstr "SUCCESS 或 INVALID／CONTEXT／UNSUPPORTED／IO，不得虚报成功。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+msgid "Basic exception frame selected and validated by the fault entry."
+msgstr "由故障入口选择并验证的基本异常帧。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:70
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+msgid "Public Members"
+msgstr "公共成员"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+msgid "Caller-owned first-fault record, optionally placed in noinit RAM."
+msgstr "调用者拥有的首故障记录，可放置于 noinit RAM。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+msgid ""
+"Zero-initialize before first use. The provider owns every field after "
+"capture. Readers and storage survive all nested reporters. noinit does not "
+"guarantee reset/power retention; Standby loses SRAM and CCM."
+msgstr ""
+"首次使用前全零初始化。捕获后所有字段归 provider 所有。读者及存储须在全部嵌套报告者存活期间保持有效。noinit "
+"不保证复位／断电保留；Standby 丢失 SRAM 和 CCM。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+msgid "An explicitly enabled cycle trace is separate from monotonic time."
+msgstr "显式启用的周期跟踪独立于单调时间。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:68
+msgid "stm32f407_wwdg_ewi.h"
+msgstr "stm32f407_wwdg_ewi.h"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:70
+msgid "Caller-owned sticky WWDG early-warning observation."
+msgstr "调用者拥有的粘滞 WWDG 提前预警观测。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:70
+msgid "Enable irreversible EWI after explicit watchdog activation."
+msgstr "显式激活看门狗后启用不可逆的 EWI。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:70
+msgid ""
+"Serialized privileged Thread, masks clear. Caller has installed the sole "
+"WWDG vector calling ewi_irq(warning). No worker, callback or feed policy is "
+"installed. Sticky EWI and its storage cannot be reclaimed before reset, even"
+" after failed NVIC enable or a reset request."
+msgstr ""
+"限串行化、特权 Thread 上下文，传入中断掩码须清除。调用者已安装唯一 WWDG 向量并调用 "
+"ewi_irq(warning)。不安装工作线程、回调或喂狗策略。粘滞 EWI 及其存储在复位前不得回收，即使 NVIC 启用失败或已请求复位。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:70
+msgid "[inout] Distinct static zero storage, retained on effects."
+msgstr "[inout] 独立静态全零存储，出现副作用后保留。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:70
+msgid "[in] Stable prepared/enabled F407 window-watchdog face."
+msgstr "[in] 稳定、已准备／启用的 F407 窗口看门狗接口。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:70
+msgid "[in] Logical WWDG IRQ priority, 0..15."
+msgstr "[in] 逻辑 WWDG IRQ 优先级，0..15。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:70
+msgid "SUCCESS or INVALID/CONTEXT/STATE/BUSY/IO; retained reports effects."
+msgstr "SUCCESS 或 INVALID／CONTEXT／STATE／BUSY／IO；retained 报告副作用。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:70
+msgid "Acknowledge one raw warning and latch its occurrence, without feed."
+msgstr "确认一次原始预警并锁存其发生，不喂狗。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:70
+msgid ""
+"WWDG IRQ only, privileged single writer. Failure retains all owners; no "
+"watchdog reload, reset, cleanup or product recovery is attempted."
+msgstr "仅限 WWDG IRQ，特权单写入者。失败保留全部所有者；不尝试看门狗重载、复位、清理或产品恢复。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:70
+msgid "[inout] Exact retained object passed to arm."
+msgstr "[inout] 传给 arm 的精确保留对象。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:70
+msgid "SUCCESS, STATE when no event, IO on failed acknowledgement."
+msgstr "SUCCESS；无事件返回 STATE；确认失败返回 IO。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:70
+msgid "Read the saturating warning count and explicit lost-count fact."
+msgstr "读取饱和预警计数及显式丢计数事实。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:70
+msgid "Privileged Thread/configurable IRQ; saved mask protects the snapshot."
+msgstr "限特权 Thread／可配置 IRQ；保存的掩码保护快照。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:70
+msgid "[in] Exact retained object, no concurrent arm/reclamation."
+msgstr "[in] 精确保留对象，不允许并发 arm 或回收。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:70
+msgid "[out] Distinct call-owned count, accessed only here."
+msgstr "[out] 独立调用期计数，仅在此处访问。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:70
+msgid "[out] Distinct call-owned saturation observation."
+msgstr "[out] 独立调用期饱和观测。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:70
+msgid "SUCCESS or INVALID/CONTEXT/STATE without withdrawing any source."
+msgstr "SUCCESS 或 INVALID／CONTEXT／STATE，不撤回任何来源。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:70
+msgid "Zero-initialized optional storage, retained through hardware reset."
+msgstr "全零初始化的可选存储，须保留到硬件复位。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:70
+msgid "Fields are provider-owned after arm, never copied or reset by caller."
+msgstr "arm 后字段归 provider 所有，调用者不得复制或重置。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:74
+msgid "stm32f4_power.h"
+msgstr "stm32f4_power.h"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+msgid "Explicit drained STOP/Standby and time-domain receipts."
+msgstr "显式排空后的 STOP／Standby 及时间域回执。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+msgid "Defines"
+msgstr "宏定义"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+msgid "Observe live retained flags without acknowledging or clearing them."
+msgstr "观测活动保留标志，不确认或清除。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+msgid "Privileged unmasked Thread with the selected System/PWR owner live."
+msgstr "限特权、未屏蔽中断的 Thread，且所选 System／PWR 所有者活动。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+msgid "[out] Separate caller-owned output, never retained."
+msgstr "[out] 独立的调用者输出，不保留。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+msgid "SUCCESS or INVALID/CONTEXT/STATE, output unchanged on rejection."
+msgstr "SUCCESS 或 INVALID／CONTEXT／STATE；拒绝时输出不变。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+msgid "Prepare the explicit F479 RTC-Standby reset workaround."
+msgstr "准备显式 F479 RTC-Standby 复位规避措施。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+msgid ""
+"Product-authorized privileged unmasked Thread with live System/PWR. Clears "
+"only SBF, leaving WUF, RTC and other retained state intact. SUCCESS obliges "
+"the caller to perform its authorized system reset; it never means RTC "
+"Standby is rearmed. This function never resets."
+msgstr ""
+"产品授权的特权、未屏蔽中断 Thread，System／PWR 须活动。仅清除 SBF，保留 WUF、RTC 及其他保留状态。SUCCESS "
+"要求调用者执行其已授权的系统复位，绝不表示 RTC Standby 已重新使能。本函数不执行复位。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+msgid "[in] Positive bound for observing SBF acknowledgment."
+msgstr "[in] 观察 SBF 确认的正数上限。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+msgid ""
+"SUCCESS after SBF is cleared; IO on refused acknowledgment; "
+"INVALID/CONTEXT/STATE or UNSUPPORTED on other maintained parts."
+msgstr ""
+"SBF 清除后返回 SUCCESS；确认遭拒返回 IO；或 INVALID／CONTEXT／STATE；其他维护中的料号返回 UNSUPPORTED。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+msgid "Enter STOP or WKUP-only Standby after explicit consumer drain."
+msgstr "显式排空消费者后进入 STOP 或仅 WKUP 的 Standby。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+msgid ""
+"Privileged serialized Thread, incoming masks clear. The owner joins devices "
+"and DMA, disables SysTick and suspends/rebuilds OS timing. The closed 150 "
+"MHz RUN/SDIO high-speed profile rejects deep sleep without hardware writes, "
+"epoch changes or retained references. An assembled Platform must "
+"successfully suspend first. A disabled hardware gate does not prove that "
+"logical deadline borrowers drained. STOP wake_events selects EXTI17/21/22 "
+"EMR/RTSR and one WFE; otherwise exact enabled wake_irqs select WFI. Standby "
+"selects WFI; an enabled RTC domain requires standby_enter and its prepared "
+"RTC owner receipt. Spurious returns are allowed. No SEV/WFE sequence "
+"discards an event. Hardware additionally rejects live DMA, peripheral gates,"
+" old pending SysTick and undeclared enabled IRQs. STOP clears no pending "
+"flags. Standby disables EWUP before CWUF and rearms the selected WKUP "
+"source; existing WUF requires discard_wakeup. Old deadlines end with "
+"old_epoch. No kernel tick or old deadline is resumed. VBAT policy is "
+"external. An unrecoverable restore keeps masks/owners, observes and parks. "
+"Real Standby resets and does not return; SRAM/CCM retention is absent."
+msgstr ""
+"限特权、串行化 Thread，传入中断掩码须清除。所有者 join 设备和 DMA、禁用 SysTick，并挂起／重建 OS 计时。已封闭的 150 "
+"MHz RUN／SDIO 高速配置拒绝深睡眠，不写硬件、不改变纪元、不保留引用。已装配 Platform "
+"必须先成功挂起。硬件门控已禁用不证明逻辑截止时间借用者已排空。STOP 的 wake_events 选择 EXTI17／21／22 的 EMR／RTSR"
+" 及一次 WFE；否则由精确已启用 wake_irqs 选择 WFI。Standby 使用 WFI；RTC 域已启用时须使用 standby_enter"
+" 及已准备的 RTC 所有者回执。允许伪唤醒返回。不使用会丢弃事件的 SEV／WFE 序列。硬件还拒绝活动 DMA、外设门控、旧待处理 SysTick "
+"及未声明的已启用 IRQ。STOP 不清除待处理标志。Standby 在 CWUF 前禁用 EWUP，再重新使能选定 WKUP 来源；已有 WUF "
+"时必须提供 discard_wakeup。旧截止时间随 old_epoch 结束。不恢复内核 tick 或旧截止时间。VBAT "
+"策略由外部负责。无法恢复时保留掩码及所有者，记录观测后停驻。真实 Standby 会复位而不返回，SRAM／CCM 不保留。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+msgid ""
+"[in] Current closed, empty domain enrolling every clock and deadline "
+"borrower, including external OS consumers."
+msgstr "[in] 当前已封闭、为空的域，纳入所有时钟和截止时间借用者，包括外部 OS 消费者。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+msgid "[in] Stable call-owned options and exact enabled wake IRQs."
+msgstr "[in] 稳定调用期选项及精确已启用的唤醒 IRQ。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+msgid "[out] Distinct call-owned output, never retained."
+msgstr "[out] 独立调用期输出，不保留。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+msgid ""
+"SUCCESS after STOP restoration; BUSY/STATE/CONTEXT before effects; "
+"UNSUPPORTED for a RUN-only profile; IO if Standby WFI returns and a new RUN "
+"epoch is restored."
+msgstr ""
+"STOP 恢复后返回 SUCCESS；产生副作用前可返回 BUSY／STATE／CONTEXT；仅 RUN 配置返回 "
+"UNSUPPORTED；Standby 的 WFI 返回且恢复新 RUN 纪元后返回 IO。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+msgid "Request Standby using the unique RTC owner's prepared wake receipt."
+msgstr "使用唯一 RTC 所有者准备的唤醒回执请求 Standby。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+msgid ""
+"Privileged serialized Thread, incoming masks clear. RTC prepare explicitly "
+"authorizes any business-event discard. This call validates disabled RTC "
+"sources, disables EWUP, clears WUF, commits RTC sources and rearms EWUP "
+"before WFI. It never writes RTC or EXTI registers. Spurious return restores "
+"RUN and RTC ownership without clearing new wake events. No pending business "
+"event is implicitly consumed."
+msgstr ""
+"限特权、串行化 Thread，传入中断掩码须清除。RTC prepare 显式授权丢弃业务事件。本调用验证已禁用 RTC 来源、禁用 EWUP、清除 "
+"WUF、提交 RTC 来源，并在 WFI 前重新使能 EWUP。绝不写 RTC 或 EXTI 寄存器。伪返回恢复 RUN 和 RTC "
+"所有权，不清除新唤醒事件。不隐式消费待处理业务事件。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+msgid "[in] Closed, drained domain as for power_enter."
+msgstr "[in] 已封闭并排空的域，要求同 power_enter。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+msgid ""
+"[in] Stable options with standby=true; discard_wakeup alone authorizes "
+"acknowledging an already pending raw PWR WUF."
+msgstr "[in] 稳定选项且 standby=true；只有 discard_wakeup 授权确认已待处理的原始 PWR WUF。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+msgid "[in] Existing suspended RTC face; never a second hardware owner."
+msgstr "[in] 已有且已挂起的 RTC 接口；不得建立第二个硬件所有者。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+msgid "[inout] Exact successful RTC standby_prepare receipt."
+msgstr "[inout] 精确且成功的 RTC standby_prepare 回执。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+msgid "[out] Distinct timer epoch receipt, including spurious return."
+msgstr "[out] 独立定时器纪元回执，包含伪返回情况。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+msgid ""
+"IO on returning Standby, or a pre-entry/restore failure. Real Standby resets"
+" and never returns. A failed restore retains its receipt."
+msgstr "Standby 返回或进入前／恢复失败时返回 IO。真实 Standby 复位且不返回。恢复失败保留回执。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+msgid "Translate a deadline across the exact recorded old/new epochs."
+msgstr "在精确记录的新旧纪元之间转换截止时间。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+msgid ""
+"Pure bounded arithmetic. The caller samples/qualifies the independent RTC "
+"and accounts for sample windows, drift and unavailable intervals. The result"
+" is an envelope, not permission to restart OS/request state."
+msgstr "纯有界算术。调用者采样并验证独立 RTC，计入采样窗口、漂移和不可用区间。结果是范围包络，不授予重启 OS／请求状态的权限。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+msgid "[in] Successful STOP receipt from the same retained boot."
+msgstr "[in] 同一次保留启动中的成功 STOP 回执。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+msgid "[in] Explicit epoch of deadline_us, must match receipt."
+msgstr "[in] deadline_us 的显式纪元，必须与回执匹配。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+msgid "[in] Old-domain absolute deadline, including UINT64_MAX."
+msgstr "[in] 旧域绝对截止时间，包含 UINT64_MAX。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+msgid "[in] Independent source's lower elapsed-time bound."
+msgstr "[in] 独立来源的已过时间下界。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+msgid "[in] Independent source's upper elapsed-time bound."
+msgstr "[in] 独立来源的已过时间上界。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+msgid "[out] Distinct call-owned bounds in the new timer domain."
+msgstr "[out] 新定时器域内独立调用期边界。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+msgid "SUCCESS or INVALID/STATE/OVERFLOW without modifying output."
+msgstr "成功返回 SUCCESS；失败返回 INVALID／STATE／OVERFLOW，并保持输出不变。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+msgid "Explicit regulator, wake routes and authorization to discard WUF."
+msgstr "显式稳压器、唤醒路线及丢弃 WUF 的授权。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+msgid ""
+"wake_pins temporarily arms explicitly selected physical wake pins. The "
+"caller owns their pad/electrical plan and every pre-enabled wake source. "
+"Original enable bits survive a spurious Standby return. Unimplemented IRQ "
+"words/bits must be zero. F446 PC13 conflicts with crystal LSE on the "
+"maintained LQFP package; no source is substituted. discard_wakeup permits "
+"clearing existing PWR WUF only for Standby."
+msgstr ""
+"wake_pins 临时使能显式选定的物理唤醒引脚。调用者负责引脚电气计划及所有预先启用的唤醒来源。伪 Standby 返回保留原启用位。未实现的 "
+"IRQ 字／位必须为零。维护的 LQFP 封装上，F446 PC13 与晶体 LSE 冲突；不替换来源。discard_wakeup 仅授权在 "
+"Standby 清除既有 PWR WUF。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+msgid "Read-only retained PWR observations, not a physical wake-cause proof."
+msgstr "只读保留的 PWR 观测，不构成物理唤醒原因证明。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+msgid ""
+"F479 conservatively requires a product-authorized reset before RTC Standby "
+"rearm when Standby/wake flags remain. WKUP-only is unaffected."
+msgstr "Standby／唤醒标志保留时，F479 保守要求产品授权复位后才可重新使能 RTC Standby。仅 WKUP 模式不受影响。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+msgid "STOP ends one boot timer epoch; no continuous Core time is claimed."
+msgstr "STOP 结束一个启动定时器纪元；不声明 Core 时间连续。"
+
+#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+msgid "A deadline translated using an independent elapsed-time envelope."
+msgstr "依据独立已过时间包络转换的截止时间。"

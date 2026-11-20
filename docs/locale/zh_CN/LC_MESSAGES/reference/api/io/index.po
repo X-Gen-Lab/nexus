@@ -1,0 +1,32 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 9f15d2230ecefe1bef7fd6ed01217ad6435e4980061e9786d4824e9192e8b707\n"
+
+#: ../../../../../../docs/reference/api/io/index.md:10
+msgid "Typed I/O reference"
+msgstr "类型化 I/O 参考"
+
+#: ../../../../../../docs/reference/api/io/index.md:12
+msgid ""
+"Choose the interface by the operation you need. The declarations define "
+"portable identities, formats, borrowing and execution requirements; the "
+"selected part, Board and provider determine the available modes. Factory "
+"lookup returns an existing face and performs no startup or allocation."
+msgstr ""
+"按所需操作选择接口。声明定义可移植身份、格式、借用及执行要求；所选料号、板卡和 provider 决定可用模式。Factory "
+"查找返回已有接口，不启动硬件，也不分配存储。"
+
+#: ../../../../../../docs/reference/api/io/index.md:14
+msgid ""
+"Accepted requests and buffers remain borrowed until acquire-observed "
+"SETTLED. Explicit progress, deadline observation, final hardware withdrawal "
+"and external joins retain their separate responsibilities."
+msgstr ""
+"已接受的请求和缓冲区在以 acquire 语义观测到 SETTLED 前持续借用。显式推进、截止时间观测、最终硬件撤回及外部 join 保持各自职责。"

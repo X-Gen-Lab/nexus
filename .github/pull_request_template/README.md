@@ -5,8 +5,8 @@
 正文先说明问题与变更后的行为，例如 `feat(io)`、`fix(os)`、`build(config)`、
 `docs(delivery)`。
 
-评审核对[当前交付](../../docs/delivery/README.md)中的合同与证据，并遵守
-[代码规范](../../docs/development/coding_standards.rst)。本地 commit hook
+评审核对[当前交付](../../docs/reference/platforms/index.md)中的合同与证据，并遵守
+[代码规范](../../docs/development/coding-standards.md)。本地 commit hook
 与 CI 使用相同格式、注释规则；Native／模型执行、实际 ARM 链接、物理 HIL
 分别建立证据。
 

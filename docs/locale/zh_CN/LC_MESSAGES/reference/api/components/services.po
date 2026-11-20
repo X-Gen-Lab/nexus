@@ -1,0 +1,979 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 6ac28636a07ba4c22031e7f2ca9abee1219ebd5f7873afbc75c1c7aacf7773d4\n"
+
+#: ../../../../../../docs/reference/api/components/services.md:10
+msgid "Storage, settings, logging and mapped storage"
+msgstr "存储、设置、日志与映射存储"
+
+#: ../../../../../../docs/reference/api/components/services.md:12
+msgid ""
+"Services consume explicit storage or memory ports and caller-owned state. "
+"Products own namespaces, persistence policy, Flash regions, migration and "
+"recovery; the platform does not choose those policies."
+msgstr "服务使用显式存储或内存端口及调用者拥有的状态。产品负责命名空间、持久化策略、Flash 区域、迁移和恢复；平台不替产品选择这些策略。"
+
+#: ../../../../../../docs/reference/api/components/services.md:16
+msgid "Public declarations"
+msgstr "公共声明"
+
+#: ../../../../../../docs/reference/api/components/services.md:18
+msgid "file_flash.h"
+msgstr "file_flash.h"
+
+#: ../../../../../../docs/reference/api/components/services.md:20
+msgid "Native persistent file Flash model with fault injection."
+msgstr "支持故障注入的 Native 持久文件 Flash 模型。"
+
+#: ../../../../../../docs/reference/api/components/services.md:20
+msgid ""
+"Author  Nexus Team   Version  1.0.0   Date  2026-10-09  Copyright  Copyright"
+" (c) 2026 Nexus Team"
+msgstr ""
+"作者  Nexus Team   版本  1.0.0   日期  2026-10-09  版权  Copyright (c) 2026 Nexus "
+"Team"
+
+#: ../../../../../../docs/reference/api/components/services.md:20
+#: ../../../../../../docs/reference/api/components/services.md:26
+#: ../../../../../../docs/reference/api/components/services.md:32
+#: ../../../../../../docs/reference/api/components/services.md:38
+#: ../../../../../../docs/reference/api/components/services.md:44
+#: ../../../../../../docs/reference/api/components/services.md:50
+#: ../../../../../../docs/reference/api/components/services.md:56
+msgid "Nexus Team"
+msgstr "Nexus Team"
+
+#: ../../../../../../docs/reference/api/components/services.md:20
+msgid "1.0.0"
+msgstr "1.0.0"
+
+#: ../../../../../../docs/reference/api/components/services.md:20
+msgid "2026-10-09"
+msgstr "2026-10-09"
+
+#: ../../../../../../docs/reference/api/components/services.md:20
+msgid "Copyright (c) 2026 Nexus Team"
+msgstr "Copyright (c) 2026 Nexus Team"
+
+#: ../../../../../../docs/reference/api/components/services.md:20
+#: ../../../../../../docs/reference/api/components/services.md:26
+#: ../../../../../../docs/reference/api/components/services.md:32
+#: ../../../../../../docs/reference/api/components/services.md:38
+#: ../../../../../../docs/reference/api/components/services.md:44
+#: ../../../../../../docs/reference/api/components/services.md:50
+#: ../../../../../../docs/reference/api/components/services.md:56
+msgid "Functions"
+msgstr "函数"
+
+#: ../../../../../../docs/reference/api/components/services.md:20
+msgid "Open an exclusively locked persistent host Flash model."
+msgstr "打开使用独占锁的持久主机 Flash 模型。"
+
+#: ../../../../../../docs/reference/api/components/services.md:20
+msgid ""
+"Task-only POSIX model. Does not qualify MCU Flash or actual power loss; "
+"existing file size mismatch is rejected without truncation."
+msgstr "仅限任务上下文的 POSIX 模型。不为 MCU Flash 或真实掉电建立资格；现有文件大小不匹配时拒绝，不截断文件。"
+
+#: ../../../../../../docs/reference/api/components/services.md:0
+msgid "Parameters"
+msgstr "参数"
+
+#: ../../../../../../docs/reference/api/components/services.md:20
+msgid "[out] Unused caller-owned storage"
+msgstr "[out] 尚未使用且由调用者拥有的存储"
+
+#: ../../../../../../docs/reference/api/components/services.md:20
+msgid "[in] Regular-file path; symlink traversal rejected"
+msgstr "[in] 普通文件路径；拒绝符号链接遍历"
+
+#: ../../../../../../docs/reference/api/components/services.md:20
+msgid "[in] Exact persistent byte size"
+msgstr "[in] 精确的持久字节数"
+
+#: ../../../../../../docs/reference/api/components/services.md:20
+msgid "[in] Uniform erase block bytes"
+msgstr "[in] 均匀擦除块的字节数"
+
+#: ../../../../../../docs/reference/api/components/services.md:20
+msgid "[in] Aligned program bytes, 1..256"
+msgstr "[in] 对齐的编程字节数，范围 1..256"
+
+#: ../../../../../../docs/reference/api/components/services.md:0
+msgid "Returns"
+msgstr "返回值"
+
+#: ../../../../../../docs/reference/api/components/services.md:20
+msgid "OK or INVALID/IO; failed open retains no file descriptor"
+msgstr "OK 或 INVALID/IO；打开失败时不保留文件描述符"
+
+#: ../../../../../../docs/reference/api/components/services.md:20
+msgid "Close the host file after all store users have quiesced."
+msgstr "全部存储使用者静止后关闭主机文件。"
+
+#: ../../../../../../docs/reference/api/components/services.md:20
+msgid "No future port calls are permitted until explicit reopen."
+msgstr "显式重新打开前不得再次调用接口。"
+
+#: ../../../../../../docs/reference/api/components/services.md:20
+msgid "[inout] Open serialized model"
+msgstr "[inout] 已打开且串行使用的模型"
+
+#: ../../../../../../docs/reference/api/components/services.md:20
+msgid "Set an explicit model interruption boundary."
+msgstr "设置显式模型中断边界。"
+
+#: ../../../../../../docs/reference/api/components/services.md:20
+msgid "Zero simulates power-off until explicitly cleared."
+msgstr "零表示模拟断电，直到显式清除。"
+
+#: ../../../../../../docs/reference/api/components/services.md:20
+msgid "[inout] Serialized open model"
+msgstr "[inout] 串行使用的已打开模型"
+
+#: ../../../../../../docs/reference/api/components/services.md:20
+msgid ""
+"[in] Programmed/erased bytes and sync attempts permitted; negative disables"
+msgstr "[in] 允许编程或擦除的字节数及同步尝试次数；负值表示禁用限制"
+
+#: ../../../../../../docs/reference/api/components/services.md:20
+#: ../../../../../../docs/reference/api/components/services.md:26
+#: ../../../../../../docs/reference/api/components/services.md:32
+#: ../../../../../../docs/reference/api/components/services.md:38
+#: ../../../../../../docs/reference/api/components/services.md:44
+#: ../../../../../../docs/reference/api/components/services.md:50
+#: ../../../../../../docs/reference/api/components/services.md:56
+msgid "Public Members"
+msgstr "公共成员"
+
+#: ../../../../../../docs/reference/api/components/services.md:24
+msgid "flash_storage.h"
+msgstr "flash_storage.h"
+
+#: ../../../../../../docs/reference/api/components/services.md:26
+msgid "Explicit physical Flash-region adapter without global registry."
+msgstr "显式物理 Flash 区域适配器，不使用全局登记表。"
+
+#: ../../../../../../docs/reference/api/components/services.md:26
+#: ../../../../../../docs/reference/api/components/services.md:32
+#: ../../../../../../docs/reference/api/components/services.md:38
+#: ../../../../../../docs/reference/api/components/services.md:44
+#: ../../../../../../docs/reference/api/components/services.md:50
+#: ../../../../../../docs/reference/api/components/services.md:56
+msgid "Author  Nexus Team"
+msgstr "作者  Nexus Team"
+
+#: ../../../../../../docs/reference/api/components/services.md:26
+msgid "Bind an explicit writable uniform-erase physical region."
+msgstr "绑定显式可写、擦除粒度统一的物理区域。"
+
+#: ../../../../../../docs/reference/api/components/services.md:26
+msgid ""
+"Task-only, serialized caller. No region is reserved by the platform. Mixed "
+"sector geometries require another explicit storage adapter; this one rejects"
+" them. IO pulse settlement guarantees sync durability; no caller buffer "
+"survives a port call. Physical power-loss remains unqualified. The caller "
+"must honor geometry.program_flags when using this port directly: ECC units "
+"require actual erase provenance, not an all-0xff read. nx_storage_save "
+"erases its inactive bank and writes each distinct full program unit at most "
+"once before its next erase, including its separate final commit marker. This"
+" adapter does not track hidden program-pulse history."
+msgstr ""
+"仅限任务上下文，由调用者串行使用。平台不保留任何区域。混合扇区几何需要另一个显式存储适配器，本适配器会拒绝。I/O "
+"脉冲结清保证同步持久化；接口调用返回后不保留任何调用者缓冲。物理掉电仍未取得资格。直接使用该接口时，调用者必须遵守 "
+"geometry.program_flags：ECC 单元需要真实擦除来源证明，不能凭全 0xff 读取推断。nx_storage_save 擦除非活动"
+" bank，在下次擦除前对每个不同的完整编程单元最多写入一次，包括独立的最终提交标记。本适配器不跟踪隐藏的编程脉冲历史。"
+
+#: ../../../../../../docs/reference/api/components/services.md:26
+msgid "[out] Unused caller storage kept through all store calls"
+msgstr "[out] 尚未使用的调用者存储，在全部存储调用期间保持有效"
+
+#: ../../../../../../docs/reference/api/components/services.md:26
+msgid "[in] Externally selected writable physical region"
+msgstr "[in] 由外部选定的可写物理区域"
+
+#: ../../../../../../docs/reference/api/components/services.md:26
+msgid "[in] Absolute whole-transaction deadline for mutations"
+msgstr "[in] 覆盖完整修改事务的绝对截止时间"
+
+#: ../../../../../../docs/reference/api/components/services.md:26
+msgid "[out] Narrow synchronous persistent port, valid on SUCCESS"
+msgstr "[out] 窄同步持久化接口，在 SUCCESS 时有效"
+
+#: ../../../../../../docs/reference/api/components/services.md:26
+msgid "SUCCESS or INVALID/PERMISSION/UNSUPPORTED geometry error"
+msgstr "SUCCESS；或 INVALID/PERMISSION/UNSUPPORTED 几何错误"
+
+#: ../../../../../../docs/reference/api/components/services.md:26
+msgid "Set the next transaction's one absolute mutation deadline."
+msgstr "设置下一事务唯一的绝对修改截止时间。"
+
+#: ../../../../../../docs/reference/api/components/services.md:26
+msgid ""
+"Caller serializes and sets this before open/save/recovery. Per-pulse "
+"timeouts cannot preempt hardware pulses; IO settles before return."
+msgstr "调用者必须串行使用，并在 open/save/recovery 前设置该值。逐脉冲超时不能抢占硬件脉冲；I/O 在返回前结清。"
+
+#: ../../../../../../docs/reference/api/components/services.md:26
+msgid "[inout] Bound adapter with no active store operation"
+msgstr "[inout] 已绑定且无活动存储操作的适配器"
+
+#: ../../../../../../docs/reference/api/components/services.md:26
+msgid "[in] Absolute deadline in nx_time_now_us domain"
+msgstr "[in] nx_time_now_us 域中的绝对截止时间"
+
+#: ../../../../../../docs/reference/api/components/services.md:26
+msgid "Caller-owned adapter, no dynamic binding or global token lookup."
+msgstr "调用者拥有的适配器，不使用动态绑定或全局 token 查找。"
+
+#: ../../../../../../docs/reference/api/components/services.md:30
+msgid "log.h"
+msgstr "log.h"
+
+#: ../../../../../../docs/reference/api/components/services.md:32
+msgid "Instance-local synchronous bounded log sink."
+msgstr "实例内同步、有界日志接收端。"
+
+#: ../../../../../../docs/reference/api/components/services.md:32
+#: ../../../../../../docs/reference/api/components/services.md:44
+#: ../../../../../../docs/reference/api/components/services.md:50
+msgid "Enums"
+msgstr "枚举"
+
+#: ../../../../../../docs/reference/api/components/services.md:32
+msgid "Structured severity, with filtering before touching a sink."
+msgstr "结构化严重级别；在访问接收端前完成过滤。"
+
+#: ../../../../../../docs/reference/api/components/services.md:32
+#: ../../../../../../docs/reference/api/components/services.md:44
+#: ../../../../../../docs/reference/api/components/services.md:50
+msgid "Values:"
+msgstr "取值："
+
+#: ../../../../../../docs/reference/api/components/services.md:32
+msgid "Initialize an unused logger before exposing it to tasks."
+msgstr "向任务暴露日志对象之前初始化。"
+
+#: ../../../../../../docs/reference/api/components/services.md:32
+msgid "[out] Unused caller storage"
+msgstr "[out] 尚未使用的调用者存储"
+
+#: ../../../../../../docs/reference/api/components/services.md:32
+msgid "[in] Required bounded synchronous sink"
+msgstr "[in] 必需的有界同步输出端"
+
+#: ../../../../../../docs/reference/api/components/services.md:32
+msgid "[in] Minimum accepted severity"
+msgstr "[in] 接受的最低严重级别"
+
+#: ../../../../../../docs/reference/api/components/services.md:32
+msgid "SUCCESS or INVALID"
+msgstr "SUCCESS 或 INVALID"
+
+#: ../../../../../../docs/reference/api/components/services.md:32
+msgid "Write caller bytes, with no implicit allocation/formatting."
+msgstr "写入调用者字节，不进行隐式分配／格式化。"
+
+#: ../../../../../../docs/reference/api/components/services.md:32
+msgid ""
+"Task multi-producer entry with nonblocking serialization. M0/M0+ use CPU-"
+"local saved-PRIMASK metadata exclusion and require privileged callers on one"
+" CPU. Sink calls run after restoring the incoming mask. This does not make "
+"NMI/HardFault or cross-security-domain writers valid. IRQ use is prohibited."
+" Drop/retry policy remains with the external caller."
+msgstr ""
+"任务中的多生产者入口，使用非阻塞串行化。M0/M0+ 使用 CPU 本地保存并恢复 PRIMASK 的元数据临界区，要求调用者在同一 CPU "
+"上具有特权。恢复进入时的屏蔽状态后才调用输出端。这不允许 NMI/HardFault 或跨安全域写入者使用。禁止 IRQ "
+"调用。丢弃或重试策略由外部调用者负责。"
+
+#: ../../../../../../docs/reference/api/components/services.md:32
+msgid "[inout] Live instance"
+msgstr "[inout] 有效的实例"
+
+#: ../../../../../../docs/reference/api/components/services.md:32
+msgid "[in] Message severity"
+msgstr "[in] 消息严重级别"
+
+#: ../../../../../../docs/reference/api/components/services.md:32
+msgid "[in] Message bytes, borrowed only during this call"
+msgstr "[in] 消息字节，仅在本次调用期间借用"
+
+#: ../../../../../../docs/reference/api/components/services.md:32
+msgid "[in] Byte count; zero permits NULL"
+msgstr "[in] 字节数；为零时允许 NULL"
+
+#: ../../../../../../docs/reference/api/components/services.md:32
+msgid "[in] Absolute deadline understood by sink"
+msgstr "[in] 输出端理解的绝对截止时间"
+
+#: ../../../../../../docs/reference/api/components/services.md:32
+msgid ""
+"SUCCESS for filtered/sent bytes, BUSY for concurrent/recursive writes, STATE"
+" after stop, otherwise sink error"
+msgstr "被过滤或已发送的字节返回 SUCCESS；并发或递归写入返回 BUSY；停止后为 STATE；其他情况返回输出端错误"
+
+#: ../../../../../../docs/reference/api/components/services.md:32
+msgid "Flush an explicit sink without creating a background worker."
+msgstr "刷新显式接收端，不创建后台执行任务。"
+
+#: ../../../../../../docs/reference/api/components/services.md:32
+msgid "Same task/privilege/CPU domain as write."
+msgstr "与 write 相同的任务、权限和 CPU 域。"
+
+#: ../../../../../../docs/reference/api/components/services.md:32
+msgid "[in] Absolute sink deadline"
+msgstr "[in] 输出端的绝对截止时间"
+
+#: ../../../../../../docs/reference/api/components/services.md:32
+msgid "SUCCESS, BUSY, STATE, UNSUPPORTED or sink error"
+msgstr "SUCCESS、BUSY、STATE、UNSUPPORTED 或输出端错误"
+
+#: ../../../../../../docs/reference/api/components/services.md:32
+msgid "Reject new writes and test whether the sink has exited."
+msgstr "拒绝新写入并检查接收端是否已退出。"
+
+#: ../../../../../../docs/reference/api/components/services.md:32
+msgid ""
+"Task context. A stop caller may retry; no active sink call is forcibly "
+"cancelled. Join publishers before reclaiming logger/sink storage."
+msgstr "任务上下文。停止调用者可以重试；不会强行取消活动的输出端调用。回收日志器或输出端存储前必须等待发布者退出。"
+
+#: ../../../../../../docs/reference/api/components/services.md:32
+msgid "[inout] Live instance; external users must eventually join"
+msgstr "[inout] 有效实例；外部使用者最终必须退出并完成汇合"
+
+#: ../../../../../../docs/reference/api/components/services.md:32
+msgid "SUCCESS when no sink call is active, BUSY while draining"
+msgstr "没有活动的输出端调用时为 SUCCESS；排空期间为 BUSY"
+
+#: ../../../../../../docs/reference/api/components/services.md:32
+msgid "Synchronous caller-injected sink."
+msgstr "调用者注入的同步接收端。"
+
+#: ../../../../../../docs/reference/api/components/services.md:32
+msgid ""
+"write/flush release every byte buffer before returning even on "
+"timeout/error; asynchronous/DMA sinks require their own settled adapter. "
+"Calls are bounded by absolute monotonic deadlines, in task context. No sink "
+"discovery, allocation, formatting, worker or global error handler exists."
+msgstr ""
+"write/flush 即使超时或出错，也在返回前释放每个字节缓冲；异步或 DMA "
+"输出端需要自行提供已结清的适配器。调用位于任务上下文，并受绝对单调截止时间约束。不存在输出端发现、分配、格式化、工作线程或全局错误处理器。"
+
+#: ../../../../../../docs/reference/api/components/services.md:32
+msgid "Logger storage belongs to its caller; shared immutable port is copied."
+msgstr "日志存储属于调用者；共享不可变端口在初始化时复制。"
+
+#: ../../../../../../docs/reference/api/components/services.md:36
+msgid "settings.h"
+msgstr "settings.h"
+
+#: ../../../../../../docs/reference/api/components/services.md:38
+msgid "Bounded key/value staging over durable whole-blob storage."
+msgstr "在持久化整块存储上提供有界 key/value 暂存。"
+
+#: ../../../../../../docs/reference/api/components/services.md:38
+#: ../../../../../../docs/reference/api/components/services.md:44
+msgid "Defines"
+msgstr "宏定义"
+
+#: ../../../../../../docs/reference/api/components/services.md:38
+msgid "Load one exact schema or stage an empty, uncommitted image."
+msgstr "加载精确 schema，或暂存空的未提交镜像。"
+
+#: ../../../../../../docs/reference/api/components/services.md:38
+msgid ""
+"Synchronous task-only scan. Missing blob stages an empty image, without "
+"reading defaults or writing Flash. Different schema/format is UNSUPPORTED "
+"and never rewritten. Truncated, duplicate or unordered keys are CORRUPT. A "
+"failed load never becomes an empty writable store; the instance stays "
+"closed."
+msgstr ""
+"仅任务上下文同步扫描。缺少 blob 时暂存空镜像，不读取默认值或写 Flash。不同 schema/format 返回 "
+"UNSUPPORTED，绝不重写。截断、重复或无序 key 返回 CORRUPT。加载失败不能变成空的可写存储；实例保持关闭。"
+
+#: ../../../../../../docs/reference/api/components/services.md:38
+msgid "[out] Unused or closed instance, exclusively owned"
+msgstr "[out] 未使用或已关闭的独占实例"
+
+#: ../../../../../../docs/reference/api/components/services.md:38
+msgid ""
+"[inout] Open durable store; no other mutating client while this settings "
+"instance is open"
+msgstr "[inout] 已打开的持久化存储；Settings 打开期间不得有其他变更性客户端"
+
+#: ../../../../../../docs/reference/api/components/services.md:38
+msgid "[in] Product-defined schema identity, including zero"
+msgstr "[in] 产品定义的 schema 身份，允许零"
+
+#: ../../../../../../docs/reference/api/components/services.md:38
+msgid ""
+"[inout] Caller buffer, disjoint from both instances and the storage "
+"workspace; borrowed until close or a failed commit"
+msgstr "[inout] 调用者 buffer，与两个实例及 storage workspace 独立；借用至 close 或失败的 commit"
+
+#: ../../../../../../docs/reference/api/components/services.md:38
+msgid "[in] At least HEADER_SIZE and at most UINT32_MAX"
+msgstr "[in] 至少 HEADER_SIZE，至多 UINT32_MAX"
+
+#: ../../../../../../docs/reference/api/components/services.md:38
+msgid "[in] Nonzero upper bound on staged entries"
+msgstr "[in] 暂存条目数量的非零上限"
+
+#: ../../../../../../docs/reference/api/components/services.md:38
+msgid "OK, INVALID, NO_SPACE, CORRUPT, UNSUPPORTED or port error"
+msgstr "OK、INVALID、NO_SPACE、CORRUPT、UNSUPPORTED 或 port 错误"
+
+#: ../../../../../../docs/reference/api/components/services.md:38
+msgid "Copy a staged value without exposing internal storage."
+msgstr "复制暂存值，不暴露内部存储。"
+
+#: ../../../../../../docs/reference/api/components/services.md:38
+msgid ""
+"Task-only synchronous copy; no pointer is retained. Missing key reports size"
+" zero. NO_SPACE leaves output untouched and reports required bytes. No "
+"underlying Flash operation occurs."
+msgstr "仅任务上下文同步复制，不保留指针。缺 key 时报告长度零。NO_SPACE 保持输出不变并报告所需字节数。不执行底层 Flash 操作。"
+
+#: ../../../../../../docs/reference/api/components/services.md:38
+msgid "[in] Open instance, serialized with all mutation"
+msgstr "[in] 已打开实例，与全部变更操作串行化"
+
+#: ../../../../../../docs/reference/api/components/services.md:38
+msgid "[in] Exact product-assigned identifier"
+msgstr "[in] 精确的产品分配标识"
+
+#: ../../../../../../docs/reference/api/components/services.md:38
+msgid "[out] Disjoint destination, or NULL to query size only"
+msgstr "[out] 独立目标，或以 NULL 只查询长度"
+
+#: ../../../../../../docs/reference/api/components/services.md:38
+msgid ""
+"[inout] Capacity on input, required/value bytes on output; disjoint from "
+"metadata, staging image and output"
+msgstr "[inout] 输入为容量，输出为所需或实际值字节数；与元数据、暂存镜像及 output 独立"
+
+#: ../../../../../../docs/reference/api/components/services.md:38
+msgid "OK, NOT_FOUND, NO_SPACE or INVALID"
+msgstr "OK、NOT_FOUND、NO_SPACE 或 INVALID"
+
+#: ../../../../../../docs/reference/api/components/services.md:38
+msgid "Insert or replace one copied value in bounded RAM staging."
+msgstr "在有界 RAM 暂存中插入或替换复制的值。"
+
+#: ../../../../../../docs/reference/api/components/services.md:38
+msgid ""
+"Task-only, bounded by image capacity and entry limit. Failed admission "
+"changes neither entries nor dirty state. A changed value marks staging dirty"
+" without touching Flash; an identical value preserves both image and the "
+"previous dirty state."
+msgstr ""
+"仅任务上下文，由镜像容量和条目上限约束。准入失败不改变条目或 dirty 状态。值变化使暂存变脏，不写 Flash；值相同时保留镜像和原 dirty "
+"状态。"
+
+#: ../../../../../../docs/reference/api/components/services.md:38
+#: ../../../../../../docs/reference/api/components/services.md:44
+msgid "[inout] Open exclusively owned instance"
+msgstr "[inout] 已打开且独占拥有的实例"
+
+#: ../../../../../../docs/reference/api/components/services.md:38
+msgid ""
+"[in] Input disjoint from instance and staging image; NULL only for an empty "
+"value, borrowed during this call"
+msgstr "[in] 输入与实例及暂存镜像独立；仅空值允许 NULL，调用期间借用"
+
+#: ../../../../../../docs/reference/api/components/services.md:38
+msgid "[in] Value byte count, at most UINT32_MAX"
+msgstr "[in] 值字节数，至多 UINT32_MAX"
+
+#: ../../../../../../docs/reference/api/components/services.md:38
+msgid "OK, NO_SPACE or INVALID"
+msgstr "OK、NO_SPACE 或 INVALID"
+
+#: ../../../../../../docs/reference/api/components/services.md:38
+msgid "Remove a staged key without writing Flash."
+msgstr "移除暂存 key，不写 Flash。"
+
+#: ../../../../../../docs/reference/api/components/services.md:38
+msgid ""
+"Task-only synchronous operation. Missing keys have no effects. Success "
+"compacts staging and marks it dirty."
+msgstr "仅任务上下文同步操作。缺 key 时无影响。成功时压紧暂存并标记 dirty。"
+
+#: ../../../../../../docs/reference/api/components/services.md:38
+msgid "OK, NOT_FOUND or INVALID"
+msgstr "OK、NOT_FOUND 或 INVALID"
+
+#: ../../../../../../docs/reference/api/components/services.md:38
+msgid "Commit the complete staged snapshot through durable Storage."
+msgstr "通过持久化 Storage 提交完整暂存快照。"
+
+#: ../../../../../../docs/reference/api/components/services.md:38
+msgid ""
+"Task-only settled call; underlying Flash may stall execution. Clean staging "
+"does not write. Successful save clears dirty. A mutating I/O failure closes "
+"the instance and preserves the dirty flag for diagnosis, but retains no "
+"staging borrow. Reopen Storage, then Settings to determine the surviving "
+"commit; failure may occur after a new marker became durable. Retrying a "
+"failed commit without recovery is rejected."
+msgstr ""
+"仅任务上下文同步完成调用；底层 Flash 可能暂停执行。干净暂存不写入，保存成功清除 dirty。变更性 I/O 失败会关闭实例并保留 dirty "
+"供诊断，不再借用暂存。先重新打开 Storage，再打开 Settings 以确定保留的提交；失败可能发生在新 marker "
+"已持久化之后。不恢复就重试失败 commit 会被拒绝。"
+
+#: ../../../../../../docs/reference/api/components/services.md:38
+msgid "OK or underlying storage error"
+msgstr "OK 或底层 storage 错误"
+
+#: ../../../../../../docs/reference/api/components/services.md:38
+msgid "Release settings metadata without committing staged values."
+msgstr "释放 Settings 元数据，不提交暂存值。"
+
+#: ../../../../../../docs/reference/api/components/services.md:38
+msgid ""
+"Task-only, serialized after all calls. No I/O or retained references remain."
+" Underlying Storage stays open; its scratch lifetime remains governed by the"
+" Storage contract."
+msgstr ""
+"仅任务上下文，在全部调用之后串行化。不执行 I/O，也无保留引用。底层 Storage 保持打开；其 scratch 生命周期仍由 Storage "
+"合同决定。"
+
+#: ../../../../../../docs/reference/api/components/services.md:38
+msgid "[inout] Quiesced instance, or NULL"
+msgstr "[inout] 已静默的实例，或 NULL"
+
+#: ../../../../../../docs/reference/api/components/services.md:38
+msgid "Caller-owned settings metadata and bounded staging image."
+msgstr "调用者拥有的 Settings 元数据与有界暂存镜像。"
+
+#: ../../../../../../docs/reference/api/components/services.md:38
+msgid ""
+"Task-only; serialize all operations and the underlying storage. No heap, "
+"workers or global key registry. Keys are product-assigned uint32 "
+"identifiers; values are byte strings, including empty strings. The format is"
+" little-endian, not authenticated. Products own defaults, schema migration, "
+"authorization, durability frequency and Flash reservations. Only commit "
+"writes storage; close discards staged changes."
+msgstr ""
+"仅任务上下文；全部操作及底层存储须串行化。无 heap、worker 或全局 key 注册表。Key 为产品分配的 uint32 "
+"标识，值为字节串，允许空串。格式为 little-endian，不提供认证。产品拥有默认值、schema 迁移、授权、持久化频率和 Flash "
+"预留。只有 commit 写存储；close 丢弃暂存变更。"
+
+#: ../../../../../../docs/reference/api/components/services.md:42
+msgid "storage.h"
+msgstr "storage.h"
+
+#: ../../../../../../docs/reference/api/components/services.md:44
+msgid "Two-bank durable blob storage over an explicit narrow port."
+msgstr "使用显式窄端口的双 bank 持久 blob 存储。"
+
+#: ../../../../../../docs/reference/api/components/services.md:44
+msgid "Storage errors expose retry/reopen/recovery decisions."
+msgstr "存储错误显式暴露重试／重开／恢复决策。"
+
+#: ../../../../../../docs/reference/api/components/services.md:44
+msgid "Open/recover two externally supplied uniform erase banks."
+msgstr "打开／恢复两个外部供给、擦除粒度统一的 bank。"
+
+#: ../../../../../../docs/reference/api/components/services.md:44
+msgid ""
+"Task-only bounded scan over both bank payloads. Workspace remains borrowed "
+"by the instance through every subsequent load/save call."
+msgstr "仅限任务上下文，对两个 bank 的载荷执行有界扫描。工作区由实例持续借用，覆盖此后每次 load/save 调用。"
+
+#: ../../../../../../docs/reference/api/components/services.md:44
+msgid "[out] Unused or quiesced instance, no concurrent calls"
+msgstr "[out] 尚未使用或已静默的实例，不存在并发调用"
+
+#: ../../../../../../docs/reference/api/components/services.md:44
+msgid "[in] Persistent settled port, may be storage's existing port"
+msgstr "[in] 返回前已结清的持久化接口，可以是存储对象原有的接口"
+
+#: ../../../../../../docs/reference/api/components/services.md:44
+msgid "[in] Erase-aligned start within port region"
+msgstr "[in] 接口区域内按擦除粒度对齐的起点"
+
+#: ../../../../../../docs/reference/api/components/services.md:44
+msgid "[in] Each bank's erase-aligned byte size"
+msgstr "[in] 每个 bank 按擦除粒度对齐的字节数"
+
+#: ../../../../../../docs/reference/api/components/services.md:44
+msgid "[in] Caller buffer, disjoint from instance/payload"
+msgstr "[in] 调用者缓冲，与实例及载荷不重叠"
+
+#: ../../../../../../docs/reference/api/components/services.md:44
+msgid "[in] At least max(32, port.program_size)"
+msgstr "[in] 至少为 max(32, port.program_size)"
+
+#: ../../../../../../docs/reference/api/components/services.md:44
+msgid ""
+"OK for recovered/empty store, CORRUPT for ambiguous or only invalid "
+"committed generations, IO/INVALID for port/geometry failures"
+msgstr "恢复成功或存储为空时为 OK；代次有歧义，或仅存在无效的已提交代次时为 CORRUPT；接口或几何错误时为 IO/INVALID"
+
+#: ../../../../../../docs/reference/api/components/services.md:44
+msgid "Load and validate the latest committed whole blob."
+msgstr "加载并验证最新提交的完整 blob。"
+
+#: ../../../../../../docs/reference/api/components/services.md:44
+msgid ""
+"Output bytes valid only on OK; failure may partially write output. No "
+"destination pointer is retained after returning."
+msgstr "只有 OK 时输出字节才有效；失败时可能已部分写入输出。返回后不保留目标指针。"
+
+#: ../../../../../../docs/reference/api/components/services.md:44
+msgid "[inout] Open instance, exclusively owned for this call"
+msgstr "[inout] 已打开的实例，本次调用期间独占拥有"
+
+#: ../../../../../../docs/reference/api/components/services.md:44
+msgid "[out] Destination; NULL requests only required size"
+msgstr "[out] 目标；NULL 表示只查询所需大小"
+
+#: ../../../../../../docs/reference/api/components/services.md:44
+msgid "[inout] Input capacity, output payload/required bytes"
+msgstr "[inout] 输入为容量，输出为载荷字节数或所需字节数"
+
+#: ../../../../../../docs/reference/api/components/services.md:44
+msgid "OK, NOT_FOUND, NO_SPACE, CORRUPT or IO/INVALID"
+msgstr "OK、NOT_FOUND、NO_SPACE、CORRUPT 或 IO/INVALID"
+
+#: ../../../../../../docs/reference/api/components/services.md:44
+msgid "Commit a complete blob to the inactive bank."
+msgstr "将完整 blob 提交到非活动 bank。"
+
+#: ../../../../../../docs/reference/api/components/services.md:44
+msgid ""
+"Marker is programmed last after sync. Failed mutation keeps the previous "
+"bank and requires reopen; ambiguous marker failure can mean the new blob "
+"committed. Product owns migration/authentication/recovery policy."
+msgstr ""
+"同步后最后编程提交标记。修改失败时保留先前的 bank，并要求重新打开；标记失败有歧义时，新 blob 可能已经提交。迁移、认证及恢复策略由产品负责。"
+
+#: ../../../../../../docs/reference/api/components/services.md:44
+msgid "[in] Payload disjoint from workspace, borrowed during call"
+msgstr "[in] 与工作区不重叠的载荷，仅调用期间借用"
+
+#: ../../../../../../docs/reference/api/components/services.md:44
+msgid "[in] Payload bytes; zero permits NULL"
+msgstr "[in] 载荷字节数；为零时允许 NULL"
+
+#: ../../../../../../docs/reference/api/components/services.md:44
+msgid "OK, NO_SPACE, INVALID or underlying port error"
+msgstr "OK、NO_SPACE、INVALID 或底层接口错误"
+
+#: ../../../../../../docs/reference/api/components/services.md:44
+msgid "Query usable blob capacity without touching hardware."
+msgstr "查询可用 blob 容量，不访问硬件。"
+
+#: ../../../../../../docs/reference/api/components/services.md:44
+msgid "[in] Geometry-established instance, or NULL"
+msgstr "[in] 已建立几何信息的实例，或 NULL"
+
+#: ../../../../../../docs/reference/api/components/services.md:44
+msgid "Payload bytes per bank, or zero for invalid geometry"
+msgstr "每个 bank 的载荷字节数；几何无效时为零"
+
+#: ../../../../../../docs/reference/api/components/services.md:44
+msgid "Synchronous settled persistent Flash port."
+msgstr "同步且已结清的持久 Flash 端口。"
+
+#: ../../../../../../docs/reference/api/components/services.md:44
+msgid ""
+"Task-only; caller serializes every operation. Offsets are byte-relative to "
+"the supplied region. program changes only 1 to 0 in complete aligned program"
+" units; erase uses complete uniform erase units. sync makes earlier "
+"successful writes durable. Errors can change a subset of addressed units, "
+"but never retain caller buffers after returning. RAM is a model, not a "
+"persistent implementation. Product owns the region/layout and power policy."
+msgstr ""
+"仅限任务上下文；调用者串行使用全部操作。偏移以所提供区域的起点为基准，单位为字节。program 只在完整且对齐的编程单元内将 1 改为 0；erase"
+" 使用完整且均匀的擦除单元。sync 使先前成功的写入持久化。错误可能改变所寻址单元的一部分，但返回后绝不保留调用者缓冲。RAM "
+"是模型，不是持久化实现。区域、布局及电源策略由产品负责。"
+
+#: ../../../../../../docs/reference/api/components/services.md:44
+msgid "Instance metadata with caller-sized workspace."
+msgstr "实例元数据与调用者确定容量的工作区。"
+
+#: ../../../../../../docs/reference/api/components/services.md:44
+msgid ""
+"Two independently erasable banks commit whole blobs. No heap, global "
+"registry, maximum pool or default product reservation. Wire format v1 is "
+"explicit little-endian and CRC-protected, not authenticated. Keep instance, "
+"port context and workspace alive through close/quiescence. A mutating I/O "
+"error invalidates opened; reopen to establish which commit actually "
+"survived."
+msgstr ""
+"两个可独立擦除的 bank 提交完整 blob。不使用堆、全局注册表、最大容量池或默认产品预留。线上格式 v1 显式采用小端和 CRC "
+"保护，不提供认证。实例、接口 context 和工作区必须保持有效，直到关闭并静默。修改性 I/O 错误会使 opened "
+"失效；需要重新打开，才能确定哪个提交实际保留。"
+
+#: ../../../../../../docs/reference/api/components/services.md:48
+msgid "mapped_storage.h"
+msgstr "mapped_storage.h"
+
+#: ../../../../../../docs/reference/api/components/services.md:50
+msgid "Bounded read mappings and exclusive storage requests."
+msgstr "有界只读映射与独占存储请求。"
+
+#: ../../../../../../docs/reference/api/components/services.md:50
+msgid "Read-only consumers; capability does not prove physical routing."
+msgstr "只读消费者；能力声明不证明物理布线。"
+
+#: ../../../../../../docs/reference/api/components/services.md:50
+msgid "Physical mutation, separate from read-map ownership."
+msgstr "物理修改操作，与只读映射所有权分离。"
+
+#: ../../../../../../docs/reference/api/components/services.md:50
+msgid "Prepare unborrowed caller storage without accessing payload."
+msgstr "准备未被借用的调用方存储，不访问载荷。"
+
+#: ../../../../../../docs/reference/api/components/services.md:50
+msgid "SUCCESS or INVALID/STATE; no retained references on failure."
+msgstr "成功返回 SUCCESS，否则返回 INVALID/STATE；失败不保留引用。"
+
+#: ../../../../../../docs/reference/api/components/services.md:50
+msgid "Query immutable geometry without starting hardware."
+msgstr "查询不可变几何参数，不启动硬件。"
+
+#: ../../../../../../docs/reference/api/components/services.md:50
+msgid "Acquire one bounded, positive read-only span on a serialized executor."
+msgstr "在串行执行器上获取一个有界、长度为正的只读范围。"
+
+#: ../../../../../../docs/reference/api/components/services.md:50
+msgid ""
+"SUCCESS, INVALID/UNSUPPORTED/BUSY/EXHAUSTED/STATE, or a backend map error. "
+"Failure retains no loan; partial hardware configuration can close admission "
+"and require stop to retry cleanup. Live read maps exclude all "
+"command/program/erase/cache/DMA writers. CPU/XIP/DMA consumers may run "
+"concurrently after successful acquisition."
+msgstr ""
+"SUCCESS、INVALID/UNSUPPORTED/BUSY/EXHAUSTED/STATE 或 backend 映射错误。失败不保留 "
+"loan；部分硬件配置可能关闭准入，需要 stop 重试清理。有效的读取映射排除所有 command/program/erase/cache/DMA "
+"writer。成功获取后，CPU/XIP/DMA 消费者可以并发运行。"
+
+#: ../../../../../../docs/reference/api/components/services.md:50
+msgid "Release an exact live loan after its consumers have joined."
+msgstr "消费者全部会合退出后，释放一个精确的活动借用。"
+
+#: ../../../../../../docs/reference/api/components/services.md:50
+msgid ""
+"SUCCESS, INVALID/STATE, or backend unmap error retaining the loan. Task-"
+"only, same serialized executor; no forced revocation or timeout release."
+msgstr ""
+"返回 SUCCESS、INVALID/STATE，或保留借用的后端解除映射错误。仅供任务调用，使用同一串行执行器；不强制撤销借用，也不因超时释放。"
+
+#: ../../../../../../docs/reference/api/components/services.md:50
+msgid "Admit one exclusive PROGRAM/ERASE request with an absolute deadline."
+msgstr "以绝对期限接纳一个独占 PROGRAM/ERASE 请求。"
+
+#: ../../../../../../docs/reference/api/components/services.md:50
+msgid ""
+"SUCCESS is ACCEPTED, possibly settled. Rejection retains no request or "
+"payload and produces no hardware effects. No map loan may remain live. Task-"
+"only serialized owner; no workers, allocation, locks or queue exist."
+msgstr ""
+"SUCCESS 表示 "
+"ACCEPTED，请求可能已经完成结算。拒绝不保留请求或载荷，也不产生硬件效果。不得仍有活动映射借用。仅供串行任务所有者使用；不创建工作线程、内存分配、锁或队列。"
+
+#: ../../../../../../docs/reference/api/components/services.md:50
+msgid "Request cancellation by instance and nonrepeating writer epoch."
+msgstr "通过实例及不重复的写入 epoch 身份请求取消。"
+
+#: ../../../../../../docs/reference/api/components/services.md:50
+msgid ""
+"SUCCESS starts/observes drain; STATE rejects stale/foreign identity. "
+"Cancellation never releases storage. Continue service through drain."
+msgstr "SUCCESS 表示启动或观察排空；STATE 拒绝过期或属于其他实例的身份。取消从不释放存储。须继续推进，直至排空结束。"
+
+#: ../../../../../../docs/reference/api/components/services.md:50
+msgid "Advance one bounded backend step or drain attempt without waiting."
+msgstr "不等待地推进一次有界后端步骤或排空尝试。"
+
+#: ../../../../../../docs/reference/api/components/services.md:50
+msgid ""
+"Backend/IRQ/data references detach before release-publication of SETTLED, "
+"which is the final request access. Failed drain is QUARANTINED; storage "
+"remains borrowed and later service may retry source withdrawal."
+msgstr ""
+"在以 release 语义发布 SETTLED 前，后端、IRQ 和数据引用全部脱离；该发布是对请求的最后访问。排空失败进入 "
+"QUARANTINED；存储继续被借用，后续推进可以重试撤回访问源。"
+
+#: ../../../../../../docs/reference/api/components/services.md:50
+msgid "Close admission and request writer cancellation."
+msgstr "关闭准入并请求取消写入操作。"
+
+#: ../../../../../../docs/reference/api/components/services.md:50
+msgid ""
+"SUCCESS only after all map loans, writer sources and partial map cleanup are"
+" gone. BUSY retains storage and needs release/service; another backend "
+"cleanup error retains its responsibility for stop retry. Repeated successful"
+" stop performs no backend operation. This does not revoke loans or reopen "
+"admission; cold restart uses the explicit owner contract."
+msgstr ""
+"所有映射 loan、writer 来源和部分映射清理全部退出后才返回 SUCCESS。BUSY 保留存储并需要 release/service；其他 "
+"backend 清理错误保留相应责任，供 stop 重试。重复成功 stop 不执行 backend 操作。此操作不撤销 "
+"loan，也不重新开放准入；冷重启遵守显式 owner 合同。"
+
+#: ../../../../../../docs/reference/api/components/services.md:50
+msgid "Exact byte geometry; units divide size and one another."
+msgstr "精确字节几何参数；各单位须整除总大小，且彼此满足整除关系。"
+
+#: ../../../../../../docs/reference/api/components/services.md:50
+msgid "Caller-owned request and input, borrowed through SETTLED."
+msgstr "调用方拥有的请求及输入，保持被借用至 SETTLED。"
+
+#: ../../../../../../docs/reference/api/components/services.md:50
+msgid ""
+"Initialize base before prepare. PROGRAM borrows length input bytes; ERASE "
+"requires NULL input. Geometry alignment is checked at admission. Partial "
+"effects survive cancellation, timeout and I/O failure. No replay."
+msgstr ""
+"准备前先初始化 base。PROGRAM 借用 length 个输入字节；ERASE 要求输入为 NULL。几何对齐在准入时检查。取消、超时或 I/O "
+"失败都不会撤销已产生的部分效果。不得重放。"
+
+#: ../../../../../../docs/reference/api/components/services.md:50
+msgid "Stable instance-bound identity of one read mapping."
+msgstr "一个只读映射的稳定实例绑定身份。"
+
+#: ../../../../../../docs/reference/api/components/services.md:50
+msgid ""
+"Fields are immutable until release. Data stays read-only. Join every CPU, "
+"XIP instruction fetch and DMA reader before release; a copied token grants "
+"no additional loan. A failed release retains cleanup responsibility; readers"
+" remain joined and must not resume access through the view. The portable "
+"owner closes admission and permits release/stop cleanup retry."
+msgstr ""
+"字段在 release 前不可变。数据保持只读。Release 前须 join 每个 CPU、XIP 指令取指和 DMA 读取者；复制 token "
+"不授予额外借用。Release 失败会保留清理责任；读取者必须保持已 join，不得通过该 view 恢复访问。可移植 owner 关闭准入，并允许重试"
+" release/stop 清理。"
+
+#: ../../../../../../docs/reference/api/components/services.md:50
+msgid "Stable writer identity; drain controls before reuse or destruction."
+msgstr "稳定的写入身份；复用或销毁前须排空控制请求。"
+
+#: ../../../../../../docs/reference/api/components/services.md:50
+msgid "Shared immutable operations; every callback receives instance state."
+msgstr "共享不可变操作表；每个回调都接收实例状态。"
+
+#: ../../../../../../docs/reference/api/components/services.md:50
+msgid "Immutable face; context and all retained storage outlive users."
+msgstr "不可变接口对象；上下文及全部保留存储必须比使用者存活更久。"
+
+#: ../../../../../../docs/reference/api/components/services.md:54
+msgid "mapped_storage_owner.h"
+msgstr "mapped_storage_owner.h"
+
+#: ../../../../../../docs/reference/api/components/services.md:56
+msgid "Explicit portable mapped-storage constructor and storage."
+msgstr "显式、可移植的映射存储构造器及存储。"
+
+#: ../../../../../../docs/reference/api/components/services.md:56
+msgid "Bind unused explicit storage without hardware or payload access."
+msgstr "绑定未使用的显式存储，不访问硬件或载荷。"
+
+#: ../../../../../../docs/reference/api/components/services.md:56
+msgid ""
+"SUCCESS or INVALID; zero capacity, overlapping metadata/aperture, "
+"overflowing spans, inconsistent units and missing callbacks reject. Caller "
+"constructs a const face with owner_ops and this owner context."
+msgstr ""
+"返回 SUCCESS 或 INVALID；容量为零、元数据与映射窗口重叠、跨度溢出、单位不一致或缺少回调时拒绝。调用方使用 owner_ops "
+"和此所有者上下文构造 const 接口对象。"
+
+#: ../../../../../../docs/reference/api/components/services.md:56
+msgid "Reopen a constructed, closed and fully quiescent owner."
+msgstr "重新开放已构造、关闭且完全静止的 owner。"
+
+#: ../../../../../../docs/reference/api/components/services.md:56
+msgid ""
+"SUCCESS; INVALID for missing construction; STATE if already open; BUSY while"
+" a writer, reader loan or map cleanup remains. No hardware is accessed. "
+"Preserve slot/free-list and writer epochs, including exhaustion. One "
+"serialized executor calls this after the backend's cold restart; all "
+"previous controls and consumers must already have joined. init is only for "
+"unused storage and must never replace this restart operation."
+msgstr ""
+"SUCCESS；未构造时为 INVALID；已开放时为 STATE；仍有 writer、reader loan 或映射清理时为 "
+"BUSY。不访问硬件。保留 slot/free-list 和 writer epoch，包括耗尽状态。唯一串行执行者在 backend "
+"冷重启后调用；原控制操作和消费者必须全部 join。init 只用于未使用的存储，绝不能替代此重启操作。"
+
+#: ../../../../../../docs/reference/api/components/services.md:56
+msgid "Variables"
+msgstr "变量"
+
+#: ../../../../../../docs/reference/api/components/services.md:56
+msgid "One read-only method table shared by every portable owner instance."
+msgstr "全部可移植所有者实例共享的一张只读方法表。"
+
+#: ../../../../../../docs/reference/api/components/services.md:56
+msgid "Mapping result and retained controller-cleanup responsibility."
+msgstr "映射结果及保留的控制器清理责任。"
+
+#: ../../../../../../docs/reference/api/components/services.md:56
+msgid ""
+"SUCCESS requires cleanup_required. A failure with cleanup_required closes "
+"admission without publishing a loan; stop retries unmap until it succeeds. A"
+" failure without cleanup_required has no hardware effects."
+msgstr ""
+"SUCCESS 必须同时设置 cleanup_required。失败且设置 cleanup_required 时关闭准入，不发布 loan；stop "
+"重试 unmap，直至成功。失败且未设置 cleanup_required 时没有硬件副作用。"
+
+#: ../../../../../../docs/reference/api/components/services.md:56
+msgid ""
+"Private provider boundary; immutable callbacks and independent context."
+msgstr "私有提供方边界；回调不可变，上下文独立。"
+
+#: ../../../../../../docs/reference/api/components/services.md:56
+msgid ""
+"Context is one explicitly sized private state span. Geometry and mapped "
+"address stay fixed. map SUCCESS establishes the readable aperture and "
+"cleanup responsibility. A partial map failure retains cleanup without "
+"granting any readable loan. unmap SUCCESS proves all aperture/cache "
+"references withdrawn; failure retains cleanup or the last loan and closes "
+"reader/writer admission. Readers remain joined after a release attempt; a "
+"retained loan authorizes cleanup retry, not renewed access. start receives "
+"the original absolute request deadline, only after request admission and "
+"mapping exclusion. It must not restart that budget. start errors may have "
+"effects and always proceed through drain. poll advances bounded work, "
+"returns BUSY or a terminal result, and supplies monotonically increasing "
+"completed bytes. cancel initiates withdrawal but proves no drain. drain "
+"SUCCESS detaches every hardware/IRQ/cache/DMA/descriptor/data source; BUSY "
+"retains ownership, other errors quarantine it. No callback retains the "
+"request itself. Command/cache/DMA writers outside these callbacks are "
+"forbidden while the owner exists. Physical adapters own cache-line domains, "
+"XIP execution exclusion and hardware-specific drain proof."
+msgstr ""
+"context 是一个显式给定大小的私有状态 span。几何与映射地址固定。map SUCCESS 建立可读 aperture "
+"和清理责任。部分映射失败保留清理，但不授予任何可读 loan。unmap SUCCESS 证明全部 aperture/cache "
+"引用已撤回；失败则保留清理或最后一个 loan，并关闭 reader/writer 准入。release 尝试后，reader 仍保持已 "
+"join；保留的 loan 只允许重试清理，不允许恢复访问。start 只在请求准入且排除映射后接收原请求的绝对 "
+"deadline，不能重启预算。start 错误可能已有副作用，始终继续排空。poll 推进有界工作，返回 BUSY "
+"或终止结果，并提供单调不减的完成字节数。cancel 发起撤回，但不证明排空。drain SUCCESS 撤回全部 "
+"hardware/IRQ/cache/DMA/descriptor/data 来源；BUSY "
+"保留所有权，其他错误进入隔离。回调均不保留请求本身。owner 存续期间，禁止在这些回调之外运行 command/cache/DMA "
+"writer。物理适配器负责 cache-line 域、XIP 执行排除及硬件特定的排空证明。"
+
+#: ../../../../../../docs/reference/api/components/services.md:56
+msgid "Exact caller-owned map capacity; fields belong to the owner."
+msgstr "精确的调用方映射容量；各字段归所有者管理。"
+
+#: ../../../../../../docs/reference/api/components/services.md:56
+msgid "Caller-owned state, published only after successful initialization."
+msgstr "调用方拥有的状态，仅在初始化成功后发布。"
+
+#: ../../../../../../docs/reference/api/components/services.md:56
+msgid ""
+"All methods and controls use one serialized task executor. Consumers may use"
+" their maps elsewhere, then join before release. No implicit IRQ guard or "
+"cross-task synchronization is supplied. Keep state, slots, backend context, "
+"clock and face alive through stop and control/consumer join."
+msgstr ""
+"全部方法和控制操作使用同一个串行任务执行器。消费者可以在其他执行上下文使用映射，但释放前须会合退出。不隐式提供 IRQ "
+"保护或跨任务同步。状态、时隙、后端上下文、时钟和接口对象均须保持存活，直至停止及控制使用者与消费者会合退出。"

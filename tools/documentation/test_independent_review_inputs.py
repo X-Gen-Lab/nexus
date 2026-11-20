@@ -11,6 +11,9 @@ from pathlib import Path
 
 from tools.documentation import cli
 
+PAGE_METADATA = ("---\nid: review.input\ntype: reference\n"
+                 "audience: maintainer\nsource_language: en\n---\n")
+
 
 class LiteralFilenameReviewTests(unittest.TestCase):
     def fixture(self, root, rendered_name, checked_name):
@@ -18,7 +21,7 @@ class LiteralFilenameReviewTests(unittest.TestCase):
         (root / "docs").mkdir()
         (root / "tests").mkdir()
         page = root / "docs/index.md"
-        page.write_text("# Literal source input\n\n"
+        page.write_text(PAGE_METADATA + "# Literal source input\n\n"
                         "```{literalinclude} ../tests/" + rendered_name
                         + "\n```\n", encoding="utf-8")
         (root / "tests" / checked_name).write_text(
@@ -43,19 +46,22 @@ class LiteralFilenameReviewTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "input|index|literal"):
                 cli._staged_sources(root)
 
-    def test_escaped_rst_colon_keeps_real_nested_include_in_snapshot(self):
+    def test_nested_markdown_include_keeps_actual_input_in_snapshot(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             (root / "docs").mkdir()
             (root / "tests").mkdir()
-            (root / "docs/index.rst").write_text(
-                "Escaped punctuation \\::\n\n"
-                "   .. include:: ../tests/consumer.c\n",
+            (root / "docs/index.md").write_text(
+                PAGE_METADATA + "# Nested include\n\n"
+                "```{include} ../tests/fragment.txt\n```\n",
                 encoding="utf-8")
+            (root / "tests/fragment.txt").write_text(
+                "```{literalinclude} consumer.c\n```\n", encoding="utf-8")
             (root / "tests/consumer.c").write_text(
                 "Actual included input.\n", encoding="utf-8")
             subprocess.run(["git", "init", "-q", str(root)], check=True)
-            subprocess.run(["git", "-C", str(root), "add", "docs/index.rst"],
+            subprocess.run(["git", "-C", str(root), "add", "docs/index.md",
+                            "tests/fragment.txt"],
                            check=True)
             with self.assertRaisesRegex(ValueError, "input|index|include"):
                 cli._staged_sources(root)
@@ -66,7 +72,7 @@ class LiteralFilenameReviewTests(unittest.TestCase):
             (root / "docs").mkdir()
             (root / "build").mkdir()
             (root / "docs/index.md").write_text(
-                "# Retained generated input\n\n"
+                PAGE_METADATA + "# Retained generated input\n\n"
                 "```{literalinclude} ../build/input.json\n```\n",
                 encoding="utf-8")
             input_path = root / "build/input.json"
@@ -85,7 +91,7 @@ class LiteralFilenameReviewTests(unittest.TestCase):
             (root / "docs").mkdir()
             (root / "build").mkdir()
             (root / "docs/index.md").write_text(
-                "# Rejected dependency\n\n"
+                PAGE_METADATA + "# Rejected dependency\n\n"
                 "```{literalinclude} ../../outside.c\n```\n",
                 encoding="utf-8")
             report = root / "build/result.json"

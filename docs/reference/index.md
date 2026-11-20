@@ -2,12 +2,13 @@
 id: reference.index
 type: reference
 audience: consumer
-source_language: en
+source_language: zh_CN
 ---
 
-# Reference
+(reference.index)=
+# 参考
 
-Public headers define API contracts. Configuration and platform references connect the actual resolver and maintained records; a symbol in the API index does not establish Board authorization or physical qualification.
+按精确符号、字段或约束查阅。公共 C 声明来自头文件；SoC/Board 事实来自包与 JSON；手写正文解释它们的责任和限制，不另建一份实现或支持数据库。
 
 ```{toctree}
 :maxdepth: 2
@@ -15,7 +16,7 @@ Public headers define API contracts. Configuration and platform references conne
 api/index
 configuration/index
 platforms/index
+contracts/index
 documentation-tools
-history
-../assets/diagrams/README
+diagrams
 ```

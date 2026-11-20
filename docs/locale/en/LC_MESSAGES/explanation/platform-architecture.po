@@ -1,0 +1,353 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: f9d4f8a974b33821c8dafae3bd535f4203fe3d1bdc4037f8337b938ca7c41e8a\n"
+
+#: ../../../../../../docs/explanation/platform-architecture.md:9
+msgid "平台如何装配和运行"
+msgstr "How the platform is assembled and runs"
+
+#: ../../../../../../docs/explanation/platform-architecture.md:11
+msgid ""
+"Nexus 是静态装配的 C11 MCU "
+"平台。构建期选定硬件与容量，运行期保留真实设备状态和借用。应用取得只读接口后，直接调用选定实现；Platform 负责装配与生命周期。"
+msgstr ""
+"Nexus is a statically assembled C11 MCU platform. Hardware and capacity are "
+"selected at build time; runtime retains actual device state and loans. "
+"Applications obtain read-only interfaces and call the selected "
+"implementation directly; Platform owns assembly and lifecycle."
+
+#: ../../../../../../docs/explanation/platform-architecture.md:13
+msgid "![平台职责与外部产品边界](../assets/diagrams/platform-architecture.svg)"
+msgstr ""
+"![Platform responsibilities and external product "
+"boundary](../assets/diagrams/platform-architecture.svg)"
+
+#: ../../../../../../docs/explanation/platform-architecture.md:13
+msgid "平台职责与外部产品边界"
+msgstr "Platform responsibilities and external product boundary"
+
+#: ../../../../../../docs/explanation/platform-architecture.md:15
+msgid "职责与状态"
+msgstr "Responsibilities and state"
+
+#: ../../../../../../docs/explanation/platform-architecture.md:0
+msgid "层"
+msgstr "Layer"
+
+#: ../../../../../../docs/explanation/platform-architecture.md:0
+msgid "负责什么"
+msgstr "Responsibilities"
+
+#: ../../../../../../docs/explanation/platform-architecture.md:0
+msgid "保持外置的内容"
+msgstr "Kept external"
+
+#: ../../../../../../docs/explanation/platform-architecture.md:0
+msgid "Core"
+msgstr "Core"
+
+#: ../../../../../../docs/explanation/platform-architecture.md:0
+msgid "结果、单调 deadline、请求发布和稳定 epoch"
+msgstr "Results, monotonic deadlines, request publication and stable epochs"
+
+#: ../../../../../../docs/explanation/platform-architecture.md:0
+msgid "硬件、内核和产品策略"
+msgstr "Hardware, kernels and product policy"
+
+#: ../../../../../../docs/explanation/platform-architecture.md:0
+msgid "Arch"
+msgstr "Arch"
+
+#: ../../../../../../docs/explanation/platform-architecture.md:0
+msgid "IRQ 状态保存恢复、屏障、原子和显式 CPU 能力"
+msgstr ""
+"IRQ state save/restore, barriers, atomics and explicit CPU capabilities"
+
+#: ../../../../../../docs/explanation/platform-architecture.md:0
+msgid "外设和 scheduler"
+msgstr "Peripherals and scheduler"
+
+#: ../../../../../../docs/explanation/platform-architecture.md:0
+msgid "SoC"
+msgstr "SoC"
+
+#: ../../../../../../docs/explanation/platform-architecture.md:0
+msgid "精确器件、时钟、启动、内存、IRQ/DMA 与控制器"
+msgstr "Exact devices, clocks, startup, memory, IRQ/DMA and controllers"
+
+#: ../../../../../../docs/explanation/platform-architecture.md:0
+msgid "PCB 接线与产品角色"
+msgstr "PCB wiring and product roles"
+
+#: ../../../../../../docs/explanation/platform-architecture.md:0
+msgid "Board"
+msgstr "Board"
+
+#: ../../../../../../docs/explanation/platform-architecture.md:0
+msgid "已审 PCB 路线、晶振、电气条件和安全电平"
+msgstr ""
+"Reviewed PCB routes, oscillators, electrical conditions and safe levels"
+
+#: ../../../../../../docs/explanation/platform-architecture.md:0
+msgid "业务配置和未知硬件事实"
+msgstr "Business configuration and unknown hardware facts"
+
+#: ../../../../../../docs/explanation/platform-architecture.md:0
+msgid "I/O"
+msgstr "I/O"
+
+#: ../../../../../../docs/explanation/platform-architecture.md:0
+msgid "公共领域类型、只读 face 与操作合同"
+msgstr "Public domain types, read-only faces and operation contracts"
+
+#: ../../../../../../docs/explanation/platform-architecture.md:0
+msgid "厂商 Handle 和可变实现状态"
+msgstr "Vendor Handles and mutable implementation state"
+
+#: ../../../../../../docs/explanation/platform-architecture.md:0
+msgid "可选 OS"
+msgstr "Optional OS"
+
+#: ../../../../../../docs/explanation/platform-architecture.md:0
+msgid "等待、通知及真实后端对象"
+msgstr "Waiting, notifications and actual backend objects"
+
+#: ../../../../../../docs/explanation/platform-architecture.md:0
+msgid "应用任务、深度、栈与停止策略"
+msgstr "Application tasks, depths, stacks and shutdown policy"
+
+#: ../../../../../../docs/explanation/platform-architecture.md:0
+msgid "可选组件"
+msgstr "Optional component"
+
+#: ../../../../../../docs/explanation/platform-architecture.md:0
+msgid "经窄端口复用的算法、设备协议和 owner"
+msgstr "Algorithms, device protocols and owners reused through narrow ports"
+
+#: ../../../../../../docs/explanation/platform-architecture.md:0
+msgid "产品协议寄存器、校准、密钥与分区"
+msgstr "Product protocol registers, calibration, keys and partitions"
+
+#: ../../../../../../docs/explanation/platform-architecture.md:0
+msgid "外部产品"
+msgstr "External product"
+
+#: ../../../../../../docs/explanation/platform-architecture.md:0
+msgid "main、worker、预算、区域、执行与恢复"
+msgstr "main, workers, budgets, regions, execution and recovery"
+
+#: ../../../../../../docs/explanation/platform-architecture.md:0
+msgid "平台内部实现"
+msgstr "Platform internals"
+
+#: ../../../../../../docs/explanation/platform-architecture.md:28
+msgid ""
+"Core 不依赖 Arch、SoC 或 OS；I/O 依赖 Core。Provider 依赖公共 I/O、Core、Arch 和私有厂商 "
+"SDK。组件通过公共端口访问设备，OS 不成为每次 I/O 的强制中间层。"
+msgstr ""
+"Core does not depend on Arch, SoC or OS; I/O depends on Core. Providers "
+"depend on public I/O, Core, Arch and a private vendor SDK. Components access"
+" devices through public ports. An OS is not a mandatory intermediary for "
+"each I/O call."
+
+#: ../../../../../../docs/explanation/platform-architecture.md:30
+msgid "构建期连接"
+msgstr "Build-time connections"
+
+#: ../../../../../../docs/explanation/platform-architecture.md:32
+msgid ""
+"一份 schema-2 TOML 表达应用选择，SoC 与 Board JSON "
+"提供已审事实。解析器校验模式、时钟、pin、IRQ、DMA、内存域和预算，冻结为具名不可变 IR，再原子生成配置、静态实例、factory "
+"和固定连接。CMake 拥有唯一翻译单元与软件依赖图。"
+msgstr ""
+"One schema-2 TOML expresses application choices; SoC and Board JSON supply "
+"reviewed facts. The resolver validates modes, clocks, pins, IRQ, DMA, memory"
+" domains and budgets, freezes named immutable IR, and atomically generates "
+"configuration, static instances, factory and fixed connections. CMake owns "
+"the single translation-unit and software dependency graph."
+
+#: ../../../../../../docs/explanation/platform-architecture.md:34
+msgid "![配置与原子生成](../assets/diagrams/configuration-generation.svg)"
+msgstr ""
+"![Configuration and atomic generation](../assets/diagrams/configuration-"
+"generation.svg)"
+
+#: ../../../../../../docs/explanation/platform-architecture.md:34
+msgid "配置与原子生成"
+msgstr "Configuration and atomic generation"
+
+#: ../../../../../../docs/explanation/platform-architecture.md:36
+msgid ""
+"Board 和 SoC 不包含 Python 插件。通用主机工具只做校验与静态连接；硬件顺序、等待、回读、回滚和恢复直接用 C 实现。包、binding"
+" 与导出边界见[接入合同](../reference/contracts/integration.md)。"
+msgstr ""
+"Board and SoC packages contain no Python plugins. Common host tools only "
+"validate and connect static objects; hardware ordering, waits, readback, "
+"rollback and recovery are implemented directly in C. See the [integration "
+"contract](../reference/contracts/integration.md) for package, binding and "
+"export boundaries."
+
+#: ../../../../../../docs/explanation/platform-architecture.md:38
+msgid "运行期访问"
+msgstr "Runtime access"
+
+#: ../../../../../../docs/explanation/platform-architecture.md:40
+msgid ""
+"一个 controller 行为域只有一个 live owner。endpoint、GPIO view、逻辑 signal 和可选 face "
+"引用已有资源，不再取得一份硬件所有权。每类实现共享只读 `ops`，每实例独立持有 `context`。"
+msgstr ""
+"A controller behavior domain has one live owner. Endpoints, GPIO views, "
+"logical signals and optional faces reference existing resources rather than "
+"acquiring another hardware ownership. Each implementation class shares read-"
+"only `ops`; each instance independently holds its `context`."
+
+#: ../../../../../../docs/explanation/platform-architecture.md:42
+msgid ""
+"factory 按生成的强类型 ID 返回已有静态 face，不分配、不初始化、不探测设备。Platform 显式启动基础设施，不启动 "
+"scheduler。应用提供请求、buffer、执行者和等待；普通同步操作不承担未选择的队列、stream 或 OS 状态。"
+msgstr ""
+"Factory lookup uses generated strong IDs to return existing static faces "
+"without allocation, initialization or discovery. Platform explicitly starts "
+"infrastructure, not the scheduler. The application supplies requests, "
+"buffers, executors and waiting. Ordinary synchronous operations do not carry"
+" unselected queue, stream or OS state."
+
+#: ../../../../../../docs/explanation/platform-architecture.md:44
+msgid "![静态 factory 与实例](../assets/diagrams/factory-instances.svg)"
+msgstr ""
+"![Static factory and instances](../assets/diagrams/factory-instances.svg)"
+
+#: ../../../../../../docs/explanation/platform-architecture.md:44
+msgid "静态 factory 与实例"
+msgstr "Static factory and instances"
+
+#: ../../../../../../docs/explanation/platform-architecture.md:46
+msgid ""
+"ACCEPTED 后请求和数据持续被借用，直到 acquire 观察 SETTLED。DMA "
+"完成、线上完成和引用撤回分别证明；取消或超时不授权提前复用。观察者、控制 handle、通知发布者和 owner 还需完成各自的 "
+"join。见[所有权](ownership.md)。"
+msgstr ""
+"After ACCEPTED, the request and data remain borrowed until SETTLED is "
+"acquire-observed. DMA completion, wire completion and reference withdrawal "
+"require separate proof. Cancellation or timeout does not authorize early "
+"reuse. Observers, control handles, notification publishers and owners must "
+"also complete their respective joins. See [ownership](ownership.md)."
+
+#: ../../../../../../docs/explanation/platform-architecture.md:48
+msgid "启动、失败与停机"
+msgstr "Startup, failure and shutdown"
+
+#: ../../../../../../docs/explanation/platform-architecture.md:50
+msgid ""
+"Platform 先完成所选控制器的准入，再对 System、共享资源和控制器执行有序启动。 中途失败按已经产生的效果逆序撤回；撤回失败继续保留原 "
+"owner、存储和恢复责任， 错误返回不表示硬件已经静默。"
+msgstr ""
+"Platform first completes admission for the selected controllers, then starts"
+" System, shared resources and controllers in order. A failure partway "
+"through withdraws actual effects in reverse order. Failed withdrawal retains"
+" the original owner, storage and recovery responsibilities; an error return "
+"does not imply that hardware is quiescent."
+
+#: ../../../../../../docs/explanation/platform-architecture.md:54
+msgid ""
+"应用在停机前关闭新工作、推进已接受请求结清，并退出相关任务和观察者。 Platform 再停止所选基础设施；它不替应用终止调度器或提前回收借用存储。"
+msgstr ""
+"Before shutdown, the application closes new work, advances accepted requests"
+" to settlement, and joins the relevant tasks and observers. Platform then "
+"stops the selected infrastructure. It does not terminate the application "
+"scheduler or reclaim borrowed storage early."
+
+#: ../../../../../../docs/explanation/platform-architecture.md:57
+msgid "![显式启动、停机与失败撤回](../assets/diagrams/platform-lifecycle.svg)"
+msgstr ""
+"![Explicit startup, shutdown and failure "
+"withdrawal](../assets/diagrams/platform-lifecycle.svg)"
+
+#: ../../../../../../docs/explanation/platform-architecture.md:57
+msgid "显式启动、停机与失败撤回"
+msgstr "Explicit startup, shutdown and failure withdrawal"
+
+#: ../../../../../../docs/explanation/platform-architecture.md:59
+msgid "Platform 与 Runtime"
+msgstr "Platform and Runtime"
+
+#: ../../../../../../docs/explanation/platform-architecture.md:0
+msgid "接入方式"
+msgstr "Integration method"
+
+#: ../../../../../../docs/explanation/platform-architecture.md:0
+msgid "平台提供"
+msgstr "Platform supplies"
+
+#: ../../../../../../docs/explanation/platform-architecture.md:0
+msgid "应用提供"
+msgstr "Application supplies"
+
+#: ../../../../../../docs/explanation/platform-architecture.md:0
+msgid "`Nexus::Platform`"
+msgstr "`Nexus::Platform`"
+
+#: ../../../../../../docs/explanation/platform-architecture.md:0
+msgid "精确 SoC/Board、选定 provider、静态 factory 和生命周期"
+msgstr "Exact SoC/Board, selected providers, static factory and lifecycle"
+
+#: ../../../../../../docs/explanation/platform-architecture.md:0
+msgid "应用源码、worker、区域、预算与恢复"
+msgstr "Application sources, workers, regions, budgets and recovery"
+
+#: ../../../../../../docs/explanation/platform-architecture.md:0
+msgid "`Nexus::Runtime`"
+msgstr "`Nexus::Runtime`"
+
+#: ../../../../../../docs/explanation/platform-architecture.md:0
+msgid "Core、Arch、公共 I/O 及明确选定的 OS 适配"
+msgstr "Core, Arch, public I/O and explicitly selected OS adaptation"
+
+#: ../../../../../../docs/explanation/platform-architecture.md:0
+msgid "启动、向量、时钟/内存、Board 与具体 provider"
+msgstr "Startup, vectors, clocks/memory, Board and concrete providers"
+
+#: ../../../../../../docs/explanation/platform-architecture.md:66
+msgid ""
+"每个构建目录只含一个工具链和装配，Runtime 与 Platform 互斥。同一装配可创建多个镜像，各镜像独立拥有 startup "
+"OBJECT。不同板卡或 CPU/安全域使用独立目录，由产品或 CI 协调。"
+msgstr ""
+"Each build directory has one toolchain and assembly; Runtime and Platform "
+"are mutually exclusive. One assembly may create multiple images, each owning"
+" an independent startup OBJECT. Different boards or CPU/security domains use"
+" separate directories, coordinated by the product or CI."
+
+#: ../../../../../../docs/explanation/platform-architecture.md:68
+msgid "当前实现位置"
+msgstr "Current implementation locations"
+
+#: ../../../../../../docs/explanation/platform-architecture.md:70
+msgid ""
+"生产系列入口为 `soc/stm32/stm32f4/`：`facts/` 提供事实，`system/` "
+"提供系统机制，`drivers/<domain>/` 保持 binding、实例布局与 C 实现相邻，`drivers/ip/` "
+"复用已核验算法，`sdk/` 保持官方依赖和配置私有。Native 模型位于 `tests/support/native/`，需要显式 test "
+"support。"
+msgstr ""
+"The production family entry is `soc/stm32/stm32f4/`: `facts/` supplies "
+"facts; `system/` supplies system mechanisms; `drivers/<domain>/` keeps "
+"bindings, instance layouts and C implementations adjacent; `drivers/ip/` "
+"reuses reviewed algorithms; `sdk/` keeps official dependencies and "
+"configuration private. Native models reside in `tests/support/native/` and "
+"require explicit test support."
+
+#: ../../../../../../docs/explanation/platform-architecture.md:72
+msgid ""
+"当前精确支持见[平台参考](../reference/platforms/support.md)，维护入口见[源码地图](../development/source-"
+"map.md)。文件或厂商库存在，不建立另一个型号、模式或实板验证结论。"
+msgstr ""
+"See [platform reference](../reference/platforms/support.md) for exact "
+"current support and the [source map](../development/source-map.md) for "
+"maintenance entry points. A file or vendor library does not establish "
+"another part, mode or physical validation result."

@@ -1,0 +1,94 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 7257867cb005a4bd69c8caed2a7548c2f4004aa8ff185ffb2f89065f2808d3c4\n"
+
+#: ../../../../../../docs/guides/cpu-runtime.md:8
+msgid "只消费 CPU Runtime"
+msgstr "Consume only the CPU Runtime"
+
+#: ../../../../../../docs/guides/cpu-runtime.md:10
+msgid ""
+"仅复用 Core、Arch、公开 I/O 和所选 OS 时，选择 `Nexus::Runtime`。调用者自己提供 "
+"启动、向量、链接布局、时钟、Board 和具体驱动；此入口不创建 SoC factory。 完整 SoC／Board 工程继续使用 "
+"`nexus_add_platform`，两者在一个构建目录中互斥。"
+msgstr ""
+"Select `Nexus::Runtime` to reuse only Core, Arch, public I/O and the "
+"selected OS. The caller supplies startup, vectors, link layout, clocks, "
+"Board and concrete drivers. This entry creates no SoC factory. Complete "
+"SoC/Board projects continue to use `nexus_add_platform`; the two are "
+"mutually exclusive within a build directory."
+
+#: ../../../../../../docs/guides/cpu-runtime.md:14
+msgid "提供运行时事实"
+msgstr "Provide runtime facts"
+
+#: ../../../../../../docs/guides/cpu-runtime.md:16
+msgid ""
+"应用维护 `runtime.toml` 与 CPU 包的 `cpu.json`。最小 runtime 输入如下，路径相对 该 TOML；对应供应方须已按"
+" SDK profile 准备："
+msgstr ""
+"The application maintains `runtime.toml` and the CPU package's `cpu.json`. "
+"The following is minimal runtime input; paths are relative to that TOML. The"
+" relevant suppliers must already be prepared through the SDK profile:"
+
+#: ../../../../../../docs/guides/cpu-runtime.md:26
+msgid "下面是 M33 NonSecure 软件配置示意；IRQ、时钟和可选能力须替换为实际审核事实， 示意不会增加新的芯片或 Board 支持："
+msgstr ""
+"The following illustrates an M33 NonSecure software configuration. Replace "
+"IRQ, clock and optional capabilities with reviewed actual facts. This "
+"example does not add chip or Board support:"
+
+#: ../../../../../../docs/guides/cpu-runtime.md:43
+msgid ""
+"后端为 baremetal、FreeRTOS 或已维护范围内的 ThreadX；裸机不接纳内核策略， CPU-only 输入也不接纳需要 SoC "
+"timer 事实的低功耗选择。`clock_hz` 描述频率， 不执行时钟配置。未知字段、矛盾特征／ABI 和非法路径必须拒绝。"
+msgstr ""
+"Backends are baremetal, FreeRTOS or ThreadX within maintained scope. "
+"Baremetal accepts no kernel policy; CPU-only inputs also reject low-power "
+"selections requiring SoC timer facts. `clock_hz` describes frequency; it "
+"does not configure a clock. Unknown fields, conflicting features/ABI and "
+"invalid paths must be rejected."
+
+#: ../../../../../../docs/guides/cpu-runtime.md:47
+msgid "显式创建 Runtime"
+msgstr "Create Runtime explicitly"
+
+#: ../../../../../../docs/guides/cpu-runtime.md:49
+msgid "以下是库消费片段，尚不构成可上板固件："
+msgstr ""
+"The following is a library-consumption fragment, not yet a flashable "
+"firmware:"
+
+#: ../../../../../../docs/guides/cpu-runtime.md:60
+msgid ""
+"MCU 自建 executable 还需调用 `nexus_apply_firmware_policy(target)`，并显式提供 "
+"自己的启动与链接脚本。仅连接 Runtime 不自动选择运行库或 `-nostartfiles`。 工具链仍须在 `project()` 前选定。"
+msgstr ""
+"A caller-created MCU executable must also call "
+"`nexus_apply_firmware_policy(target)` and explicitly supply its own startup "
+"and linker script. Linking Runtime alone does not automatically select "
+"runtime libraries or `-nostartfiles`. The toolchain must still be selected "
+"before `project()`."
+
+#: ../../../../../../docs/guides/cpu-runtime.md:64
+msgid "单独生成时可运行："
+msgstr "For separate generation, run:"
+
+#: ../../../../../../docs/guides/cpu-runtime.md:70
+msgid ""
+"输出 CPU resolved、配置头与选择信息，不输出设备 bindings／factory／链接脚本。完整字段和后端范围见 [Arch "
+"参考](../reference/platforms/cortex-m.md)与[OS "
+"合同](../reference/contracts/os/execution.md)。"
+msgstr ""
+"The output contains CPU resolved data, a configuration header and selection "
+"information, but no device bindings, factory or linker script. See the [Arch"
+" reference](../reference/platforms/cortex-m.md) and [OS "
+"contract](../reference/contracts/os/execution.md) for complete fields and "
+"backend scope."

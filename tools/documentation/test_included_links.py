@@ -41,7 +41,8 @@ class IncludedTranslationTests(unittest.TestCase):
                 + "gettext_compact = False\nexclude_patterns = ['locale/**']\n",
                 encoding='utf-8')
             (docs / 'index.md').write_text(
-                '# Include fixture\n\n```{toctree}\nexplanation/source-map\n'
+                '---\nid: index\ntype: reference\naudience: consumer\n'
+                'source_language: en\n---\n# Include fixture\n\n```{toctree}\nexplanation/source-map\n'
                 'design/contract\n```\n', encoding='utf-8')
             included = root / 'io/README.md'
             included.write_text(
@@ -51,12 +52,14 @@ class IncludedTranslationTests(unittest.TestCase):
                 '(../vendor/provider.h).\n\n'
                 'The literal `[example](../vendor/provider.h)` stays code.\n',
                 encoding='utf-8')
-            source = ('---\nsource_language: en\n---\n\n# Source-adjacent contracts\n\n'
+            source = ('---\nid: fixture\ntype: reference\naudience: consumer\nsource_language: en\n---\n\n# Source-adjacent contracts\n\n'
                       '```{include} ../../io/README.md\n'
                       ':relative-docs: ../../io/\n:relative-images:\n```\n')
             (docs / 'explanation/source-map.md').write_text(source, encoding='utf-8')
             (docs / 'design/contract.md').write_text(
-                '(scope)=\n# Current contract\n\nRetain the storage.\n', encoding='utf-8')
+                '---\nid: contract\ntype: reference\naudience: consumer\n'
+                'source_language: en\n---\n(scope)=\n# Current contract\n\nRetain the storage.\n',
+                encoding='utf-8')
             (docs / 'design/status.json').write_text('{"status":"not_executed"}\n')
             (root / 'vendor/provider.h').write_text('/* Vendor fixture. */\n')
             for arguments in (['init', '-q'], ['add', '.'],
@@ -70,10 +73,9 @@ class IncludedTranslationTests(unittest.TestCase):
             before = included.read_bytes()
             gettext = root / 'gettext'
             environment = os.environ.copy()
-            for name in ('NEXUS_DOCS_REVISION', 'NEXUS_DOCS_CODE_REVISION',
-                         'NEXUS_DOCS_TRANSLATION_ROOT', 'NEXUS_DOCS_GETTEXT_ROOT',
-                         'NEXUS_DOCS_LANGUAGES'):
-                environment.pop(name, None)
+            for name in tuple(environment):
+                if name.startswith("NEXUS_DOCS_"):
+                    environment.pop(name)
 
             def build(builder, language, output):
                 local = environment | {'NEXUS_DOCS_LANGUAGE': language}

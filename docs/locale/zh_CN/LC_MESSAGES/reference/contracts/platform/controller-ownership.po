@@ -1,0 +1,184 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 8688c03a6ec615a1b60fbb3938675254fee87f1a6fdab110ec80446fd647e847\n"
+
+#: ../../../../../../docs/reference/contracts/platform/controller-ownership.md:9
+msgid "Multiple controller ownership"
+msgstr "多控制器所有权"
+
+#: ../../../../../../docs/reference/contracts/platform/controller-ownership.md:11
+msgid ""
+"The public I/O faces keep their existing operation tables and caller-owned "
+"request contracts. Selecting another physical controller creates another "
+"private provider instance, not another transport abstraction or global "
+"registry. An instance's cold register, clock, DMA and IRQ facts remain "
+"immutable until its publisher set has been withdrawn and the instance "
+"stopped."
+msgstr ""
+"公共 I/O "
+"接口面保持既有方法表与调用方持有的请求合同。选择另一个物理控制器会建立另一个私有提供者实例，而不是增加传输抽象或全局注册表。实例的冷态寄存器、时钟、DMA"
+" 和 IRQ 事实在发布者集合撤销且实例停止前保持不可变。"
+
+#: ../../../../../../docs/reference/contracts/platform/controller-ownership.md:17
+msgid "I2C V1 IRQ and finite DMA"
+msgstr "I2C V1 IRQ 与有限 DMA"
+
+#: ../../../../../../docs/reference/contracts/platform/controller-ownership.md:19
+msgid ""
+"STM32F407 I2C1 and I2C2 execute the same maintained V1 register algorithm. "
+"Per-controller cold wrappers validate all register pointers, DATA offsets, "
+"line inputs, bus clocks and DMA selectors against the actual SDK. Their EV, "
+"ER, RX DMA and TX DMA IRQs come from the selected controller identity. "
+"Initialization of an already enabled physical controller returns `BUSY` "
+"before changing its control registers or IRQ priorities."
+msgstr ""
+"STM32F407 的 I2C1 与 I2C2 执行同一套受维护 V1 寄存器算法。各控制器的冷态包装层依据真实 SDK 验证全部寄存器指针、DATA "
+"偏移、线路输入、总线时钟和 DMA 选择器。EV、ER、RX DMA 和 TX DMA IRQ "
+"均来自所选控制器身份。初始化已启用的物理控制器时，在改变其控制寄存器或 IRQ 优先级前返回 `BUSY`。"
+
+#: ../../../../../../docs/reference/contracts/platform/controller-ownership.md:26
+msgid ""
+"For every maintained F407 polling, IRQ and DMA master, `max_hz` is a nominal"
+" upper bound. Standard mode uses the smaller of that bound and 88 kHz before"
+" rounding the 12-bit CCR upward. This applies ES0182 Rev19 section 2.10.4 to"
+" seven-bit multi-message requests and ten-bit internal repeated STARTs "
+"alike. The default 100 kHz bound therefore selects CCR 239 at 42 MHz PCLK, "
+"about 87.866 kHz; it can serve both endpoint widths without changing the "
+"authored mode. A bound above 100 kHz explicitly selects Fast mode, whose "
+"existing divider and electrical requirements remain unchanged. Repeated-"
+"START admission also checks the actual CCR before borrowing storage or "
+"touching the transfer registers. It never changes the divider inside a "
+"transaction."
+msgstr ""
+"所有已维护的 F407 轮询、IRQ 和 DMA master 都将 `max_hz` 解释为名义上界。Standard mode 先取该上界与 88 "
+"kHz 的较小值，再向上取整 12-bit CCR。这样将 ES0182 Rev19 第 2.10.4 节同时落实到七位多消息请求和十位内部 "
+"repeated START。默认 100 kHz 上界在 42 MHz PCLK 下选择 CCR 239，约为 87.866 "
+"kHz，可同时服务两种地址宽度，无需改变作者所选模式。大于 100 kHz 的上界显式选择 Fast mode，保留现有分频和电气要求。repeated"
+" START 准入还会在借用存储或操作传输寄存器前检查实际 CCR，不在事务中变更分频。"
+
+#: ../../../../../../docs/reference/contracts/platform/controller-ownership.md:37
+msgid ""
+"Readonly traits retain `configured_max_hz` and report `nominal_hz`, rounded "
+"down to integer Hz from the selected nominal PCLK and CCR. Zero means the "
+"fixture has no physical clock integration; this field is never a measured "
+"bus rate. F4 V1 does not accept the V2 `bus_hz_min` timing envelope. "
+"Oscillator tolerance, target timing and Board pull-ups still require "
+"electrical qualification."
+msgstr ""
+"只读 trait 保留 `configured_max_hz`，并以 `nominal_hz` 报告由选定名义 PCLK 和 CCR "
+"计算、向下取整到整数 Hz 的速率。零表示该 fixture 缺少物理时钟集成；此字段从不表示总线实测速率。F4 V1 不接受 V2 的 "
+"`bus_hz_min` 时序 envelope。振荡器容差、target 时序及 Board 上拉仍需电气验证。"
+
+#: ../../../../../../docs/reference/contracts/platform/controller-ownership.md:0
+msgid "SoC controller"
+msgstr "SoC 控制器"
+
+#: ../../../../../../docs/reference/contracts/platform/controller-ownership.md:0
+msgid "GPIOB pins and AF"
+msgstr "GPIOB 引脚与 AF"
+
+#: ../../../../../../docs/reference/contracts/platform/controller-ownership.md:0
+msgid "Peripheral clock"
+msgstr "外设时钟"
+
+#: ../../../../../../docs/reference/contracts/platform/controller-ownership.md:0
+msgid "Finite RX / TX route"
+msgstr "有限 RX／TX 路由"
+
+#: ../../../../../../docs/reference/contracts/platform/controller-ownership.md:0
+msgid "STM32F407 I2C1"
+msgstr "STM32F407 I2C1"
+
+#: ../../../../../../docs/reference/contracts/platform/controller-ownership.md:0
+msgid "PB6/PB7 or PB8/PB9, AF4"
+msgstr "PB6/PB7 或 PB8/PB9，AF4"
+
+#: ../../../../../../docs/reference/contracts/platform/controller-ownership.md:0
+msgid "42 MHz"
+msgstr "42 MHz"
+
+#: ../../../../../../docs/reference/contracts/platform/controller-ownership.md:0
+msgid "DMA1 stream0 / stream6, channel1"
+msgstr "DMA1 stream0 / stream6，channel1"
+
+#: ../../../../../../docs/reference/contracts/platform/controller-ownership.md:0
+msgid "STM32F407 I2C2"
+msgstr "STM32F407 I2C2"
+
+#: ../../../../../../docs/reference/contracts/platform/controller-ownership.md:0
+msgid "PB10/PB11, AF4"
+msgstr "PB10/PB11，AF4"
+
+#: ../../../../../../docs/reference/contracts/platform/controller-ownership.md:0
+msgid "DMA1 stream2 / stream7, channel7"
+msgstr "DMA1 stream2 / stream7，channel7"
+
+#: ../../../../../../docs/reference/contracts/platform/controller-ownership.md:48
+msgid ""
+"A DMA request selector never identifies or allocates a memory engine. Static"
+" cold assembly must reject other devices that select an already owned "
+"physical engine."
+msgstr "DMA 请求选择器既不标识也不分配内存引擎。静态冷态装配必须拒绝其他设备选择已被持有的物理引擎。"
+
+#: ../../../../../../docs/reference/contracts/platform/controller-ownership.md:52
+msgid ""
+"Setting the private state's DMA descriptor to `NULL` selects IRQ-only "
+"messages and acquires no DMA vector. Exact immutable macros "
+"`NX_STM32_I2C2_DMA(regions, count)` selects the secondary finite routes. The"
+" initialization API is unchanged. Pin, bus clock, DMA clock and shared "
+"resource leases remain cold assembly's responsibility; the provider does not"
+" silently allocate these resources."
+msgstr ""
+"将私有状态的 DMA 描述符设为 `NULL`，即选择仅 IRQ 消息模式，不取得 DMA 向量。精确不可变宏 "
+"`NX_STM32_I2C2_DMA(regions, count)` 选择第二控制器的有限传输路线。初始化 API 不变。引脚、总线时钟、DMA "
+"时钟与共享资源租约仍由冷态装配负责；provider 不会静默分配这些资源。"
+
+#: ../../../../../../docs/reference/contracts/platform/controller-ownership.md:59
+msgid ""
+"Each request retains its descriptor, messages, buffers and endpoint until "
+"that controller's engine, interrupt sources and wire have drained. "
+"Completing or cancelling one instance cannot acknowledge another stream's "
+"W1C flags, disable its vectors, release its request or change its wake sink."
+" A refused DMA disable retains only the affected instance's borrow in "
+"`DRAINING` or `QUARANTINED`; elapsed time does not prove hardware "
+"quiescence."
+msgstr ""
+"每个请求保留描述符、消息、缓冲区和端点，直到该控制器的引擎、中断源与线侧完成排空。一个实例的完成或取消不能确认另一 stream 的 W1C "
+"标志、关闭其向量、释放其请求或改变其唤醒接收器。DMA 拒绝停止时，仅受影响实例的借用保留在 `DRAINING` 或 "
+"`QUARANTINED`；时间流逝不能证明硬件静止。"
+
+#: ../../../../../../docs/reference/contracts/platform/controller-ownership.md:66
+msgid ""
+"The shared DMA acknowledge leaf compiles to a direct selected register "
+"write. Its test override models the real W1C side effect rather than "
+"treating a clear register as ordinary RAM. There is no per-byte MMIO "
+"operation table or new mutable field. Actual Cortex-M4F compilation measures"
+" the unchanged state at 56 bytes, endpoint at 8 bytes and optional immutable"
+" DMA descriptor at 80 bytes. The provider and shared algorithm objects "
+"contain zero global DATA/BSS. Selected object text size is evidence of a "
+"compiled object, not an entire image's retained Flash size or a cycle "
+"measurement."
+msgstr ""
+"共享 DMA 确认叶子编译为直接写入所选寄存器。测试覆盖模拟真实 W1C 副作用，而不是把清除寄存器当普通 RAM。没有逐字节 MMIO "
+"方法表或新增可变字段。真实 Cortex-M4F 编译测得不变状态为 56 字节、端点 8 字节、可选不可变 DMA 描述符 80 "
+"字节。提供者与共享算法对象的全局 DATA/BSS 为零。选中对象的 text 大小只是编译对象证据，不代表完整镜像保留的 Flash 或周期测量。"
+
+#: ../../../../../../docs/reference/contracts/platform/controller-ownership.md:75
+msgid ""
+"The reviewed silicon route source is STM32 RM0090 Rev22 Table 43. These "
+"facts do not establish a board's external wiring. Secondary-board routes "
+"require an explicit reviewed board configuration. Host tests model external "
+"CPU/MMIO behavior, and real ARM compilation uses actual vendor SDK headers. "
+"Bus timing, electrical levels and DMA contention still need hardware "
+"qualification; no physical result is claimed here."
+msgstr ""
+"经审阅的芯片路线来源为 STM32 RM0090 Rev22 Table "
+"43。这些事实不能证明开发板的外部接线。第二控制器的板级路线需要显式、经审阅的板卡配置。主机测试建模外部 CPU/MMIO 行为，真实 ARM "
+"编译使用实际厂商 SDK 头。总线时序、电平和 DMA 争用仍需硬件资格验证；此处不声明物理结果。"

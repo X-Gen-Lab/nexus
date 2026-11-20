@@ -1,0 +1,24 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 4e236e2c2f16aa4ac4c49392faddb68af6a6e25011dc1e5b635dbb53aa9fc5c7\n"
+
+#: ../../../../../../docs/reference/index.md:9
+msgid "参考"
+msgstr "Reference"
+
+#: ../../../../../../docs/reference/index.md:11
+msgid ""
+"按精确符号、字段或约束查阅。公共 C 声明来自头文件；SoC/Board 事实来自包与 "
+"JSON；手写正文解释它们的责任和限制，不另建一份实现或支持数据库。"
+msgstr ""
+"Look up exact symbols, fields, or constraints. Public C declarations come "
+"from headers; SoC/Board facts come from packages and JSON. Authored prose "
+"explains their responsibilities and limits without creating another "
+"implementation or support database."

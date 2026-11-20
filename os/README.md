@@ -7,7 +7,7 @@ OS 层提供公共等待／唤醒合同和后端专用静态对象 API。裸机�
 ![FIG-08：等待、唤醒与外部退出](../docs/assets/diagrams/wait-wake-shutdown.svg)
 
 图表达当前“检查就绪 → 登记等待 → 再检查 → 等待 → 重查”及退出会合责任；图源、范围见
-[图册](../docs/assets/diagrams/README.md)。它不建立物理时序资格。
+[图册](../docs/reference/diagrams.md)。它不建立物理时序资格。
 
 ## 分层与使用入口
 
@@ -77,7 +77,7 @@ Secure 任务上下文、不开放跨世界 Secure 调用。Secure 启动负责 
 生命周期，默认只开放无指针的延时／节拍 SVC。调用者提供受保护
 元数据和受审用户链接器区域，不开放通用用户对象池或特权
 I/O。M0／M0+、M7 MPU 与 MPU＋分域安全组合拒绝；详见
-[MPU 入口](freertos/mpu/README.md)和[OS 合同](../docs/design/os-contracts.md)。
+[MPU 入口](freertos/mpu/README.md)和[OS 合同](../docs/reference/contracts/os/execution.md)。
 
 分域模式选择真实具备 TrustZone 上下文支持的 NS 端口，另链接 Secure 裸机 Runtime
 与 `Nexus::SecureContext`。两幅镜像匹配 CPU／ABI，并使用真实 CMSE 导入／SG。
@@ -123,7 +123,6 @@ FreeRTOS 宿主验证夹具保留锁定内核／POSIX 端口，使用自有
 隔离不自动建立物理资格。`tools/hil/os_acceptance.py` 准备或
 验证保留的 OS 硬件记录，不操作设备，未执行项仍是 `not_executed`。
 
-维护状态见[OS 交付](../docs/delivery/os.md)、
-[OS01–OS55 台账](https://github.com/X-Gen-Lab/nexus/blob/83a27dfbee4e8fbf4d35875b1e9db85af7516eec/docs/design/os-execution.csv)。新内核遵循
-[后端接入合同](../docs/design/os-backend-integration.md)并执行实际探针；探针
+执行语义见[OS 合同](../docs/reference/contracts/os/execution.md)。新内核遵循
+[后端接入合同](../docs/reference/contracts/os/backend-integration.md)并执行实际探针；探针
 通过本身不登记新的受支持 RTOS。

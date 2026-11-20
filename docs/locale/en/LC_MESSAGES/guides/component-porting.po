@@ -1,0 +1,120 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 48551f9f2bce38e5afc9165a979fa5e76c98934835743e89d06ea0a1168dc1e4\n"
+
+#: ../../../../../../docs/guides/component-porting.md:8
+msgid "接入通用器件或协议组件"
+msgstr "Integrate a reusable device or protocol component"
+
+#: ../../../../../../docs/guides/component-porting.md:10
+msgid ""
+"外部器件和协议通过公开 transport、time、storage 等端口使用平台。客户私有流程、 寄存器策略、产品 "
+"worker、分区和恢复决策留在外部工程。"
+msgstr ""
+"External devices and protocols use the platform through public transport, "
+"time, storage and similar ports. Customer-specific workflows, register "
+"policies, product workers, partitions and recovery decisions remain in "
+"external projects."
+
+#: ../../../../../../docs/guides/component-porting.md:13
+msgid "先定职责，再写适配"
+msgstr "Define responsibility before adapting"
+
+#: ../../../../../../docs/guides/component-porting.md:15
+msgid "明确组件是否是值得复用的算法／协议，固定输入输出、容量、单位和错误。"
+msgstr ""
+"Determine whether the component is a reusable algorithm/protocol, and fix "
+"its inputs, outputs, capacities, units and errors."
+
+#: ../../../../../../docs/guides/component-porting.md:16
+msgid "定义窄端口，不依赖 Board、SDK Handle 或具体 UART／SPI provider。"
+msgstr ""
+"Define narrow ports without depending on Boards, SDK Handles or specific "
+"UART/SPI providers."
+
+#: ../../../../../../docs/guides/component-porting.md:17
+msgid "按需求提供独立可选 adapter；parser 不隐式打开外设、分配任务或修改时钟。"
+msgstr ""
+"Supply independent optional adapters as needed. A parser must not implicitly"
+" open peripherals, allocate tasks or change clocks."
+
+#: ../../../../../../docs/guides/component-porting.md:18
+msgid "用实际业务行为、无效输入、容量耗尽和失败退出测试组件，不只测 mock 调用次数。"
+msgstr ""
+"Test actual behavior, invalid inputs, capacity exhaustion and failure exits,"
+" rather than only mock call counts."
+
+#: ../../../../../../docs/guides/component-porting.md:19
+msgid "以完整消费者验证生成头、公开 API、ABI 与链接范围，再评估实际资源成本。"
+msgstr ""
+"Use a complete consumer to validate generated headers, public APIs, ABI and "
+"link scope, then evaluate actual resource cost."
+
+#: ../../../../../../docs/guides/component-porting.md:21
+msgid "放置与连接"
+msgstr "Placement and connection"
+
+#: ../../../../../../docs/guides/component-porting.md:23
+msgid ""
+"组件按 runtime、buses、devices、services、protocols 分类，叶目录维护代码和 CMake 依赖。普通库可直接连接公开"
+" target，无需新增 TOML 类别。"
+msgstr ""
+"Components are grouped under runtime, buses, devices, services and "
+"protocols. Leaf directories maintain code and CMake dependencies. Ordinary "
+"libraries may link public targets directly without adding a TOML category."
+
+#: ../../../../../../docs/guides/component-porting.md:26
+msgid ""
+"确需静态绑定或供应方选择时，在 `components/catalog.json` 登记逻辑 ID、叶入口和 公开 "
+"target；不在中央调度器加组件名字分支。叶目标分别声明生成公开头的 API 使用要求及 bindings 私有编译要求，避免向应用泄露私有目录。"
+msgstr ""
+"When static binding or supplier selection is actually required, register the"
+" logical ID, leaf entry point and public target in "
+"`components/catalog.json`; do not add component-name branches to a central "
+"dispatcher. Leaf targets separately declare API usage requirements for "
+"generated public headers and private bindings compile requirements, avoiding"
+" private-directory leaks to applications."
+
+#: ../../../../../../docs/guides/component-porting.md:30
+msgid "与硬件组合"
+msgstr "Combine with hardware"
+
+#: ../../../../../../docs/guides/component-porting.md:32
+msgid ""
+"TOML 选择 transport 控制器与 endpoint，应用选择逻辑角色、执行频率、队列和静态 工作区。组件不把第一个 SPI／I2C "
+"endpoint 当成整个控制器。"
+msgstr ""
+"TOML selects transport controllers and endpoints; the application selects "
+"logical roles, execution frequency, queues and static workspaces. A "
+"component must not treat the first SPI/I2C endpoint as the entire "
+"controller."
+
+#: ../../../../../../docs/guides/component-porting.md:35
+msgid ""
+"以 RS485 为例，Board／产品描述收发器、DE／RE、电平和接线；SoC UART provider 处理其维护的传输终态；adapter "
+"决定何时切方向。不能用固定软件延时替代真实线上 完成，也不能从普通 UART 成功推断整个物理协议已验证。"
+msgstr ""
+"For RS485, Board/product facts describe the transceiver, DE/RE, levels and "
+"wiring. The SoC UART provider handles maintained transfer terminal states, "
+"and an adapter decides when to change direction. A fixed software delay "
+"cannot replace actual wire completion, and ordinary UART success does not "
+"establish physical-protocol validation."
+
+#: ../../../../../../docs/guides/component-porting.md:39
+msgid ""
+"目录归属见[组件说明](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/components/README.md)，端口与公开签名见 [组件 "
+"API](../reference/api/components/index.md)，执行责任见[I/O 执行](io-execution.md)。"
+msgstr ""
+"See the [component description](https://github.com/X-Gen-"
+"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/README.md) for "
+"directory ownership, the [component "
+"API](../reference/api/components/index.md) for ports and public signatures, "
+"and [I/O execution](io-execution.md) for execution responsibilities."

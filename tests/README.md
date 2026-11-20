@@ -25,7 +25,7 @@ SoC。模型与 production C 共享实际实现，不能另写一份成功算法
 普通入口为 `tools/dev/dev.py test --preset native-debug`，行为提交按
 `python scripts/ci/tdd_gate.py --all --preset native-debug` 执行既定完整门禁。RED
 必须是实际预期行为失败；GREEN、新报告和完整执行身份分别保存。空、跳过或旧报告
-不能替代通过。规则见[工程手册](../docs/design/engineering-handbook.md)。
+不能替代通过。规则见[工程手册](../docs/reference/contracts/engineering.md)。
 
 模型检验软件行为，ARM 检查实际向量与链接，SDK 检查独立消费；实板另绑 PCB、
 station 和镜像。源码迁移不继承旧结果，当前物理 HIL 仍为 `not_executed`。

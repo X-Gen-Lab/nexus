@@ -1,6 +1,6 @@
 // FIG-13 current: source-backed, scoped engineering view.
 // Code basis: arch/arm/cortex_m; cmake/platform/Runtime.cmake; soc/stm32/stm32f4.
-// Relations and qualification limits are documented in README.md.
+// Relations and qualification limits: docs/reference/diagrams.md.
 digraph CortexMCapabilities {
     graph [newrank=true, rankdir=TB, bgcolor="white", pad=0.28, nodesep=0.42,
            ranksep=0.66, fontname="Noto Sans CJK SC", fontsize=15,
@@ -21,12 +21,8 @@ ABI / DSP / FPU / MVE / cache / MPU / DWT / security / IRQ"];
     primitives [label="Arch / Core 原语
 mask、原子、屏障、显式 cache/MPU/SAU
 Cache 冷控制仅维护 M7"];
-    runtime [label="Nexus::Runtime
-Core + Arch + typed I/O faces + 裸机/FreeRTOS
-没有 SoC / Board / startup / linker / factory"];
-    platform [label="Nexus::Platform：当前 F4 + Board 装配
-已迁入 F407VE / F407ZG；其他 F4 需独立验证
-设备 ops / IRQ / clock / DMA 与资源另行接入"];
+    runtime [label="Nexus::Runtime\nCore + Arch + typed I/O + 所选受支持 OS\n没有 SoC / Board / startup / linker / factory"];
+    platform [label="Nexus::Platform：所选 STM32F4 + Board\n精确料号和模式以当前支持矩阵为准\n另行接入设备 ops / IRQ / clock / DMA"];
     owner [label="外部产品 / boot owner
 任务、映射、安全启动、私有布局与恢复"];
     software [label="独立 software scope

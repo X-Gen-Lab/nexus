@@ -9,7 +9,7 @@ I/O 具体实现、责任者和等待适配在这些基础合同上组合具体�
 ![FIG-06：Core 请求状态与借用](../docs/assets/diagrams/request-lifecycle.svg)
 
 图表示当前辅助函数的迁移及调用前提，不承诺每个具体实现都有恢复 API。
-图源与范围见[图册](../docs/assets/diagrams/README.md)。
+图源与范围见[图册](../docs/reference/diagrams.md)。
 
 | 入口 | 责任 |
 | --- | --- |
@@ -230,4 +230,4 @@ release／acquire 协议。产品选择可写内存及保留条件。
 `silicon_admission_test.cpp` 使用真实预检和显式模拟身份来源检查这些区别。
 
 `tests/contracts/core_contract_test.c` 执行发布、准入、时间回绕和终态不变量。宿主结果不证明 MCU 中断排序或 WCET；
-完整范围见[资格说明](../docs/delivery/qualification.md)。
+完整范围见[资格说明](../docs/reference/platforms/qualification.md)。

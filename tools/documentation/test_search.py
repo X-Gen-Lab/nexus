@@ -15,6 +15,36 @@ from tools.documentation import sphinx_ext
 
 
 class SearchMetadataTests(unittest.TestCase):
+    def test_locale_records_are_isolated_and_cross_language_export_rejects(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            docs = root / 'docs'
+            docs.mkdir()
+            page = docs / 'index.md'
+            page.write_text('---\nid: index\ntype: reference\naudience: consumer\n'
+                            'source_language: en\n---\n# Factory\n')
+            app = SimpleNamespace(srcdir=str(docs), doctreedir=str(root / 'cache'),
+                outdir=str(root / 'en'), builder=SimpleNamespace(format='html',
+                    get_target_uri=lambda name: name + '.html'),
+                env=SimpleNamespace(found_docs={'index'},
+                    doc2path=lambda name, base: str(page)),
+                config=SimpleNamespace(language='en', release='fixture',
+                    nexus_revision='a' * 40, nexus_gettext_root=None,
+                    nexus_translation_root=str(docs / 'locale'), nexus_mode='preview'))
+            sphinx_ext.collect_search_record(app, 'index', 'page.html', {}, self.tree())
+            app.config.language = 'zh_CN'
+            sphinx_ext.collect_search_record(app, 'index', 'page.html', {}, self.tree())
+            folder = root / 'cache/nexus-search-records'
+            english = folder / 'en/index.json'
+            chinese = folder / 'zh_CN/index.json'
+            self.assertTrue(english.is_file())
+            self.assertTrue(chinese.is_file())
+            self.assertEqual(json.loads(english.read_text())['requested_language'], 'en')
+            english.write_bytes(chinese.read_bytes())
+            app.config.language = 'en'
+            with self.assertRaisesRegex(ValueError, 'language'):
+                sphinx_ext.write_search_data(app, None)
+
     def tree(self):
         tree = nodes.document('', '')
         section = nodes.section(ids=['factory'])
@@ -44,20 +74,20 @@ class SearchMetadataTests(unittest.TestCase):
         self.assertEqual(excerpt.count('repeated prose'), 1)
         self.assertLessEqual(len(excerpt), 80)
 
-    def test_page_type_uses_declared_role_then_explicit_scope(self):
+    def test_page_type_uses_only_explicit_metadata(self):
         self.assertEqual(sphinx_ext.search_page_type(
-            '---\ntype: tutorial\nsource_language: en\n---\n# Factory',
-            'tutorials/factory'), 'tutorial')
-        self.assertEqual(sphinx_ext.search_page_type('# API', 'reference/api'), 'reference')
-        self.assertEqual(sphinx_ext.search_page_type('# Contract', 'design/factory'),
-                         'explanation')
-        self.assertEqual(sphinx_ext.search_page_type('# Status', 'delivery/architecture'),
-                         'status')
-        self.assertEqual(sphinx_ext.search_page_type('# Legacy', 'legacy'), 'reference')
+            '---\nid: factory\ntype: tutorial\naudience: consumer\n'
+            'source_language: en\n---\n# Factory', 'design/factory'), 'tutorial')
+        for name in ('reference/api', 'design/factory', 'delivery/architecture'):
+            with self.subTest(name=name):
+                with self.assertRaises(ValueError):
+                    sphinx_ext.search_page_type('# Missing metadata', name)
 
     def test_invalid_declared_type_is_rejected(self):
-        with self.assertRaisesRegex(ValueError, 'page_type'):
-            sphinx_ext.search_page_type('---\ntype: misleading\n---\n# Title', 'guide')
+        with self.assertRaisesRegex(ValueError, 'page type'):
+            sphinx_ext.search_page_type(
+                '---\nid: guide\ntype: misleading\naudience: consumer\n'
+                'source_language: en\n---\n# Title', 'guide')
 
     def test_metadata_script_cannot_close_a_script_or_interpret_markup(self):
         payload = {'records': {'guide.html': {
@@ -82,7 +112,9 @@ class SearchMetadataTests(unittest.TestCase):
 
     def test_stale_translation_record_keeps_actual_source_language(self):
         record = sphinx_ext.search_record(
-            'design/factory', 'design/factory.html', '# Factory', self.tree(),
+            'design/factory', 'design/factory.html',
+            '---\nid: factory\ntype: explanation\naudience: consumer\n'
+            'source_language: en\n---\n# Factory', self.tree(),
             {'source_language': 'en', 'requested_language': 'zh_CN',
              'actual_language': 'en', 'status': 'stale'})
         self.assertEqual(record['type'], 'explanation')
@@ -123,10 +155,13 @@ class SearchBuildIntegrationTests(unittest.TestCase):
                 'g_titlearray': '# Arraytitle second\n\nborrow\n',
             }
             (docs / 'index.md').write_text(
-                '# Posting fixture\n\n```{toctree}\n'
+                '---\nid: index\ntype: reference\naudience: consumer\n'
+                'source_language: en\n---\n# Posting fixture\n\n```{toctree}\n'
                 + '\n'.join(pages) + '\n```\n', encoding='utf-8')
             for name, source in pages.items():
-                (docs / (name + '.md')).write_text(source, encoding='utf-8')
+                (docs / (name + '.md')).write_text(
+                    '---\nid: ' + name + '\ntype: reference\naudience: consumer\n'
+                    'source_language: en\n---\n' + source, encoding='utf-8')
             for arguments in (['init', '-q'], ['add', 'docs'],
                               ['-c', 'user.name=Fixture', '-c',
                                'user.email=fixture@example.invalid', 'commit',
@@ -187,7 +222,7 @@ class SearchBuildIntegrationTests(unittest.TestCase):
                 + "language = 'zh_CN'\nversion = release = 'docs-fixture'\n",
                 encoding='utf-8')
             (docs / 'index.md').write_text(
-                '---\nsource_language: en\ntype: tutorial\n---\n\n'
+                '---\nid: fixture\ntype: tutorial\naudience: consumer\nsource_language: en\n---\n\n'
                 '# SDK fixture\n\nSDK returns an existing interface.\n', encoding='utf-8')
             for arguments in (['init', '-q'], ['add', 'docs'],
                               ['-c', 'user.name=Fixture',
@@ -196,10 +231,9 @@ class SearchBuildIntegrationTests(unittest.TestCase):
                 subprocess.run(['git', '-C', str(root)] + arguments,
                                check=True, capture_output=True)
             environment = os.environ.copy()
-            for name in ('NEXUS_DOCS_REVISION', 'NEXUS_DOCS_CODE_REVISION',
-                         'NEXUS_DOCS_TRANSLATION_ROOT', 'NEXUS_DOCS_GETTEXT_ROOT',
-                         'NEXUS_DOCS_LANGUAGES'):
-                environment.pop(name, None)
+            for name in tuple(environment):
+                if name.startswith("NEXUS_DOCS_"):
+                    environment.pop(name)
             output = root / 'zh_CN'
             result = subprocess.run(
                 [sys.executable, '-m', 'sphinx', '-E', '-W', '--keep-going',
