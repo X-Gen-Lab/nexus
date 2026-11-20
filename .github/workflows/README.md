@@ -10,11 +10,18 @@
 | enterprise-tools.yml | 六个完整工具域，覆盖配置、构建、依赖、SDK、预算和 HIL 工装 |
 | quality-checks.yml | 与 hook 共用格式和注释规则；在真实编译数据库上运行静态分析 |
 | docs-build.yml | 锁定工具、文档测试、Doxygen 和严格中英文站点构建 |
+| docs-publish.yml | 复用本次 Pages 制品部署；main 手动入口只构建文档一次再部署 |
 | security.yml | 依赖审计、CodeQL 和秘密扫描 |
 
 Native 的 Debug、Release、ASan／UBSan、TSan 各执行完整 CTest 计划一次。
 GoogleTest 报告必须与未过滤的发现结果逐例匹配，缺失、陈旧、跳过和失败均拒绝。
 与编译模式无关的 Python 工具测试只由独立工具 job 执行一次。
+
+文档验证保持只读权限；普通 `documentation` 制品包含离线站点与报告，上传不代表
+网站已更新。可信 `main` push 在文档验证和 `CI Status` 成功后，复用同次运行的
+Pages 专用制品发布。只有部署 job 授予 Pages／OIDC 写权限，PR 不发布网站。
+需要独立更新网站时，在 `main` 手动运行 `docs-publish.yml`；该入口不启动平台矩阵。
+发布后核对线上中英文页面、搜索资源及源码提交身份，分别记录构建和公网验收。
 
 普通 commit hook 读取完整暂存区，先检查所需工具，配置和构建一次，再执行完整
 Native GoogleTest。普通固件实现不触发整套辅助工具域；公共头、声明事实和工具改动

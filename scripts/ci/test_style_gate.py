@@ -164,6 +164,7 @@ class StyleGateTests(unittest.TestCase):
             "tools/documentation/cli.py", "tools/documentation/check.py",
             "tools/documentation/build.py", "tools/documentation/diagrams.py",
             "tools/documentation/diagram_localization.py",
+            "tools/documentation/publication.py",
             "tools/documentation/install.py", "tools/dev/build_lock.py",
             "tools/dev/process.py", "tools/evidence/identity.py",
             "tools/evidence/common.py",

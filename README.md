@@ -3,7 +3,8 @@
 Nexus 为 MCU 提供 C11 通用机制：Core、Arch、类型化 I/O、静态 factory、可选 OS
 适配和器件组件。应用任务、业务协议、私有 PCB、Flash 分区与恢复策略由外部工程维护。
 
-[文档首页](docs/index.md) · [首次 F407 构建](docs/tutorials/first-f407.md) ·
+[在线文档](https://x-gen-lab.github.io/nexus/) · [源码文档](docs/index.md) ·
+[首次 F407 构建](docs/tutorials/first-f407.md) ·
 [首次 Native 运行](docs/tutorials/first-native.md) ·
 [公共示例](https://github.com/X-Gen-Lab/nexus-examples)
 

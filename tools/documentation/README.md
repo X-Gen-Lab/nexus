@@ -1,9 +1,11 @@
 # 文档工具
 
-本目录核对当前正文、翻译、配置示例与架构图，并生成中英文离线站点。
+本目录核对当前正文、翻译、配置示例与架构图，并生成中英文站点及离线产物。
 统一入口为 `python tools/dev/dev.py docs`；准备、构建与写作步骤见
 [文档维护](../../docs/development/documentation.md)，精确参数见
 [工具参考](../../docs/reference/documentation-tools.md)。
+公网部署由 `.github/workflows/docs-publish.yml` 消费已验证的 Pages 制品；
+本目录的 `publication.py` 负责本地完整站点切换。
 
 | 模块 | 责任 |
 |---|---|
