@@ -164,6 +164,43 @@ class DeveloperCommandTests(unittest.TestCase):
             self.assertIn("development checkout", output.getvalue())
 
 
+class PrepareCommandTests(unittest.TestCase):
+    def test_explicit_dependency_scope_does_not_inject_a_default_preset(self):
+        for scope in ("assembly", "native", "arm", "sdk"):
+            for arguments in (["--scope", scope], ["--scope=" + scope]):
+                with self.subTest(arguments=arguments), patch.object(
+                        dev, "execute", return_value=7) as execute:
+                    self.assertEqual(dev.main(["prepare", *arguments]), 7)
+                self.assertEqual(execute.call_args.args[0], [
+                    dev.sys.executable, "tools/dev/dependencies.py", "prepare",
+                    *arguments])
+
+    def test_preset_preparation_preserves_default_and_explicit_selection(self):
+        for arguments, forwarded in (
+                ([], ["--preset", "native-debug", "--scope", "preset"]),
+                (["--preset", "stm32-qiming-baremetal"],
+                 ["--preset", "stm32-qiming-baremetal", "--scope", "preset"]),
+                (["--scope=preset", "--preset", "stm32-qiming-baremetal"],
+                 ["--preset", "stm32-qiming-baremetal", "--scope=preset"])):
+            with self.subTest(arguments=arguments), patch.object(
+                    dev, "execute", return_value=0) as execute:
+                self.assertEqual(dev.main(["prepare", *arguments]), 0)
+            self.assertEqual(execute.call_args.args[0], [
+                dev.sys.executable, "tools/dev/dependencies.py", "prepare",
+                *forwarded])
+
+    def test_explicit_preset_with_another_scope_rejects_before_execution(self):
+        for scope in ("assembly", "native", "arm", "sdk"):
+            with self.subTest(scope=scope), patch.object(
+                    dev, "execute", return_value=0) as execute, \
+                    redirect_stderr(io.StringIO()) as errors:
+                result = dev.main(["prepare", "--scope", scope,
+                                   "--preset", "native-debug"])
+            self.assertEqual(result, 2)
+            self.assertIn("--preset requires --scope preset", errors.getvalue())
+            execute.assert_not_called()
+
+
 
 if __name__ == "__main__":
     unittest.main()

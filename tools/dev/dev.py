@@ -324,7 +324,6 @@ def main(argv=None):
                 raise ValueError("support requires an exact --assembly; --preset is not evidence")
             from tools.maintenance import capabilities
             return capabilities.main(native, support_command=True)
-        args.preset = args.preset or "native-debug"
         environment = process.execution_environment(os.environ)
         # Prefer the pinned local tools without requiring shell activation.
         local_bin = ROOT / ".venv" / ("Scripts" if os.name == "nt" else "bin")
@@ -350,14 +349,20 @@ def main(argv=None):
                        "tools/dev/" + modules[args.action] + ".py"]
             if args.action == "prepare":
                 command.append("prepare")
-                command += ["--preset", args.preset]
-                if not any(arg == "--scope" or arg.startswith("--scope=")
-                           for arg in native):
-                    command += ["--scope", "preset"]
+                selection = argparse.ArgumentParser(add_help=False)
+                selection.add_argument("--scope")
+                selected, _ = selection.parse_known_args(native)
+                if selected.scope in (None, "preset"):
+                    command += ["--preset", args.preset or "native-debug"]
+                    if selected.scope is None:
+                        command += ["--scope", "preset"]
+                elif args.preset is not None:
+                    raise ValueError("--preset requires --scope preset")
             return execute(command + native, environment)
         if args.action == "check":
             if native:
                 raise ValueError("check accepts no native CMake arguments")
+        args.preset = args.preset or "native-debug"
         presets = Presets(ROOT, environment)
         build = command_build(args, native, presets)
         selected_test = (presets.selected("test", args.preset)
