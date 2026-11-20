@@ -29,7 +29,7 @@ CONTROL_FILES = {
     "dependencies/development-tools.txt", "scripts/tools/format.py",
     "scripts/ci/style_gate.py", "scripts/ci/comment_style.py",
     "dependencies/environment.lock.json",
-    "docs/development/coding_standards.rst",
+    "docs/development/coding-standards.md",
 }
 SOURCE_SUFFIXES = {".c", ".h", ".cpp", ".hpp", ".cc", ".hh", ".inc"}
 TEXT_SUFFIXES = SOURCE_SUFFIXES | {

@@ -20,19 +20,15 @@ jobs:
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: '3.12.14'
-      - name: Prepare the reviewed selected source closure
+      - name: Prepare the selected F4 documentation source closure
         run: >-
-          python3 -B tools/dev/dependencies.py prepare --scope native
-          --allow-network --report build/dependencies/docs-build-preparation.json
+          python3 -B tools/dev/dependencies.py prepare --scope preset
+          --preset stm32-qiming-baremetal --allow-network --report build/dependencies/docs-build-preparation.json
       - name: Prepare the complete hash-locked documentation closure
         run: >-
           python3 tools/documentation/install.py
           --prefix "$RUNNER_TEMP/nexus-docs-tools"
           --cache "$RUNNER_TEMP/nexus-docs-cache"
-      - name: Check documentation source and contracts
-        run: >-
-          python3 tools/documentation/cli.py check --full
-          --tool-prefix "$RUNNER_TEMP/nexus-docs-tools"
       - name: Execute documentation tool tests
         run: >-
           python3 tools/documentation/cli.py test
@@ -42,13 +38,14 @@ jobs:
         run: >-
           python3 tools/documentation/cli.py build
           --tool-prefix "$RUNNER_TEMP/nexus-docs-tools"
-          --output build/documentation --language all
+          --output build/documentation --mode verify --language all
       - name: Preserve successful documentation output
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: documentation
           path: |
-            build/documentation/
+            build/documentation/site/
+            build/documentation/documentation-build.json
             build/dependencies/docs-build-preparation.json
             build/quality/docs-tests.json
           if-no-files-found: error

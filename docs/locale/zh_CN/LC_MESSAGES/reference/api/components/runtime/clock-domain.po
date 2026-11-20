@@ -1,0 +1,268 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 7d6e009775ea78d6aac4c25a21248f3ab25c9357359050c375f7d5f19a0a3ad1\n"
+
+#: ../../../../../../docs/reference/api/components/runtime/clock-domain.md:10
+msgid "Clock-domain ownership and coordination"
+msgstr "时钟域所有权与协调"
+
+#: ../../../../../../docs/reference/api/components/runtime/clock-domain.md:12
+msgid ""
+"A clock-domain owner coordinates admitted consumers and explicit "
+"transitions. Clock identity, epochs, retained consumers and actual hardware "
+"outcomes remain part of the selected contract."
+msgstr "时钟域所有者协调已获准消费者和显式转换。时钟身份、纪元、保留消费者及实际硬件结果始终属于选定合同。"
+
+#: ../../../../../../docs/reference/api/components/runtime/clock-domain.md:16
+msgid ""
+"Trusted static composition includes `clock_domain_owner.h`. Ordinary callers"
+" keep the opaque interface; cold helpers and span validation remain private."
+" Storage fields are implementation state after construction, not application"
+" controls."
+msgstr ""
+"受信静态装配包含 "
+"`clock_domain_owner.h`。普通调用者使用不透明接口；冷态辅助及范围校验保持私有。构造后的存储字段属于实现状态，不是应用控制入口。"
+
+#: ../../../../../../docs/reference/api/components/runtime/clock-domain.md:21
+msgid "Public declarations"
+msgstr "公共声明"
+
+#: ../../../../../../docs/reference/api/components/runtime/clock-domain.md:23
+msgid "clock_domain.h"
+msgstr "clock_domain.h"
+
+#: ../../../../../../docs/reference/api/components/runtime/clock-domain.md:25
+msgid "Explicit clock consumers and epoch-bound drain control."
+msgstr "显式时钟消费者与绑定 epoch 的排空控制。"
+
+#: ../../../../../../docs/reference/api/components/runtime/clock-domain.md:25
+msgid ""
+"Author  Nexus Team   Version  1.0.0   Date  2026-10-11   Copyright  "
+"Copyright (c) 2026 Nexus Team"
+msgstr ""
+"作者  Nexus Team   版本  1.0.0   日期  2026-10-11   版权  Copyright (c) 2026 Nexus "
+"Team"
+
+#: ../../../../../../docs/reference/api/components/runtime/clock-domain.md:25
+#: ../../../../../../docs/reference/api/components/runtime/clock-domain.md:31
+msgid "Nexus Team"
+msgstr "Nexus Team"
+
+#: ../../../../../../docs/reference/api/components/runtime/clock-domain.md:25
+#: ../../../../../../docs/reference/api/components/runtime/clock-domain.md:31
+msgid "1.0.0"
+msgstr "1.0.0"
+
+#: ../../../../../../docs/reference/api/components/runtime/clock-domain.md:25
+msgid "2026-10-11"
+msgstr "2026-10-11"
+
+#: ../../../../../../docs/reference/api/components/runtime/clock-domain.md:25
+#: ../../../../../../docs/reference/api/components/runtime/clock-domain.md:31
+msgid "Copyright (c) 2026 Nexus Team"
+msgstr "Copyright (c) 2026 Nexus Team"
+
+#: ../../../../../../docs/reference/api/components/runtime/clock-domain.md:25
+msgid "Typedefs"
+msgstr "类型定义"
+
+#: ../../../../../../docs/reference/api/components/runtime/clock-domain.md:25
+msgid "Opaque provider, statically supplied by its privileged owner."
+msgstr "不透明提供者，由其特权所有者静态供给。"
+
+#: ../../../../../../docs/reference/api/components/runtime/clock-domain.md:25
+msgid "One stable caller-owned consumer token."
+msgstr "一个稳定、调用者拥有的消费者 token。"
+
+#: ../../../../../../docs/reference/api/components/runtime/clock-domain.md:25
+msgid ""
+"Zero-initialize before first acquisition. On SUCCESS the provider borrows "
+"this exact object; do not copy, mutate or reclaim it until release succeeds."
+" Internal fields are not application controls. A release is the provider's "
+"final access, not proof that a peripheral has stopped. Release only after "
+"that consumer's IRQ, DMA and observer drain."
+msgstr ""
+"首次取得前必须零初始化。SUCCESS "
+"后提供者借用该精确对象；释放成功前不得复制、修改或回收。内部字段不是应用控制项。释放是提供者的最终访问，不证明外设已停止。只有该消费者的 IRQ、DMA"
+" 和观测者均已排空后才释放。"
+
+#: ../../../../../../docs/reference/api/components/runtime/clock-domain.md:25
+msgid "Enums"
+msgstr "枚举"
+
+#: ../../../../../../docs/reference/api/components/runtime/clock-domain.md:25
+msgid "Only shallow sleep preserves the established clock/time domain."
+msgstr "仅浅睡眠保持既有时钟／时间域。"
+
+#: ../../../../../../docs/reference/api/components/runtime/clock-domain.md:25
+msgid "Values:"
+msgstr "取值："
+
+#: ../../../../../../docs/reference/api/components/runtime/clock-domain.md:25
+#: ../../../../../../docs/reference/api/components/runtime/clock-domain.md:31
+msgid "Functions"
+msgstr "函数"
+
+#: ../../../../../../docs/reference/api/components/runtime/clock-domain.md:25
+msgid "Acquire one admitted clock consumer without waiting."
+msgstr "无等待地取得一个允许准入的时钟消费者。"
+
+#: ../../../../../../docs/reference/api/components/runtime/clock-domain.md:25
+msgid ""
+"Privileged Thread or configurable IRQ only; same CPU, saved-mask metadata "
+"guard. NMI/HardFault/SMP excluded. Capacity bounds token/alias scans. Token "
+"remains borrowed until successful release, even while admission is closed."
+msgstr ""
+"仅限特权 Thread 或可配置 IRQ；同一 CPU，以保存并恢复屏蔽状态的保护执行元数据操作。不支持 NMI、HardFault 或 "
+"SMP。容量限制令牌和别名扫描。即使准入已关闭，令牌仍持续借用至释放成功。"
+
+#: ../../../../../../docs/reference/api/components/runtime/clock-domain.md:0
+msgid "Returns"
+msgstr "返回值"
+
+#: ../../../../../../docs/reference/api/components/runtime/clock-domain.md:25
+msgid ""
+"SUCCESS, BUSY for closed admission, EXHAUSTED for budget, or "
+"INVALID/STATE/CONTEXT with no retained token or effects"
+msgstr ""
+"SUCCESS；准入关闭时为 BUSY；预算耗尽时为 EXHAUSTED；或 INVALID/STATE/CONTEXT，此时不保留令牌或效果"
+
+#: ../../../../../../docs/reference/api/components/runtime/clock-domain.md:25
+msgid "Remove the exact retained token after consumer drain."
+msgstr "消费者排空后移除准确保留的 token。"
+
+#: ../../../../../../docs/reference/api/components/runtime/clock-domain.md:25
+msgid ""
+"Same contexts as acquire. Copied tokens cannot release the original. There "
+"is no callback or last access after SUCCESS."
+msgstr "上下文与 acquire 相同。复制的令牌不能释放原令牌。SUCCESS 后不存在回调或最后一次访问。"
+
+#: ../../../../../../docs/reference/api/components/runtime/clock-domain.md:25
+msgid "SUCCESS or INVALID/STATE/CONTEXT without removing a borrow"
+msgstr "SUCCESS；或 INVALID/STATE/CONTEXT，此时不移除借用"
+
+#: ../../../../../../docs/reference/api/components/runtime/clock-domain.md:25
+msgid "Close admission and return the current epoch control."
+msgstr "关闭准入并返回当前 epoch 控制身份。"
+
+#: ../../../../../../docs/reference/api/components/runtime/clock-domain.md:25
+msgid ""
+"Serialized privileged Thread only. No waiting, cancellation, clock writes or"
+" implicit consumer shutdown. Idempotent in the same closed epoch; output "
+"must not alias live storage."
+msgstr "仅限串行的特权 Thread。不等待、不取消、不写时钟，也不隐式关闭消费者。在同一关闭 epoch 内幂等；输出不得与活动存储重叠。"
+
+#: ../../../../../../docs/reference/api/components/runtime/clock-domain.md:25
+msgid "Validate closed admission and zero retained consumers."
+msgstr "验证准入已关闭且保留消费者为零。"
+
+#: ../../../../../../docs/reference/api/components/runtime/clock-domain.md:25
+msgid ""
+"Same CPU privileged Thread. This certifies only explicitly enrolled "
+"consumers. It does not authorize PLL reprogramming, suspend kernel Tick or "
+"change the Core deadline domain."
+msgstr ""
+"同一 CPU 上的特权 Thread。该证明仅涵盖显式登记的消费者。不授权重新配置 PLL、暂停内核 Tick 或改变 Core 截止时间域。"
+
+#: ../../../../../../docs/reference/api/components/runtime/clock-domain.md:25
+msgid ""
+"SUCCESS, BUSY while consumers remain, STATE for stale/open control, INVALID "
+"or CONTEXT; no state changes"
+msgstr ""
+"SUCCESS；消费者仍存在时为 BUSY；控制身份过期或处于开放状态时为 STATE；也可能为 INVALID 或 CONTEXT，均不改变状态"
+
+#: ../../../../../../docs/reference/api/components/runtime/clock-domain.md:25
+msgid "Reopen a drained domain under a new admission epoch."
+msgstr "在新的准入 epoch 下重新开放已排空的时钟域。"
+
+#: ../../../../../../docs/reference/api/components/runtime/clock-domain.md:25
+msgid ""
+"Serialized privileged Thread. Does not restart the clock or reinterpret "
+"existing deadlines. Actual cold clock changes additionally require all "
+"Tick/time providers stopped and a new explicit deadline domain; this API "
+"performs neither."
+msgstr ""
+"串行的特权 Thread。不重启时钟，也不重新解释现有截止时间。真正的冷态时钟变更还要求停止全部 Tick/时间提供者，并显式建立新的截止时间域；本 "
+"API 不执行这两项操作。"
+
+#: ../../../../../../docs/reference/api/components/runtime/clock-domain.md:25
+msgid "SUCCESS, BUSY, STATE, EXHAUSTED or CONTEXT without changes"
+msgstr "SUCCESS、BUSY、STATE、EXHAUSTED 或 CONTEXT，不产生变更"
+
+#: ../../../../../../docs/reference/api/components/runtime/clock-domain.md:25
+#: ../../../../../../docs/reference/api/components/runtime/clock-domain.md:31
+msgid "Public Members"
+msgstr "公共成员"
+
+#: ../../../../../../docs/reference/api/components/runtime/clock-domain.md:25
+msgid "Epoch-bound close control and quiescence evidence."
+msgstr "绑定 epoch 的关闭控制与静止证据。"
+
+#: ../../../../../../docs/reference/api/components/runtime/clock-domain.md:25
+msgid ""
+"A value copy is allowed. This is not an authorization token or proof about "
+"unregistered consumers. Domain storage lives longer than every copy. A "
+"successful reopen invalidates all prior controls without resetting the "
+"epoch."
+msgstr ""
+"允许按值复制。该值不是授权令牌，也不能证明未登记消费者的状态。时钟域存储的寿命必须长于每份副本。成功重新开放会使全部旧控制身份失效，但不重置 "
+"epoch。"
+
+#: ../../../../../../docs/reference/api/components/runtime/clock-domain.md:29
+msgid "clock_domain_owner.h"
+msgstr "clock_domain_owner.h"
+
+#: ../../../../../../docs/reference/api/components/runtime/clock-domain.md:31
+msgid "Exact static storage for a trusted clock domain owner."
+msgstr "可信时钟域所有者的精确静态存储。"
+
+#: ../../../../../../docs/reference/api/components/runtime/clock-domain.md:31
+msgid ""
+"Author  Nexus Team   Version  1.0.0   Date  2026-11-13   Copyright  "
+"Copyright (c) 2026 Nexus Team"
+msgstr ""
+"作者  Nexus Team   版本  1.0.0   日期  2026-11-13   版权  Copyright (c) 2026 Nexus "
+"Team"
+
+#: ../../../../../../docs/reference/api/components/runtime/clock-domain.md:31
+msgid "2026-11-13"
+msgstr "2026-11-13"
+
+#: ../../../../../../docs/reference/api/components/runtime/clock-domain.md:31
+msgid "Construct unused zero-initialized static owner storage."
+msgstr "构造未使用且已零初始化的静态所有者存储。"
+
+#: ../../../../../../docs/reference/api/components/runtime/clock-domain.md:31
+msgid ""
+"Serialized privileged Thread. Positive exact capacity; no allocation, "
+"hardware writes, global registry or worker. Never overwrite a live domain to"
+" recycle its epoch. Caller storage outlives every token and copied barrier "
+"that can still be observed; construct does not stop hardware."
+msgstr ""
+"在串行化的特权 Thread 中调用。容量必须是正的精确值；不分配内存、不写硬件、不增加全局注册表或工作线程。绝不通过覆盖存活域来回收其 "
+"epoch。调用方存储的寿命须超过每个仍可能被观察到的令牌和屏障副本；构造操作不会停止硬件。"
+
+#: ../../../../../../docs/reference/api/components/runtime/clock-domain.md:31
+msgid "SUCCESS or INVALID/STATE/CONTEXT without retained consumers"
+msgstr "SUCCESS 或 INVALID/STATE/CONTEXT，均不保留消费者"
+
+#: ../../../../../../docs/reference/api/components/runtime/clock-domain.md:31
+msgid "Trusted static owner storage; fields are not controls."
+msgstr "可信的静态所有者存储；字段不是控制项。"
+
+#: ../../../../../../docs/reference/api/components/runtime/clock-domain.md:31
+msgid ""
+"Zero-initialize once. Storage outlives every consumer token and copied "
+"barrier. Do not copy, overwrite or reclaim a live domain, or recycle its "
+"monotonically used epoch. Ordinary consumers use the opaque type in "
+"clock_domain.h instead."
+msgstr ""
+"仅零初始化一次。存储的寿命须超过每个消费者令牌和屏障副本。不得复制、覆盖或回收存活域，也不得回收其单调使用的 epoch。普通消费者应使用 "
+"clock_domain.h 中的不透明类型。"

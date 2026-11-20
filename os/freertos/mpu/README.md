@@ -6,7 +6,7 @@ FP 的 M4，以及采用受审整数／FP／MVE 事实的 M23／M33／M55／M85�
 八个区域，受审 v8 端口接受八或十六个。Native、M0／M0+、M7 MPU 和 MPU＋分域
 TrustZone 组合拒绝，不改变这些 CPU 普通 Arch／OS 路径的支持范围。
 
-关系见[OS 总览](../../README.md)、[OS 合同](../../../docs/design/os-contracts.md)
+关系见[OS 总览](../../README.md)、[OS 合同](../../../docs/reference/contracts/os/execution.md)
 及 [FIG-13](../../../docs/assets/diagrams/cortex-m-capabilities.svg)。图描述能力
 分层，不表示任意任务已隔离或已通过实板验收。
 

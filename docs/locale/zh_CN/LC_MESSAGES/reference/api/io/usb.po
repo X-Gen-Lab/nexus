@@ -1,0 +1,1008 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 0667abdf71a94a72e6428c3f20e8c589bc85b3f9f78a4b39caf7e39e58bda2b4\n"
+
+#: ../../../../../../docs/reference/api/io/usb.md:10
+msgid "USB packets, activation and explicit roles"
+msgstr "USB 包、激活与显式角色"
+
+#: ../../../../../../docs/reference/api/io/usb.md:12
+msgid ""
+"Device packets, Host pipes and explicitly managed OTG roles have distinct "
+"identities. The selected controller, PHY, power and endpoint profile must be"
+" admitted before a ready face can be used."
+msgstr ""
+"Device 数据包、Host pipe 及显式管理的 OTG 角色具有独立身份。使用就绪接口前，必须对选定控制器、PHY、电源及端点配置完成准入。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:16
+msgid ""
+"USB Device and Host use distinct packet faces. An explicitly managed OTG "
+"role owns the selected core/PHY and exposes the ready face for its current "
+"generation. The [USB ownership contract](../../contracts/io/usb-"
+"lifecycle.md) defines PHY speeds, PIO or HS AHB DMA, power handover and "
+"optional ST Core bridges."
+msgstr ""
+"USB Device 和 Host 使用独立的 packet face。显式 managed OTG 角色拥有选定 core／PHY，并为当前 "
+"generation 提供 ready face。[USB 所有权合同](../../contracts/io/usb-lifecycle.md)定义 "
+"PHY 速度、PIO 或 HS AHB DMA、供电交接及可选 ST Core 桥接。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:21
+msgid "Public declarations"
+msgstr "公共声明"
+
+#: ../../../../../../docs/reference/api/io/usb.md:23
+msgid "usb_activation.h"
+msgstr "usb_activation.h"
+
+#: ../../../../../../docs/reference/api/io/usb.md:25
+msgid "Optional explicit nonzero USB endpoint activation."
+msgstr "可选的非零 USB endpoint 显式激活接口。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:25
+#: ../../../../../../docs/reference/api/io/usb.md:31
+#: ../../../../../../docs/reference/api/io/usb.md:37
+#: ../../../../../../docs/reference/api/io/usb.md:43
+#: ../../../../../../docs/reference/api/io/usb.md:49
+msgid "Author  Nexus Team"
+msgstr "作者  Nexus Team"
+
+#: ../../../../../../docs/reference/api/io/usb.md:25
+#: ../../../../../../docs/reference/api/io/usb.md:31
+#: ../../../../../../docs/reference/api/io/usb.md:37
+#: ../../../../../../docs/reference/api/io/usb.md:43
+#: ../../../../../../docs/reference/api/io/usb.md:49
+msgid "Nexus Team"
+msgstr "Nexus Team"
+
+#: ../../../../../../docs/reference/api/io/usb.md:25
+#: ../../../../../../docs/reference/api/io/usb.md:31
+#: ../../../../../../docs/reference/api/io/usb.md:37
+#: ../../../../../../docs/reference/api/io/usb.md:43
+#: ../../../../../../docs/reference/api/io/usb.md:49
+msgid "Functions"
+msgstr "函数"
+
+#: ../../../../../../docs/reference/api/io/usb.md:25
+msgid "Explicitly activate or deactivate one selected nonzero direction."
+msgstr "显式激活或反激活一个已选定的非零 endpoint 方向。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:25
+msgid ""
+"No request or buffer is borrowed. Existing loans must be explicitly "
+"cancelled and drained before target changes; failure never revokes other "
+"loans. Configuration/class policy remains external."
+msgstr ""
+"不借用任何 request 或 buffer。目标变更之前，必须显式取消并排空该目标的既有借用；失败从不撤销其他借用。配置／类策略仍由外部负责。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:0
+msgid "Parameters"
+msgstr "参数"
+
+#: ../../../../../../docs/reference/api/io/usb.md:25
+msgid "[in] Started serialized privileged Task owner, IRQ masks clear."
+msgstr "[in] 已启动；由序列化特权 Task owner 调用，进入时 IRQ masks 须 clear。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:25
+msgid "[in] Current software USB epoch; cold epoch zero is valid."
+msgstr "[in] 当前软件 USB epoch；冷态 epoch 0 合法。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:25
+msgid "[in] USB address byte; EP0 is not admitted."
+msgstr "[in] USB 地址字节；不准入 EP0。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:25
+msgid "[in] Requested active state, never packet submission."
+msgstr "[in] 请求的 active 状态；此操作从不提交 packet。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:0
+msgid "Returns"
+msgstr "返回值"
+
+#: ../../../../../../docs/reference/api/io/usb.md:25
+msgid ""
+"Success after proof; UNSUPPORTED when the operation is absent. "
+"INVALID/CONTEXT/STATE/BUSY reject before writes. IO may have partial effects"
+" and closes controller admission until explicit recovery."
+msgstr ""
+"证明成立后成功；操作缺失时返回 UNSUPPORTED。INVALID／CONTEXT／STATE／BUSY 在写入前拒绝。IO "
+"可能已有部分效果，并关闭 controller 准入，直到显式恢复。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:25
+msgid "Optional controller operation; absence means UNSUPPORTED."
+msgstr "可选的 controller 操作；操作缺失时返回 UNSUPPORTED。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:25
+#: ../../../../../../docs/reference/api/io/usb.md:31
+#: ../../../../../../docs/reference/api/io/usb.md:37
+#: ../../../../../../docs/reference/api/io/usb.md:43
+#: ../../../../../../docs/reference/api/io/usb.md:49
+msgid "Public Members"
+msgstr "公共成员"
+
+#: ../../../../../../docs/reference/api/io/usb.md:25
+msgid "Immutable borrowed face, using the existing controller context."
+msgstr "不可变的借用 face，使用既有 controller context。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:29
+msgid "usb_device.h"
+msgstr "usb_device.h"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "Full-speed device packets and caller-owned endpoint loans."
+msgstr "全速设备数据包与调用者拥有的端点借用。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+#: ../../../../../../docs/reference/api/io/usb.md:37
+#: ../../../../../../docs/reference/api/io/usb.md:43
+#: ../../../../../../docs/reference/api/io/usb.md:49
+msgid "Enums"
+msgstr "枚举"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+#: ../../../../../../docs/reference/api/io/usb.md:37
+#: ../../../../../../docs/reference/api/io/usb.md:43
+#: ../../../../../../docs/reference/api/io/usb.md:49
+msgid "Values:"
+msgstr "取值："
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "Prepare one IN packet without reading or borrowing its bytes."
+msgstr "准备一个 IN 数据包，不读取或借用其字节。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "[inout] Initialized unborrowed request."
+msgstr "[inout] 已初始化且未借出的请求。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "[in] Immutable packet bytes, NULL only for zero length."
+msgstr "[in] 不可变报文字节；仅在长度为零时允许 NULL。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "[in] Packet length, no automatic terminating ZLP."
+msgstr "[in] 报文长度；不自动追加终止 ZLP。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "[in] DATA or control STATUS; STATUS must be zero length."
+msgstr "[in] DATA 或控制 STATUS；STATUS 长度必须为零。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "[in] Current SETUP epoch for EP0, zero for nonzero endpoints."
+msgstr "[in] EP0 使用当前 SETUP epoch；非零端点使用零。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "[in] Absolute independent monotonic clock deadline."
+msgstr "[in] 独立单调时钟中的绝对时限。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "Success, INVALID or STATE; rejection retains no references."
+msgstr "成功、INVALID 或 STATE；拒绝时不保留引用。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "Prepare an OUT packet capacity without modifying its storage."
+msgstr "准备 OUT 数据包容量，不修改其存储。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "[out] Borrowed until SETTLED only after accepted submission."
+msgstr "[out] 仅在提交被接受后借用，持续到 SETTLED。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "[in] At most endpoint MPS; short packets complete normally."
+msgstr "[in] 最多为端点 MPS；短包正常完成。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "[in] DATA or zero-capacity control STATUS."
+msgstr "[in] DATA 或容量为零的控制 STATUS。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "Success, INVALID or STATE; rejection creates no borrow."
+msgstr "成功、INVALID 或 STATE；拒绝时不建立借用。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "Admit one packet, never a hidden queue or complete USB transaction."
+msgstr "仅准入一个数据包，不隐式建立队列或执行完整 USB 事务。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid ""
+"One privileged task executor, IRQ masks clear. IN FIFO writes do not prove "
+"host ACK. OUT overrun drains all packet words without overflow. Selected "
+"F407 ISO packets require a remaining Core deadline at most one second, "
+"observed ULPI speed and exactly one transaction. Hardware selects next "
+"frame/microframe parity; it does not implement interval scheduling, retries "
+"or receive acknowledgment. An incomplete ISO opportunity settles IO only "
+"after source/FIFO/AHB withdrawal. Long execution stalls expire by Core time "
+"before modular frame comparison. An epoch-matched zero-length EP0 STATUS OUT"
+" may be armed before or during control DATA IN. Its valid wire completion "
+"closes further DATA admission while independent DMA/FIFO/IRQ loans still "
+"require their own settlement. An outer control owner must join both "
+"directions before releasing shared reply storage."
+msgstr ""
+"由一个特权 task 执行，IRQ masks 清除。写入 IN FIFO 不证明主机 ACK；OUT overrun 排空全部 packet word"
+" 且不溢出。所选 F407 ISO packet 要求剩余 Core deadline 至多一秒、已观察 ULPI 速度并且恰好一次 "
+"transaction。硬件选择下一 frame／microframe 奇偶，不实现 interval 调度、重试或接收 ACK。未完成 ISO "
+"机会只在源／FIFO／AHB 退出后以 IO 结清。长时间执行停顿先按 Core 时间到期，再做模 frame 比较。同 epoch 的零长 EP0 "
+"STATUS OUT 可在 control DATA IN 之前或期间 arm；有效线上完成关闭后续 DATA 准入，独立 DMA／FIFO／IRQ "
+"loan 仍各自结清。outer control owner 必须 join 两方向后才释放共享 reply 存储。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "[in] Stable endpoint face and private state."
+msgstr "[in] 稳定的端点接口及私有状态。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "[inout] READY packet, buffers alive until acquire SETTLED."
+msgstr "[inout] READY 报文；缓冲须保持有效，直到以 acquire 语义观测到 SETTLED。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "Success means ACCEPTED; fourth-party buffers are not copied early."
+msgstr "成功表示 ACCEPTED；第四方缓冲不会被提前复制。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "Request endpoint disable/drain without revoking a buffer loan."
+msgstr "请求端点禁用／排空，不撤销缓冲区借用。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid ""
+"Control OUT0 has no hardware disable command: cancellation may require full "
+"device stop to settle. Missing proof becomes QUARANTINED. Reset/SETUP "
+"invalidates epochs but releases only after actual source drain."
+msgstr ""
+"控制 OUT0 没有硬件禁用命令：取消可能需要完整停止设备才能结算。缺少证明时进入 QUARANTINED。Reset/SETUP 使 epoch "
+"失效，但只有实际源排空后才释放借用。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "[in] Same serialized privileged task owner."
+msgstr "[in] 同一个串行化特权任务所有者。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "[inout] Live request accepted by this exact endpoint."
+msgstr "[inout] 由此精确端点接受的活动请求。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "Success requests drain; failures retain all prior accepted loans."
+msgstr "成功表示请求排空；失败时保留全部先前接受的借用。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "Set/clear STALL only after the endpoint has no live transfer."
+msgstr "仅端点无存活传输时设置／清除 STALL。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "[in] Serialized owner, started and IRQ masks clear."
+msgstr "[in] 已启动的串行化所有者，IRQ 屏蔽须解除。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "[in] Desired STALL; clearing bulk/interrupt resets DATA0."
+msgstr "[in] 期望的 STALL；清除 bulk/interrupt STALL 时同时复位 DATA0。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid ""
+"Success after readback, BUSY retains a pending request; a selected ISO "
+"direction returns UNSUPPORTED without an endpoint write."
+msgstr "回读验证后成功；BUSY 保留待完成请求。选定的 ISO 方向返回 UNSUPPORTED，不写 endpoint 寄存器。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "Task-only bounded progress; deadline never depends on USB SOF."
+msgstr "仅 Task 有界推进；截止时间绝不依赖 USB SOF。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "[in] Serialized privileged owner with incoming IRQ masks clear."
+msgstr "[in] 串行化特权所有者；进入时 IRQ 屏蔽须解除。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "Success requests progress; no clock/endpoint loan is released early."
+msgstr "成功表示请求推进；不提前释放时钟或端点借用。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "Consume bounded value events; output is never retained."
+msgstr "消费有界值事件，绝不保留输出。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "Invalid/STATE rejection leaves both outputs unchanged."
+msgstr "Invalid/STATE 拒绝时，两个输出均保持不变。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "[in] Single task consumer and stable controller."
+msgstr "[in] 单一任务消费者及稳定控制器。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "[out] Caller records disjoint from provider and live loans."
+msgstr "[out] 调用方记录，与 provider 及活动借用分离。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "[in] Positive output count."
+msgstr "[in] 正数输出数量。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "[out] Disjoint count output; EMPTY means zero."
+msgstr "[out] 独立的计数输出；EMPTY 表示零。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "Success, EMPTY or rejection; authoritative latest SETUP is in state."
+msgstr "成功、EMPTY 或拒绝；state 中的最新 SETUP 才是权威事实。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "Task-only authoritative snapshot, independent of event-ring space."
+msgstr "仅 Task 的权威快照，与事件环可用空间无关。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "[in] Serialized privileged owner with IRQ masks clear."
+msgstr "[in] 串行化特权所有者，IRQ 屏蔽须解除。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "[out] Disjoint caller snapshot, never retained."
+msgstr "[out] 与其他存储分离的调用方快照；不保留引用。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "Success copies state; alias/context rejection leaves output unchanged."
+msgstr "成功时复制状态；别名或上下文检查拒绝时输出不变。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "Stage SET_ADDRESS for the matching zero-data standard SETUP."
+msgstr "为匹配的零数据标准 SETUP 暂存 SET_ADDRESS。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "[in] Serialized privileged controller owner."
+msgstr "[in] 串行化特权控制器所有者。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "[in] Current SETUP identity."
+msgstr "[in] 当前 SETUP 身份。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "[in] 0..127, matching SETUP wValue."
+msgstr "[in] 0..127，与 SETUP wValue 匹配。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "Success stages only; address applies after real status-IN XFRC."
+msgstr "成功仅暂存地址；实际 status-IN XFRC 后地址才生效。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "Attach/detach a borrowed task/IRQ-compatible wake hint."
+msgstr "附加／解除被借用且兼容 Task/IRQ 的唤醒提示。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "[in] Started serialized owner with IRQ masks clear."
+msgstr "[in] 已启动的串行化所有者，IRQ 屏蔽须解除。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "[in] Immutable target, or NULL to detach."
+msgstr "[in] 不可变目标；NULL 表示解除绑定。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "[in] Additional numerical IRQ priority floor."
+msgstr "[in] 附加的 IRQ 优先级数值下限。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid ""
+"Success after actual priority policy checks, BUSY while publisher remains "
+"live; rejection retains no new sink."
+msgstr "实际优先级策略检查通过后成功；发布者仍活动时返回 BUSY；拒绝时不保留新接收器。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "Disconnect, disable, drain, detach IRQs, then release clock consumer."
+msgstr "断开连接、禁用、排空、撤离 IRQ，再释放时钟消费者。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid ""
+"PIO OUT0 may remain enabled: successful global stop proves disconnect, OUT "
+"NAK, no DMA, empty RX FIFO, IRQ withdrawal and publisher join before final "
+"SETTLED. No forced reset revokes an unproved accepted borrow."
+msgstr ""
+"PIO OUT0 可以继续启用：全局 stop 成功意味着在最终 SETTLED 前已证明断开连接、OUT NAK、无 DMA、RX FIFO "
+"为空、IRQ 引用撤离且发布者退出。强制复位不能撤销尚未证明安全释放的已接受借用。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "[in] Serialized owner; external observers must also join."
+msgstr "[in] 串行化的所有者；还须等待外部观察者退出。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid ""
+"Success ends provider access to endpoint/ring/wake storage; BUSY retains all"
+" storage and 48MHz ownership until actual progress."
+msgstr "成功结束 provider 对端点/环/wake 存储的访问；BUSY 保留全部存储及 48MHz 所有权，直到实际推进。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "Admit one asynchronous remote wake pulse without a busy wait."
+msgstr "准入一个异步远程唤醒脉冲，不忙等。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid ""
+"Requires an ACKed SET_FEATURE(DEVICE_REMOTE_WAKEUP) after ACKed nonzero "
+"SET_CONFIGURATION, a first real suspend observed at least 5001 us earlier, "
+"matching live System epoch and hardware SUSPSTS. Existing explicit service "
+"advances an approximately 2 ms pulse. The declared total delay bound must "
+"prove a 1..15 ms physical pulse; late service is a timing violation even "
+"after a successful clear. Core time and its epoch must remain live through "
+"SETTLED. Terminal Core fail-stop cannot promise subsequent cleanup. No "
+"worker, timer allocation, scheduler start or implicit OS wait is introduced."
+" Failed RWUSIG clear retains quarantine and controller ownership."
+msgstr ""
+"要求先有主机 ACK 的非零 SET_CONFIGURATION，再有主机 ACK 的 "
+"SET_FEATURE(DEVICE_REMOTE_WAKEUP)；首次真实挂起须至少已被观察到 5001 us，且须匹配活跃的 System "
+"epoch 与硬件 SUSPSTS。既有的显式 service 推进约 2 ms 的脉冲。声明的总延迟上限必须能证明物理脉冲处于 1..15 "
+"ms；即使信号已成功清除，service 迟到仍违反时序合同。Core 时间及其 epoch 必须持续有效直到 SETTLED。Core 的终止性 "
+"fail-stop 无法保证后续清理。不引入 worker、定时器分配、调度器启动或隐式 OS 等待。RWUSIG "
+"清除失败时保留隔离状态和控制器所有权。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "[in] Started serialized privileged unmasked controller owner."
+msgstr "[in] 已启动、串行、特权且未屏蔽 IRQ 的控制器所有者。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid ""
+"[inout] READY, finite deadline, explicit positive service bound; storage "
+"disjoint from all provider loans."
+msgstr "[inout] READY、有限截止时间及显式的正数 service 延迟上限；存储与具体实现的全部借用分离。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "SUCCESS means ACCEPTED; rejection retains no references/effects."
+msgstr "SUCCESS 表示 ACCEPTED；拒绝时不保留引用或效果。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "Cancel an accepted wake pulse while preserving its minimum duration."
+msgstr "取消已接受的唤醒脉冲，同时保留其最短持续时间。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid ""
+"Cancel and device stop cannot revoke the pulse or request early. Service "
+"must still withdraw the signal and release-publish SETTLED."
+msgstr "取消及设备停机均不能提前撤销脉冲或请求。仍须通过 service 撤回信号，并以 release 发布 SETTLED。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "[in] Same serialized privileged unmasked controller owner."
+msgstr "[in] 同一个串行、特权且未屏蔽 IRQ 的控制器所有者。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "[inout] Exact accepted request incarnation, still alive."
+msgstr "[inout] 精确的已接受请求代次，仍须保持有效。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "SUCCESS requests drain; failures retain every prior loan."
+msgstr "SUCCESS 表示请求排空；失败保留此前全部借用。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "Caller-owned remote wake pulse, borrowed until acquire SETTLED."
+msgstr "调用者持有的远程唤醒脉冲；持续借用直到以 acquire 观察到 SETTLED。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid ""
+"Prepare base with a finite Core deadline. max_service_delay_us is a positive"
+" product proof bound for total pulse scheduling, preemption, interrupt "
+"masking and signal-withdrawal delay, at most 12998 us. It is a caller "
+"guarantee, never a measured scheduler guarantee."
+msgstr ""
+"使用有限 Core 截止时间准备 base。max_service_delay_us "
+"是由产品证明的正数上限，覆盖整个脉冲调度、抢占、中断屏蔽及信号撤回延迟，最大为 12998 us。这是调用者的保证，绝不是经实测的调度器保证。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "UNKNOWN after reset; ENUMERATED publishes the observed speed."
+msgstr "复位后为 UNKNOWN；ENUMERATED 发布观察到的速度。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "Host-ACKed DEVICE_REMOTE_WAKEUP; false when unselected."
+msgstr "主机已 ACK 的 DEVICE_REMOTE_WAKEUP；未选定时为 false。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "Shared readonly packet methods; context is a selected endpoint."
+msgstr "共享只读数据包方法；上下文为选定端点。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:31
+msgid "Controller identity remains separate from endpoint identities."
+msgstr "控制器身份与端点身份保持分离。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:35
+msgid "usb_host.h"
+msgstr "usb_host.h"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid "Logical USB host pipes and caller-owned packet loans."
+msgstr "逻辑 USB Host pipe 与调用者拥有的 packet 借用。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+#: ../../../../../../docs/reference/api/io/usb.md:43
+msgid "Typedefs"
+msgstr "类型定义"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid "Assembly-local logical pipe identity, independent of HCD channels."
+msgstr "装配内逻辑 pipe 身份，独立于 HCD channel。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid "Prepare a host packet without accessing or borrowing its bytes."
+msgstr "准备 Host 包，不访问或借用其字节。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid "[inout] Initialized unborrowed storage."
+msgstr "[inout] 已初始化且未被借用的存储。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid "[inout] Packet buffer; NULL only for zero OUT packets."
+msgstr "[inout] 包 buffer；仅零长度 OUT 包允许 NULL。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid "[in] Actual writable IN storage or readable OUT extent."
+msgstr "[in] 实际可写 IN 存储或可读 OUT 范围。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid "[in] Requested packet bytes, at most the configured MPS."
+msgstr "[in] 所请求的包字节数，最多为已配置 MPS。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid "[in] Select the eight-byte SETUP data packet on an OUT control pipe."
+msgstr "[in] 选择 OUT control pipe 上的八字节 SETUP 数据包。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid "[in] Explicit DATA toggle; false for single-transaction ISO."
+msgstr "[in] 显式 DATA toggle；单次 ISO 事务使用 false。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid "[in] Absolute Core deadline, independent of USB SOF."
+msgstr "[in] 绝对 Core deadline，独立于 USB SOF。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid "SUCCESS, INVALID or STATE; rejection retains no storage."
+msgstr "SUCCESS、INVALID 或 STATE；拒绝不保留存储。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid "Configure an idle logical pipe for one endpoint target."
+msgstr "为一个 endpoint target 配置 idle 逻辑 pipe。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid "Serialized privileged unmasked task; no hub split transaction policy."
+msgstr "串行调用的特权、未屏蔽中断 task；不提供 hub split 事务策略。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid "[in] Stable controller face, successful external power handover."
+msgstr "[in] 稳定的 controller face，外部供电交接已成功。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid "[in] Selected logical identity, separate from endpoint address."
+msgstr "[in] 所选逻辑身份，与 endpoint 地址分别表达。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid "[in] Readable target facts, copied before return."
+msgstr "[in] 可读目标事实，返回前复制。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid "SUCCESS or rejection; no transfer buffer is borrowed."
+msgstr "SUCCESS 或拒绝；不借用传输 buffer。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid "Release an idle pipe after its IRQ and hardware references drain."
+msgstr "IRQ 与硬件引用排空后释放 idle pipe。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid "[in] Same serialized controller owner."
+msgstr "[in] 同一个串行调用的 controller owner。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid "[in] Same logical identity used to open the pipe."
+msgstr "[in] 打开 pipe 时使用的同一逻辑身份。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid "SUCCESS, BUSY or rejection; failure retains pipe responsibility."
+msgstr "SUCCESS、BUSY 或拒绝；失败保留 pipe 责任。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid "Query selected packet geometry without effects or reference retention."
+msgstr "查询所选 packet 几何，不产生作用或保留引用。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid ""
+"Pure bounded task work, no peripheral MMIO, hardware admission, allocation "
+"or storage borrow. Submit still validates current state, the actual extent, "
+"alignment, aliases and selected memory domain. An absent optional query is "
+"explicit UNSUPPORTED, never a default alignment or capacity assumption. Zero"
+" OUT length queries the real minimum extent needed by the selected "
+"transport."
+msgstr ""
+"纯、有界任务操作，不执行外设 MMIO、硬件准入、分配或存储借用。提交仍验证当前状态、实际跨度、对齐、别名与所选内存域。缺少可选 query 时明确返回"
+" UNSUPPORTED，不假定默认对齐或容量。OUT 长度为零时，查询所选 transport 实际需要的最小跨度。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid "[in] Stable started controller under its serialized task owner."
+msgstr "[in] 已启动的稳定控制器，由其串行任务 owner 管理。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid "[in] Open logical pipe; direction and MPS belong to that pipe."
+msgstr "[in] 已打开逻辑 pipe；方向与 MPS 属于该 pipe。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid "[in] Requested packet payload bytes, at most its MPS."
+msgstr "[in] 请求的 packet payload 字节数，至多为其 MPS。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid "[out] Separate ordinary writable output, unchanged on rejection."
+msgstr "[out] 独立的普通可写输出，拒绝时不变。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid "SUCCESS, INVALID, STATE, CONTEXT or UNSUPPORTED."
+msgstr "SUCCESS、INVALID、STATE、CONTEXT 或 UNSUPPORTED。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid "Admit one packet with no implicit retry or terminating ZLP."
+msgstr "准入一个包，不隐式重试或发送结束 ZLP。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid ""
+"IN capacity must cover MPS. DMA buffers also require aligned reviewed DMA-"
+"visible storage. PIO OUT returns BUSY without borrowing when the selected "
+"FIFO or request queue cannot accept the complete packet. "
+"Control/bulk/interrupt NAK/NYET settles as NACK for explicit retry. ISO "
+"admits one DATA0 opportunity; frame/error failure settles IO after actual "
+"withdrawal, without implicit retry or interval scheduling. Copied PIO OUT "
+"FIFO data may retain recovery responsibility until a controller stop that "
+"also joins its other pipes."
+msgstr ""
+"IN 容量必须覆盖 MPS。DMA 缓冲还要求已审 DMA 可见存储并满足对齐。所选 FIFO 或请求队列无法接纳完整 packet 时，PIO OUT"
+" 返回 BUSY，不建立借用。Control／bulk／interrupt 的 NAK／NYET 以 NACK 结清，由调用者显式重试。ISO "
+"只接纳一次 DATA0 机会；帧／错误失败在实际撤回后以 IO 结清，不隐式重试或调度 interval。已复制的 PIO OUT FIFO "
+"数据可保留恢复责任，直到控制器 stop 同时等待其他 pipe 退出。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid "[in] Stable started controller and privileged task executor."
+msgstr "[in] 稳定、已启动的 controller 与特权 task 执行者。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid "[in] Configured logical pipe identity."
+msgstr "[in] 已配置逻辑 pipe 身份。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid "[inout] READY request alive until acquire-observed SETTLED."
+msgstr "[inout] READY 请求，持续有效直到 acquire 观察 SETTLED。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid "SUCCESS means ACCEPTED; rejection has no retained references."
+msgstr "SUCCESS 表示 ACCEPTED；拒绝不保留引用。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid "Request pipe halt without revoking a packet loan."
+msgstr "请求停止 pipe，不撤销 packet 借用。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid "[in] Original logical identity of the accepted request."
+msgstr "[in] 已接纳请求的原始逻辑身份。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid "[inout] Exact accepted incarnation, still alive."
+msgstr "[inout] 已被接受且仍有效的精确 incarnation。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid "SUCCESS requests drain; failed drain retains the same request."
+msgstr "SUCCESS 表示已请求排空；排空失败保留同一个 request。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid "Advance all selected pipes with bounded task work."
+msgstr "通过有界任务操作推进全部所选 pipe。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid "A callback alone never proves buffer release. No worker is created."
+msgstr "单凭 callback 不能证明 buffer 已归还。不创建 worker。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid "[in] Stable privileged unmasked task owner."
+msgstr "[in] 稳定、特权且未屏蔽中断的 task owner。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid "SUCCESS or BUSY; late hardware progress can settle quarantine."
+msgstr "SUCCESS 或 BUSY；迟到的硬件进展可能使隔离请求结算。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid "Read host connection and frame facts without retaining output."
+msgstr "读取 Host 连接与 frame 事实，不保留输出。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid "After successful stop, cold facts are copied without gated MMIO."
+msgstr "成功 stop 后复制冷态事实，不访问已门控的 MMIO。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+#: ../../../../../../docs/reference/api/io/usb.md:43
+msgid "[out] Disjoint caller storage, unchanged on rejection."
+msgstr "[out] 不重叠的调用者存储，拒绝时保持原值。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid "SUCCESS or rejection; no physical speed qualification is inferred."
+msgstr "SUCCESS 或拒绝；不据此推导物理速度资格。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid "Reset a connected idle port using the independent absolute deadline."
+msgstr "使用独立的绝对 deadline 复位已连接的空闲端口。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid ""
+"Admission requires strictly more than 10 ms plus one microsecond of clock-"
+"quantization guard; insufficient or expired budget returns TIMEOUT without "
+"port effects. An admitted reset keeps its minimum signal even if preemption "
+"crosses the deadline, then reports TIMEOUT after withdrawal. Failed "
+"withdrawal closes admission and retains the controller until stop can join "
+"the signal. An invalid or persistently frozen Core clock observes a terminal"
+" fault and parks with effects retained; it cannot authorize a short signal."
+msgstr ""
+"准入预算必须严格大于 10 ms + 1 µs，其中 1 µs 为时钟量化裕量。预算不足或已过期时返回 TIMEOUT，不产生 port 效果。已准入的"
+" reset 即使因抢占越过 deadline，也保持最小信号时长，完成撤回后再报告 TIMEOUT。撤回失败将关闭后续准入并保留 "
+"controller，直到 stop 能够 join 该信号。Core "
+"时钟无效或持续冻结时，触发终止故障观察并在保留效果的情况下停驻；这不能成为缩短信号的依据。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid "[in] Same controller owner; all pipe loans are settled."
+msgstr "[in] 同一控制器 owner；全部 pipe 借用均已结清。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid "[in] Finite absolute Core deadline."
+msgstr "[in] 有限的绝对 Core deadline。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid "SUCCESS or failure; reset never revokes an active request."
+msgstr "SUCCESS 或失败；reset 不撤销活跃 request。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid "Suspend or resume an idle host port without stopping Core time."
+msgstr "挂起或恢复空闲 Host 端口，不停止 Core 时间。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid ""
+"Resume requires strictly more than 20 ms plus one microsecond of clock-"
+"quantization guard before port effects. Its admitted minimum hold, late "
+"TIMEOUT, retained withdrawal and terminal clock-failure rules match reset. A"
+" late completed resume still publishes the actual resumed state; it does not"
+" retain a stale suspended snapshot solely because the deadline elapsed."
+msgstr ""
+"resume 必须在产生 port 效果前取得严格大于 20 ms + 1 µs 的预算，其中 1 µs 为时钟量化裕量。准入后的最小保持、迟到 "
+"TIMEOUT、撤回责任保留及终止时钟失败规则与 reset 相同。迟到但已完成的 resume 仍发布实际恢复状态，不会只因 deadline "
+"已过而保留陈旧的 suspended 快照。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid "[in] Same serialized owner with settled pipe loans."
+msgstr "[in] 同一串行 owner，pipe 借用已结清。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid "[in] Requested suspended state."
+msgstr "[in] 所请求的挂起状态。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid "SUCCESS after readback or failure retaining controller ownership."
+msgstr "读回成功后返回 SUCCESS；失败保留 controller 所有权。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid "Halt, drain FIFOs/DMA, detach IRQ and release the host transport."
+msgstr "Halt、排空 FIFO／DMA、解绑 IRQ，再释放 Host transport。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid ""
+"External VBUS power must remain authorized until successful stop. Power "
+"switch control belongs to the explicit role/power owner."
+msgstr "外部 VBUS 供电授权必须持续到 stop 成功。电源开关控制由显式 role／power owner 负责。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid "[in] Same owner, observers independently joined by caller."
+msgstr "[in] 同一 owner，观察者由调用者独立 join。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid "SUCCESS ends transport access; failure retains all required state."
+msgstr "SUCCESS 结束 transport 访问；失败保留全部所需状态。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid "A single USB packet; no automatic retry, queue or class policy."
+msgstr "单个 USB 包；没有自动重试、队列或 class 策略。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid ""
+"Query the selected pipe's storage requirements before submission. Capacity "
+"may exceed payload length, including for zero-length OUT. The provider may "
+"report OVERFLOW while safely draining a packet larger than requested length."
+msgstr ""
+"提交前查询所选 pipe 的存储要求。容量可能大于 payload 长度，零长度 OUT 也如此。provider 可在安全排空超出请求长度的 "
+"packet 时报告 OVERFLOW。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid "Minimum complete packet storage and power-of-two address alignment."
+msgstr "最小完整 packet 存储与二次幂地址对齐。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:37
+msgid ""
+"Capacity includes all selected transport accesses, not just payload. Zero "
+"capacity permits NULL storage; alignment remains positive. These facts grant"
+" neither DMA reachability nor a buffer loan."
+msgstr ""
+"容量包含所选 transport 的全部访问，不仅是 payload。容量为零允许 NULL 存储；对齐仍为正。这些事实不授予 DMA "
+"可达性或缓冲借用。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:41
+msgid "usb_otg.h"
+msgstr "usb_otg.h"
+
+#: ../../../../../../docs/reference/api/io/usb.md:43
+msgid "Explicit managed USB role and generation-bound face access."
+msgstr "显式 managed USB 角色与按 generation 约束的 face 访问。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:43
+msgid "Request an explicit role using the acquire-observed generation."
+msgstr "使用 acquire 观察到的 generation 请求显式角色。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:43
+msgid "[in] Stable initialized composite owner, serialized task only."
+msgstr "[in] 稳定且已初始化的 composite owner，仅由 task 串行调用。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:43
+msgid "[in] Current generation; stale controls reject purely."
+msgstr "[in] 当前 generation；旧控制纯拒绝。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:43
+msgid "[in] OFF, DEVICE or HOST; no ID/SRP/HNP policy is inferred."
+msgstr "[in] OFF、DEVICE 或 HOST；不推定 ID／SRP／HNP 策略。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:43
+msgid "[in] Finite absolute Core deadline for the handover."
+msgstr "[in] 交接的有限绝对 Core deadline。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:43
+msgid "SUCCESS accepts; failed drain never revokes old packet loans."
+msgstr "SUCCESS 表示接受；排空失败绝不撤销旧包借用。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:43
+msgid "Advance one bounded role, drain and power observation step."
+msgstr "推进一个有界角色、排空与供电观察步骤。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:43
+msgid "[in] Same privileged unmasked task and stable owner."
+msgstr "[in] 同一个特权、未屏蔽中断的 task 与稳定 owner。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:43
+msgid "BUSY while pending, or final transition/latched power error."
+msgstr "pending 时返回 BUSY，否则返回最终转换结果／锁存的供电错误。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:43
+msgid "Copy authoritative role facts without hardware side effects."
+msgstr "复制权威角色事实，不产生硬件副作用。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:43
+msgid "[in] Stable owner; factory lookup never initializes it."
+msgstr "[in] 稳定 owner；factory 查询不初始化它。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:43
+msgid "SUCCESS or rejection before modifying caller storage."
+msgstr "SUCCESS 或在修改调用者存储前拒绝。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:43
+msgid "Return the stable Device face only in its ready current generation."
+msgstr "仅在当前 generation 已 ready 时返回稳定的 Device face。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:43
+msgid "[in] Stable initialized owner."
+msgstr "[in] 稳定且已初始化的 owner。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:43
+msgid "[in] Current generation obtained from state."
+msgstr "[in] 从 state 获取的当前 generation。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:43
+msgid "Existing immutable face or NULL; never starts a transport."
+msgstr "已有不可变 face 或 NULL；不启动 transport。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:43
+msgid "Return the stable Host face only in its ready current generation."
+msgstr "仅在当前 generation 已 ready 时返回稳定的 Host face。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:47
+msgid "usb_profile.h"
+msgstr "usb_profile.h"
+
+#: ../../../../../../docs/reference/api/io/usb.md:49
+msgid "Selected-only immutable USB facts."
+msgstr "仅针对选定实例的不可变 USB 事实。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:49
+msgid "Selection facts are not observed physical qualification."
+msgstr "选定事实不构成经实际观测建立的物理资格。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:49
+msgid "Validate exact selected FS/HS facts without observing the controller."
+msgstr "校验精确的选定 FS/HS 事实，不观测 controller。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:49
+msgid ""
+"Task/ISR bounded and read-only. Facts identify selected software support; "
+"they never imply PCB routing, VBUS wiring or physical qualification. Public "
+"metadata, endpoint arrays, faces and operations tables require their natural"
+" C alignment and nonwrapping extents. Numeric rejection is not a probe of "
+"arbitrary addresses or opaque private contexts. EP0 selects control/64; "
+"nonzero bulk selects 8/16/32/64-byte MPS at FS or 512 at HS. Interrupt "
+"selects nonzero IN/OUT with 1..64-byte MPS at FS or 1..1024 at HS. ISO "
+"selects 1..1023 bytes at FS or 1..1024 at HS, with one transaction per "
+"opportunity; full FIFO admission remains the controller's duty. ISO never "
+"supports STALL or ACK guarantees. Its request selects next-frame parity, "
+"keeps a finite remaining deadline of at most one second and never retries a "
+"missed opportunity. ULPI ISO submission requires an observed speed; FS "
+"fallback caps MPS at 1023. External descriptors own interval and "
+"synchronization; this profile does not schedule a periodic stream."
+msgstr ""
+"在 Task／ISR 中有界且只读。事实标识选定的软件支持；绝不表示 PCB 布线、VBUS 接线或物理资格。公共元数据、endpoint "
+"数组、face 及 operations table 须按其 C 类型自然对齐，存储范围不能回绕。数值检查中的拒绝不能用于探测任意地址或不透明的私有 "
+"context。EP0 选择 control/64；非零 bulk 在 FS 选择 8/16/32/64-byte MPS，在 HS 选择 "
+"512-byte MPS。interrupt 选择非零 IN/OUT，FS MPS 为 1..64-byte，HS 为 1..1024。ISO 在 FS"
+" 选择 1..1023-byte、HS 选择 1..1024-byte，每次机会一个 transaction；完整 FIFO 准入仍由 "
+"controller 负责。ISO 不支持 STALL 或 ACK 保证。请求选择下一帧奇偶，剩余有限 deadline "
+"至多一秒，错过机会不重试。ULPI ISO 提交要求已经观察到 speed；FS 回退将 MPS 限为 1023。interval 与同步由外部 "
+"descriptor 负责，该 profile 不调度周期流。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:49
+msgid "[in] Stable readable immutable facts, faces and endpoint array."
+msgstr "[in] 稳定、可读且不可变的事实、face 及 endpoint 数组。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:49
+msgid ""
+"Success or INVALID, including misaligned public metadata; no allocation, "
+"MMIO, discovery or lifecycle effect."
+msgstr "成功或 INVALID，公共元数据未对齐也会拒绝；不分配内存，不访问 MMIO，不发现设备，也不影响生命周期。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:49
+msgid "Find a direction in a previously validated immutable profile."
+msgstr "在先前已校验的不可变 profile 中查找一个方向。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:49
+msgid ""
+"Task/ISR read-only bounded lookup; all input lifetimes remain external."
+msgstr "在 Task／ISR 中执行只读有界查找；所有输入的生命周期仍由外部管理。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:49
+msgid "[in] Stable validated selected facts and endpoint array."
+msgstr "[in] 稳定、已校验的选定事实及 endpoint 数组。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:49
+msgid "[in] Endpoint number, independent of direction."
+msgstr "[in] 与方向独立的 endpoint 编号。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:49
+msgid "[in] IN direction when true; OUT when false."
+msgstr "[in] true 表示 IN 方向；false 表示 OUT 方向。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:49
+msgid ""
+"Selected stable member or NULL, including misaligned profile/array metadata."
+" No new endpoint can be discovered."
+msgstr "返回选定的稳定成员或 NULL；profile／array 元数据未对齐时也返回 NULL。不能发现新 endpoint。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:49
+msgid "Reject one published SETUP epoch by a checked EP0 IN STALL."
+msgstr "通过经检查的 EP0 IN STALL 拒绝一个已发布的 SETUP epoch。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:49
+msgid ""
+"Same privileged unmasked single task executor. The provider checks its "
+"published epoch and performs STALL in one local IRQ critical section, "
+"preserving the incoming mask. This excludes an already software-published "
+"replacement SETUP; it does not promise atomicity with physical bus packets "
+"not yet collected by the IRQ. No cancellation, global stop, allocation, "
+"class policy or address commit is implicit."
+msgstr ""
+"使用同一个特权单 Task 执行者，进入时中断未屏蔽。provider 在同一局部 IRQ 临界区中检查其已发布的 epoch 并执行 "
+"STALL，保留进入时的 mask。该保护排除已由软件发布的替代 SETUP；不保证与尚未被 IRQ "
+"采集的物理总线包之间的原子性。不隐含取消、全局停止、内存分配、class 策略或地址提交。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:49
+msgid "[in] Stable selected decision face, same controller owner."
+msgstr "[in] 稳定的选定 decision face，使用同一个 controller owner。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:49
+msgid "[in] Nonzero software-published SETUP identity to reject."
+msgstr "[in] 要拒绝的非零、已由软件发布的 SETUP 身份。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:49
+msgid ""
+"Success after guarded STALL readback; STATE for a superseded epoch/closing "
+"source, BUSY while either EP0 packet is live, INVALID for malformed "
+"metadata, CONTEXT for an invalid executor, IO for failed STALL readback, or "
+"UNSUPPORTED without the optional operation. Rejection retains no loan."
+msgstr ""
+"guard 检查及 STALL 读回成功后返回成功；epoch 已被替代或源正在 closing 时返回 STATE，任一 EP0 packet "
+"仍活动时返回 BUSY，元数据不合法时返回 INVALID，执行者不合法时返回 CONTEXT，STALL 读回失败时返回 IO，未提供可选操作时返回 "
+"UNSUPPORTED。拒绝不保留借用。"
+
+#: ../../../../../../docs/reference/api/io/usb.md:49
+msgid "Optional epoch-bound EP0 rejection, separate from generic ops."
+msgstr "可选的 epoch 绑定 EP0 拒绝接口，与 generic ops 独立。"

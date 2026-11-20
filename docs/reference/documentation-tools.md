@@ -1,164 +1,73 @@
 ---
-id: reference.documentation_tools
+id: reference.documentation-tools
 type: reference
 audience: maintainer
-source_language: en
+source_language: zh_CN
 ---
 
-# Documentation tools and preparation
+# 文档工具与执行边界
 
-Use this reference to prepare one maintained documentation environment. The
-qualified build tuple is Linux x86_64 with CPython 3.12. The local preparation
-uses CPython 3.12.14; CI selects the same patch version. Documentation tool
-qualification does not grant firmware, hardware or product qualification.
+文档只有一个工具入口 `tools/documentation/cli.py`，`tools/dev/dev.py docs` 调用它。
+选定源码的工具锁、Python 哈希要求和许可记录共同确定实际环境，正文不另维护版本表。
 
-First prepare the [fixed source and recursive dependencies](../guides/source-checkout.md).
-The manifest and tool lock must come from the same selected source revision.
+## 工具来源与准备
 
-## The authoritative closure
+`dependencies/docs-tools.lock.json` 维护目标约束、原生归档和许可；
+`dependencies/docs-python-linux-cp312.txt` 是精确版本及 SHA-256 的完整 Python 闭包，
+`docs/sphinx/requirements.txt` 只引用它。工具包括 Sphinx／MyST、Breathe／Doxygen、
+Graphviz、polib 和锁定 CJK 字体。公开 API 来自当前公共头，不扫描私有 SDK 或测试实现。
 
-`dependencies/docs-tools.lock.json` owns archive identities, target constraints,
-direct requirements and license provenance. The complete Python dependency set
-is also expressed in `dependencies/docs-python-linux-cp312.txt`, using exact
-versions and SHA-256 hashes. `docs/sphinx/requirements.txt` references that file;
-it does not define another resolver input.
-
-| Tool or resource | Maintained identity | Role |
-|---|---|---|
-| Sphinx | 7.4.7 | Strict HTML and gettext builders |
-| MyST parser | 4.0.1 | Markdown directives, roles and navigation |
-| Breathe | 4.35.0 | Public API from fresh Doxygen XML |
-| Docutils | 0.21.2 | Structured document processing |
-| Alabaster | 0.7.16 | Local HTML theme assets |
-| polib | 1.2.0 | Translation catalog validation |
-| Python closure | 28 individually hashed wheels | All runtime transitive packages |
-| Doxygen | Official Linux 1.14.0 archive | Public header XML and HTML |
-| Graphviz | Debian 2.42.4-3 archives | Reviewed DOT diagrams |
-| Noto CJK | Debian 20240730+repack1-1 archive | Exact CJK glyphs and metrics |
-| Native closure | 46 individually hashed Debian archives | Loader, libraries, renderers and font data |
-
-The native closure includes its libc loader, C/C++ runtime libraries, Graphviz
-core/dot/Pango plugins, fontconfig and each library actually linked by those
-executables and renderers. Preparation executes the locked loader's `--list`
-operation and rejects paths outside the prefix. It removes unsupported renderers
-instead of discovering host GTK, GD or Ghostscript installations. This tool set
-supports the maintained DOT/SVG/Cairo diagram path, not every Graphviz renderer.
-
-Linux kernel, the CPython/venv bootstrap, `dpkg-deb` and a POSIX shell are explicit
-host prerequisites. Their observed values belong to the preparation receipt.
-This lock does not claim a reproducible host image or a bitwise identical kernel.
-
-## Prepare a fresh prefix
-
-Run from the repository root, with CPython 3.12 available:
+正式工具 tuple 为 Linux x86_64、CPython 3.12。kernel、CPython／venv bootstrap、
+`dpkg-deb` 和 POSIX shell 为明确主机前提，其实际值记录在安装收条中。
+从平台根选择新的 prefix 与缓存目录：
 
 ```sh
 python3.12 tools/documentation/install.py \
-    --prefix build/docs-tools --cache build/docs-tool-cache
+  --prefix build/docs-tools --cache build/docs-tool-cache
 ```
 
-Preparation may download archives over HTTPS. It verifies the entire archive
-closure before creating the prefix. Wheel installation then uses `--no-index`,
-`--find-links` and `--require-hashes`; no transitive package is left for a fresh
-online resolution. Native packages are extracted locally without `sudo` or
-system package installation.
+准备阶段允许 HTTPS 获取已锁定归档，逐项校验后才建立 prefix；Python 安装使用
+`--no-index`、`--find-links` 与 `--require-hashes`。原生库和字体在本地解包，无需
+sudo，不静默发现宿主的其他 Graphviz renderer。loader／库／font 与许可闭包都需匹配。
 
-For an independent installation from a previously prepared cache:
+已准备缓存可离线恢复到另一个新 prefix：
 
 ```sh
 python3.12 tools/documentation/install.py \
-    --prefix build/docs-tools-restored --cache build/docs-tool-cache --offline
+  --prefix build/docs-tools-restored --cache build/docs-tool-cache --offline
 ```
 
-The expected result is exit code zero and `installation.json` in the fresh
-prefix. It records the lock digest, observed tool versions, kernel, resolved ELF
-closure, archive digests, installed file digests and copied license digests.
-The installed `bin/fc-match` must resolve `Noto Sans CJK SC` from the locked font
-package. A missing archive, changed byte, failed command or mismatched font fails
-preparation and leaves no success prefix.
+成功为退出零和新 prefix 的 `installation.json`。缺归档、变更字节、错误字体或
+许可不完整必须拒绝；不覆盖已存在 prefix，不用在线下载静默修复损坏缓存。
 
-An existing prefix is rejected. Choose a fresh path for an upgrade; do not
-silently mutate an installation already referenced by build evidence. Archive
-cache corruption also fails rather than being silently replaced by a download.
+## 入口与范围
 
-## Use the single documentation CLI
+| 命令 | 责任 |
+| --- | --- |
+| `docs doctor --tool-prefix <prefix>` | 核对工具、锁与许可；不安装或下载 |
+| `docs check` | 本地源、链接、四元数据和所需配置输入检查 |
+| `docs build --mode preview --language zh_CN` | 当前写作预览，保留缺译与原文回退状态 |
+| `docs build --mode verify --language all` | 公开 API、当前消息与两语言完整性验证 |
+| `docs test` | 运行文档工具的实际测试，拒绝空、跳过或陈旧结果 |
+| `docs serve --build <output>` | 只服务已完成且身份有效的当前输出 |
 
-Run the maintained CLI with the prepared Python and explicit tool prefix:
+正文根固定为 `docs/`。生成 XML、POT、翻译 stage、语言 HTML 和收条放在拥有的输出
+目录，不能写回作者 PO。配置、公共头、工具锁或翻译改变时按真实输入使阶段缓存失效。
+公开头未改变时可复用验证过字节身份的 API 中间产物，不复用前次成功报告。
 
-```sh
-build/docs-tools/venv/bin/python tools/dev/dev.py docs doctor \
-    --tool-prefix build/docs-tools
-build/docs-tools/venv/bin/python tools/dev/dev.py docs check \
-    --report build/docs-check.json
-build/docs-tools/venv/bin/python tools/dev/dev.py docs build \
-    --tool-prefix build/docs-tools --language all --output build/documentation
-```
+## 浏览、搜索与许可
 
-`install.environment(prefix)` returns a verified subprocess environment with the
-locked tool executables first on `PATH`. `install.diagnose(prefix)` rejects a
-changed lock, changed installed file or changed license before reporting tool
-identity. Neither operation installs or downloads tools. Builds must generate
-fresh XML and HTML; a former successful output cannot rescue a failed command.
+主题和搜索资源为本地文件。两语言使用各自索引；中文 tokenizer 无外部词典依赖，
+查询可混合 C 标识符和汉字。语言切换只指向实际语言输出；搜索与正文展示当前来源、
+模式和实际语言，不把 preview 或旧索引标成正式内容。
 
-The `scripts/tools/docs.py`, `.sh`, `.ps1` and `.bat` entries only forward to this
-CLI. Legacy `all`, `doxygen` and `sphinx` targets all select the same complete
-strict build. Removed generation modifiers are rejected; wrappers cannot create
-a fallback Doxyfile or Sphinx configuration. Windows and macOS wrappers preserve
-CLI forwarding, while a formal build still requires the maintained Linux tuple.
+可选布局回归使用已有 Chromium／Playwright，脚本
+`tools/documentation/check_browser_layout.py` 不安装浏览器。它只证明所执行页面、
+浏览器和视口；完整站点或硬件验收分别记录。
 
-## Replay the API mobile-layout regression
+每份归档保留 wheel、原生包、Doxygen 和字体许可；共享许可引用须在 prefix 内闭合。
+工具升级先审查上游变化与许可，再更新唯一锁与要求，执行在线准备、独立离线恢复、
+相应工具测试、双语验证和图形检查。工具版本号本身不是成功证据。
 
-This optional diagnostic needs an existing Chromium and Playwright in addition
-to the documented Sphinx tuple. It never installs tools. Use a separate prepared
-browser test environment; the formal documentation build and default stdlib test
-suite do not import Playwright.
-
-Run from the repository root, supplying the existing browser executable:
-
-```sh
-python tools/documentation/check_browser_layout.py \
-    --chromium /path/to/chromium --report build/quality/api-layout.json
-```
-
-The helper builds a temporary English/Chinese C API fixture from the production
-theme. At 390 CSS pixels it checks long signatures, unchanged symbols and anchors,
-complete code and table content with internal scrolling, and an unclipped page.
-Missing tools or failed checks return nonzero. A successful receipt qualifies
-only that fixture and observed browser; full-site responsive acceptance and
-deployment remain separate.
-
-## Search the current site
-
-The English and Chinese search pages use their own local Sphinx index and
-current-language metadata. The Chinese tokenizer has no external dictionary
-dependency and accepts Han character sequences and Latin identifiers. Separate
-keywords with whitespace for combined queries, such as `借用 排空` or `借用 HAL`.
-
-Results show the version, content type, source and actual language, and body
-excerpts. Search assets load only on the search page. Archive links and original
-qualification records retain their frozen source and language scope.
-
-## CI permission boundary
-
-`docs-build.yml` has only `contents: read`. It prepares the locked tools,
-checks source, executes the documentation tool suite and builds both languages.
-Only successful build output and actual reports enter its CI artifact. Artifact
-upload does not establish deployment or firmware acceptance. Pages publication,
-archive recovery and software candidate promotion are outside this workflow.
-
-## License and upgrade handling
-
-Each native archive carries its Debian copyright files. The locked `base-files`
-archive supplies every referenced complete text in `licenses/common-licenses/`;
-preparation rejects a missing shared license reference. Wheel license files are
-copied from the verified wheel; the five upstream wheels which omit license text
-use checked-in texts extracted from their exact verified source distributions.
-The lock records source archive digest, member and extracted text digest. The
-Doxygen archive carries its complete license text. Preparation copies these
-texts into `prefix/licenses/`; retain that license payload when redistributing tools.
-
-To upgrade, review upstream changes and licenses, resolve one new exact closure,
-update both lock and hash requirements, execute a fresh online preparation and
-an independent offline preparation, then run documentation tool tests, strict
-bilingual builds and diagram freshness checks. Retain raw failures and results;
-an updated version string alone is insufficient acceptance evidence.
+CI 使用只读仓库权限和同一入口；上传结果不表示已部署网站。具体写作与翻译流程见
+[文档维护](../development/documentation.md)。

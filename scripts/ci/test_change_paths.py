@@ -55,7 +55,7 @@ class ChangePathsTests(unittest.TestCase):
             "runtime/contracts/pyproject.toml", "runtime/contracts/poetry.lock",
             "runtime/contracts/uv.lock", ".clang-tidy", ".clang-format",
             ".clang-format-dirs", ".editorconfig", ".pre-commit-config.yaml",
-            "docs/development/coding_standards.rst",
+            "docs/development/coding-standards.md",
             "CONTRIBUTING.md", "CONTRIBUTING_CN.md",
         )
         for path in paths:
@@ -66,9 +66,12 @@ class ChangePathsTests(unittest.TestCase):
         from scripts.ci import style_gate
         from tools.dev import change_paths
 
-        standard = "docs/development/coding_standards.rst"
+        standard = "docs/development/coding-standards.md"
         self.assertIn(standard, change_paths.BEHAVIOR_DOCUMENTS)
         self.assertIn(standard, style_gate.CONTROL_FILES)
+        retired = "docs/development/coding_standards.rst"
+        self.assertNotIn(retired, change_paths.BEHAVIOR_DOCUMENTS)
+        self.assertNotIn(retired, style_gate.CONTROL_FILES)
         for paths in (change_paths.BEHAVIOR_DOCUMENTS,
                       style_gate.CONTROL_FILES):
             self.assertFalse(any(path.startswith(".kiro/") for path in paths))

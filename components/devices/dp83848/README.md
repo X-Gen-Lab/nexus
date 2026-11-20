@@ -8,5 +8,5 @@
 接口与组件状态存活，串行执行操作，提供有限 deadline，并将观察到的链路事实显式
 应用到 MAC。TI 与 NS 身份必须明确选择，未知型号拒绝。
 
-接入前阅读[以太网合同](../../../docs/design/ethernet.md)，核对寄存器来源、所有权、
+接入前阅读[以太网合同](../../../docs/reference/contracts/io/ethernet-mac.md)，核对寄存器来源、所有权、
 Board 路线和物理资格。源码接口不授权未审查的 PHY 电源、REFCLK、复位或 PCB 接线。

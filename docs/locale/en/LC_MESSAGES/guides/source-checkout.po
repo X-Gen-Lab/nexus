@@ -1,0 +1,152 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: a7b49b25bf0454db99b78bcda754c95ae010a85f2d807aa00a0c7e6aa284160a\n"
+
+#: ../../../../../../docs/guides/source-checkout.md:8
+msgid "获取源码并准备当前任务"
+msgstr "Retrieve source and prepare the current task"
+
+#: ../../../../../../docs/guides/source-checkout.md:10
+msgid ""
+"先选择要使用的平台提交。发布包从其 manifest 读取身份；阅读网站时使用 source 链接或 `documentation-"
+"build.json` 的提交。开发检出也可以明确选择一个提交并记录 它；版本号与分支名不能代替精确源码身份。"
+msgstr ""
+"First select the platform commit to consume. A release package supplies "
+"identity through its manifest. When reading the site, use its source link or"
+" the commit in `documentation-build.json`. A development checkout may also "
+"explicitly select and record a commit. Version strings and branch names do "
+"not replace exact source identity."
+
+#: ../../../../../../docs/guides/source-checkout.md:14
+msgid "获取平台与可选示例"
+msgstr "Retrieve the platform and optional examples"
+
+#: ../../../../../../docs/guides/source-checkout.md:16
+msgid "需要 Git 和网络；以下命令只取源码，不准备全部子模块："
+msgstr ""
+"Git and network access are required. These commands retrieve source only; "
+"they do not prepare all submodules:"
+
+#: ../../../../../../docs/guides/source-checkout.md:29
+msgid ""
+"检查实际 HEAD 与所选提交一致。首次应用可另取公开的 [nexus-examples](https://github.com/X-Gen-"
+"Lab/nexus-examples)固定提交；创建独立模板 只需其模板文件与清单，不要求先构建整个例库。"
+msgstr ""
+"Check that actual HEAD matches the selected commit. For a first application,"
+" also obtain a fixed commit of the public [nexus-"
+"examples](https://github.com/X-Gen-Lab/nexus-examples) repository. Creating "
+"an independent template requires only template files and their manifest, not"
+" a prior build of the entire examples repository."
+
+#: ../../../../../../docs/guides/source-checkout.md:33
+msgid "准备所选依赖"
+msgstr "Prepare selected dependencies"
+
+#: ../../../../../../docs/guides/source-checkout.md:35
+msgid "从平台根按任务选择一个入口："
+msgstr "From the platform root, select one entry point for the task:"
+
+#: ../../../../../../docs/guides/source-checkout.md:0
+msgid "当前任务"
+msgstr "Current task"
+
+#: ../../../../../../docs/guides/source-checkout.md:0
+msgid "准备方式"
+msgstr "Preparation method"
+
+#: ../../../../../../docs/guides/source-checkout.md:0
+msgid "最小 F407 裸机"
+msgstr "Minimal F407 baremetal"
+
+#: ../../../../../../docs/guides/source-checkout.md:0
+msgid "`prepare --scope preset --preset stm32-qiming-baremetal`"
+msgstr "`prepare --scope preset --preset stm32-qiming-baremetal`"
+
+#: ../../../../../../docs/guides/source-checkout.md:0
+msgid "外部应用的 TOML"
+msgstr "External application TOML"
+
+#: ../../../../../../docs/guides/source-checkout.md:0
+msgid "`prepare --scope assembly --assembly /absolute/path/assembly.toml`"
+msgstr "`prepare --scope assembly --assembly /absolute/path/assembly.toml`"
+
+#: ../../../../../../docs/guides/source-checkout.md:0
+msgid "Native 外部应用"
+msgstr "External Native application"
+
+#: ../../../../../../docs/guides/source-checkout.md:0
+msgid "上一条明确增加 `--test-support`"
+msgstr "Explicitly add `--test-support` to the preceding command"
+
+#: ../../../../../../docs/guides/source-checkout.md:0
+msgid "平台维护的完整 Native 测试"
+msgstr "Complete platform-maintenance Native tests"
+
+#: ../../../../../../docs/guides/source-checkout.md:0
+msgid "`prepare --scope native`"
+msgstr "`prepare --scope native`"
+
+#: ../../../../../../docs/guides/source-checkout.md:0
+msgid "导出源码包"
+msgstr "Export a source package"
+
+#: ../../../../../../docs/guides/source-checkout.md:0
+msgid "按[SDK 发布](../development/sdk-publishing.md)选择 package、后端和组件"
+msgstr ""
+"Select package, backend and components using [SDK "
+"publication](../development/sdk-publishing.md)"
+
+#: ../../../../../../docs/guides/source-checkout.md:45
+msgid ""
+"完整命令前缀为 `python tools/dev/dev.py`。准备器默认只验证本地输入，首次需要获取 选中依赖时明确加 `--allow-"
+"network`。普通配置和构建不隐式下载；未选库存可保持 未初始化。最小 Native 应用的闭包可以为空，不为此初始化所有 SDK 和 "
+"GoogleTest。"
+msgstr ""
+"The full command prefix is `python tools/dev/dev.py`. By default, "
+"preparation only verifies local inputs; explicitly add `--allow-network` "
+"when selected dependencies need fetching for the first time. Ordinary "
+"configuration and builds do not implicitly download anything. Unselected "
+"inventory may remain uninitialized. A minimal Native application may have an"
+" empty closure; do not initialize every SDK and GoogleTest for it."
+
+#: ../../../../../../docs/guides/source-checkout.md:49
+msgid ""
+"准备需要干净的平台检出。维护者正在升级依赖时，按[依赖维护](../development/dependencies.md) "
+"完成明确变更；普通消费者不修改锁来绕过失败。"
+msgstr ""
+"Preparation requires a clean platform checkout. Maintainers upgrading "
+"dependencies follow [dependency maintenance](../development/dependencies.md)"
+" to make explicit changes. Ordinary consumers must not edit locks to bypass "
+"failures."
+
+#: ../../../../../../docs/guides/source-checkout.md:52
+msgid "准备工具"
+msgstr "Prepare tools"
+
+#: ../../../../../../docs/guides/source-checkout.md:54
+msgid ""
+"消费工程需要 Python 3.11+、CMake 3.31+、Ninja 和对应 C 编译器。ARM 使用平台锁定 的工具链，见 "
+"`dependencies/toolchains.lock.json` 与现有安装器帮助。平台贡献者 "
+"另按[开发流程](../development/workflow.md)安装格式与提交工具。"
+msgstr ""
+"Consumer projects need Python 3.11+, CMake 3.31+, Ninja and the relevant C "
+"compiler. ARM uses the platform-pinned toolchain; see "
+"`dependencies/toolchains.lock.json` and the existing installer help. "
+"Platform contributors additionally install format and commit tools through "
+"the [development workflow](../development/workflow.md)."
+
+#: ../../../../../../docs/guides/source-checkout.md:58
+msgid ""
+"使用安装 Source SDK 时保留整个 prefix，直接按[消费指南](use-source-sdk.md)验证 和使用；不把 SDK "
+"当成带全部子模块的完整维护检出。"
+msgstr ""
+"For an installed Source SDK, retain the whole prefix and follow the "
+"[consumer guide](use-source-sdk.md) to verify and use it. Do not treat it as"
+" a complete maintenance checkout containing every submodule."

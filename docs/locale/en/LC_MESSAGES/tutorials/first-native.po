@@ -1,0 +1,114 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 337c2c884024f74febbe5a238af85f6c3801b37745f24591ed2c2f57ad6590f9\n"
+
+#: ../../../../../../docs/tutorials/first-native.md:8
+msgid "运行第一个 Native 应用"
+msgstr "Run the first Native application"
+
+#: ../../../../../../docs/tutorials/first-native.md:10
+msgid ""
+"本教程在 Linux 主机上运行一个 C11 GPIO／UART 应用，观察一次传输结清和平台停止。 Native "
+"是软件模型，需要显式启用测试支撑；本教程不运行平台完整维护测试图。"
+msgstr ""
+"This tutorial runs a C11 GPIO/UART application on a Linux host and observes "
+"one transfer settling followed by platform stop. Native is a software model "
+"requiring explicit test support. This tutorial does not execute the complete"
+" platform maintenance test graph."
+
+#: ../../../../../../docs/tutorials/first-native.md:13
+msgid "准备输入"
+msgstr "Prepare inputs"
+
+#: ../../../../../../docs/tutorials/first-native.md:15
+msgid ""
+"需要 Git、Python 3.11+、CMake 3.31+、Ninja 和主机 C 编译器。按 [获取源码](../guides/source-"
+"checkout.md)取得平台与公开示例仓库，记录所选提交。 设置路径和示例仓库的完整提交；`PRODUCT_DIR` 必须尚不存在："
+msgstr ""
+"You need Git, Python 3.11+, CMake 3.31+, Ninja and a host C compiler. Obtain"
+" the platform and public examples repository using [source "
+"retrieval](../guides/source-checkout.md), and record both selected commits. "
+"Set the paths and full examples commit. `PRODUCT_DIR` must not already "
+"exist:"
+
+#: ../../../../../../docs/tutorials/first-native.md:26
+msgid "示例模板的提交与平台提交各自记录。创建器检查模板清单及接口代际，不根据相同版本号 猜测它们是同一份源码。"
+msgstr ""
+"Record the examples-template commit separately from the platform commit. The"
+" creator checks the template manifest and interface epochs; it does not "
+"assume matching version strings identify the same source."
+
+#: ../../../../../../docs/tutorials/first-native.md:29
+msgid "创建与准备"
+msgstr "Create and prepare"
+
+#: ../../../../../../docs/tutorials/first-native.md:31
+msgid "从任意工作目录执行："
+msgstr "Run from any working directory:"
+
+#: ../../../../../../docs/tutorials/first-native.md:42
+msgid ""
+"创建器复制维护的 CMake、TOML、C 源和编辑器配置，解析所选装配，并保存 `.nexus-"
+"template.json`。输出目录已存在、模板变更或配置拒绝时，先处理诊断。 最小 Native 应用没有外部 Git 运行依赖；需要网络、TLS "
+"等组件时，准备器按 TOML 选择供应方，显式加 `--allow-network` 才允许获取它们。"
+msgstr ""
+"The creator copies maintained CMake, TOML, C source and editor "
+"configuration, resolves the selected assembly, and saves `.nexus-"
+"template.json`. If the output exists, template bytes have changed or "
+"configuration is rejected, handle the diagnostic first. A minimal Native "
+"application has no external Git runtime dependencies. When components such "
+"as networking or TLS are selected, the preparer chooses suppliers from the "
+"TOML; fetching requires explicit `--allow-network`."
+
+#: ../../../../../../docs/tutorials/first-native.md:47
+msgid "编译与运行"
+msgstr "Compile and run"
+
+#: ../../../../../../docs/tutorials/first-native.md:56
+msgid "成功时 `starter_application` 通过，直接运行生成的程序也会输出："
+msgstr ""
+"On success, `starter_application` passes. Running the generated program "
+"directly also prints:"
+
+#: ../../../../../../docs/tutorials/first-native.md:62
+msgid ""
+"这条路径执行真实应用 C，UART 由模型提供。模板使用静态请求和 payload，只有请求 真正结清后才停止平台。Native UART "
+"不连接主机串口。"
+msgstr ""
+"This path executes real application C, with UART supplied by a model. The "
+"template uses static request and payload storage and stops the platform only"
+" after the request has actually settled. Native UART does not connect to a "
+"host serial port."
+
+#: ../../../../../../docs/tutorials/first-native.md:65
+msgid ""
+"打开 `main.c`、`assembly.toml` 和 `.nexus-template.json`，分别查看执行、选择与来源。 修改应用 C "
+"后重跑 build；修改 TOML 后先检查配置，再重跑 build。"
+msgstr ""
+"Open `main.c`, `assembly.toml` and `.nexus-template.json` to inspect "
+"execution, selection and provenance respectively. After changing application"
+" C, rerun the build. After changing TOML, check configuration before "
+"rebuilding."
+
+#: ../../../../../../docs/tutorials/first-native.md:68
+msgid "下一步"
+msgstr "Next steps"
+
+#: ../../../../../../docs/tutorials/first-native.md:70
+msgid ""
+"给现有应用增加接口见[应用配置](../guides/app-configuration.md)；理解请求与执行者见 [I/O "
+"执行](../guides/io-execution.md)；构建 MCU 镜像见 [第一个 F407 "
+"工程](first-f407.md)。安装包消费见 [使用 Source SDK](../guides/use-source-sdk.md)。"
+msgstr ""
+"See [application configuration](../guides/app-configuration.md) to add "
+"interfaces, [I/O execution](../guides/io-execution.md) to understand "
+"requests and executors, and [the first F407 project](first-f407.md) to build"
+" an MCU image. For an installed package, see [use a Source "
+"SDK](../guides/use-source-sdk.md)."

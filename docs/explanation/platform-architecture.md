@@ -1,233 +1,72 @@
 ---
-id: docs-explanation-platform-architecture
+id: explanation.platform-architecture
 type: explanation
 audience: consumer
-source_language: en
+source_language: zh_CN
 ---
 
-(docs-explanation-platform-architecture)=
-# How the platform is assembled and executed
+(explanation.platform-architecture)=
+# 平台如何装配和运行
 
-Nexus is a statically assembled C11 MCU platform. It separates reusable mechanisms
-from external product policy. One authored TOML selects exact hardware and optional
-adapters; immutable I/O faces expose the chosen private providers. The application
-owns execution and recovery. These are current design boundaries, not whole-platform
-physical qualification.
+Nexus 是静态装配的 C11 MCU 平台。构建期选定硬件与容量，运行期保留真实设备状态和借用。应用取得只读接口后，直接调用选定实现；Platform 负责装配与生命周期。
 
-![Current platform layers and external product boundary](../assets/diagrams/platform-architecture.svg)
+![平台职责与外部产品边界](../assets/diagrams/platform-architecture.svg)
 
-FIG-01 expresses current layer responsibilities. Arrows describe labeled dependencies
-or access; it is not an initialization sequence.
+## 职责与状态
 
-| Layer | State and responsibility |
-| --- | --- |
-| Core | Results, monotonic deadline, request publication and stable epochs |
-| Arch | Compile-time CPU primitives; incoming masks, barriers, optional Cache/MPU/SAU |
-| SoC | Exact chip clocks, memory, startup, IRQ/DMA and controller implementation |
-| Board | Reviewed PCB routes, oscillator/safe-level facts and explicit unknowns |
-| I/O | Typed public faces and operation contracts; no vendor layout |
-| Optional OS/owner | Explicit per-object wait, task or shared-resource execution storage |
-| Optional component | Bounded algorithms through narrow ports |
-| External product | Main, workers, roles, private PCB, budgets, partitions and recovery |
-
-## Current source organization
-
-The production MCU tree contains one series package, `soc/stm32/stm32f4/`.
-The selected device, package and mode come from its reviewed catalogue; see
-[exact support](../delivery/support.md). F407 Board integration and the new
-internal-CRC software references have distinct evidence. A family directory or
-official HAL macro does not establish another part, mode or physical result.
-
-The F4 package keeps reviewed facts in `facts/`, system mechanisms in `system/`,
-and each controller's bindings, private instance layout and C implementation in
-`drivers/<domain>/`. Shared IP stays under `drivers/ip/`; `private/` holds shared
-contracts and binding fragments. `sdk/` selects official sources and private HAL
-configuration. SoC targets compile the selected sources directly.
-Native models live under `tests/support/native/` and require explicit
-`test_support=True`, CLI `--test-support` or `NEXUS_TEST_SUPPORT=ON` in CMake.
-They are test support, not a second production SoC.
-
-The [source map](source-map.md) links authoritative layer contracts. Board and
-SoC directories contain no Python plugins. The default host generator uses Python
-for validation and static connections. Core's handwritten C platform coordinator
-owns startup, stop, rollback and diagnostics; F4's private C coordinator owns
-System and shared-resource sequencing. There is one maintained host configuration
-implementation; its code is not linked into firmware.
-
-All vendor sources, Gitlinks, locks and licenses remain available. Only selected
-dependencies enter preparation, verification, compilation or Source SDK output.
-An unused SDK is neither current platform support nor a required F4 build input.
-
-## Optional network data and boot boundaries
-
-Optional network targets keep copied RX and payload-loaned RX as distinct,
-explicit stack profiles; one image selects one profile. The copied TCP byte
-face copies accepted writes into bounded stack storage. A payload-loaned RX
-frame instead has a copied writable prefix and immutable MAC-backed tails.
-Final pbuf free marks release readiness; the serialized owner performs the
-actual MAC release later. Outstanding references or failed release retain
-storage and withdrawal responsibility. The
-{ref}`network composition contract <lwip-loaned-rx-contract>` owns the exact
-public/Storage targets, capacities and failure rules. These optional components
-fit FIG-01's component boundary without adding a worker or runtime registry.
-
-MCUboot exposes distinct control and full-boot targets. The reference links the
-application and bootloader as separate images. The generic C11 control target
-requests or queries trailer state; an explicit concrete Flash port uses
-caller-owned regions, a valid clock and one finite deadline for each operation.
-Only the separate boot image selects verification and overwrite-copy code. The
-[canonical MCUboot contract and ownership diagram](../../components/protocols/mcuboot/README.md)
-own those dependencies and product reset/recovery duties. The selected profile
-provides permanent overwrite only; partial trailer writes leave product
-recovery responsibility and imply no rollback. The
-{ref}`control API <mcuboot-control-contract>` neither authenticates candidate
-bytes nor starts hardware. Source documentation, software models and linked budgets do not
-establish new firmware-candidate or physical HIL qualification.
-
-## Platform and CPU-only Runtime
-
-| Consumption entry | Provided assembly | External responsibility |
+| 层 | 负责什么 | 保持外置的内容 |
 | --- | --- | --- |
-| `Nexus::Platform` | Exact SoC/Board facts, selected providers, static factory and explicit lifecycle | Product sources, workers, budgets, storage regions and recovery |
-| `Nexus::Runtime` | Core, Arch, public I/O faces and the explicitly selected OS adapter | Startup, vectors, memory/clock facts, Board wiring and concrete device providers |
+| Core | 结果、单调 deadline、请求发布和稳定 epoch | 硬件、内核和产品策略 |
+| Arch | IRQ 状态保存恢复、屏障、原子和显式 CPU 能力 | 外设和 scheduler |
+| SoC | 精确器件、时钟、启动、内存、IRQ/DMA 与控制器 | PCB 接线与产品角色 |
+| Board | 已审 PCB 路线、晶振、电气条件和安全电平 | 业务配置和未知硬件事实 |
+| I/O | 公共领域类型、只读 face 与操作合同 | 厂商 Handle 和可变实现状态 |
+| 可选 OS | 等待、通知及真实后端对象 | 应用任务、深度、栈与停止策略 |
+| 可选组件 | 经窄端口复用的算法、设备协议和 owner | 产品协议寄存器、校准、密钥与分区 |
+| 外部产品 | main、worker、预算、区域、执行与恢复 | 平台内部实现 |
 
-One build directory admits one resolved assembly. Use separate build
-directories for different boards or CPU/security images; a product build
-coordinator or CI matrix owns their orchestration. Runtime and Platform reuse
-the same production mechanisms but are separate consumption modes.
+Core 不依赖 Arch、SoC 或 OS；I/O 依赖 Core。Provider 依赖公共 I/O、Core、Arch 和私有厂商 SDK。组件通过公共端口访问设备，OS 不成为每次 I/O 的强制中间层。
 
-The common OS boundary is the wait/wake port. Task, queue, join and storage APIs
-remain backend-specific, including the real kernel control-block types.
-Products switching kernels must adapt that lifecycle explicitly; no universal
-object pool or hidden scheduling task is supplied.
+## 构建期连接
 
-## Build-time decisions and runtime work
+一份 schema-2 TOML 表达应用选择，SoC 与 Board JSON 提供已审事实。解析器校验模式、时钟、pin、IRQ、DMA、内存域和预算，冻结为具名不可变 IR，再原子生成配置、静态实例、factory 和固定连接。CMake 拥有唯一翻译单元与软件依赖图。
 
-TOML schema 2 is the only authored platform input. The parser freezes user intent
-as `AuthoredAssembly`; `resolve_ir()` combines it with reviewed SoC/Board facts
-and validates modes, resources, clocks, IRQs, ABI, DMA reachability and budgets.
-It returns `ConfigurationIR` directly. Named frozen records hold each decision
-once; they do not expose a Mapping facade or a duplicate `values` store. Hardware
-fact leaves and keyed indexes still use immutable mappings, and local resolver
-validation drafts may use dictionaries. These are explicit data boundaries,
-not a promise to assign a separate nominal type to every JSON field.
+![配置与原子生成](../assets/diagrams/configuration-generation.svg)
 
-Factory and emitters consume the same typed result. `to_dict()` derives the
-schema-1 `resolved.json` audit/artifact projection; it is never read back as an
-authored platform input. Private typed source epoch 5 is separate from that
-serialized format and from the public C factory epoch. Old JSON assemblies are
-rejected. Historical evidence keeps its original bytes and read-only verification.
-CMake owns the source dependency graph; resolution does not discover software
-from device names or generate product workers.
+Board 和 SoC 不包含 Python 插件。通用主机工具只做校验与静态连接；硬件顺序、等待、回读、回滚和恢复直接用 C 实现。包、binding 与导出边界见[接入合同](../reference/contracts/integration.md)。
 
-An explicitly authored GPIO `active_high` value adds an immutable single-pin
-logical signal. It reuses the authorized port face and its shared ops, without
-mutable state, another hardware owner or a per-pin vtable. The strong factory
-returns that static binding or NULL when no signal is declared. Components such
-as RS485 consume logical activity; software buses still use physical levels and
-open-drain release. The GPIO initial safe level remains a separate Board fact.
+## 运行期访问
 
-Firmware execution is C11 plus necessary architecture assembly. Python runs on
-the host to validate inputs and generate static C/H; the MCU has no Python
-interpreter. Hardware algorithms belong in C: register access, admission, waits,
-resource acquisition, rollback, stop and recovery. Generation connects immutable
-configuration, exact instances, factory getters and fixed IRQ handlers. Constant
-addresses and thin typed call sequences can remain generated without adding a
-runtime interpreter or another dispatch layer.
+一个 controller 行为域只有一个 live owner。endpoint、GPIO view、逻辑 signal 和可选 face 引用已有资源，不再取得一份硬件所有权。每类实现共享只读 `ops`，每实例独立持有 `context`。
 
-F4 C owners implement admission, acquired-resource receipts, withdrawal and
-readback. The default generated plan connects fixed typed callbacks and ordinals
-from the resolved controller order to `nx_platform_lifecycle_start/stop`; the C
-engine owns the control flow and retries only the retained prefix. The existing
-`nx_lifecycle_*` reversible-resource engine remains a separate optional mechanism.
-Native support is explicitly test-scoped. Actual generated factories, models and ARM images each
-require validation; historical cross-family results do not qualify this refactor.
+factory 按生成的强类型 ID 返回已有静态 face，不分配、不初始化、不探测设备。Platform 显式启动基础设施，不启动 scheduler。应用提供请求、buffer、执行者和等待；普通同步操作不承担未选择的队列、stream 或 OS 状态。
 
-A cold receipt proves which resources this caller actually acquired. Rejection
-with an empty receipt cannot stop or overwrite an existing owner. Partial
-acquisition and failed restoration retain the original snapshot and unfinished
-effects for retry; a public peripheral stop does not discard the enclosing
-Platform lease. These checks run on the real C helpers in the register models.
-Factory lookup and ordinary I/O retain their existing direct typed paths.
+![静态 factory 与实例](../assets/diagrams/factory-instances.svg)
 
-Generated static C and maintained C use the same firmware toolchain. Moving an
-algorithm changes its maintenance and test ownership; it does not promise a
-universal resource reduction. The recorded F407 I2C owner-guard comparison saves
-RAM while increasing IRQ/DMA Flash. Linked costs and physical timing retain
-their own source, configuration and measurement requirements.
+ACCEPTED 后请求和数据持续被借用，直到 acquire 观察 SETTLED。DMA 完成、线上完成和引用撤回分别证明；取消或超时不授权提前复用。观察者、控制 handle、通知发布者和 owner 还需完成各自的 join。见[所有权](ownership.md)。
 
-![Actual compile-target dependency relationships](../assets/diagrams/build-targets.svg)
+## 启动、失败与停机
 
-FIG-02 is the checked compile graph. Vendor and provider includes remain private;
-public consumers receive Nexus types and selected compile/link policy.
+Platform 先完成所选控制器的准入，再对 System、共享资源和控制器执行有序启动。
+中途失败按已经产生的效果逆序撤回；撤回失败继续保留原 owner、存储和恢复责任，
+错误返回不表示硬件已经静默。
 
-![Authored inputs, atomic generation and firmware artifacts](../assets/diagrams/configuration-generation.svg)
+应用在停机前关闭新工作、推进已接受请求结清，并退出相关任务和观察者。
+Platform 再停止所选基础设施；它不替应用终止调度器或提前回收借用存储。
 
-FIG-03 shows current generation. Unknown and conflicting selections fail; no
-Kconfig/cache/old-header fallback repairs them. Runtime factory lookup returns an
-existing face. After explicit successful platform start, ordinary operations call
-its shared ops table with its instance context. IRQ dispatch is fixed to provider
-instances and does not repeat factory lookup for every byte.
+![显式启动、停机与失败撤回](../assets/diagrams/platform-lifecycle.svg)
 
-The selected `package.json` identifies facts, bindings, build entry and export
-ownership. The generic DataProvider reads one input snapshot and emits finite
-static connections; production no longer imports F4 Python constructors or a
-family registry. Packages with resolved `production` scope enter the maintained
-family catalogue, currently F4. Native remains an explicit test-support fixture. Package
-selection does not create another C source graph or establish execution
-qualification.
+## Platform 与 Runtime
 
-The constructor contract uses named immutable IR and direct calls for fixed
-connections. Vendor types and mutable Handles stay private. Generated definitions
-still require compiler, model and linked-image validation. The selected F407
-UART `dma-tx` transport combines finite official HAL TX and disjoint LL IRQ RX
-under one owner. Other modes retain their explicit implementations. See the
-[official driver contract](../design/official-stm32-provider.md).
+| 接入方式 | 平台提供 | 应用提供 |
+| --- | --- | --- |
+| `Nexus::Platform` | 精确 SoC/Board、选定 provider、静态 factory 和生命周期 | 应用源码、worker、区域、预算与恢复 |
+| `Nexus::Runtime` | Core、Arch、公共 I/O 及明确选定的 OS 适配 | 启动、向量、时钟/内存、Board 与具体 provider |
 
-## Lifecycle and failure responsibility
+每个构建目录只含一个工具链和装配，Runtime 与 Platform 互斥。同一装配可创建多个镜像，各镜像独立拥有 startup OBJECT。不同板卡或 CPU/安全域使用独立目录，由产品或 CI 协调。
 
-![Current initialization, failure withdrawal and retained cleanup responsibility](../assets/diagrams/platform-lifecycle.svg)
+## 当前实现位置
 
-FIG-05 shows the shared C coordinator called by fixed static connections. During
-this startup, every controller admission precedes System/resource acquisition
-and controller writes. Shared-resource or instance failure triggers reverse
-rollback; System startup separately reports primary, cleanup and retained effects.
-A static face can exist before start and after stop; its pointer grants no
-permission to operate cold hardware. Partial failure can retain irreversible
-watchdog effects or busy borrows. Products inspect both results, continue the
-real executor and retain quarantined resources. Platform start never starts a
-scheduler.
+生产系列入口为 `soc/stm32/stm32f4/`：`facts/` 提供事实，`system/` 提供系统机制，`drivers/<domain>/` 保持 binding、实例布局与 C 实现相邻，`drivers/ip/` 复用已核验算法，`sdk/` 保持官方依赖和配置私有。Native 模型位于 `tests/support/native/`，需要显式 test support。
 
-Physical Flash reports exact geometry and `program_flags`. An ECC fresh-erase
-requirement belongs to the caller's provenance contract: all-FF readback cannot
-prove unused ECC state, and a failed pulse requires another erase. All-FF source
-units issue no pulse. A started pulse must settle before return; an expired
-deadline prevents later pulses and never cancels hardware already programming.
-Products own writable regions, voltage, execution stalls, watchdog and power loss.
-
-Optional generated diagnosed start/stop entries write phase and controller
-location to caller-owned cold-path storage. They retain no diagnostic pointer
-and do not replace the primary/cleanup results or remaining-effect obligations.
-See [the diagnostic contract](../design/official-stm32-provider.md) for index
-meaning and failure responsibilities.
-The {ref}`factory diagnostic mapping <factory-controller-diagnostics>` adds named
-assembly-local ordinals and optional immutable labels; it does not create a
-device-ready state machine or a second capability object.
-
-## Costs and tradeoffs
-
-A 32-bit face contains two pointers: eight bytes of readonly storage. Provider/mode
-ops are shared; exact mutable state and selected buffers remain separate. Indirection
-lets one public interface serve independent concrete providers and GoogleMock
-ports. Its cost is one public dispatch and code/readonly table retention; actual
-Flash/RAM and timing are measured on the selected linked image.
-
-Static assembly rejects conflicts early and prunes unselected drivers. It deliberately
-forgoes hotplug discovery, runtime string registries, arbitrary dynamic clock changes
-and automatic recovery policy. Optional shared owners add explicitly budgeted slots
-and synchronization; direct single-executor paths need no default OS lock or worker.
-
-Read [factory](factory.md), [ownership](ownership.md), the
-[integration contract](../design/integration-contracts.md) and
-[exact support](../reference/platforms/support.md). Architecture diagrams explain
-mechanisms; tests, image checks and HIL establish their separate execution scopes.
+当前精确支持见[平台参考](../reference/platforms/support.md)，维护入口见[源码地图](../development/source-map.md)。文件或厂商库存在，不建立另一个型号、模式或实板验证结论。

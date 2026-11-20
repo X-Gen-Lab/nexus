@@ -236,7 +236,7 @@ class WorkflowContracts(unittest.TestCase):
                                      'Traced builds need their own finite budget')
 
 
-    def test_docs_preview_has_no_deployment_permissions(self):
+    def test_docs_validation_has_no_deployment_permissions(self):
         document = workflow('docs-build.yml')
         self.assertEqual(document['permissions'], {'contents': 'read'})
         caller = workflow('ci.yml')['jobs']['docs']
@@ -250,9 +250,17 @@ class WorkflowContracts(unittest.TestCase):
         commands = '\n'.join(step.get('run', '') for step in steps)
         self.assertIn('tools/documentation/install.py', commands)
         self.assertIn('tools/documentation/cli.py test', commands)
-        self.assertIn('tools/documentation/cli.py check', commands)
+        self.assertNotIn('tools/documentation/cli.py check', commands)
+        self.assertIn('--mode verify', commands)
+        self.assertIn('--language all', commands)
+        self.assertNotIn('--scope native', commands)
         self.assertIn('tools/documentation/cli.py build', commands)
         self.assertNotIn('sudo apt-get', commands)
+        upload = next(step['with']['path'] for step in steps if step.get(
+            'uses', '').startswith('actions/upload-artifact@')).splitlines()
+        self.assertIn('build/documentation/site/', upload)
+        self.assertIn('build/documentation/documentation-build.json', upload)
+        self.assertNotIn('build/documentation/', upload)
 
     def test_source_jobs_prepare_only_the_reviewed_selected_closure(self):
         for name, job, consumer in (
@@ -271,7 +279,9 @@ class WorkflowContracts(unittest.TestCase):
                 self.assertEqual(arguments[:4], [
                     'python3', '-B', 'tools/dev/dependencies.py', 'prepare'])
                 self.assertEqual(arguments[arguments.index('--scope') + 1],
-                                 'native')
+                                 'preset')
+                self.assertEqual(arguments[arguments.index('--preset') + 1],
+                                 'stm32-qiming-baremetal')
                 self.assertIn('--allow-network', arguments)
                 report = arguments[arguments.index('--report') + 1]
                 self.assertTrue(report.startswith('build/'))
@@ -293,7 +303,7 @@ class WorkflowContracts(unittest.TestCase):
         prepared_arguments = shlex.split(prepared.replace('\\\n', ' '))
         prefix = prepared_arguments[prepared_arguments.index('--prefix') + 1]
         self.assertEqual(prefix, '$RUNNER_TEMP/nexus-docs-tools')
-        for action in ('check', 'test', 'build'):
+        for action in ('test', 'build'):
             with self.subTest(action=action):
                 execute = next(step['run'] for step in steps
                                if 'tools/documentation/cli.py ' + action

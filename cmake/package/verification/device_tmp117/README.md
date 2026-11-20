@@ -6,5 +6,5 @@
 硬件转换时序；所选 GPIO 只保留正常生成接口。
 
 Native 执行正向生命周期；F407 只编译、链接、观察资源与 provider 保留。
-器件责任见[唯一组件合同](../../../../docs/reference/api/components.md#tmp117-one-shot-sampling-contract)。
+器件责任见[唯一组件合同](../../../../docs/reference/api/components/devices.md)。
 这里没有实板接线，也不继承真实 TMP117 资格。

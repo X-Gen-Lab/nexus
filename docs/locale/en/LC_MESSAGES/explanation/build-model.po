@@ -1,0 +1,230 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: a073c6972a21031967301b44145ea71653405d3228fbd6a7e70009cef0097758\n"
+
+#: ../../../../../../docs/explanation/build-model.md:9
+msgid "构建模型与使用要求"
+msgstr "Build model and usage requirements"
+
+#: ../../../../../../docs/explanation/build-model.md:11
+msgid ""
+"应用拥有工程、工具链选择和 TOML；Nexus 提供可复用目标与显式装配。源码检出和安装 SDK 共用一份生产图，使应用不必进入平台开发工程。"
+msgstr ""
+"The application owns its project, toolchain selection and TOML; Nexus "
+"supplies reusable targets and explicit assembly. Source checkouts and "
+"installed SDKs share one production graph, so applications need not use the "
+"platform development project."
+
+#: ../../../../../../docs/explanation/build-model.md:13
+msgid "![构建目标与作用域](../assets/diagrams/build-targets.svg)"
+msgstr "![Build targets and scopes](../assets/diagrams/build-targets.svg)"
+
+#: ../../../../../../docs/explanation/build-model.md:13
+msgid "构建目标与作用域"
+msgstr "Build targets and scopes"
+
+#: ../../../../../../docs/explanation/build-model.md:15
+msgid "发现、装配、镜像"
+msgstr "Discovery, assembly and images"
+
+#: ../../../../../../docs/explanation/build-model.md:17
+msgid ""
+"`find_package(Nexus CONFIG REQUIRED)` 验证来源并加载 "
+"API；请求版本时只接受精确匹配，不解析装配或创建生产目标。`nexus_add_platform(ASSEMBLY ...)` 解析唯一 "
+"TOML、生成静态连接并建立平台。`nexus_add_firmware()` 创建镜像及其产物检查。"
+msgstr ""
+"`find_package(Nexus CONFIG REQUIRED)` validates the source and loads the "
+"API; when a version is requested, only an exact match is accepted. It "
+"neither resolves an assembly nor creates production targets. "
+"`nexus_add_platform(ASSEMBLY ...)` resolves the single TOML input, generates"
+" static connections and creates the platform. `nexus_add_firmware()` creates"
+" an image and its artifact checks."
+
+#: ../../../../../../docs/explanation/build-model.md:27
+msgid ""
+"这是外部应用的 CMake 入口片段，仍需完整 `assembly.toml`、`main.c` "
+"和预先选定的工具链。首次操作见[应用教程](../tutorials/first-f407.md)。"
+msgstr ""
+"This is an external application's CMake entry fragment. It still requires a "
+"complete `assembly.toml`, `main.c` and a toolchain selected in advance. For "
+"the first run, see the [application tutorial](../tutorials/first-f407.md)."
+
+#: ../../../../../../docs/explanation/build-model.md:29
+msgid ""
+"一个构建目录只有一个工具链和装配。工具链在 `project()` 前选定；平台验证 "
+"CPU/FPU/ABI，不在启用语言后替换编译器。相同装配可有多个镜像；不同装配使用独立目录。"
+msgstr ""
+"A build directory has one toolchain and one assembly. Select the toolchain "
+"before `project()`; the platform validates CPU/FPU/ABI rather than replacing"
+" the compiler after languages are enabled. One assembly may produce multiple"
+" images; different assemblies use separate directories."
+
+#: ../../../../../../docs/explanation/build-model.md:31
+msgid ""
+"`nexus_add_runtime(ASSEMBLY ...)` 只创建 CPU Runtime 库，与 Platform 互斥。应用自建 "
+"executable，提供 startup、链接脚本和具体 provider，并显式调用 "
+"`nexus_apply_firmware_policy(target)`。"
+msgstr ""
+"`nexus_add_runtime(ASSEMBLY ...)` creates only a CPU Runtime library and is "
+"mutually exclusive with Platform. The application creates its own "
+"executable, supplies startup, the linker script and concrete providers, and "
+"explicitly calls `nexus_apply_firmware_policy(target)`."
+
+#: ../../../../../../docs/explanation/build-model.md:33
+msgid "谁拥有依赖"
+msgstr "Who owns dependencies"
+
+#: ../../../../../../docs/explanation/build-model.md:0
+msgid "位置"
+msgstr "Location"
+
+#: ../../../../../../docs/explanation/build-model.md:0
+msgid "责任"
+msgstr "Responsibility"
+
+#: ../../../../../../docs/explanation/build-model.md:0
+msgid "根 `CMakeLists.txt`"
+msgstr "Root `CMakeLists.txt`"
+
+#: ../../../../../../docs/explanation/build-model.md:0
+msgid "平台开发工程与明确选择的测试/workload"
+msgstr "Platform development project and explicitly selected tests/workloads"
+
+#: ../../../../../../docs/explanation/build-model.md:0
+msgid "`cmake/Nexus.cmake`"
+msgstr "`cmake/Nexus.cmake`"
+
+#: ../../../../../../docs/explanation/build-model.md:0
+msgid "显式构造 API"
+msgstr "Explicit construction API"
+
+#: ../../../../../../docs/explanation/build-model.md:0
+msgid "`cmake/platform/`"
+msgstr "`cmake/platform/`"
+
+#: ../../../../../../docs/explanation/build-model.md:0
+msgid "唯一生产图与私有装配上下文"
+msgstr "The single production graph and private assembly context"
+
+#: ../../../../../../docs/explanation/build-model.md:0
+msgid "SoC package"
+msgstr "SoC package"
+
+#: ../../../../../../docs/explanation/build-model.md:0
+msgid "驱动、SDK、System 和启动使用要求"
+msgstr "Drivers, SDK, System and startup usage requirements"
+
+#: ../../../../../../docs/explanation/build-model.md:0
+msgid "组件叶目录"
+msgstr "Component leaf directory"
+
+#: ../../../../../../docs/explanation/build-model.md:0
+msgid "本组件的源码与公共/私有依赖"
+msgstr "This component's sources and public/private dependencies"
+
+#: ../../../../../../docs/explanation/build-model.md:0
+msgid "工具链与 preset"
+msgstr "Toolchain and preset"
+
+#: ../../../../../../docs/explanation/build-model.md:0
+msgid "编译器、SDK 位置与构建目录"
+msgstr "Compiler, SDK location and build directory"
+
+#: ../../../../../../docs/explanation/build-model.md:0
+msgid "产品"
+msgstr "Product"
+
+#: ../../../../../../docs/explanation/build-model.md:0
+msgid "应用库、最终镜像与执行策略"
+msgstr "Application libraries, final images and execution policy"
+
+#: ../../../../../../docs/explanation/build-model.md:45
+msgid ""
+"Provider target 发布 `NEXUS_STARTUP_SOURCES` 和 "
+"`NEXUS_STARTUP_USAGE_TARGET`。Platform 通过 `NEXUS_PROVIDER_TARGET` 指向实际 "
+"provider；每个镜像独立创建 startup OBJECT，私有消费厂商头、器件宏与 HAL 配置。"
+msgstr ""
+"The provider target publishes `NEXUS_STARTUP_SOURCES` and "
+"`NEXUS_STARTUP_USAGE_TARGET`. Platform identifies the actual provider "
+"through `NEXUS_PROVIDER_TARGET`; each image creates its own startup OBJECT "
+"that privately consumes vendor headers, device defines and HAL "
+"configuration."
+
+#: ../../../../../../docs/explanation/build-model.md:47
+msgid ""
+"`Nexus::ABI` 传递必须一致的二进制使用要求，`Nexus::OS` "
+"表示已选择的后端。运行库、`-nostartfiles`、链接脚本和资源检查附着最终镜像；应用诊断策略由应用自己决定。"
+msgstr ""
+"`Nexus::ABI` carries binary usage requirements that must agree; `Nexus::OS` "
+"represents the selected backend. Runtime libraries, `-nostartfiles`, the "
+"linker script and resource checks attach to the final image. The application"
+" chooses its own diagnostic policy."
+
+#: ../../../../../../docs/explanation/build-model.md:49
+msgid "配置、组件与裁剪"
+msgstr "Configuration, components and selection"
+
+#: ../../../../../../docs/explanation/build-model.md:51
+msgid ""
+"TOML、事实和配置代码先冻结为不可变 IR，再原子发布一个 bundle。生成器输出配置、对象、factory 和公共需求，不维护 C "
+"源码列表。CMake 按模式、IP 和公共需求选择实际翻译单元。"
+msgstr ""
+"TOML, facts and configuration code are first frozen into immutable IR, then "
+"published atomically as one bundle. The generator emits configuration, "
+"objects, factory and public requirements, not C source lists. CMake selects "
+"actual translation units by mode, IP and public requirements."
+
+#: ../../../../../../docs/explanation/build-model.md:53
+msgid ""
+"普通组件直接使用 CMake target。需要静态绑定或厂商选择的组件共用 "
+"`components/catalog.json`，叶目录创建目标。公共生成头的 API 需求与 bindings "
+"的私有实现需求分别传播；未选重依赖不准备、不编译。"
+msgstr ""
+"Ordinary components use CMake targets directly. Components requiring static "
+"binding or vendor selection share `components/catalog.json`; leaf "
+"directories create targets. API requirements of public generated headers and"
+" private implementation requirements of bindings propagate separately. "
+"Unselected heavy dependencies are neither prepared nor compiled."
+
+#: ../../../../../../docs/explanation/build-model.md:55
+msgid "增量与失败"
+msgstr "Incremental builds and failure"
+
+#: ../../../../../../docs/explanation/build-model.md:57
+msgid ""
+"普通 C 修改由 Ninja 和编译器依赖触发相关工作。TOML、选中事实或生成器改变重新配置；相同生成内容保留时间戳。无变化构建不应再 "
+"configure、编译或链接。"
+msgstr ""
+"Ninja and compiler dependencies schedule work affected by ordinary C "
+"changes. TOML, selected fact or generator changes trigger reconfiguration; "
+"identical generated content retains timestamps. An unchanged build should "
+"not configure, compile or link again."
+
+#: ../../../../../../docs/explanation/build-model.md:59
+msgid ""
+"配置拒绝或中断使旧生成结果失效。链接失败或取消撤销旧 BIN/资源报告；缺少声明产物时直接构建固件目标能够恢复。预算和检查器变化复核现有 "
+"ELF，布局变化触发链接。"
+msgstr ""
+"Rejected or interrupted configuration invalidates previous generated "
+"results. Failed or cancelled linking withdraws old BIN/resource reports; "
+"building the firmware target directly restores missing declared artifacts. "
+"Budget or checker changes recheck the existing ELF; layout changes trigger "
+"linking."
+
+#: ../../../../../../docs/explanation/build-model.md:61
+msgid ""
+"SDK 发现与实际构造是不同消费边界。后续构造必须检出 SDK "
+"字节变化和来源冲突，不能靠持久“已验证”标志跳过。具体规范见[构建合同](../reference/contracts/build-"
+"system.md)。"
+msgstr ""
+"SDK discovery and actual construction are separate consumption boundaries. "
+"Later construction must detect SDK byte changes and source conflicts; it "
+"cannot skip checks using a persistent \"verified\" flag. See the [build "
+"contract](../reference/contracts/build-system.md) for the rules."

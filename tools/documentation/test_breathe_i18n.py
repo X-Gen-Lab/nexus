@@ -102,7 +102,7 @@ class BreatheDetailIntegrationTests(unittest.TestCase):
             xml.mkdir()
             (xml / 'index.xml').write_text(INDEX_XML)
             (xml / 'contract_8h.xml').write_text(COMPOUND_XML)
-            source = ('---\nsource_language: en\n---\n\n# Contract fixture\n\n'
+            source = ('---\nid: fixture\ntype: reference\naudience: consumer\nsource_language: en\n---\n\n# Contract fixture\n\n'
                       '```{doxygenfile} contract.h\n:project: nexus\n```\n')
             (docs / 'index.md').write_text(source)
             (docs / 'conf.py').write_text(
@@ -122,10 +122,9 @@ class BreatheDetailIntegrationTests(unittest.TestCase):
                 subprocess.run(['git', '-C', str(root), *args], check=True,
                                capture_output=True, text=True)
             environment = dict(os.environ)
-            for key in ('NEXUS_DOCS_REVISION', 'NEXUS_DOCS_CODE_REVISION',
-                        'NEXUS_DOCS_TRANSLATION_ROOT', 'NEXUS_DOCS_GETTEXT_ROOT',
-                        'NEXUS_DOCS_LANGUAGES'):
-                environment.pop(key, None)
+            for key in tuple(environment):
+                if key.startswith("NEXUS_DOCS_"):
+                    environment.pop(key)
             gettext = root / 'gettext'
 
             def build(builder, language, output):

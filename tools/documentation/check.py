@@ -8,13 +8,8 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
-EXCLUDED = {"archive", "locale", "_build", ".doctrees"}
-HISTORICAL_PAGES = ()
-HISTORICAL_PREFIXES = ()
-LEGACY_SPHINX = {"index.rst", "api/index.rst", "api.rst", "getting_started.rst",
-                 "architecture.rst", "configuration.rst", "migration.rst",
-                 "os.rst", "support.rst", "development/index.rst"}
-SITE_READMES = {"assets/diagrams/README.md", "design/README.md", "delivery/README.md"}
+EXCLUDED = {"locale", "_build", "_output", ".doctrees"}
+PAGE_TYPES = {"tutorial", "how-to", "reference", "explanation"}
 OWNED_MARKDOWN_ROOTS = ("arch", "boards", "cmake", "components", "core", "docs",
                         "io", "os", "scripts", "soc", "tests", "tools")
 ROOT_MARKDOWN = ("README.md", "README_CN.md")
@@ -22,17 +17,12 @@ LINK = re.compile(r"!?\[[^\]]*\]\((<[^>]+>|[^)]+)\)")
 REFERENCE = re.compile(r"^\s*\[[^\]]+\]:\s*(\S+)", re.MULTILINE)
 FENCE = re.compile(r"^(`{3,}|~{3,})([^\n]*)\n(.*?)^\1\s*$",
                    re.MULTILINE | re.DOTALL)
-CRITICAL_PAGES = ("index", "tutorials/source-sdk", "tutorials/async-io",
-                  "guides/board-porting", "guides/os-shutdown", "guides/migration",
-                  "reference/configuration/assembly", "explanation/factory",
-                  "explanation/ownership", "reference/platforms/support",
-                  "reference/platforms/qualification")
 
 
 def metadata(contents):
     """Read only the small authored metadata fields, not another config DSL."""
     if not contents.startswith("---\n"):
-        return {}
+        raise ValueError("page metadata requires id, type, audience and source_language")
     block, separator, _ = contents[4:].partition("\n---")
     if not separator:
         raise ValueError("unterminated page metadata")
@@ -43,49 +33,24 @@ def metadata(contents):
             if match[1] in result:
                 raise ValueError("duplicate metadata field: " + match[1])
             result[match[1]] = match[2].strip('"\'')
-    if result.get("source_language", "en") not in {"en", "zh_CN"}:
+    for name in ("id", "type", "audience", "source_language"):
+        if not result.get(name):
+            raise ValueError("missing/nonempty page metadata: " + name)
+    if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.-]*", result["id"]):
+        raise ValueError("invalid page id")
+    if result["type"] not in PAGE_TYPES:
+        raise ValueError("unsupported page type")
+    if result["source_language"] not in {"en", "zh_CN"}:
         raise ValueError("unsupported source_language")
     return result
-
-
-def configuration_content(contents, suffix):
-    """Use standard RST code-block directives with the same production parser."""
-    if suffix != ".rst":
-        return contents
-    lines, result, index = contents.splitlines(), [], 0
-    while index < len(lines):
-        match = re.match(r"^\.\. code-block::\s*(toml|json)\s*$", lines[index])
-        if not match:
-            result.append(lines[index]); index += 1
-            continue
-        language = match[1]
-        index += 1
-        while index < len(lines) and (not lines[index].strip() or
-                                     lines[index].lstrip().startswith(":")):
-            index += 1
-        body = []
-        while index < len(lines) and (not lines[index].strip() or
-                                     lines[index].startswith((" ", "\t"))):
-            body.append(lines[index]); index += 1
-        import textwrap
-        result.extend(["```" + language, textwrap.dedent("\n".join(body)).rstrip(), "```"])
-    return "\n".join(result) + "\n"
 
 
 def is_source(root, path):
     docs = root / "docs"
     if not path.is_relative_to(docs):
         return False
-    name = path.relative_to(docs).as_posix()
-    if name in HISTORICAL_PAGES or name.startswith(HISTORICAL_PREFIXES):
-        return False
-    return (path.is_relative_to(docs) and path.suffix in {".md", ".rst"}
-            and (path.name != "README.md"
-                 or path.relative_to(docs).as_posix() in SITE_READMES)
-            and path.relative_to(docs).parts[0] != "api"
-            and not EXCLUDED.intersection(path.relative_to(docs).parts)
-            and not (path.is_relative_to(docs / "sphinx") and
-                     str(path.relative_to(docs / "sphinx")) in LEGACY_SPHINX))
+    return (path.suffix == ".md"
+            and not EXCLUDED.intersection(path.relative_to(docs).parts))
 
 
 def sources(root):
@@ -114,16 +79,15 @@ def adjacent_sources(root):
     return sorted(paths)
 
 
-def file_inputs(contents, suffix):
+def file_inputs(contents, suffix=".md"):
     """Collect rendered include/image inputs, excluding fenced examples.
 
     Ordinary hyperlinks are reader destinations, not build inputs. Includes
     are followed separately so an included document's own inputs participate
     in the same staged snapshot admission as the top-level document.
     """
-    if suffix == ".rst":
-        from tools.documentation import rst
-        return rst.file_includes(contents)
+    if suffix != ".md":
+        raise ValueError("Documentation sources must be Markdown")
     result = []
     blocks = list(FENCE.finditer(contents))
     fenced_ranges = [(block.start(), block.end()) for block in blocks]
@@ -179,7 +143,7 @@ def dependencies(root, pages=None, *, require_files=True):
 
     No parser, renderer, tool installation or network is needed. A repeated
     include is allowed, but an include cycle has no finite source expansion.
-    Literal includes remain literal even when their suffix is Markdown/RST.
+    Literal includes remain literal regardless of their filename suffix.
     Output admission may collect declared paths even when missing; that mode
     also collects escaping paths without reading their contents. Source checks
     reject those inputs later, after legitimate failure reports are protected.
@@ -207,8 +171,7 @@ def dependencies(root, pages=None, *, require_files=True):
             result.add(destination)
             if (kind == "include" and destination.is_relative_to(root)
                     and destination.is_file()):
-                # Include text is parsed in the including document's syntax;
-                # a .txt fragment does not switch RST into Markdown.
+                # A text fragment retains its including Markdown syntax.
                 visit(destination, syntax)
         visiting.remove(identity)
         visited.add(identity)
@@ -220,11 +183,9 @@ def dependencies(root, pages=None, *, require_files=True):
 
 def anchors(contents, suffix=".md"):
     """Check authored labels and heading fragments; Sphinx checks full roles."""
-    if suffix == ".rst":
-        from tools.documentation import rst
-        return rst.anchors(contents)
+    if suffix != ".md":
+        raise ValueError("Documentation sources must be Markdown")
     result = set(re.findall(r"^\(([^)]+)\)=\s*$", contents, re.MULTILINE))
-    result.update(re.findall(r"^\.\. _([^:]+):\s*$", contents, re.MULTILINE))
     result.update(re.findall(r'\bid=["\']([^"\']+)["\']', contents))
     used = {}
     for line in contents.splitlines():
@@ -245,9 +206,6 @@ def reader_links(root, path, contents, urls):
     plain = FENCE.sub("", contents)
     targets = [match[1] for match in LINK.finditer(plain)]
     targets += REFERENCE.findall(plain)
-    if path.suffix == ".rst":
-        from tools.documentation import rst
-        targets = rst.target_links(contents)
     for target in targets:
         target = target.strip().split(' "', 1)[0].strip("<>")
         parsed = urllib.parse.urlsplit(target)
@@ -261,7 +219,7 @@ def reader_links(root, path, contents, urls):
         if not destination.exists():
             errors.append(label + ": missing link " + target)
         elif (destination.is_file() and parsed.fragment
-              and destination.suffix in {".md", ".rst"}):
+              and destination.suffix == ".md"):
             if urllib.parse.unquote(parsed.fragment) not in anchors(
                     destination.read_text(), destination.suffix):
                 errors.append(label + ": missing anchor " + target)
@@ -271,8 +229,6 @@ def reader_links(root, path, contents, urls):
 def navigation(path, contents):
     blocks = re.findall(r"```\{toctree\}[^\n]*\n(.*?)^```\s*$",
                         contents, re.MULTILINE | re.DOTALL)
-    blocks += re.findall(r"^\.\. toctree::\s*\n((?:[ \t]+.*\n|\n)+)",
-                         contents, re.MULTILINE)
     entries = []
     for block in blocks:
         for line in block.splitlines():
@@ -286,15 +242,13 @@ def navigation(path, contents):
             destination = path.parent / entry
             if any(character in entry for character in "*?["):
                 entries.extend(item.resolve() for item in path.parent.glob(entry)
-                               if item.suffix in {".md", ".rst"}
-                               and item != path and (item.name != "README.md"
-                               or item.parent.name in {"design", "delivery"}))
+                               if item.suffix == ".md" and item != path)
                 continue
-            if destination.suffix not in {".md", ".rst"}:
+            if destination.suffix != ".md":
                 # Dots belong to the docname unless they identify a source
                 # suffix: release-0.1.0 resolves to release-0.1.0.md.
                 candidates = [destination.with_name(destination.name + suffix)
-                              for suffix in (".md", ".rst")]
+                              for suffix in (".md",)]
                 destination = next((item for item in candidates if item.is_file()),
                                    candidates[0])
             entries.append(destination.resolve())
@@ -309,21 +263,32 @@ def validate_svg(path):
 
 
 def validate_translations(root, *, pot_root=None, languages=("en", "zh_CN"),
-                          critical_pages=None):
-    """Require reviewed translations for every current page in both directions.
+                          pages=None):
+    """Require canonical pages and reviewed opposite-language catalogs.
 
-    An explicit page subset remains available for focused fixtures. Frozen
-    archives and source-only README entries follow the normal site source policy.
-    A formal build also verifies the exact newly extracted message set.
+    Verify the complete actual POT page/message set when it is supplied. An
+    explicit page subset exists only for focused callers, not implicit tiers.
     """
     from tools.documentation import sphinx_ext
     root = Path(root)
     records, errors = [], []
-    pages = {page.relative_to(root / "docs").with_suffix("").as_posix(): page
-             for page in sources(root)}
-    selected = sorted(pages) if critical_pages is None else critical_pages
+    page_map = {page.relative_to(root / "docs").with_suffix("").as_posix(): page
+                for page in sources(root)}
+    selected = sorted(page_map) if pages is None else pages
+    if pages is None:
+        for language in languages:
+            folder = root / "docs/locale" / language / "LC_MESSAGES"
+            for catalog in folder.rglob("*.po"):
+                name = catalog.relative_to(folder).with_suffix("").as_posix()
+                if name not in page_map:
+                    errors.append("unknown translation " + name + "/" + language)
+    if pot_root is not None and pages is None:
+        actual = {path.relative_to(pot_root).with_suffix("").as_posix()
+                  for path in Path(pot_root).rglob("*.pot")}
+        errors.extend("unknown gettext output: " + name
+                      for name in sorted(actual - set(page_map)))
     for docname in selected:
-        page = pages.get(docname)
+        page = page_map.get(docname)
         if page is None:
             errors.append("missing translation page: " + docname)
             continue
@@ -334,10 +299,20 @@ def validate_translations(root, *, pot_root=None, languages=("en", "zh_CN"),
             if not pot.is_file():
                 errors.append("missing gettext output: " + docname)
                 continue
-            messages = tuple(sphinx_ext.read_catalog(pot)[1])
+            try:
+                messages = tuple(sphinx_ext.read_catalog(pot)[1])
+                if not messages:
+                    raise ValueError("empty gettext output")
+            except (OSError, UnicodeError, ValueError) as error:
+                errors.append("invalid gettext output " + docname + ": " + str(error))
+                continue
         for language in languages:
-            status = sphinx_ext.translation_status(source, docname, language,
-                                                   root / "docs/locale", messages)
+            try:
+                status = sphinx_ext.translation_status(source, docname, language,
+                                                       root / "docs/locale", messages)
+            except ValueError as error:
+                errors.append("invalid page metadata " + docname + ": " + str(error))
+                continue
             records.append({"page": docname, **status})
             if status["status"] not in {"original", "reviewed"}:
                 errors.append(f"translation {docname}/{language}: {status['status']}")
@@ -379,6 +354,9 @@ def scan(root, *, check_diagrams=True, check_configuration=True,
     root = Path(root).resolve()
     errors, identifiers, urls, graph, config_records = [], {}, set(), {}, []
     pages = sources(root)
+    errors.extend(str(path.relative_to(root)) + ": Markdown-only site rejects RST source"
+                  for path in (root / "docs").rglob("*.rst")
+                  if not EXCLUDED.intersection(path.relative_to(root / "docs").parts))
     for path in pages:
         label = str(path.relative_to(root))
         if path.is_symlink() or any(parent.is_symlink() for parent in path.parents):
@@ -388,7 +366,6 @@ def scan(root, *, check_diagrams=True, check_configuration=True,
         try:
             meta = metadata(contents)
             labels = re.findall(r"^\(([^)]+)\)=\s*$", contents, re.MULTILINE)
-            labels += re.findall(r"^\.\. _([^:]+):\s*$", contents, re.MULTILINE)
             if len(set(labels)) != len(labels):
                 errors.append(label + ": duplicate anchor")
             identifier = meta.get("id")
@@ -423,7 +400,7 @@ def scan(root, *, check_diagrams=True, check_configuration=True,
                     config_records.append({"source": str(destination), "kind": "literalinclude",
                                            "resolved": True})
             errors.extend(reader_links(root, path, contents, urls))
-            normalized = configuration_content(contents, path.suffix)
+            normalized = contents
             if check_configuration and "```toml" in normalized:
                 from tools.configure import documentation
                 config_records.extend(documentation.check_document(path, root, contents=normalized))

@@ -7,7 +7,9 @@ source_language: en
 
 # Core: requests, status and time
 
-These declarations come from public header files. Selection, lifecycle, supported execution modes and physical authorization remain bounded by the corresponding design and support records.
+These declarations come from public header files. Selection, lifecycle,
+supported execution modes and physical authorization remain bounded by the
+corresponding design and support records.
 
 ## Cold lifecycle entry points
 
@@ -79,3 +81,21 @@ headers; neither mechanism starts a scheduler or establishes physical support.
 :project: nexus
 ```
 
+
+## silicon.h
+
+```{doxygenfile} core/include/nexus/core/silicon.h
+:project: nexus
+```
+
+## lifecycle.h
+
+```{doxygenfile} core/include/nexus/core/lifecycle.h
+:project: nexus
+```
+
+## platform_lifecycle.h
+
+```{doxygenfile} core/include/nexus/core/platform_lifecycle.h
+:project: nexus
+```

@@ -36,7 +36,7 @@ HOST_MODELS = {
 }
 
 # Required portable-C correctness profile. Advisory exclusions and their
-# reviewed rationale live in docs/design/engineering-handbook.md.
+# reviewed rationale live in docs/reference/contracts/engineering.md.
 TIDY_CHECKS = ",".join((
     "-*", "clang-analyzer-*", "bugprone-*", "cert-*",
     "-clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling",

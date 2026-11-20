@@ -1,0 +1,146 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: f7f627a8a8a9092465742e389a884d440588236ebc731dd806a63182c49639ec\n"
+
+#: ../../../../../../docs/guides/io-execution.md:8
+msgid "为 I/O 提供执行与存储"
+msgstr "Provide I/O execution and storage"
+
+#: ../../../../../../docs/guides/io-execution.md:10
+msgid ""
+"取得 factory 接口以后，日常调用直接进入其操作表。Platform 管所选基础设施的 启动与停止；应用负责任务、调度、队列、service "
+"频率、缓冲与恢复决策。"
+msgstr ""
+"After acquiring a factory interface, ordinary calls go directly through its "
+"operation table. Platform starts and stops selected infrastructure. The "
+"application owns tasks, scheduling, queues, service frequency, buffers and "
+"recovery decisions."
+
+#: ../../../../../../docs/guides/io-execution.md:13
+msgid "一个接口，一个明确执行者"
+msgstr "One explicit executor for each interface"
+
+#: ../../../../../../docs/guides/io-execution.md:15
+msgid ""
+"轮询模式在所选预算内完成操作；IRQ／DMA 模式需要按接口合同提供通知、service 或 等待适配。多个 producer 共享 UART／SPI "
+"时，选择显式 owner，避免不同任务同时 推进同一控制器状态。平台不会隐式创建 worker，也不会启动 scheduler。"
+msgstr ""
+"Polling modes complete operations within the selected budget. IRQ/DMA modes "
+"require notification, service or wait adaptation according to the interface "
+"contract. When multiple producers share a UART/SPI controller, select an "
+"explicit owner so different tasks do not advance the same controller state "
+"concurrently. The platform creates no implicit worker and does not start the"
+" scheduler."
+
+#: ../../../../../../docs/guides/io-execution.md:19
+msgid "普通接口不为未选异步模式分配最大状态或缓冲。先从实际任务选择有限请求或连续流， 再确定容量和执行方式，具体模式以支持矩阵和完整配置校验为准。"
+msgstr ""
+"An ordinary interface does not allocate maximum state or buffers for "
+"unselected asynchronous modes. Choose a finite request or continuous stream "
+"from the actual task, then determine capacity and execution. Available modes"
+" are bounded by the support matrix and complete configuration validation."
+
+#: ../../../../../../docs/guides/io-execution.md:22
+msgid "有限请求的最小闭环"
+msgstr "The minimal finite-request cycle"
+
+#: ../../../../../../docs/guides/io-execution.md:24
+msgid "应用准备请求、payload 和同一单调时间域的绝对 deadline。"
+msgstr ""
+"The application prepares a request, payload and absolute deadline in the "
+"same monotonic time domain."
+
+#: ../../../../../../docs/guides/io-execution.md:25
+msgid "`REJECTED` 不保留调用者引用；处理错误后可按合同重试。"
+msgstr ""
+"`REJECTED` retains no caller references; handle the error before retrying as"
+" permitted by the contract."
+
+#: ../../../../../../docs/guides/io-execution.md:26
+msgid "`ACCEPTED` 开始借用，持续推进其执行者，观察请求状态。"
+msgstr ""
+"`ACCEPTED` begins a borrow. Continue advancing its executor and observing "
+"request state."
+
+#: ../../../../../../docs/guides/io-execution.md:27
+msgid "acquire 观察 `SETTLED` 后读取最终结果，确认控制与观察者也已排空。"
+msgstr ""
+"After an acquire observation of `SETTLED`, read the final result and confirm"
+" that control activity and observers have also drained."
+
+#: ../../../../../../docs/guides/io-execution.md:28
+msgid "再归还或复用相应存储。"
+msgstr "Only then return or reuse the relevant storage."
+
+#: ../../../../../../docs/guides/io-execution.md:30
+msgid ""
+"通知是提示，请求谓词是完成依据。DMA 搬运完成、线上完成和引用排空是不同事件。 取消、超时和 `QUARANTINED` "
+"都不授权提前释放；失败后保持存储，继续既定排空或 "
+"进入产品恢复流程。[所有权合同](../explanation/ownership.md)定义完整状态规则。"
+msgstr ""
+"Notification is a hint; the request predicate determines completion. DMA "
+"transfer completion, wire completion and reference drain are separate "
+"events. Cancellation, timeout and `QUARANTINED` do not authorize early "
+"release. Retain storage after failure and continue the defined drain path or"
+" enter product recovery. The [ownership "
+"contract](../explanation/ownership.md) defines the full state rules."
+
+#: ../../../../../../docs/guides/io-execution.md:34
+msgid "连续流与停止"
+msgstr "Continuous streams and stop"
+
+#: ../../../../../../docs/guides/io-execution.md:36
+msgid ""
+"按流合同取得并归还 loan，借用期间不改数据。容量耗尽时处理 loss／backpressure； `BUSY` stop "
+"仍可能保留已发布的借用。归还、排空并 join 相关 owner、producer 和 观察者之后，才重新使用其状态。"
+msgstr ""
+"Acquire and return loans according to the stream contract; do not modify "
+"borrowed data. Handle loss/backpressure when capacity is exhausted. A `BUSY`"
+" stop may retain published borrows. Return loans, drain and join relevant "
+"owners, producers and observers before reusing their state."
+
+#: ../../../../../../docs/guides/io-execution.md:40
+msgid ""
+"停止应用时先关闭新请求，再请求取消并继续 service，等待真正排空。最后按后端 允许的顺序停止 Platform。FreeRTOS "
+"scheduler 已尝试启动后不能按“任务从未运行” 逆序丢弃状态；内核仍使用的 Tick／时钟必须保留，见 [OS 停止](os-"
+"shutdown.md)。"
+msgstr ""
+"When stopping an application, first close admission to new requests, then "
+"request cancellation and continue service until actual drain. Finally stop "
+"Platform in the order permitted by the backend. After a FreeRTOS scheduler "
+"start has been attempted, state cannot be discarded in reverse order as "
+"though tasks never ran. Preserve Tick/clock infrastructure still used by the"
+" kernel; see [OS shutdown](os-shutdown.md)."
+
+#: ../../../../../../docs/guides/io-execution.md:45
+msgid "查看诊断"
+msgstr "Inspect diagnostics"
+
+#: ../../../../../../docs/guides/io-execution.md:47
+msgid ""
+"`nx_io_diagnose` 复制当前请求和流事实，不执行恢复，不归还借用。`unknown_facts` "
+"保留未知信息；`SERVICE_OVERDUE` 需要同时间域内实际时间戳和明确 service 预算。 "
+"`nx_dma_storage_validate` 校验完整显式存储预留，不只校验首地址对齐。"
+msgstr ""
+"`nx_io_diagnose` copies current request and stream facts; it does not "
+"recover or return borrows. `unknown_facts` preserves unknown information. "
+"`SERVICE_OVERDUE` requires actual timestamps in the same time domain and an "
+"explicit service budget. `nx_dma_storage_validate` validates the complete "
+"explicit storage reservation, not only alignment of its first address."
+
+#: ../../../../../../docs/guides/io-execution.md:51
+msgid ""
+"用[异步请求教程](../tutorials/async-io.md)练习成功与失败路径，公共签名见 [I/O "
+"API](../reference/api/io/index.md)，实际延迟与吞吐测量见 [性能与 HIL](performance-hil.md)。"
+msgstr ""
+"Practice success and failure paths with the [asynchronous-request "
+"tutorial](../tutorials/async-io.md). Public signatures are in the [I/O "
+"API](../reference/api/io/index.md); real latency and throughput measurements"
+" are covered by [performance and HIL](performance-hil.md)."

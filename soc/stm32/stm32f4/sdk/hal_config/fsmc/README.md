@@ -15,7 +15,7 @@ owner 有界观察 FEMPT/ECCR。最终 ARM ELF 不含 `HAL_GetTick`。PCCARD 仍
 NOR/SRAM 片选，与 NAND2/3 的独立寄存器 bank 不混淆。
 
 新 PSRAM/NOR/NAND 的精确参数、封装限制、有限请求和软件参考范围见
-[F407 FSMC 合同](../../../../../../docs/design/f407-fsmc.md)。所有端点继续共享本页的
+[F407 FSMC 合同](../../../../../../docs/reference/contracts/io/f4-external-memory.md)。所有端点继续共享本页的
 唯一 bus owner；NOR 异步 pulse 不削弱公共同步 Flash 的返回即 idle 合同。
 
 实际 owner 为 [`drivers/memory/fsmc.c`](../../../drivers/memory/fsmc.c)，一个 bus 持有一份 AHB3 门控收条和精确数量的

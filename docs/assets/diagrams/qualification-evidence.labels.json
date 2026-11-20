@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "en": {
+    "ARM compile / link / resource\n实际指令、ABI、布局与预算": "ARM compile / link / resources\nActual instructions, ABI, layout and budgets",
+    "FIG-11 软件、工装与物理资格分别取得\n所有结论绑定 source / config / artifact / 执行 scope": "FIG-11 Separate software, fixture and physical qualification\nEvery conclusion binds source / config / artifact / execution scope",
+    "HIL fixture / station / protocol 工装\n边界与负路径软件检查": "HIL fixture / station / protocol tooling\nSoftware checks for boundaries and negative paths",
+    "Host / model\n真实 GoogleTest/GoogleMock + 工具 tests\n算法与失败路径软件证据": "Host / model\nActual GoogleTest/GoogleMock + tool tests\nSoftware evidence for algorithms and failure paths",
+    "Source SDK 独立 consumer\n移动 prefix，实际构建/运行或链接": "Independent Source SDK consumer\nRelocated prefix, actual build/run or link",
+    "产品按实际软件 + 物理 scope 准入\n发布/安全认证由外部政策另行决定": "Product admission under actual software + physical scope\nRelease / safety certification decided by external policy",
+    "只取真实 station 结果": "Only actual station results",
+    "同镜像提供给实际设备": "Same image supplied to actual equipment",
+    "实际 station：PCB / silicon / probes / wires\n刷入同镜像后执行测量与错误注入": "Actual station: PCB / silicon / probes / wires\nFlash the same image, then measure and inject faults",
+    "实际执行": "Actual execution",
+    "工装 scope；不是物理测量": "Fixture scope, not physical measurement",
+    "已执行范围的软件结果\\n保留命令、退出码和产物身份": "Software results for the executed scope\nPreserve commands, exit codes and artifact identities",
+    "按实际已执行项目记录物理结果\n无设备时为 not_executed": "Record physical results only for actually executed cases\nWithout equipment: not_executed",
+    "物理范围独立审查": "Independent review of physical scope",
+    "软件范围": "Software scope",
+    "验证证据": "Verify evidence",
+    "clean source / dependency / toolchain / config\n分别记录 ELF / BIN / map 字节身份": "Clean source / dependencies / toolchain / configuration\nRecord each ELF / BIN / map byte identity separately"
+  },
+  "zh_CN": {
+    "ARM compile / link / resource\n实际指令、ABI、布局与预算": "ARM compile / link / resource\n实际指令、ABI、布局与预算",
+    "FIG-11 软件、工装与物理资格分别取得\n所有结论绑定 source / config / artifact / 执行 scope": "FIG-11 软件、工装与物理资格分别取得\n所有结论绑定 source / config / artifact / 执行 scope",
+    "HIL fixture / station / protocol 工装\n边界与负路径软件检查": "HIL fixture / station / protocol 工装\n边界与负路径软件检查",
+    "Host / model\n真实 GoogleTest/GoogleMock + 工具 tests\n算法与失败路径软件证据": "Host / model\n真实 GoogleTest/GoogleMock + 工具 tests\n算法与失败路径软件证据",
+    "Source SDK 独立 consumer\n移动 prefix，实际构建/运行或链接": "Source SDK 独立 consumer\n移动 prefix，实际构建/运行或链接",
+    "产品按实际软件 + 物理 scope 准入\n发布/安全认证由外部政策另行决定": "产品按实际软件 + 物理 scope 准入\n发布/安全认证由外部政策另行决定",
+    "只取真实 station 结果": "只取真实 station 结果",
+    "同镜像提供给实际设备": "同镜像提供给实际设备",
+    "实际 station：PCB / silicon / probes / wires\n刷入同镜像后执行测量与错误注入": "实际 station：PCB / silicon / probes / wires\n刷入同镜像后执行测量与错误注入",
+    "实际执行": "实际执行",
+    "工装 scope；不是物理测量": "工装 scope；不是物理测量",
+    "已执行范围的软件结果\\n保留命令、退出码和产物身份": "已执行范围的软件结果\n保留命令、退出码和产物身份",
+    "按实际已执行项目记录物理结果\n无设备时为 not_executed": "按实际已执行项目记录物理结果\n无设备时为 not_executed",
+    "物理范围独立审查": "物理范围独立审查",
+    "软件范围": "软件范围",
+    "验证证据": "验证证据",
+    "clean source / dependency / toolchain / config\n分别记录 ELF / BIN / map 字节身份": "clean source / dependency / toolchain / config\n分别记录 ELF / BIN / map 字节身份"
+  }
+}

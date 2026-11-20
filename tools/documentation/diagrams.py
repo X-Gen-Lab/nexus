@@ -192,7 +192,7 @@ def _registry(folder):
 
 
 def check(root, *, env=None, full=False):
-    """Verify registered and supplemental pairs without changing any file.
+    """Verify the exact registered source/output set without changing any file.
 
     Fast checks use no renderer. Full checks additionally compare canonical
     output from the supplied tools with each checked-in SVG, and reject stale
@@ -205,7 +205,10 @@ def check(root, *, env=None, full=False):
     except ValueError as error:
         return {"status": "failed", "diagrams": 0, "errors": [str(error)]}
     declared = {row["source_dot"] for row in rows}
-    for name in sorted(declared | {path.name for path in folder.glob("*.dot")}):
+    present = {path.name for path in folder.glob("*.dot")}
+    if declared != present:
+        errors.append("diagram registry differs from canonical sources")
+    for name in sorted(declared | present):
         source = folder / name
         output = source.with_suffix(".svg")
         try:

@@ -7,6 +7,7 @@ resulting prefix offline. An existing prefix is never overwritten implicitly.
 from __future__ import annotations
 
 import argparse
+from dataclasses import dataclass
 import hashlib
 import json
 import os
@@ -136,7 +137,14 @@ def verify_installed(prefix: Path, receipt: dict) -> None:
     files = receipt.get("files")
     if not isinstance(files, dict) or not files:
         raise ValueError("empty installed tool inventory")
-    if set(tree_files(prefix)) != set(files):
+    if not isinstance(receipt.get("links"), dict):
+        raise ValueError("installed receipt lacks link inventory")
+    excluded = {"__pycache__", "font-cache", "licenses"}
+    actual = {p.relative_to(prefix).as_posix() for p in prefix.rglob("*")
+              if p.is_file() and not p.is_symlink()
+              and not excluded.intersection(p.relative_to(prefix).parts)
+              and p.name != "installation.json" and p.suffix != ".pyc"}
+    if actual != set(files):
         raise ValueError("installed file inventory changed")
     for name, expected in files.items():
         relative = PurePosixPath(name)
@@ -145,7 +153,7 @@ def verify_installed(prefix: Path, receipt: dict) -> None:
         path = prefix / name
         if not path.is_file() or digest(path) != expected:
             raise ValueError("installed tool drift: " + name)
-    if "links" in receipt and tree_links(prefix) != receipt["links"]:
+    if tree_links(prefix) != receipt["links"]:
         raise ValueError("installed link inventory changed")
 
 
@@ -156,13 +164,20 @@ def diagnose(prefix: Path | str | None = None) -> dict:
     if not receipt_path.is_file():
         raise ValueError("documentation tools not installed: " + str(folder))
     receipt = json.loads(receipt_path.read_text())
+    required = {"schema_version", "lock_sha256", "python", "target", "host_kernel",
+                "tools", "files", "links", "elf_closure", "archives", "licenses"}
+    if (not isinstance(receipt, dict) or set(receipt) != required
+            or receipt["schema_version"] != 1
+            or not isinstance(receipt["elf_closure"], dict)
+            or not receipt["elf_closure"]
+            or not isinstance(receipt["licenses"], dict)
+            or not receipt["licenses"]):
+        raise ValueError("unsupported or incomplete documentation tool receipt; prepare again")
     if receipt.get("lock_sha256") != digest(LOCK):
         raise ValueError("documentation installation uses a different lock")
     verify_installed(folder, receipt)
-    if receipt.get("elf_closure"):
-        observe_elf_closure(folder, [folder / path
-                                    for path in receipt["elf_closure"]])
-    for name, expected in receipt.get("licenses", {}).items():
+    observe_elf_closure(folder, [folder / path for path in receipt["elf_closure"]])
+    for name, expected in receipt["licenses"].items():
         path = folder / "licenses" / name
         if not path.is_file() or digest(path) != expected:
             raise ValueError("installed license drift: " + name)
@@ -172,8 +187,22 @@ def diagnose(prefix: Path | str | None = None) -> dict:
             "installation_sha256": digest(receipt_path)}
 
 
-def environment(prefix: Path | str | None = None) -> dict:
-    """Return a verified subprocess environment; never install implicitly."""
+@dataclass(frozen=True)
+class ToolContext:
+    """An invocation's observed tool identity and immutable environment entries."""
+    identity_json: str
+    variables: tuple[tuple[str, str], ...]
+
+    @property
+    def identity(self) -> dict:
+        return json.loads(self.identity_json)
+
+    def environment(self) -> dict:
+        return dict(self.variables)
+
+
+def context(prefix: Path | str | None = None) -> ToolContext:
+    """Observe tools once for this invocation; never reuse a passed report."""
     observed = diagnose(prefix)
     folder = Path(observed["prefix"])
     values = dict(os.environ)
@@ -183,7 +212,12 @@ def environment(prefix: Path | str | None = None) -> dict:
     values["PYTHONNOUSERSITE"] = "1"
     values["NEXUS_DOCS_TOOL_PREFIX"] = str(folder)
     values["NEXUS_DOCS_TOOL_IDENTITY"] = observed["installation_receipt"]
-    return values
+    return ToolContext(json.dumps(observed, sort_keys=True), tuple(values.items()))
+
+
+def environment(prefix: Path | str | None = None) -> dict:
+    """Return a freshly verified environment for a standalone invocation."""
+    return context(prefix).environment()
 
 
 def shell_wrapper(prefix: Path, tool: str, executable: Path) -> None:

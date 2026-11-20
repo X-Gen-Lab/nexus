@@ -1,0 +1,783 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: be2764efdc96fe0c66fa3513e1e68c38424c02275a9e61109b601cee82d789e0\n"
+
+#: ../../../../../../docs/reference/api/io/uart.md:10
+msgid "UART formats, words and RS485 composition"
+msgstr "UART 格式、数值字与 RS485 装配"
+
+#: ../../../../../../docs/reference/api/io/uart.md:12
+msgid ""
+"Use these faces for byte or numeric-word transfers and the selected UART "
+"wire format. RS485 composition owns its DE signal, setup and hold timing, "
+"execution progress and joined shutdown."
+msgstr ""
+"使用这些接口传输字节或数值字，并采用所选 UART 线格式。RS485 装配拥有 DE 信号、建立与保持时间、执行推进及完成 join 的停机。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:16
+msgid ""
+"For RS485, prefer `nx_factory_uart_tx_binding_ref()` with one strongly typed"
+" UART reference. Its `nx_uart_tx_binding_t` pairs the transport and exact-"
+"context validator; unsupported modes and invalid IDs return two null fields."
+" Lookup neither admits a transfer nor authenticates an instance. The caller "
+"owns DE, setup/hold timing and joined shutdown; the {doc}`RS485 contract "
+"</reference/api/io/uart>` defines the composition. IRQ timestamps and "
+"sampled GPIO levels remain observations, with the source quality defined by "
+"the selected provider and the [infrared contract](https://github.com/X-Gen-"
+"Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/components/devices/infrared/README.md)."
+msgstr ""
+"RS485 优先通过同一个强类型 UART 引用调用 `nx_factory_uart_tx_binding_ref()`。返回的 "
+"`nx_uart_tx_binding_t` 配对 transport 与精确上下文 validator；不支持的模式和非法 ID 返回两个 NULL "
+"字段。查询不准入传输，也不认证实例。调用者拥有 DE、建立／保持时间与联合关闭；{doc}`RS485 合同 "
+"</reference/api/io/uart>`定义组合方式。IRQ 时间戳和采样 GPIO 电平仍是观测，其来源质量由所选 provider "
+"与[红外合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/components/devices/infrared/README.md)定义。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:25
+msgid "Public declarations"
+msgstr "公共声明"
+
+#: ../../../../../../docs/reference/api/io/uart.md:27
+msgid "uart.h"
+msgstr "uart.h"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid "IRQ TX requests and independently budgeted byte/event reception."
+msgstr "IRQ TX 请求与分别预算的字节／事件接收。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+#: ../../../../../../docs/reference/api/io/uart.md:35
+#: ../../../../../../docs/reference/api/io/uart.md:41
+#: ../../../../../../docs/reference/api/io/uart.md:47
+#: ../../../../../../docs/reference/api/io/uart.md:53
+msgid "Author  Nexus Team"
+msgstr "作者  Nexus Team"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+#: ../../../../../../docs/reference/api/io/uart.md:35
+#: ../../../../../../docs/reference/api/io/uart.md:41
+#: ../../../../../../docs/reference/api/io/uart.md:47
+#: ../../../../../../docs/reference/api/io/uart.md:53
+msgid "Nexus Team"
+msgstr "Nexus Team"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid "Defines"
+msgstr "宏定义"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid "Typedefs"
+msgstr "类型定义"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid "Exact transport's side-effect-free TX admission validator."
+msgstr "准确传输端口的无副作用 TX 准入验证器。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid ""
+"Reads clock/hardware facts but never writes GPIO/MMIO, admits, starts or "
+"retains a reference. One executor owns adapter and transport; no external "
+"direct TX is permitted."
+msgstr "读取时钟/硬件事实，但不写 GPIO/MMIO，不准入、不启动，也不保留引用。一个执行者拥有适配器及传输接口；不允许外部直接 TX。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:0
+msgid "Param context"
+msgstr "参数 context"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid "[in] The immutable transport face's exact context."
+msgstr "[in] 不可变传输接口的精确 context。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:0
+msgid "Param request"
+msgstr "参数 request"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid "[in] Live READY or QUEUED descriptor, never retained."
+msgstr "[in] 活动的 READY 或 QUEUED 描述符；绝不保留引用。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:0
+msgid "Return"
+msgstr "返回值"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid "Same rejectable checks used by the transport submit/start."
+msgstr "采用与传输接口 submit/start 相同的可拒绝检查。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+#: ../../../../../../docs/reference/api/io/uart.md:35
+#: ../../../../../../docs/reference/api/io/uart.md:53
+msgid "Enums"
+msgstr "枚举"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+#: ../../../../../../docs/reference/api/io/uart.md:35
+#: ../../../../../../docs/reference/api/io/uart.md:53
+msgid "Values:"
+msgstr "取值："
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+#: ../../../../../../docs/reference/api/io/uart.md:35
+#: ../../../../../../docs/reference/api/io/uart.md:41
+#: ../../../../../../docs/reference/api/io/uart.md:47
+#: ../../../../../../docs/reference/api/io/uart.md:53
+msgid "Functions"
+msgstr "函数"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid "Prepare an unborrowed IRQ TX descriptor without copying data."
+msgstr "准备未借用 IRQ TX 描述符，不复制数据。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:0
+msgid "Parameters"
+msgstr "参数"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid "[inout] Fresh initialized or consumed SETTLED request."
+msgstr "[inout] 新初始化的请求，或已经消费的 SETTLED 请求。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid "[in] Nonempty payload retained unchanged through SETTLED."
+msgstr "[in] 非空载荷，保持不变直到 SETTLED。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid "[in] Positive byte count."
+msgstr "[in] 正数字节数。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid "[in] Absolute deadline in nx_time_now_us clock domain."
+msgstr "[in] nx_time_now_us 时钟域中的绝对时限。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:0
+msgid "Returns"
+msgstr "返回值"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid "NX_SUCCESS or INVALID/STATE; failure retains no buffer."
+msgstr "NX_SUCCESS 或 INVALID/STATE；失败时不保留缓冲引用。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid "Submit one direct request to a single-executor UART."
+msgstr "向单执行者 UART 提交一个直接请求。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid ""
+"Task-only, bounded admission. TX completion waits for true TC (wire idle). "
+"IRQ only moves bytes/publishes hardware facts; the owner calls service to "
+"observe deadlines and settle. The first observed terminal fact latches its "
+"result. Later service, deadline or cancellation does not overwrite an "
+"already observed TC. IRQ/service latency bounds remain provider and product "
+"qualification inputs."
+msgstr ""
+"仅限任务上下文的有界准入。TX 完成须等待真正的 TC，即线路空闲。IRQ 仅搬运字节或发布硬件事实；所有者调用 service "
+"以观测时限并结算请求。最先观测到的终态事实锁定其结果。后续 service、时限或取消不会覆盖已观测到的 TC。IRQ/service 延迟界限仍是 "
+"provider 与产品资格验证的输入。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid "[inout] Initialized idle port owned by this execution context."
+msgstr "[inout] 由当前执行上下文拥有、已初始化且空闲的端口。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid "[inout] READY descriptor; borrowed only on NX_SUCCESS."
+msgstr "[inout] READY 描述符；仅在 NX_SUCCESS 时借用。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid ""
+"NX_SUCCESS means ACCEPTED, including a later start failure. "
+"BUSY/INVALID/CONTEXT/STATE/TIMEOUT means REJECTED with zero borrow; an "
+"already expired direct request is not admitted."
+msgstr ""
+"NX_SUCCESS 表示 ACCEPTED，包括随后启动失败的情况。BUSY/INVALID/CONTEXT/STATE/TIMEOUT 表示 "
+"REJECTED，借用为零；直接提交时已经过期的请求不获准入。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid "Start an adapter-admitted QUEUED request without readmission."
+msgstr "启动适配器已准入的 QUEUED 请求，不重复准入。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid "[inout] Single-executor initialized port."
+msgstr "[inout] 已初始化的单执行者端口。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid "[inout] QUEUED descriptor already borrowed by adapter."
+msgstr "[inout] 已由适配器借用的 QUEUED 描述符。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid ""
+"BUSY retains QUEUED; NX_SUCCESS transfers execution to port. Other start "
+"errors must be settled by the adapter executor."
+msgstr "BUSY 保留 QUEUED；NX_SUCCESS 将执行权转给端口。其他启动错误须由适配器执行者结算。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid "Request cancellation; acceptance does not mean settlement."
+msgstr "请求取消；接受取消不表示请求结清。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid "[inout] Same single execution owner as submit/service."
+msgstr "[inout] 与 submit/service 相同的单一执行所有者。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid ""
+"[inout] Active live descriptor; cross-task callers use a stable adapter slot"
+" and expected epoch instead of this pointer."
+msgstr "[inout] 当前活动且有效的描述符；跨任务调用方应使用稳定的适配器槽及期望 epoch，不能使用此指针。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid ""
+"NX_SUCCESS for pending/already settled cancellation; STATE for a different "
+"request. Borrow continues until SETTLED."
+msgstr "取消仍待完成或已结算时返回 NX_SUCCESS；请求不匹配时为 STATE。借用持续到 SETTLED。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid "Observe time/hardware completion and drain one active request."
+msgstr "观察时间／硬件完成并排空一个活动请求。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid ""
+"Bounded, no wait/callback; call throughout stop/drain and at the declared "
+"maximum service interval. Publication is final request access. Hardware "
+"unable to drain retains QUARANTINED."
+msgstr ""
+"有界操作，无等待或回调；在 stop/drain 全程及所声明的最大 service 间隔内持续调用。发布完成是对请求的最后一次访问。硬件不能排空时保留"
+" QUARANTINED。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid "[inout] Single task/loop execution owner."
+msgstr "[inout] 单一任务/主循环执行所有者。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid "Read buffered RX events from the selected event profile."
+msgstr "从选定事件配置读取缓冲的 RX 事件。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid "[inout] Initialized event-profile port; one consumer."
+msgstr "[inout] 已初始化的事件 profile 端口；只有一个消费者。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid "[out] Caller-owned destination; not retained."
+msgstr "[out] 调用方拥有的目标存储；不保留引用。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid "[in] Destination event count."
+msgstr "[in] 目的事件数量。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid "[out] Events copied, including explicit loss/error flags."
+msgstr "[out] 已复制的事件，包含显式丢失/错误标志。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid ""
+"NX_SUCCESS, EMPTY or INVALID/UNSUPPORTED. IRQ produces only into configured "
+"storage; overflow never silently overwrites."
+msgstr "NX_SUCCESS、EMPTY 或 INVALID/UNSUPPORTED。IRQ 只向已配置存储生产数据；溢出绝不静默覆盖。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid "Read buffered bytes from the selected byte profile."
+msgstr "从选定字节配置读取缓冲字节。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid "[inout] Initialized byte-profile port; one consumer."
+msgstr "[inout] 已初始化的字节 profile 端口；只有一个消费者。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid "[in] Destination capacity in bytes."
+msgstr "[in] 目标容量，单位为字节。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid ""
+"[out] Bytes copied; valid on OVERFLOW and on a provider IO failure after "
+"copying bytes and attempting RX rearm."
+msgstr "[out] 已复制的字节数；返回 OVERFLOW 时仍有效；提供者在复制字节并尝试重新启用 RX 后发生 IO 失败时也仍有效。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid ""
+"NX_SUCCESS, EMPTY, OVERFLOW or INVALID/UNSUPPORTED. Byte profile reports "
+"aggregate loss without invented timestamps. A provider can return IO if RX "
+"source rearm fails after copying; count and copied bytes remain valid. "
+"Admission closes and retained hardware requires verified stop."
+msgstr ""
+"NX_SUCCESS、EMPTY、OVERFLOW 或 "
+"INVALID/UNSUPPORTED。字节模式报告累计丢失，不虚构时间戳。提供者若在复制后重新启用 RX 源失败，可以返回 IO；count "
+"和已复制字节仍有效。准入关闭，仍保留责任的硬件必须经验证停止。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid "Close admission and drain TX before releasing hardware."
+msgstr "关闭准入，并在释放硬件之前排空 TX。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid ""
+"RX/IRQ and external consumers must quiesce before storage reclamation. No "
+"automatic task/notification destruction."
+msgstr "回收存储前，RX/IRQ 和外部消费者必须静止。不自动销毁任务或通知对象。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid "[inout] Owner; producers must already have quiesced."
+msgstr "[inout] 所有者；生产者必须已经静止。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid "NX_SUCCESS when stopped; BUSY while service must continue."
+msgstr "停止后返回 NX_SUCCESS；仍须继续 service 时返回 BUSY。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid "Attach or detach one explicit IRQ wake target."
+msgstr "附加或解除一个显式 IRQ 唤醒目标。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid ""
+"Quiesce every previous publisher before reclaiming an old target. IRQ events"
+" latch RX/completion facts before notifying. Detachment removes future "
+"publications; notification storage still requires joining external waiters "
+"and callbacks."
+msgstr ""
+"回收旧目标前，须等待全部先前发布者静止。IRQ 事件在通知前锁存 RX/完成事实。解除绑定阻止未来发布；通知存储仍须等待外部等待者和回调退出。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid "[in] Initialized provider, controlled by one task executor."
+msgstr "[in] 已初始化的 provider，由单一任务执行者控制。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid "[in] Immutable live target or NULL to detach."
+msgstr "[in] 不可变的活动目标；NULL 表示解除绑定。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid ""
+"[in] Optional additional unshifted kernel-safe priority floor; cannot weaken"
+" generated policy. PRIMASK kernel targets require zero. Ignored without "
+"kernel calls."
+msgstr "[in] 可选的额外未移位内核安全优先级数值下限；不得削弱生成策略。PRIMASK 内核目标要求为零。不调用内核时忽略。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid ""
+"Success, CONTEXT outside task control, PERMISSION for unsafe actual IRQ "
+"priority, or provider STATE/UNSUPPORTED."
+msgstr ""
+"成功；不在任务控制上下文时返回 CONTEXT；实际 IRQ 优先级不安全时返回 PERMISSION；也可能返回 provider 的 "
+"STATE/UNSUPPORTED。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid "Start the selected RX block mode using exact caller storage."
+msgstr "使用调用者准确存储启动选定 RX 块模式。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid ""
+"Provider boundaries and gaps are explicit capability facts. The provider "
+"must never overwrite a borrowed consumer block."
+msgstr "provider 的边界和缺口是显式能力事实。provider 绝不能覆盖被消费者借用的块。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid "[in] Block-capable provider, one task execution owner."
+msgstr "[in] 支持块的 provider，只有一个任务执行所有者。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid ""
+"[inout] Initialized block stream retained until RX stops and all acquired "
+"consumer blocks are released."
+msgstr "[inout] 已初始化的块流；保留到 RX 停止且全部已获取的消费者块被释放。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid ""
+"Success or INVALID/BUSY/UNSUPPORTED with zero failed admission loan; "
+"selected hardware modes validate every DMA block domain."
+msgstr "成功或 INVALID/BUSY/UNSUPPORTED；失败准入的借用为零。所选硬件模式验证每个 DMA 块的内存域。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid "Stop RX block production without revoking consumer loans."
+msgstr "停止 RX 块生产，不撤销消费者借用。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid ""
+"Consumers separately drain READY blocks and release loans; successful RX "
+"stop does not destroy stream or wake storage."
+msgstr "消费者单独排空 READY 块并释放借用；RX stop 成功不会销毁流或 wake 存储。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid "[in] Same executor as RX start; storage stays live on BUSY."
+msgstr "[in] 与 RX start 相同的执行者；BUSY 时存储继续有效。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid ""
+"Success proves memory sources detached; BUSY retains producer loan, "
+"UNSUPPORTED for a byte/event-only provider."
+msgstr "成功证明内存访问源已撤离；BUSY 保留生产者借用；仅支持字节/事件的 provider 返回 UNSUPPORTED。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid "Timestamp belongs to provider clock; precision is hardware-specific."
+msgstr "时间戳属于提供者时钟；精度由硬件决定。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid ""
+"NO_BYTE marks status-only IRQ facts: byte is invalid. LOSS is an independent"
+" NO_BYTE boundary marker, ordered after older buffered facts and before "
+"later reception. Its timestamp is provider detection/report time, never a "
+"reconstructed timestamp for missing bytes. Byte-profile reads report "
+"aggregate loss and omit status-only facts."
+msgstr ""
+"NO_BYTE 标识仅含状态的 IRQ 事实：byte 无效。LOSS 是独立的 NO_BYTE "
+"边界标记，排在更旧的已缓冲事实之后、后续接收之前。其时间戳是 provider 检测或报告的时间，绝不是为丢失字节重建的时间戳。字节 profile "
+"读取报告累计丢失，并省略仅含状态的事实。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+#: ../../../../../../docs/reference/api/io/uart.md:35
+#: ../../../../../../docs/reference/api/io/uart.md:41
+#: ../../../../../../docs/reference/api/io/uart.md:47
+msgid "Public Members"
+msgstr "公共成员"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid "Caller-owned TX descriptor; initialize base before first prepare."
+msgstr "调用者拥有的 TX 描述符；第一次 prepare 之前必须初始化 base。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid "Paired transport and exact-context admission callback."
+msgstr "配对的 transport 与精确上下文准入 callback。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid ""
+"Integration obtains both from one typed identity. This value creates no "
+"owner, storage loan or authentication guarantee. An unavailable binding has "
+"both fields NULL; faces and callback outlive their uses."
+msgstr ""
+"集成从同一强类型身份取得两者。该值不创建 owner、存储借用或认证保证。绑定不可用时两个字段均为 NULL；face 与 callback "
+"须覆盖其使用生命周期。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid "Shared read-only methods using one provider state."
+msgstr "使用同一个提供者状态的共享只读方法。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid ""
+"Methods follow each public operation's ownership contract. Missing optional "
+"methods report UNSUPPORTED."
+msgstr "各方法遵循对应公共操作的所有权合同。缺失的可选方法返回 UNSUPPORTED。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid "Immutable interface pointing to caller-owned state."
+msgstr "指向调用者自有状态的不可变接口。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:29
+msgid ""
+"Face and state outlive callers, IRQs and retained borrows. Factory lookup "
+"neither initializes nor acquires hardware."
+msgstr "接口和状态的生命周期覆盖调用方、IRQ 及保留的借用。工厂查找既不初始化，也不取得硬件。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:33
+msgid "uart_format.h"
+msgstr "uart_format.h"
+
+#: ../../../../../../docs/reference/api/io/uart.md:35
+msgid "Explicit payload, parity, stop and hardware-flow format."
+msgstr "显式的载荷、校验、停止位与硬件流控格式。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:35
+msgid "Validate generic frame values without selecting hardware support."
+msgstr "校验通用帧取值，不选择硬件支持范围。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:35
+msgid ""
+"Pure, bounded, task/IRQ safe. The selected provider separately checks its "
+"frame combinations, storage format and Board routing."
+msgstr "纯、有界、task／IRQ 安全。所选 provider 另外检查帧组合、存储格式和 Board 接线。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:35
+msgid "[in] Explicit payload width, parity, stop and flow selection."
+msgstr "[in] 显式载荷位宽、奇偶校验、停止位和流控选择。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:35
+msgid ""
+"Success for 5..9 data bits, known parity/flow and one/two stop bits; INVALID"
+" for unknown values. Success does not authorize a controller."
+msgstr "5..9 数据位、已知 parity／flow 和一／二停止位返回成功；未知值返回 INVALID。成功不授予控制器使用权限。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:35
+msgid "Immutable wire format; 5..9 data_bits exclude the parity bit."
+msgstr "不可变线格式；5..9 data_bits 不包含校验位。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:35
+msgid "RTS/CTS needs independently reviewed Board routing and peer wiring."
+msgstr "RTS/CTS 需要单独审核 Board 路由及对端接线。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:39
+msgid "uart_rs485.h"
+msgstr "uart_rs485.h"
+
+#: ../../../../../../docs/reference/api/io/uart.md:41
+msgid "Optional single-owner RS485 direction and wire-tail adapter."
+msgstr "可选单所有者 RS485 方向与线尾适配器。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:41
+msgid "Bind exclusive transport and establish inactive DE."
+msgstr "绑定独占传输端口并建立非活动 DE。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:41
+msgid ""
+"Task-only, no wait. No physical transceiver is inferred. Setup starts after "
+"successful DE assertion; hold starts after acquire-observed true transport "
+"settlement. Transfer deadline includes setup and wire completion; mandatory "
+"drain/hold may extend the borrow beyond that deadline. Rejected TX leaves DE"
+" and transport unchanged. Failed drain or DE withdrawal keeps QUARANTINED "
+"outer storage and DE ownership until service retry. Unrepresentable setup "
+"rejects with EXHAUSTED before DE assertion. Exhaustion after acceptance "
+"never revokes its borrow. If the minimum hold cannot be proved in the "
+"remaining time domain, DE and the outer loan remain QUARANTINED; stop stays "
+"BUSY until external isolation/recovery. Service never shortens that "
+"electrical hold or invents a new time domain."
+msgstr ""
+"仅 Task 调用，不等待，不推定物理收发器。DE 成功置有效后开始 setup；acquire 观察真实传输结清后开始 hold。transfer "
+"deadline 包含 setup 和线上完成，必需 drain／hold 可使借用超过该 deadline。TX 拒绝不改变 DE 或 "
+"transport。排空或 DE 撤回失败时保留 QUARANTINED outer 存储和 DE 所有权，等待 service 重试。setup "
+"无法表示时在 DE 置有效前以 EXHAUSTED 拒绝；接纳后的耗尽不撤销借用。若剩余时间域内无法证明最低 hold，DE 与 outer loan "
+"继续 QUARANTINED，stop 保持 BUSY，直到外部隔离／恢复。service 不缩短电气 hold，也不虚构新时间域。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:41
+msgid "[inout] Fresh zero-initialized caller control."
+msgstr "[inout] 调用方拥有的全新零初始化控制对象。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:41
+msgid ""
+"[in] Immutable lifetime binding; one authorized DE bit, real board polarity,"
+" setup/hold in nx_time_now_us domain."
+msgstr "[in] 生命周期内不可变的绑定；一个获授权的 DE 位、实际板级极性，以及 nx_time_now_us 域中的 setup/hold。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:41
+msgid "Success or INVALID/CONTEXT/STATE/GPIO failure, no TX loan."
+msgstr "成功或 INVALID/CONTEXT/STATE/GPIO 失败；无 TX 借用。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:41
+msgid "Variables"
+msgstr "变量"
+
+#: ../../../../../../docs/reference/api/io/uart.md:41
+msgid "Immutable selected electrical/timing facts, no task or heap."
+msgstr "不可变的选定电气／时序事实，不含任务或堆。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:41
+msgid ""
+"Configuration, faces, ops and context identities cannot change while bound. "
+"They are disjoint from mutable adapter, request and payload storage; exact "
+"pin ownership is external."
+msgstr "绑定期间，配置、接口、ops 及 context 身份不得改变。它们与可变适配器、请求及载荷存储分离；精确引脚所有权由外部负责。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:41
+msgid "Caller-owned opt-in adapter, zero-initialize before init."
+msgstr "调用者显式选择的适配器，init 前零初始化。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:41
+msgid ""
+"Control is private after initialization. Immutable config, both faces, "
+"signal, pin ownership and all storage outlive successful stop plus external "
+"observers. Default UART state is unchanged."
+msgstr ""
+"初始化后 control 为私有。不可变 config、两个 face、signal、pin 所有权及全部存储，必须保持至成功 stop "
+"及外部观察者排空。默认 UART 状态不变。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:45
+msgid "uart_word.h"
+msgstr "uart_word.h"
+
+#: ../../../../../../docs/reference/api/io/uart.md:47
+msgid "Independent nine-bit face and caller-owned word requests."
+msgstr "独立的九位接口与调用者拥有的字请求。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:47
+msgid "Prepare an unborrowed nine-bit payload, without admitting it."
+msgstr "准备尚未借用的九位载荷，不执行准入。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:47
+msgid "Task owner; payload values are checked before provider admission."
+msgstr "任务所有者；载荷值在 provider 准入前检查。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:47
+msgid "[inout] Initialized READY or consumed SETTLED descriptor."
+msgstr "[inout] 已初始化的 READY 或已消费的 SETTLED 描述符。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:47
+msgid "[in] Aligned immutable words, disjoint from the descriptor."
+msgstr "[in] 已对齐的不可变字数组，与描述符分离。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:47
+msgid "[in] Positive word count, representable as a byte extent."
+msgstr "[in] 正数字数，可表示为字节范围。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:47
+msgid "[in] Absolute nx_time_now_us monotonic transfer deadline."
+msgstr "[in] nx_time_now_us 单调域中的绝对传输时限。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:47
+msgid "Success, INVALID or STATE; rejection retains no references/effects."
+msgstr "成功、INVALID 或 STATE；拒绝时不保留引用，也不产生副作用。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:47
+msgid "Admit one READY request to the single unmasked task executor."
+msgstr "将一个 READY 请求准入唯一、未屏蔽中断的任务执行者。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:47
+msgid "Counts use words; completion requires actual wire TC."
+msgstr "计数以字为单位；完成要求实际线路 TC。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:47
+msgid "[in] Live initialized face, private state and IRQ binding."
+msgstr "[in] 已初始化的活动接口、私有状态及 IRQ 绑定。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:47
+msgid "[inout] Caller-owned descriptor, borrowed on success."
+msgstr "[inout] 调用方拥有的描述符；成功时借用。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:47
+msgid "Success means ACCEPTED; rejection has no borrow/hardware effects."
+msgstr "成功表示 ACCEPTED；拒绝时不借用，也不产生硬件副作用。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:47
+msgid "Transfer an adapter's QUEUED borrow without readmission."
+msgstr "接管适配器的 QUEUED 借用，不再次准入。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:47
+msgid "[in] Live single-owner face."
+msgstr "[in] 活动的单所有者接口。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:47
+msgid "[inout] Existing adapter borrow."
+msgstr "[inout] 已有适配器借用。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:47
+msgid "Success transfers execution; BUSY leaves QUEUED and its borrow."
+msgstr "成功转移执行权；BUSY 保留 QUEUED 及其借用。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:47
+msgid "Request cancellation without revoking request/payload ownership."
+msgstr "请求取消，不撤销请求／载荷的所有权。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:47
+msgid "Continue service through drain; failed drain stays QUARANTINED."
+msgstr "排空期间继续 service；排空失败时保留 QUARANTINED。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:47
+msgid "[in] Same unmasked task executor as submit/service."
+msgstr "[in] 与 submit/service 相同的中断未屏蔽任务执行者。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:47
+msgid "[inout] Live request; cross-task control uses a stable slot."
+msgstr "[inout] 活动请求；跨任务控制使用稳定的槽。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:47
+msgid "Success for this request, STATE for a different live request."
+msgstr "当前请求返回成功；其他活动请求返回 STATE。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:47
+msgid "Perform bounded owner-driven deadline, drain and settlement work."
+msgstr "由所有者执行有界的截止时间、排空与结清工作。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:47
+msgid ""
+"IRQ only publishes facts; SETTLED is final provider access. No wait, hidden "
+"worker or callback; obey the declared maximum service gap."
+msgstr ""
+"IRQ 仅发布事实；SETTLED 是 provider 的最后一次访问。无等待、隐藏工作任务或回调；须遵守所声明的最大 service 间隔。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:47
+msgid "[in] Single unmasked task owner, kept alive through stop."
+msgstr "[in] 单一中断未屏蔽任务所有者，保持有效直到 stop 完成。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:47
+msgid "Copy words without retaining destination storage."
+msgstr "复制字，不持续借用目标存储。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:47
+msgid "Loss does not invent a hardware timestamp or missing word count."
+msgstr "丢失不会虚构硬件时间戳，也不会虚构缺失字数。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:47
+msgid "[in] Initialized face, one consumer under the task executor."
+msgstr "[in] 已初始化的接口，由任务执行者控制且只有一个消费者。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:47
+msgid "[out] Aligned destination, disjoint from provider/RX storage."
+msgstr "[out] 已对齐的目标，与 provider/RX 存储分离。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:47
+msgid "[in] Positive destination capacity in words."
+msgstr "[in] 正数目标容量，单位为字。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:47
+msgid "[out] Number copied, including on OVERFLOW."
+msgstr "[out] 已复制数量；OVERFLOW 时也有效。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:47
+msgid "Success, EMPTY, OVERFLOW, INVALID, CONTEXT or STATE."
+msgstr "成功、EMPTY、OVERFLOW、INVALID、CONTEXT 或 STATE。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:47
+msgid "Close admission and stop after active TX and IRQ sources drain."
+msgstr "关闭准入，并在活动 TX 与 IRQ 源排空后停止。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:47
+msgid "Caller joins any in-flight IRQ before reclaiming provider storage."
+msgstr "回收 provider 存储前，调用方须等待全部正在执行的 IRQ 退出。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:47
+msgid "[in] One task owner; external producers/observers quiesced."
+msgstr "[in] 单一任务所有者；外部生产者和观测者已静止。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:47
+msgid "Success after hardware detach; BUSY while service must continue."
+msgstr "硬件引用撤离后成功；仍须继续 service 时返回 BUSY。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:47
+msgid "Each uint16_t contains 0..511; count excludes bytes and parity."
+msgstr "每个 uint16_t 包含 0..511；按字计数，不以字节计且不包含校验位。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:47
+msgid "Request and unchanged payload are borrowed until acquire SETTLED."
+msgstr "请求及保持不变的载荷持续被借用，直到以 acquire 语义观测到 SETTLED。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:47
+msgid "Independent immutable face; default byte face/state do not grow."
+msgstr "独立不可变接口；默认字节接口／状态不增加。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:47
+msgid "Static identity; lookup does not allocate, discover or initialize."
+msgstr "静态身份；查找不分配、不发现设备，也不初始化。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:51
+msgid "uart_wire.h"
+msgstr "uart_wire.h"
+
+#: ../../../../../../docs/reference/api/io/uart.md:53
+msgid "Explicit USART wire personalities and LIN break requests."
+msgstr "显式 USART wire personality 与 LIN break 请求。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:53
+msgid "A controller personality, independent of an application protocol."
+msgstr "一种 controller personality，独立于应用协议。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:53
+msgid "Prepare an unborrowed descriptor for one LIN 13-bit break."
+msgstr "为一个 LIN 13-bit break 准备未被借用的描述符。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:53
+msgid ""
+"Submit only to an explicitly selected LIN provider. The ordinary UART "
+"submit/cancel/service/stop contract applies, including retained borrow until"
+" real TC and withdrawal precede SETTLED. No LIN data is appended."
+msgstr ""
+"只能提交给显式选择的 LIN provider。普通 UART submit／cancel／service／stop "
+"合同仍适用，包括持续保留借用，直到真实 TC 和来源撤回都先于 SETTLED 完成。不追加 LIN 数据。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:53
+msgid "[inout] Initialized fresh or consumed SETTLED descriptor."
+msgstr "[inout] 已初始化的新描述符或已消费的 SETTLED 描述符。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:53
+msgid "[in] Absolute nx_time_now_us deadline including wire tail."
+msgstr "[in] 绝对 nx_time_now_us deadline，含 wire tail。"
+
+#: ../../../../../../docs/reference/api/io/uart.md:53
+msgid "Success or INVALID/STATE. No payload is retained by preparation."
+msgstr "成功或 INVALID／STATE。Prepare 不保留 payload。"

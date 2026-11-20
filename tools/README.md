@@ -14,7 +14,7 @@
 | testing | 开发、依赖、SDK、测量与 HIL 工具回归，按现有 suite 执行 |
 | schemas | HIL 和资源记录的编辑／参考 schema；实际准入由对应工具校验 |
 
-从 [开发入口](dev/README.md) 和 [工程手册](../docs/design/engineering-handbook.md) 开始。
+从 [开发入口](dev/README.md) 和 [工程手册](../docs/reference/contracts/engineering.md) 开始。
 平台不维护另一套候选晋升、归档恢复和任务台账引擎。
 
 配置工具回归位于 `configure/tests/`；CI 回归位于 `scripts/ci/`；文档回归由独立锁定

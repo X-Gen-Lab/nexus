@@ -1,5 +1,5 @@
 // FIG-06 current: Core request helper transitions and ownership conditions.
-// Code basis: 0111c8d3b9c7b37d258b9c401070305b13b6f3a1.
+// Code basis: core/include/nexus/core/request.h; core/src/request.c.
 // REJECTED and ACCEPTED are admission results, not request enum states.
 digraph requestLifecycle {
     graph [label="FIG-06 当前Core请求状态与借用\nFIG-06 Current Core request and borrow states", fontname="Noto Sans CJK SC", fontsize=15, labelloc=t, rankdir=TB, bgcolor="white", pad=0.25, nodesep=0.55, ranksep=0.70];

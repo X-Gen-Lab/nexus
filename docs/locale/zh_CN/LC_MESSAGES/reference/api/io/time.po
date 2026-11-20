@@ -1,0 +1,1043 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 83b9a64ecbe5709853775ede130e6fcf80746c8315bd2e17433e7a296466d261\n"
+
+#: ../../../../../../docs/reference/api/io/time.md:10
+msgid "RTC, low-power counters and time sources"
+msgstr "RTC、低功耗计数器与时间源"
+
+#: ../../../../../../docs/reference/api/io/time.md:12
+msgid ""
+"Calendar operations, finite low-power counters and monotonic deadline clocks"
+" have separate identities. Read the selected provider contract for "
+"continuity, backup-domain access and final source withdrawal."
+msgstr "日历操作、有限低功耗计数器和单调截止时间时钟具有独立身份。连续性、备份域访问及最终来源撤回须遵循所选 provider 合同。"
+
+#: ../../../../../../docs/reference/api/io/time.md:16
+msgid "Public declarations"
+msgstr "公共声明"
+
+#: ../../../../../../docs/reference/api/io/time.md:18
+msgid "lptim.h"
+msgstr "lptim.h"
+
+#: ../../../../../../docs/reference/api/io/time.md:20
+msgid "Finite 16-bit counter shots in a distinct tick domain."
+msgstr "在独立 tick 域中执行有限的 16 位计数。"
+
+#: ../../../../../../docs/reference/api/io/time.md:20
+#: ../../../../../../docs/reference/api/io/time.md:26
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "Author  Nexus Team"
+msgstr "作者  Nexus Team"
+
+#: ../../../../../../docs/reference/api/io/time.md:20
+#: ../../../../../../docs/reference/api/io/time.md:26
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "Nexus Team"
+msgstr "Nexus Team"
+
+#: ../../../../../../docs/reference/api/io/time.md:20
+#: ../../../../../../docs/reference/api/io/time.md:26
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "Functions"
+msgstr "函数"
+
+#: ../../../../../../docs/reference/api/io/time.md:20
+msgid "Prepare initialized unborrowed storage with copied shot metadata."
+msgstr "把复制的计数元数据准备到已初始化且未借用的存储中。"
+
+#: ../../../../../../docs/reference/api/io/time.md:20
+msgid ""
+"Complete spans must be aligned, nonwrapping and disjoint. No loan, clock "
+"access, unit conversion or physical rate qualification occurs."
+msgstr "完整存储范围必须对齐、不发生地址回绕且互不重叠。该操作不建立借用、不访问时钟、不转换单位，也不证明物理速率。"
+
+#: ../../../../../../docs/reference/api/io/time.md:0
+msgid "Parameters"
+msgstr "参数"
+
+#: ../../../../../../docs/reference/api/io/time.md:20
+msgid "[inout] READY or consumed SETTLED with all observers joined."
+msgstr "[inout] READY 或结果已消费的 SETTLED 存储，且所有观察者均已 join。"
+
+#: ../../../../../../docs/reference/api/io/time.md:20
+msgid "[in] Separate nonzero owner/generation value copied here."
+msgstr "[in] 在此复制独立、非零的 owner／代次值。"
+
+#: ../../../../../../docs/reference/api/io/time.md:20
+msgid "[in] Exact positive count, 1..65536, in this domain's ticks."
+msgstr "[in] 精确的正计数，范围为 1..65536，单位是该域的 tick。"
+
+#: ../../../../../../docs/reference/api/io/time.md:20
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid "[in] Absolute Core monotonic deadline or NX_DEADLINE_NEVER."
+msgstr "[in] 绝对 Core 单调 deadline 或 NX_DEADLINE_NEVER。"
+
+#: ../../../../../../docs/reference/api/io/time.md:0
+msgid "Returns"
+msgstr "返回值"
+
+#: ../../../../../../docs/reference/api/io/time.md:20
+msgid "SUCCESS or INVALID/STATE; failure leaves every request byte unchanged."
+msgstr "SUCCESS 或 INVALID/STATE；失败保持请求的每个字节不变。"
+
+#: ../../../../../../docs/reference/api/io/time.md:20
+msgid "Copy the live counter domain and declared units on one task owner."
+msgstr "由一个任务 owner 复制当前计数域和声明单位。"
+
+#: ../../../../../../docs/reference/api/io/time.md:20
+msgid ""
+"Open idle reports counter zero and not running. This finite interface does "
+"not reconstruct unobserved wraps or provide an absolute clock."
+msgstr "开放且空闲时报告计数器为零且未运行。此有限接口不恢复未观察到的回绕，也不提供绝对时钟。"
+
+#: ../../../../../../docs/reference/api/io/time.md:20
+msgid "[in] Serialized immutable face; no concurrent model/lifecycle."
+msgstr "[in] 串行访问的只读接口面；不允许并发模型／生命周期操作。"
+
+#: ../../../../../../docs/reference/api/io/time.md:20
+msgid "[out] Separate aligned writable snapshot."
+msgstr "[out] 独立、对齐且可写的快照。"
+
+#: ../../../../../../docs/reference/api/io/time.md:20
+msgid ""
+"SUCCESS, STATE if closed, or INVALID/UNSUPPORTED; rejected output is "
+"unchanged."
+msgstr "SUCCESS、关闭时的 STATE 或 INVALID/UNSUPPORTED；拒绝时输出不变。"
+
+#: ../../../../../../docs/reference/api/io/time.md:20
+msgid "Borrow one READY shot after all idle/domain/range checks."
+msgstr "完成空闲／域／范围检查后借用一个 READY 计数请求。"
+
+#: ../../../../../../docs/reference/api/io/time.md:20
+msgid ""
+"Expired finite deadline rejects TIMEOUT before source effects. Reserve a "
+"final nonwrapping domain increment before acceptance: EXHAUSTED never "
+"abandons a previously accepted loan. Clock context lifetime, complete "
+"extent/disjointness and non-reentry are assembly responsibilities."
+msgstr ""
+"有限 deadline 已到期时，在产生请求源效果前返回 TIMEOUT。接受请求前预留最终不回绕的域递增：EXHAUSTED "
+"绝不丢弃此前已经接受的借用。时钟上下文生命周期、完整范围／不重叠及不可重入由装配方负责。"
+
+#: ../../../../../../docs/reference/api/io/time.md:20
+msgid "[in] Same serialized owner with a copied external Core clock."
+msgstr "[in] 同一个串行 owner，持有复制的外部 Core 时钟接口面。"
+
+#: ../../../../../../docs/reference/api/io/time.md:20
+msgid "[inout] Caller request; no queue or hidden worker."
+msgstr "[inout] 调用方请求；没有队列或隐藏 worker。"
+
+#: ../../../../../../docs/reference/api/io/time.md:20
+msgid ""
+"SUCCESS means ACCEPTED; INVALID/STATE/BUSY/TIMEOUT/EXHAUSTED/UNSUPPORTED "
+"rejects without retained references or effects."
+msgstr ""
+"SUCCESS 表示 ACCEPTED；INVALID/STATE/BUSY/TIMEOUT/EXHAUSTED/UNSUPPORTED "
+"表示拒绝，不保留引用或效果。"
+
+#: ../../../../../../docs/reference/api/io/time.md:20
+msgid "Accept cancellation, retaining the loan until proved withdrawal."
+msgstr "接受取消，但保持借用直到证明已撤源。"
+
+#: ../../../../../../docs/reference/api/io/time.md:20
+msgid ""
+"Cancel/stop may win before unobserved event/expiry. First cause stays fixed;"
+" transferred counts final source progress at actual withdrawal."
+msgstr ""
+"cancel／stop 可以在尚未观察到事件／到期之前先锁存原因。首次原因保持不变；transferred 记录真实撤源时最终的请求源进度。"
+
+#: ../../../../../../docs/reference/api/io/time.md:20
+msgid "[in] Same serialized executor; no implicit cross-task locking."
+msgstr "[in] 同一个串行执行者；没有隐式跨任务锁。"
+
+#: ../../../../../../docs/reference/api/io/time.md:20
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid "[inout] Exact active identity; foreign identity is not read."
+msgstr "[inout] 精确的活动请求身份；不读取其他请求身份指向的存储。"
+
+#: ../../../../../../docs/reference/api/io/time.md:20
+msgid ""
+"SUCCESS may still mean QUARANTINED; rejection is STATE/INVALID/UNSUPPORTED."
+msgstr "SUCCESS 仍可能表示 QUARANTINED；拒绝返回 STATE/INVALID/UNSUPPORTED。"
+
+#: ../../../../../../docs/reference/api/io/time.md:20
+msgid "Observe deadline/event and continue bounded real withdrawal."
+msgstr "观察 deadline／事件，并继续有界的真实撤源。"
+
+#: ../../../../../../docs/reference/api/io/time.md:20
+msgid ""
+"First observed expiry wins over pending completion. Clear all source, "
+"pending and owner references before final release SETTLED publication."
+msgstr ""
+"首次观察到的到期优先于 pending 完成事件。最终以 release 发布 SETTLED 前，清除全部请求源、pending 和 owner "
+"引用。"
+
+#: ../../../../../../docs/reference/api/io/time.md:20
+msgid "[in] Same serialized task owner; no implicit source advance."
+msgstr "[in] 同一个串行任务 owner；不隐式推进请求源。"
+
+#: ../../../../../../docs/reference/api/io/time.md:20
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid ""
+"SUCCESS when idle/settled, BUSY while active or withdrawal is held; "
+"INVALID/STATE/UNSUPPORTED may reject dispatch."
+msgstr ""
+"空闲／已结清时返回 SUCCESS，活动或撤源被 hold 阻止时返回 BUSY；INVALID/STATE/UNSUPPORTED 可以拒绝分发。"
+
+#: ../../../../../../docs/reference/api/io/time.md:20
+msgid "Close admission; cancelled/expired is never a loan-release proof."
+msgstr "关闭准入；取消／到期绝不是借用已归还的证明。"
+
+#: ../../../../../../docs/reference/api/io/time.md:20
+msgid ""
+"Repeated clean stop is safe; it does not reset generation or lifetime. Tick "
+"rate/source and backup/Stop/VBAT continuity need separate hardware "
+"contracts; this interface establishes none of those qualifications."
+msgstr ""
+"重复执行已完成的干净 stop 是安全的；它不重置代次或生命周期。tick 速率／请求源和备份／Stop／VBAT "
+"连续性需要独立硬件合同；此接口不建立这些验证资格。"
+
+#: ../../../../../../docs/reference/api/io/time.md:20
+msgid "[in] Serialized owner, with all external publishers quiescent."
+msgstr "[in] 串行 owner，且所有外部发布者均已静止。"
+
+#: ../../../../../../docs/reference/api/io/time.md:20
+msgid ""
+"SUCCESS after detachment, BUSY retains quarantined storage; "
+"INVALID/STATE/UNSUPPORTED may reject dispatch."
+msgstr "脱离引用后返回 SUCCESS，BUSY 保留隔离存储；INVALID/STATE/UNSUPPORTED 可以拒绝分发。"
+
+#: ../../../../../../docs/reference/api/io/time.md:20
+msgid "Owner and nonwrapping shot incarnation, never an RTC/Core token."
+msgstr "owner 与不回绕的计数代次，绝不是 RTC/Core token。"
+
+#: ../../../../../../docs/reference/api/io/time.md:20
+msgid ""
+"Identity is compared without dereference. Tokens/observers must be retired "
+"before the owner storage lifetime ends or its address is reused."
+msgstr "仅比较身份，不解引用。结束 owner 存储生命周期或复用其地址前，必须退役所有 token／观察者。"
+
+#: ../../../../../../docs/reference/api/io/time.md:20
+#: ../../../../../../docs/reference/api/io/time.md:26
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "Public Members"
+msgstr "公共成员"
+
+#: ../../../../../../docs/reference/api/io/time.md:20
+msgid "Declared units and modulo counter, not an absolute time estimate."
+msgstr "声明单位与模计数值，不是绝对时间估计。"
+
+#: ../../../../../../docs/reference/api/io/time.md:20
+msgid ""
+"A complete 65536-tick shot wraps counter to zero. Counter zero alone cannot "
+"establish completion, idle, missed wraps or low-power continuity. tick_hz is"
+" a fixed declared rate, not physical oscillator accuracy."
+msgstr ""
+"完整的 65536 tick 计数会把计数器回绕到零。单凭计数器为零不能证明完成、空闲、遗漏回绕或低功耗连续性。tick_hz "
+"是固定声明速率，不是物理振荡器精度。"
+
+#: ../../../../../../docs/reference/api/io/time.md:20
+msgid "One caller-owned finite shot; transferred is final observed ticks."
+msgstr "一次由调用方持有的有限计数；transferred 是最终观察到的 tick 数。"
+
+#: ../../../../../../docs/reference/api/io/time.md:20
+msgid ""
+"Initialize base first. After ACCEPTED keep the entire request live and "
+"caller immutable until acquire-observed SETTLED and external joins. A "
+"latched CANCELLED/TIMEOUT fixes the cause, not the final progress: held "
+"withdrawal may allow further source ticks before detachment."
+msgstr ""
+"先初始化 base。ACCEPTED 后，保持整个请求有效且调用方不可修改，直到以 acquire 观察到 SETTLED 并完成外部 join。锁存的"
+" CANCELLED/TIMEOUT 固定终止原因，而不是最终进度：撤源被 hold 阻止时，脱离前请求源仍可能继续累计 tick。"
+
+#: ../../../../../../docs/reference/api/io/time.md:20
+msgid "Shared readonly methods implement the corresponding public contract."
+msgstr "共享只读方法实现相应公共合同。"
+
+#: ../../../../../../docs/reference/api/io/time.md:20
+msgid "Immutable two-pointer face; provider storage remains private."
+msgstr "只读双指针接口面；provider 存储保持私有。"
+
+#: ../../../../../../docs/reference/api/io/time.md:24
+msgid "rtc.h"
+msgstr "rtc.h"
+
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid "Raw calendar and one finite alarm in its own time domain."
+msgstr "独立时间域中的原始日历与一次有限 alarm。"
+
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid "Validate raw calendar fields without changing any storage."
+msgstr "验证原始日历字段，不改变任何存储。"
+
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid "[in] Readable naturally aligned value."
+msgstr "[in] 可读且自然对齐的值。"
+
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid "SUCCESS or INVALID; no clock or provider access."
+msgstr "SUCCESS 或 INVALID；不访问时钟或 provider。"
+
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid "Validate the finite alarm pattern's day and time ranges."
+msgstr "验证有限 alarm 模式的日和时间范围。"
+
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid "SUCCESS or INVALID; not a promise that a provider can arm it."
+msgstr "SUCCESS 或 INVALID；不承诺 provider 能够 armed 该 alarm。"
+
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid "Copy a domain/pattern into initialized unborrowed caller storage."
+msgstr "把域／模式复制到已初始化且未被借用的调用方存储中。"
+
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid ""
+"Inputs must be complete, aligned, nonwrapping spans disjoint from request. "
+"This cold operation takes no loan and cannot know the complete extent of an "
+"opaque provider or clock context. Admission checks the known provider spans;"
+" assembly owns opaque-context disjointness."
+msgstr ""
+"输入必须是完整、对齐、不回绕且与请求不重叠的范围。该冷操作不建立借用，也无法获知不透明 provider 或时钟上下文的完整范围。准入检查已知 "
+"provider 范围；不透明上下文的不重叠由装配方负责。"
+
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid "[inout] READY or consumed SETTLED storage, all joins complete."
+msgstr "[inout] READY 或结果已消费的 SETTLED 存储，所有 join 已完成。"
+
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid "[in] Nonzero owner/generation copied during this call."
+msgstr "[in] 在本次调用中复制非零 owner／代次。"
+
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid "[in] Valid pattern copied during this call."
+msgstr "[in] 在本次调用中复制有效模式。"
+
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid "SUCCESS or INVALID/STATE; every failure leaves request unchanged."
+msgstr "SUCCESS 或 INVALID/STATE；所有失败均保持请求不变。"
+
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid "Copy a set calendar/domain on the single serialized task executor."
+msgstr "由唯一串行任务执行者复制已设置的日历／域。"
+
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid "[in] Valid immutable live face; no concurrent lifecycle writer."
+msgstr "[in] 有效、只读且存活的接口面；不允许并发生命周期写入者。"
+
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid "[out] Separate aligned writable output."
+msgstr "[out] 独立、对齐且可写的输出。"
+
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid ""
+"SUCCESS or STATE for closed/unset, INVALID or UNSUPPORTED; failure leaves "
+"output unchanged."
+msgstr "SUCCESS、关闭／未设置时的 STATE、INVALID 或 UNSUPPORTED；失败保持输出不变。"
+
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid "Set an idle calendar and advance its nonwrapping setting domain."
+msgstr "设置空闲日历，并推进不回绕的设置域。"
+
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid ""
+"Admission rejection changes no state. No implicit backup reset, "
+"synchronization, Core-time adjustment or authorization to overwrite retained"
+" hardware."
+msgstr "准入拒绝不改变任何状态。不隐式复位备份域、同步、调整 Core 时间，也不授权覆盖保留的硬件状态。"
+
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid "[in] Same single serialized privileged task owner."
+msgstr "[in] 同一个唯一串行特权任务 owner。"
+
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid "[in] Separate raw value, copied on successful validation."
+msgstr "[in] 独立的原始值，通过验证后复制。"
+
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid ""
+"SUCCESS, BUSY for a loan, STATE if closed, INVALID, EXHAUSTED or "
+"UNSUPPORTED. A physical provider can return IO/TIMEOUT after acquiring "
+"hardware; its explicit recovery contract then retains ownership and may "
+"prohibit further reads until recovery."
+msgstr ""
+"SUCCESS；存在借用时返回 BUSY，已关闭时返回 STATE，也可能返回 INVALID、EXHAUSTED 或 UNSUPPORTED。物理 "
+"provider 取得硬件后可返回 IO/TIMEOUT；其显式恢复合同随后保留所有权，并可在恢复前禁止继续读取。"
+
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid "Borrow and arm one future alarm; no queue, allocation or worker."
+msgstr "借用并 armed 一个未来 alarm；没有队列、分配或 worker。"
+
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid ""
+"Closed/stale/already-matching pattern returns STATE; active is BUSY. An "
+"observed expired finite deadline returns TIMEOUT before admission. Calendar,"
+" counter and Core deadline are separate domains. Assembly keeps the copied "
+"clock face's borrowed context live, disjoint and non-reentrant for the "
+"entire owner lifetime and all external joins."
+msgstr ""
+"关闭／域过期／已匹配当前时刻的模式返回 STATE；已有活动请求返回 BUSY。观察到有限 deadline 已到期时，在准入前返回 "
+"TIMEOUT。日历、计数器和 Core deadline 分属不同域。在整个 owner 生命周期及所有外部 join "
+"期间，装配方保持复制的时钟接口面所借用上下文有效、不重叠且不重入。"
+
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid "[in] Initialized serialized owner with a valid copied Core clock."
+msgstr "[in] 已初始化的串行 owner，持有有效、复制的 Core 时钟接口面。"
+
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid "[inout] Exact READY request for the current setting domain."
+msgstr "[inout] 精确属于当前设置域的 READY 请求。"
+
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid ""
+"SUCCESS means ACCEPTED; INVALID/STATE/BUSY/TIMEOUT/UNSUPPORTED rejects "
+"without retained references or effects."
+msgstr ""
+"SUCCESS 表示 ACCEPTED；INVALID/STATE/BUSY/TIMEOUT/UNSUPPORTED 表示拒绝，不保留引用或效果。"
+
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid "Latch cancellation of the exact borrowed request, without revocation."
+msgstr "为精确借用的请求锁存取消，但不撤销借用。"
+
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid ""
+"Cancel/stop executed before service may win over unobserved expiry or event."
+" The first terminal cause never changes while withdrawal waits."
+msgstr "在 service 前执行 cancel／stop，可以先于尚未观察的到期或事件锁存原因。等待撤源期间首次终止原因始终不变。"
+
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid "[in] Same serialized executor; cross-task controls need an adapter."
+msgstr "[in] 同一个串行执行者；跨任务控制需要适配器。"
+
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid ""
+"SUCCESS accepts cancellation; it may still be QUARANTINED/borrowed. "
+"Rejection is STATE/INVALID/UNSUPPORTED."
+msgstr ""
+"SUCCESS 表示已接受取消；请求仍可能处于 QUARANTINED／被借用状态。拒绝返回 STATE/INVALID/UNSUPPORTED。"
+
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid "Observe deadline/event or continue actual source withdrawal."
+msgstr "观察 deadline／事件，或继续真实撤源。"
+
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid ""
+"At first observation expiry wins over pending event. Source/pending "
+"references detach before release SETTLED, the final provider access."
+msgstr ""
+"首次观察时，到期优先于 pending 事件。先脱离请求源／pending 引用，再以 release 发布 SETTLED，作为 provider "
+"的最终请求访问。"
+
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid "[in] Same serialized task executor; bounded, no hidden wait."
+msgstr "[in] 同一个串行任务执行者；有界，不隐藏等待。"
+
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid "Close admission and prove withdrawal before returning any loan."
+msgstr "关闭准入，并在归还任何借用前证明已撤源。"
+
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid ""
+"Clean repeated stop is idempotent. Stop does not reset identity or revoke "
+"pointers. Source/provider lifetime still covers external joins."
+msgstr "重复执行已完成的干净 stop 是幂等的。stop 不重置身份，也不撤销指针。请求源／provider 的生命周期仍须覆盖外部 join。"
+
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid "[in] Same serialized owner with external publishers quiescent."
+msgstr "[in] 同一个串行 owner，且外部发布者均已静止。"
+
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid ""
+"SUCCESS when closed/joined; BUSY retains the quarantined request. "
+"INVALID/STATE/UNSUPPORTED may reject dispatch."
+msgstr "已关闭且完成 join 时返回 SUCCESS；BUSY 保留隔离请求。INVALID/STATE/UNSUPPORTED 可以拒绝分发。"
+
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid "Configure periodic wake by duration without hardware counter codes."
+msgstr "按时间间隔配置周期唤醒，无需硬件计数器编码。"
+
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid ""
+"Bounded synchronous control, no retained output or hidden worker. The "
+"provider chooses the counter and reports its nominal period; ties select the"
+" shorter period. Failed hardware withdrawal can retain cleanup "
+"responsibility until stop succeeds. No wake route or Core deadline is "
+"configured. Output must not overlap live provider storage."
+msgstr ""
+"有界同步控制，不保留输出，不创建隐藏 worker。provider 选择计数器并报告名义周期；同等误差时选择较短周期。硬件撤回失败可保留清理责任，直到"
+" stop 成功。不配置唤醒路线或 Core deadline。输出不得与活跃 provider 存储重叠。"
+
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid "[in] Same serialized privileged RTC task owner."
+msgstr "[in] 同一个串行特权 RTC 任务 owner。"
+
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid "[in] Positive requested nominal period; zero disables."
+msgstr "[in] 请求的正名义周期；零表示禁用。"
+
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid ""
+"[in] Maximum permitted absolute nominal quantization error. Zero requires "
+"exact representation."
+msgstr "[in] 允许的最大名义量化绝对误差。零要求精确表示。"
+
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid "[out] Separate stable output, unchanged on failure."
+msgstr "[out] 独立稳定输出，失败时不变。"
+
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid ""
+"SUCCESS, INVALID, UNSUPPORTED for an unrepresentable period within the "
+"tolerance, or the provider's context/lifecycle/hardware error."
+msgstr "SUCCESS、INVALID、无法在容差内表示周期时的 UNSUPPORTED，或 provider 的上下文／生命周期／硬件错误。"
+
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid "Raw YY calendar; no UTC, century, timezone or oscillator policy."
+msgstr "原始 YY 日历；没有 UTC、世纪、时区或振荡器策略。"
+
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid ""
+"YY is 00..99 and leap years satisfy YY modulo 4 == 0. Weekday is an "
+"independent 1..7 value, not inferred from the date. Other fields use "
+"month/day 1-based and 24-hour hour/minute/second values, without leap "
+"seconds. Natural year99->00 wrap does not reset the setting domain."
+msgstr ""
+"YY 为 00..99，YY 模 4 等于零时为闰年。星期是独立的 1..7 值，不根据日期推算。其他字段使用从 1 起算的月／日及 24 "
+"小时时／分／秒，不含闰秒。自然的 year99->00 回绕不重置设置域。"
+
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid "Opaque owner identity and non-repeating setting incarnation."
+msgstr "不透明的 owner 身份与不重复的设置代次。"
+
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid ""
+"Compare identity without dereference. Valid only in that owner storage "
+"lifetime; retire all tokens/observers before ending or reusing it. This is "
+"neither authorization nor a cross-boot/backup-reset identity."
+msgstr ""
+"只比较身份而不解引用。仅在该 owner 存储生命周期内有效；结束或复用前必须退役全部 token／观察者。它既不授予权限，也不是跨启动／备份复位身份。"
+
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid "Nominal period as reference ticks divided by their declared rate."
+msgstr "以参考 ticks 除以其声明频率表示名义周期。"
+
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid ""
+"A zero tick count means disabled. The rate is positive. This reports "
+"selected quantization, not measured oscillator accuracy, calibration error, "
+"interrupt delivery time or elapsed Core time."
+msgstr "tick count 为零表示禁用，频率为正。这报告所选量化结果，不表示振荡器实测精度、校准误差、中断到达时间或 Core 经过时间。"
+
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid "Calendar and setting domain copied in one serialized operation."
+msgstr "在一次串行操作中复制日历与设置域。"
+
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid "Exact future day/time match; no month/year or wildcard masks."
+msgstr "精确的未来日／时间匹配；没有月／年或通配掩码。"
+
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid "Caller-owned alarm, borrowed until acquire-observed SETTLED."
+msgstr "调用方持有的 alarm，借用持续到以 acquire 观察到 SETTLED。"
+
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid ""
+"Initialize base before first preparation. Domain and pattern are copied by "
+"value. After ACCEPTED the complete request remains live and caller immutable"
+" through SETTLED and any separate control/observer joins. transferred counts"
+" occurrences: SUCCESS is 1, every other result is 0."
+msgstr ""
+"首次 prepare 前先初始化 base。域和模式按值复制。ACCEPTED 后，完整请求持续有效，且调用方不得修改，直到 SETTLED "
+"及所有独立控制者／观察者 join 完成。transferred 以发生次数计：SUCCESS 为 1，其他结果均为 0。"
+
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid "Shared immutable methods with the corresponding public contracts."
+msgstr "共享只读方法实现相应公共合同。"
+
+#: ../../../../../../docs/reference/api/io/time.md:26
+msgid "Two-pointer identity; face, ops and context outlive loans/observers."
+msgstr "双指针身份；接口面、ops 和 context 的生命周期覆盖借用／观察者。"
+
+#: ../../../../../../docs/reference/api/io/time.md:30
+msgid "rtc_aux.h"
+msgstr "rtc_aux.h"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "Optional raw RTC sources and backup storage ownership."
+msgstr "可选的原始 RTC 来源与备份存储所有权。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "Typedefs"
+msgstr "类型定义"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "Optional methods share the exact RTC context and lifecycle owner."
+msgstr "可选方法共享精确相同的 RTC context 和生命周期所有者。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "Enums"
+msgstr "枚举"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "F4 native wake counter clock for explicit integration controls."
+msgstr "用于显式集成控制的 F4 原生唤醒计数时钟。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid ""
+"Ordinary consumers use nx_rtc_port_periodic_wakeup in rtc.h. These native "
+"values do not describe a portable RTC counter layout."
+msgstr "普通消费者使用 rtc.h 中的 nx_rtc_port_periodic_wakeup。这些原生值不描述可移植 RTC 计数器布局。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "Values:"
+msgstr "取值："
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "Latched auxiliary events; reading never acknowledges a source."
+msgstr "锁存的辅助事件；读取从不确认来源。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid ""
+"Ordinary events/acknowledge exclude ALARM_A, whose finite request owns the "
+"flag. A joined Standby preparation can explicitly authorize discarding it; "
+"wake_route can select it independently."
+msgstr ""
+"普通事件查询／确认排除 ALARM_A，该标志由其有限请求拥有。请求已 join 的 Standby 准备可以显式授权丢弃该事件；wake_route "
+"可以独立选择它。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "Calibration method; smooth/coarse cannot run together."
+msgstr "校准方法；smooth／coarse 不能同时运行。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "Explicit autonomous resources transferred to an external owner."
+msgstr "显式转移给外部所有者的自主资源。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "Configure/disable Alarm B; no retained caller pointer or request."
+msgstr "配置／禁用 Alarm B；不保留调用者指针或请求。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "[in] Same serialized privileged unmasked RTC task owner."
+msgstr "[in] 同一串行化、特权且未屏蔽中断的 RTC 任务所有者。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "[in] Explicit comparator enable; no wildcards."
+msgstr "[in] 显式 comparator enable；不使用通配。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "[in] Valid copied pattern, required even when disabling."
+msgstr "[in] 复制的有效 pattern；禁用时也必须提供。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid ""
+"SUCCESS or exact provider error; timeout/IO may retain hardware "
+"responsibility until stop succeeds. No implicit backup reset or retry."
+msgstr "SUCCESS 或精确 provider 错误；超时／IO 可保留硬件责任，直到 stop 成功。不隐式复位备份域或重试。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "Configure an explicitly selected native wake counter profile."
+msgstr "配置显式选定的原生唤醒计数 profile。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "[in] Serialized RTC task owner."
+msgstr "[in] 串行化 RTC 任务所有者。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "[in] Copied clock/reload facts, never a Core deadline."
+msgstr "[in] 复制的 clock／reload 事实，绝不是 Core deadline。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "SUCCESS or provider error; failed withdrawal retains ownership."
+msgstr "SUCCESS 或 provider 错误；撤回失败保留所有权。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "Set explicitly owned timestamp/tamper inputs; no GPIO acquisition."
+msgstr "设置显式持有的 timestamp／tamper 输入；不取得 GPIO。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "[in] Serialized RTC task owner with externally admitted pads."
+msgstr "[in] 串行化 RTC 任务所有者，pad 已由外部准入。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "[in] Copied valid hardware choices; tamper erase authorized."
+msgstr "[in] 复制的有效硬件选择；已授权 tamper 擦除。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "SUCCESS or rejection/error; no product erase or retention policy."
+msgstr "SUCCESS 或拒绝／错误；不提供产品擦除或保持性策略。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "Copy the first captured event without clearing timestamp flags."
+msgstr "复制首次捕获的事件，不清除 timestamp flag。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "[out] Disjoint output, unchanged on failure."
+msgstr "[out] 独立输出；失败时保持不变。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "SUCCESS, BUSY when no capture, or exact provider error."
+msgstr "SUCCESS、没有捕获时的 BUSY，或精确 provider 错误。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "Copy latched auxiliary flags without acknowledging them."
+msgstr "复制锁存的辅助 flag，不确认它们。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "SUCCESS or exact provider error."
+msgstr "SUCCESS 或精确 provider 错误。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "Clear only selected observed auxiliary flags, preserving others."
+msgstr "只清除所选、已观察的辅助 flag，保留其他位。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid ""
+"Read a timestamp before acknowledging it. Hardware is a single latch, not an"
+" event queue; concurrent arrivals may be coalesced by hardware."
+msgstr "确认 timestamp 之前先读取它。硬件只有一个 latch，不是事件队列；并发到达可能被硬件合并。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "[in] Explicit NX_RTC_EVENT mask; unknown bits reject."
+msgstr "[in] 显式 NX_RTC_EVENT mask；未知位拒绝。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "SUCCESS or IO/BUSY when the source remains asserted."
+msgstr "SUCCESS，或来源仍保持断言时的 IO／BUSY。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "Apply explicit hardware calibration, without changing Core time."
+msgstr "应用显式硬件校准，不改变 Core 时间。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "[in] Serialized owner; no alarm/capture loans for coarse mode."
+msgstr "[in] 串行化所有者；coarse 模式不允许 alarm／capture 借用。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "[in] Copied raw settings."
+msgstr "[in] 复制的原始设置。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "SUCCESS or provider error; no measured ppm claim or auto tuning."
+msgstr "SUCCESS 或 provider 错误；不声称测得 ppm，也不自动调谐。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "Explicitly route sources to EXTI wake events, without NVIC handlers."
+msgstr "将来源显式路由为 EXTI wake event，不安装 NVIC handler。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid ""
+"Successful route enables source interrupt generation plus EXTI event "
+"delivery. Core time may stop in STOP; caller owns clock reconciliation."
+msgstr ""
+"成功路由会启用来源 interrupt generation 与 EXTI event delivery。STOP 中 Core "
+"时间可能停止；调用者负责时钟协调。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "[in] Serialized RTC task owner, external STOP owner joined."
+msgstr "[in] 串行化 RTC 任务所有者，外部 STOP owner 已完成 join。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "[in] Alarm A/B, wakeup, timestamp and/or tamper event mask."
+msgstr "[in] Alarm A/B、wakeup、timestamp 和/或 tamper 事件掩码。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "SUCCESS or provider error; zero withdraws the event route."
+msgstr "SUCCESS 或 provider 错误；零值撤回 event route。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "Read one of the exact provider's backup words, without allocation."
+msgstr "读取精确 provider 的一个 backup word，不分配存储。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "[in] Hardware word index; F407 has 20 words."
+msgstr "[in] 硬件 word 索引；F407 有 20 个 word。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "SUCCESS or exact provider error; no checksum/provenance policy."
+msgstr "SUCCESS 或精确 provider 错误；不提供 checksum／来源策略。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "Write/read back one backup word without clearing other words."
+msgstr "写入并回读一个 backup word，不清除其他 word。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "[in] Exact hardware word index."
+msgstr "[in] 精确硬件 word 索引。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "[in] Literal data; UID or CRC grants no secret provenance."
+msgstr "[in] 字面数据；UID 或 CRC 不授予秘密来源证明。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "SUCCESS or INVALID/STATE/IO; tamper may erase hardware words."
+msgstr "SUCCESS 或 INVALID／STATE／IO；tamper 可擦除硬件 word。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "Explicitly acquire SRAM gate and optional backup regulator."
+msgstr "显式取得 SRAM gate 与可选 backup regulator。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "[in] Serialized RTC task owner, no competing DBP/BRE writer."
+msgstr "[in] 串行化 RTC 任务所有者，没有竞争的 DBP／BRE 写者。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "[in] Request regulator enable/readiness, not proof of VBAT."
+msgstr "[in] 请求 regulator enable／ready，不证明 VBAT。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid ""
+"SUCCESS or provider error; failure retains acquired effects until stop. SRAM"
+" bytes are never cleared, tested or given a product layout."
+msgstr "SUCCESS 或 provider 错误；失败保留已取得效果直到 stop。SRAM 字节从不被清除、测试或赋予产品布局。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "Borrow the whole prepared CPU-only backup SRAM until exact release."
+msgstr "借用整个已准备的 CPU-only backup SRAM，直到精确 release。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "[inout] Stable zero disjoint storage, retained until release."
+msgstr "[inout] 稳定、置零且独立的存储，保留到 release。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "SUCCESS or rejection with no new loan; no DMA/execution permission."
+msgstr "SUCCESS，或不建立新借用的拒绝；不授予 DMA／执行权限。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "Release the original SRAM loan after all derived users joined."
+msgstr "全部派生用户完成 join 后，归还原 SRAM 借用。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "[in] Same serialized owner that granted the loan."
+msgstr "[in] 授予借用的同一串行化所有者。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "[inout] Original stable loan storage, never a copied token."
+msgstr "[inout] 原稳定借用存储，绝不能是复制的 token。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "[in] Exact generation returned on acquisition."
+msgstr "[in] 取得时返回的精确 generation。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "SUCCESS or rejection retaining the original loan and all effects."
+msgstr "SUCCESS，或保留原借用及全部效果的拒绝。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "Transfer retained provisioning effects after actual source stop."
+msgstr "实际来源停止后，转移保留的 provisioning 效果。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid ""
+"This is a responsibility transfer. It does not disable autonomous clocks or "
+"choose a later shutdown policy. Platform close may succeed only after this "
+"transfer. The receipt does not permit concurrent backup writers."
+msgstr ""
+"这是责任转移，不禁用自主时钟，也不选择后续关闭策略。只有完成转移后，Platform close 才可能成功。收条不允许并发 backup 写者。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "[in] Closed serialized RTC owner; every external user joined."
+msgstr "[in] 已关闭的串行化 RTC owner；全部外部用户已完成 join。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid ""
+"[out] Disjoint receipt, unchanged on failure. The caller explicitly accepts "
+"continuing power/access/oscillator/calendar ownership, including any "
+"reported crystal-oscillator quiet-pad responsibility."
+msgstr "[out] 不重叠的收条，失败时不变。调用者显式接纳持续的电源／访问／振荡器／日历所有权，包括收条报告的晶体振荡器引脚静默责任。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid ""
+"SUCCESS, BUSY for live loans/sources, STATE without transferable effects, or"
+" exact provider error. No reset, erase or register write occurs."
+msgstr ""
+"SUCCESS；活跃借用／来源为 BUSY，没有可转移效果为 STATE，或返回精确 provider 错误。不执行 reset、erase "
+"或寄存器写入。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "Disable RTC wake front ends and explicitly discard observed events."
+msgstr "禁用 RTC 唤醒前端，并显式丢弃已观察到的事件。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid ""
+"Privileged unmasked Thread. Preserve EXTI route configuration and "
+"backup/calendar. Only explicitly authorized observed flags/PR clear. No Core"
+" deadline/tick, implicit event discard or backup reset occurs."
+msgstr ""
+"特权、未屏蔽中断的 Thread。保留 EXTI 路线配置及备份域／日历。仅清除显式授权且已观察到的 flags／PR。不使用 Core "
+"deadline／tick，不隐式丢弃事件或复位备份域。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "[in] Suspended RTC owner; every request/SRAM user is joined."
+msgstr "[in] 已挂起的 RTC owner；全部请求／SRAM 使用者均已 join。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid ""
+"[in] Explicit NX_RTC_EVENT authorization, including ALARM_A only after its "
+"finite request is joined."
+msgstr "[in] 显式的 NX_RTC_EVENT 授权；仅在 ALARM_A 的有限请求已 join 后才可包含该事件。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "[in] Positive finite write-ready observation budget."
+msgstr "[in] 正数、有限的写就绪观察预算。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "[inout] Fresh zero stable internal disjoint caller storage."
+msgstr "[inout] 全新清零、地址稳定、位于片内且不重叠的调用者存储。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid ""
+"SUCCESS with sources disabled; BUSY for unauthorized pending events; "
+"IO/TIMEOUT can retain receipt and partial effects for restore."
+msgstr ""
+"源已禁用时返回 SUCCESS；未授权的 pending 事件返回 BUSY；IO／TIMEOUT 可能保留收条与部分效果，供 restore 处理。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "Read-only proof of the exact disabled independent-clock RTC receipt."
+msgstr "只读证明这份精确 RTC 收条仍处于独立时钟、源已禁用的状态。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "Masked or unmasked Thread; independent of any old Core epoch."
+msgstr "中断屏蔽或未屏蔽的 Thread；独立于任何旧 Core epoch。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "[in] Same suspended serialized owner, privileged Thread."
+msgstr "[in] 同一个已挂起、串行调用的 owner，特权 Thread。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "[in] Exact live original storage, never a copied token."
+msgstr "[in] 仍有效的原始精确存储，绝不能是复制的 token。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "SUCCESS or INVALID/STATE/IO without hardware or receipt mutation."
+msgstr "返回 SUCCESS 或 INVALID／STATE／IO，不修改硬件或收条。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "Reenable original RTC sources after the Power owner clears WUF."
+msgstr "Power owner 清除 WUF 后，重新使能原有 RTC 源。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid ""
+"Power owns the disable-EWUP/CWUF/reenable-EWUP/Standby sequence. This "
+"operation never clears RTC events, EXTI pending or PWR flags. Actual Standby"
+" resets the image; a returning entry needs restore."
+msgstr ""
+"Power 负责禁用 EWUP／CWUF／重新使能 EWUP／Standby 序列。本操作绝不清除 RTC 事件、EXTI pending 或 PWR "
+"标志。真实 Standby 会复位整个镜像；入口若返回，必须执行 restore。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "[in] Same suspended owner, privileged masked Thread."
+msgstr "[in] 同一个已挂起的 owner，特权且屏蔽中断的 Thread。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "[inout] Exact prepared identity retained through entry."
+msgstr "[inout] 在进入过程中持续保留的原始精确准备身份。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "SUCCESS after source readback, or retained error requiring restore."
+msgstr "源读回成功后返回 SUCCESS；否则保留错误责任，必须执行 restore。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "Restore source controls and release the exact preparation receipt."
+msgstr "恢复源控制，并释放精确的准备收条。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid ""
+"Masked or unmasked, including a new System epoch. No old Core clock "
+"callback/deadline is used. Preserve every event arriving after prepare."
+msgstr ""
+"中断屏蔽或未屏蔽均可，也适用于新的 System epoch。不调用旧 Core 时钟回调或使用旧 deadline。保留 prepare "
+"之后到达的每个事件。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "[in] Same suspended serialized privileged Thread owner."
+msgstr "[in] 同一个已挂起、串行调用的特权 Thread owner。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "[inout] Original live storage through cleanup/commit failure."
+msgstr "[inout] 清理／commit 失败期间持续有效的原始存储。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid ""
+"SUCCESS only after full readback and final detach; failure retains the "
+"receipt and responsibility for all partially restored sources."
+msgstr "仅在完整读回并最终解绑后返回 SUCCESS；失败保留收条与全部部分恢复源的责任。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "Enabled counter reloads after reload+1 ticks; extended adds 65536."
+msgstr "启用的 counter 每 reload+1 个 tick 重载；extended 另加 65536。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "Explicit capture pins and hardware tamper semantics."
+msgstr "显式 capture pin 与硬件 tamper 语义。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid ""
+"Pin 1 means RTC_AF1; pin 2 means RTC_AF2 and requires an exact fitted "
+"package/route. Tamper detection erases all hardware backup registers. filter"
+" is 0=edge, 1/2/3=2/4/8 consecutive level samples. trigger bits mean falling"
+" edge without filter or high active level with filter. sample_rate is "
+"RTCCLK/(32768 >> value), 0..7; precharge is 1<<value RTCCLK cycles, 0..3. No"
+" GPIO, pull resistor or PCB route is inferred. A provider may reject "
+"silicon-unsafe edges. A failed post-enable input check can retain an armed "
+"source; success never certifies tamper security or external setup/hold "
+"timing."
+msgstr ""
+"pin 1 表示 RTC_AF1；pin 2 表示 RTC_AF2，要求精确的实装封装／路线。tamper 检测会擦除全部硬件备份寄存器。filter "
+"的 0 表示边沿，1／2／3 表示连续 2／4／8 次电平采样。trigger 位在无滤波时表示下降沿，在滤波时表示高有效电平。sample_rate "
+"为 RTCCLK/(32768 >> value)，value 为 0..7；precharge 为 1<<value 个 RTCCLK "
+"周期，value 为 0..3。不推定 GPIO、外部拉电阻或 PCB "
+"路线。提供者可以拒绝受硅片限制的边沿。启用后的输入检查失败可能保留已启用的源；成功不证明防篡改安全性或外部 setup／hold 时序。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "Timestamp excludes year, which the hardware does not capture."
+msgstr "Timestamp 不含 year，硬件未捕获该字段。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid ""
+"subseconds is the captured downcounter, with explicit denominator. overflow "
+"means another event was lost. Domain is the setting domain, never the Core "
+"deadline clock and never an assertion of UTC."
+msgstr ""
+"subseconds 是捕获的递减 counter，分母须显式给出。overflow 表示另一个事件已丢失。Domain 是 setting "
+"domain，绝不是 Core deadline clock，也不表示 UTC。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "Raw calibration facts, never measured oscillator accuracy."
+msgstr "原始校准事实，绝不是实测振荡器精度。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid ""
+"Smooth masks 0..511 pulses per 32-second base and optionally adds 512; "
+"window_seconds is 8,16,32. Short windows require low 2/1 mask bits zero. "
+"Coarse uses pulses 0..31, subtract selects the negative direction and "
+"window_seconds must be zero. Coarse restarts the calendar divider and "
+"therefore advances its setting domain."
+msgstr ""
+"Smooth 在 32 秒基准中屏蔽 0..511 个脉冲，可选增加 512 个；window_seconds 为 8、16、32。短窗口要求 mask"
+" 最低 2／1 位为零。Coarse 使用 0..31 个脉冲，subtract 选择负方向，window_seconds 必须为零。Coarse 重启"
+" calendar divider，因此推进其 setting domain。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "Copied transfer receipt, never proof of physical VBAT retention."
+msgstr "复制的转移收条，绝不证明物理 VBAT 保持性。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid "Exact caller-owned Standby preparation identity, initially zero."
+msgstr "调用者拥有的精确 Standby 准备身份，初始清零。"
+
+#: ../../../../../../docs/reference/api/io/time.md:32
+msgid ""
+"Never copy or alter a live receipt. The RTC owner retains this exact object "
+"through commit and until successful restore, or actual reset. It is not "
+"proof that Standby occurred or that backup power survived."
+msgstr ""
+"绝不复制或修改仍有效的收条。RTC owner 在 commit 期间持续保留同一个精确对象，直到 restore 成功或真正复位。它不证明 "
+"Standby 已发生或备份供电已保持。"

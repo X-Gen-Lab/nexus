@@ -42,7 +42,8 @@ def localize(source, mapping, language):
         source)
 
 
-def read_mapping(folder):
+def read_mapping(source):
+    """Read the exact bilingual policy owned by one canonical DOT source."""
     def pairs(items):
         result = {}
         for key, value in items:
@@ -51,18 +52,38 @@ def read_mapping(folder):
             result[key] = value
         return result
 
-    path = diagrams._regular(Path(folder) / "labels.json")
-    mapping = json.loads(path.read_text(encoding="utf-8"), object_pairs_hook=pairs)
-    all_labels = set()
-    for source in Path(folder).glob("*.dot"):
-        text = diagrams._regular(source).read_text(encoding="utf-8")
-        all_labels.update(diagrams.LABEL.findall(text))
-    localize("digraph check {}", mapping, "en")
+    source = diagrams._regular(source)
+    policy = source.with_suffix(".labels.json")
+    if not policy.exists() and not policy.is_symlink():
+        raise ValueError("missing diagram label policy: " + policy.name)
+    mapping = json.loads(diagrams._regular(policy).read_text(encoding="utf-8"),
+                         object_pairs_hook=pairs)
+    content = source.read_text(encoding="utf-8")
+    required = set(diagrams.LABEL.findall(content))
     for language in LANGUAGES:
-        if set(mapping[language]) != all_labels:
-            raise ValueError("diagram label map differs from canonical sources: "
-                             + language)
+        localize(content, mapping, language)
+        if set(mapping[language]) != required:
+            raise ValueError("diagram label map differs from canonical source: "
+                             + source.name + ": " + language)
     return mapping
+
+
+def _sources(folder):
+    sources = sorted(folder.glob("*.dot"))
+    if not sources:
+        raise ValueError("diagram sources cannot be empty")
+    expected = {source.with_suffix(".labels.json") for source in sources}
+    if (folder / "labels.json").exists() or (folder / "labels.json").is_symlink():
+        raise ValueError("global diagram label policy is not supported")
+    if set(folder.glob("*.labels.json")) - expected:
+        raise ValueError("orphan diagram label policy")
+    return sources
+
+
+def _languages(languages):
+    if (not languages or any(language not in LANGUAGES for language in languages)
+            or len(set(languages)) != len(languages)):
+        raise ValueError("unsupported or duplicate diagram language")
 
 
 def _output(folder, output):
@@ -76,39 +97,35 @@ def _output(folder, output):
     return output
 
 
-def check(folder, *, env=None, full=False, output=None):
-    """Check source labels offline; optionally verify a generated asset closure."""
+def check(folder, *, env=None, full=False, output=None, languages=LANGUAGES):
+    """Check every source policy and an optional exact generated asset closure."""
     folder = Path(folder)
     target_root = _output(folder, output) if output is not None else None
-    policy = folder / "labels.json"
-    if not policy.is_file():
-        missing = ((folder / "diagram-index.csv").is_file()
-                   or policy.exists() or policy.is_symlink()
-                   or (folder / "localized").exists()
-                   or (folder / "localized").is_symlink()
-                   or (target_root is not None and target_root.exists()))
-        return {"localized_diagrams": 0,
-                "errors": ["missing diagram label policy for localized assets"]
-                if missing else []}
     errors, checked = [], 0
     try:
-        mapping = read_mapping(folder)
-    except (OSError, ValueError) as error:
+        _languages(languages)
+        sources = _sources(folder)
+    except ValueError as error:
         return {"localized_diagrams": 0, "errors": [str(error)]}
-    if (folder / "localized").exists():
+    if (folder / "localized").exists() or (folder / "localized").is_symlink():
         errors.append("localized diagrams belong in build output, not source")
     expected = set()
-    for source in sorted(folder.glob("*.dot")):
-        for language in LANGUAGES:
+    for source in sources:
+        try:
+            mapping = read_mapping(source)
+            canonical = source.read_text(encoding="utf-8")
+        except (OSError, ValueError) as error:
+            errors.append(str(error))
+            continue
+        for language in languages:
             try:
-                content = localize(source.read_text(encoding="utf-8"),
-                                   mapping, language)
+                content = localize(canonical, mapping, language)
                 diagrams.validate_source(content)
                 if target_root is not None:
                     target = target_root / language / source.name
                     svg = target.with_suffix(".svg")
                     expected.update((target, svg))
-                    if diagrams._regular(target).read_text() != content:
+                    if diagrams._regular(target).read_text(encoding="utf-8") != content:
                         raise ValueError("derived localized DOT differs: " + str(target))
                     actual = diagrams._regular(svg).read_bytes()
                     diagrams.validate_svg(actual)
@@ -130,10 +147,9 @@ def write(folder, *, env, output, languages=LANGUAGES):
     """Generate language views outside authored sources using prepared tools."""
     folder = Path(folder)
     target_root = _output(folder, output)
-    if not languages or any(language not in LANGUAGES for language in languages):
-        raise ValueError("unsupported diagram language")
-    mapping = read_mapping(folder)
-    for source in sorted(folder.glob("*.dot")):
+    _languages(languages)
+    for source in _sources(folder):
+        mapping = read_mapping(source)
         for language in languages:
             target = target_root / language / source.name
             if target.is_symlink() or any(path.is_symlink() for path in target.parents):
@@ -158,16 +174,7 @@ def image_uri(uri, page, source_root, language, *, output=None):
                  Path(page).parent / unquote(parsed.path)).resolve()
     if candidate.parent != folder or candidate.suffix != ".svg":
         return uri
-    policy = folder / "labels.json"
-    if not policy.is_file():
-        if ((folder / "diagram-index.csv").is_file()
-                or policy.exists() or policy.is_symlink()
-                or (folder / "localized").exists()
-                or (folder / "localized").is_symlink()
-                or (output is not None and Path(output).exists())):
-            raise ValueError("missing diagram label policy for localized assets")
-        return uri
-    diagrams._regular(policy)
+    read_mapping(candidate.with_suffix(".dot"))
     if language not in LANGUAGES:
         raise ValueError("unsupported diagram language")
     if output is None:

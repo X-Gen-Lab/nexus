@@ -104,6 +104,69 @@ class PresetDependencySelectionTests(unittest.TestCase):
         self.assertTrue(receipt["host_support"])
 
 
+class AssemblyDependencySelectionTests(unittest.TestCase):
+    def test_native_application_requires_only_selected_runtime_suppliers(self):
+        empty = catalogue.runtime_selection(
+            "native", backend="native", test_support=True)
+        self.assertEqual(empty, ())
+        selected = catalogue.runtime_selection(
+            "native", backend="native", test_support=True,
+            components=("network", "tls"))
+        self.assertEqual({item.identifier for item in selected},
+                         {"lwip", "mbedtls"})
+
+    def test_native_application_requires_explicit_model_admission(self):
+        for options in ({"backend": "native"},
+                        {"backend": "freertos", "test_support": True}):
+            with self.subTest(options=options), self.assertRaises(ValueError):
+                catalogue.runtime_selection("native", **options)
+
+    def test_assembly_selection_records_the_actual_native_inputs(self):
+        from tools.dev import dependencies
+        assembly = ROOT / "tests/support/native/assemblies/native-empty.toml"
+        selection = dependencies.assembly_selection(
+            ROOT, assembly, test_support=True)
+        self.assertEqual(selection["family"], "native")
+        self.assertEqual(selection["backend"], "native")
+        self.assertTrue(selection["test_support"])
+        self.assertEqual(selection["assembly"]["path"], str(assembly))
+        self.assertEqual(selection["board"]["path"],
+                         str(ROOT / "tests/support/native/board/board.json"))
+        self.assertEqual(dependencies.required_submodules(
+            "assembly", "native", "native", test_support=True), ())
+
+    def test_native_assembly_selection_rejects_implicit_test_support(self):
+        from tools.dev import dependencies
+        from tools.evidence.common import EvidenceError
+        assembly = ROOT / "tests/support/native/assemblies/native-empty.toml"
+        with self.assertRaisesRegex(EvidenceError, "test support"):
+            dependencies.assembly_selection(ROOT, assembly)
+
+    def test_native_maintenance_preset_keeps_the_complete_test_graph(self):
+        from tools.dev import dependencies
+        selected = dependencies.preset_selection(ROOT, "native-debug")
+        self.assertEqual(selected["scope"], "native")
+        sources = dependencies.required_submodules(
+            selected["scope"], selected["family"], selected["backend"])
+        self.assertIn("ext/googletest", sources)
+        self.assertIn("ext/mbedtls", sources)
+
+    def test_cli_prepares_an_assembly_without_profile_overrides(self):
+        from tools.dev import dependencies
+        assembly = ROOT / "tests/support/native/assemblies/native-empty.toml"
+        with mock.patch.object(dependencies, "prepare_assembly",
+                               return_value={"status": "verified"}) as prepare:
+            self.assertEqual(dependencies.main([
+                "prepare", "--scope", "assembly", "--assembly", str(assembly),
+                "--test-support"]), 0)
+        prepare.assert_called_once_with(
+            dependencies.ROOT, assembly, test_support=True, allow_network=False)
+        for extra in (["--backend", "native"], ["--component", "tls"]):
+            with self.subTest(extra=extra), self.assertRaises(SystemExit):
+                dependencies.main(["prepare", "--scope", "assembly",
+                    "--assembly", str(assembly), *extra])
+
+
 
 
 class DormantNetworkTests(unittest.TestCase):

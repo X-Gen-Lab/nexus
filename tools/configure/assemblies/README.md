@@ -29,4 +29,4 @@ cmake --preset stm32-qiming-baremetal
 各 `boards/<board>/assemblies/` 的 TOML。新增参考同步登记，
 `python -m tools.configure.matrix --check` 校验目录完整性和实际解析。
 真实能力见
-[派生矩阵](../../../docs/delivery/capabilities.md)。
+[派生矩阵](../../../docs/reference/platforms/capabilities.md)。

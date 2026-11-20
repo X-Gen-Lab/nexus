@@ -54,6 +54,14 @@ class DocumentationConfigurationTests(unittest.TestCase):
             self.check("<!-- nexus-toml-fragment: -->\n"
                        "```toml\n" + fragment + "```\n")
 
+    def test_current_contract_examples_cannot_escape_repository_checks(self):
+        root = Path(self.directory.name) / "repository"
+        page = root / "docs/reference/contracts/current.md"
+        page.parent.mkdir(parents=True)
+        page.write_text("```toml\n[broken\n```\n")
+        with self.assertRaisesRegex(ValueError, "TOML documentation rejected"):
+            documentation.check(root)
+
     def test_fragments_still_require_valid_toml(self):
         with self.assertRaises(ValueError):
             self.check("<!-- nexus-toml-fragment: incomplete composition -->\n"

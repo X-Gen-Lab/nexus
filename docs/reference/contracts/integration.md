@@ -1,0 +1,231 @@
+---
+id: reference.contracts.integration
+type: reference
+audience: maintainer
+source_language: zh_CN
+---
+
+(reference.contracts.integration)=
+# 接入与静态装配合同
+
+接口和资源规则由本页维护；按步骤接入Board、SoC、IP或组件请使用对应操作指南。
+
+## 1. 第一原则与工具边界
+
+接入不是把所有硬件描述转换为一个运行时设备树。它是提交有限事实、选择已维护能力、检查资源，再显式装配静态对象。
+
+- 使用 C11、CMake、Ninja、TOML 装配输入、JSON 硬件事实和一个窄 Python 校验/生成工具。核心默认不需要 heap、运行时字符串查找、自动探测或后台 worker。
+- 默认入口是外部工程的 `assembly.toml`。硬件输入分为 SoC、Board、assembly 三类，一次验证建立冻结 typed IR；`resolved.json` 是其单向审计投影。
+- CMake 仍是代码目标和代码依赖的权威。生成器不生成组件依赖图、业务线程、产品 main 或调度策略。
+- 实例选择使用 TOML schema 2，SoC/Board 事实保持 JSON。工具只解析这一个装配输入；Kconfig、CMake cache 和旧生成头不形成平行配置权威。
+- 目录可采用 `core/ arch/ soc/ io/ os/ components/ tools/ tests/`；Board 可位于独立 package。层名说明职责，不要求每个层、端口或对象成为一个独立 translation unit。
+- 未维护的能力不因 SDK 有宏、路由表有 AF 值、同系列有示例而自动可用。新路由、新 DMA 模式、新控制器分别接入。
+
+## 2. 各类接入拥有的事实
+
+| 类别 | 拥有的事实和实现 | 明确不拥有 |
+|---|---|---|
+| CPU / Arch | 指令集、异常上下文、屏障、原子/临界区、FPU 上下文和 ABI 约定 | 具体 PCB、具体控制器 IRQ/DMA、产品设备 |
+| SoC | 精确料号/封装/密度、内存域、控制器、时钟约束、IRQ/EXTI、DMA、pin/AF 路由、Flash 几何、私有 SDK | Board 接线、应用 role、产品分区 |
+| Board | PCB/source revision、晶振、电气电平、焊接器件、连接器、跳线条件、初始安全电平和复核接线 | 改写芯片密度、选主传感器、创建业务任务 |
+| 外部器件 driver | 器件命令/寄存器、转换算法、初始化顺序、器件时序要求和错误语义 | 默认 GPIO、默认总线编号、产品采样策略 |
+| 协议核心 | 帧格式、解析/编码、有界状态机和协议时间规则 | 默认 UART、RS485 DE 引脚、线程、客户业务 |
+| 组件 | 可复用算法或服务、窄端口、明确容量和执行上下文 | 隐式创建 worker、自动找依赖、固定产品存储 |
+| 产品／应用 | main、workers、应用 role、私有协议、配置策略、分区、升级/健康/制造策略 | 让通用平台反向依赖其源码 |
+
+SoC provider 实现公共 IO/核心合同，并使用 Arch。器件 driver 使用总线、GPIO、时间等窄端口；协议 core 不依赖 Board 或 OS；组件 adapter 才连接 IO/OS。外部 assembly 连接各实现。Board 声明板载器件的事实，不因此成为器件 driver 的所有者。
+
+厂商 SDK、内核实现头和可变 controller 状态保持私有；公共接口不透出其结构体。STM32 与 GD32 的相似名称不能证明寄存器兼容或驱动可以直接复用。
+
+## 3. 三类输入及少量文件模板
+
+### SoC 包
+
+一个维护中的 SoC package 通常包含：
+
+```text
+soc/<vendor>/<family>/
+  package.json
+  facts/
+  system/
+  drivers/<domain>/
+  drivers/ip/
+  private/
+  sdk/
+  CMakeLists.txt
+```
+
+系列目录复用代码，`facts/soc.json` 按精确订货号选择已审 device profile 和不重叠的
+controller groups；物理事实与软件模式分开。`facts/devices.json` 记录官方宏、startup、
+IRQ enum／number／handler。型号、封装、Flash、SRAM 域和 IRQ 表不能被家族字符串
+代替，厂商编译目录不扩大运行时模式支持。
+
+当前生产 SoC 入口只有 `soc/stm32/stm32f4/`；领域 binding、实例布局与实现相邻，
+私有共享 IP 位于其 `drivers/ip/`，跨域共享合同与片段保留在 `private/`。
+Board／SoC 不放 Python 插件；声明式 package 由 `tools/configure/` 的通用
+DataProvider、领域政策、typed IR 与有限静态节点解析，不再加载家族 Python
+构造模块。顶层 `pads` 统一显式坐标；字段与同一快照合同见
+[接入指南](../../guides/provider-porting.md)。Native 仅在
+`tests/support/native/`，必须显式启用测试 scope；不会进入生产支持枚举。
+CPU 实现按 ISA 位于 `arch/arm/cortex_m/` 或 `arch/native/`，公共头路径保持稳定。
+默认生成入口连接 Core 的手写 C 整平台生命周期和 F4 的 System／共享资源 C 协调器。
+主机保留事实校验与有限静态连接，不维护寄存器级硬件算法或驱动状态机；固定生命周期
+调用与通用错误传播仍由 typed 节点连接，只维护一套配置实现。实际生成 factory、
+C 模型与 ARM 镜像分别验收，不能用目录调整或源码存在
+宣布整条链路通过。
+
+## 4. 解析、生成与 CMake 装配
+
+配置过程必须按固定顺序执行：
+
+1. 读取 assembly，定位唯一 Board，按其精确料号定位 SoC；检查 schema、版本和依赖锁。
+2. 经同一受控快照读取 package 声明的事实与 binding 文件，校验包边界、资料中的已知／未知条件；展开选中的静态声明与器件。
+3. 建立资源占用表，检查模式能力、冲突、clock、IRQ、memory、ABI 和 layout。
+4. 原子写入单份 `resolved.json`，记录所有决定、拒绝项和输入摘要。
+5. 从该 IR 导出硬件配置头、只读资源表及 linker 输入；CMake 读取必要选项并按自己声明的目标依赖编译。
+6. 对实际 ELF/map/BIN 验证 vector、startup、handler、区域容量和产物身份；结果成为证据，不能反向冒充硬件资格。
+
+`resolved.json` 保存 schema、选中 package/料号/后端、有效选项、clock/memory/ABI、资源 claims、已选器件、证据限制和输入 hash。它不是 CMake target 依赖图，也不包含平台猜测的业务线程、role 或领域策略。
+
+派生输出都来自该 IR。不得存在 `.config`、旧生成头、独立 Board 默认宏等回退真相。生成失败使本次配置失效，不得继续使用上次成功生成的 bundle；先写临时目录，完整成功后切换。不同 Board/backend/profile 使用独立 build root。
+
+CMake 的每个库显式声明自己的代码依赖、公共头与私有 SDK 编译面。assembly 选择硬件实例和模式，不能替代 `target_link_libraries()`。生成器不扫描任意业务源码推断需要什么组件，也不自动链接所有 driver。若代码目标要求的能力与 resolved 配置矛盾，配置应失败。
+
+静态硬件 descriptors 可以由工具生成；可变上下文和真正的构造/init 仍有显式所属实现。产品 main 负责所需组件和器件的初始化顺序以及调度启动。平台不因一个器件节点出现就创建采样任务。
+
+## 5. 资源占用与编译前检查
+
+| 资源 | 必须检查的条件 |
+|---|---|
+| pin（引脚） | 精确封装具有该 pin；route 在 reviewed allowlist；AF/方向/电气约束满足；SWD、板载器件与选中功能不冲突 |
+| controller（控制器） | provider 实现所选模式；物理 controller 单一拥有；共享总线由同一个 owner 派生 child |
+| SPI child（子端点） | CS 独立；mode/频率/word width 可在已维护配置中满足；串行仲裁明确 |
+| I2C child（子端点） | 地址和 mux 层级合法；地址冲突拒绝；controller 与 mux 模式均已实现 |
+| DMA | 按实际 DMA controller/stream/channel/request 模型检查；所选 route 合法；独占资源互斥；模式已有实现 |
+| IRQ | 每个 vector 有唯一 provider 或显式有界 dispatcher；优先级、grouping、OS 调用权限吻合 |
+| EXTI | 检查 line/port mux 独占、边沿模式、共享 vector、事件容量和优先级，不能只看 pin 名 |
+| timer/PWM（定时器／PWM） | 检查 timer/channel、timebase、共享 PSC/ARR/base mode 和 trigger；同 timer 的 channel 不视为独立时基 |
+| ADC | 检查 channel、sample time、sequence、trigger、参考电压条件和具体采样模式；DMA/stream 单独维护 |
+| watchdog（看门狗） | 检查已维护 IWDG 范围、LSI 误差及启用不可逆效果；feed/健康政策仍归外部产品 |
+| clock（时钟） | 晶振、PLL、总线、Flash wait state、外设频率和后端 timebase 约束满足已维护 profile |
+| memory（内存） | 精确物理域、DMA 可达性、alignment、栈/池/队列预算、layout/erase block 边界和镜像容量 |
+| ABI | CPU/Thumb/FPU/float ABI 一致；FreeRTOS port 正确；精确型号宏来自有效配置 |
+
+resource claim 必须指出实体资源键、owner、使用模式和来源。错误例如“DMA1 stream X 同时由 A 和 B 声明”，而不是只报“配置不合法”。工具只检查显式选择，不自动寻找另一个 DMA stream、改 pin 或降低 clock。
+
+SPI/I2C bus 共享不等于重复声明 controller。总线由单一 provider 管理，child 只持有其有界引用；SPI CS 或 I2C 同层地址重复要拒绝。直接单执行者调用与显式queue/service adapter分别声明：共享路径只有adapter执行者推进controller，client等待不接管执行。短锁只保护提交/控制元数据，不跨DMA生命周期持有task mutex，器件driver不隐式依赖kernel锁。
+
+真实共享 IRQ 允许使用 SoC 声明的静态 dispatcher，检查 handler 清单和有界执行条件；不允许两个强符号争抢 vector，也不引入任意运行时注册。IRQ body 的响应/结算与 task/worker 的后续处理分别有所属者。
+
+FreeRTOS 保留 SysTick/PendSV/SVC 等被其 port 使用的资源。IRQ priority grouping 统一配置；调用内核的 ISR 必须满足该 port 的 syscall priority 规则，高优先级 ISR 禁止使用相应 OS API。备用 timebase 若占用 timer，也进入同一资源表。
+
+### clock、memory 与 ABI 的具体边界
+
+Board 提供实际 HSE/LSE、电气条件和必要跳线事实；SoC 提供合法约束与已维护 profile；assembly 选择 profile。controller 不独立重配全局 clock，driver 不重复设置 NVIC grouping。没有实现动态 clock 切换时，运行期要求切换直接报告不支持。
+
+各 SRAM 域分别声明地址、大小、初始化方式、DMA 可达性和用途限制。不能把 STM32 CCM 当作默认 DMA SRAM，也不能把全部物理 SRAM 合成一个未经维护的 linker heap。初始阶段只启用已实现且已检查的域，其余域保持未维护。
+
+静态 DMA buffer 可用 linker section、alignment 和 map 检查；调用者动态传入的指针仍须在执行时验证可达域与对齐。编译检查不能替代 borrow/settlement 生命周期。内存预算区分 MSP、任务栈、OS 对象、IO buffer、组件 workspace 和可选 libc heap。
+
+Flash 布局使用精确料号的 erase geometry，拒绝越界、重叠、重复 ID 和不满足擦除边界的 region，并且只允许一个 image。`resolved.flash` 保留完整物理几何，`resolved.layout` 选择链接镜像窗口；窗口不创建 Flash ACL 或产品写权限。所选 STM32F407VET6/ZGT6 支持经过审查的偏移镜像、512 字节向量对齐、实际 vendor vector symbol 和配套 startup/ELF/BIN 检查。准确字段和边界见[装配参考](../configuration/assembly.md#physical-flash-and-the-selected-image)。
+
+偏移链接只建立软件镜像边界。外部产品仍须提供进入 Reset_Handler 的有效启动路径、初始机器状态、认证、激活及恢复政策。现有 F407 running-image handoff 保留 PRIMASK=1，startup 不主动解除屏蔽；裸机或 FreeRTOS 链接结果不建立通用运行态交接或 FreeRTOS handoff 资格。
+
+CPU 编译选项、FPU 启用、异常上下文和 kernel port 必须一致。工具链及所有预编译输入的 ABI 记录到身份中。当前推荐源码 SDK；不默认承诺不同 compiler/version/flags 之间的 installed binary ABI。
+
+### 可由哪些阶段证明
+
+生成前检查负责事实一致性和资源冲突；C11 `_Static_assert` 与类型系统负责容量、类型、常量关系；linker/map/ELF 检查负责镜像布局、符号、handler 和对象保留。物理波形、电气电平、clock 偏差、IRQ latency、DMA 终态和长期负载需要实板证据。
+
+## 6. 实例名、应用 role 与静态成本
+
+`USART1` 是 SoC controller 名；`j1_uart`、`bme280_ext0` 是 assembly 的稳定实例名；`console`、`ambient_sensor` 是外部应用 role。Board 只提供物理资源，不决定哪个器件是产品的主传感器。
+
+role 映射和约束属于外部 consumer。它可在自己的构建步骤中读取 resolved 信息，检查 role 所需接口并生成类型化 alias 或访问器；平台不自动生成产品 role 政策。更换 physical binding 后，应用继续引用 role，而不是在业务源码里寻找具体 UART/GPIO 编号。
+
+普通数据路径不需要运行时字符串查找。只读 wiring 放 Flash；必要 context、pool、queue 和 buffer 静态分配。role alias 可编译为直接符号，通用 driver 只在需要窄端口时保留一层函数指针。不要为每个层名建立一层对象或虚调用。
+
+### 已实现的静态实例与 typed factory
+
+factory 保留取得 typed 多态接口对象的架构骨架。生成器建立静态对象，
+factory 只返回已存在的身份，不创建、初始化、锁定或重配设备。公开
+`nx_factory_uart(nx_uart_id_t)` 等类型化 getter；ID 是 `uint16_t` 和对应的
+具名常量，越界、COUNT 和未选中类别返回 NULL。ID 只在当前 assembly 内有效，
+不作为持久化格式或跨版本二进制 ABI。
+
+每个公开 face 是只读的 `{ const ops*, void* context }`；32 位目标包含两个
+指针，具体 Flash/RAM 成本由实际链接产物审核。每个 provider/mode 共享一张
+`const ops`，可变状态和容量精确的数组独立拥有。方法接收实际 context，
+不会把共享 ops 对象当作实例。IRQ 静态进入具体 provider，不要求逐字节经过
+虚调用。Native 多实例同样生成独立状态，单例只保留为明确的测试 fixture。
+
+| 对象 | 已实现的静态生成责任 |
+|---|---|
+| controller port（控制器端口） | 独占控制器的一份必要状态和一个只读公共 face |
+| GPIO view（GPIO 视图） | 独立授权 mask 和方向；共享 GPIO 基座的不同 pin 分别校验 |
+| bus endpoint（总线端点） | SPI CS 或 I2C 地址各自拥有 face 和私有配置，不借第一项设备身份 |
+| mode storage（模式存储） | 只分配所选 UART/EXTI profile、容量和显式 Native register model |
+| typed factory（类型化工厂） | 纯静态 switch；无注册、字符串查找、heap、hidden worker |
+| ops（操作表） | 同 provider/mode 共享只读表；不同实现保持相同公共接口布局 |
+| IRQ wiring（中断接线） | 固定实例直接分发；真实共享 EXTI 使用有界静态 dispatcher |
+| startup（启动） | 显式串行调用与逆序清理，BUSY 保留进度和所有被借用的存储 |
+| 组件 | 外部 composition 提供存储、窄端口和调度，不自动生成业务实例 |
+
+`nx_binding_<bus>` 和 `nx_factory_spi/i2c` 都返回真实 controller port；
+`nx_device_<child>` 和 `nx_factory_spi_device/i2c_device` 返回具体 endpoint。
+公共 I2C recovery 因此始终可取得 bus 身份。应用不能再把 bus alias 当作
+第一项 endpoint。poll 与 async mode 的资源和能力分别实现，不由 getter
+隐式改变。
+
+装配写 TOML schema 2；`authored.py` 的同一字段模型提供严格解析和 editor
+schema。冻结的 `ControllerIR/EndpointIR/MemoryBudgetIR/ConfigurationIR`
+直接供 emitter 使用，`resolved.json` 是这个决策的序列化。
+`configure.py init/list-bindings/check/explain/generate` 均使用同一解析器。
+CMake 从 resolver 的 input paths 加入精确重配置依赖，不重解析 TOML。
+
+STM32 USART1 `dma-tx` 使用固定 DMA2 stream7 channel4，RX 保持独立 IRQ ring。
+DMA 可达域与动态指针校验、memory-engine detach、UART TC wire drain 分别验证；
+不能把 NDTR=0 当作串口完成。不同 selector 对同一个 physical stream 仍冲突。
+其它硬件 DMA/stream 模式只按各自代码、模型、链接和物理证据声明支持。
+
+得到静态 face 不改变启动状态，也不授予并发执行权。取消、timeout、stop 和
+restart 都不能提前撤销请求 borrow；仅 acquire-observed SETTLED 允许回收。
+共享路径由显式 owner 执行者推进，产品拥有任务与 recovery policy。
+
+源码 SDK 包含公共接口、严格配置工具和精确依赖身份。代码/注释保持当前格式；
+行为改动使用先失败后实现的 TDD，主机 GoogleTest/GoogleMock 与生产 C11 驱动
+分开链接。源码 SDK 的普通固件不包含测试框架。
+
+## 12. 版本、路径、摘要与产物身份
+
+- SoC/Board/assembly/resolved 分别有明确 schema version；未知 version、未知字段或矛盾值拒绝，不静默忽略。确需扩展时使用受控 namespace，不能隐藏有效编译选项。
+- package 记录 API/contract version、精确依赖 revision 和来源；schema 兼容不等于硬件或行为兼容。
+- 相对路径以拥有该 manifest 的目录为基准。Board source 必须落在自己的 package 内；拒绝 `..`、symlink 逃逸和未声明 source。SDK 自身路径不能误用 consumer ancestor 的 Git 身份。
+- 所有影响构建的输入均声明并 hash，包括 route 数据、Board hooks、layout、vendor import、代码依赖 lock、工具链和编译选项。hash 原始字节用于输入身份，规范化 resolved JSON 用于有效配置身份；算法和格式有版本。
+- 解析或构建过程中不偷偷联网更新依赖。目录内新增但未声明的有效 source 必须被拒绝或重新加入清单，不能绕过身份校验。
+- 外部产品身份与平台身份分开。平台提供料号/Board/config 等中性信息，不拥有产品名、SKU 或制造政策。
+- 产物清单绑定平台及 consumer revision、依赖、工具链、SoC/Board/assembly/resolved/layout hash，以及 ELF/BIN/map digest 和证据范围。
+- dirty 开发构建可显式允许，但标记 `publishable=false`；缺输入、hash 不一致、旧证据或 snapshot 不能升级为发布资格。
+
+## 13. 支持 tuple 与支持等级
+
+支持最小单元为：
+
+```text
+<platform source, consumer source, exact MCU part/package,
+ Board source revision, physical PCB revision or unknown,
+ route, transfer mode, OS backend, resolved config hash,
+ toolchain/ABI, layout hash>
+```
+
+Board 名只是检索入口，不是整板所有外设都受支持的承诺。一个 UART IRQ tuple 的结果不能证明同 Board 的 SPI DMA、I2C、RS485或另一个 backend。
+
+| 记录项 | 可证明范围 | 不证明 |
+|---|---|---|
+| D：描述复核 | 指定资料中的料号、接线、route 已审阅 | 真实 fitted part、PCB、线路可用 |
+| C：编译/链接 | 指定工具链下真实 ARM ELF、布局和装配通过 | 硬件已运行、时序正确 |
+| M：模型行为 | 指定 source/config 的 host/fake 行为通过 | 电气、IRQ/DMA 实际终态 |
+| H：物理路径 | 指定 PCB、route、mode 的真实测量 | 任意负载、其他外设或整产品资格 |
+| Q：产品负载资格 | 指定 workload、预算和产品策略下验收 | 其他产品、无限支持期限或 LTS |
+
+这些是分列证据维度，而不是以模型结果替代编译或硬件的单一等级。C/M/H/Q 缺项必须明确写未执行；日志、工件、source/config 和预算绑定到同一个 tuple。

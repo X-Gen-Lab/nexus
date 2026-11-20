@@ -7,19 +7,67 @@ import subprocess
 import sys
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
 
 from tools.documentation import sphinx_ext
 
 
+class CurrentSourceContractTests(unittest.TestCase):
+    def test_missing_source_language_is_not_inferred_from_prose(self):
+        for source in ("# English\n", "# 中文\n"):
+            with self.subTest(source=source):
+                with self.assertRaises(ValueError):
+                    sphinx_ext.source_language(source)
+
+    def test_source_byte_changes_invalidate_the_owning_docs_and_includes(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            docs = root / "docs"
+            docs.mkdir()
+            app = SimpleNamespace(srcdir=str(docs), config=SimpleNamespace(
+                nexus_changed_inputs=("core/README.md",),
+                nexus_rebuild_all=False))
+            env = SimpleNamespace(found_docs={"index", "guide"},
+                doc2path=lambda name, base: str(docs / (name + ".md")),
+                dependencies={"index": {"../core/README.md"}, "guide": set()})
+            self.assertEqual(sphinx_ext.source_inputs_outdated(
+                app, env, set(), set(), set()), ["index"])
+            app.config.nexus_changed_inputs = ("docs/guide.md",)
+            self.assertEqual(sphinx_ext.source_inputs_outdated(
+                app, env, set(), set(), set()), ["guide"])
+            app.config.nexus_rebuild_all = True
+            self.assertEqual(sphinx_ext.source_inputs_outdated(
+                app, env, set(), set(), set()), ["guide", "index"])
+
+
 class DocumentationSourceTests(unittest.TestCase):
+    def test_multiline_source_link_binds_revision_without_touching_code(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            page = root / 'docs/api/topic.md'
+            page.parent.mkdir(parents=True)
+            target = root / 'components/network/README.md'
+            target.parent.mkdir(parents=True)
+            target.write_text('# Ownership\n')
+            link = '[canonical network\ncontract](../../components/network/README.md)'
+            source = 'Use ' + link + '.\n\n`' + link + '`\n\n```markdown\n' + link + '\n```\n'
+            result = sphinx_ext.rewrite_local_links(
+                source, page, root / 'docs', root, 'a' * 40)
+            self.assertTrue(result.startswith('Use [canonical network contract]'
+                '(https://github.com/X-Gen-Lab/nexus/blob/' + 'a' * 40
+                + '/components/network/README.md).'))
+            self.assertIn('`' + link + '`', result)
+            self.assertTrue(result.endswith('```markdown\n' + link + '\n```\n'))
+
     def test_canonical_language_is_independent_of_build_locale(self):
-        self.assertEqual(sphinx_ext.source_language('# 工厂接口\n静态实例查找。'), 'zh_CN')
-        self.assertEqual(sphinx_ext.source_language('# Factory\nStatic instance lookup.'), 'en')
-        self.assertEqual(sphinx_ext.source_language('---\nsource_language: en\n---\nEnglish with 中文标识.'), 'en')
+        metadata = ('---\nid: factory\ntype: reference\naudience: consumer\n'
+                    'source_language: {}\n---\nEnglish with 中文标识.')
+        self.assertEqual(sphinx_ext.source_language(metadata.format('zh_CN')), 'zh_CN')
+        self.assertEqual(sphinx_ext.source_language(metadata.format('en')), 'en')
 
     def test_invalid_language_is_rejected(self):
         with self.assertRaisesRegex(ValueError, 'source_language'):
-            sphinx_ext.source_language('---\nsource_language: automatic\n---\n# Title')
+            sphinx_ext.source_language('---\nid: fixture\ntype: reference\naudience: consumer\nsource_language: automatic\n---\n# Title')
 
     def test_source_file_links_are_bound_to_revision(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -73,8 +121,7 @@ class DocumentationSourceTests(unittest.TestCase):
                  f'[`assemblies`](https://github.com/X-Gen-Lab/nexus/tree/{revision}'
                  '/tools/configure/assemblies)'),
                 ('[`history.md`](../archive/history.md)',
-                 f'[`history.md`](https://github.com/X-Gen-Lab/nexus/blob/{revision}'
-                 '/docs/archive/history.md)'),
+                 '[`history.md`](../archive/history.md)'),
                 (f'Before `[example]({target})` then {literal} and [plain]({target}).',
                  f'Before `[example]({target})` then '
                  f'[`h743-high-peripherals.toml`]({bound}) and [plain]({bound}).'),
@@ -135,7 +182,8 @@ class AvailableLanguageTests(unittest.TestCase):
 
 class TranslationStatusTests(unittest.TestCase):
     def setUp(self):
-        self.source = '# 工厂\n\n返回已有静态对象。\n'
+        self.source = ('---\nid: factory\ntype: reference\naudience: consumer\n'
+                       'source_language: zh_CN\n---\n# 工厂\n\n返回已有静态对象。\n')
         self.digest = hashlib.sha256(self.source.encode()).hexdigest()
         self.temporary = tempfile.TemporaryDirectory()
         self.addCleanup(self.temporary.cleanup)
@@ -160,19 +208,26 @@ class TranslationStatusTests(unittest.TestCase):
         self.assertEqual(self.state('zh_CN')['status'], 'original')
         self.assertEqual(self.state('zh_CN')['actual_language'], 'zh_CN')
 
-    def test_same_source_locale_catalog_can_normalize_mixed_prose(self):
+    def test_same_source_locale_catalog_is_rejected(self):
         self.catalog = self.root / 'zh_CN/LC_MESSAGES/factory.po'
         self.catalog.parent.mkdir(parents=True)
         self.write_catalog(language='zh_CN')
         result = self.state('zh_CN')
-        self.assertEqual(result['status'], 'reviewed')
+        self.assertEqual(result['status'], 'invalid')
         self.assertEqual(result['actual_language'], 'zh_CN')
 
-    def test_same_source_locale_stale_catalog_is_not_silently_original(self):
+    def test_same_source_locale_catalog_is_invalid_even_when_stale(self):
         self.catalog = self.root / 'zh_CN/LC_MESSAGES/factory.po'
         self.catalog.parent.mkdir(parents=True)
         self.write_catalog(language='zh_CN', digest='b' * 64)
-        self.assertEqual(self.state('zh_CN')['status'], 'stale')
+        self.assertEqual(self.state('zh_CN')['status'], 'invalid')
+
+    def test_malformed_catalog_falls_back_without_mixing_prose(self):
+        self.catalog.write_text('msgid "duplicate"\nmsgstr "One"\n\n'
+                                'msgid "duplicate"\nmsgstr "Two"\n')
+        result = self.state()
+        self.assertEqual(result['status'], 'invalid')
+        self.assertEqual(result['actual_language'], 'zh_CN')
 
     def test_missing_catalog_falls_back_to_source_language(self):
         self.assertEqual(self.state()['status'], 'missing')
@@ -198,7 +253,8 @@ class TranslationStatusTests(unittest.TestCase):
         self.assertEqual(self.state()['status'], 'missing')
 
     def test_english_source_chinese_translation_round_trip(self):
-        source = '# Factory\n\nExisting instances.\n'
+        source = ('---\nid: factory\ntype: reference\naudience: consumer\n'
+                  'source_language: en\n---\n# Factory\n\nExisting instances.\n')
         digest = hashlib.sha256(source.encode()).hexdigest()
         path = self.root / 'zh_CN/LC_MESSAGES/factory.po'
         path.parent.mkdir(parents=True)
@@ -209,6 +265,88 @@ class TranslationStatusTests(unittest.TestCase):
         self.assertEqual(result['status'], 'reviewed')
         self.assertEqual(result['actual_language'], 'zh_CN')
         self.assertEqual(sphinx_ext.translation_status(source, 'factory', 'en', self.root)['status'], 'original')
+
+
+class ReviewedLocaleStageTests(unittest.TestCase):
+    def setUp(self):
+        self.temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temporary.cleanup)
+        self.root = Path(self.temporary.name)
+        self.docs = self.root / 'docs'
+        self.docs.mkdir()
+        self.source = self.docs / 'index.md'
+        self.source.write_text('---\nid: index\ntype: reference\n'
+                               'audience: consumer\nsource_language: en\n'
+                               '---\n# Factory\n', encoding='utf-8')
+        self.catalog = self.docs / 'locale/zh_CN/LC_MESSAGES/index.po'
+        self.catalog.parent.mkdir(parents=True)
+        self.catalog.write_text(
+            'msgid ""\nmsgstr ' + json.dumps(
+                'Language: zh_CN\nX-Nexus-Reviewed: true\n'
+                + 'X-Nexus-Source-SHA256: '
+                + hashlib.sha256(self.source.read_bytes()).hexdigest() + '\n')
+            + '\n\nmsgid "Factory"\nmsgstr "工厂"\n', encoding='utf-8')
+        self.pot = self.root / 'gettext/index.pot'
+        self.pot.parent.mkdir()
+        self.pot.write_text('msgid "Factory"\nmsgstr ""\n', encoding='utf-8')
+        for arguments in (['init', '-q'], ['add', 'docs'],
+                          ['-c', 'user.name=Fixture',
+                           '-c', 'user.email=fixture@example.invalid',
+                           'commit', '-q', '-m', 'test: reviewed locale stage']):
+            subprocess.run(['git', '-C', str(self.root)] + arguments,
+                           check=True, capture_output=True)
+
+    def configure(self):
+        config = SimpleNamespace(nexus_revision=None, nexus_code_revision=None,
+            language='zh_CN', nexus_available_languages='en,zh_CN',
+            nexus_translation_root=None, nexus_mode='preview',
+            nexus_changed_inputs='[]', nexus_rebuild_all='0',
+            nexus_gettext_root=str(self.pot.parent))
+        app = SimpleNamespace(srcdir=str(self.docs),
+                              doctreedir=str(self.root / 'doctrees'))
+        sphinx_ext._configure(app, config)
+        return Path(config.locale_dirs[0]) / 'zh_CN/LC_MESSAGES/index.po'
+
+    def test_unchanged_reviewed_catalog_keeps_staged_mtime_and_compiled_mo(self):
+        staged = self.configure()
+        compiled = staged.with_suffix('.mo')
+        compiled.write_bytes(b'existing compiled catalog')
+        os.utime(staged, ns=(1000000000, 1000000000))
+        self.configure()
+        self.assertEqual(staged.stat().st_mtime_ns, 1000000000)
+        self.assertEqual(compiled.read_bytes(), b'existing compiled catalog')
+
+    def test_revoked_or_missing_inputs_withdraw_both_po_and_mo(self):
+        for boundary in ('review', 'catalog', 'source', 'pot', 'empty-pot'):
+            with self.subTest(boundary=boundary):
+                paths = (self.catalog, self.source, self.pot)
+                original = {path: path.read_bytes() for path in paths}
+                staged = self.configure()
+                compiled = staged.with_suffix('.mo')
+                compiled.write_bytes(b'old reviewed translation')
+                if boundary == 'review':
+                    self.catalog.write_bytes(original[self.catalog].replace(
+                        b'X-Nexus-Reviewed: true', b'X-Nexus-Reviewed: false'))
+                elif boundary == 'empty-pot':
+                    self.pot.write_text('msgid ""\nmsgstr ""\n', encoding='utf-8')
+                else:
+                    {'catalog': self.catalog, 'source': self.source,
+                     'pot': self.pot}[boundary].unlink()
+                self.configure()
+                self.assertFalse(staged.exists())
+                self.assertFalse(compiled.exists())
+                for path, contents in original.items():
+                    path.write_bytes(contents)
+
+    def test_changed_reviewed_translation_invalidates_only_its_compiled_mo(self):
+        staged = self.configure()
+        compiled = staged.with_suffix('.mo')
+        compiled.write_bytes(b'old translation')
+        self.catalog.write_text(self.catalog.read_text().replace('工厂', '静态工厂'),
+                                encoding='utf-8')
+        self.configure()
+        self.assertEqual(staged.read_bytes(), self.catalog.read_bytes())
+        self.assertFalse(compiled.exists())
 
 
 class IncludedReferenceTests(unittest.TestCase):
@@ -349,8 +487,11 @@ class LocalSvgLinkTests(unittest.TestCase):
                 + "source_suffix = {'.md': 'markdown'}\nroot_doc = 'index'\n"
                 + "project = 'SVG fixture'\nhtml_theme = 'alabaster'\n"
                 + "language = os.environ['NEXUS_DOCS_LANGUAGE']\n", encoding='utf-8')
-            (docs / 'index.md').write_text('# SVG fixture\n\n```{toctree}\nguide/topic\n```\n')
+            (docs / 'index.md').write_text(
+                '---\nid: index\ntype: reference\naudience: consumer\n'
+                'source_language: en\n---\n# SVG fixture\n\n```{toctree}\nguide/topic\n```\n')
             (docs / 'guide/topic.md').write_text(
+                '---\nid: topic\ntype: reference\naudience: consumer\nsource_language: en\n---\n'
                 '# Diagrams\n\n| Scope | Source |\n| --- | --- |\n| software | `0123456789abcdef0123456789abcdef01234567` |\n\n![First diagram](../assets/diagrams/flow.svg)\n\n'
                 '![Second diagram](../other/flow.svg)\n\n'
                 '[![Original link](../other/flow.svg)](https://example.invalid/explanation)\n')
@@ -359,7 +500,7 @@ class LocalSvgLinkTests(unittest.TestCase):
                 (docs / directory / 'flow.svg').write_text(svg)
             (docs / 'assets/diagrams/flow.dot').write_text(
                 'digraph flow { a [label="Flow"]; }', encoding='utf-8')
-            (docs / 'assets/diagrams/labels.json').write_text(json.dumps({
+            (docs / 'assets/diagrams/flow.labels.json').write_text(json.dumps({
                 'schema_version': 1, 'en': {'Flow': 'Flow English'},
                 'zh_CN': {'Flow': '中文流程'}}), encoding='utf-8')
             for arguments in (['init', '-q'], ['add', 'docs'],
@@ -368,10 +509,15 @@ class LocalSvgLinkTests(unittest.TestCase):
                 subprocess.run(['git', '-C', str(root)] + arguments,
                                check=True, capture_output=True)
             environment = os.environ.copy()
-            for name in ('NEXUS_DOCS_REVISION', 'NEXUS_DOCS_CODE_REVISION',
-                         'NEXUS_DOCS_TRANSLATION_ROOT', 'NEXUS_DOCS_GETTEXT_ROOT'):
-                environment.pop(name, None)
+            for name in tuple(environment):
+                if name.startswith("NEXUS_DOCS_"):
+                    environment.pop(name)
             environment['NEXUS_DOCS_LANGUAGES'] = 'en,zh_CN'
+            from tools.documentation import diagram_localization
+            assets = root / 'diagram-assets'
+            diagram_localization.write(docs / 'assets/diagrams',
+                                       env=environment, output=assets)
+            environment['NEXUS_DOCS_DIAGRAM_ROOT'] = str(assets)
             for language in ('en', 'zh_CN'):
                 environment['NEXUS_DOCS_LANGUAGE'] = language
                 output = root / language
@@ -418,14 +564,15 @@ class SphinxTranslationIntegrationTests(unittest.TestCase):
                 + "extensions = ['myst_parser', 'tools.documentation.sphinx_ext']\n"
                 + "source_suffix = {'.md': 'markdown'}\nroot_doc = 'index'\n"
                 + "project = 'Identity fixture'\nhtml_theme = 'alabaster'\n"
+                + f"templates_path = [{str(project / 'docs/sphinx/templates')!r}]\n"
                 + "language = os.environ['NEXUS_DOCS_LANGUAGE']\n"
                 + "gettext_compact = False\nexclude_patterns = ['locale/**']\n",
                 encoding='utf-8')
-            source_en = '---\nsource_language: en\n---\n\n# Factory contract\n\nReturns an existing instance.\n'
-            source_zh = '---\nsource_language: zh_CN\n---\n\n# 工厂合同\n\n返回已有实例。\n'
+            source_en = '---\nid: fixture\ntype: reference\naudience: consumer\nsource_language: en\n---\n\n# Factory contract\n\nReturns an existing instance.\n'
+            source_zh = '---\nid: fixture\ntype: reference\naudience: consumer\nsource_language: zh_CN\n---\n\n# 工厂合同\n\n返回已有实例。\n'
             (docs / 'english.md').write_text(source_en, encoding='utf-8')
             (docs / 'chinese.md').write_text(source_zh, encoding='utf-8')
-            (docs / 'index.md').write_text('---\nsource_language: en\n---\n\n# Fixture\n\n'
+            (docs / 'index.md').write_text('---\nid: fixture\ntype: reference\naudience: consumer\nsource_language: en\n---\n\n# Fixture\n\n'
                                            '```{toctree}\nenglish\nchinese\n```\n', encoding='utf-8')
             for arguments in (['init', '-q'], ['add', 'docs'],
                               ['-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.invalid',
@@ -434,9 +581,9 @@ class SphinxTranslationIntegrationTests(unittest.TestCase):
                                check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             gettext = root / 'gettext'
             environment = os.environ.copy()
-            for name in ('NEXUS_DOCS_REVISION', 'NEXUS_DOCS_CODE_REVISION',
-                         'NEXUS_DOCS_TRANSLATION_ROOT', 'NEXUS_DOCS_GETTEXT_ROOT', 'NEXUS_DOCS_LANGUAGES'):
-                environment.pop(name, None)
+            for name in tuple(environment):
+                if name.startswith("NEXUS_DOCS_"):
+                    environment.pop(name)
 
             def build(builder, language, output):
                 current = environment | {'NEXUS_DOCS_LANGUAGE': language}

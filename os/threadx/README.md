@@ -3,7 +3,7 @@
 本后端使用官方 Eclipse ThreadX 内核。受审来源为 `v6.5.2.202603_rel`，
 提交 `93387b0a60382a29579bbad5045c68328e3751df`，保留原 MIT 许可。
 当前集成范围为 Linux GNU 宿主端口，以及 STM32F4 所选配置的 Cortex-M4
-GNU 端口。器件与模式以[平台支持](../../docs/delivery/support.md)为准。
+GNU 端口。器件与模式以[平台支持](../../docs/reference/platforms/support.md)为准。
 当前适配器尚未实现其他 Cortex 配置组合、MPU／TrustZone 任务隔离、
 无节拍空闲、直接通知槽位和运行中调度器停机；Arch、FreeRTOS 的支持范围独立维护。
 

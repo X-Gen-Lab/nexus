@@ -1,6 +1,6 @@
 // FIG-04 reference: source-backed, scoped engineering view.
-// Code basis: tools/configure/factory.py; native_factory_test.cpp.
-// Relations and qualification limits are documented in README.md.
+// Code basis: tools/configure/factory.py; tests/google/io/native_factory_test.cpp.
+// Relations and qualification limits: docs/reference/diagrams.md.
 digraph FactoryInstances {
     graph [newrank=true, rankdir=TB, bgcolor="white", pad=0.28, nodesep=0.42,
            ranksep=0.66, fontname="Noto Sans CJK SC", fontsize=15,

@@ -1,0 +1,20 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: d09ad474eebacecccb80d702d7b3ccbe9c9284baa39e19dd4234064f43c88d5b\n"
+
+#: ../../../../../../docs/reference/contracts/os/index.md:9
+msgid "OS合同"
+msgstr "OS contracts"
+
+#: ../../../../../../docs/reference/contracts/os/index.md:11
+msgid "OS适配保持任务、等待、通知和静态存储的后端边界；初始化不启动产品调度。"
+msgstr ""
+"OS adapters preserve backend boundaries for tasks, waits, notifications, and"
+" static storage. Initialization does not start product scheduling."

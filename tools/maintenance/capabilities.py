@@ -22,7 +22,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 from tools.configure import bindings, configure, documentation, matrix, packages  # noqa: E402
 
-DOCUMENT = "docs/delivery/capabilities.md"
+DOCUMENT = "docs/reference/platforms/capabilities.md"
 START = "<!-- nexus-capabilities:start -->"
 END = "<!-- nexus-capabilities:end -->"
 
@@ -320,9 +320,8 @@ def collect(root=ROOT):
 
 def render(rows):
     """Render the sole derived block deterministically without qualification."""
-    lines = [("| SoC | Controller | Kind | Mode | Reviewed SoC routes | "
-              "Declared reference Boards | Resolver fixtures | "
-              "Selected production source |"),
+    lines = [("| SoC | 控制器 | 类别 | 模式 | 已审查 SoC 路线 | "
+              "已声明参考板卡 | 解析器夹具 | 所选生产源码 |"),
              "| --- | --- | --- | --- | --- | --- | --- | --- |"]
     for row in rows:
         cells = [row[key] for key in ("family", "controller", "kind", "mode")]

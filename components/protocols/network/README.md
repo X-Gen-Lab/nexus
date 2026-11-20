@@ -168,7 +168,7 @@ callback，即使新 start 最终拒绝，也不承诺全局 stack 不变。局�
 
 ## 可选 RX 负载借用
 
-[选定 RX 借用合同](../../../docs/reference/api/components.md#lwip-loaned-rx-contract)
+[选定 RX 借用合同](../../../docs/reference/api/components/protocols/network.md)
 是装配与生命周期权威。选择 `Nexus::LwIPLoanedRX` 或 `Nexus::LwIPTCPLoanedRX`，
 仅在静态装配处使用各自 `Storage`。上述既有目标和 24 块描述属于复制 RX；每镜像
 只允许一个 singleton stack profile，CMake 拒绝复制／借用混合。

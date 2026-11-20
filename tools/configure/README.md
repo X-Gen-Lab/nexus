@@ -131,7 +131,7 @@ ThreadX 策略模块，非 FreeRTOS 后端不包含其 lowpower 策略叶子模�
 
 Board／SoC 不含 Python 插件。完整配置生成由集中 Python 工具承担，
 固件硬件算法和生命周期直接使用 C。配置工具不进入 MCU 镜像。详细合同见
-[当前架构](../../docs/delivery/architecture.md)、
+[当前架构](../../docs/explanation/platform-architecture.md)、
 [接入指南](../../docs/guides/provider-porting.md)与
 [配置参考](../../docs/reference/configuration/assembly.md)。
 

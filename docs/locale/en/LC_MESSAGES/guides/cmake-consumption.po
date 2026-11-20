@@ -1,0 +1,135 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 23c379d48feaeb6ad8df338598add0136b95e817672557694cb2e7724ff5a015\n"
+
+#: ../../../../../../docs/guides/cmake-consumption.md:8
+msgid "用 CMake 接入平台"
+msgstr "Integrate the platform with CMake"
+
+#: ../../../../../../docs/guides/cmake-consumption.md:10
+msgid ""
+"一个应用维护自己的 CMake 工程和 `assembly.toml`。源码检出和安装 Source SDK "
+"使用相同接口；先选择工具链，再创建平台，最后创建镜像。"
+msgstr ""
+"An application maintains its own CMake project and `assembly.toml`. A source"
+" checkout and an installed Source SDK use the same interface: select the "
+"toolchain, create the platform, then create the image."
+
+#: ../../../../../../docs/guides/cmake-consumption.md:13
+msgid "三个公开入口"
+msgstr "Three public entry points"
+
+#: ../../../../../../docs/guides/cmake-consumption.md:0
+msgid "调用"
+msgstr "Call"
+
+#: ../../../../../../docs/guides/cmake-consumption.md:0
+msgid "责任"
+msgstr "Responsibility"
+
+#: ../../../../../../docs/guides/cmake-consumption.md:0
+msgid "`find_package`"
+msgstr "`find_package`"
+
+#: ../../../../../../docs/guides/cmake-consumption.md:0
+msgid "检查所选来源，加载公开函数；不解析装配、不创建生产目标"
+msgstr ""
+"Validate the selected source and load public functions; do not resolve an "
+"assembly or create production targets"
+
+#: ../../../../../../docs/guides/cmake-consumption.md:0
+msgid "`nexus_add_platform`"
+msgstr "`nexus_add_platform`"
+
+#: ../../../../../../docs/guides/cmake-consumption.md:0
+msgid "解析一个 TOML，生成静态实例，创建所选平台目标"
+msgstr ""
+"Resolve one TOML, generate static instances and create selected platform "
+"targets"
+
+#: ../../../../../../docs/guides/cmake-consumption.md:0
+msgid "`nexus_add_firmware`"
+msgstr "`nexus_add_firmware`"
+
+#: ../../../../../../docs/guides/cmake-consumption.md:0
+msgid "为镜像连接启动对象、链接布局、产物及资源检查"
+msgstr ""
+"Attach startup objects, link layout, artifacts and resource checks to an "
+"image"
+
+#: ../../../../../../docs/guides/cmake-consumption.md:30
+msgid ""
+"工具链必须在 `project()` 前通过 preset 或命令行选定。每个构建目录只有一个 工具链和装配；不同板卡、后端或 SDK "
+"使用独立目录。同一装配可创建多个镜像。"
+msgstr ""
+"Select the toolchain through a preset or the command line before "
+"`project()`. Each build directory has one toolchain and one assembly. Use "
+"separate directories for different Boards, backends or SDKs. The same "
+"assembly may create multiple images."
+
+#: ../../../../../../docs/guides/cmake-consumption.md:33
+msgid "选择源码或安装 SDK"
+msgstr "Select source or an installed SDK"
+
+#: ../../../../../../docs/guides/cmake-consumption.md:35
+msgid ""
+"源码检出的 `Nexus_DIR` 为 `<nexus>/cmake`，安装 SDK 为 `<prefix>/lib/cmake/Nexus`。以 "
+"ARM 源码工程为例，从应用目录执行："
+msgstr ""
+"For a source checkout, `Nexus_DIR` is `<nexus>/cmake`; for an installed SDK,"
+" it is `<prefix>/lib/cmake/Nexus`. For an ARM source project, run from the "
+"application directory:"
+
+#: ../../../../../../docs/guides/cmake-consumption.md:45
+msgid ""
+"`NEXUS_SOURCE` 在这里是命令示例中的路径变量。平台公开选择入口为 `Nexus_DIR`， 不要求应用设置平台开发测试或 workload"
+" 开关。普通配置不下载依赖；先按 [源码准备](source-checkout.md)完成所选任务的准备。"
+msgstr ""
+"Here `NEXUS_SOURCE` is a path variable in the example command. The public "
+"platform selection entry is `Nexus_DIR`; applications do not need platform "
+"development-test or workload switches. Ordinary configuration does not "
+"download dependencies. First complete the selected task preparation in "
+"[source preparation](source-checkout.md)."
+
+#: ../../../../../../docs/guides/cmake-consumption.md:49
+msgid "连接应用库与组件"
+msgstr "Connect application libraries and components"
+
+#: ../../../../../../docs/guides/cmake-consumption.md:51
+msgid "下面的示例要求装配已选择 `log`；用这些库和镜像声明替换前面的镜像声明："
+msgstr ""
+"The example below requires the assembly to select `log`; replace the earlier"
+" image declaration with these library and image declarations:"
+
+#: ../../../../../../docs/guides/cmake-consumption.md:59
+msgid ""
+"`Nexus::Platform` 提供所选公开接口及生成头的使用要求。组件负责自己的公开和私有 依赖，应用不添加厂商 SDK 或 provider "
+"私有目录。只需要 ABI 的自建目标可连接 `Nexus::ABI`；已选 OS 后端通过 `Nexus::OS` 连接，不拼接内部目标名。"
+msgstr ""
+"`Nexus::Platform` supplies usage requirements for selected public interfaces"
+" and generated headers. Components own their public and private "
+"dependencies; applications do not add vendor SDK or provider-private include"
+" paths. A custom target needing only the ABI may link `Nexus::ABI`. Link the"
+" selected OS backend through `Nexus::OS`, without constructing internal "
+"target names."
+
+#: ../../../../../../docs/guides/cmake-consumption.md:63
+msgid "独立 CPU 工程"
+msgstr "Standalone CPU projects"
+
+#: ../../../../../../docs/guides/cmake-consumption.md:65
+msgid ""
+"只消费 Core、Arch、公共 I/O 和 OS 的独立 CPU 工程使用 [CPU Runtime 接入](cpu-"
+"runtime.md)。发现与装配合同及失败后的产物责任见 [构建合同](../explanation/build-model.md)。"
+msgstr ""
+"Independent CPU projects consuming only Core, Arch, public I/O and OS use "
+"[CPU Runtime integration](cpu-runtime.md). The [build "
+"contract](../explanation/build-model.md) defines discovery, assembly and "
+"artifact responsibility after failure."

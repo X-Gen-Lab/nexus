@@ -1,0 +1,22 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: e05519d5690af45657571fb9b724ceea7dcd8d5a149257ec27a4bf3b64af21f4\n"
+
+#: ../../../../../../docs/reference/contracts/index.md:9
+msgid "平台合同"
+msgstr "Platform contracts"
+
+#: ../../../../../../docs/reference/contracts/index.md:11
+msgid ""
+"接口与生命周期由对应合同拥有。查函数声明使用[API参考](../api/index.md)，按步骤操作使用[指南](../../guides/index.md)。"
+msgstr ""
+"The corresponding contracts own interface and lifecycle rules. Use the [API "
+"reference](../api/index.md) for function declarations and the "
+"[guides](../../guides/index.md) for procedures."

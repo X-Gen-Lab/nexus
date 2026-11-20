@@ -292,28 +292,38 @@ def runtime_selection(family, *, backend, components=(), test_support=False,
     CMake continues to own translation units and transitive target links.
     """
     from tools.configure.contracts import COMPONENTS
-    from tools.configure.packages import discover
-    if package is None:
-        root = Path(__file__).resolve().parents[2] if root is None else Path(root)
-        packages = [item for item in discover(root) if item.family == family]
-        if len(packages) != 1:
+    root = Path(__file__).resolve().parents[2] if root is None else Path(root)
+    native = family == "native"
+    if native:
+        if not test_support or package is not None or backend not in {
+                "native", "threadx"}:
+            raise ValueError("Native applications require explicit test support")
+        from tools.configure.providers.descriptor import maintained
+        dependencies = maintained("native", test_support=True,
+                                  root=root).git_modules
+    else:
+        from tools.configure.packages import discover
+        if package is None:
+            packages = [item for item in discover(root) if item.family == family]
+            if len(packages) != 1:
+                raise ValueError("Unsupported production family/backend dependency selection")
+            package = packages[0]
+        if package.family != family or backend not in {
+                "baremetal", "freertos", "threadx"}:
             raise ValueError("Unsupported production family/backend dependency selection")
-        package = packages[0]
-    if package.family != family or backend not in {
-            "baremetal", "freertos", "threadx"}:
-        raise ValueError("Unsupported production family/backend dependency selection")
+        dependencies = package.dependencies
     if (not isinstance(components, (tuple, list)) or
             any(not isinstance(value, str) for value in components) or
             len(set(components)) != len(components) or
             not set(components).issubset(COMPONENTS | {
                 "network", "network-loaned-rx", "tls", "mqtt", "mcuboot"})):
         raise ValueError("Unsupported component dependency selection")
-    identifiers = {identifier for _, identifier in package.dependencies}
+    identifiers = {identifier for _, identifier in dependencies}
     declared = {item.identifier: item for item in ALL_SOURCE_DEPENDENCIES}
     if any(identifier not in declared or declared[identifier].scope != "runtime"
            for identifier in identifiers):
         raise ValueError("Package requires an unreviewed runtime dependency")
-    if backend != "baremetal":
+    if backend not in {"baremetal", "native"}:
         identifiers.add(backend)
     suppliers = {"network": "lwip", "network-loaned-rx": "lwip",
                  "tls": "mbedtls", "mqtt": "coremqtt", "mcuboot": "mcuboot",
@@ -321,7 +331,7 @@ def runtime_selection(family, *, backend, components=(), test_support=False,
                  "st-usb-device": "stm32_usb_device"}
     identifiers.update(suppliers[value] for value in components
                        if value in suppliers)
-    if test_support:
+    if test_support and not native:
         identifiers.add("googletest")
     return tuple(item for item in ALL_SOURCE_DEPENDENCIES
                  if item.identifier in identifiers)

@@ -1,0 +1,95 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: b740f9fd3299f76960b680fa2c20c3489b16ca82dd12fd5c960961dcc55997ae\n"
+
+#: ../../../../../../docs/index.md:9
+msgid "Nexus 嵌入式平台"
+msgstr "Nexus embedded platform"
+
+#: ../../../../../../docs/index.md:11
+msgid ""
+"Nexus 提供可复用的 C11 平台机制：Core、Arch、类型化 I/O、静态 factory、可选 OS 和组件。产品任务、私有 "
+"PCB、Flash 分区与恢复策略由外部工程拥有。"
+msgstr ""
+"Nexus supplies reusable C11 platform mechanisms: Core, Arch, typed I/O, "
+"static factory, optional OS and components. External projects own product "
+"tasks, private PCBs, Flash partitions and recovery policy."
+
+#: ../../../../../../docs/index.md:13
+msgid "选择一条任务路径："
+msgstr "Choose a task path:"
+
+#: ../../../../../../docs/index.md:0
+msgid "你要完成什么"
+msgstr "Your task"
+
+#: ../../../../../../docs/index.md:0
+msgid "从哪里开始"
+msgstr "Start here"
+
+#: ../../../../../../docs/index.md:0
+msgid "第一次运行程序"
+msgstr "Run a program for the first time"
+
+#: ../../../../../../docs/index.md:0
+msgid "[Native 首次运行](tutorials/first-native.md)"
+msgstr "[First Native run](tutorials/first-native.md)"
+
+#: ../../../../../../docs/index.md:0
+msgid "为已有板卡构建固件"
+msgstr "Build firmware for an existing board"
+
+#: ../../../../../../docs/index.md:0
+msgid "[F407 首次构建](tutorials/first-f407.md)"
+msgstr "[First F407 build](tutorials/first-f407.md)"
+
+#: ../../../../../../docs/index.md:0
+msgid "编写 TOML、连接设备与组件"
+msgstr "Write TOML and connect devices and components"
+
+#: ../../../../../../docs/index.md:0
+msgid "[应用配置](guides/app-configuration.md)、[I/O 执行](guides/io-execution.md)"
+msgstr ""
+"[Application configuration](guides/app-configuration.md), [I/O "
+"execution](guides/io-execution.md)"
+
+#: ../../../../../../docs/index.md:0
+msgid "为新 PCB 或芯片接入实现"
+msgstr "Integrate a new PCB or chip"
+
+#: ../../../../../../docs/index.md:0
+msgid ""
+"[Board 接入](guides/board-porting.md)、[Provider 接入](guides/provider-"
+"porting.md)"
+msgstr ""
+"[Board integration](guides/board-porting.md), [Provider "
+"integration](guides/provider-porting.md)"
+
+#: ../../../../../../docs/index.md:0
+msgid "修改平台代码或文档"
+msgstr "Change platform code or documentation"
+
+#: ../../../../../../docs/index.md:0
+msgid "[维护流程](development/workflow.md)、[文档维护](development/documentation.md)"
+msgstr ""
+"[Maintenance workflow](development/workflow.md), [Documentation "
+"maintenance](development/documentation.md)"
+
+#: ../../../../../../docs/index.md:23
+msgid ""
+"当前生产 SoC 为 "
+"STM32F4，板卡、精确料号、模式与限制由[支持参考](reference/platforms/support.md)维护。Native "
+"是显式主机测试模型。软件行为、ARM 链接、SDK 消费和物理 HIL 分别记录；当前物理 HIL 为 `not_executed`。"
+msgstr ""
+"The current production SoC family is STM32F4. [Support "
+"reference](reference/platforms/support.md) owns boards, exact parts, modes "
+"and limitations. Native is an explicitly selected host test model. Software "
+"behavior, ARM linking, SDK consumption and physical HIL are recorded "
+"separately; current physical HIL is `not_executed`."

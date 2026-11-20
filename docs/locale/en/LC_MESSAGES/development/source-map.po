@@ -1,0 +1,404 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 31f7a47f688bedf3a7c5485fd676faf108bcda47aa972e2b40d3c626bbfd68c7\n"
+
+#: ../../../../../../docs/development/source-map.md:9
+msgid "当前源码与维护边界"
+msgstr "Current source and maintenance boundaries"
+
+#: ../../../../../../docs/development/source-map.md:11
+msgid ""
+"本页定位当前实现，不复制各目录的完整合同。生产 MCU 入口只有 STM32F4，精确 "
+"器件与模式以[支持范围](../reference/platforms/support.md)为准；F407 Board 与新增料号的软件 "
+"参考分别说明。其他 SDK 原位保留，目录、实现、执行记录和物理资格不相互替代。"
+msgstr ""
+"This page locates current implementations without copying each directory "
+"contract. STM32F4 is the sole production MCU entry; [support "
+"scope](../reference/platforms/support.md) defines exact devices and modes. "
+"F407 Boards and software references for added parts remain distinct. Other "
+"SDKs stay in place. Directories, implementation, execution records and "
+"physical qualification do not replace one another."
+
+#: ../../../../../../docs/development/source-map.md:0
+msgid "维护问题"
+msgstr "Maintenance question"
+
+#: ../../../../../../docs/development/source-map.md:0
+msgid "权威入口"
+msgstr "Authoritative entry point"
+
+#: ../../../../../../docs/development/source-map.md:0
+msgid "请求、deadline 与借用"
+msgstr "Requests, deadlines and borrowing"
+
+#: ../../../../../../docs/development/source-map.md:0
+msgid ""
+"[Core](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/core/README.md)"
+msgstr ""
+"[Core](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/core/README.md)"
+
+#: ../../../../../../docs/development/source-map.md:0
+msgid "CPU 原语与上下文"
+msgstr "CPU primitives and context"
+
+#: ../../../../../../docs/development/source-map.md:0
+msgid ""
+"[Arch](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/arch/README.md)"
+msgstr ""
+"[Arch](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/arch/README.md)"
+
+#: ../../../../../../docs/development/source-map.md:0
+msgid "公共 face、ops 与通用机制"
+msgstr "Public faces, ops and generic mechanisms"
+
+#: ../../../../../../docs/development/source-map.md:0
+msgid ""
+"[I/O](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/io/README.md)"
+msgstr ""
+"[I/O](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/io/README.md)"
+
+#: ../../../../../../docs/development/source-map.md:0
+msgid "F4 启动、时钟和外设实现"
+msgstr "F4 startup, clocks and peripheral implementations"
+
+#: ../../../../../../docs/development/source-map.md:0
+msgid ""
+"[F4 支持包](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/soc/stm32/stm32f4/README.md)"
+msgstr ""
+"[F4 support package](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-SOURCE/soc/stm32/stm32f4/README.md)"
+
+#: ../../../../../../docs/development/source-map.md:0
+msgid "PCB 接线与电气条件"
+msgstr "PCB wiring and electrical conditions"
+
+#: ../../../../../../docs/development/source-map.md:0
+msgid ""
+"[Board](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/boards/README.md)"
+msgstr ""
+"[Board](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/boards/README.md)"
+
+#: ../../../../../../docs/development/source-map.md:0
+msgid "等待、任务和内核责任"
+msgstr "Waits, tasks and kernel responsibilities"
+
+#: ../../../../../../docs/development/source-map.md:0
+msgid ""
+"[OS](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/os/README.md)"
+msgstr ""
+"[OS](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/os/README.md)"
+
+#: ../../../../../../docs/development/source-map.md:0
+msgid "外部器件与可选机制"
+msgstr "External devices and optional mechanisms"
+
+#: ../../../../../../docs/development/source-map.md:0
+msgid ""
+"[组件](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/components/README.md)"
+msgstr ""
+"[Components](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/components/README.md)"
+
+#: ../../../../../../docs/development/source-map.md:0
+msgid "包、binding 与接入边界"
+msgstr "Packages, bindings and integration boundaries"
+
+#: ../../../../../../docs/development/source-map.md:0
+msgid ""
+"[接入指南](../guides/provider-porting.md)、[package "
+"loader](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/tools/configure/packages.py)"
+msgstr ""
+"[Porting guide](../guides/provider-porting.md), [package "
+"loader](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/tools/configure/packages.py)"
+
+#: ../../../../../../docs/development/source-map.md:0
+msgid "资料身份与已审适用范围"
+msgstr "Reference identity and reviewed applicability"
+
+#: ../../../../../../docs/development/source-map.md:0
+msgid ""
+"包内 `facts/review_profiles.json`、[ProfileSet](https://github.com/X-Gen-"
+"Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/tools/configure/reference_profiles.py)"
+msgstr ""
+"Package-local `facts/review_profiles.json` and "
+"[ProfileSet](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/tools/configure/reference_profiles.py)"
+
+#: ../../../../../../docs/development/source-map.md:0
+msgid "领域与私有值"
+msgstr "Domains and private values"
+
+#: ../../../../../../docs/development/source-map.md:0
+msgid ""
+"[DomainPolicies](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-"
+"SOURCE/tools/configure/domain_policies.py)、[IR](https://github.com/X-Gen-"
+"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/ir.py)"
+msgstr ""
+"[DomainPolicies](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-SOURCE/tools/configure/domain_policies.py), "
+"[IR](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/tools/configure/ir.py)"
+
+#: ../../../../../../docs/development/source-map.md:0
+msgid "静态对象与 IRQ／endpoint 连接"
+msgstr "Static objects and IRQ/endpoint connections"
+
+#: ../../../../../../docs/development/source-map.md:0
+msgid ""
+"[StaticRecipe／StaticObjects](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-"
+"SOURCE/tools/configure/static_recipe.py)、[SharedIrq](https://github.com/X-Gen-"
+"Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/tools/configure/shared_irq.py)、[ChildGroups](https://github.com/X-Gen-"
+"Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/tools/configure/static_endpoints.py)"
+msgstr ""
+"[StaticRecipe/StaticObjects](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-SOURCE/tools/configure/static_recipe.py), "
+"[SharedIrq](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/tools/configure/shared_irq.py), "
+"[ChildGroups](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/tools/configure/static_endpoints.py)"
+
+#: ../../../../../../docs/development/source-map.md:0
+msgid "单层声明和值片段"
+msgstr "Single-level declaration and value fragments"
+
+#: ../../../../../../docs/development/source-map.md:0
+msgid ""
+"[StaticFragments](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-SOURCE/tools/configure/static_fragments.py)"
+msgstr ""
+"[StaticFragments](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-SOURCE/tools/configure/static_fragments.py)"
+
+#: ../../../../../../docs/development/source-map.md:0
+msgid "配置与构建"
+msgstr "Configuration and build"
+
+#: ../../../../../../docs/development/source-map.md:0
+msgid ""
+"[工具](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/tools/README.md)、[CMake](https://github.com/X-Gen-"
+"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/cmake/README.md)"
+msgstr ""
+"[Tools](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/tools/README.md), [CMake](https://github.com/X-Gen-"
+"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/cmake/README.md)"
+
+#: ../../../../../../docs/development/source-map.md:0
+msgid "模型、链接与执行证据"
+msgstr "Models, linking and execution evidence"
+
+#: ../../../../../../docs/development/source-map.md:0
+msgid ""
+"[测试](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/tests/README.md)、[交付边界](../reference/platforms/index.md)"
+msgstr ""
+"[Tests](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/tests/README.md), [delivery "
+"boundaries](../reference/platforms/index.md)"
+
+#: ../../../../../../docs/development/source-map.md:60
+msgid ""
+"顶层共享 MCU `drivers/` 已归入 F4，不增加运行时转发。ILI9341、XPT2046、W25 继续通过公共 I/O "
+"访问设备，留在组件目录，不随 MCU 支持包迁移。"
+msgstr ""
+"Shared MCU sources formerly under root `drivers/` now belong to F4, without "
+"extra runtime forwarding. ILI9341, XPT2046 and W25 continue to use public "
+"I/O and remain in components rather than moving with the MCU support "
+"package."
+
+#: ../../../../../../docs/development/source-map.md:63
+msgid ""
+"Board 和 SoC 不加载本地 Python 插件。声明式包由通用 DataProvider 读取同一快照的 事实和显式 binding "
+"文件，DomainPolicies 决定已维护公共语义与私有投影，有限静态 节点生成配置、存储、face、IRQ 与固定生命周期连接。CMake "
+"仍拥有唯一 C 源码图， SDK 只按选择的包导出归属收集源码。结构图见 [FIG-03 "
+"构建期输入与产物](../assets/diagrams/configuration-generation.svg)， "
+"详细字段由[包与绑定合同](../reference/contracts/package-"
+"bindings.md)唯一维护，操作步骤见[接入指南](../guides/provider-porting.md)。"
+msgstr ""
+"Board and SoC packages do not load local Python plugins. A generic "
+"DataProvider reads facts and explicit binding files from the same "
+"declarative package snapshot. DomainPolicies determine maintained public "
+"semantics and private projections; bounded static nodes generate "
+"configuration, storage, faces, IRQs and fixed lifecycle connections. CMake "
+"still owns the only C source graph. SDK export collects source according to "
+"the selected package ownership declarations. See [FIG-03: build-time inputs "
+"and artifacts](../assets/diagrams/configuration-generation.svg). The "
+"[package and binding contract](../reference/contracts/package-bindings.md) "
+"is the sole authority for detailed fields; the [porting "
+"guide](../guides/provider-porting.md) describes the steps."
+
+#: ../../../../../../docs/development/source-map.md:70
+msgid ""
+"生产配置通过通用 DataProvider 读取包事实和静态连接，不加载家族 Python 构造模块。 硬件算法和执行顺序由 C "
+"维护；主机配置代码不进入固件。完整装配分别接受资源校验、 生成模型、ARM链接和独立SDK消费检查。"
+msgstr ""
+"Production configuration uses a generic DataProvider to read package facts "
+"and static connections; it does not load family-specific Python construction"
+" modules. C maintains hardware algorithms and execution order; host "
+"configuration code does not enter firmware. Complete assemblies undergo "
+"separate resource validation, generated-model checks, ARM linking and "
+"independent SDK consumer checks."
+
+#: ../../../../../../docs/development/source-map.md:74
+msgid ""
+"Core `private/platform_lifecycle_impl.h` 维护整平台启动、停止、回滚与诊断，F4 "
+"`system/stm32f4_platform_lifecycle_impl.h` 维护 System 与共享资源的 C 协调；各自的 `.c` "
+"公共入口复用同一实现，固定装配让编译器看到常量并裁剪分支。主机只维护 一套配置实现，其代码不进入 MCU 镜像。实际生成 factory、模型与 ARM"
+" 产物 各自验证，不能把源码移动视为整条链路已经验收。 Native 必须显式启用测试 scope，不进入生产系列目录或能力聚合表。"
+msgstr ""
+"Core `private/platform_lifecycle_impl.h` owns whole-platform start, stop, "
+"rollback and diagnostics. F4 `system/stm32f4_platform_lifecycle_impl.h` owns"
+" C coordination of System and shared resources. Their public `.c` entries "
+"reuse the same implementation; fixed assembly exposes constants for compiler"
+" branch elimination. One host configuration implementation is maintained and"
+" is not linked into the MCU image. Generated factories, models and ARM "
+"artifacts are verified separately; source movement does not qualify the "
+"entire chain. Native requires explicit test scope and stays outside "
+"production family directories and capability aggregation."
+
+#: ../../../../../../docs/development/source-map.md:82
+msgid "目录维护规则"
+msgstr "Directory maintenance rules"
+
+#: ../../../../../../docs/development/source-map.md:84
+msgid ""
+"公共头位于所属模块的 `include/nexus/`，实现与内部合同分别放在 `src/` 和 "
+"`private/`；只在实际规模需要时增加子目录，不要求每个叶子拥有相同空层级。 新组件加入既有五类之一并显式登记 "
+"CMake；新增同类器件优先维护精确事实和复用 C。 新增公共语义仍需同时审查接口、配置和验证，不假设任意硬件都能只填数据。"
+msgstr ""
+"Public headers belong in their module's `include/nexus/`; implementations "
+"and internal contracts belong in `src/` and `private/`. Add subdirectories "
+"only when their real scale requires them; each leaf need not have identical "
+"empty layers. Add a component to one of the five existing categories and "
+"register it explicitly in CMake. New similar devices should first reuse C "
+"implementation and maintain exact facts. New public semantics still require "
+"interface, configuration and validation review; arbitrary hardware cannot "
+"always be integrated by filling in data alone."
+
+#: ../../../../../../docs/development/source-map.md:89
+msgid ""
+"`tools/` 维护可复用的主机能力，`scripts/` 提供安装和工程门禁入口，`.github/` 编排相同工具，`.vscode/` "
+"只引用受维护 preset。测试按被测领域组织，源码合同、 独立 SDK 消费和物理观测各保留自己的准入；删除夹具须说明合同退役或独立替代证据。"
+msgstr ""
+"`tools/` maintains reusable host capabilities, `scripts/` provides setup and"
+" engineering gates, `.github/` orchestrates the same tools, and `.vscode/` "
+"references only maintained presets. Organize tests by the domain under test."
+" Source contracts, independent SDK consumption and physical observations "
+"retain separate admission. Removing a fixture requires an obsolete contract "
+"or independent replacement evidence."
+
+#: ../../../../../../docs/development/source-map.md:93
+msgid ""
+"`dependencies/` 记录锁定身份和审核，`ext/` 保存通用依赖，`vendors/` 保存官方 "
+"硬件依赖与未启用库存。供应方原目录和许可证不按 Nexus 风格重排。`.git/`、 `.venv/` 与 `build/` "
+"是本地状态；清理构建产物前保留仍需追溯的唯一原始记录。"
+msgstr ""
+"`dependencies/` records locked identities and reviews, `ext/` holds general "
+"dependencies, and `vendors/` holds official hardware dependencies and "
+"unselected inventory. Do not reorganize supplier source directories or "
+"licenses to match Nexus style. `.git/`, `.venv/` and `build/` are local "
+"state. Before cleaning build products, preserve unique original records that"
+" remain necessary for traceability."
+
+#: ../../../../../../docs/development/source-map.md:97
+msgid "按改动选择验证"
+msgstr "Select validation for the change"
+
+#: ../../../../../../docs/development/source-map.md:0
+msgid "改动"
+msgstr "Change"
+
+#: ../../../../../../docs/development/source-map.md:0
+msgid "维护证据"
+msgstr "Maintenance evidence"
+
+#: ../../../../../../docs/development/source-map.md:0
+msgid "作者字段、包或绑定"
+msgstr "Author fields, packages or bindings"
+
+#: ../../../../../../docs/development/source-map.md:0
+msgid "真实解析/拒绝用例、不可变IR和确定性生成"
+msgstr ""
+"Real parsing/rejection cases, immutable IR and deterministic generation"
+
+#: ../../../../../../docs/development/source-map.md:0
+msgid "CPU原语与ABI"
+msgstr "CPU primitives and ABI"
+
+#: ../../../../../../docs/development/source-map.md:0
+msgid "指令/模型门禁、精确CPU Runtime编译"
+msgstr "Instruction/model gates and compilation of the exact CPU Runtime"
+
+#: ../../../../../../docs/development/source-map.md:0
+msgid "请求、IRQ、DMA与停止"
+msgstr "Requests, IRQs, DMA and stop"
+
+#: ../../../../../../docs/development/source-map.md:0
+msgid "生产C故障回归、借用/取消/排空与实例隔离"
+msgstr ""
+"Production C fault regressions, borrow/cancel/drain and instance isolation"
+
+#: ../../../../../../docs/development/source-map.md:0
+msgid "PCB和系统事实"
+msgstr "PCB and system facts"
+
+#: ../../../../../../docs/development/source-map.md:0
+msgid "资料审核、资源冲突负例、精确ARM ELF；物理行为另做HIL"
+msgstr ""
+"Source review, resource-conflict rejection cases and exact ARM ELF; physical"
+" behavior requires separate HIL"
+
+#: ../../../../../../docs/development/source-map.md:0
+msgid "CMake与导出"
+msgstr "CMake and export"
+
+#: ../../../../../../docs/development/source-map.md:0
+msgid "真实外部项目配置、链接、搬移和独立SDK消费"
+msgstr ""
+"Real external-project configuration, linking, relocation and independent SDK"
+" consumption"
+
+#: ../../../../../../docs/development/source-map.md:0
+msgid "文档"
+msgstr "Documentation"
+
+#: ../../../../../../docs/development/source-map.md:0
+msgid "内容/图示语义审查、全量链接/消息与严格双语验证"
+msgstr ""
+"Content/diagram semantic review, complete link/message checks and strict "
+"bilingual validation"
+
+#: ../../../../../../docs/development/source-map.md:108
+msgid ""
+"验证入口见[开发工作流](workflow.md)；资格范围由[验证边界](../reference/platforms/qualification.md)定义。文档定位表不形成第二份测试计划或构建图。"
+msgstr ""
+"See the [development workflow](workflow.md) for validation entry points; the"
+" [qualification boundary](../reference/platforms/qualification.md) defines "
+"scope. This documentation map does not create a second test plan or build "
+"graph."

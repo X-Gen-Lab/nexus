@@ -1,8 +1,60 @@
+#
 msgid ""
-msgstr "Project-Id-Version: Nexus documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Source-SHA256: 2038bb37dea9f517222c7deba42f1107fe51eb21ab4ae2b130fdbca18c1400b7\nX-Nexus-Reviewed: true\n"
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: d3eaba4ed5b5b96c73a07d401031ebfff94e8810d287e3127b2ca11cda9c657f\n"
 
+#: ../../../../../../docs/reference/api/index.md:10
 msgid "Public C API"
 msgstr "公共 API 参考"
 
-msgid "Doxygen reads only current public header trees. The module pages render real declarations through Breathe; vendor SDKs, private provider storage, tests and historical APIs are excluded. Generated nexus_factory.h belongs to one resolved assembly and is described in the factory explanation."
-msgstr "Doxygen 只读取当前公共头文件目录。各模块页面通过 Breathe 呈现实际声明；厂商 SDK、私有提供者存储、测试和历史 API 均被排除。生成的 nexus_factory.h 属于某一已解析装配，其合同见工厂架构说明。"
+#: ../../../../../../docs/reference/api/index.md:12
+msgid ""
+"Declarations and contracts below come from the maintained public C headers "
+"through Doxygen and Breathe. Vendor implementations and private provider "
+"state are excluded. Exact-profile composition headers explicitly identify "
+"their supplier-layout requirements; Native controls remain host-test "
+"interfaces."
+msgstr ""
+"以下声明和合同由维护中的公共 C 头文件经 Doxygen 和 Breathe 生成，不包含厂商实现及 provider "
+"私有状态。精确配置的装配头文件会显式说明厂商布局要求；Native 控制接口仅用于主机测试。"
+
+#: ../../../../../../docs/reference/api/index.md:17
+msgid ""
+"Select the exact part, Board, backend and mode from the current support "
+"reference. A public header or optional method does not authorize every "
+"provider, board connection or hardware mode."
+msgstr "从当前支持参考中选择精确料号、板卡、后端和模式。公共头文件或可选方法不表示所有 provider、板级连接或硬件模式均已获准。"
+
+#: ../../../../../../docs/reference/api/index.md:21
+msgid ""
+"Factory lookup returns an existing immutable face without starting hardware."
+" Controllers, child endpoints and optional faces retain their declared "
+"identities. Accepted requests and buffers stay borrowed until acquire-"
+"observed SETTLED; cancellation, deadlines and DMA completion do not revoke "
+"the borrow. Applications own execution progress, waiting, policy and joined "
+"shutdown."
+msgstr ""
+"Factory 查找返回已有不可变接口，不启动硬件。控制器、子端点及可选接口保持其声明的身份。已接受的请求和缓冲区在以 acquire 语义观测到 "
+"SETTLED 前持续借用；取消、截止时间及 DMA 完成均不撤销借用。应用负责执行推进、等待、策略及完成 join 的停机。"
+
+#: ../../../../../../docs/reference/api/index.md:27
+msgid "Core, architecture and OS"
+msgstr "Core、架构与 OS"
+
+#: ../../../../../../docs/reference/api/index.md:37
+msgid "Typed I/O"
+msgstr "类型化 I/O"
+
+#: ../../../../../../docs/reference/api/index.md:45
+msgid "Common components"
+msgstr "公共组件"
+
+#: ../../../../../../docs/reference/api/index.md:53
+msgid "System and explicit test support"
+msgstr "系统与显式测试支持"

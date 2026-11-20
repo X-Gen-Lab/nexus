@@ -1,9 +1,9 @@
 // FIG-16 current software mechanisms; selected-provider scope, not HIL.
-// Basis: c4249e98 baseline plus the IO evolution sources linked by
-// docs/design/io-evolution.md. The task ledger owns execution status.
+// Basis: tools/configure; io/include/nexus/io; io/src; core/private.
+// The current support matrix owns exact part/mode scope.
 // Every edge states generation, lookup, call or copied-observation semantics.
 digraph ioEvolution {
-    graph [label="FIG-16 Current I/O assembly and execution\nSoftware mechanisms; exact mode status stays in the ledger",
+    graph [label="FIG-16 当前 I/O 装配与执行\n精确料号和模式支持另行维护",
            fontname="Noto Sans CJK SC", fontsize=15, labelloc=t, rankdir=TB,
            bgcolor="white", pad=0.25, nodesep=0.35, ranksep=0.60,
            newrank=true];

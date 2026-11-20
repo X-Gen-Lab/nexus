@@ -44,7 +44,7 @@ SETUP 不撤销已取得的 ACK；ACK 前 supersession 会 abort／drain 且不�
 畸形请求的显式拒绝可能产生 guarded STALL，但不建立新 loan；标准／其他 class
 请求须先由外部 dispatcher 路由。
 
-完整语义与精确 FS provider 范围见 [USB device 合同](../../../docs/design/usb-device.md)。
+完整语义与精确 FS provider 范围见 [USB device 合同](../../../docs/reference/contracts/io/usb-lifecycle.md)。
 主机模型、描述符验证和 ARM 链接不建立 VBUS、PHY、电气、枚举或 class 实板资格。
 ## 显式 USB 角色和供电交接
 

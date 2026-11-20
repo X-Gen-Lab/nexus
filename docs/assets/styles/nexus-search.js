@@ -43,17 +43,19 @@
         }
         const chinese = data.requested_language === "zh_CN";
         const labels = chinese ? {
-            version: "版本", type: "类别", source: "原文", requested: "请求语言",
-            actual: "实际语言", translation: "翻译", original: "原文",
+            version: "版本", type: "类别", actual: "内容语言",
+            translation: "翻译", original: "原文",
             reviewed: "已审查", missing: "缺失，回退到原文",
-            stale: "过期，回退到原文", tutorial: "教程", "how-to": "操作指南",
-            reference: "参考", explanation: "架构说明", status: "状态记录"
+            stale: "过期，回退到原文", invalid: "无效目录，回退到原文",
+            tutorial: "教程", "how-to": "操作指南",
+            reference: "参考", explanation: "架构说明"
         } : {
-            version: "Version", type: "Type", source: "Source", requested: "Requested",
-            actual: "Actual", translation: "Translation", original: "original",
+            version: "Version", type: "Type", actual: "Content language",
+            translation: "Translation", original: "original",
             reviewed: "reviewed", missing: "missing, source fallback",
-            stale: "stale, source fallback", tutorial: "tutorial", "how-to": "how-to",
-            reference: "reference", explanation: "explanation", status: "status"
+            stale: "stale, source fallback", invalid: "invalid catalog, source fallback",
+            tutorial: "tutorial", "how-to": "how-to",
+            reference: "reference", explanation: "explanation"
         };
         const names = {en: "English", zh_CN: "简体中文"};
         const query = new URLSearchParams(window.location.search).get("q") || "";
@@ -103,8 +105,6 @@
                 const fields = [
                     [labels.version, data.version],
                     [labels.type, labels[record.type] || record.type],
-                    [labels.source, names[record.source_language]],
-                    [labels.requested, names[record.requested_language]],
                     [labels.actual, names[record.actual_language]],
                     [labels.translation, labels[record.status] || record.status]
                 ];
@@ -135,6 +135,12 @@
     };
 
     const initializeSearch = () => {
+        document.querySelectorAll("[data-nexus-language-switch]").forEach((link) => {
+            const target = new URL(link.getAttribute("href"), window.location.href);
+            target.search = window.location.search;
+            target.hash = window.location.hash;
+            link.setAttribute("href", target.href);
+        });
         // This asset precedes searchtools.js, so install before Search.init's
         // DOMContentLoaded callback runs the first query from the URL.
         installExclusionCompatibility();

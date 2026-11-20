@@ -12,11 +12,11 @@ required. Preserve automated gates and independent
 agent review for high-risk changes; never invent GitHub CODEOWNERS accounts or
 claim remote branch protection from a local policy file.
 
-Read [the design contracts](docs/design/README.md),
-[delivery boundaries](docs/delivery/README.md) and the relevant layer README
-before changing behavior. Historical contracts and results remain in immutable
-[Git history](https://github.com/X-Gen-Lab/nexus/tree/83a27dfbee4e8fbf4d35875b1e9db85af7516eec).
-They do not establish current support or qualification.
+Read [the architecture](docs/explanation/platform-architecture.md),
+[current contracts](docs/reference/index.md),
+[verification boundaries](docs/reference/platforms/qualification.md) and the relevant
+layer README before changing behavior. Git history retains original contracts and
+results; those records do not establish current support or qualification.
 
 ## Architecture and configuration
 
@@ -104,8 +104,8 @@ They do not establish current support or qualification.
 
 ## Tools, style and validation
 
-Documentation changes follow the [content and diagram standards](docs/design/documentation-standards.md)
-and [page templates](docs/design/documentation-templates.md). Architecture pages
+Documentation changes follow the [content and diagram standards](docs/reference/contracts/documentation-standards.md)
+and [page templates](docs/reference/contracts/documentation-templates.md). Architecture pages
 include or reference diagrams that distinguish current implementation, target
 design and exact reference configurations. Review arrow meaning, ownership,
 failure paths and source identity; rendering does not establish correctness or
@@ -117,11 +117,14 @@ Prepare the hash-locked documentation tuple explicitly with
 `python tools/documentation/install.py`; `dev.py docs test` executes the complete
 documentation suite using the same nonzero, no-skip result admission as other
 tool tests. Strict bilingual builds and whole-site translation checks use that tuple.
-Every current page has complete English and Chinese prose through one canonical
-source and reviewed gettext catalogs. Mixed-source contracts may use a reviewed
-catalog for their declared source locale too. Keep symbols, configuration keys
-and original evidence values intact. A stale, fuzzy or missing translation fails
-current-site admission; historical archives retain their frozen language scope.
+Current site pages use Markdown/MyST with explicit id, type, audience and
+source_language metadata. Each page has one canonical source and a reviewed
+gettext catalog for the other language; same-language catalogs are rejected.
+Keep symbols, configuration keys and original evidence values intact. A stale,
+fuzzy or missing translation fails strict verification. Preview is explicitly
+unqualified. Only a fresh verify build of both en and zh_CN establishes complete
+documentation validation. Retired paths, labels, wrappers and formats have no
+aliases, redirects or conversion layer.
 
 Install commit tools with `python scripts/setup/install_dev_tools.py`, then
 `.venv/bin/python -m pip install -r dependencies/environment-tools.txt` (Windows:
@@ -215,7 +218,7 @@ that copy instead of committing repeated before-images, transport archives and
 control bundles. Do not build new evidence frameworks for routine changes.
 
 Apply the test-retention and execution rules in the
-[engineering handbook](docs/design/engineering-handbook.md). Remove a test only
+[engineering handbook](docs/reference/contracts/engineering.md). Remove a test only
 after identifying its obsolete contract or equivalent independent coverage;
 preserve meaningful failure regressions. Move mode-independent Python and SDK
 checks to the explicit tool domains instead of repeating them in each Native

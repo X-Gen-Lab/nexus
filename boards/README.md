@@ -23,7 +23,7 @@ GPIO、总线及外部器件 owner 分别管理状态，组件不能重复取得
 时序；未知 PCB 修订保持未知，实板 HIL 为 `not_executed`。
 
 接入步骤见 [Board 指南](../docs/guides/board-porting.md)，模式见
-[支持范围](../docs/delivery/support.md)。
+[支持范围](../docs/reference/platforms/support.md)。
 
 ## 软件参考入口
 

@@ -5,26 +5,17 @@ from pathlib import Path
 
 _REPOSITORY = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(_REPOSITORY))
-from tools.documentation.check import HISTORICAL_PAGES, HISTORICAL_PREFIXES
 
 project = 'Nexus Embedded Platform'
 author = 'Nexus Team'
 copyright = '2026, Nexus Team'
 version = release = os.environ.get('NEXUS_DOCS_VERSION', 'source-preview')
-extensions = ['myst_parser', 'breathe', 'sphinx.ext.graphviz',
+extensions = ['myst_parser', 'breathe',
               'tools.documentation.sphinx_ext']
-source_suffix = {'.md': 'markdown', '.rst': 'restructuredtext'}
+source_suffix = {'.md': 'markdown'}
 root_doc = 'index'
 language = os.environ.get('NEXUS_DOCS_LANGUAGE', 'zh_CN')
-exclude_patterns = ['archive/**', 'api/**', '_build/**', '_output/**',
-                    'locale/**', 'README.md', 'sphinx/README.md',
-                    'sphinx/index.rst', 'sphinx/api.rst',
-                    'sphinx/getting_started.rst', 'sphinx/architecture.rst',
-                    'sphinx/configuration.rst', 'sphinx/migration.rst',
-                    'sphinx/os.rst', 'sphinx/support.rst',
-                    'sphinx/development/index.rst']
-exclude_patterns.extend(HISTORICAL_PAGES)
-exclude_patterns.extend(prefix + '**' for prefix in HISTORICAL_PREFIXES)
+exclude_patterns = ['_build/**', '_output/**', '.doctrees/**', 'locale/**']
 html_theme = 'alabaster'
 html_theme_options = {'description': ('可复用的静态嵌入式平台机制'
                       if language == 'zh_CN' else 'Static embedded platform mechanisms')}
@@ -46,6 +37,8 @@ breathe_projects = {'nexus': os.environ.get('NEXUS_DOCS_DOXYGEN_XML',
                     str(_REPOSITORY / 'docs/api/xml'))}
 breathe_default_project = 'nexus'
 breathe_domain_by_extension = {'h': 'c'}
+breathe_show_include = False
+c_id_attributes = ['_Noreturn']
 nitpicky = True
 
 # These public-page tags intentionally remain opaque, and the kernel/C types
@@ -59,6 +52,8 @@ _external_types = (
     'nx_adc_port nx_exti_port nx_flash_port nx_gpio_port nx_i2c_endpoint '
     'nx_i2c_port nx_pwm_port nx_spi_endpoint nx_spi_port nx_uart_port '
     'nx_watchdog_port nx_tls_runtime nx_tls_session nx_mqtt_session nx_mqtt_memory '
-    'nx_lwip_adapter nx_lwip_rx_slot nx_lwip_rx_piece tcp_pcb pbuf pbuf_custom'
+    'nx_lwip_adapter nx_lwip_rx_slot nx_lwip_rx_piece tcp_pcb pbuf pbuf_custom '
+    'mbedtls_ssl_context mbedtls_ssl_config mbedtls_x509_crt mbedtls_pk_context '
+    'MQTTPubAckInfo_t MQTTContext_t netif'
 ).split()
 nitpick_ignore = [('c:identifier', name) for name in _external_types]

@@ -1,0 +1,30 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 34939b8bea80a23e011b477b787248838108c9ce5732a002de7fd80ef36a9958\n"
+
+#: ../../../../../../docs/tutorials/index.md:8
+msgid "从第一个应用开始"
+msgstr "Start with the first application"
+
+#: ../../../../../../docs/tutorials/index.md:10
+msgid "没有硬件时先运行 Native 应用；需要 MCU 镜像时选择精确 F407 模板。 每条教程给出完整输入、命令和可观察的成功出口。"
+msgstr ""
+"Without hardware, run a Native application first. For an MCU image, select "
+"the exact F407 template. Each tutorial provides complete inputs, commands "
+"and observable success criteria."
+
+#: ../../../../../../docs/tutorials/index.md:21
+msgid ""
+"已有工程可直接进入[任务指南](../guides/index.md)。SDK 制作与完整平台验收属于 "
+"[维护流程](../development/index.md)。"
+msgstr ""
+"For an existing project, go directly to the [task "
+"guides](../guides/index.md). SDK creation and complete platform acceptance "
+"belong to the [maintenance workflows](../development/index.md)."

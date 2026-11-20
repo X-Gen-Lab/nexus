@@ -526,6 +526,25 @@ class DependencyPreparationTests(unittest.TestCase):
         (self.checkout / ".git").symlink_to(directory, target_is_directory=True)
         self.reject_before_mutation()
 
+    def test_empty_application_selection_never_updates_all_submodules(self):
+        calls = []
+        original = dependencies._git
+
+        def observe(root, *arguments, **options):
+            calls.append(arguments)
+            return original(root, *arguments, **options)
+
+        with patch.object(dependencies, "required_submodules", return_value=()), \
+                patch.object(dependencies, "_git", side_effect=observe):
+            result = dependencies.prepare(
+                self.root, "assembly", family="native", backend="native",
+                test_support=True, allow_network=True)
+        self.assertEqual(result["submodules"], [])
+        self.assertEqual(result["recursive_submodules"], [])
+        self.assertFalse(any("submodule" in args and
+                             ("sync" in args or "update" in args)
+                             for args in calls), calls)
+
 
 if __name__ == "__main__":
     unittest.main()

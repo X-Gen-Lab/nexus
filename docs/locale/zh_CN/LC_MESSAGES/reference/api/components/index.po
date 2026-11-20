@@ -1,0 +1,29 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: d56ed5339b8100078f415229cd53f60a4399dd7454ef40d77b128436951e81be\n"
+
+#: ../../../../../../docs/reference/api/components/index.md:10
+msgid "Optional component reference"
+msgstr "可选组件参考"
+
+#: ../../../../../../docs/reference/api/components/index.md:12
+msgid ""
+"Choose reusable protocol or coordination mechanisms by responsibility. "
+"Components consume explicit ports and caller-owned storage; products own "
+"scheduling, application policy and physical recovery. Exact-profile storage "
+"headers belong only at static composition."
+msgstr "按职责选择可复用协议或协调机制。组件使用显式端口及调用者拥有的存储；产品负责调度、应用策略和物理恢复。精确配置的存储头文件仅用于静态装配。"
+
+#: ../../../../../../docs/reference/api/components/index.md:14
+msgid ""
+"The API reference describes current software contracts. It does not "
+"authorize an unselected MCU mode, Board connection, kernel gateway or "
+"physical result."
+msgstr "API 参考描述当前软件合同，不授予未选定的 MCU 模式、板级连接、内核网关或物理结果。"

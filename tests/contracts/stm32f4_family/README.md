@@ -53,5 +53,5 @@ ARM configure、编译、链接、保留与资源检查证明选中源码能构�
 `publishable=false` 与最终 clean-source 安装包资格分开。缺失 ETH／DCMI 的器件
 必须在配置阶段拒绝相应路线；本目录的 CRC 装配不选择 CRYP／HASH，其他接口按精确
 支持矩阵判断。新料号高速 RUN 不授予其 STOP／Standby 或 180 MHz overdrive 支持。
-实际模式与后续扩展见[支持范围](../../../docs/delivery/support.md)和
-[架构工作项](../../../docs/delivery/architecture.md)。物理 HIL 为 `not_executed`。
+实际模式与后续扩展见[支持范围](../../../docs/reference/platforms/support.md)和
+[架构工作项](../../../docs/explanation/platform-architecture.md)。物理 HIL 为 `not_executed`。

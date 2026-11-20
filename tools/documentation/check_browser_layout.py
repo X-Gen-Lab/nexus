@@ -78,18 +78,19 @@ def main(argv=None):
         return 1
     arguments.report.parent.mkdir(parents=True, exist_ok=True)
     report = {'scope': 'temporary_production_theme_C_API_mobile_fixture',
+              'mode': 'preview',
               'qualification': False,
               'transport': 'loopback_HTTP_only', 'python': sys.version,
               'chromium_executable': str(arguments.chromium.resolve()),
               'cases': [], 'errors': [], 'external_requests': []}
     environment = os.environ.copy()
-    for name in ('NEXUS_DOCS_REVISION', 'NEXUS_DOCS_CODE_REVISION',
-                 'NEXUS_DOCS_TRANSLATION_ROOT', 'NEXUS_DOCS_GETTEXT_ROOT',
-                 'NEXUS_DOCS_LANGUAGES', 'NEXUS_DOCS_DOXYGEN_XML'):
-        environment.pop(name, None)
+    for name in tuple(environment):
+        if name.startswith("NEXUS_DOCS_"):
+            environment.pop(name)
     # An explicitly provided browser helper path must not replace the locked
     # Sphinx packages used by the child build.
     environment.pop('PYTHONPATH', None)
+    environment['NEXUS_DOCS_MODE'] = 'preview'
     server = None
     try:
         if (not arguments.chromium.is_file()
@@ -126,7 +127,7 @@ def main(argv=None):
                          + ' |\n| ' + ' | '.join('value' for _ in range(28))
                          + ' |\n')
                 (docs / 'index.md').write_text(
-                    '---\nsource_language: ' + language + '\n---\n\n# '
+                    '---\nid: fixture\ntype: reference\naudience: consumer\nsource_language: ' + language + '\n---\n\n# '
                     + title + '\n\n```{c:function} void ' + SYMBOL
                     + '(int value)\n```\n\n```c\n' + CODE
                     + '\n```\n\n' + table, encoding='utf-8')

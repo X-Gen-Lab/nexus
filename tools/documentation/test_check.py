@@ -7,6 +7,57 @@ import unittest
 from tools.documentation import check
 
 
+class ExplicitPageContractTests(unittest.TestCase):
+    def source(self, **changes):
+        fields = {"id": "guides.page", "type": "how-to",
+                  "audience": "consumer", "source_language": "en"}
+        fields.update(changes)
+        return "---\n" + "\n".join(
+            name + ": " + value for name, value in fields.items()
+            if value is not None) + "\n---\n# Page\n"
+
+    def test_each_identity_field_is_explicit_and_nonempty(self):
+        for name in ("id", "type", "audience", "source_language"):
+            for value in (None, ""):
+                with self.subTest(field=name, value=value):
+                    with self.assertRaisesRegex(ValueError, name):
+                        check.metadata(self.source(**{name: value}))
+
+    def test_type_and_identifier_are_validated_without_path_guesses(self):
+        for fields in ({"type": "guide"}, {"type": "status"},
+                       {"id": "../guide"}):
+            with self.subTest(fields=fields):
+                with self.assertRaises(ValueError):
+                    check.metadata(self.source(**fields))
+
+    def test_metadata_is_required_even_for_an_obvious_language(self):
+        with self.assertRaises(ValueError):
+            check.metadata("# English heading\n中文也不决定来源语言。\n")
+
+    def test_every_markdown_page_has_the_same_source_policy(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            paths = [root / "docs" / name for name in
+                     ("index.md", "README.md", "api/README.md",
+                      "archive/contract.md", "guides/new/README.md")]
+            for path in paths:
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text(self.source())
+            self.assertEqual(check.sources(root), sorted(paths))
+
+    def test_rst_is_rejected_instead_of_silently_omitted_or_rendered(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            (root / "docs").mkdir()
+            (root / "docs/index.md").write_text(self.source())
+            (root / "docs/old.rst").write_text("Old\n===\n")
+            result = check.scan(root, check_diagrams=False,
+                                check_configuration=False,
+                                check_navigation=False)
+            self.assertIn("Markdown", " ".join(result["errors"]))
+            self.assertNotIn(root / "docs/old.rst", check.sources(root))
+
+
 class DocumentationCheckTests(unittest.TestCase):
     def setUp(self):
         self.directory = tempfile.TemporaryDirectory()
@@ -21,6 +72,10 @@ class DocumentationCheckTests(unittest.TestCase):
     def write(self, name, content):
         path = self.root / "docs" / name
         path.parent.mkdir(parents=True, exist_ok=True)
+        if path.suffix == ".md" and not content.startswith("---\n"):
+            content = ("---\nid: " + name.replace("/", ".").removesuffix(".md")
+                       + "\ntype: reference\naudience: consumer\n"
+                       "source_language: en\n---\n" + content)
         path.write_text(content)
         return path
 
@@ -42,16 +97,17 @@ class DocumentationCheckTests(unittest.TestCase):
         self.assertIn("anchor", " ".join(self.scan()["errors"]))
 
     def test_duplicate_page_id_is_rejected(self):
-        self.write("other.md", "---\nid: guides.page\n---\n# Other\n")
+        self.write("other.md", "---\nid: guides.page\ntype: reference\n"
+                   "audience: consumer\nsource_language: en\n---\n# Other\n")
         self.assertIn("duplicate page ID", " ".join(self.scan()["errors"]))
 
     def test_unreachable_page_is_reported(self):
         self.write("other.md", "# Other\n")
         self.assertIn("unreachable", " ".join(self.scan()["errors"]))
 
-    def test_archive_is_not_a_current_navigation_requirement(self):
+    def test_archive_name_does_not_hide_a_current_markdown_source(self):
         self.write("archive/old.md", "# Historical\n[old](absent.md)\n")
-        self.assertEqual(self.scan()["errors"], [])
+        self.assertIn("missing link", " ".join(self.scan()["errors"]))
 
     def test_code_fences_do_not_create_links(self):
         self.write("page.md", "# Page\n\n```c\n[not a link](absent)\n```\n")
@@ -91,41 +147,12 @@ class DocumentationCheckTests(unittest.TestCase):
         self.write("page.md", "# Page\n\n[use][link]\n\n[link]: absent.md\n")
         self.assertIn("missing", " ".join(self.scan()["errors"]))
 
-    def rst_page(self, contents):
-        (self.root / "docs/page.md").unlink(missing_ok=True)
-        self.write("page.rst", contents)
 
-    def test_rst_missing_inline_link_is_reported(self):
-        self.rst_page("Page\n====\n\n`missing <absent.md>`_\n")
-        self.assertIn("missing link absent.md", " ".join(self.scan()["errors"]))
 
-    def test_rst_missing_named_link_is_reported(self):
-        self.rst_page("Page\n====\n\nUse reader_.\n\n.. _reader: absent.md\n")
-        self.assertIn("missing link absent.md", " ".join(self.scan()["errors"]))
 
-    def test_rst_missing_cross_page_anchor_is_reported(self):
-        self.rst_page("Page\n====\n\n`missing <index.md#absent>`_\n")
-        self.assertIn("missing anchor", " ".join(self.scan()["errors"]))
 
-    def test_rst_heading_and_explicit_label_links_are_accepted(self):
-        self.rst_page("Page\n====\n\n.. _contract-label:\n\n"
-                      "Contract rules\n--------------\n")
-        self.write("index.md", "# Start\n\n```{toctree}\npage\n```\n"
-                   "[heading](page.rst#contract-rules) "
-                   "[label](page.rst#contract-label)\n")
-        self.assertEqual(self.scan()["errors"], [])
 
-    def test_rst_literal_code_does_not_create_links(self):
-        self.rst_page("Page\n====\n\n.. code-block:: rst\n\n"
-                      "    `example <absent.md>`_\n    .. image:: absent.png\n")
-        self.assertEqual(self.scan()["errors"], [])
 
-    def test_rst_missing_image_and_include_inputs_are_reported(self):
-        for directive in ("include", "image", "figure"):
-            with self.subTest(directive=directive):
-                self.rst_page("Page\n====\n\n.. " + directive
-                              + ":: absent.txt\n")
-                self.assertIn("absent.txt", " ".join(self.scan()["errors"]))
 
     def test_fenced_include_documentation_is_not_a_source_dependency(self):
         self.write("page.md", "# Page\n\n````markdown\n"
@@ -170,7 +197,7 @@ class DocumentationCheckTests(unittest.TestCase):
         self.assertIn("symlink", " ".join(self.scan()["errors"]))
 
     def test_unknown_page_language_is_rejected(self):
-        self.write("page.md", "---\nid: guides.page\nsource_language: zz\n---\n# Page\n")
+        self.write("page.md", "---\nid: guides.page\ntype: reference\naudience: consumer\nsource_language: zz\n---\n# Page\n")
         self.assertIn("source_language", " ".join(self.scan()["errors"]))
 
     def test_glob_toctree_reaches_real_markdown_pages(self):
@@ -205,25 +232,15 @@ class DocumentationCheckTests(unittest.TestCase):
             check.validate_svg(path)
 
 
-    def test_rst_toml_uses_the_real_resolver_and_rejects_bad_mode(self):
-        from tools.configure import configure, documentation
-        source = (configure.ROOT / "tools/configure/assemblies/qiming-baremetal-gpio.toml").read_text()
-        rst = ".. code-block:: toml\n\n" + "\n".join("    " + line for line in source.splitlines()) + "\n"
-        converted = check.configuration_content(rst, ".rst")
-        path = self.root / "docs/example.rst"
-        rows = documentation.check_document(path, configure.ROOT, contents=converted)
-        self.assertEqual(rows[0]["kind"], "assembly")
-        with self.assertRaisesRegex(ValueError, "Unsupported mode"):
-            documentation.check_document(path, configure.ROOT,
-                contents=converted.replace('mode = "output"', 'mode = "unsupported"'))
 
     def test_required_translation_rejects_missing_stale_or_unreviewed(self):
         import hashlib
         import json
-        source = "---\nid: start\nsource_language: en\n---\n# Start\n"
+        source = ("---\nid: start\ntype: reference\naudience: consumer\n"
+                  "source_language: en\n---\n# Start\n")
         self.write("index.md", source)
         def validate():
-            return check.validate_translations(self.root, critical_pages=("index",))
+            return check.validate_translations(self.root, pages=("index",))
         self.assertTrue(validate()["errors"])
         digest = hashlib.sha256(source.encode()).hexdigest()
         catalog = self.root / "docs/locale/zh_CN/LC_MESSAGES/index.po"
@@ -264,46 +281,33 @@ class DocumentationCheckTests(unittest.TestCase):
 
 
 class DottedDocnameRegression(unittest.TestCase):
-    def test_actual_scan_reaches_dotted_docnames_and_explicit_source_names(self):
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            docs = root / "docs"
-            (docs / "status").mkdir(parents=True)
-            (docs / "index.md").write_text(
-                "# Start\n\n```{toctree}\nstatus/release-0.2.1\n"
-                "Migration <status/migration.v2>\nstatus/explicit-0.1.0.md\n"
-                "status/explicit-v2.0.rst\n```\n")
-            for name, contents in (
-                    ("release-0.2.1.md", "# Release\n"),
-                    ("migration.v2.rst", "Migration\n=========\n"),
-                    ("explicit-0.1.0.md", "# Explicit Markdown\n"),
-                    ("explicit-v2.0.rst", "Explicit RST\n============\n")):
-                (docs / "status" / name).write_text(contents)
-            result = check.scan(root, check_diagrams=False, check_configuration=False)
-            self.assertEqual(result["errors"], [])
-            self.assertEqual(result["pages"], 5)
+    def page(self, docs, name, body):
+        path = docs / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("---\nid: " + name.replace("/", ".").removesuffix(".md")
+                        + "\ntype: reference\naudience: consumer\n"
+                        "source_language: en\n---\n" + body)
+        return path
 
-    def test_dotted_rst_toctree_resolves_full_name_before_suffix_fallback(self):
+    def test_actual_scan_reaches_dotted_and_explicit_markdown_names(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             docs = root / "docs"
-            docs.mkdir()
-            (docs / "index.md").write_text(
-                "# Start\n\n```{toctree}\nstatus\n```\n")
-            (docs / "status.rst").write_text(
-                "Status\n======\n\n.. toctree::\n\n    release-0.1.0\n")
-            (docs / "release-0.1.0.rst").write_text("Release\n=======\n")
+            self.page(docs, "index.md", "# Start\n\n```{toctree}\n"
+                      "status/release-0.2.1\nMigration <status/migration.v2>\n"
+                      "status/explicit-0.1.0.md\n```\n")
+            for name in ("release-0.2.1.md", "migration.v2.md", "explicit-0.1.0.md"):
+                self.page(docs, "status/" + name, "# Current\n")
             result = check.scan(root, check_diagrams=False, check_configuration=False)
             self.assertEqual(result["errors"], [])
+            self.assertEqual(result["pages"], 4)
 
     def test_missing_dotted_target_never_resolves_a_truncated_decoy(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             docs = root / "docs"
-            docs.mkdir()
-            index = docs / "index.md"
-            index.write_text("# Start\n\n```{toctree}\nrelease-0.1.0\n```\n")
-            (docs / "release-0.1.md").write_text("# Decoy\n")
+            index = self.page(docs, "index.md", "# Start\n\n```{toctree}\nrelease-0.1.0\n```\n")
+            self.page(docs, "release-0.1.md", "# Decoy\n")
             self.assertEqual(check.navigation(index, index.read_text()),
                              [(docs / "release-0.1.0.md").resolve()])
             result = check.scan(root, check_diagrams=False, check_configuration=False)
@@ -323,7 +327,7 @@ class SourceSDKInstructionTests(unittest.TestCase):
             "documented_source_sdk", root / "cmake/package/package_source_sdk.py")
         packager = importlib.util.module_from_spec(module_spec)
         module_spec.loader.exec_module(packager)
-        source = (root / "docs/tutorials/source-sdk.md").read_text()
+        source = (root / "docs/development/sdk-publishing.md").read_text()
         commands = [shlex.split(line) for block in check.FENCE.finditer(source)
                     if block[2].strip() == "sh"
                     for line in block[3].replace("\\\n", " ").splitlines()

@@ -1,0 +1,30 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: fc7f073fc356d5f00383edf0297b050e6e09d10a415cf419e344351b4acc1411\n"
+
+#: ../../../../../../docs/guides/index.md:8
+msgid "按任务查找"
+msgstr "Find the task"
+
+#: ../../../../../../docs/guides/index.md:10
+msgid "初次使用先完成[教程](../tutorials/index.md)。已有工程按当前要做的事选择指南。"
+msgstr ""
+"For first use, complete a [tutorial](../tutorials/index.md). For an existing"
+" project, select a guide for the task at hand."
+
+#: ../../../../../../docs/guides/index.md:30
+msgid ""
+"字段与状态合同集中在[参考](../reference/index.md)，平台贡献、工具和 SDK 发布见 "
+"[维护流程](../development/index.md)。"
+msgstr ""
+"Fields and state contracts are centralized in the "
+"[reference](../reference/index.md). Platform contributions, tools and SDK "
+"publication are covered by the [maintenance "
+"workflows](../development/index.md)."

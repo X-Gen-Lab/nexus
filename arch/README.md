@@ -8,8 +8,8 @@ Arch 为 I/O、SoC 和 OS 适配提供 CPU 局部机制。公共头在
 ![FIG-13：Cortex-M 能力分层](../docs/assets/diagrams/cortex-m-capabilities.svg)
 
 图区分当前 CPU 原语、Runtime、SoC 接入和实板范围。图源与图例见
-[图册](../docs/assets/diagrams/README.md)，规范见
-[CPU 契约](../docs/design/arch-contracts.md)。
+[图册](../docs/reference/diagrams.md)，规范见
+[CPU 契约](../docs/reference/contracts/arch.md)。
 
 ## 依赖与源码入口
 
@@ -30,9 +30,9 @@ Arch 为 I/O、SoC 和 OS 适配提供 CPU 局部机制。公共头在
 
 同一 Cortex-M 实现覆盖 M0／M0+／M3／M4／M7／M23／M33／M55／M85，包括
 ARMv8.1-M Mainline 编译器配置组合。生产 SoC 的精确 STM32F4 料号、模式与运行时范围
-由[支持矩阵](../docs/delivery/support.md)单独限定；CPU 原语覆盖不扩大 SoC／Board 支持。
+由[支持矩阵](../docs/reference/platforms/support.md)单独限定；CPU 原语覆盖不扩大 SoC／Board 支持。
 独立 CPU 运行时选择 Core／Arch 和可选 OS，不创建 SoC、Board、启动或
-factory；见 [Runtime 装配](../docs/delivery/cortex-m.md)。
+factory；见 [Runtime 装配](../docs/reference/platforms/cortex-m.md)。
 
 ## 中断状态、上下文和排序
 

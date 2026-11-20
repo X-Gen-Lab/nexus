@@ -1,0 +1,21 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: d10d97e04f3339667b8f9473ab9aa877bac19f0c67ca4eca6753c5d91579ec8c\n"
+
+#: ../../../../../../docs/reference/configuration/index.md:9
+msgid "配置参考"
+msgstr "Configuration reference"
+
+#: ../../../../../../docs/reference/configuration/index.md:11
+msgid "作者输入只有一份 schema-2 TOML；SoC/Board JSON提供事实；生成结果供审查和构建使用，不能回填成另一个配置入口。"
+msgstr ""
+"The only authored input is one schema-2 TOML. SoC/Board JSON provide facts; "
+"generated results serve review and builds and cannot be fed back as another "
+"configuration entry."

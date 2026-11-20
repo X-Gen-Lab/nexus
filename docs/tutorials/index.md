@@ -2,16 +2,21 @@
 id: tutorials.index
 type: reference
 audience: consumer
-source_language: en
+source_language: zh_CN
 ---
 
-# Tutorials
+# 从第一个应用开始
 
-Follow one fixed, verifiable path. Start by creating an external application from a fixed template and running its Native model. SDK packaging and consumer verification are separate maintainer tasks. Use the request tutorial before adding asynchronous execution.
+没有硬件时先运行 Native 应用；需要 MCU 镜像时选择精确 F407 模板。
+每条教程给出完整输入、命令和可观察的成功出口。
 
 ```{toctree}
-:maxdepth: 2
+:maxdepth: 1
 
-source-sdk
+first-native
+first-f407
 async-io
 ```
+
+已有工程可直接进入[任务指南](../guides/index.md)。SDK 制作与完整平台验收属于
+[维护流程](../development/index.md)。

@@ -1,6 +1,6 @@
 // FIG-01 current: source-backed, scoped engineering view.
 // Code basis: core/private/platform_lifecycle_impl.h; tools/configure/bindings.py; io/include/nexus/io.
-// Relations and qualification limits are documented in README.md.
+// Relations and qualification limits: docs/reference/diagrams.md.
 digraph PlatformArchitecture {
     graph [newrank=true, rankdir=TB, bgcolor="white", pad=0.28, nodesep=0.42,
            ranksep=0.66, fontname="Noto Sans CJK SC", fontsize=15,

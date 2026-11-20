@@ -23,4 +23,4 @@
 
 [FIG-08：等待、唤醒与退出](../../docs/assets/diagrams/wait-wake-shutdown.svg)
 说明上层流程；公共接口和后端差异见 [OS 总览](../README.md)及
-[OS 合同](../../docs/design/os-contracts.md)。
+[OS 合同](../../docs/reference/contracts/os/execution.md)。

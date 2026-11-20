@@ -7,58 +7,16 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 import json
 import os
 from pathlib import Path
-import shutil
 import subprocess
 import sys
 import uuid
-import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 from tools.dev import process
 from tools.documentation import check
-from tools.evidence.identity import observe_git_source
-
-OWNER = ".nexus-documentation-output.json"
-
-
-def prepare_output(root, destination):
-    """Only reuse a directory whose ownership was explicitly established."""
-    root, destination = Path(root).resolve(), Path(destination).absolute()
-    if destination.is_symlink() or any(path.is_symlink() for path in destination.parents):
-        raise ValueError("documentation output cannot use a symlink")
-    destination = destination.resolve()
-    if (destination == root or root.is_relative_to(destination)
-            or destination.is_relative_to(root / "docs")
-            or (destination.is_relative_to(root) and
-                destination.relative_to(root).parts[0] != "build")):
-        raise ValueError("documentation output cannot overlap source inputs")
-    if any(path.is_relative_to(destination) for path in
-           check.dependencies(root, require_files=False)):
-        raise ValueError("documentation output cannot remove rendered inputs")
-    marker = destination / OWNER
-    if destination.exists():
-        if not marker.is_file() or marker.is_symlink():
-            raise ValueError("existing output lacks documentation ownership")
-        record = json.loads(marker.read_text())
-        if record != {"schema_version": 1, "owner": "nexus-documentation", "root": str(root)}:
-            raise ValueError("output ownership differs from this checkout")
-        shutil.rmtree(destination)
-    destination.mkdir(parents=True)
-    marker.write_text(json.dumps({"schema_version": 1,
-        "owner": "nexus-documentation", "root": str(root)}) + "\n")
-    return destination
-
-
-def _record(path, record):
-    path.parent.mkdir(parents=True, exist_ok=True)
-    temporary = path.with_name(path.name + ".tmp-" + uuid.uuid4().hex)
-    try:
-        temporary.write_text(json.dumps(record, ensure_ascii=False, indent=2) + "\n")
-        temporary.replace(path)
-    finally:
-        temporary.unlink(missing_ok=True)
-
+from tools.documentation import build as builder
+from tools.documentation.build import prepare_output, record as _record, build
 
 def _staged_sources(root):
     """A repair outside the index cannot validate the committed document."""
@@ -70,8 +28,7 @@ def _staged_sources(root):
             return True
         if name.startswith("docs/"):
             parts = path.relative_to(root / "docs").parts
-            return (parts[0] != "api"
-                    and not set(parts).intersection(check.EXCLUDED - {"locale"})
+            return (not set(parts).intersection(check.EXCLUDED - {"locale"})
                     and (parts[0] == "assets" or path.suffix in {
                         ".md", ".rst", ".dot", ".svg", ".csv", ".json",
                         ".toml", ".po", ".py", ".html", ".css", ".js"}))
@@ -79,7 +36,7 @@ def _staged_sources(root):
                 or name.startswith("dependencies/docs-")
                 or name.startswith(("tools/documentation/", "tools/configure/"))
                 or (name.startswith("boards/") and path.suffix == ".json")
-                or (name.startswith("soc/") and path.suffix in {".json", ".py"}))
+                or (name.startswith("soc/") and path.suffix == ".json"))
     indexed_names = subprocess.run(["git", "ls-files", "-z", "--", "docs/", "Doxyfile",
                                    "dependencies/docs-*", "tools/__init__.py",
                                    "tools/documentation/",
@@ -97,12 +54,41 @@ def _staged_sources(root):
                           and "__pycache__" not in path.parts)
     candidates.update(check.dependencies(root))
     candidates.update(check.adjacent_sources(root))
-    for path in sorted(candidates):
-        relative = path.relative_to(root).as_posix()
-        indexed = subprocess.run(["git", "show", ":" + relative], cwd=root,
-                                 capture_output=True, timeout=30)
-        if not path.is_file() or indexed.returncode or indexed.stdout != path.read_bytes():
-            raise ValueError("document differs from staged index: " + relative)
+    candidates.update(root / name for name in builder.inputs(root))
+    raw = subprocess.run(["git", "ls-files", "--stage", "-z"], cwd=root,
+                         capture_output=True, check=True, timeout=30).stdout
+    indexed = {}
+    for entry in raw.split(b"\0"):
+        if entry:
+            fields, name = entry.split(b"\t", 1)
+            _mode, object_id, stage = fields.split()
+            if stage != b"0":
+                raise ValueError("unmerged documentation input")
+            indexed[os.fsdecode(name)] = object_id
+    names = sorted(path.relative_to(root).as_posix() for path in candidates)
+    identities = list(dict.fromkeys(indexed[name] for name in names if name in indexed))
+    payload = subprocess.run(["git", "cat-file", "--batch"], cwd=root,
+        input=b"".join(value + b"\n" for value in identities),
+        capture_output=True, check=True, timeout=30).stdout
+    blobs, position = {}, 0
+    for expected in identities:
+        finish = payload.find(b"\n", position)
+        if finish < 0:
+            raise ValueError("incomplete Git documentation batch")
+        header = payload[position:finish].split()
+        if len(header) != 3 or header[:2] != [expected, b"blob"]:
+            raise ValueError("invalid Git documentation object")
+        length = int(header[2]); position = finish + 1
+        blobs[expected] = payload[position:position + length]
+        position += length
+        if payload[position:position + 1] != b"\n":
+            raise ValueError("incomplete Git documentation blob")
+        position += 1
+    for name in names:
+        path = root / name
+        if (not path.is_file() or name not in indexed
+                or path.read_bytes() != blobs[indexed[name]]):
+            raise ValueError("document differs from staged index: " + name)
     return tree
 
 
@@ -118,35 +104,6 @@ def _safe_report(root, path):
     if path in check.dependencies(root, require_files=False):
         raise ValueError("report cannot overwrite a rendered document input")
     return path
-
-
-
-
-
-
-def normalize_generated_svg(folder):
-    """Drop a trusted generator's external DTD without changing SVG elements."""
-    ET.register_namespace("", "http://www.w3.org/2000/svg")
-    ET.register_namespace("xlink", "http://www.w3.org/1999/xlink")
-    for path in Path(folder).rglob("*.svg"):
-        raw = path.read_bytes()
-        if b"<!ENTITY" in raw.upper():
-            raise ValueError("generated SVG contains entity definitions")
-        tree = ET.fromstring(raw)
-        path.write_bytes(ET.tostring(tree, encoding="utf-8", xml_declaration=True) + b"\n")
-
-
-def _execute(command, root, environment, workspace, stage, timeout):
-    result = process.run(command, cwd=root, env=environment,
-                         log=workspace / (stage + ".log"), timeout=timeout,
-                         stage="documentation-" + stage)
-    print(result.stdout, end="")
-    print(result.stderr, end="", file=sys.stderr)
-    if result.returncode:
-        raise ValueError(f"{stage} failed with exit {result.returncode}; "
-                         f"receipt: {result.receipt_path}")
-    return str(result.receipt_path)
-
 
 def run_tests(root, report, tool_prefix=None):
     """Run the complete suite in the verified tuple, without installing it."""
@@ -189,108 +146,45 @@ def run_tests(root, report, tool_prefix=None):
         report.unlink(missing_ok=True)
         raise
 
-
-
-
-def build(root, destination, *, language="all", tool_prefix=None, timeout=600):
-    """Build fresh XML and HTML; no previous success can survive a failure."""
-    from tools.documentation import install
-    root = Path(root).resolve()
-    output = prepare_output(root, destination)
-    workspace_parent = output.parent / "documentation-attempts"
-    if any(path.is_symlink() for path in
-           (workspace_parent, *workspace_parent.parents)):
-        raise ValueError("documentation workspace cannot use a symlink")
-    workspace = workspace_parent / uuid.uuid4().hex
-    workspace.mkdir(parents=True)
-    environment = install.environment(tool_prefix)
-    observed_tools = install.diagnose(tool_prefix)
-    prefix = Path(observed_tools["prefix"])
-    python = prefix / "venv/bin/python"
-    source = observe_git_source(root)
-    languages = ["en", "zh_CN"] if language == "all" else [language]
-    receipts = []
-    metadata = {"schema_version": 1, "kind": "nexus_documentation_build",
-                "status": "running", "source": source,
-                "tools": observed_tools, "languages": languages,
-                "qualification": False}
-    try:
-        report = check.scan(root)
-        _record(workspace / "source-check.json", report)
-        if report["errors"]:
-            raise ValueError("documentation source check failed: " + "\n".join(report["errors"]))
-        from tools.documentation import diagrams
-        diagram_report = diagrams.check(root, env=environment, full=True)
-        if diagram_report["errors"]:
-            raise ValueError("diagram verification failed: " + "\n".join(diagram_report["errors"]))
-        policy = json.loads((root / "dependencies/platform-compatibility.json").read_text())
-        api_work = workspace / "api"
-        doxygen = workspace / "Doxyfile"
-        def quoted(path):
-            return '"' + str(path).replace("\\", "\\\\").replace('"', '\\"') + '"'
-        doxygen.write_text('@INCLUDE = ' + quoted(root / "Doxyfile") + '\n'
-                           + 'OUTPUT_DIRECTORY = ' + quoted(api_work) + '\n'
-                           + 'PROJECT_NUMBER = "' + policy["semantic_version"] + '"\n')
-        receipts.append(_execute([str(prefix / "bin/doxygen"), str(doxygen)],
-                                 root, environment, workspace, "doxygen", timeout))
-        # Doxygen field labels need stable gettext keys across output languages;
-        # HTML rendering below still selects each requested language.
-        environment.update({"NEXUS_DOCS_REVISION": source["commit"],
-                            "NEXUS_DOCS_CODE_REVISION": source["commit"],
-                            "NEXUS_DOCS_VERSION": policy["semantic_version"],
-                            "NEXUS_DOCS_LANGUAGES": ",".join(
-                                dict.fromkeys(("en", *languages))),
-                            "NEXUS_DOCS_LANGUAGE": "en",
-                            "NEXUS_DOCS_DOXYGEN_XML": str(api_work / "xml"),
-                            "NEXUS_DOCS_GETTEXT_ROOT": str(workspace / "gettext")})
-        base = [str(python), "-m", "sphinx", "-n", "-W", "--keep-going",
-                "-c", str(root / "docs/sphinx"), "-d", str(workspace / "doctrees")]
-        receipts.append(_execute(base + ["-b", "gettext", str(root / "docs"),
-                                  str(workspace / "gettext")], root, environment,
-                                 workspace, "gettext", timeout))
-        translation_report = check.validate_translations(root,
-            pot_root=workspace / "gettext", languages=languages)
-        if translation_report["errors"]:
-            raise ValueError("translation gate failed: " + "\n".join(translation_report["errors"]))
-        metadata["translations"] = translation_report
-        environment["NEXUS_DOCS_LANGUAGES"] = ",".join(languages)
-        for selected in languages:
-            environment["NEXUS_DOCS_LANGUAGE"] = selected
-            command = base + ["-E", "-b", "html", "-D", "language=" + selected,
-                              str(root / "docs"), str(output / selected)]
-            receipts.append(_execute(command, root, environment, workspace,
-                                     "html-" + selected, timeout))
-        shutil.copytree(api_work / "html", output / "api")
-        normalize_generated_svg(output / "api")
-        choices = ' · '.join('<a href="' + item + '/index.html">' +
-                             ('English' if item == 'en' else '中文') + '</a>'
-                             for item in languages)
-        (output / "index.html").write_text('<!doctype html><html lang="en"><meta charset="utf-8">'
-            '<title>Nexus documentation</title><h1>Nexus documentation</h1>'
-            '<p>' + choices + ' · <a href="api/index.html">Public C API</a></p>'
-            '<p>Source ' + source["commit"] + '. Physical HIL: not executed.</p></html>')
-        licenses = output / "licenses"
-        licenses.mkdir()
-        shutil.copyfile(root / "LICENSE", licenses / "LICENSE.txt")
-        shutil.copytree(prefix / "licenses", licenses / "documentation-tools")
-        shutil.copytree(root / "docs/assets/diagrams", output / "sources/diagrams")
-        after = observe_git_source(root)
-        if after != source:
-            raise ValueError("source identity changed during documentation build")
-        metadata.update({"status": "passed", "command_receipts": receipts,
-                         "source_check": report, "workspace": str(workspace)})
-        _record(output / "documentation-build.json", metadata)
-        return metadata
-    except (OSError, ValueError, subprocess.SubprocessError) as error:
-        metadata.update({"status": "failed", "error": str(error), "command_receipts": receipts})
-        _record(workspace / "documentation-build-failure.json", metadata)
-        raise
+def serve_output(root, destination):
+    """Serve only the declared site of one current, complete documentation view."""
+    destination = Path(destination).absolute()
+    if any(path.is_symlink() for path in (destination, *destination.parents)):
+        raise ValueError("documentation serve path cannot use a symlink")
+    marker = destination / builder.OWNER
+    expected = {"schema_version": builder.SCHEMA, "owner": "nexus-documentation",
+                "root": str(Path(root).resolve())}
+    if not marker.is_file() or marker.is_symlink() or json.loads(marker.read_text()) != expected:
+        raise ValueError("serve requires current documentation ownership")
+    path = destination / builder.REPORT
+    if not path.is_file() or path.is_symlink():
+        raise ValueError("serve requires a completed documentation build")
+    value = json.loads(path.read_text())
+    if not isinstance(value, dict):
+        raise ValueError("documentation build report must be an object")
+    modes = {"preview": "ready", "verify": "passed"}
+    languages = value.get("languages")
+    if (value.get("schema_version") != builder.SCHEMA
+            or value.get("kind") != "nexus_documentation_build"
+            or value.get("mode") not in modes
+            or value.get("status") != modes[value["mode"]]
+            or not isinstance(languages, list) or not languages
+            or len(languages) != len(set(languages))
+            or any(language not in {"en", "zh_CN"} for language in languages)
+            or value.get("scope") != ("all" if set(languages) == {"en", "zh_CN"}
+                                      else "locale:" + languages[0])):
+        raise ValueError("serve requires a complete current mode/scope result")
+    site = destination / "site"
+    if (not (site / "index.html").is_file()
+            or builder.inventory(site) != value.get("files")):
+        raise ValueError("documentation site differs from its build result")
+    return site
 
 
 def main(arguments=None, *, root=ROOT):
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest="action", required=True)
-    for name in ("check", "build", "doctor", "preview", "test"):
+    for name in ("check", "build", "doctor", "serve", "test"):
         command = sub.add_parser(name)
         command.add_argument("--tool-prefix", type=Path)
         if name == "check":
@@ -304,8 +198,9 @@ def main(arguments=None, *, root=ROOT):
         elif name == "build":
             command.add_argument("--output", type=Path, default=Path(root) / "build/documentation")
             command.add_argument("--language", choices=("en", "zh_CN", "all"), default="all")
+            command.add_argument("--mode", choices=("preview", "verify"), default="verify")
             command.add_argument("--timeout", type=float, default=600)
-        elif name == "preview":
+        elif name == "serve":
             command.add_argument("--build", type=Path, default=Path(root) / "build/documentation")
             command.add_argument("--host", default="127.0.0.1")
             command.add_argument("--port", type=int, default=8000)
@@ -352,16 +247,13 @@ def main(arguments=None, *, root=ROOT):
         elif args.action == "test":
             return run_tests(root, args.report, args.tool_prefix)
         elif args.action == "build":
-            build(root, args.output, language=args.language,
+            build(root, args.output, mode=args.mode, language=args.language,
                   tool_prefix=args.tool_prefix, timeout=args.timeout)
-        elif args.action == "preview":
-            if not (args.build / "documentation-build.json").is_file():
-                raise ValueError("preview requires a completed documentation build")
-            if json.loads((args.build / "documentation-build.json").read_text()).get("status") != "passed":
-                raise ValueError("preview requires a successful documentation build")
-            handler = partial(SimpleHTTPRequestHandler, directory=str(args.build))
+        elif args.action == "serve":
+            site = serve_output(root, args.build)
+            handler = partial(SimpleHTTPRequestHandler, directory=str(site))
             server = ThreadingHTTPServer((args.host, args.port), handler)
-            print(f"Preview: http://{args.host}:{server.server_port}", flush=True)
+            print(f"Documentation: http://{args.host}:{server.server_port}", flush=True)
             try:
                 server.serve_forever()
             except KeyboardInterrupt:

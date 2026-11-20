@@ -1,0 +1,345 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 5edfc4d51fd101b528a3b2572b2b664b74a0fbb406683b89c548f8594e0f83b2\n"
+
+#: ../../../../../../docs/development/coding-standards.md:9
+msgid "Coding Standards"
+msgstr "代码规范"
+
+#: ../../../../../../docs/development/coding-standards.md:11
+msgid "Nexus follows strict coding standards for quality and safety."
+msgstr "Nexus 遵循严格的代码规范，以保障质量与安全。"
+
+#: ../../../../../../docs/development/coding-standards.md:13
+msgid "C Standard"
+msgstr "C 语言标准"
+
+#: ../../../../../../docs/development/coding-standards.md:15
+msgid "C11 for source code"
+msgstr "源码采用 C11"
+
+#: ../../../../../../docs/development/coding-standards.md:16
+msgid "C11 for production code and maintained C contract fixtures"
+msgstr "生产代码及维护范围内的 C 合同夹具采用 C11"
+
+#: ../../../../../../docs/development/coding-standards.md:17
+msgid ""
+"C++17 for host GoogleTest/GoogleMock and external ABI consumer checks; "
+"neither the test framework nor its C++ runtime enters firmware"
+msgstr "主机 GoogleTest/GoogleMock 及外部 ABI 消费验证采用 C++17；测试框架和其 C++ 运行时均不进入固件"
+
+#: ../../../../../../docs/development/coding-standards.md:20
+msgid "Code Formatting"
+msgstr "代码格式"
+
+#: ../../../../../../docs/development/coding-standards.md:22
+msgid ""
+"The project uses clang-format for automatic code formatting. Run `clang-"
+"format` before committing code."
+msgstr "项目使用 clang-format 自动格式化代码。提交代码前运行 `clang-format`。"
+
+#: ../../../../../../docs/development/coding-standards.md:25
+msgid "Indentation"
+msgstr "缩进"
+
+#: ../../../../../../docs/development/coding-standards.md:27
+msgid "Use 4 spaces for indentation (no tabs)"
+msgstr "使用 4 个空格缩进，不使用制表符"
+
+#: ../../../../../../docs/development/coding-standards.md:28
+msgid "Indent case labels inside switch statements"
+msgstr "switch 语句中的 case 标签需要缩进"
+
+#: ../../../../../../docs/development/coding-standards.md:29
+msgid "Do not indent preprocessor directives"
+msgstr "预处理指令不缩进"
+
+#: ../../../../../../docs/development/coding-standards.md:31
+msgid "Line Length"
+msgstr "行长度"
+
+#: ../../../../../../docs/development/coding-standards.md:33
+msgid "Maximum line length: 80 characters"
+msgstr "每行最长 80 个字符"
+
+#: ../../../../../../docs/development/coding-standards.md:34
+msgid "Break long lines at appropriate points"
+msgstr "在适当位置拆分长行"
+
+#: ../../../../../../docs/development/coding-standards.md:36
+msgid "Braces"
+msgstr "花括号"
+
+#: ../../../../../../docs/development/coding-standards.md:38
+msgid "Use attached braces (K&R style):"
+msgstr "使用同行左花括号（K&R 风格）："
+
+#: ../../../../../../docs/development/coding-standards.md:52
+msgid "Spaces"
+msgstr "空格"
+
+#: ../../../../../../docs/development/coding-standards.md:54
+msgid "Space after control keywords: `if (`, `for (`, `while (`"
+msgstr "控制关键字后加空格：`if (`、`for (`、`while (`"
+
+#: ../../../../../../docs/development/coding-standards.md:55
+msgid "No space after function names: `func()`"
+msgstr "函数名后不加空格：`func()`"
+
+#: ../../../../../../docs/development/coding-standards.md:56
+msgid "No space after casts: `(int)value`"
+msgstr "类型转换后不加空格：`(int)value`"
+
+#: ../../../../../../docs/development/coding-standards.md:57
+msgid "Two spaces before trailing comments"
+msgstr "行尾注释之前保留两个空格"
+
+#: ../../../../../../docs/development/coding-standards.md:58
+msgid "Space around binary operators: `a + b`, `x = y`"
+msgstr "二元运算符两侧加空格：`a + b`、`x = y`"
+
+#: ../../../../../../docs/development/coding-standards.md:60
+msgid "Pointer Alignment"
+msgstr "指针对齐"
+
+#: ../../../../../../docs/development/coding-standards.md:62
+msgid "Pointers align to the left (with the type):"
+msgstr "指针星号左对齐，与类型放在一起："
+
+#: ../../../../../../docs/development/coding-standards.md:69
+msgid "Empty Lines"
+msgstr "空行"
+
+#: ../../../../../../docs/development/coding-standards.md:71
+msgid "Maximum one consecutive empty line"
+msgstr "最多保留一个连续空行"
+
+#: ../../../../../../docs/development/coding-standards.md:72
+msgid "Use empty lines to separate logical sections"
+msgstr "使用空行分隔逻辑段落"
+
+#: ../../../../../../docs/development/coding-standards.md:74
+msgid "Naming Conventions"
+msgstr "命名约定"
+
+#: ../../../../../../docs/development/coding-standards.md:76
+msgid "Functions: `module_action_object()` (e.g., `nx_gpio_port_write()`)"
+msgstr "函数：`module_action_object()`（例如 `nx_gpio_port_write()`）"
+
+#: ../../../../../../docs/development/coding-standards.md:77
+msgid "Types: `module_type_t` (e.g., `nx_result_t`)"
+msgstr "类型：`module_type_t`（例如 `nx_result_t`）"
+
+#: ../../../../../../docs/development/coding-standards.md:78
+msgid "Macros: `MODULE_MACRO_NAME` (e.g., `NX_SUCCESS`)"
+msgstr "宏：`MODULE_MACRO_NAME`（例如 `NX_SUCCESS`）"
+
+#: ../../../../../../docs/development/coding-standards.md:79
+msgid "Constants: `MODULE_CONSTANT` (e.g., `NEXUS_UART0_SELECTED`)"
+msgstr "常量：`MODULE_CONSTANT`（例如 `NEXUS_UART0_SELECTED`）"
+
+#: ../../../../../../docs/development/coding-standards.md:80
+msgid "Static variables: `s_variable_name` prefix"
+msgstr "静态变量：使用 `s_variable_name` 前缀"
+
+#: ../../../../../../docs/development/coding-standards.md:81
+msgid "Global variables: `g_variable_name` prefix (avoid when possible)"
+msgstr "全局变量：使用 `g_variable_name` 前缀（尽量避免）"
+
+#: ../../../../../../docs/development/coding-standards.md:83
+msgid "Documentation"
+msgstr "文档注释"
+
+#: ../../../../../../docs/development/coding-standards.md:85
+msgid ""
+"All public APIs must have Doxygen comments. This project uses `\\\\` style "
+"Doxygen tags (not `@` style)."
+msgstr "所有公共 API 必须有 Doxygen 注释。本项目采用 `\\\\` 风格的 Doxygen 标签，不使用 `@` 风格。"
+
+#: ../../../../../../docs/development/coding-standards.md:88
+msgid "Tag Alignment"
+msgstr "标签对齐"
+
+#: ../../../../../../docs/development/coding-standards.md:90
+msgid ""
+"Align the description after each Doxygen tag as shown below. Excluding any "
+"surrounding code indentation, the description starts at column 21: the tag "
+"and its padding occupy 17 characters after the opening comment star:"
+msgstr ""
+"按下面的示例对齐每个 Doxygen 标签后的说明。不计外围代码缩进，说明从第 21 列开始：注释起始星号后的标签及补齐空格共占 17 个字符："
+
+#: ../../../../../../docs/development/coding-standards.md:103
+msgid "File Header Format"
+msgstr "文件头格式"
+
+#: ../../../../../../docs/development/coding-standards.md:105
+msgid "Every source file must have a file header comment."
+msgstr "每个源文件必须包含文件头注释。"
+
+#: ../../../../../../docs/development/coding-standards.md:107
+msgid "**Header files (.h)** - Minimal format:"
+msgstr "**头文件（.h）**——最简格式："
+
+#: ../../../../../../docs/development/coding-standards.md:117
+msgid "**Source files (.c)** - Full format with version and copyright:"
+msgstr "**源文件（.c）**——包含版本和版权的完整格式："
+
+#: ../../../../../../docs/development/coding-standards.md:134
+msgid "Header Files (.h)"
+msgstr "头文件 (.h)"
+
+#: ../../../../../../docs/development/coding-standards.md:136
+msgid ""
+"Header files contain full API documentation including parameters and return "
+"values:"
+msgstr "头文件提供完整 API 文档，包括参数和返回值："
+
+#: ../../../../../../docs/development/coding-standards.md:148
+msgid "Source Files (.c)"
+msgstr "源文件 (.c)"
+
+#: ../../../../../../docs/development/coding-standards.md:150
+msgid ""
+"Source definitions explain hardware ordering and invariants without "
+"duplicating `\\param` or `\\return` from the header. Use `\\brief`, "
+"`\\details` and ``\\note`` as needed:"
+msgstr ""
+"源文件定义解释硬件操作顺序和不变量，不重复头文件的 `\\param` 或 `\\return`。按需使用 `\\brief`、`\\details` "
+"和 ``\\note``："
+
+#: ../../../../../../docs/development/coding-standards.md:161
+msgid "Section Comments"
+msgstr "章节注释"
+
+#: ../../../../../../docs/development/coding-standards.md:163
+msgid ""
+"Use section comments to organize code into logical blocks. The separator "
+"line must be exactly 79 characters (`/*` + 75 characters + `*/`), preserving"
+" the existing template:"
+msgstr "使用分区注释将代码组织为逻辑块。分隔行必须恰好为 79 个字符（`/*` + 75 个字符 + `*/`），保持既有模板："
+
+#: ../../../../../../docs/development/coding-standards.md:173
+msgid ""
+"**Important**: Do NOT use `/*===...===*/` style separators. Always use "
+"`/*---...---*/` for consistency."
+msgstr "**重要**：禁止使用 `/*===...===*/` 风格的分隔符。统一使用 `/*---...---*/`。"
+
+#: ../../../../../../docs/development/coding-standards.md:176
+msgid "CMake Section Comments"
+msgstr "CMake 章节注释"
+
+#: ../../../../../../docs/development/coding-standards.md:178
+msgid ""
+"CMake section separator lines must be exactly 77 characters: `#` followed by"
+" 76 hyphens or spaces. This rule is independent of the 79-character C/C++ "
+"section comments above."
+msgstr "CMake 分隔行必须恰好为 77 个字符：`#` 后跟 76 个连字符或空格。此规则独立于上述 79 字符的 C/C++ 分区注释。"
+
+#: ../../../../../../docs/development/coding-standards.md:182
+msgid ""
+"Use the following template only for substantial top-level sections; short "
+"files and function bodies normally need blank lines and concise "
+"responsibility comments:"
+msgstr "以下模板仅用于内容较多的顶层分区；短文件和函数体通常只需空行及简短的职责注释："
+
+#: ../../../../../../docs/development/coding-standards.md:191
+msgid ""
+"Use four-space indentation and an 80-column target. Keep short calls on one "
+"line and group long argument lists by responsibility. Quote paths while "
+"preserving intentional list expansion, generator expressions and static-"
+"library link order. Declare `PUBLIC`, `PRIVATE` and `INTERFACE` dependencies"
+" explicitly; vendor headers and implementation definitions remain private. "
+"Use the locked formatter for owned CMake files, never for vendor sources. "
+"Commit checks report differences without rewriting or staging files."
+msgstr ""
+"使用四空格缩进，以 80 列为目标。短调用保持单行，长参数列表按职责分组。路径加引号，同时保留有意使用的列表展开、生成器表达式和静态库链接顺序。显式声明"
+" `PUBLIC`、`PRIVATE` 和 `INTERFACE` 依赖；厂商头文件及实现定义保持私有。仅对本项目维护的 CMake "
+"文件使用锁定版本的格式化工具，不处理厂商源码。提交检查只报告差异，不重写或暂存文件。"
+
+#: ../../../../../../docs/development/coding-standards.md:199
+msgid "Inline Comments"
+msgstr "行内注释"
+
+#: ../../../../../../docs/development/coding-standards.md:201
+msgid "Use ``/* comment */`` style for inline comments, not ``//``:"
+msgstr "行内注释采用 ``/* comment */``，不使用 ``//``："
+
+#: ../../../../../../docs/development/coding-standards.md:207
+msgid "Macro Comments"
+msgstr "宏注释"
+
+#: ../../../../../../docs/development/coding-standards.md:209
+msgid "Use Doxygen block comments or inline comments for macros:"
+msgstr "宏使用 Doxygen 块注释或行内注释："
+
+#: ../../../../../../docs/development/coding-standards.md:221
+msgid "Static Functions"
+msgstr "静态函数"
+
+#: ../../../../../../docs/development/coding-standards.md:223
+msgid "Static functions use simplified comments with only ``\\brief``:"
+msgstr "静态函数使用仅含 ``\\brief`` 的简化注释："
+
+#: ../../../../../../docs/development/coding-standards.md:234
+msgid "Prohibited Practices"
+msgstr "禁止事项"
+
+#: ../../../../../../docs/development/coding-standards.md:236
+msgid "The following practices are NOT allowed:"
+msgstr "禁止以下做法："
+
+#: ../../../../../../docs/development/coding-standards.md:238
+msgid "Using `@` style Doxygen tags (use `\\\\` instead)"
+msgstr "使用 `@` 风格的 Doxygen 标签（应改用 `\\\\`）"
+
+#: ../../../../../../docs/development/coding-standards.md:239
+msgid "Using `//` single-line comments (use `/* */` instead)"
+msgstr "使用 `//` 单行注释（应改用 `/* */`）"
+
+#: ../../../../../../docs/development/coding-standards.md:240
+msgid "Using `/*===...===*/` section separators (use `/*---...---*/` instead)"
+msgstr "使用 `/*===...===*/` 分区分隔符（应改用 `/*---...---*/`）"
+
+#: ../../../../../../docs/development/coding-standards.md:241
+msgid "Duplicating `\\param` and `\\return` in source files (only in headers)"
+msgstr "在源文件重复 `\\param` 和 `\\return`（仅在头文件提供）"
+
+#: ../../../../../../docs/development/coding-standards.md:243
+msgid "Ownership and evidence"
+msgstr "所有权与证据"
+
+#: ../../../../../../docs/development/coding-standards.md:245
+msgid ""
+"Public declarations specify context, deadlines, retained storage and failure"
+" state. Describe why a volatile read, ordering barrier or drain is "
+"necessary. `SETTLED` is the provider's final request access. Cancellation "
+"never permits reclaiming a borrowed buffer before settlement or proved "
+"controlled recovery."
+msgstr ""
+"公共声明须说明执行上下文、截止时间、保留存储和失败后的状态。解释为何需要 volatile 读取、顺序屏障或排空。`SETTLED` 表示 "
+"provider 最后一次访问该请求。借用缓冲区只有在请求结清或已证明受控恢复后才可回收，取消本身不授予回收权限。"
+
+#: ../../../../../../docs/development/coding-standards.md:250
+msgid ""
+"Changed files pass whole-file formatting and mechanical comment checks. "
+"Install local Git hooks with `python scripts/setup/install_dev_tools.py`. "
+"The commit and CI gates share `scripts/ci/style_gate.py`; no hook bypass is "
+"a validation result. Actual warning/analyzer and behavioral evidence is "
+"separate from style."
+msgstr ""
+"修改的文件须通过整文件格式化及机械注释检查。使用 `python scripts/setup/install_dev_tools.py` 安装本地 "
+"Git hooks。提交和 CI 门禁共用 `scripts/ci/style_gate.py`；绕过 hook "
+"不构成验证结果。实际编译警告、分析器和行为证据与风格检查分别记录。"
+
+#: ../../../../../../docs/development/coding-standards.md:255
+msgid ""
+"Selected analyzer checks do not establish MISRA certification or industrial "
+"functional-safety qualification."
+msgstr "选定分析器检查不建立 MISRA 认证或工业功能安全资格。"

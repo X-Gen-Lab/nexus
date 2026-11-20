@@ -29,9 +29,9 @@ files. Preserve unstaged work and actual failure diagnostics; never bypass hooks
 
 ## Prepare the pinned host test framework
 
-GoogleTest and GoogleMock are provided by the Git submodule `ext/googletest`. The lock records official version 1.16.0 at upstream base `6910c9d9165801d8827d628cb72eb7ea9dd538c5`; the Gitlink and selected lock commit pin organization patch `58ec32c09ed8a099e55cbdab9418597c4fd9b14f` on that base, including the host-test `RE` copy-assignment ownership fix. Dependency inventory records the official upstream base and the selected patch separately.
-The recursive checkout above includes it. For an existing checkout, prepare the
-Native dependency scope explicitly before running tests:
+GoogleTest and GoogleMock come from the pinned `ext/googletest` submodule. The source lock records the official upstream base and selected organization patch separately.
+Source retrieval does not initialize the entire host-test graph. Prepare the
+complete maintenance scope explicitly before running platform tests:
 
 ```sh
 python tools/dev/dev.py prepare --scope native --allow-network
@@ -75,7 +75,7 @@ Native GoogleTest and all four tool domains; independent runtime validation uses
 `native_contracts.py` after configuring and building each of `native-debug`,
 `native-release`, `native-asan` and `native-tsan`. The retained contract suite,
 strict bilingual documentation build and independent Source SDK consumers verify
-their separate boundaries. See the [engineering handbook](../design/engineering-handbook.md)
+their separate boundaries. See the [engineering handbook](../reference/contracts/engineering.md)
 for scope and concurrency rules.
 
 Record actual source commit, configuration, tool identities, commands, exit codes

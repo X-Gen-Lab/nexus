@@ -1,0 +1,1767 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 778c54c36eb6ac3fbed7144a5eabfc7fecdfc09b1b094d37194f3905d28c998e\n"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:10
+msgid "Byte transport, TCP, TLS and MQTT"
+msgstr "字节传输、TCP、TLS 与 MQTT"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:12
+msgid ""
+"The selected byte transport and protocol profile have explicit owners and "
+"storage. Ordinary consumers use opaque Nexus faces; exact supplier-backed "
+"storage headers belong only to the static composition translation unit."
+msgstr "选定的字节传输和协议配置具有显式所有者及存储。普通消费者使用不透明 Nexus 接口；具有厂商精确布局的存储头文件仅用于静态装配编译单元。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:16
+msgid ""
+"`byte_stream.h` defines immediate partial reads and copied writes with "
+"finite absolute deadlines. SUCCESS reports local byte acceptance, not peer "
+"delivery; BUSY with zero bytes requires explicit owner progress. No caller "
+"buffer remains borrowed after a stream operation returns. The optional "
+"`Nexus::LwIPTCP` client implements this face over the pinned NO_SYS IPv4 "
+"stack. Products still own the executor, peer selection, trusted time, "
+"entropy and shutdown/reconnect policy."
+msgstr ""
+"`byte_stream.h` 定义了带有限绝对截止时间的即时部分读取和复制写入。SUCCESS 表示本地字节准入，不表示已交付对端；BUSY "
+"且字节数为零时，需要所有者显式推进。字节流操作返回后，不再借用调用者的缓冲区。可选的 `Nexus::LwIPTCP` 客户端在锁定的 NO_SYS "
+"IPv4 协议栈之上实现此接口。执行器、对端选择、可信时间、熵源以及停机和重连策略仍由产品负责。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:0
+msgid "Consumer"
+msgstr "调用者"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:0
+msgid "Selected target and header"
+msgstr "选定目标与头文件"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:0
+msgid "Boundary"
+msgstr "边界"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:0
+msgid "Generic Ethernet adapter caller"
+msgstr "通用以太网适配器调用者"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:0
+msgid "`Nexus::LwIP`, `nexus/network/lwip_adapter.h`"
+msgstr "`Nexus::LwIP`, `nexus/network/lwip_adapter.h`"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:0
+msgid "Nexus types; no supplier headers or profile macros"
+msgstr "Nexus 类型；不暴露厂商头文件或配置宏"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:0
+msgid "Generic TCP byte caller"
+msgstr "通用 TCP 字节接口调用者"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:0
+msgid "`Nexus::LwIPTCP`, `nexus/network/lwip_tcp.h`"
+msgstr "`Nexus::LwIPTCP`, `nexus/network/lwip_tcp.h`"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:0
+msgid "Opaque client and the existing readonly byte face"
+msgstr "不透明客户端与既有只读字节接口"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:0
+msgid "Static netif composition"
+msgstr "静态 netif 装配"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:0
+msgid "`Nexus::LwIPStorage`, `nexus/network/lwip_storage.h`"
+msgstr "`Nexus::LwIPStorage`, `nexus/network/lwip_storage.h`"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:0
+msgid "Exact pinned netif/adapter layout, composition only"
+msgstr "锁定版本的精确 netif／适配器布局，仅供装配使用"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:0
+msgid "Static TCP composition"
+msgstr "静态 TCP 装配"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:0
+msgid "`Nexus::LwIPTCPStorage`, `nexus/network/lwip_tcp_storage.h`"
+msgstr "`Nexus::LwIPTCPStorage`, `nexus/network/lwip_tcp_storage.h`"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:0
+msgid "Exact pinned PCB/pbuf client layout, composition only"
+msgstr "锁定版本的精确 PCB／pbuf 客户端布局，仅供装配使用"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:30
+msgid ""
+"The composition initializes lwIP once and supplies a live network adapter, "
+"caller-owned storage and a positive receive-frame budget. All raw stack "
+"APIs, callbacks, network service and clients share one serialized NO_SYS "
+"executor. Call facade data/control outside raw callbacks; nested cross-"
+"facade mutation is rejected with BUSY. No socket layer, worker, scheduler, "
+"lock, name registry or maximum opaque pool is created. A successful TCP "
+"start admits CONNECTING; it does not establish the connection. Its first "
+"finite connect deadline cannot be extended. The existing byte face is a "
+"stateful handle, not a readiness proof."
+msgstr ""
+"装配代码仅初始化一次 lwIP，并提供有效的网络适配器、调用者拥有的存储以及正数接收帧预算。全部原始协议栈 API、回调、网络推进和客户端由同一串行 "
+"NO_SYS 执行器负责。接口的数据和控制调用必须位于原始回调之外；跨接口的嵌套修改以 BUSY 拒绝。组件不创建 socket "
+"层、worker、调度器、锁、名称注册表或最大尺寸不透明对象池。TCP start 成功只表示准入 "
+"CONNECTING，不表示连接已经建立。首次有限连接截止时间不能延长。既有字节接口是带状态的句柄，不是就绪证明。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:39
+msgid ""
+"TCP writes use official copied admission: a positive partial count releases "
+"the caller input immediately, while queued data remains bounded stack "
+"storage. Later output failure cannot undo that acceptance. Diagnostics "
+"continue to report that failure, and subsequent data/service calls fail "
+"until explicit abort. RX holds at most one accepted pbuf chain; refused "
+"chains stay lwIP-owned. Only consumed bytes receive credit. Buffered bytes "
+"precede orderly FIN, and peer half-close still permits writes. A frame "
+"budget bounds acquisition, not the total wall time of arbitrary raw "
+"callbacks. Each nonzero byte attempt may perform one explicitly budgeted "
+"network pass."
+msgstr ""
+"TCP "
+"写入使用官方复制准入：正数部分写入计数表示调用者可立即复用输入，已排队数据仍保存在协议栈的有界存储中。之后的输出失败不能撤销该准入。诊断持续报告该失败，后续数据／推进调用在显式"
+" abort 之前仍保持失败。RX 最多持有一条已接受的 pbuf 链；被拒收的链仍归 lwIP 所有。只对实际消费的字节返还接收额度。缓冲数据先于有序"
+" FIN 交付，对端半关闭后仍允许写入。帧预算限制取得的帧数，不限制任意原始回调的总耗时。每次非零字节尝试最多可以执行一轮显式预算的网络推进。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:49
+msgid ""
+"Official PCB allocation shares the bounded stack pool and its reclamation "
+"policy. It may progress pending closes or reclaim TIME_WAIT, LAST_ACK, "
+"CLOSING and lower-priority active connections, invoking other clients' error"
+" callbacks even if the new start later fails. Local rejection retains no new"
+" references for that client; it does not promise a globally unchanged stack."
+msgstr ""
+"官方 PCB 分配共享有界协议栈池及其回收策略。它可能推进待关闭连接，或回收 TIME_WAIT、LAST_ACK、CLOSING "
+"及较低优先级的活动连接；即使新的 start 随后失败，也可能调用其他客户端的错误回调。本地拒绝表示该客户端不保留新的引用，不承诺整个协议栈未发生变化。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:55
+msgid ""
+"After producers join, the owner consumes buffered RX and explicitly "
+"progresses and retries close on BUSY under the first finite close deadline. "
+"That deadline cannot be extended. Timeout requires explicit abort while "
+"storage stays live; abort discards local data and detaches callbacks. "
+"Successful close proves this client context's final stack access. The "
+"official stack may still own deferred FIN and TIME_WAIT state. Preserve the "
+"network adapter, global pools, timers and unchanged clock domain until the "
+"product's complete stack shutdown/restart procedure permits withdrawal. "
+"Client detachment does not prove global stack shutdown or MAC/PHY drain."
+msgstr ""
+"生产者完成 join 后，所有者消费缓冲 RX，并在首次有限关闭截止时间内遇到 BUSY 时显式推进和重试 "
+"close。该截止时间不能延长。超时后必须显式 abort，存储在此期间仍须有效；abort 丢弃本地数据并撤除回调引用。close "
+"成功仅证明此客户端上下文已完成最后一次协议栈访问。官方协议栈仍可能保留待后续处理的 FIN 及 TIME_WAIT "
+"状态。在产品的完整协议栈停机／重启流程允许撤回之前，网络适配器、全局存储池、定时器和未改变的时钟域都必须保持有效。客户端上下文脱离回调引用不证明全局协议栈停机或"
+" MAC／PHY 已排空。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:65
+msgid ""
+"Ordinary TLS/MQTT consumers include `tls.h` or `client.h` and link "
+"`Nexus::TLS` or `Nexus::CoreMQTT`. Their public session types are opaque and"
+" expose no supplier headers or profile macros. Only the static composition "
+"translation unit selects `Nexus::TLSStorage` with `nexus/tls/storage.h`, or "
+"`Nexus::CoreMQTTStorage` with `nexus/mqtt/core_mqtt_storage.h`, to allocate "
+"the exact pinned backend layout. Keep explicit storage targets local to "
+"composition; fields are implementation state, not business control APIs or "
+"binary ABI promises. Products explicitly call `nexus_add_tls()` or "
+"`nexus_add_coremqtt()` to create the selected targets."
+msgstr ""
+"普通 TLS／MQTT 调用者包含 `tls.h` 或 `client.h`，并链接 `Nexus::TLS` 或 "
+"`Nexus::CoreMQTT`。公共会话类型是不透明类型，不暴露厂商头文件或配置宏。只有静态装配翻译单元选择 `Nexus::TLSStorage`"
+" 与 `nexus/tls/storage.h`，或 `Nexus::CoreMQTTStorage` 与 "
+"`nexus/mqtt/core_mqtt_storage.h`，以分配锁定后端的精确布局。显式存储目标必须局限于装配代码；字段是实现状态，不是业务控制"
+" API 或二进制 ABI 承诺。产品显式调用 `nexus_add_tls()` 或 `nexus_add_coremqtt()` 创建选定目标。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:75
+msgid ""
+"The TLS profile is one serialized TLS 1.2 client/PSA domain using ECDHE-"
+"ECDSA P-256 and AES-128-GCM/SHA-256. It requires explicit DER trust, trusted"
+" UTC and a reviewed entropy-quality assertion. Its 64 KiB caller arena and "
+"512 B TX stage exclude session metadata, transport memory and stack. Join "
+"facade users, abort the session, then stop the runtime; failed or BUSY "
+"cleanup retains its resources. The MQTT 3.1.1 profile provides clean "
+"sessions and QoS0/1; callbacks borrow incoming views only until return. "
+"Explicit DISCONNECT and TLS close report local progress and do not replace "
+"lower-layer drain or peer acknowledgement. The component contracts detail "
+"[network](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/components/protocols/network/README.md), "
+"[TLS](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/components/protocols/tls/README.md) and "
+"[MQTT](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/components/protocols/mqtt/README.md) ownership and fixed profile "
+"limits."
+msgstr ""
+"TLS 配置是单一串行 TLS 1.2 客户端／PSA 域，使用 ECDHE-ECDSA P-256 和 "
+"AES-128-GCM/SHA-256。它要求显式 DER 信任材料、可信 UTC 和经过审查的熵质量声明。调用者提供的 64 KiB 内存区和 512"
+" B TX 暂存区不包含会话元数据、传输存储和栈。先 join 全部接口使用者，再 abort 会话，然后停止 runtime；失败或 BUSY "
+"的清理仍保留资源。MQTT 3.1.1 配置提供 clean session 和 QoS0/1；回调仅在返回前借用传入视图。显式 DISCONNECT "
+"和 TLS close 表示本地推进，不替代下层排空或对端确认。[网络](https://github.com/X-Gen-"
+"Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/components/protocols/network/README.md)、[TLS](https://github.com/X-Gen-"
+"Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/components/protocols/tls/README.md) 和 "
+"[MQTT](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/components/protocols/mqtt/README.md) 组件合同详细规定所有权及固定配置限制。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:89
+msgid ""
+"For both Ethernet adapter profiles, successful link output reports frame "
+"admission. A failed SETTLED TX outcome remains observable once through "
+"`nx_lwip_adapter_service`; until that observation, another link output "
+"cannot overwrite or reuse the TX buffer. Observing the error clears only the"
+" settled, unborrowed request. It adds no error queue or instance storage and"
+" does not reset the MAC, replay a packet or choose a product recovery "
+"policy. An ACTIVE or QUARANTINED borrow remains retained. The TCP byte "
+"facade keeps its existing connection-failure policy; frame-error observation"
+" does not promise recovery."
+msgstr ""
+"对于两种 Ethernet adapter 配置，link output 成功表示帧已被接纳。失败的 SETTLED TX 结果会保留，并通过 "
+"`nx_lwip_adapter_service` 报告一次；在该次观察之前，另一次 link output 不得覆盖或复用 TX "
+"缓冲区。观察错误只会清除已经结清且不再被借用的请求。此机制不新增错误队列或实例存储，也不复位 MAC、重放数据包或选择产品恢复策略。ACTIVE 或 "
+"QUARANTINED 的借用仍被保留。TCP 字节 facade 保留其既有的连接失败策略；观察到帧错误不承诺恢复。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:98
+msgid "Selected lwIP RX payload loans"
+msgstr "选定的 lwIP RX 负载借用"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:100
+msgid ""
+"Select one singleton NO_SYS stack profile per image. The default "
+"`Nexus::LwIP` and `Nexus::LwIPTCP` profiles retain copied RX and their "
+"existing storage layouts. The explicit targets below select RX payload "
+"loans; CMake rejects an image combining copied and loaned profiles, "
+"including a copied TCP target combined with loaned adapter storage. These "
+"targets create no second stack, netif, executor, worker or allocator."
+msgstr ""
+"每个镜像选择一个单例 NO_SYS 协议栈配置。默认 `Nexus::LwIP` 和 `Nexus::LwIPTCP` 配置保留复制式 RX "
+"及其既有存储布局。下列显式目标选择 RX 负载借用；CMake 拒绝在同一镜像中组合复制式与借用式配置，也拒绝将复制式 TCP 目标与借用式 "
+"adapter 存储组合。这些目标不创建第二个协议栈、netif、执行器、worker 或分配器。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:0
+msgid "Loaned RX adapter caller"
+msgstr "借用式 RX adapter 调用方"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:0
+msgid "`Nexus::LwIPLoanedRX`, `nexus/network/lwip_loaned_rx.h`"
+msgstr "`Nexus::LwIPLoanedRX`, `nexus/network/lwip_loaned_rx.h`"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:0
+msgid "Opaque adapter; explicit loaned start"
+msgstr "不透明 adapter；显式借用式启动"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:0
+msgid "Loaned RX TCP byte caller"
+msgstr "借用式 RX TCP 字节调用方"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:0
+msgid "`Nexus::LwIPTCPLoanedRX`, `nexus/network/lwip_tcp.h`"
+msgstr "`Nexus::LwIPTCPLoanedRX`, `nexus/network/lwip_tcp.h`"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:0
+msgid "Existing copied byte-stream contract"
+msgstr "既有的复制式字节流合同"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:0
+msgid "Static loaned RX composition"
+msgstr "静态借用式 RX 装配"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:0
+msgid "`Nexus::LwIPLoanedRXStorage`, `nexus/network/lwip_loaned_rx_storage.h`"
+msgstr ""
+"`Nexus::LwIPLoanedRXStorage`, `nexus/network/lwip_loaned_rx_storage.h`"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:0
+msgid "Exact adapter, frame-slot and custom-pbuf storage"
+msgstr "精确的 adapter、帧槽和 custom-pbuf 存储"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:0
+msgid "Static TCP composition over loaned RX"
+msgstr "基于借用式 RX 的静态 TCP 装配"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:0
+msgid "`Nexus::LwIPTCPLoanedRXStorage`, `nexus/network/lwip_tcp_storage.h`"
+msgstr "`Nexus::LwIPTCPLoanedRXStorage`, `nexus/network/lwip_tcp_storage.h`"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:0
+msgid "Exact selected TCP layout; also provide loaned adapter storage"
+msgstr "精确的选定 TCP 布局；同时提供借用式 adapter 存储"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:114
+msgid ""
+"The owner initializes lwIP once and attaches with "
+"`nx_lwip_loaned_adapter_start`. Supply zero-initialized, disjoint adapter, "
+"TX, fragment-view, frame-slot and custom-pbuf-piece storage. Select a "
+"nonzero `slot_count` and at least `slot_count * base.rx_capacity` pieces, "
+"with fragment capacity sized for the actual provider geometry. MAC payload "
+"spans must also be disjoint from adapter, TX/view and slot/piece storage. "
+"Invalid acquired spans are released without delivery. All raw APIs, "
+"reference operations, callbacks, service and stop share the same serialized,"
+" nonreentrant task owner. Live or reentrant attachment cannot erase retained"
+" references or tokens."
+msgstr ""
+"owner 只初始化 lwIP 一次，并通过 `nx_lwip_loaned_adapter_start` 挂接。须提供零初始化且互不重叠的 "
+"adapter、TX、片段视图、帧槽和 custom-pbuf 片段存储。选择非零 `slot_count`，并提供至少 `slot_count * "
+"base.rx_capacity` 个片段；片段容量须按实际 provider 的描述符布局确定。MAC 负载区间也必须与 "
+"adapter、TX／视图及槽／片段存储互不重叠。获取到的无效区间会被释放，不会交付。所有 raw API、引用操作、回调、service 和 stop"
+" 共用同一个串行、不可重入的任务 owner。对仍存活实例的再次挂接或重入挂接不会清除保留中的引用或令牌。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:130
+msgid ""
+"Each frame slot copies at most 136 B into its own writable `PBUF_REF` "
+"prefix. That prefix covers the 14 B Ethernet header, maximum 60 B IPv4 "
+"header and maximum 60 B TCP header, including the fields that official TCP "
+"input updates in place. The prefix can include payload; a frame of at most "
+"136 B is copied entirely. Only bytes beyond the prefix reference the "
+"original immutable MAC fragments through `PBUF_ROM` tails. Raw consumers "
+"must treat those tails as read-only and clone before writing. This is RX "
+"payload-tail zero-copy; whole-frame and TX zero-copy are not provided. ICMP "
+"echo uses the official copy-for-reply path. VLAN delivery, IPv6, DHCP, DNS "
+"and IP reassembly remain unselected."
+msgstr ""
+"每个帧槽最多将 136 B 复制到自身可写的 `PBUF_REF` 前缀。该前缀覆盖 14 B Ethernet 头、最大 60 B IPv4 头和最大"
+" 60 B TCP 头，包括官方 TCP 输入路径会原地更新的字段。前缀可能包含负载；不超过 136 B 的帧会被完整复制。只有前缀之后的字节通过 "
+"`PBUF_ROM` 尾部引用原始、不可变的 MAC 片段。raw 消费方必须将这些尾部视为只读，并在写入前克隆。这是 RX "
+"负载尾部零复制；不提供整帧或 TX 零复制。ICMP echo 使用官方的复制后回复路径。VLAN 交付、IPv6、DHCP、DNS 和 IP "
+"重组仍未选用。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:141
+msgid ""
+"A retained head or tail pbuf reference keeps its frame slot and exact MAC "
+"loan live. The final custom-pbuf free only marks pieces returned; it never "
+"calls the provider or rearms DMA. Subsequent owner service or stop releases "
+"the exact loan after every piece's final reference is gone. A failed release"
+" retains the token and storage and closes further adapter admission. "
+"Products first close PCBs and join raw users, callbacks, queues and "
+"observers. Stop returns BUSY while any pbuf reference remains and detaches "
+"only after exact RX release and the existing MAC/TX withdrawal obligations. "
+"Failed drain never revokes a loan."
+msgstr ""
+"保留的头部或尾部 pbuf 引用会使其帧槽及精确 MAC 借用持续存活。custom-pbuf 的最终释放只标记片段已归还；它从不调用 "
+"provider，也不重新武装 DMA。在每个片段的最后一个引用都结束后，后续 owner service 或 stop "
+"才释放精确借用。释放失败会保留令牌与存储，并关闭后续 adapter 接纳。产品须先关闭 PCB，并等待 raw "
+"用户、回调、队列和观察者退出。只要仍有任何 pbuf 引用，stop 就返回 BUSY；只有精确 RX 释放及既有 MAC／TX "
+"撤离义务均已完成后才解除挂接。排空失败绝不撤销借用。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:150
+msgid ""
+"Slot count is metadata capacity, not a provider capability or an ACK-"
+"progress promise. Concurrent acquisition also requires independent provider "
+"loans and enough descriptors for the actual frames. The maintained enhanced "
+"F407 MAC engine supports independent held RX heads and reverse-order release"
+" in software models; this fact does not establish universal capacity, "
+"lossless operation or progress under arbitrary retained traffic. Products "
+"budget and release loans for their selected frame geometry and workload."
+msgstr ""
+"槽位数是元数据容量，不是 provider 能力，也不承诺 ACK 推进。并发取得还要求独立的 provider "
+"借用，以及足以容纳真实帧的描述符。受维护的增强型 F407 MAC 引擎在软件模型中支持独立持有 RX "
+"头和逆序释放；这不证明通用容量、无损运行或任意保留流量下的推进。产品根据所选帧几何与负载制定预算并释放借用。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:158
+msgid ""
+"The selected loaned profile keeps two spare 512 B `PBUF_POOL` payload "
+"blocks; the copied profile keeps its existing 24 blocks. The 16 KiB arena "
+"and other fixed protocol pools remain unchanged. RX custom-pbuf metadata, "
+"136 B prefixes, MAC buffers and the copied TX buffer are additional caller-"
+"supplied storage. TX and ICMP reply fallback may use the existing bounded "
+"RAM allocator. These counts require the curated organization fork's narrow "
+"exemption of the explicit custom-RX/custom-pbuf profile from the stock "
+"`PBUF_POOL`/`TCP_WND` sizing heuristic. Every other stack sanity check "
+"remains active. This exemption does not establish stock-upstream admission "
+"or complete SRAM fit. Nominal pool counts are not a complete SRAM "
+"measurement."
+msgstr ""
+"选定的借用式配置保留两个备用的 512 B `PBUF_POOL` 载荷块；复制式配置仍使用既有的 24 块。16 KiB arena "
+"和其他固定协议池保持不变。RX custom-pbuf 元数据、136 B 前缀、MAC 缓冲区和复制式 TX 缓冲区仍需调用方另行提供存储。TX 和 "
+"ICMP 回复回退可使用既有的有界 RAM 分配器。该池容量需要维护的组织 fork，仅让显式 custom-RX／custom-pbuf 配置豁免原版"
+" `PBUF_POOL`／`TCP_WND` 容量启发式检查。其他协议栈 sanity 检查全部保留。此豁免不能证明原版上游也准入该配置，或证明完整 "
+"SRAM 可容纳。标称池计数不是完整 SRAM 测量。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:169
+msgid "Reference software-host interoperability chain"
+msgstr "软件主机互通参考链路"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:171
+msgid ""
+"![FIG-32: Reference software-host data flow with two independent TCP legs "
+"and one end-to-end TLS session](../../../../assets/diagrams/lwip-tcp-tls-"
+"mqtt-host.svg)"
+msgstr ""
+"![FIG-32：两条独立 TCP 传输与一条端到端 TLS "
+"会话的软件主机数据流参考](../../../../assets/diagrams/lwip-tcp-tls-mqtt-host.svg)"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:171
+msgid ""
+"FIG-32: Reference software-host data flow with two independent TCP legs "
+"andone end-to-end TLSsession"
+msgstr "FIG-32：软件参考主机的数据流——两个独立 TCP 段与一个端到端 TLS 会话"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:175
+msgid ""
+"FIG-32 is a reference host-test data flow, not a product architecture or MCU"
+" network qualification. Solid bidirectional edges carry the same ciphertext "
+"over two independent TCP connections: software Ethernet frames between the "
+"Nexus client and a test-only lwIP peer, then a host socket between the "
+"transparent relay and local Mosquitto. The dashed edge identifies the one "
+"TLS session, which terminates at the Nexus TLS client and Mosquitto; the "
+"relay does not decrypt or terminate TLS. Each lwIP process owns its own "
+"serialized stack and clock. {download}`Editable DOT "
+"<../../../../assets/diagrams/lwip-tcp-tls-mqtt-host.dot>` and the [network "
+"contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/components/protocols/network/README.md) and [maintained relay "
+"fixture](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/tests/contracts/lwip_mqtt_interop/README.md) define this figure's "
+"source and lifetime boundaries."
+msgstr ""
+"FIG-32 描述主机测试的数据流参考，不是产品架构或 MCU 网络资格。双向实线在两条独立 TCP 连接上传送同一密文：Nexus "
+"客户端与仅用于测试的 lwIP 对端之间使用软件以太网帧，透明中继与本地 Mosquitto 之间使用主机 socket。虚线标出唯一的 TLS "
+"会话，其端点是 Nexus TLS 客户端和 Mosquitto；中继不解密或终止 TLS。每个 lwIP "
+"进程拥有各自的串行协议栈和时钟。{download}`可编辑 DOT <../../../../assets/diagrams/lwip-tcp-"
+"tls-mqtt-host.dot>`、[网络合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-SOURCE/components/protocols/network/README.md) "
+"以及[维护的中继工装](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/tests/contracts/lwip_mqtt_interop/README.md) 给出图的源码及生命周期边界。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:187
+msgid ""
+"The host fixtures exercise actual pinned stack and protocol implementations "
+"with software frame ports and controlled services. Direct POSIX TLS/MQTT "
+"fixtures and the full lwIP/TCP relay fixture retain their own execution "
+"evidence. Neither model Ethernet nor a real host broker proves Board wiring,"
+" physical PHY/DMA, MCU entropy quality, measured resource peaks, installed "
+"SDK acceptance or HIL."
+msgstr ""
+"主机工装使用软件帧接口和受控服务，执行实际锁定的协议栈与协议实现。直接 POSIX TLS／MQTT 工装和完整 lwIP／TCP "
+"中继工装各自保留执行证据。模型以太网或真实主机 broker 都不证明 板卡接线、物理 PHY／DMA、MCU 熵质量、实测资源峰值、安装版 SDK "
+"验收或 HIL。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:193
+msgid "Exact-profile static composition"
+msgstr "精确配置的静态装配"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:195
+msgid ""
+"The storage headers below expose the selected supplier layout only to "
+"trusted static composition. They are not ordinary portable consumer faces or"
+" stable binary layout promises. Keep their explicit storage targets and "
+"supplier requirements private to that translation unit."
+msgstr ""
+"以下存储头文件仅向受信静态装配暴露所选厂商的布局。它们不属于普通可移植消费者接口，也不承诺稳定二进制布局。显式存储目标及厂商依赖须保持在该编译单元内部。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:200
+msgid "Public declarations"
+msgstr "公共声明"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:202
+msgid "byte_stream.h"
+msgstr "byte_stream.h"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:204
+msgid "Immediate partial byte transport without retained buffers."
+msgstr "不保留缓冲区的即时部分字节传输。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:204
+#: ../../../../../../docs/reference/api/components/protocols/network.md:210
+#: ../../../../../../docs/reference/api/components/protocols/network.md:216
+#: ../../../../../../docs/reference/api/components/protocols/network.md:222
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+#: ../../../../../../docs/reference/api/components/protocols/network.md:252
+#: ../../../../../../docs/reference/api/components/protocols/network.md:258
+#: ../../../../../../docs/reference/api/components/protocols/network.md:264
+msgid "Author  Nexus Team"
+msgstr "作者  Nexus Team"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:204
+#: ../../../../../../docs/reference/api/components/protocols/network.md:210
+#: ../../../../../../docs/reference/api/components/protocols/network.md:216
+#: ../../../../../../docs/reference/api/components/protocols/network.md:222
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+#: ../../../../../../docs/reference/api/components/protocols/network.md:234
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+#: ../../../../../../docs/reference/api/components/protocols/network.md:252
+#: ../../../../../../docs/reference/api/components/protocols/network.md:258
+#: ../../../../../../docs/reference/api/components/protocols/network.md:264
+msgid "Nexus Team"
+msgstr "Nexus Team"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:204
+msgid "Immutable methods for a serialized nonblocking byte stream."
+msgstr "用于串行化非阻塞字节流的只读方法。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:204
+msgid ""
+"Every call has a finite absolute monotonic deadline in the transport's "
+"explicit clock domain. Calls do not wait, create workers or retain "
+"input/output buffers after return. An accepted write copies bytes into the "
+"transport's own bounded storage; it does not promise peer delivery. SUCCESS "
+"writes 1..requested bytes for a nonempty write, or reads 1..requested bytes."
+" SUCCESS with read count zero means orderly EOF. BUSY has count zero and "
+"means retry after explicit owner progress. Other results are errors, never "
+"alternate encodings of would-block. Zero-byte calls return SUCCESS/count "
+"zero without underlying I/O. Output count is disjoint from all buffers and "
+"live transport storage. Transport, table and context outlive every consumer "
+"and its shutdown."
+msgstr ""
+"每次调用均使用传输层明确时间域内的有限绝对单调截止时间。调用不等待、不创建工作线程，也不在返回后保留输入/输出缓冲区。已接受的写入将字节复制到传输层自己的有界存储中；不承诺对端收到。非空写入"
+" SUCCESS 时接受 1..requested 字节；读取 SUCCESS 时取得 1..requested 字节。读取计数为零的 SUCCESS "
+"表示正常 EOF。BUSY 的计数为零，表示所有者显式推进后重试。其他结果均为错误，不能用来变相表示 would-block。零字节调用返回 "
+"SUCCESS/计数零，不执行下层 I/O。输出计数与全部缓冲区及有效传输存储互不重叠。传输层、方法表和上下文必须存活至全部使用方及其关闭操作结束。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:204
+#: ../../../../../../docs/reference/api/components/protocols/network.md:210
+#: ../../../../../../docs/reference/api/components/protocols/network.md:216
+#: ../../../../../../docs/reference/api/components/protocols/network.md:222
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+#: ../../../../../../docs/reference/api/components/protocols/network.md:234
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+#: ../../../../../../docs/reference/api/components/protocols/network.md:252
+#: ../../../../../../docs/reference/api/components/protocols/network.md:258
+#: ../../../../../../docs/reference/api/components/protocols/network.md:264
+msgid "Public Members"
+msgstr "公共成员"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:204
+msgid "Stable readonly face; no factory lookup, allocation or start."
+msgstr "稳定只读接口；不查 factory、不分配或启动。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:208
+msgid "lwip_adapter.h"
+msgstr "lwip_adapter.h"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:210
+msgid "Explicit single-owner lwIP Ethernet copying adapter."
+msgstr "显式单所有者 lwIP 以太网复制适配器。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:210
+#: ../../../../../../docs/reference/api/components/protocols/network.md:216
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid "Typedefs"
+msgstr "类型定义"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:210
+msgid "Backend storage is defined only by the explicit storage header."
+msgstr "后端存储仅由显式存储头文件定义。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:210
+#: ../../../../../../docs/reference/api/components/protocols/network.md:216
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid "Functions"
+msgstr "函数"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:210
+msgid "Attach one caller-owned netif without initializing MAC or PHY."
+msgstr "连接调用者拥有的一个 netif，不初始化 MAC 或 PHY。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:210
+msgid ""
+"Task-only, one serialized stack execution owner. Address configuration is "
+"static IPv4; the underlying stack is the pinned NO_SYS profile. Storage must"
+" be disjoint from configuration, TX bytes and RX views. Failure retains no "
+"new hardware borrow. Link starts down; only an explicit external PHY "
+"observation may bring it up."
+msgstr ""
+"仅限任务上下文，由单一串行协议栈执行所有者调用。地址配置为静态 IPv4；底层协议栈是锁定的 NO_SYS 配置。存储必须与配置、TX 字节和 RX "
+"视图互不重叠。失败不保留新的硬件借用。链路初始为 down；只有显式外部 PHY 观测才可将其设为 up。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:0
+msgid "Parameters"
+msgstr "参数"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:210
+msgid "[inout] Zero-initialized backend storage, not already live."
+msgstr "[inout] 零初始化且尚未处于有效状态的后端存储。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:210
+msgid "[in] Explicit configuration; copied without retaining it."
+msgstr "[in] 显式配置；复制内容，不保留其引用。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:0
+msgid "Returns"
+msgstr "返回值"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:210
+msgid "Success, invalid inputs, or BUSY for an already attached netif."
+msgstr "成功、输入无效，或 netif 已连接时的 BUSY。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:210
+msgid "Progress MAC, bounded complete RX frames and stack timer callbacks."
+msgstr "推进 MAC、有界数量的完整 RX 帧以及协议栈定时器回调。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:210
+msgid ""
+"Same task owner as every lwIP raw API/callback. Timer callback cost is "
+"governed by the fixed stack profile and application callbacks; this is not a"
+" hard bound on the entire invocation. The copying profile copies RX bytes "
+"before exact release. The explicit loaned-RX profile retains immutable "
+"payload tails until its custom-pbuf references end. A failed release retains"
+" its token and closes progress; stop retries release without feeding "
+"duplicate bytes into the stack. Inline and deferred TX failure remain "
+"observable before request reuse; while pending, new link output returns "
+"ERR_IF without admitting bytes. Success inline completion remains "
+"immediately reusable. Consuming an already-settled failure makes the TX "
+"request READY, without automatic reset, replay, adapter close or forced "
+"restart. The product chooses provider recovery; an actual unfinished borrow "
+"is never revoked."
+msgstr ""
+"与所有 lwIP raw API／回调共用同一任务 "
+"owner。定时器回调开销由固定协议栈配置和应用回调决定；这不构成整个调用的硬性时间上界。复制式配置在精确归还令牌前复制 RX 字节。显式借用式 RX "
+"配置保留不可变载荷尾部，直到 custom-pbuf 引用结束。release 失败会保留令牌并关闭后续接收推进；stop 重试 "
+"release，不会将重复字节送入协议栈。inline 和延后结清的 TX 失败在请求复用前均保持可观察；尚未观察时，新 link output 返回 "
+"ERR_IF，不接纳字节。inline SUCCESS 仍可立即复用。消费已结清的失败会将 TX 请求置为 READY，不会自动复位、重放、关闭 "
+"adapter 或强制重启。产品决定 provider 恢复策略；实际尚未结束的借用绝不会被撤销。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:210
+msgid "[inout] Live storage, including any unfinished loans."
+msgstr "[inout] 仍有效且包含所有未结束借用的存储。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:210
+msgid "[in] Nonzero maximum acquired frames this invocation."
+msgstr "[in] 此次调用最多取得的帧数，必须为正数。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:210
+msgid ""
+"Success, one pending settled TX failure, or provider/release/state error. A "
+"settled TX failure is consumed once before further progress."
+msgstr "成功、一个待观察的已结清 TX 失败，或 provider／release／状态错误。已结清的 TX 失败会在继续推进前消费一次。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:210
+msgid "Apply a proven external PHY fact to the MAC, then the netif."
+msgstr "先将经过确认的外部 PHY 事实应用到 MAC，再应用到 netif。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:210
+msgid ""
+"One task owner. Existing provider quiescence rules still apply. This does "
+"not negotiate, reset, power or prove the physical link."
+msgstr "由单一任务所有者调用。既有 provider 静止规则仍适用。该操作不协商、不复位、不供电，也不证明物理链路。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:210
+msgid "[inout] Live, nonclosing adapter storage."
+msgstr "[inout] 有效且尚未关闭准入的适配器存储。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:210
+msgid "[in] Actual PHY observation, not a software default."
+msgstr "[in] 实际 PHY 观测，不是软件默认值。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:210
+msgid "Underlying MAC admission result; failure preserves netif flags."
+msgstr "底层 MAC 准入结果；失败时保留 netif 标志。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:210
+msgid "Close adapter admission and detach only after actual MAC drain."
+msgstr "关闭适配器准入，只有实际 MAC 排空后才脱离连接。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:210
+msgid ""
+"The product first closes its PCBs, raw callbacks, queues and observers. This"
+" stops only the netif/MAC adapter, not the global lwIP stack or all "
+"application connections. A timeout or failed drain never revokes TX or RX "
+"loans; retry after explicit provider recovery. No automatic reset or replay "
+"occurs. Stop is idempotent after successful detachment."
+msgstr ""
+"产品必须先关闭其 PCB、原始回调、队列及观察者。该操作只停止 netif／MAC 适配器，不停止全局 lwIP "
+"协议栈或全部应用连接。超时或排空失败从不撤销 TX／RX 借用；显式恢复 provider 后重试。不自动复位或重放。成功脱离连接后的 stop "
+"是幂等操作。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:210
+msgid "[inout] Live storage retained on any unfinished withdrawal."
+msgstr "[inout] 有效存储；撤回未完成时仍保留。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:210
+msgid "Success after detachment; otherwise the actual withdrawal error."
+msgstr "成功脱离连接后返回成功，否则返回实际撤回错误。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:210
+msgid "Product-supplied monotonic milliseconds for lwIP timers."
+msgstr "由产品提供的 lwIP 定时器单调毫秒时钟。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:210
+msgid ""
+"Task owner only. Supply this symbol once per selected stack profile; its "
+"clock source and lifetime must cover every pending stack timer."
+msgstr "仅由任务所有者调用。每个选定协议栈配置只提供一次此符号；时钟源及其生命周期必须覆盖全部待处理协议栈定时器。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:210
+msgid "Wrapping milliseconds in the stack's unchanged live time domain."
+msgstr "协议栈未改变且仍有效的时间域内，允许自然回绕的毫秒数。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:210
+msgid "Product-supplied random word; no libc or timestamp fallback."
+msgstr "由产品提供的随机字；没有 libc 或时间戳回退。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:210
+msgid ""
+"Called by the serialized stack owner. Source failure must enter the "
+"product's nonreturning fault path; returning a fixed value is allowed only "
+"in an explicitly unqualified host test fixture."
+msgstr "由串行协议栈所有者调用。源失败必须进入产品的不返回故障路径；仅在显式未资格化的主机测试工装中允许返回固定值。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:210
+msgid "A word from the product's admitted random source."
+msgstr "来自产品已准入随机源的一个字。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:210
+msgid "Product-supplied nonreturning stack invariant failure observation."
+msgstr "由产品提供的不返回协议栈不变量失败观测。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:210
+msgid ""
+"Task owner. Never return or release quarantined hardware storage merely "
+"because the stack reported an assertion. No default abort is linked."
+msgstr "由任务所有者调用。不能仅因为协议栈报告断言就返回或释放隔离中的硬件存储。不链接默认 abort。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:210
+msgid "[in] Static diagnostic text, not a retained ownership token."
+msgstr "[in] 静态诊断文本，不是保留的所有权 token。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:210
+msgid "Explicit static IPv4 configuration and caller-owned frame storage."
+msgstr "显式静态 IPv4 配置及调用者拥有的帧存储。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:210
+msgid ""
+"The serialized stack owner initializes lwIP once before attachment. The "
+"port, clock, TX buffer and views outlive attachment and all loans. Clock and"
+" provider deadlines use the same live monotonic domain. No default worker, "
+"lock, PHY, address, DHCP, DNS or heap is provided."
+msgstr ""
+"串行协议栈所有者在连接之前仅初始化一次 lwIP。接口、时钟、TX 缓冲区和视图的生命周期必须覆盖连接及全部借用。时钟与 provider "
+"截止时间使用同一有效单调域。不提供默认 worker、锁、PHY、地址、DHCP、DNS 或堆。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:214
+msgid "lwip_loaned_rx.h"
+msgstr "lwip_loaned_rx.h"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:216
+msgid "Explicit immutable RX-payload loan profile for lwIP."
+msgstr "lwIP 的显式不可变 RX 负载借用配置。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:216
+msgid "Exact selected backend slot, defined by its storage target."
+msgstr "由其存储目标定义的精确选定后端槽。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:216
+msgid "Exact selected custom-pbuf piece, not a packet allocator."
+msgstr "精确选定的 custom-pbuf 片段，不是数据包分配器。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:216
+msgid "Attach the explicitly selected payload-zero-copy RX profile."
+msgstr "挂接显式选定的负载零复制 RX 配置。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:216
+msgid ""
+"Task-only, same serialized nonreentrant NO_SYS owner as all raw calls. "
+"Select only the loaned profile and its storage target in this image. "
+"Ethernet/ARP/max IPv4/max TCP headers are copied; immutable payload tails "
+"are loaned. This is not whole-frame or TX zero-copy. No VLAN, IPv6, DHCP, "
+"DNS, reassembly, worker, heap or physical link is added. MAC payload spans "
+"must be disjoint from the adapter, TX/view storage and all selected "
+"slot/piece metadata; admission releases invalid loans. Final custom-pbuf "
+"frees only mark a slot ready. Subsequent service or stop performs exact "
+"provider release. Failed release preserves the token and closes admission. "
+"Stop returns BUSY while references remain. Products close PCBs and all raw "
+"observers before adapter withdrawal."
+msgstr ""
+"仅限任务上下文，与所有 raw 调用使用同一个串行、不可重入的 NO_SYS "
+"owner。此镜像中只选择借用式配置及其存储目标。Ethernet／ARP／最大 IPv4／最大 TCP 头会被复制；不可变负载尾部被借用。这不是整帧或"
+" TX 零复制。不新增 VLAN、IPv6、DHCP、DNS、重组、worker、堆或物理链路。MAC 负载区间必须与 "
+"adapter、TX／视图存储及所有选定槽／片段元数据互不重叠；接纳路径会释放无效借用。custom-pbuf 的最终释放只标记槽已就绪。后续 "
+"service 或 stop 执行精确 provider 释放。释放失败会保留令牌并关闭接纳。引用尚存时，stop 返回 BUSY。产品须在 "
+"adapter 撤离前关闭 PCB 和所有 raw 观察者。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:216
+msgid "[inout] Zero-initialized selected backend storage."
+msgstr "[inout] 零初始化的选定后端存储。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:216
+msgid "[in] Disjoint stable storage description; copied on success."
+msgstr "[in] 互不重叠且稳定的存储描述；成功时复制。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:216
+msgid "Success, invalid configuration, or an already attached owner."
+msgstr "成功、配置无效，或已有挂接的 owner。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:216
+msgid "Caller-selected RX loan and fragment metadata, without a hidden pool."
+msgstr "调用方选定的 RX 借用和片段元数据，不含隐藏池。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:216
+msgid ""
+"Slots and pieces are zero-initialized and remain live through final pbuf "
+"release, exact MAC release and adapter detachment. Supply at least "
+"slot_count * base.rx_capacity pieces. Each slot owns one copied 136-byte "
+"writable header prefix. Remaining packet payload references immutable MAC "
+"bytes; raw consumers must not write those PBUF_ROM tail bytes. The exact "
+"provider descriptor geometry still limits concurrent loans."
+msgstr ""
+"槽和片段须零初始化，并持续存活至最终 pbuf 释放、精确 MAC 释放和 adapter 解除挂接完成。至少提供 slot_count * "
+"base.rx_capacity 个片段。每个槽拥有一个复制的 136 字节可写头部前缀。其余数据包负载引用不可变 MAC 字节；raw "
+"消费方不得写入这些 PBUF_ROM 尾部字节。实际 provider 的精确描述符布局仍限制并发借用数。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:220
+msgid "lwip_loaned_rx_storage.h"
+msgstr "lwip_loaned_rx_storage.h"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:222
+msgid "Exact selected RX-loan/custom-pbuf composition storage."
+msgstr "精确选定的 RX 借用／custom-pbuf 装配存储。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:222
+msgid "One caller-owned custom-pbuf header with its unique owning slot."
+msgstr "一个调用方拥有的 custom-pbuf 头及其唯一归属槽。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:222
+msgid "Private backend fields; raw users own only normal pbuf references."
+msgstr "私有后端字段；raw 用户只拥有普通 pbuf 引用。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:222
+msgid "One exact RX token shared by all retained pieces of that frame."
+msgstr "由该帧所有保留片段共享的一个精确 RX 令牌。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:222
+msgid ""
+"The union provides eight-byte alignment in the maintained profile. A free "
+"callback only decrements references; it never touches hardware. A slot "
+"cannot be reused until the provider accepts the exact release. Raw users "
+"cannot access a pbuf after returning its final reference."
+msgstr ""
+"该联合体在维护中的配置下提供八字节对齐。释放回调只减少引用数；它从不访问硬件。只有 provider 接受精确释放后才可复用槽。raw 用户在归还 "
+"pbuf 的最后一个引用后不得再访问它。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:226
+msgid "lwip_tcp.h"
+msgstr "lwip_tcp.h"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+msgid "Bounded copied TCP client for one NO_SYS stack."
+msgstr "面向单个 NO_SYS 协议栈的有界复制 TCP 客户端。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+msgid ""
+"Author  Nexus Team  Version  1.0.0  Date  2026-11-02  Copyright  Copyright "
+"(c) 2026 Nexus Team"
+msgstr ""
+"作者  Nexus Team  版本  1.0.0  日期  2026-11-02  版权  Copyright (c) 2026 Nexus Team"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+#: ../../../../../../docs/reference/api/components/protocols/network.md:234
+msgid "1.0.0"
+msgstr "1.0.0"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+#: ../../../../../../docs/reference/api/components/protocols/network.md:234
+msgid "2026-11-02"
+msgstr "2026-11-02"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+#: ../../../../../../docs/reference/api/components/protocols/network.md:234
+msgid "Copyright (c) 2026 Nexus Team"
+msgstr "Copyright (c) 2026 Nexus Team"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid "Enums"
+msgstr "枚举"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid "Values:"
+msgstr "取值："
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+msgid "Admit one asynchronous connect with a copied configuration."
+msgstr "使用复制的配置准入一次异步连接。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+msgid ""
+"Initialize lwIP once. SUCCESS never proves ESTABLISHED. Rejection retains no"
+" new PCB/pbuf/config reference for this client. An admitted client requires "
+"explicit close or abort."
+msgstr ""
+"调用者先初始化一次 lwIP。SUCCESS 从不表示已达 ESTABLISHED。拒绝时，本客户端不保留新的 PCB、pbuf "
+"或配置引用。准入后的客户端必须显式 close 或 abort。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+msgid ""
+"PCBs share the official stack pool and its reclamation policy. Allocation "
+"may progress pending closes and reclaim TIME_WAIT, LAST_ACK, CLOSING or "
+"lower-priority active PCBs. This can invoke other connections' error "
+"callbacks, even if this start later fails. Local rejection does not promise "
+"a globally unchanged stack."
+msgstr ""
+"PCB 共享官方协议栈的池及其回收策略。分配可能推进待完成的关闭，并回收 TIME_WAIT、LAST_ACK、CLOSING 或较低优先级的活动 "
+"PCB。即使本次 start 随后失败，也可能因此调用其他连接的错误回调。局部拒绝并不保证整个协议栈保持不变。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+msgid "[inout] Zeroed exact storage with all former users joined."
+msgstr "[inout] 精确布局的零初始化存储；所有先前使用者均已完成 join。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+msgid "[in] Live adapter, copied IPv4 peer, nonzero port/budget."
+msgstr "[in] 有效适配器、复制的 IPv4 对端，以及非零端口和预算。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+msgid "[in] First finite absolute connect deadline."
+msgstr "[in] 首个有限的连接绝对截止时间。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+msgid ""
+"SUCCESS admits CONNECTING. BUSY rejects an occupied domain. INVALID rejects "
+"configuration; EXHAUSTED/IO report stack admission."
+msgstr ""
+"SUCCESS 准入 CONNECTING。操作域已被占用时以 BUSY 拒绝。INVALID 拒绝配置；EXHAUSTED/IO 报告栈准入错误。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+msgid "Perform one budgeted network pass and progress this connection."
+msgstr "执行一次受预算限制的网络推进，并推进本连接。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+msgid ""
+"No wait or worker. Fatal errors remain sticky until explicit abort. Expiry "
+"does not release PCBs, pbufs or any underlying MAC loan."
+msgstr "不等待，也不创建工作线程。致命错误持续保留，直到显式 abort。截止时间到期不会释放 PCB、pbuf 或任何底层 MAC 借用。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+msgid "[inout] Live client owned by the serialized task executor."
+msgstr "[inout] 有效客户端，由串行任务执行器独占使用。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+msgid ""
+"SUCCESS for progress; BUSY for connecting/congestion/reentry; TIMEOUT for "
+"the locked deadline, or an actual provider/stack error."
+msgstr ""
+"推进时返回 SUCCESS；连接中、拥塞或重入时返回 BUSY；已锁定截止时间到期时返回 TIMEOUT；也可能返回实际 provider／协议栈错误。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+msgid "Copy an immediate partial write into bounded stack storage."
+msgstr "将本次可立即接受的部分写入复制到有界栈存储。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+msgid ""
+"Positive acceptance is TCP queue admission, not peer delivery. "
+"Delivery/acknowledgement policy belongs to the caller. A later output "
+"failure cannot undo an already copied acceptance. Invalid aliased counts are"
+" rejected before writing that count."
+msgstr ""
+"接受正数个字节表示准入 TCP "
+"队列，不表示已交付对端。交付与确认策略由调用方负责。后续输出失败无法撤销已经复制的接受结果。计数对象发生非法别名时，在写入该计数前拒绝。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+msgid "[inout] Live serialized task owner, outside raw callbacks."
+msgstr "[inout] 有效客户端，由串行任务上下文独占使用，且调用发生在 raw 回调之外。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+msgid "[in] Stable input for this call; never retained after return."
+msgstr "[in] 本次调用期间稳定的输入；返回后绝不保留。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+msgid "[in] Requested length; zero needs no clock/provider progress."
+msgstr "[in] 请求长度；为零时无需读取时钟或推进 provider。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+msgid "[out] Disjoint copied count; zero on valid BUSY/error."
+msgstr "[out] 与其他存储不重叠的已复制字节计数；有效的 BUSY／错误返回时为零。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+msgid "[in] Finite absolute admission deadline in adapter time."
+msgstr "[in] 适配器时间域中的有限准入绝对截止时间。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+msgid ""
+"SUCCESS with a positive copied count, BUSY without admission, TIMEOUT before"
+" admission, STATE while closing, or a sticky failure."
+msgstr ""
+"复制正数个字节时返回 SUCCESS；未准入时返回 BUSY；准入前超时返回 TIMEOUT；关闭中返回 STATE；也可能返回持续保留的失败。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+msgid "Copy partial RX data and credit only bytes actually consumed."
+msgstr "复制部分 RX 数据，并仅为实际消耗的字节归还接收额度。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+msgid ""
+"One accepted pbuf chain is held. Refused chains remain lwIP-owned. Buffered "
+"bytes precede FIN; peer half-close still permits writes. TLS independently "
+"authenticates close-notify. Invalid aliased counts are rejected before "
+"writing that count."
+msgstr ""
+"最多持有一个已接受的 pbuf 链。被拒绝的链仍由 lwIP 持有。先返回缓冲字节，再报告 FIN；对端半关闭后仍允许写入。TLS 独立认证 "
+"close-notify。计数对象发生非法别名时，在写入该计数前拒绝。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+msgid "[inout] Serialized task owner; reads may drain while closing."
+msgstr "[inout] 由串行任务上下文独占使用；关闭过程中可通过读取排空数据。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+msgid "[out] Unretained output disjoint from all known live storage."
+msgstr "[out] 返回后不保留的输出，与全部已知有效存储不重叠。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+msgid "[in] Capacity; zero needs no clock/provider progress."
+msgstr "[in] 容量；为零时无需读取时钟或推进 provider。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+msgid "[out] Disjoint count; zero on valid BUSY/error or EOF."
+msgstr "[out] 与其他存储不重叠的计数；有效的 BUSY／错误或 EOF 返回时为零。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+msgid "[in] Finite absolute attempt deadline in adapter time."
+msgstr "[in] 适配器时间域中本次尝试的有限绝对截止时间。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+msgid ""
+"SUCCESS with data, SUCCESS/count zero for orderly TCP EOF, BUSY without "
+"data, TIMEOUT, STATE when detached, or sticky failure."
+msgstr ""
+"有数据时返回 SUCCESS；有序 TCP EOF 返回 SUCCESS 且计数为零；无数据时返回 BUSY；也可能返回 TIMEOUT、脱离后的 "
+"STATE 或持续保留的失败。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+msgid "Close admission and detach after explicit local drain."
+msgstr "关闭准入，并在显式局部排空后脱离。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+msgid ""
+"CONNECTING may close before establishment. Callbacks detach before "
+"successful tcp_close; its PCB must never be accessed afterwards. The pinned "
+"stack can defer FIN allocation while returning success. FIN/TIME_WAIT belong"
+" to the still-live stack/network. This operation does not prove global or "
+"PHY drain. Timeout requires explicit abort."
+msgstr ""
+"CONNECTING 可以在建立连接前关闭。调用 tcp_close 前先解除回调引用；调用成功后绝不能再访问其 "
+"PCB。固定版本的协议栈可在返回成功时延后分配 FIN。FIN/TIME_WAIT 属于仍在存续的协议栈／网络域。本操作不证明全局或 PHY "
+"已排空。超时后必须显式 abort。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+msgid "[inout] Producers joined; reads may drain retained RX."
+msgstr "[inout] 生产者均已完成 join；可通过读取排空保留的 RX。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+msgid "[in] First finite close deadline; never implicitly extended."
+msgstr "[in] 首个有限的关闭截止时间；绝不隐式延长。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+msgid ""
+"SUCCESS detaches this context. BUSY retains held/refused RX, unacknowledged "
+"TX or a failed close. TIMEOUT retains all ownership."
+msgstr ""
+"SUCCESS 使本上下文脱离。BUSY 保留已持有或被拒绝的 RX、未确认的 TX 或失败的关闭状态。TIMEOUT 保留全部所有权责任。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+msgid "Explicitly discard data, detach callbacks and abort an owned PCB."
+msgstr "显式丢弃数据、解除回调引用，并 abort 仍由本客户端持有的 PCB。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+msgid ""
+"BUSY releases nothing. The error callback already freed its PCB. Product "
+"code separately drains the MAC/netif after all clients join."
+msgstr "BUSY 不释放任何资源。错误回调已释放其 PCB。全部客户端完成退出后，产品代码另行排空 MAC／netif。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+msgid "[inout] Exclusive storage after facade users have joined."
+msgstr "[inout] 全部接口使用者完成 join 后的独占存储。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+msgid ""
+"SUCCESS after local cleanup, including a cold client; BUSY while any facade "
+"operation/callback executes; INVALID for a null client."
+msgstr ""
+"局部清理完成后返回 SUCCESS，包括冷态客户端；任何接口操作或回调执行期间返回 BUSY；client 为 NULL 时返回 INVALID。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+msgid "Return the existing readonly byte face without progressing it."
+msgstr "返回已有的只读字节接口，不推进执行。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+msgid ""
+"Readonly query in the same serialized task domain. A face is not connection "
+"readiness; its data methods return the actual state."
+msgstr "在同一串行任务域中进行只读查询。接口存在不表示连接就绪；其数据方法返回实际状态。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+msgid "[in] Storage retained through every facade user."
+msgstr "[in] 必须保持存储有效，直到每个接口使用者均结束访问。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+msgid ""
+"Stable face while initialized, including CONNECTING/FAILED; NULL before "
+"admission or after successful close/abort."
+msgstr "初始化有效期间返回稳定接口，包括 CONNECTING/FAILED 状态；准入前或成功 close／abort 后返回 NULL。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+msgid "Copy a readonly owner snapshot without progressing the stack."
+msgstr "复制只读的所有者状态快照，不推进协议栈。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+msgid ""
+"Use the serialized executor. A snapshot neither admits I/O nor authorizes "
+"release. Detached queries never follow old borrowed state."
+msgstr "使用串行执行器。快照既不准入 I/O，也不授权释放。脱离后的查询绝不追踪旧的借用状态。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+msgid "[in] Live or locally detached storage, still allocated."
+msgstr "[in] 有效或已局部脱离、但仍保持分配的存储。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+msgid "[out] Output disjoint from known live control/data."
+msgstr "[out] 与已知有效控制／数据存储不重叠的输出。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+msgid "SUCCESS for the snapshot; INVALID for null or aliased output."
+msgstr "成功取得快照时返回 SUCCESS；输出为空或非法别名时返回 INVALID。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+msgid "One copied IPv4 peer and an explicit network progress budget."
+msgstr "复制的 IPv4 对端，以及显式网络推进预算。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+msgid ""
+"Network storage and its clock epoch outlive every client. They also outlive "
+"detached FIN/TIME_WAIT state in the stack."
+msgstr "网络存储及其时钟纪元必须比每个客户端存续更久，也必须覆盖协议栈中脱离上下文后仍存在的 FIN/TIME_WAIT 状态。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+msgid ""
+"One serialized NO_SYS executor owns raw APIs and all clients. Call facade "
+"data/control outside raw callbacks. Nested mutation across facade instances "
+"returns BUSY without recursive progress."
+msgstr ""
+"一个串行 NO_SYS 执行器拥有 raw API 和全部客户端。接口的数据／控制调用必须位于 raw 回调之外。跨接口实例的嵌套修改返回 "
+"BUSY，不递归推进。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+msgid ""
+"Nonzero I/O may service at most receive_budget Ethernet frames. No worker, "
+"DNS, reconnect policy or instance registry is added."
+msgstr "非零 I/O 最多服务 receive_budget 个以太网帧。不新增工作线程、DNS、重连策略或实例注册表。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:228
+msgid "Owner snapshot; it grants no permission to mutate a connection."
+msgstr "所有者状态快照；不授予修改连接的权限。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:232
+msgid "lwip_tcp_storage.h"
+msgstr "lwip_tcp_storage.h"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:234
+msgid "Exact pinned TCP client storage; composition only."
+msgstr "固定版本的精确 TCP 客户端存储；仅供装配使用。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:234
+msgid ""
+"Author  Nexus Team   Version  1.0.0   Date  2026-11-02   Copyright  "
+"Copyright (c) 2026 Nexus Team"
+msgstr ""
+"作者  Nexus Team   版本  1.0.0   日期  2026-11-02   版权  Copyright (c) 2026 Nexus "
+"Team"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:238
+msgid "tls.h"
+msgstr "tls.h"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid "Explicit bounded TLS 1.2 client and crypto-domain lifecycle."
+msgstr "显式有界 TLS 1.2 客户端与密码域生命周期。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid "Defines"
+msgstr "宏定义"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid "Source-quality declaration, never inferred from a health check."
+msgstr "源质量声明，绝不从健康检查推断。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid "Initialize one explicit PSA/arena domain, never once per connection."
+msgstr "初始化一个显式 PSA/arena 域，而非每次连接都初始化。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid ""
+"No worker/heap/lock. A second live domain is BUSY. Every library entropy "
+"callback is guarded by the shorter operation/entropy deadline."
+msgstr "无工作线程、堆或锁。第二个有效域返回 BUSY。每次库熵回调均受操作截止时间与熵截止时间中较早者约束。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid "[inout] Zeroed static backend storage."
+msgstr "[inout] 已清零的静态后端存储。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid "[in] Configuration copied; referenced resources stay borrowed."
+msgstr "[in] 复制配置；被引用资源继续借用。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid "[in] Finite absolute initialization deadline."
+msgstr "[in] 有限绝对初始化截止时间。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid "Success, permission for undeclared quality, or actual bounded error."
+msgstr "成功；未声明质量时返回权限错误；或实际有界操作错误。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid "Stop PSA only after all sessions and outside consumers have joined."
+msgstr "仅在全部会话和外部使用方退出后停止 PSA。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid ""
+"No session cleanup calls this operation implicitly. Product code must not "
+"use PSA outside this explicit domain or reset its global allocator."
+msgstr "会话清理不会隐式调用此操作。产品代码不得在此显式域外使用 PSA 或重置其全局分配器。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid "[inout] Exclusive live domain owner."
+msgstr "[inout] 有效域的独占所有者。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid "BUSY with a session; success frees PSA then wipes the whole arena."
+msgstr "仍有会话时返回 BUSY；成功时先释放 PSA，再擦除整个 arena。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid "Prepare one client using public Mbed TLS APIs and required peer auth."
+msgstr "使用公共 Mbed TLS API 和强制对端认证准备一个客户端。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid ""
+"No raw credential input is retained after return. Port and staging stay "
+"borrowed until abort; failures clean partial backend state."
+msgstr "返回后不保留原始凭据输入。端口和暂存区继续借用到 abort；失败时清理部分后端状态。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid "[in] Explicit trust, hostname, optional client identity/port."
+msgstr "[in] 显式信任、主机名和可选客户端身份/端口。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid "[in] Finite initialization deadline, including key import."
+msgstr "[in] 包括密钥导入的有限初始化截止时间。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid "Success, BUSY for the occupied domain, or no-admission failure."
+msgstr "成功；域已占用时为 BUSY；或未准入的失败。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid "Perform one public handshake step under the first locked deadline."
+msgstr "在首次锁定的截止时间内执行一次公共握手步骤。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid ""
+"First step publicly reseeds PSA with a finite guard. Trusted UTC is sampled "
+"coherently; loss during a library date check is latched and overrides a "
+"successful library result. Renegotiation is disabled."
+msgstr ""
+"首个步骤通过公共 API 在有限约束下重新播种 PSA。对可信 UTC "
+"取一致快照；库日期检查期间失去可信时间会被锁存，并覆盖库的成功结果。禁用重新协商。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid "[inout] Initialized exclusive client."
+msgstr "[inout] 已初始化的独占客户端。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid "[in] Finite deadline; later calls cannot extend the first."
+msgstr "[in] 有限截止时间；后续调用不能延长首次截止时间。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid "Success only after verified auth; BUSY for progress/WANT; fatal error."
+msgstr "仅认证验证成功后返回成功；推进/WANT 时返回 BUSY；或致命错误。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid "Progress the one accepted plaintext staging block without waiting."
+msgstr "推进唯一已接受的明文暂存块，不等待。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid ""
+"WANT retries keep the backend's exact original pointer/length. An expired "
+"queued write fails the session; only abort releases its stage."
+msgstr "WANT 重试保留后端原始指针和长度。排队写入过期会使会话失败；仅 abort 释放其暂存区。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid "[inout] Live serialized owner."
+msgstr "[inout] 有效的串行化所有者。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid "Success when no pending bytes; BUSY for WANT; sticky fatal error."
+msgstr "无待发字节时成功；WANT 时 BUSY；或锁存的致命错误。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid "Copy an immediate partial write into the explicit bounded stage."
+msgstr "将即时部分写入复制到显式有界暂存区。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid ""
+"Original input may be reused immediately. Pending stage is never "
+"overwritten, replayed or discarded on timeout. Late failures are sticky. An "
+"invalid aliased count is rejected before writing that count."
+msgstr "原始输入可立即复用。待发暂存区不会被覆盖、重放或在超时后丢弃。后续失败会锁存。无效别名计数在写该计数之前被拒绝。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid "[inout] Established serialized client."
+msgstr "[inout] 已建立连接的串行化客户端。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid "[in] Immutable input, not retained after return."
+msgstr "[in] 只读输入，返回后不保留。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid "[in] Requested bytes; zero performs no I/O."
+msgstr "[in] 请求字节数；零不执行 I/O。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid "[out] Disjoint copied count; zero on BUSY/error."
+msgstr "[out] 互不重叠的复制计数；BUSY/错误时为零。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid "[in] Finite absolute deadline retained for accepted bytes."
+msgstr "[in] 为已接受字节保留的有限绝对截止时间。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid "Success means copied admission, not peer delivery; BUSY or error."
+msgstr "成功表示复制准入，不表示对端收到；或 BUSY/错误。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid "Try to copy authenticated plaintext without retaining caller output."
+msgstr "尝试复制已认证明文，不保留调用方输出。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid ""
+"Raw transport EOF without close-notify is a sticky truncation error. An "
+"expired preflight retains session state and creates no new borrow. An "
+"invalid aliased count is rejected before writing that count. A pending stage"
+" with a later effective deadline returns BUSY without automatic I/O; the "
+"owner explicitly services that earlier acceptance."
+msgstr ""
+"未收到 close-notify 的底层传输 EOF "
+"是锁存的截断错误。准入前已过期时保留会话状态，不建立新借用。无效别名计数在写该计数之前被拒绝。待发暂存区的有效截止时间较晚时返回 BUSY，不自动执行 "
+"I/O；所有者显式推进先前已接受的写入。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid "[out] Unretained output disjoint from all live session storage."
+msgstr "[out] 不保留的输出，与全部有效会话存储互不重叠。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid "[in] Writable capacity; zero performs no I/O."
+msgstr "[in] 可写容量；零不执行 I/O。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid "[out] Disjoint count; zero on BUSY/error or auth EOF."
+msgstr "[out] 互不重叠的计数；BUSY/错误或认证 EOF 时为零。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid "[in] Finite absolute deadline for this nonblocking attempt."
+msgstr "[in] 本次非阻塞尝试的有限绝对截止时间。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid "Success/bytes, BUSY, authenticated close-notify EOF, or error."
+msgstr "成功/字节数、BUSY、已认证 close-notify EOF 或错误。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid "Send close-notify with an explicit first locked deadline."
+msgstr "使用首次显式锁定的截止时间发送 close-notify。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid ""
+"Pending app bytes must first drain. This never closes the underlying "
+"transport or proves the peer consumed data. Abort still frees storage."
+msgstr "必须先排空待发应用字节。此操作不关闭下层传输，也不证明对端已消费数据。仍需 abort 释放存储。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid "[inout] Exclusive live client after producers have joined."
+msgstr "[inout] 生产者全部退出后的独占有效客户端。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid "[in] Finite absolute deadline; no implicit extension."
+msgstr "[in] 有限绝对截止时间；不隐式延长。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid "Success means local alert accepted, BUSY for WANT, or sticky error."
+msgstr "成功表示本地警报已接受；WANT 时为 BUSY；或锁存错误。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid "Free synchronous session state and wipe its stage after final access."
+msgstr "最终访问结束后释放同步会话状态并擦除其暂存区。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid ""
+"BUSY retains all storage; the outer owner retries after callback join. No "
+"network I/O or replay. Underlying transport closure remains external. The "
+"pinned builtin synchronous crypto profile retains no callback after return. "
+"PSA domain/arena stays live for the next explicit session."
+msgstr ""
+"BUSY 保留全部存储；外层所有者在回调退出后重试。不执行网络 I/O "
+"或重放。下层传输关闭仍由外部负责。锁定的内置同步密码配置不在返回后保留回调。PSA 域/arena 保持有效，供下一个显式会话使用。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid "[inout] Exclusive owner, all external facade users joined."
+msgstr "[inout] 独占所有者，全部外部接口使用方已退出。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid "Success after cleanup (also cold), BUSY if crypto/BIO is executing."
+msgstr "清理完成后成功（冷态也成功）；密码/BIO 正在执行时为 BUSY。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid "Return an existing no-borrow byte face; no start or allocation."
+msgstr "返回已有、不建立借用的字节接口；不启动或分配。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid "Copy current owner diagnosis to unretained disjoint output."
+msgstr "将当前所有者诊断复制到不保留、互不重叠的输出。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid "Explicit trusted UTC, separate from monotonic operation deadlines."
+msgstr "显式可信 UTC，与单调操作截止时间分离。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid ""
+"SUCCESS means trusted Unix seconds. Unknown/untrusted/unavailable time "
+"returns an error. Calendar years are 1970..9999 within the selected time_t "
+"representation. The product owns authentication and clock policy."
+msgstr ""
+"SUCCESS 表示可信 Unix 秒数。未知、不可信或不可用时间返回错误。日历年份必须处于所选 time_t 表示范围内的 "
+"1970..9999。产品负责认证和时钟策略。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid "One serialized crypto owner, caller arena and finite entropy source."
+msgstr "一个串行化密码所有者、调用方 arena 与有限熵源。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid ""
+"Arena is max_align_t-aligned and exactly NX_TLS_ARENA_BYTES. All faces and "
+"opaque contexts outlive every session. FULL_SOURCE explicitly declares 8 "
+"bits/byte to the selected PSA entropy-driver API; software health checks and"
+" this enum do not establish physical qualification. The profile disables "
+"operating-system entropy and seed fallbacks. Clock advances in one unchanged"
+" monotonic domain throughout callbacks."
+msgstr ""
+"arena 按 max_align_t 对齐，大小恰为 "
+"NX_TLS_ARENA_BYTES。全部接口和不透明上下文必须存活至每个会话结束。FULL_SOURCE 向选定的 PSA 熵驱动 API 显式声明 "
+"8 bits/byte；软件健康检查和此枚举不能建立物理资格。配置禁用操作系统熵与种子回退。时钟必须在回调期间持续推进并保持单一时间域。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid "Client credentials copied by the backend during initialization."
+msgstr "初始化期间由后端复制的客户端凭据。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid ""
+"DER only, no implicit files, key discovery or default trust. hostname has "
+"hostname_length non-NUL bytes followed by NUL, length 1..253. Mutual-"
+"authentication certificate and key are both supplied or absent. TX staging "
+"is exactly 512 caller-owned bytes, disjoint from runtime, session, arena and"
+" transport state. It stays borrowed until abort. The single serialized "
+"executor owns all session and PSA calls."
+msgstr ""
+"仅 DER；不隐式加载文件、发现密钥或提供默认信任。hostname 包含 hostname_length 个非 NUL 字节，后接 NUL，长度为 "
+"1..253。双向认证证书和密钥必须同时提供或同时缺省。TX 暂存区恰为调用方的 512 字节，与运行时、会话、arena "
+"和传输状态互不重叠。它继续借用到 abort。单一串行化执行器负责全部会话和 PSA 调用。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:240
+msgid "Read-only diagnosis; no snapshot grants permission to operate."
+msgstr "只读诊断；快照不授予操作许可。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:244
+msgid "client.h"
+msgstr "client.h"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid "Bounded synchronous MQTT 3.1.1 client over explicit streams."
+msgstr "基于显式流的有界同步 MQTT 3.1.1 客户端。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid "Product clock shared by all clients and their transports."
+msgstr "全部客户端及其传输层共用的产品时钟。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid ""
+"Required context-free hook matches upstream's timer API. Never silently "
+"change epoch/domain. UINT64_MAX is invalid. No active-instance global "
+"registry is used by this adapter."
+msgstr "必需的无上下文钩子与上游计时器 API 一致。绝不得静默更换纪元或时间域。UINT64_MAX 无效。此适配器不使用活动实例全局注册表。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid "Absolute monotonic microseconds in one stable boot/domain"
+msgstr "同一稳定启动纪元/时间域内的绝对单调微秒数"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid "Nonreturning product invariant-failure hook."
+msgstr "不返回的产品不变量失败钩子。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid "Must not reclaim DMA or transport storage on an assertion."
+msgstr "不得因断言而回收 DMA 或传输存储。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid "[in] Static source location"
+msgstr "[in] 静态源码位置"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid "[in] Source line"
+msgstr "[in] 源码行号"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid "Initialize exact caller storage without opening transport."
+msgstr "初始化调用方的准确存储，不打开传输。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid ""
+"Task-only, no I/O/heap. All storage and port contexts remain valid and "
+"exclusively owned through successful deinit."
+msgstr "仅限任务上下文，无 I/O 或堆。全部存储与端口上下文必须保持有效、独占，直到 deinit 成功。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid "[inout] Zero-initialized or deinited metadata"
+msgstr "[inout] 已清零或已 deinit 的元数据"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid "[in] Valid stable ports; values copied, contexts borrowed"
+msgstr "[in] 有效稳定端口；复制数值，借用上下文"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid "[inout] Disjoint network, QoS and control storage"
+msgstr "[inout] 互不重叠的网络、QoS 与控制存储"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid "SUCCESS, INVALID, STATE, OVERFLOW or EXHAUSTED"
+msgstr "SUCCESS、INVALID、STATE、OVERFLOW 或 EXHAUSTED"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid "Send clean-session CONNECT and await CONNACK synchronously."
+msgstr "同步发送 clean-session CONNECT 并等待 CONNACK。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid ""
+"Does not connect TCP/TLS. The product provides transport and authentication "
+"policy. Failed CONNECT is not replayed."
+msgstr "不连接 TCP/TLS。产品提供传输与认证策略。失败 CONNECT 不会被重放。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid "[inout] Initialized inactive client on a fresh open stream"
+msgstr "[inout] 使用全新已打开流、已初始化但未活动的客户端"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid "[in] Legal MQTT UTF-8 fields, borrowed for this call"
+msgstr "[in] 合法 MQTT UTF-8 字段，仅本次调用借用"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid "[in] Finite absolute deadline and nonzero I/O budget"
+msgstr "[in] 有限绝对截止时间及非零 I/O 预算"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid "SUCCESS, admission error or sticky session/transport failure"
+msgstr "SUCCESS、准入错误或锁存的会话/传输失败"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid "Publish QoS0/1 with call-scoped topic and payload loans."
+msgstr "使用调用期主题与负载借用发布 QoS0/1。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid ""
+"QoS1 records remain borrowed through deinit. PUBACK signals confirmation; "
+"the application owns message retry/data retention. No persistent-session "
+"replay or QoS2 is provided."
+msgstr "QoS1 记录继续借用到 deinit。PUBACK 表示确认；应用负责消息重试和数据保留。不提供持久会话重放或 QoS2。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid "[inout] Connected serialized client"
+msgstr "[inout] 已连接的串行化客户端"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid "[in] Valid UTF-8 topic and byte payload; no aliases"
+msgstr "[in] 合法 UTF-8 主题与字节负载；不得别名重叠"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid "[out] Written on success only; zero for QoS0"
+msgstr "[out] 仅成功时写入；QoS0 为零"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid "[in] Finite deadline and nonzero I/O budget"
+msgstr "[in] 有限截止时间及非零 I/O 预算"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid "SUCCESS for local stream admission, never broker delivery"
+msgstr "本地流准入返回 SUCCESS，绝不代表 broker 已收到"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid "Send one bounded subscription request."
+msgstr "发送一个有界订阅请求。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid "[inout] Connected client with a free caller control slot"
+msgstr "[inout] 已连接且有空闲调用方控制槽的客户端"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid "[in] Call-scoped valid MQTT UTF-8 filter"
+msgstr "[in] 调用期合法 MQTT UTF-8 过滤器"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid "[in] Nonzero bytes, at most UINT16_MAX"
+msgstr "[in] 非零字节数，至多 UINT16_MAX"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid "[in] Requested maximum zero or one"
+msgstr "[in] 请求的最大 QoS 为零或一"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid "[out] Written on successful send only"
+msgstr "[out] 仅发送成功时写入"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid "[in] Explicit deadline and I/O budget"
+msgstr "[in] 显式截止时间与 I/O 预算"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid "SUCCESS means sent; SUBACK event reports grant/refusal"
+msgstr "SUCCESS 表示已发送；SUBACK 事件报告授权或拒绝"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid "Send one bounded unsubscribe request."
+msgstr "发送一个有界取消订阅请求。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid "SUCCESS means sent; UNSUBACK is observed during process"
+msgstr "SUCCESS 表示已发送；在 process 期间观察 UNSUBACK"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid "Caller-driven receive, acknowledgments and keepalive step."
+msgstr "调用方推进的接收、确认与保活步骤。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid ""
+"Callback views expire on return; copy needed data there. No implicit "
+"timer/task registration or automatic replay."
+msgstr "回调视图在返回时失效；需要的数据须在回调内复制。无隐式计时器/任务注册或自动重放。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid "SUCCESS, BUSY for incomplete data, or sticky failure"
+msgstr "SUCCESS、数据不完整时的 BUSY 或锁存失败"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid "Send MQTT DISCONNECT without closing the transport."
+msgstr "发送 MQTT DISCONNECT，不关闭传输。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid "SUCCESS means local admission, not TCP/TLS drain"
+msgstr "SUCCESS 表示本地准入，不表示 TCP/TLS 已排空"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid "End local borrows after all synchronous calls return."
+msgstr "全部同步调用返回后结束本地借用。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid ""
+"No I/O. The product separately drains/closes TCP/TLS before another MQTT "
+"session; deinit cannot retract accepted bytes."
+msgstr "无 I/O。产品在下一 MQTT 会话之前另行排空/关闭 TCP/TLS；deinit 不能撤回已接受的字节。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid "[inout] Inactive initialized client, including failed client"
+msgstr "[inout] 未活动的已初始化客户端，包括失败客户端"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid "SUCCESS, BUSY for reentry or INVALID"
+msgstr "SUCCESS、重入时的 BUSY 或 INVALID"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid "Inspect sticky failure in the same serialized task context."
+msgstr "在同一串行任务上下文检查锁存失败。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid "[in] Initialized instance"
+msgstr "[in] 已初始化实例"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid "First failure, SUCCESS, or STATE for an inactive instance"
+msgstr "首次失败、SUCCESS 或未活动实例的 STATE"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid "Callback-scoped facts; all pointers expire with callback return."
+msgstr "回调期事实；全部指针随回调返回失效。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid "Explicit finite operation deadline and transport-call allocation."
+msgstr "显式有限操作截止时间及传输调用预算。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid "Caller-owned ports retained until deinit."
+msgstr "借用至 deinit 的调用方端口。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid ""
+"All calls/callbacks use one serialized task context. Event and optional idle"
+" callbacks must be bounded and may not reenter this client. Idle may "
+"service/wait on lower layers; no worker, lock, scheduler or implicit "
+"reconnect is created. Idle SUCCESS/BUSY permit retry; other results fail the"
+" session. Event views are not NUL-terminated strings."
+msgstr ""
+"全部调用和回调使用单一串行任务上下文。事件回调与可选 idle 回调必须有界，不得重入此客户端。idle "
+"可在下层推进或等待；不创建工作线程、锁、调度器或隐式重连。idle 返回 SUCCESS/BUSY 允许重试；其他结果使会话失败。事件视图不是 NUL "
+"结尾字符串。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid "Transient CONNECT parameters; this profile always uses clean session."
+msgstr "临时 CONNECT 参数；此配置始终使用 clean session。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:246
+msgid "Transient publish; QoS1 confirmation is a later PUBACK event."
+msgstr "临时发布；QoS1 确认由后续 PUBACK 事件报告。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:250
+msgid "lwip_storage.h"
+msgstr "lwip_storage.h"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:252
+msgid "Exact pinned lwIP backend storage for static allocation."
+msgstr "用于静态分配的精确锁定 lwIP 后端存储。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:252
+msgid "Caller-owned backend storage; include only at the composition site."
+msgstr "调用者拥有的后端存储；仅在装配位置包含。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:252
+msgid ""
+"This explicit backend header is tied to the pinned lwIP profile and exposes "
+"its exact netif layout to avoid a maximum-size opaque pool. Fields are "
+"implementation state, not an application control API. Application raw PCBs "
+"use this netif only during live attachment."
+msgstr ""
+"此显式后端头文件绑定锁定的 lwIP 配置，暴露精确 netif 布局以避免最大尺寸不透明池。字段属于实现状态，不是应用控制 API。应用的原始 PCB"
+" 仅在有效挂接期间使用此 netif。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:256
+msgid "storage.h"
+msgstr "storage.h"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:258
+msgid "Exact pinned TLS/PSA backend storage, composition only."
+msgstr "仅供装配使用的精确锁定 TLS/PSA 后端存储。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:262
+msgid "core_mqtt_storage.h"
+msgstr "core_mqtt_storage.h"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:264
+msgid "Explicit exact-profile caller storage for coreMQTT 2.3.1."
+msgstr "coreMQTT 2.3.1 的显式精确配置调用者存储。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:264
+msgid "Caller control ACK correlation, borrowed while initialized."
+msgstr "调用者的控制 ACK 关联记录，在已初始化状态存续期间保持借用。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:264
+msgid "Disjoint caller arrays; no maximum pool is hidden."
+msgstr "互不重叠的调用者数组；不隐藏最大容量池。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:264
+msgid ""
+"Counts zero require NULL pointers. Records are not message payload "
+"retention; products keep semantic retry data."
+msgstr "数量为零时指针必须为 NULL。记录不负责保留消息负载；产品保留语义重试数据。"
+
+#: ../../../../../../docs/reference/api/components/protocols/network.md:264
+msgid "Exact backend storage, not a stable ABI or a public vendor face."
+msgstr "精确后端存储，不属于稳定 ABI 或公共厂商接口。"

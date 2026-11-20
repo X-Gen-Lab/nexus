@@ -36,6 +36,6 @@ stop 有 active work／queued event 时返回 BUSY，调用者继续 service／�
 assigned／tentative address 或 fault 时需先有整 bus reset proof。最终静止后才归还
 controller，复制 endpoint／ticket 的观察者结束前存储继续存活。
 
-[权威合同](../../../docs/design/i3c-controller.md)与 [FIG-26](../../../docs/assets/diagrams/i3c-core-lifecycle.svg)
+[权威合同](../../../docs/reference/contracts/io/i3c-controller.md)与 [FIG-26](../../../docs/assets/diagrams/i3c-core-lifecycle.svg)
 区分通用机制、H563 私有轮询参考和未完成的整 bus／SoC／Board／HIL 退出。不能由该
 核心 target 推导完整 H563 平台或实物 I3C 支持。

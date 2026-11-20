@@ -27,5 +27,5 @@ cmake --build build/timer-input-ve --parallel 2
 
 调用者提供捕获环形存储，并在关闭前消费剩余事件、结束借用和等待 IRQ 退出。
 关闭失败保留原 owner；返回错误不能作为回收存储的许可。具体公共合同见
-[定时器设计](../../../docs/design/timer-advanced.md)。ARM 链接、资源预算和
+[定时器设计](../../../docs/reference/contracts/io/timer-advanced.md)。ARM 链接、资源预算和
 方法表保留检查均不能证明物理边沿、共享中断负载或输出级安全。

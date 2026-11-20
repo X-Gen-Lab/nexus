@@ -74,8 +74,8 @@ Native 只在 `NEXUS_TEST_SUPPORT=ON` 时从 `tests/support/native/` 载入，�
 
 Source SDK 是源码快照，按已选闭包提供实现和精确可选 host-support，不打包整个
 `tests/` 或所有 vendor。完整源码模式命令、移动验证与资格见
-[SDK 教程](../docs/tutorials/source-sdk.md)；当前结构见
-[架构](../docs/delivery/architecture.md)。
+[SDK 教程](../docs/guides/use-source-sdk.md)；当前结构见
+[架构](../docs/explanation/platform-architecture.md)。
 
 当前接入边界、B1–B9 任务及实际验证范围见
-[构建架构](../docs/design/build-architecture.md)。
+[构建架构](../docs/explanation/build-model.md)。

@@ -1,0 +1,206 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 6f5bf0fd68a1936eec5f53e70d6917caa6a26aaeaf5526e2706e30b2fcb8d2c2\n"
+
+#: ../../../../../../docs/reference/documentation-tools.md:8
+msgid "文档工具与执行边界"
+msgstr "Documentation tools and execution boundaries"
+
+#: ../../../../../../docs/reference/documentation-tools.md:10
+msgid ""
+"文档只有一个工具入口 `tools/documentation/cli.py`，`tools/dev/dev.py docs` 调用它。 "
+"选定源码的工具锁、Python 哈希要求和许可记录共同确定实际环境，正文不另维护版本表。"
+msgstr ""
+"Documentation has one tool entry point, `tools/documentation/cli.py`, called"
+" by `tools/dev/dev.py docs`. The selected source's tool lock, Python hash "
+"requirements and license records determine the actual environment. The body "
+"does not maintain another version table."
+
+#: ../../../../../../docs/reference/documentation-tools.md:13
+msgid "工具来源与准备"
+msgstr "Tool provenance and preparation"
+
+#: ../../../../../../docs/reference/documentation-tools.md:15
+msgid ""
+"`dependencies/docs-tools.lock.json` 维护目标约束、原生归档和许可； `dependencies/docs-"
+"python-linux-cp312.txt` 是精确版本及 SHA-256 的完整 Python 闭包， "
+"`docs/sphinx/requirements.txt` 只引用它。工具包括 Sphinx／MyST、Breathe／Doxygen、 "
+"Graphviz、polib 和锁定 CJK 字体。公开 API 来自当前公共头，不扫描私有 SDK 或测试实现。"
+msgstr ""
+"`dependencies/docs-tools.lock.json` maintains target constraints, native "
+"archives and licenses. `dependencies/docs-python-linux-cp312.txt` is the "
+"complete exact-version Python closure with SHA-256 hashes; "
+"`docs/sphinx/requirements.txt` only references it. Tools include "
+"Sphinx/MyST, Breathe/Doxygen, Graphviz, polib and pinned CJK fonts. The "
+"public API comes from current public headers, not private SDK or test "
+"implementations."
+
+#: ../../../../../../docs/reference/documentation-tools.md:20
+msgid ""
+"正式工具 tuple 为 Linux x86_64、CPython 3.12。kernel、CPython／venv bootstrap、 `dpkg-"
+"deb` 和 POSIX shell 为明确主机前提，其实际值记录在安装收条中。 从平台根选择新的 prefix 与缓存目录："
+msgstr ""
+"The formal tool tuple is Linux x86_64 with CPython 3.12. The kernel, "
+"CPython/venv bootstrap, `dpkg-deb` and POSIX shell are explicit host "
+"prerequisites, with observed values recorded in the installation receipt. "
+"From the platform root, select a fresh prefix and cache directory:"
+
+#: ../../../../../../docs/reference/documentation-tools.md:29
+msgid ""
+"准备阶段允许 HTTPS 获取已锁定归档，逐项校验后才建立 prefix；Python 安装使用 `--no-index`、`--find-links`"
+" 与 `--require-hashes`。原生库和字体在本地解包，无需 sudo，不静默发现宿主的其他 Graphviz "
+"renderer。loader／库／font 与许可闭包都需匹配。"
+msgstr ""
+"Preparation may fetch pinned archives over HTTPS and establishes a prefix "
+"only after verifying each item. Python installation uses `--no-index`, "
+"`--find-links` and `--require-hashes`. Native libraries and fonts are "
+"unpacked locally, without sudo or silent discovery of other host Graphviz "
+"renderers. Loader/library/font and license closures must all match."
+
+#: ../../../../../../docs/reference/documentation-tools.md:33
+msgid "已准备缓存可离线恢复到另一个新 prefix："
+msgstr "A prepared cache may be restored offline into another fresh prefix:"
+
+#: ../../../../../../docs/reference/documentation-tools.md:40
+msgid ""
+"成功为退出零和新 prefix 的 `installation.json`。缺归档、变更字节、错误字体或 许可不完整必须拒绝；不覆盖已存在 "
+"prefix，不用在线下载静默修复损坏缓存。"
+msgstr ""
+"Success means exit code zero and `installation.json` in the fresh prefix. "
+"Missing archives, changed bytes, wrong fonts or incomplete licenses must be "
+"rejected. Do not overwrite an existing prefix or silently repair a corrupt "
+"cache through online downloads."
+
+#: ../../../../../../docs/reference/documentation-tools.md:43
+msgid "入口与范围"
+msgstr "Entry points and scope"
+
+#: ../../../../../../docs/reference/documentation-tools.md:0
+msgid "命令"
+msgstr "Command"
+
+#: ../../../../../../docs/reference/documentation-tools.md:0
+msgid "责任"
+msgstr "Responsibility"
+
+#: ../../../../../../docs/reference/documentation-tools.md:0
+msgid "`docs doctor --tool-prefix <prefix>`"
+msgstr "`docs doctor --tool-prefix <prefix>`"
+
+#: ../../../../../../docs/reference/documentation-tools.md:0
+msgid "核对工具、锁与许可；不安装或下载"
+msgstr "Check tools, locks and licenses; do not install or download"
+
+#: ../../../../../../docs/reference/documentation-tools.md:0
+msgid "`docs check`"
+msgstr "`docs check`"
+
+#: ../../../../../../docs/reference/documentation-tools.md:0
+msgid "本地源、链接、四元数据和所需配置输入检查"
+msgstr ""
+"Check local source, links, four metadata fields and required configuration "
+"inputs"
+
+#: ../../../../../../docs/reference/documentation-tools.md:0
+msgid "`docs build --mode preview --language zh_CN`"
+msgstr "`docs build --mode preview --language zh_CN`"
+
+#: ../../../../../../docs/reference/documentation-tools.md:0
+msgid "当前写作预览，保留缺译与原文回退状态"
+msgstr ""
+"Preview current writing, retaining missing-translation and source-fallback "
+"states"
+
+#: ../../../../../../docs/reference/documentation-tools.md:0
+msgid "`docs build --mode verify --language all`"
+msgstr "`docs build --mode verify --language all`"
+
+#: ../../../../../../docs/reference/documentation-tools.md:0
+msgid "公开 API、当前消息与两语言完整性验证"
+msgstr ""
+"Validate public API, current messages and completeness of both languages"
+
+#: ../../../../../../docs/reference/documentation-tools.md:0
+msgid "`docs test`"
+msgstr "`docs test`"
+
+#: ../../../../../../docs/reference/documentation-tools.md:0
+msgid "运行文档工具的实际测试，拒绝空、跳过或陈旧结果"
+msgstr ""
+"Run actual documentation-tool tests; reject empty, skipped or stale results"
+
+#: ../../../../../../docs/reference/documentation-tools.md:0
+msgid "`docs serve --build <output>`"
+msgstr "`docs serve --build <output>`"
+
+#: ../../../../../../docs/reference/documentation-tools.md:0
+msgid "只服务已完成且身份有效的当前输出"
+msgstr "Serve only completed current output with valid identity"
+
+#: ../../../../../../docs/reference/documentation-tools.md:54
+msgid ""
+"正文根固定为 `docs/`。生成 XML、POT、翻译 stage、语言 HTML 和收条放在拥有的输出 目录，不能写回作者 "
+"PO。配置、公共头、工具锁或翻译改变时按真实输入使阶段缓存失效。 公开头未改变时可复用验证过字节身份的 API 中间产物，不复用前次成功报告。"
+msgstr ""
+"The prose root is fixed at `docs/`. Generated XML, POT, translation stages, "
+"language HTML and receipts belong in owned output directories; do not write "
+"them back to author PO files. Changes to configuration, public headers, tool"
+" locks or translations invalidate stage caches through actual inputs. API "
+"intermediate artifacts verified by byte identity may be reused when public "
+"headers are unchanged; a previous success report may not."
+
+#: ../../../../../../docs/reference/documentation-tools.md:58
+msgid "浏览、搜索与许可"
+msgstr "Browsing, search and licenses"
+
+#: ../../../../../../docs/reference/documentation-tools.md:60
+msgid ""
+"主题和搜索资源为本地文件。两语言使用各自索引；中文 tokenizer 无外部词典依赖， 查询可混合 C "
+"标识符和汉字。语言切换只指向实际语言输出；搜索与正文展示当前来源、 模式和实际语言，不把 preview 或旧索引标成正式内容。"
+msgstr ""
+"Theme and search resources are local files. Each language uses its own "
+"index. The Chinese tokenizer has no external dictionary dependency, and "
+"queries may mix C identifiers with Han characters. Language switching "
+"targets actual language outputs only. Search and body display current "
+"provenance, mode and actual language; do not label previews or old indexes "
+"as formal content."
+
+#: ../../../../../../docs/reference/documentation-tools.md:64
+msgid ""
+"可选布局回归使用已有 Chromium／Playwright，脚本 "
+"`tools/documentation/check_browser_layout.py` 不安装浏览器。它只证明所执行页面、 "
+"浏览器和视口；完整站点或硬件验收分别记录。"
+msgstr ""
+"Optional layout regressions use an existing Chromium/Playwright "
+"installation. `tools/documentation/check_browser_layout.py` does not install"
+" browsers. Its evidence covers only executed pages, browser and viewports. "
+"Record full-site or hardware acceptance separately."
+
+#: ../../../../../../docs/reference/documentation-tools.md:68
+msgid ""
+"每份归档保留 wheel、原生包、Doxygen 和字体许可；共享许可引用须在 prefix 内闭合。 "
+"工具升级先审查上游变化与许可，再更新唯一锁与要求，执行在线准备、独立离线恢复、 相应工具测试、双语验证和图形检查。工具版本号本身不是成功证据。"
+msgstr ""
+"Retain wheel, native-package, Doxygen and font licenses in every archive; "
+"shared license references must close within the prefix. For tool upgrades, "
+"first review upstream changes and licenses, then update the single lock and "
+"requirements, perform online preparation, independent offline restoration, "
+"relevant tool tests, bilingual validation and diagram checks. A version "
+"string alone is not success evidence."
+
+#: ../../../../../../docs/reference/documentation-tools.md:72
+msgid ""
+"CI 使用只读仓库权限和同一入口；上传结果不表示已部署网站。具体写作与翻译流程见 "
+"[文档维护](../development/documentation.md)。"
+msgstr ""
+"CI uses read-only repository permissions and the same entry point. Uploading"
+" results does not establish website deployment. See [documentation "
+"maintenance](../development/documentation.md) for writing and translation "
+"workflows."

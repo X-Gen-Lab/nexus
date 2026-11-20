@@ -1,9 +1,0 @@
-# Actual-POT messages; reviewed against this canonical source.
-msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 265aee6d55145f526375fd4f63927be62e33da1f67c0ff3b007da7b3d22dc619\n"
-
-msgid "Maintaining Nexus"
-msgstr "维护 Nexus"
-
-msgid "Preserve current formatting and comment conventions. New behavior uses real RED–GREEN execution; documentation checks and firmware qualification have separate scopes."
-msgstr "保持现有格式和注释约定。新增行为必须实际执行 RED–GREEN；文档检查和固件资格有各自的验收范围。"

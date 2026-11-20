@@ -1,14 +1,15 @@
 # Contributing to Nexus
 
 Nexus maintains reusable embedded mechanisms. Product code belongs in an
-external repository. Read [AGENTS.md](AGENTS.md), [the design contracts](docs/design/README.md)
-and [current delivery](docs/delivery/README.md) before changing a boundary.
+external repository. Read [AGENTS.md](AGENTS.md), [the design contracts](docs/reference/contracts/index.md)
+and [current delivery](docs/reference/platforms/index.md) before changing a boundary.
 
 ```sh
-git clone --recurse-submodules https://github.com/X-Gen-Lab/nexus.git
+git clone https://github.com/X-Gen-Lab/nexus.git
 cd nexus
 python scripts/setup/install_dev_tools.py
 .venv/bin/python -m pip install -r requirements.txt
+python tools/dev/dev.py prepare --scope native --allow-network
 python tools/dev/dev.py configure --preset native-debug
 python tools/dev/dev.py build --preset native-debug --parallel 4
 python tools/dev/dev.py test --preset native-debug

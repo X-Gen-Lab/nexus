@@ -1,0 +1,20 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: c296c9ced2ca4daba001f474ff740fcd635020dec805be5d7ff9e4a841ab6995\n"
+
+#: ../../../../../../docs/reference/contracts/platform/index.md:9
+msgid "平台资源与生命周期合同"
+msgstr "Platform resource and lifecycle contracts"
+
+#: ../../../../../../docs/reference/contracts/platform/index.md:11
+msgid "设备停止、时钟借用、DMA可达性、执行预算和观察各自维护明确责任。"
+msgstr ""
+"Device stopping, clock borrowing, DMA reachability, execution budgets, and "
+"observation each maintain explicit responsibilities."

@@ -1,0 +1,967 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 3c6d9ffa5b74cf47134769670cd5373cef6040cb582150c6d453f967b38761f9\n"
+
+#: ../../../../../../docs/reference/api/io/spi.md:10
+msgid "SPI controllers, transactions and DMA"
+msgstr "SPI 控制器、事务与 DMA"
+
+#: ../../../../../../docs/reference/api/io/spi.md:12
+msgid ""
+"Controller identity, child endpoint identity and transaction ownership are "
+"distinct. Select the endpoint traits and finite transfer path before "
+"admitting a transaction; DMA completion does not establish wire completion "
+"or final buffer access."
+msgstr "控制器身份、子端点身份和事务所有权彼此独立。事务准入前选择端点特征及有限传输路径；DMA 完成不代表线缆传输完成或缓冲区最终访问。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:17
+msgid "Public declarations"
+msgstr "公共声明"
+
+#: ../../../../../../docs/reference/api/io/spi.md:19
+msgid "spi.h"
+msgstr "spi.h"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid "Single-executor polling SPI endpoints and complete CS transactions."
+msgstr "单执行者轮询 SPI 端点与完整 CS 事务。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+#: ../../../../../../docs/reference/api/io/spi.md:27
+#: ../../../../../../docs/reference/api/io/spi.md:33
+#: ../../../../../../docs/reference/api/io/spi.md:39
+#: ../../../../../../docs/reference/api/io/spi.md:45
+msgid "Author  Nexus Team"
+msgstr "作者  Nexus Team"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+#: ../../../../../../docs/reference/api/io/spi.md:27
+#: ../../../../../../docs/reference/api/io/spi.md:33
+#: ../../../../../../docs/reference/api/io/spi.md:39
+#: ../../../../../../docs/reference/api/io/spi.md:45
+msgid "Nexus Team"
+msgstr "Nexus Team"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+#: ../../../../../../docs/reference/api/io/spi.md:39
+msgid "Defines"
+msgstr "宏定义"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid "Explicit single-cell DMA addresses, both borrowed until SETTLED."
+msgstr "显式单元素 DMA 地址，两者均借用到 SETTLED。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+#: ../../../../../../docs/reference/api/io/spi.md:27
+#: ../../../../../../docs/reference/api/io/spi.md:33
+#: ../../../../../../docs/reference/api/io/spi.md:39
+#: ../../../../../../docs/reference/api/io/spi.md:45
+msgid "Functions"
+msgstr "函数"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid "Execute one bounded full-duplex 8-bit polling transaction."
+msgstr "执行一个有界、全双工、8 位轮询事务。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid ""
+"Task-only single executor, no allocation/OS lock. One CS interval covers the"
+" entire transfer. Payloads and result are disjoint from provider control and"
+" MMIO storage. Deadline cannot preempt an in-flight hardware byte; "
+"peripheral drain may exceed it."
+msgstr ""
+"仅 Task 的单 executor，不分配内存或使用 OS 锁。一个 CS 区间覆盖整次传输。payload 和结果与 provider "
+"控制、MMIO 存储互不重叠。deadline 不能抢占在途硬件字节；外设排空可能超过该时间。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:0
+msgid "Parameters"
+msgstr "参数"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid "[in] Fixed CS/mode/rate binding on one controller."
+msgstr "[in] 一个控制器上的固定 CS/模式/速率绑定。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid ""
+"[in] Transmit bytes, or NULL to send 0xff. Exact in-place TX/RX is "
+"permitted; partial overlap is invalid."
+msgstr "[in] 发送字节，NULL 表示发送 0xff。允许 TX／RX 精确原地重合；部分重叠非法。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid "[out] Receive bytes, or NULL to discard."
+msgstr "[out] 接收字节；NULL 表示丢弃。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid "[in] Positive transfer length; at least one buffer exists."
+msgstr "[in] 正的传输长度；至少提供一个缓冲区。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid "[in] Absolute deadline; includes adapter queue residence."
+msgstr "[in] 绝对 deadline；包含在适配器队列中的驻留时间。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid ""
+"[out] Separate complete-byte result, reset after complete admission; "
+"unchanged on preflight rejection."
+msgstr "[out] 独立的完整字节结果，完整准入后清零；preflight 拒绝时保持不变。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:0
+msgid "Returns"
+msgstr "返回值"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid ""
+"Success, BUSY/INVALID/TIMEOUT/IO. Every return ends CPU access to the "
+"supplied buffers; polling is CPU-active, not IRQ/DMA async. SUCCESS requires"
+" complete wire drain and CS withdrawal. A provider that cannot withdraw GPIO"
+" CS/clock latches its owner fault, rejects further work and retains pin "
+"recovery responsibility until explicit recover/stop succeeds; it never "
+"retains payload pointers or reports that failure as successful release."
+msgstr ""
+"Success、BUSY/INVALID/TIMEOUT/IO。每次返回都结束对所提供缓冲区的 CPU 访问；轮询占用 CPU，不是 IRQ/DMA "
+"异步。SUCCESS 要求完整线端排空与 CS 撤出。无法撤出 GPIO CS/时钟的 provider "
+"锁存所有者故障、拒绝后续工作，并保留引脚恢复责任，直至显式 recover/stop 成功；不保留载荷指针，也不将此失败报告为释放成功。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid "Recover an idle SPI controller after its retained fault."
+msgstr "保留故障后恢复空闲 SPI 控制器。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid ""
+"[in] Single executor with no live transaction or payload borrow. A failed "
+"polling call may retain static CS recovery identity until this operation "
+"proves withdrawal."
+msgstr "[in] 单一执行者，无活动事务或 payload 借用。polling 失败后可保留静态 CS 恢复身份，直至本操作证明撤回完成。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid ""
+"Success only after reset/idle and retained CS withdrawal proof. Failure "
+"preserves recovery responsibility and never replays work. Latch readback "
+"does not prove external levels."
+msgstr "只有证明复位／空闲和所保留 CS 的撤回完成后才返回成功。失败保留恢复责任，不重放工作。锁存器回读不证明外部电平。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid "Prepare an unborrowed finite request without copying buffers."
+msgstr "准备未借用的有限请求，不复制缓冲区。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid "[inout] Fresh initialized or consumed SETTLED descriptor."
+msgstr "[inout] 新初始化的描述符，或已消费的 SETTLED 描述符。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid ""
+"[in] Nonempty TX bytes or NULL when the selected mode supports dummy "
+"transmission; immutable through final settlement."
+msgstr "[in] 非空 TX 字节；所选模式支持 dummy 发送时可为 NULL；保持不可变直到最终结清。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid "[out] RX buffer or NULL when the selected mode supports discard."
+msgstr "[out] RX 缓冲区；所选模式支持丢弃时可为 NULL。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid "[in] Positive byte count with at least one supplied buffer."
+msgstr "[in] 正字节数，且至少提供一个缓冲区。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid "[in] Absolute monotonic deadline including queue time."
+msgstr "[in] 包含排队时间的绝对单调 deadline。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid "Success or INVALID/STATE; failure creates no buffer loan."
+msgstr "成功或 INVALID/STATE；失败不产生缓冲区借用。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid "Submit one finite asynchronous whole-CS transaction."
+msgstr "提交一个有限、异步、覆盖整个 CS 区间的事务。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid ""
+"Task-only bounded admission. Selected modes declare DMA domain/length/buffer"
+" requirements. DMA TC alone never proves peripheral idle; the bus executor "
+"continues service to SETTLED."
+msgstr ""
+"仅限任务上下文的有界准入。所选模式声明 DMA 域/长度/缓冲区要求。仅 DMA TC 绝不证明外设空闲；总线执行者继续 service，直到 "
+"SETTLED。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid "[in] Initialized endpoint on a single-executor bus."
+msgstr "[in] 单执行者总线上的已初始化 endpoint。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid "[inout] READY storage; retained only after NX_SUCCESS."
+msgstr "[inout] READY 存储；仅在 NX_SUCCESS 后保留。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid ""
+"Success means ACCEPTED; all rejection errors create zero retained references"
+" and zero residual hardware effects."
+msgstr "成功表示 ACCEPTED；所有拒绝错误均不保留引用，也不产生残余硬件效果。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid "Submit explicit incrementing or single-cell DMA memory."
+msgstr "提交显式递增或单元素 DMA 内存。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid ""
+"Fixed directions require one byte, other directions length bytes, within "
+"reviewed DMA domains. The actual spans must not overlap. All addresses "
+"remain borrowed through drain until acquire-observed SETTLED. No hidden "
+"scratch is used. Both fixed flags permit explicit clock-only transfers. "
+"Request preparation does not retain these flags; only this successful "
+"admission selects them. Ordinary submit and the existing owner continue "
+"their ordinary buffer contract."
+msgstr ""
+"固定方向需要一个字节，其他方向需要 length 字节，均位于已审查 DMA 域。实际范围不得重叠。所有地址在排空期间持续借用，直到以 acquire "
+"观察到 SETTLED。不使用隐藏 scratch。两个 fixed "
+"标志可显式实现仅发时钟的传输。请求准备不保留这些标志；只有本次成功准入才选择它们。普通 submit 和既有所有者仍遵循原有缓冲区契约。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid "[in] Initialized single-executor DMA endpoint"
+msgstr "[in] 已初始化的单执行者 DMA endpoint"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid "[inout] READY request with two non-NULL caller addresses"
+msgstr "[inout] 具有两个非 NULL 调用方地址的 READY 请求"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid ""
+"[in] TX_FIXED repeats one immutable dummy byte; RX_FIXED repeatedly writes "
+"one caller-owned discard byte; zero uses complete incrementing TX/RX buffers"
+msgstr ""
+"[in] TX_FIXED 重复发送一个不可变 dummy 字节；RX_FIXED 重复写入调用方持有的一个丢弃字节；零表示使用完整且地址递增的 "
+"TX/RX 缓冲区"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid "ACCEPTED on SUCCESS; other results retain no references"
+msgstr "SUCCESS 表示 ACCEPTED；其他结果不保留任何引用"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid "Start an adapter-admitted QUEUED request without readmission."
+msgstr "启动适配器已准入的 QUEUED 请求，不重复准入。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid "[in] Initialized exact CS binding and bus executor."
+msgstr "[in] 已初始化的精确 CS 绑定及总线执行者。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid "[inout] Live QUEUED storage already borrowed by its adapter."
+msgstr "[inout] 活跃的 QUEUED 存储，已由其适配器借用。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid ""
+"Success hands execution to the bus; BUSY retains QUEUED. Other errors must "
+"be settled by the adapter executor."
+msgstr "成功将执行权交给总线；BUSY 保持 QUEUED。其他错误必须由适配器执行者结清。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid "Verify an endpoint belongs to the serviced bus."
+msgstr "验证端点属于所推进的总线。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid ""
+"Task/IRQ bounded cold identity check, no lookup or ownership effects. An "
+"adapter checks this before hardware execution; asynchronous admission also "
+"checks before borrowing."
+msgstr "任务/IRQ 中均为有界冷态身份检查，不查找，也不产生所有权效果。适配器在执行硬件前检查；异步准入也在借用前检查。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid "[in] Immutable endpoint identity kept alive by its caller."
+msgstr "[in] 由调用方保持有效的不可变 endpoint 身份。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid "[in] Exact execution bus bound to an adapter."
+msgstr "[in] 绑定到适配器的精确执行总线。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid ""
+"True only when the provider proves matching controller state and compatible "
+"bus methods; false for invalid/missing methods."
+msgstr "仅当 provider 证明控制器状态匹配且总线方法兼容时为真；无效或缺少方法时为 false。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid "Request cancellation without revoking DMA/CS buffer loans."
+msgstr "请求取消，不撤销 DMA/CS 缓冲区借用。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid "Cross-task controls use stable adapter slots and epochs."
+msgstr "跨任务控制使用稳定的适配器 slot 和 epoch。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid "[in] Same single execution owner as submit and service."
+msgstr "[in] 与 submit 和 service 相同的唯一执行所有者。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid "[inout] Exact live active request, never a stale raw pointer."
+msgstr "[inout] 精确、仍然有效的活跃请求，不得使用陈旧裸指针。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid ""
+"Success starts drain or observes prior settlement; STATE for another "
+"request, UNSUPPORTED for a polling-only provider."
+msgstr "成功开始排空或观察到先前结清；其他请求返回 STATE，仅轮询 provider 返回 UNSUPPORTED。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid "Advance one asynchronous bus under its single task executor."
+msgstr "由唯一 Task 执行者推进一个异步总线。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid ""
+"Bounded no-wait service. Final publication follows DMA/IRQ detach and "
+"peripheral-idle proof; failed drain quarantines."
+msgstr "有界且不等待的 service。最终发布发生在 DMA/IRQ 分离及证明外设空闲之后；排空失败会隔离。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid "[in] Live provider; call while stopping and throughout drain."
+msgstr "[in] 仍然有效的 provider；停止及整个排空期间持续调用。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid "Close admission and retain active sources until full drain."
+msgstr "关闭准入，完整排空之前保留活动源。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid "[in] Live bus; all external producers already quiesced."
+msgstr "[in] 仍然有效的总线；所有外部生产者均已静默。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid ""
+"Success proves source release, BUSY requires service, or UNSUPPORTED when "
+"the provider has no asynchronous lifecycle."
+msgstr "成功证明来源已撤回，BUSY 要求 service；provider 不提供异步生命周期时返回 UNSUPPORTED。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid "Attach an optional hint sink to asynchronous bus IRQ publishers."
+msgstr "向异步总线 IRQ 发布者附加可选提示接收端。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid "Join old publishers and waiters before freeing wake storage."
+msgstr "释放唤醒存储前，等待旧发布者及等待者退出。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid "[in] One initialized bus controlled by a task executor."
+msgstr "[in] 由任务执行者控制的一个已初始化总线。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid "[in] Immutable borrowed target or NULL to detach."
+msgstr "[in] 不可变的借用目标；NULL 表示分离。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid ""
+"[in] Optional additional unshifted kernel-safe priority floor; cannot weaken"
+" generated policy. PRIMASK kernel targets require zero. Ignored without "
+"kernel calls."
+msgstr "[in] 可选的额外未移位内核安全优先级数值下限；不得削弱生成策略。PRIMASK 内核目标要求为零。不调用内核时忽略。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid ""
+"Success, PERMISSION for unsafe actual priority, CONTEXT/STATE for illegal "
+"control or UNSUPPORTED for a polling-only bus."
+msgstr "成功；实际优先级不安全时返回 PERMISSION，非法控制返回 CONTEXT/STATE，仅轮询总线返回 UNSUPPORTED。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid "Caller-owned finite SPI request with one whole-CS interval."
+msgstr "调用者拥有的有限 SPI 请求，包含一个完整 CS 区间。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid ""
+"Initialize base before prepare. Accepted requests borrow both non-NULL "
+"buffers until acquire-observed SETTLED, including cancellation and timeout "
+"drain. QUARANTINED retains the loan."
+msgstr ""
+"prepare 前初始化 base。已接受请求持续借用 TX/RX 中所有非 NULL 缓冲区，直到以 acquire 观察到 "
+"SETTLED，包括取消和超时排空期间。QUARANTINED 保留借用。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+#: ../../../../../../docs/reference/api/io/spi.md:27
+#: ../../../../../../docs/reference/api/io/spi.md:33
+#: ../../../../../../docs/reference/api/io/spi.md:39
+#: ../../../../../../docs/reference/api/io/spi.md:45
+msgid "Public Members"
+msgstr "公共成员"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid "Shared read-only methods using one provider state."
+msgstr "使用同一个提供者状态的共享只读方法。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid ""
+"Methods follow each public operation's ownership contract. Missing optional "
+"methods report UNSUPPORTED."
+msgstr "各方法遵循对应公共操作的所有权合同。缺失的可选方法返回 UNSUPPORTED。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid "Immutable interface pointing to caller-owned state."
+msgstr "指向调用者自有状态的不可变接口。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:21
+msgid ""
+"Face and state outlive callers, IRQs and retained borrows. Factory lookup "
+"neither initializes nor acquires hardware."
+msgstr "接口和状态的生命周期覆盖调用方、IRQ 及保留的借用。工厂查找既不初始化，也不取得硬件。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:25
+msgid "spi_dma_owner_binding.h"
+msgstr "spi_dma_owner_binding.h"
+
+#: ../../../../../../docs/reference/api/io/spi.md:27
+msgid "Optional immutable segmented SPI ownership and IRQ binding."
+msgstr "可选不可变的分段 SPI 所有权与 IRQ 绑定。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:27
+msgid "Check exact endpoint membership without hardware effects."
+msgstr "检查精确端点归属，不产生硬件效果。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:27
+msgid "No acquisition, initialization, allocation or service."
+msgstr "不获取资源、不初始化、不分配，也不执行 service。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:27
+msgid "[in] Stable provider-owned immutable capability."
+msgstr "[in] 由 provider 拥有、稳定且不可变的能力描述。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:27
+msgid "[in] Stable enhanced endpoint on the selected bus."
+msgstr "[in] 所选总线上的稳定增强端点。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:27
+msgid "False for malformed or foreign identities."
+msgstr "身份格式错误或归属不符时返回 false。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:27
+msgid "Attach a borrowed hint to actual validated IRQ publishers."
+msgstr "将借用的提示接收端附加到实际验证过的 IRQ 发布者。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:27
+msgid ""
+"Task-only. Rejection leaves the previous binding intact. A hint is never "
+"completion. Detach alone does not join a publisher that has already captured"
+" the sink. Stop and join publishers and waiters before destroying "
+"notification data."
+msgstr ""
+"仅限任务上下文。拒绝时保留原有绑定。提示不代表完成。仅 detach 不能等待已捕获接收器的发布者退出。销毁通知数据前，须停止并等待发布者和等待者退出。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:27
+msgid "[in] Stable selected controller capability."
+msgstr "[in] 稳定的所选控制器能力描述。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:27
+msgid ""
+"[in] Immutable sink kept live through publisher join, NULL to detach under "
+"the provider's lifecycle contract."
+msgstr "[in] 保持有效直到发布者退出的不可变接收器；按 provider 生命周期契约传入 NULL 可解除绑定。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:27
+msgid "[in] Actual unshifted kernel threshold."
+msgstr "[in] 实际的未移位内核阈值。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:27
+msgid "SUCCESS, INVALID, CONTEXT, UNSUPPORTED or provider failure."
+msgstr "SUCCESS、INVALID、CONTEXT、UNSUPPORTED 或 provider 失败。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:27
+msgid "Selected-only provider capability without changing IO faces."
+msgstr "仅选定实例具有的提供者能力，不修改 IO 接口。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:27
+msgid ""
+"Stable immutable storage outlives executor and publishers. contains proves "
+"actual controller identity; a display name or a caller-assembled pair of "
+"pointers is not such proof. attach_wake validates actual IRQ sources before "
+"borrowing the sink. A missing hook permits explicit periodic service."
+msgstr ""
+"稳定的不可变存储须比执行器和发布者存活更久。contains 证明实际控制器身份；显示名称或调用方拼装的一对指针不能证明归属。attach_wake "
+"在借用接收器前验证实际 IRQ 源。缺少钩子时，可显式周期性执行 service。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:31
+msgid "spi_dma_transaction.h"
+msgstr "spi_dma_transaction.h"
+
+#: ../../../../../../docs/reference/api/io/spi.md:33
+msgid "Optional finite whole-CS segmented SPI DMA request contract."
+msgstr "可选的有限、完整 CS 区间分段 SPI DMA 请求合同。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:33
+msgid "Prepare unborrowed storage after validating every span."
+msgstr "验证每个范围后准备尚未借用的存储。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:33
+msgid ""
+"Descriptors and payload never overlap request storage. RX cannot overwrite "
+"any TX or descriptor. Repeated RX alias is allowed only for the exact same "
+"explicit FIXED discard cell. Provider-specific domains are checked at "
+"admission."
+msgstr ""
+"描述符和载荷不得与请求存储重叠。RX 不得覆盖任何 TX 或描述符。仅当多次 RX 指向同一个显式 FIXED 丢弃单元时，才允许重复别名。准入时检查 "
+"provider 特有的内存域。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:33
+msgid "[inout] Initialized READY or consumed SETTLED storage."
+msgstr "[inout] 已初始化为 READY 或已消费的 SETTLED 存储。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:33
+msgid "[in] Immutable caller-owned array, at most MAX_SEGMENTS."
+msgstr "[in] 调用方拥有的不可变数组，最多 MAX_SEGMENTS 项。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:33
+msgid "[in] Positive segment count; every words count is positive."
+msgstr "[in] 正数段数；每段的 words 均为正数。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:33
+msgid "[in] Common hardware width of 8 or 16 bits."
+msgstr "[in] 全部段共用的 8 位或 16 位硬件位宽。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:33
+msgid "[in] Absolute monotonic deadline for the complete chain."
+msgstr "[in] 整条链的绝对单调时限。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:33
+msgid "SUCCESS, INVALID/UNSUPPORTED/STATE; no borrow on failure."
+msgstr "SUCCESS 或 INVALID/UNSUPPORTED/STATE；失败时不建立借用。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:33
+msgid "Validate immutable fields without admission or memory modification."
+msgstr "验证不可变字段，不执行准入或修改内存。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:33
+msgid "Admit one finite chain on a task-only single executor."
+msgstr "在仅限任务的单一执行者上准入一个有限链。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:33
+msgid ""
+"All domains and segments are validated before admission. One CS interval "
+"spans the chain; SCK gaps between segments are permitted. DMA TC alone never"
+" establishes wire idle."
+msgstr "准入前验证全部内存域和段。整条链共用一个 CS 有效区间；允许段间出现 SCK 间隔。仅有 DMA TC 不能证明线路空闲。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:33
+msgid "[in] Stable enhanced DMA endpoint and provider state."
+msgstr "[in] 稳定的增强 DMA 端点及 provider 状态。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:33
+msgid "[inout] READY descriptor, retained only on SUCCESS."
+msgstr "[inout] READY 描述符；仅在 SUCCESS 时保留引用。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:33
+msgid ""
+"SUCCESS means ACCEPTED, possibly already SETTLED. Rejection retains no "
+"references and creates no hardware effects."
+msgstr "SUCCESS 表示 ACCEPTED，也可能已经 SETTLED。拒绝时不保留引用，也不产生硬件副作用。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:33
+msgid "Cancel an exact live request while retaining all its loans."
+msgstr "取消对应活动请求，同时保留全部借用。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:33
+msgid "[in] Same single executor used by submit and service."
+msgstr "[in] 与 submit 和 service 共用的同一个单执行者。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:33
+msgid "[inout] Exact current request or acquire-observed SETTLED."
+msgstr "[inout] 精确的当前请求，或已通过 acquire 语义观测为 SETTLED 的请求。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:33
+msgid ""
+"SUCCESS starts/observes cancellation; INVALID/STATE/CONTEXT rejects without "
+"revoking any existing loan."
+msgstr "SUCCESS 启动或观测取消；INVALID/STATE/CONTEXT 拒绝操作，但不撤销任何已有借用。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:33
+msgid "Advance a bounded phase boundary, completion or drain."
+msgstr "推进一个有界阶段边界、完成或排空。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:33
+msgid ""
+"No wait, allocation, payload copy, hidden task or OS lock. Failed "
+"drain/release retains QUARANTINED storage. SETTLED follows final hardware "
+"detach and CS release and is the provider's final access to caller request "
+"and descriptors."
+msgstr ""
+"不等待、不分配、不复制载荷，也无隐藏任务或 OS 锁。排空或释放失败时保留 QUARANTINED 存储。最终硬件引用撤离且 CS 释放后才发布 "
+"SETTLED；这是 provider 对调用方请求和描述符的最后一次访问。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:33
+msgid "[in] Task-only enhanced controller; continue during stop."
+msgstr "[in] 仅限任务上下文的增强控制器；停止过程中仍须继续调用。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:33
+msgid "Close admission and stop after complete source withdrawal."
+msgstr "关闭准入，并在源完整撤离后停止。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:33
+msgid ""
+"Repeated successful stop never touches hardware again; another owner may "
+"already have acquired the controller."
+msgstr "成功停止后重复 stop 不再访问硬件；其他所有者可能已取得该控制器。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:33
+msgid "[in] Stable single-executor state, producers quiesced."
+msgstr "[in] 稳定的单执行者状态；生产者已静止。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:33
+msgid ""
+"SUCCESS proves stop; BUSY needs further service and retains all outstanding "
+"storage, including quarantined requests."
+msgstr "SUCCESS 证明已停止；BUSY 表示仍须执行 service，并保留全部未完成存储，包括隔离中的请求。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:33
+msgid "Explicit DMA words with caller-owned dummy/discard cells."
+msgstr "显式 DMA 字，使用调用者拥有的填充值／丢弃单元。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:33
+msgid ""
+"Both addresses are mandatory. A FIXED direction borrows one word; an "
+"incrementing direction borrows words elements. Width is common to all "
+"segments. DMA never uses the polling segment's implicit NULL/dummy "
+"representation or scratch. A 16-bit element is a native uint16_t numeric "
+"word, without byte-order conversion. NDTR and completion counts remain "
+"words."
+msgstr ""
+"两个地址均必填。FIXED 方向借用一个 word，递增方向借用 words 个元素。所有段使用同一宽度。DMA 不使用 polling 段的隐式 "
+"NULL／dummy 表达，也不使用临时存储。16 位元素是本机格式的 uint16_t 数值，不进行字节序转换。NDTR 和完成数量仍按 word "
+"计数。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:33
+msgid "Caller-owned request retaining every segment through drain."
+msgstr "调用者拥有的请求；每个分段持续借用至排空完成。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:33
+msgid ""
+"Initialize base before prepare. ACCEPTED borrows this object, its descriptor"
+" array, all TX/RX spans and fixed cells until acquire-observed SETTLED. "
+"Intermediate segment completion, cancellation and timeout never release any "
+"of these loans. Completion counts words of successfully settled segments; "
+"partial effects in a failed segment remain unquantified."
+msgstr ""
+"prepare 前先初始化 base。ACCEPTED 借用本对象、描述符数组、全部 TX/RX 范围和固定单元，直到通过 acquire 语义观测到 "
+"SETTLED。中间段完成、取消和超时都不释放这些借用。完成计数以成功结算的段中的字数为单位；失败段的部分副作用不作量化。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:37
+msgid "spi_transaction.h"
+msgstr "spi_transaction.h"
+
+#: ../../../../../../docs/reference/api/io/spi.md:39
+msgid "Optional multi-segment whole-CS 8/16-bit polling SPI."
+msgstr "可选的多分段、完整 CS 区间 8／16 位轮询 SPI。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:39
+msgid "Bounded descriptor count; no hidden concatenation buffer exists."
+msgstr "描述符数量有界；不存在隐藏的拼接缓冲。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:39
+msgid "Validate every descriptor and span without hardware effects."
+msgstr "验证每个描述符与范围，不产生硬件效果。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:39
+msgid ""
+"No memory is borrowed, copied, allocated or modified. NULL data pointers are"
+" legal dummy/discard operations. This does not validate provider-specific "
+"controller, rate or limits."
+msgstr ""
+"不借用、复制、分配或修改内存。NULL 数据指针可表示合法的填充发送或接收丢弃操作。本检查不验证 provider 特有的控制器、速率或限制。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:39
+msgid "[in] Aligned immutable array, retained by the caller."
+msgstr "[in] 已对齐的不可变数组，由调用方保留。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:39
+msgid "[in] Positive descriptor count, at most MAX_SEGMENTS."
+msgstr "[in] 正数描述符数量，最多 MAX_SEGMENTS 个。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:39
+msgid "[in] Exactly 8 or 16; fixed for the whole CS interval."
+msgstr "[in] 只能为 8 或 16；整个 CS 有效区间保持不变。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:39
+msgid ""
+"SUCCESS, INVALID for malformed/overlapping/overflowing spans, or UNSUPPORTED"
+" for excess descriptor count or word width."
+msgstr "SUCCESS；范围格式错误、重叠或溢出时为 INVALID；描述符数量或字宽超限时为 UNSUPPORTED。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:39
+msgid "Execute all segments under exactly one asserted CS interval."
+msgstr "在同一个 CS 有效区间内执行全部分段。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:39
+msgid ""
+"Task-only single executor; polling is CPU-active. Spans and result are "
+"disjoint from provider control and MMIO storage. Return releases "
+"descriptor/payload borrows after wire drain or provider reset and CS "
+"release. Deadline cannot preempt an in-flight word. Errors never replay "
+"prior segments. No allocation, OS lock, hidden scratch, width changes or CS "
+"toggles occur between phases. This is synchronous: existing finite DMA "
+"request and cancellation contracts are unchanged."
+msgstr ""
+"仅 Task 的单 executor；polling 会持续占用 CPU。数据 span 和结果与 provider 控制、MMIO "
+"存储互不重叠。返回前须完成 wire drain 或 provider reset，并在释放 CS 后归还 descriptor／payload "
+"借用。deadline 不能抢占在途硬件 word；错误从不重放先前 segment。各 phase 之间不分配内存，不使用 OS 锁、隐藏 "
+"scratch、宽度切换或 CS 翻转。此接口为同步调用，既有有限 DMA 请求及取消合同不变。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:39
+msgid "[in] Optional enhanced face with stable private state."
+msgstr "[in] 可选增强接口，具有稳定的私有状态。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:39
+msgid "[in] Caller-owned descriptors and their data spans."
+msgstr "[in] 调用方拥有的描述符及其数据范围。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:39
+msgid "[in] Number of phases, all validated before hardware use."
+msgstr "[in] 阶段数量；所有阶段均须在硬件使用前验证。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:39
+msgid "[in] Common hardware frame width, 8 or 16 bits."
+msgstr "[in] 共用的硬件帧位宽，为 8 位或 16 位。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:39
+msgid "[in] Absolute monotonic deadline for all phases."
+msgstr "[in] 全部阶段共用的绝对单调时限。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:39
+msgid ""
+"[out] Complete received words, never bytes; separate writable size_t "
+"storage, reset after complete admission. Preflight rejection leaves this "
+"result unchanged."
+msgstr ""
+"[out] 完整接收的 word 数，绝不是字节数；使用独立可写 size_t 存储，完整准入后清零。preflight 拒绝时结果保持不变。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:39
+msgid "SUCCESS or INVALID/UNSUPPORTED/CONTEXT/STATE/BUSY/TIMEOUT/IO."
+msgstr "SUCCESS 或 INVALID/UNSUPPORTED/CONTEXT/STATE/BUSY/TIMEOUT/IO。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:39
+msgid "One phase within a single CS interval."
+msgstr "单个 CS 区间内的一个阶段。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:39
+msgid ""
+"Words have the transaction's common width of 8 or 16 bits. NULL TX repeats "
+"dummy; NULL RX discards. Both may be NULL for clock-only words. Non-NULL "
+"spans contain words elements; 16-bit spans are uint16_t-aligned. Descriptor "
+"and TX storage stay immutable until return. RX never overlaps descriptors, "
+"TX storage, other RX spans or the completion output. A 16-bit element is a "
+"numeric uint16_t in native storage; the selected bit order controls wire "
+"serialization. No byte-order conversion or implicit scratch buffer exists. "
+"Ordinary byte-span SPI remains a separate unchanged interface."
+msgstr ""
+"所有 word 使用事务共同的 8 位或 16 位宽度。NULL TX 重复发送 dummy，NULL RX 丢弃接收；二者均为 NULL "
+"时仅输出时钟。非空区间含 words 个元素；16 位区间须按 uint16_t 对齐。描述符和 TX 存储在返回前保持不变。RX 不得与描述符、TX "
+"存储、其他 RX 区间或完成输出重叠。16 位元素是以本机格式存储的 uint16_t "
+"数值，所选位序控制线上串行化顺序。不进行字节序转换，不存在隐式临时 buffer。普通字节区间 SPI 接口保持独立。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:39
+msgid "Shared immutable methods; absent transfer reports UNSUPPORTED."
+msgstr "共享不可变方法；缺少传输方法时报告 UNSUPPORTED。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:39
+msgid "Optional face sharing the selected provider's existing bus state."
+msgstr "可选接口，与选定提供者的现有总线状态共享。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:43
+msgid "spi_frames.h"
+msgstr "spi_frames.h"
+
+#: ../../../../../../docs/reference/api/io/spi.md:45
+msgid "Explicit master/slave SPI frames and borrowed requests."
+msgstr "显式 master／slave SPI frame 与借用请求。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:45
+msgid "Enums"
+msgstr "枚举"
+
+#: ../../../../../../docs/reference/api/io/spi.md:45
+msgid "Exact clock owner, independent of an application protocol."
+msgstr "精确时钟所有者，独立于应用协议。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:45
+msgid "Values:"
+msgstr "取值："
+
+#: ../../../../../../docs/reference/api/io/spi.md:45
+msgid "Two data pads, a receive-only pad, or one bidirectional data pad."
+msgstr "两个 data pad、一个 receive-only pad，或一个双向 data pad。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:45
+msgid "Motorola whole-selection framing or TI frame-sync framing."
+msgstr "Motorola 整段选择 framing，或 TI frame-sync framing。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:45
+msgid "Bind unborrowed words and a deadline to one live port generation."
+msgstr "将未被借用的 word 和 deadline 绑定到一个活跃 port generation。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:45
+msgid ""
+"A cold restart or Core epoch change invalidates an old READY tuple. Prepare "
+"again against the live port with a new-domain deadline."
+msgstr ""
+"Cold restart 或 Core epoch 改变使旧 READY 元组失效。须以新域 deadline 针对活跃 port 再次 "
+"prepare。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:45
+msgid "[in] Initialized static owner in the current Core clock epoch."
+msgstr "[in] 当前 Core clock epoch 中已初始化的静态 owner。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:45
+msgid "[inout] Initialized fresh or consumed SETTLED descriptor."
+msgstr "[inout] 已初始化的新描述符或已消费的 SETTLED 描述符。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:45
+msgid "[in] Immutable words, or NULL for a supported dummy operation."
+msgstr "[in] 不可变 word，或支持 dummy 操作时的 NULL。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:45
+msgid "[out] Writable words, or NULL for supported discard."
+msgstr "[out] 可写 word，或支持 discard 时的 NULL。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:45
+msgid "[in] Positive count, at most 65535; width belongs to the port."
+msgstr "[in] 正计数，最多 65535；位宽由 port 决定。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:45
+msgid "[in] Absolute nx_time_now_us deadline, including wire tail."
+msgstr "[in] 绝对 nx_time_now_us deadline，含 wire tail。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:45
+msgid "Success or INVALID/STATE/CONTEXT; no provider borrow is created."
+msgstr "成功或 INVALID／STATE／CONTEXT；不建立 provider 借用。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:45
+msgid "Admit one complete frame sequence from unmasked Thread context."
+msgstr "从未屏蔽中断的 Thread 模式上下文接纳一个完整 frame 序列。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:45
+msgid ""
+"Slave peers must await successful arming before driving clocks/NSS. ISR "
+"moves bounded word data only; the owner calls service throughout completion,"
+" cancellation and stop. No worker or dynamic queue exists."
+msgstr ""
+"Slave 的对端须等待成功 arm 后才驱动 clock／NSS。ISR 只搬移有界 word 数据；完成、取消和 stop 期间都由 owner "
+"调用 service。没有 worker 或动态队列。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:45
+msgid "[in] Initialized static controller, owned by one executor."
+msgstr "[in] 已初始化的静态 controller，由唯一执行者持有。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:45
+msgid "[inout] READY descriptor and disjoint spans."
+msgstr "[inout] READY 描述符及互不重叠的 span。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:45
+msgid ""
+"Success means ACCEPTED, including later start failure; every reject retains "
+"no new reference and leaves no hardware effect."
+msgstr "成功表示 ACCEPTED，包含后续启动失败；每次拒绝都不保留新引用，也不留下硬件效果。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:45
+msgid "Stop future loading while retaining the active borrow until drain."
+msgstr "停止后续装载，保留当前借用直到排空。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:45
+msgid "Cancellation never revokes a borrow or overwrites a latched terminal."
+msgstr "取消从不撤销借用，也不覆盖已锁存的终止结果。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:45
+msgid "[in] The same single executor as submit and service."
+msgstr "[in] 与 submit 和 service 相同的唯一执行者。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:45
+msgid "[inout] The active request, or its observed SETTLED identity."
+msgstr "[inout] 活跃请求，或其已观察到 SETTLED 的身份。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:45
+msgid "Success requests cancellation; STATE means another request."
+msgstr "成功表示请求取消；STATE 表示其他请求。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:45
+msgid "Advance deadline/drain and publish only after source withdrawal."
+msgstr "推进 deadline／排空，只有来源撤回后才发布。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:45
+msgid "Failed drain/disable retains QUARANTINED storage; continue service."
+msgstr "排空／禁用失败保留 QUARANTINED 存储；继续 service。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:45
+msgid "[in] The unmasked Thread executor; bounded, no waiting callback."
+msgstr "[in] 未屏蔽中断的 Thread 模式执行者；有界，不调用等待 callback。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:45
+msgid "Close admission and join requests before returning hardware."
+msgstr "归还硬件之前，先封闭准入并 join 请求。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:45
+msgid "[in] Executor after producers and observers have joined."
+msgstr "[in] Producer 和观察者完成 join 后的执行者。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:45
+msgid "Success means stopped; BUSY retains state and requires service."
+msgstr "成功表示已停止；BUSY 保留状态并要求继续 service。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:45
+msgid "Recover an idle fault without replaying a previous request."
+msgstr "恢复空闲故障，不重放旧请求。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:45
+msgid "A changed Core epoch requires complete cold close and restart."
+msgstr "Core epoch 改变要求完整 cold close 并重启。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:45
+msgid "[in] Executor with no active borrow and unchanged static config."
+msgstr "[in] 没有活跃借用且静态配置未改变的执行者。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:45
+msgid "Success after reset/source proof; failures retain recovery duty."
+msgstr "Reset／来源证明完成后成功；失败保留恢复责任。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:45
+msgid "Immutable wire tuple selected before peripheral activation."
+msgstr "外设激活前选择的不可变 wire tuple。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:45
+msgid ""
+"The caller owns peer clocks, wiring and shared-line arbitration. "
+"irq_latency_us bounds IRQ latency and all nonwaiting software through source"
+" withdrawal; it is a declared integration budget, never a measured hardware "
+"qualification. Master receive-only and one-wire reception require a nonzero "
+"bound and finite clock progress. CRC uses an odd polynomial and an extra "
+"hardware CRC frame, excluded from request counts. TI derives its required "
+"clock phase/polarity. Slave maximum_hz is the external peer's upper clock "
+"bound; BR does not impose the master's divide-by-256 minimum on slave "
+"operation."
+msgstr ""
+"调用者负责对端时钟、接线与共享线路仲裁。irq_latency_us 为 IRQ "
+"延迟和直到来源撤回的全部非等待软件提供上界；它是声明的集成预算，绝不是实测硬件资格。Master receive-only 和 one-wire "
+"接收要求非零上界及有限时钟进展。CRC 使用奇数 polynomial 和一个额外硬件 CRC frame，该 frame 不计入请求计数。TI "
+"派生其要求的 clock phase／polarity。Slave 的 maximum_hz 是外部对端时钟上界；BR 不会将 master 的 "
+"divide-by-256 最低速率限制施加给 slave 操作。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:45
+msgid "Caller-owned descriptor and word spans borrowed through SETTLED."
+msgstr "调用者持有的描述符与 word span 持续被借用，直到 SETTLED。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:45
+msgid ""
+"Word width belongs to the static port. Sixteen-bit spans contain aligned "
+"numeric uint16_t values. TWO_LINE permits NULL TX for dummy or NULL RX for "
+"discard, but not both. RECEIVE_ONLY requires RX only; ONE_WIRE requires "
+"exactly one span and selects its direction before activation. All spans, "
+"metadata and provider storage are disjoint. owner, generation and time_epoch"
+" are written only by port preparation; callers keep them unchanged until the"
+" descriptor is unborrowed."
+msgstr ""
+"Word 位宽由静态 port 决定。16-bit span 包含对齐的数值 uint16_t。TWO_LINE 允许 NULL TX 作为 "
+"dummy，或 NULL RX 作为 discard，但不能同时为空。RECEIVE_ONLY 只允许 RX；ONE_WIRE 恰好要求一个 "
+"span，并在激活前选择方向。所有 span、metadata 与 provider 存储互不重叠。owner、generation 和 "
+"time_epoch 仅由 port preparation 写入；描述符未结束借用之前，调用者必须保持这些字段不变。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:45
+msgid "Readonly shared methods; one executor owns each instance."
+msgstr "只读共享方法；每个实例由唯一执行者持有。"
+
+#: ../../../../../../docs/reference/api/io/spi.md:45
+msgid "Immutable controller face; lookup acquires no resources."
+msgstr "不可变 controller face；lookup 不取得资源。"

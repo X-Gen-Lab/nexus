@@ -23,5 +23,5 @@ request 指针。
 可选 observation／sidecar 布局变化要求消费者重新编译，但不增加默认 owner 或
 provider 字段。其 RAM 成本按所选 ABI 测量，不能假定为零。
 
-[观察与恢复合同](../../../docs/design/io-observation-recovery.md)统一说明 Core observer、
+[观察与恢复合同](../../../docs/reference/contracts/io/observation-recovery.md)统一说明 Core observer、
 stream budget、可选存储测量和外部应用升级处置策略。

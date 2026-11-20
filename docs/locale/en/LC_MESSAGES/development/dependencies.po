@@ -1,0 +1,122 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 82aa1701deccb7ac4bf579977abccefd6a7fc16cc8f1e848beeadaf9f11673ea\n"
+
+#: ../../../../../../docs/development/dependencies.md:8
+msgid "维护依赖来源与精确选版"
+msgstr "Maintain dependency provenance and exact selection"
+
+#: ../../../../../../docs/development/dependencies.md:10
+msgid ""
+"外部 Git 源先由 X-Gen-Lab 托管，Nexus 以精确 gitlink 和锁选择版本。官方来源、 "
+"实际获取地址、选中提交、许可与本地修改分别记录，不以版本名代替源码身份。"
+msgstr ""
+"X-Gen-Lab hosts external Git source; Nexus selects versions through exact "
+"gitlinks and locks. Record the official upstream, actual fetch URL, selected"
+" commit, licenses and local changes separately. A version name does not "
+"replace source identity."
+
+#: ../../../../../../docs/development/dependencies.md:13
+msgid "按实际任务准备"
+msgstr "Prepare the actual task"
+
+#: ../../../../../../docs/development/dependencies.md:15
+msgid ""
+"`tools/maintenance/source_catalogue.py` 维护来源与已审供应方映射，package 声明 其硬件依赖，TOML "
+"选择后端与组件。CMake 仍拥有实际翻译单元和链接图，不增加另一 份源码清单。未选 vendor 库存保留，但不进入默认准备、构建或 SDK 输出。"
+msgstr ""
+"`tools/maintenance/source_catalogue.py` maintains provenance and reviewed "
+"supplier mappings. Packages declare hardware dependencies, and TOML selects "
+"backends and components. CMake continues to own actual translation units and"
+" the link graph; do not add another source manifest. Unselected vendor "
+"inventory is retained but excluded from default preparation, builds and SDK "
+"output."
+
+#: ../../../../../../docs/development/dependencies.md:24
+msgid ""
+"已有外部应用可按其 TOML 运行 `prepare --scope assembly --assembly <path>`；Native 明确加 "
+"`--test-support`。`--scope native` 则仍表示平台维护的完整宿主测试图，包含 "
+"GoogleTest／GoogleMock和维护测试实际使用的运行依赖。"
+msgstr ""
+"For an existing external application, run `prepare --scope assembly "
+"--assembly <path>` against its TOML; Native explicitly adds `--test-"
+"support`. `--scope native` still denotes the complete maintained host-test "
+"graph, including GoogleTest/GoogleMock and runtime dependencies actually "
+"used by maintenance tests."
+
+#: ../../../../../../docs/development/dependencies.md:28
+msgid ""
+"准备器默认离线核对来源、真实 gitlink、HEAD、工作区、递归子模块与别名身份。 仅显式 `--allow-network` "
+"才允许获取选中闭包，不静默改 origin 或选择更新版本。 源码消费和发布使用同一锁；安装 SDK 通过自己的完整 manifest 校验原字节。"
+msgstr ""
+"By default, preparation verifies provenance, real gitlinks, HEADs, "
+"worktrees, recursive submodules and alias identities offline. Only explicit "
+"`--allow-network` permits fetching the selected closure; it does not "
+"silently change origins or select newer versions. Source consumption and "
+"publication use the same lock. An installed SDK verifies original bytes "
+"through its own complete manifest."
+
+#: ../../../../../../docs/development/dependencies.md:32
+msgid "更新依赖"
+msgstr "Update dependencies"
+
+#: ../../../../../../docs/development/dependencies.md:34
+msgid "固定上游变更及许可证，选择组织托管的精确提交，并核对保留引用与获取方式。"
+msgstr ""
+"Pin the upstream changes and license identity, select an exact organization-"
+"hosted commit, and check retained references and fetch mechanisms."
+
+#: ../../../../../../docs/development/dependencies.md:35
+msgid "明确本地补丁、递归来源、alias 和所选平台／后端／组件受影响范围。"
+msgstr ""
+"Identify local patches, recursive sources, aliases and the affected "
+"platform/backend/component scope."
+
+#: ../../../../../../docs/development/dependencies.md:36
+msgid "更新实际 gitlink 与匹配锁，执行最小失败回归和真实构建上下文。"
+msgstr ""
+"Update actual gitlinks and matching locks, execute the minimal failing "
+"regression, and use the real build context."
+
+#: ../../../../../../docs/development/dependencies.md:37
+msgid "对受影响的 Native、ARM 与独立 SDK 消费执行相应门禁，保留原失败和源码身份。"
+msgstr ""
+"Run the appropriate gates for affected Native, ARM and independent SDK "
+"consumers; retain original failures and source identity."
+
+#: ../../../../../../docs/development/dependencies.md:38
+msgid "普通提交与评审通过后合并；既有标签与旧产物保持原始身份。"
+msgstr ""
+"Merge after normal commit checks and review. Existing tags and old artifacts"
+" retain their original identities."
+
+#: ../../../../../../docs/development/dependencies.md:40
+msgid ""
+"嵌套来源使用所属父提交的真实 `.gitmodules` 与 gitlink。不能用路径、子模块名、 组织 fork URL 或上游同名 tag "
+"互相替代。未经验证的目录、脏源码与缺失许可证必须 拒绝；依赖变更不自动扩大 MCU、模式或物理支持。"
+msgstr ""
+"Nested sources use the actual `.gitmodules` and gitlinks of their owning "
+"parent commit. Paths, submodule names, organization-fork URLs and equally "
+"named upstream tags are not interchangeable. Unverified directories, dirty "
+"source and missing licenses must be rejected. A dependency change does not "
+"automatically expand MCU, mode or physical support."
+
+#: ../../../../../../docs/development/dependencies.md:44
+msgid ""
+"Native 最小消费与完整维护图是不同选择，维护范围不会因教程优化而削弱。 工具准备缓存可复用，历史成功报告不作为新源码验收。发布范围见 [SDK "
+"发布](sdk-publishing.md)，代码接口／schema 代际见 [SDK "
+"格式合同](../reference/contracts/sdk-format.md)。"
+msgstr ""
+"Minimal Native consumption and the complete maintenance graph are separate "
+"selections. Tutorial improvements do not weaken maintenance scope. Tool-"
+"preparation caches may be reused; historical success reports do not qualify "
+"new source. See [SDK publication](sdk-publishing.md) for release scope and "
+"the [SDK format contract](../reference/contracts/sdk-format.md) for source-"
+"interface/schema epochs."

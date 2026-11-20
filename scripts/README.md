@@ -3,7 +3,7 @@
 构建使用 `python tools/dev/dev.py configure|build|test --preset <name>` 与一份
 schema-2 TOML，SoC／Board 事实仍是 JSON，原生 CMake 参数传给维护 preset。
 配置、SDK、ELF 与 HIL 工装入口在 `tools/`、`cmake/package/`，见
-[交付入口](../docs/delivery/README.md)。
+[交付入口](../docs/reference/platforms/index.md)。
 
 | 目录 | 责任 |
 | --- | --- |

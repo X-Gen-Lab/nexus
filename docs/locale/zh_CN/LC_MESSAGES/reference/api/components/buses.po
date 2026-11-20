@@ -1,0 +1,1303 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 3b5d7ba012623e9e50b19e5a0be2c7c69afd61f4fb9b55fa1f841f68bbf572a1\n"
+
+#: ../../../../../../docs/reference/api/components/buses.md:10
+msgid "Software buses and bounded bus protocols"
+msgstr "软件总线与有界总线协议"
+
+#: ../../../../../../docs/reference/api/components/buses.md:12
+msgid ""
+"These optional C11 components use already selected public I/O faces. The "
+"caller owns static storage, serialized progress, finite deadlines, outer "
+"resource lifetimes and recovery. No implicit worker or additional "
+"configuration authority is created."
+msgstr ""
+"这些可选 C11 组件使用已选定的公共 I/O "
+"接口。调用者负责静态存储、串行化推进、有限截止时间、外层资源生命周期和恢复。组件不创建隐式工作线程或额外配置权威。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:0
+msgid "Target"
+msgstr "目标"
+
+#: ../../../../../../docs/reference/api/components/buses.md:0
+msgid "Public header under `nexus/components/`"
+msgstr "`nexus/components/` 下的公共头文件"
+
+#: ../../../../../../docs/reference/api/components/buses.md:0
+msgid "Contract"
+msgstr "合同"
+
+#: ../../../../../../docs/reference/api/components/buses.md:0
+msgid "`Nexus::SoftwareI2C`, `Nexus::SoftwareSCCB`"
+msgstr "`Nexus::SoftwareI2C`, `Nexus::SoftwareSCCB`"
+
+#: ../../../../../../docs/reference/api/components/buses.md:0
+msgid "`software_i2c.h`, `software_sccb.h`"
+msgstr "`software_i2c.h`, `software_sccb.h`"
+
+#: ../../../../../../docs/reference/api/components/buses.md:0
+msgid ""
+"[Separate GPIO I2C and SCCB protocols](https://github.com/X-Gen-"
+"Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/components/buses/software_i2c/README.md)"
+msgstr ""
+"[相互独立的 GPIO I2C 与 SCCB 协议](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-SOURCE/components/buses/software_i2c/README.md)"
+
+#: ../../../../../../docs/reference/api/components/buses.md:0
+msgid "`Nexus::SMBus`"
+msgstr "`Nexus::SMBus`"
+
+#: ../../../../../../docs/reference/api/components/buses.md:0
+msgid "`smbus.h`"
+msgstr "`smbus.h`"
+
+#: ../../../../../../docs/reference/api/components/buses.md:0
+msgid ""
+"[Bounded packet PEC over an existing asynchronous I2C "
+"endpoint](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/components/buses/smbus/README.md)"
+msgstr ""
+"[现有异步 I2C 端点上的有界包 PEC](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-SOURCE/components/buses/smbus/README.md)"
+
+#: ../../../../../../docs/reference/api/components/buses.md:0
+msgid "`Nexus::SoftwareSPI`"
+msgstr "`Nexus::SoftwareSPI`"
+
+#: ../../../../../../docs/reference/api/components/buses.md:0
+msgid "`software_spi.h`"
+msgstr "`software_spi.h`"
+
+#: ../../../../../../docs/reference/api/components/buses.md:0
+msgid ""
+"[Bounded GPIO mode-zero SPI](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-SOURCE/components/buses/software_spi/README.md)"
+msgstr ""
+"[有界 GPIO 模式零 SPI](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-SOURCE/components/buses/software_spi/README.md)"
+
+#: ../../../../../../docs/reference/api/components/buses.md:0
+msgid "`Nexus::OneWire`"
+msgstr "`Nexus::OneWire`"
+
+#: ../../../../../../docs/reference/api/components/buses.md:0
+msgid "`onewire.h`"
+msgstr "`onewire.h`"
+
+#: ../../../../../../docs/reference/api/components/buses.md:0
+msgid ""
+"[Bounded GPIO slots and failed-withdrawal "
+"ownership](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/components/buses/onewire/README.md)"
+msgstr ""
+"[有界 GPIO 时隙与撤出失败后的所有权](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-SOURCE/components/buses/onewire/README.md)"
+
+#: ../../../../../../docs/reference/api/components/buses.md:25
+msgid ""
+"The optional component frames bounded packets over an already configured "
+"asynchronous I2C endpoint. Its generated companion reuses existing endpoint "
+"IDs; it does not qualify hardware SMBTYPE, timeout or ALERT operation. See "
+"the [component contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-SOURCE/components/buses/smbus/README.md) for "
+"`nexus_smbus_factory.h`, static binding and borrowing lifetimes."
+msgstr ""
+"此可选组件在已配置的异步 I2C 端点上封装有界包。其生成的配套文件复用现有端点 ID；不认定硬件 SMBTYPE、超时或 ALERT 操作的资格。有关"
+" `nexus_smbus_factory.h`、静态绑定和借用寿命，参见[组件合同](https://github.com/X-Gen-"
+"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/buses/smbus/README.md)。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:31
+msgid "Public declarations"
+msgstr "公共声明"
+
+#: ../../../../../../docs/reference/api/components/buses.md:33
+msgid "software_i2c.h"
+msgstr "software_i2c.h"
+
+#: ../../../../../../docs/reference/api/components/buses.md:35
+msgid "Bounded open-drain GPIO I2C with explicit bus withdrawal."
+msgstr "有界开漏 GPIO I2C，显式撤出总线。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:35
+#: ../../../../../../docs/reference/api/components/buses.md:41
+#: ../../../../../../docs/reference/api/components/buses.md:47
+#: ../../../../../../docs/reference/api/components/buses.md:53
+#: ../../../../../../docs/reference/api/components/buses.md:59
+msgid "Author  Nexus Team"
+msgstr "作者  Nexus Team"
+
+#: ../../../../../../docs/reference/api/components/buses.md:35
+#: ../../../../../../docs/reference/api/components/buses.md:41
+#: ../../../../../../docs/reference/api/components/buses.md:47
+#: ../../../../../../docs/reference/api/components/buses.md:53
+#: ../../../../../../docs/reference/api/components/buses.md:59
+#: ../../../../../../docs/reference/api/components/buses.md:65
+#: ../../../../../../docs/reference/api/components/buses.md:71
+msgid "Nexus Team"
+msgstr "Nexus Team"
+
+#: ../../../../../../docs/reference/api/components/buses.md:35
+#: ../../../../../../docs/reference/api/components/buses.md:41
+#: ../../../../../../docs/reference/api/components/buses.md:47
+#: ../../../../../../docs/reference/api/components/buses.md:53
+#: ../../../../../../docs/reference/api/components/buses.md:59
+#: ../../../../../../docs/reference/api/components/buses.md:65
+#: ../../../../../../docs/reference/api/components/buses.md:71
+msgid "Functions"
+msgstr "函数"
+
+#: ../../../../../../docs/reference/api/components/buses.md:35
+msgid "Bind strict I2C and observe released idle under a budget."
+msgstr "绑定严格 I2C，并在预算内观察已释放的空闲状态。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:35
+msgid ""
+"Invalid input or expired preflight touches no pin. Once a pin write is "
+"attempted, failure retains the same binding for explicit recovery/stop. Init"
+" is not physical bus proof."
+msgstr ""
+"输入无效或预检已过期时不触碰任何引脚。一旦尝试写引脚，失败就会保留相同绑定，以供显式 recovery/stop。Init 不证明物理总线状态。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:0
+msgid "Parameters"
+msgstr "参数"
+
+#: ../../../../../../docs/reference/api/components/buses.md:35
+msgid "[inout] Fresh zero/stopped disjoint owner"
+msgstr "[inout] 新的零初始化或已停止的所有者，存储互不重叠"
+
+#: ../../../../../../docs/reference/api/components/buses.md:35
+msgid "[in] Immutable wiring, alive through successful stop"
+msgstr "[in] 不可变接线配置，持续有效直至成功停止"
+
+#: ../../../../../../docs/reference/api/components/buses.md:35
+msgid "[in] Finite absolute time in config clock domain"
+msgstr "[in] config 时钟域内的有限绝对时间"
+
+#: ../../../../../../docs/reference/api/components/buses.md:0
+msgid "Returns"
+msgstr "返回值"
+
+#: ../../../../../../docs/reference/api/components/buses.md:35
+msgid "SUCCESS, INVALID, BUSY, TIMEOUT or GPIO/clock error"
+msgstr "SUCCESS、INVALID、BUSY、TIMEOUT 或 GPIO/时钟错误"
+
+#: ../../../../../../docs/reference/api/components/buses.md:35
+msgid "Project the synchronous strict-I2C face for one child."
+msgstr "为一个子端点投影同步严格 I2C 接口。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:35
+msgid ""
+"No discovery, allocation or hardware start. Face, child, owner, config and "
+"contexts outlive all calls. Transactions use 1..8 messages of 1..256 bytes, "
+"repeated START between messages and one final STOP. transferred counts "
+"completed payload bytes, excluding address phases; partial reads may remain "
+"on error. All spans release even when STOP fails, while the physical bus "
+"owner remains faulted and retained. Async submit/start are unsupported, "
+"never a stack fallback."
+msgstr ""
+"不发现、不分配内存，也不启动硬件。接口、子端点、所有者、配置和上下文的生命周期须覆盖所有调用。事务包含 1..8 条消息，每条 1..256 "
+"字节；消息间使用重复 START，最后发送一次 STOP。transferred 计数已完成的载荷字节，不含地址阶段；出错时可能保留部分读取结果。即使 "
+"STOP 失败，对所有缓冲区范围的借用也会结束，但物理总线所有者仍保持故障并保留。不支持异步 submit/start，绝不回退使用栈缓冲区。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:35
+msgid "[in] Immutable child, exact 7-bit address 08h..77h"
+msgstr "[in] 不可变子端点，精确 7 位地址范围为 08h..77h"
+
+#: ../../../../../../docs/reference/api/components/buses.md:35
+msgid "Shared-method value face, or zero for invalid/SCCB child"
+msgstr "共享方法的值类型接口；子端点无效或为 SCCB 时返回零"
+
+#: ../../../../../../docs/reference/api/components/buses.md:35
+msgid "Project exact controller identity and nonwaiting stop."
+msgstr "投影精确控制器身份及不等待的 stop。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:35
+msgid ""
+"Port recover has no deadline and is UNSUPPORTED. Its stop only "
+"releases/observes an already proved idle bus; otherwise BUSY retains "
+"ownership. Use the direct budgeted APIs below."
+msgstr ""
+"Port recover 不带截止时间，返回 UNSUPPORTED。其 stop 仅释放/观察已证明空闲的总线；否则返回 BUSY "
+"并保留所有权。请使用下方直接提供的带预算 API。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:35
+msgid "[inout] Stable physical owner"
+msgstr "[inout] 稳定的物理所有者"
+
+#: ../../../../../../docs/reference/api/components/buses.md:35
+msgid "Shared-method controller face; no hardware access"
+msgstr "共享方法的控制器接口；不访问硬件"
+
+#: ../../../../../../docs/reference/api/components/buses.md:35
+msgid "Explicitly attempt one protocol STOP under a new budget."
+msgstr "在新预算内显式尝试一次协议 STOP。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:35
+msgid ""
+"Caller first reestablishes exclusive bus ownership, including after "
+"arbitration, and joins foreign writers/controllers. This is one explicit "
+"STOP, never nine-clock bus clear, reset, transaction replay or clock-domain "
+"replacement."
+msgstr ""
+"调用方须先重新建立总线独占所有权，包括仲裁后，并汇合其他写入者/控制器。本操作仅显式发送一次 "
+"STOP，绝不进行九时钟总线清除、复位、事务重放或时钟域替换。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:35
+msgid "[inout] Same retained binding, with no active call"
+msgstr "[inout] 相同的保留绑定，当前无活动调用"
+
+#: ../../../../../../docs/reference/api/components/buses.md:35
+msgid "[in] Finite cleanup time in the same live clock domain"
+msgstr "[in] 同一有效时钟域内的有限清理时间"
+
+#: ../../../../../../docs/reference/api/components/buses.md:35
+msgid ""
+"SUCCESS only after STOP/idle observation; other errors retain the fault, "
+"immutable binding and external pin-owner duty"
+msgstr "仅观察到 STOP/空闲后返回 SUCCESS；其他错误保留故障、不可变绑定及外部引脚所有者责任"
+
+#: ../../../../../../docs/reference/api/components/buses.md:35
+msgid "Finish one explicit STOP and drop only a proved binding."
+msgstr "完成一次显式 STOP，仅解除已证明可解除的绑定。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:35
+msgid ""
+"Same exclusive-bus precondition as recover. No outer GPIO lease or Board "
+"modes are released here. Clock discontinuity cannot be repaired by a new "
+"numerical deadline."
+msgstr "总线独占前提与 recover 相同。此处不释放外层 GPIO 租约或 Board 模式。新的数值截止时间不能修复时钟不连续。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:35
+msgid "[inout] Same serialized wire owner"
+msgstr "[inout] 同一个串行使用的总线所有者"
+
+#: ../../../../../../docs/reference/api/components/buses.md:35
+msgid "[in] Finite cleanup budget, not an expired transfer one"
+msgstr "[in] 有限清理预算，不能使用已过期的传输预算"
+
+#: ../../../../../../docs/reference/api/components/buses.md:35
+msgid "SUCCESS, INVALID, BUSY or retained cleanup failure"
+msgstr "SUCCESS、INVALID、BUSY，或保留的清理失败"
+
+#: ../../../../../../docs/reference/api/components/buses.md:35
+msgid "Observe a retained bus fault without touching pins."
+msgstr "观察保留的总线故障，不触碰引脚。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:35
+msgid "[in] Stable owner or NULL"
+msgstr "[in] 稳定的所有者或 NULL"
+
+#: ../../../../../../docs/reference/api/components/buses.md:35
+msgid "True only for a non-NULL faulted owner"
+msgstr "仅当所有者非 NULL 且处于故障状态时返回 True"
+
+#: ../../../../../../docs/reference/api/components/buses.md:35
+msgid "Observe cleanup independently of the primary transfer error."
+msgstr "独立于主传输错误观察清理结果。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:35
+msgid "[in] Stable owner"
+msgstr "[in] 稳定的所有者"
+
+#: ../../../../../../docs/reference/api/components/buses.md:35
+msgid ""
+"Last cleanup outcome, STATE when arbitration forbade STOP, or INVALID for "
+"NULL"
+msgstr "最后一次清理结果；仲裁禁止 STOP 时为 STATE，NULL 时为 INVALID"
+
+#: ../../../../../../docs/reference/api/components/buses.md:35
+msgid "Exactly one authorized open-drain bit with actual input readback."
+msgstr "恰好一个获授权的开漏位，须读回实际输入。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:35
+#: ../../../../../../docs/reference/api/components/buses.md:41
+#: ../../../../../../docs/reference/api/components/buses.md:47
+#: ../../../../../../docs/reference/api/components/buses.md:53
+#: ../../../../../../docs/reference/api/components/buses.md:59
+#: ../../../../../../docs/reference/api/components/buses.md:65
+#: ../../../../../../docs/reference/api/components/buses.md:71
+msgid "Public Members"
+msgstr "公共成员"
+
+#: ../../../../../../docs/reference/api/components/buses.md:35
+msgid "Immutable single-controller two-wire electrical facts."
+msgstr "不可变的单控制器双线电气事实。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:35
+msgid ""
+"Both pins must already be open-drain outputs with external pull-ups and "
+"actual IDR readback. Writing one releases a line; it never drives a push-"
+"pull high. Caller owns mode, wiring, voltage and GPIO lifetime. "
+"half_period_us is a minimum 5..1000000 us phase, not measured bus frequency."
+" poll_limit is 1..1000000 observations per timed wait. No concurrent foreign"
+" controller, IRQ writer or clock/pin reconfiguration is permitted. "
+"Arbitration detection avoids forcing STOP after a collision; multi-"
+"controller operation and bus-clear pulses are not provided."
+msgstr ""
+"两个引脚必须已配置为开漏输出，配有外部上拉，并能读回实际 IDR。写一表示释放线路，绝不以推挽方式驱动高电平。调用方负责模式、接线、电压和 GPIO "
+"生命周期。half_period_us 表示最短 5..1000000 us 的相位时间，不是实测总线频率。poll_limit 为每次定时等待最多 "
+"1..1000000 次观察。不允许并发的其他控制器、IRQ 写入者或时钟/引脚重配置。仲裁检测避免碰撞后强制发送 "
+"STOP；不提供多控制器运行或总线清除脉冲。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:35
+msgid "Caller-owned physical wire owner, zero before first init."
+msgstr "调用方拥有的物理线路所有者，首次 init 前须清零。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:35
+msgid ""
+"One serialized task executor, no concurrent/reentrant call. No descriptors "
+"or payloads survive a synchronous return. An unproved STOP retains config, "
+"fault and pin ownership; no buffer loan is invented. Fields are "
+"implementation state. SCCB uses this same wire storage with an explicit "
+"distinct personality; it is never exposed as an I2C endpoint."
+msgstr ""
+"单个串行任务执行者，不允许并发/重入调用。同步返回后不保留对描述符或载荷的引用。未获证明的 STOP "
+"会保留配置、故障和引脚所有权；不会凭空建立缓冲区借用。字段属于实现状态。SCCB 以显式独立的协议类型使用同一线路存储，绝不暴露为 I2C 端点。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:35
+msgid "Immutable exact addressed child; not another bus owner."
+msgstr "精确且不可变的寻址子端点；不是另一个总线所有者。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:39
+msgid "software_sccb.h"
+msgstr "software_sccb.h"
+
+#: ../../../../../../docs/reference/api/components/buses.md:41
+msgid "Explicit two-wire SCCB register protocol, separate from I2C."
+msgstr "显式双线 SCCB 寄存器协议，与 I2C 分离。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:41
+msgid "Select the separate SCCB two-wire personality."
+msgstr "选择独立的 SCCB 双线协议类型。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:41
+msgid ""
+"Two-wire, one target, register8/data8 only. No SCCB_E, push-pull conflict "
+"mode or multi-target discovery. The ninth master-byte bit is released and "
+"ignored as Don't-Care. A completed waveform does not prove target ACK or "
+"presence."
+msgstr ""
+"仅支持双线、单目标和 register8/data8。不支持 SCCB_E、推挽冲突模式或多目标发现。主机发送字节的第九位释放，并按 "
+"Don't-Care 忽略。波形执行结束不证明目标已 ACK 或实际存在。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:41
+msgid "[inout] Fresh zero/stopped physical wire storage"
+msgstr "[inout] 新的零初始化或已停止的物理总线存储"
+
+#: ../../../../../../docs/reference/api/components/buses.md:41
+msgid "[in] Same stable open-drain/pull-up wire contract"
+msgstr "[in] 相同且稳定的开漏／上拉连线合同"
+
+#: ../../../../../../docs/reference/api/components/buses.md:41
+msgid "[in] Finite absolute initialization budget"
+msgstr "[in] 有限的绝对初始化预算"
+
+#: ../../../../../../docs/reference/api/components/buses.md:41
+msgid "Same binding/idle errors as strict I2C initialization"
+msgstr "绑定/空闲错误与严格 I2C 初始化相同"
+
+#: ../../../../../../docs/reference/api/components/buses.md:41
+msgid "Emit one three-phase SCCB register write."
+msgstr "发送一次三阶段 SCCB 寄存器写入。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:41
+msgid ""
+"Device meaning, identity/readback and side effects are external. SCCB "
+"Don't-Care never weakens a strict I2C face."
+msgstr "器件语义、身份/读回和副作用由外部负责。SCCB Don't-Care 绝不削弱严格 I2C 接口。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:41
+msgid "[in] Immutable child of an initialized SCCB owner"
+msgstr "[in] 已初始化 SCCB 所有者的不可变子端点"
+
+#: ../../../../../../docs/reference/api/components/buses.md:41
+msgid "[in] Exact eight-bit sub-address"
+msgstr "[in] 精确的 8 位子地址"
+
+#: ../../../../../../docs/reference/api/components/buses.md:41
+msgid "[in] Exact eight-bit register value"
+msgstr "[in] 精确的 8 位寄存器值"
+
+#: ../../../../../../docs/reference/api/components/buses.md:41
+msgid "[in] One finite budget through final STOP"
+msgstr "[in] 一个覆盖至最终 STOP 的有限预算"
+
+#: ../../../../../../docs/reference/api/components/buses.md:41
+msgid "SUCCESS for settled waveform, or exact wire/clock failure"
+msgstr "波形完全结束时返回 SUCCESS，或返回确切线路/时钟错误"
+
+#: ../../../../../../docs/reference/api/components/buses.md:41
+msgid "Pointer write then STOP-separated two-phase SCCB read."
+msgstr "先写指针，再执行由 STOP 分隔的两阶段 SCCB 读取。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:41
+msgid ""
+"Master emits logical-one NA after the read byte. There is no repeated-START "
+"substitution or ignored-I2C-NACK fallback. Recover/stop use the shared "
+"physical-owner budgeted APIs."
+msgstr ""
+"主机在读字节后发送逻辑一 NA。不替换为重复 START，也不通过忽略 I2C NACK 回退。Recover/stop 使用共享物理所有者的带预算 "
+"API。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:41
+msgid "[in] Immutable exact child on the same live wire owner"
+msgstr "[in] 同一个有效总线所有者上的精确不可变子端点"
+
+#: ../../../../../../docs/reference/api/components/buses.md:41
+msgid "[in] Eight-bit sub-address"
+msgstr "[in] 8 位子地址"
+
+#: ../../../../../../docs/reference/api/components/buses.md:41
+msgid "[out] Separate byte, unchanged on every error"
+msgstr "[out] 独立字节，任一错误时均保持不变"
+
+#: ../../../../../../docs/reference/api/components/buses.md:41
+msgid "[in] One finite budget for both cycles and final STOP"
+msgstr "[in] 两个周期及最终 STOP 共用一个有限预算"
+
+#: ../../../../../../docs/reference/api/components/buses.md:41
+msgid "SUCCESS only after a complete read and STOP; exact error"
+msgstr "仅完整读取并完成 STOP 后返回 SUCCESS；否则返回确切错误"
+
+#: ../../../../../../docs/reference/api/components/buses.md:41
+msgid "Immutable reviewed SCCB child, not an I2C address face."
+msgstr "不可变且经审阅的 SCCB 子端点，不是 I2C 地址接口。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:41
+msgid ""
+"write_id is an even 8-bit device ID; OV2640 uses 60h, with 61h for reading. "
+"No identity discovery or address fallback."
+msgstr "write_id 是偶数的 8 位器件 ID；OV2640 使用 60h，读取时使用 61h。不进行身份发现或地址回退。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:45
+msgid "software_spi.h"
+msgstr "software_spi.h"
+
+#: ../../../../../../docs/reference/api/components/buses.md:47
+msgid "Caller-owned bounded GPIO mode-zero SPI endpoint."
+msgstr "调用方拥有的有界 GPIO 模式零 SPI 端点。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:47
+msgid "Validate exact pins and establish inactive CS/clock/MOSI."
+msgstr "校验精确引脚，并将 CS、时钟和 MOSI 置于非活动状态。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:47
+msgid ""
+"Validation failure writes no pin. Once a pin write is attempted, failure "
+"retains the config and a faulted owner; retry recovery/stop before "
+"rebinding. No clock/IRQ/OS setup or physical electrical proof is inferred."
+msgstr ""
+"校验失败时不写入任何引脚。一旦尝试写引脚，失败后仍须保留 config "
+"和处于故障状态的所有者；重新绑定前先重试恢复或停止。不由此推断已完成时钟／IRQ／OS 设置，也不构成物理电气验证。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:47
+msgid "[inout] Fresh zero or successfully stopped owner"
+msgstr "[inout] 新的零初始化所有者，或已成功停止的所有者"
+
+#: ../../../../../../docs/reference/api/components/buses.md:47
+msgid "[in] Stable disjoint configuration; no copied pin state"
+msgstr "[in] 稳定且互不重叠的配置，不复制引脚状态"
+
+#: ../../../../../../docs/reference/api/components/buses.md:47
+msgid "SUCCESS, INVALID, BUSY, or the exact GPIO error"
+msgstr "SUCCESS、INVALID、BUSY，或确切 GPIO 错误"
+
+#: ../../../../../../docs/reference/api/components/buses.md:47
+msgid "Project the existing synchronous SPI endpoint face."
+msgstr "投影既有同步 SPI 端点接口。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:47
+msgid ""
+"Lookup allocates nothing and starts no hardware. The only supported endpoint"
+" method is polling transfer. Length is 1..max_bytes (at most 256); deadline "
+"must be finite. Exact in-place TX/RX is allowed, partial overlap is "
+"rejected. Output buffers can contain completed bytes on failure; transferred"
+" reports only complete bytes. Any active error latches a fault even when "
+"idle-pin cleanup succeeds."
+msgstr ""
+"查找不分配任何内存，也不启动硬件。端点仅支持轮询 transfer 方法。长度为 1..max_bytes（最多 256），deadline "
+"必须有限。允许 TX/RX 完全原地重叠，拒绝部分重叠。失败时输出缓冲区可能含有已完成字节；transferred "
+"仅报告完整字节。任何活动期间错误都会锁存故障，即使空闲引脚清理成功。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:47
+msgid "[inout] Owner storage that outlives the returned face"
+msgstr "[inout] 生命周期长于返回接口的所有者存储"
+
+#: ../../../../../../docs/reference/api/components/buses.md:47
+msgid "A value face with shared immutable methods"
+msgstr "共享不可变方法的值类型接口"
+
+#: ../../../../../../docs/reference/api/components/buses.md:47
+msgid "Project existing SPI owner recovery and stop methods."
+msgstr "投影既有 SPI 所有者的 recovery 和 stop 方法。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:47
+msgid ""
+"Recover/stop reject callback reentry, retry inactive CS, SCK-low and MOSI-"
+"low without replaying a byte, and preserve the original config on failure. "
+"Stop clears the binding only after all three writes succeed. Neither "
+"operation restores Board pad modes or ends an external GPIO lease."
+msgstr ""
+"Recover/stop 拒绝回调重入，重试将 CS 置为非选中态、SCK 置低、MOSI "
+"置低，不重放任何字节；失败时保留原配置。仅当三次写入全部成功，stop 才清除绑定。这两种操作都不恢复 Board 引脚模式，也不结束外部 GPIO "
+"租约。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:47
+msgid "[inout] Stable owner storage, never an endpoint substitute"
+msgstr "[inout] 稳定的所有者存储，绝不可用它代替端点"
+
+#: ../../../../../../docs/reference/api/components/buses.md:47
+msgid "Observe retained bus recovery responsibility."
+msgstr "观察保留的总线恢复责任。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:47
+msgid "[in] Stable single-task owner, or NULL"
+msgstr "[in] 稳定的单任务所有者或 NULL"
+
+#: ../../../../../../docs/reference/api/components/buses.md:47
+msgid "True only when a non-NULL owner has a latched fault"
+msgstr "仅当所有者非 NULL 且已锁存故障时返回 True"
+
+#: ../../../../../../docs/reference/api/components/buses.md:47
+msgid "One stable initialized GPIO face and exactly one authorized bit."
+msgstr "单个稳定且已初始化的 GPIO 接口，以及恰好一个获授权的位。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:47
+msgid "Immutable mode-zero, MSB-first, active-low-CS wiring."
+msgstr "不可变的模式零、MSB 优先、CS 低有效接线。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:47
+msgid ""
+"Caller owns pads, pull configuration and clock lifetime. Clock/MOSI/CS are "
+"outputs and MISO is an input. Known pin identities must be disjoint; aliases"
+" hidden behind different contexts remain the caller's responsibility. Delays"
+" are minimum microseconds, never a measured frequency or WCET. Each wait has"
+" at most poll_limit clock reads; a stalled clock fails rather than spinning "
+"indefinitely. All fields, faces and contexts stay alive and immutable "
+"through stop."
+msgstr ""
+"调用方负责引脚、上下拉配置和时钟生命周期。Clock/MOSI/CS 为输出，MISO "
+"为输入。已知引脚身份必须互不重叠；不同上下文隐藏的别名仍由调用方负责。延迟表示最短微秒数，绝非实测频率或 WCET。每次等待最多读取 "
+"poll_limit 次时钟；时钟停滞时失败，不会无限自旋。所有字段、接口和上下文必须保持存活且不可变，直至 stop 完成。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:47
+msgid "Exact zero-initialized single-task owner, without a worker."
+msgstr "精确零初始化的单任务所有者，不包含工作线程。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:47
+msgid ""
+"Fields are implementation state. No transfer retains a payload pointer after"
+" return. Failed GPIO withdrawal keeps the same pin owner faulted until "
+"recovery or stop succeeds. No concurrent, IRQ or reentrant calls are "
+"supported; a callback reentry is rejected BUSY before another pin write."
+msgstr ""
+"字段属于实现状态。传输返回后不保留载荷指针。GPIO 撤出失败会使同一引脚所有者保持故障，直至恢复或 stop 成功。不支持并发、IRQ "
+"或重入调用；回调重入会在再次写引脚前以 BUSY 拒绝。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:51
+msgid "onewire.h"
+msgstr "onewire.h"
+
+#: ../../../../../../docs/reference/api/components/buses.md:53
+msgid "Bounded standard-speed open-drain one-wire transactions."
+msgstr "有界标准速率开漏单总线事务。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:53
+msgid "Bind exact wiring and observe a released idle line under a budget."
+msgstr "绑定精确接线，并在预算内观察已释放的空闲线路。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:53
+msgid ""
+"Input/expired preflight is effect-free. After a pin write, failed withdrawal"
+" retains the binding for stop/recovery; no CPU buffer loan."
+msgstr "输入/已过期预算的预检无副作用。写引脚后，撤出失败会保留绑定以供 stop/recovery；不借出 CPU 缓冲区。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:53
+msgid "[inout] Stable zero/stopped disjoint state."
+msgstr "[inout] 稳定的零初始化／已停止状态，存储互不重叠。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:53
+msgid "[in] Immutable wiring, preconfigured externally."
+msgstr "[in] 不可变接线配置，已在外部预先配置。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:53
+msgid "[in] Finite absolute monotonic deadline."
+msgstr "[in] 有限的绝对单调截止时间。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:53
+msgid "SUCCESS, INVALID, BUSY, TIMEOUT or GPIO/clock failure."
+msgstr "SUCCESS、INVALID、BUSY、TIMEOUT 或 GPIO/时钟失败。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:53
+msgid "Reset/presence, send LSB-first bytes, then receive bounded bits."
+msgstr "复位/存在检测，发送 LSB 优先字节，再接收有界位数。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:53
+msgid ""
+"No buffers survive return; partial receive bytes may change on error. "
+"Failure releases the open-drain line and records cleanup separately. Failure"
+" to prove release retains physical ownership. No ROM discovery, parasite "
+"supply, strong pull-up, overdrive or multichannel registry."
+msgstr ""
+"返回后不保留对缓冲区的引用；出错时部分接收字节可能已改变。失败时释放开漏线路并单独记录清理结果。无法证明释放时仍保留物理所有权。不提供 ROM "
+"发现、寄生供电、强上拉、超速模式或多通道注册表。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:53
+msgid "[inout] Initialized serialized wire owner."
+msgstr "[inout] 已初始化并串行使用的总线所有者。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:53
+msgid "[in] Separate readable1..16 bytes, unchanged throughout call."
+msgstr "[in] 独立的 1..16 个可读字节，在整个调用期间保持不变。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:53
+msgid "[in] Exact transmitted length."
+msgstr "[in] 精确的发送长度。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:53
+msgid "[out] Separate writable ceil(rx_bits/8) bytes, or NULL if zero."
+msgstr "[out] 独立且可写的 ceil(rx_bits/8) 字节；数量为零时可为 NULL。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:53
+msgid "[in] Zero to128 bits; unused high bits are zero."
+msgstr "[in] 0 至 128 位；未使用的高位为零。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:53
+msgid "[in] Finite absolute time, not a relative timeout."
+msgstr "[in] 有限绝对时间，不是相对超时。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:53
+msgid "SUCCESS or bounded timing/context/state/GPIO error."
+msgstr "SUCCESS 或有界时序/上下文/状态/GPIO 错误。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:53
+msgid "Observe the same finite monotonic epoch without touching the wire."
+msgstr "观察同一有限单调时钟纪元，不触碰线路。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:53
+msgid "[inout] Stable initialized state, no overlapping executor."
+msgstr "[inout] 稳定的已初始化状态，无重叠执行者。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:53
+msgid "[out] Separate writable output, unchanged on failure."
+msgstr "[out] 独立可写输出，失败时保持不变。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:53
+msgid "SUCCESS or STATE/INVALID/IO; backward/NEVER readings fault epoch."
+msgstr "SUCCESS 或 STATE/INVALID/IO；时钟倒退/NEVER 读数使当前纪元故障。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:53
+msgid "Release/observe the line and close admission without a protocol reset."
+msgstr "释放/观察线路并关闭操作接纳，不进行协议复位。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:53
+msgid ""
+"No descriptors survive; a stopped sensor may continue autonomous work. "
+"Faulted withdrawal additionally holds the wire through 500us after physical "
+"high observation, then rechecks high and deadline. A short deadline or "
+"insufficient poll count retains the binding for recovery."
+msgstr ""
+"不保留描述符；已停止的传感器仍可能继续自主工作。故障撤出还须在观察到物理高电平后的 500us "
+"期间保留线路所有权，随后再次检查高电平与截止时间。截止时间过短或轮询次数不足会保留绑定以供恢复。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:53
+msgid "[inout] Same state, no active or reentrant caller."
+msgstr "[inout] 同一状态，无活动或重入调用方。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:53
+msgid "[in] Finite new withdrawal budget in the same live epoch."
+msgstr "[in] 同一有效纪元内新的有限撤出预算。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:53
+msgid "SUCCESS when released; failure retains binding and wire duty."
+msgstr "已释放时返回 SUCCESS；失败保留绑定及线路责任。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:53
+msgid "Dallas/Maxim CRC8 (reflected polynomial8Ch), initial accumulator0."
+msgstr "Dallas/Maxim CRC8（反射多项式 8Ch），累加器初值为 0。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:53
+msgid "[in] Readable bytes, NULL permitted only when length is zero."
+msgstr "[in] 可读字节；仅在长度为零时允许 NULL。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:53
+msgid "[in] Exact finite byte count."
+msgstr "[in] 精确且有限的字节数。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:53
+msgid "CRC8; zero for NULL. No mutation, allocation or timing dependence."
+msgstr "CRC8；NULL 时返回零。不修改数据、不分配内存，也不依赖时序。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:53
+msgid "Immutable electrical and monotonic-clock facts, borrowed until stop."
+msgstr "不可变的电气与单调时钟事实，借用至 stop 完成。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:53
+msgid ""
+"Exactly one preconfigured open-drain output, writing one releases it, actual"
+" input readback and an external pull-up are required. Only one serialized "
+"task executor controls this physical bus; no concurrent pin, clock, mode or "
+"configuration writer. poll_limit is1..1000000. Standard-speed timing uses "
+"fixed conservative slot targets and finite observed jitter windows. This "
+"detects overruns; it is not a WCET, electrical rise-time or physical "
+"qualification. No IRQ masks or worker."
+msgstr ""
+"恰好一个预配置的开漏输出；写一表示释放，必须具备实际输入读回和外部上拉。此物理总线仅由一个串行任务执行者控制；不允许并发的引脚、时钟、模式或配置写入者。poll_limit"
+" 为 1..1000000。标准速率时序使用固定的保守时隙目标和有限的观察抖动窗口。这可检测超限，但不构成 WCET、电气上升时间或物理资格证明。不屏蔽"
+" IRQ，不创建工作线程。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:53
+msgid "Stable caller-owned wire state, initially zero and never copied."
+msgstr "调用方拥有的稳定线路状态，初始为零且绝不复制。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:53
+msgid ""
+"Failed release retains this binding/fault, never caller buffers. Opaque "
+"GPIO/clock contexts stay live and disjoint through stop/joins. Clock "
+"discontinuity is terminal for transactions in this clock epoch."
+msgstr ""
+"释放失败会保留此绑定/故障，绝不保留调用方缓冲区。不透明 GPIO/时钟上下文须保持存活且互不重叠，直至 "
+"stop/汇合完成。时钟不连续对当前时钟纪元的事务是终止性故障。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:57
+msgid "smbus.h"
+msgstr "smbus.h"
+
+#: ../../../../../../docs/reference/api/components/buses.md:59
+msgid "Bounded packet PEC over one reviewed asynchronous I2C binding."
+msgstr "一个已审查异步 I2C 绑定上的有界包 PEC。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:59
+msgid "Defines"
+msgstr "宏定义"
+
+#: ../../../../../../docs/reference/api/components/buses.md:59
+#: ../../../../../../docs/reference/api/components/buses.md:65
+msgid "Typedefs"
+msgstr "类型定义"
+
+#: ../../../../../../docs/reference/api/components/buses.md:59
+#: ../../../../../../docs/reference/api/components/buses.md:65
+msgid "Enums"
+msgstr "枚举"
+
+#: ../../../../../../docs/reference/api/components/buses.md:59
+msgid "Received-packet integrity, readable only after acquire-SETTLED."
+msgstr "接收包的完整性，仅在以 acquire 语义观察到 SETTLED 后可读。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:59
+msgid ""
+"Writes remain NOT_CHECKED: an ACK does not prove peer PEC policy. CRC8 "
+"detects transmission errors; it provides no authentication."
+msgstr "写操作保持 NOT_CHECKED：ACK 不能证明对端的 PEC 策略。CRC8 检测传输错误，不提供身份认证。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:59
+#: ../../../../../../docs/reference/api/components/buses.md:65
+msgid "Values:"
+msgstr "取值："
+
+#: ../../../../../../docs/reference/api/components/buses.md:59
+msgid "Bind a preconfigured endpoint without opening or changing hardware."
+msgstr "绑定已预先配置的端点，不开启或更改硬件。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:59
+msgid ""
+"Task-only. Opaque provider control extents are externally disjoint from this"
+" adapter and every request/payload; public extents are checked."
+msgstr "仅限任务上下文。不透明提供方控制对象的范围须由外部保证与此适配器及每个请求/载荷互不重叠；公共范围会被检查。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:59
+msgid "[inout] Fresh zero or successfully stopped independent control."
+msgstr "[inout] 全新零初始化或已成功停止的独立控制对象。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:59
+msgid "[in] Immutable matching transport/address,08h..77h."
+msgstr "[in] 不可变且匹配的传输/地址，08h..77h。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:59
+msgid "SUCCESS or INVALID/UNSUPPORTED/CONTEXT/BUSY/EXHAUSTED."
+msgstr "SUCCESS 或 INVALID/UNSUPPORTED/CONTEXT/BUSY/EXHAUSTED。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:59
+msgid "Prepare write, read, or write/read with one terminal packet PEC."
+msgstr "准备写、读或写/读操作，使用一个位于包末尾的 PEC。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:59
+msgid ""
+"Task-only, no callback or payload access, hardware or PEC-tail writes. No "
+"SMBus command, dynamic block-count or product register policy."
+msgstr "仅限任务上下文，不调用回调、不访问载荷、不写硬件或 PEC 尾部。不提供 SMBus 命令、动态块计数或产品寄存器策略。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:59
+msgid "[in] Initialized adapter and unchanged transport generation."
+msgstr "[in] 已初始化的适配器和未改变的传输代次。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:59
+msgid "[inout] Initialized/consumed descriptor, disjoint from data."
+msgstr "[inout] 已初始化/已消耗且与数据不重叠的描述符。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:59
+msgid "[in] Immutable payload and optional explicit writable PEC tail."
+msgstr "[in] 不可变载荷及可选的显式可写 PEC 尾部。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:59
+msgid "[in] Writable payload and reserved PEC capacity."
+msgstr "[in] 可写载荷及为 PEC 预留的容量。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:59
+msgid "[in] Finite absolute Core deadline, unchanged clock domain."
+msgstr "[in] 有限的绝对 Core 截止时间，时钟域保持不变。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:59
+msgid "SUCCESS or INVALID/STATE/CONTEXT/BUSY; failure changes no packet."
+msgstr "SUCCESS 或 INVALID/STATE/CONTEXT/BUSY；失败不改变任何包。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:59
+msgid "Accept one packet before writing its PEC tail or submitting I2C."
+msgstr "先接受一个包，再写入其 PEC 尾部或提交 I2C。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:59
+msgid ""
+"Task-only, bounded. An inner start rejection after outer acceptance settles "
+"the outer request with that error; it never leaks a borrow."
+msgstr "仅限任务上下文，操作有界。外层接受后，若内层启动被拒绝，外层请求以该错误结清；绝不遗留未释放的借用。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:59
+msgid ""
+"SUCCESS is ACCEPTED; inspect acquire-SETTLED for final status. Rejection has"
+" no retained reference, PEC write or transport effect."
+msgstr ""
+"SUCCESS 表示 ACCEPTED；以 acquire 语义观察 SETTLED 获取最终状态。拒绝不会保留引用、写入 PEC 或产生传输效果。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:59
+msgid "Advance the existing I2C owner and observe its authoritative loan."
+msgstr "推进现有 I2C 所有者并观察其权威借用状态。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:59
+msgid ""
+"Task-only. QUARANTINED storage remains borrowed. Inner SETTLED must prove "
+"complete hardware/IRQ withdrawal before PEC verification and final outer "
+"publication. Only final packet SUCCESS validates RX."
+msgstr ""
+"仅限任务上下文。QUARANTINED 存储仍被借用。在验证 PEC 和最终发布外层结果之前，内层 SETTLED 必须证明硬件/IRQ "
+"已完整撤回。仅最终包结果为 SUCCESS 时 RX 才有效。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:59
+msgid ""
+"BUSY while borrowed, terminal packet result on settlement, or SUCCESS while "
+"idle; CONTEXT/STATE leaves existing ownership intact."
+msgstr "借用期间返回 BUSY，结清时返回包的终态结果，空闲时返回 SUCCESS；CONTEXT/STATE 保持现有所有权不变。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:59
+msgid "Request withdrawal without revoking wire-storage ownership."
+msgstr "请求撤回，不撤销总线字节存储的所有权。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:59
+msgid ""
+"Task-only. Already settled I2C wins a later cancel. Continue service until "
+"outer SETTLED, including after timeout or cancellation failure."
+msgstr "仅限任务上下文。已结清的 I2C 结果优先于后续取消。持续调用 service，直到外层 SETTLED；超时或取消失败后也必须如此。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:59
+msgid ""
+"SUCCESS for requested/already completed cancellation, otherwise the exact "
+"context, identity or underlying cancellation error."
+msgstr "已请求取消或取消已完成时返回 SUCCESS，否则返回确切的上下文错误、身份错误或底层取消错误。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:59
+msgid "Close packet admission and join this adapter's current request."
+msgstr "关闭包准入，并汇合此适配器的当前请求。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:59
+msgid ""
+"Task-only. This does not stop/reset the shared I2C controller or return its "
+"resources. Caller stops that independent owner after all consumers. Repeated"
+" successful stop is a no-op and does not call the transport."
+msgstr ""
+"仅限任务上下文。这不会停止/复位共享 I2C 控制器或归还其资源。调用方在所有消费者结束后停止该独立所有者。成功停止后再次停止为空操作，不调用传输。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:59
+msgid ""
+"SUCCESS after settlement, BUSY while withdrawal remains borrowed, otherwise "
+"CONTEXT/STATE. Failure retains the same binding/control."
+msgstr "结清后返回 SUCCESS，撤回期间仍被借用时返回 BUSY，否则返回 CONTEXT/STATE。失败保留同一绑定/控制对象。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:59
+msgid "One immutable transport and its exact seven-bit PEC address."
+msgstr "一个不可变传输及其精确的七位 PEC 地址。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:59
+msgid ""
+"Generated bindings derive all three fields from one I2C endpoint. Manual "
+"integration must supply the same wire address as the endpoint; an opaque "
+"endpoint does not provide runtime address authentication. "
+"Endpoint/controller identity is checked without opening hardware. Binding, "
+"faces, operations and opaque contexts outlive adapter stop. This is packet "
+"framing, not a hardware SMBTYPE/timeout/ALERT owner."
+msgstr ""
+"生成的绑定从同一个 I2C "
+"端点派生全部三个字段。手工集成必须提供与端点相同的总线地址；不透明端点不提供运行时地址认证。检查端点/控制器身份时不打开硬件。绑定、接口面、操作表和不透明上下文的寿命须超过适配器停止。这是包封装，不是硬件"
+" SMBTYPE/超时/ALERT 所有者。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:59
+msgid "Immutable payload and an explicitly writable terminal PEC byte."
+msgstr "不可变载荷和一个显式可写的末尾 PEC 字节。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:59
+msgid ""
+"Empty is {NULL,0,NULL}. Payload is1..32 bytes. A write-only packet requires "
+"pec == data + payload_bytes in the same actual contiguous wire allocation, "
+"with that tail writable. No const cast or payload copy is made. Write/read "
+"uses pec=NULL; its only PEC ends the RX."
+msgstr ""
+"空值为 {NULL,0,NULL}。载荷为 1..32 字节。仅写包要求 pec == data + "
+"payload_bytes，且位于同一实际连续总线存储分配内，该尾部必须可写。不进行 const 强制转换或载荷复制。写/读使用 "
+"pec=NULL；其唯一 PEC 位于 RX 末尾。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:59
+msgid "Caller-owned payload plus one byte reserved for received PEC."
+msgstr "调用方所有的载荷，加上为接收 PEC 预留的一个字节。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:59
+msgid ""
+"Empty is {NULL,0,0}. Payload is1..32 bytes and capacity covers at least "
+"payload_bytes+1. The whole capacity is disjoint from TX and all adapter, "
+"binding and transport metadata. RX bytes are untrusted until acquire-"
+"observed SETTLED reports SUCCESS and PEC_VALID."
+msgstr ""
+"空值为 {NULL,0,0}。载荷为 1..32 字节，capacity 至少覆盖 payload_bytes+1。整个 capacity 范围与 TX"
+" 以及全部适配器、绑定和传输元数据互不重叠。以 acquire 语义观察到的 SETTLED 报告 SUCCESS 和 PEC_VALID 之前，RX "
+"字节均不可信。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:59
+msgid "One finite packet, borrowed through acquire-observed SETTLED."
+msgstr "一个有限包，借用持续到以 acquire 语义观察到 SETTLED。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:59
+msgid ""
+"Initialize base before prepare. TX payload stays immutable; only the "
+"explicit PEC tail and RX wire storage may be written after acceptance. "
+"Successful transferred counts TX+RX payload bytes, excluding PEC and "
+"addresses. Errors report zero, with possible remote effects and partial RX "
+"writes. Never replay automatically or consume failed RX as valid. Fields are"
+" private after prepare; READY is bound to one owner epoch."
+msgstr ""
+"在 prepare 前初始化 base。TX 载荷保持不可变；接受后仅允许写入显式 PEC 尾部和 RX 总线存储。成功时 transferred 计入"
+" TX+RX 载荷字节，不含 PEC 和地址。错误报告零，但可能已产生远端效果和部分 RX 写入。绝不自动重放，也不将失败的 RX "
+"当作有效数据使用。prepare 后字段为私有；READY 绑定一个所有者 epoch。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:59
+msgid "Optional single-executor adapter; zero before its first initialize."
+msgstr "可选的单执行者适配器；首次 initialize 前置零。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:59
+msgid ""
+"Private control after initialization, never copied or zeroed to revoke a "
+"borrow. Exactly two message headers support the one repeated START; there is"
+" no payload scratch, queue, allocation, task or hidden retry. One unmasked "
+"task serializes calls and I2C execution. No reentry or direct competing "
+"submission through this binding while active. The Core clock domain and "
+"underlying I2C owner stay live until stop."
+msgstr ""
+"初始化后为私有控制对象，绝不通过复制或置零来撤销借用。恰好两个消息头支持一次 repeated "
+"START；不设载荷暂存区、队列、分配、任务或隐藏重试。一个未屏蔽中断的任务串行化调用与 I2C "
+"执行。活动期间不得重入，也不得通过此绑定直接竞争提交。Core 时钟域和底层 I2C 所有者须保持存活直到 stop。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:63
+msgid "i3c_controller.h"
+msgstr "i3c_controller.h"
+
+#: ../../../../../../docs/reference/api/components/buses.md:65
+msgid "Explicit bounded I3C discovery, transfers and event ownership."
+msgstr "显式有界的 I3C 发现、传输及事件所有权。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:65
+#: ../../../../../../docs/reference/api/components/buses.md:71
+msgid ""
+"Author  Nexus Team   Version  1.0.0   Date  2026-10-20   Copyright  "
+"Copyright (c) 2026 Nexus Team"
+msgstr ""
+"作者  Nexus Team   版本  1.0.0   日期  2026-10-20   版权  Copyright (c) 2026 Nexus "
+"Team"
+
+#: ../../../../../../docs/reference/api/components/buses.md:65
+#: ../../../../../../docs/reference/api/components/buses.md:71
+msgid "1.0.0"
+msgstr "1.0.0"
+
+#: ../../../../../../docs/reference/api/components/buses.md:65
+#: ../../../../../../docs/reference/api/components/buses.md:71
+msgid "2026-10-20"
+msgstr "2026-10-20"
+
+#: ../../../../../../docs/reference/api/components/buses.md:65
+#: ../../../../../../docs/reference/api/components/buses.md:71
+msgid "Copyright (c) 2026 Nexus Team"
+msgstr "Copyright (c) 2026 Nexus Team"
+
+#: ../../../../../../docs/reference/api/components/buses.md:65
+msgid "Prepare unused metadata without retaining its payload."
+msgstr "准备未使用的元数据，不取得载荷借用。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:65
+msgid ""
+"Serialized owner Thread. DISCOVER has no payload or target. PRIVATE permits "
+"1..65535 bytes. CCC permits only ENEC/DISEC broadcast/direct writes and "
+"direct GETMWL/GETMRL/GETPID/ GETBCR/GETDCR/GETSTATUS reads, with exact "
+"defined lengths. GETMRL uses two bytes, or three when confirmed BCR bit2 "
+"advertises an IBI payload. Address-changing, HDR and controller-handoff CCCs"
+" reject. All APIs require one serialized executor. Port and clock callbacks "
+"must not reenter the core, invoke application code or mutate retained state."
+" No ISR, allocation, OS lock or worker. Absolute deadlines use the injected "
+"clock."
+msgstr ""
+"由所有者 Thread 串行执行。DISCOVER 没有载荷或目标。PRIVATE 允许 1..65535 字节。CCC 仅允许 ENEC/DISEC "
+"广播／定向写入，以及具有精确定义长度的定向 GETMWL/GETMRL/GETPID/GETBCR/GETDCR/GETSTATUS 读取。GETMRL"
+" 使用两字节；若已确认 BCR 的 bit2 声明 IBI 载荷，则使用三字节。拒绝改变地址、HDR 及控制器交接 CCC。全部 API "
+"都要求唯一串行执行者。端口与时钟回调不得重入核心、调用应用代码或修改保留状态。不得在 ISR 中调用；不进行分配，不使用 OS "
+"锁或工作线程。绝对截止时间使用注入的时钟。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:65
+msgid "Admit a finite operation after cold validation and readiness."
+msgstr "经初始校验及就绪检查后接纳有限操作。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:65
+msgid ""
+"SUCCESS transfers the borrow. Rejection has no effects or retained "
+"references. Outputs cannot alias retained controller, port table, "
+"target/event storage, policy, request or payload. Port and clock context "
+"spans remain the caller's responsibility."
+msgstr ""
+"SUCCESS "
+"转移借用。拒绝不产生效果，也不保留引用。输出不得与保留的控制器、端口表、目标／事件存储、策略、请求或载荷形成别名。端口与时钟上下文范围仍由调用方负责。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:65
+msgid "Perform one bounded FIFO/event phase or one drain proof."
+msgstr "执行一个有界 FIFO／事件阶段，或一次排空证明。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:65
+msgid ""
+"Partial DAA, malformed observations and errors fault admission while "
+"retaining every known/tentative assigned address. Cancel/timeout/failed "
+"drain never release a loan. Failed quiescence stays QUARANTINED; continued "
+"service may recover. An event overflow returns OVERFLOW and latches its "
+"counter, without discarding an already retained queued event."
+msgstr ""
+"部分 DAA、畸形观察及错误使接纳进入故障状态，同时保留每个已知／暂定分配地址。取消、超时或排空失败绝不释放借用。静默证明失败时保持 "
+"QUARANTINED；继续 service 可以恢复。事件溢出返回 OVERFLOW 并锁存计数，不丢弃已保留的队列事件。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:65
+msgid "Request withdrawal using stable epoch before request dereference."
+msgstr "在解引用请求前，使用稳定纪元请求撤回。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:65
+msgid "Obtain only a confirmed target; tentative/retired records reject."
+msgstr "仅获取已确认目标；拒绝暂定／已退役记录。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:65
+msgid "Copy one retained event; EMPTY leaves output unchanged."
+msgstr "复制一个保留事件；EMPTY 时输出不变。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:65
+msgid "Copy saturating loss counters without clearing them."
+msgstr "复制饱和丢失计数器，不清零。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:65
+msgid "Close admission without changing loans, target identities or events."
+msgstr "关闭接纳，不更改借用、目标身份或事件。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:65
+msgid "Prove a whole-bus reset before invalidating dynamic addresses."
+msgstr "使动态地址失效前，证明已完成整条总线复位。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:65
+msgid ""
+"Requires closed admission. Hardware proof covers real wire, FIFO and IRQ "
+"quiescence AND every target's dynamic address invalidated. Peripheral reset "
+"or FIFO flush alone is never this proof. Failure preserves all loans and "
+"address records. Success settles outstanding work and invalidates endpoints;"
+" retained events preserve their old epochs for the caller."
+msgstr ""
+"要求接纳已关闭。硬件证明必须同时覆盖真实线路、FIFO、IRQ 静默，以及每个目标的动态地址均已失效。仅外设复位或 FIFO "
+"清空绝不构成此证明。失败保留全部借用与地址记录。成功使未完成工作结算并使端点失效；保留事件仍携带旧纪元供调用方处理。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:65
+msgid "Reopen an idle unfaulted pause; faults require explicit bus reset."
+msgstr "重新打开空闲且无故障的暂停；故障要求显式总线复位。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:65
+msgid "Close, withdraw and finally relinquish the unique controller."
+msgstr "关闭、撤回，最后放弃唯一控制器。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:65
+msgid ""
+"Active work or queued events return BUSY. Caller continues service, consumes"
+" events and retries. Assigned/tentative addresses or a fault return STATE "
+"until whole-bus reset proof invalidates them. Successful final wire/ "
+"FIFO/IRQ quiescence releases ownership, never reconstructing this object. "
+"Storage outlives copied endpoints and tickets."
+msgstr ""
+"活动工作或队列事件返回 BUSY。调用方须继续 service、消费事件并重试。存在已分配／暂定地址或故障时返回 "
+"STATE，直至整条总线复位证明使其失效。最终真实线路／FIFO／IRQ "
+"静默证明成功后释放所有权，不得重新构造此对象。存储须在所有复制的端点与票据存续期间保持有效。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:65
+msgid "Controller-bound confirmed target incarnation, never a factory ID."
+msgstr "绑定到控制器的已确认目标代次，绝不是工厂 ID。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:65
+msgid "Stable operation identity; controller outlives all copied controls."
+msgstr "稳定操作身份；控制器须在全部复制的控制存续期间保持有效。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:65
+msgid "Caller-owned finite operation; no implicit bus discovery."
+msgstr "调用方拥有的有限操作；不隐式发现总线。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:65
+msgid ""
+"Initialize base once with nx_request_initialize. Accepted metadata and "
+"payload stay borrowed until acquire SETTLED. TX stays immutable; transferred"
+" counts bytes handed to the FIFO, not acknowledged target effects. No replay"
+" after errors. Public fields are immutable throughout an accepted borrow."
+msgstr ""
+"仅使用 nx_request_initialize 初始化 base 一次。已接受元数据和载荷保持借用，直至以 acquire 观察 "
+"SETTLED。TX 保持不可变；transferred 统计交给 FIFO "
+"的字节，而不是目标已确认的效果。错误后不重放。在整个已接受借用期间，公共字段均不可变。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:65
+msgid "Copied event; no callback, target creation or hidden work."
+msgstr "复制的事件；不调用回调、不创建目标、不隐式执行工作。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:65
+msgid ""
+"IBI endpoint retains its exact confirmed target epoch. Confirmed BCR bit1 "
+"must advertise IBI. Bit2 requires 1..4 payload bytes including MDB; "
+"otherwise zero data bytes. HOT_JOIN carries no endpoint and only requests "
+"explicit caller-controlled discovery. Payload is at most four bytes, as in "
+"the selected H563 reference; no timestamp claim."
+msgstr ""
+"IBI 端点保留精确已确认目标纪元。已确认 BCR 的 bit1 必须声明 IBI 能力。bit2 置位时要求 1..4 字节载荷且包含 "
+"MDB；否则为零数据字节。HOT_JOIN 不携带端点，仅请求由调用方显式控制的发现。与所选 H563 参考一致，载荷最多四字节；不提供时间戳保证。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:65
+msgid "Explicit loss accounting; counters saturate rather than wrap."
+msgstr "显式丢失统计；计数器饱和而不回绕。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:69
+msgid "i3c_controller_storage.h"
+msgstr "i3c_controller_storage.h"
+
+#: ../../../../../../docs/reference/api/components/buses.md:71
+msgid "Caller storage and aggregate I3C hardware boundary."
+msgstr "调用方存储及聚合 I3C 硬件边界。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:71
+msgid "Bind unused zero storage and claim one controller."
+msgstr "绑定尚未使用且已零初始化的存储，并申领一个控制器。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:71
+msgid ""
+"Reject overlapping/unaligned/overflowing storage, duplicate PIDs/addresses, "
+"reserved I3C addresses and nonzero targets. The config value is copied and "
+"need not remain alive; its referenced storage and contexts remain live and "
+"separate from every request/payload/output. 48-bit PIDs are caller- "
+"authored, never selected by a factory. Positive event capacity and 1..8-byte"
+" service batches match this bounded SDR/IBI reference. No legacy I2C, DMA, "
+"HDR, target role, implicit discovery or hidden event worker."
+msgstr ""
+"拒绝重叠、未对齐、地址运算溢出的存储、重复 PID／地址、I3C 保留地址及非零目标。config "
+"值被复制，无需继续存活；但其引用的存储与上下文须保持存活，并与每个请求／载荷／输出分离。48 位 PID 由调用方编写，绝不由工厂选择。正数事件容量及 "
+"1..8 字节 service 批次对应此有界 SDR/IBI 参考。不支持传统 I2C、DMA、HDR、目标角色、隐式发现或隐藏事件工作线程。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:71
+msgid "Authored immutable target policy, not runtime factory discovery."
+msgstr "预先编写的不可变目标策略，不是运行时工厂发现。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:71
+msgid "Caller-owned target record, zero-initialized once."
+msgstr "调用方拥有的目标记录，仅零初始化一次。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:71
+msgid ""
+"Core retains tentative and confirmed addresses on DAA error. Epoch never "
+"resets or wraps, including after bus reset."
+msgstr "DAA 出错时核心保留暂定及已确认地址。纪元从不重置或回绕，包括总线复位后。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:71
+msgid "Value command; begin copies it synchronously and retains no pointer."
+msgstr "值命令；begin 同步复制，不保留指针。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:71
+msgid "One bounded hardware observation and aggregate FIFO progress."
+msgstr "单次有界硬件观察及聚合 FIFO 进度。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:71
+msgid ""
+"No callback retains spans. tx/rx counts may not exceed the supplied "
+"capacities. DAA acknowledged confirms the preceding assignment BEFORE any "
+"next identity in this observation. A complete DAA with a tentative "
+"unacknowledged address is an error, never implicit success. Event data are "
+"fully copied."
+msgstr ""
+"任何回调均不保留跨度。tx/rx 计数不得超过提供的容量。本次观察中，DAA 确认必须先确认此前的地址分配，再处理下一个身份。若 DAA "
+"完成时仍有未确认的暂定地址，则是错误，绝不视为隐式成功。事件数据全部复制。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:71
+msgid "Synchronous bounded hardware leaves; no request forwarding."
+msgstr "同步有界硬件叶操作；不转发请求。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:71
+msgid ""
+"begin and assign are infallible commands. pump reports later hardware "
+"failures and services at most the supplied payload batch capacities, one "
+"fixed eight-byte DAA identity, one IBI and one hot-join latch. Identity "
+"metadata does not contribute to transmitted/received payload counts. No "
+"command or span is retained. No application code is called. withdraw "
+"requests abort. quiescent SUCCESS proves actual wire/FIFO/IRQ quiescence and"
+" all port observers detached."
+msgstr ""
+"begin 和 assign 是不会失败的命令。pump 报告后续硬件错误，每次最多处理给定载荷批次容量、一条固定八字节 DAA 身份、一条 IBI "
+"和一个 hot-join 锁存。身份元数据不计入 transmitted/received "
+"载荷计数。不保留命令或区间指针，不调用应用代码。withdraw 请求中止。quiescent SUCCESS 证明实际线上/FIFO/IRQ "
+"已静默，且所有端口观察者均已脱离。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:71
+msgid ""
+"reset additionally proves EVERY target dynamic address invalidated. FIFO "
+"flush or controller reset alone cannot report SUCCESS. BUSY/IO/UNSUPPORTED "
+"proof retains loans and ownership. release is infallible after successful "
+"final quiescence; it must not silently refuse ownership transfer or repeat a"
+" fallible proof while the core publishes join. The port context and supplied"
+" storage outlive observers."
+msgstr ""
+"reset 还必须证明每个目标的动态地址均已失效。仅刷新 FIFO 或复位控制器不得返回 SUCCESS。BUSY/IO/UNSUPPORTED "
+"证明保留借用和所有权。最终静默成功后的 release 不得失败；核心发布 join 时，它不得静默拒绝所有权转交，也不得重复执行可能失败的证明。端口 "
+"context 和所提供的存储必须存活到观察者全部退出之后。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:71
+msgid ""
+"All port/clock callbacks are non-reentrant: no core calls, application calls"
+" or mutation of retained core state. claim atomically acquires an exclusive "
+"controller and its IRQ/clock/pins. SUCCESS requires independently "
+"established proof that EVERY target dynamic address is invalidated, "
+"including targets still powered across MCU reset. The caller establishes "
+"this baseline before construction; claim never attempts an unproven reset. "
+"Rejection has no effects. ready is a read-only admission check."
+msgstr ""
+"全部端口／时钟回调均不可重入：不得调用核心、调用应用代码或修改核心保留状态。claim 原子地取得控制器及其 "
+"IRQ／时钟／引脚的独占所有权。SUCCESS 要求独立建立证明：每个目标的动态地址都已失效，包括 MCU "
+"复位期间仍保持供电的目标。调用方须在构造前建立此基线；claim 绝不尝试未经证明的复位。拒绝不产生效果。ready 是只读接纳检查。"
+
+#: ../../../../../../docs/reference/api/components/buses.md:71
+msgid "Exact caller capacities; separate static controller and target data."
+msgstr "调用方的精确容量；静态控制器与目标数据分离。"

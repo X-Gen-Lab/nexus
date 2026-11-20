@@ -1,0 +1,858 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 335a7b3d5cb3ab22a347480eba8bb3e16699bfcdf0cadc25075fc495a2261b06\n"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:10
+msgid "I2C messages, target exchanges and bus recovery"
+msgstr "I2C 消息、目标交换与总线恢复"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:12
+msgid ""
+"The endpoint owns its selected address and provider limits. Message "
+"construction, request preparation and hardware admission are separate "
+"operations; accepted descriptors and payloads remain borrowed until acquire-"
+"observed SETTLED."
+msgstr ""
+"端点拥有选定地址及 provider 限制。消息构造、请求准备和硬件准入是独立操作；已接受描述符及负载在以 acquire 语义观测到 SETTLED "
+"前持续借用。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:17
+msgid ""
+"I2C master descriptors use `nx_i2c_message_write()` for immutable TX and "
+"`nx_i2c_message_read()` for writable RX, without adding a second payload "
+"pointer. Construction performs no admission, allocation or payload access; "
+"prepare and provider admission still validate spans, limits and ownership. "
+"Rebuild a descriptor to change direction instead of changing `read` alone; "
+"the selected union member must match its direction. Accepted descriptors and"
+" payloads remain borrowed until acquire-observed SETTLED."
+msgstr ""
+"I2C master 描述符使用 `nx_i2c_message_write()` 绑定不可变 TX，使用 "
+"`nx_i2c_message_read()` 绑定可写 RX，不增加第二个 payload 指针。构造不执行准入、分配或 payload "
+"访问；prepare 与 provider 准入仍校验存储跨度、限额和所有权。切换方向时应重新构造描述符，不单独修改 `read`；所选 union "
+"成员必须与方向一致。已接纳描述符和 payload 持续借用，直到 acquire 观察 SETTLED。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:25
+msgid ""
+"I2C request preparation validates message grammar and storage; selected "
+"providers apply explicit `nx_i2c_limits_t` admission budgets. The maintained"
+" bounded profile remains eight messages of at most 256 bytes each, with a "
+"2048-byte total. A legal descriptor is not permission to exceed that "
+"profile. There is no separate long-transfer engine, implicit splitting or "
+"mode fallback."
+msgstr ""
+"I2C 请求准备验证消息语法与存储；所选 provider 使用明确的 `nx_i2c_limits_t` 准入预算。维护的有界 profile "
+"仍为至多八条消息，每条至多 256 字节，总计 2048 字节。描述符合法不授予超出该 profile 的权限。没有独立长传输引擎、隐式拆分或模式回退。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:31
+msgid ""
+"I2C target exchanges use `i2c_target.h` and borrow complete bounded "
+"requests. WRITE_READ supplies a precomputed response across one repeated "
+"START. The [F407 target contract](https://github.com/X-Gen-"
+"Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/soc/stm32/stm32f4/drivers/i2c/README-target.md) defines own "
+"addresses, optional PEC/ARA, IRQ latency and full drain. Product command "
+"tables, ARP and Host Notify remain external."
+msgstr ""
+"I2C target 交换通过 `i2c_target.h` 借用完整的有界请求。WRITE_READ 通过一次 repeated "
+"START，在接收后发送预计算响应。[F407 target 合同](https://github.com/X-Gen-"
+"Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/soc/stm32/stm32f4/drivers/i2c/README-target.md)定义自身地址、可选 PEC／ARA、IRQ "
+"延迟与完整排空。产品命令表、ARP 和 Host Notify 仍由外部提供。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:36
+msgid "Public declarations"
+msgstr "公共声明"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:38
+msgid "i2c.h"
+msgstr "i2c.h"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "Address endpoints, repeated START and explicit STOP settlement."
+msgstr "地址端点、重复 START 与显式 STOP 结清。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+#: ../../../../../../docs/reference/api/io/i2c.md:46
+#: ../../../../../../docs/reference/api/io/i2c.md:52
+msgid "Author  Nexus Team"
+msgstr "作者  Nexus Team"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+#: ../../../../../../docs/reference/api/io/i2c.md:46
+#: ../../../../../../docs/reference/api/io/i2c.md:52
+msgid "Nexus Team"
+msgstr "Nexus Team"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+#: ../../../../../../docs/reference/api/io/i2c.md:46
+#: ../../../../../../docs/reference/api/io/i2c.md:52
+msgid "Defines"
+msgstr "宏定义"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "Explicit bounded profile used by the current selected providers."
+msgstr "当前所选 provider 使用的显式有界 profile。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "These are implementation budgets, not I2C message grammar limits."
+msgstr "这些是实现预算，不是 I2C 消息语法上限。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+#: ../../../../../../docs/reference/api/io/i2c.md:46
+#: ../../../../../../docs/reference/api/io/i2c.md:52
+msgid "Functions"
+msgstr "函数"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "Describe immutable TX storage without borrowing or reading it."
+msgstr "描述不可变 TX 存储，不借用或读取数据。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "Pure task/IRQ construction, without allocation or hardware effects."
+msgstr "纯 task／IRQ 构造，不分配，不产生硬件作用。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:0
+msgid "Parameters"
+msgstr "参数"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "[in] Write payload, kept immutable throughout the transaction."
+msgstr "[in] 写入 payload，整次事务期间保持不可变。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "[in] Payload bytes; full bounds are checked before admission."
+msgstr "[in] payload 字节数；准入前检查完整边界。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:0
+msgid "Returns"
+msgstr "返回值"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "A write descriptor, owned by the caller until explicit submission."
+msgstr "写描述符，由调用者拥有，直到显式提交。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "Describe writable RX storage without borrowing or accessing it."
+msgstr "描述可写 RX 存储，不借用或访问数据。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid ""
+"Pure task/IRQ construction. A descriptor never converts const storage into a"
+" writable receive span; cancellation does not revoke its loan."
+msgstr "纯 task／IRQ 构造。描述符不会把 const 存储转成可写接收跨度；取消不撤销其借用。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "[in] Writable receive span, exclusively owned during transfer."
+msgstr "[in] 可写接收跨度，传输期间独占拥有。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "A read descriptor, owned by the caller until explicit submission."
+msgstr "读描述符，由调用者拥有，直到显式提交。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "Inspect the selected span without granting writable access."
+msgstr "查看所选跨度，不授予可写访问。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid ""
+"Pure task/IRQ view, no reference retention or payload access. A provider "
+"writes only buffer.rx after checking the read direction."
+msgstr "纯 task／IRQ 视图，不保留引用或访问 payload。provider 检查读方向后，仅写入 buffer.rx。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "[in] Live descriptor, immutable during this bounded access."
+msgstr "[in] 活跃描述符，在本次有界访问期间不可变。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "Selected payload address; the helper does not validate its bounds."
+msgstr "所选 payload 地址；helper 不验证其边界。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "Execute a polling transaction at the endpoint's address."
+msgstr "在端点的地址上执行轮询事务。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid ""
+"Task-only, one executor. No hidden scan or GPIO recovery. Descriptors, "
+"progress and payloads cannot overlap provider control metadata. Progress "
+"cannot alias descriptors or any payload; opposite-direction payloads must "
+"not overlap. Context or invalid storage/shape rejection leaves progress "
+"unchanged. Failed recovery never reports transfer success."
+msgstr ""
+"仅限任务上下文，由一个执行者负责。没有隐式扫描或 GPIO 恢复。描述符、进度输出和载荷不得与 provider "
+"控制元数据重叠。进度输出不得与描述符或任何载荷重叠；相反传输方向的载荷不得重叠。因上下文或存储／结构无效而拒绝时，进度输出保持不变。恢复失败绝不报告为传输成功。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "[in] Fixed address/controller binding."
+msgstr "[in] 固定的地址/控制器绑定。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "[inout] Message buffers; write data are not modified."
+msgstr "[inout] 消息缓冲区；写入方向的数据不会被修改。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "[in] Positive descriptor count within provider limits."
+msgstr "[in] provider 限额内的正描述符数量。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "[in] Finite absolute provider-clock deadline."
+msgstr "[in] provider 时钟域中的有限绝对 deadline。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid ""
+"[out] Provider byte progress across messages, including error returns. TX "
+"may count bytes handed to the data register before their wire/ACK outcome is"
+" known."
+msgstr ""
+"[out] provider 跨消息记录的字节进度，错误返回时也提供。TX 可能已统计交给数据寄存器的字节，而此时尚不知道线上传输或 ACK 结果。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid ""
+"Success or INVALID/UNSUPPORTED/CONTEXT/STATE/BUSY/TIMEOUT/ "
+"NACK/ARBITRATION/IO. Each message has a positive byte length within selected"
+" limits; any message may read or write. Return releases buffers after "
+"STOP/abort drain. Controller settlement does not establish bus recovery."
+msgstr ""
+"成功，或 "
+"INVALID／UNSUPPORTED／CONTEXT／STATE／BUSY／TIMEOUT／NACK／ARBITRATION／IO。每条消息的正字节长度须满足所选限额；各消息可以读或写。返回前在"
+" STOP／abort 排空后归还缓冲。控制器结清不证明总线已恢复。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "Recover an idle controller after a bus fault."
+msgstr "总线故障后恢复空闲控制器。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "[inout] Single executor, no live transaction/buffer borrow."
+msgstr "[inout] 唯一执行者；不存在活跃事务或缓冲区借用。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid ""
+"Success only when hardware bus idle is observed; otherwise "
+"BUSY/IO/UNSUPPORTED. Does not replay a failed transaction."
+msgstr "仅观察到硬件总线空闲时成功；否则返回 BUSY/IO/UNSUPPORTED。不重放失败事务。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "Prepare an unborrowed request without copying payload."
+msgstr "准备未借用请求，不复制载荷。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid ""
+"Payloads cannot overlap control storage, nor a read span overlap an "
+"immutable write span. Preparation checks grammar; the selected provider "
+"separately enforces admission limits. Task-only work is O(count squared) for"
+" alias checks."
+msgstr ""
+"payload 不得与控制存储重叠，读跨度不得与不可变写跨度重叠。准备检查语法；所选 provider "
+"另行执行准入限额检查。仅限任务，别名检查的工作量为 O(count squared)。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "[inout] Initialized READY or consumed SETTLED storage"
+msgstr "[inout] 已初始化的 READY 存储，或已消费的 SETTLED 存储"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "[inout] Complete caller-owned descriptors"
+msgstr "[inout] 调用者拥有的完整描述符"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "[in] Exact descriptor count"
+msgstr "[in] 精确的描述符数量"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "[in] Absolute provider-clock deadline"
+msgstr "[in] provider 时钟域中的绝对 deadline"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "SUCCESS, INVALID or STATE; no new loan"
+msgstr "SUCCESS、INVALID 或 STATE；不建立新借用"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "Validate finite descriptors and payload/control separation."
+msgstr "验证有限描述符以及载荷／控制存储分离。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid ""
+"Task-only grammar check with O(count squared) alias work. Provider validates"
+" its limits, state, context and DMA domains before acquiring any loan."
+msgstr ""
+"仅限任务的语法检查，别名工作量为 O(count squared)。provider 在取得任何借用前验证限额、状态、上下文与 DMA 域。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "[in] Complete caller-owned request, not retained"
+msgstr "[in] 完整且由调用方持有的请求，不予保留"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "SUCCESS or INVALID without mutation"
+msgstr "SUCCESS 或 INVALID，不修改输入"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "Validate grammar within explicit selected provider limits."
+msgstr "在明确的所选 provider 限额内校验语法。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid ""
+"Task-only preflight. Count is bounded before descriptors are scanned; "
+"payload lengths are checked before access. The provider still validates "
+"actual state and memory domains."
+msgstr "仅限任务的预检。扫描描述符前先限制 count；访问前检查 payload 长度。provider 仍检查实际状态与内存域。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "[in] Stable positive count, message and aggregate bounds"
+msgstr "[in] 稳定的正 count、消息和累计限额"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "SUCCESS, INVALID or UNSUPPORTED without mutation or a loan"
+msgstr "SUCCESS、INVALID 或 UNSUPPORTED，不修改输入，不建立借用"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "Admit one finite asynchronous repeated-START transaction."
+msgstr "准入一个有限、异步、重复 START 事务。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid ""
+"Selected modes declare DMA domains. DMA completion alone never establishes "
+"wire/STOP drain or borrow release. Any admitted abort requires explicit "
+"local recover before reuse; recovery never replays or pulses Board GPIO "
+"lines."
+msgstr ""
+"选中模式声明 DMA 域。仅 DMA 完成不能证明线上/STOP 排空或借用归还。任何已接受的中止均须先显式本地恢复才能复用；恢复不重放事务，也不在 "
+"Board GPIO 上产生脉冲。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "[in] Initialized fixed address and single executor"
+msgstr "[in] 已初始化的固定地址及唯一执行者"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "[inout] READY descriptor and all referenced storage"
+msgstr "[inout] READY 描述符及其引用的全部存储"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "SUCCESS means ACCEPTED; rejection retains no references"
+msgstr "SUCCESS 表示 ACCEPTED；拒绝不保留任何引用"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "Start an already borrowed QUEUED request without readmission."
+msgstr "启动已借用的 QUEUED 请求，不重复准入。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "Other errors require adapter settlement; no polling fallback."
+msgstr "其他错误要求由适配器结清；不回退为轮询。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "[in] Fixed address on the adapter's exact controller"
+msgstr "[in] 位于适配器精确控制器上的固定地址"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "[inout] Adapter-admitted QUEUED storage"
+msgstr "[inout] 经适配器准入的 QUEUED 存储"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "SUCCESS hands execution to provider; BUSY retains QUEUED"
+msgstr "SUCCESS 将执行权交给 provider；BUSY 保持 QUEUED"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "Prove controller identity without hardware effects."
+msgstr "证明控制器身份，不产生硬件效果。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "[in] Immutable addressed child"
+msgstr "[in] 不可变的带地址子对象"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "[in] Exact execution controller"
+msgstr "[in] 精确的执行控制器"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "True only for matching provider state and compatible methods"
+msgstr "仅当 provider 状态匹配且方法兼容时为真"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "Request cancellation without reclaiming any storage."
+msgstr "请求取消，不回收任何存储。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "[in] Same single executor as submit/service"
+msgstr "[in] 与 submit/service 相同的唯一执行者"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "[inout] Exact active descriptor, never a stale raw pointer"
+msgstr "[inout] 精确的活跃描述符，不得使用陈旧裸指针"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "SUCCESS begins drain; STATE for another request"
+msgstr "SUCCESS 开始排空；其他请求返回 STATE"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "Advance deadline and STOP/DMA drain in bounded task context."
+msgstr "在有界 Task 上下文处理截止时间，并推进 STOP/DMA 排空。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid ""
+"Final publication follows source detach and local wire idle. Drain failure "
+"quarantines all storage. This invokes no payload completion callback and "
+"never automatically replays."
+msgstr "最终发布发生在来源分离及本地线上空闲之后。排空失败会隔离全部存储。不调用 payload 完成回调，也绝不自动重放。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "[in] Live single executor, serviced throughout stop"
+msgstr "[in] 仍然有效的唯一执行者，在整个停止过程中持续调用 service"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "Close admission and stop only after every borrower drains."
+msgstr "关闭准入，全部借用者排空后才停止。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "[in] Controller with external producers quiesced"
+msgstr "[in] 外部生产者已静默的控制器"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "SUCCESS releases sources; BUSY requires continued service"
+msgstr "SUCCESS 证明来源已撤回；BUSY 要求继续 service"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "Attach one optional hint sink after actual IRQ policy checks."
+msgstr "检查实际 IRQ 策略后附加一个可选提示接收端。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "Task-only. Sink remains alive until successful stop/detach."
+msgstr "仅限任务上下文。sink 须保持有效，直到成功停止或分离。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "[in] Initialized asynchronous controller"
+msgstr "[in] 已初始化的异步控制器"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "[in] Borrowed sink or NULL to detach after publisher exit"
+msgstr "[in] 借用的 sink；或在发布者退出后使用 NULL 分离"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "[in] Cannot weaken selected kernel policy"
+msgstr "[in] 不得削弱选中的内核策略"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "SUCCESS or rejection before replacing any live binding"
+msgstr "返回 SUCCESS，或在替换任何活跃绑定前拒绝"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "Variables"
+msgstr "变量"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "Shared readonly profile; current providers retain their 8x256 budget."
+msgstr "共享只读 profile；当前 provider 保持 8x256 预算。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "Immutable selected admission limits, including aggregate progress."
+msgstr "不可变所选准入限额，包含累计进度上限。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid ""
+"All limits are positive. A provider checks them before retaining any request"
+" or touching hardware. They do not allocate payload storage."
+msgstr "全部限额为正。provider 在保留请求或访问硬件前检查限额；它们不分配 payload 存储。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+#: ../../../../../../docs/reference/api/io/i2c.md:46
+#: ../../../../../../docs/reference/api/io/i2c.md:52
+msgid "Public Members"
+msgstr "公共成员"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid ""
+"One message; a new message starts with repeated START, final with STOP."
+msgstr "一个消息；新消息以重复 START 开始，最后以 STOP 结束。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "Caller-owned finite message sequence."
+msgstr "调用者拥有的有限消息序列。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid ""
+"Descriptors and payloads remain borrowed until SETTLED. Writes stay "
+"immutable; reads receive into caller storage. Cancellation, deadlines and "
+"quarantine never revoke loans."
+msgstr ""
+"描述符与 payload 保持借用直到 SETTLED。写入数据保持不可变；读取数据写入调用方存储。取消、deadline 和隔离均不撤销借用。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "Shared read-only methods using one provider state."
+msgstr "使用同一个提供者状态的共享只读方法。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid ""
+"Methods follow each public operation's ownership contract. Missing optional "
+"methods report UNSUPPORTED."
+msgstr "各方法遵循对应公共操作的所有权合同。缺失的可选方法返回 UNSUPPORTED。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid "Immutable interface pointing to caller-owned state."
+msgstr "指向调用者自有状态的不可变接口。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:40
+msgid ""
+"Face and state outlive callers, IRQs and retained borrows. Factory lookup "
+"neither initializes nor acquires hardware."
+msgstr "接口和状态的生命周期覆盖调用方、IRQ 及保留的借用。工厂查找既不初始化，也不取得硬件。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:44
+msgid "i2c_bus_clear.h"
+msgstr "i2c_bus_clear.h"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:46
+msgid "Explicit open-drain I2C bus clear with retained leases."
+msgstr "显式开漏 I2C 总线清理，保留租约。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:46
+msgid "Maximum completed recovery low/high periods per attempt."
+msgstr "每次尝试中允许完成的恢复低／高电平周期上限。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:46
+msgid "Bind explicit electrical operations without touching pins."
+msgstr "绑定显式电气操作，不接触引脚。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:46
+msgid "[inout] Fresh zeroed session or a session with no lease."
+msgstr "[inout] 新的清零会话，或没有租约的会话。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:46
+msgid ""
+"[in] All five methods required; caller verifies electrical authorization "
+"rather than relying on generic GPIO APIs."
+msgstr "[in] 必须具备全部五个方法；调用方须验证电气授权，不能依赖通用 GPIO API 推定。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:46
+msgid "[in] Required bounded monotonic read in one boot domain."
+msgstr "[in] 必需的、有界的同一启动域内单调时间读取。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:46
+msgid "[in] Reviewed nonzero low/high/STOP/poll durations."
+msgstr "[in] 已审查且非零的低电平/高电平/STOP/轮询时长。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:46
+msgid ""
+"SUCCESS, INVALID or BUSY for a retained lease. Rejection leaves the session "
+"and external resources unchanged."
+msgstr "返回 SUCCESS、INVALID，或因保留租约而返回 BUSY。拒绝使会话及外部资源保持不变。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:46
+msgid "Clear one idle, authorized bus with at most nine pulses."
+msgstr "用至多九个脉冲清理一个空闲、已授权总线。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:46
+msgid ""
+"Task-only, all other bus users quiescent. Timing evidence and actual open-"
+"drain behavior require physical HIL."
+msgstr "仅限任务上下文，其他总线使用者均已静默。时序证据及实际开漏行为需要物理 HIL。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:46
+msgid "[inout] Initialized session with no retained lease."
+msgstr "[inout] 已初始化且无保留租约的会话。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:46
+msgid "[in] Finite absolute primary-operation deadline."
+msgstr "[in] 主要操作的有限绝对 deadline。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:46
+msgid ""
+"[in] Finite absolute STOP/lease deadline in the same clock domain, at or "
+"after deadline."
+msgstr "[in] 同一时钟域中的有限绝对 STOP/租约 deadline，不得早于 deadline。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:46
+msgid "[out] Independent primary/cleanup and retained effects."
+msgstr "[out] 独立的主要/清理结果及保留效果。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:46
+msgid ""
+"Primary failure, otherwise cleanup result. Invalid inputs and an existing "
+"lease reject without callbacks or changing result. An expired primary "
+"deadline has no pin effects. Each released SCL must be physically HIGH "
+"before timing its high period. A frozen/reversed clock reports IO and exits "
+"rather than spinning. Every acquired attempt performs explicit STOP cleanup "
+"under its independent budget; failed STOP or release method retains the "
+"lease. If release succeeds after its deadline, cleanup reports TIMEOUT with "
+"lease_held false to preserve actual returned ownership. It never replays the"
+" failed I2C transaction or retries recovery pulses."
+msgstr ""
+"主要操作失败时返回该失败，否则返回清理结果。无效输入或已有租约会被拒绝，不调用回调，也不改变 result。主要 deadline "
+"已到期时不产生引脚效果。每次释放 SCL 后，必须先观察到物理 HIGH，再计其高电平时长。时钟冻结或倒退时报告 IO "
+"并退出，不持续空转。每次已取得所有权的尝试均在独立预算内显式执行 STOP 清理；STOP 或 release 方法失败会保留租约。若 release "
+"在其 deadline 之后成功，清理报告 TIMEOUT，但 lease_held 为 false，以保留实际已经归还所有权的事实。绝不重放失败的 "
+"I2C 事务，也不重试恢复脉冲。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:46
+msgid "Retry only retained STOP cleanup and ownership return."
+msgstr "仅重试保留的 STOP 清理与所有权归还。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:46
+msgid "[inout] Initialized session with a retained lease."
+msgstr "[inout] 已初始化且保留租约的会话。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:46
+msgid "[in] New finite absolute cleanup deadline."
+msgstr "[in] 新的有限绝对清理 deadline。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:46
+msgid "[out] Preserved primary/pulse count and latest cleanup."
+msgstr "[out] 保留的主要结果/脉冲数及最新清理结果。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:46
+msgid ""
+"Latest cleanup result; INVALID/STATE rejects without effects. A proved STOP "
+"is not repeated after release fails. Failure retains the lease and must not "
+"trigger a new clear or transaction. Success does not change a failed primary"
+" operation into success."
+msgstr ""
+"返回最新清理结果；INVALID/STATE 拒绝且无效果。release 失败后，不重复已经证明完成的 "
+"STOP。失败保留租约，不得因此开始新的总线清理或事务。成功不会将主要操作的失败改为成功。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:46
+msgid "Read-only methods for an authorized two-pin GPIO handoff."
+msgstr "授权双引脚 GPIO 交接的只读方法。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:46
+msgid ""
+"Task-only, one executor. acquire is a bounded, nonblocking handoff: success "
+"proves the controller, DMA, IRQs, other masters and pin users quiescent, "
+"both physical pins exclusively leased in reviewed open-drain GPIO mode, with"
+" both lines released. Failure retains no lease or effects. drive only sinks "
+"LOW or releases a pin; false never means drive HIGH. When scl_low is true, "
+"drive establishes SCL LOW before changing SDA, including a retry from "
+"unknown previous pin state. sample reads physical levels, not output "
+"latches. Methods are bounded and preserve the lease on errors. release "
+"restores the saved peripheral/pin ownership only on success; failure retains"
+" all lease/storage responsibility. wait_until uses the injected clock's "
+"finite absolute domain and reaches target or reports an error within a "
+"caller- proved finite bound, even if the clock stops. Late waits cannot "
+"qualify an expired operation. No callback may recursively operate on this "
+"session or run a transaction. The adapter must verify reviewed open-drain, "
+"pull-up, voltage and two-pin authorization facts before acquire."
+msgstr ""
+"仅限任务上下文，由一个执行者负责。acquire "
+"是有界、非阻塞的交接：成功证明控制器、DMA、IRQ、其他主机及引脚使用者均已静默；两个物理引脚已按审查过的开漏 GPIO "
+"模式独占租用，且两根线均已释放。失败不保留租约或效果。drive 只拉 LOW 或释放引脚；false 绝不表示主动驱动 HIGH。scl_low 为 "
+"true 时，drive 先建立 SCL LOW，再改变 SDA，包括从未知先前引脚状态重试的情况。sample "
+"读取物理电平，而不是输出锁存值。方法均有界，错误时保留租约。release "
+"仅在成功时恢复保存的外设/引脚所有权；失败保留全部租约/存储责任。wait_until "
+"使用注入时钟中的有限绝对时间域，即使时钟停止，也须在调用方已证明的有限上界内到达 target "
+"或报告错误。迟到的等待不能使已到期操作获得资格。任何回调均不得递归操作本会话或运行事务。适配器在 acquire "
+"前必须验证经过审查的开漏、上拉、电压及双引脚授权事实。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:46
+msgid "Explicit immutable GPIO methods and caller-owned adapter state."
+msgstr "显式不可变 GPIO 方法与调用者拥有的适配器状态。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:46
+msgid "Caller-selected electrical timings in microseconds."
+msgstr "调用者选择的电气时序，单位为微秒。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:46
+msgid ""
+"All fields are nonzero. low/high bound each clear pulse; stop_setup bounds "
+"the observed SCL-high to SDA-release interval. stretch_poll bounds the "
+"interval between actual SCL samples. Values need board/device electrical "
+"review; the mechanism supplies no universal safe defaults."
+msgstr ""
+"全部字段均非零。low/high 约束每个清理脉冲；stop_setup 约束观察到 SCL 高电平至释放 SDA 的间隔。stretch_poll "
+"约束实际 SCL 采样之间的间隔。这些值需要板卡/器件电气审查；机制不提供通用安全默认值。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:46
+msgid "Independent recovery and STOP/ownership-return results."
+msgstr "分别记录恢复结果与 STOP／所有权归还结果。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:46
+msgid ""
+"pulses counts completed recovery low/high periods, not the STOP preparation "
+"edge. stop_observed proves the requested STOP sequence ended with both "
+"sampled lines HIGH. lease_held means the adapter, session and context must "
+"remain alive and no controller transaction may start. A cleanup failure "
+"never replaces the primary failure."
+msgstr ""
+"pulses 统计已完成的恢复低/高电平周期，不统计准备 STOP 的边沿。stop_observed 证明请求的 STOP "
+"序列结束时，两根线的采样均为 HIGH。lease_held 表示适配器、会话及上下文必须保持有效，且不得启动控制器事务。清理失败绝不替换主要失败。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:46
+msgid "Caller-owned, zero-initialized single-executor session."
+msgstr "调用者拥有、零初始化的单执行者会话。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:46
+msgid ""
+"Public fields are mechanism storage, not caller controls. Methods, context "
+"and clock outlive every retained lease. No allocation, worker, lock, "
+"transaction buffer or hidden retry exists. Abandoning a retained lease "
+"requires explicit product quarantine/reset responsibility."
+msgstr ""
+"公共字段用于机制内部存储，不是调用方控制项。方法、上下文及 clock "
+"的生命周期覆盖每个保留租约。不存在分配、worker、锁、事务缓冲区或隐式重试。放弃保留租约必须显式承接产品隔离/复位责任。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:50
+msgid "i2c_target.h"
+msgstr "i2c_target.h"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:52
+msgid "Finite I2C target exchanges and explicit SMBus responses."
+msgstr "有限 I2C target 交换与显式 SMBus 响应。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:52
+msgid "Typedefs"
+msgstr "类型定义"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:52
+msgid "One addressed receive, transmit, or receive/repeated-START transmit."
+msgstr "一次寻址后的接收、发送，或接收／repeated START 后发送。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:52
+msgid ""
+"ALERT_RESPONSE explicitly requests the SMBus ARA transaction and its "
+"provider-owned address byte. Its descriptor remains borrowed while expected "
+"ARA arbitration retries until success or a finite deadline."
+msgstr ""
+"ALERT_RESPONSE 显式请求 SMBus ARA 事务及 provider 拥有的地址字节。预期的 ARA 仲裁重试持续至成功或有限 "
+"deadline 到期；重试期间，其描述符始终被借用。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:52
+msgid "Observed hardware/protocol diagnostics, independent of byte counts."
+msgstr "观察到的硬件／协议诊断，与字节计数独立。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:52
+msgid "ARA arbitration is an expected retry and can accompany SUCCESS."
+msgstr "ARA 仲裁是预期重试，因而可能与 SUCCESS 同时出现。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:52
+msgid "Enums"
+msgstr "枚举"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:52
+msgid "Values:"
+msgstr "取值："
+
+#: ../../../../../../docs/reference/api/io/i2c.md:52
+msgid "Bind unborrowed spans and a finite deadline to one live generation."
+msgstr "将未被借用的 spans 和有限 deadline 绑定到一个活跃 generation。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:52
+msgid ""
+"Observing the existing System clock can maintain its shared counter; it "
+"never arms I2C acknowledgement or acquires another clock owner."
+msgstr "观察现有 System 时钟可以维护其共享计数器；它不启用 I2C 地址确认，也不取得另一份时钟 owner。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:52
+msgid "[in] Prepared static controller, privileged unmasked executor."
+msgstr "[in] 已准备的静态 controller，特权且未屏蔽中断的执行者。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:52
+msgid "[inout] Initialized or consumed SETTLED descriptor."
+msgstr "[inout] 已初始化，或已消费 SETTLED 的描述符。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:52
+msgid "[out] RX capacity bytes or NULL when the direction has no RX."
+msgstr "[out] RX capacity 个字节；方向没有 RX 时为 NULL。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:52
+msgid "[in] Positive bounded capacity, or zero without RX."
+msgstr "[in] 正数、有界的 capacity；没有 RX 时为零。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:52
+msgid "[in] Immutable response bytes, or NULL without caller TX."
+msgstr "[in] 不可变响应字节；没有调用者 TX 时为 NULL。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:52
+msgid "[in] Positive bounded response length, or zero without TX."
+msgstr "[in] 正数、有界的响应长度；没有 TX 时为零。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:52
+msgid "[in] Explicit finite wire sequence."
+msgstr "[in] 显式、有限的线上序列。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:52
+msgid ""
+"[in] Absolute Core deadline, including source withdrawal, in this live "
+"controller epoch. Expiry never revokes a retained borrow."
+msgstr "[in] 当前活跃 controller epoch 中的绝对 Core deadline，包括源撤回。到期绝不撤销已保留的借用。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:52
+msgid "SUCCESS or rejection with no new borrow or controller/pad writes."
+msgstr "SUCCESS 或拒绝；不建立新借用，也不写 controller／pad。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:52
+msgid "Accept one whole descriptor before enabling address acknowledgement."
+msgstr "在启用地址确认之前接受一份完整描述符。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:52
+msgid ""
+"Peer traffic begins after successful arming. SUCCESS transfers all spans "
+"until SETTLED, including start failures, cancellation and timeout. One "
+"privileged unmasked Thread executor calls service until settled."
+msgstr ""
+"成功 arm 后开始对端通信。SUCCESS 移交所有 spans 的借用，持续到 "
+"SETTLED，包括启动失败、取消和超时期间。同一个特权、未屏蔽中断的 Thread 执行者持续调用 service，直到结算。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:52
+msgid "Begin cancellation without revoking a borrow or replacing a result."
+msgstr "开始取消，不撤销借用或替换结果。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:52
+msgid "Bounded Thread progress; no worker, allocation or implicit replay."
+msgstr "有界 Thread 进展；没有 worker、分配或隐式重放。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:52
+msgid "Close admission and drain every source before controller release."
+msgstr "关闭准入，在释放 controller 前排空全部源。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:52
+msgid ""
+"Reset-based abort releases this controller's outputs/references; it does not"
+" certify shared-bus recovery or generate GPIO clock pulses."
+msgstr "基于 reset 的中止释放本 controller 的输出／引用；不证明共享总线已经恢复，也不产生 GPIO 时钟脉冲。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:52
+msgid "SUCCESS after withdrawal, BUSY/IO with retained cleanup duty."
+msgstr "撤回成功后返回 SUCCESS；BUSY／IO 保留清理责任。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:52
+msgid "Reinitialize an idle faulted owner without replaying old storage."
+msgstr "重新初始化空闲的故障 owner，不重放旧存储。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:52
+msgid ""
+"Once cold close starts, only close may release its retained receipt; "
+"recovery cannot rearm partially restored pads, clocks or IRQs."
+msgstr ""
+"冷态 close 一旦开始，只有 close 能释放其保留的收条；recover 不能重新 arm 部分恢复的 pad、clock 或 IRQ。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:52
+msgid "Complete caller-owned exchange borrowed through acquire-SETTLED."
+msgstr "调用者拥有的完整交换，持续借用至 acquire 观察 SETTLED。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:52
+msgid ""
+"All spans are disjoint from metadata, provider state and one another. RX "
+"capacity is 1..256 bytes; RECEIVE with PEC requires exactly this many "
+"payload bytes and a separate PEC. TX has 1..256 immutable bytes. WRITE_READ "
+"supplies a precomputed response after one repeated START; PEC spans both "
+"address directions and payloads, ending in TX PEC. Application "
+"register/protocol policy is external. ARA has no payload span. Counts "
+"exclude addresses/PEC; ARA completion counts one byte. "
+"Owner/generation/epoch are provider-written preparation identities. Result "
+"fields may be read only after acquire-observed SETTLED."
+msgstr ""
+"所有 spans 与元数据、provider state 及彼此均不重叠。RX capacity 为 1..256 字节；启用 PEC 的 "
+"RECEIVE 恰好接收该数量的 payload 字节，另加独立 PEC。TX 为 1..256 个不可变字节。WRITE_READ 在一次 "
+"repeated START 后提供预计算响应；PEC 连续覆盖两个方向的地址及 payload，最终以 TX PEC "
+"结束。应用寄存器／协议策略由外部提供。ARA 没有 payload span。计数排除地址／PEC；ARA "
+"完成按一个字节统计。owner／generation／epoch 是 provider 写入的准备身份。结果字段仅可在 acquire 观察 "
+"SETTLED 后读取。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:52
+msgid "Readonly methods shared by static single-executor controllers."
+msgstr "静态、单执行者 controller 共享的只读方法表。"
+
+#: ../../../../../../docs/reference/api/io/i2c.md:52
+msgid "Immutable existing controller face; lookup has no hardware effects."
+msgstr "已有 controller 的不可变 face；查询不产生硬件效果。"

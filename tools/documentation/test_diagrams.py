@@ -36,7 +36,7 @@ class DiagramContractTests(unittest.TestCase):
         self.registry()
         labels = {label: label for label in diagrams.LABEL.findall(
             self.source.read_text(encoding="utf-8"))}
-        (self.folder / "labels.json").write_text(json.dumps({
+        (self.folder / "sample.labels.json").write_text(json.dumps({
             "schema_version": 1, "en": labels, "zh_CN": labels}),
             encoding="utf-8")
 
@@ -60,7 +60,7 @@ class DiagramContractTests(unittest.TestCase):
 
     def test_registered_source_requires_label_policy_without_generated_outputs(self):
         self.source.with_suffix(".svg").write_bytes(self.render())
-        (self.folder / "labels.json").unlink()
+        (self.folder / "sample.labels.json").unlink()
         report = diagrams.check(self.root)
         self.assertTrue(any("label policy" in error for error in report["errors"]))
         self.assertFalse((self.folder / "localized").exists())
@@ -215,11 +215,11 @@ class DiagramContractTests(unittest.TestCase):
         self.registry()
         self.assertIn("missing SVG", " ".join(diagrams.check(self.root)["errors"]))
 
-    def test_unregistered_supplemental_source_is_still_verified(self):
+    def test_unregistered_source_is_rejected(self):
         self.source.with_suffix(".svg").write_bytes(self.render())
         (self.folder / "extra.dot").write_text('digraph Extra {}')
         report = diagrams.check(self.root)
-        self.assertIn("missing SVG", " ".join(report["errors"]))
+        self.assertIn("registry", " ".join(report["errors"]))
 
 
 if __name__ == "__main__":
