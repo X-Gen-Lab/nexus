@@ -11,6 +11,8 @@ source_language: zh_CN
 OS 提供有界等待、显式任务和同步存储，设备接口不依赖 scheduler。默认固件是 C11、
 静态装配、零平台堆；Native 的 pthread 库内部 bookkeeping 不构成 MCU 零堆证据。
 产品的任务角色、优先级、栈、队列容量、启动、停止、安全输出和恢复策略由外部工程拥有。
+本页描述当前分支已实现的公共接口；最终软件候选、SDK 消费和物理资格仍按各自
+实际执行结果验收，不由接口或本文档自动取得。
 
 ## 分层与依赖
 
@@ -20,16 +22,19 @@ OS 提供有界等待、显式任务和同步存储，设备接口不依赖 sche
 后端和完整平台边界见[FIG-01](../../../assets/diagrams/platform-architecture.svg)。
 - `Core` 保持无 OS/Arch 依赖。发布的 acquire/release 语义独立于内核。
 - `Arch` 拥有 CPU-local IRQ 掩码、原子操作和浅睡眠原语，不拥有 Tick、任务或设备。
-- `OS` 选择后端并检验其真实能力。公共 Wait 合同不包含任务创建、设备 service 或派发。
+- `OS` 以共同接口连接所选后端并检验真实能力；公共 Wait 本身不创建任务、推进设备或派发。
 - `SoC` 拥有时钟、控制器、实际 IRQ 和可用计时器；Board 拥有实际引脚、电气与外部器件。
 - `Product` 创建 owner/producer/coordinator，提供 timer/trace/fail-stop port，并启动 scheduler。
   `nx_platform_start()` 不替产品启动 scheduler。
 
-公共 Wait 是跨后端合同；任务、队列和内核专属能力仍显式使用后端类型，不伪装成所有
-RTOS 都提供同样的能力。生成的 typed factory 返回既有设备 face，不创建 OS 对象。
+业务通过公共 opaque 任务、通知、queue 和 channel 引用调用共同接口。定义静态存储的
+装配文件包含 `nexus/os/storage.h`，目标 include 路径提供所选后端的真实布局；不以
+最大 union、固定字节 TCB 池或第二套 sizeof 清单统一二进制大小。每个可执行文件只
+链接一个导出共同符号的后端，不增加运行时 OS 判断或分派表。专有能力继续使用明确
+扩展。生成的 typed factory 返回既有设备 face，不创建 OS 对象。
 
 Native entry 可以在 `pthread_create` 返回前执行。入口自己的 join 必须返回
-`BUSY`，且不能读取外部 owner 尚未发布的 pthread identity 或 started 状态。
+`CONTEXT`，且不能读取外部 owner 尚未发布的 pthread identity 或 started 状态。
 其他 start/join 操作仍由唯一外部 lifecycle owner 串行执行；这一修正不提供多 joiner
 或跨任务竞争 start 的能力。创建失败不保留 entry/context；资源耗尽与非法参数分别报告。
 
@@ -40,8 +45,9 @@ Native entry 可以在 `pthread_create` 返回前执行。入口自己的 join �
 唯一权威，通知序号不转移 payload 所有权。单 port 只有一个 waiter，允许后端合同内
 多个 publisher；从 arm 到 recheck 之间必须少于 2^32 次 wake。
 
-所有 deadline 是对应后端时钟域中的绝对单调微秒。Native 使用 `CLOCK_MONOTONIC`，
-FreeRTOS 使用 `nx_time_now_us()`，裸机使用初始化时提供的时钟。不得在活请求期间
+任务后端的 deadline 是 `nx_os_now_us()` 时钟域中的绝对单调微秒。Native 使用真实
+`CLOCK_MONOTONIC`，不混用外设模型的手动时钟；FreeRTOS／ThreadX 使用 Core
+`nx_time_now_us()`。裸机使用初始化时提供的时钟。不得在活请求期间
 切换时钟域。`NX_DEADLINE_NEVER` 真正表示无限等待，不把 UINT64_MAX 转成有限
 `timespec`。微秒表达不保证微秒调度精度；阻塞误差还包括 Tick 量化和调度延迟。
 
@@ -49,6 +55,9 @@ FreeRTOS 使用 `nx_time_now_us()`，裸机使用初始化时提供的时钟。�
 helper 在后端错误后保留一次最终 `ready` 检查：已观察到真实完成可以胜出。
 裸机未就绪返回 `BUSY`，调用方继续显式调度。队列立即可用的操作采用 try 语义；
 只有需要阻塞时才消耗 deadline，失败不改调用方输出。
+公共 queue 的 deadline 零表示 try，channel 关闭后发送和排空后的接收返回
+`CANCELLED`。有限 `nx_sleep_until` 已过期时立即成功，拒绝无限 sentinel；`yield`
+只提示调度，不承诺公平、指定下一任务或低优先级进度，两者都不创建 timer worker。
 
 `nx_wait_select()` 的校验和就绪扫描随候选数线性增长。每个 predicate 必须有界，
 不阻塞、不执行设备 service；调用者在成功消费后推进自己的 cursor，才能公平轮转。
@@ -68,21 +77,44 @@ ceiling；Baseline 按 PRIMASK port 合同检查实际 configurable IRQ。typed 
 和 priority policy 只约束所选 provider/backend/mode 已实现的通知路径；类型存在或
 ceiling 校验通过不建立新模式、新内核或实板 IRQ 资格。不支持的组合明确拒绝。
 
-NMI、HardFault 和内核专属异常不进入这些 kernel wake API。Task API 要求当前世界
-privileged Thread mode，运行时手工掩码已恢复、scheduler 未被挂起；启动阶段只允许
-所选 Port 的规范 bootstrap mask。数值相同不证明掩码所有权。拒绝应发生在修改对象、
-发布引用、创建内核对象之前。
+NMI、HardFault 和内核专属异常不进入这些 kernel wake API。MCU Task API 要求当前
+世界 privileged Thread mode，运行时手工掩码已恢复。阻塞、transfer、join 和 sleep
+只在合法运行任务且 scheduler 未挂起时执行；构造与非阻塞发布按各后端合法的
+task/bootstrap 范围执行，不依赖主动挂起内核后的专有可调用性。启动阶段只允许
+所选 Port 的规范 bootstrap mask；数值相同不证明掩码所有权。已有上下文检查在
+对象变更前拒绝违约调用，但不能代替外部生命周期和完整调用前提。
+
+`nx_notify_wake` 面向 task/bootstrap，`nx_notify_wake_from_isr` 面向受审硬件 IRQ；
+绑定后的 `port.wake` 保留该后端允许的 task/bootstrap/IRQ 发布域。Native 的 ISR
+入口返回 `CONTEXT`，POSIX signal handler 不能借用普通任务合同。
 
 只使用 CPU-local mask 不保护 SMP、DMA 对元数据写入或另一个安全世界的 publisher。
 IRQ sink 和 context 必须一直存在到实际 provider 停止并证明 publisher quiescent。
 
 ## 静态存储与任务
 
-每个任务显式提供 TCB、栈和 context。创建前按当前 Port 的初始 frame 和对齐要求
-校验实际栈容量；启动最低容量不能替代任务运行栈预算、异常嵌套 MSP 预算和 FP/MVE
+首次使用前将控制对象清零。任务通过选定布局声明对象，提供非空名称、字节栈容量和
+context；原生类型只留在装配、后端实现和明确扩展中。创建前按当前 Port 的初始
+frame 和对齐要求校验实际栈容量；启动最低容量不能替代任务运行栈预算、异常嵌套 MSP 预算和 FP/MVE
 context 预算。Native 栈须满足 pthread 平台下限并加上应用预算，不能继承成 MCU 成本。
 
-首次 scheduler 启动采用 cold privileged Thread/MSP 合同：`CONTROL.nPRIV=0`、
+逻辑任务优先级统一为高数值高优先级，由后端映射原生编号；ThreadX 原生优先级
+方向相反，不直接传给公共接口。Native 只接受逻辑优先级 0，不忽略不支持的等级或
+声称拥有 MCU 抢占保证。内核 tick、时间片与真实响应仍由所选后端和预算决定。
+
+应用通过 `nx_os_run` 显式进入真实 bootstrap，成功不返回；Platform start 仍不启动
+scheduler。Native 执行回调后停驻当前引导线程，保留其调用栈，不增加隐藏 coordinator；
+进程退出由应用明确决定。不同内核的 bootstrap 可调用范围分别维护，不能把运行态
+重新解释为冷态或在引导回调中等待未来任务。
+
+MCU 工程把静态存储声明与内核对象构造分开：先完成平台所需初始化，再从合法
+cold Thread/MSP 上下文调用 `nx_os_run`，在其 bootstrap 回调中初始化通知、
+queue／channel 并创建任务。FreeRTOS 静态创建可能留下所选 Port 的规范启动掩码，
+因此不能先创建这些对象，再要求 `nx_os_run` 把该状态当成干净入口；不要手工清掩码
+来绕过检查。引导回调可以构造对象，不能等待尚未运行的任务，也不能执行
+queue／channel transfer。
+
+MCU 首次 scheduler 启动采用 cold privileged Thread/MSP 合同：`CONTROL.nPRIV=0`、
 `SPSEL=0`、`FPCA=0`。启动前不得留下 active FP context 或把 main 切换到 PSP；调用方
 不能仅清掉标志来丢弃仍活跃的 FP 状态。MPU bootstrap guard 绑定真实 protected startup
 指令、基本 exception frame 与正确 EXC_RETURN，一次性 lease 在 restore 前消耗，重复
@@ -90,11 +122,19 @@ raw START SVC 不能再次取得启动权限。任务开始后的 FP/MVE 使用�
 不是禁用应用浮点能力；实际 context retention 仍需要硬件验收。
 
 可 join 任务返回后的机制由后端决定：FreeRTOS wrapper 发布完成后挂起，等待外部
-joiner 删除；Native entry 返回 pthread，由 `pthread_join` 证明线程退出；ThreadX
-wrapper 发布完成提示后返回内核 completion 路径，join 仍检查完成状态并执行删除。
+joiner 删除；Native entry 返回 pthread，由真实 try/monotonic clock-join 证明线程
+退出；ThreadX wrapper 发布完成提示后返回内核 completion 路径，join 仍检查完成状态并执行删除。
 三者均由唯一外部 lifecycle owner 完成 join；成功前不得重用 TCB/栈/context，
 join 超时保留全部存储。Native 禁止绕过 adapter 执行 `pthread_cancel`、detach
 或另外一次 join。完成提示本身不能替代后端的实际退出与引用撤离证明。
+公共入口为 `nx_task_join_until`。Native 有限等待使用可真实链接的 GNU clock-join，
+不在完成标志后调用无界 join；仅显式 `NX_DEADLINE_NEVER` 允许无限等待。
+
+仅 Native TSan 构建为检测器兼容采用另一条有限 join 路径：真实、受 TSan 拦截的
+`pthread_tryjoin_np` 配合 `CLOCK_MONOTONIC` 绝对睡眠，每次睡眠不超过 1 ms，且
+裁剪至原始 deadline，不因重试延长预算。普通构建保留 GNU clock-join 路径。该路径
+不屏蔽检测器报告，也不把 entry 完成标志当成线程退出；成功仍须真实内核会合，
+包括线程局部存储清理完成，之后才允许回收调用方存储。
 
 永久任务使用独立显式 API，entry 不得返回，control/stack/context 保留到 reset；它
 没有 completion semaphore、join 或 destroy。适用于产品确实具有永久生命周期的任务。
@@ -105,11 +145,13 @@ storage 一直存在到所有保存的 port 都不再可用。平台不隐式占
 
 ## 队列与关闭
 
-raw queue 保持原有最小存储和原生阻塞路径。绝对 deadline 入口复用同一时钟域，并
+公共 raw queue 保持最小存储和后端阻塞路径，不包含 close 广播。初始化要求真实
+`storage_bytes` 至少容纳 `depth * item_size`，完整声明容量跨度不得回绕或与完整控制
+对象重叠；不能仅检查有效 item 区间。绝对 deadline 入口复用同一时钟域，并
 避免连续操作把相对等待预算重复放大。较大数据优先排队稳定 slot/handle，而非在
 内核临界区复制整个 payload；slot 本身仍有明确借用和回收规则。
 
-可关闭队列使用单独 opt-in 类型和精确最大并发 waiter 数。每个并发阻塞操作持有独立
+可关闭 channel 使用单独 opt-in 类型和精确最大并发操作数。每个并发操作持有独立
 调用方 waiter 存储；close 停止 admission，锁存并唤醒已注册 waiter。关闭后旧 item
 可继续 drain，不能继续 send。destroy 需要 closed、drained、users/publishers quiescent。
 不得用 periodic polling 冒充立即关闭唤醒，也不得让 raw queue 默默承担这项成本。
@@ -118,11 +160,14 @@ FreeRTOS closable registry 仅供 task 使用，以 scheduler suspend/resume gua
 admission、waiter 注册/退出和 close 广播。内核 give 可能触发 yield，不能假设一个
 IRQ critical token 能跨越这个 yield 保持链表不变。maximum_waiters 预算 close 的
 调度暂停时间；单 item 复制与 latch give 的 IRQ 屏蔽时间另行测量，不能混为一个成本。
+Native 使用同一 mutex 下的条件变量广播和最小 waiter active guard，不复制 RTOS
+等待者链；同样检查 waiter 独占与最大并发操作数。raw queue 和 channel 的控制类型分开。
 
 ## 配置与成本
 
-平台 schema-2 和独立 runtime schema-1 TOML 的可选 `[os]` 只用于 FreeRTOS。
-`tools/configure/kernel.py` 是唯一政策解析源，生成不可变 `KernelProfileIR`。默认
+平台 schema-2 和独立 runtime schema-1 TOML 沿既有配置路径选择后端。FreeRTOS 的
+可选 `[os]` 由 `tools/configure/kernel.py` 解析为不可变 `KernelProfileIR`；ThreadX
+独立政策见[ThreadX 配置](threadx.md)。不为普通公共接口再增加配置权威。FreeRTOS 默认
 `standard` 延续 1 kHz/八级优先级/Idle 128 words/16-byte name；`minimal` 缩短
 name 与优先级列表并关闭未用同步能力；`diagnostic` 开 trace；`lowpower` 显式开
 custom tickless。生成的实际能力为准，不能用 profile 名推导芯片能力。
@@ -138,6 +183,8 @@ single 不接受作者显式设置此字段。CPU 的 `mpu_regions` 是物理事
 SysTick 使用真实 core clock，要求频率整除且 reload 在 24-bit 合法范围；外部 Tick
 必须实现强 `nx_freertos_external_tick_setup(uint32_t)`。runtime stats 必须实现
 counter start/now；缺失 hook 使链接失败，不提供伪时钟或永远为零的统计。
+内核的 mutex／counting semaphore 配置开关不自动建立公共对象 API；实际公共头和
+配置能力校验决定通用消费者能使用什么，不能从内核宏推导已维护接口。
 
 成本报告分开计算 Wait face、notify、raw/closable queue、每个 waiter、joinable/
 permanent TCB、调用方栈、Idle 栈和内核全局对象。保持现有 four-pointer Wait ABI；
@@ -168,9 +215,9 @@ init、进入 wait/send/receive 或释放存储。关闭和 join 仍须先完成
    和观察者存储均不可复用。业务 payload 还须满足其自身的其他借用合同。
 4. coordinator 请求 owner 停止并 join；同时确认 owner idle 包含 publication 已退出。
 5. 停止硬件 RX/IRQ publisher 并 detach wake；join 其他可能的发布者。
-6. 销毁 notification/queue/guard。Native/裸机随后可执行 platform stop；正在运行的
-   FreeRTOS 保留 platform 时钟和 Tick，coordinator 发布状态后挂起。产品通过显式
-   reset 或完整 scheduler-stop port 才能关闭内核基础设施，不能从 I/O idle 推导内核停止。
+6. 销毁 notification/queue/guard。仅在全部消费者退出且所选生命周期允许时停止
+   platform；正在运行的内核继续保留时钟和 Tick。没有通用 scheduler shutdown，
+   不能从 I/O idle、任务返回或普通停机接口推导内核已经停止。
 
 失败保留 storage，并由产品选择恢复。`QUARANTINED` 是仍有引用的状态，不是允许
 释放的终态。一次 destroy 返回 BUSY 只是防护，不替代未来 publisher 已停止的证明。
@@ -258,7 +305,7 @@ candidate、旧 ELF 和旧物理报告都不能自动授予新内核资格。产
 
 - 明确 startup/running/suspended/task/IRQ 上下文、scheduler 启动责任和中断政策。
 - 同域单调时钟、有限及无限 deadline、arm/recheck/wait race 和单 waiter 合同。
-- 每类对象的精确存储、对齐、初始化失败零副作用、关闭与 destroy 条件。
+- 每类对象的精确存储、对齐、干净拒绝无新增借用、部分清理失败保留资源及关闭／destroy 条件。
 - returning/permanent 任务生命周期、单 joiner、超时后引用保留和存储复用证明。
 - producer/owner stop 与 request drain 能继续进展，不用强制删除任务解除 borrow。
 - CPU Port/ABI/context save、实际源依赖、最小资源报告和 missing-hook 链接拒绝。
@@ -271,6 +318,7 @@ candidate、旧 ELF 和旧物理报告都不能自动授予新内核资格。产
 |---|---|
 | `BUSY` | 保持 storage；非阻塞调用方继续显式 service/pump 或按应用政策重试 |
 | `TIMEOUT` | 只结束本次等待预算；不能释放尚未 SETTLED 的 operation/bytes |
+| `CANCELLED` | channel 停止发送准入，已有 item 继续排空；仍需会合用户再销毁 |
 | `CONTEXT` | 先恢复合法任务/IRQ/掩码/scheduler 上下文，不在 guard 内重试 kernel |
 | `STATE` | 检查对象生命周期、close、stale ticket、receiver/index 和唯一所有者 |
 | `QUARANTINED` | 保留全部 borrow，owner 继续 recovery/drain，产品决定安全输出/reset |

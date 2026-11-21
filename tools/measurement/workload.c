@@ -11,7 +11,12 @@
 #include "nexus_config.h"
 #include "nexus_factory.h"
 #if defined(NEXUS_BACKEND_FREERTOS)
-#include "nexus/os/freertos.h"
+#include "nexus/os/storage.h"
+
+/** \brief Kernel bootstrap has no implicit product tasks in this workload. */
+static void kernel_startup(void* context) {
+    (void)context;
+}
 #endif
 
 /** \brief           Exercise only the explicitly selected resource fixture. */
@@ -54,7 +59,7 @@ int main(void) {
 #if defined(NEXUS_BACKEND_NATIVE)
     return nx_platform_stop() == NX_SUCCESS ? 0 : 8;
 #elif defined(NEXUS_BACKEND_FREERTOS)
-    vTaskStartScheduler();
+    (void)nx_os_run(kernel_startup, NULL);
     return 9;
 #else
     for (;;) {

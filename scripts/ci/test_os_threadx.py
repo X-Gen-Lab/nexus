@@ -78,7 +78,7 @@ class ThreadXGateTest(unittest.TestCase):
     def test_missing_retained_api_is_not_a_completed_board_link(self):
         with self.assertRaises(ValueError):
             self.gate().check_symbols(self.symbols().replace(
-                '08000100 T nx_threadx_task_start', ''))
+                '08000100 T nx_task_start', ''))
 
     def tick_entry(self):
         return ('08000100 <SysTick_Handler>:\n'

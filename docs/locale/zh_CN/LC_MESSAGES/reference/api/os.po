@@ -7,110 +7,769 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 19e814994c88793bf3d9239412ac824d2d225c205381fc12c400c87b01930a69\n"
+"X-Nexus-Source-SHA256: b7b04c220eac29829b7e46a45467c8beb132183d20129011939d61e6dd71f3d3\n"
 
-#: ../../../../../../docs/reference/api/os.md:8
-msgid "OS adapters: tasks, waits and explicit storage"
-msgstr "OS 适配器：任务、等待与显式存储"
+#: ../../../../docs/reference/api/os.md:8
+msgid "Portable OS tasks, waits and static storage"
+msgstr "可移植 OS：任务、等待与静态存储"
 
-#: ../../../../../../docs/reference/api/os.md:10
+#: ../../../../docs/reference/api/os.md:10
 msgid ""
 "These declarations come from public header files. Selection, lifecycle, "
 "supported execution modes and physical authorization remain bounded by the "
 "corresponding design and support records."
 msgstr "这些声明来自公共头文件。选择、生命周期、支持的执行模式和物理资源授权范围仍以对应设计及支持记录为准。"
 
-#: ../../../../../../docs/reference/api/os.md:14
-msgid "baremetal.h"
-msgstr "baremetal.h"
+#: ../../../../docs/reference/api/os.md:12
+msgid ""
+"Business code includes the common opaque task, notification, queue and "
+"channel interfaces. Assembly code includes `storage.h` for the selected "
+"backend's exact layout. Each executable links one backend implementation. "
+"Backend extensions remain explicit; these declarations do not establish "
+"final software or HIL qualification."
+msgstr ""
+"业务代码包含公共的不透明任务、通知、队列和通道接口。装配代码包含 "
+"`storage.h`，取得所选后端的精确布局。每个可执行文件只链接一个后端实现。后端扩展保持显式；这些声明不建立最终软件或 HIL 验收资格。"
 
-#: ../../../../../../docs/reference/api/os.md:16
-msgid "Bare-metal poll notification with caller-owned storage."
-msgstr "使用调用者存储的裸机轮询通知。"
+#: ../../../../docs/reference/api/os.md:20
+msgid "task.h"
+msgstr "task.h"
 
-#: ../../../../../../docs/reference/api/os.md:16
-#: ../../../../../../docs/reference/api/os.md:34
-#: ../../../../../../docs/reference/api/os.md:50
-#: ../../../../../../docs/reference/api/os.md:58
-#: ../../../../../../docs/reference/api/os.md:66
-#: ../../../../../../docs/reference/api/os.md:82
-#: ../../../../../../docs/reference/api/os.md:98
-#: ../../../../../../docs/reference/api/os.md:106
-#: ../../../../../../docs/reference/api/os.md:114
+#: ../../../../docs/reference/api/os.md:22
+msgid "Portable static tasks and absolute execution budgets."
+msgstr "可移植静态任务与绝对执行预算。"
+
+#: ../../../../docs/reference/api/os.md:22
+#: ../../../../docs/reference/api/os.md:30
+#: ../../../../docs/reference/api/os.md:38
+#: ../../../../docs/reference/api/os.md:46
+#: ../../../../docs/reference/api/os.md:54
+#: ../../../../docs/reference/api/os.md:62
+#: ../../../../docs/reference/api/os.md:80
+#: ../../../../docs/reference/api/os.md:96
+#: ../../../../docs/reference/api/os.md:104
+#: ../../../../docs/reference/api/os.md:112
+#: ../../../../docs/reference/api/os.md:136
+#: ../../../../docs/reference/api/os.md:144
+#: ../../../../docs/reference/api/os.md:152
 msgid "Author  Nexus Team"
 msgstr "作者  Nexus Team"
 
-#: ../../../../../../docs/reference/api/os.md:16
-#: ../../../../../../docs/reference/api/os.md:26
-#: ../../../../../../docs/reference/api/os.md:34
-#: ../../../../../../docs/reference/api/os.md:42
-#: ../../../../../../docs/reference/api/os.md:50
-#: ../../../../../../docs/reference/api/os.md:58
-#: ../../../../../../docs/reference/api/os.md:66
-#: ../../../../../../docs/reference/api/os.md:74
-#: ../../../../../../docs/reference/api/os.md:82
-#: ../../../../../../docs/reference/api/os.md:90
-#: ../../../../../../docs/reference/api/os.md:98
-#: ../../../../../../docs/reference/api/os.md:106
-#: ../../../../../../docs/reference/api/os.md:114
+#: ../../../../docs/reference/api/os.md:22
+#: ../../../../docs/reference/api/os.md:30
+#: ../../../../docs/reference/api/os.md:38
+#: ../../../../docs/reference/api/os.md:46
+#: ../../../../docs/reference/api/os.md:54
+#: ../../../../docs/reference/api/os.md:62
+#: ../../../../docs/reference/api/os.md:72
+#: ../../../../docs/reference/api/os.md:80
+#: ../../../../docs/reference/api/os.md:88
+#: ../../../../docs/reference/api/os.md:96
+#: ../../../../docs/reference/api/os.md:104
+#: ../../../../docs/reference/api/os.md:112
+#: ../../../../docs/reference/api/os.md:120
+#: ../../../../docs/reference/api/os.md:128
+#: ../../../../docs/reference/api/os.md:136
+#: ../../../../docs/reference/api/os.md:144
+#: ../../../../docs/reference/api/os.md:152
 msgid "Nexus Team"
 msgstr "Nexus Team"
 
-#: ../../../../../../docs/reference/api/os.md:16
-#: ../../../../../../docs/reference/api/os.md:26
-#: ../../../../../../docs/reference/api/os.md:34
-#: ../../../../../../docs/reference/api/os.md:42
-#: ../../../../../../docs/reference/api/os.md:50
-#: ../../../../../../docs/reference/api/os.md:58
-#: ../../../../../../docs/reference/api/os.md:66
-#: ../../../../../../docs/reference/api/os.md:74
-#: ../../../../../../docs/reference/api/os.md:82
-#: ../../../../../../docs/reference/api/os.md:90
-#: ../../../../../../docs/reference/api/os.md:98
-#: ../../../../../../docs/reference/api/os.md:106
-#: ../../../../../../docs/reference/api/os.md:114
+#: ../../../../docs/reference/api/os.md:22
+#: ../../../../docs/reference/api/os.md:30
+#: ../../../../docs/reference/api/os.md:38
+#: ../../../../docs/reference/api/os.md:46
+msgid "Typedefs"
+msgstr "类型定义"
+
+#: ../../../../docs/reference/api/os.md:22
+msgid "Returning task; only storage.h completes the selected layout."
+msgstr "可返回任务；仅 storage.h 补全所选后端布局。"
+
+#: ../../../../docs/reference/api/os.md:22
+msgid "Permanent task without join-completion storage."
+msgstr "永久任务，不包含 join 完成同步存储。"
+
+#: ../../../../docs/reference/api/os.md:22
+#: ../../../../docs/reference/api/os.md:30
+#: ../../../../docs/reference/api/os.md:38
+#: ../../../../docs/reference/api/os.md:46
+#: ../../../../docs/reference/api/os.md:62
+#: ../../../../docs/reference/api/os.md:72
+#: ../../../../docs/reference/api/os.md:80
+#: ../../../../docs/reference/api/os.md:88
+#: ../../../../docs/reference/api/os.md:96
+#: ../../../../docs/reference/api/os.md:104
+#: ../../../../docs/reference/api/os.md:112
+#: ../../../../docs/reference/api/os.md:120
+#: ../../../../docs/reference/api/os.md:128
+#: ../../../../docs/reference/api/os.md:136
+#: ../../../../docs/reference/api/os.md:144
+#: ../../../../docs/reference/api/os.md:152
 msgid "Functions"
 msgstr "函数"
 
-#: ../../../../../../docs/reference/api/os.md:16
+#: ../../../../docs/reference/api/os.md:22
+msgid "Enter the selected kernel through its real bootstrap."
+msgstr "通过所选内核的真实引导流程进入内核。"
+
+#: ../../../../docs/reference/api/os.md:22
+msgid ""
+"One cold privileged lifecycle owner. Platform startup is separate. Bootstrap"
+" only uses declared nonblocking object construction operations. Native parks"
+" this calling thread after startup; it does not create a hidden coordinator."
+" Kernel return cannot authorize resource reclamation."
+msgstr ""
+"由一个冷态特权生命周期所有者调用。Platform 启动与此分开。引导阶段仅使用明确允许的非阻塞对象构建操作。Native "
+"在启动回调结束后使调用线程驻留等待，不创建隐藏协调线程。内核返回不表示资源可以回收。"
+
+#: ../../../../docs/reference/api/os.md:0
+msgid "Parameters"
+msgstr "参数"
+
+#: ../../../../docs/reference/api/os.md:22
+msgid "[in] Non-NULL application bootstrap callback"
+msgstr "[in] 非 NULL 的应用引导回调"
+
+#: ../../../../docs/reference/api/os.md:22
+msgid "[in] Borrowed bootstrap context"
+msgstr "[in] 借用的引导上下文"
+
+#: ../../../../docs/reference/api/os.md:0
+msgid "Returns"
+msgstr "返回值"
+
+#: ../../../../docs/reference/api/os.md:22
+msgid "INVALID/CONTEXT before entry; success never returns"
+msgstr "进入前可返回 INVALID/CONTEXT；成功进入后不返回"
+
+#: ../../../../docs/reference/api/os.md:22
+msgid "Read the selected OS deadline domain in microseconds."
+msgstr "以微秒读取所选 OS 的截止时间域。"
+
+#: ../../../../docs/reference/api/os.md:22
+msgid ""
+"Native uses CLOCK_MONOTONIC, independent of model clocks; MCU backends use "
+"Core time. Keep the domain live through waits, drain and join. Zero alone "
+"does not prove readiness."
+msgstr ""
+"Native 使用 CLOCK_MONOTONIC，与模型时钟独立；MCU 后端使用 Core 时间。等待、排空和 join "
+"期间必须保持该时间域有效。仅凭零值不能证明时钟就绪。"
+
+#: ../../../../docs/reference/api/os.md:22
+msgid "Monotonic time; the physical clock must already be live"
+msgstr "单调时间；物理时钟必须已经有效运行"
+
+#: ../../../../docs/reference/api/os.md:22
+msgid "Start a returning task in caller-owned static storage."
+msgstr "在调用者拥有的静态存储中启动可返回任务。"
+
+#: ../../../../docs/reference/api/os.md:22
+msgid ""
+"Task/bootstrap only. Prepare all borrowed state before calling: entry may "
+"run before start returns. One external owner serializes start/join. Known "
+"control/stack overlap and wrapping spans reject before kernel effects. A "
+"cleanup failure retains its resources and the same object storage."
+msgstr ""
+"仅限任务／引导阶段。调用前准备好所有被借用的状态：入口可能在 start 返回前执行。由一个外部所有者串行执行 "
+"start/join。已知的控制对象／栈重叠及地址范围回绕在产生内核效果前拒绝。清理失败时保留相关资源及同一对象存储。"
+
+#: ../../../../docs/reference/api/os.md:22
+msgid "[inout] Zeroed unused object, retained until successful join"
+msgstr "[inout] 已清零的未使用对象，保留到 join 成功"
+
+#: ../../../../docs/reference/api/os.md:22
+msgid "[in] Nonempty name retained until join"
+msgstr "[in] 非空名称，保留到 join"
+
+#: ../../../../docs/reference/api/os.md:22
+msgid "[in] Aligned native stack array, retained until join"
+msgstr "[in] 对齐的原生栈数组，保留到 join"
+
+#: ../../../../docs/reference/api/os.md:22
+msgid "[in] Actual byte capacity, not a word count"
+msgstr "[in] 实际字节容量，不是字数"
+
+#: ../../../../docs/reference/api/os.md:22
+msgid "[in] Logical priority; larger values are higher"
+msgstr "[in] 逻辑优先级；数值越大，优先级越高"
+
+#: ../../../../docs/reference/api/os.md:22
+msgid "[in] Non-NULL application entry, allowed to return"
+msgstr "[in] 非 NULL 的应用入口，允许返回"
+
+#: ../../../../docs/reference/api/os.md:22
+msgid "[in] Entry context retained until successful join"
+msgstr "[in] 入口上下文，保留到 join 成功"
+
+#: ../../../../docs/reference/api/os.md:22
+msgid "SUCCESS or argument, context, creation or resource error"
+msgstr "SUCCESS，或参数、上下文、创建及资源错误"
+
+#: ../../../../docs/reference/api/os.md:22
+msgid "Join only after the actual kernel releases task references."
+msgstr "仅在真实内核解除任务引用后完成 join。"
+
+#: ../../../../docs/reference/api/os.md:22
+msgid ""
+"Running task only. No forced cancellation or detach. Entry return and "
+"completion notification do not replace join. Quiesce all other users before "
+"reclaiming caller storage."
+msgstr "仅限运行中的任务。不强制取消或 detach。入口返回和完成通知不能代替 join。回收调用者存储前，必须使其他所有使用者静默退出。"
+
+#: ../../../../docs/reference/api/os.md:22
+msgid "[inout] Live task, owned by one external joiner"
+msgstr "[inout] 有效任务，由一个外部 joiner 拥有"
+
+#: ../../../../docs/reference/api/os.md:22
+#: ../../../../docs/reference/api/os.md:38
+#: ../../../../docs/reference/api/os.md:46
+msgid "[in] Absolute OS deadline or NX_DEADLINE_NEVER"
+msgstr "[in] 绝对 OS 截止时间或 NX_DEADLINE_NEVER"
+
+#: ../../../../docs/reference/api/os.md:22
+msgid ""
+"SUCCESS permits reuse; TIMEOUT retains every resource; CONTEXT rejects self-"
+"join or an unsafe execution context"
+msgstr "SUCCESS 允许重用；TIMEOUT 保留全部资源；CONTEXT 拒绝 self-join 或不安全的执行上下文"
+
+#: ../../../../docs/reference/api/os.md:22
+msgid "Withdraw a task that has never executed before scheduling."
+msgstr "在调度前撤回从未执行过的任务。"
+
+#: ../../../../docs/reference/api/os.md:22
+msgid ""
+"Native tasks can execute immediately and reject this call. This operation "
+"never cancels or joins an executed task."
+msgstr "Native 任务可能立即执行，因此拒绝此调用。该操作绝不取消或 join 已经执行过的任务。"
+
+#: ../../../../docs/reference/api/os.md:22
+msgid "[inout] Created, unused task under its unique startup owner"
+msgstr "[inout] 已创建但未执行的任务，由唯一启动所有者管理"
+
+#: ../../../../docs/reference/api/os.md:22
+msgid ""
+"SUCCESS after actual deletion; CONTEXT outside the supported pre-scheduler "
+"phase; failure retains its references"
+msgstr "实际删除后返回 SUCCESS；超出所支持的调度器启动前阶段时返回 CONTEXT；失败时保留相关引用"
+
+#: ../../../../docs/reference/api/os.md:22
+msgid "Start a permanent task without a completion object."
+msgstr "启动不带完成对象的永久任务。"
+
+#: ../../../../docs/reference/api/os.md:22
+msgid ""
+"Task/bootstrap only. No join, destroy or detach is implied. Unexpected entry"
+" return enters fail-stop. Storage survives until reset or separately "
+"reviewed external termination."
+msgstr ""
+"仅限任务／引导阶段。不隐含 join、destroy 或 detach。入口意外返回将进入 fail-stop。存储保留到复位或另经审查的外部终止。"
+
+#: ../../../../docs/reference/api/os.md:22
+msgid "[inout] Zeroed unused static control"
+msgstr "[inout] 已清零的未使用静态控制对象"
+
+#: ../../../../docs/reference/api/os.md:22
+msgid "[in] Nonempty name retained for the task lifetime"
+msgstr "[in] 非空名称，保留整个任务生命周期"
+
+#: ../../../../docs/reference/api/os.md:22
+msgid "[in] Aligned caller stack retained for the lifetime"
+msgstr "[in] 对齐的调用者栈，保留整个生命周期"
+
+#: ../../../../docs/reference/api/os.md:22
+msgid "[in] Actual byte capacity"
+msgstr "[in] 实际字节容量"
+
+#: ../../../../docs/reference/api/os.md:22
+msgid "[in] Logical priority supported by the selected backend"
+msgstr "[in] 所选后端支持的逻辑优先级"
+
+#: ../../../../docs/reference/api/os.md:22
+msgid "[in] Application entry that must never return"
+msgstr "[in] 不得返回的应用入口"
+
+#: ../../../../docs/reference/api/os.md:22
+msgid "[in] Context retained for the task lifetime"
+msgstr "[in] 上下文，保留整个任务生命周期"
+
+#: ../../../../docs/reference/api/os.md:22
+msgid "SUCCESS or an admission/creation error"
+msgstr "SUCCESS，或准入／创建错误"
+
+#: ../../../../docs/reference/api/os.md:22
+msgid "Sleep until a finite absolute OS deadline."
+msgstr "休眠到有限的绝对 OS 截止时间。"
+
+#: ../../../../docs/reference/api/os.md:22
+msgid ""
+"Running task only. Expired deadlines return immediately. No device service "
+"or timer worker is implicit. Tick rounding and scheduling can delay return; "
+"precision is not one us."
+msgstr "仅限运行中的任务。截止时间已过期时立即返回。不隐含设备服务或定时器工作线程。Tick 取整和调度可能延迟返回，不保证 1 us 精度。"
+
+#: ../../../../docs/reference/api/os.md:22
+msgid "[in] Finite deadline in nx_os_now_us domain"
+msgstr "[in] nx_os_now_us 时间域中的有限截止时间"
+
+#: ../../../../docs/reference/api/os.md:22
+msgid ""
+"SUCCESS after expiration; INVALID for NX_DEADLINE_NEVER; CONTEXT when "
+"blocking is not permitted"
+msgstr "到期后返回 SUCCESS；NX_DEADLINE_NEVER 返回 INVALID；不允许阻塞时返回 CONTEXT"
+
+#: ../../../../docs/reference/api/os.md:22
+msgid "Offer a scheduling opportunity without fairness guarantees."
+msgstr "提供调度机会，不保证公平性。"
+
+#: ../../../../docs/reference/api/os.md:22
+msgid "No promise about the next task, lower priorities or progress."
+msgstr "不保证下一任务、低优先级任务或执行进度。"
+
+#: ../../../../docs/reference/api/os.md:22
+msgid "SUCCESS or CONTEXT outside an allowed running task"
+msgstr "SUCCESS，或在不允许的运行任务上下文中返回 CONTEXT"
+
+#: ../../../../docs/reference/api/os.md:28
+msgid "notify.h"
+msgstr "notify.h"
+
+#: ../../../../docs/reference/api/os.md:30
+msgid "Portable single-waiter latched notifications."
+msgstr "可移植的单等待者锁存通知。"
+
+#: ../../../../docs/reference/api/os.md:30
+msgid "Caller-owned notification with one waiter and multiple publishers."
+msgstr "调用者拥有的通知，支持一个等待者和多个发布者。"
+
+#: ../../../../docs/reference/api/os.md:30
+msgid "Initialize unused zeroed notification storage."
+msgstr "初始化已清零且未使用的通知存储。"
+
+#: ../../../../docs/reference/api/os.md:30
+msgid "Task/bootstrap only; one external lifecycle owner."
+msgstr "仅限任务／引导阶段；由一个外部生命周期所有者管理。"
+
+#: ../../../../docs/reference/api/os.md:30
+msgid "[inout] Object retained through all port users"
+msgstr "[inout] 对象，保留到所有端口使用者退出"
+
+#: ../../../../docs/reference/api/os.md:30
+msgid ""
+"SUCCESS or admission/initialization error; BUSY can retain resources that "
+"require destroy before retry"
+msgstr "SUCCESS 或准入／初始化错误；BUSY 可能保留资源，重试前必须先 destroy"
+
+#: ../../../../docs/reference/api/os.md:30
+msgid "Bind the existing sequence-hint wait protocol."
+msgstr "绑定现有的序列提示等待协议。"
+
+#: ../../../../docs/reference/api/os.md:30
+msgid ""
+"arm/wait have one owner. port.wake accepts only the backend's admitted "
+"task/bootstrap or hardware IRQ domain. Read authoritative predicates after "
+"hints. A timeout never releases request buffers. Fewer than 2^32 wakes may "
+"occur between arm and recheck; see wait.h for the full contract."
+msgstr ""
+"arm/wait 由一个所有者执行。port.wake 仅接受后端准许的任务／引导或硬件 IRQ "
+"发布域。收到提示后读取权威判定条件。超时绝不释放请求缓冲区。arm 与复查之间的唤醒次数必须少于 2^32；完整合同见 wait.h。"
+
+#: ../../../../docs/reference/api/os.md:30
+msgid "[inout] Live object, retained through all publishers"
+msgstr "[inout] 有效对象，保留到全部发布者退出"
+
+#: ../../../../docs/reference/api/os.md:30
+msgid "Wait port; an empty port for invalid/non-live storage"
+msgstr "等待端口；存储无效或未处于有效状态时返回空端口"
+
+#: ../../../../docs/reference/api/os.md:30
+msgid "Publish a task/bootstrap notification hint."
+msgstr "发布任务／引导阶段的通知提示。"
+
+#: ../../../../docs/reference/api/os.md:30
+msgid ""
+"Admission rejects before publication. A kernel error may follow a published "
+"hint and cannot revoke it. No transfer of business data ownership or "
+"completion proof is implied."
+msgstr "准入拒绝发生在发布之前。内核错误可能发生在提示已发布之后，不能撤回该提示。不隐含业务数据所有权转移或完成证明。"
+
+#: ../../../../docs/reference/api/os.md:30
+msgid "[inout] Live object with stable storage"
+msgstr "[inout] 具有稳定存储的有效对象"
+
+#: ../../../../docs/reference/api/os.md:30
+msgid "SUCCESS or an admission/kernel error"
+msgstr "SUCCESS，或准入／内核错误"
+
+#: ../../../../docs/reference/api/os.md:30
+msgid "Publish from a validated configurable hardware IRQ."
+msgstr "从经过验证的可配置硬件 IRQ 发布。"
+
+#: ../../../../docs/reference/api/os.md:30
+msgid ""
+"No blocking. Validate masks, actual IRQ bounds and kernel syscall priority "
+"before mutation. NMI/faults are unsupported."
+msgstr "不阻塞。在修改前检查掩码、实际 IRQ 范围及内核系统调用优先级。不支持 NMI／故障上下文。"
+
+#: ../../../../docs/reference/api/os.md:30
+msgid "[inout] Live object retained until IRQ quiescence"
+msgstr "[inout] 有效对象，保留到 IRQ 发布源静默"
+
+#: ../../../../docs/reference/api/os.md:30
+msgid "SUCCESS or INVALID/CONTEXT/error; Native returns CONTEXT"
+msgstr "SUCCESS，或 INVALID/CONTEXT/错误；Native 返回 CONTEXT"
+
+#: ../../../../docs/reference/api/os.md:30
+msgid "Destroy only after every publisher and waiter has exited."
+msgstr "仅在全部发布者和等待者退出后销毁。"
+
+#: ../../../../docs/reference/api/os.md:30
+msgid ""
+"Task lifecycle owner only. Busy checks cannot prevent a future caller racing"
+" destruction. After partial failure, retain storage and retry destroy, never"
+" reinitialize it."
+msgstr "仅限任务生命周期所有者。忙状态检查不能阻止未来调用者与销毁发生竞争。部分失败后保留存储并重试 destroy，绝不重新初始化。"
+
+#: ../../../../docs/reference/api/os.md:30
+msgid "[inout] Live object with no future users"
+msgstr "[inout] 有效对象，不再有后续使用者"
+
+#: ../../../../docs/reference/api/os.md:30
+msgid "SUCCESS or BUSY/error retaining outstanding resources"
+msgstr "SUCCESS，或保留未释放资源的 BUSY/错误"
+
+#: ../../../../docs/reference/api/os.md:36
+msgid "queue.h"
+msgstr "queue.h"
+
+#: ../../../../docs/reference/api/os.md:38
+msgid "Portable bounded byte-copy queues without close broadcasts."
+msgstr "可移植的有界字节复制队列，不包含关闭广播。"
+
+#: ../../../../docs/reference/api/os.md:38
+msgid "Caller-owned control; payload storage is supplied separately."
+msgstr "调用者拥有控制对象，数据存储另外提供。"
+
+#: ../../../../docs/reference/api/os.md:38
+msgid "Initialize an exact logical depth and item size."
+msgstr "初始化精确的逻辑深度和消息大小。"
+
+#: ../../../../docs/reference/api/os.md:38
+msgid ""
+"Task/bootstrap only. Reject multiplication/span overflow and complete "
+"control/payload overlap before kernel effects. No allocator or global pool. "
+"Partial cleanup retains storage."
+msgstr "仅限任务／引导阶段。在产生内核效果前拒绝乘法／地址范围溢出，以及完整控制对象与数据存储的重叠。没有分配器或全局池。部分清理失败时保留存储。"
+
+#: ../../../../docs/reference/api/os.md:38
+msgid "[inout] Unused zeroed control, retained until destroy"
+msgstr "[inout] 已清零的未使用控制对象，保留到 destroy"
+
+#: ../../../../docs/reference/api/os.md:38
+msgid "[in] Caller payload buffer, retained until destroy"
+msgstr "[in] 调用者数据缓冲区，保留到 destroy"
+
+#: ../../../../docs/reference/api/os.md:38
+#: ../../../../docs/reference/api/os.md:46
+msgid "[in] Actual capacity, at least depth * item_size"
+msgstr "[in] 实际容量，至少为 depth * item_size"
+
+#: ../../../../docs/reference/api/os.md:38
+msgid "[in] Positive number of items"
+msgstr "[in] 消息数量，必须大于零"
+
+#: ../../../../docs/reference/api/os.md:38
+msgid "[in] Positive number of bytes per item"
+msgstr "[in] 每条消息的字节数，必须大于零"
+
+#: ../../../../docs/reference/api/os.md:38
+#: ../../../../docs/reference/api/os.md:46
+msgid "SUCCESS or admission/initialization error"
+msgstr "SUCCESS，或准入／初始化错误"
+
+#: ../../../../docs/reference/api/os.md:38
+msgid "Copy an immediately available item before expiry."
+msgstr "先复制立即可用的消息，再考虑过期。"
+
+#: ../../../../docs/reference/api/os.md:38
+msgid ""
+"Running task only, including deadline zero (try). Copying a pointer does not"
+" transfer its payload ownership. No ISR API."
+msgstr "仅限运行中的任务，包括 deadline 为零的 try 操作。复制指针不会转移其数据所有权。没有 ISR API。"
+
+#: ../../../../docs/reference/api/os.md:38
+msgid "[inout] Live queue retained throughout the operation"
+msgstr "[inout] 存活队列，在整个操作期间保留"
+
+#: ../../../../docs/reference/api/os.md:38
+msgid "[in] item_size readable bytes, borrowed until return only"
+msgstr "[in] item_size 个可读字节，仅借用到本次调用返回"
+
+#: ../../../../docs/reference/api/os.md:38
+msgid "SUCCESS after copy; TIMEOUT or error retains no new item"
+msgstr "复制后返回 SUCCESS；TIMEOUT 或错误不保留本次新消息"
+
+#: ../../../../docs/reference/api/os.md:38
+msgid "Receive an available item before checking expiry."
+msgstr "先接收可用消息，再检查过期。"
+
+#: ../../../../docs/reference/api/os.md:38
+msgid "Running task only. Spurious wakes never renew the budget."
+msgstr "仅限运行中的任务。虚假唤醒绝不重新开始预算。"
+
+#: ../../../../docs/reference/api/os.md:38
+#: ../../../../docs/reference/api/os.md:46
+msgid "[out] item_size writable bytes, changed only on SUCCESS"
+msgstr "[out] item_size 个可写字节，仅在 SUCCESS 时修改"
+
+#: ../../../../docs/reference/api/os.md:38
+#: ../../../../docs/reference/api/os.md:46
+msgid "[in] Absolute OS deadline; zero means try"
+msgstr "[in] 绝对 OS 截止时间；零表示 try"
+
+#: ../../../../docs/reference/api/os.md:38
+msgid "SUCCESS, TIMEOUT or an admission/context/kernel error"
+msgstr "SUCCESS、TIMEOUT，或准入／上下文／内核错误"
+
+#: ../../../../docs/reference/api/os.md:38
+msgid "Destroy a drained queue after every user quiesces."
+msgstr "在所有使用者静默后销毁已排空队列。"
+
+#: ../../../../docs/reference/api/os.md:38
+msgid ""
+"One task/bootstrap lifecycle owner. No close broadcast is implied; "
+"applications must arrange caller termination."
+msgstr "由一个任务／引导阶段生命周期所有者管理。不隐含关闭广播；应用必须安排调用者退出。"
+
+#: ../../../../docs/reference/api/os.md:38
+msgid "[inout] Live control and payload, with no future calls"
+msgstr "[inout] 有效控制对象及数据存储，不再有后续调用"
+
+#: ../../../../docs/reference/api/os.md:38
+msgid "SUCCESS or BUSY/error retaining remaining resources"
+msgstr "SUCCESS，或保留剩余资源的 BUSY/错误"
+
+#: ../../../../docs/reference/api/os.md:44
+msgid "channel.h"
+msgstr "channel.h"
+
+#: ../../../../docs/reference/api/os.md:46
+msgid "Portable close-aware channels with caller-owned waiters."
+msgstr "可移植的可感知关闭通道，使用调用者拥有的等待者。"
+
+#: ../../../../docs/reference/api/os.md:46
+msgid "Static close-aware byte queue; ordinary queues remain separate."
+msgstr "可感知关闭的静态字节队列；普通队列保持独立。"
+
+#: ../../../../docs/reference/api/os.md:46
+msgid "One exclusive caller-owned latch per simultaneous channel call."
+msgstr "每个同时进行的通道调用都有独占的调用者锁存对象。"
+
+#: ../../../../docs/reference/api/os.md:46
+msgid "Initialize an unused operation waiter."
+msgstr "初始化尚未使用的操作等待者。"
+
+#: ../../../../docs/reference/api/os.md:46
+msgid "Task/bootstrap only; never share one active waiter."
+msgstr "仅限任务／引导阶段；绝不共享正在使用的等待者。"
+
+#: ../../../../docs/reference/api/os.md:46
+msgid "[inout] Zeroed storage retained until waiter destroy"
+msgstr "[inout] 已清零的存储，保留到等待者 destroy"
+
+#: ../../../../docs/reference/api/os.md:46
+msgid "Release an inactive waiter after its operation has returned."
+msgstr "在操作返回后释放非活动等待者。"
+
+#: ../../../../docs/reference/api/os.md:46
+msgid "One task lifecycle owner; failure never permits reuse."
+msgstr "由一个任务生命周期所有者管理；失败绝不允许重用。"
+
+#: ../../../../docs/reference/api/os.md:46
+msgid "[inout] Live exclusive storage with no future operation"
+msgstr "[inout] 有效的独占存储，不再有后续操作"
+
+#: ../../../../docs/reference/api/os.md:46
+msgid "SUCCESS or BUSY/error retaining resources"
+msgstr "SUCCESS，或保留资源的 BUSY/错误"
+
+#: ../../../../docs/reference/api/os.md:46
+msgid "Initialize a channel with explicit broadcast capacity."
+msgstr "初始化具有明确广播容量的通道。"
+
+#: ../../../../docs/reference/api/os.md:46
+msgid ""
+"Task/bootstrap only. Complete control/payload spans must not overlap or "
+"wrap. No hidden waiter pool or worker."
+msgstr "仅限任务／引导阶段。完整控制对象与数据缓冲区地址范围不得重叠或回绕。没有隐藏等待者池或工作线程。"
+
+#: ../../../../docs/reference/api/os.md:46
+msgid "[inout] Unused zeroed storage retained until destroy"
+msgstr "[inout] 已清零的未使用存储，保留到 destroy"
+
+#: ../../../../docs/reference/api/os.md:46
+msgid "[in] Payload buffer retained until destroy"
+msgstr "[in] 数据缓冲区，保留到 destroy"
+
+#: ../../../../docs/reference/api/os.md:46
+msgid "[in] Positive number of copied items"
+msgstr "[in] 复制消息的数量，必须大于零"
+
+#: ../../../../docs/reference/api/os.md:46
+msgid "[in] Positive bytes per item"
+msgstr "[in] 每条消息的字节数，必须大于零"
+
+#: ../../../../docs/reference/api/os.md:46
+msgid "[in] Positive maximum concurrent operations"
+msgstr "[in] 最大并发操作数，必须大于零"
+
+#: ../../../../docs/reference/api/os.md:46
+msgid "Close send admission and wake registered blockers."
+msgstr "关闭发送准入并唤醒已登记的阻塞者。"
+
+#: ../../../../docs/reference/api/os.md:46
+msgid ""
+"Task lifecycle owner. Existing items remain receivable. Close does not join "
+"users, destroy storage or cancel I/O."
+msgstr "由任务生命周期所有者调用。已有消息仍可接收。关闭不 join 使用者、不销毁存储，也不取消 I/O。"
+
+#: ../../../../docs/reference/api/os.md:46
+msgid "[inout] Live channel retained through all users"
+msgstr "[inout] 有效通道，保留到所有使用者退出"
+
+#: ../../../../docs/reference/api/os.md:46
+msgid "SUCCESS (idempotent) or admission/context error"
+msgstr "SUCCESS（幂等），或准入／上下文错误"
+
+#: ../../../../docs/reference/api/os.md:46
+msgid "Copy an item or observe close without periodic polling."
+msgstr "无需周期轮询即可复制消息或观察关闭。"
+
+#: ../../../../docs/reference/api/os.md:46
+msgid "Running task only. Closed sends never retain the item."
+msgstr "仅限运行中的任务。被关闭拒绝的发送绝不保留本次消息。"
+
+#: ../../../../docs/reference/api/os.md:46
+msgid "[inout] Live channel retained throughout the call"
+msgstr "[inout] 有效通道，保留到本次调用结束"
+
+#: ../../../../docs/reference/api/os.md:46
+msgid "[in] item_size readable bytes, borrowed until return"
+msgstr "[in] item_size 个可读字节，借用到返回"
+
+#: ../../../../docs/reference/api/os.md:46
+msgid "[inout] Live exclusive waiter retained through this call"
+msgstr "[inout] 有效的独占等待者，保留到本次调用结束"
+
+#: ../../../../docs/reference/api/os.md:46
+msgid "SUCCESS, CANCELLED after close, TIMEOUT, BUSY or error"
+msgstr "SUCCESS、关闭后的 CANCELLED、TIMEOUT、BUSY 或错误"
+
+#: ../../../../docs/reference/api/os.md:46
+msgid "Receive and drain data queued before close."
+msgstr "接收并排空关闭前已入队的数据。"
+
+#: ../../../../docs/reference/api/os.md:46
+msgid "Running task only. Immediate readiness wins expiration."
+msgstr "仅限运行中的任务。立即就绪优先于过期。"
+
+#: ../../../../docs/reference/api/os.md:46
+msgid "SUCCESS; CANCELLED when closed and empty; TIMEOUT/BUSY/error"
+msgstr "SUCCESS；关闭且为空时返回 CANCELLED；或 TIMEOUT/BUSY/错误"
+
+#: ../../../../docs/reference/api/os.md:46
+msgid "Destroy a closed, drained and externally quiesced channel."
+msgstr "销毁已关闭、已排空且经外部会合静默的通道。"
+
+#: ../../../../docs/reference/api/os.md:46
+msgid ""
+"Task lifecycle owner. Join publishers and waiters before destroy; completion"
+" or a users count alone is insufficient."
+msgstr "由任务生命周期所有者调用。destroy 前 join 全部发布者和等待者；仅有完成提示或 users 计数不够。"
+
+#: ../../../../docs/reference/api/os.md:46
+msgid "[inout] Live control and payload with no future users"
+msgstr "[inout] 有效控制对象及数据存储，不再有后续使用者"
+
+#: ../../../../docs/reference/api/os.md:46
+msgid "SUCCESS or BUSY/error retaining every outstanding resource"
+msgstr "SUCCESS，或保留所有尚未释放资源的 BUSY/错误"
+
+#: ../../../../docs/reference/api/os.md:52
+msgid "storage.h"
+msgstr "storage.h"
+
+#: ../../../../docs/reference/api/os.md:54
+msgid "Assembly-only selected static OS layouts and stack storage."
+msgstr "仅供装配使用的选定静态 OS 布局和栈存储。"
+
+#: ../../../../docs/reference/api/os.md:54
+msgid ""
+"Business headers use the opaque public object references. Include this "
+"header only where actual storage is defined. Link exactly one task backend; "
+"native kernel headers remain an assembly dependency, not a business API. "
+"Zero-initialize controls before first use. Never change live private fields."
+msgstr ""
+"业务头使用公共不透明对象引用。仅在定义实际存储处包含此头。只链接一个任务后端；原生内核头仅是装配依赖，不是业务 "
+"API。控制对象首次使用前必须清零。绝不修改有效对象的私有字段。"
+
+#: ../../../../docs/reference/api/os.md:54
+#: ../../../../docs/reference/api/os.md:112
+#: ../../../../docs/reference/api/os.md:120
+#: ../../../../docs/reference/api/os.md:128
+msgid "Defines"
+msgstr "宏定义"
+
+#: ../../../../docs/reference/api/os.md:54
+msgid ""
+"Declare static native-word storage, rounded up to a positive byte size."
+msgstr "声明静态原生栈元素存储，向上取整到所要求的正字节容量。"
+
+#: ../../../../docs/reference/api/os.md:54
+msgid ""
+"File/block scope only. Pass sizeof(name) as actual capacity to start. The "
+"target compiler owns sizeof/alignment; no maximum union is used."
+msgstr "仅限文件／代码块作用域。start 时传入 sizeof(name) 作为实际容量。sizeof／对齐由目标编译器决定，不使用最大联合体。"
+
+#: ../../../../docs/reference/api/os.md:60
+msgid "baremetal.h"
+msgstr "baremetal.h"
+
+#: ../../../../docs/reference/api/os.md:62
+msgid "Bare-metal poll notification with caller-owned storage."
+msgstr "使用调用者存储的裸机轮询通知。"
+
+#: ../../../../docs/reference/api/os.md:62
 msgid "Initialize storage before exposing it to any ISR."
 msgstr "向任何 ISR 暴露存储之前先初始化。"
 
-#: ../../../../../../docs/reference/api/os.md:16
+#: ../../../../docs/reference/api/os.md:62
 msgid ""
 "Startup context; not a task/queue emulation. Word publication uses the "
 "reviewed inline compiler/CPU port."
 msgstr "启动上下文；不模拟任务或队列。字发布使用经审查的内联编译器／CPU 端口。"
 
-#: ../../../../../../docs/reference/api/os.md:0
-msgid "Parameters"
-msgstr "参数"
-
-#: ../../../../../../docs/reference/api/os.md:16
+#: ../../../../docs/reference/api/os.md:62
 msgid "[out] Unused caller-owned storage"
 msgstr "[out] 尚未使用、由调用者拥有的存储"
 
-#: ../../../../../../docs/reference/api/os.md:16
+#: ../../../../docs/reference/api/os.md:62
 msgid "[in] Monotonic microsecond source, continuing while waiting"
 msgstr "[in] 单调微秒时间源，等待期间持续运行"
 
-#: ../../../../../../docs/reference/api/os.md:16
+#: ../../../../docs/reference/api/os.md:62
 msgid "[in] Clock source context"
 msgstr "[in] 时钟源上下文"
 
-#: ../../../../../../docs/reference/api/os.md:0
-msgid "Returns"
-msgstr "返回值"
-
-#: ../../../../../../docs/reference/api/os.md:16
+#: ../../../../docs/reference/api/os.md:62
 msgid "NX_SUCCESS or NX_ERROR_INVALID"
 msgstr "NX_SUCCESS 或 NX_ERROR_INVALID"
 
-#: ../../../../../../docs/reference/api/os.md:16
+#: ../../../../docs/reference/api/os.md:62
 msgid "Bind the explicit polling notification."
 msgstr "绑定显式轮询通知。"
 
-#: ../../../../../../docs/reference/api/os.md:16
+#: ../../../../docs/reference/api/os.md:62
 msgid ""
 "wake uses compiler RMW or, on M0/M0+, a bounded saved PRIMASK guard. That "
 "guard requires one CPU and privileged Thread/configurable-IRQ callers; "
@@ -123,46 +782,43 @@ msgstr ""
 "Thread／可配置 IRQ 调用者；不支持 NMI/HardFault、非特权代码、DMA 或其他安全域访问其元数据。返回 BUSY "
 "后，所有者循环仍须继续服务控制器并推进排空。没有经过审查的架构专用原子睡眠合同，不插入 WFI/WFE。"
 
-#: ../../../../../../docs/reference/api/os.md:16
-#: ../../../../../../docs/reference/api/os.md:82
+#: ../../../../docs/reference/api/os.md:62
 msgid "[in] Initialized storage"
 msgstr "[in] 已初始化的存储"
 
-#: ../../../../../../docs/reference/api/os.md:16
+#: ../../../../docs/reference/api/os.md:62
 msgid ""
 "Port whose wait returns BUSY while unchanged before deadline; "
 "NX_DEADLINE_NEVER disables expiry, never implies blocking"
 msgstr "等待端口：截止时间前若状态未变，wait 返回 BUSY；NX_DEADLINE_NEVER 禁用到期，不意味着阻塞"
 
-#: ../../../../../../docs/reference/api/os.md:16
+#: ../../../../docs/reference/api/os.md:62
 msgid "Explicit nonblocking bare-metal notification storage."
 msgstr "显式、非阻塞的裸机通知存储。"
 
-#: ../../../../../../docs/reference/api/os.md:16
-#: ../../../../../../docs/reference/api/os.md:26
-#: ../../../../../../docs/reference/api/os.md:34
-#: ../../../../../../docs/reference/api/os.md:50
-#: ../../../../../../docs/reference/api/os.md:58
-#: ../../../../../../docs/reference/api/os.md:74
-#: ../../../../../../docs/reference/api/os.md:82
-#: ../../../../../../docs/reference/api/os.md:90
-#: ../../../../../../docs/reference/api/os.md:98
-#: ../../../../../../docs/reference/api/os.md:114
+#: ../../../../docs/reference/api/os.md:62
+#: ../../../../docs/reference/api/os.md:72
+#: ../../../../docs/reference/api/os.md:80
+#: ../../../../docs/reference/api/os.md:96
+#: ../../../../docs/reference/api/os.md:104
+#: ../../../../docs/reference/api/os.md:120
+#: ../../../../docs/reference/api/os.md:128
+#: ../../../../docs/reference/api/os.md:152
 msgid "Public Members"
 msgstr "公共成员"
 
-#: ../../../../../../docs/reference/api/os.md:24
+#: ../../../../docs/reference/api/os.md:70
 msgid "diagnostic.h"
 msgstr "diagnostic.h"
 
-#: ../../../../../../docs/reference/api/os.md:26
+#: ../../../../docs/reference/api/os.md:72
 msgid "Bounded diagnostics with explicit caller-owned ring storage."
 msgstr "使用调用者显式环形存储的有界诊断。"
 
-#: ../../../../../../docs/reference/api/os.md:26
-#: ../../../../../../docs/reference/api/os.md:42
-#: ../../../../../../docs/reference/api/os.md:74
-#: ../../../../../../docs/reference/api/os.md:90
+#: ../../../../docs/reference/api/os.md:72
+#: ../../../../docs/reference/api/os.md:88
+#: ../../../../docs/reference/api/os.md:120
+#: ../../../../docs/reference/api/os.md:128
 msgid ""
 "Author  Nexus Team   Version  1.0.0   Date  2026-10-11   Copyright  "
 "Copyright (c) 2026 Nexus Team"
@@ -170,59 +826,59 @@ msgstr ""
 "作者  Nexus Team   版本  1.0.0   日期  2026-10-11   版权  Copyright (c) 2026 Nexus "
 "Team"
 
-#: ../../../../../../docs/reference/api/os.md:26
-#: ../../../../../../docs/reference/api/os.md:42
-#: ../../../../../../docs/reference/api/os.md:74
-#: ../../../../../../docs/reference/api/os.md:90
+#: ../../../../docs/reference/api/os.md:72
+#: ../../../../docs/reference/api/os.md:88
+#: ../../../../docs/reference/api/os.md:120
+#: ../../../../docs/reference/api/os.md:128
 msgid "1.0.0"
 msgstr "1.0.0"
 
-#: ../../../../../../docs/reference/api/os.md:26
-#: ../../../../../../docs/reference/api/os.md:42
-#: ../../../../../../docs/reference/api/os.md:74
-#: ../../../../../../docs/reference/api/os.md:90
+#: ../../../../docs/reference/api/os.md:72
+#: ../../../../docs/reference/api/os.md:88
+#: ../../../../docs/reference/api/os.md:120
+#: ../../../../docs/reference/api/os.md:128
 msgid "2026-10-11"
 msgstr "2026-10-11"
 
-#: ../../../../../../docs/reference/api/os.md:26
-#: ../../../../../../docs/reference/api/os.md:42
-#: ../../../../../../docs/reference/api/os.md:74
-#: ../../../../../../docs/reference/api/os.md:90
+#: ../../../../docs/reference/api/os.md:72
+#: ../../../../docs/reference/api/os.md:88
+#: ../../../../docs/reference/api/os.md:120
+#: ../../../../docs/reference/api/os.md:128
 msgid "Copyright (c) 2026 Nexus Team"
 msgstr "Copyright (c) 2026 Nexus Team"
 
-#: ../../../../../../docs/reference/api/os.md:26
+#: ../../../../docs/reference/api/os.md:72
 msgid "Initialize unpublished ring and caller-owned entries."
 msgstr "初始化尚未发布的环与调用者提供的条目。"
 
-#: ../../../../../../docs/reference/api/os.md:26
+#: ../../../../docs/reference/api/os.md:72
 msgid ""
 "Startup or exclusive lifecycle owner only. Both allocations remain alive "
 "until all publishers and readers are stopped. Entries cannot alias ring "
 "state or a submitted record."
 msgstr "仅限启动上下文或独占生命周期所有者。两块存储都必须保持存活，直到所有发布者和读取者停止。条目不得与环状态或已提交记录存在内存别名。"
 
-#: ../../../../../../docs/reference/api/os.md:26
+#: ../../../../docs/reference/api/os.md:72
 msgid "[out] Unused caller-owned state."
 msgstr "[out] 尚未使用、由调用者拥有的状态。"
 
-#: ../../../../../../docs/reference/api/os.md:26
+#: ../../../../docs/reference/api/os.md:72
 msgid "[in] Naturally aligned contiguous entry storage."
 msgstr "[in] 自然对齐的连续条目存储。"
 
-#: ../../../../../../docs/reference/api/os.md:26
+#: ../../../../docs/reference/api/os.md:72
 msgid "[in] Nonzero storage length, at most UINT32_MAX."
 msgstr "[in] 非零存储长度，至多为 UINT32_MAX。"
 
-#: ../../../../../../docs/reference/api/os.md:26
+#: ../../../../docs/reference/api/os.md:72
 msgid "SUCCESS or INVALID without modifying storage on rejection."
 msgstr "SUCCESS 或 INVALID；拒绝时不修改存储。"
 
-#: ../../../../../../docs/reference/api/os.md:26
+#: ../../../../docs/reference/api/os.md:72
 msgid "Copy one event under a bounded saved interrupt mask."
 msgstr "在有界且保存原屏蔽状态的临界区内复制一个事件。"
 
-#: ../../../../../../docs/reference/api/os.md:26
+#: ../../../../docs/reference/api/os.md:72
 msgid ""
 "Privileged Thread/configurable IRQ on one CPU only. NMI/HardFault, "
 "unprivileged, SMP, DMA and other security worlds are excluded. Full rings "
@@ -232,704 +888,195 @@ msgstr ""
 "仅适用于单 CPU 上的特权 Thread／可配置 IRQ。排除 NMI/HardFault、非特权代码、SMP、DMA "
 "和其他安全域。环满时保留较早记录，并使丢失记录计数器饱和递增。不使用时钟回调、OS 操作、堆、字符串格式化或传输机制。"
 
-#: ../../../../../../docs/reference/api/os.md:26
+#: ../../../../docs/reference/api/os.md:72
 msgid "[inout] Initialized ring."
 msgstr "[inout] 已初始化的环。"
 
-#: ../../../../../../docs/reference/api/os.md:26
+#: ../../../../docs/reference/api/os.md:72
 msgid "[in] Stable record until this call returns."
 msgstr "[in] 保持稳定直到本次调用返回的记录。"
 
-#: ../../../../../../docs/reference/api/os.md:26
+#: ../../../../docs/reference/api/os.md:72
 msgid "SUCCESS, BUSY when full, INVALID or CONTEXT."
 msgstr "SUCCESS、环满时的 BUSY、INVALID 或 CONTEXT。"
 
-#: ../../../../../../docs/reference/api/os.md:26
+#: ../../../../docs/reference/api/os.md:72
 msgid "Consume one event from caller-owned ring."
 msgstr "从调用者拥有的环中消费一个事件。"
 
-#: ../../../../../../docs/reference/api/os.md:26
+#: ../../../../docs/reference/api/os.md:72
 msgid ""
 "Same privileged single-CPU domain as write. Failed reads leave destination "
 "unchanged. This is diagnostic storage, never a completion queue or "
 "application work queue."
 msgstr "与 write 使用相同的特权单 CPU 域。读取失败时目标保持不变。这是诊断存储，不能用作完成队列或应用工作队列。"
 
-#: ../../../../../../docs/reference/api/os.md:26
+#: ../../../../docs/reference/api/os.md:72
 msgid "[inout] Initialized ring with live producers."
 msgstr "[inout] 已初始化且仍有存活生产者的环。"
 
-#: ../../../../../../docs/reference/api/os.md:26
+#: ../../../../docs/reference/api/os.md:72
 msgid "[out] Separate caller-owned destination."
 msgstr "[out] 调用者拥有的独立目标存储。"
 
-#: ../../../../../../docs/reference/api/os.md:26
+#: ../../../../docs/reference/api/os.md:72
 msgid "SUCCESS, BUSY when empty, INVALID or CONTEXT."
 msgstr "SUCCESS、环空时的 BUSY、INVALID 或 CONTEXT。"
 
-#: ../../../../../../docs/reference/api/os.md:26
+#: ../../../../docs/reference/api/os.md:72
 msgid "Snapshot the saturating overflow count."
 msgstr "读取饱和溢出计数快照。"
 
-#: ../../../../../../docs/reference/api/os.md:26
+#: ../../../../docs/reference/api/os.md:72
 msgid "Uses the same bounded saved-mask domain as record access."
 msgstr "与记录访问使用相同的有界、保存原屏蔽状态的执行域。"
 
-#: ../../../../../../docs/reference/api/os.md:26
+#: ../../../../docs/reference/api/os.md:72
 msgid "[in] Initialized ring."
 msgstr "[in] 已初始化的环。"
 
-#: ../../../../../../docs/reference/api/os.md:26
+#: ../../../../docs/reference/api/os.md:72
 msgid "[out] Caller-owned result."
 msgstr "[out] 调用者拥有的结果存储。"
 
-#: ../../../../../../docs/reference/api/os.md:26
+#: ../../../../docs/reference/api/os.md:72
 msgid "SUCCESS, INVALID or CONTEXT."
 msgstr "SUCCESS、INVALID 或 CONTEXT。"
 
-#: ../../../../../../docs/reference/api/os.md:26
+#: ../../../../docs/reference/api/os.md:72
 msgid "One opaque diagnostic record; interpretation belongs to its owner."
 msgstr "一个不透明诊断记录；解释责任属于其所有者。"
 
-#: ../../../../../../docs/reference/api/os.md:26
+#: ../../../../docs/reference/api/os.md:72
 msgid "Explicit ring state, with no default pool, worker or transport."
 msgstr "显式环状态，不提供默认池、执行任务或传输机制。"
 
-#: ../../../../../../docs/reference/api/os.md:32
+#: ../../../../docs/reference/api/os.md:78
 msgid "freertos.h"
 msgstr "freertos.h"
 
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "Per-object static FreeRTOS storage and optional thin services."
-msgstr "每对象静态 FreeRTOS 存储与可选轻量服务。"
+#: ../../../../docs/reference/api/os.md:80
+msgid "Explicit FreeRTOS notification-slot and IRQ extensions."
+msgstr "显式 FreeRTOS 通知槽与 IRQ 扩展。"
 
-#: ../../../../../../docs/reference/api/os.md:34
+#: ../../../../docs/reference/api/os.md:80
 msgid ""
-"Running task operations require privileged unmasked Thread mode; IRQ wake "
-"has its own contract. Before scheduler start, the selected Baseline port may"
-" retain PRIMASK=1 or the Mainline port its exact syscall BASEPRI; all other "
-"masks must be zero. Matching a value cannot prove mask provenance. Unsafe "
-"contexts return CONTEXT before mutating kernel APIs or object storage; a "
-"scheduler-state read may be needed. Startup permits init, task creation, "
-"wake and zero-wait queues. Wait, join and nonzero waits require a running "
-"scheduler. Port binding and sequence snapshots remain reads. MPU user-task "
-"gateways and cross-world secure task calls are outside these privileged, "
-"current-security-domain APIs."
-msgstr ""
-"运行期任务操作要求特权、未屏蔽的 Thread 模式；IRQ 唤醒有独立合同。调度器启动前，选定的 Baseline 端口可保留 "
-"PRIMASK=1，Mainline 端口可保留其准确的系统调用 "
-"BASEPRI；其他屏蔽值都必须为零。数值匹配不能证明屏蔽状态的来源。不安全的上下文会在修改内核 API 状态或对象存储之前返回 "
-"CONTEXT；可能需要读取调度器状态。启动阶段允许初始化、创建任务、唤醒和零等待队列操作。wait、join "
-"和非零等待要求调度器正在运行。端口绑定和序列快照始终只读。MPU 用户任务网关及跨安全域的 Secure 任务调用不属于这些特权、当前安全域 API "
-"的范围。"
+"Ordinary tasks, queues and notifications use public OS headers. Extensions "
+"retain native receiver identity and require privileged, current-security-"
+"domain callers."
+msgstr "普通任务、队列和通知使用公共 OS 头。扩展保留原生接收者身份，要求当前安全域中的特权调用者。"
 
-#: ../../../../../../docs/reference/api/os.md:34
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "Typedefs"
-msgstr "类型定义"
+#: ../../../../docs/reference/api/os.md:80
+msgid "Check whether the actual IRQ may call kernel ISR APIs."
+msgstr "检查实际 IRQ 是否允许调用内核 ISR API。"
 
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "Caller-owned single-operation latch for a closable queue."
-msgstr "调用者拥有的单操作锁存器，用于可关闭队列。"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "Test whether the current context may call kernel ISR APIs."
-msgstr "检查当前上下文是否允许调用内核 ISR API。"
-
-#: ../../../../../../docs/reference/api/os.md:34
+#: ../../../../docs/reference/api/os.md:80
 msgid ""
-"Native POSIX has no physical IRQ and returns false. NMI, faults and kernel-"
-"owned exceptions are rejected before entering FreeRTOS. Mainline "
-"priority/grouping must respect the syscall ceiling. Baseline PRIMASK ports "
-"accept every configurable IRQ and do not read Mainline priority grouping. "
-"Nonsecure permission does not exclude Secure-side accesses."
-msgstr ""
-"Native POSIX 没有物理 IRQ，返回 false。NMI、故障和内核拥有的异常会在进入 FreeRTOS 前被拒绝。Mainline "
-"的优先级／分组必须遵守系统调用优先级上限。Baseline PRIMASK 端口接受所有可配置 IRQ，不读取 Mainline "
-"优先级分组。Nonsecure 侧权限不排除 Secure 侧访问。"
+"Validate actual bounds, masks and selected port policy. Mainline also checks"
+" grouping and syscall ceiling. Native, NMI, faults and kernel exceptions are"
+" rejected."
+msgstr "检查实际范围、掩码与所选端口政策。Mainline 还检查分组和系统调用上限。拒绝 Native、NMI、故障和内核异常。"
 
-#: ../../../../../../docs/reference/api/os.md:34
-msgid ""
-"True for a privileged unmasked external Cortex-M IRQ within the selected "
-"CPU/SoC bounds and kernel mask contract"
-msgstr "仅当当前为特权、未屏蔽的外部 Cortex-M IRQ，且符合选定 CPU／SoC 边界及内核屏蔽合同，才返回 true"
+#: ../../../../docs/reference/api/os.md:80
+msgid "True only for an admitted privileged external IRQ"
+msgstr "仅在准许的特权外部 IRQ 中为 true"
 
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "Initialize unused notification storage."
-msgstr "初始化尚未使用的通知存储。"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "Task/startup context; no heap or timer daemon is needed."
-msgstr "任务／启动上下文；不需要堆或定时器守护任务。"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "[out] Caller storage, zeroed before first use"
-msgstr "[out] 调用者提供的存储，首次使用前清零"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "SUCCESS or invalid/context/initialization error"
-msgstr "SUCCESS 或无效参数／上下文／初始化错误"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "Bind a latched single-waiter notification."
-msgstr "绑定序列锁存、单等待者通知。"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid ""
-"Task wake uses xSemaphoreGive. IRQ wake validates priority then uses "
-"xSemaphoreGiveFromISR. Saturated latch is harmless; sequence and request "
-"predicates remain authoritative. No deferred daemon publishes wakes."
-msgstr ""
-"任务唤醒使用 xSemaphoreGive。IRQ 唤醒先验证优先级，再使用 "
-"xSemaphoreGiveFromISR。锁存器饱和无害；序列和请求谓词仍是权威依据。不通过延迟守护任务发布唤醒。"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "[in] Initialized live storage"
-msgstr "[in] 已初始化且存活的存储"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "Notification port using nx_time_now_us clock domain"
-msgstr "使用 nx_time_now_us 时钟域的通知端口"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "Destroy after publishers and waiter have stopped and joined."
-msgstr "发布者和等待者均停止并完成 join 后再销毁。"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "Task context. Quiescence is required beyond this busy check."
-msgstr "任务上下文。除了本项 busy 检查，还必须确保所有使用者静止。"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "[inout] Live storage with no future users"
-msgstr "[inout] 存活存储，之后不再有使用者"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "SUCCESS, BUSY if a waiter is still registered, or error"
-msgstr "SUCCESS、仍有等待者登记时的 BUSY，或错误"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "Create one task from its exact caller-owned stack and TCB."
-msgstr "使用调用者提供的准确栈和 TCB 创建一个任务。"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid ""
-"Task/startup context. No hidden worker or maximum pool. Stack and task "
-"control must not overlap; known span wrap and overlap reject before any "
-"kernel object is created. Entry must return in privileged Thread mode, with "
-"manual interrupt masks restored and the scheduler resumed after any "
-"temporary suspension."
-msgstr ""
-"任务／启动上下文。不提供隐藏 worker 或最大池。栈与任务控制不得重叠；在创建任何内核对象之前拒绝已知范围的地址回绕及重叠。entry 必须在特权 "
-"Thread mode 返回，手动中断 mask 已恢复，临时挂起的 scheduler 已恢复运行。"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "[out] Zero-initialized unused control storage"
-msgstr "[out] 已清零且尚未使用的控制存储"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "[in] Kernel diagnostic name, copied by the kernel"
-msgstr "[in] 内核诊断名称，由内核复制"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "[in] StackType_t array kept until successful join"
-msgstr "[in] 保留直到成功 join 的 StackType_t 数组"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid ""
-"[in] Actual capacity, at least the selected port startup minimum; runtime "
-"stack budget remains caller-owned"
-msgstr "[in] 实际容量，至少满足选定端口的启动最小值；运行期栈预算仍由调用者负责"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "[in] Priority below configMAX_PRIORITIES"
-msgstr "[in] 小于 configMAX_PRIORITIES 的优先级"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "[in] Application entry, may return after cooperative stop"
-msgstr "[in] 应用入口，可在协作停止后返回"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "[in] Entry context kept until join"
-msgstr "[in] 保留直到 join 的入口上下文"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "SUCCESS or invalid/context/start error"
-msgstr "SUCCESS 或无效参数／上下文／启动错误"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "Discard one created task before its wrapper has executed."
-msgstr "在包装函数执行之前，丢弃一个已创建的任务。"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid ""
-"Single privileged startup lifecycle owner; scheduler state must be "
-"NOT_STARTED. The kernel candidate is first suspended to remove its retained "
-"TCB reference before deletion. No unmatched vTaskSuspendAll may remain "
-"during bootstrap: NOT_STARTED cannot reveal the kernel's private suspension "
-"nesting. This caller precondition applies before mutation. Success permits "
-"TCB, stack and context reuse after all external users are quiescent. This "
-"does not cancel or join an executed task."
-msgstr ""
-"仅限一个特权启动生命周期所有者；调度器状态必须为 NOT_STARTED。内核候选任务先被挂起，以在删除前移除内核保留的 TCB "
-"引用。bootstrap 期间不得遗留未配对的 vTaskSuspendAll：NOT_STARTED "
-"无法揭示内核私有的挂起嵌套层数。该调用者前置条件必须在修改前满足。成功后，只有在所有外部使用者均静止时，才允许复用 TCB、栈和上下文。这不会取消或 "
-"join 已执行的任务。"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "[inout] Live caller-owned static task, unused by other callers"
-msgstr "[inout] 存活、由调用者拥有且未被其他调用者使用的静态任务"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid ""
-"SUCCESS after synchronous kernel deletion and latch cleanup; INVALID for "
-"absent, incomplete or already entered control; CONTEXT for ISR, "
-"unprivileged, noncanonical masks or a running/suspended scheduler, without "
-"mutation"
-msgstr ""
-"仅在同步内核删除及锁存器清理完成后返回 SUCCESS；控制状态不存在、不完整或已经进入执行时返回 "
-"INVALID；ISR、非特权、非规范屏蔽状态或调度器正在运行／挂起时返回 CONTEXT，且不修改状态"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "Join a cooperatively returned task and reclaim kernel state."
-msgstr "对协作返回的任务执行 join，并回收内核状态。"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid ""
-"Single joiner, task context. The entry return parks its wrapper; no self-"
-"delete/idle cleanup race releases caller storage early. Stop producers, keep"
-" bus owner draining, join producers, then join owner."
-msgstr ""
-"单个 join 调用者，任务上下文。入口返回后停驻于包装函数；不会因自删除／Idle "
-"清理竞态而提前释放调用者存储。先停止生产者，保持总线所有者推进排空，join 生产者，再 join 所有者。"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "[inout] Started task, distinct from current task"
-msgstr "[inout] 已启动且不是当前任务的任务"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "[in] Absolute wait deadline in nx_time_now_us domain"
-msgstr "[in] nx_time_now_us 域内的绝对等待截止时间"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid ""
-"SUCCESS only after external vTaskDelete removes the task; TIMEOUT retains "
-"handle, TCB, stack and context; CONTEXT rejects unsafe CPU context, self-"
-"join or stopped scheduler"
-msgstr ""
-"仅当外部 vTaskDelete 已移除任务后返回 SUCCESS；TIMEOUT 保留句柄、TCB、栈和上下文；CONTEXT 拒绝不安全的 CPU "
-"上下文、自 join 或已停止的调度器"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "Create an exact-sized static byte-copy queue."
-msgstr "创建准确容量的静态字节复制队列。"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid ""
-"The used depth times item_size payload must not overlap queue control. Span "
-"wrap rejects before kernel mutation."
-msgstr "实际使用的 depth 乘 item_size 大小的 payload 不得与队列控制重叠。范围地址回绕在内核状态改变之前拒绝。"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "[out] Zero-initialized caller queue control"
-msgstr "[out] 已清零的调用者队列控制存储"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "[in] Byte buffer kept until destroy"
-msgstr "[in] 保留直到 destroy 的字节缓冲区"
-
-#: ../../../../../../docs/reference/api/os.md:34
-#: ../../../../../../docs/reference/api/os.md:82
-msgid "[in] Actual byte capacity"
-msgstr "[in] 实际字节容量"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "[in] Number of items"
-msgstr "[in] 条目数量"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "[in] Bytes copied per item"
-msgstr "[in] 每个条目复制的字节数"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "Copy an item with a bounded relative kernel wait."
-msgstr "在有界内核相对等待内复制一个条目。"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid ""
-"Task context. Admission/stop belongs to the application's explicit owner "
-"adapter, not this generic copy queue."
-msgstr "任务上下文。准入／停止由应用显式所有者适配器负责，不属于此通用复制队列。"
-
-#: ../../../../../../docs/reference/api/os.md:34
-#: ../../../../../../docs/reference/api/os.md:82
-msgid "[inout] Live queue"
-msgstr "[inout] 存活队列"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "[in] At least configured item bytes; not retained afterward"
-msgstr "[in] 至少为已配置条目字节数；返回后不再保留"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "[in] Explicit relative wait; portMAX_DELAY prohibited"
-msgstr "[in] 显式相对等待；禁止 portMAX_DELAY"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "SUCCESS, TIMEOUT, INVALID or CONTEXT"
-msgstr "SUCCESS、TIMEOUT、INVALID 或 CONTEXT"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "Receive one byte-copy item."
-msgstr "接收一个字节复制条目。"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "[out] Configured item byte capacity, valid only on success"
-msgstr "[out] 已配置的条目字节容量，仅在成功时有效"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "Destroy after admission is stopped and all users joined."
-msgstr "准入已停止且全部使用者完成 join 后再销毁。"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "[inout] Live drained queue, no future operations"
-msgstr "[inout] 存活且已排空的队列，之后不再有操作"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "SUCCESS, BUSY while users/items remain, or invalid/context"
-msgstr "SUCCESS、仍有使用者／条目时的 BUSY，或无效参数／上下文错误"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "Send using one absolute monotonic deadline."
-msgstr "使用一个绝对单调截止时间发送。"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid ""
-"Immediate readiness wins over expiration. Stop admission and user quiescence"
-" remain external raw-queue obligations."
-msgstr "立即就绪优先于截止到期。停止准入和使用者静止仍是外部对原始队列必须履行的责任。"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "[inout] Live raw queue"
-msgstr "[inout] 存活的原始队列"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "[in] Configured bytes borrowed until return"
-msgstr "[in] 已配置数量的字节，借用直到返回"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "[in] nx_time_now_us domain, NEVER permits long waits"
-msgstr "[in] nx_time_now_us 域；NEVER 允许长时间等待"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "SUCCESS, TIMEOUT or validation/context error"
-msgstr "SUCCESS、TIMEOUT 或验证／上下文错误"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "Receive using one absolute monotonic deadline."
-msgstr "使用一个绝对单调截止时间接收。"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "[out] Configured bytes valid only on SUCCESS"
-msgstr "[out] 已配置数量的字节，仅在 SUCCESS 时有效"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "[in] nx_time_now_us domain"
-msgstr "[in] nx_time_now_us 域"
-
-#: ../../../../../../docs/reference/api/os.md:34
+#: ../../../../docs/reference/api/os.md:80
 msgid "Bind an exclusive slot of one live receiver task."
 msgstr "绑定一个存活接收任务的独占通知槽。"
 
-#: ../../../../../../docs/reference/api/os.md:34
+#: ../../../../docs/reference/api/os.md:80
 msgid ""
 "Caller ensures slot exclusivity. No global slot registry, allocation, slot "
 "discovery or cross-world synchronization."
 msgstr "调用者确保通知槽独占。不提供全局槽注册表、分配、槽发现或跨安全域同步。"
 
-#: ../../../../../../docs/reference/api/os.md:34
+#: ../../../../docs/reference/api/os.md:80
 msgid "[out] Zeroed caller storage"
 msgstr "[out] 已清零的调用者存储"
 
-#: ../../../../../../docs/reference/api/os.md:34
+#: ../../../../docs/reference/api/os.md:80
 msgid "[in] Task retained until all publishers quiesce"
 msgstr "[in] 保留直到所有发布者静止的任务"
 
-#: ../../../../../../docs/reference/api/os.md:34
+#: ../../../../docs/reference/api/os.md:80
 msgid "[in] Exclusively owned kernel notification slot"
 msgstr "[in] 独占拥有的内核通知槽"
 
-#: ../../../../../../docs/reference/api/os.md:34
+#: ../../../../docs/reference/api/os.md:80
 msgid "SUCCESS, INVALID, CONTEXT or UNSUPPORTED by OS profile"
 msgstr "SUCCESS、INVALID、CONTEXT，或 OS profile 不支持时的 UNSUPPORTED"
 
-#: ../../../../../../docs/reference/api/os.md:34
+#: ../../../../docs/reference/api/os.md:80
 msgid "Get a direct notification wait port."
 msgstr "取得直接任务通知的等待端口。"
 
-#: ../../../../../../docs/reference/api/os.md:34
+#: ../../../../docs/reference/api/os.md:80
 msgid ""
 "Only receiver may wait. Task/validated IRQ publishers use the exclusive "
 "slot; notification remains a predicate hint."
 msgstr "仅接收者可以等待。任务／已验证 IRQ 发布者使用独占槽；通知仍只是谓词提示。"
 
-#: ../../../../../../docs/reference/api/os.md:34
+#: ../../../../docs/reference/api/os.md:80
 msgid "[in] Live explicitly bound storage"
 msgstr "[in] 存活且已显式绑定的存储"
 
-#: ../../../../../../docs/reference/api/os.md:34
+#: ../../../../docs/reference/api/os.md:80
 msgid "Port using nx_time_now_us or an invalid zero port"
 msgstr "使用 nx_time_now_us 的端口，或无效的零端口"
 
-#: ../../../../../../docs/reference/api/os.md:34
+#: ../../../../docs/reference/api/os.md:80
 msgid "Unbind after all publishers stop and join."
 msgstr "全部发布者停止并完成 join 后解除绑定。"
 
-#: ../../../../../../docs/reference/api/os.md:34
+#: ../../../../docs/reference/api/os.md:80
 msgid ""
 "Does not delete receiver or clear its kernel slot. Receiver and storage must"
 " outlive every retained port and publisher."
 msgstr "不删除接收者，也不清除其内核槽。接收者和存储必须比每个保留的端口及发布者存活更久。"
 
-#: ../../../../../../docs/reference/api/os.md:34
+#: ../../../../docs/reference/api/os.md:80
+msgid "[inout] Live storage with no future users"
+msgstr "[inout] 存活存储，之后不再有使用者"
+
+#: ../../../../docs/reference/api/os.md:80
 msgid "SUCCESS, BUSY if waiting, or validation/context error"
 msgstr "SUCCESS、正在等待时的 BUSY，或验证／上下文错误"
 
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "Start a task whose entry must never return."
-msgstr "启动入口函数绝不允许返回的任务。"
+#: ../../../../docs/reference/api/os.md:80
+msgid "Fixed receiver and exclusive notification slot; no semaphore."
+msgstr "固定接收者和独占通知槽；不使用信号量。"
 
-#: ../../../../../../docs/reference/api/os.md:34
-msgid ""
-"No join latch, destroy or forced deletion. Choose joinable tasks for "
-"cooperative shutdown and reclaimable storage."
-msgstr "不提供 join 锁存器、destroy 或强制删除。需要协作关闭和可回收存储时，应选择可 join 的任务。"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "[out] Zeroed permanent control, retained until reset"
-msgstr "[out] 已清零的永久控制存储，保留直到复位"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "[in] Copied kernel diagnostic name"
-msgstr "[in] 由内核复制的诊断名称"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "[in] Aligned actual stack retained until reset"
-msgstr "[in] 已对齐的实际栈，保留直到复位"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "[in] Capacity includes reviewed startup minimum"
-msgstr "[in] 包含已审查启动最小值的容量"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "[in] Below configMAX_PRIORITIES"
-msgstr "[in] 小于 configMAX_PRIORITIES"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "[in] Permanent entry; return violates kernel contract"
-msgstr "[in] 永久入口；返回将违反内核合同"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "[in] Retained until reset"
-msgstr "[in] 保留直到复位"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "SUCCESS or validation/context/start error"
-msgstr "SUCCESS 或验证／上下文／启动错误"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "Initialize one exact caller-owned queue waiter."
-msgstr "初始化调用者提供的准确队列等待者存储。"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "[out] Zeroed storage, one simultaneous operation maximum"
-msgstr "[out] 已清零的存储，最多同时执行一个操作"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "Destroy only after all operations stop and join."
-msgstr "全部操作停止并完成 join 后才允许销毁。"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "[inout] Live storage without future callers"
-msgstr "[inout] 存活存储，之后不再有调用者"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "SUCCESS, BUSY if active, or validation/context error"
-msgstr "SUCCESS、活动时的 BUSY，或验证／上下文错误"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "Initialize an optional reliably closable byte-copy queue."
-msgstr "初始化可选、能可靠关闭的字节复制队列。"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid ""
-"No hidden worker or waiter pool. Each concurrent blocking operation supplies"
-" its own initialized waiter. Broadcasting pauses scheduling while visiting "
-"at most maximum_waiters latches. Kernel payload copies and each latch signal"
-" have their own short IRQ guards. Budget scheduling delay and IRQ latency "
-"separately. Large payloads should queue stable handles. The registry is "
-"single-core and task-only."
-msgstr ""
-"没有隐藏执行任务或等待者池。每个并发阻塞操作都提供自己的已初始化等待者。广播在访问至多 maximum_waiters "
-"个锁存器期间暂停调度。内核载荷复制和每次锁存器信号各自使用短 IRQ 保护。调度延迟和 IRQ "
-"延迟须分别预算。大载荷应通过队列传递稳定句柄。登记机制仅适用于单核和任务上下文。"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "[out] Zeroed control kept until destroy"
-msgstr "[out] 已清零的控制存储，保留直到 destroy"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "[in] Payload buffer kept until destroy"
-msgstr "[in] 载荷缓冲区，保留直到 destroy"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "[in] Actual payload capacity"
-msgstr "[in] 实际载荷容量"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "[in] Positive item count"
-msgstr "[in] 正数条目数量"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "[in] Positive byte-copy size"
-msgstr "[in] 正数的字节复制大小"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "[in] Explicit positive simultaneous-call budget"
-msgstr "[in] 显式、正数的同时调用预算"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "Send with close-aware admission and absolute deadline."
-msgstr "发送时执行关闭感知准入，并采用绝对截止时间。"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid ""
-"Readiness/admission and close serialize in a kernel task scheduling guard. A"
-" latched wake closes wake-before-sleep."
-msgstr "就绪／准入与 close 在内核任务调度保护内串行化。锁存唤醒消除先唤醒、后睡眠的竞态。"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "[inout] Live closable queue"
-msgstr "[inout] 存活的可关闭队列"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "[in] Bytes borrowed until return, never after timeout"
-msgstr "[in] 借用直到返回的字节，超时后绝不保留"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "[in] nx_time_now_us domain, NEVER supported"
-msgstr "[in] nx_time_now_us 域，支持 NEVER"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "[inout] Exclusive initialized caller waiter"
-msgstr "[inout] 调用者独占、已初始化的等待者"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "SUCCESS, CANCELLED after close, TIMEOUT, BUSY or error"
-msgstr "SUCCESS、关闭后的 CANCELLED、TIMEOUT、BUSY 或错误"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "Receive existing items after close, then CANCELLED."
-msgstr "关闭后仍接收已有条目，排空后返回 CANCELLED。"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "SUCCESS, CANCELLED when closed/empty, TIMEOUT or error"
-msgstr "SUCCESS、已关闭且为空时的 CANCELLED、TIMEOUT 或错误"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "Stop sends and wake every currently registered waiter."
-msgstr "停止发送，并唤醒当前登记的全部等待者。"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid ""
-"Task-only, no forced cancellation or task deletion. Close does not join "
-"users or authorize storage reclamation."
-msgstr "仅限任务上下文，不提供强制取消或任务删除。close 不会 join 使用者，也不授权回收存储。"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "SUCCESS, including repeated close, or validation/context"
-msgstr "SUCCESS（包括重复 close），或验证／上下文错误"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "Destroy a closed, drained and quiesced queue."
-msgstr "销毁已关闭、已排空且静止的队列。"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid ""
-"Stop/join producers, drain with owner, join consumers and then destroy queue"
-" and every waiter independently."
-msgstr "停止并 join 生产者，由所有者排空，join 消费者，然后分别销毁队列和每个等待者。"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "[inout] Live queue without future entrants"
-msgstr "[inout] 存活队列，之后不再有调用者进入"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "SUCCESS, BUSY while open/users/items remain, or error"
-msgstr "SUCCESS、尚未关闭／仍有使用者／仍有条目时的 BUSY，或错误"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "Static binary latch; one waiter, independently quiesced publishers."
-msgstr "静态二值锁存器；一个等待者，发布者分别停止并排空。"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "Task has its own TCB; stack is supplied with its actual word count."
-msgstr "任务拥有独立 TCB；栈以其实际字数显式供给。"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid ""
-"Control fields are adapter-owned. The caller zero-initializes storage before"
-" first use and does not modify live fields. Entry is consumed as the wrapper"
-" begins execution; context remains borrowed until successful join or "
-"prestart discard."
-msgstr ""
-"控制字段由适配器拥有。调用者在首次使用前将存储清零，不得修改存活字段。包装函数开始执行时即消耗入口；上下文继续被借用，直到成功 join 或启动前 "
-"discard。"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "Queue control only; actual depth/item byte storage is external."
-msgstr "仅队列控制状态；实际深度／条目字节存储由外部提供。"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "Fixed receiver and exclusive kernel notification slot; no latch."
-msgstr "固定接收者及独占内核通知槽；不含锁存器。"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "Permanent task control without a join completion semaphore."
-msgstr "永久任务控制，不含 join 完成信号量。"
-
-#: ../../../../../../docs/reference/api/os.md:34
-msgid "Opt-in close broadcasts; raw queue storage remains unchanged."
-msgstr "显式选择的关闭广播；原始队列存储不变。"
-
-#: ../../../../../../docs/reference/api/os.md:40
+#: ../../../../docs/reference/api/os.md:86
 msgid "freertos_diagnostics.h"
 msgstr "freertos_diagnostics.h"
 
-#: ../../../../../../docs/reference/api/os.md:42
+#: ../../../../docs/reference/api/os.md:88
 msgid "Bounded explicit FreeRTOS trace sink without global storage."
 msgstr "显式、有界的 FreeRTOS 跟踪接收端，不使用全局存储。"
 
-#: ../../../../../../docs/reference/api/os.md:42
-#: ../../../../../../docs/reference/api/os.md:50
-#: ../../../../../../docs/reference/api/os.md:90
+#: ../../../../docs/reference/api/os.md:88
+#: ../../../../docs/reference/api/os.md:96
+#: ../../../../docs/reference/api/os.md:128
 msgid "Enums"
 msgstr "枚举"
 
-#: ../../../../../../docs/reference/api/os.md:42
+#: ../../../../docs/reference/api/os.md:88
 msgid ""
 "Maintained kernel trace identities; product interpretation is external."
 msgstr "维护范围内的内核跟踪身份；产品解释位于外部。"
 
-#: ../../../../../../docs/reference/api/os.md:42
-#: ../../../../../../docs/reference/api/os.md:50
-#: ../../../../../../docs/reference/api/os.md:90
+#: ../../../../docs/reference/api/os.md:88
+#: ../../../../docs/reference/api/os.md:96
+#: ../../../../docs/reference/api/os.md:128
 msgid "Values:"
 msgstr "取值："
 
-#: ../../../../../../docs/reference/api/os.md:42
+#: ../../../../docs/reference/api/os.md:88
 msgid "Consume one bounded kernel trace event."
 msgstr "消费一个有界内核跟踪事件。"
 
-#: ../../../../../../docs/reference/api/os.md:42
+#: ../../../../docs/reference/api/os.md:88
 msgid ""
 "Application may override the weak no-op and write an explicit "
 "nx_diagnostic_ring_t. May run under kernel masks or configurable IRQ, so "
@@ -941,35 +1088,35 @@ msgstr ""
 "下运行，因此绝不能阻塞、分配、格式化、传输、取得 OS 锁或调用内核服务。接收端负责时间戳和生命周期；不会自动提供缓冲区。trace profile "
 "启用真实内核钩子。"
 
-#: ../../../../../../docs/reference/api/os.md:42
+#: ../../../../docs/reference/api/os.md:88
 msgid "[in] Maintained trace kind."
 msgstr "[in] 维护范围内的跟踪类别。"
 
-#: ../../../../../../docs/reference/api/os.md:42
+#: ../../../../docs/reference/api/os.md:88
 msgid "[in] Opaque task identity, never a dereference license."
 msgstr "[in] 不透明任务身份，绝不构成解引用许可。"
 
-#: ../../../../../../docs/reference/api/os.md:42
+#: ../../../../docs/reference/api/os.md:88
 msgid "[in] Optional caller-defined numeric diagnostic."
 msgstr "[in] 可选的调用者自定义数值诊断信息。"
 
-#: ../../../../../../docs/reference/api/os.md:48
+#: ../../../../docs/reference/api/os.md:94
 msgid "freertos_mpu.h"
 msgstr "freertos_mpu.h"
 
-#: ../../../../../../docs/reference/api/os.md:50
+#: ../../../../docs/reference/api/os.md:96
 msgid "Privileged static lifecycle for isolated MPU user tasks."
 msgstr "隔离 MPU 用户任务的特权静态生命周期。"
 
-#: ../../../../../../docs/reference/api/os.md:50
+#: ../../../../docs/reference/api/os.md:96
 msgid "User data is nonexecuting normal RAM with only these permissions."
 msgstr "用户数据是不可执行的普通 RAM，仅允许这些权限。"
 
-#: ../../../../../../docs/reference/api/os.md:50
+#: ../../../../docs/reference/api/os.md:96
 msgid "Create an unprivileged task from exact caller-owned storage."
 msgstr "使用调用者准确存储创建非特权任务。"
 
-#: ../../../../../../docs/reference/api/os.md:50
+#: ../../../../docs/reference/api/os.md:96
 msgid ""
 "Privileged Thread only, scheduler not suspended, no manual masks. Rejection "
 "retains no references and calls no kernel creation API. Actual linker bounds"
@@ -980,57 +1127,57 @@ msgstr ""
 "仅限特权 Thread，调度器未挂起且没有手动屏蔽。拒绝时不保留引用，不调用内核创建 API。检查实际链接器边界及 MPU_TYPE。创建容量最少为 "
 "64 个字；应用须另外预算实际执行深度。不使用堆或对象池。"
 
-#: ../../../../../../docs/reference/api/os.md:50
+#: ../../../../docs/reference/api/os.md:96
 msgid "[inout] Cold or live-free metadata in protected linker RAM."
 msgstr "[inout] 受保护链接器 RAM 中的冷态或已无存活任务的元数据。"
 
-#: ../../../../../../docs/reference/api/os.md:50
+#: ../../../../docs/reference/api/os.md:96
 msgid "[in] Validated user entry, stack and data mappings."
 msgstr "[in] 已验证的用户入口、栈和数据映射。"
 
-#: ../../../../../../docs/reference/api/os.md:50
+#: ../../../../docs/reference/api/os.md:96
 msgid "Success or INVALID/CONTEXT/STATE/BUSY/IO before admission."
 msgstr "成功，或在准入前返回 INVALID／CONTEXT／STATE／BUSY／IO。"
 
-#: ../../../../../../docs/reference/api/os.md:50
+#: ../../../../docs/reference/api/os.md:96
 msgid "Delete another isolated task after external users quiesce."
 msgstr "外部使用者静止后，删除另一个隔离任务。"
 
-#: ../../../../../../docs/reference/api/os.md:50
+#: ../../../../docs/reference/api/os.md:96
 msgid ""
 "One privileged lifecycle owner stops external access first. Kernel deletion "
 "synchronously removes scheduler references. Self deletion is rejected; no "
 "hidden reaper."
 msgstr "一个特权生命周期所有者先停止外部访问。内核删除会同步移除调度器引用。拒绝自删除；不设隐藏回收任务。"
 
-#: ../../../../../../docs/reference/api/os.md:50
+#: ../../../../docs/reference/api/os.md:96
 msgid "[inout] Owned live protected metadata; never the calling task."
 msgstr "[inout] 已拥有、存活且受保护的元数据；绝不能是调用任务本身。"
 
-#: ../../../../../../docs/reference/api/os.md:50
+#: ../../../../docs/reference/api/os.md:96
 msgid "Success, INVALID, CONTEXT, STATE or BUSY."
 msgstr "SUCCESS、INVALID、CONTEXT、STATE 或 BUSY。"
 
-#: ../../../../../../docs/reference/api/os.md:50
+#: ../../../../docs/reference/api/os.md:96
 msgid "A caller-selected exact region, copied during task creation."
 msgstr "调用者选定的准确区域，在任务创建时复制。"
 
-#: ../../../../../../docs/reference/api/os.md:50
+#: ../../../../docs/reference/api/os.md:96
 msgid "Complete caller-owned protected task metadata."
 msgstr "调用者拥有的完整受保护任务元数据。"
 
-#: ../../../../../../docs/reference/api/os.md:50
+#: ../../../../docs/reference/api/os.md:96
 msgid ""
 "Zero-initialize in privileged RAM before first start. The TCB includes the "
 "real port context and protected stack. One privileged lifecycle owner "
 "serializes start/delete."
 msgstr "首次启动前，在特权 RAM 中零初始化。TCB 包含真实端口上下文和受保护栈。一个特权生命周期所有者串行调用 start/delete。"
 
-#: ../../../../../../docs/reference/api/os.md:50
+#: ../../../../docs/reference/api/os.md:96
 msgid "Immutable creation inputs, borrowed for this call only."
 msgstr "不可变创建输入，仅在本次调用内被借用。"
 
-#: ../../../../../../docs/reference/api/os.md:50
+#: ../../../../docs/reference/api/os.md:96
 msgid ""
 "The entry must be explicit user code and must not return. Stack and context "
 "data remain borrowed until owner deletion; regions never include kernel RAM,"
@@ -1041,19 +1188,19 @@ msgstr ""
 "入口必须是显式用户代码，且不得返回。栈和上下文数据保持被借用，直到所有者删除；区域不得包含内核 RAM、代码或 MMIO。上下文必须完整位于用户栈、用户"
 " Flash 或已映射数据内。名称必须在可读的链接器保留区域内、在 configMAX_TASK_NAME_LEN 长度内终止；名称在冷路径复制。"
 
-#: ../../../../../../docs/reference/api/os.md:56
+#: ../../../../docs/reference/api/os.md:102
 msgid "freertos_stack.h"
 msgstr "freertos_stack.h"
 
-#: ../../../../../../docs/reference/api/os.md:58
+#: ../../../../docs/reference/api/os.md:104
 msgid "Optional bounded task stack paint snapshot."
 msgstr "可选、有界的任务栈涂色快照。"
 
-#: ../../../../../../docs/reference/api/os.md:58
+#: ../../../../docs/reference/api/os.md:104
 msgid "Copy bounded stack paint facts using actual kernel identity."
 msgstr "使用真实内核身份复制有界栈涂色事实。"
 
-#: ../../../../../../docs/reference/api/os.md:58
+#: ../../../../docs/reference/api/os.md:104
 msgid ""
 "Privileged unmasked running Thread; task stack quiescent throughout the "
 "scan. Available only with NEXUS_OS_TRACE. xTaskGetStaticBuffers verifies "
@@ -1070,103 +1217,97 @@ msgstr ""
 "words*sizeof(StackType_t) 个字节。涂色值是锁定内核使用的 0xA5。未触及／已触及的字节不能证明物理栈峰值。POSIX "
 "内核端口使用独立的 pthread 执行栈；其查询不能测得 MCU 或 Linux 执行栈峰值。"
 
-#: ../../../../../../docs/reference/api/os.md:58
+#: ../../../../docs/reference/api/os.md:104
 msgid "[in] Exact original TCB, stack and capacity, all live."
 msgstr "[in] 准确的原始 TCB、栈及容量，均须存活。"
 
-#: ../../../../../../docs/reference/api/os.md:58
+#: ../../../../docs/reference/api/os.md:104
 msgid "[out] Distinct output, unchanged on rejection."
 msgstr "[out] 独立输出，拒绝时保持不变。"
 
-#: ../../../../../../docs/reference/api/os.md:58
+#: ../../../../docs/reference/api/os.md:104
 msgid "SUCCESS, INVALID, CONTEXT or STATE for a binding mismatch."
 msgstr "SUCCESS、INVALID、CONTEXT，或绑定不匹配时的 STATE。"
 
-#: ../../../../../../docs/reference/api/os.md:58
+#: ../../../../docs/reference/api/os.md:104
 msgid "Exact static task facts supplied at original creation."
 msgstr "原始创建时提供的准确静态任务事实。"
 
-#: ../../../../../../docs/reference/api/os.md:58
+#: ../../../../docs/reference/api/os.md:104
 msgid ""
 "The caller retains all storage, excludes delete/join/discard and never "
 "replaces the live binding. This is not a registry."
 msgstr "调用者保留全部存储，排除 delete/join/discard，并且绝不替换存活绑定。这不是注册表。"
 
-#: ../../../../../../docs/reference/api/os.md:64
+#: ../../../../docs/reference/api/os.md:110
 msgid "freertos_user.h"
 msgstr "freertos_user.h"
 
-#: ../../../../../../docs/reference/api/os.md:66
+#: ../../../../docs/reference/api/os.md:112
 msgid "Narrow pointer-free services for MPU-isolated user tasks."
 msgstr "MPU 隔离用户任务的窄接口、无指针服务。"
 
-#: ../../../../../../docs/reference/api/os.md:66
-#: ../../../../../../docs/reference/api/os.md:74
-#: ../../../../../../docs/reference/api/os.md:90
-msgid "Defines"
-msgstr "宏定义"
-
-#: ../../../../../../docs/reference/api/os.md:66
+#: ../../../../docs/reference/api/os.md:112
 msgid "Explicitly reviewed unprivileged executable code section."
 msgstr "显式审查的非特权可执行代码段。"
 
-#: ../../../../../../docs/reference/api/os.md:66
+#: ../../../../docs/reference/api/os.md:112
 msgid "Explicit user RAM, separate from kernel and provider state."
 msgstr "显式用户 RAM，与内核和提供者状态分离。"
 
-#: ../../../../../../docs/reference/api/os.md:66
+#: ../../../../docs/reference/api/os.md:112
 msgid "Explicit zero-initialized user storage in its reserved RAM span."
 msgstr "在预留 RAM 区间中显式定义、零初始化的用户存储。"
 
-#: ../../../../../../docs/reference/api/os.md:66
+#: ../../../../docs/reference/api/os.md:112
 msgid "Trusted static task metadata placed in protected kernel RAM."
 msgstr "放入受保护内核 RAM 的可信静态任务元数据。"
 
-#: ../../../../../../docs/reference/api/os.md:66
+#: ../../../../docs/reference/api/os.md:112
 msgid "Delay the calling user task through the real MPU SVC."
 msgstr "通过真实 MPU SVC 延迟调用用户任务。"
 
-#: ../../../../../../docs/reference/api/os.md:66
+#: ../../../../docs/reference/api/os.md:112
 msgid ""
 "Thread only with a running scheduler. No handle or pointer crosses the "
 "boundary. This is not a microsecond deadline."
 msgstr "仅限调度器正在运行的 Thread。边界两侧不传递句柄或指针。这不是微秒截止时间。"
 
-#: ../../../../../../docs/reference/api/os.md:66
+#: ../../../../docs/reference/api/os.md:112
 msgid "[in] Relative kernel ticks; zero requests rescheduling."
 msgstr "[in] 内核相对 tick 数；零表示请求重新调度。"
 
-#: ../../../../../../docs/reference/api/os.md:66
+#: ../../../../docs/reference/api/os.md:112
 msgid "Read the kernel's wrapping 32-bit tick counter through SVC."
 msgstr "通过 SVC 读取内核可回绕的 32 位 tick 计数器。"
 
-#: ../../../../../../docs/reference/api/os.md:66
+#: ../../../../docs/reference/api/os.md:112
 msgid ""
 "Thread-only MPU profile service, distinct from Core time. No object handle "
 "or pointer crosses this service."
 msgstr "仅限 Thread 的 MPU 配置服务，与 Core 时间不同。此服务不跨边界传递对象句柄或指针。"
 
-#: ../../../../../../docs/reference/api/os.md:66
+#: ../../../../docs/reference/api/os.md:112
 msgid "Current kernel tick count in the selected OS clock domain."
 msgstr "选定 OS 时钟域内的当前内核 tick 计数。"
 
-#: ../../../../../../docs/reference/api/os.md:72
+#: ../../../../docs/reference/api/os.md:118
 msgid "lowpower.h"
 msgstr "lowpower.h"
 
-#: ../../../../../../docs/reference/api/os.md:74
+#: ../../../../docs/reference/api/os.md:120
 msgid "Explicit continuous-clock tickless timer port."
 msgstr "显式的连续时钟无 tick 定时器端口。"
 
-#: ../../../../../../docs/reference/api/os.md:74
+#: ../../../../docs/reference/api/os.md:120
 msgid "Bounded late alarm catch-up; larger delays violate the timer port."
 msgstr "有界的延迟闹钟追赶；超出边界即违反定时器端口合同。"
 
-#: ../../../../../../docs/reference/api/os.md:74
+#: ../../../../docs/reference/api/os.md:120
 msgid "Return the explicitly selected continuous timer port."
 msgstr "返回显式选定的连续定时器端口。"
 
-#: ../../../../../../docs/reference/api/os.md:74
+#: ../../../../docs/reference/api/os.md:120
 msgid ""
 "A maintained SoC binding or application implementation overrides the weak "
 "NULL default. The port and context remain live throughout the scheduler; no "
@@ -1176,15 +1317,15 @@ msgstr ""
 "维护范围内的 SoC 绑定或应用实现覆盖弱 NULL "
 "默认值。端口和上下文必须在调度器整个生命周期内存活；不提供运行期重新绑定、隐藏池或执行任务。没有端口时绝不停止 tick，也不进入睡眠。"
 
-#: ../../../../../../docs/reference/api/os.md:74
+#: ../../../../docs/reference/api/os.md:120
 msgid "Stable port or NULL to leave normal periodic ticking."
 msgstr "稳定端口，或以 NULL 保持正常周期 tick。"
 
-#: ../../../../../../docs/reference/api/os.md:74
+#: ../../../../docs/reference/api/os.md:120
 msgid "Kernel tickless hook with measured phase preservation."
 msgstr "保留实测相位的内核无 tick 钩子。"
 
-#: ../../../../../../docs/reference/api/os.md:74
+#: ../../../../docs/reference/api/os.md:120
 msgid ""
 "Called only by Idle with scheduler suspended. Uses reviewed masked shallow "
 "WFI, exact saved PRIMASK restoration and bounded pended-tick catch-up. The "
@@ -1197,19 +1338,19 @@ msgstr ""
 "频率必须能整除 1000000。暂停 tick 前先做最后一次内核就绪检查；暂停被拒绝时不产生修改。默认 profile 不调用此钩子。HIL "
 "必须验证具体定时器、时钟连续性和实际唤醒延迟。"
 
-#: ../../../../../../docs/reference/api/os.md:74
+#: ../../../../docs/reference/api/os.md:120
 msgid "[in] Kernel's bounded next-unblock window."
 msgstr "[in] 内核给出的有界、距下一次解除阻塞的窗口。"
 
-#: ../../../../../../docs/reference/api/os.md:74
+#: ../../../../docs/reference/api/os.md:120
 msgid "Stopped-tick epoch with the concrete port's declared precision."
 msgstr "tick 停止 epoch，精度以具体端口声明为准。"
 
-#: ../../../../../../docs/reference/api/os.md:74
+#: ../../../../docs/reference/api/os.md:120
 msgid "Caller-owned, immutable tickless timer implementation."
 msgstr "调用者拥有的不可变无 tick 定时器实现。"
 
-#: ../../../../../../docs/reference/api/os.md:74
+#: ../../../../docs/reference/api/os.md:120
 msgid ""
 "All methods run in privileged Idle Thread mode with PRIMASK=1 and scheduler "
 "suspended. They are bounded, never block or call kernel functions. "
@@ -1234,304 +1375,27 @@ msgstr ""
 "tick。闹钟必须不晚于截止时间唤醒；至多允许追赶八个额外 tick 的延迟。时钟倒退或更大延迟必须故障停止。本接口不配置时钟、NVIC、SCR "
 "或板级定时器。"
 
-#: ../../../../../../docs/reference/api/os.md:80
-msgid "native.h"
-msgstr "native.h"
-
-#: ../../../../../../docs/reference/api/os.md:82
-msgid "Explicit POSIX notification, queue and task storage."
-msgstr "显式 POSIX 通知、队列与任务存储。"
-
-#: ../../../../../../docs/reference/api/os.md:82
-msgid "Read POSIX monotonic microseconds."
-msgstr "读取 POSIX 单调微秒时间。"
-
-#: ../../../../../../docs/reference/api/os.md:82
-msgid "Clock value; clock_gettime failure is process-fatal"
-msgstr "时钟值；clock_gettime 失败会导致进程终止"
-
-#: ../../../../../../docs/reference/api/os.md:82
-msgid "Initialize a notification in unused caller storage."
-msgstr "在调用者尚未使用的存储中初始化通知。"
-
-#: ../../../../../../docs/reference/api/os.md:82
-msgid ""
-"Task context; POSIX signal handlers are unsupported. BUSY retains resources:"
-" keep storage and retry destroy only. Other failures leave no resources; "
-"initialization may retry."
-msgstr ""
-"任务上下文；不支持 POSIX signal handler。BUSY 保留资源：保持存储，只重试 destroy。其他失败不遗留资源，可重试初始化。"
-
-#: ../../../../../../docs/reference/api/os.md:82
-msgid "[out] Storage kept alive through all publishers"
-msgstr "[out] 存储须比所有发布者存活更久"
-
-#: ../../../../../../docs/reference/api/os.md:82
-msgid "NX_SUCCESS, BUSY or an initialization error"
-msgstr "NX_SUCCESS、BUSY 或初始化错误"
-
-#: ../../../../../../docs/reference/api/os.md:82
-msgid "Bind a single-waiter latched notification port."
-msgstr "绑定单等待者的序列锁存通知端口。"
-
-#: ../../../../../../docs/reference/api/os.md:82
-msgid ""
-"Port using CLOCK_MONOTONIC absolute microseconds and NX_DEADLINE_NEVER for "
-"untimed waiting"
-msgstr "端口使用 CLOCK_MONOTONIC 绝对微秒时间；NX_DEADLINE_NEVER 表示不设超时的等待"
-
-#: ../../../../../../docs/reference/api/os.md:82
-msgid "Destroy after external publisher quiescence."
-msgstr "外部发布者静止后再销毁。"
-
-#: ../../../../../../docs/reference/api/os.md:82
-msgid ""
-"Stop and join publishers first. The check cannot authorize a future call to "
-"race destruction. After success, no storage access is allowed. A partial "
-"destroy disables new ports; retain storage and retry destroy without "
-"reinitialization."
-msgstr ""
-"先停止并 join publisher。检查不能授权未来调用与销毁并发。成功后不得再访问存储。部分 destroy 禁用新 "
-"port；保留存储，不重新初始化，只重试 destroy。"
-
-#: ../../../../../../docs/reference/api/os.md:82
-msgid "[inout] Live storage with no future publishers"
-msgstr "[inout] 存活存储，之后不再有发布者"
-
-#: ../../../../../../docs/reference/api/os.md:82
-msgid "NX_SUCCESS or BUSY while a waiter/resource remains"
-msgstr "NX_SUCCESS；waiter／资源仍保留时返回 BUSY"
-
-#: ../../../../../../docs/reference/api/os.md:82
-msgid "Initialize an explicit bounded byte-copy queue."
-msgstr "初始化显式、有界的字节复制队列。"
-
-#: ../../../../../../docs/reference/api/os.md:82
-msgid ""
-"Task context; caller keeps buffer until successful destroy. Used depth times"
-" item_size bytes must not overlap the complete queue control; wrapping spans"
-" reject at admission. After initialization BUSY, only destroy is allowed. "
-"Other failures leave no resources and permit initialization again."
-msgstr ""
-"任务上下文；调用者保留 buffer 直至成功 destroy。实际使用的 depth 乘 item_size "
-"字节不得与完整队列控制对象重叠；范围地址回绕在准入时拒绝。初始化返回 BUSY 后，只允许 destroy。其他失败不遗留资源，并允许再次初始化。"
-
-#: ../../../../../../docs/reference/api/os.md:82
-msgid "[out] Unused caller storage"
-msgstr "[out] 尚未使用的调用者存储"
-
-#: ../../../../../../docs/reference/api/os.md:82
-msgid "[in] Caller-owned byte buffer"
-msgstr "[in] 调用者拥有的字节缓冲区"
-
-#: ../../../../../../docs/reference/api/os.md:82
-msgid "[in] Number of items, greater than zero"
-msgstr "[in] 条目数量，大于零"
-
-#: ../../../../../../docs/reference/api/os.md:82
-msgid "[in] Bytes per item, greater than zero"
-msgstr "[in] 每条目字节数，大于零"
-
-#: ../../../../../../docs/reference/api/os.md:82
-msgid ""
-"NX_SUCCESS or invalid/initialization error; BUSY retains resources for a "
-"subsequent destroy"
-msgstr "NX_SUCCESS 或参数／初始化错误；BUSY 保留资源，供后续 destroy"
-
-#: ../../../../../../docs/reference/api/os.md:82
-msgid "Copy one item to the queue."
-msgstr "向队列复制一个条目。"
-
-#: ../../../../../../docs/reference/api/os.md:82
-msgid ""
-"Immediately available capacity is used even at an expired deadline. A finite"
-" deadline bounds waiting; spurious wakes never restart its budget. No item "
-"is retained on failure."
-msgstr "即使截止时间已到期，仍使用立即可用的容量。有限截止时间约束等待；伪唤醒绝不重新开始等待预算。失败时不保留任何条目。"
-
-#: ../../../../../../docs/reference/api/os.md:82
-msgid "[in] At least item_size bytes, borrowed during call only"
-msgstr "[in] 至少 item_size 字节，仅在调用期间借用"
-
-#: ../../../../../../docs/reference/api/os.md:82
-msgid "[in] Absolute CLOCK_MONOTONIC deadline or NX_DEADLINE_NEVER"
-msgstr "[in] CLOCK_MONOTONIC 绝对截止时间，或 NX_DEADLINE_NEVER"
-
-#: ../../../../../../docs/reference/api/os.md:82
-msgid "SUCCESS, TIMEOUT, STATE (closed) or error"
-msgstr "SUCCESS、TIMEOUT、STATE（已关闭）或错误"
-
-#: ../../../../../../docs/reference/api/os.md:82
-msgid "Receive one item; closed queues can still be drained."
-msgstr "接收一个条目；关闭的队列仍可排空。"
-
-#: ../../../../../../docs/reference/api/os.md:82
-msgid ""
-"An immediately available item can be received at an expired deadline. On "
-"failure the output is unchanged. Closed queues return STATE only after "
-"existing items have been drained."
-msgstr "截止时间已到期时仍可接收立即可用的条目。失败时输出不变。关闭的队列仅在现有条目排空后返回 STATE。"
-
-#: ../../../../../../docs/reference/api/os.md:82
-msgid "[out] At least item_size bytes; valid only on SUCCESS"
-msgstr "[out] 至少 item_size 字节；仅在 SUCCESS 时有效"
-
-#: ../../../../../../docs/reference/api/os.md:82
-msgid "Reject sends and wake all waiting callers."
-msgstr "拒绝发送，并唤醒全部正在等待的调用者。"
-
-#: ../../../../../../docs/reference/api/os.md:82
-msgid "Task context; caller must join queue users before destroy."
-msgstr "任务上下文；调用者必须在 destroy 前 join 队列使用者。"
-
-#: ../../../../../../docs/reference/api/os.md:82
-msgid "NX_SUCCESS or invalid error"
-msgstr "NX_SUCCESS 或无效参数错误"
-
-#: ../../../../../../docs/reference/api/os.md:82
-msgid "Destroy quiesced and drained queue storage."
-msgstr "销毁已静止且已排空的队列存储。"
-
-#: ../../../../../../docs/reference/api/os.md:82
-msgid ""
-"A partial destroy closes all public operations. Retain storage and retry "
-"destroy; do not reinitialize it yet."
-msgstr "部分 destroy 关闭所有公共操作。保留存储并重试 destroy，暂不得重新初始化。"
-
-#: ../../../../../../docs/reference/api/os.md:82
-msgid "[inout] Closed queue, no future users"
-msgstr "[inout] 已关闭队列，之后不再有使用者"
-
-#: ../../../../../../docs/reference/api/os.md:82
-msgid "NX_SUCCESS or BUSY if users/items/resources remain"
-msgstr "NX_SUCCESS；user／item／资源仍保留时返回 BUSY"
-
-#: ../../../../../../docs/reference/api/os.md:82
-msgid "Start a task using the supplied host stack."
-msgstr "使用供给的主机栈启动任务。"
-
-#: ../../../../../../docs/reference/api/os.md:82
-msgid ""
-"Task context. No default task, pool or hidden stack exists. Stack and "
-"complete task control must not overlap; wrapping spans reject before POSIX "
-"task creation. POSIX library bookkeeping is host-runtime allocation, not MCU"
-" RAM evidence. Failure retains no entry/context borrow."
-msgstr ""
-"任务上下文。没有默认任务、池或隐藏栈。栈与完整任务控制对象不得重叠；范围地址回绕在创建 POSIX 任务之前拒绝。POSIX "
-"库内部管理分配属于主机运行时分配，不是 MCU RAM 证据。失败不保留 entry／context 借用。"
-
-#: ../../../../../../docs/reference/api/os.md:82
-msgid "[out] Zero-initialized unused caller handle"
-msgstr "[out] 已清零且尚未使用的调用者句柄"
-
-#: ../../../../../../docs/reference/api/os.md:82
-msgid "[in] Aligned storage accepted by pthread_attr_setstack"
-msgstr "[in] pthread_attr_setstack 接受的对齐存储"
-
-#: ../../../../../../docs/reference/api/os.md:82
-msgid "[in] Host stack size, at least PTHREAD_STACK_MIN"
-msgstr "[in] 主机栈大小，至少为 PTHREAD_STACK_MIN"
-
-#: ../../../../../../docs/reference/api/os.md:82
-msgid "[in] Returning bounded application entry"
-msgstr "[in] 会返回、执行有界的应用入口"
-
-#: ../../../../../../docs/reference/api/os.md:82
-msgid "[in] Entry context, kept alive until join"
-msgstr "[in] 入口上下文，保留直到 join"
-
-#: ../../../../../../docs/reference/api/os.md:82
-msgid ""
-"NX_SUCCESS or invalid/start error; EXHAUSTED when POSIX cannot create "
-"another task"
-msgstr "NX_SUCCESS 或参数／启动错误；POSIX 无法再创建任务时返回 EXHAUSTED"
-
-#: ../../../../../../docs/reference/api/os.md:82
-msgid "Join after requesting cooperative application stop."
-msgstr "请求应用协作停止之后执行 join。"
-
-#: ../../../../../../docs/reference/api/os.md:82
-msgid ""
-"May block until entry returns. No forced cancellation. Caller may release "
-"context, handle and stack only after success. One external owner serializes "
-"start/join; multiple simultaneous joiners and external pthread_cancel/detach"
-" are unsupported. Stop/join publishers before destroying their notification "
-"or queue storage. Inactive private pointer values do not retain a borrow."
-msgstr ""
-"可能阻塞至 entry 返回。不强制取消。只有成功后调用者才可释放 context、handle 和栈。由唯一外部 owner 串行执行 "
-"start／join；不支持多个并发 joiner 或外部 pthread_cancel／detach。销毁通知或队列存储前，先停止并 join 其 "
-"publisher。非活动私有指针值不保留借用。"
-
-#: ../../../../../../docs/reference/api/os.md:82
-msgid "[inout] Started task; caller must not be the joined task"
-msgstr "[inout] 已启动的任务；调用者不得是被 join 的任务"
-
-#: ../../../../../../docs/reference/api/os.md:82
-msgid "NX_SUCCESS only after pthread_join confirms execution exit"
-msgstr "仅在 pthread_join 确认执行已退出后返回 NX_SUCCESS"
-
-#: ../../../../../../docs/reference/api/os.md:82
-msgid "Single waiter, multiple task publishers; fields are private."
-msgstr "单等待者、多个 Task 发布者；字段为私有状态。"
-
-#: ../../../../../../docs/reference/api/os.md:82
-msgid ""
-"Initialize/destroy have one external lifecycle owner. Stop and join all "
-"publishers and the waiter before destroy. External pthread_cancel of a "
-"caller blocked in these APIs is unsupported; use cooperative stop, publish "
-"and join."
-msgstr ""
-"initialize/destroy 由一个外部生命周期所有者负责。destroy 前，停止并 join 所有发布者和等待者。不支持外部对阻塞在这些 "
-"API 中的调用者执行 pthread_cancel；应使用协作停止、发布和 join。"
-
-#: ../../../../../../docs/reference/api/os.md:82
-msgid "Caller-sized queue storage; no heap or global object pool."
-msgstr "由调用者确定容量的队列存储，不使用堆或全局对象池。"
-
-#: ../../../../../../docs/reference/api/os.md:82
-msgid ""
-"One lifecycle owner initializes, closes and destroys. Multiple "
-"producers/consumers are supported while live. External pthread_cancel of "
-"blocked users is unsupported."
-msgstr ""
-"由一个生命周期所有者执行 initialize、close 和 destroy。存活期间支持多个生产者／消费者。不支持外部对阻塞使用者执行 "
-"pthread_cancel。"
-
-#: ../../../../../../docs/reference/api/os.md:82
-msgid "Explicit task handle; stack storage is supplied at start."
-msgstr "显式任务句柄；启动时供给栈存储。"
-
-#: ../../../../../../docs/reference/api/os.md:82
-msgid ""
-"Zero-initialize before the first start; successful join permits reuse. "
-"Start/join have one external lifecycle owner; there is one joiner. An entry "
-"may attempt a self-join, which returns BUSY. External cancellation and "
-"detachment are unsupported."
-msgstr ""
-"首次 start 之前零初始化；成功 join 后可复用。start／join 由唯一外部生命周期 owner 负责；只有一个 joiner。entry"
-" 可尝试 self-join，此时返回 BUSY。不支持外部取消或 detach。"
-
-#: ../../../../../../docs/reference/api/os.md:88
+#: ../../../../docs/reference/api/os.md:126
 msgid "secure_context.h"
 msgstr "secure_context.h"
 
-#: ../../../../../../docs/reference/api/os.md:90
+#: ../../../../docs/reference/api/os.md:128
 msgid "Caller-owned Secure context leases for a trusted NS kernel."
 msgstr "供可信 NS 内核使用的调用者自有 Secure 上下文租约。"
 
-#: ../../../../../../docs/reference/api/os.md:90
+#: ../../../../docs/reference/api/os.md:128
 msgid "Minimum context capacity excludes the eight-byte ARM stack seal."
 msgstr "最小上下文容量不包含八字节 ARM 栈封印。"
 
-#: ../../../../../../docs/reference/api/os.md:90
+#: ../../../../docs/reference/api/os.md:128
 msgid "Secure-context integrity failures, distinct from normal rejection."
 msgstr "Secure 上下文完整性失败，与普通拒绝区分。"
 
-#: ../../../../../../docs/reference/api/os.md:90
+#: ../../../../docs/reference/api/os.md:128
 msgid "Prepare exact Secure storage for one trusted task identity."
 msgstr "为一个可信任务身份准备准确 Secure 存储。"
 
-#: ../../../../../../docs/reference/api/os.md:90
+#: ../../../../docs/reference/api/os.md:128
 msgid ""
 "Secure privileged Thread startup/exclusive lifecycle owner. Both memory "
 "spans must be Secure, writable and disjoint. No NS task may run against this"
@@ -1541,50 +1405,50 @@ msgstr ""
 "Secure 特权 Thread 启动上下文／独占生命周期所有者。两段内存都必须是 Secure、可写且互不重叠。prepare 期间，不得有 NS "
 "任务以此身份运行。拒绝重复 prepare；epoch 绝不重置。不使用分配、内核操作或运行期注册表。"
 
-#: ../../../../../../docs/reference/api/os.md:90
+#: ../../../../docs/reference/api/os.md:128
 msgid "[out] Zero-initialized caller-owned Secure metadata."
 msgstr "[out] 已清零、由调用者拥有的 Secure 元数据。"
 
-#: ../../../../../../docs/reference/api/os.md:90
+#: ../../../../docs/reference/api/os.md:128
 msgid "[in] Eight-byte-aligned Secure writable stack allocation."
 msgstr "[in] 八字节对齐的 Secure 可写栈分配。"
 
-#: ../../../../../../docs/reference/api/os.md:90
+#: ../../../../docs/reference/api/os.md:128
 msgid "[in] Whole allocation, including eight-byte upper seal."
 msgstr "[in] 整块分配，包含上端八字节封印。"
 
-#: ../../../../../../docs/reference/api/os.md:90
+#: ../../../../docs/reference/api/os.md:128
 msgid "[in] Opaque NS task identity, never dereferenced here."
 msgstr "[in] 不透明 NS 任务身份，此处绝不解引用。"
 
-#: ../../../../../../docs/reference/api/os.md:90
+#: ../../../../docs/reference/api/os.md:128
 msgid "SUCCESS, INVALID, CONTEXT, STATE or BUSY."
 msgstr "SUCCESS、INVALID、CONTEXT、STATE 或 BUSY。"
 
-#: ../../../../../../docs/reference/api/os.md:90
+#: ../../../../docs/reference/api/os.md:128
 msgid "Rebind retired metadata while preserving its epoch history."
 msgstr "在保留 epoch 历史的前提下重新绑定已退役元数据。"
 
-#: ../../../../../../docs/reference/api/os.md:90
+#: ../../../../docs/reference/api/os.md:128
 msgid ""
 "Secure lifecycle owner only after joining the previous task and stopping "
 "every observer. Existing stack is reused; stale handles remain invalid after"
 " the next allocation."
 msgstr "仅限 Secure 生命周期所有者，在先前任务已 join 且每个观察者均已停止后调用。复用现有栈；下一次分配后，过期句柄仍无效。"
 
-#: ../../../../../../docs/reference/api/os.md:90
+#: ../../../../docs/reference/api/os.md:128
 msgid "[inout] Prepared, unleased and unloaded Secure metadata."
 msgstr "[inout] 已准备、未租出且未加载的 Secure 元数据。"
 
-#: ../../../../../../docs/reference/api/os.md:90
+#: ../../../../docs/reference/api/os.md:128
 msgid "[in] New trusted NS task identity."
 msgstr "[in] 新的可信 NS 任务身份。"
 
-#: ../../../../../../docs/reference/api/os.md:90
+#: ../../../../docs/reference/api/os.md:128
 msgid "Resolve a trusted, statically composed Secure task record."
 msgstr "解析可信、静态组合的 Secure 任务记录。"
 
-#: ../../../../../../docs/reference/api/os.md:90
+#: ../../../../docs/reference/api/os.md:128
 msgid ""
 "Secure application overrides the weak NULL default with an immutable "
 "mapping. Called with both PRIMASK states held; never dereference an NS-"
@@ -1597,19 +1461,19 @@ msgstr ""
 "提供的元数据指针、分配、阻塞、发现对象、调用内核或修改映射。NS 内核及其 SVC/PendSV 被信任：此机制不认证恶意 NS 特权内核。NS "
 "Thread 调用不能伪装为 Handler 来源。"
 
-#: ../../../../../../docs/reference/api/os.md:90
+#: ../../../../docs/reference/api/os.md:128
 msgid "[in] Opaque identity supplied by the trusted NS kernel."
 msgstr "[in] 可信 NS 内核提供的不透明身份。"
 
-#: ../../../../../../docs/reference/api/os.md:90
+#: ../../../../docs/reference/api/os.md:128
 msgid "Prepared caller-owned metadata, or NULL when unauthorized."
 msgstr "已准备、由调用者拥有的元数据；未获授权时为 NULL。"
 
-#: ../../../../../../docs/reference/api/os.md:90
+#: ../../../../docs/reference/api/os.md:128
 msgid "Fail stop after a loaded Secure stack integrity failure."
 msgstr "已加载 Secure 栈发生完整性失败后执行故障停止。"
 
-#: ../../../../../../docs/reference/api/os.md:90
+#: ../../../../docs/reference/api/os.md:128
 msgid ""
 "Secure application may override to record/reset safely. Called with both "
 "masks held; must not return, block, call a kernel or release retained "
@@ -1619,15 +1483,15 @@ msgstr ""
 "Secure "
 "应用可覆盖以安全记录／复位。调用期间持有两侧屏蔽；不得返回、阻塞、调用内核或释放保留的存储。默认保持屏蔽并自旋。不强加传输机制或产品恢复策略。"
 
-#: ../../../../../../docs/reference/api/os.md:90
+#: ../../../../docs/reference/api/os.md:128
 msgid "[in] Seal or stack invariant violation."
 msgstr "[in] 封印或栈不变量被破坏。"
 
-#: ../../../../../../docs/reference/api/os.md:90
+#: ../../../../docs/reference/api/os.md:128
 msgid "Explicit Secure metadata, never stored in Nonsecure RAM."
 msgstr "显式 Secure 元数据，绝不存放于 Nonsecure RAM。"
 
-#: ../../../../../../docs/reference/api/os.md:90
+#: ../../../../docs/reference/api/os.md:128
 msgid ""
 "Zero-initialize before prepare. Fields are mechanism-owned while prepared; "
 "applications cannot modify them. Metadata and stack remain alive until the "
@@ -1637,474 +1501,94 @@ msgstr ""
 "prepare 前清零。准备期间字段由机制拥有，应用不得修改。元数据和栈必须保持存活，直到任务已 join、租约已释放且不再有已加载上下文。Secure"
 " 栈的运行期容量属于应用预算，不是此端口的最小值。"
 
-#: ../../../../../../docs/reference/api/os.md:96
+#: ../../../../docs/reference/api/os.md:134
 msgid "threadx.h"
 msgstr "threadx.h"
 
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "Caller-owned ThreadX task, wait and byte queue services."
-msgstr "调用者拥有的 ThreadX 任务、等待和字节队列服务。"
+#: ../../../../docs/reference/api/os.md:136
+msgid "Explicit ThreadX fault, Tick and IRQ inspection extensions."
+msgstr "显式 ThreadX 故障、Tick 与 IRQ 检查扩展。"
 
-#: ../../../../../../docs/reference/api/os.md:98
+#: ../../../../docs/reference/api/os.md:136
 msgid ""
-"Privileged, single-core, current-security-domain APIs. All controls start "
-"zeroed and remain adapter-owned while live. One external lifecycle owner "
-"serializes init/destroy and joins; publishers, queue callers and IRQ sources"
-" must quiesce before reclaiming storage. Runtime task operations require "
-"unmasked Thread mode and a running kernel. Actual bootstrap permits object "
-"init, task create/discard and wake; it does not permit blocking waits or "
-"queue operations. A manual mask, ISR or unsupported context returns CONTEXT "
-"before mutation. The byte queue's task threshold guard rejects foreign "
-"priority-zero time-sliced callers. Caller controls, stack ranges, full "
-"borrowed name/context objects, queue payloads, item buffers and waiters must"
-" be disjoint. Cold admission rejects known control/stack/payload overlap and"
-" name/context starting inside control or stack; unknown opaque extents "
-"remain the caller's responsibility. Never operate a closable queue through "
-"its raw inner queue. All deadlines use nx_time_now_us; NX_DEADLINE_NEVER is "
-"an actual unbounded kernel wait. Timeout never revokes any accepted I/O "
-"borrow. MPU/TZ isolation, tickless sleep and additional Cortex-M ports are "
-"outside this backend scope."
-msgstr ""
-"特权、单核、当前安全域 API。所有控制存储初始清零，存活期间由适配器拥有。一个外部生命周期所有者串行执行 init/destroy 和 "
-"join；回收存储前，发布者、队列调用者和 IRQ 源必须静止。运行期任务操作要求未屏蔽的 Thread 模式且内核正在运行。真实 bootstrap "
-"允许对象初始化、任务 create/discard 和唤醒；不允许阻塞等待或队列操作。手动屏蔽、ISR 或不支持的上下文会在修改前返回 "
-"CONTEXT。字节队列的任务阈值保护拒绝外来的优先级零时间片调用者。调用者控制存储、栈范围、完整借用的名称／上下文对象、队列载荷、条目缓冲区和等待者必须互不重叠。冷路径准入拒绝已知的控制／栈／载荷重叠，以及起始地址位于控制存储或栈内的名称／上下文；未知不透明对象的完整范围仍由调用者负责。绝不能通过可关闭队列内部的原始队列执行操作。所有截止时间均使用"
-" nx_time_now_us；NX_DEADLINE_NEVER 是真正无界的内核等待。超时绝不撤销任何已接受的 I/O 借用。MPU/TZ 隔离、无"
-" tick 睡眠及其他 Cortex-M 端口不属于此后端范围。"
+"Common OS operations use the public Nexus headers. Static layouts belong in "
+"nexus/os/storage.h. These hooks remain backend-specific."
+msgstr "公共 OS 操作使用 Nexus 公共头。静态布局位于 nexus/os/storage.h。这些钩子保持后端专用。"
 
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "One explicit caller latch per simultaneous close-aware operation."
-msgstr "每个同时执行的关闭感知操作都显式拥有一个调用者锁存器。"
+#: ../../../../docs/reference/api/os.md:136
+msgid "Product failure hook; the default retains effects and parks."
+msgstr "产品故障钩子；默认保留效果并驻留等待。"
 
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "Explicit irreversible kernel entry owned by the product."
-msgstr "由产品拥有的显式、不可逆内核入口。"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid ""
-"Privileged cold Thread/MSP, no live FP context or masks. Startup may create "
-"and discard unused static objects. After startup returns, the bootstrap "
-"scope is sealed. Only the trusted kernel may call adapter "
-"tx_application_define; it validates canonical privileged Thread context "
-"before the product callback. This is not a security isolation API. An "
-"unexpected kernel return invokes fail-stop and retains all effects; it never"
-" reopens bootstrap reclamation."
-msgstr ""
-"特权冷启动 Thread/MSP，无存活 FP 上下文或屏蔽状态。启动阶段可创建并 discard 尚未使用的静态对象。启动返回后，bootstrap "
-"范围即被封闭。只有可信内核可调用适配器 tx_application_define；适配器在产品回调之前验证规范的特权 Thread "
-"上下文。这不是安全隔离 API。内核意外返回时调用故障停止并保留全部效果；绝不重新开放 bootstrap 回收。"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "[in] Product initialization inside tx_application_define"
-msgstr "[in] 在 tx_application_define 内执行的产品初始化"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "[in] Borrowed through startup and kernel lifetime"
-msgstr "[in] 在整个启动及内核生命周期内借用"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "CONTEXT or INVALID before entry; successful entry never returns"
-msgstr "进入前返回 CONTEXT 或 INVALID；成功进入后绝不返回"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "Product failure hook; default parks forever."
-msgstr "产品失败钩子；默认永久停驻。"
-
-#: ../../../../../../docs/reference/api/os.md:98
+#: ../../../../docs/reference/api/os.md:136
 msgid ""
 "Actual fault context is not repaired or normalized; it may be masked, ISR or"
 " unprivileged. Do not assume a working kernel, clock, stack or permission to"
-" access a peripheral. The adapter observes the Core fault hook before this "
-"hook. Product owns separately reviewed safe output/reset actions. Returning "
-"does not authorize cleanup; the adapter parks."
+" access a peripheral. The adapter observes Core faults before invoking this "
+"hook. Returning does not authorize cleanup; the adapter parks."
 msgstr ""
-"不修复或规范化实际故障上下文；它可能处于屏蔽、ISR "
-"或非特权状态。不得假定内核、时钟、栈可正常使用，也不得假定拥有访问外设的权限。适配器在此钩子之前先调用 Core "
-"故障钩子。产品负责另外审查的安全输出／复位动作。返回不授权清理；适配器将停驻。"
+"不修复或规范化实际故障上下文；它可能带有掩码、位于 ISR 或处于非特权态。不得假定内核、时钟、栈正常工作，或具有访问外设的权限。适配器先调用 Core"
+" 故障观察，再调用本钩子。钩子返回不允许清理；适配器继续驻留等待。"
 
-#: ../../../../../../docs/reference/api/os.md:98
+#: ../../../../docs/reference/api/os.md:136
 msgid "[in] Context, permanent-entry or kernel-return failure"
 msgstr "[in] 上下文、永久入口或内核返回失败"
 
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "Mandatory product hook only for explicit external Tick."
-msgstr "仅显式外部 Tick 模式要求的产品钩子。"
+#: ../../../../docs/reference/api/os.md:136
+msgid "Product hook required only for an explicit external Tick."
+msgstr "仅显式选择外部 Tick 时要求产品提供的钩子。"
 
-#: ../../../../../../docs/reference/api/os.md:98
+#: ../../../../docs/reference/api/os.md:136
 msgid ""
-"Actual kernel bootstrap, privileged PRIMASK masked. Provider owns timer "
-"clock and IRQ ceiling; it must not change the platform's continuous "
-"monotonic clock. Missing hook fails linking. Failure enters retaining fail-"
-"stop."
+"Actual kernel bootstrap, privileged with PRIMASK masked. The provider owns "
+"its timer and IRQ ceiling; it must not change the continuous Core deadline "
+"clock. A missing hook fails linking. Failure retains effects in fail-stop."
 msgstr ""
-"真实内核 bootstrap，特权且 PRIMASK 屏蔽。提供者负责定时器时钟和 IRQ "
-"优先级上限；不得改变平台的连续单调时钟。缺少钩子会导致链接失败。失败将进入保留状态的故障停止。"
+"真实内核引导阶段，处于特权态且 PRIMASK 屏蔽。provider 拥有其定时器和 IRQ 上限，不得改变连续的 Core "
+"截止时间时钟。缺少钩子将链接失败。失败时保留效果并进入 fail-stop。"
 
-#: ../../../../../../docs/reference/api/os.md:98
+#: ../../../../docs/reference/api/os.md:136
 msgid "[in] Exact immutable resolved kernel frequency"
 msgstr "[in] 准确、不可变、已解析的内核频率"
 
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "SUCCESS after binding a real bounded periodic IRQ source"
-msgstr "绑定真实、有界的周期 IRQ 源后返回 SUCCESS"
+#: ../../../../docs/reference/api/os.md:136
+msgid "SUCCESS after binding a bounded real periodic IRQ source"
+msgstr "绑定有界的真实周期 IRQ 源后返回 SUCCESS"
 
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "Read-only configurable-IRQ and selected mask-policy gate."
-msgstr "只读的可配置 IRQ 与选定屏蔽策略检查。"
+#: ../../../../docs/reference/api/os.md:136
+msgid "Inspect the reviewed IRQ and selected kernel mask policy."
+msgstr "检查经过审查的 IRQ 与所选内核掩码政策。"
 
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "Native has no hardware IRQ source and returns false."
-msgstr "Native 没有硬件 IRQ 源，返回 false。"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "True only in a privileged unmasked reviewed external IRQ"
-msgstr "仅在特权、未屏蔽且经过审查的外部 IRQ 中返回 true"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "Initialize one binary latch in task or actual bootstrap."
-msgstr "在任务或真实 bootstrap 上下文初始化一个二值锁存器。"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "[inout] Zeroed caller control retained until destroy"
-msgstr "[inout] 已清零的调用者控制存储，保留直到 destroy"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "SUCCESS, INVALID, CONTEXT or IO"
-msgstr "SUCCESS、INVALID、CONTEXT 或 IO"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "Bind a sequence hint and one concurrent blocking waiter."
-msgstr "绑定序列提示和一个并发阻塞等待者。"
-
-#: ../../../../../../docs/reference/api/os.md:98
+#: ../../../../docs/reference/api/os.md:136
 msgid ""
-"Binding/arm are reads. Wake supports task/bootstrap or an IRQ admitted by "
-"nx_threadx_isr_allowed. Wait is task-only; finite deadline expiration "
-"precedes a changed sequence."
-msgstr ""
-"绑定／arm 为只读操作。wake 支持任务／bootstrap，或经 nx_threadx_isr_allowed 准入的 IRQ。wait "
-"仅限任务上下文；有限截止时间到期的判断优先于序列变化。"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "[inout] Live latch retained through every port user"
-msgstr "[inout] 存活锁存器，须在每个端口使用者存活期间保留"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "Wait face; empty face for null or non-live control"
-msgstr "等待接口；控制存储为 null 或未存活时返回空接口"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "Destroy only after all publishers and waiter quiesce."
-msgstr "全部发布者和等待者静止后才允许销毁。"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "[inout] Live caller latch"
-msgstr "[inout] 存活的调用者锁存器"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "SUCCESS, INVALID, CONTEXT, BUSY or IO; failure retains it"
-msgstr "SUCCESS、INVALID、CONTEXT、BUSY 或 IO；失败时保留锁存器"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "Create a cooperatively returning task using exact storage."
-msgstr "使用准确存储创建可协作返回的任务。"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid ""
-"No adapter heap or worker. Name is borrowed, not copied. Linux uses its own "
-"pthread stack; the caller buffer only validates kernel metadata and is not a"
-" host stack budget. Higher-priority entries may run before start returns."
-msgstr ""
-"没有适配器堆或执行任务。名称被借用，不复制。Linux 使用自己的 pthread "
-"栈；调用者缓冲区仅用于验证内核元数据，不是主机栈预算。优先级更高的入口可能在 start 返回前运行。"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "[inout] Zeroed caller TCB/control, retained until join/discard"
-msgstr "[inout] 已清零的调用者 TCB／控制存储，保留直到 join/discard"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "[in] Borrowed immutable name, retained until reclamation"
-msgstr "[in] 借用的不可变名称，保留直到回收"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "[in] Eight-byte aligned caller storage"
-msgstr "[in] 八字节对齐的调用者存储"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "[in] Actual capacity, at least TX_MINIMUM_STACK"
-msgstr "[in] 实际容量，至少为 TX_MINIMUM_STACK"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "[in] ThreadX priority; smaller values run first"
-msgstr "[in] ThreadX 优先级；数值越小越先运行"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "[in] Returns only after application stop/drain"
-msgstr "[in] 仅在应用停止／排空后返回"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "[in] Borrowed until successful join/discard"
-msgstr "[in] 借用直到成功 join/discard"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid ""
-"SUCCESS, INVALID, CONTEXT or IO; partial failure retains live control if "
-"reclamation cannot be established"
-msgstr "SUCCESS、INVALID、CONTEXT 或 IO；部分失败且无法确认可回收时，保留存活控制存储"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "Join a cooperatively returned task and prove detachment."
-msgstr "对协作返回的任务执行 join，并证明引用已撤离。"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid ""
-"Self-join is rejected. Timeout retains task, borrowed name, stack and "
-"context. Completion hint alone never reclaims; successful real kernel "
-"deletion establishes detachment."
-msgstr "拒绝自 join。超时保留任务、借用名称、栈和上下文。仅有完成提示绝不允许回收；真实内核删除成功才证明引用已撤离。"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "[inout] Live caller task, one external joiner only"
-msgstr "[inout] 存活的调用者任务，仅允许一个外部 join 调用者"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "[in] Absolute Core deadline or NX_DEADLINE_NEVER"
-msgstr "[in] 绝对 Core 截止时间，或 NX_DEADLINE_NEVER"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "SUCCESS, INVALID, CONTEXT, TIMEOUT or IO"
-msgstr "SUCCESS、INVALID、CONTEXT、TIMEOUT 或 IO"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "Discard an unused task only inside actual bootstrap."
-msgstr "仅在真实 bootstrap 内丢弃尚未使用的任务。"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "This is prestart rollback, never runtime cancellation."
-msgstr "这是启动前回滚，绝不是运行期取消。"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "[inout] Live task whose entry has never begun"
-msgstr "[inout] 存活且入口从未开始执行的任务"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "SUCCESS, INVALID, CONTEXT or IO; failure retains storage"
-msgstr "SUCCESS、INVALID、CONTEXT 或 IO；失败时保留存储"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "Start a permanent task without a completion latch."
-msgstr "启动不含完成锁存器的永久任务。"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "Eight-byte stack alignment; failure can retain live state."
-msgstr "栈按八字节对齐；失败时可能保留存活状态。"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "[inout] Zeroed caller control, retained until reset"
-msgstr "[inout] 已清零的调用者控制存储，保留直到复位"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "[in] Borrowed immutable name, retained until reset"
-msgstr "[in] 借用的不可变名称，保留直到复位"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "[in] Aligned caller buffer, retained until reset"
-msgstr "[in] 已对齐的调用者缓冲区，保留直到复位"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "[in] Smaller ThreadX priority values run first"
-msgstr "[in] ThreadX 优先级数值越小越先运行"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "[in] Never returns; return invokes retaining fail-stop"
-msgstr "[in] 绝不返回；返回将触发保留状态的故障停止"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "[in] Borrowed until reset"
-msgstr "[in] 借用直到复位"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "Initialize an exact arbitrary-byte bounded queue."
-msgstr "初始化支持准确任意字节条目的有界队列。"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "[in] Caller payload storage retained until destroy"
-msgstr "[in] 调用者载荷存储，保留直到 destroy"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "[in] Exact depth multiplied by item_size"
-msgstr "[in] 准确的深度乘以 item_size"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "[in] Positive bounded capacity, below TX_WAIT_FOREVER"
-msgstr "[in] 正数、有界且小于 TX_WAIT_FOREVER 的容量"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "[in] Positive byte count, without word-size narrowing"
-msgstr "[in] 正数字节数，不缩减为字尺寸"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "Task-only send; immediate readiness wins over expiration."
-msgstr "仅 Task 发送；立即就绪优先于截止到期。"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "[inout] Live queue retained throughout the operation"
-msgstr "[inout] 存活队列，在整个操作期间保留"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "[in] Exactly item_size readable bytes borrowed until return"
-msgstr "[in] 准确的 item_size 个可读字节，借用直到返回"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "SUCCESS, INVALID, CONTEXT, TIMEOUT, OVERFLOW or IO"
-msgstr "SUCCESS、INVALID、CONTEXT、TIMEOUT、OVERFLOW 或 IO"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "Task-only receive; output changes only on SUCCESS."
-msgstr "仅 Task 接收；只在 SUCCESS 时修改输出。"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "[out] Exactly item_size writable bytes borrowed until return"
-msgstr "[out] 准确的 item_size 个可写字节，借用直到返回"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "Destroy a drained queue after every caller quiesces."
-msgstr "每个调用者静止后，销毁已排空队列。"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "[inout] Live caller control and storage"
-msgstr "[inout] 存活的调用者控制存储及数据存储"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "SUCCESS, INVALID, CONTEXT or BUSY; failure retains storage"
-msgstr "SUCCESS、INVALID、CONTEXT 或 BUSY；失败时保留存储"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "Initialize one explicit close-aware operation latch."
-msgstr "初始化一个显式关闭感知操作锁存器。"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "[inout] Zeroed caller storage retained until waiter destroy"
-msgstr "[inout] 已清零的调用者存储，保留直到等待者 destroy"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "Destroy inactive waiter after its operation has returned."
-msgstr "等待者操作返回后，销毁其非活动存储。"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "[inout] Live caller latch with no concurrent users"
-msgstr "[inout] 存活的调用者锁存器，不能有并发使用者"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "SUCCESS, INVALID, CONTEXT, BUSY or IO"
-msgstr "SUCCESS、INVALID、CONTEXT、BUSY 或 IO"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "Add explicit bounded close broadcast to a byte queue."
-msgstr "向字节队列加入显式、有界的关闭广播。"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid ""
-"Payload size and maximum_waiters bound task scheduling pause; the entire "
-"copy/broadcast does not mask interrupts."
-msgstr "载荷大小和 maximum_waiters 约束任务调度暂停时长；整个复制／广播过程不屏蔽中断。"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "[in] Positive capacity below TX_WAIT_FOREVER"
-msgstr "[in] 正数且小于 TX_WAIT_FOREVER 的容量"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "[in] Positive exact payload byte count"
-msgstr "[in] 正数、准确的载荷字节数"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "[in] Positive maximum simultaneous operations"
-msgstr "[in] 正数的最大同时操作数"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "Reject sends, wake registered waiters, retain queued items."
-msgstr "拒绝发送、唤醒已登记等待者、保留已入队条目。"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "[inout] Live close-aware queue"
-msgstr "[inout] 存活的关闭感知队列"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "SUCCESS, INVALID or CONTEXT; close is idempotent"
-msgstr "SUCCESS、INVALID 或 CONTEXT；close 是幂等操作"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "Send with immediate close wake and explicit admission."
-msgstr "发送时提供立即关闭唤醒与显式准入。"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "A closed queue rejects sends without changing payload."
-msgstr "已关闭队列拒绝发送，且不修改载荷。"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "[inout] Live exclusive latch for this simultaneous call"
-msgstr "[inout] 本次并发调用独占的存活锁存器"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "SUCCESS, CANCELLED, TIMEOUT, BUSY, INVALID, CONTEXT or IO"
-msgstr "SUCCESS、CANCELLED、TIMEOUT、BUSY、INVALID、CONTEXT 或 IO"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "Receive and drain previously queued items after close."
-msgstr "关闭后接收并排空此前已入队的条目。"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "Closed and empty returns CANCELLED; failure leaves output."
-msgstr "已关闭且为空时返回 CANCELLED；失败时输出保持不变。"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "Destroy only a closed, drained and quiesced queue."
-msgstr "仅销毁已关闭、已排空且静止的队列。"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "[inout] Live control and its borrowed payload storage"
-msgstr "[inout] 存活控制存储及其借用的载荷存储"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "One binary latch; publishers quiesce before destruction."
-msgstr "一个二值锁存器；销毁之前发布者必须静止。"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "Returning task retains all storage until external successful join."
-msgstr "返回型任务保留全部存储，直到外部成功 join。"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "Permanent task has no completion latch, join or destroy."
-msgstr "永久任务不含完成锁存器、join 或 destroy。"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "Exact arbitrary byte items; no native word-size narrowing."
-msgstr "准确的任意字节条目，不缩减为原生字尺寸。"
-
-#: ../../../../../../docs/reference/api/os.md:98
-msgid "Optional bounded close broadcast; registry is task-only."
-msgstr "可选、有界关闭广播；登记仅在 Task 上下文执行。"
-
-#: ../../../../../../docs/reference/api/os.md:104
+"Checks actual IRQ range, grouping and syscall ceiling when applicable. The "
+"Linux port has no physical IRQ source and returns false. This read-only "
+"check grants no ownership."
+msgstr "按适用条件检查实际 IRQ 范围、分组和系统调用上限。Linux 端口没有物理 IRQ 源，因此返回 false。本只读检查不授予所有权。"
+
+#: ../../../../docs/reference/api/os.md:136
+msgid "True only in an admitted privileged unmasked external IRQ"
+msgstr "仅在准许的特权、未屏蔽外部 IRQ 中为 true"
+
+#: ../../../../docs/reference/api/os.md:142
 msgid "tick.h"
 msgstr "tick.h"
 
-#: ../../../../../../docs/reference/api/os.md:106
+#: ../../../../docs/reference/api/os.md:144
 msgid "Explicit external Tick and diagnostic counter contracts."
 msgstr "显式外部 Tick 与诊断计数器合同。"
 
-#: ../../../../../../docs/reference/api/os.md:106
+#: ../../../../docs/reference/api/os.md:144
 msgid ""
 "Applications implement these symbols only when the authored OS policy "
 "enables them. No weak timer/counter fallback is supplied. The platform never"
 " invents timer wiring."
 msgstr "只有配置中显式声明的 OS 策略启用这些符号时，应用才实现它们。不提供弱定时器／计数器回退实现。平台绝不臆造定时器接线。"
 
-#: ../../../../../../docs/reference/api/os.md:106
+#: ../../../../docs/reference/api/os.md:144
 msgid "Configure the application's selected kernel Tick source."
 msgstr "配置应用选定的内核 Tick 源。"
 
-#: ../../../../../../docs/reference/api/os.md:106
+#: ../../../../docs/reference/api/os.md:144
 msgid ""
 "Scheduler startup calls this in its canonical masked, privileged context. "
 "Configure a periodic interrupt, clear pending state and route it to the "
@@ -2114,25 +1598,25 @@ msgstr ""
 "调度器启动时在其规范、已屏蔽、特权上下文调用。配置周期中断，清除 pending 状态，并以已验证的优先级路由到选定内核 Tick "
 "处理函数。不得在此启动任务。硬件时钟和路由仍由应用／SoC 拥有。"
 
-#: ../../../../../../docs/reference/api/os.md:106
+#: ../../../../docs/reference/api/os.md:144
 msgid "[in] Exact authored Tick frequency in hertz"
 msgstr "[in] 配置中显式声明的准确 Tick 频率，单位为赫兹"
 
-#: ../../../../../../docs/reference/api/os.md:106
+#: ../../../../docs/reference/api/os.md:144
 msgid "Start the explicitly selected diagnostic counter."
 msgstr "启动显式选定的诊断计数器。"
 
-#: ../../../../../../docs/reference/api/os.md:106
+#: ../../../../docs/reference/api/os.md:144
 msgid ""
 "Called during scheduler startup. Counter initialization must be bounded, "
 "allocation-free and safe in the startup mask."
 msgstr "调度器启动期间调用。计数器初始化必须有界、不分配，并在启动屏蔽状态下安全。"
 
-#: ../../../../../../docs/reference/api/os.md:106
+#: ../../../../docs/reference/api/os.md:144
 msgid "Read the diagnostic counter without blocking."
 msgstr "无阻塞地读取诊断计数器。"
 
-#: ../../../../../../docs/reference/api/os.md:106
+#: ../../../../docs/reference/api/os.md:144
 msgid ""
 "Called by the kernel during context switches. It must be bounded, "
 "allocation-free and safe in interrupt/critical context. Configure a "
@@ -2140,23 +1624,23 @@ msgid ""
 "recorded totals."
 msgstr "由内核在上下文切换期间调用。必须有界、不分配，并在中断／临界上下文中安全。配置高于 Tick 的频率，并在解释记录总量时处理回绕。"
 
-#: ../../../../../../docs/reference/api/os.md:106
+#: ../../../../docs/reference/api/os.md:144
 msgid "Monotonic modulo-32-bit counter in application-defined units"
 msgstr "以应用定义单位计量、按 2^32 取模回绕的单调计数器"
 
-#: ../../../../../../docs/reference/api/os.md:112
+#: ../../../../docs/reference/api/os.md:150
 msgid "wait.h"
 msgstr "wait.h"
 
-#: ../../../../../../docs/reference/api/os.md:114
+#: ../../../../docs/reference/api/os.md:152
 msgid "Optional sequence-latched waiting without hidden workers."
 msgstr "可选的序列锁存等待，不含隐藏执行任务。"
 
-#: ../../../../../../docs/reference/api/os.md:114
+#: ../../../../docs/reference/api/os.md:152
 msgid "Wait for an authoritative caller predicate."
 msgstr "等待调用者的权威谓词。"
 
-#: ../../../../../../docs/reference/api/os.md:114
+#: ../../../../docs/reference/api/os.md:152
 msgid ""
 "Task context. No service, queue, callback dispatch or task creation is "
 "implicit. A shared-bus client must not use ready to service the controller; "
@@ -2164,35 +1648,35 @@ msgid ""
 msgstr ""
 "任务上下文。不隐式执行服务、队列操作、回调派发或任务创建。共享总线客户端不得用 ready 服务控制器；停止／排空期间，其执行所有者必须保持运行。"
 
-#: ../../../../../../docs/reference/api/os.md:114
+#: ../../../../docs/reference/api/os.md:152
 msgid "[in] Live single-waiter notification port"
 msgstr "[in] 存活的单等待者通知端口"
 
-#: ../../../../../../docs/reference/api/os.md:114
+#: ../../../../docs/reference/api/os.md:152
 msgid "[in] Bounded predicate, called in caller context"
 msgstr "[in] 有界谓词，在调用者上下文调用"
 
-#: ../../../../../../docs/reference/api/os.md:114
+#: ../../../../docs/reference/api/os.md:152
 msgid "[in] Predicate context, retained for this call only"
 msgstr "[in] 谓词上下文，仅在本次调用期间保留"
 
-#: ../../../../../../docs/reference/api/os.md:114
+#: ../../../../docs/reference/api/os.md:152
 msgid ""
 "[in] Absolute deadline in port's clock domain, or NX_DEADLINE_NEVER; no "
 "wall-clock or relative values"
 msgstr "[in] 端口时钟域内的绝对截止时间，或 NX_DEADLINE_NEVER；不能使用墙上时钟或相对值"
 
-#: ../../../../../../docs/reference/api/os.md:114
+#: ../../../../docs/reference/api/os.md:152
 msgid ""
 "NX_SUCCESS when predicate is observed true, including a final observation "
 "after TIMEOUT; otherwise port error"
 msgstr "观察到谓词为 true 时返回 NX_SUCCESS，包括 TIMEOUT 后的最后一次观察；否则返回端口错误"
 
-#: ../../../../../../docs/reference/api/os.md:114
+#: ../../../../docs/reference/api/os.md:152
 msgid "Wait for any source in caller-selected cyclic priority order."
 msgstr "按调用者选定的循环优先顺序等待任一 source。"
 
-#: ../../../../../../docs/reference/api/os.md:114
+#: ../../../../docs/reference/api/os.md:152
 msgid ""
 "Task-only; follows nx_wait_until's arm/recheck and deadline contract. Each "
 "scan visits at most count predicates, wrapping from start, with no "
@@ -2209,34 +1693,34 @@ msgstr ""
 "以选择公平性。调用者连接 source 通知到同一 port，维护权威谓词，并在回收状态前停止和 join publisher/waiter。没有隐式 "
 "worker、派发、订阅、自动注销或 service。除非调用者 callback 改变 selected，错误会保留它。"
 
-#: ../../../../../../docs/reference/api/os.md:114
+#: ../../../../docs/reference/api/os.md:152
 msgid "[in] Same live single-waiter port used by source publishers"
 msgstr "[in] Source publisher 使用的同一有效单 waiter port"
 
-#: ../../../../../../docs/reference/api/os.md:114
+#: ../../../../docs/reference/api/os.md:152
 msgid "[in] Stable array; every ready callback is non-NULL"
 msgstr "[in] 稳定数组，每个 ready callback 非 NULL"
 
-#: ../../../../../../docs/reference/api/os.md:114
+#: ../../../../docs/reference/api/os.md:152
 msgid "[in] Nonzero number of readable source entries"
 msgstr "[in] 可读 source 条目数量，非零"
 
-#: ../../../../../../docs/reference/api/os.md:114
+#: ../../../../docs/reference/api/os.md:152
 msgid "[in] First index to inspect, strictly less than count"
 msgstr "[in] 首个检查索引，严格小于 count"
 
-#: ../../../../../../docs/reference/api/os.md:114
+#: ../../../../docs/reference/api/os.md:152
 msgid ""
 "[in] Absolute monotonic deadline in port's domain, or NX_DEADLINE_NEVER"
 msgstr "[in] Port 时间域内的绝对单调 deadline，或 NX_DEADLINE_NEVER"
 
-#: ../../../../../../docs/reference/api/os.md:114
+#: ../../../../docs/reference/api/os.md:152
 msgid ""
 "[out] Index written on success only; disjoint from port, sources, their live"
 " contexts and other borrowed metadata"
 msgstr "[out] 仅成功时写索引；与 port、sources、其有效 context 及其他借用元数据独立"
 
-#: ../../../../../../docs/reference/api/os.md:114
+#: ../../../../docs/reference/api/os.md:152
 msgid ""
 "NX_SUCCESS for observed readiness, including final readiness after a backend"
 " error; INVALID for invalid/overlapping arguments, OVERFLOW for "
@@ -2245,11 +1729,11 @@ msgstr ""
 "观察到 ready 时返回 NX_SUCCESS，包括后端错误后的最终 ready；参数无效或重叠返回 INVALID，跨度不可表示返回 "
 "OVERFLOW，或返回 port 错误"
 
-#: ../../../../../../docs/reference/api/os.md:114
+#: ../../../../docs/reference/api/os.md:152
 msgid "Single-waiter notification port."
 msgstr "单等待者通知端口。"
 
-#: ../../../../../../docs/reference/api/os.md:114
+#: ../../../../docs/reference/api/os.md:152
 msgid ""
 "Caller owns storage and serializes arm/wait. Multiple wake publishers are "
 "permitted by each backend's documented context. Sequence is a hint; the "
@@ -2280,11 +1764,11 @@ msgstr ""
 "在每次调用以及每次从阻塞返回后，都先检查到期，再报告提示。未到期时，非阻塞后端可以返回 BUSY。仅一个所有者可以执行 "
 "arm/wait；即使后端会拒绝第二个并发等待，其行为仍位于端口合同之外。"
 
-#: ../../../../../../docs/reference/api/os.md:114
+#: ../../../../docs/reference/api/os.md:152
 msgid "One caller-owned authoritative readiness source."
 msgstr "一个调用者拥有的权威 ready source。"
 
-#: ../../../../../../docs/reference/api/os.md:114
+#: ../../../../docs/reference/api/os.md:152
 msgid ""
 "ready runs in the waiting caller's context and must be bounded. Observe real"
 " state with its required synchronization; do not service a controller or "

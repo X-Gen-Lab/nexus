@@ -10,7 +10,7 @@
  */
 #define _POSIX_C_SOURCE 200809L
 #include "nexus/components/bus_owner.h"
-#include "nexus/os/native.h"
+#include "nexus/os/storage.h"
 #include <sched.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -284,7 +284,7 @@ static void producer_task(void* context) {
     nx_owner_ticket_t old = {0, 0};
     int operation = 1;
     for (unsigned i = 0; i < 1000; ++i) {
-        uint64_t bound = nx_native_now_us() + 5000000u;
+        uint64_t bound = nx_os_now_us() + 5000000u;
         CHECK(nx_request_prepare(&request, NX_DEADLINE_NEVER) == NX_SUCCESS);
         nx_owner_ticket_t ticket;
         nx_result_t admitted;
@@ -292,7 +292,7 @@ static void producer_task(void* context) {
             admitted = nx_bus_owner_submit(&fixture->owner, &request,
                                            &operation, NULL, &ticket);
             CHECK(admitted == NX_SUCCESS || admitted == NX_ERROR_EXHAUSTED);
-            CHECK(nx_native_now_us() < bound);
+            CHECK(nx_os_now_us() < bound);
             if (admitted != NX_SUCCESS) {
                 sched_yield();
             }
@@ -301,7 +301,7 @@ static void producer_task(void* context) {
             CHECK(nx_bus_owner_cancel(&fixture->owner, old) == NX_ERROR_STATE);
         }
         while (nx_request_state(&request) != NX_REQUEST_SETTLED) {
-            CHECK(nx_native_now_us() < bound);
+            CHECK(nx_os_now_us() < bound);
             sched_yield();
         }
         nx_result_t result;
@@ -318,16 +318,16 @@ static void producer_task(void* context) {
 /** \brief The only executor keeps running while callers wait and join. */
 static void executor_task(void* context) {
     concurrent_t* concurrent = context;
-    uint64_t bound = nx_native_now_us() + 5000000u;
+    uint64_t bound = nx_os_now_us() + 5000000u;
     uint32_t observed = 0;
     for (;;) {
         uint32_t completed =
             __atomic_load_n(&concurrent->completed, __ATOMIC_RELAXED);
         if (completed != observed) {
             observed = completed;
-            bound = nx_native_now_us() + 5000000u;
+            bound = nx_os_now_us() + 5000000u;
         }
-        CHECK(nx_native_now_us() < bound);
+        CHECK(nx_os_now_us() < bound);
         nx_result_t result = nx_bus_owner_service(&concurrent->fixture->owner);
         CHECK(result == NX_SUCCESS || result == NX_ERROR_BUSY);
         if (__atomic_load_n(&concurrent->done, __ATOMIC_ACQUIRE) == 3 &&
@@ -345,21 +345,21 @@ static void multi_producer(void) {
     initialize(&fixture);
     fixture.auto_complete = true;
     concurrent_t concurrent = {&fixture, 0, 0};
-    nx_native_task_t tasks[4] = {0};
+    nx_task_t tasks[4] = {0};
     void* stacks[4];
     for (size_t i = 0; i < 4; ++i) {
         /* Host instrumentation storage, not an MCU stack budget. */
         CHECK(posix_memalign(&stacks[i], 4096, 256U * 1024U) == 0);
-        CHECK(nx_native_task_start(&tasks[i], stacks[i], 256U * 1024U,
-                                   i == 0 ? executor_task : producer_task,
-                                   &concurrent) == NX_SUCCESS);
+        CHECK(nx_task_start(&tasks[i], "fixture", stacks[i], 256U * 1024U, 0U,
+                            i == 0 ? executor_task : producer_task,
+                            &concurrent) == NX_SUCCESS);
     }
     /* Joining producers never stops their unique execution owner first. */
     for (size_t i = 1; i < 4; ++i) {
-        CHECK(nx_native_task_join(&tasks[i]) == NX_SUCCESS);
+        CHECK(nx_task_join_until(&tasks[i], NX_DEADLINE_NEVER) == NX_SUCCESS);
         free(stacks[i]);
     }
-    CHECK(nx_native_task_join(&tasks[0]) == NX_SUCCESS);
+    CHECK(nx_task_join_until(&tasks[0], NX_DEADLINE_NEVER) == NX_SUCCESS);
     free(stacks[0]);
     CHECK(fixture.starts == 3000 && nx_bus_owner_idle(&fixture.owner));
     CHECK(pthread_mutex_destroy(&fixture.mutex) == 0);

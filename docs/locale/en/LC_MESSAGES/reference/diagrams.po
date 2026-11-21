@@ -7,26 +7,25 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: cf39e749fee9fdf71ec0e129eae52254945bb2d26a7b47b46b1dc6990f7d61f7\n"
+"X-Nexus-Source-SHA256: 01eb5bc29c9b93534bef310f64df128622de7a47355270843bff1cffb209d025\n"
 
-#: ../../../../../../docs/reference/diagrams.md:8
+#: ../../../../docs/reference/diagrams.md:8
 msgid "架构图册"
 msgstr "Architecture diagram atlas"
 
-#: ../../../../../../docs/reference/diagrams.md:10
+#: ../../../../docs/reference/diagrams.md:10
 msgid ""
-"本页收录 20 张当前架构与精确参考图。先读每图的范围和箭头，再核对对应代码； "
+"本页收录当前架构、目标设计与精确参考图。先读每图的范围和箭头，再核对对应代码； "
 "图源存在或渲染成功不证明某种硬件模式已经实现、通过实板验证或满足性能预算。 实线和虚线的含义以各边标签为准；编译依赖不表示每次 I/O 都会经过该层。"
 msgstr ""
-"This page collects 20 current architecture and exact-reference diagrams. "
-"Read each diagram's scope and arrows before checking the corresponding code."
-" The presence of diagram source or successful rendering does not establish "
-"that a hardware mode is implemented, physically verified, or within a "
-"performance budget. Edge labels define the meaning of solid and dashed "
-"lines; a compilation dependency does not imply that every I/O call passes "
-"through that layer."
+"This page collects current architecture, target designs and exact reference "
+"diagrams. Read each scope and arrow before checking its source. A diagram "
+"source or successful rendering does not prove that a hardware mode is "
+"implemented, physically validated or within its performance budget. Edge "
+"labels define solid and dashed arrows; a build dependency does not imply an "
+"extra layer on every I/O call."
 
-#: ../../../../../../docs/reference/diagrams.md:14
+#: ../../../../docs/reference/diagrams.md:14
 msgid ""
 "每图维护一份 DOT 拓扑、一份 canonical SVG 预览和同名 `.labels.json`。 标签政策精确覆盖英文和中文，语言 SVG "
 "由锁定工具一次生成到构建目录，站点只读选取。 图内所有权、取消、排空和失败责任在两种语言中保持一致。图的来源与范围见 {download}`图索引 "
@@ -42,11 +41,11 @@ msgstr ""
 " sources and scope, and [documentation tools](documentation-tools.md) for "
 "maintenance commands."
 
-#: ../../../../../../docs/reference/diagrams.md:20
+#: ../../../../docs/reference/diagrams.md:20
 msgid "FIG-01 全平台分层与外部边界"
 msgstr "FIG-01 Whole-platform layers and external boundaries"
 
-#: ../../../../../../docs/reference/diagrams.md:22
+#: ../../../../docs/reference/diagrams.md:22
 msgid ""
 "平台职责与产品外置；Platform 连接静态实例与共享 C 协调器，OS 和组件可选。 逐边区分构建事实与日常调用，生成器不拥有驱动状态机。"
 msgstr ""
@@ -55,50 +54,50 @@ msgstr ""
 "remain optional. Edge labels distinguish build-time facts from ordinary "
 "calls. The generator does not own driver state machines."
 
-#: ../../../../../../docs/reference/diagrams.md:25
+#: ../../../../docs/reference/diagrams.md:25
 msgid "![FIG-01：全平台分层与外部边界](../assets/diagrams/platform-architecture.svg)"
 msgstr ""
 "![FIG-01: Platform layers and external "
 "boundaries](../assets/diagrams/platform-architecture.svg)"
 
-#: ../../../../../../docs/reference/diagrams.md:25
+#: ../../../../docs/reference/diagrams.md:25
 msgid "FIG-01：全平台分层与外部边界"
 msgstr "FIG-01: Platform layers and external boundaries"
 
-#: ../../../../../../docs/reference/diagrams.md:27
+#: ../../../../docs/reference/diagrams.md:27
 msgid "{download}`可编辑 DOT <../assets/diagrams/platform-architecture.dot>`。"
 msgstr ""
 "{download}`Editable DOT <../assets/diagrams/platform-architecture.dot>`."
 
-#: ../../../../../../docs/reference/diagrams.md:29
+#: ../../../../docs/reference/diagrams.md:29
 msgid "FIG-02 选定编译目标依赖"
 msgstr "FIG-02 Selected compile-target dependencies"
 
-#: ../../../../../../docs/reference/diagrams.md:31
+#: ../../../../docs/reference/diagrams.md:31
 msgid "F407ZG 裸机 IRQ UART 的构建依赖；虚线为 include 使用要求或 OBJECT 注入。"
 msgstr ""
 "Build dependencies of the F407ZG baremetal IRQ UART reference; dashed edges "
 "denote include usage requirements or OBJECT injection."
 
-#: ../../../../../../docs/reference/diagrams.md:33
+#: ../../../../docs/reference/diagrams.md:33
 msgid "![FIG-02：选定编译目标依赖](../assets/diagrams/build-targets.svg)"
 msgstr ""
 "![FIG-02: Selected build-target dependencies](../assets/diagrams/build-"
 "targets.svg)"
 
-#: ../../../../../../docs/reference/diagrams.md:33
+#: ../../../../docs/reference/diagrams.md:33
 msgid "FIG-02：选定编译目标依赖"
 msgstr "FIG-02: Selected build-target dependencies"
 
-#: ../../../../../../docs/reference/diagrams.md:35
+#: ../../../../docs/reference/diagrams.md:35
 msgid "{download}`可编辑 DOT <../assets/diagrams/build-targets.dot>`。"
 msgstr "{download}`Editable DOT <../assets/diagrams/build-targets.dot>`."
 
-#: ../../../../../../docs/reference/diagrams.md:37
+#: ../../../../docs/reference/diagrams.md:37
 msgid "FIG-03 配置与原子生成"
 msgstr "FIG-03 Configuration and atomic generation"
 
-#: ../../../../../../docs/reference/diagrams.md:39
+#: ../../../../docs/reference/diagrams.md:39
 msgid ""
 "包声明、Board 与 TOML 沿同一输入快照进入通用政策与具名 IR，再形成有限静态连接 和原子 bundle。包只选择 CMake "
 "入口，CMake 拥有唯一 C 源码图；失败不继续使用旧 输出或半成品。F4 的 `facts/` 与相邻领域 binding 通过 manifest "
@@ -111,50 +110,50 @@ msgstr ""
 "manifest explicitly selects F4 facts under `facts/` and adjacent domain "
 "bindings. Every arrow denotes build-time data or artifact dependencies."
 
-#: ../../../../../../docs/reference/diagrams.md:44
+#: ../../../../docs/reference/diagrams.md:44
 msgid "![FIG-03：配置与原子生成](../assets/diagrams/configuration-generation.svg)"
 msgstr ""
 "![FIG-03: Configuration and atomic "
 "generation](../assets/diagrams/configuration-generation.svg)"
 
-#: ../../../../../../docs/reference/diagrams.md:44
+#: ../../../../docs/reference/diagrams.md:44
 msgid "FIG-03：配置与原子生成"
 msgstr "FIG-03: Configuration and atomic generation"
 
-#: ../../../../../../docs/reference/diagrams.md:46
+#: ../../../../docs/reference/diagrams.md:46
 msgid "{download}`可编辑 DOT <../assets/diagrams/configuration-generation.dot>`。"
 msgstr ""
 "{download}`Editable DOT <../assets/diagrams/configuration-generation.dot>`."
 
-#: ../../../../../../docs/reference/diagrams.md:48
+#: ../../../../docs/reference/diagrams.md:48
 msgid "FIG-04 factory与静态实例"
 msgstr "FIG-04 Factory and static instances"
 
-#: ../../../../../../docs/reference/diagrams.md:50
+#: ../../../../docs/reference/diagrams.md:50
 msgid "按需静态实例、强类型 factory、共享 ops 与独立 context；查询不启动硬件。"
 msgstr ""
 "Selected static instances, strong factory types, shared ops and separate "
 "contexts; lookup does not start hardware."
 
-#: ../../../../../../docs/reference/diagrams.md:52
+#: ../../../../docs/reference/diagrams.md:52
 msgid "![FIG-04：factory与静态实例](../assets/diagrams/factory-instances.svg)"
 msgstr ""
 "![FIG-04: Factory and static instances](../assets/diagrams/factory-"
 "instances.svg)"
 
-#: ../../../../../../docs/reference/diagrams.md:52
+#: ../../../../docs/reference/diagrams.md:52
 msgid "FIG-04：factory与静态实例"
 msgstr "FIG-04: Factory and static instances"
 
-#: ../../../../../../docs/reference/diagrams.md:54
+#: ../../../../docs/reference/diagrams.md:54
 msgid "{download}`可编辑 DOT <../assets/diagrams/factory-instances.dot>`。"
 msgstr "{download}`Editable DOT <../assets/diagrams/factory-instances.dot>`."
 
-#: ../../../../../../docs/reference/diagrams.md:56
+#: ../../../../docs/reference/diagrams.md:56
 msgid "FIG-05 显式启动停机与失败撤回"
 msgstr "FIG-05 Explicit start, stop and failure cleanup"
 
-#: ../../../../../../docs/reference/diagrams.md:58
+#: ../../../../docs/reference/diagrams.md:58
 msgid ""
 "运行期由共享 C 协调器先检查上下文，再完成全部 controller 准入，之后才取得 "
 "System、共享资源与实例。共享资源／实例失败执行逆序回滚；System 启动结果分别 报告 primary、cleanup 和残效。释放失败保留具体"
@@ -167,97 +166,97 @@ msgstr ""
 "failed release retains the concrete owner's receipts and storage; timeout "
 "cannot force reclamation."
 
-#: ../../../../../../docs/reference/diagrams.md:62
+#: ../../../../docs/reference/diagrams.md:62
 msgid "![FIG-05：显式启动停机与失败撤回](../assets/diagrams/platform-lifecycle.svg)"
 msgstr ""
 "![FIG-05: Explicit start, stop and failure "
 "rollback](../assets/diagrams/platform-lifecycle.svg)"
 
-#: ../../../../../../docs/reference/diagrams.md:62
+#: ../../../../docs/reference/diagrams.md:62
 msgid "FIG-05：显式启动停机与失败撤回"
 msgstr "FIG-05: Explicit start, stop and failure rollback"
 
-#: ../../../../../../docs/reference/diagrams.md:64
+#: ../../../../docs/reference/diagrams.md:64
 msgid "{download}`可编辑 DOT <../assets/diagrams/platform-lifecycle.dot>`。"
 msgstr "{download}`Editable DOT <../assets/diagrams/platform-lifecycle.dot>`."
 
-#: ../../../../../../docs/reference/diagrams.md:66
+#: ../../../../docs/reference/diagrams.md:66
 msgid "FIG-06 Core请求状态与借用"
 msgstr "FIG-06 Core request states and borrows"
 
-#: ../../../../../../docs/reference/diagrams.md:68
+#: ../../../../docs/reference/diagrams.md:68
 msgid "请求接纳、借用、排空和最终 SETTLED；取消不直接释放存储。"
 msgstr ""
 "Request admission, borrowing, drain and final SETTLED; cancellation does not"
 " release storage directly."
 
-#: ../../../../../../docs/reference/diagrams.md:70
+#: ../../../../docs/reference/diagrams.md:70
 msgid "![FIG-06：Core请求状态与借用](../assets/diagrams/request-lifecycle.svg)"
 msgstr ""
 "![FIG-06: Core request state and borrowing](../assets/diagrams/request-"
 "lifecycle.svg)"
 
-#: ../../../../../../docs/reference/diagrams.md:70
+#: ../../../../docs/reference/diagrams.md:70
 msgid "FIG-06：Core请求状态与借用"
 msgstr "FIG-06: Core request state and borrowing"
 
-#: ../../../../../../docs/reference/diagrams.md:72
+#: ../../../../docs/reference/diagrams.md:72
 msgid "{download}`可编辑 DOT <../assets/diagrams/request-lifecycle.dot>`。"
 msgstr "{download}`Editable DOT <../assets/diagrams/request-lifecycle.dot>`."
 
-#: ../../../../../../docs/reference/diagrams.md:74
+#: ../../../../docs/reference/diagrams.md:74
 msgid "FIG-07 UART与SPI有限DMA时序"
 msgstr "FIG-07 Finite UART and SPI DMA timing"
 
-#: ../../../../../../docs/reference/diagrams.md:76
+#: ../../../../docs/reference/diagrams.md:76
 msgid "选定 F407 有限 DMA 的内存完成、线上完成、撤回与发布顺序。"
 msgstr ""
 "Memory completion, wire completion, withdrawal and publication ordering for "
 "selected finite F407 DMA."
 
-#: ../../../../../../docs/reference/diagrams.md:78
+#: ../../../../docs/reference/diagrams.md:78
 msgid "![FIG-07：UART与SPI有限DMA时序](../assets/diagrams/dma-completion.svg)"
 msgstr ""
 "![FIG-07: Finite UART and SPI DMA timing](../assets/diagrams/dma-"
 "completion.svg)"
 
-#: ../../../../../../docs/reference/diagrams.md:78
+#: ../../../../docs/reference/diagrams.md:78
 msgid "FIG-07：UART与SPI有限DMA时序"
 msgstr "FIG-07: Finite UART and SPI DMA timing"
 
-#: ../../../../../../docs/reference/diagrams.md:80
+#: ../../../../docs/reference/diagrams.md:80
 msgid "{download}`可编辑 DOT <../assets/diagrams/dma-completion.dot>`。"
 msgstr "{download}`Editable DOT <../assets/diagrams/dma-completion.dot>`."
 
-#: ../../../../../../docs/reference/diagrams.md:82
+#: ../../../../docs/reference/diagrams.md:82
 msgid "FIG-08 wait wake与外部退出"
 msgstr "FIG-08 Wait, wake and externally owned shutdown"
 
-#: ../../../../../../docs/reference/diagrams.md:84
+#: ../../../../docs/reference/diagrams.md:84
 msgid "等待、唤醒提示、执行进度与外部 join；通知不替代真实状态。"
 msgstr ""
 "Waiting, wake hints, execution progress and external join; notification does"
 " not replace actual state."
 
-#: ../../../../../../docs/reference/diagrams.md:86
+#: ../../../../docs/reference/diagrams.md:86
 msgid "![FIG-08：wait wake与外部退出](../assets/diagrams/wait-wake-shutdown.svg)"
 msgstr ""
 "![FIG-08: Wait, wake and external shutdown](../assets/diagrams/wait-wake-"
 "shutdown.svg)"
 
-#: ../../../../../../docs/reference/diagrams.md:86
+#: ../../../../docs/reference/diagrams.md:86
 msgid "FIG-08：wait wake与外部退出"
 msgstr "FIG-08: Wait, wake and external shutdown"
 
-#: ../../../../../../docs/reference/diagrams.md:88
+#: ../../../../docs/reference/diagrams.md:88
 msgid "{download}`可编辑 DOT <../assets/diagrams/wait-wake-shutdown.dot>`。"
 msgstr "{download}`Editable DOT <../assets/diagrams/wait-wake-shutdown.dot>`."
 
-#: ../../../../../../docs/reference/diagrams.md:90
+#: ../../../../docs/reference/diagrams.md:90
 msgid "FIG-10 Source SDK独立消费"
 msgstr "FIG-10 Independent Source SDK consumption"
 
-#: ../../../../../../docs/reference/diagrams.md:92
+#: ../../../../docs/reference/diagrams.md:92
 msgid ""
 "schema3 按所选 `profile.packages` 与包导出归属收集源码，不从单个 ELF 推导 SDK。 完整 prefix 可用于公开 "
 "GPIO 首工程或已有外部工程；实际编译仍由包内 CMake 负责。 主机运行、ARM 链接与物理 HIL 分别判断，图不授予软件候选资格。"
@@ -269,158 +268,158 @@ msgstr ""
 "physical HIL are assessed separately. The diagram grants no software-"
 "candidate qualification."
 
-#: ../../../../../../docs/reference/diagrams.md:96
+#: ../../../../docs/reference/diagrams.md:96
 msgid "![FIG-10：Source SDK独立消费](../assets/diagrams/source-sdk-consumer.svg)"
 msgstr ""
 "![FIG-10: Independent Source SDK consumption](../assets/diagrams/source-sdk-"
 "consumer.svg)"
 
-#: ../../../../../../docs/reference/diagrams.md:96
+#: ../../../../docs/reference/diagrams.md:96
 msgid "FIG-10：Source SDK独立消费"
 msgstr "FIG-10: Independent Source SDK consumption"
 
-#: ../../../../../../docs/reference/diagrams.md:98
+#: ../../../../docs/reference/diagrams.md:98
 msgid "{download}`可编辑 DOT <../assets/diagrams/source-sdk-consumer.dot>`。"
 msgstr ""
 "{download}`Editable DOT <../assets/diagrams/source-sdk-consumer.dot>`."
 
-#: ../../../../../../docs/reference/diagrams.md:100
+#: ../../../../docs/reference/diagrams.md:100
 msgid "FIG-11 软件与HIL证据关系"
 msgstr "FIG-11 Software and HIL evidence relationships"
 
-#: ../../../../../../docs/reference/diagrams.md:102
+#: ../../../../docs/reference/diagrams.md:102
 msgid "主机测试、ARM 链接、SDK 消费、HIL 工装和实板测量分别取得结果；每项绑定实际输入与产物，不能自动晋级。"
 msgstr ""
 "Host tests, ARM linking, SDK consumption, HIL fixtures, and physical "
 "measurements each obtain separate results. Every result is bound to actual "
 "inputs and artifacts and cannot be promoted automatically."
 
-#: ../../../../../../docs/reference/diagrams.md:104
+#: ../../../../docs/reference/diagrams.md:104
 msgid "![FIG-11：软件与HIL证据关系](../assets/diagrams/qualification-evidence.svg)"
 msgstr ""
 "![FIG-11: Software and HIL evidence "
 "relationships](../assets/diagrams/qualification-evidence.svg)"
 
-#: ../../../../../../docs/reference/diagrams.md:104
+#: ../../../../docs/reference/diagrams.md:104
 msgid "FIG-11：软件与HIL证据关系"
 msgstr "FIG-11: Software and HIL evidence relationships"
 
-#: ../../../../../../docs/reference/diagrams.md:106
+#: ../../../../docs/reference/diagrams.md:106
 msgid "{download}`可编辑 DOT <../assets/diagrams/qualification-evidence.dot>`。"
 msgstr ""
 "{download}`Editable DOT <../assets/diagrams/qualification-evidence.dot>`."
 
-#: ../../../../../../docs/reference/diagrams.md:108
+#: ../../../../docs/reference/diagrams.md:108
 msgid "FIG-12 文档、SDK 与实板验证边界"
 msgstr "FIG-12 Documentation, SDK and physical validation boundaries"
 
-#: ../../../../../../docs/reference/diagrams.md:110
+#: ../../../../docs/reference/diagrams.md:110
 msgid "文档构建、独立 SDK 消费与实板执行各自记录结果，软件检查不自动建立部署或物理资格。"
 msgstr ""
 "Documentation builds, independent SDK consumption and physical execution "
 "record separate results; software checks do not automatically establish "
 "deployment or physical qualification."
 
-#: ../../../../../../docs/reference/diagrams.md:112
+#: ../../../../docs/reference/diagrams.md:112
 msgid ""
 "![FIG-12：文档、SDK 与实板验证边界](../assets/diagrams/verification-boundaries.svg)"
 msgstr ""
 "![FIG-12: Documentation, SDK and physical validation "
 "boundaries](../assets/diagrams/verification-boundaries.svg)"
 
-#: ../../../../../../docs/reference/diagrams.md:112
+#: ../../../../docs/reference/diagrams.md:112
 msgid "FIG-12：文档、SDK 与实板验证边界"
 msgstr "FIG-12: Documentation, SDK and physical validation boundaries"
 
-#: ../../../../../../docs/reference/diagrams.md:114
+#: ../../../../docs/reference/diagrams.md:114
 msgid "{download}`可编辑 DOT <../assets/diagrams/verification-boundaries.dot>`。"
 msgstr ""
 "{download}`Editable DOT <../assets/diagrams/verification-boundaries.dot>`."
 
-#: ../../../../../../docs/reference/diagrams.md:116
+#: ../../../../docs/reference/diagrams.md:116
 msgid "FIG-13 Cortex-M能力分层"
 msgstr "FIG-13 Cortex-M capability layers"
 
-#: ../../../../../../docs/reference/diagrams.md:118
+#: ../../../../docs/reference/diagrams.md:118
 msgid "通用 CPU 原语与 Runtime 独立于当前 F4 SoC；CPU 名称不授予可选能力。"
 msgstr ""
 "Generic CPU primitives and Runtime remain separate from current F4 SoC "
 "integration; a CPU name grants no optional capability."
 
-#: ../../../../../../docs/reference/diagrams.md:120
+#: ../../../../docs/reference/diagrams.md:120
 msgid "![FIG-13：Cortex-M能力分层](../assets/diagrams/cortex-m-capabilities.svg)"
 msgstr ""
 "![FIG-13: Cortex-M capability layers](../assets/diagrams/cortex-m-"
 "capabilities.svg)"
 
-#: ../../../../../../docs/reference/diagrams.md:120
+#: ../../../../docs/reference/diagrams.md:120
 msgid "FIG-13：Cortex-M能力分层"
 msgstr "FIG-13: Cortex-M capability layers"
 
-#: ../../../../../../docs/reference/diagrams.md:122
+#: ../../../../docs/reference/diagrams.md:122
 msgid "{download}`可编辑 DOT <../assets/diagrams/cortex-m-capabilities.dot>`。"
 msgstr ""
 "{download}`Editable DOT <../assets/diagrams/cortex-m-capabilities.dot>`."
 
-#: ../../../../../../docs/reference/diagrams.md:124
+#: ../../../../docs/reference/diagrams.md:124
 msgid "FIG-15 连续RX与可见丢块"
 msgstr "FIG-15 Continuous RX and observable block loss"
 
-#: ../../../../../../docs/reference/diagrams.md:126
+#: ../../../../docs/reference/diagrams.md:126
 msgid "选定 F407 连续接收的 producer、块借用、替换和 loss／停机责任。"
 msgstr ""
 "Producer, block borrowing, replacement, loss and shutdown duties for "
 "selected continuous F407 reception."
 
-#: ../../../../../../docs/reference/diagrams.md:128
+#: ../../../../docs/reference/diagrams.md:128
 msgid "![FIG-15：连续RX与可见丢块](../assets/diagrams/continuous-stream.svg)"
 msgstr ""
 "![FIG-15: Continuous RX and visible block "
 "loss](../assets/diagrams/continuous-stream.svg)"
 
-#: ../../../../../../docs/reference/diagrams.md:128
+#: ../../../../docs/reference/diagrams.md:128
 msgid "FIG-15：连续RX与可见丢块"
 msgstr "FIG-15: Continuous RX and visible block loss"
 
-#: ../../../../../../docs/reference/diagrams.md:130
+#: ../../../../docs/reference/diagrams.md:130
 msgid "{download}`可编辑 DOT <../assets/diagrams/continuous-stream.dot>`。"
 msgstr "{download}`Editable DOT <../assets/diagrams/continuous-stream.dot>`."
 
-#: ../../../../../../docs/reference/diagrams.md:132
+#: ../../../../docs/reference/diagrams.md:132
 msgid "FIG-16 当前 I/O 装配与执行"
 msgstr "FIG-16 Current I/O assembly and execution"
 
-#: ../../../../../../docs/reference/diagrams.md:134
+#: ../../../../docs/reference/diagrams.md:134
 msgid "构建期资源计划与运行时操作分开；不引入隐藏调度器或设备注册表。"
 msgstr ""
 "Build-time resource plans remain separate from runtime operations, without a"
 " hidden scheduler or device registry."
 
-#: ../../../../../../docs/reference/diagrams.md:136
+#: ../../../../docs/reference/diagrams.md:136
 msgid "![FIG-16：当前 I/O 装配与执行](../assets/diagrams/io-evolution.svg)"
 msgstr ""
 "![FIG-16: Current I/O assembly and execution](../assets/diagrams/io-"
 "evolution.svg)"
 
-#: ../../../../../../docs/reference/diagrams.md:136
+#: ../../../../docs/reference/diagrams.md:136
 msgid "FIG-16：当前 I/O 装配与执行"
 msgstr "FIG-16: Current I/O assembly and execution"
 
-#: ../../../../../../docs/reference/diagrams.md:138
+#: ../../../../docs/reference/diagrams.md:138
 msgid "{download}`可编辑 DOT <../assets/diagrams/io-evolution.dot>`。"
 msgstr "{download}`Editable DOT <../assets/diagrams/io-evolution.dot>`."
 
-#: ../../../../../../docs/reference/diagrams.md:140
+#: ../../../../docs/reference/diagrams.md:140
 msgid "FIG-21 Native RTC/LPTIM 装配、借用与重新开放"
 msgstr "FIG-21 Native RTC/LPTIM assembly, loans and reopen"
 
-#: ../../../../../../docs/reference/diagrams.md:142
+#: ../../../../docs/reference/diagrams.md:142
 msgid "显式 Native RTC／LPTIM 主机测试；物理 provider 和低功耗不由模型推导。"
 msgstr ""
 "Explicit Native RTC/LPTIM host tests; models establish neither a physical "
 "provider nor low-power behavior."
 
-#: ../../../../../../docs/reference/diagrams.md:144
+#: ../../../../docs/reference/diagrams.md:144
 msgid ""
 "![FIG-21：Native RTC/LPTIM装配与显式生命周期](../assets/diagrams/rtc-lptim-"
 "lifecycle.svg)"
@@ -428,26 +427,26 @@ msgstr ""
 "![FIG-21: Native RTC/LPTIM assembly and explicit "
 "lifecycle](../assets/diagrams/rtc-lptim-lifecycle.svg)"
 
-#: ../../../../../../docs/reference/diagrams.md:144
+#: ../../../../docs/reference/diagrams.md:144
 msgid "FIG-21：Native RTC/LPTIM装配与显式生命周期"
 msgstr "FIG-21: Native RTC/LPTIM assembly and explicit lifecycle"
 
-#: ../../../../../../docs/reference/diagrams.md:146
+#: ../../../../docs/reference/diagrams.md:146
 msgid "{download}`可编辑 DOT <../assets/diagrams/rtc-lptim-lifecycle.dot>`。"
 msgstr ""
 "{download}`Editable DOT <../assets/diagrams/rtc-lptim-lifecycle.dot>`."
 
-#: ../../../../../../docs/reference/diagrams.md:148
+#: ../../../../docs/reference/diagrams.md:148
 msgid "FIG-25 UART TX 复制代理的 kernel 所有权与退出"
 msgstr "FIG-25: UART TX copy-broker kernel ownership and shutdown"
 
-#: ../../../../../../docs/reference/diagrams.md:150
+#: ../../../../docs/reference/diagrams.md:150
 msgid "公共复制 UART TX 代理的 owner、真实排空与退出；不授予硬件隔离。"
 msgstr ""
 "Ownership, actual drain and shutdown in the public copied UART TX broker; no"
 " hardware isolation is granted."
 
-#: ../../../../../../docs/reference/diagrams.md:152
+#: ../../../../docs/reference/diagrams.md:152
 msgid ""
 "![FIG-25：UART TX 复制代理的 kernel 所有权与退出](../assets/diagrams/user-io-copied-"
 "ownership.svg)"
@@ -455,44 +454,80 @@ msgstr ""
 "![FIG-25: UART TX copy-broker kernel ownership and "
 "shutdown](../assets/diagrams/user-io-copied-ownership.svg)"
 
-#: ../../../../../../docs/reference/diagrams.md:152
+#: ../../../../docs/reference/diagrams.md:152
 msgid "FIG-25：UART TX 复制代理的 kernel 所有权与退出"
 msgstr "FIG-25: UART TX copy-broker kernel ownership and shutdown"
 
-#: ../../../../../../docs/reference/diagrams.md:154
+#: ../../../../docs/reference/diagrams.md:154
 msgid "{download}`可编辑 DOT <../assets/diagrams/user-io-copied-ownership.dot>`。"
 msgstr ""
 "{download}`Editable DOT <../assets/diagrams/user-io-copied-ownership.dot>`."
 
-#: ../../../../../../docs/reference/diagrams.md:156
+#: ../../../../docs/reference/diagrams.md:156
 msgid "FIG-26 I3C 核心借用与整总线证明"
 msgstr "FIG-26: I3C core borrowing and whole-bus proofs"
 
-#: ../../../../../../docs/reference/diagrams.md:158
+#: ../../../../docs/reference/diagrams.md:158
 msgid "公共有界 I3C 核心与借用合同；本轮没有生产 MCU I3C adapter。"
 msgstr ""
 "Public bounded I3C core and borrowing contract; this iteration has no "
 "production MCU I3C adapter."
 
-#: ../../../../../../docs/reference/diagrams.md:160
+#: ../../../../docs/reference/diagrams.md:160
 msgid "![FIG-26：I3C 核心借用与整总线证明](../assets/diagrams/i3c-core-lifecycle.svg)"
 msgstr ""
 "![FIG-26: I3C core borrowing and whole-bus "
 "proofs](../assets/diagrams/i3c-core-lifecycle.svg)"
 
-#: ../../../../../../docs/reference/diagrams.md:160
+#: ../../../../docs/reference/diagrams.md:160
 msgid "FIG-26：I3C 核心借用与整总线证明"
 msgstr "FIG-26: I3C core borrowing and whole-bus proofs"
 
-#: ../../../../../../docs/reference/diagrams.md:162
+#: ../../../../docs/reference/diagrams.md:162
 msgid "{download}`可编辑 DOT <../assets/diagrams/i3c-core-lifecycle.dot>`。"
 msgstr "{download}`Editable DOT <../assets/diagrams/i3c-core-lifecycle.dot>`."
 
-#: ../../../../../../docs/reference/diagrams.md:164
+#: ../../../../docs/reference/diagrams.md:164
+msgid "FIG-27 统一 OS 源码接口的当前构建依赖"
+msgstr "FIG-27 Current build dependencies for the unified OS source interface"
+
+#: ../../../../docs/reference/diagrams.md:166
+msgid ""
+"当前任务后端的构建结构。箭头表示构建期依赖，包含编译依赖和链接时的实现选择； 每幅镜像选择一个任务后端，虚线表示可选扩展或按后端需要的依赖。 "
+"业务依赖公共接口，装配侧持有选定后端的静态布局；图中不增加运行时转发层、对象池或 worker。 "
+"设计与退出条件分别见[架构方案](../explanation/os-portability.md)和 "
+"[实施清单](../development/os-portability-plan.md)。"
+msgstr ""
+"Build structure of the current task backends. Arrows show build-time "
+"dependencies, including compilation dependencies and implementation "
+"selection at link time. Each image selects one task backend; dashed edges "
+"are optional extensions or dependencies required by that backend. Business "
+"code uses public interfaces; assembly code owns the selected backend's "
+"static layout. The diagram adds no runtime forwarding layer, object pool or "
+"worker. See the [architecture](../explanation/os-portability.md) and "
+"[implementation checklist](../development/os-portability-plan.md) for the "
+"design and exit conditions."
+
+#: ../../../../docs/reference/diagrams.md:172
+msgid "![FIG-27：统一 OS 源码接口的当前构建依赖](../assets/diagrams/os-portability.svg)"
+msgstr ""
+"![FIG-27: Current build dependencies for the unified OS source "
+"interface](../assets/diagrams/os-portability.svg)"
+
+#: ../../../../docs/reference/diagrams.md:172
+msgid "FIG-27：统一 OS 源码接口的当前构建依赖"
+msgstr ""
+"FIG-27: Current build dependencies for the unified OS source interface"
+
+#: ../../../../docs/reference/diagrams.md:174
+msgid "{download}`可编辑 DOT <../assets/diagrams/os-portability.dot>`。"
+msgstr "{download}`Editable DOT <../assets/diagrams/os-portability.dot>`."
+
+#: ../../../../docs/reference/diagrams.md:176
 msgid "FIG-31 F4 源码归属与接口边界"
 msgstr "FIG-31: F4 source ownership and interface boundaries"
 
-#: ../../../../../../docs/reference/diagrams.md:166
+#: ../../../../docs/reference/diagrams.md:178
 msgid ""
 "包内 `facts/`、相邻 binding、Board 和 TOML 由通用配置器生成静态实例与固定连接。 `system/` "
 "拥有系统与共享生命周期，`drivers/<domain>/` 拥有控制器行为，`sdk/` 选择私有官方库。虚线是构建／测试依赖，实线是公共 I/O "
@@ -506,32 +541,32 @@ msgstr ""
 " diagram adds no runtime layer and does not promote reference models to "
 "production or physical qualification."
 
-#: ../../../../../../docs/reference/diagrams.md:171
+#: ../../../../docs/reference/diagrams.md:183
 msgid "![FIG-31：F4 源码归属与接口边界](../assets/diagrams/driver-source-ownership.svg)"
 msgstr ""
 "![FIG-31: F4 source ownership and interface "
 "boundaries](../assets/diagrams/driver-source-ownership.svg)"
 
-#: ../../../../../../docs/reference/diagrams.md:171
+#: ../../../../docs/reference/diagrams.md:183
 msgid "FIG-31：F4 源码归属与接口边界"
 msgstr "FIG-31: F4 source ownership and interface boundaries"
 
-#: ../../../../../../docs/reference/diagrams.md:173
+#: ../../../../docs/reference/diagrams.md:185
 msgid "{download}`可编辑 DOT <../assets/diagrams/driver-source-ownership.dot>`。"
 msgstr ""
 "{download}`Editable DOT <../assets/diagrams/driver-source-ownership.dot>`."
 
-#: ../../../../../../docs/reference/diagrams.md:175
+#: ../../../../docs/reference/diagrams.md:187
 msgid "FIG-32 lwIP/TCP/TLS/MQTT 软件主机互通参考"
 msgstr "FIG-32: lwIP/TCP/TLS/MQTT host interoperability reference"
 
-#: ../../../../../../docs/reference/diagrams.md:177
+#: ../../../../docs/reference/diagrams.md:189
 msgid "主机 TCP／TLS／MQTT 互操作；不证明 MCU、SDK 或物理联网能力。"
 msgstr ""
 "Host TCP/TLS/MQTT interoperability; this proves no MCU, SDK or physical "
 "networking capability."
 
-#: ../../../../../../docs/reference/diagrams.md:179
+#: ../../../../docs/reference/diagrams.md:191
 msgid ""
 "![FIG-32：lwIP/TCP/TLS/MQTT 软件主机互通参考](../assets/diagrams/lwip-tcp-tls-mqtt-"
 "host.svg)"
@@ -539,20 +574,20 @@ msgstr ""
 "![FIG-32: lwIP/TCP/TLS/MQTT host interoperability "
 "reference](../assets/diagrams/lwip-tcp-tls-mqtt-host.svg)"
 
-#: ../../../../../../docs/reference/diagrams.md:179
+#: ../../../../docs/reference/diagrams.md:191
 msgid "FIG-32：lwIP/TCP/TLS/MQTT 软件主机互通参考"
 msgstr "FIG-32: lwIP/TCP/TLS/MQTT host interoperability reference"
 
-#: ../../../../../../docs/reference/diagrams.md:181
+#: ../../../../docs/reference/diagrams.md:193
 msgid "{download}`可编辑 DOT <../assets/diagrams/lwip-tcp-tls-mqtt-host.dot>`。"
 msgstr ""
 "{download}`Editable DOT <../assets/diagrams/lwip-tcp-tls-mqtt-host.dot>`."
 
-#: ../../../../../../docs/reference/diagrams.md:183
+#: ../../../../docs/reference/diagrams.md:195
 msgid "FIG-33 当前运行时访问"
 msgstr "FIG-33 Current runtime access"
 
-#: ../../../../../../docs/reference/diagrams.md:185
+#: ../../../../docs/reference/diagrams.md:197
 msgid ""
 "factory 只查找既有静态接口；启动后普通 I/O 直接经共享 ops 与实例 context 调用具体实现。 "
 "owner、等待和调度为显式选择，不形成额外的必经转发层。"
@@ -562,24 +597,24 @@ msgstr ""
 "and the instance context. Owners, waits, and scheduling are explicit choices"
 " and add no mandatory forwarding layer."
 
-#: ../../../../../../docs/reference/diagrams.md:188
+#: ../../../../docs/reference/diagrams.md:200
 msgid "![FIG-33：当前运行时访问](../assets/diagrams/platform-runtime.svg)"
 msgstr ""
 "![FIG-33: Current runtime access](../assets/diagrams/platform-runtime.svg)"
 
-#: ../../../../../../docs/reference/diagrams.md:188
+#: ../../../../docs/reference/diagrams.md:200
 msgid "FIG-33：当前运行时访问"
 msgstr "FIG-33: Current runtime access"
 
-#: ../../../../../../docs/reference/diagrams.md:190
+#: ../../../../docs/reference/diagrams.md:202
 msgid "{download}`可编辑 DOT <../assets/diagrams/platform-runtime.dot>`。"
 msgstr "{download}`Editable DOT <../assets/diagrams/platform-runtime.dot>`."
 
-#: ../../../../../../docs/reference/diagrams.md:192
+#: ../../../../docs/reference/diagrams.md:204
 msgid "图资源维护"
 msgstr "Diagram asset maintenance"
 
-#: ../../../../../../docs/reference/diagrams.md:194
+#: ../../../../docs/reference/diagrams.md:206
 msgid ""
 "每图维护 `.dot`、`.svg` 和 `.labels.json` 同名三件套，图索引完整登记。 标签文件使用 `schema_version: "
 "1`、`en`、`zh_CN`；两种语言精确覆盖本图全部标签。 缺失、多余、重复或空白翻译均失败，不使用全局词典或未翻译回退。 "
@@ -592,7 +627,7 @@ msgstr ""
 "or untranslated fallback is used. Layout labels that were originally empty "
 "may explicitly retain an empty string."
 
-#: ../../../../../../docs/reference/diagrams.md:199
+#: ../../../../docs/reference/diagrams.md:211
 msgid ""
 "编辑后使用已准备的锁定工具生成预览并运行文档检查。Graphviz、字体和依赖身份 由工具环境校验；SVG "
 "内嵌字形，拒绝外部资源和活动内容。正式构建在一次资产阶段 生成所选语言图，Sphinx 只读使用构建目录。不要在源码中维护另一套语言 DOT／SVG， "

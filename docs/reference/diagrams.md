@@ -7,7 +7,7 @@ source_language: zh_CN
 
 # 架构图册
 
-本页收录 20 张当前架构与精确参考图。先读每图的范围和箭头，再核对对应代码；
+本页收录当前架构、目标设计与精确参考图。先读每图的范围和箭头，再核对对应代码；
 图源存在或渲染成功不证明某种硬件模式已经实现、通过实板验证或满足性能预算。
 实线和虚线的含义以各边标签为准；编译依赖不表示每次 I/O 都会经过该层。
 
@@ -160,6 +160,18 @@ schema3 按所选 `profile.packages` 与包导出归属收集源码，不从单�
 ![FIG-26：I3C 核心借用与整总线证明](../assets/diagrams/i3c-core-lifecycle.svg)
 
 [可编辑 DOT](../assets/diagrams/i3c-core-lifecycle.dot)。
+
+## FIG-27 统一 OS 源码接口的当前构建依赖
+
+当前任务后端的构建结构。箭头表示构建期依赖，包含编译依赖和链接时的实现选择；
+每幅镜像选择一个任务后端，虚线表示可选扩展或按后端需要的依赖。
+业务依赖公共接口，装配侧持有选定后端的静态布局；图中不增加运行时转发层、对象池或 worker。
+设计与退出条件分别见[架构方案](../explanation/os-portability.md)和
+[实施清单](../development/os-portability-plan.md)。
+
+![FIG-27：统一 OS 源码接口的当前构建依赖](../assets/diagrams/os-portability.svg)
+
+[可编辑 DOT](../assets/diagrams/os-portability.dot)。
 
 ## FIG-31 F4 源码归属与接口边界
 

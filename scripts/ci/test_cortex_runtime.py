@@ -40,17 +40,17 @@ class RuntimeAuditTests(unittest.TestCase):
     def test_runtime_retains_new_sleep_and_static_service_bodies(self):
         sleep = {'nx_arch_wait_for_interrupt', 'nx_arch_idle_if_unchanged'}
         services = {
-            'nx_freertos_queue_send_until', 'nx_freertos_queue_receive_until',
+            'nx_queue_send_until', 'nx_queue_receive_until',
             'nx_freertos_direct_notify_init', 'nx_freertos_direct_notify_port',
             'nx_freertos_direct_notify_destroy',
-            'nx_freertos_permanent_task_start',
-            'nx_freertos_queue_waiter_init',
-            'nx_freertos_queue_waiter_destroy',
-            'nx_freertos_closable_queue_init',
-            'nx_freertos_closable_queue_send_until',
-            'nx_freertos_closable_queue_receive_until',
-            'nx_freertos_closable_queue_close',
-            'nx_freertos_closable_queue_destroy',
+            'nx_permanent_task_start',
+            'nx_channel_waiter_init',
+            'nx_channel_waiter_destroy',
+            'nx_channel_init',
+            'nx_channel_send_until',
+            'nx_channel_receive_until',
+            'nx_channel_close',
+            'nx_channel_destroy',
         }
         self.assertLessEqual(sleep, gate.required_symbols('baremetal'))
         self.assertLessEqual(sleep | services,

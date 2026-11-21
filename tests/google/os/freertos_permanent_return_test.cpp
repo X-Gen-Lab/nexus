@@ -9,6 +9,7 @@
  */
 #include "nexus/core/fault.h"
 #include "nexus/os/freertos.h"
+#include "nexus/os/storage.h"
 #include <cstdlib>
 #include <cstring>
 #include <gtest/gtest.h>
@@ -25,11 +26,11 @@ void invalid_permanent_entry(void*) {
 /** \brief Kernel entry stays in the child; the parent has no RTOS threads. */
 void run_returning_permanent_task() {
     (void)alarm(3U);
-    nx_freertos_permanent_task_t task{};
+    nx_permanent_task_t task{};
     alignas(8) StackType_t stack[8192]{};
-    if (nx_freertos_permanent_task_start(&task, "returning", stack, 8192U, 3U,
-                                         invalid_permanent_entry,
-                                         nullptr) != NX_SUCCESS) {
+    if (nx_permanent_task_start(
+            &task, "returning", stack, (8192U) * sizeof(StackType_t), 3U,
+            invalid_permanent_entry, nullptr) != NX_SUCCESS) {
         std::_Exit(93);
     }
     vTaskStartScheduler();

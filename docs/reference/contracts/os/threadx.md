@@ -9,10 +9,14 @@ source_language: en
 # ThreadX configuration and integration
 
 ThreadX adds a real additional kernel backend while retaining the static factory,
-immutable device faces and portable wait contract. It selects the official
+immutable device faces and common OS interfaces. It selects the official
 Eclipse ThreadX GNU kernel port; it does not rename FreeRTOS or substitute a host
 scheduler model. [Backend contracts](../../../../os/threadx/README.md) define caller
 storage, bootstrap proof, deadlines, close/join and unsupported mechanisms.
+Business code uses common opaque references; assembly selects real static
+layouts through `nexus/os/storage.h`. Only explicit ThreadX extensions depend
+on `threadx.h`. Current implementation does not itself establish final software
+or physical qualification.
 
 One authored assembly selects `backend = "threadx"`. CPU/IRQ facts remain SoC
 facts. `tools/configure/threadx.py` validates the kernel-specific policy into an
@@ -60,8 +64,12 @@ max_priorities = 32
 
 The `board` locator selects the reviewed package; its actual identity is then
 validated. Product tasks, queue payload/depth, stack budgets and startup/stop
-policy stay external. ThreadX priorities are backend-specific: smaller numbers
-run before larger ones. Do not copy FreeRTOS's reversed ordering into a product.
+policy stay external. Public task priorities increase with their numeric value.
+The adapter reverses that order into ThreadX native numbering, where smaller
+numbers run first. Pass logical priorities to common task APIs, never raw
+ThreadX priority numbers. All controls start zeroed and stacks use byte capacity.
+Call `nx_os_run` for the real bootstrap; successful entry never returns, and
+Platform startup does not enter the scheduler.
 
 | OS field | Native Linux | Cortex-M4/M4F |
 | --- | --- | --- |
@@ -111,7 +119,7 @@ remain separately qualified.
 ## Repeatable software gate
 
 `python scripts/ci/os_threadx.py --compiler arm-none-eabi-gcc --output <fresh-dir>`
-executes the production platform graph for all three maintained Boards with
+executes the production platform graph for the two maintained MCU Boards with
 BASEPRI and PRIMASK. Each ELF retains the real task, queue, close, notification,
 join, timer and scheduling entry points; the two official PendSV aliases must
 resolve to the same strong instruction entry. Every official common/M4 source
@@ -119,7 +127,8 @@ must have a real compiled object and the same numeric C/ASM policy. The gate
 retains the exact ELF/BIN/map, resource report, authored/resolved configuration,
 compiler database, command results and pre/post source identities.
 
-A seventh build must fail specifically at the ELF link for the absent strong
+The four positive Board/mask builds are separate from a fifth build that must
+fail specifically at the ELF link for the absent strong
 external-Tick provider. Unrelated compiler failures, an existing ELF, weak or
 missing retained entries, host/dynamic symbols, stale output and source changes
 fail qualification. No command in this gate flashes or executes an MCU.

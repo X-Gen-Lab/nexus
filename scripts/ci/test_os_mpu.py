@@ -29,7 +29,7 @@ class MpuEvidence(unittest.TestCase):
             'nx_freertos_mpu_task_start': (0x08000001, 32),
             'nx_freertos_mpu_task_delete': (0x08000021, 32),
             'nx_freertos_mpu_layout': (0x08000041, 32),
-            'nx_freertos_permanent_task_start': (0x08000061, 32),
+            'nx_permanent_task_start': (0x08000061, 32),
             'MPU_vTaskDelayImpl': (0x08000081, 32),
             'MPU_xTaskGetTickCountImpl': (0x080000a1, 32),
             'SysTick_Handler': (0x080000c1, 16),

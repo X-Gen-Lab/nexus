@@ -7,13 +7,13 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 7deff85f5945788a645923b4976d9b902f9e09c9e92a4d8a24f93c2b02d27c24\n"
+"X-Nexus-Source-SHA256: 91acaa6f4bdfbba1c0c8c33f1fd6edd7f8db1cf3d0810903f39c553644193716\n"
 
-#: ../../../../../../docs/guides/os-shutdown.md:9
+#: ../../../../docs/guides/os-shutdown.md:9
 msgid "Wait correctly and shut down an explicit owner"
 msgstr "正确等待并停止显式 owner"
 
-#: ../../../../../../docs/guides/os-shutdown.md:11
+#: ../../../../docs/guides/os-shutdown.md:11
 msgid ""
 "Use this guide for applications selecting an optional Native, FreeRTOS or "
 "ThreadX adapter. The application owns tasks, stacks, notifications, queues "
@@ -25,11 +25,22 @@ msgstr ""
 "的应用使用本指南。应用拥有任务、栈、通知、队列和执行进度。裸机没有调度器。平台启动从不启动内核。[OS "
 "合同](../reference/contracts/os/execution.md)保持权威。"
 
-#: ../../../../../../docs/guides/os-shutdown.md:16
+#: ../../../../docs/guides/os-shutdown.md:16
+msgid ""
+"Use the common opaque task, notification, queue and channel APIs. Include "
+"`nexus/os/storage.h` only in files defining zero-initialized static objects "
+"and native-word stacks; ordinary business headers do not include kernel "
+"headers. One executable selects one backend. The current implementation does"
+" not by itself establish final software-candidate or physical qualification."
+msgstr ""
+"使用公共 opaque 任务、通知、queue 和 channel API。只在定义清零静态对象及原生元素栈的文件中包含 "
+"`nexus/os/storage.h`，普通业务头不包含内核头。每个可执行文件选择一个后端。当前实现本身不授予最终软件候选或物理资格。"
+
+#: ../../../../docs/guides/os-shutdown.md:22
 msgid "Avoid lost completion and unbounded waits"
 msgstr "避免丢失完成和无限等待"
 
-#: ../../../../../../docs/guides/os-shutdown.md:18
+#: ../../../../docs/guides/os-shutdown.md:24
 msgid ""
 "Use the request's latched predicate as truth. Check the completion "
 "predicate, arm the notification sequence, recheck, wait with the same "
@@ -41,17 +52,17 @@ msgstr ""
 "以请求的锁存谓词为权威。先检查完成谓词，调用 `arm` "
 "快照通知序列，再次检查，以同一绝对单调截止时间等待，然后再次检查。唤醒只是提示，可能合并或与当前请求无关。超时后执行合同要求的最后一次谓词观察。不得在每次提示后重新开始相对时间预算，也不得阻塞唯一负责推进的执行者。"
 
-#: ../../../../../../docs/guides/os-shutdown.md:24
+#: ../../../../docs/guides/os-shutdown.md:30
 msgid ""
 "![Predicate, wake and explicit shutdown "
 "responsibilities](../assets/diagrams/wait-wake-shutdown.svg)"
 msgstr "![谓词、唤醒与显式停机责任](../assets/diagrams/wait-wake-shutdown.svg)"
 
-#: ../../../../../../docs/guides/os-shutdown.md:24
+#: ../../../../docs/guides/os-shutdown.md:30
 msgid "Predicate, wake and explicit shutdown responsibilities"
 msgstr "谓词、唤醒与显式停机责任"
 
-#: ../../../../../../docs/guides/os-shutdown.md:26
+#: ../../../../docs/guides/os-shutdown.md:32
 msgid ""
 "FIG-08 shows the current wait/wake responsibilities. A provider IRQ sink "
 "must respect the selected kernel syscall ceiling; an unqualified priority "
@@ -63,139 +74,195 @@ msgstr ""
 "API。ThreadX 有自己复核的 M4/Native 子集和屏蔽策略，不继承 FreeRTOS 端口或 tickless/isolation "
 "能力集。"
 
-#: ../../../../../../docs/guides/os-shutdown.md:31
+#: ../../../../docs/guides/os-shutdown.md:37
 msgid "Shut down in dependency order"
 msgstr "按依赖顺序停机"
 
-#: ../../../../../../docs/guides/os-shutdown.md:33
+#: ../../../../docs/guides/os-shutdown.md:39
 msgid "Close client admission and reject new work without borrowing it."
 msgstr "关闭客户端准入，不借用地拒绝新工作。"
 
-#: ../../../../../../docs/guides/os-shutdown.md:34
+#: ../../../../docs/guides/os-shutdown.md:40
 msgid ""
 "Keep the resource owner/executor running. Request cancellation using stable "
 "slots and matching epochs; cancellation does not release accepted storage."
 msgstr "保持资源 owner/执行者运行。通过稳定槽与匹配 epoch 请求取消；取消不释放已接受的存储。"
 
-#: ../../../../../../docs/guides/os-shutdown.md:36
+#: ../../../../docs/guides/os-shutdown.md:42
 msgid ""
 "Drain transfers and block loans. Acquire-observe SETTLED and read results. A"
 " failed drain retains QUARANTINED storage and explicit recovery "
 "responsibility."
 msgstr "排空传输和块借用。Acquire 观察 SETTLED 并读取结果。失败排空保留 QUARANTINED 存储和明确恢复责任。"
 
-#: ../../../../../../docs/guides/os-shutdown.md:38
+#: ../../../../docs/guides/os-shutdown.md:44
 msgid ""
 "Join producers and detach/join control observers before slot or request "
 "reuse."
 msgstr "复用槽或请求前，join 生产者并 detach/join 控制观察者。"
 
-#: ../../../../../../docs/guides/os-shutdown.md:39
+#: ../../../../docs/guides/os-shutdown.md:45
 msgid ""
 "Stop and join the owner. Quiesce hardware IRQ publishers before destroying "
 "their notification, queue, guard, stack or TCB storage."
 msgstr "停止并 join owner。销毁通知、队列、临界区保护、栈或 TCB 存储前，确保硬件 IRQ 发布者停止访问并完成必要同步。"
 
-#: ../../../../../../docs/guides/os-shutdown.md:41
+#: ../../../../docs/guides/os-shutdown.md:47
 msgid ""
 "Stop platform providers only when their selected lifetime and kernel "
 "clock/Tick ownership permit it. A running scheduler is not stopped by "
 "ordinary I/O teardown."
 msgstr "只有选定生命周期与内核时钟/Tick 所有权允许时才能停止 platform 提供者。普通 I/O 拆除不停止正在运行的调度器。"
 
-#: ../../../../../../docs/guides/os-shutdown.md:44
+#: ../../../../docs/guides/os-shutdown.md:50
 msgid "Task return has a backend-specific implementation:"
 msgstr "任务返回后的实现因后端而异："
 
-#: ../../../../../../docs/guides/os-shutdown.md:0
+#: ../../../../docs/guides/os-shutdown.md:0
 msgid "Backend"
 msgstr "后端"
 
-#: ../../../../../../docs/guides/os-shutdown.md:0
+#: ../../../../docs/guides/os-shutdown.md:0
 msgid "After the application entry returns"
 msgstr "应用入口返回后的行为"
 
-#: ../../../../../../docs/guides/os-shutdown.md:0
+#: ../../../../docs/guides/os-shutdown.md:0
 msgid "External owner must prove"
 msgstr "外部所有者必须证明"
 
-#: ../../../../../../docs/guides/os-shutdown.md:0
+#: ../../../../docs/guides/os-shutdown.md:0
 msgid "Native"
 msgstr "Native"
 
-#: ../../../../../../docs/guides/os-shutdown.md:0
+#: ../../../../docs/guides/os-shutdown.md:0
 msgid "The pthread entry returns and the host thread terminates"
 msgstr "pthread 入口返回，主机线程终止"
 
-#: ../../../../../../docs/guides/os-shutdown.md:0
-msgid "Successful `nx_native_task_join()`"
-msgstr "`nx_native_task_join()` 成功"
+#: ../../../../docs/guides/os-shutdown.md:0
+msgid "Successful `nx_task_join_until()` after actual pthread exit"
+msgstr "实际 pthread 退出后 `nx_task_join_until()` 成功"
 
-#: ../../../../../../docs/guides/os-shutdown.md:0
+#: ../../../../docs/guides/os-shutdown.md:0
 msgid "FreeRTOS"
 msgstr "FreeRTOS"
 
-#: ../../../../../../docs/guides/os-shutdown.md:0
+#: ../../../../docs/guides/os-shutdown.md:0
 msgid ""
 "The wrapper publishes its completion hint and suspends until the external "
 "joiner deletes it"
 msgstr "包装任务发布完成提示，然后挂起，直到外部 join 调用方将其删除"
 
-#: ../../../../../../docs/guides/os-shutdown.md:0
-msgid "Successful `nx_freertos_task_join()` and external kernel detachment"
-msgstr "`nx_freertos_task_join()` 成功，且内核引用已在外部解除"
+#: ../../../../docs/guides/os-shutdown.md:0
+msgid "Successful `nx_task_join_until()` after external kernel deletion"
+msgstr "外部内核删除后 `nx_task_join_until()` 成功"
 
-#: ../../../../../../docs/guides/os-shutdown.md:0
+#: ../../../../docs/guides/os-shutdown.md:0
 msgid "ThreadX"
 msgstr "ThreadX"
 
-#: ../../../../../../docs/guides/os-shutdown.md:0
+#: ../../../../docs/guides/os-shutdown.md:0
 msgid ""
 "The wrapper publishes its return predicate and completion hint, then follows"
 " the kernel completion path"
 msgstr "包装任务发布返回谓词和完成提示，然后进入内核完成路径"
 
-#: ../../../../../../docs/guides/os-shutdown.md:0
-msgid ""
-"Successful `nx_threadx_task_join()`; the hint alone does not prove ready-"
-"list detachment"
-msgstr "`nx_threadx_task_join()` 成功；提示本身不能证明任务已经脱离就绪链表"
+#: ../../../../docs/guides/os-shutdown.md:0
+msgid "Successful `nx_task_join_until()` after real ThreadX deletion"
+msgstr "真实 ThreadX 删除后 `nx_task_join_until()` 成功"
 
-#: ../../../../../../docs/guides/os-shutdown.md:52
+#: ../../../../docs/guides/os-shutdown.md:58
 msgid ""
 "Returning from an entry function or observing a completion hint never "
 "authorizes stack/TCB reclamation. Keep wrapper, stack and kernel-control "
 "storage until the one external lifecycle owner successfully joins it. Raw "
 "queues and closable queues have different lifecycle contracts; close is not "
 "destruction. Keep all storage on the failure path and retry cleanup only "
-"through its real owner."
+"through its real owner. Native finite join uses the real GNU monotonic "
+"clock-join path; a completion flag followed by unbounded `pthread_join` is "
+"not equivalent. The Native process clock remains independent of "
+"deterministic peripheral-model clocks."
 msgstr ""
-"入口函数返回或观察到完成提示，都不允许回收栈／TCB。必须保留包装对象、栈和内核控制存储，直到唯一的外部生命周期所有者成功 "
-"join。原始队列和可关闭队列的生命周期合同不同；关闭不等于销毁。失败路径保留全部存储，只能由真实所有者重试清理。"
+"入口函数返回或观察到完成提示都不授权回收栈／TCB。在唯一外部生命周期责任者成功 join 前，保留 wrapper、栈和内核控制存储。raw "
+"queue 与可关闭队列有不同的生命周期合同，close 不是销毁。失败路径保留所有存储，只能通过真实 owner 重试清理。Native 有限 "
+"join 使用真实 GNU 单调 clock-join 路径；完成标志后再无界调用 `pthread_join` 并不等价。Native "
+"进程时钟独立于可确定性推进的外设模型时钟。"
 
-#: ../../../../../../docs/guides/os-shutdown.md:58
+#: ../../../../docs/guides/os-shutdown.md:67
+msgid ""
+"Channels require an initialized exclusive caller waiter for each "
+"simultaneous send/receive. Close rejects sends with `CANCELLED`, wakes "
+"blockers and retains queued items; receive reports `CANCELLED` only when "
+"closed and drained. Queue deadline zero is an immediate try. A raw queue has"
+" no close broadcast and needs an external protocol ensuring callers exit "
+"before destruction."
+msgstr ""
+"channel 的每个并发发送／接收使用一个已初始化的独占调用者 waiter。close 使发送返回 "
+"`CANCELLED`，唤醒阻塞者并保留队列中的数据；仅在关闭且排空后接收才返回 `CANCELLED`。queue 的 deadline 零表示立即 "
+"try。raw queue 没有关闭广播，需要外部协议保证调用者退出后再销毁。"
+
+#: ../../../../docs/guides/os-shutdown.md:73
+msgid ""
+"`nx_os_run` succeeds without returning. Native parks its existing bootstrap "
+"thread to preserve caller-stack loans; process exit is explicit application "
+"policy. Native supports only logical priority zero. The common priority "
+"order is larger values first; do not pass ThreadX native priority numbers "
+"directly."
+msgstr ""
+"`nx_os_run` 成功不返回。Native 停驻既有 bootstrap 线程以保留调用者栈的借用，进程退出由应用显式决定。Native "
+"只支持逻辑优先级 0。公共优先级方向为高数值优先，不能直接传 ThreadX 原生优先级编号。"
+
+#: ../../../../docs/guides/os-shutdown.md:78
+msgid "Retain ownership after task-start failures"
+msgstr "任务启动失败后保留所有权"
+
+#: ../../../../docs/guides/os-shutdown.md:80
+msgid ""
+"A non-successful start does not always mean clean rejection. INVALID/CONTEXT"
+" reject the current attempt without new effects; they do not release "
+"references held by an already live task. ThreadX may create a task "
+"successfully and then report IO when resume fails, retaining the live "
+"control and its borrowed storage."
+msgstr ""
+"start 非成功并不总是干净拒绝。INVALID／CONTEXT 拒绝本次尝试而不新增效果，但不释放既有 live 任务持有的引用。ThreadX "
+"可能先成功创建任务，再因 resume 失败返回 IO，同时保留 live 控制对象及其借用存储。"
+
+#: ../../../../docs/guides/os-shutdown.md:85
+msgid ""
+"For a creation or cleanup failure without proof of complete withdrawal, "
+"retain the control, stack, name and context. Use discard only when the "
+"selected phase and actual entry state prove that the task never executed; "
+"otherwise use the permitted cooperative-completion/join path or explicit "
+"external recovery. If teardown cannot be proved, do not reinitialize or free"
+" the object. There is no generic task destroy or kill that safely revokes "
+"these responsibilities."
+msgstr ""
+"创建或清理失败且无法证明已经完整撤回时，保留控制对象、栈、名称和 context。只有所选阶段和真实入口状态证明任务从未执行时才能 "
+"discard；否则使用允许的合作式完成／join 路径或显式外部恢复。无法证明结束时，不得重新初始化或释放对象。没有能够安全撤销这些责任的通用任务 "
+"destroy 或 kill。"
+
+#: ../../../../docs/guides/os-shutdown.md:92
 msgid "Execute maintained software fixtures"
 msgstr "执行维护中的软件夹具"
 
-#: ../../../../../../docs/guides/os-shutdown.md:60
+#: ../../../../docs/guides/os-shutdown.md:94
 msgid ""
 "First prepare the [fixed source and recursive dependencies](source-"
 "checkout.md). From that repository root, with host build tools available:"
 msgstr "先准备[固定源码与递归依赖](source-checkout.md)。然后从该仓库根目录、在主机构建工具可用的条件下执行："
 
-#: ../../../../../../docs/guides/os-shutdown.md:70
+#: ../../../../docs/guides/os-shutdown.md:107
 msgid ""
-"Both binaries must execute nonempty passing cases. This targeted development"
-" scope does not replace the complete TDD gate. The external UART owner "
+"All binaries must execute nonempty passing cases. This targeted development "
+"scope does not replace the complete TDD gate. The external UART owner "
 "application in [nexus-examples](https://github.com/X-Gen-Lab/nexus-examples)"
 " supplies product workers; its pin/revision must be recorded before claiming"
 " consumer execution."
 msgstr ""
-"两个可执行文件都必须实际执行非空且全部通过的用例。此定向开发范围不替代完整 TDD 门禁。[nexus-"
-"examples](https://github.com/X-Gen-Lab/nexus-examples) 的外部 UART owner "
-"应用提供产品执行任务；声明消费工程执行前必须记录其固定源码版本。"
+"所有二进制都必须执行非空且通过的用例。此定向开发范围不能替代完整 TDD 门禁。[nexus-"
+"examples](https://github.com/X-Gen-Lab/nexus-examples) 中的外部 UART owner "
+"应用提供产品 worker；声明已执行消费者前必须记录其 pin／revision。"
 
-#: ../../../../../../docs/guides/os-shutdown.md:75
+#: ../../../../docs/guides/os-shutdown.md:112
 msgid ""
 "Physical scheduler context, IRQ ceiling, FP/MVE retention, stack peaks and "
 "wake latency require real station evidence. Do not inherit POSIX behavior as"

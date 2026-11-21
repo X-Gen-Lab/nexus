@@ -254,7 +254,7 @@ target_link_libraries(
     PRIVATE nexus_os_wait nexus_arch nexus_owned_warnings nexus_build_options
 )
 
-add_library(nexus_os_freertos STATIC freertos.c)
+add_library(nexus_os_freertos STATIC freertos.c task_runtime.c)
 if(NEXUS_OS_MEMORY_PROTECTION)
     target_sources(nexus_os_freertos PRIVATE mpu/task.c mpu/layout.c)
     # Port SVC code can require this table after scanning the adapter archive.

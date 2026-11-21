@@ -19,6 +19,7 @@ source-map
 dependencies
 sdk-publishing
 documentation
+os-portability-plan
 ```
 
 只开发外部应用时先看[应用指南](../guides/index.md)；公共状态与字段见

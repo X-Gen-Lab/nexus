@@ -30,12 +30,11 @@ STORAGE = OBJECTS | {
     'join_stack', 'permanent_stack', 'raw_payload', 'closable_payload',
 }
 PUBLIC_HOT_PATHS = (
-    'nx_freertos_queue_send', 'nx_freertos_queue_receive',
-    'nx_freertos_queue_send_until', 'nx_freertos_queue_receive_until',
-    'nx_freertos_task_start', 'nx_freertos_task_join',
-    'nx_freertos_permanent_task_start', 'nx_freertos_closable_queue_close',
-    'nx_freertos_closable_queue_send_until',
-    'nx_freertos_closable_queue_receive_until',
+    'nx_queue_send_until', 'nx_queue_receive_until',
+    'nx_task_start', 'nx_task_join_until',
+    'nx_permanent_task_start', 'nx_channel_close',
+    'nx_channel_send_until',
+    'nx_channel_receive_until',
 )
 CORE_OBJECTS = frozenset({'request', 'slot', 'observer', 'clock', 'clock32'})
 

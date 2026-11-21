@@ -6,7 +6,7 @@
  * \date            2026-10-11
  * \copyright       Copyright (c) 2026 Nexus Team
  */
-#include "nexus/os/freertos.h"
+#include "nexus/os/storage.h"
 static StaticTask_t task_tcb
     __attribute__((section(".fixture.tcb"), aligned(8)));
 static _Alignas(8) StackType_t task_stack[256];

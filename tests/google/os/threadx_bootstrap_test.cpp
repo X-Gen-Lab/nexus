@@ -9,6 +9,7 @@
  */
 #include "nexus/arch/arch.h"
 #include "nexus/core/fault.h"
+#include "nexus/os/storage.h"
 #include "nexus/os/threadx.h"
 #include <cstdlib>
 #include <cstring>
@@ -24,7 +25,7 @@ void product(void*) {
 void enter(int selected, bool observation_required = false) {
     mode = selected;
     verify_observer = observation_required;
-    nx_threadx_kernel_enter(product, nullptr);
+    nx_os_run(product, nullptr);
     std::_Exit(66);
 }
 TEST(ThreadXBootstrap, RejectsISRCallbackBeforeProduct) {

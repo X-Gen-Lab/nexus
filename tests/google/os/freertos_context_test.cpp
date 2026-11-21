@@ -9,6 +9,7 @@
  */
 #include "nexus/arch/arch.h"
 #include "nexus/os/freertos.h"
+#include "nexus/os/storage.h"
 #include <cstring>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
@@ -80,8 +81,6 @@ enum class Operation {
     TaskJoin,
     TaskDiscard,
     QueueInit,
-    QueueSend,
-    QueueReceive,
     QueueDestroy,
     NotifyWait,
     NotifyWake,
@@ -104,9 +103,9 @@ class FreeRTOSContextTest : public ::testing::Test {
   protected:
     StrictMock<Kernel> calls;
     StrictMock<Cpu> context;
-    nx_freertos_notify_t notification{};
-    nx_freertos_task_t task{};
-    nx_freertos_queue_t queue{};
+    nx_notify_t notification{};
+    nx_task_t task{};
+    nx_queue_t queue{};
     alignas(8) StackType_t stack[128]{};
     uint8_t bytes[16]{};
     unsigned item = 23;
@@ -207,9 +206,9 @@ TEST_P(FreeRTOSRejectedContextTest, RejectsBeforeKernelOrStorageEffects) {
     task.finished = latch;
     queue.handle = queue_handle;
     nx_freertos_direct_notify_t direct{};
-    nx_freertos_permanent_task_t permanent{};
-    nx_freertos_queue_waiter_t waiter{};
-    nx_freertos_closable_queue_t closable{};
+    nx_permanent_task_t permanent{};
+    nx_channel_waiter_t waiter{};
+    nx_channel_t closable{};
     direct.receiver =
         operation == Operation::DirectInit ? nullptr : task_handle;
     waiter.handle = operation == Operation::WaiterInit ? nullptr : latch;
@@ -240,37 +239,31 @@ TEST_P(FreeRTOSRejectedContextTest, RejectsBeforeKernelOrStorageEffects) {
     std::memcpy(notification_before, &notification, sizeof notification);
     std::memcpy(task_before, &task, sizeof task);
     std::memcpy(queue_before, &queue, sizeof queue);
-    const auto port = nx_freertos_notify_port(&notification);
+    const auto port = nx_notify_port(&notification);
     nx_result_t result = NX_ERROR_INVALID;
     switch (operation) {
         case Operation::NotifyInit:
-            result = nx_freertos_notify_init(&notification);
+            result = nx_notify_init(&notification);
             break;
         case Operation::NotifyDestroy:
-            result = nx_freertos_notify_destroy(&notification);
+            result = nx_notify_destroy(&notification);
             break;
         case Operation::TaskStart:
-            result = nx_freertos_task_start(&task, "test", stack, 128, 1, entry,
-                                            &item);
+            result =
+                nx_task_start(&task, "test", stack, (128) * sizeof(StackType_t),
+                              1, entry, &item);
             break;
         case Operation::TaskJoin:
-            result = nx_freertos_task_join(&task, 1000);
+            result = nx_task_join_until(&task, 1000);
             break;
         case Operation::TaskDiscard:
-            result = nx_freertos_task_discard_before_scheduler(&task);
+            result = nx_task_discard_before_scheduler(&task);
             break;
         case Operation::QueueInit:
-            result = nx_freertos_queue_init(&queue, bytes, sizeof bytes, 2,
-                                            sizeof item);
-            break;
-        case Operation::QueueSend:
-            result = nx_freertos_queue_send(&queue, &item, 0);
-            break;
-        case Operation::QueueReceive:
-            result = nx_freertos_queue_receive(&queue, &item, 0);
+            result = nx_queue_init(&queue, bytes, sizeof bytes, 2, sizeof item);
             break;
         case Operation::QueueDestroy:
-            result = nx_freertos_queue_destroy(&queue);
+            result = nx_queue_destroy(&queue);
             break;
         case Operation::NotifyWait:
             result = port.wait(port.context, 42, 1000);
@@ -279,10 +272,10 @@ TEST_P(FreeRTOSRejectedContextTest, RejectsBeforeKernelOrStorageEffects) {
             result = port.wake(port.context);
             break;
         case Operation::QueueSendUntil:
-            result = nx_freertos_queue_send_until(&queue, &item, 1000);
+            result = nx_queue_send_until(&queue, &item, 1000);
             break;
         case Operation::QueueReceiveUntil:
-            result = nx_freertos_queue_receive_until(&queue, &item, 1000);
+            result = nx_queue_receive_until(&queue, &item, 1000);
             break;
         case Operation::DirectInit:
             result = nx_freertos_direct_notify_init(&direct, task_handle, 0);
@@ -291,32 +284,31 @@ TEST_P(FreeRTOSRejectedContextTest, RejectsBeforeKernelOrStorageEffects) {
             result = nx_freertos_direct_notify_destroy(&direct);
             break;
         case Operation::PermanentStart:
-            result = nx_freertos_permanent_task_start(
-                &permanent, "permanent", stack, 128, 1, entry, &item);
+            result = nx_permanent_task_start(&permanent, "permanent", stack,
+                                             (128) * sizeof(StackType_t), 1,
+                                             entry, &item);
             break;
         case Operation::WaiterInit:
-            result = nx_freertos_queue_waiter_init(&waiter);
+            result = nx_channel_waiter_init(&waiter);
             break;
         case Operation::WaiterDestroy:
-            result = nx_freertos_queue_waiter_destroy(&waiter);
+            result = nx_channel_waiter_destroy(&waiter);
             break;
         case Operation::ClosableInit:
-            result = nx_freertos_closable_queue_init(
-                &closable, bytes, sizeof bytes, 2, sizeof item, 1);
+            result = nx_channel_init(&closable, bytes, sizeof bytes, 2,
+                                     sizeof item, 1);
             break;
         case Operation::ClosableSend:
-            result = nx_freertos_closable_queue_send_until(&closable, &item,
-                                                           1000, &waiter);
+            result = nx_channel_send_until(&closable, &item, 1000, &waiter);
             break;
         case Operation::ClosableReceive:
-            result = nx_freertos_closable_queue_receive_until(&closable, &item,
-                                                              1000, &waiter);
+            result = nx_channel_receive_until(&closable, &item, 1000, &waiter);
             break;
         case Operation::ClosableClose:
-            result = nx_freertos_closable_queue_close(&closable);
+            result = nx_channel_close(&closable);
             break;
         case Operation::ClosableDestroy:
-            result = nx_freertos_closable_queue_destroy(&closable);
+            result = nx_channel_destroy(&closable);
             break;
     }
     EXPECT_EQ(result, NX_ERROR_CONTEXT);
@@ -339,7 +331,6 @@ INSTANTIATE_TEST_SUITE_P(
         ::testing::Values(Operation::NotifyInit, Operation::NotifyDestroy,
                           Operation::TaskStart, Operation::TaskJoin,
                           Operation::TaskDiscard, Operation::QueueInit,
-                          Operation::QueueSend, Operation::QueueReceive,
                           Operation::QueueDestroy, Operation::NotifyWait,
                           Operation::NotifyWake, Operation::QueueSendUntil,
                           Operation::QueueReceiveUntil, Operation::DirectInit,
@@ -353,35 +344,33 @@ TEST_F(FreeRTOSContextTest, BootstrapCreatesObjectsWithoutSchedulerQueries) {
     EXPECT_CALL(calls, create_queue(1, 0, nullptr, &notification.storage,
                                     queueQUEUE_TYPE_BINARY_SEMAPHORE))
         .WillOnce(Return(latch));
-    EXPECT_EQ(nx_freertos_notify_init(&notification), NX_SUCCESS);
+    EXPECT_EQ(nx_notify_init(&notification), NX_SUCCESS);
     EXPECT_CALL(calls, create_queue(1, 0, nullptr, &task.finished_storage,
                                     queueQUEUE_TYPE_BINARY_SEMAPHORE))
         .WillOnce(Return(latch));
     EXPECT_CALL(calls, create_task(_, ::testing::StrEq("test"), 128, &task, 1,
                                    stack, &task.control))
         .WillOnce(Return(task_handle));
-    EXPECT_EQ(
-        nx_freertos_task_start(&task, "test", stack, 128, 1, entry, &item),
-        NX_SUCCESS);
+    EXPECT_EQ(nx_task_start(&task, "test", stack, (128) * sizeof(StackType_t),
+                            1, entry, &item),
+              NX_SUCCESS);
     EXPECT_CALL(calls, create_queue(2, sizeof item, bytes, &queue.control,
                                     queueQUEUE_TYPE_BASE))
         .WillOnce(Return(queue_handle));
-    EXPECT_EQ(
-        nx_freertos_queue_init(&queue, bytes, sizeof bytes, 2, sizeof item),
-        NX_SUCCESS);
+    EXPECT_EQ(nx_queue_init(&queue, bytes, sizeof bytes, 2, sizeof item),
+              NX_SUCCESS);
 }
 
-TEST_F(FreeRTOSContextTest, BootstrapNoWaitQueueAndWakeRemainAllowed) {
+TEST_F(FreeRTOSContextTest, BootstrapRejectsTransfersButStillPermitsWake) {
     queue.handle = queue_handle;
     notification.handle = latch;
-    EXPECT_CALL(calls, send(queue_handle, &item, 0, queueSEND_TO_BACK))
-        .WillOnce(Return(pdTRUE));
-    EXPECT_EQ(nx_freertos_queue_send(&queue, &item, 0), NX_SUCCESS);
-    EXPECT_CALL(calls, receive(queue_handle, &item, 0))
-        .WillOnce(Return(pdTRUE));
-    EXPECT_EQ(nx_freertos_queue_receive(&queue, &item, 0), NX_SUCCESS);
+    EXPECT_CALL(calls, scheduler())
+        .Times(2)
+        .WillRepeatedly(Return(taskSCHEDULER_NOT_STARTED));
+    EXPECT_EQ(nx_queue_send_until(&queue, &item, 0), NX_ERROR_CONTEXT);
+    EXPECT_EQ(nx_queue_receive_until(&queue, &item, 0), NX_ERROR_CONTEXT);
     EXPECT_EQ(queue.users, 0U);
-    const auto port = nx_freertos_notify_port(&notification);
+    const auto port = nx_notify_port(&notification);
     EXPECT_CALL(calls, send(latch, nullptr, 0, queueSEND_TO_BACK))
         .WillOnce(Return(pdFALSE));
     EXPECT_EQ(port.wake(port.context), NX_SUCCESS);
@@ -396,11 +385,11 @@ TEST_F(FreeRTOSContextTest, BootstrapRejectsAllBlockingOperations) {
     EXPECT_CALL(calls, scheduler())
         .Times(4)
         .WillRepeatedly(Return(taskSCHEDULER_NOT_STARTED));
-    EXPECT_EQ(nx_freertos_queue_send(&queue, &item, 1), NX_ERROR_CONTEXT);
-    EXPECT_EQ(nx_freertos_queue_receive(&queue, &item, 1), NX_ERROR_CONTEXT);
-    const auto port = nx_freertos_notify_port(&notification);
+    EXPECT_EQ(nx_queue_send_until(&queue, &item, 1000), NX_ERROR_CONTEXT);
+    EXPECT_EQ(nx_queue_receive_until(&queue, &item, 1000), NX_ERROR_CONTEXT);
+    const auto port = nx_notify_port(&notification);
     EXPECT_EQ(port.wait(port.context, 0, 1000), NX_ERROR_CONTEXT);
-    EXPECT_EQ(nx_freertos_task_join(&task, 1000), NX_ERROR_CONTEXT);
+    EXPECT_EQ(nx_task_join_until(&task, 1000), NX_ERROR_CONTEXT);
     EXPECT_EQ(queue.users, 0U);
     EXPECT_EQ(notification.waiting, 0U);
     EXPECT_EQ(task.handle, task_handle);
@@ -408,7 +397,7 @@ TEST_F(FreeRTOSContextTest, BootstrapRejectsAllBlockingOperations) {
 
 TEST_F(FreeRTOSContextTest, RunningWaitRetainsSequenceAndReleasesWaiter) {
     notification.handle = latch;
-    const auto port = nx_freertos_notify_port(&notification);
+    const auto port = nx_notify_port(&notification);
     EXPECT_CALL(calls, scheduler()).WillOnce(Return(taskSCHEDULER_RUNNING));
     EXPECT_CALL(calls, now()).Times(2).WillRepeatedly(Return(500));
     EXPECT_CALL(calls, take(latch, 1)).WillOnce([&](QueueHandle_t, TickType_t) {
@@ -423,7 +412,7 @@ TEST_F(FreeRTOSContextTest, RunningWaitRetainsSequenceAndReleasesWaiter) {
 TEST_F(FreeRTOSContextTest, ExpiredWakeDoesNotBypassDeadline) {
     notification.handle = latch;
     notification.sequence = 1;
-    const auto port = nx_freertos_notify_port(&notification);
+    const auto port = nx_notify_port(&notification);
     EXPECT_CALL(calls, scheduler()).WillOnce(Return(taskSCHEDULER_RUNNING));
     EXPECT_CALL(calls, now()).WillOnce(Return(1000));
     EXPECT_EQ(port.wait(port.context, 0, 1000), NX_ERROR_TIMEOUT);
@@ -431,10 +420,11 @@ TEST_F(FreeRTOSContextTest, ExpiredWakeDoesNotBypassDeadline) {
 }
 
 TEST_F(FreeRTOSContextTest, RejectsSmallStackBeforeAnyKernelMutation) {
-    EXPECT_EQ(nx_freertos_task_start(&task, "small", stack,
-                                     NEXUS_OS_MIN_STACK_WORDS - 1U, 1, entry,
-                                     &item),
-              NX_ERROR_INVALID);
+    EXPECT_EQ(
+        nx_task_start(&task, "small", stack,
+                      (NEXUS_OS_MIN_STACK_WORDS - 1U) * sizeof(StackType_t), 1,
+                      entry, &item),
+        NX_ERROR_INVALID);
     EXPECT_EQ(task.handle, nullptr);
     EXPECT_EQ(task.finished, nullptr);
     EXPECT_EQ(task.entry, nullptr);
@@ -443,8 +433,8 @@ TEST_F(FreeRTOSContextTest, RejectsSmallStackBeforeAnyKernelMutation) {
 TEST_F(FreeRTOSContextTest, RejectsMisalignedStackBeforeKernelMutation) {
     auto* misaligned =
         reinterpret_cast<StackType_t*>(reinterpret_cast<uintptr_t>(stack) + 1U);
-    EXPECT_EQ(nx_freertos_task_start(&task, "alignment", misaligned, 127, 1,
-                                     entry, &item),
+    EXPECT_EQ(nx_task_start(&task, "alignment", misaligned,
+                            (127) * sizeof(StackType_t), 1, entry, &item),
               NX_ERROR_INVALID);
     EXPECT_EQ(task.handle, nullptr);
     EXPECT_EQ(task.finished, nullptr);
@@ -452,8 +442,9 @@ TEST_F(FreeRTOSContextTest, RejectsMisalignedStackBeforeKernelMutation) {
 
 TEST_F(FreeRTOSContextTest, TaskStackCannotOverwriteItsOwnControl) {
     auto* overlapping = reinterpret_cast<StackType_t*>(&task);
-    EXPECT_EQ(nx_freertos_task_start(&task, "overlap", overlapping,
-                                     NEXUS_OS_MIN_STACK_WORDS, 1, entry, &item),
+    EXPECT_EQ(nx_task_start(&task, "overlap", overlapping,
+                            (NEXUS_OS_MIN_STACK_WORDS) * sizeof(StackType_t), 1,
+                            entry, &item),
               NX_ERROR_INVALID);
     EXPECT_EQ(task.handle, nullptr);
     EXPECT_EQ(task.finished, nullptr);
@@ -461,36 +452,35 @@ TEST_F(FreeRTOSContextTest, TaskStackCannotOverwriteItsOwnControl) {
 }
 
 TEST_F(FreeRTOSContextTest, PermanentStackCannotOverwriteItsOwnControl) {
-    nx_freertos_permanent_task_t permanent{};
+    nx_permanent_task_t permanent{};
     auto* overlapping = reinterpret_cast<StackType_t*>(&permanent);
-    EXPECT_EQ(nx_freertos_permanent_task_start(
-                  &permanent, "overlap", overlapping, NEXUS_OS_MIN_STACK_WORDS,
-                  1, entry, &item),
+    EXPECT_EQ(nx_permanent_task_start(&permanent, "overlap", overlapping,
+                                      (NEXUS_OS_MIN_STACK_WORDS) *
+                                          sizeof(StackType_t),
+                                      1, entry, &item),
               NX_ERROR_INVALID);
     EXPECT_EQ(permanent.handle, nullptr);
 }
 
 TEST_F(FreeRTOSContextTest, QueuePayloadCannotOverwriteItsOwnControl) {
     auto* overlapping = reinterpret_cast<uint8_t*>(&queue);
-    EXPECT_EQ(nx_freertos_queue_init(&queue, overlapping, sizeof queue, 2,
-                                     sizeof item),
+    EXPECT_EQ(nx_queue_init(&queue, overlapping, sizeof queue, 2, sizeof item),
               NX_ERROR_INVALID);
     EXPECT_EQ(queue.handle, nullptr);
 }
 
 TEST_F(FreeRTOSContextTest, QueuePayloadSpanCannotWrapTheAddressSpace) {
     auto* wrapping = reinterpret_cast<uint8_t*>(UINTPTR_MAX - 1U);
-    EXPECT_EQ(nx_freertos_queue_init(&queue, wrapping, 16, 2, sizeof item),
+    EXPECT_EQ(nx_queue_init(&queue, wrapping, 16, 2, sizeof item),
               NX_ERROR_INVALID);
     EXPECT_EQ(queue.handle, nullptr);
 }
 
 TEST_F(FreeRTOSContextTest, ClosablePayloadCannotOverwriteWaiterRegistry) {
-    nx_freertos_closable_queue_t closable{};
+    nx_channel_t closable{};
     auto* overlapping = reinterpret_cast<uint8_t*>(&closable.send_waiters);
-    EXPECT_EQ(nx_freertos_closable_queue_init(&closable, overlapping,
-                                              sizeof closable.send_waiters, 1,
-                                              1, 1),
+    EXPECT_EQ(nx_channel_init(&closable, overlapping,
+                              sizeof closable.send_waiters, 1, 1, 1),
               NX_ERROR_INVALID);
     EXPECT_EQ(closable.queue.handle, nullptr);
     EXPECT_EQ(closable.send_waiters, nullptr);
@@ -499,15 +489,15 @@ TEST_F(FreeRTOSContextTest, ClosablePayloadCannotOverwriteWaiterRegistry) {
 
 TEST_F(FreeRTOSContextTest, AdjacentQueueControlAndPayloadRemainValid) {
     struct {
-        nx_freertos_queue_t control;
+        nx_queue_t control;
         uint8_t payload[16];
     } adjacent{};
     EXPECT_CALL(calls,
                 create_queue(2, sizeof item, adjacent.payload,
                              &adjacent.control.control, queueQUEUE_TYPE_BASE))
         .WillOnce(Return(queue_handle));
-    EXPECT_EQ(nx_freertos_queue_init(&adjacent.control, adjacent.payload,
-                                     sizeof adjacent.payload, 2, sizeof item),
+    EXPECT_EQ(nx_queue_init(&adjacent.control, adjacent.payload,
+                            sizeof adjacent.payload, 2, sizeof item),
               NX_SUCCESS);
 }
 
@@ -520,14 +510,14 @@ TEST_F(FreeRTOSContextTest, SuccessfulJoinDeletesBeforeReclaimPermission) {
     EXPECT_CALL(calls, take(latch, 1)).WillOnce(Return(pdTRUE));
     EXPECT_CALL(calls, delete_task(task_handle));
     EXPECT_CALL(calls, delete_queue(latch));
-    EXPECT_EQ(nx_freertos_task_join(&task, 1000), NX_SUCCESS);
+    EXPECT_EQ(nx_task_join_until(&task, 1000), NX_SUCCESS);
     EXPECT_EQ(task.handle, nullptr);
     EXPECT_EQ(task.finished, nullptr);
 }
 
 #endif
 
-TEST_F(FreeRTOSContextTest, KernelBootstrapMaskAllowsFollowingStaticObjects) {
+TEST_F(FreeRTOSContextTest, KernelBootstrapMaskAllowsConstructionAndWakeOnly) {
     EXPECT_CALL(calls, create_queue(1, 0, nullptr, &notification.storage,
                                     queueQUEUE_TYPE_BINARY_SEMAPHORE))
         .WillOnce(
@@ -539,9 +529,9 @@ TEST_F(FreeRTOSContextTest, KernelBootstrapMaskAllowsFollowingStaticObjects) {
                 EXPECT_CALL(context, masks()).WillRepeatedly(Return(masks));
                 return latch;
             });
-    EXPECT_EQ(nx_freertos_notify_init(&notification), NX_SUCCESS);
+    EXPECT_EQ(nx_notify_init(&notification), NX_SUCCESS);
     EXPECT_CALL(calls, scheduler())
-        .Times(5)
+        .Times(AnyNumber())
         .WillRepeatedly(Return(taskSCHEDULER_NOT_STARTED));
     EXPECT_CALL(calls, create_queue(1, 0, nullptr, &task.finished_storage,
                                     queueQUEUE_TYPE_BINARY_SEMAPHORE))
@@ -549,22 +539,17 @@ TEST_F(FreeRTOSContextTest, KernelBootstrapMaskAllowsFollowingStaticObjects) {
     EXPECT_CALL(calls, create_task(_, ::testing::StrEq("test"), 128, &task, 1,
                                    stack, &task.control))
         .WillOnce(Return(task_handle));
-    EXPECT_EQ(
-        nx_freertos_task_start(&task, "test", stack, 128, 1, entry, &item),
-        NX_SUCCESS);
+    EXPECT_EQ(nx_task_start(&task, "test", stack, (128) * sizeof(StackType_t),
+                            1, entry, &item),
+              NX_SUCCESS);
     EXPECT_CALL(calls, create_queue(2, sizeof item, bytes, &queue.control,
                                     queueQUEUE_TYPE_BASE))
         .WillOnce(Return(queue_handle));
-    EXPECT_EQ(
-        nx_freertos_queue_init(&queue, bytes, sizeof bytes, 2, sizeof item),
-        NX_SUCCESS);
-    EXPECT_CALL(calls, send(queue_handle, &item, 0, queueSEND_TO_BACK))
-        .WillOnce(Return(pdTRUE));
-    EXPECT_EQ(nx_freertos_queue_send(&queue, &item, 0), NX_SUCCESS);
-    EXPECT_CALL(calls, receive(queue_handle, &item, 0))
-        .WillOnce(Return(pdTRUE));
-    EXPECT_EQ(nx_freertos_queue_receive(&queue, &item, 0), NX_SUCCESS);
-    const auto port = nx_freertos_notify_port(&notification);
+    EXPECT_EQ(nx_queue_init(&queue, bytes, sizeof bytes, 2, sizeof item),
+              NX_SUCCESS);
+    EXPECT_EQ(nx_queue_send_until(&queue, &item, 0), NX_ERROR_CONTEXT);
+    EXPECT_EQ(nx_queue_receive_until(&queue, &item, 0), NX_ERROR_CONTEXT);
+    const auto port = nx_notify_port(&notification);
     EXPECT_CALL(calls, send(latch, nullptr, 0, queueSEND_TO_BACK))
         .WillOnce(Return(pdTRUE));
     EXPECT_EQ(port.wake(port.context), NX_SUCCESS);
@@ -583,9 +568,9 @@ TEST_F(FreeRTOSContextTest, RunningAndSuspendedCanonicalMasksRejectMutation) {
         .WillOnce(Return(taskSCHEDULER_SUSPENDED));
     queue.handle = queue_handle;
     notification.handle = latch;
-    const auto port = nx_freertos_notify_port(&notification);
+    const auto port = nx_notify_port(&notification);
     for (unsigned i = 0; i < 2; ++i) {
-        EXPECT_EQ(nx_freertos_queue_send(&queue, &item, 0), NX_ERROR_CONTEXT);
+        EXPECT_EQ(nx_queue_send_until(&queue, &item, 0), NX_ERROR_CONTEXT);
         EXPECT_EQ(port.wake(port.context), NX_ERROR_CONTEXT);
         EXPECT_EQ(queue.users, 0U);
         EXPECT_EQ(notification.sequence, 0U);
@@ -598,7 +583,7 @@ TEST_F(FreeRTOSContextTest, NoncanonicalBasepriRejectsWithoutKernelQueries) {
         0, configMAX_SYSCALL_INTERRUPT_PRIORITY + 0x10U, 0};
     EXPECT_CALL(context, masks()).WillRepeatedly(Return(masks));
     queue.handle = queue_handle;
-    EXPECT_EQ(nx_freertos_queue_send(&queue, &item, 0), NX_ERROR_CONTEXT);
+    EXPECT_EQ(nx_queue_send_until(&queue, &item, 0), NX_ERROR_CONTEXT);
     EXPECT_EQ(queue.users, 0U);
 }
 
@@ -611,7 +596,7 @@ TEST_F(FreeRTOSContextTest, AllowedIrqPublishesBeforeGivingAndYielding) {
         .WillOnce(Return(configMAX_SYSCALL_INTERRUPT_PRIORITY));
 #endif
     notification.handle = latch;
-    const auto port = nx_freertos_notify_port(&notification);
+    const auto port = nx_notify_port(&notification);
     EXPECT_CALL(calls, give_isr(latch, _))
         .WillOnce([&](QueueHandle_t, BaseType_t* required) {
             EXPECT_EQ(notification.sequence, 1U);
@@ -629,7 +614,7 @@ TEST_F(FreeRTOSContextTest, UnsafeGroupingRejectsBeforePriorityOrKernelReads) {
     EXPECT_CALL(context, priority_group())
         .WillOnce(Return(allowed_group() + 1U));
     notification.handle = latch;
-    const auto port = nx_freertos_notify_port(&notification);
+    const auto port = nx_notify_port(&notification);
     EXPECT_EQ(port.wake(port.context), NX_ERROR_CONTEXT);
     EXPECT_EQ(notification.sequence, 0U);
 }
@@ -642,7 +627,7 @@ TEST_F(FreeRTOSContextTest, AboveCeilingIrqRejectsBeforeSequencePublication) {
         .WillOnce(Return(configMAX_SYSCALL_INTERRUPT_PRIORITY -
                          (1U << (8U - configPRIO_BITS))));
     notification.handle = latch;
-    const auto port = nx_freertos_notify_port(&notification);
+    const auto port = nx_notify_port(&notification);
     EXPECT_EQ(port.wake(port.context), NX_ERROR_CONTEXT);
     EXPECT_EQ(notification.sequence, 0U);
 }
@@ -660,7 +645,7 @@ TEST_F(FreeRTOSContextTest, SystemAndOutOfRangeExceptionsNeverReadNvic) {
         .WillOnce(Return(15U))
         .WillOnce(Return(16U + NEXUS_CPU_EXTERNAL_IRQ_COUNT));
     notification.handle = latch;
-    const auto port = nx_freertos_notify_port(&notification);
+    const auto port = nx_notify_port(&notification);
     for (unsigned i = 0; i < 7; ++i) {
         EXPECT_EQ(port.wake(port.context), NX_ERROR_CONTEXT);
         EXPECT_EQ(notification.sequence, 0U);
@@ -670,7 +655,7 @@ TEST_F(FreeRTOSContextTest, SystemAndOutOfRangeExceptionsNeverReadNvic) {
 TEST_F(FreeRTOSContextTest, MaskedIrqNeverReadsNvicOrPublishesSequence) {
     set_context(true, true, true);
     notification.handle = latch;
-    const auto port = nx_freertos_notify_port(&notification);
+    const auto port = nx_notify_port(&notification);
     EXPECT_EQ(port.wake(port.context), NX_ERROR_CONTEXT);
     EXPECT_EQ(notification.sequence, 0U);
 }
@@ -684,7 +669,7 @@ TEST_F(FreeRTOSContextTest, LastExternalVectorAcceptedWithinSelectedProfile) {
     EXPECT_CALL(context, irq_priority(exception)).WillOnce(Return(0xf0));
 #endif
     notification.handle = latch;
-    const auto port = nx_freertos_notify_port(&notification);
+    const auto port = nx_notify_port(&notification);
     EXPECT_CALL(calls, give_isr(latch, _)).WillOnce(Return(pdTRUE));
     EXPECT_EQ(port.wake(port.context), NX_SUCCESS);
     EXPECT_EQ(notification.sequence, 1U);
@@ -696,7 +681,7 @@ TEST_F(FreeRTOSContextTest, FaultmaskAlwaysRejectsBeforeKernelQueries) {
     masks.faultmask = 1;
     EXPECT_CALL(context, masks()).WillRepeatedly(Return(masks));
     queue.handle = queue_handle;
-    EXPECT_EQ(nx_freertos_queue_send(&queue, &item, 0), NX_ERROR_CONTEXT);
+    EXPECT_EQ(nx_queue_send_until(&queue, &item, 0), NX_ERROR_CONTEXT);
     EXPECT_EQ(queue.users, 0U);
 }
 #if NEXUS_FREERTOS_COMMON_CONTRACTS
@@ -712,8 +697,7 @@ TEST_F(FreeRTOSContextTest, DeadlineQueueKeepsOneBudgetAfterSpuriousReturn) {
     EXPECT_CALL(calls, send(queue_handle, &item, 1, queueSEND_TO_BACK))
         .Times(2)
         .WillRepeatedly(Return(pdFALSE));
-    EXPECT_EQ(nx_freertos_queue_send_until(&queue, &item, 1000),
-              NX_ERROR_TIMEOUT);
+    EXPECT_EQ(nx_queue_send_until(&queue, &item, 1000), NX_ERROR_TIMEOUT);
     EXPECT_EQ(queue.users, 0U);
 }
 
@@ -722,16 +706,17 @@ TEST_F(FreeRTOSContextTest, ExpiredDeadlineQueueStillReceivesReadyItem) {
     EXPECT_CALL(calls, scheduler()).WillOnce(Return(taskSCHEDULER_RUNNING));
     EXPECT_CALL(calls, receive(queue_handle, &item, 0))
         .WillOnce(Return(pdTRUE));
-    EXPECT_EQ(nx_freertos_queue_receive_until(&queue, &item, 0), NX_SUCCESS);
+    EXPECT_EQ(nx_queue_receive_until(&queue, &item, 0), NX_SUCCESS);
 }
 
 TEST_F(FreeRTOSContextTest, PermanentTaskCreatesNoJoinSemaphore) {
-    nx_freertos_permanent_task_t permanent{};
+    nx_permanent_task_t permanent{};
     EXPECT_CALL(calls, create_task(entry, ::testing::StrEq("permanent"), 128,
                                    &item, 1, stack, &permanent.control))
         .WillOnce(Return(task_handle));
-    EXPECT_EQ(nx_freertos_permanent_task_start(&permanent, "permanent", stack,
-                                               128, 1, entry, &item),
+    EXPECT_EQ(nx_permanent_task_start(&permanent, "permanent", stack,
+                                      (128) * sizeof(StackType_t), 1, entry,
+                                      &item),
               NX_SUCCESS);
     EXPECT_EQ(permanent.handle, task_handle);
 }
@@ -824,10 +809,10 @@ TEST_F(FreeRTOSContextTest, DisabledNotificationsRejectBeforeObjectChanges) {
 
 #if NEXUS_FREERTOS_COMMON_CONTRACTS
 TEST_F(FreeRTOSContextTest, ClosableQueueCloseLatchesBeforeWaiterSleeps) {
-    nx_freertos_closable_queue_t closable{};
+    nx_channel_t closable{};
     closable.queue.handle = queue_handle;
     closable.maximum_waiters = 1;
-    nx_freertos_queue_waiter_t waiter{};
+    nx_channel_waiter_t waiter{};
     waiter.handle = latch;
     EXPECT_CALL(calls, scheduler()).WillOnce(Return(taskSCHEDULER_RUNNING));
     EXPECT_CALL(calls, suspend_scheduler()).Times(AnyNumber());
@@ -839,13 +824,12 @@ TEST_F(FreeRTOSContextTest, ClosableQueueCloseLatchesBeforeWaiterSleeps) {
         EXPECT_EQ(closable.send_waiters, &waiter);
         EXPECT_CALL(calls, send(latch, nullptr, 0, queueSEND_TO_BACK))
             .WillOnce(Return(pdTRUE));
-        EXPECT_EQ(nx_freertos_closable_queue_close(&closable), NX_SUCCESS);
+        EXPECT_EQ(nx_channel_close(&closable), NX_SUCCESS);
         return 500;
     });
     EXPECT_CALL(calls, take(latch, 1)).WillOnce(Return(pdTRUE));
-    EXPECT_EQ(
-        nx_freertos_closable_queue_send_until(&closable, &item, 1000, &waiter),
-        NX_ERROR_CANCELLED);
+    EXPECT_EQ(nx_channel_send_until(&closable, &item, 1000, &waiter),
+              NX_ERROR_CANCELLED);
     EXPECT_TRUE(closable.closed);
     EXPECT_EQ(closable.queue.users, 0U);
     EXPECT_EQ(closable.send_waiters, nullptr);
@@ -853,11 +837,11 @@ TEST_F(FreeRTOSContextTest, ClosableQueueCloseLatchesBeforeWaiterSleeps) {
 }
 
 TEST_F(FreeRTOSContextTest, ClosedQueueDrainsThenRejectsReceiveAndSends) {
-    nx_freertos_closable_queue_t closable{};
+    nx_channel_t closable{};
     closable.queue.handle = queue_handle;
     closable.maximum_waiters = 1;
     closable.closed = true;
-    nx_freertos_queue_waiter_t waiter{};
+    nx_channel_waiter_t waiter{};
     waiter.handle = latch;
     EXPECT_CALL(calls, scheduler())
         .Times(3)
@@ -868,69 +852,64 @@ TEST_F(FreeRTOSContextTest, ClosedQueueDrainsThenRejectsReceiveAndSends) {
     EXPECT_CALL(calls, receive(queue_handle, &item, 0))
         .WillOnce(Return(pdTRUE))
         .WillOnce(Return(pdFALSE));
-    EXPECT_EQ(
-        nx_freertos_closable_queue_receive_until(&closable, &item, 0, &waiter),
-        NX_SUCCESS);
-    EXPECT_EQ(
-        nx_freertos_closable_queue_receive_until(&closable, &item, 0, &waiter),
-        NX_ERROR_CANCELLED);
-    EXPECT_EQ(
-        nx_freertos_closable_queue_send_until(&closable, &item, 0, &waiter),
-        NX_ERROR_CANCELLED);
+    EXPECT_EQ(nx_channel_receive_until(&closable, &item, 0, &waiter),
+              NX_SUCCESS);
+    EXPECT_EQ(nx_channel_receive_until(&closable, &item, 0, &waiter),
+              NX_ERROR_CANCELLED);
+    EXPECT_EQ(nx_channel_send_until(&closable, &item, 0, &waiter),
+              NX_ERROR_CANCELLED);
 }
 
 TEST_F(FreeRTOSContextTest, ClosableQueueDestroyRequiresCloseAndDrain) {
-    nx_freertos_closable_queue_t closable{};
+    nx_channel_t closable{};
     closable.queue.handle = queue_handle;
     EXPECT_CALL(calls, suspend_scheduler()).Times(AnyNumber());
     EXPECT_CALL(calls, resume_scheduler()).Times(AnyNumber());
-    EXPECT_EQ(nx_freertos_closable_queue_destroy(&closable), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_channel_destroy(&closable), NX_ERROR_BUSY);
     closable.closed = true;
     EXPECT_CALL(calls, messages(queue_handle)).WillOnce(Return(1));
-    EXPECT_EQ(nx_freertos_closable_queue_destroy(&closable), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_channel_destroy(&closable), NX_ERROR_BUSY);
     EXPECT_CALL(calls, messages(queue_handle)).WillOnce(Return(0));
     EXPECT_CALL(calls, delete_queue(queue_handle));
-    EXPECT_EQ(nx_freertos_closable_queue_destroy(&closable), NX_SUCCESS);
+    EXPECT_EQ(nx_channel_destroy(&closable), NX_SUCCESS);
 }
 
 TEST_F(FreeRTOSContextTest, ClosableQueueBudgetRejectsBeforeQueueAccess) {
-    nx_freertos_closable_queue_t closable{};
+    nx_channel_t closable{};
     closable.queue.handle = queue_handle;
     closable.maximum_waiters = 1;
     closable.queue.users = 1;
-    nx_freertos_queue_waiter_t waiter{};
+    nx_channel_waiter_t waiter{};
     waiter.handle = latch;
     EXPECT_CALL(calls, scheduler()).WillOnce(Return(taskSCHEDULER_RUNNING));
     EXPECT_CALL(calls, take(latch, 0)).WillOnce(Return(pdFALSE));
     EXPECT_CALL(calls, suspend_scheduler());
     EXPECT_CALL(calls, resume_scheduler());
-    EXPECT_EQ(
-        nx_freertos_closable_queue_send_until(&closable, &item, 1000, &waiter),
-        NX_ERROR_BUSY);
+    EXPECT_EQ(nx_channel_send_until(&closable, &item, 1000, &waiter),
+              NX_ERROR_BUSY);
     EXPECT_EQ(closable.queue.users, 1U);
     EXPECT_EQ(waiter.active, 0U);
 }
 
 TEST_F(FreeRTOSContextTest, ClosableWaiterRejectsConcurrentBorrowAndDestroy) {
-    nx_freertos_closable_queue_t closable{};
+    nx_channel_t closable{};
     closable.queue.handle = queue_handle;
     closable.maximum_waiters = 1;
-    nx_freertos_queue_waiter_t waiter{};
+    nx_channel_waiter_t waiter{};
     waiter.handle = latch;
     waiter.active = 1;
     EXPECT_CALL(calls, scheduler()).WillOnce(Return(taskSCHEDULER_RUNNING));
-    EXPECT_EQ(
-        nx_freertos_closable_queue_send_until(&closable, &item, 1000, &waiter),
-        NX_ERROR_BUSY);
-    EXPECT_EQ(nx_freertos_queue_waiter_destroy(&waiter), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_channel_send_until(&closable, &item, 1000, &waiter),
+              NX_ERROR_BUSY);
+    EXPECT_EQ(nx_channel_waiter_destroy(&waiter), NX_ERROR_BUSY);
     EXPECT_EQ(waiter.active, 1U);
 }
 
 TEST_F(FreeRTOSContextTest, ClosableInitRejectsMissingWaiterBudget) {
-    nx_freertos_closable_queue_t closable{};
-    EXPECT_EQ(nx_freertos_closable_queue_init(&closable, bytes, sizeof bytes, 2,
-                                              sizeof item, 0),
-              NX_ERROR_INVALID);
+    nx_channel_t closable{};
+    EXPECT_EQ(
+        nx_channel_init(&closable, bytes, sizeof bytes, 2, sizeof item, 0),
+        NX_ERROR_INVALID);
     EXPECT_EQ(closable.queue.handle, nullptr);
 }
 
@@ -941,9 +920,9 @@ TEST_F(FreeRTOSContextTest, FailedTaskCreateReleasesOnlyNewLatch) {
     EXPECT_CALL(calls, create_task(_, _, 128, &task, 1, stack, &task.control))
         .WillOnce(Return(nullptr));
     EXPECT_CALL(calls, delete_queue(latch));
-    EXPECT_EQ(
-        nx_freertos_task_start(&task, "failed", stack, 128, 1, entry, &item),
-        NX_ERROR_IO);
+    EXPECT_EQ(nx_task_start(&task, "failed", stack, (128) * sizeof(StackType_t),
+                            1, entry, &item),
+              NX_ERROR_IO);
     EXPECT_EQ(task.handle, nullptr);
     EXPECT_EQ(task.finished, nullptr);
     EXPECT_EQ(task.entry, nullptr);
@@ -967,7 +946,7 @@ TEST_F(FreeRTOSContextTest, PrestartDiscardSuspendsThenDeletesBeforeReclaim) {
             EXPECT_EQ(task.context, &item);
         });
     }
-    EXPECT_EQ(nx_freertos_task_discard_before_scheduler(&task), NX_SUCCESS);
+    EXPECT_EQ(nx_task_discard_before_scheduler(&task), NX_SUCCESS);
     EXPECT_EQ(task.handle, nullptr);
     EXPECT_EQ(task.finished, nullptr);
     EXPECT_EQ(task.entry, nullptr);
@@ -990,7 +969,7 @@ TEST_F(FreeRTOSContextTest, PrestartDiscardPreservesCanonicalBootstrapMask) {
         EXPECT_CALL(calls, delete_task(task_handle));
         EXPECT_CALL(calls, delete_queue(latch));
     }
-    EXPECT_EQ(nx_freertos_task_discard_before_scheduler(&task), NX_SUCCESS);
+    EXPECT_EQ(nx_task_discard_before_scheduler(&task), NX_SUCCESS);
     EXPECT_EQ(model_primask, masks.primask);
 }
 
@@ -1002,8 +981,7 @@ TEST_F(FreeRTOSContextTest, DiscardRejectsRunningAndSuspendedWithoutMutation) {
     const auto before = task;
     for (BaseType_t state : {taskSCHEDULER_RUNNING, taskSCHEDULER_SUSPENDED}) {
         EXPECT_CALL(calls, scheduler()).WillOnce(Return(state));
-        EXPECT_EQ(nx_freertos_task_discard_before_scheduler(&task),
-                  NX_ERROR_CONTEXT);
+        EXPECT_EQ(nx_task_discard_before_scheduler(&task), NX_ERROR_CONTEXT);
         EXPECT_EQ(std::memcmp(&task, &before, sizeof task), 0);
     }
 }
@@ -1012,16 +990,12 @@ TEST_F(FreeRTOSContextTest, DiscardRejectsMalformedOrUnstartedObjects) {
     EXPECT_CALL(calls, scheduler())
         .Times(4)
         .WillRepeatedly(Return(taskSCHEDULER_NOT_STARTED));
-    EXPECT_EQ(nx_freertos_task_discard_before_scheduler(nullptr),
-              NX_ERROR_INVALID);
-    EXPECT_EQ(nx_freertos_task_discard_before_scheduler(&task),
-              NX_ERROR_INVALID);
+    EXPECT_EQ(nx_task_discard_before_scheduler(nullptr), NX_ERROR_INVALID);
+    EXPECT_EQ(nx_task_discard_before_scheduler(&task), NX_ERROR_INVALID);
     task.handle = task_handle;
-    EXPECT_EQ(nx_freertos_task_discard_before_scheduler(&task),
-              NX_ERROR_INVALID);
+    EXPECT_EQ(nx_task_discard_before_scheduler(&task), NX_ERROR_INVALID);
     task.finished = latch;
-    EXPECT_EQ(nx_freertos_task_discard_before_scheduler(&task),
-              NX_ERROR_INVALID);
+    EXPECT_EQ(nx_task_discard_before_scheduler(&task), NX_ERROR_INVALID);
     EXPECT_EQ(task.handle, task_handle);
     EXPECT_EQ(task.finished, latch);
 }
@@ -1035,7 +1009,7 @@ TEST_F(FreeRTOSContextTest, JoinTimeoutRetainsEveryBorrowedResource) {
     EXPECT_CALL(calls, current_task()).WillOnce(Return(nullptr));
     EXPECT_CALL(calls, now()).Times(2).WillRepeatedly(Return(1000));
     EXPECT_CALL(calls, take(latch, 0)).WillOnce(Return(pdFALSE));
-    EXPECT_EQ(nx_freertos_task_join(&task, 1000), NX_ERROR_TIMEOUT);
+    EXPECT_EQ(nx_task_join_until(&task, 1000), NX_ERROR_TIMEOUT);
     EXPECT_EQ(task.handle, task_handle);
     EXPECT_EQ(task.finished, latch);
     EXPECT_EQ(task.context, &item);

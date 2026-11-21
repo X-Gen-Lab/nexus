@@ -37,7 +37,7 @@ def check_syscall_table(data: bytes, delay: int, ticks: int) -> None:
 def check_domains(table: dict[str, tuple[int, int]]) -> None:
     groups = {
         'privileged_flash': ('nx_freertos_mpu_task_start', 'nx_freertos_mpu_task_delete',
-                             'nx_freertos_mpu_layout', 'nx_freertos_permanent_task_start',
+                             'nx_freertos_mpu_layout', 'nx_permanent_task_start',
                              'MPU_vTaskDelayImpl', 'MPU_xTaskGetTickCountImpl',
                              'SysTick_Handler', 'nx_freertos_kernel_tick_handler'),
         'user_flash': ('nx_freertos_user_delay', 'nx_freertos_user_ticks', 'user_entry'),

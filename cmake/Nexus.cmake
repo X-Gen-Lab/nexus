@@ -77,3 +77,36 @@ function(nexus_add_platform)
 endfunction()
 
 include("${CMAKE_CURRENT_LIST_DIR}/platform/Runtime.cmake")
+
+# Validate a consumer's requirements against the selected implementation.
+# This reads build metadata only; callers retain explicit link dependencies.
+function(nexus_require_os_capabilities)
+    cmake_parse_arguments(OS "" "TARGET" "CAPABILITIES" ${ARGN})
+    if(
+        OS_UNPARSED_ARGUMENTS
+        OR OS_KEYWORDS_MISSING_VALUES
+        OR NOT OS_TARGET
+        OR NOT OS_CAPABILITIES
+        OR NOT TARGET "${OS_TARGET}"
+    )
+        message(
+            FATAL_ERROR
+            "nexus_require_os_capabilities requires TARGET and CAPABILITIES"
+        )
+    endif()
+    if(NOT TARGET Nexus::OS)
+        message(
+            FATAL_ERROR
+            "OS capability validation requires an explicit Nexus assembly"
+        )
+    endif()
+    get_target_property(available Nexus::OS NEXUS_OS_CAPABILITIES)
+    foreach(capability IN LISTS OS_CAPABILITIES)
+        if(NOT capability IN_LIST available)
+            message(
+                FATAL_ERROR
+                "OS capability ${capability} required by ${OS_TARGET} is unavailable"
+            )
+        endif()
+    endforeach()
+endfunction()

@@ -9,6 +9,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "nexus/os/freertos.h"
+#include "nexus/os/storage.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -20,11 +21,11 @@
         }                                                                      \
     } while (0)
 
-static nx_freertos_task_t s_coordinator;
-static nx_freertos_task_t s_child;
+static nx_task_t s_coordinator;
+static nx_task_t s_child;
 static StackType_t s_coordinator_stack[4096];
 static StackType_t s_child_stack[4096];
-static nx_freertos_notify_t s_notification;
+static nx_notify_t s_notification;
 static uint32_t s_counter;
 static uint32_t s_ready;
 static uint32_t s_done;
@@ -70,73 +71,77 @@ static void child_wait(void* context) {
 static void coordinator(void* context) {
     (void)context;
     CHECK(!nx_freertos_isr_allowed());
-    CHECK(nx_freertos_notify_init(&s_notification) == NX_SUCCESS);
-    nx_wait_port_t port = nx_freertos_notify_port(&s_notification);
+    CHECK(nx_notify_init(&s_notification) == NX_SUCCESS);
+    nx_wait_port_t port = nx_notify_port(&s_notification);
     uint32_t sequence = port.arm(port.context);
-    CHECK(nx_freertos_task_start(&s_child, "wake", s_child_stack, 4096, 3,
-                                 child_wake, &port) == NX_SUCCESS);
+    CHECK(nx_task_start(&s_child, "wake", s_child_stack,
+                        (4096) * sizeof(StackType_t), 3, child_wake,
+                        &port) == NX_SUCCESS);
     CHECK(port.wait(port.context, sequence,
                     nx_deadline_after(nx_time_now_us(), 1000000)) ==
           NX_SUCCESS);
     fputs("FreeRTOS phase: join saturated notification publisher\n", stderr);
-    CHECK(nx_freertos_task_join(&s_child,
-                                nx_deadline_after(nx_time_now_us(), 1000000)) ==
+    CHECK(nx_task_join_until(&s_child,
+                             nx_deadline_after(nx_time_now_us(), 1000000)) ==
           NX_SUCCESS);
     CHECK(s_counter == 1 && s_child.handle == NULL);
     sequence = port.arm(port.context);
     CHECK(port.wait(port.context, sequence,
                     nx_deadline_after(nx_time_now_us(), 2000)) ==
           NX_ERROR_TIMEOUT);
-    CHECK(nx_freertos_task_start(&s_child, "delay", s_child_stack, 4096, 3,
-                                 child_delayed, NULL) == NX_SUCCESS);
-    CHECK(nx_freertos_task_join(&s_child,
-                                nx_deadline_after(nx_time_now_us(), 1000)) ==
+    CHECK(nx_task_start(&s_child, "delay", s_child_stack,
+                        (4096) * sizeof(StackType_t), 3, child_delayed,
+                        NULL) == NX_SUCCESS);
+    CHECK(nx_task_join_until(&s_child,
+                             nx_deadline_after(nx_time_now_us(), 1000)) ==
           NX_ERROR_TIMEOUT);
     CHECK(s_child.handle != NULL);
     fputs("FreeRTOS phase: join after retained timeout\n", stderr);
-    CHECK(nx_freertos_task_join(&s_child,
-                                nx_deadline_after(nx_time_now_us(), 1000000)) ==
+    CHECK(nx_task_join_until(&s_child,
+                             nx_deadline_after(nx_time_now_us(), 1000000)) ==
           NX_SUCCESS);
     CHECK(s_counter == 2);
     fputs("FreeRTOS phase: repeated task reclamation\n", stderr);
     for (unsigned i = 0; i < 10; ++i) {
-        CHECK(nx_freertos_task_start(&s_child, "reuse", s_child_stack, 4096, 3,
-                                     child_wake, &port) == NX_SUCCESS);
-        CHECK(nx_freertos_task_join(
+        CHECK(nx_task_start(&s_child, "reuse", s_child_stack,
+                            (4096) * sizeof(StackType_t), 3, child_wake,
+                            &port) == NX_SUCCESS);
+        CHECK(nx_task_join_until(
                   &s_child, nx_deadline_after(nx_time_now_us(), 1000000)) ==
               NX_SUCCESS);
     }
     CHECK(s_counter == 12);
     fputs("FreeRTOS phase: active waiter quiescence\n", stderr);
-    CHECK(nx_freertos_task_start(&s_child, "wait", s_child_stack, 4096, 3,
-                                 child_wait, &port) == NX_SUCCESS);
+    CHECK(nx_task_start(&s_child, "wait", s_child_stack,
+                        (4096) * sizeof(StackType_t), 3, child_wait,
+                        &port) == NX_SUCCESS);
     CHECK(__atomic_load_n(&s_notification.waiting, __ATOMIC_ACQUIRE) == 1);
-    CHECK(nx_freertos_notify_destroy(&s_notification) == NX_ERROR_BUSY);
+    CHECK(nx_notify_destroy(&s_notification) == NX_ERROR_BUSY);
     __atomic_store_n(&s_ready, 1, __ATOMIC_RELEASE);
     CHECK(port.wake(port.context) == NX_SUCCESS);
-    CHECK(nx_freertos_task_join(&s_child,
-                                nx_deadline_after(nx_time_now_us(), 1000000)) ==
+    CHECK(nx_task_join_until(&s_child,
+                             nx_deadline_after(nx_time_now_us(), 1000000)) ==
           NX_SUCCESS);
-    CHECK(nx_freertos_notify_destroy(&s_notification) == NX_SUCCESS);
+    CHECK(nx_notify_destroy(&s_notification) == NX_SUCCESS);
     fputs("FreeRTOS phase: exact static queue storage\n", stderr);
-    nx_freertos_queue_t queue = {0};
+    nx_queue_t queue = {0};
     uint32_t bytes[3];
-    CHECK(nx_freertos_queue_init(&queue, (uint8_t*)bytes, sizeof(bytes), 4,
-                                 sizeof(uint32_t)) == NX_ERROR_INVALID);
-    CHECK(nx_freertos_queue_init(&queue, (uint8_t*)bytes, sizeof(bytes), 3,
-                                 sizeof(uint32_t)) == NX_SUCCESS);
+    CHECK(nx_queue_init(&queue, (uint8_t*)bytes, sizeof(bytes), 4,
+                        sizeof(uint32_t)) == NX_ERROR_INVALID);
+    CHECK(nx_queue_init(&queue, (uint8_t*)bytes, sizeof(bytes), 3,
+                        sizeof(uint32_t)) == NX_SUCCESS);
     for (uint32_t i = 0; i < 3; ++i) {
-        CHECK(nx_freertos_queue_send(&queue, &i, 0) == NX_SUCCESS);
+        CHECK(nx_queue_send_until(&queue, &i, 0) == NX_SUCCESS);
     }
     uint32_t value = 99;
-    CHECK(nx_freertos_queue_send(&queue, &value, 0) == NX_ERROR_TIMEOUT);
-    CHECK(nx_freertos_queue_destroy(&queue) == NX_ERROR_BUSY);
+    CHECK(nx_queue_send_until(&queue, &value, 0) == NX_ERROR_TIMEOUT);
+    CHECK(nx_queue_destroy(&queue) == NX_ERROR_BUSY);
     for (uint32_t i = 0; i < 3; ++i) {
-        CHECK(nx_freertos_queue_receive(&queue, &value, 0) == NX_SUCCESS);
+        CHECK(nx_queue_receive_until(&queue, &value, 0) == NX_SUCCESS);
         CHECK(value == i);
     }
-    CHECK(nx_freertos_queue_receive(&queue, &value, 0) == NX_ERROR_TIMEOUT);
-    CHECK(nx_freertos_queue_destroy(&queue) == NX_SUCCESS);
+    CHECK(nx_queue_receive_until(&queue, &value, 0) == NX_ERROR_TIMEOUT);
+    CHECK(nx_queue_destroy(&queue) == NX_SUCCESS);
     puts("Real FreeRTOS scheduler static queue, latched wake, timed join and "
          "TCB reuse passed");
     __atomic_store_n(&s_done, 1, __ATOMIC_RELEASE);
@@ -145,8 +150,9 @@ static void coordinator(void* context) {
 
 /** \brief Start the actual pinned FreeRTOS POSIX port scheduler. */
 int main(void) {
-    CHECK(nx_freertos_task_start(&s_coordinator, "checks", s_coordinator_stack,
-                                 4096, 2, coordinator, NULL) == NX_SUCCESS);
+    CHECK(nx_task_start(&s_coordinator, "checks", s_coordinator_stack,
+                        (4096) * sizeof(StackType_t), 2, coordinator,
+                        NULL) == NX_SUCCESS);
     vTaskStartScheduler();
     CHECK(__atomic_load_n(&s_done, __ATOMIC_ACQUIRE) == 1);
     return 0;

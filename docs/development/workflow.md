@@ -78,6 +78,15 @@ strict bilingual documentation build and independent Source SDK consumers verify
 their separate boundaries. See the [engineering handbook](../reference/contracts/engineering.md)
 for scope and concurrency rules.
 
+For cold sanitizer builds on low-core hosts, give the existing matrix an explicit
+finite per-command budget, for example:
+
+```sh
+NEXUS_COMMAND_TIMEOUT=5400 python tools/dev/dev.py matrix --jobs 1 --parallel-modes 1
+```
+
+This invocation overrides the 1800-second default without changing test scope.
+
 Record actual source commit, configuration, tool identities, commands, exit codes
 and fresh reports in the pull request. A failed, partial or interrupted run keeps
 its real result. Local execution does not establish a GitHub Actions status,

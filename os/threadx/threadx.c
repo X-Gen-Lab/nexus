@@ -11,6 +11,7 @@
 #include "nexus/arch/arch.h"
 #include "nexus/arch/atomic.h"
 #include "nexus/core/fault.h"
+#include "nexus/os/storage.h"
 #include "tx_initialize.h"
 #if defined(__linux__) && !defined(__arm__) && !defined(__thumb__)
 #include "tx_thread.h"
@@ -47,6 +48,9 @@ static _Thread_local bool s_bootstrap_owner;
 
 _Static_assert(sizeof(ULONG) == 4 && sizeof(UINT) == 4,
                "Reviewed ThreadX ports require 32-bit words");
+_Static_assert(offsetof(nx_task_t, control) == 0 &&
+                   offsetof(nx_permanent_task_t, control) == 0,
+               "Kernel identity must identify its actual task owner");
 
 /* These pinned kernel facts are observed, never forged or used as a global
  * suspend API. Bootstrap deletion uses narrow unchecked services only while
@@ -182,7 +186,7 @@ bool nx_threadx_isr_allowed(void) {
 #endif
 }
 
-nx_result_t nx_threadx_kernel_enter(void (*startup)(void*), void* context) {
+nx_result_t nx_os_run(void (*startup)(void*), void* context) {
     if (startup == NULL || nx_atomic_u32_load_acquire(&s_phase) != NX_TX_COLD) {
         return NX_ERROR_INVALID;
     }
@@ -205,6 +209,10 @@ nx_result_t nx_threadx_kernel_enter(void (*startup)(void*), void* context) {
     nx_atomic_u32_store_release(&s_phase, NX_TX_FAILED);
     fail_stop(NX_ERROR_IO);
     return NX_ERROR_IO;
+}
+
+nx_time_us_t nx_os_now_us(void) {
+    return nx_time_now_us();
 }
 
 /** \brief Kernel wiring invokes exactly one product-owned startup callback. */
@@ -250,6 +258,32 @@ static ULONG ticks_until(nx_time_us_t deadline) {
     return (ULONG)(ticks > maximum ? maximum : ticks);
 }
 
+nx_result_t nx_sleep_until(nx_time_us_t deadline) {
+    if (!task_allowed(true)) {
+        return NX_ERROR_CONTEXT;
+    }
+    if (deadline == NX_DEADLINE_NEVER) {
+        return NX_ERROR_INVALID;
+    }
+    for (;;) {
+        ULONG ticks = ticks_until(deadline);
+        if (ticks == TX_NO_WAIT) {
+            return NX_SUCCESS;
+        }
+        if (tx_thread_sleep(ticks) != TX_SUCCESS) {
+            return NX_ERROR_IO;
+        }
+    }
+}
+
+nx_result_t nx_task_yield(void) {
+    if (!task_allowed(true)) {
+        return NX_ERROR_CONTEXT;
+    }
+    tx_thread_relinquish();
+    return NX_SUCCESS;
+}
+
 /** \brief Keep a finite Core deadline across bounded kernel wait chunks. */
 static nx_result_t take_until(TX_SEMAPHORE* semaphore, nx_time_us_t deadline) {
     for (;;) {
@@ -279,15 +313,14 @@ static UINT semaphore_delete(TX_SEMAPHORE* semaphore) {
 
 /** \brief Snapshot hint without acquiring payload ownership. */
 static uint32_t notify_arm(void* context) {
-    return nx_atomic_u32_load_acquire(
-        &((nx_threadx_notify_t*)context)->sequence);
+    return nx_atomic_u32_load_acquire(&((nx_notify_t*)context)->sequence);
 }
 
 /** \brief Deadline always precedes hint; latch closes wake-before-block race.
  */
 static nx_result_t notify_wait(void* context, uint32_t sequence,
                                uint64_t deadline) {
-    nx_threadx_notify_t* notification = context;
+    nx_notify_t* notification = context;
     if (!task_allowed(true)) {
         return NX_ERROR_CONTEXT;
     }
@@ -316,21 +349,44 @@ static nx_result_t notify_wait(void* context, uint32_t sequence,
     return result;
 }
 
-/** \brief Publish hint before binary ceiling put, valid task or reviewed IRQ.
- */
-static nx_result_t notify_wake(void* context) {
-    nx_threadx_notify_t* notification = context;
-    if ((nx_arch_in_isr() && !nx_threadx_isr_allowed()) ||
-        (!nx_arch_in_isr() && !task_allowed(false))) {
-        return NX_ERROR_CONTEXT;
-    }
+/** \brief Publish once after the caller has admitted its execution context. */
+static nx_result_t notify_publish(nx_notify_t* notification) {
     (void)nx_atomic_u32_fetch_add_release(&notification->sequence, 1);
     UINT status = tx_semaphore_ceiling_put(&notification->control, 1);
     return status == TX_SUCCESS || status == TX_CEILING_EXCEEDED ? NX_SUCCESS
                                                                  : NX_ERROR_IO;
 }
 
-nx_result_t nx_threadx_notify_init(nx_threadx_notify_t* notification) {
+/** \brief A bound port accepts task/bootstrap or reviewed IRQ publishers. */
+static nx_result_t notify_wake(void* context) {
+    if ((nx_arch_in_isr() && !nx_threadx_isr_allowed()) ||
+        (!nx_arch_in_isr() && !task_allowed(false))) {
+        return NX_ERROR_CONTEXT;
+    }
+    return notify_publish(context);
+}
+
+nx_result_t nx_notify_wake(nx_notify_t* notification) {
+    if (nx_arch_in_isr() || !task_allowed(false)) {
+        return NX_ERROR_CONTEXT;
+    }
+    if (notification == NULL || !notification->live) {
+        return NX_ERROR_INVALID;
+    }
+    return notify_publish(notification);
+}
+
+nx_result_t nx_notify_wake_from_isr(nx_notify_t* notification) {
+    if (!nx_arch_in_isr() || !nx_threadx_isr_allowed()) {
+        return NX_ERROR_CONTEXT;
+    }
+    if (notification == NULL || !notification->live) {
+        return NX_ERROR_INVALID;
+    }
+    return notify_publish(notification);
+}
+
+nx_result_t nx_notify_init(nx_notify_t* notification) {
     if (!task_allowed(false)) {
         return NX_ERROR_CONTEXT;
     }
@@ -347,14 +403,14 @@ nx_result_t nx_threadx_notify_init(nx_threadx_notify_t* notification) {
     return NX_SUCCESS;
 }
 
-nx_wait_port_t nx_threadx_notify_port(nx_threadx_notify_t* notification) {
+nx_wait_port_t nx_notify_port(nx_notify_t* notification) {
     if (notification == NULL || !notification->live) {
         return (nx_wait_port_t){0};
     }
     return (nx_wait_port_t){notification, notify_arm, notify_wait, notify_wake};
 }
 
-nx_result_t nx_threadx_notify_destroy(nx_threadx_notify_t* notification) {
+nx_result_t nx_notify_destroy(nx_notify_t* notification) {
     if (!task_allowed(false)) {
         return NX_ERROR_CONTEXT;
     }
@@ -402,15 +458,15 @@ static void guard_end(UINT previous) {
     }
 }
 
-nx_result_t nx_threadx_queue_init(nx_threadx_queue_t* queue, uint8_t* storage,
-                                  size_t storage_bytes, size_t depth,
-                                  size_t item_size) {
+nx_result_t nx_queue_init(nx_queue_t* queue, void* storage,
+                          size_t storage_bytes, size_t depth,
+                          size_t item_size) {
     if (!task_allowed(false)) {
         return NX_ERROR_CONTEXT;
     }
     if (queue == NULL || queue->live || storage == NULL || depth == 0 ||
         depth >= TX_WAIT_FOREVER || item_size == 0 ||
-        depth > SIZE_MAX / item_size || storage_bytes != depth * item_size ||
+        depth > SIZE_MAX / item_size || storage_bytes < depth * item_size ||
         !disjoint(queue, sizeof *queue, storage, storage_bytes)) {
         return NX_ERROR_INVALID;
     }
@@ -437,7 +493,7 @@ nx_result_t nx_threadx_queue_init(nx_threadx_queue_t* queue, uint8_t* storage,
 }
 
 /** \brief Copy only after a kernel capacity/item token has been acquired. */
-static nx_result_t queue_call(nx_threadx_queue_t* queue, void* item,
+static nx_result_t queue_call(nx_queue_t* queue, void* item,
                               nx_time_us_t deadline, bool send) {
     if (!guard_allowed()) {
         return NX_ERROR_CONTEXT;
@@ -477,18 +533,17 @@ static nx_result_t queue_call(nx_threadx_queue_t* queue, void* item,
     return result;
 }
 
-nx_result_t nx_threadx_queue_send_until(nx_threadx_queue_t* queue,
-                                        const void* item,
-                                        nx_time_us_t deadline) {
+nx_result_t nx_queue_send_until(nx_queue_t* queue, const void* item,
+                                nx_time_us_t deadline) {
     return queue_call(queue, (void*)item, deadline, true);
 }
 
-nx_result_t nx_threadx_queue_receive_until(nx_threadx_queue_t* queue,
-                                           void* item, nx_time_us_t deadline) {
+nx_result_t nx_queue_receive_until(nx_queue_t* queue, void* item,
+                                   nx_time_us_t deadline) {
     return queue_call(queue, item, deadline, false);
 }
 
-nx_result_t nx_threadx_queue_destroy(nx_threadx_queue_t* queue) {
+nx_result_t nx_queue_destroy(nx_queue_t* queue) {
     if (!task_allowed(false)) {
         return NX_ERROR_CONTEXT;
     }
@@ -509,7 +564,7 @@ nx_result_t nx_threadx_queue_destroy(nx_threadx_queue_t* queue) {
 /** \brief First member is the real kernel TCB, avoiding ULONG pointer casts. */
 static void task_entry(ULONG input) {
     (void)input;
-    nx_threadx_task_t* task = (nx_threadx_task_t*)tx_thread_identify();
+    nx_task_t* task = (nx_task_t*)tx_thread_identify();
     void (*entry)(void*) = task->entry;
     nx_atomic_u32_store_release(&task->entered, 1);
     task->entry = NULL;
@@ -530,21 +585,23 @@ static void task_entry(ULONG input) {
  */
 static bool task_arguments(const void* control, size_t control_bytes,
                            const char* name, void* stack, size_t stack_bytes,
-                           UINT priority, void (*entry)(void*), void* context) {
+                           uint32_t priority, void (*entry)(void*),
+                           void* context) {
     return name != NULL && entry != NULL && stack != NULL &&
            ((uintptr_t)stack & 7u) == 0 && stack_bytes >= TX_MINIMUM_STACK &&
            stack_bytes <= UINT32_MAX && priority < TX_MAX_PRIORITIES &&
            disjoint(control, control_bytes, stack, stack_bytes) &&
            disjoint(name, 1, stack, stack_bytes) &&
            disjoint(name, 1, control, control_bytes) &&
-           (context == NULL || (disjoint(context, 1, stack, stack_bytes) &&
-                                disjoint(context, 1, control, control_bytes)));
+           (context == NULL ||
+            (disjoint(context, 1, stack, stack_bytes) &&
+             disjoint(context, 1, control, control_bytes))) &&
+           name[0] != '\0';
 }
 
-nx_result_t nx_threadx_task_start(nx_threadx_task_t* task, const char* name,
-                                  void* stack, size_t stack_bytes,
-                                  UINT priority, void (*entry)(void*),
-                                  void* context) {
+nx_result_t nx_task_start(nx_task_t* task, const char* name, void* stack,
+                          size_t stack_bytes, uint32_t priority,
+                          void (*entry)(void*), void* context) {
     if (!task_allowed(false)) {
         return NX_ERROR_CONTEXT;
     }
@@ -561,9 +618,10 @@ nx_result_t nx_threadx_task_start(nx_threadx_task_t* task, const char* name,
     task->context = context;
     task->entered = 0;
     task->returned = 0;
-    UINT status = tx_thread_create(&task->control, (CHAR*)name, task_entry, 0,
-                                   stack, (ULONG)stack_bytes, priority,
-                                   priority, TX_NO_TIME_SLICE, TX_DONT_START);
+    UINT status = tx_thread_create(
+        &task->control, (CHAR*)name, task_entry, 0, stack, (ULONG)stack_bytes,
+        TX_MAX_PRIORITIES - 1u - priority, TX_MAX_PRIORITIES - 1u - priority,
+        TX_NO_TIME_SLICE, TX_DONT_START);
     if (status != TX_SUCCESS) {
         if (semaphore_delete(&task->finished) != TX_SUCCESS) {
             fail_stop(NX_ERROR_IO);
@@ -580,8 +638,7 @@ nx_result_t nx_threadx_task_start(nx_threadx_task_t* task, const char* name,
                                                           : NX_ERROR_IO;
 }
 
-nx_result_t nx_threadx_task_join(nx_threadx_task_t* task,
-                                 nx_time_us_t deadline) {
+nx_result_t nx_task_join_until(nx_task_t* task, nx_time_us_t deadline) {
     if (!task_allowed(true) ||
         (task != NULL && tx_thread_identify() == &task->control)) {
         return NX_ERROR_CONTEXT;
@@ -622,7 +679,7 @@ nx_result_t nx_threadx_task_join(nx_threadx_task_t* task,
     }
 }
 
-nx_result_t nx_threadx_task_discard_before_scheduler(nx_threadx_task_t* task) {
+nx_result_t nx_task_discard_before_scheduler(nx_task_t* task) {
     if (!bootstrap() || !task_allowed(false)) {
         return NX_ERROR_CONTEXT;
     }
@@ -648,17 +705,15 @@ nx_result_t nx_threadx_task_discard_before_scheduler(nx_threadx_task_t* task) {
 /** \brief Permanent entry has no return latch or hidden reaper. */
 static void permanent_entry(ULONG input) {
     (void)input;
-    nx_threadx_permanent_task_t* task =
-        (nx_threadx_permanent_task_t*)tx_thread_identify();
+    nx_permanent_task_t* task = (nx_permanent_task_t*)tx_thread_identify();
     task->entry(task->context);
     fail_stop(NX_ERROR_STATE);
 }
 
-nx_result_t nx_threadx_permanent_task_start(nx_threadx_permanent_task_t* task,
-                                            const char* name, void* stack,
-                                            size_t stack_bytes, UINT priority,
-                                            void (*entry)(void*),
-                                            void* context) {
+nx_result_t nx_permanent_task_start(nx_permanent_task_t* task, const char* name,
+                                    void* stack, size_t stack_bytes,
+                                    uint32_t priority, void (*entry)(void*),
+                                    void* context) {
     if (!task_allowed(false)) {
         return NX_ERROR_CONTEXT;
     }
@@ -669,9 +724,10 @@ nx_result_t nx_threadx_permanent_task_start(nx_threadx_permanent_task_t* task,
     }
     task->entry = entry;
     task->context = context;
-    UINT status = tx_thread_create(&task->control, (CHAR*)name, permanent_entry,
-                                   0, stack, (ULONG)stack_bytes, priority,
-                                   priority, TX_NO_TIME_SLICE, TX_DONT_START);
+    UINT status = tx_thread_create(
+        &task->control, (CHAR*)name, permanent_entry, 0, stack,
+        (ULONG)stack_bytes, TX_MAX_PRIORITIES - 1u - priority,
+        TX_MAX_PRIORITIES - 1u - priority, TX_NO_TIME_SLICE, TX_DONT_START);
     if (status != TX_SUCCESS) {
         task->entry = NULL;
         task->context = NULL;
@@ -682,17 +738,17 @@ nx_result_t nx_threadx_permanent_task_start(nx_threadx_permanent_task_t* task,
                                                           : NX_ERROR_IO;
 }
 
-nx_result_t nx_threadx_queue_waiter_init(nx_threadx_queue_waiter_t* waiter) {
+nx_result_t nx_channel_waiter_init(nx_channel_waiter_t* waiter) {
     if (!task_allowed(false)) {
         return NX_ERROR_CONTEXT;
     }
     if (waiter == NULL || waiter->active != 0 || waiter->next != NULL) {
         return NX_ERROR_INVALID;
     }
-    return nx_threadx_notify_init(&waiter->notification);
+    return nx_notify_init(&waiter->notification);
 }
 
-nx_result_t nx_threadx_queue_waiter_destroy(nx_threadx_queue_waiter_t* waiter) {
+nx_result_t nx_channel_waiter_destroy(nx_channel_waiter_t* waiter) {
     if (!task_allowed(false)) {
         return NX_ERROR_CONTEXT;
     }
@@ -702,14 +758,12 @@ nx_result_t nx_threadx_queue_waiter_destroy(nx_threadx_queue_waiter_t* waiter) {
     if (waiter->active != 0) {
         return NX_ERROR_BUSY;
     }
-    return nx_threadx_notify_destroy(&waiter->notification);
+    return nx_notify_destroy(&waiter->notification);
 }
 
-nx_result_t nx_threadx_closable_queue_init(nx_threadx_closable_queue_t* queue,
-                                           uint8_t* storage,
-                                           size_t storage_bytes, size_t depth,
-                                           size_t item_size,
-                                           size_t maximum_waiters) {
+nx_result_t nx_channel_init(nx_channel_t* queue, void* storage,
+                            size_t storage_bytes, size_t depth,
+                            size_t item_size, size_t maximum_waiters) {
     if (!task_allowed(false)) {
         return NX_ERROR_CONTEXT;
     }
@@ -718,8 +772,8 @@ nx_result_t nx_threadx_closable_queue_init(nx_threadx_closable_queue_t* queue,
         !disjoint(queue, sizeof *queue, storage, storage_bytes)) {
         return NX_ERROR_INVALID;
     }
-    nx_result_t result = nx_threadx_queue_init(&queue->queue, storage,
-                                               storage_bytes, depth, item_size);
+    nx_result_t result =
+        nx_queue_init(&queue->queue, storage, storage_bytes, depth, item_size);
     if (result == NX_SUCCESS) {
         queue->send_waiters = NULL;
         queue->receive_waiters = NULL;
@@ -730,7 +784,7 @@ nx_result_t nx_threadx_closable_queue_init(nx_threadx_closable_queue_t* queue,
 }
 
 /** \brief Threshold guard prevents awakened tasks from unlinking this visit. */
-static void broadcast(nx_threadx_queue_waiter_t* waiter) {
+static void broadcast(nx_channel_waiter_t* waiter) {
     while (waiter != NULL) {
         if (notify_wake(&waiter->notification) != NX_SUCCESS) {
             fail_stop(NX_ERROR_IO);
@@ -739,8 +793,7 @@ static void broadcast(nx_threadx_queue_waiter_t* waiter) {
     }
 }
 
-nx_result_t
-nx_threadx_closable_queue_close(nx_threadx_closable_queue_t* queue) {
+nx_result_t nx_channel_close(nx_channel_t* queue) {
     if (!guard_allowed()) {
         return NX_ERROR_CONTEXT;
     }
@@ -757,9 +810,9 @@ nx_threadx_closable_queue_close(nx_threadx_closable_queue_t* queue) {
 
 /** \brief Serialize admission, registry and payload commit in one task domain.
  */
-static nx_result_t closable_call(nx_threadx_closable_queue_t* queue, void* item,
+static nx_result_t closable_call(nx_channel_t* queue, void* item,
                                  nx_time_us_t deadline,
-                                 nx_threadx_queue_waiter_t* waiter, bool send) {
+                                 nx_channel_waiter_t* waiter, bool send) {
     if (!guard_allowed()) {
         return NX_ERROR_CONTEXT;
     }
@@ -772,7 +825,7 @@ static nx_result_t closable_call(nx_threadx_closable_queue_t* queue, void* item,
         guard_end(previous);
         return NX_ERROR_BUSY;
     }
-    nx_threadx_queue_waiter_t** list =
+    nx_channel_waiter_t** list =
         send ? &queue->send_waiters : &queue->receive_waiters;
     waiter->active = 1;
     waiter->next = *list;
@@ -824,22 +877,19 @@ static nx_result_t closable_call(nx_threadx_closable_queue_t* queue, void* item,
     return result;
 }
 
-nx_result_t
-nx_threadx_closable_queue_send_until(nx_threadx_closable_queue_t* queue,
-                                     const void* item, nx_time_us_t deadline,
-                                     nx_threadx_queue_waiter_t* waiter) {
+nx_result_t nx_channel_send_until(nx_channel_t* queue, const void* item,
+                                  nx_time_us_t deadline,
+                                  nx_channel_waiter_t* waiter) {
     return closable_call(queue, (void*)item, deadline, waiter, true);
 }
 
-nx_result_t
-nx_threadx_closable_queue_receive_until(nx_threadx_closable_queue_t* queue,
-                                        void* item, nx_time_us_t deadline,
-                                        nx_threadx_queue_waiter_t* waiter) {
+nx_result_t nx_channel_receive_until(nx_channel_t* queue, void* item,
+                                     nx_time_us_t deadline,
+                                     nx_channel_waiter_t* waiter) {
     return closable_call(queue, item, deadline, waiter, false);
 }
 
-nx_result_t
-nx_threadx_closable_queue_destroy(nx_threadx_closable_queue_t* queue) {
+nx_result_t nx_channel_destroy(nx_channel_t* queue) {
     if (!task_allowed(false)) {
         return NX_ERROR_CONTEXT;
     }
@@ -850,5 +900,5 @@ nx_threadx_closable_queue_destroy(nx_threadx_closable_queue_t* queue) {
         queue->receive_waiters != NULL) {
         return NX_ERROR_BUSY;
     }
-    return nx_threadx_queue_destroy(&queue->queue);
+    return nx_queue_destroy(&queue->queue);
 }

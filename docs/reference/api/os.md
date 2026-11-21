@@ -5,9 +5,55 @@ audience: consumer
 source_language: en
 ---
 
-# OS adapters: tasks, waits and explicit storage
+# Portable OS tasks, waits and static storage
 
 These declarations come from public header files. Selection, lifecycle, supported execution modes and physical authorization remain bounded by the corresponding design and support records.
+
+Business code includes the common opaque task, notification, queue and channel
+interfaces. Assembly code includes `storage.h` for the selected backend's exact
+layout. Each executable links one backend implementation. Backend extensions
+remain explicit; these declarations do not establish final software or HIL
+qualification.
+
+(os_2include_2nexus_2os_2task_8h)=
+
+## task.h
+
+```{doxygenfile} os/include/nexus/os/task.h
+:project: nexus
+```
+
+(os_2include_2nexus_2os_2notify_8h)=
+
+## notify.h
+
+```{doxygenfile} os/include/nexus/os/notify.h
+:project: nexus
+```
+
+(os_2include_2nexus_2os_2queue_8h)=
+
+## queue.h
+
+```{doxygenfile} os/include/nexus/os/queue.h
+:project: nexus
+```
+
+(os_2include_2nexus_2os_2channel_8h)=
+
+## channel.h
+
+```{doxygenfile} os/include/nexus/os/channel.h
+:project: nexus
+```
+
+(os_2include_2nexus_2os_2storage_8h)=
+
+## storage.h
+
+```{doxygenfile} os/include/nexus/os/storage.h
+:project: nexus
+```
 
 (baremetal_8h)=
 
@@ -72,14 +118,6 @@ These declarations come from public header files. Selection, lifecycle, supporte
 ## lowpower.h
 
 ```{doxygenfile} lowpower.h
-:project: nexus
-```
-
-(native_8h)=
-
-## native.h
-
-```{doxygenfile} native.h
 :project: nexus
 ```
 

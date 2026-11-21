@@ -18,10 +18,10 @@ import arch_compile as compiler_gate
 
 REQUIRED_SYMBOLS = frozenset({
     'PendSV_Handler', '__tx_PendSVHandler', 'SysTick_Handler',
-    '_tx_timer_interrupt', '_tx_thread_schedule', 'nx_threadx_kernel_enter',
-    'nx_threadx_task_start', 'nx_threadx_permanent_task_start',
-    'nx_threadx_task_join', 'nx_threadx_queue_send_until',
-    'nx_threadx_closable_queue_close', 'nx_threadx_notify_init'})
+    '_tx_timer_interrupt', '_tx_thread_schedule', 'nx_os_run',
+    'nx_task_start', 'nx_permanent_task_start',
+    'nx_task_join_until', 'nx_queue_send_until',
+    'nx_channel_close', 'nx_notify_init'})
 
 
 def matrix():

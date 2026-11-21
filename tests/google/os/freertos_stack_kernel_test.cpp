@@ -9,6 +9,7 @@
 
 #include "nexus/os/freertos.h"
 #include "nexus/os/freertos_stack.h"
+#include "nexus/os/storage.h"
 #include <cstdlib>
 #include <gtest/gtest.h>
 
@@ -24,18 +25,19 @@ void finished_entry(void* context) {
  */
 class FreeRTOSStackKernel : public testing::Test {
   protected:
-    nx_freertos_task_t task{};
+    nx_task_t task{};
     alignas(8) StackType_t stack[words]{};
     uint32_t finished{};
 
     void SetUp() override {
-        ASSERT_EQ(nx_freertos_task_start(&task, "snapshot", stack, words, 3U,
-                                         finished_entry, &finished),
+        ASSERT_EQ(nx_task_start(&task, "snapshot", stack,
+                                (words) * sizeof(StackType_t), 3U,
+                                finished_entry, &finished),
                   NX_SUCCESS);
     }
     void TearDown() override {
         if (task.handle != nullptr) {
-            const nx_result_t result = nx_freertos_task_join(
+            const nx_result_t result = nx_task_join_until(
                 &task, nx_deadline_after(nx_time_now_us(), 1000000U));
             EXPECT_EQ(result, NX_SUCCESS);
             if (result != NX_SUCCESS) {
@@ -61,8 +63,8 @@ TEST_F(FreeRTOSStackKernel, QueriesActualUnjoinedStaticTaskWithoutRepainting) {
     /* Finish snapshot readers before deletion; stale handles are not queried.
      */
     binding = {};
-    ASSERT_EQ(nx_freertos_task_join(
-                  &task, nx_deadline_after(nx_time_now_us(), 1000000U)),
+    ASSERT_EQ(nx_task_join_until(&task,
+                                 nx_deadline_after(nx_time_now_us(), 1000000U)),
               NX_SUCCESS);
     EXPECT_EQ(task.handle, nullptr);
     EXPECT_EQ(nx_freertos_stack_observe(&binding, &second), NX_ERROR_INVALID);
@@ -78,8 +80,8 @@ TEST_F(FreeRTOSStackKernel,
     EXPECT_EQ(out.capacity_bytes, 77U);
     EXPECT_EQ(stack[0], before);
     binding = {};
-    ASSERT_EQ(nx_freertos_task_join(
-                  &task, nx_deadline_after(nx_time_now_us(), 1000000U)),
+    ASSERT_EQ(nx_task_join_until(&task,
+                                 nx_deadline_after(nx_time_now_us(), 1000000U)),
               NX_SUCCESS);
 }
 } /* namespace */

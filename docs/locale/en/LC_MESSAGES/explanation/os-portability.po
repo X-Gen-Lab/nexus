@@ -1,0 +1,924 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: a30b16e45c8fa78792a005afb2c31352b10d2f938746c997060a4374cc89c79f\n"
+
+#: ../../../../docs/explanation/os-portability.md:9
+msgid "OS 源码可移植性：现行架构"
+msgstr "OS source portability: current architecture"
+
+#: ../../../../docs/explanation/os-portability.md:11
+msgid ""
+"本页说明公共 OS 接口、静态内存与后端扩展如何连接。任务、通知、队列、关闭通道 和执行预算已在 FreeRTOS、ThreadX、Native "
+"后端使用同一组公共符号；装配侧持有 选定后端的真实存储，业务只接收公共引用。实施与验收清单见 [交付清单](../development/os-"
+"portability-plan.md)，调用要求见 [OS "
+"执行合同](../reference/contracts/os/execution.md)和 "
+"[后端接入合同](../reference/contracts/os/backend-integration.md)。"
+msgstr ""
+"This page explains how public OS interfaces, static memory and backend "
+"extensions connect. Tasks, notifications, queues, closable channels and "
+"execution budgets now use the same public symbols across the FreeRTOS, "
+"ThreadX and Native backends. Assembly code owns actual storage for the "
+"selected backend; business code receives only public references. See the "
+"[delivery checklist](../development/os-portability-plan.md) for "
+"implementation and acceptance, and the [OS execution "
+"contract](../reference/contracts/os/execution.md) and [backend integration "
+"contract](../reference/contracts/os/backend-integration.md) for calling "
+"requirements."
+
+#: ../../../../docs/explanation/os-portability.md:18
+msgid ""
+"公共消费链已有真实内核与外部示例的阶段验证。最终集成、ARM、资源和 SDK 资格 仍以绑定最终源码及配置的实际报告为准。源码可移植不表示二进制 "
+"ABI、调度时序、 最小栈或所有内核特性相同；Host 执行不建立 MCU 实时性或实板资格。"
+msgstr ""
+"The public consumer chain has stage validation using real kernels and "
+"external examples. Final integration, ARM, resource and SDK qualification "
+"still requires actual reports bound to the final source and configuration. "
+"Source portability does not imply identical binary ABIs, scheduling "
+"behavior, minimum stacks or all kernel features. Host execution establishes "
+"neither MCU real-time behavior nor physical-board qualification."
+
+#: ../../../../docs/explanation/os-portability.md:22
+msgid "当前接口与边界"
+msgstr "Current interfaces and boundaries"
+
+#: ../../../../docs/explanation/os-portability.md:0
+msgid "边界"
+msgstr "Boundary"
+
+#: ../../../../docs/explanation/os-portability.md:0
+msgid "当前实现"
+msgstr "Current implementation"
+
+#: ../../../../docs/explanation/os-portability.md:0
+msgid "使用限制"
+msgstr "Usage limits"
+
+#: ../../../../docs/explanation/os-portability.md:0
+msgid "等待"
+msgstr "Waiting"
+
+#: ../../../../docs/explanation/os-portability.md:0
+msgid "公共 `nx_wait_port_t` 和条件等待"
+msgstr "Common `nx_wait_port_t` and predicate-based waiting"
+
+#: ../../../../docs/explanation/os-portability.md:0
+msgid "保留现有合同与直接 callback 布局"
+msgstr "Retain the existing contract and direct callback layout"
+
+#: ../../../../docs/explanation/os-portability.md:0
+msgid "任务与通信"
+msgstr "Tasks and communication"
+
+#: ../../../../docs/explanation/os-portability.md:0
+msgid "公共任务、通知、队列和 channel 接口"
+msgstr "Public task, notification, queue and channel interfaces"
+
+#: ../../../../docs/explanation/os-portability.md:0
+msgid "专有调度与隔离仍用明确扩展"
+msgstr "Backend-specific scheduling and isolation retain explicit extensions"
+
+#: ../../../../docs/explanation/os-portability.md:0
+msgid "存储"
+msgstr "Storage"
+
+#: ../../../../docs/explanation/os-portability.md:0
+msgid "`storage.h` 完成选定后端布局"
+msgstr "`storage.h` completes the selected backend layout"
+
+#: ../../../../docs/explanation/os-portability.md:0
+msgid "业务头不包含原生控制块，切换后端重新编译"
+msgstr ""
+"Business headers contain no native control blocks; switching backends "
+"requires recompilation"
+
+#: ../../../../docs/explanation/os-portability.md:0
+msgid "后端选择"
+msgstr "Backend selection"
+
+#: ../../../../docs/explanation/os-portability.md:0
+msgid "CMake 选择并校验唯一任务后端"
+msgstr "CMake selects and validates one task backend"
+
+#: ../../../../docs/explanation/os-portability.md:0
+msgid "无运行期分派表或按调用判断 OS"
+msgstr "No runtime dispatch table or per-call OS selection"
+
+#: ../../../../docs/explanation/os-portability.md:0
+msgid "能力要求"
+msgstr "Capability requirements"
+
+#: ../../../../docs/explanation/os-portability.md:0
+msgid "`nexus_require_os_capabilities` 校验目标元数据"
+msgstr "`nexus_require_os_capabilities` validates target metadata"
+
+#: ../../../../docs/explanation/os-portability.md:0
+msgid "不隐式链接，不将缺失能力降级为成功"
+msgstr "No implicit linking or treating missing capabilities as success"
+
+#: ../../../../docs/explanation/os-portability.md:0
+msgid "裸机"
+msgstr "Baremetal"
+
+#: ../../../../docs/explanation/os-portability.md:0
+msgid "非阻塞通知，没有任务调度器"
+msgstr "Nonblocking notification, without a task scheduler"
+
+#: ../../../../docs/explanation/os-portability.md:0
+msgid "只声明等待能力，不能满足任务能力要求"
+msgstr "Declares only waiting capability and cannot satisfy task requirements"
+
+#: ../../../../docs/explanation/os-portability.md:33
+msgid ""
+"接口合同、对象布局和构建选择分别维护。业务不需要命名原生 TCB，平台也不预留 跨内核最大对象、动态句柄表或通用对象池。现有内核算法继续由对应后端执行。"
+msgstr ""
+"Interface contracts, object layouts and build selection are maintained "
+"separately. Business code need not name native TCBs. The platform reserves "
+"no cross-kernel maximum objects, dynamic handle tables or common object "
+"pools. Each backend continues to execute its existing kernel algorithms."
+
+#: ../../../../docs/explanation/os-portability.md:36
+msgid "依赖、职责与目录"
+msgstr "Dependencies, responsibilities and directories"
+
+#: ../../../../docs/explanation/os-portability.md:38
+msgid "![FIG-27：当前 OS 构建依赖，单镜像只选择一个后端](../assets/diagrams/os-portability.svg)"
+msgstr ""
+"![FIG-27: current OS build dependencies, with one selected backend per "
+"image](../assets/diagrams/os-portability.svg)"
+
+#: ../../../../docs/explanation/os-portability.md:38
+msgid "FIG-27：当前 OS 构建依赖，单镜像只选择一个后端"
+msgstr ""
+"FIG-27: current OS build dependencies, with one selected backend per image"
+
+#: ../../../../docs/explanation/os-portability.md:40
+msgid ""
+"FIG-27 的身份是 current，每条箭头都表示构建期依赖，包含编译依赖和链接时的实现 "
+"选择，不表示启动顺序、每次运行调用或所有权转移。图中的后端是互斥选择； 应用不会同时链接三个同名 OS 实现。 图只覆盖任务后端，不包含裸机路径。普通 "
+"I/O 不强制经过 OS， 也不新增运行期 factory、worker 或对象池。"
+msgstr ""
+"FIG-27 is a current diagram. Every arrow denotes a build-time dependency, "
+"including compilation dependencies and implementation selection at link "
+"time; it does not denote startup order, every runtime call or ownership "
+"transfer. The backends shown are mutually exclusive choices: an application "
+"does not link three OS implementations with the same symbols. The diagram "
+"covers only task backends, not the Baremetal path. Ordinary I/O is not "
+"forced through the OS, and no runtime factory, worker or object pool is "
+"added."
+
+#: ../../../../docs/explanation/os-portability.md:0
+msgid "层"
+msgstr "Layer"
+
+#: ../../../../docs/explanation/os-portability.md:0
+msgid "拥有的责任"
+msgstr "Owned responsibilities"
+
+#: ../../../../docs/explanation/os-portability.md:0
+msgid "不承担的责任"
+msgstr "Responsibilities not assumed"
+
+#: ../../../../docs/explanation/os-portability.md:0
+msgid "业务与协议"
+msgstr "Business logic and protocols"
+
+#: ../../../../docs/explanation/os-portability.md:0
+msgid "领域状态、输入输出和策略"
+msgstr "Domain state, inputs, outputs and policy"
+
+#: ../../../../docs/explanation/os-portability.md:0
+msgid "内核类型、tick 换算、后端条件编译"
+msgstr ""
+"Kernel types, tick conversion and backend-dependent conditional compilation"
+
+#: ../../../../docs/explanation/os-portability.md:0
+msgid "可复用执行组件"
+msgstr "Reusable execution components"
+
+#: ../../../../docs/explanation/os-portability.md:0
+msgid "排队、停止和进度，通过公共 OS/I/O 端口工作"
+msgstr "Queueing, stopping and progress through public OS/I/O ports"
+
+#: ../../../../docs/explanation/os-portability.md:0
+msgid "产品线程角色和内存预算"
+msgstr "Product thread roles and memory budgets"
+
+#: ../../../../docs/explanation/os-portability.md:0
+msgid "外部装配"
+msgstr "External assembly"
+
+#: ../../../../docs/explanation/os-portability.md:0
+msgid "后端、对象存储、栈、优先级、容量和启动退出顺序"
+msgstr ""
+"Backend, object storage, stacks, priorities, capacities, startup and "
+"shutdown order"
+
+#: ../../../../docs/explanation/os-portability.md:0
+msgid "复制内核算法"
+msgstr "Duplicating kernel algorithms"
+
+#: ../../../../docs/explanation/os-portability.md:0
+msgid "公共 OS"
+msgstr "Common OS interface"
+
+#: ../../../../docs/explanation/os-portability.md:0
+msgid "稳定单位、上下文、所有权、失败和生命周期合同"
+msgstr "Stable units, context, ownership, failure and lifecycle contracts"
+
+#: ../../../../docs/explanation/os-portability.md:0
+msgid "调度策略的虚假等价"
+msgstr "Claiming false equivalence between scheduling policies"
+
+#: ../../../../docs/explanation/os-portability.md:0
+msgid "后端"
+msgstr "Backend"
+
+#: ../../../../docs/explanation/os-portability.md:0
+msgid "内核调用、状态转换、优先级映射与真实资源回收"
+msgstr ""
+"Kernel calls, state transitions, priority mapping and actual resource "
+"reclamation"
+
+#: ../../../../docs/explanation/os-portability.md:0
+msgid "产品恢复策略"
+msgstr "Product recovery policy"
+
+#: ../../../../docs/explanation/os-portability.md:0
+msgid "Core / Arch / SoC"
+msgstr "Core / Arch / SoC"
+
+#: ../../../../docs/explanation/os-portability.md:0
+msgid "原有请求、时间、CPU 和硬件职责"
+msgstr "Existing request, time, CPU and hardware responsibilities"
+
+#: ../../../../docs/explanation/os-portability.md:0
+msgid "隐式启动 scheduler"
+msgstr "Implicitly starting the scheduler"
+
+#: ../../../../docs/explanation/os-portability.md:55
+msgid ""
+"该划分对应 SOLID：接口与存储各有单一变化原因；新增后端实现同一合同；只有满足 "
+"合同的能力才能替换；小接口分离基础与可选能力；组件依赖公共端口。它不要求为 每个函数增加接口层，也不允许以 `UNSUPPORTED` "
+"掩盖已声明能力的缺失。"
+msgstr ""
+"This division follows SOLID: interfaces and storage each have a single "
+"reason to change; new backends implement the same contract; only "
+"capabilities that satisfy the contract are substitutable; small interfaces "
+"separate basic and optional capabilities; and components depend on public "
+"ports. It does not require another interface layer for every function, or "
+"permit `UNSUPPORTED` to hide missing capabilities that a backend has "
+"declared."
+
+#: ../../../../docs/explanation/os-portability.md:59
+msgid "当前目录保留公共声明、选定存储布局和实际后端实现，按职责分文件。"
+msgstr ""
+"The current directories separate public declarations, selected storage "
+"layouts and actual backend implementations. Files follow their "
+"responsibilities."
+
+#: ../../../../docs/explanation/os-portability.md:76
+msgid ""
+"FreeRTOS 的 `task_runtime.c` 实现内核启动、读时钟、延时与 yield，普通对象算法 保留在 "
+"`freertos.c`；ThreadX 与 Native 分别由自己的 C 实现承担。每个任务后端 通过 include 路径提供同名 "
+"`nexus/os/detail/backend_storage.h`，而不是依靠整仓 配置宏选择布局；真实 RTOS 的 Host "
+"夹具因此也能取得正确存储。现有 MPU、Secure、 端口准备工具与锁定依赖继续归后端维护，Host 脚本不进入固件、不修改 vendor。"
+msgstr ""
+"FreeRTOS `task_runtime.c` implements kernel entry, clock reads, sleep and "
+"yield, while ordinary object algorithms remain in `freertos.c`. ThreadX and "
+"Native use their own C implementations. Each task backend provides the same "
+"`nexus/os/detail/backend_storage.h` path through its include directories, "
+"rather than selecting layouts through repository-wide configuration macros. "
+"Real RTOS Host fixtures therefore receive the correct storage too. Existing "
+"MPU, Secure, port preparation tools and locked dependencies remain with "
+"their backend. Host scripts do not enter firmware or modify vendor "
+"originals."
+
+#: ../../../../docs/explanation/os-portability.md:82
+msgid "编译期选择与静态存储"
+msgstr "Compile-time selection and static storage"
+
+#: ../../../../docs/explanation/os-portability.md:84
+msgid ""
+"公共函数在各后端具有相同符号，CMake 每次只选择一个实现。无需 `switch(os_type)`、通用 ops "
+"表、运行期名称查找或动态对象池。保留 `nx_wait_port_t` 的 callback，是因为组件需要连接具体通知对象，与整幅镜像 "
+"选择内核是不同问题；不再包一层通知 vtable。"
+msgstr ""
+"Public functions use the same symbols across backends, with CMake selecting "
+"just one implementation. No `switch(os_type)`, common ops table, runtime "
+"name lookup or dynamic object pool is needed. The callbacks in "
+"`nx_wait_port_t` remain because components must connect to specific "
+"notification objects, which is distinct from selecting the kernel for an "
+"entire image. No further notification vtable is added."
+
+#: ../../../../docs/explanation/os-portability.md:89
+msgid ""
+"业务头只看到未完成类型及引用。装配文件包含选定布局头，才能定义实际存储； 同一对象直接形成业务引用，不额外分配一个只保存指针的包装对象。 "
+"原生控制块头可以成为装配文件的编译依赖，但不进入业务头。"
+msgstr ""
+"Business headers see only incomplete types and references. Assembly files "
+"include the selected layout header to define actual storage. The same object"
+" directly supplies the business reference, without another allocated wrapper"
+" that holds only a pointer. Native control-block headers may be compilation "
+"dependencies of assembly files, but do not enter business headers."
+
+#: ../../../../docs/explanation/os-portability.md:93
+msgid ""
+"以下片段来自三后端实际共用的 C11 消费者：两步操作共用一个绝对预算，业务不包含 内核分支。它不包含对象装配、内核启动和退出流程，不是完整 "
+"`main` 教程。"
+msgstr ""
+"The following fragment comes from the actual C11 consumer shared across the "
+"three backends. Both operations share one absolute budget, with no kernel "
+"branches in business code. It omits object assembly, kernel startup and "
+"shutdown, and is not a complete `main` tutorial."
+
+#: ../../../../docs/explanation/os-portability.md:102
+msgid ""
+"装配侧用 [storage.h](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-SOURCE/os/include/nexus/os/storage.h) 和 `NX_OS_STACK_DEFINE` "
+"定义实际对象与栈；业务侧只需要相应公共头。"
+msgstr ""
+"Assembly code uses [storage.h](https://github.com/X-Gen-"
+"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/os/include/nexus/os/storage.h) and"
+" `NX_OS_STACK_DEFINE` to define actual objects and stacks. Business code "
+"needs only the corresponding public headers."
+
+#: ../../../../docs/explanation/os-portability.md:105
+msgid ""
+"栈容量对外以 B 表示。后端检查对齐、启动帧、容量溢出和原生单位换算；TCB、 任务上下文、同步对象和队列数据区由外部 owner "
+"持有。布局由真实选定类型决定， 不维护另一套手写 sizeof，不预留跨内核最大 union，不把固定字节数组当通用 TCB。 "
+"选择不同内核或配置后必须重新编译，并重新核对 `sizeof`、alignment 和预算。"
+msgstr ""
+"Stack capacity is expressed externally in B. Backends check alignment, "
+"startup frames, capacity overflow and conversion to native units. The "
+"external owner holds TCBs, task contexts, synchronization objects and queue "
+"data areas. Layouts follow the actual selected types: there is no second "
+"handwritten sizeof authority, no cross-kernel maximum union, and no fixed "
+"byte array used as a universal TCB. Changing the kernel or configuration "
+"requires recompilation and a fresh check of `sizeof`, alignment and budgets."
+
+#: ../../../../docs/explanation/os-portability.md:110
+msgid ""
+"硬件选择沿用 TOML、typed IR 和 CMake 单一路径。软件消费者在显式建立装配后， 用 "
+"`nexus_require_os_capabilities` 校验 `Nexus::OS` 的能力，再显式链接该目标； "
+"校验函数不创建对象、不代替链接、不复制一份 TOML 能力清单。 后端发布 `NEXUS_OS_BACKEND` 兼容身份，CMake "
+"拒绝一幅镜像混入不同任务后端。 裸机不冒充任务实现，真实 Host 内核端口也不声明硬件 IRQ 发布能力。"
+msgstr ""
+"Hardware selection retains the single TOML, typed IR and CMake path. After "
+"explicitly creating an assembly, software consumers use "
+"`nexus_require_os_capabilities` to validate `Nexus::OS` capabilities, then "
+"explicitly link that target. Validation neither creates objects nor replaces"
+" linking or duplicates a capability list in TOML. Backends publish the "
+"compatible identity `NEXUS_OS_BACKEND`; CMake rejects mixing different task "
+"backends in one image. Baremetal does not impersonate a task implementation,"
+" and real Host kernel ports do not declare hardware IRQ publication "
+"capability."
+
+#: ../../../../docs/explanation/os-portability.md:116
+msgid ""
+"这里不新增 Kconfig、缓存回退或独立 MCU 注册表。新 MCU 若复用已有 CPU/内核 合同，提供 SoC、IRQ、时钟和 Board "
+"事实即可；新端口或新语义才修改 OS 集成。"
+msgstr ""
+"This adds no Kconfig, cache fallback or separate MCU registry. A new MCU "
+"reusing an existing CPU/kernel contract supplies SoC, IRQ, clock and Board "
+"facts. Only a new port or new semantics require OS integration changes."
+
+#: ../../../../docs/explanation/os-portability.md:119
+msgid "通用能力与可选扩展"
+msgstr "Common capabilities and optional extensions"
+
+#: ../../../../docs/explanation/os-portability.md:121
+msgid ""
+"本页的任务能力集合覆盖 FreeRTOS、ThreadX 和 Native 公共实现，不是新增的 TOML "
+"配置键。裸机只保留非阻塞机制；任务、关闭和优先级等需求通过实际目标能力校验。 永久任务与可返回任务、普通队列与关闭通道分别承担各自的存储成本。"
+msgstr ""
+"The task capability set on this page covers the public FreeRTOS, ThreadX and"
+" Native implementations; it is not a new TOML configuration key. Baremetal "
+"retains only nonblocking mechanisms. Task, close and priority requirements "
+"are validated against actual target capabilities. Permanent versus "
+"returnable tasks, and ordinary queues versus closable channels, carry their "
+"respective storage costs."
+
+#: ../../../../docs/explanation/os-portability.md:96
+msgid "能力"
+msgstr "Capability"
+
+#: ../../../../docs/explanation/os-portability.md:96
+msgid "当前公共合同"
+msgstr "Current public contract"
+
+#: ../../../../docs/explanation/os-portability.md:96
+msgid "选用成本与限制"
+msgstr "Selection costs and limits"
+
+#: ../../../../docs/explanation/os-portability.md:96
+msgid "通知"
+msgstr "Notification"
+
+#: ../../../../docs/explanation/os-portability.md:96
+msgid "单 waiter、多 publisher；提示后重查真实条件"
+msgstr ""
+"One waiter, multiple publishers; recheck the authoritative predicate after a"
+" hint"
+
+#: ../../../../docs/explanation/os-portability.md:96
+msgid "保存序列与后端唤醒状态，发布域明确"
+msgstr ""
+"Retain sequence and backend wake state, with an explicit publication domain"
+
+#: ../../../../docs/explanation/os-portability.md:96
+msgid "可返回任务"
+msgstr "Returnable task"
+
+#: ../../../../docs/explanation/os-portability.md:96
+msgid "入口返回后可由唯一外部 owner join"
+msgstr "A sole external owner can join after the entry returns"
+
+#: ../../../../docs/explanation/os-portability.md:96
+msgid "需要完成同步与真实内核回收"
+msgstr "Requires completion synchronization and actual kernel reclamation"
+
+#: ../../../../docs/explanation/os-portability.md:96
+msgid "永久任务"
+msgstr "Permanent task"
+
+#: ../../../../docs/explanation/os-portability.md:96
+msgid "无 join；入口不得返回"
+msgstr "No join; the entry must not return"
+
+#: ../../../../docs/explanation/os-portability.md:96
+msgid "省完成状态，误返回 fail-stop"
+msgstr "Omits completion state; an unexpected return causes fail-stop"
+
+#: ../../../../docs/explanation/os-portability.md:96
+msgid "任务时间与让出"
+msgstr "Task timing and yielding"
+
+#: ../../../../docs/explanation/os-portability.md:96
+msgid "`nx_sleep_until` 与 `nx_task_yield`，仅 task 使用"
+msgstr "Task-only `nx_sleep_until` and `nx_task_yield`"
+
+#: ../../../../docs/explanation/os-portability.md:96
+msgid "不创建 timer worker，不保证微秒精度或公平"
+msgstr "No timer worker, microsecond precision or fairness guarantee"
+
+#: ../../../../docs/explanation/os-portability.md:96
+msgid "基础队列"
+msgstr "Basic queue"
+
+#: ../../../../docs/explanation/os-portability.md:96
+msgid "固定 item size/depth、复制、有限等待"
+msgstr "Fixed item size/depth, copying and bounded waits"
+
+#: ../../../../docs/explanation/os-portability.md:96
+msgid "控制对象和 `depth * item_size` 数据区"
+msgstr "Control object and a `depth * item_size` data area"
+
+#: ../../../../docs/explanation/os-portability.md:96
+msgid "可关闭通道"
+msgstr "Closable channel"
+
+#: ../../../../docs/explanation/os-portability.md:96
+msgid "关闭发送准入、广播退出、保留已有数据排空"
+msgstr ""
+"Close send admission, broadcast shutdown and retain existing data for "
+"draining"
+
+#: ../../../../docs/explanation/os-portability.md:96
+msgid "额外 waiter 存储与广播成本"
+msgstr "Additional waiter storage and broadcast cost"
+
+#: ../../../../docs/explanation/os-portability.md:134
+msgid ""
+"本批没有公共 mutex／semaphore 接口。OSU-21 盘点确认：现有生产组件通过窄端口 注入同步，未直接依赖跨 OS mutex 或计数 "
+"semaphore；当前消费链由通知、队列与 channel 满足。OSU-22／23 因此明确不纳入，不创建空头或宣称已支持。原生内核 "
+"已有这些功能，不等于 Nexus 已提供相应公共合同。"
+msgstr ""
+"This batch provides no public mutex/semaphore interface. The OSU-21 "
+"inventory confirmed that current production components inject "
+"synchronization through narrow ports and do not directly depend on cross-OS "
+"mutexes or counting semaphores. Notifications, queues and channels satisfy "
+"the current consumer chain. OSU-22/23 are therefore explicitly excluded, "
+"with no empty headers or support claims. Existing native-kernel "
+"functionality does not mean Nexus provides the corresponding public "
+"contract."
+
+#: ../../../../docs/explanation/os-portability.md:139
+msgid ""
+"FreeRTOS 直接通知槽、ThreadX 抢占阈值、MPU 受限任务和 Secure 上下文属于显式 "
+"扩展。应用选择这些能力就接受对应装配的移植成本；不能让普通组件私自依赖它们。 不默认引入软件 timer daemon、事件派发线程或通用 user-"
+"object pool。"
+msgstr ""
+"FreeRTOS direct-notification slots, ThreadX preemption thresholds, MPU "
+"restricted tasks and Secure contexts are explicit extensions. Applications "
+"selecting them accept the corresponding assembly migration cost; ordinary "
+"components must not introduce undeclared dependencies on them. No software "
+"timer daemon, event dispatch thread or general user-object pool is "
+"introduced by default."
+
+#: ../../../../docs/explanation/os-portability.md:143
+msgid "任务、启动与回收"
+msgstr "Tasks, startup and reclamation"
+
+#: ../../../../docs/explanation/os-portability.md:145
+msgid ""
+"任务接口统一入口签名、可返回/永久分类和结果语义。start 成功后任务可能已经 执行，甚至在 start 返回前结束；context "
+"和必要连接必须先准备完成。 创建被拒绝时不保留 entry/context。若底层部分资源未能撤回，必须返回明确的残余 "
+"责任并保留控制对象，不能把它描述成可立即重用的干净拒绝。"
+msgstr ""
+"The task interface unifies entry signatures, returnable/permanent categories"
+" and result semantics. A task may already be executing after start succeeds,"
+" or may even finish before start returns; its context and required "
+"connections must be prepared first. Rejected creation retains no "
+"entry/context references. If some underlying resources cannot be withdrawn, "
+"the result must identify residual responsibility and retain the control "
+"object; it must not describe this as a clean rejection permitting immediate "
+"reuse."
+
+#: ../../../../docs/explanation/os-portability.md:150
+msgid ""
+"可返回任务的入口返回只表示业务结束。FreeRTOS 外部删除、ThreadX 的真实删除、 pthread join "
+"由后端实现；共同成功条件是内核与适配层已解除对应引用。 join 超时不强杀任务，不释放栈、TCB 或 context；self-join 和竞争 "
+"join 被拒绝。 不提供一个声称能安全撤销所有业务效果的通用 task-kill。"
+msgstr ""
+"A returnable task entry returning means only that its business work has "
+"ended. The backend implements external FreeRTOS deletion, actual ThreadX "
+"deletion or pthread join. Success requires the kernel and adapter to have "
+"detached the corresponding references. A join timeout neither kills the task"
+" nor frees its stack, TCB or context. Self-join and competing joins are "
+"rejected. There is no generic task-kill claiming to safely undo all business"
+" effects."
+
+#: ../../../../docs/explanation/os-portability.md:155
+msgid ""
+"`nx_os_run` 接受明确的 bootstrap 回调，成功进入后不返回。FreeRTOS 在回调后 启动真实 scheduler；ThreadX"
+" 在实际 `tx_application_define` 范围执行回调； Native 执行回调后停驻调用线程，保留其栈，不创建隐藏 "
+"coordinator。 各内核不伪装相同的引导状态；bootstrap 只完成声明允许的非阻塞构造与连接。 "
+"平台启动仍不启动调度器，不允许将已运行内核重新解释成冷态 bootstrap。"
+msgstr ""
+"`nx_os_run` accepts an explicit bootstrap callback and does not return after"
+" successful entry. FreeRTOS starts the real scheduler after the callback; "
+"ThreadX executes it within the actual `tx_application_define` scope. Native "
+"parks the calling thread after the callback, preserving its stack without "
+"creating a hidden coordinator. Kernels do not pretend to have identical "
+"bootstrap states. Bootstrap performs only declared nonblocking construction "
+"and connection operations. Platform startup still does not start the "
+"scheduler, and a running kernel must not be reinterpreted as a cold "
+"bootstrap."
+
+#: ../../../../docs/explanation/os-portability.md:161
+msgid ""
+"Native 有限 join 先尝试 `pthread_tryjoin_np`，再用 "
+"`pthread_clockjoin_np(CLOCK_MONOTONIC, ...)` 共享同一截止时间。 构建使用真实链接探针检查这两项 GNU "
+"能力，缺失时拒绝 Native 任务配置。 只有显式 `NX_DEADLINE_NEVER` 使用无期限 join；入口完成提示不能代替 pthread"
+" 实际退出，不在有限等待后偷偷调用无界 join。"
+msgstr ""
+"Bounded Native join first tries `pthread_tryjoin_np`, then uses "
+"`pthread_clockjoin_np(CLOCK_MONOTONIC, ...)` with the same deadline. A real "
+"link probe checks both GNU capabilities during configuration, rejecting "
+"Native task configuration when they are absent. Only explicit "
+"`NX_DEADLINE_NEVER` uses an unbounded join. Entry-completion hints do not "
+"replace actual pthread exit, and bounded waits never silently fall through "
+"to unbounded join."
+
+#: ../../../../docs/explanation/os-portability.md:167
+msgid "队列、通道和同步语义"
+msgstr "Queue, channel and synchronization semantics"
+
+#: ../../../../docs/explanation/os-portability.md:169
+msgid ""
+"基础队列不承担关闭广播。发送成功表示队列已复制 item，接收成功才交付 item； 超时或关闭拒绝不能偷偷消费 item，也不能在失败时改写接收输出。"
+" 排队指针只复制指针，payload 的借用与回收仍由调用者协议负责。"
+msgstr ""
+"Basic queues do not bear close-broadcast costs. A successful send means the "
+"queue has copied the item; only a successful receive delivers an item. A "
+"timeout or close rejection must not silently consume an item or modify "
+"receive output on failure. Queueing a pointer copies only that pointer; the "
+"caller protocol still owns payload borrowing and reclamation."
+
+#: ../../../../docs/explanation/os-portability.md:173
+msgid ""
+"可关闭通道复用现有正确性要求：close 后拒绝新发送，唤醒已登记阻塞者，旧 item 仍可接收，排空后接收返回关闭结果。控制对象、每个并发 "
+"waiter 和数据区都由 调用者提供；destroy 要求 closed、drained 且 users/publishers 已退出。 close "
+"和 destroy 不替代执行 owner 推进；不能以定期超时检查代替关闭唤醒。"
+msgstr ""
+"Closable channels retain existing correctness requirements: after close, new"
+" sends are rejected, registered blockers are woken, existing items remain "
+"receivable, and receive reports closure once drained. Callers provide the "
+"control object, every concurrent waiter and the data area. Destroy requires "
+"closed, drained state and exited users/publishers. Close and destroy do not "
+"replace execution-owner progress, and periodic timeout checks must not "
+"substitute for close wakeups."
+
+#: ../../../../docs/explanation/os-portability.md:178
+msgid ""
+"通知与通道都需要等待者和发布者实际退出，才能销毁；销毁失败保留未解除的资源， 只允许受审重试。应用若明确选择原生同步扩展，仍需自行维护 "
+"owner、计数和优先级 协议，不能用普通 binary semaphore 冒充优先级继承 mutex。"
+msgstr ""
+"Notification and channel waiters and publishers must actually exit before "
+"destruction. Destruction failures retain unreleased resources and permit "
+"only reviewed retries. Applications explicitly selecting native "
+"synchronization extensions still own their owner, count and priority "
+"protocols; an ordinary binary semaphore must not masquerade as a priority-"
+"inheritance mutex."
+
+#: ../../../../docs/explanation/os-portability.md:182
+msgid "时间、优先级与上下文"
+msgstr "Time, priorities and context"
+
+#: ../../../../docs/explanation/os-portability.md:184
+msgid ""
+"有限等待保持现有绝对单调微秒合同；后端向上换算 tick，跨唤醒重算剩余预算。 无限等待只能显式选择 "
+"`NX_DEADLINE_NEVER`；溢出不能降为无限。立即可满足的 操作可先成功，等待错误后仍按公共 Wait 合同重查真实条件。 "
+"时间域必须在等待、排空和 join 期间连续；重启 epoch 后旧 deadline 失效。"
+msgstr ""
+"Bounded waits retain the existing absolute monotonic-microsecond contract. "
+"Backends round tick conversions upward and recompute the remaining budget "
+"across wakeups. Infinite waits require explicit `NX_DEADLINE_NEVER`; "
+"overflow must not turn into infinity. An immediately satisfiable operation "
+"may succeed first, and the authoritative predicate is still rechecked after "
+"wait errors under the public Wait contract. The time domain must remain "
+"continuous through waiting, draining and join; restarting the epoch "
+"invalidates old deadlines."
+
+#: ../../../../docs/explanation/os-portability.md:189
+msgid ""
+"`task.h` 提供 task-only 的 `nx_sleep_until` 和 `nx_task_yield`。 `nx_sleep_until`"
+" 使用 `nx_os_now_us` 的同域绝对 deadline，过期立即返回，拒绝 "
+"`NX_DEADLINE_NEVER`，不推进设备、不保证微秒唤醒精度。Native 的 OS 时钟始终是 真实 "
+"`CLOCK_MONOTONIC`，不能混用可切换的硬件模型时钟。`nx_task_yield` 只提出 "
+"调度提示，不保证公平、指定下一任务或让低优先级任务运行，两者不隐建 timer worker。"
+msgstr ""
+"`task.h` provides task-only `nx_sleep_until` and `nx_task_yield`. "
+"`nx_sleep_until` uses an absolute deadline in the `nx_os_now_us` domain, "
+"returns immediately on expiry, rejects `NX_DEADLINE_NEVER`, does not service"
+" devices and does not guarantee microsecond wake precision. The Native OS "
+"clock is always real `CLOCK_MONOTONIC`; do not mix it with a switchable "
+"hardware-model clock. `nx_task_yield` is only a scheduling hint, "
+"guaranteeing neither fairness, a specific next task nor execution of a "
+"lower-priority task. Neither operation creates an implicit timer worker."
+
+#: ../../../../docs/explanation/os-portability.md:195
+msgid ""
+"公共逻辑优先级数值越大越高。FreeRTOS 保持同向编号，ThreadX 反向映射；可用 等级由所选存储头的 "
+"`NX_OS_PRIORITY_LEVELS` 表示。Native 只接受逻辑值 0， 其他值拒绝，不忽略参数；它不声明 `priority` "
+"能力，也不声称普通 pthread 调度 具有 MCU 抢占保证。应用装配显式选择优先级与栈预算。"
+msgstr ""
+"Public logical priority increases with its numeric value. FreeRTOS retains "
+"the same direction; ThreadX reverses its native numbering. The selected "
+"storage header exposes the available levels as `NX_OS_PRIORITY_LEVELS`. "
+"Native accepts only logical value 0 and rejects other values rather than "
+"ignoring them. It does not declare the `priority` capability or claim that "
+"ordinary pthread scheduling provides MCU preemption guarantees. Application "
+"assembly explicitly selects priorities and stack budgets."
+
+#: ../../../../docs/explanation/os-portability.md:96
+msgid "上下文"
+msgstr "Context"
+
+#: ../../../../docs/explanation/os-portability.md:96
+msgid "当前准入"
+msgstr "Current admission"
+
+#: ../../../../docs/explanation/os-portability.md:96
+msgid "普通 task"
+msgstr "Ordinary task"
+
+#: ../../../../docs/explanation/os-portability.md:96
+msgid "已运行的正确内核、受支持权限和屏蔽状态；阻塞只在允许阶段"
+msgstr ""
+"Correct running kernel, supported privilege and mask state; blocking only in"
+" permitted phases"
+
+#: ../../../../docs/explanation/os-portability.md:96
+msgid "Bootstrap"
+msgstr "Bootstrap"
+
+#: ../../../../docs/explanation/os-portability.md:96
+msgid "允许受审的构造、未执行任务撤回与通知发布；队列/channel 传输仍拒绝"
+msgstr ""
+"Reviewed construction, unused-task withdrawal and notification publication "
+"are permitted; queue/channel transfers remain rejected"
+
+#: ../../../../docs/explanation/os-portability.md:96
+msgid "IRQ 发布"
+msgstr "IRQ publication"
+
+#: ../../../../docs/explanation/os-portability.md:96
+msgid "独立入口，先核验 IRQ 范围、mask、分组与 syscall ceiling"
+msgstr ""
+"Separate entry; first validate IRQ range, masks, grouping and syscall "
+"ceiling"
+
+#: ../../../../docs/explanation/os-portability.md:96
+msgid "NMI / fault / 其他安全域"
+msgstr "NMI / fault / other security domains"
+
+#: ../../../../docs/explanation/os-portability.md:96
+msgid "不继承普通 IRQ 合同，未维护的组合拒绝"
+msgstr ""
+"Does not inherit the ordinary IRQ contract; reject unmaintained combinations"
+
+#: ../../../../docs/explanation/os-portability.md:96
+msgid "MPU 用户任务"
+msgstr "MPU user task"
+
+#: ../../../../docs/explanation/os-portability.md:96
+msgid "仅受审 syscall；公共名称不自动授予原生内核或 I/O 权限"
+msgstr ""
+"Reviewed syscalls only; public names do not automatically grant native-"
+"kernel or I/O privileges"
+
+#: ../../../../docs/explanation/os-portability.md:208
+msgid ""
+"本批不提供 ISR 队列/channel 传输；IRQ 通过明确通知入口发布提示，不调用阻塞操作。 实际 IRQ 原语继续保存/恢复 incoming "
+"mask，不用本地关中断声称获得 SMP、DMA 或跨安全域互斥。Secure companion 不增加第二个 "
+"scheduler，信任边界保持原合同。"
+msgstr ""
+"This batch provides no ISR queue/channel transfer. IRQs publish hints "
+"through explicit notification entry points and do not call blocking "
+"operations. Actual IRQ primitives continue to save/restore incoming masks. "
+"Disabling local interrupts does not establish SMP, DMA or cross-security-"
+"domain exclusion. The Secure companion adds no second scheduler, and the "
+"trust boundary remains governed by the original contract."
+
+#: ../../../../docs/explanation/os-portability.md:212
+msgid "结果、停止与失败责任"
+msgstr "Results, stopping and failure responsibility"
+
+#: ../../../../docs/explanation/os-portability.md:214
+msgid ""
+"公共接口沿用 Core 结果类型，不另建 OS 错误枚举；准确码值及输出规则由公共头 "
+"维护。参数与上下文拒绝发生在对象和内核效果变更前；内核错误不撤销已经发布的 通知提示，调用者仍须重查真实条件，不能据错误返回提前回收借用。"
+msgstr ""
+"Public interfaces retain Core result types rather than adding another OS "
+"error enumeration. Public headers govern exact codes and output rules. "
+"Argument and context rejection precede object changes or kernel effects. "
+"Kernel errors do not undo notification hints already published: callers must"
+" still recheck authoritative predicates and must not reclaim loans early "
+"because an error was returned."
+
+#: ../../../../docs/explanation/os-portability.md:96
+msgid "结果类别"
+msgstr "Result category"
+
+#: ../../../../docs/explanation/os-portability.md:96
+msgid "存储和后续责任"
+msgstr "Storage and subsequent responsibility"
+
+#: ../../../../docs/explanation/os-portability.md:96
+msgid "参数/上下文拒绝"
+msgstr "Argument/context rejection"
+
+#: ../../../../docs/explanation/os-portability.md:96
+msgid "不取得新的业务借用，不执行内核操作"
+msgstr "No new business loans or kernel operations"
+
+#: ../../../../docs/explanation/os-portability.md:96
+msgid "必需能力不满足"
+msgstr "Required capability not satisfied"
+
+#: ../../../../docs/explanation/os-portability.md:96
+msgid "配置失败；动态扩展另按明确接口拒绝，不偷偷选择替代模式"
+msgstr ""
+"Configuration fails; dynamic extensions reject under their explicit "
+"interfaces, without silently selecting a replacement mode"
+
+#: ../../../../docs/explanation/os-portability.md:96
+msgid "等待超时"
+msgstr "Wait timeout"
+
+#: ../../../../docs/explanation/os-portability.md:96
+msgid "结束本次等待；保留任务、请求和其他未结束借用"
+msgstr "End this wait; retain tasks, requests and other outstanding loans"
+
+#: ../../../../docs/explanation/os-portability.md:96
+msgid "通道关闭"
+msgstr "Channel closure"
+
+#: ../../../../docs/explanation/os-portability.md:96
+msgid "停止发送准入；继续 drain 和等待者退出"
+msgstr "Stop send admission; continue draining and waiter exit"
+
+#: ../../../../docs/explanation/os-portability.md:96
+msgid "忙/尚未退出"
+msgstr "Busy/not yet exited"
+
+#: ../../../../docs/explanation/os-portability.md:96
+msgid "保留同一存储，继续必要进度，不能重新 init"
+msgstr ""
+"Retain the same storage and continue necessary progress; no reinitialization"
+
+#: ../../../../docs/explanation/os-portability.md:96
+msgid "部分清理失败"
+msgstr "Partial cleanup failure"
+
+#: ../../../../docs/explanation/os-portability.md:96
+msgid "保留精确残余资源和恢复责任，不伪报 destroy 成功"
+msgstr ""
+"Retain exact residual resources and recovery responsibility; do not falsely "
+"report successful destroy"
+
+#: ../../../../docs/explanation/os-portability.md:227
+msgid ""
+"![FIG-08：当前等待、真实条件重查与外部退出责任](../assets/diagrams/wait-wake-shutdown.svg)"
+msgstr ""
+"![FIG-08: current waiting, authoritative predicate recheck and external "
+"shutdown responsibilities](../assets/diagrams/wait-wake-shutdown.svg)"
+
+#: ../../../../docs/explanation/os-portability.md:227
+msgid "FIG-08：当前等待、真实条件重查与外部退出责任"
+msgstr ""
+"FIG-08: current waiting, authoritative predicate recheck and external "
+"shutdown responsibilities"
+
+#: ../../../../docs/explanation/os-portability.md:229
+msgid ""
+"FIG-08 表达现行等待协议与退出责任。请求 SETTLED、 任务入口完成、join 成功、通知发布者退出分别证明不同事实。应用先关准入，继续 执行"
+" owner 的取消/排空，再会合有关任务和 IRQ 发布路径。通知和队列只在全部 相关发布者与等待者会合后销毁。平台时钟与 Tick "
+"保留到全部消费者静默且所选内核 生命周期允许撤回；不能在内核运行时直接撤销，也不承诺当前支持 scheduler "
+"shutdown。失败时保留尚未结清的引用，不把 timeout/cancel 当作存储释放。"
+msgstr ""
+"FIG-08 expresses the current waiting protocol and shutdown responsibilities."
+" Request SETTLED, task-entry completion, successful join and notification-"
+"publisher exit each prove distinct facts. Applications first close "
+"admission, keep the execution owner progressing cancellation/drain, then "
+"join the relevant tasks and IRQ publication paths. Notifications and queues "
+"are destroyed only after all relevant publishers and waiters have quiesced "
+"and been joined. Platform clocks and Tick remain until every consumer is "
+"quiescent and the selected kernel lifecycle permits withdrawal. They must "
+"not simply be withdrawn while the kernel is running, and current scheduler "
+"shutdown support is not promised. Failures retain outstanding references; "
+"timeout/cancel does not release storage."
+
+#: ../../../../docs/explanation/os-portability.md:236
+msgid "成本、参考与验收边界"
+msgstr "Costs, references and acceptance boundaries"
+
+#: ../../../../docs/explanation/os-portability.md:238
+msgid ""
+"编译期共同符号避免额外后端分派，但统一合同仍可能需要完成状态、deadline 换算或上下文检查。精简对象按能力选用；未选择的 "
+"channel、trace、MPU 与 Secure 状态不得进入普通对象。报告分别列对象、栈、payload、内核全局状态、 Flash 和总保留 "
+"RAM，不用单个 `sizeof` 代表整幅镜像。"
+msgstr ""
+"Common compile-time symbols avoid additional backend dispatch, but the "
+"unified contract may still require completion state, deadline conversion or "
+"context checks. Select lean objects by capability. Unselected channel, "
+"trace, MPU and Secure state must not enter ordinary objects. Reports "
+"separately list objects, stacks, payloads, kernel-global state, Flash and "
+"total retained RAM; a single `sizeof` does not represent the entire image."
+
+#: ../../../../docs/explanation/os-portability.md:243
+msgid ""
+"现有 [Wait 成本夹具](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/tests/contracts/os_wait_cost/README.md)与 "
+"[资源夹具](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/tests/contracts/os_resources/README.md)是当前比较入口，不能 把其旧结果标成新 API 的证据。实际"
+" IRQ 延迟、栈峰值、FP/MVE 保留和低功耗时间 连续性仍需设备验证；本文不新增当前支持或 HIL 结论。"
+msgstr ""
+"The existing [Wait cost fixture](https://github.com/X-Gen-"
+"Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/tests/contracts/os_wait_cost/README.md) and [resource "
+"fixture](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/tests/contracts/os_resources/README.md) provide current comparison "
+"entry points. Their old results must not be relabeled as evidence for new "
+"APIs. Actual IRQ latency, stack peaks, FP/MVE retention and low-power time "
+"continuity still require device validation. This page adds no current "
+"support or HIL conclusions."
+
+#: ../../../../docs/explanation/os-portability.md:248
+msgid ""
+"[CMSIS-RTOS2 官方接口](https://arm-"
+"software.github.io/CMSIS_6/latest/RTOS2/index.html) "
+"说明共同线程/同步接口与调用者存储属性可以并存，值得借鉴术语与上下文规则。 但 CMSIS 接口存在不证明某个内核有合格实现，也不能替代 Nexus "
+"的绝对 deadline、 外部 join、借用和关闭合同。当前没有引入 CMSIS-RTOS2 中间层，内核 pin 保持原样。"
+msgstr ""
+"The [official CMSIS-RTOS2 interface](https://arm-"
+"software.github.io/CMSIS_6/latest/RTOS2/index.html) shows that common "
+"thread/synchronization interfaces can coexist with caller-provided storage "
+"attributes. Its terminology and context rules are useful references. The "
+"existence of a CMSIS interface does not prove a qualified implementation for"
+" a kernel, or replace Nexus absolute deadlines, external join, borrowing and"
+" close contracts. No CMSIS-RTOS2 middleware layer has been added, and "
+"existing kernel pins remain unchanged."
+
+#: ../../../../docs/explanation/os-portability.md:253
+msgid ""
+"普通后端公开入口已经迁入公共接口，不保留旧 alias、兼容 wrapper 或 fallback； 明确扩展继续保留后端名称。阶段验证执行真实生产 C"
+" 路径及同一 C11 消费者， 但不代替最终完整集成、ARM、资源或独立 SDK 验收。当前工作包及退出条件由 "
+"[交付清单](../development/os-portability-plan.md)维护，未执行 HIL 仍是 `not_executed`。"
+msgstr ""
+"Ordinary backend public entry points have migrated to common interfaces, "
+"without old aliases, compatibility wrappers or fallbacks. Explicit "
+"extensions retain backend-specific names. Stage validation executes actual "
+"production C paths and the same C11 consumer, but does not replace final "
+"complete integration, ARM, resource or independent SDK acceptance. The "
+"[delivery checklist](../development/os-portability-plan.md) maintains "
+"current work packages and exit conditions. Unexecuted HIL remains "
+"`not_executed`."

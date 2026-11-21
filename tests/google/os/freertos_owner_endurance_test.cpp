@@ -9,6 +9,7 @@
 
 #include "nexus/components/uart_owner.h"
 #include "nexus/os/freertos.h"
+#include "nexus/os/storage.h"
 #include "provider.h"
 #include <cstdlib>
 #include <gtest/gtest.h>
@@ -21,9 +22,9 @@ struct Round;
 /** \brief Each real producer retains its own request and bytes until join. */
 struct Producer {
     Round* round;
-    nx_freertos_notify_t completion{};
+    nx_notify_t completion{};
     nx_wait_port_t wake{};
-    nx_freertos_task_t task{};
+    nx_task_t task{};
     alignas(8) StackType_t stack[words]{};
     nx_request_t request{};
     nx_uart_owner_operation_t operation{};
@@ -40,11 +41,11 @@ struct Round {
     nx_bus_owner_t owner{};
     nx_owner_slot_t slots[2]{};
     nx_uart_owner_executor_t executor{};
-    nx_freertos_notify_t owner_event{};
-    nx_freertos_notify_t coordinator_event{};
+    nx_notify_t owner_event{};
+    nx_notify_t coordinator_event{};
     nx_wait_port_t owner_wake{};
     nx_wait_port_t coordinator_wake{};
-    nx_freertos_task_t owner_task{};
+    nx_task_t owner_task{};
     alignas(8) StackType_t owner_stack[words]{};
     Producer producer[2]{};
     uint8_t rx[2]{};
@@ -147,9 +148,9 @@ struct Round {
             (void)owner_wake.wake(owner_wake.context);
         }
     }
-    bool join(nx_freertos_task_t* task) {
+    bool join(nx_task_t* task) {
         return task->handle == nullptr ||
-               nx_freertos_task_join(
+               nx_task_join_until(
                    task, nx_deadline_after(nx_time_now_us(), 2000000U)) ==
                    NX_SUCCESS;
     }
@@ -176,16 +177,16 @@ struct Round {
         }
         for (auto& item : producer) {
             if (item.completion.handle != nullptr &&
-                nx_freertos_notify_destroy(&item.completion) != NX_SUCCESS) {
+                nx_notify_destroy(&item.completion) != NX_SUCCESS) {
                 std::abort();
             }
         }
         if (owner_event.handle != nullptr &&
-            nx_freertos_notify_destroy(&owner_event) != NX_SUCCESS) {
+            nx_notify_destroy(&owner_event) != NX_SUCCESS) {
             std::abort();
         }
         if (coordinator_event.handle != nullptr &&
-            nx_freertos_notify_destroy(&coordinator_event) != NX_SUCCESS) {
+            nx_notify_destroy(&coordinator_event) != NX_SUCCESS) {
             std::abort();
         }
     }
@@ -211,12 +212,10 @@ void run_rounds(unsigned rounds) {
                       NX_SUCCESS);
             ASSERT_EQ(nx_uart_port_attach_wake(&round.uart, &round.hint, 0U),
                       NX_SUCCESS);
-            ASSERT_EQ(nx_freertos_notify_init(&round.owner_event), NX_SUCCESS);
-            ASSERT_EQ(nx_freertos_notify_init(&round.coordinator_event),
-                      NX_SUCCESS);
-            round.owner_wake = nx_freertos_notify_port(&round.owner_event);
-            round.coordinator_wake =
-                nx_freertos_notify_port(&round.coordinator_event);
+            ASSERT_EQ(nx_notify_init(&round.owner_event), NX_SUCCESS);
+            ASSERT_EQ(nx_notify_init(&round.coordinator_event), NX_SUCCESS);
+            round.owner_wake = nx_notify_port(&round.owner_event);
+            round.coordinator_wake = nx_notify_port(&round.coordinator_event);
             ASSERT_EQ(
                 nx_bus_owner_init(
                     &round.owner, round.slots, 2U,
@@ -232,18 +231,19 @@ void run_rounds(unsigned rounds) {
                     NX_SUCCESS);
                 producer.operation = {producer.payload,
                                       sizeof producer.payload};
-                ASSERT_EQ(nx_freertos_notify_init(&producer.completion),
-                          NX_SUCCESS);
-                producer.wake = nx_freertos_notify_port(&producer.completion);
+                ASSERT_EQ(nx_notify_init(&producer.completion), NX_SUCCESS);
+                producer.wake = nx_notify_port(&producer.completion);
             }
-            ASSERT_EQ(nx_freertos_task_start(&round.owner_task, "owner-loop",
-                                             round.owner_stack, words, 3U,
-                                             Round::execute, &round),
+            ASSERT_EQ(nx_task_start(&round.owner_task, "owner-loop",
+                                    round.owner_stack,
+                                    (words) * sizeof(StackType_t), 3U,
+                                    Round::execute, &round),
                       NX_SUCCESS);
             for (auto& producer : round.producer) {
-                ASSERT_EQ(nx_freertos_task_start(
-                              &producer.task, "producer-loop", producer.stack,
-                              words, 4U, Round::produce, &producer),
+                ASSERT_EQ(nx_task_start(&producer.task, "producer-loop",
+                                        producer.stack,
+                                        (words) * sizeof(StackType_t), 4U,
+                                        Round::produce, &producer),
                           NX_SUCCESS);
             }
             const bool complete = iteration % 3U == 0U;
@@ -326,14 +326,11 @@ void run_rounds(unsigned rounds) {
             EXPECT_EQ(round.state.wake, nullptr);
             EXPECT_FALSE(round.state.opened);
             for (auto& producer : round.producer) {
-                ASSERT_EQ(nx_freertos_notify_destroy(&producer.completion),
-                          NX_SUCCESS);
+                ASSERT_EQ(nx_notify_destroy(&producer.completion), NX_SUCCESS);
                 EXPECT_EQ(producer.completion.handle, nullptr);
             }
-            ASSERT_EQ(nx_freertos_notify_destroy(&round.owner_event),
-                      NX_SUCCESS);
-            ASSERT_EQ(nx_freertos_notify_destroy(&round.coordinator_event),
-                      NX_SUCCESS);
+            ASSERT_EQ(nx_notify_destroy(&round.owner_event), NX_SUCCESS);
+            ASSERT_EQ(nx_notify_destroy(&round.coordinator_event), NX_SUCCESS);
         }
         EXPECT_EQ(uxTaskGetNumberOfTasks(), baseline);
     }

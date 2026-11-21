@@ -16,18 +16,26 @@ kernel license, version, port and resource budget. This document and the executa
 probe prepare that work; they do not claim RTX, Zephyr or another kernel is
 supported. Applications continue to own task topology, storage and shutdown.
 
+The current branch implements common opaque task, notification, queue and
+channel APIs. Each executable links one selected backend exporting the common
+symbols, without runtime OS dispatch. Assembly includes `storage.h` to complete
+the selected layouts; business headers do not depend on native kernel types.
+Existing implementation and focused checks do not confer final software or
+physical qualification.
+
 ## Public contract
 
 | Boundary | Required behavior |
 | --- | --- |
-| Time | Finite absolute monotonic microseconds in the same clock domain as the caller; the clock continues while waiting. Use `NX_DEADLINE_NEVER` for infinity and `nx_deadline_after` for saturating construction. |
+| Time | Finite absolute monotonic microseconds in the `nx_os_now_us()` domain; the clock continues while waiting. Construct finite budgets with `nx_deadline_finite_after` and handle overflow. `NX_DEADLINE_NEVER` explicitly permits infinite join/wait, but is invalid for sleep. |
 | Completion | A wake or changed sequence is a hint to recheck the authoritative predicate. Unrelated wakes never restart a deadline. The final predicate observation can win over a timeout or another wait error. |
 | Admission | A rejected operation retains no references. Timeout does not cancel, settle or reclaim an accepted I/O request. |
 | Wait port | One owner calls `arm` and `wait`; multiple publishers may call `wake` within the documented context. Arming and the predicate recheck must close the lost-wake window. |
-| Storage | The application supplies adapter objects, stacks, task control blocks and queue buffers. No hidden workers or maximum-size pools. Native POSIX libraries may allocate internally; their cost is not a MCU budget. |
+| Storage | Zeroed selected-layout controls and byte-sized stack/payload capacities remain caller-owned. Reject complete capacity spans that overlap or wrap, not merely the used item range. No maximum-size union, guessed TCB size or hidden worker. Native POSIX bookkeeping is not a MCU budget. |
 | Notification teardown | Publishers and the single waiter must be quiesced before reclaim. A wait error is insufficient evidence of quiescence. |
 | Task teardown | One lifecycle owner and one joiner. Entry return alone is insufficient; successful join establishes reclaim. Cooperative stop is explicit. |
-| Queue teardown | Close rejects new sends, wakes blocked users and permits retained items to drain; users must exit before destroy. A raw kernel queue without close must expose its separate owner protocol. |
+| Priority | Public logical priorities increase with their values. Backends map native numbering; Native accepts only level zero, without claiming MCU preemption. Reject requirements that cannot be met. |
+| Queue teardown | Raw queues have no close broadcast. Channels require exclusive caller waiters, enforce concurrent-operation capacity, reject closed sends with CANCELLED and allow retained items to drain. All users exit before destroy. |
 | ISR | Declare which calls are legal in task and ISR context. Reject exceptions or priorities outside the kernel syscall ceiling before calling any ISR kernel API. |
 | Masks | Preserve incoming interrupt masks on every return path. Baseline ports explicitly restore their borrowed PRIMASK before kernel calls; Mainline ports obey their BASEPRI ceiling. Never assume entry was unmasked. |
 | Features | Unsupported CPU, port, ABI, security or MPU combinations fail at configuration. A host model cannot establish real kernel scheduling, physical IRQ priority or board timing. |
@@ -36,6 +44,15 @@ supported. Applications continue to own task topology, storage and shutdown.
 [Wait cost models](../../../../tests/contracts/os_wait_cost/README.md) compare actual
 linked alternatives. Backend integration must not create a second deadline
 helper, runtime device registry or another assembly authority.
+
+`nx_os_run` enters the real backend bootstrap and never returns successfully.
+Platform startup remains separate. Native runs the callback, then parks the
+calling thread without invalidating its stack or creating a coordinator.
+`nx_task_join_until` must establish actual kernel detachment; self-join returns
+CONTEXT and timeout retains storage. Native requires real GNU try/clock-join
+capabilities using CLOCK_MONOTONIC, rather than entry flags followed by an
+unbounded join. Raw queue deadline zero means immediate try; failure preserves
+receive output. Sleep and yield do not service devices or imply fairness.
 
 ## Integration sequence
 
@@ -47,7 +64,8 @@ helper, runtime device registry or another assembly authority.
    GoogleTest/GoogleMock with real production adapter code, mocking external
    hardware or kernel boundaries only. Add a real-kernel scheduler probe for
    kernel behavior; mocked calls alone cannot establish it.
-3. Implement the static adapter and its context/deadline/lifecycle documentation.
+3. Implement the common symbols, selected static layouts and their
+   context/deadline/lifecycle documentation.
    Define notification ownership, shutdown/join and ISR priority rejection
    before integrating I/O waits. Keep firmware C11, and keep test C++ outside
    firmware targets.

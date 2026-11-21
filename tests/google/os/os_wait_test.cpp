@@ -9,7 +9,7 @@
  */
 #include "nexus/core/time.h"
 #include "nexus/os/baremetal.h"
-#include "nexus/os/native.h"
+#include "nexus/os/storage.h"
 #include <atomic>
 #include <cerrno>
 #include <condition_variable>
@@ -104,6 +104,32 @@ struct NativeStack {
     /* Host sanitizers need additional stack; this is not an MCU budget. */
     alignas(4096) unsigned char bytes[262144];
 };
+
+/** \brief Give each simultaneous send its own live operation waiter. */
+nx_result_t sendChannel(nx_channel_t* channel, const void* item,
+                        nx_time_us_t deadline) {
+    nx_channel_waiter_t waiter{};
+    nx_result_t result = nx_channel_waiter_init(&waiter);
+    if (result != NX_SUCCESS) {
+        return result;
+    }
+    result = nx_channel_send_until(channel, item, deadline, &waiter);
+    EXPECT_EQ(nx_channel_waiter_destroy(&waiter), NX_SUCCESS);
+    return result;
+}
+
+/** \brief Give each simultaneous receive its own live operation waiter. */
+nx_result_t receiveChannel(nx_channel_t* channel, void* item,
+                           nx_time_us_t deadline) {
+    nx_channel_waiter_t waiter{};
+    nx_result_t result = nx_channel_waiter_init(&waiter);
+    if (result != NX_SUCCESS) {
+        return result;
+    }
+    result = nx_channel_receive_until(channel, item, deadline, &waiter);
+    EXPECT_EQ(nx_channel_waiter_destroy(&waiter), NX_SUCCESS);
+    return result;
+}
 
 /** \brief Let a real child finish entry before pthread_create returns. */
 struct CreateBoundary {
@@ -352,48 +378,48 @@ TEST(BaremetalWait, SequenceWrapIsAnObservedHint) {
 }
 
 TEST(NativeWait, ChangedSequenceCannotBypassExpiredDeadline) {
-    nx_native_notify_t notification;
-    ASSERT_EQ(nx_native_notify_init(&notification), NX_SUCCESS);
-    auto port = nx_native_notify_port(&notification);
+    nx_notify_t notification{};
+    ASSERT_EQ(nx_notify_init(&notification), NX_SUCCESS);
+    auto port = nx_notify_port(&notification);
     auto sequence = port.arm(port.context);
     ASSERT_EQ(port.wake(port.context), NX_SUCCESS);
     EXPECT_EQ(port.wait(port.context, sequence, 0), NX_ERROR_TIMEOUT);
-    EXPECT_EQ(nx_native_notify_destroy(&notification), NX_SUCCESS);
+    EXPECT_EQ(nx_notify_destroy(&notification), NX_SUCCESS);
 }
 
 TEST(NativeWait, ContinuousHintsCannotExtendAbsoluteDeadline) {
-    nx_native_notify_t notification;
-    ASSERT_EQ(nx_native_notify_init(&notification), NX_SUCCESS);
-    WakeStorm storm{nx_native_notify_port(&notification)};
+    nx_notify_t notification{};
+    ASSERT_EQ(nx_notify_init(&notification), NX_SUCCESS);
+    WakeStorm storm{nx_notify_port(&notification)};
     EXPECT_EQ(nx_wait_until(&storm.port, WakeStorm::ready, &storm, 0),
               NX_ERROR_TIMEOUT);
     EXPECT_LT(storm.checks, 64U);
-    EXPECT_EQ(nx_native_notify_destroy(&notification), NX_SUCCESS);
+    EXPECT_EQ(nx_notify_destroy(&notification), NX_SUCCESS);
 }
 
 TEST(NativeWait, RepeatedHintsDoNotRestartAFutureDeadline) {
-    nx_native_notify_t notification;
-    ASSERT_EQ(nx_native_notify_init(&notification), NX_SUCCESS);
+    nx_notify_t notification{};
+    ASSERT_EQ(nx_notify_init(&notification), NX_SUCCESS);
     testing::StrictMock<ClockBoundary> clock;
     EXPECT_CALL(clock, read())
         .WillOnce(testing::Return(100))
         .WillOnce(testing::Return(101))
         .WillOnce(testing::Return(102))
         .WillOnce(testing::Return(103));
-    WakeStorm storm{nx_native_notify_port(&notification)};
+    WakeStorm storm{nx_notify_port(&notification)};
     selectedClock = &clock;
     nx_result_t result =
         nx_wait_until(&storm.port, WakeStorm::ready, &storm, 103);
     selectedClock = nullptr;
     EXPECT_EQ(result, NX_ERROR_TIMEOUT);
     EXPECT_EQ(storm.checks, 9U);
-    EXPECT_EQ(nx_native_notify_destroy(&notification), NX_SUCCESS);
+    EXPECT_EQ(nx_notify_destroy(&notification), NX_SUCCESS);
 }
 
 TEST(NativeWait, NeverUsesUntimedWaitAndSecondWaiterIsRejected) {
-    nx_native_notify_t notification;
-    ASSERT_EQ(nx_native_notify_init(&notification), NX_SUCCESS);
-    auto port = nx_native_notify_port(&notification);
+    nx_notify_t notification{};
+    ASSERT_EQ(nx_notify_init(&notification), NX_SUCCESS);
+    auto port = nx_notify_port(&notification);
     auto sequence = port.arm(port.context);
     boundary.select(&notification.condition);
     std::atomic<nx_result_t> result{NX_ERROR_IO};
@@ -402,20 +428,20 @@ TEST(NativeWait, NeverUsesUntimedWaitAndSecondWaiterIsRejected) {
     boundary.await();
     EXPECT_EQ(port.wait(port.context, sequence, NX_DEADLINE_NEVER),
               NX_ERROR_BUSY);
-    EXPECT_EQ(nx_native_notify_destroy(&notification), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_notify_destroy(&notification), NX_ERROR_BUSY);
     EXPECT_EQ(port.wake(port.context), NX_SUCCESS);
     waiter.join();
     EXPECT_EQ(result.load(), NX_SUCCESS);
     EXPECT_GE(boundary.infinite, 1U);
     EXPECT_EQ(boundary.timed, 0U);
     boundary.select(nullptr);
-    EXPECT_EQ(nx_native_notify_destroy(&notification), NX_SUCCESS);
+    EXPECT_EQ(nx_notify_destroy(&notification), NX_SUCCESS);
 }
 
 TEST(NativeWait, MultiplePublishersPreserveEverySequenceIncrement) {
-    nx_native_notify_t notification;
-    ASSERT_EQ(nx_native_notify_init(&notification), NX_SUCCESS);
-    auto port = nx_native_notify_port(&notification);
+    nx_notify_t notification{};
+    ASSERT_EQ(nx_notify_init(&notification), NX_SUCCESS);
+    auto port = nx_notify_port(&notification);
     auto sequence = port.arm(port.context);
     std::vector<std::thread> publishers;
     std::atomic<unsigned> errors{0};
@@ -434,28 +460,28 @@ TEST(NativeWait, MultiplePublishersPreserveEverySequenceIncrement) {
     EXPECT_EQ(errors.load(), 0U);
     EXPECT_EQ(port.arm(port.context), sequence + 4000U);
     EXPECT_EQ(port.wait(port.context, sequence, NX_DEADLINE_NEVER), NX_SUCCESS);
-    EXPECT_EQ(nx_native_notify_destroy(&notification), NX_SUCCESS);
+    EXPECT_EQ(nx_notify_destroy(&notification), NX_SUCCESS);
 }
 
 TEST(NativeWait, SequenceWrapRemainsObservableBeforeDeadline) {
-    nx_native_notify_t notification;
-    ASSERT_EQ(nx_native_notify_init(&notification), NX_SUCCESS);
+    nx_notify_t notification{};
+    ASSERT_EQ(nx_notify_init(&notification), NX_SUCCESS);
     notification.sequence = UINT32_MAX;
-    auto port = nx_native_notify_port(&notification);
+    auto port = nx_notify_port(&notification);
     auto sequence = port.arm(port.context);
     ASSERT_EQ(port.wake(port.context), NX_SUCCESS);
     EXPECT_EQ(port.wait(port.context, sequence, NX_DEADLINE_NEVER), NX_SUCCESS);
     EXPECT_EQ(port.arm(port.context), 0U);
-    EXPECT_EQ(nx_native_notify_destroy(&notification), NX_SUCCESS);
+    EXPECT_EQ(nx_notify_destroy(&notification), NX_SUCCESS);
 }
 
 TEST(NativeWait, ActualTimeoutPreservesFinalPredicateCompletion) {
-    nx_native_notify_t notification;
-    ASSERT_EQ(nx_native_notify_init(&notification), NX_SUCCESS);
+    nx_notify_t notification{};
+    ASSERT_EQ(nx_notify_init(&notification), NX_SUCCESS);
     struct Predicate {
         nx_wait_port_t port;
         unsigned observations = 0;
-    } predicate{nx_native_notify_port(&notification)};
+    } predicate{nx_notify_port(&notification)};
     auto ready = [](void* context) {
         auto* state = static_cast<Predicate*>(context);
         ++state->observations;
@@ -464,25 +490,25 @@ TEST(NativeWait, ActualTimeoutPreservesFinalPredicateCompletion) {
     };
     EXPECT_EQ(nx_wait_until(&predicate.port, ready, &predicate, 0), NX_SUCCESS);
     EXPECT_EQ(predicate.observations, 3U);
-    EXPECT_EQ(nx_native_notify_destroy(&notification), NX_SUCCESS);
+    EXPECT_EQ(nx_notify_destroy(&notification), NX_SUCCESS);
 }
 
 TEST(NativeWait, PastDeadlineNeverEntersAPosixBlockingOperation) {
-    nx_native_notify_t notification;
-    ASSERT_EQ(nx_native_notify_init(&notification), NX_SUCCESS);
+    nx_notify_t notification{};
+    ASSERT_EQ(nx_notify_init(&notification), NX_SUCCESS);
     boundary.select(&notification.condition);
-    auto port = nx_native_notify_port(&notification);
+    auto port = nx_notify_port(&notification);
     EXPECT_EQ(port.wait(port.context, port.arm(port.context), 0),
               NX_ERROR_TIMEOUT);
     EXPECT_EQ(boundary.infinite, 0U);
     EXPECT_EQ(boundary.timed, 0U);
     boundary.select(nullptr);
-    EXPECT_EQ(nx_native_notify_destroy(&notification), NX_SUCCESS);
+    EXPECT_EQ(nx_notify_destroy(&notification), NX_SUCCESS);
 }
 
 TEST(NativeWait, PublisherBetweenRecheckAndSleepCannotLoseWake) {
-    nx_native_notify_t notification;
-    ASSERT_EQ(nx_native_notify_init(&notification), NX_SUCCESS);
+    nx_notify_t notification{};
+    ASSERT_EQ(nx_notify_init(&notification), NX_SUCCESS);
     struct State {
         std::mutex mutex;
         std::condition_variable gate;
@@ -502,12 +528,12 @@ TEST(NativeWait, PublisherBetweenRecheckAndSleepCannotLoseWake) {
         }
         return observed;
     };
-    auto port = nx_native_notify_port(&notification);
+    auto port = nx_notify_port(&notification);
     boundary.select(&notification.condition);
     nx_result_t result = NX_ERROR_IO;
     std::thread waiter([&] {
         result = nx_wait_until(&port, ready, &fixture,
-                               nx_deadline_after(nx_native_now_us(), 1000000));
+                               nx_deadline_after(nx_os_now_us(), 1000000));
     });
     {
         std::unique_lock<std::mutex> lock(fixture.mutex);
@@ -522,83 +548,82 @@ TEST(NativeWait, PublisherBetweenRecheckAndSleepCannotLoseWake) {
     EXPECT_EQ(fixture.checks, 3U);
     EXPECT_EQ(boundary.timed, 0U);
     boundary.select(nullptr);
-    EXPECT_EQ(nx_native_notify_destroy(&notification), NX_SUCCESS);
+    EXPECT_EQ(nx_notify_destroy(&notification), NX_SUCCESS);
 }
 
 TEST(NativeQueue, CloseWakesBlockedProducerAndRetainsDrain) {
-    nx_native_queue_t queue;
+    nx_channel_t queue{};
     uint32_t storage[1];
-    ASSERT_EQ(nx_native_queue_init(&queue, storage, sizeof(storage), 1,
-                                   sizeof(uint32_t)),
+    ASSERT_EQ(nx_channel_init(&queue, storage, sizeof(storage), 1,
+                              sizeof(uint32_t), 16U),
               NX_SUCCESS);
     uint32_t first = 1;
-    ASSERT_EQ(nx_native_queue_send(&queue, &first, 0), NX_SUCCESS);
-    boundary.select(&queue.writable);
+    ASSERT_EQ(sendChannel(&queue, &first, 0), NX_SUCCESS);
+    boundary.select(&queue.queue.writable);
     std::atomic<nx_result_t> result{NX_ERROR_IO};
     std::thread producer([&] {
         uint32_t second = 2;
-        result = nx_native_queue_send(&queue, &second, NX_DEADLINE_NEVER);
+        result = sendChannel(&queue, &second, NX_DEADLINE_NEVER);
     });
     boundary.await();
-    EXPECT_EQ(nx_native_queue_close(&queue), NX_SUCCESS);
+    EXPECT_EQ(nx_channel_close(&queue), NX_SUCCESS);
     producer.join();
-    EXPECT_EQ(result.load(), NX_ERROR_STATE);
+    EXPECT_EQ(result.load(), NX_ERROR_CANCELLED);
     EXPECT_GE(boundary.infinite, 1U);
     EXPECT_EQ(boundary.timed, 0U);
     boundary.select(nullptr);
-    EXPECT_EQ(nx_native_queue_destroy(&queue), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_channel_destroy(&queue), NX_ERROR_BUSY);
     uint32_t received = 0;
-    EXPECT_EQ(nx_native_queue_receive(&queue, &received, 0), NX_SUCCESS);
+    EXPECT_EQ(receiveChannel(&queue, &received, 0), NX_SUCCESS);
     EXPECT_EQ(received, first);
-    EXPECT_EQ(nx_native_queue_receive(&queue, &received, 0), NX_ERROR_STATE);
-    EXPECT_EQ(nx_native_queue_destroy(&queue), NX_SUCCESS);
+    EXPECT_EQ(receiveChannel(&queue, &received, 0), NX_ERROR_CANCELLED);
+    EXPECT_EQ(nx_channel_destroy(&queue), NX_SUCCESS);
 }
 
 TEST(NativeQueue, CloseWakesBlockedConsumerAndPreservesOutputOnRejection) {
-    nx_native_queue_t queue;
+    nx_channel_t queue{};
     uint32_t storage[1];
-    ASSERT_EQ(nx_native_queue_init(&queue, storage, sizeof(storage), 1,
-                                   sizeof(uint32_t)),
+    ASSERT_EQ(nx_channel_init(&queue, storage, sizeof(storage), 1,
+                              sizeof(uint32_t), 16U),
               NX_SUCCESS);
-    boundary.select(&queue.readable);
+    boundary.select(&queue.queue.readable);
     std::atomic<nx_result_t> result{NX_ERROR_IO};
     uint32_t received = 99;
-    std::thread consumer([&] {
-        result = nx_native_queue_receive(&queue, &received, NX_DEADLINE_NEVER);
-    });
+    std::thread consumer(
+        [&] { result = receiveChannel(&queue, &received, NX_DEADLINE_NEVER); });
     boundary.await();
-    EXPECT_EQ(nx_native_queue_close(&queue), NX_SUCCESS);
+    EXPECT_EQ(nx_channel_close(&queue), NX_SUCCESS);
     consumer.join();
-    EXPECT_EQ(result.load(), NX_ERROR_STATE);
+    EXPECT_EQ(result.load(), NX_ERROR_CANCELLED);
     EXPECT_EQ(received, 99U);
     EXPECT_GE(boundary.infinite, 1U);
     EXPECT_EQ(boundary.timed, 0U);
     boundary.select(nullptr);
-    EXPECT_EQ(nx_native_queue_destroy(&queue), NX_SUCCESS);
+    EXPECT_EQ(nx_channel_destroy(&queue), NX_SUCCESS);
 }
 
 TEST(NativeQueue, ImmediateOperationsUseAvailableCapacityAtExpiredDeadline) {
-    nx_native_queue_t queue;
+    nx_channel_t queue{};
     uint32_t storage[1];
-    ASSERT_EQ(nx_native_queue_init(&queue, storage, sizeof(storage), 1,
-                                   sizeof(uint32_t)),
+    ASSERT_EQ(nx_channel_init(&queue, storage, sizeof(storage), 1,
+                              sizeof(uint32_t), 16U),
               NX_SUCCESS);
     uint32_t value = 7;
-    EXPECT_EQ(nx_native_queue_send(&queue, &value, 0), NX_SUCCESS);
-    EXPECT_EQ(nx_native_queue_send(&queue, &value, 0), NX_ERROR_TIMEOUT);
+    EXPECT_EQ(sendChannel(&queue, &value, 0), NX_SUCCESS);
+    EXPECT_EQ(sendChannel(&queue, &value, 0), NX_ERROR_TIMEOUT);
     uint32_t received = 0;
-    EXPECT_EQ(nx_native_queue_receive(&queue, &received, 0), NX_SUCCESS);
+    EXPECT_EQ(receiveChannel(&queue, &received, 0), NX_SUCCESS);
     EXPECT_EQ(received, value);
-    EXPECT_EQ(nx_native_queue_receive(&queue, &received, 0), NX_ERROR_TIMEOUT);
-    EXPECT_EQ(nx_native_queue_close(&queue), NX_SUCCESS);
-    EXPECT_EQ(nx_native_queue_destroy(&queue), NX_SUCCESS);
+    EXPECT_EQ(receiveChannel(&queue, &received, 0), NX_ERROR_TIMEOUT);
+    EXPECT_EQ(nx_channel_close(&queue), NX_SUCCESS);
+    EXPECT_EQ(nx_channel_destroy(&queue), NX_SUCCESS);
 }
 
 TEST(NativeQueue, MultipleProducersCloseThenDrainWithoutLosingItems) {
-    nx_native_queue_t queue;
+    nx_channel_t queue{};
     uint32_t storage[2];
-    ASSERT_EQ(nx_native_queue_init(&queue, storage, sizeof(storage), 2,
-                                   sizeof(uint32_t)),
+    ASSERT_EQ(nx_channel_init(&queue, storage, sizeof(storage), 2,
+                              sizeof(uint32_t), 16U),
               NX_SUCCESS);
     constexpr unsigned producerCount = 4;
     constexpr unsigned itemsPerProducer = 500;
@@ -608,8 +633,8 @@ TEST(NativeQueue, MultipleProducersCloseThenDrainWithoutLosingItems) {
         for (;;) {
             uint32_t value = 0;
             nx_result_t result =
-                nx_native_queue_receive(&queue, &value, NX_DEADLINE_NEVER);
-            if (result == NX_ERROR_STATE) {
+                receiveChannel(&queue, &value, NX_DEADLINE_NEVER);
+            if (result == NX_ERROR_CANCELLED) {
                 break;
             }
             if (result != NX_SUCCESS || value >= received.size()) {
@@ -624,7 +649,7 @@ TEST(NativeQueue, MultipleProducersCloseThenDrainWithoutLosingItems) {
         producers.emplace_back([&, id] {
             for (unsigned item = 0; item < itemsPerProducer; ++item) {
                 uint32_t value = id * itemsPerProducer + item;
-                if (nx_native_queue_send(&queue, &value, NX_DEADLINE_NEVER) !=
+                if (sendChannel(&queue, &value, NX_DEADLINE_NEVER) !=
                     NX_SUCCESS) {
                     ++errors;
                     break;
@@ -635,79 +660,78 @@ TEST(NativeQueue, MultipleProducersCloseThenDrainWithoutLosingItems) {
     for (auto& producer : producers) {
         producer.join();
     }
-    EXPECT_EQ(nx_native_queue_close(&queue), NX_SUCCESS);
+    EXPECT_EQ(nx_channel_close(&queue), NX_SUCCESS);
     consumer.join();
     EXPECT_EQ(errors.load(), 0U);
     for (unsigned count : received) {
         EXPECT_EQ(count, 1U);
     }
-    EXPECT_EQ(nx_native_queue_destroy(&queue), NX_SUCCESS);
+    EXPECT_EQ(nx_channel_destroy(&queue), NX_SUCCESS);
 }
 
 TEST(NativeQueue, RepeatedCloseIsIdempotentAndRejectsFutureAdmission) {
-    nx_native_queue_t queue;
+    nx_channel_t queue{};
     uint32_t storage[1];
-    ASSERT_EQ(nx_native_queue_init(&queue, storage, sizeof(storage), 1,
-                                   sizeof(uint32_t)),
+    ASSERT_EQ(nx_channel_init(&queue, storage, sizeof(storage), 1,
+                              sizeof(uint32_t), 16U),
               NX_SUCCESS);
-    EXPECT_EQ(nx_native_queue_close(&queue), NX_SUCCESS);
-    EXPECT_EQ(nx_native_queue_close(&queue), NX_SUCCESS);
+    EXPECT_EQ(nx_channel_close(&queue), NX_SUCCESS);
+    EXPECT_EQ(nx_channel_close(&queue), NX_SUCCESS);
     uint32_t item = 42;
-    EXPECT_EQ(nx_native_queue_send(&queue, &item, NX_DEADLINE_NEVER),
-              NX_ERROR_STATE);
-    EXPECT_EQ(nx_native_queue_receive(&queue, &item, NX_DEADLINE_NEVER),
-              NX_ERROR_STATE);
+    EXPECT_EQ(sendChannel(&queue, &item, NX_DEADLINE_NEVER),
+              NX_ERROR_CANCELLED);
+    EXPECT_EQ(receiveChannel(&queue, &item, NX_DEADLINE_NEVER),
+              NX_ERROR_CANCELLED);
     EXPECT_EQ(item, 42U);
-    EXPECT_EQ(nx_native_queue_destroy(&queue), NX_SUCCESS);
-    EXPECT_EQ(nx_native_queue_close(&queue), NX_ERROR_INVALID);
+    EXPECT_EQ(nx_channel_destroy(&queue), NX_SUCCESS);
+    EXPECT_EQ(nx_channel_close(&queue), NX_ERROR_INVALID);
 }
 
 TEST(NativeQueue, PayloadCannotOverwriteControlOrItsTail) {
-    for (size_t offset : {size_t{0}, sizeof(nx_native_queue_t) - 1U}) {
+    for (size_t offset : {size_t{0}, sizeof(nx_channel_t) - 1U}) {
         SCOPED_TRACE(offset);
-        nx_native_queue_t queue{};
+        nx_channel_t queue{};
         auto* overlapping = reinterpret_cast<unsigned char*>(&queue) + offset;
-        nx_result_t result = nx_native_queue_init(&queue, overlapping, 1, 1, 1);
+        nx_result_t result = nx_channel_init(&queue, overlapping, 1, 1, 1, 16U);
         if (result == NX_SUCCESS) {
-            EXPECT_EQ(nx_native_queue_close(&queue), NX_SUCCESS);
-            EXPECT_EQ(nx_native_queue_destroy(&queue), NX_SUCCESS);
+            EXPECT_EQ(nx_channel_close(&queue), NX_SUCCESS);
+            EXPECT_EQ(nx_channel_destroy(&queue), NX_SUCCESS);
         }
         EXPECT_EQ(result, NX_ERROR_INVALID);
     }
 }
 
 TEST(NativeQueue, PayloadSpanCannotWrapTheAddressSpace) {
-    nx_native_queue_t queue{};
+    nx_channel_t queue{};
     auto* wrapping = reinterpret_cast<void*>(UINTPTR_MAX - 3U);
-    nx_result_t result = nx_native_queue_init(&queue, wrapping, 8, 2, 4);
+    nx_result_t result = nx_channel_init(&queue, wrapping, 8, 2, 4, 16U);
     if (result == NX_SUCCESS) {
-        EXPECT_EQ(nx_native_queue_close(&queue), NX_SUCCESS);
-        EXPECT_EQ(nx_native_queue_destroy(&queue), NX_SUCCESS);
+        EXPECT_EQ(nx_channel_close(&queue), NX_SUCCESS);
+        EXPECT_EQ(nx_channel_destroy(&queue), NX_SUCCESS);
     }
     EXPECT_EQ(result, NX_ERROR_INVALID);
 }
 
 TEST(NativeQueue, AdjacentControlAndPayloadRemainUsable) {
     struct {
-        nx_native_queue_t queue{};
+        nx_channel_t queue{};
         uint32_t payload[2];
     } storage;
-    ASSERT_EQ(nx_native_queue_init(&storage.queue, storage.payload,
-                                   sizeof storage.payload, 2, sizeof(uint32_t)),
+    ASSERT_EQ(nx_channel_init(&storage.queue, storage.payload,
+                              sizeof storage.payload, 2, sizeof(uint32_t), 16U),
               NX_SUCCESS);
     uint32_t sent = 42U;
     uint32_t received = 0U;
-    EXPECT_EQ(nx_native_queue_send(&storage.queue, &sent, 0), NX_SUCCESS);
-    EXPECT_EQ(nx_native_queue_receive(&storage.queue, &received, 0),
-              NX_SUCCESS);
+    EXPECT_EQ(sendChannel(&storage.queue, &sent, 0), NX_SUCCESS);
+    EXPECT_EQ(receiveChannel(&storage.queue, &received, 0), NX_SUCCESS);
     EXPECT_EQ(received, sent);
-    EXPECT_EQ(nx_native_queue_close(&storage.queue), NX_SUCCESS);
-    EXPECT_EQ(nx_native_queue_destroy(&storage.queue), NX_SUCCESS);
+    EXPECT_EQ(nx_channel_close(&storage.queue), NX_SUCCESS);
+    EXPECT_EQ(nx_channel_destroy(&storage.queue), NX_SUCCESS);
 }
 
 TEST(NativeTask, ControlCannotOccupyTheSuppliedStack) {
     NativeStack stack;
-    auto* task = ::new (stack.bytes) nx_native_task_t{};
+    auto* task = ::new (stack.bytes) nx_task_t{};
     unsigned calls = 0;
     auto entry = [](void* context) { ++*static_cast<unsigned*>(context); };
     testing::StrictMock<ResourceBoundary> resources;
@@ -720,8 +744,8 @@ TEST(NativeTask, ControlCannotOccupyTheSuppliedStack) {
                 create(testing::_, testing::_, testing::_, testing::_))
         .Times(0);
     selectedResources = &resources;
-    nx_result_t result = nx_native_task_start(
-        task, stack.bytes, sizeof stack.bytes, entry, &calls);
+    nx_result_t result = nx_task_start(task, "native-test", stack.bytes,
+                                       sizeof stack.bytes, 0U, entry, &calls);
     selectedResources = nullptr;
     EXPECT_EQ(result, NX_ERROR_INVALID);
     EXPECT_FALSE(task->started);
@@ -733,23 +757,23 @@ TEST(NativeTask, ControlCannotOccupyTheSuppliedStack) {
 TEST(NativeTask, AdjacentStackAndControlRemainUsable) {
     struct {
         NativeStack stack;
-        nx_native_task_t task{};
+        nx_task_t task{};
         unsigned calls = 0;
     } storage;
     auto entry = [](void* context) { ++*static_cast<unsigned*>(context); };
-    ASSERT_EQ(nx_native_task_start(&storage.task, storage.stack.bytes,
-                                   sizeof storage.stack.bytes, entry,
-                                   &storage.calls),
+    ASSERT_EQ(nx_task_start(&storage.task, "native-test", storage.stack.bytes,
+                            sizeof storage.stack.bytes, 0U, entry,
+                            &storage.calls),
               NX_SUCCESS);
-    EXPECT_EQ(nx_native_task_join(&storage.task), NX_SUCCESS);
+    EXPECT_EQ(nx_task_join_until(&storage.task, NX_DEADLINE_NEVER), NX_SUCCESS);
     EXPECT_EQ(storage.calls, 1U);
 }
 
 TEST(NativeTask, JoinRejectsSelfThenConfirmsEntryExitAndAllowsReuse) {
     NativeStack stack;
-    nx_native_task_t task{};
+    nx_task_t task{};
     struct Context {
-        nx_native_task_t* task = nullptr;
+        nx_task_t* task = nullptr;
         std::mutex mutex;
         std::condition_variable admission;
         bool started = false;
@@ -761,54 +785,55 @@ TEST(NativeTask, JoinRejectsSelfThenConfirmsEntryExitAndAllowsReuse) {
         auto* state = static_cast<Context*>(opaque);
         std::unique_lock<std::mutex> lock(state->mutex);
         state->admission.wait(lock, [&] { return state->started; });
-        state->selfJoin = nx_native_task_join(state->task);
+        state->selfJoin = nx_task_join_until(state->task, NX_DEADLINE_NEVER);
         ++state->runs;
     };
     for (unsigned i = 0; i < 3; ++i) {
         context.started = false;
-        ASSERT_EQ(nx_native_task_start(&task, stack.bytes, sizeof(stack.bytes),
-                                       entry, &context),
+        ASSERT_EQ(nx_task_start(&task, "native-test", stack.bytes,
+                                sizeof(stack.bytes), 0U, entry, &context),
                   NX_SUCCESS);
         {
             std::lock_guard<std::mutex> lock(context.mutex);
             context.started = true;
             context.admission.notify_one();
         }
-        EXPECT_EQ(nx_native_task_join(&task), NX_SUCCESS);
-        EXPECT_EQ(context.selfJoin, NX_ERROR_BUSY);
+        EXPECT_EQ(nx_task_join_until(&task, NX_DEADLINE_NEVER), NX_SUCCESS);
+        EXPECT_EQ(context.selfJoin, NX_ERROR_CONTEXT);
         EXPECT_EQ(context.runs, i + 1);
         EXPECT_FALSE(task.started);
     }
-    EXPECT_EQ(nx_native_task_join(&task), NX_ERROR_INVALID);
+    EXPECT_EQ(nx_task_join_until(&task, NX_DEADLINE_NEVER), NX_ERROR_INVALID);
 }
 
 TEST(NativeTask, EntryMayRejectSelfJoinBeforeCreateReturns) {
     NativeStack stack;
-    nx_native_task_t task{};
+    nx_task_t task{};
     CreateBoundary created;
     struct Context {
-        nx_native_task_t* task;
+        nx_task_t* task;
         CreateBoundary* boundary;
         nx_result_t selfJoin = NX_SUCCESS;
     } context{&task, &created};
     auto entry = [](void* opaque) {
         auto* state = static_cast<Context*>(opaque);
-        state->selfJoin = nx_native_task_join(state->task);
+        state->selfJoin = nx_task_join_until(state->task, NX_DEADLINE_NEVER);
         state->boundary->finish();
     };
     selectedCreate = &created;
-    nx_result_t result = nx_native_task_start(
-        &task, stack.bytes, sizeof(stack.bytes), entry, &context);
+    nx_result_t result =
+        nx_task_start(&task, "native-test", stack.bytes, sizeof(stack.bytes),
+                      0U, entry, &context);
     selectedCreate = nullptr;
     ASSERT_EQ(result, NX_SUCCESS);
-    EXPECT_EQ(context.selfJoin, NX_ERROR_BUSY);
-    EXPECT_EQ(nx_native_task_join(&task), NX_SUCCESS);
+    EXPECT_EQ(context.selfJoin, NX_ERROR_CONTEXT);
+    EXPECT_EQ(nx_task_join_until(&task, NX_DEADLINE_NEVER), NX_SUCCESS);
     EXPECT_FALSE(task.started);
 }
 
 TEST(NativeTask, CreationExhaustionDoesNotRetainEntryOrContext) {
     NativeStack stack;
-    nx_native_task_t task{};
+    nx_task_t task{};
     unsigned calls = 0;
     auto entry = [](void* context) { ++*static_cast<unsigned*>(context); };
     testing::StrictMock<ResourceBoundary> resources;
@@ -817,18 +842,18 @@ TEST(NativeTask, CreationExhaustionDoesNotRetainEntryOrContext) {
     EXPECT_CALL(resources, create(&task.thread, testing::_, testing::_, &task))
         .WillOnce(testing::Return(EAGAIN));
     selectedResources = &resources;
-    nx_result_t result = nx_native_task_start(
-        &task, stack.bytes, sizeof(stack.bytes), entry, &calls);
+    nx_result_t result = nx_task_start(&task, "native-test", stack.bytes,
+                                       sizeof(stack.bytes), 0U, entry, &calls);
     selectedResources = nullptr;
     EXPECT_EQ(result, NX_ERROR_EXHAUSTED);
     EXPECT_FALSE(task.started);
     EXPECT_EQ(task.entry, nullptr);
     EXPECT_EQ(task.context, nullptr);
     EXPECT_EQ(calls, 0U);
-    ASSERT_EQ(nx_native_task_start(&task, stack.bytes, sizeof(stack.bytes),
-                                   entry, &calls),
+    ASSERT_EQ(nx_task_start(&task, "native-test", stack.bytes,
+                            sizeof(stack.bytes), 0U, entry, &calls),
               NX_SUCCESS);
-    ASSERT_EQ(nx_native_task_join(&task), NX_SUCCESS);
+    ASSERT_EQ(nx_task_join_until(&task, NX_DEADLINE_NEVER), NX_SUCCESS);
     EXPECT_EQ(calls, 1U);
 }
 
@@ -836,25 +861,25 @@ class NativeTaskAttributeFailure : public testing::TestWithParam<int> {};
 
 TEST_P(NativeTaskAttributeFailure, ExhaustionRetainsUnusedReusableHandle) {
     NativeStack stack;
-    nx_native_task_t task{};
+    nx_task_t task{};
     unsigned calls = 0;
     auto entry = [](void* context) { ++*static_cast<unsigned*>(context); };
     testing::StrictMock<ResourceBoundary> resources;
     EXPECT_CALL(resources, initialize(testing::A<pthread_attr_t*>()))
         .WillOnce(testing::Return(GetParam()));
     selectedResources = &resources;
-    nx_result_t result = nx_native_task_start(
-        &task, stack.bytes, sizeof(stack.bytes), entry, &calls);
+    nx_result_t result = nx_task_start(&task, "native-test", stack.bytes,
+                                       sizeof(stack.bytes), 0U, entry, &calls);
     selectedResources = nullptr;
     EXPECT_EQ(result, NX_ERROR_EXHAUSTED);
     EXPECT_FALSE(task.started);
     EXPECT_EQ(task.entry, nullptr);
     EXPECT_EQ(task.context, nullptr);
     EXPECT_EQ(calls, 0U);
-    ASSERT_EQ(nx_native_task_start(&task, stack.bytes, sizeof(stack.bytes),
-                                   entry, &calls),
+    ASSERT_EQ(nx_task_start(&task, "native-test", stack.bytes,
+                            sizeof(stack.bytes), 0U, entry, &calls),
               NX_SUCCESS);
-    EXPECT_EQ(nx_native_task_join(&task), NX_SUCCESS);
+    EXPECT_EQ(nx_task_join_until(&task, NX_DEADLINE_NEVER), NX_SUCCESS);
     EXPECT_EQ(calls, 1U);
 }
 
@@ -862,8 +887,8 @@ INSTANTIATE_TEST_SUITE_P(ResourceErrors, NativeTaskAttributeFailure,
                          testing::Values(EAGAIN, ENOMEM));
 
 TEST(NativeNotify, PartialDestroyRetriesOnlyOwnedResources) {
-    nx_native_notify_t notification;
-    ASSERT_EQ(nx_native_notify_init(&notification), NX_SUCCESS);
+    nx_notify_t notification{};
+    ASSERT_EQ(nx_notify_init(&notification), NX_SUCCESS);
     testing::StrictMock<ResourceBoundary> resources;
     testing::InSequence order;
     EXPECT_CALL(resources, destroy(&notification.condition))
@@ -873,70 +898,71 @@ TEST(NativeNotify, PartialDestroyRetriesOnlyOwnedResources) {
     EXPECT_CALL(resources, destroy(&notification.mutex))
         .WillOnce(testing::Invoke(__real_pthread_mutex_destroy));
     selectedResources = &resources;
-    EXPECT_EQ(nx_native_notify_destroy(&notification), NX_ERROR_BUSY);
-    EXPECT_EQ(nx_native_notify_port(&notification).context, nullptr);
-    EXPECT_EQ(nx_native_notify_destroy(&notification), NX_SUCCESS);
+    EXPECT_EQ(nx_notify_destroy(&notification), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_notify_port(&notification).context, nullptr);
+    EXPECT_EQ(nx_notify_destroy(&notification), NX_SUCCESS);
     selectedResources = nullptr;
 }
 
 TEST(NativeQueue, PartialDestroyRetriesOnlyOwnedResources) {
-    nx_native_queue_t queue;
+    nx_channel_t queue{};
     uint32_t storage[1];
-    ASSERT_EQ(nx_native_queue_init(&queue, storage, sizeof(storage), 1,
-                                   sizeof(uint32_t)),
+    ASSERT_EQ(nx_channel_init(&queue, storage, sizeof(storage), 1,
+                              sizeof(uint32_t), 16U),
               NX_SUCCESS);
-    ASSERT_EQ(nx_native_queue_close(&queue), NX_SUCCESS);
+    ASSERT_EQ(nx_channel_close(&queue), NX_SUCCESS);
     testing::StrictMock<ResourceBoundary> resources;
     testing::InSequence order;
-    EXPECT_CALL(resources, destroy(&queue.readable))
+    EXPECT_CALL(resources, destroy(&queue.queue.readable))
         .WillOnce(testing::Invoke(__real_pthread_cond_destroy));
-    EXPECT_CALL(resources, destroy(&queue.writable))
+    EXPECT_CALL(resources, destroy(&queue.queue.writable))
         .WillOnce(testing::Return(EBUSY));
-    EXPECT_CALL(resources, destroy(&queue.writable))
+    EXPECT_CALL(resources, destroy(&queue.queue.writable))
         .WillOnce(testing::Invoke(__real_pthread_cond_destroy));
-    EXPECT_CALL(resources, destroy(&queue.mutex))
+    EXPECT_CALL(resources, destroy(&queue.queue.mutex))
         .WillOnce(testing::Invoke(__real_pthread_mutex_destroy));
     selectedResources = &resources;
-    EXPECT_EQ(nx_native_queue_destroy(&queue), NX_ERROR_BUSY);
-    EXPECT_FALSE(queue.initialized);
-    EXPECT_EQ(nx_native_queue_destroy(&queue), NX_SUCCESS);
+    EXPECT_EQ(nx_channel_destroy(&queue), NX_ERROR_BUSY);
+    EXPECT_FALSE(queue.queue.initialized);
+    EXPECT_EQ(nx_channel_destroy(&queue), NX_SUCCESS);
     selectedResources = nullptr;
 }
 
 TEST(NativeQueue, FailedCreationCanFinishItsFailedRollback) {
-    nx_native_queue_t queue;
+    nx_channel_t queue{};
     uint32_t storage[1];
     testing::StrictMock<ResourceBoundary> resources;
     testing::InSequence order;
-    EXPECT_CALL(resources, initialize(&queue.readable, testing::_))
+    EXPECT_CALL(resources, initialize(&queue.queue.readable, testing::_))
         .WillOnce(testing::Invoke(__real_pthread_cond_init));
-    EXPECT_CALL(resources, initialize(&queue.writable, testing::_))
+    EXPECT_CALL(resources, initialize(&queue.queue.writable, testing::_))
         .WillOnce(testing::Return(EAGAIN));
-    EXPECT_CALL(resources, destroy(&queue.readable))
+    EXPECT_CALL(resources, destroy(&queue.queue.readable))
         .WillOnce(testing::Return(EBUSY));
-    EXPECT_CALL(resources, destroy(&queue.readable))
+    EXPECT_CALL(resources, destroy(&queue.queue.readable))
         .WillOnce(testing::Invoke(__real_pthread_cond_destroy));
-    EXPECT_CALL(resources, destroy(&queue.mutex))
+    EXPECT_CALL(resources, destroy(&queue.queue.mutex))
         .WillOnce(testing::Invoke(__real_pthread_mutex_destroy));
     selectedResources = &resources;
-    EXPECT_EQ(nx_native_queue_init(&queue, storage, sizeof(storage), 1,
-                                   sizeof(uint32_t)),
+    EXPECT_EQ(nx_channel_init(&queue, storage, sizeof(storage), 1,
+                              sizeof(uint32_t), 16U),
               NX_ERROR_BUSY);
-    EXPECT_FALSE(queue.initialized);
-    EXPECT_EQ(nx_native_queue_destroy(&queue), NX_SUCCESS);
+    EXPECT_FALSE(queue.queue.initialized);
+    EXPECT_EQ(nx_channel_destroy(&queue), NX_SUCCESS);
     selectedResources = nullptr;
 }
 
 TEST(NativeTask, SmallStackRejectionRetainsUnusedHandle) {
     NativeStack stack;
-    nx_native_task_t task{};
+    nx_task_t task{};
     unsigned calls = 0;
     auto entry = [](void* context) { ++*static_cast<unsigned*>(context); };
-    EXPECT_EQ(nx_native_task_start(&task, stack.bytes, 16, entry, &calls),
-              NX_ERROR_INVALID);
+    EXPECT_EQ(
+        nx_task_start(&task, "native-test", stack.bytes, 16, 0U, entry, &calls),
+        NX_ERROR_INVALID);
     EXPECT_FALSE(task.started);
     EXPECT_EQ(task.entry, nullptr);
     EXPECT_EQ(task.context, nullptr);
     EXPECT_EQ(calls, 0U);
-    EXPECT_EQ(nx_native_task_join(&task), NX_ERROR_INVALID);
+    EXPECT_EQ(nx_task_join_until(&task, NX_DEADLINE_NEVER), NX_ERROR_INVALID);
 }

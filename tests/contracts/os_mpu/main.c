@@ -7,8 +7,8 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #define MPU_WRAPPERS_INCLUDED_FROM_API_FILE
-#include "nexus/os/freertos.h"
 #include "nexus/os/freertos_mpu.h"
+#include "nexus/os/storage.h"
 
 void _start(void);
 void SVC_Handler(void);
@@ -31,7 +31,7 @@ void vApplicationGetIdleTaskMemory(StaticTask_t** control, StackType_t** stack,
 #endif
 
 static nx_freertos_mpu_task_t task NX_FREERTOS_PRIVILEGED_DATA;
-static nx_freertos_permanent_task_t privileged_task;
+static nx_permanent_task_t privileged_task;
 static StackType_t privileged_stack[256];
 static StackType_t user_stack[256] NX_FREERTOS_USER_DATA
     __attribute__((aligned(1024)));
@@ -82,9 +82,9 @@ void _start(void) {
     (void)nx_freertos_mpu_task_start(&task, &config);
     (void)nx_freertos_mpu_task_delete(&task);
     (void)nx_freertos_mpu_task_start(&task, &config);
-    (void)nx_freertos_permanent_task_start(&privileged_task, "owner",
-                                           privileged_stack, 256, 2,
-                                           privileged_entry, NULL);
+    (void)nx_permanent_task_start(&privileged_task, "owner", privileged_stack,
+                                  (256) * sizeof(StackType_t), 2,
+                                  privileged_entry, NULL);
     vTaskStartScheduler();
     for (;;) {
     }
