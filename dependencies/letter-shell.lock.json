@@ -5,15 +5,16 @@
   "path": "ext/letter_shell",
   "upstream_url": "https://github.com/NevermindZZT/letter-shell.git",
   "fetch_url": "https://github.com/X-Gen-Lab/letter-shell.git",
-  "commit": "03432e824ca889d961743b437bce3f837c47bb86",
-  "tree": "234664240be6352eeddbeb7ad4cf5b22e76ecf94",
+  "commit": "b149c4d84ac5b5ea9950ce9154f264a9279ff736",
+  "tree": "942c645c8e86cb47276eeae8675e7377f6918af9",
   "license": {
     "path": "LICENSE",
     "expression": "MIT"
   },
   "files": {
     "LICENSE": "0f31e3db830a1862679a450f17e442c97537f96aa9ed3434f82949d5300a0cbd",
-    "src/shell.c": "a7f735b2733005ad3bb1b1f25aff64d8fde8ce194b8cab4cc0cd77b5175e9b9e",
+    "NEXUS-SOURCE-CURATION.md": "ec8b6c0daab658c8c299c7d1b1f16872de46a1a63c53ae7e8d4d997a98181e99",
+    "src/shell.c": "436a35f1aeb8290d2bdfe25efd3ee70d8bcfa7814807ab683b10e80cce58a3b8",
     "src/shell.h": "71b3460a3ab3b90b47ddd77a47d4e8f10ce2e06248edf9f078a051198ef80ab9",
     "src/shell_cfg.h": "e8d57fc01eab0cd15e866b4491e147d57eb8f18a6d1a9e20d285d89e6bdfe431",
     "src/shell_cmd_list.c": "de9e1006300703c8fb734152acfe11718467cd3446cb7248868c2e3c80fbdb62",

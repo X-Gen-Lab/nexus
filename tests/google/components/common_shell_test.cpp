@@ -60,6 +60,9 @@ TEST(CommonShell, RealParserRunsReadOnlyCommandsAndRejectsMaintenanceNames) {
     EXPECT_NE(terminal.output.find("resources=unknown"), std::string::npos);
     EXPECT_NE(terminal.output.find("reset=0x00000048"), std::string::npos);
     EXPECT_NE(terminal.output.find("Command not Found"), std::string::npos);
+    terminal.input = {0x80U, 0xFFU, 0x08U, 0x08U, '\n'};
+    while (!terminal.input.empty())
+        ASSERT_EQ(nx_shell_step(&shell, 500), NX_SUCCESS);
     EXPECT_EQ(nx_shell_step(&shell, 500), NX_ERROR_EMPTY);
     EXPECT_EQ(nx_shell_stop(&shell), NX_SUCCESS);
     EXPECT_EQ(nx_shell_step(&shell, 500), NX_ERROR_STATE);
