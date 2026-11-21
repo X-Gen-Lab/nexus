@@ -1,0 +1,19 @@
+{
+  "sources": [
+    {
+      "url": "https://www.st.com/resource/en/programming_manual/dm00046982-stm32-cortex-m4-mcus-and-mpus-programming-manual-stmicroelectronics.pdf",
+      "publisher": "STMicroelectronics",
+      "document": "PM0214 STM32 Cortex-M4 MCUs and MPUs programming manual",
+      "revision": "Rev 10",
+      "sha256": "fb54012a46c674a26dee56bc8cdfa281315f78634f18998001144980b08d1b03",
+      "bytes": 2732268,
+      "sections": [
+        "page 43 Figure 12 Cortex-M4 stack frame layout",
+        "page 44 Table 18 Exception return behavior",
+        "page 237 Configurable fault status register"
+      ]
+    }
+  ],
+  "reviewed_scope": "Selected F407 Cortex-M4F exception entry: core registers at raw IRQ SP, optional trailing FP state, complete frame bounds and stacking/unstacking/lazy-state fault gating; no TrustZone or other core layout claim",
+  "physical_status": "not_executed"
+}

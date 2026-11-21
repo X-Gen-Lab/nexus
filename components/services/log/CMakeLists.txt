@@ -11,3 +11,4 @@ target_link_libraries(
     PRIVATE nexus_arch nexus_owned_warnings nexus_build_options
 )
 add_library(Nexus::Log ALIAS nexus_log)
+include("${CMAKE_CURRENT_SOURCE_DIR}/formatter.cmake")

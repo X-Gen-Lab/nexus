@@ -324,6 +324,8 @@ static nx_result_t read_byte(nx_software_i2c_t* owner, uint8_t* byte, bool last,
 static nx_result_t stop_wire(nx_software_i2c_t* owner, nx_time_us_t deadline) {
     nx_result_t result = observe(owner, deadline);
     if (result == NX_SUCCESS) {
+        /* Starting a new waveform invalidates any older idle observation. */
+        owner->stop_proved = false;
         result = drive(owner->config->scl, false);
     }
     if (result == NX_SUCCESS) {
@@ -353,6 +355,10 @@ static nx_result_t stop_wire(nx_software_i2c_t* owner, nx_time_us_t deadline) {
         if (result == NX_SUCCESS && !high) {
             result = NX_ERROR_BUSY;
         }
+    }
+    if (result == NX_SUCCESS) {
+        /* The final input callback can outlast the last timed wait. */
+        result = observe(owner, deadline);
     }
     if (result == NX_SUCCESS) {
         owner->bus_active = false;

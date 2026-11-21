@@ -24,8 +24,8 @@ class LwIPProfilesTests(unittest.TestCase):
         source = self.directory / "consumer source"
         source.mkdir()
         (source / "main.c").write_text("int main(void) { return 0; }\n")
-        # Prerequisite interfaces provide graph identities only. The component,
-        # target policy and pinned-source verifier are the maintained files.
+        # I/O and policy interfaces provide graph identities only. Core, the
+        # component, target policy and source verifier use maintained files.
         (source / "CMakeLists.txt").write_text(
             'cmake_minimum_required(VERSION 3.31)\n'
             'project(lwip_profile_admission C)\n'
@@ -46,6 +46,7 @@ class LwIPProfilesTests(unittest.TestCase):
             'add_library(nexus_build_options INTERFACE)\n'
             'add_library(nexus_owned_warnings INTERFACE)\n'
             f'include("{ROOT.as_posix()}/cmake/platform/TargetPolicy.cmake")\n'
+            f'add_subdirectory("{ROOT.as_posix()}/core" core)\n'
             f'add_subdirectory("{NETWORK_COMPONENT.as_posix()}" network)\n'
             'nexus_add_lwip()\n'
             'add_executable(consumer main.c)\n'

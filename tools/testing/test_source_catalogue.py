@@ -56,7 +56,9 @@ class SourceCatalogueTests(unittest.TestCase):
         self.assertEqual({item.identifier for item in catalogue.SOURCE_DEPENDENCIES}, {
             "freertos", "cmsis_core", "stm32f4_cmsis", "stm32f4_hal",
             "threadx", "lwip", "mbedtls", "coremqtt", "mcuboot",
-            "stm32_usb_host", "stm32_usb_device"})
+            "stm32_usb_host", "stm32_usb_device", "flashdb", "littlefs",
+            "fatfs", "sfud", "segger_rtt", "letter_shell", "cm_backtrace",
+            "cmsis_dsp"})
         self.assertEqual({item.identifier for item in catalogue.HOST_TEST_DEPENDENCIES},
                          {"googletest"})
         self.assertEqual(catalogue.dependency("googletest").scope, "host-test")

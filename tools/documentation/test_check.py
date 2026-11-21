@@ -349,12 +349,16 @@ class SourceSDKInstructionTests(unittest.TestCase):
         self.assertEqual({package.id for package in selection.packages}, {"stm32f4"})
         self.assertEqual(set(selection.components), {
             "network", "network-loaned-rx", "tls", "mqtt", "mcuboot",
-            "st-usb-device", "st-usb-host"})
+            "st-usb-device", "st-usb-host", "flashdb", "littlefs", "fatfs",
+            "sfud", "rtt", "shell", "cmsis-dsp", "cm-backtrace"})
         selected = set(packager.runtime_dependency_closure(root=root, selection=selection))
         self.assertTrue({"ext/lwip", "ext/mbedtls", "ext/coremqtt",
                          "ext/mcuboot", "ext/freertos", "vendors/st/usb_device",
-                         "vendors/st/usb_host"}.issubset(selected),
-                        "The complete plan includes network, TLS, MQTT, boot and ST USB users")
+                         "vendors/st/usb_host", "ext/flashdb", "ext/littlefs",
+                         "ext/fatfs", "ext/sfud", "ext/segger-rtt",
+                         "ext/letter_shell", "vendors/arm/CMSIS_DSP",
+                         "ext/cm_backtrace"}.issubset(selected),
+                        "The complete plan includes every selected service supplier")
 
 
 if __name__ == "__main__":

@@ -17,7 +17,10 @@ class ComponentCatalogTests(unittest.TestCase):
         self.assertEqual(entries["log"].entry, "")
         self.assertEqual(entries["tls"].entry,
                          "components/protocols/tls/Select.cmake")
-        self.assertEqual(len(entries), 21)
+        for component in entries.values():
+            if component.entry:
+                self.assertTrue((ROOT / component.entry).is_file(),
+                                component.entry)
         with self.assertRaises(TypeError):
             entries["other"] = entries["log"]
 

@@ -20,16 +20,23 @@
 #define LWIP_RAW             1
 #define LWIP_UDP             1
 #define LWIP_TCP             1
-#define LWIP_DHCP            0
-#define LWIP_DNS             0
-#define LWIP_AUTOIP          0
-#define LWIP_IGMP            0
-#define LWIP_ALTCP           0
-#define LWIP_NETIF_HOSTNAME  0
-#define LWIP_SINGLE_NETIF    1
-#define LWIP_NETIF_LOOPBACK  0
-#define LWIP_STATS           0
-#define LWIP_DEBUG           0
+#if defined(NEXUS_LWIP_MANAGED)
+#define LWIP_DHCP           1
+#define LWIP_DNS            1
+#define DNS_TABLE_SIZE      2
+#define DNS_MAX_NAME_LENGTH 128
+#else
+#define LWIP_DHCP 0
+#define LWIP_DNS  0
+#endif
+#define LWIP_AUTOIP         0
+#define LWIP_IGMP           0
+#define LWIP_ALTCP          0
+#define LWIP_NETIF_HOSTNAME 0
+#define LWIP_SINGLE_NETIF   1
+#define LWIP_NETIF_LOOPBACK 0
+#define LWIP_STATS          0
+#define LWIP_DEBUG          0
 #if UINTPTR_MAX > UINT32_MAX
 #define MEM_ALIGNMENT 8
 #else

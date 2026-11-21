@@ -40,11 +40,19 @@ broker 会话、网络或 Board 资格。TCP／TLS／MQTT 的主机参考关系�
 
 ## 能力与状态归属
 
-首个 profile 提供 clean-session CONNECT、QoS0／1 PUBLISH、每次一个 filter 的
+当前 profile 提供默认 clean-session CONNECT、显式 session flag／last-will CONNECT、
+QoS0／1 PUBLISH、每次一个 filter 的
 SUBSCRIBE／UNSUBSCRIBE、PUBACK／SUBACK／UNSUBACK 关联、接收 publish、DISCONNECT
 及调用者推进的 keepalive／process。topic、凭据、授权、重连、离线队列、语义重试
-数据、持久化和 broker 选择属于产品。QoS2、持久 session 恢复／重放、last will、
+数据、持久化和 broker 选择属于产品。QoS2、自动持久 session 恢复／payload 重放、
 MQTT 5 与自动重连不在此范围。
+
+`nx_mqtt_connect_options` 显式传入 clean_session 和可选 QoS0／1 last will，
+成功后返回 broker 的 session_present；topic／payload 仅在本次同步调用借用。
+Will 是 broker 在异常断连时发布的协议配置，不是客户端本地的掉线通知。
+clean_session=false 允许保留 broker 会话，但不保存本地 payload、重建 transport
+或恢复业务 outbox。产品依据 session_present 决定订阅恢复与消息重试；
+控制请求 ACK slots 在每次成功 CONNECT 后清空，避免把旧连接响应关联到新请求。
 
 输入须满足 MQTT UTF-8；adapter 不增加 Unicode codec，也不扩大固定库验证之外的
 认证承诺。基本长度、NUL／topic wildcard 约束和 filter 位置在 I/O 前检查。

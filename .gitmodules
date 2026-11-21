@@ -83,3 +83,27 @@
 [submodule "vendors/st/usb_host"]
 	path = vendors/st/usb_host
 	url = https://github.com/X-Gen-Lab/stm32-mw-usb-host.git
+[submodule "ext/flashdb"]
+	path = ext/flashdb
+	url = https://github.com/X-Gen-Lab/FlashDB.git
+[submodule "ext/segger-rtt"]
+	path = ext/segger-rtt
+	url = https://github.com/X-Gen-Lab/RTT.git
+[submodule "ext/cm_backtrace"]
+	path = ext/cm_backtrace
+	url = https://github.com/X-Gen-Lab/CmBacktrace.git
+[submodule "ext/letter_shell"]
+	path = ext/letter_shell
+	url = https://github.com/X-Gen-Lab/letter-shell.git
+[submodule "vendors/arm/CMSIS_DSP"]
+	path = vendors/arm/CMSIS_DSP
+	url = https://github.com/X-Gen-Lab/CMSIS-DSP.git
+[submodule "ext/littlefs"]
+	path = ext/littlefs
+	url = https://github.com/X-Gen-Lab/littlefs.git
+[submodule "ext/sfud"]
+	path = ext/sfud
+	url = https://github.com/X-Gen-Lab/SFUD.git
+[submodule "ext/fatfs"]
+	path = ext/fatfs
+	url = https://github.com/X-Gen-Lab/stm32-mw-fatfs.git

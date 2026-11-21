@@ -50,3 +50,5 @@ deadline，观察最多可滞后这一有界批次。不推导 DMA、连续图�
 
 协议依据为 ILITEK *ILI9341* 的 01h、11h、28h、29h、2Ah／2Bh／2Ch、36h、3Ah、
 D3h 命令及 reset／sleep-out 恢复限制。只使用文档事实，不分发参考 PDF。
+精确来源、版本、镜像 URL 和已核对的 SHA-256 见 `references.json`。
+ILITEK V1.11 文档由 Adafruit 镜像取得，不宣称镜像验证了已焊 panel 的身份。

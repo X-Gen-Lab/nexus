@@ -1,0 +1,781 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: e547bad15e7dba55c45f53c28ecdf3e4def49daccc133395423302edd658b4cb\n"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:10
+msgid "Explicit-event runtime helpers"
+msgstr "显式事件运行辅助组件"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:12
+msgid ""
+"These optional C11 helpers run in the caller's existing serialized execution"
+" path. They do not create threads, OS timers, global ticks or another event "
+"queue. Keep immutable tables and contexts live through the final call, and "
+"provide independent state for each instance."
+msgstr ""
+"这些可选 C11 辅助组件在调用方已有的串行执行路径中运行，不创建线程、OS timer、全局 tick "
+"或另一套事件队列。不可变表和上下文必须存活到最后一次调用结束，每个实例都须提供独立状态。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:0
+msgid "Target"
+msgstr "目标"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:0
+msgid "Public header under `nexus/components/`"
+msgstr "`nexus/components/` 下的公共头文件"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:0
+msgid "Selected behavior"
+msgstr "所选行为"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:0
+msgid "`Nexus::FSM`"
+msgstr "`Nexus::FSM`"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:0
+msgid "`fsm.h`"
+msgstr "`fsm.h`"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:0
+msgid ""
+"Flat synchronous run-to-completion; ordered guards and explicit "
+"internal/external transitions"
+msgstr "平面同步执行至完成；有序 guard 及显式内部／外部转换"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:0
+msgid "`Nexus::Periodic`"
+msgstr "`Nexus::Periodic`"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:0
+msgid "`periodic.h`"
+msgstr "`periodic.h`"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:0
+msgid "Fixed-phase release calculation with skip or caller-bounded catch-up"
+msgstr "固定相位释放计算，支持跳过或调用方限定的追赶"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:0
+msgid "`Nexus::Timers`"
+msgstr "`Nexus::Timers`"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:0
+msgid "`timers.h`"
+msgstr "`timers.h`"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:0
+msgid "Exact caller slots, O(capacity) scan and stable slot/epoch tickets"
+msgstr "调用方提供精确槽位，O(capacity) 扫描及稳定 slot/epoch ticket"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:0
+msgid "`Nexus::Debounce`"
+msgstr "`Nexus::Debounce`"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:0
+msgid "`debounce.h`"
+msgstr "`debounce.h`"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:0
+msgid "Boolean stability with independent rising/falling intervals"
+msgstr "具有独立上升／下降间隔的布尔稳定判定"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:0
+msgid "`Nexus::EventFanout`"
+msgstr "`Nexus::EventFanout`"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:0
+msgid "`event_fanout.h`"
+msgstr "`event_fanout.h`"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:0
+msgid "Ordered synchronous sinks with per-emission delivery accounting"
+msgstr "有序同步 sink，逐次统计分发结果"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:25
+msgid ""
+"FSM callbacks must finish within the caller's budget. Events are borrowed "
+"only during dispatch; a callback cannot retain their payload implicitly. The"
+" flat profile does not implement hierarchical states, history or orthogonal "
+"regions; that choice remains `not_selected`. See the [FSM "
+"contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/components/runtime/fsm/README.md) for transition ordering and reentry"
+" rejection."
+msgstr ""
+"FSM 回调必须在调用方预算内结束。事件仅在 dispatch 期间被借用；回调不能隐式保留其 payload。平面 profile "
+"不实现层次状态、历史或正交区域；该选项保持 `not_selected`。转换顺序和重入拒绝见 [FSM "
+"合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/components/runtime/fsm/README.md)。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:31
+msgid ""
+"Periodic, Timers and Debounce consume finite Core microsecond observations. "
+"After a clock reset or domain change, join former users and explicitly reset"
+" or reinitialize the helper. A new numerical deadline alone does not prove "
+"epoch continuity. Periodic releases retain planned phase; they do not "
+"refresh the deadline of an already queued I/O request. Timers preserve "
+"identity counters on reset so a stale ticket cannot cancel a newly armed "
+"event."
+msgstr ""
+"Periodic、Timers 和 Debounce 使用有限的 Core 微秒时间观察值。时钟重置或域变化后，须等待旧使用者退出，再显式 reset "
+"或重新初始化辅助组件。仅有新的数值截止时间不能证明代次连续。周期释放保持计划相位，不刷新已经排队的 I/O 请求截止时间。Timers 在 reset "
+"时保留身份计数器，因此旧 ticket 不能取消新设置的事件。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:38
+msgid ""
+"EventFanout attempts the declared sinks and reports their individual outcome"
+" counts and first error; its successful return does not mean every sink "
+"accepted the message. Queue sinks use the existing queue's capacity and "
+"context rules. Stream sinks retain the existing "
+"reserve/publish/acquire/release contract. Copying a pointer in a message "
+"does not transfer the pointed-to storage."
+msgstr ""
+"EventFanout 尝试已声明的 sink，并报告各结果的计数及第一个错误；返回成功不表示每个 sink 都接受了消息。队列 sink "
+"使用已有队列的容量与上下文规则。stream sink 保留既有 reserve/publish/acquire/release "
+"合同。复制消息中的指针不转移其指向存储的所有权。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:44
+msgid ""
+"Close upstream event admission before joining dispatchers and sinks. Then "
+"drain accepted I/O through its existing owner and join observers before "
+"reclaiming shared storage. [Owners](owners.md), [ClockDomain](clock-"
+"domain.md) and the [I/O execution guide](../../../../guides/io-execution.md)"
+" provide those separate lifecycle contracts. These helpers do not establish "
+"callback WCET, GPIO timing or scheduler latency; physical timing remains "
+"`not_executed`."
+msgstr ""
+"先关闭上游事件准入，再等待 dispatcher 和 sink 退出。随后通过既有 owner 排空已接受的 "
+"I/O，并等待观察者退出后再回收共享存储。[Owners](owners.md)、[ClockDomain](clock-domain.md) 和 "
+"[I/O 执行指南](../../../../guides/io-execution.md) 分别规定这些生命周期合同。这些辅助组件不证明回调 "
+"WCET、GPIO 时序或调度延迟；物理时序保持 `not_executed`。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:51
+msgid "Public declarations"
+msgstr "公共声明"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:53
+msgid "fsm.h"
+msgstr "fsm.h"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:55
+msgid "Synchronous table-driven finite state machines."
+msgstr "同步表驱动有限状态机。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:55
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:61
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:67
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:73
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:79
+msgid ""
+"Author  Nexus Team   Version  1.0.0   Date  2026-11-21   Copyright  "
+"Copyright (c) 2026 Nexus Team"
+msgstr ""
+"作者  Nexus Team   版本  1.0.0   日期  2026-11-21   版权  Copyright (c) 2026 Nexus "
+"Team"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:55
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:61
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:67
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:73
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:79
+msgid "Nexus Team"
+msgstr "Nexus Team"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:55
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:61
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:67
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:73
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:79
+msgid "1.0.0"
+msgstr "1.0.0"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:55
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:61
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:67
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:73
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:79
+msgid "2026-11-21"
+msgstr "2026-11-21"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:55
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:61
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:67
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:73
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:79
+msgid "Copyright (c) 2026 Nexus Team"
+msgstr "Copyright (c) 2026 Nexus Team"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:55
+msgid "Typedefs"
+msgstr "类型定义"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:55
+msgid "Bounded callbacks on the caller's serialized execution context."
+msgstr "在调用方串行执行上下文中运行的有界回调。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:55
+msgid "A guard must not mutate the machine or retain the borrowed event."
+msgstr "guard 不得修改状态机或保留借用的事件。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:55
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:61
+msgid "Enums"
+msgstr "枚举"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:55
+msgid "External transitions run exit/entry, including external self loops."
+msgstr "外部转换执行 exit/entry，包括外部自循环。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:55
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:61
+msgid "Values:"
+msgstr "取值："
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:55
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:61
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:67
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:73
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:79
+msgid "Functions"
+msgstr "函数"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:55
+msgid "Validate tables and enter one explicit initial state."
+msgstr "校验表并进入显式指定的初始状态。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:55
+msgid ""
+"Initial entry receives a NULL event. Reinitializing an idle instance "
+"replaces its configuration without an exit action. This is an explicit "
+"reset, with no retained event to drain. Work is bounded by table size and "
+"the one entry callback; callbacks must not block and have no "
+"failure/rollback path."
+msgstr ""
+"初始 entry 接收 NULL 事件。重新初始化空闲实例会替换其配置，不执行 exit action。这是显式 "
+"reset，没有需要排空的保留事件。工作量受表大小及一次 entry 回调约束；回调不得阻塞，且没有失败／回滚路径。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:0
+msgid "Parameters"
+msgstr "参数"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:55
+msgid "[inout] Zero or idle caller-owned instance."
+msgstr "[inout] 已清零或空闲的调用方实例。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:55
+msgid "[in] Stable immutable tables, distinct from machine."
+msgstr "[in] 稳定不可变表，与 machine 存储分离。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:55
+msgid "[in] Borrowed callback context, which may be NULL."
+msgstr "[in] 借用的回调上下文，可以为 NULL。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:55
+msgid "[in] State index below state_count."
+msgstr "[in] 小于 state_count 的状态索引。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:0
+msgid "Returns"
+msgstr "返回值"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:55
+msgid ""
+"SUCCESS; INVALID for invalid tables or index; BUSY during a callback. "
+"Rejection preserves the machine and runs no callbacks."
+msgstr "SUCCESS；表或索引无效时为 INVALID；回调期间为 BUSY。拒绝时保留状态机，不执行回调。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:55
+msgid "Consume one event using the first matching enabled row."
+msgstr "使用首个匹配且启用的行消费一个事件。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:55
+msgid ""
+"Nonzero payload size requires a non-NULL payload. Guards run in table order "
+"after source/event matching. External transitions run source exit, "
+"transition action, then target entry. Exit/action observe the source state; "
+"entry observes the target. Internal transitions run only their action. There"
+" are no automatic/completion or ancestor transitions. EMPTY and rejected "
+"dispatch leave the machine unchanged; external callback effects cannot be "
+"rolled back."
+msgstr ""
+"非零 payload 大小要求非 NULL payload。匹配 source/event 后，guard 按表顺序运行。外部转换依次运行源 "
+"exit、转换 action、目标 entry。exit/action 观察源状态，entry 观察目标状态。内部转换仅运行其 "
+"action。不提供自动／完成转换或祖先转换。EMPTY 和拒绝的 dispatch 不改状态机；外部回调的效果不可回滚。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:55
+msgid "[inout] Initialized, externally serialized instance."
+msgstr "[inout] 已初始化、由外部串行化的实例。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:55
+msgid "[in] Borrowed immutable event and payload for this call."
+msgstr "[in] 本次调用期间借用的不可变事件及 payload。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:55
+msgid ""
+"SUCCESS when a row ran; EMPTY when no row passed; INVALID for invalid "
+"arguments; STATE for an uninitialized/corrupt instance; BUSY on same-"
+"instance callback reentry."
+msgstr ""
+"执行一行时为 SUCCESS；没有行通过时为 EMPTY；参数无效时为 INVALID；实例未初始化／损坏时为 STATE；同实例回调重入时为 "
+"BUSY。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:55
+msgid "A borrowed event, retained only during synchronous dispatch."
+msgstr "借用的事件，仅在同步 dispatch 期间保留。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:55
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:61
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:67
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:73
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:79
+msgid "Public Members"
+msgstr "公共成员"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:55
+msgid "State actions; either callback may be NULL."
+msgstr "状态 action；任一回调均可为 NULL。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:55
+msgid "A transition; internal transitions must have target == source."
+msgstr "转换；内部转换必须满足 target == source。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:55
+msgid ""
+"Immutable borrowed tables, valid until the machine is no longer used and all"
+" calls have returned."
+msgstr "借用的不可变表，须保持有效直到状态机不再使用且所有调用返回。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:55
+msgid "Caller-owned instance; zero before its first initialize."
+msgstr "调用方拥有的实例；首次 initialize 前清零。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:55
+msgid ""
+"Fields are implementation storage, not mutation controls. One execution "
+"owner serializes every call and lifecycle. Callbacks cannot dispatch or "
+"initialize this same instance; such calls return BUSY. Separate instances "
+"are independent. No allocation, queue, task, timer or implicit clock exists."
+msgstr ""
+"字段是实现存储，不是修改控制接口。一个执行 owner 串行化所有调用与生命周期。回调不能 dispatch 或 initialize "
+"同一实例；此类调用返回 BUSY。各实例相互独立。不分配内存，也没有队列、任务、timer 或隐式时钟。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:59
+msgid "periodic.h"
+msgstr "periodic.h"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:61
+msgid "Explicit-clock fixed-phase periodic release arithmetic."
+msgstr "显式时钟的固定相位周期释放运算。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:61
+msgid "Skip selects the latest due release; catch-up retains old backlog."
+msgstr "Skip 选择最近的到期释放；catch-up 保留旧积压。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:61
+msgid "Reset phase after owner joins consumers of the old domain."
+msgstr "owner 等待旧域消费者退出后重置相位。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:61
+msgid ""
+"Clock stop/change/restart requires this explicit reset; numerical timestamps"
+" cannot detect a different epoch."
+msgstr "时钟停止／改变／重启要求显式 reset；数值时间戳不能检测不同代次。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:61
+msgid "[out] Quiescent caller state, unchanged on rejection."
+msgstr "[out] 已静默的调用方状态，拒绝时不变。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:61
+msgid "[in] Finite explicit Core microsecond timestamp."
+msgstr "[in] 显式有限 Core 微秒时间戳。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:61
+msgid "[in] Positive finite duration; first due is now+period."
+msgstr "[in] 正的有限时长；首次到期为 now+period。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:61
+msgid "[in] Explicit skipped-release or bounded catch-up policy."
+msgstr "[in] 显式跳过释放或有界追赶策略。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:61
+msgid "SUCCESS, INVALID or EXHAUSTED; no clock read/OS/allocation."
+msgstr "SUCCESS、INVALID 或 EXHAUSTED；不读时钟，不使用 OS 或分配内存。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:61
+msgid "Account due releases without running any callback/worker."
+msgstr "统计到期释放，不运行任何回调／worker。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:61
+msgid ""
+"Phase advances by whole periods. Catch-up retains unserved backlog; skip "
+"reports one latest release and missed count. EMPTY may advance last_observed"
+" only. Other errors change neither state nor output. Core only; ClockDomain "
+"optional."
+msgstr ""
+"相位按整周期推进。Catch-up 保留未处理积压；skip 报告最近一次释放及错过数量。EMPTY 只可能推进 "
+"last_observed。其他错误不改状态或输出。仅依赖 Core；ClockDomain 可选。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:61
+msgid "[inout] Initialized unique-owner state."
+msgstr "[inout] 已初始化的唯一 owner 状态。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:61
+msgid "[in] Nondecreasing finite snapshot in the reset domain."
+msgstr "[in] reset 所选域中不回退的有限快照。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:61
+msgid "[in] Positive execution budget for catch-up."
+msgstr "[in] 正的追赶执行预算。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:61
+msgid "[out] Separate copied facts, unchanged on failure/EMPTY."
+msgstr "[out] 分离的事实副本，失败／EMPTY 时不变。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:61
+msgid "SUCCESS, EMPTY, INVALID/STATE or EXHAUSTED for next deadline."
+msgstr "SUCCESS、EMPTY、INVALID/STATE，或下一截止时间无法表示时的 EXHAUSTED。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:61
+msgid "One caller-owned time-domain consumer, driven by its unique owner."
+msgstr "由唯一 owner 驱动、调用方拥有的单个时间域消费者。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:61
+msgid "Copied release facts; caller executes bounded work outside helper."
+msgstr "释放事实副本；调用方在辅助组件外执行有界工作。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:65
+msgid "timers.h"
+msgstr "timers.h"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:67
+msgid "Caller-owned bounded deadline container without workers."
+msgstr "调用方拥有的有界截止时间容器，不含 worker。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:67
+msgid "Initialize unused container and exact slot storage."
+msgstr "初始化未使用的容器及精确槽位存储。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:67
+msgid "[out] Fresh single-owner state, no retained old controls."
+msgstr "[out] 全新单 owner 状态，不保留旧控制对象。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:67
+msgid "[inout] Distinct writable capacity slots, retained until join."
+msgstr "[inout] 分离的可写 capacity 个槽位，保留到退出会合。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:67
+msgid "[in] Positive actual count; no fixed maximum pool."
+msgstr "[in] 正的实际数量；不使用固定最大池。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:67
+msgid "[in] Finite initial timestamp in the selected Core domain."
+msgstr "[in] 所选 Core 域中的有限初始时间戳。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:67
+msgid "SUCCESS or INVALID; no clock read/OS/allocation."
+msgstr "SUCCESS 或 INVALID；不读时钟，不使用 OS 或分配内存。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:67
+msgid "Arm one exact finite deadline, preserving same-deadline FIFO."
+msgstr "设置一个精确有限截止时间，保持同截止时间的 FIFO 顺序。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:67
+msgid "O(capacity), no worker. Epoch/order exhaustion never wraps."
+msgstr "O(capacity)，不含 worker。Epoch/order 耗尽时不回绕。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:67
+msgid "[inout] Initialized unique-owner container."
+msgstr "[inout] 已初始化的唯一 owner 容器。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:67
+msgid "[in] Finite absolute deadline, including past values."
+msgstr "[in] 有限绝对截止时间，可以是过去的值。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:67
+msgid "[in] Copied application value; pointer lifetime stays caller's."
+msgstr "[in] 复制的应用值；指针存活期仍由调用方负责。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:67
+msgid "[out] Distinct stable control, unchanged on rejection."
+msgstr "[out] 分离的稳定控制对象，拒绝时不变。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:67
+msgid "SUCCESS, INVALID/STATE or EXHAUSTED for capacity/identity."
+msgstr "SUCCESS、INVALID/STATE，或容量／身份耗尽时的 EXHAUSTED。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:67
+msgid "Cancel an exact active identity without invoking a callback."
+msgstr "取消精确的活跃身份，不调用回调。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:67
+msgid "[inout] Same initialized serialized container."
+msgstr "[inout] 同一已初始化、串行化的容器。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:67
+msgid "[in] Identity returned from a successful arm."
+msgstr "[in] 成功 arm 返回的身份。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:67
+msgid "SUCCESS, INVALID or STATE for stale/inactive identity."
+msgstr "SUCCESS、INVALID，或身份过期／非活跃时的 STATE。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:67
+msgid "Peek earliest finite due value without consuming it."
+msgstr "查看最早的有限到期值，不消费该项。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:67
+msgid "[in] Live serialized container, borrowed until return."
+msgstr "[in] 活跃串行化容器，借用到调用返回。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:67
+msgid "[out] Distinct result, unchanged when empty or rejected."
+msgstr "[out] 分离的结果，空容器或拒绝时不变。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:67
+msgid "SUCCESS, EMPTY or INVALID/STATE; O(capacity), no clock read."
+msgstr "SUCCESS、EMPTY 或 INVALID/STATE；O(capacity)，不读时钟。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:67
+msgid "Remove at most one due item; equal deadlines preserve arm order."
+msgstr "最多移除一个到期项；同截止时间保持 arm 顺序。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:67
+msgid ""
+"Caller dispatches events through existing FSM/queue/owner. EMPTY may advance"
+" last_observed; there is no hidden worker."
+msgstr "调用方通过已有 FSM/queue/owner 分发事件。EMPTY 可能推进 last_observed；没有隐藏 worker。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:67
+msgid "[in] Finite nondecreasing snapshot in the selected epoch."
+msgstr "[in] 所选代次中不回退的有限快照。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:67
+msgid "[out] Distinct copied event, unchanged on EMPTY/error."
+msgstr "[out] 分离的事件副本，EMPTY／错误时不变。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:67
+msgid "SUCCESS, EMPTY or INVALID/STATE; clock reversal changes none."
+msgstr "SUCCESS、EMPTY 或 INVALID/STATE；时钟回退时均不改动。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:67
+msgid "Cancel all arms and explicitly admit a new clock epoch."
+msgstr "取消全部设置项，并显式准入新的时钟代次。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:67
+msgid "Old tickets remain invalid; reset does not recycle identity."
+msgstr "旧 ticket 保持无效；reset 不回收身份供重用。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:67
+msgid "[inout] Unique-owner container, all former users joined."
+msgstr "[inout] 唯一 owner 容器，此前使用者均已退出。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:67
+msgid "[in] Finite first timestamp in the replacement domain."
+msgstr "[in] 替换域中的第一个有限时间戳。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:67
+msgid "SUCCESS or INVALID/STATE; retains epoch/order counters."
+msgstr "SUCCESS 或 INVALID/STATE；保留 epoch/order 计数器。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:67
+msgid "Stable identity for one arm; old identities never cancel a new arm."
+msgstr "一次 arm 的稳定身份；旧身份不能取消新的 arm。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:67
+msgid "Exact supplied storage; only container operations mutate it."
+msgstr "精确提供的存储；只有容器操作可修改。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:67
+msgid "Single-owner O(capacity) profile with no callback or internal queue."
+msgstr "单 owner 的 O(capacity) profile，没有回调或内部队列。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:67
+msgid "Copied due event; no pointer to mutable slot storage."
+msgstr "到期事件副本；不包含指向可变槽位存储的指针。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:71
+msgid "debounce.h"
+msgstr "debounce.h"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:73
+msgid "Explicit-time asymmetric Boolean input qualification."
+msgstr "显式时间的非对称布尔输入稳定判定。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:73
+msgid "Establish a trusted initial level and fresh time domain."
+msgstr "建立可信初始电平及新的时间域。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:73
+msgid "[out] Caller-owned state, not concurrently observed."
+msgstr "[out] 调用方拥有的状态，不允许并发观察。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:73
+msgid "[in] Already-qualified initial level."
+msgstr "[in] 已完成稳定判定的初始电平。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:73
+msgid "[in] Required stable-high duration; zero is immediate."
+msgstr "[in] 所需稳定高电平时长；零表示立即。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:73
+msgid "[in] Required stable-low duration; zero is immediate."
+msgstr "[in] 所需稳定低电平时长；零表示立即。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:73
+msgid "[in] Finite monotonic microsecond snapshot."
+msgstr "[in] 有限单调微秒快照。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:73
+msgid ""
+"SUCCESS or INVALID for NULL/nonfinite arguments. Rejection leaves the state "
+"unchanged. NX_DEADLINE_NEVER is invalid both as a timestamp and as a hold "
+"duration."
+msgstr ""
+"SUCCESS；NULL／非有限参数返回 INVALID。拒绝时状态不变。NX_DEADLINE_NEVER 既不能作为时间戳，也不能作为保持时长。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:73
+msgid "Observe a raw input and qualify at the exact hold boundary."
+msgstr "观察原始输入，在精确保持边界完成稳定判定。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:73
+msgid ""
+"A candidate starts when first observed, not at an inferred earlier hardware "
+"edge. Returning to the stable level clears the candidate immediately. "
+"Repeated observations of the same qualified level report changed=false. "
+"Sampling frequency, missed input edges and input ownership remain external."
+msgstr ""
+"候选从首次观察时开始，不推断更早的硬件边沿。返回稳定电平会立即清除候选。重复观察相同已确认电平报告 "
+"changed=false。采样频率、遗漏的输入边沿及输入所有权仍由外部负责。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:73
+msgid "[inout] Initialized single-owner state."
+msgstr "[inout] 已初始化的单 owner 状态。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:73
+msgid "[in] Raw input level at now."
+msgstr "[in] now 时刻的原始输入电平。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:73
+msgid "[in] Finite nondecreasing snapshot in the same domain."
+msgstr "[in] 同一域中不回退的有限快照。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:73
+msgid "[out] Distinct copied observation, never retained."
+msgstr "[out] 分离的观察副本，不保留引用。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:73
+msgid ""
+"SUCCESS; INVALID for NULL/nonfinite/overlapping output; STATE before "
+"initialization or for time reversal. Failure changes neither state nor "
+"output."
+msgstr "SUCCESS；NULL／非有限参数／输出重叠返回 INVALID；初始化前或时间回退返回 STATE。失败时状态和输出均不变。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:73
+msgid "A copied observation, with one edge only on a stable change."
+msgstr "观察副本，仅在稳定变化时产生一个边沿。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:73
+msgid "Caller-owned state with independent rise/fall hold times."
+msgstr "调用方拥有的状态，上升／下降保持时间相互独立。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:73
+msgid ""
+"Fields are implementation storage. One execution owner serializes initialize"
+" and observe. All timestamps belong to one live Core monotonic microsecond "
+"domain. A clock reset requires an explicit reinitialize after consumers "
+"join. No clock reads, allocation, callbacks or input I/O occur."
+msgstr ""
+"字段是实现存储。一个执行 owner 串行化 initialize 和 observe。全部时间戳属于一个活跃 Core 单调微秒域。时钟 reset "
+"后须等待消费者退出，再显式重新初始化。不读时钟、不分配内存，不执行回调或输入 I/O。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:77
+msgid "event_fanout.h"
+msgstr "event_fanout.h"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:79
+msgid "Bounded static fanout into caller-selected existing sinks."
+msgstr "向调用方选定的已有 sink 进行有界静态扇出。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:79
+msgid "Validate and bind one immutable exact sink array."
+msgstr "校验并绑定一个精确的不可变 sink 数组。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:79
+msgid "[out] Fresh unused caller storage, unchanged on error."
+msgstr "[out] 全新未使用的调用方存储，错误时不变。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:79
+msgid "[in] Immutable count sink entries, retained until join."
+msgstr "[in] 不可变的 count 个 sink 项，保留到退出会合。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:79
+msgid "[in] Positive exact bounded count, every write non-NULL."
+msgstr "[in] 精确的正有界数量，每个 write 均非 NULL。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:79
+msgid "SUCCESS or INVALID; no queue/worker/OS/allocation is created."
+msgstr "SUCCESS 或 INVALID；不创建队列／worker／OS 对象，不分配内存。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:79
+msgid "Attempt each sink in declared order despite individual errors."
+msgstr "按声明顺序尝试每个 sink，不因单项错误停止。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:79
+msgid ""
+"Task/loop context selected by sinks; no ISR promise. Sinks must be bounded, "
+"retain no borrowed bytes and not destroy fanout. Lifecycle changes require "
+"all emitters joined."
+msgstr ""
+"task/loop 上下文由 sink 选择，不承诺 ISR 支持。sink 必须有界，不保留借用字节，也不销毁 fanout。生命周期变化要求全部 "
+"emit 调用者退出。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:79
+msgid "[inout] Initialized serialized source; reentry is rejected."
+msgstr "[inout] 已初始化的串行化源；拒绝重入。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:79
+msgid "[in] length readable bytes, borrowed until all sinks return."
+msgstr "[in] length 个可读字节，借用到所有 sink 返回。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:79
+msgid "[in] Positive payload size agreed with every sink."
+msgstr "[in] 与所有 sink 约定的正 payload 大小。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:79
+msgid "[out] Distinct result, unchanged on pre-admission error."
+msgstr "[out] 分离的结果，准入前错误时不变。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:79
+msgid ""
+"SUCCESS after all attempts; per-sink failure in report. INVALID/STATE/BUSY "
+"rejects before calling any new sink."
+msgstr ""
+"完成全部尝试后为 SUCCESS；单 sink 失败记录在 report。INVALID/STATE/BUSY 在调用任何新 sink 前拒绝。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:79
+msgid "Immutable bounded synchronous sink; no hidden delivery buffer."
+msgstr "不可变、有界、同步 sink，没有隐藏分发缓冲。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:79
+msgid ""
+"write borrows data only until return. A queue sink copies exact bytes into "
+"existing nx_queue storage with a nonblocking deadline; a stream sink uses "
+"the existing reserve/publish ownership protocol. Copying a pointer never "
+"transfers payload ownership. Context outlives every emit."
+msgstr ""
+"write 仅借用 data 到返回。队列 sink 使用非阻塞截止时间将精确字节复制到已有 nx_queue 存储；stream sink 使用既有 "
+"reserve/publish 所有权协议。复制指针从不转移 payload 所有权。上下文须存活到每次 emit 结束。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:79
+msgid "Caller serializes lifecycle/emit; no global registry or subscription."
+msgstr "调用方串行化生命周期／emit；没有全局注册表或订阅机制。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/runtime/helpers.md:79
+msgid ""
+"Best-effort copied facts; successful earlier sinks are not rolled back."
+msgstr "尽力提供的事实副本；先前成功的 sink 不回滚。"

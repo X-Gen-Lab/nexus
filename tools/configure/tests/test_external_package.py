@@ -247,8 +247,9 @@ class ExternalPackageTests(unittest.TestCase):
             capture_output=True, text=True, timeout=60,
             env=dict(os.environ, PYTHONDONTWRITEBYTECODE="1"))
         self.assertNotEqual(execution.returncode, 0)
-        self.assertRegex(execution.stdout + execution.stderr,
-                         r"Production SoC packages require\s+declarative package\.json")
+        diagnostic = " ".join((execution.stdout + execution.stderr).split())
+        self.assertIn("Production SoC packages require declarative package.json",
+                      diagnostic)
 
     def test_external_source_target_configures_links_and_runs(self):
         """Execute a package-owned C adapter, not a generated-source snapshot."""

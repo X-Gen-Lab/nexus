@@ -37,6 +37,7 @@ try:
         cmsis_device_lock,
         threadx_lock, freertos_transport, lwip_lock, mbedtls_lock,
         coremqtt_lock, mcuboot_lock, st_usb_lock,
+        component_lock,
     )
     from tools.configure.metadata import parse_json, snapshot
     from tools.configure import dependencies as configuration_dependencies
@@ -174,6 +175,7 @@ SDK_TOOL_FILES = (
     'tools/dev/dependencies.py',
     'tools/dev/dev.py',
     'tools/dev/device.py',
+    'tools/dev/fault_decode.py',
     'tools/dev/presets.py',
     'tools/dev/process.py',
     'tools/dev/projects.py',
@@ -186,6 +188,7 @@ SDK_TOOL_FILES = (
     'tools/maintenance/cmsis_device_lock.py',
     'tools/maintenance/consumer_profiles.py',
     'tools/maintenance/coremqtt_lock.py',
+    'tools/maintenance/component_lock.py',
     'tools/maintenance/freertos_transport.py',
     'tools/maintenance/lwip_lock.py',
     'tools/maintenance/mbedtls_lock.py',
@@ -201,6 +204,11 @@ SDK_TOOL_FILES = (
 )
 
 SDK_VERIFICATION_FILES = (
+    'cmake/package/verification/common_components/application.c',
+    'cmake/package/verification/common_components/application.h',
+    'cmake/package/verification/common_components/composition.c',
+    'cmake/package/verification/common_components/native.toml',
+    'cmake/package/verification/common_components/f407.toml',
     'cmake/package/verification/common_services/f407.toml',
     'cmake/package/verification/common_services/native.toml',
     'cmake/package/verification/common_services/services.c',
@@ -524,6 +532,11 @@ def dependency_required_files(root, profile, *, selection=None):
             lock_path = dependency(path).source_lock
             lock = parse_json(regular(root, lock_path).read_bytes())
             names.update(path + "/" + name for name in verifier.contract(lock)["files"])
+        elif item.identifier in component_lock.IDENTIFIERS:
+            lock = component_lock.contract(
+                parse_json(regular(root, item.source_lock).read_bytes()),
+                item.identifier)
+            names.update(path + "/" + name for name in lock["files"])
         elif path in {mount.path for mount in mbedtls_lock.mounts()}:
             lock = mbedtls_lock.load_lock(root / mbedtls_lock.LOCK_NAME)
             names.update(path + "/" + name for name in mbedtls_lock.record(lock, path)["files"])
@@ -712,6 +725,12 @@ def dependency_entries(root, path):
         names = set(mbedtls_lock.record(lock, path)["files"])
         if not names.issubset(entries):
             raise SDKError("TLS committed static source closure is incomplete")
+        entries = {name: entries[name] for name in names}
+    elif item.identifier in component_lock.IDENTIFIERS:
+        raw, _ = snapshot(root / item.source_lock)
+        names = set(component_lock.contract(parse_json(raw), item.identifier)["files"])
+        if not names.issubset(entries):
+            raise SDKError("Component committed source graph is incomplete: " + path)
         entries = {name: entries[name] for name in names}
     elif item.paired_driver_checker is not None:
         raw, _ = snapshot(root / item.source_lock)
@@ -1026,6 +1045,12 @@ def validate_import_records(identity, *, root=SOURCE_ROOT, selection=None):
 def verify_selected_dependencies(root, records, *, source_sdk=False):
     """Run full byte/provenance admission only for packaged suppliers."""
     records = {record["path"]: record for record in records}
+    for path, record in records.items():
+        item = dependency(path)
+        if item.identifier in component_lock.IDENTIFIERS:
+            identity = component_lock.verify(root, item.identifier, source_sdk=source_sdk)
+            if (record["commit"], record["tree"]) != (identity["commit"], identity["tree"]):
+                raise SDKError("Component package identity differs from reviewed source: " + path)
     if "ext/freertos" in records:
         freertos_transport.verify(root, selected_commit=records["ext/freertos"]["commit"],
                                   require_git=not source_sdk, require_children=False)

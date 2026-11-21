@@ -30,6 +30,19 @@ class SelectedDependencyTests(unittest.TestCase):
             "cmsis_core", "stm32f4_cmsis", "stm32f4_hal", "threadx",
             "mbedtls", "coremqtt"})
 
+    def test_new_component_sources_are_selected_individually(self):
+        suppliers = {"flashdb": "flashdb", "littlefs": "littlefs",
+                     "fatfs": "fatfs", "sfud": "sfud", "rtt": "segger_rtt",
+                     "shell": "letter_shell", "cm-backtrace": "cm_backtrace",
+                     "cmsis-dsp": "cmsis_dsp"}
+        base = {"cmsis_core", "stm32f4_cmsis", "stm32f4_hal"}
+        for component, supplier in suppliers.items():
+            with self.subTest(component=component):
+                selected = catalogue.runtime_selection(
+                    "stm32f4", backend="baremetal", components=(component,))
+                self.assertEqual({item.identifier for item in selected},
+                                 base | {supplier})
+
     def test_invalid_production_selection_is_rejected(self):
         for kwargs in ({"family": "stm32h743", "backend": "baremetal"},
                        {"family": "stm32f4", "backend": "automatic"},
@@ -182,6 +195,7 @@ class DormantNetworkTests(unittest.TestCase):
                      "  add_library(${policy} INTERFACE)",
                      "endforeach()",
                      "add_library(test_io INTERFACE)",
+                     "add_library(Nexus::Core ALIAS test_io)",
                      "add_library(Nexus::IO ALIAS test_io)",
                      "add_library(Nexus::IOEthernetFrames ALIAS test_io)",
                      "find_package(Python3 REQUIRED COMPONENTS Interpreter)",

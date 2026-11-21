@@ -14,7 +14,7 @@ own fitted-part identity, wiring, calibration, display or key policy, and
 physical recovery. Software observations keep the limits of the selected device
 contract.
 
-| Target | Public header under `nexus/components/` | Contract |
+| Target | Public header (`nexus/components/` unless shown in full) | Contract |
 | --- | --- | --- |
 | `Nexus::AT24C02` | `at24c02.h` | [Settled EEPROM access and write-cycle responsibility](../../../../components/devices/at24c02/README.md) |
 | `Nexus::W25` | `w25.h` | [Explicit W25Q128JV profile and retained Flash completion](../../../../components/devices/w25/README.md) |
@@ -22,11 +22,46 @@ contract.
 | `Nexus::XPT2046` | `xpt2046.h` | [Raw touch samples with live pen observation](../../../../components/devices/xpt2046/README.md) |
 | `Nexus::DS18B20` | `ds18b20.h` | [External-VDD identity, conversion and CRC](../../../../components/devices/ds18b20/README.md) |
 | `Nexus::Infrared` | `infrared.h` | [Explicit NEC address and source-quality policies](../../../../components/devices/infrared/README.md) |
+| `Nexus::BMP280`, `Nexus::BMP280SPI` | `bmp280.h`, `bmp280_spi.h` | [Explicit forced conversion and settled SPI adapter](../../../../components/devices/bmp280/README.md) |
+| `Nexus::TMP117`, `Nexus::TMP117I2C` | `tmp117.h`, `tmp117_i2c.h` | [One-shot temperature and existing offset verification](../../../../components/devices/tmp117/README.md) |
+| `Nexus::DP83848` | `nexus/dp83848/dp83848.h` | [Explicit PHY reset, negotiation and link observation](../../../../components/devices/dp83848/README.md) |
+| `Nexus::SFUD` | `sfud.h` | Selected upstream W25Q128JV algorithms behind the existing SPI owner |
 
 Reference assemblies and software tests do not establish fitted-part identity,
 electrical timing, calibration or physical HIL. Panel, touch, sensor and decoded
 key results retain their contract's observation limits; products supply display
 policy, calibration, key mapping and recovery.
+
+## Select identity, data meaning and shutdown
+
+| Device profile | Successful copied result | Responsibility retained by the product |
+| --- | --- | --- |
+| BMP280 x1/x1 forced conversion | Centi-Celsius and pascals after calibration/compensation | Sample timing and freshness policy; no invented hardware timestamp |
+| DS18B20 external VDD | Signed temperature in 1/16 Celsius after identity/configuration/CRC checks | Exact ROM or explicit single-drop selection; physical conversion may continue after software stop |
+| TMP117 one-shot, no averaging | Raw/offset in 1/128 Celsius, rounded micro-Celsius and software observation | Verify domain/epoch and conservative conversion-start age; never apply the existing offset twice |
+| XPT2046 differential 12-bit | Raw X/Y, optional raw Z1/Z2 and software completion observation | Fitted-panel calibration, orientation, pressure interpretation and live PEN policy |
+| ILI9341 RGB565 | Completed pixel prefix for an in-bounds logical rectangle | Panel power/gamma, backlight and visual readiness; native 240x320 or MV-swapped 320x240 |
+
+Result validity follows the selected operation's status and integrity checks;
+a numeric zero or a recent software read is not independent evidence of quality
+or freshness. Software observations retain their original provenance and unknown
+physical uncertainty. The external touch calibration reference belongs to
+`nexus-examples/recipes/control`, where measured axis bounds and logical display
+orientation are explicit; the generic device does not guess coefficients.
+
+AT24C02 uncertain writes retain write-cycle responsibility until explicit sync.
+W25 and SFUD select W25Q128JV rather than treating a JEDEC value as complete
+suffix proof. Do not command one physical Flash through both owners. SFUD uses
+caller workspace for private upstream state and exposes the existing Flash
+face; products select regions and retain the same SPI binding through uncertain
+program/erase cleanup. Successful readiness probes do not repair an earlier
+failed write or authorize replay.
+
+Stop users before stopping the device, and stop the device before returning its
+outer bus/GPIO/clock resources. A timeout can leave converter, display or Flash
+effects even after CPU spans are released. No additional exact device is
+selected by this reference (`not_selected`); physical HIL remains
+`not_executed`.
 
 ## TMP117 one-shot sampling contract
 
@@ -164,5 +199,11 @@ bus/EEPROM status rather than a hidden sleep.
 ### dp83848.h
 
 ```{doxygenfile} components/devices/dp83848/include/nexus/dp83848/dp83848.h
+:project: nexus
+```
+
+### sfud.h
+
+```{doxygenfile} components/devices/sfud/include/nexus/components/sfud.h
 :project: nexus
 ```

@@ -59,6 +59,8 @@ XPTEK **XPT2046 Touch Screen Controller**、copyright2007、30 页，Tables4／5
 - <https://files.waveshare.com/upload/9/98/XPT2046-EN.pdf>
 - PDF SHA-256：`d01b61c1f08dc74963ac73d996c93ed0aed485ba33dcb09960adbbb629e9d515`
 
+相同来源的 byte count、hash 与所用章节同时记录在 `references.json`。
+
 这是由模块供应商镜像取得的厂商 PDF，不宣称来自当前厂商站点，也不证明已焊 silicon
 身份或器件在线。page26 明确转换须在 1.6 ms 内完成以避免传输中断导致保持电压下降；
 page27 Table9 的 DCLK 高／低最小时间不能转为实测频率或波形保证。

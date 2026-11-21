@@ -8,6 +8,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "nexus/components/modbus_rtu.h"
+#include "register_pdu.h"
 
 #include <limits.h>
 #include <string.h>
@@ -15,17 +16,6 @@
 /** \brief Deadline add. */
 static uint64_t deadline_add(uint64_t now, uint32_t duration) {
     return UINT64_MAX - now < duration ? UINT64_MAX : now + duration;
-}
-
-/** \brief Get u16. */
-static uint16_t get_u16(const uint8_t* p) {
-    return (uint16_t)(((uint16_t)p[0] << 8) | p[1]);
-}
-
-/** \brief Put u16. */
-static void put_u16(uint8_t* p, uint16_t value) {
-    p[0] = (uint8_t)(value >> 8);
-    p[1] = (uint8_t)value;
 }
 
 /** \brief Compute the standard wire CRC without allocations. */
@@ -92,42 +82,14 @@ static bool clock_ok(nx_modbus_rtu_t* s, uint64_t now) {
     return true;
 }
 
-/** \brief Exception code. */
-static uint8_t exception_code(nx_modbus_register_result_t result) {
-    switch (result) {
-        case NX_MODBUS_ILLEGAL_ADDRESS:
-        case NX_MODBUS_ILLEGAL_VALUE:
-        case NX_MODBUS_DEVICE_FAILURE:
-        case NX_MODBUS_DEVICE_BUSY:
-            return (uint8_t)result;
-        default:
-            return NX_MODBUS_DEVICE_FAILURE;
-    }
-}
-
-/** \brief Exception response. */
-static void exception_response(nx_modbus_rtu_t* s, uint8_t function,
-                               uint8_t code) {
-    s->tx[0] = s->config.address;
-    s->tx[1] = (uint8_t)(function | 0x80u);
-    s->tx[2] = code;
-    s->tx_length = 3;
-    ++s->counters.exceptions;
-}
-
-/** \brief Range valid. */
-static bool range_valid(uint16_t start, uint16_t count) {
-    return count != 0 && (uint32_t)start + count <= 65536u;
-}
-
-/** \brief Decode frame. */
+/** \brief Validate RTU framing, then use the shared register PDU engine. */
 static void decode_frame(nx_modbus_rtu_t* s) {
     ++s->counters.frames;
     s->tx_length = 0;
     if (s->rx_length < 4) {
         return;
     }
-    const uint16_t payload = (uint16_t)(s->rx_length - 2u);
+    const uint16_t payload = (uint16_t)(s->rx_length - 2U);
     const uint16_t expected = nx_modbus_crc16(s->rx, payload);
     const uint16_t received =
         (uint16_t)(s->rx[payload] | ((uint16_t)s->rx[payload + 1] << 8));
@@ -136,87 +98,23 @@ static void decode_frame(nx_modbus_rtu_t* s) {
         return;
     }
     const bool broadcast = s->rx[0] == 0;
-    if (!broadcast && s->rx[0] != s->config.address) {
-        return;
-    }
-    const uint8_t function = s->rx[1];
-    if (broadcast && function != 6 && function != 16) {
+    if ((!broadcast && s->rx[0] != s->config.address) ||
+        (broadcast && s->rx[1] != 6 && s->rx[1] != 16)) {
         return;
     }
     ++s->counters.accepted;
     if (broadcast) {
         ++s->counters.broadcasts;
     }
-    nx_modbus_register_result_t result = NX_MODBUS_OK;
-    uint16_t start = 0;
-    uint16_t count = 0;
-    if (function == 3 || function == 6) {
-        if (s->rx_length != 8) {
-            exception_response(s, function, NX_MODBUS_ILLEGAL_VALUE);
-            goto done;
-        }
-        start = get_u16(&s->rx[2]);
-        count = function == 3 ? get_u16(&s->rx[4]) : 1;
-        if (!range_valid(start, count) || count > NX_MODBUS_REGISTER_MAX) {
-            exception_response(s, function, NX_MODBUS_ILLEGAL_VALUE);
-            goto done;
-        }
-        if (function == 3) {
-            result = s->config.registers.read(s->config.registers.context,
-                                              start, count, s->values);
-            if (result == NX_MODBUS_OK) {
-                s->tx[0] = s->config.address;
-                s->tx[1] = function;
-                s->tx[2] = (uint8_t)(count * 2u);
-                for (uint16_t i = 0; i < count; ++i) {
-                    put_u16(&s->tx[3u + (size_t)i * 2u], s->values[i]);
-                }
-                s->tx_length = (uint16_t)(3u + count * 2u);
-            }
-        } else {
-            s->values[0] = get_u16(&s->rx[4]);
-        }
-    } else if (function == 16) {
-        if (s->rx_length < 9) {
-            exception_response(s, function, NX_MODBUS_ILLEGAL_VALUE);
-            goto done;
-        }
-        start = get_u16(&s->rx[2]);
-        count = get_u16(&s->rx[4]);
-        if (!range_valid(start, count) || count > 123 ||
-            (uint16_t)s->rx[6] != count * 2u ||
-            s->rx_length != (uint16_t)(9u + count * 2u)) {
-            exception_response(s, function, NX_MODBUS_ILLEGAL_VALUE);
-            goto done;
-        }
-        for (uint16_t i = 0; i < count; ++i) {
-            s->values[i] = get_u16(&s->rx[7u + (size_t)i * 2u]);
-        }
-    } else {
-        exception_response(s, function, 1); /* illegal function */
-        goto done;
+    s->tx[0] = s->config.address;
+    size_t response = nx_modbus_register_pdu(
+        &s->config.registers, s->rx + 1, payload - 1U, s->tx + 1, s->values);
+    if ((s->tx[1] & 0x80U) != 0) {
+        ++s->counters.exceptions;
     }
-    if (function == 6 || function == 16) {
-        result = s->config.registers.authorize_write(
-            s->config.registers.context, start, count, s->values);
-        if (result == NX_MODBUS_OK) {
-            result = s->config.registers.write_atomic(
-                s->config.registers.context, start, count, s->values);
-        }
-        if (result == NX_MODBUS_OK) {
-            memcpy(s->tx, s->rx, 6);
-            s->tx_length = 6;
-        }
-    }
-    if (result != NX_MODBUS_OK) {
-        exception_response(s, function, exception_code(result));
-    }
-done:
-    if (broadcast) {
-        s->tx_length = 0; /* All broadcast failures remain silent. */
-    }
-    if (s->tx_length != 0) {
-        const uint16_t crc = nx_modbus_crc16(s->tx, s->tx_length);
+    if (!broadcast) {
+        s->tx_length = (uint16_t)(response + 1U);
+        uint16_t crc = nx_modbus_crc16(s->tx, s->tx_length);
         s->tx[s->tx_length++] = (uint8_t)crc;
         s->tx[s->tx_length++] = (uint8_t)(crc >> 8);
     }

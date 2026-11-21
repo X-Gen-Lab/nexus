@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "kind": "nexus-component-source",
+  "identifier": "segger_rtt",
+  "path": "ext/segger-rtt",
+  "upstream_url": "https://github.com/SEGGERMicro/RTT.git",
+  "fetch_url": "https://github.com/X-Gen-Lab/RTT.git",
+  "commit": "9106eaa39babe53e00994d7828c1afb29390cdc1",
+  "tree": "bdf67c0bc747a590a1f2a35b6c5bd558e8b148e4",
+  "license": {
+    "path": "LICENSE.md",
+    "expression": "LicenseRef-SEGGER-RTT-2026"
+  },
+  "files": {
+    "Config/SEGGER_RTT_Conf.h": "d02ef83f826dd29cddb466adca6c75dbdd71128f18bc6bef1113ca0127944d6f",
+    "LICENSE.md": "e033779c697246a7a89eb411eca41cabb791dbf0b23619cfbd6d42429191baa8",
+    "RTT/SEGGER_RTT.c": "cf1715eb74aacc903c4c010bbec2ee4e14d6eeb4f7e8fda5f8a61c8b9f7f3e2a",
+    "RTT/SEGGER_RTT.h": "b8b6c29abd72c42082502306fe7cdaa0ca90ca2a9b7821dceaa3b023b75f4d95",
+    "RTT/SEGGER_RTT_ConfDefaults.h": "d2af82ee107fba25157e850109ed9da38243d234f5b70a1039a5c37a0579a054",
+    "RTT/SEGGER_RTT_printf.c": "0816e1dd2a03cdfcb186c82195da0994f9afea0139c20789d7c0a8fa3fb70dce"
+  }
+}

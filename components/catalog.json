@@ -105,6 +105,46 @@
       "id": "st-usb-device",
       "entry": "components/protocols/st_usb_device/Select.cmake",
       "target": "Nexus::STUSBDevice"
+    },
+    {
+      "id": "flashdb",
+      "entry": "components/services/flashdb/Select.cmake",
+      "target": "Nexus::FlashDB"
+    },
+    {
+      "id": "littlefs",
+      "entry": "components/services/littlefs/Select.cmake",
+      "target": "Nexus::LittleFS"
+    },
+    {
+      "id": "fatfs",
+      "entry": "components/services/fatfs/Select.cmake",
+      "target": "Nexus::FatFS"
+    },
+    {
+      "id": "sfud",
+      "entry": "components/devices/sfud/Select.cmake",
+      "target": "Nexus::SFUD"
+    },
+    {
+      "id": "rtt",
+      "entry": "components/services/rtt/Select.cmake",
+      "target": "Nexus::RTT"
+    },
+    {
+      "id": "shell",
+      "entry": "components/services/shell/Select.cmake",
+      "target": "Nexus::Shell"
+    },
+    {
+      "id": "cm-backtrace",
+      "entry": "components/services/fault/Select.cmake",
+      "target": "Nexus::CmBacktrace"
+    },
+    {
+      "id": "cmsis-dsp",
+      "entry": "components/algorithms/cmsis_dsp/Select.cmake",
+      "target": "Nexus::AlgorithmsCMSISDSP"
     }
   ]
 }

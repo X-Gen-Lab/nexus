@@ -2,6 +2,7 @@
 # Author: Nexus Team
 add_library(nexus_component_bindings INTERFACE)
 add_library(nexus_component_api INTERFACE)
+add_subdirectory(algorithms)
 add_subdirectory(runtime)
 add_subdirectory(buses)
 add_subdirectory(devices)

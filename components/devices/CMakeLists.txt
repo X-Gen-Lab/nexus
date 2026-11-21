@@ -1,5 +1,6 @@
 # Optional device protocols; board wiring remains external.
 # Author: Nexus Team
+add_subdirectory(sfud)
 add_subdirectory(at24c02)
 add_subdirectory(bmp280)
 add_subdirectory(dp83848)

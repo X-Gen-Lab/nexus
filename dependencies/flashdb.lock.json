@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "kind": "nexus-component-source",
+  "identifier": "flashdb",
+  "path": "ext/flashdb",
+  "upstream_url": "https://github.com/armink/FlashDB.git",
+  "fetch_url": "https://github.com/X-Gen-Lab/FlashDB.git",
+  "commit": "6c722f169f27f99f96670ee00c27b2f59b1505e2",
+  "tree": "ff7b92eea0a8e7695b34234028bf2c413627064d",
+  "license": {
+    "path": "LICENSE",
+    "expression": "Apache-2.0"
+  },
+  "files": {
+    "LICENSE": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+    "inc/fdb_cfg_template.h": "22b7480c8a29b0a36a584887391cf32b89a88829246ce9ce981c6683b768af5d",
+    "inc/fdb_def.h": "18279b85e890ac545e7d3ee9e78d63d7da19ffef3fe2c9b954cddde5b5781aff",
+    "inc/fdb_low_lvl.h": "d936282fb35d9f148eafad0eaf12584a64c16ba1a65c593e97481de761e70426",
+    "inc/flashdb.h": "9acc8d35fa9124af2c4a0de30e8c387fa6dcedc7239040da3ddb321a468680f2",
+    "port/fal/inc/fal.h": "37d28f905573c44d1b62757762b10f4091342749be9760e757de0779abce7724",
+    "port/fal/inc/fal_def.h": "159d4cef03eeb27becff3fa41dd7f9a30265b4efce8900429ad37ae145530099",
+    "src/fdb.c": "e067034c7bdb97f136d0a191426d04f8d644c20e918cda39d59923860928243c",
+    "src/fdb_file.c": "07a4875cbd7f5671ccb5e99fc381750ce291392f528aebaf39aaf44834922eae",
+    "src/fdb_kvdb.c": "8d743dd379dcc817b935877644087bdbf4ce0d74ec3392a2618eea4620ef8d09",
+    "src/fdb_read_cache.c": "fa2d2bf57abff52031228e7b01141ddabcd30c92c881bede08426cc1c0f12846",
+    "src/fdb_tsdb.c": "4cc8af0d53125bc3def23a9bfd9516545654fc517fd81fdf01da5a8521c64347",
+    "src/fdb_utils.c": "9932b0da91487d744718796164724f1bbe865a7be8e7d5458ca956364eaa3a00"
+  }
+}

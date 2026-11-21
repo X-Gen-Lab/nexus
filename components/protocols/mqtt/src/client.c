@@ -416,9 +416,13 @@ static bool text(const nx_mqtt_t* s, const char* p, size_t n,
     return true;
 }
 
-nx_result_t nx_mqtt_connect(nx_mqtt_t* s, const nx_mqtt_connect_t* connect,
-                            nx_mqtt_call_t call) {
-    if (s == NULL || connect == NULL) {
+nx_result_t nx_mqtt_connect_options(nx_mqtt_t* s,
+                                    const nx_mqtt_connect_t* connect,
+                                    const nx_mqtt_connect_options_t* options,
+                                    bool* session_present,
+                                    nx_mqtt_call_t call) {
+    if (s == NULL || connect == NULL || options == NULL ||
+        session_present == NULL) {
         return NX_ERROR_INVALID;
     }
     if (!s->opened) {
@@ -428,6 +432,18 @@ nx_result_t nx_mqtt_connect(nx_mqtt_t* s, const nx_mqtt_connect_t* connect,
         return NX_ERROR_STATE;
     }
     if (!external(s, connect, sizeof(*connect)) ||
+        !external(s, options, sizeof(*options)) ||
+        !external(s, session_present, sizeof(*session_present)) ||
+        overlap(session_present, sizeof(*session_present), connect,
+                sizeof(*connect)) ||
+        overlap(session_present, sizeof(*session_present), options,
+                sizeof(*options)) ||
+        overlap(session_present, sizeof(*session_present), connect->client_id,
+                connect->client_id_size) ||
+        overlap(session_present, sizeof(*session_present), connect->username,
+                connect->username_size) ||
+        overlap(session_present, sizeof(*session_present), connect->password,
+                connect->password_size) ||
         !text(s, connect->client_id, connect->client_id_size, TEXT_RAW) ||
         connect->username_size > UINT16_MAX ||
         connect->password_size > UINT16_MAX ||
@@ -438,11 +454,34 @@ nx_result_t nx_mqtt_connect(nx_mqtt_t* s, const nx_mqtt_connect_t* connect,
         (connect->password != NULL && connect->username == NULL)) {
         return NX_ERROR_INVALID;
     }
+    MQTTPublishInfo_t will;
+    MQTTPublishInfo_t* will_pointer = NULL;
+    if (options->will != NULL) {
+        const nx_mqtt_publish_t* p = options->will;
+        if (!external(s, p, sizeof(*p)) ||
+            !text(s, p->topic, p->topic_size, TEXT_TOPIC) ||
+            !external(s, p->payload, p->payload_size) ||
+            p->payload_size > UINT16_MAX ||
+            overlap(session_present, sizeof(*session_present), p, sizeof(*p)) ||
+            overlap(session_present, sizeof(*session_present), p->topic,
+                    p->topic_size) ||
+            overlap(session_present, sizeof(*session_present), p->payload,
+                    p->payload_size)) {
+            return NX_ERROR_INVALID;
+        }
+        if (p->qos > 1) {
+            return NX_ERROR_UNSUPPORTED;
+        }
+        will = (MQTTPublishInfo_t){
+            (MQTTQoS_t)p->qos,       p->retain,  false,          p->topic,
+            (uint16_t)p->topic_size, p->payload, p->payload_size};
+        will_pointer = &will;
+    }
     nx_result_t admitted = admit(s, call, false);
     if (admitted != NX_SUCCESS) {
         return admitted;
     }
-    MQTTConnectInfo_t c = {true,
+    MQTTConnectInfo_t c = {options->clean_session,
                            connect->keepalive_seconds,
                            connect->client_id,
                            (uint16_t)connect->client_id_size,
@@ -454,15 +493,28 @@ nx_result_t nx_mqtt_connect(nx_mqtt_t* s, const nx_mqtt_connect_t* connect,
     uint32_t timeout =
         remaining > UINT32_MAX ? UINT32_MAX : (uint32_t)remaining;
     bool present = false;
-    MQTTStatus_t result = MQTT_Connect(&s->mqtt, &c, NULL, timeout, &present);
-    if (result == MQTTSuccess && present) {
+    MQTTStatus_t result =
+        MQTT_Connect(&s->mqtt, &c, will_pointer, timeout, &present);
+    if (result == MQTTSuccess && present && options->clean_session) {
         fail(s, NX_ERROR_STATE);
     } else if (result == MQTTSuccess && s->memory.control_count != 0u) {
-        /* A clean session cannot inherit requests from its predecessor. */
+        /* SUB/UNSUB correlation does not survive transport replacement. */
         memset(s->memory.controls, 0,
                s->memory.control_count * sizeof(*s->memory.controls));
     }
-    return finished(s, result, true);
+    nx_result_t status = finished(s, result, true);
+    if (status == NX_SUCCESS) {
+        *session_present = present;
+    }
+    return status;
+}
+
+/** \brief Select the default clean session without imposing will policy. */
+nx_result_t nx_mqtt_connect(nx_mqtt_t* s, const nx_mqtt_connect_t* connect,
+                            nx_mqtt_call_t call) {
+    const nx_mqtt_connect_options_t options = {true, NULL};
+    bool present = false;
+    return nx_mqtt_connect_options(s, connect, &options, &present, call);
 }
 
 static uint16_t next_id(nx_mqtt_t* s) {

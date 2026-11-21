@@ -343,7 +343,13 @@ class WorkflowContracts(unittest.TestCase):
                          "${{ github.event_name == 'push' && " + trusted + " }}")
         caller = ci['publish-docs']
         self.assertEqual(set(caller['needs']), {'docs', 'status-check'})
-        self.assertEqual(caller['if'], "github.event_name == 'push' && " + trusted)
+        # A docs-only push has skipped code ancestors. Explicit status handling
+        # permits that trusted publication while rejecting failed/cancelled CI.
+        self.assertEqual(caller['if'],
+                         "always() && !cancelled() && "
+                         "github.event_name == 'push' && " + trusted
+                         + " && needs.docs.result == 'success'"
+                         + " && needs.status-check.result == 'success'")
         self.assertEqual(caller['uses'], './.github/workflows/docs-publish.yml')
         self.assertEqual(caller['permissions'],
                          {'contents': 'read', 'pages': 'write', 'id-token': 'write'})

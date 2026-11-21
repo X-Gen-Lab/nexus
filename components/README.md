@@ -1,6 +1,6 @@
 # 可选通用组件
 
-本目录提供可复用的器件协议、共享资源组合、存储与中间件机制。组件通过明确的窄端口
+本目录提供可复用的算法、器件协议、共享资源组合、存储与中间件机制。组件通过明确的窄端口
 连接公共 I/O、时钟与外部策略；应用提供实例存储、执行者、预算和停机顺序。组件不
 选择产品引脚、业务寄存器、默认任务或全局设备名称。
 
@@ -12,19 +12,37 @@
 
 | 目录 | 组件及入口 | 外部工程仍负责 |
 | --- | --- | --- |
+| `algorithms/` | [数值、CRC、统计、滤波、插值与 PI／PID](algorithms/README.md)、[条件 CMSIS-DSP f32 profile](algorithms/cmsis_dsp/README.md) | 采样节拍、物理单位、系数、独立历史／工作区和控制对象验证 |
 | `runtime/` | [BusOwner／SPI／UART owner](runtime/bus_owner/README.md)、[OwnerObserver](runtime/owner_observer/README.md)、[ClockDomain](runtime/clock_domain/README.md)、[User I/O broker](runtime/user_io_broker/README.md)、[AMP IPC](runtime/amp_ipc/README.md) | executor、guard、队列容量、内存权限和退出会合 |
 | `buses/` | [软件 SPI](buses/software_spi/README.md)、[I2C／SCCB](buses/software_i2c/README.md)、[OneWire](buses/onewire/README.md)、[SMBus packet PEC](buses/smbus/README.md)、[I3C controller](buses/i3c_controller/README.md) | 硬件 owner、GPIO 电气、上拉、时钟与实测时序 |
 | `devices/` | [AT24C02](devices/at24c02/README.md)、[BMP280](devices/bmp280/README.md)、[DP83848](devices/dp83848/README.md)、[DS18B20](devices/ds18b20/README.md)、[ILI9341](devices/ili9341/README.md)、[红外](devices/infrared/README.md)、[TMP117](devices/tmp117/README.md)、[W25](devices/w25/README.md)、[XPT2046](devices/xpt2046/README.md) | 精确器件、接线、供电、校准、区域与恢复策略 |
-| `services/` | [Storage](services/storage/README.md)、[MappedStorage](services/mapped_storage/README.md)、[Settings](services/settings/README.md)、[Log](services/log/README.md) | 存储、schema、授权、提交频率、耐久和日志去向 |
+| `services/` | [Storage](services/storage/README.md)、[MappedStorage](services/mapped_storage/README.md)、[Settings](services/settings/README.md)、[Log](services/log/README.md)、[FAL](services/fal/README.md)、[FlashDB](services/flashdb/README.md)、[LittleFS](services/littlefs/README.md)、[FatFs](services/fatfs/README.md)、[诊断与故障 API](../docs/reference/api/components/services.md) | region／volume、schema、授权、维护窗口、耐久、观测新鲜度和日志去向 |
 | `protocols/` | [Modbus RTU](protocols/modbus/README.md)、[lwIP](protocols/network/README.md)、[TLS](protocols/tls/README.md)、[MQTT](protocols/mqtt/README.md)、[ST USB Host](protocols/st_usb/README.md)、[ST USB Device](protocols/st_usb_device/README.md)、[USB control](protocols/usb_control/README.md)、[MCUboot](protocols/mcuboot/README.md) | 寄存器表、网络执行进度、信任根、产品身份、布局与恢复 |
 
 `devices/` 包括输入设备解码；`infrared` 是 NEC 事件解码器，不代表具体接收器驱动。
+`runtime/` 的 [FSM](runtime/fsm/README.md)、[Periodic](runtime/periodic/README.md)、
+[Timers](runtime/timers/README.md)、[Debounce](runtime/debounce/README.md) 与
+[EventFanout](runtime/event_fanout/README.md)复用调用者已有执行路径；它们不建立另一套
+worker、queue 或全局 tick。平面 FSM 不表示已选层次状态机。
+`devices/` 的 [SFUD](devices/sfud/README.md)只选择明确 NOR profile，并复用已有 SPI
+owner。`protocols/` 还包括 [Modbus TCP](protocols/modbus_tcp/README.md)、
+[COBS framing](protocols/framing/README.md)、[UTC／SNTP](protocols/wall_clock/README.md)、
+[XMODEM CRC-128](protocols/xmodem/README.md)和 [AT client](protocols/at_client/README.md)；
+它们不选择产品寄存器、模块型号、更新分区、信任源或自动重放政策。
 
 分类只改变源码位置，既有公共头命名与 CMake target 保持不变。精确 F407 镜像交接
 归 [F4 System](../soc/stm32/stm32f4/system/README.md#f407-掩码状态下的镜像交接)
 所有，通过 `nexus/soc/stm32f407_handoff.h` 访问；通用组件不持有芯片私有实现。
 
+本页跨目录 `docs/`／`tests/` 链接以完整源码 checkout 为上下文。使用安装 SDK 时，
+按 SDK manifest 记录的 source commit 阅读同版本源仓；不能据此推断 SDK 携带文档
+工具或测试源码。
+
 ## 选择、存储与执行
+
+按[组件接入指南](../docs/guides/component-porting.md)选择实际 profile、静态存储和
+公开 target。六类是代码职责，不是装配必须同时启用的六个层。CMSIS-DSP、文件系统、
+数据库、Shell、RTT 等依赖 profile 必须显式选择；库存存在不触发下载、初始化或编译。
 
 CMake 管理组件源码依赖。普通库在所属分类与叶目录定义 target，应用使用
 `target_link_libraries()` 或固件 `LIBRARIES` 直接消费，无需加入 TOML 枚举。

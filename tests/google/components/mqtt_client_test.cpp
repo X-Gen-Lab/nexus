@@ -543,3 +543,46 @@ TEST_F(Mqtt, CleanSessionReconnectDoesNotRetainPriorControlRequests) {
               NX_SUCCESS);
     EXPECT_NE(second, 0);
 }
+
+TEST_F(Mqtt, ConnectOptionsSerializeLastWillWithoutRetainingItsInput) {
+    open();
+    stream.feed({0x20, 2, 0, 0});
+    const uint8_t payload[]{'o', 'f', 'f'};
+    nx_mqtt_publish_t will{"status", 6, payload, sizeof(payload), 1, true};
+    nx_mqtt_connect_options_t options{true, &will};
+    bool present = true;
+    ASSERT_EQ(nx_mqtt_connect_options(&client, &connection, &options, &present,
+                                      limit()),
+              NX_SUCCESS);
+    EXPECT_FALSE(present);
+    ASSERT_GT(stream.tx.size(), 10U);
+    EXPECT_EQ(stream.tx[9], 0x2e);
+    const std::vector<uint8_t> tail{0,   6, 's', 't', 'a', 't', 'u',
+                                    's', 0, 3,   'o', 'f', 'f'};
+    ASSERT_GE(stream.tx.size(), tail.size());
+    EXPECT_TRUE(
+        std::equal(tail.begin(), tail.end(), stream.tx.end() - tail.size()));
+}
+TEST_F(Mqtt, BrokerSessionPresentIsExplicitAndNotAnAutomaticOutboxReplay) {
+    open();
+    stream.feed({0x20, 2, 1, 0});
+    nx_mqtt_connect_options_t options{false, nullptr};
+    bool present = false;
+    ASSERT_EQ(nx_mqtt_connect_options(&client, &connection, &options, &present,
+                                      limit()),
+              NX_SUCCESS);
+    EXPECT_TRUE(present);
+    EXPECT_EQ(stream.tx[9], 0);
+    EXPECT_TRUE(events.empty());
+}
+TEST_F(Mqtt, InvalidWillRejectsBeforeAnyTransportEffect) {
+    open();
+    nx_mqtt_publish_t will{"bad/+", 5, nullptr, 0, 1, false};
+    nx_mqtt_connect_options_t options{true, &will};
+    bool present = true;
+    EXPECT_EQ(nx_mqtt_connect_options(&client, &connection, &options, &present,
+                                      limit()),
+              NX_ERROR_INVALID);
+    EXPECT_TRUE(present);
+    EXPECT_EQ(stream.writes + stream.reads, 0U);
+}

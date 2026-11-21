@@ -1,5 +1,6 @@
 """Retained supplier inventory does not silently enter an installed SDK."""
 import importlib.util
+import json
 from pathlib import Path
 import unittest
 
@@ -19,6 +20,17 @@ class SourceSDKImportSetTests(unittest.TestCase):
             with self.subTest(directory=directory):
                 self.assertFalse(sdk.selected(directory + "/source.lock.json"))
                 self.assertFalse(sdk.selected(directory + "/Firmware/driver.h"))
+
+    def test_optional_component_suppliers_stay_out_of_default_payload(self):
+        from tools.maintenance.component_lock import IDENTIFIERS
+        from tools.maintenance.source_catalogue import dependency
+        for identifier in sorted(IDENTIFIERS):
+            item = dependency(identifier)
+            with self.subTest(dependency=identifier):
+                self.assertFalse(sdk.selected(item.path + "/" + item.notice))
+                lock = json.loads((ROOT / item.source_lock).read_text())
+                entries = sdk.dependency_entries(ROOT, item.path)
+                self.assertEqual(set(entries), set(lock["files"]))
 
     def test_import_records_reject_malformed_or_unselected_sources(self):
         identity = {"source_tree": "a" * 40, "reviewed_imports": []}

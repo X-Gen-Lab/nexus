@@ -116,6 +116,8 @@ def private_compile_inputs(entry, sdk, extra_private=(), *,
                     parts[:4] != ("soc", "stm32", "stm32f4", "include")):
                 return True
             if parts[0] == "components":
+                if parts[:3] == ("components", "algorithms", "include"):
+                    return not (root / "components/algorithms/include/nexus/algorithms").is_dir()
                 # The canonical common-services composition owns this exact
                 # lwIP storage profile. Forced inputs and aliases stay private.
                 if (include_directory and path == declared_path and
@@ -195,9 +197,9 @@ def prepare_consumer(prefix, directory, name, run_checked, *, fixture=False,
         'nexus_add_platform(ASSEMBLY "${NEXUS_ASSEMBLY_FILE}")\n'
         'find_package(Nexus CONFIG REQUIRED)\n'
         'add_executable(parent_plain parent.c)\n'
-        'nexus_add_firmware(installed_c SOURCES main.c)\n'
+        'nexus_add_firmware(installed_c SOURCES main.c LIBRARIES Nexus::Algorithms Nexus::Periodic)\n'
         'nexus_add_firmware(installed_cpp SOURCES main.cpp LIBRARIES '
-        'Nexus::Log Nexus::BMP280 Nexus::Storage Nexus::MappedStorage Nexus::AMPIPC Nexus::I3CController Nexus::UserIoBroker Nexus::UserIoAsync'
+        'Nexus::Log Nexus::BMP280 Nexus::Storage Nexus::MappedStorage Nexus::AMPIPC Nexus::I3CController Nexus::UserIoBroker Nexus::UserIoAsync Nexus::Algorithms Nexus::Periodic'
         + (' Nexus::STM32F407Handoff' if arm and chip == "stm32" else '') + ')\n'
         'target_compile_options(installed_cpp PRIVATE "$<$<COMPILE_LANGUAGE:CXX>:-fno-exceptions;-fno-rtti>")\n'
         'get_target_property(sdk_root Nexus::Config NEXUS_SOURCE_DIR)\n'
@@ -218,7 +220,16 @@ def prepare_consumer(prefix, directory, name, run_checked, *, fixture=False,
             '#error Vendor SDK leaked into product source\n#endif\n'
             '#if __has_include("private/stm32f407_provider.h") || __has_include("gd32f470_provider.h")\n'
             '#error Concrete provider leaked into product source\n#endif\n'
+            '#include "nexus/algorithms/numeric.h"\n'
+            '#include "nexus/components/periodic.h"\n'
             'int main(void) {\n'
+            ' float bounded = 0.0F;\n'
+            ' if (nx_clamp_f32(2.0F, -1.0F, 1.0F, &bounded) != NX_SUCCESS || bounded != 1.0F) return 11;\n'
+            ' nx_periodic_t periodic;\n'
+            ' nx_periodic_release_t released;\n'
+            ' if (nx_periodic_reset(&periodic, 0U, 10U, NX_PERIODIC_SKIP) != NX_SUCCESS ||\n'
+            '     nx_periodic_poll(&periodic, 20U, 1U, &released) != NX_SUCCESS ||\n'
+            '     released.first_due != 20U || released.skipped != 1U) return 12;\n'
             '#if defined(NX_FACTORY_HAS_GPIO)\n'
             ' if (nx_factory_gpio_ref(NX_GPIO_REF_COUNT) != 0) return 7;\n'
             '#endif\n'
@@ -325,6 +336,9 @@ def service_sources(sdk, specification):
                 "application.h": selected / "application.h",
                 "composition.c": selected / "composition.c",
                 "public_ca.h": verification / "public_ca.h"}
+    if specification.scenario == "common_components":
+        return {name: verification / name for name in
+                ("application.c", "application.h", "composition.c")}
     if specification.scenario == "image_window":
         return {"main.c": verification / "main.c",
                 "layout.json": verification / "layout.json"}
@@ -394,6 +408,7 @@ def prepare_service_consumer(prefix, directory, specification, run_checked, *,
         + '_Static_assert(1, "Public service include isolation");\n')
     libraries = {
         "common_services": "Nexus::Settings Nexus::OSWait Nexus::LwIPStorage",
+        "common_components": "",
         "device_tmp117": "Nexus::TMP117I2C",
         "smbus": "Nexus::SMBus",
         "image_window": "",
@@ -410,7 +425,20 @@ def prepare_service_consumer(prefix, directory, specification, run_checked, *,
         "f4_sai": "",
     }
     selected_setup = ""
-    if specification.scenario in {"loaned_rx", "mcuboot_control"}:
+    if specification.scenario == "common_components":
+        selected_setup = (
+            'add_library(installed_public STATIC application.c private_headers.c)\n'
+            'target_link_libraries(installed_public PRIVATE Nexus::Algorithms '
+            'Nexus::AlgorithmsCMSISDSP Nexus::Periodic Nexus::FlashDB '
+            'Nexus::LittleFS Nexus::FatFS Nexus::SFUD Nexus::RTT Nexus::Shell)\n'
+            'nexus_apply_target_policy(installed_public)\n'
+            'nexus_target_warnings(installed_public STRICT)\n'
+            'nexus_add_firmware(installed_services SOURCES composition.c\n'
+            '  LIBRARIES installed_public Nexus::ShellStorage'
+            + (' Nexus::CmBacktrace' if specification.arm else '') + ')\n'
+            + ('target_compile_definitions(installed_services PRIVATE NX_COMPONENTS_F407=1)\n'
+               if specification.arm else ''))
+    elif specification.scenario in {"loaned_rx", "mcuboot_control"}:
         generic, storage = (("Nexus::LwIPLoanedRX", "Nexus::LwIPLoanedRXStorage")
                             if specification.scenario == "loaned_rx" else
                             ("Nexus::MCUBootControl", "Nexus::MCUBootPort"))
@@ -763,6 +791,17 @@ def service_symbols(specification):
     service_profile(specification)
     if specification.scenario == "secure_services":
         return secure_service_symbols(specification)
+    if specification.scenario == "common_components":
+        symbols = {"nx_platform_start", "nx_platform_stop", "nx_clamp_f32",
+                   "nx_periodic_reset", "nx_periodic_poll", "nx_cmsis_dot_f32",
+                   "arm_dot_prod_f32", "nx_flashdb_open", "fdb_kvdb_init",
+                   "fdb_tsdb_init", "nx_littlefs_mount", "lfs_mount",
+                   "nx_fatfs_mount", "f_mount", "nx_sfud_init", "sfud_write",
+                   "nx_rtt_init", "SEGGER_RTT_Init", "nx_shell_init", "shellInit"}
+        if specification.arm:
+            symbols.update({"nx_cm_backtrace_init", "cm_backtrace_init",
+                            "nx_cm_backtrace_record", "cm_backtrace_call_stack_any"})
+        return frozenset(symbols)
     if specification.scenario == "smbus":
         return frozenset({"nx_platform_start", "nx_platform_stop",
                           "nx_factory_smbus_binding", "nx_factory_i2c_device",
@@ -885,6 +924,12 @@ def service_symbols(specification):
 
 def service_scope(specification):
     """Describe the executed software boundary without physical claims."""
+    if specification.scenario == "common_components":
+        return ("Explicit selected common-component source profile: public "
+                "arithmetic, metadata/admission, RTT and read-only Shell. "
+                "Database/filesystem negative admission establishes no media "
+                "I/O or persistence. Native execution or F407 ARM linkage and "
+                "resources only; no hardware execution, stack or timing result.")
     if specification.scenario == "f4_power":
         return ("Selected exact F411/F446/F479 HSI96/168 System plus RTC primary "
                 "crystal LSE and explicit static ClockDomain owner; public C11 link, "
@@ -1011,7 +1056,7 @@ def check_service_image(sdk, source, build, specification, run_checked):
     canonical = verification / specification.assembly
     canonical_sources = service_sources(sdk, specification)
     secure = specification.scenario == "secure_services"
-    split = specification.scenario in {"secure_services", "loaned_rx",
+    split = specification.scenario in {"secure_services", "common_components", "loaned_rx",
                                        "mcuboot_control"}
     boot = specification.scenario == "mcuboot_boot"
     if ((source / "assembly.toml").read_bytes() != canonical.read_bytes()
@@ -1122,7 +1167,8 @@ def check_service_image(sdk, source, build, specification, run_checked):
         if secure:
             retention_command += ["--component-owner", "f407-secure-services",
                                   "--consumer", str(source / "application.c")]
-        no_provider = specification.scenario in {"image_window", "mcuboot_control"}
+        no_provider = specification.scenario in {
+            "image_window", "mcuboot_control", "common_components"}
         if not no_provider:
             run_checked(retention_command)
         retained = (json.loads(retention_path.read_text())

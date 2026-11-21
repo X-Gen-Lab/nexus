@@ -20,17 +20,24 @@ package 导出声明、选中依赖和许可记录，CMake 继续拥有源码／
 python tools/dev/dev.py prepare --scope sdk --backend freertos --host-support \
   --component network --component network-loaned-rx --component tls \
   --component mqtt --component mcuboot --component st-usb-device \
-  --component st-usb-host --allow-network
+  --component st-usb-host --component flashdb --component littlefs \
+  --component fatfs --component sfud --component rtt --component shell \
+  --component cmsis-dsp --component cm-backtrace --allow-network
 python cmake/package/package_source_sdk.py --source . --output /tmp/nexus-sdk-export \
   --package stm32f4 --backend freertos --host-support \
   --component network --component network-loaned-rx --component tls \
   --component mqtt --component mcuboot --component st-usb-device \
-  --component st-usb-host
+  --component st-usb-host --component flashdb --component littlefs \
+  --component fatfs --component sfud --component rtt --component shell \
+  --component cmsis-dsp --component cm-backtrace
 ```
 
 输出路径必须属于本次任务且尚未存在。制作器核对 clean source、gitlink、选中递归
 依赖与许可，记录精确 source revision／tree。默认包不能借完整计划的名义跳过缺失
 消费者；小型包的完整性与其产品消费范围分别验收。
+完整维护计划的 common-components 消费者需要上述八个新增依赖 profile；默认精简包
+不包含它们，不能用于这份完整计划。Native 场景不选择 CmBacktrace；对应 F407
+场景显式选择它。普通应用继续只交付自己实际选定的组件。
 
 ## 搬迁并执行实际消费者
 

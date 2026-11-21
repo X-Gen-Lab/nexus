@@ -55,6 +55,9 @@ _external_types = (
     'nx_lwip_adapter nx_lwip_rx_slot nx_lwip_rx_piece tcp_pcb pbuf pbuf_custom '
     'nx_task nx_permanent_task nx_notify nx_queue nx_channel nx_channel_waiter '
     'mbedtls_ssl_context mbedtls_ssl_config mbedtls_x509_crt mbedtls_pk_context '
-    'MQTTPubAckInfo_t MQTTContext_t netif'
+    'MQTTPubAckInfo_t MQTTContext_t netif '
+    'nx_lwip_dhcp tcp_pcb_listen udp_pcb'
 ).split()
-nitpick_ignore = [('c:identifier', name) for name in _external_types]
+# Standard variadic ABI and the opt-in letter-shell composition layout are
+# external declarations; they do not name Nexus API reference targets.
+nitpick_ignore = [('c:identifier', name) for name in (*_external_types, 'va_list', 'Shell')]

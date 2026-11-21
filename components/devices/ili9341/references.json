@@ -1,0 +1,20 @@
+{
+  "sources": [
+    {
+      "url": "https://cdn-shop.adafruit.com/datasheets/ILI9341.pdf",
+      "publisher": "ILITEK manufacturer-authored specification mirrored by Adafruit",
+      "document": "ILI9341_DS_V1.11.pdf",
+      "version": "V1.11",
+      "sha256": "a9bbfdf6d078f54a6aca7a56cba91246905358d3a4ed738817bfd3f582b5741c",
+      "bytes": 3667641,
+      "sections": [
+        "8.2.2 Software Reset (01h)",
+        "8.2.12 Sleep Out (11h)",
+        "Memory Access Control (36h)",
+        "240RGBx320 native addressing and RGB565 MCU interface"
+      ]
+    }
+  ],
+  "reviewed_scope": "Explicit 240x320 or MV-swapped 320x240 logical dimensions, RGB565 command/data access, cooperative reset and sleep-out waits; no module power/gamma/calibration profile",
+  "physical_status": "not_executed"
+}

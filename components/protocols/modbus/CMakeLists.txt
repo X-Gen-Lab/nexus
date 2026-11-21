@@ -1,9 +1,10 @@
 # Bounded RTU protocol with explicit register and settled RS485 ports.
 # Author: Nexus Team
-add_library(nexus_modbus STATIC src/modbus_rtu.c)
+add_library(nexus_modbus STATIC src/modbus_rtu.c src/register_pdu.c)
 target_include_directories(
     nexus_modbus
     PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include"
+    PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/private"
 )
 target_link_libraries(
     nexus_modbus

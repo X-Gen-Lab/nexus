@@ -7,13 +7,13 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 682cfb74dcf7549d1705c3b9126568894d892c9a1e374de8ff86a10970984b2d\n"
+"X-Nexus-Source-SHA256: b8d41649728ca8f93aa491d3591c371d6d6a98e21fb4454c1c00a4eb2f35b43b\n"
 
-#: ../../../../../../docs/development/sdk-publishing.md:8
+#: ../../../../../../../../workspace/nexus/docs/development/sdk-publishing.md:8
 msgid "导出与验收 Source SDK"
 msgstr "Export and qualify a Source SDK"
 
-#: ../../../../../../docs/development/sdk-publishing.md:10
+#: ../../../../../../../../workspace/nexus/docs/development/sdk-publishing.md:10
 msgid ""
 "本页面向维护者。普通应用从已选源码或 SDK 消费，不执行整套 SDK 发布验证。 先冻结干净、已提交的平台源码，再选择 "
 "package、后端和可选组件。"
@@ -23,11 +23,11 @@ msgstr ""
 " clean, committed platform source, then select the package, backend and "
 "optional components."
 
-#: ../../../../../../docs/development/sdk-publishing.md:13
+#: ../../../../../../../../workspace/nexus/docs/development/sdk-publishing.md:13
 msgid "选择交付范围"
 msgstr "Select the delivery scope"
 
-#: ../../../../../../docs/development/sdk-publishing.md:15
+#: ../../../../../../../../workspace/nexus/docs/development/sdk-publishing.md:15
 msgid ""
 "默认导出是精简 F4 裸机源码包；Native 模型和中间件须明确选入。包内容来源于 package 导出声明、选中依赖和许可记录，CMake "
 "继续拥有源码／链接图。 完整维护消费者计划还需要 FreeRTOS、Native 和下列组件；从平台根执行："
@@ -39,23 +39,29 @@ msgstr ""
 " plan also needs FreeRTOS, Native and the following components. Run from the"
 " platform root:"
 
-#: ../../../../../../docs/development/sdk-publishing.md:31
+#: ../../../../../../../../workspace/nexus/docs/development/sdk-publishing.md:35
 msgid ""
 "输出路径必须属于本次任务且尚未存在。制作器核对 clean source、gitlink、选中递归 依赖与许可，记录精确 source "
-"revision／tree。默认包不能借完整计划的名义跳过缺失 消费者；小型包的完整性与其产品消费范围分别验收。"
+"revision／tree。默认包不能借完整计划的名义跳过缺失 消费者；小型包的完整性与其产品消费范围分别验收。 完整维护计划的 common-"
+"components 消费者需要上述八个新增依赖 profile；默认精简包 不包含它们，不能用于这份完整计划。Native 场景不选择 "
+"CmBacktrace；对应 F407 场景显式选择它。普通应用继续只交付自己实际选定的组件。"
 msgstr ""
 "The output path must belong to this task and must not already exist. The "
 "packager checks clean source, gitlinks, selected recursive dependencies and "
-"licenses, and records the exact source revision and tree. A default package "
-"cannot claim the complete plan while omitting missing consumers. Package "
-"integrity and the product scope of a smaller package are validated "
-"separately."
+"licenses, and records the exact source revision/tree. A default package "
+"cannot claim the complete plan while skipping missing consumers; validate a "
+"small package’s integrity and its product consumption scope separately. The "
+"complete maintenance plan’s common-components consumers require the eight "
+"additional dependency profiles listed above; the default minimal package "
+"omits them and cannot run this complete plan. Native scenarios do not select"
+" CmBacktrace; the corresponding F407 scenario selects it explicitly. "
+"Ordinary applications continue to deliver only their selected components."
 
-#: ../../../../../../docs/development/sdk-publishing.md:35
+#: ../../../../../../../../workspace/nexus/docs/development/sdk-publishing.md:42
 msgid "搬迁并执行实际消费者"
 msgstr "Relocate and execute real consumers"
 
-#: ../../../../../../docs/development/sdk-publishing.md:48
+#: ../../../../../../../../workspace/nexus/docs/development/sdk-publishing.md:55
 msgid ""
 "当前完整计划由 `tools/maintenance/consumer_profiles.py` 维护。读取新生成的 "
 "`verification.json`、每条命令退出码、Native 运行结果、MCU ELF／BIN／map 和 资源报告。`--parallel` "
@@ -69,7 +75,7 @@ msgstr ""
 " work runs concurrently. Do not cache success reports, filter complete "
 "acceptance or mark missing executions as passed."
 
-#: ../../../../../../docs/development/sdk-publishing.md:53
+#: ../../../../../../../../workspace/nexus/docs/development/sdk-publishing.md:60
 msgid ""
 "SDK prefix 与验证输出必须是独立、无 symlink 别名的规范路径，不互相包含。路径 拒绝不清除无关目录；已接纳的验证器只管理自己的输出。"
 msgstr ""
@@ -78,11 +84,11 @@ msgstr ""
 " does not remove unrelated directories; an admitted verifier manages only "
 "its own output."
 
-#: ../../../../../../docs/development/sdk-publishing.md:56
+#: ../../../../../../../../workspace/nexus/docs/development/sdk-publishing.md:63
 msgid "发布收条"
 msgstr "Release receipt"
 
-#: ../../../../../../docs/development/sdk-publishing.md:58
+#: ../../../../../../../../workspace/nexus/docs/development/sdk-publishing.md:65
 msgid ""
 "收条至少关联平台 source revision／tree、profile、依赖、manifest、实际消费者范围、 "
 "命令与退出码、产物及失败原件。消费前后完整性须一致；制作可下载归档时再验证 归档成员及校验和。软件结果、文档来源、版本标签和物理记录保持各自身份。"
@@ -95,7 +101,7 @@ msgstr ""
 "documentation sources, version tags and physical records retain separate "
 "identities."
 
-#: ../../../../../../docs/development/sdk-publishing.md:62
+#: ../../../../../../../../workspace/nexus/docs/development/sdk-publishing.md:69
 msgid ""
 "维护源码不得依赖开发 fixture opt-in 获得正式包资格。`--development-fixture` 生成的包为 "
 "nonpublishable；许可、来源、接口代际等错误不因 opt-in 放宽。 签名密钥、产品分区、制造数据和产品发布审批留在所属外部工程。"
@@ -106,7 +112,7 @@ msgstr ""
 " errors. Signing keys, product partitions, manufacturing data and product "
 "release approval remain in their external projects."
 
-#: ../../../../../../docs/development/sdk-publishing.md:66
+#: ../../../../../../../../workspace/nexus/docs/development/sdk-publishing.md:73
 msgid ""
 "示例仓先更新对应 gitlink、依赖锁、schema 与模板摘要，再执行其正常门禁。平台与 示例的提交分别记录。验收工具与公开 API 见 "
 "[文档与维护工具参考](../reference/documentation-tools.md)，实际消费见 [使用 Source "

@@ -58,7 +58,7 @@ typedef struct {
     void* idle_context;
 } nx_mqtt_config_t;
 
-/** \brief Transient CONNECT parameters; this profile always uses clean session.
+/** \brief Transient CONNECT fields; the default connect API uses clean session.
  */
 typedef struct {
     const char* client_id;
@@ -79,6 +79,31 @@ typedef struct {
     uint8_t qos;
     bool retain;
 } nx_mqtt_publish_t;
+
+/** \brief Explicit CONNECT profile; caller owns broker session policy. */
+typedef struct {
+    bool clean_session;
+    const nx_mqtt_publish_t* will;
+} nx_mqtt_connect_options_t;
+
+/**
+ * \brief           Connect with explicit last-will and broker session flags.
+ * \param[in,out]   client: Initialized inactive client, fresh/drained
+ * transport. \param[in]       connect: Transient identity and credential
+ * fields. \param[in]       options: Transient clean-session flag and optional
+ * QoS0/1 will. \param[out]      session_present: Distinct output, set only on
+ * success. \param[in]       call: Finite deadline and transport-call budget.
+ * \return          SUCCESS or admission/sticky transport failure.
+ * \note            Task-only, all inputs expire on return. Persistent broker
+ *                  session selection does not persist local message payloads,
+ *                  reconnect transport, or replay outstanding QoS1 messages.
+ *                  Product reconciles session_present and its semantic outbox.
+ *                  Control ACK slots are retired on each successful CONNECT.
+ */
+nx_result_t nx_mqtt_connect_options(nx_mqtt_t* client,
+                                    const nx_mqtt_connect_t* connect,
+                                    const nx_mqtt_connect_options_t* options,
+                                    bool* session_present, nx_mqtt_call_t call);
 
 /**
  * \brief           Product clock shared by all clients and their transports

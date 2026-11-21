@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 
-CONSUMER_POLICY = "nexus-sdk-consumers-v29"
+CONSUMER_POLICY = "nexus-sdk-consumers-v30"
 BASE_CONSUMERS = (("native", False, "native"), ("stm32", True, "stm32"))
 MODERN_CONSUMERS = ()
 SELECTED_CONSUMERS = (
@@ -110,6 +110,10 @@ SERVICE_CONSUMERS = (
                        f"arm-{slice_name}-{part}-{role}-blocks", True, "f4_sai")
       for part, slice_name in (("f446ze", "sai2"), ("f479ni", "sparse"))
       for role in ("master", "slave")),
+    ServiceConsumer("native common components", "native.toml",
+                    "native-common-components", False, "common_components"),
+    ServiceConsumer("f407 common components", "f407.toml",
+                    "arm-common-components", True, "common_components"),
 )
 NATIVE_TIME_SMOKES = frozenset({"native-time-pair", "native-time-empty"})
 

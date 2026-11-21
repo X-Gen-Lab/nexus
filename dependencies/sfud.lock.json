@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "kind": "nexus-component-source",
+  "identifier": "sfud",
+  "path": "ext/sfud",
+  "upstream_url": "https://github.com/armink/SFUD.git",
+  "fetch_url": "https://github.com/X-Gen-Lab/SFUD.git",
+  "commit": "6b4bef82e6c603b783a17968f1b75da89cc5e2f8",
+  "tree": "aa6103f1ed3db97c19135607d4062455a4287aaa",
+  "license": {
+    "path": "LICENSE",
+    "expression": "MIT"
+  },
+  "files": {
+    "LICENSE": "e9616ae0782b263aa7ce9d33fc825ada7ebe7b284318b66dfed270e40725bb0a",
+    "sfud/inc/sfud.h": "53dc02936309a5d51d0ddd91d2fa838d54718b1461bb3c99d227a24fda292fdb",
+    "sfud/inc/sfud_cfg.h": "56a292b58012e2e27a23a5288c4fc14cf853f41102c639bcaf712188e34639d3",
+    "sfud/inc/sfud_def.h": "b21ab03cda346bd3d7e8d41d570a0f5505c8df395849f4076effce6b757f698d",
+    "sfud/inc/sfud_flash_def.h": "4c83e7bf33b71497b8a1ab996a998d4be4700a576c0e5360efde87f16308a227",
+    "sfud/src/sfud.c": "874b612166a392186dfef00d4cccb81ce28a2e85f19c62c3c26a17d0aff33775",
+    "sfud/src/sfud_sfdp.c": "f8c30af001b94f0be81c056cb6f41ce9c9e6b782aa1a6bb2b92b7c46de2993ff"
+  }
+}
