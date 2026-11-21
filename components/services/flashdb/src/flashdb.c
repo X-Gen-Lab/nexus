@@ -141,7 +141,7 @@ nx_result_t nx_flashdb_init(nx_flashdb_t* database, nx_fal_t* flash,
     memcpy(state->device.name, "nexus", sizeof("nexus"));
     state->device.len = flash->region.size;
     state->device.blk_size = flash->erase_bytes;
-    state->device.write_gran = flash->program_bytes * 8U;
+    state->device.write_gran = (size_t)flash->program_bytes * 8U;
     return NX_SUCCESS;
 }
 

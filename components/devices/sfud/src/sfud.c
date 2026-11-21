@@ -390,6 +390,9 @@ nx_result_t nx_sfud_init(nx_sfud_t* device, const nx_spi_endpoint_t* endpoint,
     uint8_t identity[3];
     sfud_err probed = exchange(&state->flash.spi, &command, 1U, identity, 3U);
     nx_result_t result = probed == SFUD_SUCCESS ? NX_SUCCESS : device->error;
+    if (probed != SFUD_SUCCESS && result == NX_SUCCESS) {
+        result = NX_ERROR_IO;
+    }
     if (result == NX_SUCCESS && (identity[0] != 0xefU || identity[1] != 0x40U ||
                                  identity[2] != 0x18U)) {
         result = NX_ERROR_UNSUPPORTED;

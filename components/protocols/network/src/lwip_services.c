@@ -124,7 +124,10 @@ nx_result_t nx_lwip_udp_send(nx_lwip_udp_t* s, const nx_ipv4_peer_t* peer,
         s->active = false;
         return NX_ERROR_EXHAUSTED;
     }
-    err_t error = size != 0 ? pbuf_take(packet, data, (u16_t)size) : ERR_OK;
+    err_t error = ERR_OK;
+    if (size != 0) {
+        error = pbuf_take(packet, data, (u16_t)size);
+    }
     if (error == ERR_OK) {
         ip_addr_t address;
         IP_ADDR4(&address, peer->address[0], peer->address[1], peer->address[2],

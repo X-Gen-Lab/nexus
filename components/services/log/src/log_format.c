@@ -97,10 +97,7 @@ typedef enum {
     LENGTH_HH,
     LENGTH_H,
     LENGTH_L,
-    LENGTH_LL,
-    LENGTH_J,
-    LENGTH_Z,
-    LENGTH_T
+    LENGTH_LL
 } length_t;
 
 /** \brief Literal width and precision are validated before argument access. */
@@ -172,53 +169,32 @@ static specification_t specification(const char* format, size_t* cursor) {
                                       : (twice ? LENGTH_LL : LENGTH_L);
     } else if (modifier == 'j' || modifier == 'z' || modifier == 't') {
         ++*cursor;
-        spec.length = modifier == 'j'   ? LENGTH_J
-                      : modifier == 'z' ? LENGTH_Z
-                                        : LENGTH_T;
+        if (modifier == 'j') {
+            bool signed_conversion =
+                format[*cursor] == 'd' || format[*cursor] == 'i';
+            if (signed_conversion)
+                spec.length = _Generic((intmax_t)0, int
+                                       : LENGTH_DEFAULT, long
+                                       : LENGTH_L, long long
+                                       : LENGTH_LL);
+            else
+                spec.length = _Generic((uintmax_t)0, unsigned
+                                       : LENGTH_DEFAULT, unsigned long
+                                       : LENGTH_L, unsigned long long
+                                       : LENGTH_LL);
+        }
+        if (modifier == 'z')
+            spec.length = _Generic((size_t)0, unsigned
+                                   : LENGTH_DEFAULT, unsigned long
+                                   : LENGTH_L, unsigned long long
+                                   : LENGTH_LL);
+        if (modifier == 't')
+            spec.length = _Generic((ptrdiff_t)0, int
+                                   : LENGTH_DEFAULT, long
+                                   : LENGTH_L, long long
+                                   : LENGTH_LL);
     }
     return spec;
-}
-
-/** \brief Fetch a promoted signed argument in the maintained C ABI. */
-static intmax_t signed_argument(va_list* args, length_t length) {
-    switch (length) {
-        case LENGTH_HH:
-            return (signed char)va_arg(*args, int);
-        case LENGTH_H:
-            return (short)va_arg(*args, int);
-        case LENGTH_L:
-            return va_arg(*args, long);
-        case LENGTH_LL:
-            return va_arg(*args, long long);
-        case LENGTH_J:
-            return va_arg(*args, intmax_t);
-        case LENGTH_Z:
-        case LENGTH_T:
-            return va_arg(*args, ptrdiff_t);
-        default:
-            return va_arg(*args, int);
-    }
-}
-
-/** \brief Size/ptrdiff counterparts use the selected ABI's integer types. */
-static uintmax_t unsigned_argument(va_list* args, length_t length) {
-    switch (length) {
-        case LENGTH_HH:
-            return (unsigned char)va_arg(*args, unsigned);
-        case LENGTH_H:
-            return (unsigned short)va_arg(*args, unsigned);
-        case LENGTH_L:
-            return va_arg(*args, unsigned long);
-        case LENGTH_LL:
-            return va_arg(*args, unsigned long long);
-        case LENGTH_J:
-            return va_arg(*args, uintmax_t);
-        case LENGTH_Z:
-        case LENGTH_T:
-            return va_arg(*args, size_t);
-        default:
-            return va_arg(*args, unsigned);
-    }
 }
 
 /** \brief Render sign/prefix before zero padding with bounded local digits. */
@@ -247,7 +223,7 @@ static void integer(output_t* out, specification_t spec, char type,
         ++zeros;
     char sign = 0;
     if (type == 'd' || type == 'i')
-        sign = negative ? '-' : spec.plus ? '+' : spec.space ? ' ' : 0;
+        sign = (char)(negative ? '-' : spec.plus ? '+' : spec.space ? ' ' : 0);
     bool prefix = type == 'p' || (base == 16U && spec.alternate && value != 0U);
     size_t size = count + zeros + (sign != 0 ? 1U : 0U) + (prefix ? 2U : 0U);
     size_t padding = spec.width > size ? spec.width - size : 0U;
@@ -268,24 +244,14 @@ static void integer(output_t* out, specification_t spec, char type,
         repeat(out, ' ', padding);
 }
 
-/** \brief Strings never read beyond precision; characters read one promoted
- * int. */
-static bool text(output_t* out, specification_t spec, char type,
-                 va_list* args) {
-    char byte = 0;
-    const char* bytes;
+/** \brief Precision limits all string reads; no character temporary is indexed.
+ */
+static bool text(output_t* out, specification_t spec, const char* bytes) {
+    if (bytes == NULL)
+        return false;
     size_t count = 0U;
-    if (type == 'c') {
-        byte = (char)va_arg(*args, int);
-        bytes = &byte;
-        count = 1U;
-    } else {
-        bytes = va_arg(*args, const char*);
-        if (bytes == NULL)
-            return false;
-        while (count < spec.precision && bytes[count] != '\0')
-            ++count;
-    }
+    while (count < spec.precision && bytes[count] != '\0')
+        ++count;
     size_t padding = spec.width > count ? spec.width - count : 0U;
     if (!spec.left)
         repeat(out, ' ', padding);
@@ -321,18 +287,62 @@ nx_result_t nx_log_render(char* buffer, size_t capacity, size_t* length,
         }
         specification_t spec = specification(format, &i);
         char type = format[i];
-        if (type == 's' || type == 'c')
-            valid = text(&out, spec, type, &values);
-        else if (type == 'd' || type == 'i') {
-            intmax_t value = signed_argument(&values, spec.length);
+        if (type == 's')
+            valid = text(&out, spec, va_arg(values, const char*));
+        else if (type == 'c') {
+            char byte = (char)va_arg(values, int);
+            size_t padding = spec.width > 1U ? spec.width - 1U : 0U;
+            if (!spec.left)
+                repeat(&out, ' ', padding);
+            put(&out, byte);
+            if (spec.left)
+                repeat(&out, ' ', padding);
+        } else if (type == 'd' || type == 'i') {
+            intmax_t value;
+            switch (spec.length) {
+                case LENGTH_HH:
+                    value = (intmax_t)(signed char)va_arg(values, int);
+                    break;
+                case LENGTH_H:
+                    value = (short)va_arg(values, int);
+                    break;
+                case LENGTH_L:
+                    value = va_arg(values, long);
+                    break;
+                case LENGTH_LL:
+                    value = (intmax_t)va_arg(values, long long);
+                    break;
+                default:
+                    value = va_arg(values, int);
+                    break;
+            }
             bool negative = value < 0;
             uintmax_t magnitude =
                 negative ? 0U - (uintmax_t)value : (uintmax_t)value;
             integer(&out, spec, type, magnitude, negative);
         } else {
-            uintmax_t value = type == 'p'
-                                  ? (uintmax_t)(uintptr_t)va_arg(values, void*)
-                                  : unsigned_argument(&values, spec.length);
+            uintmax_t value;
+            if (type == 'p')
+                value = (uintmax_t)(uintptr_t)va_arg(values, void*);
+            else {
+                switch (spec.length) {
+                    case LENGTH_HH:
+                        value = (unsigned char)va_arg(values, unsigned);
+                        break;
+                    case LENGTH_H:
+                        value = (unsigned short)va_arg(values, unsigned);
+                        break;
+                    case LENGTH_L:
+                        value = va_arg(values, unsigned long);
+                        break;
+                    case LENGTH_LL:
+                        value = (uintmax_t)va_arg(values, unsigned long long);
+                        break;
+                    default:
+                        value = va_arg(values, unsigned);
+                        break;
+                }
+            }
             integer(&out, spec, type, value, false);
         }
     }

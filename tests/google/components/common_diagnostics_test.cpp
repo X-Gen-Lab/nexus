@@ -10,12 +10,15 @@
 #include "nexus/components/health.h"
 #include "nexus/components/log_format.h"
 #include <array>
+#include <cinttypes>
 #include <cstddef>
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
 #include <gtest/gtest.h>
+#include <limits>
 #include <string>
+#include <type_traits>
 
 namespace {
 TEST(CommonDiagnostics, FaultRoundTripPreservesNumericFactsAndResetBits) {
@@ -127,6 +130,38 @@ struct CapturedLog {
     }
 };
 
+/** \brief Compare independent bytes while reusing the caller's same va_list. */
+static void compare_reused_arguments(const char* format, ...) {
+    CapturedLog capture;
+    nx_log_t logger{};
+    ASSERT_EQ(nx_log_init(&logger, {&capture, CapturedLog::write, nullptr},
+                          NX_LOG_INFO),
+              NX_SUCCESS);
+    std::array<char, 4096> reference{}, scratch{};
+    va_list arguments;
+    va_start(arguments, format);
+    va_list copied;
+    va_copy(copied, arguments);
+    int expected =
+        std::vsnprintf(reference.data(), reference.size(), format, copied);
+    va_end(copied);
+    nx_result_t first = nx_log_vprintf(&logger, NX_LOG_INFO, scratch.data(),
+                                       scratch.size(), 100U, format, arguments);
+    std::string initial = capture.bytes;
+    nx_result_t second =
+        nx_log_vprintf(&logger, NX_LOG_INFO, scratch.data(), scratch.size(),
+                       100U, format, arguments);
+    va_end(arguments);
+    ASSERT_GE(expected, 0);
+    ASSERT_LT(static_cast<size_t>(expected), reference.size());
+    EXPECT_EQ(first, NX_SUCCESS);
+    EXPECT_EQ(second, NX_SUCCESS);
+    EXPECT_EQ(capture.writes, 2U);
+    EXPECT_EQ(initial,
+              std::string(reference.data(), static_cast<size_t>(expected)));
+    EXPECT_EQ(capture.bytes, initial);
+}
+
 TEST(CommonDiagnostics, FormatterPublishesOnlyWholeAdmittedRecords) {
     CapturedLog capture;
     nx_log_t logger{};
@@ -201,5 +236,39 @@ TEST(CommonDiagnostics, FormatterRejectsUnboundedOrExcessWorkBeforeSink) {
     EXPECT_EQ(nx_log_printf(&logger, NX_LOG_INFO, scratch.data(), 1, 100, "x"),
               NX_ERROR_OVERFLOW);
     EXPECT_EQ(capture.writes, 0U);
+}
+TEST(CommonDiagnostics, FormatterMixedIntegerLengthsPreserveCallerArguments) {
+    compare_reused_arguments(
+        "%hhd|%hhu|%hd|%hu|%d|%u|%ld|%lu|%lld|%llu|%jd|%ju|%zd|%zu|%td|%tu",
+        -128, 255, -32768, 65535, -7, 7U, std::numeric_limits<long>::min(),
+        std::numeric_limits<unsigned long>::max(),
+        std::numeric_limits<long long>::min(),
+        std::numeric_limits<unsigned long long>::max(),
+        std::numeric_limits<intmax_t>::min(),
+        std::numeric_limits<uintmax_t>::max(), std::make_signed_t<size_t>{-8},
+        size_t{8}, ptrdiff_t{-9}, std::make_unsigned_t<ptrdiff_t>{9});
+}
+
+TEST(CommonDiagnostics, FormatterCharactersPreserveNulsPaddingAndWholeRecords) {
+    compare_reused_arguments("%3c|%-4c|%.0s|%.1s|%+08d|%#08x|%.8u", 0, 255,
+                             "ignored", "abcdef", -12, 0xABU, 9U);
+    compare_reused_arguments("%1024c|%-1024.0s", 'x', "ignored");
+    CapturedLog capture;
+    nx_log_t logger{};
+    ASSERT_EQ(nx_log_init(&logger, {&capture, CapturedLog::write, nullptr},
+                          NX_LOG_INFO),
+              NX_SUCCESS);
+    std::array<char, 6> scratch{'<', 'a', 'a', 'a', 'a', '>'};
+    EXPECT_EQ(nx_log_printf(&logger, NX_LOG_INFO, scratch.data() + 1U, 4U, 100U,
+                            "%4c", 'x'),
+              NX_ERROR_OVERFLOW);
+    EXPECT_EQ(capture.writes, 0U);
+    EXPECT_EQ(scratch[4], '\0');
+    EXPECT_EQ(scratch.front(), '<');
+    EXPECT_EQ(scratch.back(), '>');
+    EXPECT_EQ(nx_log_printf(&logger, NX_LOG_INFO, scratch.data() + 1U, 4U, 100U,
+                            "%-3c", 'x'),
+              NX_SUCCESS);
+    EXPECT_EQ(capture.bytes, "x  ");
 }
 } /* namespace */

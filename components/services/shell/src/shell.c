@@ -58,7 +58,10 @@ static signed short output_bytes(char* bytes, unsigned short length) {
     }
     active_shell->result = active_shell->io.write(
         active_shell->io.context, bytes, length, active_shell->deadline);
-    return active_shell->result == NX_SUCCESS ? (signed short)length : 0;
+    if (active_shell->result != NX_SUCCESS) {
+        return 0;
+    }
+    return (signed short)length;
 }
 
 /** \brief Command formatting uses fixed numeric formats and an 80-byte version.
