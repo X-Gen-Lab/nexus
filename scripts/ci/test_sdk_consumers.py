@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 import subprocess
 import tempfile
+import tomllib
 import unittest
 
 from scripts.ci import sdk_consumers
@@ -47,6 +48,19 @@ class SDKChangeTests(unittest.TestCase):
             sdk_consumers.verify_checkout(root, head, device, Path(parent) / "report", run=run)
             self.assertIn("--changed-path", actions[-1])
             self.assertIn(device[0], actions[-1])
+            self.assertFalse(any("--component" in call for call in actions[:2]))
+            actions.clear()
+            sdk_consumers.verify_checkout(root, head, None, Path(parent) / "full", run=run)
+            required = {"mcuboot", "mqtt", "network", "network-loaned-rx",
+                        "st-usb-device", "st-usb-host", "tls"}
+            consumers = (Path(__file__).resolve().parents[2] /
+                         "cmake/package/verification/common_components")
+            for assembly in ("native.toml", "f407.toml"):
+                required.update(tomllib.loads((consumers / assembly).read_text())["components"])
+            for call in actions[:2]:
+                components = {call[index + 1] for index, item in enumerate(call)
+                              if item == "--component"}
+                self.assertEqual(components, required)
             actions.clear()
             fake_head[0] = "c" * 40
             with self.assertRaisesRegex(ValueError, "revision"):

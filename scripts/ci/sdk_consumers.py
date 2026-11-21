@@ -12,9 +12,10 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 from tools.dev.change_paths import changed_paths, classify
 
-# The complete published consumer plan exercises these optional SDK transports.
+# The complete published consumer plan exercises these optional SDK components.
 FULL_COMPONENTS = ("mcuboot", "mqtt", "network", "network-loaned-rx",
-                   "st-usb-device", "st-usb-host", "tls")
+                   "st-usb-device", "st-usb-host", "tls", "flashdb", "littlefs",
+                   "fatfs", "sfud", "rtt", "shell", "cmsis-dsp", "cm-backtrace")
 DEVICE_INPUTS = ("components/devices/tmp117/src/", "cmake/package/verification/device_tmp117/")
 
 
