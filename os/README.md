@@ -15,6 +15,10 @@ OS 层提供公共等待／唤醒合同和后端专用静态对象 API。裸机�
 暴露真实内核控制块需求。产品换内核时显式调整任务生命周期，不存在统一 Task／
 Queue ABI 或最大存储池。
 
+统一源码接口的[目标架构](../docs/explanation/os-portability.md)与
+[实施清单](../docs/development/os-portability-plan.md)单独记录待实施设计；
+它们不改变本页当前接口、后端支持或验证状态。
+
 | 入口 | 内容 |
 | --- | --- |
 | `include/nexus/os/wait.h`、`wait.c` | 公共判定条件等待和等待选择 |

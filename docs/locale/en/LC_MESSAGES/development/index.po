@@ -7,20 +7,20 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 8fcd6a2bd9448749bae0f607752c0f44fafaa0ee391dd099bb5a7b0a75c605dc\n"
+"X-Nexus-Source-SHA256: 6ae87ff0867af123a69f00be88790cce1d7cd5066298d60c1aff93aa79a140e4\n"
 
-#: ../../../../../../docs/development/index.md:8
+#: ../../../../docs/development/index.md:8
 msgid "维护平台与文档"
 msgstr "Maintain the platform and documentation"
 
-#: ../../../../../../docs/development/index.md:10
+#: ../../../../docs/development/index.md:10
 msgid "平台贡献保留既有 C11、格式与注释合同，新行为执行真实 RED／GREEN。 按当前任务进入工具、依赖、SDK 或文档流程。"
 msgstr ""
 "Platform contributions preserve existing C11, formatting and comment "
 "contracts. New behavior executes real RED/GREEN. Enter the tool, dependency,"
 " SDK or documentation workflow appropriate to the task."
 
-#: ../../../../../../docs/development/index.md:24
+#: ../../../../docs/development/index.md:25
 msgid ""
 "只开发外部应用时先看[应用指南](../guides/index.md)；公共状态与字段见 "
 "[参考合同](../reference/contracts/index.md)。"

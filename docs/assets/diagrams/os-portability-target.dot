@@ -1,0 +1,34 @@
+// FIG-27 target design, not current API or hardware qualification.
+// Basis: docs/explanation/os-portability.md; os/README.md; os/CMakeLists.txt.
+// All arrows are build dependencies, including compilation and link selection.
+// Dashed edges are conditional.
+// Exactly one backend is selected for each image; no runtime dispatch is shown.
+digraph osPortabilityTarget {
+    graph [label="FIG-27 统一 OS 接口：目标构建依赖\n尚未实现；一幅镜像只选一个后端",
+           fontname="Noto Sans CJK SC", fontsize=15, labelloc=t, rankdir=TB,
+           bgcolor="white", pad=0.25, nodesep=0.35, ranksep=0.50];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
+          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
+          fontsize=12, margin="0.16,0.10"];
+    edge [color="#475569", fontcolor="#0f172a",
+          fontname="Noto Sans CJK SC", fontsize=10, arrowsize=0.8];
+    business [label="业务与可复用执行组件\n只依赖公共引用与行为合同"];
+    assembly [label="外部应用装配\n任务、栈、容量与退出政策", fillcolor="#f8fafc"];
+    api [label="目标公共 OS API\n任务 / 通知 / 队列 / 通道"];
+    storage [label="装配侧静态存储声明\n布局由所选后端确定"];
+    extension [label="显式后端扩展\n仅选择者承担移植责任", fillcolor="#fff7ed"];
+    backend [label="编译期选定的唯一实现\nFreeRTOS / ThreadX / pthread"];
+    kernel [label="选定官方内核或 pthread\n原生对象与实际退出机制"];
+    core [label="Core\n结果与单调截止时间"];
+    arch [label="Arch\n中断上下文与原子操作"];
+    business -> api [label="公共声明"];
+    assembly -> api [label="创建与退出合同"];
+    assembly -> storage [label="实际容量与对齐"];
+    assembly -> extension [label="可选专有能力", style=dashed];
+    api -> backend [label="同名符号的选定实现"];
+    storage -> backend [label="选定布局头"];
+    extension -> backend [label="可选专有入口", style=dashed];
+    backend -> kernel [label="私有内核依赖"];
+    backend -> core [label="公共时间与结果"];
+    backend -> arch [label="按后端需要的上下文检查", style=dashed];
+}
