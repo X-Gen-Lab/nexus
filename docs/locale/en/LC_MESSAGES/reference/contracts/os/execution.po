@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 2615530a91c55c8f7846f7af953bd5d1840b3410fdc483de57a6cb71c7b80524\n"
+"X-Nexus-Source-SHA256: 69212432faea2157fda9d55cf99a262d6d8a418386d998ceb925164d6375f2fb\n"
 
 #: ../../../../docs/reference/contracts/os/execution.md:9
 msgid "OS 执行与生命周期合同"
@@ -312,6 +312,23 @@ msgstr ""
 
 #: ../../../../docs/reference/contracts/os/execution.md:110
 msgid ""
+"MCU 工程把静态存储声明与内核对象构造分开：先完成平台所需初始化，再从合法 cold Thread/MSP 上下文调用 `nx_os_run`，在其 "
+"bootstrap 回调中初始化通知、 queue／channel 并创建任务。FreeRTOS 静态创建可能留下所选 Port 的规范启动掩码， "
+"因此不能先创建这些对象，再要求 `nx_os_run` 把该状态当成干净入口；不要手工清掩码 "
+"来绕过检查。引导回调可以构造对象，不能等待尚未运行的任务，也不能执行 queue／channel transfer。"
+msgstr ""
+"MCU projects separate static storage declarations from kernel-object "
+"construction: complete the required platform initialization, call "
+"`nx_os_run` from admitted cold Thread/MSP context, then initialize "
+"notifications and queues/channels and create tasks inside its bootstrap "
+"callback. FreeRTOS static creation may leave the selected port's canonical "
+"startup mask. Do not create these objects first and then expect `nx_os_run` "
+"to treat that state as a clean entry; do not manually clear masks to bypass "
+"admission. The bootstrap callback may construct objects, but must neither "
+"wait for tasks that have not started nor perform queue/channel transfers."
+
+#: ../../../../docs/reference/contracts/os/execution.md:117
+msgid ""
 "MCU 首次 scheduler 启动采用 cold privileged Thread/MSP 合同：`CONTROL.nPRIV=0`、 "
 "`SPSEL=0`、`FPCA=0`。启动前不得留下 active FP context 或把 main 切换到 PSP；调用方 "
 "不能仅清掉标志来丢弃仍活跃的 FP 状态。MPU bootstrap guard 绑定真实 protected startup 指令、基本 "
@@ -329,7 +346,7 @@ msgstr ""
 "begin; this does not prohibit application floating-point use. Actual context"
 " retention still requires hardware acceptance."
 
-#: ../../../../docs/reference/contracts/os/execution.md:117
+#: ../../../../docs/reference/contracts/os/execution.md:124
 msgid ""
 "可 join 任务返回后的机制由后端决定：FreeRTOS wrapper 发布完成后挂起，等待外部 joiner 删除；Native entry 返回"
 " pthread，由真实 try/monotonic clock-join 证明线程 退出；ThreadX wrapper 发布完成提示后返回内核 "
@@ -352,7 +369,23 @@ msgstr ""
 "genuinely linked GNU clock-join support, never unbounded join after a "
 "completion flag. Only explicit `NX_DEADLINE_NEVER` permits infinite waiting."
 
-#: ../../../../docs/reference/contracts/os/execution.md:126
+#: ../../../../docs/reference/contracts/os/execution.md:133
+msgid ""
+"仅 Native TSan 构建为检测器兼容采用另一条有限 join 路径：真实、受 TSan 拦截的 `pthread_tryjoin_np` 配合 "
+"`CLOCK_MONOTONIC` 绝对睡眠，每次睡眠不超过 1 ms，且 裁剪至原始 deadline，不因重试延长预算。普通构建保留 GNU "
+"clock-join 路径。该路径 不屏蔽检测器报告，也不把 entry 完成标志当成线程退出；成功仍须真实内核会合， "
+"包括线程局部存储清理完成，之后才允许回收调用方存储。"
+msgstr ""
+"Only Native TSan builds use a separate finite-join path for detector "
+"compatibility: actual, TSan-intercepted `pthread_tryjoin_np` calls combined "
+"with absolute `CLOCK_MONOTONIC` sleeps. Each sleep is at most 1 ms and "
+"clipped to the original deadline; retries do not extend the budget. Ordinary"
+" builds retain the GNU clock-join path. This path neither suppresses "
+"detector reports nor treats an entry-completion flag as thread exit. Success"
+" still requires an actual kernel join, including completed thread-local-"
+"storage cleanup, before caller storage may be reclaimed."
+
+#: ../../../../docs/reference/contracts/os/execution.md:139
 msgid ""
 "永久任务使用独立显式 API，entry 不得返回，control/stack/context 保留到 reset；它 没有 completion "
 "semaphore、join 或 destroy。适用于产品确实具有永久生命周期的任务。"
@@ -361,7 +394,7 @@ msgstr ""
 "control/stack/context live until reset. They have no completion semaphore, "
 "join or destroy and serve products with genuinely permanent task lifetimes."
 
-#: ../../../../docs/reference/contracts/os/execution.md:129
+#: ../../../../docs/reference/contracts/os/execution.md:142
 msgid ""
 "direct task notification 是显式 opt-in：调用方指定已存在的 receiver 和独占 notification "
 "index，只有该 receiver 等待。停止并 join publisher 后才能解绑；receiver handle 和 storage "
@@ -373,11 +406,11 @@ msgstr ""
 "retained ports become unusable. Platforms reserve no application "
 "notification slots implicitly."
 
-#: ../../../../docs/reference/contracts/os/execution.md:133
+#: ../../../../docs/reference/contracts/os/execution.md:146
 msgid "队列与关闭"
 msgstr "Queues and closure"
 
-#: ../../../../docs/reference/contracts/os/execution.md:135
+#: ../../../../docs/reference/contracts/os/execution.md:148
 msgid ""
 "公共 raw queue 保持最小存储和后端阻塞路径，不包含 close 广播。初始化要求真实 `storage_bytes` 至少容纳 `depth "
 "* item_size`，完整声明容量跨度不得回绕或与完整控制 对象重叠；不能仅检查有效 item 区间。绝对 deadline 入口复用同一时钟域，并"
@@ -393,7 +426,7 @@ msgstr ""
 "large data instead of copying full payloads inside kernel critical regions; "
 "slots retain explicit loan and reclamation rules."
 
-#: ../../../../docs/reference/contracts/os/execution.md:141
+#: ../../../../docs/reference/contracts/os/execution.md:154
 msgid ""
 "可关闭 channel 使用单独 opt-in 类型和精确最大并发操作数。每个并发操作持有独立 调用方 waiter 存储；close 停止 "
 "admission，锁存并唤醒已注册 waiter。关闭后旧 item 可继续 drain，不能继续 send。destroy 需要 "
@@ -408,7 +441,7 @@ msgstr ""
 "must not masquerade as immediate close notification, and raw queues must not"
 " silently bear that cost."
 
-#: ../../../../docs/reference/contracts/os/execution.md:146
+#: ../../../../docs/reference/contracts/os/execution.md:159
 msgid ""
 "FreeRTOS closable registry 仅供 task 使用，以 scheduler suspend/resume guard 保护 "
 "admission、waiter 注册/退出和 close 广播。内核 give 可能触发 yield，不能假设一个 IRQ critical "
@@ -426,11 +459,11 @@ msgstr ""
 "waiter lists. It also enforces waiter exclusivity and concurrent-operation "
 "capacity. Raw queue and channel control types remain separate."
 
-#: ../../../../docs/reference/contracts/os/execution.md:153
+#: ../../../../docs/reference/contracts/os/execution.md:166
 msgid "配置与成本"
 msgstr "Configuration and cost"
 
-#: ../../../../docs/reference/contracts/os/execution.md:155
+#: ../../../../docs/reference/contracts/os/execution.md:168
 msgid ""
 "平台 schema-2 和独立 runtime schema-1 TOML 沿既有配置路径选择后端。FreeRTOS 的 可选 `[os]` 由 "
 "`tools/configure/kernel.py` 解析为不可变 `KernelProfileIR`；ThreadX 独立政策见[ThreadX "
@@ -449,7 +482,7 @@ msgstr ""
 "custom tickless. Actual generated capabilities govern; a profile name does "
 "not imply chip capabilities."
 
-#: ../../../../docs/reference/contracts/os/execution.md:162
+#: ../../../../docs/reference/contracts/os/execution.md:175
 msgid ""
 "可覆写字段为 `tick_source`、`tick_hz`、`max_priorities`、`syscall_priority`、 "
 "`idle_stack_words`、`max_task_name_len`、`notification_slots`、`mutexes`、 "
@@ -486,7 +519,7 @@ msgstr ""
 "headers and capability validation determine what common consumers may use; "
 "kernel macros do not prove a maintained interface."
 
-#: ../../../../docs/reference/contracts/os/execution.md:176
+#: ../../../../docs/reference/contracts/os/execution.md:189
 msgid ""
 "成本报告分开计算 Wait face、notify、raw/closable queue、每个 waiter、joinable/ permanent "
 "TCB、调用方栈、Idle 栈和内核全局对象。保持现有 four-pointer Wait ABI； 共享 ops 表是否值得采用由实际 linked "
@@ -568,7 +601,7 @@ msgstr ""
 "Close admission and wake waiters; caller supplies extra control and a waiter"
 " per operation"
 
-#: ../../../../docs/reference/contracts/os/execution.md:190
+#: ../../../../docs/reference/contracts/os/execution.md:203
 msgid ""
 "Native destroy 可能只释放部分 POSIX 资源。首次销毁撤销公开操作准入；每个资源只在 实际销毁成功后解除 "
 "ownership。失败后保持同一 control，仅重试 destroy；不得重新 init、进入 wait/send/receive "
@@ -584,23 +617,23 @@ msgstr ""
 "queue payload, scheduler-suspended regions and actual IRQ-masked regions; a "
 "suspended scheduler does not mean that all interrupts are masked."
 
-#: ../../../../docs/reference/contracts/os/execution.md:196
+#: ../../../../docs/reference/contracts/os/execution.md:209
 msgid "产品停止顺序"
 msgstr "Product shutdown order"
 
-#: ../../../../docs/reference/contracts/os/execution.md:198
+#: ../../../../docs/reference/contracts/os/execution.md:211
 msgid "coordinator 关闭 admission；owner stop 请求所有已接受操作取消。"
 msgstr ""
 "Coordinator closes admission; owner stop requests cancellation of every "
 "accepted operation."
 
-#: ../../../../docs/reference/contracts/os/execution.md:199
+#: ../../../../docs/reference/contracts/os/execution.md:212
 msgid "owner 保持 service/drain；producer/observer 仅观察 acquire `SETTLED`。"
 msgstr ""
 "Owners continue service/drain; producers/observers only acquire-observe "
 "`SETTLED`."
 
-#: ../../../../docs/reference/contracts/os/execution.md:200
+#: ../../../../docs/reference/contracts/os/execution.md:213
 msgid ""
 "coordinator join producer；必须已 acquire 观察每个 accepted request 的 `SETTLED`。 再排空"
 " slot control 并 detach/join observer；最后一次 callback 返回之前，request、slot "
@@ -612,19 +645,19 @@ msgstr ""
 "last callback returns. Business payload must also satisfy its own other "
 "borrowing contracts."
 
-#: ../../../../docs/reference/contracts/os/execution.md:203
+#: ../../../../docs/reference/contracts/os/execution.md:216
 msgid "coordinator 请求 owner 停止并 join；同时确认 owner idle 包含 publication 已退出。"
 msgstr ""
 "Coordinator stops/joins owners and verifies that owner idle includes "
 "completed publication."
 
-#: ../../../../docs/reference/contracts/os/execution.md:204
+#: ../../../../docs/reference/contracts/os/execution.md:217
 msgid "停止硬件 RX/IRQ publisher 并 detach wake；join 其他可能的发布者。"
 msgstr ""
 "Stop hardware RX/IRQ publishers and detach wake ports; join any other "
 "publishers."
 
-#: ../../../../docs/reference/contracts/os/execution.md:205
+#: ../../../../docs/reference/contracts/os/execution.md:218
 msgid ""
 "销毁 notification/queue/guard。仅在全部消费者退出且所选生命周期允许时停止 platform；正在运行的内核继续保留时钟和 "
 "Tick。没有通用 scheduler shutdown， 不能从 I/O idle、任务返回或普通停机接口推导内核已经停止。"
@@ -634,7 +667,7 @@ msgstr ""
 "retains clocks and Tick. There is no generic scheduler shutdown; I/O idle, "
 "task return or ordinary teardown does not prove the kernel has stopped."
 
-#: ../../../../docs/reference/contracts/os/execution.md:209
+#: ../../../../docs/reference/contracts/os/execution.md:222
 msgid ""
 "失败保留 storage，并由产品选择恢复。`QUARANTINED` 是仍有引用的状态，不是允许 释放的终态。一次 destroy 返回 BUSY "
 "只是防护，不替代未来 publisher 已停止的证明。 每个成功 milestone 只执行一次；超时继续使用原 absolute deadline "
@@ -655,11 +688,11 @@ msgstr ""
 "implements monotonic stop milestones under one coordinator; after failure it"
 " retries only the failed phase without repeating successful joins."
 
-#: ../../../../docs/reference/contracts/os/execution.md:216
+#: ../../../../docs/reference/contracts/os/execution.md:229
 msgid "低功耗、诊断与安全边界"
 msgstr "Low power, diagnostics and security boundaries"
 
-#: ../../../../docs/reference/contracts/os/execution.md:218
+#: ../../../../docs/reference/contracts/os/execution.md:231
 msgid ""
 "Arch 的序号复查与浅睡眠保存恢复 incoming PRIMASK；WFI 前 DSB，明确拒绝默认深睡眠。 应用负责唤醒 timer "
 "和持续时钟。FreeRTOS tickless 使用 caller-owned timer port：精确 Tick phase、暂停/恢复、绝对 "
@@ -672,7 +705,7 @@ msgstr ""
 " continuous clocks and abnormal overshoot. Unbound ports retain ordinary "
 "ticks without guessed low-power devices or wake pins."
 
-#: ../../../../docs/reference/contracts/os/execution.md:223
+#: ../../../../docs/reference/contracts/os/execution.md:236
 msgid ""
 "诊断 ring 由调用方提供 capacity；写满不覆盖旧事件，lost counter 饱和。内核 trace 默认 weak no-op，无默认大"
 " buffer；产品覆盖 sink 并负责消费。异常 hook 是有界平台 扩展点，安全输出、watchdog/reset、事件持久化和释放策略归产品。"
@@ -683,7 +716,7 @@ msgstr ""
 "extension ports; products own safe outputs, watchdog/reset, persistence and "
 "release policy."
 
-#: ../../../../docs/reference/contracts/os/execution.md:227
+#: ../../../../docs/reference/contracts/os/execution.md:240
 msgid ""
 "显式 MPU profile 使用真实 restricted-task kernel port、专用 linker regions 和窄 SVC "
 "gateway。调用方在 privileged RAM 提供 TCB/context/syscall stack，在 user RAM 提供 "
@@ -699,7 +732,7 @@ msgstr ""
 "violations, overlaps and illegal contexts. Ordinary code/data/providers "
 "remain privileged; only explicit user text/data enters user regions."
 
-#: ../../../../docs/reference/contracts/os/execution.md:233
+#: ../../../../docs/reference/contracts/os/execution.md:246
 msgid ""
 "默认公开 user 服务为无指针的 delay/tick-read，经真实 MPU veneer/SVC。当前 F4 生产集成不提供 scalar "
 "GPIO gateway；公共 copied broker 机制与具体 内核／安全域入口分别维护，不建立任意指针调用或隐式升权。 受维护基础软件组合为 "
@@ -721,7 +754,7 @@ msgstr ""
 "explicitly deletes another task only after all external users are quiescent;"
 " self-deletion is rejected. There is no hidden reaper."
 
-#: ../../../../docs/reference/contracts/os/execution.md:242
+#: ../../../../docs/reference/contracts/os/execution.md:255
 msgid ""
 "显式 split 由两个独立 Runtime 图像组成：Secure 侧是明确 Secure CPU facts、baremetal runtime 与"
 " `Nexus::SecureContext`；Nonsecure 侧选择匹配 CPU facts 和 split FreeRTOS。 匹配 "
@@ -736,7 +769,7 @@ msgstr ""
 "consume it and actual CM23/33/55/85 TrustZone-aware non_secure ports. Macros"
 " on NTZ ports cannot impersonate cross-world save/load."
 
-#: ../../../../docs/reference/contracts/os/execution.md:248
+#: ../../../../docs/reference/contracts/os/execution.md:261
 msgid ""
 "每个获准 NS task，包括内核 Idle，均由调用方提供 NS TCB/stack 和独立 Secure metadata/stack。Secure"
 " startup 先 prepare，可信 immutable task→context selector 只 "
@@ -752,7 +785,7 @@ msgstr ""
 "business stack budgets. Split consumers provide Idle callbacks/matching "
 "Secure Idle storage; policy controls request budgets without default pools."
 
-#: ../../../../docs/reference/contracts/os/execution.md:254
+#: ../../../../docs/reference/contracts/os/execution.md:267
 msgid ""
 "租约身份包含可信 task 与单调 epoch；free 保留 metadata/epoch 历史，join 与 observers quiescent"
 " 后才能 rebind。已 load 的 context 不能 free。真实 PSP/PSPLIM assembly 处理 save/load，保留 "
@@ -774,11 +807,11 @@ msgstr ""
 "calls, but the mechanism does not defend against a malicious privileged NS "
 "kernel forging its own task parameters."
 
-#: ../../../../docs/reference/contracts/os/execution.md:263
+#: ../../../../docs/reference/contracts/os/execution.md:276
 msgid "自动化与实际证据"
 msgstr "Automation and actual evidence"
 
-#: ../../../../docs/reference/contracts/os/execution.md:265
+#: ../../../../docs/reference/contracts/os/execution.md:278
 msgid ""
 "行为变更先记录真实 GoogleTest/GoogleMock RED，再实现 GREEN，最后重构。mock "
 "外部硬件、CPU/内核边界或产品调度动作，不 mock 实现本身。等待竞态以 barrier、 可控时钟和显式调度构造，不能依赖 sleep "
@@ -790,7 +823,7 @@ msgstr ""
 "barriers, controlled clocks and explicit schedules rather than sleep "
 "duration."
 
-#: ../../../../docs/reference/contracts/os/execution.md:269
+#: ../../../../docs/reference/contracts/os/execution.md:282
 msgid ""
 "配置和 evidence 工具使用 Python unittest；hook 和 CI 执行实际发现的完整 suite， 拒绝零测试、过滤、skip-"
 "only、陈旧 JUnit 与缺工具。真实 POSIX scheduler 验证 kernel 集成；ARM 编译/link/ELF 报告验证 ABI "
@@ -802,7 +835,7 @@ msgstr ""
 "integration; ARM compile/link/ELF proves ABI/resources, not MCU timing or "
 "physical context behavior."
 
-#: ../../../../docs/reference/contracts/os/execution.md:273
+#: ../../../../docs/reference/contracts/os/execution.md:286
 msgid ""
 "`tools/hil/os_acceptance.py` 提供 OS49–55 的 unbound 计划与严格物理记录验证。验证 重建 "
 "admission，绑定实际 ELF/config/CPU ABI/station/workload/instrument，检查完整 register "
@@ -816,11 +849,11 @@ msgstr ""
 "real safe outputs. It does not run probes, serial ports, supplies or Flash; "
 "absent equipment leaves every physical item `not_executed`."
 
-#: ../../../../docs/reference/contracts/os/execution.md:278
+#: ../../../../docs/reference/contracts/os/execution.md:291
 msgid "内核升级与新后端接入检查表"
 msgstr "Kernel-upgrade and new-backend checklist"
 
-#: ../../../../docs/reference/contracts/os/execution.md:280
+#: ../../../../docs/reference/contracts/os/execution.md:293
 msgid ""
 "内核升级先在独立分支锁定 commit/tree 和所有实际使用 Port；不要只升级版本字符串。 审核配置宏、TCB/queue ABI、初始 "
 "frame、ISR priority gate、yield/critical 行为和任务返回 wrapper。M7 integer overlay "
@@ -836,7 +869,7 @@ msgstr ""
 "coprocessor initialization need matching macros, real assembly/disassembly "
 "and eventual hardware switch records."
 
-#: ../../../../docs/reference/contracts/os/execution.md:286
+#: ../../../../docs/reference/contracts/os/execution.md:299
 msgid ""
 "升级通过全部 GoogleMock/context tests、真实 POSIX lifecycle、九核链接、profile 正负路径和 formal"
 " installed SDK 后，重新记录成本与当前 source identity。旧 clean candidate、旧 ELF "
@@ -848,60 +881,60 @@ msgstr ""
 "reports do not qualify new kernels automatically. Products approve actual "
 "task budgets, timing/HIL, recovery and release scope."
 
-#: ../../../../docs/reference/contracts/os/execution.md:291
+#: ../../../../docs/reference/contracts/os/execution.md:304
 msgid "新 RTOS/backend 必须逐项提供："
 msgstr "New RTOS/backends must provide:"
 
-#: ../../../../docs/reference/contracts/os/execution.md:293
+#: ../../../../docs/reference/contracts/os/execution.md:306
 msgid "明确 startup/running/suspended/task/IRQ 上下文、scheduler 启动责任和中断政策。"
 msgstr ""
 "Explicit startup/running/suspended/task/IRQ contexts, scheduler-start "
 "responsibility and interrupt policy."
 
-#: ../../../../docs/reference/contracts/os/execution.md:294
+#: ../../../../docs/reference/contracts/os/execution.md:307
 msgid "同域单调时钟、有限及无限 deadline、arm/recheck/wait race 和单 waiter 合同。"
 msgstr ""
 "One-domain monotonic clocks, finite/infinite deadlines, arm/recheck/wait "
 "races and single-waiter contracts."
 
-#: ../../../../docs/reference/contracts/os/execution.md:295
+#: ../../../../docs/reference/contracts/os/execution.md:308
 msgid "每类对象的精确存储、对齐、干净拒绝无新增借用、部分清理失败保留资源及关闭／destroy 条件。"
 msgstr ""
 "Exact storage, alignment, clean rejection without new loans, retained "
 "resources after partial cleanup failure, and close/destroy conditions for "
 "each object class."
 
-#: ../../../../docs/reference/contracts/os/execution.md:296
+#: ../../../../docs/reference/contracts/os/execution.md:309
 msgid "returning/permanent 任务生命周期、单 joiner、超时后引用保留和存储复用证明。"
 msgstr ""
 "Returning/permanent task lifecycles, single joiners, timeout reference "
 "retention and storage-reuse proof."
 
-#: ../../../../docs/reference/contracts/os/execution.md:297
+#: ../../../../docs/reference/contracts/os/execution.md:310
 msgid "producer/owner stop 与 request drain 能继续进展，不用强制删除任务解除 borrow。"
 msgstr ""
 "Producer/owner stop and request-drain progress without forced deletion "
 "revoking borrows."
 
-#: ../../../../docs/reference/contracts/os/execution.md:298
+#: ../../../../docs/reference/contracts/os/execution.md:311
 msgid "CPU Port/ABI/context save、实际源依赖、最小资源报告和 missing-hook 链接拒绝。"
 msgstr ""
 "CPU ports/ABI/context save, actual dependencies, minimum resource reports "
 "and missing-hook link failures."
 
-#: ../../../../docs/reference/contracts/os/execution.md:299
+#: ../../../../docs/reference/contracts/os/execution.md:312
 msgid "真实 backend execution 与同一 GoogleTest 合同；新 kernel 不通过只有 mock 的验证。"
 msgstr ""
 "Real backend execution with the same GoogleTest contracts; mocks alone "
 "cannot verify new kernels."
 
-#: ../../../../docs/reference/contracts/os/execution.md:300
+#: ../../../../docs/reference/contracts/os/execution.md:313
 msgid "正确标注 Native/model、ARM link 和 physical station 的不同资格，禁止推测新板接线。"
 msgstr ""
 "Separate Native/model, ARM link and physical-station qualification without "
 "guessed Board wiring."
 
-#: ../../../../docs/reference/contracts/os/execution.md:302
+#: ../../../../docs/reference/contracts/os/execution.md:315
 msgid "错误与恢复责任"
 msgstr "Error and recovery responsibilities"
 
@@ -981,7 +1014,7 @@ msgstr ""
 "Select actual capabilities during configuration/integration; no silent "
 "substitute workers or modes."
 
-#: ../../../../docs/reference/contracts/os/execution.md:314
+#: ../../../../docs/reference/contracts/os/execution.md:327
 msgid ""
 "平台不把这些结果自动映射成 retry、重启、写 Flash 或恢复安全输出。生产策略必须 "
 "使用产品自己的预算、告警和状态机，并保留实际失败路径的原始证据。"

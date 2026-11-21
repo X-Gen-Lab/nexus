@@ -10,6 +10,7 @@
 #include "nexus/os/storage.h"
 #include "portable_consumer.h"
 #include <atomic>
+#include <cerrno>
 #include <chrono>
 #include <condition_variable>
 #include <cstdlib>
@@ -19,8 +20,8 @@
 #include <new>
 
 namespace {
-NX_OS_STACK_DEFINE(first_stack, 65536);
-NX_OS_STACK_DEFINE(second_stack, 65536);
+NX_OS_STACK_DEFINE(first_stack, 524288);
+NX_OS_STACK_DEFINE(second_stack, 524288);
 
 /** \brief A finite budget never silently becomes an infinite sentinel. */
 nx_time_us_t after(uint64_t budget) {
@@ -103,7 +104,9 @@ struct ExitGate {
     std::mutex mutex;
     std::condition_variable condition;
     bool entered = false;
+    unsigned payload = 0;
 };
+thread_local ExitGate* release_on_busy_join;
 
 /** \brief Retain the real pthread during its thread-specific destructor. */
 void block_thread_destructor(void* context) {
@@ -122,6 +125,12 @@ void attach_exit_gate(void* context) {
     if (pthread_setspecific(state->key, state) != 0) {
         std::abort();
     }
+}
+
+/** \brief Publish ordinary caller data only during real pthread teardown. */
+void write_after_thread_destructor_gate(void* context) {
+    block_thread_destructor(context);
+    static_cast<ExitGate*>(context)->payload = 73U;
 }
 
 /** \brief A task can identify self-join before external start publication. */
@@ -189,6 +198,31 @@ TEST(PortableOSTask, EntryReturnDoesNotReleaseAStillRunningPthreadDestructor) {
     state.gate.ready.store(true, std::memory_order_release);
     EXPECT_EQ(nx_notify_wake(&state.gate.notification), NX_SUCCESS);
     require_join(&task);
+    EXPECT_EQ(state.gate.result, NX_SUCCESS);
+    EXPECT_EQ(nx_notify_destroy(&state.gate.notification), NX_SUCCESS);
+    EXPECT_EQ(pthread_key_delete(state.key), 0);
+}
+
+TEST(PortableOSTask, SuccessfulFiniteJoinObservesPlainTLSDestructorPayload) {
+    nx_task_t task{};
+    ExitGate state;
+    ASSERT_EQ(
+        pthread_key_create(&state.key, write_after_thread_destructor_gate), 0);
+    ASSERT_EQ(nx_notify_init(&state.gate.notification), NX_SUCCESS);
+    ASSERT_EQ(nx_task_start(&task, "teardown-data", first_stack,
+                            sizeof first_stack, 0, attach_exit_gate, &state),
+              NX_SUCCESS);
+    {
+        std::unique_lock<std::mutex> lock(state.mutex);
+        EXPECT_TRUE(state.condition.wait_for(
+            lock, std::chrono::seconds(2), [&state] { return state.entered; }));
+    }
+    /* The wrapper releases the child only after a real busy join. Its gate
+     * orders parent to child; only successful join publishes the payload. */
+    release_on_busy_join = &state;
+    require_join(&task);
+    EXPECT_EQ(release_on_busy_join, nullptr);
+    EXPECT_EQ(state.payload, 73U);
     EXPECT_EQ(state.gate.result, NX_SUCCESS);
     EXPECT_EQ(nx_notify_destroy(&state.gate.notification), NX_SUCCESS);
     EXPECT_EQ(pthread_key_delete(state.key), 0);
@@ -456,6 +490,21 @@ TEST(PortableOSTime, FiniteSleepUsesTheSameMonotonicDeadlineDomain) {
 extern "C" int __real_pthread_cond_wait(pthread_cond_t*, pthread_mutex_t*);
 extern "C" int __real_pthread_cond_timedwait(pthread_cond_t*, pthread_mutex_t*,
                                              const struct timespec*);
+extern "C" int __real_pthread_tryjoin_np(pthread_t, void**);
+
+/** \brief Release teardown only after the real join reports a live pthread. */
+extern "C" int __wrap_pthread_tryjoin_np(pthread_t thread, void** result) {
+    const int error = __real_pthread_tryjoin_np(thread, result);
+    if (error == EBUSY && release_on_busy_join != nullptr) {
+        auto* state = release_on_busy_join;
+        release_on_busy_join = nullptr;
+        state->gate.ready.store(true, std::memory_order_release);
+        if (nx_notify_wake(&state->gate.notification) != NX_SUCCESS) {
+            std::abort();
+        }
+    }
+    return error;
+}
 
 /** \brief Interpose only the external wait boundary and call real pthread. */
 extern "C" int __wrap_pthread_cond_wait(pthread_cond_t* condition,

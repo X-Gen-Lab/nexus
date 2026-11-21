@@ -107,6 +107,13 @@ scheduler。Native 执行回调后停驻当前引导线程，保留其调用栈�
 进程退出由应用明确决定。不同内核的 bootstrap 可调用范围分别维护，不能把运行态
 重新解释为冷态或在引导回调中等待未来任务。
 
+MCU 工程把静态存储声明与内核对象构造分开：先完成平台所需初始化，再从合法
+cold Thread/MSP 上下文调用 `nx_os_run`，在其 bootstrap 回调中初始化通知、
+queue／channel 并创建任务。FreeRTOS 静态创建可能留下所选 Port 的规范启动掩码，
+因此不能先创建这些对象，再要求 `nx_os_run` 把该状态当成干净入口；不要手工清掩码
+来绕过检查。引导回调可以构造对象，不能等待尚未运行的任务，也不能执行
+queue／channel transfer。
+
 MCU 首次 scheduler 启动采用 cold privileged Thread/MSP 合同：`CONTROL.nPRIV=0`、
 `SPSEL=0`、`FPCA=0`。启动前不得留下 active FP context 或把 main 切换到 PSP；调用方
 不能仅清掉标志来丢弃仍活跃的 FP 状态。MPU bootstrap guard 绑定真实 protected startup
@@ -122,6 +129,12 @@ join 超时保留全部存储。Native 禁止绕过 adapter 执行 `pthread_canc
 或另外一次 join。完成提示本身不能替代后端的实际退出与引用撤离证明。
 公共入口为 `nx_task_join_until`。Native 有限等待使用可真实链接的 GNU clock-join，
 不在完成标志后调用无界 join；仅显式 `NX_DEADLINE_NEVER` 允许无限等待。
+
+仅 Native TSan 构建为检测器兼容采用另一条有限 join 路径：真实、受 TSan 拦截的
+`pthread_tryjoin_np` 配合 `CLOCK_MONOTONIC` 绝对睡眠，每次睡眠不超过 1 ms，且
+裁剪至原始 deadline，不因重试延长预算。普通构建保留 GNU clock-join 路径。该路径
+不屏蔽检测器报告，也不把 entry 完成标志当成线程退出；成功仍须真实内核会合，
+包括线程局部存储清理完成，之后才允许回收调用方存储。
 
 永久任务使用独立显式 API，entry 不得返回，control/stack/context 保留到 reset；它
 没有 completion semaphore、join 或 destroy。适用于产品确实具有永久生命周期的任务。

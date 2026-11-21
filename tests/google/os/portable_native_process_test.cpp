@@ -62,7 +62,7 @@ TEST(PortableNativeLifecycleDeathTest, PermanentEntryReturnStopsTheProcess) {
                 _exit(23);
             }
             static nx_permanent_task_t task{};
-            NX_OS_STACK_DEFINE(stack, 65536);
+            NX_OS_STACK_DEFINE(stack, 524288);
             (void)alarm(2);
             if (nx_permanent_task_start(&task, "permanent", stack, sizeof stack,
                                         0, returning_permanent,

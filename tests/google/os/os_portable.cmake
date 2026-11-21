@@ -7,7 +7,10 @@ nexus_google_test(nexus_os_portable_native_test
 )
 target_link_options(
     nexus_os_portable_native_test
-    PRIVATE "-Wl,--wrap=pthread_cond_wait" "-Wl,--wrap=pthread_cond_timedwait"
+    PRIVATE
+        "-Wl,--wrap=pthread_cond_wait"
+        "-Wl,--wrap=pthread_cond_timedwait"
+        "-Wl,--wrap=pthread_tryjoin_np"
 )
 
 nexus_google_test(nexus_os_portable_native_process_test

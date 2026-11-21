@@ -7,13 +7,13 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 4706e53ada1eca9a78244e4a109354ba37acc8db08a0d8ff3ad76bf537cd3fe9\n"
+"X-Nexus-Source-SHA256: 65cb3a09eb2151f903152c274f462fc1837d59c82d31183ab7a618c69e49f675\n"
 
-#: ../../../../../../docs/development/workflow.md:9
+#: ../../../../docs/development/workflow.md:9
 msgid "Develop with TDD and normal commit gates"
 msgstr "使用 TDD 与正常提交门禁开发"
 
-#: ../../../../../../docs/development/workflow.md:11
+#: ../../../../docs/development/workflow.md:11
 msgid ""
 "This workflow preserves current C11 architecture, formatting and explicit "
 "evidence. Codex owns platform maintenance; independent agents review high-"
@@ -23,18 +23,18 @@ msgstr ""
 "本工作流保留当前 C11 架构、格式与显式证据。Codex 负责平台维护；独立 agent 审查高风险变更。虚构人员或本地文件都不能建立 GitHub "
 "分支保护。"
 
-#: ../../../../../../docs/development/workflow.md:15
+#: ../../../../docs/development/workflow.md:15
 msgid "Install and check tools"
 msgstr "安装并检查工具"
 
-#: ../../../../../../docs/development/workflow.md:17
+#: ../../../../docs/development/workflow.md:17
 msgid ""
 "First complete the [fixed source and recursive dependency "
 "guide](../guides/source-checkout.md). From that repository root, install the"
 " maintenance tools:"
 msgstr "先完成[固定源码与递归依赖指南](../guides/source-checkout.md)。然后从该仓库根目录安装维护工具："
 
-#: ../../../../../../docs/development/workflow.md:26
+#: ../../../../docs/development/workflow.md:26
 msgid ""
 "Windows uses `.venv/Scripts/python.exe`. Installation establishes pre-commit"
 " and commit-msg hooks. Hooks inspect staged inputs without staging or "
@@ -44,11 +44,11 @@ msgstr ""
 "Windows 使用 `.venv/Scripts/python.exe`。安装建立 pre-commit 和 commit-msg "
 "钩子。钩子检查暂存输入，不替用户暂存，也不静默修复文件。保留未暂存工作和真实失败诊断；不得绕过钩子。"
 
-#: ../../../../../../docs/development/workflow.md:30
+#: ../../../../docs/development/workflow.md:30
 msgid "Prepare the pinned host test framework"
 msgstr "准备锁定的主机测试框架"
 
-#: ../../../../../../docs/development/workflow.md:32
+#: ../../../../docs/development/workflow.md:32
 msgid ""
 "GoogleTest and GoogleMock come from the pinned `ext/googletest` submodule. "
 "The source lock records the official upstream base and selected organization"
@@ -59,7 +59,7 @@ msgstr ""
 "GoogleTest 和 GoogleMock 来自锁定的 `ext/googletest` "
 "子模块。源码锁分别记录官方上游基线与选定组织补丁。获取源码不会初始化完整主机测试图。运行平台测试前，须显式准备完整维护范围："
 
-#: ../../../../../../docs/development/workflow.md:40
+#: ../../../../docs/development/workflow.md:40
 msgid ""
 "To initialize only this submodule, use `git submodule update --init "
 "--recursive ext/googletest` instead. Preparation may use the network; CMake "
@@ -74,11 +74,11 @@ msgstr ""
 "配置只使用已准备的本地源码，缺失、版本与锁定值不符或存在本地修改均失败。配置过程不获取依赖，也不使用系统安装替代。框架只进入主机测试目标图；ARM "
 "构建和固件 SDK 消费者不需要它。"
 
-#: ../../../../../../docs/development/workflow.md:48
+#: ../../../../docs/development/workflow.md:48
 msgid "Execute RED, GREEN and review"
 msgstr "执行 RED、GREEN 与评审"
 
-#: ../../../../../../docs/development/workflow.md:50
+#: ../../../../docs/development/workflow.md:50
 msgid ""
 "For new C behavior or defect fixes, first add a meaningful "
 "GoogleTest/GoogleMock regression. Execute it and retain the expected failure"
@@ -92,7 +92,7 @@ msgstr ""
 " GREEN，再重构。Mock 外部端口／MMIO，而不是被测实现。覆盖相关拒绝、取消、排空、溢出、隔离保留和实例隔离。Python 生产工具使用标准库"
 " unittest，遵循相同实际 RED／GREEN 规则。"
 
-#: ../../../../../../docs/development/workflow.md:61
+#: ../../../../docs/development/workflow.md:61
 msgid ""
 "The full gate builds the pinned offline framework and executes discovered "
 "cases with fresh reports and no filters/shards. Empty, skipped, partial, "
@@ -107,7 +107,7 @@ msgstr ""
 "filter／shard。空、跳过、部分、陈旧或变化输入均失败。钩子核对暂存树保持不变；CI 独立执行门禁。框架仅用于主机 C++17；固件保持 "
 "C11。自动化证明执行，保留的开发日志记录历史 RED／GREEN 顺序。纯正文或图源修改需要对应文档检查和语义审查，不需要镜像实现测试。"
 
-#: ../../../../../../docs/development/workflow.md:69
+#: ../../../../docs/development/workflow.md:69
 msgid ""
 "The commit gate writes its selected hardware assemblies and expansion "
 "reasons to `build/native-debug/tdd/arm-selection.json` for the default "
@@ -123,11 +123,11 @@ msgstr ""
 "源码时可以复用经过验证的编译依赖记录。缺少信息时扩大硬件检查范围。示例构建入口与 Native 门禁在配置输入匹配时复用已预热的 Ninja "
 "目录。设置不超过 `NEXUS_BUILD_JOBS` 的 `NEXUS_TOOL_JOBS` 可以并发运行独立工具模块。"
 
-#: ../../../../../../docs/development/workflow.md:71
+#: ../../../../docs/development/workflow.md:71
 msgid "Run local validation when Actions is unavailable"
 msgstr "Actions 不可用时执行本地验证"
 
-#: ../../../../../../docs/development/workflow.md:73
+#: ../../../../docs/development/workflow.md:73
 msgid ""
 "Use the same maintained entry points as CI. The complete TDD gate above runs"
 " Native GoogleTest and all four tool domains; independent runtime validation"
@@ -143,7 +143,19 @@ msgstr ""
 "`native_contracts.py`。保留的合同测试、严格双语文档构建和独立 Source SDK "
 "消费者分别验证各自边界。范围及并发规则见[工程手册](../reference/contracts/engineering.md)。"
 
-#: ../../../../../../docs/development/workflow.md:81
+#: ../../../../docs/development/workflow.md:81
+msgid ""
+"For cold sanitizer builds on low-core hosts, give the existing matrix an "
+"explicit finite per-command budget, for example:"
+msgstr "在低核主机进行冷态 sanitizer 构建时，为现有矩阵命令设置显式有限的逐命令预算，例如："
+
+#: ../../../../docs/development/workflow.md:88
+msgid ""
+"This invocation overrides the 1800-second default without changing test "
+"scope."
+msgstr "此调用覆盖默认的 1800 秒超时，不改变测试范围。"
+
+#: ../../../../docs/development/workflow.md:90
 msgid ""
 "Record actual source commit, configuration, tool identities, commands, exit "
 "codes and fresh reports in the pull request. A failed, partial or "
@@ -154,11 +166,11 @@ msgstr ""
 "在 PR 中记录实际源码提交、配置、工具身份、命令、退出码和新生成的报告。失败、部分完成或中断的执行保留真实结果。本地执行不建立 GitHub "
 "Actions 状态、服务端分支规则、软件发布或物理 HIL 结果。"
 
-#: ../../../../../../docs/development/workflow.md:86
+#: ../../../../docs/development/workflow.md:95
 msgid "Keep feedback fast and evidence complete"
 msgstr "快速反馈与完整证据"
 
-#: ../../../../../../docs/development/workflow.md:88
+#: ../../../../docs/development/workflow.md:97
 msgid ""
 "Use a focused development run for the behavior being changed, then execute "
 "the normal complete acceptance gates for the final source. Discover the "
@@ -169,7 +181,7 @@ msgstr ""
 "先对修改的行为执行定向开发测试，再对最终源码执行正常完整验收门禁。发现已维护的测试名称，不增加重复测试程序。保留原始 RED 失败、GREEN "
 "结果和实际命令。过滤执行或缓存结果不能使完整候选通过验收。"
 
-#: ../../../../../../docs/development/workflow.md:94
+#: ../../../../docs/development/workflow.md:103
 msgid ""
 "`python tools/dev/dev.py timings /path/to/receipts` summarizes existing "
 "process receipts without rerunning work. Separate preparation, "
@@ -182,7 +194,7 @@ msgstr ""
 "receipt，不重新运行工作。分别观察准备、配置、编译、测试、文档和 SDK 消费。保留失败／取消的尝试以及未观测的 CPU 或 "
 "RSS；重叠的墙钟时间不能相加作为总耗时。比较等价源码、工具与配置范围后再归因提速。"
 
-#: ../../../../../../docs/development/workflow.md:100
+#: ../../../../docs/development/workflow.md:109
 msgid ""
 "On Linux, a normally reaped process, including a nonzero exit, can have "
 "`resource_usage` observed by `wait4`: user/system CPU seconds and "
@@ -196,7 +208,7 @@ msgstr ""
 "`maximum_process_rss_bytes`。范围是被等待的进程及其已经回收的后代。RSS "
 "值是观测到的最大单进程峰值，不是整个进程树的同时占用。超时、取消、启动失败、旧收据和其他平台保留未知值，不从墙钟耗时估算。"
 
-#: ../../../../../../docs/development/workflow.md:108
+#: ../../../../docs/development/workflow.md:117
 msgid ""
 "The timings summary exposes `measured_resource_attempts` and "
 "`maximum_observed_process_rss_bytes` while preserving each original receipt."
@@ -213,7 +225,7 @@ msgstr ""
 "仍为未知，因为嵌套收据可能重复计算工作，这些观测也不能建立全局内存峰值或缓存行为。分别比较同一工具链、源码和 profile 下的 cold 与 "
 "warm 尝试；小型工具回归的测量不能量化全项目构建收益。"
 
-#: ../../../../../../docs/development/workflow.md:116
+#: ../../../../docs/development/workflow.md:125
 msgid ""
 "Choose an explicit finite compiler budget for available RAM and disk, not "
 "just CPU count. Reuse verified source/tool preparation and ordinary "
@@ -226,7 +238,7 @@ msgstr ""
 "根据可用 RAM 与磁盘显式选择有限编译并发预算，不能只看 CPU "
 "数量。复用已验证的源码／工具准备与正常增量构建；按正常规则使改变的配置、依赖和生成输入失效。不得缓存验收报告、恢复不相容的对象或同时修改同一构建树。完整门禁发现、实际退出码、输出身份及失败／取消保留仍为必需。"
 
-#: ../../../../../../docs/development/workflow.md:123
+#: ../../../../docs/development/workflow.md:132
 msgid ""
 "The commit gate configures and builds once for unchanged staged inputs, then"
 " runs all Native GoogleTest cases and complete affected tool modules. Known "
@@ -242,7 +254,7 @@ msgstr ""
 "用例和受影响的完整工具测试模块。已知的固件实现改动无需辅助工具域。公共头和声明事实选择配置合同与一次全局支持检查。已修改的测试模块完整运行；已知工具实现使用维护的模块映射。未知路径或缺少已知覆盖时保留完整域。提交报告标记"
 " `commit-tools` 和 `qualification=false`，不声称完整域验收通过，也不筛选已选模块内的用例。"
 
-#: ../../../../../../docs/development/workflow.md:132
+#: ../../../../docs/development/workflow.md:141
 msgid ""
 "Before merge or delivery, independently execute the complete tool domains, "
 "relevant ARM links and Source SDK consumers. `--all` and `--tools all` "
@@ -256,7 +268,7 @@ msgstr ""
 "始终运行四个完整域；`dev.py check` 是完整集成入口。完整 CI 还执行全部四种 Native "
 "模式，不按模式重复工具测试，也不在工具作业中重复完整 Native 执行。快速提交不能替代这些结果，不缓存成功的资格报告。"
 
-#: ../../../../../../docs/development/workflow.md:139
+#: ../../../../docs/development/workflow.md:148
 msgid ""
 "`doctor` only diagnoses the selected environment and tool versions. Ordinary"
 " configure/build commands keep process logs and actual exits; add `--record-"
@@ -269,7 +281,7 @@ msgstr ""
 "命令保留进程日志和真实退出码；为设备操作准备具备明确身份的映像时，显式添加 `--record-provenance`。testing "
 "域统一检查一次全局能力矩阵与派生文档。局部外设测试使用自身输入，不扫描全部装配。"
 
-#: ../../../../../../docs/development/workflow.md:145
+#: ../../../../docs/development/workflow.md:154
 msgid ""
 "Before deleting a test, identify its behavioral obligation and independent "
 "remaining coverage. Remove only an obsolete behavior or a demonstrated "
@@ -283,11 +295,11 @@ msgstr ""
 "删除测试前，指出其行为责任和仍存在的独立覆盖。仅删除过时行为或已经证明重复覆盖同一合同的测试。保留检查拒绝所有权、借用保留、实例隔离、取消、IRQ "
 "顺序、真实厂家行为或外部 SDK 消费的测试。照着实现编写的通过断言本身不能作为独立替代。审查未找到可安全删除的测试时应保留；减少测试数量不是优化目标。"
 
-#: ../../../../../../docs/development/workflow.md:153
+#: ../../../../docs/development/workflow.md:162
 msgid "Preserve style and scope"
 msgstr "保留风格与范围"
 
-#: ../../../../../../docs/development/workflow.md:155
+#: ../../../../docs/development/workflow.md:164
 msgid ""
 "Use the unchanged `.clang-format` and `.editorconfig`: 80 columns, four "
 "spaces, attached braces, type-attached pointer stars and backslash Doxygen "
@@ -299,7 +311,7 @@ msgstr ""
 "使用未改变的 `.clang-format` 和 `.editorconfig`：80 列、四空格、附着大括号、类型侧指针星号和反斜杠 Doxygen "
 "注释。公共头文件说明上下文、截止时间、所有权和失败。源注释解释不变量和硬件顺序，不重复声明参数。新增／修改文件通过整文件检查；已有冻结欠账只能减少。"
 
-#: ../../../../../../docs/development/workflow.md:161
+#: ../../../../docs/development/workflow.md:170
 msgid ""
 "Commit one reviewable change with Conventional Commits. Review "
 "interface/configuration changes together with diagrams, examples, "

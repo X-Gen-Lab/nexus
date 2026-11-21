@@ -18,6 +18,14 @@
 #include <time.h>
 #include <unistd.h>
 
+#if defined(__SANITIZE_THREAD__)
+#define NATIVE_THREAD_SANITIZED
+#elif defined(__has_feature)
+#if __has_feature(thread_sanitizer)
+#define NATIVE_THREAD_SANITIZED
+#endif
+#endif
+
 enum {
     NATIVE_MUTEX = 1u,
     NATIVE_FIRST_CONDITION = 2u,
@@ -597,6 +605,30 @@ nx_result_t nx_permanent_task_start(nx_permanent_task_t* task, const char* name,
     return NX_SUCCESS;
 }
 
+#if defined(NATIVE_THREAD_SANITIZED)
+/** \brief Retain real thread-exit ordering in runtimes without clockjoin hooks.
+ */
+static int sanitized_join_before(pthread_t thread, nx_time_us_t deadline) {
+    for (;;) {
+        int error = pthread_tryjoin_np(thread, NULL);
+        if (error != EBUSY) {
+            return error;
+        }
+        nx_time_us_t now = nx_os_now_us();
+        if (now >= deadline) {
+            return ETIMEDOUT;
+        }
+        nx_time_us_t wake = deadline - now > 1000U ? now + 1000U : deadline;
+        struct timespec absolute = absolute_time(wake);
+        error =
+            clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &absolute, NULL);
+        if (error != 0 && error != EINTR) {
+            return error;
+        }
+    }
+}
+#endif
+
 /** \brief Actual pthread exit, not an entry flag, ends the retained loan. */
 nx_result_t nx_task_join_until(nx_task_t* task, nx_time_us_t deadline) {
     if (task == NULL) {
@@ -615,9 +647,13 @@ nx_result_t nx_task_join_until(nx_task_t* task, nx_time_us_t deadline) {
         if (nx_os_now_us() >= deadline) {
             return NX_ERROR_TIMEOUT;
         }
+#if defined(NATIVE_THREAD_SANITIZED)
+        error = sanitized_join_before(task->thread, deadline);
+#else
         struct timespec absolute = absolute_time(deadline);
         error = pthread_clockjoin_np(task->thread, NULL, CLOCK_MONOTONIC,
                                      &absolute);
+#endif
     }
     if (error != 0) {
         return error == ETIMEDOUT ? NX_ERROR_TIMEOUT : NX_ERROR_IO;

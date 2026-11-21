@@ -12,9 +12,10 @@ source_language: zh_CN
 [OS 现行架构](../explanation/os-portability.md)；本文保留 32 个稳定任务 ID、
 优先级和依赖，不复制第二份 API 合同。
 
-**状态：公共实现与阶段验收已交付，最终集成验收进行中。** OSU-22／23 根据
+**状态：公共接口与三后端实现已交付；软件验收以精确源码和配置绑定的完整报告为准。**
+OSU-22／23 根据
 实际需求盘点明确不纳入本批；HIL 继续暂缓，保持 `not_executed`。
-阶段结果不能提前关闭最终集成、ARM、资源和 SDK 验收。当前调用要求与生命周期以
+当前调用要求与生命周期以
 [OS 执行合同](../reference/contracts/os/execution.md)为准。
 软件实施覆盖 FreeRTOS、ThreadX、Native 的已维护范围，裸机保留非阻塞能力。
 不因此新增 CPU、SoC、Board、安全配置或实板资格。
