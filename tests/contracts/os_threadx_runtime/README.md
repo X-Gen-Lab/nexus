@@ -1,7 +1,7 @@
 # ThreadX runtime 合同夹具
 
-host Google 程序调用 `nx_threadx_kernel_enter`，在官方真实 Linux kernel thread
-内跑用例；bootstrap task 由真实 adapter callback 在该线程启动前创建／discard。
+host Google 程序通过公共 `nx_os_run` 接入官方真实 Linux kernel；startup
+回调构造／撤回静态任务，运行态用例在真实内核线程中执行。
 `clock.c` 为真实 CLOCK_MONOTONIC，mock entry 只代替应用边界，task／queue／wait
 是真实服务。kernel、GoogleTest／Mock archive 精确锁定。
 
@@ -20,7 +20,7 @@ tool、object／ELF。失败编译不是行为 RED；前实现快照说明修正
 RED 的阶段。dirty 开发不资格化 clean candidate，M4 Board link 和实板工位另记。
 
 CMake 链接实际选定平台、固定 kernel、真实 vector／startup、task／queue／notify／
-close／join。三块维护 M4F Board 分别构建 BASEPRI／PRIMASK。缺 `external_tick.c`
+close／join。启明、天空星两块维护 M4F Board 分别构建 BASEPRI／PRIMASK。缺 `external_tick.c`
 的负链接必须因 strong provider symbol 失败；加入它仅得到返回 UNSUPPORTED 的
 provider，不虚构周期时钟。固件只链接／测预算，不刷写。retention-only main 不是
 产品启动／错误处理示范，产品须检查每次初始化并提供安全失败和清理策略。
