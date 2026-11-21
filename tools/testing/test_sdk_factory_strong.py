@@ -64,7 +64,9 @@ class SDKFactoryTemplateTests(unittest.TestCase):
         command = ["cc", "-std=c11", "-Wall", "-Wextra", "-Werror",
                    "-pedantic", "-I" + str(generated)]
         command.extend("-I" + str(ROOT / layer / "include")
-                       for layer in ("core", "io", "arch"))
+                       for layer in ("core", "io", "arch",
+                                     "components/algorithms",
+                                     "components/runtime/periodic"))
         result = subprocess.run(
             command + ["-c", str(source / "main.c"), "-o",
                        str(self.root / "consumer.o")],

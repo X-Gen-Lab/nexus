@@ -16,6 +16,7 @@ extern "C" {
 }
 #include <array>
 #include <cerrno>
+#include <chrono>
 #include <csignal>
 #include <cstdint>
 #include <cstring>
@@ -450,10 +451,17 @@ class ProcessPair {
             if (children[role] > 0) {
                 int status = 0;
                 bool reaped = false;
-                for (unsigned attempt = 0U; attempt < 20U; ++attempt) {
-                    if (waitpid(children[role], &status, WNOHANG) ==
-                        children[role]) {
+                pid_t waited = 0;
+                const auto deadline =
+                    std::chrono::steady_clock::now() + std::chrono::seconds(2);
+                for (;;) {
+                    waited = waitpid(children[role], &status, WNOHANG);
+                    if (waited == children[role]) {
                         reaped = true;
+                        break;
+                    }
+                    if ((waited < 0 && errno != EINTR) ||
+                        std::chrono::steady_clock::now() >= deadline) {
                         break;
                     }
                     const timespec delay{0, 1000000};
@@ -461,12 +469,17 @@ class ProcessPair {
                 }
                 if (!reaped) {
                     (void)kill(children[role], SIGTERM);
-                    (void)waitpid(children[role], &status, 0);
+                    do {
+                        waited = waitpid(children[role], &status, 0);
+                    } while (waited < 0 && errno == EINTR);
                 }
                 EXPECT_TRUE(reaped);
-                EXPECT_TRUE(WIFEXITED(status));
-                if (WIFEXITED(status)) {
-                    EXPECT_EQ(0, WEXITSTATUS(status));
+                EXPECT_EQ(children[role], waited);
+                if (waited == children[role]) {
+                    EXPECT_TRUE(WIFEXITED(status));
+                    if (WIFEXITED(status)) {
+                        EXPECT_EQ(0, WEXITSTATUS(status));
+                    }
                 }
             }
         }

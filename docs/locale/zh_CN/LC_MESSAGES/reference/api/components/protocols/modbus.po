@@ -7,84 +7,123 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: ce8883a20f433db97d0e4b8ef351baccf7951f373c204a9b7e505b95f6d00006\n"
+"X-Nexus-Source-SHA256: 67330bb53a69a43c01b5b6fef18c1abd31137b2153440ea3c989a5b06053e5a1\n"
 
-#: ../../../../../../docs/reference/api/components/protocols/modbus.md:10
-msgid "Modbus RTU composition"
-msgstr "Modbus RTU 装配"
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:10
+msgid "Modbus RTU and TCP composition"
+msgstr "Modbus RTU 与 TCP 装配"
 
-#: ../../../../../../docs/reference/api/components/protocols/modbus.md:12
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:12
 msgid ""
 "The application selects the settled byte transport, storage, addresses, "
 "protocol register policy and executor. The reusable RTU mechanism does not "
 "own a product register map or a hidden worker."
 msgstr "应用选择已结清的字节传输、存储、地址、协议寄存器策略及执行器。可复用 RTU 机制不拥有产品寄存器映射，也不创建隐式工作线程。"
 
-#: ../../../../../../docs/reference/api/components/protocols/modbus.md:16
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:16
+msgid ""
+"`Nexus::ModbusTCP` instead selects one connection's MBAP/PDU byte-session "
+"boundary, reusing the same product-owned holding-register callbacks. It "
+"supports functions 03, 06 and 16. A complete request borrows a stable "
+"response until explicit release; a slow sender must retain unconsumed "
+"pipeline bytes, and must not re-execute the write while the response is "
+"pending."
+msgstr ""
+"`Nexus::ModbusTCP` 选择一条连接的 MBAP／PDU 字节会话边界，复用同一组产品拥有的 holding-register "
+"callback，支持功能 03、06 和 16。完整请求产生的稳定 response 借用到显式 "
+"release；慢发送方必须保留尚未消费的流水线字节，response 仍 pending 时不得再次执行写入。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:22
+msgid ""
+"The connection owner supplies TCP transport, finite deadlines, storage "
+"limits and close policy. Malformed MBAP closes parser admission; it does not"
+" search arbitrary payload for a new header. Register callbacks run in the "
+"same serialized task. Product write authorization and atomic update rules "
+"remain required; Modbus/TCP itself does not authenticate a peer. See the "
+"[selected session contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-SOURCE/components/protocols/modbus_tcp/README.md). Neither "
+"profile establishes physical serial timing or network HIL; those remain "
+"`not_executed`."
+msgstr ""
+"连接 owner 提供 TCP transport、有限 deadline、存储上限和关闭策略。畸形 MBAP 关闭 parser 准入，不在任意 "
+"payload 中搜索新 header。register callback 在同一串行 task "
+"执行。产品仍须提供写授权和原子更新规则；Modbus／TCP 本身不认证 "
+"peer。见[选定会话合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/components/protocols/modbus_tcp/README.md)。两个 profile 都不建立物理串口时序或网络 "
+"HIL 资格，相应状态保持 `not_executed`。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:31
 msgid "Public declarations"
 msgstr "公共声明"
 
-#: ../../../../../../docs/reference/api/components/protocols/modbus.md:18
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:33
 msgid "modbus_rtu.h"
 msgstr "modbus_rtu.h"
 
-#: ../../../../../../docs/reference/api/components/protocols/modbus.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:35
 msgid "Bounded Modbus RTU core and explicit RS485 ports."
 msgstr "有界 Modbus RTU 核心与显式 RS485 端口。"
 
-#: ../../../../../../docs/reference/api/components/protocols/modbus.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:35
 msgid "Author  Nexus Team"
 msgstr "作者  Nexus Team"
 
-#: ../../../../../../docs/reference/api/components/protocols/modbus.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:41
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:47
 msgid "Nexus Team"
 msgstr "Nexus Team"
 
-#: ../../../../../../docs/reference/api/components/protocols/modbus.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:41
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:47
 msgid "Defines"
 msgstr "宏定义"
 
-#: ../../../../../../docs/reference/api/components/protocols/modbus.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:47
 msgid "Enums"
 msgstr "枚举"
 
-#: ../../../../../../docs/reference/api/components/protocols/modbus.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:47
 msgid "Values:"
 msgstr "取值："
 
-#: ../../../../../../docs/reference/api/components/protocols/modbus.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:41
 msgid "Functions"
 msgstr "函数"
 
-#: ../../../../../../docs/reference/api/components/protocols/modbus.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:35
 msgid "Compute standard Modbus CRC16 over caller bytes."
 msgstr "对调用者字节计算标准 Modbus CRC16。"
 
-#: ../../../../../../docs/reference/api/components/protocols/modbus.md:0
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:0
 msgid "Parameters"
 msgstr "参数"
 
-#: ../../../../../../docs/reference/api/components/protocols/modbus.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:35
 msgid "[in] Input, NULL only when length is zero"
 msgstr "[in] 输入，仅长度为零时允许 NULL"
 
-#: ../../../../../../docs/reference/api/components/protocols/modbus.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:35
 msgid "[in] Byte count"
 msgstr "[in] 字节数"
 
-#: ../../../../../../docs/reference/api/components/protocols/modbus.md:0
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:0
 msgid "Returns"
 msgstr "返回值"
 
-#: ../../../../../../docs/reference/api/components/protocols/modbus.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:35
 msgid "CRC16; zero for invalid NULL input with nonzero length"
 msgstr "CRC16；非零长度配合无效 NULL 输入时返回零"
 
-#: ../../../../../../docs/reference/api/components/protocols/modbus.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:35
 msgid "Initialize an unused or fully quiesced protocol instance."
 msgstr "初始化尚未使用或完全静止的协议实例。"
 
-#: ../../../../../../docs/reference/api/components/protocols/modbus.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:35
 msgid ""
 "Task-only; configuration is copied, contexts stay live. First "
 "direction(false) failure is reported; no worker or UART is created. "
@@ -93,50 +132,50 @@ msgstr ""
 "仅限任务上下文；配置被复制，各 context 保持有效。报告首次 direction(false) 失败；不创建工作线程或 "
 "UART。禁止重新初始化仍持有故障 TX 借用的实例，必须先 stop/recover。"
 
-#: ../../../../../../docs/reference/api/components/protocols/modbus.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:35
 msgid "[out] Caller-owned storage, no existing transport borrow"
 msgstr "[out] 调用者拥有的存储，不存在先前的传输借用"
 
-#: ../../../../../../docs/reference/api/components/protocols/modbus.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:35
 msgid "[in] Explicit register/RS485 ports and finite budgets"
 msgstr "[in] 显式的寄存器及 RS485 接口，以及有限预算"
 
-#: ../../../../../../docs/reference/api/components/protocols/modbus.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:35
 msgid "True when initialized into RX silence acquisition"
 msgstr "初始化成功进入 RX 静默判定阶段时为 true"
 
-#: ../../../../../../docs/reference/api/components/protocols/modbus.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:35
 msgid "Feed an externally timestamped UART byte."
 msgstr "输入外部添加时间戳的 UART 字节。"
 
-#: ../../../../../../docs/reference/api/components/protocols/modbus.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:35
 msgid ""
 "Task-only. IRQ queues are external, bounded and explicit; queue overflow "
 "must call rx_error. No live UART discovery or ISR callback."
 msgstr ""
 "仅限任务上下文。IRQ 队列在外部显式提供且容量有界；队列溢出时必须调用 rx_error。不进行活动 UART 发现，也没有 ISR 回调。"
 
-#: ../../../../../../docs/reference/api/components/protocols/modbus.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:35
 msgid "[inout] Initialized instance, serialized by caller"
 msgstr "[inout] 已初始化的实例，由调用者串行使用"
 
-#: ../../../../../../docs/reference/api/components/protocols/modbus.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:35
 msgid "[in] Wire byte"
 msgstr "[in] 线上字节"
 
-#: ../../../../../../docs/reference/api/components/protocols/modbus.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:35
 msgid "[in] Capture timestamp in port monotonic domain"
 msgstr "[in] 接口单调时钟域中的捕获时间戳"
 
-#: ../../../../../../docs/reference/api/components/protocols/modbus.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:35
 msgid "True if byte joined the frame, false for discard/error"
 msgstr "字节并入帧时为 true；丢弃或出错时为 false"
 
-#: ../../../../../../docs/reference/api/components/protocols/modbus.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:35
 msgid "Service RTU silence and bounded synchronous RS485 response."
 msgstr "推进 RTU 静默间隔与有界同步 RS485 响应。"
 
-#: ../../../../../../docs/reference/api/components/protocols/modbus.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:35
 msgid ""
 "Task-only, explicit external scheduling. RS485 drain must observe the final "
 "stop bit. Failed abort retains TX bytes and asserted DE in LINK_FAULTED; "
@@ -145,70 +184,221 @@ msgstr ""
 "仅限任务上下文，由外部显式调度。RS485 排空必须观察最终停止位。中止失败时，LINK_FAULTED 保留 TX 字节并保持 DE 置位；直到 "
 "recover 或 stop 成功前，必须保持实例及接口有效。"
 
-#: ../../../../../../docs/reference/api/components/protocols/modbus.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:35
 msgid "[inout] Initialized instance, single execution owner"
 msgstr "[inout] 已初始化且具有单一执行所有者的实例"
 
-#: ../../../../../../docs/reference/api/components/protocols/modbus.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:35
 msgid "[in] Snapshot in the same monotonic domain"
 msgstr "[in] 同一单调时钟域中的快照"
 
-#: ../../../../../../docs/reference/api/components/protocols/modbus.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:35
 msgid "True for successful progress, false for clock/transport error"
 msgstr "取得进展时为 true；时钟或传输错误时为 false"
 
-#: ../../../../../../docs/reference/api/components/protocols/modbus.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:35
 msgid "Discard an errored or overrun receive frame."
 msgstr "丢弃发生错误或溢出的接收帧。"
 
-#: ../../../../../../docs/reference/api/components/protocols/modbus.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:35
 msgid "Task-only. Does not discard a retained faulted TX borrow."
 msgstr "仅限任务上下文。不丢弃仍保留的故障 TX 借用。"
 
-#: ../../../../../../docs/reference/api/components/protocols/modbus.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:35
 msgid "[inout] Initialized serialized instance"
 msgstr "[inout] 已初始化且串行使用的实例"
 
-#: ../../../../../../docs/reference/api/components/protocols/modbus.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:35
 msgid "[in] Error timestamp in port's monotonic domain"
 msgstr "[in] 接口单调时钟域中的错误时间戳"
 
-#: ../../../../../../docs/reference/api/components/protocols/modbus.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:35
 msgid "Settle retained TX then restore receive silence acquisition."
 msgstr "结清保留的 TX，再恢复接收静默判定。"
 
-#: ../../../../../../docs/reference/api/components/protocols/modbus.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:35
 msgid "Explicit task maintenance action, no fabricated recovery."
 msgstr "显式的任务维护动作，不虚构恢复。"
 
-#: ../../../../../../docs/reference/api/components/protocols/modbus.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:35
 msgid "[inout] Initialized serialized instance with live ports"
 msgstr "[inout] 已初始化且串行使用的实例，各接口保持有效"
 
-#: ../../../../../../docs/reference/api/components/protocols/modbus.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:35
 msgid "True only after actual port abort/drain and receive direction"
 msgstr "只有实际完成接口中止和排空，并切换到接收方向后才为 true"
 
-#: ../../../../../../docs/reference/api/components/protocols/modbus.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:35
 msgid "Settle the port before reclaiming protocol storage."
 msgstr "回收协议存储之前先使端口结清。"
 
-#: ../../../../../../docs/reference/api/components/protocols/modbus.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:35
 msgid ""
 "Stop future feed/poll users first. No future use except explicit "
 "initialization is allowed after successful stop."
 msgstr "必须先停止将来可能调用 feed/poll 的使用者。成功停止后，除显式初始化外不得再次使用。"
 
-#: ../../../../../../docs/reference/api/components/protocols/modbus.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:35
 msgid "[inout] Initialized, exclusively owned instance"
 msgstr "[inout] 已初始化且独占拥有的实例"
 
-#: ../../../../../../docs/reference/api/components/protocols/modbus.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:35
 msgid ""
 "True when no transport borrow remains and instance is stopped; false "
 "preserves fault state, TX bytes and all port lifetime obligations"
 msgstr "传输借用全部结束且实例已停止时为 true；false 保留故障状态、TX 字节及全部接口生命周期责任"
 
-#: ../../../../../../docs/reference/api/components/protocols/modbus.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:41
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:47
 msgid "Public Members"
 msgstr "公共成员"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:39
+msgid "modbus_tcp.h"
+msgstr "modbus_tcp.h"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:41
+msgid "Bounded Modbus TCP framing with explicit register policy."
+msgstr "具有显式寄存器策略的有界 Modbus TCP 分帧。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:41
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:47
+msgid ""
+"Author  Nexus Team   Version  1.0.0   Date  2026-11-21   Copyright  "
+"Copyright (c) 2026 Nexus Team"
+msgstr ""
+"作者  Nexus Team   版本  1.0.0   日期  2026-11-21   版权  Copyright (c) 2026 Nexus "
+"Team"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:41
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:47
+msgid "1.0.0"
+msgstr "1.0.0"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:41
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:47
+msgid "2026-11-21"
+msgstr "2026-11-21"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:41
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:47
+msgid "Copyright (c) 2026 Nexus Team"
+msgstr "Copyright (c) 2026 Nexus Team"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:41
+msgid "Initialize an unused, quiescent session."
+msgstr "初始化未使用且没有在途调用的会话。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:41
+msgid ""
+"Task-only serialized calls; no I/O or allocation. TCP is unauthenticated: "
+"product callbacks own authorization."
+msgstr "仅 task 上下文串行调用；不执行 I/O 或分配。TCP 不认证 peer，授权由产品 callback 负责。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:41
+msgid "[out] Caller storage, private after success."
+msgstr "[out] 调用者存储，成功后为私有状态。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:41
+msgid "[in] Bounded callbacks, copied; context stays live."
+msgstr "[in] 复制的有界 callback；其 context 持续存活。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:41
+msgid "[in] Exact accepted unit identity, 1..247; no broadcast."
+msgstr "[in] 精确接纳的 unit 身份，1..247；无广播。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:41
+msgid "SUCCESS or INVALID, unchanged on failure."
+msgstr "SUCCESS 或 INVALID；失败保持不变。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:41
+msgid "Consume bytes through at most one complete MBAP request."
+msgstr "消费字节，至多处理一个完整 MBAP 请求。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:41
+msgid ""
+"No socket I/O, deadline or retained input. Caller advances socket with its "
+"finite deadline. Pending response blocks the next request, so writes are "
+"never executed twice while a response is backpressured. Bad framing requires"
+" closing the connection; do not search arbitrary payload for MBAP."
+msgstr ""
+"不执行 socket I/O，不持有 deadline，也不保留输入。调用者以自己的有限 deadline 推进 socket。pending "
+"response 阻止下一请求，确保 response 背压期间不会重复执行写入。分帧错误须关闭连接，不在任意 payload 中搜索 MBAP。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:41
+msgid "[inout] Initialized, serialized session."
+msgstr "[inout] 已初始化且串行管理的会话。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:41
+msgid "[in] Readable bytes, not retained; NULL only for zero size."
+msgstr "[in] 不保留的可读字节；仅 size 为零时允许 NULL。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:41
+msgid "[in] Available bytes, may include another request."
+msgstr "[in] 可用字节，可能包含另一请求。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:41
+msgid "[out] Distinct count; zero on admission failure."
+msgstr "[out] 独立计数；准入失败时为零。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:41
+msgid ""
+"SUCCESS after response production, BUSY for partial/pending, INVALID for "
+"malformed MBAP (sticky failed session)."
+msgstr ""
+"产生 response 后返回 SUCCESS，partial／pending 返回 BUSY，畸形 MBAP 返回 INVALID（会话锁存失败）。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:41
+msgid "Borrow the complete response until exact release."
+msgstr "借用完整 response，直到精确 release。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:41
+msgid "Transport must copy or settle its borrow before release."
+msgstr "transport 必须在 release 前完成复制或结清其借用。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:41
+msgid "[in] Initialized serialized session."
+msgstr "[in] 已初始化且串行管理的会话。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:41
+msgid "[out] Distinct pointer into stable session TX storage."
+msgstr "[out] 指向会话稳定 TX 存储的独立指针输出。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:41
+msgid "[out] Distinct number of response bytes."
+msgstr "[out] 独立的 response 字节数。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:41
+msgid "SUCCESS, EMPTY, INVALID or STATE; failure leaves outputs."
+msgstr "SUCCESS、EMPTY、INVALID 或 STATE；失败保持输出不变。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:41
+msgid "Release a fully copied/settled response for next request."
+msgstr "释放已完整复制／结清的 response，允许下一请求。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:41
+msgid ""
+"Product closes admission and joins socket operations before reclaiming or "
+"reinitializing session storage."
+msgstr "回收或重新初始化会话存储前，产品关闭准入并 join socket 操作。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:41
+msgid "[inout] Serialized session, all response borrowers joined."
+msgstr "[inout] 串行会话，所有 response 借用者均已退出会合。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:41
+msgid "SUCCESS, EMPTY, INVALID or STATE; does not close a socket."
+msgstr "SUCCESS、EMPTY、INVALID 或 STATE；不关闭 socket。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:41
+msgid "One serialized session; no socket, global map or worker."
+msgstr "一个串行会话；无 socket、全局映射或 worker。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:45
+msgid "modbus_registers.h"
+msgstr "modbus_registers.h"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/modbus.md:47
+msgid "Shared bounded Modbus register and authorization contract."
+msgstr "共享的有界 Modbus 寄存器与授权合同。"

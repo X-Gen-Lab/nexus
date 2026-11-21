@@ -3,6 +3,11 @@
 `dev.py` 直接调用 CMake／CTest，保留真实退出码、日志与实际构建来源。
 产品应用、调度策略和私有板级数据放在外部仓库。
 
+`fault_decode.py` 在主机上校验并解码固定格式的保留故障记录。未提供 ELF 时只输出
+数值事实；提供 ELF 时，先核对应用嵌入的 16 字节 `nx_fault_build_id`，再调用
+`arm-none-eabi-addr2line` 解析 PC／LR。当前支持 F407 的小端 ARM ELF32 配置。
+构建标识应由应用保证每次构建唯一；标识和 CRC 都不提供认证。
+
 ```sh
 python tools/dev/dev.py doctor --target native
 python tools/dev/dev.py prepare --scope native --allow-network

@@ -1,0 +1,1315 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-21 15:03+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: b3de5b67e133fe68daa6c938063055033bf6beca24cf2b962b8c9d195c189229\n"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:10
+msgid "Explicit-state numeric algorithms"
+msgstr "显式状态的数值算法"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:12
+msgid ""
+"Select `Nexus::Algorithms` for the portable C11 scalar profile. The caller "
+"provides every mutable history, coefficient array and workspace, and "
+"serializes updates with reset and teardown. Algorithms perform no device "
+"I/O, clock read, allocation or scheduling. The [leaf "
+"contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/components/algorithms/README.md) owns the selected conventions; "
+"public declarations below own each operation."
+msgstr ""
+"选择 `Nexus::Algorithms` 使用可移植 C11 scalar profile。调用者提供全部可变历史、系数数组和 "
+"workspace，并将更新与 reset／teardown 串行化。算法不访问器件、不读 "
+"clock、不分配或调度。选定约定由[叶合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-SOURCE/components/algorithms/README.md)维护；每个操作的合同由下方公共声明维护。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:0
+msgid "Need"
+msgstr "需求"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:0
+msgid "Header under `nexus/algorithms/`"
+msgstr "`nexus/algorithms/` 下的头文件"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:0
+msgid "Selection boundary"
+msgstr "选择边界"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:0
+msgid "Saturating Q1.15/Q1.31 arithmetic"
+msgstr "饱和 Q1.15／Q1.31 算术"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:0
+msgid "`numeric.h`"
+msgstr "`numeric.h`"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:0
+msgid "Explicit scaling; nearest rounding with ties away from zero"
+msgstr "显式缩放；舍入到最近值，恰好位于中点时向远离零的方向舍入"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:0
+msgid "Checksums and byte representation"
+msgstr "校验和与字节表示"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:0
+msgid "`crc.h`, `endian.h`"
+msgstr "`crc.h`, `endian.h`"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:0
+msgid "Declared CRC model and wire byte order; CRC is not authentication"
+msgstr "显式 CRC 模型与线上字节序；CRC 不是认证"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:0
+msgid "Streaming statistics"
+msgstr "流式统计"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:0
+msgid "`statistics.h`"
+msgstr "`statistics.h`"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:0
+msgid "Caller chooses population/sample interpretation and sample quality"
+msgstr "调用者选择总体／样本含义与样本质量"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:0
+msgid "Small filters"
+msgstr "轻量滤波"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:0
+msgid "`filter.h`"
+msgstr "`filter.h`"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:0
+msgid "EMA, moving mean and bounded odd-window median"
+msgstr "EMA、滑动均值及有界奇数窗口中值"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:0
+msgid "Portable FIR/SOS"
+msgstr "可移植 FIR／SOS"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:0
+msgid "`dsp.h`"
+msgstr "`dsp.h`"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:0
+msgid ""
+"Current-sample-first FIR coefficients; conventional SOS denominator signs"
+msgstr "FIR 系数以当前样本系数优先；SOS 使用传统分母符号"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:0
+msgid "Calibration tables"
+msgstr "标定表"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:0
+msgid "`interpolation.h`"
+msgstr "`interpolation.h`"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:0
+msgid "One-dimensional linear interpolation with an explicit boundary policy"
+msgstr "具有显式边界策略的一维线性插值"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:0
+msgid "Scalar control and PI/PID"
+msgstr "Scalar 控制与 PI／PID"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:0
+msgid "`control.h`, `pid.h`"
+msgstr "`control.h`, `pid.h`"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:0
+msgid ""
+"Explicit elapsed seconds, limits and independently owned controller state"
+msgstr "显式经过秒数、限值与独立拥有的控制器状态"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:28
+msgid ""
+"The product supplies physical units, sampling continuity, coefficient design"
+" and the response to missed samples. PID gains use continuous-time Ki/Kd; do"
+" not apply the sample interval twice. Anti-windup and explicit actual-output"
+" feedback do not establish stability of a physical plant. Numeric rejection "
+"is not an actuator shutdown command. Preserve IEEE nonfinite checks when "
+"compiling this profile; fast-math assumptions cannot replace its input "
+"contract."
+msgstr ""
+"产品提供物理单位、采样连续性、系数设计及丢样处置。PID 使用连续时间 "
+"Ki／Kd，不得重复应用采样间隔。抗积分饱和及显式实际输出反馈不建立物理控制对象的稳定性。数值拒绝不是执行器停机命令。编译此 profile 时保留 "
+"IEEE 非有限值检查，fast-math 假设不能替代其输入合同。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:35
+msgid ""
+"Portable SOS computes into separate scratch and commits history only after a"
+" successful step. Scratch may change on failure. Exact input/output "
+"separation, startup history and reset conditions remain those of the "
+"selected header; a generic reset must not race a live caller."
+msgstr ""
+"可移植 SOS 在独立 scratch 中计算，仅成功 step 后提交历史。失败可能改变 scratch。精确输入／输出分离、启动历史与 reset "
+"条件以选定头文件为准；通用 reset 不得与 live 调用者竞态。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:40
+msgid "Conditional CMSIS-DSP backend"
+msgstr "条件 CMSIS-DSP backend"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:42
+msgid ""
+"Explicit `nexus_add_cmsis_dsp()` selection creates the locked upstream "
+"`Nexus::CMSISDSP` backend and the Nexus-facing `Nexus::AlgorithmsCMSISDSP` "
+"adapter. Ordinary Algorithms does not select that dependency. The reviewed "
+"[f32 profile](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/components/algorithms/cmsis_dsp/README.md) includes dot, scalar FIR, "
+"DF1 biquad and fixed RFFT1024, with caller-provided history and FFT "
+"workspace. Vendor headers remain private."
+msgstr ""
+"显式选择 `nexus_add_cmsis_dsp()` 后，才创建锁定的上游 `Nexus::CMSISDSP` backend 和面向 Nexus "
+"的 `Nexus::AlgorithmsCMSISDSP` adapter。普通 Algorithms 不选择该依赖。已审[f32 "
+"profile](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/components/algorithms/cmsis_dsp/README.md)包含 dot、scalar FIR、DF1 "
+"biquad 和固定 RFFT1024，历史和 FFT workspace 均由调用者提供。vendor 头保持私有。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:49
+msgid ""
+"CMSIS FIR coefficient order and biquad feedback signs differ from the "
+"portable profile. Do not reuse those arrays without conversion. CMSIS block "
+"processing does not inherit portable SOS history rollback. RFFT output is "
+"packed as `[DC, Nyquist, Re(1), Im(1), ...]`, with no forward normalization;"
+" the caller owns sample rate, window and spectral units. MCU cycle budgets "
+"and physical sampling/control qualification remain `not_executed` unless "
+"their exact target and hardware are separately exercised."
+msgstr ""
+"CMSIS FIR 的系数顺序和 biquad 反馈符号与可移植 profile 不同，未转换前不得复用数组。CMSIS block "
+"processing 不继承可移植 SOS 的历史回滚。RFFT 输出打包为 `[DC, Nyquist, Re(1), Im(1), "
+"...]`，正向不归一化；采样率、窗函数与频谱单位归调用者。除非另行执行精确 target 和硬件，MCU 周期预算与物理采样／控制资格保持 "
+"`not_executed`。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:57
+msgid "Public declarations"
+msgstr "公共声明"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:59
+msgid "numeric.h"
+msgstr "numeric.h"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:61
+msgid "Explicit saturating fixed-point and scalar arithmetic."
+msgstr "显式饱和定点与 scalar 算术。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:61
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:67
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:73
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:79
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:85
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:91
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:97
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:103
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:109
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:115
+msgid ""
+"Author  Nexus Team   Version  1.0.0   Date  2026-11-21   Copyright  "
+"Copyright (c) 2026 Nexus Team"
+msgstr ""
+"作者  Nexus Team   版本  1.0.0   日期  2026-11-21   版权  Copyright (c) 2026 Nexus "
+"Team"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:61
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:67
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:73
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:79
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:85
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:91
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:97
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:103
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:109
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:115
+msgid "Nexus Team"
+msgstr "Nexus Team"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:61
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:67
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:73
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:79
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:85
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:91
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:97
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:103
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:109
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:115
+msgid "1.0.0"
+msgstr "1.0.0"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:61
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:67
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:73
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:79
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:85
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:91
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:97
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:103
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:109
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:115
+msgid "2026-11-21"
+msgstr "2026-11-21"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:61
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:67
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:73
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:79
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:85
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:91
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:97
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:103
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:109
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:115
+msgid "Copyright (c) 2026 Nexus Team"
+msgstr "Copyright (c) 2026 Nexus Team"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:61
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:67
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:73
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:79
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:85
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:91
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:97
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:103
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:109
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:115
+msgid "Functions"
+msgstr "函数"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:61
+msgid "Saturate an integer to the signed Q1.15 storage range."
+msgstr "将整数饱和到有符号 Q1.15 存储范围。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:61
+msgid "Q1.15 product, rounded to nearest with ties away from zero."
+msgstr "Q1.15 乘积，舍入到最近值，恰好位于中点时向远离零的方向舍入。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:61
+msgid "Q1.31 product, rounded to nearest with ties away from zero."
+msgstr "Q1.31 乘积，舍入到最近值，恰好位于中点时向远离零的方向舍入。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:61
+msgid "Convert finite normalized float to saturated Q1.15."
+msgstr "将有限归一化 float 转换为饱和 Q1.15。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:61
+msgid ""
+"Task/IRQ pure arithmetic; no retained storage or allocation. Rounding is "
+"nearest with ties away from zero."
+msgstr "Task／IRQ 纯算术；不保留存储引用，也不分配。舍入到最近值，恰好位于中点时向远离零的方向舍入。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:0
+msgid "Parameters"
+msgstr "参数"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:61
+msgid "[in] Finite input; values outside [-1, 1) saturate."
+msgstr "[in] 有限输入；超出 [-1, 1) 的值饱和。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:61
+msgid "[out] Distinct writable result, unchanged on rejection."
+msgstr "[out] 独立可写结果，拒绝时保持不变。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:0
+msgid "Returns"
+msgstr "返回值"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:61
+msgid "SUCCESS or INVALID for NULL/nonfinite input."
+msgstr "NULL／非有限输入返回 INVALID，否则 SUCCESS。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:61
+msgid "Apply a finite scalar bound without changing invalid output."
+msgstr "应用有限 scalar 边界，不改变非法情况下的输出。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:61
+msgid "[in] Finite input."
+msgstr "[in] 有限输入。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:61
+msgid "[in] Finite inclusive lower bound."
+msgstr "[in] 有限且包含边界的下限。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:61
+msgid "[in] Finite inclusive upper bound, not below lower."
+msgstr "[in] 有限且包含边界的上限，不低于 lower。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:61
+msgid "[out] Distinct caller result, unchanged on failure."
+msgstr "[out] 独立调用者结果，失败保持不变。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:61
+msgid "SUCCESS or INVALID; no clock, allocation or retained state."
+msgstr "SUCCESS 或 INVALID；不读 clock、不分配或保留状态。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:65
+msgid "crc.h"
+msgstr "crc.h"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:67
+msgid "Streaming software CRC with explicit catalogue parameters."
+msgstr "具有显式 catalogue 参数的流式软件 CRC。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:67
+msgid "Fold bytes into an unfinalized register."
+msgstr "将字节折叠到尚未 finalize 的寄存器。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:67
+msgid "[in] Immutable valid model, borrowed until return."
+msgstr "[in] 不可变有效模型，借用到返回。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:67
+msgid "[in] Readable length bytes; NULL only when length is zero."
+msgstr "[in] length 个可读字节；仅 length 为零时允许 NULL。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:67
+msgid "[in] Number of bytes to consume."
+msgstr "[in] 要消费的字节数。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:67
+msgid ""
+"[inout] Register initialized to model.initial; separate from model/data. "
+"Unchanged on argument failure."
+msgstr "[inout] 初始化为 model.initial 的寄存器，与 model／data 分离。参数失败时保持不变。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:67
+msgid "SUCCESS or INVALID; bounded by length*width, no heap/OS."
+msgstr "SUCCESS 或 INVALID；工作量受 length*width 约束，无 heap／OS。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:67
+msgid "Finalize a register without changing streaming state."
+msgstr "finalize 寄存器，不改变流式状态。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:67
+msgid "[in] Same immutable model used for update."
+msgstr "[in] 与 update 使用的同一不可变模型。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:67
+msgid "[in] Unfinalized register within the selected width."
+msgstr "[in] 选定 width 范围内尚未 finalize 的寄存器。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:67
+msgid "[out] Distinct result, unchanged on failure."
+msgstr "[out] 独立结果，失败保持不变。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:67
+msgid "SUCCESS or INVALID; no allocation or retained references."
+msgstr "SUCCESS 或 INVALID；无分配或保留引用。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:67
+msgid "Variables"
+msgstr "变量"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:67
+msgid "CRC-32/ISO-HDLC model; immutable shared data."
+msgstr "CRC-32/ISO-HDLC 模型；共享不可变数据。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:67
+msgid "CRC-16/MODBUS model; immutable shared data."
+msgstr "CRC-16/MODBUS 模型；共享不可变数据。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:67
+msgid "CRC-8/SMBUS model; immutable shared data."
+msgstr "CRC-8/SMBUS 模型；共享不可变数据。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:67
+msgid "Width 8..32, normal polynomial without its leading x^width term."
+msgstr "Width 为 8..32，普通多项式不包含最高 x^width 项。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:67
+msgid ""
+"initial/xor_out must fit width. reflect_input reverses each input byte; "
+"reflect_output reverses the register before xor_out. This is byte-oriented "
+"software math, not an MCU hardware CRC word contract."
+msgstr ""
+"initial／xor_out 必须适合 width。reflect_input 按位反转每个输入字节；reflect_output 在执行 "
+"xor_out 前按位反转寄存器。这是面向字节的软件数学，不是 MCU 硬件 CRC word 合同。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:67
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:79
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:85
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:91
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:97
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:103
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:109
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:115
+msgid "Public Members"
+msgstr "公共成员"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:71
+msgid "endian.h"
+msgstr "endian.h"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:73
+msgid "Unaligned byte-order conversion without pointer punning."
+msgstr "无需 pointer punning 的非对齐字节序转换。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:73
+msgid "Read an unsigned integer from an unaligned byte sequence."
+msgstr "从非对齐字节序列读取无符号整数。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:73
+msgid "[in] At least width readable bytes, borrowed for call."
+msgstr "[in] 至少 width 个可读字节，仅在调用期间借用。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:73
+msgid "[in] Exactly 1, 2, 4 or 8 bytes."
+msgstr "[in] 恰为 1、2、4 或 8 字节。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:73
+msgid "[in] True selects least significant byte first."
+msgstr "[in] True 选择最低有效字节优先。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:73
+msgid "[out] Separate caller result, unchanged on invalid arguments."
+msgstr "[out] 独立调用者结果，非法参数保持不变。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:73
+msgid "SUCCESS or INVALID; bounded byte math, no OS/heap/state."
+msgstr "SUCCESS 或 INVALID；有界字节数学，无 OS／heap／state。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:73
+msgid "Write an unsigned integer without silently truncating it."
+msgstr "写无符号整数，不静默截断。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:73
+msgid "[out] At least width writable bytes, changed on success only."
+msgstr "[out] 至少 width 个可写字节，仅成功时修改。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:73
+msgid "[in] Value representable by the selected byte width."
+msgstr "[in] 可由选定字节宽度表示的值。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:73
+msgid "SUCCESS, INVALID or OVERFLOW; no retained references/heap."
+msgstr "SUCCESS、INVALID 或 OVERFLOW；无保留引用／heap。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:77
+msgid "statistics.h"
+msgstr "statistics.h"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:79
+msgid "Caller-owned streaming mean, variance and RMS statistics."
+msgstr "调用者拥有的流式均值、方差与 RMS 统计。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:79
+msgid "Add one finite sample using a stable centered recurrence."
+msgstr "使用稳定的中心化递推加入一个有限样本。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:79
+msgid "No OS/heap/clock. Rejection preserves the complete state."
+msgstr "无 OS／heap／clock。拒绝保持全部状态不变。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:79
+msgid "[inout] Zeroed/initialized single-owner state."
+msgstr "[inout] 已清零／已初始化的单 owner 状态。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:79
+msgid "[in] Finite bounded sample; square must be representable."
+msgstr "[in] 有限有界样本，平方必须可表示。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:79
+msgid "SUCCESS, INVALID or EXHAUSTED on count/numeric overflow."
+msgstr "SUCCESS、INVALID，计数／数值溢出返回 EXHAUSTED。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:79
+msgid "Copy population or sample statistics."
+msgstr "复制总体或样本统计。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:79
+msgid "No allocation/clock; caller serializes reads with updates."
+msgstr "不分配或读 clock；调用者串行化读取和更新。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:79
+msgid "[in] Same single-owner state, borrowed until return."
+msgstr "[in] 同一单 owner 状态，借用到返回。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:79
+msgid "[in] True selects n-1 instead of n."
+msgstr "[in] True 选择 n-1 而非 n。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:79
+msgid "[out] Distinct output; unchanged for empty/invalid input."
+msgstr "[out] 独立输出；empty／非法输入保持不变。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:79
+msgid "SUCCESS, EMPTY for insufficient samples, or INVALID."
+msgstr "SUCCESS、样本不足时 EMPTY，或 INVALID。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:79
+msgid "Zero initialization/reset starts an empty independent accumulator."
+msgstr "清零初始化／reset 开始一个空的独立累积器。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:79
+msgid "Copied statistics; variance uses the explicitly selected divisor."
+msgstr "复制的统计；方差使用显式选定的除数。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:83
+msgid "filter.h"
+msgstr "filter.h"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:85
+msgid "Allocation-free scalar smoothing and finite-window filters."
+msgstr "无分配 scalar 平滑及有限窗口滤波。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:85
+msgid "Exponential smoothing with an explicit discrete coefficient."
+msgstr "具有显式离散系数的指数平滑。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:85
+msgid "Task/IRQ arithmetic only; no time source or heap."
+msgstr "仅 Task／IRQ 算术；无时间源或 heap。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:85
+msgid "[inout] Single-owner state, reset by zeroing when quiescent."
+msgstr "[inout] 单 owner 状态；确认其他访问已停止且调用均已退出后，才可通过清零 reset。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:85
+msgid "[in] Finite input in the same units as output."
+msgstr "[in] 与输出同单位的有限输入。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:85
+msgid "[in] Finite coefficient in (0, 1]."
+msgstr "[in] (0, 1] 内的有限系数。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:85
+msgid "[out] Separate caller output, unchanged on failure."
+msgstr "[out] 独立调用者输出，失败保持不变。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:85
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:115
+msgid "SUCCESS, INVALID or EXHAUSTED on numeric overflow."
+msgstr "SUCCESS、INVALID，数值溢出时 EXHAUSTED。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:85
+msgid "Initialize unused moving-mean control without filling data."
+msgstr "初始化未使用的滑动均值控制，不填充数据。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:85
+msgid "[out] Fresh distinct caller storage, no live users."
+msgstr "[out] fresh 独立调用者存储，无 live 使用者。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:85
+msgid "[inout] Distinct writable capacity floats, retained."
+msgstr "[inout] 独立可写的 capacity 个 float，保持存活。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:85
+msgid "[in] Positive actual buffer length."
+msgstr "[in] 正数实际 buffer 长度。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:85
+msgid "SUCCESS or INVALID; no allocation. State reset drops history."
+msgstr "SUCCESS 或 INVALID；不分配。状态 reset 丢弃历史。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:85
+msgid "Update a compensated sum; startup averages available samples."
+msgstr "更新补偿和；启动时对已有样本求平均。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:85
+msgid "[inout] Initialized single-owner state and live buffer."
+msgstr "[inout] 已初始化的单 owner 状态及 live buffer。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:85
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:109
+msgid "[in] Finite next sample."
+msgstr "[in] 下一个有限样本。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:85
+msgid "[out] Separate output, unchanged on error."
+msgstr "[out] 独立输出，错误时保持不变。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:85
+msgid "SUCCESS, INVALID/STATE or EXHAUSTED; O(1), no clock/heap."
+msgstr "SUCCESS、INVALID／STATE 或 EXHAUSTED；O(1)，无 clock／heap。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:85
+msgid "Median of a bounded odd window using caller scratch."
+msgstr "使用调用者 scratch 求有界奇数窗口的中值。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:85
+msgid "[in] Finite count samples, retained only until return."
+msgstr "[in] count 个有限样本，仅借用到返回。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:85
+msgid "[in] Odd window length in [1, 31]."
+msgstr "[in] [1, 31] 内的奇数窗口长度。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:85
+msgid "[inout] Distinct writable count floats, borrowed for call."
+msgstr "[inout] 独立可写的 count 个 float，仅在调用期间借用。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:85
+msgid "[out] Distinct scalar result, unchanged on invalid input."
+msgstr "[out] 独立 scalar 结果，非法输入保持不变。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:85
+msgid "SUCCESS or INVALID; O(count^2), no stack array/heap/clock."
+msgstr "SUCCESS 或 INVALID；O(count^2)，无栈数组／heap／clock。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:85
+msgid "Zeroed independent EMA state; first sample seeds the output."
+msgstr "已清零的独立 EMA 状态；首个样本建立输出初值。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:85
+msgid "Caller owns the complete buffer for the lifetime of the filter."
+msgstr "调用者在 filter 的整个存活期拥有完整 buffer。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:89
+msgid "interpolation.h"
+msgstr "interpolation.h"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:91
+msgid "Explicit finite piecewise-linear calibration tables."
+msgstr "显式有限分段线性标定表。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:91
+msgid "Enums"
+msgstr "枚举"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:91
+msgid "Caller selects behavior outside the inclusive table domain."
+msgstr "调用者选择包含端点的表定义域之外的行为。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:91
+msgid "Values:"
+msgstr "取值："
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:91
+msgid "Validate and bind a finite strictly increasing table."
+msgstr "验证并绑定有限且严格递增的表。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:91
+msgid "[out] Fresh distinct caller control, unchanged on error."
+msgstr "[out] fresh 独立调用者控制，错误时保持不变。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:91
+msgid "[in] At least two finite strictly increasing coordinates."
+msgstr "[in] 至少两个有限且严格递增的坐标。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:91
+msgid "[in] Matching finite values, retained without copying."
+msgstr "[in] 对应的有限值，不复制，保持存活。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:91
+msgid "[in] Number of entries in both arrays."
+msgstr "[in] 两个数组各自的 entry 数量。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:91
+msgid "[in] Explicit out-of-range behavior."
+msgstr "[in] 显式越界行为。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:91
+msgid "SUCCESS or INVALID; O(count), no OS/clock/allocation."
+msgstr "SUCCESS 或 INVALID；O(count)，无 OS／clock／分配。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:91
+msgid "Evaluate with binary search and a double intermediate."
+msgstr "通过二分搜索及 double 中间值求值。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:91
+msgid "Read-only and reentrant with independent output storage."
+msgstr "只读操作，使用独立输出存储时可重入。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:91
+msgid "[in] Validated table, borrowed until return."
+msgstr "[in] 已验证的表，借用到返回。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:91
+msgid "[in] Finite coordinate in the table's physical units."
+msgstr "[in] 使用表的物理单位的有限坐标。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:91
+msgid "[out] Separate result, unchanged on error."
+msgstr "[out] 独立结果，错误时保持不变。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:91
+msgid "SUCCESS, INVALID or EXHAUSTED for unrepresentable output."
+msgstr "SUCCESS、INVALID，或输出无法表示时 EXHAUSTED。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:91
+msgid "Immutable arrays remain live and unchanged for every evaluation."
+msgstr "每次求值期间，不可变数组都必须保持存活且不变。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:95
+msgid "control.h"
+msgstr "control.h"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:97
+msgid "Explicit-time scalar integration, rate and derivative tools."
+msgstr "显式时间的 scalar 积分、速率和微分工具。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:97
+msgid "Limit a change using caller-selected units per second."
+msgstr "按调用者选定的每秒单位限制变化。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:97
+msgid "[in] Finite previous output."
+msgstr "[in] 有限的上次输出。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:97
+msgid "[in] Finite desired output, in the same units."
+msgstr "[in] 同单位的有限目标输出。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:97
+msgid "[in] Finite nonnegative positive-direction rate."
+msgstr "[in] 有限、非负的正方向速率。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:97
+msgid "[in] Finite nonnegative negative-direction rate."
+msgstr "[in] 有限、非负的负方向速率。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:97
+msgid "[in] Finite positive elapsed seconds, supplied by caller."
+msgstr "[in] 调用者提供的有限正数经过秒数。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:97
+msgid "[out] Distinct result, unchanged on invalid input/overflow."
+msgstr "[out] 独立结果，非法输入／溢出时保持不变。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:97
+msgid "SUCCESS, INVALID or EXHAUSTED; no OS/heap/clock."
+msgstr "SUCCESS、INVALID 或 EXHAUSTED；无 OS／heap／clock。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:97
+msgid "Bounded rectangular integration, with explicit state."
+msgstr "具有显式状态的有界矩形积分。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:97
+msgid "No time read, allocation or automatic execution."
+msgstr "不读时间、不分配或自动执行。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:97
+msgid "[inout] Finite single-owner accumulated output."
+msgstr "[inout] 有限的单 owner 累积输出。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:97
+msgid "[in] Finite input, output units per second."
+msgstr "[in] 有限输入，单位为输出单位每秒。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:97
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:103
+msgid "[in] Finite positive elapsed seconds."
+msgstr "[in] 有限正数的经过秒数。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:97
+msgid "[in] Finite inclusive accumulator minimum."
+msgstr "[in] 有限且包含边界的累积器最小值。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:97
+msgid "[in] Finite inclusive accumulator maximum."
+msgstr "[in] 有限且包含边界的累积器最大值。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:97
+msgid "SUCCESS, INVALID or EXHAUSTED; rejection preserves state."
+msgstr "SUCCESS、INVALID 或 EXHAUSTED；拒绝保持状态不变。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:97
+msgid "Backward difference followed by backward-Euler low-pass."
+msgstr "后向差分，随后执行后向 Euler 低通。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:97
+msgid "No OS/clock/heap. Reset only after all users join."
+msgstr "无 OS／clock／heap。仅在所有使用者已 join 后 reset。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:97
+msgid "[inout] Independent single-owner state."
+msgstr "[inout] 独立单 owner 状态。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:97
+msgid "[in] Finite measurement."
+msgstr "[in] 有限测量值。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:97
+msgid "[in] Finite nonnegative filter time constant in seconds."
+msgstr "[in] 有限非负 filter 时间常数，单位秒。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:97
+msgid "[out] Distinct output in sample units per second."
+msgstr "[out] 独立输出，单位为样本单位每秒。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:97
+msgid "SUCCESS, INVALID or EXHAUSTED; no changes on failure."
+msgstr "SUCCESS、INVALID 或 EXHAUSTED；失败不作任何更改。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:97
+msgid "Zeroed derivative state; first sample returns zero."
+msgstr "已清零的微分器状态；首个样本返回零。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:101
+msgid "pid.h"
+msgstr "pid.h"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:103
+msgid "Explicit-state PID with anti-windup and output tracking."
+msgstr "具有抗积分饱和与输出跟踪的显式状态 PID。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:103
+msgid "Validate configuration and initialize unused PID storage."
+msgstr "验证配置并初始化未使用的 PID 存储。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:103
+msgid "[out] Fresh single-owner control, unchanged on error."
+msgstr "[out] fresh 单 owner 控制，错误时保持不变。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:103
+msgid "[in] Finite gains, tau>=0 and ordered finite limits."
+msgstr "[in] 有限增益、tau>=0 及有序有限限值。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:103
+msgid "SUCCESS or INVALID; no OS/heap/device/time access."
+msgstr "SUCCESS 或 INVALID；无 OS／heap／器件／时间访问。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:103
+msgid "Rectangular integral and filtered measurement derivative."
+msgstr "矩形积分与滤波后的测量值微分。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:103
+msgid ""
+"Conditional integration clips a crossing increment at the reachable output "
+"bound and freezes further outward motion. A disabled D never evaluates a "
+"derivative. Physical actuator limits/rate and scheduling remain external. No"
+" allocation or clock read."
+msgstr ""
+"条件积分将跨越边界的增量裁剪到可达输出限值，并冻结进一步向外的变化。D 被禁用时不计算微分。物理执行器限值／速率及调度仍由外部负责。不分配或读 "
+"clock。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:103
+msgid "[inout] Initialized single-owner controller."
+msgstr "[inout] 已初始化的单 owner 控制器。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:103
+msgid "[in] Finite reference in measurement units."
+msgstr "[in] 使用测量单位的有限 reference。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:103
+msgid "[in] Finite observation in the same units."
+msgstr "[in] 同单位的有限观测。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:103
+msgid "[in] Finite positive sampling interval in seconds."
+msgstr "[in] 有限正数采样间隔，单位秒。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:103
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:109
+msgid "[out] Distinct output, unchanged on failure."
+msgstr "[out] 独立输出，失败保持不变。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:103
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:109
+msgid "SUCCESS, INVALID/STATE or EXHAUSTED for numeric overflow."
+msgstr "SUCCESS、INVALID／STATE，或数值溢出时 EXHAUSTED。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:103
+msgid "Seed tracking/manual output without a derivative kick."
+msgstr "建立 tracking／manual 输出初值，不产生 derivative kick。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:103
+msgid ""
+"Seeds I=output-Kp*error and D=0. Rejects if I cannot fit its bounds. Next "
+"step includes its ordinary integral increment."
+msgstr "设定 I=output-Kp*error 且 D=0。I 无法落入其限值则拒绝。下一 step 包含其普通积分增量。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:103
+msgid "[inout] Initialized controller, serialized with step."
+msgstr "[inout] 已初始化控制器，与 step 串行化。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:103
+msgid "[in] Finite current reference."
+msgstr "[in] 有限的当前 reference。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:103
+msgid "[in] Finite current measurement."
+msgstr "[in] 有限的当前 measurement。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:103
+msgid "[in] Desired finite output within output limits."
+msgstr "[in] 输出限值内的有限目标输出。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:103
+msgid "SUCCESS or INVALID/STATE; rejection preserves all state."
+msgstr "SUCCESS 或 INVALID／STATE；拒绝保持全部状态不变。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:103
+msgid "Preserve last computed output when changing gains/limits."
+msgstr "改变增益／限值时保持最近已计算输出。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:103
+msgid ""
+"Keeps current filtered D and adjusts I using last_error. Rejects if old "
+"output or required I is outside new limits. Caller still validates closed-"
+"loop behavior on its plant."
+msgstr "保留当前已滤波 D，并使用 last_error 调整 I。旧输出或所需 I 超出新限值则拒绝。调用者仍须验证其物理对象的闭环行为。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:103
+msgid "[inout] Initialized controller with a tracked/computed output."
+msgstr "[inout] 已初始化且已有 tracked／computed 输出的控制器。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:103
+msgid "[in] New finite configuration and limits."
+msgstr "[in] 新的有限配置和限值。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:103
+msgid "SUCCESS or INVALID/STATE; no partial change on rejection."
+msgstr "SUCCESS 或 INVALID／STATE；拒绝无部分变更。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:103
+msgid "Apply actual actuator tracking as a back-calculation step."
+msgstr "通过 back-calculation step 应用实际执行器跟踪。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:103
+msgid ""
+"Adjusts I by rate*dt*(actual-last_unsaturated), bounded by integral limits. "
+"Caller selects whether/when to combine this with conditional integration; no"
+" automatic device I/O."
+msgstr ""
+"按 rate*dt*(actual-last_unsaturated) 调整 "
+"I，并限制在积分边界内。是否以及何时与条件积分结合由调用者选择；不自动访问器件。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:103
+msgid "[inout] Initialized controller after a successful step."
+msgstr "[inout] 已成功 step 后的已初始化控制器。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:103
+msgid "[in] Finite actual actuator value in output units."
+msgstr "[in] 使用输出单位的有限实际执行器值。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:103
+msgid "[in] Finite nonnegative tracking rate, inverse seconds."
+msgstr "[in] 有限非负 tracking rate，单位为秒的倒数。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:103
+msgid "SUCCESS, INVALID/STATE or EXHAUSTED; failure is unchanged."
+msgstr "SUCCESS、INVALID／STATE 或 EXHAUSTED；失败保持不变。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:103
+msgid "Continuous gains: Kp [U/E], Ki [U/(E*s)], Kd [U*s/E]."
+msgstr "连续增益：Kp [U/E]、Ki [U/(E*s)]、Kd [U*s/E]。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:103
+msgid ""
+"Error is setpoint-measurement. Signed gains select control action. tau_s "
+"filters derivative-on-measurement. Limits are in output units; the caller "
+"selects physical units, sampling and actuator policy."
+msgstr ""
+"误差为 setpoint-measurement。有符号增益选择控制作用方向。tau_s 对 measurement "
+"微分滤波。限值使用输出单位；物理单位、采样和执行器策略由调用者选择。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:103
+msgid "Independent caller-owned controller; never share mutable history."
+msgstr "调用者拥有的独立控制器；不得共享可变历史。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:107
+msgid "dsp.h"
+msgstr "dsp.h"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:109
+msgid "Portable f32 FIR and second-order-section scalar profile."
+msgstr "可移植 f32 FIR 与 second-order-section scalar profile。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:109
+msgid "Bind and clear exact FIR history, without allocation."
+msgstr "绑定并清除精确 FIR 历史，不执行分配。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:109
+msgid "[out] Fresh control, separate from coefficients/history."
+msgstr "[out] fresh 控制，与系数／历史分离。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:109
+msgid "[in] Finite taps values, immutable until teardown."
+msgstr "[in] 有限的 taps 个值，保持不可变直到 teardown。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:109
+msgid "[inout] Distinct writable taps floats, cleared on success."
+msgstr "[inout] 独立可写的 taps 个 float，成功时清零。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:109
+msgid "[in] Positive actual lengths of both arrays."
+msgstr "[in] 两数组实际长度，均为正。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:109
+msgid "SUCCESS or INVALID; one serialized owner, no OS/clock."
+msgstr "SUCCESS 或 INVALID；一个串行 owner，无 OS／clock。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:109
+msgid "Process one finite sample with double accumulation."
+msgstr "通过 double 累加处理一个有限样本。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:109
+msgid "[inout] Live independent state/history."
+msgstr "[inout] live 独立状态／历史。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:109
+msgid "[out] Distinct result, unchanged on rejected input/overflow."
+msgstr "[out] 独立结果，输入被拒绝／溢出时保持不变。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:109
+msgid "SUCCESS, INVALID/STATE or EXHAUSTED; O(taps), no heap."
+msgstr "SUCCESS、INVALID／STATE 或 EXHAUSTED；O(taps)，无 heap。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:109
+msgid "Validate finite stable sections and clear exact history."
+msgstr "验证有限且稳定的 section，并清除精确历史。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:109
+msgid "[out] Fresh distinct caller control."
+msgstr "[out] fresh 独立调用者控制。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:109
+msgid "[in] Immutable sections with poles inside unit disk."
+msgstr "[in] 不可变 section，极点位于单位圆内。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:109
+msgid "[inout] Distinct sections history entries, cleared on success."
+msgstr "[inout] 独立的 sections 项历史，成功时清零。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:109
+msgid "[inout] Distinct sections workspace for transactional step."
+msgstr "[inout] 独立的 sections 项 workspace，用于事务式 step。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:109
+msgid "[in] Positive actual array lengths."
+msgstr "[in] 正数实际数组长度。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:109
+msgid "SUCCESS or INVALID; O(sections), no OS/heap/time access."
+msgstr "SUCCESS 或 INVALID；O(sections)，无 OS／heap／时间访问。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:109
+msgid "Process a sample, committing all sections only on success."
+msgstr "处理一个样本，仅成功时提交全部 section。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:109
+msgid "O(sections). Failure may change scratch, never live history."
+msgstr "O(sections)。失败可改变 scratch，但不改变 live 历史。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:109
+msgid "[inout] Live single-owner state and writable scratch."
+msgstr "[inout] live 单 owner 状态和可写 scratch。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:109
+msgid "[in] Finite sample in the configured signal units."
+msgstr "[in] 使用已配置信号单位的有限样本。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:109
+msgid "Immutable taps ordered current sample first, caller-owned history."
+msgstr "不可变 taps 以当前样本系数优先排列，历史归调用者。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:109
+msgid "Conventional denominator 1+a1*z^-1+a2*z^-2, unlike CMSIS signs."
+msgstr "传统分母 1+a1*z^-1+a2*z^-2，符号与 CMSIS 不同。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:109
+msgid "One caller-owned direct-form-II-transposed history per section."
+msgstr "每个 section 一个调用者拥有的 direct-form-II-transposed 历史。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:109
+msgid "Caller keeps immutable coefficients and mutable history distinct."
+msgstr "调用者保持不可变系数与可变历史分离。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:113
+msgid "cmsis_dsp.h"
+msgstr "cmsis_dsp.h"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:115
+msgid "Selected scalar f32 CMSIS-DSP profile without vendor types."
+msgstr "不暴露 vendor 类型的选定 scalar f32 CMSIS-DSP profile。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:115
+msgid "Defines"
+msgstr "宏定义"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:115
+msgid "Exact selected transform length; packed spectrum has 1024 floats."
+msgstr "精确选定的变换长度；packed spectrum 含 1024 个 float。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:115
+msgid "Compute an f32 dot product with the selected upstream kernel."
+msgstr "使用选定上游 kernel 计算 f32 dot product。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:115
+msgid "Task/IRQ bounded by count; no heap, clock or OS."
+msgstr "Task／IRQ 工作量受 count 约束；无 heap、clock 或 OS。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:115
+msgid "[in] count finite floats, borrowed until return."
+msgstr "[in] count 个有限 float，借用到返回。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:115
+msgid "[in] Positive input length fitting uint32_t."
+msgstr "[in] 可由 uint32_t 表示的正数输入长度。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:115
+msgid "[out] Distinct scalar result, unchanged on failure."
+msgstr "[out] 独立 scalar 结果，失败保持不变。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:115
+msgid "Initialize scalar FIR with upstream reversed coefficients."
+msgstr "使用上游倒序系数初始化 scalar FIR。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:115
+msgid ""
+"Selected Cortex-M4/scalar profile excludes Helium/Neon. All storage remains "
+"live until the single owner joins."
+msgstr "选定 Cortex-M4／scalar profile 不含 Helium／Neon。全部存储保持存活直到唯一 owner 退出会合。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:115
+msgid "[out] Fresh independent control."
+msgstr "[out] fresh 独立控制。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:115
+msgid "[in] taps immutable floats, {b[N-1],...,b[0]}."
+msgstr "[in] taps 个不可变 float，{b[N-1],...,b[0]}。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:115
+msgid "[in] Positive coefficient count fitting uint16_t."
+msgstr "[in] 可由 uint16_t 表示的正数系数数量。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:115
+msgid "[inout] Distinct writable history_floats buffer, retained."
+msgstr "[inout] 独立可写的 history_floats buffer，保持存活。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:115
+msgid "[in] At least taps+maximum_block-1 floats."
+msgstr "[in] 至少 taps+maximum_block-1 个 float。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:115
+msgid "[in] Positive largest admitted processing block."
+msgstr "[in] 最大接纳处理 block 长度，为正数。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:115
+msgid "SUCCESS or INVALID; failure preserves control/history."
+msgstr "SUCCESS 或 INVALID；失败保持 control／history 不变。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:115
+msgid "Process a finite block through the real upstream FIR."
+msgstr "通过真实上游 FIR 处理有限 block。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:115
+msgid ""
+"No allocation/clock/OS. Caller budgets f32 dynamic range; upstream "
+"processing commits history/output without rollback."
+msgstr "无分配／clock／OS。调用者核算 f32 动态范围；上游处理直接提交历史／输出，不回滚。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:115
+msgid "[inout] Live single-owner state/history."
+msgstr "[inout] live 单 owner 状态／历史。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:115
+msgid "[in] count finite input floats, distinct from history."
+msgstr "[in] count 个有限输入 float，与历史分离。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:115
+msgid "[out] count writable floats, distinct from all inputs/state."
+msgstr "[out] count 个可写 float，与全部输入／状态分离。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:115
+msgid "[in] Positive, not greater than configured maximum_block."
+msgstr "[in] 正数，不大于已配置 maximum_block。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:115
+msgid "SUCCESS or INVALID/STATE before processing."
+msgstr "SUCCESS，或在处理前返回 INVALID／STATE。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:115
+msgid "Initialize selected CMSIS DF1 cascade and clear history."
+msgstr "初始化选定 CMSIS DF1 cascade 并清除历史。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:115
+msgid "Caller designs/validates coefficients and f32 dynamic range."
+msgstr "调用者设计／验证系数及 f32 动态范围。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:115
+msgid "[out] Fresh single-owner control."
+msgstr "[out] fresh 单 owner 控制。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:115
+msgid ""
+"[in] 5*sections immutable floats in CMSIS order {b0,b1,b2,a1,a2}; feedback "
+"signs are positive in the equation."
+msgstr "[in] 5*sections 个不可变 float，按 CMSIS 顺序 {b0,b1,b2,a1,a2}；方程中的反馈符号为正。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:115
+msgid "[in] Positive count fitting uint8_t."
+msgstr "[in] 可由 uint8_t 表示的正数数量。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:115
+msgid "[inout] Distinct retained writable history buffer."
+msgstr "[inout] 独立、保持存活的可写 history buffer。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:115
+msgid "[in] At least 4*sections floats."
+msgstr "[in] 至少 4*sections 个 float。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:115
+msgid "SUCCESS or INVALID; no partial clearing on rejection."
+msgstr "SUCCESS 或 INVALID；拒绝时不部分清零。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:115
+msgid "Process a finite block using actual CMSIS DF1 code."
+msgstr "使用真实 CMSIS DF1 代码处理有限 block。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:115
+msgid "No allocation/clock/OS; upstream commits history and output."
+msgstr "无分配／clock／OS；上游直接提交历史和输出。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:115
+msgid "[inout] Live single-owner control/history."
+msgstr "[inout] live 单 owner 控制／历史。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:115
+msgid "[in] count readable finite floats."
+msgstr "[in] count 个可读有限 float。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:115
+msgid "[out] count distinct writable floats."
+msgstr "[out] count 个独立可写 float。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:115
+msgid "[in] Positive finite block length."
+msgstr "[in] 有限正数 block 长度。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:115
+msgid "Forward real FFT of exactly 1024 samples using upstream code."
+msgstr "使用上游代码对恰好 1024 个样本执行正向 real FFT。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:115
+msgid ""
+"Packed [DC,Nyquist,Re(1),Im(1),...] is unnormalized. Real kernel/table "
+"sources are selected explicitly; no substitute transform, allocation, "
+"background task or automatic window. Caller budgets dynamic range and "
+"signal/sample-rate units."
+msgstr ""
+"打包的 [DC,Nyquist,Re(1),Im(1),...] 不归一化。显式选择真实 kernel／table 源码；没有替代变换、分配、后台 "
+"task 或自动窗函数。调用者核算动态范围并确定信号／采样率单位。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:115
+msgid "[in] Exactly 1024 finite floats, borrowed until return."
+msgstr "[in] 恰好 1024 个有限 float，借用到返回。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:115
+msgid "[inout] Distinct 1024 writable floats for mutable input."
+msgstr "[inout] 独立的 1024 个可写 float，用作可变输入。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:115
+msgid "[out] Distinct 1024 writable floats, packed CMSIS order."
+msgstr "[out] 独立的 1024 个可写 float，使用 packed CMSIS 顺序。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:115
+msgid "SUCCESS, INVALID or STATE if upstream init rejects profile."
+msgstr "上游 init 拒绝 profile 时为 STATE，否则 SUCCESS 或 INVALID。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:115
+msgid "Retained reversed coefficients and caller-owned scalar FIR history."
+msgstr "保持存活的倒序系数和调用者拥有的 scalar FIR 历史。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/algorithms.md:115
+msgid "Retained CMSIS DF1 coefficients and four history floats per section."
+msgstr "保持存活的 CMSIS DF1 系数，每 section 四个 history float。"

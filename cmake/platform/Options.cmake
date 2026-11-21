@@ -21,6 +21,8 @@ set_target_properties(
         NEXUS_SOURCE_DIR "${NEXUS_SOURCE_DIR}"
         NEXUS_CONFIG_DIR "${NEXUS_CONFIG_DIR}"
         NEXUS_BACKEND "${NEXUS_BACKEND}"
+        NEXUS_CPU_ARCH "${NEXUS_CPU_ARCH}"
+        NEXUS_SOC_FAMILY "${NEXUS_SOC_FAMILY}"
         NEXUS_SELECTED_COMPONENTS "${NEXUS_SELECTED_COMPONENTS}"
         NEXUS_SOC_PACKAGE_ID "${NEXUS_SOC_PACKAGE_ID}"
         NEXUS_TEST_SUPPORT "${_nexus_test_support}"
@@ -225,6 +227,7 @@ if(cpu)
             --specs=nosys.specs
             -nostartfiles
             -Wl,--gc-sections
+            -Wl,-z,noexecstack
     )
 endif()
 option(NEXUS_ENABLE_SANITIZERS "Host ASan/UBSan instrumentation" OFF)

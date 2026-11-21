@@ -1,5 +1,10 @@
 # Optional protocol adapters; supplier preparation remains explicitly selected.
 # Author: Nexus Team
+add_subdirectory(modbus_tcp)
+add_subdirectory(framing)
+add_subdirectory(wall_clock)
+add_subdirectory(xmodem)
+add_subdirectory(at_client)
 add_subdirectory(mcuboot)
 add_subdirectory(modbus)
 add_subdirectory(mqtt)

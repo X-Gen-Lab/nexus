@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "kind": "nexus-component-source",
+  "identifier": "fatfs",
+  "path": "ext/fatfs",
+  "upstream_url": "https://github.com/STMicroelectronics/stm32-mw-fatfs.git",
+  "fetch_url": "https://github.com/X-Gen-Lab/stm32-mw-fatfs.git",
+  "commit": "dd9126e957ae841a13ccbe2115d39a1fb7414126",
+  "tree": "c209e3e0e10868f5348515e1fe33602df5868183",
+  "license": {
+    "path": "LICENSE.md",
+    "expression": "BSD-3-Clause"
+  },
+  "files": {
+    "LICENSE.md": "504402e7f729e3115f0f24a813d080c77a72bbb722967c2508c0cf7b6496ba85",
+    "source/diskio.c": "c1b7be7de0d4bd525faf84e50035b34b2e8b359e2eb76d179364bc678bf7caa7",
+    "source/diskio.h": "9ad9ea857ea7752cb7dcf2f065899eee3abfeec5039598d28cc3cf2acebcbb86",
+    "source/ff.c": "4b5694046ff712e5a20de9b5760e85f3bec121ecbfa791f0cf2ef0cf205387ed",
+    "source/ff.h": "9cf28c0a40260123c3f290692cbc46326a73f00290a740bdd68d1b82fff3bb05",
+    "source/ff_gen_drv.c": "4b594ab5239bd10623368545ad10ff5fd1d171a55a9c1351e171192982815759",
+    "source/ff_gen_drv.h": "060f6c105b4388618ac2d70a7923b7a18ac4c68881542ed4704ae18ffd3a4b1c",
+    "source/ffconf_template.h": "add5829629dd40c9c8b76bd5f53e1491475aaa53f0d80c29d262185853d358dc",
+    "source/ffsystem_baremetal.c": "4eb747924fa9cf48d007010a9de6419fdf6d4d14831b677b627499381b93751c",
+    "source/ffsystem_cmsis_os.c": "14bdb278b4f8534cd1ee5cc8c38d3b7394eb19bebe94bd3939728b5a363e9059",
+    "source/ffsystem_template.c": "826c298f5e4fe8cb777e595711354568b8e7f67da8b8ccb7cac28d381798249f",
+    "source/ffunicode.c": "6cd4dc4a664386ebd108e56d367582c35f005fc20381486366b5d77ac58119bd",
+    "st_license.txt": "d5a162f3eaf2b7b6762f00700017cae5695ebbdce7932fead8316448baafd9c1"
+  }
+}

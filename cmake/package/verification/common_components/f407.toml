@@ -1,0 +1,12 @@
+schema = 2
+components = ["flashdb", "littlefs", "fatfs", "sfud", "rtt", "shell", "cmsis-dsp", "cm-backtrace"]
+board = "stm32f407ve_sky_qingchun"
+backend = "baremetal"
+clock = "hse8-pll168"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 4096
+flash_load_limit_bytes = 262144
+static_ram_limit_bytes = 65536
+libc_heap_bytes = 0

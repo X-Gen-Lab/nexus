@@ -218,3 +218,38 @@ pbuf、结清 MAC loans 并 stop adapter 后才结束 service。network／clock 
 以上为各自精确源码下的开发证据。完整软件计划、已安装 SDK、物理 PHY／DMA、性能、
 MCU trusted time／entropy 各有独立验收；模型帧和真实主机 broker 不证明 Board 接线、
 物理连通或 HIL。
+
+## 显式 managed IPv4 profile
+
+`Nexus::LwIPManaged`／`Nexus::LwIPManagedTCP` 复用相同单执行者、复制 RX 路径，额外
+编译官方 DHCP、DNS、ACD。该 profile 不改变默认静态地址目标；同一镜像必须从
+copied、loaned、managed 中选一个，CMake compatibility property 拒绝混合栈全局状态。
+
+`Nexus::LwIPManagedServices` 提供仅 Nexus 类型的 UDP／DHCP／DNS API；装配单元显式
+链接 `Nexus::LwIPManagedServicesStorage` 获得精确后端状态。普通算法/串口工程不选择
+这些目标，既不编网络源码，也不分配它们的 arena/PCB/查询存储。
+
+UDP 提供一个 caller-owned RX buffer、一个 PCB、一个 pending datagram。过大或已满
+的输入明确丢弃并累计饱和 dropped；receive 容量不足保留整包，不截断。send 将数据
+复制到上游 pbuf，返回后不保留 caller input；SUCCESS 仅指本地接纳。没有隐式 socket
+队列或 service。profile 不启用 IP fragmentation，所选负载上限为 1472 bytes。
+
+DHCP 显式绑定调用者的静态 `struct dhcp`，同一个 netif 第二个 owner 被拒绝。
+start 成功只表示 discovery，address 依据真实 supplied-address predicate；不是看到
+一个非零配置字段就宣布 lease。产品持续推进 adapter/timers，并在 adapter 停止前
+stop DHCP，选择静态回退或地址变更策略仍由产品负责。
+
+DNS 显式 query context 对应一个官方异步 callback。cancel 或 deadline 关闭结果
+交付，不能撤销库对 context 的引用；pending 时返回 BUSY，继续推进真实 DNS timers
+直到 callback 退休，才允许回收。hostname 由上游复制，最多 127 bytes；DNS cache
+两项，共享四个 UDP PCB 中 DHCP/DNS 也会占用，不能把剩余容量当作每个应用独享。
+DNS 的结果不认证服务端，TLS hostname/trust 验证继续独立执行。
+
+`lwip_listener.h` 在已有 TCP target 中提供显式 listener。调用者给定精确 client
+数组，接受连接直接接入同一 TCP byte face、borrow 和 close/abort 路径。满容量中止
+新连接；没有隐藏 backlog 或最大状态池。listener stop 只结束新连接准入，已有 client
+继续存活，产品须逐个 close/abort 并会合所有 face 使用者后才能回收数组和网络资源。
+
+新增合同测试执行真实上游 UDP input、DHCP/DNS 状态及 timers；listener 的有界 slot
+测试在官方 PCB 上直接调用 accept callback，建立该软件连接动作的合同，不替代完整
+TCP wire handshake、真实 PHY、吞吐或物理 HIL。

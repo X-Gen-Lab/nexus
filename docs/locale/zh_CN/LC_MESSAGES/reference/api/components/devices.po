@@ -7,13 +7,13 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: eecf5ad828bee3bc42612935b07de09cc66d22eaa623cc6316e94698cd8eec1b\n"
+"X-Nexus-Source-SHA256: 4297b0d9b4ebea337513b7e51ed449ad285defef91f10e45d2be2a4b233b68c3\n"
 
-#: ../../../../../../docs/reference/api/components/devices.md:10
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:10
 msgid "External device protocols"
 msgstr "外部器件协议"
 
-#: ../../../../../../docs/reference/api/components/devices.md:12
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:12
 msgid ""
 "These optional device protocols use already selected public I/O faces. "
 "Products own fitted-part identity, wiring, calibration, display or key "
@@ -22,27 +22,27 @@ msgid ""
 msgstr ""
 "这些可选器件协议使用已选定的公共 I/O 接口。产品负责实际器件身份、接线、校准、显示或按键策略以及物理恢复。软件观测始终受所选器件合同的边界约束。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:0
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:0
 msgid "Target"
 msgstr "目标"
 
-#: ../../../../../../docs/reference/api/components/devices.md:0
-msgid "Public header under `nexus/components/`"
-msgstr "`nexus/components/` 下的公共头文件"
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:0
+msgid "Public header (`nexus/components/` unless shown in full)"
+msgstr "公开头（除完整路径外均位于 `nexus/components/`）"
 
-#: ../../../../../../docs/reference/api/components/devices.md:0
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:0
 msgid "Contract"
 msgstr "合同"
 
-#: ../../../../../../docs/reference/api/components/devices.md:0
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:0
 msgid "`Nexus::AT24C02`"
 msgstr "`Nexus::AT24C02`"
 
-#: ../../../../../../docs/reference/api/components/devices.md:0
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:0
 msgid "`at24c02.h`"
 msgstr "`at24c02.h`"
 
-#: ../../../../../../docs/reference/api/components/devices.md:0
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:0
 msgid ""
 "[Settled EEPROM access and write-cycle "
 "responsibility](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
@@ -51,15 +51,15 @@ msgstr ""
 "[同步 EEPROM 访问与写周期责任](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
 "DOCUMENTATION-SOURCE/components/devices/at24c02/README.md)"
 
-#: ../../../../../../docs/reference/api/components/devices.md:0
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:0
 msgid "`Nexus::W25`"
 msgstr "`Nexus::W25`"
 
-#: ../../../../../../docs/reference/api/components/devices.md:0
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:0
 msgid "`w25.h`"
 msgstr "`w25.h`"
 
-#: ../../../../../../docs/reference/api/components/devices.md:0
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:0
 msgid ""
 "[Explicit W25Q128JV profile and retained Flash "
 "completion](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
@@ -68,15 +68,15 @@ msgstr ""
 "[显式 W25Q128JV 配置与保留的 Flash 完成责任](https://github.com/X-Gen-"
 "Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/devices/w25/README.md)"
 
-#: ../../../../../../docs/reference/api/components/devices.md:0
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:0
 msgid "`Nexus::ILI9341`"
 msgstr "`Nexus::ILI9341`"
 
-#: ../../../../../../docs/reference/api/components/devices.md:0
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:0
 msgid "`ili9341.h`"
 msgstr "`ili9341.h`"
 
-#: ../../../../../../docs/reference/api/components/devices.md:0
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:0
 msgid ""
 "[Settled RGB565 command/data access](https://github.com/X-Gen-"
 "Lab/nexus/blob/NEXUS-DOCUMENTATION-"
@@ -85,15 +85,15 @@ msgstr ""
 "[同步 RGB565 命令与数据访问](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
 "DOCUMENTATION-SOURCE/components/devices/ili9341/README.md)"
 
-#: ../../../../../../docs/reference/api/components/devices.md:0
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:0
 msgid "`Nexus::XPT2046`"
 msgstr "`Nexus::XPT2046`"
 
-#: ../../../../../../docs/reference/api/components/devices.md:0
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:0
 msgid "`xpt2046.h`"
 msgstr "`xpt2046.h`"
 
-#: ../../../../../../docs/reference/api/components/devices.md:0
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:0
 msgid ""
 "[Raw touch samples with live pen observation](https://github.com/X-Gen-"
 "Lab/nexus/blob/NEXUS-DOCUMENTATION-"
@@ -102,15 +102,15 @@ msgstr ""
 "[带实时触笔观察的原始触摸样本](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
 "DOCUMENTATION-SOURCE/components/devices/xpt2046/README.md)"
 
-#: ../../../../../../docs/reference/api/components/devices.md:0
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:0
 msgid "`Nexus::DS18B20`"
 msgstr "`Nexus::DS18B20`"
 
-#: ../../../../../../docs/reference/api/components/devices.md:0
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:0
 msgid "`ds18b20.h`"
 msgstr "`ds18b20.h`"
 
-#: ../../../../../../docs/reference/api/components/devices.md:0
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:0
 msgid ""
 "[External-VDD identity, conversion and CRC](https://github.com/X-Gen-"
 "Lab/nexus/blob/NEXUS-DOCUMENTATION-"
@@ -119,15 +119,15 @@ msgstr ""
 "[外部 VDD 供电下的身份、转换与 CRC](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
 "DOCUMENTATION-SOURCE/components/devices/ds18b20/README.md)"
 
-#: ../../../../../../docs/reference/api/components/devices.md:0
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:0
 msgid "`Nexus::Infrared`"
 msgstr "`Nexus::Infrared`"
 
-#: ../../../../../../docs/reference/api/components/devices.md:0
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:0
 msgid "`infrared.h`"
 msgstr "`infrared.h`"
 
-#: ../../../../../../docs/reference/api/components/devices.md:0
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:0
 msgid ""
 "[Explicit NEC address and source-quality policies](https://github.com/X-Gen-"
 "Lab/nexus/blob/NEXUS-DOCUMENTATION-"
@@ -136,7 +136,71 @@ msgstr ""
 "[显式 NEC 地址与来源质量策略](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
 "DOCUMENTATION-SOURCE/components/devices/infrared/README.md)"
 
-#: ../../../../../../docs/reference/api/components/devices.md:26
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:0
+msgid "`Nexus::BMP280`, `Nexus::BMP280SPI`"
+msgstr "`Nexus::BMP280`, `Nexus::BMP280SPI`"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:0
+msgid "`bmp280.h`, `bmp280_spi.h`"
+msgstr "`bmp280.h`, `bmp280_spi.h`"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:0
+msgid ""
+"[Explicit forced conversion and settled SPI "
+"adapter](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/components/devices/bmp280/README.md)"
+msgstr ""
+"[显式 forced conversion 与已结清 SPI adapter](https://github.com/X-Gen-"
+"Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/components/devices/bmp280/README.md)"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:0
+msgid "`Nexus::TMP117`, `Nexus::TMP117I2C`"
+msgstr "`Nexus::TMP117`, `Nexus::TMP117I2C`"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:0
+msgid "`tmp117.h`, `tmp117_i2c.h`"
+msgstr "`tmp117.h`, `tmp117_i2c.h`"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:0
+msgid ""
+"[One-shot temperature and existing offset "
+"verification](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/components/devices/tmp117/README.md)"
+msgstr ""
+"[单次测温与既有 offset 验证](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-SOURCE/components/devices/tmp117/README.md)"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:0
+msgid "`Nexus::DP83848`"
+msgstr "`Nexus::DP83848`"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:0
+msgid "`nexus/dp83848/dp83848.h`"
+msgstr "`nexus/dp83848/dp83848.h`"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:0
+msgid ""
+"[Explicit PHY reset, negotiation and link "
+"observation](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/components/devices/dp83848/README.md)"
+msgstr ""
+"[显式 PHY reset、协商与 link 观测](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-SOURCE/components/devices/dp83848/README.md)"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:0
+msgid "`Nexus::SFUD`"
+msgstr "`Nexus::SFUD`"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:0
+msgid "`sfud.h`"
+msgstr "`sfud.h`"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:0
+msgid "Selected upstream W25Q128JV algorithms behind the existing SPI owner"
+msgstr "已有 SPI owner 后的选定上游 W25Q128JV 算法"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:30
 msgid ""
 "Reference assemblies and software tests do not establish fitted-part "
 "identity, electrical timing, calibration or physical HIL. Panel, touch, "
@@ -146,11 +210,137 @@ msgstr ""
 "参考装配和软件测试不证明实装器件身份、电气时序、校准或物理 "
 "HIL。屏幕、触摸、传感器和解码按键结果仍受其合同中的观察边界约束；产品提供显示策略、校准、按键映射和恢复。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:31
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:35
+msgid "Select identity, data meaning and shutdown"
+msgstr "选择身份、数据含义和停机方式"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:0
+msgid "Device profile"
+msgstr "器件 profile"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:0
+msgid "Successful copied result"
+msgstr "成功时复制的结果"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:0
+msgid "Responsibility retained by the product"
+msgstr "产品仍须承担的责任"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:0
+msgid "BMP280 x1/x1 forced conversion"
+msgstr "BMP280 x1/x1 forced conversion"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:0
+msgid "Centi-Celsius and pascals after calibration/compensation"
+msgstr "校准／补偿后的百分之一摄氏度和帕斯卡"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:0
+msgid "Sample timing and freshness policy; no invented hardware timestamp"
+msgstr "采样时序与新鲜度策略；不虚构硬件 timestamp"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:0
+msgid "DS18B20 external VDD"
+msgstr "DS18B20 外部 VDD"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:0
+msgid ""
+"Signed temperature in 1/16 Celsius after identity/configuration/CRC checks"
+msgstr "身份／配置／CRC 检查后的有符号温度，单位 1/16 摄氏度"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:0
+msgid ""
+"Exact ROM or explicit single-drop selection; physical conversion may "
+"continue after software stop"
+msgstr "精确 ROM 或显式 single-drop 选择；软件 stop 后物理转换可能继续"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:0
+msgid "TMP117 one-shot, no averaging"
+msgstr "TMP117 one-shot，无 averaging"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:0
+msgid ""
+"Raw/offset in 1/128 Celsius, rounded micro-Celsius and software observation"
+msgstr "raw／offset 单位 1/128 摄氏度、舍入后的微摄氏度和软件观测"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:0
+msgid ""
+"Verify domain/epoch and conservative conversion-start age; never apply the "
+"existing offset twice"
+msgstr "验证 domain／epoch 和以转换起点计算的保守年龄；不重复应用既有 offset"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:0
+msgid "XPT2046 differential 12-bit"
+msgstr "XPT2046 差分 12 位"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:0
+msgid "Raw X/Y, optional raw Z1/Z2 and software completion observation"
+msgstr "raw X／Y、可选 raw Z1／Z2 和软件完成观测"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:0
+msgid ""
+"Fitted-panel calibration, orientation, pressure interpretation and live PEN "
+"policy"
+msgstr "实际装配面板的校准、方向、压力含义和当前 PEN 状态判定策略"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:0
+msgid "ILI9341 RGB565"
+msgstr "ILI9341 RGB565"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:0
+msgid "Completed pixel prefix for an in-bounds logical rectangle"
+msgstr "界内逻辑矩形已完成的像素前缀"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:0
+msgid ""
+"Panel power/gamma, backlight and visual readiness; native 240x320 or MV-"
+"swapped 320x240"
+msgstr "panel 供电／gamma、背光和可见就绪；原生 240x320 或经 MV 交换的 320x240"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:45
+msgid ""
+"Result validity follows the selected operation's status and integrity "
+"checks; a numeric zero or a recent software read is not independent evidence"
+" of quality or freshness. Software observations retain their original "
+"provenance and unknown physical uncertainty. The external touch calibration "
+"reference belongs to `nexus-examples/recipes/control`, where measured axis "
+"bounds and logical display orientation are explicit; the generic device does"
+" not guess coefficients."
+msgstr ""
+"结果有效性遵循所选操作的状态及完整性检查；数值零或近期软件读回都不是独立的质量或新鲜度证据。软件观测保留原始来源和未知物理不确定度。外部触摸校准参考位于"
+" `nexus-examples/recipes/control`，显式给出测得的轴边界和逻辑显示方向；通用器件不猜测系数。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:52
+msgid ""
+"AT24C02 uncertain writes retain write-cycle responsibility until explicit "
+"sync. W25 and SFUD select W25Q128JV rather than treating a JEDEC value as "
+"complete suffix proof. Do not command one physical Flash through both "
+"owners. SFUD uses caller workspace for private upstream state and exposes "
+"the existing Flash face; products select regions and retain the same SPI "
+"binding through uncertain program/erase cleanup. Successful readiness probes"
+" do not repair an earlier failed write or authorize replay."
+msgstr ""
+"AT24C02 不确定写入保留 write-cycle 责任，直到显式 sync。W25 和 SFUD 选择 W25Q128JV，不把 JEDEC "
+"值当成完整后缀证明。禁止两个 owner 同时向一个物理 Flash 发命令。SFUD 在调用者 workspace 中保存私有上游状态，并暴露既有 "
+"Flash face；产品选择 region，在不确定 program／erase 的 cleanup 期间保留同一 SPI binding。成功 "
+"readiness probe 不修复先前失败的写入，也不授权 replay。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:60
+msgid ""
+"Stop users before stopping the device, and stop the device before returning "
+"its outer bus/GPIO/clock resources. A timeout can leave converter, display "
+"or Flash effects even after CPU spans are released. No additional exact "
+"device is selected by this reference (`not_selected`); physical HIL remains "
+"`not_executed`."
+msgstr ""
+"先停止使用者，再停止器件，最后才归还器件外层 bus／GPIO／clock 资源。即使 CPU span 已释放，timeout 仍可能留下 "
+"converter、display 或 Flash 效果。本参考不另选精确器件（`not_selected`）；物理 HIL 保持 "
+"`not_executed`。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:66
 msgid "TMP117 one-shot sampling contract"
 msgstr "TMP117 单次采样合同"
 
-#: ../../../../../../docs/reference/api/components/devices.md:33
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:68
 msgid ""
 "Select `Nexus::TMP117` for the device protocol and `Nexus::TMP117I2C` for "
 "its settled I2C adapter through the firmware target's `LIBRARIES`. These "
@@ -168,7 +358,7 @@ msgstr ""
 "所有权架构](../../../explanation/io-model.md) 继续适用；不引入传感器工作线程、堆、地址扫描或额外的 owner "
 "框架。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:42
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:77
 msgid ""
 "The reviewed device is TI TMP117 with complete identity `0x0117`, using one-"
 "shot mode and one conversion with averaging disabled. Initialization checks "
@@ -191,7 +381,7 @@ msgstr ""
 "读取就绪状态后再读取温度。每次寄存器读取先写指针，再以重复 START "
 "读取两个高字节在前的字节。仅接受同步端点事务：每次返回，包括错误，均结束对描述符和 TX/RX 存储区的使用。不能用仅支持异步的端点替代这一已结清合同。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:55
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:90
 msgid ""
 "A sample is published only on SUCCESS and contains independent numeric "
 "values. BUSY and errors leave the complete output unchanged. Signed raw and "
@@ -208,7 +398,7 @@ msgstr ""
 "`int32_t`。已审查输出范围为芯片应用现有偏移之后的 -55 至 150 摄氏度。POR、饱和及超出该范围的值返回 "
 "IO。芯片已经应用偏移：驱动仅核对并报告，不会重复相加、编程校准或修改 EEPROM。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:64
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:99
 msgid ""
 "`observed` reuses `nx_io_timestamp_t` with microsecond rate, explicit domain"
 " and epoch, SERVICE_OBSERVATION provenance and unknown physical uncertainty."
@@ -227,7 +417,7 @@ msgstr ""
 "和速率，再将当前时间与转换开始下界比较。最近读取寄存器本身不能证明数据新鲜。样本副本在器件 stop "
 "后仍有效，不保留器件、传输或样本缓冲区引用；消费者仍须遵守时钟连续性假设。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:74
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:109
 msgid ""
 "All calls use one serialized task executor and finite absolute deadlines. "
 "Poll checks the conversion deadline before and after exchange. A successful "
@@ -245,7 +435,7 @@ msgstr ""
 "会清除就绪标志，因此随后温度读取失败时，不能将其重试为缓存零值或无限未就绪转换。一次样本成功后再次 poll 返回 "
 "STATE。已知控制与输出存储区重叠会被拒绝；由于通用驱动无法推断不透明上下文及借用总线存储的范围，调用者必须保证这些存储不重叠。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:84
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:119
 msgid ""
 "`cancel` uses a separate finite cleanup deadline and succeeds only after a "
 "shutdown readback. It cannot preempt a synchronous exchange. Failed cleanup "
@@ -263,7 +453,7 @@ msgstr ""
 "才可解除软件绑定。Stop 不执行 I/O，不关闭器件电源，不释放 Board 资源，也不消除尚未解决的物理恢复责任。Owner "
 "不能把同步栈事务排到自身执行器之后。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:94
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:129
 msgid ""
 "The protocol follows TI **SNOSD82D**, June 2018 revised September 2022, "
 "sections 6.5 and 7.3-7.6 ([official data "
@@ -277,71 +467,73 @@ msgstr ""
 "时，单次转换的最短／典型／最长时间为 13／15.5／17.5 ms；调用者须另计总线和调度余量。上电就绪需要 1.5 ms，通过总线／EEPROM "
 "状态报告，不进行隐式休眠。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:102
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:137
 msgid "Public declarations"
 msgstr "公共声明"
 
-#: ../../../../../../docs/reference/api/components/devices.md:104
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:139
 msgid "at24c02.h"
 msgstr "at24c02.h"
 
-#: ../../../../../../docs/reference/api/components/devices.md:106
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:141
 msgid "Settled AT24C02 page access and explicit write-cycle drain."
 msgstr "同步完成的 AT24C02 页访问及显式写周期排空。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:106
-#: ../../../../../../docs/reference/api/components/devices.md:112
-#: ../../../../../../docs/reference/api/components/devices.md:118
-#: ../../../../../../docs/reference/api/components/devices.md:124
-#: ../../../../../../docs/reference/api/components/devices.md:130
-#: ../../../../../../docs/reference/api/components/devices.md:136
-#: ../../../../../../docs/reference/api/components/devices.md:142
-#: ../../../../../../docs/reference/api/components/devices.md:148
-#: ../../../../../../docs/reference/api/components/devices.md:154
-#: ../../../../../../docs/reference/api/components/devices.md:160
-#: ../../../../../../docs/reference/api/components/devices.md:166
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:141
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:153
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:159
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:165
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:171
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:177
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:183
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:189
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:195
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:201
 msgid "Author  Nexus Team"
 msgstr "作者  Nexus Team"
 
-#: ../../../../../../docs/reference/api/components/devices.md:106
-#: ../../../../../../docs/reference/api/components/devices.md:112
-#: ../../../../../../docs/reference/api/components/devices.md:118
-#: ../../../../../../docs/reference/api/components/devices.md:124
-#: ../../../../../../docs/reference/api/components/devices.md:130
-#: ../../../../../../docs/reference/api/components/devices.md:136
-#: ../../../../../../docs/reference/api/components/devices.md:142
-#: ../../../../../../docs/reference/api/components/devices.md:148
-#: ../../../../../../docs/reference/api/components/devices.md:154
-#: ../../../../../../docs/reference/api/components/devices.md:160
-#: ../../../../../../docs/reference/api/components/devices.md:166
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:141
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:153
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:159
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:165
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:171
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:177
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:183
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:189
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:195
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:201
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:207
 msgid "Nexus Team"
 msgstr "Nexus Team"
 
-#: ../../../../../../docs/reference/api/components/devices.md:106
-#: ../../../../../../docs/reference/api/components/devices.md:112
-#: ../../../../../../docs/reference/api/components/devices.md:166
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:141
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:201
 msgid "Defines"
 msgstr "宏定义"
 
-#: ../../../../../../docs/reference/api/components/devices.md:106
-#: ../../../../../../docs/reference/api/components/devices.md:112
-#: ../../../../../../docs/reference/api/components/devices.md:118
-#: ../../../../../../docs/reference/api/components/devices.md:124
-#: ../../../../../../docs/reference/api/components/devices.md:130
-#: ../../../../../../docs/reference/api/components/devices.md:136
-#: ../../../../../../docs/reference/api/components/devices.md:142
-#: ../../../../../../docs/reference/api/components/devices.md:148
-#: ../../../../../../docs/reference/api/components/devices.md:154
-#: ../../../../../../docs/reference/api/components/devices.md:160
-#: ../../../../../../docs/reference/api/components/devices.md:166
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:141
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:153
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:159
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:165
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:171
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:177
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:183
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:189
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:195
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:201
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:207
 msgid "Functions"
 msgstr "函数"
 
-#: ../../../../../../docs/reference/api/components/devices.md:106
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:141
 msgid "Bind an explicitly selected polling endpoint without I/O."
 msgstr "绑定显式选择的轮询端点，不进行 I/O。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:106
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:141
 msgid ""
 "Board A0-A2 must be low, WP low, exact 256-byte/8-byte-page device selected "
 "and supplies valid. No discovery or runtime address introspection is "
@@ -352,39 +544,39 @@ msgstr ""
 "Board 的 A0-A2 必须为低，WP 必须为低，须选择精确的 256 字节/8 "
 "字节页器件，且供电有效。不透明接口不提供发现或运行时地址自省；调用方必须提供精确寻址的端点。仅支持异步的端点会被拒绝，不回退为提交栈缓冲区。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:0
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:0
 msgid "Parameters"
 msgstr "参数"
 
-#: ../../../../../../docs/reference/api/components/devices.md:106
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:141
 msgid "[inout] Fresh zero or successfully stopped storage"
 msgstr "[inout] 新的零初始化存储，或已成功停止的存储"
 
-#: ../../../../../../docs/reference/api/components/devices.md:106
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:141
 msgid "[in] Fixed 7-bit 50h endpoint, alive through stop"
 msgstr "[in] 固定 7 位地址 50h 的端点，持续有效直至停止"
 
-#: ../../../../../../docs/reference/api/components/devices.md:106
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:141
 msgid "[in] Same stable monotonic domain as endpoint deadlines"
 msgstr "[in] 与端点截止时间相同且稳定的单调时钟域"
 
-#: ../../../../../../docs/reference/api/components/devices.md:106
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:141
 msgid "[in] Nonzero per-page polling attempt limit"
 msgstr "[in] 非零的每页轮询尝试次数上限"
 
-#: ../../../../../../docs/reference/api/components/devices.md:0
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:0
 msgid "Returns"
 msgstr "返回值"
 
-#: ../../../../../../docs/reference/api/components/devices.md:106
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:141
 msgid "SUCCESS, INVALID, UNSUPPORTED or BUSY; no bus transaction"
 msgstr "SUCCESS、INVALID、UNSUPPORTED 或 BUSY；不进行总线事务"
 
-#: ../../../../../../docs/reference/api/components/devices.md:106
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:141
 msgid "Random-read an in-range nonempty byte span."
 msgstr "随机读取范围内非空字节区间。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:106
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:141
 msgid ""
 "Word-address write plus repeated-START read is settled on every return. No "
 "caller buffer is retained. On validation rejection no bus access or output "
@@ -395,35 +587,35 @@ msgstr ""
 "读取是同步操作，每次返回时缓冲区借用均已结束。不会保留调用方缓冲区。校验拒绝时不访问总线，也不修改输出。待处理且结果不确定的写入要求显式 "
 "sync；不会自动重放。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:106
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:141
 msgid "[inout] Initialized, idle, nonuncertain exclusive device"
 msgstr "[inout] 已初始化、空闲且无不确定性的独占器件"
 
-#: ../../../../../../docs/reference/api/components/devices.md:106
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:141
 msgid "[in] First byte, 0 through 255"
 msgstr "[in] 首字节，范围为 0 至 255"
 
-#: ../../../../../../docs/reference/api/components/devices.md:106
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:141
 msgid "[out] Separate writable span; may be partial after I/O error"
 msgstr "[out] 独立可写存储区间；I/O 错误后可能仅部分有效"
 
-#: ../../../../../../docs/reference/api/components/devices.md:106
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:141
 msgid "[in] 1 through 256, not crossing the device boundary"
 msgstr "[in] 1 至 256，不得越过器件边界"
 
-#: ../../../../../../docs/reference/api/components/devices.md:106
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:141
 msgid "[in] Finite absolute time, equality is expired"
 msgstr "[in] 有限绝对时间，相等即视为过期"
 
-#: ../../../../../../docs/reference/api/components/devices.md:106
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:141
 msgid "SUCCESS, INVALID, STATE, BUSY, TIMEOUT or exact bus error"
 msgstr "SUCCESS、INVALID、STATE、BUSY、TIMEOUT 或确切总线错误"
 
-#: ../../../../../../docs/reference/api/components/devices.md:106
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:141
 msgid "Split a span at every physical page and await each cycle."
 msgstr "在每个物理页边界拆分缓冲区范围，并等待各写周期完成。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:106
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:141
 msgid ""
 "Readiness uses a settled one-byte current-address read. Only NACK during "
 "this driver's issued cycle is retried; ARBITRATION, IO and other failures "
@@ -437,79 +629,79 @@ msgstr ""
 "和其他失败绝不视为忙。私有当前地址指针可能前移。探测次数耗尽或撤出失败会保留 write_pending，直至在新清理预算内 "
 "sync；任何返回后都不保留对 MCU 缓冲区的访问。写入不可逆、非原子且不可取消。耐久性、校验和、读回和布局策略由外部负责。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:106
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:141
 msgid "[inout] Initialized idle exclusive device"
 msgstr "[inout] 已初始化、空闲且独占的器件"
 
-#: ../../../../../../docs/reference/api/components/devices.md:106
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:141
 msgid "[in] Separate immutable input, borrowed only during call"
 msgstr "[in] 独立的不可变输入，仅在调用期间借用"
 
-#: ../../../../../../docs/reference/api/components/devices.md:106
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:141
 msgid "[in] Nonempty span wholly within the 256-byte device"
 msgstr "[in] 完全位于 256 字节器件内部的非空存储区间"
 
-#: ../../../../../../docs/reference/api/components/devices.md:106
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:141
 msgid "[in] One finite absolute budget for all pages/probes"
 msgstr "[in] 所有页／探测共用一个有限绝对预算"
 
-#: ../../../../../../docs/reference/api/components/devices.md:106
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:141
 msgid "[out] Separate result; unchanged on argument rejection"
 msgstr "[out] 独立结果；参数被拒绝时保持不变"
 
-#: ../../../../../../docs/reference/api/components/devices.md:106
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:141
 msgid ""
 "SUCCESS only after every page is ready; exact bus failure, TIMEOUT or BUSY "
 "when the explicit probe limit is exhausted"
 msgstr "仅每一页均就绪后返回 SUCCESS；否则返回确切总线错误、TIMEOUT，或在显式探测次数耗尽时返回 BUSY"
 
-#: ../../../../../../docs/reference/api/components/devices.md:106
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:141
 msgid "Observe completion of a retained uncertain write cycle."
 msgstr "观察保留的不确定写周期是否完成。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:106
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:141
 msgid ""
 "No data write, replay, GPIO recovery, sleep or hidden worker. Readiness "
 "never proves previous contents or write success. A synchronous call cannot "
 "be preempted by another call."
 msgstr "不写数据、不重放、不恢复 GPIO、不休眠，也不创建隐藏工作线程。就绪状态绝不证明先前内容或写入成功。同步调用不能被另一次调用抢占。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:106
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:141
 msgid "[inout] Same live endpoint and clock binding"
 msgstr "[inout] 相同的有效端点与时钟绑定"
 
-#: ../../../../../../docs/reference/api/components/devices.md:106
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:141
 msgid "[in] Finite cleanup budget, possibly later than write"
 msgstr "[in] 有限清理预算，可以晚于写入预算"
 
-#: ../../../../../../docs/reference/api/components/devices.md:106
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:141
 msgid "SUCCESS when idle; BUSY at probe limit, TIMEOUT or bus error"
 msgstr "空闲时返回 SUCCESS；探测次数耗尽时返回 BUSY，或返回 TIMEOUT、总线错误"
 
-#: ../../../../../../docs/reference/api/components/devices.md:106
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:141
 msgid "Drop only a quiescent fully drained software binding."
 msgstr "仅解除已静止且完全排空的软件绑定。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:106
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:141
 msgid ""
 "No bus access, controller stop or physical cancellation. A pending write "
 "must first sync or remain owned for explicit external recovery; a timeout "
 "cannot authorize forgetting it."
 msgstr "不访问总线、停止控制器或执行物理取消。待完成写入必须先 sync，或保持所有权以供显式外部恢复；超时不能授权遗忘该责任。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:106
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:141
 msgid "[inout] Serialized instance with no active call"
 msgstr "[inout] 无活动调用的串行实例"
 
-#: ../../../../../../docs/reference/api/components/devices.md:106
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:141
 msgid "SUCCESS or INVALID; BUSY retains active/uncertain binding"
 msgstr "SUCCESS 或 INVALID；BUSY 保留活动/不确定绑定"
 
-#: ../../../../../../docs/reference/api/components/devices.md:106
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:141
 msgid "Results copied once at the end of an admitted write call."
 msgstr "结果在已接纳写调用结束时一次性复制。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:106
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:141
 msgid ""
 "confirmed_bytes includes only pages whose write-cycle end was observed under"
 " the operation deadline. uncertain marks an issued final page with unknown "
@@ -519,24 +711,25 @@ msgstr ""
 "confirmed_bytes 仅包含在操作截止时间内已观察到写周期结束的页。uncertain "
 "标记已发出但结果未知的最后一页；不得将该页字节计入、重放或视为已确认数据使用。后续 sync 仅证明器件已就绪，绝不会修正本次结果。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:106
-#: ../../../../../../docs/reference/api/components/devices.md:112
-#: ../../../../../../docs/reference/api/components/devices.md:118
-#: ../../../../../../docs/reference/api/components/devices.md:124
-#: ../../../../../../docs/reference/api/components/devices.md:130
-#: ../../../../../../docs/reference/api/components/devices.md:136
-#: ../../../../../../docs/reference/api/components/devices.md:142
-#: ../../../../../../docs/reference/api/components/devices.md:154
-#: ../../../../../../docs/reference/api/components/devices.md:166
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:141
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:153
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:159
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:165
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:171
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:177
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:189
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:201
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:207
 msgid "Public Members"
 msgstr "公共成员"
 
-#: ../../../../../../docs/reference/api/components/devices.md:106
-#: ../../../../../../docs/reference/api/components/devices.md:142
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:141
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:177
 msgid "Exact caller-owned instance, fresh zero before first init."
 msgstr "调用者拥有精确实例，首次 init 前须清零。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:106
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:141
 msgid ""
 "Task-only, one serialized executor and exclusive endpoint current-address "
 "pointer. No concurrent or reentrant calls. The immutable endpoint, ops, "
@@ -545,39 +738,41 @@ msgid ""
 msgstr ""
 "仅限任务上下文，由一个执行者串行推进，并独占端点的当前地址指针。禁止并发或重入调用。不可变端点、ops、不透明上下文和时钟必须持续有效，且与器件状态及载荷存储互不重叠。字段属于实现状态，不能据此认定可以回收存储。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:110
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:145
 msgid "w25.h"
 msgstr "w25.h"
 
-#: ../../../../../../docs/reference/api/components/devices.md:112
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
 msgid "Bounded W25Q128JV commands and retained busy ownership."
 msgstr "有界 W25Q128JV 命令及忙状态期间保留的所有权。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:112
-#: ../../../../../../docs/reference/api/components/devices.md:118
-#: ../../../../../../docs/reference/api/components/devices.md:136
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:153
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:171
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:207
 msgid "Enums"
 msgstr "枚举"
 
-#: ../../../../../../docs/reference/api/components/devices.md:112
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
 msgid "An explicit reviewed model; JEDEC identity alone is not suffix proof."
 msgstr "显式指定已审阅的型号；仅有 JEDEC 身份不能证明型号后缀。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:112
-#: ../../../../../../docs/reference/api/components/devices.md:118
-#: ../../../../../../docs/reference/api/components/devices.md:136
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:153
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:171
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:207
 msgid "Values:"
 msgstr "取值："
 
-#: ../../../../../../docs/reference/api/components/devices.md:112
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
 msgid "Last requested array operation, independent of its final outcome."
 msgstr "最后请求的阵列操作，与其最终结果无关。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:112
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
 msgid "Probe one explicitly selected awake W25Q128JV through a polling face."
 msgstr "通过轮询接口探测一个显式选择且已唤醒的 W25Q128JV。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:112
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
 msgid ""
 "Task-only serialized calls; no worker, heap, lock, discovery fallback, reset"
 " or status/QE/protection writes. JEDEC is necessary, not unique "
@@ -589,27 +784,27 @@ msgstr ""
 "是必要条件，不是型号/修订的唯一证明。调用方须排除其他 "
 "Flash、引脚、电源、时钟和总线所有者。端点、ops、上下文和时钟的生命周期须长于组件，且与状态和可写载荷互不重叠。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:112
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
 msgid "[inout] Disjoint caller state, live through successful stop."
 msgstr "[inout] 互不重叠的调用方状态，持续有效直至成功停止。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:112
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
 msgid "[in] Stable mode 0/3, single-line, at most 50 MHz SPI binding."
 msgstr "[in] 稳定的 mode 0/3、单线且最高 50 MHz 的 SPI 绑定。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:112
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
 msgid "[in] Ready monotonic microseconds, stable through pending duty."
 msgstr "[in] 已就绪的单调微秒时钟，在待处理责任存续期间保持稳定。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:112
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
 msgid "[in] Explicit region/model/power/clock facts, copied on success."
 msgstr "[in] 显式区域／型号／供电／时钟事实，成功时复制。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:112
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
 msgid "[in] Finite absolute deadline in that same live clock epoch."
 msgstr "[in] 同一个有效时钟纪元内的有限绝对截止时间。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:112
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
 msgid ""
 "SUCCESS after EF4018 and idle/non-suspended/WEL0 observation; BUSY before "
 "ready_at or while the chip is busy/armed/suspended. Unknown models reject. "
@@ -618,70 +813,70 @@ msgstr ""
 "观察到 EF4018 及空闲/未挂起/WEL0 后返回 SUCCESS；ready_at 前，或芯片忙/已置写使能/已挂起时返回 "
 "BUSY。未知型号拒绝。拒绝不发出改变状态的命令。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:112
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
 msgid "Read one 1..252-byte region-relative chunk through command 03h."
 msgstr "通过命令 03h 读取一个相对于区域的 1..252 字节块。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:112
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
 msgid "Every return ends CPU access to data. No asynchronous payload borrow."
 msgstr "每次返回均终止 CPU 对数据的访问。不进行异步载荷借用。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:112
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
 msgid "[inout] Initialized, idle single owner."
 msgstr "[inout] 已初始化、空闲的单一所有者。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:112
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
 msgid "[in] Offset inside the configured region."
 msgstr "[in] 所配置区域内的偏移。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:112
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
 msgid "[out] Disjoint output, unchanged on any failed transaction."
 msgstr "[out] 互不重叠的输出，任一事务失败时均保持不变。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:112
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
 msgid "[in] Positive bounded byte count inside the region."
 msgstr "[in] 区域内为正且有界的字节数。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:112
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
 msgid "[in] Finite absolute deadline covering complete CS withdrawal."
 msgstr "[in] 覆盖 CS 完整撤出的有限绝对截止时间。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:112
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
 msgid "SUCCESS or a checked range/state/transport/time error."
 msgstr "SUCCESS 或经检查的范围/状态/传输/时间错误。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:112
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
 msgid "Issue one bounded 02h page program without crossing its 256-byte page."
 msgstr "发出一次有界 02h 页编程，不跨越其 256 字节页。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:112
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
 msgid ""
 "Only pre-existing unprotected WPS0/CMP0/BP0 array mode is admitted. "
 "Protection is never unlocked. No caller payload pointer is retained. This "
 "does not verify bytes or promise atomic/durable replacement."
 msgstr "仅接纳原已处于未保护 WPS0/CMP0/BP0 的阵列模式。绝不解锁保护。不保留调用方载荷指针。不验证字节，也不承诺原子/持久替换。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:112
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
 msgid "[inout] Initialized idle owner; retained while pending."
 msgstr "[inout] 已初始化的空闲所有者；待处理期间持续保留。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:112
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
 msgid "[in] Region-relative offset inside one physical page."
 msgstr "[in] 相对区域起点的偏移，位于一个物理页内。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:112
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
 msgid "[in] 1..252 source bytes, no longer accessed after return."
 msgstr "[in] 1..252 个源字节，返回后不再访问。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:112
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
 msgid "[in] Positive bounded span; target obeys NOR 1-to-0 semantics."
 msgstr "[in] 非空且有界的存储区间；目标遵循 NOR 的 1-to-0 语义。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:112
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
 msgid "[in] Finite absolute deadline including later device busy time."
 msgstr "[in] 包括后续器件忙碌时间的有限绝对截止时间。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:112
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
 msgid ""
 "SUCCESS means the command was issued, not completed. Validation rejection "
 "has no I/O. A transport/time failure after write-enable may leave "
@@ -690,35 +885,35 @@ msgstr ""
 "SUCCESS 表示命令已发出，不代表完成。校验拒绝不进行 I/O。写使能后的传输/时间失败可能留下待完成/不确定的器件责任；须检查 status 和 "
 "service。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:112
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
 msgid "Issue 20h erase for one 4 KiB-aligned sector in the declared region."
 msgstr "对声明区域内一个按 4 KiB 对齐的扇区发出 20h 擦除。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:112
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
 msgid "No whole-chip erase, erase suspend, implicit retry or product policy."
 msgstr "不执行整片擦除、擦除挂起、隐式重试或产品策略。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:112
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
 msgid "[inout] Initialized idle owner retained through final service."
 msgstr "[inout] 已初始化的空闲所有者，保留至最后一次 service 完成。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:112
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
 msgid "[in] Region-relative, 4 KiB-aligned sector start."
 msgstr "[in] 相对区域起点且按 4 KiB 对齐的扇区起始位置。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:112
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
 msgid "[in] Finite operation deadline; cannot preempt a flash pulse."
 msgstr "[in] 有限操作截止时间；无法抢占 Flash 脉冲。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:112
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
 msgid "Same command-issued and uncertainty contract as program_start."
 msgstr "命令已发出及不确定状态合同与 program_start 相同。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:112
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
 msgid "Perform bounded status progress using a separate cleanup deadline."
 msgstr "使用单独的清理截止时间进行有界状态推进。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:112
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
 msgid ""
 "At most four short SPI transactions; no waiting loop. WRDI may clear an "
 "observed idle WEL, then is checked. No reset, resume, unlock or replay. Lost"
@@ -730,15 +925,15 @@ msgstr ""
 "WEL，随后须进行检查。不复位、恢复、解锁或重放。时钟纪元丢失时仍保留待完成责任。器件静止不证明旧数据、擦除内容或掉电结果；须按产品策略读回。共享 "
 "SPI 的恢复由外层总线所有者负责。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:112
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
 msgid "[inout] Same binding, storage and live clock retained."
 msgstr "[inout] 保留相同绑定、存储和有效时钟。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:112
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
 msgid "[in] Fresh finite budget, never extends operation time."
 msgstr "[in] 新的有限预算，绝不延长操作时间。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:112
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
 msgid ""
 "BUSY while WIP remains set. SUS never establishes completion. After "
 "WIP0/SUS0 and observed WEL0, pending duty ends and the original operation "
@@ -747,36 +942,36 @@ msgstr ""
 "WIP 仍置位时返回 BUSY。SUS 从不证明完成。在 WIP0/SUS0 且观察到 WEL0 后，待完成责任结束，并返回原操作结果，包括已锁存的 "
 "TIMEOUT/IO。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:112
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
 msgid "Observe component state and the last requested operation result."
 msgstr "观察组件状态及最后请求的操作结果。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:112
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
 msgid "[in] Stable serialized state, no in-progress callback."
 msgstr "[in] 稳定且串行使用的状态，无正在执行的回调。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:112
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
 msgid "[out] Disjoint caller output, unchanged on rejection."
 msgstr "[out] 互不重叠的调用方输出，拒绝时保持不变。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:112
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
 msgid "SUCCESS or INVALID/BUSY; no physical I/O or qualification inference."
 msgstr "SUCCESS 或 INVALID/BUSY；不进行物理 I/O，也不推导资格。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:112
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
 msgid "Forget a known-quiescent component binding after callers join."
 msgstr "调用方完成汇合后，解除已知静止的组件绑定。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:112
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
 msgid ""
 "No I/O, bus stop, pin release, power-off or erasure of SPI owner faults."
 msgstr "不进行 I/O、停止总线、释放引脚、断电或清除 SPI 所有者故障。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:112
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
 msgid "[inout] State with no pending or uncertain array operation."
 msgstr "[inout] 无待处理或不确定的阵列操作的状态。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:112
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
 msgid ""
 "SUCCESS after unbinding; BUSY preserves state until service proves "
 "settlement. Clock loss during a pending operation requires external system "
@@ -784,11 +979,11 @@ msgid ""
 msgstr ""
 "解除绑定后返回 SUCCESS；在 service 证明完全完成前，BUSY 保留状态。待完成操作期间时钟丢失需要外部系统恢复；超时绝不撤销该责任。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:112
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
 msgid "Explicit product region and stable power/clock identity declarations."
 msgstr "显式产品区域及稳定的电源/时钟身份声明。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:112
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
 msgid ""
 "Region offset/size are 4 KiB aligned, nonempty and inside the reviewed 16 "
 "MiB array. Public offsets are relative to this caller-selected region. "
@@ -799,35 +994,35 @@ msgstr ""
 "区域偏移/大小须按 4 KiB 对齐、非空，且位于已审阅的 16 MiB 阵列内。公共偏移相对于此调用方选定区域。ready_at "
 "是实际电源轨已满足数据手册上电/写入延迟后的绝对时间；调用方须建立该事实。时钟域/纪元标签是声明，不是运行时时钟认证。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:112
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
 msgid "Caller-owned state, zero-initialized before its first initialization."
 msgstr "调用方拥有的状态，首次初始化前须零初始化。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:112
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
 msgid "Private fields are exposed for static allocation, not caller mutation."
 msgstr "公开私有字段仅为静态分配，不供调用方修改。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:112
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:147
 msgid "Serialized observation; SUCCESS never implies power-loss durability."
 msgstr "串行化观察；SUCCESS 绝不意味着掉电持久性。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:116
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:151
 msgid "ili9341.h"
 msgstr "ili9341.h"
 
-#: ../../../../../../docs/reference/api/components/devices.md:118
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:153
 msgid "Caller-owned ILI9341 RGB565 parallel-display controller."
 msgstr "调用方拥有的 ILI9341 RGB565 并行显示控制器。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:118
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:153
 msgid "Explicit cooperative initialization and uncertainty states."
 msgstr "显式协作式初始化与不确定状态。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:118
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:153
 msgid "Verify ID 9341h and begin software-reset initialization."
 msgstr "校验 ID 为 9341h，并开始软件复位初始化。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:118
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:153
 msgid ""
 "ID4 reads four low bytes: dummy, manufacturer, 93h, 41h. External NRST is "
 "never driven. Call service after at least 120 ms reset recovery and 120 ms "
@@ -837,19 +1032,19 @@ msgstr ""
 "ID4 读取四个低字节：dummy、manufacturer、93h、41h。绝不驱动外部 NRST。复位恢复至少 120 ms、退出休眠恢复至少 "
 "120 ms 后调用 service。这些是实际经过的时钟间隔，绝非循环计数延迟。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:118
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:153
 msgid "[inout] Zero/stopped or same-binding uncertain state."
 msgstr "[inout] 零初始化／已停止状态，或相同绑定的不确定状态。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:118
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:153
 msgid "[in] Stable immutable endpoint, clock and orientation."
 msgstr "[in] 稳定且不可变的端点、时钟及方向。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:118
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:153
 msgid "[in] Finite absolute deadline covering all phases."
 msgstr "[in] 覆盖全部阶段的有限绝对截止时间。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:118
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:153
 msgid ""
 "SUCCESS after SWRESET, BUSY for a live instance or exact "
 "validation/transport failure. Malformed inputs and a budget shorter than 240"
@@ -859,19 +1054,19 @@ msgstr ""
 "SWRESET 后返回 SUCCESS；实例已存活时返回 BUSY；或返回确切校验/传输错误。输入格式错误或预算不足 240 ms "
 "时不访问总线。一旦尝试命令 D3h，失败便保留 UNCERTAIN 绑定。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:118
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:153
 msgid "Progress at most one timed initialization transition."
 msgstr "最多推进一次带时限的初始化状态转换。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:118
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:153
 msgid "No sleeping, spinning, scheduler, reset or backlight action."
 msgstr "不休眠、不自旋、不运行调度器、不复位，也不操作背光。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:118
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:153
 msgid "[inout] Same serialized live instance and clock epoch."
 msgstr "[inout] 同一个串行使用的有效实例及其时钟纪元。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:118
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:153
 msgid ""
 "BUSY before the required interval or after sleep-out; SUCCESS after "
 "RGB565/orientation/display-on programming, or exact failure retaining "
@@ -879,55 +1074,55 @@ msgid ""
 msgstr ""
 "规定间隔届满前或退出休眠后返回 BUSY；完成 RGB565/方向/显示开启编程后返回 SUCCESS；或返回确切错误并保留 UNCERTAIN 绑定。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:118
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:153
 msgid "Write one complete in-bounds packed RGB565 rectangle."
 msgstr "写入一个完整、未越界且紧凑排列的 RGB565 矩形。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:118
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:153
 msgid ""
 "No clipping, rotation copy, heap or framebuffer is hidden. Interruption can "
 "leave a partially updated physical panel."
 msgstr "不隐藏裁剪、旋转复制、堆或帧缓冲区。中断操作可能使物理面板仅部分更新。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:118
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:153
 msgid "[inout] READY single-owner instance."
 msgstr "[inout] 处于 READY 状态的单所有者实例。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:118
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:153
 msgid "[in] Logical left coordinate."
 msgstr "[in] 逻辑左坐标。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:118
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:153
 msgid "[in] Logical top coordinate."
 msgstr "[in] 逻辑上坐标。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:118
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:153
 msgid "[in] Nonzero rectangle width."
 msgstr "[in] 非零矩形宽度。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:118
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:153
 msgid "[in] Nonzero rectangle height."
 msgstr "[in] 非零矩形高度。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:118
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:153
 msgid "[in] Stable packed native-halfword RGB565 span."
 msgstr "[in] 稳定、紧凑排列且使用本机半字格式的 RGB565 存储区间。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:118
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:153
 msgid "[in] Exactly width times height, no implicit stride."
 msgstr "[in] 恰好为宽度乘以高度，不隐含行步长。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:118
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:153
 msgid ""
 "[out] Distinct completed pixel prefix, set to zero after admission and "
 "updated even on a pixel-data failure."
 msgstr "[out] 独立的已完成像素前缀计数，接纳后置零，即使像素数据传输失败也会更新。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:118
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:153
 msgid "[in] Finite absolute deadline for all bus operations."
 msgstr "[in] 全部总线操作共用的有限绝对截止时间。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:118
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:153
 msgid ""
 "SUCCESS only for all pixels, INVALID for malformed bounds, aliases or span, "
 "or exact transport/time error. Rejection before bus access leaves written "
@@ -937,26 +1132,26 @@ msgstr ""
 "仅全部像素写入后返回 SUCCESS；边界、别名或缓冲区范围无效时返回 INVALID；或返回确切传输/时间错误。总线访问前拒绝时 written "
 "保持不变。命令之后的错误保留 UNCERTAIN；返回后不保留对调用方缓冲区的引用。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:118
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:153
 msgid "Send display-off and release the settled software binding."
 msgstr "发送显示关闭命令，并解除同步操作及其借用均已结束的软件绑定。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:118
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:153
 msgid ""
 "Does not power down the module, pulse shared NRST, withdraw the bus or set "
 "backlight. The caller stops all components before releasing their transport "
 "and platform resources."
 msgstr "不会使模块断电、脉冲驱动共享 NRST、撤出总线或设置背光。调用方须先停止所有组件，再释放其传输和平台资源。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:118
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:153
 msgid "[inout] Stopped or same-owner live/uncertain instance."
 msgstr "[inout] 已停止的实例，或同一所有者的有效／不确定实例。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:118
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:153
 msgid "[in] Finite current deadline, independent of old init."
 msgstr "[in] 当前的有限截止时间，独立于先前初始化。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:118
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:153
 msgid ""
 "SUCCESS after all port access finishes, BUSY during reset or sleep-out quiet"
 " time, or exact failure retaining the binding. An attempted command failure "
@@ -966,11 +1161,11 @@ msgstr ""
 "所有端口访问结束后返回 SUCCESS；复位或退出休眠的静默期返回 BUSY；或返回确切错误并保留绑定。已尝试命令失败会保持 "
 "UNCERTAIN，以供显式重试；校验绝不清除已有副作用。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:118
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:153
 msgid "Explicit native orientation and RGB/BGR selection."
 msgstr "显式原生方向及 RGB/BGR 选择。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:118
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:153
 msgid ""
 "madctl permits MY/MX/MV and BGR only (mask E8h). Native addressing is 240 by"
 " 320; MV exchanges logical dimensions. No module-specific gamma, power, scan"
@@ -985,11 +1180,11 @@ msgstr ""
 "gamma、供电、扫描或电压设置。面板专用扩展必须使用单独审阅的配置；此处为控制器复位配置，使用 16 位 RGB565 DBI "
 "并开启显示。配置、端点、操作表和时钟上下文必须保持不可变且有效，直至成功停止。重新初始化 UNCERTAIN 状态时，必须使用完全相同的配置对象。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:118
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:153
 msgid "Exact caller-owned state, zero before first initialize."
 msgstr "调用方拥有的精确状态，首次 initialize 前须清零。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:118
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:153
 msgid ""
 "One nonreentrant task owner; no concurrent calls. The configuration "
 "reference survives initialization and uncertainty until successful stop. "
@@ -1007,19 +1202,19 @@ msgstr ""
 "成功或以完全相同的绑定重新初始化。字段属于实现状态，不代表可绕过生命周期检查。软件 READY "
 "证明命令已完成，不代表光学就绪或物理时序资格。调用方缓冲区范围须与所有传输和时钟所有者存储互不重叠。检查会拒绝与已知只读对象或上下文锚点的重叠；不透明所有者的完整存储范围仍由调用方负责。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:122
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:157
 msgid "xpt2046.h"
 msgstr "xpt2046.h"
 
-#: ../../../../../../docs/reference/api/components/devices.md:124
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:159
 msgid "Explicit XPT2046 raw differential touch sampling."
 msgstr "显式 XPT2046 原始差分触摸采样。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:124
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:159
 msgid "Send one complete PD=00 conversion to establish PENIRQ mode."
 msgstr "发送一次完整 PD=00 转换以建立 PENIRQ 模式。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:124
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:159
 msgid ""
 "The chip has no identity read used here. Init does not establish physical "
 "module fitting. A failed/short transfer may have changed converter power "
@@ -1028,27 +1223,27 @@ msgid ""
 msgstr ""
 "此处不读取该芯片的身份标识。初始化不证明模块已实际安装。失败或短传输可能已经改变转换器的电源状态，因此仍须保留恢复责任。禁止重新绑定处于不确定状态的器件。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:124
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:159
 msgid "[inout] Fresh zero/stopped or same-binding uncertain state"
 msgstr "[inout] 新的零初始化／已停止状态，或相同绑定的不确定状态"
 
-#: ../../../../../../docs/reference/api/components/devices.md:124
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:159
 msgid "[in] Stable disjoint exact binding, no chip-ID fallback"
 msgstr "[in] 稳定、互不重叠的精确绑定，不回退到其他芯片 ID"
 
-#: ../../../../../../docs/reference/api/components/devices.md:124
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:159
 msgid "[in] Finite absolute deadline, including the exchange"
 msgstr "[in] 包括本次交换的有限绝对截止时间"
 
-#: ../../../../../../docs/reference/api/components/devices.md:124
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:159
 msgid "SUCCESS or exact validation/transport error"
 msgstr "SUCCESS 或确切校验/传输错误"
 
-#: ../../../../../../docs/reference/api/components/devices.md:124
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:159
 msgid "Read complete differential X/Y and optional Z1/Z2 samples."
 msgstr "读取完整差分 X/Y 及可选 Z1/Z2 样本。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:124
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:159
 msgid ""
 "Each conversion has its own complete 24-clock CS interval, differential "
 "12-bit mode and PD=00. Any transfer error closes sampling until same-binding"
@@ -1062,51 +1257,51 @@ msgstr ""
 "只是提示；I/O 前后均检查选定的实时触笔谓词。空位/尾随位非零时，拒绝该不符合精确 12 "
 "位线路格式的数据；这不是芯片身份或实装测试。输出还必须与不透明 SPI/触笔/时钟上下文存储互不重叠；此处仅检查已知存储范围。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:124
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:159
 msgid "[inout] Live exclusive initialized instance"
 msgstr "[inout] 有效、独占且已初始化的实例"
 
-#: ../../../../../../docs/reference/api/components/devices.md:124
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:159
 msgid "[out] Separate aligned output, unchanged on every error"
 msgstr "[out] 独立且对齐的输出，任一错误时均保持不变"
 
-#: ../../../../../../docs/reference/api/components/devices.md:124
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:159
 msgid "[in] One finite deadline for the complete sequence"
 msgstr "[in] 完整序列共用一个有限截止时间"
 
-#: ../../../../../../docs/reference/api/components/devices.md:124
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:159
 msgid "SUCCESS, EMPTY for pen-up, or exact validation/I/O error"
 msgstr "SUCCESS；触笔抬起时为 EMPTY；或返回确切校验/I/O 错误"
 
-#: ../../../../../../docs/reference/api/components/devices.md:124
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:159
 msgid "Restore converter PD=00 before releasing this device binding."
 msgstr "恢复转换器 PD=00 后再释放此器件绑定。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:124
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:159
 msgid ""
 "Does not stop the shared SPI owner, change pad modes or join external "
 "GPIO/IRQ observers; those remain caller duties."
 msgstr "不会停止共享 SPI 所有者、改变引脚模式或汇合外部 GPIO/IRQ 观察者；这些仍由调用方负责。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:124
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:159
 msgid "[inout] Initialized or uncertain exclusive instance"
 msgstr "[inout] 已初始化或处于不确定状态的独占实例"
 
-#: ../../../../../../docs/reference/api/components/devices.md:124
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:159
 msgid "[in] Separate finite cleanup deadline when necessary"
 msgstr "[in] 必要时提供独立的有限清理截止时间"
 
-#: ../../../../../../docs/reference/api/components/devices.md:124
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:159
 msgid ""
 "SUCCESS only after complete cleanup conversion; failure preserves the "
 "binding and recovery responsibility"
 msgstr "仅完整清理转换完成后返回 SUCCESS；失败保留绑定及恢复责任"
 
-#: ../../../../../../docs/reference/api/components/devices.md:124
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:159
 msgid "Exact immutable touch binding and explicit clock identity."
 msgstr "精确且不可变的触摸绑定及显式时钟身份。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:124
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:159
 msgid ""
 "SPI mode zero/MSB-first and actual settling/rate are owned by the selected "
 "endpoint. Select exactly one GPIO pen face with one-bit mask, or an EXTI pen"
@@ -1127,11 +1322,11 @@ msgstr ""
 "的 PD=00，均须在调用方截止时间与经检查的交换起始时刻加 1600 us 两者中较早者之前完成。即使 SPI 返回 "
 "SUCCESS，仍在返回后检查此保守的完整交换上限；它不是实测波形或通用 SPI 边沿限制。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:124
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:159
 msgid "Copied 12-bit converter values, without display calibration."
 msgstr "复制的 12 位转换器数值，未经显示校准。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:124
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:159
 msgid ""
 "x/y are channels 101/001; z1/z2 are 011/100 when requested. Axis rotation, "
 "pressure resistance, filtering and gesture policy are external. Pen was low "
@@ -1143,11 +1338,11 @@ msgstr ""
 "011/100。轴旋转、压力电阻、滤波和手势策略由外部提供。序列前后触笔均为低电平，不证明转换同时发生，也不证明物理接触稳定。observed "
 "是不确定度未知的软件完成时间，绝不是转换时间戳。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:124
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:159
 msgid "Zero-initialized caller-owned serialized touch state."
 msgstr "由调用方所有、零初始化并串行使用的触摸状态。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:124
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:159
 msgid ""
 "No payload pointer survives a call. Failed I/O retains the binding as "
 "uncertain; recover the SPI owner first when needed, then retry same-binding "
@@ -1157,43 +1352,43 @@ msgstr ""
 "调用返回后不保留载荷指针。I/O 失败会将绑定保留为不确定状态；需要时先恢复 SPI 所有者，再以相同绑定重试 init 或 "
 "stop。不引入轮询工作线程、消抖、IRQ 所有者或内存分配。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:128
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:163
 msgid "ds18b20.h"
 msgstr "ds18b20.h"
 
-#: ../../../../../../docs/reference/api/components/devices.md:130
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:165
 msgid "External-VDD DS18B20 identity and cooperative conversion."
 msgstr "外部 VDD 供电的 DS18B20 身份与协作式转换。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:130
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:165
 msgid "Validate identity, actual supply mode and scratchpad configuration."
 msgstr "校验身份、实际供电模式及暂存器配置。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:130
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:165
 msgid "Initial scratchpad temperature, including85C, is never a fresh result."
 msgstr "初始暂存器温度，包括 85C，绝不是新转换结果。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:130
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:165
 msgid "[inout] Zero/stopped disjoint stable state."
 msgstr "[inout] 零初始化／已停止、稳定且互不重叠的状态。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:130
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:165
 msgid "[in] Immutable exact selection, with initialized wire owner."
 msgstr "[in] 精确不可变的选择，总线所有者已初始化。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:130
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:165
 msgid "[in] Finite absolute communication budget."
 msgstr "[in] 有限的绝对通信预算。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:130
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:165
 msgid "SUCCESS or INVALID/STATE/BUSY/TIMEOUT/UNSUPPORTED/IO."
 msgstr "SUCCESS 或 INVALID/STATE/BUSY/TIMEOUT/UNSUPPORTED/IO。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:130
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:165
 msgid "Read actual resolution then start one bounded autonomous conversion."
 msgstr "读取实际分辨率，再启动一次有界自主转换。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:130
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:165
 msgid ""
 "Max waits are93750/187500/375000/750000us for9/10/11/12 bits. No blocking "
 "conversion delay. Command execution may have effects even when a later "
@@ -1202,23 +1397,23 @@ msgstr ""
 "9/10/11/12 位的最长等待分别为 "
 "93750/187500/375000/750000us。不进行阻塞式转换延迟。即使后续时钟/预算观察失败，命令执行仍可能已产生副作用；这不代表取消。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:130
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:165
 msgid "[inout] Initialized serialized owner; no current conversion."
 msgstr "[inout] 已初始化并串行使用的所有者，当前无转换。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:130
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:165
 msgid "[in] Finite overall communication/conversion/read budget."
 msgstr "[in] 覆盖通信／转换／读取全过程的有限总预算。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:130
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:165
 msgid "SUCCESS when issued; otherwise bounded validation/bus/clock error."
 msgstr "已发出时返回 SUCCESS；否则返回有界校验/总线/时钟错误。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:130
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:165
 msgid "After the real resolution maximum, read/CRC-validate a fresh result."
 msgstr "实际分辨率对应的最长转换时间届满后，读取新结果并校验 CRC。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:130
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:165
 msgid ""
 "Reads use a fresh reset/select, not a stale conversion-poll context. "
 "Undefined low bits are cleared; valid85C is not rejected by value. "
@@ -1227,41 +1422,41 @@ msgstr ""
 "读取使用新的复位/选择，不复用过期的转换轮询上下文。未定义的低位会清零；不会仅因值为有效的 85C 而拒绝。温度范围为 -55..125C。不提供 "
 "UTC 或产品校准策略。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:130
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:165
 msgid "[inout] Same serialized state and live bus/clock epoch."
 msgstr "[inout] 同一串行状态及有效总线／时钟纪元。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:130
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:165
 msgid "[out] Separate signed1/16C output, unchanged on error."
 msgstr "[out] 独立的有符号 1/16C 输出，错误时保持不变。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:130
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:165
 msgid ""
 "BUSY before ready without wire activity, SUCCESS once, or a bounded "
 "timeout/clock/identity/CRC/configuration error closing admission."
 msgstr "尚未就绪时返回 BUSY，且无线路活动；成功仅返回一次 SUCCESS；或返回有界的超时/时钟/身份/CRC/配置错误并关闭操作接纳。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:130
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:165
 msgid "Close only software admission; never reset or release the shared bus."
 msgstr "仅关闭软件操作接纳，绝不复位或释放共享总线。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:130
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:165
 msgid "Physical conversion may continue; no physical cancel/off claim."
 msgstr "物理转换可能继续；不声称已物理取消或断电。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:130
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:165
 msgid "[inout] Stable same-executor state, no in-progress call."
 msgstr "[inout] 同一执行者使用的稳定状态，无正在执行的调用。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:130
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:165
 msgid "SUCCESS idempotently, INVALID or BUSY for an overlapping call."
 msgstr "幂等返回 SUCCESS；或返回 INVALID；调用重叠时返回 BUSY。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:130
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:165
 msgid "Immutable selected sensor identity, not a bus or physical fitting."
 msgstr "不可变的选定传感器身份，不代表总线或物理实装。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:130
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:165
 msgid ""
 "Known ROM requires family28h and CRC8. Skip ROM additionally requires "
 "explicit single_device=true, reads/retains its CRC-valid ROM and checks that"
@@ -1273,11 +1468,11 @@ msgstr ""
 "有效的 ROM，并在后续命令中再次检查该身份。external_vdd 必须为 true，且 Read Power Supply "
 "必须予以确认；不支持寄生供电模式。每次转换期间传感器电源和身份须保持稳定。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:130
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:165
 msgid "Caller-owned serialized device state; zero before first init."
 msgstr "调用方拥有的串行化器件状态；首次 init 前须清零。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:130
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:165
 msgid ""
 "Configuration, bus and clock contexts remain borrowed while open. Conversion"
 " is autonomous; software stop/timeout never claims physical cancellation. No"
@@ -1287,47 +1482,47 @@ msgstr ""
 "绑定有效期间持续借用配置、总线和时钟上下文。转换自主进行；软件 stop/timeout 绝不声称已物理取消。不创建任务、堆、隐藏队列、校准或保留的 "
 "CPU 载荷。软件关闭并完成汇合后，不再保留器件引用。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:134
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:169
 msgid "infrared.h"
 msgstr "infrared.h"
 
-#: ../../../../../../docs/reference/api/components/devices.md:136
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:171
 msgid "Bounded NEC decoding from copied active-low EXTI edges."
 msgstr "对复制的低电平有效 EXTI 边沿进行有界 NEC 解码。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:136
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:171
 msgid "Explicit address policy; no inverse-error fallback is permitted."
 msgstr "显式地址策略；不允许反码错误回退。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:136
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:171
 msgid "Strict by default; IRQ sampling is an explicit software reference."
 msgstr "默认严格；IRQ 采样是显式软件参考。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:136
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:171
 msgid "Source declarations/flags never attest physical capture integrity."
 msgstr "来源声明/标志绝不证明物理捕获完整性。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:136
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:171
 msgid "Bind explicit timing/address policy without hardware access."
 msgstr "绑定显式时序/地址策略，不访问硬件。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:136
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:171
 msgid "[inout] Fresh zero or successfully stopped, aligned storage."
 msgstr "[inout] 新的零初始化存储，或已成功停止的存储；必须对齐。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:136
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:171
 msgid "[in] Stable readonly policy, disjoint from owner."
 msgstr "[in] 稳定的只读策略，与所有者存储互不重叠。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:136
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:171
 msgid "SUCCESS, INVALID or BUSY; rejection leaves both spans unchanged."
 msgstr "SUCCESS、INVALID 或 BUSY；拒绝时两个缓冲区范围均保持不变。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:136
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:171
 msgid "Consume one copied edge through the deterministic NEC state machine."
 msgstr "通过确定性 NEC 状态机消费一个已复制的边沿。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:136
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:171
 msgid ""
 "Feed exactly one bound input source to each owner; route multiplexed inputs "
 "before this call. Unknown flags/edge and invalid spans reject unchanged. "
@@ -1344,15 +1539,15 @@ msgstr ""
 "采样保留其观察时间和标志。接纳的时间戳若相等或回退，会锁存 clock_fault，直至 stop/init。畸形或截断帧绝不发布部分命令。不提供 "
 "RC5、NEC2 解释、自动协议发现或校准。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:136
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:171
 msgid "[inout] Initialized single consumer in its original epoch."
 msgstr "[inout] 原始纪元内已初始化的单消费者。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:136
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:171
 msgid "[in] Disjoint copied public edge, borrowed only during call."
 msgstr "[in] 已复制的公共边沿，与其他存储互不重叠，仅在调用期间借用。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:136
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:171
 msgid ""
 "Value SUCCESS only after 32 valid bits and trailer or valid repeat; EMPTY "
 "awaits more edges; OVERFLOW rejects LOSS in every policy and COALESCED in "
@@ -1362,56 +1557,56 @@ msgstr ""
 "仅在收到 32 个有效位及尾部，或有效重复帧后返回 SUCCESS；EMPTY 表示等待更多边沿；OVERFLOW 在所有策略下拒绝 LOSS，并在 "
 "STRICT 下拒绝 COALESCED。IRQ_OBSERVATION 保留采样不确定性。IO 拒绝畸形波形／时钟，TIMEOUT 拒绝过期帧。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:136
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:171
 msgid "Read at most one edge from a caller-owned public EXTI queue."
 msgstr "从调用方拥有的公共 EXTI 队列最多读取一个边沿。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:136
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:171
 msgid ""
 "Caller exclusively drains one physical source. This method does not "
 "initialize, stop, attach a wake, recover or otherwise own that source. A "
 "failed/inconsistent read invalidates frame and repeat history."
 msgstr "调用方独占排空一个物理来源。此方法不初始化、停止、连接唤醒、恢复或以其他方式拥有该来源。读取失败或不一致会使帧及重复帧历史失效。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:136
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:171
 msgid "[inout] Same decoder; callback reentry returns BUSY."
 msgstr "[inout] 同一解码器；回调重入返回 BUSY。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:136
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:171
 msgid "[in] Stable exact both-edge source in the config clock epoch."
 msgstr "[in] config 时钟纪元内稳定且精确的双边沿来源。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:136
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:171
 msgid "Same feed result, EMPTY or exact port error; no callback is retained."
 msgstr "与 feed 结果相同，或为 EMPTY、确切端口错误；不保留回调。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:136
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:171
 msgid "Drop software decode history after the serialized caller joins."
 msgstr "串行调用方完成汇合后，清除软件解码历史。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:136
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:171
 msgid ""
 "Drain/rebind the external source before a new clock epoch is supplied to a "
 "reinitialized decoder. Stop does not establish hardware quiescence."
 msgstr "为重新初始化的解码器提供新时钟纪元前，须先排空/重新绑定外部来源。Stop 不证明硬件静止。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:136
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:171
 msgid "[inout] Stable storage with no active feed/poll callback."
 msgstr "[inout] 稳定存储，无活动 feed/poll 回调。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:136
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:171
 msgid "SUCCESS or INVALID/BUSY. No GPIO, EXTI stop or hardware access."
 msgstr "SUCCESS 或 INVALID/BUSY。不执行 GPIO、EXTI stop 或硬件访问。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:136
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:171
 msgid "Inclusive authored microsecond limits, not measured tolerances."
 msgstr "显式配置的微秒限值（含边界），不是实测容差。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:136
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:171
 msgid "Immutable complete waveform policy, retained through stop."
 msgstr "完整且不可变的波形策略，保留至 stop 完成。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:136
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:171
 msgid ""
 "All windows are nonzero and at most 20000 us. Zero/one and full/repeat space"
 " windows cannot overlap. frame_max_us admits the complete worst permitted "
@@ -1431,11 +1626,11 @@ msgstr ""
 " 默认为 STRICT（零）。IRQ_OBSERVATION 明确允许将 COALESCED 观察作为软件参考；即使某些输入未带标志，每个结果仍保持 "
 "SAMPLED_UNCERTAIN。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:136
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:171
 msgid "Checked command; timestamp is its final edge or IRQ observation."
 msgstr "经检查的命令；时间戳对应其最终边沿或 IRQ 观察。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:136
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:171
 msgid ""
 "quality and preserved source_flags describe source uncertainty, not physical"
 " capture proof. Repeat provenance includes its predecessor. NEC inverse "
@@ -1444,15 +1639,15 @@ msgstr ""
 "quality 和保留的 source_flags 描述来源不确定性，不是物理捕获证明。重复帧的来源记录包括其前序帧。NEC 反码检查无法证明 IRQ "
 "来源没有丢失边沿。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:136
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:171
 msgid "Value result; frame is meaningful only with SUCCESS."
 msgstr "返回结果值；仅在 SUCCESS 时 frame 才有意义。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:136
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:171
 msgid "Caller-owned exact decoder storage, zero before initialization."
 msgstr "调用方拥有的精确解码器存储，初始化前须清零。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:136
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:171
 msgid ""
 "One serialized task executor. No edge/request/output survives return. Config"
 " and any EXTI face/ops/opaque context remain live and disjoint from this "
@@ -1461,19 +1656,19 @@ msgstr ""
 "单个串行任务执行者。返回后不保留对边沿/请求/输出的引用。配置及所有 EXTI "
 "接口/ops/不透明上下文须保持存活，且与此所有者互不重叠。字段属于实现状态，不是调用方控制项。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:140
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:175
 msgid "tmp117.h"
 msgstr "tmp117.h"
 
-#: ../../../../../../docs/reference/api/components/devices.md:142
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:177
 msgid "Explicit settled TMP117 one-shot sampling and provenance."
 msgstr "显式已结清 TMP117 单次采样与来源信息。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:142
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:177
 msgid "Validate ID 0117h, locked EEPROM, offset and shutdown."
 msgstr "校验标识 0117h、EEPROM 锁定、偏移及 shutdown 状态。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:142
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:177
 msgid ""
 "No scan, reset, sleep, EEPROM write, worker or Board action. Use a separate "
 "cleanup deadline to cancel, or retry init on that same binding. A different "
@@ -1483,23 +1678,23 @@ msgstr ""
 "不扫描、复位、sleep、写 EEPROM、创建工作线程或执行 Board 动作。使用独立清理 deadline 执行 cancel，或在相同绑定上重试"
 " init。更换绑定需要先 join 并执行软件 stop；外部不确定状态的恢复仍由 owner 负责。写入失败不等同于器件复位。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:142
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:177
 msgid "[inout] Fresh zero/stopped or same-binding uncertain storage"
 msgstr "[inout] 首次清零、已 stop 或同绑定下状态不确定的存储"
 
-#: ../../../../../../docs/reference/api/components/devices.md:142
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:177
 msgid "[in] Copied on success or uncertain shutdown write"
 msgstr "[in] 成功时或已调用 shutdown 写入后状态不确定时复制并保留"
 
-#: ../../../../../../docs/reference/api/components/devices.md:142
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:177
 msgid "[in] Stable explicit facts, not overlapping device"
 msgstr "[in] 稳定的显式事实，不得与 device 重叠"
 
-#: ../../../../../../docs/reference/api/components/devices.md:142
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:177
 msgid "[in] Finite absolute deadline, shared across accesses"
 msgstr "[in] 所有访问共享的有限绝对 deadline"
 
-#: ../../../../../../docs/reference/api/components/devices.md:142
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:177
 msgid ""
 "SUCCESS, BUSY for power-up/EEPROM, or exact transport error; unsupported "
 "identity, offset mismatch and unlocked EEPROM reject without writes. Pre-"
@@ -1509,34 +1704,34 @@ msgstr ""
 "SUCCESS、上电或 EEPROM 导致的 BUSY，或原始传输错误；不支持的标识、偏移不符及未锁定 EEPROM 均不执行写入即拒绝。调用 "
 "shutdown 写入之前失败不保留新绑定。一旦发出 shutdown 写入，失败将保留相同端口、配置及时钟，实例保持未初始化且状态不确定。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:142
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:177
 msgid "Begin one fresh conversion with averaging disabled."
 msgstr "禁用平均并开始一次新的转换。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:142
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:177
 msgid ""
 "Clears stale readiness before OS admission. BUSY retains conversion metadata"
 " only, never a stack/caller buffer. Failure after I/O closes sampling until "
 "explicit resync."
 msgstr "接纳 OS 请求前清除过期就绪状态。BUSY 仅保留转换元数据，从不保留栈或调用者缓冲区。I/O 后失败将关闭采样，直至显式重新同步。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:142
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:177
 msgid "[inout] Initialized nonmeasuring exclusive device"
 msgstr "[inout] 已初始化、未测量的独占器件"
 
-#: ../../../../../../docs/reference/api/components/devices.md:142
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:177
 msgid "[in] Finite conversion/read deadline in the same clock"
 msgstr "[in] 同一时钟中的有限转换与读取 deadline"
 
-#: ../../../../../../docs/reference/api/components/devices.md:142
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:177
 msgid "SUCCESS, INVALID, BUSY, STATE, TIMEOUT or transport error"
 msgstr "SUCCESS、INVALID、BUSY、STATE、TIMEOUT 或传输错误"
 
-#: ../../../../../../docs/reference/api/components/devices.md:142
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:177
 msgid "Observe readiness and publish one complete fresh sample."
 msgstr "观察就绪状态并发布一个完整的新样本。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:142
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:177
 msgid ""
 "Reads CONFIG clear readiness. A later temperature-read failure is terminal "
 "and requires resync, never cached zero or endless ready retry. Any transport"
@@ -1550,23 +1745,23 @@ msgstr ""
 "BUSY，均关闭采样直至重新同步；仅成功读取到未就绪状态才保留转换。成功后再次 poll 返回 STATE。输出不得与 "
 "device、不透明端口或时钟上下文存储、借用总线存储重叠；只能检查已知范围。POR、饱和及超出已审查范围的值返回 IO。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:142
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:177
 msgid "[inout] Previously begun conversion, same task executor"
 msgstr "[inout] 已开始转换的器件，保持同一任务执行器"
 
-#: ../../../../../../docs/reference/api/components/devices.md:142
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:177
 msgid "[out] Aligned separate output, unchanged on every error"
 msgstr "[out] 对齐且独立的输出；每个错误路径均保持不变"
 
-#: ../../../../../../docs/reference/api/components/devices.md:142
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:177
 msgid "SUCCESS, INVALID, BUSY before ready, STATE or transport/IO"
 msgstr "SUCCESS、INVALID、未就绪时的 BUSY、STATE 或传输/IO 错误"
 
-#: ../../../../../../docs/reference/api/components/devices.md:142
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:177
 msgid "Request and verify shutdown under a separate cleanup budget."
 msgstr "使用独立清理预算请求并核验 shutdown 状态。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:142
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:177
 msgid ""
 "Cannot preempt a synchronous exchange. Cancel failure never proves physical "
 "stop; no MCU span survives a port return. Success does not close a bus owner"
@@ -1574,25 +1769,25 @@ msgid ""
 msgstr ""
 "不能抢占同步交换。取消失败从不证明物理停止；端口返回后不存在 MCU 存储借用。成功也不会关闭 bus owner 或 join 其观察者。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:142
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:177
 msgid "[inout] Live or uncertain same binding, serialized owner"
 msgstr "[inout] 活跃或状态不确定的同一绑定，由串行 owner 使用"
 
-#: ../../../../../../docs/reference/api/components/devices.md:142
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:177
 msgid "[in] Finite cleanup deadline, not an expired sample one"
 msgstr "[in] 独立的有限清理 deadline，不复用已过期采样 deadline"
 
-#: ../../../../../../docs/reference/api/components/devices.md:142
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:177
 msgid ""
 "SUCCESS only after shutdown observation; other results keep recovery "
 "responsibility and may require init resync"
 msgstr "仅观察到 shutdown 后返回 SUCCESS；其他结果保留恢复责任，可能需要重新 init 同步"
 
-#: ../../../../../../docs/reference/api/components/devices.md:142
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:177
 msgid "Drop software binding after calls and outer owners join."
 msgstr "调用及外层 owner 均 join 后解除软件绑定。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:142
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:177
 msgid ""
 "No physical I/O. Not power-off, verified cancellation, Board release or "
 "erasure of external uncertain-state duty. A caller requiring physical "
@@ -1602,15 +1797,15 @@ msgstr ""
 "不执行物理 I/O，不等同于断电、核验取消、Board 释放，也不消除外部不确定状态责任。需要物理 shutdown 时，调用者应先完成 cancel "
 "或外部恢复。回调期间调用不执行任何动作。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:142
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:177
 msgid "[inout] Quiescent instance with no in-progress call"
 msgstr "[inout] 不存在进行中调用的静止实例"
 
-#: ../../../../../../docs/reference/api/components/devices.md:142
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:177
 msgid "Synchronous register exchange, settled on every return."
 msgstr "每次返回均已结清的同步寄存器交换。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:142
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:177
 msgid ""
 "Read writes one register byte then repeated-START reads two bytes; write "
 "sends register plus two MSB-first bytes. The serialized task owner keeps "
@@ -1622,11 +1817,11 @@ msgstr ""
 "join 的软件 stop 期间保持 context 和 clock 有效。每种结果均释放 TX/RX 存储区，包括 "
 "TIMEOUT/CANCELLED。不允许异步 submit 或保留栈存储区。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:142
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:177
 msgid "Explicit clock identity and expected existing calibration."
 msgstr "显式时钟身份与预期现有校准。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:142
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:177
 msgid ""
 "Nonzero domain/epoch follow nx_io_timestamp_t. The owner changes epoch on "
 "discontinuity/reset/rate change. Offset is already applied by the chip; this"
@@ -1635,11 +1830,11 @@ msgstr ""
 "非零 domain/epoch 遵循 nx_io_timestamp_t。发生不连续、复位或速率变更时，owner 必须变更 "
 "epoch。芯片已经应用偏移；本驱动只核对并报告，从不编程校准或 EEPROM。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:142
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:177
 msgid "Independent copied sample, published only on SUCCESS."
 msgstr "仅 SUCCESS 发布的独立样本副本。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:142
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:177
 msgid ""
 "micro_celsius rounds raw/128 Celsius to nearest microdegree, ties away from "
 "zero. raw/offset use 1/128 Celsius per LSB; offset is not added again. "
@@ -1659,7 +1854,7 @@ msgstr ""
 "之间。消费者可使用下界执行保守的逻辑年龄检查；最近读取完成本身不能确立新鲜度。所有字段均为值，不保留器件或 payload 引用。副本在 stop "
 "后仍有效；时钟域假设仍依赖调用者的连续性和生命周期合同。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:142
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:177
 msgid ""
 "Task-only single executor, no concurrent/reentrant calls. Uncertain physical"
 " state retains the port for explicit cancel/resync; it creates no MCU buffer"
@@ -1668,19 +1863,19 @@ msgstr ""
 "仅限任务中单一执行器，不允许并发或重入调用。不确定物理状态保留端口以供显式 cancel/resync，不产生 MCU "
 "缓冲区借用。字段均为内部状态，不能作为回收借用存储的许可。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:146
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:181
 msgid "tmp117_i2c.h"
 msgstr "tmp117_i2c.h"
 
-#: ../../../../../../docs/reference/api/components/devices.md:148
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:183
 msgid "TMP117 transport over an explicit settled I2C endpoint."
 msgstr "基于显式已结清 I2C 端点的 TMP117 传输。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:148
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:183
 msgid "Bind an existing polling endpoint without I/O or discovery."
 msgstr "绑定现有轮询端点，不执行 I/O 或设备发现。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:148
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:183
 msgid ""
 "Actual ADD0 wiring/address 48h..4Bh remains external. An async-only endpoint"
 " is rejected. No submit fallback borrows stack descriptors. Exactly one "
@@ -1689,96 +1884,96 @@ msgstr ""
 "实际 ADD0 接线及地址 48h..4Bh 由外部负责。拒绝仅支持异步的端点；没有借用栈描述符的 submit "
 "后备路径。仅一个串行总线执行器执行交换，不嵌套 owner 队列。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:148
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:183
 msgid "[in] Explicit fixed-address face, alive until stop/join"
 msgstr "[in] 显式固定地址接口，保持有效直至 stop/join"
 
-#: ../../../../../../docs/reference/api/components/devices.md:148
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:183
 msgid "[in] Same live domain as endpoint transaction deadlines"
 msgstr "[in] 与端点事务 deadline 相同的活跃时钟域"
 
-#: ../../../../../../docs/reference/api/components/devices.md:148
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:183
 msgid "Settled transport, or an invalid zero port for bad methods"
 msgstr "已结清传输；方法无效时返回无效零端口"
 
-#: ../../../../../../docs/reference/api/components/devices.md:152
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:187
 msgid "bmp280.h"
 msgstr "bmp280.h"
 
-#: ../../../../../../docs/reference/api/components/devices.md:154
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:189
 msgid "BMP280 calibration and explicit forced-conversion driver."
 msgstr "BMP280 校准与显式强制转换驱动。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:154
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:189
 msgid "Parse the exact 24-byte little-endian calibration block."
 msgstr "解析准确的 24 字节小端校准块。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:154
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:189
 msgid "[in] Register block beginning at 0x88"
 msgstr "[in] 从 0x88 开始的寄存器块"
 
-#: ../../../../../../docs/reference/api/components/devices.md:154
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:189
 msgid "[in] Must be exactly 24"
 msgstr "[in] 必须恰为 24"
 
-#: ../../../../../../docs/reference/api/components/devices.md:154
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:189
 msgid "[out] Written only on success"
 msgstr "[out] 仅成功时写入"
 
-#: ../../../../../../docs/reference/api/components/devices.md:154
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:189
 msgid "SUCCESS or INVALID for length/zero pressure divisor"
 msgstr "SUCCESS；长度错误或压力除数为零时为 INVALID"
 
-#: ../../../../../../docs/reference/api/components/devices.md:154
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:189
 msgid "Compensate one raw sample using checked integer arithmetic."
 msgstr "使用经过检查的整数运算补偿一个原始样本。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:154
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:189
 msgid "[in] Parsed calibration"
 msgstr "[in] 已解析的校准数据"
 
-#: ../../../../../../docs/reference/api/components/devices.md:154
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:189
 msgid "[in] Unsigned 20-bit ADC value"
 msgstr "[in] 无符号 20 位 ADC 值"
 
-#: ../../../../../../docs/reference/api/components/devices.md:154
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:189
 msgid ""
 "SUCCESS, INVALID for malformed/overflow calibration or IO for disabled ADC "
 "sentinel/out-of-datasheet-range physical output"
 msgstr "SUCCESS；校准格式错误或溢出时为 INVALID；ADC 禁用哨兵值或物理输出超出数据手册范围时为 IO"
 
-#: ../../../../../../docs/reference/api/components/devices.md:154
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:189
 msgid "Validate chip ID and load calibration, without scanning."
 msgstr "验证芯片 ID 并加载校准，不扫描设备。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:154
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:189
 msgid ""
 "Task context; failure leaves initialized false and no borrow. Does not soft-"
 "reset the part or create a wait loop/task. Retry BUSY explicitly."
 msgstr ""
 "任务上下文；失败时 initialized 保持 false，且无借用。不软复位器件，也不创建等待循环或任务。BUSY 必须由调用者显式重试。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:154
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:189
 msgid "[out] Zero-initialized unused instance"
 msgstr "[out] 零初始化且尚未使用的实例"
 
-#: ../../../../../../docs/reference/api/components/devices.md:154
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:189
 msgid "[in] Synchronous settled port and live monotonic clock"
 msgstr "[in] 调用返回前已结清的同步接口，以及有效的单调时钟"
 
-#: ../../../../../../docs/reference/api/components/devices.md:154
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:189
 msgid "[in] Absolute deadline for all initialization accesses"
 msgstr "[in] 覆盖全部初始化访问的绝对截止时间"
 
-#: ../../../../../../docs/reference/api/components/devices.md:154
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:189
 msgid "SUCCESS, BUSY for NVM update, or transport/identity error"
 msgstr "SUCCESS；NVM 更新期间为 BUSY；也可能返回传输或身份错误"
 
-#: ../../../../../../docs/reference/api/components/devices.md:154
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:189
 msgid "Start one forced temperature/pressure conversion."
 msgstr "启动一次强制温度／压力转换。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:154
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:189
 msgid ""
 "Task-only serialized driver owner; oversampling x1/x1. Ready time is finite "
 "even with an explicit infinite caller deadline. EXHAUSTED retains no "
@@ -1788,23 +1983,23 @@ msgstr ""
 "仅由串行 Task 驱动 owner 调用，过采样 x1／x1。即使调用方显式选择无限 deadline，ready 等待仍有限。EXHAUSTED "
 "不保留软件转换状态或 MCU buffer；已经完成的配置写入仍可能启动传感器。重试须观察其实际 idle 状态。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:154
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:189
 msgid "[inout] Initialized non-measuring instance"
 msgstr "[inout] 已初始化且未在测量的实例"
 
-#: ../../../../../../docs/reference/api/components/devices.md:154
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:189
 msgid "[in] Absolute deadline covering conversion and reads"
 msgstr "[in] 覆盖转换与读取的绝对截止时间"
 
-#: ../../../../../../docs/reference/api/components/devices.md:154
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:189
 msgid "SUCCESS, BUSY, TIMEOUT, EXHAUSTED or transport error"
 msgstr "SUCCESS、BUSY、TIMEOUT、EXHAUSTED 或传输错误"
 
-#: ../../../../../../docs/reference/api/components/devices.md:154
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:189
 msgid "Poll conversion without an implicit worker or blocking delay."
 msgstr "轮询转换，不使用隐式执行任务或阻塞延迟。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:154
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:189
 msgid ""
 "Task-only. Every port call releases temporary buffers before return. BUSY "
 "retains device conversion state, never stack or caller buffers. After "
@@ -1812,37 +2007,37 @@ msgid ""
 msgstr ""
 "仅限任务上下文。每次接口调用在返回前释放临时缓冲。BUSY 保留器件转换状态，不保留栈或调用者缓冲。终止失败后可再次 begin；策略由外部所有者选择。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:154
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:189
 msgid "[inout] Instance with a previously started conversion"
 msgstr "[inout] 已启动过转换的实例"
 
-#: ../../../../../../docs/reference/api/components/devices.md:154
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:189
 msgid "[out] Written only on SUCCESS"
 msgstr "[out] 仅在 SUCCESS 时写入"
 
-#: ../../../../../../docs/reference/api/components/devices.md:154
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:189
 msgid "SUCCESS, BUSY while converting, TIMEOUT or transport error"
 msgstr "SUCCESS；转换期间为 BUSY；也可能返回 TIMEOUT 或传输错误"
 
-#: ../../../../../../docs/reference/api/components/devices.md:154
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:189
 msgid "Stop software use after all synchronous calls have exited."
 msgstr "全部同步调用退出后停止软件使用。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:154
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:189
 msgid ""
 "Does not power off or reset a physical part. Sensor-internal conversion can "
 "finish without accessing MCU storage. No MCU borrow remains."
 msgstr "不为物理器件断电或复位。传感器内部转换可在不访问 MCU 存储的情况下完成。不再存在 MCU 借用。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:154
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:189
 msgid "[inout] Quiesced driver instance"
 msgstr "[inout] 已静默的驱动实例"
 
-#: ../../../../../../docs/reference/api/components/devices.md:154
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:189
 msgid "Synchronous settled SPI transaction port."
 msgstr "同步、已结清的 SPI 事务端口。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:154
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:189
 msgid ""
 "exchange always releases every TX/RX buffer before returning, including "
 "TIMEOUT/error. One CS interval covers all bytes; mode 0 or 3, 8-bit words, "
@@ -1852,111 +2047,111 @@ msgstr ""
 "exchange 始终在返回前释放全部 TX/RX 缓冲，包括 TIMEOUT 或错误路径。一个 CS 区间覆盖全部字节；采用模式 0 或 3、8 "
 "位字、频率不超过 10 MHz。调用者串行使用该器件及其总线所有者。驱动的栈上事务不会跨越异步借用边界。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:154
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:189
 msgid "Register calibration, owned by one device instance."
 msgstr "由一个设备实例拥有的寄存器校准数据。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:154
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:189
 msgid "Output is valid only on successful conversion/compensation."
 msgstr "仅成功转换／补偿时输出有效。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:154
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:189
 msgid "Explicit device context, no Board pins or automatic sampling task."
 msgstr "显式设备上下文，不含 Board 引脚或自动采样任务。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:158
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:193
 msgid "bmp280_spi.h"
 msgstr "bmp280_spi.h"
 
-#: ../../../../../../docs/reference/api/components/devices.md:160
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:195
 msgid "Optional BMP280 adapter over a fixed SPI endpoint."
 msgstr "固定 SPI 端点上的可选 BMP280 适配器。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:160
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:195
 msgid "Bind a real polling SPI endpoint as settled transport."
 msgstr "绑定真实轮询 SPI 端点作为能结清的传输端口。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:160
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:195
 msgid "[in] Fixed endpoint kept alive throughout device use"
 msgstr "[in] 在器件使用期间始终保持有效的固定端点"
 
-#: ../../../../../../docs/reference/api/components/devices.md:160
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:195
 msgid "[in] Same monotonic domain as IO transfer deadlines"
 msgstr "[in] 与 I/O 传输截止时间相同的单调时钟域"
 
-#: ../../../../../../docs/reference/api/components/devices.md:160
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:195
 msgid "Narrow transport; no global discovery or CS selection"
 msgstr "窄传输接口；不进行全局发现或 CS 选择"
 
-#: ../../../../../../docs/reference/api/components/devices.md:164
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:199
 msgid "dp83848.h"
 msgstr "dp83848.h"
 
-#: ../../../../../../docs/reference/api/components/devices.md:166
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:201
 msgid "Explicit DP83848 identity, reset and observed link mechanism."
 msgstr "显式 DP83848 身份、复位与链路观察机制。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:166
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:201
 msgid "Read exact supported identity; mismatch never becomes a default PHY."
 msgstr "读取准确支持的身份；不匹配时绝不改用默认 PHY。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:166
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:201
 msgid "[inout] Explicit MDIO face, address and expected supported model."
 msgstr "[inout] 显式的 MDIO 接口、地址及预期支持的型号。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:166
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:201
 msgid "[in] Finite absolute MDIO clock deadline."
 msgstr "[in] MDIO 时钟域中的有限绝对截止时间。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:166
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:201
 msgid "Success, UNSUPPORTED for identity mismatch, or MDIO error."
 msgstr "成功；身份不符时为 UNSUPPORTED；或 MDIO 错误。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:166
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:201
 msgid "Bounded BMCR soft reset and observed self-clearing acknowledgement."
 msgstr "有界 BMCR 软件复位，并观察自清除确认。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:166
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:201
 msgid ""
 "Task-only finite absolute deadline; reset restraps the device and clears "
 "configured truth. This is not a GPIO, power or strap proof."
 msgstr "仅限任务上下文，使用有限绝对截止时间；复位会重新采样器件 strap，并清除已配置事实。这不证明 GPIO、电源或 strap 正确。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:166
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:201
 msgid "[inout] Proved identity and caller-owned component state."
 msgstr "[inout] 已证明的身份及调用者拥有的组件状态。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:166
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:201
 msgid "Success after real reset acknowledgement, or state/MDIO error."
 msgstr "真实复位得到确认后成功；否则返回状态或 MDIO 错误。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:166
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:201
 msgid "Start explicit negotiation or fixed mode, never wait for fake link."
 msgstr "启动显式协商或固定模式，不等待伪造链路。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:166
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:201
 msgid ""
 "Task-only; identity must be proved. SUCCESS means registers configured, not "
 "autonegotiation complete. Failures retain configured=false."
 msgstr "仅限任务上下文；必须已证明身份。SUCCESS 表示寄存器已配置，不表示自协商已完成。失败时 configured 保持 false。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:166
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:201
 msgid "[inout] Proved identity, kept live through operations."
 msgstr "[inout] 已证明的身份，操作期间持续保持有效。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:166
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:201
 msgid "[in] Explicit fixed mode or negotiation advertisement."
 msgstr "[in] 显式的固定模式或协商通告。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:166
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:201
 msgid "Success means configured registers; otherwise no configured truth."
 msgstr "成功表示寄存器已配置；其他结果不建立已配置事实。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:166
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:201
 msgid "Observe latch-low BMSR twice and DP83848 PHYSTS speed/duplex truth."
 msgstr "对锁存低电平 BMSR 读取两次，并观察 DP83848 PHYSTS 的真实速率／双工状态。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:166
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:201
 msgid ""
 "Task-only; output changes only on SUCCESS. up requires actual link and "
 "complete autonegotiation when selected. Protocol or remote fault does not "
@@ -1965,29 +2160,198 @@ msgstr ""
 "仅限任务上下文；只在 SUCCESS 时改变输出。up 要求真实链路有效，且选用自协商时必须完成自协商。协议或远端故障不能虚构速率或链路状态。向 MAC"
 " 应用该状态仍是外部动作。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:166
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:201
 msgid "[inout] Probed and configured caller-owned component."
 msgstr "[inout] 已探测并配置、由调用者拥有的组件。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:166
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:201
 msgid "[out] Observed value, separate from component storage."
 msgstr "[out] 观察值，必须与组件存储分离。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:166
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:201
 msgid "Success copies observed link; other results preserve output."
 msgstr "成功时复制观察到的链路；其他结果保持输出不变。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:166
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:201
 msgid "External policy explicitly selects autonegotiation or fixed mode."
 msgstr "外部策略显式选择自动协商或固定模式。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:166
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:201
 msgid ""
 "Caller-owned PHY state; no board address, reset GPIO or worker default."
 msgstr "调用者拥有的 PHY 状态；不提供默认板级地址、reset GPIO 或执行任务。"
 
-#: ../../../../../../docs/reference/api/components/devices.md:166
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:201
 msgid ""
 "expected_id selects TI or NS model, ignoring revision nibble only. One task "
 "owner serializes this component and the shared MDIO port."
 msgstr "expected_id 选择 TI 或 NS 型号，仅忽略修订号的四位字段。由一个任务所有者串行使用该组件及共享 MDIO 接口。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:205
+msgid "sfud.h"
+msgstr "sfud.h"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:207
+msgid "Selected SFUD NOR algorithms behind the existing SPI owner."
+msgstr "已有 SPI owner 后的选定 SFUD NOR 算法。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:207
+msgid ""
+"Author  Nexus Team   Version  1.0.0   Date  2026-11-21   Copyright  "
+"Copyright (c) 2026 Nexus Team"
+msgstr ""
+"作者  Nexus Team   版本  1.0.0   日期  2026-11-21   版权  Copyright (c) 2026 Nexus "
+"Team"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:207
+msgid "1.0.0"
+msgstr "1.0.0"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:207
+msgid "2026-11-21"
+msgstr "2026-11-21"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:207
+msgid "Copyright (c) 2026 Nexus Team"
+msgstr "Copyright (c) 2026 Nexus Team"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:207
+msgid "Explicit suffix selection; JEDEC alone does not prove this model."
+msgstr "显式后缀选择；仅 JEDEC 不能证明该型号。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:207
+msgid "Exact workspace bytes for the selected static chip profile."
+msgstr "选定静态芯片 profile 的精确 workspace 字节数。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:207
+msgid "Required workspace alignment, without allocation."
+msgstr "所需 workspace 对齐，不执行分配。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:207
+msgid ""
+"Admit one explicitly selected awake W25Q128JV using only read commands."
+msgstr "仅用读命令准入一个显式选定且已唤醒的 W25Q128JV。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:207
+msgid ""
+"Calls selected upstream read/program/erase algorithms after explicit "
+"metadata admission, not SFUD's reset-capable device_init/discovery. No "
+"concurrent W25/SFUD owner may command this same physical chip."
+msgstr ""
+"显式 metadata 准入后调用选定上游 read／program／erase 算法，不使用 SFUD 可 reset 的 "
+"device_init／discovery。不得由并行 W25／SFUD owner 向同一物理芯片发命令。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:207
+msgid "[out] Unused caller metadata; retained through proven stop."
+msgstr "[out] 未使用的调用者 metadata；保留到 stop 已被证明成功。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:207
+msgid "[in] Existing single-line mode 0/3 SPI owner, at most 50 MHz."
+msgstr "[in] 已有单线 mode 0/3 SPI owner，最高 50 MHz。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:207
+msgid "[in] Ready monotonic clock in the same deadline domain."
+msgstr "[in] 同一 deadline 域内已就绪的单调 clock。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:207
+msgid "[in] Exact product-selected model, not autodetection policy."
+msgstr "[in] 产品精确选定的型号，不是自动探测策略。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:207
+msgid "[in] Actual power-up/write readiness established externally."
+msgstr "[in] 由外部建立的真实 power-up／write readiness。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:207
+msgid "[inout] Disjoint aligned caller vendor-state storage."
+msgstr "[inout] 独立、对齐的调用者 vendor-state 存储。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:207
+msgid "[in] At least the exact reported requirement."
+msgstr "[in] 至少达到所报告的精确要求。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:207
+msgid "[in] Finite absolute probe deadline."
+msgstr "[in] 有限绝对 probe deadline。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:207
+msgid "SUCCESS or error; no reset, status write, protection change or erase."
+msgstr "SUCCESS 或错误；不执行 reset、status write、保护变更或 erase。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:207
+msgid ""
+"Query the full physical 16 MiB array; products supply their own region."
+msgstr "查询完整物理 16 MiB array；region 由产品提供。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:207
+msgid "The current profile is non-ECC NOR, one-byte program and 4 KiB erase."
+msgstr "当前 profile 为 non-ECC NOR，编程粒度为 1 字节，擦除粒度为 4 KiB。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:207
+msgid "[in] Initialized serialized owner, stable through all users."
+msgstr "[in] 已初始化、串行管理的 owner，在所有使用者存活期间保持稳定。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:207
+msgid "Existing immutable face or NULL; lookup does not initialize hardware."
+msgstr "已有不可变 face 或 NULL；lookup 不初始化硬件。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:207
+msgid "Set the next explicit synchronous read budget without any bus access."
+msgstr "不访问 bus，设置下一次显式同步 read 预算。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:207
+msgid ""
+"Set once before the whole FAL/DB/filesystem operation, never per read. No "
+"timeout renewal or hidden current-deadline variable is created."
+msgstr ""
+"在整次 FAL／DB／filesystem 操作前只设一次，不为每次 read 重设。不续期 timeout，也不创建隐藏的 current-"
+"deadline 变量。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:207
+msgid "[inout] Initialized idle instance, externally serialized."
+msgstr "[inout] 已初始化的空闲实例，由外部串行化。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:207
+msgid "[in] Finite provider-domain budget, shared with its consumer."
+msgstr "[in] provider 域内与 consumer 共用的有限预算。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:207
+msgid "SUCCESS, BUSY, STATE, INVALID or TIMEOUT without hardware effects."
+msgstr "SUCCESS、BUSY、STATE、INVALID 或 TIMEOUT；无硬件效果。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:207
+msgid "Perform bounded cleanup without resetting or replaying failed writes."
+msgstr "执行有界 cleanup，不 reset，也不 replay 失败写入。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:207
+msgid ""
+"Cleanup never upgrades a previous write result. Call before the Flash face's"
+" non-I/O recover observation; preserve storage while BUSY."
+msgstr "cleanup 不升级先前写入结果。在 Flash face 的非 I/O recover 观测前调用；BUSY 期间保留存储。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:207
+msgid "[inout] Same owner retained after timeout or uncertain command."
+msgstr "[inout] timeout 或不确定命令后仍保留的同一 owner。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:207
+msgid "[in] Fresh finite budget for at most four probes."
+msgstr "[in] 至多四次 probe 的新有限预算。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:207
+msgid "SUCCESS after WIP0/SUS0/WEL0, BUSY or a retained error otherwise."
+msgstr "WIP0／SUS0／WEL0 后返回 SUCCESS，否则为 BUSY 或保留的错误。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:207
+msgid "Unbind only after every user joined and the chip proved quiescent."
+msgstr "只有所有使用者已退出会合，且已证明芯片没有在途操作时，才可解绑。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:207
+msgid "[inout] Stable serialized state, live through refused stop."
+msgstr "[inout] 稳定串行状态，被拒绝 stop 时仍存活。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:207
+msgid "SUCCESS or BUSY; does not stop/reset the existing SPI bus owner."
+msgstr "SUCCESS 或 BUSY；不 stop／reset 已有 SPI bus owner。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/devices.md:207
+msgid "Caller metadata; workspace contains all private upstream state."
+msgstr "调用者 metadata；workspace 保存全部私有上游状态。"

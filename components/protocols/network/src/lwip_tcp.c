@@ -6,6 +6,7 @@
  * \date            2026-11-02
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "nexus/network/lwip_listener_storage.h"
 #include "nexus/network/lwip_storage.h"
 #include "nexus/network/lwip_tcp_storage.h"
 #include <string.h>
@@ -629,5 +630,141 @@ nx_result_t nx_lwip_tcp_diagnostic(const nx_lwip_tcp_t* client,
             client->pcb != NULL ? (size_t)TCP_SND_BUF - tcp_sndbuf(client->pcb)
                                 : 0U;
     }
+    return NX_SUCCESS;
+}
+
+/** \brief Bind incoming raw TCP directly into existing caller-selected slots.
+ */
+static err_t accept_client(void* context, struct tcp_pcb* pcb, err_t error) {
+    nx_lwip_tcp_listener_t* listener = context;
+    if (error != ERR_OK || pcb == NULL) {
+        return error;
+    }
+    nx_lwip_tcp_t* client = NULL;
+    for (size_t i = 0; i < listener->count; ++i) {
+        nx_lwip_tcp_t* candidate = &listener->clients[i];
+        if (!candidate->initialized && !candidate->active &&
+            !candidate->callback_active) {
+            client = candidate;
+            break;
+        }
+    }
+    if (client == NULL || listener->active || !listener->network->attached ||
+        listener->network->closing) {
+        if (listener->rejected != UINT32_MAX) {
+            ++listener->rejected;
+        }
+        tcp_abort(pcb);
+        return ERR_ABRT;
+    }
+    const ip4_addr_t* address = ip_2_ip4(&pcb->remote_ip);
+    memset(client, 0, sizeof(*client));
+    client->config =
+        (nx_lwip_tcp_config_t){listener->network,
+                               listener->receive_budget,
+                               {ip4_addr1(address), ip4_addr2(address),
+                                ip4_addr3(address), ip4_addr4(address)},
+                               pcb->remote_port};
+    client->pcb = pcb;
+    client->initialized = true;
+    client->stream = (nx_byte_stream_t){&stream_ops, client};
+    client->diagnostic.state = NX_LWIP_TCP_ESTABLISHED;
+    client->diagnostic.result = NX_SUCCESS;
+    attach(client);
+    refresh(client);
+    if (listener->accepted != UINT32_MAX) {
+        ++listener->accepted;
+    }
+    return ERR_OK;
+}
+/** \brief Admit one listener without allocating application connection state.
+ */
+nx_result_t nx_lwip_tcp_listen(nx_lwip_tcp_listener_t* listener,
+                               nx_lwip_adapter_t* network,
+                               nx_lwip_tcp_t* clients, size_t count,
+                               uint16_t port, size_t receive_budget) {
+    if (listener == NULL || network == NULL || clients == NULL || count == 0 ||
+        count > SIZE_MAX / sizeof(*clients) || port == 0 ||
+        receive_budget == 0 || !network->attached || network->closing ||
+        network->config.clock.read == NULL ||
+        overlaps(listener, sizeof(*listener), network, sizeof(*network)) ||
+        overlaps(listener, sizeof(*listener), clients,
+                 count * sizeof(*clients)) ||
+        overlaps(network, sizeof(*network), clients,
+                 count * sizeof(*clients)) ||
+        overlaps(clients, count * sizeof(*clients), network->config.tx_buffer,
+                 network->config.tx_capacity) ||
+        overlaps(clients, count * sizeof(*clients), network->config.rx_views,
+                 network->config.rx_capacity *
+                     sizeof(*network->config.rx_views))) {
+        return NX_ERROR_INVALID;
+    }
+    if (owner_active || listener->pcb != NULL || listener->active) {
+        return NX_ERROR_BUSY;
+    }
+    for (size_t i = 0; i < count; ++i) {
+        if (clients[i].initialized || clients[i].active ||
+            clients[i].callback_active) {
+            return NX_ERROR_BUSY;
+        }
+    }
+    owner_active = true;
+    struct tcp_pcb* pcb = tcp_new_ip_type(IPADDR_TYPE_V4);
+    if (pcb == NULL) {
+        owner_active = false;
+        return NX_ERROR_EXHAUSTED;
+    }
+    err_t error = tcp_bind(pcb, IP4_ADDR_ANY, port);
+    if (error != ERR_OK) {
+        tcp_abort(pcb);
+        owner_active = false;
+        return error == ERR_USE ? NX_ERROR_BUSY : NX_ERROR_IO;
+    }
+    tcp_bind_netif(pcb, &network->interface);
+    struct tcp_pcb* listening = tcp_listen_with_backlog_and_err(pcb, 1, &error);
+    if (listening == NULL) {
+        tcp_abort(pcb);
+        owner_active = false;
+        return error == ERR_MEM ? NX_ERROR_EXHAUSTED : NX_ERROR_IO;
+    }
+    memset(listener, 0, sizeof(*listener));
+    listener->pcb = (struct tcp_pcb_listen*)listening;
+    listener->network = network;
+    listener->clients = clients;
+    listener->count = count;
+    listener->receive_budget = receive_budget;
+    tcp_arg(listening, listener);
+    tcp_accept(listening, accept_client);
+    owner_active = false;
+    return NX_SUCCESS;
+}
+/** \brief Detach only listener callbacks; live clients retain their own owners.
+ */
+nx_result_t nx_lwip_tcp_listener_stop(nx_lwip_tcp_listener_t* listener) {
+    if (listener == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    if (owner_active || listener->active) {
+        return NX_ERROR_BUSY;
+    }
+    if (listener->pcb == NULL) {
+        return NX_SUCCESS;
+    }
+    owner_active = true;
+    struct tcp_pcb* pcb = (struct tcp_pcb*)listener->pcb;
+    tcp_accept(pcb, NULL);
+    tcp_arg(pcb, NULL);
+    err_t error = tcp_close(pcb);
+    if (error != ERR_OK) {
+        tcp_arg(pcb, listener);
+        tcp_accept(pcb, accept_client);
+        owner_active = false;
+        return error == ERR_MEM ? NX_ERROR_BUSY : NX_ERROR_IO;
+    }
+    listener->pcb = NULL;
+    listener->network = NULL;
+    listener->clients = NULL;
+    listener->count = 0;
+    owner_active = false;
     return NX_SUCCESS;
 }

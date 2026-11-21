@@ -79,6 +79,13 @@ function(nexus_google_test name)
     set_tests_properties(${name} PROPERTIES TIMEOUT 30 LABELS "GoogleTest")
 endfunction()
 
+include("${nexus_google_root}/components/common_algorithms.cmake")
+include("${nexus_google_root}/components/common_diagnostics.cmake")
+include("${nexus_google_root}/components/common_diagnostics_vendor.cmake")
+include("${nexus_google_root}/components/common_storage.cmake")
+include("${nexus_google_root}/components/common_protocols.cmake")
+include("${nexus_google_root}/components/common_devices.cmake")
+
 include("${nexus_google_root}/soc/dac.cmake")
 include("${nexus_google_root}/soc/crc.cmake")
 include("${nexus_google_root}/soc/crypto.cmake")
@@ -264,6 +271,7 @@ nexus_google_test(nexus_freertos_services_kernel_test
     LIBRARIES contract_os_freertos_posix Nexus::UARTOwner Nexus::NativeModel
     INCLUDES "${NEXUS_SOURCE_DIR}/tests/support/native/drivers"
 )
+include("${nexus_google_root}/components/common_diagnostics_freertos.cmake")
 
 # A second assembly is a separate image, never linked to the default platform.
 set(native_factory_input

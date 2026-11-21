@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "kind": "nexus-component-source",
+  "identifier": "littlefs",
+  "path": "ext/littlefs",
+  "upstream_url": "https://github.com/littlefs-project/littlefs.git",
+  "fetch_url": "https://github.com/X-Gen-Lab/littlefs.git",
+  "commit": "6cb4e86540eca0d9ba62500a298385c9d863c8be",
+  "tree": "9079d55ac294f6b66c58147a215ea73779431cef",
+  "license": {
+    "path": "LICENSE.md",
+    "expression": "BSD-3-Clause"
+  },
+  "files": {
+    "LICENSE.md": "0cb4ff1daf5fdc1359c6a6ee3116092f08fc100c9d58b1b77ab17bfd801f856d",
+    "lfs.c": "a36d6a095785ddea9571d541d68d3e4ef01d5b255a99d17d3f07fb6ea60ea132",
+    "lfs.h": "b1befd7288d08815accc8f9af744c55686c0b9e3ac0061c32ceee38a1b3eb96d",
+    "lfs_util.c": "f2fbde533670560434bd9f5a547174cc7c5a4670a02c47b4bd85180dced8b2ec",
+    "lfs_util.h": "548d46aa524dc7449e16739286c1a422a52f9de727ff0be0c2ffc5593f5ca981"
+  }
+}

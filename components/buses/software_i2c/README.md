@@ -24,6 +24,10 @@ NA；master 释放并忽略 target 第九个 Don't-Care bit。成功完成波形
 引脚责任。同一 task 串行管理调用和 clock。仲裁丢失只释放线路，不强制 STOP。
 恢复前调用者重新建立独占并会合 foreign writer；恢复仅尝试一次有界 STOP，不做
 九时钟 bus-clear、reset 或事务重放。没有 deadline 的 controller recover 方法不支持。
+最终 SCL input callback 返回后再次检查 deadline 和单调 clock，才发布 STOP 已证明；
+末次读回期间到期或 clock 失效仍保留 fault 与相同 binding。
+新 STOP 首次尝试改变线路前即撤销旧 idle proof；clock 失效后不能用先前 proof
+越过本次未完成的 STOP 验证并释放 binding。
 
 释放外层 GPIO lease／配置前，调用带预算的 stop 并确认成功。后来的数值 deadline
 不能修复故障或不连续 clock domain；不承诺多 controller 协作。

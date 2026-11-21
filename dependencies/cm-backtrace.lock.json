@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "kind": "nexus-component-source",
+  "identifier": "cm_backtrace",
+  "path": "ext/cm_backtrace",
+  "upstream_url": "https://github.com/armink/CmBacktrace.git",
+  "fetch_url": "https://github.com/X-Gen-Lab/CmBacktrace.git",
+  "commit": "3be35d99673805f258de5c2f156fac94eb896da4",
+  "tree": "7a1120f8d06491c163878c168d1d5aa4e5d9b23f",
+  "license": {
+    "path": "LICENSE",
+    "expression": "MIT"
+  },
+  "files": {
+    "LICENSE": "e8ed0e84184d2130bd1fcf5a52ce8c16b5bf338c272cab6bbd7993a9d723934e",
+    "cm_backtrace/Languages/en-US/cmb_en_US.h": "ad77299fecaa9a63c766bfbe9d17099c7542751fc11084bf88520bc88c35a844",
+    "cm_backtrace/Languages/zh-CN/cmb_zh_CN.h": "b87fe1a620c559201b748f2eb58d4cf0452a3c0035dddfa2255ce0879c3bab1b",
+    "cm_backtrace/Languages/zh-CN/cmb_zh_CN_UTF8.h": "cdd28297ea872554289cf38d3d25a4c6d8f88bb3ea0f1419017600b246c53931",
+    "cm_backtrace/cm_backtrace.c": "bcb65ad69068b3bc17d7b2f70fdd6096656442605605ccfe9c619876e98fca0e",
+    "cm_backtrace/cm_backtrace.h": "91591c2fc8bb4129c51899d80c1188c4c683167bf28cf892aacfc9f955bc7fbe",
+    "cm_backtrace/cmb_cfg.h": "bfa13d7d6e1136e3106566b1fdccbff0d43210963e70827fc23ce9cee756bbf5",
+    "cm_backtrace/cmb_def.h": "4fc1838dc2c51f25ab329eed0f233a3463ee6e1bf8c72d92f513419d9a1a585e"
+  }
+}

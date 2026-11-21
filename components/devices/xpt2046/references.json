@@ -1,0 +1,22 @@
+{
+  "sources": [
+    {
+      "url": "https://files.waveshare.com/upload/9/98/XPT2046-EN.pdf",
+      "publisher": "XPTEK manufacturer-authored datasheet mirrored by Waveshare",
+      "document": "XPT2046 Data Sheet",
+      "publication": "2007.5",
+      "sha256": "d01b61c1f08dc74963ac73d996c93ed0aed485ba33dcb09960adbbb629e9d515",
+      "bytes": 907078,
+      "sections": [
+        "Tables 4 and 5 channel selection",
+        "page 21 24-clock transfer",
+        "page 22 control byte",
+        "pages 24 and 25 power-down and PENIRQ",
+        "page 26 interrupted conversion and 1.6 ms hold limit",
+        "page 27 Table 9 DCLK timing"
+      ]
+    }
+  ],
+  "reviewed_scope": "Differential 12-bit raw X/Y and optional Z1/Z2, PD=00 completion, live PEN predicate, copied software observation; fitted-panel coordinate calibration remains external",
+  "physical_status": "not_executed"
+}

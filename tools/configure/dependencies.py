@@ -42,6 +42,7 @@ SDK = (
     "tools/evidence/common.py",
     "tools/maintenance/cmsis_device_lock.py",
     "tools/maintenance/coremqtt_lock.py",
+    "tools/maintenance/component_lock.py",
     "tools/maintenance/freertos_transport.py",
     "tools/maintenance/lwip_lock.py",
     "tools/maintenance/mbedtls_lock.py",

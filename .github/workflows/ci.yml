@@ -68,7 +68,7 @@ jobs:
   publish-docs:
     name: Publish Documentation
     needs: [docs, status-check]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: always() && !cancelled() && github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.docs.result == 'success' && needs.status-check.result == 'success'
     uses: ./.github/workflows/docs-publish.yml
     permissions:
       contents: read

@@ -260,6 +260,11 @@ static nx_result_t transfer(void* context, const uint8_t* tx, uint8_t* rx,
         result = delay(owner, owner->config->select_hold_us, deadline);
     }
     nx_result_t cleanup = idle(owner);
+    /* GPIO withdrawal can itself be delayed; success includes its completion.
+     */
+    if (result == NX_SUCCESS && cleanup == NX_SUCCESS) {
+        result = observe(owner, deadline);
+    }
     owner->faulted = result != NX_SUCCESS || cleanup != NX_SUCCESS;
     owner->in_call = false;
     return result != NX_SUCCESS ? result : cleanup;

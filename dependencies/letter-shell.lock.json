@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "kind": "nexus-component-source",
+  "identifier": "letter_shell",
+  "path": "ext/letter_shell",
+  "upstream_url": "https://github.com/NevermindZZT/letter-shell.git",
+  "fetch_url": "https://github.com/X-Gen-Lab/letter-shell.git",
+  "commit": "03432e824ca889d961743b437bce3f837c47bb86",
+  "tree": "234664240be6352eeddbeb7ad4cf5b22e76ecf94",
+  "license": {
+    "path": "LICENSE",
+    "expression": "MIT"
+  },
+  "files": {
+    "LICENSE": "0f31e3db830a1862679a450f17e442c97537f96aa9ed3434f82949d5300a0cbd",
+    "src/shell.c": "a7f735b2733005ad3bb1b1f25aff64d8fde8ce194b8cab4cc0cd77b5175e9b9e",
+    "src/shell.h": "71b3460a3ab3b90b47ddd77a47d4e8f10ce2e06248edf9f078a051198ef80ab9",
+    "src/shell_cfg.h": "e8d57fc01eab0cd15e866b4491e147d57eb8f18a6d1a9e20d285d89e6bdfe431",
+    "src/shell_cmd_list.c": "de9e1006300703c8fb734152acfe11718467cd3446cb7248868c2e3c80fbdb62",
+    "src/shell_companion.c": "866450661621b9bb2a381cfb566cd4a8aa28b166eb8b0c4d3833a77769470dc4",
+    "src/shell_ext.c": "9804350a354b7c2ba3d12bf78c848fcd3e81ab771903687ab8f73623943b0364",
+    "src/shell_ext.h": "830396abda852af446264c846b5680d6dbb21873a8a9aa318d26f31ab644858d"
+  }
+}

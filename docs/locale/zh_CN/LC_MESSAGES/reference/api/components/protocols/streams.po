@@ -1,0 +1,837 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-21 15:03+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 3506654c17c3a6d24f4880db9d9cbfa0fa3a0771c52d6254760a275194ec1bf1\n"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:10
+msgid "Bounded framing, time and byte sessions"
+msgstr "有界分帧、时间与字节会话"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:12
+msgid ""
+"These optional C11 mechanisms consume explicit bytes or the existing byte-"
+"stream face. The application supplies storage, a serialized executor, "
+"protocol policy and any finite deadlines. They create no UART/socket owner, "
+"worker, device scan or automatic command replay."
+msgstr ""
+"这些可选 C11 机制消费显式字节或已有 byte-stream face。应用提供存储、串行 executor、协议策略及所需有限 "
+"deadline；它们不创建 UART／socket owner、worker、设备扫描或自动命令 replay。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:0
+msgid "Target"
+msgstr "目标"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:0
+msgid "Header under `nexus/components/`"
+msgstr "`nexus/components/` 下的头文件"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:0
+msgid "Selected profile"
+msgstr "选定 profile"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:0
+msgid "`Nexus::Framing`"
+msgstr "`Nexus::Framing`"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:0
+msgid "`framing.h`"
+msgstr "`framing.h`"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:0
+msgid "COBS encoding/decoding and bounded delimiter accumulation"
+msgstr "COBS 编解码与有界 delimiter 累积"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:0
+msgid "`Nexus::WallClock`"
+msgstr "`Nexus::WallClock`"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:0
+msgid "`wall_clock.h`"
+msgstr "`wall_clock.h`"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:0
+msgid ""
+"Explicit UTC quality, age/drift uncertainty and 48-byte SNTP v3/v4 server-"
+"reply parsing"
+msgstr "显式 UTC 质量、年龄／漂移不确定度及 48-byte SNTP v3／v4 server-reply 解析"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:0
+msgid "`Nexus::XModem`"
+msgstr "`Nexus::XModem`"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:0
+msgid "`xmodem.h`"
+msgstr "`xmodem.h`"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:0
+msgid "SOH/128-byte/CRC16-XMODEM receive session"
+msgstr "SOH／128-byte／CRC16-XMODEM 接收会话"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:0
+msgid "`Nexus::ATClient`"
+msgstr "`Nexus::ATClient`"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:0
+msgid "`at_client.h`"
+msgstr "`at_client.h`"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:0
+msgid ""
+"One command over a caller-supplied `nx_byte_stream_t`, text/URC and explicit"
+" binary lengths"
+msgstr "调用者提供的 `nx_byte_stream_t` 上的一条命令、text／URC 和显式 binary 长度"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:24
+msgid "Retain frame and response boundaries"
+msgstr "保留 frame 与 response 边界"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:26
+msgid ""
+"COBS supplies message boundaries, without integrity or authentication. Its "
+"incremental decoder discards overflow until a delimiter. Once ready, its "
+"frame view borrows the decoder buffer until release; feed returns BUSY "
+"without consuming a byte. Preserve that byte or stop reading upstream. If "
+"integrity is required, validate the product-selected CRC before dispatching "
+"the payload."
+msgstr ""
+"COBS 提供消息边界，不提供完整性或认证。增量 decoder 在 overflow 后丢弃输入直到 delimiter。ready 后，frame "
+"view 借用 decoder buffer 直到 release；feed 返回 BUSY "
+"且不消费字节。须保留该字节或暂停上游读取。需要完整性时，先验证产品选定的 CRC，再分发 payload。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:32
+msgid ""
+"ATClient copies an admitted command into caller TX storage, then service "
+"advances partial stream writes and reads under the original absolute "
+"deadline and explicit call budget. Response, URC and binary callback views "
+"expire when the callback returns. Binary lengths come from reviewed module-"
+"specific responses; there is no assumed module or prompt grammar. A timeout,"
+" malformed line or stream failure can desynchronize the session after real "
+"command effects. Recover software parsing only after the product "
+"reestablishes the actual module boundary and joins transport users; never "
+"blindly replay the command."
+msgstr ""
+"ATClient 将已准入 command 复制到调用者 TX 存储，再由 service 按原绝对 deadline 和显式调用预算推进 "
+"partial stream write／read。Response、URC 和 binary callback view 在 callback "
+"返回后失效。binary 长度来自已审模块特定 response，不假定模块或 prompt 语法。timeout、畸形行或 stream 失败可能在 "
+"command 已产生实际效果后使会话失同步。只有产品重新建立模块真实边界并 join transport 使用者后，才恢复软件解析；不得盲目 "
+"replay command。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:41
+msgid "Separate local transfer from product update policy"
+msgstr "区分本地传输与产品更新策略"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:43
+msgid ""
+"XMODEM validates sequence, complement and CRC before each bounded 128-byte "
+"write callback. A repeated previous block is acknowledged without writing it"
+" again. The caller copies emitted control bytes into its own TX state, "
+"supplies same-domain time to feed/poll, and enforces the finite session and "
+"packet budgets. BUSY with a pending control byte does not consume new input."
+msgstr ""
+"XMODEM 在每次有界 128-byte write callback 前验证序号、反码和 CRC。重复的上一 block 仅 "
+"ACK，不再次写入。调用者将输出 control byte 复制到自己的 TX 状态，为 feed／poll 提供同域时间，并执行有限 "
+"session／packet 预算。有 pending control byte 时，BUSY 不消费新输入。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:49
+msgid ""
+"Every callback receives 128 bytes including sender padding. Product length, "
+"manifest, authorization, staging and signature/version checks determine "
+"usable content and whether an update may proceed. Accepted blocks are not "
+"rolled back by cancellation or failure. This profile has no checksum "
+"fallback, 1 KiB blocks, YMODEM filename handling, Flash partition selection "
+"or reboot policy."
+msgstr ""
+"每次 callback 收到含发送方 padding 的 128 字节。产品 length、manifest、授权、staging "
+"和签名／版本检查确定有效内容及是否允许更新。取消或失败不回滚已接纳 block。此 profile 无 checksum fallback、1 KiB "
+"block、YMODEM 文件名、Flash partition 选择或 reboot 策略。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:55
+msgid "Keep UTC quality separate from monotonic deadlines"
+msgstr "区分 UTC 质量与单调 deadline"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:57
+msgid ""
+"WallClock does not modify Core time or scheduler deadlines. It combines an "
+"explicit UTC sample with its monotonic observation, validity interval and "
+"stated oscillator-drift bound. Ordinary SNTP results remain MEASURED; the "
+"product must review a source before asserting TRUSTED. A parse result cannot"
+" bypass TLS's trusted-time requirement."
+msgstr ""
+"WallClock 不修改 Core 时间或 scheduler deadline。它将显式 UTC 样本与其单调观测、有效期及声明的 "
+"oscillator drift 上界组合。普通 SNTP 结果保持 MEASURED，产品须审查来源后才能声明 TRUSTED。解析结果不能绕过 "
+"TLS 的可信时间要求。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:63
+msgid ""
+"The product validates the response source IP/port, original unpredictable "
+"request token and unique outstanding request, and explicitly selects NTP era"
+" 0 or 1. Uncertainty includes local RTT and server delay/dispersion, without"
+" proving network symmetry, source honesty or physical timestamp accuracy. "
+"Invalid, expired or discontinuous time must not become a fabricated usable "
+"UTC value."
+msgstr ""
+"产品验证 response source IP／port、原始不可预测 request token 及唯一 outstanding "
+"request，并显式选择 NTP era 0 或 1。不确定度包含本地往返时延（RTT）和 server "
+"delay／dispersion，不证明网络对称、来源诚实或物理 timestamp 准确。无效、到期或不连续时间不得变成伪造的可用 UTC 值。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:69
+msgid ""
+"Join callbacks and release borrowed views before resetting or reclaiming "
+"session storage, then close the lower transport under its own contract. "
+"Software protocol results do not establish physical serial/network timing or"
+" device qualification; hardware HIL remains `not_executed`. CANopen and "
+"additional exact device profiles remain `not_selected`."
+msgstr ""
+"reset 或回收 session 存储前，join callback 并释放借用 view，再按下层 transport "
+"自身合同关闭。软件协议结果不建立物理串口／网络时序或器件资格；硬件 HIL 保持 `not_executed`。CANopen 与其他精确器件 "
+"profile 保持 `not_selected`。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:75
+msgid "Public declarations"
+msgstr "公共声明"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:77
+msgid "framing.h"
+msgstr "framing.h"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:79
+msgid "Bounded COBS packets with explicit caller-owned buffers."
+msgstr "具有显式调用者 buffer 的有界 COBS packet。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:79
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:85
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:91
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:97
+msgid ""
+"Author  Nexus Team   Version  1.0.0   Date  2026-11-21   Copyright  "
+"Copyright (c) 2026 Nexus Team"
+msgstr ""
+"作者  Nexus Team   版本  1.0.0   日期  2026-11-21   版权  Copyright (c) 2026 Nexus "
+"Team"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:79
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:85
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:91
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:97
+msgid "Nexus Team"
+msgstr "Nexus Team"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:79
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:85
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:91
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:97
+msgid "1.0.0"
+msgstr "1.0.0"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:79
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:85
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:91
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:97
+msgid "2026-11-21"
+msgstr "2026-11-21"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:79
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:85
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:91
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:97
+msgid "Copyright (c) 2026 Nexus Team"
+msgstr "Copyright (c) 2026 Nexus Team"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:79
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:85
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:91
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:97
+msgid "Functions"
+msgstr "函数"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:79
+msgid "Encode one COBS packet including its zero delimiter."
+msgstr "编码一个 COBS packet，包含结尾零 delimiter。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:79
+msgid ""
+"COBS provides framing, not integrity or authentication. Add the selected CRC"
+" before encoding and verify after decoding."
+msgstr "COBS 提供分帧，不提供完整性或认证。在编码前添加选定 CRC，解码后验证。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:0
+msgid "Parameters"
+msgstr "参数"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:79
+msgid "[in] Input bytes, NULL only for zero size; not retained."
+msgstr "[in] 输入字节，仅 size 为零时允许 NULL；不保留。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:79
+msgid "[in] Input byte count."
+msgstr "[in] 输入字节数。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:79
+msgid "[out] Disjoint caller-owned encoded storage."
+msgstr "[out] 独立的调用者编码存储。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:79
+msgid "[in] Writable output extent."
+msgstr "[in] 可写输出范围。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:79
+msgid "[out] Distinct encoded byte count, unchanged on failure."
+msgstr "[out] 独立编码字节数，失败保持不变。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:0
+msgid "Returns"
+msgstr "返回值"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:79
+msgid ""
+"SUCCESS, INVALID, OVERFLOW or EXHAUSTED; no partial output on capacity "
+"failure. Task/IRQ pure bounded-by-size operation."
+msgstr ""
+"SUCCESS、INVALID、OVERFLOW 或 EXHAUSTED；容量失败无部分输出。Task／IRQ 纯操作，工作量受 size 约束。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:79
+msgid "Decode one COBS packet without its zero delimiter."
+msgstr "解码一个不含零 delimiter 的 COBS packet。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:79
+msgid "[in] Encoded input, nonzero size, readable until return."
+msgstr "[in] 编码输入，size 非零，可读到返回。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:79
+msgid "[in] Bytes excluding the delimiter."
+msgstr "[in] 不含 delimiter 的字节数。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:79
+msgid "[out] Disjoint buffer or exactly data for in-place decode."
+msgstr "[out] 独立 buffer，或与 data 精确同址以原地解码。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:79
+msgid "[out] Distinct decoded byte count, unchanged on failure."
+msgstr "[out] 独立解码字节数，失败保持不变。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:79
+msgid ""
+"SUCCESS, INVALID or EXHAUSTED; malformed/capacity checks precede output "
+"mutation. No allocation, time or I/O."
+msgstr "SUCCESS、INVALID 或 EXHAUSTED；先完成畸形／容量检查再修改输出。不分配、不读时间或执行 I/O。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:79
+msgid "Initialize a bounded COBS receive accumulator."
+msgstr "初始化有界 COBS 接收累积器。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:79
+msgid "[out] Unused or quiesced metadata."
+msgstr "[out] 未使用，或已完成退出会合且没有在途调用的 metadata。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:79
+msgid "[inout] Nonempty disjoint buffer, retained until join."
+msgstr "[inout] 非空独立 buffer，保留到 join。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:79
+msgid "[in] Maximum encoded packet bytes, without delimiter."
+msgstr "[in] 不含 delimiter 的最大编码 packet 字节数。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:79
+msgid "SUCCESS or INVALID; no I/O or implicit queue/worker."
+msgstr "SUCCESS 或 INVALID；不执行 I/O，不隐式建立 queue／worker。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:79
+msgid "Feed one byte in a serialized execution context."
+msgstr "在串行执行上下文 feed 一个字节。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:79
+msgid "No time/I/O/retained input; BUSY while ready consumes no byte."
+msgstr "不读时间／执行 I/O／保留输入；ready 时 BUSY 不消费字节。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:79
+msgid "[inout] Initialized caller-owned state."
+msgstr "[inout] 已初始化的调用者状态。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:79
+msgid "[in] Wire byte; zero terminates a packet."
+msgstr "[in] wire byte；零结束一个 packet。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:79
+msgid ""
+"SUCCESS for a complete decoded packet; BUSY for partial packet or a still-"
+"borrowed previous packet; OVERFLOW closes admission until next zero; INVALID"
+" rejects malformed packet."
+msgstr ""
+"完整 decoded packet 返回 SUCCESS；partial packet 或前一 packet 仍被借用返回 BUSY；OVERFLOW "
+"关闭准入直到下一个零；INVALID 拒绝畸形 packet。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:79
+msgid "Borrow the current decoded packet until release."
+msgstr "借用当前 decoded packet，直到 release。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:79
+msgid "[in] Initialized serialized decoder."
+msgstr "[in] 已初始化的串行 decoder。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:79
+msgid "[out] Distinct pointer to retained caller storage."
+msgstr "[out] 指向所保留调用者存储的独立指针输出。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:79
+msgid "[out] Distinct payload byte count; empty packet is valid."
+msgstr "[out] 独立 payload 字节数；空 packet 有效。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:79
+msgid "SUCCESS, EMPTY or INVALID; failure leaves outputs unchanged."
+msgstr "SUCCESS、EMPTY 或 INVALID；失败保持输出不变。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:79
+msgid "Release the decoded packet after all borrowers have joined."
+msgstr "所有借用者 join 后释放 decoded packet。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:79
+msgid "[inout] Initialized serialized decoder."
+msgstr "[inout] 已初始化的串行 decoder。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:79
+msgid "SUCCESS, EMPTY or INVALID; no hardware effects."
+msgstr "SUCCESS、EMPTY 或 INVALID；无硬件效果。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:79
+msgid "Serialized stream accumulator; initialize once, then keep private."
+msgstr "串行 stream 累积器；初始化一次后保持其私有。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:79
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:85
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:91
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:97
+msgid "Public Members"
+msgstr "公共成员"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:83
+msgid "wall_clock.h"
+msgstr "wall_clock.h"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:85
+msgid "Explicit UTC quality independent of monotonic deadlines."
+msgstr "独立于单调 deadline 的显式 UTC 质量。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:85
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:97
+msgid "Enums"
+msgstr "枚举"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:85
+msgid "Time quality; plain SNTP is a measurement, never authentication."
+msgstr "时间质量；普通 SNTP 是测量，不是认证。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:85
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:97
+msgid "Values:"
+msgstr "取值："
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:85
+msgid "Admit an explicit UTC measurement and expiry."
+msgstr "准入显式 UTC 测量和到期时间。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:85
+msgid ""
+"Task-only serialized operation; no I/O, heap or clock read. Product "
+"determines trust. UTC updates never modify deadlines."
+msgstr "仅 task 上下文串行操作；无 I/O、heap 或 clock read。产品判定信任，UTC 更新不修改 deadline。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:85
+msgid "[inout] Caller-owned state in one live monotonic domain."
+msgstr "[inout] 位于同一 live 单调域内的调用者状态。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:85
+msgid "[in] UTC/uncertainty/quality and finite observation time."
+msgstr "[in] UTC／不确定度／质量及有限观测时间。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:85
+msgid "[in] Finite absolute expiry after observation."
+msgstr "[in] 观测之后的有限绝对到期时间。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:85
+msgid "[in] Upper oscillator drift bound, at most 1000000."
+msgstr "[in] oscillator drift 上界，至多 1000000。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:85
+msgid "SUCCESS or INVALID; unchanged on failure."
+msgstr "SUCCESS 或 INVALID；失败保持不变。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:85
+msgid "Project UTC and bounded uncertainty at a monotonic snapshot."
+msgstr "在单调时间快照处投影 UTC 与有界不确定度。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:85
+msgid ""
+"Task-only, caller serializes updates. Trusted TLS consumers explicitly "
+"require quality TRUSTED; MEASURED is insufficient."
+msgstr "仅 task 上下文，由调用者串行化更新。可信 TLS consumer 显式要求 TRUSTED 质量；MEASURED 不足。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:85
+msgid "[in] Stable bridge, same live monotonic domain."
+msgstr "[in] 稳定 bridge，同一 live 单调域。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:85
+msgid "[in] Finite monotonic time, not before observation."
+msgstr "[in] 不早于观测的有限单调时间。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:85
+msgid "[out] Distinct value output, unchanged on failure."
+msgstr "[out] 独立值输出，失败保持不变。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:85
+msgid ""
+"SUCCESS, STATE for unknown/rollback, TIMEOUT at expiry, or OVERFLOW; no "
+"hidden refresh or trust upgrade."
+msgstr "SUCCESS，unknown／rollback 时 STATE，到期时 TIMEOUT，或 OVERFLOW；不隐式刷新或升级信任。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:85
+msgid "Validate one server reply and derive an SNTP observation."
+msgstr "验证一个 server reply，并导出 SNTP 观测。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:85
+msgid ""
+"Task-only bounded pure parsing. Caller verifies source IP, port and "
+"outstanding request identity. SNTP has no peer authentication; request "
+"matching does not establish trust."
+msgstr ""
+"仅 task 上下文的有界纯解析。调用者验证 source IP、port 和 outstanding request 身份。SNTP 无 peer "
+"认证；request 匹配不建立信任。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:85
+msgid "[in] Exactly 48 bytes, not retained."
+msgstr "[in] 恰好 48 字节，不保留。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:85
+msgid "[in] Must be 48 (extension/auth formats are unselected)."
+msgstr "[in] 必须为 48（不选择 extension／auth 格式）。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:85
+msgid "[in] Eight unpredictable transmitted timestamp bytes."
+msgstr "[in] 已发送的八字节不可预测 timestamp。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:85
+msgid "[in] Finite request send time in monotonic domain."
+msgstr "[in] 单调域内的有限 request 发送时间。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:85
+msgid "[in] Same-domain receive snapshot, not before send."
+msgstr "[in] 同域接收快照，不早于发送。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:85
+msgid "[in] Explicit NTP era, zero or one; no 2036 guess."
+msgstr "[in] 显式 NTP era，零或一；不猜测 2036。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:85
+msgid "[out] Distinct output, unchanged on failure."
+msgstr "[out] 独立输出，失败保持不变。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:85
+msgid ""
+"SUCCESS, INVALID for bad mode/stratum/leap/originate, or OVERFLOW; output "
+"quality always MEASURED."
+msgstr ""
+"SUCCESS，mode／stratum／leap／originate 错误时 INVALID，或 OVERFLOW；输出质量始终为 MEASURED。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:85
+msgid "Caller-owned immutable observation returned as a value."
+msgstr "以值返回的调用者不可变观测。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:85
+msgid "Serialized affine bridge; initialize to zero, treat fields private."
+msgstr "串行 affine bridge；初始化为零，字段视作私有。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:89
+msgid "xmodem.h"
+msgstr "xmodem.h"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:91
+msgid "Caller-driven XMODEM CRC-128 receive state machine."
+msgstr "调用者推进的 XMODEM CRC-128 接收状态机。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:91
+msgid "Typedefs"
+msgstr "类型定义"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:91
+msgid "Bounded block acceptance; SUCCESS means copied/committed locally."
+msgstr "有界 block 接纳；SUCCESS 表示本地已复制／提交。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:91
+msgid "Start CRC-128 receive and queue initial 'C' handshake."
+msgstr "开始 CRC-128 接收并将初始 'C' 握手字符入队。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:91
+msgid ""
+"Packet blocks are always 128 bytes, including sender padding. Product owns "
+"exact length, authorization, staging and erase."
+msgstr "packet block 始终为含发送方 padding 的 128 字节。精确长度、授权、staging 和 erase 归产品负责。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:91
+msgid "[out] Unused or quiescent caller storage."
+msgstr "[out] 未使用或没有在途调用的调用者存储。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:91
+msgid "[in] Bounded task callback, no reentry, retains no data."
+msgstr "[in] 有界 task callback，不重入，不保留数据。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:91
+msgid "[in] Stable callback state until receive completion."
+msgstr "[in] 稳定 callback 状态，保留到接收结束。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:91
+msgid "[in] Finite monotonic start snapshot."
+msgstr "[in] 有限单调起始快照。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:91
+msgid "[in] Finite whole-transfer deadline after now."
+msgstr "[in] 晚于 now 的有限整次传输 deadline。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:91
+msgid "[in] Nonzero bounded packet interval."
+msgstr "[in] 非零有界 packet 间隔。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:91
+msgid "[in] Nonzero maximum consecutive corrupt/timeouts."
+msgstr "[in] 非零的连续损坏／超时次数上限。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:91
+msgid "SUCCESS or INVALID; no transport I/O or allocation."
+msgstr "SUCCESS 或 INVALID；不执行 transport I/O 或分配。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:91
+msgid "Consume one received byte under finite session time."
+msgstr "在有限 session 时间内消费一个接收字节。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:91
+msgid ""
+"Valid new blocks call write exactly once; duplicate previous blocks only "
+"ACK. CRC is corruption detection, not signature."
+msgstr "合法新 block 恰好调用一次 write；重复的上一 block 仅 ACK。CRC 检测损坏，不是签名。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:91
+msgid "[inout] Serialized active state."
+msgstr "[inout] 串行 active 状态。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:91
+msgid "[in] Next wire byte."
+msgstr "[in] 下一个 wire byte。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:91
+msgid "[in] Same-domain nondecreasing finite snapshot."
+msgstr "[in] 同域、非递减的有限快照。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:91
+msgid ""
+"SUCCESS for progress/completion, BUSY when an outgoing control byte is "
+"pending (input not consumed), or failure."
+msgstr "推进／完成返回 SUCCESS，有待发 control byte 时返回 BUSY（不消费输入），或失败。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:91
+msgid "Advance timeout/retry without receiving data."
+msgstr "无接收数据时推进 timeout／retry。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:91
+msgid ""
+"Caller explicitly schedules progress and transmits queued controls; no "
+"hidden timer, retransmission task or worker."
+msgstr "调用者显式调度推进并发送已入队 control；无隐藏 timer、重传 task 或 worker。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:91
+msgid "[inout] Serialized initialized state."
+msgstr "[inout] 已初始化的串行状态。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:91
+msgid "[in] Same-domain finite monotonic snapshot."
+msgstr "[in] 同域有限单调快照。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:91
+msgid "SUCCESS, BUSY for active transfer, or latched failure."
+msgstr "SUCCESS、active transfer 时 BUSY，或锁存的失败。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:91
+msgid "Take one queued control byte for copying into transport."
+msgstr "取出一个已入队 control byte，供复制到 transport。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:91
+msgid "[out] Distinct output byte, unchanged if no control."
+msgstr "[out] 独立字节输出，无 control 时保持不变。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:91
+msgid ""
+"SUCCESS, EMPTY or INVALID; caller retains copied byte until transport "
+"accepts it. This call has no transport effects."
+msgstr "SUCCESS、EMPTY 或 INVALID；调用者保留复制字节直到 transport 接纳。本调用无 transport 效果。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:91
+msgid "Cancel local transfer after joining all calls/callbacks."
+msgstr "所有调用／callback 已 join 后取消本地传输。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:91
+msgid "Product may send CAN bytes explicitly, then settle transport."
+msgstr "产品可显式发送 CAN 取消控制字符，随后结清 transport。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:91
+msgid "[inout] Initialized serialized state."
+msgstr "[inout] 已初始化的串行状态。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:91
+msgid "CANCELLED, or INVALID; does not undo accepted blocks."
+msgstr "CANCELLED 或 INVALID；不撤销已接纳 block。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:91
+msgid "Caller-owned CRC-128 receiver, no UART, files or firmware policy."
+msgstr "调用者拥有的 CRC-128 receiver，无 UART、文件或固件策略。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:95
+msgid "at_client.h"
+msgstr "at_client.h"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:97
+msgid "Bounded single-owner AT command, URC and binary parsing."
+msgstr "有界单 owner AT command、URC 和 binary 解析。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:97
+msgid "Callback view, valid only until callback return."
+msgstr "callback view，仅在 callback 返回前有效。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:97
+msgid "Bind one caller-owned AT parser to an existing byte stream."
+msgstr "将调用者 AT parser 绑定到既有 byte stream。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:97
+msgid ""
+"Task-only serialized calls; no I/O/heap. Prefix strings are immutable, "
+"nonempty and retained until all users join."
+msgstr "仅 task 上下文串行调用；无 I/O／heap。prefix string 不可变、非空，保留到所有使用者 join。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:97
+msgid "[out] Unused/quiescent metadata, private after success."
+msgstr "[out] 未使用／没有在途调用的 metadata，成功后为私有状态。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:97
+msgid "[in] Disjoint caller buffers and stable callbacks/prefixes."
+msgstr "[in] 独立调用者 buffer 与稳定 callback／prefix。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:97
+msgid "SUCCESS or INVALID, unchanged on admission failure."
+msgstr "SUCCESS 或 INVALID；准入失败保持不变。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:97
+msgid "Copy one command and append CRLF without starting transport."
+msgstr "复制一条命令并追加 CRLF，不启动 transport。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:97
+msgid ""
+"Only one command is active. Standard OK/ERROR/+CME ERROR/ +CMS ERROR "
+"terminate it. Module-specific replies use events."
+msgstr ""
+"同一时刻只允许一条 active command。标准 OK／ERROR／+CME ERROR／+CMS ERROR 结束命令。模块特定 reply 经"
+" event 交付。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:97
+msgid "[inout] Initialized serialized healthy state."
+msgstr "[inout] 已初始化、串行且 healthy 的状态。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:97
+msgid "[in] Nonempty text, no NUL/CR/LF, copied before return."
+msgstr "[in] 非空文本，不含 NUL／CR／LF，返回前复制。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:97
+msgid "[in] Text byte count, excludes terminator."
+msgstr "[in] 文本字节数，不含终止符。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:97
+msgid "[in] Finite absolute deadline in the stream clock domain."
+msgstr "[in] stream clock 域内的有限绝对 deadline。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:97
+msgid "SUCCESS, INVALID, BUSY, EXHAUSTED, TIMEOUT or STATE."
+msgstr "SUCCESS、INVALID、BUSY、EXHAUSTED、TIMEOUT 或 STATE。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:97
+msgid "Advance immediate copying stream calls with explicit budget."
+msgstr "以显式预算推进即时复制的 stream 调用。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:97
+msgid ""
+"No waits/worker. Callbacks are bounded, cannot reenter any client operation "
+"except expect_binary. Timeout/overflow or I/O loss latches "
+"desynchronization; recover explicitly after the product has drained/reset "
+"the module to a known boundary."
+msgstr ""
+"无等待／worker。callback 必须有界，除 expect_binary 外不得重入任何 client 操作。timeout／overflow "
+"或 I/O 丢失锁存失同步；产品将模块排空／reset 到已知边界后再显式 recover。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:97
+msgid "[inout] Initialized state and all retained storage still live."
+msgstr "[inout] 已初始化状态及全部保留存储仍存活。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:97
+msgid "[in] Finite service deadline, bounded with command time."
+msgstr "[in] 有限 service deadline，与 command 时间共同约束。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:97
+msgid "[in] Nonzero maximum individual read/write calls."
+msgstr "[in] 独立 read／write 调用次数的非零上限。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:97
+msgid "SUCCESS for progress, BUSY for no progress, or failure."
+msgstr "推进时 SUCCESS，无进展时 BUSY，或失败。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:97
+msgid "Select the next exact bytes as binary, including CR/LF/NUL."
+msgstr "将后续精确字节选择为 binary，包含 CR／LF／NUL。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:97
+msgid ""
+"Payload is reported in callback-scoped chunks; the caller validates its "
+"module's length before invoking this method."
+msgstr "payload 以 callback 存活期内的 chunk 报告；调用者在调用本方法前验证模块给出的长度。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:97
+msgid "[inout] Serialized initialized parser, optionally in event."
+msgstr "[inout] 已初始化串行 parser，也可在 event 内。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:97
+msgid "[in] Positive exact module-announced binary length."
+msgstr "[in] 模块宣布的精确正数 binary 长度。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:97
+msgid "SUCCESS, INVALID, BUSY or STATE; no transport access."
+msgstr "SUCCESS、INVALID、BUSY 或 STATE；不访问 transport。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:97
+msgid "Reset software framing after external synchronization."
+msgstr "外部同步后 reset 软件分帧状态。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:97
+msgid "Abandons a timed-out command, never silently replays it."
+msgstr "放弃已超时 command，从不静默 replay。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:97
+msgid ""
+"[inout] All event/stream calls have returned; healthy module boundary and "
+"transport drain are independently established."
+msgstr "[inout] 所有 event／stream 调用已返回；healthy 模块边界与 transport 排空已独立建立。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:97
+msgid "SUCCESS, BUSY or INVALID; does not reset or probe hardware."
+msgstr "SUCCESS、BUSY 或 INVALID；不 reset 或 probe 硬件。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:97
+msgid "Explicit caller-owned state; fields private after initialization."
+msgstr "显式调用者状态；初始化后字段为私有。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/streams.md:97
+msgid "Stable assembly ports; no worker, ISR callbacks or UART ownership."
+msgstr "稳定装配端口；无 worker、ISR callback 或 UART owner 责任。"

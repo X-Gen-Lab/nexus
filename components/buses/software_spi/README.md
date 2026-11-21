@@ -25,6 +25,8 @@ face／count 别名拒绝。完整 opaque GPIO／clock context 范围由调用�
 每次同步返回结束 payload 访问。SUCCESS 另外要求全部 bits、延时及 CS／SCK／MOSI
 inactive 撤回成功。一旦尝试 select，之后错误即锁存 fault，即使 idle 清理成功；
 显式 recover 或 stop 成功前拒绝新传输。
+最终 idle GPIO callback 返回后再次观察 deadline 和单调 clock；撤回期间的抢占、
+clock 回退或非有限值不能以 SUCCESS 返回，已完成 byte count 仍保留。
 
 CS／clock GPIO 写入失败保留同一 pin owner 和绑定，不宣称物理撤回、不保留 TX／RX
 指针，也不重放 byte。recover 只重试三个 idle output；三个均成功后 stop 才解绑，

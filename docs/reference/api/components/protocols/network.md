@@ -198,6 +198,34 @@ static composition. They are not ordinary portable consumer faces or stable
 binary layout promises. Keep their explicit storage targets and supplier
 requirements private to that translation unit.
 
+## Explicit managed IPv4 services and listeners
+
+`Nexus::LwIPManaged` and `Nexus::LwIPManagedTCP` select the copied-RX managed
+IPv4 profile with upstream DHCP, DNS and ACD. It does not change the default
+static-address profile. Choose exactly one copied, loaned or managed stack
+profile per image. Ordinary service callers link `Nexus::LwIPManagedServices`
+and include `lwip_services.h`; only composition links
+`Nexus::LwIPManagedServicesStorage` for the exact supplier-backed state.
+
+UDP retains one complete copied datagram in caller RX storage; insufficient
+receive capacity leaves it pending. Oversized/full input drops are counted,
+without another queue. DHCP start admits discovery rather than proving a lease.
+DNS cancellation or expiry cannot revoke the upstream callback's context;
+continue explicit network/timer service until it retires. Keep adapter, clock
+and query storage live through that result. DNS itself authenticates no peer.
+
+The selected TCP target also exposes `lwip_listener.h`. Composition provides its
+exact listener layout through `lwip_listener_storage.h` and an explicitly sized
+array of existing TCP client slots. For the managed profile, ordinary listeners
+link `Nexus::LwIPManagedTCP`, while only static composition links
+`Nexus::LwIPManagedTCPStorage`; copied and loaned callers use their corresponding
+TCP storage targets listed above. Full capacity rejects a new connection;
+there is no hidden backlog. Listener stop closes only new connection admission.
+Close/abort every client and join all face users before reclaiming the array or
+withdrawing network/MAC resources. See the
+[managed-profile contract](../../../../../components/protocols/network/README.md#显式-managed-ipv4-profile)
+for pool sharing, copied payload limits and the selected progress obligations.
+
 ## Public declarations
 
 ### byte_stream.h
@@ -263,5 +291,29 @@ requirements private to that translation unit.
 ### core_mqtt_storage.h
 
 ```{doxygenfile} components/protocols/mqtt/include/nexus/mqtt/core_mqtt_storage.h
+:project: nexus
+```
+
+### lwip_listener.h
+
+```{doxygenfile} components/protocols/network/include/nexus/network/lwip_listener.h
+:project: nexus
+```
+
+### lwip_services.h
+
+```{doxygenfile} components/protocols/network/include/nexus/network/lwip_services.h
+:project: nexus
+```
+
+### lwip_listener_storage.h
+
+```{doxygenfile} components/protocols/network/include/nexus/network/lwip_listener_storage.h
+:project: nexus
+```
+
+### lwip_services_storage.h
+
+```{doxygenfile} components/protocols/network/include/nexus/network/lwip_services_storage.h
 :project: nexus
 ```

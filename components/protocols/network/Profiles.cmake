@@ -34,7 +34,22 @@ function(nexus_lwip_profile suffix adapter_alias tcp_alias loaned)
     set(storage "nexus_lwip${suffix}_storage")
     set(tcp "nexus_lwip${suffix}_tcp")
     set(tcp_storage "nexus_lwip${suffix}_tcp_storage")
-    add_library("${vendor}" STATIC EXCLUDE_FROM_ALL ${nexus_lwip_sources})
+    set(managed FALSE)
+    if(ARGC EQUAL 5)
+        set(managed "${ARGV4}")
+    elseif(ARGC GREATER 5)
+        message(FATAL_ERROR "Invalid private lwIP profile arguments")
+    endif()
+    set(profile_sources ${nexus_lwip_sources})
+    if(managed)
+        list(
+            APPEND profile_sources
+            "${nexus_lwip_source}/src/core/dns.c"
+            "${nexus_lwip_source}/src/core/ipv4/dhcp.c"
+            "${nexus_lwip_source}/src/core/ipv4/acd.c"
+        )
+    endif()
+    add_library("${vendor}" STATIC EXCLUDE_FROM_ALL ${profile_sources})
     nexus_apply_target_policy("${vendor}")
     target_include_directories(
         "${vendor}"
@@ -54,7 +69,12 @@ function(nexus_lwip_profile suffix adapter_alias tcp_alias loaned)
         )
         set(profile loaned_rx)
     else()
-        set(profile copied_rx)
+        if(managed)
+            set(profile managed_copied_rx)
+            target_compile_definitions("${vendor}" PUBLIC NEXUS_LWIP_MANAGED=1)
+        else()
+            set(profile copied_rx)
+        endif()
     endif()
     set_property(
         TARGET "${vendor}"
@@ -133,4 +153,37 @@ function(nexus_lwip_profile suffix adapter_alias tcp_alias loaned)
             INTERFACE NEXUS_LWIP_LOANED_RX=1
         )
     endif()
+endfunction()
+
+# Services bind to this one managed stack, with no additional executor.
+function(nexus_lwip_managed_services)
+    add_library(
+        nexus_lwip_managed_services
+        STATIC
+        EXCLUDE_FROM_ALL
+        "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/src/lwip_services.c"
+    )
+    target_include_directories(
+        nexus_lwip_managed_services
+        PUBLIC "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/include"
+    )
+    target_link_libraries(
+        nexus_lwip_managed_services
+        PUBLIC Nexus::Core
+        PRIVATE
+            Nexus::LwIPManagedStorage
+            nexus_build_options
+            nexus_owned_warnings
+    )
+    nexus_apply_target_policy(nexus_lwip_managed_services)
+    add_library(Nexus::LwIPManagedServices ALIAS nexus_lwip_managed_services)
+    add_library(nexus_lwip_managed_services_storage INTERFACE)
+    target_link_libraries(
+        nexus_lwip_managed_services_storage
+        INTERFACE Nexus::LwIPManagedServices Nexus::LwIPManagedStorage
+    )
+    add_library(
+        Nexus::LwIPManagedServicesStorage
+        ALIAS nexus_lwip_managed_services_storage
+    )
 endfunction()

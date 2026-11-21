@@ -74,6 +74,19 @@ class SDKPublicCompileInputTests(unittest.TestCase):
                 with self.subTest(path=path, command=command):
                     self.assertFalse(self.private_input(["-I", path], command=command))
 
+    def test_flat_algorithm_public_tree_does_not_authorize_its_backend(self):
+        public = self.sdk / "components/algorithms/include"
+        (public / "nexus/algorithms").mkdir(parents=True)
+        for command in (False, True):
+            with self.subTest(command=command):
+                self.assertFalse(self.private_input(["-I", public], command=command))
+                self.assertTrue(self.private_input(
+                    ["-I", self.sdk / "components/algorithms/cmsis_dsp"],
+                    command=command))
+                self.assertTrue(self.private_input(
+                    ["-I", self.sdk / "vendors/arm/CMSIS_DSP/Include"],
+                    command=command))
+
     def test_clock_owner_storage_compiles_with_only_public_headers(self):
         source = self.root / "clock-owner.c"
         source.write_text(
@@ -760,7 +773,7 @@ class SDKConsumerParallelTests(unittest.TestCase):
                         self.sdk / "cmake/package/verification/common_services")
         shutil.copytree(ROOT / "cmake/package/verification/secure_services",
                         self.sdk / "cmake/package/verification/secure_services")
-        for scenario in ("device_tmp117", "image_window", "loaned_rx",
+        for scenario in ("common_components", "device_tmp117", "image_window", "loaned_rx",
                          "mcuboot_control", "mcuboot_boot", "smbus"):
             shutil.copytree(ROOT / "cmake/package/verification" / scenario,
                             self.sdk / "cmake/package/verification" / scenario)
@@ -1170,7 +1183,7 @@ class SDKConsumerParallelTests(unittest.TestCase):
                     if not smoke.startswith("native-time-")}
         retained.update(item.name for item in self.consumer.SERVICE_CONSUMERS
                         if item.arm and item.scenario not in
-                        {"image_window", "mcuboot_control"})
+                        {"image_window", "mcuboot_control", "common_components"})
         commands = [command for command in self.commands
                     if any(arg.endswith("retention.py") for arg in command)]
         self.assertEqual({Path(command[command.index("--elf") + 1]).parents[1]
