@@ -53,6 +53,7 @@ _external_types = (
     'nx_i2c_port nx_pwm_port nx_spi_endpoint nx_spi_port nx_uart_port '
     'nx_watchdog_port nx_tls_runtime nx_tls_session nx_mqtt_session nx_mqtt_memory '
     'nx_lwip_adapter nx_lwip_rx_slot nx_lwip_rx_piece tcp_pcb pbuf pbuf_custom '
+    'nx_task nx_permanent_task nx_notify nx_queue nx_channel nx_channel_waiter '
     'mbedtls_ssl_context mbedtls_ssl_config mbedtls_x509_crt mbedtls_pk_context '
     'MQTTPubAckInfo_t MQTTContext_t netif'
 ).split()

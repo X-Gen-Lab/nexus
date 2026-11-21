@@ -10,7 +10,7 @@
 #include "nexus/components/bmp280_spi.h"
 #include "nexus/components/spi_owner.h"
 #include "nexus/io/native/model.h"
-#include "nexus/os/native.h"
+#include "nexus/os/storage.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

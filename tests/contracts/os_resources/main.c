@@ -8,9 +8,15 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "nexus/os/freertos.h"
+#include "nexus/os/storage.h"
 #include "nexus_config.h"
 
 #define NX_OS_PROBE_STORAGE __attribute__((used, section(".bss.os.probes")))
+
+/** \brief Explicit empty bootstrap for this software-only link fixture. */
+static void startup(void* context) {
+    (void)context;
+}
 
 void _start(void);
 void SVC_Handler(void);
@@ -19,13 +25,13 @@ void SysTick_Handler(void);
 
 StaticTask_t nx_os_tcb__bytes NX_OS_PROBE_STORAGE;
 nx_wait_port_t nx_os_wait_port__bytes NX_OS_PROBE_STORAGE;
-nx_freertos_notify_t nx_os_notify__bytes NX_OS_PROBE_STORAGE;
+nx_notify_t nx_os_notify__bytes NX_OS_PROBE_STORAGE;
 nx_freertos_direct_notify_t nx_os_direct_notify__bytes NX_OS_PROBE_STORAGE;
-nx_freertos_queue_t nx_os_raw_queue__bytes NX_OS_PROBE_STORAGE;
-nx_freertos_closable_queue_t nx_os_closable_queue__bytes NX_OS_PROBE_STORAGE;
-nx_freertos_queue_waiter_t nx_os_queue_waiter__bytes NX_OS_PROBE_STORAGE;
-nx_freertos_task_t nx_os_joinable_task__bytes NX_OS_PROBE_STORAGE;
-nx_freertos_permanent_task_t nx_os_permanent_task__bytes NX_OS_PROBE_STORAGE;
+nx_queue_t nx_os_raw_queue__bytes NX_OS_PROBE_STORAGE;
+nx_channel_t nx_os_closable_queue__bytes NX_OS_PROBE_STORAGE;
+nx_channel_waiter_t nx_os_queue_waiter__bytes NX_OS_PROBE_STORAGE;
+nx_task_t nx_os_joinable_task__bytes NX_OS_PROBE_STORAGE;
+nx_permanent_task_t nx_os_permanent_task__bytes NX_OS_PROBE_STORAGE;
 _Alignas(8) StackType_t nx_os_join_stack__bytes[128] NX_OS_PROBE_STORAGE;
 _Alignas(8) StackType_t nx_os_permanent_stack__bytes[128] NX_OS_PROBE_STORAGE;
 uint32_t nx_os_raw_payload__bytes[3] NX_OS_PROBE_STORAGE;
@@ -63,61 +69,57 @@ static bool not_ready(void* context) {
 
 /** \brief Emit true target-ABI sizeof as absolute ELF symbols. */
 static void object_size_symbols(void) {
-    __asm__ volatile(".global __nexus_os_size_tcb\n"
-                     ".equ __nexus_os_size_tcb,%c0\n"
-                     ".global __nexus_os_size_wait_port\n"
-                     ".equ __nexus_os_size_wait_port,%c1\n"
-                     ".global __nexus_os_size_joinable_task\n"
-                     ".equ __nexus_os_size_joinable_task,%c2\n"
-                     ".global __nexus_os_size_permanent_task\n"
-                     ".equ __nexus_os_size_permanent_task,%c3\n"
-                     ".global __nexus_os_size_notify\n"
-                     ".equ __nexus_os_size_notify,%c4\n"
-                     ".global __nexus_os_size_direct_notify\n"
-                     ".equ __nexus_os_size_direct_notify,%c5\n"
-                     ".global __nexus_os_size_raw_queue\n"
-                     ".equ __nexus_os_size_raw_queue,%c6\n"
-                     ".global __nexus_os_size_closable_queue\n"
-                     ".equ __nexus_os_size_closable_queue,%c7\n"
-                     ".global __nexus_os_size_queue_waiter\n"
-                     ".equ __nexus_os_size_queue_waiter,%c8\n"
-                     ".global __nexus_os_size_semaphore\n"
-                     ".equ __nexus_os_size_semaphore,%c9\n"
-                     ".global __nexus_os_size_stack_word\n"
-                     ".equ __nexus_os_size_stack_word,%c10\n"
-                     :
-                     : "i"(sizeof(StaticTask_t)), "i"(sizeof(nx_wait_port_t)),
-                       "i"(sizeof(nx_freertos_task_t)),
-                       "i"(sizeof(nx_freertos_permanent_task_t)),
-                       "i"(sizeof(nx_freertos_notify_t)),
-                       "i"(sizeof(nx_freertos_direct_notify_t)),
-                       "i"(sizeof(nx_freertos_queue_t)),
-                       "i"(sizeof(nx_freertos_closable_queue_t)),
-                       "i"(sizeof(nx_freertos_queue_waiter_t)),
-                       "i"(sizeof(StaticSemaphore_t)),
-                       "i"(sizeof(StackType_t)));
+    __asm__ volatile(
+        ".global __nexus_os_size_tcb\n"
+        ".equ __nexus_os_size_tcb,%c0\n"
+        ".global __nexus_os_size_wait_port\n"
+        ".equ __nexus_os_size_wait_port,%c1\n"
+        ".global __nexus_os_size_joinable_task\n"
+        ".equ __nexus_os_size_joinable_task,%c2\n"
+        ".global __nexus_os_size_permanent_task\n"
+        ".equ __nexus_os_size_permanent_task,%c3\n"
+        ".global __nexus_os_size_notify\n"
+        ".equ __nexus_os_size_notify,%c4\n"
+        ".global __nexus_os_size_direct_notify\n"
+        ".equ __nexus_os_size_direct_notify,%c5\n"
+        ".global __nexus_os_size_raw_queue\n"
+        ".equ __nexus_os_size_raw_queue,%c6\n"
+        ".global __nexus_os_size_closable_queue\n"
+        ".equ __nexus_os_size_closable_queue,%c7\n"
+        ".global __nexus_os_size_queue_waiter\n"
+        ".equ __nexus_os_size_queue_waiter,%c8\n"
+        ".global __nexus_os_size_semaphore\n"
+        ".equ __nexus_os_size_semaphore,%c9\n"
+        ".global __nexus_os_size_stack_word\n"
+        ".equ __nexus_os_size_stack_word,%c10\n"
+        :
+        : "i"(sizeof(StaticTask_t)), "i"(sizeof(nx_wait_port_t)),
+          "i"(sizeof(nx_task_t)), "i"(sizeof(nx_permanent_task_t)),
+          "i"(sizeof(nx_notify_t)), "i"(sizeof(nx_freertos_direct_notify_t)),
+          "i"(sizeof(nx_queue_t)), "i"(sizeof(nx_channel_t)),
+          "i"(sizeof(nx_channel_waiter_t)), "i"(sizeof(StaticSemaphore_t)),
+          "i"(sizeof(StackType_t)));
 }
 
 /** \brief A retained link consumer, not executable SoC/Board startup. */
 void _start(void) {
     object_size_symbols();
-    result_sink += (uint32_t)nx_freertos_notify_init(&nx_os_notify__bytes);
-    nx_os_wait_port__bytes = nx_freertos_notify_port(&nx_os_notify__bytes);
+    result_sink += (uint32_t)nx_notify_init(&nx_os_notify__bytes);
+    nx_os_wait_port__bytes = nx_notify_port(&nx_os_notify__bytes);
     result_sink +=
         (uint32_t)nx_os_wait_port__bytes.arm(nx_os_wait_port__bytes.context);
     result_sink +=
         (uint32_t)nx_os_wait_port__bytes.wake(nx_os_wait_port__bytes.context);
     result_sink +=
         (uint32_t)nx_wait_until(&nx_os_wait_port__bytes, not_ready, NULL, 1);
-    result_sink += (uint32_t)nx_freertos_notify_destroy(&nx_os_notify__bytes);
-    result_sink += (uint32_t)nx_freertos_task_start(
-        &nx_os_joinable_task__bytes, "join", nx_os_join_stack__bytes, 128, 1,
-        returning_entry, NULL);
-    result_sink +=
-        (uint32_t)nx_freertos_task_join(&nx_os_joinable_task__bytes, 1);
-    result_sink += (uint32_t)nx_freertos_permanent_task_start(
-        &nx_os_permanent_task__bytes, "keep", nx_os_permanent_stack__bytes, 128,
-        1, permanent_entry, NULL);
+    result_sink += (uint32_t)nx_notify_destroy(&nx_os_notify__bytes);
+    result_sink += (uint32_t)nx_task_start(
+        &nx_os_joinable_task__bytes, "join", nx_os_join_stack__bytes,
+        (128) * sizeof(StackType_t), 1, returning_entry, NULL);
+    result_sink += (uint32_t)nx_task_join_until(&nx_os_joinable_task__bytes, 1);
+    result_sink += (uint32_t)nx_permanent_task_start(
+        &nx_os_permanent_task__bytes, "keep", nx_os_permanent_stack__bytes,
+        (128) * sizeof(StackType_t), 1, permanent_entry, NULL);
     result_sink += (uint32_t)nx_freertos_direct_notify_init(
         &nx_os_direct_notify__bytes, xTaskGetCurrentTaskHandle(), 0);
     nx_wait_port_t direct =
@@ -128,35 +130,28 @@ void _start(void) {
     }
     result_sink += (uint32_t)nx_freertos_direct_notify_destroy(
         &nx_os_direct_notify__bytes);
-    result_sink += (uint32_t)nx_freertos_queue_init(
+    result_sink += (uint32_t)nx_queue_init(
         &nx_os_raw_queue__bytes, (uint8_t*)nx_os_raw_payload__bytes,
         sizeof(nx_os_raw_payload__bytes), 3, sizeof(uint32_t));
     uint32_t item = result_sink;
     result_sink +=
-        (uint32_t)nx_freertos_queue_send(&nx_os_raw_queue__bytes, &item, 1);
+        (uint32_t)nx_queue_send_until(&nx_os_raw_queue__bytes, &item, 1);
     result_sink +=
-        (uint32_t)nx_freertos_queue_receive(&nx_os_raw_queue__bytes, &item, 1);
-    result_sink += (uint32_t)nx_freertos_queue_send_until(
-        &nx_os_raw_queue__bytes, &item, 1);
-    result_sink += (uint32_t)nx_freertos_queue_receive_until(
-        &nx_os_raw_queue__bytes, &item, 1);
-    result_sink += (uint32_t)nx_freertos_queue_destroy(&nx_os_raw_queue__bytes);
-    result_sink +=
-        (uint32_t)nx_freertos_queue_waiter_init(&nx_os_queue_waiter__bytes);
-    result_sink += (uint32_t)nx_freertos_closable_queue_init(
+        (uint32_t)nx_queue_receive_until(&nx_os_raw_queue__bytes, &item, 1);
+    result_sink += (uint32_t)nx_queue_destroy(&nx_os_raw_queue__bytes);
+    result_sink += (uint32_t)nx_channel_waiter_init(&nx_os_queue_waiter__bytes);
+    result_sink += (uint32_t)nx_channel_init(
         &nx_os_closable_queue__bytes, (uint8_t*)nx_os_closable_payload__bytes,
         sizeof(nx_os_closable_payload__bytes), 3, sizeof(uint32_t), 1);
-    result_sink += (uint32_t)nx_freertos_closable_queue_send_until(
+    result_sink += (uint32_t)nx_channel_send_until(
         &nx_os_closable_queue__bytes, &item, 1, &nx_os_queue_waiter__bytes);
-    result_sink += (uint32_t)nx_freertos_closable_queue_receive_until(
+    result_sink += (uint32_t)nx_channel_receive_until(
         &nx_os_closable_queue__bytes, &item, 1, &nx_os_queue_waiter__bytes);
-    result_sink += (uint32_t)nx_freertos_closable_queue_close(
-        &nx_os_closable_queue__bytes);
-    result_sink += (uint32_t)nx_freertos_closable_queue_destroy(
-        &nx_os_closable_queue__bytes);
+    result_sink += (uint32_t)nx_channel_close(&nx_os_closable_queue__bytes);
+    result_sink += (uint32_t)nx_channel_destroy(&nx_os_closable_queue__bytes);
     result_sink +=
-        (uint32_t)nx_freertos_queue_waiter_destroy(&nx_os_queue_waiter__bytes);
-    vTaskStartScheduler();
+        (uint32_t)nx_channel_waiter_destroy(&nx_os_queue_waiter__bytes);
+    (void)nx_os_run(startup, NULL);
     for (;;) {
     }
 }

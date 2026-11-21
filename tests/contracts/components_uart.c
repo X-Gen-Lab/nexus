@@ -10,7 +10,7 @@
 #define _POSIX_C_SOURCE 200809L
 #include "nexus/components/uart_owner.h"
 #include "nexus/io/native/model.h"
-#include "nexus/os/native.h"
+#include "nexus/os/storage.h"
 #include <sched.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -368,7 +368,7 @@ static void producer_task(void* context) {
     nx_uart_owner_operation_t operation = {bytes, sizeof(bytes)};
     for (unsigned i = 0; i < 1000; ++i) {
         /* Bound each operation's admission and settlement, not throughput. */
-        uint64_t bound = nx_native_now_us() + UINT64_C(5000000);
+        uint64_t bound = nx_os_now_us() + UINT64_C(5000000);
         bytes[1] = (uint8_t)i;
         CHECK(nx_request_prepare(&request, NX_DEADLINE_NEVER) == NX_SUCCESS);
         nx_owner_ticket_t ticket;
@@ -377,7 +377,7 @@ static void producer_task(void* context) {
             admitted = nx_bus_owner_submit(&concurrent->fixture->owner,
                                            &request, &operation, NULL, &ticket);
             CHECK(admitted == NX_SUCCESS || admitted == NX_ERROR_EXHAUSTED);
-            CHECK(nx_native_now_us() < bound);
+            CHECK(nx_os_now_us() < bound);
             if (admitted != NX_SUCCESS) {
                 CHECK(nx_request_state(&request) == NX_REQUEST_READY);
                 sched_yield();
@@ -388,7 +388,7 @@ static void producer_task(void* context) {
                   NX_ERROR_STATE);
         }
         while (nx_request_state(&request) != NX_REQUEST_SETTLED) {
-            CHECK(nx_native_now_us() < bound);
+            CHECK(nx_os_now_us() < bound);
             sched_yield();
         }
         nx_result_t result;
@@ -404,7 +404,7 @@ static void producer_task(void* context) {
 /** \brief Continue controller progress while producer tasks wait and join. */
 static void executor_task(void* context) {
     concurrent_t* concurrent = context;
-    uint64_t bound = nx_native_now_us() + UINT64_C(5000000);
+    uint64_t bound = nx_os_now_us() + UINT64_C(5000000);
     uint32_t settled = 0;
     for (;;) {
         uint32_t progress =
@@ -412,9 +412,9 @@ static void executor_task(void* context) {
         if (progress != settled) {
             /* Only a checked successful frame renews the inactivity bound. */
             settled = progress;
-            bound = nx_native_now_us() + UINT64_C(5000000);
+            bound = nx_os_now_us() + UINT64_C(5000000);
         }
-        CHECK(nx_native_now_us() < bound);
+        CHECK(nx_os_now_us() < bound);
         nx_result_t result = nx_bus_owner_service(&concurrent->fixture->owner);
         CHECK(result == NX_SUCCESS || result == NX_ERROR_BUSY);
         if (__atomic_load_n(&concurrent->done, __ATOMIC_ACQUIRE) == 3 &&
@@ -432,22 +432,21 @@ static void multi_producer(void) {
     concurrent_t concurrent = {&fixture, 0, 0};
     producer_t producers[3] = {
         {&concurrent, 1}, {&concurrent, 2}, {&concurrent, 3}};
-    nx_native_task_t tasks[4] = {0};
+    nx_task_t tasks[4] = {0};
     void* stacks[4];
     for (size_t i = 0; i < 4; ++i) {
         /* Host instrumentation storage, not an MCU stack budget. */
         CHECK(posix_memalign(&stacks[i], 4096, 256U * 1024U) == 0);
-        CHECK(nx_native_task_start(&tasks[i], stacks[i], 256U * 1024U,
-                                   i == 0 ? executor_task : producer_task,
-                                   i == 0 ? (void*)&concurrent
-                                          : (void*)&producers[i - 1]) ==
-              NX_SUCCESS);
+        CHECK(nx_task_start(&tasks[i], "fixture", stacks[i], 256U * 1024U, 0U,
+                            i == 0 ? executor_task : producer_task,
+                            i == 0 ? (void*)&concurrent
+                                   : (void*)&producers[i - 1]) == NX_SUCCESS);
     }
     for (size_t i = 1; i < 4; ++i) {
-        CHECK(nx_native_task_join(&tasks[i]) == NX_SUCCESS);
+        CHECK(nx_task_join_until(&tasks[i], NX_DEADLINE_NEVER) == NX_SUCCESS);
         free(stacks[i]);
     }
-    CHECK(nx_native_task_join(&tasks[0]) == NX_SUCCESS);
+    CHECK(nx_task_join_until(&tasks[0], NX_DEADLINE_NEVER) == NX_SUCCESS);
     free(stacks[0]);
     CHECK(__atomic_load_n(&concurrent.settled, __ATOMIC_ACQUIRE) == 3000);
     CHECK(nx_native_uart_transmitted() == sizeof(fixture.transmitted));

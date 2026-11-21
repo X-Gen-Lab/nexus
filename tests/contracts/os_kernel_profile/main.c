@@ -7,6 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "nexus/os/freertos.h"
+#include "nexus/os/storage.h"
 #include "nexus/os/tick.h"
 #include "nexus_config.h"
 #if NEXUS_OS_TRACE
@@ -16,6 +17,11 @@
 #if NEXUS_OS_TICKLESS
 #include "nexus/os/lowpower.h"
 #endif
+
+/** \brief Explicit empty bootstrap for this software-only link fixture. */
+static void startup(void* context) {
+    (void)context;
+}
 
 void _start(void);
 void SVC_Handler(void);
@@ -28,7 +34,7 @@ static void (*const exception_references[])(void)
 static volatile uint32_t observed_tick_hz;
 static volatile uint32_t counter;
 static nx_freertos_direct_notify_t direct;
-static nx_freertos_permanent_task_t permanent_task;
+static nx_permanent_task_t permanent_task;
 static StackType_t task_stack[256];
 
 static void permanent_entry(void* context) {
@@ -136,13 +142,11 @@ void _start(void) {
                      ".equ __nexus_os_size_queue_waiter,%c8\n"
                      :
                      : "i"(sizeof(StaticTask_t)), "i"(sizeof(nx_wait_port_t)),
-                       "i"(sizeof(nx_freertos_task_t)),
-                       "i"(sizeof(nx_freertos_permanent_task_t)),
-                       "i"(sizeof(nx_freertos_notify_t)),
+                       "i"(sizeof(nx_task_t)), "i"(sizeof(nx_permanent_task_t)),
+                       "i"(sizeof(nx_notify_t)),
                        "i"(sizeof(nx_freertos_direct_notify_t)),
-                       "i"(sizeof(nx_freertos_queue_t)),
-                       "i"(sizeof(nx_freertos_closable_queue_t)),
-                       "i"(sizeof(nx_freertos_queue_waiter_t)));
+                       "i"(sizeof(nx_queue_t)), "i"(sizeof(nx_channel_t)),
+                       "i"(sizeof(nx_channel_waiter_t)));
     observed_tick_hz = (uint32_t)configTICK_RATE_HZ;
 #if NEXUS_OS_TRACE
     (void)nx_diagnostic_ring_init(&trace_ring, trace_events, 8u);
@@ -156,9 +160,10 @@ void _start(void) {
     if (port.wait != NULL) {
         (void)port.wait(port.context, 0u, 1u);
     }
-    (void)nx_freertos_permanent_task_start(
-        &permanent_task, "worker", task_stack, 256u, 0u, permanent_entry, NULL);
-    vTaskStartScheduler();
+    (void)nx_permanent_task_start(&permanent_task, "worker", task_stack,
+                                  (256u) * sizeof(StackType_t), 0u,
+                                  permanent_entry, NULL);
+    (void)nx_os_run(startup, NULL);
     for (;;) {
     }
 }

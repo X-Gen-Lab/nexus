@@ -42,7 +42,9 @@ add_library(
     contract_os_freertos_posix
     STATIC
     "${NEXUS_SOURCE_DIR}/os/freertos/freertos.c"
+    "${NEXUS_SOURCE_DIR}/os/freertos/task_runtime.c"
 )
+_nexus_os_backend(contract_os_freertos_posix freertos)
 target_include_directories(
     contract_os_freertos_posix
     PUBLIC

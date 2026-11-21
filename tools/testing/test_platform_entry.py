@@ -78,6 +78,66 @@ nexus_add_platform(ASSEMBLY "{ASSEMBLY}")
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("only one resolved Nexus assembly", result.stdout + result.stderr)
 
+    def test_os_capabilities_bind_to_the_actual_selected_target(self):
+        self.assert_success(f'''\
+set(NEXUS_TEST_SUPPORT ON)
+nexus_add_platform(ASSEMBLY "{ASSEMBLY}")
+add_executable(app main.c)
+nexus_require_os_capabilities(TARGET app
+    CAPABILITIES tasks notify queue channel join_until sleep_until)
+target_link_libraries(app PRIVATE Nexus::OS)
+''')
+
+    def test_os_capabilities_reject_missing_native_irq_support(self):
+        result = self.configure(f'''\
+set(NEXUS_TEST_SUPPORT ON)
+nexus_add_platform(ASSEMBLY "{ASSEMBLY}")
+add_executable(app main.c)
+nexus_require_os_capabilities(TARGET app CAPABILITIES isr_notify)
+''')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("OS capability isr_notify required by app",
+                      result.stdout + result.stderr)
+
+    def test_os_capabilities_require_explicit_assembly(self):
+        result = self.configure('''\
+add_executable(app main.c)
+nexus_require_os_capabilities(TARGET app CAPABILITIES tasks)
+''')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("requires an explicit Nexus assembly",
+                      result.stdout + result.stderr)
+
+    def test_one_image_rejects_two_actual_task_backends(self):
+        result = self.configure('''\
+set(NEXUS_TEST_SUPPORT ON)
+set(input "${CMAKE_CURRENT_BINARY_DIR}/threadx.toml")
+file(WRITE "${input}" "schema=2\\nboard=\\\"native_reference\\\"\\n"
+    "backend=\\\"threadx\\\"\\nclock=\\\"model\\\"\\n"
+    "[memory]\\nmain_stack_bytes=2048\\n")
+nexus_add_platform(ASSEMBLY "${input}")
+add_executable(app main.c)
+target_link_libraries(app PRIVATE Nexus::OSNative Nexus::OSThreadX)
+''')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("INTERFACE_NEXUS_OS_BACKEND", result.stdout + result.stderr)
+
+    def test_host_threadx_does_not_claim_hardware_irq_notifications(self):
+        result = self.configure('''\
+set(NEXUS_TEST_SUPPORT ON)
+set(input "${CMAKE_CURRENT_BINARY_DIR}/threadx.toml")
+file(WRITE "${input}" "schema=2\\nboard=\\\"native_reference\\\"\\n"
+    "backend=\\\"threadx\\\"\\nclock=\\\"model\\\"\\n"
+    "[memory]\\nmain_stack_bytes=2048\\n")
+nexus_add_platform(ASSEMBLY "${input}")
+add_executable(app main.c)
+nexus_require_os_capabilities(TARGET app CAPABILITIES priority)
+nexus_require_os_capabilities(TARGET app CAPABILITIES isr_notify)
+''')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("OS capability isr_notify required by app",
+                      result.stdout + result.stderr)
+
     def test_unknown_or_repeated_arguments_reject(self):
         for arguments in ('', 'UNKNOWN value',
                           f'ASSEMBLY "{ASSEMBLY}" ASSEMBLY "{ASSEMBLY}"'):

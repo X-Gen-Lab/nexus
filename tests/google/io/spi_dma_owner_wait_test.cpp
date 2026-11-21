@@ -11,7 +11,7 @@
 #include "nexus/components/spi_dma_owner.h"
 #include "nexus/io/native/model.h"
 #include "nexus/io/native/spi_dma_model.h"
-#include "nexus/os/native.h"
+#include "nexus/os/storage.h"
 #include "spi_dma_provider.h"
 #include <atomic>
 #include <condition_variable>
@@ -54,8 +54,8 @@ class SPIDMAOwnerWait : public testing::Test {
     nx_owner_slot_t slots[2]{};
     nx_owner_observer_t observer{};
     nx_owner_observation_t observed{};
-    nx_native_notify_t owner_event{};
-    nx_native_notify_t completion_events[2]{};
+    nx_notify_t owner_event{};
+    nx_notify_t completion_events[2]{};
     unsigned events_ready = 0U;
     nx_wait_port_t owner_wake{};
     const nx_irq_wake_t hint{&owner_wake,
@@ -96,14 +96,13 @@ class SPIDMAOwnerWait : public testing::Test {
                 &sequence, &nx_native_spi_dma_sequence_backend, &hardware),
             NX_SUCCESS);
         ASSERT_EQ(nx_native_spi_dma_model_automatic(&port, false), NX_SUCCESS);
-        ASSERT_EQ(nx_native_notify_init(&owner_event), NX_SUCCESS);
+        ASSERT_EQ(nx_notify_init(&owner_event), NX_SUCCESS);
         ++events_ready;
-        owner_wake = nx_native_notify_port(&owner_event);
+        owner_wake = nx_notify_port(&owner_event);
         for (unsigned i = 0U; i < 2U; ++i) {
-            ASSERT_EQ(nx_native_notify_init(&completion_events[i]), NX_SUCCESS);
+            ASSERT_EQ(nx_notify_init(&completion_events[i]), NX_SUCCESS);
             ++events_ready;
-            producer[i].completion =
-                nx_native_notify_port(&completion_events[i]);
+            producer[i].completion = nx_notify_port(&completion_events[i]);
             producer[i].tx[0] = static_cast<uint16_t>(0x1234U + i);
             producer[i].tx[1] = static_cast<uint16_t>(0xABCDU + i);
             for (unsigned j = 0U; j < 2U; ++j) {
@@ -113,10 +112,10 @@ class SPIDMAOwnerWait : public testing::Test {
             producer[i].operation = {&endpoints[i], producer[i].segments, 2U,
                                      16U};
             nx_request_initialize(&producer[i].request);
-            ASSERT_EQ(nx_request_prepare(
-                          &producer[i].request,
-                          nx_deadline_after(nx_native_now_us(), 2000000U)),
-                      NX_SUCCESS);
+            ASSERT_EQ(
+                nx_request_prepare(&producer[i].request,
+                                   nx_deadline_after(nx_os_now_us(), 2000000U)),
+                NX_SUCCESS);
         }
         const auto executor =
             nx_spi_dma_owner_executor_port(&execution, &binding);
@@ -126,8 +125,7 @@ class SPIDMAOwnerWait : public testing::Test {
             [](void*, uintptr_t token) {
                 nx_arch_irq_restore({static_cast<uint32_t>(token)});
             }};
-        const nx_clock_t clock{[](void*) { return nx_native_now_us(); },
-                               nullptr};
+        const nx_clock_t clock{[](void*) { return nx_os_now_us(); }, nullptr};
         ASSERT_EQ(nx_bus_owner_init(&owner, slots, 2U, guard, executor, clock,
                                     &owner_wake),
                   NX_SUCCESS);
@@ -206,11 +204,11 @@ class SPIDMAOwnerWait : public testing::Test {
     void TearDown() override {
         Close();
         for (unsigned i = 1U; i < events_ready; ++i) {
-            EXPECT_EQ(nx_native_notify_destroy(&completion_events[i - 1U]),
+            EXPECT_EQ(nx_notify_destroy(&completion_events[i - 1U]),
                       NX_SUCCESS);
         }
         if (events_ready != 0U) {
-            EXPECT_EQ(nx_native_notify_destroy(&owner_event), NX_SUCCESS);
+            EXPECT_EQ(nx_notify_destroy(&owner_event), NX_SUCCESS);
         }
         EXPECT_EQ(nx_native_clock_configure(false, 0U), NX_SUCCESS);
     }
@@ -220,15 +218,13 @@ TEST_F(SPIDMAOwnerWait, RealPublishersWaitersAndObserverJoinAfterWholeChain) {
     StartPublisher();
     StartProducer(0U);
     StartProducer(1U);
-    const nx_time_us_t limit = nx_deadline_after(nx_native_now_us(), 2000000U);
+    const nx_time_us_t limit = nx_deadline_after(nx_os_now_us(), 2000000U);
     while ((!Settled(&producer[0]) || !Settled(&producer[1])) &&
-           !nx_deadline_expired(limit, nx_native_now_us())) {
+           !nx_deadline_expired(limit, nx_os_now_us())) {
         const uint32_t snapshot = owner_wake.arm(owner_wake.context);
-        (void)nx_owner_observer_service(&observer, nx_native_now_us(),
-                                        &observed);
+        (void)nx_owner_observer_service(&observer, nx_os_now_us(), &observed);
         if (!Settled(&producer[0]) || !Settled(&producer[1])) {
-            nx_time_us_t fallback =
-                nx_deadline_after(nx_native_now_us(), 1000U);
+            nx_time_us_t fallback = nx_deadline_after(nx_os_now_us(), 1000U);
             if (fallback > limit) {
                 fallback = limit;
             }
@@ -261,12 +257,11 @@ TEST_F(SPIDMAOwnerWait, ConcurrentCancelRetainsLoansUntilPublisherDrain) {
     ASSERT_EQ(nx_native_spi_dma_model_hold(&port, true), NX_SUCCESS);
     StartPublisher();
     StartProducer(0U);
-    const nx_time_us_t limit = nx_deadline_after(nx_native_now_us(), 2000000U);
+    const nx_time_us_t limit = nx_deadline_after(nx_os_now_us(), 2000000U);
     while ((!producer[0].submitted.load(std::memory_order_acquire) ||
             !execution.pending) &&
-           !nx_deadline_expired(limit, nx_native_now_us())) {
-        (void)nx_owner_observer_service(&observer, nx_native_now_us(),
-                                        &observed);
+           !nx_deadline_expired(limit, nx_os_now_us())) {
+        (void)nx_owner_observer_service(&observer, nx_os_now_us(), &observed);
         std::this_thread::yield();
     }
     if (!producer[0].submitted.load(std::memory_order_acquire) ||
@@ -276,7 +271,7 @@ TEST_F(SPIDMAOwnerWait, ConcurrentCancelRetainsLoansUntilPublisherDrain) {
         return;
     }
     EXPECT_EQ(nx_bus_owner_cancel(&owner, producer[0].ticket), NX_SUCCESS);
-    (void)nx_owner_observer_service(&observer, nx_native_now_us(), &observed);
+    (void)nx_owner_observer_service(&observer, nx_os_now_us(), &observed);
     EXPECT_NE(nx_request_state(&producer[0].request), NX_REQUEST_SETTLED);
     EXPECT_FALSE(nx_bus_owner_idle(&owner));
     EXPECT_EQ(execution.inner.segments, producer[0].segments);
@@ -284,13 +279,12 @@ TEST_F(SPIDMAOwnerWait, ConcurrentCancelRetainsLoansUntilPublisherDrain) {
     EXPECT_EQ(devices[0].releases, 0U);
     EXPECT_EQ(nx_native_spi_dma_model_hold(&port, false), NX_SUCCESS);
     while (!Settled(&producer[0]) &&
-           !nx_deadline_expired(limit, nx_native_now_us())) {
+           !nx_deadline_expired(limit, nx_os_now_us())) {
         const uint32_t snapshot = owner_wake.arm(owner_wake.context);
-        (void)nx_owner_observer_service(&observer, nx_native_now_us(),
-                                        &observed);
+        (void)nx_owner_observer_service(&observer, nx_os_now_us(), &observed);
         if (!Settled(&producer[0])) {
             (void)owner_wake.wait(owner_wake.context, snapshot,
-                                  nx_deadline_after(nx_native_now_us(), 1000U));
+                                  nx_deadline_after(nx_os_now_us(), 1000U));
         }
     }
     EXPECT_TRUE(Settled(&producer[0]));
@@ -314,14 +308,14 @@ TEST_F(SPIDMAOwnerWait, SettledDoesNotJoinCompletionPublisherOrObserverCall) {
               NX_SUCCESS);
     executor_thread = std::thread([&] {
         for (unsigned i = 0U; i < 128U && !Settled(&producer[0]); ++i) {
-            (void)nx_owner_observer_service(&observer, nx_native_now_us(),
+            (void)nx_owner_observer_service(&observer, nx_os_now_us(),
                                             &observed);
         }
         observer_exited.store(true, std::memory_order_release);
     });
-    const nx_time_us_t limit = nx_deadline_after(nx_native_now_us(), 2000000U);
+    const nx_time_us_t limit = nx_deadline_after(nx_os_now_us(), 2000000U);
     while (!callback_entered.load(std::memory_order_acquire) &&
-           !nx_deadline_expired(limit, nx_native_now_us())) {
+           !nx_deadline_expired(limit, nx_os_now_us())) {
         std::this_thread::yield();
     }
     EXPECT_TRUE(callback_entered.load(std::memory_order_acquire));

@@ -7,28 +7,33 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 1ca639690fc5e9e27c291d7a7a0348b1d368628a4d8e26bbc8d662d45598bc4b\n"
+"X-Nexus-Source-SHA256: 2615530a91c55c8f7846f7af953bd5d1840b3410fdc483de57a6cb71c7b80524\n"
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:9
+#: ../../../../docs/reference/contracts/os/execution.md:9
 msgid "OS 执行与生命周期合同"
 msgstr "OS execution and lifecycle contract"
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:11
+#: ../../../../docs/reference/contracts/os/execution.md:11
 msgid ""
 "OS 提供有界等待、显式任务和同步存储，设备接口不依赖 scheduler。默认固件是 C11、 静态装配、零平台堆；Native 的 pthread "
-"库内部 bookkeeping 不构成 MCU 零堆证据。 产品的任务角色、优先级、栈、队列容量、启动、停止、安全输出和恢复策略由外部工程拥有。"
+"库内部 bookkeeping 不构成 MCU 零堆证据。 产品的任务角色、优先级、栈、队列容量、启动、停止、安全输出和恢复策略由外部工程拥有。 "
+"本页描述当前分支已实现的公共接口；最终软件候选、SDK 消费和物理资格仍按各自 实际执行结果验收，不由接口或本文档自动取得。"
 msgstr ""
-"OS provides bounded waits and explicit task/synchronization storage; device "
-"interfaces do not depend on a scheduler. Default firmware is C11, statically"
-" assembled and uses no platform heap. Native pthread bookkeeping is not MCU "
-"zero-heap evidence. External products own task roles, priorities, stacks, "
-"queue capacities, startup, shutdown, safe outputs and recovery policy."
+"OS provides bounded waiting, explicit tasks and synchronization storage; "
+"device interfaces do not depend on a scheduler. Default firmware uses C11, "
+"static assembly and no platform heap. Native pthread bookkeeping does not "
+"establish MCU heap-free execution. External projects own product task roles,"
+" priorities, stacks, queue capacities, startup, stopping, safe outputs and "
+"recovery policy. This page describes common interfaces implemented on the "
+"current branch. Final software candidates, SDK consumption and physical "
+"qualification each require actual acceptance results; interfaces and this "
+"document do not grant them."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:15
+#: ../../../../docs/reference/contracts/os/execution.md:17
 msgid "分层与依赖"
 msgstr "Layers and dependencies"
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:17
+#: ../../../../docs/reference/contracts/os/execution.md:19
 msgid ""
 "![当前等待与退出：ready-arm-ready-wait-"
 "ready，执行者与join责任由外部管理](../../../assets/diagrams/wait-wake-shutdown.svg)"
@@ -36,13 +41,13 @@ msgstr ""
 "![Current waits/shutdown: ready-arm-ready-wait-ready; external owners manage"
 " executors and joins](../../../assets/diagrams/wait-wake-shutdown.svg)"
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:17
+#: ../../../../docs/reference/contracts/os/execution.md:19
 msgid "当前等待与退出：ready-arm-ready-wait-ready，执行者与join责任由外部管理"
 msgstr ""
 "Current waits/shutdown: ready-arm-ready-wait-ready; external owners manage "
 "executors and joins."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:19
+#: ../../../../docs/reference/contracts/os/execution.md:21
 msgid ""
 "当前执行语义见[FIG-08及源码依据](../../diagrams.md#fig-08-wait-wake与外部退出)。 "
 "后端和完整平台边界见[FIG-01](../../../assets/diagrams/platform-architecture.svg)。"
@@ -52,31 +57,32 @@ msgstr ""
 "[FIG-01](../../../assets/diagrams/platform-architecture.svg) for backend and"
 " full-platform boundaries."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:21
+#: ../../../../docs/reference/contracts/os/execution.md:23
 msgid "`Core` 保持无 OS/Arch 依赖。发布的 acquire/release 语义独立于内核。"
 msgstr ""
 "`Core` has no OS/Arch dependencies. Published acquire/release semantics are "
 "kernel-independent."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:22
+#: ../../../../docs/reference/contracts/os/execution.md:24
 msgid "`Arch` 拥有 CPU-local IRQ 掩码、原子操作和浅睡眠原语，不拥有 Tick、任务或设备。"
 msgstr ""
 "`Arch` owns CPU-local IRQ masks, atomics and shallow sleep, not ticks, tasks"
 " or devices."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:23
-msgid "`OS` 选择后端并检验其真实能力。公共 Wait 合同不包含任务创建、设备 service 或派发。"
+#: ../../../../docs/reference/contracts/os/execution.md:25
+msgid "`OS` 以共同接口连接所选后端并检验真实能力；公共 Wait 本身不创建任务、推进设备或派发。"
 msgstr ""
-"`OS` selects backends and validates actual capabilities. Public Wait does "
-"not include task creation, device service or dispatch."
+"`OS` connects the selected backend through common interfaces and checks "
+"actual capabilities. Public Wait itself neither creates tasks, services "
+"devices nor dispatches work."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:24
+#: ../../../../docs/reference/contracts/os/execution.md:26
 msgid "`SoC` 拥有时钟、控制器、实际 IRQ 和可用计时器；Board 拥有实际引脚、电气与外部器件。"
 msgstr ""
 "`SoC` owns clocks, controllers, actual IRQs and available timers; Boards own"
 " actual pins, electrical facts and external devices."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:25
+#: ../../../../docs/reference/contracts/os/execution.md:27
 msgid ""
 "`Product` 创建 owner/producer/coordinator，提供 timer/trace/fail-stop port，并启动 "
 "scheduler。 `nx_platform_start()` 不替产品启动 scheduler。"
@@ -85,35 +91,42 @@ msgstr ""
 " ports and start schedulers. `nx_platform_start()` never starts them on the "
 "product’s behalf."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:28
+#: ../../../../docs/reference/contracts/os/execution.md:30
 msgid ""
-"公共 Wait 是跨后端合同；任务、队列和内核专属能力仍显式使用后端类型，不伪装成所有 RTOS 都提供同样的能力。生成的 typed factory "
-"返回既有设备 face，不创建 OS 对象。"
+"业务通过公共 opaque 任务、通知、queue 和 channel 引用调用共同接口。定义静态存储的 装配文件包含 "
+"`nexus/os/storage.h`，目标 include 路径提供所选后端的真实布局；不以 最大 union、固定字节 TCB 池或第二套 "
+"sizeof 清单统一二进制大小。每个可执行文件只 链接一个导出共同符号的后端，不增加运行时 OS 判断或分派表。专有能力继续使用明确 扩展。生成的 "
+"typed factory 返回既有设备 face，不创建 OS 对象。"
 msgstr ""
-"Public Wait is cross-backend. Tasks, queues and kernel-specific capabilities"
-" use explicit backend types rather than implying every RTOS has identical "
-"features. Generated factories return existing device faces without creating "
-"OS objects."
+"Business code calls common interfaces through opaque task, notification, "
+"queue and channel references. Assembly files defining static storage include"
+" `nexus/os/storage.h`; target include paths supply the actual selected "
+"layout. Binary sizes are not unified through a maximum union, fixed-byte TCB"
+" pool or second sizeof manifest. Each executable links one backend exporting"
+" common symbols, without runtime OS selection or a dispatch table. Backend-"
+"specific capabilities remain explicit extensions. The generated typed "
+"factory returns existing device faces and creates no OS objects."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:31
+#: ../../../../docs/reference/contracts/os/execution.md:36
 msgid ""
-"Native entry 可以在 `pthread_create` 返回前执行。入口自己的 join 必须返回 `BUSY`，且不能读取外部 owner"
-" 尚未发布的 pthread identity 或 started 状态。 其他 start/join 操作仍由唯一外部 lifecycle owner"
-" 串行执行；这一修正不提供多 joiner 或跨任务竞争 start 的能力。创建失败不保留 entry/context；资源耗尽与非法参数分别报告。"
+"Native entry 可以在 `pthread_create` 返回前执行。入口自己的 join 必须返回 `CONTEXT`，且不能读取外部 "
+"owner 尚未发布的 pthread identity 或 started 状态。 其他 start/join 操作仍由唯一外部 lifecycle "
+"owner 串行执行；这一修正不提供多 joiner 或跨任务竞争 start 的能力。创建失败不保留 "
+"entry/context；资源耗尽与非法参数分别报告。"
 msgstr ""
-"A Native entry may execute before `pthread_create` returns. Joining itself "
-"must return `BUSY` without reading the pthread identity or started state "
-"that the external owner has not yet published. All other start/join "
-"operations remain serialized by one external lifecycle owner; this "
-"correction adds neither multiple joiners nor competing start calls across "
-"tasks. Failed creation retains no entry/context; resource exhaustion and "
-"invalid arguments are reported separately."
+"A Native entry may execute before `pthread_create` returns. Self-join must "
+"return `CONTEXT` without reading pthread identity or started state not yet "
+"published by the external owner. A unique external lifecycle owner "
+"serializes other start/join operations; this does not provide multiple "
+"joiners or competing starts across tasks. Native creation failure retains no"
+" entry/context references; resource exhaustion and invalid arguments are "
+"reported separately."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:36
+#: ../../../../docs/reference/contracts/os/execution.md:41
 msgid "等待、时钟与完成"
 msgstr "Waiting, clocks and completion"
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:38
+#: ../../../../docs/reference/contracts/os/execution.md:43
 msgid ""
 "`nx_wait_until()` 使用 `ready → arm → ready → wait → ready`。后端必须把序号观察与 "
 "进入等待作为不会丢失已锁存 wake 的操作。wake 只是提示；业务 predicate 是结果的 唯一权威，通知序号不转移 payload "
@@ -127,34 +140,45 @@ msgstr ""
 "allow multiple publishers under its backend contract. Fewer than 2^32 wakes "
 "may occur between arm and recheck."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:43
+#: ../../../../docs/reference/contracts/os/execution.md:48
 msgid ""
-"所有 deadline 是对应后端时钟域中的绝对单调微秒。Native 使用 `CLOCK_MONOTONIC`， FreeRTOS 使用 "
-"`nx_time_now_us()`，裸机使用初始化时提供的时钟。不得在活请求期间 切换时钟域。`NX_DEADLINE_NEVER` "
+"任务后端的 deadline 是 `nx_os_now_us()` 时钟域中的绝对单调微秒。Native 使用真实 "
+"`CLOCK_MONOTONIC`，不混用外设模型的手动时钟；FreeRTOS／ThreadX 使用 Core "
+"`nx_time_now_us()`。裸机使用初始化时提供的时钟。不得在活请求期间 切换时钟域。`NX_DEADLINE_NEVER` "
 "真正表示无限等待，不把 UINT64_MAX 转成有限 `timespec`。微秒表达不保证微秒调度精度；阻塞误差还包括 Tick 量化和调度延迟。"
 msgstr ""
-"Deadlines are absolute monotonic microseconds in the backend’s domain: "
-"Native `CLOCK_MONOTONIC`, FreeRTOS `nx_time_now_us()`, or the bare-metal "
-"initialization clock. Never switch domains while requests are alive. "
-"`NX_DEADLINE_NEVER` is truly infinite, not UINT64_MAX converted to finite "
-"`timespec`. Microsecond representation does not promise microsecond "
-"scheduling; blocking error includes tick quantization and scheduling "
+"Task-backend deadlines are absolute monotonic microseconds in the "
+"`nx_os_now_us()` domain. Native uses real `CLOCK_MONOTONIC`, independently "
+"of manual peripheral-model clocks; FreeRTOS/ThreadX use Core "
+"`nx_time_now_us()`. Baremetal uses the clock supplied at initialization. Do "
+"not change clock domains while requests are live. `NX_DEADLINE_NEVER` means "
+"actual infinite waiting; UINT64_MAX is not converted to a finite `timespec`."
+" Microsecond representation does not guarantee microsecond scheduling "
+"precision; blocking error also includes tick quantization and scheduling "
 "latency."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:48
+#: ../../../../docs/reference/contracts/os/execution.md:54
 msgid ""
 "有限 notify deadline 在检查 hint 时仍必须检查过期，持续无关 wake 不能续期。公共 helper 在后端错误后保留一次最终 "
 "`ready` 检查：已观察到真实完成可以胜出。 裸机未就绪返回 `BUSY`，调用方继续显式调度。队列立即可用的操作采用 try 语义； "
-"只有需要阻塞时才消耗 deadline，失败不改调用方输出。"
+"只有需要阻塞时才消耗 deadline，失败不改调用方输出。 公共 queue 的 deadline 零表示 try，channel "
+"关闭后发送和排空后的接收返回 `CANCELLED`。有限 `nx_sleep_until` 已过期时立即成功，拒绝无限 "
+"sentinel；`yield` 只提示调度，不承诺公平、指定下一任务或低优先级进度，两者都不创建 timer worker。"
 msgstr ""
-"Finite notification waits must still check expiry while inspecting hints; "
-"irrelevant repeated wakes do not extend budgets. Helpers retain one final "
-"`ready` check after backend errors, letting observed actual completion win. "
-"Bare metal returns `BUSY` when unready so callers schedule explicitly. "
-"Immediately available queue operations use try semantics; deadlines are "
-"consumed only when blocking, and failures preserve caller outputs."
+"Finite notification waits must check expiry even when inspecting hints; "
+"continuous unrelated wakes cannot renew the budget. After a backend error, "
+"the public helper retains a final `ready` check so observed actual "
+"completion may win. Baremetal returns `BUSY` when not ready, leaving "
+"explicit scheduling to its caller. Immediately available queue operations "
+"use try semantics; only blocking consumes the deadline, and failure "
+"preserves caller output. A zero public queue deadline means try. Closed "
+"channel sends, and receives after draining, return `CANCELLED`. An expired "
+"finite `nx_sleep_until` succeeds immediately and rejects the infinite "
+"sentinel. `yield` is only a scheduling hint: it guarantees neither fairness,"
+" a specified next task nor lower-priority progress. Neither creates a timer "
+"worker."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:53
+#: ../../../../docs/reference/contracts/os/execution.md:62
 msgid ""
 "`nx_wait_select()` 的校验和就绪扫描随候选数线性增长。每个 predicate 必须有界， 不阻塞、不执行设备 "
 "service；调用者在成功消费后推进自己的 cursor，才能公平轮转。 比较 1、4、16 "
@@ -169,7 +193,7 @@ msgstr ""
 "notifications do not count business events; a queue or latched state owns "
 "the event count."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:58
+#: ../../../../docs/reference/contracts/os/execution.md:67
 msgid ""
 "等待不推进 UART/SPI service。共享控制器的生产者不能在 `ready` 内 service；其唯一 execution owner "
 "在取消、停止和排空期间仍须运行。timeout/cancel 请求不等于最终 settlement，不释放 request、operation、DMA "
@@ -180,11 +204,11 @@ msgstr ""
 "cancel/stop/drain. Timeout/cancel requests are not settlement and release no"
 " request, operation, DMA buffer or notification storage."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:62
+#: ../../../../docs/reference/contracts/os/execution.md:71
 msgid "中断政策与上下文"
 msgstr "Interrupt policy and context"
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:64
+#: ../../../../docs/reference/contracts/os/execution.md:73
 msgid ""
 "CPU/SoC facts 包含实际 IRQ 数、实现优先级位数和分组能力。OS runtime policy 明确 区分无内核、PRIMASK 内核和"
 " BASEPRI 内核，不能仅凭 ceiling=0 推导内核不存在。 Mainline 调用内核 ISR API 前验证实际 publisher "
@@ -203,20 +227,37 @@ msgstr ""
 "establish no new mode, kernel or physical IRQ qualification; unsupported "
 "combinations fail explicitly."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:71
+#: ../../../../docs/reference/contracts/os/execution.md:80
 msgid ""
-"NMI、HardFault 和内核专属异常不进入这些 kernel wake API。Task API 要求当前世界 privileged Thread"
-" mode，运行时手工掩码已恢复、scheduler 未被挂起；启动阶段只允许 所选 Port 的规范 bootstrap "
-"mask。数值相同不证明掩码所有权。拒绝应发生在修改对象、 发布引用、创建内核对象之前。"
+"NMI、HardFault 和内核专属异常不进入这些 kernel wake API。MCU Task API 要求当前 世界 privileged "
+"Thread mode，运行时手工掩码已恢复。阻塞、transfer、join 和 sleep 只在合法运行任务且 scheduler "
+"未挂起时执行；构造与非阻塞发布按各后端合法的 task/bootstrap 范围执行，不依赖主动挂起内核后的专有可调用性。启动阶段只允许 所选 Port"
+" 的规范 bootstrap mask；数值相同不证明掩码所有权。已有上下文检查在 对象变更前拒绝违约调用，但不能代替外部生命周期和完整调用前提。"
 msgstr ""
-"NMI, HardFault and kernel-owned exceptions cannot use these kernel wake "
-"APIs. Task APIs require current-world privileged Thread mode, restored "
-"manual masks and unsuspended scheduling. Bootstrap permits only the selected"
-" port’s prescribed mask. Equal numerical masks do not prove ownership. "
-"Reject before mutating objects, publishing references or creating kernel "
-"objects."
+"NMI, HardFault and kernel-specific exceptions do not enter these kernel wake"
+" APIs. MCU Task APIs require privileged Thread mode in the current world "
+"with manual runtime masks restored. Blocking, transfer, join and sleep run "
+"only in an admitted running task with the scheduler unsuspended. "
+"Construction and nonblocking publication follow each backend's permitted "
+"task/bootstrap scope, without relying on backend-specific calls while "
+"deliberately suspending the kernel. Startup admits only the selected port's "
+"canonical bootstrap mask; a matching numeric value does not prove mask "
+"ownership. Existing context checks reject violations before object mutation "
+"but do not replace external lifecycle ownership or complete calling "
+"preconditions."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:76
+#: ../../../../docs/reference/contracts/os/execution.md:87
+msgid ""
+"`nx_notify_wake` 面向 task/bootstrap，`nx_notify_wake_from_isr` 面向受审硬件 IRQ； "
+"绑定后的 `port.wake` 保留该后端允许的 task/bootstrap/IRQ 发布域。Native 的 ISR 入口返回 "
+"`CONTEXT`，POSIX signal handler 不能借用普通任务合同。"
+msgstr ""
+"`nx_notify_wake` serves task/bootstrap callers; `nx_notify_wake_from_isr` "
+"serves reviewed hardware IRQs. A bound `port.wake` retains its backend's "
+"admitted task/bootstrap/IRQ publication domain. The Native ISR entry returns"
+" `CONTEXT`; a POSIX signal handler cannot borrow the ordinary task contract."
+
+#: ../../../../docs/reference/contracts/os/execution.md:91
 msgid ""
 "只使用 CPU-local mask 不保护 SMP、DMA 对元数据写入或另一个安全世界的 publisher。 IRQ sink 和 context"
 " 必须一直存在到实际 provider 停止并证明 publisher quiescent。"
@@ -225,59 +266,93 @@ msgstr ""
 " another security world. IRQ sinks/contexts live until providers stop and "
 "publisher quiescence is proven."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:79
+#: ../../../../docs/reference/contracts/os/execution.md:94
 msgid "静态存储与任务"
 msgstr "Static storage and tasks"
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:81
+#: ../../../../docs/reference/contracts/os/execution.md:96
 msgid ""
-"每个任务显式提供 TCB、栈和 context。创建前按当前 Port 的初始 frame 和对齐要求 "
-"校验实际栈容量；启动最低容量不能替代任务运行栈预算、异常嵌套 MSP 预算和 FP/MVE context 预算。Native 栈须满足 pthread"
-" 平台下限并加上应用预算，不能继承成 MCU 成本。"
+"首次使用前将控制对象清零。任务通过选定布局声明对象，提供非空名称、字节栈容量和 context；原生类型只留在装配、后端实现和明确扩展中。创建前按当前 "
+"Port 的初始 frame 和对齐要求校验实际栈容量；启动最低容量不能替代任务运行栈预算、异常嵌套 MSP 预算和 FP/MVE context "
+"预算。Native 栈须满足 pthread 平台下限并加上应用预算，不能继承成 MCU 成本。"
 msgstr ""
-"Every task explicitly supplies TCB, stack and context. Creation checks "
-"actual stack capacity against the port’s initial frame/alignment. Startup "
-"minima do not replace runtime task, nested-exception MSP or FP/MVE budgets. "
-"Native stacks satisfy pthread minimums plus application budgets; their costs"
-" do not carry over to MCUs."
+"Zero controls before first use. Tasks use selected-layout objects, nonempty "
+"names, byte-sized stack capacities and contexts; native types remain in "
+"assembly, backend implementation and explicit extensions. Before creation, "
+"validate actual stack capacity against the selected port's initial frame and"
+" alignment. Startup minimums do not replace runtime task-stack, nested-"
+"exception MSP or FP/MVE context budgets. Native stacks must meet pthread "
+"platform minimums plus application budgets; they do not establish MCU costs."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:85
+#: ../../../../docs/reference/contracts/os/execution.md:101
 msgid ""
-"首次 scheduler 启动采用 cold privileged Thread/MSP 合同：`CONTROL.nPRIV=0`、 "
+"逻辑任务优先级统一为高数值高优先级，由后端映射原生编号；ThreadX 原生优先级 方向相反，不直接传给公共接口。Native 只接受逻辑优先级 "
+"0，不忽略不支持的等级或 声称拥有 MCU 抢占保证。内核 tick、时间片与真实响应仍由所选后端和预算决定。"
+msgstr ""
+"Public logical task priorities increase with their numeric value; backends "
+"map native numbering. ThreadX native priorities run in the opposite "
+"direction and must not be passed directly to public interfaces. Native "
+"accepts only logical priority zero, without ignoring unsupported levels or "
+"claiming MCU preemption guarantees. Kernel ticks, time slicing and actual "
+"response remain properties of the selected backend and budgets."
+
+#: ../../../../docs/reference/contracts/os/execution.md:105
+msgid ""
+"应用通过 `nx_os_run` 显式进入真实 bootstrap，成功不返回；Platform start 仍不启动 scheduler。Native"
+" 执行回调后停驻当前引导线程，保留其调用栈，不增加隐藏 coordinator； 进程退出由应用明确决定。不同内核的 bootstrap "
+"可调用范围分别维护，不能把运行态 重新解释为冷态或在引导回调中等待未来任务。"
+msgstr ""
+"Applications explicitly enter the real bootstrap through `nx_os_run`, which "
+"never returns successfully; Platform start still does not start a scheduler."
+" After the callback, Native parks the existing bootstrap thread to retain "
+"its stack, without adding a hidden coordinator. Applications explicitly own "
+"process exit. Maintain each kernel's permitted bootstrap scope separately; "
+"do not reinterpret running state as cold state or wait for future tasks "
+"inside the bootstrap callback."
+
+#: ../../../../docs/reference/contracts/os/execution.md:110
+msgid ""
+"MCU 首次 scheduler 启动采用 cold privileged Thread/MSP 合同：`CONTROL.nPRIV=0`、 "
 "`SPSEL=0`、`FPCA=0`。启动前不得留下 active FP context 或把 main 切换到 PSP；调用方 "
 "不能仅清掉标志来丢弃仍活跃的 FP 状态。MPU bootstrap guard 绑定真实 protected startup 指令、基本 "
 "exception frame 与正确 EXC_RETURN，一次性 lease 在 restore 前消耗，重复 raw START SVC "
 "不能再次取得启动权限。任务开始后的 FP/MVE 使用由对应 Port 管理， 不是禁用应用浮点能力；实际 context retention "
 "仍需要硬件验收。"
 msgstr ""
-"First scheduler startup requires cold privileged Thread/MSP: "
-"`CONTROL.nPRIV=0`, `SPSEL=0` and `FPCA=0`. Do not leave active FP context or"
-" switch main to PSP; clearing flags cannot discard live FP state. MPU "
-"bootstrap guards bind actual protected startup instructions, basic exception"
-" frames and correct EXC_RETURN. One-shot leases are consumed before restore;"
-" repeated raw START SVC cannot regain permission. Ports own subsequent "
-"FP/MVE task use rather than banning application floating point. Actual "
-"context retention still needs hardware acceptance."
+"Initial MCU scheduler startup requires cold privileged Thread/MSP state: "
+"`CONTROL.nPRIV=0`, `SPSEL=0` and `FPCA=0`. Do not leave an active FP context"
+" or switch main to PSP before startup; clearing flags alone must not discard"
+" live FP state. The MPU bootstrap guard binds actual protected startup "
+"instructions, a basic exception frame and the correct EXC_RETURN. Its "
+"single-use lease is consumed before restore; repeated raw START SVC cannot "
+"reacquire startup permission. The selected port manages FP/MVE after tasks "
+"begin; this does not prohibit application floating-point use. Actual context"
+" retention still requires hardware acceptance."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:92
+#: ../../../../docs/reference/contracts/os/execution.md:117
 msgid ""
 "可 join 任务返回后的机制由后端决定：FreeRTOS wrapper 发布完成后挂起，等待外部 joiner 删除；Native entry 返回"
-" pthread，由 `pthread_join` 证明线程退出；ThreadX wrapper 发布完成提示后返回内核 completion "
-"路径，join 仍检查完成状态并执行删除。 三者均由唯一外部 lifecycle owner 完成 join；成功前不得重用 "
+" pthread，由真实 try/monotonic clock-join 证明线程 退出；ThreadX wrapper 发布完成提示后返回内核 "
+"completion 路径，join 仍检查完成状态并执行删除。 三者均由唯一外部 lifecycle owner 完成 join；成功前不得重用 "
 "TCB/栈/context， join 超时保留全部存储。Native 禁止绕过 adapter 执行 `pthread_cancel`、detach "
-"或另外一次 join。完成提示本身不能替代后端的实际退出与引用撤离证明。"
+"或另外一次 join。完成提示本身不能替代后端的实际退出与引用撤离证明。 公共入口为 `nx_task_join_until`。Native "
+"有限等待使用可真实链接的 GNU clock-join， 不在完成标志后调用无界 join；仅显式 `NX_DEADLINE_NEVER` "
+"允许无限等待。"
 msgstr ""
-"Returning joinable tasks follow backend-specific mechanisms: FreeRTOS "
-"wrappers publish completion then suspend until external deletion; Native "
-"entries return from pthread and `pthread_join` proves thread exit; ThreadX "
-"wrappers publish completion hints then return through the kernel completion "
-"path, while join still checks completion and deletes externally. One "
-"external lifecycle owner joins each task. TCB/stack/context cannot be reused"
-" before successful join; timeouts retain all storage. Native forbids adapter"
-" bypass through `pthread_cancel`, detach or another join. Completion hints "
-"alone do not prove actual exit/reference detachment."
+"After a joinable entry returns, each backend uses its actual mechanism: the "
+"FreeRTOS wrapper publishes completion and suspends for external deletion; "
+"Native returns from the pthread entry and uses actual try/monotonic clock-"
+"join to establish thread exit; the ThreadX wrapper publishes its completion "
+"hint, follows kernel completion, and still checks completion and deletes "
+"during join. One external lifecycle owner performs join. Do not reuse TCB, "
+"stack or context before success; timeout retains all storage. Native forbids"
+" bypassing the adapter with `pthread_cancel`, detach or another join. A "
+"completion hint does not prove actual backend exit or reference withdrawal. "
+"The common entry is `nx_task_join_until`. Finite Native waits require "
+"genuinely linked GNU clock-join support, never unbounded join after a "
+"completion flag. Only explicit `NX_DEADLINE_NEVER` permits infinite waiting."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:99
+#: ../../../../docs/reference/contracts/os/execution.md:126
 msgid ""
 "永久任务使用独立显式 API，entry 不得返回，control/stack/context 保留到 reset；它 没有 completion "
 "semaphore、join 或 destroy。适用于产品确实具有永久生命周期的任务。"
@@ -286,7 +361,7 @@ msgstr ""
 "control/stack/context live until reset. They have no completion semaphore, "
 "join or destroy and serve products with genuinely permanent task lifetimes."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:102
+#: ../../../../docs/reference/contracts/os/execution.md:129
 msgid ""
 "direct task notification 是显式 opt-in：调用方指定已存在的 receiver 和独占 notification "
 "index，只有该 receiver 等待。停止并 join publisher 后才能解绑；receiver handle 和 storage "
@@ -298,69 +373,83 @@ msgstr ""
 "retained ports become unusable. Platforms reserve no application "
 "notification slots implicitly."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:106
+#: ../../../../docs/reference/contracts/os/execution.md:133
 msgid "队列与关闭"
 msgstr "Queues and closure"
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:108
+#: ../../../../docs/reference/contracts/os/execution.md:135
 msgid ""
-"raw queue 保持原有最小存储和原生阻塞路径。绝对 deadline 入口复用同一时钟域，并 "
-"避免连续操作把相对等待预算重复放大。较大数据优先排队稳定 slot/handle，而非在 内核临界区复制整个 payload；slot "
+"公共 raw queue 保持最小存储和后端阻塞路径，不包含 close 广播。初始化要求真实 `storage_bytes` 至少容纳 `depth "
+"* item_size`，完整声明容量跨度不得回绕或与完整控制 对象重叠；不能仅检查有效 item 区间。绝对 deadline 入口复用同一时钟域，并"
+" 避免连续操作把相对等待预算重复放大。较大数据优先排队稳定 slot/handle，而非在 内核临界区复制整个 payload；slot "
 "本身仍有明确借用和回收规则。"
 msgstr ""
-"Raw queues retain minimum storage/native blocking. Absolute-deadline APIs "
-"use one domain without repeatedly expanding relative budgets. Large data "
-"should queue stable slots/handles rather than copy full payloads in kernel "
-"critical sections; slots still have explicit borrows/reclamation."
+"Public raw queues retain minimal storage and backend blocking paths without "
+"close broadcast. Actual `storage_bytes` must hold at least `depth * "
+"item_size`; the entire declared capacity span must neither wrap nor overlap "
+"the complete control object. Checking only the used item range is "
+"insufficient. Absolute-deadline operations reuse one clock domain rather "
+"than repeatedly extending relative budgets. Prefer stable slots/handles for "
+"large data instead of copying full payloads inside kernel critical regions; "
+"slots retain explicit loan and reclamation rules."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:112
+#: ../../../../docs/reference/contracts/os/execution.md:141
 msgid ""
-"可关闭队列使用单独 opt-in 类型和精确最大并发 waiter 数。每个并发阻塞操作持有独立 调用方 waiter 存储；close 停止 "
+"可关闭 channel 使用单独 opt-in 类型和精确最大并发操作数。每个并发操作持有独立 调用方 waiter 存储；close 停止 "
 "admission，锁存并唤醒已注册 waiter。关闭后旧 item 可继续 drain，不能继续 send。destroy 需要 "
 "closed、drained、users/publishers quiescent。 不得用 periodic polling "
 "冒充立即关闭唤醒，也不得让 raw queue 默默承担这项成本。"
 msgstr ""
-"Closable queues are separate opt-in types with exact maximum concurrent "
-"waiters. Every blocked operation retains independent caller-owned waiter "
-"storage. Close stops admission and latches/wakes registered waiters; old "
-"items may drain, but sends cannot continue. Destroy requires closed, drained"
-" and quiescent users/publishers. Periodic polling is not immediate close "
-"wakeup, and raw queues never silently pay this cost."
+"Closable channels use separate opt-in types and an exact maximum number of "
+"concurrent operations. Every simultaneous operation owns independent caller "
+"waiter storage. Close stops admission, latches and wakes registered waiters,"
+" and permits old items to drain while refusing sends. Destroy requires "
+"closed and drained state with users/publishers quiescent. Periodic polling "
+"must not masquerade as immediate close notification, and raw queues must not"
+" silently bear that cost."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:117
+#: ../../../../docs/reference/contracts/os/execution.md:146
 msgid ""
 "FreeRTOS closable registry 仅供 task 使用，以 scheduler suspend/resume guard 保护 "
 "admission、waiter 注册/退出和 close 广播。内核 give 可能触发 yield，不能假设一个 IRQ critical "
 "token 能跨越这个 yield 保持链表不变。maximum_waiters 预算 close 的 调度暂停时间；单 item 复制与 latch "
-"give 的 IRQ 屏蔽时间另行测量，不能混为一个成本。"
+"give 的 IRQ 屏蔽时间另行测量，不能混为一个成本。 Native 使用同一 mutex 下的条件变量广播和最小 waiter active "
+"guard，不复制 RTOS 等待者链；同样检查 waiter 独占与最大并发操作数。raw queue 和 channel 的控制类型分开。"
 msgstr ""
-"FreeRTOS closable registries are task-only. Scheduler suspend/resume guards "
-"protect admission, waiter registration/exit and close broadcasting. Kernel "
-"give can yield; an IRQ critical token does not keep lists unchanged across "
-"that yield. maximum_waiters budgets scheduler-pause duration; item-"
-"copy/latch-give IRQ masking is measured separately."
+"The FreeRTOS closable registry is task-only. A scheduler suspend/resume "
+"guard protects admission, waiter registration/withdrawal and close "
+"broadcast. Kernel give may yield, so an IRQ-critical token cannot be assumed"
+" to preserve the list across that yield. maximum_waiters budgets scheduler "
+"suspension during close; IRQ masking for individual item copies and latch "
+"gives is measured separately. Native uses condition-variable broadcast under"
+" one mutex with a minimal waiter active guard rather than duplicating RTOS "
+"waiter lists. It also enforces waiter exclusivity and concurrent-operation "
+"capacity. Raw queue and channel control types remain separate."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:122
+#: ../../../../docs/reference/contracts/os/execution.md:153
 msgid "配置与成本"
 msgstr "Configuration and cost"
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:124
+#: ../../../../docs/reference/contracts/os/execution.md:155
 msgid ""
-"平台 schema-2 和独立 runtime schema-1 TOML 的可选 `[os]` 只用于 FreeRTOS。 "
-"`tools/configure/kernel.py` 是唯一政策解析源，生成不可变 `KernelProfileIR`。默认 `standard` "
-"延续 1 kHz/八级优先级/Idle 128 words/16-byte name；`minimal` 缩短 name "
-"与优先级列表并关闭未用同步能力；`diagnostic` 开 trace；`lowpower` 显式开 custom "
-"tickless。生成的实际能力为准，不能用 profile 名推导芯片能力。"
+"平台 schema-2 和独立 runtime schema-1 TOML 沿既有配置路径选择后端。FreeRTOS 的 可选 `[os]` 由 "
+"`tools/configure/kernel.py` 解析为不可变 `KernelProfileIR`；ThreadX 独立政策见[ThreadX "
+"配置](threadx.md)。不为普通公共接口再增加配置权威。FreeRTOS 默认 `standard` 延续 1 kHz/八级优先级/Idle "
+"128 words/16-byte name；`minimal` 缩短 name 与优先级列表并关闭未用同步能力；`diagnostic` 开 "
+"trace；`lowpower` 显式开 custom tickless。生成的实际能力为准，不能用 profile 名推导芯片能力。"
 msgstr ""
-"Optional `[os]` in platform schema-2 and independent runtime schema-1 TOML "
-"is FreeRTOS-only. `tools/configure/kernel.py` is the sole policy parser and "
-"emits immutable `KernelProfileIR`. `standard` retains 1 kHz/eight "
-"priorities/Idle 128 words/16-byte names; `minimal` shortens names/priorities"
-" and disables unused synchronization; `diagnostic` enables trace; `lowpower`"
-" explicitly enables custom tickless. Generated capabilities are "
-"authoritative; profile names do not imply chip features."
+"Platform schema-2 and independent runtime schema-1 TOML select backends "
+"through the existing configuration path. FreeRTOS's optional `[os]` is "
+"parsed by `tools/configure/kernel.py` into immutable `KernelProfileIR`; see "
+"[ThreadX configuration](threadx.md) for its independent policy. Common "
+"interfaces add no configuration authority. FreeRTOS `standard` retains 1 "
+"kHz, eight priorities, a 128-word Idle stack and 16-byte names. `minimal` "
+"shortens names and the priority list and disables unused synchronization "
+"capabilities; `diagnostic` enables trace; `lowpower` explicitly enables "
+"custom tickless. Actual generated capabilities govern; a profile name does "
+"not imply chip capabilities."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:130
+#: ../../../../docs/reference/contracts/os/execution.md:162
 msgid ""
 "可覆写字段为 `tick_source`、`tick_hz`、`max_priorities`、`syscall_priority`、 "
 "`idle_stack_words`、`max_task_name_len`、`notification_slots`、`mutexes`、 "
@@ -372,25 +461,32 @@ msgid ""
 "single 不接受作者显式设置此字段。CPU 的 `mpu_regions` 是物理事实，未声明为 unknown， 不能由运行时政策凭空生成 "
 "MPU。受维护安全组合见下节，不由参数校验成功推导支持。 SysTick 使用真实 core clock，要求频率整除且 reload 在 24-bit"
 " 合法范围；外部 Tick 必须实现强 `nx_freertos_external_tick_setup(uint32_t)`。runtime "
-"stats 必须实现 counter start/now；缺失 hook 使链接失败，不提供伪时钟或永远为零的统计。"
+"stats 必须实现 counter start/now；缺失 hook 使链接失败，不提供伪时钟或永远为零的统计。 内核的 "
+"mutex／counting semaphore 配置开关不自动建立公共对象 API；实际公共头和 "
+"配置能力校验决定通用消费者能使用什么，不能从内核宏推导已维护接口。"
 msgstr ""
-"Overrides: `tick_source`, `tick_hz`, `max_priorities`, `syscall_priority`, "
-"`idle_stack_words`, `max_task_name_len`, `notification_slots`, `mutexes`, "
-"`counting_semaphores`, `task_notifications`, `trace`, `runtime_stats` and "
-"`tickless`. Security profiles additionally use `memory_protection`, "
-"`system_call_stack_words`, `security_model` and `secure_idle_stack_bytes`. "
-"MPU defaults off and single-world. Syscall stacks default to 128 words with "
-"an even 64–65536-word range. Secure Idle in split mode defaults to 128 "
-"bytes, accepts 64–65536 with 8-byte alignment; single mode rejects explicit "
-"settings. Physical `mpu_regions` remains unknown unless declared; runtime "
-"policy cannot invent MPU hardware. Maintained combinations are listed below,"
-" not inferred from valid parameters. SysTick uses actual core clocks with "
-"exact divisibility and valid 24-bit reloads. External ticks require strong "
-"`nx_freertos_external_tick_setup(uint32_t)`; runtime statistics require "
-"counter start/now hooks. Missing hooks fail linking instead of producing "
-"fake clocks or zero-only statistics."
+"Overridable fields are `tick_source`, `tick_hz`, `max_priorities`, "
+"`syscall_priority`, `idle_stack_words`, `max_task_name_len`, "
+"`notification_slots`, `mutexes`, `counting_semaphores`, "
+"`task_notifications`, `trace`, `runtime_stats` and `tickless`. Security "
+"profiles additionally use `memory_protection`, `system_call_stack_words`, "
+"`security_model` and `secure_idle_stack_bytes`. MPU defaults off and "
+"execution is single-world. The MPU syscall stack defaults to 128 words, with"
+" even capacities of 64–65536 words. Split Secure Idle defaults to 128 bytes,"
+" within 64–65536 with 8-byte alignment; single rejects an authored value. "
+"CPU `mpu_regions` is a physical fact, unknown when undeclared, not something"
+" runtime policy can invent. Maintained security combinations are listed "
+"below; successful parameter validation does not establish support. SysTick "
+"uses the actual core clock with exact frequency division and a valid 24-bit "
+"reload. External Tick requires a strong "
+"`nx_freertos_external_tick_setup(uint32_t)`. Runtime statistics require "
+"counter start/now hooks; absent hooks fail linking instead of supplying a "
+"fake clock or constant-zero statistics. Kernel mutex/counting-semaphore "
+"switches do not automatically establish public object APIs. Actual public "
+"headers and capability validation determine what common consumers may use; "
+"kernel macros do not prove a maintained interface."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:142
+#: ../../../../docs/reference/contracts/os/execution.md:176
 msgid ""
 "成本报告分开计算 Wait face、notify、raw/closable queue、每个 waiter、joinable/ permanent "
 "TCB、调用方栈、Idle 栈和内核全局对象。保持现有 four-pointer Wait ABI； 共享 ops 表是否值得采用由实际 linked "
@@ -404,75 +500,75 @@ msgstr ""
 "compare RAM/Flash/instructions only; CPU cycles/latency need measurements, "
 "not disassembly byte counts."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:0
+#: ../../../../docs/reference/contracts/os/execution.md:0
 msgid "选择"
 msgstr "Choice"
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:0
+#: ../../../../docs/reference/contracts/os/execution.md:0
 msgid "适用条件与额外责任"
 msgstr "Applicable conditions and additional responsibilities"
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:0
+#: ../../../../docs/reference/contracts/os/execution.md:0
 msgid "普通 notify"
 msgstr "Ordinary notify"
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:0
+#: ../../../../docs/reference/contracts/os/execution.md:0
 msgid "调用方持有独立通知控制；publisher 全部退出后才销毁"
 msgstr ""
 "Caller owns separate notification control; destroy only after every "
 "publisher has exited"
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:0
+#: ../../../../docs/reference/contracts/os/execution.md:0
 msgid "直接通知"
 msgstr "direct notify"
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:0
+#: ../../../../docs/reference/contracts/os/execution.md:0
 msgid "已存在且唯一的 receiver、独占 index；receiver 生命周期覆盖所有 publisher"
 msgstr ""
 "An existing unique receiver and exclusive index; the receiver outlives all "
 "publishers"
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:0
+#: ../../../../docs/reference/contracts/os/execution.md:0
 msgid "joinable task"
 msgstr "Joinable task"
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:0
+#: ../../../../docs/reference/contracts/os/execution.md:0
 msgid "entry 可以返回；completion 后仍保留 control/stack，直到外部 join 成功"
 msgstr ""
 "Entry may return; retain control/stack after completion until external join "
 "succeeds"
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:0
+#: ../../../../docs/reference/contracts/os/execution.md:0
 msgid "永久任务"
 msgstr "Permanent tasks"
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:0
+#: ../../../../docs/reference/contracts/os/execution.md:0
 msgid "entry 永不返回；没有 join/completion 存储，误返回必须 fail-stop"
 msgstr ""
 "Entry never returns; no join/completion storage; an erroneous return must "
 "fail-stop"
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:0
+#: ../../../../docs/reference/contracts/os/execution.md:0
 msgid "原始队列"
 msgstr "raw queue"
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:0
+#: ../../../../docs/reference/contracts/os/execution.md:0
 msgid "已有独立停止协议；payload copy 成本随 item 大小增长"
 msgstr ""
 "An independent stop protocol already exists; payload-copy cost grows with "
 "item size"
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:0
+#: ../../../../docs/reference/contracts/os/execution.md:0
 msgid "可关闭队列"
 msgstr "closable queue"
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:0
+#: ../../../../docs/reference/contracts/os/execution.md:0
 msgid "需要关闭 admission 并唤醒 waiter；额外 control 和每操作 waiter 由调用方提供"
 msgstr ""
 "Close admission and wake waiters; caller supplies extra control and a waiter"
 " per operation"
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:156
+#: ../../../../docs/reference/contracts/os/execution.md:190
 msgid ""
 "Native destroy 可能只释放部分 POSIX 资源。首次销毁撤销公开操作准入；每个资源只在 实际销毁成功后解除 "
 "ownership。失败后保持同一 control，仅重试 destroy；不得重新 init、进入 wait/send/receive "
@@ -488,23 +584,23 @@ msgstr ""
 "queue payload, scheduler-suspended regions and actual IRQ-masked regions; a "
 "suspended scheduler does not mean that all interrupts are masked."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:162
+#: ../../../../docs/reference/contracts/os/execution.md:196
 msgid "产品停止顺序"
 msgstr "Product shutdown order"
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:164
+#: ../../../../docs/reference/contracts/os/execution.md:198
 msgid "coordinator 关闭 admission；owner stop 请求所有已接受操作取消。"
 msgstr ""
 "Coordinator closes admission; owner stop requests cancellation of every "
 "accepted operation."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:165
+#: ../../../../docs/reference/contracts/os/execution.md:199
 msgid "owner 保持 service/drain；producer/observer 仅观察 acquire `SETTLED`。"
 msgstr ""
 "Owners continue service/drain; producers/observers only acquire-observe "
 "`SETTLED`."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:166
+#: ../../../../docs/reference/contracts/os/execution.md:200
 msgid ""
 "coordinator join producer；必须已 acquire 观察每个 accepted request 的 `SETTLED`。 再排空"
 " slot control 并 detach/join observer；最后一次 callback 返回之前，request、slot "
@@ -516,31 +612,29 @@ msgstr ""
 "last callback returns. Business payload must also satisfy its own other "
 "borrowing contracts."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:169
+#: ../../../../docs/reference/contracts/os/execution.md:203
 msgid "coordinator 请求 owner 停止并 join；同时确认 owner idle 包含 publication 已退出。"
 msgstr ""
 "Coordinator stops/joins owners and verifies that owner idle includes "
 "completed publication."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:170
+#: ../../../../docs/reference/contracts/os/execution.md:204
 msgid "停止硬件 RX/IRQ publisher 并 detach wake；join 其他可能的发布者。"
 msgstr ""
 "Stop hardware RX/IRQ publishers and detach wake ports; join any other "
 "publishers."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:171
+#: ../../../../docs/reference/contracts/os/execution.md:205
 msgid ""
-"销毁 notification/queue/guard。Native/裸机随后可执行 platform stop；正在运行的 FreeRTOS 保留 "
-"platform 时钟和 Tick，coordinator 发布状态后挂起。产品通过显式 reset 或完整 scheduler-stop port "
-"才能关闭内核基础设施，不能从 I/O idle 推导内核停止。"
+"销毁 notification/queue/guard。仅在全部消费者退出且所选生命周期允许时停止 platform；正在运行的内核继续保留时钟和 "
+"Tick。没有通用 scheduler shutdown， 不能从 I/O idle、任务返回或普通停机接口推导内核已经停止。"
 msgstr ""
-"Destroy notifications/queues/guards. Native/bare metal may then stop "
-"platforms. Running FreeRTOS retains platform clocks/ticks; coordinators "
-"publish status then suspend. Only explicit reset or a complete scheduler-"
-"stop port can close kernel infrastructure; I/O idle does not establish "
-"stopped kernels."
+"Destroy notification/queue/guard objects. Stop Platform only after every "
+"consumer exits and the selected lifecycle permits it. A running kernel "
+"retains clocks and Tick. There is no generic scheduler shutdown; I/O idle, "
+"task return or ordinary teardown does not prove the kernel has stopped."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:175
+#: ../../../../docs/reference/contracts/os/execution.md:209
 msgid ""
 "失败保留 storage，并由产品选择恢复。`QUARANTINED` 是仍有引用的状态，不是允许 释放的终态。一次 destroy 返回 BUSY "
 "只是防护，不替代未来 publisher 已停止的证明。 每个成功 milestone 只执行一次；超时继续使用原 absolute deadline "
@@ -561,11 +655,11 @@ msgstr ""
 "implements monotonic stop milestones under one coordinator; after failure it"
 " retries only the failed phase without repeating successful joins."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:182
+#: ../../../../docs/reference/contracts/os/execution.md:216
 msgid "低功耗、诊断与安全边界"
 msgstr "Low power, diagnostics and security boundaries"
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:184
+#: ../../../../docs/reference/contracts/os/execution.md:218
 msgid ""
 "Arch 的序号复查与浅睡眠保存恢复 incoming PRIMASK；WFI 前 DSB，明确拒绝默认深睡眠。 应用负责唤醒 timer "
 "和持续时钟。FreeRTOS tickless 使用 caller-owned timer port：精确 Tick phase、暂停/恢复、绝对 "
@@ -578,7 +672,7 @@ msgstr ""
 " continuous clocks and abnormal overshoot. Unbound ports retain ordinary "
 "ticks without guessed low-power devices or wake pins."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:189
+#: ../../../../docs/reference/contracts/os/execution.md:223
 msgid ""
 "诊断 ring 由调用方提供 capacity；写满不覆盖旧事件，lost counter 饱和。内核 trace 默认 weak no-op，无默认大"
 " buffer；产品覆盖 sink 并负责消费。异常 hook 是有界平台 扩展点，安全输出、watchdog/reset、事件持久化和释放策略归产品。"
@@ -589,7 +683,7 @@ msgstr ""
 "extension ports; products own safe outputs, watchdog/reset, persistence and "
 "release policy."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:193
+#: ../../../../docs/reference/contracts/os/execution.md:227
 msgid ""
 "显式 MPU profile 使用真实 restricted-task kernel port、专用 linker regions 和窄 SVC "
 "gateway。调用方在 privileged RAM 提供 TCB/context/syscall stack，在 user RAM 提供 "
@@ -605,7 +699,7 @@ msgstr ""
 "violations, overlaps and illegal contexts. Ordinary code/data/providers "
 "remain privileged; only explicit user text/data enters user regions."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:199
+#: ../../../../docs/reference/contracts/os/execution.md:233
 msgid ""
 "默认公开 user 服务为无指针的 delay/tick-read，经真实 MPU veneer/SVC。当前 F4 生产集成不提供 scalar "
 "GPIO gateway；公共 copied broker 机制与具体 内核／安全域入口分别维护，不建立任意指针调用或隐式升权。 受维护基础软件组合为 "
@@ -627,7 +721,7 @@ msgstr ""
 "explicitly deletes another task only after all external users are quiescent;"
 " self-deletion is rejected. There is no hidden reaper."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:208
+#: ../../../../docs/reference/contracts/os/execution.md:242
 msgid ""
 "显式 split 由两个独立 Runtime 图像组成：Secure 侧是明确 Secure CPU facts、baremetal runtime 与"
 " `Nexus::SecureContext`；Nonsecure 侧选择匹配 CPU facts 和 split FreeRTOS。 匹配 "
@@ -642,7 +736,7 @@ msgstr ""
 "consume it and actual CM23/33/55/85 TrustZone-aware non_secure ports. Macros"
 " on NTZ ports cannot impersonate cross-world save/load."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:214
+#: ../../../../docs/reference/contracts/os/execution.md:248
 msgid ""
 "每个获准 NS task，包括内核 Idle，均由调用方提供 NS TCB/stack 和独立 Secure metadata/stack。Secure"
 " startup 先 prepare，可信 immutable task→context selector 只 "
@@ -658,7 +752,7 @@ msgstr ""
 "business stack budgets. Split consumers provide Idle callbacks/matching "
 "Secure Idle storage; policy controls request budgets without default pools."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:220
+#: ../../../../docs/reference/contracts/os/execution.md:254
 msgid ""
 "租约身份包含可信 task 与单调 epoch；free 保留 metadata/epoch 历史，join 与 observers quiescent"
 " 后才能 rebind。已 load 的 context 不能 free。真实 PSP/PSPLIM assembly 处理 save/load，保留 "
@@ -680,11 +774,11 @@ msgstr ""
 "calls, but the mechanism does not defend against a malicious privileged NS "
 "kernel forging its own task parameters."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:229
+#: ../../../../docs/reference/contracts/os/execution.md:263
 msgid "自动化与实际证据"
 msgstr "Automation and actual evidence"
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:231
+#: ../../../../docs/reference/contracts/os/execution.md:265
 msgid ""
 "行为变更先记录真实 GoogleTest/GoogleMock RED，再实现 GREEN，最后重构。mock "
 "外部硬件、CPU/内核边界或产品调度动作，不 mock 实现本身。等待竞态以 barrier、 可控时钟和显式调度构造，不能依赖 sleep "
@@ -696,7 +790,7 @@ msgstr ""
 "barriers, controlled clocks and explicit schedules rather than sleep "
 "duration."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:235
+#: ../../../../docs/reference/contracts/os/execution.md:269
 msgid ""
 "配置和 evidence 工具使用 Python unittest；hook 和 CI 执行实际发现的完整 suite， 拒绝零测试、过滤、skip-"
 "only、陈旧 JUnit 与缺工具。真实 POSIX scheduler 验证 kernel 集成；ARM 编译/link/ELF 报告验证 ABI "
@@ -708,7 +802,7 @@ msgstr ""
 "integration; ARM compile/link/ELF proves ABI/resources, not MCU timing or "
 "physical context behavior."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:239
+#: ../../../../docs/reference/contracts/os/execution.md:273
 msgid ""
 "`tools/hil/os_acceptance.py` 提供 OS49–55 的 unbound 计划与严格物理记录验证。验证 重建 "
 "admission，绑定实际 ELF/config/CPU ABI/station/workload/instrument，检查完整 register "
@@ -722,11 +816,11 @@ msgstr ""
 "real safe outputs. It does not run probes, serial ports, supplies or Flash; "
 "absent equipment leaves every physical item `not_executed`."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:244
+#: ../../../../docs/reference/contracts/os/execution.md:278
 msgid "内核升级与新后端接入检查表"
 msgstr "Kernel-upgrade and new-backend checklist"
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:246
+#: ../../../../docs/reference/contracts/os/execution.md:280
 msgid ""
 "内核升级先在独立分支锁定 commit/tree 和所有实际使用 Port；不要只升级版本字符串。 审核配置宏、TCB/queue ABI、初始 "
 "frame、ISR priority gate、yield/critical 行为和任务返回 wrapper。M7 integer overlay "
@@ -742,7 +836,7 @@ msgstr ""
 "coprocessor initialization need matching macros, real assembly/disassembly "
 "and eventual hardware switch records."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:252
+#: ../../../../docs/reference/contracts/os/execution.md:286
 msgid ""
 "升级通过全部 GoogleMock/context tests、真实 POSIX lifecycle、九核链接、profile 正负路径和 formal"
 " installed SDK 后，重新记录成本与当前 source identity。旧 clean candidate、旧 ELF "
@@ -754,129 +848,140 @@ msgstr ""
 "reports do not qualify new kernels automatically. Products approve actual "
 "task budgets, timing/HIL, recovery and release scope."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:257
+#: ../../../../docs/reference/contracts/os/execution.md:291
 msgid "新 RTOS/backend 必须逐项提供："
 msgstr "New RTOS/backends must provide:"
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:259
+#: ../../../../docs/reference/contracts/os/execution.md:293
 msgid "明确 startup/running/suspended/task/IRQ 上下文、scheduler 启动责任和中断政策。"
 msgstr ""
 "Explicit startup/running/suspended/task/IRQ contexts, scheduler-start "
 "responsibility and interrupt policy."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:260
+#: ../../../../docs/reference/contracts/os/execution.md:294
 msgid "同域单调时钟、有限及无限 deadline、arm/recheck/wait race 和单 waiter 合同。"
 msgstr ""
 "One-domain monotonic clocks, finite/infinite deadlines, arm/recheck/wait "
 "races and single-waiter contracts."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:261
-msgid "每类对象的精确存储、对齐、初始化失败零副作用、关闭与 destroy 条件。"
+#: ../../../../docs/reference/contracts/os/execution.md:295
+msgid "每类对象的精确存储、对齐、干净拒绝无新增借用、部分清理失败保留资源及关闭／destroy 条件。"
 msgstr ""
-"Exact per-object storage/alignment, zero-side-effect initialization failures"
-" and close/destroy conditions."
+"Exact storage, alignment, clean rejection without new loans, retained "
+"resources after partial cleanup failure, and close/destroy conditions for "
+"each object class."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:262
+#: ../../../../docs/reference/contracts/os/execution.md:296
 msgid "returning/permanent 任务生命周期、单 joiner、超时后引用保留和存储复用证明。"
 msgstr ""
 "Returning/permanent task lifecycles, single joiners, timeout reference "
 "retention and storage-reuse proof."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:263
+#: ../../../../docs/reference/contracts/os/execution.md:297
 msgid "producer/owner stop 与 request drain 能继续进展，不用强制删除任务解除 borrow。"
 msgstr ""
 "Producer/owner stop and request-drain progress without forced deletion "
 "revoking borrows."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:264
+#: ../../../../docs/reference/contracts/os/execution.md:298
 msgid "CPU Port/ABI/context save、实际源依赖、最小资源报告和 missing-hook 链接拒绝。"
 msgstr ""
 "CPU ports/ABI/context save, actual dependencies, minimum resource reports "
 "and missing-hook link failures."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:265
+#: ../../../../docs/reference/contracts/os/execution.md:299
 msgid "真实 backend execution 与同一 GoogleTest 合同；新 kernel 不通过只有 mock 的验证。"
 msgstr ""
 "Real backend execution with the same GoogleTest contracts; mocks alone "
 "cannot verify new kernels."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:266
+#: ../../../../docs/reference/contracts/os/execution.md:300
 msgid "正确标注 Native/model、ARM link 和 physical station 的不同资格，禁止推测新板接线。"
 msgstr ""
 "Separate Native/model, ARM link and physical-station qualification without "
 "guessed Board wiring."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:268
+#: ../../../../docs/reference/contracts/os/execution.md:302
 msgid "错误与恢复责任"
 msgstr "Error and recovery responsibilities"
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:0
+#: ../../../../docs/reference/contracts/os/execution.md:0
 msgid "结果/状态"
 msgstr "Result/status"
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:0
+#: ../../../../docs/reference/contracts/os/execution.md:0
 msgid "调用方责任"
 msgstr "Caller responsibility"
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:0
+#: ../../../../docs/reference/contracts/os/execution.md:0
 msgid "`BUSY`"
 msgstr "`BUSY`"
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:0
+#: ../../../../docs/reference/contracts/os/execution.md:0
 msgid "保持 storage；非阻塞调用方继续显式 service/pump 或按应用政策重试"
 msgstr ""
 "Retain storage; nonblocking callers continue explicit service/pump or retry "
 "under product policy."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:0
+#: ../../../../docs/reference/contracts/os/execution.md:0
 msgid "`TIMEOUT`"
 msgstr "`TIMEOUT`"
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:0
+#: ../../../../docs/reference/contracts/os/execution.md:0
 msgid "只结束本次等待预算；不能释放尚未 SETTLED 的 operation/bytes"
 msgstr ""
 "Only this wait budget ends; unsettled operations/bytes cannot be released."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:0
+#: ../../../../docs/reference/contracts/os/execution.md:0
+msgid "`CANCELLED`"
+msgstr "`CANCELLED`"
+
+#: ../../../../docs/reference/contracts/os/execution.md:0
+msgid "channel 停止发送准入，已有 item 继续排空；仍需会合用户再销毁"
+msgstr ""
+"A channel stops send admission while existing items continue draining; join "
+"users before destruction."
+
+#: ../../../../docs/reference/contracts/os/execution.md:0
 msgid "`CONTEXT`"
 msgstr "`CONTEXT`"
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:0
+#: ../../../../docs/reference/contracts/os/execution.md:0
 msgid "先恢复合法任务/IRQ/掩码/scheduler 上下文，不在 guard 内重试 kernel"
 msgstr ""
 "Restore legal task/IRQ/mask/scheduler context first; do not retry kernel "
 "calls inside guards."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:0
+#: ../../../../docs/reference/contracts/os/execution.md:0
 msgid "`STATE`"
 msgstr "`STATE`"
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:0
+#: ../../../../docs/reference/contracts/os/execution.md:0
 msgid "检查对象生命周期、close、stale ticket、receiver/index 和唯一所有者"
 msgstr ""
 "Check lifecycle, closure, stale tickets, receiver/index and sole ownership."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:0
+#: ../../../../docs/reference/contracts/os/execution.md:0
 msgid "`QUARANTINED`"
 msgstr "`QUARANTINED`"
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:0
+#: ../../../../docs/reference/contracts/os/execution.md:0
 msgid "保留全部 borrow，owner 继续 recovery/drain，产品决定安全输出/reset"
 msgstr ""
 "Retain all borrows; owners continue recovery/drain while products choose "
 "safe outputs/reset."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:0
+#: ../../../../docs/reference/contracts/os/execution.md:0
 msgid "`UNSUPPORTED`"
 msgstr "`UNSUPPORTED`"
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:0
+#: ../../../../docs/reference/contracts/os/execution.md:0
 msgid "在配置/接入阶段选择真实能力；不静默启用替代 worker 或改变模式"
 msgstr ""
 "Select actual capabilities during configuration/integration; no silent "
 "substitute workers or modes."
 
-#: ../../../../../../docs/reference/contracts/os/execution.md:279
+#: ../../../../docs/reference/contracts/os/execution.md:314
 msgid ""
 "平台不把这些结果自动映射成 retry、重启、写 Flash 或恢复安全输出。生产策略必须 "
 "使用产品自己的预算、告警和状态机，并保留实际失败路径的原始证据。"

@@ -228,7 +228,7 @@ def execute_variant(root: Path, recorder, selected_tools: dict,
                              variant['name'] + '-symbols', nonempty=True)
     required = {'SVC_Handler', 'PendSV_Handler', 'SysTick_Handler',
                 'vTaskStartScheduler', 'nx_freertos_direct_notify_init',
-                'nx_freertos_permanent_task_start'}
+                'nx_permanent_task_start'}
     if not required <= cortex_runtime.symbols(names):
         raise ValueError('Actual kernel/adapter contract symbols were discarded')
     cortex_runtime.check_runtime_dependencies(names)

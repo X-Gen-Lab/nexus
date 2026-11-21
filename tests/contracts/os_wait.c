@@ -9,7 +9,7 @@
  */
 #define _POSIX_C_SOURCE 200809L
 #include "nexus/os/baremetal.h"
-#include "nexus/os/native.h"
+#include "nexus/os/storage.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -41,33 +41,33 @@ static void wait_task(void* context) {
     fixture_t* fixture = context;
     __atomic_store_n(&fixture->waiting, 1, __ATOMIC_RELEASE);
     CHECK(nx_wait_until(&fixture->port, ready, fixture,
-                        nx_native_now_us() + 1000000u) == NX_SUCCESS);
+                        nx_os_now_us() + 1000000u) == NX_SUCCESS);
 }
 
 /** \brief Wake between arm and sleep, including repeated latch saturation. */
 static void native_lost_wake(void) {
-    nx_native_notify_t notification;
-    CHECK(nx_native_notify_init(&notification) == NX_SUCCESS);
-    nx_wait_port_t port = nx_native_notify_port(&notification);
+    nx_notify_t notification = {0};
+    CHECK(nx_notify_init(&notification) == NX_SUCCESS);
+    nx_wait_port_t port = nx_notify_port(&notification);
     uint32_t sequence = port.arm(port.context);
     for (unsigned i = 0; i < 1000; ++i) {
         CHECK(port.wake(port.context) == NX_SUCCESS);
     }
-    CHECK(port.wait(port.context, sequence, nx_native_now_us() + 10000) ==
+    CHECK(port.wait(port.context, sequence, nx_os_now_us() + 10000) ==
           NX_SUCCESS);
     sequence = port.arm(port.context);
-    CHECK(port.wait(port.context, sequence, nx_native_now_us() + 1000) ==
+    CHECK(port.wait(port.context, sequence, nx_os_now_us() + 1000) ==
           NX_ERROR_TIMEOUT);
     fixture_t fixture = {port, 0, 0};
-    nx_native_task_t task = {0};
+    nx_task_t task = {0};
     void* stack;
     /* Explicit host sanitizer allowance; it is not an MCU stack budget. */
     const size_t stack_bytes = 262144;
     CHECK(posix_memalign(&stack, 4096, stack_bytes) == 0);
-    CHECK(nx_native_task_start(&task, stack, 16, wait_task, &fixture) ==
+    CHECK(nx_task_start(&task, "fixture", stack, 16, 0U, wait_task, &fixture) ==
           NX_ERROR_INVALID);
-    CHECK(nx_native_task_start(&task, stack, stack_bytes, wait_task,
-                               &fixture) == NX_SUCCESS);
+    CHECK(nx_task_start(&task, "fixture", stack, stack_bytes, 0U, wait_task,
+                        &fixture) == NX_SUCCESS);
     while (__atomic_load_n(&fixture.waiting, __ATOMIC_ACQUIRE) == 0) {
         struct timespec pause = {0, 100000};
         nanosleep(&pause, NULL);
@@ -83,12 +83,12 @@ static void native_lost_wake(void) {
         }
     }
     CHECK(entered);
-    CHECK(nx_native_notify_destroy(&notification) == NX_ERROR_BUSY);
+    CHECK(nx_notify_destroy(&notification) == NX_ERROR_BUSY);
     __atomic_store_n(&fixture.ready, 1, __ATOMIC_RELEASE);
     CHECK(port.wake(port.context) == NX_SUCCESS);
-    CHECK(nx_native_task_join(&task) == NX_SUCCESS);
+    CHECK(nx_task_join_until(&task, NX_DEADLINE_NEVER) == NX_SUCCESS);
     free(stack);
-    CHECK(nx_native_notify_destroy(&notification) == NX_SUCCESS);
+    CHECK(nx_notify_destroy(&notification) == NX_SUCCESS);
 }
 
 /** \brief Model a monotonic bare-metal source. */
@@ -117,37 +117,40 @@ static void baremetal_poll(void) {
  *                  losing drain.
  */
 static void queue_lifecycle(void) {
-    nx_native_queue_t queue;
+    nx_channel_t queue = {0};
+    nx_channel_waiter_t waiter = {0};
+    CHECK(nx_channel_waiter_init(&waiter) == NX_SUCCESS);
     uint32_t storage[3];
-    CHECK(nx_native_queue_init(&queue, storage, sizeof(storage), 4,
-                               sizeof(uint32_t)) == NX_ERROR_INVALID);
-    CHECK(nx_native_queue_init(&queue, storage, sizeof(storage), 3,
-                               sizeof(uint32_t)) == NX_SUCCESS);
+    CHECK(nx_channel_init(&queue, storage, sizeof(storage), 4, sizeof(uint32_t),
+                          1U) == NX_ERROR_INVALID);
+    CHECK(nx_channel_init(&queue, storage, sizeof(storage), 3, sizeof(uint32_t),
+                          1U) == NX_SUCCESS);
     for (uint32_t i = 0; i < 3; ++i) {
-        CHECK(nx_native_queue_send(&queue, &i, nx_native_now_us()) ==
+        CHECK(nx_channel_send_until(&queue, &i, nx_os_now_us(), &waiter) ==
               NX_SUCCESS);
     }
     uint32_t value = 99;
-    CHECK(nx_native_queue_send(&queue, &value, nx_native_now_us()) ==
+    CHECK(nx_channel_send_until(&queue, &value, nx_os_now_us(), &waiter) ==
           NX_ERROR_TIMEOUT);
-    CHECK(nx_native_queue_destroy(&queue) == NX_ERROR_BUSY);
-    CHECK(nx_native_queue_receive(&queue, &value, nx_native_now_us()) ==
+    CHECK(nx_channel_destroy(&queue) == NX_ERROR_BUSY);
+    CHECK(nx_channel_receive_until(&queue, &value, nx_os_now_us(), &waiter) ==
           NX_SUCCESS);
     CHECK(value == 0);
     value = 3;
-    CHECK(nx_native_queue_send(&queue, &value, nx_native_now_us()) ==
+    CHECK(nx_channel_send_until(&queue, &value, nx_os_now_us(), &waiter) ==
           NX_SUCCESS);
-    CHECK(nx_native_queue_close(&queue) == NX_SUCCESS);
-    CHECK(nx_native_queue_send(&queue, &value, nx_native_now_us()) ==
-          NX_ERROR_STATE);
+    CHECK(nx_channel_close(&queue) == NX_SUCCESS);
+    CHECK(nx_channel_send_until(&queue, &value, nx_os_now_us(), &waiter) ==
+          NX_ERROR_CANCELLED);
     for (uint32_t i = 1; i < 4; ++i) {
-        CHECK(nx_native_queue_receive(&queue, &value, nx_native_now_us()) ==
-              NX_SUCCESS);
+        CHECK(nx_channel_receive_until(&queue, &value, nx_os_now_us(),
+                                       &waiter) == NX_SUCCESS);
         CHECK(value == i);
     }
-    CHECK(nx_native_queue_receive(&queue, &value, nx_native_now_us()) ==
-          NX_ERROR_STATE);
-    CHECK(nx_native_queue_destroy(&queue) == NX_SUCCESS);
+    CHECK(nx_channel_receive_until(&queue, &value, nx_os_now_us(), &waiter) ==
+          NX_ERROR_CANCELLED);
+    CHECK(nx_channel_destroy(&queue) == NX_SUCCESS);
+    CHECK(nx_channel_waiter_destroy(&waiter) == NX_SUCCESS);
 }
 
 /** \brief Run real host synchronization and bare-metal progress contracts. */

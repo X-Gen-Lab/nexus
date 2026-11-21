@@ -7,26 +7,29 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 59b149177f138a96625924bf9f2d8d7f6f0ce18c4f3c89aa65bb39f45d05b408\n"
+"X-Nexus-Source-SHA256: 9e597dc734631ea2ebfd34159feb2b1fb63d3aef7879fe8994304a6cf1b3c5c0\n"
 
-#: ../../../../../../docs/guides/os-backend-porting.md:8
+#: ../../../../docs/guides/os-backend-porting.md:8
 msgid "维护或接入 OS 后端"
 msgstr "Maintain or integrate an OS backend"
 
-#: ../../../../../../docs/guides/os-backend-porting.md:10
+#: ../../../../docs/guides/os-backend-porting.md:10
 msgid ""
 "已有后端先从 TOML 选择，不为每块板复制 OSAL。新后端必须实现明确的任务、同步、 时间和生命周期合同；不能仅增加 backend "
-"名字就宣称支持。"
+"名字就宣称支持。当前公共任务、通知、 queue 和 channel 接口由所选后端实现，最终软件候选和硬件资格仍须单独验证。"
 msgstr ""
-"Select an existing backend through TOML; do not copy OSAL per Board. A new "
-"backend must implement explicit task, synchronization, time and lifecycle "
-"contracts. Adding a backend name alone does not establish support."
+"Select an existing backend through TOML rather than copying OSAL for each "
+"Board. A new backend must implement explicit task, synchronization, time and"
+" lifecycle contracts; adding a backend name alone does not establish "
+"support. The selected backend implements the current common task, "
+"notification, queue and channel interfaces. Final software candidates and "
+"hardware qualification still require separate validation."
 
-#: ../../../../../../docs/guides/os-backend-porting.md:13
+#: ../../../../docs/guides/os-backend-porting.md:14
 msgid "确定所需子集"
 msgstr "Determine the required subset"
 
-#: ../../../../../../docs/guides/os-backend-porting.md:15
+#: ../../../../docs/guides/os-backend-porting.md:16
 msgid ""
 "先列调用方实际需要的静态任务、队列、通知、等待和时间能力。未实现能力明确拒绝； ThreadX 的 Native／M4 子集不继承 FreeRTOS 的"
 " tickless、隔离或端口范围。 CPU 原语、SoC 时钟与 OS 内核职责分别维护。"
@@ -37,66 +40,139 @@ msgstr ""
 "or port scope. Maintain CPU primitives, SoC clocks and OS kernel "
 "responsibilities separately."
 
-#: ../../../../../../docs/guides/os-backend-porting.md:19
+#: ../../../../docs/guides/os-backend-porting.md:20
+msgid ""
+"业务头只使用公共 opaque 引用。静态装配包含 `nexus/os/storage.h`，由目标的 include "
+"路径选择完整布局；每个可执行文件只链接一个后端。不建立最大 union、 固定 TCB 字节池、运行时 OS 判断或第二层 "
+"vtable。裸机保持非阻塞机制，不提供 假任务；要求任务、有限 join 或关闭广播的消费者在能力不足时配置拒绝。"
+msgstr ""
+"Business headers use only public opaque references. Static assembly includes"
+" `nexus/os/storage.h`, with target include paths selecting the complete "
+"layout; each executable links one backend. Do not add a maximum union, "
+"fixed-byte TCB pool, runtime OS selection or another vtable. Baremetal "
+"retains nonblocking mechanisms rather than fake tasks. Reject consumers "
+"requiring tasks, finite join or close broadcast at configuration when "
+"capabilities are absent."
+
+#: ../../../../docs/guides/os-backend-porting.md:25
 msgid "以一条实际路径接入"
 msgstr "Integrate one actual path"
 
-#: ../../../../../../docs/guides/os-backend-porting.md:21
+#: ../../../../docs/guides/os-backend-porting.md:27
 msgid "锁定内核、端口、许可证与编译上下文，在 `os/<backend>/` 实现窄 adapter。"
 msgstr ""
 "Pin the kernel, port, license and compilation context, and implement a "
 "narrow adapter in `os/<backend>/`."
 
-#: ../../../../../../docs/guides/os-backend-porting.md:22
-msgid "明确调用者提供的 stack、TCB、队列和控制状态，固定返回、等待、关闭与 join。"
+#: ../../../../docs/guides/os-backend-porting.md:28
+msgid ""
+"完成公共 struct 标签及真实选定布局；调用者清零控制对象，提供字节栈容量和完整 payload 容量。准入检查完整跨度、对齐和重叠，不仅检查有效 "
+"item 区间。"
 msgstr ""
-"Specify caller-provided stacks, TCBs, queues and control state, and define "
-"return, wait, close and join behavior."
+"Complete public struct tags and actual selected layouts. Callers zero "
+"controls and provide byte-sized stack capacity and complete payload "
+"capacity. Admission checks full spans, alignment and overlap, not merely the"
+" used item range."
 
-#: ../../../../../../docs/guides/os-backend-porting.md:23
-msgid "实现同一绝对单调 deadline 和最终谓词观察，拒绝非法 ISR 调用和优先级。"
+#: ../../../../docs/guides/os-backend-porting.md:30
+msgid ""
+"实现共同符号及同域绝对单调 deadline；映射高数值高优先级，分离 Task／ISR 入口，拒绝非法上下文，不忽略 Native "
+"无法提供的优先级保证。"
 msgstr ""
-"Implement the same absolute monotonic deadline and final predicate "
-"observation; reject invalid ISR calls and priorities."
+"Implement common symbols and absolute monotonic deadlines in one domain. Map"
+" higher numeric logical priorities to higher priority, separate Task/ISR "
+"entry points and reject invalid contexts. Do not ignore priority guarantees "
+"Native cannot provide."
 
-#: ../../../../../../docs/guides/os-backend-porting.md:24
+#: ../../../../docs/guides/os-backend-porting.md:32
 msgid "验证真实任务执行、部分创建失败、通知竞争、超时、关闭和失败排空。"
 msgstr ""
 "Validate actual task execution, partial-creation failures, notification "
 "races, timeouts, close and failed drain."
 
-#: ../../../../../../docs/guides/os-backend-porting.md:25
+#: ../../../../docs/guides/os-backend-porting.md:33
 msgid "编译所维护的 CPU／ABI 组合，再单独记录 MCU 上下文、栈峰值和时序实测。"
 msgstr ""
 "Compile maintained CPU/ABI combinations, then separately record MCU context,"
 " stack peaks and measured timing."
 
-#: ../../../../../../docs/guides/os-backend-porting.md:27
+#: ../../../../docs/guides/os-backend-porting.md:35
 msgid ""
 "应用拥有 scheduler 启动和产品 worker。Platform start 不进入内核；任务入口返回 或通知到达不授权回收 "
-"stack／TCB。内核仍使用的 Tick、时钟和 IRQ 必须保留。"
+"stack／TCB。内核仍使用的 Tick、时钟和 IRQ 必须保留。 公共 `nx_os_run` 通过真实 bootstrap "
+"启动，成功不返回；Native 在回调后停驻原调用 线程以保留其栈。`nx_task_join_until` 成功必须证明真实内核引用撤离，有限 "
+"join 不能退成无界调用。Native 要求可真实链接的 GNU monotonic clock-join 能力。"
 msgstr ""
-"The application owns scheduler startup and product workers. Platform start "
-"does not enter the kernel. Task-entry return or notification arrival does "
-"not authorize stack/TCB reclamation. Tick, clock and IRQ infrastructure "
-"still used by the kernel must be retained."
+"Applications own scheduler startup and product workers. Platform start does "
+"not enter the kernel. Task-entry return or notification arrival does not "
+"authorize stack/TCB reclamation. Retain Tick, clocks and IRQs still used by "
+"the kernel. Common `nx_os_run` enters actual bootstrap and never returns "
+"successfully; Native subsequently parks the original calling thread to "
+"retain its stack. Successful `nx_task_join_until` must prove actual kernel "
+"reference withdrawal; finite join must not fall back to an unbounded call. "
+"Native requires genuinely linked GNU monotonic clock-join support."
 
-#: ../../../../../../docs/guides/os-backend-porting.md:30
+#: ../../../../docs/guides/os-backend-porting.md:41
 msgid "与配置和构建组合"
 msgstr "Compose with configuration and builds"
 
-#: ../../../../../../docs/guides/os-backend-porting.md:32
+#: ../../../../docs/guides/os-backend-porting.md:43
 msgid ""
 "后端的能力与策略字段进入公开合同和 typed IR，实际 CMake 目标发布为所选 "
-"`Nexus::OS`。新增后端同时维护兼容性事实、依赖选择、生成、Source SDK profile 和实际消费者，不创建第二套实例或源码图。"
+"`Nexus::OS`。新增后端同时维护兼容性事实、依赖选择、生成、Source SDK profile 和实际消费者，不创建第二套实例或源码图。 "
+"配置工具处理能力与静态选择，不实现内核行为。复用同一 CPU／port 合同的新 MCU 提供相应 SoC、时钟和 IRQ 事实，不复制公共 OS "
+"API 或逐芯片增加行为分支。"
 msgstr ""
-"Backend capability and policy fields enter public contracts and typed IR. "
-"The selected actual CMake target is published as `Nexus::OS`. A new backend "
-"also maintains compatibility facts, dependency selection, generation, Source"
-" SDK profiles and real consumers. Do not create another instance or source "
-"graph."
+"Backend capabilities and policy fields enter public contracts and typed IR, "
+"while the actual CMake target is published as the selected `Nexus::OS`. A "
+"new backend maintains compatibility facts, dependency selection, generation,"
+" Source SDK profiles and actual consumers together, without a second "
+"instance or source graph. Configuration tools validate capabilities and "
+"static selection rather than implement kernel behavior. An MCU reusing the "
+"same CPU/port contract provides its SoC, clock and IRQ facts instead of "
+"copying public OS APIs or adding per-chip behavior branches."
 
-#: ../../../../../../docs/guides/os-backend-porting.md:36
+#: ../../../../docs/guides/os-backend-porting.md:49
+msgid ""
+"消费者在显式调用 `nexus_add_platform` 或 `nexus_add_runtime`、并建立应用 target "
+"后声明必要能力。下面是片段，假定装配和 `app` 已存在，不是完整工程："
+msgstr ""
+"Consumers declare required capabilities after explicitly calling "
+"`nexus_add_platform` or `nexus_add_runtime` and creating the application "
+"target. The following is a fragment assuming the assembly and `app` already "
+"exist, not a complete project:"
+
+#: ../../../../docs/guides/os-backend-porting.md:58
+msgid ""
+"该函数只校验选定 `Nexus::OS` 的能力元数据，不隐式添加链接。缺失能力、拼写错误、 尚未选择装配或不存在的应用 target "
+"都在配置阶段失败。CMake 的 compatible-interface 约束另行拒绝同一可执行文件链接两个 task 后端，不依靠运行时发现冲突。"
+msgstr ""
+"This function only validates capability metadata on the selected "
+"`Nexus::OS`; it does not link implicitly. Missing capabilities, spelling "
+"errors, no selected assembly or a nonexistent application target fail during"
+" configuration. CMake compatible-interface constraints separately reject two"
+" task backends linked into one executable, without runtime conflict "
+"detection."
+
+#: ../../../../docs/guides/os-backend-porting.md:62
+msgid ""
+"Native 不提供 `priority` 或硬件 `isr_notify`；Host ThreadX 不提供硬件 `isr_notify`； "
+"裸机仅声明 `wait`，不能接纳要求 task-profile 的消费者。task-profile 是能力集合的 说明，不是新增 TOML "
+"字段。配置与源码仍沿同一目标图维护。实际回归入口为 "
+"[`test_platform_entry.py`](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-SOURCE/tools/testing/test_platform_entry.py)，不能仅凭此片段 "
+"宣称另一个后端或目标已验证。"
+msgstr ""
+"Native provides neither `priority` nor hardware `isr_notify`; Host ThreadX "
+"provides no hardware `isr_notify`. Baremetal declares only `wait` and cannot"
+" admit consumers requiring a task-profile. Here task-profile describes a "
+"capability set, not a new TOML field. Configuration and source remain in the"
+" same target graph. Actual regressions are maintained in "
+"[`test_platform_entry.py`](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-SOURCE/tools/testing/test_platform_entry.py); the fragment "
+"alone does not establish validation of another backend or target."
+
+#: ../../../../docs/guides/os-backend-porting.md:68
 msgid ""
 "详细 port、IRQ ceiling、Tick 和错误语义集中在 "
 "[后端集成合同](../reference/contracts/os/backend-integration.md)。应用停机见 [OS 停止](os-"

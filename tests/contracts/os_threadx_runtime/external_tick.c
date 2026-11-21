@@ -7,6 +7,7 @@
  *
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "nexus/os/storage.h"
 #include "nexus/os/threadx.h"
 /** \brief No physical source is bound; successful link does not enable Tick. */
 nx_result_t nx_threadx_external_tick_setup(uint32_t tick_hz) {

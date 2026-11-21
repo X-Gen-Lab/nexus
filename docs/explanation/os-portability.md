@@ -6,41 +6,41 @@ source_language: zh_CN
 ---
 
 (explanation.os-portability)=
-# OS 源码可移植性：目标设计
+# OS 源码可移植性：现行架构
 
-本页帮助维护者审查统一 OS 接口、静态内存和后端扩展之间的边界。它是以
-`main@86f94e69` 为现状依据的目标提案，尚未改变公共头、配置合同或后端实现。
-实施顺序、任务和退出条件见[实施计划](../development/os-portability-plan.md)。
-当前行为仍由 [OS 执行合同](../reference/contracts/os/execution.md)和
-[后端接入合同](../reference/contracts/os/backend-integration.md)维护。
+本页说明公共 OS 接口、静态内存与后端扩展如何连接。任务、通知、队列、关闭通道
+和执行预算已在 FreeRTOS、ThreadX、Native 后端使用同一组公共符号；装配侧持有
+选定后端的真实存储，业务只接收公共引用。实施与验收清单见
+[交付清单](../development/os-portability-plan.md)，调用要求见
+[OS 执行合同](../reference/contracts/os/execution.md)和
+[后端接入合同](../reference/contracts/os/backend-integration.md)。
 
-目标是：常规业务与可复用执行组件更换 OS 时保持源码不变，装配侧调整后端选择、
-资源预算和明确使用的专有扩展。源码可移植不表示二进制 ABI、调度时序、最小栈或
-所有内核特性相同；Host 执行也不建立 MCU 实时性或物理验证资格。
+公共消费链已有真实内核与外部示例的阶段验证。最终集成、ARM、资源和 SDK 资格
+仍以绑定最终源码及配置的实际报告为准。源码可移植不表示二进制 ABI、调度时序、
+最小栈或所有内核特性相同；Host 执行不建立 MCU 实时性或实板资格。
 
-## 当前限制与目标
+## 当前接口与边界
 
-| 边界 | 当前实现 | 目标 |
+| 边界 | 当前实现 | 使用限制 |
 | --- | --- | --- |
 | 等待 | 公共 `nx_wait_port_t` 和条件等待 | 保留现有合同与直接 callback 布局 |
-| 任务与队列 | 后端专用名称、类型和调用 | 通用能力使用共同名称与语义 |
-| 存储 | 调用者提供真实后端对象 | 装配侧提供选定后端布局，业务只持有 opaque 引用 |
-| 后端选择 | 构建期选择 | 继续单镜像单后端，不增加运行期分派表 |
-| 专有能力 | 原生类型和扩展入口 | 仅专有集成使用明确扩展，普通业务不依赖它们 |
-| 裸机 | 非阻塞通知，没有任务调度器 | 保留机制；要求 task-profile 的配置直接拒绝 |
+| 任务与通信 | 公共任务、通知、队列和 channel 接口 | 专有调度与隔离仍用明确扩展 |
+| 存储 | `storage.h` 完成选定后端布局 | 业务头不包含原生控制块，切换后端重新编译 |
+| 后端选择 | CMake 选择并校验唯一任务后端 | 无运行期分派表或按调用判断 OS |
+| 能力要求 | `nexus_require_os_capabilities` 校验目标元数据 | 不隐式链接，不将缺失能力降级为成功 |
+| 裸机 | 非阻塞通知，没有任务调度器 | 只声明等待能力，不能满足任务能力要求 |
 
-当前后端专用 API 已暴露真实成本，但把任务和队列的内核身份带入了应用。
-资源透明并不要求业务使用内核类型。统一源码接口也不需要固定最大对象、动态
-句柄表或每次调用检查后端；应分别解决接口合同、存储布局和编译选择。
+接口合同、对象布局和构建选择分别维护。业务不需要命名原生 TCB，平台也不预留
+跨内核最大对象、动态句柄表或通用对象池。现有内核算法继续由对应后端执行。
 
 ## 依赖、职责与目录
 
-![FIG-27：目标 OS 构建依赖，单镜像只选择一个后端](../assets/diagrams/os-portability-target.svg)
+![FIG-27：当前 OS 构建依赖，单镜像只选择一个后端](../assets/diagrams/os-portability.svg)
 
-FIG-27 的身份是 target，每条箭头都表示构建期依赖，包含编译依赖和链接时的实现
+FIG-27 的身份是 current，每条箭头都表示构建期依赖，包含编译依赖和链接时的实现
 选择，不表示启动顺序、每次运行调用或所有权转移。图中的后端是互斥选择；
 应用不会同时链接三个同名 OS 实现。
-图只覆盖 task-profile，不包含裸机路径。目标结构不让普通 I/O 强制经过 OS，
+图只覆盖任务后端，不包含裸机路径。普通 I/O 不强制经过 OS，
 也不新增运行期 factory、worker 或对象池。
 
 | 层 | 拥有的责任 | 不承担的责任 |
@@ -56,7 +56,7 @@ FIG-27 的身份是 target，每条箭头都表示构建期依赖，包含编译
 合同的能力才能替换；小接口分离基础与可选能力；组件依赖公共端口。它不要求为
 每个函数增加接口层，也不允许以 `UNSUPPORTED` 掩盖已声明能力的缺失。
 
-拟议目录如下；这些路径不表示文件已存在。按真实规模分文件，不创建空目录。
+当前目录保留公共声明、选定存储布局和实际后端实现，按职责分文件。
 
 ```text
 os/
@@ -66,7 +66,6 @@ os/
     notify.h
     queue.h
     channel.h
-    mutex.h / semaphore.h
     storage.h
   baremetal/
   freertos/
@@ -74,13 +73,15 @@ os/
   native/
 ```
 
-后端内部可以按 task、notify、queue 等实际职责拆分 C 单元，共享少量私有辅助。
-不为了目录对称引入 forwarding 文件。现有 MPU、Secure、端口准备工具与锁定
-依赖继续归后端维护；Host 准备脚本不进入固件，不修改 vendor 原件。
+FreeRTOS 的 `task_runtime.c` 实现内核启动、读时钟、延时与 yield，普通对象算法
+保留在 `freertos.c`；ThreadX 与 Native 分别由自己的 C 实现承担。每个任务后端
+通过 include 路径提供同名 `nexus/os/detail/backend_storage.h`，而不是依靠整仓
+配置宏选择布局；真实 RTOS 的 Host 夹具因此也能取得正确存储。现有 MPU、Secure、
+端口准备工具与锁定依赖继续归后端维护，Host 脚本不进入固件、不修改 vendor。
 
 ## 编译期选择与静态存储
 
-拟议通用函数在各后端具有相同符号，CMake 每次只选择一个实现。无需
+公共函数在各后端具有相同符号，CMake 每次只选择一个实现。无需
 `switch(os_type)`、通用 ops 表、运行期名称查找或动态对象池。保留
 `nx_wait_port_t` 的 callback，是因为组件需要连接具体通知对象，与整幅镜像
 选择内核是不同问题；不再包一层通知 vtable。
@@ -89,40 +90,51 @@ os/
 同一对象直接形成业务引用，不额外分配一个只保存指针的包装对象。
 原生控制块头可以成为装配文件的编译依赖，但不进入业务头。
 
-以下仅为拟议写法示意，尚无可运行教程或稳定 API；省略了初始化与失败处理：
+以下片段来自三后端实际共用的 C11 消费者：两步操作共用一个绝对预算，业务不包含
+内核分支。它不包含对象装配、内核启动和退出流程，不是完整 `main` 教程。
 
-```c
-/* Assembly pseudocode: selected storage layout completes nx_task_t. */
-static nx_task_t worker;
-NX_OS_STACK_DEFINE(worker_stack, WORKER_STACK_BYTES);
-/* Business receives an opaque nx_task_t*, not a native kernel handle. */
+```{literalinclude} ../../tests/google/os/portable_consumer.c
+:language: c
+:start-at: nx_result_t nx_portable_queue_exchange
+:end-at: }
 ```
+
+装配侧用 [storage.h](../../os/include/nexus/os/storage.h) 和
+`NX_OS_STACK_DEFINE` 定义实际对象与栈；业务侧只需要相应公共头。
 
 栈容量对外以 B 表示。后端检查对齐、启动帧、容量溢出和原生单位换算；TCB、
 任务上下文、同步对象和队列数据区由外部 owner 持有。布局由真实选定类型决定，
 不维护另一套手写 sizeof，不预留跨内核最大 union，不把固定字节数组当通用 TCB。
 选择不同内核或配置后必须重新编译，并重新核对 `sizeof`、alignment 和预算。
 
-配置沿用现有 TOML、typed IR 和 CMake 单一路径。能力要求在同一解析链校验，
-不新增 Kconfig、缓存回退或第二套生成权威。新 MCU 若复用已有 CPU/内核合同，
-应提供 SoC、IRQ、时钟和 Board 事实；只有新端口或新语义才修改 OS 集成。
+硬件选择沿用 TOML、typed IR 和 CMake 单一路径。软件消费者在显式建立装配后，
+用 `nexus_require_os_capabilities` 校验 `Nexus::OS` 的能力，再显式链接该目标；
+校验函数不创建对象、不代替链接、不复制一份 TOML 能力清单。
+后端发布 `NEXUS_OS_BACKEND` 兼容身份，CMake 拒绝一幅镜像混入不同任务后端。
+裸机不冒充任务实现，真实 Host 内核端口也不声明硬件 IRQ 发布能力。
+
+这里不新增 Kconfig、缓存回退或独立 MCU 注册表。新 MCU 若复用已有 CPU/内核
+合同，提供 SoC、IRQ、时钟和 Board 事实即可；新端口或新语义才修改 OS 集成。
 
 ## 通用能力与可选扩展
 
-task-profile 指要求真实任务调度的目标能力集合，不是已存在的配置键。
-它覆盖 FreeRTOS、ThreadX 和满足所选合同的 Native；裸机只保留非阻塞机制。
-同步对象和关闭能力按需选择，不让全部对象承担最高成本。
+本页的任务能力集合覆盖 FreeRTOS、ThreadX 和 Native 公共实现，不是新增的 TOML
+配置键。裸机只保留非阻塞机制；任务、关闭和优先级等需求通过实际目标能力校验。
+永久任务与可返回任务、普通队列与关闭通道分别承担各自的存储成本。
 
-| 能力 | 目标合同 | 选用成本与限制 |
+| 能力 | 当前公共合同 | 选用成本与限制 |
 | --- | --- | --- |
 | 通知 | 单 waiter、多 publisher；提示后重查真实条件 | 保存序列与后端唤醒状态，发布域明确 |
 | 可返回任务 | 入口返回后可由唯一外部 owner join | 需要完成同步与真实内核回收 |
 | 永久任务 | 无 join；入口不得返回 | 省完成状态，误返回 fail-stop |
-| 任务时间与让出 | 拟议 `sleep_until` 与 `yield`，仅 task 使用 | 不创建 timer worker，不保证微秒精度或公平 |
+| 任务时间与让出 | `nx_sleep_until` 与 `nx_task_yield`，仅 task 使用 | 不创建 timer worker，不保证微秒精度或公平 |
 | 基础队列 | 固定 item size/depth、复制、有限等待 | 控制对象和 `depth * item_size` 数据区 |
 | 可关闭通道 | 关闭发送准入、广播退出、保留已有数据排空 | 额外 waiter 存储与广播成本 |
-| Mutex | task owner、解锁归属、明确优先级继承与递归政策 | 后端必须真实实现所选政策 |
-| Semaphore | 计数上限、获取/发布、明确饱和与 IRQ 范围 | 不冒充有 owner 的 mutex |
+
+本批没有公共 mutex／semaphore 接口。OSU-21 盘点确认：现有生产组件通过窄端口
+注入同步，未直接依赖跨 OS mutex 或计数 semaphore；当前消费链由通知、队列与
+channel 满足。OSU-22／23 因此明确不纳入，不创建空头或宣称已支持。原生内核
+已有这些功能，不等于 Nexus 已提供相应公共合同。
 
 FreeRTOS 直接通知槽、ThreadX 抢占阈值、MPU 受限任务和 Secure 上下文属于显式
 扩展。应用选择这些能力就接受对应装配的移植成本；不能让普通组件私自依赖它们。
@@ -130,7 +142,7 @@ FreeRTOS 直接通知槽、ThreadX 抢占阈值、MPU 受限任务和 Secure 上
 
 ## 任务、启动与回收
 
-拟议任务接口统一入口签名、可返回/永久分类和结果语义。start 成功后任务可能已经
+任务接口统一入口签名、可返回/永久分类和结果语义。start 成功后任务可能已经
 执行，甚至在 start 返回前结束；context 和必要连接必须先准备完成。
 创建被拒绝时不保留 entry/context。若底层部分资源未能撤回，必须返回明确的残余
 责任并保留控制对象，不能把它描述成可立即重用的干净拒绝。
@@ -140,16 +152,17 @@ pthread join 由后端实现；共同成功条件是内核与适配层已解除�
 join 超时不强杀任务，不释放栈、TCB 或 context；self-join 和竞争 join 被拒绝。
 不提供一个声称能安全撤销所有业务效果的通用 task-kill。
 
-公共启动入口应统一外部流程，并让调用者提供明确 bootstrap 回调；不得伪装内核
-已经处于同一状态。FreeRTOS 的调度器前创建、ThreadX 的真实
-`tx_application_define` 引导范围，以及 Native 已运行进程内的线程创建不同。
-首批任务在允许的阶段创建；bootstrap 只完成声明允许的非阻塞操作。
+`nx_os_run` 接受明确的 bootstrap 回调，成功进入后不返回。FreeRTOS 在回调后
+启动真实 scheduler；ThreadX 在实际 `tx_application_define` 范围执行回调；
+Native 执行回调后停驻调用线程，保留其栈，不创建隐藏 coordinator。
+各内核不伪装相同的引导状态；bootstrap 只完成声明允许的非阻塞构造与连接。
 平台启动仍不启动调度器，不允许将已运行内核重新解释成冷态 bootstrap。
 
-Native 当前有限 join 是实际缺口：`pthread_join` 没有 deadline，入口完成提示也
-不证明 pthread 已退出。目标必须接入并验证真实单调截止时间 join 能力；不满足的
-Host 组合拒绝所需 profile。受支持平台可用真实 try-join 配合同一单调 deadline
-和有界等待；禁止完成标志后无界 join、反复重置预算或忽略期限的轮询。
+Native 有限 join 先尝试 `pthread_tryjoin_np`，再用
+`pthread_clockjoin_np(CLOCK_MONOTONIC, ...)` 共享同一截止时间。
+构建使用真实链接探针检查这两项 GNU 能力，缺失时拒绝 Native 任务配置。
+只有显式 `NX_DEADLINE_NEVER` 使用无期限 join；入口完成提示不能代替 pthread
+实际退出，不在有限等待后偷偷调用无界 join。
 
 ## 队列、通道和同步语义
 
@@ -162,9 +175,9 @@ Host 组合拒绝所需 profile。受支持平台可用真实 try-join 配合同
 调用者提供；destroy 要求 closed、drained 且 users/publishers 已退出。
 close 和 destroy 不替代执行 owner 推进；不能以定期超时检查代替关闭唤醒。
 
-Mutex 固定 owner 与非法解锁行为，递归作为显式选择。优先级继承不得用普通
-binary semaphore 代替。Semaphore 明确最大计数与满时结果；所有对象都需要先
-退出等待者和发布者，再销毁。销毁失败保留尚未解除的资源，只允许受审的重试。
+通知与通道都需要等待者和发布者实际退出，才能销毁；销毁失败保留未解除的资源，
+只允许受审重试。应用若明确选择原生同步扩展，仍需自行维护 owner、计数和优先级
+协议，不能用普通 binary semaphore 冒充优先级继承 mutex。
 
 ## 时间、优先级与上下文
 
@@ -173,32 +186,34 @@ binary semaphore 代替。Semaphore 明确最大计数与满时结果；所有�
 操作可先成功，等待错误后仍按公共 Wait 合同重查真实条件。
 时间域必须在等待、排空和 join 期间连续；重启 epoch 后旧 deadline 失效。
 
-目标还提供 task-only 的 `sleep_until` 和 `yield`，避免周期业务调用原生 delay。
-`sleep_until` 使用同域绝对 deadline，已过期立即返回，不推进设备，也不保证微秒
-唤醒精度。`yield` 只是调度提示，不保证公平、指定下一任务或让低优先级任务运行。
-两者不隐建 timer worker，可归入 `task.h`，不为两个函数机械增加模块。
+`task.h` 提供 task-only 的 `nx_sleep_until` 和 `nx_task_yield`。
+`nx_sleep_until` 使用 `nx_os_now_us` 的同域绝对 deadline，过期立即返回，拒绝
+`NX_DEADLINE_NEVER`，不推进设备、不保证微秒唤醒精度。Native 的 OS 时钟始终是
+真实 `CLOCK_MONOTONIC`，不能混用可切换的硬件模型时钟。`nx_task_yield` 只提出
+调度提示，不保证公平、指定下一任务或让低优先级任务运行，两者不隐建 timer worker。
 
-逻辑优先级拟议为数值越大优先级越高，具体值放装配，后端映射原生编号。
-可用等级、保留等级、时间片与调度政策必须在配置中校验。Native 当前没有任务
-优先级接口；普通 pthread 调度不能证明 MCU 抢占等价。若组件要求真实优先级
-排序，Host 必须实现并验证对应调度能力，否则拒绝该能力要求，不忽略参数。
+公共逻辑优先级数值越大越高。FreeRTOS 保持同向编号，ThreadX 反向映射；可用
+等级由所选存储头的 `NX_OS_PRIORITY_LEVELS` 表示。Native 只接受逻辑值 0，
+其他值拒绝，不忽略参数；它不声明 `priority` 能力，也不声称普通 pthread 调度
+具有 MCU 抢占保证。应用装配显式选择优先级与栈预算。
 
-| 上下文 | 目标准入 |
+| 上下文 | 当前准入 |
 | --- | --- |
 | 普通 task | 已运行的正确内核、受支持权限和屏蔽状态；阻塞只在允许阶段 |
-| Bootstrap | 只允许该内核真实阶段支持的创建与非阻塞连接，不允许等待未来任务 |
+| Bootstrap | 允许受审的构造、未执行任务撤回与通知发布；队列/channel 传输仍拒绝 |
 | IRQ 发布 | 独立入口，先核验 IRQ 范围、mask、分组与 syscall ceiling |
 | NMI / fault / 其他安全域 | 不继承普通 IRQ 合同，未维护的组合拒绝 |
 | MPU 用户任务 | 仅受审 syscall；公共名称不自动授予原生内核或 I/O 权限 |
 
-现有后端没有的 ISR 队列不能靠重命名变为支持。Mutex 与阻塞操作不在 ISR 调用。
+本批不提供 ISR 队列/channel 传输；IRQ 通过明确通知入口发布提示，不调用阻塞操作。
 实际 IRQ 原语继续保存/恢复 incoming mask，不用本地关中断声称获得 SMP、DMA
 或跨安全域互斥。Secure companion 不增加第二个 scheduler，信任边界保持原合同。
 
 ## 结果、停止与失败责任
 
-目标错误归类沿用 Core 结果类型，不建立另一套 OS 错误枚举；各 API 冻结时细化
-准确码值与输出规则。参数、能力与上下文错误必须在对象和内核效果变更前拒绝。
+公共接口沿用 Core 结果类型，不另建 OS 错误枚举；准确码值及输出规则由公共头
+维护。参数与上下文拒绝发生在对象和内核效果变更前；内核错误不撤销已经发布的
+通知提示，调用者仍须重查真实条件，不能据错误返回提前回收借用。
 
 | 结果类别 | 存储和后续责任 |
 | --- | --- |
@@ -211,7 +226,7 @@ binary semaphore 代替。Semaphore 明确最大计数与满时结果；所有�
 
 ![FIG-08：当前等待、真实条件重查与外部退出责任](../assets/diagrams/wait-wake-shutdown.svg)
 
-FIG-08 是当前合同图，目标继续保留其中的等待协议与退出责任。请求 SETTLED、
+FIG-08 表达现行等待协议与退出责任。请求 SETTLED、
 任务入口完成、join 成功、通知发布者退出分别证明不同事实。应用先关准入，继续
 执行 owner 的取消/排空，再会合有关任务和 IRQ 发布路径。通知和队列只在全部
 相关发布者与等待者会合后销毁。平台时钟与 Tick 保留到全部消费者静默且所选内核
@@ -221,22 +236,21 @@ shutdown。失败时保留尚未结清的引用，不把 timeout/cancel 当作�
 ## 成本、参考与验收边界
 
 编译期共同符号避免额外后端分派，但统一合同仍可能需要完成状态、deadline
-换算或上下文检查。精简对象按能力选用；未选择的 channel、mutex、trace、MPU
+换算或上下文检查。精简对象按能力选用；未选择的 channel、trace、MPU
 与 Secure 状态不得进入普通对象。报告分别列对象、栈、payload、内核全局状态、
 Flash 和总保留 RAM，不用单个 `sizeof` 代表整幅镜像。
 
 现有 [Wait 成本夹具](../../tests/contracts/os_wait_cost/README.md)与
-[资源夹具](../../tests/contracts/os_resources/README.md)是实施时的比较入口，不能
+[资源夹具](../../tests/contracts/os_resources/README.md)是当前比较入口，不能
 把其旧结果标成新 API 的证据。实际 IRQ 延迟、栈峰值、FP/MVE 保留和低功耗时间
 连续性仍需设备验证；本文不新增当前支持或 HIL 结论。
 
 [CMSIS-RTOS2 官方接口](https://arm-software.github.io/CMSIS_6/latest/RTOS2/index.html)
 说明共同线程/同步接口与调用者存储属性可以并存，值得借鉴术语与上下文规则。
-但 CMSIS 接口存在不证明目标内核有合格实现，也不能替代 Nexus 的绝对 deadline、
-外部 join、借用和关闭合同。本方案不引入 CMSIS-RTOS2 中间层，不改现有内核 pin。
+但 CMSIS 接口存在不证明某个内核有合格实现，也不能替代 Nexus 的绝对 deadline、
+外部 join、借用和关闭合同。当前没有引入 CMSIS-RTOS2 中间层，内核 pin 保持原样。
 
-实施采用不兼容迁移：公共合同冻结后同步迁移平台消费者、外部示例和测试，移除
-旧后端公开入口，不保留 alias、兼容 wrapper 或 fallback。后端内部可以复用真实
-算法，vendor、gitlink、锁和许可记录保持原样。每次交付以真实生产 C 路径的
-GoogleTest/GoogleMock RED/GREEN、精确 ARM/Host 上下文、SDK 消费和成本差值为据。
-具体工作包、并行边界及退出条件由[实施计划](../development/os-portability-plan.md)维护。
+普通后端公开入口已经迁入公共接口，不保留旧 alias、兼容 wrapper 或 fallback；
+明确扩展继续保留后端名称。阶段验证执行真实生产 C 路径及同一 C11 消费者，
+但不代替最终完整集成、ARM、资源或独立 SDK 验收。当前工作包及退出条件由
+[交付清单](../development/os-portability-plan.md)维护，未执行 HIL 仍是 `not_executed`。

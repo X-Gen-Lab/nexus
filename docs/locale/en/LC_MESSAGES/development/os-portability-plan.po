@@ -7,41 +7,54 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 5f70c3f31fb3708cee6468e09c653b5ef13c645784b634e234fa17399ee3fd43\n"
+"X-Nexus-Source-SHA256: 11805da6559f863b061a6991837d8ba16d96269caac99c2c22c2b5f0b134e195\n"
 
 #: ../../../../docs/development/os-portability-plan.md:9
-msgid "OS 可移植接口实施计划"
-msgstr "OS portable interface implementation plan"
+msgid "OS 可移植接口交付与验收清单"
+msgstr "OS portable interface delivery and acceptance checklist"
 
 #: ../../../../docs/development/os-portability-plan.md:11
 msgid ""
-"本计划将普通业务、可移植服务与内核专用装配分开，使选定 RTOS 之间切换时， 业务保持同一份源码。目标架构、接口范围与取舍由 [OS "
-"可移植架构提案](../explanation/os-portability.md)定义；本文只维护实施顺序、 产物和退出条件，不复制第二份 API "
-"合同。"
+"本清单记录公共接口、后端和消费者迁移的交付内容及验收条件。接口范围与取舍见 [OS 现行架构](../explanation/os-"
+"portability.md)；本文保留 32 个稳定任务 ID、 优先级和依赖，不复制第二份 API 合同。"
 msgstr ""
-"This plan separates ordinary business logic, portable services and kernel-"
-"specific assembly so that business logic retains one source tree when "
-"switching between the selected RTOS backends. The [OS portability "
-"architecture proposal](../explanation/os-portability.md) defines the target "
-"architecture, interface scope and tradeoffs. This page maintains only "
-"implementation order, deliverables and exit criteria; it does not duplicate "
-"the API contract."
+"This checklist records deliverables and acceptance criteria for public "
+"interfaces, backends and consumer migration. See the [current OS "
+"architecture](../explanation/os-portability.md) for scope and tradeoffs. "
+"This page retains 32 stable task IDs, priorities and dependencies without "
+"duplicating the API contract."
 
-#: ../../../../docs/development/os-portability-plan.md:16
+#: ../../../../docs/development/os-portability-plan.md:15
 msgid ""
-"**状态：本页全部 OSU 任务均为 `planned`。** 文档交付不表示接口已经实现。 当前 API、支持范围和生命周期继续以 [OS "
+"**状态：公共实现与阶段验收已交付，最终集成验收进行中。** OSU-22／23 根据 实际需求盘点明确不纳入本批；HIL 继续暂缓，保持 "
+"`not_executed`。 阶段结果不能提前关闭最终集成、ARM、资源和 SDK 验收。当前调用要求与生命周期以 [OS "
 "执行合同](../reference/contracts/os/execution.md)为准。 软件实施覆盖 "
 "FreeRTOS、ThreadX、Native 的已维护范围，裸机保留非阻塞能力。 不因此新增 CPU、SoC、Board、安全配置或实板资格。"
 msgstr ""
-"**Status: every OSU task on this page is `planned`.** Delivering the "
-"documentation does not mean the interfaces have been implemented. The [OS "
-"execution contract](../reference/contracts/os/execution.md) continues to "
-"govern current APIs, support scope and lifecycles. Software implementation "
-"covers the maintained FreeRTOS, ThreadX and Native scope; baremetal retains "
-"nonblocking mechanisms. This does not add CPU, SoC, Board, security-profile "
-"or physical-board qualification."
+"**Status: common implementation and stage validation have been delivered; "
+"final integration acceptance is in progress.** OSU-22/23 are explicitly "
+"excluded from this batch based on actual requirements. HIL remains deferred "
+"and `not_executed`. Stage results cannot prematurely close final "
+"integration, ARM, resource or SDK acceptance. The [OS execution "
+"contract](../reference/contracts/os/execution.md) governs current calling "
+"requirements and lifecycles. Software implementation covers the maintained "
+"FreeRTOS, ThreadX and Native scope; baremetal retains nonblocking "
+"mechanisms. This does not add CPU, SoC, Board, security-profile or physical-"
+"board qualification."
 
 #: ../../../../docs/development/os-portability-plan.md:22
+msgid ""
+"本轮开发阶段已有 32 项新公共接口测试、18 个保留的旧 GoogleTest／CTest 模块和 9 项外部示例检查通过。它们分别验证三后端实际生产"
+" C、既有故障合同和示例消费， 不是最终完整集成或所有硬件配置的通过声明；最终关闭需匹配相关源码、配置及报告。"
+msgstr ""
+"This development iteration has passed 32 new public-interface tests, 18 "
+"retained GoogleTest/CTest modules and 9 external example checks. They "
+"validate actual production C across three backends, existing failure "
+"contracts and example consumption respectively. They do not declare final "
+"complete integration or every hardware configuration passed; final closure "
+"requires matching source, configuration and reports."
+
+#: ../../../../docs/development/os-portability-plan.md:26
 msgid "范围、复用与完成口径"
 msgstr "Scope, reuse and completion criteria"
 
@@ -110,8 +123,10 @@ msgid "TOML、typed IR、CMake 与 Source SDK"
 msgstr "TOML, typed IR, CMake and Source SDK"
 
 #: ../../../../docs/development/os-portability-plan.md:0
-msgid "扩展现有选择和导出路径"
-msgstr "Extend existing selection and export paths"
+msgid "保留硬件装配链，增加选定目标的软件能力校验"
+msgstr ""
+"Retain the hardware assembly chain and add software capability validation "
+"for the selected target"
 
 #: ../../../../docs/development/os-portability-plan.md:0
 msgid "不引入第二份配置权威或源码图"
@@ -129,7 +144,7 @@ msgstr "Add missing contracts and reuse coverage by implementation class"
 msgid "不重建测试、台账或证据框架"
 msgstr "Do not rebuild test, ledger or evidence frameworks"
 
-#: ../../../../docs/development/os-portability-plan.md:33
+#: ../../../../docs/development/os-portability-plan.md:37
 msgid ""
 "静态存储使用所选后端的真实大小和对齐，不使用全部后端的最大联合体。 统一源码 API 不承诺统一二进制布局；切换后端需要重新编译、配置存储和评估调度。 "
 "不增加运行时后端选择、隐藏 worker、默认 timer daemon 或对象池。"
@@ -141,7 +156,7 @@ msgstr ""
 "runtime backend selection, hidden workers, a default timer daemon or object "
 "pools."
 
-#: ../../../../docs/development/os-portability-plan.md:37
+#: ../../../../docs/development/os-portability-plan.md:41
 msgid ""
 "优先级 P0 表示冻结后续工作依赖的合同或集成阻塞；P1 表示完成可移植消费链所需 实现；P2 "
 "表示由真实消费者决定的可选扩展。依赖栏中的编号均指本页稳定任务 ID。 任务在相关代码、测试、文档及验证一起满足退出条件后才能关闭，不能仅以提交数 "
@@ -154,17 +169,18 @@ msgstr ""
 "code, tests, documentation and validation together meet its exit criteria. "
 "Commit counts or the number of new interfaces are not completion criteria."
 
-#: ../../../../docs/development/os-portability-plan.md:42
+#: ../../../../docs/development/os-portability-plan.md:46
 msgid "WP1：冻结合同与真实消费者"
 msgstr "WP1: freeze contracts and real consumers"
 
-#: ../../../../docs/development/os-portability-plan.md:44
-msgid "先选最小可用范围再实现，避免为了完整 API 名称表增加没有消费者的功能。 本包产物是提案的实施基线与一条真实消费路径，不修改当前支持声明。"
+#: ../../../../docs/development/os-portability-plan.md:48
+msgid ""
+"合同与真实消费路径已经落入公共头和维护夹具。下面保留各项退出条件，后续改动 继续从具体消费者出发，不为凑齐原生 API 名称增加没有使用者的功能。"
 msgstr ""
-"Select the minimum useful scope before implementation, rather than adding "
-"unused features to complete an API name list. This package produces the "
-"implementation baseline for the proposal and one real consumption path; it "
-"does not change current support claims."
+"Contracts and real consumption paths now reside in public headers and "
+"maintained fixtures. The following exit conditions remain applicable to "
+"later changes, which continue to start from concrete consumers rather than "
+"adding unused functionality to complete a native API list."
 
 #: ../../../../docs/development/os-portability-plan.md:0
 msgid "任务"
@@ -264,22 +280,22 @@ msgstr ""
 "implementers start only after receiving the original command and source "
 "snapshot"
 
-#: ../../../../docs/development/os-portability-plan.md:54
+#: ../../../../docs/development/os-portability-plan.md:58
 msgid ""
 "合同冻结同时列出不纳入项：强制杀任务、通用 scheduler shutdown、运行时换内核、 透明裸机阻塞线程和未维护的 MPU／TrustZone"
-" 组合。后续新增需求先说明消费者， 再修改架构提案和对应合同。"
+" 组合。后续新增需求先说明消费者， 再修改现行架构和对应合同。"
 msgstr ""
 "Contract freeze also records exclusions: forced task termination, generic "
 "scheduler shutdown, runtime kernel switching, transparent blocking threads "
 "on baremetal and unmaintained MPU/TrustZone combinations. Identify a "
-"consumer before adding a requirement, then update the architecture proposal "
+"consumer before adding a requirement, then update the current architecture "
 "and relevant contract."
 
-#: ../../../../docs/development/os-portability-plan.md:58
+#: ../../../../docs/development/os-portability-plan.md:62
 msgid "WP2：类型、静态存储与构建选择"
 msgstr "WP2: types, static storage and build selection"
 
-#: ../../../../docs/development/os-portability-plan.md:60
+#: ../../../../docs/development/os-portability-plan.md:64
 msgid "本包把后端布局限制在装配及私有实现。普通业务只接收公共类型，不包含内核头， 不根据后端设置预处理分支。"
 msgstr ""
 "This package confines backend layouts to assembly and private "
@@ -331,16 +347,16 @@ msgid "P0／05、06"
 msgstr "P0／05、06"
 
 #: ../../../../docs/development/os-portability-plan.md:0
-msgid "用现有 CMake 目标与生成头选一个后端，覆盖 Platform／Runtime"
+msgid "用现有 CMake 目标选定存储布局和后端，覆盖 Platform／Runtime"
 msgstr ""
-"Select one backend through existing CMake targets and generated headers for "
+"Select storage layouts and the backend through existing CMake targets for "
 "Platform/Runtime"
 
 #: ../../../../docs/development/os-portability-plan.md:0
-msgid "一个构建目录只有一套实现；未选内核不编译、不链接、不进入 SDK 依赖"
+msgid "一幅镜像只有一套任务实现，混合后端身份在生成时拒绝；未选内核不进入该镜像"
 msgstr ""
-"One build directory contains one implementation; unselected kernels are "
-"neither compiled nor linked and do not enter SDK dependencies"
+"Each image has one task implementation; mixed backend identities reject "
+"during generation, and unselected kernels do not enter that image"
 
 #: ../../../../docs/development/os-portability-plan.md:0
 msgid "OSU-08"
@@ -351,34 +367,39 @@ msgid "P1／02、07"
 msgstr "P1／02、07"
 
 #: ../../../../docs/development/os-portability-plan.md:0
-msgid "在现有配置路径声明所需能力及支持组合，保留裸机轻路径"
+msgid "通过选定目标的能力元数据校验软件需求，保留裸机轻路径"
 msgstr ""
-"Declare required capabilities and supported combinations in the existing "
-"configuration path; retain the lightweight baremetal path"
+"Validate software requirements through capability metadata on the selected "
+"target; retain the lightweight baremetal path"
 
 #: ../../../../docs/development/os-portability-plan.md:0
-msgid "缺能力的装配在配置或编译期拒绝；新增同 CPU MCU 不需重写公共 OS 工具"
+msgid "缺能力在配置或编译期拒绝，helper 不隐式链接；新增同 CPU MCU 不需重写 OS 工具"
 msgstr ""
-"Reject assemblies missing a capability at configuration or compilation; "
-"adding an MCU with the same CPU contract does not require rewriting public "
-"OS tools"
+"Missing capabilities reject at configuration or compilation; the helper does"
+" not link implicitly, and adding an MCU with the same CPU contract does not "
+"require rewriting OS tools"
 
-#: ../../../../docs/development/os-portability-plan.md:70
+#: ../../../../docs/development/os-portability-plan.md:74
 msgid ""
 "不为对象尺寸另建独立清单或手写 magic number。生成连接与 C 类型定义共用现有 "
-"权威来源；配置器不实现内核行为。对象布局随后端变化时，消费者完整重编译。"
+"权威来源；配置器不实现内核行为。对象布局随后端变化时，消费者完整重编译。 独立 Host "
+"夹具可以在同一构建图生成不同后端的可执行文件，每幅镜像分别校验身份。 公共 `storage.h` 不根据整仓 Native 配置误选 RTOS "
+"夹具布局。"
 msgstr ""
 "Do not create a separate object-size manifest or handwritten magic numbers. "
 "Generated connections and C type definitions share the existing "
 "authoritative sources; the configurator does not implement kernel behavior. "
 "Rebuild consumers completely when the selected backend changes object "
-"layouts."
+"layouts. Independent Host fixtures may build executables with different "
+"backends in the same graph, validating each image identity separately. "
+"Public `storage.h` does not incorrectly select RTOS fixture layouts from "
+"repository-wide Native configuration."
 
-#: ../../../../docs/development/os-portability-plan.md:73
+#: ../../../../docs/development/os-portability-plan.md:79
 msgid "WP3：任务、引导与真实退出"
 msgstr "WP3: tasks, bootstrap and actual teardown"
 
-#: ../../../../docs/development/os-portability-plan.md:75
+#: ../../../../docs/development/os-portability-plan.md:81
 msgid "复用各后端已经存在的生命周期算法。统一的是任务入口与成功退出后的资源保证， 不要求三个内核具有相同的创建时机。"
 msgstr ""
 "Reuse the lifecycle algorithms already implemented by each backend. Unify "
@@ -465,7 +486,7 @@ msgstr ""
 "MCU mappings preserve priority order; Native explicitly rejects hard "
 "guarantees without RT capability rather than silently clamping values"
 
-#: ../../../../docs/development/os-portability-plan.md:85
+#: ../../../../docs/development/os-portability-plan.md:91
 msgid ""
 "ThreadX 的引导回调、FreeRTOS 启动前对象创建和 Native 线程立即执行需要在适配器 "
 "内部协调。实际内核启动只能由外部工程显式调用，入口返回不能被当成可回收证明。 不增加统一的强制终止接口来掩盖合作式停止依赖。"
@@ -476,11 +497,11 @@ msgstr ""
 " not proof that storage is reclaimable. Do not add a common forced-"
 "termination interface to conceal cooperative-stop dependencies."
 
-#: ../../../../docs/development/os-portability-plan.md:89
+#: ../../../../docs/development/os-portability-plan.md:95
 msgid "WP4：通知、等待与发布者撤回"
 msgstr "WP4: notifications, waiting and publisher withdrawal"
 
-#: ../../../../docs/development/os-portability-plan.md:91
+#: ../../../../docs/development/os-portability-plan.md:97
 msgid "本包保持现有 ready／arm／ready／wait 协议，消除消费方显式选择内核通知对象的 需要。单端口仍只有一个等待者。"
 msgstr ""
 "This package retains the existing ready/arm/ready/wait protocol and removes "
@@ -492,8 +513,8 @@ msgid "OSU-13"
 msgstr "OSU-13"
 
 #: ../../../../docs/development/os-portability-plan.md:0
-msgid "P1／02、05"
-msgstr "P1／02、05"
+msgid "P1／02、05；运行接入另依赖 07、09、10"
+msgstr "P1 / 02, 05; runtime integration also requires 07, 09, 10"
 
 #: ../../../../docs/development/os-portability-plan.md:0
 msgid "统一 wait／select 及 task-only sleep_until／yield，不复制 deadline 工具"
@@ -502,10 +523,10 @@ msgstr ""
 "deadline tools"
 
 #: ../../../../docs/development/os-portability-plan.md:0
-msgid "保留等待协议；覆盖过期立即返回、tick 量化与非法上下文，yield 不承诺公平"
+msgid "公共等待可先完成；延时／yield 在后端与任务上下文稳定后验收，覆盖过期、量化与非法上下文"
 msgstr ""
-"Retain the wait protocol; cover immediate return on expiry, tick "
-"quantization and invalid contexts; yield does not promise fairness"
+"Public waiting may complete first; validate sleep/yield after backend and "
+"task contexts stabilize, including expiry, quantization and invalid contexts"
 
 #: ../../../../docs/development/os-portability-plan.md:0
 msgid "OSU-14"
@@ -567,18 +588,19 @@ msgstr ""
 "A publisher still executing after SETTLED cannot access reclaimed storage; "
 "no hidden teardown thread"
 
-#: ../../../../docs/development/os-portability-plan.md:101
+#: ../../../../docs/development/os-portability-plan.md:107
 msgid ""
-"sleep_until 使用同域绝对 deadline，不承诺微秒调度精度、不隐建 timer。 yield "
-"只提出调度提示；不得把它作为轮转公平性或等待完成的证明。 TIMEOUT 只表示本次等待预算结束，不能撤销已接受 I/O 的借用。取消、排空失败及 "
-"QUARANTINED 的责任继续沿用 Core 和 provider 合同；不把通知销毁当成取消设备。 运行中的内核继续保留 platform "
-"clock／Tick；仅在全部消费者静默且所选内核生命周期 允许时撤回，不承诺通用 scheduler shutdown，不在内核运行期间直接关闭它们。"
+"`nx_sleep_until` 使用同域绝对 deadline，拒绝 `NX_DEADLINE_NEVER`，不承诺微秒 调度精度、不隐建 "
+"timer。`nx_task_yield` 只提出调度提示，不是公平性或等待完成证明。 TIMEOUT 只表示本次等待预算结束，不能撤销已接受 I/O "
+"的借用。取消、排空失败及 QUARANTINED 的责任继续沿用 Core 和 provider 合同；不把通知销毁当成取消设备。 运行中的内核继续保留"
+" platform clock／Tick；仅在全部消费者静默且所选内核生命周期 允许时撤回，不承诺通用 scheduler "
+"shutdown，不在内核运行期间直接关闭它们。"
 msgstr ""
-"sleep_until uses an absolute deadline in the same domain; it neither "
-"promises microsecond scheduling precision nor creates an implicit timer. "
-"yield is only a scheduling hint; it must not be treated as proof of round-"
-"robin fairness or wait completion. TIMEOUT ends only this wait budget and "
-"does not revoke accepted I/O loans. Cancellation, drain failure and "
+"`nx_sleep_until` uses an absolute deadline in the same domain, rejects "
+"`NX_DEADLINE_NEVER`, and neither promises microsecond scheduling precision "
+"nor creates an implicit timer. `nx_task_yield` is only a scheduling hint, "
+"not proof of fairness or wait completion. TIMEOUT ends only this wait budget"
+" and does not revoke accepted I/O loans. Cancellation, drain failure and "
 "QUARANTINED responsibilities retain the Core and provider contracts; "
 "destroying a notification does not cancel a device. A running kernel retains"
 " the platform clock/Tick. Withdraw them only after every consumer is "
@@ -586,11 +608,11 @@ msgstr ""
 "generic scheduler shutdown or disable them directly while the kernel is "
 "running."
 
-#: ../../../../docs/development/os-portability-plan.md:108
+#: ../../../../docs/development/os-portability-plan.md:114
 msgid "WP5：普通队列与可关闭 channel"
 msgstr "WP5: ordinary queues and closable channels"
 
-#: ../../../../docs/development/os-portability-plan.md:110
+#: ../../../../docs/development/os-portability-plan.md:116
 msgid "复用已有字节队列和关闭协议。原始队列与可关闭通信通道保留分开的类型或明确 配置，使固定常驻关系可以选择更小的对象。"
 msgstr ""
 "Reuse existing byte queues and close protocols. Keep separate types or "
@@ -645,14 +667,14 @@ msgid "P1／15、17、18"
 msgstr "P1／15、17、18"
 
 #: ../../../../docs/development/os-portability-plan.md:0
-msgid "明确队列 Task-only 范围及可选 ISR try 能力"
-msgstr "Define Task-only queue scope and optional ISR try capability"
+msgid "固定 queue／channel transfer 的运行态 Task-only 范围"
+msgstr "Fix queue/channel transfers to running Task-only scope"
 
 #: ../../../../docs/development/os-portability-plan.md:0
-msgid "没有已维护实现就明确拒绝；ISR 不阻塞，不以轮询伪装关闭广播"
+msgid "deadline 0 也不能在 bootstrap 传输；本批无 ISR transfer，IRQ 使用受审通知入口"
 msgstr ""
-"Explicitly reject operations without a maintained implementation; ISR calls "
-"never block; polling must not masquerade as close broadcast"
+"Even deadline 0 cannot transfer during bootstrap; this batch has no ISR "
+"transfer, and IRQs use reviewed notification entry points"
 
 #: ../../../../docs/development/os-portability-plan.md:0
 msgid "OSU-20"
@@ -674,7 +696,7 @@ msgstr ""
 "The execution owner keeps running during drain; stable references for large "
 "payloads have their own complete loan lifecycle"
 
-#: ../../../../docs/development/os-portability-plan.md:120
+#: ../../../../docs/development/os-portability-plan.md:126
 msgid ""
 "等待者数量和 payload 大小分别决定广播与复制成本。配置明确最大并发 waiter， 不创建全局池；性能报告分开记录调度暂停与 IRQ "
 "屏蔽，不能混成一次主机耗时。"
@@ -684,19 +706,25 @@ msgstr ""
 "global pool. Performance reports distinguish scheduler suspension from IRQ "
 "masking rather than combining them into one host elapsed time."
 
-#: ../../../../docs/development/os-portability-plan.md:123
-msgid "WP6：按需求提供同步原语"
-msgstr "WP6: provide synchronization primitives on demand"
+#: ../../../../docs/development/os-portability-plan.md:129
+msgid "WP6：同步原语需求与范围决定"
+msgstr "WP6: synchronization requirements and scope decision"
 
-#: ../../../../docs/development/os-portability-plan.md:125
+#: ../../../../docs/development/os-portability-plan.md:131
 msgid ""
-"本包先确认真实消费者。无需求的 mutex／semaphore 扩展以明确的暂不纳入决定 "
-"退出，不能生成空壳接口或把整套原生对象逐一包装。已有内核能力不等于缺失功能。"
+"OSU-21 已盘点生产组件：同步通过窄端口注入，未直接依赖公共跨 OS mutex 或计数 "
+"semaphore。当前任务与通信消费链不需要新增这两类原语，因此 OSU-22／23 明确不 纳入本批，没有新增 "
+"`mutex.h`／`semaphore.h` 或占位实现。原生内核具备相应能力， 不表示 Nexus "
+"已提供公共支持。下表保留未来真正选入时必须满足的合同。"
 msgstr ""
-"First confirm real consumers. A mutex/semaphore extension with no "
-"requirement exits through an explicit exclusion decision, rather than "
-"producing empty interfaces or wrapping every native object. Existing kernel "
-"capabilities are not missing functionality."
+"OSU-21 has inventoried production components: synchronization is injected "
+"through narrow ports, without direct dependence on a public cross-OS mutex "
+"or counting semaphore. The current task and communication consumer chain "
+"needs neither new primitive, so OSU-22/23 are explicitly excluded from this "
+"batch. No `mutex.h`/`semaphore.h` or placeholder implementation has been "
+"added. Native-kernel capabilities do not establish public Nexus support. The"
+" table retains contracts required if these primitives are genuinely selected"
+" later."
 
 #: ../../../../docs/development/os-portability-plan.md:0
 msgid "OSU-21"
@@ -727,16 +755,17 @@ msgid "P2／06、12、21"
 msgstr "P2／06、12、21"
 
 #: ../../../../docs/development/os-portability-plan.md:0
-msgid "对选中需求接入 mutex，明确 owner、递归及优先级继承"
+msgid "公共 mutex 本批不纳入；后续选入须明确 owner、递归及优先级继承"
 msgstr ""
-"Integrate a mutex for selected requirements; define owner, recursion and "
-"priority inheritance"
+"Public mutex is excluded from this batch; later inclusion requires "
+"ownership, recursion and priority inheritance to be defined"
 
 #: ../../../../docs/development/os-portability-plan.md:0
-msgid "非 owner 释放、自锁和不支持协议有一致结果；硬要求不能降级为普通 host mutex"
+msgid "排除依据为 OSU-21；未来实现仍须覆盖非 owner 释放、自锁及不支持协议，不降级硬要求"
 msgstr ""
-"Non-owner unlock, self-lock and unsupported protocols have consistent "
-"results; hard requirements cannot degrade to an ordinary host mutex"
+"OSU-21 establishes the exclusion; a future implementation must still cover "
+"non-owner unlock, self-lock and unsupported protocols without weakening hard"
+" requirements"
 
 #: ../../../../docs/development/os-portability-plan.md:0
 msgid "OSU-23"
@@ -747,16 +776,16 @@ msgid "P2／06、15、21"
 msgstr "P2／06、15、21"
 
 #: ../../../../docs/development/os-portability-plan.md:0
-msgid "对选中需求接入二值／计数 semaphore，明确饱和与 ISR 范围"
+msgid "公共 semaphore 本批不纳入；后续选入须明确饱和与 ISR 范围"
 msgstr ""
-"Integrate binary/counting semaphores for selected requirements; define "
-"saturation and ISR scope"
+"Public semaphore is excluded from this batch; later inclusion requires "
+"saturation behavior and ISR scope to be defined"
 
 #: ../../../../docs/development/os-portability-plan.md:0
-msgid "计数上界、超限失败、等待超时及销毁前置条件执行真实回归"
+msgid "排除依据为 OSU-21；未来实现仍须覆盖计数上界、超限、超时及销毁前置条件"
 msgstr ""
-"Execute real regressions for count limits, over-limit failures, wait "
-"timeouts and destruction preconditions"
+"OSU-21 establishes the exclusion; a future implementation must still cover "
+"count limits, over-limit failures, timeouts and destruction preconditions"
 
 #: ../../../../docs/development/os-portability-plan.md:0
 msgid "OSU-24"
@@ -777,7 +806,7 @@ msgstr ""
 "Do not add another relative-timeout converter or map unsupported native "
 "capabilities to success or infinite waits"
 
-#: ../../../../docs/development/os-portability-plan.md:135
+#: ../../../../docs/development/os-portability-plan.md:143
 msgid ""
 "普通业务不能用 semaphore 替代带所有权的 mutex。受限用户任务、跨安全域同步和 "
 "内核专属抢占控制仍属扩展范围，未完成准入不能放进公共默认能力。"
@@ -787,11 +816,11 @@ msgstr ""
 "domains and kernel-specific preemption control remain extensions; they "
 "cannot enter public default capabilities without admission."
 
-#: ../../../../docs/development/os-portability-plan.md:138
+#: ../../../../docs/development/os-portability-plan.md:146
 msgid "WP7：迁移消费者与交付入口"
 msgstr "WP7: migrate consumers and delivery entry points"
 
-#: ../../../../docs/development/os-portability-plan.md:140
+#: ../../../../docs/development/os-portability-plan.md:148
 msgid ""
 "采用一次性源码迁移，不保留旧 API shim、别名或兼容门面。先保证目标消费者能 完成同一流程，再删除旧公开入口，避免留下两套竞争的维护路径。"
 msgstr ""
@@ -879,7 +908,7 @@ msgstr ""
 "The relocated SDK independently configures, links and runs applicable "
 "consumers without private checkout path leaks"
 
-#: ../../../../docs/development/os-portability-plan.md:150
+#: ../../../../docs/development/os-portability-plan.md:158
 msgid ""
 "常规应用只使用公共合同；主动采用 MPU、TrustZone、直接通知槽或特有调度机制的 "
 "适配留在产品基础设施层。业务源码可移植不等于原生扩展、存储预算和实时参数 无需重新评估，也不承诺跨工具链、ABI 的二进制兼容。"
@@ -891,20 +920,24 @@ msgstr ""
 "budgets or real-time parameters, and does not promise binary compatibility "
 "across toolchains or ABIs."
 
-#: ../../../../docs/development/os-portability-plan.md:154
+#: ../../../../docs/development/os-portability-plan.md:162
 msgid "WP8：测试、资源审查与软件退出"
 msgstr "WP8: testing, resource review and software exit"
 
-#: ../../../../docs/development/os-portability-plan.md:156
+#: ../../../../docs/development/os-portability-plan.md:164
 msgid ""
 "验证沿用[开发工作流](workflow.md)和[工程手册](../reference/contracts/engineering.md)。 "
-"每个新行为在所属工作包先真实 RED 后 GREEN，以下任务负责整合与交付，不能把 TDD 延迟到最后补写。纯文档修改不新增镜像实现测试。"
+"新行为在所属工作包先真实 RED 后 GREEN，以下任务负责整合与交付，不能把 TDD 延迟到最后补写。接口缺失的编译／链接 RED "
+"与容量、名称等运行期缺陷 RED 分开 记录，不能把前者冒充全部行为的运行期 RED。纯文档修改不新增镜像实现测试。"
 msgstr ""
 "Validation follows the [development workflow](workflow.md) and [engineering "
-"handbook](../reference/contracts/engineering.md). Each new behavior receives"
-" an actual RED run before GREEN in its own work package. The following tasks"
-" integrate and deliver that work; TDD must not be postponed until the end. "
-"Pure documentation changes do not add tests that mirror implementation."
+"handbook](../reference/contracts/engineering.md). New behavior receives an "
+"actual RED run before GREEN in its own work package. The following tasks "
+"integrate and deliver that work; TDD must not be postponed until the end. "
+"Compile/link RED for missing interfaces is recorded separately from runtime "
+"defect RED for capacity, names and other behavior; the former must not "
+"masquerade as runtime RED for every behavior. Pure documentation changes do "
+"not add tests that mirror implementation."
 
 #: ../../../../docs/development/os-portability-plan.md:0
 msgid "OSU-29"
@@ -961,11 +994,11 @@ msgstr ""
 "English catalog"
 
 #: ../../../../docs/development/os-portability-plan.md:0
-msgid "目标与当前状态一致；严格双语与 SDK 引用通过，删除过时入口和错误支持表述"
+msgid "正文与实际实现一致；严格双语与 SDK 引用通过，删除过时入口和错误支持表述"
 msgstr ""
-"Target and current-status statements are consistent; strict bilingual and "
-"SDK reference checks pass; remove obsolete entry points and incorrect "
-"support claims"
+"Content agrees with actual implementation; strict bilingual and SDK "
+"reference checks pass, removing obsolete entry points and incorrect support "
+"claims"
 
 #: ../../../../docs/development/os-portability-plan.md:0
 msgid "OSU-32"
@@ -988,58 +1021,61 @@ msgstr ""
 "substituting old reports; record remaining boundaries and HIL status "
 "accurately"
 
-#: ../../../../docs/development/os-portability-plan.md:167
+#: ../../../../docs/development/os-portability-plan.md:176
 msgid ""
-"OSU-30 中未选入的 P2 原语以 OSU-21 的排除决定满足依赖；不能把未实现原语标为 已支持。通用算法按实现类别验证一次，编译变体保留其独有 "
-"ABI、掩码、FP／MVE、 MPU 或安全合同；不展开所有 CPU、板卡、后端、优化和功能的笛卡尔积。"
+"OSU-30 对 OSU-22／23 的依赖由 OSU-21 的明确排除决定满足；两类原语不标为 "
+"已实现或已支持。通用算法按实现类别验证一次，编译变体保留其独有 ABI、掩码、FP／MVE、 MPU 或安全合同；不展开所有 "
+"CPU、板卡、后端、优化和功能的笛卡尔积。"
 msgstr ""
-"For OSU-30, an OSU-21 exclusion decision satisfies dependencies on "
-"unselected P2 primitives; do not mark unimplemented primitives as supported."
-" Validate common algorithms once per implementation class. Compile-time "
-"variants retain their distinct ABI, mask, FP/MVE, MPU or security contracts "
-"rather than expanding the Cartesian product of all CPUs, boards, backends, "
+"The explicit OSU-21 exclusion decision satisfies OSU-30 dependencies on "
+"OSU-22/23; neither primitive is marked implemented or supported. Validate "
+"common algorithms once per implementation class. Compile-time variants "
+"retain their distinct ABI, mask, FP/MVE, MPU or security contracts rather "
+"than expanding the Cartesian product of all CPUs, boards, backends, "
 "optimization levels and features."
 
-#: ../../../../docs/development/os-portability-plan.md:171
+#: ../../../../docs/development/os-portability-plan.md:180
 msgid "顺序、并行与效率"
 msgstr "Order, parallel work and efficiency"
 
-#: ../../../../docs/development/os-portability-plan.md:173
-msgid "先完成 WP1／WP2，冻结公共接口与测试交接。任务和通知可分派并行实现； 队列复用冻结后的通知，消费者迁移等待相关 GREEN。"
+#: ../../../../docs/development/os-portability-plan.md:182
+msgid ""
+"公共头和存储合同冻结后，三个后端按各自目录并行；消费方使用相同 C11 公共 业务源，后端测试 runner 分别维护，不在业务中添加内核条件分支。"
 msgstr ""
-"Complete WP1/WP2 first and freeze public interfaces and test handoffs. Task "
-"and notification implementations may run in parallel; queues reuse the "
-"frozen notification contract, and consumer migration waits for the relevant "
-"GREEN results."
+"After public headers and storage contracts freeze, the three backends "
+"proceed in parallel within their own directories. Consumers use the same "
+"public C11 business source, with separate backend test runners and no "
+"kernel-dependent branches in business code."
 
-#: ../../../../docs/development/os-portability-plan.md:175
-msgid "每个并行任务拥有明确文件范围和独立构建目录；同目录阶段保持串行。 统一集成后只执行一次所需完整门禁，不为每项任务重复全仓工具测试。"
+#: ../../../../docs/development/os-portability-plan.md:184
+msgid "每个并行任务有明确文件范围；同一维护构建目录通过显式交接串行使用。 汇总已发现的合同修正后执行所需完整门禁，不为每项任务重复全仓工具测试。"
 msgstr ""
-"Each parallel task owns an explicit file scope and an independent build "
-"directory; stages sharing a directory remain serial. After integration, "
-"execute the required complete gates once rather than repeating repository-"
-"wide tool tests for every task."
+"Each parallel task has an explicit file scope; stages sharing a maintained "
+"build directory are serialized by explicit handoff. Integrate discovered "
+"contract fixes before running the required complete gates rather than "
+"repeating repository-wide tool tests for each task."
 
-#: ../../../../docs/development/os-portability-plan.md:177
-msgid "WP6 按消费者决定范围；WP7 与已稳定接口分段推进，不提前删除仍有消费者的头。 实现者在同一交付分支完成全部消费点后整体退役旧入口。"
+#: ../../../../docs/development/os-portability-plan.md:186
+msgid "普通后端公开入口完成一次性迁移，专有扩展保留明确命名，不增加兼容门面。 生产组件与应用分仓，示例锁定和 SDK 消费需分别绑定实际平台提交。"
 msgstr ""
-"WP6 scope follows consumers; WP7 progresses with stable interfaces without "
-"prematurely deleting headers that still have consumers. Complete all "
-"consumption points on the same delivery branch before retiring the old entry"
-" points together."
+"Ordinary backend public entry points have completed a one-time migration, "
+"while backend-specific extensions retain explicit names without "
+"compatibility facades. Production components and applications stay in "
+"separate repositories; example locks and SDK consumption must each bind the "
+"actual platform commit."
 
-#: ../../../../docs/development/os-portability-plan.md:179
+#: ../../../../docs/development/os-portability-plan.md:188
 msgid "日常反馈使用维护的相关目标；最终运行范围沿用现有工具选择，不加过滤来冒充 完整验收，不缓存成功报告，不绕过提交门禁。"
 msgstr ""
 "Use maintained relevant targets for daily feedback. Final execution follows "
 "existing tool scope selection without filters that masquerade as complete "
 "acceptance, cached successful reports or commit-gate bypasses."
 
-#: ../../../../docs/development/os-portability-plan.md:182
+#: ../../../../docs/development/os-portability-plan.md:191
 msgid "软件交付与后续 HIL"
 msgstr "Software delivery and subsequent HIL"
 
-#: ../../../../docs/development/os-portability-plan.md:184
+#: ../../../../docs/development/os-portability-plan.md:193
 msgid ""
 "软件退出需要：公共合同有真实消费者；三后端在明确范围内保持同一业务源码； 失败及退出路径完成；选定存储与源码可裁剪；外部示例、Source SDK 和 "
 "CPU Runtime 完成各自验证；当前合同、中英文说明和实际行为一致。不能以本页发布代替这些条件。"
@@ -1051,7 +1087,7 @@ msgstr ""
 "contracts, Chinese and English documentation, and actual behavior. "
 "Publishing this page does not satisfy those conditions."
 
-#: ../../../../docs/development/os-portability-plan.md:188
+#: ../../../../docs/development/os-portability-plan.md:197
 msgid ""
 "物理 IRQ 到唤醒延迟、调度抖动、真实栈峰值、低功耗时间连续性、FP／MVE 切换和 安全隔离保持独立 HIL 验收，当前按用户安排暂缓，状态保留 "
 "`not_executed`。 它们不阻塞已明确边界的软件交付，也不能被 Native、模型或 ARM 链接结果标成通过。 "

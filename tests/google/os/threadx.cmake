@@ -13,6 +13,7 @@ nexus_google_test(nexus_threadx_kernel_test
     LIBRARIES ${tx_service_libraries}
     INCLUDES ${tx_service_includes}
 )
+_nexus_os_backend(nexus_threadx_kernel_test threadx)
 target_link_options(
     nexus_threadx_kernel_test
     PRIVATE -Wl,--wrap=pthread_mutex_timedlock
@@ -23,6 +24,7 @@ nexus_google_test(nexus_threadx_bootstrap_test
     LIBRARIES ${tx_service_libraries}
     INCLUDES ${tx_service_includes}
 )
+_nexus_os_backend(nexus_threadx_bootstrap_test threadx)
 target_link_options(
     nexus_threadx_bootstrap_test
     PRIVATE
@@ -60,6 +62,7 @@ foreach(policy basepri primask)
         LIBRARIES ${tx_service_libraries}
         INCLUDES ${tx_service_includes} "${tx_root}" "${tx_root}/private"
     )
+    _nexus_os_backend(${irq_target} threadx)
     target_compile_definitions(
         ${irq_target}
         PRIVATE

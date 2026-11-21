@@ -549,6 +549,7 @@ include("${nexus_google_root}/arch/arch_native_mechanism.cmake")
 include("${nexus_google_root}/os/freertos_context.cmake")
 include("${nexus_google_root}/os/freertos_prestart.cmake")
 include("${nexus_google_root}/os/os_wait.cmake")
+include("${nexus_google_root}/os/os_portable.cmake")
 nexus_google_test(nexus_wait_select_test SOURCES "${nexus_google_root}/os/wait_select_test.cpp"
     LIBRARIES Nexus::OSWait
 )
