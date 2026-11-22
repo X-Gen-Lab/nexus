@@ -1,0 +1,19 @@
+{
+  "manufacturer": "Wolfson Microelectronics / Cirrus Logic",
+  "document": "WM8978 Stereo CODEC with Speaker Driver",
+  "revision": "PD Rev4.5 October2011",
+  "url": "https://statics.cirrus.com/pubs/proDatasheet/WM8978_v4.5.pdf",
+  "reviewed_mirror": "https://datasheets.ibselectronics.com/WM8978CGEFL-V-Cirrus-Logic-datasheet-12512905.pdf",
+  "sections": [
+    "R1-R3 power management",
+    "R4 digital audio format",
+    "R6 MCLK and slave mode",
+    "R10 DAC soft mute",
+    "R52/R53 OUT1 gain and stereo HPVU",
+    "pp83-85 recommended power up/down sequence"
+  ],
+  "reviewed_scope": "External MCLK/256, nominal48kHz slave I2S, stereo DAC-to-OUT1; no ADC, speaker boost, codec PLL or EQ",
+  "physical_status": "not_executed",
+  "bytes": 1520495,
+  "sha256": "28e1f65f38b4012e351bd6a4c88602229858012de9e237dd9987d9c7470ad214"
+}

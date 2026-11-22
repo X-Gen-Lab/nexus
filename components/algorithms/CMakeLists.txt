@@ -11,6 +11,9 @@ add_library(
     src/filter.c
     src/interpolation.c
     src/control.c
+    src/calibration.c
+    src/motion.c
+    src/attitude.c
     src/pid.c
     src/dsp.c
 )
@@ -29,3 +32,4 @@ if(NOT MSVC)
 endif()
 add_library(Nexus::Algorithms ALIAS nexus_algorithms)
 include("${CMAKE_CURRENT_SOURCE_DIR}/cmsis_dsp/CMSISDSP.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/cmsis_nn/CMSISNN.cmake")

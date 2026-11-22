@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 
-CONSUMER_POLICY = "nexus-sdk-consumers-v30"
+CONSUMER_POLICY = "nexus-sdk-consumers-v32"
 BASE_CONSUMERS = (("native", False, "native"), ("stm32", True, "stm32"))
 MODERN_CONSUMERS = ()
 SELECTED_CONSUMERS = (
@@ -114,6 +114,18 @@ SERVICE_CONSUMERS = (
                     "native-common-components", False, "common_components"),
     ServiceConsumer("f407 common components", "f407.toml",
                     "arm-common-components", True, "common_components"),
+    ServiceConsumer("f407 pwm adc finite", "finite.toml",
+                    "arm-pwm-adc-finite", True, "f4_pwm_adc"),
+    ServiceConsumer("f407 pwm adc loop", "control.toml",
+                    "arm-pwm-adc-loop", True, "f4_pwm_adc_loop"),
+    ServiceConsumer("native smart components", "native.toml",
+                    "native-smart-components", False, "smart_components"),
+    ServiceConsumer("f407 smart components", "f407.toml",
+                    "arm-smart-components", True, "smart_components"),
+    ServiceConsumer("f407 mcuboot swap", "assembly.toml",
+                    "arm-boot-swap", True, "mcuboot_swap"),
+    ServiceConsumer("f407 freertos stop", "stop.toml",
+                    "arm-freertos-stop", True, "f4_freertos_stop"),
 )
 NATIVE_TIME_SMOKES = frozenset({"native-time-pair", "native-time-empty"})
 

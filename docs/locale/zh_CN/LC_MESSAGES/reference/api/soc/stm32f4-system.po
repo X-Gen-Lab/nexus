@@ -7,13 +7,13 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: ed05116575af7b5bfb44413f2c6c81b6d35c1acacb4eae65ba2035b155232359\n"
+"X-Nexus-Source-SHA256: 6d59f124c09ed0672a828dc45159bca1a6f7c628fed7f0d937a349d2373f2c4a\n"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:10
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:10
 msgid "STM32F4 system integration"
 msgstr "STM32F4 系统集成"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:12
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:12
 msgid ""
 "These headers are exact STM32F4 system composition contracts rather than "
 "portable I/O faces. Follow each header's part, privilege, clock, memory and "
@@ -23,15 +23,15 @@ msgstr ""
 "这些头文件是精确 STM32F4 系统装配合同，不是可移植 I/O "
 "接口。须遵循各头文件的料号、权限、时钟、内存及保留资源要求；公共可见性不将其扩展到其他器件。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:17
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:17
 msgid "Selected F407 entropy owner"
 msgstr "所选 F407 熵源 owner"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:19
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:19
 msgid "Select the chip's one internal RNG through the authored assembly:"
 msgstr "通过 authored assembly 选择芯片内唯一的 RNG："
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:28
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:28
 msgid ""
 "The Board supplies the pinless `rng` binding. Configuration requires the "
 "selected nominal PLL48 domain to be exactly 48 MHz, including an explicit "
@@ -45,7 +45,7 @@ msgstr ""
 "`pll48 = true`。生成的 `nx_factory_entropy(NX_ENTROPY_ID_RANDOM)` 返回已有只读{doc}`熵源"
 " face </reference/api/io/system>`，不启动硬件。不使用独立 CMake 构造器、公开可变 owner 或第二套时钟配置。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:36
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:36
 msgid ""
 "Readonly admission rejects foreign enabled RNG or IRQ state before System "
 "clock effects. Platform prepares the same private RNG owner after System "
@@ -65,7 +65,7 @@ msgstr ""
 "stop 前，必须 join 所有熵源、TLS 和网络消费者。撤回失败保留 owner 和清理责任；重试生命周期操作时不可重置其状态。冷态或已停止的 "
 "face 仍有效，数据调用返回 STATE。时钟故障或 epoch 改变后停止数据发布，清理仍可执行。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:47
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:47
 msgid ""
 "The [System contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
 "DOCUMENTATION-SOURCE/soc/stm32/stm32f4/system/README.md) defines clock "
@@ -76,7 +76,7 @@ msgstr ""
 "SOURCE/soc/stm32/stm32f4/system/README.md)定义时钟权威与恢复。RNG 健康检查和软件模型均不能证明物理最小熵或"
 " HIL 资格。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:51
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:51
 msgid ""
 "The chip-specific entry is `nexus/soc/stm32f407_handoff.h`, owned by the [F4"
 " System contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
@@ -89,41 +89,127 @@ msgstr ""
 "SOURCE/soc/stm32/stm32f4/system/README.md#f407-掩码状态下的镜像交接)所有。在选定的 F407 "
 "裸机固件中显式链接 `Nexus::STM32F407Handoff`。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:54
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:54
+msgid "Optional FreeRTOS STOP reference"
+msgstr "可选 FreeRTOS STOP 参考"
+
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:56
+msgid ""
+"`nexus_add_stm32f4_freertos_stop(target)` explicitly links the one-shot "
+"OBJECT adapter for the reviewed F407ZG `lowpower`/`timebase` kernel and "
+"existing RTC owner. The ordinary shallow-sleep path remains the default. The"
+" product returns its stable caller-owned state from "
+"`nx_stm32_freertos_stop_context()`; there is no runtime registry, second "
+"tick source or hidden worker."
+msgstr ""
+"`nexus_add_stm32f4_freertos_stop(target)` 显式链接一次性 OBJECT adapter，使用已审 F407ZG"
+" `lowpower`／`timebase` 内核和既有 RTC owner。默认仍为普通浅睡路径。产品通过 "
+"`nx_stm32_freertos_stop_context()` 返回稳定的调用者状态；没有运行时注册表、第二时钟 tick 源或隐藏 "
+"worker。"
+
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:62
+msgid ""
+"Before arming, the product suspends Platform, joins old Core/I/O borrowers "
+"and closes the exact ClockDomain. Only actual scheduler-suspended Idle may "
+"perform the masked tick/STOP handoff. The reviewed RTC uses 32768 Hz LSE, "
+"PRER127/255, WUT div16/reload255 (nominal 125 ms), EXTI22 events and no "
+"calibration. A retained RTC still has its original unique owner; this "
+"adapter does not add a second register writer."
+msgstr ""
+"arm 前，产品先暂停 Platform、会合旧 Core／I/O 借用者并关闭精确的 ClockDomain。只有实际 scheduler-"
+"suspended Idle 才能执行屏蔽中断下的 tick／STOP 交接。已审 RTC 使用 32768 Hz "
+"LSE、PRER127/255、WUT div16/reload255（名义 125 ms）、EXTI22 事件且无校准。保留 RTC 仍由原唯一 "
+"owner 持有；此 adapter 不增加第二个寄存器写者。"
+
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:69
+msgid ""
+"`max_elapsed_us` is an externally established 140000..1000000 µs upper bound"
+" including wake, restore and quantization; `drift_ppm` is a relative "
+"RTC/Core frequency bound, at most 10000 ppm. The two nominal 256 Hz RTC "
+"snapshots cannot detect arbitrary whole-day gaps or prove that LSE kept "
+"running: those liveness and duration bounds are product preconditions. The "
+"receipt reports elapsed lower/upper bounds and uncertainty, not physical "
+"precision."
+msgstr ""
+"`max_elapsed_us` 是由外部证明的 140000..1000000 µs 上界，包含唤醒、恢复和量化；`drift_ppm` 是 "
+"RTC／Core 相对频率误差上界，最大 10000 ppm。两个名义 256 Hz RTC 快照无法检测任意整数天间隔，也不能证明 LSE "
+"始终运行：这些持续运行和时长上界属于产品前置条件。收条报告 elapsed 上下界和不确定度，不代表物理精度。"
+
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:76
+msgid ""
+"The kernel advances only conservative complete ticks, strictly before its "
+"next unblock boundary, and restores the same SysTick with a complete first "
+"tick. Discarded partial phase remains explicit. Quantization contributes "
+"about 7.813 ms, plus declared drift, observation windows and less than one "
+"kernel tick of phase lag; this is not 1 ms continuous time across STOP. Old "
+"Core epoch deadlines and admission generations remain invalid after resume. "
+"The product retains accumulated uncertainty across repeated explicit "
+"attempts."
+msgstr ""
+"内核只推进保守的完整 tick，严格早于其 next-unblock 边界，并以完整首 tick 恢复同一个 "
+"SysTick。舍弃的部分相位保持显式。量化约贡献 7.813 ms，另加声明 drift、观察窗口以及小于一个内核 tick 的相位迟滞；这不是跨 "
+"STOP 的 1 ms 连续时间。恢复后，旧 Core epoch 的 deadline 和准入 generation "
+"仍然无效。多次显式尝试时，由产品保留累计不确定度。"
+
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:84
+msgid ""
+"Each qualified Idle attempt consumes the authorization once, including "
+"failure. Inspect the receipt before rearming or restoring users. After STOP "
+"invalidates old Core time, lost RTC timing proof, duration outside the "
+"declared bound or failed tick restoration retains masks/tick responsibility "
+"and fail-stops. Pre-STOP rejection may restore the original tick and report "
+"an error without inventing deep-sleep elapsed time. No path automatically "
+"restarts output. The [System contract](https://github.com/X-Gen-"
+"Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/soc/stm32/stm32f4/system/README.md) owns the complete ordering and "
+"failure requirements. The linked reference does not run the scheduler or "
+"STOP on hardware; power, drift and wake latency remain `not_executed`."
+msgstr ""
+"每次满足条件的 Idle 尝试消耗一次授权，包括失败。再次 arm 或恢复使用者前先检查收条。STOP 使旧 Core 时间失效后，若 RTC "
+"时间证明丢失、时长超出声明上界或 tick 恢复失败，则保留 mask／tick 责任并 fail-stop。STOP 前拒绝可以恢复原 tick "
+"并报告错误，不伪造深睡 elapsed 时间。任何路径均不自动重启输出。[System 合同](https://github.com/X-Gen-"
+"Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/soc/stm32/stm32f4/system/README.md)拥有完整顺序与失败要求。链接参考不在硬件上执行 scheduler "
+"或 STOP；功耗、drift 和唤醒延迟保持 `not_executed`。"
+
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:95
 msgid "Public declarations"
 msgstr "公共声明"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:56
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:97
 msgid "stm32f407_handoff.h"
 msgstr "stm32f407_handoff.h"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:58
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:99
 msgid "Exact F407 Flash-image transfer after explicit owner drain."
 msgstr "显式所有者排空后的精确 F407 Flash 映像移交。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:58
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:99
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:123
 msgid "Author  Nexus Team"
 msgstr "作者  Nexus Team"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:58
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:70
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:99
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:105
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:111
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:117
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:123
 msgid "Nexus Team"
 msgstr "Nexus Team"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:58
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:70
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:99
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:105
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:111
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:117
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:123
 msgid "Functions"
 msgstr "函数"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:58
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:99
 msgid "Construct the single static F407 handoff admission domain."
 msgstr "构造唯一的静态 F407 移交准入域。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:58
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:99
 msgid ""
 "Serialized privileged Thread, once before any consumer. No heap, hardware "
 "writes, discovery or implicit startup. The caller enrolls every "
@@ -133,39 +219,39 @@ msgstr ""
 "由串行特权 Thread "
 "在任何消费者启动前调用一次。不使用堆，不写硬件，不执行发现或隐式启动。调用方须登记每个可能在入口之后仍存活的平台或产品执行者、IRQ、DMA、观察者及内存所有者。租约仅在其实际会合退出或排空后释放。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:0
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:0
 msgid "Parameters"
 msgstr "参数"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:58
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:99
 msgid "[in] Positive bound on enrolled live tokens."
 msgstr "[in] 已登记活动令牌数的正数上限。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:0
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:0
 msgid "Returns"
 msgstr "返回值"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:58
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:99
 msgid "SUCCESS, INVALID, CONTEXT or STATE; never resets an epoch."
 msgstr "返回 SUCCESS、INVALID、CONTEXT 或 STATE；从不重置 epoch。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:58
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:99
 msgid "Return the existing single static admission domain."
 msgstr "返回既有的唯一静态准入域。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:58
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:99
 msgid "Pure lookup; does not initialize, acquire or touch hardware."
 msgstr "纯查询；不初始化、不获取租约，也不访问硬件。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:58
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:99
 msgid "Stable object identity, including before initialization."
 msgstr "稳定对象身份，初始化前亦有效。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:58
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:99
 msgid "Validate stopped F407 state and tail-transfer to Flash."
 msgstr "校验已停止的 F407 状态，并以尾跳转移交至 Flash。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:58
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:99
 msgid ""
 "Selected STM32F407VET6/ZGT6 baremetal images only. Caller is privileged "
 "Thread on MSP, PRIMASK=1, other masks clear. No scheduler may have started. "
@@ -202,29 +288,29 @@ msgstr ""
 "及其他总线主设备。登记属于调用方策略；Platform 和产品所有者从不自动登记。拒绝时保留中断屏蔽状态，且不执行可写 MMIO 操作。即使拒绝，读取 "
 "SysTick CTRL 也会消耗 COUNTFLAG。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:58
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:99
 msgid "[in] Closed, drained barrier from this exact domain."
 msgstr "[in] 来自此精确域、已关闭且已排空的屏障。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:58
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:99
 msgid "[in] 512-aligned physical Flash vector address."
 msgstr "[in] 按 512 字节对齐的物理 Flash 向量地址。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:58
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:99
 msgid "Error before transfer; success never returns."
 msgstr "移交前可能返回错误；成功时永不返回。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:62
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:103
 msgid "stm32f407_supervision.h"
 msgstr "stm32f407_supervision.h"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:105
 msgid "Explicit reset, first-fault retention and trace controls."
 msgstr "显式复位、首故障保留与 trace 控制。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:70
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:105
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:111
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:117
 msgid ""
 "Author  Nexus Team   Version  1.0.0   Date  2026-11-10   Copyright  "
 "Copyright (c) 2026 Nexus Team"
@@ -232,29 +318,29 @@ msgstr ""
 "作者  Nexus Team   版本  1.0.0   日期  2026-11-10   版权  Copyright (c) 2026 Nexus "
 "Team"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:70
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:105
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:111
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:117
 msgid "1.0.0"
 msgstr "1.0.0"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:70
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:105
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:111
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:117
 msgid "2026-11-10"
 msgstr "2026-11-10"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:70
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:105
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:111
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:117
 msgid "Copyright (c) 2026 Nexus Team"
 msgstr "Copyright (c) 2026 Nexus Team"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:105
 msgid "Publish one bounded first-fault snapshot without allocation or locks."
 msgstr "无分配、无锁地发布一份有界首故障快照。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:105
 msgid ""
 "Privileged Thread/IRQ/NMI/fault. Does not walk an untrusted stack or infer "
 "the FPU/extended frame layout. Caller accounts for EXC_RETURN, stack limits "
@@ -264,70 +350,70 @@ msgstr ""
 "限特权 Thread／IRQ／NMI／fault 上下文。不遍历不可信栈，不推断 FPU／扩展帧布局。调用者在提供 frame 前处理 "
 "EXC_RETURN、栈限制及压栈错误。不调用 tick、传输、观察者、复位、清理或持久化写入。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:105
 msgid "[inout] Distinct static zero storage; retained after capture."
 msgstr "[inout] 独立的静态全零存储；捕获后保持保留。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:105
 msgid "[in] Product-selected raw diagnostic value, never policy."
 msgstr "[in] 产品选择的原始诊断值，不代表策略。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:105
 msgid "[in] Raw fault entry EXC_RETURN, not dereferenced."
 msgstr "[in] 故障入口的原始 EXC_RETURN，不解引用。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:105
 msgid "[in] Optional caller-validated accessible basic frame or NULL."
 msgstr "[in] 可选、经调用者验证可访问的基本帧，或 NULL。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:105
 msgid "SUCCESS, BUSY for an earlier/nested capture, INVALID/CONTEXT."
 msgstr "SUCCESS；已有／嵌套捕获返回 BUSY；或 INVALID／CONTEXT。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:105
 msgid "Copy an acquire-published immutable first-fault record."
 msgstr "复制以 release 发布、由 acquire 读取的不可变首故障记录。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:105
 msgid ""
 "Bounded, no MMIO and no clock dependency. Checksum detects simple "
 "corruption; it does not authenticate a record or promise retention."
 msgstr "有界，无 MMIO 及时钟依赖。校验和检测简单损坏，不认证记录，也不保证保留性。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:105
 msgid "[in] Retained provider-owned snapshot, never concurrently reset."
 msgstr "[in] 保留的 provider 所有快照，不得并发重置。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:105
 msgid "[out] Distinct complete call-owned record."
 msgstr "[out] 独立完整、由调用者在本次调用拥有的记录。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:105
 msgid "SUCCESS or INVALID/STATE/IO, leaving output unchanged on failure."
 msgstr "SUCCESS 或 INVALID／STATE／IO；失败时输出不变。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:105
 msgid "Explicitly acknowledge all raw RCC reset flags after capture."
 msgstr "捕获后显式确认全部原始 RCC 复位标志。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:105
 msgid ""
 "Serialized privileged Thread; RMVF clears the complete flag group. No "
 "selective clear or automatic acknowledgement is invented."
 msgstr "串行化的特权 Thread 上下文；RMVF 清除整组标志。不虚构选择性清除或自动确认。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:105
 msgid ""
 "SUCCESS, CONTEXT, STATE before startup capture, or IO. The captured "
 "nx_reset_cause stays unchanged across STOP or a clock restart."
 msgstr ""
 "SUCCESS、CONTEXT、启动捕获前的 STATE，或 IO。捕获的 nx_reset_cause 在 STOP 或时钟重启后保持不变。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:105
 msgid "Request a system reset and retain masks if hardware has not reset."
 msgstr "请求系统复位；硬件尚未复位时保持中断掩码。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:105
 msgid ""
 "Explicit privileged product action, Thread or exception context. Preserves "
 "AIRCR priority grouping, writes the required key, issues barriers and parks "
@@ -337,11 +423,11 @@ msgstr ""
 "产品显式授权的特权动作，限 Thread 或异常上下文。保留 AIRCR "
 "优先级分组，写入所需密钥，执行屏障并停驻直到复位。不回收借用、不暗示复位成功、不改变备份策略，也不写保留记录。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:105
 msgid "Enable or disable DWT cycle tracing after explicit product selection."
 msgstr "产品显式选择后启用或禁用 DWT 周期跟踪。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:105
 msgid ""
 "Serialized privileged Thread owns debugger/DWT access. No SWO pin, ITM "
 "transport or wall-clock source is selected. CYCCNT halts in STOP and changes"
@@ -350,37 +436,38 @@ msgstr ""
 "串行化的特权 Thread 拥有调试器／DWT 访问权。不选择 SWO 引脚、ITM 传输或墙上时钟源。CYCCNT 在 STOP 停止，速率随 "
 "HCLK 变化；模差计算要求间隔少于一次回绕。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:105
 msgid "[in] Selected CYCCNT state; disabling leaves shared TRCENA on."
 msgstr "[in] 选定 CYCCNT 状态；禁用时保持共享 TRCENA 开启。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:105
 msgid "[in] Explicitly reset CYCCNT, only when enabling."
 msgstr "[in] 显式重置 CYCCNT，仅在启用时允许。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:105
 msgid "[out] Distinct call-owned actual enabled/cycle/frequency state."
 msgstr "[out] 独立调用期输出，反映实际启用／周期／频率状态。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:105
 msgid "SUCCESS or INVALID/CONTEXT/UNSUPPORTED/IO before false success."
 msgstr "SUCCESS 或 INVALID／CONTEXT／UNSUPPORTED／IO，不得虚报成功。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:105
 msgid "Basic exception frame selected and validated by the fault entry."
 msgstr "由故障入口选择并验证的基本异常帧。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:70
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:105
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:111
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:117
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:123
 msgid "Public Members"
 msgstr "公共成员"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:105
 msgid "Caller-owned first-fault record, optionally placed in noinit RAM."
 msgstr "调用者拥有的首故障记录，可放置于 noinit RAM。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:105
 msgid ""
 "Zero-initialize before first use. The provider owns every field after "
 "capture. Readers and storage survive all nested reporters. noinit does not "
@@ -389,23 +476,23 @@ msgstr ""
 "首次使用前全零初始化。捕获后所有字段归 provider 所有。读者及存储须在全部嵌套报告者存活期间保持有效。noinit "
 "不保证复位／断电保留；Standby 丢失 SRAM 和 CCM。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:64
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:105
 msgid "An explicitly enabled cycle trace is separate from monotonic time."
 msgstr "显式启用的周期跟踪独立于单调时间。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:68
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:109
 msgid "stm32f407_wwdg_ewi.h"
 msgstr "stm32f407_wwdg_ewi.h"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:70
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:111
 msgid "Caller-owned sticky WWDG early-warning observation."
 msgstr "调用者拥有的粘滞 WWDG 提前预警观测。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:70
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:111
 msgid "Enable irreversible EWI after explicit watchdog activation."
 msgstr "显式激活看门狗后启用不可逆的 EWI。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:70
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:111
 msgid ""
 "Serialized privileged Thread, masks clear. Caller has installed the sole "
 "WWDG vector calling ewi_irq(warning). No worker, callback or feed policy is "
@@ -415,105 +502,105 @@ msgstr ""
 "限串行化、特权 Thread 上下文，传入中断掩码须清除。调用者已安装唯一 WWDG 向量并调用 "
 "ewi_irq(warning)。不安装工作线程、回调或喂狗策略。粘滞 EWI 及其存储在复位前不得回收，即使 NVIC 启用失败或已请求复位。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:70
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:111
 msgid "[inout] Distinct static zero storage, retained on effects."
 msgstr "[inout] 独立静态全零存储，出现副作用后保留。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:70
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:111
 msgid "[in] Stable prepared/enabled F407 window-watchdog face."
 msgstr "[in] 稳定、已准备／启用的 F407 窗口看门狗接口。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:70
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:111
 msgid "[in] Logical WWDG IRQ priority, 0..15."
 msgstr "[in] 逻辑 WWDG IRQ 优先级，0..15。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:70
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:111
 msgid "SUCCESS or INVALID/CONTEXT/STATE/BUSY/IO; retained reports effects."
 msgstr "SUCCESS 或 INVALID／CONTEXT／STATE／BUSY／IO；retained 报告副作用。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:70
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:111
 msgid "Acknowledge one raw warning and latch its occurrence, without feed."
 msgstr "确认一次原始预警并锁存其发生，不喂狗。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:70
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:111
 msgid ""
 "WWDG IRQ only, privileged single writer. Failure retains all owners; no "
 "watchdog reload, reset, cleanup or product recovery is attempted."
 msgstr "仅限 WWDG IRQ，特权单写入者。失败保留全部所有者；不尝试看门狗重载、复位、清理或产品恢复。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:70
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:111
 msgid "[inout] Exact retained object passed to arm."
 msgstr "[inout] 传给 arm 的精确保留对象。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:70
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:111
 msgid "SUCCESS, STATE when no event, IO on failed acknowledgement."
 msgstr "SUCCESS；无事件返回 STATE；确认失败返回 IO。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:70
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:111
 msgid "Read the saturating warning count and explicit lost-count fact."
 msgstr "读取饱和预警计数及显式丢计数事实。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:70
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:111
 msgid "Privileged Thread/configurable IRQ; saved mask protects the snapshot."
 msgstr "限特权 Thread／可配置 IRQ；保存的掩码保护快照。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:70
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:111
 msgid "[in] Exact retained object, no concurrent arm/reclamation."
 msgstr "[in] 精确保留对象，不允许并发 arm 或回收。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:70
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:111
 msgid "[out] Distinct call-owned count, accessed only here."
 msgstr "[out] 独立调用期计数，仅在此处访问。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:70
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:111
 msgid "[out] Distinct call-owned saturation observation."
 msgstr "[out] 独立调用期饱和观测。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:70
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:111
 msgid "SUCCESS or INVALID/CONTEXT/STATE without withdrawing any source."
 msgstr "SUCCESS 或 INVALID／CONTEXT／STATE，不撤回任何来源。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:70
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:111
 msgid "Zero-initialized optional storage, retained through hardware reset."
 msgstr "全零初始化的可选存储，须保留到硬件复位。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:70
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:111
 msgid "Fields are provider-owned after arm, never copied or reset by caller."
 msgstr "arm 后字段归 provider 所有，调用者不得复制或重置。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:74
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:115
 msgid "stm32f4_power.h"
 msgstr "stm32f4_power.h"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:117
 msgid "Explicit drained STOP/Standby and time-domain receipts."
 msgstr "显式排空后的 STOP／Standby 及时间域回执。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:117
 msgid "Defines"
 msgstr "宏定义"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:117
 msgid "Observe live retained flags without acknowledging or clearing them."
 msgstr "观测活动保留标志，不确认或清除。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:117
 msgid "Privileged unmasked Thread with the selected System/PWR owner live."
 msgstr "限特权、未屏蔽中断的 Thread，且所选 System／PWR 所有者活动。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:117
 msgid "[out] Separate caller-owned output, never retained."
 msgstr "[out] 独立的调用者输出，不保留。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:117
 msgid "SUCCESS or INVALID/CONTEXT/STATE, output unchanged on rejection."
 msgstr "SUCCESS 或 INVALID／CONTEXT／STATE；拒绝时输出不变。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:117
 msgid "Prepare the explicit F479 RTC-Standby reset workaround."
 msgstr "准备显式 F479 RTC-Standby 复位规避措施。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:117
 msgid ""
 "Product-authorized privileged unmasked Thread with live System/PWR. Clears "
 "only SBF, leaving WUF, RTC and other retained state intact. SUCCESS obliges "
@@ -523,22 +610,22 @@ msgstr ""
 "产品授权的特权、未屏蔽中断 Thread，System／PWR 须活动。仅清除 SBF，保留 WUF、RTC 及其他保留状态。SUCCESS "
 "要求调用者执行其已授权的系统复位，绝不表示 RTC Standby 已重新使能。本函数不执行复位。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:117
 msgid "[in] Positive bound for observing SBF acknowledgment."
 msgstr "[in] 观察 SBF 确认的正数上限。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:117
 msgid ""
 "SUCCESS after SBF is cleared; IO on refused acknowledgment; "
 "INVALID/CONTEXT/STATE or UNSUPPORTED on other maintained parts."
 msgstr ""
 "SBF 清除后返回 SUCCESS；确认遭拒返回 IO；或 INVALID／CONTEXT／STATE；其他维护中的料号返回 UNSUPPORTED。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:117
 msgid "Enter STOP or WKUP-only Standby after explicit consumer drain."
 msgstr "显式排空消费者后进入 STOP 或仅 WKUP 的 Standby。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:117
 msgid ""
 "Privileged serialized Thread, incoming masks clear. The owner joins devices "
 "and DMA, disables SysTick and suspends/rebuilds OS timing. The closed 150 "
@@ -566,21 +653,21 @@ msgstr ""
 "时必须提供 discard_wakeup。旧截止时间随 old_epoch 结束。不恢复内核 tick 或旧截止时间。VBAT "
 "策略由外部负责。无法恢复时保留掩码及所有者，记录观测后停驻。真实 Standby 会复位而不返回，SRAM／CCM 不保留。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:117
 msgid ""
 "[in] Current closed, empty domain enrolling every clock and deadline "
 "borrower, including external OS consumers."
 msgstr "[in] 当前已封闭、为空的域，纳入所有时钟和截止时间借用者，包括外部 OS 消费者。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:117
 msgid "[in] Stable call-owned options and exact enabled wake IRQs."
 msgstr "[in] 稳定调用期选项及精确已启用的唤醒 IRQ。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:117
 msgid "[out] Distinct call-owned output, never retained."
 msgstr "[out] 独立调用期输出，不保留。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:117
 msgid ""
 "SUCCESS after STOP restoration; BUSY/STATE/CONTEXT before effects; "
 "UNSUPPORTED for a RUN-only profile; IO if Standby WFI returns and a new RUN "
@@ -589,11 +676,11 @@ msgstr ""
 "STOP 恢复后返回 SUCCESS；产生副作用前可返回 BUSY／STATE／CONTEXT；仅 RUN 配置返回 "
 "UNSUPPORTED；Standby 的 WFI 返回且恢复新 RUN 纪元后返回 IO。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:117
 msgid "Request Standby using the unique RTC owner's prepared wake receipt."
 msgstr "使用唯一 RTC 所有者准备的唤醒回执请求 Standby。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:117
 msgid ""
 "Privileged serialized Thread, incoming masks clear. RTC prepare explicitly "
 "authorizes any business-event discard. This call validates disabled RTC "
@@ -606,78 +693,78 @@ msgstr ""
 "WUF、提交 RTC 来源，并在 WFI 前重新使能 EWUP。绝不写 RTC 或 EXTI 寄存器。伪返回恢复 RUN 和 RTC "
 "所有权，不清除新唤醒事件。不隐式消费待处理业务事件。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:117
 msgid "[in] Closed, drained domain as for power_enter."
 msgstr "[in] 已封闭并排空的域，要求同 power_enter。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:117
 msgid ""
 "[in] Stable options with standby=true; discard_wakeup alone authorizes "
 "acknowledging an already pending raw PWR WUF."
 msgstr "[in] 稳定选项且 standby=true；只有 discard_wakeup 授权确认已待处理的原始 PWR WUF。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:117
 msgid "[in] Existing suspended RTC face; never a second hardware owner."
 msgstr "[in] 已有且已挂起的 RTC 接口；不得建立第二个硬件所有者。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:117
 msgid "[inout] Exact successful RTC standby_prepare receipt."
 msgstr "[inout] 精确且成功的 RTC standby_prepare 回执。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:117
 msgid "[out] Distinct timer epoch receipt, including spurious return."
 msgstr "[out] 独立定时器纪元回执，包含伪返回情况。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:117
 msgid ""
 "IO on returning Standby, or a pre-entry/restore failure. Real Standby resets"
 " and never returns. A failed restore retains its receipt."
 msgstr "Standby 返回或进入前／恢复失败时返回 IO。真实 Standby 复位且不返回。恢复失败保留回执。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:117
 msgid "Translate a deadline across the exact recorded old/new epochs."
 msgstr "在精确记录的新旧纪元之间转换截止时间。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:117
 msgid ""
 "Pure bounded arithmetic. The caller samples/qualifies the independent RTC "
 "and accounts for sample windows, drift and unavailable intervals. The result"
 " is an envelope, not permission to restart OS/request state."
 msgstr "纯有界算术。调用者采样并验证独立 RTC，计入采样窗口、漂移和不可用区间。结果是范围包络，不授予重启 OS／请求状态的权限。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:117
 msgid "[in] Successful STOP receipt from the same retained boot."
 msgstr "[in] 同一次保留启动中的成功 STOP 回执。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:117
 msgid "[in] Explicit epoch of deadline_us, must match receipt."
 msgstr "[in] deadline_us 的显式纪元，必须与回执匹配。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:117
 msgid "[in] Old-domain absolute deadline, including UINT64_MAX."
 msgstr "[in] 旧域绝对截止时间，包含 UINT64_MAX。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:117
 msgid "[in] Independent source's lower elapsed-time bound."
 msgstr "[in] 独立来源的已过时间下界。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:117
 msgid "[in] Independent source's upper elapsed-time bound."
 msgstr "[in] 独立来源的已过时间上界。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:117
 msgid "[out] Distinct call-owned bounds in the new timer domain."
 msgstr "[out] 新定时器域内独立调用期边界。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:117
 msgid "SUCCESS or INVALID/STATE/OVERFLOW without modifying output."
 msgstr "成功返回 SUCCESS；失败返回 INVALID／STATE／OVERFLOW，并保持输出不变。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:117
 msgid "Explicit regulator, wake routes and authorization to discard WUF."
 msgstr "显式稳压器、唤醒路线及丢弃 WUF 的授权。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:117
 msgid ""
 "wake_pins temporarily arms explicitly selected physical wake pins. The "
 "caller owns their pad/electrical plan and every pre-enabled wake source. "
@@ -690,20 +777,89 @@ msgstr ""
 "IRQ 字／位必须为零。维护的 LQFP 封装上，F446 PC13 与晶体 LSE 冲突；不替换来源。discard_wakeup 仅授权在 "
 "Standby 清除既有 PWR WUF。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:117
 msgid "Read-only retained PWR observations, not a physical wake-cause proof."
 msgstr "只读保留的 PWR 观测，不构成物理唤醒原因证明。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:117
 msgid ""
 "F479 conservatively requires a product-authorized reset before RTC Standby "
 "rearm when Standby/wake flags remain. WKUP-only is unaffected."
 msgstr "Standby／唤醒标志保留时，F479 保守要求产品授权复位后才可重新使能 RTC Standby。仅 WKUP 模式不受影响。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:117
 msgid "STOP ends one boot timer epoch; no continuous Core time is claimed."
 msgstr "STOP 结束一个启动定时器纪元；不声明 Core 时间连续。"
 
-#: ../../../../../../docs/reference/api/soc/stm32f4-system.md:76
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:117
 msgid "A deadline translated using an independent elapsed-time envelope."
 msgstr "依据独立已过时间包络转换的截止时间。"
+
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:121
+msgid "stm32f4_freertos_stop.h"
+msgstr "stm32f4_freertos_stop.h"
+
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:123
+msgid "Explicit one-shot low-speed FreeRTOS STOP reference."
+msgstr "显式一次性低速 FreeRTOS STOP 参考。"
+
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:123
+msgid "Product returns its stable selected owner, or NULL for shallow Idle."
+msgstr "产品返回其稳定的选定 owner，或返回 NULL 以使用浅睡 Idle。"
+
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:123
+msgid ""
+"No registry or runtime binding. The selected object and configuration remain"
+" valid through the scheduler. The default returns NULL."
+msgstr "无注册表或运行时绑定。选定对象与配置在 scheduler 使用期间保持有效。默认返回 NULL。"
+
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:123
+msgid "Arm one attempt without modifying SysTick, RTC or kernel time."
+msgstr "授权一次尝试，不修改 SysTick、RTC 或内核时间。"
+
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:123
+msgid ""
+"Privileged unmasked Thread; all product users are already joined. The "
+"product subsequently blocks using kernel-owned timing. An Idle window "
+"shorter than max_elapsed_us leaves the one-shot armed and uses ordinary "
+"shallow ticking. A qualified attempt consumes the arm once, even on failure;"
+" the product must inspect its receipt before rearming."
+msgstr ""
+"特权且未屏蔽中断的 Thread；全部产品使用者已经会合。产品随后使用内核拥有的时间阻塞。Idle 窗口短于 max_elapsed_us "
+"时，保持一次性授权并使用普通浅睡 tick。满足条件的尝试只消耗一次授权，即使失败也一样；产品再次 arm 前必须检查收条。"
+
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:123
+msgid "SUCCESS or rejection without retained effects."
+msgstr "SUCCESS；拒绝时无遗留效果。"
+
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:123
+msgid "Immutable authorization, retained for one actual Idle attempt."
+msgstr "不可变授权，保留至一次实际 Idle 尝试结束。"
+
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:123
+msgid ""
+"The product first suspends Platform, joins all other Core borrowers, and "
+"closes the exact ClockDomain. RTC stays suspended with its sole 32768Hz LSE "
+"owner, PRER127/255, div16/reload255 periodic wake and EXTI22 event route. "
+"max_elapsed_us includes wake, restore and quantization; it is an externally "
+"established bound, not a measured WCET. drift_ppm bounds relative RTC/Core "
+"frequency error in both directions."
+msgstr ""
+"产品先暂停 Platform、会合全部其他 Core 借用者并关闭精确的 ClockDomain。RTC 由唯一 32768Hz LSE owner "
+"持有并保持 suspended，使用 PRER127/255、div16/reload255 周期唤醒和 EXTI22 "
+"事件路线。max_elapsed_us 包含唤醒、恢复和量化；它是外部证明的上界，不是实测 WCET。drift_ppm 限定 RTC／Core "
+"双向相对频率误差。"
+
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:123
+msgid "Stable caller-owned one-shot and its observable time envelope."
+msgstr "调用者稳定拥有的一次性状态及其可观察时间包络。"
+
+#: ../../../../../workspace/nexus/docs/reference/api/soc/stm32f4-system.md:123
+msgid ""
+"Read only from its serialized owner after Idle returned. elapsed bounds "
+"include declared drift. uncertainty_us additionally includes the discarded "
+"partial first tick; these are software bounds, not physical precision "
+"measurements. Old Core deadlines stay invalid."
+msgstr ""
+"只在 Idle 返回后由其串行 owner 读取。elapsed 上下界包含声明 drift；uncertainty_us 另含舍弃的部分首 "
+"tick。这些是软件界限，不是物理精度实测值。旧 Core deadline 仍然无效。"

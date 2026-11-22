@@ -394,3 +394,82 @@ nx_result_t nx_fatfs_get(const nx_fatfs_operation_t* operation,
     result = finish(filesystem, upstream);
     return result == NX_SUCCESS && full ? NX_ERROR_EXHAUSTED : result;
 }
+
+/** \brief A failed close keeps volume admission closed until explicit exit. */
+static FRESULT close_chunk(nx_fatfs_t* filesystem, FIL* file,
+                           FRESULT upstream) {
+    FRESULT closed = f_close(file);
+    if (closed != FR_OK) {
+        filesystem->faulted = true;
+    }
+    return upstream == FR_OK ? closed : upstream;
+}
+
+/** \brief Read only the requested file window without a persistent handle. */
+nx_result_t nx_fatfs_read_at(const nx_fatfs_operation_t* operation,
+                             const char* path, uint32_t offset, void* data,
+                             size_t* bytes) {
+    if (!valid_path(path) || data == NULL || bytes == NULL || *bytes == 0U ||
+        *bytes > UINT_MAX) {
+        return NX_ERROR_INVALID;
+    }
+    UINT capacity = (UINT)*bytes;
+    nx_result_t result = begin(operation, true);
+    if (result != NX_SUCCESS) {
+        return result;
+    }
+    *bytes = 0U;
+    nx_fatfs_t* filesystem = operation->filesystem;
+    FIL file;
+    FRESULT upstream = f_open(&file, path, FA_READ);
+    bool beyond = false;
+    if (upstream == FR_OK) {
+        beyond = offset > f_size(&file);
+        if (!beyond) {
+            upstream = f_lseek(&file, (FSIZE_t)offset);
+            if (upstream == FR_OK) {
+                UINT read = 0U;
+                upstream = f_read(&file, data, capacity, &read);
+                *bytes = read;
+            }
+        }
+        upstream = close_chunk(filesystem, &file, upstream);
+    }
+    result = finish(filesystem, upstream);
+    return result == NX_SUCCESS && beyond ? NX_ERROR_INVALID : result;
+}
+
+/** \brief Report write progress even when subsequent sync cannot complete. */
+nx_result_t nx_fatfs_append(const nx_fatfs_operation_t* operation,
+                            const char* path, const void* data, size_t* bytes) {
+    if (!valid_path(path) || bytes == NULL || *bytes > UINT_MAX ||
+        (data == NULL && *bytes != 0U)) {
+        return NX_ERROR_INVALID;
+    }
+    UINT requested = (UINT)*bytes;
+    nx_result_t result = begin(operation, true);
+    if (result != NX_SUCCESS) {
+        return result;
+    }
+    *bytes = 0U;
+    nx_fatfs_t* filesystem = operation->filesystem;
+    FIL file;
+    FRESULT upstream = f_open(&file, path, FA_WRITE | FA_OPEN_APPEND);
+    if (upstream == FR_OK) {
+        if (requested > UINT32_MAX - f_size(&file)) {
+            upstream = FR_DENIED;
+        } else if (requested != 0U) {
+            UINT written = 0U;
+            upstream = f_write(&file, data, requested, &written);
+            *bytes = written;
+            if (upstream == FR_OK && written != requested) {
+                upstream = FR_DENIED;
+            }
+        }
+        if (upstream == FR_OK) {
+            upstream = f_sync(&file);
+        }
+        upstream = close_chunk(filesystem, &file, upstream);
+    }
+    return finish(filesystem, upstream);
+}

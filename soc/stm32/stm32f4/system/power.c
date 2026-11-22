@@ -9,6 +9,7 @@
 #include "nexus/soc/stm32f4_power.h"
 #include "system/stm32f407_clock.h"
 #include "system/stm32f407_system.h"
+#include "system/stm32f4_idle_power.h"
 #include "system/stm32f4_power_traits.h"
 
 extern nx_stm32_system_t g_nx_stm32_system;
@@ -309,15 +310,15 @@ static bool write_wake(PWR_TypeDef* power, uint32_t selected) {
 }
 
 /** \brief One power transaction consumes only explicit static owners. */
-static nx_result_t enter(nx_clock_barrier_t barrier,
-                         const nx_stm32_power_options_t* options,
-                         const nx_rtc_port_t* rtc,
-                         nx_rtc_standby_t* rtc_receipt,
-                         nx_stm32_stop_receipt_t* receipt, bool require_rtc) {
+static nx_result_t
+enter(nx_clock_barrier_t barrier, const nx_stm32_power_options_t* options,
+      const nx_rtc_port_t* rtc, nx_rtc_standby_t* rtc_receipt,
+      nx_stm32_stop_receipt_t* receipt, bool require_rtc, bool idle_masked) {
     if (!nx_arch_is_privileged() || nx_arch_in_isr())
         return NX_ERROR_CONTEXT;
     nx_arch_irq_masks_t masks = nx_arch_irq_masks();
-    if (masks.primask || masks.basepri || masks.faultmask)
+    if (masks.primask != (idle_masked ? 1U : 0U) || masks.basepri ||
+        masks.faultmask)
         return NX_ERROR_CONTEXT;
     nx_stm32_system_t* system = &g_nx_stm32_system;
     const void* rtc_storage = (const void*)(uintptr_t)rtc;
@@ -329,7 +330,7 @@ static nx_result_t enter(nx_clock_barrier_t barrier,
         overlaps(options, sizeof(*options), receipt, sizeof(*receipt)) ||
         overlaps(options, sizeof(*options), system, sizeof(*system)) ||
         overlaps(receipt, sizeof(*receipt), system, sizeof(*system)) ||
-        options->poll_limit == 0U ||
+        options->poll_limit == 0U || (idle_masked && options->standby) ||
         (require_rtc && (!has_rtc || !options->standby)) ||
         ((rtc != NULL || rtc_receipt != NULL) && !has_rtc) ||
         (!options->standby && (options->discard_wakeup || options->wake_pins)))
@@ -510,7 +511,14 @@ done:
 nx_result_t nx_stm32_power_enter(nx_clock_barrier_t barrier,
                                  const nx_stm32_power_options_t* options,
                                  nx_stm32_stop_receipt_t* receipt) {
-    return enter(barrier, options, NULL, NULL, receipt, false);
+    return enter(barrier, options, NULL, NULL, receipt, false, false);
+}
+
+nx_result_t
+nx_stm32_power_enter_idle_masked(nx_clock_barrier_t barrier,
+                                 const nx_stm32_power_options_t* options,
+                                 nx_stm32_stop_receipt_t* receipt) {
+    return enter(barrier, options, NULL, NULL, receipt, false, true);
 }
 
 nx_result_t nx_stm32_standby_enter(nx_clock_barrier_t barrier,
@@ -518,7 +526,7 @@ nx_result_t nx_stm32_standby_enter(nx_clock_barrier_t barrier,
                                    const nx_rtc_port_t* rtc,
                                    nx_rtc_standby_t* rtc_receipt,
                                    nx_stm32_stop_receipt_t* receipt) {
-    return enter(barrier, options, rtc, rtc_receipt, receipt, true);
+    return enter(barrier, options, rtc, rtc_receipt, receipt, true, false);
 }
 
 nx_result_t nx_stm32_deadline_bridge(const nx_stm32_stop_receipt_t* receipt,

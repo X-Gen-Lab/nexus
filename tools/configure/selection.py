@@ -154,6 +154,11 @@ def normalize_controller(selection, route, binding, hardware, provider, *,
     the enclosing graph and never published as a second configuration result.
     """
     mode = selection["mode"]
+    if route["kind"] == "pwm_adc":
+        policy = getattr(provider, "COUPLED_IO", None)
+        if policy is None:
+            fail("Selected provider has no coupled I/O clock policy")
+        policy.validate_clock(selection, route, clock, clock_plan)
     if route["kind"] in {"display", "image"}:
         policy = getattr(provider, "EXTERNAL_BUS", None)
         if policy is None:
@@ -205,6 +210,8 @@ def normalize_controller(selection, route, binding, hardware, provider, *,
         result["waveform_resolution"] = policy.resolve_fields(selection, route, clock)
     if route["kind"] == "can_fd":
         result["message_ram_words"] = hardware["message_ram_words"]
+    if route["kind"] == "pwm_adc" and mode == "injected-control":
+        result["interface_kind"] = "pwm_adc_loop"
     from tools.configure import gpio_electrical
     gpio_electrical.require_selection(result, binding)
     return result

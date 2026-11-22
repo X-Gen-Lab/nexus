@@ -2985,6 +2985,16 @@
               "minimum": 0
             }
           },
+          "commit_before_ticks": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Count in the explicitly selected timer clock ticks."
+          },
+          "compute_budget_ticks": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Count in the explicitly selected timer clock ticks."
+          },
           "deadtime_ticks": {
             "type": "integer",
             "minimum": 0,
@@ -3010,6 +3020,11 @@
               "priority"
             ],
             "additionalProperties": false
+          },
+          "max_irq_delay_us": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Time interval in microseconds; not a measured hardware guarantee."
           },
           "mode": {
             "type": "string",

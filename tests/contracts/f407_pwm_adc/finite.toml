@@ -1,0 +1,22 @@
+# Software route only; no motor power stage or physical timing qualification.
+schema = 2
+board_package = "board"
+backend = "baremetal"
+clock = "hse8-pll168"
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+
+[pwm_adc.drive]
+binding = "drive"
+mode = "finite-regular-dma"
+tick_hz = 1000000
+period_ticks = 1000
+trigger_ticks = 500
+deadtime_ticks = 0
+channels = [0]
+sample_times = [3]
+reference_mv = 3300
+exclusive = true
+irq = { priority = 5, calls_os = false }

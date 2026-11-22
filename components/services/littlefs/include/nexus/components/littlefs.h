@@ -84,6 +84,47 @@ nx_result_t nx_littlefs_put(nx_littlefs_t* filesystem, const char* path,
  */
 nx_result_t nx_littlefs_get(nx_littlefs_t* filesystem, const char* path,
                             void* data, size_t* bytes, nx_time_us_t deadline);
+/**
+ * \brief Read one bounded chunk without retaining a file handle or buffer.
+ * \param[in,out] filesystem: Mounted, task-only, same-owner serialized state.
+ * \param[in] path: Relative bounded path, with the same limits as get.
+ * \param[in] offset: File byte offset, at most INT32_MAX; no sparse seek.
+ * \param[out] data: Disjoint caller buffer for the requested capacity.
+ * \param[in,out] bytes: Positive capacity, then upstream-confirmed prefix.
+ * \param[in] deadline: One finite budget for open, seek, read and close.
+ * \return SUCCESS, EMPTY, INVALID or checked error. EOF is SUCCESS with zero
+ *         bytes; an offset past EOF is INVALID with zero bytes.
+ * \note A short successful read reaches EOF. Argument/admission rejection
+ *       leaves bytes unchanged. After admission, bytes starts at zero; on
+ *       error, bytes identifies only the prefix confirmed by the vendor read,
+ *       not successful close or a met deadline. Other output is unspecified.
+ *       Data, bytes and path do not overlap each other or live adapter storage.
+ *       All borrows end on return; caller retains the physical owner and
+ *       workspace through explicit recovery/unmount. No automatic retries.
+ */
+nx_result_t nx_littlefs_read_at(nx_littlefs_t* filesystem, const char* path,
+                                uint32_t offset, void* data, size_t* bytes,
+                                nx_time_us_t deadline);
+/**
+ * \brief Append and synchronize one bounded chunk, closing within this call.
+ * \param[in,out] filesystem: Mounted, task-only, same-owner serialized state.
+ * \param[in] path: Relative bounded path; create the file if absent.
+ * \param[in] data: Disjoint immutable buffer, NULL only for zero length.
+ * \param[in,out] bytes: Requested length, then vendor-confirmed written prefix.
+ * \param[in] deadline: One finite budget for open, write, sync and close.
+ * \return SUCCESS, EXHAUSTED or checked error; no implicit format or retry.
+ * \note Argument/admission rejection leaves bytes unchanged; admitted calls
+ *       set it to zero before writing. A failure may change the medium beyond
+ *       this confirmed prefix. Written bytes do not prove durable commit on
+ *       error; do not append the remainder blindly after sync/close failure.
+ *       SUCCESS proves the selected sync, not a multi-call transaction or
+ *       physical power-loss guarantee. A zero-length call creates/syncs an
+ *       empty file if absent. Buffer and metadata follow read_at's disjoint
+ *       storage and same-owner lifetime rules; no handle survives return.
+ */
+nx_result_t nx_littlefs_append(nx_littlefs_t* filesystem, const char* path,
+                               const void* data, size_t* bytes,
+                               nx_time_us_t deadline);
 #ifdef __cplusplus
 }
 #endif

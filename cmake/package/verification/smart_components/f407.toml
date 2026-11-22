@@ -1,0 +1,12 @@
+schema = 2
+components = ["cmsis-nn", "atecc608b", "lsm6dsox", "canopen", "lvgl"]
+board = "stm32f407zg_qiming_v41"
+backend = "baremetal"
+clock = "hse8-pll168"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 4096
+flash_load_limit_bytes = 524288
+static_ram_limit_bytes = 65536
+libc_heap_bytes = 0

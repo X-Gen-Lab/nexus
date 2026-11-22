@@ -59,6 +59,15 @@ typedef struct {
  *                  Absence of a port never stops ticks or sleeps.
  */
 const nx_freertos_lowpower_port_t* nx_freertos_lowpower_port(void);
+/** \brief Optional selected one-shot deep Idle handoff; default returns false.
+ * \note Called from the sole tickless entry before shallow timer admission.
+ *       true means the attempt is fully handled, including rejection or tick
+ *       restoration; the caller must never subsequently compensate it twice.
+ *       The selected implementation owns kernel suspension, tick borrowing,
+ *       clock transitions and its bounded uncertainty contract. It creates no
+ *       default task, state, secondary SysTick handler or hardware owner.
+ */
+bool nx_freertos_try_stop_idle(uint32_t expected_idle_ticks);
 /**
  * \brief           Kernel tickless hook with measured phase preservation.
  * \param[in]       expected_idle_ticks: Kernel's bounded next-unblock window.

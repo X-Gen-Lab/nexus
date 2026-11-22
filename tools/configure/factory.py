@@ -36,7 +36,8 @@ def controller_ordinals(result):
 
 def interface_type(class_name, shape):
     """Use actual public types where controller/direction names differ."""
-    if class_name in {"timer_capture", "advanced_pwm", "pwm_group", "encoder", "pwm_adc"}:
+    if class_name in {"timer_capture", "advanced_pwm", "pwm_group", "encoder",
+                      "pwm_adc", "pwm_adc_loop"}:
         return f"nx_{class_name}_t"
     if class_name in {"eth", "mdio", "memory_window", "flash_async", "nand",
                       "mapped_storage"}:
@@ -75,7 +76,8 @@ def classes(result):
     records = [(kind, "port", [item for item in result.controllers
                               if controller_class(item) == kind])
                for kind in KINDS]
-    for kind in ("uart_word", "spi_dma_transaction", "spi_frames", "pin_state"):
+    for kind in ("uart_word", "spi_dma_transaction", "spi_frames", "pin_state",
+                 "pwm_adc_loop"):
         instances = [item for item in result.controllers
                      if controller_class(item) == kind]
         if instances:

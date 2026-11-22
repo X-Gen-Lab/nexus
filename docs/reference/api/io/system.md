@@ -22,6 +22,23 @@ authorize full entropy credit for a cryptographic library. See the selected
 Platform lifecycle and clock prerequisites. Other retained SDKs do not grant an
 entropy provider.
 
+## Sign an existing digest without exporting the key
+
+`Nexus::IOP256Signer` exposes an existing selected signing-key face. The caller
+supplies exactly 32 SHA256 digest bytes; the synchronous task-only method
+returns raw P256 `R || S`, 64 bytes with each scalar big-endian. Public-key
+output is 64-byte big-endian `X || Y`, without an `04` tag. No implicit hashing,
+DER encoding, low-S normalization, certificate or authorization policy is added.
+
+The face, operations and private context remain live through serialized calls
+and joined provider stop. Inputs/outputs are disjoint from each other and
+control storage. Every return releases MCU buffer access; failures leave the
+complete public output unchanged. A finite provider-clock deadline does not
+preempt device computation. Key identity, provisioning, physical recovery and
+trust remain the product's responsibility. The selected
+[ATECC608B adapter](../components/devices.md) verifies a specific already-locked
+device/slot; its existence does not establish an opaque-key TLS integration.
+
 ## Public declarations
 
 ### chip.h
@@ -51,6 +68,12 @@ entropy provider.
 ### hash.h
 
 ```{doxygenfile} io/include/nexus/io/hash.h
+:project: nexus
+```
+
+### p256_signer.h
+
+```{doxygenfile} io/include/nexus/io/p256_signer.h
 :project: nexus
 ```
 

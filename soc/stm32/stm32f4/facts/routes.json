@@ -18229,6 +18229,88 @@
           "DMA1:stream7:channel7"
         ]
       }
+    },
+    {
+      "id": "tim8-pwm-adc1",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "controller": "PWM_ADC8",
+      "kind": "pwm_adc",
+      "pins": [
+        {
+          "pin": "PC6",
+          "function": "ch1",
+          "af": 3
+        },
+        {
+          "pin": "PC7",
+          "function": "ch2",
+          "af": 3
+        },
+        {
+          "pin": "PC8",
+          "function": "ch3",
+          "af": 3
+        },
+        {
+          "pin": "PA6",
+          "function": "bkin",
+          "af": 3
+        },
+        {
+          "pin": "PA0",
+          "function": "adc0",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "finite-regular-dma"
+      ],
+      "dma": [
+        "DMA2:stream4:channel0"
+      ],
+      "source": "RM0090 Rev22 Table68 TIM8 TRGO regular ADC1, Table44 DMA2 stream4 channel0; TIM8 OC4REF MMS=7; DS8626 Rev12 AF3 PC6/PC7/PC8 CH1-3, PA6 BKIN and PA0 ADC1_IN0. Software route only; no power stage or PCB authorization."
+    },
+    {
+      "id": "tim8-pwm-adc1-loop",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "controller": "PWM_ADC8",
+      "kind": "pwm_adc",
+      "pins": [
+        {
+          "pin": "PC6",
+          "function": "ch1",
+          "af": 3
+        },
+        {
+          "pin": "PC7",
+          "function": "ch2",
+          "af": 3
+        },
+        {
+          "pin": "PC8",
+          "function": "ch3",
+          "af": 3
+        },
+        {
+          "pin": "PA6",
+          "function": "bkin",
+          "af": 3
+        },
+        {
+          "pin": "PA0",
+          "function": "adc0",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "injected-control"
+      ],
+      "dma": [],
+      "source": "RM0090 Rev22 Table69 TIM8 CC4 injected ADC1; DS8626 Rev12 AF3 PC6/PC7/PC8 CH1-3, PA6 BKIN and PA0 ADC1_IN0. Single-rank IRQ software reference; no DMA, power stage or physical timing qualification."
     }
   ]
 }

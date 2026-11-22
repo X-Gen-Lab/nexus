@@ -91,6 +91,7 @@ nexus_io_domain(cipher ALIAS IOCipher SOURCES src/api/cipher.c
 nexus_io_domain(hash ALIAS IOHash SOURCES src/api/hash.c
     DEPENDS nexus_io_wake
 )
+nexus_io_domain(p256_signer ALIAS IOP256Signer SOURCES src/api/p256_signer.c)
 nexus_io_domain(display ALIAS IODisplay SOURCES src/api/display.c
     DEPENDS nexus_io_dma nexus_io_wake
 )
@@ -138,6 +139,9 @@ nexus_io_domain(pwm_group ALIAS IOPWMGroup SOURCES src/api/pwm_group.c
 nexus_io_domain(encoder ALIAS IOEncoder SOURCES src/api/encoder.c)
 nexus_io_domain(pwm_adc ALIAS IOPWMADC SOURCES src/api/pwm_adc.c
     DEPENDS nexus_io_adc
+)
+nexus_io_domain(pwm_adc_loop ALIAS IOPWMADCLoop SOURCES src/api/pwm_adc_loop.c
+    DEPENDS nexus_io_adc_format
 )
 nexus_io_domain(can_fd ALIAS IOCANFD SOURCES src/api/can_fd.c
     DEPENDS nexus_io_wake
@@ -200,6 +204,7 @@ if(
         crc
         cipher
         hash
+        p256_signer
         display
         image
         can
@@ -212,6 +217,7 @@ if(
         pwm_group
         encoder
         pwm_adc
+        pwm_adc_loop
         can_fd
         adc_group
         rtc

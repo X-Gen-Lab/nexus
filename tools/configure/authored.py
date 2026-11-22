@@ -208,7 +208,8 @@ def editor_schema():
                    "tx_count", "rx_count", "rx_storage_bytes", "init_timeout_us",
                    "filter", "filter_a", "filter_b", "deadtime_ticks",
                    "trigger_ticks", "data_bitrate", "period_us", "lower",
-                   "upper", "image_prefix_bytes", "image_suffix_bytes", "drain_us"}
+                   "upper", "image_prefix_bytes", "image_suffix_bytes", "drain_us",
+                   "commit_before_ticks", "compute_budget_ticks", "max_irq_delay_us"}
         for name in fields & numeric:
             properties[name] = {"type": "integer", "minimum": 0}
         for name in fields & block_bounds.keys():

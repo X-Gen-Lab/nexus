@@ -54,7 +54,7 @@ def native_model_composition(sdk, canonical):
 
 
 def private_compile_inputs(entry, sdk, extra_private=(), *,
-                           composition_includes=()):
+                           composition_includes=(), public_includes=()):
     """Audit actual compiler options against canonical Nexus source boundaries.
 
     Kernel PUBLIC headers remain valid. F407 SoC APIs live only below the
@@ -83,6 +83,7 @@ def private_compile_inputs(entry, sdk, extra_private=(), *,
     arguments = list(arguments[1:])
     roots = {Path(sdk).resolve(), Path(__file__).resolve().parents[2]}
     composition_includes = {Path(path) for path in composition_includes}
+    public_includes = {Path(path).resolve() for path in public_includes}
 
     def private_path(value, *, include_directory=False):
         if not value or value.startswith(("=", "$SYSROOT")):
@@ -98,6 +99,8 @@ def private_compile_inputs(entry, sdk, extra_private=(), *,
             path = Path(entry["directory"]) / path
         declared_path = path
         path = path.resolve()
+        if include_directory and path in public_includes and path.is_dir():
+            return False
         if any(path.is_relative_to(root.resolve()) for root in extra_private):
             return True
         for root in roots:
@@ -295,6 +298,10 @@ def service_directory(sdk, specification):
         return Path(sdk) / "tests/contracts/stm32f4_qspi"
     if specification.scenario == "f4_capture_audio":
         return Path(sdk) / "tests/contracts/f407_capture_audio"
+    if specification.scenario in {"f4_pwm_adc", "f4_pwm_adc_loop",
+                                  "f4_freertos_stop"}:
+        return Path(sdk) / "tests/contracts" / specification.scenario.replace(
+            "f4_", "f407_", 1)
     return (Path(sdk) / "tests/contracts" / ("stm32" + specification.scenario)
             if specification.scenario.startswith("f4_") else
             Path(sdk) / "cmake/package/verification" / specification.scenario)
@@ -326,6 +333,9 @@ def service_sources(sdk, specification):
             consumer = verification / "frame_session.c"
         elif specification.scenario == "f4_qspi_mapped":
             consumer = verification / "mapped_consumer.c"
+        elif specification.scenario in {"f4_pwm_adc", "f4_pwm_adc_loop",
+                                        "f4_freertos_stop"}:
+            consumer = verification / "main.c"
         else:
             consumer = verification / "consumer.c"
         return {"main.c": consumer,
@@ -336,7 +346,7 @@ def service_sources(sdk, specification):
                 "application.h": selected / "application.h",
                 "composition.c": selected / "composition.c",
                 "public_ca.h": verification / "public_ca.h"}
-    if specification.scenario == "common_components":
+    if specification.scenario in {"common_components", "smart_components"}:
         return {name: verification / name for name in
                 ("application.c", "application.h", "composition.c")}
     if specification.scenario == "image_window":
@@ -354,6 +364,10 @@ def service_sources(sdk, specification):
     if specification.scenario == "mcuboot_boot":
         return {name: verification / name for name in
                 ("main.c", "layout.json", "public_key.c")}
+    if specification.scenario == "mcuboot_swap":
+        return {"main.c": verification / "main.c",
+                "layout.json": verification / "layout.json",
+                "public_key.c": verification.parent / "mcuboot_boot/public_key.c"}
     return {"main.c": verification / "services.c"}
 
 
@@ -386,7 +400,7 @@ def prepare_service_consumer(prefix, directory, specification, run_checked, *,
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(path, target)
     secure = specification.scenario == "secure_services"
-    boot = specification.scenario == "mcuboot_boot"
+    boot = specification.scenario in {"mcuboot_boot", "mcuboot_swap"}
     (source / "private_headers.c").write_text(
         '#if __has_include("stm32f4xx.h") || '
         '__has_include("gd32f4xx.h") || __has_include("provider.h")\n'
@@ -409,6 +423,7 @@ def prepare_service_consumer(prefix, directory, specification, run_checked, *,
     libraries = {
         "common_services": "Nexus::Settings Nexus::OSWait Nexus::LwIPStorage",
         "common_components": "",
+        "smart_components": "",
         "device_tmp117": "Nexus::TMP117I2C",
         "smbus": "Nexus::SMBus",
         "image_window": "",
@@ -423,6 +438,9 @@ def prepare_service_consumer(prefix, directory, specification, run_checked, *,
         "f4_graphics": "",
         "f4_graphics_sdram": "",
         "f4_sai": "",
+        "f4_pwm_adc": "",
+        "f4_pwm_adc_loop": "",
+        "f4_freertos_stop": "",
     }
     selected_setup = ""
     if specification.scenario == "common_components":
@@ -438,6 +456,20 @@ def prepare_service_consumer(prefix, directory, specification, run_checked, *,
             + (' Nexus::CmBacktrace' if specification.arm else '') + ')\n'
             + ('target_compile_definitions(installed_services PRIVATE NX_COMPONENTS_F407=1)\n'
                if specification.arm else ''))
+    elif specification.scenario == "smart_components":
+        selected_setup = (
+            'add_library(installed_public STATIC application.c private_headers.c)\n'
+            'target_link_libraries(installed_public PRIVATE Nexus::AlgorithmsCMSISNN '
+            'Nexus::ATECC608B Nexus::LSM6DSOX Nexus::CANopen Nexus::LVGL)\n'
+            'nexus_apply_target_policy(installed_public)\n'
+            'nexus_target_warnings(installed_public STRICT)\n'
+            'nexus_add_firmware(installed_services SOURCES composition.c\n'
+            '  LIBRARIES installed_public)\n')
+    elif specification.scenario == "f4_freertos_stop":
+        selected_setup = (
+            'nexus_add_stm32f4_freertos_stop(selected_stop)\n'
+            'nexus_add_firmware(installed_services SOURCES main.c private_headers.c\n'
+            '  LIBRARIES selected_stop)\n')
     elif specification.scenario in {"loaned_rx", "mcuboot_control"}:
         generic, storage = (("Nexus::LwIPLoanedRX", "Nexus::LwIPLoanedRXStorage")
                             if specification.scenario == "loaned_rx" else
@@ -458,6 +490,35 @@ def prepare_service_consumer(prefix, directory, specification, run_checked, *,
             'nexus_add_stm32f4_sleep(selected_power)\n'
             'nexus_add_firmware(installed_services SOURCES main.c private_headers.c\n'
             '  LIBRARIES selected_power)\n')
+    elif specification.scenario == "mcuboot_swap":
+        selected_setup = (
+            'nexus_add_mcuboot_swap_boot()\n'
+            'add_library(installed_public STATIC private_headers.c)\n'
+            'target_link_libraries(installed_public PRIVATE Nexus::MCUBootSwapControl)\n'
+            'nexus_apply_target_policy(installed_public)\n'
+            'nexus_target_warnings(installed_public STRICT)\n'
+            'get_target_property(mcuboot_source Nexus::MCUBootSwapControl NEXUS_MCUBOOT_SOURCE)\n'
+            'file(READ "${CMAKE_CURRENT_SOURCE_DIR}/layout.json" reference_layout)\n'
+            'file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/reference")\n'
+            'set(regions "/* Authored scratch software reference. */\\n")\n'
+            'foreach(role PRIMARY SECONDARY SCRATCH)\n'
+            '  if(role STREQUAL "PRIMARY")\n'
+            '    set(index 1)\n'
+            '  elseif(role STREQUAL "SECONDARY")\n'
+            '    set(index 2)\n'
+            '  else()\n'
+            '    set(index 3)\n'
+            '  endif()\n'
+            '  string(JSON origin GET "${reference_layout}" regions ${index} origin)\n'
+            '  string(JSON size GET "${reference_layout}" regions ${index} size)\n'
+            '  string(APPEND regions "#define REFERENCE_${role}_ORIGIN ${origin}U\\n"\n'
+            '    "#define REFERENCE_${role}_SIZE ${size}U\\n")\n'
+            'endforeach()\n'
+            'file(WRITE "${CMAKE_BINARY_DIR}/reference/reference_regions.h" "${regions}")\n'
+            'nexus_add_firmware(installed_services SOURCES main.c public_key.c\n'
+            '  LIBRARIES installed_public Nexus::MCUBootSwapBootStorage Nexus::MCUBootSwapPort)\n'
+            'target_include_directories(installed_services PRIVATE "${CMAKE_BINARY_DIR}/reference")\n'
+            'target_include_directories(installed_services SYSTEM PRIVATE "${mcuboot_source}/boot/bootutil/include")\n')
     elif boot:
         selected_setup = (
             'nexus_add_mcuboot_boot()\n'
@@ -789,6 +850,21 @@ def secure_service_symbols(specification):
 def service_symbols(specification):
     """Required linked methods come from the exact immutable scenario entry."""
     service_profile(specification)
+    if specification.scenario == "smart_components":
+        return frozenset({"nx_platform_start", "nx_platform_stop",
+                          "nx_cmsis_nn_dense_s8", "arm_fully_connected_s8",
+                          "nx_atecc608b_init", "nx_lsm6dsox_init",
+                          "nx_canopen_init", "nx_lvgl_init"})
+    if specification.scenario == "f4_freertos_stop":
+        return frozenset({"nx_freertos_suppress_ticks_and_sleep",
+                          "nx_stm32_freertos_stop_arm",
+                          "nx_clock_domain_construct", "nx_clock_domain_close"})
+    if specification.scenario in {"f4_pwm_adc", "f4_pwm_adc_loop"}:
+        prefix = ("nx_stm32_pwm_adc_loop" if
+                  specification.scenario == "f4_pwm_adc_loop" else
+                  "nx_stm32_pwm_adc")
+        return frozenset({"nx_platform_start", "nx_platform_stop",
+                          prefix + "_prepare", prefix + "_close"})
     if specification.scenario == "secure_services":
         return secure_service_symbols(specification)
     if specification.scenario == "common_components":
@@ -825,7 +901,7 @@ def service_symbols(specification):
                           "nx_mcuboot_query", "nx_mcuboot_request",
                           "boot_swap_type_multi", "boot_set_pending_multi",
                           "flash_area_read", "flash_area_write"})
-    if specification.scenario == "mcuboot_boot":
+    if specification.scenario in {"mcuboot_boot", "mcuboot_swap"}:
         return frozenset({"nx_platform_start", "nx_platform_stop", "boot_go",
                           "bootutil_img_validate", "bootutil_verify_sig",
                           "flash_area_read", "flash_area_write",
@@ -924,6 +1000,22 @@ def service_symbols(specification):
 
 def service_scope(specification):
     """Describe the executed software boundary without physical claims."""
+    if specification.scenario == "smart_components":
+        return ("Public C11 CMSIS-NN known-vector execution and optional adapter "
+                "metadata/rejected admission. No sensor, signing, CANopen node "
+                "or GUI is started. Native execution or F407 ARM linkage and "
+                "resources only; no hardware, network or timing qualification.")
+    if specification.scenario == "f4_freertos_stop":
+        return ("Selected F407 FreeRTOS lowpower/timebase STOP adapter and "
+                "external LSE software reference; public C11 linkage, strong "
+                "hook/kernel ABI and resources only. No scheduler, physical "
+                "STOP, oscillator accuracy, wake latency or HIL execution.")
+    if specification.scenario == "mcuboot_swap":
+        return ("Separate F407ZG scratch-profile boot ARM link with explicit "
+                "128/384/384/128KiB layout and public test key. Linkage and "
+                "resources only; actual reset, signed-image handoff, power "
+                "loss, physical Flash and timing remain unexecuted. Single "
+                "bank writes/erases do not preserve real-time execution.")
     if specification.scenario == "common_components":
         return ("Explicit selected common-component source profile: public "
                 "arithmetic, metadata/admission, RTT and read-only Shell. "
@@ -1007,6 +1099,9 @@ def service_scope(specification):
 
 def check_service_compiles(commands, public, sdk, resolved, specification):
     """Audit actual C11/CPU/ABI argv and the narrow public-only API boundary."""
+    kernel_includes = (() if specification.scenario != "f4_freertos_stop" else
+        tuple(Path(sdk) / "ext/freertos" / directory for directory in
+              ("include", "portable/GCC/ARM_CM4F")))
     for entry in public:
         argv = entry.get("arguments") or shlex.split(entry["command"])
         # Public-only callers may not opt into either supplier's storage layout.
@@ -1015,8 +1110,10 @@ def check_service_compiles(commands, public, sdk, resolved, specification):
                         for directory in ("port", "profile"))
         private += tuple(root / "ext" for root in
                          (Path(sdk), Path(__file__).resolve().parents[2]))
-        if (any(str(sdk / "ext") in argument for argument in argv) or
-                private_compile_inputs(entry, sdk, private) or
+        if ((not kernel_includes and
+             any(str(sdk / "ext") in argument for argument in argv)) or
+                private_compile_inputs(entry, sdk, private,
+                                       public_includes=kernel_includes) or
                 any(argument.split("=")[0] == "-DNEXUS_LWIP_LOANED_RX"
                     or (argument == "-D" and index + 1 < len(argv) and
                         argv[index + 1].split("=")[0] == "NEXUS_LWIP_LOANED_RX")
@@ -1056,9 +1153,9 @@ def check_service_image(sdk, source, build, specification, run_checked):
     canonical = verification / specification.assembly
     canonical_sources = service_sources(sdk, specification)
     secure = specification.scenario == "secure_services"
-    split = specification.scenario in {"secure_services", "common_components", "loaned_rx",
+    split = specification.scenario in {"secure_services", "common_components", "smart_components", "loaned_rx",
                                        "mcuboot_control"}
-    boot = specification.scenario == "mcuboot_boot"
+    boot = specification.scenario in {"mcuboot_boot", "mcuboot_swap"}
     if ((source / "assembly.toml").read_bytes() != canonical.read_bytes()
             or any((source / name).read_bytes() != path.read_bytes()
                    for name, path in canonical_sources.items())):
@@ -1085,9 +1182,9 @@ def check_service_image(sdk, source, build, specification, run_checked):
         if resolved.get("part") != json.loads(board.read_text())["soc"]:
             raise ValueError("F4 reference resolved another exact part")
     native = resolved.get("cpu", {}).get("arch") == "native"
-    if (native == specification.arm or
-            resolved.get("backend") != ("baremetal" if specification.arm
-                                         else "native")):
+    backend = ("freertos" if specification.scenario == "f4_freertos_stop" else
+               "baremetal" if specification.arm else "native")
+    if native == specification.arm or resolved.get("backend") != backend:
         raise ValueError("Service consumer differs from its reviewed domain")
     commands = json.loads((build / "compile_commands.json").read_text())
     products = ({source / "private_headers.c"} if boot else
@@ -1168,7 +1265,8 @@ def check_service_image(sdk, source, build, specification, run_checked):
             retention_command += ["--component-owner", "f407-secure-services",
                                   "--consumer", str(source / "application.c")]
         no_provider = specification.scenario in {
-            "image_window", "mcuboot_control", "common_components"}
+            "image_window", "mcuboot_control", "common_components",
+            "smart_components"}
         if not no_provider:
             run_checked(retention_command)
         retained = (json.loads(retention_path.read_text())

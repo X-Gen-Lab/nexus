@@ -774,7 +774,8 @@ class SDKConsumerParallelTests(unittest.TestCase):
         shutil.copytree(ROOT / "cmake/package/verification/secure_services",
                         self.sdk / "cmake/package/verification/secure_services")
         for scenario in ("common_components", "device_tmp117", "image_window", "loaned_rx",
-                         "mcuboot_control", "mcuboot_boot", "smbus"):
+                         "mcuboot_control", "mcuboot_boot", "mcuboot_swap",
+                         "smart_components", "smbus"):
             shutil.copytree(ROOT / "cmake/package/verification" / scenario,
                             self.sdk / "cmake/package/verification" / scenario)
         family = Path("tests/contracts/stm32f4_family")
@@ -782,7 +783,8 @@ class SDKConsumerParallelTests(unittest.TestCase):
         for name in ("stm32f4_crypto", "stm32f4_sdram", "stm32f4_graphics",
                      "stm32f4_graphics_sdram", "stm32f4_sai", "stm32f4_qspi",
                      "stm32f4_power", "stm32f4_sdio_hs",
-                     "f407_capture_audio"):
+                     "f407_capture_audio", "f407_pwm_adc", "f407_pwm_adc_loop",
+                     "f407_freertos_stop"):
             relative = Path("tests/contracts") / name
             shutil.copytree(ROOT / relative, self.sdk / relative)
         crc = Path("tests/contracts/crc_assembly/consumer.c")
@@ -992,7 +994,7 @@ class SDKConsumerParallelTests(unittest.TestCase):
                 if service.scenario != "common_services" and service.arm:
                     cpu.update(float_abi="hard", fpu="fpv4-sp-d16")
                 resolved = {
-                    "backend": "baremetal" if service.arm else "native",
+                    "backend": tomllib.loads(Path(assembly_arg).read_text())["backend"],
                     "soc_family": family, "cpu": cpu,
                     "enum_abi": "short-enums" if service.arm else "native-int",
                     "controllers": []}
@@ -1183,7 +1185,8 @@ class SDKConsumerParallelTests(unittest.TestCase):
                     if not smoke.startswith("native-time-")}
         retained.update(item.name for item in self.consumer.SERVICE_CONSUMERS
                         if item.arm and item.scenario not in
-                        {"image_window", "mcuboot_control", "common_components"})
+                        {"image_window", "mcuboot_control", "common_components",
+                         "smart_components"})
         commands = [command for command in self.commands
                     if any(arg.endswith("retention.py") for arg in command)]
         self.assertEqual({Path(command[command.index("--elf") + 1]).parents[1]

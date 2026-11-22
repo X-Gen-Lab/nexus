@@ -246,6 +246,7 @@ class DomainPolicies:
     GPIO_PHASE: object | None = None
     SAI: object | None = None
     WAVEFORM: object | None = None
+    COUPLED_IO: object | None = None
     SELECTION: object | None = None
     DAC_TRIGGERS: Mapping = field(default_factory=lambda: MappingProxyType({}))
     PLATFORM: object | None = None
@@ -280,7 +281,7 @@ class DomainPolicies:
             "capabilities", "dma", "shared_irqs", "clock", "adc_group",
             "capture_audio", "external_bus", "gpio_phase", "sai", "waveform",
             "selection", "platform", "startup_memory", "packet", "headers",
-            "dac_triggers"})
+            "dac_triggers", "coupled_io"})
         if type(value["schema_version"]) is not int or value["schema_version"] != 1:
             fail("Unsupported domain policy schema")
         result = {}
@@ -350,6 +351,9 @@ class DomainPolicies:
         if "waveform" in value:
             from tools.configure.policies.timer_waveform import TimerWaveformPolicy
             result["WAVEFORM"] = TimerWaveformPolicy.from_validated(value["waveform"])
+        if "coupled_io" in value:
+            from tools.configure.coupled_io import CoupledIoPolicy
+            result["COUPLED_IO"] = CoupledIoPolicy.from_validated(value["coupled_io"])
         if "sai" in value:
             from tools.configure.policies.sai import SaiPolicy
             result["SAI"] = SaiPolicy.from_validated(value["sai"])

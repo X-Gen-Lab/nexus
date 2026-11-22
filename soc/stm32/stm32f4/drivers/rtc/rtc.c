@@ -6,6 +6,7 @@
  * \date            2026-11-07
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "drivers/rtc/rtc_idle.h"
 #include "drivers/rtc/stm32f407_rtc.h"
 #include "nexus/arch/arch.h"
 #include "rtc_lptim_internal.h"
@@ -179,7 +180,7 @@ static bool bcd(uint32_t value, uint8_t* out) {
     return true;
 }
 /** \brief BYPSHAD requires two equal complete SSR/TR/DR observations. */
-static nx_result_t calendar(nx_rtc_calendar_t* out) {
+static nx_result_t calendar(nx_rtc_calendar_t* out, uint32_t* subsecond) {
     for (unsigned i = 0; i < 8U; ++i) {
         uint32_t sub = NX_F407_RTC_READ(&NX_F407_RTC->SSR);
         uint32_t time = NX_F407_RTC_READ(&NX_F407_RTC->TR);
@@ -202,6 +203,8 @@ static nx_result_t calendar(nx_rtc_calendar_t* out) {
             nx_rtc_calendar_validate(&c) != NX_SUCCESS)
             return NX_ERROR_STATE;
         *out = c;
+        if (subsecond != NULL)
+            *subsecond = sub;
         return NX_SUCCESS;
     }
     return NX_ERROR_BUSY;
@@ -331,7 +334,7 @@ static nx_result_t program_calendar(nx_stm32_rtc_state_t* s,
      * Observe the complete value within the same finite operation budget. */
     for (uint32_t i = 0U; i < s->config->poll_limit; ++i) {
         nx_rtc_calendar_t observed;
-        r = calendar(&observed);
+        r = calendar(&observed, NULL);
         if (r == NX_SUCCESS && observed.year == c->year &&
             observed.month == c->month && observed.day == c->day &&
             observed.weekday == c->weekday && observed.hour == c->hour &&
@@ -355,7 +358,7 @@ static nx_result_t read_calendar(const void* raw, nx_rtc_snapshot_t* out) {
     if (!s->opened || s->closing || s->suspended || s->tainted || !live(s))
         return NX_ERROR_STATE;
     nx_rtc_snapshot_t value = {.domain = {s, s->generation}};
-    nx_result_t result = calendar(&value.calendar);
+    nx_result_t result = calendar(&value.calendar, NULL);
     if (result == NX_SUCCESS)
         *out = value;
     return result;
@@ -426,7 +429,7 @@ static nx_result_t submit(void* raw, nx_rtc_request_t* request) {
     if (nx_rtc_alarm_validate(&request->alarm) != NX_SUCCESS)
         return NX_ERROR_INVALID;
     nx_rtc_calendar_t c;
-    nx_result_t r = calendar(&c);
+    nx_result_t r = calendar(&c, NULL);
     if (r != NX_SUCCESS)
         return r;
     if (c.day == request->alarm.day && c.hour == request->alarm.hour &&
@@ -1270,7 +1273,7 @@ static nx_result_t handoff(void* raw, nx_rtc_backup_handoff_t* out) {
         return NX_ERROR_STATE;
     nx_rtc_backup_handoff_t value = {.resources = s->effects,
                                      .oscillator_hz = 32768U};
-    nx_result_t r = calendar(&value.calendar);
+    nx_result_t r = calendar(&value.calendar, NULL);
     if (r != NX_SUCCESS)
         return r;
     s->effects = 0U;
@@ -1665,7 +1668,7 @@ nx_result_t nx_stm32_rtc_prepare(nx_stm32_rtc_state_t* s,
             (NX_F407_RTC_READ(&NX_F407_RTC->ISR) &
              (FOREIGN_STATUS | RTC_ISR_ALRAF)))
             return NX_ERROR_STATE;
-        nx_result_t r = calendar(&retained);
+        nx_result_t r = calendar(&retained, NULL);
         if (r != NX_SUCCESS)
             return r;
     } else {
@@ -1789,4 +1792,97 @@ nx_result_t nx_stm32_rtc_resume(nx_stm32_rtc_state_t* s) {
     ++s->generation;
     s->suspended = false;
     return NX_SUCCESS;
+}
+
+#define IDLE_WAKE_LINE UINT32_C(0x00400000)
+#define IDLE_WAKE_CR   (RTC_CR_WUTE | RTC_CR_WUTIE)
+
+/** \brief Private masked access never relaxes ordinary public task admission.
+ */
+static nx_result_t idle_owner(const nx_rtc_port_t* port,
+                              const nx_stm32_rtc_state_t** selected) {
+    const nx_arch_irq_masks_t masks = nx_arch_irq_masks();
+    if (!nx_arch_is_privileged() || nx_arch_in_isr() || masks.primask != 1 ||
+        masks.basepri != 0 || masks.faultmask != 0)
+        return NX_ERROR_CONTEXT;
+    if (!nx_time_span(port, sizeof(*port), _Alignof(nx_rtc_port_t)) ||
+        port->ops != &nx_stm32_rtc_ops || !owner(port->context))
+        return NX_ERROR_INVALID;
+    const nx_stm32_rtc_state_t* state = port->context;
+    if (!nx_time_span(state->config, sizeof(*state->config),
+                      _Alignof(nx_stm32_rtc_config_t)) ||
+        !state->opened || !state->suspended || state->closing ||
+        state->tainted || state->auxiliary_faulted || state->stage != IDLE ||
+        state->active != NULL || state->sram_lease != NULL ||
+        state->sram_ready || state->sram_effects != 0 ||
+        state->standby_receipt != NULL || state->standby_phase != 0)
+        return NX_ERROR_STATE;
+    *selected = state;
+    return NX_SUCCESS;
+}
+
+/** \brief Unique 125ms WUT; all foreign pending sources retain their flags. */
+static bool idle_profile(const nx_stm32_rtc_state_t* state) {
+    const uint32_t foreign =
+        (FOREIGN_STATUS & ~(uint32_t)RTC_ISR_WUTF) | (uint32_t)RTC_ISR_ALRAF;
+    return state->wake_lines == IDLE_WAKE_LINE &&
+           state->auxiliary_cr == IDLE_WAKE_CR && state->auxiliary_tafcr == 0 &&
+           state->auxiliary_calr == 0 && state->auxiliary_calibr == 0 &&
+           live(state) &&
+           NX_F407_RTC_READ(&NX_F407_RTC->CR) ==
+               (RTC_CR_BYPSHAD | IDLE_WAKE_CR) &&
+           NX_F407_RTC_READ(&NX_F407_RTC->WUTR) == 255 &&
+           (NX_F407_RTC_READ(&NX_F407_RTC->ISR) & foreign) == 0 &&
+           (NX_F407_RTC_READ(&NX_F407_RTC_EXTI->PR) & ~IDLE_WAKE_LINE) == 0;
+}
+
+nx_result_t nx_stm32_rtc_idle_sample(const nx_rtc_port_t* port,
+                                     uint32_t* ticks_256) {
+    const nx_stm32_rtc_state_t* state;
+    nx_result_t result = idle_owner(port, &state);
+    if (result != NX_SUCCESS)
+        return result;
+    if (!external(state, ticks_256, sizeof(*ticks_256), _Alignof(uint32_t),
+                  true) ||
+        nx_time_overlap(ticks_256, sizeof(*ticks_256), port, sizeof(*port)))
+        return NX_ERROR_INVALID;
+    if (!idle_profile(state))
+        return NX_ERROR_STATE;
+    nx_rtc_calendar_t value;
+    uint32_t subsecond;
+    result = calendar(&value, &subsecond);
+    if (result != NX_SUCCESS)
+        return result;
+    if (!idle_profile(state))
+        return NX_ERROR_STATE;
+    const uint32_t seconds =
+        ((uint32_t)value.hour * 60U + value.minute) * 60U + value.second;
+    *ticks_256 = seconds * 256U + 255U - subsecond;
+    return NX_SUCCESS;
+}
+
+nx_result_t nx_stm32_rtc_idle_ack(const nx_rtc_port_t* port) {
+    const nx_stm32_rtc_state_t* state;
+    nx_result_t result = idle_owner(port, &state);
+    if (result != NX_SUCCESS)
+        return result;
+    if (!idle_profile(state))
+        return NX_ERROR_STATE;
+    if ((NX_F407_RTC_READ(&NX_F407_RTC->ISR) & RTC_ISR_WUTF) != 0 &&
+        !clear_status(RTC_ISR_WUTF))
+        return NX_ERROR_IO;
+    /* A new foreign event is preserved before touching the EXTI latch. */
+    if (!idle_profile(state) ||
+        (NX_F407_RTC_READ(&NX_F407_RTC->ISR) & RTC_ISR_WUTF) != 0)
+        return NX_ERROR_IO;
+    if ((NX_F407_RTC_READ(&NX_F407_RTC_EXTI->PR) & IDLE_WAKE_LINE) != 0) {
+        NX_F407_RTC_WRITE(&NX_F407_RTC_EXTI->PR, IDLE_WAKE_LINE);
+        nx_arch_dsb();
+    }
+    return idle_profile(state) &&
+                   (NX_F407_RTC_READ(&NX_F407_RTC->ISR) & RTC_ISR_WUTF) == 0 &&
+                   (NX_F407_RTC_READ(&NX_F407_RTC_EXTI->PR) & IDLE_WAKE_LINE) ==
+                       0
+               ? NX_SUCCESS
+               : NX_ERROR_IO;
 }

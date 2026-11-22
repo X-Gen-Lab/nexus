@@ -87,6 +87,10 @@ class DomainBridge:
             if domains.ADC_GROUP is None:
                 common.fail("Selected package has no ADC sequencer policy")
             domains.ADC_GROUP.validate(selection, route)
+        elif kind == "pwm_adc":
+            if domains.COUPLED_IO is None:
+                common.fail("Selected package has no coupled I/O policy")
+            domains.COUPLED_IO.validate(selection, route)
         elif kind in {"capture", "audio"}:
             policy = (domains.SAI if domains.SAI is not None and
                       domains.SAI.handles(route["controller"]) else domains.CAPTURE_AUDIO)
@@ -101,7 +105,7 @@ class DomainBridge:
             domains.SELECTION.validate(selection, route, self.hardware_facts)
 
     def validate_mode_context(self, selection, route, *, backend, clock_profile,
-                              part=None, clock_plan=None):
+                              part=None, clock_plan=None, kernel_profile=None):
         if backend not in self.software["backends"]:
             common.fail("Backend is outside the selected package binding scope")
         external = self._domains().EXTERNAL_BUS
@@ -111,7 +115,8 @@ class DomainBridge:
         policy = self._domains().SELECTION
         if policy is not None:
             policy.validate_context(selection, route, backend=backend,
-                clock_profile=clock_profile, part=part, clock_plan=clock_plan)
+                clock_profile=clock_profile, part=part, clock_plan=clock_plan,
+                kernel_profile=kernel_profile)
 
     def validate_dma_resource(self, resource):
         return common.validate_dma_resource(resource, self.DMA_TOPOLOGY)
@@ -146,6 +151,9 @@ class DomainBridge:
         elif kind == "timer_sequence":
             expected = (domains.WAVEFORM.dma_paths(route, mode)
                         if domains.WAVEFORM is not None else None)
+        elif kind == "pwm_adc":
+            expected = (domains.COUPLED_IO.dma_paths(route, mode)
+                        if domains.COUPLED_IO is not None else None)
         elif domains.SELECTION is not None:
             expected = domains.SELECTION.dma_paths(route, mode, self.hardware_facts)
         else:

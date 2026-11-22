@@ -1,0 +1,33 @@
+// FIG-34 current: caller-owned control and optional smart-device composition.
+// Code basis: io/include/nexus/io/pwm_adc_loop.h; components; external recipes.
+// Solid edges are calls/execution; dashed edges are loans or exit duties.
+digraph ControlSmartDevices {
+    graph [label="FIG-34 控制与智能器件：执行和退出责任", rankdir=TB,
+           bgcolor="white", pad=0.28, nodesep=0.4, ranksep=0.6,
+           fontname="Noto Sans CJK SC", fontsize=15, labelloc=t];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
+          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
+          fontsize=13, margin="0.16,0.12"];
+    edge [color="#475569", fontcolor="#0f172a",
+          fontname="Noto Sans CJK SC", fontsize=11, arrowsize=0.8];
+
+    app [label="应用执行者：目标、参数、调度", fillcolor="#f8fafc"];
+    slow [label="可选器件、协议、GUI 与存储"];
+    face [label="既有公共 I/O face"];
+    provider [label="唯一硬件 provider：私有状态"];
+    session [label="调用者 session、缓冲和 context", fillcolor="#f8fafc"];
+    compute [label="选定 ADC IRQ：有界 compute"];
+    exit [label="停止准入、排空、会合与 cold close", fillcolor="#fff7ed"];
+    boundary [label="精确软件参考；不建立实板或电机资格", fillcolor="#fefce8"];
+
+    app -> slow [label="显式调用或 service"];
+    slow -> face [label="按选定领域合同调用"];
+    face -> provider [label="ops 与实例 context"];
+    app -> session [label="prepare 与 start"];
+    session -> provider [label="借用持续至 acquire 观察 SETTLED", style=dashed];
+    provider -> compute [label="完整 raw scan"];
+    compute -> provider [label="完整 duty 组", constraint=false];
+    app -> exit [label="关闭新目标后显式退出", style=dashed];
+    provider -> exit [label="失败保留借用与恢复责任", style=dashed];
+    exit -> boundary [label="输出抑制与引用退出分别证明", style=dashed];
+}

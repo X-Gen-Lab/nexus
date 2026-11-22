@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "kind": "nexus-component-source",
+  "identifier": "cmsis_nn",
+  "path": "vendors/arm/CMSIS_NN",
+  "upstream_url": "https://github.com/ARM-software/CMSIS-NN.git",
+  "fetch_url": "https://github.com/X-Gen-Lab/CMSIS-NN.git",
+  "commit": "22080c68d040c98139e6cb1549473e3149735f4d",
+  "tree": "afbe1d1e98657a8b9c3de19980fa4d2cc301d8b7",
+  "license": {
+    "path": "LICENSE",
+    "expression": "Apache-2.0"
+  },
+  "files": {
+    "Include/Internal/arm_nn_compiler.h": "54d7c0c72e6e197f36883e540b160518a74220bd159db9230e7871bba307ed4a",
+    "Include/arm_nn_math_types.h": "6752576d4a274c4954ef17a376206895fdf8b3a3a68d5dc49747d41df087979a",
+    "Include/arm_nn_tables.h": "862cd074c391c90b7ca41d2737426b0c4fa6e38ba3f762905302a4c78f9fe0ac",
+    "Include/arm_nn_types.h": "0c38d780c2e2803804af97f610ab4704dd8ab9104392e17f45ffc56fc818d29d",
+    "Include/arm_nnfunctions.h": "1b79a6f66d5e644496bc9acd562d0af04e702d60bcee08274096d29721dac351",
+    "Include/arm_nnsupportfunctions.h": "891f62fca60714634eb3036ec226ea0408be4daf040d73e34fed864372f77793",
+    "LICENSE": "b40930bbcf80744c86c46a12bc9da056641d722716c378f5659b9e555ef833e1",
+    "Source/FullyConnectedFunctions/arm_fully_connected_s8.c": "e6eb8c143a8f473a218e5310820a346cccb1564fd4690b0a0fdaa1124f6a3435",
+    "Source/NNSupportFunctions/arm_nn_vec_mat_mult_t_s8.c": "056300bafed58af6a5e337e5391d63bee4e0cfba1749fa1b58c7365aae41221e"
+  }
+}

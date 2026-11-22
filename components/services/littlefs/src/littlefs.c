@@ -315,3 +315,98 @@ nx_result_t nx_littlefs_get(nx_littlefs_t* filesystem, const char* path,
     }
     return finish(filesystem, upstream);
 }
+
+/** \brief A local file is always withdrawn before its stack storage expires. */
+nx_result_t nx_littlefs_read_at(nx_littlefs_t* filesystem, const char* path,
+                                uint32_t offset, void* data, size_t* bytes,
+                                nx_time_us_t deadline) {
+    if (!valid_path(path) || data == NULL || bytes == NULL || *bytes == 0U ||
+        *bytes > INT32_MAX || offset > INT32_MAX) {
+        return NX_ERROR_INVALID;
+    }
+    size_t capacity = *bytes;
+    nx_result_t result = begin(filesystem, deadline, true);
+    if (result != NX_SUCCESS) {
+        return result;
+    }
+    *bytes = 0U;
+    filesystem_state_t* state = filesystem->state;
+    lfs_file_t file;
+    struct lfs_file_config config = {0};
+    config.buffer = state->file_cache;
+    int upstream = lfs_file_opencfg(&state->filesystem, &file, path,
+                                    LFS_O_RDONLY, &config);
+    if (upstream == 0) {
+        lfs_soff_t length = lfs_file_size(&state->filesystem, &file);
+        if (length < 0 || offset > (uint32_t)length) {
+            upstream = length < 0 ? (int)length : LFS_ERR_INVAL;
+        } else {
+            lfs_soff_t position = lfs_file_seek(
+                &state->filesystem, &file, (lfs_soff_t)offset, LFS_SEEK_SET);
+            if (position < 0) {
+                upstream = (int)position;
+            } else {
+                lfs_ssize_t read = lfs_file_read(&state->filesystem, &file,
+                                                 data, (lfs_size_t)capacity);
+                if (read < 0) {
+                    upstream = (int)read;
+                } else {
+                    *bytes = (size_t)read;
+                }
+            }
+        }
+        int closed = lfs_file_close(&state->filesystem, &file);
+        if (upstream == 0) {
+            upstream = closed;
+        }
+    }
+    return finish(filesystem, upstream);
+}
+
+/** \brief Prefix progress and durable completion are separate observations. */
+nx_result_t nx_littlefs_append(nx_littlefs_t* filesystem, const char* path,
+                               const void* data, size_t* bytes,
+                               nx_time_us_t deadline) {
+    if (!valid_path(path) || bytes == NULL || *bytes > INT32_MAX ||
+        (data == NULL && *bytes != 0U)) {
+        return NX_ERROR_INVALID;
+    }
+    size_t requested = *bytes;
+    nx_result_t result = begin(filesystem, deadline, true);
+    if (result != NX_SUCCESS) {
+        return result;
+    }
+    *bytes = 0U;
+    filesystem_state_t* state = filesystem->state;
+    lfs_file_t file;
+    struct lfs_file_config config = {0};
+    config.buffer = state->file_cache;
+    int upstream =
+        lfs_file_opencfg(&state->filesystem, &file, path,
+                         LFS_O_WRONLY | LFS_O_CREAT | LFS_O_APPEND, &config);
+    if (upstream == 0) {
+        lfs_soff_t length = lfs_file_size(&state->filesystem, &file);
+        if (length < 0 || requested > (size_t)INT32_MAX - (size_t)length) {
+            upstream = length < 0 ? (int)length : LFS_ERR_FBIG;
+        } else if (requested != 0U) {
+            lfs_ssize_t written = lfs_file_write(&state->filesystem, &file,
+                                                 data, (lfs_size_t)requested);
+            if (written < 0) {
+                upstream = (int)written;
+            } else {
+                *bytes = (size_t)written;
+                if (*bytes != requested) {
+                    upstream = LFS_ERR_NOSPC;
+                }
+            }
+        }
+        if (upstream == 0) {
+            upstream = lfs_file_sync(&state->filesystem, &file);
+        }
+        int closed = lfs_file_close(&state->filesystem, &file);
+        if (upstream == 0) {
+            upstream = closed;
+        }
+    }
+    return finish(filesystem, upstream);
+}

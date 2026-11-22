@@ -146,3 +146,60 @@ if(NEXUS_OS_TIMEBASE_LOWPOWER)
         INTERFACE NEXUS_TIMEBASE_LOWPOWER=1
     )
 endif()
+
+# One explicit Idle owner; normal Platform builds add no STOP state or target.
+function(nexus_add_stm32f4_freertos_stop target)
+    if(NOT ARGC EQUAL 1 OR TARGET "${target}")
+        message(FATAL_ERROR "STOP adapter requires one unused target name")
+    endif()
+    if(NOT TARGET Nexus::Platform OR NOT TARGET nx_stm32f407_lowpower_binding)
+        message(FATAL_ERROR "STOP requires the selected FreeRTOS timebase port")
+    endif()
+    get_target_property(stop_device nexus_soc_stm32f4 NEXUS_STM32_DEVICE)
+    nexus_controller_modes(stop_rtc_modes rtc)
+    if(NOT stop_device STREQUAL "STM32F407xx" OR NOT stop_rtc_modes)
+        message(FATAL_ERROR "STOP reference requires F407 and its RTC owner")
+    endif()
+    get_property(
+        stop_owner
+        TARGET nexus_build_options
+        PROPERTY NEXUS_STOP_ADAPTER
+    )
+    if(stop_owner)
+        message(FATAL_ERROR "Only one selected FreeRTOS STOP owner is allowed")
+    endif()
+    get_target_property(stop_source Nexus::Platform NEXUS_SOURCE_DIR)
+    get_filename_component(
+        stop_package
+        "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/.."
+        ABSOLUTE
+    )
+    nexus_add_stm32f4_sleep(${target}_power)
+    add_library(
+        ${target}
+        OBJECT
+        "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/freertos_stop.c"
+    )
+    nexus_apply_target_policy(${target})
+    target_link_libraries(
+        ${target}
+        PUBLIC ${target}_power Nexus::OSFreeRTOS
+        PRIVATE Nexus::Arch nexus_build_options nexus_owned_warnings
+    )
+    target_include_directories(
+        ${target}
+        PRIVATE
+            "${stop_package}"
+            "${stop_source}/os/freertos/private"
+            "${stop_source}/components/runtime/clock_domain/private"
+    )
+    target_include_directories(${target} PUBLIC "${stop_package}/include")
+    target_compile_definitions(
+        nx_stm32f407_lowpower_binding
+        PRIVATE NEXUS_FREERTOS_STOP_SELECTED=1
+    )
+    set_property(
+        TARGET nexus_build_options
+        PROPERTY NEXUS_STOP_ADAPTER "${target}"
+    )
+endfunction()

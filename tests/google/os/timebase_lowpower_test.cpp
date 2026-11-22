@@ -33,7 +33,8 @@ class TimebaseLowpower : public testing::Test {
     nx_timebase_registers_t registers{
         &control, &reload, &value, &pending, &status,    &interrupts, &compare,
         2U,       2U,      168U,   167999U,  read_clock, this};
-    nx_timebase_lowpower_t context{&registers, 0U, 0U, false, false, false};
+    nx_timebase_lowpower_t context{&registers, 0U,    0U,   false,
+                                   false,      false, false};
     static TimebaseLowpower* active;
 
     static uint64_t read_clock(void* p) {
@@ -69,6 +70,52 @@ class TimebaseLowpower : public testing::Test {
 };
 TimebaseLowpower* TimebaseLowpower::active;
 
+TEST_F(TimebaseLowpower, StopHandoffRetainsOnePauseAndRestoresItsTickOwner) {
+    pause();
+    ASSERT_EQ(nx_timebase_stop_handoff(&context), NX_SUCCESS);
+    EXPECT_EQ(control, 4U);
+    EXPECT_TRUE(context.paused);
+    EXPECT_TRUE(context.stop_handoff);
+    EXPECT_TRUE(nx_timebase_stop_released(&context));
+    EXPECT_EQ(nx_timebase_arm_deadline(&context, now + 1000U), NX_ERROR_STATE);
+    now = 17U; /* STOP has established a distinct Core epoch. */
+    nx_timebase_resume_tick(&context, now + 500U);
+    EXPECT_EQ(control, 7U);
+    EXPECT_FALSE(context.paused);
+    EXPECT_FALSE(context.stop_handoff);
+    EXPECT_FALSE(nx_timebase_stop_released(&context));
+}
+TEST_F(TimebaseLowpower, StopResumeExplicitlyRebasesFullFirstTick) {
+    pause();
+    ASSERT_NE(context.phase_cycles, 0U);
+    ASSERT_EQ(nx_timebase_stop_handoff(&context), NX_SUCCESS);
+    now = 17U;
+    nx_timebase_stop_resume(&context, now + 1000U);
+    EXPECT_EQ(context.phase_cycles, 0U);
+    EXPECT_FALSE(context.stop_handoff);
+    EXPECT_EQ(reload, registers.full_reload);
+    EXPECT_FALSE(context.first_short);
+    EXPECT_EQ(control, 7U);
+}
+TEST_F(TimebaseLowpower, StopCannotConsumeOrAcknowledgeAPendingTick) {
+    pause();
+    pending = pending_tick;
+    unsigned before = writes;
+    EXPECT_EQ(nx_timebase_stop_handoff(&context), NX_ERROR_BUSY);
+    EXPECT_EQ(writes, before);
+    EXPECT_EQ(pending, pending_tick);
+    EXPECT_TRUE(context.paused);
+    EXPECT_FALSE(context.stop_handoff);
+    EXPECT_FALSE(nx_timebase_stop_released(&context));
+}
+TEST_F(TimebaseLowpower, StopHandoffRejectsForeignOrAlreadyLoanedState) {
+    EXPECT_EQ(nx_timebase_stop_handoff(nullptr), NX_ERROR_INVALID);
+    EXPECT_EQ(nx_timebase_stop_handoff(&context), NX_ERROR_STATE);
+    pause();
+    ASSERT_EQ(nx_timebase_arm_deadline(&context, now + 1000U), NX_SUCCESS);
+    EXPECT_EQ(nx_timebase_stop_handoff(&context), NX_ERROR_STATE);
+    EXPECT_FALSE(nx_timebase_stop_released(&context));
+}
 TEST_F(TimebaseLowpower, PendingTickRejectsWithoutChangingSource) {
     pending = pending_tick;
     nx_freertos_tick_snapshot_t out{77U, 78U};
@@ -267,7 +314,7 @@ TEST_F(TimebaseLowpower, ContinuousTimerAccountsForRegisterLatencyAndPhase) {
             timer_fraction = fraction;
             elapsed_cycles = 0U;
             access_cycles = latency;
-            context = {&registers, 0U, 0U, false, false, false};
+            context = {&registers, 0U, 0U, false, false, false, false};
             nx_freertos_tick_snapshot_t snapshot{};
             ASSERT_EQ(nx_timebase_pause_tick(&context, &snapshot), NX_SUCCESS);
             nx_timebase_resume_tick(&context, snapshot.time_us + 1000U -

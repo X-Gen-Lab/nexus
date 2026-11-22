@@ -40,6 +40,20 @@
       "tests/contracts/f407_capture_audio/frame_session.c",
       "tests/contracts/f407_capture_audio/ve-frames-raw.toml",
       "tests/contracts/f407_capture_audio/ve_board/board.json",
+      "tests/contracts/f407_freertos_stop/CMakeLists.txt",
+      "tests/contracts/f407_freertos_stop/README.md",
+      "tests/contracts/f407_freertos_stop/board/board.json",
+      "tests/contracts/f407_freertos_stop/main.c",
+      "tests/contracts/f407_freertos_stop/stop.toml",
+      "tests/contracts/f407_pwm_adc/CMakeLists.txt",
+      "tests/contracts/f407_pwm_adc/board/board.json",
+      "tests/contracts/f407_pwm_adc/finite.toml",
+      "tests/contracts/f407_pwm_adc/main.c",
+      "tests/contracts/f407_pwm_adc_loop/CMakeLists.txt",
+      "tests/contracts/f407_pwm_adc_loop/README.md",
+      "tests/contracts/f407_pwm_adc_loop/board/board.json",
+      "tests/contracts/f407_pwm_adc_loop/control.toml",
+      "tests/contracts/f407_pwm_adc_loop/main.c",
       "tests/contracts/stm32f4_crypto/CMakeLists.txt",
       "tests/contracts/stm32f4_crypto/consumer.c",
       "tests/contracts/stm32f4_crypto/f415zg-board/board.json",
@@ -167,6 +181,7 @@
     "drivers/spi/binding.json",
     "drivers/i2c/binding.json",
     "drivers/spi/spi_frames.binding.json",
-    "drivers/i2c/i2c_target.binding.json"
+    "drivers/i2c/i2c_target.binding.json",
+    "drivers/pwm_adc/binding.json"
   ]
 }

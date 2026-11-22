@@ -44,7 +44,8 @@ nitpicky = True
 # These public-page tags intentionally remain opaque, and the kernel/C types
 # are external. Exact ignored identifiers do not relax other references.
 _external_types = (
-    'size_t uint8_t uint16_t uint32_t uint64_t int16_t int32_t int64_t uintptr_t '
+    'size_t uint8_t uint16_t uint32_t uint64_t int8_t '
+    'int16_t int32_t int64_t uintptr_t '
     'pthread_t pthread_mutex_t pthread_cond_t '
     'QueueHandle_t SemaphoreHandle_t StackType_t StaticQueue_t TaskFunction_t '
     'StaticSemaphore_t StaticTask_t TaskHandle_t TickType_t UBaseType_t '

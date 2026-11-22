@@ -342,6 +342,8 @@
           "nand:raw-page",
           "parallel16:8080-16",
           "pwm:fixed-pwm",
+          "pwm_adc:finite-regular-dma",
+          "pwm_adc:injected-control",
           "pwm_group:coherent-pwm",
           "rtc:adopt-retained",
           "rtc:provision-empty",

@@ -22,6 +22,7 @@ os-shutdown
 board-porting
 provider-porting
 component-porting
+control-and-smart-devices
 cpu-runtime
 os-backend-porting
 performance-hil

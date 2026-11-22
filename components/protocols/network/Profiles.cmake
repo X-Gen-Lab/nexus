@@ -169,7 +169,7 @@ function(nexus_lwip_managed_services)
     )
     target_link_libraries(
         nexus_lwip_managed_services
-        PUBLIC Nexus::Core
+        PUBLIC Nexus::IOEthernetFrames
         PRIVATE
             Nexus::LwIPManagedStorage
             nexus_build_options

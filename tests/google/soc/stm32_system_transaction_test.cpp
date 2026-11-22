@@ -13,6 +13,7 @@ extern "C" {
 #include "nexus/soc/stm32f4_power.h"
 #include "system/stm32f407_clock.h"
 #include "system/stm32f407_system.h"
+#include "system/stm32f4_idle_power.h"
 nx_result_t nx_stm32_power_enter(nx_clock_barrier_t,
                                  const nx_stm32_power_options_t*,
                                  nx_stm32_stop_receipt_t*)
@@ -421,6 +422,34 @@ TEST_F(Stm32System, ColdAdmissionRejectsForeignRccInterruptAndReadySource) {
     rcc.CIR = 0U;
     rcc.CR |= RCC_CR_HSERDY;
     EXPECT_EQ(NX_ERROR_BUSY, nx_stm32_system_preflight(&g_nx_stm32_system));
+}
+
+TEST_F(Stm32System, TrustedIdleStopPreservesMaskWithoutWeakeningPublicEntry) {
+    ASSERT_EQ(0, Start().primary);
+    nx_clock_domain_t domain{};
+    ASSERT_EQ(NX_SUCCESS, nx_clock_domain_construct(&domain, 1U));
+    nx_clock_barrier_t barrier{};
+    ASSERT_EQ(NX_SUCCESS, nx_clock_domain_close(&domain, &barrier));
+    nx_stm32_power_options_t options = {
+        {1U << 6U, 0U, 0U, 0U}, 8U, 0U, 0U, true, false, false};
+    nx_power_enabled[0] = 1U << 6U;
+    nx_stm32_stop_receipt_t receipt{};
+    mask = 1U;
+    EXPECT_EQ(NX_ERROR_CONTEXT,
+              nx_stm32_power_enter(barrier, &options, &receipt));
+    EXPECT_EQ(0U, deep_waits);
+    ASSERT_EQ(NX_SUCCESS,
+              nx_stm32_power_enter_idle_masked(barrier, &options, &receipt));
+    EXPECT_EQ(1U, mask);
+    EXPECT_EQ(1U, deep_waits);
+    EXPECT_NE(receipt.old_epoch, receipt.new_epoch);
+    options.standby = true;
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_stm32_power_enter_idle_masked(barrier, &options, &receipt));
+    mask = 0U;
+    options.standby = false;
+    EXPECT_EQ(NX_ERROR_CONTEXT,
+              nx_stm32_power_enter_idle_masked(barrier, &options, &receipt));
 }
 
 TEST_F(Stm32System, DisabledExtiRouteCannotBecomeASuccessfulWakePublisher) {

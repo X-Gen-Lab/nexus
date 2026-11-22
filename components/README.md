@@ -34,6 +34,27 @@ owner。`protocols/` 还包括 [Modbus TCP](protocols/modbus_tcp/README.md)、
 归 [F4 System](../soc/stm32/stm32f4/system/README.md#f407-掩码状态下的镜像交接)
 所有，通过 `nexus/soc/stm32f407_handoff.h` 访问；通用组件不持有芯片私有实现。
 
+## 控制与智能硬件选配
+
+按实际任务选择以下窄组件，不必同时启用。完整组合与调用顺序见
+[控制和智能器件指南](../docs/guides/control-and-smart-devices.md)。
+
+| 任务 | 当前入口 | 必须另外提供 |
+| --- | --- | --- |
+| 标定、计数展开、轨迹和姿态 | [Algorithms](algorithms/README.md) | 单位、连续采样事实、安装旋转、版本与每实例历史；相对 yaw 无绝对航向保证 |
+| 固定量化推理 | [CMSIS-NN](algorithms/cmsis_nn/README.md) | 显式 tensor、量化、形状和执行预算；手工图不建立训练准确率 |
+| 精确角度与电源监测 | [AS5047P](devices/as5047p/README.md)、[INA226](devices/ina226/README.md) | 前者 SPI CS 电气时序；后者分流电阻与校准，不能代替 FOC 相电流采样 |
+| 六轴与 tagged FIFO | [LSM6DSOX](devices/lsm6dsox/README.md) | 配对、丢样边界、时间映射与标定；普通读取时间不是 aperture |
+| 模组网络 | [UARTByteStream](runtime/uart_stream/README.md)、[ESP-AT](devices/esp_at/README.md) | 唯一 UART owner、调用者复制缓冲、显式 service、信任与物理恢复 |
+| 设备网络与界面 | [CANopen](protocols/canopen/README.md)、[LVGL](protocols/lvgl/README.md) | OD 产品校验；一个 GUI owner、显式 arena/tile 和同步 settled 显示端口 |
+| 音视频控制 | [OV2640](devices/ov2640/README.md)、[WM8978](devices/wm8978/README.md) | 另行审核 capture/PCM 接线、时钟、缓冲、带宽和退出；控制线不等于数据线接入 |
+| 非导出密钥签名 | [ATECC608B](devices/atecc608b/README.md) | 已烧录且锁定的精确 slot、有限 wake/delay 与完整操作 scope；不选 provisioning 或自动 TLS 绑定 |
+| 试运行与回退 | [MCUboot scratch swap](protocols/mcuboot/swap/README.md) | 明确三 area、独立 boot 镜像、健康判断和显式 confirm；不与 overwrite 混链 |
+
+快环属于独立 [PWM/ADC provider](../soc/stm32/stm32f4/drivers/pwm_adc/README.md)，
+不由通用算法创建硬件 owner。当前 ST MCSDK 原始源码包尚未取得，相关复用保持
+`blocked`；本目录没有以自写控制算法冒充官方 MCSDK。实板行为保持 `not_executed`。
+
 本页跨目录 `docs/`／`tests/` 链接以完整源码 checkout 为上下文。使用安装 SDK 时，
 按 SDK manifest 记录的 source commit 阅读同版本源仓；不能据此推断 SDK 携带文档
 工具或测试源码。

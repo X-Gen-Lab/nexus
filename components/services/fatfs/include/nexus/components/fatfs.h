@@ -101,6 +101,44 @@ nx_result_t nx_fatfs_put(const nx_fatfs_operation_t* operation,
  */
 nx_result_t nx_fatfs_get(const nx_fatfs_operation_t* operation,
                          const char* path, void* data, size_t* bytes);
+/**
+ * \brief Read a bounded file chunk and close the local handle before return.
+ * \param[in] operation: Mounted, task-only, same-owner scope and finite budget.
+ * \param[in] path: Relative short-name path, with the same limits as get.
+ * \param[in] offset: File byte offset; seeking past EOF is rejected.
+ * \param[out] data: Disjoint caller buffer for the requested capacity.
+ * \param[in,out] bytes: Positive capacity, then vendor-confirmed read prefix.
+ * \return SUCCESS, EMPTY, INVALID or checked error. EOF is SUCCESS with zero
+ *         bytes; an offset past EOF is INVALID with zero bytes.
+ * \note Short successful reads reach EOF. Argument/admission rejection leaves
+ *       bytes unchanged; admitted calls set it to zero. An error may follow a
+ *       confirmed prefix; bytes does not prove successful close or deadline
+ *       compliance. Other output is unspecified. Data, bytes and path do not
+ *       overlap each other or live adapter storage. No handle, buffer, hidden
+ *       worker or lock survives return; media uncertainty retains the original
+ *       Block owner and workspace until explicit recovery/unmount.
+ */
+nx_result_t nx_fatfs_read_at(const nx_fatfs_operation_t* operation,
+                             const char* path, uint32_t offset, void* data,
+                             size_t* bytes);
+/**
+ * \brief Append and synchronize one chunk within the original operation.
+ * \param[in] operation: Mounted task-only scope, serialized with all users.
+ * \param[in] path: Relative short-name path; create the file if absent.
+ * \param[in] data: Disjoint immutable input, NULL only for zero length.
+ * \param[in,out] bytes: Requested length, then vendor-confirmed written prefix.
+ * \return SUCCESS, EXHAUSTED or checked error; sync/close failure retains
+ *         volume fault responsibility and closes new admission.
+ * \note Open, append, sync and close share the operation deadline. Rejection
+ *       before admission leaves bytes unchanged; admitted calls start at zero.
+ *       On failure, effects can exceed the confirmed prefix and this count
+ *       proves no durable commit or retry permission. SUCCESS establishes the
+ *       selected sync, not power-loss atomicity or a multi-call transaction.
+ *       A zero-length call creates/syncs an empty file if absent. Storage and
+ *       borrow rules match read_at; no file handle survives the call.
+ */
+nx_result_t nx_fatfs_append(const nx_fatfs_operation_t* operation,
+                            const char* path, const void* data, size_t* bytes);
 #ifdef __cplusplus
 }
 #endif

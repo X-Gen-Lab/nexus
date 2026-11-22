@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: fc7f073fc356d5f00383edf0297b050e6e09d10a415cf419e344351b4acc1411\n"
+"X-Nexus-Source-SHA256: 8b1d57a195bc7df63806d3799683bd4b41572089956d4cf39f3002d222da08bb\n"
 
 #: ../../../../../../docs/guides/index.md:8
 msgid "按任务查找"

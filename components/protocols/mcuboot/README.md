@@ -1,5 +1,9 @@
 # MCUboot 固定覆盖模式软件参考
 
+本页描述既有 overwrite-only profile。[独立 scratch 交换模式](swap/README.md)提供
+选定的 TEST／confirm／revert 软件实现；两个 profile 使用不同公开 target 和操作
+scope，可存在于同一构建图的不同最终镜像。
+
 本组件集成 MCUboot 2.4.0 普通 API，固定组织提交
 `62471ebd5825ef05b7c10922a15ed70f8ade9426`。它复用官方 bootutil，以及同一提交内
 TinyCrypt P256／SHA256 与 vendored ASN.1 parser。已审软件目标为 STM32F407VET6；

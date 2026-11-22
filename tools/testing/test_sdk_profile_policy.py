@@ -58,6 +58,10 @@ class SDKProfilePolicyTests(unittest.TestCase):
         sdk = prefix / 'share/nexus/src'
         shutil.copytree(ROOT / 'cmake/package/verification' / profile.scenario,
                         sdk / 'cmake/package/verification' / profile.scenario)
+        if profile.scenario == 'mcuboot_swap':
+            key = Path('cmake/package/verification/mcuboot_boot/public_key.c')
+            (sdk / key).parent.mkdir(parents=True)
+            shutil.copyfile(ROOT / key, sdk / key)
         (sdk / 'dependencies').mkdir()
         shutil.copyfile(ROOT / 'dependencies/platform-compatibility.json',
                         sdk / 'dependencies/platform-compatibility.json')
@@ -303,6 +307,71 @@ class SDKProfilePolicyTests(unittest.TestCase):
             self.assertEqual((source / 'assembly.toml').read_text().count(
                 'layout = "layout.json"'), 1)
             self.assertIn('REFERENCE_PRIMARY_ORIGIN', cmake)
+
+    def test_robotics_profiles_export_public_consumers_without_supplier_headers(self):
+        for name in ('native smart components', 'f407 smart components',
+                     'f407 mcuboot swap'):
+            with self.subTest(name=name), tempfile.TemporaryDirectory() as tmp:
+                profile = self.profile(name)
+                sources = self.consumers.service_sources(ROOT, profile)
+                required = set(self.packager.SDK_VERIFICATION_FILES)
+                for path in sources.values():
+                    self.assertIn(path.relative_to(ROOT).as_posix(), required)
+                _, source, _, _, _ = self.prepared(Path(tmp), name)
+                cmake = (source / 'CMakeLists.txt').read_text()
+                self.assertIn('add_library(installed_public STATIC', cmake)
+                if profile.scenario == 'smart_components':
+                    for target in ('AlgorithmsCMSISNN', 'ATECC608B',
+                                   'LSM6DSOX', 'CANopen', 'LVGL'):
+                        self.assertIn('Nexus::' + target, cmake)
+                    self.assertNotIn('Nexus::LVGLProfile', cmake)
+                    self.assertNotIn('#include "cryptoauthlib.h"',
+                                     (source / 'application.c').read_text())
+                else:
+                    self.assertIn('nexus_add_mcuboot_swap_boot()', cmake)
+                    self.assertIn('Nexus::MCUBootSwapBootStorage', cmake)
+                    self.assertIn('foreach(role PRIMARY SECONDARY SCRATCH)', cmake)
+                    self.assertTrue((source / 'public_key.c').is_file())
+                    self.assertNotIn('Nexus::MCUBootBootStorage)', cmake)
+
+    def test_freertos_stop_consumer_exports_the_exact_lowpower_reference(self):
+        profile = self.profile('f407 freertos stop')
+        package = json.loads((ROOT / 'soc/stm32/stm32f4/package.json').read_text())
+        sources = self.consumers.service_sources(ROOT, profile)
+        for path in sources.values():
+            self.assertIn(path.relative_to(ROOT).as_posix(),
+                          package['exports']['verification_files'])
+        self.assertEqual(profile.assembly, 'stop.toml')
+        self.assertIn('nx_stm32_freertos_stop_arm',
+                      self.consumers.service_symbols(profile))
+
+    def test_stop_admits_only_its_two_public_kernel_include_directories(self):
+        profile = self.profile('f407 freertos stop')
+        resolved = {'enum_abi': 'short-enums', 'soc_family': 'stm32f4',
+                    'cpu': {'arch': 'cortex-m4', 'float_abi': 'hard',
+                            'fpu': 'fpv4-sp-d16'}}
+        flags = ['-std=c11', '-mcpu=cortex-m4', '-mthumb',
+                 '-mfpu=fpv4-sp-d16', '-mfloat-abi=hard', '-fshort-enums']
+        for option, accepted in (
+                ('-I' + str(ROOT / 'ext/freertos/include'), True),
+                ('-I' + str(ROOT / 'ext/freertos/portable/GCC/ARM_CM4F'), True),
+                ('-I' + str(ROOT / 'ext/freertos/portable/GCC/ARM_CM3'), False),
+                ('-I' + str(ROOT / 'ext/mcuboot/boot/bootutil/include'), False),
+                ('-include' + str(ROOT / 'ext/freertos/include/FreeRTOS.h'), False)):
+            row = {'file': '/consumer/main.c', 'directory': str(ROOT),
+                   'arguments': ['cc', *flags, option, '-c', '/consumer/main.c']}
+            with self.subTest(option=option):
+                if accepted:
+                    self.consumers.check_service_compiles(
+                        [row], [row], ROOT, resolved, profile)
+                    with self.assertRaisesRegex(ValueError, 'private'):
+                        self.consumers.check_service_compiles(
+                            [row], [row], ROOT, resolved,
+                            self.profile('f407 mcuboot boot'))
+                else:
+                    with self.assertRaisesRegex(ValueError, 'private'):
+                        self.consumers.check_service_compiles(
+                            [row], [row], ROOT, resolved, profile)
 
     def test_generic_api_rejects_selected_layout_flags_and_port_paths(self):
         cases = [('f407 loaned rx', '-DNEXUS_LWIP_LOANED_RX=1'),

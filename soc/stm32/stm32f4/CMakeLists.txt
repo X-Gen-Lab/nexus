@@ -113,6 +113,7 @@ foreach(
     exti
     timer
     adc
+    pwm_adc
     dac
     crc
     crypto

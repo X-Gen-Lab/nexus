@@ -145,6 +145,41 @@
       "id": "cmsis-dsp",
       "entry": "components/algorithms/cmsis_dsp/Select.cmake",
       "target": "Nexus::AlgorithmsCMSISDSP"
+    },
+    {
+      "id": "cmsis-nn",
+      "entry": "components/algorithms/cmsis_nn/Select.cmake",
+      "target": "Nexus::AlgorithmsCMSISNN"
+    },
+    {
+      "id": "lsm6dsox",
+      "entry": "components/devices/lsm6dsox/Select.cmake",
+      "target": "Nexus::LSM6DSOX"
+    },
+    {
+      "id": "canopen",
+      "entry": "components/protocols/canopen/Select.cmake",
+      "target": "Nexus::CANopen"
+    },
+    {
+      "id": "lvgl",
+      "entry": "components/protocols/lvgl/Select.cmake",
+      "target": "Nexus::LVGL"
+    },
+    {
+      "id": "ov2640",
+      "entry": "components/devices/ov2640/Select.cmake",
+      "target": "Nexus::OV2640"
+    },
+    {
+      "id": "mcuboot-swap",
+      "entry": "components/protocols/mcuboot/swap/Select.cmake",
+      "target": "Nexus::MCUBootSwapControl"
+    },
+    {
+      "id": "atecc608b",
+      "entry": "components/devices/atecc608b/Select.cmake",
+      "target": "Nexus::ATECC608B"
     }
   ]
 }

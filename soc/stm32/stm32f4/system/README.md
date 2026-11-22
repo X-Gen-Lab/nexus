@@ -345,3 +345,61 @@ masked entry，仅在自己的状态 ready 后 unmask，不能复用源 deadline
 context，不支持 RAM／ROM vector、H743／Cache-on transition、通用 Cortex-M 或
 实测交接。SOC-34 DVFS 与 IO-30 runtime clock 仍开放，固定频率 provider 不因此
 变为 mutable-clock 合同。
+
+## FreeRTOS 一次性 STOP 软件参考
+
+`nexus_add_stm32f4_freertos_stop(target)` 显式选择 F407、FreeRTOS
+`profile = "lowpower"`、`lowpower_port = "timebase"` 和现有 RTC owner。
+它链接一个 OBJECT 适配器，接入唯一的 `portSUPPRESS_TICKS_AND_SLEEP` 入口；
+没有第二个 SysTick、后台任务或默认深睡状态。未选择时只保留返回 false 的弱入口，
+普通浅睡仍使用连续 TIM2 和原有部分 tick 相位。
+
+```mermaid
+flowchart LR
+    P[产品停止用户和 I/O] --> S[Platform suspend 与 ClockDomain close]
+    S --> A[显式 arm 一次]
+    A --> I[真实 Idle / scheduler suspended]
+    I --> T[唯一 SysTick pause 与 STOP handoff]
+    T --> R[同一 suspended RTC / 前快照]
+    R --> W[masked STOP / System 新 epoch]
+    W --> B[RTC 后快照 / elapsed 上下界]
+    B --> K[严格早于 next unblock 的 Kernel step]
+    K --> F[恢复同一 SysTick / 完整首 tick]
+    F --> O[产品检查收条并自行恢复用户]
+```
+
+箭头表示当前选定 C 路径的责任顺序。产品负责暂停使用者，确认所有旧 Core deadline、
+DMA、借用和回调均退出，再关闭同一个 ClockDomain；一个空白 domain 不能替代这些
+工作。产品以 `nx_stm32_freertos_stop_context()` 返回稳定静态对象，并显式 arm。
+下一次可接纳的 Idle 消耗这一次授权，失败也不自动重试或再次补 tick。
+
+当前仅审核 32768 Hz LSE、PRER127/255、WUT RTCCLK/16 与 reload255，即名义
+125 ms 周期，只有 EXTI22 事件路由，无校准、其他 RTC 事件或 SRAM lease。
+RTC 在 Platform suspend 后保持 autonomous 计时；它的私有 helper 复用同一个 owner，
+不建立第二个寄存器写者。`max_elapsed_us` 必须涵盖实际唤醒、恢复和量化上界，范围为
+140000～1000000 微秒；`drift_ppm` 明确声明相对 RTC／Core 频率误差上界，不能用
+软件参考数值冒充晶振实测。
+
+两个 RTC 快照返回一天内的 256 Hz 名义计数。适配器按单次日界环绕、SSR 量化、
+Core 前后采样窗口及声明 drift 计算 elapsed 上下界；单次声明上界不超过一秒，
+该上界和 LSE 持续运行是外部准入前提，modulo 样本自身无法识别整数天停顿或
+超出前提后的数值巧合。可接纳的 elapsed 上界必须严格
+早于 Kernel 提供的 next-unblock 窗口，因而 `vTaskStepTick` 不跨任何 timeout 列表。
+已挂起 Kernel tick 或硬件 pending SysTick 均在暂停前拒绝，不被隐式清除。
+
+Kernel 只补保守下界对应的完整 tick，并重建完整首 tick。旧部分相位用于完整 tick
+计算，剩余相位显式写入 `discarded_phase_us`；软件收条 `elapsed_min_us`／
+`elapsed_max_us`／`uncertainty_us` 不等于实测精度。典型量化宽度约 7.813 ms，
+另加声明 drift、采样窗口和小于一个 Kernel tick 的相位迟滞。此模式面向低速设备，
+不承诺跨 STOP 的 1 ms 连续时间，也不用于控制快环。重复显式 arm 时，产品必须保存并
+累计前次不确定度，不能把重置后的单次收条当成累计时间误差。
+
+失去 RTC／Core 计时证明、观察到超过声明的停钟时间或 SysTick 恢复失败时，保持
+mask 与 tick 责任并 fail-stop。普通准入拒绝恢复同一来源后返回收条；RTC ack 失败
+仍保持错误可观察。原 `nx_stm32_power_enter` 的未屏蔽 Thread 合同保持不变；私有
+`stm32f4_idle_power.h` 仅供持有审核 tick handoff 的 masked Idle 适配器使用。
+旧 Core epoch 的请求、deadline 和 RTC admission generation 不能直接复用。
+
+`tests/contracts/f407_freertos_stop/` 是真实配置和 ARM 链接消费者，不运行 scheduler
+或 STOP；模型测试分别验证 RTC 叶操作、tick handoff、Power 事务和实际 Idle 编排。
+物理功耗、LSE 漂移和唤醒延迟保持 `not_executed`。

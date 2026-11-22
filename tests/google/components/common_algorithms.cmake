@@ -5,6 +5,11 @@ nexus_google_test(nexus_common_algorithms_test
     INCLUDES "${NEXUS_SOURCE_DIR}/components/algorithms/include"
     LIBRARIES Nexus::Algorithms
 )
+nexus_google_test(nexus_common_motion_test
+    SOURCES "${nexus_google_root}/components/common_motion_test.cpp"
+    INCLUDES "${NEXUS_SOURCE_DIR}/components/algorithms/include"
+    LIBRARIES Nexus::Algorithms
+)
 nexus_google_test(nexus_common_fsm_test
     SOURCES "${nexus_google_root}/components/common_fsm_test.cpp"
     LIBRARIES Nexus::FSM

@@ -44,6 +44,7 @@ typedef struct {
     bool paused;
     bool armed;
     bool first_short;
+    bool stop_handoff;
 } nx_timebase_lowpower_t;
 
 /**
@@ -57,6 +58,21 @@ typedef struct {
  */
 nx_result_t nx_timebase_pause_tick(void* context,
                                    nx_freertos_tick_snapshot_t* snapshot);
+/** \brief Hand one already paused, unpending SysTick to a selected STOP owner.
+ * \details Clears TICKINT, never acknowledges a pending tick. SUCCESS retains
+ *          the same pause receipt across the explicit clock epoch change;
+ *          resume_tick restores it. No timer alarm may coexist. Rejection
+ *          retains the original pause and requires resume_tick before reuse.
+ */
+nx_result_t nx_timebase_stop_handoff(void* context);
+/** \brief Prove this exact paused source is handed off and no tick can pend. */
+bool nx_timebase_stop_released(const nx_timebase_lowpower_t* context);
+/** \brief Restore the same handed-off source with a new full first tick.
+ * \note Only selected STOP uses this entry. It explicitly discards the old
+ *       submicrosecond phase; the adapter reports discarded phase/uncertainty.
+ *       Invalid receipts or failed restoration fail stop with ownership held.
+ */
+void nx_timebase_stop_resume(void* context, uint64_t next_tick_us);
 /** \brief Arm exclusive CC1/CH0 within one future 32-bit timer revolution. */
 nx_result_t nx_timebase_arm_deadline(void* context, uint64_t deadline_us);
 /** \brief Remove only this alarm, preserving the monotonic overflow source. */

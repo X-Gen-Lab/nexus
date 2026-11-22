@@ -1240,7 +1240,7 @@ def _resolve_device_graph(assembly, *, root, soc, board, routes, bindings,
             provider.validate_mode_context(
                 selection, route, backend=backend,
                 clock_profile=assembly.clock_profile, part=part,
-                clock_plan=context_clock_plan)
+                clock_plan=context_clock_plan, kernel_profile=kernel_profile)
             validate_controller_execution(
                 selection, route, hardware, irq_profile=irq_profile,
                 kernel_profile=kernel_profile, host=host)
@@ -1383,7 +1383,8 @@ def _resolve_device_graph(assembly, *, root, soc, board, routes, bindings,
         selected, adc_triggers=getattr(provider, "ADC_TRIGGERS", None),
         adc_injected_triggers=getattr(adc_group, "INJECTED_TRIGGERS", None),
         adc_group_converter=(adc_group.converter_names[0]
-                             if adc_group is not None else None))
+                             if adc_group is not None else None),
+        coupled_io=getattr(provider, "COUPLED_IO", None))
     adc.complete_triggers(selected, triggers)
     dma_plan = dma_topology.resolve_selected(selected, provider)
     controllers = tuple(ControllerIR.create(item, family) for item in selected)

@@ -145,6 +145,28 @@ TEST_F(TimebaseIntegration, FreshCompareBetweenFlagReadAndAckStillWakes) {
     EXPECT_EQ(TIMER_ENABLE, 1U);
     EXPECT_EQ(TIMER_FLAGS & 3U, 0U);
 }
+TEST_F(TimebaseIntegration, OnlyExplicitSourceProofGrantsClockRelease) {
+    face = nx_freertos_lowpower_port();
+    ASSERT_NE(face, nullptr);
+    nx_freertos_tick_snapshot_t snapshot{};
+    ASSERT_EQ(face->pause_tick(face->context, &snapshot), NX_SUCCESS);
+    EXPECT_TRUE(nx_stm32_lowpower_busy());
+    ASSERT_EQ(nx_timebase_stop_handoff(face->context), NX_SUCCESS);
+    EXPECT_EQ(SysTick->CTRL, 4U);
+    EXPECT_FALSE(nx_stm32_lowpower_busy());
+    SysTick->CTRL |= 2U;
+    EXPECT_TRUE(nx_stm32_lowpower_busy());
+    SysTick->CTRL &= ~2U;
+    SCB->ICSR = 1U << 26U;
+    EXPECT_TRUE(nx_stm32_lowpower_busy());
+    SCB->ICSR = 0U; /* Model the explicit owner resolving this failed proof. */
+    nx_timebase_stop_resume(face->context, face->now_us(face->context) + 1000U);
+    EXPECT_EQ(SysTick->CTRL, 7U);
+    EXPECT_FALSE(nx_stm32_lowpower_busy());
+    SysTick_Handler();
+    EXPECT_EQ(ticks, 1U);
+}
+
 TEST_F(TimebaseIntegration, ClockStopRejectsOutstandingPauseBeforeAnyRelease) {
     face = nx_freertos_lowpower_port();
     ASSERT_NE(face, nullptr);
