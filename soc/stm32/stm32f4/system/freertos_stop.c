@@ -76,7 +76,10 @@ nx_stm32_freertos_stop_arm(nx_stm32_freertos_stop_t* s,
                            const nx_stm32_freertos_stop_config_t* c) {
     if (!thread())
         return NX_ERROR_CONTEXT;
-    if (s == NULL || nx_stm32_freertos_stop_context() != s || !valid(s, c))
+    if (s == NULL || !valid(s, c))
+        return NX_ERROR_INVALID;
+    nx_stm32_freertos_stop_t* selected = nx_stm32_freertos_stop_context();
+    if (selected == NULL || selected != s)
         return NX_ERROR_INVALID;
     if (s->armed)
         return NX_ERROR_BUSY;
