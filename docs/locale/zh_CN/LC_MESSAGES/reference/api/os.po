@@ -1777,3 +1777,21 @@ msgid ""
 msgstr ""
 "ready 在等待调用者的上下文执行，必须有界。按状态要求的同步规则观察真实状态，不 service 控制器或修改 source "
 "数组。若谓词允许，context 可为 NULL。整个选择期间，source 配置和 context 必须保持有效。"
+
+#: ../../../../../../workspace/nexus/docs/reference/api/os.md:120
+msgid "Optional selected one-shot deep Idle handoff; default returns false."
+msgstr "可选的选定一次性深睡 Idle 交接；默认返回 false。"
+
+#: ../../../../../../workspace/nexus/docs/reference/api/os.md:120
+msgid ""
+"Called from the sole tickless entry before shallow timer admission. true "
+"means the attempt is fully handled, including rejection or tick restoration;"
+" the caller must never subsequently compensate it twice. The selected "
+"implementation owns kernel suspension, tick borrowing, clock transitions and"
+" its bounded uncertainty contract. It creates no default task, state, "
+"secondary SysTick handler or hardware owner."
+msgstr ""
+"在唯一 tickless 入口中、浅睡 timer 准入之前调用。true 表示本次尝试已全部处理，包括拒绝或 tick "
+"恢复；调用方随后不得对同一次尝试再次补偿。选定实现拥有内核暂停、tick 借用、时钟切换及其有界不确定度合同。它不创建默认任务、状态、第二个 "
+"SysTick handler 或硬件 owner。"
+
