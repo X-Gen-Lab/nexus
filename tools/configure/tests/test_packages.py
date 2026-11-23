@@ -18,7 +18,7 @@ class PackageTests(unittest.TestCase):
         (self.package / "CMakeLists.txt").write_text("# package target\n")
         self.manifest = self.package / "package.json"
         self.value = {
-            "schema_version": 1, "interface_version": 1,
+            "schema_version": 1, "interface_version": 2,
             "id": "family", "family": "family", "vendor": "vendor",
             "source_directory": ".",
             "facts": {"soc": "soc.json", "routes": "routes.json",
@@ -59,7 +59,7 @@ class PackageTests(unittest.TestCase):
         self.assertEqual(tuple(item.family for item in selected), ("family",))
 
     def test_unknown_fields_versions_targets_and_escaping_paths_reject(self):
-        for field, value in (("unknown", True), ("interface_version", 2),
+        for field, value in (("unknown", True), ("interface_version", 3),
                              ("schema_version", True),
                              ("source_directory", ".."),
                              ("cmake", {"entry": "else.cmake", "target": "bad;id"}),

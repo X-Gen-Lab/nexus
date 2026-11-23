@@ -85,8 +85,12 @@ def validate_selection(selection, route, provider, ram_size, *, clock=None,
         usb_host.validate_selection(selection, route, provider)
     elif kind == "can":
         from tools.configure import can
+        from tools.configure.ir import ClockPlanIR
+        plan = (ClockPlanIR.from_validated(clock_plan)
+                if isinstance(clock_plan, dict) else clock_plan)
+        selected_clock = provider.controller_clock_domain(plan, route["controller"])
         can.validate_selection(selection, provider, ram_size,
-                               clock_hz=clock["apb1_hz"] if clock else None)
+                               clock_hz=selected_clock.nominal_hz)
     elif kind == "uart":
         from tools.configure import uart_formats
         uart_formats.validate_selection(selection, route, provider, ram_size)

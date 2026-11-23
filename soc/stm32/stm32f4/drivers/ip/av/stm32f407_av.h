@@ -171,6 +171,40 @@ static inline bool nx_stm32_av_overlap(const void* a, size_t an, const void* b,
            an > UINTPTR_MAX - ap || bn > UINTPTR_MAX - bp ||
            (ap < bp + bn && bp < ap + an);
 }
+/** \brief Keep full duplex capacities separate before admitting either loan.
+ * \note Both streams already have validated metadata, slot counts and payload
+ *       spans. NULL denotes an unselected direction. This readonly cold check
+ *       includes unused capacities and never accesses hardware or owns storage.
+ */
+static inline bool nx_stm32_av_streams_disjoint(const nx_stream_t* tx,
+                                                const nx_stream_t* rx) {
+    if (tx == NULL || rx == NULL)
+        return true;
+    if (nx_stm32_av_overlap(tx, sizeof(*tx), rx, sizeof(*rx)) ||
+        nx_stm32_av_overlap(tx->slots, tx->count * sizeof(*tx->slots), rx,
+                            sizeof(*rx)) ||
+        nx_stm32_av_overlap(rx->slots, rx->count * sizeof(*rx->slots), tx,
+                            sizeof(*tx)) ||
+        nx_stm32_av_overlap(tx->slots, tx->count * sizeof(*tx->slots),
+                            rx->slots, rx->count * sizeof(*rx->slots)))
+        return false;
+    for (size_t i = 0U; i < tx->count; ++i) {
+        const nx_stream_slot_t* a = &tx->slots[i];
+        if (nx_stm32_av_overlap(a->data, a->capacity, rx, sizeof(*rx)) ||
+            nx_stm32_av_overlap(a->data, a->capacity, rx->slots,
+                                rx->count * sizeof(*rx->slots)))
+            return false;
+        for (size_t j = 0U; j < rx->count; ++j) {
+            const nx_stream_slot_t* b = &rx->slots[j];
+            if (nx_stm32_av_overlap(b->data, b->capacity, tx, sizeof(*tx)) ||
+                nx_stm32_av_overlap(b->data, b->capacity, tx->slots,
+                                    tx->count * sizeof(*tx->slots)) ||
+                nx_stm32_av_overlap(a->data, a->capacity, b->data, b->capacity))
+                return false;
+        }
+    }
+    return true;
+}
 /** \brief No caller storage may overlap the shared clock/resource owner. */
 static inline bool nx_stm32_av_system_disjoint(const void* data, size_t bytes) {
     return !nx_stm32_av_overlap(data, bytes, &g_nx_stm32_system,

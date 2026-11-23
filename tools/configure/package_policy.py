@@ -4,6 +4,7 @@ from dataclasses import dataclass, replace
 from types import MappingProxyType
 
 from tools.configure.calls import Symbol
+from tools.configure.pinmux import NumericPinMuxPolicy
 from tools.configure.providers.common import fail, integer
 from tools.configure.resource_graph import identifier, normalize_resource
 
@@ -58,6 +59,7 @@ class ModeExclusion:
 @dataclass(frozen=True)
 class BindingPolicy:
     custom_clock_profile: str
+    pinmux_policy: NumericPinMuxPolicy
     oscillators: Mapping
     timebase: Timebase
     exclusions: tuple[ModeExclusion, ...]
@@ -68,11 +70,15 @@ class BindingPolicy:
     controller_irqs: Mapping
 
     @classmethod
-    def from_validated(cls, value):
-        _fields(value, {"schema_version", "custom_clock_profile", "system",
+    def from_validated(cls, value, *, pinmux=None):
+        _fields(value, {"schema_version", "custom_clock_profile", "pinmux_policy", "system",
                         "mode_exclusions"}, {"pinmux", "software", "hardware", "domains", "pads"})
         if type(value["schema_version"]) is not int or value["schema_version"] != 1:
             fail("Unsupported binding policy schema")
+        declared = NumericPinMuxPolicy.from_validated(value["pinmux_policy"])
+        pinmux = declared if pinmux is None else pinmux
+        if not isinstance(pinmux, NumericPinMuxPolicy) or pinmux != declared:
+            fail("Binding policy requires its selected numeric pinmux policy")
         profile = identifier(value["custom_clock_profile"], "Custom clock profile")
         system = value["system"]
         _fields(system, {"oscillator_resources", "timebase"})
@@ -90,16 +96,17 @@ class BindingPolicy:
         exclusions = value["mode_exclusions"]
         if not isinstance(exclusions, list):
             fail("Mode exclusions require an explicit list")
-        pinmux = value.get("pinmux", {})
-        if not isinstance(pinmux, Mapping):
+        pinmux_rules = value.get("pinmux", {})
+        if not isinstance(pinmux_rules, Mapping):
             fail("Pinmux constraints require a controller mapping")
-        for controller, functions in pinmux.items():
+        for controller, functions in pinmux_rules.items():
             Symbol(controller)
             if (not isinstance(functions, list) or not functions or
-                    any(type(item) is not int or not 0 <= item <= 15
-                        for item in functions) or
+                    any(type(item) is not int for item in functions) or
                     len(set(functions)) != len(functions)):
-                fail("Pinmux alternate functions require distinct values 0..15")
+                fail("Pinmux alternate functions require distinct numeric values")
+            for selector in functions:
+                pinmux.validate(selector, "Controller alternate selector")
         hardware = value.get("hardware", {})
         if not isinstance(hardware, Mapping):
             fail("Private hardware bindings require an object")
@@ -127,11 +134,11 @@ class BindingPolicy:
                 fail("DMA status bank requires an explicit L/H identity")
             integer(row["flag_shift"], 0, 31, "DMA flag shift")
             dma[name] = MappingProxyType(dict(row))
-        return cls(profile, MappingProxyType(oscillators),
+        return cls(profile, pinmux, MappingProxyType(oscillators),
                    Timebase.create(system["timebase"]),
                    tuple(ModeExclusion.create(item) for item in exclusions),
                    MappingProxyType({key: tuple(items)
-                                     for key, items in pinmux.items()}),
+                                     for key, items in pinmux_rules.items()}),
                    MappingProxyType(pads), MappingProxyType(dma),
                    MappingProxyType({}), MappingProxyType({}))
 
@@ -207,6 +214,8 @@ class BindingPolicy:
                 fail(rule.message)
 
     def validate_route(self, route):
+        for pin in route["pins"]:
+            self.pinmux_policy.validate(pin["af"], "Route alternate selector")
         allowed = self.pinmux.get(route["controller"])
         if allowed is not None and any(pin["af"] not in allowed
                                        for pin in route["pins"]):

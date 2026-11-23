@@ -1,4 +1,5 @@
 """Public provider hooks delegate only to the selected immutable domains."""
+from tools.configure.tests.f4_fixture import f4_pinmux
 from types import SimpleNamespace
 import unittest
 
@@ -30,7 +31,7 @@ class Provider(DomainBridge):
 class DomainBridgeContracts(unittest.TestCase):
     def provider(self):
         return Provider(DomainPolicies.from_validated(None, physical_facts(),
-            {"domains": domain_facts()}))
+            {"domains": domain_facts()}, pinmux=f4_pinmux()))
 
     def test_selected_properties_are_explicit_and_never_fall_back_to_a_family(self):
         provider = self.provider()

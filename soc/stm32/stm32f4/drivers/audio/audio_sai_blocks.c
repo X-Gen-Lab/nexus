@@ -180,32 +180,6 @@ static nx_result_t validate_stream(nx_stm32_sai_blocks_state_t* s,
     }
     return NX_SUCCESS;
 }
-static bool streams_disjoint(const nx_stream_t* tx, const nx_stream_t* rx) {
-    if (tx == NULL || rx == NULL)
-        return true;
-    if (overlap(tx, sizeof(*tx), rx, sizeof(*rx)) ||
-        overlap(tx->slots, tx->count * sizeof(*tx->slots), rx, sizeof(*rx)) ||
-        overlap(rx->slots, rx->count * sizeof(*rx->slots), tx, sizeof(*tx)) ||
-        overlap(tx->slots, tx->count * sizeof(*tx->slots), rx->slots,
-                rx->count * sizeof(*rx->slots)))
-        return false;
-    for (size_t i = 0U; i < tx->count; ++i) {
-        const nx_stream_slot_t* a = &tx->slots[i];
-        if (overlap(a->data, a->capacity, rx, sizeof(*rx)) ||
-            overlap(a->data, a->capacity, rx->slots,
-                    rx->count * sizeof(*rx->slots)))
-            return false;
-        for (size_t j = 0U; j < rx->count; ++j) {
-            const nx_stream_slot_t* b = &rx->slots[j];
-            if (overlap(b->data, b->capacity, tx, sizeof(*tx)) ||
-                overlap(b->data, b->capacity, tx->slots,
-                        tx->count * sizeof(*tx->slots)) ||
-                overlap(a->data, a->capacity, b->data, b->capacity))
-                return false;
-        }
-    }
-    return true;
-}
 /** \brief Exclusive idle-stream writes connect exactly two borrowed targets.
  * \note HAL's transfer callback does not establish inactive-bank withdrawal;
  *       the selected DBM transport retains that handoff in one C owner.
@@ -313,7 +287,7 @@ static nx_result_t start(void* context, nx_audio_blocks_request_t* request) {
                 return result;
         }
     }
-    if (!streams_disjoint(request->tx, request->rx))
+    if (!nx_stm32_av_streams_disjoint(request->tx, request->rx))
         return NX_ERROR_INVALID;
     nx_result_t result = nx_request_admit(&request->base, NX_REQUEST_QUEUED);
     if (result != NX_SUCCESS)

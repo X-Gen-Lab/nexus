@@ -1,4 +1,5 @@
 """Domain contracts consume explicit facts without choosing an MCU family."""
+from tools.configure.tests.f4_fixture import f4_pinmux
 from dataclasses import FrozenInstanceError
 from types import SimpleNamespace
 import copy
@@ -14,8 +15,11 @@ def domain_facts():
                          "byte_frames": [[8, "none"], [7, "even"]]},
         "stream_geometry": {"hardware_targets": 2, "spare_blocks": 1,
                             "counter_max": 65535},
-        "can": {"irq_roles": ["tx", "rx0", "rx1", "error"],
-                "fifo_order_supported": True},
+        "can": {"model": "bxcan",
+                "fifo_order_supported": True,
+                "transport": {name: {"clock_domain": row["clock_domain"],
+                                      "irq_sources": row["irq_sources"]}
+                              for name, row in physical_facts()["controllers"].items()}},
         "usb_device": {"controller": "USB_A", "irq": 20,
             "clock_hz": 48000000, "fifo_words": 320, "endpoint_numbers": 4,
             "pins": [["PA1", "dm", 5], ["PA2", "dp", 5]],
@@ -47,7 +51,9 @@ def domain_facts():
 def physical_facts():
     return {"can_domain": {"controllers": ["BUS_A", "BUS_B"],
                            "primary": "BUS_A", "filter_banks": 14},
-            "controllers": {name: {"kind": "can", "clock_hz": 24000000}
+            "controllers": {name: {"kind": "can", "clock_domain": name.lower(),
+                "irq_sources": {role: name + "_" + role.upper()
+                                for role in ("tx", "rx0", "rx1", "error")}}
                             for name in ("BUS_A", "BUS_B")}}
 
 
@@ -55,7 +61,7 @@ class DomainPolicyContracts(unittest.TestCase):
     def load(self, facts=None):
         return DomainPolicies.from_validated(
             SimpleNamespace(family="unrelated_mcu", vendor="sample"), physical_facts(),
-            {"domains": domain_facts() if facts is None else facts})
+            {"domains": domain_facts() if facts is None else facts}, pinmux=f4_pinmux())
 
     def test_explicit_facts_construct_existing_narrow_domain_contracts(self):
         selected = self.load()
@@ -77,7 +83,7 @@ class DomainPolicyContracts(unittest.TestCase):
 
     def test_missing_domains_never_inherit_first_provider_capabilities(self):
         selected = DomainPolicies.from_validated(
-            SimpleNamespace(family="new_mcu", vendor="new_vendor"), {}, {})
+            SimpleNamespace(family="new_mcu", vendor="new_vendor"), {}, {}, pinmux=f4_pinmux())
         self.assertIsNone(selected.USB_DEVICE)
         self.assertIsNone(selected.ETHERNET)
         self.assertIsNone(selected.STREAM_GEOMETRY)

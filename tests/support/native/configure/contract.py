@@ -3,6 +3,9 @@ from tools.configure.uart_formats import UartFormatPolicy
 from types import MappingProxyType
 from tools.configure.providers import common
 from tools.configure.adc import RESOLUTION_BITS
+from tools.configure.pinmux import NumericPinMuxPolicy
+
+PINMUX_POLICY = NumericPinMuxPolicy.from_validated({"encoding": "numeric", "selectors": [0]})
 
 # Explicit coordinates for this host fixture, independent of production naming.
 PAD_FACTS = MappingProxyType({

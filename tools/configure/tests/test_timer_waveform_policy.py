@@ -1,4 +1,5 @@
 """Waveform policy consumes declared routes instead of a family module."""
+from tools.configure.tests.f4_fixture import f4_pinmux
 from copy import deepcopy
 import json
 import unittest
@@ -74,7 +75,7 @@ class WaveformPolicyTests(unittest.TestCase):
         route.update(id="reviewed-route", controller="TIMER_A", channels=[6],
             pins=[["P6", "ch6", 0]], internal_trigger=True, default_master="compare6")
         facts["routes"] = [route]
-        policy = TimerWaveformPolicy.from_validated(facts)
+        policy = TimerWaveformPolicy.from_validated(facts, pinmux=f4_pinmux())
         selection = dict(mode="coherent-pwm", tick_hz=1000000, period_ticks=1000,
             deadtime_ticks=0, exclusive=True, poll_limit=128, break_active_high=True,
             idle_high=False, idle_complement_high=False, irq_priority=5, calls_os=False)
@@ -98,7 +99,7 @@ class WaveformPolicyTests(unittest.TestCase):
             facts = deepcopy(original)
             mutate(facts)
             with self.subTest(mutation=index), self.assertRaises(ValueError):
-                TimerWaveformPolicy.from_validated(facts)
+                TimerWaveformPolicy.from_validated(facts, pinmux=f4_pinmux())
 
 
 if __name__ == "__main__":

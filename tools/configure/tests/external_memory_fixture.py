@@ -1,4 +1,5 @@
 """Authoritative package data for direct external-memory policy unit tests."""
+from tools.configure.tests.f4_fixture import f4_pinmux
 import json
 from pathlib import Path
 from tools.configure.policies.external_bus import ExternalBusPolicy
@@ -8,7 +9,7 @@ def policy():
     root = Path(__file__).resolve().parents[3]
     path = root / 'soc/stm32/stm32f4/drivers/memory/external_bus_policy.binding.json'
     return ExternalBusPolicy.from_validated(
-        json.loads(path.read_text())['domains']['external_bus'])
+        json.loads(path.read_text())['domains']['external_bus'], pinmux=f4_pinmux())
 
 
 def construct(item, result):

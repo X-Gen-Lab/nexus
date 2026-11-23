@@ -316,13 +316,15 @@ class DataProvider(DomainBridge):
         from tools.configure.hardware_bindings import load_hardware
         from tools.configure.package_policy import BindingPolicy
         selected = binding_document(package, document, read=read)
-        policies = DomainPolicies.from_validated(package, soc, selected)
-        hardware = load_hardware(package, read=read)
+        from tools.configure.pinmux import NumericPinMuxPolicy
+        pinmux = NumericPinMuxPolicy.from_validated(selected.get("pinmux_policy"))
+        policies = DomainPolicies.from_validated(package, soc, selected, pinmux=pinmux)
+        hardware = load_hardware(package, read=read, pinmux=pinmux)
         from tools.configure.reference_profiles import ProfileSet
         profiles = (ProfileSet.from_validated(read(package.fact("review_profiles")))
                     if "review_profiles" in package.facts else None)
         return cls(package, soc, selected["software"], policies, hardware,
-                   BindingPolicy.from_validated(selected), profiles)
+                   BindingPolicy.from_validated(selected, pinmux=pinmux), profiles)
 
     def __post_init__(self):
         _fields(self.software, {"enum_abi", "backends", "headers", "bindings"},
@@ -541,4 +543,8 @@ class DataProvider(DomainBridge):
             binding = self.binding(item.kind, item.mode, item.controller)
             if binding.shared_irq is not None:
                 selected.append((binding.shared_irq, item))
-        return connections(tuple(selected))
+        policy = result.provider_context.binding_policy
+        handlers = {"irq:" + key: binding.handler
+                    for key, binding in policy.irq_facts.items()} if policy else {}
+        return connections(tuple(selected), claims=result.resource_plan.claims,
+                           vector_handlers=handlers)

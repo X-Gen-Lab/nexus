@@ -1,4 +1,5 @@
 """USB policy selects a reviewed transport capability, never a vendor label."""
+from tools.configure.tests.f4_fixture import f4_pinmux
 from types import SimpleNamespace
 import unittest
 
@@ -25,7 +26,7 @@ def facts():
 
 class UsbPacketCapabilityTests(unittest.TestCase):
     def provider(self):
-        return SimpleNamespace(PREFIX="another_vendor", PACKET=PacketPolicy.from_validated(facts()))
+        return SimpleNamespace(PREFIX="another_vendor", PACKET=PacketPolicy.from_validated(facts(), pinmux=f4_pinmux()))
 
     @staticmethod
     def route():
@@ -59,7 +60,7 @@ class UsbPacketCapabilityTests(unittest.TestCase):
         usb_device.validate_selection(selected, route, provider, 65536)
         restricted = facts()
         restricted["admission"]["device"]["device-hs-fs"]["remote_wakeup"] = False
-        provider.PACKET = PacketPolicy.from_validated(restricted)
+        provider.PACKET = PacketPolicy.from_validated(restricted, pinmux=f4_pinmux())
         with self.assertRaisesRegex(ValueError, "remote_wakeup"):
             usb_device.validate_selection(selected, route, provider, 65536)
         route["pins"][0]["af"] = 4

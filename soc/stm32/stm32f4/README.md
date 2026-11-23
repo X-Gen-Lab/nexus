@@ -131,6 +131,37 @@ SAI、LTDC／DMA2D 和基础 CRYP／HASH 的所选模式复用经审阅的官方
 [官方驱动合同](../../../docs/reference/contracts/stm32-provider.md)规定完整模式的
 所有权、时间、成本和交付边界。
 
+### 完整模式的硬件责任
+
+下表区分热态传输与冷态资源，不能只检查一次 HAL 调用是否成功。Platform 先取得
+共享时钟与引脚快照，驱动保留自己的收条；运行期 stop 不等于已经归还冷态资源。
+所有请求的取消、超时及失败清理都保留原借用，直到真实退出后发布 SETTLED。
+
+| 模式 | 唯一运行期 owner／事件源 | 厂商状态 | 完成与冷退出入口 |
+| --- | --- | --- | --- |
+| UART `dma-tx` | `nx_stm32_uart_hal_state_t`；UART 与所选 TX DMA IRQ | 该模式独有的 UART／DMA Handle；HAL TX 与 LL byte/event RX 共用同一 owner | [uart_hal.c](drivers/uart/uart_hal.c) 的 callback 只锁存事实，service 证明 DMA、线上 TC 和地址退出；cold close 才归还 `nx_stm32_uart_cold_receipt_t` |
+| SPI `dma` | `nx_stm32_spi_dma_state_t`；独立 TX／RX DMA IRQ，service 观察 SPI 与 CS | 无 HAL Handle；局部 C 保留完整端点和双向 DMA 合同 | [spi_dma.c](drivers/spi/spi_dma.c) 先 join 两路 DMA、IRQ 和线上状态，再处理 CS；cold close 恢复向量优先级并归还 `nx_stm32_spi_dma_cold_t` |
+| ADC `trigger-dma-continuous` | `nx_stm32_adc_continuous_state_t`；所选 ADC、触发 timer 与 DMA publisher | 无 HAL Handle；LL／局部 C 管理两个 future targets | [adc_continuous.c](drivers/adc/adc_continuous.c) 先停触发再停 DMA，回读后反向撤回 future loans；[cold.h](drivers/adc/cold.h) 另保留 converter／timer 的 cold effects |
+| I2S `*-blocks` | `nx_stm32_audio_blocks_state_t`；主 I2S／extension 与所选 TX／RX DMA IRQ | 无 HAL Handle；现有 AV 原语与 I2S owner | [audio_blocks.c](drivers/audio/audio_blocks.c) 证明 serializer、DMA、IRQ 和地址退出后才结清 session；close 继续归还内嵌 cold owner |
+| SAI `*-blocks` | `nx_stm32_sai_blocks_state_t`；所选 SAI 的 A／B 行为域与 DMA IRQ | `HAL_SAI_Init` 仅使用 cold configure 的局部 Handle，无常驻 Handle 或 HAL runtime callback | [audio_sai_blocks.c](drivers/audio/audio_sai_blocks.c) 按 SAI 线上停止、FIFO 和地址撤回结清；close 继续归还内嵌 cold owner |
+
+UART 普通 IRQ 与 HAL DMA 路径已经共用 `uart_cold.c` 的 gate、pin、vector 收条。
+两者的运行期停止分别处理普通 TX IRQ 和 HAL depth／callback／DMA Handle，不能
+再合并为第二个通用 transport。SPI 增强 sequence 可继续持有 CS；底层 child 的
+SETTLED 不能被解释为整个 sequence 已归还总线。ADC 与音频已发布的 consumer
+blocks 仍由调用者归还，停硬件不撤销这些独立借用。
+
+I2S／SAI blocks 相同的跨方向 metadata／payload 容量重叠检查由 AV 私有纯函数
+维护。`validate_stream` 保留各自的 DMA 容器宽度和完整 owner 控制跨度；
+I2S、SAI、ADC 的停源顺序及 FIFO／target 证明不同，继续由各 owner 直接实现。
+短 NVIC idle 检查也保留原位，不为它引入新状态、回调或设备依赖。
+详细音频边界见 [AV 合同](drivers/ip/av/README.md)。
+
+有限与连续模式分别选编自己的状态：UART 非 DMA 模式不分配 HAL Handle，ADC
+有限模式不分配 continuous 扩展，音频有限模式不分配 blocks 的双目标与替代存储。
+以实际生成实例、CMake 编译闭包和 ARM ELF／map 检查成本，不能把头文件中存在
+某个结构体理解为每个实例都承担它。
+
 `SystemInit` 开启 CP10/CP11，此 hard-float 平台不关闭 lazy FP context。FreeRTOS
 CM4F port 显式开启 ASPEN/LSPEN。因此 ES0182 Rev19 §2.1.2（Arm776924）对所列全部
 F407 cut 都是集成约束：当受影响 VDIV/VSQRT 条件可能出现时，中断 handler 在异常

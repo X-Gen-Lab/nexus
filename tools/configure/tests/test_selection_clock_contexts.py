@@ -1,4 +1,5 @@
 """Clock execution restrictions are immutable package facts, not MCU branches."""
+from tools.configure.tests.f4_fixture import f4_pinmux
 import copy
 from pathlib import Path
 from types import SimpleNamespace
@@ -24,7 +25,7 @@ class ClockContextSelectionTests(unittest.TestCase):
         return value
 
     def test_non_vendor_profile_uses_only_its_explicit_reviewed_context(self):
-        policy = SelectionPolicy.from_validated(self.author())
+        policy = SelectionPolicy.from_validated(self.author(), pinmux=f4_pinmux())
         policy.validate_assembly_context(backend="native", clock_profile="reviewed-eco-plan",
             power=None, controllers=(SimpleNamespace(kind="gpio"),))
         for fields in ({"backend": "baremetal"}, {"power": {}},
@@ -38,14 +39,14 @@ class ClockContextSelectionTests(unittest.TestCase):
 
     def test_profiles_without_a_context_rule_keep_existing_admission(self):
         for value in (facts(), self.author()):
-            policy = SelectionPolicy.from_validated(value)
+            policy = SelectionPolicy.from_validated(value, pinmux=f4_pinmux())
             policy.validate_assembly_context(backend="freertos", clock_profile="another-run",
                 power={}, controllers=(SimpleNamespace(kind="standby"),))
 
     def test_explicit_power_permission_remains_a_finite_boolean_choice(self):
         value = self.author()
         value["clock_contexts"]["reviewed-eco-plan"]["allow_power"] = True
-        policy = SelectionPolicy.from_validated(value)
+        policy = SelectionPolicy.from_validated(value, pinmux=f4_pinmux())
         policy.validate_assembly_context(backend="native", clock_profile="reviewed-eco-plan",
                                         power={}, controllers=())
         with self.assertRaises(ValueError):
@@ -71,7 +72,7 @@ class ClockContextSelectionTests(unittest.TestCase):
 
     def test_author_facts_are_frozen_once_without_a_second_registry(self):
         value = self.author()
-        policy = SelectionPolicy.from_validated(value)
+        policy = SelectionPolicy.from_validated(value, pinmux=f4_pinmux())
         value["clock_contexts"]["reviewed-eco-plan"]["backends"].append("baremetal")
         with self.assertRaises(ValueError):
             policy.validate_assembly_context(backend="baremetal", clock_profile="reviewed-eco-plan",
@@ -103,7 +104,7 @@ class ClockContextSelectionTests(unittest.TestCase):
             value = copy.deepcopy(self.author())
             mutate(value)
             with self.subTest(mutate=mutate), self.assertRaises(ValueError):
-                SelectionPolicy.from_validated(value)
+                SelectionPolicy.from_validated(value, pinmux=f4_pinmux())
 
     def test_production_resolver_consults_the_selected_package_context(self):
         selected = SelectionPolicy.validate_assembly_context

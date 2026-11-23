@@ -9,6 +9,7 @@ from dataclasses import dataclass
 
 from tools.configure import board_hardware
 from tools.configure.contracts import SERIAL_FLASH_FIELDS
+from tools.configure.pinmux import NumericPinMuxPolicy
 from tools.configure.providers.common import fail, integer
 from tools.configure.records import freeze
 from . import graphics, parallel_memory, sdram, serial_nor
@@ -27,7 +28,7 @@ def _names(values, label):
         fail("External memory " + label + " requires distinct names")
 
 
-def _controller(value):
+def _controller(value, *, pinmux):
     common = {"ip", "modes", "max_hclk_hz", "contexts"}
     ip = value.get("ip") if isinstance(value, Mapping) else None
     if ip == "async-banked-v1":
@@ -51,7 +52,7 @@ def _controller(value):
     else:
         fail("External memory IP has no reviewed policy: " + str(ip))
     if "alternate" in value:
-        integer(value["alternate"], 0, 15, "External memory alternate")
+        pinmux.validate(value["alternate"], "External memory alternate")
     integer(value["max_hclk_hz"], 1, 0xffffffff, "External memory HCLK limit")
     _names(value["modes"], "controller modes")
     modes = {"async-banked-v1": {"async16", "external-memory"},
@@ -124,13 +125,13 @@ def _endpoint(value, controllers):
         _names(value["functions"], "serial NOR functions")
 
 
-def _graphics(value, controllers):
+def _graphics(value, controllers, *, pinmux):
     _fields(value, {"display_controller", "image_controller", "image_route",
         "display_routes", "alternate", "max_pixel_hz", "clock_path", "memory_producers"})
     for key in ("display_controller", "image_controller", "image_route"):
         if not isinstance(value[key], str) or not value[key]:
             fail("Graphics requires explicit controller and route identities")
-    integer(value["alternate"], 0, 15, "Graphics alternate")
+    pinmux.validate(value["alternate"], "Graphics alternate")
     integer(value["max_pixel_hz"], 1, 0xffffffff, "Graphics pixel clock limit")
     _names(value["clock_path"], "pixel clock path")
     if not isinstance(value["display_routes"], Mapping) or not value["display_routes"]:
@@ -170,7 +171,9 @@ class ExternalBusPolicy:
     packages: Mapping
 
     @classmethod
-    def from_validated(cls, value):
+    def from_validated(cls, value, *, pinmux):
+        if not isinstance(pinmux, NumericPinMuxPolicy):
+            fail("External memory requires a selected numeric pinmux policy")
         _fields(value, {"schema_version", "controllers", "endpoints"}, {"graphics", "packages"})
         if type(value["schema_version"]) is not int or value["schema_version"] != 1:
             fail("Unsupported external-memory policy schema")
@@ -178,11 +181,11 @@ class ExternalBusPolicy:
         if not isinstance(controllers, Mapping) or not isinstance(endpoints, Mapping):
             fail("External memory requires named controller and endpoint facts")
         for controller in controllers.values():
-            _controller(controller)
+            _controller(controller, pinmux=pinmux)
         for endpoint in endpoints.values():
             _endpoint(endpoint, controllers)
         if "graphics" in value:
-            _graphics(value["graphics"], controllers)
+            _graphics(value["graphics"], controllers, pinmux=pinmux)
         packages = value.get("packages", {})
         if not isinstance(packages, Mapping):
             fail("External package extents require an explicit named mapping")

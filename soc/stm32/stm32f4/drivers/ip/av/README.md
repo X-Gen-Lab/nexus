@@ -21,6 +21,31 @@ storage blocks 或 CM1 帧会话。
 Platform close 调用同一个 C owner 排空，失败会阻止 System 退出，保留全部借用和
 精确清理责任。没有 heap、运行时名字注册表、默认 buffer pool 或后台任务。
 
+## 音频 owner 与共享边界
+
+I2S 的 `nx_stm32_audio_blocks_state_t` 与 SAI 的
+`nx_stm32_sai_blocks_state_t` 分别内嵌自己的 cold owner。每个 owner 独占所选
+主外设／extension 或 SAI A／B 行为域、DMA targets、IRQ 和借用记录；只读公共
+face 不再取得第二份硬件。SAI 的官方 Init 使用局部 Handle，运行期 IRQ、DBM 和
+退出不引用它；I2S 没有为统一外观分配一个 HAL Handle。
+
+两种 blocks 的准入在各自完成 stream 元数据、DMA 域、容器宽度、请求及 owner
+控制存储检查后，再调用私有 `nx_stm32_av_streams_disjoint()`。该纯函数仅检查
+TX／RX 全部控制、slot 表和 payload 的完整容量互不覆盖；NULL 表示未选方向。
+它不读写寄存器、不取得借用、不分配状态，也不接收硬件回调。
+使用私有 inline 定义避免新增翻译单元与运行期转发；是否产生代码仍以实际链接结果
+为准。完整容量检查不能缩为本次有效数据：相邻有效 payload 仍可能共享保留区。
+
+`validate_stream` 的相似循环没有继续泛化：I2S DMA unit 固定为 2 B，SAI 按有效
+样本选择 1／2／4 B 容器，两者的 outer state、配置和活动借用跨度不同。各 owner
+直接检查自己的完整控制存储，比增加 predicate callback 或共同最大状态更清楚。
+
+停止顺序也保持独立。I2S 处理 TXDMAEN、serializer 尾字、I2SE、RX 残字与扩展端；
+SAI 处理 clock source／sink、SAIEN、FIFO flush 和 selected slots。两者都先证明
+硬件／IRQ／地址退出，再撤回未来 RX targets、归还 TX loans，最后清 active 并
+发布 session 的 SETTLED。失败保留原 request、存储、cold owner 与首个原因；已发布
+的 RX consumer loan 不随 session 结清自动消失。公共 stop 后的冷资源归还仍须 close。
+
 DCMI 的 stream、slot 表、request／RAW frame 控制及每个 payload 的完整容量不得
 覆盖 provider 配置、DMA 域表、引脚事实或逐 pin 的恢复 snapshot。所有未来 block
 在首个 producer loan 或 request 接纳前一起检查，不能把尚未使用的 payload 尾部

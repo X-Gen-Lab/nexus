@@ -432,7 +432,7 @@ class STM32F4OfficialSourceTests(unittest.TestCase):
         adapter.parent.mkdir()
         adapter.write_text("# Reviewed source graph.\n")
         (package / "package.json").write_text(json.dumps({
-            "schema_version": 1, "interface_version": 1, "id": "reviewed",
+            "schema_version": 1, "interface_version": 2, "id": "reviewed",
             "family": "stm32f4", "vendor": "acme", "source_directory": ".",
             "facts": {"soc": "soc.json", "routes": "routes.json"},
             "dependencies": {},

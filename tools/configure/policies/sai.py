@@ -36,7 +36,7 @@ class SaiPolicy:
     data: Mapping
 
     @classmethod
-    def from_validated(cls, value):
+    def from_validated(cls, value, *, pinmux):
         _fields(value, {"mechanism", "controllers", "bounds", "sample_bits", "slot_bits", "frame_bits_max", "kernel", "bus_clock", "bus_margin", "frame_divider", "mclk_hz"})
         if value["mechanism"] != "free-frame-v1":
             fail("SAI free-frame mechanism is not reviewed")
@@ -48,7 +48,7 @@ class SaiPolicy:
             if not isinstance(row["alternates"], (tuple, list)) or not row["alternates"]:
                 fail("SAI requires explicit reviewed alternates")
             for alternate in row["alternates"]:
-                integer(alternate, 0, 15, "SAI alternate")
+                pinmux.validate(alternate, "SAI alternate selector")
             _fields(row["dma_roles"], {"A", "B"})
             for paths in row["dma_roles"].values():
                 if (not isinstance(paths, (tuple, list)) or not paths or

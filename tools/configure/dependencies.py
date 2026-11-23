@@ -10,12 +10,13 @@ COMMON = (
     "component_catalog",
     "__init__", "bundle", "dependencies", "contracts", "sdk", "cpu", "kernel", "metadata", "factory", "ir", "records",
     "providers/__init__", "providers/common", "calls",
-    "resource_graph", "trigger_graph", "dma_topology", "io_traits",
+    "validation", "resource_graph", "trigger_graph", "dma_topology", "io_traits",
     "selected_contracts",
     "enhanced_endpoints", "uart_formats", "stream_profiles", "usb_profiles",
     "usb_host", "usb_otg",
 )
 PLATFORM = (
+    "device_graph", "pinmux", "policies/bxcan",
     "providers/descriptor", "packages", "package_policy", "static_ir",
     "data_provider", "static_recipe", "static_endpoints", "static_fragments",
     "shared_irq", "domain_policies", "domain_bridge", "header_projection",

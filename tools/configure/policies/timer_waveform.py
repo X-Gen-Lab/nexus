@@ -51,7 +51,7 @@ class TimerWaveformPolicy:
         return frozenset(self.modes)
 
     @classmethod
-    def from_validated(cls, value):
+    def from_validated(cls, value, *, pinmux):
         _fields(value, {"modes", "controllers", "routes", "deadtime_ranges",
             "master_modes", "internal_master_modes", "sync_modes", "prescaler_max", "poll_limit_max",
             "burst_base", "burst_items"})
@@ -111,7 +111,7 @@ class TimerWaveformPolicy:
                 if (len(pin) != 3 or any(not isinstance(item, str) or not item
                                           for item in pin[:2])):
                     fail("Timer waveform pin requires wire, role and alternate")
-                integer(pin[2], 0, 15, "Timer waveform alternate")
+                pinmux.validate(pin[2], "Timer waveform alternate selector")
                 pins.append(pin)
             if not pins or len({pin[0] for pin in pins}) != len(pins):
                 fail("Timer waveform pads must be nonempty and distinct")

@@ -1,7 +1,10 @@
 """Software-only external GPIO reference capability contract."""
 from tools.configure.uart_formats import UartFormatPolicy
+from tools.configure.pinmux import NumericPinMuxPolicy
 from types import MappingProxyType
 from tools.configure.providers import common
+
+PINMUX_POLICY = NumericPinMuxPolicy.from_validated({"encoding": "numeric", "selectors": [0]})
 
 PAD_FACTS = MappingProxyType({
     "PA0": MappingProxyType({"registers": "GPIOA", "port_index": 0, "number": 0}),

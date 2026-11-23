@@ -22,7 +22,7 @@ def package_tree(root):
         (package / name).write_text("{}\n")
     (package / "CMakeLists.txt").write_text("# Reviewed fixture target.\n")
     (package / "package.json").write_text(json.dumps({
-        "schema_version": 1, "interface_version": 1, "id": "reviewed",
+        "schema_version": 1, "interface_version": 2, "id": "reviewed",
         "family": "reviewed", "vendor": "acme", "source_directory": ".",
         "facts": {"soc": "soc.json", "routes": "routes.json"},
         "dependencies": {},

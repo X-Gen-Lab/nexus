@@ -541,14 +541,33 @@ TEST_F(CaptureAudio, ContinuousOldEpochNeverReleasesItsBankLoans) {
 TEST_F(CaptureAudio,
        ContinuousAdmissionRejectsAliasedDirectionsWithoutEffects) {
     ASSERT_NO_FATAL_FAILURE(blocks_open(true, true));
-    ASSERT_NO_FATAL_FAILURE(blocks_tx_ready(3U));
-    blocks_request.rx = &stream;
-    unsigned before = hardware.writes;
-    EXPECT_EQ(nx_audio_port_start_blocks(&blocks_face, &blocks_request),
-              NX_ERROR_INVALID);
-    EXPECT_EQ(nx_request_state(&blocks_request.base), NX_REQUEST_READY);
-    EXPECT_EQ(hardware.writes, before);
-    EXPECT_EQ(slots[0].state, NX_STREAM_SLOT_READY);
+    blocks_request.block_bytes = 128U;
+    for (unsigned i = 0U; i < 3U; ++i) {
+        nx_stream_fill_t fill;
+        ASSERT_EQ(nx_stream_reserve(&stream, &fill), NX_SUCCESS);
+        ASSERT_EQ(nx_stream_publish(&stream, &fill, 128U, 0U), NX_SUCCESS);
+    }
+    uint8_t* original = rx_slots[0].data;
+    size_t capacity = rx_slots[0].capacity;
+    for (unsigned alias = 0U; alias < 3U; ++alias) {
+        SCOPED_TRACE(alias);
+        blocks_request.rx = alias == 0U ? &stream : &rx_stream;
+        rx_slots[0].data = alias == 0U ? original : slots[0].data;
+        rx_slots[0].capacity = capacity;
+        if (alias == 2U) {
+            /* Active payloads are adjacent; reserved TX capacity overlaps. */
+            rx_slots[0].data += 128U;
+            rx_slots[0].capacity = 128U;
+        }
+        unsigned before = hardware.writes;
+        EXPECT_EQ(nx_audio_port_start_blocks(&blocks_face, &blocks_request),
+                  NX_ERROR_INVALID);
+        EXPECT_EQ(nx_request_state(&blocks_request.base), NX_REQUEST_READY);
+        EXPECT_EQ(hardware.writes, before);
+        EXPECT_EQ(slots[0].state, NX_STREAM_SLOT_READY);
+        EXPECT_EQ(rx_slots[0].state, NX_STREAM_SLOT_FREE);
+        EXPECT_EQ(rx_stream.outstanding, 0U);
+    }
 }
 TEST_F(CaptureAudio, ContinuousClockBoundsRejectAnUnobservableShortBlock) {
     ASSERT_NO_FATAL_FAILURE(blocks_open(false, true));

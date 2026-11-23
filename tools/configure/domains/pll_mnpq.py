@@ -392,7 +392,7 @@ class PllMnpqPolicy:
             fail("Selected SDIO FIFO clock model has no legal divider")
         return divisor - 2
 
-    def validate_consumers(self, selected, controllers):
+    def validate_consumers(self, selected, controllers, *, controller_domains=None):
         """Check explicit I/O clock contracts against the one resolved plan."""
         facts = self.data["consumers"]
         domain = lambda name: selected["domains"][name]["nominal_hz"]
@@ -450,7 +450,8 @@ class PllMnpqPolicy:
                 self._sdio_divider(selected, 1, domain("pll48") // 400000 + 1)
             if item.kind in {"adc", "adc_group", "pwm_adc"} and domain("adc") < facts["adc_min_hz"]:
                 fail("Selected ADC clock is below its reviewed minimum")
-            controller_domain = self.data["controller_domains"].get(item.controller)
+            controller_domain = ((controller_domains or {}).get(item.controller) or
+                                 self.data["controller_domains"].get(item.controller))
             if item.kind in {"uart", "i2c", "i2c_target", "can"}:
                 if controller_domain is None:
                     fail("Selected controller lacks an explicit consumer clock domain")

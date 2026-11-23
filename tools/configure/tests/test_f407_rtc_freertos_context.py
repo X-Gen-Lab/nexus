@@ -1,4 +1,5 @@
 """Only the exact reviewed RTC/FreeRTOS context gains backend admission."""
+from tools.configure.tests.f4_fixture import f4_pinmux
 import json
 from pathlib import Path
 import tempfile
@@ -77,7 +78,7 @@ class RtcFreeRtosContextTests(unittest.TestCase):
             "backend_contexts": {"freertos": {
                 "modes": ["adopt-retained"], "kernel_profile": "lowpower",
                 "lowpower_port": "timebase", "options": {"allow_set": False}}}}
-        policy = SelectionPolicy.from_validated(value)
+        policy = SelectionPolicy.from_validated(value, pinmux=f4_pinmux())
         route = {"kind": "rtc"}
         selected = {"mode": "adopt-retained", "allow_set": False}
         kernel = SimpleNamespace(profile="lowpower", lowpower_port="timebase")
@@ -97,7 +98,7 @@ class RtcFreeRtosContextTests(unittest.TestCase):
             value["rtc"]["default_context"]["backend_contexts"] = {
                 "freertos": {**context, **changes}}
             with self.subTest(changes=changes), self.assertRaises(ValueError):
-                SelectionPolicy.from_validated(value)
+                SelectionPolicy.from_validated(value, pinmux=f4_pinmux())
 
 
 if __name__ == "__main__":

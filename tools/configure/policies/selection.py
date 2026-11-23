@@ -9,6 +9,7 @@ from dataclasses import dataclass
 import re
 
 from tools.configure.calls import Symbol
+from tools.configure.pinmux import NumericPinMuxPolicy
 from tools.configure.providers.common import fail, integer, mode_traits
 from tools.configure.records import freeze
 
@@ -66,7 +67,9 @@ class SelectionPolicy:
     data: Mapping
 
     @classmethod
-    def from_validated(cls, value):
+    def from_validated(cls, value, *, pinmux):
+        if not isinstance(pinmux, NumericPinMuxPolicy):
+            fail("Selection requires a selected numeric pinmux policy")
         _fields(value, {"schema_version", "internal", "encoder", "i2c_target",
             "block", "rtc", "contexts", "dma", "pwm_period_max",
             "adc_internal_sample"}, {"limits", "watchdog_controller", "i2c_nominal",
@@ -85,14 +88,14 @@ class SelectionPolicy:
         _fields(value["encoder"], {"controllers"})
         for controller, alternate in _mapping(value["encoder"]["controllers"], "encoders").items():
             Symbol(controller)
-            integer(alternate, 0, 15, "Encoder alternate function")
+            pinmux.validate(alternate, "Encoder alternate function")
         _fields(value["i2c_target"], {"controllers", "alternate"})
         _names(value["i2c_target"]["controllers"], "target controllers")
-        integer(value["i2c_target"]["alternate"], 0, 15, "Target alternate function")
+        pinmux.validate(value["i2c_target"]["alternate"], "Target alternate function")
         block = value["block"]
         _fields(block, {"controller", "alternate", "pins", "max_blocks", "poll_budget"})
         Symbol(block["controller"])
-        integer(block["alternate"], 0, 15, "Card alternate function")
+        pinmux.validate(block["alternate"], "Card alternate function")
         if set(_mapping(block["pins"], "card pins")) != {"1", "4", "8"}:
             fail("Card pin catalog requires exact supported bus widths")
         for pins in block["pins"].values():

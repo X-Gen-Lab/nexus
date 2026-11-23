@@ -35,7 +35,7 @@ def snapshot_package(repository, *, dependencies=None):
     files = {
         "dependencies/platform-compatibility.json": json.dumps(policy),
         manifest: json.dumps({
-            "schema_version": 1, "interface_version": 1,
+            "schema_version": 1, "interface_version": 2,
             "id": "snapshot_fixture", "family": "snapshot_fixture",
             "vendor": "fixture", "source_directory": ".",
             "facts": {"soc": "soc.json", "routes": "routes.json"},

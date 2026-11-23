@@ -1,4 +1,5 @@
 """Reviewed serial roles and clock domains do not depend on MCU names."""
+from tools.configure.tests.f4_fixture import f4_pinmux
 from copy import deepcopy
 import json
 from pathlib import Path
@@ -73,10 +74,10 @@ class SerialModePolicies(unittest.TestCase):
         path = ROOT / "soc/stm32/stm32f4/private/bindings/selection_policy.json"
         facts = json.loads(path.read_text())["domains"]["selection"]
         facts["serial_modes"] = provider().SELECTION.data["serial_modes"]
-        SelectionPolicy.from_validated(facts)
+        SelectionPolicy.from_validated(facts, pinmux=f4_pinmux())
         facts["serial_modes"]["uart_wire"]["controllers"]["SERIAL_A"]["flows"] = ["made-up"]
         with self.assertRaises(ValueError):
-            SelectionPolicy.from_validated(facts)
+            SelectionPolicy.from_validated(facts, pinmux=f4_pinmux())
 
 
 if __name__ == "__main__":

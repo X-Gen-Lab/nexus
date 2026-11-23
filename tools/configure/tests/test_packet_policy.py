@@ -1,4 +1,5 @@
 """Packet storage metadata references canonical endpoints and selected owners."""
+from tools.configure.tests.f4_fixture import f4_pinmux
 from dataclasses import dataclass
 from types import SimpleNamespace
 import unittest
@@ -28,7 +29,7 @@ class PacketPolicyTests(unittest.TestCase):
                 "high_speed": True, "managed": True, "phy": "SAMPLE_EXTERNAL"}},
             "host_modes": {"host-fs": "SAMPLE_INTERNAL"},
             "dma_alignment": 4, "setup_slots": 3, "setup_bytes": 8,
-            "ethernet_memory": "bus_ram"})
+            "ethernet_memory": "bus_ram"}, pinmux=f4_pinmux())
 
     def test_dma_extent_is_private_and_endpoint_identity_is_not_cloned(self):
         children = (Endpoint("control-out", "usb", EndpointOptions(0, "out", 63)),

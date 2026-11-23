@@ -9,6 +9,34 @@ from tools.configure.static_ir import Array, Declaration, IrqConnection
 from tools.configure.static_recipe import _immutable, _path, _read
 
 
+class IrqClaims:
+    """Admit sharing only through the selected static dispatcher contract.
+
+    This local normalizer updates the resolver's sole claim ledger. Final
+    source-mask overlap is checked by connections against canonical typed IR.
+    """
+
+    def __init__(self, records, claim):
+        self.records = records
+        self.exclusive_claim = claim
+        self.publishers = {}
+
+    def claim(self, key, owner, mode, source, *, kind, priority, calls_os,
+              shared=False, contract=None):
+        previous = self.publishers.get(key)
+        signature = (kind, priority, calls_os, contract)
+        if previous is not None and self.records[key]["owner"] != owner:
+            if (not shared or not isinstance(contract, SharedIrqGroup) or
+                    previous != signature):
+                fail("Shared IRQ dispatcher, priorities and OS constraints must agree: " + key)
+            self.records[key]["owner"] += ";" + owner
+            self.records[key]["mode"] = "static-irq-dispatch"
+            return
+        self.exclusive_claim(key, owner, mode, source)
+        # An exclusive first publisher never grants sharing to a later owner.
+        self.publishers[key] = signature if shared else None
+
+
 @dataclass(frozen=True)
 class SharedIrqMember:
     group: "SharedIrqGroup"
@@ -16,6 +44,7 @@ class SharedIrqMember:
     priority: int
     mask: int
     state: Address
+    owner: str
 
 
 @dataclass(frozen=True)
@@ -57,15 +86,28 @@ class SharedIrqGroup:
             fail("Shared IRQ priority differs from its resolved owner")
         mask = integer(_read(self.mask, context), 1, context="Shared IRQ source mask")
         return SharedIrqMember(self, handler, priority, mask,
-            Address("s_nx_port_" + item.id.replace("-", "_")))
+            Address("s_nx_port_" + item.id.replace("-", "_")), item.id)
 
 
-def connections(selections):
+def connections(selections, *, claims=None, vector_handlers=None):
     """Build one static array and dispatcher per exact selected handler."""
     groups = {}
     for specification, item in selections:
         member = specification.member(item)
         groups.setdefault(member.handler, []).append(member)
+    if claims is not None:
+        if not isinstance(vector_handlers, Mapping):
+            fail("Shared IRQ claims require the selected physical vector bindings")
+        for handler, members in groups.items():
+            actual = {owner for claim in claims
+                      if vector_handlers.get(claim.key) == handler
+                      for owner in claim.owner.split(";")}
+            if actual != {member.owner for member in members}:
+                fail("Shared IRQ dispatcher differs from canonical vector ownership: " + handler)
+        for claim in claims:
+            if (claim.mode == "static-irq-dispatch" and
+                    vector_handlers.get(claim.key) not in groups):
+                fail("Shared IRQ claim has no selected static dispatcher: " + claim.key)
     nodes = []
     for handler, members in groups.items():
         first = members[0]
