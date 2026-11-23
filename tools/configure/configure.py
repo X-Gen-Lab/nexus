@@ -33,8 +33,7 @@ from tools.configure.ir import (
     EndpointIR, FactoryOptions, FlashRegionIR, MemoryBudgetIR, PhysicalPartIR, PwmSharedOwnerIR,
     RuntimePowerIR, VendorDeviceIR, freeze, thaw)
 from tools.configure import resource_graph, trigger_graph, dma_topology, board_hardware, gpio_electrical
-from tools.configure import device_graph, component_catalog
-from tools.configure.resource_graph import resource_claims, reserved_claims
+from tools.configure import device_graph, component_catalog, validation
 from tools.configure.contracts import (
     COMPONENTS, CONTROLLER_KINDS, CONTROLLER_SELECTION_FIELDS,
     ENDPOINT_SELECTION_FIELDS)
@@ -47,12 +46,14 @@ from tools.configure.providers.common import (ConfigurationError, cpu_abi, fail,
                                mode_traits, route_dma,
                                sequence, vendor_device_catalog, VendorDeviceProfile)
 
-from tools.configure.validation import (
-    IDENTIFIER, error_context, c_identity, c_id, obj, text, identity, unique)
+from tools.configure.validation import obj, text, identity, unique
 
 ROOT = Path(__file__).resolve().parents[2]
 UINT32_MAX = (1 << 32) - 1
 KINDS = frozenset(CONTROLLER_KINDS)
+IDENTIFIER = validation.IDENTIFIER
+c_identity = validation.c_identity
+reserved_claims = resource_graph.reserved_claims
 
 
 

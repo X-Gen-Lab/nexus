@@ -12,6 +12,7 @@ from dataclasses import asdict, dataclass
 import re
 
 from tools.configure.providers.common import fail, sequence
+from tools.configure.providers.common import normalize_resource as normalize_resource
 from tools.configure.validation import obj, text
 
 
@@ -209,28 +210,6 @@ with compatible attributes. Existing controller reservations stay exclusive.
         if not duplicate:
             result.append(item)
     return ResourcePlanIR(tuple(result))
-
-
-def normalize_resource(value):
-    timer = re.fullmatch(r"(?:timer:|controller:)?(TIM[0-9]+|TIMER[0-9]+)", value)
-    if timer is not None:
-        return "controller:" + timer[1]
-    if value.startswith("dma:"):
-        channel = re.fullmatch(r"dma:(GPDMA1):channel(0|[1-9][0-9]*)"
-                               r"(?::request(0|[1-9][0-9]*))?", value)
-        if channel is not None:
-            return f"dma:{channel[1]}:channel{channel[2]}"
-        match = re.fullmatch(r"dma:([A-Z][A-Z0-9_]*):stream([0-9]+)"
-                             r"(?::channel([0-9]+))?", value)
-        if match is None:
-            fail(f"Invalid physical DMA resource: {value}")
-        return f"dma:{match[1]}:stream{int(match[2])}"
-    if value.startswith("irq:"):
-        irq = value[4:]
-        for suffix in ("_IRQHandler", "_IRQn", "_Handler"):
-            if irq.endswith(suffix):
-                return "irq:" + irq[:-len(suffix)]
-    return value
 
 
 def resource_claims(provider):

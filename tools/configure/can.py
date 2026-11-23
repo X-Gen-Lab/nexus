@@ -5,8 +5,11 @@ The emitted C calls the real common controller directly; no runtime registry,
 forwarding face, protocol retry policy or inferred transceiver is introduced.
 """
 from tools.configure.providers.common import fail, integer
-from tools.configure.policies.bxcan import (
-    BxCanPolicy, FILTER_FIELDS, domain_topology, resolve_domain)
+from tools.configure.policies import bxcan
+from tools.configure.policies.bxcan import BxCanPolicy
+
+FILTER_FIELDS = bxcan.FILTER_FIELDS
+resolve_domain = bxcan.resolve_domain
 
 FIELDS = {"operation", "event_capacity", "bitrate", "timing", "irq_priority",
           "calls_os", "drain_timeout_us", "poll_limit", "fifo_order"}

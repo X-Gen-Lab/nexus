@@ -1,5 +1,9 @@
 """Catalog authors select device identifiers, paths, IRQs and SDK lock aliases."""
 import copy
+import json
+import subprocess
+import sys
+import textwrap
 import unittest
 
 from tools.configure import configure
@@ -33,6 +37,42 @@ def soc():
 
 
 class GenericDeviceCatalogTests(unittest.TestCase):
+    def test_irq_facts_read_without_loading_resolution_modules(self):
+        value = catalog()
+        value["devices"][0]["irq_bindings"] = {
+            "SERIAL_IRQn": {"number": 0, "handler": "enter_serial"},
+            "COUNTER_IRQHandler": {"number": 1, "handler": "enter_counter"}}
+        value["devices"][0]["last_external_irq"]["name"] = "COUNTER_IRQHandler"
+        script = textwrap.dedent("""
+            import json
+            import sys
+            from tools.configure.providers.common import (
+                irq_resource_bindings, vendor_device_catalog)
+
+            facts = vendor_device_catalog(json.load(sys.stdin))["chip-alpha"]
+            resources = irq_resource_bindings(facts.irq_bindings)
+            resolution_modules = {
+                "tools.configure.resource_graph", "tools.configure.validation",
+                "tools.configure.configure"}
+            print(json.dumps({
+                "resources": {key: {
+                    "enum": item.enum, "number": item.number,
+                    "handler": item.handler} for key, item in resources.items()},
+                "unexpected_modules": sorted(resolution_modules & sys.modules.keys())
+            }))
+        """)
+        execution = subprocess.run(
+            [sys.executable, "-B", "-c", script], cwd=configure.ROOT,
+            input=json.dumps(value), capture_output=True, text=True, timeout=30)
+        self.assertEqual(execution.returncode, 0, execution.stderr)
+        result = json.loads(execution.stdout)
+        self.assertEqual(result["resources"], {
+            "SERIAL": {"enum": "SERIAL_IRQn", "number": 0,
+                       "handler": "enter_serial"},
+            "COUNTER": {"enum": "COUNTER_IRQHandler", "number": 1,
+                        "handler": "enter_counter"}})
+        self.assertEqual(result["unexpected_modules"], [])
+
     def test_non_st_identifiers_and_explicit_paths_do_not_inherit_f4_naming(self):
         selected = vendor_device_catalog(catalog())["chip-alpha"]
         self.assertEqual(selected.macro, "ACME_CHIP_A")
