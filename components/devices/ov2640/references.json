@@ -1,0 +1,16 @@
+{
+  "manufacturer": "OmniVision Technologies",
+  "document": "OV2640 Color CMOS UXGA CameraChip Sensor",
+  "revision": "Version2.2 February23,2007",
+  "url": "https://dl.espressif.com/dl/schematics/Camera_OV2640.pdf",
+  "sections": [
+    "Table8 XVCLK timing",
+    "Table12 IMAGE_MODE0xDA byte swap and RGB565",
+    "Table13 COM2 standby and output drive",
+    "Table13 PIDH/PIDL"
+  ],
+  "reviewed_scope": "Locked ST RGB565 DVP tables, explicit PIDL and external XCLK; first F407 software reference QQVGA",
+  "physical_status": "not_executed",
+  "bytes": 846605,
+  "sha256": "7b88a029c84342779fccc106e27d2bbda8165144e10ac8e6584b73e5dbf46abd"
+}

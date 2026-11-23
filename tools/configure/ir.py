@@ -735,6 +735,14 @@ class PwmAdcOptions:
 
 
 @dataclass(frozen=True)
+class PwmAdcLoopOptions(PwmAdcOptions):
+    """The selected IRQ loop owns explicit computation and commit bounds."""
+    commit_before_ticks: int
+    compute_budget_ticks: int
+    max_irq_delay_us: int
+
+
+@dataclass(frozen=True)
 class CanFdFilterOptions:
     id: int
     mask: int
@@ -882,7 +890,7 @@ ControllerOptions = (DisplayOptions | ImageOptions | CaptureOptions | AudioOptio
                      ExtiOptions | ExtiHardwareOptions | PvdOptions | PvdEventsOptions | PwmOptions | PwmGroupOptions | TimerWaveformOptions | EncoderOptions | AdcOptions | DacOptions | CanOptions |
                      UsbDeviceOptions | UsbHostOptions | EthernetOptions | EthernetFramesOptions |
                      TimerCaptureOptions |
-                     AdvancedPwmOptions | PwmAdcOptions | CanFdOptions |
+                     AdvancedPwmOptions | PwmAdcOptions | PwmAdcLoopOptions | CanFdOptions |
                      AdcGroupOptions | LptimOptions | RtcOptions | ExternalBusOptions |
                      WindowWatchdogOptions | CryptoOptions | NoOptions)
 
@@ -971,10 +979,14 @@ def mode_options(values):
                        if "injected_timer" in plan else None))
                 if "injected" in values else None))
     if kind == "pwm_adc":
-        return PwmAdcOptions(*(values[key] for key in (
+        arguments = (*(values[key] for key in (
             "tick_hz", "period_ticks", "trigger_ticks", "deadtime_ticks")),
             tuple(values["channels"]), tuple(values["sample_times"]),
             values["reference_mv"], values["exclusive"], irq)
+        if values["mode"] == "injected-control":
+            return PwmAdcLoopOptions(*arguments, *(values[key] for key in (
+                "commit_before_ticks", "compute_budget_ticks", "max_irq_delay_us")))
+        return PwmAdcOptions(*arguments)
     if kind == "can_fd":
         return CanFdOptions(values["bitrate"], values["data_bitrate"],
                             values["event_capacity"],

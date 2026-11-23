@@ -95,6 +95,24 @@
           "profile": "hse8-pll168"
         },
         "part_contexts": {
+          "STM32F407ZGT6": {
+            "backend": "baremetal",
+            "profile": "hse8-pll168",
+            "backend_contexts": {
+              "freertos": {
+                "modes": [
+                  "adopt-retained"
+                ],
+                "kernel_profile": "lowpower",
+                "lowpower_port": "timebase",
+                "options": {
+                  "allow_set": false,
+                  "lse_bypass": true,
+                  "periodic_wakeup": true
+                }
+              }
+            }
+          },
           "STM32F411RET6": {
             "backend": "baremetal",
             "profile": "custom",

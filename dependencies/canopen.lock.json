@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "kind": "nexus-component-source",
+  "identifier": "canopen",
+  "path": "vendors/CANopenNode",
+  "upstream_url": "https://github.com/CANopenNode/CANopenNode.git",
+  "fetch_url": "https://github.com/X-Gen-Lab/CANopenNode.git",
+  "commit": "9b8beed8367241e96ac03f916cd5a500bcb2cf23",
+  "tree": "ce115e65fb21f400483f82372ee3301c5c874387",
+  "license": {
+    "path": "LICENSE",
+    "expression": "Apache-2.0"
+  },
+  "files": {
+    "301/CO_Emergency.c": "be85a4515c3b5b0c0da37e9025a4f60d8eae4fef739d7b4df463c16705bb06cb",
+    "301/CO_Emergency.h": "ebfb8fb2d635f869bd89b25856adc82945a875754683c2b85d3b778acc437791",
+    "301/CO_HBconsumer.c": "8507404f1fcf5e66680699cb3f698ea805d337a6f5c01e7688a780ac54ca0a8e",
+    "301/CO_HBconsumer.h": "73dda4d0fa6ce61f1d6c4aa2a4cf7046e1e15ef6e4effde9ab8e6a9f5f28bc2d",
+    "301/CO_NMT_Heartbeat.c": "2ad2b2f92ea1198de0ca3b28465d50039a8de09f6f33587ee9735c7b63e2589d",
+    "301/CO_NMT_Heartbeat.h": "4da3d1e3bf82e616a47c59096b6a58a12c58454916af4765adcefda31f8ff9bb",
+    "301/CO_ODinterface.c": "af3672c73c8b2e6141fb59a21d0f8b757240fc77dc25720b446a21a96fc1dd75",
+    "301/CO_ODinterface.h": "6d0335b932871f32b95beabef60a204b07aae7aa6294299a25ede92e3505ac93",
+    "301/CO_PDO.c": "4791d3acaa044fbe4c05b3b9cd4cbe76c07d9534b04adda3f3df12fdc71a2252",
+    "301/CO_PDO.h": "e370c8093356a60ef6cce7f346809182bc241f326090f7ecb568da37fc309201",
+    "301/CO_SDOserver.c": "27d3e86c519bd99e388f57f5b44192a44d75aaf3247aae9e00db13a17fddd00b",
+    "301/CO_SDOserver.h": "1679a82fb5b41114c2c9353b445cf4e408a2aa48082ad65f41da208c3bf5b2c3",
+    "301/CO_SYNC.h": "3e9ae95c5b548a645f691829913e2bd118bf8d1857a6e2b8fbb9288eccc954a6",
+    "301/CO_config.h": "da059de7fa1108e038f25fa5004202b688538544dee08727f2ea8b3b3cd27503",
+    "301/CO_driver.h": "ab42dae276ff244ebb511cf8d5374f5017891eaa57a1c7696b8a91a06b95d246",
+    "301/crc16-ccitt.h": "e503c0483788412f45cabd039155927e2ddd8d688f412a082bd249584d21c33b",
+    "LICENSE": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+  }
+}

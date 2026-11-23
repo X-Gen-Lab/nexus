@@ -17,10 +17,10 @@ if __name__ == "__main__":
 
 from tools.configure.metadata import fields, parse_json, snapshot
 from tools.dev.dependencies import verify_selected_checkout
-from tools.maintenance.source_catalogue import dependency
+from tools.maintenance.source_catalogue import ALL_SOURCE_DEPENDENCIES, dependency
 
-IDENTIFIERS = frozenset({"flashdb", "segger_rtt", "cm_backtrace", "letter_shell",
-                         "cmsis_dsp", "littlefs", "sfud", "fatfs"})
+IDENTIFIERS = frozenset(item.identifier for item in ALL_SOURCE_DEPENDENCIES
+                        if item.component_source)
 
 
 def contract(lock, identifier):

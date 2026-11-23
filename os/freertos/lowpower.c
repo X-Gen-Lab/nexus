@@ -18,6 +18,12 @@ nx_freertos_lowpower_port(void) {
     return NULL;
 }
 
+__attribute__((weak)) bool
+nx_freertos_try_stop_idle(uint32_t expected_idle_ticks) {
+    (void)expected_idle_ticks;
+    return false;
+}
+
 #if configUSE_TICKLESS_IDLE != 0
 _Static_assert(configTICK_RATE_HZ > 0 && 1000000u % configTICK_RATE_HZ == 0,
                "The tickless clock requires exact microsecond tick periods");
@@ -32,6 +38,8 @@ static bool lowpower_port_valid(const nx_freertos_lowpower_port_t* port) {
 
 void nx_freertos_suppress_ticks_and_sleep(uint32_t expected_idle_ticks) {
 #if configUSE_TICKLESS_IDLE != 0
+    if (nx_freertos_try_stop_idle(expected_idle_ticks))
+        return;
     const nx_freertos_lowpower_port_t* port = nx_freertos_lowpower_port();
     if (!lowpower_port_valid(port) || expected_idle_ticks < 2u) {
         return;

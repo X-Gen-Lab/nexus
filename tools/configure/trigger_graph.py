@@ -202,7 +202,7 @@ def resolve(nodes, edges, *, startup=(), loops=()):
 
 
 def resolve_fixed(selected, *, adc_triggers=None, adc_injected_triggers=None,
-                  adc_group_converter=None):
+                  adc_group_converter=None, coupled_io=None):
     """Project only existing reviewed timer-triggered ADC modes.
 
 No additional selector is invented. Their providers already validate the exact
@@ -294,24 +294,34 @@ controller name never implies a converter identity.
                 startup.append((dma, adc))
             continue
         if item["kind"] == "pwm_adc":
+            if coupled_io is None:
+                fail("Coupled I/O trigger plan requires its declared route")
+            facts = coupled_io.route({**item, "id": item["route"]})
             owner = item["id"]
             trigger, adc, dma = (owner + suffix for suffix in
                                  (":trigger", ":adc", ":dma"))
             for name, clock, events, actions in (
-                    (trigger, "controller:TIM1", ["oc4ref-rising"], ["stop"]),
-                    (adc, "controller:ADC1", ["sample-ready"], ["sample", "stop"]),
-                    (dma, "engine:DMA1", ["block-ready"], ["transfer", "stop"])):
+                    (trigger, "controller:" + facts["timer"],
+                     [facts["trigger_event"]], ["stop"]),
+                    (adc, "controller:" + facts["adc"],
+                     ["sample-ready"], ["sample", "stop"])):
                 nodes.append({"id": name, "owner": owner, "clock_domain": clock,
                               "events": events, "actions": actions,
                               "stop_actions": ["stop"]})
-            edges += [
-                {"source": trigger, "event": "oc4ref-rising", "target": adc,
-                 "action": "sample", "route": "TIM1:TRGO2:OC4REF:ADC1",
-                 "cross_domain": True},
-                {"source": adc, "event": "sample-ready", "target": dma,
-                 "action": "transfer", "route": item["dma"][0],
-                 "cross_domain": True}]
-            startup += [(dma, adc), (adc, trigger)]
+            edges.append({"source": trigger, "event": facts["trigger_event"],
+                          "target": adc, "action": "sample",
+                          "route": facts["trigger_route"],
+                          "cross_domain": True})
+            if item.get("dma"):
+                nodes.append({"id": dma, "owner": owner,
+                    "clock_domain": "engine:" + item["dma"][0].split(":")[0],
+                    "events": ["block-ready"], "actions": ["transfer", "stop"],
+                    "stop_actions": ["stop"]})
+                edges.append({"source": adc, "event": "sample-ready", "target": dma,
+                    "action": "transfer", "route": item["dma"][0],
+                    "cross_domain": True})
+                startup.append((dma, adc))
+            startup.append((adc, trigger))
             continue
         if item["kind"] != "adc" or item["mode"] not in {
                 "trigger-dma", "trigger-dma-continuous"}:

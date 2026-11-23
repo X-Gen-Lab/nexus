@@ -2,6 +2,18 @@
 # Author: Nexus Team
 include_guard(GLOBAL)
 
+function(nexus_mcuboot_profile target profile)
+    set_property(
+        TARGET ${target}
+        PROPERTY INTERFACE_NEXUS_MCUBOOT_PROFILE "${profile}"
+    )
+    set_property(
+        TARGET ${target}
+        APPEND
+        PROPERTY COMPATIBLE_INTERFACE_STRING NEXUS_MCUBOOT_PROFILE
+    )
+endfunction()
+
 function(_nexus_mcuboot_admit_source output)
     if(NOT TARGET Nexus::Config OR NOT TARGET Nexus::IO)
         message(FATAL_ERROR "MCUboot requires a configured Nexus assembly")
@@ -96,6 +108,7 @@ function(nexus_add_mcuboot_control)
     add_library(nexus_mcuboot_port INTERFACE)
     target_link_libraries(nexus_mcuboot_port INTERFACE nexus_mcuboot_flash)
     add_library(Nexus::MCUBootPort ALIAS nexus_mcuboot_port)
+    nexus_mcuboot_profile(nexus_mcuboot_port overwrite-only)
 
     add_library(
         nexus_mcuboot_public
@@ -155,6 +168,7 @@ function(nexus_add_mcuboot_control)
         PROPERTY NEXUS_MCUBOOT_SOURCE "${source}"
     )
     add_library(Nexus::MCUBootControl ALIAS nexus_mcuboot_control)
+    nexus_mcuboot_profile(nexus_mcuboot_control overwrite-only)
 endfunction()
 
 function(nexus_add_mcuboot_boot)
@@ -173,7 +187,13 @@ function(nexus_add_mcuboot_boot)
             "Reviewed MCUboot boot profile requires GNU/LLVM MCU or Linux"
         )
     endif()
-    if(TARGET bootutil OR TARGET mcuboot_crypto)
+    if(TARGET bootutil)
+        get_target_property(owned bootutil NEXUS_MCUBOOT_UPSTREAM_ROOT)
+        if(NOT owned)
+            message(FATAL_ERROR "MCUboot source graph has a foreign owner")
+        endif()
+    endif()
+    if(TARGET mcuboot_crypto)
         message(
             FATAL_ERROR
             "MCUboot requires its reviewed separate core profile"
@@ -185,3 +205,5 @@ function(nexus_add_mcuboot_boot)
     include("${component}/private/upstream_profile.cmake")
     nexus_reference_mcuboot_core("${source}" "${component}" nexus_mcuboot_flash)
 endfunction()
+
+include("${CMAKE_CURRENT_LIST_DIR}/private/swap_profile.cmake")

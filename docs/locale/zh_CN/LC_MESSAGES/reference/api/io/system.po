@@ -7,20 +7,20 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 7af1557fbc9cf60a61740c41af2c39de7fdff55b38acc1caac396c475b37da59\n"
+"X-Nexus-Source-SHA256: d93571b34566f18191184a0bfbe59a4ddc5deb2b810ca3708e6ce6336b103d65\n"
 
-#: ../../../../../../docs/reference/api/io/system.md:10
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:10
 msgid "Chip information, integrity and entropy faces"
 msgstr "芯片信息、完整性与熵接口"
 
-#: ../../../../../../docs/reference/api/io/system.md:12
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:12
 msgid ""
 "Read chip identity and bounded integrity or entropy results through the "
 "selected public face. A UID is not a secret, a CRC unit is not an arbitrary "
 "hash, and source words alone do not establish cryptographic entropy quality."
 msgstr "通过选定公共接口读取芯片身份及有界完整性或熵结果。UID 不是秘密，CRC 单元不是任意哈希，来源字本身不能证明密码学熵质量。"
 
-#: ../../../../../../docs/reference/api/io/system.md:16
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:16
 msgid ""
 "The entropy face supplies bounded, health-admitted source words. "
 "`nx_entropy_fill` uses a finite absolute deadline and erases the complete "
@@ -37,50 +37,88 @@ msgstr ""
 "</reference/api/soc/stm32f4-system>` 说明其 typed factory、Platform "
 "生命周期与时钟前提。其他保留的 SDK 不授予熵源 provider。"
 
-#: ../../../../../../docs/reference/api/io/system.md:25
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:25
+msgid "Sign an existing digest without exporting the key"
+msgstr "签署已有摘要，不导出密钥"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:27
+msgid ""
+"`Nexus::IOP256Signer` exposes an existing selected signing-key face. The "
+"caller supplies exactly 32 SHA256 digest bytes; the synchronous task-only "
+"method returns raw P256 `R || S`, 64 bytes with each scalar big-endian. "
+"Public-key output is 64-byte big-endian `X || Y`, without an `04` tag. No "
+"implicit hashing, DER encoding, low-S normalization, certificate or "
+"authorization policy is added."
+msgstr ""
+"`Nexus::IOP256Signer` 暴露已选签名密钥的既有 face。调用者提供恰好 32 字节的 SHA256 摘要；仅任务同步方法返回原始 "
+"P256 `R || S`，共 64 字节，每个标量为大端。公钥输出是 64 字节大端 `X || Y`，不带 `04` 标记。不隐式增加哈希、DER "
+"编码、low-S 规范化、证书或授权策略。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:33
+msgid ""
+"The face, operations and private context remain live through serialized "
+"calls and joined provider stop. Inputs/outputs are disjoint from each other "
+"and control storage. Every return releases MCU buffer access; failures leave"
+" the complete public output unchanged. A finite provider-clock deadline does"
+" not preempt device computation. Key identity, provisioning, physical "
+"recovery and trust remain the product's responsibility. The selected "
+"[ATECC608B adapter](../components/devices.md) verifies a specific already-"
+"locked device/slot; its existence does not establish an opaque-key TLS "
+"integration."
+msgstr ""
+"face、方法与私有 context 在串行调用和已会合的 provider stop "
+"期间保持有效。输入／输出互相分离，也不覆盖控制存储。任何返回均结束 MCU 缓冲访问；失败保持完整公共输出不变。provider 时钟的有限 "
+"deadline 不能抢占器件计算。密钥身份、provisioning、物理恢复与信任仍归产品。选定 [ATECC608B "
+"adapter](../components/devices.md) 核验一组已经锁定的精确器件／slot；它的存在不建立 opaque-key TLS"
+" 集成。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:42
 msgid "Public declarations"
 msgstr "公共声明"
 
-#: ../../../../../../docs/reference/api/io/system.md:27
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:44
 msgid "chip.h"
 msgstr "chip.h"
 
-#: ../../../../../../docs/reference/api/io/system.md:29
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:46
 msgid "Read-only observed silicon identity without runtime storage."
 msgstr "无需运行时存储的只读硅片身份观察。"
 
-#: ../../../../../../docs/reference/api/io/system.md:29
-#: ../../../../../../docs/reference/api/io/system.md:35
-#: ../../../../../../docs/reference/api/io/system.md:41
-#: ../../../../../../docs/reference/api/io/system.md:47
-#: ../../../../../../docs/reference/api/io/system.md:53
-#: ../../../../../../docs/reference/api/io/system.md:59
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:46
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:52
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:58
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:64
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:70
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:76
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:82
 msgid "Author  Nexus Team"
 msgstr "作者  Nexus Team"
 
-#: ../../../../../../docs/reference/api/io/system.md:29
-#: ../../../../../../docs/reference/api/io/system.md:35
-#: ../../../../../../docs/reference/api/io/system.md:41
-#: ../../../../../../docs/reference/api/io/system.md:47
-#: ../../../../../../docs/reference/api/io/system.md:53
-#: ../../../../../../docs/reference/api/io/system.md:59
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:46
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:52
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:58
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:64
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:70
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:76
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:82
 msgid "Nexus Team"
 msgstr "Nexus Team"
 
-#: ../../../../../../docs/reference/api/io/system.md:29
-#: ../../../../../../docs/reference/api/io/system.md:35
-#: ../../../../../../docs/reference/api/io/system.md:41
-#: ../../../../../../docs/reference/api/io/system.md:47
-#: ../../../../../../docs/reference/api/io/system.md:53
-#: ../../../../../../docs/reference/api/io/system.md:59
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:46
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:52
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:58
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:64
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:70
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:76
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:82
 msgid "Functions"
 msgstr "函数"
 
-#: ../../../../../../docs/reference/api/io/system.md:29
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:46
 msgid "Read the selected SoC's physical identity into independent storage."
 msgstr "读取所选 SoC 的物理身份到独立存储。"
 
-#: ../../../../../../docs/reference/api/io/system.md:29
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:46
 msgid ""
 "Bounded privileged task/ISR read, including masked context. No clocks, "
 "allocation, preparation or retained references. The selected Platform "
@@ -93,27 +131,27 @@ msgstr ""
 "only Runtime 不提供 SoC 后端。UID 是公开的硅片身份，不提供认证证明。device／revision "
 "字段不能证明精确封装或完整订货号。显式 Native 测试支撑返回 UNSUPPORTED，不编造物理身份。"
 
-#: ../../../../../../docs/reference/api/io/system.md:0
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:0
 msgid "Parameters"
 msgstr "参数"
 
-#: ../../../../../../docs/reference/api/io/system.md:29
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:46
 msgid "[out] Aligned caller-owned output; changed only on success."
 msgstr "[out] 对齐且由调用方拥有的输出；仅在成功时修改。"
 
-#: ../../../../../../docs/reference/api/io/system.md:0
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:0
 msgid "Returns"
 msgstr "返回值"
 
-#: ../../../../../../docs/reference/api/io/system.md:29
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:46
 msgid "SUCCESS, INVALID, CONTEXT or UNSUPPORTED; no cached fallback values."
 msgstr "SUCCESS、INVALID、CONTEXT 或 UNSUPPORTED；不使用缓存回退值。"
 
-#: ../../../../../../docs/reference/api/io/system.md:29
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:46
 msgid "Copy opaque silicon identity bytes into caller-provided storage."
 msgstr "将不透明芯片身份字节复制到调用者提供的存储。"
 
-#: ../../../../../../docs/reference/api/io/system.md:29
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:46
 msgid ""
 "Bounded privileged task/ISR read, no allocation, retained references or "
 "initialization. Byte order is stable within the provider; consumers treat it"
@@ -126,107 +164,108 @@ msgstr ""
 "provider 按 UID 字顺序输出，每个字低有效字节优先。身份是公开信息，不认证芯片，也不证明封装或订货号。Native "
 "模型对读取与大小查询均返回 UNSUPPORTED，不伪造 UID。"
 
-#: ../../../../../../docs/reference/api/io/system.md:29
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:46
 msgid "[out] Writable bytes, or NULL with zero capacity to query size."
 msgstr "[out] 可写字节存储；查询大小时使用 NULL 与零容量。"
 
-#: ../../../../../../docs/reference/api/io/system.md:29
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:46
 msgid "[in] Complete caller-owned extent, not a platform maximum."
 msgstr "[in] 调用者拥有的完整跨度，不是平台最大容量。"
 
-#: ../../../../../../docs/reference/api/io/system.md:29
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:46
 msgid "[out] UID length on success; disjoint aligned writable storage."
 msgstr "[out] 成功时的 UID 长度；独立、对齐且可写的存储。"
 
-#: ../../../../../../docs/reference/api/io/system.md:29
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:46
 msgid ""
 "SUCCESS, INVALID, OVERFLOW when capacity is insufficient, CONTEXT or "
 "UNSUPPORTED. Both outputs remain unchanged on every failure."
 msgstr "SUCCESS、INVALID、容量不足时的 OVERFLOW、CONTEXT 或 UNSUPPORTED。任何失败均保持两个输出不变。"
 
-#: ../../../../../../docs/reference/api/io/system.md:29
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:46
 msgid "Native diagnostic profile: identity words, revision and Flash size."
 msgstr "原生诊断 profile：身份字、revision 与 Flash 容量。"
 
-#: ../../../../../../docs/reference/api/io/system.md:29
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:46
 msgid ""
 "The maintained STM32 profile uses three UID words. Portable consumers use "
 "nx_chip_uid_read rather than depending on this diagnostic layout."
 msgstr "维护的 STM32 profile 使用三个 UID 字。可移植消费者使用 nx_chip_uid_read，不依赖该诊断布局。"
 
-#: ../../../../../../docs/reference/api/io/system.md:29
-#: ../../../../../../docs/reference/api/io/system.md:35
-#: ../../../../../../docs/reference/api/io/system.md:41
-#: ../../../../../../docs/reference/api/io/system.md:47
-#: ../../../../../../docs/reference/api/io/system.md:53
-#: ../../../../../../docs/reference/api/io/system.md:59
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:46
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:52
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:58
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:64
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:70
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:76
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:82
 msgid "Public Members"
 msgstr "公共成员"
 
-#: ../../../../../../docs/reference/api/io/system.md:33
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:50
 msgid "cipher.h"
 msgstr "cipher.h"
 
-#: ../../../../../../docs/reference/api/io/system.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:52
 msgid "Single-shot hardware cipher requests and explicit spans."
 msgstr "单次硬件密码运算请求与显式数据区间。"
 
-#: ../../../../../../docs/reference/api/io/system.md:35
-#: ../../../../../../docs/reference/api/io/system.md:59
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:52
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:82
 msgid "Defines"
 msgstr "宏定义"
 
-#: ../../../../../../docs/reference/api/io/system.md:35
-#: ../../../../../../docs/reference/api/io/system.md:53
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:52
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:70
 msgid "Enums"
 msgstr "枚举"
 
-#: ../../../../../../docs/reference/api/io/system.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:52
 msgid "Standard algorithms; a provider explicitly reports its constraints."
 msgstr "标准算法；具体实现须显式报告其约束。"
 
-#: ../../../../../../docs/reference/api/io/system.md:35
-#: ../../../../../../docs/reference/api/io/system.md:53
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:52
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:70
 msgid "Values:"
 msgstr "取值："
 
-#: ../../../../../../docs/reference/api/io/system.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:52
 msgid "Direction does not change key/IV encoding or buffer ownership."
 msgstr "运算方向不改变 key／IV 编码或缓冲区所有权。"
 
-#: ../../../../../../docs/reference/api/io/system.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:52
 msgid "Query a selected algorithm without hardware effects or borrowing."
 msgstr "查询选定算法，不产生硬件效果或借用。"
 
-#: ../../../../../../docs/reference/api/io/system.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:52
 msgid ""
 "Readonly, no allocation or implicit start. Query does not establish physical"
 " qualification or approve product cryptographic policy."
 msgstr "只读，不分配，也不隐式启动。查询不建立物理资格，也不批准产品的密码学策略。"
 
-#: ../../../../../../docs/reference/api/io/system.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:52
 msgid "[in] Stable selected face and live private owner storage."
 msgstr "[in] 稳定的选定接口，以及仍有效的私有所有者存储。"
 
-#: ../../../../../../docs/reference/api/io/system.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:52
 msgid "[in] Standard algorithm selector."
 msgstr "[in] 标准算法选择值。"
 
-#: ../../../../../../docs/reference/api/io/system.md:35
-#: ../../../../../../docs/reference/api/io/system.md:53
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:52
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:70
 msgid "[out] Independent output, changed only on success."
 msgstr "[out] 独立输出，仅在成功时改变。"
 
-#: ../../../../../../docs/reference/api/io/system.md:35
-#: ../../../../../../docs/reference/api/io/system.md:53
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:52
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:70
 msgid "SUCCESS, UNSUPPORTED, INVALID or provider error."
 msgstr "SUCCESS、UNSUPPORTED、INVALID 或具体实现错误。"
 
-#: ../../../../../../docs/reference/api/io/system.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:52
 msgid "Copy a valid value tuple into unborrowed request storage."
 msgstr "将有效的值元组复制到未被借用的请求存储。"
 
-#: ../../../../../../docs/reference/api/io/system.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:52
 msgid ""
 "Provider-specific alignment/granularity is checked at submit. Generic CTR "
 "preparation does not require whole blocks. Partial input/output overlap is "
@@ -241,138 +280,138 @@ msgstr ""
 " 还须与 key／IV 分离。operation "
 "参数本身只复制值，绝不是保留的数据区间。所有区间与不透明的具体实现状态／配置分离，由选定的准入路径证明。"
 
-#: ../../../../../../docs/reference/api/io/system.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:52
 msgid "[inout] Initialized READY or consumed SETTLED descriptor."
 msgstr "[inout] 已初始化的 READY 或已消费的 SETTLED 描述符。"
 
-#: ../../../../../../docs/reference/api/io/system.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:52
 msgid "[in] Value copied here; it need not remain live afterward."
 msgstr "[in] 值在此处复制；原对象此后无须继续有效。"
 
-#: ../../../../../../docs/reference/api/io/system.md:35
-#: ../../../../../../docs/reference/api/io/system.md:53
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:52
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:70
 msgid "[in] Finite absolute Core monotonic deadline."
 msgstr "[in] 有限的绝对 Core 单调 deadline。"
 
-#: ../../../../../../docs/reference/api/io/system.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:52
 msgid "SUCCESS or INVALID/STATE; rejection leaves the tuple unchanged."
 msgstr "SUCCESS 或 INVALID／STATE；拒绝时元组保持不变。"
 
-#: ../../../../../../docs/reference/api/io/system.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:52
 msgid "Admit one operation; rejection has no retained or hardware effect."
 msgstr "准入一个操作；拒绝时不保留引用，也不产生硬件效果。"
 
-#: ../../../../../../docs/reference/api/io/system.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:52
 msgid "No queue, worker, allocation or concurrent control is supplied."
 msgstr "不提供队列、worker、分配或并发控制。"
 
-#: ../../../../../../docs/reference/api/io/system.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:52
 msgid "[in] Initialized privileged task owner, with IRQs unmasked."
 msgstr "[in] 已初始化的特权任务所有者，且 IRQ 未屏蔽。"
 
-#: ../../../../../../docs/reference/api/io/system.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:52
 msgid "[inout] READY tuple and stable referenced spans."
 msgstr "[inout] READY 元组及其引用的稳定区间。"
 
-#: ../../../../../../docs/reference/api/io/system.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:52
 msgid "SUCCESS means ACCEPTED, including later settled start failure."
 msgstr "SUCCESS 表示 ACCEPTED，包括之后结清的启动失败。"
 
-#: ../../../../../../docs/reference/api/io/system.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:52
 msgid "Request cancellation without revoking any borrowed span."
 msgstr "请求取消，不撤销任何已借用区间。"
 
-#: ../../../../../../docs/reference/api/io/system.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:52
 msgid "First terminal cause wins; hardware and secret cleanup still follow."
 msgstr "最先确定的终止原因保持有效；仍须继续清理硬件与敏感状态。"
 
-#: ../../../../../../docs/reference/api/io/system.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:52
 msgid "[in] Same serialized task owner as submit."
 msgstr "[in] 与 submit 相同的串行任务所有者。"
 
-#: ../../../../../../docs/reference/api/io/system.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:52
 msgid "[inout] Exact active descriptor or observed SETTLED identity."
 msgstr "[inout] 精确的活跃描述符，或已观察到 SETTLED 的身份。"
 
-#: ../../../../../../docs/reference/api/io/system.md:35
-#: ../../../../../../docs/reference/api/io/system.md:53
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:52
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:70
 msgid "SUCCESS requests cancellation; STATE means another request."
 msgstr "SUCCESS 表示请求取消；STATE 表示属于另一个请求。"
 
-#: ../../../../../../docs/reference/api/io/system.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:52
 msgid "Make bounded deadline/drain/cleanup progress without waiting."
 msgstr "有界推进截止时间处理、排空与清理，不等待。"
 
-#: ../../../../../../docs/reference/api/io/system.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:52
 msgid "HAL completion is a fact; it does not alone publish SETTLED."
 msgstr "HAL 完成只是一个事实；它本身不发布 SETTLED。"
 
-#: ../../../../../../docs/reference/api/io/system.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:52
 msgid "[in] Same unmasked task owner, called through stop/recovery."
 msgstr "[in] 同一个未屏蔽 IRQ 的任务所有者；停机／恢复期间持续调用。"
 
-#: ../../../../../../docs/reference/api/io/system.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:52
 msgid "SUCCESS after progress; BUSY/IO can retain quarantined storage."
 msgstr "推进后返回 SUCCESS；BUSY／IO 可能保留隔离中的存储。"
 
-#: ../../../../../../docs/reference/api/io/system.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:52
 msgid "Close admission and drain the active operation and secret state."
 msgstr "关闭新准入，并排空活跃操作及敏感状态。"
 
-#: ../../../../../../docs/reference/api/io/system.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:52
 msgid ""
 "No task or notification destruction. Late IRQ cannot access retired "
 "request/key/config storage after successful stop."
 msgstr "不销毁任务或通知。成功停机后，迟到 IRQ 无法访问已归还的请求／key／配置存储。"
 
-#: ../../../../../../docs/reference/api/io/system.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:52
 msgid "[in] Serialized owner; producers/observers must quiesce."
 msgstr "[in] 串行所有者；生产者／观察者必须已停止活动。"
 
-#: ../../../../../../docs/reference/api/io/system.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:52
 msgid "SUCCESS after complete withdrawal; BUSY/IO retains responsibility."
 msgstr "完整撤回后返回 SUCCESS；BUSY／IO 保留责任。"
 
-#: ../../../../../../docs/reference/api/io/system.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:52
 msgid "Bind an optional IRQ hint, independent of request state predicates."
 msgstr "绑定可选 IRQ 提示，独立于请求状态判定条件。"
 
-#: ../../../../../../docs/reference/api/io/system.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:52
 msgid "Wake storage remains live through source/publisher withdrawal."
 msgstr "在源和发布者撤回期间，wake 存储须持续有效。"
 
-#: ../../../../../../docs/reference/api/io/system.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:52
 msgid "[in] Live serialized task owner, no active request."
 msgstr "[in] 有效的串行任务所有者，且没有活跃请求。"
 
-#: ../../../../../../docs/reference/api/io/system.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:52
 msgid "[in] Stable explicit hint binding, or NULL to detach."
 msgstr "[in] 稳定且显式的提示绑定，或用 NULL 拆除绑定。"
 
-#: ../../../../../../docs/reference/api/io/system.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:52
 msgid "[in] Existing backend IRQ ceiling contract."
 msgstr "[in] 既有后端的 IRQ 上限合同。"
 
-#: ../../../../../../docs/reference/api/io/system.md:35
-#: ../../../../../../docs/reference/api/io/system.md:53
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:52
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:70
 msgid "SUCCESS or INVALID/CONTEXT/STATE/BUSY/UNSUPPORTED."
 msgstr "SUCCESS 或 INVALID／CONTEXT／STATE／BUSY／UNSUPPORTED。"
 
-#: ../../../../../../docs/reference/api/io/system.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:52
 msgid "Readonly transport constraints for one standard algorithm."
 msgstr "一个标准算法的只读传输约束。"
 
-#: ../../../../../../docs/reference/api/io/system.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:52
 msgid ""
 "A CTR provider can report length_multiple=1 or a whole-block value; CTR "
 "itself does not imply a sixteen-byte request requirement."
 msgstr "CTR 具体实现可以报告 length_multiple=1，也可以要求整块长度；CTR 本身不要求请求长度为十六字节的整数倍。"
 
-#: ../../../../../../docs/reference/api/io/system.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:52
 msgid "Value copied at preparation; referenced storage is never copied."
 msgstr "准备时复制值；绝不复制其引用的存储。"
 
-#: ../../../../../../docs/reference/api/io/system.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:52
 msgid ""
 "key/iv contain standard algorithm byte order, not vendor words. bytes is "
 "positive; output provides exactly bytes writable bytes. ECB has no IV; "
@@ -382,11 +421,11 @@ msgstr ""
 "key／iv 使用标准算法的字节顺序，不使用厂商字。bytes 为正；output 须恰好提供 bytes 个可写字节。ECB 没有 "
 "IV；CBC／CTR 接受调用者选定的 IV／计数器。不隐含 IV 生成、填充、认证或秘密存储策略。"
 
-#: ../../../../../../docs/reference/api/io/system.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:52
 msgid "Caller-owned request; initialize base before the first prepare."
 msgstr "调用者持有的请求；首次 prepare 前初始化 base。"
 
-#: ../../../../../../docs/reference/api/io/system.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:52
 msgid ""
 "ACCEPTED retains this descriptor and input/output/key/IV through acquire-"
 "observed SETTLED. Failed drain/secret cleanup retains them in QUARANTINED. "
@@ -405,27 +444,27 @@ msgstr ""
 " 引用，并清理具体实现的临时数据、硬件 key／IV／context／FIFO 残留和 HAL 指针引用，或证明已完成文档规定的独占复位。BUSY "
 "或清理被拒绝时，借用继续保持 QUARANTINED；清理不只发生在 stop。"
 
-#: ../../../../../../docs/reference/api/io/system.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:52
 msgid "Immutable shared methods; one task serializes each controller."
 msgstr "不可变共享方法；每个控制器由一个任务串行执行。"
 
-#: ../../../../../../docs/reference/api/io/system.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:52
 msgid "Stable two-pointer face; factory lookup never initializes hardware."
 msgstr "由两个指针组成的稳定接口；factory 查询绝不初始化硬件。"
 
-#: ../../../../../../docs/reference/api/io/system.md:39
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:56
 msgid "crc.h"
 msgstr "crc.h"
 
-#: ../../../../../../docs/reference/api/io/system.md:41
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:58
 msgid "Serialized CRC-32 of an explicit sequence of 32-bit words."
 msgstr "对明确的 32 位字序列执行串行 CRC-32 计算。"
 
-#: ../../../../../../docs/reference/api/io/system.md:41
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:58
 msgid "Compute fixed CRC-32 without byte-order or padding inference."
 msgstr "计算固定 CRC-32，不推断字节顺序或补齐规则。"
 
-#: ../../../../../../docs/reference/api/io/system.md:41
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:58
 msgid ""
 "Polynomial is 0x04C11DB7, initial state 0xffffffff, no reflection and no "
 "final XOR. An empty sequence returns the initial state. This is a word "
@@ -440,57 +479,58 @@ msgstr ""
 "IRQ／DMA，也不保留引用；输入、输出和接口在该同步调用期间保持稳定。超时丢弃部分计算；每次新调用从全新初始状态开始。调用方存储与 provider "
 "state 和硬件控制区分离。"
 
-#: ../../../../../../docs/reference/api/io/system.md:41
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:58
 msgid "[in] Initialized face with one serialized privileged task owner."
 msgstr "[in] 具有单一串行特权 task owner 的已初始化接口。"
 
-#: ../../../../../../docs/reference/api/io/system.md:41
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:58
 msgid ""
 "[in] Aligned immutable 32-bit values, consumed MSB first. NULL is permitted "
 "only for an empty sequence."
 msgstr "[in] 对齐且不可变的 32 位数值，MSB 优先处理。仅空序列允许 NULL。"
 
-#: ../../../../../../docs/reference/api/io/system.md:41
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:58
 msgid "[in] Number of words, not bytes; no implicit trailing padding."
 msgstr "[in] 数值字的数量，不是字节数；不隐式补齐尾部。"
 
-#: ../../../../../../docs/reference/api/io/system.md:41
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:58
 msgid "[in] Absolute live Core deadline, including final readback."
 msgstr "[in] 当前 Core 时域的绝对 deadline，包含最终读回。"
 
-#: ../../../../../../docs/reference/api/io/system.md:41
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:58
 msgid "[out] Independent aligned output, changed only on success."
 msgstr "[out] 独立且对齐的输出，仅在成功时修改。"
 
-#: ../../../../../../docs/reference/api/io/system.md:41
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:58
 msgid "SUCCESS, INVALID, STATE, CONTEXT, TIMEOUT, IO or UNSUPPORTED."
 msgstr "SUCCESS、INVALID、STATE、CONTEXT、TIMEOUT、IO 或 UNSUPPORTED。"
 
-#: ../../../../../../docs/reference/api/io/system.md:41
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:58
 msgid "Shared immutable methods receive the selected controller context."
 msgstr "共享的不可变方法接收所选 controller 的 context。"
 
-#: ../../../../../../docs/reference/api/io/system.md:41
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:58
 msgid "Stable controller identity; lookup never resets the calculator."
 msgstr "稳定的 controller 身份；查询不会 reset 计算器。"
 
-#: ../../../../../../docs/reference/api/io/system.md:45
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:62
 msgid "entropy.h"
 msgstr "entropy.h"
 
-#: ../../../../../../docs/reference/api/io/system.md:47
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:64
 msgid "Explicit entropy source and finite all-or-erased filling."
 msgstr "显式熵源与有限的完整填充或全部擦除操作。"
 
-#: ../../../../../../docs/reference/api/io/system.md:47
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:64
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:76
 msgid "Typedefs"
 msgstr "类型定义"
 
-#: ../../../../../../docs/reference/api/io/system.md:47
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:64
 msgid "Static two-pointer source face with private mutable state."
 msgstr "含私有可变状态的静态双指针源接口。"
 
-#: ../../../../../../docs/reference/api/io/system.md:47
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:64
 msgid ""
 "Caller serializes use and lifecycle; face/table/state outlive each call. No "
 "buffer or request is retained after return. Source enable, clock "
@@ -500,11 +540,11 @@ msgstr ""
 "调用方串行化使用和生命周期；接口、方法表和状态必须存活至每次调用结束。返回后不保留缓冲区或请求。源启用、时钟依赖、恢复和停止由显式生命周期所有者负责，不由"
 " TLS 或此接口负责。"
 
-#: ../../../../../../docs/reference/api/io/system.md:47
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:64
 msgid "Try to copy one complete source word without waiting."
 msgstr "尝试复制一个完整源数据字，不等待。"
 
-#: ../../../../../../docs/reference/api/io/system.md:47
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:64
 msgid ""
 "Invalid public spans reject before provider access. This wrapper cannot "
 "infer the extent of an opaque context; the caller proves its complete "
@@ -514,25 +554,25 @@ msgstr ""
 "公共存储区间无效时，在访问 provider 前拒绝。此包装层无法推断不透明上下文的范围；调用方证明其完整区间互不重叠。provider "
 "拒绝时绝不使用固定值或时间戳代替熵。"
 
-#: ../../../../../../docs/reference/api/io/system.md:47
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:64
 msgid "[in] Live immutable face on its serialized task executor"
 msgstr "[in] 在其串行任务执行器中使用的有效只读接口"
 
-#: ../../../../../../docs/reference/api/io/system.md:47
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:64
 msgid ""
 "[out] Naturally aligned writable word, disjoint from face, table and the "
 "complete private provider state"
 msgstr "[out] 自然对齐的可写数据字，与接口、方法表及完整 provider 私有状态互不重叠"
 
-#: ../../../../../../docs/reference/api/io/system.md:47
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:64
 msgid "SUCCESS, BUSY, IO, STATE, INVALID or UNSUPPORTED"
 msgstr "SUCCESS、BUSY、IO、STATE、INVALID 或 UNSUPPORTED"
 
-#: ../../../../../../docs/reference/api/io/system.md:47
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:64
 msgid "Fill exactly the requested bytes before a finite deadline."
 msgstr "在有限截止时间前恰好填满请求的字节。"
 
-#: ../../../../../../docs/reference/api/io/system.md:47
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:64
 msgid ""
 "Task-only synchronous polling; no heap, worker or OS wait. BUSY causes "
 "another clock-bounded poll. The supplied clock must continue advancing "
@@ -554,37 +594,37 @@ msgstr ""
 "写擦除全部输出；不得消费部分熵。输出与接口、方法表、时钟及其全部有效不透明上下文互不重叠。本函数检测已知区间别名，不推断不透明对象的范围。调理、DRBG"
 " 和信任策略由密码库负责。"
 
-#: ../../../../../../docs/reference/api/io/system.md:47
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:64
 msgid "[in] Live serialized source; no concurrent lifecycle change"
 msgstr "[in] 有效的串行化源；不得并发生命周期变更"
 
-#: ../../../../../../docs/reference/api/io/system.md:47
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:64
 msgid "[out] Writable byte span; NULL only for zero bytes"
 msgstr "[out] 可写字节区间；仅零字节时允许 NULL"
 
-#: ../../../../../../docs/reference/api/io/system.md:47
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:64
 msgid "[in] Exact required output size, not an entropy estimate"
 msgstr "[in] 所需输出的准确大小，不是熵含量估计"
 
-#: ../../../../../../docs/reference/api/io/system.md:47
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:64
 msgid "[in] Live monotonic microsecond clock in one stable domain"
 msgstr "[in] 单一稳定时间域内有效的单调微秒时钟"
 
-#: ../../../../../../docs/reference/api/io/system.md:47
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:64
 msgid "[in] Finite absolute deadline in that clock domain"
 msgstr "[in] 该时间域内的有限绝对截止时间"
 
-#: ../../../../../../docs/reference/api/io/system.md:47
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:64
 msgid ""
 "SUCCESS only for a complete fill; TIMEOUT, IO, STATE or source error; "
 "INVALID/UNSUPPORTED for preflight rejection"
 msgstr "仅完整填充返回 SUCCESS；否则为 TIMEOUT、IO、STATE 或源错误；准入前拒绝返回 INVALID/UNSUPPORTED"
 
-#: ../../../../../../docs/reference/api/io/system.md:47
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:64
 msgid "Shared immutable entropy-source methods."
 msgstr "共享的只读熵源方法。"
 
-#: ../../../../../../docs/reference/api/io/system.md:47
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:64
 msgid ""
 "try_read is task-only and bounded, never waits for hardware. SUCCESS copies "
 "one complete health-admitted 32-bit word; BUSY means no word yet, IO means a"
@@ -597,39 +637,39 @@ msgstr ""
 "表示源或健康检查失败，STATE 表示不可用或已关闭。失败保持输出不变。provider 负责硬件健康检查与首样本处理。不隐含确定性回退、调理、DRBG"
 " 或密码学认证。"
 
-#: ../../../../../../docs/reference/api/io/system.md:51
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:68
 msgid "hash.h"
 msgstr "hash.h"
 
-#: ../../../../../../docs/reference/api/io/system.md:53
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:70
 msgid "Single-shot hardware digest/HMAC and retained byte spans."
 msgstr "单次硬件摘要／HMAC 与保留的字节区间。"
 
-#: ../../../../../../docs/reference/api/io/system.md:53
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:70
 msgid "Exact standard operation; hardware availability remains explicit."
 msgstr "精确的标准操作；硬件可用性始终显式声明。"
 
-#: ../../../../../../docs/reference/api/io/system.md:53
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:70
 msgid "Query exact selected constraints with no hardware or borrow effect."
 msgstr "查询选定的精确约束，不产生硬件效果或借用。"
 
-#: ../../../../../../docs/reference/api/io/system.md:53
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:70
 msgid "Readonly; no key policy, TLS binding or certification is implied."
 msgstr "只读；不隐含密钥策略、TLS 绑定或认证资格。"
 
-#: ../../../../../../docs/reference/api/io/system.md:53
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:70
 msgid "[in] Stable selected face and private owner storage."
 msgstr "[in] 稳定的选定接口及私有所有者存储。"
 
-#: ../../../../../../docs/reference/api/io/system.md:53
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:70
 msgid "[in] SHA1/MD5 or explicitly keyed variant."
 msgstr "[in] SHA1／MD5，或显式带 key 的变体。"
 
-#: ../../../../../../docs/reference/api/io/system.md:53
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:70
 msgid "Prepare a one-shot tuple without reading any message/key byte."
 msgstr "准备单次元组，不读取任何消息／key 字节。"
 
-#: ../../../../../../docs/reference/api/io/system.md:53
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:70
 msgid ""
 "Every referenced byte span (message/key/digest) is disjoint from the entire "
 "mutable request. Digest is also disjoint from message/key; the operation "
@@ -640,59 +680,59 @@ msgstr ""
 "每个引用的字节区间（消息／key／摘要）均须与整个可变请求分离。摘要还须与消息／key 分离；operation "
 "参数本身只复制值，绝不是保留的数据区间。具体实现的限制在借用或产生硬件效果前检查并拒绝。本接口不要求源数据填充，也不要求复制整条消息的中转缓冲区。"
 
-#: ../../../../../../docs/reference/api/io/system.md:53
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:70
 msgid "[inout] Initialized READY or consumed SETTLED storage."
 msgstr "[inout] 已初始化为 READY 或已消费的 SETTLED 存储。"
 
-#: ../../../../../../docs/reference/api/io/system.md:53
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:70
 msgid "[in] Value copied; its object is not retained."
 msgstr "[in] 复制值，不保留该对象。"
 
-#: ../../../../../../docs/reference/api/io/system.md:53
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:70
 msgid "SUCCESS or INVALID/STATE, with no tuple mutation on rejection."
 msgstr "SUCCESS 或 INVALID／STATE；拒绝时不改变元组。"
 
-#: ../../../../../../docs/reference/api/io/system.md:53
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:70
 msgid "Admit exactly one operation on an initialized serialized owner."
 msgstr "在已初始化的串行所有者上准入恰好一个操作。"
 
-#: ../../../../../../docs/reference/api/io/system.md:53
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:70
 msgid "Keep every span live through cancellation and verified cleanup."
 msgstr "取消及经验证的清理期间，每个区间须持续有效。"
 
-#: ../../../../../../docs/reference/api/io/system.md:53
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:70
 msgid "[in] Privileged unmasked task executor."
 msgstr "[in] 特权且未屏蔽 IRQ 的任务执行者。"
 
-#: ../../../../../../docs/reference/api/io/system.md:53
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:70
 msgid "[inout] READY descriptor and immutable input/key spans."
 msgstr "[inout] READY 描述符与不可变 input／key 区间。"
 
-#: ../../../../../../docs/reference/api/io/system.md:53
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:70
 msgid "SUCCESS means ACCEPTED; rejection retains no reference/effect."
 msgstr "SUCCESS 表示 ACCEPTED；拒绝时不保留引用或效果。"
 
-#: ../../../../../../docs/reference/api/io/system.md:53
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:70
 msgid "Cancel without revoking the active message/key/digest borrow."
 msgstr "取消操作，不撤销活跃消息／key／摘要的借用。"
 
-#: ../../../../../../docs/reference/api/io/system.md:53
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:70
 msgid "First observed terminal cause wins; cleanup can outlive its deadline."
 msgstr "最先观察到的终止原因保持有效；清理可以延续到截止时间之后。"
 
-#: ../../../../../../docs/reference/api/io/system.md:53
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:70
 msgid "[in] Same serialized executor as submit."
 msgstr "[in] 与 submit 相同的串行执行者。"
 
-#: ../../../../../../docs/reference/api/io/system.md:53
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:70
 msgid "[inout] Active descriptor or observed SETTLED identity."
 msgstr "[inout] 活跃描述符，或已观察到 SETTLED 的身份。"
 
-#: ../../../../../../docs/reference/api/io/system.md:53
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:70
 msgid "Observe hardware/deadline and make bounded cleanup progress."
 msgstr "观察硬件／截止时间并有界推进清理。"
 
-#: ../../../../../../docs/reference/api/io/system.md:53
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:70
 msgid ""
 "No busy wait inside the HASH/RNG IRQ and no implicit worker. The bounded "
 "FIFO provider requires explicit service while HMAC is active, including "
@@ -702,55 +742,55 @@ msgstr ""
 "HASH／RNG IRQ 内没有忙等，也没有隐式 worker。有界 FIFO 具体实现在 HMAC 活跃期间要求显式 service，包括内部阶段与 "
 "key 阶段之间。wake 只是提示；仅等待最终摘要 IRQ 无法推进这些阶段。"
 
-#: ../../../../../../docs/reference/api/io/system.md:53
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:70
 msgid "[in] Same unmasked owner, called throughout stop/drain."
 msgstr "[in] 同一个未屏蔽 IRQ 的所有者；停机／排空期间持续调用。"
 
-#: ../../../../../../docs/reference/api/io/system.md:53
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:70
 msgid "SUCCESS after progress; BUSY/IO may retain QUARANTINED storage."
 msgstr "推进后返回 SUCCESS；BUSY／IO 可能保留 QUARANTINED 存储。"
 
-#: ../../../../../../docs/reference/api/io/system.md:53
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:70
 msgid "Seal admission and retire hardware, key/context and IRQ references."
 msgstr "封闭新准入，撤回硬件、key／context 及 IRQ 引用。"
 
-#: ../../../../../../docs/reference/api/io/system.md:53
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:70
 msgid "Callback completion alone cannot establish secret/context cleanup."
 msgstr "仅回调完成不能证明敏感状态／context 已清理。"
 
-#: ../../../../../../docs/reference/api/io/system.md:53
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:70
 msgid "[in] Serialized owner with producers/observers quiesced."
 msgstr "[in] 串行所有者，生产者／观察者已停止活动。"
 
-#: ../../../../../../docs/reference/api/io/system.md:53
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:70
 msgid "SUCCESS only after withdrawal; BUSY/IO retains responsibility."
 msgstr "仅在撤回完成后返回 SUCCESS；BUSY／IO 保留责任。"
 
-#: ../../../../../../docs/reference/api/io/system.md:53
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:70
 msgid "Attach one optional IRQ hint under the existing ceiling contract."
 msgstr "按既有上限合同挂接一个可选 IRQ 提示。"
 
-#: ../../../../../../docs/reference/api/io/system.md:53
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:70
 msgid "Retain wake storage until source and publishers have withdrawn."
 msgstr "在源及发布者全部撤回前，保留 wake 存储。"
 
-#: ../../../../../../docs/reference/api/io/system.md:53
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:70
 msgid "[in] Live owner with no active request."
 msgstr "[in] 有效所有者，且没有活跃请求。"
 
-#: ../../../../../../docs/reference/api/io/system.md:53
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:70
 msgid "[in] Stable explicit binding or NULL to detach."
 msgstr "[in] 稳定且显式的绑定，或用 NULL 拆除绑定。"
 
-#: ../../../../../../docs/reference/api/io/system.md:53
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:70
 msgid "[in] Existing backend IRQ admission bound."
 msgstr "[in] 既有后端的 IRQ 准入上限。"
 
-#: ../../../../../../docs/reference/api/io/system.md:53
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:70
 msgid "Readonly algorithm/transport constraints, no hidden readable padding."
 msgstr "只读算法／传输约束，不隐含额外可读填充。"
 
-#: ../../../../../../docs/reference/api/io/system.md:53
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:70
 msgid ""
 "Alignment applies only to the named start address. A message/key with a "
 "nonmultiple-of-four length never implies extra readable bytes. Positive "
@@ -761,11 +801,11 @@ msgstr ""
 "对齐仅适用于所指明的起始地址。消息/密钥的长度不是四的倍数时，绝不意味着存在额外可读字节。正的长度倍数描述所选传输，与 "
 "empty_message/empty_key 相互独立。倍数为一时接受任意字节长度；更大的倍数会在借用前拒绝其他长度，不添加隐式填充。"
 
-#: ../../../../../../docs/reference/api/io/system.md:53
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:70
 msgid "Value tuple; referenced spans remain explicit caller storage."
 msgstr "值元组；其引用的数据区间始终是调用者显式持有的存储。"
 
-#: ../../../../../../docs/reference/api/io/system.md:53
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:70
 msgid ""
 "An empty input may use NULL. Plain hash requires NULL key/zero key bytes; "
 "HMAC may use an empty key if the provider explicitly supports it. "
@@ -775,11 +815,11 @@ msgstr ""
 "空输入可使用 NULL。普通 hash 要求 key 为 NULL 且 key 字节数为零；只有具体实现显式支持时，HMAC 才可使用空 "
 "key。digest_capacity 至少为 SHA1 的 20 字节或 MD5 的 16 字节。只写入算法规定的摘要字节，其余部分保持不变。"
 
-#: ../../../../../../docs/reference/api/io/system.md:53
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:70
 msgid "Caller-owned one-shot request and byte-span lifetime."
 msgstr "调用者持有的单次请求及字节区间生命周期。"
 
-#: ../../../../../../docs/reference/api/io/system.md:53
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:70
 msgid ""
 "ACCEPTED retains descriptor, message, key and digest until observed SETTLED."
 " A failed hardware/context/secret cleanup retains the borrow in QUARANTINED."
@@ -796,29 +836,122 @@ msgstr ""
 "在成功时为摘要字节数，错误时为零。每条终止路径都撤回源／IRQ 引用，并清理具体实现的临时数据、key／context／FIFO 残留及 HAL "
 "引用，或证明已完成文档规定的独占 HASH 复位。清理被拒绝时，借用继续保持 QUARANTINED。共享 RNG 的源／IRQ 所有权保持不变。"
 
-#: ../../../../../../docs/reference/api/io/system.md:53
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:70
 msgid "Shared immutable operations; no queue, worker, heap or key store."
 msgstr "共享不可变操作；没有队列、worker、堆或密钥存储。"
 
-#: ../../../../../../docs/reference/api/io/system.md:53
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:70
 msgid "Stable two-pointer face; lookup does not initialize hardware."
 msgstr "由两个指针组成的稳定接口；查询不初始化硬件。"
 
-#: ../../../../../../docs/reference/api/io/system.md:57
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:74
+msgid "p256_signer.h"
+msgstr "p256_signer.h"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:76
+msgid "Finite SHA256 digest signing with a non-exported P256 key."
+msgstr "用非导出的 P256 密钥有限签署 SHA256 摘要。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:76
+msgid "Existing initialized signer identity, without private key material."
+msgstr "既有已初始化 signer 身份，不含私钥材料。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:76
+msgid ""
+"Face/ops/context stay live through calls and joined provider stop. One task "
+"executor serializes operations. No allocation or key discovery."
+msgstr "face／ops／context 保持有效至调用和已会合的 provider stop 结束。一个任务执行者串行化操作。不分配或发现密钥。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:76
+msgid "Read the public key for the already selected signing key."
+msgstr "读取已选签名密钥的公钥。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:76
+msgid ""
+"Task-only synchronous settled call: no retained output after return. "
+"Hardware identity/provisioning and authenticity need external policy. Output"
+" cannot overlap face/ops or private provider control storage."
+msgstr ""
+"仅任务的同步 settled 调用：返回后不保留输出。硬件身份／provisioning 与真实性需要外部策略。输出不得覆盖 face／ops 或 "
+"provider 私有控制存储。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:76
+msgid "[in] Stable readonly face and initialized private provider."
+msgstr "[in] 稳定只读 face 与已初始化私有 provider。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:76
+msgid "[out] Distinct writable complete key, unchanged on failure."
+msgstr "[out] 独立可写完整公钥，失败不变。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:76
+msgid "[in] Finite absolute provider-monotonic deadline."
+msgstr "[in] provider 单调域的有限绝对 deadline。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:76
+msgid "SUCCESS, INVALID/UNSUPPORTED/STATE or actual provider error."
+msgstr "SUCCESS、INVALID／UNSUPPORTED／STATE 或实际 provider 错误。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:76
+msgid "Sign a caller-supplied digest without exposing private key bytes."
+msgstr "签署调用者摘要，不暴露私钥字节。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:76
+msgid ""
+"Synchronous settled buffers, including failure. No implicit hash, DER, low-S"
+" normalization, certificate, authorization or private-key export. "
+"Input/output are disjoint from each other and private control storage. A "
+"deadline cannot preempt an already running device computation."
+msgstr ""
+"缓冲在包括失败的所有返回中同步结清。不隐式哈希、DER、low-S "
+"规范化、证书、授权或导出私钥。输入／输出互相分离，也不覆盖私有控制存储。deadline 无法抢占已经开始的器件计算。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:76
+msgid "[in] Stable same-executor selected face and provider state."
+msgstr "[in] 稳定且同一执行者使用的选定 face 与 provider 状态。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:76
+msgid "[in] Complete immutable SHA256 digest, borrowed during call."
+msgstr "[in] 完整不可变 SHA256 摘要，仅在调用中借用。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:76
+msgid "[out] Disjoint complete raw R/S signature, unchanged on failure."
+msgstr "[out] 独立完整原始 R/S 签名，失败不变。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:76
+msgid "[in] Finite whole-operation absolute provider deadline."
+msgstr "[in] 整个操作共用的有限绝对 provider deadline。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:76
+msgid "Exactly 32 SHA256 digest bytes, supplied and hashed by the caller."
+msgstr "恰好 32 字节 SHA256 摘要，由调用者哈希并提供。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:76
+msgid "P256 uncompressed X then Y, each 32-byte big-endian, without 04 tag."
+msgstr "P256 非压缩 X 后接 Y，每个为 32 字节大端，不含 04 标记。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:76
+msgid "ECDSA P256 R then S, each 32-byte big-endian; no ASN.1/DER framing."
+msgstr "ECDSA P256 R 后接 S，每个为 32 字节大端；无 ASN.1／DER 封装。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:76
+msgid "Shared readonly methods; each implements the public call contract."
+msgstr "共享只读方法；每项实现对应公共调用合同。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:80
 msgid "watchdog.h"
 msgstr "watchdog.h"
 
-#: ../../../../../../docs/reference/api/io/system.md:59
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:82
 msgid "Irreversible watchdog effects and neutral hardware reset causes."
 msgstr "不可逆的看门狗效应与中立的硬件复位原因。"
 
-#: ../../../../../../docs/reference/api/io/system.md:59
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:82
 msgid ""
 "Enable the selected watchdog and report its effect and known timing bounds; "
 "activation is irreversible."
 msgstr "启用所选看门狗，报告其效应及已知时间界限；激活不可逆。"
 
-#: ../../../../../../docs/reference/api/io/system.md:59
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:82
 msgid ""
 "Success establishes nominal hardware programming, not a guaranteed deadline."
 " Both timeout bounds remain zero when oscillator limits are unknown. A "
@@ -835,27 +968,27 @@ msgstr ""
 "喂狗；激活不支持在影子寄存器编程期间并发重载。 窗口 provider 会拒绝不能留下合法喂狗窗口的 timeout。计数器 tick "
 "与未知预分频相位不能建立精确的实际时间间隔。"
 
-#: ../../../../../../docs/reference/api/io/system.md:59
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:82
 msgid "[inout] Fixed provider; product owns feed/recovery policy."
 msgstr "[inout] 固定 provider；产品拥有喂狗和恢复策略。"
 
-#: ../../../../../../docs/reference/api/io/system.md:59
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:82
 msgid "[in] Requested nominal timeout in maintained range."
 msgstr "[in] 所请求的标称超时，须处于已维护范围内。"
 
-#: ../../../../../../docs/reference/api/io/system.md:59
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:82
 msgid ""
 "[in] Requested CPU-managed debug-freeze setting; external debugger "
 "configuration is outside this request."
 msgstr "[in] 请求由 CPU 管理的调试冻结设置；外部调试器配置不属于此请求。"
 
-#: ../../../../../../docs/reference/api/io/system.md:59
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:82
 msgid ""
 "[out] Actual timeout bounds and remaining effect, including enabled=true "
 "when later setup reports failure after enabling."
 msgstr "[out] 实际超时界限及剩余副作用；若启用后后续配置失败，也包括 enabled=true。"
 
-#: ../../../../../../docs/reference/api/io/system.md:59
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:82
 msgid ""
 "Success or INVALID/STATE/UNSUPPORTED/IO; never claims enabled hardware was "
 "disabled during rollback. Existing enable is identified. A provider without "
@@ -865,15 +998,15 @@ msgstr ""
 "成功，或返回 INVALID/STATE/UNSUPPORTED/IO；绝不声称回滚禁用了已启用的硬件。已有启用状态会被识别。无法由 CPU "
 "访问调试控制的提供者在激活前以 UNSUPPORTED 拒绝 true；它既不查询，也不改变外部调试器控制。"
 
-#: ../../../../../../docs/reference/api/io/system.md:59
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:82
 msgid "Feed an enabled watchdog without changing product health policy."
 msgstr "对已启用的看门狗执行喂狗，不改变产品健康策略。"
 
-#: ../../../../../../docs/reference/api/io/system.md:59
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:82
 msgid "[inout] Fixed enabled provider with one serialized feed owner."
 msgstr "[inout] 固定且已启用的 provider，只有一个串行化喂狗所有者。"
 
-#: ../../../../../../docs/reference/api/io/system.md:59
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:82
 msgid ""
 "Success, INVALID/CONTEXT, or STATE when no feed is admitted. A window "
 "provider returns BUSY for an early feed and STATE for its guarded late "
@@ -883,19 +1016,19 @@ msgstr ""
 "成功；INVALID/CONTEXT，或未准入喂狗时的 STATE。窗口 provider 对过早喂狗返回 BUSY，对受保护的迟喂边界返回 "
 "STATE；两者都不会 reload 或等待。任务／IRQ 执行有界且不分配内存。"
 
-#: ../../../../../../docs/reference/api/io/system.md:59
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:82
 msgid "Query current watchdog effect and timeout uncertainty."
 msgstr "查询当前看门狗效果与超时不确定性。"
 
-#: ../../../../../../docs/reference/api/io/system.md:59
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:82
 msgid "[in] Fixed provider."
 msgstr "[in] 固定 provider。"
 
-#: ../../../../../../docs/reference/api/io/system.md:59
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:82
 msgid "[out] Current hardware/remembered initialization state."
 msgstr "[out] 当前硬件状态或已记忆的初始化状态。"
 
-#: ../../../../../../docs/reference/api/io/system.md:59
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:82
 msgid ""
 "Success or INVALID/CONTEXT/STATE; UNSUPPORTED retains observed hardware "
 "effects with both timeout bounds zero when those bounds cannot be "
@@ -905,24 +1038,24 @@ msgstr ""
 "成功或 INVALID/CONTEXT/STATE；无法建立时限界限时，UNSUPPORTED 仍保留已观察到的硬件效应，并把两个 timeout "
 "界限保持为零。绝不能根据查询失败或未知 timeout 推断看门狗已经关闭。"
 
-#: ../../../../../../docs/reference/api/io/system.md:59
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:82
 msgid "Read latched boot reset causes captured before clearing flags."
 msgstr "读取清除标志前捕获的锁存启动复位原因。"
 
-#: ../../../../../../docs/reference/api/io/system.md:59
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:82
 msgid "No implicit acknowledgement, reboot or product classification."
 msgstr "不隐式确认、不重启，也不作产品分类。"
 
-#: ../../../../../../docs/reference/api/io/system.md:59
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:82
 msgid "Bitmask of NX_RESET_*; multiple causes may be reported."
 msgstr "NX_RESET_* 位掩码；可同时报告多个原因。"
 
-#: ../../../../../../docs/reference/api/io/system.md:59
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:82
 msgid ""
 "Hardware-selected timeout bounds, including declared clock uncertainty."
 msgstr "硬件所选 timeout 界限，包含已声明的时钟不确定性。"
 
-#: ../../../../../../docs/reference/api/io/system.md:59
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:82
 msgid ""
 "A zero minimum and maximum mean the timeout bounds are unknown, for example "
 "while hardware shadow updates remain pending or no oscillator limits have "
@@ -939,21 +1072,21 @@ msgstr ""
 "调试控制访问能力的提供者仅支持 false；该值既未观察，也不描述外部调试器的设置。 未证实的激活写入也可保留 enabled 与 "
 "irreversible 效应；provider 不会隐式重试，也不会依据回读失败推断能够安全关闭。"
 
-#: ../../../../../../docs/reference/api/io/system.md:59
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:82
 msgid "Shared read-only methods using one provider state."
 msgstr "使用同一个提供者状态的共享只读方法。"
 
-#: ../../../../../../docs/reference/api/io/system.md:59
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:82
 msgid ""
 "Methods follow each public operation's ownership contract. Missing optional "
 "methods report UNSUPPORTED."
 msgstr "各方法遵循对应公共操作的所有权合同。缺失的可选方法返回 UNSUPPORTED。"
 
-#: ../../../../../../docs/reference/api/io/system.md:59
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:82
 msgid "Immutable interface pointing to caller-owned state."
 msgstr "指向调用者自有状态的不可变接口。"
 
-#: ../../../../../../docs/reference/api/io/system.md:59
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/system.md:82
 msgid ""
 "Face and state outlive callers, IRQs and retained borrows. Factory lookup "
 "neither initializes nor acquires hardware."

@@ -17,7 +17,9 @@ typedef enum {
     NX_AT_RESPONSE,
     NX_AT_URC,
     NX_AT_BINARY,
-    NX_AT_COMPLETE
+    NX_AT_COMPLETE,
+    NX_AT_PROMPT,
+    NX_AT_HEADER
 } nx_at_event_kind_t;
 typedef struct {
     nx_at_event_kind_t kind;
@@ -25,6 +27,23 @@ typedef struct {
     size_t size;
     nx_result_t result;
 } nx_at_event_t;
+/**
+ * \brief Optional immutable framing tokens, selected only at a quiet boundary.
+ * \note binary_prefix is NULL to disable header recognition; otherwise it is
+ *       nonempty, printable and shorter than line capacity. A matching line
+ *       prefix followed by binary_delimiter emits HEADER without the delimiter.
+ *       The callback validates the full header and calls expect_binary before
+ *       returning; otherwise framing fails before any payload is interpreted.
+ *       prompt is zero to disable or one printable byte recognized at empty
+ *       line position without CRLF. No module command or length grammar lives
+ *       in the generic parser. Descriptor and strings remain immutable/live
+ *       through every parser use, including recovery.
+ */
+typedef struct {
+    const char* binary_prefix;
+    uint8_t binary_delimiter;
+    uint8_t prompt;
+} nx_at_framing_t;
 /** \brief Explicit caller-owned state; fields private after initialization. */
 typedef struct {
     nx_byte_stream_t stream;
@@ -47,6 +66,7 @@ typedef struct {
     bool command_active;
     bool active;
     bool failed;
+    const nx_at_framing_t* framing;
 } nx_at_client_t;
 /** \brief Stable assembly ports; no worker, ISR callbacks or UART ownership. */
 typedef struct {
@@ -70,6 +90,18 @@ typedef struct {
  * Prefix strings are immutable, nonempty and retained until all users join.
  */
 nx_result_t nx_at_init(nx_at_client_t* client, const nx_at_config_t* config);
+/**
+ * \brief Select optional non-line tokens on an initialized quiescent parser.
+ * \param[in,out] client: Same serialized task owner, no pending command/data.
+ * \param[in] framing: Disjoint immutable tokens, or NULL to restore line mode.
+ * \return SUCCESS, INVALID, BUSY for an active/partial parser, or STATE after
+ *         desynchronization; rejection keeps the original selection.
+ * \note No I/O, allocation or command replay. Caller joins previous callbacks
+ *       before changing/releasing a descriptor. HEADER/PROMPT views expire on
+ *       callback return; the existing expect_binary callback exception applies.
+ */
+nx_result_t nx_at_set_framing(nx_at_client_t* client,
+                              const nx_at_framing_t* framing);
 /**
  * \brief           Copy one command and append CRLF without starting transport.
  * \param[in,out]   client: Initialized serialized healthy state.

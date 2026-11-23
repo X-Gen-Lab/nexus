@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "kind": "nexus-component-source",
+  "identifier": "stm32_bsp_common",
+  "path": "vendors/st/bsp_common",
+  "upstream_url": "https://github.com/STMicroelectronics/stm32-bsp-common.git",
+  "fetch_url": "https://github.com/X-Gen-Lab/stm32-bsp-common.git",
+  "commit": "1e18c5afdf1f5971a35c8e2f88b6a21e5568ed92",
+  "tree": "46689c229d7c86b9c2bc18782cd9736463612238",
+  "license": {
+    "path": "camera.h",
+    "expression": "BSD-3-Clause"
+  },
+  "files": {
+    "camera.h": "2411c8bf6c6a736d32a5929d1cf9263c6f87bfa949c2adf499b30564528cd3e6"
+  }
+}

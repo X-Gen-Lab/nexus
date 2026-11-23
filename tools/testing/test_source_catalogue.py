@@ -7,11 +7,44 @@ import unittest
 from unittest.mock import patch
 
 from tools.maintenance import source_catalogue as catalogue
+from tools.maintenance import component_lock
 
 ROOT = Path(__file__).resolve().parents[2]
 
 
 class SourceCatalogueTests(unittest.TestCase):
+    def test_profile_association_does_not_change_a_supplier_lock_contract(self):
+        for identifier in ("mcuboot", "mbedtls", "lwip"):
+            with self.subTest(identifier=identifier):
+                item = catalogue.dependency(identifier)
+                self.assertTrue(item.component_profiles)
+                self.assertFalse(item.component_source)
+                self.assertNotIn(identifier, component_lock.IDENTIFIERS)
+        self.assertTrue(catalogue.dependency("cmsis_dsp").component_source)
+
+    def test_component_profiles_select_all_declared_sources(self):
+        original = catalogue.dependency("cmsis_dsp")
+        changed = replace(original, component_profiles=("cmsis-dsp", "rtt"))
+        entries = tuple(changed if item == original else item
+                        for item in catalogue.ALL_SOURCE_DEPENDENCIES)
+        with patch.object(catalogue, "ALL_SOURCE_DEPENDENCIES", entries):
+            selected = catalogue.runtime_selection(
+                "native", backend="native", components=("rtt",),
+                test_support=True)
+        self.assertTrue({"segger_rtt", "cmsis_dsp"}.issubset(
+            {item.identifier for item in selected}))
+
+    def test_component_profiles_require_an_explicit_runtime_source_lock(self):
+        original = catalogue.dependency("cmsis_dsp")
+        for changes in ({"component_profiles": ["cmsis-dsp"]},
+                        {"component_profiles": ("bad_profile",)},
+                        {"source_lock": None}, {"scope": "inventory"}):
+            with self.subTest(changes=changes):
+                invalid = replace(original, **changes)
+                with self.assertRaisesRegex(ValueError, "Component profile"):
+                    catalogue.validate_catalogue(tuple(
+                        invalid if item == original else item
+                        for item in catalogue.ALL_DEPENDENCIES))
 
     def test_selected_sources_keep_their_reviewed_origin_and_license(self):
         # Admission remains in the selected dependency's verifier. The catalogue
@@ -58,7 +91,8 @@ class SourceCatalogueTests(unittest.TestCase):
             "threadx", "lwip", "mbedtls", "coremqtt", "mcuboot",
             "stm32_usb_host", "stm32_usb_device", "flashdb", "littlefs",
             "fatfs", "sfud", "segger_rtt", "letter_shell", "cm_backtrace",
-            "cmsis_dsp"})
+            "cmsis_dsp", "cmsis_nn", "lsm6dsox", "lvgl", "canopen",
+            "ov2640", "stm32_bsp_common", "cryptoauthlib"})
         self.assertEqual({item.identifier for item in catalogue.HOST_TEST_DEPENDENCIES},
                          {"googletest"})
         self.assertEqual(catalogue.dependency("googletest").scope, "host-test")

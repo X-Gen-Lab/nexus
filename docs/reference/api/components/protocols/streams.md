@@ -7,12 +7,12 @@ source_language: en
 
 (reference.api.components.protocols.streams)=
 
-# Bounded framing, time and byte sessions
+# Bounded protocol and user-interface sessions
 
-These optional C11 mechanisms consume explicit bytes or the existing byte-stream
-face. The application supplies storage, a serialized executor, protocol policy
-and any finite deadlines. They create no UART/socket owner, worker, device scan
-or automatic command replay.
+These optional C11 mechanisms consume explicit bytes, existing byte/CAN faces
+or selected display/input callbacks. The application supplies storage, a
+serialized executor, protocol policy and finite deadlines. They create no
+UART/socket owner, worker, device scan or automatic command replay.
 
 | Target | Header under `nexus/components/` | Selected profile |
 | --- | --- | --- |
@@ -20,6 +20,9 @@ or automatic command replay.
 | `Nexus::WallClock` | `wall_clock.h` | Explicit UTC quality, age/drift uncertainty and 48-byte SNTP v3/v4 server-reply parsing |
 | `Nexus::XModem` | `xmodem.h` | SOH/128-byte/CRC16-XMODEM receive session |
 | `Nexus::ATClient` | `at_client.h` | One command over a caller-supplied `nx_byte_stream_t`, text/URC and explicit binary lengths |
+| `Nexus::UARTByteStream` | `uart_stream.h` | Copied bytes over one existing UART request/RX owner, with explicit service and final TX drain |
+| `Nexus::CANopen` | `canopen.h` | Fixed classic-CAN NMT slave, one heartbeat peer, expedited SDO and asynchronous RPDO/TPDO |
+| `Nexus::LVGL` | `lvgl.h` | Single-owner RGB565 software GUI with caller arena/tile and settled display/input callbacks |
 
 ## Retain frame and response boundaries
 
@@ -37,6 +40,62 @@ responses; there is no assumed module or prompt grammar. A timeout, malformed
 line or stream failure can desynchronize the session after real command effects.
 Recover software parsing only after the product reestablishes the actual module
 boundary and joins transport users; never blindly replay the command.
+
+Selected binary framing is decided before the next byte is consumed, including
+when the header and binary body share one transport read. The exact
+[ESP-AT device](../../../../../components/devices/esp_at/README.md) supplies its
+reviewed grammar; the generic parser does not guess a modem personality.
+
+## Copy UART bytes without replacing its owner
+
+`Nexus::UARTByteStream` returns an existing `nx_byte_stream_t` over the selected
+UART. A successful write copies a bounded prefix into caller-provided staging
+and admits one inner request; it proves neither wire completion nor peer
+delivery. No new write reuses staging before acquire-observed SETTLED. RX loss
+or a short/failed TX closes admission. EMPTY UART RX means BUSY, never EOF.
+
+The task explicitly advances UART-stream service and then the consuming AT
+module. ESP-AT configure, join, connect, send and close preserve each original
+finite deadline. `SEND OK` is module-stack admission. Remote CLOSED permits
+draining copied RX to EOF but is terminal for that session: actual module/UART
+reset and synchronization, joined users and explicit recovery precede another
+configure. Stop continues cancel/service even after a latched fault and retains
+the accepted UART request until SETTLED; it does not stop the outer UART/RX owner.
+
+## Keep CANopen staging separate from product commands
+
+Explicit `nexus_add_canopen()` creates `Nexus::CANopen` from the locked real
+CANopenNode protocol objects. One task owns the existing started CAN port,
+bounded RX/TX slots, private workspace and product OD values. Node ID, peer,
+filters, heartbeat periods and maximum step gap are explicit. The profile has
+one expedited 1/2/4-byte SDO server and one asynchronous PDO per direction,
+each mapping 1..8 bytes; it does not select CiA402, CAN FD or authentication.
+
+RX loss, mailbox overrun, wrong PDO length, bus-off, time discontinuity and TX
+exhaustion close admission. Queued frames retain their first finite deadline.
+Reset is reported and closes admission before SDO/PDO staging writes; no MCU
+reset is executed. Product validation still checks complete command units,
+sequence, epoch and validity before use. NMT Operational is not actuator enable.
+Stop discards unsent copies and drains the original accepted CAN request,
+including service after cancel failure. Reclaim workspace and OD only after
+successful stop and joined callers; the outer CAN owner remains separate.
+
+## Render only in the selected GUI executor
+
+Explicit `nexus_add_lvgl()` creates `Nexus::LVGL`. One task owns GUI calls,
+callbacks and the caller workspace, including the fixed 32 KiB TLSF pool;
+there is no libc heap or worker. Only one live GUI owner is permitted.
+Product UI implementation alone links `Nexus::LVGLProfile` to use selected
+official label/button APIs; ordinary business code keeps Nexus/application types.
+
+The caller supplies an aligned RGB565 tile, explicit elapsed milliseconds and
+a finite service deadline. Settled flush callbacks release every tile reference
+before returning, including errors. Deadline checks cannot preempt rendering
+or widget callbacks. Errors close GUI progress but do not erase the panel's
+recovery duties. Join all widget/event users before stop; successful stop
+invalidates widget pointers and releases arena/tile references. Display, touch
+and bus shutdown remain external. See the [selected GUI contract](../../../../../components/protocols/lvgl/README.md)
+for pool-exhaustion fail-stop and complete scope.
 
 ## Separate local transfer from product update policy
 
@@ -69,8 +128,7 @@ expired or discontinuous time must not become a fabricated usable UTC value.
 Join callbacks and release borrowed views before resetting or reclaiming session
 storage, then close the lower transport under its own contract. Software
 protocol results do not establish physical serial/network timing or device
-qualification; hardware HIL remains `not_executed`. CANopen and additional exact
-device profiles remain `not_selected`.
+qualification; hardware HIL remains `not_executed`.
 
 ## Public declarations
 
@@ -95,5 +153,23 @@ device profiles remain `not_selected`.
 ### at_client.h
 
 ```{doxygenfile} components/protocols/at_client/include/nexus/components/at_client.h
+:project: nexus
+```
+
+### uart_stream.h
+
+```{doxygenfile} components/runtime/uart_stream/include/nexus/components/uart_stream.h
+:project: nexus
+```
+
+### canopen.h
+
+```{doxygenfile} components/protocols/canopen/include/nexus/components/canopen.h
+:project: nexus
+```
+
+### lvgl.h
+
+```{doxygenfile} components/protocols/lvgl/include/nexus/components/lvgl.h
 :project: nexus
 ```

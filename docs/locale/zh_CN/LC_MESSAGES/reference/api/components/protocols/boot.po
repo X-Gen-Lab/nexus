@@ -7,24 +7,24 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 470102e7b79abe38255a7e817837d8b8d28f9e1995a3acb751bbcf46b24329cc\n"
+"X-Nexus-Source-SHA256: 8c58a3bb7e8e2b969b28ed26dee89b65d26cb3ba989a181b56bf7bed3d8cc03a\n"
 
-#: ../../../../../../docs/reference/api/components/protocols/boot.md:10
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:10
 msgid "MCUboot control and Flash composition"
 msgstr "MCUboot 控制与 Flash 装配"
 
-#: ../../../../../../docs/reference/api/components/protocols/boot.md:12
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:12
 msgid ""
 "The stateless control API and concrete Flash composition have separate "
 "responsibilities. Products own authentication policy, image regions, reset "
 "and recovery decisions."
 msgstr "无状态控制 API 与具体 Flash 装配职责独立。产品负责认证策略、镜像区域、复位和恢复决策。"
 
-#: ../../../../../../docs/reference/api/components/protocols/boot.md:16
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:16
 msgid "MCUboot control and explicit Flash composition"
 msgstr "MCUboot 控制与显式 Flash 装配"
 
-#: ../../../../../../docs/reference/api/components/protocols/boot.md:18
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:18
 msgid ""
 "`Nexus::MCUBootControl` exposes the stateless public control API below. It "
 "uses only Nexus types. `Nexus::MCUBootPort` is the separate, concrete Flash "
@@ -35,36 +35,138 @@ msgstr ""
 "是独立的具体 Flash 装配边界；`Nexus::MCUBootBootStorage` 属于独立链接的 boot 镜像。这些 target "
 "均不属于默认平台装配。"
 
-#: ../../../../../../docs/reference/api/components/protocols/boot.md:23
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:23
 msgid ""
 "Use the [canonical MCUboot contract](https://github.com/X-Gen-"
 "Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/components/protocols/mcuboot/README.md) for helper selection, the "
 "boot/application ownership diagram, finite operation and Flash-region "
 "lifetime, partial persistent writes and product recovery duties. The "
-"selected overwrite-only profile supports permanent requests; the control API"
-" does not authenticate a candidate, reset hardware or provide rollback. "
-"Software models and linked-image budgets do not establish physical Flash, "
-"power-cut or HIL qualification."
+"overwrite-only profile supports permanent requests and has no rollback. The "
+"separate [scratch-swap profile](https://github.com/X-Gen-"
+"Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/components/protocols/mcuboot/swap/README.md) adds TEST, explicit "
+"confirmation and unconfirmed revert using real upstream bootutil. Neither "
+"control API authenticates a candidate or resets hardware; the separately "
+"linked boot image owns verification and exchange. The product owns the "
+"decision to accept, execute and confirm an image."
 msgstr ""
-"helper 选择、boot／应用所有权图、有限 operation 与 Flash region 生命周期、部分持久写入和产品恢复责任，以 "
-"[MCUboot 权威合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/components/protocols/mcuboot/README.md)为准。所选覆盖配置支持永久更新请求；控制 API "
-"不鉴别候选镜像、不复位硬件，也不提供回滚。软件模型与已链接镜像预算不建立物理 Flash、掉电或 HIL 资格。"
+"helper 选择、boot／应用所有权图、有限操作与 Flash region 生命周期、部分持久化写入及产品恢复责任见[权威 MCUboot "
+"合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/components/protocols/mcuboot/README.md)。overwrite-only profile "
+"只支持永久请求，不提供回退。独立的 [scratch-swap profile](https://github.com/X-Gen-"
+"Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/components/protocols/mcuboot/swap/README.md)复用真实上游 bootutil，增加 "
+"TEST、显式确认及未确认回退。两种控制 API 均不认证候选或复位硬件；独立链接的 boot 镜像拥有验证与交换。产品决定是否接受、执行和确认镜像。"
 
-#: ../../../../../../docs/reference/api/components/protocols/boot.md:31
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:33
+msgid "Select one profile per final image"
+msgstr "每个最终镜像选择一种 profile"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:0
+msgid "Profile"
+msgstr "Profile"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:0
+msgid "Application targets"
+msgstr "应用目标"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:0
+msgid "Boot target"
+msgstr "Boot 目标"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:0
+msgid "Persistent geometry"
+msgstr "持久化几何"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:0
+msgid "Overwrite-only"
+msgstr "仅覆盖"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:0
+msgid "`Nexus::MCUBootControl`, `Nexus::MCUBootPort`"
+msgstr "`Nexus::MCUBootControl`, `Nexus::MCUBootPort`"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:0
+msgid "`Nexus::MCUBootBootStorage`"
+msgstr "`Nexus::MCUBootBootStorage`"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:0
+msgid "Explicit primary/secondary; permanent request only"
+msgstr "显式 primary／secondary；只接纳永久请求"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:0
+msgid "Scratch swap"
+msgstr "Scratch 交换"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:0
+msgid "`Nexus::MCUBootSwapControl`, `Nexus::MCUBootSwapPort`"
+msgstr "`Nexus::MCUBootSwapControl`, `Nexus::MCUBootSwapPort`"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:0
+msgid "`Nexus::MCUBootSwapBootStorage`"
+msgstr "`Nexus::MCUBootSwapBootStorage`"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:0
+msgid "Explicit primary/secondary/scratch; TEST/PERMANENT, confirm and revert"
+msgstr "显式 primary／secondary／scratch；TEST／PERMANENT、确认与回退"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:40
+msgid ""
+"Use `nexus_add_mcuboot_swap_control()` for application control and "
+"`nexus_add_mcuboot_swap_boot()` for the independent boot profile. CMake "
+"rejects mixing overwrite and swap in one final consumer; separate "
+"executables may select different profiles in the same build graph. Public "
+"types and operation scopes remain separate so an overwrite consumer does not"
+" acquire scratch storage."
+msgstr ""
+"应用控制使用 `nexus_add_mcuboot_swap_control()`，独立 boot profile 使用 "
+"`nexus_add_mcuboot_swap_boot()`。CMake 拒绝在同一最终消费者中混链 overwrite 和 "
+"swap；同一构建图中的不同 executable 可以选择不同 profile。公共类型和操作 scope 保持分离，overwrite 消费者不承担"
+" scratch 存储。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:46
+msgid ""
+"Every Flash operation uses the caller's stable explicit "
+"region/clock/deadline scope through the entire call. A failed request or "
+"confirmation may already have persistent effects; do not retry blindly, "
+"extend the old deadline or infer rollback from an error. A TEST request is "
+"not automatic confirmation. Confirm only after the product validates the "
+"actual running image and its health. On F407, single-bank program/erase can "
+"stall instruction fetch and IRQ service; the operation deadline cannot "
+"preempt a physical programming pulse."
+msgstr ""
+"完整 Flash 调用始终使用调用者稳定且显式的 region／clock／deadline "
+"scope。请求或确认失败可能已产生持久作用；不得盲目重试、延长旧 deadline 或从错误推断写入已回滚。TEST "
+"请求不自动确认；产品验证实际运行镜像及其健康后才允许确认。F407 单 bank 写擦可能停顿取指与 IRQ service；操作 deadline "
+"无法抢占物理编程脉冲。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:54
+msgid ""
+"The reviewed F407ZG swap reference reserves 128 KiB boot, two 384 KiB image "
+"slots and 128 KiB scratch in 1 MiB internal Flash. Its shared layout file "
+"owns linker and region geometry; do not copy those addresses to another part"
+" or existing product layout. Exact model interruption and ARM-linked image "
+"budgets do not establish physical Flash, endurance, power-cut or HIL "
+"qualification."
+msgstr ""
+"已审 F407ZG swap 参考在 1 MiB 内部 Flash 中预留 128 KiB boot、两个 384 KiB 镜像槽及 128 KiB "
+"scratch。共享布局文件拥有链接与 region 几何；不要把这些地址复制到其他器件或已有产品布局。精确模型中断和 ARM 链接镜像预算不建立物理 "
+"Flash、耐久、掉电或 HIL 资格。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:60
 msgid "Public declarations"
 msgstr "公共声明"
 
-#: ../../../../../../docs/reference/api/components/protocols/boot.md:33
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:62
 msgid "mcuboot_control.h"
 msgstr "mcuboot_control.h"
 
-#: ../../../../../../docs/reference/api/components/protocols/boot.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:64
 msgid "Stateless control of a fixed MCUboot overwrite-only image."
 msgstr "固定 MCUboot 覆盖镜像的无状态控制。"
 
-#: ../../../../../../docs/reference/api/components/protocols/boot.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:64
 msgid ""
 "The selected single-image profile supports permanent requests only. This API"
 " neither downloads nor verifies an image, resets hardware, confirms a trial "
@@ -75,41 +177,43 @@ msgstr ""
 "所选单镜像配置仅支持永久更新请求。此 API "
 "不下载或校验镜像、不复位硬件、不确认试运行镜像，也不提供回滚。应用负责授权、有效候选字节、维护调度、平台生命周期和复位策略。作者  Nexus Team"
 
-#: ../../../../../../docs/reference/api/components/protocols/boot.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:64
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:70
 msgid "Nexus Team"
 msgstr "Nexus Team"
 
-#: ../../../../../../docs/reference/api/components/protocols/boot.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:64
 msgid "Enums"
 msgstr "枚举"
 
-#: ../../../../../../docs/reference/api/components/protocols/boot.md:35
-msgid "Requested upgrade behavior; TEST is explicitly unsupported."
-msgstr "请求的更新行为；明确不支持 TEST。"
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:64
+msgid "Upgrade intent; the overwrite-only request API rejects TEST."
+msgstr "更新意图；overwrite-only 请求 API 拒绝 TEST。"
 
-#: ../../../../../../docs/reference/api/components/protocols/boot.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:64
 msgid "Values:"
 msgstr "取值："
 
-#: ../../../../../../docs/reference/api/components/protocols/boot.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:64
 msgid "Upstream observed action, not a physical or image-health verdict."
 msgstr "上游观察到的动作，不是物理或镜像健康结论。"
 
-#: ../../../../../../docs/reference/api/components/protocols/boot.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:64
 msgid ""
 "TEST and REVERT can be observed in foreign trailer metadata; their presence "
 "does not add support for those modes to overwrite-only firmware."
 msgstr "外部 trailer 元数据中可能观察到 TEST 和 REVERT；出现这些值不会为覆盖模式固件增加相应模式支持。"
 
-#: ../../../../../../docs/reference/api/components/protocols/boot.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:64
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:70
 msgid "Functions"
 msgstr "函数"
 
-#: ../../../../../../docs/reference/api/components/protocols/boot.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:64
 msgid "Query upstream's planned action for image zero."
 msgstr "查询上游对镜像零的计划动作。"
 
-#: ../../../../../../docs/reference/api/components/protocols/boot.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:64
 msgid ""
 "Task/boot context only. Caller serializes access and supplies the immutable "
 "Flash operation hook and its finite deadline for the whole call. All "
@@ -121,19 +225,19 @@ msgstr ""
 "deadline。所有被引用的 area、region、时钟与 provider 持续存活至返回。固定上游 API 将不可读的 secondary "
 "trailer 视为空，因此 NONE 不能证明 secondary 可用或镜像有效。"
 
-#: ../../../../../../docs/reference/api/components/protocols/boot.md:0
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:0
 msgid "Parameters"
 msgstr "参数"
 
-#: ../../../../../../docs/reference/api/components/protocols/boot.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:64
 msgid "Receives a value on success only; never retained."
 msgstr "仅在成功时接收值；不保留该指针。"
 
-#: ../../../../../../docs/reference/api/components/protocols/boot.md:0
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:0
 msgid "Returns"
 msgstr "返回值"
 
-#: ../../../../../../docs/reference/api/components/protocols/boot.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:64
 msgid ""
 "NX_SUCCESS for a known action, NX_ERROR_INVALID for NULL, or NX_ERROR_IO for"
 " upstream PANIC, an unknown value or a reported read error."
@@ -141,11 +245,11 @@ msgstr ""
 "已知动作返回 NX_SUCCESS，NULL 返回 NX_ERROR_INVALID，上游 PANIC、未知值或报告的读取错误返回 "
 "NX_ERROR_IO。"
 
-#: ../../../../../../docs/reference/api/components/protocols/boot.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:64
 msgid "Request a permanent upgrade using the upstream public trailer API."
 msgstr "使用上游公共 trailer API 请求永久更新。"
 
-#: ../../../../../../docs/reference/api/components/protocols/boot.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:64
 msgid ""
 "Same serialized finite operation/lifetime contract as query. Return settles "
 "current Flash access; a timeout is not a physical pulse abort. This does not"
@@ -155,11 +259,11 @@ msgstr ""
 "沿用 query 的串行化、有限 operation 与生命周期合同。返回时当前 Flash "
 "访问已结清；超时不是中止物理脉冲。该调用不证明候选真实性、不承诺恢复旧镜像、不续期 deadline、不停止基础设施，也不复位 MCU。"
 
-#: ../../../../../../docs/reference/api/components/protocols/boot.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:64
 msgid "PERMANENT requests an update; TEST rejects without access."
 msgstr "PERMANENT 请求更新；TEST 无访问即拒绝。"
 
-#: ../../../../../../docs/reference/api/components/protocols/boot.md:35
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:64
 msgid ""
 "NX_SUCCESS after upstream completes and reports PERMANENT on readback, "
 "NX_ERROR_UNSUPPORTED for TEST, NX_ERROR_INVALID for an unknown request, "
@@ -170,3 +274,96 @@ msgstr ""
 "上游完成且读回报告 PERMANENT 后返回 NX_SUCCESS；TEST 返回 NX_ERROR_UNSUPPORTED，未知请求返回 "
 "NX_ERROR_INVALID，读回其他已知动作返回 NX_ERROR_STATE，上游错误返回 NX_ERROR_IO。部分持久 trailer "
 "修改后仍可能返回错误，包括不能悄悄提升为永久更新的 pending TEST。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:68
+msgid "mcuboot_swap_control.h"
+msgstr "mcuboot_swap_control.h"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:70
+msgid "Explicit single-image MCUboot scratch trial/confirm control."
+msgstr "显式单镜像 MCUboot scratch 试运行／确认控制。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:70
+msgid "Author  Nexus Team"
+msgstr "作者 Nexus Team"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:70
+msgid "Observe the selected scratch profile's next boot action."
+msgstr "观察选定 scratch profile 的下次启动动作。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:70
+msgid ""
+"Task/boot context, serialized by the product. The immutable three-area "
+"operation, regions, clock and provider live for the entire call. NONE is not"
+" image authenticity or media health; pinned upstream may treat unreadable "
+"secondary metadata as empty. No allocation, worker or hardware start."
+msgstr ""
+"由产品串行化的任务／boot 上下文。不可变三 area 操作、region、clock 与 provider 在完整调用期间保持有效。NONE "
+"不证明镜像真实性或介质健康；锁定上游可能把不可读的 secondary 元数据当作空槽。不分配、不建 worker、不启动硬件。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:70
+msgid "[out] Separate result, unchanged on rejection/error."
+msgstr "[out] 独立结果，拒绝／错误时保持不变。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:70
+msgid "SUCCESS, INVALID or IO for unknown/PANIC/read error."
+msgstr "SUCCESS、INVALID，或未知／PANIC／读错误对应的 IO。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:70
+msgid "Request a trial or permanent scratch swap via upstream API."
+msgstr "通过上游 API 请求试运行或永久 scratch 交换。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:70
+msgid ""
+"Same immutable operation and finite deadline as query. TEST requires "
+"explicit application confirmation after a successful boot, otherwise next "
+"boot reverts. Product owns candidate authentication, health, authorization "
+"and reset. No request validates the image or renews the deadline."
+msgstr ""
+"使用与 query 相同的不可变操作及有限 deadline。TEST "
+"在成功启动后需要应用显式确认，否则下一次启动回退。产品拥有候选认证、健康、授权及复位策略。请求不验证镜像，也不续期 deadline。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:70
+msgid "[in] TEST or PERMANENT; unknown values reject."
+msgstr "[in] TEST 或 PERMANENT；拒绝未知值。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:70
+msgid ""
+"SUCCESS only after matching action readback; IO or STATE may follow partial "
+"persistent trailer modification."
+msgstr "只在动作读回匹配后返回 SUCCESS；IO 或 STATE 之前可能已部分修改持久化 trailer。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:70
+msgid "Observe the primary trailer's confirmation flag."
+msgstr "观察 primary trailer 的确认标志。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:70
+msgid ""
+"Serialized finite operation; this is a trailer observation, not health, "
+"executable identity or physical boot evidence."
+msgstr "串行有限操作；这里只观察 trailer，不证明健康、执行镜像身份或物理启动。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:70
+msgid "[out] Written only for a valid SET/UNSET flag."
+msgstr "[out] 仅对合法 SET／UNSET 标志写入结果。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:70
+msgid "SUCCESS, INVALID, STATE for corrupt flag, or IO."
+msgstr "SUCCESS、INVALID、损坏标志对应的 STATE，或 IO。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:70
+msgid "Confirm the current primary through the official API."
+msgstr "通过官方 API 确认当前 primary。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:70
+msgid ""
+"Product authorizes this only after its health checks and exact running-image"
+" identification. No automatic confirm, reset, replay, Flash rollback or "
+"deadline renewal occurs."
+msgstr "产品仅在健康检查和精确运行镜像身份核对完成后授权调用。不自动确认、复位、重放、回滚 Flash 或续期 deadline。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/components/protocols/boot.md:70
+msgid ""
+"SUCCESS after SET readback, STATE or IO; partial persistent effects remain "
+"possible on failure."
+msgstr "SET 读回后返回 SUCCESS，或返回 STATE／IO；失败仍可能有部分持久化作用。"

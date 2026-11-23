@@ -197,12 +197,14 @@ CONTROLLER_CONTRACTS = MappingProxyType({
         frozenset((
             'binding', 'channels', 'deadtime_ticks', 'exclusive', 'irq',
             'mode', 'period_ticks', 'reference_mv', 'sample_times', 'tick_hz',
-            'trigger_ticks',
+            'trigger_ticks', 'commit_before_ticks', 'compute_budget_ticks',
+            'max_irq_delay_us',
         )),
         frozenset((
             'calls_os', 'channels', 'deadtime_ticks', 'exclusive',
             'irq_priority', 'period_ticks', 'reference_mv', 'sample_times',
             'tick_hz', 'trigger_ticks',
+            'commit_before_ticks', 'compute_budget_ticks', 'max_irq_delay_us',
         )), 'pwm_adc'),
     'can_fd': ControllerContract(
         frozenset((

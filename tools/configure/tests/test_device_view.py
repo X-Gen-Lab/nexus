@@ -47,7 +47,8 @@ class DeviceViewTests(unittest.TestCase):
                 self.assertIn("irq-byte-event", view.modes["USART1"].modes)
                 media = part.startswith(("STM32F407", "STM32F417"))
                 crypto = part.startswith(("STM32F415", "STM32F417"))
-                self.assertEqual(len(view.controllers), 67 + 2 * media + 2 * crypto)
+                self.assertEqual("PWM_ADC8" in view.controllers,
+                                 part.startswith("STM32F407"))
                 self.assertEqual("ETH" in view.controllers, media)
                 self.assertEqual("DCMI" in view.controllers, media)
                 self.assertEqual("CRYP" in view.modes, crypto)

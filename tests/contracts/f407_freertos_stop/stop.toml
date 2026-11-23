@@ -1,0 +1,23 @@
+# Software reference: external LSE input, no physical accuracy qualification.
+schema = 2
+board_package = "board"
+backend = "freertos"
+clock = "hse8-pll168"
+optimization = "Os"
+
+[os]
+profile = "lowpower"
+lowpower_port = "timebase"
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+
+[rtc.calendar]
+binding = "calendar"
+mode = "adopt-retained"
+allow_set = false
+timeout_us = 2000000
+poll_limit = 1000000
+lse_bypass = true
+periodic_wakeup = true

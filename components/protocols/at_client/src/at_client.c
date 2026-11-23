@@ -109,6 +109,57 @@ nx_result_t nx_at_init(nx_at_client_t* c, const nx_at_config_t* config) {
     c->last_time = now;
     return NX_SUCCESS;
 }
+/** \brief Retain only validated readonly tokens outside all live parsing. */
+nx_result_t nx_at_set_framing(nx_at_client_t* c,
+                              const nx_at_framing_t* framing) {
+    if (c == NULL || c->event == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    if (c->failed) {
+        return NX_ERROR_STATE;
+    }
+    if (c->active || c->command_active || c->binary_remaining != 0U ||
+        c->line_size != 0U || c->transmit_offset != c->transmit_size) {
+        return NX_ERROR_BUSY;
+    }
+    if (framing != NULL) {
+        if (overlap(c, sizeof(*c), framing, sizeof(*framing)) ||
+            overlap(c->line, c->line_capacity, framing, sizeof(*framing)) ||
+            overlap(c->transmit, c->transmit_capacity, framing,
+                    sizeof(*framing)) ||
+            (framing->prompt != 0U &&
+             (framing->prompt < 32U || framing->prompt > 126U))) {
+            return NX_ERROR_INVALID;
+        }
+        const char* prefix = framing->binary_prefix;
+        if (prefix != NULL) {
+            if (framing->binary_delimiter < 32U ||
+                framing->binary_delimiter > 126U || prefix[0] == '\0' ||
+                (uint8_t)prefix[0] == framing->prompt) {
+                return NX_ERROR_INVALID;
+            }
+            size_t length = 0U;
+            while (length < c->line_capacity && prefix[length] != '\0') {
+                uint8_t byte = (uint8_t)prefix[length++];
+                if (byte < 32U || byte > 126U ||
+                    byte == framing->binary_delimiter) {
+                    return NX_ERROR_INVALID;
+                }
+            }
+            if (length >= c->line_capacity ||
+                overlap(c, sizeof(*c), prefix, length + 1U) ||
+                overlap(c->line, c->line_capacity, prefix, length + 1U) ||
+                overlap(c->transmit, c->transmit_capacity, prefix,
+                        length + 1U)) {
+                return NX_ERROR_INVALID;
+            }
+        } else if (framing->binary_delimiter != 0U) {
+            return NX_ERROR_INVALID;
+        }
+    }
+    c->framing = framing;
+    return NX_SUCCESS;
+}
 /** \brief Copy a whole command before any byte reaches the transport. */
 nx_result_t nx_at_submit(nx_at_client_t* c, const uint8_t* command, size_t size,
                          nx_time_us_t deadline) {
@@ -204,6 +255,23 @@ static nx_result_t receive(nx_at_client_t* c, const uint8_t* bytes,
             continue;
         }
         uint8_t byte = bytes[i++];
+        if (c->framing != NULL) {
+            if (c->line_size == 0U && c->framing->prompt != 0U &&
+                byte == c->framing->prompt) {
+                emit(c, NX_AT_PROMPT, bytes + i - 1U, 1U, NX_SUCCESS);
+                continue;
+            }
+            if (c->framing->binary_prefix != NULL &&
+                byte == c->framing->binary_delimiter &&
+                prefix(c, c->framing->binary_prefix)) {
+                emit(c, NX_AT_HEADER, c->line, c->line_size, NX_SUCCESS);
+                c->line_size = 0U;
+                if (c->binary_remaining == 0U) {
+                    return fail(c, NX_ERROR_STATE);
+                }
+                continue;
+            }
+        }
         if (byte == '\r') {
             continue;
         }

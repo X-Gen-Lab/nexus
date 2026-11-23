@@ -1,8 +1,9 @@
 """Reviewed source SDK consumer configurations and execution domains."""
 
 from dataclasses import dataclass
+from pathlib import Path
 
-CONSUMER_POLICY = "nexus-sdk-consumers-v30"
+CONSUMER_POLICY = "nexus-sdk-consumers-v32"
 BASE_CONSUMERS = (("native", False, "native"), ("stm32", True, "stm32"))
 MODERN_CONSUMERS = ()
 SELECTED_CONSUMERS = (
@@ -114,6 +115,18 @@ SERVICE_CONSUMERS = (
                     "native-common-components", False, "common_components"),
     ServiceConsumer("f407 common components", "f407.toml",
                     "arm-common-components", True, "common_components"),
+    ServiceConsumer("f407 pwm adc finite", "finite.toml",
+                    "arm-pwm-adc-finite", True, "f4_pwm_adc"),
+    ServiceConsumer("f407 pwm adc loop", "control.toml",
+                    "arm-pwm-adc-loop", True, "f4_pwm_adc_loop"),
+    ServiceConsumer("native smart components", "native.toml",
+                    "native-smart-components", False, "smart_components"),
+    ServiceConsumer("f407 smart components", "f407.toml",
+                    "arm-smart-components", True, "smart_components"),
+    ServiceConsumer("f407 mcuboot swap", "assembly.toml",
+                    "arm-boot-swap", True, "mcuboot_swap"),
+    ServiceConsumer("f407 freertos stop", "stop.toml",
+                    "arm-freertos-stop", True, "f4_freertos_stop"),
 )
 NATIVE_TIME_SMOKES = frozenset({"native-time-pair", "native-time-empty"})
 
@@ -132,3 +145,18 @@ def consumer_plan():
             + tuple(("modern", item) for item in MODERN_CONSUMERS)
             + tuple(("selected", item) for item in SELECTED_CONSUMERS)
             + tuple(("services", item) for item in SERVICE_CONSUMERS))
+
+
+def service_directory(sdk, specification):
+    """Use the single owned scenario tree, including shared F4 references."""
+    if specification.scenario == "f4_qspi_mapped":
+        return Path(sdk) / "tests/contracts/stm32f4_qspi"
+    if specification.scenario == "f4_capture_audio":
+        return Path(sdk) / "tests/contracts/f407_capture_audio"
+    if specification.scenario in {"f4_pwm_adc", "f4_pwm_adc_loop",
+                                  "f4_freertos_stop"}:
+        return Path(sdk) / "tests/contracts" / specification.scenario.replace(
+            "f4_", "f407_", 1)
+    return (Path(sdk) / "tests/contracts" / ("stm32" + specification.scenario)
+            if specification.scenario.startswith("f4_") else
+            Path(sdk) / "cmake/package/verification" / specification.scenario)

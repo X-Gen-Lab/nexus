@@ -81,7 +81,12 @@ const nx_freertos_lowpower_port_t* nx_freertos_lowpower_port(void) {
 
 /** \brief Retain the continuous clock for every outstanding tick/alarm loan. */
 bool nx_stm32_lowpower_busy(void) {
+#if defined(NEXUS_FREERTOS_STOP_SELECTED) && NEXUS_FREERTOS_STOP_SELECTED
+    return s_context.armed || s_context.first_short ||
+           (s_context.paused && !nx_timebase_stop_released(&s_context));
+#else
     return s_context.paused || s_context.armed || s_context.first_short;
+#endif
 }
 
 /** \brief Own only compare acknowledgement; the overflow owner runs first. */

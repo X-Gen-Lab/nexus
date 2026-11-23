@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "kind": "nexus-component-source",
+  "identifier": "lsm6dsox",
+  "path": "vendors/st/lsm6dsox",
+  "upstream_url": "https://github.com/STMicroelectronics/lsm6dsox-pid.git",
+  "fetch_url": "https://github.com/X-Gen-Lab/lsm6dsox-pid.git",
+  "commit": "82e615e799f2683f2e6562c4df7d6193313b15df",
+  "tree": "d50dba989724003af41f032f1df17ee44cbc2951",
+  "license": {
+    "path": "LICENSE",
+    "expression": "BSD-3-Clause"
+  },
+  "files": {
+    "LICENSE": "b54f36a43cf9b8f6292c8f0f3b4c267ebd59859587e0152c94305bc81dda68bc",
+    "lsm6dsox_reg.h": "c3b26d5e87c74cc80f38ad79edc0953fe425dee4c2c4456ad751d2a509092aca",
+    "lsm6dsox_reg.c": "5dba5bdddfb38c38f113653a91bba0a3345259455b93e1293aae6fd779ee3a74"
+  }
+}

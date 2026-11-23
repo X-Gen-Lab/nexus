@@ -9,6 +9,14 @@
 #include "flash_map_backend/flash_map_backend.h"
 #include <errno.h>
 
+#ifdef NEXUS_MCUBOOT_SWAP_SCRATCH
+#include "mcuboot_config/mcuboot_config.h"
+#include "nexus/mcuboot_swap_port.h"
+typedef nx_mcuboot_swap_flash_operation_t operation_t;
+#else
+typedef nx_mcuboot_flash_operation_t operation_t;
+#endif
+
 /** \brief Temporary view of existing facts; never a retained descriptor. */
 typedef struct {
     const nx_flash_geometry_t* geometry;
@@ -69,9 +77,12 @@ static int region_view(const nx_flash_region_t* region, region_view_t* view) {
 }
 
 /** \brief Borrow the product's fixed operation without acquiring hardware. */
-static int current_operation(const nx_mcuboot_flash_operation_t** selected) {
-    const nx_mcuboot_flash_operation_t* operation =
-        nx_mcuboot_flash_operation();
+static int current_operation(const operation_t** selected) {
+#ifdef NEXUS_MCUBOOT_SWAP_SCRATCH
+    const operation_t* operation = nx_mcuboot_swap_flash_operation();
+#else
+    const operation_t* operation = nx_mcuboot_flash_operation();
+#endif
     if (operation == NULL) {
         return -EPERM;
     }
@@ -98,24 +109,62 @@ static int current_operation(const nx_mcuboot_flash_operation_t** selected) {
          secondary->offset < primary->offset + primary->size)) {
         return -EINVAL;
     }
+#ifdef NEXUS_MCUBOOT_SWAP_SCRATCH
+    if (operation->scratch == NULL ||
+        operation->scratch == operation->primary ||
+        operation->scratch == operation->secondary ||
+        operation->scratch->id != NX_MCUBOOT_SCRATCH_AREA_ID) {
+        return -EINVAL;
+    }
+    const nx_flash_region_t* scratch = operation->scratch->region;
+    region_view_t primary_view, secondary_view, scratch_view;
+    if (region_view(primary, &primary_view) != 0 ||
+        region_view(secondary, &secondary_view) != 0 ||
+        region_view(scratch, &scratch_view) != 0 ||
+        scratch->port != primary->port || primary->size != secondary->size ||
+        primary_view.count != secondary_view.count ||
+        primary_view.count > MCUBOOT_MAX_IMG_SECTORS ||
+        scratch_view.count != 1 ||
+        (scratch->offset < primary->offset + primary->size &&
+         primary->offset < scratch->offset + scratch->size) ||
+        (scratch->offset < secondary->offset + secondary->size &&
+         secondary->offset < scratch->offset + scratch->size)) {
+        return -EINVAL;
+    }
+    for (uint32_t index = 0; index < primary_view.count; ++index) {
+        nx_flash_sector_t first, second;
+        if (nx_flash_geometry_sector_at(primary_view.geometry,
+                                        primary_view.first + index,
+                                        &first) != NX_SUCCESS ||
+            nx_flash_geometry_sector_at(secondary_view.geometry,
+                                        secondary_view.first + index,
+                                        &second) != NX_SUCCESS ||
+            first.size != second.size || first.size > scratch->size) {
+            return -EINVAL;
+        }
+    }
+#endif
     *selected = operation;
     return 0;
 }
 
 /** \brief Accept only the exact objects borrowed by this operation. */
 static int selected_area(const struct flash_area* area,
-                         const nx_mcuboot_flash_operation_t** selected) {
+                         const operation_t** selected) {
     int result = current_operation(selected);
     if (result != 0) {
         return result;
     }
     return area == (*selected)->primary || area == (*selected)->secondary
+#ifdef NEXUS_MCUBOOT_SWAP_SCRATCH
+                   || area == (*selected)->scratch
+#endif
                ? 0
                : -EINVAL;
 }
 
 /** \brief Expiry prevents new work and never renews the caller's deadline. */
-static int check_deadline(const nx_mcuboot_flash_operation_t* operation) {
+static int check_deadline(const operation_t* operation) {
     nx_time_us_t now = operation->clock.read(operation->clock.context);
     return nx_deadline_expired(operation->deadline, now) ? -ETIMEDOUT : 0;
 }
@@ -125,7 +174,7 @@ int flash_area_open(uint8_t id, const struct flash_area** area) {
         return -EINVAL;
     }
     *area = NULL;
-    const nx_mcuboot_flash_operation_t* operation = NULL;
+    const operation_t* operation = NULL;
     int result = current_operation(&operation);
     if (result != 0) {
         return result;
@@ -134,6 +183,10 @@ int flash_area_open(uint8_t id, const struct flash_area** area) {
         *area = operation->primary;
     } else if (id == NX_MCUBOOT_SECONDARY_AREA_ID) {
         *area = operation->secondary;
+#ifdef NEXUS_MCUBOOT_SWAP_SCRATCH
+    } else if (id == NX_MCUBOOT_SCRATCH_AREA_ID) {
+        *area = operation->scratch;
+#endif
     } else {
         return -EINVAL;
     }
@@ -148,7 +201,7 @@ void flash_area_close(const struct flash_area* area) {
 
 int flash_area_read(const struct flash_area* area, uint32_t offset, void* data,
                     uint32_t length) {
-    const nx_mcuboot_flash_operation_t* operation = NULL;
+    const operation_t* operation = NULL;
     int result = selected_area(area, &operation);
     if (result == 0) {
         result = check_deadline(operation);
@@ -160,7 +213,7 @@ int flash_area_read(const struct flash_area* area, uint32_t offset, void* data,
 
 int flash_area_write(const struct flash_area* area, uint32_t offset,
                      const void* data, uint32_t length) {
-    const nx_mcuboot_flash_operation_t* operation = NULL;
+    const operation_t* operation = NULL;
     int result = selected_area(area, &operation);
     if (result == 0) {
         result = check_deadline(operation);
@@ -173,7 +226,7 @@ int flash_area_write(const struct flash_area* area, uint32_t offset,
 
 int flash_area_erase(const struct flash_area* area, uint32_t offset,
                      uint32_t length) {
-    const nx_mcuboot_flash_operation_t* operation = NULL;
+    const operation_t* operation = NULL;
     int result = selected_area(area, &operation);
     if (result == 0) {
         result = check_deadline(operation);
@@ -218,7 +271,7 @@ int flash_device_base(uint8_t device_id, uintptr_t* base) {
     if (base == NULL || device_id != 0U) {
         return -EINVAL;
     }
-    const nx_mcuboot_flash_operation_t* operation = NULL;
+    const operation_t* operation = NULL;
     int result = current_operation(&operation);
     if (result != 0) {
         return result;
@@ -267,7 +320,7 @@ int flash_area_get_sector(const struct flash_area* area, uint32_t offset,
     if (sector == NULL) {
         return -EINVAL;
     }
-    const nx_mcuboot_flash_operation_t* operation = NULL;
+    const operation_t* operation = NULL;
     int result = selected_area(area, &operation);
     region_view_t view;
     if (result == 0) {

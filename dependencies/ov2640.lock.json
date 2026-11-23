@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "kind": "nexus-component-source",
+  "identifier": "ov2640",
+  "path": "vendors/st/ov2640",
+  "upstream_url": "https://github.com/STMicroelectronics/stm32-ov2640.git",
+  "fetch_url": "https://github.com/X-Gen-Lab/stm32-ov2640.git",
+  "commit": "aec9e7400350575dbae974faf3db91cd5631d78d",
+  "tree": "fe47239e7ce30919a8af88ba002723b05792c805",
+  "license": {
+    "path": "License.md",
+    "expression": "BSD-3-Clause"
+  },
+  "files": {
+    "License.md": "1a0c3a2cf55d2d808048d452c6598d441f89890d62d0890147459ec6db61037a",
+    "ov2640.h": "5a23ae961a44d8acc716daa9277b3a8b82238cbaf66bd0278dadbfd1c8d798bf",
+    "ov2640.c": "7078bb4360480b25d811541a5bac688457dd844c231e26914bd5630c8275c6ca"
+  }
+}

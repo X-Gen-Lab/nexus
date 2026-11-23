@@ -6,6 +6,7 @@
  * \date            2026-11-07
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "drivers/rtc/rtc_idle.h"
 #include "f407_rtc_model.h"
 #include "nexus/io/rtc_aux.h"
 #include <cstring>
@@ -1428,4 +1429,214 @@ TEST_F(F407Rtc, AuthoredBypassCannotAdoptAnObservedCrystalSource) {
     EXPECT_EQ(0U, g_f407_rtc_model.writes);
     EXPECT_EQ(0U, state.effects);
     EXPECT_FALSE(state.opened);
+}
+
+class F407RtcIdle : public F407Rtc {
+  protected:
+    static constexpr uint32_t wake_line = 1U << 22U;
+    void suspend_idle() {
+        open();
+        const nx_rtc_wakeup_t wake = {true, NX_RTC_WAKE_DIV16, 255};
+        ASSERT_EQ(nx_rtc_port_wakeup(&port, &wake), NX_SUCCESS);
+        ASSERT_EQ(nx_rtc_port_wake_route(&port, NX_RTC_EVENT_WAKEUP),
+                  NX_SUCCESS);
+        ASSERT_EQ(nx_stm32_rtc_suspend(&state), NX_SUCCESS);
+        g_f407_rtc_model.masked = true;
+    }
+    void TearDown() override {
+        g_f407_rtc_model.observe_write = nullptr;
+    }
+};
+
+TEST_F(F407RtcIdle, NominalSampleIsReadOnlyAndKeepsPublicContextRestrictions) {
+    suspend_idle();
+    auto& model = g_f407_rtc_model;
+    model.rtc.SSR = 128;
+    model.rtc.BKP0R = 0x12345678;
+    const auto before = state;
+    const auto writes = model.writes;
+    const auto clocks = model.clock_reads;
+    uint32_t ticks = 0;
+    ASSERT_EQ(nx_stm32_rtc_idle_sample(&port, &ticks), NX_SUCCESS);
+    EXPECT_EQ(ticks, (23U * 3600 + 59U * 60 + 58U) * 256 + 127);
+    EXPECT_EQ(model.writes, writes);
+    EXPECT_EQ(model.clock_reads, clocks);
+    EXPECT_EQ(model.rtc.BKP0R, 0x12345678U);
+    EXPECT_EQ(std::memcmp(&state, &before, sizeof(state)), 0);
+    nx_rtc_snapshot_t snapshot = {};
+    EXPECT_EQ(nx_rtc_port_read(&port, &snapshot), NX_ERROR_CONTEXT);
+}
+
+TEST_F(F407RtcIdle, DayBoundaryIsExplicitModuloNominal256Hz) {
+    suspend_idle();
+    nx_rtc_calendar_t value = {24, 12, 31, 2, 23, 59, 59};
+    nx_f407_rtc_model_calendar(&value);
+    g_f407_rtc_model.rtc.SSR = 0;
+    uint32_t ticks = 0;
+    ASSERT_EQ(nx_stm32_rtc_idle_sample(&port, &ticks), NX_SUCCESS);
+    EXPECT_EQ(ticks, 86400U * 256 - 1);
+    value = {25, 1, 1, 3, 0, 0, 0};
+    nx_f407_rtc_model_calendar(&value);
+    g_f407_rtc_model.rtc.SSR = 255;
+    ASSERT_EQ(nx_stm32_rtc_idle_sample(&port, &ticks), NX_SUCCESS);
+    EXPECT_EQ(ticks, 0U);
+}
+
+TEST_F(F407RtcIdle, RequiresExactMaskedPrivilegedThreadAndDisjointSameOwner) {
+    suspend_idle();
+    auto& model = g_f407_rtc_model;
+    const auto writes = model.writes;
+    uint32_t ticks = 91;
+    model.masked = false;
+    EXPECT_EQ(nx_stm32_rtc_idle_sample(&port, &ticks), NX_ERROR_CONTEXT);
+    model.masked = true;
+    model.basepri = 1;
+    EXPECT_EQ(nx_stm32_rtc_idle_sample(&port, &ticks), NX_ERROR_CONTEXT);
+    model.basepri = 0;
+    model.faultmask = 1;
+    EXPECT_EQ(nx_stm32_rtc_idle_ack(&port), NX_ERROR_CONTEXT);
+    model.faultmask = 0;
+    model.in_isr = true;
+    EXPECT_EQ(nx_stm32_rtc_idle_ack(&port), NX_ERROR_CONTEXT);
+    model.in_isr = false;
+    model.privileged = false;
+    EXPECT_EQ(nx_stm32_rtc_idle_sample(&port, &ticks), NX_ERROR_CONTEXT);
+    model.privileged = true;
+    const auto before = state;
+    EXPECT_EQ(nx_stm32_rtc_idle_sample(&port, &state.effects),
+              NX_ERROR_INVALID);
+    EXPECT_EQ(std::memcmp(&state, &before, sizeof(state)), 0);
+    const nx_rtc_ops_t foreign_ops = {};
+    const nx_rtc_port_t foreign = {&foreign_ops, &state};
+    EXPECT_EQ(nx_stm32_rtc_idle_sample(&foreign, &ticks), NX_ERROR_INVALID);
+    EXPECT_EQ(ticks, 91U);
+    EXPECT_EQ(model.writes, writes);
+}
+
+TEST_F(F407RtcIdle, RejectsWrongProfileAndOutstandingOwnersWithoutWrites) {
+    suspend_idle();
+    auto& model = g_f407_rtc_model;
+    const auto writes = model.writes;
+    uint32_t ticks = 91;
+    state.suspended = false;
+    EXPECT_EQ(nx_stm32_rtc_idle_sample(&port, &ticks), NX_ERROR_STATE);
+    state.suspended = true;
+    model.rtc.WUTR = 254;
+    EXPECT_EQ(nx_stm32_rtc_idle_sample(&port, &ticks), NX_ERROR_STATE);
+    model.rtc.WUTR = 255;
+    model.rtc.CALR = 1;
+    EXPECT_EQ(nx_stm32_rtc_idle_sample(&port, &ticks), NX_ERROR_STATE);
+    model.rtc.CALR = 0;
+    state.active = &request;
+    EXPECT_EQ(nx_stm32_rtc_idle_sample(&port, &ticks), NX_ERROR_STATE);
+    state.active = nullptr;
+    state.sram_ready = true;
+    EXPECT_EQ(nx_stm32_rtc_idle_sample(&port, &ticks), NX_ERROR_STATE);
+    state.sram_ready = false;
+    nx_rtc_standby_t receipt = {};
+    state.standby_receipt = &receipt;
+    EXPECT_EQ(nx_stm32_rtc_idle_sample(&port, &ticks), NX_ERROR_STATE);
+    EXPECT_EQ(model.writes, writes);
+    EXPECT_EQ(ticks, 91U);
+}
+
+TEST_F(F407RtcIdle, UnstableOrMalformedCalendarDoesNotPublishOrRepair) {
+    suspend_idle();
+    auto& model = g_f407_rtc_model;
+    const auto writes = model.writes;
+    uint32_t ticks = 91;
+    model.incoherent = true;
+    EXPECT_EQ(nx_stm32_rtc_idle_sample(&port, &ticks), NX_ERROR_BUSY);
+    model.incoherent = false;
+    model.rtc.SSR = 256;
+    EXPECT_EQ(nx_stm32_rtc_idle_sample(&port, &ticks), NX_ERROR_STATE);
+    model.rtc.SSR = 255;
+    model.rtc.TR = 0x00600000;
+    EXPECT_EQ(nx_stm32_rtc_idle_sample(&port, &ticks), NX_ERROR_STATE);
+    EXPECT_EQ(ticks, 91U);
+    EXPECT_EQ(model.writes, writes);
+}
+
+TEST_F(F407RtcIdle, AcknowledgeKeepsCalendarAndOwnerThenEmptyAckDoesNoWrites) {
+    suspend_idle();
+    auto& model = g_f407_rtc_model;
+    model.rtc.ISR |= RTC_ISR_WUTF;
+    model.exti.PR = wake_line;
+    model.rtc.BKP0R = 0x12345678;
+    const auto before = state;
+    const auto time = model.rtc.TR;
+    const auto date = model.rtc.DR;
+    const auto prescaler = model.rtc.PRER;
+    ASSERT_EQ(nx_stm32_rtc_idle_ack(&port), NX_SUCCESS);
+    EXPECT_EQ(model.rtc.ISR & RTC_ISR_WUTF, 0U);
+    EXPECT_EQ(model.exti.PR, 0U);
+    EXPECT_EQ(model.rtc.TR, time);
+    EXPECT_EQ(model.rtc.DR, date);
+    EXPECT_EQ(model.rtc.PRER, prescaler);
+    EXPECT_EQ(model.rtc.BKP0R, 0x12345678U);
+    EXPECT_TRUE(model.locked);
+    EXPECT_EQ(std::memcmp(&state, &before, sizeof(state)), 0);
+    const auto writes = model.writes;
+    EXPECT_EQ(nx_stm32_rtc_idle_ack(&port), NX_SUCCESS);
+    EXPECT_EQ(model.writes, writes);
+}
+
+TEST_F(F407RtcIdle,
+       ForeignEventsRejectWithoutClearingAndFailedOwnAckStaysLive) {
+    suspend_idle();
+    auto& model = g_f407_rtc_model;
+    model.rtc.ISR |= RTC_ISR_WUTF | RTC_ISR_TSF;
+    model.exti.PR = wake_line | (1U << 3U);
+    const auto writes = model.writes;
+    EXPECT_EQ(nx_stm32_rtc_idle_ack(&port), NX_ERROR_STATE);
+    EXPECT_EQ(model.writes, writes);
+    EXPECT_NE(model.rtc.ISR & RTC_ISR_WUTF, 0U);
+    EXPECT_NE(model.rtc.ISR & RTC_ISR_TSF, 0U);
+    EXPECT_EQ(model.exti.PR, wake_line | (1U << 3U));
+    model.rtc.ISR &= ~static_cast<uint32_t>(RTC_ISR_TSF);
+    model.exti.PR = wake_line;
+    model.hold_clear = true;
+    EXPECT_EQ(nx_stm32_rtc_idle_ack(&port), NX_ERROR_IO);
+    EXPECT_NE(model.rtc.ISR & RTC_ISR_WUTF, 0U);
+    EXPECT_NE(model.exti.PR & wake_line, 0U);
+    EXPECT_TRUE(state.suspended);
+    EXPECT_TRUE(model.locked);
+}
+
+TEST_F(F407RtcIdle, NewForeignEventDuringClearIsPreservedAndReported) {
+    suspend_idle();
+    auto& model = g_f407_rtc_model;
+    model.rtc.ISR |= RTC_ISR_WUTF;
+    model.exti.PR = wake_line;
+    model.observe_write = [](volatile uint32_t* reg, uint32_t) {
+        auto& hardware = g_f407_rtc_model;
+        if (reg == &hardware.rtc.ISR) {
+            hardware.rtc.ISR |= RTC_ISR_TSF;
+            hardware.exti.PR |= 1U << 21U;
+            hardware.observe_write = nullptr;
+        }
+    };
+    EXPECT_EQ(nx_stm32_rtc_idle_ack(&port), NX_ERROR_IO);
+    EXPECT_NE(model.rtc.ISR & RTC_ISR_TSF, 0U);
+    EXPECT_NE(model.exti.PR & (1U << 21U), 0U);
+    const auto writes = model.writes;
+    EXPECT_EQ(nx_stm32_rtc_idle_ack(&port), NX_ERROR_STATE);
+    EXPECT_EQ(model.writes, writes);
+}
+
+TEST_F(F407RtcIdle, WakeRelatchedDuringExtiClearRemainsObservable) {
+    suspend_idle();
+    auto& model = g_f407_rtc_model;
+    model.rtc.ISR |= RTC_ISR_WUTF;
+    model.exti.PR = wake_line;
+    model.observe_write = [](volatile uint32_t* reg, uint32_t) {
+        auto& hardware = g_f407_rtc_model;
+        if (reg == &hardware.exti.PR) {
+            hardware.rtc.ISR |= RTC_ISR_WUTF;
+            hardware.observe_write = nullptr;
+        }
+    };
+    EXPECT_EQ(nx_stm32_rtc_idle_ack(&port), NX_ERROR_IO);
+    EXPECT_NE(model.rtc.ISR & RTC_ISR_WUTF, 0U);
+    EXPECT_TRUE(state.suspended);
 }

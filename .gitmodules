@@ -107,3 +107,31 @@
 [submodule "ext/fatfs"]
 	path = ext/fatfs
 	url = https://github.com/X-Gen-Lab/stm32-mw-fatfs.git
+
+[submodule "vendors/arm/CMSIS_NN"]
+	path = vendors/arm/CMSIS_NN
+	url = https://github.com/X-Gen-Lab/CMSIS-NN.git
+
+[submodule "vendors/st/lsm6dsox"]
+	path = vendors/st/lsm6dsox
+	url = https://github.com/X-Gen-Lab/lsm6dsox-pid.git
+
+[submodule "vendors/lvgl"]
+	path = vendors/lvgl
+	url = https://github.com/X-Gen-Lab/lvgl.git
+
+[submodule "vendors/CANopenNode"]
+	path = vendors/CANopenNode
+	url = https://github.com/X-Gen-Lab/CANopenNode.git
+
+[submodule "vendors/st/ov2640"]
+	path = vendors/st/ov2640
+	url = https://github.com/X-Gen-Lab/stm32-ov2640.git
+
+[submodule "vendors/st/bsp_common"]
+	path = vendors/st/bsp_common
+	url = https://github.com/X-Gen-Lab/stm32-bsp-common.git
+
+[submodule "vendors/microchip/cryptoauthlib"]
+	path = vendors/microchip/cryptoauthlib
+	url = https://github.com/X-Gen-Lab/cryptoauthlib.git

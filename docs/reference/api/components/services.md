@@ -31,6 +31,21 @@ and FatFs consumers supply their operation getter in the same external
 serialization domain and keep its exact scope live for the complete call.
 Do not renew a finite absolute deadline for each vendor callback.
 
+LittleFS and FatFs also provide bounded `read_at` and `append` operations. A
+caller can process a file through fixed-size chunks without loading the whole
+file or retaining an open handle. Argument/admission rejection preserves the
+input byte count; an admitted call reports the confirmed prefix, including on
+error. EOF is SUCCESS with zero bytes, while a starting offset beyond EOF is
+rejected. `append` syncs and closes under the original operation deadline.
+
+A failed append's prefix is not a durable commit or permission to replay:
+media effects may exceed that prefix. FatFs close failure faults the instance
+and rejects new file operations; keep the same volume, operation scope and
+workspace through explicit unmount/recovery. An unmount error retains that
+responsibility. Neither adapter creates a VFS, global file-handle pool or
+background writer. Durable queues, acknowledgements and truncation/retention
+policy remain in the product.
+
 Mount/open failure never authorizes formatting. LittleFS and FatFs format only
 through explicit destructive calls. FlashDB existing-only preserves erased or
 unknown media; create-if-erased is restricted to a wholly erased selected

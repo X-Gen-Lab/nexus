@@ -16,6 +16,27 @@ def load(name):
 
 
 class ClosedF4SDKModesTests(unittest.TestCase):
+    def test_coupled_pwm_adc_profiles_keep_relocatable_inputs_and_provider(self):
+        package, consumers = load("package_source_sdk"), load("verify_consumers")
+        profiles = {item.name: item for item in SERVICE_CONSUMERS}
+        for name, scenario, symbol in (
+                ("f407 pwm adc finite", "f407_pwm_adc", "nx_stm32_pwm_adc_prepare"),
+                ("f407 pwm adc loop", "f407_pwm_adc_loop",
+                 "nx_stm32_pwm_adc_loop_prepare")):
+            with self.subTest(name=name):
+                self.assertIn(name, profiles)
+                profile = profiles[name]
+                self.assertTrue(profile.arm)
+                directory = ROOT / "tests/contracts" / scenario
+                self.assertEqual(consumers.service_directory(ROOT, profile), directory)
+                sources = consumers.service_sources(ROOT, profile)
+                self.assertEqual(set(sources), {"main.c", "board/board.json"})
+                for path in (*sources.values(), directory / profile.assembly):
+                    self.assertTrue(path.is_file())
+                    self.assertIn(path.relative_to(ROOT).as_posix(),
+                                  package.REQUIRED_FILES)
+                self.assertIn(symbol, consumers.service_symbols(profile))
+
     def test_exact_profiles_are_unique_in_the_existing_plan(self):
         expected = {"f479ni qspi mapped cpu", "f407 sd37 dma", "f407 mmc37 irq"}
         selected = [item for item in SERVICE_CONSUMERS if item.name in expected]

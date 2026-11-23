@@ -17,7 +17,7 @@
 extern "C" {
 #endif
 
-/** \brief Requested upgrade behavior; TEST is explicitly unsupported. */
+/** \brief Upgrade intent; the overwrite-only request API rejects TEST. */
 typedef enum {
     NX_MCUBOOT_REQUEST_TEST,
     NX_MCUBOOT_REQUEST_PERMANENT

@@ -114,7 +114,8 @@ class SelectionPolicy:
         Symbol(rtc["controller"])
         for context in (rtc["default_context"], *_mapping(rtc["part_contexts"], "RTC parts").values()):
             _fields(context, {"backend", "profile"},
-                    {"parameters", "forbidden_options", "forbid_auxiliary"})
+                    {"parameters", "forbidden_options", "forbid_auxiliary",
+                     "backend_contexts"})
             if not isinstance(context["backend"], str) or not isinstance(context["profile"], str):
                 fail("RTC context requires explicit backend and profile")
             if "forbid_auxiliary" in context and type(context["forbid_auxiliary"]) is not bool:
@@ -124,6 +125,20 @@ class SelectionPolicy:
             for scalar in _mapping(context.get("parameters", {}), "RTC parameters").values():
                 if type(scalar) not in {bool, int, str}:
                     fail("RTC parameter review requires scalar values")
+            for backend, review in _mapping(
+                    context.get("backend_contexts", {}), "RTC backends").items():
+                if backend not in {"baremetal", "freertos", "threadx", "native"}:
+                    fail("RTC context requires a known backend")
+                _fields(review, {"modes", "kernel_profile", "lowpower_port", "options"})
+                _names(review["modes"], "RTC backend modes")
+                for field in ("kernel_profile", "lowpower_port"):
+                    if not isinstance(review[field], str) or not review[field]:
+                        fail("RTC backend requires an explicit kernel context")
+                for name, scalar in _mapping(review["options"], "RTC backend options").items():
+                    if (not isinstance(name, str) or
+                            re.fullmatch(r"[a-z][a-z0-9_]*", name) is None or
+                            type(scalar) not in {bool, int, str}):
+                        fail("RTC backend options require named scalar values")
         for row in value["contexts"]:
             _fields(row, {"kind", "modes", "backend", "profile"})
             _names(row["modes"], "context modes")
@@ -266,11 +281,19 @@ class SelectionPolicy:
             fail("SDIO IRQs do not call an OS or create a hidden worker")
 
     def validate_context(self, selection, route, *, backend, clock_profile,
-                         part=None, clock_plan=None):
+                         part=None, clock_plan=None, kernel_profile=None):
         if route["kind"] == "rtc":
             rtc = self.data["rtc"]
             value = rtc["part_contexts"].get(part, rtc["default_context"])
-            if backend != value["backend"] or clock_profile != value["profile"]:
+            review = value.get("backend_contexts", {}).get(backend)
+            reviewed_backend = backend == value["backend"] or (
+                review is not None and kernel_profile is not None and
+                kernel_profile.profile == review["kernel_profile"] and
+                getattr(kernel_profile, "lowpower_port", None) == review["lowpower_port"] and
+                selection.get("mode") in review["modes"] and
+                all(selection.get(name) == expected
+                    for name, expected in review["options"].items()))
+            if not reviewed_backend or clock_profile != value["profile"]:
                 fail("RTC requires its reviewed RUN ownership")
             if (value.get("forbid_auxiliary", False) and
                     (clock_plan is None or clock_plan.pll_sai is not None) or

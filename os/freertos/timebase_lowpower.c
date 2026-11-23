@@ -141,6 +141,48 @@ nx_result_t nx_timebase_pause_tick(void* context,
     return NX_SUCCESS;
 }
 
+/** \brief Transfer the same paused source, never a second tick owner. */
+nx_result_t nx_timebase_stop_handoff(void* context) {
+    nx_timebase_lowpower_t* state = context;
+    if (!valid(state))
+        return NX_ERROR_INVALID;
+    if (!state->paused || state->armed || state->first_short ||
+        state->stop_handoff)
+        return NX_ERROR_STATE;
+    const nx_timebase_registers_t* r = state->registers;
+    if ((NX_TIMEBASE_READ(r->pending) & NX_TICK_PENDING) != 0u ||
+        (NX_TIMEBASE_READ(r->tick_control) &
+         (NX_TICK_COUNT_FLAG | NX_TICK_ENABLE)) != 0u)
+        return NX_ERROR_BUSY;
+    NX_TIMEBASE_WRITE(r->tick_control, state->saved_control & ~UINT32_C(3));
+    nx_arch_dsb();
+    if ((NX_TIMEBASE_READ(r->tick_control) & NX_TICK_REQUIRED) !=
+            (state->saved_control & ~UINT32_C(3)) ||
+        (NX_TIMEBASE_READ(r->pending) & NX_TICK_PENDING) != 0u)
+        return NX_ERROR_IO;
+    state->stop_handoff = true;
+    return NX_SUCCESS;
+}
+
+/** \brief This receipt is inspected by the sole System clock owner. */
+bool nx_timebase_stop_released(const nx_timebase_lowpower_t* state) {
+    return valid(state) && state->paused && state->stop_handoff &&
+           !state->armed && !state->first_short &&
+           (NX_TIMEBASE_READ(state->registers->tick_control) &
+            (UINT32_C(3) | NX_TICK_COUNT_FLAG)) == 0u &&
+           (NX_TIMEBASE_READ(state->registers->pending) & NX_TICK_PENDING) ==
+               0u;
+}
+
+/** \brief Only deep STOP explicitly discards fractional phase at rebase. */
+void nx_timebase_stop_resume(void* context, uint64_t next_tick_us) {
+    nx_timebase_lowpower_t* state = context;
+    if (!nx_timebase_stop_released(state))
+        protocol_fault();
+    state->phase_cycles = 0U;
+    nx_timebase_resume_tick(state, next_tick_us);
+}
+
 /** \brief Remove exactly the owned compare wake, never the shared update flag.
  */
 void nx_timebase_disarm(void* context) {
@@ -168,7 +210,7 @@ nx_result_t nx_timebase_arm_deadline(void* context, uint64_t deadline_us) {
     if (!valid(state)) {
         return NX_ERROR_INVALID;
     }
-    if (!state->paused || state->armed) {
+    if (!state->paused || state->armed || state->stop_handoff) {
         return NX_ERROR_STATE;
     }
     const nx_timebase_registers_t* r = state->registers;
@@ -260,6 +302,7 @@ void nx_timebase_resume_tick(void* context, uint64_t next_tick_us) {
     }
     state->first_short = cycles != r->full_reload + 1u;
     state->paused = false;
+    state->stop_handoff = false;
 }
 
 /** \brief Shared timer IRQ dispatch has no kernel Tick or broadcast behavior.

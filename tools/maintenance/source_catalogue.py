@@ -30,41 +30,86 @@ class SourceDependency:
     submodule_name: str | None = None
     alias_of: str | None = None
     paired_driver_checker: str | None = None
+    component_profiles: tuple[str, ...] = ()
+    component_source: bool = False
 
 
 ALL_DEPENDENCIES = (
     SourceDependency("flashdb", "ext/flashdb",
         "https://github.com/armink/FlashDB.git",
         "https://github.com/X-Gen-Lab/FlashDB.git",
-        "runtime", "LICENSE", "dependencies/flashdb.lock.json"),
+        "runtime", "LICENSE", "dependencies/flashdb.lock.json",
+        component_profiles=("flashdb",), component_source=True),
     SourceDependency("segger_rtt", "ext/segger-rtt",
         "https://github.com/SEGGERMicro/RTT.git",
         "https://github.com/X-Gen-Lab/RTT.git",
-        "runtime", "LICENSE.md", "dependencies/segger-rtt.lock.json"),
+        "runtime", "LICENSE.md", "dependencies/segger-rtt.lock.json",
+        component_profiles=("rtt",), component_source=True),
     SourceDependency("cm_backtrace", "ext/cm_backtrace",
         "https://github.com/armink/CmBacktrace.git",
         "https://github.com/X-Gen-Lab/CmBacktrace.git",
-        "runtime", "LICENSE", "dependencies/cm-backtrace.lock.json"),
+        "runtime", "LICENSE", "dependencies/cm-backtrace.lock.json",
+        component_profiles=("cm-backtrace",), component_source=True),
     SourceDependency("letter_shell", "ext/letter_shell",
         "https://github.com/NevermindZZT/letter-shell.git",
         "https://github.com/X-Gen-Lab/letter-shell.git",
-        "runtime", "LICENSE", "dependencies/letter-shell.lock.json"),
+        "runtime", "LICENSE", "dependencies/letter-shell.lock.json",
+        component_profiles=("shell",), component_source=True),
     SourceDependency("cmsis_dsp", "vendors/arm/CMSIS_DSP",
         "https://github.com/ARM-software/CMSIS-DSP.git",
         "https://github.com/X-Gen-Lab/CMSIS-DSP.git",
-        "runtime", "LICENSE", "dependencies/cmsis-dsp.lock.json"),
+        "runtime", "LICENSE", "dependencies/cmsis-dsp.lock.json",
+        component_profiles=("cmsis-dsp",), component_source=True),
     SourceDependency("littlefs", "ext/littlefs",
         "https://github.com/littlefs-project/littlefs.git",
         "https://github.com/X-Gen-Lab/littlefs.git",
-        "runtime", "LICENSE.md", "dependencies/littlefs.lock.json"),
+        "runtime", "LICENSE.md", "dependencies/littlefs.lock.json",
+        component_profiles=("littlefs",), component_source=True),
     SourceDependency("sfud", "ext/sfud",
         "https://github.com/armink/SFUD.git",
         "https://github.com/X-Gen-Lab/SFUD.git",
-        "runtime", "LICENSE", "dependencies/sfud.lock.json"),
+        "runtime", "LICENSE", "dependencies/sfud.lock.json",
+        component_profiles=("sfud",), component_source=True),
     SourceDependency("fatfs", "ext/fatfs",
         "https://github.com/STMicroelectronics/stm32-mw-fatfs.git",
         "https://github.com/X-Gen-Lab/stm32-mw-fatfs.git",
-        "runtime", "LICENSE.md", "dependencies/fatfs.lock.json"),
+        "runtime", "LICENSE.md", "dependencies/fatfs.lock.json",
+        component_profiles=("fatfs",), component_source=True),
+    SourceDependency("cmsis_nn", "vendors/arm/CMSIS_NN",
+        "https://github.com/ARM-software/CMSIS-NN.git",
+        "https://github.com/X-Gen-Lab/CMSIS-NN.git",
+        "runtime", "LICENSE", "dependencies/cmsis-nn.lock.json",
+        component_profiles=("cmsis-nn",), component_source=True),
+    SourceDependency("lsm6dsox", "vendors/st/lsm6dsox",
+        "https://github.com/STMicroelectronics/lsm6dsox-pid.git",
+        "https://github.com/X-Gen-Lab/lsm6dsox-pid.git",
+        "runtime", "LICENSE", "dependencies/lsm6dsox.lock.json",
+        component_profiles=("lsm6dsox",), component_source=True),
+    SourceDependency("lvgl", "vendors/lvgl",
+        "https://github.com/lvgl/lvgl.git",
+        "https://github.com/X-Gen-Lab/lvgl.git",
+        "runtime", "LICENCE.txt", "dependencies/lvgl.lock.json",
+        component_profiles=("lvgl",), component_source=True),
+    SourceDependency("canopen", "vendors/CANopenNode",
+        "https://github.com/CANopenNode/CANopenNode.git",
+        "https://github.com/X-Gen-Lab/CANopenNode.git",
+        "runtime", "LICENSE", "dependencies/canopen.lock.json",
+        component_profiles=("canopen",), component_source=True),
+    SourceDependency("ov2640", "vendors/st/ov2640",
+        "https://github.com/STMicroelectronics/stm32-ov2640.git",
+        "https://github.com/X-Gen-Lab/stm32-ov2640.git",
+        "runtime", "License.md", "dependencies/ov2640.lock.json",
+        component_profiles=("ov2640",), component_source=True),
+    SourceDependency("stm32_bsp_common", "vendors/st/bsp_common",
+        "https://github.com/STMicroelectronics/stm32-bsp-common.git",
+        "https://github.com/X-Gen-Lab/stm32-bsp-common.git",
+        "runtime", "camera.h", "dependencies/stm32-bsp-common.lock.json",
+        component_profiles=("ov2640",), component_source=True),
+    SourceDependency("cryptoauthlib", "vendors/microchip/cryptoauthlib",
+        "https://github.com/MicrochipTech/cryptoauthlib.git",
+        "https://github.com/X-Gen-Lab/cryptoauthlib.git",
+        "runtime", "license.txt", "dependencies/cryptoauthlib.lock.json",
+        component_profiles=("atecc608b",), component_source=True),
     SourceDependency("stm32f1_cmsis", "vendors/st/cmsis_device_f1",
         "https://github.com/STMicroelectronics/cmsis-device-f1.git",
         "https://github.com/X-Gen-Lab/cmsis-device-f1.git",
@@ -93,11 +138,13 @@ ALL_DEPENDENCIES = (
     SourceDependency("stm32_usb_device", "vendors/st/usb_device",
         "https://github.com/STMicroelectronics/stm32-mw-usb-device.git",
         "https://github.com/X-Gen-Lab/stm32-mw-usb-device.git",
-        "runtime", "LICENSE.md", "dependencies/stm32-usb-device.lock.json"),
+        "runtime", "LICENSE.md", "dependencies/stm32-usb-device.lock.json",
+        component_profiles=('st-usb-device',)),
     SourceDependency("stm32_usb_host", "vendors/st/usb_host",
         "https://github.com/STMicroelectronics/stm32-mw-usb-host.git",
         "https://github.com/X-Gen-Lab/stm32-mw-usb-host.git",
-        "runtime", "LICENSE.md", "dependencies/stm32-usb-host.lock.json"),
+        "runtime", "LICENSE.md", "dependencies/stm32-usb-host.lock.json",
+        component_profiles=('st-usb-host',)),
     SourceDependency("threadx", "ext/threadx",
         "https://github.com/eclipse-threadx/threadx.git",
         "https://github.com/X-Gen-Lab/threadx.git",
@@ -149,19 +196,23 @@ ALL_DEPENDENCIES = (
     SourceDependency("lwip", "ext/lwip",
         "https://github.com/lwip-tcpip/lwip.git",
         "https://github.com/X-Gen-Lab/lwip.git",
-        "runtime", "COPYING", "dependencies/lwip.lock.json"),
+        "runtime", "COPYING", "dependencies/lwip.lock.json",
+        component_profiles=('network', 'network-loaned-rx')),
     SourceDependency("mbedtls", "ext/mbedtls",
         "https://github.com/Mbed-TLS/mbedtls.git",
         "https://github.com/X-Gen-Lab/mbedtls.git",
-        "runtime", "LICENSE", "dependencies/mbedtls.lock.json"),
+        "runtime", "LICENSE", "dependencies/mbedtls.lock.json",
+        component_profiles=('tls',)),
     SourceDependency("coremqtt", "ext/coremqtt",
         "https://github.com/FreeRTOS/coreMQTT.git",
         "https://github.com/X-Gen-Lab/coreMQTT.git",
-        "runtime", "LICENSE", "dependencies/coremqtt.lock.json"),
+        "runtime", "LICENSE", "dependencies/coremqtt.lock.json",
+        component_profiles=('mqtt',)),
     SourceDependency("mcuboot", "ext/mcuboot",
         "https://github.com/mcu-tools/mcuboot.git",
         "https://github.com/X-Gen-Lab/mcuboot.git",
-        "runtime", "LICENSE", "dependencies/mcuboot.lock.json"),
+        "runtime", "LICENSE", "dependencies/mcuboot.lock.json",
+        component_profiles=('mcuboot', 'mcuboot-swap')),
     SourceDependency("tf_psa_crypto", "ext/mbedtls/tf-psa-crypto",
         "https://github.com/Mbed-TLS/TF-PSA-Crypto.git",
         "https://github.com/X-Gen-Lab/TF-PSA-Crypto.git",
@@ -246,6 +297,17 @@ def validate_catalogue(entries):
             _relative(item.submodule_name)
         if item.scope not in {"runtime", "host-test", "inventory"}:
             raise ValueError("Unsupported source dependency scope")
+        if (not isinstance(item.component_profiles, tuple) or
+                any(not isinstance(profile, str) or not re.fullmatch(
+                    r"[a-z][a-z0-9]*(?:-[a-z0-9]+)*", profile)
+                    for profile in item.component_profiles) or
+                len(set(item.component_profiles)) != len(item.component_profiles) or
+                (item.component_profiles and
+                 (item.scope != "runtime" or item.source_lock is None))):
+            raise ValueError("Component profile requires a locked runtime source")
+        if (type(item.component_source) is not bool or
+                (item.component_source and not item.component_profiles)):
+            raise ValueError("Component profile source contract is invalid")
         for url in (item.upstream_url, item.fetch_url):
             _url(url)
     for item in entries:
@@ -357,16 +419,8 @@ def runtime_selection(family, *, backend, components=(), test_support=False,
         raise ValueError("Package requires an unreviewed runtime dependency")
     if backend not in {"baremetal", "native"}:
         identifiers.add(backend)
-    suppliers = {"network": "lwip", "network-loaned-rx": "lwip",
-                 "tls": "mbedtls", "mqtt": "coremqtt", "mcuboot": "mcuboot",
-                 "st-usb-host": "stm32_usb_host",
-                 "st-usb-device": "stm32_usb_device",
-                 "flashdb": "flashdb", "littlefs": "littlefs",
-                 "fatfs": "fatfs", "sfud": "sfud",
-                 "rtt": "segger_rtt", "shell": "letter_shell",
-                 "cm-backtrace": "cm_backtrace", "cmsis-dsp": "cmsis_dsp"}
-    identifiers.update(suppliers[value] for value in components
-                       if value in suppliers)
+    identifiers.update(item.identifier for item in ALL_SOURCE_DEPENDENCIES
+                       if set(item.component_profiles).intersection(components))
     if test_support and not native:
         identifiers.add("googletest")
     return tuple(item for item in ALL_SOURCE_DEPENDENCIES

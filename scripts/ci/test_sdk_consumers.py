@@ -2,6 +2,7 @@
 
 import json
 from pathlib import Path
+import shutil
 import subprocess
 import tempfile
 import tomllib
@@ -29,6 +30,12 @@ class SDKChangeTests(unittest.TestCase):
                             "commit", "--allow-empty", "-qm", "SDK input"], cwd=root, check=True)
             head = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root,
                                            text=True).strip()
+            fixtures = Path(__file__).resolve().parents[2]
+            for name in ("cmake/package/verification", "tests/contracts"):
+                for source in (fixtures / name).rglob("*.toml"):
+                    target = root / source.relative_to(fixtures)
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copyfile(source, target)
             fake_head = [head]
             actions = []
 
@@ -55,12 +62,31 @@ class SDKChangeTests(unittest.TestCase):
                         "st-usb-device", "st-usb-host", "tls"}
             consumers = (Path(__file__).resolve().parents[2] /
                          "cmake/package/verification/common_components")
-            for assembly in ("native.toml", "f407.toml"):
-                required.update(tomllib.loads((consumers / assembly).read_text())["components"])
+            for scenario in ("common_components", "smart_components"):
+                for assembly in ("native.toml", "f407.toml"):
+                    path = consumers.parent / scenario / assembly
+                    required.update(tomllib.loads(path.read_text())["components"])
+            path = consumers.parent / "mcuboot_swap/assembly.toml"
+            required.update(tomllib.loads(path.read_text())["components"])
             for call in actions[:2]:
                 components = {call[index + 1] for index, item in enumerate(call)
                               if item == "--component"}
                 self.assertEqual(components, required)
+            # Read this checkout's authored selection, not this test module's
+            # source root or every supplier retained in the catalogue.
+            for assembly in ("native.toml", "f407.toml"):
+                path = (root / "cmake/package/verification/smart_components" /
+                        assembly)
+                path.write_text(path.read_text().replace(
+                    '"cmsis-nn"', '"ov2640"'))
+            actions.clear()
+            sdk_consumers.verify_checkout(root, head, None,
+                                         Path(parent) / "changed", run=run)
+            for call in actions[:2]:
+                components = {call[index + 1] for index, item in enumerate(call)
+                              if item == "--component"}
+                self.assertEqual(components,
+                                 required - {"cmsis-nn"} | {"ov2640"})
             actions.clear()
             fake_head[0] = "c" * 40
             with self.assertRaisesRegex(ValueError, "revision"):

@@ -201,6 +201,19 @@ owner、等待和调度为显式选择，不形成额外的必经转发层。
 
 [可编辑 DOT](../assets/diagrams/platform-runtime.dot)。
 
+(fig-34-control-smart-devices)=
+## FIG-34 控制与智能器件的执行和退出
+
+实线表示调用或执行，虚线表示借用或退出责任。应用选择慢路径组件和精确快环模式，
+提供执行者与全部存储；既有 I/O face 进入唯一硬件 provider。ADC IRQ 只运行已预算
+的 compute，不调用 GUI、网络或存储。停止输出与借用退出分别证明，失败保留原引用。
+图表达当前软件组合，不把全部可选路径变成默认层，也不授予实板或电机控制资格。
+使用步骤见[控制与智能器件](../guides/control-and-smart-devices.md)。
+
+![FIG-34：控制与智能器件的执行和退出](../assets/diagrams/control-smart-devices.svg)
+
+[可编辑 DOT](../assets/diagrams/control-smart-devices.dot)。
+
 ## 图资源维护
 
 每图维护 `.dot`、`.svg` 和 `.labels.json` 同名三件套，图索引完整登记。

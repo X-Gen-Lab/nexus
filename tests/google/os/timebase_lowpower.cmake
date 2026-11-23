@@ -79,6 +79,7 @@ foreach(timebase_family stm32f4)
         ${timebase_target}
         PRIVATE
             NEXUS_TIMEBASE_LOWPOWER=1
+            NEXUS_FREERTOS_STOP_SELECTED=1
             NX_TIMEBASE_INTEGRATION
             NX_TEST_SYSTEM_TIM5=1
     )

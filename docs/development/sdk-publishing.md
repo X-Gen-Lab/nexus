@@ -14,48 +14,50 @@ source_language: zh_CN
 
 默认导出是精简 F4 裸机源码包；Native 模型和中间件须明确选入。包内容来源于
 package 导出声明、选中依赖和许可记录，CMake 继续拥有源码／链接图。
-完整维护消费者计划还需要 FreeRTOS、Native 和下列组件；从平台根执行：
+完整维护消费者计划还需要 FreeRTOS、Native 和所用组件的供应方。从干净、已提交的
+完整检出根目录执行：
 
 ```sh
-python tools/dev/dev.py prepare --scope sdk --backend freertos --host-support \
-  --component network --component network-loaned-rx --component tls \
-  --component mqtt --component mcuboot --component st-usb-device \
-  --component st-usb-host --component flashdb --component littlefs \
-  --component fatfs --component sfud --component rtt --component shell \
-  --component cmsis-dsp --component cm-backtrace --allow-network
+NEXUS_BUILD_JOBS=2 python scripts/ci/sdk_consumers.py --all --allow-network \
+  --output build/quality/sdk-consumers
+```
+
+入口从维护消费者的装配声明及显式 CMake helper 需求选择供应方，准备依赖、导出并
+搬迁临时 SDK，核对源码提交后执行完整计划。未被消费者选择的库存不进入这份 SDK。
+`NEXUS_BUILD_JOBS` 是本次消费者执行的总 worker 预算；同时执行其他工作时由协调者
+分配预算。
+
+当前完整计划由 `tools/maintenance/consumer_profiles.py` 维护。读取新生成的
+`verification.json`、每条命令退出码、Native 运行结果、MCU ELF／BIN／map 和
+资源报告。不要缓存成功报告、过滤完整验收或把缺失执行补成通过。
+
+## 单独导出产品范围
+
+以下命令仅演示默认 F4 裸机产品包，不执行完整维护计划。普通应用只交付自己实际
+选定的组件；需要其他组件或 Native 支撑时，在准备和导出时使用相同显式选择。
+从干净、已提交的平台根目录执行：
+
+```sh
+python tools/dev/dev.py prepare --scope sdk --backend baremetal --allow-network
 python cmake/package/package_source_sdk.py --source . --output /tmp/nexus-sdk-export \
-  --package stm32f4 --backend freertos --host-support \
-  --component network --component network-loaned-rx --component tls \
-  --component mqtt --component mcuboot --component st-usb-device \
-  --component st-usb-host --component flashdb --component littlefs \
-  --component fatfs --component sfud --component rtt --component shell \
-  --component cmsis-dsp --component cm-backtrace
+  --package stm32f4 --backend baremetal
 ```
 
 输出路径必须属于本次任务且尚未存在。制作器核对 clean source、gitlink、选中递归
 依赖与许可，记录精确 source revision／tree。默认包不能借完整计划的名义跳过缺失
 消费者；小型包的完整性与其产品消费范围分别验收。
-完整维护计划的 common-components 消费者需要上述八个新增依赖 profile；默认精简包
-不包含它们，不能用于这份完整计划。Native 场景不选择 CmBacktrace；对应 F407
-场景显式选择它。普通应用继续只交付自己实际选定的组件。
 
-## 搬迁并执行实际消费者
+## 搬迁并核对产品交付
 
 ```sh
 mv /tmp/nexus-sdk-export /tmp/nexus-sdk-relocated
 python cmake/package/package_source_sdk.py \
   --verify /tmp/nexus-sdk-relocated/share/nexus/src
-python cmake/package/verify_consumers.py \
-  --prefix /tmp/nexus-sdk-relocated --output build/sdk-consumers \
-  --parallel 2
-python cmake/package/package_source_sdk.py \
-  --verify /tmp/nexus-sdk-relocated/share/nexus/src
 ```
 
-当前完整计划由 `tools/maintenance/consumer_profiles.py` 维护。读取新生成的
-`verification.json`、每条命令退出码、Native 运行结果、MCU ELF／BIN／map 和
-资源报告。`--parallel` 是该调用的总 worker 预算；同时执行其他工作时由协调者
-分配预算。不要缓存成功报告、过滤完整验收或把缺失执行补成通过。
+按[使用 Source SDK](../guides/use-source-sdk.md)配置、构建并执行所选产品消费者，
+消费后再次核验整个 prefix。自动完整计划的结果仅属于它实际导出的 SDK，不能代替
+这份产品包的消费结果。
 
 SDK prefix 与验证输出必须是独立、无 symlink 别名的规范路径，不互相包含。路径
 拒绝不清除无关目录；已接纳的验证器只管理自己的输出。

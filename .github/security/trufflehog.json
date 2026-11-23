@@ -4,5 +4,16 @@
   "archive_url": "https://github.com/trufflesecurity/trufflehog/releases/download/v3.99.1/trufflehog_3.99.1_linux_amd64.tar.gz",
   "archive_sha256": "a15492ba041e4574ed604ba52a6a49b5f628ff0f13833c18e3cb617021c37d86",
   "binary_sha256": "df190aa9f2833297dca7d287c3ba274819d17002f18b938421f594e453f60d83",
-  "reviewed_unknowns": []
+  "reviewed_unknowns": [
+    {
+      "detector": "URI",
+      "detector_type": 17,
+      "source_type": 16,
+      "path": "tools/testing/test_dependency_preparation.py",
+      "function": "test_remote_failure_reports_dependency_without_private_diagnostics",
+      "raw_sha256": "9a093f5f3e01a3ecdb52be1d02ecbf1701b7f242bb7b84e360572cd8f7d59661",
+      "context_sha256": "0f811a1c35010c474caab9fc995a2c56c5ac560d20e4b90e14e95769866095d0",
+      "reason": "Public synthetic example.invalid credential URI in the dependency remote-error regression verifies that private Git diagnostics are not exposed; no live account or endpoint is represented."
+    }
+  ]
 }

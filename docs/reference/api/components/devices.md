@@ -26,6 +26,13 @@ contract.
 | `Nexus::TMP117`, `Nexus::TMP117I2C` | `tmp117.h`, `tmp117_i2c.h` | [One-shot temperature and existing offset verification](../../../../components/devices/tmp117/README.md) |
 | `Nexus::DP83848` | `nexus/dp83848/dp83848.h` | [Explicit PHY reset, negotiation and link observation](../../../../components/devices/dp83848/README.md) |
 | `Nexus::SFUD` | `sfud.h` | Selected upstream W25Q128JV algorithms behind the existing SPI owner |
+| `Nexus::AS5047P` | `as5047p.h` | Pipelined 14-bit angle, parity/error and diagnostic checks; explicit electrical SPI preconditions |
+| `Nexus::INA226` | `ina226.h` | Triggered shunt/bus/current/power snapshot with explicit calibration and ready/overflow checks |
+| `Nexus::LSM6DSOX`, `Nexus::LSM6DSOXI2C`, `Nexus::LSM6DSOXSPI` | `lsm6dsox.h`, `lsm6dsox_i2c.h`, `lsm6dsox_spi.h` | Selected ST direct samples or uncompressed tagged FIFO, with explicit reset and loss boundaries |
+| `Nexus::OV2640` | `ov2640.h` | Selected official RGB565 control tables over settled SCCB; capture remains a separate owner |
+| `Nexus::WM8978` | `wm8978.h` | Bounded staged headphone playback control; PCM and physical settling remain external |
+| `Nexus::ESPAT` | `esp_at.h` | Exact ESP32-C3-MINI-1 ESP-AT 4.1.1.0, one copied TCP session over an existing UART stream |
+| `Nexus::ATECC608B` | `atecc608b.h` | Already provisioned and locked B-revision P256 key; public identity and opaque signer, no provisioning |
 
 Reference assemblies and software tests do not establish fitted-part identity,
 electrical timing, calibration or physical HIL. Panel, touch, sensor and decoded
@@ -134,6 +141,46 @@ scheduling margin. Power-up readiness requires 1.5 ms and is reported through
 bus/EEPROM status rather than a hidden sleep.
 
 
+## Exact control, sensing and identity profiles
+
+[AS5047P](../../../../components/devices/as5047p/README.md) reads a command and
+then a separate response frame. The old pipeline response is not the requested
+angle. A binding must establish mode 1, MSB-first, at most 10 MHz and the
+datasheet's CS setup/inactive/hold timing; a generic F4 SPI endpoint does not
+establish that timing by its existence. Raw counts are not calibrated position.
+[INA226](../../../../components/devices/ina226/README.md) uses one triggered
+shunt/bus conversion, verifies calibration/configuration and propagates not-ready
+and overflow. It is a power monitor, not a FOC phase-current sampler.
+
+[LSM6DSOX](../../../../components/devices/lsm6dsox/README.md) selects 104 Hz,
+±4 g and ±500 deg/s. DIRECT reads do not promise simultaneous six-axis capture.
+FIFO vectors and 25 µs nominal timestamp ticks are independent tagged records;
+the application establishes pairing, rollover handling and clock mapping. Loss
+closes publication until explicit stop/reset/start. Read-completion time is not
+the sample aperture. Calibration, mounting rotation and relative attitude stay
+in the caller's algorithm state.
+
+[OV2640](../../../../components/devices/ov2640/README.md) controls the selected
+official RGB565 modes; DCMI, frame storage, DMA and consumers remain separately
+owned. [WM8978](../../../../components/devices/wm8978/README.md) stages mute,
+VMID wait and selected slave-I2S stereo playback control. Neither creates a
+capture/audio transport. Current Qiming V4.1 references authorize control lines
+only; they do not establish fitted modules or complete DVP/I2S wiring.
+
+The [ESP-AT profile](../../../../components/devices/esp_at/README.md) verifies
+the module's exact AT core/bin report before setup. Credentials, network choice
+and peer trust remain external. Its copied byte face and explicit service/close
+are described in [protocol sessions](protocols/streams.md).
+
+[ATECC608B](../../../../components/devices/atecc608b/README.md) admits only the
+reviewed B revision, both locked zones and a compatible existing private P256
+slot. The caller supplies bounded settled I2C, electrical wake/delay callbacks,
+workspace and an explicit operation scope for context-free vendor hooks. It
+exposes the [P256 signer](../io/system.md), not private key bytes, provisioning,
+OTP writes, certificates or automatic TLS integration. Serial/revision readback
+does not authenticate the fitted device. Failed sleep retains the original
+binding for cleanup; join all signer users before stopping it.
+
 ## Public declarations
 
 ### at24c02.h
@@ -205,5 +252,59 @@ bus/EEPROM status rather than a hidden sleep.
 ### sfud.h
 
 ```{doxygenfile} components/devices/sfud/include/nexus/components/sfud.h
+:project: nexus
+```
+
+### as5047p.h
+
+```{doxygenfile} components/devices/as5047p/include/nexus/components/as5047p.h
+:project: nexus
+```
+
+### ina226.h
+
+```{doxygenfile} components/devices/ina226/include/nexus/components/ina226.h
+:project: nexus
+```
+
+### lsm6dsox.h
+
+```{doxygenfile} components/devices/lsm6dsox/include/nexus/components/lsm6dsox.h
+:project: nexus
+```
+
+### lsm6dsox_i2c.h
+
+```{doxygenfile} components/devices/lsm6dsox/include/nexus/components/lsm6dsox_i2c.h
+:project: nexus
+```
+
+### lsm6dsox_spi.h
+
+```{doxygenfile} components/devices/lsm6dsox/include/nexus/components/lsm6dsox_spi.h
+:project: nexus
+```
+
+### ov2640.h
+
+```{doxygenfile} components/devices/ov2640/include/nexus/components/ov2640.h
+:project: nexus
+```
+
+### wm8978.h
+
+```{doxygenfile} components/devices/wm8978/include/nexus/components/wm8978.h
+:project: nexus
+```
+
+### esp_at.h
+
+```{doxygenfile} components/devices/esp_at/include/nexus/components/esp_at.h
+:project: nexus
+```
+
+### atecc608b.h
+
+```{doxygenfile} components/devices/atecc608b/include/nexus/components/atecc608b.h
 :project: nexus
 ```

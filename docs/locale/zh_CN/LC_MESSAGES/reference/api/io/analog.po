@@ -2,127 +2,238 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Nexus documentation\n"
+"POT-Creation-Date: 2026-11-22 05:02+0000\n"
+"PO-Revision-Date: 2026-11-22 00:00+0000\n"
+"Last-Translator: Nexus Team\n"
+"Language-Team: Nexus Team\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 8721a99e89c71b98e8e6cf5a1ea4e5ba14f0f3a326c30dba2049407d44998d89\n"
+"X-Nexus-Source-SHA256: 88205c66ee8129785385e0e506d68b33e0dc2d87f03e3acf35404b7784d81f2a\n"
 
-#: ../../../../../../docs/reference/api/io/analog.md:10
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:10
 msgid "ADC, DAC and synchronized sampling"
 msgstr "ADC、DAC 与同步采样"
 
-#: ../../../../../../docs/reference/api/io/analog.md:12
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:12
 msgid ""
 "Select the numeric format, conversion or output geometry, trigger and "
 "borrowing contract before starting a sample operation. The provider retains "
 "responsibility for actual DMA, trigger and peripheral withdrawal."
 msgstr "开始采样操作前，选择数值格式、转换或输出几何、触发及借用合同。provider 仍负责实际 DMA、触发及外设撤回。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:16
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:16
+msgid "Select independent sampling or one coupled owner"
+msgstr "选择独立采样或一个耦合所有者"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:18
+msgid ""
+"Ordinary ADC/DAC, groups and observers remain independent interfaces. A "
+"control application needing one coherent PWM/ADC schedule selects a separate"
+" coupled face; the ordinary PWM/ADC method tables and states do not grow to "
+"hold it."
+msgstr ""
+"普通 ADC/DAC、组接口和观察者仍为独立接口。需要一致 PWM/ADC 调度的控制应用，选择单独的耦合接口；普通 PWM/ADC "
+"方法表和状态不会为此扩大。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:0
+msgid "Face / target"
+msgstr "接口 / 目标"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:0
+msgid "Selected behavior"
+msgstr "选定行为"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:0
+msgid "Borrow and execution"
+msgstr "借用与执行"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:0
+msgid "`pwm_adc.h` / `Nexus::IOPWMADC`"
+msgstr "`pwm_adc.h` / `Nexus::IOPWMADC`"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:0
+msgid ""
+"A finite window with one fixed complete duty frame and triggered raw samples"
+msgstr "有限窗口，使用一个固定、完整的占空比帧和触发式原始采样"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:0
+msgid ""
+"Task submission/service; request, duty and samples borrowed until acquire-"
+"observed SETTLED"
+msgstr "由 Task 提交和推进；request、占空比和样本持续被借用，直至通过 acquire 语义观察到 SETTLED"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:0
+msgid "`pwm_adc_loop.h` / `Nexus::IOPWMADCLoop`"
+msgstr "`pwm_adc_loop.h` / `Nexus::IOPWMADCLoop`"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:0
+msgid ""
+"A finite-lifetime continuous session; each complete scan invokes bounded "
+"compute and stages one complete duty group"
+msgstr "生命周期有限的连续会话；每次完整扫描调用有界计算，并暂存一个完整占空比组"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:0
+msgid ""
+"Task prepare/start/service/stop; compute runs only in the selected ADC IRQ"
+msgstr "由 Task 执行 prepare/start/service/stop；compute 仅在选定 ADC IRQ 中运行"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:27
+msgid ""
+"The current F407ZGT6 software reference selects TIM8 CH1..3, BKIN and "
+"ADC1_IN0. `finite-regular-dma` uses TIM8 TRGO, ADC regular conversion and "
+"DMA2 Stream4; `injected-control` uses TIM8 CH4 and injected JEOC without "
+"DMA. These alternative modes share the same controller resources and cannot "
+"be selected together. Neither establishes power-board wiring, complementary "
+"outputs, FOC, a measured aperture timestamp or an exact physical PWM pulse "
+"count. See the [coupled provider contract](https://github.com/X-Gen-"
+"Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/soc/stm32/stm32f4/drivers/pwm_adc/README.md) for the exact route, "
+"clocks and timing inequalities."
+msgstr ""
+"当前 F407ZGT6 软件参考选择 TIM8 CH1..3、BKIN 和 ADC1_IN0。`finite-regular-dma` 使用 TIM8 "
+"TRGO、ADC 规则转换和 DMA2 Stream4；`injected-control` 使用 TIM8 CH4 和注入组 JEOC，不使用 "
+"DMA。这两个互斥模式占用相同控制器资源，不能同时选择。它们都不确立功率板接线、互补输出、FOC、实测采样时刻时间戳或精确物理 PWM "
+"脉冲计数。精确路线、时钟和时序不等式参见[耦合 provider 合同](https://github.com/X-Gen-"
+"Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/soc/stm32/stm32f4/drivers/pwm_adc/README.md)。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:36
+msgid ""
+"The IRQ session has explicit trigger, conversion, IRQ-delay, compute and "
+"commit budgets. Its callback must return within budget; software cannot "
+"preempt it. It cannot call task-only I/O, OS, Flash, file or network "
+"methods, nor retain callback-local scan/output views. Session, buffers, "
+"callback and context remain exclusively borrowed through SETTLED, even after"
+" output inhibition. A separately owned bounded queue/mailbox can transfer "
+"targets under its own synchronization contract; tasks must not mutate live "
+"borrowed algorithm state field by field."
+msgstr ""
+"IRQ 会话显式声明触发、转换、IRQ 延迟、计算和提交预算。回调必须在预算内返回；软件无法抢占它。回调不能调用仅限任务的 "
+"I/O、OS、Flash、文件或网络方法，也不能保留仅在回调内有效的扫描或输出视图。即使输出已被禁止，会话、缓冲区、回调和上下文仍被独占借用，直至 "
+"SETTLED。另行持有的有界队列或邮箱，可按自身同步合同传递目标；任务不得逐字段修改正在借用中的算法状态。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:44
+msgid ""
+"Late IRQ, lost-cycle evidence, invalid duty, break or failed full-group "
+"commit closes output admission. Stop/service must still drain sources and "
+"join IRQs; failed withdrawal retains storage, and cold "
+"close/reinitialization establishes the next session. Finite deadline and "
+"completed-cycle counters are software contracts, not measured worst-case "
+"control latency or physical qualification."
+msgstr ""
+"IRQ 迟到、检测到丢失周期、占空比无效、刹车事件或完整组提交失败，都会关闭输出准入。Stop/service 仍须排空事件源，并等待 IRQ "
+"结束；撤回失败时继续保留存储借用，必须经冷态关闭和重新初始化才能建立下一会话。有限 deadline "
+"和已完成周期计数是软件合同，不是实测的最坏控制延迟，也不代表物理验收通过。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:50
 msgid "Public declarations"
 msgstr "公共声明"
 
-#: ../../../../../../docs/reference/api/io/analog.md:18
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:52
 msgid "dac.h"
 msgstr "dac.h"
 
-#: ../../../../../../docs/reference/api/io/analog.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:54
 msgid "Raw DAC output, explicit triggers and digital observation."
 msgstr "原始 DAC 输出、显式触发与数字观察。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:20
-#: ../../../../../../docs/reference/api/io/analog.md:26
-#: ../../../../../../docs/reference/api/io/analog.md:32
-#: ../../../../../../docs/reference/api/io/analog.md:38
-#: ../../../../../../docs/reference/api/io/analog.md:44
-#: ../../../../../../docs/reference/api/io/analog.md:50
-#: ../../../../../../docs/reference/api/io/analog.md:56
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:54
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:60
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:72
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:84
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:90
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:96
 msgid "Author  Nexus Team"
 msgstr "作者  Nexus Team"
 
-#: ../../../../../../docs/reference/api/io/analog.md:20
-#: ../../../../../../docs/reference/api/io/analog.md:26
-#: ../../../../../../docs/reference/api/io/analog.md:32
-#: ../../../../../../docs/reference/api/io/analog.md:38
-#: ../../../../../../docs/reference/api/io/analog.md:44
-#: ../../../../../../docs/reference/api/io/analog.md:50
-#: ../../../../../../docs/reference/api/io/analog.md:56
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:54
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:60
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:72
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:84
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:90
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:96
 msgid "Nexus Team"
 msgstr "Nexus Team"
 
-#: ../../../../../../docs/reference/api/io/analog.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:54
 msgid ""
 "One serialized task owner controls a port. Factory lookup has no hardware "
 "effect. Digital codes do not measure voltage, settling, precision or the "
 "external load."
 msgstr "端口由单一任务所有者串行控制。factory 查找不产生硬件副作用。数字码不测量电压、建立时间、精度或外部负载。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:20
-#: ../../../../../../docs/reference/api/io/analog.md:50
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:54
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:84
 msgid "Defines"
 msgstr "宏定义"
 
-#: ../../../../../../docs/reference/api/io/analog.md:20
-#: ../../../../../../docs/reference/api/io/analog.md:38
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:54
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:72
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "Enums"
 msgstr "枚举"
 
-#: ../../../../../../docs/reference/api/io/analog.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:54
 msgid "Explicit native storage encoding, independent of analog precision."
 msgstr "显式原生存储编码，与模拟精度分别表达。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:20
-#: ../../../../../../docs/reference/api/io/analog.md:38
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:54
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:72
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "Values:"
 msgstr "取值："
 
-#: ../../../../../../docs/reference/api/io/analog.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:54
 msgid "Optional deterministic hardware waveform, never an entropy source."
 msgstr "可选的确定性硬件波形，不能用作熵源。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:20
-#: ../../../../../../docs/reference/api/io/analog.md:26
-#: ../../../../../../docs/reference/api/io/analog.md:32
-#: ../../../../../../docs/reference/api/io/analog.md:38
-#: ../../../../../../docs/reference/api/io/analog.md:44
-#: ../../../../../../docs/reference/api/io/analog.md:50
-#: ../../../../../../docs/reference/api/io/analog.md:56
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:54
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:60
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:72
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:84
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:90
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:96
 msgid "Functions"
 msgstr "函数"
 
-#: ../../../../../../docs/reference/api/io/analog.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:54
 msgid "Query fixed raw format and authorized channels without starting I/O."
 msgstr "查询固定原始格式与授权通道，不启动 I/O。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:0
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:0
 msgid "Parameters"
 msgstr "参数"
 
-#: ../../../../../../docs/reference/api/io/analog.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:54
 msgid "[in] Stable initialized face; serialized task owner."
 msgstr "[in] 稳定且已初始化的接口；由串行任务 owner 使用。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:54
 msgid "[out] Independent output storage, unchanged on rejection."
 msgstr "[out] 独立输出存储；拒绝时保持原值。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:0
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:0
 msgid "Returns"
 msgstr "返回值"
 
-#: ../../../../../../docs/reference/api/io/analog.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:54
 msgid "SUCCESS, INVALID, STATE or UNSUPPORTED."
 msgstr "SUCCESS、INVALID、STATE 或 UNSUPPORTED。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:54
 msgid "Stage one input code; left alignment is encoded by the provider."
 msgstr "暂存一个输入码；左对齐由 provider 编码。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:54
 msgid ""
 "No buffer is retained. Triggered output waits for a later trigger; waveform "
 "offsets must leave room for the selected amplitude. External-event ports "
@@ -130,156 +241,157 @@ msgid ""
 "detection."
 msgstr "不保留任何缓冲区。触发输出等待后续触发；波形偏移须为选定振幅留出空间。外部事件端口要求源正在运行；在停止状态写入不会隐式重新启用触发检测。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:54
 msgid "[in] Selected controller under one serialized task owner."
 msgstr "[in] 由一个串行任务 owner 控制的所选控制器。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:54
 msgid "[in] Physical channel 1 or 2, authorized by this face."
 msgstr "[in] 此接口授权的物理通道 1 或 2。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:54
 msgid "[in] 0..255 for u8 or 0..4095 for either 12-bit storage format."
 msgstr "[in] u8 为 0..255，两种 12 位存储格式均为 0..4095。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:54
 msgid "SUCCESS, INVALID, PERMISSION, STATE, CONTEXT or UNSUPPORTED."
 msgstr "SUCCESS、INVALID、PERMISSION、STATE、CONTEXT 或 UNSUPPORTED。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:54
 msgid "Stage both channels using one hardware dual-data write."
 msgstr "通过一次硬件双通道数据写入暂存两个通道。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:54
 msgid ""
 "No retained buffers. A common trigger determines simultaneous output; atomic"
 " staging alone does not establish analog simultaneity."
 msgstr "不保留 buffer。公共触发决定同时输出；原子暂存本身不能证明模拟输出同时变化。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:54
 msgid "[in] Exclusive owner authorized for both channels."
 msgstr "[in] 同时获得两个通道授权的独占 owner。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:54
 msgid "[in] Channel-one input code in the selected raw unit."
 msgstr "[in] 按所选原始单位表示的通道 1 输入码。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:54
 msgid "[in] Channel-two input code in the selected raw unit."
 msgstr "[in] 按所选原始单位表示的通道 2 输入码。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:54
 msgid "Enable selected outputs and their explicitly owned trigger source."
 msgstr "启用所选输出及其显式拥有的触发源。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:54
 msgid ""
 "Failure may retain enabled hardware; stop/close must observe release. "
 "Declared digital startup does not qualify an unknown analog load."
 msgstr "失败后可能保留已启用硬件；stop／close 必须观察释放。声明的数字启动完成不代表未知模拟负载已通过验证。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:54
 msgid "[in] Prepared exclusive task owner; no concurrent controls."
 msgstr "[in] 已准备的独占任务 owner；禁止并发控制。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:54
 msgid ""
 "[in] Positive for an owned timer; zero for direct/software or an external "
 "source with unknown frequency."
 msgstr "[in] 自有定时器须为正数；直接／软件模式，或频率未知的外部源使用零。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:54
 msgid "[in] Absolute monotonic deadline including startup delay."
 msgstr "[in] 包括启动延时的绝对单调 deadline。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:54
 msgid ""
 "SUCCESS, INVALID, BUSY, STATE, TIMEOUT, EXHAUSTED, IO, CONTEXT or "
 "UNSUPPORTED."
 msgstr ""
 "SUCCESS、INVALID、BUSY、STATE、TIMEOUT、EXHAUSTED、IO、CONTEXT 或 UNSUPPORTED。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:54
 msgid "Emit one common software trigger for an authorized channel mask."
 msgstr "为授权通道掩码发出一次公共软件触发。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:54
 msgid "This never substitutes for an external trigger or a DMA request."
 msgstr "此操作不能替代外部触发或 DMA 请求。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:54
 msgid "[in] Running software-trigger owner, serialized task context."
 msgstr "[in] 运行中的软件触发 owner；串行任务上下文。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:54
 msgid "[in] Nonempty NX_DAC_CHANNEL_* mask within authorization."
 msgstr "[in] 授权范围内的非空 NX_DAC_CHANNEL_* 掩码。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:54
 msgid "Stop progression and hold selected idle codes until full close."
 msgstr "停止推进并保持所选空闲码，直至完整 close。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:54
 msgid ""
 "BUSY/failure retains hardware responsibility. Full Platform release later "
 "disables the DAC and restores its selected original pin fields."
 msgstr "BUSY／失败保留硬件责任。后续完整 Platform 释放才禁用 DAC 并恢复所选原引脚字段。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:54
 msgid "[in] Same serialized owner, with all caller storage still live."
 msgstr "[in] 同一个串行 owner，调用者存储须仍然存活。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:54
 msgid "[in] Absolute deadline for the digital idle observation."
 msgstr "[in] 数字空闲观察的绝对 deadline。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:54
 msgid "SUCCESS, INVALID, STATE, BUSY, TIMEOUT, IO or CONTEXT."
 msgstr "SUCCESS、INVALID、STATE、BUSY、TIMEOUT、IO 或 CONTEXT。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:54
 msgid "Read digital codes and declared timer division, not analog voltage."
 msgstr "读取数字码与声明的定时器分频，不测量模拟电压。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:54
 msgid "[in] Initialized task owner; no concurrent state mutation."
 msgstr "[in] 已初始化的任务 owner；禁止并发修改状态。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:54
 msgid "[out] Independent snapshot using the same code unit as write."
 msgstr "[out] 独立快照，使用与 write 相同的码值单位。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:54
 msgid "SUCCESS, INVALID, STATE, CONTEXT or UNSUPPORTED."
 msgstr "SUCCESS、INVALID、STATE、CONTEXT 或 UNSUPPORTED。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:54
 msgid "Immutable selected facts; no physical qualification is inferred."
 msgstr "不可变的所选事实；不由此推导物理资格。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:20
-#: ../../../../../../docs/reference/api/io/analog.md:26
-#: ../../../../../../docs/reference/api/io/analog.md:32
-#: ../../../../../../docs/reference/api/io/analog.md:38
-#: ../../../../../../docs/reference/api/io/analog.md:44
-#: ../../../../../../docs/reference/api/io/analog.md:50
-#: ../../../../../../docs/reference/api/io/analog.md:56
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:54
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:60
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:72
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:84
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:90
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:96
 msgid "Public Members"
 msgstr "公共成员"
 
-#: ../../../../../../docs/reference/api/io/analog.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:54
 msgid "Physical source; rate remains unknown."
 msgstr "物理源；频率仍未知。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:54
 msgid "Significant bits in each public write/output code."
 msgstr "每个公共写入／输出码的有效位数。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:54
 msgid "Digital output observations in the selected public write-code unit."
 msgstr "以所选公共写入码单位表达数字输出观测。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:54
 msgid ""
 "This explicit two-channel profile reports code_bits and zero-based "
 "output_codes slots in channel order. Codes do not measure voltage or analog "
@@ -289,69 +401,69 @@ msgstr ""
 "该显式双通道 profile 报告 code_bits，并按通道顺序使用从零开始的 output_codes "
 "slot。数字码不测量电压或模拟稳定时间。provider 移除原生对齐／缩放；较窄的所选码单位不表示未使用的原生低位。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:54
 msgid "Shared immutable operations; callbacks receive instance context."
 msgstr "共享的不可变方法表；回调接收实例 context。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:20
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:54
 msgid "Face and caller/provider storage outlive all uses and full close."
 msgstr "接口及调用者／provider 存储必须存活至所有使用和完整 close 结束。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:24
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:58
 msgid "dac_tx.h"
 msgstr "dac_tx.h"
 
-#: ../../../../../../docs/reference/api/io/analog.md:26
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:60
 msgid "Borrowed encoded DAC frames under one serialized owner."
 msgstr "由单个串行 owner 借用的编码 DAC 帧。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:26
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:60
 msgid ""
 "Transport selection is static. No allocation, queue or worker is created by "
 "preparation or interface lookup."
 msgstr "静态选择传输实现。准备请求或查询接口都不分配存储，也不创建队列或 worker。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:26
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:60
 msgid "Prepare an unborrowed descriptor without copying encoded frames."
 msgstr "准备尚未借出的描述符，不复制编码帧。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:26
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:60
 msgid ""
 "Serialized task owner only. Preparation does not touch hardware or validate "
 "an unknown provider's memory reachability or frequency."
 msgstr "仅由串行 task owner 调用。准备不访问硬件，也不验证未知 provider 的内存可达性或频率。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:26
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:60
 msgid "[inout] Initialized READY or consumed SETTLED storage."
 msgstr "[inout] 已初始化为 READY 或已消费的 SETTLED 存储。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:26
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:60
 msgid "[in] Independent immutable frames, live through settlement."
 msgstr "[in] 独立且不可变的帧，保持有效至结清。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:26
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:60
 msgid "[in] Nonzero byte extent; provider validates frame geometry."
 msgstr "[in] 非零字节长度；provider 验证帧布局。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:26
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:60
 msgid ""
 "[in] Requested internal rate; zero for an external source whose frequency is"
 " unknown to this port."
 msgstr "[in] 请求的内部频率；外部源频率不为此端口所知时使用零。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:26
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:60
 msgid "[in] Absolute live Core deadline, never a duration."
 msgstr "[in] 当前 Core 时域的绝对 deadline，不是持续时间。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:26
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:60
 msgid "SUCCESS, INVALID or STATE; rejection leaves the descriptor intact."
 msgstr "SUCCESS、INVALID 或 STATE；拒绝时描述符保持不变。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:26
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:60
 msgid "Admit one direct finite or circular transfer selected by the port."
 msgstr "准入由端口静态选定的直接有限或循环传输。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:26
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:60
 msgid ""
 "REJECTED retains nothing. ACCEPTED borrows until acquire-observed SETTLED, "
 "including timeout and quarantine. Service must be progressed. Finite SUCCESS"
@@ -378,15 +490,15 @@ msgstr ""
 "size。有限尾部可能暂停并重新启动独占的触发定时器，从而延长最后一个间隔；有限输出并非严格周期输出。选定恢复路径可以在波形计时开始前内部触发声明的空闲码，随后短暂禁用转换器输出。这些转换不计为有效载荷进度。请求之间不承诺模拟输出不间断保持或持续输出波形。外部循环模式可仅为同样的空闲输出恢复保留独占租用的定时器。播放只在存储路径已就绪后开始检测，绝不启动该定时器。无法证明最后一次外部转换的模式拒绝有限播放。循环传输只在取消、停机或失败后结清。循环字节进度表示最后一轮已消耗的前缀，不是总播放量。DMA"
 " 进度从不等于数字转换次数。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:26
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:60
 msgid "[in] Initialized face owned by this serialized task executor."
 msgstr "[in] 由该串行 task executor 拥有的已初始化接口。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:26
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:60
 msgid "[inout] READY descriptor and immutable encoded payload."
 msgstr "[inout] READY 描述符与不可变的编码 payload。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:26
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:60
 msgid ""
 "SUCCESS means ACCEPTED, including later hardware start failure; INVALID, "
 "BUSY, STATE, CONTEXT, TIMEOUT, PERMISSION or UNSUPPORTED is REJECTED."
@@ -395,31 +507,31 @@ msgstr ""
 "ACCEPTED，包含随后发生硬件启动失败的情况；INVALID、BUSY、STATE、CONTEXT、TIMEOUT、PERMISSION 或 "
 "UNSUPPORTED 表示 REJECTED。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:26
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:60
 msgid "Request withdrawal; this never revokes the descriptor or frame loan."
 msgstr "请求撤回；这不会撤销描述符或帧的借用。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:26
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:60
 msgid "Cross-task controls require a separate stable slot/epoch adapter."
 msgstr "跨 task 控制需要独立的稳定 slot/epoch 适配器。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:26
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:60
 msgid "[in] Same serialized executor and stable instance face."
 msgstr "[in] 同一个串行 executor 和稳定的实例接口。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:26
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:60
 msgid "[inout] Exact live descriptor, retained through SETTLED."
 msgstr "[inout] 精确的有效描述符，保留至 SETTLED。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:26
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:60
 msgid "SUCCESS, INVALID, STATE, BUSY, CONTEXT or UNSUPPORTED."
 msgstr "SUCCESS、INVALID、STATE、BUSY、CONTEXT 或 UNSUPPORTED。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:26
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:60
 msgid "Progress deadlines, final digital latch and complete withdrawal."
 msgstr "推进 deadline、最后数字锁存和完整撤回。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:26
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:60
 msgid ""
 "No hidden worker or blocking completion wait. An IRQ is a hint; request "
 "state is authoritative. An invalid or absent method is a no-op. The matching"
@@ -428,15 +540,15 @@ msgstr ""
 "没有隐藏 worker 或阻塞完成等待。IRQ 只是提示；请求状态是权威条件。无效或缺失的方法不执行操作。对应 DAC 控制接口负责 stop、idle"
 " code 和观察。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:26
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:60
 msgid "[in] Same nonreentrant serialized task owner; stable storage."
 msgstr "[in] 同一个不可重入的串行 task owner；存储保持稳定。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:26
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:60
 msgid "Bind an explicit IRQ hint target while the controller is idle."
 msgstr "在 controller 空闲时绑定显式 IRQ 提示目标。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:26
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:60
 msgid ""
 "The provider validates actual publisher priorities. Target and context "
 "outlive attachment and all publishers; shutdown/detachment joins them. A "
@@ -445,45 +557,45 @@ msgstr ""
 "provider 验证实际发布源的优先级。目标及其 context 持续存活至解除绑定并 join 所有发布者；停机或解除绑定会 join "
 "发布者。提示不会归还借用，也不能替代锁存的请求状态。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:26
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:60
 msgid "[in] Same serialized task owner with all IRQ storage live."
 msgstr "[in] 同一个串行 task owner，所有 IRQ 存储保持有效。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:26
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:60
 msgid "[in] Borrowed immutable target, or NULL to detach it."
 msgstr "[in] 被借用的不可变目标，或用 NULL 解除绑定。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:26
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:60
 msgid "[in] Selected backend's unshifted IRQ ceiling."
 msgstr "[in] 所选后端未移位的 IRQ ceiling。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:26
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:60
 msgid "SUCCESS, INVALID, STATE, BUSY, CONTEXT, PERMISSION or UNSUPPORTED."
 msgstr "SUCCESS、INVALID、STATE、BUSY、CONTEXT、PERMISSION 或 UNSUPPORTED。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:26
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:60
 msgid "Query when the caller should next progress service."
 msgstr "查询调用方下次应推进 service 的时间。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:26
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:60
 msgid ""
 "This is a scheduling hint, not a completion or recovery guarantee. A "
 "quarantined request still requires the caller's recovery policy."
 msgstr "这只是调度提示，不保证完成或恢复。被隔离的请求仍需由调用方执行恢复策略。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:26
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:60
 msgid "[in] Same serialized task owner; no concurrent controls."
 msgstr "[in] 同一个串行 task owner；没有并发控制。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:26
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:60
 msgid "Absolute live Core deadline; NEVER means wait for a new IRQ/control."
 msgstr "当前 Core 时域的绝对 deadline；NEVER 表示等待新的 IRQ 或控制。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:26
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:60
 msgid "Descriptor and immutable encoded frames remain live until SETTLED."
 msgstr "描述符和不可变编码帧持续存活至 SETTLED。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:26
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:60
 msgid ""
 "Raw CPU writes use unshifted codes. This separate transfer interface borrows"
 " hardware-encoded frames without conversion or a bounce buffer. Single u8 "
@@ -499,109 +611,109 @@ msgstr ""
 "uint32_t 帧为每个通道使用独立 16 位 "
 "lane，并遵循所选对齐方式。未使用位必须为零；调用方负责该不变量，接口不隐式遍历整个缓冲区转换或验证。长度以字节观察。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:26
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:60
 msgid "Zero explicitly denotes an unknown external rate."
 msgstr "零显式表示未知的外部频率。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:26
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:60
 msgid "Shared immutable methods receive the selected instance context."
 msgstr "共享的不可变方法接收所选实例的 context。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:26
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:60
 msgid "Stable optional transfer face; CPU-only modes need no TX storage."
 msgstr "稳定的可选传输接口；仅 CPU 模式无需 TX 存储。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:30
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:64
 msgid "adc.h"
 msgstr "adc.h"
 
-#: ../../../../../../docs/reference/api/io/analog.md:32
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
 msgid "Reviewed ADC single-shot and low-rate polling scans."
 msgstr "已审查的 ADC 单次采样与低速轮询扫描。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:32
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
 msgid "Query the fixed reviewed ADC sequence and raw-count format."
 msgstr "查询固定、已审查的 ADC 序列与原始计数格式。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:32
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
 msgid "[in] Single-shot/low-rate scan provider."
 msgstr "[in] 单次或低速扫描 provider。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:32
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
 msgid "[out] Resolution, declared reference and sequence length."
 msgstr "[out] 分辨率、声明的参考值及序列长度。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:32
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
 msgid "Success or INVALID."
 msgstr "成功或 INVALID。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:32
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
 msgid "Read logical scan width and nominal conversion duration."
 msgstr "读取逻辑扫描宽度与名义转换时长。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:32
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
 msgid "[in] Initialized timing-capable provider."
 msgstr "[in] 已初始化且支持时序信息的 provider。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:32
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
 msgid "[out] Independent copied facts; no acquisition starts."
 msgstr "[out] 独立复制的事实；不启动采集。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:32
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
 msgid "Success or INVALID/STATE/UNSUPPORTED."
 msgstr "成功或 INVALID/STATE/UNSUPPORTED。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:32
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
 msgid "Attach optional observer storage before acquisition starts."
 msgstr "采集开始前附加可选观察者存储。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:32
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
 msgid ""
 "Stop and join before detach/reclaim. No hidden allocation; polling and "
 "finite modes need no observation storage."
 msgstr "分离或回收前，先停止并等待相关访问者退出。没有隐藏分配；轮询及有限模式无需观察存储。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:32
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
 msgid "[in] Initialized continuous provider, one task owner."
 msgstr "[in] 已初始化的连续采集 provider，由一个任务所有者控制。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:32
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
 msgid ""
 "[inout] Initialized stable caller storage, or NULL to detach. Provider "
 "validates exact stream count at start."
 msgstr "[inout] 已初始化且稳定的调用方存储；传入 NULL 表示分离。provider 在启动时验证精确的 stream 数量。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:32
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
 msgid "Success or BUSY/CONTEXT/UNSUPPORTED."
 msgstr "成功或 BUSY/CONTEXT/UNSUPPORTED。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:32
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
 msgid "Query one live consumer loan's software completion record."
 msgstr "查询一个存活消费者借用的软件完成记录。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:32
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
 msgid "[in] Same stable observer-capable provider."
 msgstr "[in] 同一个稳定且支持观察的 provider。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:32
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
 msgid "[in] Same stream's currently acquired immutable block."
 msgstr "[in] 同一 stream 当前已取得的不可变 block。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:32
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
 msgid ""
 "[out] Copied epoch, ordinal, observed time and gap flag. This is never a "
 "hardware sample aperture timestamp."
 msgstr "[out] 复制的 epoch、序号、观察时间和间隙标志。这绝不是硬件采样孔径时间戳。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:32
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
 msgid "Success or INVALID/STATE/UNSUPPORTED, output unchanged on rejection."
 msgstr "成功或 INVALID/STATE/UNSUPPORTED；拒绝时输出不变。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:32
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
 msgid "Sample the fixed single/scan sequence by bounded polling."
 msgstr "通过有界轮询采样固定单次／扫描序列。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:32
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
 msgid ""
 "CPU-active task-only acquisition. A provider may require privileged, "
 "unmasked Thread mode. Reference voltage, sampling error and maximum rate "
@@ -610,27 +722,27 @@ msgstr ""
 "采用 CPU 主动轮询，仅限任务上下文采样。具体 provider 可要求特权且未屏蔽中断的 Thread "
 "模式。参考电压、采样误差和最高速率需要实物验证。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:32
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
 msgid "[inout] Single execution owner; fixed channel/sample-time setup."
 msgstr "[inout] 唯一执行所有者；通道及采样时间配置固定。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:32
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
 msgid "[out] Raw counts in configured channel order."
 msgstr "[out] 按配置通道顺序排列的原始计数。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:32
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
 msgid "[in] Sample capacity at least channel_count."
 msgstr "[in] 样本容量至少为 channel_count。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:32
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
 msgid "[in] Absolute clock-domain deadline."
 msgstr "[in] 时钟域中的绝对 deadline。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:32
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
 msgid "[out] Complete valid samples; remaining output is untouched."
 msgstr "[out] 完整有效样本；其余输出保持不变。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:32
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
 msgid ""
 "Success or INVALID/BUSY/TIMEOUT/IO/CONTEXT/UNSUPPORTED; EXHAUSTED if a "
 "required finite warmup is unrepresentable. No caller buffer or count pointer"
@@ -642,11 +754,11 @@ msgstr ""
 "EXHAUSTED。返回时不保留调用方 buffer 或 count 指针。硬件停止失败返回 IO，并可保留设备清理责任；owner "
 "完成清理前新采样保持 BUSY。count 继续描述已完成样本。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:32
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
 msgid "Start selected trigger/block acquisition with caller storage."
 msgstr "使用调用者存储启动选定的触发／块采集。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:32
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
 msgid ""
 "Blocks contain native uint16_t raw counts in channel order. Capacities and "
 "lengths are multiples of a complete scan; DMA domains/alignment and physical"
@@ -659,50 +771,50 @@ msgstr ""
 "域、对齐和物理速率分别取证。接纳不表示 warmup 已完成或 trigger 已运行。借用后的失败会锁存并由 service 报告；stop 会合所有"
 " producer 和 consumer loan 前，保留 stream 与存储。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:32
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
 msgid "[in] Trigger/block-capable provider, one task executor."
 msgstr "[in] 支持触发及 block 的 provider，由一个任务执行者控制。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:32
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
 msgid "[inout] Initialized immutable-consumer block mechanism."
 msgstr "[inout] 已初始化、供消费者不可变访问的 block 机制。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:32
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
 msgid ""
 "[in] Positive requested complete-scan rate; provider rejects rates outside "
 "its declared timer/ADC capability."
 msgstr "[in] 请求的完整扫描速率，为正值；超出所声明定时器或 ADC 能力的速率由 provider 拒绝。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:32
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
 msgid ""
 "SUCCESS accepts the stream session. Admission errors, including an "
 "unrepresentable finite warmup (EXHAUSTED), occur before buffer borrowing."
 msgstr ""
 "SUCCESS 表示接纳 stream 会话。准入错误（包括有限 warmup 无法表示时的 EXHAUSTED）发生在借用 buffer 之前。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:32
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
 msgid "Stop trigger and memory sources without revoking consumer loans."
 msgstr "停止触发与内存写入源，不撤销消费者借用。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:32
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
 msgid "Consumer READY/BORROWED blocks must still be drained/released."
 msgstr "消费者的 READY/BORROWED block 仍须排空或释放。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:32
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
 msgid "[in] Same acquisition executor; retain storage on BUSY."
 msgstr "[in] 同一个采集执行者；BUSY 时保留存储。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:32
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
 msgid ""
 "Success proves source detach, BUSY retains producer storage, UNSUPPORTED for"
 " a polling-only provider."
 msgstr "成功证明源已分离；BUSY 保留生产者存储；仅支持轮询的 provider 返回 UNSUPPORTED。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:32
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
 msgid "Explicitly resume discrete block acquisition after consumer drain."
 msgstr "消费者排空后，显式恢复离散块采集。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:32
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
 msgid ""
 "No task, retry or hidden rearm is created. Block modes state their trigger "
 "gaps; continuous zero-gap capture requires a separately declared hardware "
@@ -712,11 +824,11 @@ msgstr ""
 "不创建 task、重试或隐藏 rearm。block 模式明确其 trigger 间隙；连续无间隙采集需要独立声明并验证硬件能力。service "
 "错误不释放借用存储；回收 stream 或 provider 前须完成 stop。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:32
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
 msgid "[in] Same single task executor as start and stop."
 msgstr "[in] 与 start 和 stop 相同的唯一任务执行者。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:32
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
 msgid ""
 "Success when an engine is armed, BUSY during source drain or free-block "
 "backpressure, STATE after acquisition stops; IO or EXHAUSTED reports a "
@@ -725,45 +837,45 @@ msgstr ""
 "引擎已 arm 时成功；源排空或无空闲 block 的背压期间返回 BUSY；采集停止后返回 STATE；IO 或 EXHAUSTED 报告已锁存的 "
 "provider 失败。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:32
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
 msgid "Attach an optional hint sink after checking publisher IRQ priority."
 msgstr "检查发布者 IRQ 优先级后，附加可选提示接收端。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:32
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
 msgid ""
 "Block/error predicates latch before notifications. Stop and join publishers "
 "and waiters before reclaiming old sink storage."
 msgstr "先锁存 block 或错误条件，再通知。回收旧 sink 存储前，停止并等待发布者及等待者退出。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:32
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
 msgid "[in] Initialized block-capable provider, one task executor."
 msgstr "[in] 已初始化且支持 block 的 provider，由一个任务执行者控制。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:32
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
 msgid "[in] Immutable borrowed target or NULL to detach."
 msgstr "[in] 不可变的借用目标；NULL 表示分离。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:32
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
 msgid ""
 "[in] Optional additional unshifted kernel-safe priority floor; cannot weaken"
 " generated policy. PRIMASK kernel targets require zero. Ignored without "
 "kernel calls."
 msgstr "[in] 可选的额外未移位内核安全优先级数值下限；不得削弱生成策略。PRIMASK 内核目标要求为零。不调用内核时忽略。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:32
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
 msgid "Success or CONTEXT/STATE/PERMISSION/UNSUPPORTED."
 msgstr "成功或 CONTEXT/STATE/PERMISSION/UNSUPPORTED。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:32
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
 msgid ""
 "Raw count facts; nominal Vref is not a calibrated physical measurement."
 msgstr "原始计数事实；标称 Vref 不是经过校准的物理测量。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:32
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
 msgid "Logical scan width and nominal conversion duration."
 msgstr "逻辑扫描宽度与名义转换时长。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:32
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
 msgid ""
 "scan_ticks / ticks_per_second is the selected complete scan conversion time,"
 " including every sampling window. A positive tick rate describes declared "
@@ -775,67 +887,67 @@ msgstr ""
 "scan_ticks / ticks_per_second 表示所选完整扫描的转换时间，包含全部采样窗口。正 tick rate 描述声明的单位，不表示"
 " CPU 时钟或实测精度。这不是触发周期、交付延迟、采样孔径或绝对时间戳。逻辑结果保持配置顺序。硬件通道号、采样编码与时序表保留在私有实现中。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:32
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
 msgid "Shared read-only methods using one provider state."
 msgstr "使用同一个提供者状态的共享只读方法。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:32
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
 msgid ""
 "Methods follow each public operation's ownership contract. Missing optional "
 "methods report UNSUPPORTED."
 msgstr "各方法遵循对应公共操作的所有权合同。缺失的可选方法返回 UNSUPPORTED。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:32
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
 msgid "Immutable interface pointing to caller-owned state."
 msgstr "指向调用者自有状态的不可变接口。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:32
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:66
 msgid ""
 "Face and state outlive callers, IRQs and retained borrows. Factory lookup "
 "neither initializes nor acquires hardware."
 msgstr "接口和状态的生命周期覆盖调用方、IRQ 及保留的借用。工厂查找既不初始化，也不取得硬件。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:36
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:70
 msgid "adc_format.h"
 msgstr "adc_format.h"
 
-#: ../../../../../../docs/reference/api/io/analog.md:38
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:72
 msgid "Explicit integer sample representation and scan layout."
 msgstr "明确的整数采样表示与扫描布局。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:38
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:72
 msgid "Integer encoding; no implicit voltage or floating-point conversion."
 msgstr "整数编码；不隐式转换电压或浮点数。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:38
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:72
 msgid "Byte order is explicit, independently of the executing CPU."
 msgstr "显式声明字节序，与执行代码的 CPU 无关。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:38
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:72
 msgid "Hardware conversion group; descriptive facts do not enable it."
 msgstr "硬件转换组；描述性事实不会启用该组。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:38
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:72
 msgid "Trigger identity is not a sample aperture timestamp."
 msgstr "触发身份不是采样孔径时间戳。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:38
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:72
 msgid "Validate a complete immutable layout without reading sample storage."
 msgstr "验证完整的不可变布局，不读取采样存储。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:38
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:72
 msgid "[in] Readable naturally aligned layout, retained by caller."
 msgstr "[in] 可读、自然对齐的布局，由调用方保持有效。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:38
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:72
 msgid "SUCCESS or INVALID; no allocation, hardware access or retained loan."
 msgstr "SUCCESS 或 INVALID；不分配、不访问硬件，也不保留借用。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:38
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:72
 msgid "Decode one integer from a caller-owned or consumer-acquired scan."
 msgstr "从调用者拥有或消费者已取得的扫描数据中解码一个整数。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:38
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:72
 msgid ""
 "No pointer is retained. Input/output/format overlap and wrapping spans "
 "reject before access. Sample loads have bounded1..4 byte work. This "
@@ -845,40 +957,40 @@ msgstr ""
 "不保留任何指针。输入、输出或 format 重叠，以及地址回绕的范围，均在访问前拒绝。样本装载的工作量有界，为 1..4 "
 "字节。此操作既不转换为经过校准的工程单位，也不与活跃生产者同步；消费者负责完成该访问的同步／退出等待。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:38
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:72
 msgid "[in] Valid immutable uniform-channel scan description."
 msgstr "[in] 有效且不可变、通道布局一致的扫描描述。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:38
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:72
 msgid "[in] Readable storage; any producer/DMA access must be joined."
 msgstr "[in] 可读存储；必须先等待所有生产者或 DMA 访问结束。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:38
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:72
 msgid "[in] Positive exact multiple of scan_stride, including padding."
 msgstr "[in] 为 scan_stride 的正整数倍，包含填充。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:38
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:72
 msgid "[in] Zero-based complete scan index."
 msgstr "[in] 从零开始的完整扫描索引。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:38
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:72
 msgid "[in] Zero-based channel position in provider order."
 msgstr "[in] 按 provider 顺序从零开始的通道位置。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:38
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:72
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "[out] Separate aligned output, unchanged on rejection."
 msgstr "[out] 独立且已对齐的输出，被拒绝时保持不变。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:38
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:72
 msgid "SUCCESS or INVALID; all32-bit unsigned/signed raw values fit int64_t."
 msgstr "SUCCESS 或 INVALID；全部 32 位无符号或有符号原始值均可容纳于 int64_t。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:38
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:72
 msgid "Immutable uniform-channel integer layout, independent of ADC faces."
 msgstr "各通道存储格式一致的不可变整数布局，与 ADC 接口独立。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:38
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:72
 msgid ""
 "storage_bytes is1..4; significant_bits is1..32 within that storage. lsb_bits"
 " names discarded low bits, not an arithmetic scaling factor. sample_stride "
@@ -894,23 +1006,23 @@ msgstr ""
 "provider 另行声明的通道顺序。软件触发使用 identity0；硬件触发标识是非零、装配内局部的 ID，绝不是地址或物理时序承诺。group 或"
 " trigger 声明描述 provider 已支持的模式；验证布局不会为设备增加支持，也不会配置设备。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:42
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:76
 msgid "adc_group.h"
 msgstr "adc_group.h"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "Optional finite whole-sequence integer ADC acquisition."
 msgstr "可选的有限完整序列整数 ADC 采集。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "A request names raw frames or one explicit two-group result view."
 msgstr "请求明确指定原始帧，或一个显式的双组结果视图。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "Prepare caller storage without hardware access or retained borrow."
 msgstr "准备调用者存储，不访问硬件，也不保留借用。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid ""
 "Request and frames are distinct. Preparation reads no sample bytes and does "
 "not prove a DMA domain or chip mode. All previous observers must be joined "
@@ -919,67 +1031,67 @@ msgstr ""
 "请求与帧存储彼此独立。准备过程不读取样本字节，也不证明 DMA 域或芯片模式成立。复用前必须等待所有先前的观察者退出。拒绝 "
 "NX_DEADLINE_NEVER。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
-#: ../../../../../../docs/reference/api/io/analog.md:56
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:90
 msgid "[inout] Initialized READY or fully consumed SETTLED storage."
 msgstr "[inout] 已初始化为 READY，或已完全消费的 SETTLED 存储。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "[out] Aligned nonempty raw output including explicit padding."
 msgstr "[out] 已对齐、非空的原始输出，包含显式填充。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "[in] Positive nonwrapping span; provider validates exact layout."
 msgstr "[in] 长度为正且地址不回绕的范围；由 provider 验证精确布局。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "[in] Positive whole-frame count, not a raw rank count."
 msgstr "[in] 正的完整帧数，不是原始 rank 数。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "[in] Finite absolute deadline in platform monotonic domain."
 msgstr "[in] 平台单调时间域中的有限绝对 deadline。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "SUCCESS or INVALID/STATE, rejected request remains unchanged."
 msgstr "返回 SUCCESS 或 INVALID/STATE；被拒绝的请求保持不变。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "Prepare one explicit regular/injected result descriptor."
 msgstr "准备一个显式的规则组／注入组结果描述符。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid ""
 "Selection must expose paired acquisition. Admission borrows descriptor, both"
 " spans and request jointly. Errors guarantee zero valid joint frames; cancel"
 " or failed drain cannot revoke either storage loan."
 msgstr "所选模式必须提供成对采集。准入同时借用描述符、两个数据区间及请求。错误保证有效联合帧数为零；取消或排空失败均不能撤销任一存储借用。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "[inout] Initialized READY or consumed SETTLED metadata."
 msgstr "[inout] 已初始化的 READY 元数据，或结果已消费的 SETTLED 元数据。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "[inout] Stable descriptor naming two disjoint output spans."
 msgstr "[inout] 稳定描述符，指定两个互不重叠的输出区间。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "[in] Positive joint frames; provider checks its limit."
 msgstr "[in] 正数个联合帧；具体实现检查其上限。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "[in] Finite absolute deadline for both results and withdrawal."
 msgstr "[in] 两组结果及撤回共用的有限绝对截止时间。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "SUCCESS or pure INVALID/STATE; no sample data is read or written."
 msgstr "SUCCESS，或无副作用的 INVALID／STATE；不读取或写入采样数据。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "Accept and start one selected finite acquisition under a sole owner."
 msgstr "由唯一所有者接受并启动一次选定的有限采集。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid ""
 "Accepted descriptor is caller-immutable; caller cannot access frames until "
 "acquire-observed SETTLED. Priming may write this entire span but never "
@@ -993,61 +1105,61 @@ msgstr ""
 "失败仍保留借用，直到实际排空。没有可信完成时间戳时，首次在 deadline 时刻或之后观察到完成即为 TIMEOUT。单帧 injected "
 "配置有意防止第二次触发及 JDR 覆盖。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "[in] Initialized selected face with immutable retained facts."
 msgstr "[in] 已初始化的选中接口，其保留配置事实不可变。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "[inout] Exact READY descriptor and exclusive writable span."
 msgstr "[inout] 精确处于 READY 的描述符及独占可写范围。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid ""
 "SUCCESS means ACCEPTED, including immediate SETTLED failure. Other results "
 "reject without pointer retention or residual new effects."
 msgstr "SUCCESS 表示已 ACCEPTED，包括立即进入 SETTLED 的失败。其他结果表示拒绝，不保留指针，也不留下新的残余效果。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "Start cancellation without revoking the accepted storage borrow."
 msgstr "开始取消，不撤销已接受的存储借用。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "The first terminal fault/cancel/timeout remains authoritative."
 msgstr "最先出现的终结故障、取消或超时保持最终决定权。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "[in] Same stable selected face and serialized privileged task."
 msgstr "[in] 同一个稳定的选中接口，并由串行化的特权任务调用。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "[inout] Exact current accepted request, still live."
 msgstr "[inout] 当前已接受且仍然存活的精确请求。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "SUCCESS starts/observes cancellation; it does not imply SETTLED."
 msgstr "SUCCESS 表示开始或观察到取消，不代表已经 SETTLED。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "Make bounded prime/acquisition/drain progress without hidden waits."
 msgstr "推进有界的预转换、采集和排空，不包含隐藏等待。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid ""
 "No request or output is reclaimed while sources, ADC, DMA or IRQs may still "
 "reference it. QUARANTINED requests remain owned and retryable."
 msgstr "只要各源、ADC、DMA 或 IRQ 仍可能引用请求或输出，就不得回收它们。QUARANTINED 请求仍归当前所有者持有，可重试排空。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid ""
 "SUCCESS after progress/settlement, BUSY during outstanding drain, or an "
 "error with retained recovery responsibility."
 msgstr "推进或结算后返回 SUCCESS；排空尚未完成时返回 BUSY；或返回错误并保留恢复责任。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "Stop the current request, prove drain and clear a recoverable fault."
 msgstr "停止当前请求、证明排空并清除可恢复故障。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid ""
 "Stop is not cold close: pads, common clock, internal-source enables and "
 "provider storage remain retained until platform joined close. A fully "
@@ -1057,31 +1169,31 @@ msgstr ""
 "Stop 不是 cold close：pad、公共时钟、内部来源 enable 与 provider 存储持续保留，直到平台完成 join 后 "
 "close。完全停止的 face 可用相同静态选择接纳下一请求。待处理的平台 close 继续封闭准入。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "SUCCESS only after final request detach; BUSY/IO keeps all leases."
 msgstr "仅在最终请求分离后返回 SUCCESS；BUSY/IO 保留全部租约。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "Copy actual selected facts and current retained owner state."
 msgstr "复制实际选定事实与当前保留的所有者状态。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "Observing idle/fault does not release a request or any cold lease."
 msgstr "观察到空闲或故障不会释放请求或任何冷租约。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "[in] Same initialized selected face, unique task executor."
 msgstr "[in] 同一个已初始化的选中接口，由唯一任务执行者调用。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "SUCCESS or INVALID/STATE/CONTEXT/UNSUPPORTED."
 msgstr "返回 SUCCESS 或 INVALID/STATE/CONTEXT/UNSUPPORTED。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "Accept caller-owned continuous complete-scan blocks."
 msgstr "接受由调用者持有的连续完整扫描数据块。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid ""
 "Errors after acceptance latch until joined stop. Service is explicit; no "
 "heap, default buffers or worker exists. Budget loss never publishes an "
@@ -1090,109 +1202,109 @@ msgstr ""
 "接受后的错误会锁存，直到停机完成 join。必须显式调用 service；没有堆、默认缓冲区或 "
 "worker。预算不足时绝不发布未经证明已安全脱离硬件的数据 bank。消费者借用在停机后仍有效，直到显式释放。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "[in] Static blocks provider, one serialized privileged executor."
 msgstr "[in] 静态 blocks 具体实现，由一个特权执行者串行推进。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "[inout] At least three equal complete-frame DMA slots."
 msgstr "[inout] 至少三个大小相同、容纳完整帧的 DMA 槽位。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "SUCCESS accepts the session; it does not certify completed warmup."
 msgstr "SUCCESS 表示接受会话，不证明预热已完成。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "Attach existing caller-owned ADC observation records while idle."
 msgstr "空闲时挂接调用者已有的 ADC 观察记录。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid ""
 "Observation timestamps are software completion observations, never trigger "
 "counts or sample-aperture timestamps. Stop joins before reuse."
 msgstr "观察时间戳表示软件观察到完成的时刻，绝不是触发计数或采样孔径时间戳。复用前停机并完成 join。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "[in] Same selected continuous group port."
 msgstr "[in] 同一个选定的连续组端口。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "[inout] Initialized optional control, or NULL to detach."
 msgstr "[inout] 已初始化的可选控制对象，或用 NULL 拆除绑定。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "SUCCESS or pure INVALID/BUSY/CONTEXT/UNSUPPORTED rejection."
 msgstr "SUCCESS，或无副作用的 INVALID／BUSY／CONTEXT／UNSUPPORTED 拒绝。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "Read one acquired block's exact existing ADC observation."
 msgstr "读取一个已取得数据块已有的精确 ADC 观察记录。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "[in] Same bound observation-capable group port."
 msgstr "[in] 同一个已绑定且支持观察的组端口。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "[in] Current immutable consumer loan from that exact stream."
 msgstr "[in] 来自该精确数据流的当前不可变消费者借用。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "[out] Separate copied record, unchanged on rejection."
 msgstr "[out] 独立的记录副本；拒绝时保持不变。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "SUCCESS or INVALID/STATE/UNSUPPORTED with no retained output."
 msgstr "SUCCESS 或 INVALID／STATE／UNSUPPORTED，不保留输出引用。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "Accept one explicit software injection alongside regular blocks."
 msgstr "在规则组数据块运行期间接受一次显式软件注入。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid ""
 "The selected minimum interval bounds regular conversion disruption. Only one"
 " injected request may be live. Cancellation waits for all JEOC or a complete"
 " controller withdrawal. No automatic injection is implied."
 msgstr "所选最小间隔约束注入对规则组转换的扰动。最多只允许一个活跃注入请求。取消须等待所有 JEOC，或完成整个控制器的撤回。不隐含自动注入。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "[in] Sole selected combined regular/injected controller owner."
 msgstr "[in] 所选规则组／注入组联合控制器的唯一所有者。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "[inout] One frame in the separately queried injected layout."
 msgstr "[inout] 按独立查询所得注入布局提供的一帧。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "SUCCESS accepts and borrows; other results have no retained effects."
 msgstr "SUCCESS 表示接受并借用；其他结果不保留任何效果。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "Query the separate selected injected integer rank layout."
 msgstr "查询独立选定的注入组整数 rank 布局。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "[in] Same initialized combined controller owner."
 msgstr "[in] 同一个已初始化的联合控制器所有者。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "[out] Distinct output; unchanged on refusal."
 msgstr "[out] 独立输出；拒绝时保持不变。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid ""
 "SUCCESS, UNSUPPORTED for finite/regular-only faces, or admission error."
 msgstr "SUCCESS；有限／仅规则组接口返回 UNSUPPORTED；也可能返回准入错误。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "One exact result span; format belongs to its queried ADC group."
 msgstr "一个精确的结果区间；格式由其所属 ADC 组的查询结果确定。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "Both group spans and this descriptor have one request lifetime."
 msgstr "两个组的数据区间与本描述符共用一个请求生命周期。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid ""
 "The producer borrows this immutable descriptor and both disjoint spans until"
 " one acquire-observed SETTLED. No independent subgroup success or partial "
@@ -1200,11 +1312,11 @@ msgid ""
 msgstr ""
 "生产者借用此不可变描述符和两个互不重叠的数据区间，直到一次以 acquire 观察到 SETTLED。不分别发布子组成功，也不发布部分有效帧。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "Complete raw frame span with an explicit finite request lifetime."
 msgstr "完整的原始帧存储跨度，具有明确的有限请求生命周期。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid ""
 "base.transferred counts complete frames, never bytes or individual ranks. "
 "SUCCESS means exactly frame_count; errors guarantee zero valid frames. "
@@ -1213,35 +1325,35 @@ msgstr ""
 "base.transferred 统计完整帧，不统计字节或单个 rank。SUCCESS 表示恰好完成 frame_count "
 "帧；错误时报告的保证有效帧数为零。部分 DMA/JEOC 进度不会发布为有效前缀。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "Raw frame storage, including declared padding."
 msgstr "原始帧存储，包含声明的填充。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "Explicit paired descriptor."
 msgstr "显式成对结果描述符。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "Explicit result view selected by results_kind."
 msgstr "由 results_kind 显式选择的结果视图。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "Raw bytes, or sizeof(*output.results) when paired."
 msgstr "原始字节数；成对请求则为 sizeof(*output.results)。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "Positive complete frames, within selected bound."
 msgstr "完整帧数量，必须为正且不超过选定上限。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "Explicit active view."
 msgstr "显式指定的当前视图。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "Cold selected rank order, actual integer layout and scheduling facts."
 msgstr "冷态选定的 rank 顺序、实际整数布局与调度事实。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid ""
 "Arrays belong to immutable selected facts and outlive this port. A physical "
 "rank can be discarded padding required by silicon errata; format describes "
@@ -1255,54 +1367,54 @@ msgstr ""
 "仅描述有效逻辑结果。不承诺隐式打包、工程单位、孔径时间戳或触发计数。format 是可移植结果布局。通道／转换器标识、采样码表与 physical-"
 "rank 细节是该高级采集 profile 的显式原生诊断，不是可移植 ID。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "Logical rank order, including repeats."
 msgstr "逻辑 rank 顺序，包含重复项。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "Actual per-channel sampling codes."
 msgstr "实际逐通道采样编码。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "Sampling-code lookup, immutable."
 msgstr "不可变的采样编码查找表。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "Complete scan cost; zero for an unknown interleaved span."
 msgstr "完整 scan 成本；交错 span 未知时为零。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "Zero for software; not an aperture."
 msgstr "软件触发时为零；不表示采样孔径。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "Converter ID per logical result, or NULL."
 msgstr "每个逻辑结果的 converter ID，或 NULL。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "Selected minimum spacing."
 msgstr "所选最小间隔。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "DMA access can exceed one sample."
 msgstr "DMA 访问范围可超过一个 sample。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "Shared read-only selected methods; ordinary ADC tables do not grow."
 msgstr "共享只读的选定方法；普通 ADC 方法表不增加。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid ""
 "A privileged task serializes every call. IRQs only record bounded facts in "
 "the same unique physical owner. No allocation, pool, implicit task, "
 "automatic rearm or runtime discovery is provided."
 msgstr "由一个特权任务串行化所有调用。IRQ 只在同一个唯一物理所有者中记录有界事实。不提供分配、池、隐式任务、自动重新 arm 或运行时发现。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid "Immutable selected face, sharing one const table across instances."
 msgstr "不可变的选定接口，多个实例共享同一 const 方法表。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:44
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:78
 msgid ""
 "Face/context/configuration outlive every request, vector and retained close."
 " Existing ordinary ADC or PWM/ADC faces cannot expose the same leased ADC. A"
@@ -1311,121 +1423,121 @@ msgstr ""
 "接口、上下文和配置的生命周期覆盖每个请求、向量及保留责任的关闭过程。现有普通 ADC 或 PWM/ADC 接口不得暴露同一个已租用的 "
 "ADC。工厂仅返回此既有对象。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:48
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:82
 msgid "adc_observer.h"
 msgstr "adc_observer.h"
 
-#: ../../../../../../docs/reference/api/io/analog.md:50
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:84
 msgid "Optional caller-owned ADC publication observations."
 msgstr "调用者拥有的可选 ADC 发布观察。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:50
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:84
 msgid "Initialize fresh unborrowed optional observation storage."
 msgstr "初始化全新、尚未借用的可选观察存储。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:50
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:84
 msgid "[out] Aligned fresh control, not published to readers."
 msgstr "[out] 已对齐的新控制对象，尚未发布给读者。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:50
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:84
 msgid "[out] Distinct aligned exact record array."
 msgstr "[out] 独立且已对齐、大小精确的记录数组。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:50
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:84
 msgid "[in] Positive count; must equal the selected stream count."
 msgstr "[in] 正数量；必须等于选中 stream 的数量。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:50
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:84
 msgid "Success or INVALID/CONTEXT; rejected outputs stay untouched."
 msgstr "成功或 INVALID/CONTEXT；被拒绝的输出保持不变。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:50
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:84
 msgid ""
 "Provider-only cold bind validates every metadata/payload span before the "
 "first DMA loan."
 msgstr "仅提供者可执行的冷绑定；第一次 DMA 借用之前验证每个元数据／载荷范围。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:50
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:84
 msgid "[inout] Initialized exclusive observation control."
 msgstr "[inout] 已初始化的独占观察控制对象。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:50
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:84
 msgid "[in] Exact initialized stream, no outstanding loans."
 msgstr "[in] 精确的已初始化 stream，且没有尚未归还的借用。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:50
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:84
 msgid "[in] Provider's stable complete private state span."
 msgstr "[in] provider 稳定且完整的私有状态范围。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:50
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:84
 msgid "[in] Positive exact state byte count."
 msgstr "[in] 正的精确状态字节数。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:50
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:84
 msgid "Success or INVALID/BUSY, without a partial retained bind."
 msgstr "成功或 INVALID/BUSY，不留下部分保留的绑定。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:50
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:84
 msgid "Provider-only record before matching release-publication."
 msgstr "仅提供者可执行的记录，必须先于对应的 release 发布。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:50
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:84
 msgid "[inout] Bound exact producer-owned control."
 msgstr "[inout] 已绑定、由精确生产者持有的控制对象。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:50
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:84
 msgid "[in] Still FILLING, with a proved detached memory target."
 msgstr "[in] 仍为 FILLING，且已证明内存目标已分离。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:50
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:84
 msgid ""
 "[in] Finite software observation in the same clock domain; NX_DEADLINE_NEVER"
 " is not an observed time."
 msgstr "[in] 同一时钟域中的有限软件观察值；NX_DEADLINE_NEVER 不属于观察到的时间。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:50
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:84
 msgid ""
 "Success or INVALID/STATE/EXHAUSTED without wrapping identities or changing a"
 " rejected record."
 msgstr "成功，或返回 INVALID/STATE/EXHAUSTED；不使身份回绕，也不改变被拒绝的记录。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:50
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:84
 msgid "Read only a currently acquired block's exact epoch record."
 msgstr "只读取当前已取得块的准确 epoch 记录。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:50
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:84
 msgid "[in] Stable bound observation control."
 msgstr "[in] 稳定且已绑定的观察控制对象。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:50
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:84
 msgid "[in] Same stream's live immutable consumer loan."
 msgstr "[in] 同一 stream 中仍存活且不可变的消费者借用。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:50
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:84
 msgid "[out] Complete copy; untouched on rejection."
 msgstr "[out] 完整副本；拒绝时不变。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:50
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:84
 msgid "Success or INVALID/STATE for a missing/stale/released loan."
 msgstr "成功；借用缺失、陈旧或已释放时返回 INVALID/STATE。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:50
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:84
 msgid "Provider-only unbind after all producer/consumer loans join."
 msgstr "全部生产者／消费者借用完成 join 后，仅提供者可解除绑定。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:50
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:84
 msgid "[inout] Stable initialized control; NULL is allowed."
 msgstr "[inout] 稳定且已初始化的控制对象；允许 NULL。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:50
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:84
 msgid "Success or BUSY retaining the bound stream."
 msgstr "成功，或返回 BUSY 并保留已绑定的 stream。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:50
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:84
 msgid "One loan's software observation, never a sample aperture."
 msgstr "一个借用的软件观察，绝不表示采样孔径。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:50
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:84
 msgid ""
 "observed_at uses the platform monotonic clock after target detach readback. "
 "IRQ delivery and publication latency are included. sequence counts observed "
@@ -1434,11 +1546,11 @@ msgstr ""
 "observed_at 使用目标分离读回之后的平台单调时钟，包含 IRQ 递送及发布延迟。sequence 统计观察到的有效 block "
 "记录，不统计定时器触发、样本或推测的漏失扫描。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:50
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:84
 msgid "Optional caller-owned observer control and exact records."
 msgstr "调用者拥有的可选观察者控制与准确记录。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:50
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:84
 msgid ""
 "Initialize before attaching; internal fields belong to one producer. Records"
 " and control remain live through successful provider stop and all consumer "
@@ -1447,19 +1559,19 @@ msgstr ""
 "附加前先初始化；内部字段属于一个生产者。记录和控制对象必须保持存活，直到 provider 成功停止且全部消费者归还借用。不会扩大默认 "
 "stream、slot 或有限 provider 的存储。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:54
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:88
 msgid "pwm_adc.h"
 msgstr "pwm_adc.h"
 
-#: ../../../../../../docs/reference/api/io/analog.md:56
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:90
 msgid "Optional finite coherent PWM / triggered ADC window."
 msgstr "可选的有限相干 PWM／触发 ADC 窗口。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:56
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:90
 msgid "Prepare distinct unborrowed request, frame and sample storage."
 msgstr "准备彼此独立且尚未借用的请求、帧和采样存储。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:56
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:90
 msgid ""
 "Request, sample span, source frame descriptor and duty span must be "
 "naturally aligned, nonwrapping and disjoint. The caller has consumed prior "
@@ -1473,33 +1585,33 @@ msgstr ""
 "NX_DEADLINE_NEVER；可以准备已到期的有限 "
 "deadline，但不得因此准入新的物理效果。准备过程不访问样本内容、不借用硬件，也不建立速率/区域支持。失败使已初始化请求保持不变。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:56
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:90
 msgid "[out] Naturally aligned writable caller sample array."
 msgstr "[out] 自然对齐且可写的调用方样本数组。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:56
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:90
 msgid "[in] Positive exact sample count; provider checks DMA."
 msgstr "[in] 精确的正样本数；provider 检查 DMA。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:56
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:90
 msgid ""
 "[in] Readable descriptor copied by value during this call only; its complete"
 " duty array remains live through SETTLED."
 msgstr "[in] 仅在本次调用中按值复制的可读描述符；完整占空比数组须保持有效直到 SETTLED。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:56
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:90
 msgid "[in] Finite absolute monotonic deadline for the whole window."
 msgstr "[in] 整个窗口的有限绝对单调 deadline。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:56
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:90
 msgid "SUCCESS or INVALID/STATE; no hardware access or provider borrow."
 msgstr "返回 SUCCESS 或 INVALID/STATE；不访问硬件，也不产生 provider 借用。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:56
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:90
 msgid "Admit and arm one complete finite window on the unique task owner."
 msgstr "由唯一任务所有者准入并布防一个完整有限窗口。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:56
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:90
 msgid ""
 "Post-admission arm/prime failures drain under the accepted request. Normal "
 "completion stops the PWM sources before SETTLED and never rearms. DMA TC "
@@ -1523,64 +1635,64 @@ msgstr ""
 "脉冲数。没有可信完成时间戳时，首次在请求 deadline 时刻或之后观察到完成会报告 TIMEOUT，即使 DMA "
 "已经完成。这一保守观察规则不承诺物理执行时间上界，也绝不放宽必需的来源排空。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:56
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:90
 msgid "[in] Initialized stable selected coupled face and cold leases."
 msgstr "[in] 已初始化且稳定的选中耦合接口及冷租约。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:56
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:90
 msgid "[inout] Exact READY window prepared by the caller."
 msgstr "[inout] 调用方准备的精确 READY 窗口。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:56
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:90
 msgid ""
 "SUCCESS means ACCEPTED, including a possibly already SETTLED error. "
 "Rejection means no retained pointer, payload access or new effect."
 msgstr "SUCCESS 表示 ACCEPTED，包括可能已经 SETTLED 的错误。拒绝表示不保留指针、不访问 payload，也不产生新效果。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:56
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:90
 msgid "Latch cancellation while retaining the exact live window loan."
 msgstr "锁存取消，同时保留对应活动窗口的借用。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:56
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:90
 msgid ""
 "Cancellation is task-local and does not provide a cross-task stable "
 "identity. Use the established adapter slot/epoch mechanism externally. A "
 "prior terminal fault is retained; cancellation never clears it."
 msgstr "取消局限于本任务，不提供跨任务稳定身份。外部应使用既有适配器 slot/epoch 机制。先前终态故障保持保留；取消绝不清除它。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:56
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:90
 msgid "[in] Same live coupled face and serialized privileged task."
 msgstr "[in] 同一个仍然有效的耦合接口及串行化特权任务。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:56
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:90
 msgid "[inout] Exact admitted request, still live until SETTLED."
 msgstr "[inout] 精确的已准入请求，须保持有效直到 SETTLED。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:56
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:90
 msgid "SUCCESS starts/observes cancellation, never implies SETTLED."
 msgstr "SUCCESS 开始或观察到取消，绝不代表已经 SETTLED。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:56
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:90
 msgid "Advance bounded completion or source drain on the same task owner."
 msgstr "由同一任务所有者推进有界完成或源排空。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:56
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:90
 msgid ""
 "No hidden worker/wait/allocation. Only observed source/vector withdrawal "
 "permits final pointer detach and release publication."
 msgstr "没有隐藏 worker、等待或分配。只有观察到来源/向量撤回后，才允许最终指针分离和 release 发布。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:56
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:90
 msgid ""
 "SUCCESS after progress/settlement, BUSY while drain remains, or a fault "
 "requiring continued recovery service and explicit stop."
 msgstr "推进或结清后返回 SUCCESS，排空尚未完成时返回 BUSY；或返回故障，要求继续恢复 service 并显式停止。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:56
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:90
 msgid "Close admission and attempt final drain without revoking a loan."
 msgstr "关闭准入并尝试最终排空，不撤销借用。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:56
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:90
 msgid ""
 "Continue the unique service/stop until quiet. Cold close additionally joins "
 "vectors and restores saved leases. Fault recovery does not automatically "
@@ -1591,31 +1703,31 @@ msgstr ""
 "继续由唯一执行者 service/stop，直到静默。冷关闭还需等待向量退出并恢复保存的租约。故障恢复不自动重新启动 PWM 或恢复采集。SUCCESS"
 " 不释放引脚、时钟或私有存储；这些冷租约保持持有，直到平台最终完成退出汇合并成功关闭。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:56
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:90
 msgid "SUCCESS proves stopped sources; BUSY/IO retains recovery storage."
 msgstr "SUCCESS 证明来源已停止；BUSY/IO 保留恢复所需存储。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:56
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:90
 msgid "Copy exact fixed facts and observed active/fault/quarantine state."
 msgstr "复制精确的固定事实与观察到的活动／故障／隔离状态。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:56
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:90
 msgid "State is an observation, not a source-drain or release operation."
 msgstr "state 是观察操作，不是来源排空或归还操作。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:56
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:90
 msgid "[out] Distinct aligned output, unchanged on rejection."
 msgstr "[out] 独立且已对齐的输出，拒绝时保持不变。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:56
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:90
 msgid "SUCCESS, INVALID/STATE/CONTEXT or UNSUPPORTED for a missing method."
 msgstr "返回 SUCCESS、INVALID/STATE/CONTEXT，或因缺少方法而返回 UNSUPPORTED。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:56
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:90
 msgid "One finite window; transferred counts are raw samples, never bytes."
 msgstr "一个有限窗口；传输数量以原始采样为单位，不以字节计。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:56
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:90
 msgid ""
 "Initialize base before first preparation. After successful admission, the "
 "request and duty array remain live and caller-immutable through acquire-"
@@ -1631,27 +1743,27 @@ msgstr ""
 "独占；借用期间调用方既不读也不写。帧元数据在准备时复制。本有限窗口接口不包含后续影子提交、自动重装、控制算法或工程单位转换。硬件专有样本存储和整数编码由"
 " state.format 报告。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:56
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:90
 msgid "Borrow and release publication state."
 msgstr "借用状态与释放发布状态。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:56
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:90
 msgid "Exclusive writable raw sample storage."
 msgstr "独占可写的原始采样存储。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:56
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:90
 msgid "Positive number of requested samples."
 msgstr "请求的采样数量，必须为正。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:56
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:90
 msgid "Copied metadata; duty array is borrowed."
 msgstr "复制的元数据；占空比数组保持借用。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:56
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:90
 msgid "Exact selected facts and observed source/recovery state."
 msgstr "精确的选定事实与观察到的源／恢复状态。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:56
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:90
 msgid ""
 "Format describes actual supported hardware. It does not establish aperture "
 "timestamps, analog accuracy, PWM duty epochs, IRQ latency, the number of "
@@ -1659,55 +1771,55 @@ msgid ""
 msgstr ""
 "format 描述实际支持的硬件，不建立采样孔径时间戳、模拟精度、PWM 占空比 epoch、IRQ 时延、输出脉冲数量或已检查物理电路的事实。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:56
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:90
 msgid "Actual integer storage and provenance."
 msgstr "实际整数存储表示与来源。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:56
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:90
 msgid "PWM counter ticks per second."
 msgstr "PWM 计数器每秒的计数刻度数。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:56
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:90
 msgid "Fixed period in counter ticks."
 msgstr "以计数器刻度表示的固定周期。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:56
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:90
 msgid "Fixed phase in counter ticks."
 msgstr "以计数器刻度表示的固定相位。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:56
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:90
 msgid "Deadtime in separate deadtime_hz units."
 msgstr "以独立的 deadtime_hz 单位表示的死区时间。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:56
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:90
 msgid "Deadtime clock; never inferred from PSC."
 msgstr "死区时钟；不得从 PSC 推断。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:56
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:90
 msgid "Complete fixed-order frame width."
 msgstr "完整、固定顺序的帧通道数。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:56
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:90
 msgid "Provider/DMA finite-window count bound."
 msgstr "提供者／DMA 的有限窗口计数上限。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:56
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:90
 msgid "Observed source/counter activity."
 msgstr "观察到的源／计数器活动状态。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:56
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:90
 msgid "Latched fault requiring cold recovery."
 msgstr "需要冷恢复的锁存故障。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:56
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:90
 msgid "Incomplete withdrawal retains ownership."
 msgstr "撤离未完成时保留所有权。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:56
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:90
 msgid "Selected-only operations; no growth to ordinary PWM/ADC tables."
 msgstr "仅选定实例具有的操作；普通 PWM／ADC 方法表不增加。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:56
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:90
 msgid ""
 "Each callback implements its corresponding public function contract. One "
 "privileged task serializes submit/cancel/service/stop/state; IRQs only latch"
@@ -1717,11 +1829,11 @@ msgstr ""
 "每个回调实现对应的公共函数契约。一个特权任务串行化 submit/cancel/service/stop/state；IRQ "
 "只向同一私有所有者锁存有界物理事实。缺失回调返回 UNSUPPORTED。不进行分配，也没有隐藏 worker。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:56
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:90
 msgid "Immutable cold-selected identity, never an allocating factory."
 msgstr "不可变的冷装配选定身份；工厂不执行分配。"
 
-#: ../../../../../../docs/reference/api/io/analog.md:56
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:90
 msgid ""
 "Face, operations, context and cold configuration outlive every request and "
 "IRQ publisher. One coupled face owns all selected hardware; no independently"
@@ -1729,3 +1841,247 @@ msgid ""
 msgstr ""
 "接口、方法表、上下文及冷配置的生命周期覆盖每个请求和 IRQ 发布者。一个耦合接口拥有全部选中硬件；不存在可独立启动的 PWM-group 或 ADC "
 "接口暴露该硬件。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:94
+msgid "pwm_adc_loop.h"
+msgstr "pwm_adc_loop.h"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:96
+msgid "Selected bounded IRQ control over coherent PWM/ADC hardware."
+msgstr "在一致 PWM/ADC 硬件上运行的选定、有界 IRQ 控制。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:96
+msgid "Typedefs"
+msgstr "类型定义"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:96
+msgid "Compute one complete duty group from one selected raw scan."
+msgstr "根据一次选定的原始扫描，计算一个完整占空比组。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:96
+msgid ""
+"Runs in the selected privileged ADC IRQ, with a declared hard budget. No "
+"pointer retention, blocking, task-only I/O, Flash, OS API, heap or "
+"concurrent access to borrowed context/storage is permitted. The callback "
+"must return within its budget; software cannot preempt it. Samples are raw "
+"codes, not calibrated physical units or timestamps."
+msgstr ""
+"运行于选定的特权 ADC IRQ 中，并具有声明的硬预算。不允许保留指针、阻塞、调用仅限任务的 I/O、Flash、OS "
+"API、使用堆，或并发访问借用中的上下文和存储。回调必须在其预算内返回；软件无法抢占它。样本是原始码值，不是已校准物理量，也不是时间戳。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:0
+msgid "Param context"
+msgstr "参数 context"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:96
+msgid "[inout] Caller state exclusively loaned with the session."
+msgstr "[inout] 随会话独占借出的调用者状态。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:0
+msgid "Param samples"
+msgstr "参数 samples"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:96
+msgid "[in] Complete raw scan, readable only during this callback."
+msgstr "[in] 完整原始扫描，仅在本次回调期间可读。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:0
+msgid "Param sample_count"
+msgstr "参数 sample_count"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:96
+msgid "[in] Exact selected rank count, fixed for the session."
+msgstr "[in] 选定的精确 rank 数量，在会话期间固定。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:0
+msgid "Param sequence"
+msgstr "参数 sequence"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:96
+msgid "[in] Starts at zero; exhaustion faults instead of wrapping."
+msgstr "[in] 从零开始；耗尽时触发故障，不会回绕。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:0
+msgid "Param duty_ticks"
+msgstr "参数 duty_ticks"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:96
+msgid "[out] Complete output group, writable only in callback."
+msgstr "[out] 完整输出组，仅在回调期间可写。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:0
+msgid "Param duty_count"
+msgstr "参数 duty_count"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:96
+msgid "[in] Exact selected output count and fixed channel order."
+msgstr "[in] 选定的精确输出数量，通道顺序固定。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:0
+msgid "Return"
+msgstr "返回"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:96
+msgid "SUCCESS to stage the complete group; any error latches a fault."
+msgstr "SUCCESS 表示暂存完整组；任何错误都会锁存故障。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:96
+msgid "Prepare disjoint caller storage and a finite session deadline."
+msgstr "准备互不重叠的调用者存储和有限的会话 deadline。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:96
+msgid ""
+"Thread only. Context's starting byte must be representable and outside "
+"session/samples/duties; its full opaque extent and lifetime remain the "
+"caller's responsibility. Provider validates count, range and placement."
+msgstr ""
+"仅限 Thread。Context 的起始字节必须可表示，且不得位于 session/samples/duties "
+"内；其完整不透明范围和生命周期仍由调用者负责。Provider 验证数量、范围和存放位置。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:96
+msgid "[inout] READY or consumed SETTLED initialized session."
+msgstr "[inout] 已初始化的会话，状态为 READY 或已消费的 SETTLED。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:96
+msgid "[out] Aligned raw-scan buffer, exact selected rank count."
+msgstr "[out] 对齐的原始扫描缓冲区，长度等于选定的精确 rank 数量。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:96
+msgid "[in] Positive number of uint16_t containers."
+msgstr "[in] uint16_t 容器数量，必须为正。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:96
+msgid "[inout] Aligned complete initial duty group."
+msgstr "[inout] 对齐且完整的初始占空比组。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:96
+msgid "[in] Positive number of uint32_t counter-tick values."
+msgstr "[in] uint32_t 计数器 tick 值的数量，必须为正。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:96
+msgid "[in] Stable IRQ callback, retained after admission."
+msgstr "[in] 稳定的 IRQ 回调，准入后保留。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:96
+msgid "[inout] Non-NULL callback state, retained after admission."
+msgstr "[inout] 非 NULL 的回调状态，准入后保留。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:96
+msgid "[in] Finite absolute deadline in the selected Core epoch."
+msgstr "[in] 选定 Core epoch 内有限的绝对 deadline。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:96
+msgid "SUCCESS or rejection, with no hardware access or retained borrow."
+msgstr "SUCCESS 或拒绝；不访问硬件，也不保留借用。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:96
+msgid "Admit one session; SUCCESS means borrowing, not physical actuation."
+msgstr "准入一个会话；SUCCESS 表示开始借用，不代表物理执行器已经动作。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:96
+msgid ""
+"Serialized privileged unmasked Thread. Warmup/service precede IRQ control. A"
+" finite deadline bounds admission/progress, not callback WCET."
+msgstr ""
+"须在串行化、特权且未屏蔽中断的 Thread 中调用。IRQ 控制之前先完成 warmup/service。有限 deadline "
+"限制准入和推进，不限定回调 WCET。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:96
+msgid "[in] Stable selected coupled owner and immutable face."
+msgstr "[in] 稳定的选定耦合所有者与不可变接口。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:96
+msgid "[inout] Exact prepared session, retained until SETTLED."
+msgstr "[inout] 精确的已准备会话，持续保留至 SETTLED。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:96
+msgid "SUCCESS means ACCEPTED; rejection retains no references/effects."
+msgstr "SUCCESS 表示 ACCEPTED；拒绝时不保留任何引用，也不产生效果。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:96
+msgid "Advance warmup, failure withdrawal and final session publication."
+msgstr "推进预热、失败时的撤回，以及最终会话发布。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:96
+msgid ""
+"Required for timeout/cleanup even when callbacks progress in IRQ. Never "
+"refreshes the admitted deadline or automatically restarts output."
+msgstr "即使回调在 IRQ 中持续推进，超时和清理仍需要本操作。不会刷新已准入的 deadline，也不会自动重启输出。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:96
+msgid "[in] Same live owner, serialized privileged unmasked Thread."
+msgstr "[in] 同一个有效所有者，须在串行化、特权且未屏蔽中断的 Thread 中调用。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:96
+msgid "SUCCESS, BUSY or retained error; inspect request for SETTLED."
+msgstr "SUCCESS、BUSY 或保留的错误；须检查 request 是否已 SETTLED。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:96
+msgid "Close session admission, withdraw outputs and join IRQ callbacks."
+msgstr "关闭会话准入，撤回输出并等待 IRQ 回调结束。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:96
+msgid "No automatic restart. Cold Platform close separately releases leases."
+msgstr "不会自动重启。冷态 Platform close 另行释放租约。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:96
+msgid "[in] Same stable owner, serialized privileged unmasked Thread."
+msgstr "[in] 同一个稳定所有者，须在串行化、特权且未屏蔽中断的 Thread 中调用。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:96
+msgid "SUCCESS proves stopped/joined; failure retains all borrowed state."
+msgstr "SUCCESS 证明已停止且回调已结束；失败时保留所有被借用的状态。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:96
+msgid "Copy selected facts and observations without changing ownership."
+msgstr "复制选定事实和观测值，不改变所有权。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:96
+msgid "[out] Distinct aligned writable observation."
+msgstr "[out] 独立、对齐且可写的观测结果。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:96
+msgid "SUCCESS or rejection; failure leaves state unchanged."
+msgstr "SUCCESS 或拒绝；失败时状态保持不变。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:96
+msgid "One finite-lifetime continuous control session."
+msgstr "一个生命周期有限的连续控制会话。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:96
+msgid ""
+"Initialize base before prepare. After ACCEPTED, session, callback, context, "
+"samples and duties remain exclusively provider-borrowed until acquire-"
+"observed SETTLED. The initial duty group is caller-authored; subsequent "
+"groups are callback-authored. A timeout/cancel cannot revoke memory, code or"
+" callback-context borrowing. Context may refer to a separately owned bounded"
+" queue/atomic mailbox whose own transfer contract permits cross-context "
+"commands. The borrowed context body and live controller parameters cannot be"
+" concurrently changed by tasks. On settlement, base.transferred is the "
+"accepted commit count, saturated at SIZE_MAX. It does not count physical PWM"
+" periods or sampled pulses."
+msgstr ""
+"Prepare 前须初始化 base。进入 ACCEPTED 后，会话、回调、上下文、样本和占空比持续被 provider 独占借用，直至通过 "
+"acquire 语义观察到 "
+"SETTLED。初始占空比组由调用者编写，后续各组由回调编写。超时或取消不能撤销对内存、代码或回调上下文的借用。Context "
+"可引用另行持有的有界队列或原子邮箱，其自身传递合同须允许跨上下文命令。任务不得并发修改借用中的上下文内容或正在运行的控制器参数。结束时，base.transferred"
+" 是已接受的提交次数，并在 SIZE_MAX 饱和；它不计数物理 PWM 周期或采样脉冲。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:96
+msgid "Selected static capabilities and ordinary-context observations."
+msgstr "选定的静态能力与普通上下文中的观测值。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:96
+msgid ""
+"Counters describe accepted IRQ cycles, not qualified physical pulses or "
+"aperture timestamps. Callback/data memory remains borrowed even if hardware "
+"outputs have already been disabled."
+msgstr "计数器表示已接受的 IRQ 周期，不代表已验收的物理脉冲或采样时刻时间戳。即使硬件输出已经关闭，回调和数据内存仍被借用。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:96
+msgid "Selected-only methods; ordinary PWM and finite tables stay small."
+msgstr "仅针对选定模式的方法；普通 PWM 和有限窗口方法表保持精简。"
+
+#: ../../../../../../../../workspace/nexus/docs/reference/api/io/analog.md:96
+msgid "Immutable face; no allocator, worker or device discovery."
+msgstr "不可变接口；不提供分配器、工作线程或设备发现。"

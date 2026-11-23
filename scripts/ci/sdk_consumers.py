@@ -7,15 +7,19 @@ from pathlib import Path
 import subprocess
 import sys
 import tempfile
+import tomllib
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 from tools.dev.change_paths import changed_paths, classify
+from tools.maintenance.consumer_profiles import (SERVICE_CONSUMERS,
+                                                 service_directory)
+from tools.maintenance.source_catalogue import ALL_SOURCE_DEPENDENCIES
 
-# The complete published consumer plan exercises these optional SDK components.
-FULL_COMPONENTS = ("mcuboot", "mqtt", "network", "network-loaned-rx",
-                   "st-usb-device", "st-usb-host", "tls", "flashdb", "littlefs",
-                   "fatfs", "sfud", "rtt", "shell", "cmsis-dsp", "cm-backtrace")
+# These suppliers are selected by consumer CMake helpers or provider modes.
+# Other optional suppliers come from the canonical consumer assemblies below.
+EXPLICIT_COMPONENTS = ("mcuboot", "mqtt", "network", "network-loaned-rx",
+                       "st-usb-device", "st-usb-host", "tls")
 DEVICE_INPUTS = ("components/devices/tmp117/src/", "cmake/package/verification/device_tmp117/")
 
 
@@ -42,12 +46,25 @@ def sdk_changes(paths):
     return sorted(set(selected))
 
 
+def full_components(root):
+    """Select only supplier profiles used by maintained SDK consumers."""
+    supplied = {profile for item in ALL_SOURCE_DEPENDENCIES
+                for profile in item.component_profiles}
+    selected = set(EXPLICIT_COMPONENTS)
+    for specification in SERVICE_CONSUMERS:
+        assembly = (service_directory(root, specification) /
+                    specification.assembly)
+        authored = tomllib.loads(assembly.read_text())
+        selected.update(supplied.intersection(authored.get("components", ())))
+    return tuple(sorted(selected))
+
+
 def verify_checkout(root, head, changes, output, *, allow_network=False, run=subprocess.run):
     """Use a fresh publisher output and bind both consumer domains to its revision."""
     minimal = changes and all(name.startswith(DEVICE_INPUTS) for name in changes)
     profile = ["--backend", "baremetal" if minimal else "freertos", "--host-support"]
     if not minimal:
-        for component in FULL_COMPONENTS:
+        for component in full_components(root):
             profile.extend(("--component", component))
     with tempfile.TemporaryDirectory(prefix="nexus-sdk-check-") as temporary:
         directory = Path(temporary)

@@ -287,7 +287,7 @@ class EndpointPolicy:
 
 
 def validate_mode_context(selection, route, *, backend, clock_profile,
-                          part=None, clock_plan=None):
+                          part=None, clock_plan=None, kernel_profile=None):
     """Default families impose no additional mode/profile coupling here."""
 
 
@@ -509,6 +509,7 @@ _MODE_TRAITS = MappingProxyType({
     ("adc_group", "regular-auto-injected"): ModeTraits(irq=True, rx_dma=True),
     ("adc_group", "injected-sequence"): ModeTraits(irq=True),
     ("pwm_adc", "finite-regular-dma"): ModeTraits(irq=True, rx_dma=True),
+    ("pwm_adc", "injected-control"): ModeTraits(irq=True, continuous=True),
     ("can_fd", "iso-fd-loopback"): ModeTraits(irq=True),
     ("can_fd", "iso-fd-normal"): ModeTraits(irq=True),
     ("pwm_group", "coherent-pwm"): ModeTraits(irq=True),
