@@ -152,6 +152,11 @@ class OrdinaryHookOrderingTests(unittest.TestCase):
 
 class StyleGateTests(unittest.TestCase):
     def setUp(self):
+        # Disposable hook installs must not leave periodic wheel daemons.
+        environment = patch.dict(os.environ,
+                                 {"VIRTUALENV_NO_PERIODIC_UPDATE": "1"})
+        environment.start()
+        self.addCleanup(environment.stop)
         self.directory = tempfile.TemporaryDirectory()
         self.addCleanup(self.directory.cleanup)
         self.root = Path(self.directory.name)

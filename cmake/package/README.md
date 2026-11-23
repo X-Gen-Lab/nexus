@@ -118,10 +118,17 @@ SDK manifest 的 `source_exports.members` 保存从选中包导出范围与精�
 发行自动化验证已有可发布 prefix，不使用开发 opt-in：
 
 上方默认导出是精简裸机包。[完整维护消费者计划](../../tools/maintenance/consumer_profiles.py)
-还需要显式 host 支撑、FreeRTOS 与所选网络／安全／USB 供应方，以及
-`flashdb`、`littlefs`、`fatfs`、`sfud`、`rtt`、`shell`、`cmsis-dsp`、
-`cm-backtrace` 八个可选组件；按[Source SDK 教程](../../docs/guides/use-source-sdk.md)
-准备并导出完整 profile，再执行以下验证。验证器不会跳过缺失消费者来接纳精简包。
+需要显式 host 支撑、FreeRTOS 和所用组件的供应方。从干净、已提交的完整检出执行：
+
+```sh
+NEXUS_BUILD_JOBS=2 python scripts/ci/sdk_consumers.py --all --allow-network \
+  --output build/quality/sdk-consumers
+```
+
+入口从维护消费者的装配声明及显式 CMake helper 需求选择供应方，准备依赖、导出并
+搬迁临时 SDK，再执行完整计划。未被消费者选择的库存不进入这份 SDK。产品交付的
+独立范围见[维护者发布流程](../../docs/development/sdk-publishing.md)。
+已有满足完整计划的可发布 prefix 时，也可直接验证：
 
 ```sh
 python cmake/package/verify_consumers.py \

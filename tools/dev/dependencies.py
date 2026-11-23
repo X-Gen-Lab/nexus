@@ -311,7 +311,12 @@ def _advertised(root: Path, item, commit: str):
     arguments = ("ls-remote", "--exit-code", item.fetch_url)
     if item.fetch_url != item.upstream_url:
         arguments += (reference, reference + "^{}")
-    result = _git(root, *arguments)
+    result = _git(root, *arguments, check=False)
+    if result.returncode == 2 and item.fetch_url != item.upstream_url:
+        raise EvidenceError("dependency retained pin is unavailable: " + item.path)
+    if result.returncode:
+        raise EvidenceError("dependency remote query failed: " + item.path +
+                            " (exit " + str(result.returncode) + ")")
     if not result.stdout.strip():
         raise EvidenceError("dependency fetch URL has no advertised references: " + item.path)
     if item.fetch_url != item.upstream_url:

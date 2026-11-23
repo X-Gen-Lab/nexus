@@ -1,6 +1,7 @@
 """Reviewed source SDK consumer configurations and execution domains."""
 
 from dataclasses import dataclass
+from pathlib import Path
 
 CONSUMER_POLICY = "nexus-sdk-consumers-v32"
 BASE_CONSUMERS = (("native", False, "native"), ("stm32", True, "stm32"))
@@ -144,3 +145,18 @@ def consumer_plan():
             + tuple(("modern", item) for item in MODERN_CONSUMERS)
             + tuple(("selected", item) for item in SELECTED_CONSUMERS)
             + tuple(("services", item) for item in SERVICE_CONSUMERS))
+
+
+def service_directory(sdk, specification):
+    """Use the single owned scenario tree, including shared F4 references."""
+    if specification.scenario == "f4_qspi_mapped":
+        return Path(sdk) / "tests/contracts/stm32f4_qspi"
+    if specification.scenario == "f4_capture_audio":
+        return Path(sdk) / "tests/contracts/f407_capture_audio"
+    if specification.scenario in {"f4_pwm_adc", "f4_pwm_adc_loop",
+                                  "f4_freertos_stop"}:
+        return Path(sdk) / "tests/contracts" / specification.scenario.replace(
+            "f4_", "f407_", 1)
+    return (Path(sdk) / "tests/contracts" / ("stm32" + specification.scenario)
+            if specification.scenario.startswith("f4_") else
+            Path(sdk) / "cmake/package/verification" / specification.scenario)

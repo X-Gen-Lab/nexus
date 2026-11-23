@@ -22,7 +22,7 @@ from tools.dev import process  # noqa: E402
 from tools.evidence.common import file_identity, regular_file  # noqa: E402
 from tools.maintenance.consumer_profiles import (BASE_CONSUMERS, MODERN_CONSUMERS,
                                      SELECTED_CONSUMERS, SERVICE_CONSUMERS,
-                                     ServiceConsumer, consumer_plan,
+                                     ServiceConsumer, consumer_plan, service_directory,
                                      selected_domain, NATIVE_TIME_SMOKES)  # noqa: E402
 
 
@@ -290,21 +290,6 @@ def service_profile(specification):
             or specification not in SERVICE_CONSUMERS):
         raise ValueError("Service consumer differs from the canonical plan")
     return specification
-
-
-def service_directory(sdk, specification):
-    """Use the single owned scenario tree, including shared F4 references."""
-    if specification.scenario == "f4_qspi_mapped":
-        return Path(sdk) / "tests/contracts/stm32f4_qspi"
-    if specification.scenario == "f4_capture_audio":
-        return Path(sdk) / "tests/contracts/f407_capture_audio"
-    if specification.scenario in {"f4_pwm_adc", "f4_pwm_adc_loop",
-                                  "f4_freertos_stop"}:
-        return Path(sdk) / "tests/contracts" / specification.scenario.replace(
-            "f4_", "f407_", 1)
-    return (Path(sdk) / "tests/contracts" / ("stm32" + specification.scenario)
-            if specification.scenario.startswith("f4_") else
-            Path(sdk) / "cmake/package/verification" / specification.scenario)
 
 
 def service_sources(sdk, specification):

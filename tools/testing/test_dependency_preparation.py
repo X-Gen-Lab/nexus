@@ -232,6 +232,56 @@ class DependencyPreparationTests(unittest.TestCase):
         self.assertEqual(self.git(self.checkout, "remote", "get-url", "origin"),
                          self.origin)
 
+    def test_absent_remote_pin_reports_dependency_before_mutation(self):
+        controlled = self.controlled_transport()
+        run = subprocess.run
+        queried = []
+        operations = []
+
+        def observe(argv, **kwargs):
+            if "ls-remote" in argv and "--get-url" not in argv:
+                # Exercise Git's real exit code for an absent advertised ref.
+                local = list(argv)
+                local[local.index(controlled.fetch_url)] = str(self.seed)
+                result = run(local, **kwargs)
+                queried.append(result.returncode)
+                return result
+            if "submodule" in argv:
+                operations.append(argv)
+            return run(argv, **kwargs)
+
+        with patch.object(dependencies.subprocess, "run", side_effect=observe):
+            with self.assertRaisesRegex(EvidenceError,
+                    "dependency retained pin is unavailable: " + self.module):
+                self.prepare(network=True)
+        self.assertEqual(queried, [2])
+        self.assertEqual(operations, [])
+        self.assertEqual(self.git(self.checkout, "remote", "get-url", "origin"),
+                         self.origin)
+        self.assertEqual(self.git(self.checkout, "rev-parse", "HEAD"),
+                         self.selected)
+
+    def test_remote_failure_reports_dependency_without_private_diagnostics(self):
+        self.controlled_transport()
+        run = subprocess.run
+        operations = []
+        private = "fatal: https://fixture:private-token@example.invalid/repo"
+
+        def observe(argv, **kwargs):
+            if "ls-remote" in argv and "--get-url" not in argv:
+                return subprocess.CompletedProcess(argv, 128, "", private)
+            if "submodule" in argv:
+                operations.append(argv)
+            return run(argv, **kwargs)
+
+        with patch.object(dependencies.subprocess, "run", side_effect=observe):
+            with self.assertRaises(EvidenceError) as caught:
+                self.prepare(network=True)
+        self.assertEqual(str(caught.exception),
+            "dependency remote query failed: " + self.module + " (exit 128)")
+        self.assertNotIn(private, str(caught.exception))
+        self.assertEqual(operations, [])
+
     def test_controlled_policy_does_not_take_over_another_user_fork(self):
         self.controlled_transport()
         self.git(self.checkout, "remote", "set-url", "origin",

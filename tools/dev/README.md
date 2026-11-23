@@ -17,6 +17,9 @@ python tools/dev/dev.py test --preset native-debug
 ```
 
 `prepare` 显式允许网络后才下载依赖；配置和编译不隐式下载。
+组织来源缺少保留 pin 时，错误指出依赖路径；应恢复该 fork 上选中提交的
+`refs/tags/nexus/pins/<commit>`，保持来源与锁定提交不变。其他远端查询失败
+报告依赖路径和 Git 退出码，不公开可能包含凭据的原始诊断。
 `doctor --target arm` 检查锁定的 ARM 编译器；`contracts` 同时检查 Native 和 ARM。
 CMake 的原生参数可以直接透传。并发受进程分配预算约束。
 
