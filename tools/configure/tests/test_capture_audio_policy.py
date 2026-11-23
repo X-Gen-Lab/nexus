@@ -1,4 +1,5 @@
 """Capture and I2S planning follows package facts and semantic route roles."""
+from tools.configure.tests.f4_fixture import f4_pinmux
 import copy
 import json
 from pathlib import Path
@@ -17,7 +18,7 @@ class CaptureAudioPolicyTests(unittest.TestCase):
             facts["audio"]["controllers"]["SERIAL_AUDIO"] = facts["audio"]["controllers"].pop("I2S2")
             facts["audio"]["external_sources"] = ["quartz"]
             facts["audio"]["clock_groups"] = {"serializer": ["SERIAL_AUDIO", "I2S3"]}
-        return CaptureAudioPolicy.from_validated(facts)
+        return CaptureAudioPolicy.from_validated(facts, pinmux=f4_pinmux())
 
     @staticmethod
     def capture_route(controller="CAMERA_PORT"):

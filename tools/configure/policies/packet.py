@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from types import MappingProxyType
 
 from tools.configure.calls import Symbol
+from tools.configure.pinmux import NumericPinMuxPolicy
 from tools.configure.providers.common import fail, integer
 from tools.configure.records import freeze
 
@@ -79,7 +80,9 @@ class PacketPolicy:
     data: Mapping
 
     @classmethod
-    def from_validated(cls, value):
+    def from_validated(cls, value, *, pinmux):
+        if not isinstance(pinmux, NumericPinMuxPolicy):
+            fail("Packet policy requires a selected numeric pinmux policy")
         _fields(value, {"schema_version", "usb_modes", "host_modes", "dma_alignment",
                         "setup_slots", "setup_bytes"}, {"ethernet_memory", "admission", "faces"})
         if type(value["schema_version"]) is not int or value["schema_version"] != 1:
@@ -128,7 +131,7 @@ class PacketPolicy:
                     if (not isinstance(pin, (tuple, list)) or len(pin) != 3 or
                             any(not isinstance(name, str) or not name for name in pin[:2])):
                         fail("USB capability requires pin, role and alternate")
-                    integer(pin[2], 0, 15, "USB alternate")
+                    pinmux.validate(pin[2], "USB alternate")
                 engines = row["engines"]
                 if (not isinstance(engines, (tuple, list)) or not engines or
                         len(set(engines)) != len(engines) or set(engines) - {"pio", "dma"}):

@@ -10,7 +10,7 @@ from tools.configure.records import freeze
 CONTROLLER_REQUIRED = frozenset(("kind", "irq", "pins"))
 CONTROLLER_OPTIONAL = frozenset((
     "resources", "max_hz", "irq_numbers", "channel_count", "clock_hz",
-    "clock_domain", "fifo_words", "endpoint_numbers", "message_ram_words"))
+    "clock_domain", "irq_sources", "fifo_words", "endpoint_numbers", "message_ram_words"))
 
 
 @dataclass(frozen=True)
@@ -19,6 +19,7 @@ class ControllerFacts:
     kind: str
     pins: tuple[str, ...]
     irqs: tuple[str, ...]
+    irq_sources: Mapping
     irq_numbers: Mapping | tuple | None
     clock_domain: str | None
     resources: tuple[str, ...]
@@ -150,12 +151,13 @@ def from_validated(soc, part, vendor_device):
         controllers[name] = ControllerFacts(
             kind=value["kind"], pins=tuple(value["pins"]),
             irqs=tuple(value["irq"]),
+            irq_sources=freeze(value.get("irq_sources", {})),
             irq_numbers=freeze(value.get("irq_numbers")),
             clock_domain=value.get("clock_domain"),
             resources=tuple(value.get("resources", ())),
             limits=freeze({key: value[key] for key in CONTROLLER_OPTIONAL
                            if key in value and key not in {
-                               "irq_numbers", "clock_domain", "resources"}}))
+                               "irq_numbers", "irq_sources", "clock_domain", "resources"}}))
         policies[name] = ControllerModes(
             modes=tuple(value["modes"]),
             interfaces=freeze(value.get("interfaces", {})))

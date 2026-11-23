@@ -120,13 +120,19 @@
             21,
             22
           ],
-          "clock_hz": 42000000,
           "pins": [
             "PA11",
             "PA12",
             "PB8",
             "PB9"
-          ]
+          ],
+          "clock_domain": "apb1",
+          "irq_sources": {
+            "tx": "CAN1_TX",
+            "rx0": "CAN1_RX0",
+            "rx1": "CAN1_RX1",
+            "error": "CAN1_SCE"
+          }
         },
         "CAN2": {
           "kind": "can",
@@ -142,11 +148,17 @@
             65,
             66
           ],
-          "clock_hz": 42000000,
           "pins": [
             "PB12",
             "PB13"
-          ]
+          ],
+          "clock_domain": "apb1",
+          "irq_sources": {
+            "tx": "CAN2_TX",
+            "rx0": "CAN2_RX0",
+            "rx1": "CAN2_RX1",
+            "error": "CAN2_SCE"
+          }
         },
         "DAC": {
           "kind": "dac",

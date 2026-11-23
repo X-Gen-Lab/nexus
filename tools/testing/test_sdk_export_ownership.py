@@ -29,7 +29,7 @@ class SDKExportOwnershipTests(unittest.TestCase):
         for name in ("soc.json", "routes.json", "CMakeLists.txt"):
             (self.package / name).write_text("{}\n")
         (self.package / "package.json").write_text(json.dumps({
-            "schema_version": 1, "interface_version": 1,
+            "schema_version": 1, "interface_version": 2,
             "id": "reviewed", "family": "reviewed", "vendor": "acme",
             "source_directory": ".",
             "facts": {"soc": "soc.json", "routes": "routes.json"},

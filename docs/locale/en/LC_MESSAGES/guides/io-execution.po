@@ -7,13 +7,13 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: f7f627a8a8a9092465742e389a884d440588236ebc731dd806a63182c49639ec\n"
+"X-Nexus-Source-SHA256: 0f96928b2bd1d70b1c286cf582642d51b5c9a5a699caa7118963c25308bf69be\n"
 
-#: ../../../../../../docs/guides/io-execution.md:8
+#: ../../../../../../../docs/guides/io-execution.md:8
 msgid "为 I/O 提供执行与存储"
 msgstr "Provide I/O execution and storage"
 
-#: ../../../../../../docs/guides/io-execution.md:10
+#: ../../../../../../../docs/guides/io-execution.md:10
 msgid ""
 "取得 factory 接口以后，日常调用直接进入其操作表。Platform 管所选基础设施的 启动与停止；应用负责任务、调度、队列、service "
 "频率、缓冲与恢复决策。"
@@ -23,11 +23,11 @@ msgstr ""
 "application owns tasks, scheduling, queues, service frequency, buffers and "
 "recovery decisions."
 
-#: ../../../../../../docs/guides/io-execution.md:13
+#: ../../../../../../../docs/guides/io-execution.md:13
 msgid "一个接口，一个明确执行者"
 msgstr "One explicit executor for each interface"
 
-#: ../../../../../../docs/guides/io-execution.md:15
+#: ../../../../../../../docs/guides/io-execution.md:15
 msgid ""
 "轮询模式在所选预算内完成操作；IRQ／DMA 模式需要按接口合同提供通知、service 或 等待适配。多个 producer 共享 UART／SPI "
 "时，选择显式 owner，避免不同任务同时 推进同一控制器状态。平台不会隐式创建 worker，也不会启动 scheduler。"
@@ -39,7 +39,7 @@ msgstr ""
 "concurrently. The platform creates no implicit worker and does not start the"
 " scheduler."
 
-#: ../../../../../../docs/guides/io-execution.md:19
+#: ../../../../../../../docs/guides/io-execution.md:19
 msgid "普通接口不为未选异步模式分配最大状态或缓冲。先从实际任务选择有限请求或连续流， 再确定容量和执行方式，具体模式以支持矩阵和完整配置校验为准。"
 msgstr ""
 "An ordinary interface does not allocate maximum state or buffers for "
@@ -47,39 +47,39 @@ msgstr ""
 "from the actual task, then determine capacity and execution. Available modes"
 " are bounded by the support matrix and complete configuration validation."
 
-#: ../../../../../../docs/guides/io-execution.md:22
+#: ../../../../../../../docs/guides/io-execution.md:22
 msgid "有限请求的最小闭环"
 msgstr "The minimal finite-request cycle"
 
-#: ../../../../../../docs/guides/io-execution.md:24
+#: ../../../../../../../docs/guides/io-execution.md:24
 msgid "应用准备请求、payload 和同一单调时间域的绝对 deadline。"
 msgstr ""
 "The application prepares a request, payload and absolute deadline in the "
 "same monotonic time domain."
 
-#: ../../../../../../docs/guides/io-execution.md:25
+#: ../../../../../../../docs/guides/io-execution.md:25
 msgid "`REJECTED` 不保留调用者引用；处理错误后可按合同重试。"
 msgstr ""
 "`REJECTED` retains no caller references; handle the error before retrying as"
 " permitted by the contract."
 
-#: ../../../../../../docs/guides/io-execution.md:26
+#: ../../../../../../../docs/guides/io-execution.md:26
 msgid "`ACCEPTED` 开始借用，持续推进其执行者，观察请求状态。"
 msgstr ""
 "`ACCEPTED` begins a borrow. Continue advancing its executor and observing "
 "request state."
 
-#: ../../../../../../docs/guides/io-execution.md:27
+#: ../../../../../../../docs/guides/io-execution.md:27
 msgid "acquire 观察 `SETTLED` 后读取最终结果，确认控制与观察者也已排空。"
 msgstr ""
 "After an acquire observation of `SETTLED`, read the final result and confirm"
 " that control activity and observers have also drained."
 
-#: ../../../../../../docs/guides/io-execution.md:28
+#: ../../../../../../../docs/guides/io-execution.md:28
 msgid "再归还或复用相应存储。"
 msgstr "Only then return or reuse the relevant storage."
 
-#: ../../../../../../docs/guides/io-execution.md:30
+#: ../../../../../../../docs/guides/io-execution.md:30
 msgid ""
 "通知是提示，请求谓词是完成依据。DMA 搬运完成、线上完成和引用排空是不同事件。 取消、超时和 `QUARANTINED` "
 "都不授权提前释放；失败后保持存储，继续既定排空或 "
@@ -92,11 +92,11 @@ msgstr ""
 " enter product recovery. The [ownership "
 "contract](../explanation/ownership.md) defines the full state rules."
 
-#: ../../../../../../docs/guides/io-execution.md:34
+#: ../../../../../../../docs/guides/io-execution.md:34
 msgid "连续流与停止"
 msgstr "Continuous streams and stop"
 
-#: ../../../../../../docs/guides/io-execution.md:36
+#: ../../../../../../../docs/guides/io-execution.md:36
 msgid ""
 "按流合同取得并归还 loan，借用期间不改数据。容量耗尽时处理 loss／backpressure； `BUSY` stop "
 "仍可能保留已发布的借用。归还、排空并 join 相关 owner、producer 和 观察者之后，才重新使用其状态。"
@@ -106,7 +106,7 @@ msgstr ""
 " stop may retain published borrows. Return loans, drain and join relevant "
 "owners, producers and observers before reusing their state."
 
-#: ../../../../../../docs/guides/io-execution.md:40
+#: ../../../../../../../docs/guides/io-execution.md:40
 msgid ""
 "停止应用时先关闭新请求，再请求取消并继续 service，等待真正排空。最后按后端 允许的顺序停止 Platform。FreeRTOS "
 "scheduler 已尝试启动后不能按“任务从未运行” 逆序丢弃状态；内核仍使用的 Tick／时钟必须保留，见 [OS 停止](os-"
@@ -119,11 +119,186 @@ msgstr ""
 "though tasks never ran. Preserve Tick/clock infrastructure still used by the"
 " kernel; see [OS shutdown](os-shutdown.md)."
 
-#: ../../../../../../docs/guides/io-execution.md:45
+#: ../../../../../../../docs/guides/io-execution.md:45
+msgid "五条最小使用路径"
+msgstr "Five minimal usage paths"
+
+#: ../../../../../../../docs/guides/io-execution.md:47
+msgid ""
+"配套 [nexus-examples](https://github.com/X-Gen-Lab/nexus-examples) 维护实际应用 "
+"C， 平台不复制另一份应用实现。阅读时核对例库 gitlink 与 SDK lock；主工程的 UART IRQ 或 SPI polling "
+"装配不能代替独立 DMA 装配。以下每条都需明确配置、接口、存储、 执行者、正常顺序、失败退出和实际验证范围。"
+msgstr ""
+"The companion [nexus-examples](https://github.com/X-Gen-Lab/nexus-"
+"examples) maintains the actual application C code; the platform does not "
+"duplicate the application implementation. Check the examples gitlink and "
+"SDK lock when reading. The main project's UART IRQ or SPI polling "
+"assembly cannot substitute for a separate DMA assembly. Each path below "
+"must specify its configuration, interface, storage, executor, normal "
+"sequence, failure exit and actual validation scope."
+
+#: ../../../../../../../docs/guides/io-execution.md:52
+msgid "同步 GPIO"
+msgstr "Synchronous GPIO"
+
+#: ../../../../../../../docs/guides/io-execution.md:54
+msgid ""
+"`apps/platform_reference/` 与起始模板使用所选 Board 的已审极性。取得 strong logical signal"
+" 后调用 `nx_gpio_signal_write` 或 `nx_gpio_signal_read`；业务不重复 pin mask 和极性。 "
+"未知极性不从初始电平猜测，逻辑 inactive 也不表示高阻或电气断能。"
+msgstr ""
+"`apps/platform_reference/` and the starter template use the reviewed "
+"polarity of the selected Board. After obtaining a strong logical signal, "
+"call `nx_gpio_signal_write` or `nx_gpio_signal_read`; application logic "
+"does not repeat pin masks or polarity. Do not infer unknown polarity from"
+" the initial level. Logical inactive does not imply high impedance or "
+"electrical de-energization."
+
+#: ../../../../../../../docs/guides/io-execution.md:59
+msgid ""
+"这条路径只需同步调用和明确写入者，不承担 request、队列或 worker。停止写入者后 再停 Platform；启动或停止失败保留其 "
+"primary、cleanup 和 remaining effects。"
+msgstr ""
+"This path needs only synchronous calls and an explicit writer; it has no "
+"request, queue or worker responsibilities. Stop the writer before "
+"stopping Platform. If startup or shutdown fails, retain its primary, "
+"cleanup and remaining effects."
+
+#: ../../../../../../../docs/guides/io-execution.md:62
+msgid "有限 UART DMA"
+msgstr "Finite UART DMA"
+
+#: ../../../../../../../docs/guides/io-execution.md:64
+msgid ""
+"选择真实 `dma-tx` 装配，调用者持有 request、payload 和同一时钟域的有限绝对 deadline。先用 "
+"`nx_deadline_finite_after` 检查有限预算，失败时拒绝本次准入。 请求接受后由同一执行者持续推进；DMA TC、UART "
+"TC 和 acquire 观察 SETTLED 分别证明内存搬运、线上完成及借用结束。该模式原有 RX 职责仍由同一 owner 持有。"
+msgstr ""
+"Select an actual `dma-tx` assembly. The caller holds the request, payload"
+" and a finite absolute deadline in the same clock domain. First check the"
+" finite budget with `nx_deadline_finite_after`; reject admission if this "
+"fails. After the request is accepted, the same executor must keep "
+"advancing it. DMA TC, UART TC and acquire-observed SETTLED respectively "
+"establish memory transfer, wire completion and the end of the borrow. The"
+" same owner retains the mode's existing RX responsibilities."
+
+#: ../../../../../../../docs/guides/io-execution.md:69
+msgid ""
+"取消或超时仅请求终止。每次推进返回进行中或保留责任时，原 request、payload、 回调和硬件资源继续存活；QUARANTINED "
+"不允许直接退出存储作用域。仅使用该模式 实际提供的恢复操作，无恢复能力时由外部产品决定停机或复位。"
+msgstr ""
+"Cancellation or timeout only requests termination. Whenever an "
+"advancement step reports work in progress or retained responsibilities, "
+"the original request, payload, callbacks and hardware resources must "
+"remain alive. QUARANTINED does not permit leaving the storage scope. Use "
+"only recovery operations actually provided by the mode. If no recovery "
+"capability exists, the external product decides whether to shut down or "
+"reset."
+
+#: ../../../../../../../docs/guides/io-execution.md:73
+msgid "有限 SPI DMA"
+msgstr "Finite SPI DMA"
+
+#: ../../../../../../../docs/guides/io-execution.md:75
+msgid ""
+"从 controller 取得已配置 endpoint，起始路径只用一个执行者。调用者持有 request、 段表与 TX/RX "
+"span，并明确帧宽、数量单位、CS 时序及允许的重叠关系。需要多个 producer 时才接入既有 SPI owner，不为单次 DMA "
+"强制增加队列和线程。"
+msgstr ""
+"Obtain the configured endpoint from the controller and use one executor "
+"for the initial path. The caller holds the request, segment table and "
+"TX/RX spans, and specifies the frame width, count units, CS timing and "
+"permitted overlaps. Connect the existing SPI owner only when multiple "
+"producers are needed; a single DMA operation does not mandate an "
+"additional queue and thread."
+
+#: ../../../../../../../docs/guides/io-execution.md:79
+msgid ""
+"双向 DMA 的 memory TC 不代替 wire idle 或 CS 合同完成。取消、错误和排空期间仍 保留全部被接受的 "
+"span；acquire 观察 SETTLED 后读取最终结果和实际传输前缀， 失败结果也不表示零效果。"
+msgstr ""
+"Memory TC for bidirectional DMA does not establish wire idle or "
+"completion of the CS contract. Retain all accepted spans during "
+"cancellation, errors and draining. After an acquire observation of "
+"SETTLED, read the final result and actual transfer prefix; a failure "
+"result does not imply zero effects."
+
+#: ../../../../../../../docs/guides/io-execution.md:83
+msgid "连续 ADC blocks"
+msgstr "Continuous ADC blocks"
+
+#: ../../../../../../../docs/guides/io-execution.md:85
+msgid ""
+"`apps/stream_recovery/` 维护采集和退出组合；`recipes/control/` 另演示数据处理。 配置明确 scan "
+"格式、硬件触发、rate、service 上界和 DMA 可达存储。容量包含硬件 目标、替换块和消费者保留；CCM 等 CPU-only "
+"内存不能作为 DMA 目标。"
+msgstr ""
+"`apps/stream_recovery/` maintains acquisition and exit combinations; "
+"`recipes/control/` separately demonstrates data processing. The "
+"configuration specifies the scan format, hardware trigger, rate, service "
+"upper bound and DMA-reachable storage. Capacity includes hardware "
+"targets, replacement blocks and blocks retained by consumers. CPU-only "
+"memory such as CCM cannot be a DMA target."
+
+#: ../../../../../../../docs/guides/io-execution.md:89
+msgid ""
+"按 service、acquire 完整 block、处理、release 原 token 推进。EMPTY 不复用旧样本， LOSS "
+"和错误由应用明确决定是否停止。调用所选停止操作，由 provider 先撤新触发； 调用者继续排空 filling、READY 和 "
+"BORROWED。release 或 stop 失败保留原 token、 状态和 executor，不清零重启。"
+msgstr ""
+"Advance through service, acquire of a complete block, processing and "
+"release of the original token. EMPTY does not permit reuse of old "
+"samples. The application explicitly decides whether LOSS or errors "
+"require stopping. Call the selected stop operation; the provider first "
+"withdraws new triggers, and the caller continues draining filling, READY "
+"and BORROWED. If release or stop fails, retain the original token, state "
+"and executor; do not zero them and restart."
+
+#: ../../../../../../../docs/guides/io-execution.md:94
+msgid "连续音频 blocks"
+msgstr "Continuous audio blocks"
+
+#: ../../../../../../../docs/guides/io-execution.md:96
+msgid ""
+"按精确 I2S/SAI 装配选择 layout、主从时钟、rate 与调用者 block 存储；frame、 sample 和 DMA "
+"container 的单位分别读取公共合同。实际提交或取得完整 block 后， 按对应方向归还借用；TX 与 RX "
+"不共用一份已回收证明，duplex 停止须两侧真实退出。"
+msgstr ""
+"Select the layout, master/slave clocks, rate and caller-owned block "
+"storage for the exact I2S/SAI assembly. Read the public contracts "
+"separately for the units of frame, sample and DMA container. After "
+"actually submitting or acquiring a complete block, return the borrow for "
+"the corresponding direction. TX and RX each require their own reclamation"
+" evidence; stopping duplex requires both sides to actually exit."
+
+#: ../../../../../../../docs/guides/io-execution.md:100
+msgid ""
+"underrun、overrun、缺少替换块或外部时钟停止走显式错误与退出路径。平台不自动 "
+"填静音或丢弃借用数据。有限运行窗口结束只停止新增工作；每次 step 的工作量上限 不构成物理停机时限，失败排空仍保留原 owner 与数据。"
+msgstr ""
+"An underrun, overrun, missing replacement block or stopped external clock"
+" follows an explicit error and exit path. The platform does not "
+"automatically fill silence or discard borrowed data. Ending a finite run "
+"window only stops adding new work. The work limit of each step does not "
+"establish a physical shutdown time limit. A failed drain still retains "
+"the original owner and data."
+
+#: ../../../../../../../docs/guides/io-execution.md:104
+msgid ""
+"上述用例的软件行为、真实 provider 的 ARM 链接和物理时序分别验收。Native mock "
+"只替代外部端口，不代替应用退出逻辑，也不建立真实 DMA、电气或采样时序资格。"
+msgstr ""
+"The software behavior of these use cases, ARM linking of the real "
+"provider and physical timing are accepted separately. Native mocks "
+"replace only external ports. They do not replace application exit logic "
+"or establish qualification for real DMA, electrical behavior or sampling "
+"timing."
+
+#: ../../../../../../../docs/guides/io-execution.md:107
 msgid "查看诊断"
 msgstr "Inspect diagnostics"
 
-#: ../../../../../../docs/guides/io-execution.md:47
+#: ../../../../../../../docs/guides/io-execution.md:109
 msgid ""
 "`nx_io_diagnose` 复制当前请求和流事实，不执行恢复，不归还借用。`unknown_facts` "
 "保留未知信息；`SERVICE_OVERDUE` 需要同时间域内实际时间戳和明确 service 预算。 "
@@ -135,7 +310,7 @@ msgstr ""
 "explicit service budget. `nx_dma_storage_validate` validates the complete "
 "explicit storage reservation, not only alignment of its first address."
 
-#: ../../../../../../docs/guides/io-execution.md:51
+#: ../../../../../../../docs/guides/io-execution.md:113
 msgid ""
 "用[异步请求教程](../tutorials/async-io.md)练习成功与失败路径，公共签名见 [I/O "
 "API](../reference/api/io/index.md)，实际延迟与吞吐测量见 [性能与 HIL](performance-hil.md)。"

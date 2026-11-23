@@ -6,13 +6,16 @@ from types import SimpleNamespace
 import unittest
 
 from tools.configure import configure, experience, physical_facts
+from tools.configure.pinmux import NumericPinMuxPolicy
 from tools.configure.tests import test_data_package as data_fixture
 
 
 class PadFactResolutionTests(unittest.TestCase):
     def test_named_pad_routes_and_gpio_masks_use_explicit_coordinates(self):
         pads = {"IO_ENABLE": {"registers": "GPIO_A", "port_index": 3, "number": 11}}
-        provider = SimpleNamespace(PAD_FACTS=pads)
+        pinmux = NumericPinMuxPolicy.from_validated(
+            {"encoding": "numeric", "selectors": [0]})
+        provider = SimpleNamespace(PAD_FACTS=pads, PINMUX_POLICY=pinmux)
         soc = {"variants": {"TEST_PART": {"pins": ["IO_ENABLE"]}},
                "controllers": {"PORT_A": {"kind": "gpio", "modes": ["output"],
                                            "pins": ["IO_ENABLE"]}}}
@@ -30,7 +33,8 @@ class PadFactResolutionTests(unittest.TestCase):
             configure.resolve_bindings(board, routes, "TEST_PART", pad_facts={})
         with self.assertRaises(ValueError):
             configure.resolve_routes({"schema_version": 1, "routes": [route]},
-                                     soc, "TEST_PART", SimpleNamespace(PAD_FACTS={}))
+                                     soc, "TEST_PART", SimpleNamespace(
+                                         PAD_FACTS={}, PINMUX_POLICY=pinmux))
 
     def test_conditional_pad_explicitly_refers_to_a_declared_gpio(self):
         pads = {"IO_2": {"registers": "GPIO_A", "port_index": 0, "number": 2},

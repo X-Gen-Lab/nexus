@@ -7,13 +7,13 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: a21289ccbf7ba674280a56fd7daadc0bf90a7329bc6b44140361c538fbd4911a\n"
+"X-Nexus-Source-SHA256: 2f0f3dae272ca6068e979ccb8adfdbd8e5d7387cb043ee379eb23f2a468ea073\n"
 
-#: ../../../../../../docs/guides/provider-porting.md:8
+#: ../../../../../../../docs/guides/provider-porting.md:8
 msgid "接入 MCU、IP 与静态实例"
 msgstr "Integrate an MCU, IP and static instances"
 
-#: ../../../../../../docs/guides/provider-porting.md:10
+#: ../../../../../../../docs/guides/provider-porting.md:10
 msgid ""
 "先查看[当前支持](../reference/platforms/support.md)，选择实际需要的最小增量。 生产入口为 "
 "`soc/<vendor>/<family>/`，硬件算法由 C 实现；主机配置器校验事实并 生成静态连接，不在 SoC／Board 中增加 "
@@ -25,55 +25,55 @@ msgstr ""
 "configurator validates facts and generates static connections. Do not add "
 "Python plugins within SoC/Board packages."
 
-#: ../../../../../../docs/guides/provider-porting.md:0
+#: ../../../../../../../docs/guides/provider-porting.md:0
 msgid "增量"
 msgstr "Increment"
 
-#: ../../../../../../docs/guides/provider-porting.md:0
+#: ../../../../../../../docs/guides/provider-porting.md:0
 msgid "修改边界"
 msgstr "Change boundary"
 
-#: ../../../../../../docs/guides/provider-porting.md:0
+#: ../../../../../../../docs/guides/provider-porting.md:0
 msgid "已有 IP 和时钟方案的新料号／封装"
 msgstr "New part/package with existing IP and clock profiles"
 
-#: ../../../../../../docs/guides/provider-porting.md:0
+#: ../../../../../../../docs/guides/provider-porting.md:0
 msgid "精确器件、内存、封装和差异数据"
 msgstr "Exact device, memory, package and difference data"
 
-#: ../../../../../../docs/guides/provider-porting.md:0
+#: ../../../../../../../docs/guides/provider-porting.md:0
 msgid "已有模式的新实例／路线"
 msgstr "New instance/route for an existing mode"
 
-#: ../../../../../../docs/guides/provider-porting.md:0
+#: ../../../../../../../docs/guides/provider-porting.md:0
 msgid "route、资源和 Board 授权；复用 C 驱动"
 msgstr "Routes, resources and Board authorization; reuse the C driver"
 
-#: ../../../../../../docs/guides/provider-porting.md:0
+#: ../../../../../../../docs/guides/provider-porting.md:0
 msgid "新 SoC 复用已知 IP"
 msgstr "A new SoC reusing known IP"
 
-#: ../../../../../../docs/guides/provider-porting.md:0
+#: ../../../../../../../docs/guides/provider-porting.md:0
 msgid "包内启动、时钟、内存、binding 和 CMake 集成"
 msgstr "Package-local startup, clock, memory, binding and CMake integration"
 
-#: ../../../../../../docs/guides/provider-porting.md:0
+#: ../../../../../../../docs/guides/provider-porting.md:0
 msgid "新 IP 沿用已有公开语义"
 msgstr "New IP using existing public semantics"
 
-#: ../../../../../../docs/guides/provider-porting.md:0
+#: ../../../../../../../docs/guides/provider-porting.md:0
 msgid "包内 C、binding 与能力数据"
 msgstr "Package-local C, bindings and capability data"
 
-#: ../../../../../../docs/guides/provider-porting.md:0
+#: ../../../../../../../docs/guides/provider-porting.md:0
 msgid "新公开语义或硬件模型"
 msgstr "New public semantics or hardware model"
 
-#: ../../../../../../docs/guides/provider-porting.md:0
+#: ../../../../../../../docs/guides/provider-porting.md:0
 msgid "先扩展领域合同／policy 和真实测试"
 msgstr "First extend the domain contract/policy and real tests"
 
-#: ../../../../../../docs/guides/provider-porting.md:22
+#: ../../../../../../../docs/guides/provider-porting.md:22
 msgid ""
 "同一 MCU 的新 PCB 走[Board 接入](board-porting.md)。新增现有模型的 MCU 不给 公共 resolver "
 "添加型号分支；数据也不能替代未知时钟、DMA 或外设算法。"
@@ -83,47 +83,104 @@ msgstr ""
 "specific branches to the public resolver. Data cannot replace unknown clock,"
 " DMA or peripheral algorithms."
 
-#: ../../../../../../docs/guides/provider-porting.md:25
+#: ../../../../../../../docs/guides/provider-porting.md:25
+msgid "先划分公共语义与硬件模型"
+msgstr "First separate public semantics from the hardware model"
+
+#: ../../../../../../../docs/guides/provider-porting.md:27
+msgid ""
+"公共 I/O 维护帧、单位、借用、完成和错误语义。IP policy 维护该硬件的时序范围、 FIFO、滤波器和中断原因；SoC "
+"提供实际控制器、时钟域与向量，Board 授权路线和电气 条件。新增同模型器件只补事实和 C 绑定；新模型先增加有真实回归的窄 policy。"
+msgstr ""
+"Public I/O maintains frame, unit, borrow, completion and error semantics."
+" An IP policy maintains the hardware's timing ranges, FIFO, filters and "
+"interrupt causes. The SoC supplies actual controllers, clock domains and "
+"vectors; the Board authorizes routes and electrical conditions. Adding a "
+"device with the same model requires only facts and C bindings. A new "
+"model first requires a narrow policy with real regressions."
+
+#: ../../../../../../../docs/guides/provider-porting.md:31
+msgid ""
+"CAN 控制器显式引用已经解析的 ClockPlan 域，时序检查和生成的 C 配置消费同一 结果。已有 UART／SPI "
+"的时钟事实按各自合同维护。公共 CAN 不猜测 APB、core 时钟 或另一控制器的频率。需要同源、同频或主控制器 gate 的 IP "
+"分别声明这些约束；相同数值频率不代替同一资源身份。"
+msgstr ""
+"CAN controllers explicitly reference an already resolved ClockPlan "
+"domain; timing checks and generated C configuration consume the same "
+"result. Existing UART/SPI clock facts remain governed by their respective"
+" contracts. Public CAN does not guess an APB or core clock, or another "
+"controller's frequency. An IP block requiring a common source, equal "
+"frequencies or the primary controller's gate declares each constraint "
+"separately. Equal numerical frequencies do not establish the same "
+"resource identity."
+
+#: ../../../../../../../docs/guides/provider-porting.md:36
+msgid ""
+"中断原因与物理向量分别声明，不通过列表位置推导 TX、RX 或 error。共享向量只有 在包声明关系、存在已审 C "
+"dispatcher，且优先级、OS 调用约束和来源所有权兼容时 接纳。生成器输出一个固定入口，pending、ack 和硬件撤回仍由 C "
+"owner 处理。"
+msgstr ""
+"Declare interrupt causes and physical vectors separately; do not infer "
+"TX, RX or error from list positions. A shared vector is admitted only "
+"when the package declares the relationship, a reviewed C dispatcher "
+"exists, and priorities, OS call constraints and source ownership are "
+"compatible. The generator emits one fixed entry; the C owner still "
+"handles pending, ack and hardware withdrawal."
+
+#: ../../../../../../../docs/guides/provider-porting.md:40
+msgid ""
+"pinmux 使用包选定的编码模型。当前 F4 数值 AF 仅接受 0..15；其他范围由对应模型 和 C driver "
+"同时维护，未知编码拒绝。共享 remap 需要真实资源和实现，不能伪装为 较大的 AF 数字。应用继续选择 Board "
+"binding，不编写寄存器编码或执行脚本。"
+msgstr ""
+"Pinmux uses the encoding model selected by the package. The current F4 "
+"numerical AF accepts only 0..15. Other ranges must be maintained by both "
+"the corresponding model and C driver; reject unknown encodings. Shared "
+"remap requires actual resources and implementation and cannot be "
+"represented as a larger AF number. Applications continue to select Board "
+"bindings; they do not write register encodings or execution scripts."
+
+#: ../../../../../../../docs/guides/provider-porting.md:44
 msgid "按一条纵向路径完成接入"
 msgstr "Complete one vertical integration path"
 
-#: ../../../../../../docs/guides/provider-porting.md:27
+#: ../../../../../../../docs/guides/provider-porting.md:46
 msgid "固定官方手册、数据手册、勘误和 SDK 身份，确认精确料号及可复用 IP。"
 msgstr ""
 "Pin official manuals, datasheets, errata and SDK identities; establish the "
 "exact part and reusable IP."
 
-#: ../../../../../../docs/guides/provider-porting.md:28
+#: ../../../../../../../docs/guides/provider-porting.md:47
 msgid "在一个包中声明 `package.json`、所需 facts、binding、私有实例布局和 C 行为。"
 msgstr ""
 "Declare `package.json`, required facts, bindings, private instance layouts "
 "and C behavior within one package."
 
-#: ../../../../../../docs/guides/provider-porting.md:29
+#: ../../../../../../../docs/guides/provider-porting.md:48
 msgid "先以状态 GPIO／console 等最小路径验证 Clock、IRQ、内存与生命周期。"
 msgstr ""
 "First validate Clock, IRQ, memory and lifecycle through a minimal path such "
 "as a status GPIO/console."
 
-#: ../../../../../../docs/guides/provider-porting.md:30
+#: ../../../../../../../docs/guides/provider-porting.md:49
 msgid "通过同一 TOML 解析和静态生成，实际编译、链接并检查向量及资源。"
 msgstr ""
 "Resolve and generate statically through the same TOML, then actually "
 "compile, link and inspect vectors and resources."
 
-#: ../../../../../../docs/guides/provider-porting.md:31
+#: ../../../../../../../docs/guides/provider-porting.md:50
 msgid "再按所选模式补请求、取消、迟到 IRQ、排空失败、恢复和实例隔离回归。"
 msgstr ""
 "For selected modes, add regressions for requests, cancellation, late IRQs, "
 "failed drain, recovery and instance isolation."
 
-#: ../../../../../../docs/guides/provider-porting.md:32
+#: ../../../../../../../docs/guides/provider-porting.md:51
 msgid "对实际导出范围执行源码与安装 SDK 消费，记录精确结果；物理行为另行验收。"
 msgstr ""
 "Execute source and installed-SDK consumers for the actual export scope and "
 "record exact results. Validate physical behavior separately."
 
-#: ../../../../../../docs/guides/provider-porting.md:34
+#: ../../../../../../../docs/guides/provider-porting.md:53
 msgid ""
 "新行为先实际 RED，再最小实现、GREEN 和整理。驱动优先复用审核过的官方 HAL／LL， 厂商类型、Handle "
 "和寄存器布局留在实现内部。一个活跃控制器行为域只保留一个 硬件传输 owner，公开接口继续使用 Nexus 类型。"
@@ -134,11 +191,11 @@ msgstr ""
 "controller behavior domain retains a single hardware-transfer owner; public "
 "interfaces continue to use Nexus types."
 
-#: ../../../../../../docs/guides/provider-porting.md:38
+#: ../../../../../../../docs/guides/provider-porting.md:57
 msgid "构建与生成的责任"
 msgstr "Build and generation responsibilities"
 
-#: ../../../../../../docs/guides/provider-porting.md:45
+#: ../../../../../../../docs/guides/provider-porting.md:64
 msgid ""
 "Provider target 发布 `NEXUS_STARTUP_SOURCES` 和 `NEXUS_STARTUP_USAGE_TARGET`； "
 "Platform 用 `NEXUS_PROVIDER_TARGET` 引用它。每个镜像独立创建 startup OBJECT， "
@@ -151,7 +208,7 @@ msgstr ""
 "includes. Do not inject vendor sources into applications through public "
 "`INTERFACE_SOURCES`."
 
-#: ../../../../../../docs/guides/provider-porting.md:50
+#: ../../../../../../../docs/guides/provider-porting.md:69
 msgid ""
 "驱动直接声明 SDK、DMA 和辅助实现需求；System 声明自己的启动环境，不修改兄弟 目录稍后读取的开关。HAL "
 "对象复用须证明器件、ABI、配置头与回调相同。"
@@ -161,7 +218,7 @@ msgstr ""
 "switches read later by sibling directories. HAL object reuse must establish "
 "identical device, ABI, configuration headers and callbacks."
 
-#: ../../../../../../docs/guides/provider-porting.md:53
+#: ../../../../../../../docs/guides/provider-porting.md:72
 msgid ""
 "package 字段、同一输入快照、静态 recipe 与 fragment 语法集中见 "
 "[包与绑定合同](../reference/contracts/package-bindings.md)。公开构建入口见 [CMake "

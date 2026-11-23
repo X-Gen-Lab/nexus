@@ -1,4 +1,5 @@
 """External memory policy reuses an IP contract with package-owned identities."""
+from tools.configure.tests.f4_fixture import f4_pinmux
 from copy import deepcopy
 import unittest
 
@@ -56,7 +57,7 @@ def facts():
 class ExternalBusPolicyTests(unittest.TestCase):
     def policy(self, value=None):
         from tools.configure.policies.external_bus import ExternalBusPolicy
-        return ExternalBusPolicy.from_validated(facts() if value is None else value)
+        return ExternalBusPolicy.from_validated(facts() if value is None else value, pinmux=f4_pinmux())
 
     @staticmethod
     def endpoint():

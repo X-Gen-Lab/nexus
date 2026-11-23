@@ -3,6 +3,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 
 from tools.configure.calls import Symbol
+from tools.configure.pinmux import NumericPinMuxPolicy
 from tools.configure.providers.common import fail, integer
 from tools.configure.records import freeze
 
@@ -14,7 +15,9 @@ class CoupledIoPolicy:
     routes: Mapping
 
     @classmethod
-    def from_validated(cls, value):
+    def from_validated(cls, value, *, pinmux):
+        if not isinstance(pinmux, NumericPinMuxPolicy):
+            fail("Coupled I/O requires a selected numeric pinmux policy")
         if not isinstance(value, Mapping) or set(value) != {"routes"}:
             fail("Coupled I/O requires explicit route records")
         routes = {}
@@ -40,7 +43,7 @@ class CoupledIoPolicy:
                 if not isinstance(pin, (list, tuple)) or len(pin) != 3:
                     fail("Coupled I/O pin requires identity, role and alternate")
                 Symbol(pin[0])
-                integer(pin[2], 0, 15, "Coupled pin alternate")
+                pinmux.validate(pin[2], "Coupled pin alternate")
             for name in ("conversion_cycles", "clock_multiplier", "prescaler_max",
                          "period_max"):
                 integer(row[name], 1, context="Coupled " + name)

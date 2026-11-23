@@ -43,13 +43,28 @@
       "counter_max": 65535
     },
     "can": {
-      "irq_roles": [
-        "tx",
-        "rx0",
-        "rx1",
-        "error"
-      ],
-      "fifo_order_supported": true
+      "fifo_order_supported": true,
+      "model": "bxcan",
+      "transport": {
+        "CAN1": {
+          "clock_domain": "apb1",
+          "irq_sources": {
+            "tx": "CAN1_TX",
+            "rx0": "CAN1_RX0",
+            "rx1": "CAN1_RX1",
+            "error": "CAN1_SCE"
+          }
+        },
+        "CAN2": {
+          "clock_domain": "apb1",
+          "irq_sources": {
+            "tx": "CAN2_TX",
+            "rx0": "CAN2_RX0",
+            "rx1": "CAN2_RX1",
+            "error": "CAN2_SCE"
+          }
+        }
+      }
     },
     "usb_device": {
       "controller": "OTG_FS",
@@ -1121,8 +1136,6 @@
         "I2C1": "apb1",
         "I2C2": "apb1",
         "I2C3": "apb1",
-        "CAN1": "apb1",
-        "CAN2": "apb1",
         "DAC": "apb1",
         "WWDG": "apb1",
         "TIM1": "apb2_timer",

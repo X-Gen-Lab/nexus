@@ -15,7 +15,7 @@ from tools.configure.providers.common import fail
 
 
 MANIFEST = "package.json"
-INTERFACE_VERSION = 1
+INTERFACE_VERSION = 2
 _IDENTIFIER = re.compile(r"[A-Za-z][A-Za-z0-9_-]{0,63}")
 _C_IDENTIFIER = re.compile(r"[A-Za-z_][A-Za-z0-9_]*")
 

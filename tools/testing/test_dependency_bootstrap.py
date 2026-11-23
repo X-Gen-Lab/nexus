@@ -30,7 +30,7 @@ class DependencyBootstrapTests(unittest.TestCase):
                 (package / name).write_text("{}\n")
             manifest = "soc/acme/reviewed/package.json"
             (package / "package.json").write_text(json.dumps({
-                "schema_version": 1, "interface_version": 1,
+                "schema_version": 1, "interface_version": 2,
                 "id": "reviewed", "family": "reviewed", "vendor": "acme",
                 "source_directory": ".", "facts": {"soc": "soc.json",
                     "routes": "routes.json"},

@@ -11,14 +11,14 @@ from unittest.mock import patch
 from operator import getitem
 import unittest
 
-from tools.configure import configure
+from tools.configure import configure, device_graph
 from tools.configure.ir import ControllerIR, EndpointIR, thaw
 
 
 class DeviceGraphStageTests(unittest.TestCase):
     def resolve_graph(self, relative):
         observed = []
-        stage = configure._resolve_device_graph
+        stage = device_graph.resolve
 
         def capture(assembly, **arguments):
             authored_before = thaw(assembly)
@@ -27,7 +27,7 @@ class DeviceGraphStageTests(unittest.TestCase):
             observed.append(graph)
             return graph
 
-        with patch.object(configure, "_resolve_device_graph", side_effect=capture):
+        with patch.object(device_graph, "resolve", side_effect=capture):
             result = configure.resolve_ir(configure.ROOT / relative, test_support=True)
         self.assertEqual(len(observed), 1)
         return observed[0], result

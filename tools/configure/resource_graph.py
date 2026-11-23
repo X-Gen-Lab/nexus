@@ -11,7 +11,9 @@ from collections.abc import Mapping
 from dataclasses import asdict, dataclass
 import re
 
-from tools.configure.providers.common import fail
+from tools.configure.providers.common import fail, sequence
+from tools.configure.providers.common import normalize_resource as normalize_resource
+from tools.configure.validation import obj, text
 
 
 def identifier(value, context):
@@ -210,23 +212,55 @@ with compatible attributes. Existing controller reservations stay exclusive.
     return ResourcePlanIR(tuple(result))
 
 
-def normalize_resource(value):
-    timer = re.fullmatch(r"(?:timer:|controller:)?(TIM[0-9]+|TIMER[0-9]+)", value)
-    if timer is not None:
-        return "controller:" + timer[1]
-    if value.startswith("dma:"):
-        channel = re.fullmatch(r"dma:(GPDMA1):channel(0|[1-9][0-9]*)"
-                               r"(?::request(0|[1-9][0-9]*))?", value)
-        if channel is not None:
-            return f"dma:{channel[1]}:channel{channel[2]}"
-        match = re.fullmatch(r"dma:([A-Z][A-Z0-9_]*):stream([0-9]+)"
-                             r"(?::channel([0-9]+))?", value)
-        if match is None:
-            fail(f"Invalid physical DMA resource: {value}")
-        return f"dma:{match[1]}:stream{int(match[2])}"
-    if value.startswith("irq:"):
-        irq = value[4:]
-        for suffix in ("_IRQHandler", "_IRQn", "_Handler"):
-            if irq.endswith(suffix):
-                return "irq:" + irq[:-len(suffix)]
-    return value
+def resource_claims(provider):
+    """One claim ledger serves resolution and read-only reservation queries."""
+    claims = {}
+    claim_list = []
+
+    def claim(key, owner, mode, source):
+        text(key, "resource key")
+        if key.startswith("dma:"):
+            provider.validate_dma_resource(key)
+        key = normalize_resource(key)
+        previous = claims.get(key)
+        record = {"key": key, "owner": owner, "mode": mode, "source": source}
+        if previous is not None:
+            if previous == record:
+                return
+            fail(f"Resource conflict {key}: {previous['owner']} "
+                 f"(source {previous['source']}) versus {owner} "
+                 f"(source {source})", code="resource_conflict",
+                 resource=key, claims=[previous, record])
+        claims[key] = record
+        claim_list.append(record)
+
+    return claims, claim_list, claim
+
+
+def reserved_claims(soc, board, provider):
+    """Project the same immutable SoC and Board reservations used by resolve."""
+    claims, records, claim = resource_claims(provider)
+    family = soc["id"]
+    for resource in soc.get("reserved_resources", []):
+        claim(resource, "soc-timebase", "reserved", family)
+    policy = getattr(provider, "binding_policy", None)
+    if policy is not None:
+        timebase = policy.timebase
+        for resource in ("timer:" + timebase.timer, "irq:" + timebase.irq):
+            if normalize_resource(resource) not in claims:
+                claim(resource, "soc-timebase", "reserved", family)
+    for reserved in sequence(board["reserved_resources"], "reserved resources"):
+        if isinstance(reserved, str):
+            key = "pin:" + reserved if reserved in getattr(provider, "PAD_FACTS", {}) else reserved
+            owner = "board-reserved"
+        else:
+            obj(reserved, {"key", "owner"}, (), "reserved resource")
+            key, owner = reserved["key"], reserved["owner"]
+        # A Board may restate a silicon reservation; it cannot release it.
+        if key.startswith("dma:"):
+            provider.validate_dma_resource(key)
+        previous = claims.get(normalize_resource(text(key, "resource key")))
+        if previous is not None and previous["owner"] == "soc-timebase":
+            continue
+        claim(key, owner, "reserved", board["id"])
+    return records

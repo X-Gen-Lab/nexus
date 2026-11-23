@@ -153,7 +153,7 @@ def _controller_bindings(records, controllers, routes, irqs, lanes):
     return tuple(result)
 
 
-def _pwm(timers, controllers, routes, bounds):
+def _pwm(timers, controllers, routes, bounds, pinmux):
     if not isinstance(timers, Mapping) or not timers:
         fail("Hardware PWM timers require explicit bus records")
     result, channels = {}, {}
@@ -175,7 +175,7 @@ def _pwm(timers, controllers, routes, bounds):
                 if key in channels and channels[key] != channel:
                     fail("Hardware PWM pad has conflicting channel facts")
                 channels[key] = channel
-                functions.add(integer(pin["af"], *bounds["alternate"], "Hardware PWM AF"))
+                functions.add(pinmux.validate(pin["af"], "Hardware PWM AF selector"))
         if len(functions) != 1:
             fail("Hardware PWM timer requires one reviewed alternate function")
         result[name] = PwmTimer(integer(record["apb"], 1, 2, "PWM APB"),
@@ -184,7 +184,7 @@ def _pwm(timers, controllers, routes, bounds):
     return MappingProxyType(result), MappingProxyType(channels)
 
 
-def load_hardware(package, *, read=None):
+def load_hardware(package, *, read=None, pinmux=None):
     """Project one selected snapshot; no default family or imported fact cache.
 
     A managed reader must expose snapshot_bytes(path) from the same first-read
@@ -214,6 +214,9 @@ def load_hardware(package, *, read=None):
         return value
 
     bindings_document = document("bindings")
+    if pinmux is None:
+        from tools.configure.pinmux import NumericPinMuxPolicy
+        pinmux = NumericPinMuxPolicy.from_validated(bindings_document.get("pinmux_policy"))
     if "hardware" not in bindings_document:
         empty = MappingProxyType({})
         return HardwareFacts(empty, empty, empty, empty, empty, empty, empty,
@@ -226,7 +229,7 @@ def load_hardware(package, *, read=None):
     if data["protocol"] != "apb-numeric-stream-v1":
         fail("Unreviewed hardware metadata protocol")
     bounds = data["channel_bounds"]
-    _fields(bounds, {"adc", "adc_internal", "dac", "dac_masks", "pwm", "alternate"})
+    _fields(bounds, {"adc", "adc_internal", "dac", "dac_masks", "pwm"})
     for name, limits in bounds.items():
         if not isinstance(limits, list) or len(limits) != 2:
             fail("Hardware channel bounds require explicit minimum and maximum")
@@ -295,7 +298,7 @@ def load_hardware(package, *, read=None):
         for path in paths:
             _dma_path(path, data["dma_lanes"])
         dac_dma[value] = tuple(paths)
-    pwm_timers, pwm_channels = _pwm(data["pwm_timers"], controllers, routes, bounds)
+    pwm_timers, pwm_channels = _pwm(data["pwm_timers"], controllers, routes, bounds, pinmux)
     bindings = _controller_bindings(data["controllers"], controllers, routes, irqs, data["dma_lanes"])
     secondary = {}
     for name in _names(data["secondary_controllers"], "secondary controllers"):

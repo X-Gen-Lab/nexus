@@ -375,7 +375,8 @@ class AdvancedResolverTests(unittest.TestCase):
     def test_shared_exti_priority_contradiction_rejected(self):
         data = self.fixture("exti")
         data["controllers"][1]["irq_priority"] = 6
-        self.reject(data, "identical priorities")
+        self.reject(data, "Shared IRQ dispatcher, priorities and OS constraints "
+                    "must agree: irq:EXTI9_5")
 
     def test_exti_boolean_capacity_rejected(self):
         data = self.fixture("exti")

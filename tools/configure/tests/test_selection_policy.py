@@ -1,4 +1,5 @@
 """Silicon narrowing uses explicit facts and stable protocol validators."""
+from tools.configure.tests.f4_fixture import f4_pinmux
 from types import SimpleNamespace
 import copy
 import unittest
@@ -33,7 +34,7 @@ def facts():
 
 class SelectionPolicyContracts(unittest.TestCase):
     def policy(self):
-        return SelectionPolicy.from_validated(facts())
+        return SelectionPolicy.from_validated(facts(), pinmux=f4_pinmux())
 
     def test_controller_names_are_author_data_and_not_vendor_guesses(self):
         selected = self.policy()
@@ -94,7 +95,7 @@ class SelectionPolicyContracts(unittest.TestCase):
             value = copy.deepcopy(facts())
             mutate(value)
             with self.subTest(value=value), self.assertRaises(ValueError):
-                SelectionPolicy.from_validated(value)
+                SelectionPolicy.from_validated(value, pinmux=f4_pinmux())
 
 
 if __name__ == "__main__":

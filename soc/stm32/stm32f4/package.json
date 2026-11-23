@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "interface_version": 1,
+  "interface_version": 2,
   "id": "stm32f4",
   "family": "stm32f4",
   "vendor": "stm32",

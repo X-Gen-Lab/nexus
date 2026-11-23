@@ -8,6 +8,7 @@ class PackagePolicyTests(unittest.TestCase):
         from tools.configure.package_policy import BindingPolicy
         value = {
             "schema_version": 1, "custom_clock_profile": "explicit-run",
+            "pinmux_policy": {"encoding": "numeric", "selectors": list(range(16))},
             "system": {
                 "oscillator_resources": {"hse": ["pin:PH0", "pin:PH1"]},
                 "timebase": {"timer": "TIM5", "irq": "TIM5_IRQn",

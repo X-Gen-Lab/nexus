@@ -140,6 +140,70 @@ class TDDBinaryPlanBoundaryTests(unittest.TestCase):
                           for command in commands if "--suite" in command],
                          ["workflows", "ci", "configure", "testing"])
 
+    def test_mixed_commit_plan_runs_tool_domains_before_extra_domains(self):
+        plan = dict.fromkeys((*tdd_gate.TOOL_SUITES, "contracts", "freertos"))
+        plan["configure"] = ("tools/configure/tests/test_configure.py",
+                             "tools/configure/tests/test_device_graph_stage.py")
+        plan["contracts"] = ("tests/contracts/test_source_sdk.py",)
+        plan["freertos"] = ("os/freertos/test_m7_integer_overlay.py",)
+        commands = []
+
+        def execute(command, environment, log):
+            commands.append(command)
+            return self.fixture.execute(command, environment, log)
+
+        with patch.object(tdd_gate, "staged_paths", return_value=["AGENTS.md"]), \
+                patch.object(tdd_gate, "check_staged_snapshot"), \
+                patch.object(tdd_gate, "staged_tree", return_value="frozen"), \
+                patch.object(tdd_gate, "commit_tool_plan", return_value=plan):
+            status, output = self.fixture.run_gate(
+                execute=execute, arguments=["--staged"])
+        self.assertEqual(status, 0, output)
+        tools = [command for command in commands if "--suite" in command]
+        self.assertEqual([command[command.index("--suite") + 1]
+                          for command in tools],
+                         ["workflows", "ci", "configure", "testing",
+                          "contracts", "freertos"])
+        for command in tools:
+            files = plan[command[command.index("--suite") + 1]]
+            if files is None:
+                self.assertNotIn("--files", command)
+            else:
+                self.assertEqual(command[command.index("--files") + 1:],
+                                 list(files))
+        self.assertIn("discovery", self.fixture.events)
+        self.assertIn("execution", self.fixture.events)
+        record = json.loads((self.fixture.build / "tdd/execution.json").read_text())
+        self.assertEqual(record["scope"], "commit-tools")
+        self.assertFalse(record["qualification"])
+        self.assertEqual(len(record["tool_suites"]), len(plan))
+        self.assertEqual(record["passed"], 1)
+
+    def test_early_tool_failure_does_not_start_extra_domains(self):
+        plan = dict.fromkeys((*tdd_gate.TOOL_SUITES, "contracts", "freertos"))
+        commands = []
+
+        def execute(command, environment, log):
+            commands.append(command)
+            if ("--suite" in command and
+                    command[command.index("--suite") + 1] == "configure"):
+                raise ValueError("configuration contract failed")
+            return self.fixture.execute(command, environment, log)
+
+        with patch.object(tdd_gate, "staged_paths", return_value=["AGENTS.md"]), \
+                patch.object(tdd_gate, "check_staged_snapshot"), \
+                patch.object(tdd_gate, "staged_tree", return_value="frozen"), \
+                patch.object(tdd_gate, "commit_tool_plan", return_value=plan):
+            status, output = self.fixture.run_gate(
+                execute=execute, arguments=["--staged"])
+        self.assertEqual(status, 1, output)
+        self.assertEqual([command[command.index("--suite") + 1]
+                          for command in commands if "--suite" in command],
+                         ["workflows", "ci", "configure"])
+        self.assertFalse((self.fixture.build / "tdd/execution.json").exists())
+        self.assertNotIn("discovery", self.fixture.events)
+        self.assertNotIn("execution", self.fixture.events)
+
     def test_staged_build_maintenance_runs_modules_and_full_google(self):
         commands = []
 

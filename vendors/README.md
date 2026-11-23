@@ -29,7 +29,7 @@ python3 scripts/ci/verify_vendor_source.py --root vendors/gigadevice/gd32f4xx
 保留的 STM32F103、F407、G474、H743、U575 与 GD32F303、F470 来源曾通过共享
 `arm/CMSIS_6` 的显式 Core 探针；这不建立七个 family 的当前生产支持。当前生产
 维护 [STM32F4 系列支持包](../soc/stm32/stm32f4/README.md)，精确器件与模式以
-[支持范围](../docs/delivery/support.md)为准；其他来源作为库存保留。具体 Device、IRQ、
+[支持范围](../docs/reference/platforms/support.md)为准；其他来源作为库存保留。具体 Device、IRQ、
 startup 和 HAL／LL 仍来自各自锁定来源；Core 迁移不自动启用芯片、外设或安全域。
 精确版本、上游 pack 字段和许可证身份见 [VERSIONS.md](VERSIONS.md)。
 
@@ -65,7 +65,7 @@ C11／C++17 检查，启用 `CMSIS_DISABLE_DEPRECATED=1`，
 来源和取回是两个身份：catalogue 记录官方 `upstream_url` 与受审 `fetch_url`，
 gitlink 选择精确 commit。注册 Git 依赖从 X-Gen-Lab fork 取回，并以
 `refs/tags/nexus/pins/<full-SHA>` 保留所选版本；这不升级 SDK 代码。递归 FreeRTOS、
-显式准备与恢复见[依赖托管合同](../docs/design/source-compatibility.md)。
+显式准备与恢复见[依赖维护](../docs/development/dependencies.md)。
 
 更新需要复核来源、版本、许可证和内容身份，执行匹配的编译／链接及设备合同回归。
 Board 接线写入 Nexus adapter 或外部工程，不修改导入文件；配置阶段不联网下载依赖。

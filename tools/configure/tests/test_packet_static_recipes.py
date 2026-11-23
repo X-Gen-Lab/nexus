@@ -1,4 +1,5 @@
 """Packet recipes retain static storage, selected faces and fixed lifecycle."""
+from tools.configure.tests.f4_fixture import f4_pinmux
 from dataclasses import dataclass, replace
 import json
 from pathlib import Path
@@ -70,7 +71,7 @@ class PacketStaticRecipesTests(unittest.TestCase):
 
     def build(self, item, devices=(), owners=()):
         document = self.document()
-        policy = PacketPolicy.from_validated(document["domains"]["packet"])
+        policy = PacketPolicy.from_validated(document["domains"]["packet"], pinmux=f4_pinmux())
         memory = MappingProxyType({"id": "bus_ram", "origin": 0x20000000,
                                    "size": 65536, "dma": True})
         physical = SimpleNamespace(memory=(memory,))

@@ -3,6 +3,7 @@ from .contract import (
     ADC_PIN_CHANNELS,
     UART_FORMATS,
     PAD_FACTS,
+    PINMUX_POLICY,
     PARTS,
     PUBLIC_FORMATS,
     ADC_GROUP,

@@ -58,16 +58,27 @@ class DomainBridge:
             common.fail("Selected package declares no timer clock domain")
         return clock.timer_domain(controller)
 
+    def controller_clock_domain(self, plan, controller):
+        domain = self.soc["controllers"][controller].get("clock_domain")
+        if not domain or plan is None or domain not in plan.domains:
+            common.fail("Controller clock domain is absent from the selected plan: " + controller)
+        return plan.domains[domain]
+
     def controller_clock_hz(self, result, controller):
+        facts = self.soc["controllers"][controller]
+        if facts.get("clock_domain") is not None:
+            return self.controller_clock_domain(result.clock_plan, controller).nominal_hz
         clock = self._clock()
         if clock is not None:
             return clock.controller_hz(result, controller)
-        return self.soc["controllers"][controller].get("clock_hz", result.clock["core_hz"])
+        return facts.get("clock_hz", result.clock["core_hz"])
 
     def validate_clock_consumers(self, plan, selected):
         clock = self._clock()
         if clock is not None:
-            clock.validate_consumers(plan, selected)
+            clock.validate_consumers(plan, selected, controller_domains={
+                name: row["clock_domain"] for name, row in self.soc["controllers"].items()
+                if "clock_domain" in row})
 
     def validate_selection(self, selection, route):
         kind, mode = route["kind"], selection["mode"]

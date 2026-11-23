@@ -1,4 +1,5 @@
 """Free-frame SAI planning is reusable through reviewed package facts."""
+from tools.configure.tests.f4_fixture import f4_pinmux
 import copy
 import json
 from pathlib import Path
@@ -14,7 +15,7 @@ class SaiPolicyTests(unittest.TestCase):
         facts = copy.deepcopy(facts)
         facts["controllers"] = {"SERIAL_FRAME": facts["controllers"]["SAI1"]}
         facts["controllers"]["SERIAL_FRAME"]["dma_roles"]["A"] = ["DMA2:stream6:channel7"]
-        return SaiPolicy.from_validated(facts)
+        return SaiPolicy.from_validated(facts, pinmux=f4_pinmux())
 
     @staticmethod
     def route():

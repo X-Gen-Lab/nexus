@@ -28,6 +28,28 @@ def fail(message, **details):
     raise ConfigurationError(message, **details)
 
 
+def normalize_resource(value):
+    timer = re.fullmatch(r"(?:timer:|controller:)?(TIM[0-9]+|TIMER[0-9]+)", value)
+    if timer is not None:
+        return "controller:" + timer[1]
+    if value.startswith("dma:"):
+        channel = re.fullmatch(r"dma:(GPDMA1):channel(0|[1-9][0-9]*)"
+                               r"(?::request(0|[1-9][0-9]*))?", value)
+        if channel is not None:
+            return f"dma:{channel[1]}:channel{channel[2]}"
+        match = re.fullmatch(r"dma:([A-Z][A-Z0-9_]*):stream([0-9]+)"
+                             r"(?::channel([0-9]+))?", value)
+        if match is None:
+            fail(f"Invalid physical DMA resource: {value}")
+        return f"dma:{match[1]}:stream{int(match[2])}"
+    if value.startswith("irq:"):
+        irq = value[4:]
+        for suffix in ("_IRQHandler", "_IRQn", "_Handler"):
+            if irq.endswith(suffix):
+                return "irq:" + irq[:-len(suffix)]
+    return value
+
+
 def validate_vendor_device(value):
     """Admit an explicit compiler selector and one safe startup basename."""
     if (not isinstance(value, Mapping) or
@@ -79,7 +101,6 @@ class VendorIrqResource:
 
 def irq_resource_bindings(bindings):
     """Index actual declarations by existing resource grammar, never guess."""
-    from tools.configure.resource_graph import normalize_resource
     result = {}
     for enum, binding in bindings.items():
         name = normalize_resource("irq:" + enum)[4:]

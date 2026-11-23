@@ -17,16 +17,23 @@ class CanFactContracts(unittest.TestCase):
                 "irq": [f"LINE_{index}_{role}" for role in ("T", "A", "B", "E")],
                 "irq_numbers": [5 + index * 31, 9 + index * 31,
                                 12 + index * 31, 18 + index * 31],
-                "clock_hz": 24000000, "pins": []}
+                "clock_domain": name.lower(), "pins": [],
+                "irq_sources": dict(zip(("tx", "rx0", "rx1", "error"),
+                    [f"LINE_{index}_{role}" for role in ("T", "A", "B", "E")]))}
         return {"id": "unrelated_mcu", "controllers": controllers,
                 "can_domain": {"controllers": list(names), "primary": names[0],
                                "filter_banks": banks},
                 "irq": {"external_count": 128}}
 
     def provider(self, soc):
+        controllers = (soc.get("controllers") or
+                       next(iter(soc["controller_groups"].values()))["controllers"])
         policy = {"schema_version": 1, "can": {
-            "irq_roles": ["tx", "rx0", "rx1", "error"],
-            "fifo_order_supported": True}}
+            "model": "bxcan",
+            "fifo_order_supported": True,
+            "transport": {name: {"clock_domain": row["clock_domain"],
+                                 "irq_sources": row["irq_sources"]}
+                          for name, row in controllers.items()}}}
         return DomainPolicies.from_validated(
             SimpleNamespace(family=soc["id"], vendor="unrelated"), soc,
             {"domains": policy})
@@ -55,7 +62,7 @@ class CanFactContracts(unittest.TestCase):
         policy = self.provider(soc)
         can.validate_soc(soc, policy)
         self.assertEqual(policy.CAN_CONTROLLERS, ("BUS_A", "BUS_B"))
-        self.assertEqual(policy.CAN_CLOCK_HZ, 24000000)
+        self.assertFalse(hasattr(policy, "CAN_CLOCK_HZ"))
         self.assertEqual(policy.CAN_INTEGRATION.irq_roles, ("tx", "rx0", "rx1", "error"))
 
     def test_single_controller_owns_the_authored_full_filter_domain(self):
@@ -85,7 +92,7 @@ class CanFactContracts(unittest.TestCase):
         controllers = soc.pop("controllers")
         soc["controller_groups"] = {"reviewed_ip": {"controllers": controllers}}
         policy = self.provider(soc)
-        self.assertEqual(policy.CAN_CLOCK_HZ, 24000000)
+        self.assertFalse(hasattr(policy, "CAN_CLOCK_HZ"))
         self.assertEqual(policy.CAN_CONTROLLERS, ("BUS_A", "BUS_B"))
 
     def test_catalog_mismatch_remains_rejected_independently(self):
@@ -104,8 +111,8 @@ class CanFactContracts(unittest.TestCase):
                 lambda value: value["can_domain"].update(filter_banks=33),
                 lambda value: value["can_domain"].update(filter_banks=True),
                 lambda value: value["controllers"]["BUS_A"]["irq"].pop(),
-                lambda value: value["controllers"]["BUS_A"].update(clock_hz=True),
-                lambda value: value["controllers"]["BUS_B"].update(clock_hz=12000000)):
+                lambda value: value["controllers"]["BUS_A"].update(clock_domain=""),
+                lambda value: value["controllers"]["BUS_B"]["irq_sources"].pop("error")):
             with self.subTest(mutate=mutate), self.assertRaises(ValueError):
                 soc = copy.deepcopy(original)
                 mutate(soc)
@@ -113,12 +120,11 @@ class CanFactContracts(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "CAN"):
             soc = self.facts(owners=3)
             can.validate_soc(soc, self.provider(soc))
-        for roles in (("tx", "rx0", "rx1"), ("tx", "tx", "rx1", "error"),
-                      ("rx0", "tx", "rx1", "error")):
-            with self.subTest(roles=roles), self.assertRaises(ValueError):
+        for model in ("unknown", "fdcan", ""):
+            with self.subTest(model=model), self.assertRaisesRegex(ValueError, "CAN"):
                 DomainPolicies.from_validated(SimpleNamespace(), original,
                     {"domains": {"schema_version": 1, "can": {
-                        "irq_roles": list(roles), "fifo_order_supported": True}}})
+                        "model": model, "fifo_order_supported": True, "transport": {}}}})
 
     def test_filter_boundaries_use_selected_bank_count_and_partition(self):
         soc = self.facts(banks=14)

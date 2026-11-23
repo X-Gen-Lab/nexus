@@ -172,7 +172,9 @@ def execute_gate(args, env, build, initial_tree=None, *, preset):
     tool_results = []
     # Keep the same complete selection, running cheap workflow/CI checks
     # before configuration and SDK consumers so failures stop work early.
-    for suite in reversed(suites):
+    ordered = [name for name in reversed(TOOL_SUITES) if name in plan]
+    ordered.extend(name for name in plan if name not in TOOL_SUITES)
+    for suite in ordered:
         files = plan[suite]
         suffix = "-commit" if files is not None else ""
         tool_report = output / f"tools-{suite}{suffix}.json"

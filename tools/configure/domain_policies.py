@@ -9,10 +9,11 @@ from dataclasses import dataclass, field
 from types import MappingProxyType
 
 from tools.configure.calls import Symbol
-from tools.configure.can import CanPolicy
+from tools.configure.policies.bxcan import BxCanPolicy, BxCanTransport
 from tools.configure.ethernet import EthernetPolicy
 from tools.configure.providers.common import EndpointPolicy, fail, integer
 from tools.configure.records import freeze
+from tools.configure.pinmux import NumericPinMuxPolicy
 from tools.configure.stream_profiles import StreamGeometry
 from tools.configure.timer_advanced import TimerBinding, TimerPolicy, TimerRoute
 from tools.configure.uart_formats import UartFormatPolicy
@@ -42,7 +43,7 @@ def _names(values, name, *, symbols=False, empty=True):
     return tuple(values)
 
 
-def _pins(values, width):
+def _pins(values, width, pinmux):
     if not isinstance(values, (tuple, list)):
         fail("Domain pins require an ordered list")
     pins = []
@@ -51,7 +52,7 @@ def _pins(values, width):
                 any(not isinstance(item, str) or not item for item in value[:2])):
             fail("Domain pin requires wire/function and optional alternate")
         if width == 3:
-            integer(value[2], 0, 15, "Domain alternate function")
+            pinmux.validate(value[2], "Domain alternate selector")
         pins.append(tuple(value))
     if len(set(pins)) != len(pins):
         fail("Domain pin route contains duplicate signals")
@@ -84,28 +85,23 @@ def _uart(value):
 
 
 def _can(value, soc):
-    _fields(value, {"irq_roles", "fifo_order_supported"})
-    roles = _names(value["irq_roles"], "CAN IRQ roles", empty=False)
-    if roles != ("tx", "rx0", "rx1", "error"):
-        fail("Domain CAN requires reviewed bxCAN IRQ role order")
-    from tools.configure.can import domain_topology
+    if not isinstance(value, Mapping) or "transport" not in value:
+        fail("CAN policy requires explicit reviewed transport bindings")
+    _fields(value, {"model", "fifo_order_supported", "transport"})
+    if value["model"] != "bxcan":
+        fail("Unsupported CAN IP policy model")
+    from tools.configure.policies.bxcan import domain_topology
     controllers, _ = domain_topology(soc)
-    groups = ([soc["controllers"]] if "controllers" in soc else
-              [group["controllers"] for group in soc.get("controller_groups", {}).values()])
-    clocks = set()
-    for name in controllers:
-        selected = [group[name] for group in groups if name in group]
-        if not selected or any(row["kind"] != "can" for row in selected):
-            fail("Domain CAN controller requires its authored physical facts")
-        clocks.update(integer(row.get("clock_hz"), 1, context="Domain CAN clock")
-                      for row in selected)
-    if len(clocks) != 1:
-        fail("Domain CAN filter owners require one shared authored clock")
-    return (controllers, clocks.pop(), CanPolicy(roles,
-            _boolean(value["fifo_order_supported"], "CAN FIFO order")))
+    transports = value["transport"]
+    if not isinstance(transports, Mapping) or set(transports) != set(controllers):
+        fail("CAN transport must cover the exact physical controllers")
+    return controllers, BxCanPolicy(
+        fifo_order_supported=_boolean(value["fifo_order_supported"], "CAN FIFO order"),
+        transports=MappingProxyType({name: BxCanTransport.from_validated(row)
+                                    for name, row in transports.items()}))
 
 
-def _usb(value):
+def _usb(value, pinmux):
     _fields(value, {"controller", "irq", "clock_hz", "fifo_words",
                     "endpoint_numbers", "pins", "resources"})
     Symbol(value["controller"])
@@ -114,10 +110,10 @@ def _usb(value):
         integer(value["clock_hz"], 1, context="Domain USB clock"),
         integer(value["fifo_words"], 1, context="Domain USB FIFO words"),
         integer(value["endpoint_numbers"], 1, context="Domain USB endpoint numbers"),
-        _pins(value["pins"], 3), _names(value["resources"], "USB resources"))
+        _pins(value["pins"], 3, pinmux), _names(value["resources"], "USB resources"))
 
 
-def _ethernet(value):
+def _ethernet(value, pinmux):
     _fields(value, {"controller", "irq", "clock_hz", "pins", "resources",
                     "alternate", "memory_region"}, {"mii_pins"})
     Symbol(value["controller"])
@@ -125,12 +121,12 @@ def _ethernet(value):
     return EthernetPolicy(value["controller"],
         integer(value["irq"], context="Domain Ethernet IRQ"),
         integer(value["clock_hz"], 1, context="Domain Ethernet clock"),
-        _pins(value["pins"], 2), _names(value["resources"], "Ethernet resources"),
-        integer(value["alternate"], 0, 15, "Domain Ethernet alternate"),
-        value["memory_region"], _pins(value.get("mii_pins", ()), 2))
+        _pins(value["pins"], 2, pinmux), _names(value["resources"], "Ethernet resources"),
+        pinmux.validate(value["alternate"], "Domain Ethernet alternate selector"),
+        value["memory_region"], _pins(value.get("mii_pins", ()), 2, pinmux))
 
 
-def _timers(values):
+def _timers(values, pinmux):
     if not isinstance(values, (tuple, list)) or not values:
         fail("Domain timers require explicit bindings")
     bindings, keys = [], set()
@@ -151,7 +147,7 @@ def _timers(values):
         for route in value["routes"]:
             _fields(route, {"channel", "pins"})
             channel = integer(route["channel"], 1, 4, "Domain timer channel")
-            pins = _pins(route["pins"], 3)
+            pins = _pins(route["pins"], 3, pinmux)
             connection = channel, pins
             if connection in connections:
                 fail("Duplicate domain timer channel route")
@@ -230,11 +226,11 @@ def _dma(value):
 class DomainPolicies:
     """Selected protocol capabilities; absent facts grant no optional domain."""
 
+    PINMUX_POLICY: NumericPinMuxPolicy | None = None
     UART_FORMATS: UartFormatPolicy = field(default_factory=UartFormatPolicy)
     STREAM_GEOMETRY: StreamGeometry | None = None
-    CAN_INTEGRATION: CanPolicy | None = None
+    CAN_INTEGRATION: BxCanPolicy | None = None
     CAN_CONTROLLERS: tuple[str, ...] = ()
-    CAN_CLOCK_HZ: int = 0
     USB_DEVICE: UsbDevicePolicy | None = None
     USB_CONTROLLER: str | None = None
     ETHERNET: EthernetPolicy | None = None
@@ -270,12 +266,14 @@ class DomainPolicies:
     clock: object | None = None
 
     @classmethod
-    def from_validated(cls, package, soc, bindings_document):
+    def from_validated(cls, package, soc, bindings_document, *, pinmux=None):
         """Load explicit domain data; never infer behavior from a vendor name."""
         del package
+        if pinmux is None and "pinmux_policy" in bindings_document:
+            pinmux = NumericPinMuxPolicy.from_validated(bindings_document["pinmux_policy"])
         value = bindings_document.get("domains")
         if value is None:
-            return cls()
+            return cls(PINMUX_POLICY=pinmux)
         _fields(value, {"schema_version"}, {"uart_formats", "stream_geometry",
             "can", "usb_device", "ethernet", "timers", "endpoints", "limits",
             "capabilities", "dma", "shared_irqs", "clock", "adc_group",
@@ -284,7 +282,7 @@ class DomainPolicies:
             "dac_triggers", "coupled_io"})
         if type(value["schema_version"]) is not int or value["schema_version"] != 1:
             fail("Unsupported domain policy schema")
-        result = {}
+        result = {"PINMUX_POLICY": pinmux}
         if "uart_formats" in value:
             result["UART_FORMATS"] = _uart(value["uart_formats"])
         if "stream_geometry" in value:
@@ -295,17 +293,16 @@ class DomainPolicies:
                               context="Domain stream " + name)
                 for name, item in geometry.items()})
         if "can" in value:
-            controllers, frequency, policy = _can(value["can"], soc)
-            result.update(CAN_CONTROLLERS=controllers, CAN_CLOCK_HZ=frequency,
-                          CAN_INTEGRATION=policy)
+            controllers, policy = _can(value["can"], soc)
+            result.update(CAN_CONTROLLERS=controllers, CAN_INTEGRATION=policy)
         if "usb_device" in value:
-            result["USB_DEVICE"] = _usb(value["usb_device"])
+            result["USB_DEVICE"] = _usb(value["usb_device"], pinmux)
             result["USB_CONTROLLER"] = result["USB_DEVICE"].controller
         if "ethernet" in value:
-            result["ETHERNET"] = _ethernet(value["ethernet"])
+            result["ETHERNET"] = _ethernet(value["ethernet"], pinmux)
             result["ETH_CONTROLLER"] = result["ETHERNET"].controller
         if "timers" in value:
-            result["TIMER_ADVANCED"] = _timers(value["timers"])
+            result["TIMER_ADVANCED"] = _timers(value["timers"], pinmux)
         if "endpoints" in value:
             result["ENDPOINT_POLICY"] = _endpoints(value["endpoints"])
         if "limits" in value:
@@ -335,28 +332,28 @@ class DomainPolicies:
                 value["adc_group"], bindings_document.get("hardware", {}))
         if "capture_audio" in value:
             from tools.configure.policies.capture_audio import CaptureAudioPolicy
-            result["CAPTURE_AUDIO"] = CaptureAudioPolicy.from_validated(value["capture_audio"])
+            result["CAPTURE_AUDIO"] = CaptureAudioPolicy.from_validated(value["capture_audio"], pinmux=pinmux)
         if "external_bus" in value:
             from tools.configure.policies.external_bus import ExternalBusPolicy
-            result["EXTERNAL_BUS"] = ExternalBusPolicy.from_validated(value["external_bus"])
+            result["EXTERNAL_BUS"] = ExternalBusPolicy.from_validated(value["external_bus"], pinmux=pinmux)
         if "gpio_phase" in value:
             from tools.configure.policies.gpio_phase import GpioPhasePolicy
             result["GPIO_PHASE"] = GpioPhasePolicy.from_validated(value["gpio_phase"])
         if "selection" in value:
             from tools.configure.policies.selection import SelectionPolicy
-            result["SELECTION"] = SelectionPolicy.from_validated(value["selection"])
+            result["SELECTION"] = SelectionPolicy.from_validated(value["selection"], pinmux=pinmux)
         if "dac_triggers" in value:
             from tools.configure import dac
             result["DAC_TRIGGERS"] = dac.trigger_facts(value["dac_triggers"])
         if "waveform" in value:
             from tools.configure.policies.timer_waveform import TimerWaveformPolicy
-            result["WAVEFORM"] = TimerWaveformPolicy.from_validated(value["waveform"])
+            result["WAVEFORM"] = TimerWaveformPolicy.from_validated(value["waveform"], pinmux=pinmux)
         if "coupled_io" in value:
             from tools.configure.coupled_io import CoupledIoPolicy
-            result["COUPLED_IO"] = CoupledIoPolicy.from_validated(value["coupled_io"])
+            result["COUPLED_IO"] = CoupledIoPolicy.from_validated(value["coupled_io"], pinmux=pinmux)
         if "sai" in value:
             from tools.configure.policies.sai import SaiPolicy
-            result["SAI"] = SaiPolicy.from_validated(value["sai"])
+            result["SAI"] = SaiPolicy.from_validated(value["sai"], pinmux=pinmux)
         if "platform" in value:
             from tools.configure.platform_bindings import PlatformBindings
             result["PLATFORM"] = PlatformBindings.from_validated(value["platform"])
@@ -366,7 +363,7 @@ class DomainPolicies:
                 value["startup_memory"], external_bus=result.get("EXTERNAL_BUS"))
         if "packet" in value:
             from tools.configure.policies.packet import PacketPolicy
-            result["PACKET"] = PacketPolicy.from_validated(value["packet"])
+            result["PACKET"] = PacketPolicy.from_validated(value["packet"], pinmux=pinmux)
         if "headers" in value:
             from tools.configure.header_projection import HeaderProjection
             result["HEADER"] = HeaderProjection.from_validated(value["headers"])

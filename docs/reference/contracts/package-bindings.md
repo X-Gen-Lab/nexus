@@ -94,6 +94,34 @@ binding 文件片段声明 `schema_version`、`bindings`，以及可选 `domains
 名称、相似寄存器或目录推断支持。物理事实、可用模式、Board 路线与资源约束仍共同
 决定某个完整装配是否合法。
 
+### 时钟、IRQ 与 pinmux 的唯一解析
+
+SoC 的 CAN 控制器事实通过 `clock_domain` 引用所选 ClockPlan 域。CAN 时序校验、
+绑定值和审计输出复用同一解析结果；缺少域引用拒绝，不回退到 core 时钟或全局
+CAN 频率。已有 UART／SPI 的事实继续按原领域合同校验。需要共享
+时钟来源的约束属于具体 IP，时钟频率相等不代替时钟域身份相同。
+
+CAN 的公开帧与借用合同保持独立；bxCAN 的时序范围、mailbox/FIFO、bank/split 和
+FMI 属于明确的 IP policy。控制器事实的 `irq_sources` 将逻辑原因映射至已审物理
+IRQ，不能仅按列表序号推导语义。多个原因引用同一向量时，所选绑定必须提供对应的
+固定分发；跨控制器共享还须有明确共享组、兼容优先级和互斥来源。未知 dispatcher
+或未审核的异构共享拒绝。
+
+`domains.can.model` 明确选择 `bxcan`。其必填 `transport` 按控制器记录已审 C 实现
+接受的 `clock_domain` 和 `irq_sources`，与物理事实分别核对；F4 当前仅接受自己的
+APB1 和四条独立向量。应用 TOML 不能覆盖这些 policy。修改 transport 本身属于
+实现合同变更，须重新审查 C 行为、ARM 链接和消费结果；这份受信声明不证明任意
+元数据与任意 C 算法等价，也不扩大芯片能力。
+
+包接口代际由 `packages.INTERFACE_VERSION` 和同源生成的编辑器 schema 固定。
+本轮原子迁移声明式包，旧接口明确拒绝。包清单格式、binding fragment 格式、TOML
+和 factory 代际各自维护；消费方不能只因语义版本相同而混用不同提交的工具与事实。
+
+绑定事实的 `pinmux_policy` 选择有限的编码合同。数值编码声明其合法 selectors，
+每个 AF 使用点都由同一 policy 检查；F4 的合法集合仍为 0..15。不同编码需要对应的
+事实、资源和 C 实现，不能仅放宽整数上限。定时器滤波等独立硬件位段继续按自身
+合同校验，不受 pinmux 范围影响。
+
 公共语义在 UART／CAN／USB 等窄合同中维护；采集、SAI、波形、外部总线、存储与
 图形政策在 `tools/configure/policies/` 就近校验。新 IP 符合已有模型时增加数据与 C
 绑定；模型不同则扩展经过审查的 policy 和测试，不给公共 resolver 增加型号条件。

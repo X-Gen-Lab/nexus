@@ -54,3 +54,11 @@ def copy_package(root, source_root=_ROOT):
     destination = Path(root) / relative
     shutil.copytree(Path(source_root) / relative, destination)
     return destination
+
+
+def f4_pinmux(root=_ROOT):
+    """Use the actual F4 declared selector model in isolated policy tests."""
+    import json
+    from tools.configure.pinmux import NumericPinMuxPolicy
+    document = json.loads((Path(root) / "soc/stm32/stm32f4/facts/bindings.json").read_text())
+    return NumericPinMuxPolicy.from_validated(document["pinmux_policy"])

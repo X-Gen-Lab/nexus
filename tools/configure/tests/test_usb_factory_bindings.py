@@ -1,4 +1,5 @@
 """USB ROM factories project reviewed callbacks and physical facts verbatim."""
+from tools.configure.tests.f4_fixture import f4_pinmux
 from types import MappingProxyType, SimpleNamespace
 import unittest
 
@@ -18,7 +19,7 @@ class UsbFactoryBindingTests(unittest.TestCase):
             "setup_slots": 3, "setup_bytes": 8, "faces": {
                 "device": {"setup_ops": "sample_setup", "activation_ops": "sample_activate"},
                 "managed": {"setup_ops": "sample_managed_setup",
-                    "activation_ops": "sample_managed_activate", "otg_ops": "sample_otg"}}})
+                    "activation_ops": "sample_managed_activate", "otg_ops": "sample_otg"}}}, pinmux=f4_pinmux())
         irq = IrqOptions(5, False)
         host = UsbHostOptions(2, 128, 96, 96, "pio", 0, 1000, 5000,
                               "external-owner", irq) if managed else None

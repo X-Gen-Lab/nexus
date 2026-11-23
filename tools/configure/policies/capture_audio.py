@@ -12,6 +12,7 @@ from tools.configure.calls import Symbol
 from tools.configure.media_schema import CROP_FIELDS, STANDARDS
 from tools.configure.providers.common import fail, integer, route_dma
 from tools.configure.records import freeze
+from tools.configure.pinmux import NumericPinMuxPolicy
 
 CAPTURE_MODES = ("snapshot-raw", "snapshot-jpeg", "raw-blocks", "jpeg-blocks",
                  "frames-raw", "frames-jpeg")
@@ -39,6 +40,13 @@ def _numbers(values, name):
     return tuple(integer(item, 1, context=name) for item in values)
 
 
+def _alternates(values, pinmux, context):
+    if (not isinstance(values, (list, tuple)) or not values or
+            len(set(values)) != len(values)):
+        fail(context + " requires distinct explicit selectors")
+    return tuple(pinmux.validate(value, context) for value in values)
+
+
 def _bounds(values, name):
     numbers = _numbers(values, name)
     if len(numbers) != 2 or numbers[0] >= numbers[1]:
@@ -57,7 +65,9 @@ class CaptureAudioPolicy:
     audio: Mapping
 
     @classmethod
-    def from_validated(cls, value):
+    def from_validated(cls, value, *, pinmux):
+        if not isinstance(pinmux, NumericPinMuxPolicy):
+            fail("Capture/audio requires its selected numeric pinmux policy")
         _fields(value, {"mechanism", "capture", "audio"})
         if value["mechanism"] != "capture-i2s-v1":
             fail("Capture/audio mechanism is not reviewed")
@@ -74,10 +84,9 @@ class CaptureAudioPolicy:
             fail("Capture controller identities must be explicit and distinct")
         for name in capture["controllers"]:
             Symbol(name)
-        for name in ("alternates", "widths", "embedded_widths", "jpeg_widths", "frame_divisors"):
+        for name in ("widths", "embedded_widths", "jpeg_widths", "frame_divisors"):
             _numbers(capture[name], "Capture " + name)
-        if any(item > 15 for item in capture["alternates"]):
-            fail("Capture alternate is outside its reviewed pinmux mechanism")
+        _alternates(capture["alternates"], pinmux, "Capture alternate selector")
         if (not set(capture["embedded_widths"]) <= set(capture["widths"]) or
                 not set(capture["jpeg_widths"]) <= set(capture["widths"])):
             fail("Capture specialized widths exceed the reviewed parallel port")
@@ -92,9 +101,7 @@ class CaptureAudioPolicy:
             Symbol(name)
             _fields(roles, {"ws", "ck", "sd", "ext_sd", "mclk"})
             for alternates in roles.values():
-                _numbers(alternates, "I2S signal alternate")
-                if any(item > 15 for item in alternates):
-                    fail("I2S alternate exceeds reviewed pinmux mechanism")
+                _alternates(alternates, pinmux, "I2S alternate selector")
         for name in ("sample_bits", "slot_bits"):
             _numbers(audio[name], "I2S " + name)
         for name in ("sample_rate_hz", "pll_n", "pll_r", "pll_input_hz", "pll_vco_hz", "prescaler"):

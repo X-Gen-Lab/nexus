@@ -1,4 +1,5 @@
 """Boot placement references the selected external endpoint geometry once."""
+from tools.configure.tests.f4_fixture import f4_pinmux
 import copy
 import importlib
 import subprocess
@@ -30,7 +31,7 @@ class StartupMemoryPolicyTests(unittest.TestCase):
         facts = self.facts()
         external = self.external()
         external["endpoints"][facts["endpoint_profile"]]["bytes"] = 0x200000
-        selected = ExternalBusPolicy.from_validated(external)
+        selected = ExternalBusPolicy.from_validated(external, pinmux=f4_pinmux())
         policy = module.StartupMemoryPolicy.from_validated(facts, external_bus=selected)
         self.assertIs(policy.endpoint, selected.endpoints[facts["endpoint_profile"]])
         assembly = configure.load_assembly(configure.ROOT /
@@ -42,7 +43,7 @@ class StartupMemoryPolicyTests(unittest.TestCase):
 
     def test_unknown_policy_and_insufficient_stack_are_rejected(self):
         module = importlib.import_module("tools.configure.startup_memory")
-        external = ExternalBusPolicy.from_validated(self.external())
+        external = ExternalBusPolicy.from_validated(self.external(), pinmux=f4_pinmux())
         facts = self.facts()
         changed = copy.deepcopy(facts)
         changed["register_program"] = "write()"
