@@ -317,10 +317,15 @@ class DottedDocnameRegression(unittest.TestCase):
 class SourceSDKInstructionTests(unittest.TestCase):
     def test_complete_consumer_instructions_export_the_required_profile(self):
         import importlib.util
+        import json
         import shlex
         from contextlib import redirect_stdout
         import io
         from unittest.mock import patch
+
+        from scripts.ci import sdk_consumers
+        from tools.maintenance.source_catalogue import (ALL_SOURCE_DEPENDENCIES,
+                                                        dependency)
 
         root = Path(__file__).resolve().parents[2]
         module_spec = importlib.util.spec_from_file_location(
@@ -332,33 +337,68 @@ class SourceSDKInstructionTests(unittest.TestCase):
                     if block[2].strip() == "sh"
                     for line in block[3].replace("\\\n", " ").splitlines()
                     if line.strip()]
-        command = next(argv for argv in commands
-                       if len(argv) > 2 and argv[1].endswith(
-                           "cmake/package/package_source_sdk.py")
-                       and "--source" in argv and "--output" in argv)
         result = {"kind": "source_snapshot", "source_revision": "a" * 40,
-                  "publishable": True, "files_sha256": {},
-                  "snapshot_sha256": "b" * 64}
-        with patch.object(packager, "prepare", return_value=result) as prepare, \
+                  "source_dirty": False, "publishable": True,
+                  "files_sha256": {}, "snapshot_sha256": "b" * 64}
+
+        def selection_for(command):
+            script = "cmake/package/package_source_sdk.py"
+            with patch.object(packager, "prepare", return_value=result) as prepare, \
+                    redirect_stdout(io.StringIO()):
+                self.assertEqual(packager.main(
+                    command[command.index(script) + 1:]), 0)
+            return packager.resolve_selection(root, **prepare.call_args.kwargs)
+
+        script = "scripts/ci/sdk_consumers.py"
+        command = next(argv for argv in commands if script in argv)
+        self.assertIn("--all", command)
+        with patch.object(sdk_consumers, "verify_checkout") as verify_checkout, \
+                patch.object(sdk_consumers.subprocess, "check_output",
+                             return_value=result["source_revision"]), \
                 redirect_stdout(io.StringIO()):
-            self.assertEqual(packager.main(command[2:]), 0)
-        selection = packager.resolve_selection(root, **prepare.call_args.kwargs)
+            self.assertEqual(sdk_consumers.main(
+                command[command.index(script) + 1:]), 0)
+        verify_checkout.assert_called_once_with(
+            root, result["source_revision"], None,
+            Path(command[command.index("--output") + 1]).resolve(),
+            allow_network=True)
+        actions = []
+
+        def run(argv, **options):
+            actions.append(argv)
+            if "cmake/package/package_source_sdk.py" in argv:
+                path = (Path(argv[argv.index("--output") + 1]) /
+                        "share/nexus/src")
+                path.mkdir(parents=True)
+                (path / ".nexus-source-sdk.json").write_text(json.dumps(result))
+
+        sdk_consumers.verify_checkout(*verify_checkout.call_args.args,
+                                      **verify_checkout.call_args.kwargs, run=run)
+        self.assertIn("--allow-network", actions[0])
+        self.assertNotIn("--changed-path", actions[-1])
+        selection = selection_for(next(
+            argv for argv in actions if "cmake/package/package_source_sdk.py" in argv))
         self.assertTrue(selection.host_support,
                         "The complete plan starts with a Native consumer")
         self.assertEqual(selection.backend, "freertos")
         self.assertEqual({package.id for package in selection.packages}, {"stm32f4"})
-        self.assertEqual(set(selection.components), {
-            "network", "network-loaned-rx", "tls", "mqtt", "mcuboot",
-            "st-usb-device", "st-usb-host", "flashdb", "littlefs", "fatfs",
-            "sfud", "rtt", "shell", "cmsis-dsp", "cm-backtrace"})
+        self.assertEqual(selection.components, sdk_consumers.full_components(root))
+        required = {item.path for item in ALL_SOURCE_DEPENDENCIES
+                    if set(item.component_profiles).intersection(selection.components)}
+        required.add(dependency(selection.backend).path)
         selected = set(packager.runtime_dependency_closure(root=root, selection=selection))
-        self.assertTrue({"ext/lwip", "ext/mbedtls", "ext/coremqtt",
-                         "ext/mcuboot", "ext/freertos", "vendors/st/usb_device",
-                         "vendors/st/usb_host", "ext/flashdb", "ext/littlefs",
-                         "ext/fatfs", "ext/sfud", "ext/segger-rtt",
-                         "ext/letter_shell", "vendors/arm/CMSIS_DSP",
-                         "ext/cm_backtrace"}.issubset(selected),
+        self.assertTrue(required.issubset(selected),
                         "The complete plan includes every selected service supplier")
+
+        with self.subTest(scope="baremetal product export"):
+            selection = selection_for(next(
+                argv for argv in commands
+                if "cmake/package/package_source_sdk.py" in argv
+                and "--source" in argv and "--output" in argv))
+            self.assertEqual(selection.backend, "baremetal")
+            self.assertFalse(selection.host_support)
+            self.assertEqual(selection.components, ())
+            self.assertEqual({package.id for package in selection.packages}, {"stm32f4"})
 
 
 if __name__ == "__main__":
