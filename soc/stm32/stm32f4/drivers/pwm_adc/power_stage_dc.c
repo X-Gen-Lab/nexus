@@ -163,14 +163,16 @@ nx_result_t
 nx_stm32_power_stage_dc_read(const nx_stm32_power_stage_dc_config_t* c,
                              const nx_power_stage_dc_capture_t** out) {
     if (!selected(c) ||
-        !object(out, sizeof(*out),
+        !object(out, sizeof(const nx_power_stage_dc_capture_t*),
                 _Alignof(const nx_power_stage_dc_capture_t*)) ||
-        nx_stm32_av_overlap(out, sizeof(*out), c->state, sizeof(*c->state)) ||
-        nx_stm32_av_overlap(out, sizeof(*out), c, sizeof(*c)) ||
-        nx_stm32_av_overlap(out, sizeof(*out), c->capture.adc,
-                            sizeof(*c->capture.adc)) ||
-        nx_stm32_av_overlap(out, sizeof(*out), c->capture.timer,
-                            sizeof(*c->capture.timer))) {
+        nx_stm32_av_overlap(out, sizeof(const nx_power_stage_dc_capture_t*),
+                            c->state, sizeof(*c->state)) ||
+        nx_stm32_av_overlap(out, sizeof(const nx_power_stage_dc_capture_t*), c,
+                            sizeof(*c)) ||
+        nx_stm32_av_overlap(out, sizeof(const nx_power_stage_dc_capture_t*),
+                            c->capture.adc, sizeof(*c->capture.adc)) ||
+        nx_stm32_av_overlap(out, sizeof(const nx_power_stage_dc_capture_t*),
+                            c->capture.timer, sizeof(*c->capture.timer))) {
         return NX_ERROR_INVALID;
     }
     nx_stm32_power_stage_dc_t* s = c->state;

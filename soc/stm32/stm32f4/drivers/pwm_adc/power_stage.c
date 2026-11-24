@@ -924,9 +924,10 @@ static bool disjoint(const nx_stm32_power_stage_t* s, const void* data,
         if (dc == NULL || nx_stm32_av_overlap(data, bytes, d, sizeof(*d)) ||
             nx_stm32_av_overlap(data, bytes, dc, sizeof(*dc)) ||
             nx_stm32_av_overlap(data, bytes, dc->members,
-                                dc->count * sizeof(*dc->members)) ||
-            nx_stm32_av_overlap(data, bytes, dc->configurations,
-                                dc->count * sizeof(*dc->configurations)))
+                                dc->count * sizeof(nx_stm32_power_stage_t*)) ||
+            nx_stm32_av_overlap(
+                data, bytes, dc->configurations,
+                dc->count * sizeof(const nx_stm32_power_stage_config_t*)))
             return false;
         for (size_t i = 0U; i < dc->count; ++i) {
             const nx_stm32_power_stage_t* peer = dc->members[i];
@@ -972,7 +973,7 @@ static bool plan_valid(const nx_stm32_power_stage_t* s,
     }
 #if NEXUS_STM32_POWER_STAGE_DC
     if (dc_profile(c)) {
-        return nx_stm32_power_stage_dc_valid(c->dc, plan) &&
+        return plan->dc != NULL && nx_stm32_power_stage_dc_valid(c->dc, plan) &&
                (uint64_t)plan->dc->sample_ticks[1] +
                        ((uint64_t)s->scan_span_us + c->max_irq_delay_us +
                         c->compute_budget_us + 4U) *
@@ -1577,6 +1578,12 @@ void nx_stm32_power_stage_adc_irq(nx_stm32_power_stage_t* s) {
     const uint8_t current_count = phase_count(s->staged_phase_mask);
     const size_t rank_count =
         (size_t)current_count + (s->config->sample_bus ? 1U : 0U);
+#if NEXUS_STM32_POWER_STAGE_PAIR
+    if (s->config->pair != NULL && rank_count != 2U) {
+        trip(s, NX_ERROR_STATE);
+        return;
+    }
+#endif
     for (size_t i = 0U; i < rank_count; ++i) {
         uint32_t value;
 #if NEXUS_STM32_POWER_STAGE_PAIR

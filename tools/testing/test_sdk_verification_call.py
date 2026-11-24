@@ -1174,7 +1174,7 @@ class SDKConsumerParallelTests(unittest.TestCase):
         retained.update(item.name for item in self.consumer.SERVICE_CONSUMERS
                         if item.arm and item.scenario not in
                         {"image_window", "mcuboot_control", "common_components",
-                         "smart_components"})
+                         "smart_components", "foc_control"})
         commands = [command for command in self.commands
                     if any(arg.endswith("retention.py") for arg in command)]
         self.assertEqual({Path(command[command.index("--elf") + 1]).parents[1]
@@ -1192,6 +1192,51 @@ class SDKConsumerParallelTests(unittest.TestCase):
         self.assertEqual(len(self.builds()), 2)
         self.assertIn("--verify", self.commands[0])
         self.assertIn("--verify", self.commands[-1])
+
+    def test_pure_foc_keeps_arm_image_and_symbols_without_provider_retention(self):
+        status, report = self.execute(("--consumer", "native foc composition",
+                                       "--consumer", "f407 foc composition",
+                                       "--parallel", "1"))
+        self.assertEqual(status, 0, report)
+        images = {item["name"]: item for item in report["service_images"]}
+        for profile in self.consumer.SERVICE_CONSUMERS:
+            if profile.scenario != "foc_control":
+                continue
+            image = images[profile.name]
+            self.assertEqual(set(image["symbols"]),
+                             self.consumer.service_symbols(profile))
+            self.assertIsNone(image["retention"])
+            self.assertEqual(image["runtime_executed"], not profile.arm)
+            if profile.arm:
+                self.assertIsNotNone(image["resources"])
+                self.assertIn("elf", image["inputs"])
+                self.assertFalse(any(image["forbidden_symbols"].values()))
+        self.assertFalse(any(argument.endswith("retention.py")
+                             for command in self.commands for argument in command))
+
+    def test_foc_with_selected_io_still_requires_provider_retention(self):
+        profile = next(item for item in self.consumer.SERVICE_CONSUMERS
+                       if item.name == "f407 foc composition")
+        output = self.directory / profile.domain
+        output.mkdir()
+        source, build, command = self.consumer.prepare_service_consumer(
+            self.prefix, output, profile, self.external_process,
+            expected_revision="a" * 40, fixture=True)
+        self.external_process(command)
+        config = Path((build / "resolved-config.txt").read_text())
+        resolved_path = config / "resolved.json"
+        resolved = json.loads(resolved_path.read_text())
+        resolved["controllers"] = [{"kind": "gpio", "id": "status"}]
+        resolved_path.write_text(json.dumps(resolved))
+        resources_path = build / "bin/installed_services.resources.json"
+        resources = json.loads(resources_path.read_text())
+        resources["resolved"] = file_identity(resolved_path)
+        resources_path.write_text(json.dumps(resources))
+        image = self.consumer.check_service_image(
+            self.sdk, source, build, profile, self.external_process)
+        self.assertIsNotNone(image["retention"])
+        self.assertTrue(any(argument.endswith("retention.py")
+                            for command in self.commands for argument in command))
 
     def test_unknown_consumer_never_starts_external_commands(self):
         with self.assertRaisesRegex(ValueError, "Unknown SDK consumer"):

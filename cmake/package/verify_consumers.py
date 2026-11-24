@@ -1285,7 +1285,8 @@ def check_service_image(sdk, source, build, specification, run_checked):
                                   "--consumer", str(source / "application.c")]
         no_provider = specification.scenario in {
             "image_window", "mcuboot_control", "common_components",
-            "smart_components"}
+            "smart_components"} or (specification.scenario == "foc_control" and
+                                     resolved.get("controllers") == [])
         if not no_provider:
             run_checked(retention_command)
         retained = (json.loads(retention_path.read_text())
