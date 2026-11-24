@@ -1,0 +1,847 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, Nexus Team
+# This file is distributed under the same license as the Nexus Embedded Platform package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus Embedded Platform 0.2.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-24 03:56+0000\n"
+"PO-Revision-Date: 2026-11-24 11:58+0800\n"
+"Last-Translator: Nexus Team\n"
+"Language-Team: Nexus Team\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 48edcc0bc397eceaf220372c70cdb6f63f52199e1be22199e2282bd5c2cd6643\n"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:10
+msgid "Explicit motor and axis control"
+msgstr "显式电机与轴控制"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:12
+msgid ""
+"Select `Nexus::MotorControl` for the independent C11 current-control kernel "
+"and `Nexus::AxisControl` for command admission and rotary axis control. Each"
+" caller owns its state, parameters, execution context and time facts. These "
+"components do not allocate, schedule work, read a clock or initialize a "
+"peripheral."
+msgstr ""
+"选择 `Nexus::MotorControl` 使用独立的 C11 电流控制核，选择 `Nexus::AxisControl` "
+"实现命令准入与旋转轴控制。每个调用者拥有自己的状态、参数、执行上下文和时间事实。组件不分配内存、不调度工作、不读取时钟，也不初始化外设。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:17
+msgid ""
+"Current, voltage, mechanical angle and velocity use explicitly named SI "
+"units. Motor pole pairs, encoder scaling and mechanical transmission are "
+"different facts. Keep parameter publication separate from live IRQ "
+"computation; ordinary structure copies do not provide cross-context "
+"synchronization."
+msgstr ""
+"电流、电压、机械角和速度使用名称中明确标注的 SI 单位。电机极对数、编码器缩放和机械传动是不同事实。参数发布与运行中的 IRQ "
+"计算分开处理；普通结构体复制不提供跨上下文同步。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:22
+msgid ""
+"An axis decision adopts a software reference. A motor result is an output "
+"plan. Neither establishes hardware adoption, physical position or a safe "
+"electrical state. The selected provider owns actual PWM/ADC transitions and "
+"final request, buffer and callback withdrawal. Failed withdrawal retains "
+"that ownership even after outputs have been inhibited."
+msgstr ""
+"轴控制决策采用的是软件参考，电机计算结果是输出计划。两者均不证明硬件已采用、实际位置或电气安全状态。选定 provider 负责实际 PWM／ADC "
+"状态变化，以及请求、缓冲区和回调引用的最终撤回。即使输出已被抑制，撤回失败仍保留这些所有权。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:28
+msgid ""
+"The [control component boundary](https://github.com/X-Gen-"
+"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/control/README.md) and "
+"[control composition guide](../../../guides/control-and-smart-devices.md) "
+"explain how external products provide scheduling, hardware bindings and "
+"recovery."
+msgstr ""
+"[控制组件边界](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/components/control/README.md)和[控制组合指南](../../../guides/control-and-"
+"smart-devices.md)说明外部产品如何提供调度、硬件绑定及恢复策略。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:32
+msgid "Preserve explicit control and stopping policy"
+msgstr "保留显式控制与停止策略"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:34
+msgid ""
+"Axis commands retain the original local receipt, complete identity and "
+"finite authority. Repeated/old sequences do not renew it; accepting a "
+"command does not adopt it until a later valid step. Feedback carries its "
+"mechanical side and observation interval. Position trajectory completion and"
+" measured target settling remain separate results."
+msgstr ""
+"轴命令保留原始本地接收时间、完整身份和有期限的授权。重复或旧序号不会续期；命令被接纳后，要到后续有效 step "
+"才会采用。反馈携带机械侧和观察区间。位置轨迹计算完成与测得目标已稳定保持为独立结果。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:40
+msgid ""
+"`NX_AXIS_INHIBIT_AFTER_DWELL` ends the selected software decision after "
+"observed zero-speed dwell. `NX_AXIS_HOLD_ZERO_VELOCITY` enters "
+"`NX_AXIS_HOLDING` and keeps the zero-velocity PI running while refusing new "
+"motion. Holding is not proof of load support, fixed position or mechanical "
+"safety. The product first completes its mechanical handoff, then disables "
+"and separately withdraws actual hardware. Invalid feedback cannot be "
+"repaired by retaining a previous holding output."
+msgstr ""
+"`NX_AXIS_INHIBIT_AFTER_DWELL` "
+"在观察到零速停留满足要求后结束所选软件决策。`NX_AXIS_HOLD_ZERO_VELOCITY` 进入 "
+"`NX_AXIS_HOLDING`，继续运行零速 PI "
+"并拒绝新运动。保持状态不证明负载已被支撑、位置固定或机械安全。产品先完成机械交接，再禁能并单独撤回实际硬件。保留上一次保持输出不能修复无效反馈。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:47
+msgid ""
+"Motor computation uses calibrated A/V/rad/rad/s with a shared microsecond "
+"domain and 64-bit epoch. It distinguishes the declared sample event, angle "
+"observation, control observation and planned apply boundary. Backward angle "
+"projection and output prediction have separate bounded spans. A sequential "
+"ADC bridge must qualify its sampling skew instead of claiming simultaneous "
+"measurements."
+msgstr ""
+"电机计算使用经过标定的 A／V／rad／rad/s，以及共享的微秒时间域和 64 位 "
+"epoch。声明的采样事件、角度观察、控制观察和计划采用边界分别表达。向过去时刻投影角度与向输出时刻预测各自具有有界时间跨度。顺序 ADC "
+"桥接必须验证其采样偏斜，不能声称同时测量。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:53
+msgid ""
+"The complete duty plan and `planned_voltage` are not a measured voltage "
+"receipt. `nx_motor_track_voltage` feeds final quantization/window limitation"
+" back once for the matching latest cycle. A hardware commit error must close"
+" kernel admission and follow the real provider's withdrawal; resetting a C "
+"object cannot join IRQs."
+msgstr ""
+"完整占空比计划和 `planned_voltage` 不代表实测电压回执。`nx_motor_track_voltage` "
+"只对匹配的最新周期回馈一次最终量化／窗口限制。硬件提交错误必须关闭控制核准入，并按真实 provider 的合同撤回；重置 C 对象不能会合 IRQ。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:58
+msgid "Motor computation"
+msgstr "电机计算"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "Caller-owned sensored PMSM calculation and offset candidates."
+msgstr "由调用者拥有的有感 PMSM 计算与偏置候选。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid ""
+"Author  Nexus Team   Version  1.0.0   Date  2026-11-24   Copyright  "
+"Copyright (c) 2026 Nexus Team"
+msgstr "作者 Nexus Team 版本 1.0.0 日期 2026-11-24 版权 Copyright (c) 2026 Nexus Team"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "Nexus Team"
+msgstr "Nexus 团队"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "1.0.0"
+msgstr "1.0.0"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "2026-11-24"
+msgstr "2026-11-24"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "Copyright (c) 2026 Nexus Team"
+msgstr "Copyright (c) 2026 Nexus Team"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "Functions"
+msgstr "函数"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "Transform calibrated phase currents into alpha/beta."
+msgstr "将标定后的相电流变换到 alpha／beta 坐标。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "Uses alpha=(2A-B-C)/3 and beta=(B-C)/sqrt(3)."
+msgstr "使用 alpha=(2A-B-C)/3 和 beta=(B-C)/sqrt(3)。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:0
+msgid "Parameters"
+msgstr "参数"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "[in] Three finite A/B/C values, distinct from out."
+msgstr "[in] 三个有限的 A／B／C 数值，与 out 分离。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "[out] Separate result; unchanged on failure."
+msgstr "[out] 独立结果，失败时不变。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:0
+msgid "Returns"
+msgstr "返回值"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "SUCCESS, INVALID or EXHAUSTED; bounded pure Task/IRQ math."
+msgstr "SUCCESS、INVALID 或 EXHAUSTED；有界的纯 Task／IRQ 数学计算。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "Rotate stationary values into the electrical dq frame."
+msgstr "将静止坐标值旋转到电气 dq 坐标。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "[in] Finite alpha/beta in one common unit."
+msgstr "[in] 使用同一单位的有限 alpha／beta 数值。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "[in] Finite electrical angle in radians."
+msgstr "[in] 有限电角度，单位 rad。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "[out] Exclusive result; unchanged on failure."
+msgstr "[out] 独占结果，失败时不变。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "SUCCESS, INVALID or EXHAUSTED; pure Task/IRQ math."
+msgstr "SUCCESS、INVALID 或 EXHAUSTED；纯 Task／IRQ 数学计算。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "Rotate dq values back to the stationary frame."
+msgstr "将 dq 数值旋转回静止坐标。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "[in] Finite d/q in one common unit."
+msgstr "[in] 使用同一单位的有限 d／q 数值。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "Validate and copy a profile into unused zeroed storage."
+msgstr "校验配置并复制到未使用且已清零的存储。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "Pure initialization; no hardware effects or default profile."
+msgstr "仅初始化软件，不影响硬件，也不选择默认配置。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "[out] Fresh state, distinct from config; no live users."
+msgstr "[out] 新状态，与 config 分离，且没有活跃使用者。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "[in] Explicit finite profile, copied, never retained."
+msgstr "[in] 显式且数值有限的配置；复制内容，不保留引用。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "SUCCESS, INVALID or STATE; rejection preserves motor."
+msgstr "SUCCESS、INVALID 或 STATE；拒绝时保留 motor。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "Calculate one complete sensored current-control plan."
+msgstr "计算一个完整的有感电流控制计划。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid ""
+"Known storage aliases reject before mutation. Caller proves memory and "
+"serial access. Bounded Task/IRQ math, including sinf/cosf/hypotf; no "
+"physical WCET promise. Rejects missed sequence, timing, invalid measurement "
+"and overcurrent."
+msgstr ""
+"已知存储别名在任何修改前拒绝。调用者证明内存有效并保证串行访问。有界 Task／IRQ 数学计算包含 "
+"sinf／cosf／hypotf，不承诺实际最坏执行时间。拒绝漏序号、时序错误、无效测量和过流。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "[inout] Initialized single-owner state and fixed profile."
+msgstr "[inout] 已初始化、由单一所有者管理的状态与固定配置。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "[in] Complete input, stable for this call only."
+msgstr "[in] 完整输入，仅在本次调用期间保持稳定。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "[in] Finite dq target, valid through planned apply."
+msgstr "[in] 数值有限的 dq 目标，有效期覆盖计划采用时刻。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "[out] Separate plan; unchanged on every failure."
+msgstr "[out] 独立计划，任何失败时均不变。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "SUCCESS or exact latched error; FAULT blocks later steps."
+msgstr "SUCCESS 或精确锁存的错误；FAULT 阻止后续 step。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "Feed final quantization/actuator limitation back once."
+msgstr "回馈一次最终量化／执行器限制。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid ""
+"Corrects by final-minus-previous-plan, avoiding duplicate back-calculation. "
+"It is not a measured voltage receipt."
+msgstr "使用最终计划减去前一计划的差值修正，避免重复回算。它不代表实测电压回执。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "[inout] Same owner after the latest successful step."
+msgstr "[inout] 最新一次成功 step 后的同一所有者。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "[in] Exact latest cycle, not yet tracked."
+msgstr "[in] 精确匹配且尚未跟踪的最新周期。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "[in] Final implemented plan in output dq V."
+msgstr "[in] 最终实施的计划，使用输出 dq 坐标，单位 V。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "SUCCESS, STATE or INVALID; rejects stale/duplicate tracking."
+msgstr "SUCCESS、STATE 或 INVALID；拒绝过期或重复跟踪。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "Retain the first hardware/outer-owner error in the kernel."
+msgstr "在控制核中保留首个硬件／外层所有者错误。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "Use after output commit failure, then withdraw via its owner."
+msgstr "输出提交失败后调用，再由其所有者撤回。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "[inout] Initialized serialized state."
+msgstr "[inout] 已初始化的串行状态。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "[in] Non-success error describing the actual failure."
+msgstr "[in] 描述实际失败的非成功错误码。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "SUCCESS, INVALID or STATE; never starts or stops hardware."
+msgstr "SUCCESS、INVALID 或 STATE；从不启动或停止硬件。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "Reset only algorithm history after externally joined stop."
+msgstr "外部完成停止及会合后，仅重置算法历史。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid ""
+"Caller must first stop/join the real provider and all users. This function "
+"cannot prove shutdown from a C object."
+msgstr "调用者必须先停止真实 provider，并会合它与全部使用者。此函数无法仅凭 C 对象证明硬件已关闭。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "[inout] Initialized same-owner state with no hardware users."
+msgstr "[inout] 已初始化、由同一所有者管理且无硬件使用者的状态。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "SUCCESS or STATE; no output enable or hardware recovery."
+msgstr "SUCCESS 或 STATE；不使能输出，也不恢复硬件。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "Begin an independent fixed-count zero-current estimate."
+msgstr "开始独立的固定样本数零电流估计。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "[out] Unused caller state, no concurrent users."
+msgstr "[out] 未使用的调用者状态，不得有并发使用者。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "[in] Count in [1,65535]."
+msgstr "[in] 样本数，范围 [1,65535]。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "[in] Finite nonnegative raw-code spread per phase."
+msgstr "[in] 各相允许的非负有限原始码跨度。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "SUCCESS or INVALID; rejection preserves state."
+msgstr "SUCCESS 或 INVALID；拒绝时保留状态。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "Consume one complete raw scan without device access."
+msgstr "消费一次完整原始扫描，不访问设备。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid ""
+"Nonfinite/excess-spread scans poison the candidate; callers cannot silently "
+"skip noisy samples and claim it passed."
+msgstr "非有限值或跨度超限的扫描会使候选无效；调用者不能静默跳过噪声样本后声称通过。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "[inout] Initialized same-owner candidate."
+msgstr "[inout] 已初始化、由同一所有者管理的候选。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "[in] Three finite raw values, distinct from candidate."
+msgstr "[in] 三个有限原始值，与候选分离。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "SUCCESS, INVALID, STATE or EXHAUSTED."
+msgstr "SUCCESS、INVALID、STATE 或 EXHAUSTED。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "Copy a completed candidate; never applies or persists it."
+msgstr "复制已完成候选，从不自动应用或持久化。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "[in] Complete valid same-owner candidate."
+msgstr "[in] 完整有效且由同一所有者管理的候选。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "[out] Three distinct result values, unchanged on error."
+msgstr "[out] 三个独立结果值，错误时不变。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "SUCCESS, BUSY, STATE or INVALID; pure bounded calculation."
+msgstr "SUCCESS、BUSY、STATE 或 INVALID；纯有界计算。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "Amplitude-invariant stationary frame, with phase A on alpha."
+msgstr "幅值不变的静止坐标，A 相位于 alpha 轴。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "Public Members"
+msgstr "公共成员"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "Rotating-frame values; q is positive beta at electrical angle zero."
+msgstr "旋转坐标值；电角度为零时，q 沿 beta 正方向。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "Immutable explicit profile; gains use A, V and seconds."
+msgstr "不可变的显式配置；增益使用 A、V 和秒。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid ""
+"Kp is V/A and Ki is V/(A*s). Limits are inclusive. Modulation is (0,1]; "
+"minimum_duty is [0,0.5). Their combined linear voltage bound is "
+"Vbus/sqrt(3)*maximum_modulation*(1-2*minimum_duty). This conservative bound "
+"reserves a common low-side sampling window; it does not prove analog "
+"settling or any Board route. Anti-windup is an inverse-second back-"
+"calculation rate. Initial dt uses nominal_period_us; later dt uses "
+"consecutive sample times. Domain/epoch must remain valid and nonzero. The "
+"caller proves phase current calibration, direction and actual "
+"sample/angle/apply timing. Mechanical angle is motor-shaft radians, already "
+"direction-normalized; pole pairs are applied exactly once."
+msgstr ""
+"Kp 的单位为 V/A，Ki 为 V/(A*s)。限制包含边界。调制度范围为 (0,1]，minimum_duty 范围为 "
+"[0,0.5)。两者共同确定线性电压上限 "
+"Vbus/sqrt(3)*maximum_modulation*(1-2*minimum_duty)。这个保守上限为共同低侧采样窗口预留空间，不证明模拟信号已稳定，也不授权任何"
+" Board 路线。抗饱和参数是单位为 1/s 的回算速率。初次 dt 使用 "
+"nominal_period_us，之后使用相邻采样时间。时间域／epoch "
+"必须保持有效且非零。调用者证明相电流标定、方向以及真实采样／角度／采用时序。机械角是已归一化方向的电机轴角度，单位 rad；极对数仅应用一次。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "One complete calibrated sample and its planned output boundary."
+msgstr "一次完整标定采样及其计划输出边界。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid ""
+"Times are microseconds in one declared domain/epoch. sample_time_us is the "
+"declared measurement event, not an IRQ observation. A hardware bridge must "
+"separately identify a scheduled proxy and bound its error. observed_at_us "
+"states when these values became known to this executor; "
+"sample<=observed<=apply and angle<=observed must hold. Angle may be acquired"
+" after sampling, with bounded backward projection. Apply time is a plan, not"
+" proof of physical output. A separately validated mechanical velocity "
+"predicts angle for sampling and output. Sequence starts at any value, then "
+"increases by exactly one without wrap. No pointer is retained. Phase A/B/C "
+"currents use A, Vbus uses V, and motor shaft angle/velocity use rad/rad/s. A"
+" common event or a bounded-skew approximation must be established outside "
+"this numerical kernel."
+msgstr ""
+"所有时间使用同一声明时间域／epoch 的微秒单位。sample_time_us 是声明的测量事件，不是 IRQ "
+"观察时间。硬件桥接必须单独标明计划时刻替代值并约束误差。observed_at_us 表示本执行者获知这些值的时刻；必须满足 "
+"sample<=observed<=apply 及 "
+"angle<=observed。角度可在采样后取得，但向过去时刻投影的跨度必须有界。采用时间是计划，不证明实际输出。分别验证的机械速度用于预测采样及输出时刻角度。序号可从任意值开始，之后每次恰好递增一且不得回绕。不保留指针。A／B／C"
+" 相电流使用 A，Vbus 使用 V，电机轴角度／速度使用 rad／rad/s。共同事件或有界偏斜近似必须在本数值核之外成立。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "Complete dq current target; equality with its expiry is expired."
+msgstr "完整 dq 电流目标；达到有效期边界即过期。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "Full normalized A/B/C duty plan; not a hardware completion receipt."
+msgstr "完整的归一化 A／B／C 占空比计划，不是硬件完成回执。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid ""
+"requested_voltage and planned_voltage use V in the output-angle dq frame. "
+"measured_current uses A in the sample-angle frame. The caller commits the "
+"entire plan through the sole hardware owner; a commit error must latch the "
+"motor fault and follow that owner's withdrawal. No actual phase voltage or "
+"exact physical update is inferred here."
+msgstr ""
+"requested_voltage 和 planned_voltage 使用输出角度下的 dq 坐标，单位 V。measured_current "
+"使用采样角度下的坐标，单位 "
+"A。调用者通过唯一硬件所有者提交完整计划；提交错误必须锁存电机故障，并按该所有者合同撤回。这里不推断实际相电压或精确物理更新。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "Independent serialized algorithm state; fields are not controls."
+msgstr "独立的串行算法状态；字段不作为控制入口。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid ""
+"No hardware/OS/heap/clock access. One executor owns all operations. Task and"
+" IRQ must not concurrently access it. Failed steps preserve integrators and "
+"output, and latch fault. Success advances algorithm history before hardware "
+"commit; commit failure must close admission."
+msgstr ""
+"不访问硬件／OS／堆／时钟。全部操作由一个执行者拥有。任务与 IRQ "
+"不得并发访问。失败时保留积分器和输出并锁存故障。成功会在硬件提交前推进算法历史；提交失败必须关闭准入。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid "Bounded raw offset estimator, independent from live motor parameters."
+msgstr "有界原始偏置估计器，与活跃电机参数独立。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+msgid ""
+"Only use samples acquired under externally proven zero-current conditions. "
+"Neither zero mean nor low spread proves zero real current. It never "
+"energizes hardware, changes calibration or writes storage."
+msgstr "仅使用在外部已证明零电流条件下取得的样本。零均值和低跨度都不能证明真实电流为零。它从不使能硬件、不修改标定，也不写入存储。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:64
+msgid "Axis commands and execution"
+msgstr "轴命令与执行"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "Explicit-reference rotary axis control and command admission."
+msgstr "显式参考的旋转轴控制与命令准入。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "Enums"
+msgstr "枚举"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "Selected reference units; no protocol scaling is implied."
+msgstr "选定参考的单位，不隐含协议缩放。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "Values:"
+msgstr "取值："
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "Algorithm admission, never hardware power or borrow state."
+msgstr "算法准入，不代表硬件功率或借用状态。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "Explicit terminal software action after observed zero-speed dwell."
+msgstr "观察到零速停留满足要求后的显式软件终态动作。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "Initialize independent state without touching hardware."
+msgstr "初始化独立状态，不影响硬件。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "Task context. Reinitialize only after every user joins."
+msgstr "任务上下文。仅在全部使用者会合后重新初始化。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "[out] Unused aligned storage, disjoint from both inputs."
+msgstr "[out] 未使用的对齐存储，与两个输入均不重叠。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "[in] Nonzero identity and finite step/feedback budgets."
+msgstr "[in] 非零身份及有限的 step／反馈预算。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "[in] Complete legal revision, copied on success."
+msgstr "[in] 完整合法的参数版本，成功时复制。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "SUCCESS or INVALID; rejection preserves axis."
+msgstr "SUCCESS 或 INVALID；拒绝时保留 axis。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "Establish READY from a valid reference, without actuation."
+msgstr "由有效参考建立 READY，不执行驱动动作。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "Task context. READY does not imply a powered or homed axis."
+msgstr "任务上下文。READY 不表示轴已上电或已回零。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "[inout] Initialized DISABLED owner, without a latched fault."
+msgstr "[inout] 已初始化的 DISABLED 所有者，且没有锁存故障。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "[in] Complete current same-domain observation."
+msgstr "[in] 同一时间域中的完整当前观察。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "[in] Finite microsecond control time, not before feedback."
+msgstr "[in] 有限微秒控制时间，不早于反馈。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "SUCCESS or INVALID/STATE; rejection preserves axis."
+msgstr "SUCCESS 或 INVALID/STATE；拒绝时保留 axis。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "Admit a copied new command, without adopting it yet."
+msgstr "接纳并复制新命令，尚不采用。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid ""
+"Task context. Repeats/old frames never refresh authority. A newer accepted "
+"command replaces an unadopted candidate; acceptance does not promise that "
+"candidate was adopted. Mode changes require READY. POSITION uses sqrt during"
+" planning and rejects active-motion replanning."
+msgstr ""
+"任务上下文。重复／旧帧从不刷新授权。新的已接纳命令会替换尚未采用的候选；接纳不保证该候选最终被采用。模式切换要求 READY。POSITION "
+"在规划时使用 sqrt，并拒绝运动中重规划。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "[inout] READY/RUNNING owner without a pending parameter set."
+msgstr "[inout] 无待应用参数集的 READY／RUNNING 所有者。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "[in] Fresh identity, sequence, units and finite bounds."
+msgstr "[in] 新鲜身份、序号、单位及有限边界。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "[in] Finite same-domain time at or after last_step."
+msgstr "[in] 有限的同时间域时刻，不早于 last_step。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "SUCCESS, INVALID/STATE/TIMEOUT or BUSY; no I/O or borrowing."
+msgstr "SUCCESS、INVALID/STATE/TIMEOUT 或 BUSY；不执行 I/O，也不建立借用。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "Calculate one bounded f32 axis cycle and copied decision."
+msgstr "执行一个有界 f32 轴周期并复制决策。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid ""
+"Task context. Age >= valid_until starts controlled STOPPING with valid "
+"feedback; it does not disable a power stage. HOLDING keeps zero-speed PI "
+"active; it never proves mechanical support or position holding. Caller "
+"separately stops/joins I/O and performs mechanical support handover."
+msgstr ""
+"任务上下文。当前时间达到或超过 valid_until 时，在反馈有效的前提下开始受控 STOPPING；它不关闭功率级。HOLDING 保持零速 PI"
+" 运行，从不证明机械支撑或位置保持。调用者单独停止／会合 I/O，并完成机械支撑交接。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "[inout] READY/RUNNING/STOPPING/HOLDING owner."
+msgstr "[inout] READY／RUNNING／STOPPING／HOLDING 所有者。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "[in] Fresh consecutive mechanical observation."
+msgstr "[in] 新鲜、序号连续的机械观察。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "[in] Current-reference range supported downstream now."
+msgstr "[in] 当前下游支持的电流参考范围。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "[in] Strictly increasing finite control time."
+msgstr "[in] 严格递增的有限控制时间。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "[in] Seconds matching now-last_step within 1 us."
+msgstr "[in] 与 now-last_step 对应的秒数，误差不超过 1 us。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "[out] Separate aligned decision, unchanged on errors."
+msgstr "[out] 独立对齐的决策，错误时不变。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid ""
+"SUCCESS or exact validation/numeric fault; errors latch FAULT without "
+"pretending hardware has stopped."
+msgstr "SUCCESS 或精确的校验／数值故障；错误会锁存 FAULT，不会假称硬件已停止。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "Close new command admission and request controlled stopping."
+msgstr "关闭新命令准入并请求受控停止。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid ""
+"Task context. Continue step with valid feedback and power. Zero current is "
+"not assumed to provide mechanical braking."
+msgstr "任务上下文。继续在反馈与供电有效时执行 step。不假定零电流能够提供机械制动。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "[inout] Initialized same-executor enabled owner."
+msgstr "[inout] 已初始化、由同一执行者管理的已使能所有者。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "SUCCESS or INVALID/STATE; no hardware access."
+msgstr "SUCCESS 或 INVALID/STATE；不访问硬件。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "Disable algorithm admission while retaining any fault."
+msgstr "关闭算法准入并保留故障。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid ""
+"Task context. Caller separately withdraws/join all hardware and users before"
+" reclaiming this state or its references."
+msgstr "任务上下文。调用者在回收此状态或其引用之前，单独撤回并会合全部硬件及使用者。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "[inout] Initialized serialized owner."
+msgstr "[inout] 已初始化的串行所有者。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "SUCCESS or INVALID; no provider or hardware operation."
+msgstr "SUCCESS 或 INVALID；不操作 provider 或硬件。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "Clear a fault only while algorithm admission is disabled."
+msgstr "仅在算法准入已禁用时清除故障。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid ""
+"Task context. Product first proves hardware recovery and joined users; "
+"clearing this code never enables output."
+msgstr "任务上下文。产品先证明硬件恢复及使用者会合；清除本错误码从不使能输出。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "[inout] Initialized DISABLED same-executor owner."
+msgstr "[inout] 已初始化的 DISABLED 同执行者所有者。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "SUCCESS, INVALID or STATE; remains DISABLED on success."
+msgstr "SUCCESS、INVALID 或 STATE；成功后仍为 DISABLED。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "Stage a complete newer parameter revision for a boundary."
+msgstr "暂存完整且更新的参数版本，等待周期边界切换。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid ""
+"Task context. Gains preserve the last calculated output where representable."
+" Active trajectory geometry cannot be changed. No persistence, hidden lock "
+"or partial publication."
+msgstr "任务上下文。在可表示时，增益调整保留最后计算的输出。不能修改活跃轨迹的几何条件。不持久化，不隐藏锁，也不逐部分发布。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "[inout] Initialized same-executor owner, one pending slot."
+msgstr "[inout] 已初始化的同执行者所有者，提供一个待应用槽。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "[in] Independent complete legal parameter snapshot."
+msgstr "[in] 独立、完整且合法的参数快照。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "SUCCESS, INVALID/STATE or BUSY; rejection preserves state."
+msgstr "SUCCESS、INVALID/STATE 或 BUSY；拒绝时保留状态。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "Track an additional downstream current-reference limitation."
+msgstr "跟踪额外的下游电流参考限制。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid ""
+"Task context. Back-calculation uses the declared tracking rate; track before"
+" staging a new revision. No hardware adoption or physical current is "
+"inferred."
+msgstr "任务上下文。回算使用声明的跟踪速率；先完成跟踪，再暂存新参数版本。不据此推断硬件已采用或真实电流。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "[inout] Owner after a successful step, before the next step."
+msgstr "[inout] 成功 step 后、下次 step 前的所有者。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "[in] Exact most recent decision, once only."
+msgstr "[in] 精确匹配的最新决策，仅处理一次。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "[in] Downstream accepted reference, not a measured winding current."
+msgstr "[in] 下游接纳的参考，不是实测绕组电流。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "[in] The same positive finite cycle interval."
+msgstr "[in] 同一周期的正有限时间间隔。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid ""
+"SUCCESS, INVALID/STATE, BUSY or EXHAUSTED; error preserves state. BUSY "
+"retains the cycle when parameters are pending."
+msgstr "SUCCESS、INVALID/STATE、BUSY 或 EXHAUSTED；错误时保留状态。参数待应用时返回 BUSY，不消费该周期。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "Immutable microsecond domain and sampling budgets."
+msgstr "不可变的微秒时间域与采样预算。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "Complete independent parameter revision in SI mechanical units."
+msgstr "使用 SI 机械单位的完整独立参数版本。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid ""
+"velocity_kp is A/(rad/s), velocity_ki is A/rad, position_kp is 1/s. Gains, "
+"tracking rate, integral limit and tolerances are finite and nonnegative. "
+"Current/velocity limits and acceleration are strictly positive; the finite "
+"position minimum is below its maximum. settling_us is a continuous observed "
+"dwell, not a physical guarantee. stop_feedforward_a is an explicit "
+"STOPPING/HOLDING bias, bounded by current_limit_a. It does not reuse a "
+"previous acceleration bias or establish mechanical support. Downstream "
+"limits still apply."
+msgstr ""
+"velocity_kp 的单位为 A/(rad/s)，velocity_ki 为 A/rad，position_kp 为 "
+"1/s。增益、跟踪速率、积分限制和容差均有限且非负。电流／速度限制及加速度严格为正；有限位置范围的下限小于上限。settling_us "
+"表示连续观察的停留时间，不是物理保证。stop_feedforward_a 是显式 STOPPING／HOLDING 偏置，受 "
+"current_limit_a 约束。它不复用先前的加速偏置，也不证明机械支撑。下游限制仍然适用。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "Copied command, with the original local receipt and finite authority."
+msgstr "复制的命令，保留原始本地接收时间及有期限的授权。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid ""
+"CURRENT selects current_a; VELOCITY selects velocity_rad_s and adds "
+"current_a as feed-forward; POSITION selects position_rad with a rest-to-rest"
+" trajectory, and current_a as feed-forward. POSITION requires "
+"velocity_rad_s=0. All fields must be finite. Position and velocity use the "
+"same mechanical side as feedback. Current is the downstream motor reference "
+"in A, never scaled by the gear ratio. No authentication is provided."
+msgstr ""
+"CURRENT 选择 current_a；VELOCITY 选择 velocity_rad_s，并把 current_a 加作前馈；POSITION "
+"选择 position_rad 的静止到静止轨迹，并把 current_a 加作前馈。POSITION 要求 "
+"velocity_rad_s=0。全部字段必须有限。位置和速度与反馈使用同一机械侧。电流是下游电机参考，单位 A，绝不按齿比缩放。不提供身份认证。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "Complete caller-qualified mechanical feedback."
+msgstr "完整且由调用者确认有效的机械反馈。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid ""
+"velocity_rad_s describes [interval_start, sampled_at]. sampled_at identifies"
+" the selected observation event, not an invented aperture. The caller proves"
+" timestamp origin, calibration and mechanical side. Publication sequence is "
+"consecutive for this axis consumer."
+msgstr ""
+"velocity_rad_s 描述 [interval_start, sampled_at] 区间。sampled_at "
+"标识所选观察事件，不伪造采样孔径。调用者证明时间戳来源、标定和机械侧。对此轴消费者，发布序号必须连续。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "Final downstream current-reference admission limits, in amperes."
+msgstr "最终下游电流参考准入范围，单位 A。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "Copied software decision; no hardware or physical adoption promise."
+msgstr "复制的软件决策，不承诺硬件或物理采用。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid ""
+"adopted_at is when this executor adopted command_sequence. The downstream "
+"provider separately reports staged/applied output facts. requested_current_a"
+" precedes total current limiting. Trajectory completion and measured "
+"position settling are independent facts."
+msgstr ""
+"adopted_at 是本执行者采用 command_sequence 的时刻。下游 provider "
+"单独报告暂存／采用输出的事实。requested_current_a 位于总电流限制之前。轨迹完成与测得位置已稳定是独立事实。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid "Caller-owned single-executor state, independent for every axis."
+msgstr "调用者拥有、每轴独立的单执行者状态。"
+
+#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+msgid ""
+"Fields are not controls. Serialize every call with the same executor; cross-"
+"context code transfers complete copies through an external bounded queue or "
+"guard. No allocation, task, I/O or implicit clock."
+msgstr ""
+"字段不作为控制入口。所有调用由同一执行者串行进行；跨上下文代码通过外部有界队列或 guard 交接完整副本。不分配内存、不创建任务、不执行 "
+"I/O，也不隐式读取时钟。"

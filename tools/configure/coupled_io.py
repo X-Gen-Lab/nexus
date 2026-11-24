@@ -27,7 +27,8 @@ class CoupledIoPolicy:
             "prescaler_max", "period_max", "trigger_event", "trigger_route",
             "resources"}
         for row in value["routes"]:
-            if not isinstance(row, Mapping) or set(row) != required:
+            if (not isinstance(row, Mapping) or not required.issubset(row) or
+                    set(row) - required - {"power_stage"}):
                 fail("Coupled I/O route requires exact named facts")
             if row["id"] in routes:
                 fail("Duplicate coupled I/O route")
@@ -51,6 +52,27 @@ class CoupledIoPolicy:
                 integer(channel, 0, 31, "Coupled channel")
             for cycles in row["sample_cycles"]:
                 integer(cycles, 1, context="Coupled sample cycles")
+            if "power_stage" in row:
+                power = row["power_stage"]
+                if (not isinstance(power, Mapping) or set(power) != {
+                        "encoder", "minimum_deadtime_ticks", "deadtime_ranges",
+                        "tick_multiple", "max_encoder_filter", "guard_us"}):
+                    fail("Power stage route requires exact encoder/timing facts")
+                Symbol(power["encoder"])
+                for name in ("minimum_deadtime_ticks", "tick_multiple", "guard_us"):
+                    integer(power[name], 1, context="Power stage " + name)
+                integer(power["max_encoder_filter"], 0,
+                        context="Power stage encoder filter maximum")
+                if not isinstance(power["deadtime_ranges"], (list, tuple)):
+                    fail("Power stage requires exact deadtime encoding ranges")
+                for limits in power["deadtime_ranges"]:
+                    if not isinstance(limits, (list, tuple)) or len(limits) != 3:
+                        fail("Power stage deadtime range requires low/high/step")
+                    low = integer(limits[0], 0, context="Deadtime range low")
+                    integer(limits[1], low, context="Deadtime range high")
+                    integer(limits[2], 1, context="Deadtime range step")
+                if not power["deadtime_ranges"]:
+                    fail("Power stage requires a reviewed deadtime encoding")
             routes[row["id"]] = freeze(dict(row))
         if not routes:
             fail("Coupled I/O requires a maintained route")
@@ -64,6 +86,9 @@ class CoupledIoPolicy:
             if (owner["kind"] != "pwm_adc" or
                     not set(row["resources"]).issubset(owner.get("resources", ()))):
                 fail("Coupled I/O must own its physical controller resources")
+            if ("power_stage" in row and
+                    row["power_stage"]["encoder"] not in soc["controllers"]):
+                fail("Power stage encoder must be an explicit physical controller")
 
     def route(self, route):
         row = self.routes.get(route["id"])
@@ -89,7 +114,10 @@ class CoupledIoPolicy:
         period = integer(selected["period_ticks"], 2, row["period_max"],
                          "Coupled period")
         integer(selected["trigger_ticks"], 1, period - 1, "Coupled trigger")
-        if selected["deadtime_ticks"] != 0:
+        power = row.get("power_stage")
+        if power is not None:
+            self._validate_power_stage(selected, power, period)
+        elif selected["deadtime_ticks"] != 0:
             fail("Selected non-complementary coupled route uses zero deadtime")
         if tuple(selected["channels"]) != row["channels"]:
             fail("Coupled ADC sequence differs from its exact analog route")
@@ -99,6 +127,11 @@ class CoupledIoPolicy:
             integer(sample, 0, len(row["sample_cycles"]) - 1, "Coupled sample time")
         integer(selected["reference_mv"], 1, 3600, "Coupled reference")
         budgets = {"commit_before_ticks", "compute_budget_ticks", "max_irq_delay_us"}
+        if power is not None:
+            return
+        if {"minimum_duty_ticks", "maximum_duty_ticks", "settling_ticks",
+                "compute_budget_us", "encoder_filter"}.intersection(selected):
+            fail("Ordinary coupled mode does not accept power-stage-only fields")
         if selected["mode"] == "injected-control":
             if budgets - selected.keys():
                 fail("Coupled IRQ loop requires explicit compute_budget_ticks, "
@@ -111,6 +144,50 @@ class CoupledIoPolicy:
                     "Coupled IRQ delay budget")
         elif budgets.intersection(selected):
             fail("Coupled finite window does not accept loop-only budgets")
+
+    @staticmethod
+    def _validate_power_stage(selected, facts, period):
+        """Validate declared output-window geometry, not a physical waveform."""
+        required = {"minimum_duty_ticks", "maximum_duty_ticks", "settling_ticks",
+                    "compute_budget_us", "max_irq_delay_us", "encoder_filter",
+                    "commit_before_ticks"}
+        if required - selected.keys():
+            fail("Power stage requires explicit " +
+                 ", ".join(sorted(required - selected.keys())))
+        if "compute_budget_ticks" in selected:
+            fail("Power stage uses compute_budget_us, not a legacy loop budget")
+        minimum = integer(selected["minimum_duty_ticks"], 1, period - 1,
+                          "Power stage minimum duty")
+        maximum = integer(selected["maximum_duty_ticks"], minimum + 1, period - 1,
+                          "Power stage maximum duty")
+        settling = integer(selected["settling_ticks"], 1, period - 1,
+                           "Power stage settling window")
+        if maximum + settling >= selected["trigger_ticks"]:
+            fail("Power stage output and settling must precede its sample window")
+        deadtime = integer(selected["deadtime_ticks"],
+                           facts["minimum_deadtime_ticks"],
+                           context="Power stage deadtime")
+        if not any(low <= deadtime <= high and (deadtime - low) % step == 0
+                   for low, high, step in facts["deadtime_ranges"]):
+            fail("Power stage deadtime has no exact reviewed encoding")
+        integer(selected["compute_budget_us"], 1,
+                context="Power stage compute budget")
+        integer(selected["max_irq_delay_us"], 1,
+                context="Power stage IRQ delay budget")
+        integer(selected["encoder_filter"], 0, facts["max_encoder_filter"],
+                "Power stage encoder filter")
+        integer(selected["commit_before_ticks"], 1, period - 2,
+                "Power stage commit boundary")
+        multiple = facts["tick_multiple"]
+        if selected["tick_hz"] % multiple:
+            fail("Power stage tick_hz must preserve its declared timing unit")
+        divisor = selected["tick_hz"] // multiple
+        if (period < 4 * divisor or
+                selected["commit_before_ticks"] > period - 2 * divisor):
+            fail("Power stage commit boundary requires two complete timing units")
+        if any(selected[name] % divisor for name in (
+                "period_ticks", "trigger_ticks", "commit_before_ticks")):
+            fail("Power stage period/trigger/commit must preserve timing units")
 
     def validate_clock(self, selected, route, clock, plan):
         del clock
@@ -129,6 +206,21 @@ class CoupledIoPolicy:
                      for sample in selected["sample_times"])
         if cycles * tick >= selected["period_ticks"] * adc:
             fail("Coupled ADC scan does not fit within one PWM period")
+        if "power_stage" in row:
+            power = row["power_stage"]
+            deadtime_ticks = (selected["deadtime_ticks"] * tick + timer - 1) // timer
+            if (selected["maximum_duty_ticks"] + deadtime_ticks +
+                    selected["settling_ticks"] >= selected["trigger_ticks"]):
+                fail("Power stage deadtime/settling exceeds its sample window")
+            conversion_us = (cycles * 1000000 + adc - 1) // adc
+            conversion = (conversion_us * tick + 999999) // 1000000
+            budget = ((selected["max_irq_delay_us"] +
+                       selected["compute_budget_us"] + power["guard_us"]) *
+                      tick + 999999) // 1000000
+            if (selected["trigger_ticks"] + conversion + budget >=
+                    selected["commit_before_ticks"]):
+                fail("Power stage scan, IRQ and compute budget exceed its window")
+            return
         if selected["mode"] == "injected-control":
             conversion_ticks = (cycles * tick + adc - 1) // adc
             delay_ticks = (selected["max_irq_delay_us"] * tick + 999999) // 1000000

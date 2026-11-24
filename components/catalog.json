@@ -162,6 +162,11 @@
       "target": "Nexus::CANopen"
     },
     {
+      "id": "cia402",
+      "entry": "components/protocols/canopen/SelectCia402.cmake",
+      "target": "Nexus::CiA402"
+    },
+    {
       "id": "lvgl",
       "entry": "components/protocols/lvgl/Select.cmake",
       "target": "Nexus::LVGL"

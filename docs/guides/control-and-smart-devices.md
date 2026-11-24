@@ -35,7 +35,20 @@ FIG-34 是当前软件组合图。实线表示调用／执行，虚线表示借�
 4. 先按下面的路径完成启停，再接入遥测、GUI、网络和持久化；慢消费者不得延长硬件
    借用或在 IRQ 中调用慢路径。
 
-## 2. 选择任务位置环或硬件耦合窗口
+## 2. 选择控制计算与硬件执行路径
+
+`Nexus::AxisControl` 提供独立的命令准入、速度／位置参考和参数边界，
+`Nexus::MotorControl` 提供纯 C11 有感电流计算。它们不读硬件、不创建任务，也不依赖
+MCSDK。应用桥明确完成 raw 到 SI 的标定、角度与时间解释、duty 量化和最终限制
+反馈，再通过唯一硬件 owner 提交。先阅读[控制架构](../explanation/motor-control.md)
+和[公共声明](../reference/api/components/control.md)，不要把算法成功当成硬件采用。
+
+Axis 的参考采用、Motor 的计划、provider 的输出暂存及机械到位分别观察。任务不得
+逐字段修改 IRQ 正在使用的参数；在已有有界交接对象中传递完整目标和 revision。
+Axis 的停止 policy 必须显式选择。零速 PI 保持仍需有效反馈和供电，不证明承重或
+固定位置；机械交接完成后，应用才停止实际硬件并结束借用。
+
+### 任务位置组合
 
 任务位置环使用独立 encoder、计数展开、标定、轨迹、PID 和 PWM group。输入包含
 单位、sequence、epoch、有效期及完整参数 revision。轨迹 READY 只表示命令计算
@@ -46,23 +59,37 @@ FIG-34 是当前软件组合图。实线表示调用／执行，虚线表示借�
 补回漏掉的完整圈数。位置环遵守公共 encoder/waveform 的任务上下文，不作为 IRQ
 电流环使用。具体 API 见[算法](../reference/api/components/algorithms.md)。
 
+### 耦合采样与电驱会话
+
 需要统一 PWM/ADC 硬件节拍时，选择一个独立 `pwm_adc` controller，不能再分别占用
-同一 TIM8、ADC 共享域或 DMA。两种模式的接口和状态分离：
+同一 TIM8、ADC 共享域或 DMA。模式的接口和状态分离：
 
 | 模式 | 用途 | 调用者责任 |
 | --- | --- | --- |
 | `finite-regular-dma` | 固定 duty 的有限采样窗口 | request、duty 和 DMA 可达 samples 保持至 acquire 观察 SETTLED；显式推进 service |
 | `injected-control` | 有有限生命周期的 IRQ compute session | 固定 raw scan／完整 duty 数量，独占借用 context，并证明 IRQ 与 compute 预算 |
+| `injected-power-stage` | 互补输出、顺序三相／母线 raw scan 和编码器观察 | 独立长期 session；有限启动预算；应用证明标定、采样偏斜、命令新鲜度及最终退出 |
 
-连续参考固定 timer 为 1 MHz。配置校验 trigger、conversion、最大 IRQ 延迟、compute
+`injected-control` 参考固定 timer 为 1 MHz。配置校验 trigger、conversion、最大 IRQ 延迟、compute
 与 commit 窗口，并包含明确量化裕量。该校验不测量物理 WCET。ADC IRQ callback
 不能保存临时 scan/output 指针，也不能调用 task-only I/O、OS、文件或网络。给快环
 更新目标时，只通过另一个有独立同步合同的有界消息对象交接；不能逐字段修改已借用
 的 PID／session。详细公式、精确引脚与退出见
 [耦合 owner](../../soc/stm32/stm32f4/drivers/pwm_adc/README.md)。
 
-ST MCSDK 6.4.2 官方原始包尚未取得，复用工作保持 `blocked`。已实现的通用数值与
-PWM/ADC owner 不构成官方 MCSDK、FOC、功率级保护或电机调参能力声明。
+PowerStage 当前 F407ZG 参考采用边沿对齐 TIM8、ADC1 四个顺序 rank 和 TIM4。
+`sample_at` 是计划触发参考，`angle_at`／`observed_at` 是软件观察，
+`planned_apply_at` 是预期更新边界。三相采样有明确偏斜；不声明多 ADC 同时采样、
+实测孔径或中心对齐。触发、deadtime、AFE 稳定和提交预算的权威说明见
+[电驱参考](../../soc/stm32/stm32f4/drivers/pwm_adc/README.md#电驱完整软件参考injected-power-stage)。
+
+`nx_power_stage_prepare` 的 `startup_deadline` 单独约束启动；非阻塞长期 session
+仍须显式 stop／service，并保持全部 context 至 acquire 观察 SETTLED。
+运动命令有效期与硬件会话寿命分别管理，不能通过改写借用存储续期。尚未核验功率板、
+电流比例、机械参考或电角偏置的外部工程必须拒绝激励；软件参考数值不作为实物默认值。
+
+自有控制核不等待 MCSDK 源码包；MCSDK 后端尚未接入，也不是默认依赖。当前数值、
+模型和链接结果不建立实际电机稳定性、功率保护、调参或物理性能资格。
 
 ## 3. 为每个器件保留事实边界
 
@@ -125,13 +152,19 @@ provisioning，也没有因此完成 TLS opaque-key 集成。精确模式、单�
 | 入口 | 可审查的组合 |
 | --- | --- |
 | `apps/axis_control` | 实际 encoder／trajectory／PID／PWM、整组参数、Settings 与 copied telemetry |
+| `recipes/control/differential_drive` | 真实 Axis 控制、独立 DC／机械模型、成组目标、超时与分层验收 |
+| `recipes/control/servo_axis` | Axis、真实电流 PI 与独立带载 DC 模型；软件位置／速度／电流闭环和实测驻留判据 |
+| `recipes/control/lift_axis` | 重力／闸模型中的承重交接与有限机械回零；不授予实际承重或制动资格 |
+| `recipes/control/motor_drive` | 显式标定桥、MotorControl、PowerStage 会话与未 commissioning 时拒绝激励 |
 | `recipes/control` | 触摸／数值控制和 IMU 校准、安装旋转、姿态消费 |
 | `recipes/inference` | 实际 CMSIS-NN 的固定三输入、四隐藏节点、二输出量化图 |
 | `recipes/ui` | 小缓冲局部绘制与校准触摸片段；不是 LVGL recipe |
 | `apps/connected_terminal` | 实际显示／触摸、route／UDP 与 Settings 组合；默认不启用 LVGL 或 TLS |
+| `recipes/network/drive_host` | Python 标准库的有限 CiA 402 PV／SocketCAN 主机参考；默认仅 codec 演示，实物总线未执行 |
 | `recipes/network`、`apps/network_gateway` | 路由与交付事实、独立传输会话、boot audit 和网关消费 |
 
 阅读示例时使用该仓库交付记录绑定的精确提交与 Nexus 依赖，不从 `main` 的后续变化
 继承资格。本仓库 `tests/contracts/f407_pwm_adc` 和 `f407_pwm_adc_loop` 提供真实
-TOML、typed factory 与 ARM 链接入口；它们是 cold consumer，不执行实板快环。
+TOML、typed factory 与 ARM 链接入口；`tests/contracts/f407_power_stage` 增加电驱
+软件路线。这些 cold consumer 不执行实板快环。
 Native 行为、ARM 链接与实板测量分别记录；物理 HIL 仍为 `not_executed`。

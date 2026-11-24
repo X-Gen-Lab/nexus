@@ -209,7 +209,9 @@ def editor_schema():
                    "filter", "filter_a", "filter_b", "deadtime_ticks",
                    "trigger_ticks", "data_bitrate", "period_us", "lower",
                    "upper", "image_prefix_bytes", "image_suffix_bytes", "drain_us",
-                   "commit_before_ticks", "compute_budget_ticks", "max_irq_delay_us"}
+                   "commit_before_ticks", "compute_budget_ticks", "max_irq_delay_us",
+                   "minimum_duty_ticks", "maximum_duty_ticks", "settling_ticks",
+                   "compute_budget_us", "encoder_filter"}
         for name in fields & numeric:
             properties[name] = {"type": "integer", "minimum": 0}
         for name in fields & block_bounds.keys():

@@ -23,6 +23,7 @@ face; the ordinary PWM/ADC method tables and states do not grow to hold it.
 | --- | --- | --- |
 | `pwm_adc.h` / `Nexus::IOPWMADC` | A finite window with one fixed complete duty frame and triggered raw samples | Task submission/service; request, duty and samples borrowed until acquire-observed SETTLED |
 | `pwm_adc_loop.h` / `Nexus::IOPWMADCLoop` | A finite-lifetime continuous session; each complete scan invokes bounded compute and stages one complete duty group | Task prepare/start/service/stop; compute runs only in the selected ADC IRQ |
+| `power_stage.h` / `Nexus::IOPowerStage` | An independent complementary-output drive session with sequential raw currents/bus and encoder observation | Finite startup deadline; nonblocking long-lived borrow until explicit stop/fault and acquire-observed SETTLED |
 
 The current F407ZGT6 software reference selects TIM8 CH1..3, BKIN and ADC1_IN0.
 `finite-regular-dma` uses TIM8 TRGO, ADC regular conversion and DMA2 Stream4;
@@ -46,6 +47,28 @@ closes output admission. Stop/service must still drain sources and join IRQs;
 failed withdrawal retains storage, and cold close/reinitialization establishes
 the next session. Finite deadline and completed-cycle counters are software
 contracts, not measured worst-case control latency or physical qualification.
+
+## Keep the selected electric-drive profile explicit
+
+`injected-power-stage` directly owns its selected TIM8, ADC shared domain and
+TIM4 route; it does not forward through another live `pwm_adc_loop` owner. The
+F407ZG software reference uses edge-aligned complementary PWM and four sequential
+ADC1 injected ranks: raw phase A/B/C followed by raw bus voltage. It does not
+establish simultaneous multi-ADC sampling or a real power-board connection.
+
+`sample_at` is a scheduled trigger reference with declared `scan_span_us`, not a
+measured aperture. `angle_at` and `observed_at` are software observations, and
+`planned_apply_at` is the intended next update. The caller's explicit bridge
+owns calibration, skew/angle interpretation, quantization and final limitation
+feedback to the [motor kernel](../components/control.md). See the
+[selected provider contract](../../../../soc/stm32/stm32f4/drivers/pwm_adc/README.md#电驱完整软件参考injected-power-stage)
+for the complete sampling-window inequalities and exact pins.
+
+The session's finite `startup_deadline` bounds startup. Its Core request uses
+`NX_DEADLINE_NEVER` for the nonblocking running lifetime; external command
+authority and cleanup attempts remain separate. Output inhibition never ends
+the session/context borrow. Stop/service must withdraw sources and join actual
+publishers before settlement, including after time or clock faults.
 
 ## Public declarations
 
@@ -94,5 +117,11 @@ contracts, not measured worst-case control latency or physical qualification.
 ### pwm_adc_loop.h
 
 ```{doxygenfile} io/include/nexus/io/pwm_adc_loop.h
+:project: nexus
+```
+
+### power_stage.h
+
+```{doxygenfile} io/include/nexus/io/power_stage.h
 :project: nexus
 ```

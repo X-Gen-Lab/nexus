@@ -13,6 +13,7 @@
 | 目录 | 组件及入口 | 外部工程仍负责 |
 | --- | --- | --- |
 | `algorithms/` | [数值、CRC、统计、滤波、插值与 PI／PID](algorithms/README.md)、[条件 CMSIS-DSP f32 profile](algorithms/cmsis_dsp/README.md) | 采样节拍、物理单位、系数、独立历史／工作区和控制对象验证 |
+| `control/` | [电机与轴控制](control/README.md) | 校准后的测量、功率约束、执行者、硬件提交及机械恢复 |
 | `runtime/` | [BusOwner／SPI／UART owner](runtime/bus_owner/README.md)、[OwnerObserver](runtime/owner_observer/README.md)、[ClockDomain](runtime/clock_domain/README.md)、[User I/O broker](runtime/user_io_broker/README.md)、[AMP IPC](runtime/amp_ipc/README.md) | executor、guard、队列容量、内存权限和退出会合 |
 | `buses/` | [软件 SPI](buses/software_spi/README.md)、[I2C／SCCB](buses/software_i2c/README.md)、[OneWire](buses/onewire/README.md)、[SMBus packet PEC](buses/smbus/README.md)、[I3C controller](buses/i3c_controller/README.md) | 硬件 owner、GPIO 电气、上拉、时钟与实测时序 |
 | `devices/` | [AT24C02](devices/at24c02/README.md)、[BMP280](devices/bmp280/README.md)、[DP83848](devices/dp83848/README.md)、[DS18B20](devices/ds18b20/README.md)、[ILI9341](devices/ili9341/README.md)、[红外](devices/infrared/README.md)、[TMP117](devices/tmp117/README.md)、[W25](devices/w25/README.md)、[XPT2046](devices/xpt2046/README.md) | 精确器件、接线、供电、校准、区域与恢复策略 |
@@ -51,9 +52,10 @@ owner。`protocols/` 还包括 [Modbus TCP](protocols/modbus_tcp/README.md)、
 | 非导出密钥签名 | [ATECC608B](devices/atecc608b/README.md) | 已烧录且锁定的精确 slot、有限 wake/delay 与完整操作 scope；不选 provisioning 或自动 TLS 绑定 |
 | 试运行与回退 | [MCUboot scratch swap](protocols/mcuboot/swap/README.md) | 明确三 area、独立 boot 镜像、健康判断和显式 confirm；不与 overwrite 混链 |
 
-快环属于独立 [PWM/ADC provider](../soc/stm32/stm32f4/drivers/pwm_adc/README.md)，
-不由通用算法创建硬件 owner。当前 ST MCSDK 原始源码包尚未取得，相关复用保持
-`blocked`；本目录没有以自写控制算法冒充官方 MCSDK。实板行为保持 `not_executed`。
+快环由独立 [PWM/ADC provider](../soc/stm32/stm32f4/drivers/pwm_adc/README.md)
+拥有硬件；[MotorControl 与 AxisControl](control/README.md)提供自有 C11 控制计算。
+计算结果是计划，不证明物理输出已采用。MCSDK 后端尚未集成，也不是这些组件的
+前置依赖。精确功率配置与实板行为分别验证，物理 HIL 保持 `not_executed`。
 
 本页跨目录 `docs/`／`tests/` 链接以完整源码 checkout 为上下文。使用安装 SDK 时，
 按 SDK manifest 记录的 source commit 阅读同版本源仓；不能据此推断 SDK 携带文档
@@ -62,7 +64,7 @@ owner。`protocols/` 还包括 [Modbus TCP](protocols/modbus_tcp/README.md)、
 ## 选择、存储与执行
 
 按[组件接入指南](../docs/guides/component-porting.md)选择实际 profile、静态存储和
-公开 target。六类是代码职责，不是装配必须同时启用的六个层。CMSIS-DSP、文件系统、
+公开 target。分类表示代码职责，装配按需选择。CMSIS-DSP、文件系统、
 数据库、Shell、RTT 等依赖 profile 必须显式选择；库存存在不触发下载、初始化或编译。
 
 CMake 管理组件源码依赖。普通库在所属分类与叶目录定义 target，应用使用

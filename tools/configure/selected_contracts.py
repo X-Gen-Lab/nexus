@@ -290,7 +290,8 @@ def describe(item, endpoint=None, *, public_class=None):
         # phases are not independent messages or caller payload bytes.
         limits.update(max_transfer_units=512, max_segment_units=256,
                       max_segments=2, max_total_units=512)
-    elif kind == "pwm_adc" and item.mode == "injected-control":
+    elif kind == "pwm_adc" and item.mode in {
+            "injected-control", "injected-power-stage"}:
         limits.update(unit="cycles", unit_bytes=None, buffer_alignment=2,
                       max_transfer_units=None, word_bits=(12,))
     elif kind in {"adc", "pwm_adc"}:

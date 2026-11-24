@@ -28,4 +28,11 @@ if(pwm_adc_modes)
             PRIVATE "${CMAKE_CURRENT_LIST_DIR}/loop.c"
         )
     endif()
+    if("injected-power-stage" IN_LIST pwm_adc_modes)
+        target_link_libraries(nexus_soc_stm32f4 PRIVATE Nexus::IOPowerStage)
+        target_sources(
+            nexus_soc_stm32f4
+            PRIVATE "${CMAKE_CURRENT_LIST_DIR}/power_stage.c"
+        )
+    endif()
 endif()

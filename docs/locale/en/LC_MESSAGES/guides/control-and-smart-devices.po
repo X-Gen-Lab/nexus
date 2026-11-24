@@ -1,19 +1,19 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Nexus\n"
+"Project-Id-Version: Nexus documentation\n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 26e63008ffd6dd23615fe95a6f1d56389f5856094d0f37cf5b16843cc3879f72\n"
+"X-Nexus-Source-SHA256: 252ce5937b6210c1f3805b5b492e319709fb16017953570bca8302e91b4f0c8a\n"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:9
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:9
 msgid "组合控制与智能器件"
 msgstr "Compose control and smart devices"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:11
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:11
 msgid ""
 "本指南帮助外部应用选择已有 I/O、算法和器件组件，明确执行者、存储、预算与退出。 当前生产 SoC 为 STM32F4；下述 PWM/ADC 路线仅是"
 " STM32F407ZGT6 的精确软件参考。 它不替产品选择功率板、控制稳定性、私有 PCB、存储分区或调度，也不建立实板资格。"
@@ -25,23 +25,23 @@ msgstr ""
 "stability, private PCB, storage partitions or scheduling for the product, or"
 " establish hardware qualification."
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:15
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:15
 msgid "1. 先划分执行与资源"
 msgstr "1. Separate execution and resources first"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:17
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:17
 msgid ""
 "![FIG-34：调用者拥有控制与智能器件的执行及退出](../assets/diagrams/control-smart-devices.svg)"
 msgstr ""
 "![FIG-34: Caller-owned execution and shutdown for control and smart "
 "devices](../assets/diagrams/control-smart-devices.svg)"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:17
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:17
 msgid "FIG-34：调用者拥有控制与智能器件的执行及退出"
 msgstr ""
 "FIG-34: Caller-owned execution and shutdown for control and smart devices"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:19
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:19
 msgid ""
 "FIG-34 是当前软件组合图。实线表示调用／执行，虚线表示借用或退出责任；不表示 每个应用必须启用全部节点。图源与源码依据见{ref}`图册 "
 "<fig-34-control-smart-devices>`。"
@@ -51,64 +51,64 @@ msgstr ""
 "Applications need not enable every node. See the {ref}`diagram catalogue "
 "<fig-34-control-smart-devices>` for the source and code basis."
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "执行路径"
 msgstr "Execution path"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "放置内容"
 msgstr "What belongs here"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "不得从该路径推导"
 msgstr "What this path does not imply"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "普通任务"
 msgstr "Ordinary task"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "位置环、器件采样、命令校验、参数快照、GUI、协议 service"
 msgstr ""
 "Position loop, device sampling, command validation, parameter snapshots, GUI"
 " and protocol service"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "调用间隔就是实际采样孔径，或接口可直接从 IRQ 使用"
 msgstr ""
 "The call interval is the physical sample aperture, or the interface can be "
 "used directly from IRQ"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "选定 ADC IRQ"
 msgstr "Selected ADC IRQ"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "完整 raw scan、已预算的 compute、完整 duty 组提交"
 msgstr "Complete raw scan, budgeted compute and complete duty-group commit"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "能阻塞、写 Flash、运行网络／GUI，或并发修改借用算法状态"
 msgstr ""
 "Permission to block, write Flash, run networking/GUI or concurrently change "
 "borrowed algorithm state"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "外部维护流程"
 msgstr "External maintenance flow"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "Settings 保存、文件耐久、镜像请求／确认、恢复"
 msgstr ""
 "Settings saves, file durability, image requests/confirmation and recovery"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "超时撤销持久效果、自动重放或自动重新使能输出"
 msgstr ""
 "Timeout revokes persistent effects, or automatically replays operations or "
 "re-enables outputs"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:28
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:28
 msgid ""
 "TOML 选择精确控制器、模式和已审 Board 路线。使用 [应用配置](app-configuration.md)与 [I/O 执行指南](io-"
 "execution.md)，不要在业务中 复写 SDK 初始化或重新取得同一 controller owner。"
@@ -118,7 +118,7 @@ msgstr ""
 "execution.md); do not duplicate SDK initialization or acquire the same "
 "controller owner again in business code."
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:31
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:31
 msgid ""
 "CMake 选择实际组件 target。依赖库只在明确选择时准备／编译；普通器件 C 库可以 直接链接。厂商结构和 Handle 不进入业务接口。"
 msgstr ""
@@ -127,7 +127,7 @@ msgstr ""
 " may be linked directly. Vendor structures and Handles do not enter business"
 " interfaces."
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:33
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:33
 msgid ""
 "为每个实例提供独立状态、缓冲、有限 deadline、同一 domain/epoch 的时间与 一个执行者。跨任务消息使用应用已有的有界 "
 "queue/guard，不把普通字段当原子快照。"
@@ -137,18 +137,53 @@ msgstr ""
 "messages through the existing bounded application queue/guard; ordinary "
 "fields are not an atomic snapshot."
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:35
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:35
 msgid "先按下面的路径完成启停，再接入遥测、GUI、网络和持久化；慢消费者不得延长硬件 借用或在 IRQ 中调用慢路径。"
 msgstr ""
 "Complete startup and shutdown on the paths below before adding telemetry, "
 "GUI, networking and persistence. Slow consumers must not extend hardware "
 "borrowing or call slow paths from IRQ."
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:38
-msgid "2. 选择任务位置环或硬件耦合窗口"
-msgstr "2. Choose a task position loop or a coupled hardware window"
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:38
+msgid "2. 选择控制计算与硬件执行路径"
+msgstr "2. Select control computation and hardware execution paths"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:40
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:40
+msgid ""
+"`Nexus::AxisControl` 提供独立的命令准入、速度／位置参考和参数边界， `Nexus::MotorControl` 提供纯 C11 "
+"有感电流计算。它们不读硬件、不创建任务，也不依赖 MCSDK。应用桥明确完成 raw 到 SI 的标定、角度与时间解释、duty 量化和最终限制 "
+"反馈，再通过唯一硬件 owner 提交。先阅读[控制架构](../explanation/motor-control.md) "
+"和[公共声明](../reference/api/components/control.md)，不要把算法成功当成硬件采用。"
+msgstr ""
+"`Nexus::AxisControl` provides separate command admission, velocity/position "
+"references and parameter boundaries; `Nexus::MotorControl` provides pure C11"
+" sensored current computation. Neither reads hardware, creates tasks or "
+"depends on MCSDK. The explicit application bridge handles raw-to-SI "
+"calibration, angle and time interpretation, duty quantization and final "
+"limitation feedback, then submits through the sole hardware owner. Read the "
+"[control architecture](../explanation/motor-control.md) and [public "
+"declarations](../reference/api/components/control.md) first. Algorithm "
+"success is not hardware adoption."
+
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:46
+msgid ""
+"Axis 的参考采用、Motor 的计划、provider 的输出暂存及机械到位分别观察。任务不得 逐字段修改 IRQ "
+"正在使用的参数；在已有有界交接对象中传递完整目标和 revision。 Axis 的停止 policy 必须显式选择。零速 PI "
+"保持仍需有效反馈和供电，不证明承重或 固定位置；机械交接完成后，应用才停止实际硬件并结束借用。"
+msgstr ""
+"Observe Axis reference adoption, Motor planning, provider output staging and"
+" mechanical arrival separately. Tasks must not change parameters used by an "
+"IRQ field by field: hand over complete targets and revisions through an "
+"existing bounded object. Choose the Axis stop policy explicitly. Zero-speed "
+"PI holding still requires valid feedback and supply, and proves neither load"
+" support nor fixed position. Only after mechanical handoff does the "
+"application stop the actual hardware and end its borrow."
+
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:51
+msgid "任务位置组合"
+msgstr "Task-based position composition"
+
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:53
 msgid ""
 "任务位置环使用独立 encoder、计数展开、标定、轨迹、PID 和 PWM group。输入包含 单位、sequence、epoch、有效期及完整参数"
 " revision。轨迹 READY 只表示命令计算 完成，不表示机构到位；新位置范围同时约束当前测量与仍在保持的目标。参数在一个 "
@@ -162,7 +197,7 @@ msgstr ""
 "still being held. Parameters switch together at one cycle boundary, and "
 "saving is explicit only after control sources withdraw."
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:45
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:58
 msgid ""
 "编码器软件观察时间不等于边沿时间。有界计数展开依赖产品证明的最大单步位移，不能 补回漏掉的完整圈数。位置环遵守公共 encoder/waveform "
 "的任务上下文，不作为 IRQ 电流环使用。具体 API "
@@ -174,201 +209,256 @@ msgstr ""
 "encoder/waveform task-context requirements and is not an IRQ current loop. "
 "See the [algorithm APIs](../reference/api/components/algorithms.md)."
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:49
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:62
+msgid "耦合采样与电驱会话"
+msgstr "Coupled sampling and electric-drive sessions"
+
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:64
 msgid ""
 "需要统一 PWM/ADC 硬件节拍时，选择一个独立 `pwm_adc` controller，不能再分别占用 同一 TIM8、ADC 共享域或 "
-"DMA。两种模式的接口和状态分离："
+"DMA。模式的接口和状态分离："
 msgstr ""
-"For one coherent PWM/ADC hardware schedule, select a separate `pwm_adc` "
-"controller. Do not independently claim the same TIM8, ADC shared domain or "
-"DMA. The two modes have separate interfaces and state:"
+"When PWM/ADC need one hardware cadence, select an independent `pwm_adc` "
+"controller. Do not separately claim the same TIM8, ADC shared domain or DMA."
+" Modes have separate interfaces and state:"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "模式"
 msgstr "Mode"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "用途"
 msgstr "Purpose"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "调用者责任"
 msgstr "Caller responsibility"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "`finite-regular-dma`"
 msgstr "`finite-regular-dma`"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "固定 duty 的有限采样窗口"
 msgstr "Finite sampling window with fixed duty"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "request、duty 和 DMA 可达 samples 保持至 acquire 观察 SETTLED；显式推进 service"
 msgstr ""
 "Keep request, duty and DMA-reachable samples live until acquire-observed "
 "SETTLED; explicitly advance service"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "`injected-control`"
 msgstr "`injected-control`"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "有有限生命周期的 IRQ compute session"
 msgstr "Finite-lifetime IRQ compute session"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "固定 raw scan／完整 duty 数量，独占借用 context，并证明 IRQ 与 compute 预算"
 msgstr ""
 "Fix raw-scan/complete-duty counts, lend context exclusively, and establish "
 "IRQ and compute budgets"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:57
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
+msgid "`injected-power-stage`"
+msgstr "`injected-power-stage`"
+
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
+msgid "互补输出、顺序三相／母线 raw scan 和编码器观察"
+msgstr ""
+"Complementary outputs, sequential raw three-phase/bus scan and encoder "
+"observation"
+
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
+msgid "独立长期 session；有限启动预算；应用证明标定、采样偏斜、命令新鲜度及最终退出"
+msgstr ""
+"Independent long-lived session and finite startup budget; the application "
+"proves calibration, sampling skew, command freshness and final withdrawal"
+
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:73
 msgid ""
-"连续参考固定 timer 为 1 MHz。配置校验 trigger、conversion、最大 IRQ 延迟、compute 与 commit "
-"窗口，并包含明确量化裕量。该校验不测量物理 WCET。ADC IRQ callback 不能保存临时 scan/output 指针，也不能调用 "
-"task-only I/O、OS、文件或网络。给快环 更新目标时，只通过另一个有独立同步合同的有界消息对象交接；不能逐字段修改已借用 的 "
-"PID／session。详细公式、精确引脚与退出见 [耦合 owner](https://github.com/X-Gen-"
-"Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"`injected-control` 参考固定 timer 为 1 MHz。配置校验 trigger、conversion、最大 IRQ "
+"延迟、compute 与 commit 窗口，并包含明确量化裕量。该校验不测量物理 WCET。ADC IRQ callback 不能保存临时 "
+"scan/output 指针，也不能调用 task-only I/O、OS、文件或网络。给快环 "
+"更新目标时，只通过另一个有独立同步合同的有界消息对象交接；不能逐字段修改已借用 的 PID／session。详细公式、精确引脚与退出见 [耦合 "
+"owner](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/soc/stm32/stm32f4/drivers/pwm_adc/README.md)。"
 msgstr ""
-"The continuous reference fixes the timer at 1 MHz. Configuration checks "
-"trigger, conversion, maximum IRQ delay, compute and commit windows, "
-"including an explicit quantization margin. These checks do not measure "
+"The `injected-control` reference fixes the timer at 1 MHz. Configuration "
+"validates the trigger, conversion, maximum IRQ latency, compute and commit "
+"windows, including explicit quantization margin. This does not measure "
 "physical WCET. The ADC IRQ callback must not retain temporary scan/output "
-"pointers or call task-only I/O, OS, file or network methods. Update fast-"
-"loop targets only through a separate bounded message object with its own "
+"pointers or call task-only I/O, OS, file or network operations. Update fast-"
+"loop targets only through another bounded message object with its own "
 "synchronization contract; do not change borrowed PID/session fields "
 "individually. See the [coupled owner](https://github.com/X-Gen-"
 "Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/soc/stm32/stm32f4/drivers/pwm_adc/README.md) for exact equations, "
-"pins and shutdown."
+"SOURCE/soc/stm32/stm32f4/drivers/pwm_adc/README.md) for complete formulas, "
+"exact pins and withdrawal."
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:64
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:80
 msgid ""
-"ST MCSDK 6.4.2 官方原始包尚未取得，复用工作保持 `blocked`。已实现的通用数值与 PWM/ADC owner 不构成官方 "
-"MCSDK、FOC、功率级保护或电机调参能力声明。"
+"PowerStage 当前 F407ZG 参考采用边沿对齐 TIM8、ADC1 四个顺序 rank 和 TIM4。 `sample_at` "
+"是计划触发参考，`angle_at`／`observed_at` 是软件观察， `planned_apply_at` "
+"是预期更新边界。三相采样有明确偏斜；不声明多 ADC 同时采样、 实测孔径或中心对齐。触发、deadtime、AFE 稳定和提交预算的权威说明见 "
+"[电驱参考](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/soc/stm32/stm32f4/drivers/pwm_adc/README.md#电驱完整软件参考injected-power-"
+"stage)。"
 msgstr ""
-"The official original ST MCSDK 6.4.2 package has not been obtained, so reuse"
-" remains `blocked`. The implemented generic numeric mechanisms and PWM/ADC "
-"owner do not establish official MCSDK, FOC, power-stage protection or motor-"
-"tuning capabilities."
+"The current F407ZG PowerStage reference uses edge-aligned TIM8, four "
+"sequential ADC1 ranks and TIM4. `sample_at` is a scheduled trigger "
+"reference; `angle_at` and `observed_at` are software observations; "
+"`planned_apply_at` is the intended update boundary. Phase sampling has "
+"explicit skew. No simultaneous multi-ADC sampling, measured aperture or "
+"center alignment is claimed. The [electric-drive "
+"reference](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/soc/stm32/stm32f4/drivers/pwm_adc/README.md#电驱完整软件参考injected-power-"
+"stage) is authoritative for trigger, deadtime, AFE settling and commit "
+"budgets."
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:67
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:86
+msgid ""
+"`nx_power_stage_prepare` 的 `startup_deadline` 单独约束启动；非阻塞长期 session 仍须显式 "
+"stop／service，并保持全部 context 至 acquire 观察 SETTLED。 "
+"运动命令有效期与硬件会话寿命分别管理，不能通过改写借用存储续期。尚未核验功率板、 "
+"电流比例、机械参考或电角偏置的外部工程必须拒绝激励；软件参考数值不作为实物默认值。"
+msgstr ""
+"The `startup_deadline` of `nx_power_stage_prepare` independently bounds "
+"startup. The nonblocking long-lived session still requires explicit "
+"stop/service and retains all context until acquire-observed SETTLED. Manage "
+"motion-command validity separately from hardware-session lifetime; mutating "
+"borrowed storage cannot renew it. An external project with unverified power "
+"board, current scaling, mechanical reference or electrical offset must "
+"reject excitation. Software-reference numbers are not physical defaults."
+
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:91
+msgid ""
+"自有控制核不等待 MCSDK 源码包；MCSDK 后端尚未接入，也不是默认依赖。当前数值、 "
+"模型和链接结果不建立实际电机稳定性、功率保护、调参或物理性能资格。"
+msgstr ""
+"The self-owned control kernel does not wait for an MCSDK source package. The"
+" MCSDK backend is unintegrated and is not a default dependency. Current "
+"numerical, model and link results do not qualify physical motor stability, "
+"power protection, tuning or physical performance."
+
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:94
 msgid "3. 为每个器件保留事实边界"
 msgstr "3. Preserve the factual boundary of each device"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "需求"
 msgstr "Need"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "选定组件"
 msgstr "Selected component"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "接入前必须补齐"
 msgstr "Required before integration"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "绝对角度"
 msgstr "Absolute angle"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "`Nexus::AS5047P`"
 msgstr "`Nexus::AS5047P`"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "mode 1／MSB／速率与 CS setup、hold、inactive 时序；原始角度校准"
 msgstr ""
 "Mode 1/MSB/rate and CS setup, hold and inactive timing; raw-angle "
 "calibration"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "电源监测"
 msgstr "Power monitoring"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "`Nexus::INA226`"
 msgstr "`Nexus::INA226`"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "分流电阻、量程、校准、触发与 ready；不是快速相电流 ADC"
 msgstr ""
 "Shunt resistance, range, calibration, trigger and ready status; not a fast "
 "phase-current ADC"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "六轴采样"
 msgstr "Six-axis sampling"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "`Nexus::LSM6DSOX` 及 I2C/SPI adapter"
 msgstr "`Nexus::LSM6DSOX` and I2C/SPI adapter"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "实际地址／电气、样本配对、FIFO overrun、timestamp 映射、标定与安装坐标"
 msgstr ""
 "Actual address/electrical facts, sample pairing, FIFO overrun, timestamp "
 "mapping, calibration and mounting axes"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "相对姿态"
 msgstr "Relative attitude"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "`Nexus::Algorithms` 的 `attitude.h`"
 msgstr "`attitude.h` in `Nexus::Algorithms`"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "SI 单位、连续 dt、初始姿态与质量窗口；无外部参考时 yaw 会漂移"
 msgstr ""
 "SI units, continuous dt, initial attitude and quality window; yaw drifts "
 "without an external reference"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "固定量化图"
 msgstr "Fixed quantized graph"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "`Nexus::AlgorithmsCMSISNN`"
 msgstr "`Nexus::AlgorithmsCMSISNN`"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "tensor、缩放、形状与执行预算；手工权重没有产品分类准确率"
 msgstr ""
 "Tensors, scaling, shapes and execution budget; hand-authored weights "
 "establish no product classifier accuracy"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "像素与播放控制"
 msgstr "Pixel and playback control"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "`Nexus::OV2640`、`Nexus::WM8978`"
 msgstr "`Nexus::OV2640`, `Nexus::WM8978`"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "capture/PCM owner、真实数据线、时钟、缓冲与带宽；启明参考只有控制连接授权"
 msgstr ""
 "Capture/PCM owner, actual data lines, clocks, buffers and bandwidth; the "
 "Qiming reference authorizes control connections only"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "非导出签名"
 msgstr "Non-exported signing key"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "`Nexus::ATECC608B`、`Nexus::IOP256Signer`"
 msgstr "`Nexus::ATECC608B`, `Nexus::IOP256Signer`"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "已 provision/锁定的精确 B 器件与 slot、wake/delay 和有限操作 scope"
 msgstr ""
 "Exact already-provisioned/locked B device and slot, wake/delay and finite "
 "operation scope"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:79
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:106
 msgid ""
 "器件方法成功只建立各自数字合同。AS5047P 的两帧流水线不能取旧响应冒充当前角度； 普通 SPI endpoint 的存在也不证明 CS "
 "纳秒约束。LSM6DSOX 的 DIRECT 与 FIFO 各有 数据含义，不把分离 tagged 记录强行配成同一采样。选定 P256 API "
@@ -385,17 +475,17 @@ msgstr ""
 "reference](../reference/api/components/devices.md) for exact modes, units "
 "and failure duties."
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:85
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:112
 msgid "4. 接入界面、通信与持久化"
 msgstr "4. Add user interface, communications and persistence"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:87
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:114
 msgid "从控制路径复制带有效性、时间来源和参数版本的观察，再由普通执行者处理："
 msgstr ""
 "Copy observations with validity, time provenance and parameter version from "
 "the control path, then process them in an ordinary executor:"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:89
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:116
 msgid ""
 "CANopen OD 是原始 staging；NMT Operational 和 SDO/PDO 写入都不是产品命令 授权。外层检查完整命令后再交给控制"
 " owner。协议 reset／overrun 关闭准入，不重置 MCU，也不重放旧目标。"
@@ -405,7 +495,7 @@ msgstr ""
 " it to the control owner. Protocol reset/overrun closes admission without "
 "resetting the MCU or replaying old targets."
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:92
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:119
 msgid ""
 "ESP-AT 复用已有 UARTByteStream。显式推进 UART service 与模块 service；复制 "
 "写入成功不等于线上完成，`SEND OK` 不等于 peer 收到。CLOSED 后先真实恢复模块／ UART 边界，再重新 configure；TLS"
@@ -417,7 +507,7 @@ msgstr ""
 "boundary before configuring again. TLS trust, time and entropy remain "
 "external policy."
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:95
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:122
 msgid ""
 "LVGL 只保留一个 live GUI owner。调用者提供私有 arena、32 KiB pool 与 RGB565 tile，同一任务推进 "
 "UI。display/input 回调必须同步结清；任意异步 DMA flush 不能 直接替换这个合同。上游 arena 子分配和耗尽 fail-"
@@ -429,7 +519,7 @@ msgstr ""
 "replace this contract. Include upstream arena suballocation and exhaustion "
 "fail-stop in the complete page budget."
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:98
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:125
 msgid ""
 "LittleFS／FatFs 用固定块 `read_at`／`append` 处理文件，无 VFS 或全局句柄池。 失败时的 prefix "
 "不证明耐久，也不授权重放；close/unmount 失败保持原 volume 和 workspace。远端 ACK、重复消除、retention "
@@ -441,7 +531,7 @@ msgstr ""
 "workspace. Remote ACK, deduplication, retention and offline queues belong to"
 " the external product."
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:101
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:128
 msgid ""
 "MCUboot overwrite-only 与 scratch swap 分开选择。TEST 后由产品核对运行镜像和 健康结果，再显式 "
 "confirm；没有确认就重启可触发选定 revert。共享布局文件拥有 Flash 几何，不能把参考地址直接复制进已有产品分区。"
@@ -452,7 +542,7 @@ msgstr ""
 "layout file owns Flash geometry; do not copy reference addresses into an "
 "existing product partition scheme."
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:105
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:132
 msgid ""
 "详细合同见[协议与字节会话](../reference/api/components/protocols/streams.md)、 "
 "[存储服务](../reference/api/components/services.md)与 "
@@ -464,17 +554,17 @@ msgstr ""
 "[MCUboot](../reference/api/components/protocols/boot.md) for complete "
 "contracts."
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:109
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:136
 msgid "5. 按责任退出"
 msgstr "5. Shut down by responsibility"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:111
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:138
 msgid "关闭新目标、UI 命令和网络准入，停止产生新的快照／请求。"
 msgstr ""
 "Close admission for new targets, UI commands and networking, and stop "
 "producing new snapshots/requests."
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:112
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:139
 msgid ""
 "在各自 executor 调用 stop/service，等待真实硬件源、IRQ callback 与接受的 request 退出。失败保持原 "
 "instance、buffer、callback 和恢复责任；不直接清零状态。"
@@ -484,7 +574,7 @@ msgstr ""
 "instance, buffers, callbacks and recovery duties; do not simply zero the "
 "state."
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:114
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:141
 msgid ""
 "acquire 观察 SETTLED 后才结束对应借用；另外会合 observer、widget、协议与外部 调用者。输出抑制和引用退出分别判断。"
 msgstr ""
@@ -492,7 +582,7 @@ msgstr ""
 "observers, widgets, protocols and external callers. Check output inhibition "
 "and reference withdrawal independently."
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:116
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:143
 msgid ""
 "停 capture/PCM 后再停 sensor/codec；GUI stop 后再退出显示／触摸；上层网络退出 后再停 UART "
 "stream；最后关闭 bus 与 Platform 的 cold 资源。"
@@ -501,7 +591,7 @@ msgstr ""
 "stop upper network consumers before the UART stream. Finally close the buses"
 " and Platform cold resources."
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:118
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:145
 msgid ""
 "持久化或 Flash 操作失败可能已有效果。按原 owner 合同恢复并核对实际状态，不能 通过重新初始化软件或延长 deadline 抹去责任。"
 msgstr ""
@@ -509,96 +599,147 @@ msgstr ""
 "original owner contract and inspect actual state; software reinitialization "
 "or an extended deadline cannot erase those duties."
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:121
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:148
 msgid "维护的完整参考"
 msgstr "Maintained complete references"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:123
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:150
 msgid "完整应用源码与消费测试属于独立 `X-Gen-Lab/nexus-examples`，本页不复制另一套实现："
 msgstr ""
 "Complete application sources and consumer tests belong to the separate "
 "`X-Gen-Lab/nexus-examples` repository; this page does not duplicate their "
 "implementation:"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "入口"
 msgstr "Entry"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "可审查的组合"
 msgstr "Reviewable composition"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "`apps/axis_control`"
 msgstr "`apps/axis_control`"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "实际 encoder／trajectory／PID／PWM、整组参数、Settings 与 copied telemetry"
 msgstr ""
 "Actual encoder/trajectory/PID/PWM, complete parameters, Settings and copied "
 "telemetry"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
+msgid "`recipes/control/differential_drive`"
+msgstr "`recipes/control/differential_drive`"
+
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
+msgid "真实 Axis 控制、独立 DC／机械模型、成组目标、超时与分层验收"
+msgstr ""
+"Actual Axis control, independent DC/mechanical model, grouped targets, "
+"timeouts and layered acceptance"
+
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
+msgid "`recipes/control/servo_axis`"
+msgstr "`recipes/control/servo_axis`"
+
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
+msgid "Axis、真实电流 PI 与独立带载 DC 模型；软件位置／速度／电流闭环和实测驻留判据"
+msgstr ""
+"Axis, actual current PI and an independent loaded DC model; software "
+"position/velocity/current loops and measured-dwell criteria"
+
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
+msgid "`recipes/control/lift_axis`"
+msgstr "`recipes/control/lift_axis`"
+
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
+msgid "重力／闸模型中的承重交接与有限机械回零；不授予实际承重或制动资格"
+msgstr ""
+"Load-support handoff and bounded mechanical homing in a gravity/brake model;"
+" no physical load-support or braking qualification"
+
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
+msgid "`recipes/control/motor_drive`"
+msgstr "`recipes/control/motor_drive`"
+
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
+msgid "显式标定桥、MotorControl、PowerStage 会话与未 commissioning 时拒绝激励"
+msgstr ""
+"Explicit calibration bridge, MotorControl, PowerStage session and rejection "
+"of excitation before commissioning"
+
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "`recipes/control`"
 msgstr "`recipes/control`"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "触摸／数值控制和 IMU 校准、安装旋转、姿态消费"
 msgstr ""
 "Touch/numeric control and IMU calibration, mounting rotation and attitude "
 "consumption"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "`recipes/inference`"
 msgstr "`recipes/inference`"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "实际 CMSIS-NN 的固定三输入、四隐藏节点、二输出量化图"
 msgstr ""
 "Actual CMSIS-NN fixed three-input, four-hidden-node, two-output quantized "
 "graph"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "`recipes/ui`"
 msgstr "`recipes/ui`"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "小缓冲局部绘制与校准触摸片段；不是 LVGL recipe"
 msgstr ""
 "Small-buffer partial drawing and calibrated-touch fragments; not an LVGL "
 "recipe"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "`apps/connected_terminal`"
 msgstr "`apps/connected_terminal`"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "实际显示／触摸、route／UDP 与 Settings 组合；默认不启用 LVGL 或 TLS"
 msgstr ""
 "Actual display/touch, route/UDP and Settings composition; LVGL and TLS are "
 "disabled by default"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
+msgid "`recipes/network/drive_host`"
+msgstr "`recipes/network/drive_host`"
+
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
+msgid "Python 标准库的有限 CiA 402 PV／SocketCAN 主机参考；默认仅 codec 演示，实物总线未执行"
+msgstr ""
+"A bounded CiA 402 PV/SocketCAN host reference using the Python standard "
+"library; codec demo only by default, with no physical-bus execution"
+
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "`recipes/network`、`apps/network_gateway`"
 msgstr "`recipes/network`, `apps/network_gateway`"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:0
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:0
 msgid "路由与交付事实、独立传输会话、boot audit 和网关消费"
 msgstr ""
 "Route/delivery facts, independent transport sessions, boot audit and gateway"
 " consumption"
 
-#: ../../../../../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:134
+#: ../../../../../../nexus/docs/guides/control-and-smart-devices.md:166
 msgid ""
 "阅读示例时使用该仓库交付记录绑定的精确提交与 Nexus 依赖，不从 `main` 的后续变化 继承资格。本仓库 "
 "`tests/contracts/f407_pwm_adc` 和 `f407_pwm_adc_loop` 提供真实 TOML、typed factory"
-" 与 ARM 链接入口；它们是 cold consumer，不执行实板快环。 Native 行为、ARM 链接与实板测量分别记录；物理 HIL 仍为 "
-"`not_executed`。"
+" 与 ARM 链接入口；`tests/contracts/f407_power_stage` 增加电驱 软件路线。这些 cold consumer "
+"不执行实板快环。 Native 行为、ARM 链接与实板测量分别记录；物理 HIL 仍为 `not_executed`。"
 msgstr ""
 "Read examples at the exact commit and Nexus dependency bound by that "
 "repository's delivery record; do not inherit qualification from later `main`"
 " changes. This repository's `tests/contracts/f407_pwm_adc` and "
-"`f407_pwm_adc_loop` provide real TOML, typed factories and ARM-link entry "
-"points. They are cold consumers and do not run hardware fast loops. Native "
-"behavior, ARM linking and hardware measurement remain separate; physical HIL"
-" is still `not_executed`."
+"`f407_pwm_adc_loop` provide real TOML, typed-factory and ARM-link entry "
+"points. `tests/contracts/f407_power_stage` adds the electric-drive software "
+"route. These cold consumers do not execute a board fast loop. Native "
+"behavior, ARM linking and board measurements are recorded separately; "
+"physical HIL remains `not_executed`."

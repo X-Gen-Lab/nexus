@@ -7,13 +7,13 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 659850aabd6a9c73641ee8298b5eef8227d61479ac151720ee4fc1133acd4bf6\n"
+"X-Nexus-Source-SHA256: 86cb901075aef9f28befe893624a5a23cfe03d048c3dda41453608da2a58159d\n"
 
-#: ../../../../docs/explanation/index.md:9
+#: ../../../../../../../docs/explanation/index.md:9
 msgid "理解平台"
 msgstr "Understand the platform"
 
-#: ../../../../docs/explanation/index.md:11
+#: ../../../../../../../docs/explanation/index.md:11
 msgid "先理解状态、资源和责任，再选择具体接口。图中的依赖、调用、生成和所有权分别标注，架构分层不要求日常 I/O 逐层转发。"
 msgstr ""
 "Understand state, resources and responsibilities before choosing an "

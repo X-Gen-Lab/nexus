@@ -203,6 +203,7 @@ PCB、供电、跳线、波形、吞吐与时序需要真实 station 原件，�
 | stm32f4 | OTG_HS | usb_host | host-hs-ulpi | `usbhs-host-ulpi` | — | `tests/contracts/st_usb_host_assembly/stm32-zg-ulpi-dma.toml`, `tests/contracts/usb_host_assembly/stm32-zg-ulpi-dma.toml` | `soc/stm32/stm32f4/drivers/usb/usb_host.c` |
 | stm32f4 | PWM_ADC8 | pwm_adc | finite-regular-dma | `tim8-pwm-adc1` | — | `tests/contracts/f407_pwm_adc/finite.toml` | `soc/stm32/stm32f4/drivers/pwm_adc/pwm_adc.c` |
 | stm32f4 | PWM_ADC8 | pwm_adc | injected-control | `tim8-pwm-adc1-loop` | — | `tests/contracts/f407_pwm_adc_loop/control.toml` | `soc/stm32/stm32f4/drivers/pwm_adc/loop.c` |
+| stm32f4 | PWM_ADC8 | pwm_adc | injected-power-stage | `tim8-power-stage-adc1-tim4` | — | `tests/contracts/f407_power_stage/control.toml` | `soc/stm32/stm32f4/drivers/pwm_adc/power_stage.c` |
 | stm32f4 | QUADSPI | external_bus | qspi-indirect-dma | `quadspi-indirect-control` | — | `tests/contracts/stm32f4_qspi/f479ni-qspi-dma.toml`, `tests/contracts/stm32f4_qspi/f479ni-qspi-quad-dma.toml` | `soc/stm32/stm32f4/drivers/memory/qspi.c` |
 | stm32f4 | QUADSPI | external_bus | qspi-indirect-sdr | `quadspi-indirect-control` | — | `tests/contracts/stm32f4_qspi/f479ni-qspi-map.toml`, `tests/contracts/stm32f4_qspi/f479ni-qspi-quad.toml`, `tests/contracts/stm32f4_qspi/f479ni-qspi.toml` | `soc/stm32/stm32f4/drivers/memory/qspi.c` |
 | stm32f4 | QUADSPI | flash_async | nor-indirect | `quadspi-bank1-sdr111` | — | — | — |

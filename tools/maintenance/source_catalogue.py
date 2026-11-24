@@ -94,7 +94,7 @@ ALL_DEPENDENCIES = (
         "https://github.com/CANopenNode/CANopenNode.git",
         "https://github.com/X-Gen-Lab/CANopenNode.git",
         "runtime", "LICENSE", "dependencies/canopen.lock.json",
-        component_profiles=("canopen",), component_source=True),
+        component_profiles=("canopen", "cia402"), component_source=True),
     SourceDependency("ov2640", "vendors/st/ov2640",
         "https://github.com/STMicroelectronics/stm32-ov2640.git",
         "https://github.com/X-Gen-Lab/stm32-ov2640.git",
