@@ -276,6 +276,19 @@ class ChangedDomainTests(unittest.TestCase):
             "scripts/ci/test_commit_message.py"]),
             {"ci": ("scripts/ci/test_commit_message.py",)})
 
+    def test_coupled_assembly_selects_complete_ownership_and_ir_modules(self):
+        plan = run_tool_tests.commit_tool_plan([
+            "tools/configure/coupled_assembly.py"])
+        self.assertIsNotNone(plan.get("configure"))
+        self.assertTrue({
+            "tools/configure/tests/test_power_stage_domains.py",
+            "tools/configure/tests/test_controller_integration.py",
+            "tools/configure/tests/test_static_ir.py",
+            "tools/configure/tests/test_platform_lifecycle.py",
+            "tools/configure/tests/test_factory_features.py",
+            "tools/configure/tests/test_runtime.py",
+        }.issubset(plan["configure"]))
+
     def test_preset_helper_selects_its_consumer_and_build_contracts(self):
         self.assertEqual(run_tool_tests.commit_tool_plan([
             "tools/dev/presets.py"]), {"testing": (

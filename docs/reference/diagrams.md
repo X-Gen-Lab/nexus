@@ -217,10 +217,11 @@ owner、等待和调度为显式选择，不形成额外的必经转发层。
 (fig-35-motor-control)=
 ## FIG-35 电机与轴控制的调用和退出责任
 
-实线是显式调用或数据交付，虚线是借用与退出责任。Axis 消费完整目标，应用桥
-将 raw 采样、时间与电机 SI 输入连接，再把归一化计划量化成完整 tick 组。
-PowerStage 唯一管理硬件；组件不创建任务或另一个 owner。图中的 F407ZG 是边沿
-对齐、顺序 ADC rank 的软件参考，不表示多 ADC 同时采样或物理电机验证。
+实线是显式调用或数据交付，虚线是借用与退出责任。Axis 消费完整目标，Drive
+交接有限参考和连续反馈；应用组合按标号连接 Current、独立电压计算与 Modulation，
+完成最终电压 tracking，再返回完整计划。PowerStage 与所选共享域管理硬件，
+组件不创建任务或另一个 owner。图表示当前可选软件组合；精确 F407ZG 配置、
+独立 ADC 共同域和未实施的硬件模式分别列明，不授予物理电机资格。
 详细责任见[电机与轴控制](../explanation/motor-control.md)。
 
 ![FIG-35：电机与轴控制的调用和退出责任](../assets/diagrams/motor-control.svg)

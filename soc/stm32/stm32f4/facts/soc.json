@@ -1248,7 +1248,7 @@
         "ethernet-f4",
         "dcmi-v1",
         "crc-fixed-polynomial",
-        "pwm-adc-tim8"
+        "pwm-adc-f407"
       ],
       "clock_policy": "rm0090-f407-run"
     },

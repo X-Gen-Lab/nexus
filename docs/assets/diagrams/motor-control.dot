@@ -1,9 +1,9 @@
-// FIG-35 current: optional software composition and exact F407ZG reference.
+// FIG-35 current: optional control composition and selected STM32F4 execution.
 // Code basis: components/control; io/power_stage.h; F4 pwm_adc implementation.
 // Solid arrows are calls/data; dashed arrows are loans or exit duties.
 digraph MotorControl {
     graph [label="FIG-35 电机与轴控制：调用和退出责任", rankdir=TB,
-           bgcolor="white", pad=0.28, nodesep=0.35, ranksep=0.55,
+           bgcolor="white", pad=0.28, nodesep=0.32, ranksep=0.55,
            fontname="Noto Sans CJK SC", fontsize=15, labelloc=t];
     node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
           color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
@@ -11,28 +11,40 @@ digraph MotorControl {
     edge [color="#475569", fontcolor="#0f172a",
           fontname="Noto Sans CJK SC", fontsize=10, arrowsize=0.8];
 
-    app [label="外部应用：目标与机械策略", fillcolor="#f8fafc"];
-    axis [label="AxisControl：目标与软件采用"];
+    app [label="外部应用：授权与机械策略", fillcolor="#f8fafc"];
+    axis [label="AxisControl：目标与外环"];
+    reference [label="Task→快环：完整有限参考"];
+    drive [label="DriveControl：参考采用与电压计算"];
+    current [label="CurrentControl：标定与重构"];
     motor [label="MotorControl：SI 电流计算"];
-    bridge [label="显式应用桥：标定、时间与量化", fillcolor="#f8fafc"];
-    stage [label="PowerStage provider：唯一硬件 owner"];
-    hardware [label="TIM8／ADC1／TIM4 与故障输入"];
+    modulation [label="ModulationControl：脉冲与采样规划"];
+    bridge [label="应用组合：角度、时间与完整映射", fillcolor="#f8fafc"];
+    feedback [label="快环→Task：连续区间与覆盖"];
+    stage [label="PowerStage／共享域：唯一硬件 owner"];
+    hardware [label="所选 TIM／ADC／IRQ 与保护输入"];
     session [label="调用者静态 session 与 context", fillcolor="#f8fafc"];
     exit [label="停止准入、抑制、排空与会合", fillcolor="#fff7ed"];
-    scope [label="F407ZG 软件参考；物理 HIL 未执行", fillcolor="#fefce8"];
+    scope [label="STM32F4 软件组合；物理 HIL 未执行", fillcolor="#fefce8"];
 
     { rank=same; axis; session; }
+    { rank=same; axis; feedback; }
+    { rank=same; current; drive; modulation; }
 
     app -> axis [label="完整目标与参数"];
-    axis -> bridge [label="有界完整交接的电流参考"];
-    stage -> bridge [label="raw scan 与观察时间"];
-    bridge -> motor [label="有效 SI 测量与参考"];
-    motor -> bridge [label="归一化 duty 与计划电压", constraint=false];
-    bridge -> stage [label="完整 tick 组", constraint=false];
-    stage -> hardware [label="私有硬件操作与真实退出"];
+    axis -> reference [label="有限电流参考"];
+    reference -> drive [label="每步最多采用一条"];
+    stage -> bridge [label="捕获与计划身份；调用 compute", constraint=false];
+    bridge -> current [label="1 标定与重构"];
+    bridge -> drive [label="2 电压计算；4 最终 tracking"];
+    drive -> motor [label="调用独立电压内核"];
+    bridge -> modulation [label="3 开关与采样联合规划"];
+    bridge -> stage [label="5 返回完整脉冲与采样计划"];
+    stage -> hardware [label="私有操作与完整退出"];
+    bridge -> feedback [label="发布真实区间与覆盖", constraint=false];
+    feedback -> axis [label="连续机械反馈", constraint=false];
     app -> session [label="显式 prepare／start"];
     session -> stage [label="借用至 acquire 观察 SETTLED", style=dashed];
     app -> exit [label="先关闭新命令", style=dashed];
     stage -> exit [label="失败保留原引用", style=dashed];
-    exit -> scope [label="输出抑制与借用退出分别证明", style=dashed];
+    exit -> scope [label="抑制与借用退出分别证明", style=dashed];
 }

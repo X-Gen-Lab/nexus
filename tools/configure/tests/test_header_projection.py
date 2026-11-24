@@ -20,6 +20,21 @@ def facts():
 
 
 class HeaderProjectionTests(unittest.TestCase):
+    def test_optional_record_presence_selects_a_build_feature(self):
+        value = facts()
+        value["features"] = {"paired_capture": {
+            "source": "option_present", "owners": ["pwm_adc"],
+            "flag": "pair", "macro": "SAMPLE_PAIR"}}
+        owner = SimpleNamespace(kind="pwm_adc", options=SimpleNamespace(
+            pair=SimpleNamespace(converters=("ADC1", "ADC2"))))
+        result = SimpleNamespace(controllers=(owner,), devices=())
+        header = HeaderProjection.from_validated(value)
+        self.assertEqual(header.features(result),
+                         (("paired_capture", True, "SAMPLE_PAIR"),))
+        owner.options.pair = None
+        self.assertEqual(header.features(result),
+                         (("paired_capture", False, "SAMPLE_PAIR"),))
+
     def test_package_features_drive_private_modes_and_shared_header_values(self):
         value = facts()
         value["features"] = {"fifo": {"source": "controller", "owners": ["uart"],

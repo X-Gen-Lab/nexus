@@ -12,7 +12,7 @@ from tools.configure import (
 from tools.configure.contracts import CONTROLLER_SELECTION_FIELDS, ENDPOINT_SELECTION_FIELDS
 from tools.configure.ir import (
     CanDomainIR, CanFilterIR, ClockPlanIR, ControllerIR, EndpointIR,
-    PwmSharedOwnerIR, thaw)
+    PowerStageDomainIR, PwmSharedOwnerIR, thaw)
 from tools.configure.providers.common import fail, mode_traits, route_dma, sequence
 from tools.configure.resource_graph import normalize_resource, resource_claims, reserved_claims
 from tools.configure.selection import (
@@ -31,6 +31,7 @@ class DeviceGraphResolution:
     can_domain: CanDomainIR | None
     pwm_shared_owners: tuple[PwmSharedOwnerIR, ...]
     inputs: tuple[Path, ...]
+    power_stage_domains: tuple[PowerStageDomainIR, ...] = ()
 
 
 def resolve(assembly, *, root, soc, board, routes, bindings,
@@ -135,6 +136,17 @@ def resolve(assembly, *, root, soc, board, routes, bindings,
             shared_pwm = (provider.PWM_SHARED is not None and
                           provider.PWM_SHARED.selected(
                               {"kind": route["kind"], "mode": mode}))
+            coupled = getattr(provider, "COUPLED_IO", None)
+            domain_resources = (tuple(coupled.domain_resources(selection, route))
+                                if coupled is not None and route["kind"] == "pwm_adc"
+                                else ())
+            domain_keys = {normalize_resource(key) for key in domain_resources}
+            if domain_resources:
+                domain = identity(selection.get("domain", name), "power stage domain")
+                physical = coupled.domain_facts(route)["id"]
+                for key in domain_resources:
+                    claim(key, "power-stage-domain:" + domain,
+                          "power-stage-domain", physical)
             if route["kind"] == "external_bus":
                 claim("ip:" + route["controller"] + "/control", name, mode,
                       route["id"])
@@ -145,6 +157,8 @@ def resolve(assembly, *, root, soc, board, routes, bindings,
             if traits.irq:
                 for irq in hardware["irq"]:
                     key = normalize_resource("irq:" + irq)
+                    if key in domain_keys:
+                        continue
                     priority = selection.get("irq_priority")
                     selected_binding = (provider.binding(route["kind"], mode,
                         route["controller"]) if hasattr(provider, "binding") else None)
@@ -157,7 +171,8 @@ def resolve(assembly, *, root, soc, board, routes, bindings,
             for resource in (*hardware.get("resources", ()),
                              *route.get("resources", ()),
                              *route.get("mode_resources", {}).get(mode, ())):
-                claim(resource, name, mode, route["id"])
+                if normalize_resource(resource) not in domain_keys:
+                    claim(resource, name, mode, route["id"])
             if route["kind"] == "adc_group":
                 for resource in adc.group_trigger_resources(selection, provider):
                     claim(resource, name, mode, route["id"])
@@ -182,6 +197,8 @@ def resolve(assembly, *, root, soc, board, routes, bindings,
                 selected[-1]["adc_group_resolution"] = resolution
     provider.validate_controller_set(
         selected, clock_profile=assembly.clock_profile)
+    coupled = getattr(provider, "COUPLED_IO", None)
+    power_stage_domains = coupled.resolve_domains(selected) if coupled is not None else ()
     ethernet.resolve_counter_domains(selected)
     pwm_shared_owners = []
     pwm_sharing = {}
@@ -277,4 +294,4 @@ def resolve(assembly, *, root, soc, board, routes, bindings,
             if can_domain is not None else None),
         pwm_shared_owners=tuple(PwmSharedOwnerIR.from_validated(item)
                                for item in pwm_shared_owners),
-        inputs=())
+        inputs=(), power_stage_domains=power_stage_domains)

@@ -769,23 +769,11 @@ class SDKConsumerParallelTests(unittest.TestCase):
                         / (smoke + ".c"))
             (self.sdk / consumer).parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(ROOT / consumer, self.sdk / consumer)
-        shutil.copytree(ROOT / "cmake/package/verification/common_services",
-                        self.sdk / "cmake/package/verification/common_services")
-        shutil.copytree(ROOT / "cmake/package/verification/secure_services",
-                        self.sdk / "cmake/package/verification/secure_services")
-        for scenario in ("common_components", "device_tmp117", "image_window", "loaned_rx",
-                         "mcuboot_control", "mcuboot_boot", "mcuboot_swap",
-                         "smart_components", "smbus"):
-            shutil.copytree(ROOT / "cmake/package/verification" / scenario,
-                            self.sdk / "cmake/package/verification" / scenario)
-        family = Path("tests/contracts/stm32f4_family")
-        shutil.copytree(ROOT / family, self.sdk / family)
-        for name in ("stm32f4_crypto", "stm32f4_sdram", "stm32f4_graphics",
-                     "stm32f4_graphics_sdram", "stm32f4_sai", "stm32f4_qspi",
-                     "stm32f4_power", "stm32f4_sdio_hs",
-                     "f407_capture_audio", "f407_pwm_adc", "f407_pwm_adc_loop",
-                     "f407_freertos_stop"):
-            relative = Path("tests/contracts") / name
+        from tools.maintenance.consumer_profiles import (
+            SERVICE_CONSUMERS, service_directory)
+        directories = {service_directory(ROOT, profile).relative_to(ROOT)
+                       for profile in SERVICE_CONSUMERS}
+        for relative in sorted(directories):
             shutil.copytree(ROOT / relative, self.sdk / relative)
         crc = Path("tests/contracts/crc_assembly/consumer.c")
         (self.sdk / crc).parent.mkdir(parents=True)
@@ -1186,7 +1174,7 @@ class SDKConsumerParallelTests(unittest.TestCase):
         retained.update(item.name for item in self.consumer.SERVICE_CONSUMERS
                         if item.arm and item.scenario not in
                         {"image_window", "mcuboot_control", "common_components",
-                         "smart_components"})
+                         "smart_components", "foc_control"})
         commands = [command for command in self.commands
                     if any(arg.endswith("retention.py") for arg in command)]
         self.assertEqual({Path(command[command.index("--elf") + 1]).parents[1]
@@ -1204,6 +1192,51 @@ class SDKConsumerParallelTests(unittest.TestCase):
         self.assertEqual(len(self.builds()), 2)
         self.assertIn("--verify", self.commands[0])
         self.assertIn("--verify", self.commands[-1])
+
+    def test_pure_foc_keeps_arm_image_and_symbols_without_provider_retention(self):
+        status, report = self.execute(("--consumer", "native foc composition",
+                                       "--consumer", "f407 foc composition",
+                                       "--parallel", "1"))
+        self.assertEqual(status, 0, report)
+        images = {item["name"]: item for item in report["service_images"]}
+        for profile in self.consumer.SERVICE_CONSUMERS:
+            if profile.scenario != "foc_control":
+                continue
+            image = images[profile.name]
+            self.assertEqual(set(image["symbols"]),
+                             self.consumer.service_symbols(profile))
+            self.assertIsNone(image["retention"])
+            self.assertEqual(image["runtime_executed"], not profile.arm)
+            if profile.arm:
+                self.assertIsNotNone(image["resources"])
+                self.assertIn("elf", image["inputs"])
+                self.assertFalse(any(image["forbidden_symbols"].values()))
+        self.assertFalse(any(argument.endswith("retention.py")
+                             for command in self.commands for argument in command))
+
+    def test_foc_with_selected_io_still_requires_provider_retention(self):
+        profile = next(item for item in self.consumer.SERVICE_CONSUMERS
+                       if item.name == "f407 foc composition")
+        output = self.directory / profile.domain
+        output.mkdir()
+        source, build, command = self.consumer.prepare_service_consumer(
+            self.prefix, output, profile, self.external_process,
+            expected_revision="a" * 40, fixture=True)
+        self.external_process(command)
+        config = Path((build / "resolved-config.txt").read_text())
+        resolved_path = config / "resolved.json"
+        resolved = json.loads(resolved_path.read_text())
+        resolved["controllers"] = [{"kind": "gpio", "id": "status"}]
+        resolved_path.write_text(json.dumps(resolved))
+        resources_path = build / "bin/installed_services.resources.json"
+        resources = json.loads(resources_path.read_text())
+        resources["resolved"] = file_identity(resolved_path)
+        resources_path.write_text(json.dumps(resources))
+        image = self.consumer.check_service_image(
+            self.sdk, source, build, profile, self.external_process)
+        self.assertIsNotNone(image["retention"])
+        self.assertTrue(any(argument.endswith("retention.py")
+                            for command in self.commands for argument in command))
 
     def test_unknown_consumer_never_starts_external_commands(self):
         with self.assertRaisesRegex(ValueError, "Unknown SDK consumer"):

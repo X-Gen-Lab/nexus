@@ -129,6 +129,30 @@
             "nor-mapped-cpu"
           ],
           "macro": "NEXUS_QSPI_QUAD_READ"
+        },
+        "power_stage_pair": {
+          "source": "option_present",
+          "owners": [
+            "pwm_adc"
+          ],
+          "flag": "pair",
+          "macro": "NEXUS_STM32_POWER_STAGE_PAIR"
+        },
+        "power_stage_tdm": {
+          "source": "option_present",
+          "owners": [
+            "pwm_adc"
+          ],
+          "flag": "slot",
+          "macro": "NEXUS_STM32_POWER_STAGE_TDM"
+        },
+        "power_stage_dc": {
+          "source": "option_present",
+          "owners": [
+            "pwm_adc"
+          ],
+          "flag": "dc",
+          "macro": "NEXUS_STM32_POWER_STAGE_DC"
         }
       }
     }

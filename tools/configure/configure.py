@@ -1194,7 +1194,8 @@ def _resolve(assembly_path, root=ROOT, *, input_paths=None, test_support=False,
         fact_references=freeze(references),
         pwm_shared_owners=selected_graph.pwm_shared_owners,
         provider_context=facts.provider_context,
-        hardware=facts.hardware, external_memory=external_memory)
+        hardware=facts.hardware, external_memory=external_memory,
+        power_stage_domains=selected_graph.power_stage_domains)
     resolved = resolved.with_integrations()
     if assembly.power is not None:
         from tools.configure import runtime_power

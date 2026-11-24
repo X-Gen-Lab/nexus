@@ -2978,6 +2978,9 @@
             "type": "string",
             "description": "Exact reviewed Board binding; no route fallback."
           },
+          "center_aligned": {
+            "type": "boolean"
+          },
           "channels": {
             "type": "array",
             "items": {
@@ -3004,6 +3007,10 @@
             "type": "integer",
             "minimum": 0,
             "description": "Count in the explicitly selected timer clock ticks."
+          },
+          "domain": {
+            "type": "string",
+            "minLength": 1
           },
           "encoder_filter": {
             "type": "integer",
@@ -3054,6 +3061,12 @@
             "minimum": 0,
             "description": "Count in the explicitly selected timer clock ticks."
           },
+          "phase_offset_ticks": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4294967295,
+            "description": "Count in the explicitly selected timer clock ticks."
+          },
           "reference_mv": {
             "type": "integer",
             "minimum": 0,
@@ -3070,6 +3083,12 @@
             "type": "integer",
             "minimum": 0,
             "description": "Count in the explicitly selected timer clock ticks."
+          },
+          "start_tolerance_us": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 4294967295,
+            "description": "Time interval in microseconds; not a measured hardware guarantee."
           },
           "tick_hz": {
             "type": "integer",

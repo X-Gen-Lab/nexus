@@ -18,6 +18,57 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class SDKServicesPolicyTests(unittest.TestCase):
+    def test_power_stage_profiles_copy_the_selected_cold_provider_consumers(self):
+        profiles = tuple(item for item in consumer_profiles.SERVICE_CONSUMERS
+                         if item.scenario == "f4_power_stage")
+        self.assertEqual({item.assembly for item in profiles},
+                         {"pair.toml", "tdm.toml", "dc.toml"})
+        prefix = self.prefix()
+        sdk = prefix / "share/nexus/src"
+        relative = Path("tests/contracts/f407_power_stage")
+        shutil.copytree(ROOT / relative, sdk / relative)
+        for profile in profiles:
+            with self.subTest(profile=profile.name):
+                self.assertTrue(profile.arm)
+                output = self.directory / profile.domain
+                output.mkdir()
+                source, _, _ = self.consumers.prepare_service_consumer(
+                    prefix, output, profile, self.command,
+                    expected_revision="a" * 40, fixture=True)
+                self.assertEqual((source / "main.c").read_bytes(),
+                                 (ROOT / relative / "main.c").read_bytes())
+                self.assertEqual((source / "domain_board/board.json").read_bytes(),
+                                 (ROOT / relative / "domain_board/board.json").read_bytes())
+                self.assertIn("nx_stm32_power_stage_domain_prepare",
+                              self.consumers.service_symbols(profile))
+                self.assertIn("No physical", self.consumers.service_scope(profile))
+
+    def test_foc_profiles_copy_the_actual_public_composition(self):
+        profiles = tuple(item for item in consumer_profiles.SERVICE_CONSUMERS
+                         if item.scenario == "foc_control")
+        self.assertEqual({item.arm for item in profiles}, {False, True})
+        prefix = self.prefix()
+        sdk = prefix / "share/nexus/src"
+        relative = Path("cmake/package/verification/foc_control")
+        shutil.copytree(ROOT / relative, sdk / relative)
+        for profile in profiles:
+            with self.subTest(profile=profile.name):
+                output = self.directory / profile.domain
+                output.mkdir()
+                source, _, _ = self.consumers.prepare_service_consumer(
+                    prefix, output, profile, self.command,
+                    expected_revision="a" * 40, fixture=True)
+                self.assertEqual((source / "main.c").read_bytes(),
+                                 (ROOT / relative / "main.c").read_bytes())
+                cmake = (source / "CMakeLists.txt").read_text()
+                for target in ("Nexus::DriveControl", "Nexus::CurrentControl",
+                               "Nexus::ModulationControl"):
+                    self.assertIn(target, cmake)
+                self.assertLessEqual({"nx_drive_step", "nx_current_convert",
+                                      "nx_modulation_phase_plan"},
+                                     self.consumers.service_symbols(profile))
+                self.assertIn("No physical", self.consumers.service_scope(profile))
+
     def test_power_profiles_keep_public_owner_boundary_and_exact_payload(self):
         profiles = tuple(item for item in consumer_profiles.SERVICE_CONSUMERS
                          if item.scenario == "f4_power")

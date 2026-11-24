@@ -116,6 +116,62 @@ TEST(Motor, RealFocProducesCompletePlannedDutiesWithoutHardware) {
     }
 }
 
+TEST(Motor, VoltageOnlyDecisionPreservesNumericsWithoutChoosingDuty) {
+    nx_motor_t motor = {}, legacy = {};
+    const auto c = config();
+    ASSERT_EQ(nx_motor_initialize(&motor, &c), NX_SUCCESS);
+    ASSERT_EQ(nx_motor_initialize(&legacy, &c), NX_SUCCESS);
+    const auto s = sample();
+    const auto r = reference();
+    nx_motor_voltage_t voltage = {};
+    nx_motor_output_t output = {};
+    ASSERT_EQ(nx_motor_voltage_step(&motor, &s, &r, &voltage), NX_SUCCESS);
+    ASSERT_EQ(nx_motor_step(&legacy, &s, &r, &output), NX_SUCCESS);
+    EXPECT_FLOAT_EQ(voltage.measured_current.q, output.measured_current.q);
+    EXPECT_FLOAT_EQ(voltage.requested_voltage.q, output.requested_voltage.q);
+    EXPECT_FLOAT_EQ(voltage.planned_voltage.q, output.planned_voltage.q);
+    EXPECT_EQ(voltage.sequence, output.sequence);
+    EXPECT_EQ(nx_motor_track_voltage(&motor, voltage.sequence,
+                                     voltage.planned_voltage),
+              NX_SUCCESS);
+    EXPECT_EQ(nx_motor_track_voltage(&motor, voltage.sequence,
+                                     voltage.planned_voltage),
+              NX_ERROR_STATE);
+}
+
+TEST(Motor, VoltageOnlyFailureLeavesOutputAndIntegratorsUnchanged) {
+    nx_motor_t motor = {};
+    const auto c = config();
+    ASSERT_EQ(nx_motor_initialize(&motor, &c), NX_SUCCESS);
+    auto s = sample();
+    const auto r = reference();
+    nx_motor_voltage_t voltage = {};
+    voltage.sequence = 91;
+    s.valid = false;
+    EXPECT_EQ(nx_motor_voltage_step(&motor, &s, &r, &voltage), NX_ERROR_STATE);
+    EXPECT_EQ(voltage.sequence, 91U);
+    EXPECT_FLOAT_EQ(motor.integral_d_v, 0);
+    EXPECT_FLOAT_EQ(motor.integral_q_v, 0);
+}
+
+TEST(Motor, VoltageOnlyLeavesSamplingWindowToSelectedModulator) {
+    nx_motor_t motor = {}, legacy = {};
+    auto c = config();
+    c.minimum_duty = 0.2F;
+    c.kp_q = 100;
+    ASSERT_EQ(nx_motor_initialize(&motor, &c), NX_SUCCESS);
+    ASSERT_EQ(nx_motor_initialize(&legacy, &c), NX_SUCCESS);
+    const auto s = sample();
+    const auto r = reference();
+    nx_motor_voltage_t voltage = {};
+    nx_motor_output_t fixed = {};
+    ASSERT_EQ(nx_motor_voltage_step(&motor, &s, &r, &voltage), NX_SUCCESS);
+    ASSERT_EQ(nx_motor_step(&legacy, &s, &r, &fixed), NX_SUCCESS);
+    const float linear_limit = 24 * 0.5773502691896258F * 0.9F;
+    EXPECT_NEAR(voltage.planned_voltage.q, linear_limit, 1e-5F);
+    EXPECT_NEAR(fixed.planned_voltage.q, linear_limit * 0.6F, 1e-5F);
+}
+
 TEST(Motor, SamplingAndPlannedOutputUseDifferentPredictedAngles) {
     nx_motor_t motor = {};
     auto c = config();

@@ -36,3 +36,19 @@ if(pwm_adc_modes)
         )
     endif()
 endif()
+
+if(NEXUS_FEATURE_POWER_STAGE_PAIR)
+    target_sources(
+        nexus_soc_stm32f4
+        PRIVATE "${CMAKE_CURRENT_LIST_DIR}/adc_pair.c"
+    )
+endif()
+
+if(NEXUS_FEATURE_POWER_STAGE_DC)
+    target_sources(
+        nexus_soc_stm32f4
+        PRIVATE
+            "${CMAKE_CURRENT_LIST_DIR}/single_shunt.c"
+            "${CMAKE_CURRENT_LIST_DIR}/power_stage_dc.c"
+    )
+endif()

@@ -743,6 +743,34 @@ class PwmAdcLoopOptions(PwmAdcOptions):
 
 
 @dataclass(frozen=True)
+class PowerStagePairIR(Record):
+    """One reviewed simultaneous capture, not a second converter owner."""
+    converters: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class PowerStageTimingIR(Record):
+    """One shared startup tolerance for explicitly phased static carriers."""
+    start_tolerance_us: int
+
+
+@dataclass(frozen=True)
+class PowerStageSlotIR(Record):
+    """A member's phase references its domain's single timing authority."""
+    phase_offset_ticks: int
+    timing: PowerStageTimingIR
+
+
+@dataclass(frozen=True)
+class PowerStageDcIR(Record):
+    """Selected DC-link capture margins, independent of phase measurements."""
+    rearm_guard_ticks: int
+    maximum_lateness_ticks: int
+    aperture_ticks: int
+    settling_ticks: int
+
+
+@dataclass(frozen=True)
 class PowerStageOptions(PwmAdcOptions):
     """One complementary output/scan owner with a reviewed inactive window."""
     minimum_duty_ticks: int
@@ -751,7 +779,36 @@ class PowerStageOptions(PwmAdcOptions):
     commit_before_ticks: int
     compute_budget_us: int
     max_irq_delay_us: int
-    encoder_filter: int
+    encoder_filter: int | None
+    current_count: int
+    current_phase_mask: int
+    sample_bus: bool
+    adc_index: int
+    trigger_selector: int
+    center_aligned: bool
+    domain: str
+    scan_span_us: int
+    pair: PowerStagePairIR | None
+    slot: PowerStageSlotIR | None
+    dc: PowerStageDcIR | None
+
+
+@dataclass(frozen=True)
+class PowerStageDomainIR(Record):
+    """One physical common/IRQ owner with exactly the selected static axes."""
+    id: str
+    physical: str
+    members: tuple[str, ...]
+    state_type: str
+    config_type: str
+    member_state_type: str
+    member_config_type: str
+    admit: str
+    prepare: str
+    close: str
+    adc_irq: str
+    handler: str
+    timing: PowerStageTimingIR | None
 
 
 @dataclass(frozen=True)
@@ -1002,7 +1059,9 @@ def mode_options(values):
             return PowerStageOptions(*arguments, *(values[key] for key in (
                 "minimum_duty_ticks", "maximum_duty_ticks", "settling_ticks",
                 "commit_before_ticks", "compute_budget_us", "max_irq_delay_us",
-                "encoder_filter")))
+                "encoder_filter", "current_count", "current_phase_mask",
+                "sample_bus", "adc_index", "trigger_selector",
+                "center_aligned", "domain", "scan_span_us", "pair", "slot", "dc")))
         return PwmAdcOptions(*arguments)
     if kind == "can_fd":
         return CanFdOptions(values["bitrate"], values["data_bitrate"],
@@ -1800,6 +1859,7 @@ class ControllerIntegrationIR:
     execution_profile: str = "default"
     physical_flash: Mapping | None = None
     named_pads: Mapping | None = None
+    power_stage_domain: PowerStageDomainIR | None = None
 
 
 @dataclass(frozen=True)
@@ -1831,7 +1891,7 @@ class ExternalMemoryRegionIR(Record):
 
 @dataclass(frozen=True)
 class ConfigurationIR(Record):
-    source_epoch: ClassVar[int] = 5
+    source_epoch: ClassVar[int] = 6
     board: str
     soc_family: str
     cpu_profile: CpuProfileIR
@@ -1868,6 +1928,7 @@ class ConfigurationIR(Record):
     provider_context: "ProviderContext | None" = None
     hardware: "BoardHardwareIR | None" = None
     external_memory: tuple[ExternalMemoryRegionIR, ...] = ()
+    power_stage_domains: tuple[PowerStageDomainIR, ...] = ()
 
     @property
     def backend(self):
@@ -1958,7 +2019,7 @@ class ConfigurationIR(Record):
     def with_integrations(self):
         """Reference canonical selected plans without copying or re-resolving."""
         from tools.configure.providers import for_selection
-        from tools.configure.providers.common import kernel_policy_constant
+        from tools.configure.providers.common import kernel_policy_constant, owned_claims
         from tools.configure.memory import dma_region_bindings
         from tools.configure.uart_formats import execution_profile
         provider = for_selection(self)
@@ -1973,9 +2034,7 @@ class ConfigurationIR(Record):
                  provider.CONTROLLER_INTERFACES.get(item.controller, {}))), None)
             lanes = tuple(lane for lane in self.dma_topology.lanes
                           if lane.owner == item.id)
-            claims = tuple(claim for claim in self.resource_plan.claims
-                if item.id in claim.owner.split(";") and
-                claim.mode not in {"reserved", "kernel"})
+            claims = tuple(owned_claims(self, {item.id}))
             pads = policy.pad_bindings(item.pins) if policy is not None else ()
             dma = policy.dma_bindings(lanes) if policy is not None else ()
             named, repeated = {}, set()
@@ -2009,7 +2068,9 @@ class ConfigurationIR(Record):
                 if self.provider_context is not None and
                 self.provider_context.domain_policies is not None else
                 execution_profile(item) if item.kind == "uart" else "default",
-                self.physical_part.flash, named_pads)
+                self.physical_part.flash, named_pads,
+                next((domain for domain in self.power_stage_domains
+                      if item.id in domain.members), None))
             integrated.append(replace(item, integration=integration,
                                       provider_context=self.provider_context))
         return replace(self, controllers=tuple(integrated))
@@ -2038,9 +2099,12 @@ def coherent_controller_ir(item, result, provider):
             any(getattr(item, member.name) != getattr(owners[0], member.name)
                 for member in fields(ControllerIR))):
         raise ValueError("Controller integration differs from its canonical selected owner")
-    claims = tuple(claim for claim in result.resource_plan.claims
-                   if item.id in claim.owner.split(";") and
-                   claim.mode not in {"reserved", "kernel"})
+    domain = next((domain for domain in result.power_stage_domains
+                   if item.id in domain.members), None)
+    if selected.power_stage_domain is not domain:
+        raise ValueError("Controller integration differs from its canonical common domain")
+    from tools.configure.providers.common import owned_claims
+    claims = tuple(owned_claims(result, {item.id}))
     lanes = tuple(lane for lane in result.dma_topology.lanes if lane.owner == item.id)
     if (selected.controller != item.controller or selected.pins is not item.pins or
             selected.irq is not getattr(item.options, "irq", None) or

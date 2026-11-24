@@ -34,8 +34,8 @@ typedef struct {
 /**
  * \brief Immutable explicit profile; gains use A, V and seconds.
  * \note Kp is V/A and Ki is V/(A*s). Limits are inclusive. Modulation is
- *       (0,1]; minimum_duty is [0,0.5). Their combined linear voltage bound
- *       is Vbus/sqrt(3)*maximum_modulation*(1-2*minimum_duty). This
+ *       (0,1]; minimum_duty is [0,0.5). The fixed-modulation step uses the
+ *       bound Vbus/sqrt(3)*maximum_modulation*(1-2*minimum_duty). This
  * conservative bound reserves a common low-side sampling window; it does not
  * prove analog settling or any Board route. Anti-windup is an inverse-second
  *       back-calculation rate. Initial dt uses nominal_period_us; later dt uses
@@ -104,6 +104,23 @@ typedef struct {
     float iq_a;
     uint64_t valid_until_us;
 } nx_motor_reference_t;
+
+/**
+ * \brief Current-control voltage decision before any switching modulation.
+ * \note Values use the same frames and units as nx_motor_output_t. There are
+ *       no duty fields: a selected modulator must jointly plan switching,
+ *       sampling and quantization, then track its final voltage once. This
+ *       decision never proves that hardware staged or applied an output.
+ */
+typedef struct {
+    nx_motor_dq_t measured_current;
+    nx_motor_dq_t requested_voltage;
+    nx_motor_dq_t planned_voltage;
+    float sample_electrical_angle_rad;
+    float output_electrical_angle_rad;
+    uint64_t sequence;
+    bool limited;
+} nx_motor_voltage_t;
 
 /**
  * \brief Full normalized A/B/C duty plan; not a hardware completion receipt.
@@ -200,6 +217,25 @@ nx_result_t nx_motor_initialize(nx_motor_t* motor,
 nx_result_t nx_motor_step(nx_motor_t* motor, const nx_motor_sample_t* sample,
                           const nx_motor_reference_t* reference,
                           nx_motor_output_t* out);
+
+/**
+ * \brief Calculate a voltage decision without choosing switching or samples.
+ * \param[in,out] motor: Initialized single-executor current controller.
+ * \param[in] sample: Complete calibrated, qualified same-epoch observation.
+ * \param[in] reference: Complete target valid through the planned output.
+ * \param[out] out: Separate result, unchanged on rejection or failure.
+ * \return SUCCESS or exact latched validation or numerical error.
+ * \note Bounded Task/IRQ math with the same ownership and timing contract as
+ *       step. The configured circular bound remains conservative; final
+ *       switching/window restrictions belong to the selected modulator.
+ *       minimum_duty is ignored here; the voltage bound is
+ *       Vbus/sqrt(3)*maximum_modulation, avoiding a second sampling reserve.
+ *       Track final voltage once and close admission if hardware commit fails.
+ */
+nx_result_t nx_motor_voltage_step(nx_motor_t* motor,
+                                  const nx_motor_sample_t* sample,
+                                  const nx_motor_reference_t* reference,
+                                  nx_motor_voltage_t* out);
 
 /**
  * \brief           Feed final quantization/actuator limitation back once.

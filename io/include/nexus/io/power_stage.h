@@ -9,17 +9,52 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-/** \brief One complete raw drive observation; callback-local and read-only.
- * \note sample_at is a scheduled trigger reference, not a measured aperture.
- *       The four ADC ranks are sequential; scan_span_us bounds their declared
- *       conversion span. observed_at and angle_at are software observations in
- *       the same Core epoch. planned_apply_at is the next intended PWM update,
- *       never a physical-output receipt. Raw current order is A/B/C; bus_raw is
- *       the fourth rank. The caller owns calibration and physical units.
+/** \brief Two independent active-vector observations in one DC-link cycle.
+ * \note Vector bits 2/1/0 identify upper switches A/B/C. The selected provider
+ *       proves these states match the adopted PWM plan. sample_ticks retain
+ *       scheduled carrier references, not measured analog apertures. This
+ *       record is callback-local; retain only complete independent copies.
+ */
+typedef struct {
+    uint16_t code[2];
+    uint32_t sample_ticks[2];
+    uint8_t switching_vector[2];
+    uint64_t sequence;
+} nx_power_stage_dc_capture_t;
+/** \brief Selected DC-link sampling descriptor, copied by the provider.
+ * \note Two ordered observable ticks and independent active vectors describe
+ *       one complete plan. The descriptor must be contained in the session's
+ *       declared algorithm context; callback stack pointers are not allowed.
+ *       Selected hardware rejects unobservable plans without inventing pulses.
+ */
+typedef struct {
+    uint32_t sample_ticks[2];
+    uint8_t switching_vector[2];
+} nx_power_stage_dc_plan_t;
+/** \brief Selected ADC observation; callback-local and read-only.
+ * \note current_raw uses logical A/B/C slots. current_phase_mask marks actual
+ *       measured slots; zero-filled unselected slots are not measurements.
+ *       current_count is two or three for phase sampling. A DC-link profile
+ *       instead has count/mask zero and a non-NULL dc record. Phase sampling
+ *       always has dc=NULL. bus_raw and encoder_count may only be
+ *       consumed when their corresponding valid flag is true. Raw scaling and
+ *       source qualification remain caller responsibilities. plan_sequence
+ *       identifies the complete previously staged plan that caused this scan.
+ *       sample_at is the scheduled trigger reference, not a measured aperture;
+ *       trigger_ticks retains the finer carrier coordinate. scan_span_us bounds
+ *       the complete observation span, including both trigger references for
+ *       a DC-link pair and their final conversion. planned_apply_at is an
+ * intended boundary, never a physical-output receipt. Times use the same Core
+ * epoch.
  */
 typedef struct {
     uint16_t current_raw[3];
     uint16_t bus_raw;
+    uint8_t current_count;
+    uint8_t current_phase_mask;
+    bool bus_valid;
+    bool encoder_valid;
+    uint64_t plan_sequence;
     uint32_t encoder_count;
     uint64_t sequence;
     uint64_t clock_epoch;
@@ -28,10 +63,25 @@ typedef struct {
     nx_time_us_t angle_at;
     nx_time_us_t planned_apply_at;
     uint32_t scan_span_us;
+    uint32_t trigger_ticks;
+    const nx_power_stage_dc_capture_t* dc;
 } nx_power_stage_sample_t;
-/** \brief Complete next shadow group in the cold-selected timer tick unit. */
+/** \brief Complete output and observation plan in full-carrier tick units.
+ * \note duty_ticks is each high pulse's total width; start_ticks is its
+ *       modulo-carrier beginning. Selected providers reject unsupported pulse
+ *       shapes rather than ignoring starts. trigger_ticks and phase mask belong
+ *       to the same plan. Initial sequence is zero; a callback returns its
+ *       sample sequence plus one. dc is NULL for phase-current profiles; a
+ *       DC-link profile requires a complete context-contained descriptor.
+ *       Successful staging is not physical adoption.
+ */
 typedef struct {
     uint32_t duty_ticks[3];
+    uint32_t start_ticks[3];
+    uint32_t trigger_ticks;
+    uint8_t current_phase_mask;
+    uint64_t sequence;
+    const nx_power_stage_dc_plan_t* dc;
 } nx_power_stage_plan_t;
 /** \brief Compute one bounded complete group in the selected ADC IRQ.
  * \param[in,out] context: Exclusively borrowed caller algorithm state.
@@ -62,15 +112,38 @@ typedef struct {
     void* context;
     size_t context_bytes;
 } nx_power_stage_session_t;
-/** \brief Selected timing/limits and ordinary-context observations. */
+/** \brief Selected timing/limits and ordinary-context observations.
+ * \note Every *_ticks field uses the selected full-carrier tick unit. The
+ *       aperture/conversion bounds are conservative configured scan bounds,
+ *       never measured analog or WCET qualification. Current count/mask and
+ *       optional-source availability describe the cold-selected capabilities;
+ *       each callback separately identifies its actual captured phases.
+ */
 typedef struct {
+    uint64_t clock_epoch;
     uint32_t tick_hz;
     uint32_t period_ticks;
     uint32_t trigger_ticks;
     uint32_t minimum_duty_ticks;
     uint32_t maximum_duty_ticks;
     uint32_t scan_span_us;
+    uint32_t capture_begin_ticks;
+    uint32_t capture_end_ticks;
+    uint32_t deadtime_ticks;
+    uint32_t settling_ticks;
+    uint32_t aperture_ticks;
+    uint32_t conversion_ticks;
+    uint32_t irq_ticks;
+    uint32_t compute_ticks;
+    uint32_t rearm_ticks;
+    uint32_t commit_before_ticks;
     uint64_t completed_cycles;
+    uint8_t current_count;
+    uint8_t current_phase_mask;
+    bool bus_available;
+    bool encoder_available;
+    bool center_aligned;
+    bool dc_link;
     nx_result_t fault;
     bool running;
     bool quarantined;

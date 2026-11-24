@@ -204,6 +204,10 @@ SDK_TOOL_FILES = (
 )
 
 SDK_VERIFICATION_FILES = (
+    'cmake/package/verification/foc_control/CMakeLists.txt',
+    'cmake/package/verification/foc_control/main.c',
+    'cmake/package/verification/foc_control/native.toml',
+    'cmake/package/verification/foc_control/f407.toml',
     'cmake/package/verification/common_components/application.c',
     'cmake/package/verification/common_components/application.h',
     'cmake/package/verification/common_components/composition.c',

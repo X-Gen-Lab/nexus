@@ -2353,7 +2353,7 @@
         }
       }
     },
-    "pwm-adc-tim8": {
+    "pwm-adc-f407": {
       "controllers": {
         "PWM_ADC8": {
           "kind": "pwm_adc",
@@ -2383,6 +2383,31 @@
             "controller:ADC3",
             "timer:TIM8"
           ]
+        },
+        "PWM_ADC1": {
+          "kind": "pwm_adc",
+          "irq": [
+            "ADC_IRQn",
+            "TIM1_BRK_TIM9_IRQn"
+          ],
+          "pins": [
+            "PE9",
+            "PE8",
+            "PE11",
+            "PE10",
+            "PE13",
+            "PE12",
+            "PE15",
+            "PA4",
+            "PA5"
+          ],
+          "resources": [
+            "controller:TIM1",
+            "controller:ADC1",
+            "controller:ADC2",
+            "controller:ADC3",
+            "timer:TIM1"
+          ]
         }
       },
       "modes": {
@@ -2390,6 +2415,11 @@
           "modes": [
             "finite-regular-dma",
             "injected-control",
+            "injected-power-stage"
+          ]
+        },
+        "PWM_ADC1": {
+          "modes": [
             "injected-power-stage"
           ]
         }

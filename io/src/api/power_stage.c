@@ -16,6 +16,13 @@ static bool span(const void* p, size_t n, size_t alignment) {
 static bool overlap(const void* a, size_t an, const void* b, size_t bn) {
     return (uintptr_t)a < (uintptr_t)b + bn && (uintptr_t)b < (uintptr_t)a + an;
 }
+static bool contained(const void* owner, size_t owner_bytes, const void* member,
+                      size_t bytes, size_t alignment) {
+    const uintptr_t base = (uintptr_t)owner;
+    const uintptr_t begin = (uintptr_t)member;
+    return span(member, bytes, alignment) && begin >= base &&
+           bytes <= owner_bytes && begin - base <= owner_bytes - bytes;
+}
 static bool valid(const nx_power_stage_t* port) {
     return span(port, sizeof(*port), _Alignof(nx_power_stage_t)) &&
            span(port->ops, sizeof(*port->ops),
@@ -32,6 +39,9 @@ nx_result_t nx_power_stage_prepare(nx_power_stage_session_t* session,
         !span(initial, sizeof(*initial), _Alignof(nx_power_stage_plan_t)) ||
         !span(context, context_bytes, 1U) || compute == NULL ||
         startup_deadline == NX_DEADLINE_NEVER ||
+        (initial->dc != NULL &&
+         !contained(context, context_bytes, initial->dc, sizeof(*initial->dc),
+                    _Alignof(nx_power_stage_dc_plan_t))) ||
         overlap(session, sizeof(*session), initial, sizeof(*initial)) ||
         overlap(session, sizeof(*session), context, context_bytes) ||
         overlap(initial, sizeof(*initial), context, context_bytes))
@@ -56,7 +66,11 @@ nx_result_t nx_power_stage_start(const nx_power_stage_t* port,
         overlap(session->context, session->context_bytes, port,
                 sizeof(*port)) ||
         overlap(session->context, session->context_bytes, port->ops,
-                sizeof(*port->ops)))
+                sizeof(*port->ops)) ||
+        (session->initial.dc != NULL &&
+         !contained(session->context, session->context_bytes,
+                    session->initial.dc, sizeof(*session->initial.dc),
+                    _Alignof(nx_power_stage_dc_plan_t))))
         return NX_ERROR_INVALID;
     return port->ops->start == NULL ? NX_ERROR_UNSUPPORTED
                                     : port->ops->start(port->context, session);

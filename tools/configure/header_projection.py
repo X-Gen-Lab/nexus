@@ -53,17 +53,18 @@ class HeaderProjection:
             if name != name.lower():
                 fail("Build feature IDs require lowercase identifiers")
             source = feature.get("source") if isinstance(feature, Mapping) else None
-            if source not in ("controller", "endpoint", "option"):
+            option = source in {"option", "option_present"}
+            if source not in ("controller", "endpoint", "option", "option_present"):
                 fail("Build feature requires a controller, endpoint or option")
-            _fields(feature, {"source", "owners", "flag" if source == "option" else "modes"},
+            _fields(feature, {"source", "owners", "flag" if option else "modes"},
                     {"macro"})
-            for field in (("owners",) if source == "option" else ("owners", "modes")):
+            for field in (("owners",) if option else ("owners", "modes")):
                 items = feature[field]
                 if (not isinstance(items, list) or not items or
                         any(not isinstance(item, str) or not item for item in items)
                         or len(set(items)) != len(items)):
                     fail("Build feature requires distinct owners and modes")
-            if source == "option":
+            if option:
                 Symbol(feature["flag"])
             if "macro" in feature:
                 macro = feature["macro"]
@@ -126,9 +127,13 @@ class HeaderProjection:
             elif feature["source"] == "controller":
                 enabled = any(item.kind in owners and item.mode in feature["modes"]
                               for item in result.controllers)
-            else:
+            elif feature["source"] == "option":
                 enabled = any(item.kind in owners and
                     getattr(item.options, feature["flag"], None) is True
+                    for item in result.controllers)
+            else:
+                enabled = any(item.kind in owners and
+                    getattr(item.options, feature["flag"], None) is not None
                     for item in result.controllers)
             flags.append((name, enabled, feature.get("macro")))
         return tuple(flags)

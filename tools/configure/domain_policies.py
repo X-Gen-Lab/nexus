@@ -400,7 +400,7 @@ class DomainPolicies:
         if item.kind == "spi" and item.mode != "irq-frames":
             from tools.configure.spi_connections import binding_values
             values["spi"] = binding_values(item, configuration)
-        for name in ("ADC_GROUP", "CAPTURE_AUDIO", "SAI", "WAVEFORM", "EXTERNAL_BUS", "PACKET"):
+        for name in ("ADC_GROUP", "CAPTURE_AUDIO", "SAI", "WAVEFORM", "EXTERNAL_BUS", "PACKET", "COUPLED_IO"):
             policy = getattr(self, name)
             project = getattr(policy, "binding_values", None)
             if project is not None:

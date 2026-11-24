@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 from pathlib import Path
 
-CONSUMER_POLICY = "nexus-sdk-consumers-v32"
+CONSUMER_POLICY = "nexus-sdk-consumers-v34"
 BASE_CONSUMERS = (("native", False, "native"), ("stm32", True, "stm32"))
 MODERN_CONSUMERS = ()
 SELECTED_CONSUMERS = (
@@ -127,6 +127,13 @@ SERVICE_CONSUMERS = (
                     "arm-boot-swap", True, "mcuboot_swap"),
     ServiceConsumer("f407 freertos stop", "stop.toml",
                     "arm-freertos-stop", True, "f4_freertos_stop"),
+    ServiceConsumer("native foc composition", "native.toml",
+                    "native-foc-control", False, "foc_control"),
+    ServiceConsumer("f407 foc composition", "f407.toml",
+                    "arm-foc-control", True, "foc_control"),
+    *(ServiceConsumer(f"f407 power stage {mode}", f"{mode}.toml",
+                       f"arm-power-stage-{mode}", True, "f4_power_stage")
+      for mode in ("pair", "tdm", "dc")),
 )
 NATIVE_TIME_SMOKES = frozenset({"native-time-pair", "native-time-empty"})
 
@@ -154,7 +161,7 @@ def service_directory(sdk, specification):
     if specification.scenario == "f4_capture_audio":
         return Path(sdk) / "tests/contracts/f407_capture_audio"
     if specification.scenario in {"f4_pwm_adc", "f4_pwm_adc_loop",
-                                  "f4_freertos_stop"}:
+                                  "f4_freertos_stop", "f4_power_stage"}:
         return Path(sdk) / "tests/contracts" / specification.scenario.replace(
             "f4_", "f407_", 1)
     return (Path(sdk) / "tests/contracts" / ("stm32" + specification.scenario)
