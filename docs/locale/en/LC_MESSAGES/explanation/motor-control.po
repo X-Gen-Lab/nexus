@@ -7,13 +7,13 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 07eb84438f6613f43b3df8926f62295474f018add9a9ee7699c373e87cf83a2f\n"
+"X-Nexus-Source-SHA256: 0bba1033937d702b175ff70613289a22a349317b5fb6db32d3e238561807e388\n"
 
-#: ../../../../../docs/explanation/motor-control.md:9
+#: ../../../../docs/explanation/motor-control.md:9
 msgid "电机计算、轴目标与硬件执行"
 msgstr "Motor computation, axis targets and hardware execution"
 
-#: ../../../../../docs/explanation/motor-control.md:11
+#: ../../../../docs/explanation/motor-control.md:11
 msgid ""
 "Nexus 将电机计算、轴目标和硬件执行分别交给可选 C11 组件、外部应用桥和唯一 "
 "provider。本文说明当前软件合同及其成本，不把软件参考配置授予任何功率板、 电机或物理控制资格。"
@@ -24,7 +24,7 @@ msgstr ""
 "software reference does not qualify any power board, motor or physical "
 "controller."
 
-#: ../../../../../docs/explanation/motor-control.md:15
+#: ../../../../docs/explanation/motor-control.md:15
 msgid ""
 "当前生产接入范围限定为 STM32F4。GD32F470 与其他非 F4 MCU 不在本轮实现范围； 保留厂商依赖库存和公共接口边界，不建立占位 "
 "provider，也不据此声称跨厂商验证。"
@@ -34,17 +34,17 @@ msgstr ""
 "dependencies and public interface boundaries remain; no placeholder provider"
 " or cross-vendor qualification is claimed."
 
-#: ../../../../../docs/explanation/motor-control.md:18
+#: ../../../../docs/explanation/motor-control.md:18
 msgid "![FIG-35：电机与轴控制的调用和退出责任](../assets/diagrams/motor-control.svg)"
 msgstr ""
 "![FIG-35: Motor and axis control calls and withdrawal "
 "responsibilities](../assets/diagrams/motor-control.svg)"
 
-#: ../../../../../docs/explanation/motor-control.md:18
+#: ../../../../docs/explanation/motor-control.md:18
 msgid "FIG-35：电机与轴控制的调用和退出责任"
 msgstr "FIG-35: Motor and axis control calls and withdrawal responsibilities"
 
-#: ../../../../../docs/explanation/motor-control.md:20
+#: ../../../../docs/explanation/motor-control.md:20
 msgid ""
 "FIG-35 表达当前可选组合：实线是显式调用或数据交付，虚线是借用和退出责任。 图不要求应用启用全部节点；精确 F407ZG 参考、源路径和边界见 "
 "{ref}`图册 <fig-35-motor-control>`。"
@@ -55,126 +55,126 @@ msgstr ""
 "{ref}`diagram catalog <fig-35-motor-control>` for the exact F407ZG "
 "reference, source paths and limits."
 
-#: ../../../../../docs/explanation/motor-control.md:24
+#: ../../../../docs/explanation/motor-control.md:24
 msgid "由谁计算，由谁执行"
 msgstr "Who computes and who executes"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid "边界"
 msgstr "Boundary"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid "拥有的内容"
 msgstr "Owns"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid "外部应用仍负责"
 msgstr "The external application still owns"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid "`Nexus::MotorControl`"
 msgstr "`Nexus::MotorControl`"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid "有感电流计算、坐标变换、限制、调制计划及零偏候选"
 msgstr ""
 "Sensored current computation, coordinate transforms, limits, modulation "
 "plans and zero-offset candidates"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid "校准后的相电流、角度来源、电机参数和硬件提交"
 msgstr ""
 "Calibrated phase currents, angle sources, motor parameters and hardware "
 "submission"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid "`Nexus::AxisControl`"
 msgstr "`Nexus::AxisControl`"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid "目标准入、速度／位置参考、参数 revision 与软件采用事实"
 msgstr ""
 "Target admission, velocity/position references, parameter revisions and "
 "software adoption facts"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid "执行节拍、机械侧、命令授权和机构恢复"
 msgstr ""
 "Execution cadence, mechanical side, command authority and mechanism recovery"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid "`Nexus::CurrentControl`"
 msgstr "`Nexus::CurrentControl`"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid "标定身份、物理电流换算、实测／重构来源及观测检查"
 msgstr ""
 "Calibration identity, physical-current conversion, measured/reconstructed "
 "provenance and observation checks"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid "原始来源、零电流依据、周期关联和误差预算"
 msgstr ""
 "Raw sources, zero-current evidence, cycle association and error budgets"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid "`Nexus::ModulationControl`"
 msgstr "`Nexus::ModulationControl`"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid "整周期脉冲、有效采样窗口和最终量化电压"
 msgstr "Full-period pulses, valid capture windows and final quantized voltage"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid "硬件完整映射、实际模拟建立及 WCET"
 msgstr "Complete hardware mapping, actual analog settling and WCET"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid "`Nexus::DriveControl`"
 msgstr "`Nexus::DriveControl`"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid "有界参考交接、连续反馈分频、独立 inhibit 与可选功率预算计算"
 msgstr ""
 "Bounded reference exchange, continuous-feedback decimation, independent "
 "inhibit and optional power-budget calculation"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid "存储容量、执行者、完整控制组合和硬件保护"
 msgstr ""
 "Storage capacity, executors, complete control composition and hardware "
 "protection"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid "`Nexus::IOPowerStage`"
 msgstr "`Nexus::IOPowerStage`"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid "session、raw 观察、完整 tick 输出和退出合同"
 msgstr ""
 "Session, raw observations, complete tick output and withdrawal contract"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid "完整 callback context、校准桥和有限操作预算"
 msgstr ""
 "Complete callback context, calibration bridge and bounded operation budgets"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid "F4 provider"
 msgstr "F4 provider"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid "所选 TIM、ADC、可选角度观察、IRQ 与共享域的生命周期"
 msgstr ""
 "Lifecycle of selected TIMs, ADCs, optional angle observation, IRQs and "
 "shared domains"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid "经审核的板级授权、供电、模拟前端和功率能力"
 msgstr ""
 "Reviewed board authorization, supply, analog front end and power capability"
 
-#: ../../../../../docs/explanation/motor-control.md:36
+#: ../../../../docs/explanation/motor-control.md:36
 msgid ""
 "组件不创建堆、任务、全局时钟或电机注册表。控制数学不包含 HAL；provider 使用私有 厂商类型和经审核的硬件操作。组件 target "
 "仅在被明确链接时进入镜像，实例状态由 调用者提供，未选模式不承担其最大缓冲与运行状态。"
@@ -185,64 +185,64 @@ msgstr ""
 "explicitly linked. Callers supply instance state; unselected modes pay no "
 "maximum-buffer or runtime-state cost."
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid "执行入口"
 msgstr "Entry point"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid "合法上下文与推进"
 msgstr "Allowed context and progress"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid "Axis 命令、参数、step 与停止"
 msgstr "Axis commands, parameters, step and stopping"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid "同一个 Task 执行者；位置规划不进入 ADC IRQ"
 msgstr "One Task executor; position planning does not enter the ADC IRQ"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid "Motor step 与数学函数"
 msgstr "Motor step and mathematics"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid "单一执行者的 Task 或选定 IRQ，满足自身计算预算"
 msgstr ""
 "A single executor in Task or a selected IRQ, within its computation budget"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid "PowerStage prepare／start／service／stop"
 msgstr "PowerStage prepare/start/service/stop"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid "同一个 privileged、未屏蔽的 Task；显式推进"
 msgstr "One privileged, unmasked Task; progress is explicit"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid "PowerStage compute"
 msgstr "PowerStage compute"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid "仅选定 ADC IRQ；不等待 Task、不保存临时指针"
 msgstr ""
 "Only the selected ADC IRQ; no waiting for Tasks or retaining temporary "
 "pointers"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid "CANopen／CiA402"
 msgstr "CANopen/CiA402"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid "单个 Thread 执行者，先完成协议 step，再提供有效轴事实"
 msgstr ""
 "One Thread executor; complete the protocol step before supplying valid axis "
 "facts"
 
-#: ../../../../../docs/explanation/motor-control.md:48
+#: ../../../../docs/explanation/motor-control.md:48
 msgid "一份决定不等于一个物理结果"
 msgstr "A decision is not a physical result"
 
-#: ../../../../../docs/explanation/motor-control.md:50
+#: ../../../../docs/explanation/motor-control.md:50
 msgid ""
 "应用分别保留原始请求、受约束参考、软件采用、输出计划和测量。Axis 的 `adopted_at` 描述其执行者采用目标的时刻；Motor "
 "的输出是归一化 duty 和计划电压。 provider 接受完整 shadow 组，也不证明对应物理边沿已经发生。"
@@ -253,7 +253,7 @@ msgstr ""
 "and planned voltage. Even acceptance of a complete shadow group by the "
 "provider does not prove that the physical edge occurred."
 
-#: ../../../../../docs/explanation/motor-control.md:54
+#: ../../../../docs/explanation/motor-control.md:54
 msgid ""
 "`nx_motor_voltage_step` 单独产生电流环电压决策，不生成 duty，由选定调制器联合 "
 "决定开关和采样计划。`nx_motor_step` 保留固定 min/max 共模调制入口；调用者仍须 "
@@ -266,7 +266,7 @@ msgstr ""
 "and fault contracts; do not advance the same instance through both in one "
 "cycle."
 
-#: ../../../../../docs/explanation/motor-control.md:58
+#: ../../../../docs/explanation/motor-control.md:58
 msgid ""
 "位置、速度、电流、机械角、电角和转矩不能混用。齿比、编码器计数倍率、方向和极对数 分别有明确来源。应用桥将 Axis 选定机械侧的角度和速度换算为 "
 "Motor 要求的转子 机械侧，再由电机计算应用极对数；电流参考的单位是 A，不按齿比折算。没有核验转矩 常数与电流约定时，安培目标不能改名为转矩反馈。"
@@ -280,11 +280,11 @@ msgstr ""
 "verified torque constants and current conventions, an ampere target cannot "
 "be renamed torque feedback."
 
-#: ../../../../../docs/explanation/motor-control.md:63
+#: ../../../../docs/explanation/motor-control.md:63
 msgid "采样、观察与计划输出分别计时"
 msgstr "Time sampling, observation and planned output separately"
 
-#: ../../../../../docs/explanation/motor-control.md:65
+#: ../../../../docs/explanation/motor-control.md:65
 msgid ""
 "Motor 输入区分 `sample_time_us`、`angle_time_us`、`observed_at_us` 和 "
 "`apply_time_us`。角度可以在采样之后、观察之前取得，随后在明确误差预算内向采样 "
@@ -297,7 +297,7 @@ msgstr ""
 "valid mechanical velocity; a software-read time does not automatically "
 "become a sampling aperture."
 
-#: ../../../../../docs/explanation/motor-control.md:70
+#: ../../../../docs/explanation/motor-control.md:70
 msgid ""
 "当前 F407ZG `injected-power-stage` 维护下列软件配置。文件名的 single／dual 表示轴数，不表示分流拓扑："
 msgstr ""
@@ -305,15 +305,15 @@ msgstr ""
 "configurations. The names single/dual indicate axis count, not shunt "
 "topology:"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid "配置"
 msgstr "Configuration"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid "选定采集与资源"
 msgstr "Selected capture and resources"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid ""
 "[control.toml](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/tests/contracts/f407_power_stage/control.toml)"
@@ -321,15 +321,15 @@ msgstr ""
 "[control.toml](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/tests/contracts/f407_power_stage/control.toml)"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid "TIM8、ADC1 三相加母线顺序 rank、TIM4"
 msgstr "TIM8, ADC1 sequential three-phase plus bus ranks, TIM4"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid "原始三相不是同时采样"
 msgstr "The raw phases are not simultaneous measurements"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid ""
 "[single.toml](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/tests/contracts/f407_power_stage/single.toml)"
@@ -337,15 +337,15 @@ msgstr ""
 "[single.toml](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/tests/contracts/f407_power_stage/single.toml)"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid "单轴、ADC1 两路相电流，无必需母线／编码器"
 msgstr "One axis, two ADC1 phase currents, no mandatory bus/encoder"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid "角度和母线必须由有效的独立来源提供"
 msgstr "Angle and bus must come from valid independent sources"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid ""
 "[dual.toml](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/tests/contracts/f407_power_stage/dual.toml)"
@@ -353,15 +353,15 @@ msgstr ""
 "[dual.toml](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/tests/contracts/f407_power_stage/dual.toml)"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid "TIM8／ADC1 与 TIM1／ADC2，各自顺序采集；共享 common／IRQ"
 msgstr "TIM8/ADC1 and TIM1/ADC2, each sequential; shared common/IRQ"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid "不是同 ADC 时分或单轴双 ADC 同时采样"
 msgstr "Neither one-ADC time sharing nor single-axis simultaneous dual ADC"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid ""
 "[pair.toml](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/tests/contracts/f407_power_stage/pair.toml)"
@@ -369,19 +369,19 @@ msgstr ""
 "[pair.toml](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/tests/contracts/f407_power_stage/pair.toml)"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid "单轴 ADC1＋ADC2 injected simultaneous，各一 rank、相同采样配置"
 msgstr ""
 "Single axis, ADC1 + ADC2 injected simultaneous capture, one rank each with "
 "matching sample configuration"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid "独占共同域；无必需母线／编码器，不与独立 ADC2 轴混用"
 msgstr ""
 "Exclusive common domain; no mandatory bus/encoder; cannot coexist with an "
 "independent ADC2 axis"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid ""
 "[center.toml](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/tests/contracts/f407_power_stage/center.toml)"
@@ -389,17 +389,17 @@ msgstr ""
 "[center.toml](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/tests/contracts/f407_power_stage/center.toml)"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid "TIM8 完整载波、下降段 CC4、更新 IRQ 门控"
 msgstr "TIM8 full carrier, descending CC4 and update-IRQ gating"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid "专用 center 路线；不推导双轴中心对齐或任意脉冲相移"
 msgstr ""
 "Dedicated center route; no inferred dual-axis center alignment or arbitrary "
 "pulse shifts"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid ""
 "[tdm.toml](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/tests/contracts/f407_power_stage/tdm.toml)"
@@ -407,18 +407,18 @@ msgstr ""
 "[tdm.toml](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/tests/contracts/f407_power_stage/tdm.toml)"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid "TIM8／TIM1 两轴中心对齐、相差半载波，共用 ADC1"
 msgstr ""
 "TIM8/TIM1 center-aligned axes, nominally half a carrier apart, sharing ADC1"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid "固定双会话共同启动与显式容差；不与 simultaneous pair 组合，也不支持运行中加入"
 msgstr ""
 "Fixed joint startup of two sessions with explicit tolerance; no "
 "simultaneous-pair combination or hot join"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid ""
 "[dc.toml](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/tests/contracts/f407_power_stage/dc.toml)"
@@ -426,19 +426,19 @@ msgstr ""
 "[dc.toml](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/tests/contracts/f407_power_stage/dc.toml)"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid "单轴 ADC1 单路母线分流、边沿对齐、每载波两次有效矢量采集"
 msgstr ""
 "Single-axis ADC1 DC-link shunt, edge alignment and two active-vector "
 "observations per carrier"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid "无脉冲相移；必须提供合法非零首计划，零电压退化不产生可观测窗口"
 msgstr ""
 "No pulse shift; requires a valid nonzero initial plan; a degenerate zero-"
 "voltage request provides no observable window"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid ""
 "[fast.toml](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/tests/contracts/f407_power_stage/fast.toml)"
@@ -446,16 +446,16 @@ msgstr ""
 "[fast.toml](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/tests/contracts/f407_power_stage/fast.toml)"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid "20 kHz 载波与声明预算"
 msgstr "20 kHz carrier and declared budgets"
 
-#: ../../../../../docs/explanation/motor-control.md:0
+#: ../../../../docs/explanation/motor-control.md:0
 msgid "配置与链接不证明实际 WCET 或物理运行"
 msgstr ""
 "Configuration and linking do not prove actual WCET or physical operation"
 
-#: ../../../../../docs/explanation/motor-control.md:84
+#: ../../../../docs/explanation/motor-control.md:84
 msgid ""
 "`current_phase_mask` 标识真正测量的逻辑相位，未选槽填零不成为测量。只有 `bus_valid`／`encoder_valid` "
 "为真时，才能消费相应字段。`sample_at` 是计划触发 参考，`trigger_ticks` 保留细粒度载波坐标，`scan_span_us` "
@@ -469,7 +469,7 @@ msgstr ""
 "application composition qualifies sampling skew and angle estimation; "
 "relabeling timestamps cannot create synchronization."
 
-#: ../../../../../docs/explanation/motor-control.md:89
+#: ../../../../docs/explanation/motor-control.md:89
 msgid ""
 "DC-link profile 的相电流 count／mask 为零，`dc` 提供同一已采用计划的两个原始 "
 "母线电流码、开关矢量和计划采集坐标。`scan_span_us` 覆盖两触发间隔及末次转换， 不能把它解释为一条 ADC rank "
@@ -483,7 +483,7 @@ msgstr ""
 "application converts them using qualified bounded group timing. A separate "
 "DC-bus voltage source and DC-link shunt current are different measurements."
 
-#: ../../../../../docs/explanation/motor-control.md:94
+#: ../../../../docs/explanation/motor-control.md:94
 msgid ""
 "有效窗口同时受 duty、deadtime、模拟稳定时间、转换、IRQ 延迟、compute 和提交 预算约束。调制器的数学余量不能代替 "
 "provider 的窗口检查，更不能证明真实模拟 稳定时间。所选 provider 必须明确其完整映射能力，不能从数学规划推导中心对齐、 多 ADC "
@@ -497,11 +497,11 @@ msgstr ""
 "center alignment, simultaneous multi-ADC sampling, single shunt or "
 "sensorless commutation."
 
-#: ../../../../../docs/explanation/motor-control.md:99
+#: ../../../../docs/explanation/motor-control.md:99
 msgid "电流观测和调制共同规划"
 msgstr "Current observation and modulation are planned together"
 
-#: ../../../../../docs/explanation/motor-control.md:101
+#: ../../../../docs/explanation/motor-control.md:101
 msgid ""
 "Current 接收明确身份与 revision 的标定，把逻辑相位原始码换算为 A。独立测量的 "
 "三相可以检查相电流和；从两相重构第三相时，和为零是计算恒等式，不能作为独立 传感器诊断。单分流还必须关联同一已采用计划中的两个有效开关矢量。饱和、无效 "
@@ -515,7 +515,7 @@ msgstr ""
 "adopted plan. Saturation, invalid windows, excessive aperture skew or "
 "mismatched calibration identity cannot produce valid current."
 
-#: ../../../../../docs/explanation/motor-control.md:106
+#: ../../../../docs/explanation/motor-control.md:106
 msgid ""
 "时序明确分为 `NX_CURRENT_APERTURES_EXPLICIT` 和 `NX_CURRENT_APERTURES_BOUNDED`。 "
 "前者使用真实孔径，后者保留合格的组参考与正偏差上界，不读取或填造逐相孔径。 仅知道计划触发和 scan span "
@@ -528,7 +528,7 @@ msgstr ""
 " scheduled trigger and scan span are known; a software time proxy does not "
 "establish measured simultaneous capture."
 
-#: ../../../../../docs/explanation/motor-control.md:110
+#: ../../../../docs/explanation/motor-control.md:110
 msgid ""
 "Modulation 用整载波 tick 坐标共同确定脉宽、起点、采样窗口和最终理想平均电压。 模拟恢复、采样保持、ADC 占用和 CPU "
 "提交分别预算；没有有效窗口就拒绝，输出 保持不变。可选固定相移只是一种规划候选，实际 provider 必须完整映射脉冲起点 与采样安排，不得只取 "
@@ -542,7 +542,7 @@ msgstr ""
 "map pulse starts and capture arrangements completely, never taking duty "
 "alone or silently clamping again."
 
-#: ../../../../../docs/explanation/motor-control.md:115
+#: ../../../../docs/explanation/motor-control.md:115
 msgid ""
 "选定 provider 给出可用采集槽，规划器还要求触发、完整结果及 rearm 都留在该槽。 "
 "例如中心参考只开放下降段，不能选中数学上可观测但硬件未开放的上升段。"
@@ -552,7 +552,7 @@ msgstr ""
 "example, the center reference opens only the descending half; it cannot "
 "select a mathematically observable but unopened ascending half."
 
-#: ../../../../../docs/explanation/motor-control.md:118
+#: ../../../../docs/explanation/motor-control.md:118
 msgid ""
 "纯 C 规划的中心对齐、双／单分流能力不自动授予对应 F4 硬件模式。具体器件、 路线、capture profile、提交方式及验证范围仍由所选 "
 "provider 决定。"
@@ -561,34 +561,40 @@ msgstr ""
 "corresponding F4 hardware modes. The selected provider still determines "
 "exact parts, routes, capture profiles, submission and verification scope."
 
-#: ../../../../../docs/explanation/motor-control.md:121
+#: ../../../../docs/explanation/motor-control.md:121
 msgid ""
 "选定 F4 DC-link mapper 只接受边沿对齐、无相移的完整脉冲。首计划必须显式包含 两个独立有效矢量；中性等 duty "
 "不能建立采样。初始与后续 DC descriptor 均位于 声明的完整会话 context 内，不能指向 callback 栈；provider "
-"验证后复制，不保留 临时计划指针。零电压等退化要求若没有可观测窗口就返回 `UNSUPPORTED`，不能靠 "
-"虚构电流或隐含激励维持运行。固定相移仍只是规划候选，没有对应 mapper 就不开放。"
+"验证后复制，不保留 临时计划指针。规划器对没有可观测窗口的零电压等退化请求返回 "
+"`NX_ERROR_UNSUPPORTED`，不发布部分计划。provider 对非法首计划（包括中性等 duty）返回 "
+"`NX_ERROR_INVALID`，拒绝借用且不启动会话；两者不是同一种失败。 不能靠虚构电流或隐含激励维持运行。固定相移仍只是规划候选，没有对应 "
+"mapper 就不开放。"
 msgstr ""
 "The selected F4 DC-link mapper accepts only complete edge-aligned pulses "
 "without shifts. The initial plan must explicitly contain two independent "
 "active vectors; neutral equal duties cannot establish capture. Initial and "
 "subsequent DC descriptors reside in the complete declared session context, "
 "never callback stack storage. The provider validates and copies them without"
-" retaining temporary plan pointers. A degenerate request such as zero "
-"voltage returns `UNSUPPORTED` when no observable window exists; fabricated "
-"current or implicit excitation cannot keep it running. Fixed shifts remain "
-"planning candidates and are not exposed without a corresponding mapper."
+" retaining temporary plan pointers. For a degenerate request such as zero "
+"voltage without an observable window, the planner returns "
+"`NX_ERROR_UNSUPPORTED` without publishing a partial plan. The provider "
+"returns `NX_ERROR_INVALID` for an invalid initial plan, including neutral "
+"equal duties, without borrowing or starting the session. These are different"
+" failures. Fabricated current or implicit excitation cannot keep it running."
+" Fixed shifts remain planning candidates and are not exposed without a "
+"corresponding mapper."
 
-#: ../../../../../docs/explanation/motor-control.md:127
+#: ../../../../docs/explanation/motor-control.md:130
 msgid "三种期限保持独立"
 msgstr "Keep three kinds of deadline independent"
 
-#: ../../../../../docs/explanation/motor-control.md:129
+#: ../../../../docs/explanation/motor-control.md:132
 msgid "外部命令有效期决定旧运动参考还能否使用，重复帧和心跳不自动续期。"
 msgstr ""
 "External command validity determines whether an old motion reference remains"
 " usable. Repeated frames and heartbeats do not automatically renew it."
 
-#: ../../../../../docs/explanation/motor-control.md:130
+#: ../../../../docs/explanation/motor-control.md:133
 msgid ""
 "PowerStage 用单独的 `startup_deadline` 约束启动；非阻塞长期 session 的 `base.deadline` 为 "
 "`NX_DEADLINE_NEVER`，运行直到显式停止或故障。"
@@ -597,13 +603,13 @@ msgstr ""
 "nonblocking long-lived session uses `NX_DEADLINE_NEVER` for `base.deadline` "
 "and runs until explicit stop or fault."
 
-#: ../../../../../docs/explanation/motor-control.md:132
+#: ../../../../docs/explanation/motor-control.md:135
 msgid "service、清理尝试和维护使用各自有界执行；超时不能撤销借用或证明已经断能。"
 msgstr ""
 "Service, cleanup attempts and maintenance each have bounded execution. "
 "Timeout cannot revoke a borrow or prove deenergization."
 
-#: ../../../../../docs/explanation/motor-control.md:134
+#: ../../../../docs/explanation/motor-control.md:137
 msgid ""
 "Task 通过显式 service 推进启动及最终排空；选定 ADC IRQ 只执行有界 callback。 任务不得逐字段改动被 IRQ "
 "借用的算法状态。跨上下文目标与参数通过已有有界对象 交接，普通结构体复制不构成同步协议。软件只能在 callback 返回后检测其超预算， 不能用 "
@@ -617,11 +623,11 @@ msgstr ""
 "overrun only after it returns. A deadline cannot preempt computation that "
 "never returns."
 
-#: ../../../../../docs/explanation/motor-control.md:139
+#: ../../../../docs/explanation/motor-control.md:142
 msgid "参考、连续反馈和遥测各有通道"
 msgstr "References, continuous feedback and telemetry have separate channels"
 
-#: ../../../../../docs/explanation/motor-control.md:141
+#: ../../../../docs/explanation/motor-control.md:144
 msgid ""
 "Drive 使用调用者提供的固定容量 SPSC：一个 Task 发布完整有限参考，一个快环 执行者每步最多采用一条。队列满时拒绝，原始 receipt "
 "不随排队刷新。独立 inhibit 不等待参考队列空间；真正的硬件抑制和退出仍由 provider 完成。"
@@ -632,7 +638,7 @@ msgstr ""
 "Independent inhibit does not wait for reference space. The provider still "
 "performs actual hardware inhibition and withdrawal."
 
-#: ../../../../../docs/explanation/motor-control.md:145
+#: ../../../../docs/explanation/motor-control.md:148
 msgid ""
 "Drive 的参数 revision 标识停机初始化的 Motor profile，与 Axis 参数 revision "
 "分别管理。生产者只能交付完整记录，不能访问 IRQ 正在借用的 Motor 或 Drive。 参考接纳、快环采用、输出 staged "
@@ -644,7 +650,7 @@ msgstr ""
 "admission, fast adoption, staged output and physical results are separate "
 "observations."
 
-#: ../../../../../docs/explanation/motor-control.md:149
+#: ../../../../docs/explanation/motor-control.md:152
 msgid ""
 "反馈分频保留实际区间和快环覆盖，丢周期、区间断裂或队列溢出锁存故障，不能靠 读取旧记录或重编 sequence 修复。`accepted_iq_a` "
 "是某个 generation 采用的参考， 不是实测电流；下游 tracking 必须匹配原 Axis 决策，不能回算到更新的决策。 "
@@ -658,7 +664,7 @@ msgstr ""
 "uses a separate object and does not establish continuous-feedback "
 "qualification."
 
-#: ../../../../../docs/explanation/motor-control.md:154
+#: ../../../../docs/explanation/motor-control.md:157
 msgid ""
 "共母线预算计算分别限制消费与回生功率，不假定两轴相抵消。它只计算缩放；产品 提供带有效期的预算、实施限幅并反馈下游采用。供电吸收能力、制动硬件和机械 "
 "停车仍需实际证明，软件预算不充当快速过压／过流保护。"
@@ -670,11 +676,11 @@ msgstr ""
 "actual evidence; software budgets do not provide fast "
 "overvoltage/overcurrent protection."
 
-#: ../../../../../docs/explanation/motor-control.md:158
+#: ../../../../docs/explanation/motor-control.md:161
 msgid "标定资格与参数采用"
 msgstr "Calibration qualification and parameter adoption"
 
-#: ../../../../../docs/explanation/motor-control.md:160
+#: ../../../../docs/explanation/motor-control.md:163
 msgid ""
 "偏置、AFE 增益／方向、相序、编码器方向和电角偏移分别建立来源。稳定偏置、零 PWM 或输出关闭不能单独证明零电流。Current 的标定身份和 "
 "revision 只检查匹配， 不认证硬件，也不自行写存储或授予激励。外部组合默认未投入运行，必须先核对 实际传感链、电机与参数身份。"
@@ -687,7 +693,7 @@ msgstr ""
 "uncommissioned and first verify the actual sensor chain, motor and parameter"
 " identity."
 
-#: ../../../../../docs/explanation/motor-control.md:165
+#: ../../../../docs/explanation/motor-control.md:168
 msgid ""
 "运动参考运行中交接；Motor profile 和标定在退出并会合后重新初始化。Axis 按其 公共合同独立采用参数 "
 "revision，不能将其版本号当作 Drive 的停机 profile 版本。 持久化由普通维护路径处理；F407 控制期间不因此获得未审核的内部 "
@@ -700,11 +706,11 @@ msgstr ""
 "This does not authorize unreviewed internal Flash programming or erasure "
 "during F407 control."
 
-#: ../../../../../docs/explanation/motor-control.md:169
+#: ../../../../docs/explanation/motor-control.md:172
 msgid "每轴状态与共享硬件域"
 msgstr "Per-axis state and the shared hardware domain"
 
-#: ../../../../../docs/explanation/motor-control.md:171
+#: ../../../../docs/explanation/motor-control.md:174
 msgid ""
 "每轴分别拥有算法、会话、参数和故障。配置中的显式 `domain` 把共同 ADC 设置、 门钟和 IRQ 交给一个静态 owner。Factory "
 "只返回既有 face，不创建第二个 owner。 当前独立 ADC 共享域检查共同配置和串行计算预算；它没有合成动态调度器。"
@@ -715,7 +721,7 @@ msgstr ""
 " owner. The current independent-ADC domain checks common configuration and "
 "serial compute budgets; it synthesizes no dynamic scheduler."
 
-#: ../../../../../docs/explanation/motor-control.md:175
+#: ../../../../docs/explanation/motor-control.md:178
 msgid ""
 "同 ADC 时分参考由共同域明确持有当前 capture owner。两会话先完成接纳与准备， "
 "再按完整载波的固定半周期偏移启动；每个时隙覆盖转换、IRQ、计算和重新装载。 公共 ADC IRQ 只分发给已发布 "
@@ -732,7 +738,7 @@ msgstr ""
 " This selected implementation has production C model and ARM link evidence; "
 "startup tolerance and physical periods still require hardware verification."
 
-#: ../../../../../docs/explanation/motor-control.md:181
+#: ../../../../docs/explanation/motor-control.md:184
 msgid ""
 "共享域及其成员的生命周期操作使用同一个普通上下文执行者，或由应用显式共同 串行化；不能从每个 face 各自串行推导跨 Task "
 "并发启停。快环保持其单一执行者， 平台不为此添加隐藏 OS 锁。"
@@ -743,7 +749,7 @@ msgstr ""
 "lifecycle calls from different Tasks. The fast loop retains its sole "
 "executor; the platform adds no hidden OS lock."
 
-#: ../../../../../docs/explanation/motor-control.md:185
+#: ../../../../docs/explanation/motor-control.md:188
 msgid ""
 "停止一轴先抑制其输出、撤回采集与回调，再移除其发布资格。其他成员仍运行时， 不能复位共同 ADC 或 detach 整个 "
 "IRQ。最后一轴退出后才归还共同效果；恢复失败 保留逐项 receipt。共同模式不再可信时，所有受影响成员关闭准入并抑制输出。"
@@ -755,11 +761,11 @@ msgstr ""
 "common mode is no longer trustworthy, every affected member closes admission"
 " and inhibits output."
 
-#: ../../../../../docs/explanation/motor-control.md:189
+#: ../../../../docs/explanation/motor-control.md:192
 msgid "故障与退出沿着原 owner 完成"
 msgstr "Faults and withdrawal follow the original owner"
 
-#: ../../../../../docs/explanation/motor-control.md:191
+#: ../../../../docs/explanation/motor-control.md:194
 msgid ""
 "计算错误、角度过期、非法采样或完整输出失败关闭相应准入。Motor 算法故障不能 替代硬件抑制；应用仍按 PowerStage 合同 "
 "stop／service。输出关闭后，session 和 全部 context 仍保留到 acquire 观察 `SETTLED`。退出失败保持 "
@@ -773,7 +779,7 @@ msgstr ""
 " retains `QUARANTINED`: storage cannot be zeroed and reused, and restoring "
 "the same epoch value cannot masquerade as a new session."
 
-#: ../../../../../docs/explanation/motor-control.md:196
+#: ../../../../docs/explanation/motor-control.md:199
 msgid ""
 "受控减速依赖仍有效的反馈、供电和能量处理。硬件 stop 是输出与源撤回，不是机械 "
 "减速或功率隔离。升降承重、抱闸、机械回零和整机重新启动条件属于外部应用；电角 偏置、编码器参考和机械零位分别建立有效性。"
@@ -785,11 +791,11 @@ msgstr ""
 "external application. Electrical offset, encoder reference and mechanical "
 "zero establish their validity separately."
 
-#: ../../../../../docs/explanation/motor-control.md:200
+#: ../../../../docs/explanation/motor-control.md:203
 msgid "软件项目提供各自范围的证据"
 msgstr "Software projects provide evidence within their own scope"
 
-#: ../../../../../docs/explanation/motor-control.md:202
+#: ../../../../docs/explanation/motor-control.md:205
 msgid ""
 "独立示例仓库的双轮 SIL 运行实际 C 控制和独立 DC／机械模型；控制器只看模拟 "
 "传感器，验收器可以读取模型真值。轮速、里程计和地面真值分别报告。固定窗口缺样 不能填成零误差；课程参数只属于明确的教学 profile。"
@@ -800,7 +806,7 @@ msgstr ""
 "are reported separately. Missing samples in a fixed window cannot become "
 "zero error. Course parameters belong only to an explicit teaching profile."
 
-#: ../../../../../docs/explanation/motor-control.md:206
+#: ../../../../docs/explanation/motor-control.md:209
 msgid ""
 "`recipes/control/dual_motor_drive` 另用两个独立平均 PMSM 电气／机械模型，量化 ADC 与编码器反馈给实际 "
 "Axis／Drive／Current／Motor／Modulation 组合。电流、 速度和位置目标、Task 失联及单轴采样故障走同一生产 C "
@@ -813,7 +819,7 @@ msgstr ""
 "run through the same production C composition. This does not rename the "
 "earlier DC model or prove physical STM32F4 dual-axis timing."
 
-#: ../../../../../docs/explanation/motor-control.md:211
+#: ../../../../docs/explanation/motor-control.md:214
 msgid ""
 "`motor_drive` 可选 AS5047P Task 采集，通过独立有界角度通道交给快环；默认 消费者不因此链接 "
 "SPI。换坐标、重新绑定或复位通道前先会合 reader 和快环， 不得把旧缓存与新映射混用。整数位移是多圈权威，软件观察时间与实际孔径分开。"
@@ -826,7 +832,7 @@ msgstr ""
 "multiple turns; software observation time remains distinct from the actual "
 "aperture."
 
-#: ../../../../../docs/explanation/motor-control.md:215
+#: ../../../../docs/explanation/motor-control.md:218
 msgid ""
 "可选 INA226 母线来源同样由 Task 采集，每轴使用独立有界通道。有效期从实际 转换开始的保守时间下界计算，不能从 "
 "poll、发布或读取缓存的时刻续期；它不是 快速相电流采样或硬件过压保护。快环还要求母线资格覆盖计划输出边界，源故障 即使队列已满也独立关闭缓存准入。"
@@ -839,7 +845,7 @@ msgstr ""
 "through the planned output boundary; source faults independently close cache"
 " admission even when the queue is full."
 
-#: ../../../../../docs/explanation/motor-control.md:220
+#: ../../../../docs/explanation/motor-control.md:223
 msgid ""
 "`recipes/network/cia402_motor` 用同一个 Task 把真实 CANopen／CiA402 的选定 PV／绝对 PP "
 "接到该控制组合。实际 RPDO 的原始本地 receipt 产生有限候选，且 受独立产品授权限制；SDO、心跳和协议轮询不续期。PP 确认等待匹配的快环"
@@ -855,7 +861,7 @@ msgstr ""
 "Native composition delegates to the original CAN owner; failed withdrawal "
 "retains both protocol and drive loans."
 
-#: ../../../../../docs/explanation/motor-control.md:226
+#: ../../../../docs/explanation/motor-control.md:229
 msgid ""
 "PMSM 数学模型、生产 C 寄存器模型、ARM 链接、安装 SDK 消费和物理测量是不同 证据。DC 模型通过不授予 PMSM 或实板能力；当前物理 "
 "HIL 保持 `not_executed`。 MCSDK 不是自有控制核的依赖，尚未接入的后端也不占位声明为已支持。"
@@ -867,79 +873,362 @@ msgstr ""
 "owned kernel. Unintegrated backends are not advertised as supported "
 "placeholders."
 
-#: ../../../../../docs/explanation/motor-control.md:230
-msgid "本轮验收沿用 FOC 工作包，不建立另一套资格台账："
+#: ../../../../docs/explanation/motor-control.md:233
+msgid "当前交付能力映射"
+msgstr "Current delivery capability map"
+
+#: ../../../../docs/explanation/motor-control.md:235
+msgid "下表按当前已维护能力关联生产实现、合同测试和 ARM／SDK 消费入口； 支持范围以精确 profile 与执行证据为准。"
 msgstr ""
-"This iteration retains the FOC work packages rather than creating another "
-"qualification ledger:"
+"The table links currently maintained capabilities to production "
+"implementations, contract tests and ARM/SDK consumer entry points. Exact "
+"profiles and execution evidence determine the supported scope."
 
-#: ../../../../../docs/explanation/motor-control.md:0
-msgid "工作范围"
-msgstr "Work scope"
+#: ../../../../docs/explanation/motor-control.md:0
+msgid "当前能力"
+msgstr "Current capability"
 
-#: ../../../../../docs/explanation/motor-control.md:0
-msgid "必须分别证明"
-msgstr "Evidence required separately"
+#: ../../../../docs/explanation/motor-control.md:0
+msgid "生产 C"
+msgstr "Production C"
 
-#: ../../../../../docs/explanation/motor-control.md:0
-msgid "FOC-01～13：单轴与生命周期"
-msgstr "FOC-01–13: single axis and lifecycle"
+#: ../../../../docs/explanation/motor-control.md:0
+msgid "维护合同测试"
+msgstr "Maintained contract tests"
 
-#: ../../../../../docs/explanation/motor-control.md:0
-msgid "有效目标、真实区间反馈、正确计划、有限授权、最终退出"
+#: ../../../../docs/explanation/motor-control.md:0
+msgid "ARM／SDK 与消费者边界"
+msgstr "ARM/SDK and consumer boundaries"
+
+#: ../../../../docs/explanation/motor-control.md:0
+msgid "标定身份、两／三相换算与单分流重构"
 msgstr ""
-"Valid targets, real-interval feedback, correct plans, finite authority and "
-"final withdrawal"
+"Calibration identity, two/three-phase conversion and single-shunt "
+"reconstruction"
 
-#: ../../../../../docs/explanation/motor-control.md:0
-msgid "FOC-14～23：来源与共享执行"
-msgstr "FOC-14–23: sources and shared execution"
-
-#: ../../../../../docs/explanation/motor-control.md:0
-msgid "来源质量、完整映射、单轴退出不破坏另一轴、错代／迟到事件"
+#: ../../../../docs/explanation/motor-control.md:0
+msgid ""
+"[Current](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/components/control/current/src/current.c)"
 msgstr ""
-"Source quality, complete mapping, one axis stopping without harming the "
-"other, stale/late events"
+"[Current](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/components/control/current/src/current.c)"
 
-#: ../../../../../docs/explanation/motor-control.md:0
-msgid "FOC-24～26：组合消费者"
-msgstr "FOC-24–26: composition consumers"
-
-#: ../../../../../docs/explanation/motor-control.md:0
-msgid "共母线限制的实际实施、独立 PMSM 模型、协议到控制链"
+#: ../../../../docs/explanation/motor-control.md:0
+msgid ""
+"[电流测试](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/tests/google/components/current_control_test.cpp)"
 msgstr ""
-"Actual common-bus limitation, independent PMSM models and protocol-to-"
-"control integration"
+"[Current tests](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/tests/google/components/current_control_test.cpp)"
 
-#: ../../../../../docs/explanation/motor-control.md:0
-msgid "FOC-28～31：事实与拓扑"
-msgstr "FOC-28–31: facts and topologies"
-
-#: ../../../../../docs/explanation/motor-control.md:0
-msgid "配置负例、算法支持与 provider 支持分列、角度有效范围"
+#: ../../../../docs/explanation/motor-control.md:0
+msgid ""
+"[FOC SDK](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/cmake/package/verification/foc_control/README.md) 消费相电流；单分流另由外部 "
+"single consumer 消费"
 msgstr ""
-"Negative configurations, separate algorithm/provider support and angle "
-"validity ranges"
+"[FOC SDK](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/cmake/package/verification/foc_control/README.md) consumes phase-"
+"current observations; the external single consumer separately consumes "
+"single-shunt reconstruction"
 
-#: ../../../../../docs/explanation/motor-control.md:0
-msgid "FOC-33～36：成本与交付"
-msgstr "FOC-33–36: cost and delivery"
+#: ../../../../docs/explanation/motor-control.md:0
+msgid "电压决策与匹配周期 tracking"
+msgstr "Voltage decisions and matching-cycle tracking"
 
-#: ../../../../../docs/explanation/motor-control.md:0
-msgid "实际 ARM／内存／SDK 结果、当前文档与 HIL 工装"
-msgstr "Actual ARM/memory/SDK results, current documentation and HIL fixtures"
-
-#: ../../../../../docs/explanation/motor-control.md:0
-msgid "FOC-27、FOC-32：非 F4 接入"
-msgstr "FOC-27, FOC-32: non-F4 integration"
-
-#: ../../../../../docs/explanation/motor-control.md:0
-msgid "本轮不实施，不把接口预留称为跨厂商验证"
+#: ../../../../docs/explanation/motor-control.md:0
+msgid ""
+"[Motor](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/components/control/motor/src/motor.c)"
 msgstr ""
-"Outside this iteration; reserved interfaces do not establish cross-vendor "
-"verification"
+"[Motor](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/components/control/motor/src/motor.c)"
 
-#: ../../../../../docs/explanation/motor-control.md:241
+#: ../../../../docs/explanation/motor-control.md:0
+msgid ""
+"[电机测试](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/tests/google/components/motor_control_test.cpp)"
+msgstr ""
+"[Motor tests](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/tests/google/components/motor_control_test.cpp)"
+
+#: ../../../../docs/explanation/motor-control.md:0
+msgid "同一 FOC SDK consumer：Native 执行、F407 纯算法链接，不启动 PowerStage session"
+msgstr ""
+"The same FOC SDK consumer executes on Native and links pure algorithms for "
+"F407 without starting a PowerStage session"
+
+#: ../../../../docs/explanation/motor-control.md:0
+msgid "完整脉冲、采样窗口与最终量化电压"
+msgstr "Complete pulses, capture windows and final quantized voltage"
+
+#: ../../../../docs/explanation/motor-control.md:0
+msgid ""
+"[相电流规划](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/components/control/modulation/src/phase_shunt.c)、[单分流规划](https://github.com/X-Gen-"
+"Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/components/control/modulation/src/single_shunt.c)"
+msgstr ""
+"[Phase-current planning](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-SOURCE/components/control/modulation/src/phase_shunt.c), "
+"[Single-shunt planning](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-SOURCE/components/control/modulation/src/single_shunt.c)"
+
+#: ../../../../docs/explanation/motor-control.md:0
+msgid ""
+"[调制测试](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/tests/google/components/modulation_control_test.cpp)"
+msgstr ""
+"[Modulation tests](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-SOURCE/tests/google/components/modulation_control_test.cpp)"
+
+#: ../../../../docs/explanation/motor-control.md:0
+msgid ""
+"FOC SDK 选择 phase planner；外部 single consumer 选择 bus planner；未选 planner "
+"不因此进入镜像"
+msgstr ""
+"The FOC SDK selects the phase planner; the external single consumer selects "
+"the bus planner. This does not pull unselected planners into the image"
+
+#: ../../../../docs/explanation/motor-control.md:0
+msgid "有限命令、参考交接、连续反馈与 inhibit"
+msgstr "Finite commands, reference handoff, continuous feedback and inhibit"
+
+#: ../../../../docs/explanation/motor-control.md:0
+msgid ""
+"[Axis](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/components/control/axis/src/axis.c)、[Drive](https://github.com/X-Gen-"
+"Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/components/control/drive/src/drive.c)"
+msgstr ""
+"[Axis](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/components/control/axis/src/axis.c), "
+"[Drive](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/components/control/drive/src/drive.c)"
+
+#: ../../../../docs/explanation/motor-control.md:0
+msgid ""
+"[轴测试](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/tests/google/components/axis_control_test.cpp)、[交接测试](https://github.com/X-Gen-"
+"Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/tests/google/components/drive_control_test.cpp)"
+msgstr ""
+"[Axis tests](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/tests/google/components/axis_control_test.cpp), [Handoff "
+"tests](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/tests/google/components/drive_control_test.cpp)"
+
+#: ../../../../docs/explanation/motor-control.md:0
+msgid "FOC SDK 组合这条公共链；实际 Task／IRQ 分工由外部应用完成"
+msgstr ""
+"The FOC SDK composes this public chain; the external application supplies "
+"the actual Task/IRQ division"
+
+#: ../../../../docs/explanation/motor-control.md:0
+msgid "消费／回生独立预算与实际限流"
+msgstr "Separate motoring/regeneration budgets and applied current limits"
+
+#: ../../../../docs/explanation/motor-control.md:0
+msgid ""
+"[Drive](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/components/control/drive/src/drive.c)"
+msgstr ""
+"[Drive](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/components/control/drive/src/drive.c)"
+
+#: ../../../../docs/explanation/motor-control.md:0
+msgid "交接测试及外部双 PMSM 合同"
+msgstr "Handoff tests and external dual PMSM contracts"
+
+#: ../../../../docs/explanation/motor-control.md:0
+msgid ""
+"外部 [双 PMSM SIL](https://github.com/X-Gen-Lab/nexus-"
+"examples/blob/eeed791310a1bb6e471d044f7f16f3f542dbe641/recipes/control/dual_motor_drive/sil.c)"
+" 实施预算；不是物理母线保护或功耗测量"
+msgstr ""
+"External [dual PMSM SIL](https://github.com/X-Gen-Lab/nexus-"
+"examples/blob/eeed791310a1bb6e471d044f7f16f3f542dbe641/recipes/control/dual_motor_drive/sil.c)"
+" applies the budgets; it does not establish physical DC-bus protection or "
+"power measurement"
+
+#: ../../../../docs/explanation/motor-control.md:0
+msgid "F4 相电流、中心采集与独立 ADC 双轴"
+msgstr ""
+"F4 phase-current capture, center alignment and independent-ADC dual axes"
+
+#: ../../../../docs/explanation/motor-control.md:0
+msgid ""
+"[PowerStage owner](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-SOURCE/soc/stm32/stm32f4/drivers/pwm_adc/power_stage.c)"
+msgstr ""
+"[PowerStage owner](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-SOURCE/soc/stm32/stm32f4/drivers/pwm_adc/power_stage.c)"
+
+#: ../../../../docs/explanation/motor-control.md:0
+msgid ""
+"[生产 C 寄存器模型](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/tests/google/soc/power_stage_test.cpp)"
+msgstr ""
+"[Production C register model](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-SOURCE/tests/google/soc/power_stage_test.cpp)"
+
+#: ../../../../docs/explanation/motor-control.md:0
+msgid "上表 control／single／fast／center／dual 为冷态 ARM fixture，不据此声称实板快环运行"
+msgstr ""
+"The control/single/fast/center/dual entries above are cold ARM fixtures, not"
+" evidence of physical fast-loop execution"
+
+#: ../../../../docs/explanation/motor-control.md:0
+msgid "单轴双 ADC 同时采集"
+msgstr "Single-axis simultaneous capture with two ADCs"
+
+#: ../../../../docs/explanation/motor-control.md:0
+msgid ""
+"[ADC pair](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/soc/stm32/stm32f4/drivers/pwm_adc/adc_pair.c) 与 PowerStage owner"
+msgstr ""
+"[ADC pair](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/soc/stm32/stm32f4/drivers/pwm_adc/adc_pair.c) and the PowerStage "
+"owner"
+
+#: ../../../../docs/explanation/motor-control.md:0
+msgid ""
+"[pair 测试](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/tests/google/soc/adc_pair_test.cpp)及寄存器模型"
+msgstr ""
+"[Pair tests](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/tests/google/soc/adc_pair_test.cpp) and the register model"
+
+#: ../../../../docs/explanation/motor-control.md:0
+msgid "`pair.toml` 同时进入 ARM fixture 和规范 Source SDK consumer，仍不测实际孔径"
+msgstr ""
+"`pair.toml` is both an ARM fixture and a canonical Source SDK consumer; it "
+"still does not measure actual apertures"
+
+#: ../../../../docs/explanation/motor-control.md:0
+msgid "同 ADC 固定时隙双轴及共同退出"
+msgstr "Same-ADC fixed-slot dual axes and shared withdrawal"
+
+#: ../../../../docs/explanation/motor-control.md:0
+msgid "PowerStage owner"
+msgstr "PowerStage owner"
+
+#: ../../../../docs/explanation/motor-control.md:0
+msgid "寄存器模型的时隙归属、共同启动与单轴退出合同"
+msgstr ""
+"Register-model contracts for slot ownership, joint startup and single-axis "
+"withdrawal"
+
+#: ../../../../docs/explanation/motor-control.md:0
+msgid "`tdm.toml` 的 ARM／SDK 消费仅覆盖固定半载波参考，不开放 hot-join 或任意调度"
+msgstr ""
+"ARM/SDK consumption of `tdm.toml` covers only the fixed half-carrier "
+"reference, without hot join or arbitrary scheduling"
+
+#: ../../../../docs/explanation/motor-control.md:0
+msgid "DC-link 两观察、一次计算与完整提交"
+msgstr "Two DC-link observations, one computation and a complete commit"
+
+#: ../../../../docs/explanation/motor-control.md:0
+msgid ""
+"[采集叶](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/soc/stm32/stm32f4/drivers/pwm_adc/single_shunt.c)、[周期组装](https://github.com/X-Gen-"
+"Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/soc/stm32/stm32f4/drivers/pwm_adc/power_stage_dc.c)及 PowerStage owner"
+msgstr ""
+"[Capture leaf](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/soc/stm32/stm32f4/drivers/pwm_adc/single_shunt.c), [Cycle "
+"assembly](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/soc/stm32/stm32f4/drivers/pwm_adc/power_stage_dc.c) and the "
+"PowerStage owner"
+
+#: ../../../../docs/explanation/motor-control.md:0
+msgid ""
+"[采集测试](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/tests/google/soc/single_shunt_test.cpp)、[周期测试](https://github.com/X-Gen-"
+"Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/tests/google/soc/power_stage_dc_test.cpp)及寄存器模型"
+msgstr ""
+"[Capture tests](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/tests/google/soc/single_shunt_test.cpp), [Cycle "
+"tests](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/tests/google/soc/power_stage_dc_test.cpp) and the register model"
+
+#: ../../../../docs/explanation/motor-control.md:0
+msgid ""
+"`dc.toml` 的 ARM／SDK 消费只开放无相移边沿 profile；非零首计划和实际控制组合另由外部 single consumer 检验"
+msgstr ""
+"ARM/SDK consumption of `dc.toml` exposes only the unshifted edge profile; "
+"the external single consumer separately tests the nonzero initial plan and "
+"actual control composition"
+
+#: ../../../../docs/explanation/motor-control.md:0
+msgid "合格角度／母线来源、PMSM 与 CiA402 整机组合"
+msgstr ""
+"Qualified angle/DC-bus sources, PMSM and CiA402 application composition"
+
+#: ../../../../docs/explanation/motor-control.md:0
+msgid ""
+"外部 [控制组合](https://github.com/X-Gen-Lab/nexus-"
+"examples/blob/eeed791310a1bb6e471d044f7f16f3f542dbe641/recipes/control/motor_drive/control.c)、Task"
+" adapter 与 [CiA402 桥](https://github.com/X-Gen-Lab/nexus-"
+"examples/blob/eeed791310a1bb6e471d044f7f16f3f542dbe641/recipes/network/cia402_motor/cia402_motor.c)"
+msgstr ""
+"External [control composition](https://github.com/X-Gen-Lab/nexus-"
+"examples/blob/eeed791310a1bb6e471d044f7f16f3f542dbe641/recipes/control/motor_drive/control.c),"
+" Task adapters and the [CiA402 bridge](https://github.com/X-Gen-Lab/nexus-"
+"examples/blob/eeed791310a1bb6e471d044f7f16f3f542dbe641/recipes/network/cia402_motor/cia402_motor.c)"
+
+#: ../../../../docs/explanation/motor-control.md:0
+msgid ""
+"外部 [维护合同](https://github.com/X-Gen-Lab/nexus-"
+"examples/tree/eeed791310a1bb6e471d044f7f16f3f542dbe641/tests/apps/motor_control)"
+msgstr ""
+"External [maintained contracts](https://github.com/X-Gen-Lab/nexus-"
+"examples/tree/eeed791310a1bb6e471d044f7f16f3f542dbe641/tests/apps/motor_control)"
+
+#: ../../../../docs/explanation/motor-control.md:0
+msgid ""
+"`motor_drive` phase／single 有 ARM consumer；独立双 PMSM 与 CiA402 整机合同在 Native "
+"执行，不据此声明 F4 物理双轴或 CAN 网络通过"
+msgstr ""
+"`motor_drive` phase/single have ARM consumers; independent dual PMSM and "
+"CiA402 application contracts execute on Native, without establishing "
+"physical F4 dual-axis or CAN-network results"
+
+#: ../../../../docs/explanation/motor-control.md:251
+msgid ""
+"Source SDK 的对应关系由[现有消费计划](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-SOURCE/tools/maintenance/consumer_profiles.py) "
+"维护：`foc_control` 覆盖 Native／F407 公共算法组合，`f4_power_stage` 覆盖 pair／tdm／dc "
+"三个精确冷态装配。本表不另定义一份消费选择。"
+msgstr ""
+"The [existing consumer plan](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-SOURCE/tools/maintenance/consumer_profiles.py) maintains the "
+"Source SDK mapping: `foc_control` covers the Native/F407 public algorithm "
+"composition, and `f4_power_stage` covers the three exact pair/tdm/dc cold "
+"assemblies. This table does not define another consumer selection."
+
+#: ../../../../docs/explanation/motor-control.md:255
+msgid ""
+"ARM fixture 与 SDK 冷态 consumer 检验配置、公共接口、选编、链接和资源； [fixture "
+"main](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/tests/contracts/f407_power_stage/main.c) 不启动电驱 session。 寄存器模型执行真实 "
+"provider C，PMSM 模型执行控制组合；两者都不能证明真实 开关、采样孔径、IRQ 延迟或电气保护。物理 HIL 仍为 "
+"`not_executed`。 未列出的拓扑组合、固定相移 mapper、TDM 运行中加入及非 F4 provider 保持未开放。"
+msgstr ""
+"ARM fixtures and cold SDK consumers check configuration, public interfaces, "
+"source selection, linking and resources; the [fixture "
+"main](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/tests/contracts/f407_power_stage/main.c) does not start a drive "
+"session. Register models execute real provider C, while PMSM models execute "
+"the control composition. Neither establishes actual switching, sampling "
+"apertures, IRQ latency or electrical protection. Physical HIL remains "
+"`not_executed`. Unlisted topology combinations, fixed-shift mappers, TDM hot"
+" join and non-F4 providers remain unexposed."
+
+#: ../../../../docs/explanation/motor-control.md:261
 msgid ""
 "操作入口见[控制与智能器件](../guides/control-and-smart-devices.md)，权威公共声明见 [电机与轴 "
 "API](../reference/api/components/control.md)及 [耦合采样 "

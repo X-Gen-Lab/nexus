@@ -682,25 +682,10 @@ TEST_F(PowerStage, StateExposesTheActualColdEpochBeforeStartingAQueue) {
     ASSERT_EQ(nx_power_stage_state(&port, &state), NX_SUCCESS);
     EXPECT_EQ(state.clock_epoch, g_nx_stm32_system.time_epoch);
 }
-TEST_F(PowerStage, SharedDomainOwnsOnlySelectedAdcGatesAndRestoresCommon) {
-    nx_stm32_power_stage_t peer = {};
-    nx_stm32_power_stage_config_t peer_config = config;
-    nx_stm32_power_stage_domain_t domain = {};
-    nx_stm32_power_stage_t* members[] = {&owner, &peer};
-    const nx_stm32_power_stage_config_t* configurations[] = {&config,
-                                                             &peer_config};
-    const nx_stm32_power_stage_domain_config_t selected = {
-        members, configurations, 2U, false, 0U};
-    config.domain = &domain;
-    peer_config.domain = &domain;
-    peer_config.adc_index = 1U;
-    peer_config.pwm.controller = 1U;
-    peer_config.pwm.registers = &hardware.other_timer;
-    peer_config.analog.adc = &hardware.adc2;
-    peer_config.analog.peers[0] = &hardware.adc;
-    peer_config.analog.peers[1] = &hardware.adc3;
+TEST_F(SharedPowerStage,
+       SharedDomainOwnsOnlySelectedAdcGatesAndRestoresCommon) {
     hardware.common.CCR = ADC_CCR_ADCPRE_0;
-    ASSERT_EQ(nx_stm32_power_stage_domain_prepare(&domain, &selected),
+    ASSERT_EQ(nx_stm32_power_stage_domain_prepare(&domain, &selection),
               NX_SUCCESS);
     EXPECT_EQ(hardware.rcc.APB2ENR & (RCC_APB2ENR_ADC1EN | RCC_APB2ENR_ADC2EN |
                                       RCC_APB2ENR_ADC3EN),
@@ -876,7 +861,10 @@ TEST_F(PowerStage, WarmupStartsAfterTheActualConverterEnableWrite) {
 }
 class DcPowerStage : public PowerStage {
   protected:
-    nx_stm32_power_stage_dc_t dc_state = {};
+    union CaptureStorage {
+        nx_stm32_power_stage_dc_t capture;
+        nx_power_stage_state_t query;
+    } dc_storage = {};
     nx_stm32_power_stage_dc_config_t dc_config = {};
     void SetUp() override {
         PowerStage::SetUp();
@@ -889,7 +877,7 @@ class DcPowerStage : public PowerStage {
         config.maximum_duty_ticks = 70U;
         dc_config.capture = {&hardware.timer,         &hardware.adc, 0U, 0U,
                              config.trigger_selector, 100U,          4U, 6U};
-        dc_config.state = &dc_state;
+        dc_config.state = &dc_storage.capture;
         dc_config.settling_ticks = 3U;
         dc_config.aperture_ticks = 1U;
         config.dc = &dc_config;
@@ -978,14 +966,10 @@ TEST_F(DcPowerStage,
 }
 TEST_F(DcPowerStage,
        SelectedCaptureStorageCannotBeOverwrittenThroughStateOutput) {
-    union Storage {
-        nx_stm32_power_stage_dc_t capture;
-        nx_power_stage_state_t query;
-    } storage = {};
-    dc_config.state = &storage.capture;
     ASSERT_EQ(nx_stm32_power_stage_prepare(&owner, &config), NX_SUCCESS);
-    EXPECT_EQ(nx_power_stage_state(&port, &storage.query), NX_ERROR_INVALID);
+    EXPECT_EQ(nx_power_stage_state(&port, &dc_storage.query), NX_ERROR_INVALID);
 }
+
 TEST_F(DcPowerStage,
        CallbackDescriptorOutsideBorrowedContextFaultsWithoutPublishing) {
     dc_running();

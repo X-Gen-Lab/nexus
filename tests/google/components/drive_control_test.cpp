@@ -405,9 +405,13 @@ TEST(DriveFeedback, ConsecutiveControlRecordsRoundTripWithoutPayloadTearing) {
             std::this_thread::yield();
             continue;
         }
+        const float expected_iq = static_cast<float>(i);
+        /* This handoff preserves float bits; ULP tolerance could hide tearing.
+         */
         if (result != NX_SUCCESS || out.mechanical.sequence != i ||
             out.reference_generation != i ||
-            out.accepted_iq_a != static_cast<float>(i) ||
+            std::memcmp(&out.accepted_iq_a, &expected_iq,
+                        sizeof(expected_iq)) != 0 ||
             out.fast_last_cycle != i * 2U + 2U) {
             failed.store(true);
             break;
