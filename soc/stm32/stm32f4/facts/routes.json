@@ -18398,6 +18398,445 @@
           "controller:TIM12"
         ]
       }
+    },
+    {
+      "id": "tim8-power-stage-adc1",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "controller": "PWM_ADC8",
+      "kind": "pwm_adc",
+      "pins": [
+        {
+          "pin": "PC6",
+          "function": "ch1",
+          "af": 3
+        },
+        {
+          "pin": "PA7",
+          "function": "ch1n",
+          "af": 3
+        },
+        {
+          "pin": "PC7",
+          "function": "ch2",
+          "af": 3
+        },
+        {
+          "pin": "PB0",
+          "function": "ch2n",
+          "af": 3
+        },
+        {
+          "pin": "PC8",
+          "function": "ch3",
+          "af": 3
+        },
+        {
+          "pin": "PB1",
+          "function": "ch3n",
+          "af": 3
+        },
+        {
+          "pin": "PA6",
+          "function": "bkin",
+          "af": 3
+        },
+        {
+          "pin": "PA0",
+          "function": "adc0",
+          "af": 0
+        },
+        {
+          "pin": "PA1",
+          "function": "adc1",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "injected-power-stage"
+      ],
+      "dma": [],
+      "source": "RM0090 TIM1/TIM8 CH4 injected trigger and independent ADC1/ADC2; DS8626 LQFP144 selected AF1/AF3 complementary pairs and break. Two sequential current ranks; no encoder, bus rank, physical PCB or timing qualification."
+    },
+    {
+      "id": "tim1-power-stage-adc2",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "controller": "PWM_ADC1",
+      "kind": "pwm_adc",
+      "pins": [
+        {
+          "pin": "PE9",
+          "function": "ch1",
+          "af": 1
+        },
+        {
+          "pin": "PE8",
+          "function": "ch1n",
+          "af": 1
+        },
+        {
+          "pin": "PE11",
+          "function": "ch2",
+          "af": 1
+        },
+        {
+          "pin": "PE10",
+          "function": "ch2n",
+          "af": 1
+        },
+        {
+          "pin": "PE13",
+          "function": "ch3",
+          "af": 1
+        },
+        {
+          "pin": "PE12",
+          "function": "ch3n",
+          "af": 1
+        },
+        {
+          "pin": "PE15",
+          "function": "bkin",
+          "af": 1
+        },
+        {
+          "pin": "PA4",
+          "function": "adc4",
+          "af": 0
+        },
+        {
+          "pin": "PA5",
+          "function": "adc5",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "injected-power-stage"
+      ],
+      "dma": [],
+      "source": "RM0090 TIM1/TIM8 CH4 injected trigger and independent ADC1/ADC2; DS8626 LQFP144 selected AF1/AF3 complementary pairs and break. Two sequential current ranks; no encoder, bus rank, physical PCB or timing qualification."
+    },
+    {
+      "id": "tim8-power-stage-adc1-center",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "controller": "PWM_ADC8",
+      "kind": "pwm_adc",
+      "pins": [
+        {
+          "pin": "PC6",
+          "function": "ch1",
+          "af": 3
+        },
+        {
+          "pin": "PA7",
+          "function": "ch1n",
+          "af": 3
+        },
+        {
+          "pin": "PC7",
+          "function": "ch2",
+          "af": 3
+        },
+        {
+          "pin": "PB0",
+          "function": "ch2n",
+          "af": 3
+        },
+        {
+          "pin": "PC8",
+          "function": "ch3",
+          "af": 3
+        },
+        {
+          "pin": "PB1",
+          "function": "ch3n",
+          "af": 3
+        },
+        {
+          "pin": "PA6",
+          "function": "bkin",
+          "af": 3
+        },
+        {
+          "pin": "PA0",
+          "function": "adc0",
+          "af": 0
+        },
+        {
+          "pin": "PA1",
+          "function": "adc1",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "injected-power-stage"
+      ],
+      "dma": [],
+      "source": "RM0090 TIM8 center carrier with explicit update-IRQ gating of the injected external trigger; TIM8_UP_TIM13 IRQ and TIM13 peer are exclusively reserved. DS8626 selected LQFP144 pins. Two sequential current ranks; software only, no physical timing or power PCB qualification.",
+      "mode_resources": {
+        "injected-power-stage": [
+          "irq:TIM8_UP_TIM13_IRQn",
+          "controller:TIM13"
+        ]
+      }
+    },
+    {
+      "id": "tim8-power-stage-dual-adc",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "controller": "PWM_ADC8",
+      "kind": "pwm_adc",
+      "pins": [
+        {
+          "pin": "PC6",
+          "function": "ch1",
+          "af": 3
+        },
+        {
+          "pin": "PA7",
+          "function": "ch1n",
+          "af": 3
+        },
+        {
+          "pin": "PC7",
+          "function": "ch2",
+          "af": 3
+        },
+        {
+          "pin": "PB0",
+          "function": "ch2n",
+          "af": 3
+        },
+        {
+          "pin": "PC8",
+          "function": "ch3",
+          "af": 3
+        },
+        {
+          "pin": "PB1",
+          "function": "ch3n",
+          "af": 3
+        },
+        {
+          "pin": "PA6",
+          "function": "bkin",
+          "af": 3
+        },
+        {
+          "pin": "PA0",
+          "function": "adc0",
+          "af": 0
+        },
+        {
+          "pin": "PA1",
+          "function": "adc1",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "injected-power-stage"
+      ],
+      "dma": [],
+      "source": "RM0090 ADC1/ADC2 injected simultaneous mode (MULTI=5), TIM8 CH4 external trigger on the master; ADC1 channel0 and ADC2 channel1, equal sampling times. DS8626 PA0/PA1 analog inputs and TIM8 complementary route. Software reference only; no measured aperture or PCB qualification."
+    },
+    {
+      "id": "tim8-power-stage-adc1-tdm",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "controller": "PWM_ADC8",
+      "kind": "pwm_adc",
+      "pins": [
+        {
+          "pin": "PC6",
+          "function": "ch1",
+          "af": 3
+        },
+        {
+          "pin": "PA7",
+          "function": "ch1n",
+          "af": 3
+        },
+        {
+          "pin": "PC7",
+          "function": "ch2",
+          "af": 3
+        },
+        {
+          "pin": "PB0",
+          "function": "ch2n",
+          "af": 3
+        },
+        {
+          "pin": "PC8",
+          "function": "ch3",
+          "af": 3
+        },
+        {
+          "pin": "PB1",
+          "function": "ch3n",
+          "af": 3
+        },
+        {
+          "pin": "PA6",
+          "function": "bkin",
+          "af": 3
+        },
+        {
+          "pin": "PA0",
+          "function": "adc0",
+          "af": 0
+        },
+        {
+          "pin": "PA1",
+          "function": "adc1",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "injected-power-stage"
+      ],
+      "dma": [],
+      "source": "RM0090 TIM1/TIM8 center carriers, update IRQ gating, ADC1 injected sequential ranks and half-carrier software phase slots. DS8626 selected LQFP144 pins. Software reference; no physical timing, power PCB or safety qualification.",
+      "mode_resources": {
+        "injected-power-stage": [
+          "irq:TIM8_UP_TIM13_IRQn",
+          "controller:TIM13"
+        ]
+      }
+    },
+    {
+      "id": "tim1-power-stage-adc1-tdm",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "controller": "PWM_ADC1",
+      "kind": "pwm_adc",
+      "pins": [
+        {
+          "pin": "PE9",
+          "function": "ch1",
+          "af": 1
+        },
+        {
+          "pin": "PE8",
+          "function": "ch1n",
+          "af": 1
+        },
+        {
+          "pin": "PE11",
+          "function": "ch2",
+          "af": 1
+        },
+        {
+          "pin": "PE10",
+          "function": "ch2n",
+          "af": 1
+        },
+        {
+          "pin": "PE13",
+          "function": "ch3",
+          "af": 1
+        },
+        {
+          "pin": "PE12",
+          "function": "ch3n",
+          "af": 1
+        },
+        {
+          "pin": "PE15",
+          "function": "bkin",
+          "af": 1
+        },
+        {
+          "pin": "PA4",
+          "function": "adc4",
+          "af": 0
+        },
+        {
+          "pin": "PA5",
+          "function": "adc5",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "injected-power-stage"
+      ],
+      "dma": [],
+      "source": "RM0090 TIM1/TIM8 center carriers, update IRQ gating, ADC1 injected sequential ranks and half-carrier software phase slots. DS8626 selected LQFP144 pins. Software reference; no physical timing, power PCB or safety qualification.",
+      "mode_resources": {
+        "injected-power-stage": [
+          "irq:TIM1_UP_TIM10_IRQn",
+          "controller:TIM10"
+        ]
+      }
+    },
+    {
+      "id": "tim8-power-stage-dc-link",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "controller": "PWM_ADC8",
+      "kind": "pwm_adc",
+      "pins": [
+        {
+          "pin": "PC6",
+          "function": "ch1",
+          "af": 3
+        },
+        {
+          "pin": "PA7",
+          "function": "ch1n",
+          "af": 3
+        },
+        {
+          "pin": "PC7",
+          "function": "ch2",
+          "af": 3
+        },
+        {
+          "pin": "PB0",
+          "function": "ch2n",
+          "af": 3
+        },
+        {
+          "pin": "PC8",
+          "function": "ch3",
+          "af": 3
+        },
+        {
+          "pin": "PB1",
+          "function": "ch3n",
+          "af": 3
+        },
+        {
+          "pin": "PA6",
+          "function": "bkin",
+          "af": 3
+        },
+        {
+          "pin": "PA0",
+          "function": "adc0",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "injected-power-stage"
+      ],
+      "dma": [],
+      "source": "RM0090 TIM8 edge/upcount carrier, immediate CC4 reference, ADC1 one injected DC-link rank, update-IRQ first arm and JEOC second rearm. Complete session plans must prove two active-vector windows. DS8626 selected LQFP144 pins. Software reference; no physical aperture, power PCB or safety qualification.",
+      "mode_resources": {
+        "injected-power-stage": [
+          "irq:TIM8_UP_TIM13_IRQn",
+          "controller:TIM13"
+        ]
+      }
     }
   ]
 }

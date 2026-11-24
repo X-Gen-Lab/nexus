@@ -446,6 +446,10 @@ class Construction:
 
 def owned_claims(result, owners):
     """Instance names never acquire Board/SoC reservations or kernel claims."""
+    owners = set(owners)
+    owners.update("power-stage-domain:" + domain.id
+        for domain in getattr(result, "power_stage_domains", ())
+        if owners.intersection(domain.members))
     return (claim for claim in result.resource_plan.claims
             if claim.mode not in {"reserved", "kernel"} and
             owners.intersection(claim.owner.split(";")))

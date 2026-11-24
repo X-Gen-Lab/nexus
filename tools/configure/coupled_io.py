@@ -4,8 +4,14 @@ from dataclasses import dataclass
 
 from tools.configure.calls import Symbol
 from tools.configure.pinmux import NumericPinMuxPolicy
-from tools.configure.providers.common import fail, integer
+from tools.configure.providers.common import fail, integer, normalize_resource
 from tools.configure.records import freeze
+
+
+def _conversion_cycles(row, sample_times):
+    cycles = tuple(row["sample_cycles"][sample] + row["conversion_cycles"]
+                   for sample in sample_times)
+    return max(cycles) if row.get("power_stage", {}).get("pair") else sum(cycles)
 
 
 @dataclass(frozen=True)
@@ -54,15 +60,110 @@ class CoupledIoPolicy:
                 integer(cycles, 1, context="Coupled sample cycles")
             if "power_stage" in row:
                 power = row["power_stage"]
-                if (not isinstance(power, Mapping) or set(power) != {
-                        "encoder", "minimum_deadtime_ticks", "deadtime_ranges",
-                        "tick_multiple", "max_encoder_filter", "guard_us"}):
-                    fail("Power stage route requires exact encoder/timing facts")
-                Symbol(power["encoder"])
+                required_power = {"minimum_deadtime_ticks", "deadtime_ranges",
+                    "tick_multiple", "guard_us", "capture", "hardware", "domain",
+                    "alignments"}
+                if (not isinstance(power, Mapping) or
+                        not required_power.issubset(power) or
+                        set(power) - required_power - {"encoder", "max_encoder_filter",
+                                                       "pair", "dc"}):
+                    fail("Power stage route requires exact capture/timing facts")
+                if ("encoder" in power) != ("max_encoder_filter" in power):
+                    fail("Power stage angle route requires encoder and filter facts")
+                if "encoder" in power:
+                    Symbol(power["encoder"])
+                    integer(power["max_encoder_filter"], 0,
+                            context="Power stage encoder filter maximum")
                 for name in ("minimum_deadtime_ticks", "tick_multiple", "guard_us"):
                     integer(power[name], 1, context="Power stage " + name)
-                integer(power["max_encoder_filter"], 0,
-                        context="Power stage encoder filter maximum")
+                capture = power["capture"]
+                if (not isinstance(capture, Mapping) or set(capture) != {
+                        "current_count", "current_phase_mask", "sample_bus",
+                        "adc_index", "trigger_selector"}):
+                    fail("Power stage requires exact capture facts")
+                dc = power.get("dc")
+                count = integer(capture["current_count"], 0, 3,
+                                "Power stage current count")
+                mask = integer(capture["current_phase_mask"], 0, 7,
+                               "Power stage measured phase mask")
+                if dc is not None:
+                    if (not isinstance(dc, Mapping) or set(dc) != {"rearm_guard_us"}
+                            or count != 0 or mask != 0 or capture["sample_bus"] or
+                            power.get("pair") is not None or
+                            len(row["channels"]) != 1):
+                        fail("Power stage DC-link requires one independent bus converter")
+                    integer(dc["rearm_guard_us"], 1, context="DC-link rearm guard")
+                elif count not in {2, 3} or mask.bit_count() != count:
+                    fail("Power stage current count and phase mask differ")
+                if type(capture["sample_bus"]) is not bool:
+                    fail("Power stage bus capture requires a boolean")
+                index = integer(capture["adc_index"], 0, 255,
+                                "Power stage ADC index")
+                integer(capture["trigger_selector"], 0, 0xffffffff,
+                        "Power stage trigger selector")
+                if dc is None and len(row["channels"]) != count + int(capture["sample_bus"]):
+                    fail("Power stage rank count differs from its capture profile")
+                hardware = power["hardware"]
+                if (not isinstance(hardware, Mapping) or set(hardware) != {
+                        "timer_index", "break_irq", "break_bank", "break_mask",
+                        "peer0", "peer1", "break_handler", "update_handler"}):
+                    fail("Power stage requires exact private timer facts")
+                integer(hardware["timer_index"], 0, 255, "Power stage timer index")
+                integer(hardware["break_mask"], 1, 0xffff, "Power stage break mask")
+                Symbol(hardware["break_irq"])
+                Symbol(hardware["break_bank"])
+                Symbol(hardware["break_handler"])
+                Symbol(hardware["update_handler"])
+                Symbol(hardware["peer0"])
+                Symbol(hardware["peer1"])
+                domain = power["domain"]
+                if (not isinstance(domain, Mapping) or set(domain) != {
+                        "id", "resources", "state_type", "config_type", "admit",
+                        "prepare", "close", "adc_irq", "handler",
+                        "member_state_type", "member_config_type", "converters",
+                        "time_shared"}):
+                    fail("Power stage requires exact physical domain wiring")
+                if type(domain["time_shared"]) is not bool:
+                    fail("Power stage domain time_shared requires a boolean")
+                for name in set(domain) - {"resources", "converters", "time_shared"}:
+                    Symbol(domain[name])
+                converters = domain["converters"]
+                if (not isinstance(converters, (tuple, list)) or
+                        not converters or len(converters) > 256 or
+                        any(type(name) is not str for name in converters) or
+                        len(set(converters)) != len(converters)):
+                    fail("Power stage domain requires ordered distinct converters")
+                for name in converters:
+                    Symbol(name)
+                if index >= len(converters) or converters[index] != row["adc"]:
+                    fail("Power stage ADC index differs from its declared converter")
+                if (not isinstance(power["alignments"], (tuple, list)) or
+                        not power["alignments"] or
+                        any(type(item) is not str for item in power["alignments"]) or
+                        len(set(power["alignments"])) != len(power["alignments"]) or
+                        set(power["alignments"]) - {"edge", "center"}):
+                    fail("Power stage requires reviewed carrier alignments")
+                if (not isinstance(domain["resources"], (tuple, list)) or
+                        not domain["resources"] or
+                        len(set(domain["resources"])) != len(domain["resources"])):
+                    fail("Power stage domain requires distinct physical resources")
+                for resource in domain["resources"]:
+                    if not isinstance(resource, str):
+                        fail("Power stage domain resource requires an identity")
+                    normalize_resource(resource)
+                if not {"controller:" + name for name in converters}.issubset(
+                        domain["resources"]):
+                    fail("Power stage domain must own its declared converters")
+                pair = power.get("pair")
+                if pair is not None:
+                    if (not isinstance(pair, Mapping) or set(pair) != {"converters"} or
+                            not isinstance(pair["converters"], (tuple, list)) or
+                            len(pair["converters"]) != 2 or
+                            len(set(pair["converters"])) != 2 or
+                            not set(pair["converters"]).issubset(converters) or
+                            pair["converters"][0] != row["adc"] or count != 2 or
+                            capture["sample_bus"]):
+                        fail("Power stage pair requires two reviewed current converters")
                 if not isinstance(power["deadtime_ranges"], (list, tuple)):
                     fail("Power stage requires exact deadtime encoding ranges")
                 for limits in power["deadtime_ranges"]:
@@ -86,7 +187,7 @@ class CoupledIoPolicy:
             if (owner["kind"] != "pwm_adc" or
                     not set(row["resources"]).issubset(owner.get("resources", ()))):
                 fail("Coupled I/O must own its physical controller resources")
-            if ("power_stage" in row and
+            if ("power_stage" in row and "encoder" in row["power_stage"] and
                     row["power_stage"]["encoder"] not in soc["controllers"]):
                 fail("Power stage encoder must be an explicit physical controller")
 
@@ -130,7 +231,8 @@ class CoupledIoPolicy:
         if power is not None:
             return
         if {"minimum_duty_ticks", "maximum_duty_ticks", "settling_ticks",
-                "compute_budget_us", "encoder_filter"}.intersection(selected):
+                "compute_budget_us", "encoder_filter", "domain",
+                "center_aligned", "phase_offset_ticks", "start_tolerance_us"}.intersection(selected):
             fail("Ordinary coupled mode does not accept power-stage-only fields")
         if selected["mode"] == "injected-control":
             if budgets - selected.keys():
@@ -149,20 +251,38 @@ class CoupledIoPolicy:
     def _validate_power_stage(selected, facts, period):
         """Validate declared output-window geometry, not a physical waveform."""
         required = {"minimum_duty_ticks", "maximum_duty_ticks", "settling_ticks",
-                    "compute_budget_us", "max_irq_delay_us", "encoder_filter",
-                    "commit_before_ticks"}
+                    "compute_budget_us", "max_irq_delay_us", "commit_before_ticks"}
+        if "encoder" in facts:
+            required.add("encoder_filter")
         if required - selected.keys():
             fail("Power stage requires explicit " +
                  ", ".join(sorted(required - selected.keys())))
         if "compute_budget_ticks" in selected:
             fail("Power stage uses compute_budget_us, not a legacy loop budget")
+        center = selected.get("center_aligned", False)
+        if type(center) is not bool:
+            fail("Power stage center_aligned requires a boolean")
+        alignment = "center" if center else "edge"
+        if alignment not in facts["alignments"]:
+            fail("Power stage alignment is outside the reviewed route")
+        timing = {"phase_offset_ticks", "start_tolerance_us"}
+        if facts["domain"]["time_shared"]:
+            if timing - selected.keys():
+                fail("Power stage time-shared axes require explicit phase and tolerance")
+            integer(selected["phase_offset_ticks"], 0, period - 1,
+                    "Power stage phase offset")
+            integer(selected["start_tolerance_us"], 1, 0xffffffff,
+                    "Power stage startup tolerance")
+        elif timing.intersection(selected):
+            fail("Power stage time-shared fields require a reviewed time-shared route")
         minimum = integer(selected["minimum_duty_ticks"], 1, period - 1,
                           "Power stage minimum duty")
         maximum = integer(selected["maximum_duty_ticks"], minimum + 1, period - 1,
                           "Power stage maximum duty")
         settling = integer(selected["settling_ticks"], 1, period - 1,
                            "Power stage settling window")
-        if maximum + settling >= selected["trigger_ticks"]:
+        if (facts.get("dc") is None and not center and
+                maximum + settling >= selected["trigger_ticks"]):
             fail("Power stage output and settling must precede its sample window")
         deadtime = integer(selected["deadtime_ticks"],
                            facts["minimum_deadtime_ticks"],
@@ -174,14 +294,30 @@ class CoupledIoPolicy:
                 context="Power stage compute budget")
         integer(selected["max_irq_delay_us"], 1,
                 context="Power stage IRQ delay budget")
-        integer(selected["encoder_filter"], 0, facts["max_encoder_filter"],
-                "Power stage encoder filter")
+        if "encoder" in facts:
+            integer(selected["encoder_filter"], 0, facts["max_encoder_filter"],
+                    "Power stage encoder filter")
+        elif "encoder_filter" in selected:
+            fail("Power stage without an angle route rejects encoder_filter")
+        if facts.get("pair") is not None and (
+                not isinstance(selected["sample_times"], (tuple, list)) or
+                len(selected["sample_times"]) != 2 or
+                selected["sample_times"][0] != selected["sample_times"][1]):
+            fail("Power stage simultaneous sampling requires matching apertures")
         integer(selected["commit_before_ticks"], 1, period - 2,
                 "Power stage commit boundary")
         multiple = facts["tick_multiple"]
         if selected["tick_hz"] % multiple:
             fail("Power stage tick_hz must preserve its declared timing unit")
         divisor = selected["tick_hz"] // multiple
+        if center:
+            if period % 2:
+                fail("Power stage center carrier requires an even full period")
+            if (selected["trigger_ticks"] <= period // 2 +
+                    (selected["max_irq_delay_us"] + 2) * divisor):
+                fail("Power stage center update gate cannot precede the trigger")
+            if selected["trigger_ticks"] + settling >= period - maximum // 2:
+                fail("Power stage center sampling exceeds the low-side window")
         if (period < 4 * divisor or
                 selected["commit_before_ticks"] > period - 2 * divisor):
             fail("Power stage commit boundary requires two complete timing units")
@@ -202,18 +338,24 @@ class CoupledIoPolicy:
         tick = selected["tick_hz"]
         if timer % tick or not 1 <= timer // tick <= row["prescaler_max"]:
             fail("Coupled tick must exactly divide its timer clock")
-        cycles = sum(row["sample_cycles"][sample] + row["conversion_cycles"]
-                     for sample in selected["sample_times"])
+        cycles = _conversion_cycles(row, selected["sample_times"])
         if cycles * tick >= selected["period_ticks"] * adc:
             fail("Coupled ADC scan does not fit within one PWM period")
         if "power_stage" in row:
             power = row["power_stage"]
             deadtime_ticks = (selected["deadtime_ticks"] * tick + timer - 1) // timer
-            if (selected["maximum_duty_ticks"] + deadtime_ticks +
+            edge = selected["maximum_duty_ticks"]
+            if selected.get("center_aligned", False):
+                edge //= 2
+            if (power.get("dc") is None and edge + deadtime_ticks +
                     selected["settling_ticks"] >= selected["trigger_ticks"]):
                 fail("Power stage deadtime/settling exceeds its sample window")
             conversion_us = (cycles * 1000000 + adc - 1) // adc
             conversion = (conversion_us * tick + 999999) // 1000000
+            if (selected.get("center_aligned", False) and
+                    selected["trigger_ticks"] + conversion +
+                    selected["settling_ticks"] >= selected["period_ticks"] - edge):
+                fail("Power stage center sampling conversion exceeds its window")
             budget = ((selected["max_irq_delay_us"] +
                        selected["compute_budget_us"] + power["guard_us"]) *
                       tick + 999999) // 1000000
@@ -236,6 +378,153 @@ class CoupledIoPolicy:
         if mode not in row["modes"]:
             fail("Coupled DMA mode is outside the reviewed route")
         return row["dma"]
+
+    def resolve_fields(self, selected, route, clock_plan):
+        """Capture meaning comes from the reviewed route, never MCU switches."""
+        from tools.configure.validation import identity
+        from tools.configure.ir import PowerStageDcIR, PowerStagePairIR
+        row = self.route(route)
+        power = row["power_stage"]
+        adc = clock_plan["domains"][row["adc_clock_domain"]]["nominal_hz"]
+        cycles = _conversion_cycles(row, selected["sample_times"])
+        span = (cycles * 1000000 + adc - 1) // adc
+        to_ticks = lambda us: (us * selected["tick_hz"] + 999999) // 1000000
+        dc = power.get("dc")
+        timer_hz = clock_plan["domains"][row["timer_clock_domain"]]["nominal_hz"]
+        deadtime = (selected["deadtime_ticks"] * selected["tick_hz"] +
+                    timer_hz - 1) // timer_hz
+        return {**power["capture"],
+            "encoder_filter": selected.get("encoder_filter"),
+            "center_aligned": selected.get("center_aligned", False),
+            "domain": identity(selected.get("domain", selected["id"]),
+                               "power stage domain"),
+            "scan_span_us": span,
+            "pair": (PowerStagePairIR(tuple(power["pair"]["converters"]))
+                     if power.get("pair") is not None else None),
+            "dc": (PowerStageDcIR(to_ticks(dc["rearm_guard_us"]),
+                    to_ticks(span + selected["max_irq_delay_us"]), to_ticks(span),
+                    deadtime + selected["settling_ticks"])
+                   if dc is not None else None)}
+
+    def domain_resources(self, selected, route):
+        """One static domain owns common/IRQ effects across its selected axes."""
+        if selected["mode"] != "injected-power-stage":
+            return ()
+        return self.route(route)["power_stage"]["domain"]["resources"]
+
+    def domain_facts(self, route):
+        return self.route(route)["power_stage"]["domain"]
+
+    def resolve_domains(self, selected):
+        """Freeze finite static groups; no dynamic scheduler is synthesized."""
+        from tools.configure.ir import PowerStageDomainIR
+        grouped = {}
+        for item in selected:
+            if item["kind"] == "pwm_adc" and item["mode"] == "injected-power-stage":
+                grouped.setdefault(item["domain"], []).append(item)
+        result = []
+        for name, members in grouped.items():
+            first = members[0]
+            row = self.routes[first["route"]]
+            facts = row["power_stage"]["domain"]
+            carrier = tuple(first[key] for key in
+                            ("tick_hz", "period_ticks", "center_aligned"))
+            if any(item["dc"] is not None for item in members) and (
+                    len(members) != 1 or facts["time_shared"]):
+                fail("Power stage DC-link capture requires an exclusive domain")
+            indices = set()
+            for item in members:
+                power = self.routes[item["route"]]["power_stage"]
+                if power["domain"] != facts:
+                    fail("Power stage domain requires one physical wiring contract")
+                if tuple(item[key] for key in
+                         ("tick_hz", "period_ticks", "center_aligned")) != carrier:
+                    fail("Power stage domain carrier settings must agree")
+                if item["irq_priority"] != first["irq_priority"]:
+                    fail("Power stage domain IRQ priorities must agree")
+                if not facts["time_shared"] and item["adc_index"] in indices:
+                    fail("Power stage domain requires distinct independent ADC slots")
+                indices.add(item["adc_index"])
+            timing = self._resolve_slots(members) if facts["time_shared"] else None
+            if not facts["time_shared"] and len(members) != 1 and any(
+                    item["pair"] is not None for item in members):
+                fail("Power stage paired capture requires an exclusive domain")
+            if timing is None:
+                self._validate_serial_windows(members)
+                for item in members:
+                    item["slot"] = None
+            result.append(PowerStageDomainIR(name, facts["id"],
+                tuple(item["id"] for item in members),
+                *(facts[key] for key in ("state_type", "config_type",
+                    "member_state_type", "member_config_type", "admit",
+                    "prepare", "close", "adc_irq", "handler")), timing))
+        return tuple(result)
+
+    def _validate_serial_windows(self, members):
+        """Independent converters still serialize callbacks on their common IRQ."""
+        total = sum(item["compute_budget_us"] for item in members)
+        delay = max(item["max_irq_delay_us"] for item in members)
+        for item in members:
+            power = self.routes[item["route"]]["power_stage"]
+            budget = ((total + delay + power["guard_us"]) * item["tick_hz"] +
+                      999999) // 1000000
+            scan = (item["scan_span_us"] * item["tick_hz"] + 999999) // 1000000
+            if item["trigger_ticks"] + scan + budget >= item["commit_before_ticks"]:
+                fail("Power stage domain serial compute budget exceeds a window")
+
+    def _resolve_slots(self, members):
+        """Prove two circular capture-to-rearm windows do not overlap."""
+        from tools.configure.ir import PowerStageSlotIR, PowerStageTimingIR
+        if len(members) != 2 or not all(item["center_aligned"] for item in members):
+            fail("Power stage time-shared domain requires two center-aligned axes")
+        first = members[0]
+        period = first["period_ticks"]
+        if {item["phase_offset_ticks"] for item in members} != {0, period // 2}:
+            fail("Power stage time-shared slots require half-carrier phase offsets")
+        if first["phase_offset_ticks"] != 0:
+            fail("Power stage time-shared first member must establish zero phase")
+        tolerance = first["start_tolerance_us"]
+        if any(item["start_tolerance_us"] != tolerance for item in members):
+            fail("Power stage time-shared startup tolerance must agree")
+        if any(item["adc_index"] != first["adc_index"] or
+               item["pair"] != first["pair"] for item in members):
+            fail("Power stage time-shared slots require the same converter route")
+        intervals = []
+        for item in members:
+            scale = item["tick_hz"]
+            offset = item["phase_offset_ticks"]
+            if offset * 1000000 % scale:
+                fail("Power stage time-shared phase requires complete timing units")
+            # Each Core-to-carrier anchor contributes one microsecond quantum.
+            margin = ((tolerance + 2) * scale + 999999) // 1000000
+            begin = period // 2 + offset - margin
+            # Conversion, callback and rearm retain the shared converter owner.
+            span_us = (item["scan_span_us"] + item["max_irq_delay_us"] +
+                       item["compute_budget_us"] +
+                       self.routes[item["route"]]["power_stage"]["guard_us"])
+            end = (item["trigger_ticks"] + offset + margin +
+                   (span_us * scale + 999999) // 1000000)
+            intervals.append((begin, end))
+        (a, b), (c, d) = intervals
+        if any(max(a, c + shift) <= min(b, d + shift)
+               for shift in (-period, 0, period)):
+            fail("Power stage time slots overlap their capture-to-rearm intervals")
+        timing = PowerStageTimingIR(tolerance)
+        for item in members:
+            item["slot"] = PowerStageSlotIR(item.pop("phase_offset_ticks"), timing)
+            item.pop("start_tolerance_us")
+        return timing
+
+    def binding_values(self, item, configuration=None):
+        del configuration
+        if item.kind != "pwm_adc" or item.mode != "injected-power-stage":
+            return None
+        row = self.routes[item.route]
+        power = row["power_stage"]
+        return {"power_stage": {**power["hardware"],
+            "timer": row["timer"], "adc": row["adc"],
+            "encoder": power.get("encoder"),
+            "has_encoder": "encoder" in power}}
 
 
 def validate_soc(soc, provider):

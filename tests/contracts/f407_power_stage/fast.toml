@@ -1,0 +1,29 @@
+# 20 kHz declaration/budget fixture; compute/IRQ bounds are not measured.
+schema = 2
+board_package = "domain_board"
+backend = "baremetal"
+clock = "hse8-pll168"
+
+[memory]
+main_stack_bytes = 3072
+libc_heap_bytes = 0
+
+[pwm_adc.drive]
+binding = "left"
+domain = "current"
+mode = "injected-power-stage"
+tick_hz = 1000000
+period_ticks = 50
+trigger_ticks = 30
+deadtime_ticks = 84
+minimum_duty_ticks = 1
+maximum_duty_ticks = 20
+settling_ticks = 2
+commit_before_ticks = 48
+compute_budget_us = 5
+max_irq_delay_us = 2
+channels = [0, 1]
+sample_times = [0, 0]
+reference_mv = 3300
+exclusive = true
+irq = { priority = 5, calls_os = false }

@@ -89,6 +89,20 @@ COMMIT_ALIASES = {
     "cmake/package/package_source_sdk.py": (
         "tools/testing/test_sdk_profile_policy.py",
         "tools/testing/test_sdk_export_ownership.py"),
+    "tools/configure/coupled_assembly.py": (
+        "tools/configure/tests/test_power_stage_domains.py",
+        "tools/configure/tests/test_power_stage.py",
+        "tools/configure/tests/test_bindings.py",
+        "tools/configure/tests/test_controller_integration.py",
+        "tools/configure/tests/test_device_graph_stage.py",
+        "tools/configure/tests/test_static_ir.py",
+        "tools/configure/tests/test_static_calls.py",
+        "tools/configure/tests/test_platform_lifecycle.py",
+        "tools/configure/tests/test_factory_includes.py",
+        "tools/configure/tests/test_factory_features.py",
+        "tools/configure/tests/test_ir_unification.py",
+        "tools/configure/tests/test_runtime.py",
+        "tools/configure/tests/test_header_projection.py"),
 }
 
 

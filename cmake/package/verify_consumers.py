@@ -319,7 +319,7 @@ def service_sources(sdk, specification):
         elif specification.scenario == "f4_qspi_mapped":
             consumer = verification / "mapped_consumer.c"
         elif specification.scenario in {"f4_pwm_adc", "f4_pwm_adc_loop",
-                                        "f4_freertos_stop"}:
+                                        "f4_freertos_stop", "f4_power_stage"}:
             consumer = verification / "main.c"
         else:
             consumer = verification / "consumer.c"
@@ -337,6 +337,8 @@ def service_sources(sdk, specification):
     if specification.scenario == "image_window":
         return {"main.c": verification / "main.c",
                 "layout.json": verification / "layout.json"}
+    if specification.scenario == "foc_control":
+        return {"main.c": verification / "main.c"}
     if specification.scenario == "smbus":
         return {"main.c": verification / "services.c",
                 "board/board.json": verification / "board/board.json"}
@@ -425,7 +427,9 @@ def prepare_service_consumer(prefix, directory, specification, run_checked, *,
         "f4_sai": "",
         "f4_pwm_adc": "",
         "f4_pwm_adc_loop": "",
+        "f4_power_stage": "",
         "f4_freertos_stop": "",
+        "foc_control": "Nexus::DriveControl Nexus::CurrentControl Nexus::ModulationControl",
     }
     selected_setup = ""
     if specification.scenario == "common_components":
@@ -835,6 +839,24 @@ def secure_service_symbols(specification):
 def service_symbols(specification):
     """Required linked methods come from the exact immutable scenario entry."""
     service_profile(specification)
+    if specification.scenario == "f4_power_stage":
+        symbols = {"nx_platform_start", "nx_platform_stop",
+                   "nx_factory_power_stage", "nx_power_stage_state",
+                   "nx_stm32_power_stage_prepare",
+                   "nx_stm32_power_stage_domain_prepare"}
+        if specification.assembly == "pair.toml":
+            symbols.add("nx_stm32_adc_pair_prepare")
+        elif specification.assembly == "dc.toml":
+            symbols.update({"nx_stm32_power_stage_dc_prepare",
+                            "nx_stm32_single_shunt_prepare"})
+        return frozenset(symbols)
+    if specification.scenario == "foc_control":
+        return frozenset({"nx_platform_start", "nx_platform_stop",
+                          "nx_axis_initialize", "nx_axis_step",
+                          "nx_drive_initialize", "nx_drive_step",
+                          "nx_drive_reference_publish", "nx_drive_inhibit",
+                          "nx_drive_track_voltage", "nx_current_convert",
+                          "nx_modulation_phase_plan", "nx_motor_voltage_step"})
     if specification.scenario == "smart_components":
         return frozenset({"nx_platform_start", "nx_platform_stop",
                           "nx_cmsis_nn_dense_s8", "arm_fully_connected_s8",
@@ -985,6 +1007,18 @@ def service_symbols(specification):
 
 def service_scope(specification):
     """Describe the executed software boundary without physical claims."""
+    if specification.scenario == "f4_power_stage":
+        return ("Selected F407 paired, fixed-slot shared-ADC or edge DC-link "
+                "provider source closure, strong factory and cold lifecycle "
+                "ARM link and resources only. No live control session is "
+                "started. No physical current sampling, motor actuation, "
+                "measured timing, stack high-water mark or HIL qualification.")
+    if specification.scenario == "foc_control":
+        return ("Public C11 synthetic Axis-to-reference-to-Drive cycle with "
+                "calibrated current conversion, phase-shunt planning and "
+                "final voltage tracking. Native execution or F407 ARM link "
+                "and resources. No physical power stage, motor, sampling "
+                "aperture, measured timing or HIL qualification.")
     if specification.scenario == "smart_components":
         return ("Public C11 CMSIS-NN known-vector execution and optional adapter "
                 "metadata/rejected admission. No sensor, signing, CANopen node "

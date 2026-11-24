@@ -1,0 +1,29 @@
+# One DC-link channel; complete two-active-vector plans are session-owned.
+schema = 2
+board_package = "domain_board"
+backend = "baremetal"
+clock = "hse8-pll168"
+
+[memory]
+main_stack_bytes = 3072
+libc_heap_bytes = 0
+
+[pwm_adc.drive]
+binding = "dc"
+domain = "current"
+mode = "injected-power-stage"
+tick_hz = 1000000
+period_ticks = 1000
+trigger_ticks = 600
+deadtime_ticks = 84
+minimum_duty_ticks = 25
+maximum_duty_ticks = 800
+settling_ticks = 25
+commit_before_ticks = 990
+compute_budget_us = 100
+max_irq_delay_us = 120
+channels = [0]
+sample_times = [0]
+reference_mv = 3300
+exclusive = true
+irq = { priority = 5, calls_os = false }

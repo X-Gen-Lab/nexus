@@ -26,6 +26,7 @@ class SDKFactoryTemplateTests(unittest.TestCase):
                   / "platform-compatibility.json")
         policy.parent.mkdir(parents=True)
         shutil.copyfile(ROOT / "dependencies/platform-compatibility.json", policy)
+        self.epoch = json.loads(policy.read_text())["factory_abi_epoch"]
 
     def test_base_c_and_cpp_consumers_use_nominal_references(self):
         for name, arm, chip in (("native", False, "stm32"),
@@ -38,18 +39,18 @@ class SDKFactoryTemplateTests(unittest.TestCase):
                     code = (source / filename).read_text()
                     self.assertIn('#include "nexus_factory_strong.h"', code)
                     self.assertIn("nx_factory_gpio_ref(NX_GPIO_REF_COUNT)", code)
-                    self.assertIn('#if NEXUS_FACTORY_ABI_EPOCH != 6U', code)
+                    self.assertIn(f'#if NEXUS_FACTORY_ABI_EPOCH != {self.epoch}U', code)
 
     def test_explicit_version_still_binds_the_installed_policy_epoch(self):
         policy = (self.prefix / "share/nexus/src/dependencies"
                   / "platform-compatibility.json")
         value = json.loads(policy.read_text())
-        value["factory_abi_epoch"] = 7
+        value["factory_abi_epoch"] = self.epoch + 1
         policy.write_text(json.dumps(value))
         source, _, _ = CONSUMERS.prepare_consumer(
             self.prefix, self.root, "selected-policy", lambda _: None,
             version=value["semantic_version"])
-        self.assertIn('#if NEXUS_FACTORY_ABI_EPOCH != 7U',
+        self.assertIn(f'#if NEXUS_FACTORY_ABI_EPOCH != {self.epoch + 1}U',
                       (source / "main.c").read_text())
 
     def test_base_consumer_compiles_without_a_gpio_factory(self):

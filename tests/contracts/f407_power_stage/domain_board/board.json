@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "id": "f407zg-dual-power-stage-software-reference",
+  "soc": "STM32F407ZGT6",
+  "soc_family": "stm32f4",
+  "source_revision": "software-v1",
+  "physical_pcb_revision": null,
+  "clocks": {
+    "hse_hz": 8000000
+  },
+  "bindings": [
+    {
+      "id": "left",
+      "controller": "PWM_ADC8",
+      "route": "tim8-power-stage-adc1"
+    },
+    {
+      "id": "right",
+      "controller": "PWM_ADC1",
+      "route": "tim1-power-stage-adc2"
+    },
+    {
+      "id": "left_center",
+      "controller": "PWM_ADC8",
+      "route": "tim8-power-stage-adc1-center"
+    },
+    {
+      "id": "pair",
+      "controller": "PWM_ADC8",
+      "route": "tim8-power-stage-dual-adc"
+    },
+    {
+      "id": "left_tdm",
+      "controller": "PWM_ADC8",
+      "route": "tim8-power-stage-adc1-tdm"
+    },
+    {
+      "id": "right_tdm",
+      "controller": "PWM_ADC1",
+      "route": "tim1-power-stage-adc1-tdm"
+    },
+    {
+      "id": "dc",
+      "controller": "PWM_ADC8",
+      "route": "tim8-power-stage-dc-link"
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14"
+  ],
+  "unknowns": [
+    "Software route only; no reviewed power PCB or attached motors",
+    "Independent ADC1/ADC2 sequences share common configuration and IRQ",
+    "No physical aperture, switching, protection or execution-time qualification"
+  ],
+  "provenance": [
+    {
+      "url": "https://www.st.com/resource/en/reference_manual/dm00031020.pdf",
+      "scope": "RM0090 TIM1/TIM8 CH4 injected triggers, independent ADC1/ADC2, shared ADC IRQ and common prescaler."
+    },
+    {
+      "url": "https://www.st.com/resource/en/datasheet/stm32f407vg.pdf",
+      "scope": "DS8626 LQFP144 AF3 TIM8 output pairs and PA6 BKIN; AF1 PE8..PE15 TIM1 output pairs and BKIN; PA0/1 ADC1 and PA4/5 ADC2."
+    }
+  ]
+}

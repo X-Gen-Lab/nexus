@@ -12,7 +12,7 @@ from tools.configure import stream_profiles, uart_formats, usb_profiles
 from tools.configure.calls import Symbol
 from tools.configure import usb_otg
 
-FACTORY_ABI_EPOCH = 6
+FACTORY_ABI_EPOCH = 7
 
 KINDS = CONTROLLER_KINDS
 

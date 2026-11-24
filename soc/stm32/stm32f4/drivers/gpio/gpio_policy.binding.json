@@ -335,6 +335,21 @@
           "apb1_clocks": [
             "RCC_APB1ENR_TIM7EN"
           ]
+        },
+        "ADC1": {
+          "apb2_clocks": [
+            "RCC_APB2ENR_ADC1EN"
+          ]
+        },
+        "ADC2": {
+          "apb2_clocks": [
+            "RCC_APB2ENR_ADC2EN"
+          ]
+        },
+        "ADC3": {
+          "apb2_clocks": [
+            "RCC_APB2ENR_ADC3EN"
+          ]
         }
       },
       "resource_gates": {

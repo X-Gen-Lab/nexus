@@ -269,7 +269,1153 @@
             ],
             "tick_multiple": 1000000,
             "max_encoder_filter": 15,
-            "guard_us": 4
+            "guard_us": 4,
+            "capture": {
+              "current_count": 3,
+              "current_phase_mask": 7,
+              "sample_bus": true,
+              "adc_index": 0,
+              "trigger_selector": 917504
+            },
+            "hardware": {
+              "timer_index": 8,
+              "break_irq": "TIM8_BRK_TIM12_IRQn",
+              "break_bank": "GPIOA",
+              "break_mask": 64,
+              "peer0": "ADC2",
+              "peer1": "ADC3",
+              "break_handler": "TIM8_BRK_TIM12_IRQHandler",
+              "update_handler": "TIM8_UP_TIM13_IRQHandler"
+            },
+            "domain": {
+              "id": "ADC123",
+              "resources": [
+                "controller:ADC1",
+                "controller:ADC2",
+                "controller:ADC3",
+                "irq:ADC_IRQn"
+              ],
+              "state_type": "nx_stm32_power_stage_domain_t",
+              "config_type": "nx_stm32_power_stage_domain_config_t",
+              "admit": "nx_stm32_power_stage_domain_admit",
+              "prepare": "nx_stm32_power_stage_domain_prepare",
+              "close": "nx_stm32_power_stage_domain_close",
+              "adc_irq": "nx_stm32_power_stage_domain_adc_irq",
+              "handler": "ADC_IRQHandler",
+              "member_state_type": "nx_stm32_power_stage_t",
+              "member_config_type": "nx_stm32_power_stage_config_t",
+              "converters": [
+                "ADC1",
+                "ADC2",
+                "ADC3"
+              ],
+              "time_shared": false
+            },
+            "alignments": [
+              "edge"
+            ]
+          }
+        },
+        {
+          "id": "tim8-power-stage-adc1",
+          "controller": "PWM_ADC8",
+          "timer": "TIM8",
+          "adc": "ADC1",
+          "modes": [
+            "injected-power-stage"
+          ],
+          "dma": [],
+          "pins": [
+            [
+              "PC6",
+              "ch1",
+              3
+            ],
+            [
+              "PA7",
+              "ch1n",
+              3
+            ],
+            [
+              "PC7",
+              "ch2",
+              3
+            ],
+            [
+              "PB0",
+              "ch2n",
+              3
+            ],
+            [
+              "PC8",
+              "ch3",
+              3
+            ],
+            [
+              "PB1",
+              "ch3n",
+              3
+            ],
+            [
+              "PA6",
+              "bkin",
+              3
+            ],
+            [
+              "PA0",
+              "adc0",
+              0
+            ],
+            [
+              "PA1",
+              "adc1",
+              0
+            ]
+          ],
+          "channels": [
+            0,
+            1
+          ],
+          "sample_cycles": [
+            3,
+            15,
+            28,
+            56,
+            84,
+            112,
+            144,
+            480
+          ],
+          "conversion_cycles": 12,
+          "timer_clock_domain": "apb2_timer",
+          "adc_clock_domain": "adc",
+          "clock_multiplier": 2,
+          "prescaler_max": 65536,
+          "period_max": 65535,
+          "trigger_event": "cc4-rising",
+          "trigger_route": "TIM8:CC4:ADC1:injected",
+          "resources": [
+            "controller:TIM8",
+            "controller:ADC1",
+            "controller:ADC2",
+            "controller:ADC3",
+            "timer:TIM8"
+          ],
+          "power_stage": {
+            "minimum_deadtime_ticks": 1,
+            "deadtime_ranges": [
+              [
+                0,
+                127,
+                1
+              ],
+              [
+                128,
+                254,
+                2
+              ],
+              [
+                256,
+                504,
+                8
+              ],
+              [
+                512,
+                1008,
+                16
+              ]
+            ],
+            "tick_multiple": 1000000,
+            "guard_us": 4,
+            "capture": {
+              "current_count": 2,
+              "current_phase_mask": 3,
+              "sample_bus": false,
+              "adc_index": 0,
+              "trigger_selector": 917504
+            },
+            "hardware": {
+              "timer_index": 8,
+              "break_irq": "TIM8_BRK_TIM12_IRQn",
+              "break_bank": "GPIOA",
+              "break_mask": 64,
+              "peer0": "ADC2",
+              "peer1": "ADC3",
+              "break_handler": "TIM8_BRK_TIM12_IRQHandler",
+              "update_handler": "TIM8_UP_TIM13_IRQHandler"
+            },
+            "domain": {
+              "id": "ADC123",
+              "resources": [
+                "controller:ADC1",
+                "controller:ADC2",
+                "controller:ADC3",
+                "irq:ADC_IRQn"
+              ],
+              "state_type": "nx_stm32_power_stage_domain_t",
+              "config_type": "nx_stm32_power_stage_domain_config_t",
+              "admit": "nx_stm32_power_stage_domain_admit",
+              "prepare": "nx_stm32_power_stage_domain_prepare",
+              "close": "nx_stm32_power_stage_domain_close",
+              "adc_irq": "nx_stm32_power_stage_domain_adc_irq",
+              "handler": "ADC_IRQHandler",
+              "member_state_type": "nx_stm32_power_stage_t",
+              "member_config_type": "nx_stm32_power_stage_config_t",
+              "converters": [
+                "ADC1",
+                "ADC2",
+                "ADC3"
+              ],
+              "time_shared": false
+            },
+            "alignments": [
+              "edge"
+            ]
+          }
+        },
+        {
+          "id": "tim1-power-stage-adc2",
+          "controller": "PWM_ADC1",
+          "timer": "TIM1",
+          "adc": "ADC2",
+          "modes": [
+            "injected-power-stage"
+          ],
+          "dma": [],
+          "pins": [
+            [
+              "PE9",
+              "ch1",
+              1
+            ],
+            [
+              "PE8",
+              "ch1n",
+              1
+            ],
+            [
+              "PE11",
+              "ch2",
+              1
+            ],
+            [
+              "PE10",
+              "ch2n",
+              1
+            ],
+            [
+              "PE13",
+              "ch3",
+              1
+            ],
+            [
+              "PE12",
+              "ch3n",
+              1
+            ],
+            [
+              "PE15",
+              "bkin",
+              1
+            ],
+            [
+              "PA4",
+              "adc4",
+              0
+            ],
+            [
+              "PA5",
+              "adc5",
+              0
+            ]
+          ],
+          "channels": [
+            4,
+            5
+          ],
+          "sample_cycles": [
+            3,
+            15,
+            28,
+            56,
+            84,
+            112,
+            144,
+            480
+          ],
+          "conversion_cycles": 12,
+          "timer_clock_domain": "apb2_timer",
+          "adc_clock_domain": "adc",
+          "clock_multiplier": 2,
+          "prescaler_max": 65536,
+          "period_max": 65535,
+          "trigger_event": "cc4-rising",
+          "trigger_route": "TIM1:CC4:ADC2:injected",
+          "resources": [
+            "controller:TIM1",
+            "controller:ADC1",
+            "controller:ADC2",
+            "controller:ADC3",
+            "timer:TIM1"
+          ],
+          "power_stage": {
+            "minimum_deadtime_ticks": 1,
+            "deadtime_ranges": [
+              [
+                0,
+                127,
+                1
+              ],
+              [
+                128,
+                254,
+                2
+              ],
+              [
+                256,
+                504,
+                8
+              ],
+              [
+                512,
+                1008,
+                16
+              ]
+            ],
+            "tick_multiple": 1000000,
+            "guard_us": 4,
+            "capture": {
+              "current_count": 2,
+              "current_phase_mask": 3,
+              "sample_bus": false,
+              "adc_index": 1,
+              "trigger_selector": 0
+            },
+            "hardware": {
+              "timer_index": 1,
+              "break_irq": "TIM1_BRK_TIM9_IRQn",
+              "break_bank": "GPIOE",
+              "break_mask": 32768,
+              "peer0": "ADC1",
+              "peer1": "ADC3",
+              "break_handler": "TIM1_BRK_TIM9_IRQHandler",
+              "update_handler": "TIM1_UP_TIM10_IRQHandler"
+            },
+            "domain": {
+              "id": "ADC123",
+              "resources": [
+                "controller:ADC1",
+                "controller:ADC2",
+                "controller:ADC3",
+                "irq:ADC_IRQn"
+              ],
+              "state_type": "nx_stm32_power_stage_domain_t",
+              "config_type": "nx_stm32_power_stage_domain_config_t",
+              "admit": "nx_stm32_power_stage_domain_admit",
+              "prepare": "nx_stm32_power_stage_domain_prepare",
+              "close": "nx_stm32_power_stage_domain_close",
+              "adc_irq": "nx_stm32_power_stage_domain_adc_irq",
+              "handler": "ADC_IRQHandler",
+              "member_state_type": "nx_stm32_power_stage_t",
+              "member_config_type": "nx_stm32_power_stage_config_t",
+              "converters": [
+                "ADC1",
+                "ADC2",
+                "ADC3"
+              ],
+              "time_shared": false
+            },
+            "alignments": [
+              "edge"
+            ]
+          }
+        },
+        {
+          "id": "tim8-power-stage-adc1-center",
+          "controller": "PWM_ADC8",
+          "timer": "TIM8",
+          "adc": "ADC1",
+          "modes": [
+            "injected-power-stage"
+          ],
+          "dma": [],
+          "pins": [
+            [
+              "PC6",
+              "ch1",
+              3
+            ],
+            [
+              "PA7",
+              "ch1n",
+              3
+            ],
+            [
+              "PC7",
+              "ch2",
+              3
+            ],
+            [
+              "PB0",
+              "ch2n",
+              3
+            ],
+            [
+              "PC8",
+              "ch3",
+              3
+            ],
+            [
+              "PB1",
+              "ch3n",
+              3
+            ],
+            [
+              "PA6",
+              "bkin",
+              3
+            ],
+            [
+              "PA0",
+              "adc0",
+              0
+            ],
+            [
+              "PA1",
+              "adc1",
+              0
+            ]
+          ],
+          "channels": [
+            0,
+            1
+          ],
+          "sample_cycles": [
+            3,
+            15,
+            28,
+            56,
+            84,
+            112,
+            144,
+            480
+          ],
+          "conversion_cycles": 12,
+          "timer_clock_domain": "apb2_timer",
+          "adc_clock_domain": "adc",
+          "clock_multiplier": 2,
+          "prescaler_max": 65536,
+          "period_max": 65535,
+          "trigger_event": "cc4-down-slope",
+          "trigger_route": "TIM8:CC4:ADC1:injected",
+          "resources": [
+            "controller:TIM8",
+            "controller:ADC1",
+            "controller:ADC2",
+            "controller:ADC3",
+            "timer:TIM8"
+          ],
+          "power_stage": {
+            "minimum_deadtime_ticks": 1,
+            "deadtime_ranges": [
+              [
+                0,
+                127,
+                1
+              ],
+              [
+                128,
+                254,
+                2
+              ],
+              [
+                256,
+                504,
+                8
+              ],
+              [
+                512,
+                1008,
+                16
+              ]
+            ],
+            "tick_multiple": 1000000,
+            "guard_us": 4,
+            "capture": {
+              "current_count": 2,
+              "current_phase_mask": 3,
+              "sample_bus": false,
+              "adc_index": 0,
+              "trigger_selector": 917504
+            },
+            "hardware": {
+              "timer_index": 8,
+              "break_irq": "TIM8_BRK_TIM12_IRQn",
+              "break_bank": "GPIOA",
+              "break_mask": 64,
+              "peer0": "ADC2",
+              "peer1": "ADC3",
+              "break_handler": "TIM8_BRK_TIM12_IRQHandler",
+              "update_handler": "TIM8_UP_TIM13_IRQHandler"
+            },
+            "domain": {
+              "id": "ADC123",
+              "resources": [
+                "controller:ADC1",
+                "controller:ADC2",
+                "controller:ADC3",
+                "irq:ADC_IRQn"
+              ],
+              "state_type": "nx_stm32_power_stage_domain_t",
+              "config_type": "nx_stm32_power_stage_domain_config_t",
+              "admit": "nx_stm32_power_stage_domain_admit",
+              "prepare": "nx_stm32_power_stage_domain_prepare",
+              "close": "nx_stm32_power_stage_domain_close",
+              "adc_irq": "nx_stm32_power_stage_domain_adc_irq",
+              "handler": "ADC_IRQHandler",
+              "member_state_type": "nx_stm32_power_stage_t",
+              "member_config_type": "nx_stm32_power_stage_config_t",
+              "converters": [
+                "ADC1",
+                "ADC2",
+                "ADC3"
+              ],
+              "time_shared": false
+            },
+            "alignments": [
+              "center"
+            ]
+          }
+        },
+        {
+          "id": "tim8-power-stage-dual-adc",
+          "controller": "PWM_ADC8",
+          "timer": "TIM8",
+          "adc": "ADC1",
+          "modes": [
+            "injected-power-stage"
+          ],
+          "dma": [],
+          "pins": [
+            [
+              "PC6",
+              "ch1",
+              3
+            ],
+            [
+              "PA7",
+              "ch1n",
+              3
+            ],
+            [
+              "PC7",
+              "ch2",
+              3
+            ],
+            [
+              "PB0",
+              "ch2n",
+              3
+            ],
+            [
+              "PC8",
+              "ch3",
+              3
+            ],
+            [
+              "PB1",
+              "ch3n",
+              3
+            ],
+            [
+              "PA6",
+              "bkin",
+              3
+            ],
+            [
+              "PA0",
+              "adc0",
+              0
+            ],
+            [
+              "PA1",
+              "adc1",
+              0
+            ]
+          ],
+          "channels": [
+            0,
+            1
+          ],
+          "sample_cycles": [
+            3,
+            15,
+            28,
+            56,
+            84,
+            112,
+            144,
+            480
+          ],
+          "conversion_cycles": 12,
+          "timer_clock_domain": "apb2_timer",
+          "adc_clock_domain": "adc",
+          "clock_multiplier": 2,
+          "prescaler_max": 65536,
+          "period_max": 65535,
+          "trigger_event": "cc4-rising",
+          "trigger_route": "TIM8:CC4:ADC1_ADC2:injected-simultaneous",
+          "resources": [
+            "controller:TIM8",
+            "controller:ADC1",
+            "controller:ADC2",
+            "controller:ADC3",
+            "timer:TIM8"
+          ],
+          "power_stage": {
+            "minimum_deadtime_ticks": 1,
+            "deadtime_ranges": [
+              [
+                0,
+                127,
+                1
+              ],
+              [
+                128,
+                254,
+                2
+              ],
+              [
+                256,
+                504,
+                8
+              ],
+              [
+                512,
+                1008,
+                16
+              ]
+            ],
+            "tick_multiple": 1000000,
+            "guard_us": 4,
+            "capture": {
+              "current_count": 2,
+              "current_phase_mask": 3,
+              "sample_bus": false,
+              "adc_index": 0,
+              "trigger_selector": 917504
+            },
+            "hardware": {
+              "timer_index": 8,
+              "break_irq": "TIM8_BRK_TIM12_IRQn",
+              "break_bank": "GPIOA",
+              "break_mask": 64,
+              "peer0": "ADC2",
+              "peer1": "ADC3",
+              "break_handler": "TIM8_BRK_TIM12_IRQHandler",
+              "update_handler": "TIM8_UP_TIM13_IRQHandler"
+            },
+            "domain": {
+              "id": "ADC123",
+              "resources": [
+                "controller:ADC1",
+                "controller:ADC2",
+                "controller:ADC3",
+                "irq:ADC_IRQn"
+              ],
+              "state_type": "nx_stm32_power_stage_domain_t",
+              "config_type": "nx_stm32_power_stage_domain_config_t",
+              "admit": "nx_stm32_power_stage_domain_admit",
+              "prepare": "nx_stm32_power_stage_domain_prepare",
+              "close": "nx_stm32_power_stage_domain_close",
+              "adc_irq": "nx_stm32_power_stage_domain_adc_irq",
+              "handler": "ADC_IRQHandler",
+              "member_state_type": "nx_stm32_power_stage_t",
+              "member_config_type": "nx_stm32_power_stage_config_t",
+              "converters": [
+                "ADC1",
+                "ADC2",
+                "ADC3"
+              ],
+              "time_shared": false
+            },
+            "alignments": [
+              "edge"
+            ],
+            "pair": {
+              "converters": [
+                "ADC1",
+                "ADC2"
+              ]
+            }
+          }
+        },
+        {
+          "id": "tim8-power-stage-adc1-tdm",
+          "controller": "PWM_ADC8",
+          "timer": "TIM8",
+          "adc": "ADC1",
+          "modes": [
+            "injected-power-stage"
+          ],
+          "dma": [],
+          "pins": [
+            [
+              "PC6",
+              "ch1",
+              3
+            ],
+            [
+              "PA7",
+              "ch1n",
+              3
+            ],
+            [
+              "PC7",
+              "ch2",
+              3
+            ],
+            [
+              "PB0",
+              "ch2n",
+              3
+            ],
+            [
+              "PC8",
+              "ch3",
+              3
+            ],
+            [
+              "PB1",
+              "ch3n",
+              3
+            ],
+            [
+              "PA6",
+              "bkin",
+              3
+            ],
+            [
+              "PA0",
+              "adc0",
+              0
+            ],
+            [
+              "PA1",
+              "adc1",
+              0
+            ]
+          ],
+          "channels": [
+            0,
+            1
+          ],
+          "sample_cycles": [
+            3,
+            15,
+            28,
+            56,
+            84,
+            112,
+            144,
+            480
+          ],
+          "conversion_cycles": 12,
+          "timer_clock_domain": "apb2_timer",
+          "adc_clock_domain": "adc",
+          "clock_multiplier": 2,
+          "prescaler_max": 65536,
+          "period_max": 65535,
+          "trigger_event": "cc4-down-slope",
+          "trigger_route": "TIM8:CC4:ADC1:injected",
+          "resources": [
+            "controller:TIM8",
+            "controller:ADC1",
+            "controller:ADC2",
+            "controller:ADC3",
+            "timer:TIM8"
+          ],
+          "power_stage": {
+            "minimum_deadtime_ticks": 1,
+            "deadtime_ranges": [
+              [
+                0,
+                127,
+                1
+              ],
+              [
+                128,
+                254,
+                2
+              ],
+              [
+                256,
+                504,
+                8
+              ],
+              [
+                512,
+                1008,
+                16
+              ]
+            ],
+            "tick_multiple": 1000000,
+            "guard_us": 4,
+            "capture": {
+              "current_count": 2,
+              "current_phase_mask": 3,
+              "sample_bus": false,
+              "adc_index": 0,
+              "trigger_selector": 917504
+            },
+            "hardware": {
+              "timer_index": 8,
+              "break_irq": "TIM8_BRK_TIM12_IRQn",
+              "break_bank": "GPIOA",
+              "break_mask": 64,
+              "peer0": "ADC2",
+              "peer1": "ADC3",
+              "break_handler": "TIM8_BRK_TIM12_IRQHandler",
+              "update_handler": "TIM8_UP_TIM13_IRQHandler"
+            },
+            "domain": {
+              "id": "ADC123",
+              "resources": [
+                "controller:ADC1",
+                "controller:ADC2",
+                "controller:ADC3",
+                "irq:ADC_IRQn"
+              ],
+              "state_type": "nx_stm32_power_stage_domain_t",
+              "config_type": "nx_stm32_power_stage_domain_config_t",
+              "admit": "nx_stm32_power_stage_domain_admit",
+              "prepare": "nx_stm32_power_stage_domain_prepare",
+              "close": "nx_stm32_power_stage_domain_close",
+              "adc_irq": "nx_stm32_power_stage_domain_adc_irq",
+              "handler": "ADC_IRQHandler",
+              "member_state_type": "nx_stm32_power_stage_t",
+              "member_config_type": "nx_stm32_power_stage_config_t",
+              "converters": [
+                "ADC1",
+                "ADC2",
+                "ADC3"
+              ],
+              "time_shared": true
+            },
+            "alignments": [
+              "center"
+            ]
+          }
+        },
+        {
+          "id": "tim1-power-stage-adc1-tdm",
+          "controller": "PWM_ADC1",
+          "timer": "TIM1",
+          "adc": "ADC1",
+          "modes": [
+            "injected-power-stage"
+          ],
+          "dma": [],
+          "pins": [
+            [
+              "PE9",
+              "ch1",
+              1
+            ],
+            [
+              "PE8",
+              "ch1n",
+              1
+            ],
+            [
+              "PE11",
+              "ch2",
+              1
+            ],
+            [
+              "PE10",
+              "ch2n",
+              1
+            ],
+            [
+              "PE13",
+              "ch3",
+              1
+            ],
+            [
+              "PE12",
+              "ch3n",
+              1
+            ],
+            [
+              "PE15",
+              "bkin",
+              1
+            ],
+            [
+              "PA4",
+              "adc4",
+              0
+            ],
+            [
+              "PA5",
+              "adc5",
+              0
+            ]
+          ],
+          "channels": [
+            4,
+            5
+          ],
+          "sample_cycles": [
+            3,
+            15,
+            28,
+            56,
+            84,
+            112,
+            144,
+            480
+          ],
+          "conversion_cycles": 12,
+          "timer_clock_domain": "apb2_timer",
+          "adc_clock_domain": "adc",
+          "clock_multiplier": 2,
+          "prescaler_max": 65536,
+          "period_max": 65535,
+          "trigger_event": "cc4-down-slope",
+          "trigger_route": "TIM1:CC4:ADC2:injected",
+          "resources": [
+            "controller:TIM1",
+            "controller:ADC1",
+            "controller:ADC2",
+            "controller:ADC3",
+            "timer:TIM1"
+          ],
+          "power_stage": {
+            "minimum_deadtime_ticks": 1,
+            "deadtime_ranges": [
+              [
+                0,
+                127,
+                1
+              ],
+              [
+                128,
+                254,
+                2
+              ],
+              [
+                256,
+                504,
+                8
+              ],
+              [
+                512,
+                1008,
+                16
+              ]
+            ],
+            "tick_multiple": 1000000,
+            "guard_us": 4,
+            "capture": {
+              "current_count": 2,
+              "current_phase_mask": 3,
+              "sample_bus": false,
+              "adc_index": 0,
+              "trigger_selector": 0
+            },
+            "hardware": {
+              "timer_index": 1,
+              "break_irq": "TIM1_BRK_TIM9_IRQn",
+              "break_bank": "GPIOE",
+              "break_mask": 32768,
+              "peer0": "ADC2",
+              "peer1": "ADC3",
+              "break_handler": "TIM1_BRK_TIM9_IRQHandler",
+              "update_handler": "TIM1_UP_TIM10_IRQHandler"
+            },
+            "domain": {
+              "id": "ADC123",
+              "resources": [
+                "controller:ADC1",
+                "controller:ADC2",
+                "controller:ADC3",
+                "irq:ADC_IRQn"
+              ],
+              "state_type": "nx_stm32_power_stage_domain_t",
+              "config_type": "nx_stm32_power_stage_domain_config_t",
+              "admit": "nx_stm32_power_stage_domain_admit",
+              "prepare": "nx_stm32_power_stage_domain_prepare",
+              "close": "nx_stm32_power_stage_domain_close",
+              "adc_irq": "nx_stm32_power_stage_domain_adc_irq",
+              "handler": "ADC_IRQHandler",
+              "member_state_type": "nx_stm32_power_stage_t",
+              "member_config_type": "nx_stm32_power_stage_config_t",
+              "converters": [
+                "ADC1",
+                "ADC2",
+                "ADC3"
+              ],
+              "time_shared": true
+            },
+            "alignments": [
+              "center"
+            ]
+          }
+        },
+        {
+          "id": "tim8-power-stage-dc-link",
+          "controller": "PWM_ADC8",
+          "timer": "TIM8",
+          "adc": "ADC1",
+          "modes": [
+            "injected-power-stage"
+          ],
+          "dma": [],
+          "pins": [
+            [
+              "PC6",
+              "ch1",
+              3
+            ],
+            [
+              "PA7",
+              "ch1n",
+              3
+            ],
+            [
+              "PC7",
+              "ch2",
+              3
+            ],
+            [
+              "PB0",
+              "ch2n",
+              3
+            ],
+            [
+              "PC8",
+              "ch3",
+              3
+            ],
+            [
+              "PB1",
+              "ch3n",
+              3
+            ],
+            [
+              "PA6",
+              "bkin",
+              3
+            ],
+            [
+              "PA0",
+              "adc0",
+              0
+            ]
+          ],
+          "channels": [
+            0
+          ],
+          "sample_cycles": [
+            3,
+            15,
+            28,
+            56,
+            84,
+            112,
+            144,
+            480
+          ],
+          "conversion_cycles": 12,
+          "timer_clock_domain": "apb2_timer",
+          "adc_clock_domain": "adc",
+          "clock_multiplier": 2,
+          "prescaler_max": 65536,
+          "period_max": 65535,
+          "trigger_event": "cc4-rising",
+          "trigger_route": "TIM8:CC4:ADC1:injected",
+          "resources": [
+            "controller:TIM8",
+            "controller:ADC1",
+            "controller:ADC2",
+            "controller:ADC3",
+            "timer:TIM8"
+          ],
+          "power_stage": {
+            "minimum_deadtime_ticks": 1,
+            "deadtime_ranges": [
+              [
+                0,
+                127,
+                1
+              ],
+              [
+                128,
+                254,
+                2
+              ],
+              [
+                256,
+                504,
+                8
+              ],
+              [
+                512,
+                1008,
+                16
+              ]
+            ],
+            "tick_multiple": 1000000,
+            "guard_us": 4,
+            "capture": {
+              "current_count": 0,
+              "current_phase_mask": 0,
+              "sample_bus": false,
+              "adc_index": 0,
+              "trigger_selector": 917504
+            },
+            "hardware": {
+              "timer_index": 8,
+              "break_irq": "TIM8_BRK_TIM12_IRQn",
+              "break_bank": "GPIOA",
+              "break_mask": 64,
+              "peer0": "ADC2",
+              "peer1": "ADC3",
+              "break_handler": "TIM8_BRK_TIM12_IRQHandler",
+              "update_handler": "TIM8_UP_TIM13_IRQHandler"
+            },
+            "domain": {
+              "id": "ADC123",
+              "resources": [
+                "controller:ADC1",
+                "controller:ADC2",
+                "controller:ADC3",
+                "irq:ADC_IRQn"
+              ],
+              "state_type": "nx_stm32_power_stage_domain_t",
+              "config_type": "nx_stm32_power_stage_domain_config_t",
+              "admit": "nx_stm32_power_stage_domain_admit",
+              "prepare": "nx_stm32_power_stage_domain_prepare",
+              "close": "nx_stm32_power_stage_domain_close",
+              "adc_irq": "nx_stm32_power_stage_domain_adc_irq",
+              "handler": "ADC_IRQHandler",
+              "member_state_type": "nx_stm32_power_stage_t",
+              "member_config_type": "nx_stm32_power_stage_config_t",
+              "converters": [
+                "ADC1",
+                "ADC2",
+                "ADC3"
+              ],
+              "time_shared": false
+            },
+            "alignments": [
+              "edge"
+            ],
+            "dc": {
+              "rearm_guard_us": 4
+            }
           }
         }
       ]
@@ -1223,7 +2369,8 @@
       "mode": "injected-power-stage",
       "implementation": "power_stage",
       "controllers": [
-        "PWM_ADC8"
+        "PWM_ADC8",
+        "PWM_ADC1"
       ],
       "headers": [
         "drivers/pwm_adc/power_stage.h"
@@ -1335,6 +2482,166 @@
             }
           },
           {
+            "role": "pair",
+            "type": "nx_stm32_adc_pair_config_t",
+            "const": true,
+            "enabled": {
+              "optional": "item.options.pair",
+              "value": true,
+              "default": false
+            },
+            "value": {
+              "record": [
+                [
+                  "master",
+                  {
+                    "source": "item.options.pair.converters.0",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "slave",
+                  {
+                    "source": "item.options.pair.converters.1",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "common",
+                  {
+                    "symbol": "ADC123_COMMON"
+                  }
+                ],
+                [
+                  "channels",
+                  {
+                    "array": [
+                      {
+                        "source": "item.options.channels.0"
+                      },
+                      {
+                        "source": "item.options.channels.1"
+                      }
+                    ]
+                  }
+                ],
+                [
+                  "sample_times",
+                  {
+                    "array": [
+                      {
+                        "source": "item.options.sample_times.0"
+                      },
+                      {
+                        "source": "item.options.sample_times.1"
+                      }
+                    ]
+                  }
+                ]
+              ]
+            }
+          },
+          {
+            "role": "dc_state",
+            "type": "nx_stm32_power_stage_dc_t",
+            "const": false,
+            "enabled": {
+              "optional": "item.options.dc",
+              "value": true,
+              "default": false
+            }
+          },
+          {
+            "role": "dc",
+            "type": "nx_stm32_power_stage_dc_config_t",
+            "const": true,
+            "enabled": {
+              "optional": "item.options.dc",
+              "value": true,
+              "default": false
+            },
+            "value": {
+              "record": [
+                [
+                  "capture",
+                  {
+                    "record": [
+                      [
+                        "timer",
+                        {
+                          "source": "selected.constants.power_stage.timer",
+                          "as": "symbol"
+                        }
+                      ],
+                      [
+                        "adc",
+                        {
+                          "source": "selected.constants.power_stage.adc",
+                          "as": "symbol"
+                        }
+                      ],
+                      [
+                        "channel",
+                        {
+                          "source": "item.options.channels.0"
+                        }
+                      ],
+                      [
+                        "sample_time",
+                        {
+                          "source": "item.options.sample_times.0"
+                        }
+                      ],
+                      [
+                        "trigger_selector",
+                        {
+                          "source": "item.options.trigger_selector"
+                        }
+                      ],
+                      [
+                        "period_ticks",
+                        {
+                          "source": "item.options.period_ticks"
+                        }
+                      ],
+                      [
+                        "rearm_guard_ticks",
+                        {
+                          "source": "item.options.dc.rearm_guard_ticks"
+                        }
+                      ],
+                      [
+                        "maximum_lateness_ticks",
+                        {
+                          "source": "item.options.dc.maximum_lateness_ticks"
+                        }
+                      ]
+                    ]
+                  }
+                ],
+                [
+                  "state",
+                  {
+                    "ref": "dc_state",
+                    "as": "address"
+                  }
+                ],
+                [
+                  "settling_ticks",
+                  {
+                    "source": "item.options.dc.settling_ticks"
+                  }
+                ],
+                [
+                  "aperture_ticks",
+                  {
+                    "source": "item.options.dc.aperture_ticks"
+                  }
+                ]
+              ]
+            }
+          },
+          {
             "role": "config",
             "type": "nx_stm32_power_stage_config_t",
             "const": true,
@@ -1385,7 +2692,8 @@
                       [
                         "registers",
                         {
-                          "symbol": "TIM8"
+                          "source": "selected.constants.power_stage.timer",
+                          "as": "symbol"
                         }
                       ],
                       [
@@ -1393,7 +2701,8 @@
                         {
                           "pointer_member": {
                             "base": {
-                              "symbol": "GPIOA"
+                              "source": "selected.constants.power_stage.break_bank",
+                              "as": "symbol"
                             },
                             "member": "IDR"
                           }
@@ -1401,7 +2710,9 @@
                       ],
                       [
                         "break_mask",
-                        64
+                        {
+                          "source": "selected.constants.power_stage.break_mask"
+                        }
                       ],
                       [
                         "timer_hz",
@@ -1430,7 +2741,8 @@
                       [
                         "irq",
                         {
-                          "symbol": "TIM8_BRK_TIM12_IRQn"
+                          "source": "selected.constants.power_stage.break_irq",
+                          "as": "symbol"
                         }
                       ],
                       [
@@ -1441,7 +2753,9 @@
                       ],
                       [
                         "controller",
-                        8
+                        {
+                          "source": "selected.constants.power_stage.timer_index"
+                        }
                       ],
                       [
                         "channels",
@@ -1462,6 +2776,20 @@
                       [
                         "complementary",
                         true
+                      ],
+                      [
+                        "center_aligned",
+                        {
+                          "source": "item.options.center_aligned"
+                        }
+                      ],
+                      [
+                        "immediate_trigger",
+                        {
+                          "optional": "item.options.dc",
+                          "value": true,
+                          "default": false
+                        }
                       ]
                     ]
                   }
@@ -1473,7 +2801,8 @@
                       [
                         "adc",
                         {
-                          "symbol": "ADC1"
+                          "source": "selected.constants.power_stage.adc",
+                          "as": "symbol"
                         }
                       ],
                       [
@@ -1481,10 +2810,12 @@
                         {
                           "array": [
                             {
-                              "symbol": "ADC2"
+                              "source": "selected.constants.power_stage.peer0",
+                              "as": "symbol"
                             },
                             {
-                              "symbol": "ADC3"
+                              "source": "selected.constants.power_stage.peer1",
+                              "as": "symbol"
                             }
                           ]
                         }
@@ -1560,15 +2891,28 @@
                 [
                   "encoder",
                   {
-                    "symbol": "TIM4"
+                    "optional": "selected.constants.power_stage.encoder",
+                    "value": {
+                      "source": "selected.constants.power_stage.encoder",
+                      "as": "symbol"
+                    },
+                    "default": {
+                      "symbol": "NULL"
+                    }
                   }
                 ],
                 [
                   "encoder_pins",
                   {
-                    "ref": "pins",
-                    "as": "address",
-                    "index": 11
+                    "optional": "selected.constants.power_stage.encoder",
+                    "value": {
+                      "ref": "pins",
+                      "as": "address",
+                      "index": 11
+                    },
+                    "default": {
+                      "symbol": "NULL"
+                    }
                   }
                 ],
                 [
@@ -1598,7 +2942,79 @@
                 [
                   "encoder_filter",
                   {
-                    "source": "item.options.encoder_filter"
+                    "source": "item.options.encoder_filter",
+                    "default": 0
+                  }
+                ],
+                [
+                  "current_count",
+                  {
+                    "source": "item.options.current_count"
+                  }
+                ],
+                [
+                  "current_phase_mask",
+                  {
+                    "source": "item.options.current_phase_mask"
+                  }
+                ],
+                [
+                  "sample_bus",
+                  {
+                    "source": "item.options.sample_bus"
+                  }
+                ],
+                [
+                  "adc_index",
+                  {
+                    "source": "item.options.adc_index"
+                  }
+                ],
+                [
+                  "trigger_selector",
+                  {
+                    "source": "item.options.trigger_selector"
+                  }
+                ],
+                [
+                  "domain",
+                  {
+                    "owner": {
+                      "source": "selected.power_stage_domain.members.0",
+                      "role": "domain",
+                      "as": "address"
+                    }
+                  }
+                ],
+                [
+                  "pair",
+                  {
+                    "optional": "item.options.pair",
+                    "value": {
+                      "ref": "pair",
+                      "as": "address"
+                    },
+                    "default": {
+                      "symbol": "NULL"
+                    }
+                  }
+                ],
+                [
+                  "phase_offset_ticks",
+                  {
+                    "source": "item.options.slot.phase_offset_ticks",
+                    "default": 0
+                  }
+                ],
+                [
+                  "dc",
+                  {
+                    "optional": "item.options.dc",
+                    "value": {
+                      "ref": "dc",
+                      "as": "address"
+                    },
+                    "default": null
                   }
                 ]
               ]
@@ -1666,11 +3082,38 @@
           },
           {
             "name": {
-              "symbol": "TIM8_BRK_TIM12_IRQHandler"
+              "source": "selected.constants.power_stage.break_handler",
+              "as": "symbol"
             },
             "calls": [
               {
                 "function": "nx_stm32_power_stage_break_irq",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  }
+                ]
+              }
+            ],
+            "barrier": "nx_arch_dsb"
+          },
+          {
+            "name": {
+              "source": "selected.constants.power_stage.update_handler",
+              "as": "symbol"
+            },
+            "enabled": {
+              "optional": "item.options.dc",
+              "value": true,
+              "default": {
+                "source": "item.options.center_aligned",
+                "as": "bool"
+              }
+            },
+            "calls": [
+              {
+                "function": "nx_stm32_power_stage_update_irq",
                 "args": [
                   {
                     "ref": "port",

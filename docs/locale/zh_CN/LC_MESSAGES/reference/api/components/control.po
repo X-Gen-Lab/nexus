@@ -1,7 +1,3 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) 2026, Nexus Team
-# This file is distributed under the same license as the Nexus Embedded Platform package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 msgid ""
 msgstr ""
@@ -16,24 +12,29 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 48edcc0bc397eceaf220372c70cdb6f63f52199e1be22199e2282bd5c2cd6643\n"
+"X-Nexus-Source-SHA256: 6fa7338371cd15960a6021eeed96c0c6e10c613f8df9bf79e8c2cd0f38af5903\n"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:10
+#: ../../../../../docs/reference/api/components/control.md:10
 msgid "Explicit motor and axis control"
 msgstr "显式电机与轴控制"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:12
+#: ../../../../../docs/reference/api/components/control.md:12
 msgid ""
-"Select `Nexus::MotorControl` for the independent C11 current-control kernel "
-"and `Nexus::AxisControl` for command admission and rotary axis control. Each"
-" caller owns its state, parameters, execution context and time facts. These "
+"Select `Nexus::MotorControl` for the independent C11 current-control kernel,"
+" `Nexus::AxisControl` for command admission and rotary axis control, and "
+"`Nexus::DriveControl` for bounded reference and continuous-feedback "
+"exchange. `Nexus::CurrentControl` converts qualified captures; "
+"`Nexus::ModulationControl` jointly plans switching and sampling. Each caller"
+" owns its state, parameters, execution context and time facts. These "
 "components do not allocate, schedule work, read a clock or initialize a "
 "peripheral."
 msgstr ""
-"选择 `Nexus::MotorControl` 使用独立的 C11 电流控制核，选择 `Nexus::AxisControl` "
-"实现命令准入与旋转轴控制。每个调用者拥有自己的状态、参数、执行上下文和时间事实。组件不分配内存、不调度工作、不读取时钟，也不初始化外设。"
+"选择 `Nexus::MotorControl` 使用独立 C11 电流控制核，选择 `Nexus::AxisControl` "
+"使用命令准入与旋转轴控制，选择 `Nexus::DriveControl` 使用有界参考和连续反馈交接。`Nexus::CurrentControl` "
+"转换合格捕获，`Nexus::ModulationControl` "
+"联合规划开关和采样。调用者拥有状态、参数、执行上下文与时间事实。这些组件不分配存储、不调度工作、不读取时钟，也不初始化外设。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:17
+#: ../../../../../docs/reference/api/components/control.md:20
 msgid ""
 "Current, voltage, mechanical angle and velocity use explicitly named SI "
 "units. Motor pole pairs, encoder scaling and mechanical transmission are "
@@ -44,7 +45,7 @@ msgstr ""
 "电流、电压、机械角和速度使用名称中明确标注的 SI 单位。电机极对数、编码器缩放和机械传动是不同事实。参数发布与运行中的 IRQ "
 "计算分开处理；普通结构体复制不提供跨上下文同步。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:22
+#: ../../../../../docs/reference/api/components/control.md:25
 msgid ""
 "An axis decision adopts a software reference. A motor result is an output "
 "plan. Neither establishes hardware adoption, physical position or a safe "
@@ -55,7 +56,7 @@ msgstr ""
 "轴控制决策采用的是软件参考，电机计算结果是输出计划。两者均不证明硬件已采用、实际位置或电气安全状态。选定 provider 负责实际 PWM／ADC "
 "状态变化，以及请求、缓冲区和回调引用的最终撤回。即使输出已被抑制，撤回失败仍保留这些所有权。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:28
+#: ../../../../../docs/reference/api/components/control.md:31
 msgid ""
 "The [control component boundary](https://github.com/X-Gen-"
 "Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/control/README.md) and "
@@ -67,11 +68,11 @@ msgstr ""
 "SOURCE/components/control/README.md)和[控制组合指南](../../../guides/control-and-"
 "smart-devices.md)说明外部产品如何提供调度、硬件绑定及恢复策略。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:32
+#: ../../../../../docs/reference/api/components/control.md:35
 msgid "Preserve explicit control and stopping policy"
 msgstr "保留显式控制与停止策略"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:34
+#: ../../../../../docs/reference/api/components/control.md:37
 msgid ""
 "Axis commands retain the original local receipt, complete identity and "
 "finite authority. Repeated/old sequences do not renew it; accepting a "
@@ -82,7 +83,7 @@ msgstr ""
 "轴命令保留原始本地接收时间、完整身份和有期限的授权。重复或旧序号不会续期；命令被接纳后，要到后续有效 step "
 "才会采用。反馈携带机械侧和观察区间。位置轨迹计算完成与测得目标已稳定保持为独立结果。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:40
+#: ../../../../../docs/reference/api/components/control.md:43
 msgid ""
 "`NX_AXIS_INHIBIT_AFTER_DWELL` ends the selected software decision after "
 "observed zero-speed dwell. `NX_AXIS_HOLD_ZERO_VELOCITY` enters "
@@ -97,7 +98,7 @@ msgstr ""
 "`NX_AXIS_HOLDING`，继续运行零速 PI "
 "并拒绝新运动。保持状态不证明负载已被支撑、位置固定或机械安全。产品先完成机械交接，再禁能并单独撤回实际硬件。保留上一次保持输出不能修复无效反馈。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:47
+#: ../../../../../docs/reference/api/components/control.md:50
 msgid ""
 "Motor computation uses calibrated A/V/rad/rad/s with a shared microsecond "
 "domain and 64-bit epoch. It distinguishes the declared sample event, angle "
@@ -110,7 +111,18 @@ msgstr ""
 "epoch。声明的采样事件、角度观察、控制观察和计划采用边界分别表达。向过去时刻投影角度与向输出时刻预测各自具有有界时间跨度。顺序 ADC "
 "桥接必须验证其采样偏斜，不能声称同时测量。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:53
+#: ../../../../../docs/reference/api/components/control.md:56
+msgid ""
+"`nx_motor_voltage_step` produces a current-control voltage decision without "
+"choosing PWM or sampling. A selected modulator then plans both and returns "
+"the final quantized voltage for tracking. `nx_motor_step` retains its fixed "
+"min/max common-mode modulation as a separate maintained entry point; it does"
+" not prove that a chosen hardware sampling window is valid."
+msgstr ""
+"`nx_motor_voltage_step` 产生电流环电压决策，不选择 PWM 或采样。选定调制器随后共同规划二者，并返回最终量化电压供 "
+"tracking 使用。`nx_motor_step` 作为独立维护入口保留固定 min/max 共模调制；它不证明所选硬件采样窗口有效。"
+
+#: ../../../../../docs/reference/api/components/control.md:62
 msgid ""
 "The complete duty plan and `planned_voltage` are not a measured voltage "
 "receipt. `nx_motor_track_voltage` feeds final quantization/window limitation"
@@ -121,127 +133,133 @@ msgstr ""
 "完整占空比计划和 `planned_voltage` 不代表实测电压回执。`nx_motor_track_voltage` "
 "只对匹配的最新周期回馈一次最终量化／窗口限制。硬件提交错误必须关闭控制核准入，并按真实 provider 的合同撤回；重置 C 对象不能会合 IRQ。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:58
+#: ../../../../../docs/reference/api/components/control.md:67
 msgid "Motor computation"
 msgstr "电机计算"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "Caller-owned sensored PMSM calculation and offset candidates."
 msgstr "由调用者拥有的有感 PMSM 计算与偏置候选。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:69
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid ""
 "Author  Nexus Team   Version  1.0.0   Date  2026-11-24   Copyright  "
 "Copyright (c) 2026 Nexus Team"
 msgstr "作者 Nexus Team 版本 1.0.0 日期 2026-11-24 版权 Copyright (c) 2026 Nexus Team"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:69
+#: ../../../../../docs/reference/api/components/control.md:75
+#: ../../../../../docs/reference/api/components/control.md:100
+#: ../../../../../docs/reference/api/components/control.md:120
+#: ../../../../../docs/reference/api/components/control.md:150
 msgid "Nexus Team"
 msgstr "Nexus 团队"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:69
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid "1.0.0"
 msgstr "1.0.0"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:69
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid "2026-11-24"
 msgstr "2026-11-24"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:69
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid "Copyright (c) 2026 Nexus Team"
 msgstr "Copyright (c) 2026 Nexus Team"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:69
+#: ../../../../../docs/reference/api/components/control.md:75
+#: ../../../../../docs/reference/api/components/control.md:100
+#: ../../../../../docs/reference/api/components/control.md:120
+#: ../../../../../docs/reference/api/components/control.md:150
 msgid "Functions"
 msgstr "函数"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "Transform calibrated phase currents into alpha/beta."
 msgstr "将标定后的相电流变换到 alpha／beta 坐标。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "Uses alpha=(2A-B-C)/3 and beta=(B-C)/sqrt(3)."
 msgstr "使用 alpha=(2A-B-C)/3 和 beta=(B-C)/sqrt(3)。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:0
+#: ../../../../../docs/reference/api/components/control.md:0
 msgid "Parameters"
 msgstr "参数"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "[in] Three finite A/B/C values, distinct from out."
 msgstr "[in] 三个有限的 A／B／C 数值，与 out 分离。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "[out] Separate result; unchanged on failure."
 msgstr "[out] 独立结果，失败时不变。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:0
+#: ../../../../../docs/reference/api/components/control.md:0
 msgid "Returns"
 msgstr "返回值"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "SUCCESS, INVALID or EXHAUSTED; bounded pure Task/IRQ math."
 msgstr "SUCCESS、INVALID 或 EXHAUSTED；有界的纯 Task／IRQ 数学计算。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "Rotate stationary values into the electrical dq frame."
 msgstr "将静止坐标值旋转到电气 dq 坐标。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "[in] Finite alpha/beta in one common unit."
 msgstr "[in] 使用同一单位的有限 alpha／beta 数值。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "[in] Finite electrical angle in radians."
 msgstr "[in] 有限电角度，单位 rad。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "[out] Exclusive result; unchanged on failure."
 msgstr "[out] 独占结果，失败时不变。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "SUCCESS, INVALID or EXHAUSTED; pure Task/IRQ math."
 msgstr "SUCCESS、INVALID 或 EXHAUSTED；纯 Task／IRQ 数学计算。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "Rotate dq values back to the stationary frame."
 msgstr "将 dq 数值旋转回静止坐标。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "[in] Finite d/q in one common unit."
 msgstr "[in] 使用同一单位的有限 d／q 数值。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "Validate and copy a profile into unused zeroed storage."
 msgstr "校验配置并复制到未使用且已清零的存储。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "Pure initialization; no hardware effects or default profile."
 msgstr "仅初始化软件，不影响硬件，也不选择默认配置。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "[out] Fresh state, distinct from config; no live users."
 msgstr "[out] 新状态，与 config 分离，且没有活跃使用者。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "[in] Explicit finite profile, copied, never retained."
 msgstr "[in] 显式且数值有限的配置；复制内容，不保留引用。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "SUCCESS, INVALID or STATE; rejection preserves motor."
 msgstr "SUCCESS、INVALID 或 STATE；拒绝时保留 motor。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "Calculate one complete sensored current-control plan."
 msgstr "计算一个完整的有感电流控制计划。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid ""
 "Known storage aliases reject before mutation. Caller proves memory and "
 "serial access. Bounded Task/IRQ math, including sinf/cosf/hypotf; no "
@@ -251,169 +269,209 @@ msgstr ""
 "已知存储别名在任何修改前拒绝。调用者证明内存有效并保证串行访问。有界 Task／IRQ 数学计算包含 "
 "sinf／cosf／hypotf，不承诺实际最坏执行时间。拒绝漏序号、时序错误、无效测量和过流。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "[inout] Initialized single-owner state and fixed profile."
 msgstr "[inout] 已初始化、由单一所有者管理的状态与固定配置。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "[in] Complete input, stable for this call only."
 msgstr "[in] 完整输入，仅在本次调用期间保持稳定。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "[in] Finite dq target, valid through planned apply."
 msgstr "[in] 数值有限的 dq 目标，有效期覆盖计划采用时刻。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "[out] Separate plan; unchanged on every failure."
 msgstr "[out] 独立计划，任何失败时均不变。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "SUCCESS or exact latched error; FAULT blocks later steps."
 msgstr "SUCCESS 或精确锁存的错误；FAULT 阻止后续 step。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
+msgid "Calculate a voltage decision without choosing switching or samples."
+msgstr "计算电压决策，不选择开关或采样。"
+
+#: ../../../../../docs/reference/api/components/control.md:69
+msgid ""
+"Bounded Task/IRQ math with the same ownership and timing contract as step. "
+"The configured circular bound remains conservative; final switching/window "
+"restrictions belong to the selected modulator. minimum_duty is ignored here;"
+" the voltage bound is Vbus/sqrt(3)*maximum_modulation, avoiding a second "
+"sampling reserve. Track final voltage once and close admission if hardware "
+"commit fails."
+msgstr ""
+"与 step 保持相同所有权和时间合同的有界 Task/IRQ 数学。配置的圆形边界仍是保守边界，最终开关和窗口限制由所选调制器负责。此处忽略 "
+"minimum_duty；电压边界为 Vbus/sqrt(3)*maximum_modulation，避免再次预留采样余量。最终电压只 tracking"
+" 一次；硬件提交失败时关闭准入。"
+
+#: ../../../../../docs/reference/api/components/control.md:69
+msgid "[inout] Initialized single-executor current controller."
+msgstr "[inout] 已初始化且只有一个执行者的电流控制器。"
+
+#: ../../../../../docs/reference/api/components/control.md:69
+msgid "[in] Complete calibrated, qualified same-epoch observation."
+msgstr "[in] 完整、已标定、已确认有效且处于同一 epoch 的观察。"
+
+#: ../../../../../docs/reference/api/components/control.md:69
+msgid "[in] Complete target valid through the planned output."
+msgstr "[in] 在计划输出时刻仍有效的完整目标。"
+
+#: ../../../../../docs/reference/api/components/control.md:69
+msgid "[out] Separate result, unchanged on rejection or failure."
+msgstr "[out] 独立结果；拒绝或失败时保持不变。"
+
+#: ../../../../../docs/reference/api/components/control.md:69
+msgid "SUCCESS or exact latched validation or numerical error."
+msgstr "SUCCESS 或锁存的精确校验／数值错误。"
+
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "Feed final quantization/actuator limitation back once."
 msgstr "回馈一次最终量化／执行器限制。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid ""
 "Corrects by final-minus-previous-plan, avoiding duplicate back-calculation. "
 "It is not a measured voltage receipt."
 msgstr "使用最终计划减去前一计划的差值修正，避免重复回算。它不代表实测电压回执。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "[inout] Same owner after the latest successful step."
 msgstr "[inout] 最新一次成功 step 后的同一所有者。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "[in] Exact latest cycle, not yet tracked."
 msgstr "[in] 精确匹配且尚未跟踪的最新周期。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "[in] Final implemented plan in output dq V."
 msgstr "[in] 最终实施的计划，使用输出 dq 坐标，单位 V。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "SUCCESS, STATE or INVALID; rejects stale/duplicate tracking."
 msgstr "SUCCESS、STATE 或 INVALID；拒绝过期或重复跟踪。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "Retain the first hardware/outer-owner error in the kernel."
 msgstr "在控制核中保留首个硬件／外层所有者错误。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "Use after output commit failure, then withdraw via its owner."
 msgstr "输出提交失败后调用，再由其所有者撤回。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "[inout] Initialized serialized state."
 msgstr "[inout] 已初始化的串行状态。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "[in] Non-success error describing the actual failure."
 msgstr "[in] 描述实际失败的非成功错误码。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "SUCCESS, INVALID or STATE; never starts or stops hardware."
 msgstr "SUCCESS、INVALID 或 STATE；从不启动或停止硬件。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "Reset only algorithm history after externally joined stop."
 msgstr "外部完成停止及会合后，仅重置算法历史。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid ""
 "Caller must first stop/join the real provider and all users. This function "
 "cannot prove shutdown from a C object."
 msgstr "调用者必须先停止真实 provider，并会合它与全部使用者。此函数无法仅凭 C 对象证明硬件已关闭。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "[inout] Initialized same-owner state with no hardware users."
 msgstr "[inout] 已初始化、由同一所有者管理且无硬件使用者的状态。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "SUCCESS or STATE; no output enable or hardware recovery."
 msgstr "SUCCESS 或 STATE；不使能输出，也不恢复硬件。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "Begin an independent fixed-count zero-current estimate."
 msgstr "开始独立的固定样本数零电流估计。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "[out] Unused caller state, no concurrent users."
 msgstr "[out] 未使用的调用者状态，不得有并发使用者。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "[in] Count in [1,65535]."
 msgstr "[in] 样本数，范围 [1,65535]。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "[in] Finite nonnegative raw-code spread per phase."
 msgstr "[in] 各相允许的非负有限原始码跨度。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "SUCCESS or INVALID; rejection preserves state."
 msgstr "SUCCESS 或 INVALID；拒绝时保留状态。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "Consume one complete raw scan without device access."
 msgstr "消费一次完整原始扫描，不访问设备。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid ""
 "Nonfinite/excess-spread scans poison the candidate; callers cannot silently "
 "skip noisy samples and claim it passed."
 msgstr "非有限值或跨度超限的扫描会使候选无效；调用者不能静默跳过噪声样本后声称通过。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "[inout] Initialized same-owner candidate."
 msgstr "[inout] 已初始化、由同一所有者管理的候选。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "[in] Three finite raw values, distinct from candidate."
 msgstr "[in] 三个有限原始值，与候选分离。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "SUCCESS, INVALID, STATE or EXHAUSTED."
 msgstr "SUCCESS、INVALID、STATE 或 EXHAUSTED。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "Copy a completed candidate; never applies or persists it."
 msgstr "复制已完成候选，从不自动应用或持久化。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "[in] Complete valid same-owner candidate."
 msgstr "[in] 完整有效且由同一所有者管理的候选。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "[out] Three distinct result values, unchanged on error."
 msgstr "[out] 三个独立结果值，错误时不变。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "SUCCESS, BUSY, STATE or INVALID; pure bounded calculation."
 msgstr "SUCCESS、BUSY、STATE 或 INVALID；纯有界计算。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "Amplitude-invariant stationary frame, with phase A on alpha."
 msgstr "幅值不变的静止坐标，A 相位于 alpha 轴。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:69
+#: ../../../../../docs/reference/api/components/control.md:75
+#: ../../../../../docs/reference/api/components/control.md:100
+#: ../../../../../docs/reference/api/components/control.md:120
+#: ../../../../../docs/reference/api/components/control.md:150
 msgid "Public Members"
 msgstr "公共成员"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "Rotating-frame values; q is positive beta at electrical angle zero."
 msgstr "旋转坐标值；电角度为零时，q 沿 beta 正方向。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "Immutable explicit profile; gains use A, V and seconds."
 msgstr "不可变的显式配置；增益使用 A、V 和秒。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid ""
 "Kp is V/A and Ki is V/(A*s). Limits are inclusive. Modulation is (0,1]; "
-"minimum_duty is [0,0.5). Their combined linear voltage bound is "
+"minimum_duty is [0,0.5). The fixed-modulation step uses the bound "
 "Vbus/sqrt(3)*maximum_modulation*(1-2*minimum_duty). This conservative bound "
 "reserves a common low-side sampling window; it does not prove analog "
 "settling or any Board route. Anti-windup is an inverse-second back-"
@@ -423,18 +481,17 @@ msgid ""
 "sample/angle/apply timing. Mechanical angle is motor-shaft radians, already "
 "direction-normalized; pole pairs are applied exactly once."
 msgstr ""
-"Kp 的单位为 V/A，Ki 为 V/(A*s)。限制包含边界。调制度范围为 (0,1]，minimum_duty 范围为 "
-"[0,0.5)。两者共同确定线性电压上限 "
-"Vbus/sqrt(3)*maximum_modulation*(1-2*minimum_duty)。这个保守上限为共同低侧采样窗口预留空间，不证明模拟信号已稳定，也不授权任何"
-" Board 路线。抗饱和参数是单位为 1/s 的回算速率。初次 dt 使用 "
-"nominal_period_us，之后使用相邻采样时间。时间域／epoch "
-"必须保持有效且非零。调用者证明相电流标定、方向以及真实采样／角度／采用时序。机械角是已归一化方向的电机轴角度，单位 rad；极对数仅应用一次。"
+"Kp 的单位为 V/A，Ki 为 V/(A*s)。限值包含边界。Modulation 为 (0,1]，minimum_duty 为 "
+"[0,0.5)。固定调制 step 使用 Vbus/sqrt(3)*maximum_modulation*(1-2*minimum_duty) "
+"边界。该保守边界预留共同低侧采样窗口，不证明模拟建立或任何 Board 路线。Anti-windup 是以秒的倒数（s⁻¹）为单位的反算率。初始 dt "
+"使用 nominal_period_us，之后使用连续采样时间。Domain/epoch 必须保持有效且非零。调用者证明相电流标定、方向及实际 "
+"sample/angle/apply 时间。机械角是已规范方向的电机轴弧度；极对数只应用一次。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "One complete calibrated sample and its planned output boundary."
 msgstr "一次完整标定采样及其计划输出边界。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid ""
 "Times are microseconds in one declared domain/epoch. sample_time_us is the "
 "declared measurement event, not an IRQ observation. A hardware bridge must "
@@ -455,15 +512,29 @@ msgstr ""
 "angle<=observed。角度可在采样后取得，但向过去时刻投影的跨度必须有界。采用时间是计划，不证明实际输出。分别验证的机械速度用于预测采样及输出时刻角度。序号可从任意值开始，之后每次恰好递增一且不得回绕。不保留指针。A／B／C"
 " 相电流使用 A，Vbus 使用 V，电机轴角度／速度使用 rad／rad/s。共同事件或有界偏斜近似必须在本数值核之外成立。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "Complete dq current target; equality with its expiry is expired."
 msgstr "完整 dq 电流目标；达到有效期边界即过期。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
+msgid "Current-control voltage decision before any switching modulation."
+msgstr "任何开关调制之前的电流环电压决策。"
+
+#: ../../../../../docs/reference/api/components/control.md:69
+msgid ""
+"Values use the same frames and units as nx_motor_output_t. There are no duty"
+" fields: a selected modulator must jointly plan switching, sampling and "
+"quantization, then track its final voltage once. This decision never proves "
+"that hardware staged or applied an output."
+msgstr ""
+"数值沿用 nx_motor_output_t 的坐标系和单位。没有 duty 字段：选定调制器必须共同规划开关、采样与量化，再对最终电压 "
+"tracking 一次。该决策从不证明硬件已经 staged 或 applied 输出。"
+
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "Full normalized A/B/C duty plan; not a hardware completion receipt."
 msgstr "完整的归一化 A／B／C 占空比计划，不是硬件完成回执。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid ""
 "requested_voltage and planned_voltage use V in the output-angle dq frame. "
 "measured_current uses A in the sample-angle frame. The caller commits the "
@@ -475,11 +546,11 @@ msgstr ""
 "使用采样角度下的坐标，单位 "
 "A。调用者通过唯一硬件所有者提交完整计划；提交错误必须锁存电机故障，并按该所有者合同撤回。这里不推断实际相电压或精确物理更新。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "Independent serialized algorithm state; fields are not controls."
 msgstr "独立的串行算法状态；字段不作为控制入口。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid ""
 "No hardware/OS/heap/clock access. One executor owns all operations. Task and"
 " IRQ must not concurrently access it. Failed steps preserve integrators and "
@@ -489,98 +560,102 @@ msgstr ""
 "不访问硬件／OS／堆／时钟。全部操作由一个执行者拥有。任务与 IRQ "
 "不得并发访问。失败时保留积分器和输出并锁存故障。成功会在硬件提交前推进算法历史；提交失败必须关闭准入。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid "Bounded raw offset estimator, independent from live motor parameters."
 msgstr "有界原始偏置估计器，与活跃电机参数独立。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:60
+#: ../../../../../docs/reference/api/components/control.md:69
 msgid ""
 "Only use samples acquired under externally proven zero-current conditions. "
 "Neither zero mean nor low spread proves zero real current. It never "
 "energizes hardware, changes calibration or writes storage."
 msgstr "仅使用在外部已证明零电流条件下取得的样本。零均值和低跨度都不能证明真实电流为零。它从不使能硬件、不修改标定，也不写入存储。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:64
+#: ../../../../../docs/reference/api/components/control.md:73
 msgid "Axis commands and execution"
 msgstr "轴命令与执行"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid "Explicit-reference rotary axis control and command admission."
 msgstr "显式参考的旋转轴控制与命令准入。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
+#: ../../../../../docs/reference/api/components/control.md:120
+#: ../../../../../docs/reference/api/components/control.md:150
 msgid "Enums"
 msgstr "枚举"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid "Selected reference units; no protocol scaling is implied."
 msgstr "选定参考的单位，不隐含协议缩放。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
+#: ../../../../../docs/reference/api/components/control.md:120
+#: ../../../../../docs/reference/api/components/control.md:150
 msgid "Values:"
 msgstr "取值："
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid "Algorithm admission, never hardware power or borrow state."
 msgstr "算法准入，不代表硬件功率或借用状态。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid "Explicit terminal software action after observed zero-speed dwell."
 msgstr "观察到零速停留满足要求后的显式软件终态动作。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid "Initialize independent state without touching hardware."
 msgstr "初始化独立状态，不影响硬件。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid "Task context. Reinitialize only after every user joins."
 msgstr "任务上下文。仅在全部使用者会合后重新初始化。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid "[out] Unused aligned storage, disjoint from both inputs."
 msgstr "[out] 未使用的对齐存储，与两个输入均不重叠。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid "[in] Nonzero identity and finite step/feedback budgets."
 msgstr "[in] 非零身份及有限的 step／反馈预算。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid "[in] Complete legal revision, copied on success."
 msgstr "[in] 完整合法的参数版本，成功时复制。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid "SUCCESS or INVALID; rejection preserves axis."
 msgstr "SUCCESS 或 INVALID；拒绝时保留 axis。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid "Establish READY from a valid reference, without actuation."
 msgstr "由有效参考建立 READY，不执行驱动动作。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid "Task context. READY does not imply a powered or homed axis."
 msgstr "任务上下文。READY 不表示轴已上电或已回零。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid "[inout] Initialized DISABLED owner, without a latched fault."
 msgstr "[inout] 已初始化的 DISABLED 所有者，且没有锁存故障。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid "[in] Complete current same-domain observation."
 msgstr "[in] 同一时间域中的完整当前观察。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid "[in] Finite microsecond control time, not before feedback."
 msgstr "[in] 有限微秒控制时间，不早于反馈。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid "SUCCESS or INVALID/STATE; rejection preserves axis."
 msgstr "SUCCESS 或 INVALID/STATE；拒绝时保留 axis。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid "Admit a copied new command, without adopting it yet."
 msgstr "接纳并复制新命令，尚不采用。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid ""
 "Task context. Repeats/old frames never refresh authority. A newer accepted "
 "command replaces an unadopted candidate; acceptance does not promise that "
@@ -590,27 +665,27 @@ msgstr ""
 "任务上下文。重复／旧帧从不刷新授权。新的已接纳命令会替换尚未采用的候选；接纳不保证该候选最终被采用。模式切换要求 READY。POSITION "
 "在规划时使用 sqrt，并拒绝运动中重规划。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid "[inout] READY/RUNNING owner without a pending parameter set."
 msgstr "[inout] 无待应用参数集的 READY／RUNNING 所有者。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid "[in] Fresh identity, sequence, units and finite bounds."
 msgstr "[in] 新鲜身份、序号、单位及有限边界。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid "[in] Finite same-domain time at or after last_step."
 msgstr "[in] 有限的同时间域时刻，不早于 last_step。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid "SUCCESS, INVALID/STATE/TIMEOUT or BUSY; no I/O or borrowing."
 msgstr "SUCCESS、INVALID/STATE/TIMEOUT 或 BUSY；不执行 I/O，也不建立借用。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid "Calculate one bounded f32 axis cycle and copied decision."
 msgstr "执行一个有界 f32 轴周期并复制决策。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid ""
 "Task context. Age >= valid_until starts controlled STOPPING with valid "
 "feedback; it does not disable a power stage. HOLDING keeps zero-speed PI "
@@ -620,155 +695,155 @@ msgstr ""
 "任务上下文。当前时间达到或超过 valid_until 时，在反馈有效的前提下开始受控 STOPPING；它不关闭功率级。HOLDING 保持零速 PI"
 " 运行，从不证明机械支撑或位置保持。调用者单独停止／会合 I/O，并完成机械支撑交接。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid "[inout] READY/RUNNING/STOPPING/HOLDING owner."
 msgstr "[inout] READY／RUNNING／STOPPING／HOLDING 所有者。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid "[in] Fresh consecutive mechanical observation."
 msgstr "[in] 新鲜、序号连续的机械观察。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid "[in] Current-reference range supported downstream now."
 msgstr "[in] 当前下游支持的电流参考范围。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid "[in] Strictly increasing finite control time."
 msgstr "[in] 严格递增的有限控制时间。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid "[in] Seconds matching now-last_step within 1 us."
 msgstr "[in] 与 now-last_step 对应的秒数，误差不超过 1 us。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid "[out] Separate aligned decision, unchanged on errors."
 msgstr "[out] 独立对齐的决策，错误时不变。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid ""
 "SUCCESS or exact validation/numeric fault; errors latch FAULT without "
 "pretending hardware has stopped."
 msgstr "SUCCESS 或精确的校验／数值故障；错误会锁存 FAULT，不会假称硬件已停止。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid "Close new command admission and request controlled stopping."
 msgstr "关闭新命令准入并请求受控停止。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid ""
 "Task context. Continue step with valid feedback and power. Zero current is "
 "not assumed to provide mechanical braking."
 msgstr "任务上下文。继续在反馈与供电有效时执行 step。不假定零电流能够提供机械制动。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid "[inout] Initialized same-executor enabled owner."
 msgstr "[inout] 已初始化、由同一执行者管理的已使能所有者。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid "SUCCESS or INVALID/STATE; no hardware access."
 msgstr "SUCCESS 或 INVALID/STATE；不访问硬件。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid "Disable algorithm admission while retaining any fault."
 msgstr "关闭算法准入并保留故障。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid ""
 "Task context. Caller separately withdraws/join all hardware and users before"
 " reclaiming this state or its references."
 msgstr "任务上下文。调用者在回收此状态或其引用之前，单独撤回并会合全部硬件及使用者。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid "[inout] Initialized serialized owner."
 msgstr "[inout] 已初始化的串行所有者。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid "SUCCESS or INVALID; no provider or hardware operation."
 msgstr "SUCCESS 或 INVALID；不操作 provider 或硬件。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid "Clear a fault only while algorithm admission is disabled."
 msgstr "仅在算法准入已禁用时清除故障。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid ""
 "Task context. Product first proves hardware recovery and joined users; "
 "clearing this code never enables output."
 msgstr "任务上下文。产品先证明硬件恢复及使用者会合；清除本错误码从不使能输出。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid "[inout] Initialized DISABLED same-executor owner."
 msgstr "[inout] 已初始化的 DISABLED 同执行者所有者。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid "SUCCESS, INVALID or STATE; remains DISABLED on success."
 msgstr "SUCCESS、INVALID 或 STATE；成功后仍为 DISABLED。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid "Stage a complete newer parameter revision for a boundary."
 msgstr "暂存完整且更新的参数版本，等待周期边界切换。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid ""
 "Task context. Gains preserve the last calculated output where representable."
 " Active trajectory geometry cannot be changed. No persistence, hidden lock "
 "or partial publication."
 msgstr "任务上下文。在可表示时，增益调整保留最后计算的输出。不能修改活跃轨迹的几何条件。不持久化，不隐藏锁，也不逐部分发布。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid "[inout] Initialized same-executor owner, one pending slot."
 msgstr "[inout] 已初始化的同执行者所有者，提供一个待应用槽。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid "[in] Independent complete legal parameter snapshot."
 msgstr "[in] 独立、完整且合法的参数快照。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid "SUCCESS, INVALID/STATE or BUSY; rejection preserves state."
 msgstr "SUCCESS、INVALID/STATE 或 BUSY；拒绝时保留状态。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid "Track an additional downstream current-reference limitation."
 msgstr "跟踪额外的下游电流参考限制。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid ""
 "Task context. Back-calculation uses the declared tracking rate; track before"
 " staging a new revision. No hardware adoption or physical current is "
 "inferred."
 msgstr "任务上下文。回算使用声明的跟踪速率；先完成跟踪，再暂存新参数版本。不据此推断硬件已采用或真实电流。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid "[inout] Owner after a successful step, before the next step."
 msgstr "[inout] 成功 step 后、下次 step 前的所有者。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid "[in] Exact most recent decision, once only."
 msgstr "[in] 精确匹配的最新决策，仅处理一次。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid "[in] Downstream accepted reference, not a measured winding current."
 msgstr "[in] 下游接纳的参考，不是实测绕组电流。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid "[in] The same positive finite cycle interval."
 msgstr "[in] 同一周期的正有限时间间隔。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid ""
 "SUCCESS, INVALID/STATE, BUSY or EXHAUSTED; error preserves state. BUSY "
 "retains the cycle when parameters are pending."
 msgstr "SUCCESS、INVALID/STATE、BUSY 或 EXHAUSTED；错误时保留状态。参数待应用时返回 BUSY，不消费该周期。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid "Immutable microsecond domain and sampling budgets."
 msgstr "不可变的微秒时间域与采样预算。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid "Complete independent parameter revision in SI mechanical units."
 msgstr "使用 SI 机械单位的完整独立参数版本。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid ""
 "velocity_kp is A/(rad/s), velocity_ki is A/rad, position_kp is 1/s. Gains, "
 "tracking rate, integral limit and tolerances are finite and nonnegative. "
@@ -784,11 +859,11 @@ msgstr ""
 "表示连续观察的停留时间，不是物理保证。stop_feedforward_a 是显式 STOPPING／HOLDING 偏置，受 "
 "current_limit_a 约束。它不复用先前的加速偏置，也不证明机械支撑。下游限制仍然适用。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid "Copied command, with the original local receipt and finite authority."
 msgstr "复制的命令，保留原始本地接收时间及有期限的授权。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid ""
 "CURRENT selects current_a; VELOCITY selects velocity_rad_s and adds "
 "current_a as feed-forward; POSITION selects position_rad with a rest-to-rest"
@@ -801,11 +876,11 @@ msgstr ""
 "选择 position_rad 的静止到静止轨迹，并把 current_a 加作前馈。POSITION 要求 "
 "velocity_rad_s=0。全部字段必须有限。位置和速度与反馈使用同一机械侧。电流是下游电机参考，单位 A，绝不按齿比缩放。不提供身份认证。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid "Complete caller-qualified mechanical feedback."
 msgstr "完整且由调用者确认有效的机械反馈。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid ""
 "velocity_rad_s describes [interval_start, sampled_at]. sampled_at identifies"
 " the selected observation event, not an invented aperture. The caller proves"
@@ -815,15 +890,15 @@ msgstr ""
 "velocity_rad_s 描述 [interval_start, sampled_at] 区间。sampled_at "
 "标识所选观察事件，不伪造采样孔径。调用者证明时间戳来源、标定和机械侧。对此轴消费者，发布序号必须连续。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid "Final downstream current-reference admission limits, in amperes."
 msgstr "最终下游电流参考准入范围，单位 A。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid "Copied software decision; no hardware or physical adoption promise."
 msgstr "复制的软件决策，不承诺硬件或物理采用。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid ""
 "adopted_at is when this executor adopted command_sequence. The downstream "
 "provider separately reports staged/applied output facts. requested_current_a"
@@ -833,11 +908,11 @@ msgstr ""
 "adopted_at 是本执行者采用 command_sequence 的时刻。下游 provider "
 "单独报告暂存／采用输出的事实。requested_current_a 位于总电流限制之前。轨迹完成与测得位置已稳定是独立事实。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid "Caller-owned single-executor state, independent for every axis."
 msgstr "调用者拥有、每轴独立的单执行者状态。"
 
-#: ../../../../../../nexus/docs/reference/api/components/control.md:66
+#: ../../../../../docs/reference/api/components/control.md:75
 msgid ""
 "Fields are not controls. Serialize every call with the same executor; cross-"
 "context code transfers complete copies through an external bounded queue or "
@@ -845,3 +920,875 @@ msgid ""
 msgstr ""
 "字段不作为控制入口。所有调用由同一执行者串行进行；跨上下文代码通过外部有界队列或 guard 交接完整副本。不分配内存、不创建任务、不执行 "
 "I/O，也不隐式读取时钟。"
+
+#: ../../../../../docs/reference/api/components/control.md:79
+msgid "Fast references and continuous feedback"
+msgstr "快环参考与连续反馈"
+
+#: ../../../../../docs/reference/api/components/control.md:81
+msgid ""
+"One Task publishes complete finite references; one fast executor adopts at "
+"most one record per step. A full reference queue rejects without overwriting"
+" or refreshing the original receipt. The Drive parameter revision identifies"
+" its stopped Motor profile, independently of an Axis parameter revision. An "
+"inhibit word bypasses reference congestion, but hardware protection and "
+"withdrawal remain the provider's responsibility."
+msgstr ""
+"一个 Task 发布完整有限参考，一个快环执行者每步最多采用一条。参考队列满时拒绝，不覆盖，也不刷新原始 receipt。Drive 参数 "
+"revision 标识其停机 Motor profile，与 Axis 参数 revision 分别管理。独立 inhibit "
+"字绕过参考拥堵；硬件保护与退出仍由 provider 负责。"
+
+#: ../../../../../docs/reference/api/components/control.md:88
+msgid ""
+"Feedback decimation retains real measurement intervals and consecutive fast "
+"coverage. Its queue latches overflow or a coverage gap; consuming old "
+"records does not clear that fault. Droppable telemetry requires a separate "
+"object. `accepted_iq_a` is an adopted reference associated with a "
+"generation, not a measured current. Match that generation to its original "
+"Axis decision before tracking a downstream limit; delayed feedback cannot "
+"track a newer decision."
+msgstr ""
+"反馈分频保留真实测量区间和连续快环覆盖。队列锁存溢出或覆盖断裂；消费旧记录不能清除故障。可丢遥测使用独立对象。`accepted_iq_a` 是关联 "
+"generation 的已采用参考，不是实测电流。下游限幅 tracking 前先匹配该 generation 的原 Axis "
+"决策；延迟反馈不能回算到更新的决策。"
+
+#: ../../../../../docs/reference/api/components/control.md:95
+msgid ""
+"The optional common-bus calculation applies separate finite motoring and "
+"regeneration budgets. It does not assume credit from opposing axes or "
+"provide power protection. The product supplies qualified power requests, "
+"applies the resulting limits and completes the mechanical stopping policy."
+msgstr ""
+"可选共母线计算分别应用有限消费与回生预算。它不假定反向功率轴可以抵消，也不提供功率保护。产品提供合格功率请求、实施所得限幅，并完成机械停止策略。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "Explicit current references and continuous control feedback."
+msgstr "显式电流参考与连续控制反馈。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+#: ../../../../../docs/reference/api/components/control.md:120
+#: ../../../../../docs/reference/api/components/control.md:150
+msgid "Author  Nexus Team"
+msgstr "作者  Nexus Team"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "Initialize empty caller-provided reference storage without hardware."
+msgstr "初始化调用者提供的空参考存储，不操作硬件。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "Serialized Task before publication. Storage is never allocated."
+msgstr "发布前在串行 Task 中调用。从不分配存储。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "[out] Joined, disjoint storage for this SPSC identity."
+msgstr "[out] 已会合、互不重叠的本 SPSC 身份存储。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "[inout] Stable aligned array for exactly capacity records."
+msgstr "[inout] 恰好容纳 capacity 条记录的稳定对齐数组。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "[in] Nonzero power of two below 2^31."
+msgstr "[in] 小于 2^31 的非零二次幂。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "[in] Nonzero Core domain for every reference."
+msgstr "[in] 所有参考使用的非零 Core domain。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "[in] Nonzero epoch, immutable until all executors join."
+msgstr "[in] 非零 epoch，在所有执行者会合前保持不变。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "SUCCESS or INVALID; rejection preserves queue and slots."
+msgstr "SUCCESS 或 INVALID；拒绝保持队列与槽位不变。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "Publish a whole finite reference without changing its receipt."
+msgstr "发布完整有限参考，不改变其 receipt。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid ""
+"Task only. Publication is admission, never IRQ adoption. Full storage "
+"rejects; generations never wrap. No pointer is retained."
+msgstr "仅 Task。发布是准入，不是 IRQ 采用。存储满时拒绝；generation 不回绕。不保留指针。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "[inout] Initialized queue; only its Task producer calls this."
+msgstr "[inout] 已初始化队列；仅其 Task 生产者调用。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "[in] Separate complete same-identity newer generation."
+msgstr "[in] 独立、完整、相同身份且 generation 更新的记录。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "SUCCESS, BUSY, INVALID or STATE; rejection publishes nothing."
+msgstr "SUCCESS、BUSY、INVALID 或 STATE；拒绝不发布内容。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "Latch the first independent inhibit without waiting for queue space."
+msgstr "不等待队列空间，锁存首个独立 inhibit。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid ""
+"Task/IRQ atomic publication. The next fast step rejects; hardware protection"
+" and provider withdrawal remain separately required."
+msgstr "Task/IRQ 原子发布。下一次快环 step 拒绝；硬件保护与 provider 退出仍需分别完成。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "[inout] Stable initialized identity shared with the fast owner."
+msgstr "[inout] 与快环 owner 共享的稳定已初始化身份。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "[in] Non-success result to retain until joined reinitialization."
+msgstr "[in] 保留到会合后重新初始化的非成功结果。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "SUCCESS or INVALID/STATE; no hardware operation is performed."
+msgstr "SUCCESS 或 INVALID/STATE；不执行硬件操作。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "Initialize one stopped fast controller and its immutable revision."
+msgstr "初始化一个已停止的快环控制器及不可变 revision。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "Task before the hardware session borrows drive. No actuation occurs."
+msgstr "硬件会话借用 drive 前在 Task 调用。不产生激励。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "[out] Fresh or joined independent caller storage."
+msgstr "[out] 新建或已会合的调用者独立存储。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "[in] Complete same-domain numerical profile, copied on success."
+msgstr "[in] 同一 domain 的完整数值 profile；成功时复制。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "[inout] Stable initialized Task/IRQ exchange."
+msgstr "[inout] 稳定、已初始化的 Task/IRQ 交接对象。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "[in] Nonzero revision required by every reference."
+msgstr "[in] 每条参考必须匹配的非零 revision。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "SUCCESS, INVALID or STATE; rejection preserves drive."
+msgstr "SUCCESS、INVALID 或 STATE；拒绝保持 drive 不变。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "Adopt at most one reference and compute one voltage decision."
+msgstr "每步最多采用一条参考并计算一个电压决策。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid ""
+"Bounded IRQ/Task math. An empty queue reuses only unexpired authority. Stop,"
+" expiry, stale revision or bad measurement closes admission. Final "
+"modulation and hardware commit remain external and explicit."
+msgstr ""
+"有界 IRQ/Task 数学。队列空时只能复用未过期授权。停止、过期、旧 revision 或无效测量关闭准入。最终调制与硬件提交保持外部显式责任。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "[inout] Same sole fast executor, never accessed by Task live."
+msgstr "[inout] 同一唯一快环执行者；Task 不在运行期间访问。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "[in] Qualified physical sample with exact cycle identity."
+msgstr "[in] 具有精确周期身份的合格物理测量。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "[out] Independent result, unchanged on every failure."
+msgstr "[out] 独立结果，任何失败时保持不变。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "SUCCESS, EMPTY before a first reference, or exact latched fault."
+msgstr "SUCCESS、首条参考前的 EMPTY，或精确锁存故障。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "Track one final quantized plan through the current controller."
+msgstr "通过电流控制器 tracking 一份最终量化计划。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid ""
+"No hardware receipt. Commit failure must latch/withdraw externally; never "
+"reuse advanced algorithm history after a failed commit."
+msgstr "不表示硬件回执。提交失败必须由外部锁存故障并退出；提交失败后不得继续复用已经推进的算法历史。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "[inout] Same fast owner after a successful step."
+msgstr "[inout] 成功 step 后的同一快环 owner。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "[in] Exact most recent cycle, not tracked previously."
+msgstr "[in] 尚未 tracking 的最近一次精确周期。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "[in] Final planned dq volts in the output-angle frame."
+msgstr "[in] 输出角坐标系中的最终计划 dq 电压，单位 V。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "SUCCESS or exact current-controller error."
+msgstr "SUCCESS 或精确电流控制器错误。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "Initialize a fixed fast-to-outer feedback decimator."
+msgstr "初始化固定快环到外环反馈分频器。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "Task before publication; no implicit clock, queue or sampling."
+msgstr "发布前在 Task 调用；没有隐式时钟、队列或采样。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "[out] Joined caller storage for one fast executor."
+msgstr "[out] 供一个快环执行者使用、旧使用者已完成会合的调用者存储。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "[in] Nonzero domain of the input observations."
+msgstr "[in] 输入观察的非零 domain。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "[in] Nonzero immutable epoch."
+msgstr "[in] 非零且不可变的 epoch。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "[in] Positive number of fast intervals per publication."
+msgstr "[in] 每次发布包含的快环间隔数，为正数。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "[in] Positive maximum between fast observations."
+msgstr "[in] 快环观察之间允许的最大间隔，为正数。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "SUCCESS or INVALID; rejection preserves sampler."
+msgstr "SUCCESS 或 INVALID；拒绝保持 sampler 不变。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "Accumulate consecutive observations and produce one real interval."
+msgstr "累积连续观察，产生一个真实区间。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid ""
+"IRQ/Task. Missing cycles, backward time and excessive gaps fault; "
+"observations are never renumbered to hide lost coverage."
+msgstr "IRQ/Task。丢周期、时间倒退和间隔过大产生故障；不通过重新编号隐藏覆盖丢失。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "[inout] Same single fast executor."
+msgstr "[inout] 同一唯一快环执行者。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "[in] Qualified same-domain current-cycle observation."
+msgstr "[in] 同一 domain 中当前周期的合格观察。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "[in] Qualified bounded position at sample_time_us."
+msgstr "[in] sample_time_us 时刻的合格有界位置。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "[in] Same-cycle reference adoption receipt."
+msgstr "[in] 同一周期的参考采用回执。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "[out] Separate record, unchanged while BUSY or on failure."
+msgstr "[out] 独立记录；BUSY 或失败时保持不变。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "SUCCESS at publication, BUSY while accumulating, or latched error."
+msgstr "发布时 SUCCESS，累积时 BUSY，或锁存错误。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "Initialize an empty continuous-feedback SPSC with external storage."
+msgstr "用外部存储初始化空连续反馈 SPSC。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "Task before publisher starts; IRQ publishes and Task takes copies."
+msgstr "发布者启动前在 Task 调用；IRQ 发布，Task 取得副本。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "[out] Joined independent queue metadata."
+msgstr "[out] 已会合的独立队列元数据。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "[inout] Stable aligned array of capacity records."
+msgstr "[inout] 稳定对齐、容纳 capacity 条记录的数组。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "[in] Nonzero feedback domain."
+msgstr "[in] 非零反馈 domain。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "SUCCESS or INVALID; rejection preserves all storage."
+msgstr "SUCCESS 或 INVALID；拒绝保持全部存储不变。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "Publish one whole consecutive control record, never droppable data."
+msgstr "发布一条完整连续控制记录，不作为可丢数据。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid ""
+"Full storage latches lost coverage independently of consumer progress. A "
+"telemetry channel must be a different object with its own contract."
+msgstr "存储满时独立于消费者进度锁存覆盖丢失。遥测必须使用另一个具有独立合同的对象。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "[inout] Same single IRQ/fast producer."
+msgstr "[inout] 同一唯一 IRQ／快环生产者。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "[in] Complete disjoint same-identity observation."
+msgstr "[in] 完整、互不重叠且相同身份的观察。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "SUCCESS, INVALID or exact latched STATE/OVERFLOW fault."
+msgstr "SUCCESS、INVALID 或精确锁存的 STATE/OVERFLOW 故障。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "Copy one control record and return its slot to the fast producer."
+msgstr "复制一条控制记录，并把槽位归还快环生产者。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid ""
+"Task only. A latched coverage fault cannot be repaired by draining old "
+"records or inventing a new sequence; stop/join before reset."
+msgstr "仅 Task。排空旧记录或编造新 sequence 不能修复已锁存的覆盖故障；复位前先停止并会合。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "[inout] Same single Task consumer."
+msgstr "[inout] 同一唯一 Task 消费者。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "[out] Separate output, unchanged on EMPTY or failure."
+msgstr "[out] 独立输出；EMPTY 或失败时保持不变。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "SUCCESS, EMPTY or exact latched feedback fault."
+msgstr "SUCCESS、EMPTY 或精确锁存的反馈故障。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "Compute conservative per-axis power scales for one common bus."
+msgstr "为同一母线计算各轴保守功率比例。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid ""
+"Task only. Positive/negative demands use separate totals; no assumed credit "
+"for opposing motors. Apply reference limits and track Axis downstream "
+"acceptance explicitly. This is not hardware protection."
+msgstr "仅 Task。正负需求分别求和；不假定反向功率电机可以抵消。显式实施参考限制并 tracking Axis 下游采用。这不是硬件保护。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "[in] Qualified finite nonnegative consumption/regeneration."
+msgstr "[in] 合格、有限、非负的消费／回生预算。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "[in] Count complete signed per-axis watt requests."
+msgstr "[in] count 条完整有符号各轴功率请求，单位 W。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "[in] Actual positive axis count, no maximum array is allocated."
+msgstr "[in] 实际轴数量，必须大于零；不分配最大轴数组。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "[in] Finite current time in the budget's qualified local domain."
+msgstr "[in] 预算所确认本地域中的有限当前时间。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "[out] Disjoint count results in [0,1], unchanged on failure."
+msgstr "[out] 互不重叠的 count 项 [0,1] 结果；失败时保持不变。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "SUCCESS, INVALID, TIMEOUT or EXHAUSTED; no retained references."
+msgstr "SUCCESS、INVALID、TIMEOUT 或 EXHAUSTED；不保留引用。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "Complete Task-to-IRQ current reference, copied without borrowing."
+msgstr "Task 到 IRQ 的完整电流参考，复制而不借用。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid ""
+"received_at is the original local receipt, never refreshed by a queue. "
+"generation and parameters_revision are nonzero. The latter identifies the "
+"stopped Motor profile, not Axis's separately adopted revision. A finite "
+"current expiry must follow receipt; it remains independent from session "
+"life."
+msgstr ""
+"received_at 是原始本地 receipt，不因排队刷新。generation 和 parameters_revision 非零。后者标识停机 "
+"Motor profile，与 Axis 独立采用的 revision 不同。有限电流期限必须晚于 receipt，且与会话寿命独立。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "Caller-owned SPSC reference storage and independent inhibit word."
+msgstr "调用者拥有的 SPSC 参考存储与独立 inhibit 字。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid ""
+"One Task publishes, one fast executor consumes. Only atomic helpers access "
+"indices/inhibited concurrently. Other fields belong to their indicated "
+"executor. Capacity is a power of two; full rejects without overwriting. Join"
+" both executors before reinitializing any storage."
+msgstr ""
+"一个 Task 发布，一个快环执行者消费。仅原子 helper 并发访问索引和 "
+"inhibited；其他字段归各自执行者。容量为二次幂，满时拒绝而不覆盖。重新初始化任何存储前先会合两个执行者。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "Fast-executor adoption receipt, never a hardware completion."
+msgstr "快环执行者的采用回执，不是硬件完成。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "One IRQ-owned algorithm instance; Task accesses only the queues."
+msgstr "一个 IRQ 拥有的算法实例；Task 只访问队列。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid ""
+"No task, I/O, heap or hidden clock. The reference queue remains stable "
+"through hardware withdrawal and executor join. A parameter revision belongs "
+"to this stopped initialization, not mutable live fields."
+msgstr "没有任务、I/O、堆或隐藏时钟。参考队列在硬件退出和执行者会合期间保持稳定。参数 revision 属于本次停机初始化，不是可变运行字段。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "Continuous outer-loop record, separate from droppable telemetry."
+msgstr "连续外环记录，与可丢遥测分开。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid ""
+"fast_first_cycle and fast_last_cycle include the shared interval endpoints. "
+"Adjacent records share one endpoint. accepted_iq_a belongs to "
+"reference_generation, not measured winding current. Match that generation's "
+"Axis output before downstream tracking; never track a newer Axis decision "
+"from this delayed receipt. command_sequence proves that command reached the "
+"fast owner by this record, not its earliest adoption time across reference "
+"generations. Mechanical units use the motor shaft unless the caller supplies"
+" a qualified side mapping."
+msgstr ""
+"fast_first_cycle 和 fast_last_cycle 包含共同区间端点，相邻记录共享一个端点。accepted_iq_a 属于 "
+"reference_generation，不是实测绕组电流。下游 tracking 前匹配该 generation 的 Axis "
+"输出；不得用此延迟回执回算更新的 Axis 决策。command_sequence 证明该命令截至本记录的观察时刻已经到达快环 owner，不证明跨参考"
+" generation 的最早采用时刻。机械单位使用电机轴侧，除非调用者提供合格侧别换算。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "IRQ-producer/Task-consumer SPSC; any overflow latches lost coverage."
+msgstr "IRQ 生产、Task 消费的 SPSC；任何溢出锁存覆盖丢失。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid ""
+"No automatic drop or renumbering. Once faulted, drain/reinitialize only "
+"after both executors and hardware publishers have joined."
+msgstr "不自动丢弃或重新编号。产生故障后，只有两个执行者与硬件发布者会合后才能排空／重新初始化。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "Fixed decimator retaining actual interval and fast-cycle coverage."
+msgstr "保留实际区间和快环覆盖的固定分频器。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid ""
+"One fast executor owns it. Positions are caller-qualified bounded motor-"
+"shaft radians; keep multi-turn integer counts upstream. It never treats Task"
+" scheduling time as a measurement interval."
+msgstr "由一个快环执行者拥有。位置是调用者确认的有界电机轴弧度；上游保留多圈整数计数。不把 Task 调度时间当作测量区间。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid "Finite external common-bus power budget, not a protection circuit."
+msgstr "有限外部共母线功率预算，不是保护电路。"
+
+#: ../../../../../docs/reference/api/components/control.md:100
+msgid ""
+"Positive requested power consumes the bus; negative regenerates. Budgets are"
+" nonnegative watts and are not netted against each other. The caller "
+"qualifies their source, domain and actual braking hardware."
+msgstr "正请求功率消费母线，负功率回生。预算为非负 W，二者不相抵。调用者确认来源、domain 和实际制动硬件。"
+
+#: ../../../../../docs/reference/api/components/control.md:104
+msgid "Current provenance and reconstruction"
+msgstr "电流来源与重构"
+
+#: ../../../../../docs/reference/api/components/control.md:106
+msgid ""
+"Current conversion matches the selected calibration identity and revision, "
+"rejects saturated codes and bounds aperture skew. Three independent phase "
+"measurements can use their sum as a consistency check; reconstructing a "
+"third phase from two measurements cannot establish that independent "
+"evidence. DC-link reconstruction requires two distinct observable active-"
+"vector phases from the same accepted switching plan. These checks neither "
+"prove zero current nor commission or persist calibration."
+msgstr ""
+"电流换算匹配选定标定身份和 "
+"revision，拒绝饱和码并限制孔径偏差。三个独立相电流测量可用其和检查一致性；从两相重构第三相不能建立这种独立证据。母线重构要求来自同一已接纳开关计划、可观察不同相位的两个有效矢量。检查不证明零电流，也不投入运行或持久化标定。"
+
+#: ../../../../../docs/reference/api/components/control.md:114
+msgid ""
+"Explicit timing uses actual aperture positions; bounded timing retains a "
+"qualified group reference and positive skew bound without reading fabricated"
+" per-phase apertures. Scheduled provider trigger coordinates remain "
+"scheduled facts. A two-trigger DC capture spans both observations and the "
+"last conversion, independently of any separately qualified DC-bus voltage "
+"source."
+msgstr ""
+"显式时序使用真实孔径位置；有界时序保留合格的组参考与正偏差上界，不读取虚构的逐相孔径。provider 的计划触发坐标始终是计划事实。两触发 DC "
+"采集的跨度覆盖两次观察及末次转换，与另外建立资格的母线电压来源分别管理。"
+
+#: ../../../../../docs/reference/api/components/control.md:120
+msgid "Explicit calibrated current observations and reconstruction."
+msgstr "显式标定电流观察与重构。"
+
+#: ../../../../../docs/reference/api/components/control.md:120
+msgid "Logical phase bits; unrelated to ADC rank or switching-vector bits."
+msgstr "逻辑相位位，与 ADC rank 或开关矢量位无关。"
+
+#: ../../../../../docs/reference/api/components/control.md:120
+msgid "Distinguish actual aperture positions from a qualified group bound."
+msgstr "区分真实孔径位置与合格的组偏差上界。"
+
+#: ../../../../../docs/reference/api/components/control.md:120
+msgid "Validate an immutable sensor-chain calibration without side effects."
+msgstr "无副作用地校验不可变传感链标定。"
+
+#: ../../../../../docs/reference/api/components/control.md:120
+msgid "Bounded pure C11, valid from a serialized Task or IRQ."
+msgstr "有界纯 C11，可在串行 Task 或 IRQ 中调用。"
+
+#: ../../../../../docs/reference/api/components/control.md:120
+msgid "[in] Stable caller-qualified complete coefficients."
+msgstr "[in] 稳定、由调用者确认的完整系数。"
+
+#: ../../../../../docs/reference/api/components/control.md:120
+msgid "SUCCESS or INVALID; no references retained."
+msgstr "SUCCESS 或 INVALID；不保留引用。"
+
+#: ../../../../../docs/reference/api/components/control.md:120
+msgid "Convert two or three phase observations and reconstruct one if needed."
+msgstr "换算两相或三相观察，并在需要时重构一相。"
+
+#: ../../../../../docs/reference/api/components/control.md:120
+msgid ""
+"No allocation, hardware, OS or implicit time. Three independently measured "
+"phases use maximum_sum_a. Two measured phases reconstruct the third without "
+"treating their zero sum as a sensor diagnostic."
+msgstr "无分配、硬件、OS 或隐式时间。三个独立实测相使用 maximum_sum_a。两个实测相重构第三相，不把其零和当作传感器诊断。"
+
+#: ../../../../../docs/reference/api/components/control.md:120
+msgid "[in] Stable immutable matching calibration."
+msgstr "[in] 稳定、不可变且匹配的标定。"
+
+#: ../../../../../docs/reference/api/components/control.md:120
+msgid "[in] Complete same-cycle logical phase observations."
+msgstr "[in] 同一周期的完整逻辑相位观察。"
+
+#: ../../../../../docs/reference/api/components/control.md:120
+msgid "[out] Separate output, unchanged on every failure."
+msgstr "[out] 独立输出，任何失败时保持不变。"
+
+#: ../../../../../docs/reference/api/components/control.md:120
+msgid "SUCCESS, INVALID, STATE, OVERFLOW or IO."
+msgstr "SUCCESS、INVALID、STATE、OVERFLOW 或 IO。"
+
+#: ../../../../../docs/reference/api/components/control.md:120
+msgid "Convert two active-vector DC-link samples into phase currents."
+msgstr "把两个有效矢量母线采样换算为相电流。"
+
+#: ../../../../../docs/reference/api/components/control.md:120
+msgid ""
+"Caller proves the accepted PWM plan and current-slew error. Opposite vectors"
+" observing only the same phase cannot reconstruct three phases."
+msgstr "调用者证明已接纳 PWM 计划及电流变化引起的采样误差。仅观察同一相的相反矢量不能重构三相。"
+
+#: ../../../../../docs/reference/api/components/control.md:120
+msgid "[in] Matching immutable DC-link calibration in slot zero."
+msgstr "[in] 槽零中的匹配不可变母线标定。"
+
+#: ../../../../../docs/reference/api/components/control.md:120
+msgid "[in] Two time-ordered independent active-vector observations."
+msgstr "[in] 按时间排序、可独立观测有效矢量的两个采样。"
+
+#: ../../../../../docs/reference/api/components/control.md:120
+msgid "[out] Separate output, unchanged on failure."
+msgstr "[out] 独立输出；失败时保持不变。"
+
+#: ../../../../../docs/reference/api/components/control.md:120
+msgid "Immutable calibration for one explicitly identified sensor chain."
+msgstr "明确身份传感链的不可变标定。"
+
+#: ../../../../../docs/reference/api/components/control.md:120
+msgid ""
+"identity and revision are nonzero matching facts, not authentication. "
+"maximum_code is at most 2^24-1, preserving integer-to-f32 precision. Codes "
+"at either rail are saturation. Gains are positive A/code; direction is "
+"exactly +1 or -1. An all-zero coefficient triplet marks an absent sensor; at"
+" least one is present and every measured slot must be present. Phase capture"
+" uses A/B/C coefficients; bus capture uses coefficient zero. Actual aperture"
+" ticks, when provided, do not wrap within one cycle. maximum_skew_ticks "
+"bounds the accepted approximation; the caller proves that its current-slew "
+"error is acceptable. Calibration does not prove zero current, commission "
+"hardware or persist results."
+msgstr ""
+"identity 与 revision 是非零匹配事实，不是身份认证。maximum_code 最大为 2^24-1，以保持整数转 f32 "
+"的精度。任一轨值均视为饱和。增益为正的 A/code；direction 必须恰为 +1 或 "
+"-1。全零系数三元组表示缺席传感器；至少一个传感器存在，每个实际测量槽都必须存在。相电流采集使用 A/B/C 系数；母线电流采集使用槽 0 "
+"的系数。提供真实孔径 tick 时，同一周期内不得回绕。maximum_skew_ticks "
+"限定所接受的近似；调用者证明电流变化引起的采样误差可接受。标定不证明零电流，不完成硬件投入运行，也不持久化结果。"
+
+#: ../../../../../docs/reference/api/components/control.md:120
+msgid "Two or three logical phase codes, stable only during the call."
+msgstr "两路或三路逻辑相位码，仅在调用期间稳定。"
+
+#: ../../../../../docs/reference/api/components/control.md:120
+msgid ""
+"Only measured_mask entries are read. Identity/revision must match the "
+"selected calibration. Caller validates the source cycle/plan/epoch; these "
+"pure calculations do not invent that qualification. EXPLICIT reads actual "
+"aperture_tick entries; nonzero skew_bound_ticks must cover their span and is"
+" retained. BOUNDED never reads aperture_tick; it requires a positive "
+"qualified skew_bound_ticks and uses the stated group reference_tick. A "
+"scheduled group reference is not an aperture."
+msgstr ""
+"只读取 measured_mask 标记的条目。身份与 revision 必须匹配选定标定。调用者验证来源的周期、计划和 "
+"epoch；纯计算不会生成这些资格。EXPLICIT 读取真实 aperture_tick 条目；非零 skew_bound_ticks "
+"必须覆盖其跨度，并原样保留。BOUNDED 从不读取 aperture_tick；它要求正的合格 skew_bound_ticks，并使用声明的组 "
+"reference_tick。计划组参考不是采样孔径。"
+
+#: ../../../../../docs/reference/api/components/control.md:120
+msgid "Two DC-link measurements in independently observable active vectors."
+msgstr "在可独立观察的有效矢量内取得的两个母线测量。"
+
+#: ../../../../../docs/reference/api/components/control.md:120
+msgid ""
+"switching_vector uses binary upper-switch A/B/C as bits 2/1/0. Values zero "
+"and seven are unobservable zero vectors. ADC conversion, current polarity "
+"and actual switching-state provenance are external facts. Both samples must "
+"belong to the same accepted cycle plan. EXPLICIT requires ordered actual "
+"apertures. BOUNDED retains a positive group skew bound and reference, "
+"without reading aperture_tick entries."
+msgstr ""
+"switching_vector 用二进制位 2/1/0 表示 A/B/C 上桥臂开关。零与七为不可观测的零矢量。ADC "
+"转换、电流极性和真实开关状态来源属于外部事实。两次采样必须属于同一个已接受周期计划。EXPLICIT 要求有序的真实孔径。BOUNDED "
+"保留正的组偏差上界与参考，不读取 aperture_tick 条目。"
+
+#: ../../../../../docs/reference/api/components/control.md:120
+msgid "Reconstructed physical currents with retained observation provenance."
+msgstr "保留观察来源的重构物理电流。"
+
+#: ../../../../../docs/reference/api/components/control.md:120
+msgid ""
+"EXPLICIT reference_tick is the earliest actual aperture; BOUNDED uses the "
+"caller's group reference, never an invented measured aperture. skew_ticks "
+"retains the declared bound where supplied. Nonzero skew is a bounded "
+"approximation, not simultaneous sampling. A reconstructed phase is never "
+"independent sensor-consistency evidence."
+msgstr ""
+"EXPLICIT 的 reference_tick 是最早的真实孔径；BOUNDED "
+"使用调用者的组参考，不虚构实测孔径。提供声明上界时，skew_ticks "
+"保留该上界。非零偏差是有界近似，不是同时采样。重构相位从不作为独立的传感器一致性证据。"
+
+#: ../../../../../docs/reference/api/components/control.md:124
+msgid "Joint pulse and capture planning"
+msgstr "联合脉冲与采集规划"
+
+#: ../../../../../docs/reference/api/components/control.md:126
+msgid ""
+"The modulation result contains full-carrier pulse widths, pulse starts, "
+"selected capture windows and the final ideal quantized alpha/beta voltage. "
+"Analog recovery, sample-and-hold, ADC occupation and CPU submission budgets "
+"have separate meanings. A missing observable window returns an error without"
+" publishing a partial plan."
+msgstr ""
+"调制结果包含完整载波脉宽、脉冲起点、所选采集窗口及最终理想量化 alpha/beta 电压。模拟恢复、采样保持、ADC 占用和 CPU "
+"提交预算各有含义。没有可观测窗口时返回错误，不发布部分计划。"
+
+#: ../../../../../docs/reference/api/components/control.md:132
+msgid ""
+"The selected provider also supplies a capture slot. Trigger, result "
+"occupation and rearm must remain inside it; a mathematically observable "
+"half-carrier is not usable when the hardware profile opens only the other "
+"half."
+msgstr ""
+"选定 provider 还提供采集槽。触发、结果占用和 rearm 必须留在槽内；硬件 profile "
+"只开放另一半载波时，数学上可观测的半载波也不能使用。"
+
+#: ../../../../../docs/reference/api/components/control.md:136
+msgid ""
+"The pure calculation supports selected edge/center alignment and shunt "
+"topologies. A provider must explicitly map the whole result or reject it. In"
+" particular, pulse starts and a single-shunt phase shift cannot be discarded"
+" by a duty-only mapper. A software plan does not qualify a corresponding MCU"
+" mode, PCB, actual aperture, voltage or WCET."
+msgstr ""
+"纯计算支持所选边沿／中心对齐及分流拓扑。provider 必须显式完整映射结果或拒绝。尤其是，只有 duty 的 mapper "
+"不能丢弃脉冲起点或单分流相移。软件计划不授予相应 MCU 模式、PCB、实际孔径、电压或 WCET 资格。"
+
+#: ../../../../../docs/reference/api/components/control.md:142
+msgid ""
+"The selected F4 DC-link mapper uses unshifted edge-aligned pulses. Its "
+"initial plan must contain two independent active-vector observations; "
+"neutral equal duties do not qualify. DC descriptors reside in the complete "
+"declared session context and are copied after validation, never retained "
+"from callback stack storage. A degenerate zero-voltage request without an "
+"observable window returns `UNSUPPORTED`; unsupported fixed shifts are not "
+"silently mapped or replaced by unrequested excitation."
+msgstr ""
+"选定 F4 DC-link mapper 使用无相移的边沿对齐脉冲。首计划必须包含两个独立有效矢量观察；中性等 duty 不具备采样资格。DC "
+"descriptor 位于完整声明的会话 context 内，验证后复制，不能保留 callback 栈存储。没有可观测窗口的零电压退化请求返回 "
+"`UNSUPPORTED`；不支持的固定相移不能被静默映射或替换为未经请求的激励。"
+
+#: ../../../../../docs/reference/api/components/control.md:150
+msgid "Coherent integer-carrier PWM and current-sampling planning."
+msgstr "一致的整数载波 PWM 与电流采样规划。"
+
+#: ../../../../../docs/reference/api/components/control.md:150
+msgid "Physically distinct current-observation requirements."
+msgstr "物理上不同的电流观察要求。"
+
+#: ../../../../../docs/reference/api/components/control.md:150
+msgid "Carrier shape; full period ticks never means a vendor ARR value."
+msgstr "载波形状；完整周期 tick 从不等同于厂商 ARR 值。"
+
+#: ../../../../../docs/reference/api/components/control.md:150
+msgid "Validate one selected static carrier/observation profile."
+msgstr "校验一套选定的静态载波／观察 profile。"
+
+#: ../../../../../docs/reference/api/components/control.md:150
+msgid "Pure bounded Task/IRQ math; call at cold admission as well."
+msgstr "纯有界 Task/IRQ 数学；冷态准入时也应调用。"
+
+#: ../../../../../docs/reference/api/components/control.md:150
+msgid "[in] Caller-owned stable timing and topology facts."
+msgstr "[in] 调用者拥有的稳定时序与拓扑事实。"
+
+#: ../../../../../docs/reference/api/components/control.md:150
+msgid "SUCCESS or INVALID; no effects or retained references."
+msgstr "SUCCESS 或 INVALID；无效果，也不保留引用。"
+
+#: ../../../../../docs/reference/api/components/control.md:150
+msgid "Jointly plan quantized output and observable current capture."
+msgstr "联合规划量化输出与可观测电流采集。"
+
+#: ../../../../../docs/reference/api/components/control.md:150
+msgid ""
+"No vendor, OS, allocation or implicit clock. The caller associates the "
+"result with its cycle/epoch and tracks voltage once after all planning. A "
+"provider must map the entire plan or reject; never silently clamp duty or "
+"retain old sample routing. Optional shifts preserve average pulse widths but"
+" require a separately reviewed hardware mode."
+msgstr ""
+"无厂商、OS、分配或隐式时钟。调用者把结果关联到其 cycle/epoch，并在全部规划完成后 tracking 电压一次。provider "
+"必须完整映射计划或拒绝；不得静默裁剪 duty 或保留旧采样路线。可选相移保留平均脉宽，但需要独立审核的硬件模式。"
+
+#: ../../../../../docs/reference/api/components/control.md:150
+msgid "[in] Stable selected profile with qualified timing budgets."
+msgstr "[in] 稳定且时序预算已确认的选定 profile。"
+
+#: ../../../../../docs/reference/api/components/control.md:150
+msgid "[in] Finite amplitude-invariant alpha/beta volts."
+msgstr "[in] 有限幅值不变 alpha/beta 电压，单位 V。"
+
+#: ../../../../../docs/reference/api/components/control.md:150
+msgid "[in] Positive finite selected DC-link observation."
+msgstr "[in] 正且有限的选定母线电压观察。"
+
+#: ../../../../../docs/reference/api/components/control.md:150
+msgid "[out] Separate complete result, unchanged on failure."
+msgstr "[out] 独立完整结果；失败时保持不变。"
+
+#: ../../../../../docs/reference/api/components/control.md:150
+msgid "SUCCESS, INVALID, EXHAUSTED or UNSUPPORTED for no valid window."
+msgstr "SUCCESS、INVALID、EXHAUSTED，或没有有效窗口时的 UNSUPPORTED。"
+
+#: ../../../../../docs/reference/api/components/control.md:150
+msgid "Plan only a two/three-phase shunt profile without linking bus logic."
+msgstr "只规划双／三相分流 profile，不链接母线分流逻辑。"
+
+#: ../../../../../docs/reference/api/components/control.md:150
+msgid "Direct bounded Task/IRQ entry; no dispatch to a bus-shunt planner."
+msgstr "直接有界 Task/IRQ 入口，不派发到母线分流规划器。"
+
+#: ../../../../../docs/reference/api/components/control.md:150
+msgid "[in] Stable THREE_SHUNT or TWO_SHUNT profile."
+msgstr "[in] 稳定的 THREE_SHUNT 或 TWO_SHUNT profile。"
+
+#: ../../../../../docs/reference/api/components/control.md:150
+msgid "[in] Finite stationary alpha/beta volts."
+msgstr "[in] 有限静止坐标 alpha/beta 电压，单位 V。"
+
+#: ../../../../../docs/reference/api/components/control.md:150
+msgid "[in] Positive finite DC-link observation."
+msgstr "[in] 正且有限的母线电压观测。"
+
+#: ../../../../../docs/reference/api/components/control.md:150
+msgid "[out] Separate complete plan, unchanged on failure."
+msgstr "[out] 独立完整计划；失败时保持不变。"
+
+#: ../../../../../docs/reference/api/components/control.md:150
+msgid "Same results as plan; SINGLE_SHUNT is INVALID."
+msgstr "结果与 plan 相同；SINGLE_SHUNT 为 INVALID。"
+
+#: ../../../../../docs/reference/api/components/control.md:150
+msgid "Plan only a two-observation DC-link shunt profile."
+msgstr "只规划具有两个观察的母线分流 profile。"
+
+#: ../../../../../docs/reference/api/components/control.md:150
+msgid "Direct bounded Task/IRQ entry; selected shifts require mapper support."
+msgstr "直接有界 Task/IRQ 入口；实际选中的相移需要 mapper 支持。"
+
+#: ../../../../../docs/reference/api/components/control.md:150
+msgid "[in] Stable SINGLE_SHUNT profile."
+msgstr "[in] 稳定的 SINGLE_SHUNT profile。"
+
+#: ../../../../../docs/reference/api/components/control.md:150
+msgid "Same results as plan; phase-shunt profiles are INVALID."
+msgstr "结果与 plan 相同；相位分流 profile 为 INVALID。"
+
+#: ../../../../../docs/reference/api/components/control.md:150
+msgid "Immutable selected topology and conservative integer timing budgets."
+msgstr "选定拓扑和保守整数时序预算的不可变配置。"
+
+#: ../../../../../docs/reference/api/components/control.md:150
+msgid ""
+"period_ticks spans one complete unfolded carrier, at most 2^24 ticks. duty "
+"limits are full-period high-pulse widths. Centered widths and limits are "
+"even. sensor_mask uses logical A/B/C bits 0/1/2. Phase topologies select two"
+" or three samples_per_trigger; SINGLE selects one DC-link value at each of "
+"two triggers. deadtime+settling bounds switching recovery; aperture bounds "
+"the whole selected S/H envelope; conversion bounds trigger-to-result "
+"occupancy, including aperture. irq+compute must fit before "
+"commit_before_ticks. rearm_ticks covers the selected route-switch work after"
+" the first single-shunt result. capture_begin/end reserve an ADC slot in "
+"unfolded carrier ticks; end zero means the full period. Trigger, conversion,"
+" IRQ extraction and rearm all fit in that slot. The provider supplies its "
+"supported half-cycle/shared-resource range, never an application guess of "
+"ARR. A nonzero single_shunt_shift_ticks authorizes one fixed phase-shift "
+"candidate, only for a mapper that can preserve each pulse width. Budgets are"
+" caller-qualified declarations, never measured WCET."
+msgstr ""
+"period_ticks 跨越一个完整展开载波，至多 2^24 tick。duty "
+"限制表示整周期高脉冲宽度，中心对齐宽度和限值均为偶数。sensor_mask 用逻辑 A/B/C 位 0/1/2。相位拓扑每次触发选择两个或三个 "
+"samples_per_trigger；SINGLE 在两次触发分别取得一个母线值。deadtime+settling 限制开关恢复，aperture "
+"覆盖所选完整采样保持包络，conversion 覆盖包括孔径的触发到结果占用。irq+compute 必须在 commit_before_ticks "
+"前完成。rearm_ticks 覆盖首个单分流结果之后的所选路线切换。capture_begin/end 在展开载波 tick 中预留 ADC "
+"槽；end 为零表示完整周期。触发、转换、IRQ 抽取和 rearm 都留在此槽。provider 提供可支持的半周期／共享资源范围，应用不猜测 "
+"ARR。非零 single_shunt_shift_ticks 授权一种固定相移候选，仅适用于能够保留各脉宽的 "
+"mapper。预算是调用者确认的声明，从不表示实测 WCET。"
+
+#: ../../../../../docs/reference/api/components/control.md:150
+msgid "One valid capture window, with its actual logical switching state."
+msgstr "一个有效采集窗口及其实际逻辑开关状态。"
+
+#: ../../../../../docs/reference/api/components/control.md:150
+msgid ""
+"The aperture starts at tick. window_begin/end bound stable sampling, "
+"excluding recovery at its beginning; end is exclusive for switching. "
+"phase_mask uses A/B/C bits 0/1/2; switching_vector uses upper-switch A/B/C "
+"bits 2/1/0. These coordinates belong to the accompanying plan."
+msgstr ""
+"孔径从 tick 开始。window_begin/end 限定稳定采样，排除起点恢复时间；end 是开关区间的排他边界。phase_mask 用 "
+"A/B/C 位 0/1/2；switching_vector 用上侧 A/B/C 开关位 2/1/0。这些坐标属于随附计划。"
+
+#: ../../../../../docs/reference/api/components/control.md:150
+msgid "Complete logical pulse/capture plan, never a hardware receipt."
+msgstr "完整逻辑脉冲／采集计划，不是硬件回执。"
+
+#: ../../../../../docs/reference/api/components/control.md:150
+msgid ""
+"Each leg is high for duty_ticks from start_ticks, wrapping at the full "
+"period. start_ticks must not be ignored by a mapper. voltage is the ideal "
+"final quantized average alpha/beta voltage, excluding unmeasured "
+"deadtime/device drops. At most two events are intrinsic to the selected "
+"shunt modes, not a maximum-axis or arbitrary-hardware union."
+msgstr ""
+"每相从 start_ticks 开始保持 duty_ticks 宽度的高电平，在完整周期处回绕。mapper 不得忽略 "
+"start_ticks。voltage 是最终量化理想平均 alpha/beta "
+"电压，不包含未测量的死区／器件压降。至多两个事件来自所选分流模式本身，不是最大轴数或任意硬件 union。"

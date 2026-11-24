@@ -193,7 +193,7 @@ static nx_result_t validate_sample(const nx_motor_t* motor,
 
 static nx_result_t sample_angles(const nx_motor_config_t* c,
                                  const nx_motor_sample_t* s,
-                                 nx_motor_output_t* out) {
+                                 nx_motor_voltage_t* out) {
     const float pairs = (float)c->pole_pairs;
     const float phase =
         pairs * wrap_angle(s->mechanical_angle_rad) + c->electrical_offset_rad;
@@ -217,7 +217,7 @@ static nx_result_t sample_angles(const nx_motor_config_t* c,
 static nx_result_t voltage_plan(nx_motor_t* next,
                                 const nx_motor_sample_t* sample,
                                 const nx_motor_reference_t* reference,
-                                nx_motor_output_t* out) {
+                                bool fixed_window, nx_motor_voltage_t* out) {
     const nx_motor_config_t* c = &next->config;
     const float dt = next->last_dt_s;
     const float error_d = reference->id_a - out->measured_current.d;
@@ -237,8 +237,9 @@ static nx_result_t voltage_plan(nx_motor_t* next,
     if (!finite_dq(out->requested_voltage) || !isfinite(norm)) {
         return NX_ERROR_EXHAUSTED;
     }
+    const float window = fixed_window ? 1 - 2 * c->minimum_duty : 1;
     const float limit = sample->bus_voltage_v * NX_MOTOR_INV_SQRT3 *
-                        c->maximum_modulation * (1 - 2 * c->minimum_duty);
+                        c->maximum_modulation * window;
     if (!isfinite(limit) || limit <= 0) {
         return NX_ERROR_EXHAUSTED;
     }
@@ -259,12 +260,113 @@ static nx_result_t voltage_plan(nx_motor_t* next,
     }
     next->integral_d_v = bounded(corrected_d, c->integral_limit_v);
     next->integral_q_v = bounded(corrected_q, c->integral_limit_v);
-    nx_motor_ab_t voltage;
-    nx_result_t result = nx_motor_inverse_park(
-        out->planned_voltage, out->output_electrical_angle_rad, &voltage);
+    return NX_SUCCESS;
+}
+
+/** \brief Validate external storage once before copying transactional state. */
+static nx_result_t admit_step(nx_motor_t* motor,
+                              const nx_motor_sample_t* sample,
+                              const nx_motor_reference_t* reference,
+                              const void* out, size_t out_bytes) {
+    if (motor == NULL || sample == NULL || reference == NULL || out == NULL ||
+        overlaps(motor, sizeof(*motor), sample, sizeof(*sample)) ||
+        overlaps(motor, sizeof(*motor), reference, sizeof(*reference)) ||
+        overlaps(motor, sizeof(*motor), out, out_bytes) ||
+        overlaps(sample, sizeof(*sample), out, out_bytes) ||
+        overlaps(reference, sizeof(*reference), out, out_bytes)) {
+        return NX_ERROR_INVALID;
+    }
+    if (!motor->initialized || motor->fault != NX_SUCCESS) {
+        return NX_ERROR_STATE;
+    }
+    nx_result_t result = validate_sample(motor, sample, reference);
+    return result == NX_SUCCESS ? NX_SUCCESS : fault(motor, result);
+}
+
+/** \brief Advance only a private transaction, shared by both public modes. */
+static nx_result_t compute_voltage(nx_motor_t* next,
+                                   const nx_motor_sample_t* sample,
+                                   const nx_motor_reference_t* reference,
+                                   bool fixed_window,
+                                   nx_motor_voltage_t* plan) {
+    const uint64_t elapsed =
+        next->have_sample ? sample->sample_time_us - next->last_sample_time_us
+                          : next->config.nominal_period_us;
+    next->last_dt_s = (float)elapsed * 0.000001f;
+    nx_result_t result = sample_angles(&next->config, sample, plan);
+    nx_motor_ab_t current;
+    if (result == NX_SUCCESS) {
+        result = nx_motor_clarke(sample->phase_current_a, &current);
+    }
+    if (result == NX_SUCCESS) {
+        result = nx_motor_park(current, plan->sample_electrical_angle_rad,
+                               &plan->measured_current);
+    }
+    if (result == NX_SUCCESS) {
+        result = voltage_plan(next, sample, reference, fixed_window, plan);
+    }
     if (result != NX_SUCCESS) {
         return result;
     }
+    next->last_planned_voltage = plan->planned_voltage;
+    next->last_sample_time_us = sample->sample_time_us;
+    next->last_observed_at_us = sample->observed_at_us;
+    next->last_sequence = sample->sequence;
+    next->have_sample = true;
+    next->track_pending = true;
+    plan->sequence = sample->sequence;
+    return NX_SUCCESS;
+}
+
+nx_result_t nx_motor_voltage_step(nx_motor_t* motor,
+                                  const nx_motor_sample_t* sample,
+                                  const nx_motor_reference_t* reference,
+                                  nx_motor_voltage_t* out) {
+    nx_result_t result =
+        admit_step(motor, sample, reference, out, sizeof(*out));
+    if (result != NX_SUCCESS) {
+        return result;
+    }
+    nx_motor_t next = *motor;
+    nx_motor_voltage_t plan = {0};
+    result = compute_voltage(&next, sample, reference, false, &plan);
+    if (result != NX_SUCCESS) {
+        return fault(motor, result);
+    }
+    *motor = next;
+    *out = plan;
+    return NX_SUCCESS;
+}
+
+nx_result_t nx_motor_step(nx_motor_t* motor, const nx_motor_sample_t* sample,
+                          const nx_motor_reference_t* reference,
+                          nx_motor_output_t* out) {
+    nx_result_t result =
+        admit_step(motor, sample, reference, out, sizeof(*out));
+    if (result != NX_SUCCESS) {
+        return result;
+    }
+    nx_motor_t next = *motor;
+    nx_motor_voltage_t decision = {0};
+    result = compute_voltage(&next, sample, reference, true, &decision);
+    if (result != NX_SUCCESS) {
+        return fault(motor, result);
+    }
+    nx_motor_ab_t voltage;
+    result =
+        nx_motor_inverse_park(decision.planned_voltage,
+                              decision.output_electrical_angle_rad, &voltage);
+    if (result != NX_SUCCESS) {
+        return fault(motor, result);
+    }
+    nx_motor_output_t plan = {
+        .measured_current = decision.measured_current,
+        .requested_voltage = decision.requested_voltage,
+        .planned_voltage = decision.planned_voltage,
+        .sample_electrical_angle_rad = decision.sample_electrical_angle_rad,
+        .output_electrical_angle_rad = decision.output_electrical_angle_rad,
+        .sequence = decision.sequence,
+        .limited = decision.limited};
     const float phase[3] = {
         voltage.alpha,
         -0.5f * voltage.alpha + NX_MOTOR_SQRT3_HALF * voltage.beta,
@@ -275,62 +377,11 @@ static nx_result_t voltage_plan(nx_motor_t* next,
     for (size_t i = 0; i < 3; ++i) {
         const float duty = 0.5f + (phase[i] - common) / sample->bus_voltage_v;
         if (!isfinite(duty)) {
-            return NX_ERROR_EXHAUSTED;
+            return fault(motor, NX_ERROR_EXHAUSTED);
         }
-        /* The circular voltage bound reserves both edge windows. The final
-         * clamp absorbs only f32 endpoint rounding, not an alternate limiter.
-         */
-        out->duty[i] = fminf(fmaxf(duty, c->minimum_duty), 1 - c->minimum_duty);
+        plan.duty[i] = fminf(fmaxf(duty, next.config.minimum_duty),
+                             1 - next.config.minimum_duty);
     }
-    return NX_SUCCESS;
-}
-
-nx_result_t nx_motor_step(nx_motor_t* motor, const nx_motor_sample_t* sample,
-                          const nx_motor_reference_t* reference,
-                          nx_motor_output_t* out) {
-    if (motor == NULL || sample == NULL || reference == NULL || out == NULL ||
-        overlaps(motor, sizeof(*motor), sample, sizeof(*sample)) ||
-        overlaps(motor, sizeof(*motor), reference, sizeof(*reference)) ||
-        overlaps(motor, sizeof(*motor), out, sizeof(*out)) ||
-        overlaps(sample, sizeof(*sample), out, sizeof(*out)) ||
-        overlaps(reference, sizeof(*reference), out, sizeof(*out))) {
-        return NX_ERROR_INVALID;
-    }
-    if (!motor->initialized || motor->fault != NX_SUCCESS) {
-        return NX_ERROR_STATE;
-    }
-    nx_result_t result = validate_sample(motor, sample, reference);
-    if (result != NX_SUCCESS) {
-        return fault(motor, result);
-    }
-    nx_motor_t next = *motor;
-    nx_motor_output_t plan = {0};
-    const uint64_t elapsed =
-        motor->have_sample ? sample->sample_time_us - motor->last_sample_time_us
-                           : motor->config.nominal_period_us;
-    next.last_dt_s = (float)elapsed * 0.000001f;
-    result = sample_angles(&motor->config, sample, &plan);
-    nx_motor_ab_t current;
-    if (result == NX_SUCCESS) {
-        result = nx_motor_clarke(sample->phase_current_a, &current);
-    }
-    if (result == NX_SUCCESS) {
-        result = nx_motor_park(current, plan.sample_electrical_angle_rad,
-                               &plan.measured_current);
-    }
-    if (result == NX_SUCCESS) {
-        result = voltage_plan(&next, sample, reference, &plan);
-    }
-    if (result != NX_SUCCESS) {
-        return fault(motor, result);
-    }
-    next.last_planned_voltage = plan.planned_voltage;
-    next.last_sample_time_us = sample->sample_time_us;
-    next.last_observed_at_us = sample->observed_at_us;
-    next.last_sequence = sample->sequence;
-    next.have_sample = true;
-    next.track_pending = true;
-    plan.sequence = sample->sequence;
     *motor = next;
     *out = plan;
     return NX_SUCCESS;

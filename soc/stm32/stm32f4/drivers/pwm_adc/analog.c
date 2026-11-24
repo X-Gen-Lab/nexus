@@ -20,8 +20,11 @@ bool nx_stm32_control_adc_valid(const nx_stm32_control_adc_config_t* c) {
         c->clock_hz != NEXUS_ADC_HZ)
         return false;
 #ifndef NEXUS_STM32_MODEL
-    if (c->adc != ADC1 || c->peers[0] != ADC2 || c->peers[1] != ADC3 ||
-        c->common != ADC123_COMMON)
+    if ((c->adc != ADC1 && c->adc != ADC2 && c->adc != ADC3) ||
+        c->common != ADC123_COMMON || c->adc == c->peers[0] ||
+        c->adc == c->peers[1] || c->peers[0] == c->peers[1] ||
+        (c->peers[0] != ADC1 && c->peers[0] != ADC2 && c->peers[0] != ADC3) ||
+        (c->peers[1] != ADC1 && c->peers[1] != ADC2 && c->peers[1] != ADC3))
         return false;
 #endif
     for (size_t i = 0U; i < c->channel_count; ++i) {

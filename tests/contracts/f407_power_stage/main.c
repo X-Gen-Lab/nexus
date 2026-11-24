@@ -13,11 +13,19 @@ int main(void) {
     if (nx_platform_start().primary != NX_SUCCESS) {
         return 1;
     }
-    const nx_power_stage_t* drive =
-        nx_factory_power_stage_ref(NX_POWER_STAGE_REF_DRIVE);
-    nx_power_stage_state_t state;
-    if (nx_power_stage_state(drive, &state) != NX_SUCCESS) {
-        return 2;
+#if defined(NX_POWER_STAGE_REF_DRIVE)
+    const nx_power_stage_t* stages[] = {
+        nx_factory_power_stage_ref(NX_POWER_STAGE_REF_DRIVE)};
+#else
+    const nx_power_stage_t* stages[] = {
+        nx_factory_power_stage_ref(NX_POWER_STAGE_REF_LEFT),
+        nx_factory_power_stage_ref(NX_POWER_STAGE_REF_RIGHT)};
+#endif
+    for (size_t i = 0; i < sizeof(stages) / sizeof(stages[0]); ++i) {
+        nx_power_stage_state_t state;
+        if (nx_power_stage_state(stages[i], &state) != NX_SUCCESS) {
+            return 2;
+        }
     }
     return nx_platform_stop() == NX_SUCCESS ? 0 : 3;
 }

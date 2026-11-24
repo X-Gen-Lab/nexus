@@ -211,9 +211,16 @@ def editor_schema():
                    "upper", "image_prefix_bytes", "image_suffix_bytes", "drain_us",
                    "commit_before_ticks", "compute_budget_ticks", "max_irq_delay_us",
                    "minimum_duty_ticks", "maximum_duty_ticks", "settling_ticks",
-                   "compute_budget_us", "encoder_filter"}
+                   "compute_budget_us", "encoder_filter", "phase_offset_ticks",
+                   "start_tolerance_us"}
         for name in fields & numeric:
             properties[name] = {"type": "integer", "minimum": 0}
+        for name in fields & {"phase_offset_ticks", "start_tolerance_us"}:
+            properties[name]["maximum"] = 0xffffffff
+        if "start_tolerance_us" in fields:
+            properties["start_tolerance_us"]["minimum"] = 1
+        if "domain" in fields:
+            properties["domain"]["minLength"] = 1
         for name in fields & block_bounds.keys():
             properties[name] = block_bounds[name]
         for name in fields & {"image_prefix_bytes", "image_suffix_bytes"}:
@@ -246,7 +253,7 @@ def editor_schema():
                                "threshold bounds and hysteresis. No voltage "
                                "policy is selected by default."}
         for name in fields & {"active_high", "fifo_order", "remote", "match_remote", "vbus_sensing", "remote_wakeup",
-                             "break_active_high", "idle_high", "idle_complement_high", "exclusive", "invert_a", "invert_b", "lsb_first", "maintenance", "checksum_offload"}:
+                             "break_active_high", "idle_high", "idle_complement_high", "exclusive", "invert_a", "invert_b", "lsb_first", "maintenance", "checksum_offload", "center_aligned"}:
             properties[name] = {"type": "boolean"}
         if "lsb_first" in fields:
             properties["lsb_first"].update(

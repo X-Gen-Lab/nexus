@@ -43,6 +43,12 @@ MCSDK。应用桥明确完成 raw 到 SI 的标定、角度与时间解释、dut
 反馈，再通过唯一硬件 owner 提交。先阅读[控制架构](../explanation/motor-control.md)
 和[公共声明](../reference/api/components/control.md)，不要把算法成功当成硬件采用。
 
+需要可复用快慢环组合时，链接 `Nexus::CurrentControl`、`Nexus::ModulationControl`
+和 `Nexus::DriveControl`。先准备固定容量参考／反馈存储、合格角度和标定身份，
+再让应用组合执行 Current→Drive 电压计算→Modulation→最终电压 tracking，并把
+完整脉冲和采样计划交回 provider。provider 不支持的起点、窗口或拓扑应拒绝，
+不能退化成仅提交三个 duty。实际源代码消费者见本页末尾与控制 API。
+
 Axis 的参考采用、Motor 的计划、provider 的输出暂存及机械到位分别观察。任务不得
 逐字段修改 IRQ 正在使用的参数；在已有有界交接对象中传递完整目标和 revision。
 Axis 的停止 policy 必须显式选择。零速 PI 保持仍需有效反馈和供电，不证明承重或
@@ -68,7 +74,7 @@ Axis 的停止 policy 必须显式选择。零速 PI 保持仍需有效反馈和
 | --- | --- | --- |
 | `finite-regular-dma` | 固定 duty 的有限采样窗口 | request、duty 和 DMA 可达 samples 保持至 acquire 观察 SETTLED；显式推进 service |
 | `injected-control` | 有有限生命周期的 IRQ compute session | 固定 raw scan／完整 duty 数量，独占借用 context，并证明 IRQ 与 compute 预算 |
-| `injected-power-stage` | 互补输出、顺序三相／母线 raw scan 和编码器观察 | 独立长期 session；有限启动预算；应用证明标定、采样偏斜、命令新鲜度及最终退出 |
+| `injected-power-stage` | 完整输出／采样计划、两路或三路相电流及可选母线／编码器观察 | 长期 session；有限启动预算；显式共享 domain；证明标定、偏斜、命令时效与最终退出 |
 
 `injected-control` 参考固定 timer 为 1 MHz。配置校验 trigger、conversion、最大 IRQ 延迟、compute
 与 commit 窗口，并包含明确量化裕量。该校验不测量物理 WCET。ADC IRQ callback
@@ -77,10 +83,20 @@ Axis 的停止 policy 必须显式选择。零速 PI 保持仍需有效反馈和
 的 PID／session。详细公式、精确引脚与退出见
 [耦合 owner](../../soc/stm32/stm32f4/drivers/pwm_adc/README.md)。
 
-PowerStage 当前 F407ZG 参考采用边沿对齐 TIM8、ADC1 四个顺序 rank 和 TIM4。
-`sample_at` 是计划触发参考，`angle_at`／`observed_at` 是软件观察，
-`planned_apply_at` 是预期更新边界。三相采样有明确偏斜；不声明多 ADC 同时采样、
-实测孔径或中心对齐。触发、deadtime、AFE 稳定和提交预算的权威说明见
+PowerStage 的 `control.toml` 保留边沿对齐 TIM8、ADC1 四个顺序 rank 和 TIM4
+参考。其他维护配置可省去必需的母线／编码器，或让两轴的独立 ADC 共享 common
+和 IRQ；精确配置见[控制架构](../explanation/motor-control.md)。`sample_at` 是计划
+触发参考，`angle_at`／`observed_at` 是软件观察，`planned_apply_at` 是预期更新边界。
+顺序采样有明确偏斜；独立 ADC 共享域不等于单轴同时采样或同 ADC 时分。
+`center.toml` 使用专用中心对齐路线与更新 IRQ，仅开放下降段采集；边沿路线不会
+静默切换，规划器必须使用 provider 给出的采集槽。
+`pair.toml` 选择独占共同域的 ADC1／ADC2 同时采样；`tdm.toml` 则由固定半载波
+相差的 TIM8／TIM1 双会话时分使用 ADC1。它们是各自经审核的配置，不能任意
+叠加；时分模式要求共同启动并拒绝运行中加入。
+`dc.toml` 使用单路 DC-link 电流与每载波两个有效矢量，只开放无相移边沿对齐。
+应用显式提供合法非零首计划与完整 context 内的 DC descriptor；中性首计划和
+没有可观测窗口的零电压退化不被接受。不要混用该电流来源与独立母线电压。
+触发、deadtime、AFE 稳定和提交预算的权威说明见
 [电驱参考](../../soc/stm32/stm32f4/drivers/pwm_adc/README.md#电驱完整软件参考injected-power-stage)。
 
 `nx_power_stage_prepare` 的 `startup_deadline` 单独约束启动；非阻塞长期 session
@@ -154,13 +170,15 @@ provisioning，也没有因此完成 TLS opaque-key 集成。精确模式、单�
 | `apps/axis_control` | 实际 encoder／trajectory／PID／PWM、整组参数、Settings 与 copied telemetry |
 | `recipes/control/differential_drive` | 真实 Axis 控制、独立 DC／机械模型、成组目标、超时与分层验收 |
 | `recipes/control/servo_axis` | Axis、真实电流 PI 与独立带载 DC 模型；软件位置／速度／电流闭环和实测驻留判据 |
+| `recipes/control/dual_motor_drive` | 双独立平均 PMSM 模型、量化 ADC／编码器、实际 FOC 组合、有限目标与故障退出 |
 | `recipes/control/lift_axis` | 重力／闸模型中的承重交接与有限机械回零；不授予实际承重或制动资格 |
-| `recipes/control/motor_drive` | 显式标定桥、MotorControl、PowerStage 会话与未 commissioning 时拒绝激励 |
+| `recipes/control/motor_drive` | Axis／Drive／Current／Motor／Modulation 到 PowerStage 的组合；未 commissioning 时拒绝激励；可选 Task 角度／母线源 |
 | `recipes/control` | 触摸／数值控制和 IMU 校准、安装旋转、姿态消费 |
 | `recipes/inference` | 实际 CMSIS-NN 的固定三输入、四隐藏节点、二输出量化图 |
 | `recipes/ui` | 小缓冲局部绘制与校准触摸片段；不是 LVGL recipe |
 | `apps/connected_terminal` | 实际显示／触摸、route／UDP 与 Settings 组合；默认不启用 LVGL 或 TLS |
 | `recipes/network/drive_host` | Python 标准库的有限 CiA 402 PV／SocketCAN 主机参考；默认仅 codec 演示，实物总线未执行 |
+| `recipes/network/cia402_motor` | 真实 CANopen／CiA402 PV／绝对 PP 到 PMSM 控制组合；原始接收期限、快环确认和双 owner 退出 |
 | `recipes/network`、`apps/network_gateway` | 路由与交付事实、独立传输会话、boot audit 和网关消费 |
 
 阅读示例时使用该仓库交付记录绑定的精确提交与 Nexus 依赖，不从 `main` 的后续变化

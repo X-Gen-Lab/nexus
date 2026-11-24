@@ -24,11 +24,22 @@ static nx_result_t sequence_stop(void* context);
 
 static uint32_t base_cr1(const nx_stm32_waveform_config_t* c) {
     return TIM_CR1_ARPE | TIM_CR1_URS |
-           (c->kind == NX_STM32_WAVE_PULSE ? TIM_CR1_OPM : 0U);
+           (c->kind == NX_STM32_WAVE_PULSE ? TIM_CR1_OPM : 0U) |
+           (c->center_aligned ? TIM_CR1_CMS_0 : 0U);
 }
 static uint32_t stored_compare(const nx_stm32_waveform_config_t* c,
                                uint32_t duty) {
-    return c->kind == NX_STM32_WAVE_PULSE ? c->period_ticks - duty : duty;
+    return c->center_aligned                ? duty / 2U
+           : c->kind == NX_STM32_WAVE_PULSE ? c->period_ticks - duty
+                                            : duty;
+}
+
+static uint32_t stored_trigger(const nx_stm32_waveform_config_t* c,
+                               uint32_t phase) {
+    return c->center_aligned ? c->period_ticks - phase : phase;
+}
+static uint32_t reload(const nx_stm32_waveform_config_t* c) {
+    return c->center_aligned ? c->period_ticks / 2U : c->period_ticks - 1U;
 }
 
 static bool advanced(const nx_stm32_waveform_config_t* c) {
@@ -164,7 +175,7 @@ static uint32_t ccmr(const nx_stm32_waveform_config_t* c, unsigned bank) {
             result |= (c->kind == NX_STM32_WAVE_PULSE ? 0x78U : 0x68U)
                       << (i * 8U);
         else if (channel == 3U && c->internal_trigger)
-            result |= 0x78U << (i * 8U);
+            result |= (c->immediate_trigger ? 0x70U : 0x78U) << (i * 8U);
     }
     return result;
 }
@@ -194,6 +205,12 @@ static bool valid(const nx_stm32_waveform_config_t* c) {
         c->timer_hz != (apb2(c) ? NEXUS_APB2_TIMER_HZ : NEXUS_APB1_TIMER_HZ) ||
         c->timer_hz % c->tick_hz != 0U || c->timer_hz / c->tick_hz > 65536U ||
         c->period_ticks == 0U ||
+        (c->immediate_trigger && (c->kind != NX_STM32_WAVE_GROUP ||
+                                  !c->internal_trigger || c->center_aligned)) ||
+        (c->center_aligned &&
+         (c->kind != NX_STM32_WAVE_GROUP || !advanced(c) ||
+          !c->internal_trigger || c->period_ticks < 4U ||
+          (c->period_ticks & 1U) != 0U || c->sync_mode != 0U)) ||
         (c->controller != 5U && c->period_ticks > 65535U) ||
         (!advanced(c) && (c->deadtime_ticks != 0U || c->complementary)) ||
         (c->complementary && (c->channels & 8U) != 0U) ||
@@ -363,8 +380,10 @@ static bool invariant(nx_stm32_waveform_state_t* s) {
     const nx_stm32_waveform_config_t* c = s->config;
     TIM_TypeDef* t = c->registers;
     if (NX_AV_READ(&t->PSC) != c->timer_hz / c->tick_hz - 1U ||
-        NX_AV_READ(&t->ARR) != c->period_ticks - 1U ||
-        (NX_AV_READ(&t->CR1) & ~TIM_CR1_CEN) != base_cr1(c) ||
+        NX_AV_READ(&t->ARR) != reload(c) ||
+        (NX_AV_READ(&t->CR1) &
+         ~((uint32_t)TIM_CR1_CEN |
+           (c->center_aligned ? (uint32_t)TIM_CR1_DIR : 0U))) != base_cr1(c) ||
         NX_AV_READ(&t->CCMR1) != ccmr(c, 0U) ||
         (master_capable(c) &&
          (NX_AV_READ(&t->CCMR2) != ccmr(c, 1U) ||
@@ -382,7 +401,7 @@ static bool invariant(nx_stm32_waveform_state_t* s) {
              (i == 3U && c->internal_trigger)) &&
             NX_AV_READ(compare(t, i)) !=
                 (i == 3U && c->internal_trigger
-                     ? s->trigger_ticks
+                     ? stored_trigger(c, s->trigger_ticks)
                      : stored_compare(c, s->duties[i])))
             return false;
     if (advanced(c)) {
@@ -478,7 +497,7 @@ nx_result_t nx_stm32_waveform_prepare(nx_stm32_waveform_state_t* s,
     ok =
         nx_stm32_av_write(&t->PSC, c->timer_hz / c->tick_hz - 1U, UINT32_MAX) &&
         ok;
-    ok = nx_stm32_av_write(&t->ARR, c->period_ticks - 1U, UINT32_MAX) && ok;
+    ok = nx_stm32_av_write(&t->ARR, reload(c), UINT32_MAX) && ok;
     ok = nx_stm32_av_write(&t->CNT, 0U, UINT32_MAX) && ok;
     ok = nx_stm32_av_write(&t->CCMR1, ccmr(c, 0U), UINT32_MAX) && ok;
     if (master_capable(c)) {
@@ -494,12 +513,15 @@ nx_result_t nx_stm32_waveform_prepare(nx_stm32_waveform_state_t* s,
     }
     if (slave_capable(c))
         ok = nx_stm32_av_write(&t->SMCR, 0U, UINT32_MAX) && ok;
-    s->trigger_ticks = c->internal_trigger ? c->period_ticks / 2U : 0U;
+    s->trigger_ticks = c->internal_trigger
+                           ? (c->center_aligned ? c->period_ticks * 3U / 4U
+                                                : c->period_ticks / 2U)
+                           : 0U;
     for (unsigned i = 0U; i < 4U; ++i)
         if ((c->channels & (1U << i)) != 0U || (i == 3U && c->internal_trigger))
             ok = nx_stm32_av_write(compare(t, i),
                                    i == 3U && c->internal_trigger
-                                       ? s->trigger_ticks
+                                       ? stored_trigger(c, s->trigger_ticks)
                                        : stored_compare(c, 0U),
                                    UINT32_MAX) &&
                  ok;
@@ -548,7 +570,7 @@ static nx_result_t stage_values(nx_stm32_waveform_state_t* s,
         if ((c->channels & (1U << i)) != 0U || (i == 3U && c->internal_trigger))
             ok = nx_stm32_av_write(compare(t, i),
                                    i == 3U && c->internal_trigger
-                                       ? trigger
+                                       ? stored_trigger(c, trigger)
                                        : stored_compare(c, duty[i]),
                                    UINT32_MAX) &&
                  ok;
@@ -588,10 +610,12 @@ static nx_result_t group_commit(void* context,
     for (unsigned i = 0U, item = 0U; i < 4U; ++i)
         if ((c->channels & (1U << i)) != 0U) {
             duty[i] = frame->duty_ticks[item++];
-            if (duty[i] > c->period_ticks)
+            if (duty[i] > c->period_ticks ||
+                (c->center_aligned && (duty[i] & 1U) != 0U))
                 return NX_ERROR_INVALID;
         }
-    if ((c->internal_trigger && (frame->trigger_ticks == 0U ||
+    if ((c->center_aligned && frame->trigger_ticks <= c->period_ticks / 2U) ||
+        (c->internal_trigger && (frame->trigger_ticks == 0U ||
                                  frame->trigger_ticks >= c->period_ticks)) ||
         (!c->internal_trigger && frame->trigger_ticks != 0U))
         return NX_ERROR_INVALID;

@@ -5,6 +5,7 @@ from tools.configure.factory import (interface_type, public_include,
                                      controller_class, controller_ordinals)
 from tools.configure import gpio_phase
 from tools.configure import enhanced_endpoints
+from tools.configure import coupled_assembly
 from tools.configure import stream_profiles, uart_formats
 from tools.configure.calls import DirectCall, InitializeSequence, Symbol
 from tools.configure.providers.common import fail
@@ -246,12 +247,14 @@ def emit(result):
                'static const uint8_t s_nx_platform_identity;']
     source.extend(_render_static(provider.state_declarations(result),
                                  model=provider.MODEL))
+    source.extend(_render_static(coupled_assembly.states(result.power_stage_domains)))
     initialize = []
     admission = []
     initialization_indices = []
     retained_initialization = []
     stop = []
     pin_snapshots = {}
+    initialize_sequences = []
     shared_members = {member.id: owner for owner in result.pwm_shared_owners
                       for member in owner.members}
     physical_constructed = set()
@@ -277,7 +280,7 @@ def emit(result):
                 source.extend(construction.definitions)
                 source.extend(_static_connections(construction))
                 for sequence in construction.initialize_sequences:
-                    source.extend(sequence.render())
+                    initialize_sequences.append(sequence)
                 admission.extend((selection_index, call.render())
                                  for call in construction.admission)
                 initialize.append(construction.initialize.render())
@@ -290,6 +293,8 @@ def emit(result):
             continue
         construction = provider.constructor(item, result, result.board_bindings,
                                             result.routes, result.devices)
+        construction = coupled_assembly.construction(
+            construction, item, result.power_stage_domains)
         pre_c_effects |= construction.pre_c_effects
         initial = (" = " + construction.initial_state.render()
                    if construction.initial_state is not None else "")
@@ -315,7 +320,7 @@ def emit(result):
                    f'const {exported_type}* const nx_binding_{name} = &s_nx_face_{name};']
         source.extend(_static_connections(construction))
         for sequence in construction.initialize_sequences:
-            source.extend(sequence.render())
+            initialize_sequences.append(sequence)
         admission.extend((selection_index, call.render())
                          for call in construction.admission)
         header.extend(construction.exports)
@@ -328,6 +333,12 @@ def emit(result):
         retained_initialization.append(construction.retain_on_failed_init)
         stop.extend((len(initialize), expression.render())
                     for expression in construction.stop)
+    source.extend(_render_static(coupled_assembly.configurations(result.power_stage_domains)))
+    for sequence in initialize_sequences:
+        source.extend(sequence.render())
+    for connection in coupled_assembly.interrupts(result.power_stage_domains):
+        source.append(f"void {connection.name}(void);")
+        source.extend(connection.render())
     for device in result.devices:
         class_name = enhanced_endpoints.class_name(device)
         header.append(f'extern const {interface_type(class_name, "endpoint")}* const nx_device_{symbol(device.id)};')

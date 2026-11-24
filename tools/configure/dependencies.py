@@ -23,6 +23,7 @@ PLATFORM = (
     "integration_package",
     "configure", "selection", "onboarding", "authored", "bindings", "emission", "experience", "can", "memory",
     "usb_device", "ethernet", "timer_advanced", "secondary_controllers", "coupled_io",
+    "coupled_assembly",
     "fact_references", "reference_profiles", "device_view", "clocks", "physical_facts", "gpio_phase",
     "i2c_timing", "i2c_timing_selection", "pin_states", "runtime_power",
     "adc", "dac", "exti", "board_hardware", "gpio_electrical", "rtc",

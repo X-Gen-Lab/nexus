@@ -22,7 +22,9 @@ class MetadataBindingTests(unittest.TestCase):
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(gate.ROOT / name, target)
         self.policy_path = self.root / metadata.POLICY
-        self.version = json.loads(self.policy_path.read_text())["semantic_version"]
+        self.policy = json.loads(self.policy_path.read_text())
+        self.version = self.policy["semantic_version"]
+        self.epoch = self.policy["factory_abi_epoch"]
         major, minor, patch_version = map(int, self.version.split("."))
         self.other_version = f"{major}.{minor}.{patch_version + 1}"
         self.assembly = self.root / "assembly.toml"
@@ -57,8 +59,8 @@ class MetadataBindingTests(unittest.TestCase):
             self.policy_path.read_bytes()).hexdigest())
         header = (output / "nexus_config.h").read_text()
         self.assertIn(f'#define NEXUS_PLATFORM_VERSION "{self.version}"', header)
-        self.assertIn('#define NEXUS_FACTORY_ABI_EPOCH 6U', header)
-        self.assertEqual(factory.FACTORY_ABI_EPOCH, 6)
+        self.assertIn(f'#define NEXUS_FACTORY_ABI_EPOCH {self.epoch}U', header)
+        self.assertEqual(factory.FACTORY_ABI_EPOCH, self.epoch)
 
     def test_assembly_policy_change_invalidates_configuration_identity(self):
         before = gate.resolve_ir(self.assembly, self.root, test_support=True).configuration_sha256
@@ -70,9 +72,9 @@ class MetadataBindingTests(unittest.TestCase):
 
     def test_unsupported_factory_epoch_rejects_owned_assembly_bundle(self):
         output = self.root / "platform"
-        for epoch in (1, 2, 3, 4, 5, 7):
+        for epoch in (self.epoch - 1, self.epoch + 1):
             with self.subTest(epoch=epoch):
-                self.change_policy(factory_abi_epoch=6)
+                self.change_policy(factory_abi_epoch=self.epoch)
                 gate.configure(self.assembly, output, self.root, test_support=True)
                 self.change_policy(factory_abi_epoch=epoch)
                 with self.assertRaisesRegex(ValueError, "factory epoch"):
@@ -96,7 +98,7 @@ class MetadataBindingTests(unittest.TestCase):
             self.assertIn(str(self.policy_path), before.snapshots)
             header = (output / "nexus_config.h").read_text()
             self.assertIn(f'#define NEXUS_PLATFORM_VERSION "{self.version}"', header)
-            self.assertIn('#define NEXUS_FACTORY_ABI_EPOCH 6U', header)
+            self.assertIn(f'#define NEXUS_FACTORY_ABI_EPOCH {self.epoch}U', header)
             self.change_policy(semantic_version=self.other_version)
             after = runtime.configure(self.runtime, output)
             self.assertNotEqual(before.input_sha256, after.input_sha256)
@@ -106,9 +108,9 @@ class MetadataBindingTests(unittest.TestCase):
     def test_runtime_epoch_mismatch_invalidates_owned_bundle(self):
         output = self.root / "runtime-output"
         with patch.object(runtime, "ROOT", self.root, create=True):
-            for epoch in (1, 2, 3, 4, 5, 7):
+            for epoch in (self.epoch - 1, self.epoch + 1):
                 with self.subTest(epoch=epoch):
-                    self.change_policy(factory_abi_epoch=6)
+                    self.change_policy(factory_abi_epoch=self.epoch)
                     runtime.configure(self.runtime, output)
                     self.change_policy(factory_abi_epoch=epoch)
                     with self.assertRaisesRegex(ValueError, "factory epoch"):
@@ -150,7 +152,7 @@ class MetadataBindingTests(unittest.TestCase):
         with patch.object(cpu, "ROOT", self.root, create=True):
             self.assertEqual(cpu.main(args), 0)
             before = json.loads((output / "resolved-cpu.json").read_text())
-            self.assertIn('#define NEXUS_FACTORY_ABI_EPOCH 6U',
+            self.assertIn(f'#define NEXUS_FACTORY_ABI_EPOCH {self.epoch}U',
                           (output / "nexus_config.h").read_text())
             self.change_policy(semantic_version=self.other_version)
             self.assertEqual(cpu.main(args), 0)

@@ -769,23 +769,11 @@ class SDKConsumerParallelTests(unittest.TestCase):
                         / (smoke + ".c"))
             (self.sdk / consumer).parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(ROOT / consumer, self.sdk / consumer)
-        shutil.copytree(ROOT / "cmake/package/verification/common_services",
-                        self.sdk / "cmake/package/verification/common_services")
-        shutil.copytree(ROOT / "cmake/package/verification/secure_services",
-                        self.sdk / "cmake/package/verification/secure_services")
-        for scenario in ("common_components", "device_tmp117", "image_window", "loaned_rx",
-                         "mcuboot_control", "mcuboot_boot", "mcuboot_swap",
-                         "smart_components", "smbus"):
-            shutil.copytree(ROOT / "cmake/package/verification" / scenario,
-                            self.sdk / "cmake/package/verification" / scenario)
-        family = Path("tests/contracts/stm32f4_family")
-        shutil.copytree(ROOT / family, self.sdk / family)
-        for name in ("stm32f4_crypto", "stm32f4_sdram", "stm32f4_graphics",
-                     "stm32f4_graphics_sdram", "stm32f4_sai", "stm32f4_qspi",
-                     "stm32f4_power", "stm32f4_sdio_hs",
-                     "f407_capture_audio", "f407_pwm_adc", "f407_pwm_adc_loop",
-                     "f407_freertos_stop"):
-            relative = Path("tests/contracts") / name
+        from tools.maintenance.consumer_profiles import (
+            SERVICE_CONSUMERS, service_directory)
+        directories = {service_directory(ROOT, profile).relative_to(ROOT)
+                       for profile in SERVICE_CONSUMERS}
+        for relative in sorted(directories):
             shutil.copytree(ROOT / relative, self.sdk / relative)
         crc = Path("tests/contracts/crc_assembly/consumer.c")
         (self.sdk / crc).parent.mkdir(parents=True)

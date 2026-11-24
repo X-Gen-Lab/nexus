@@ -1,0 +1,30 @@
+# Full-carrier center alignment with explicitly gated down-slope capture.
+schema = 2
+board_package = "domain_board"
+backend = "baremetal"
+clock = "hse8-pll168"
+
+[memory]
+main_stack_bytes = 3072
+libc_heap_bytes = 0
+
+[pwm_adc.drive]
+binding = "left_center"
+domain = "current"
+mode = "injected-power-stage"
+center_aligned = true
+tick_hz = 1000000
+period_ticks = 1000
+trigger_ticks = 700
+deadtime_ticks = 84
+minimum_duty_ticks = 25
+maximum_duty_ticks = 300
+settling_ticks = 25
+commit_before_ticks = 990
+compute_budget_us = 100
+max_irq_delay_us = 20
+channels = [0, 1]
+sample_times = [0, 0]
+reference_mv = 3300
+exclusive = true
+irq = { priority = 5, calls_os = false }

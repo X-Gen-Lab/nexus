@@ -37,6 +37,10 @@ typedef enum nx_stm32_waveform_kind {
  *       pad immediately after its primary. An advanced timer's BKIN is last.
  *       The System owns the source clock and TIM2; no configuration selects
  *       TIM2. DMA burst rows start at ARR and include the RCR/reserved item.
+ *       center_aligned uses a complete up/down carrier: ARR=P/2 and symmetric
+ *       high widths are even. immediate_trigger removes only internal CH4
+ *       preload so a selected edge capture owner can rearm within one period;
+ *       the three output channels keep their complete-group preloads.
  */
 typedef struct {
     nx_stm32_av_config_t common;
@@ -61,6 +65,8 @@ typedef struct {
     bool break_active_high;
     bool idle_high;
     bool idle_complement_high;
+    bool center_aligned;
+    bool immediate_trigger;
 } nx_stm32_waveform_config_t;
 
 /** \brief Exact static owner, retained until output, memory and IRQ joins.
