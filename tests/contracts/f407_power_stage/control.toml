@@ -1,0 +1,29 @@
+# Sequential current scans and encoder observations; software reference only.
+schema = 2
+board_package = "board"
+backend = "baremetal"
+clock = "hse8-pll168"
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+
+[pwm_adc.drive]
+binding = "drive"
+mode = "injected-power-stage"
+tick_hz = 1000000
+period_ticks = 1000
+trigger_ticks = 800
+deadtime_ticks = 84
+minimum_duty_ticks = 50
+maximum_duty_ticks = 700
+settling_ticks = 25
+commit_before_ticks = 990
+compute_budget_us = 100
+max_irq_delay_us = 20
+encoder_filter = 0
+channels = [0, 1, 2, 3]
+sample_times = [0, 0, 0, 0]
+reference_mv = 3300
+exclusive = true
+irq = { priority = 5, calls_os = false }

@@ -22,6 +22,7 @@ UART/socket owner, worker, device scan or automatic command replay.
 | `Nexus::ATClient` | `at_client.h` | One command over a caller-supplied `nx_byte_stream_t`, text/URC and explicit binary lengths |
 | `Nexus::UARTByteStream` | `uart_stream.h` | Copied bytes over one existing UART request/RX owner, with explicit service and final TX drain |
 | `Nexus::CANopen` | `canopen.h` | Fixed classic-CAN NMT slave, one heartbeat peer, expedited SDO and asynchronous RPDO/TPDO |
+| `Nexus::CiA402` | `cia402.h`, `cia402_position.h` | Selected Profile Velocity and absolute immediate single-point Profile Position over the real CANopen node |
 | `Nexus::LVGL` | `lvgl.h` | Single-owner RGB565 software GUI with caller arena/tile and settled display/input callbacks |
 
 ## Retain frame and response boundaries
@@ -79,6 +80,35 @@ sequence, epoch and validity before use. NMT Operational is not actuator enable.
 Stop discards unsent copies and drains the original accepted CAN request,
 including service after cancel failure. Reclaim workspace and OD only after
 successful stop and joined callers; the outer CAN owner remains separate.
+
+## Select a drive profile without granting actuator authority
+
+Explicit `nexus_add_cia402()` adds the selected real standard OD bridge. Profile
+Velocity and Profile Position own separate state and object arrays; ordinary
+CANopen retains its generic application-object restrictions. The selected
+asynchronous RPDO and TPDO each use seven bytes, with declared user-unit scaling.
+No universal radian wire unit, SYNC, CSP/CSV, homing, relative point or queued
+position sequence is implied.
+
+Requested mode, actual mode, action requests and observed axis conditions remain
+different facts. The application supplies current feedback and validates command
+authority before applying a copied action. Network Operational and a successful
+SDO/PDO do not enable a power stage. Heartbeat and repeated target values do not
+by themselves renew a motion-command lease.
+
+The selected position profile uses a rising controlword bit 4 for one new point.
+Its acknowledgment bit 12 follows genuine matching axis admission, not reception.
+Target-reached bit 10 requires the measured position and velocity windows for the
+declared observation dwell; trajectory completion is not used as arrival. The
+adapter's local generation is not a standard CANopen field and cannot prove
+simultaneous multi-axis adoption.
+
+Fault/reset, feedback loss, command validity and actual hardware withdrawal have
+their own responsibilities. Fault reset requests recovery and never automatically
+resumes an old point. Release only after the bound protocol has stopped and its
+users have joined; it does not stop or deenergize the actuator. The
+[selected profile contract](../../../../../components/protocols/canopen/README.md)
+owns the exact objects, handshake and restrictions.
 
 ## Render only in the selected GUI executor
 
@@ -165,6 +195,18 @@ qualification; hardware HIL remains `not_executed`.
 ### canopen.h
 
 ```{doxygenfile} components/protocols/canopen/include/nexus/components/canopen.h
+:project: nexus
+```
+
+### cia402.h
+
+```{doxygenfile} components/protocols/canopen/include/nexus/components/cia402.h
+:project: nexus
+```
+
+### cia402_position.h
+
+```{doxygenfile} components/protocols/canopen/include/nexus/components/cia402_position.h
 :project: nexus
 ```
 

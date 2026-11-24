@@ -1,0 +1,363 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 340963477051cf24af7f8956dde08cd5f42972d878f8d07d1194ec1dde4e5a25\n"
+
+#: ../../../../../../nexus/docs/explanation/motor-control.md:9
+msgid "电机计算、轴目标与硬件执行"
+msgstr "Motor computation, axis targets and hardware execution"
+
+#: ../../../../../../nexus/docs/explanation/motor-control.md:11
+msgid ""
+"Nexus 将电机计算、轴目标和硬件执行分别交给可选 C11 组件、外部应用桥和唯一 "
+"provider。本文说明当前软件合同及其成本，不把软件参考配置授予任何功率板、 电机或物理控制资格。"
+msgstr ""
+"Nexus assigns motor computation, axis targets and hardware execution to "
+"optional C11 components, an explicit application bridge and one provider. "
+"This page describes the current software contracts and their costs; a "
+"software reference does not qualify any power board, motor or physical "
+"controller."
+
+#: ../../../../../../nexus/docs/explanation/motor-control.md:15
+msgid "![FIG-35：电机与轴控制的调用和退出责任](../assets/diagrams/motor-control.svg)"
+msgstr ""
+"![FIG-35: Motor and axis control calls and withdrawal "
+"responsibilities](../assets/diagrams/motor-control.svg)"
+
+#: ../../../../../../nexus/docs/explanation/motor-control.md:15
+msgid "FIG-35：电机与轴控制的调用和退出责任"
+msgstr "FIG-35: Motor and axis control calls and withdrawal responsibilities"
+
+#: ../../../../../../nexus/docs/explanation/motor-control.md:17
+msgid ""
+"FIG-35 表达当前可选组合：实线是显式调用或数据交付，虚线是借用和退出责任。 图不要求应用启用全部节点；精确 F407ZG 参考、源路径和边界见 "
+"{ref}`图册 <fig-35-motor-control>`。"
+msgstr ""
+"FIG-35 shows the current optional composition: solid lines are explicit "
+"calls or data delivery; dashed lines are borrowing and withdrawal "
+"responsibilities. Applications need not enable every node. See the "
+"{ref}`diagram catalog <fig-35-motor-control>` for the exact F407ZG "
+"reference, source paths and limits."
+
+#: ../../../../../../nexus/docs/explanation/motor-control.md:21
+msgid "由谁计算，由谁执行"
+msgstr "Who computes and who executes"
+
+#: ../../../../../../nexus/docs/explanation/motor-control.md:0
+msgid "边界"
+msgstr "Boundary"
+
+#: ../../../../../../nexus/docs/explanation/motor-control.md:0
+msgid "拥有的内容"
+msgstr "Owns"
+
+#: ../../../../../../nexus/docs/explanation/motor-control.md:0
+msgid "外部应用仍负责"
+msgstr "The external application still owns"
+
+#: ../../../../../../nexus/docs/explanation/motor-control.md:0
+msgid "`Nexus::MotorControl`"
+msgstr "`Nexus::MotorControl`"
+
+#: ../../../../../../nexus/docs/explanation/motor-control.md:0
+msgid "有感电流计算、坐标变换、限制、调制计划及零偏候选"
+msgstr ""
+"Sensored current computation, coordinate transforms, limits, modulation "
+"plans and zero-offset candidates"
+
+#: ../../../../../../nexus/docs/explanation/motor-control.md:0
+msgid "校准后的相电流、角度来源、电机参数和硬件提交"
+msgstr ""
+"Calibrated phase currents, angle sources, motor parameters and hardware "
+"submission"
+
+#: ../../../../../../nexus/docs/explanation/motor-control.md:0
+msgid "`Nexus::AxisControl`"
+msgstr "`Nexus::AxisControl`"
+
+#: ../../../../../../nexus/docs/explanation/motor-control.md:0
+msgid "目标准入、速度／位置参考、参数 revision 与软件采用事实"
+msgstr ""
+"Target admission, velocity/position references, parameter revisions and "
+"software adoption facts"
+
+#: ../../../../../../nexus/docs/explanation/motor-control.md:0
+msgid "执行节拍、机械侧、命令授权和机构恢复"
+msgstr ""
+"Execution cadence, mechanical side, command authority and mechanism recovery"
+
+#: ../../../../../../nexus/docs/explanation/motor-control.md:0
+msgid "`Nexus::IOPowerStage`"
+msgstr "`Nexus::IOPowerStage`"
+
+#: ../../../../../../nexus/docs/explanation/motor-control.md:0
+msgid "session、raw 观察、完整 tick 输出和退出合同"
+msgstr ""
+"Session, raw observations, complete tick output and withdrawal contract"
+
+#: ../../../../../../nexus/docs/explanation/motor-control.md:0
+msgid "完整 callback context、校准桥和有限操作预算"
+msgstr ""
+"Complete callback context, calibration bridge and bounded operation budgets"
+
+#: ../../../../../../nexus/docs/explanation/motor-control.md:0
+msgid "F4 provider"
+msgstr "F4 provider"
+
+#: ../../../../../../nexus/docs/explanation/motor-control.md:0
+msgid "TIM8、ADC1、TIM4、所选 IRQ、门钟与引脚的生命周期"
+msgstr "Lifecycle of TIM8, ADC1, TIM4, selected IRQs, clock gates and pins"
+
+#: ../../../../../../nexus/docs/explanation/motor-control.md:0
+msgid "经审核的板级授权、供电、模拟前端和功率能力"
+msgstr ""
+"Reviewed board authorization, supply, analog front end and power capability"
+
+#: ../../../../../../nexus/docs/explanation/motor-control.md:30
+msgid ""
+"组件不创建堆、任务、全局时钟或电机注册表。控制数学不包含 HAL；provider 使用私有 厂商类型和经审核的硬件操作。组件 target "
+"仅在被明确链接时进入镜像，实例状态由 调用者提供，未选模式不承担其最大缓冲与运行状态。"
+msgstr ""
+"Components create no heap, tasks, global clock or motor registry. Control "
+"mathematics contains no HAL; the provider uses private vendor types and "
+"reviewed hardware operations. Component targets enter the image only when "
+"explicitly linked. Callers supply instance state; unselected modes pay no "
+"maximum-buffer or runtime-state cost."
+
+#: ../../../../../../nexus/docs/explanation/motor-control.md:0
+msgid "执行入口"
+msgstr "Entry point"
+
+#: ../../../../../../nexus/docs/explanation/motor-control.md:0
+msgid "合法上下文与推进"
+msgstr "Allowed context and progress"
+
+#: ../../../../../../nexus/docs/explanation/motor-control.md:0
+msgid "Axis 命令、参数、step 与停止"
+msgstr "Axis commands, parameters, step and stopping"
+
+#: ../../../../../../nexus/docs/explanation/motor-control.md:0
+msgid "同一个 Task 执行者；位置规划不进入 ADC IRQ"
+msgstr "One Task executor; position planning does not enter the ADC IRQ"
+
+#: ../../../../../../nexus/docs/explanation/motor-control.md:0
+msgid "Motor step 与数学函数"
+msgstr "Motor step and mathematics"
+
+#: ../../../../../../nexus/docs/explanation/motor-control.md:0
+msgid "单一执行者的 Task 或选定 IRQ，满足自身计算预算"
+msgstr ""
+"A single executor in Task or a selected IRQ, within its computation budget"
+
+#: ../../../../../../nexus/docs/explanation/motor-control.md:0
+msgid "PowerStage prepare／start／service／stop"
+msgstr "PowerStage prepare/start/service/stop"
+
+#: ../../../../../../nexus/docs/explanation/motor-control.md:0
+msgid "同一个 privileged、未屏蔽的 Task；显式推进"
+msgstr "One privileged, unmasked Task; progress is explicit"
+
+#: ../../../../../../nexus/docs/explanation/motor-control.md:0
+msgid "PowerStage compute"
+msgstr "PowerStage compute"
+
+#: ../../../../../../nexus/docs/explanation/motor-control.md:0
+msgid "仅选定 ADC IRQ；不等待 Task、不保存临时指针"
+msgstr ""
+"Only the selected ADC IRQ; no waiting for Tasks or retaining temporary "
+"pointers"
+
+#: ../../../../../../nexus/docs/explanation/motor-control.md:0
+msgid "CANopen／CiA402"
+msgstr "CANopen/CiA402"
+
+#: ../../../../../../nexus/docs/explanation/motor-control.md:0
+msgid "单个 Thread 执行者，先完成协议 step，再提供有效轴事实"
+msgstr ""
+"One Thread executor; complete the protocol step before supplying valid axis "
+"facts"
+
+#: ../../../../../../nexus/docs/explanation/motor-control.md:42
+msgid "一份决定不等于一个物理结果"
+msgstr "A decision is not a physical result"
+
+#: ../../../../../../nexus/docs/explanation/motor-control.md:44
+msgid ""
+"应用分别保留原始请求、受约束参考、软件采用、输出计划和测量。Axis 的 `adopted_at` 描述其执行者采用目标的时刻；Motor "
+"的输出是归一化 duty 和计划电压。 provider 接受完整 shadow 组，也不证明对应物理边沿已经发生。"
+msgstr ""
+"Applications retain the original request, constrained reference, software "
+"adoption, output plan and measurement separately. Axis `adopted_at` "
+"describes when its executor adopts a target; Motor produces normalized duty "
+"and planned voltage. Even acceptance of a complete shadow group by the "
+"provider does not prove that the physical edge occurred."
+
+#: ../../../../../../nexus/docs/explanation/motor-control.md:48
+msgid ""
+"位置、速度、电流、机械角、电角和转矩不能混用。齿比、编码器计数倍率、方向和极对数 分别有明确来源。应用桥将 Axis 选定机械侧的角度和速度换算为 "
+"Motor 要求的转子 机械侧，再由电机计算应用极对数；电流参考的单位是 A，不按齿比折算。没有核验转矩 常数与电流约定时，安培目标不能改名为转矩反馈。"
+msgstr ""
+"Position, velocity, current, mechanical angle, electrical angle and torque "
+"are distinct. Gear ratio, encoder count multiplier, direction and pole pairs"
+" each need an explicit source. The application bridge converts the angle and"
+" velocity from the mechanical side selected for Axis to the rotor mechanical"
+" side required by Motor; motor computation then applies the pole pairs. The "
+"current reference is in A and is never scaled by the gear ratio. Without "
+"verified torque constants and current conventions, an ampere target cannot "
+"be renamed torque feedback."
+
+#: ../../../../../../nexus/docs/explanation/motor-control.md:53
+msgid "采样、观察与计划输出分别计时"
+msgstr "Time sampling, observation and planned output separately"
+
+#: ../../../../../../nexus/docs/explanation/motor-control.md:55
+msgid ""
+"Motor 输入区分 `sample_time_us`、`angle_time_us`、`observed_at_us` 和 "
+"`apply_time_us`。角度可以在采样之后、观察之前取得，随后在明确误差预算内向采样 "
+"时刻回投影或向输出时刻预测。预测使用调用者提供的有效机械速度；软件读取时刻 不自动成为采样孔径。"
+msgstr ""
+"Motor input distinguishes `sample_time_us`, `angle_time_us`, "
+"`observed_at_us` and `apply_time_us`. The angle may be obtained after "
+"sampling and before observation, then projected back to sampling or forward "
+"to output within an explicit error budget. Prediction uses caller-supplied "
+"valid mechanical velocity; a software-read time does not automatically "
+"become a sampling aperture."
+
+#: ../../../../../../nexus/docs/explanation/motor-control.md:60
+msgid ""
+"F407ZG `injected-power-stage` 参考使用边沿对齐 TIM8、ADC1 四个顺序 injected rank，以及 TIM4 "
+"编码器观察。前三 rank 是 raw 相电流，第四个是 raw 母线电压。 `sample_at` 是计划触发参考，`scan_span_us` "
+"是声明的转换跨度；三相不是同时采样。 应用桥必须说明顺序采样近似和角度估计的适用范围，不能靠重写时间戳伪造同步。"
+msgstr ""
+"The F407ZG `injected-power-stage` reference uses edge-aligned TIM8, four "
+"sequential ADC1 injected ranks and TIM4 encoder observation. The first three"
+" ranks contain raw phase currents; the fourth contains raw bus voltage. "
+"`sample_at` is the scheduled trigger reference and `scan_span_us` the "
+"declared conversion span; the phases are not sampled simultaneously. The "
+"application bridge must state where its sequential-sampling approximation "
+"and angle estimate apply. Rewriting timestamps cannot fabricate "
+"synchronization."
+
+#: ../../../../../../nexus/docs/explanation/motor-control.md:65
+msgid ""
+"有效窗口同时受 duty、deadtime、模拟稳定时间、转换、IRQ 延迟、compute 和提交 预算约束。调制器的数学余量不能代替 "
+"provider 的窗口检查，更不能证明真实模拟 稳定时间。当前参考不声明中心对齐、多 ADC 同时采样、单分流或无感换相。"
+msgstr ""
+"The valid window is jointly constrained by duty, deadtime, analog settling, "
+"conversion, IRQ latency, compute and commit budgets. Mathematical modulator "
+"headroom does not replace provider window checks or prove physical analog "
+"settling. This reference does not claim center alignment, simultaneous "
+"multi-ADC sampling, single-shunt operation or sensorless commutation."
+
+#: ../../../../../../nexus/docs/explanation/motor-control.md:69
+msgid "三种期限保持独立"
+msgstr "Keep three kinds of deadline independent"
+
+#: ../../../../../../nexus/docs/explanation/motor-control.md:71
+msgid "外部命令有效期决定旧运动参考还能否使用，重复帧和心跳不自动续期。"
+msgstr ""
+"External command validity determines whether an old motion reference remains"
+" usable. Repeated frames and heartbeats do not automatically renew it."
+
+#: ../../../../../../nexus/docs/explanation/motor-control.md:72
+msgid ""
+"PowerStage 用单独的 `startup_deadline` 约束启动；非阻塞长期 session 的 `base.deadline` 为 "
+"`NX_DEADLINE_NEVER`，运行直到显式停止或故障。"
+msgstr ""
+"PowerStage bounds startup with a separate `startup_deadline`. The "
+"nonblocking long-lived session uses `NX_DEADLINE_NEVER` for `base.deadline` "
+"and runs until explicit stop or fault."
+
+#: ../../../../../../nexus/docs/explanation/motor-control.md:74
+msgid "service、清理尝试和维护使用各自有界执行；超时不能撤销借用或证明已经断能。"
+msgstr ""
+"Service, cleanup attempts and maintenance each have bounded execution. "
+"Timeout cannot revoke a borrow or prove deenergization."
+
+#: ../../../../../../nexus/docs/explanation/motor-control.md:76
+msgid ""
+"Task 通过显式 service 推进启动及最终排空；选定 ADC IRQ 只执行有界 callback。 任务不得逐字段改动被 IRQ "
+"借用的算法状态。跨上下文目标与参数通过已有有界对象 交接，普通结构体复制不构成同步协议。软件只能在 callback 返回后检测其超预算， 不能用 "
+"deadline 抢占一个不返回的计算。"
+msgstr ""
+"The Task explicitly services startup and final drainage; the selected ADC "
+"IRQ executes only a bounded callback. Tasks must not change algorithm state "
+"borrowed by the IRQ field by field. Cross-context targets and parameters "
+"pass through an existing bounded object handoff; an ordinary structure copy "
+"is not a synchronization protocol. Software can detect a callback budget "
+"overrun only after it returns. A deadline cannot preempt computation that "
+"never returns."
+
+#: ../../../../../../nexus/docs/explanation/motor-control.md:81
+msgid "故障与退出沿着原 owner 完成"
+msgstr "Faults and withdrawal follow the original owner"
+
+#: ../../../../../../nexus/docs/explanation/motor-control.md:83
+msgid ""
+"计算错误、角度过期、非法采样或完整输出失败关闭相应准入。Motor 算法故障不能 替代硬件抑制；应用仍按 PowerStage 合同 "
+"stop／service。输出关闭后，session 和 全部 context 仍保留到 acquire 观察 `SETTLED`。退出失败保持 "
+"`QUARANTINED`， 不能清零状态后复用，也不能用恢复同一个 epoch 数值伪装新会话。"
+msgstr ""
+"Computation errors, stale angles, invalid samples or failed complete outputs"
+" close the corresponding admission. A Motor algorithm fault cannot replace "
+"hardware inhibition; the application must still stop/service under the "
+"PowerStage contract. After output inhibition, the session and all context "
+"remain borrowed until an acquire observation of `SETTLED`. Failed withdrawal"
+" retains `QUARANTINED`: storage cannot be zeroed and reused, and restoring "
+"the same epoch value cannot masquerade as a new session."
+
+#: ../../../../../../nexus/docs/explanation/motor-control.md:88
+msgid ""
+"受控减速依赖仍有效的反馈、供电和能量处理。硬件 stop 是输出与源撤回，不是机械 "
+"减速或功率隔离。升降承重、抱闸、机械回零和整机重新启动条件属于外部应用；电角 偏置、编码器参考和机械零位分别建立有效性。"
+msgstr ""
+"Controlled deceleration requires feedback, supply and energy handling that "
+"remain valid. Hardware stop withdraws outputs and sources; it does not "
+"promise mechanical deceleration or power isolation. Load support, brakes, "
+"mechanical homing and whole-machine restart conditions belong to the "
+"external application. Electrical offset, encoder reference and mechanical "
+"zero establish their validity separately."
+
+#: ../../../../../../nexus/docs/explanation/motor-control.md:92
+msgid "软件项目提供各自范围的证据"
+msgstr "Software projects provide evidence within their own scope"
+
+#: ../../../../../../nexus/docs/explanation/motor-control.md:94
+msgid ""
+"独立示例仓库的双轮 SIL 运行实际 C 控制和独立 DC／机械模型；控制器只看模拟 "
+"传感器，验收器可以读取模型真值。轮速、里程计和地面真值分别报告。固定窗口缺样 不能填成零误差；课程参数只属于明确的教学 profile。"
+msgstr ""
+"The external differential-drive SIL executes actual C control with an "
+"independent DC/mechanical model. The controller sees simulated sensors; the "
+"evaluator may read model truth. Wheel velocity, odometry and ground truth "
+"are reported separately. Missing samples in a fixed window cannot become "
+"zero error. Course parameters belong only to an explicit teaching profile."
+
+#: ../../../../../../nexus/docs/explanation/motor-control.md:98
+msgid ""
+"PMSM 数学模型、生产 C 寄存器模型、ARM 链接、安装 SDK 消费和物理测量是不同 证据。DC 模型通过不授予 PMSM 或实板能力；当前物理 "
+"HIL 保持 `not_executed`。 MCSDK 不是自有控制核的依赖，尚未接入的后端也不占位声明为已支持。"
+msgstr ""
+"PMSM mathematical models, production-C register models, ARM linking, "
+"installed-SDK consumption and physical measurements provide different "
+"evidence. Passing a DC model does not qualify PMSM operation or a board; "
+"physical HIL remains `not_executed`. MCSDK is not a dependency of the self-"
+"owned kernel. Unintegrated backends are not advertised as supported "
+"placeholders."
+
+#: ../../../../../../nexus/docs/explanation/motor-control.md:102
+msgid ""
+"操作入口见[控制与智能器件](../guides/control-and-smart-devices.md)，权威公共声明见 [电机与轴 "
+"API](../reference/api/components/control.md)及 [耦合采样 "
+"API](../reference/api/io/analog.md)。"
+msgstr ""
+"For operation, see [control and smart devices](../guides/control-and-smart-"
+"devices.md). Authoritative public declarations are in the [motor and axis "
+"API](../reference/api/components/control.md) and [coupled sampling "
+"API](../reference/api/io/analog.md)."

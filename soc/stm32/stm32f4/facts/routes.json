@@ -18311,6 +18311,93 @@
       ],
       "dma": [],
       "source": "RM0090 Rev22 Table69 TIM8 CC4 injected ADC1; DS8626 Rev12 AF3 PC6/PC7/PC8 CH1-3, PA6 BKIN and PA0 ADC1_IN0. Single-rank IRQ software reference; no DMA, power stage or physical timing qualification."
+    },
+    {
+      "id": "tim8-power-stage-adc1-tim4",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "controller": "PWM_ADC8",
+      "kind": "pwm_adc",
+      "pins": [
+        {
+          "pin": "PC6",
+          "function": "ch1",
+          "af": 3
+        },
+        {
+          "pin": "PA7",
+          "function": "ch1n",
+          "af": 3
+        },
+        {
+          "pin": "PC7",
+          "function": "ch2",
+          "af": 3
+        },
+        {
+          "pin": "PB0",
+          "function": "ch2n",
+          "af": 3
+        },
+        {
+          "pin": "PC8",
+          "function": "ch3",
+          "af": 3
+        },
+        {
+          "pin": "PB1",
+          "function": "ch3n",
+          "af": 3
+        },
+        {
+          "pin": "PA6",
+          "function": "bkin",
+          "af": 3
+        },
+        {
+          "pin": "PA0",
+          "function": "adc0",
+          "af": 0
+        },
+        {
+          "pin": "PA1",
+          "function": "adc1",
+          "af": 0
+        },
+        {
+          "pin": "PA2",
+          "function": "adc2",
+          "af": 0
+        },
+        {
+          "pin": "PA3",
+          "function": "adc3",
+          "af": 0
+        },
+        {
+          "pin": "PD12",
+          "function": "encoder_a",
+          "af": 2
+        },
+        {
+          "pin": "PD13",
+          "function": "encoder_b",
+          "af": 2
+        }
+      ],
+      "modes": [
+        "injected-power-stage"
+      ],
+      "dma": [],
+      "source": "RM0090 Rev22 TIM8 CH4 ADC1 injected trigger, four sequential ADC1 ranks and TIM4 quadrature counter; DS8626 Rev12 AF3 PC6/PA7 CH1/1N, PC7/PB0 CH2/2N, PC8/PB1 CH3/3N, PA6 BKIN, PA0..PA3 ADC1_IN0..3 and AF2 PD12/PD13 TIM4 CH1/2. Edge-aligned sequential-scan software reference; no physical PCB, simultaneous sampling or rotor-angle aperture qualification.",
+      "mode_resources": {
+        "injected-power-stage": [
+          "controller:TIM4",
+          "timer:TIM4",
+          "controller:TIM12"
+        ]
+      }
     }
   ]
 }

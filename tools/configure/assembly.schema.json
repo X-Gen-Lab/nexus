@@ -2995,10 +2995,19 @@
             "minimum": 0,
             "description": "Count in the explicitly selected timer clock ticks."
           },
+          "compute_budget_us": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Time interval in microseconds; not a measured hardware guarantee."
+          },
           "deadtime_ticks": {
             "type": "integer",
             "minimum": 0,
             "description": "Count in the explicitly selected timer clock ticks."
+          },
+          "encoder_filter": {
+            "type": "integer",
+            "minimum": 0
           },
           "exclusive": {
             "type": "boolean"
@@ -3026,6 +3035,16 @@
             "minimum": 0,
             "description": "Time interval in microseconds; not a measured hardware guarantee."
           },
+          "maximum_duty_ticks": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Count in the explicitly selected timer clock ticks."
+          },
+          "minimum_duty_ticks": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Count in the explicitly selected timer clock ticks."
+          },
           "mode": {
             "type": "string",
             "description": "Explicit maintained mode; the product owns service and shutdown."
@@ -3046,6 +3065,11 @@
               "type": "integer",
               "minimum": 0
             }
+          },
+          "settling_ticks": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Count in the explicitly selected timer clock ticks."
           },
           "tick_hz": {
             "type": "integer",

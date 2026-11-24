@@ -743,6 +743,18 @@ class PwmAdcLoopOptions(PwmAdcOptions):
 
 
 @dataclass(frozen=True)
+class PowerStageOptions(PwmAdcOptions):
+    """One complementary output/scan owner with a reviewed inactive window."""
+    minimum_duty_ticks: int
+    maximum_duty_ticks: int
+    settling_ticks: int
+    commit_before_ticks: int
+    compute_budget_us: int
+    max_irq_delay_us: int
+    encoder_filter: int
+
+
+@dataclass(frozen=True)
 class CanFdFilterOptions:
     id: int
     mask: int
@@ -890,7 +902,7 @@ ControllerOptions = (DisplayOptions | ImageOptions | CaptureOptions | AudioOptio
                      ExtiOptions | ExtiHardwareOptions | PvdOptions | PvdEventsOptions | PwmOptions | PwmGroupOptions | TimerWaveformOptions | EncoderOptions | AdcOptions | DacOptions | CanOptions |
                      UsbDeviceOptions | UsbHostOptions | EthernetOptions | EthernetFramesOptions |
                      TimerCaptureOptions |
-                     AdvancedPwmOptions | PwmAdcOptions | PwmAdcLoopOptions | CanFdOptions |
+                     AdvancedPwmOptions | PwmAdcOptions | PwmAdcLoopOptions | PowerStageOptions | CanFdOptions |
                      AdcGroupOptions | LptimOptions | RtcOptions | ExternalBusOptions |
                      WindowWatchdogOptions | CryptoOptions | NoOptions)
 
@@ -986,6 +998,11 @@ def mode_options(values):
         if values["mode"] == "injected-control":
             return PwmAdcLoopOptions(*arguments, *(values[key] for key in (
                 "commit_before_ticks", "compute_budget_ticks", "max_irq_delay_us")))
+        if values["mode"] == "injected-power-stage":
+            return PowerStageOptions(*arguments, *(values[key] for key in (
+                "minimum_duty_ticks", "maximum_duty_ticks", "settling_ticks",
+                "commit_before_ticks", "compute_budget_us", "max_irq_delay_us",
+                "encoder_filter")))
         return PwmAdcOptions(*arguments)
     if kind == "can_fd":
         return CanFdOptions(values["bitrate"], values["data_bitrate"],

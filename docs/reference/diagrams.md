@@ -214,6 +214,19 @@ owner、等待和调度为显式选择，不形成额外的必经转发层。
 
 [可编辑 DOT](../assets/diagrams/control-smart-devices.dot)。
 
+(fig-35-motor-control)=
+## FIG-35 电机与轴控制的调用和退出责任
+
+实线是显式调用或数据交付，虚线是借用与退出责任。Axis 消费完整目标，应用桥
+将 raw 采样、时间与电机 SI 输入连接，再把归一化计划量化成完整 tick 组。
+PowerStage 唯一管理硬件；组件不创建任务或另一个 owner。图中的 F407ZG 是边沿
+对齐、顺序 ADC rank 的软件参考，不表示多 ADC 同时采样或物理电机验证。
+详细责任见[电机与轴控制](../explanation/motor-control.md)。
+
+![FIG-35：电机与轴控制的调用和退出责任](../assets/diagrams/motor-control.svg)
+
+[可编辑 DOT](../assets/diagrams/motor-control.dot)。
+
 ## 图资源维护
 
 每图维护 `.dot`、`.svg` 和 `.labels.json` 同名三件套，图索引完整登记。

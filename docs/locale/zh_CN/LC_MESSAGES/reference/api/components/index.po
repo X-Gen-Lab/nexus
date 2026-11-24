@@ -7,13 +7,13 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: a2233883434d1fd18a27ea20940a1b1aec3eff4a7f29e2cecf46bb8534c83942\n"
+"X-Nexus-Source-SHA256: b87ec6ff15ccd59d975b466b77b5d96ea112e0a8b396c1b78eedf09b4b64a0fb\n"
 
-#: ../../../../../../../../workspace/nexus/docs/reference/api/components/index.md:10
+#: ../../../../../../../docs/reference/api/components/index.md:10
 msgid "Optional component reference"
 msgstr "可选组件参考"
 
-#: ../../../../../../../../workspace/nexus/docs/reference/api/components/index.md:12
+#: ../../../../../../../docs/reference/api/components/index.md:12
 msgid ""
 "Choose reusable mechanisms by responsibility, then select the exact software"
 " profile and its public CMake target. Components consume explicit ports and "
@@ -24,91 +24,91 @@ msgstr ""
 "按职责选择可复用机制，再选择精确的软件 profile 及其公开 CMake "
 "target。组件使用显式端口和调用者拥有的存储；产品负责调度、应用策略和物理恢复。精确 profile 的存储头仅用于静态装配。"
 
-#: ../../../../../../../../workspace/nexus/docs/reference/api/components/index.md:0
+#: ../../../../../../../docs/reference/api/components/index.md:0
 msgid "Responsibility"
 msgstr "责任"
 
-#: ../../../../../../../../workspace/nexus/docs/reference/api/components/index.md:0
+#: ../../../../../../../docs/reference/api/components/index.md:0
 msgid "Start here"
 msgstr "阅读入口"
 
-#: ../../../../../../../../workspace/nexus/docs/reference/api/components/index.md:0
+#: ../../../../../../../docs/reference/api/components/index.md:0
 msgid "Product input"
 msgstr "产品输入"
 
-#: ../../../../../../../../workspace/nexus/docs/reference/api/components/index.md:0
+#: ../../../../../../../docs/reference/api/components/index.md:0
 msgid "Numeric processing and control"
 msgstr "数值处理与控制"
 
-#: ../../../../../../../../workspace/nexus/docs/reference/api/components/index.md:0
-msgid "[Algorithms](algorithms.md)"
-msgstr "[算法](algorithms.md)"
+#: ../../../../../../../docs/reference/api/components/index.md:0
+msgid "[Algorithms](algorithms.md), [motor and axis control](control.md)"
+msgstr "[算法](algorithms.md)、[电机与轴控制](control.md)"
 
-#: ../../../../../../../../workspace/nexus/docs/reference/api/components/index.md:0
+#: ../../../../../../../docs/reference/api/components/index.md:0
 msgid "Units, coefficients, sample interval and independent history"
 msgstr "单位、系数、采样间隔及独立历史"
 
-#: ../../../../../../../../workspace/nexus/docs/reference/api/components/index.md:0
+#: ../../../../../../../docs/reference/api/components/index.md:0
 msgid "Execution coordination"
 msgstr "执行协调"
 
-#: ../../../../../../../../workspace/nexus/docs/reference/api/components/index.md:0
+#: ../../../../../../../docs/reference/api/components/index.md:0
 msgid "[Runtime helpers](runtime/helpers.md), [owners](runtime/owners.md)"
 msgstr "[Runtime 辅助机制](runtime/helpers.md)、[owner](runtime/owners.md)"
 
-#: ../../../../../../../../workspace/nexus/docs/reference/api/components/index.md:0
+#: ../../../../../../../docs/reference/api/components/index.md:0
 msgid "Executor, bounded slots, service budget and joins"
 msgstr "执行者、有界 slot、service 预算和退出会合"
 
-#: ../../../../../../../../workspace/nexus/docs/reference/api/components/index.md:0
+#: ../../../../../../../docs/reference/api/components/index.md:0
 msgid "Wire protocol over selected ports"
 msgstr "选定端口上的线路协议"
 
-#: ../../../../../../../../workspace/nexus/docs/reference/api/components/index.md:0
+#: ../../../../../../../docs/reference/api/components/index.md:0
 msgid "[Buses](buses.md)"
 msgstr "[总线](buses.md)"
 
-#: ../../../../../../../../workspace/nexus/docs/reference/api/components/index.md:0
+#: ../../../../../../../docs/reference/api/components/index.md:0
 msgid "Electrical facts, address, clock and cleanup budget"
 msgstr "电气事实、地址、clock 和 cleanup 预算"
 
-#: ../../../../../../../../workspace/nexus/docs/reference/api/components/index.md:0
+#: ../../../../../../../docs/reference/api/components/index.md:0
 msgid "Exact external device"
 msgstr "精确外部器件"
 
-#: ../../../../../../../../workspace/nexus/docs/reference/api/components/index.md:0
+#: ../../../../../../../docs/reference/api/components/index.md:0
 msgid "[Devices](devices.md)"
 msgstr "[器件](devices.md)"
 
-#: ../../../../../../../../workspace/nexus/docs/reference/api/components/index.md:0
+#: ../../../../../../../docs/reference/api/components/index.md:0
 msgid "Fitted part, power, calibration and recovery"
 msgstr "已焊 part、供电、校准和恢复"
 
-#: ../../../../../../../../workspace/nexus/docs/reference/api/components/index.md:0
+#: ../../../../../../../docs/reference/api/components/index.md:0
 msgid "Storage and diagnostics"
 msgstr "存储与诊断"
 
-#: ../../../../../../../../workspace/nexus/docs/reference/api/components/index.md:0
+#: ../../../../../../../docs/reference/api/components/index.md:0
 msgid "[Services](services.md)"
 msgstr "[服务](services.md)"
 
-#: ../../../../../../../../workspace/nexus/docs/reference/api/components/index.md:0
+#: ../../../../../../../docs/reference/api/components/index.md:0
 msgid "Region/volume, schema, workspace and observation provenance"
 msgstr "region／volume、schema、workspace 和观测来源"
 
-#: ../../../../../../../../workspace/nexus/docs/reference/api/components/index.md:0
+#: ../../../../../../../docs/reference/api/components/index.md:0
 msgid "Transport middleware"
 msgstr "传输中间件"
 
-#: ../../../../../../../../workspace/nexus/docs/reference/api/components/index.md:0
+#: ../../../../../../../docs/reference/api/components/index.md:0
 msgid "Protocol pages below"
 msgstr "下方协议页面"
 
-#: ../../../../../../../../workspace/nexus/docs/reference/api/components/index.md:0
+#: ../../../../../../../docs/reference/api/components/index.md:0
 msgid "Selected dependency profile and product protocol policy"
 msgstr "选定依赖 profile 与产品协议策略"
 
-#: ../../../../../../../../workspace/nexus/docs/reference/api/components/index.md:26
+#: ../../../../../../../docs/reference/api/components/index.md:26
 msgid ""
 "The [component guide](../../../guides/component-porting.md) connects "
 "selection, static composition, progress and shutdown. An algorithm or helper"
@@ -121,7 +121,7 @@ msgstr ""
 "worker、queue、heap、设备注册表或强制 OS lock。外部异步 transport 仍借用已接受的请求和 payload，直到 "
 "acquire 观察 SETTLED；组件超时不能撤销该借用。"
 
-#: ../../../../../../../../workspace/nexus/docs/reference/api/components/index.md:32
+#: ../../../../../../../docs/reference/api/components/index.md:32
 msgid ""
 "The API reference describes current software contracts. It does not "
 "authorize an unselected MCU mode, Board connection, kernel gateway or "

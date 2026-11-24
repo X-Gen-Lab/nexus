@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "id": "f407zg-power-stage-software-reference",
+  "soc": "STM32F407ZGT6",
+  "soc_family": "stm32f4",
+  "source_revision": "software-v1",
+  "physical_pcb_revision": null,
+  "clocks": {
+    "hse_hz": 8000000
+  },
+  "bindings": [
+    {
+      "id": "drive",
+      "controller": "PWM_ADC8",
+      "route": "tim8-power-stage-adc1-tim4"
+    },
+    {
+      "id": "pwm",
+      "controller": "TIM8",
+      "route": "tim8-group-complementary"
+    },
+    {
+      "id": "encoder",
+      "controller": "TIM4",
+      "route": "tim4-encoder-pb6-pb7"
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14"
+  ],
+  "unknowns": [
+    "Software reference only; no reviewed power PCB or attached motor",
+    "ADC1 ranks are sequential, not simultaneous phase-current measurements",
+    "TIM4 count is an IRQ observation, not a hardware-latched rotor angle",
+    "No physical switching, current accuracy, latency or protection qualification"
+  ],
+  "provenance": [
+    {
+      "url": "https://www.st.com/resource/en/reference_manual/dm00031020.pdf",
+      "scope": "RM0090 Rev22 TIM8 CH4 ADC1 injected trigger; TIM8 complementary outputs and break; ADC1 four injected ranks; TIM4 quadrature counter."
+    },
+    {
+      "url": "https://www.st.com/resource/en/datasheet/stm32f407vg.pdf",
+      "scope": "DS8626 Rev12 LQFP144 AF3 PC6/PA7, PC7/PB0, PC8/PB1 TIM8 output pairs; PA6 break; PA0..PA3 ADC1_IN0..3; AF2 PD12/PD13 TIM4 CH1/2. Silicon routes, not PCB authorization."
+    }
+  ]
+}

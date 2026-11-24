@@ -7,6 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "nexus/components/canopen.h"
+#include "cia402_private.h"
 #define OD_DEFINITION
 #include "301/CO_Emergency.h"
 #include "301/CO_HBconsumer.h"
@@ -83,7 +84,32 @@ size_t nx_canopen_workspace_alignment(void) {
     return _Alignof(canopen_state_t);
 }
 
-static bool valid_config(const nx_canopen_config_t* config) {
+static bool drive_index(uint16_t index) {
+    switch (index) {
+        case 0x603f:
+        case 0x6040:
+        case 0x6041:
+        case 0x6060:
+        case 0x6061:
+        case 0x6064:
+        case 0x6067:
+        case 0x6068:
+        case 0x606c:
+        case 0x607a:
+        case 0x607f:
+        case 0x6081:
+        case 0x6083:
+        case 0x6084:
+        case 0x6085:
+        case 0x60ff:
+        case 0x6502:
+            return true;
+        default:
+            return false;
+    }
+}
+
+static bool valid_config(const nx_canopen_config_t* config, bool drive) {
     if (config == NULL || config->port == NULL || config->clock.read == NULL ||
         config->objects == NULL || config->node_id == 0 ||
         config->node_id > 127 || config->peer_node_id == 0 ||
@@ -101,7 +127,8 @@ static bool valid_config(const nx_canopen_config_t* config) {
     uint16_t previous = 0;
     for (size_t index = 0; index < config->object_count; ++index) {
         const nx_canopen_object_t* object = &config->objects[index];
-        if (object->index < 0x2000 || object->index > 0x5fff ||
+        if ((drive ? !drive_index(object->index)
+                   : object->index < 0x2000 || object->index > 0x5fff) ||
             object->index <= previous || object->value == NULL ||
             (object->bytes != 1 && object->bytes != 2 && object->bytes != 4) ||
             (object->receive_pdo && !object->writable)) {
@@ -241,10 +268,10 @@ static CO_ReturnError_t objects_init(canopen_state_t* state) {
     return result;
 }
 
-nx_result_t nx_canopen_init(nx_canopen_t* node,
-                            const nx_canopen_config_t* config, void* workspace,
-                            size_t bytes) {
-    if (node == NULL || node->state != NULL || !valid_config(config) ||
+static nx_result_t initialize(nx_canopen_t* node,
+                              const nx_canopen_config_t* config,
+                              void* workspace, size_t bytes, bool drive) {
+    if (node == NULL || node->state != NULL || !valid_config(config, drive) ||
         workspace == NULL ||
         (uintptr_t)workspace % nx_canopen_workspace_alignment() != 0 ||
         bytes < nx_canopen_workspace_bytes(config->object_count)) {
@@ -264,6 +291,7 @@ nx_result_t nx_canopen_init(nx_canopen_t* node,
     state->module.txArray = state->transmit;
     state->module.txSize = TX_COUNT;
     state->module.CANnormal = true;
+    state->device_type = drive ? 402U : 0U;
     nx_request_initialize(&state->request.base);
     dictionary_init(state);
     if (objects_init(state) != CO_ERROR_NO) {
@@ -271,6 +299,18 @@ nx_result_t nx_canopen_init(nx_canopen_t* node,
     }
     node->state = state;
     return NX_SUCCESS;
+}
+
+nx_result_t nx_canopen_init(nx_canopen_t* node,
+                            const nx_canopen_config_t* config, void* workspace,
+                            size_t bytes) {
+    return initialize(node, config, workspace, bytes, false);
+}
+
+nx_result_t nx_canopen_init_drive(nx_canopen_t* node,
+                                  const nx_canopen_config_t* config,
+                                  void* workspace, size_t bytes) {
+    return initialize(node, config, workspace, bytes, true);
 }
 
 CO_ReturnError_t CO_CANrxBufferInit(CO_CANmodule_t* module, uint16_t index,

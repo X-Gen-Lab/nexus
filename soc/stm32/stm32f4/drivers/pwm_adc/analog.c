@@ -120,6 +120,11 @@ nx_result_t nx_stm32_control_adc_close(nx_stm32_control_adc_t* s) {
     if (s->config == NULL)
         return NX_SUCCESS;
     const nx_stm32_control_adc_config_t* c = s->config;
+    /* A retained receipt cannot authorize MMIO after its ADC gate is lost. */
+    if ((s->touched || s->common_touched) &&
+        (NX_AV_READ(&g_nx_stm32_system.rcc->APB2ENR) & RCC_APB2ENR_ADC1EN) ==
+            0U)
+        return NX_ERROR_STATE;
     if (s->touched) {
         if (!nx_stm32_av_write(&c->adc->CR2, 0U, UINT32_MAX) ||
             !nx_stm32_av_write(&c->adc->CR1, 0U, UINT32_MAX))

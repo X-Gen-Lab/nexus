@@ -28,6 +28,17 @@ class SDKProfilePolicyTests(unittest.TestCase):
             spec.loader.exec_module(module)
             setattr(cls, name, module)
 
+    def test_drive_profile_retains_locked_canopen_source_without_default_cost(self):
+        plain = self.packager.source_profile()
+        self.assertNotIn('vendors/CANopenNode',
+                         self.packager.runtime_dependency_closure(plain))
+        drive = self.packager.source_profile(components=('cia402',))
+        self.assertIn('vendors/CANopenNode',
+                      self.packager.runtime_dependency_closure(drive))
+        required = set(self.packager.required_files(ROOT, drive))
+        self.assertIn('vendors/CANopenNode/301/CO_NMT_Heartbeat.c', required)
+        self.assertIn('vendors/CANopenNode/LICENSE', required)
+
     def test_native_controls_require_explicit_host_support_export(self):
         controls = ('model.h', 'rtc_lptim_model.h', 'spi_dma_model.h')
         for host_support in (False, True):

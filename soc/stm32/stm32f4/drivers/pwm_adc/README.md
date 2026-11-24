@@ -106,3 +106,79 @@ session。显式 stop 后通过 cold close 和重新初始化建立新会话，�
   namespace 分开。产品拥有任务、功率板、控制政策和实板测量。
 
 物理测试状态保持 `not_executed`。
+
+## 电驱完整软件参考：injected-power-stage
+
+`power_stage.h/.c` 提供独立的 `nx_power_stage_t` face，直接拥有选定硬件，
+不在另一个 `pwm_adc_loop` 实例上转发。它与前述两种模式互斥。当前精确软件路线为：
+
+| 资源 | 本模式选择 |
+| --- | --- |
+| MCU | STM32F407ZGT6；没有关联真实功率 PCB |
+| 输出 | TIM8，边沿对齐 PWM1，CH1／2／3 及三个互补输出 |
+| 输出引脚 | PC6／PA7、PC7／PB0、PC8／PB1，AF3 |
+| 故障 | PA6 TIM8 BKIN，显式极性；禁止自动输出重新使能 |
+| ADC | ADC1 injected，PA0／1／2／3，即 IN0／1／2／3 |
+| 数据顺序 | A／B／C 原始电流及原始母线电压，四个**顺序** rank |
+| 触发 | TIM8 CH4，官方 LL 定义的 injected selector 14 |
+| 编码器 | TIM4 x4，PD12／PD13 AF2，16-bit 原始模数计数 |
+
+这是边沿对齐、单 ADC 顺序采样模式，不声明中心对齐、双／三 ADC 同时采样、
+模拟前端精度或真实电机运行。当前通用 waveform 与 analog C 核心仍只有一个
+PowerStage owner；同一 TIM4／TIM8／ADC 共享域不能再装配独立接口。
+
+### 固定低侧窗口与预算
+
+调用者明确声明最小／最大 duty、AFE `settling_ticks`、deadtime、触发、提交边界、
+最大 IRQ 延迟和 compute 预算。配置与生产 C 均检查：
+
+```text
+deadtime_pwm_ticks = ceil(deadtime_tDTS * pwm_tick_hz / timer_hz)
+scan_us = ceil(sum(sample_cycles[rank] + 12) * 1000000 / adc_clock_hz)
+
+maximum_duty_ticks + deadtime_pwm_ticks + settling_ticks < trigger_ticks
+trigger_ticks + scan_us * ticks_per_us < period_ticks
+trigger_ticks + (scan_us + max_irq_delay_us + compute_budget_us + 4)
+    * ticks_per_us < commit_before_ticks
+commit_before_ticks <= period_ticks - 2 * ticks_per_us
+```
+
+三个 PWM1 上侧均关闭且低侧经过死区及声明稳定时间后，才进入四 rank 采样窗口。
+最大 duty 限制持续保持这个窗口；不能接纳一个绕过限制的任意调制结果。整数 MHz
+计数时钟允许小于微秒的 duty 量化，但 period、trigger 和提交边界须为整数微秒，
+以便与当前 Core 时间建立有界锚点。4 µs 裕量覆盖声明的量化与软件检查范围，
+不证明实际 IRQ 或回调 WCET。
+
+`sample_at` 是计划触发的时间参考，`scan_span_us` 是四次顺序转换的名义上界；
+它们不是实测采样孔径。三相原始值不代表同一瞬时的三个模拟量。控制消费者必须为
+选定的电流变化率、AFE、rank 偏移和误差预算证明可接受性，不能只把一个时间戳
+复制给三相后声称完成同步测量。
+
+`observed_at` 是完整读取后的软件观察，`angle_at` 是 TIM4 CNT 读取完成的观察；
+计数读取前后 Core 间隔超过 1 µs 即拒绝本周期。`planned_apply_at` 是下一次预期
+UEV 边界，不是已测得的电气输出生效时间。consumer 应保留这些来源，按明确模型
+处理采样角和输出角。raw 到安培／伏特／弧度的标定保持外部显式配置。
+
+### 会话、故障和最终退出
+
+`nx_power_stage_prepare` 只复制完整初始 plan、callback 及其 context 的完整跨度。
+`startup_deadline` 有限，分别约束 warmup；Core request 的整体 deadline 为 NEVER，
+表示非阻塞、长期借用的运行会话，直到显式 stop 或故障。运动命令的有效期由
+Axis／compute 独立监督；不得通过修改已借用的 deadline 或 context 延长旧目标。
+
+所有控制方法由同一 privileged、未屏蔽的 Task 串行调用。ADC IRQ 才调用 compute。
+callback 不保存临时 sample／plan，不调用 task-only I/O、OS、Flash 或网络；软件
+只能在返回后发现预算超限，不能抢占一个不返回的 callback。
+
+错误首先尽力抑制仍有门钟的 PWM／ADC。门钟或 epoch 失效不阻止对其他仍可访问
+硬件的抑制；缺少实际退出证明时继续保留 QUARANTINED。恢复相同的时钟数值不恢复
+运行准入，必须完成真实源撤回和 IRQ join。清故障不自动开始新会话。
+
+停止要分别证明输出、ADC、编码器源、ADC IRQ 和 break publisher 退出。只有最终
+退出后才 SETTLED，输出已关闭不结束借用。冷态 close 逐项保存恢复进度；timer 已经
+释放后，后续 ADC／优先级恢复失败仍可从原 receipt 重试，不重复热态准入。开启门钟
+后发现的外部 encoder 状态不会被 cold close 清除，只归还本次增加的门钟。
+
+`tests/google/soc/power_stage_test.cpp` 执行生产 C 和真实公共分发，只有物理 MMIO、
+CPU 与时间叶边界由模型提供。`tests/contracts/f407_power_stage/` 检查实际配置、
+factory 和 ARM 链接。物理波形、采样精度、转矩、时延与保护测试仍为 `not_executed`。

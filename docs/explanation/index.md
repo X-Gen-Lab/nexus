@@ -17,6 +17,7 @@ platform-architecture
 design-principles
 factory
 io-model
+motor-control
 ownership
 build-model
 time-and-epochs

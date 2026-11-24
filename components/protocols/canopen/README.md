@@ -91,3 +91,83 @@ stop 成功清空 `node.state`；外部调用者仍需 join，再回收存储并
 
 源锁位于 `dependencies/canopen.lock.json`；原始 `LICENSE` 和源码 notices 随所选
 Source SDK 保留，采用 Apache-2.0。正式消费仍需该 SDK 的来源准入与独立集成验证。
+
+## 可选 CiA 402 驱动对象与轴请求
+
+`nexus_add_cia402()` 显式创建 `Nexus::CiA402`，复用上面的真实 CANopenNode
+服务端。普通 `nx_canopen_init()` 的产品对象范围和存储布局保持原合同；只有
+驱动专用绑定入口接纳本节列出的标准对象。未选择时不增加驱动实例、状态或 worker。
+
+两个独立 profile 各自拥有 OD 和必要状态，没有最大模式对象池：
+
+| profile | 公共头 | RPDO，按实际对象顺序 |
+| --- | --- | --- |
+| Profile Velocity，mode 3 | `nexus/components/cia402.h` | `6040h` controlword 2 B、`6060h` 请求模式 1 B、`60ffh` 目标速度 4 B |
+| Profile Position，mode 1 | `nexus/components/cia402_position.h` | `6040h` 2 B、`6060h` 1 B、`607ah` 目标位置 4 B |
+
+PV 的 TPDO 为 `6041h` statusword 2 B、`6061h` 实际模式 1 B、`606ch` 实际速度
+4 B。PP 的 TPDO 前三字节相同，后四字节为 `6064h` 实际位置。每个方向都是一个
+7 B 异步 PDO，不使用 SYNC、分帧私有命令或 CAN FD。
+
+`6502h` 只公布当前选定模式；`603fh` 保存首个故障代码。两种 profile 都暴露固定
+只读的 `607fh` 最大速度、`6083h/6084h` 加减速和 `6085h` quick-stop 减速。
+PP 另暴露只读 `6067h/6068h` 位置窗口与时间、`6081h` profile 速度。
+它们是明确选择的对象子集，不构成完整 CiA 402 认证或全部模式声明。
+
+### 单位、绑定和状态确认
+
+速度 LSB 对应多少 rad/s 由配置明确给出；加速度对象采用相同速度单位每秒。
+PP 独立声明位置 LSB 对应多少 rad。机械侧、方向、减速器和有效标定仍由应用负责，
+不能把这些 user units 当作协议统一规定的弧度缩放。
+
+按顺序执行：
+
+1. 初始化调用者提供的 PV 或 PP 状态和固定参数。
+2. 用专用 `node_init` 绑定既有 CAN port、明确时钟、TX slots 和 workspace。
+   传输配置中的 `objects/count` 保持空，避免两份 OD 权威。
+3. 同一个 Thread 执行者推进 `nx_canopen_step`，随后用本次 report 和新鲜轴事实
+   调用对应 `update`，把复制的 action 交给外部轴/功率准入层。
+4. 停止新命令和轴动作，按实际 owner 完成退出；再停止 CANopen、会合外部使用者，
+   最后 release profile。协议停止不证明机械停止或功率已断开。
+
+action 是动作请求。statusword 和 `6061h` 根据实际轴事实更新，不因写入
+controlword 或 `6060h` 就宣布已使能/已切换。硬件 enable 与 operation enable
+分别确认；无准备条件、意外失去已确认使能、网络停止或有效反馈丢失会锁存故障。
+fault reset 上升沿只请求恢复，满足条件且观察到故障消除后回到 DISABLED，
+不会自动执行旧的 Enable Operation 或运动目标。
+
+Halt 与 Quick Stop 也只是明确的本地请求。外部轴必须按仍然可用的反馈、供能和
+能量处理能力执行；组件不操作门极、抱闸，不承诺任意条件下的机械制动。
+
+### PP 的单点握手与真实到位
+
+当前 PP 选择 absolute、immediate、rest-to-rest 单点。相对点、排队和运动中重规划
+会明确关闭准入，不把其含义改成绝对目标继续执行。
+
+controlword bit 4 的新上升沿复制一份完整点位，生成不回绕的局部 generation。
+应用适配器真正接纳后，返回相同 epoch/generation 的确认，才置 statusword bit 12。
+第一次发布之前的反馈不能确认新请求；bit 4 持续为高也不会重复发起新运动。
+等待实际接纳有明确上界，等于绑定 transport 的 `maximum_step_us`。
+
+epoch 是应用提供的会话身份，generation 是组件内部的点位身份，均不是标准 PDO
+字段。重新初始化前须退出全部使用者并选择新 epoch；不能让旧确认接纳新会话。
+重复的 action 仍指向同一份准入请求，不授权刷新运动有效期。
+
+bit 10 使用实际位置、实际速度、完整连续样本及固定窗口时间计算。
+轨迹 complete 或外部一个 target-reached 布尔值不能代替这些测量。
+PP 的 sequence 必须连续且非零，观察时刻单调推进，间隔满足声明上界；
+缺样、倒退或不可表示的位置会关闭准入，不补零误差、不累积虚假的停留时间。
+此判据只针对声明的观测，不证明采样之间的全部物理行为。
+
+### 运动授权与验证范围
+
+PV action 是当前暂存目标的快照，不是“刚收到一条新运动命令”的事件。
+调用 update、收到心跳或重复读到同一目标都不能续期。外部产品须明确采用有限任务
+还是周期参考的授权协议，并保留真实接收时间；不能每次轮询便给旧目标生成新序号。
+这组驱动对象不增加一个隐藏通信看门狗，也不替代独立命令监督器。
+
+`cia402_test.cpp` 和 `cia402_position_test.cpp` 执行真实生产 C、锁定 CANopenNode
+NMT/SDO/PDO 和外部 CAN 端口。它们覆盖标准对象访问、两个 7 B PDO、实际状态确认、
+故障恢复、PP 握手、跨会话确认与测量停留。普通服务端的既有回归独立保留。
+ARM 链接、网络实物互通、电气输出、机械到位和时延分别验证；物理 HIL 仍为
+`not_executed`。

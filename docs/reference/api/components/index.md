@@ -16,7 +16,7 @@ recovery. Exact-profile storage headers belong only at static composition.
 
 | Responsibility | Start here | Product input |
 | --- | --- | --- |
-| Numeric processing and control | [Algorithms](algorithms.md) | Units, coefficients, sample interval and independent history |
+| Numeric processing and control | [Algorithms](algorithms.md), [motor and axis control](control.md) | Units, coefficients, sample interval and independent history |
 | Execution coordination | [Runtime helpers](runtime/helpers.md), [owners](runtime/owners.md) | Executor, bounded slots, service budget and joins |
 | Wire protocol over selected ports | [Buses](buses.md) | Electrical facts, address, clock and cleanup budget |
 | Exact external device | [Devices](devices.md) | Fitted part, power, calibration and recovery |
@@ -35,6 +35,7 @@ The API reference describes current software contracts. It does not authorize an
 :maxdepth: 1
 
 algorithms
+control
 buses
 devices
 protocols/network

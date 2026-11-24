@@ -143,6 +143,7 @@ nexus_io_domain(pwm_adc ALIAS IOPWMADC SOURCES src/api/pwm_adc.c
 nexus_io_domain(pwm_adc_loop ALIAS IOPWMADCLoop SOURCES src/api/pwm_adc_loop.c
     DEPENDS nexus_io_adc_format
 )
+nexus_io_domain(power_stage ALIAS IOPowerStage SOURCES src/api/power_stage.c)
 nexus_io_domain(can_fd ALIAS IOCANFD SOURCES src/api/can_fd.c
     DEPENDS nexus_io_wake
 )
@@ -218,6 +219,7 @@ if(
         encoder
         pwm_adc
         pwm_adc_loop
+        power_stage
         can_fd
         adc_group
         rtc

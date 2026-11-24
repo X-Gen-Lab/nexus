@@ -216,6 +216,8 @@ def normalize_controller(selection, route, binding, hardware, provider, *,
         result["message_ram_words"] = hardware["message_ram_words"]
     if route["kind"] == "pwm_adc" and mode == "injected-control":
         result["interface_kind"] = "pwm_adc_loop"
+    if route["kind"] == "pwm_adc" and mode == "injected-power-stage":
+        result["interface_kind"] = "power_stage"
     from tools.configure import gpio_electrical
     gpio_electrical.require_selection(result, binding)
     return result

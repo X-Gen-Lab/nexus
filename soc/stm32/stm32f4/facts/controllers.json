@@ -2366,7 +2366,15 @@
             "PC7",
             "PC8",
             "PA6",
-            "PA0"
+            "PA0",
+            "PA7",
+            "PB0",
+            "PB1",
+            "PA1",
+            "PA2",
+            "PA3",
+            "PD12",
+            "PD13"
           ],
           "resources": [
             "controller:TIM8",
@@ -2381,7 +2389,8 @@
         "PWM_ADC8": {
           "modes": [
             "finite-regular-dma",
-            "injected-control"
+            "injected-control",
+            "injected-power-stage"
           ]
         }
       }
