@@ -172,3 +172,9 @@ changes together with diagrams, examples, translation and execution scope. Keep
 products, workers, private PCB and recovery policy outside Nexus. Record actual
 source/configuration/tool/ELF identities and physical pending items; a successful
 commit or CI does not promote a product release.
+
+For a GitHub or API merge commit, retain the default title
+`Merge pull request #N from owner/branch`. A custom merge title must use the
+existing Conventional Commit format, for example `chore: merge PR #N`.
+Squash commit titles follow the same Conventional Commit format. Preserve the
+existing commit-message checks.
