@@ -284,6 +284,22 @@ jobs:
           - multi_controller_assembly
           - declared_io_assembly
           - stm32f4_family
+        include:
+          - fixture: stm32f4_family
+            project: tests/contracts/stm32f4_family
+            assemblies: |
+              tests/contracts/stm32f4_family/f405zg.toml
+              tests/contracts/stm32f4_family/f407zg.toml
+              tests/contracts/stm32f4_family/f411re.toml
+              tests/contracts/stm32f4_family/f415zg.toml
+              tests/contracts/stm32f4_family/f417zg.toml
+              tests/contracts/stm32f4_family/f446ze.toml
+              tests/contracts/stm32f4_family/f479ni.toml
+          - fixture: stm32f4_gpio
+            project: tests/contracts/stm32f4_family/gpio
+            assemblies: |
+              tests/contracts/stm32f4_family/f407zg-gpio.toml
+              tests/contracts/stm32f4_family/f479ni-gpio.toml
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -296,24 +312,27 @@ jobs:
       - name: Link and audit each authored software assembly
         env:
           FIXTURE: ${{ matrix.fixture }}
-          PROVIDER_PROJECT: ''
-          PROVIDER_ASSEMBLIES: ''
+          PROVIDER_PROJECT: ${{ matrix.project || '' }}
+          PROVIDER_ASSEMBLIES: ${{ matrix.assemblies || '' }}
         run: |
           fixture="tests/contracts/$FIXTURE"
           arguments=()
           if [ -n "$PROVIDER_PROJECT" ]; then
             arguments+=(--project "$PROVIDER_PROJECT")
           fi
-          for assembly in "$fixture"/*.toml; do
-            if [ -f "$assembly" ]; then
-              arguments+=(--fixture "$assembly")
-            fi
-          done
-          while IFS= read -r assembly; do
-            if [ -n "$assembly" ]; then
-              arguments+=(--fixture "$assembly")
-            fi
-          done <<< "$PROVIDER_ASSEMBLIES"
+          if [ -n "$PROVIDER_ASSEMBLIES" ]; then
+            while IFS= read -r assembly; do
+              if [ -n "$assembly" ]; then
+                arguments+=(--fixture "$assembly")
+              fi
+            done <<< "$PROVIDER_ASSEMBLIES"
+          else
+            for assembly in "$fixture"/*.toml; do
+              if [ -f "$assembly" ]; then
+                arguments+=(--fixture "$assembly")
+              fi
+            done
+          fi
           .venv/bin/python scripts/ci/provider_assemblies.py \
             --root "$GITHUB_WORKSPACE" \
             --compiler arm-none-eabi-gcc \
