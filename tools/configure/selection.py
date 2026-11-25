@@ -1,5 +1,7 @@
 """Cross-domain selection checks above the leaf provider contracts."""
 
+from collections.abc import Mapping
+
 from tools.configure.contracts import CONTROLLER_CONTRACTS
 from tools.configure.providers.common import (
     UINT32_MAX, cpu_abi, fail, integer, mode_traits, route_dma)
@@ -87,7 +89,7 @@ def validate_selection(selection, route, provider, ram_size, *, clock=None,
         from tools.configure import can
         from tools.configure.ir import ClockPlanIR
         plan = (ClockPlanIR.from_validated(clock_plan)
-                if isinstance(clock_plan, dict) else clock_plan)
+                if isinstance(clock_plan, Mapping) else clock_plan)
         selected_clock = provider.controller_clock_domain(plan, route["controller"])
         can.validate_selection(selection, provider, ram_size,
                                clock_hz=selected_clock.nominal_hz)

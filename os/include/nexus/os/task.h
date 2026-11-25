@@ -48,9 +48,14 @@ nx_time_us_t nx_os_now_us(void);
  * \return          SUCCESS or argument, context, creation or resource error
  * \note            Task/bootstrap only. Prepare all borrowed state before
  *                  calling: entry may run before start returns. One external
- *                  owner serializes start/join. Known control/stack overlap and
- *                  wrapping spans reject before kernel effects. A cleanup
- *                  failure retains its resources and the same object storage.
+ *                  owner serializes start/join. Known control/stack overlap,
+ *                  wrapping spans and name/context starting inside either span
+ *                  reject before kernel effects. The caller keeps complete name
+ *                  bytes and application state accessed through context outside
+ *                  kernel-written storage. Full accessed ranges cannot be
+ *                  inferred from pointers; a containing object need not be
+ *                  disjoint when its kernel-owned members remain untouched.
+ *                  Cleanup failure retains resources and the same storage.
  */
 nx_result_t nx_task_start(nx_task_t* task, const char* name, void* stack,
                           size_t stack_bytes, uint32_t priority,
@@ -85,9 +90,11 @@ nx_result_t nx_task_discard_before_scheduler(nx_task_t* task);
  * \param[in]       entry: Application entry that must never return
  * \param[in]       context: Context retained for the task lifetime
  * \return          SUCCESS or an admission/creation error
- * \note            Task/bootstrap only. No join, destroy or detach is implied.
- *                  Unexpected entry return enters fail-stop. Storage survives
- *                  until reset or separately reviewed external termination.
+ * \note            Task/bootstrap only. The returning-task known-span and
+ *                  borrowed-input admission rules also apply. No join, destroy
+ *                  or detach is implied. Unexpected return enters fail-stop.
+ *                  Storage survives until reset or separately reviewed
+ *                  external termination.
  */
 nx_result_t nx_permanent_task_start(nx_permanent_task_t* task, const char* name,
                                     void* stack, size_t stack_bytes,

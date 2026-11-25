@@ -10,6 +10,7 @@
 #include "drivers/gpio/instance.h"
 #include "drivers/gpio/pins.h"
 #include "nexus/arch/arch.h"
+#include "private/stm32f4_gpio_banks.h"
 #include "stm32f4xx_ll_gpio.h"
 #include "system/stm32f407_system.h"
 
@@ -36,18 +37,18 @@ static nx_result_t initialize_electrical(nx_stm32_gpio_state_t* port,
 
 /** \brief Match a GPIO bank without acquiring its bus clock. */
 static unsigned gpio_bank_index(const GPIO_TypeDef* registers) {
-    for (unsigned index = 0U; index < 9U; ++index) {
+    for (unsigned index = 0U; index < NX_STM32_GPIO_BANK_COUNT; ++index) {
         const GPIO_TypeDef* bank =
             (const GPIO_TypeDef*)(uintptr_t)(GPIOA_BASE + (uintptr_t)index *
                                                               UINT32_C(0x400));
-        if (registers == bank)
+        if (registers == bank && nx_stm32_gpio_bank_valid(index))
             return index;
     }
 #ifdef NEXUS_STM32_MODEL
     if (registers == GPIOA)
         return 0U;
 #endif
-    return 9U;
+    return NX_STM32_GPIO_BANK_COUNT;
 }
 
 /** \brief Validate every GPIO argument before clock or state changes. */
@@ -69,7 +70,7 @@ nx_result_t nx_stm32_gpio_admit(const nx_stm32_gpio_state_t* port,
         return NX_ERROR_INVALID;
     if (port->initialized)
         return NX_ERROR_BUSY;
-    if (gpio_bank_index(config->registers) == 9U ||
+    if (gpio_bank_index(config->registers) == NX_STM32_GPIO_BANK_COUNT ||
         g_nx_stm32_system.rcc == NULL)
         return NX_ERROR_INVALID;
     if (config->registers == GPIOC && (config->mask & (1U << 13U)) != 0U &&
@@ -224,7 +225,8 @@ nx_result_t nx_stm32_gpio_toggle(void* context, uint32_t mask) {
 
 /** \brief Establish GPIO clock access before the first mode/BSRR operation. */
 nx_result_t nx_stm32_gpio_clock_enable(unsigned port_index) {
-    if (port_index > 8U || g_nx_stm32_system.rcc == NULL) {
+    if (!nx_stm32_gpio_bank_valid(port_index) ||
+        g_nx_stm32_system.rcc == NULL) {
         return NX_ERROR_INVALID;
     }
     uint32_t bit = 1U << port_index;

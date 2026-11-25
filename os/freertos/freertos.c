@@ -228,6 +228,19 @@ static bool storage_disjoint(const void* control, size_t control_bytes,
            storage_begin + storage_bytes <= control_begin;
 }
 
+/** \brief Retained input starts cannot alias either known writable span. */
+static bool task_inputs_disjoint(const void* control, size_t control_bytes,
+                                 const char* name, const void* stack,
+                                 size_t stack_bytes, const void* context) {
+    return name != NULL &&
+           storage_disjoint(control, control_bytes, stack, stack_bytes) &&
+           storage_disjoint(name, 1, control, control_bytes) &&
+           storage_disjoint(name, 1, stack, stack_bytes) &&
+           (context == NULL ||
+            (storage_disjoint(context, 1, control, control_bytes) &&
+             storage_disjoint(context, 1, stack, stack_bytes)));
+}
+
 /** \brief Validate capacity before the kernel writes its initial frame. */
 static bool task_storage_valid(const char* name, const StackType_t* stack,
                                size_t stack_words, UBaseType_t priority,
@@ -255,9 +268,9 @@ nx_result_t nx_task_start(nx_task_t* task, const char* name, void* stack_memory,
     size_t stack_words = stack_bytes / sizeof(*stack);
     if (task == NULL || (uintptr_t)task % _Alignof(nx_task_t) != 0 ||
         stack_bytes % sizeof(*stack) != 0 ||
+        !task_inputs_disjoint(task, sizeof *task, name, stack, stack_bytes,
+                              context) ||
         !task_storage_valid(name, stack, stack_words, priority, entry) ||
-        !storage_disjoint(task, sizeof *task, stack,
-                          stack_words * sizeof *stack) ||
         task->handle != NULL || task->finished != NULL) {
         return NX_ERROR_INVALID;
     }
@@ -562,9 +575,9 @@ nx_result_t nx_permanent_task_start(nx_permanent_task_t* task, const char* name,
     size_t stack_words = stack_bytes / sizeof(*stack);
     if (task == NULL || stack_bytes % sizeof(*stack) != 0 ||
         (uintptr_t)task % _Alignof(nx_permanent_task_t) != 0 ||
+        !task_inputs_disjoint(task, sizeof *task, name, stack, stack_bytes,
+                              context) ||
         !task_storage_valid(name, stack, stack_words, priority, entry) ||
-        !storage_disjoint(task, sizeof *task, stack,
-                          stack_words * sizeof *stack) ||
         task->handle != NULL) {
         return NX_ERROR_INVALID;
     }

@@ -13,6 +13,7 @@
 #include "nexus/core/status.h"
 #include "nexus_config.h"
 #include "stm32f4xx.h"
+#include "system/stm32f4_identity.h"
 #include "system/stm32f4_timebase.h"
 #include <stdbool.h>
 #include <stddef.h>
@@ -200,20 +201,5 @@ bool nx_stm32_system_cpu_boot(SCB_Type* scb,
  *       Cold bootstrap uses its own finite poll limits, never this clock.
  */
 uint32_t HAL_GetTick(void);
-
-/**
- * \brief           Check observed device group, reviewed cut and Flash density.
- *
- * \param[in]       expected_flash_bytes: Reviewed VE/ZG density.
- *
- * \return          SUCCESS; INVALID for an invalid expected density, IO for
- *                  die/density mismatch, UNSUPPORTED for an unreviewed cut.
- *
- * \note            Package and F405/F407 identity require fixture inspection;
- *                  these parts share a device group ID. The actual complete
- *                  IDCODE is read once; no configured revision substitutes for
- *                  observation. Unknown revisions never inherit compatibility.
- */
-nx_result_t nx_stm32_validate_identity(uint32_t expected_flash_bytes);
 
 #endif

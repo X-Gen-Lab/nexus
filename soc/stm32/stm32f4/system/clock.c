@@ -9,7 +9,7 @@
 #include "nexus/core/fault.h"
 #include "nexus/core/time.h"
 #include "nexus_config.h"
-#include "private/stm32f407_silicon.h"
+#include "private/stm32f4_traits.h"
 #include "system/stm32f407_clock.h"
 #include "system/stm32f407_system.h"
 #if !defined(NEXUS_STM32_MODEL)
@@ -767,22 +767,4 @@ uint64_t nx_stm32_system_clock_read(void* context) {
                    g_nx_stm32_system.timer_error == NX_SUCCESS
                ? now
                : UINT64_MAX;
-}
-
-/** \brief Validate observed density without pretending DEV_ID encodes package.
- */
-nx_result_t nx_stm32_validate_identity(uint32_t expected_flash_bytes) {
-    if (expected_flash_bytes != NX_STM32_FLASH_MIN_BYTES &&
-        expected_flash_bytes != NX_STM32_FLASH_MAX_BYTES) {
-        return NX_ERROR_INVALID;
-    }
-#ifndef NX_STM32_FLASH_KIB
-#define NX_STM32_FLASH_KIB() (*(volatile const uint16_t*)FLASHSIZE_BASE)
-#define NX_STM32_DEVICE_ID() (DBGMCU->IDCODE)
-#endif
-    uint32_t observed_bytes = (uint32_t)NX_STM32_FLASH_KIB() * 1024U;
-    if (observed_bytes != expected_flash_bytes) {
-        return NX_ERROR_IO;
-    }
-    return nx_stm32f407_silicon_admit(NX_STM32_DEVICE_ID());
 }

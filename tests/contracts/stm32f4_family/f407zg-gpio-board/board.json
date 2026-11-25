@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "id": "f407zg-gpio-software-reference",
+  "soc": "STM32F407ZGT6",
+  "soc_family": "stm32f4",
+  "source_revision": "software-reference-v1",
+  "physical_pcb_revision": null,
+  "clocks": {},
+  "bindings": [
+    {
+      "id": "status",
+      "controller": "GPIOG",
+      "route": "gpio-pg9",
+      "mask": 512,
+      "initial": 0
+    },
+    {
+      "id": "aux",
+      "controller": "GPIOB",
+      "route": "gpio-pb2",
+      "mask": 4,
+      "initial": 0
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14"
+  ],
+  "unknowns": [
+    "Software reference only; no PCB, external oscillator, electrical measurement or physical qualification",
+    "The authored 3.3 V supply is a software clock/Flash assumption, not an observed supply",
+    "GPIO signal software reference; no connected LED, power stage, PCB wiring or physical output qualification"
+  ],
+  "provenance": [
+    {
+      "url": "https://www.st.com/resource/en/datasheet/stm32f407vg.pdf",
+      "scope": "Reviewed exact bonded GPIO signal and selected internal clock software reference only; no PCB wiring, electrical observation, executed image or physical qualification"
+    },
+    {
+      "url": "https://www.st.com/resource/en/reference_manual/dm00031020.pdf",
+      "scope": "Reviewed exact bonded GPIO signal and selected internal clock software reference only; no PCB wiring, electrical observation, executed image or physical qualification"
+    }
+  ]
+}

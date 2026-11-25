@@ -174,15 +174,24 @@ def commit_tool_plan(names):
                 plan[suite].add(name)
         return True
 
+    def fallback(name, files=()):
+        domains = set(changed_suites([name]))
+        domains.update(domain for path in files
+                       if (domain := module_domain(path)) is not None)
+        for suite in domains:
+            plan[suite] = None
+
     for name in names:
         if not behavioral(name):
             continue
+        files = COMMIT_ALIASES.get(name)
         if not (ROOT / name).is_file():
             domain = module_domain(name)
-            for suite in (domain,) if domain else changed_suites([name]):
-                plan[suite] = None
+            if domain is not None:
+                plan[domain] = None
+            else:
+                fallback(name, files or ())
             continue
-        files = COMMIT_ALIASES.get(name)
         domain = module_domain(name)
         if files is None and name.startswith((
                 "components/devices/tmp117/src/", "cmake/package/verification/device_tmp117/",
@@ -224,8 +233,7 @@ def commit_tool_plan(names):
             files = (candidate,) if (ROOT / candidate).is_file() else ()
         if files and add(files):
             continue
-        for suite in changed_suites([name]):
-            plan[suite] = None
+        fallback(name, files or ())
     return {suite: None if plan[suite] is None else tuple(sorted(plan[suite]))
             for suite in CI_SUITES if suite in plan}
 

@@ -178,15 +178,18 @@ callback，即使新 start 最终拒绝，也不承诺全局 stack 不变。局�
 slots 和至少 `slot_count * base.rx_capacity` 个 pieces。引用操作与 adapter 调用
 共享串行 NO_SYS owner。最终 pbuf free 只标记 release-ready，后续 owner service／
 stop 才精确归还 MAC。失败关闭准入并保留存储；pbuf 引用未结束时 stop 保持 BUSY。
-增强 F407／GD470 provider 的独立 held loans 不表示通用容量或 ACK 保证。
+所选 F407 provider 的独立 held loans 不表示通用容量或 ACK 保证；软件引用归还与
+MAC descriptor 归还分别由原 owner 推进。
 
 此配置保留两个备用 512 B pool payload、既有 16 KiB arena 和其他不变固定池。
 外部 slots、pieces、prefixes、MAC buffers、TX 字节另计；TX 与 ICMP 回复回退仍用
-有界 RAM。pool 计数不能证明完整 SRAM 适合。C11 link-only 外部开发探针在 F407／
-GD470 使用两 frame slots、四 pieces、2048 B main stack、无 libc heap，通过
-32 KiB 预算，实测链接 SRAM 分别为 24344 B／24316 B；探针不提供真实 MAC rings
-和 payload buffers。源码／安装 SDK 资格另行建立，不新增 DMA／Cache、PHY、吞吐或
-物理 HIL 资格。组织 fork 只对此显式 custom-RX／custom-pbuf profile 豁免原版
+有界 RAM。pool 计数不能证明完整 SRAM 适合；须按精确 F4 装配同时核算 stack pools、
+外部 slots／pieces、MAC rings／payload buffers、TX、其他组件和任务／main stack。
+早期 link-only 探针和已退役 GD470 结果仅按
+[原 Git 提交](https://github.com/X-Gen-Lab/nexus/blob/2b72592f6ed6539d4781bc388e30ec56483d8ae4/components/protocols/network/README.md)
+读取，不建立当前支持或资源预算。源码／安装 SDK 资格另行建立，不新增 DMA／Cache、
+PHY、吞吐或物理 HIL 资格。
+组织 fork 只对此显式 custom-RX／custom-pbuf profile 豁免原版
 `PBUF_POOL`／`TCP_WND` 容量启发式，保留其他全部 sanity checks；不证明原版上游准入。
 
 ## 源码入口与验证范围

@@ -53,7 +53,10 @@ class F407GpioMatrixTests(unittest.TestCase):
                         if any(item["kind"] == kind and
                                modes <= set(item["modes"])
                                for item in profiles[facts["device"]].values())}
-            self.assertEqual(parts, declared, kind)
+            # F479 has a separate two-pad GPIO reference, without the classic
+            # full-package GPIO/EXTI declaration exercised below.
+            expected = parts | ({"STM32F479NIH6"} if kind == "gpio" else set())
+            self.assertEqual(expected, declared, kind)
         for part in sorted(parts):
             facts = soc["variants"][part]
             for pin in facts["pins"]:

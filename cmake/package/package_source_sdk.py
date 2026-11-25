@@ -619,13 +619,9 @@ def filesystem_identity(path):
 def stable_file(root, name):
     """Bind content to one unchanged regular file throughout verification."""
     path = regular(root, name)
-
-    def filesystem():
-        return filesystem_identity(regular(root, name))
-
-    before = filesystem()
+    before = filesystem_identity(path)
     data = path.read_bytes()
-    after = filesystem()
+    after = filesystem_identity(regular(root, name))
     if before != after or len(data) != after[3]:
         raise SDKError("Source SDK input changed during read: " + name)
     return data, (digest(data), after)

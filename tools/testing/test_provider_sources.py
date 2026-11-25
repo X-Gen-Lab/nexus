@@ -19,7 +19,8 @@ class ProviderSourceSelectionTests(unittest.TestCase):
         package = find(ROOT, family)
         expected = set(names) | {
             "platform_coordinator.c", "platform_lifecycle.c", "system_lifecycle.c",
-            "platform_cold.c", "lifecycle_pins.c", "chip.c", "reset.c", "supervision.c"}
+            "platform_cold.c", "lifecycle_pins.c", "chip.c", "identity.c",
+            "reset.c", "supervision.c"}
         paths = set()
         for name in expected:
             matches = [path for directory in package.export_roots

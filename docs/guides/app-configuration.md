@@ -57,6 +57,26 @@ python "$NEXUS_SOURCE/tools/configure/configure.py" diff \
 两份输入都须有效。重点看 factory ID、公开接口、传输、执行和存储变化。调整实例
 顺序可能改变紧凑 ID，不将它们持久化后跨 bundle 使用。
 
+## 对照实际镜像与报告
+
+从同一完整源码读取自己的装配与已有报告，替换下面的真实文件路径：
+
+```sh
+python "$NEXUS_SOURCE/tools/dev/dev.py" support \
+  --assembly /tmp/product-uart.toml \
+  --evidence /path/to/image.resources.json
+```
+
+`--evidence` 可重复指定，读取既有 `elf_resource_budget` 或 `build_provenance`，
+不生成新测试或 HIL 结果。查询重新核对实际文件、配置、后端／模式、输入及产物；
+报告自称 `passed` 不足以建立匹配。资源报告未记录生产源码身份时，
+`identities.source = "not_recorded"`，总状态与相应验证仍为 `not_assessed`。
+
+通过既有 verifier 的 provenance 还须匹配当前源码和实际 ELF 配置，才报告
+`identity_matched`；它只表示身份对应，`software_qualified` 仍为 `false`，不证明
+模型执行、实时行为或物理 HIL。陈旧、不匹配或未知报告保留 `not_assessed` 和
+`reason`。必须读取各维身份与状态，不能把查询命令成功等同于报告通过。
+
 ## 使用所选接口
 
 生成 bundle 自带 `nexus_factory_strong.h`。`uart.console` 使用

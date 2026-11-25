@@ -102,3 +102,29 @@ target_compile_options(
     nexus_stm32_f446_irq_banks_test
     PRIVATE "-include${nexus_google_root}/soc/stm32_family_irq_banks_model.h"
 )
+
+# Only distinguishing bank topologies repeat; the complete cold contract above
+# remains the single shared behavior suite.
+foreach(device STM32F411xE STM32F479xx)
+    set(bank_test "nexus_${device}_gpio_banks_test")
+    nexus_google_test(${bank_test} STM32F4_LL
+        SOURCES "${nexus_google_root}/soc/stm32_gpio_banks_test.cpp"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/platform_cold.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio/gpio.c"
+        LIBRARIES Nexus::IO
+        INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
+            "${NEXUS_SOURCE_DIR}/tests/support/f4_cpu"
+            "${NEXUS_SOURCE_DIR}/arch/include"
+    )
+    target_include_directories(
+        ${bank_test}
+        SYSTEM
+        PRIVATE "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
+    )
+    target_compile_definitions(${bank_test} PRIVATE ${device})
+    target_compile_options(
+        ${bank_test}
+        PRIVATE
+            "-include${nexus_google_root}/soc/stm32_family_irq_banks_model.h"
+    )
+endforeach()

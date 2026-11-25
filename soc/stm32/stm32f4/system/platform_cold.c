@@ -20,14 +20,14 @@ static bool cold_context(void) {
 
 static bool config_valid(const nx_stm32_platform_config_t* config) {
     if (config == NULL || (config->pin_count != 0U && config->pins == NULL) ||
-        config->pin_count > 144U ||
+        config->pin_count > NX_STM32_GPIO_PIN_CAPACITY ||
         (config->dma_stream_count != 0U && config->dma_streams == NULL) ||
         config->dma_stream_count > 16U)
         return false;
     for (size_t i = 0U; i < config->pin_count; ++i) {
         const nx_stm32_platform_pin_config_t* pin = &config->pins[i];
         if (pin->registers == NULL || pin->snapshot == NULL ||
-            pin->port_index > 8U || pin->pin > 15U)
+            !nx_stm32_gpio_bank_valid(pin->port_index) || pin->pin > 15U)
             return false;
     }
     for (size_t i = 0U; i < config->dma_stream_count; ++i) {
@@ -105,7 +105,8 @@ nx_result_t nx_stm32_platform_gpio_clocks_release(
     nx_stm32_platform_pin_receipt_t* receipt) {
     if (!cold_context())
         return NX_ERROR_CONTEXT;
-    if (receipt == NULL || (receipt->clocks_added & ~UINT32_C(0x1FF)) != 0U)
+    if (receipt == NULL ||
+        (receipt->clocks_added & ~(uint32_t)NX_STM32_GPIO_CLOCK_MASK) != 0U)
         return NX_ERROR_INVALID;
     if (receipt->captured)
         return NX_ERROR_BUSY;

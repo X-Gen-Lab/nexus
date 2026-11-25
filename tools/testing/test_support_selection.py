@@ -5,8 +5,12 @@ from contextlib import redirect_stdout
 import io
 import json
 from pathlib import Path
+import re
+import shutil
+import subprocess
 import tempfile
 import unittest
+from unittest.mock import patch
 
 from tools.maintenance import capabilities
 
@@ -175,6 +179,125 @@ class ExactSupportSelectionTests(unittest.TestCase):
         report = json.loads(stream.getvalue())
         self.assertEqual(report["kind"], "selected_support")
         self.assertEqual((ROOT / capabilities.DOCUMENT).read_bytes(), before)
+
+
+class SupportEvidenceSelectionTests(unittest.TestCase):
+    def setUp(self):
+        from tools.configure import configure
+        from tools.evidence.common import atomic_json
+        from tools.measurement import resources
+        from tests.contracts.test_evidence_support import link_fixture
+
+        temporary = tempfile.TemporaryDirectory(prefix="support evidence ")
+        self.addCleanup(temporary.cleanup)
+        self.directory = Path(temporary.name)
+        self.assembly = self.directory / "assembly.toml"
+        self.assembly.write_text((ASSEMBLIES / "qiming-baremetal-empty.toml")
+            .read_text().replace("main_stack_bytes = 2048", "main_stack_bytes = 1024")
+            .replace("libc_heap_bytes = 0", "libc_heap_bytes = 64"))
+        generated = self.directory / "generated"
+        configure.configure(self.assembly, generated)
+        self.resolved = generated / "resolved.json"
+        value = json.loads(self.resolved.read_text())
+        linked = self.directory / "linked"
+        linked.mkdir()
+        self.compiler = shutil.which("arm-none-eabi-gcc")
+        self.assertIsNotNone(self.compiler, "Prepared ARM compiler required")
+        self.elf, _, _ = link_fixture(linked)
+        image = linked / "image.c"
+        handlers = value["cortex_m_irq_vectors"]
+        declarations = "".join("void " + handler + "(void) {}\n"
+                               for handler in handlers)
+        entries = ", ".join("[" + str(16 + number) + "] = " + handler
+                            for handler, number in handlers.items())
+        vector = "const void* const vectors[" + str(
+            16 + value["irq"]["external_count"]) + "] = {&__nx_msp_end, Reset_Handler, "
+        vector += entries + "};"
+        source = image.read_text().replace(
+            "const void* const vectors[] = {&__nx_msp_end, Reset_Handler};", vector)
+        image.write_text(declarations + source)
+        script = linked / "memory.ld"
+        script.write_text(re.sub(r"__nx_resolved_sha256_(\d+) = 0x[0-9a-f]+;",
+            lambda match: "__nx_resolved_sha256_" + match[1] + " = 0x" +
+            value["configuration_sha256"][int(match[1]) * 8:int(match[1]) * 8 + 8] + ";",
+            script.read_text()))
+        command = [self.compiler, "-mcpu=cortex-m4", "-mthumb",
+            "-mfpu=fpv4-sp-d16", "-mfloat-abi=hard", "-nostdlib", "-Os",
+            "-T", str(script), str(linked / "image.c"), "-o", str(self.elf)]
+        subprocess.run(command, capture_output=True, check=True, timeout=30)
+        self.resource_report = self.directory / "resources.json"
+        self.resource = resources.measure(self.elf, self.resolved,
+                                          generated / "resource-budget.json")
+        atomic_json(self.resource_report, self.resource)
+
+    def query(self, *reports):
+        return capabilities.selection(self.assembly, ROOT, evidence=reports)
+
+    def test_resource_identity_match_does_not_invent_source_or_qualification(self):
+        result = self.query(self.resource_report)
+        record, = result["evidence"]
+        self.assertEqual(record["status"], "not_assessed")
+        self.assertEqual(record["identities"], {
+            "source": "not_recorded", "configuration": "matched",
+            "backend_modes": "matched", "inputs": "matched",
+            "artifact": "matched"})
+        self.assertEqual(record["reason"], "source_identity_not_recorded")
+        self.assertEqual(result["validation"]["resource_budget"], "not_assessed")
+        self.assertIs(result["physical_qualified"], False)
+
+    def test_unknown_or_forged_report_cannot_promote_a_selection(self):
+        forged = self.directory / "forged.json"
+        variants = (
+            dict(self.resource, kind="invented", status="passed"),
+            dict(self.resource, metrics={}),
+            dict(self.resource, elf={**self.resource["elf"], "sha256": "0" * 64}),
+        )
+        for report in variants:
+            with self.subTest(kind=report["kind"], metrics=bool(report.get("metrics"))):
+                forged.write_text(json.dumps(report))
+                result = self.query(forged)
+                self.assertEqual(result["evidence"][0]["status"], "not_assessed")
+                self.assertEqual(result["validation"]["arm_image"], "not_assessed")
+                self.assertEqual(result["validation"]["resource_budget"], "not_assessed")
+
+    def test_changed_assembly_keeps_the_old_report_unassociated(self):
+        self.assembly.write_text(self.assembly.read_text() +
+                                 '\n[factory]\ncapabilities=true\n')
+        result = self.query(self.resource_report)
+        self.assertEqual(result["evidence"][0]["status"], "not_assessed")
+        self.assertNotEqual(result["evidence"][0]["identities"]["configuration"],
+                            "matched")
+
+    def test_read_only_cli_accepts_repeated_evidence_paths(self):
+        stream = io.StringIO()
+        original = self.resource_report.read_bytes()
+        with redirect_stdout(stream):
+            code = capabilities.main([
+                "--assembly", str(self.assembly), "--evidence",
+                str(self.resource_report), "--evidence", str(self.resource_report)],
+                support_command=True)
+        self.assertEqual(code, 0)
+        self.assertEqual(len(json.loads(stream.getvalue())["evidence"]), 2)
+        self.assertEqual(original, self.resource_report.read_bytes())
+
+    def test_build_provenance_identity_is_observed_and_never_qualified(self):
+        from tools.dev import provenance
+        source = {"root": str(ROOT), "commit": "1" * 40, "tree": "2" * 40,
+                  "dirty": False, "submodules": []}
+        record = provenance.provenance(source, [self.resolved], [self.elf],
+            [[self.compiler, "--version"]], configuration=self.resolved)
+        report = self.directory / "provenance.json"
+        report.write_text(json.dumps(record))
+        with patch("tools.evidence.identity.observe_git_source", return_value=source):
+            result = self.query(report)
+        self.assertEqual(result["evidence"][0]["status"], "identity_matched")
+        self.assertEqual(result["validation"]["arm_image"], "identity_matched")
+        self.assertEqual(result["validation"]["software_candidate"], "not_assessed")
+        with patch("tools.evidence.identity.observe_git_source",
+                   return_value={**source, "tree": "3" * 40}):
+            stale = self.query(report)
+        self.assertEqual(stale["evidence"][0]["status"], "not_assessed")
+        self.assertEqual(stale["validation"]["arm_image"], "not_assessed")
 
 
 if __name__ == "__main__":

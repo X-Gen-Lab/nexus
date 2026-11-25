@@ -49,6 +49,15 @@ source_language: zh_CN
 或 SPI polling 装配不能代替独立 DMA 装配。以下每条都需明确配置、接口、存储、
 执行者、正常顺序、失败退出和实际验证范围。
 
+下面的固定例库基线提供完整源码、TOML 和构建命令。实际工程继续按自己的
+gitlink／SDK lock 消费，不能把固定链接的执行结果继承给另一版本。
+
+| 使用路径 | 完整入口 |
+| --- | --- |
+| GPIO／有限 UART DMA | [GPIO/UART 参考](https://github.com/X-Gen-Lab/nexus-examples/blob/8fd879438d1ddb5c5622c2b9d24355d2aace3f21/apps/platform_reference/README.md) |
+| 有限 SPI DMA | [SPI DMA 参考](https://github.com/X-Gen-Lab/nexus-examples/blob/8fd879438d1ddb5c5622c2b9d24355d2aace3f21/apps/shared_spi_runtime/README.md) |
+| 连续 ADC／音频 blocks | [采集与退出参考](https://github.com/X-Gen-Lab/nexus-examples/blob/8fd879438d1ddb5c5622c2b9d24355d2aace3f21/apps/stream_recovery/README.md) |
+
 ### 同步 GPIO
 
 `apps/platform_reference/` 与起始模板使用所选 Board 的已审极性。取得 strong

@@ -6,6 +6,7 @@ nexus_cmsis_core_include(stm32_cmsis)
 add_executable(
     contract_stm32_system_model
     "${stm32_root}/system/clock.c"
+    "${stm32_root}/system/identity.c"
     "${stm32_root}/system/startup.c"
     "../stm32_system_test.c"
 )

@@ -30,6 +30,7 @@ from tools.configure import bundle, dependencies, sdk, enhanced_endpoints, packa
 from tools.configure import integration_package, adc, dac, device_view
 from tools.configure.ir import (
     CanDomainIR, CanFilterIR, ClockPlanIR, ConfigurationIR, ControllerIR,
+    CpuProfileIR, KernelProfileIR, ThreadXKernelProfileIR,
     EndpointIR, FactoryOptions, FlashRegionIR, MemoryBudgetIR, PhysicalPartIR, PwmSharedOwnerIR,
     RuntimePowerIR, VendorDeviceIR, freeze, thaw)
 from tools.configure import resource_graph, trigger_graph, dma_topology, board_hardware, gpio_electrical
@@ -1037,40 +1038,20 @@ def _resolve_facts(assembly, *, root, assembly_directory, read,
 
 
 
-def _resolve(assembly_path, root=ROOT, *, input_paths=None, test_support=False,
-             allow_legacy_provider=True):
-    """Validate all input facts before producing the sole resolved decision."""
-    root = root.resolve()
-    verified_sdk = sdk.verify(root)
+@dataclass(frozen=True)
+class _ExecutionResolution:
+    """One admitted CPU, kernel and clock selection before device planning."""
 
-    def source_dependency(relative, expected=None):
-        return (sdk_dependency_identity(verified_sdk, relative, expected)
-                if verified_sdk is not None else
-                dependency_identity(root, relative, expected))
-    if assembly_path.is_symlink():
-        fail("Assembly must not be a symlink")
-    snapshots = {}
-    read = _SnapshotReader(snapshots)
-    assembly_path = assembly_path.resolve()
-    policy_path = contained_file(root, metadata.POLICY)
-    catalogue_path = contained_file(root, component_catalog.CATALOG)
-    component_entries = component_catalog.parse(read(catalogue_path))
-    platform_metadata = metadata.policy_contract(
-        read(policy_path), expected_factory_epoch=factory.FACTORY_ABI_EPOCH)
-    assembly = load_assembly(assembly_path, root, snapshots,
-                             test_support=test_support)
-    factory_options = obj(thaw(assembly.factory) if assembly.factory is not None else {}, (),
-                          {"capabilities"}, "factory policy")
-    if ("capabilities" in factory_options and
-            type(factory_options["capabilities"]) is not bool):
-        fail("Factory capabilities must be boolean")
-    facts = _resolve_facts(assembly, root=root,
-                           assembly_directory=assembly_path.parent, read=read,
-                           test_support=test_support, snapshots=snapshots,
-                           allow_legacy_provider=allow_legacy_provider)
-    board, soc, routes = facts.board, facts.soc, facts.routes
-    family, part, provider = facts.family, facts.part, facts.provider
-    variant, references = facts.variant, facts.references
+    cpu: CpuProfileIR
+    kernel: KernelProfileIR | ThreadXKernelProfileIR | None
+    clock: Mapping
+    clock_plan: Mapping | None
+    optimization: str
+
+
+def _resolve_execution(assembly, facts):
+    """Admit the execution environment against the selected hardware facts."""
+    board, provider = facts.board, facts.provider
     backend = assembly.backend
     if backend not in {"baremetal", "freertos", "native", "threadx"}:
         fail(f"Unsupported OS backend: {backend}")
@@ -1108,12 +1089,54 @@ def _resolve(assembly_path, root=ROOT, *, input_paths=None, test_support=False,
             not provider.TIMEBASE_ALARM):
         fail("Timebase lowpower requires the selected SoC's maintained alarm")
     cpu_profile = kernel.bind(cpu_profile, kernel_profile)
-    irq_profile = cpu_profile.irq
     if assembly.abi is not None and assembly.abi != cpu_abi(facts.device.cpu):
         fail("Assembly ABI contradicts the selected SoC")
     optimization = assembly.optimization
     if optimization not in {"O0", "Og", "O2", "Os", "O3", "O2-lto", "Os-lto", "O3-lto"}:
         fail(f"Unsupported optimization profile: {optimization}")
+    return _ExecutionResolution(cpu_profile, kernel_profile, freeze(clock),
+                                freeze(clock_plan), optimization)
+
+
+def _resolve(assembly_path, root=ROOT, *, input_paths=None, test_support=False,
+             allow_legacy_provider=True):
+    """Validate all input facts before producing the sole resolved decision."""
+    root = root.resolve()
+    verified_sdk = sdk.verify(root)
+
+    def source_dependency(relative, expected=None):
+        return (sdk_dependency_identity(verified_sdk, relative, expected)
+                if verified_sdk is not None else
+                dependency_identity(root, relative, expected))
+    if assembly_path.is_symlink():
+        fail("Assembly must not be a symlink")
+    snapshots = {}
+    read = _SnapshotReader(snapshots)
+    assembly_path = assembly_path.resolve()
+    policy_path = contained_file(root, metadata.POLICY)
+    catalogue_path = contained_file(root, component_catalog.CATALOG)
+    component_entries = component_catalog.parse(read(catalogue_path))
+    platform_metadata = metadata.policy_contract(
+        read(policy_path), expected_factory_epoch=factory.FACTORY_ABI_EPOCH)
+    assembly = load_assembly(assembly_path, root, snapshots,
+                             test_support=test_support)
+    factory_options = obj(thaw(assembly.factory) if assembly.factory is not None else {}, (),
+                          {"capabilities"}, "factory policy")
+    if ("capabilities" in factory_options and
+            type(factory_options["capabilities"]) is not bool):
+        fail("Factory capabilities must be boolean")
+    facts = _resolve_facts(assembly, root=root,
+                           assembly_directory=assembly_path.parent, read=read,
+                           test_support=test_support, snapshots=snapshots,
+                           allow_legacy_provider=allow_legacy_provider)
+    board, soc, routes = facts.board, facts.soc, facts.routes
+    family, part, provider = facts.family, facts.part, facts.provider
+    variant, references = facts.variant, facts.references
+    backend = assembly.backend
+    execution = _resolve_execution(assembly, facts)
+    cpu_profile, kernel_profile = execution.cpu, execution.kernel
+    clock, clock_plan = execution.clock, execution.clock_plan
+    irq_profile = cpu_profile.irq
     selected_memory = _resolve_memory(assembly, variant, provider, part)
     bindings = facts.bindings
     selected_graph = device_graph.resolve(
@@ -1187,7 +1210,7 @@ def _resolve(assembly_path, root=ROOT, *, input_paths=None, test_support=False,
         components=tuple(components),
         can_controllers=(tuple(provider.CAN_CONTROLLERS)
                          if selected_graph.can_domain is not None else ()),
-        optimization=optimization,
+        optimization=execution.optimization,
         physical_pcb_revision=board["physical_pcb_revision"],
         limitations=tuple(board["unknowns"]) + ("Physical qualification not executed",),
         physical_qualified=False,

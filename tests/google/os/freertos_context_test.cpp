@@ -10,6 +10,7 @@
 #include "nexus/arch/arch.h"
 #include "nexus/os/freertos.h"
 #include "nexus/os/storage.h"
+#include <array>
 #include <cstring>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
@@ -461,6 +462,48 @@ TEST_F(FreeRTOSContextTest, PermanentStackCannotOverwriteItsOwnControl) {
               NX_ERROR_INVALID);
     EXPECT_EQ(permanent.handle, nullptr);
 }
+
+/** \brief Known mutable spans cannot overwrite retained task inputs. */
+class FreeRTOSTaskAliasTest
+    : public FreeRTOSContextTest,
+      public ::testing::WithParamInterface<std::tuple<bool, bool>> {};
+
+TEST_P(FreeRTOSTaskAliasTest, ReturningTaskRejectsBeforeKernelEffects) {
+    const auto [name_alias, control_alias] = GetParam();
+    void* alias =
+        control_alias ? static_cast<void*>(&task) : static_cast<void*>(stack);
+    if (name_alias) {
+        std::memcpy(alias, "name", 5);
+    }
+    std::array<unsigned char, sizeof task> before{};
+    std::memcpy(before.data(), &task, sizeof task);
+    EXPECT_EQ(nx_task_start(
+                  &task, name_alias ? static_cast<char*>(alias) : "name", stack,
+                  sizeof stack, 1, entry, name_alias ? &item : alias),
+              NX_ERROR_INVALID);
+    EXPECT_EQ(std::memcmp(&task, before.data(), sizeof task), 0);
+}
+
+TEST_P(FreeRTOSTaskAliasTest, PermanentTaskRejectsBeforeKernelEffects) {
+    nx_permanent_task_t permanent{};
+    const auto [name_alias, control_alias] = GetParam();
+    void* alias = control_alias ? static_cast<void*>(&permanent)
+                                : static_cast<void*>(stack);
+    if (name_alias) {
+        std::memcpy(alias, "name", 5);
+    }
+    std::array<unsigned char, sizeof permanent> before{};
+    std::memcpy(before.data(), &permanent, sizeof permanent);
+    EXPECT_EQ(nx_permanent_task_start(
+                  &permanent, name_alias ? static_cast<char*>(alias) : "name",
+                  stack, sizeof stack, 1, entry, name_alias ? &item : alias),
+              NX_ERROR_INVALID);
+    EXPECT_EQ(std::memcmp(&permanent, before.data(), sizeof permanent), 0);
+}
+
+INSTANTIATE_TEST_SUITE_P(KnownBorrowedInputs, FreeRTOSTaskAliasTest,
+                         ::testing::Combine(::testing::Bool(),
+                                            ::testing::Bool()));
 
 TEST_F(FreeRTOSContextTest, QueuePayloadCannotOverwriteItsOwnControl) {
     auto* overlapping = reinterpret_cast<uint8_t*>(&queue);

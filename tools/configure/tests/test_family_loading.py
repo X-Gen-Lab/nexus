@@ -25,40 +25,27 @@ CONFIGURATIONS = {
 
 
 class FamilyLoadingTests(unittest.TestCase):
-    def test_runtime_imports_are_in_the_runtime_source_closure(self):
+    def test_f4_generation_seals_the_loaded_configuration_modules(self):
         code = "\n".join((
-            "import pathlib, sys",
-            "from tools.configure import runtime, dependencies",
+            "import json, pathlib, sys, tempfile",
+            "from tools.configure import configure",
             "root = pathlib.Path(sys.argv[1])",
-            "names = set(dependencies.source_names('runtime', None))",
+            "with tempfile.TemporaryDirectory() as temporary:",
+            "    output = pathlib.Path(temporary) / 'generated'",
+            "    configure.configure(root / sys.argv[2], output)",
+            "    identity = json.loads((output / 'generator-identity.json').read_text())",
+            "names = {item['path'] for item in identity['files']}",
             "loaded = {pathlib.Path(module.__file__).relative_to(root).as_posix()",
             "          for name, module in tuple(sys.modules.items())",
-            "          if name.startswith('tools.configure')}",
+            "          if name.startswith('tools.configure')",
+            "          and getattr(module, '__file__', None)}",
             "assert loaded <= names, sorted(loaded - names)",
         ))
-        result = subprocess.run([sys.executable, "-B", "-c", code, str(ROOT)],
-                                capture_output=True, text=True, check=False)
+        result = subprocess.run([
+            sys.executable, "-B", "-c", code, str(ROOT),
+            "tests/contracts/f407_power_stage/control.toml"],
+            capture_output=True, text=True, check=False, timeout=30)
         self.assertEqual(result.returncode, 0, result.stderr)
-
-    def test_loaded_soc_modules_are_in_the_selected_source_closure(self):
-        for family in descriptor.families():
-            with self.subTest(family=family.family):
-                code = "\n".join((
-                    "import pathlib, sys",
-                    "from tools.configure.providers import maintained",
-                    "from tools.configure import dependencies",
-                    "maintained(sys.argv[1], test_support=(sys.argv[1]=='native'))",
-                    "root = pathlib.Path(sys.argv[2])",
-                    "names = set(dependencies.source_names('platform', sys.argv[1], test_support=(sys.argv[1]=='native')))",
-                    "loaded = {pathlib.Path(module.__file__).relative_to(root).as_posix()",
-                    "          for name, module in tuple(sys.modules.items())",
-                    "          if name.startswith(('tools.configure.stm32f4', 'tests.support.native'))}",
-                    "assert loaded <= names, sorted(loaded - names)",
-                ))
-                result = subprocess.run([
-                    sys.executable, "-B", "-c", code, family.family, str(ROOT)],
-                    capture_output=True, text=True, check=False)
-                self.assertEqual(result.returncode, 0, result.stderr)
 
     def test_descriptors_declare_exact_paths_without_family_name_inference(self):
         fields = {field.name for field in dataclasses.fields(
