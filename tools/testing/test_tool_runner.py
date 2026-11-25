@@ -270,6 +270,12 @@ class ToolRunnerTests(unittest.TestCase):
 
 
 class ChangedDomainTests(unittest.TestCase):
+    def test_support_changes_select_the_complete_evidence_reader_contracts(self):
+        self.assertEqual(run_tool_tests.commit_tool_plan([
+            "tools/maintenance/capabilities.py"]), {"testing": (
+                "tools/testing/test_maintenance.py",
+                "tools/testing/test_support_selection.py")})
+
     def test_maintained_aliases_reference_existing_sources_and_complete_modules(self):
         for source, modules in run_tool_tests.COMMIT_ALIASES.items():
             with self.subTest(source=source):

@@ -83,7 +83,9 @@ COMMIT_ALIASES = {
                                   "tools/testing/test_tdd_gate.py"),
     "scripts/ci/reference_matrix.py": (".github/workflows/test_platform_ci.py",),
     "tools/measurement/compare.py": ("tests/contracts/test_measurement_compare.py",),
-    "tools/maintenance/capabilities.py": ("tools/testing/test_maintenance.py",),
+    "tools/maintenance/capabilities.py": (
+        "tools/testing/test_maintenance.py",
+        "tools/testing/test_support_selection.py"),
     "tests/support/external_provider/provider/nexus-soc.json": (
         "tools/configure/tests/test_external_package.py",),
     "cmake/package/package_source_sdk.py": (
