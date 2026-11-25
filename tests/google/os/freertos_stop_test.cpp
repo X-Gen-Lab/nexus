@@ -76,9 +76,13 @@ TEST_F(FreeRtosStop, UnselectedAndShortIdleNeverBorrowATick) {
     selected = &owner;
     Arm();
     EXPECT_FALSE(nx_freertos_try_stop_idle(100U));
+    EXPECT_FALSE(nx_freertos_try_stop_idle(201U));
     EXPECT_TRUE(owner.armed);
     EXPECT_EQ(pauses, 0U);
     EXPECT_EQ(powers, 0U);
+    EXPECT_TRUE(nx_freertos_try_stop_idle(202U));
+    EXPECT_FALSE(owner.armed);
+    EXPECT_EQ(owner.result, NX_SUCCESS);
 }
 TEST_F(FreeRtosStop, RealIdleHandoffBoundsElapsedAndNeverCrossesNextUnblock) {
     Arm();
@@ -129,10 +133,11 @@ TEST_F(FreeRtosStop, FailedHandoffRestoresOneTickAndCannotFallThrough) {
     EXPECT_EQ(owner.result, NX_ERROR_IO);
     EXPECT_EQ(mask, 0U);
 }
-TEST_F(FreeRtosStop, RejectedPowerDoesNotInventANewEpochOrDeepElapsed) {
+TEST_F(FreeRtosStop, RejectedPowerRestoresTheOriginalTickPhase) {
     Arm();
     power_result = NX_ERROR_BUSY;
     EXPECT_TRUE(nx_freertos_try_stop_idle(1000U));
+    EXPECT_EQ(handoffs, 1U);
     EXPECT_EQ(restores, 1U);
     EXPECT_EQ(owner.result, NX_ERROR_BUSY);
     EXPECT_EQ(owner.power.new_epoch, 0U);
@@ -140,6 +145,8 @@ TEST_F(FreeRtosStop, RejectedPowerDoesNotInventANewEpochOrDeepElapsed) {
     EXPECT_EQ(owner.elapsed_max_us, 0U);
     EXPECT_EQ(acks, 0U);
     EXPECT_EQ(stepped, 0U);
+    EXPECT_EQ(owner.discarded_phase_us, 0U);
+    EXPECT_EQ(resume_at, now + 1000U - phase);
 }
 TEST_F(FreeRtosStop, PowerFailureCannotReuseAnObservedDifferentCoreEpoch) {
     Arm();

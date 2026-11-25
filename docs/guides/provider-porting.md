@@ -19,6 +19,12 @@ source_language: zh_CN
 | 新 IP 沿用已有公开语义 | 包内 C、binding 与能力数据 |
 | 新公开语义或硬件模型 | 先扩展领域合同／policy 和真实测试 |
 
+`package.json` 选择事实、binding 和构建入口。SoC facts 描述精确器件拥有的资源，
+`board.json` 授权路线及外部时钟等电气条件，binding 将选择连接到已有 C 实例。
+沿用现有 IP 和时钟模型时，先在这三个输入边界表达差异。若所需分频、共享 IRQ 或
+DMA 拓扑无法表达，先用一个精确装配和拒绝用例确定新模型边界，再扩展对应的
+`tools/configure/domains/` 或 `tools/configure/policies/` 校验与包内 C 行为。
+
 同一 MCU 的新 PCB 走[Board 接入](board-porting.md)。新增现有模型的 MCU 不给
 公共 resolver 添加型号分支；数据也不能替代未知时钟、DMA 或外设算法。
 
@@ -63,8 +69,10 @@ CMake 选择各承担什么差异。已有公共语义的同类器件应复用�
 最小装配只生成所选接口和存储，生成源码字节数不能当作最终 Flash／RAM 成本。
 
 现有 [F4 同源消费参考](../../tests/contracts/stm32f4_family/README.md)使用同一
-`gpio_consumer.c` 连接 F407 与 F479 的不同逻辑 signal；具体软件 Board、TOML 和
-ARM 构建命令在该目录维护。它检验这条接入路径，不扩大到该系列全部外设或实板资格。
+`gpio_consumer.c` 驱动 `status` 和 `aux`。F407 的软件 Board 授权 PG9／PB2，F479 的
+软件 Board 授权 PJ0／PK3。两份 TOML 选择逻辑极性并生成相同的接口类型，F479 的新路线
+复用已有 GPIO 实现。按该目录的 ARM 构建命令验证两份装配，同时用越权 pad 或路线验证
+解析拒绝。物理 PCB 接线另需测量证据。
 
 新行为先实际 RED，再最小实现、GREEN 和整理。驱动优先复用审核过的官方 HAL／LL，
 厂商类型、Handle 和寄存器布局留在实现内部。一个活跃控制器行为域只保留一个

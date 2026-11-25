@@ -10,6 +10,7 @@ import argparse
 import json
 import os
 from pathlib import Path
+import platform
 import re
 import subprocess
 import sys
@@ -127,7 +128,7 @@ def ensure_venv(root):
     return directory, python, formatter
 
 
-def inspect_venv(directory, python, root):
+def inspect_venv(directory, python, root, *, expected_python=None):
     result = run([python, "-I", "-c", PROBE], root, capture=True)
     try:
         data = json.loads(result.stdout)
@@ -147,6 +148,9 @@ def inspect_venv(directory, python, root):
         raise InstallError(f"{python} requires Python >=3.11; repair the existing .venv")
     if prefix != directory.resolve() or prefix == base_prefix:
         raise InstallError(f"{python} is not running inside the repository .venv")
+    if expected_python is not None and version[:2] != expected_python:
+        required = ".".join(map(str, expected_python))
+        raise InstallError(f"{python} uses a different Python ABI than the {required} lock")
     return versions
 
 
@@ -170,6 +174,8 @@ def main(arguments=None):
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument("--skip-hooks", action="store_true", help="install/verify tools without Git hooks (CI)")
+    parser.add_argument("--locked-linux", action="store_true",
+                        help="install the complete hash-locked Linux x86-64 tool closure")
     args = parser.parse_args(arguments)
     try:
         if sys.version_info < (3, 11):
@@ -177,11 +183,23 @@ def main(arguments=None):
         root = ROOT.resolve()
         lock = root / LOCK_NAME
         pins = read_lock(lock)
+        locked_python = None
+        if args.locked_linux:
+            locked_python = sys.version_info[:2]
+            if (sys.platform != "linux" or platform.machine() != "x86_64" or
+                    locked_python not in ((3, 11), (3, 12))):
+                raise InstallError("Hash-locked tool setup requires Linux x86-64 and Python 3.11 or 3.12")
+            minor = locked_python[1]
+            hashed_lock = root / f"dependencies/python-tools-linux-cp3{minor}.txt"
         if not args.skip_hooks:
             check_hook_location(root)
         directory, python, formatter = ensure_venv(root)
-        installed = inspect_venv(directory, python, root)
-        if all(installed[name] == pins[name] for name in PACKAGES):
+        installed = inspect_venv(directory, python, root, expected_python=locked_python)
+        if args.locked_linux:
+            run([python, "-m", "pip", "install", "--require-hashes",
+                 "--only-binary=:all:", "--force-reinstall", "-r", hashed_lock], root)
+            installed = inspect_venv(directory, python, root, expected_python=locked_python)
+        elif all(installed[name] == pins[name] for name in PACKAGES):
             print("Locked development tools already installed; skipping pip installation.")
         else:
             run([python, "-m", "pip", "install", "-r", lock], root)

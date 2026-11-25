@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 04841d927cc5bd103918f0efd9cb752da52339ea2de81e29144e2646192f486d\n"
+"X-Nexus-Source-SHA256: 106c0247a7182f9869997a447cbd3a95e2573e16408a3502c7c0eb8da683a1ef\n"
 
 #: ../../../../../../docs/reference/platforms/support.md:9
 msgid "精确平台支持"
@@ -305,21 +305,20 @@ msgstr ""
 "DOCUMENTATION-SOURCE/soc/stm32/stm32f4/system/README.md)"
 
 #: ../../../../../../docs/reference/platforms/support.md:0
-msgid "Sleep／STOP"
-msgstr "Sleep／STOP"
+msgid "浅 Sleep／裸机 STOP"
+msgstr "Shallow Sleep and baremetal STOP"
 
 #: ../../../../../../docs/reference/platforms/support.md:0
 msgid ""
-"浅 Sleep 保留时间域；F407 既有配置与 F411／F446／F479 精确高频软件参考分别支持受约束 STOP。实际 traits 校验 "
-"NVIC bank、备份／CCM 和唤醒源，拒绝外来低功耗／debug 状态；排空后进入 STOP，真实 System 恢复才建立新 Core "
-"epoch，旧 deadline 不继承。仅 baremetal，elapsed bounds 由调用者提供"
+"浅 Sleep 保留时间域。F407 既有裸机配置和 F411／F446／F479 精确高频裸机软件参考支持受约束 STOP。实际 traits 校验 "
+"NVIC bank、备份／CCM 和唤醒源，并拒绝外来低功耗／debug 状态。调用者提供 elapsed bounds 并排空旧期限和借用。System 恢复后建立新 Core epoch"
 msgstr ""
-"Shallow Sleep preserves the time domain; existing F407 configurations and "
-"exact high-frequency software references for F411/F446/F479 separately "
-"support constrained STOP. Actual traits validate NVIC banks, backup/CCM and "
-"wakeup sources, rejecting foreign low-power/debug states; STOP follows "
-"drain, and only actual System restoration establishes a new Core epoch. Old "
-"deadlines are not inherited. Baremetal only; callers supply elapsed bounds"
+"Shallow Sleep preserves the time domain. Existing F407 baremetal configurations "
+"and exact high-frequency F411/F446/F479 baremetal software references support "
+"constrained STOP. Device traits check NVIC banks, backup/CCM and wake sources "
+"and reject foreign low-power and debug states. The caller supplies elapsed "
+"bounds and drains old deadlines and loans. System restoration establishes a "
+"new Core epoch"
 
 #: ../../../../../../docs/reference/platforms/support.md:0
 msgid ""
@@ -330,6 +329,35 @@ msgstr ""
 "[System low power](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
 "DOCUMENTATION-SOURCE/soc/stm32/stm32f4/system/README.md), [ClockDomain "
 "barrier](../contracts/platform/clock-domain.md)"
+
+#: ../../../../../../docs/reference/platforms/support.md:0
+msgid "F407 FreeRTOS 一次性 STOP"
+msgstr "F407 FreeRTOS one-shot STOP"
+
+#: ../../../../../../docs/reference/platforms/support.md:0
+msgid ""
+"显式链接 `nexus_add_stm32f4_freertos_stop`，选择 `lowpower`／`timebase` 与同一个已暂停的 RTC owner。"
+"已审唤醒为 32768 Hz LSE、PRER127/255、RTCCLK/16、reload255 和仅 EXTI22 事件，名义 125 ms。"
+"产品排空旧 Core deadline、暂停 Platform 并关闭对应 ClockDomain 后才 arm。真实 Idle 消耗一次授权，elapsed 上界必须严格早于下一个内核 unblock。"
+"模型验证 Idle 编排，软件参考验证 ARM 链接，物理功耗、漂移和唤醒延迟为 `not_executed`"
+msgstr ""
+"Explicitly link `nexus_add_stm32f4_freertos_stop` and select `lowpower`/"
+"`timebase` with the same suspended RTC owner. The reviewed wake source uses "
+"32768 Hz LSE, PRER127/255, RTCCLK/16, reload255 and an EXTI22 event only at "
+"a nominal 125 ms. The product drains old Core deadlines, suspends Platform "
+"and closes the corresponding ClockDomain before arming. Actual Idle "
+"consumes one authorization. The elapsed upper bound must be strictly "
+"earlier than the next kernel unblock. Models verify Idle orchestration "
+"and the software reference verifies ARM linking. Physical power draw, drift "
+"and wake latency remain `not_executed`"
+
+#: ../../../../../../docs/reference/platforms/support.md:0
+msgid ""
+"[FreeRTOS STOP API](../api/soc/stm32f4-system.md)、"
+"[精确装配](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/contracts/f407_freertos_stop/README.md)"
+msgstr ""
+"[FreeRTOS STOP API](../api/soc/stm32f4-system.md), "
+"[exact assembly](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/contracts/f407_freertos_stop/README.md)"
 
 #: ../../../../../../docs/reference/platforms/support.md:0
 msgid "Standby"
@@ -591,6 +619,34 @@ msgid ""
 msgstr ""
 "[Finite waveform contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
 "DOCUMENTATION-SOURCE/soc/stm32/stm32f4/drivers/timer/README-waveform.md)"
+
+#: ../../../../../../docs/reference/platforms/support.md:0
+msgid "PWM／ADC 耦合"
+msgstr "Coupled PWM and ADC"
+
+#: ../../../../../../docs/reference/platforms/support.md:0
+msgid ""
+"F407 已审软件路线按一个 `pwm_adc` owner 分选三种互斥模式。`finite-regular-dma` 以固定 duty 窗口借用 raw sample 存储。"
+"`injected-control` 在 ADC IRQ 中对完整 scan 执行有界计算并提交 duty 组。"
+"`injected-power-stage` 使用独立 power stage face 和已审 TIM1／TIM8 路线，具体采样与共享域按装配选择。"
+"实体功率板、采样精度和保护动作需独立物理证据"
+msgstr ""
+"Reviewed F407 software routes select one of three mutually exclusive "
+"modes for a `pwm_adc` owner. `finite-regular-dma` borrows raw sample "
+"storage for a fixed-duty window. `injected-control` runs bounded compute "
+"on a complete scan in the ADC IRQ and commits a duty group. "
+"`injected-power-stage` uses a dedicated power stage face and reviewed "
+"TIM1/TIM8 routes, with exact sampling and shared domains selected in the "
+"assembly. Physical power boards, sampling accuracy and protection behavior "
+"require independent physical evidence"
+
+#: ../../../../../../docs/reference/platforms/support.md:0
+msgid ""
+"[PWM／ADC 合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/drivers/pwm_adc/README.md)、"
+"[路线与软件参考](capabilities.md)"
+msgstr ""
+"[PWM/ADC contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f4/drivers/pwm_adc/README.md), "
+"[routes and software references](capabilities.md)"
 
 #: ../../../../../../docs/reference/platforms/support.md:0
 msgid "独立 ADC"
@@ -1176,13 +1232,18 @@ msgstr ""
 
 #: ../../../../../../docs/reference/platforms/support.md:108
 msgid ""
-"从完整源码根执行。查询给出可选事实和模式，不能代替全装配准入或运行结果。Native需要显式test support，物理MCU保持 "
-"`not_executed`，精确边界见[验证参考](qualification.md)。"
+"从完整源码根执行。`list-bindings` 列出候选绑定，`check` 验证完整装配，`support --assembly` "
+"解析同一 TOML 并只读报告已选后端、时钟、接口和资源。Native 装配需要显式 test support。 "
+"模型执行、ARM 链接、SDK 消费和物理测量各自提供证据，当前物理 HIL 为 `not_executed`。 "
+"精确边界见[验证参考](qualification.md)。"
 msgstr ""
-"Run from the complete source root. Queries describe available facts and "
-"modes; they do not replace admission of the complete assembly or execution "
-"results. Native requires explicit test support; physical MCU status remains "
-"`not_executed`. See [validation reference](qualification.md) for exact "
+"Run from the complete source root. `list-bindings` lists candidate "
+"bindings, `check` validates the complete assembly, and `support --assembly` "
+"resolves the same TOML to report the selected backend, clocks, interfaces "
+"and resources without writing files. Native assemblies require explicit "
+"test support. Model execution, ARM linking, SDK consumption and physical "
+"measurement provide independent evidence. Physical HIL currently remains "
+"`not_executed`. See the [validation reference](qualification.md) for exact "
 "boundaries."
 
 msgid ""

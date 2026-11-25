@@ -13,6 +13,14 @@
 | docs-publish.yml | 复用本次 Pages 制品部署；main 手动入口只构建文档一次再部署 |
 | security.yml | 依赖审计、CodeQL 和秘密扫描 |
 
+Security Analysis 保留 C++ 与 Python check。push 或 PR 只有在基线策略用实际
+Git 对象证明已审阅的开发流程页或对应翻译仅修改正文时，C++ check 才记录分流。
+代码示例、生成输入、未知变更及无法验证的提交身份均触发完整分析。定时和手动运行
+执行完整分析。Python CodeQL、依赖审计和秘密扫描分别执行。
+
+构建准备使用当前 CPython 的 hash 锁一次安装完整 Python 工具闭包，并按 preset
+核对递归依赖。pip 和 ARM 归档缓存只保存可验证的下载输入。
+
 Native 的 Debug、Release、ASan／UBSan、TSan 各执行完整 CTest 计划一次。
 GoogleTest 报告必须与未过滤的发现结果逐例匹配，缺失、陈旧、跳过和失败均拒绝。
 与编译模式无关的 Python 工具测试只由独立工具 job 执行一次。

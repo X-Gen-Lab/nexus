@@ -9,6 +9,7 @@
 extern "C" {
 #include "clock_domain_impl.h"
 #include "nexus/core/fault.h"
+#include "nexus/core/time.h"
 #include "nexus/soc/stm32f407_supervision.h"
 #include "nexus/soc/stm32f4_power.h"
 #include "system/stm32f407_clock.h"
@@ -845,22 +846,48 @@ TEST_F(Stm32System, StopRestoresRunInANewEpochWithUnknownElapsedTime) {
     timer.CNT = 123U;
     nx_clock_domain_t domain{};
     ASSERT_EQ(NX_SUCCESS, nx_clock_domain_construct(&domain, 1U));
+    nx_clock_lease_t loan{};
+    ASSERT_EQ(NX_SUCCESS, nx_clock_domain_acquire(&domain, &loan));
+    nx_time_us_t old_deadline;
+    ASSERT_EQ(NX_SUCCESS, nx_deadline_finite_after(
+                              nx_stm32_system_clock_read(&g_nx_stm32_system),
+                              500U, &old_deadline));
     nx_clock_barrier_t barrier{};
     ASSERT_EQ(NX_SUCCESS, nx_clock_domain_close(&domain, &barrier));
     nx_stm32_power_options_t options = {
         {1U << 6U, 0U, 0U, 0U}, 8U, 0U, 0U, true, false, false};
     nx_power_enabled[0] = 1U << 6U;
     nx_stm32_stop_receipt_t receipt{};
+    const auto original_epoch = g_nx_stm32_system.time_epoch;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32_power_enter(barrier, &options, &receipt));
+    EXPECT_EQ(0U, deep_waits);
+    EXPECT_EQ(original_epoch, g_nx_stm32_system.time_epoch);
+    EXPECT_EQ(0U, receipt.old_epoch);
+    ASSERT_EQ(NX_SUCCESS, nx_clock_domain_release(&domain, &loan));
     ASSERT_EQ(NX_SUCCESS, nx_stm32_power_enter(barrier, &options, &receipt));
     EXPECT_TRUE(receipt.waited);
     EXPECT_EQ(1U, deep_waits);
     EXPECT_EQ(123U, receipt.before_us);
     EXPECT_EQ(0U, receipt.after_us);
+    EXPECT_EQ(original_epoch, receipt.old_epoch);
     EXPECT_LT(receipt.old_epoch, receipt.new_epoch);
     EXPECT_EQ(0U, nx_power_scr);
     EXPECT_EQ(0U, nx_power_tick);
     EXPECT_EQ(0U, mask);
     EXPECT_TRUE(g_nx_stm32_system.started);
+    EXPECT_EQ(NX_SUCCESS, nx_clock_domain_quiescent(barrier));
+    ASSERT_EQ(NX_SUCCESS, nx_clock_domain_reopen(barrier));
+    EXPECT_EQ(NX_ERROR_STATE,
+              nx_stm32_power_enter(barrier, &options, &receipt));
+    EXPECT_EQ(1U, deep_waits);
+    ASSERT_EQ(NX_SUCCESS, nx_clock_domain_acquire(&domain, &loan));
+    nx_time_us_t new_deadline;
+    ASSERT_EQ(NX_SUCCESS, nx_deadline_finite_after(
+                              nx_stm32_system_clock_read(&g_nx_stm32_system),
+                              500U, &new_deadline));
+    EXPECT_EQ(623U, old_deadline);
+    EXPECT_EQ(500U, new_deadline);
+    EXPECT_EQ(NX_SUCCESS, nx_clock_domain_release(&domain, &loan));
 }
 
 TEST_F(Stm32System, StopClockRestoreFailureRetainsMasksAndEndsOldEpoch) {

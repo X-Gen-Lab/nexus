@@ -87,8 +87,9 @@ Each qualified Idle attempt consumes the authorization once, including failure.
 Inspect the receipt before rearming or restoring users. After STOP invalidates
 old Core time, lost RTC timing proof, duration outside the declared bound or
 failed tick restoration retains masks/tick responsibility and fail-stops.
-Pre-STOP rejection may restore the original tick and report an error without
-inventing deep-sleep elapsed time. No path automatically restarts output.
+If admission rejects after SysTick is paused and before the Core epoch changes,
+the adapter restores the remaining phase on that source and reports the error.
+No path automatically restarts output.
 The [System contract](../../../../soc/stm32/stm32f4/system/README.md) owns the
 complete ordering and failure requirements. The linked reference does not run
 the scheduler or STOP on hardware; power, drift and wake latency remain

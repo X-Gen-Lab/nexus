@@ -60,36 +60,56 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           submodules: false
-      - name: Initialize pinned build dependencies
-        if: matrix.language == 'cpp'
+          fetch-depth: ${{ matrix.language == 'cpp' && (github.event_name == 'push' || github.event_name == 'pull_request') && '0' || '1' }}
+      - name: Prove whether the C++ input changed
+        id: cpp-scope
+        if: matrix.language == 'cpp' && (github.event_name == 'push' || github.event_name == 'pull_request')
+        env:
+          GIT_NO_REPLACE_OBJECTS: '1'
+          NEXUS_CHANGE_EVENT: ${{ github.event_name }}
+          NEXUS_CHANGE_BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+          NEXUS_CHANGE_HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
+          NEXUS_CHANGE_CHECKOUT: ${{ github.sha }}
         run: |
-          git submodule update --init --recursive ext/freertos vendors/arm/CMSIS_6 \
-            vendors/st/cmsis_device_f4
+          if [[ "$NEXUS_CHANGE_BASE" =~ ^[0-9a-f]{40}$ ]] && policy=$(mktemp); then
+            trap 'rm -f "$policy"' EXIT
+            if git cat-file blob "$NEXUS_CHANGE_BASE:tools/dev/change_paths.py" > "$policy" &&
+               python3 -I "$policy" --codeql --github-output "$GITHUB_OUTPUT"; then
+              exit 0
+            fi
+          fi
+          echo 'Git input proof unavailable. The complete C++ analysis will run.'
+          echo 'skip_cpp=false' >> "$GITHUB_OUTPUT"
       - uses: github/codeql-action/init@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4
+        if: matrix.language == 'python' || steps.cpp-scope.outputs.skip_cpp != 'true'
         with:
           languages: ${{ matrix.language }}
           config-file: ./.github/codeql/config.yml
           queries: security-and-quality
           build-mode: ${{ matrix.language == 'cpp' && 'manual' || 'none' }}
       - name: Configure native compiler environment
-        if: matrix.language == 'cpp'
+        if: matrix.language == 'cpp' && steps.cpp-scope.outputs.skip_cpp != 'true'
         uses: ./.github/actions/setup-build
         with:
           os: ubuntu-latest
           preset: native-debug
           arm: 'true'
       - name: Trace the actual native build
-        if: matrix.language == 'cpp'
+        if: matrix.language == 'cpp' && steps.cpp-scope.outputs.skip_cpp != 'true'
         run: |
           .venv/bin/python tools/dev/dev.py configure --preset native-debug
           NEXUS_COMMAND_TIMEOUT=3600 .venv/bin/python tools/dev/dev.py build --preset native-debug --parallel 2
           test -s build/native-debug/compile_commands.json
       - uses: github/codeql-action/analyze@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4
+        if: matrix.language == 'python' || steps.cpp-scope.outputs.skip_cpp != 'true'
         with:
           category: /language:${{ matrix.language }}
           upload: true
       # Extraction/upload is execution evidence; findings still need triage.
       # This job does not assert that the product has zero vulnerabilities.
+      - name: Report the reviewed C++ scope decision
+        if: matrix.language == 'cpp' && steps.cpp-scope.outputs.skip_cpp == 'true'
+        run: echo 'C++ analysis skipped because the checked Git changes only edit reviewed prose.' >> "$GITHUB_STEP_SUMMARY"
 
   secret-scan:
     name: Secret scan

@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 514923b07160c80d136fcddab507bcb174f432d4c7d3ea0a9baa607096496b3d\n"
+"X-Nexus-Source-SHA256: dc15bcedc3e6388d85d140445864c5cc3348106c9ae9c32472f549bfeb8b3e7b\n"
 
 #: ../../../../../../docs/guides/use-source-sdk.md:8
 msgid "使用 Source SDK 与升级工程"
@@ -85,30 +85,48 @@ msgid "升级已有工程"
 msgstr "Upgrade an existing project"
 
 #: ../../../../../../docs/guides/use-source-sdk.md:53
-msgid "保留应用源与 `.nexus-template.json`，取得下一份 SDK 及精确提交。"
+msgid "保留应用源与 `.nexus-template.json`，记录旧 SDK、完整提交、profile、工具链和工件摘要，再核验下一份 SDK 的身份。"
 msgstr ""
-"Keep application sources and `.nexus-template.json`; obtain the next SDK and"
-" exact commit."
+"Keep the application sources and `.nexus-template.json`. Record the previous"
+" SDK, full commit, profile, toolchain and artifact digests before verifying"
+" the identity of the next SDK."
 
 #: ../../../../../../docs/guides/use-source-sdk.md:54
-msgid "阅读对应变更和[源码接口兼容性](../reference/contracts/sdk-format.md)。"
+msgid "阅读对应变更和[源码接口兼容性](../reference/contracts/sdk-format.md)，检查 factory 代际、TOML schema、Board、后端和工具链。"
 msgstr ""
 "Read the relevant changes and [source-interface "
-"compatibility](../reference/contracts/sdk-format.md)."
+"compatibility](../reference/contracts/sdk-format.md). Check the factory "
+"epoch, TOML schema, Board, backend and toolchain."
 
 #: ../../../../../../docs/guides/use-source-sdk.md:55
-msgid "在新构建目录切换 `Nexus_DIR` 和期望提交，重新生成并编译全部相关对象。"
+msgid "用同一应用输入在独立目录分别构建旧版和候选版。通过 `Nexus_DIR` 和期望提交选择 SDK，重新生成并编译全部相关对象。"
 msgstr ""
-"In a new build directory, change `Nexus_DIR` and the expected revision, "
-"regenerate and compile all relevant objects."
+"Build the previous and candidate versions with the same application inputs "
+"in separate directories. Select the SDK with `Nexus_DIR` and the expected "
+"revision, then regenerate and compile all relevant objects."
 
 #: ../../../../../../docs/guides/use-source-sdk.md:56
-msgid "执行产品需要的 Native、ARM 和硬件检查，再更新产品依赖锁。"
+msgid "对照 ARM 资源报告，执行产品需要的 Native、ARM 和硬件检查，并在消费前后校验 SDK。验收完成后更新产品依赖锁。"
 msgstr ""
-"Execute the Native, ARM and hardware checks required by the product before "
-"updating its dependency lock."
+"Compare the ARM resource reports, run the Native, ARM and hardware checks "
+"required by the product, and verify the SDK before and after consumption. "
+"Update the product dependency lock after acceptance."
 
-#: ../../../../../../docs/guides/use-source-sdk.md:58
+#: ../../../../../../docs/guides/use-source-sdk.md:57
+msgid "在独立构建目录用上一份锁和 SDK 验证回退，保留其工件与复验记录。产品数据迁移和回退仍由产品决定。"
+msgstr ""
+"Verify rollback with the previous lock and SDK in a separate build directory. "
+"Retain the previous artifacts and the verification record. The product owns "
+"its data migration and rollback decisions."
+
+#: ../../../../../../docs/guides/use-source-sdk.md:59
+msgid "记录候选版本的兼容和验证范围。长期维护承诺需要明确支持窗口、修复回移和可重建依赖的证据。"
+msgstr ""
+"Record the candidate's compatibility and verification scope. A long-term "
+"maintenance commitment needs a defined support window and evidence of fix "
+"backports and rebuildable dependencies."
+
+#: ../../../../../../docs/guides/use-source-sdk.md:61
 msgid ""
 "模板来源记录描述工程最初从哪里创建，不会自动改成新 SDK 身份。平台版本、factory 接口代际、TOML schema、typed IR 与 "
 "SDK manifest schema 各自负责不同合同；相同 版本号不能替代精确提交，也不能证明二进制兼容。"
@@ -119,7 +137,7 @@ msgstr ""
 "govern separate contracts. An identical version string cannot replace an "
 "exact commit or establish binary compatibility."
 
-#: ../../../../../../docs/guides/use-source-sdk.md:62
+#: ../../../../../../docs/guides/use-source-sdk.md:65
 msgid ""
 "原 Kconfig／宏实例、旧请求字段与目录迁移只按匹配版本的固定记录读取。当前工程用 TOML、强类型 factory "
 "和显式生命周期；不要在未知字段后回退到旧配置或生成文件。 常见失败见[排错指南](troubleshooting.md)。"

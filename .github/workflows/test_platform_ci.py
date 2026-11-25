@@ -235,6 +235,43 @@ class WorkflowContracts(unittest.TestCase):
                     self.assertEqual(records[1]['timeout'], 3600,
                                      'Traced builds need their own finite budget')
 
+    def test_codeql_scope_only_bypasses_cpp_analysis_on_proven_prose(self):
+        document = workflow('security.yml')
+        jobs = document['jobs']
+        codeql = jobs['codeql']
+        self.assertEqual(codeql['name'], 'CodeQL analysis (${{ matrix.language }})')
+        self.assertNotIn('if', codeql)
+        self.assertEqual(codeql['strategy']['matrix']['language'], ['cpp', 'python'])
+        for event in ('push', 'pull_request', 'schedule', 'workflow_dispatch'):
+            self.assertIn(event, document['on'])
+        for name in ('python-dependency-audit', 'secret-scan'):
+            self.assertNotIn('if', jobs[name])
+        scope = next(step for step in codeql['steps'] if step.get('id') == 'cpp-scope')
+        self.assertIn('matrix.language', scope['if'])
+        self.assertIn('pull_request', scope['if'])
+        self.assertIn('push', scope['if'])
+        self.assertIn('git cat-file blob', scope['run'])
+        self.assertIn('--codeql', scope['run'])
+        self.assertIn('steps.cpp-scope.outputs.skip_cpp', codeql['steps'][-1]['if'])
+        commands = '\n'.join(step.get('run', '') for step in codeql['steps'])
+        self.assertNotIn('git submodule update', commands)
+        for step in codeql['steps']:
+            if ('codeql-action/' in step.get('uses', '') or
+                    'setup-build' in step.get('uses', '') or
+                    step.get('name') == 'Trace the actual native build'):
+                self.assertIn("steps.cpp-scope.outputs.skip_cpp != 'true'", step['if'])
+
+    def test_build_setup_installs_one_hash_locked_tool_closure(self):
+        setup = yaml.load((ROOT / '.github/actions/setup-build/action.yml').read_text(),
+                          Loader=yaml.BaseLoader)
+        steps = setup['runs']['steps']
+        commands = '\n'.join(step.get('run', '') for step in steps)
+        self.assertIn('install_dev_tools.py --skip-hooks --locked-linux', commands)
+        self.assertNotIn('pip install', commands)
+        self.assertEqual(steps[0]['with']['cache'], 'pip')
+        self.assertEqual(steps[0]['with']['cache-dependency-path'],
+                         'dependencies/python-tools-linux-cp311.txt')
+
 
     def test_docs_validation_has_no_deployment_permissions(self):
         document = workflow('docs-build.yml')

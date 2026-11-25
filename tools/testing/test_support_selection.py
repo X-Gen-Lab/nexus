@@ -4,6 +4,7 @@ from tools.configure.tests.native_fixture import native_fixture, with_native_sup
 from contextlib import redirect_stdout
 import io
 import json
+import os
 from pathlib import Path
 import re
 import shutil
@@ -279,6 +280,56 @@ class SupportEvidenceSelectionTests(unittest.TestCase):
         self.assertEqual(code, 0)
         self.assertEqual(len(json.loads(stream.getvalue())["evidence"]), 2)
         self.assertEqual(original, self.resource_report.read_bytes())
+
+    def test_sdk_identity_match_does_not_promote_arm_or_hardware(self):
+        with patch.object(capabilities, "selection_evidence", return_value={
+                "kind": "source_sdk_consumer_verification",
+                "status": "identity_matched",
+                "software_qualified": False}):
+            result = self.query(self.resource_report)
+        self.assertEqual(result["validation"]["installed_sdk"],
+                         "identity_matched")
+        self.assertEqual(result["validation"]["arm_image"], "not_assessed")
+        self.assertEqual(result["validation"]["physical_hil"], "not_assessed")
+        self.assertFalse(result["physical_qualified"])
+
+    def test_malformed_optional_report_preserves_the_validated_selection(self):
+        broken = self.directory / "incomplete.json"
+        broken.write_text('{"schema_version": 1,')
+        result = self.query(broken, self.resource_report)
+        self.assertEqual(result["validation"]["configuration"], "validated")
+        self.assertEqual([item["status"] for item in result["evidence"]],
+                         ["not_assessed", "not_assessed"])
+
+    def test_sdk_build_receipt_rejects_changed_output(self):
+        from tools.dev import process
+        from tools.evidence.common import EvidenceError
+
+        source = self.directory / "consumer"
+        source.mkdir()
+        (source / "CMakeLists.txt").write_text(
+            "cmake_minimum_required(VERSION 3.20)\n"
+            "project(SupportReceipt NONE)\n"
+            "add_custom_target(consumer ALL COMMAND "
+            "${CMAKE_COMMAND} -E echo installed-consumer)\n")
+        build = self.directory / "consumer-build"
+        subprocess.run(["cmake", "-S", str(source), "-B", str(build), "-G", "Ninja"],
+                       capture_output=True, check=True, timeout=30)
+        argv = ["cmake", "--build", str(build)]
+        result = process.run(argv, cwd=self.directory, env=os.environ.copy(),
+                             log=self.directory / "consumer.log",
+                             timeout=30, stage="source-sdk-consumer")
+        self.assertEqual(result.returncode, 0)
+        consumer = {"consumer_index": 1}
+        report = {"commands": [{
+            **consumer, "argv": argv, "exit_code": 0,
+            "withdrawal_complete": True,
+            "receipt": str(result.receipt_path.relative_to(self.directory)),
+        }]}
+        capabilities._successful_build(self.directory, report, consumer, build)
+        result.receipt_path.with_name("stdout.txt").write_text("replaced")
+        with self.assertRaisesRegex(EvidenceError, "build output has changed"):
+            capabilities._successful_build(self.directory, report, consumer, build)
 
     def test_build_provenance_identity_is_observed_and_never_qualified(self):
         from tools.dev import provenance

@@ -1,7 +1,9 @@
 """Execute the single hook/CI path policy and required-job decisions."""
 
-import unittest
 from pathlib import Path
+import subprocess
+import tempfile
+import unittest
 
 from scripts.ci.check_required_jobs import check_required_jobs, required_jobs
 from tools.dev.change_paths import classify as classify_paths, behavioral
@@ -12,6 +14,105 @@ WORKFLOW = Path(__file__).resolve().parents[2] / ".github/workflows/ci.yml"
 def classify(changes):
     return {name: str(value).lower()
             for name, value in classify_paths(path for _, path in changes).items()}
+
+
+class CodeqlScopeTests(unittest.TestCase):
+    page = Path("docs/development/workflow.md")
+    locale = Path("docs/locale/zh_CN/LC_MESSAGES/development/workflow.po")
+    initial = "# Workflow\n\nKeep the current title.\n\n```sh\nold command\n```\n"
+
+    def setUp(self):
+        temporary = tempfile.TemporaryDirectory(prefix="nexus CodeQL scope ")
+        self.addCleanup(temporary.cleanup)
+        self.root = Path(temporary.name)
+        self.git("init", "-q")
+        self.git("config", "user.name", "Nexus test")
+        self.git("config", "user.email", "test@example.invalid")
+        self.write(self.page, self.initial)
+        self.write(self.locale, 'msgid "Keep the current title."\n'
+                               'msgstr "保留当前标题。"\n')
+        self.base = self.commit()
+
+    def git(self, *args):
+        return subprocess.run(["git", *args], cwd=self.root, text=True,
+                              capture_output=True, check=True,
+                              timeout=10).stdout.strip()
+
+    def write(self, path, value):
+        output = self.root / path
+        output.parent.mkdir(parents=True, exist_ok=True)
+        output.write_text(value, encoding="utf-8")
+
+    def commit(self):
+        self.git("add", ".")
+        self.git("commit", "-qm", "test: record input")
+        return self.git("rev-parse", "HEAD")
+
+    def decision(self, head, *, event="push", base=None, checkout=None):
+        from tools.dev.change_paths import codeql_scope
+
+        return codeql_scope(self.root, event, base or self.base, head,
+                            checkout or head)["skip_cpp"]
+
+    def test_push_admits_reviewed_prose_and_locale_updates(self):
+        self.write(self.page, self.initial.replace("current title", "default title"))
+        self.write(self.locale, 'msgid "Keep the default title."\n'
+                               'msgstr "保留默认标题。"\n')
+        self.assertTrue(self.decision(self.commit()))
+
+    def test_edited_code_block_generated_input_and_unknown_docs_require_analysis(self):
+        self.write(self.page, self.initial.replace("old command", "new command"))
+        self.assertFalse(self.decision(self.commit()))
+        self.write(self.page, self.initial + "\nCheck the title.\n")
+        for path in ("docs/demo/assembly.toml", "docs/guide.md",
+                     "tools/configure/emit.py", "dependencies/new.lock.json",
+                     ".github/workflows/security.yml"):
+            with self.subTest(path=path):
+                self.write(path, "another input\n")
+                self.assertFalse(self.decision(self.commit()))
+                self.git("reset", "--hard", self.base)
+                self.write(self.page, self.initial + "\nCheck the title.\n")
+
+    def test_renames_deletions_symlinks_and_new_files_require_analysis(self):
+        self.git("mv", str(self.page), "docs/renamed.md")
+        self.assertFalse(self.decision(self.commit()))
+        self.git("reset", "--hard", self.base)
+        (self.root / self.locale).unlink()
+        self.assertFalse(self.decision(self.commit()))
+        self.git("reset", "--hard", self.base)
+        (self.root / self.page).unlink()
+        (self.root / self.page).symlink_to("missing.md")
+        self.assertFalse(self.decision(self.commit()))
+        self.git("reset", "--hard", self.base)
+        self.write("docs/new.md", "Check the title.\n")
+        self.assertFalse(self.decision(self.commit()))
+
+    def test_gitlink_and_locale_code_changes_require_analysis(self):
+        self.git("config", "diff.ignoreSubmodules", "all")
+        self.git("update-index", "--add", "--cacheinfo",
+                 "160000," + self.base + ",ext/provider")
+        self.git("commit", "-qm", "test: add gitlink")
+        self.assertFalse(self.decision(self.git("rev-parse", "HEAD")))
+        self.git("reset", "--hard", self.base)
+        self.write(self.locale, 'msgid "Keep the current title."\n'
+                               'msgstr "```sh\\nnew command\\n```"\n')
+        self.assertFalse(self.decision(self.commit()))
+
+    def test_pr_checks_exact_merge_parents_and_keeps_ambiguous_events_full(self):
+        self.write(self.page, self.initial + "\nCheck the title.\n")
+        head = self.commit()
+        tree = self.git("rev-parse", "HEAD^{tree}")
+        merge = self.git("commit-tree", tree, "-p", self.base, "-p", head,
+                         "-m", "test: merge input")
+        self.git("checkout", "-q", "--detach", merge)
+        self.assertTrue(self.decision(head, event="pull_request", checkout=merge))
+        self.assertFalse(self.decision(head, event="pull_request"))
+        self.assertFalse(self.decision(merge, base="0" * 40))
+        self.assertFalse(self.decision(merge, base="b" * 40))
+        self.assertFalse(self.decision(merge, base=head, checkout=self.base))
+        self.assertFalse(self.decision(merge, base=merge))
+        for event in ("schedule", "workflow_dispatch", "unknown"):
+            self.assertFalse(self.decision(merge, event=event))
 
 
 class ChangePathsTests(unittest.TestCase):

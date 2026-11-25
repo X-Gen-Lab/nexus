@@ -52,7 +52,8 @@ F415／F417。F411、F446、F479 分别绑定独立 RM／ES profile；F446 的 P
 | --- | --- | --- |
 | 冷态与平台归还 | 静态 factory 纯查询；手写 C 执行准入、取得、逆序撤回和回读。部分效果、未退出 IRQ／DMA 与失败引脚恢复继续保留原 owner 和收条 | [所有权](../../explanation/ownership.md)、[F4 实现](../../../soc/stm32/stm32f4/README.md) |
 | System／时钟 | F407 默认 `hse8-pll168`，其余已审 custom HSE／HSI、PLL、总线和 Flash latency 共用 ClockPlanIR。F411 显式 HSI96；F446／F479 显式 HSI168，均保留 direct HSI16。F479 可选 M10／N210 以同时使用共享 M 的 PLLSAI 音频／图形输出；System 先证明 PLLRDY／VOSRDY、prefetch 与 latency，再切换并发布时间。HSI 名义频率不证明 USB 或音频精度。无 180 MHz／overdrive 或运行期 DVFS；新增器件 STOP 只按独立已审高频 profile 与唤醒合同开放 | [System 与时钟](../../../soc/stm32/stm32f4/system/README.md) |
-| Sleep／STOP | 浅 Sleep 保留时间域；F407 既有配置与 F411／F446／F479 精确高频软件参考分别支持受约束 STOP。实际 traits 校验 NVIC bank、备份／CCM 和唤醒源，拒绝外来低功耗／debug 状态；排空后进入 STOP，真实 System 恢复才建立新 Core epoch，旧 deadline 不继承。仅 baremetal，elapsed bounds 由调用者提供 | [System 低功耗](../../../soc/stm32/stm32f4/system/README.md)、[ClockDomain 屏障](../contracts/platform/clock-domain.md) |
+| 浅 Sleep／裸机 STOP | 浅 Sleep 保留时间域。F407 既有裸机配置和 F411／F446／F479 精确高频裸机软件参考支持受约束 STOP。实际 traits 校验 NVIC bank、备份／CCM 和唤醒源，并拒绝外来低功耗／debug 状态。调用者提供 elapsed bounds 并排空旧期限和借用。System 恢复后建立新 Core epoch | [System 低功耗](../../../soc/stm32/stm32f4/system/README.md)、[ClockDomain 屏障](../contracts/platform/clock-domain.md) |
+| F407 FreeRTOS 一次性 STOP | 显式链接 `nexus_add_stm32f4_freertos_stop`，选择 `lowpower`／`timebase` 与同一个已暂停的 RTC owner。已审唤醒为 32768 Hz LSE、PRER127/255、RTCCLK/16、reload255 和仅 EXTI22 事件，名义 125 ms。产品排空旧 Core deadline、暂停 Platform 并关闭对应 ClockDomain 后才 arm。真实 Idle 消耗一次授权，elapsed 上界必须严格早于下一个内核 unblock。模型验证 Idle 编排，软件参考验证 ARM 链接，物理功耗、漂移和唤醒延迟为 `not_executed` | [FreeRTOS STOP API](../api/soc/stm32f4-system.md)、[精确装配](../../../tests/contracts/f407_freertos_stop/README.md) |
 | Standby | 显式 WKUP／RTC 唤醒与同一 RTC owner 的准备收条；F446 另校验 EWUP2／PC13 与晶体 LSE 的冲突。F479 SBF／sticky WUF 阻止 RTC 重入；显式 reset-prepare 只按授权清 SBF，之后产品必须复位，平台不自动复位或清 RTC。真实进入经复位重建启动；虚假返回建立新 Core epoch，restore 失败保留责任 | [System 低功耗](../../../soc/stm32/stm32f4/system/README.md)、[RTC 合同](../contracts/io/f407-rtc.md) |
 | 监督与故障 | IWDG／WWDG 显式启用；可选 WWDG EWI、HSE CSS／NMI、复位原因、首次故障记录与 DWT trace。无自动喂狗、任务重启或旧时间域降频续跑 | [监督与故障](../../../soc/stm32/stm32f4/system/README.md) |
 | GPIO／EXTI／PVD | 按精确器件和已审路线选择 GPIO input／output、四档显式输出速度与 EXTI0–15；PVD 原始电平／事件。F479NI 的 J／K 当前只提供上表两条 GPIO 软件路线，不授予 EXTI。EXTI 的 `hardware-event` 只产生 EMR 硬件事件，不取得 IRQ 或软件队列。省略速度保留已有配置，PC13–15 输出限制为 LOW；晶振 LSE 占用时 PC13 保持静默，晶振和调试引脚仍受资源约束。单 pin 可显式声明 `active_high`，生成复用授权 port 的只读逻辑 signal；省略时无 signal，不从初始电平推导极性。软件事件保留 COALESCED／LOSS，不提供自动消抖、精确边沿时间或 BOR 资格 | [F4 GPIO／PVD](../../../soc/stm32/stm32f4/README.md)、[I/O 观察](../contracts/io/observation-recovery.md) |
@@ -65,6 +66,7 @@ F415／F417。F411、F446、F479 分别绑定独立 RM／ES profile；F446 的 P
 | 普通 PWM／capture／encoder | 已审 TIM3／4／5／9–14 PWM；TIM1／3／4／5／8／9–14 原始输入捕获，按实例开放 1／2／4 通道，TIM5 保留 32 位；TIM1／3／4／5／8 支持 x2／x4 正交计数。TIM2 保留给 Core，TIM6／7 用作专用触发；timer personality 独占，IRQ 只取得所选模式实际使用的向量 | [定时器合同](../contracts/io/timer-advanced.md)、[F4 实现](../../../soc/stm32/stm32f4/README.md) |
 | 互补 PWM | TIM1／TIM8 的 CH1–3／CH1N–3N、deadtime、break 和显式 rearm；没有自动故障重启或隐式跨 timer 同步 | [高级定时器](../contracts/io/timer-advanced.md) |
 | PWM 组／有限波形 | 单 timer 多通道 CPU group、硬件单脉冲与有限 UPDATE-DMA sequence；实例、TRGO／ITR、break 和 burst 预算显式选择。sequence 成功统计 staged 存储字节，不承诺精确电脉冲数 | [有限波形合同](../../../soc/stm32/stm32f4/drivers/timer/README-waveform.md) |
+| PWM／ADC 耦合 | F407 已审软件路线按一个 `pwm_adc` owner 分选三种互斥模式。`finite-regular-dma` 以固定 duty 窗口借用 raw sample 存储。`injected-control` 在 ADC IRQ 中对完整 scan 执行有界计算并提交 duty 组。`injected-power-stage` 使用独立 power stage face 和已审 TIM1／TIM8 路线，具体采样与共享域按装配选择。实体功率板、采样精度和保护动作需独立物理证据 | [PWM／ADC 合同](../../../soc/stm32/stm32f4/drivers/pwm_adc/README.md)、[路线与软件参考](capabilities.md) |
 | 独立 ADC | ADC1／2／3 的已审外部输入，ADC1 内部输入；6／8／10／12-bit、regular shot／scan、软件 injected、有限／连续 timer DMA。内部输入与模拟路径有独立启动／退出责任 | [F4 ADC](../../../soc/stm32/stm32f4/README.md) |
 | 多 ADC／注入采集 | `adc_group` 独占 ADC123 域；保留有限 regular／injected 与双／三 ADC 同步或交错，新增对应 regular DBM blocks。同一同步 owner 可接一次软件或独占 Table69 timer 注入；有限 `regular-auto-injected` 用具名 descriptor 联合借用 regular／injected 两个 span，TC＋全部 JEOC＋真实 join 才共同终止。交错 blocks 按原生 CDR 几何、最快吞吐和 service gap 准入，不承诺均匀 aperture。未建立连续 JAUTO 逐次 JDR、交错＋注入或未知外来 trigger 合同。 | [多 ADC 合同](../contracts/io/f407-adc-groups.md) |
 | DAC | 单／双通道 direct、独占 timer、noise／triangle、有限／循环 DMA 与 idle code；可选 EXTI9 event-only 外部触发 CPU／循环 DMA，实际外部 rate 为 unknown，有限外部尾部拒绝。ES0182 恢复可内部转换声明的 idle，随后短时禁输出，不计 payload，不保证请求间模拟连续。 | [F4 DAC](../../../soc/stm32/stm32f4/README.md) |
@@ -105,4 +107,7 @@ python tools/configure/configure.py check --assembly tools/configure/assemblies/
 python tools/dev/dev.py support --assembly tools/configure/assemblies/qiming-baremetal-uart.toml
 ```
 
-从完整源码根执行。查询给出可选事实和模式，不能代替全装配准入或运行结果。Native需要显式test support，物理MCU保持 `not_executed`，精确边界见[验证参考](qualification.md)。
+从完整源码根执行。`list-bindings` 列出候选绑定，`check` 验证完整装配，`support --assembly`
+解析同一 TOML 并只读报告已选后端、时钟、接口和资源。Native 装配需要显式 test support。
+模型执行、ARM 链接、SDK 消费和物理测量各自提供证据，当前物理 HIL 为 `not_executed`。
+精确边界见[验证参考](qualification.md)。

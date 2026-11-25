@@ -77,6 +77,10 @@ python "$NEXUS_SOURCE/tools/dev/dev.py" support \
 模型执行、实时行为或物理 HIL。陈旧、不匹配或未知报告保留 `not_assessed` 和
 `reason`。必须读取各维身份与状态，不能把查询命令成功等同于报告通过。
 
+也可直接提供现有 SDK 消费报告 `source_sdk_consumer_verification`。查询匹配 ARM
+消费者的实际装配、封存源码、ELF 与构建收条，仅更新 `validation.installed_sdk`。
+使用消费工程实际构建的 TOML。删除、移动或修改报告引用的产物后，旧报告无法关联。
+
 ## 使用所选接口
 
 生成 bundle 自带 `nexus_factory_strong.h`。`uart.console` 使用
