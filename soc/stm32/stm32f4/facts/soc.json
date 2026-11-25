@@ -1299,7 +1299,8 @@
         "f479-graphics",
         "f479-quadspi-indirect",
         "f479-internal-flash",
-        "rtc-reviewed-lse"
+        "rtc-reviewed-lse",
+        "f479-gpio-jk"
       ],
       "clock_policy": "rm0386-run"
     }

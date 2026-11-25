@@ -9,6 +9,7 @@
 #include "drivers/graphics/stm32f4_ltdc.h"
 #include "graphics_checks.h"
 #include "nexus/arch/arch.h"
+#include "private/stm32f4_gpio_banks.h"
 #include "system/stm32f407_system.h"
 #include <stddef.h>
 #include <string.h>
@@ -136,7 +137,7 @@ static bool pins_valid(nx_stm32_ltdc_state_t* s,
         return false;
     for (size_t i = 0U; i < c->pin_count; ++i) {
         const nx_stm32_ltdc_pin_t* p = &c->pins[i];
-        if (p->bank > 8U || p->pin > 15U ||
+        if (!nx_stm32_gpio_bank_valid(p->bank) || p->pin > 15U ||
             !nx_graphics_span(p->registers, sizeof(*p->registers),
                               _Alignof(GPIO_TypeDef)) ||
             nx_graphics_overlap(s, sizeof(*s), p->registers,

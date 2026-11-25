@@ -2874,6 +2874,8 @@
           "flash:poll-word",
           "flash_async:nor-indirect",
           "flash_async:nor-indirect-quad-read",
+          "gpio:input",
+          "gpio:output",
           "image:irq-blit",
           "mapped_storage:nor-mapped-cpu",
           "memory_window:cpu-window",

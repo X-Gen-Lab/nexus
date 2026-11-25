@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 from pathlib import Path
 
-CONSUMER_POLICY = "nexus-sdk-consumers-v34"
+CONSUMER_POLICY = "nexus-sdk-consumers-v35"
 BASE_CONSUMERS = (("native", False, "native"), ("stm32", True, "stm32"))
 MODERN_CONSUMERS = ()
 SELECTED_CONSUMERS = (
@@ -68,6 +68,9 @@ SERVICE_CONSUMERS = (
                     "f4_family"),
     ServiceConsumer("f479ni family", "f479ni.toml", "arm-family-f479ni", True,
                     "f4_family"),
+    *(ServiceConsumer(f"{part} gpio", f"{part}-gpio.toml",
+                       f"arm-gpio-{part}", True, "f4_gpio")
+      for part in ("f407zg", "f479ni")),
     *(ServiceConsumer(f"{part} power", f"{part}-provision-empty.toml",
                        f"arm-power-{part}", True, "f4_power")
       for part in ("f411re", "f446ze", "f479ni")),
@@ -156,6 +159,8 @@ def consumer_plan():
 
 def service_directory(sdk, specification):
     """Use the single owned scenario tree, including shared F4 references."""
+    if specification.scenario == "f4_gpio":
+        return Path(sdk) / "tests/contracts/stm32f4_family"
     if specification.scenario == "f4_qspi_mapped":
         return Path(sdk) / "tests/contracts/stm32f4_qspi"
     if specification.scenario == "f4_capture_audio":

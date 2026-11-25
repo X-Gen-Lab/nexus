@@ -823,6 +823,36 @@ class WorkflowContracts(unittest.TestCase):
         self.assertNotIn('cmake --build', commands)
         self.assertNotIn('NEXUS_BACKEND', commands)
 
+    def test_family_gpio_matrix_partitions_the_actual_authored_inputs(self):
+        job = workflow('build-matrix.yml')['jobs']['controller-routes']
+        matrix = job['strategy']['matrix']
+        rows = {row['fixture']: row for row in matrix.get('include', [])}
+        self.assertEqual(set(rows), {'stm32f4_family', 'stm32f4_gpio'})
+        expected_projects = {
+            'stm32f4_family': 'tests/contracts/stm32f4_family',
+            'stm32f4_gpio': 'tests/contracts/stm32f4_family/gpio',
+        }
+        selected = []
+        for name, project in expected_projects.items():
+            with self.subTest(fixture=name):
+                self.assertEqual(rows[name]['project'], project)
+                self.assertTrue((ROOT / project / 'CMakeLists.txt').is_file())
+                assemblies = rows[name]['assemblies'].splitlines()
+                self.assertEqual(len(assemblies), 2 if name.endswith('gpio') else 7)
+                self.assertEqual(any('-gpio.toml' in path for path in assemblies),
+                                 name.endswith('gpio'))
+                selected.extend(assemblies)
+        authored = {path.relative_to(ROOT).as_posix() for path in
+                    (ROOT / 'tests/contracts/stm32f4_family').glob('*.toml')}
+        self.assertEqual(set(selected), authored)
+        self.assertEqual(len(selected), len(authored))
+        step = next(step for step in job['steps'] if step.get('name') ==
+                    'Link and audit each authored software assembly')
+        self.assertEqual(step['env']['PROVIDER_PROJECT'],
+                         "${{ matrix.project || '' }}")
+        self.assertEqual(step['env']['PROVIDER_ASSEMBLIES'],
+                         "${{ matrix.assemblies || '' }}")
+
 
 
     def test_provider_shell_passes_each_authored_and_canonical_input_once(self):
@@ -830,6 +860,13 @@ class WorkflowContracts(unittest.TestCase):
         step = next(step for step in job['steps'] if step.get('name') ==
                     'Link and audit each authored software assembly')
         selections = {'stm32_assembly': [], 'can_assembly': []}
+        authored_family = sorted('tests/contracts/stm32f4_family/' + path.name
+            for path in (ROOT / 'tests/contracts/stm32f4_family').glob('*.toml'))
+        selections.update(
+            stm32f4_family=[path for path in authored_family
+                            if not path.endswith('-gpio.toml')],
+            stm32f4_gpio=[path for path in authored_family
+                          if path.endswith('-gpio.toml')])
         for family, canonical in selections.items():
             with self.subTest(family=family), tempfile.TemporaryDirectory() as name:
                 root = Path(name) / 'repository with spaces'
@@ -852,8 +889,10 @@ class WorkflowContracts(unittest.TestCase):
                     '    f.write(json.dumps(sys.argv[1:]) + "\\n")\n')
                 tool.chmod(0o700)
                 record = root / 'actual-arguments.jsonl'
-                selected_project = ('tests/contracts/' + family
-                                    if canonical else '')
+                selected_project = (
+                    'tests/contracts/stm32f4_family/gpio'
+                    if family == 'stm32f4_gpio' else
+                    'tests/contracts/' + family if canonical else '')
                 env = dict(os.environ, FIXTURE=family,
                            GITHUB_WORKSPACE=str(root),
                            PROVIDER_PROJECT=selected_project,
@@ -875,7 +914,7 @@ class WorkflowContracts(unittest.TestCase):
                 expected = ['tests/contracts/' + family + '/' + name
                             for name in fixture_names]
                 if canonical:
-                    expected += canonical
+                    expected = canonical
                     self.assertEqual(argv.count('--project'), 1)
                     self.assertEqual(argv[argv.index('--project') + 1],
                                      selected_project)

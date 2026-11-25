@@ -600,8 +600,85 @@ def external_system_headers(root: Path, entry: dict) -> list[dict]:
     return [headers[name] for name in sorted(headers)]
 
 
+class AnalysisInputs:
+    """Share identical input observations within one run, never analysis results.
+
+    Every translation unit still runs its analyzer. Ordered compiler queries
+    retain their working directory, target, ABI, defines and forced includes.
+    A new run always queries the compiler and inventories foreign headers anew.
+    """
+
+    def __init__(self):
+        self.lock = threading.Lock()
+        self.compilers = {}
+        self.headers = {}
+
+    def observe(self, table, key, operation):
+        with self.lock:
+            owner = key not in table
+            if owner:
+                table[key] = concurrent.futures.Future()
+            future = table[key]
+        if owner:
+            try:
+                future.set_result(operation())
+            except BaseException as error:
+                future.set_exception(error)
+                raise
+        return future.result()
+
+    def compiler(self, entry, directory, output, cancel_event):
+        version, query = compiler_query(entry)
+        key = (entry['directory'], tuple(version), tuple(query))
+
+        def query_once():
+            transcript = io.StringIO()
+            path = directory / 'compiler-observation.txt'
+            try:
+                flags = predefines(entry, transcript, log_directory=directory,
+                                   cancel_event=cancel_event)
+            except BaseException:
+                output.write(transcript.getvalue())
+                raise
+            finally:
+                path.write_text(transcript.getvalue(), encoding='utf-8')
+            return tuple(flags), path, transcript.getvalue(), entry
+
+        flags, path, transcript, _ = self.observe(self.compilers, key, query_once)
+        output.write('Compiler observation: ' + str(path) + '\n')
+        if path.parent == directory:
+            output.write(transcript)
+        return flags
+
+    def foreign_headers(self, root, entry):
+        _, systems = system_include_arguments(entry)
+        key = (str(root), tuple(str(Path(entry['directory']) / path)
+                                for path in systems))
+        _, _, headers = self.observe(
+            self.headers, key,
+            lambda: (root, entry, external_system_headers(root, entry)))
+        return headers
+
+    def validate(self, output, cancel_event):
+        """Reject changed compiler inputs or exclusions before admitting a run."""
+        for future in self.compilers.values():
+            if cancel_event.is_set():
+                return
+            expected, path, _, entry = future.result()
+            directory = path.parent / 'closing-compiler'
+            directory.mkdir()
+            observed = predefines(entry, output, log_directory=directory,
+                                  cancel_event=cancel_event)
+            if tuple(observed) != expected:
+                raise ValueError('Compiler observation changed during analysis')
+        for future in self.headers.values():
+            root, entry, expected = future.result()
+            if external_system_headers(root, entry) != expected:
+                raise ValueError('External header ownership changed during analysis')
+
+
 def analyze_context(kind, root, tool, index, context, directory, cancel_event,
-                    timeout):
+                    timeout, inputs):
     """Analyze one actual context with isolated files and retained commands."""
     output = io.StringIO()
     entry = context["entry"]
@@ -619,12 +696,11 @@ def analyze_context(kind, root, tool, index, context, directory, cancel_event,
             database.write_text(json.dumps([projected]))
             output.write(f"Predefined source entry {index}: " + json.dumps(entry) + "\n")
             output.write(f"Cppcheck source projection {index}: " + json.dumps(projected) + "\n")
-            observed = predefines(entry, output, log_directory=directory,
-                                  cancel_event=cancel_event)
+            observed = inputs.compiler(entry, directory, output, cancel_event)
             forced = observed_forced_includes(
                 entry, directory, output, log_directory=directory,
                 cancel_event=cancel_event)
-            external = external_system_headers(root, entry)
+            external = inputs.foreign_headers(root, entry)
             output.write("External system header exclusions: " + json.dumps(external) + "\n")
             output.write("External header ownership rule: exact header files in this configuration's SYSTEM paths under vendors/ or ext/ only; owned headers and implementation files remain checked.\n")
             # Cppcheck 2.13 reports project headers relative to its working
@@ -666,6 +742,7 @@ def run(kind: str, root: Path, build: Path, tool: str, report: Path, *,
         root = root.resolve()
         selected = commands(root, build.resolve())
         contexts = analysis_contexts(selected)
+        inputs = AnalysisInputs()
         attempts = report.parent / (report.stem + ".contexts")
         attempts.mkdir(exist_ok=True)
         directory = Path(tempfile.mkdtemp(prefix="run-", dir=attempts))
@@ -710,18 +787,22 @@ def run(kind: str, root: Path, build: Path, tool: str, report: Path, *,
             with concurrent.futures.ThreadPoolExecutor(max_workers=parallel) as pool:
                 futures = [pool.submit(
                     analyze_context, kind, root, tool, index, context,
-                    directory / str(index), cancel_event, timeout)
+                    directory / str(index), cancel_event, timeout, inputs)
                     for index, context in enumerate(contexts)]
                 for future in futures:
                     code, text = future.result()
                     output.write(text)
                     output.flush()
                     failed |= code != 0
+            if kind == 'cppcheck':
+                output.write(f'Compiler observation contexts: {len(inputs.compilers)}\n')
+                output.write(f'Foreign header inventories: {len(inputs.headers)}\n')
+                inputs.validate(output, cancel_event)
             return 130 if cancel_event.is_set() else int(failed)
     except (OSError, ValueError, subprocess.TimeoutExpired) as error:
         with report.open("a", encoding="utf-8") as output:
             output.write(f"Analysis execution failed: {error}\n")
-        return 1
+        return 130 if cancel_event.is_set() else 1
     finally:
         for signum, handler in previous.items():
             signal.signal(signum, handler)

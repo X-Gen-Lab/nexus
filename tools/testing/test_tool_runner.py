@@ -270,6 +270,21 @@ class ToolRunnerTests(unittest.TestCase):
 
 
 class ChangedDomainTests(unittest.TestCase):
+    def test_support_changes_select_the_complete_evidence_reader_contracts(self):
+        self.assertEqual(run_tool_tests.commit_tool_plan([
+            "tools/maintenance/capabilities.py"]), {"testing": (
+                "tools/testing/test_maintenance.py",
+                "tools/testing/test_support_selection.py")})
+
+    def test_maintained_aliases_reference_existing_sources_and_complete_modules(self):
+        for source, modules in run_tool_tests.COMMIT_ALIASES.items():
+            with self.subTest(source=source):
+                self.assertTrue((ROOT / source).is_file(), source)
+                self.assertTrue(modules, source)
+                for module in modules:
+                    self.assertIsNotNone(run_tool_tests.module_domain(module), module)
+                    self.assertTrue((ROOT / module).is_file(), module)
+
     def test_commit_message_checker_selects_its_complete_test_module(self):
         self.assertEqual(run_tool_tests.commit_tool_plan([
             "scripts/ci/check_commit_message.py",
@@ -328,6 +343,21 @@ class ChangedDomainTests(unittest.TestCase):
                 plan = run_tool_tests.commit_tool_plan([name])
                 self.assertTrue(plan)
                 self.assertTrue(all(files is None for files in plan.values()))
+
+    def test_stale_cross_domain_alias_keeps_its_declared_full_domain(self):
+        with tempfile.TemporaryDirectory() as name:
+            root = Path(name)
+            source = root / "tools/measurement/resources.py"
+            source.parent.mkdir(parents=True)
+            source.write_text("# Resource parser fixture.\n")
+            for deleted_source in (False, True):
+                with self.subTest(deleted_source=deleted_source):
+                    if deleted_source:
+                        source.unlink()
+                    with patch.object(run_tool_tests, "ROOT", root):
+                        self.assertEqual(run_tool_tests.commit_tool_plan([
+                            "tools/measurement/resources.py"]),
+                            {"testing": None, "contracts": None})
 
     def test_unknown_namespace_does_not_borrow_another_tools_named_test(self):
         with tempfile.TemporaryDirectory() as name:

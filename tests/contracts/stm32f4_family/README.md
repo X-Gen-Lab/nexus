@@ -1,4 +1,4 @@
-# STM32F4 精确器件内部时钟与 CRC 软件参考
+# STM32F4 精确器件与同源消费软件参考
 
 本目录验证同一 STM32F4 provider 的精确型号、startup、内存与内部 CRC 闭包。
 `f405zg.toml`、`f407zg.toml`、`f415zg.toml`、`f417zg.toml` 分别选择
@@ -6,7 +6,7 @@ STM32F405ZGT6、F407ZGT6、F415ZGT6、F417ZGT6；`f411re.toml`、`f446ze.toml`�
 `f479ni.toml` 分别选择 STM32F411RET6、F446ZET6、F479NIH6。Board JSON 均为软件参考，
 不描述实体 PCB，不替代 `boards/` 中四个 F407 开发板包。
 
-各装配仅选择内部时钟与 CRC，不选择外部振荡源或外设引脚。当前参数如下；完整
+上述七份基础装配仅选择内部时钟与 CRC，不选择外部振荡源或外设引脚。当前参数如下；完整
 静态元组以各 TOML 为准，[System 合同](../../../soc/stm32/stm32f4/system/README.md)
 说明供电、辅助 PLL、启动回读和退出责任。
 
@@ -45,6 +45,40 @@ cmake --build build/f4-family-f405zg
 [`crc_assembly/consumer.c`](../crc_assembly/consumer.c) 和生成的强类型 factory，
 不复制驱动、任务或 Board 生命周期算法。正式安装 SDK 的器件消费者沿
 `tools/maintenance/consumer_profiles.py` 的唯一计划执行，不从本目录推定通过。
+
+## 同一 GPIO 应用跨器件消费
+
+`f407zg-gpio.toml` 和 `f479ni-gpio.toml` 显式选择两个逻辑 signal，均由同一个
+`gpio_consumer.c` 通过强类型 factory 取得。消费 C 不包含芯片、bank、mask 或 pin
+判断；声明 `active_high=true`，由静态装配连接到各自已有 GPIO owner。
+
+| 软件装配 | `status` | `aux` | 准入范围 |
+| --- | --- | --- | --- |
+| `f407zg-gpio.toml` | PG9 | PB2 | 复用已有 F407 路线与同一 C 驱动 |
+| `f479ni-gpio.toml` | PJ0 | PK3 | 精确 F479 bonded pad，新增窄路线事实，复用同一 C 驱动 |
+
+`f407zg-gpio-board/board.json` 与 `f479ni-gpio-board/board.json` 只是软件装配授权，
+不声明 LED、功率输出、PCB 接线或实物电平。F479 的 PK0 不在已审封装名单中，不能
+从 GPIOK 的寄存器存在推导任意 pad 都可用。C 用所选官方器件头形成 bank clock
+mask；resolver 继续负责封装与 Board 路线。退出失败保留实际 clock 收条，直到同一
+owner 成功重试归还；原先存在的 gate 不由此释放。
+
+独立 `gpio/CMakeLists.txt` 默认选择 GPIO 消费源；父目录仍默认选择 CRC。两者复用
+`Reference.cmake` 的同一公共构建与保留检查，不根据 TOML 内容或芯片名称猜测应用。
+例如在仓库根构建 F479 版本：
+
+```sh
+cmake -S tests/contracts/stm32f4_family/gpio -B build/f4-family-f479-gpio -G Ninja \
+  -DCMAKE_TOOLCHAIN_FILE="$PWD/cmake/toolchains/arm-gcc.cmake" \
+  -DCMAKE_BUILD_TYPE=Release -DNEXUS_SOURCE_ROOT="$PWD" \
+  -DPython3_EXECUTABLE="$PWD/.venv/bin/python" \
+  -DNEXUS_ASSEMBLY_FILE="$PWD/tests/contracts/stm32f4_family/f479ni-gpio.toml"
+cmake --build build/f4-family-f479-gpio
+```
+
+F407 使用 `f407zg-gpio.toml` 和另一个构建目录。新增这个同类模式只维护事实、软件
+Board 与装配，不增加中央 resolver／emitter 的型号分支。真实 C 模型、ARM 链接与
+安装 SDK 消费各自提供证据；生成或链接不会证明任何实际 GPIO 已驱动。
 
 ## 验证边界
 

@@ -42,7 +42,7 @@ TEST(LtdcConstants, StaticTimingAndFormatsUseTheOfficialFieldLayout) {
 
 struct Hardware {
     RCC_TypeDef rcc{};
-    GPIO_TypeDef gpio[9]{};
+    GPIO_TypeDef gpio[11]{};
     LTDC_TypeDef registers{};
     LTDC_Layer_TypeDef active[2]{}, shadow[2]{};
     uint32_t enabled[93]{}, pending[93]{}, in_irq[93]{}, priority[93]{};
@@ -504,6 +504,22 @@ TEST_F(LtdcOwner, HALPadsUseAF14AndCloseOnlyWithdrawsTheirParentLeases) {
     EXPECT_EQ(model.rcc.AHB1ENR & 0x1ffU, 0x1ffU);
     EXPECT_EQ(model.gpio[0].MODER, 2U << 6U);
     EXPECT_EQ(model.gpio[0].AFR[0], 7U << 12U);
+}
+
+TEST_F(LtdcOwner, HigherBanksKeepTheSameParentSnapshotAndGateOwnership) {
+    pins[0] = {&model.gpio[9], 9U, 0U};
+    pins[1] = {&model.gpio[10], 10U, 0U};
+    model.rcc.AHB1ENR |= RCC_AHB1ENR_GPIOJEN | RCC_AHB1ENR_GPIOKEN;
+    ASSERT_EQ(nx_stm32_ltdc_prepare(&state, &config), NX_SUCCESS);
+    EXPECT_EQ(model.gpio[9].MODER & 3U, 2U);
+    EXPECT_EQ(model.gpio[10].MODER & 3U, 2U);
+    ASSERT_EQ(finish_stop(), NX_SUCCESS);
+    EXPECT_EQ(model.gpio[9].MODER & 3U, 3U);
+    EXPECT_EQ(model.gpio[10].MODER & 3U, 3U);
+    EXPECT_EQ(snapshots[0], 0x59a5U);
+    EXPECT_EQ(snapshots[1], 0x59a5U);
+    EXPECT_EQ(model.rcc.AHB1ENR & (RCC_AHB1ENR_GPIOJEN | RCC_AHB1ENR_GPIOKEN),
+              RCC_AHB1ENR_GPIOJEN | RCC_AHB1ENR_GPIOKEN);
 }
 
 TEST_F(LtdcOwner, MalformedOrUnpoweredPadsRejectBeforeAnyColdEffect) {

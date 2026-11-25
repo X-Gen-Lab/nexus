@@ -7,6 +7,7 @@ foreach(
     nexus_google_test(${system_target}
         SOURCES "${nexus_google_root}/soc/stm32_system_transaction_test.cpp"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/clock.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/identity.c"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/startup.c"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/power.c"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/supervision.c"
@@ -60,6 +61,7 @@ foreach(ahb_div 2 4)
     nexus_google_test(${ahb_target}
         SOURCES "${nexus_google_root}/soc/stm32_ahb_clock_test.cpp"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/clock.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/identity.c"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/startup.c"
         LIBRARIES Nexus::Core
         INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
@@ -89,6 +91,7 @@ foreach(sdio_high_speed 0 1)
     nexus_google_test(${sdio_system_target}
         SOURCES "${nexus_google_root}/soc/stm32_sdio_system_test.cpp"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/clock.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/identity.c"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/startup.c"
         LIBRARIES Nexus::Core
         INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
@@ -128,6 +131,7 @@ endforeach()
 nexus_google_test(nexus_stm32_silicon_identity_test
     SOURCES "${nexus_google_root}/soc/stm32_silicon_identity_test.cpp"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/clock.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/identity.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/startup.c"
     LIBRARIES Nexus::IO Nexus::Arch
     INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
@@ -164,6 +168,7 @@ foreach(power_rtc_part f407 f411 f446 f479)
     nexus_google_test(${power_rtc_target} STM32F4_LL
         SOURCES "${nexus_google_root}/soc/power_rtc_integration_test.cpp" "${nexus_google_root}/soc/f407_rtc_model.cpp"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/clock.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/identity.c"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/startup.c"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/power.c"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/rtc/rtc.c"
@@ -228,6 +233,7 @@ foreach(input_profile hsi hse hsi_pll48 hse_pll48)
     nexus_google_test(${input_target}
         SOURCES "${nexus_google_root}/soc/stm32_input_clock_test.cpp"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/clock.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/identity.c"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/startup.c"
         LIBRARIES Nexus::Core
         INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
@@ -291,6 +297,7 @@ foreach(family_profile f407 f411 f446 f479)
     nexus_google_test(${family_target}
         SOURCES "${nexus_google_root}/soc/stm32_family_system_test.cpp"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/clock.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/identity.c"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/startup.c"
         LIBRARIES Nexus::IO Nexus::Arch
         INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
@@ -325,6 +332,7 @@ foreach(family_profile f407 f411 f446 f479)
         nexus_google_test(${high_target}
             SOURCES "${nexus_google_root}/soc/stm32_high_clock_test.cpp"
                 "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/clock.c"
+                "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/identity.c"
                 "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/startup.c"
                 "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/power.c"
                 "${NEXUS_SOURCE_DIR}/components/runtime/clock_domain/src/clock_domain.c"
@@ -375,6 +383,7 @@ foreach(aux_case f446_q f479_q f479_r f479_qr)
     nexus_google_test(${aux_target}
         SOURCES "${nexus_google_root}/soc/stm32_sai_system_test.cpp"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/clock.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/identity.c"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/startup.c"
         LIBRARIES Nexus::Core
         INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"

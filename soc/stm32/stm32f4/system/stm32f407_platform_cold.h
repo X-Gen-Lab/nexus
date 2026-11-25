@@ -7,6 +7,7 @@
 #define NX_STM32F407_PLATFORM_COLD_H
 
 #include "private/model.h"
+#include "private/stm32f4_gpio_banks.h"
 #include "private/stm32f4_traits.h"
 #include "system/stm32f407_system.h"
 
@@ -66,6 +67,14 @@ nx_stm32_platform_pin_valid(const nx_stm32_platform_pin_config_t* pin) {
 #ifdef GPIOI
         case 8U:
             return pin->registers == GPIOI;
+#endif
+#ifdef GPIOJ
+        case 9U:
+            return pin->registers == GPIOJ;
+#endif
+#ifdef GPIOK
+        case 10U:
+            return pin->registers == GPIOK;
 #endif
         default:
             return false;

@@ -13,6 +13,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/uart/uart_cold.c"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio/gpio.c"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/clock.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/identity.c"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/startup.c"
         LIBRARIES Nexus::IO
         INCLUDES "${f407_private}" "${NEXUS_SOURCE_DIR}/arch/include"

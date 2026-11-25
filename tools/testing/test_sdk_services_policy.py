@@ -18,6 +18,38 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class SDKServicesPolicyTests(unittest.TestCase):
+    def test_f4_gpio_profiles_share_the_public_consumer_and_exact_board_payload(self):
+        profiles = tuple(item for item in consumer_profiles.SERVICE_CONSUMERS
+                         if item.scenario == "f4_gpio")
+        self.assertEqual({item.assembly for item in profiles},
+                         {"f407zg-gpio.toml", "f479ni-gpio.toml"})
+        prefix = self.prefix()
+        sdk = prefix / "share/nexus/src"
+        relative = Path("tests/contracts/stm32f4_family")
+        shutil.copytree(ROOT / relative, sdk / relative)
+        for profile in profiles:
+            with self.subTest(profile=profile.name):
+                self.assertTrue(profile.arm)
+                self.assertEqual(self.consumers.service_directory(ROOT, profile),
+                                 ROOT / relative)
+                output = self.directory / profile.domain
+                output.mkdir()
+                source, _, command = self.consumers.prepare_service_consumer(
+                    prefix, output, profile, self.command,
+                    expected_revision="a" * 40, fixture=True)
+                self.assertEqual((source / "main.c").read_bytes(),
+                                 (ROOT / relative / "gpio_consumer.c").read_bytes())
+                self.assertEqual((source / "assembly.toml").read_bytes(),
+                                 (ROOT / relative / profile.assembly).read_bytes())
+                board = profile.assembly.removesuffix(".toml") + "-board/board.json"
+                self.assertEqual((source / board).read_bytes(),
+                                 (ROOT / relative / board).read_bytes())
+                self.assertLessEqual({"nx_factory_gpio_signal", "nx_gpio_signal_write",
+                                      "nx_stm32_gpio_ops"},
+                                     self.consumers.service_symbols(profile))
+                self.assertIn("No physical", self.consumers.service_scope(profile))
+                self.assertFalse(any("GPIO" in argument for argument in command))
+
     def test_power_stage_profiles_copy_the_selected_cold_provider_consumers(self):
         profiles = tuple(item for item in consumer_profiles.SERVICE_CONSUMERS
                          if item.scenario == "f4_power_stage")

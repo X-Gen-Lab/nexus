@@ -2424,6 +2424,51 @@
           ]
         }
       }
+    },
+    "f479-gpio-jk": {
+      "controllers": {
+        "GPIOJ": {
+          "kind": "gpio",
+          "irq": [],
+          "pins": [
+            "PJ0",
+            "PJ1",
+            "PJ2",
+            "PJ3",
+            "PJ4",
+            "PJ5",
+            "PJ12",
+            "PJ13",
+            "PJ14",
+            "PJ15"
+          ]
+        },
+        "GPIOK": {
+          "kind": "gpio",
+          "irq": [],
+          "pins": [
+            "PK3",
+            "PK4",
+            "PK5",
+            "PK6",
+            "PK7"
+          ]
+        }
+      },
+      "modes": {
+        "GPIOJ": {
+          "modes": [
+            "input",
+            "output"
+          ]
+        },
+        "GPIOK": {
+          "modes": [
+            "input",
+            "output"
+          ]
+        }
+      }
     }
   },
   "can_domain": {

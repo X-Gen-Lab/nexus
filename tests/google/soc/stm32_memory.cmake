@@ -29,6 +29,7 @@ foreach(memory_variant default ccm invalid)
     )
     nexus_google_test(${memory_target} SOURCES "${nexus_google_root}/soc/stm32_memory_boot_test.cpp"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/clock.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/identity.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/startup.c"
         INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"

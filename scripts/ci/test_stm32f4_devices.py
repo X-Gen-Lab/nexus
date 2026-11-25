@@ -291,6 +291,34 @@ class STM32F4PrivateHeaderCompileTests(unittest.TestCase):
                              '#error "private include changed the device"\n'
                              '#endif\n', "STM32F405xx", preprocess=True)
 
+    def test_production_traits_match_declared_device_and_density_facts(self):
+        gate = implementation()
+        soc = json.loads((ROOT / "soc/stm32/stm32f4/facts/soc.json").read_text())
+        catalog = gate.load_catalog(ROOT)
+        for profile in catalog["devices"]:
+            if profile["id"] not in soc["device_profiles"]:
+                continue
+            parts = [part for part in soc["variants"].values()
+                     if part["device"] == profile["id"]]
+            text = ('#include "stm32f4xx.h"\n'
+                    '#include "private/stm32f4_traits.h"\n'
+                    '#include "private/stm32f4_gpio_banks.h"\n'
+                    f'_Static_assert(NX_STM32_EXTERNAL_IRQ_COUNT == '
+                    f'{profile["external_irq_count"]}U, "declared IRQ extent");\n')
+            for part in parts:
+                flash = part["flash"]["size"]
+                mask = sum(1 << (ord(bank) - ord("A"))
+                           for bank in {pin[1] for pin in part["pins"]})
+                text += (f'_Static_assert({flash}U >= NX_STM32_FLASH_MIN_BYTES && '
+                         f'{flash}U <= NX_STM32_FLASH_MAX_BYTES, "declared density");\n'
+                         f'_Static_assert(({mask}U & ~(uint32_t)NX_STM32_GPIO_CLOCK_MASK) '
+                         '== 0U, "bonded GPIO bank exists");\n'
+                         f'_Static_assert({len(part["pins"])}U <= '
+                         'NX_STM32_GPIO_PIN_CAPACITY, "snapshot capacity");\n')
+            with self.subTest(device=profile["define"]):
+                self.compile("traits-" + profile["define"], text,
+                             profile["define"])
+
     def test_usb_cold_headers_do_not_require_an_ethernet_controller(self):
         for device in ("STM32F405xx", "STM32F407xx"):
             with self.subTest(device=device):

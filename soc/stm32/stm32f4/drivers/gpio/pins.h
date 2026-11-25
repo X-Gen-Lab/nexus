@@ -21,7 +21,7 @@ nx_result_t nx_stm32_pin_configure(GPIO_TypeDef* gpio, uint8_t pin,
 uint16_t nx_stm32_pin_capture(const GPIO_TypeDef* gpio, uint8_t pin);
 /** \brief Restore a captured pin without changing neighboring pin fields. */
 void nx_stm32_pin_restore(GPIO_TypeDef* gpio, uint8_t pin, uint16_t state);
-/** \brief Enable one GPIOA--GPIOI clock with ordered readback. */
+/** \brief Enable one selected device GPIO bank with ordered readback. */
 nx_result_t nx_stm32_gpio_clock_enable(unsigned port_index);
 
 #ifdef __cplusplus

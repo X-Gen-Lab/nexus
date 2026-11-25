@@ -20,7 +20,7 @@ Nexus 为 MCU 提供 C11 通用机制：Core、Arch、类型化 I/O、静态 fac
 | [Board](boards/README.md) | 精确料号、晶振、PCB 接线与电气条件 |
 | [I/O](io/README.md) | 公共接口、检查分派和硬件无关机制 |
 | [OS](os/README.md) | 可选裸机、FreeRTOS、ThreadX 与主机测试后端 |
-| [组件](components/README.md) | algorithms／runtime／buses／devices／services／protocols |
+| [组件](components/README.md) | algorithms／control／runtime／buses／devices／services／protocols |
 | [CMake](cmake/README.md)／[工具](tools/README.md) | 配置、构建、测试与源码 SDK |
 
 ```text

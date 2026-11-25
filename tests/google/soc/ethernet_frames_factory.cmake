@@ -29,6 +29,7 @@ foreach(eth_frames_family stm32)
     nexus_google_test(${eth_frames_target}
         SOURCES "${nexus_google_root}/soc/ethernet_frames_factory_test.cpp" "${eth_frames_bundle}/bindings.c"
             "${NEXUS_SOC_SOURCE_${eth_frames_soc}}/system/clock.c"
+            "${NEXUS_SOC_SOURCE_${eth_frames_soc}}/system/identity.c"
             "${NEXUS_SOC_SOURCE_${eth_frames_soc}}/system/startup.c"
             "${NEXUS_SOC_SOURCE_${eth_frames_soc}}/drivers/gpio/gpio.c"
             "${NEXUS_SOC_SOURCE_${eth_frames_soc}}/drivers/ethernet/ethernet_frames.c"

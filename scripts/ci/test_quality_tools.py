@@ -7,6 +7,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 import quality_tools
 
 
@@ -472,6 +473,123 @@ class RequiredAnalysisTests(unittest.TestCase):
             "print('fixture analysis executed')\n")
         path.chmod(0o700)
         return str(path)
+
+    def test_cppcheck_reuses_only_same_run_compiler_observations(self):
+        driver, log = self.compiler()
+        second = self.source.with_name('second.c')
+        second.write_text('int second(void) { return 2; }\n')
+        entries = [
+            {'directory': str(self.root), 'file': str(source),
+             'arguments': [driver, '-std=c11', '-c', str(source)]}
+            for source in (self.source, second)
+        ]
+        (self.build / 'compile_commands.json').write_text(json.dumps(entries))
+        tool = self.recording_analyzer()
+        self.assertEqual(quality_tools.run(
+            'cppcheck', self.root, self.build, tool, self.report, parallel=2), 0)
+        self.assertEqual(len(self.analyzer_log.read_text().splitlines()), 2)
+        self.assertLessEqual(len(log.read_text().splitlines()), 6,
+                             'one observation and one closing ABI validation')
+        # A later invocation observes the compiler anew, never an old success.
+        self.compiler(identity='23')
+        self.assertEqual(quality_tools.run(
+            'cppcheck', self.root, self.build, tool, self.report, parallel=2), 0)
+        self.assertLessEqual(len(log.read_text().splitlines()), 12)
+        rows = [json.loads(line) for line in
+                self.analyzer_log.read_text().splitlines()]
+        self.assertTrue(all('-D__GNUC__=23' in row for row in rows[2:]))
+
+    def test_changed_compiler_invalidates_shared_observations(self):
+        driver, _ = self.compiler()
+        second = self.source.with_name('second.c')
+        second.write_text('int second(void) { return 2; }\n')
+        entries = [
+            {'directory': str(self.root), 'file': str(source),
+             'arguments': [driver, '-c', str(source)]}
+            for source in (self.source, second)
+        ]
+        (self.build / 'compile_commands.json').write_text(json.dumps(entries))
+        tool = self.root / 'compiler-changing-analyzer'
+        tool.write_text(
+            f'#!{sys.executable}\nimport pathlib,sys\n'
+            "if '--version' in sys.argv: print('fixture'); sys.exit(0)\n"
+            f"pathlib.Path({driver!r}).write_text('#!{sys.executable}\\nimport sys\\nsys.exit(42)\\n')\n")
+        tool.chmod(0o700)
+        self.assertEqual(quality_tools.run(
+            'cppcheck', self.root, self.build, str(tool), self.report), 1,
+            'replacement must invalidate the shared compiler observation')
+
+    def test_closing_compiler_cancellation_preserves_exit_130(self):
+        driver, log = self.compiler()
+        compiler = Path(driver)
+        compiler.write_text(compiler.read_text().replace(
+            "if '--version' in sys.argv:\n print('fixture compiler identity'); sys.exit(0)",
+            "if '--version' in sys.argv:\n"
+            f" rows=[json.loads(line) for line in open({str(log)!r})]\n"
+            " if sum('--version' in row for row in rows) > 1:\n"
+            "  import os,signal,time\n"
+            "  os.kill(os.getppid(),signal.SIGTERM); time.sleep(0.2)\n"
+            " print('fixture compiler identity'); sys.exit(0)"))
+        (self.build / 'compile_commands.json').write_text(json.dumps([
+            {'directory': str(self.root), 'file': str(self.source),
+             'arguments': [driver, '-c', str(self.source)]}]))
+        self.assertEqual(quality_tools.run(
+            'cppcheck', self.root, self.build, self.recording_analyzer(),
+            self.report), 130)
+
+    def test_cppcheck_shares_foreign_inventory_without_merging_analysis(self):
+        driver, _ = self.compiler()
+        second = self.source.with_name('second.c')
+        second.write_text('int second(void) { return 2; }\n')
+        headers = self.root / 'vendors/fixture/include'
+        headers.mkdir(parents=True)
+        header = headers / 'header.h'
+        header.write_text('typedef unsigned fixture_word;\n')
+        entries = [
+            {'directory': str(self.root), 'file': str(source),
+             'arguments': [driver, '-isystem', str(headers), '-c', str(source)]}
+            for source in (self.source, second)
+        ]
+        (self.build / 'compile_commands.json').write_text(json.dumps(entries))
+        with patch.object(quality_tools, 'external_system_headers',
+                          wraps=quality_tools.external_system_headers) as scan:
+            self.assertEqual(quality_tools.run(
+                'cppcheck', self.root, self.build, self.recording_analyzer(),
+                self.report, parallel=2), 0)
+            self.assertLessEqual(scan.call_count, 2,
+                                 'one inventory plus its closing validation')
+        self.assertEqual(len(self.analyzer_log.read_text().splitlines()), 2)
+        self.assertIn(str(header), self.report.read_text())
+
+    def test_changed_foreign_alias_cannot_hide_owned_diagnostics(self):
+        driver, _ = self.compiler()
+        second = self.source.with_name('second.c')
+        second.write_text('int second(void) { return 2; }\n')
+        owned = self.root / 'os/owned.h'
+        owned.parent.mkdir()
+        owned.write_text('extern int dangerous(void);\n')
+        alias = self.root / 'vendors/fixture/include/alias.h'
+        alias.parent.mkdir(parents=True)
+        alias.write_text('extern int foreign(void);\n')
+        entries = [
+            {'directory': str(self.root), 'file': str(source),
+             'arguments': [driver, '-isystem', str(alias.parent),
+                           '-c', str(source)]}
+            for source in (self.source, second)
+        ]
+        (self.build / 'compile_commands.json').write_text(json.dumps(entries))
+        tool = self.root / 'alias-changing-analyzer'
+        tool.write_text(
+            f'#!{sys.executable}\nimport pathlib,sys\n'
+            "if '--version' in sys.argv: print('fixture'); sys.exit(0)\n"
+            f'alias=pathlib.Path({str(alias)!r})\n'
+            'if not alias.is_symlink():\n'
+            f' alias.unlink(); alias.symlink_to({str(owned)!r}); sys.exit(0)\n'
+            f"sys.exit(0 if {'--suppress=*:' + str(alias)!r} in sys.argv else 2)\n")
+        tool.chmod(0o700)
+        self.assertEqual(quality_tools.run(
+            'cppcheck', self.root, self.build, str(tool), self.report), 1,
+            'changed ownership must invalidate earlier header exclusions')
 
     def test_cppcheck_imports_actual_compiler_and_target_per_duplicate_source(self):
         first, first_log = self.compiler("one-gcc", "17")

@@ -97,7 +97,7 @@ def os_selection(typed, data):
         "runtime_stack_peak": "not_measured", "restrictions": restrictions}
 
 
-def selection(assembly, root=ROOT, *, test_support=False):
+def selection(assembly, root=ROOT, *, test_support=False, evidence=()):
     """Describe one validated selection; execution has a separate authority.
 
     Family declarations cannot establish a selected Board/backend/clock tuple.
@@ -168,9 +168,92 @@ def selection(assembly, root=ROOT, *, test_support=False):
                             "hardware qualification.",
                             *[item for item in data.get("limitations", [])
                               if item != "Physical qualification not executed"]]}
+    if evidence:
+        result["evidence"] = [selection_evidence(path, typed, root,
+            test_support=test_support) for path in evidence]
+        if any(item["status"] == "identity_matched" for item in result["evidence"]):
+            validation["arm_image"] = "identity_matched"
     return result
 
 
+def selection_evidence(path, typed, root, *, test_support):
+    """Associate existing reports by observed bytes, never reported success."""
+    from tools.configure import emission
+    from tools.evidence.common import file_identity, load_json, verify_file_identity
+    from tools.evidence.identity import (
+        observe_git_source, resolved_identity, resolved_input_files, verify_sdk_package)
+    from tools.measurement import resources
+    from tools.measurement.elf import Elf32
+
+    report_identity = file_identity(path)
+    report = load_json(path)
+    result = {"report": report_identity, "kind": report.get("kind"),
+        "status": "not_assessed", "software_qualified": False,
+        "identities": {"source": "not_recorded", "configuration": "not_assessed",
+            "backend_modes": "not_assessed", "inputs": "not_assessed",
+            "artifact": "not_assessed"},
+        "reason": "unsupported_report_kind"}
+    if report.get("kind") not in ("elf_resource_budget", "build_provenance"):
+        return result
+    try:
+        if type(report.get("schema_version")) is not int or report["schema_version"] != 1:
+            raise ValueError("unsupported evidence report schema")
+        configuration = report.get("resolved", report.get("configuration"))
+        resolved_path = verify_file_identity(configuration)
+        resolved, resolved_file = resolved_identity(resolved_path,
+                                                    allow_reference=test_support)
+        if resolved != emission.resolved_projection(typed):
+            result["identities"]["configuration"] = "mismatched"
+            raise ValueError("report configuration differs from the selected assembly")
+        inputs = resolved_input_files(resolved_path, resolved)
+        result["identities"].update(configuration="matched", backend_modes="matched")
+        if report["kind"] == "elf_resource_budget":
+            elf = verify_file_identity(report["elf"])
+            budget = verify_file_identity(report["budget"])
+            # The selected projection was verified above. Reuse only this
+            # observation inside the same read; no report success is cached.
+            def read_inputs(path, *, allow_reference):
+                if path != resolved_path:
+                    raise ValueError("resource report changed its configuration")
+                return resolved, resolved_file, inputs
+            actual = resources.measure(elf, resolved_path, budget,
+                require_cpu=True, allow_reference=test_support, read_inputs=read_inputs)
+            if actual != report:
+                raise ValueError("resource report differs from its actual inputs or ELF")
+            result["identities"].update(inputs="matched", artifact="matched")
+            result["reason"] = "source_identity_not_recorded"
+        else:
+            from tools.dev.provenance import verify_provenance
+            verify_provenance(report)
+            expected_source = report["source"]
+            result["identities"]["source"] = "not_assessed"
+            if (root / ".nexus-source-sdk.json").exists():
+                package = verify_sdk_package(root)
+                actual_source = {"kind": "source_sdk",
+                    "source_revision": package["source_revision"],
+                    "source_tree": package["source_tree"],
+                    "manifest": file_identity(root / ".nexus-source-sdk.json")}
+            else:
+                actual_source = observe_git_source(root)
+            if expected_source != actual_source:
+                result["identities"]["source"] = "mismatched"
+                raise ValueError("report source identity differs from the current source")
+            images = [item for item in report["artifacts"]
+                      if Path(item["path"]).suffix == ".elf"]
+            if not images:
+                raise ValueError("build provenance contains no ARM ELF artifact")
+            for image in images:
+                elf = Elf32(verify_file_identity(image).read_bytes(),
+                    float_abi=resources.resolved_float_abi(resolved, require_cpu=True))
+                resources.validate_elf_configuration(elf, resolved)
+            result["identities"].update(source="matched", inputs="matched",
+                                        artifact="matched")
+            result.update(status="identity_matched", reason="identities_verified")
+        if file_identity(path) != report_identity:
+            raise ValueError("report changed during identity association")
+    except (OSError, ValueError, KeyError, TypeError) as error:
+        result.update(status="not_assessed", reason=str(error))
+    return result
 
 
 def c_code(source):
@@ -354,16 +437,20 @@ def main(arguments=None, *, support_command=False):
                         help="print exact selected support JSON, not execution "
                              "qualification")
     parser.add_argument("--json", action="store_true")
+    parser.add_argument("--evidence", type=Path, action="append", default=[],
+                        help="associate an existing resource/provenance report by identity")
     parser.add_argument("--root", type=Path, default=ROOT)
     parser.add_argument("--test-support", action="store_true",
                         help="explicitly query a host test fixture")
     args = parser.parse_args(arguments)
     if support_command and (args.assembly is None or args.write or args.check):
         parser.error("support requires --assembly and is a read-only query")
+    if args.evidence and args.assembly is None:
+        parser.error("--evidence requires an exact --assembly")
     try:
         if args.assembly is not None:
             result = selection(args.assembly, args.root,
-                               test_support=args.test_support)
+                               test_support=args.test_support, evidence=args.evidence)
             print(json.dumps(result, indent=2, sort_keys=True))
             return 0
         examples = documentation.check(args.root)

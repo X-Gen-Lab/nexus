@@ -34,6 +34,21 @@ For current F4 DMA, verify selected SRAM reachability and exclude CCM. DMA
 completion, peripheral wire completion and borrow settlement remain separate.
 No cache contract is inferred from a retired chip reference.
 
+For a maintained whole-component example, use the
+[F407 network reference](../../tests/contracts/f407_qiming_network/README.md).
+It links the real selected MAC rings and RX payloads, DP83848, copied-RX lwIP
+TCP, TLS and MQTT under one baremetal assembly. Its resource report includes the
+8 KiB MSP reservation; there are no RTOS task stacks or libc heap in that exact
+assembly. Read the ELF total before using the documented symbol groups to locate
+costs. A 64 KiB TLS arena or an lwIP pool count alone is not a subsystem budget.
+
+This reference deliberately lacks trusted UTC and does not establish an
+authenticated MCU session. Linked costs, host protocol execution, actual
+allocator/stack high-water and physical network operation remain separate
+observations. Keep the current profile when it meets the product budget; only
+introduce a narrower profile after measuring a real constraint and verifying its
+preserved behavior.
+
 ## Compare costs without changing the question
 
 Resource regression compares equivalent CPU, ABI, optimization, clock, backend,

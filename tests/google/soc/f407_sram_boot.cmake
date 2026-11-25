@@ -12,6 +12,7 @@ nexus_google_test(nexus_f407_sram_boot_test STM32F4_LL
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/sram_boot.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/memory.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/clock.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/identity.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/system/startup.c"
         "${NEXUS_SOURCE_DIR}/vendors/st/stm32f4_hal/Src/stm32f4xx_ll_fsmc.c"
     LIBRARIES Nexus::IO

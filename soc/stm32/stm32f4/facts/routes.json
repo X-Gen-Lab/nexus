@@ -18837,6 +18837,46 @@
           "controller:TIM13"
         ]
       }
+    },
+    {
+      "id": "gpio-pj0",
+      "variants": [
+        "STM32F479NIH6"
+      ],
+      "controller": "GPIOJ",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PJ0",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS11118 Rev8 reviewed TFBGA216 bonded pad and RM0386 GPIO IP; exact silicon route only, no PCB wiring or physical qualification"
+    },
+    {
+      "id": "gpio-pk3",
+      "variants": [
+        "STM32F479NIH6"
+      ],
+      "controller": "GPIOK",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PK3",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS11118 Rev8 reviewed TFBGA216 bonded pad and RM0386 GPIO IP; exact silicon route only, no PCB wiring or physical qualification"
     }
   ]
 }

@@ -58,6 +58,28 @@ cmake -S tests/contracts/f407_qiming_network -B /absolute/new/build -G Ninja \
 cmake --build /absolute/new/build --parallel 1
 ```
 
+构建的 `bin/f407_qiming_network_reference.resources.json` 是这份完整组合的资源
+结果：`metrics.flash.loaded_bytes` 为实际 Flash LOAD，
+`metrics.ram.sram.reserved_bytes` 已包含 MSP，不能再加一次8 KiB；
+`metrics.reservations` 分别列出 MSP 与 heap。该 baremetal 装配没有 RTOS task stack，
+不将其零预留解释为通用组件或 RTOS 组合不需要栈。
+
+按下表定位成本；各行有包含关系，不把所有数值再次相加到 ELF 总数：
+
+| 范围 | 当前装配包含的存储 | 实际核对入口 |
+| --- | --- | --- |
+| TLS | 64 KiB arena、512 B stage、runtime 和 session | `main.c` 的 `tls_*`，符号表中的实际布局 |
+| lwIP | 16 KiB arena、24×512 B payload 与 pool／协议元数据 | `ram_heap`、`memp_memory_*` 与选定 lwIP profile |
+| MAC | 2 TX／2 RX descriptors、RX payload、slots 和 owner | 生成的 bindings 与 `s_nx_eth_*`、`s_nx_port_mac` |
+| 网络组合 | 1514 B TX、2 fragment views、TCP／PHY context | `network*`、`tcp_client`、`phy` |
+| MQTT | 1024 B网络 buffer、ACK／control 各2项、session | `mqtt_*`，不是 TLS stage 的别名 |
+| 栈与其他 | MSP8 KiB、零 libc heap，以及剩余全局状态／对齐 | resource report、ELF sections 与 map |
+
+需要分项时用同一锁定工具链的 `arm-none-eabi-nm -S --size-sort` 读取该 ELF；
+symbols 只是分项视图，最终总数仍按真实 RAM 区间并集核算。固定 arena 容量、
+链接成功和预留栈不证明实际握手峰值或 stack high-water。只有实际组合不满足预算时
+再选择更窄 profile，并重新验证相应行为；不因单个大数组存在就裁减 TLS 能力。
+
 分离 staging 时可传 `NEXUS_REFERENCE_ROOT`。每次记录 C11／CPU／ABI／option、
 map、ELF／BIN hash、heap symbol、resolved 和资源。typed Os 不因 CMake IPO=ON
 自动变 LTO，实验需证明真实 `-flto` compile／link。

@@ -306,6 +306,8 @@ def service_sources(sdk, specification):
         name = (board / "board.json").as_posix()
         if specification.scenario == "f4_family":
             consumer = Path(sdk) / "tests/contracts/crc_assembly/consumer.c"
+        elif specification.scenario == "f4_gpio":
+            consumer = verification / "gpio_consumer.c"
         elif (specification.scenario == "f4_graphics_sdram" or
               (specification.scenario == "f4_graphics" and
                specification.assembly != "image-only.toml")):
@@ -415,6 +417,7 @@ def prepare_service_consumer(prefix, directory, specification, run_checked, *,
         "smbus": "Nexus::SMBus",
         "image_window": "",
         "f4_family": "",
+        "f4_gpio": "",
         "f4_crypto": "",
         "f4_sdram": "",
         "f4_qspi": "",
@@ -914,6 +917,10 @@ def service_symbols(specification):
                           "flash_area_read", "flash_area_write",
                           "flash_area_erase", "nx_factory_flash", "bootutil_keys",
                           "bootutil_key_cnt"})
+    if specification.scenario == "f4_gpio":
+        return frozenset({"nx_platform_start", "nx_platform_stop",
+                          "nx_factory_gpio_signal", "nx_gpio_signal_write",
+                          "nx_stm32_gpio_ops"})
     if specification.scenario == "f4_family":
         return frozenset({"nx_platform_start", "nx_platform_stop",
                           "nx_chip_info_read", "nx_factory_crc",
@@ -1056,6 +1063,11 @@ def service_scope(specification):
                 "SD high-speed or MMC HS52; ARM C11 link, resources and "
                 "method retention only. No physical card, electrical margin, "
                 "throughput, power entry or HIL qualification.")
+    if specification.scenario == "f4_gpio":
+        return ("Same public logical GPIO consumer on exact F407ZG and F479NI "
+                "software routes; ARM C11 link, resources and method retention "
+                "only. No physical Board, output waveform, startup execution, "
+                "measured timing or HIL qualification.")
     if specification.scenario == "f4_family":
         return ("Selected exact F4 internal HSI16/CRC C11 link, "
                 "resources and method retention only. No external PCB, "

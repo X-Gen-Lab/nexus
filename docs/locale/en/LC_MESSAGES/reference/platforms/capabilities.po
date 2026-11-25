@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 2a71ea44fedcbee89d53abac81b55e101f91c71f1514ebf8b480c4cf80ee3b1a\n"
+"X-Nexus-Source-SHA256: dfb7816b7dadf924a843afbf88e68d089659ac74b871a6b254bcca05b488ae7f\n"
 
 #: ../../../../../docs/reference/platforms/capabilities.md:9
 msgid "当前派生能力矩阵"
@@ -1386,20 +1386,6 @@ msgstr ""
 "`gpio-pb6`, `gpio-pb7`, `gpio-pb8`, `gpio-pb9`"
 
 #: ../../../../../docs/reference/platforms/capabilities.md:0
-msgid ""
-"`tests/contracts/declared_io_assembly/f407-output.toml`, "
-"`tools/configure/assemblies/sky-baremetal-gpio.toml`, "
-"`tools/configure/assemblies/sky-baremetal.toml`, "
-"`tools/configure/assemblies/sky-freertos-gpio.toml`, "
-"`tools/configure/assemblies/sky-freertos.toml`"
-msgstr ""
-"`tests/contracts/declared_io_assembly/f407-output.toml`, "
-"`tools/configure/assemblies/sky-baremetal-gpio.toml`, "
-"`tools/configure/assemblies/sky-baremetal.toml`, "
-"`tools/configure/assemblies/sky-freertos-gpio.toml`, "
-"`tools/configure/assemblies/sky-freertos.toml`"
-
-#: ../../../../../docs/reference/platforms/capabilities.md:0
 msgid "GPIOC"
 msgstr "GPIOC"
 
@@ -1528,10 +1514,6 @@ msgstr ""
 #: ../../../../../docs/reference/platforms/capabilities.md:0
 msgid "`tests/contracts/declared_io_assembly/f407-input.toml`"
 msgstr "`tests/contracts/declared_io_assembly/f407-input.toml`"
-
-#: ../../../../../docs/reference/platforms/capabilities.md:0
-msgid "`tests/contracts/declared_io_assembly/f407.toml`"
-msgstr "`tests/contracts/declared_io_assembly/f407.toml`"
 
 #: ../../../../../docs/reference/platforms/capabilities.md:0
 msgid "GPIOH"
@@ -3814,3 +3796,50 @@ msgstr ""
 #: ../../../../../docs/reference/platforms/capabilities.md:0
 msgid "`soc/stm32/stm32f4/drivers/watchdog/window_watchdog.c`"
 msgstr "`soc/stm32/stm32f4/drivers/watchdog/window_watchdog.c`"
+
+msgid ""
+"GPIOJ"
+msgstr ""
+"GPIOJ"
+
+msgid ""
+"GPIOK"
+msgstr ""
+"GPIOK"
+
+msgid ""
+"`gpio-pj0`"
+msgstr ""
+"`gpio-pj0`"
+
+msgid ""
+"`gpio-pk3`"
+msgstr ""
+"`gpio-pk3`"
+
+msgid ""
+"`tests/contracts/declared_io_assembly/f407-output.toml`, "
+"`tests/contracts/stm32f4_family/f407zg-gpio.toml`, "
+"`tools/configure/assemblies/sky-baremetal-gpio.toml`, "
+"`tools/configure/assemblies/sky-baremetal.toml`, "
+"`tools/configure/assemblies/sky-freertos-gpio.toml`, "
+"`tools/configure/assemblies/sky-freertos.toml`"
+msgstr ""
+"`tests/contracts/declared_io_assembly/f407-output.toml`, "
+"`tests/contracts/stm32f4_family/f407zg-gpio.toml`, "
+"`tools/configure/assemblies/sky-baremetal-gpio.toml`, "
+"`tools/configure/assemblies/sky-baremetal.toml`, "
+"`tools/configure/assemblies/sky-freertos-gpio.toml`, "
+"`tools/configure/assemblies/sky-freertos.toml`"
+
+msgid ""
+"`tests/contracts/declared_io_assembly/f407.toml`, "
+"`tests/contracts/stm32f4_family/f407zg-gpio.toml`"
+msgstr ""
+"`tests/contracts/declared_io_assembly/f407.toml`, "
+"`tests/contracts/stm32f4_family/f407zg-gpio.toml`"
+
+msgid ""
+"`tests/contracts/stm32f4_family/f479ni-gpio.toml`"
+msgstr ""
+"`tests/contracts/stm32f4_family/f479ni-gpio.toml`"
