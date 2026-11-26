@@ -1,5 +1,5 @@
 """Select two fixed C GPIO model calls; no runtime algorithm is generated."""
-from tools.configure.calls import Address, DirectCall
+from tools.configure.generation.calls import Address, DirectCall
 from tools.configure.ir import ControllerIR
 from tools.configure.providers.common import Construction
 

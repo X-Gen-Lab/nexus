@@ -100,7 +100,7 @@ class QimingHilPreparationTests(unittest.TestCase):
     def test_board_only_schema_lock_does_not_ban_the_shared_part(self):
         from tools.hil.admit import SOFTWARE_REFERENCE_BOARD_TARGETS
         schema = json.loads((ROOT /
-            "tools/schemas/hil-fixture.schema.json").read_text())
+            "tools/hil/schemas/hil-fixture.schema.json").read_text())
         targets = schema["$defs"]["software_reference_board_target"]["oneOf"]
         self.assertEqual({(item["properties"]["board"]["const"],
                            item["properties"]["part"]["const"])

@@ -8,7 +8,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Union
 
-from tools.configure.calls import Address, DirectCall, Symbol
+from tools.configure.generation.calls import Address, DirectCall, Symbol
 
 
 def _sequence(values, purpose):

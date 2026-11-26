@@ -141,10 +141,12 @@ def _api_roots(root):
                 yield root / entry
 
 
-def inputs(root):
+def inputs(root, *, rendered=None):
     """Observe authored, included, API and renderer inputs as actual bytes."""
-    paths = set(check.sources(root)) | set(check.adjacent_sources(root))
-    paths.update(check.dependencies(root))
+    if rendered is None:
+        pages = check.sources(root)
+        rendered = set(pages) | check.dependencies(root, pages)
+    paths = set(rendered) | set(check.adjacent_sources(root))
     for name in ("Doxyfile", "LICENSE", "dependencies/platform-compatibility.json",
                  "dependencies/docs-tools.lock.json",
                  "dependencies/docs-python-linux-cp312.txt"):
@@ -247,13 +249,20 @@ def _admit(root, work, tool_prefix, *, parallel):
 
     def source():
         started = time.perf_counter()
-        identity, observed = observe_git_source(root), inputs(root)
+        identity = observe_git_source(root)
+        pages = check.sources(root)
+        rendered_paths = set(pages) | check.dependencies(root, pages)
+        observed = inputs(root, rendered=rendered_paths)
         parser = _parser_inputs(observed)
         rendered = {path.relative_to(root).as_posix()
-                    for path in (*check.sources(root), *check.dependencies(root))}
+                    for path in rendered_paths}
         snapshot_seconds = time.perf_counter() - started
         started = time.perf_counter()
-        report = check.scan(root)
+        # This admission already validated the include closure. The build's
+        # diagram gate below owns the prepared renderer; standalone check
+        # retains both validations by default.
+        report = check.scan(root, check_diagram_outputs=False,
+                            check_dependencies=False)
         record(work / "source-check.json", report)
         return ((identity, observed, parser, rendered, report), snapshot_seconds,
                 time.perf_counter() - started)

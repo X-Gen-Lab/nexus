@@ -4,7 +4,8 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from tools.configure import authored, bindings, configure as gate, selected_contracts
+from tools.configure import authored, configure as gate, selected_contracts
+from tools.configure.generation import bindings
 from tools.configure.tests.f4_fixture import provider as f4_provider
 
 adc_group = f4_provider("STM32F407ZGT6").ADC_GROUP

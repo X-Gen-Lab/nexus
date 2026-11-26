@@ -13,7 +13,7 @@ from unittest.mock import patch
 
 from scripts.ci import tdd_gate
 from tools.evidence.common import file_identity
-from tools.testing import gate_fixture
+from tools.testing.support import gate_fixture
 
 
 def exercise_links():

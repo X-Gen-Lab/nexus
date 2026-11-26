@@ -5,7 +5,8 @@ from functools import cache
 import unittest
 
 from tools.configure import io_traits
-from tools.configure import configure, factory
+from tools.configure import configure
+from tools.configure.generation import factory
 from tools.configure.ir import ControllerIR
 
 

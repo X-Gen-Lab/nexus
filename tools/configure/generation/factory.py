@@ -9,7 +9,7 @@ from tools.configure import io_traits, selected_contracts
 from tools.configure.providers import for_selection
 from tools.configure import enhanced_endpoints
 from tools.configure import stream_profiles, uart_formats, usb_profiles
-from tools.configure.calls import Symbol
+from tools.configure.generation.calls import Symbol
 from tools.configure import usb_otg
 
 FACTORY_ABI_EPOCH = 7

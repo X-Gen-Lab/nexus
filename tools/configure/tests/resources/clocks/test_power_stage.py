@@ -4,7 +4,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from tools.configure import bindings, factory
+from tools.configure.generation import bindings, factory
 from tools.configure.configure import resolve_ir
 from tools.configure.providers.common import ConfigurationError
 

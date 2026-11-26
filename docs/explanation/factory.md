@@ -125,8 +125,8 @@ stop without granting readiness, resource ownership or execution permission.
 
 The default-disabled option emits no diagnostic text or runtime lookup objects.
 Named ordinal constants alone occupy no runtime storage. See the actual
-[factory emitter](../../tools/configure/factory.py),
-[binding emitter](../../tools/configure/bindings.py),
+[factory emitter](../../tools/configure/generation/factory.py),
+[binding emitter](../../tools/configure/generation/bindings.py),
 [configuration regressions](../../tools/configure/tests/emission/test_factory_diagnostics.py)
 and [generated Native factory tests](../../tests/behavior/io/native_factory_test.cpp).
 These source/test locations are review entry points, not downloadable execution

@@ -10,8 +10,8 @@ from tools.configure.data_provider import Binding
 from tools.configure.ir import (DmaMemoryBindingIR, EndpointIR, InterruptBindingIR,
                                 PadBindingIR, mode_options)
 from tools.configure.records import freeze
-from tools.configure.calls import Symbol
-from tools.configure.static_ir import Flags
+from tools.configure.generation.calls import Symbol
+from tools.configure.generation.static_ir import Flags
 from tools.configure.tests.device_fixture import load_binding_facts
 
 ROOT = Path(__file__).resolve().parents[5]

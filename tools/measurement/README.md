@@ -1,5 +1,8 @@
 # 链接后资源成本与测量边界
 
+[资源预算 schema](resource-budget.schema.json)说明编辑时使用的 JSON 字段。
+实际测量还核对映像、装配输入和预算身份，并检查字段间约束。
+
 `resources.py` 从真实 ARM ELF 的 LOAD、RAM 区间并集和链接器保留区测量 Flash、
 RAM、MSP 与 heap。`interfaces.py` 单独检查只读接口对象和共享操作表。源码行数或
 选中控制器的数量不能证明最终镜像成本。

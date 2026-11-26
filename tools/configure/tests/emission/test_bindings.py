@@ -9,7 +9,7 @@ import unittest
 from unittest.mock import patch
 
 from tools.configure.tests.assembly_fixture import render_toml
-from tools.configure import bindings
+from tools.configure.generation import bindings
 from tools.configure import configure as gate
 
 

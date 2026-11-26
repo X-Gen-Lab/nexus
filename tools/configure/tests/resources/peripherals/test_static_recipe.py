@@ -7,8 +7,8 @@ import tempfile
 from types import MappingProxyType
 import unittest
 
-from tools.configure.static_recipe import StaticRecipe
-from tools.configure.calls import Symbol
+from tools.configure.generation.static_recipe import StaticRecipe
+from tools.configure.generation.calls import Symbol
 
 
 @dataclass(frozen=True)
@@ -261,7 +261,7 @@ class StaticRecipeTests(unittest.TestCase):
         self.assertIn(".encoding = GPIO_ENCODING(3u, GPIO_SPEED)", value)
 
     def test_static_values_owner_connections_and_prepare_sequences_are_finite(self):
-        from tools.configure.static_ir import Flags
+        from tools.configure.generation.static_ir import Flags
 
         @dataclass(frozen=True)
         class Assembly:

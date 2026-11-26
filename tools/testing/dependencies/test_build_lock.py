@@ -17,7 +17,7 @@ from unittest.mock import patch
 
 from tools.dev import dev, process
 from scripts.ci import native_contracts
-from tools.testing import gate_fixture
+from tools.testing.support import gate_fixture
 
 ROOT = Path(__file__).resolve().parents[3]
 

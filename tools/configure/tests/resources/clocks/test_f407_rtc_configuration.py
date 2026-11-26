@@ -8,7 +8,8 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from tools.configure import authored, bindings, factory, gpio_phase
+from tools.configure import authored, gpio_phase
+from tools.configure.generation import bindings, factory
 from tools.configure import configure as gate
 from tools.configure.providers import for_selection
 

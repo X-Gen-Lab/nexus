@@ -4,7 +4,8 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from tools.configure import bindings, configure as gate, device_view
+from tools.configure import configure as gate, device_view
+from tools.configure.generation import bindings
 from tools.configure.tests.native_fixture import native_fixture
 from tools.configure.tests.device_fixture import load_authored_soc
 

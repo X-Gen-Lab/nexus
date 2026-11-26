@@ -1139,7 +1139,8 @@ class GeneratedFaceInitializerTests(unittest.TestCase):
         return source
 
     def test_actual_qspi_recipe_exposes_bus_readonly_and_async_faces(self):
-        from tools.configure import bindings, configure
+        from tools.configure import configure
+        from tools.configure.generation import bindings
         result = configure.resolve_ir(configure.ROOT /
             "tests/integration/assemblies/stm32f4_qspi/f479ni-qspi.toml")
         source = bindings.emit(result)[1]
@@ -1154,7 +1155,8 @@ class GeneratedFaceInitializerTests(unittest.TestCase):
              "nx_stm32_qspi_async_ops", "s_nx_port_serial")})
 
     def test_actual_usb_recipe_retains_all_uint_indexed_endpoint_faces(self):
-        from tools.configure import bindings, configure
+        from tools.configure import configure
+        from tools.configure.generation import bindings
         result = configure.resolve_ir(configure.ROOT /
             "tests/integration/assemblies/usb_assembly/stm32-ve.toml")
         source = bindings.emit(result)[1]

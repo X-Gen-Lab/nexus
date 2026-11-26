@@ -7,7 +7,8 @@ identity, policy data, call ordering and retention rather than emitted algorithm
 from tools.configure.tests.native_fixture import native_fixture
 import unittest
 
-from tools.configure import bindings, configure as gate, gpio_phase
+from tools.configure import configure as gate, gpio_phase
+from tools.configure.generation import bindings
 from tools.configure.providers import for_selection
 
 

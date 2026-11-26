@@ -10,7 +10,7 @@ REQUIRED = frozenset(("role", "lines", "word_bits", "irq_latency_us"))
 def validate_policy(value):
     """Admit finite frame capabilities without owning physical pin routes."""
     from collections.abc import Mapping
-    from tools.configure.calls import Symbol
+    from tools.configure.generation.calls import Symbol
     if (not isinstance(value, Mapping) or set(value) != {
             "controllers", "word_bits", "crc_odd_required", "crc_one_wire"}):
         fail("SPI frame policy requires exact controller and format facts")

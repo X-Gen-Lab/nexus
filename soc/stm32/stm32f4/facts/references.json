@@ -385,7 +385,7 @@
             "handling": "Maintained C compilation does not emit these SP loads. External assembly must load a general register then MOV SP; review linked reachable assembly when adding an ISR/context port. A host model cannot prove the silicon instruction interleaving. Basic CRYP/HASH reuse this CPU external constraint; implementation uses C11 with no new assembly/context switching or blanket application-code qualification.",
             "implementation": [
               "arch/arm/cortex_m/nx_arch_cortex_m.c",
-              "tools/configure/bindings.py",
+              "tools/configure/generation/bindings.py",
               "soc/stm32/stm32f4/drivers/crypto/cipher.c",
               "soc/stm32/stm32f4/drivers/crypto/hash.c",
               "soc/stm32/stm32f4/drivers/crypto/crypto_irq.c"
@@ -407,7 +407,7 @@
             "handling": "Retain the FreeRTOS CM4F lazy-frame ABI. Generated entries call real handlers and end in DSB; linked entries and external/kernel overrides must execute more than two instructions excluding exception return, counting reachable callees. The absence of VDIV in a platform-only image does not qualify external application code. Basic CRYP/HASH reuse this CPU external constraint; implementation uses C11 with no new assembly/context switching or blanket application-code qualification.",
             "implementation": [
               "arch/arm/cortex_m/nx_arch_cortex_m.c",
-              "tools/configure/bindings.py",
+              "tools/configure/generation/bindings.py",
               "soc/stm32/stm32f4/drivers/crypto/cipher.c",
               "soc/stm32/stm32f4/drivers/crypto/hash.c",
               "soc/stm32/stm32f4/drivers/crypto/crypto_irq.c"
@@ -429,7 +429,7 @@
             "handling": "Every generator-owned F4 IRQ entry ends in nx_arch_dsb before its outer return; generation handles accepted thin-entry whitespace and refuses early returns. The handwritten TIM2 and low-power SysTick entries also issue a final DSB after their real handlers. Normal FreeRTOS uses a Nexus-owned entry calling the renamed real kernel tick then DSB, without modifying vendor code. Arch restore barriers do not substitute for these final stores. External/overridden entries remain responsible for the same rule. The maintained ThreadX M4 SysTick assembly calls the real _tx_timer_interrupt, restores registers, executes DSB SY and only then BX LR; its actual linked entry is checked separately. The new basic CRYP and HASH_RNG thin entries dispatch their true selected C owners and retain the same final outer DSB. A static two-byte vector receipt owns only CRYP79 or shared HASH_RNG80; HASH currently shares with polling RNG, not an independent RNG IRQ publisher. CM1 frame sessions reuse the same selected DCMI/DMA2 thin entries and their true C handlers; every generated outer entry still ends in DSB. No additional interrupt owner is introduced. Continuous CM0 JPEG storage blocks reuse the same two thin DCMI/DMA2 entry paths and their final DSB; FRAME notification is masked and does not become a frame boundary or a software frame owner.",
             "implementation": [
               "arch/arm/cortex_m/nx_arch_cortex_m.c",
-              "tools/configure/bindings.py",
+              "tools/configure/generation/bindings.py",
               "soc/stm32/stm32f4/system/clock.c",
               "soc/stm32/stm32f4/system/timebase_lowpower.c",
               "os/freertos/systick.c",
@@ -1976,7 +1976,7 @@
             "handling": "Maintained C compilation does not emit these SP loads. External assembly must load a general register then MOV SP; review linked reachable assembly when adding an ISR/context port. A host model cannot prove the silicon instruction interleaving.",
             "implementation": [
               "arch/arm/cortex_m/nx_arch_cortex_m.c",
-              "tools/configure/bindings.py"
+              "tools/configure/generation/bindings.py"
             ],
             "regressions": [
               "tools/configure/tests/resources/peripherals/test_irq_errata.py"
@@ -1991,7 +1991,7 @@
             "handling": "Retain the FreeRTOS CM4F lazy-frame ABI. Generated entries call real handlers and end in DSB; linked entries and external/kernel overrides must execute more than two instructions excluding exception return, counting reachable callees. The absence of VDIV in a platform-only image does not qualify external application code.",
             "implementation": [
               "arch/arm/cortex_m/nx_arch_cortex_m.c",
-              "tools/configure/bindings.py"
+              "tools/configure/generation/bindings.py"
             ],
             "regressions": [
               "tools/configure/tests/resources/peripherals/test_irq_errata.py"
@@ -2006,7 +2006,7 @@
             "handling": "The maintained baremetal TIM2 entry executes a final DSB after the true overflow handler. Initial CRC has no peripheral IRQ. Generated thin F4 entries keep their final DSB rule. Any external or overridden exception entry must preserve that rule; a software result does not observe the physical interrupt interleaving.",
             "implementation": [
               "soc/stm32/stm32f4/system/clock.c",
-              "tools/configure/bindings.py"
+              "tools/configure/generation/bindings.py"
             ],
             "regressions": [
               "tests/behavior/soc/stm32/stm32f4/system/stm32_system_transaction_test.cpp",
@@ -2441,7 +2441,7 @@
             "handling": "Maintained C compilation does not emit these SP loads. External assembly must load a general register then MOV SP; review linked reachable assembly when adding an ISR/context port. A host model cannot prove the silicon instruction interleaving.",
             "implementation": [
               "arch/arm/cortex_m/nx_arch_cortex_m.c",
-              "tools/configure/bindings.py"
+              "tools/configure/generation/bindings.py"
             ],
             "regressions": [
               "tools/configure/tests/resources/peripherals/test_irq_errata.py"
@@ -2456,7 +2456,7 @@
             "handling": "Retain the FreeRTOS CM4F lazy-frame ABI. Generated entries call real handlers and end in DSB; linked entries and external/kernel overrides must execute more than two instructions excluding exception return, counting reachable callees. The absence of VDIV in a platform-only image does not qualify external application code.",
             "implementation": [
               "arch/arm/cortex_m/nx_arch_cortex_m.c",
-              "tools/configure/bindings.py"
+              "tools/configure/generation/bindings.py"
             ],
             "regressions": [
               "tools/configure/tests/resources/peripherals/test_irq_errata.py"
@@ -2471,7 +2471,7 @@
             "handling": "The maintained baremetal TIM2 entry executes a final DSB after the true overflow handler. Generated thin F4 entries keep their final DSB rule. Any external or overridden exception entry must preserve that rule; a software result does not observe the physical interrupt interleaving. SAI1 IRQ87 dispatches the one static A/B owner; selected DMA2 stream1/stream4 dispatch their source-specific handlers and keep the generated outer DSB. There is no second per-block NVIC owner. Selected SAI2 IRQ91 and DMA2 Stream4/6 Channel3 dispatch only the SAI2 owner and keep the same final DSB; no SAI1 gate or vector is acquired by a standalone SAI2 selection.",
             "implementation": [
               "soc/stm32/stm32f4/system/clock.c",
-              "tools/configure/bindings.py",
+              "tools/configure/generation/bindings.py",
               "soc/stm32/stm32f4/drivers/audio/audio_sai.c"
             ],
             "regressions": [
@@ -2893,7 +2893,7 @@
             "handling": "Maintained C compilation does not emit these SP loads. External assembly must load a general register then MOV SP; review linked reachable assembly when adding an ISR/context port. A host model cannot prove the silicon instruction interleaving.",
             "implementation": [
               "arch/arm/cortex_m/nx_arch_cortex_m.c",
-              "tools/configure/bindings.py"
+              "tools/configure/generation/bindings.py"
             ],
             "regressions": [
               "tools/configure/tests/resources/peripherals/test_irq_errata.py"
@@ -2908,7 +2908,7 @@
             "handling": "Retain the FreeRTOS CM4F lazy-frame ABI. Generated entries call real handlers and end in DSB; linked entries and external/kernel overrides must execute more than two instructions excluding exception return, counting reachable callees. The absence of VDIV in a platform-only image does not qualify external application code.",
             "implementation": [
               "arch/arm/cortex_m/nx_arch_cortex_m.c",
-              "tools/configure/bindings.py"
+              "tools/configure/generation/bindings.py"
             ],
             "regressions": [
               "tools/configure/tests/resources/peripherals/test_irq_errata.py"
@@ -2923,7 +2923,7 @@
             "handling": "The maintained baremetal TIM2 entry executes a final DSB after the true overflow handler. Generated thin F4 entries keep their final DSB rule. Any external or overridden exception entry must preserve that rule; a software result does not observe the physical interrupt interleaving. SAI1 IRQ87 dispatches the one static A/B owner; selected DMA2 stream1/stream4 dispatch their source-specific handlers and keep the generated outer DSB. There is no second per-block NVIC owner. Parallel LTDC uses both LTDC88 and LTDC_ER89, and DMA2D uses90; generated thin entries dispatch only their existing static C owner and retain the final DSB. DSI mode and its interrupt remain outside the selected scope.",
             "implementation": [
               "soc/stm32/stm32f4/system/clock.c",
-              "tools/configure/bindings.py",
+              "tools/configure/generation/bindings.py",
               "soc/stm32/stm32f4/drivers/audio/audio_sai.c",
               "soc/stm32/stm32f4/drivers/graphics/ltdc.c",
               "soc/stm32/stm32f4/drivers/graphics/dma2d.c"

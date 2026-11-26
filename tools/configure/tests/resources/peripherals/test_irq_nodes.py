@@ -4,10 +4,10 @@ import tempfile
 import unittest
 
 from tools.configure import configure
-from tools.configure.calls import Symbol
+from tools.configure.generation.calls import Symbol
 from tools.configure.data_provider import DataProvider
 from tools.configure.providers import for_selection
-from tools.configure.static_ir import IrqConnection
+from tools.configure.generation.static_ir import IrqConnection
 
 
 class DriverIrqNodesTests(unittest.TestCase):

@@ -5,7 +5,8 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from tools.configure import bindings, configure, factory, io_traits
+from tools.configure import configure, io_traits
+from tools.configure.generation import bindings, factory
 from tools.configure import selected_contracts
 
 

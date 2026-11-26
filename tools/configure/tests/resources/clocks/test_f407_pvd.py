@@ -5,7 +5,8 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from tools.configure import authored, bindings, configure
+from tools.configure import authored, configure
+from tools.configure.generation import bindings
 
 
 class PvdConfigurationTests(unittest.TestCase):

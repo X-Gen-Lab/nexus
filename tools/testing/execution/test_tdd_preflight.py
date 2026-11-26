@@ -12,7 +12,7 @@ from unittest.mock import patch
 from scripts.ci import tdd_gate
 from tools.dev import dev
 from tools.configure import authored
-from tools.testing.gate_fixture import GateFixture
+from tools.testing.support.gate_fixture import GateFixture
 
 
 class TDDToolPreflightTests(unittest.TestCase):

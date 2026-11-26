@@ -6,7 +6,8 @@ import re
 import tempfile
 import unittest
 
-from tools.configure import bindings, configure, factory
+from tools.configure import configure
+from tools.configure.generation import bindings, factory
 
 
 class StreamProfileConfiguration(unittest.TestCase):

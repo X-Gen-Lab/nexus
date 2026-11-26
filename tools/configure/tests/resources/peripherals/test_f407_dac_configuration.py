@@ -5,7 +5,8 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from tools.configure import authored, bindings, configure as gate, factory
+from tools.configure import authored, configure as gate
+from tools.configure.generation import bindings, factory
 
 
 class F407DacConfigurationTests(unittest.TestCase):

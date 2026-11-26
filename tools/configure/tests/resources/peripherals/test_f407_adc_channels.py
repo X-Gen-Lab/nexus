@@ -5,7 +5,8 @@ import tempfile
 from types import SimpleNamespace
 import unittest
 
-from tools.configure import adc, bindings, configure as gate
+from tools.configure import adc, configure as gate
+from tools.configure.generation import bindings
 from tools.configure.tests.f4_fixture import provider as f4_provider
 
 contract = f4_provider("STM32F407ZGT6")

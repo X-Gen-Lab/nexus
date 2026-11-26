@@ -5,7 +5,8 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from tools.configure import bindings, configure as gate, experience
+from tools.configure import configure as gate, experience
+from tools.configure.generation import bindings
 
 
 CORE = "stm32f407zg_qiming_core"

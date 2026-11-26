@@ -32,7 +32,7 @@ def recipe():
 
 class StaticEndpointFacesTests(unittest.TestCase):
     def compile(self, value=None):
-        from tools.configure.static_endpoints import EndpointFaces
+        from tools.configure.generation.static_endpoints import EndpointFaces
         return EndpointFaces.from_validated(recipe() if value is None else value)
 
     def test_single_child_export_uses_endpoint_id_and_existing_parent_context(self):
@@ -121,7 +121,7 @@ class StaticChildGroupTests(unittest.TestCase):
         }}}
 
     def compile(self, value=None):
-        from tools.configure.static_endpoints import ChildGroups
+        from tools.configure.generation.static_endpoints import ChildGroups
         return ChildGroups.from_validated(self.recipe() if value is None else value)
 
     def test_child_storage_calls_and_export_share_one_selected_identity(self):

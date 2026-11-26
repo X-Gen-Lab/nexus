@@ -7,9 +7,9 @@ import tempfile
 import unittest
 
 from tools.configure import authored
-from tools.configure import bindings
+from tools.configure.generation import bindings
 from tools.configure import configure as gate
-from tools.configure import factory
+from tools.configure.generation import factory
 from tools.configure import selected_contracts
 from tools.configure.providers import maintained
 

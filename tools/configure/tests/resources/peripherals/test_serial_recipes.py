@@ -4,8 +4,8 @@ import unittest
 
 from tools.configure import configure
 from tools.configure.data_provider import Binding
-from tools.configure.static_ir import Array, Record, Symbol
-from tools.configure.static_fragments import StaticFragments
+from tools.configure.generation.static_ir import Array, Record, Symbol
+from tools.configure.generation.static_fragments import StaticFragments
 
 
 class SerialRecipeTests(unittest.TestCase):

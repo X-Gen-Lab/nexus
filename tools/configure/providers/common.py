@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 import re
 from types import MappingProxyType
 
-from tools.configure.calls import Address, DirectCall, InitializeSequence, Symbol
+from tools.configure.generation.calls import Address, DirectCall, InitializeSequence, Symbol
 
 UINT32_MAX = (1 << 32) - 1
 
@@ -389,7 +389,7 @@ class Construction:
     static_declarations: tuple = ()
 
     def __post_init__(self):
-        from tools.configure.static_ir import Declaration, IrqConnection
+        from tools.configure.generation.static_ir import Declaration, IrqConnection
         for name, kind in (("irq_connections", IrqConnection),
                            ("static_declarations", Declaration)):
             values = getattr(self, name)

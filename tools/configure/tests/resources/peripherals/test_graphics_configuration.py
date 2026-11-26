@@ -6,7 +6,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from tools.configure import bindings, factory
+from tools.configure.generation import bindings, factory
 from tools.configure import configure as gate
 
 

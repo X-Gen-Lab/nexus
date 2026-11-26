@@ -163,8 +163,6 @@ FREERTOS_REQUIRED_FILES = (
 
 MANIFEST = ".nexus-source-sdk.json"
 SDK_TOOL_FILES = (
-    'tools/configure/documentation.py',
-    'tools/configure/matrix.py',
     'scripts/ci/vendor_import_identity.py',
     'scripts/ci/verify_vendor_source.py',
     'scripts/validation/junit.py',

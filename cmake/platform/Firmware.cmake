@@ -22,10 +22,7 @@ function(_nexus_firmware_checker output support)
     set(checker "${NEXUS_SOURCE_DIR}/tools/measurement/resources.py")
     cmake_path(GET CMAKE_CURRENT_FUNCTION_LIST_DIR PARENT_PATH cmake_dir)
     cmake_path(GET cmake_dir PARENT_PATH owner)
-    if(
-        NOT NEXUS_SOURCE_DIR STREQUAL owner
-        OR EXISTS "${NEXUS_SOURCE_DIR}/.nexus-source-sdk.json"
-    )
+    if(NOT NEXUS_SOURCE_DIR STREQUAL owner)
         set(${output} "${checker}" PARENT_SCOPE)
         return()
     endif()
@@ -36,6 +33,14 @@ function(_nexus_firmware_checker output support)
         PROPERTY NEXUS_FIRMWARE_PROJECTION
     )
     if(NOT anchor)
+        set(sdk_manifest "${NEXUS_SOURCE_DIR}/.nexus-source-sdk.json")
+        if(EXISTS "${sdk_manifest}")
+            set_property(
+                DIRECTORY
+                APPEND
+                PROPERTY CMAKE_CONFIGURE_DEPENDS "${sdk_manifest}"
+            )
+        endif()
         set_property(
             DIRECTORY
             APPEND

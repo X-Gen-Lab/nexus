@@ -17,7 +17,7 @@ from tools.configure import secondary_controllers
 
 class SecondaryControllerConfigurationTests(unittest.TestCase):
     def test_spi_dma_resources_are_readonly_decoded_selected_routes(self):
-        from tools.configure import bindings
+        from tools.configure.generation import bindings
         result = gate.resolve_ir(gate.ROOT /
             "tests/integration/assemblies/multi_controller_assembly/stm32-zg.toml")
         source = bindings.emit(result)[1]

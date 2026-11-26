@@ -10,7 +10,8 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from tools.configure import matrix, bindings, configure, dependencies, factory
+from tools.configure import matrix, configure, dependencies
+from tools.configure.generation import bindings, factory
 from tools.configure.ir import ControllerIR
 
 

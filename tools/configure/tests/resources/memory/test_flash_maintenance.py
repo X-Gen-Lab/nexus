@@ -4,7 +4,8 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from tools.configure import bindings, configure, factory
+from tools.configure import configure
+from tools.configure.generation import bindings, factory
 from tools.configure.tests.native_fixture import native_fixture
 
 
@@ -40,7 +41,7 @@ class FlashMaintenanceConfigurationTests(unittest.TestCase):
         self.assertIn("nx_factory_flash_maintenance", header)
         self.assertIn("return &s_nx_flash_maintenance_physical", source)
         emitted = bindings.emit(result)[1]
-        from tools.configure.calls import Address
+        from tools.configure.generation.calls import Address
         from tools.configure.providers import for_selection
         construction = for_selection(result).constructor(
             item, result, result.board_bindings, result.routes, result.devices)

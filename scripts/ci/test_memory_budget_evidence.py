@@ -12,14 +12,14 @@ ROOT = Path(__file__).resolve().parents[2]
 
 class MemoryBudgetEvidenceTests(unittest.TestCase):
     def gate(self):
-        return importlib.import_module('memory_budget')
+        return importlib.import_module('scripts.ci.qualification.memory_budget')
 
     def test_family_checkers_capture_shared_budget_and_recorder_sources(self):
         with tempfile.TemporaryDirectory() as name:
             root = Path(name)
-            (root / 'scripts/ci').mkdir(parents=True)
+            (root / 'scripts/ci/qualification').mkdir(parents=True)
             (root / 'CMakeLists.txt').write_text('# Source fixture.\n')
-            for name in ('memory_budget.py', 'arch_compile.py'):
+            for name in ('qualification/memory_budget.py', 'arch_compile.py'):
                 (root / 'scripts/ci' / name).write_text('# Recorded helper.\n')
             for module in ('stm32_memory', 'os_threadx'):
                 gate = importlib.import_module(module)
@@ -28,7 +28,7 @@ class MemoryBudgetEvidenceTests(unittest.TestCase):
                 recorder = root / 'scripts/ci/arch_compile.py'
                 self.assertIn(str(recorder), paths)
                 if module != 'os_threadx':
-                    shared = root / 'scripts/ci/memory_budget.py'
+                    shared = root / 'scripts/ci/qualification/memory_budget.py'
                     self.assertIn(str(shared), paths)
                     shared.write_text(shared.read_text() + '# Changed helper.\n')
                     self.assertNotEqual(before, gate.source_inputs(root))
@@ -39,9 +39,9 @@ class MemoryBudgetEvidenceTests(unittest.TestCase):
     def test_family_checkers_capture_shared_driver_source_and_header_bytes(self):
         with tempfile.TemporaryDirectory() as name:
             root = Path(name)
-            (root / 'scripts/ci').mkdir(parents=True)
+            (root / 'scripts/ci/qualification').mkdir(parents=True)
             (root / 'CMakeLists.txt').write_text('# Source fixture.\n')
-            for name in ('memory_budget.py', 'arch_compile.py'):
+            for name in ('qualification/memory_budget.py', 'arch_compile.py'):
                 (root / 'scripts/ci' / name).write_text('# Recorded helper.\n')
             for module in ('stm32_memory', 'os_threadx'):
                 gate = importlib.import_module(module)

@@ -10,6 +10,7 @@
 | `execution/` | 命令、构建锁、进程撤回、测试发现和报告准入 |
 | `measurement/` | ELF、资源预算、HIL 工装和测量身份 |
 | `sdk/` | 导出选择、包完整性、接口消费和精确来源 |
+| `support/` | 执行、依赖和编译探针使用的共享夹具 |
 
 ```sh
 python tools/testing/run_tool_tests.py --suite testing --report build/quality/tools-testing.json
@@ -28,6 +29,8 @@ python tools/testing/run_tool_tests.py --suite testing --report build/quality/to
 新增工具行为先记录 RED 再实现 GREEN。纯粹删除废弃功能不新增镜像式测试。
 testing 域集中执行一次全局能力和派生文档检查；局部外设测试不重复扫描整个平台。
 报告包含最慢用例摘要，用于定位实际成本，不以测试数量作为优化目标。
+`duration_seconds` 记录整域执行时间。并行模块的 `module_durations_seconds`
+包含解释器启动、导入、类夹具和清理。并行模块时长可重叠，整域耗时以整体字段为准。
 
 完整模块默认在独立进程中执行，worker 数继承调用方的 `NEXUS_BUILD_JOBS` 或
 `CMAKE_BUILD_PARALLEL_LEVEL`；独立调用未提供预算时使用 2 个槽。

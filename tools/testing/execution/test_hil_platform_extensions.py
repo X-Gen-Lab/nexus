@@ -21,7 +21,7 @@ class HilFixtureSchemaTests(unittest.TestCase):
     def setUp(self):
         self.root = Path(__file__).resolve().parents[3]
         self.schema = json.loads((self.root /
-            "tools/schemas/hil-fixture.schema.json").read_text())
+            "tools/hil/schemas/hil-fixture.schema.json").read_text())
 
     def test_part_inventory_accepts_all_existing_maintained_fixture_inputs(self):
         for path in (self.root / "tools/hil/fixtures").glob("*.json"):

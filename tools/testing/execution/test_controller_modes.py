@@ -5,7 +5,8 @@ import subprocess
 import tempfile
 import unittest
 
-from tools.configure import configure, emission
+from tools.configure import configure
+from tools.configure.generation import emission
 
 ROOT = Path(__file__).resolve().parents[3]
 

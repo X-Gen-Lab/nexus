@@ -5,7 +5,8 @@ import unittest
 import json
 import re
 import tempfile
-from tools.configure import bindings, configure, factory
+from tools.configure import configure
+from tools.configure.generation import bindings, factory
 from tools.configure.providers import for_selection
 from tools.configure.resource_graph import ResourcePlanIR
 from tools.configure.contracts import CONTROLLER_CONTRACTS

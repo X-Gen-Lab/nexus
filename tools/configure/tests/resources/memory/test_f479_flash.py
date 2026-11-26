@@ -4,7 +4,8 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from tools.configure import bindings, configure
+from tools.configure import configure
+from tools.configure.generation import bindings
 
 
 class F479FlashTests(unittest.TestCase):

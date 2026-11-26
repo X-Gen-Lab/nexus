@@ -6,7 +6,8 @@ import tempfile
 from types import SimpleNamespace
 import unittest
 
-from tools.configure import adc, authored, bindings, configure as gate
+from tools.configure import adc, authored, configure as gate
+from tools.configure.generation import bindings
 
 
 class F407AdcResolutionTests(unittest.TestCase):

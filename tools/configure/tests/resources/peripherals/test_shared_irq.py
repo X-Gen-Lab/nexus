@@ -30,7 +30,7 @@ class Item:
 
 class SharedIrqTests(unittest.TestCase):
     def spec(self):
-        from tools.configure.shared_irq import SharedIrqGroup
+        from tools.configure.generation.shared_irq import SharedIrqGroup
         return SharedIrqGroup.from_validated({"state_type": "line_state_t",
             "dispatch": "dispatch_lines", "barrier": "nx_arch_dsb",
             "handler": "selected.vector_bindings.0.handler",
@@ -40,7 +40,7 @@ class SharedIrqTests(unittest.TestCase):
         return Item(name, Integration(Irq(priority), MappingProxyType({"mask": mask})))
 
     def test_one_dispatcher_preserves_exact_ports_mask_priority_and_barrier(self):
-        from tools.configure.shared_irq import connections
+        from tools.configure.generation.shared_irq import connections
         spec = self.spec()
         declarations, irq = connections(((spec, self.item("a", 32)),
                                          (spec, self.item("b", 64))))
@@ -51,7 +51,7 @@ class SharedIrqTests(unittest.TestCase):
         self.assertEqual(irq.exit_barrier.name, "nx_arch_dsb")
 
     def test_overlap_priority_and_unknown_publisher_fail_before_rendering(self):
-        from tools.configure.shared_irq import connections
+        from tools.configure.generation.shared_irq import connections
         spec = self.spec()
         for other in (self.item("b", 32), self.item("b", 64, priority=6)):
             with self.subTest(item=other), self.assertRaises(ValueError):

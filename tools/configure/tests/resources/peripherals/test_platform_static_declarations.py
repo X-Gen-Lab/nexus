@@ -2,8 +2,8 @@
 import unittest
 
 from tools.configure import configure
-from tools.configure.calls import InitializeSequence
-from tools.configure.static_ir import Declaration
+from tools.configure.generation.calls import InitializeSequence
+from tools.configure.generation.static_ir import Declaration
 from tools.configure.providers import for_selection
 
 
@@ -30,7 +30,7 @@ class PlatformStaticDeclarationTests(unittest.TestCase):
                     "Static storage and fixed call order must remain typed")
 
     def test_retained_rtc_controller_uses_fixed_typed_power_connections(self):
-        from tools.configure.static_ir import ControllerPowerConnection
+        from tools.configure.generation.static_ir import ControllerPowerConnection
         result = configure.resolve_ir(configure.ROOT /
             "tests/integration/assemblies/rtc_bypass_assembly/adopt-periodic.toml")
         indices = list(range(len(result.controllers)))

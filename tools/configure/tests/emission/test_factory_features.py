@@ -8,7 +8,7 @@ import unittest
 
 from tools.configure.tests.assembly_fixture import render_toml
 from tools.configure import configure as gate
-from tools.configure import factory
+from tools.configure.generation import factory
 
 
 class OptionalFactoryTests(unittest.TestCase):

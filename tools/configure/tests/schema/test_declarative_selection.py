@@ -6,7 +6,8 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from tools.configure import configure, emission
+from tools.configure import configure
+from tools.configure.generation import emission
 from tools.configure import integration_package, packages
 from tools.configure.tests.schema import test_device_catalog as fixtures
 

@@ -1,7 +1,8 @@
 """Optional F4 pad and clock owners retain only selected hardware algorithms."""
 import unittest
 
-from tools.configure import bindings, configure, gpio_phase
+from tools.configure import configure, gpio_phase
+from tools.configure.generation import bindings
 
 
 class F407PlatformPinOwnerTests(unittest.TestCase):

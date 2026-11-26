@@ -7,7 +7,8 @@ from operator import getitem
 import tempfile
 import unittest
 
-from tools.configure import configure, emission, factory
+from tools.configure import configure
+from tools.configure.generation import emission, factory
 from tools.configure.ir import ConfigurationIR, ControllerIR, EndpointIR
 
 

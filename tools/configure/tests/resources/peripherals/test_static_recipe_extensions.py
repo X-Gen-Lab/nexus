@@ -2,9 +2,9 @@
 from dataclasses import dataclass, replace
 import unittest
 
-from tools.configure.calls import Address, InitializeSequence
-from tools.configure.static_ir import Signed32
-from tools.configure.static_recipe import StaticRecipe
+from tools.configure.generation.calls import Address, InitializeSequence
+from tools.configure.generation.static_ir import Signed32
+from tools.configure.generation.static_recipe import StaticRecipe
 
 
 @dataclass(frozen=True)

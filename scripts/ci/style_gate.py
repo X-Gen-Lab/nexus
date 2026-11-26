@@ -13,18 +13,17 @@ import sys
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts/ci"))
 sys.path.insert(0, str(ROOT / "scripts/tools"))
-sys.path.insert(0, str(ROOT / "scripts/setup"))
 import format as formatting
 import cmake_format
 import comment_style
-import install_dev_tools
+import tool_lock
 
 BASELINE_PATH = "dependencies/style-baseline.json"
 # This is the reviewed pre-automation source, not an adjustable debt budget.
 BOOTSTRAP_SOURCE = "b68922d1b29291734a2b056f3b8229a0bebd654c"
 CONTROL_FILES = {
     ".clang-format", ".clang-format-dirs", ".editorconfig", ".gersemirc",
-    "scripts/tools/cmake_format.py",
+    "scripts/tools/cmake_format.py", "scripts/tools/tool_lock.py",
     ".pre-commit-config.yaml", BASELINE_PATH,
     "dependencies/development-tools.txt", "scripts/tools/format.py",
     "scripts/ci/style_gate.py", "scripts/ci/comment_style.py",
@@ -73,7 +72,7 @@ def blob(root, revision, path):
 
 
 def locked_versions(root):
-    return install_dev_tools.read_lock(root / "dependencies/development-tools.txt")
+    return tool_lock.read_lock(root / "dependencies/development-tools.txt")
 
 
 def validate_baseline(data, expected_version):
@@ -347,7 +346,7 @@ def main(arguments=None):
         return int(bool(result["errors"]))
     except (
         OSError, UnicodeError, ValueError, subprocess.SubprocessError,
-        formatting.FormatError, install_dev_tools.InstallError,
+        formatting.FormatError,
     ) as error:
         if args.report:
             try:

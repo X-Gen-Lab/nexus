@@ -2,8 +2,8 @@
 from dataclasses import dataclass
 import unittest
 
-from tools.configure.calls import InitializeSequence
-from tools.configure.static_ir import Declaration
+from tools.configure.generation.calls import InitializeSequence
+from tools.configure.generation.static_ir import Declaration
 
 
 @dataclass(frozen=True)
@@ -17,7 +17,7 @@ class SelectedOwners:
 
 class StaticObjectTests(unittest.TestCase):
     def test_selected_register_member_is_a_checked_symbol(self):
-        from tools.configure.static_recipe import StaticObjects
+        from tools.configure.generation.static_recipe import StaticObjects
         group = StaticObjects.from_validated({"symbols": {"status": "status"},
             "declarations": [{"role": "status", "type": "uint32_t", "const": True,
                 "pointer": True, "value": {"pointer_member": {
@@ -30,7 +30,7 @@ class StaticObjectTests(unittest.TestCase):
                 group.project(SelectedOwners(0, register_member=member))
 
     def test_device_recipe_omits_disabled_storage_and_exports_selected_endpoint(self):
-        from tools.configure.static_recipe import StaticRecipe
+        from tools.configure.generation.static_recipe import StaticRecipe
 
         @dataclass(frozen=True)
         class Device:
@@ -58,7 +58,7 @@ class StaticObjectTests(unittest.TestCase):
                       result.static_declarations[0].render()[0])
 
     def test_scalar_maps_optional_records_and_unselected_storage_are_finite(self):
-        from tools.configure.static_recipe import StaticObjects
+        from tools.configure.generation.static_recipe import StaticObjects
         document = {"symbols": {"values": "samples", "wide": "wide",
                                 "optional": "optional_record", "spare": "spare"},
             "declarations": [
@@ -96,7 +96,7 @@ class StaticObjectTests(unittest.TestCase):
                     {"ref": "receipt", "as": "address"}]}]}]}
 
     def test_fixed_objects_and_call_sequence_share_one_typed_projection(self):
-        from tools.configure.static_recipe import StaticObjects
+        from tools.configure.generation.static_recipe import StaticObjects
         group = StaticObjects.from_validated(self.definition())
         nodes = group.project(SelectedOwners(7))
         self.assertEqual(len(nodes), 3)
@@ -108,7 +108,7 @@ class StaticObjectTests(unittest.TestCase):
         self.assertEqual(group.project(None), ())
 
     def test_unknown_symbols_source_text_and_mutable_inputs_reject(self):
-        from tools.configure.static_recipe import StaticObjects
+        from tools.configure.generation.static_recipe import StaticObjects
         for field, value in (("unexpected", True), ("declarations", {"C": "int x;"})):
             document = self.definition()
             document[field] = value

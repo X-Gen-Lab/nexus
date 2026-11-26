@@ -2,7 +2,8 @@
 from dataclasses import FrozenInstanceError
 import unittest
 
-from tools.configure import authored, configure, dependencies, factory, selection
+from tools.configure import authored, configure, dependencies, selection
+from tools.configure.generation import factory
 from tools.configure.contracts import CONTROLLER_CONTRACTS, CONTROLLER_KINDS
 
 

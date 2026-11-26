@@ -22,6 +22,8 @@ def fingerprint(path, allow_reference):
             "tools/evidence/identity.py", "tools/evidence/common.py",
             "tools/measurement/elf.py", "tools/measurement/resources.py",
             "tools/measurement/build_resources.py")))
+    if sdk.installed(ROOT):
+        files += (ROOT / sdk.MANIFEST,)
     values = [str(allow_reference), *(digest(item) for item in files)]
     return hashlib.sha256("\n".join(values).encode()).hexdigest()
 
@@ -62,6 +64,12 @@ def from_graph(path, expected, *, allow_reference):
     """The expected digest comes from the build command, outside the bundle."""
     if fingerprint(path, allow_reference) != expected:
         raise EvidenceError("Configured firmware projection or checker changed")
+    try:
+        # Installed SDKs still check their entire payload at measurement time.
+        # The configured digest replaces only the replay of assembly resolution.
+        sdk.verify(ROOT)
+    except ValueError as error:
+        raise EvidenceError(str(error)) from error
     selected, artifact = load_json(path), file_identity(path)
     check_generator(path)
     declared = resolved_input_files(path, selected)

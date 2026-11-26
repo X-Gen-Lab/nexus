@@ -325,7 +325,7 @@ class HilAcquireTests(unittest.TestCase):
             self.recipe = original
 
     def test_json_schema_supports_runtime_reviewed_lower_bound(self):
-        path = Path("tools/schemas/hil-station.schema.json")
+        path = Path("tools/hil/schemas/hil-station.schema.json")
         schema = json.loads(path.read_text())
         budget = schema["properties"]["budgets"]["additionalProperties"]
         self.assertIn("minimum", budget["properties"])

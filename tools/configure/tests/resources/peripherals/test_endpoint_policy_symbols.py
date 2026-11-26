@@ -5,7 +5,7 @@ from unittest.mock import patch
 import unittest
 
 from tools.configure import configure, enhanced_endpoints
-from tools.configure.calls import Symbol
+from tools.configure.generation.calls import Symbol
 from tools.configure.domain_policies import _endpoints
 from tools.configure.providers.common import EndpointPolicy
 

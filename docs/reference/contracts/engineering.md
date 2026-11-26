@@ -55,7 +55,7 @@ python tools/dev/dev.py check --preset native-debug
 python scripts/ci/tdd_gate.py --all --preset native-debug
 ```
 
-两条命令是合并前完整集成门禁的替代入口，不需要连续执行两遍。
+两条命令共用完整 Native 和三个常规工具域，`check` 先执行整仓风格检查。
 完整 CI 在三个常规工具域之外分别执行 integration 和 freertos，文档 job 执行文档用例
 和严格双语构建。工作流合同由 ci 域维护。Native 矩阵分别执行
 native-debug、native-release、native-asan、native-tsan 的完整 CTest 计划。

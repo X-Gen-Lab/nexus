@@ -1,19 +1,22 @@
 """Execute the single hook/CI path policy and required-job decisions."""
 
+import contextlib
+import io
+import json
 from pathlib import Path
 import subprocess
 import tempfile
 import unittest
 
 from scripts.ci.check_required_jobs import check_required_jobs, required_jobs
-from tools.dev.change_paths import classify as classify_paths, behavioral
+from tools.dev.change_paths import classify as classify_paths, behavioral, ci_scope
 
 WORKFLOW = Path(__file__).resolve().parents[2] / ".github/workflows/ci.yml"
 
 
 def classify(changes):
     return {name: str(value).lower()
-            for name, value in classify_paths(path for _, path in changes).items()}
+            for name, value in ci_scope(path for _, path in changes).items()}
 
 
 class CodeqlScopeTests(unittest.TestCase):
@@ -126,6 +129,91 @@ class ChangePathsTests(unittest.TestCase):
 
     def decisions(self, changes):
         return required_jobs(classify(changes), "pull_request")
+
+    def test_ordinary_path_roles_keep_unknown_and_consumer_inputs_conservative(self):
+        from tools.dev.change_paths import path_role
+
+        cases = {
+            "tests/behavior/core/atomic_native_test.cpp": "behavior-test",
+            "tests/behavior/core/tests.cmake": "behavior-test",
+            "tests/behavior/CMakeLists.txt": "behavior-test",
+            "tests/support/native/include/nexus/io/native/model.h": "consumer-input",
+            "tests/integration/assemblies/f407_pwm_adc/main.c": "consumer-input",
+            "cmake/package/verification/io_evolution/native-time-pair.toml": "consumer-input",
+            "README.md": "documentation",
+            "tests/behavior/future.generator": "unknown",
+            "tests/cmake/GooglePlan.cmake": "unknown",
+            "core/include/nexus/core/status.h": "unknown",
+            "future/new.build": "unknown",
+        }
+        for name, expected in cases.items():
+            with self.subTest(path=name):
+                self.assertEqual(path_role(name), expected)
+        for name in ("../tests/behavior/case.cpp", "tests/behavior/../case.cpp"):
+            with self.subTest(path=name), self.assertRaises(ValueError):
+                path_role(name)
+
+    def test_ci_tooling_skip_is_limited_to_known_private_behavior_inputs(self):
+        from tools.dev.change_paths import ci_scope
+
+        behavior = ("tests/behavior/core/atomic_native_test.cpp",
+                    "tests/behavior/core/tests.cmake",
+                    "tests/behavior/CMakeLists.txt")
+        for paths in ((behavior[0],), behavior, (*behavior, "README.md")):
+            with self.subTest(paths=paths):
+                outputs = ci_scope(paths)
+                self.assertTrue(outputs["code"])
+                self.assertFalse(outputs["tooling"])
+        for name in ("tests/cmake/GooglePlan.cmake",
+                     "core/include/nexus/core/status.h",
+                     "tests/support/native/include/nexus/io/native/model.h",
+                     "cmake/package/verification/io_evolution/native-time-pair.toml",
+                     "soc/stm32/stm32f4/drivers/uart/uart.c",
+                     "tests/behavior/future.generator", "future/new.build"):
+            with self.subTest(path=name):
+                self.assertTrue(ci_scope([*behavior, name])["tooling"])
+        self.assertFalse(ci_scope(["README.md"])["tooling"])
+
+    def test_ci_cli_keeps_deleted_behavior_private_and_mixed_renames_conservative(self):
+        from tools.dev import change_paths
+
+        with tempfile.TemporaryDirectory(prefix="Nexus ordinary scope ") as name:
+            root = Path(name) / "checkout"
+            root.mkdir()
+            def git(*arguments):
+                return subprocess.check_output(["git", *arguments], cwd=root,
+                                               text=True, timeout=10).strip()
+            git("init", "-q")
+            git("config", "user.name", "Nexus test")
+            git("config", "user.email", "test@example.invalid")
+            behavior = "tests/behavior/core/atomic_native_test.cpp"
+            path = root / behavior
+            path.parent.mkdir(parents=True)
+            path.write_text("// Private behavior fixture.\n")
+            git("add", ".")
+            git("commit", "-qm", "test: baseline behavior")
+            base = git("rev-parse", "HEAD")
+            for renamed in (False, True):
+                git("reset", "--hard", base)
+                if renamed:
+                    destination = root / "tests/integration/consumer.cpp"
+                    destination.parent.mkdir(parents=True)
+                    git("mv", behavior, str(destination.relative_to(root)))
+                else:
+                    path.unlink()
+                git("add", "-A")
+                git("commit", "-qm", "test: change behavior scope")
+                output = root.parent / "github-output.txt"
+                output.unlink(missing_ok=True)
+                trace = io.StringIO()
+                with self.subTest(renamed=renamed), contextlib.redirect_stdout(trace):
+                    self.assertEqual(change_paths.main([
+                        "--root", str(root), "--base", base, "--head", "HEAD",
+                        "--github-output", str(output)]), 0)
+                    result = json.loads(trace.getvalue())
+                    self.assertTrue(result["code"])
+                    self.assertEqual(result["tooling"], renamed)
+                    self.assertIn("tooling=" + str(renamed).lower(), output.read_text())
 
     def test_production_sources_and_runtime_boundaries_require_builds(self):
         paths = (

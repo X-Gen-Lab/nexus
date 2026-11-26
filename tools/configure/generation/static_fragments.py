@@ -8,7 +8,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 import re
 
-from tools.configure.calls import Symbol
+from tools.configure.generation.calls import Symbol
 from tools.configure.records import freeze
 
 
@@ -65,7 +65,7 @@ class StaticFragments:
 
     @classmethod
     def from_validated(cls, value):
-        from tools.configure.static_recipe import _Declaration, _parse
+        from tools.configure.generation.static_recipe import _Declaration, _parse
         if not isinstance(value, Mapping) or set(value) - {"declarations", "values"}:
             raise ValueError("Static fragment library has unknown fields")
         _data(value)

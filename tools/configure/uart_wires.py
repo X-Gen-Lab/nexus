@@ -29,7 +29,7 @@ def validate_policy(value):
     integer(value["irda_max_baud"], 1, context="IrDA maximum baud")
     integer(value["smartcard_prescaler_max"], 1, 255, "Smartcard maximum prescaler")
     for controller, facts in value["controllers"].items():
-        from tools.configure.calls import Symbol
+        from tools.configure.generation.calls import Symbol
         Symbol(controller)
         if not isinstance(facts, Mapping) or set(facts) != {"protocols", "flows"}:
             fail("UART wire controller requires protocols and flows")

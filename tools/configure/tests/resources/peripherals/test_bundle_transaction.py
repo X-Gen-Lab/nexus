@@ -124,9 +124,9 @@ class BundleTransactionTests(unittest.TestCase):
         self.configure()
         paths = json.loads((self.output / "configuration_code_paths.json").read_text())
         identity = json.loads((self.output / "generator-identity.json").read_text())
-        self.assertIn("tools/configure/factory.py", paths)
+        self.assertIn("tools/configure/generation/factory.py", paths)
         self.assertIn("tools/configure/bundle.py", paths)
-        self.assertIn("tools/configure/emission.py", paths)
+        self.assertIn("tools/configure/generation/emission.py", paths)
         self.assertIn("tests/support/native/configure/emission.py", paths)
         self.assertNotIn("soc/gd32/gd32f470/configure/emission.py", paths)
         self.assertEqual(set(paths), {item["path"] for item in identity["files"]})
@@ -204,8 +204,8 @@ class BundleTransactionTests(unittest.TestCase):
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(source, target)
         original = gate.resolve_ir
-        for module in ('tools/configure/factory.py',
-                       'tools/configure/emission.py',
+        for module in ('tools/configure/generation/factory.py',
+                       'tools/configure/generation/emission.py',
                        'tests/support/native/configure/emission.py',
                        'tools/configure/hardware_bindings.py'):
             with self.subTest(module=module):
@@ -261,7 +261,7 @@ class RuntimeIncrementalTests(unittest.TestCase):
             before = {p.name: (p.read_bytes(), p.stat().st_mtime_ns)
                       for p in output.iterdir()}
             paths = json.loads((output / "configuration_code_paths.json").read_text())
-            self.assertIn("tools/configure/factory.py", paths)
+            self.assertIn("tools/configure/generation/factory.py", paths)
             runtime.configure(assembly, output)
             after = {p.name: (p.read_bytes(), p.stat().st_mtime_ns)
                      for p in output.iterdir()}
@@ -308,7 +308,7 @@ class RuntimeIncrementalTests(unittest.TestCase):
             original = runtime.resolve
             def changing(*args, **kwargs):
                 result = original(*args, **kwargs)
-                path = code_root / "tools/configure/factory.py"
+                path = code_root / "tools/configure/generation/factory.py"
                 path.write_bytes(path.read_bytes() + b"\n# concurrent edit\n")
                 return result
             with patch.object(runtime.dependencies, "ROOT", code_root):

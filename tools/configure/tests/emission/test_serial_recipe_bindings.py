@@ -7,9 +7,10 @@ import subprocess
 import tempfile
 import unittest
 
-from tools.configure import bindings, configure
-from tools.configure.calls import DirectCall
-from tools.configure.static_recipe import StaticRecipe
+from tools.configure import configure
+from tools.configure.generation import bindings
+from tools.configure.generation.calls import DirectCall
+from tools.configure.generation.static_recipe import StaticRecipe
 
 
 class FaceContextCompileTests(unittest.TestCase):
@@ -115,7 +116,7 @@ _Static_assert(NX_STM32_I2C_ADDRESS_TEN_BIT(10U), "10-bit address");
 class SerialRecipeProjectionTests(unittest.TestCase):
     def library(self):
         from tools.configure.data_provider import Binding
-        from tools.configure.static_fragments import StaticFragments
+        from tools.configure.generation.static_fragments import StaticFragments
         from tools.configure.tests.device_fixture import load_binding_facts
         document = load_binding_facts(configure.ROOT / "soc/stm32/stm32f4")
         library = {"declarations": {}, "values": {}}
@@ -127,7 +128,7 @@ class SerialRecipeProjectionTests(unittest.TestCase):
                      if row["kind"] in {"spi", "i2c", "i2c_target"})
 
     def test_every_selected_serial_layout_has_one_c_owner_and_typed_connections(self):
-        from tools.configure.static_ir import Declaration
+        from tools.configure.generation.static_ir import Declaration
         library = self.library()
         fixtures = (
             ("stm32_assembly/zg-spi.toml", "spi"),

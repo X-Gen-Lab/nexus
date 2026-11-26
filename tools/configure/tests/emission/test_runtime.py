@@ -170,9 +170,9 @@ class RuntimeAssemblyTests(unittest.TestCase):
 
 
 PLATFORM_ONLY = (
-    "providers/descriptor", "packages", "package_policy", "static_ir",
-    "data_provider", "static_recipe", "static_endpoints", "static_fragments",
-    "shared_irq", "domain_policies", "domain_bridge", "header_projection",
+    "providers/descriptor", "packages", "package_policy", "generation/static_ir",
+    "data_provider", "generation/static_recipe", "generation/static_endpoints", "generation/static_fragments",
+    "generation/shared_irq", "domain_policies", "domain_bridge", "generation/header_projection",
     "integration_package",
 )
 
@@ -224,8 +224,8 @@ class ConfigurationInputScopeTests(unittest.TestCase):
         names = {row["path"] for row in self.identity("runtime")["files"]}
         for module in PLATFORM_ONLY:
             self.assertNotIn("tools/configure/" + module + ".py", names)
-        for module in ("factory", "usb_otg", "usb_host", "stream_profiles",
-                       "uart_formats", "contracts", "calls"):
+        for module in ("generation/__init__", "generation/factory", "usb_otg", "usb_host", "stream_profiles",
+                       "uart_formats", "contracts", "generation/calls"):
             self.assertIn("tools/configure/" + module + ".py", names)
 
     def test_threadx_code_is_selected_only_for_its_backend(self):
@@ -283,7 +283,7 @@ class ConfigurationInputScopeTests(unittest.TestCase):
         mirror = self.mirror_sources()
         original = runtime.resolve
         with patch.object(dependencies, "ROOT", mirror):
-            for backend, module in (("baremetal", "factory"),
+            for backend, module in (("baremetal", "generation/factory"),
                                     ("freertos", "lowpower"), ("threadx", "threadx")):
                 with self.subTest(backend=backend):
                     self.identity("runtime", backend)
@@ -390,7 +390,7 @@ assert not loaded - paths.keys(), sorted(loaded - paths.keys())
         paths = output / "configuration_code_paths.json"
         identity = output / "generator-identity.json"
         catalog, code = json.loads(paths.read_text()), json.loads(identity.read_text())
-        name = "tools/configure/factory.py"
+        name = "tools/configure/generation/factory.py"
         replacement = self.directory / "replacement.py"
         replacement.write_bytes(Path(catalog[name]).read_bytes())
         catalog[name] = str(replacement)

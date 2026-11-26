@@ -15,8 +15,8 @@ class StaticFragmentTests(unittest.TestCase):
                 {"use": "owner"}, {"ref": "config", "as": "address"}]}, "close": []}}
 
     def test_shared_fragments_expand_into_the_existing_finite_recipe(self):
-        from tools.configure.static_fragments import StaticFragments
-        from tools.configure.static_recipe import StaticRecipe
+        from tools.configure.generation.static_fragments import StaticFragments
+        from tools.configure.generation.static_recipe import StaticRecipe
 
         @dataclass(frozen=True)
         class Device:
@@ -32,7 +32,7 @@ class StaticFragmentTests(unittest.TestCase):
                          "prepare(&s_nx_port_console, &s_nx_config_console)")
 
     def test_missing_recursive_overridden_or_executable_fragments_reject(self):
-        from tools.configure.static_fragments import StaticFragments
+        from tools.configure.generation.static_fragments import StaticFragments
         for library in (
                 {"values": {"loop": {"use": "loop"}}},
                 {"values": {"code": "RCC->CR = 1"}},

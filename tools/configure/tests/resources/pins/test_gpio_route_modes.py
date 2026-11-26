@@ -5,7 +5,8 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from tools.configure import bindings, configure as gate
+from tools.configure import configure as gate
+from tools.configure.generation import bindings
 
 
 class GpioRouteModeTests(unittest.TestCase):

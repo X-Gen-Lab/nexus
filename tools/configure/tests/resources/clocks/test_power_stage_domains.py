@@ -6,7 +6,8 @@ import json
 import tempfile
 import unittest
 
-from tools.configure import authored, bindings, emission, factory
+from tools.configure import authored
+from tools.configure.generation import bindings, emission, factory
 from tools.configure.configure import resolve_ir
 from tools.configure.coupled_io import CoupledIoPolicy
 from tools.configure.pinmux import NumericPinMuxPolicy

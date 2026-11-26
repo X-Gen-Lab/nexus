@@ -6,8 +6,8 @@ import subprocess
 import tempfile
 import unittest
 
-from tools.configure.calls import Address, DirectCall, Symbol
-from tools.configure.static_ir import (Array, ArrayElementAddress, ConstantMacro, Declaration,
+from tools.configure.generation.calls import Address, DirectCall, Symbol
+from tools.configure.generation.static_ir import (Array, ArrayElementAddress, ConstantMacro, Declaration,
     Flags, IrqConnection, PointerMemberAddress, Record, Signed32, Unsigned64)
 
 

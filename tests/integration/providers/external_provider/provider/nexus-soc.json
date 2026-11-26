@@ -4,7 +4,7 @@
   "id": "external-lifecycle-reference",
   "inputs": {
     "configure/__init__.py": "fe7cd3c42c52ef0ea1495d5258d78a85228754cf1cce1057ce056e1f8ec3ff2e",
-    "configure/bindings.py": "4e536ff9ffbce0d4e2ce9bd3507263a4e7505aa8c05b0e9e9be5294f3e636821",
+    "configure/bindings.py": "e5f0c332e958d1f2a8383c6f9f3ea937ce3cfab48d92e25695d60a4f53dccaa0",
     "configure/contract.py": "af42bf1e73bbe33a47d15be38eaa266b81331dbdbce5cf46f5bc2f306e9f2af2",
     "configure/emission.py": "f04042742a7c3fa5b719f55a5dc5e6534245527fe8d89af9500f31a989deb5fb",
     "include/nexus_reference/lifecycle_probe.h": "c325da2330d85997bddfcc6122b4fa5cbfb8f441b26da47d26d453831c6901ed",

@@ -7,7 +7,8 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from tools.configure import configure as gate, cpu, factory, metadata, runtime
+from tools.configure import configure as gate, cpu, metadata, runtime
+from tools.configure.generation import factory
 
 
 class MetadataBindingTests(unittest.TestCase):

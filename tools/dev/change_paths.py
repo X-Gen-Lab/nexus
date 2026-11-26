@@ -183,6 +183,30 @@ def behavioral(name):
     return result["code"] or result["workflows"]
 
 
+def path_role(name):
+    """Recognize reviewed ordinary inputs; unknown paths never justify a skip."""
+    if not behavioral(name):
+        return "documentation"
+    path = PurePosixPath(name)
+    if name.startswith("tests/behavior/") and (
+            path.name == "CMakeLists.txt" or path.suffix.lower() in {
+                ".c", ".cc", ".cpp", ".cxx", ".h", ".hpp", ".inc", ".s", ".cmake"}):
+        return "behavior-test"
+    if name.startswith(("tests/support/", "tests/integration/",
+                        "cmake/package/verification/")):
+        return "consumer-input"
+    return "unknown"
+
+
+def ci_scope(names):
+    """Narrow ordinary tool jobs only for reviewed private behavior tests."""
+    names = tuple(names)
+    result = classify(names)
+    result["tooling"] = any(path_role(name) not in {
+        "documentation", "behavior-test"} for name in names)
+    return result
+
+
 def changed_paths(root, base=None, head="HEAD"):
     """Classify adds/deletes and both rename sides from actual Git bytes."""
     if base and base != "0" * 40:
@@ -222,7 +246,7 @@ def main(arguments=None):
                 with args.github_output.open("a") as output:
                     output.write("skip_cpp=" + str(result["skip_cpp"]).lower() + "\n")
             return 0
-        result = classify(changed_paths(args.root, args.base, args.head))
+        result = ci_scope(changed_paths(args.root, args.base, args.head))
         if args.github_output:
             with args.github_output.open("a") as output:
                 for name, value in result.items():

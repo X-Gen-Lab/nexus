@@ -196,7 +196,8 @@ class F407ClockTests(unittest.TestCase):
             self.provider.validate_clock_consumers(plan, (ulpi,))
 
     def test_direct_input_pwm_uses_its_actual_timer_divider(self):
-        from tools.configure import configure, bindings
+        from tools.configure import configure
+        from tools.configure.generation import bindings
         with tempfile.TemporaryDirectory(dir=configure.ROOT / "build") as temp:
             path = Path(temp) / "pwm.toml"
             source = (configure.ROOT /
@@ -314,7 +315,7 @@ class F407ClockTests(unittest.TestCase):
             result = configure.resolve_ir(path)
             self.assertEqual(result.controllers[0].integration.clock_hz,
                              42000000)
-            from tools.configure import emission
+            from tools.configure.generation import emission
             emission.emit_bundle(result, Path(temp))
             header = (Path(temp) / "nexus_config.h").read_text()
             self.assertIn("#define NEXUS_CORE_HZ 84000000u", header)

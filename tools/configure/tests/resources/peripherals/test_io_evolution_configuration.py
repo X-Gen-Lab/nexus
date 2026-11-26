@@ -6,7 +6,8 @@ import re
 import tempfile
 import unittest
 
-from tools.configure import bindings, configure, enhanced_endpoints, factory
+from tools.configure import configure, enhanced_endpoints
+from tools.configure.generation import bindings, factory
 
 
 class EnhancedEndpointConfiguration(unittest.TestCase):

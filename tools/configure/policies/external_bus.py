@@ -382,7 +382,7 @@ class ExternalBusPolicy:
                 indexes = {pad.identity: index for index, pad in enumerate(cold)}
                 values.update(pins=tuple(ExternalBusPad(pad, indexes.get(pad.identity))
                                         for pad in pads), cold_pads=cold, has_cold_pads=bool(cold))
-                from tools.configure.calls import Symbol
+                from tools.configure.generation.calls import Symbol
                 endpoints = {}
                 for child in configuration.devices:
                     if child.controller != item.id:
@@ -404,9 +404,9 @@ class ExternalBusPolicy:
                 values["readable_regions"] = dma_region_bindings(configuration,
                     include_flash=True, engine=next(iter(engines)))
         else:
-            from tools.configure.calls import Symbol
+            from tools.configure.generation.calls import Symbol
             from tools.configure.ir import DmaMemoryBindingIR
-            from tools.configure.static_ir import Flags
+            from tools.configure.generation.static_ir import Flags
             regions = dma_region_bindings(configuration)
             endpoint = None
             if item.options.memory_window is not None:

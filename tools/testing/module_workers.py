@@ -9,17 +9,21 @@ import signal
 import sys
 import tempfile
 import threading
+from time import perf_counter
 
 from tools.dev import build_lock, process
 from tools.testing import run_tool_tests as runner
 
 
 def run(suite, files, jobs):
+    started = perf_counter()
     requested = process.positive_integer(jobs, "module workers")
     if files is None:
         selected = runner.discover_modules(suite)
         if selected is None:
-            return runner.execute(suite)
+            record = runner.execute(suite)
+            record["duration_seconds"] = perf_counter() - started
+            return record
     else:
         selected = sorted(set(files))
     if not selected:
@@ -52,7 +56,7 @@ def run(suite, files, jobs):
         completed = process.run(
             [sys.executable, "-B", "-m", "tools.testing.module_workers",
              suite, name, str(path), "full" if files is None else "selected"],
-            cwd=runner.ROOT, env=env,
+            cwd=runner.ROOT, env=env, log=path.with_suffix(".log"),
             stage=name, cancel_event=cancel, reject_background=True)
         if completed.returncode:
             if completed.returncode == 130 and cancel.is_set():
@@ -60,7 +64,12 @@ def run(suite, files, jobs):
             cancel.set()
             raise ValueError(f"{name} exited {completed.returncode}\n" +
                              completed.stdout + completed.stderr)
-        return json.loads(path.read_text())
+        record = json.loads(path.read_text())
+        # The existing process receipt includes startup, imports and class
+        # fixtures that unittest case timings intentionally do not measure.
+        record["process_duration_seconds"] = json.loads(
+            completed.receipt_path.read_text())["duration_seconds"]
+        return record
 
     with tempfile.TemporaryDirectory(prefix="nexus-tool-modules-") as temp:
         scratch = Path(temp)
@@ -95,6 +104,9 @@ def run(suite, files, jobs):
     summary.update(suite=suite, qualification=False, status="passed",
                    scope="full-tool-domain" if files is None else "commit-tools",
                    slowest_tests=slowest[:10], workers=count,
+                   duration_seconds=perf_counter() - started,
+                   module_durations_seconds={name: r["process_duration_seconds"]
+                                             for name, r in zip(selected, records)},
                    modules={name: r["case_set_sha256"]
                             for name, r in zip(selected, records)})
     if files is not None:

@@ -8,7 +8,8 @@ import tempfile
 import tomllib
 import unittest
 
-from tools.configure import bindings, configure as gate, factory
+from tools.configure import configure as gate
+from tools.configure.generation import bindings, factory
 from tools.configure.providers.common import ConfigurationError, mode_traits
 
 ROOT = Path(__file__).resolve().parents[5]

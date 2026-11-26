@@ -6,8 +6,9 @@ from operator import getitem
 import unittest
 from unittest.mock import patch
 
-from tools.configure import bindings, configure as gate
-from tools.configure.calls import DirectCall, Symbol
+from tools.configure import configure as gate
+from tools.configure.generation import bindings
+from tools.configure.generation.calls import DirectCall, Symbol
 from tools.configure.providers import common, descriptor, for_selection
 
 

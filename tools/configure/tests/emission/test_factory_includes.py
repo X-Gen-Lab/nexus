@@ -7,7 +7,8 @@ import subprocess
 import tempfile
 import unittest
 
-from tools.configure import configure, experience, factory
+from tools.configure import configure, experience
+from tools.configure.generation import factory
 from tools.configure.tests.assembly_fixture import render_toml
 
 

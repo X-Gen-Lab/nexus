@@ -9,7 +9,7 @@ sys.path.insert(0, str(root))
 from tools.configure.configure import resolve_ir  # noqa: E402
 from tools.configure.dependencies import source_names  # noqa: E402
 from tools.configure.providers import for_selection  # noqa: E402
-from tools.configure.static_ir import Declaration, IrqConnection  # noqa: E402
+from tools.configure.generation.static_ir import Declaration, IrqConnection  # noqa: E402
 
 inputs = {str(root / name) for name in source_names("platform", None)}
 inputs.add(str(Path(__file__).resolve()))

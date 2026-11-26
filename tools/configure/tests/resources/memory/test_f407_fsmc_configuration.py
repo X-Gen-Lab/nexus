@@ -8,7 +8,8 @@ import tomllib
 import unittest
 from tools.configure.providers import maintained
 
-from tools.configure import bindings, configure as gate, factory, selected_contracts
+from tools.configure import configure as gate, selected_contracts
+from tools.configure.generation import bindings, factory
 
 
 class F407FSMCConfigurationTests(unittest.TestCase):

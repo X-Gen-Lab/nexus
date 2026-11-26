@@ -1,8 +1,14 @@
 """One global support scan checks facts, exports and derived documentation."""
 
 from pathlib import Path
+import contextlib
+import io
+import subprocess
+import sys
+import tempfile
 import tomllib
 import unittest
+from unittest.mock import patch
 
 from scripts.ci import provider_assemblies
 from tools.maintenance import capabilities
@@ -11,6 +17,42 @@ ROOT = Path(__file__).resolve().parents[3]
 
 
 class CapabilityUnitTests(unittest.TestCase):
+    def test_selected_query_does_not_import_checkout_only_tools(self):
+        script = '''
+import importlib.abc
+import sys
+from pathlib import Path
+sys.path.insert(0, sys.argv[1])
+class InstalledScope(importlib.abc.MetaPathFinder):
+    def find_spec(self, fullname, path, target=None):
+        if fullname in {'tools.configure.documentation', 'tools.configure.matrix'}:
+            raise ImportError('checkout-only module requested: ' + fullname)
+sys.meta_path.insert(0, InstalledScope())
+from tools.maintenance import capabilities
+root = Path(sys.argv[1])
+selected = capabilities.selection(
+    root / 'tools/configure/assemblies/qiming-baremetal-gpio.toml', root)
+assert selected['selection']['soc_family'] == 'stm32f4'
+assert selected['validation']['configuration'] == 'validated'
+'''
+        result = subprocess.run([sys.executable, '-I', '-B', '-c', script, str(ROOT)],
+                                capture_output=True, text=True, timeout=60)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_global_maintenance_rejects_installed_or_incomplete_source(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            for installed in (False, True):
+                if installed:
+                    (root / '.nexus-source-sdk.json').write_text('{}\n')
+                with self.subTest(installed=installed):
+                    errors = io.StringIO()
+                    with contextlib.redirect_stdout(io.StringIO()), \
+                            contextlib.redirect_stderr(errors):
+                        status = capabilities.main(['--check', '--root', str(root)])
+                    self.assertEqual(status, 1)
+                    self.assertIn('complete source checkout', errors.getvalue())
+
     def test_generated_block_requires_exact_content_and_single_markers(self):
         expected = "| UART | dma-tx |\n"
         document = ("intro\n" + capabilities.START + "\n" + expected
@@ -36,7 +78,9 @@ const nx_uart_ops_t nx_sample_uart_ops = {0};
 class CapabilityDocumentationTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.rows = capabilities.collect(ROOT)
+        with patch('tools.configure.generation.bindings.emit',
+                   side_effect=AssertionError('capability queries must not emit C')):
+            cls.rows = capabilities.collect(ROOT)
 
     def test_current_matrix_uses_actual_resolver_and_preserves_scope(self):
         rows = self.rows

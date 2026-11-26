@@ -5,7 +5,7 @@ import unittest
 from unittest.mock import patch
 
 from scripts.ci import tdd_gate
-from tools.testing import gate_fixture as integration
+from tools.testing.support import gate_fixture as integration
 
 
 class TDDBinaryPlanBoundaryTests(unittest.TestCase):

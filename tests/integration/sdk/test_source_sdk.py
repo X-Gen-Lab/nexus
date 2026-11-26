@@ -414,7 +414,7 @@ class SourceSDKSelectionTests(unittest.TestCase):
             "tools/maintenance/capabilities.py",
             "tools/maintenance/consumer_profiles.py",
             "tools/evidence/common.py", "tools/evidence/identity.py",
-            "tools/configure/documentation.py",
+            "tools/configure/generation/__init__.py",
             "scripts/validation/junit.py",
         )
         self.assert_rehashed_required_omissions(required)
@@ -422,7 +422,8 @@ class SourceSDKSelectionTests(unittest.TestCase):
     def test_build_policy_and_tool_module_closure_is_required(self):
         required = {"cmake/platform/TargetPolicy.cmake",
                     "tools/configure/bundle.py", "tools/configure/dependencies.py",
-                    "tools/configure/contracts.py", "tools/configure/matrix.py",
+                    "tools/configure/contracts.py",
+                    "tools/configure/generation/emission.py",
                     "tools/dev/dev.py", "tools/dev/presets.py", "tools/dev/process.py",
                     "tools/dev/change_paths.py", "tools/dev/cache.py",
                     "tools/dev/dependencies.py", "tools/dev/provenance.py",
@@ -1184,14 +1185,35 @@ class SourceSDKTests(unittest.TestCase):
 
     @unittest.skipUnless(shutil.which("arm-none-eabi-gcc"), "ARM GNU toolchain unavailable: no ARM execution claim")
     def test_relocated_arm_consumer_compiles_real_startup_and_linker(self):
-        _, build, result = self.consumer("arm", arm=True, fixture=True)
+        source, build, result = self.consumer("arm", arm=True, fixture=True)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        ninja = (build / "build.ninja").read_text()
+        self.assertRegex(ninja, r"build_resources\.py;[0-9a-f]{64};--elf")
         self.run_ok(["cmake", "--build", str(build), "--parallel", "1", "--target", "installed_c", "installed_cpp"])
         for application in ("installed_c", "installed_cpp"):
             self.assertGreater((build / "bin" / (application + ".elf")).stat().st_size, 0)
             resources = json.loads((build / "bin" / (application + ".resources.json")).read_text())
             self.assertEqual(resources["status"], "passed")
         self.check_private_includes(build)
+
+        # An app-only rebuild still checks source SDK payload bytes even when
+        # the installed file has no edge in the firmware compilation graph.
+        license_file = self.sdk / "LICENSE"
+        original = license_file.read_bytes()
+        try:
+            license_file.write_bytes(original + b"\nChanged after configuration.\n")
+            with (source / "main.c").open("a") as stream:
+                stream.write("\n/* Force application relink. */\n")
+            rejected = self.run_process(["cmake", "--build", str(build),
+                                         "--parallel", "1", "--target", "installed_c"])
+            diagnostic = rejected.stdout + rejected.stderr
+            self.assertNotEqual(rejected.returncode, 0, diagnostic)
+            report_path = build / "bin/installed_c.resources.json"
+            if report_path.is_file():
+                diagnostic += json.loads(report_path.read_text()).get("failure", "")
+            self.assertIn("Source SDK file identity changed: LICENSE", diagnostic)
+        finally:
+            license_file.write_bytes(original)
 
 
 
@@ -1492,7 +1514,7 @@ class SourceSDKTests(unittest.TestCase):
             'tools/configure/usb_device.py',
             'tools/configure/ethernet.py',
             'tools/configure/timer_advanced.py',
-            'tools/configure/bindings.py',
+            'tools/configure/generation/bindings.py',
             'cmake/platform/ControllerModes.cmake',
             'components/runtime/clock_domain/private/clock_domain_impl.h',
             'components/runtime/amp_ipc/CMakeLists.txt',

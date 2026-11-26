@@ -2,9 +2,9 @@
 from dataclasses import FrozenInstanceError
 import unittest
 
-from tools.configure.calls import Address, DirectCall, Symbol
+from tools.configure.generation.calls import Address, DirectCall, Symbol
 from tools.configure.providers.common import Construction
-from tools.configure.static_ir import Declaration, IrqConnection
+from tools.configure.generation.static_ir import Declaration, IrqConnection
 
 
 class TypedConstructionTests(unittest.TestCase):

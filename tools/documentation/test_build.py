@@ -40,6 +40,7 @@ class BuildTests(unittest.TestCase):
         self.enterContext(patch.object(install, "context", return_value=self.context))
         self.source = {"commit": "1" * 40, "tree": "2" * 40, "dirty": False}
         self.enterContext(patch.object(build, "observe_git_source", return_value=self.source))
+        self.source_scan = build.check.scan
         self.enterContext(patch.object(build.check, "scan", return_value={"errors": []}))
         self.enterContext(patch.object(build.check, "validate_translations",
             return_value={"status": "passed", "errors": [], "records": []}))
@@ -84,6 +85,42 @@ class BuildTests(unittest.TestCase):
 
     def invoke(self, **kwargs):
         return build.build(self.root, self.output, **kwargs)
+
+    def test_build_shares_include_discovery_and_keeps_one_graph_validation(self):
+        folder = self.root / 'parts'
+        folder.mkdir()
+        (folder / 'fragment.txt').write_text(
+            '```{literalinclude} nested.c\n```\n')
+        (folder / 'nested.c').write_text('int included_input;\n')
+        with (self.root / 'docs/index.md').open('a') as page:
+            page.write('\n```{include} ../parts/fragment.txt\n```\n')
+        (self.root / 'docs/assets/diagrams/diagram-index.csv').write_text(
+            'diagram_id,source_dot,rendered_svg,render_status\n'
+            'FIG-01,flow.dot,flow.svg,rendered\n')
+        with patch.object(build.check, 'scan', wraps=self.source_scan), \
+                patch.object(build.check, 'dependencies',
+                             wraps=build.check.dependencies) as discover:
+            self.invoke()
+            # Output protection, admission and the final observation each
+            # independently discover inputs; admission must not parse twice.
+            self.assertEqual(discover.call_count, 3)
+        graph = build.diagrams.check
+        graph.assert_called_once_with(self.root,
+            env=self.context.environment(), full=True)
+        self.assertIn('parts/nested.c', build.inputs(self.root))
+        graph.reset_mock()
+        graph.return_value = {'errors': ['standalone diagram rejection']}
+        result = self.source_scan(self.root)
+        self.assertIn('standalone diagram rejection', result['errors'])
+        graph.assert_called_once_with(self.root, full=False)
+
+    def test_build_still_rejects_a_diagram_declared_unrendered(self):
+        (self.root / 'docs/assets/diagrams/diagram-index.csv').write_text(
+            'diagram_id,source_dot,rendered_svg,render_status\n'
+            'FIG-01,flow.dot,flow.svg,pending\n')
+        with patch.object(build.check, 'scan', wraps=self.source_scan):
+            with self.assertRaisesRegex(ValueError, 'required diagram not rendered'):
+                self.invoke()
 
     def test_verify_publishes_only_site_with_explicit_full_scope(self):
         result = self.invoke()
@@ -136,7 +173,7 @@ class BuildTests(unittest.TestCase):
         def observe(_root):
             snapshot_done.set()
             return self.source
-        def scan(_root):
+        def scan(_root, **_options):
             self.assertTrue(snapshot_done.is_set())
             self.assertTrue(tools_started.wait(timeout=3))
             checked.set()
@@ -157,7 +194,7 @@ class BuildTests(unittest.TestCase):
         def prepare(_prefix):
             self.assertTrue(checked.wait(timeout=3))
             raise ValueError("tool tuple failed")
-        def scan(_root):
+        def scan(_root, **_options):
             checked.set()
             return {"errors": []}
         import os
@@ -190,7 +227,7 @@ class BuildTests(unittest.TestCase):
             def observe(_root):
                 order.append("snapshot")
                 return self.source
-            def scan(_root):
+            def scan(_root, **_options):
                 order.append("source-check")
                 return {"errors": []}
             with self.subTest(mode=mode), \

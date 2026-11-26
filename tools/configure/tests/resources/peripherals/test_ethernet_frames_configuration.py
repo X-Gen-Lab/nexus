@@ -7,7 +7,8 @@ import tempfile
 import tomllib
 import unittest
 
-from tools.configure import bindings, configure, factory, selected_contracts
+from tools.configure import configure, selected_contracts
+from tools.configure.generation import bindings, factory
 
 
 class EthernetFramesConfiguration(unittest.TestCase):

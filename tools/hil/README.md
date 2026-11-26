@@ -51,6 +51,17 @@ population、jumpers、connector personality 和 PCB revision，复制声明不�
 
 ## Fixture 与精确模式边界
 
+HIL 的编辑参考 schema 由本目录就近维护：
+
+| 文件 | 编写用途 | 实际校验入口 |
+| --- | --- | --- |
+| [hil-fixture.schema.json](schemas/hil-fixture.schema.json) | 工装字段 | `admit.py` |
+| [hil-station.schema.json](schemas/hil-station.schema.json) | station 字段与预算 | `admit.py`、`acquire.py` |
+| [physical-hil-evidence.schema.json](schemas/physical-hil-evidence.schema.json) | 物理观测记录 | `admit.py` 及对应观测工具 |
+
+这些文件供编辑与记录编写使用，不是第二份准入权威。工具继续校验文件身份、
+物理条件、时间与数值关系；不增加默认 JSON Schema 运行依赖。
+
 当前维护四份 F407 fixture，均未取得实板观察。文件名、Board 和精确 part 必须与
 同一构建的 `resolved.json` 一致，不能交换核心板、底板、V3.1 或天空星的身份。
 

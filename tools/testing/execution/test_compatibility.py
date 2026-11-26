@@ -26,7 +26,7 @@ class CompatibilityTests(unittest.TestCase):
                          "source_sdk_exact_only": True, "factory_abi_epoch": self.epoch}
 
     def test_power_stage_cycle_contract_requires_epoch_seven(self):
-        from tools.configure import factory
+        from tools.configure.generation import factory
         from tools.configure.ir import ConfigurationIR
 
         self.assertEqual(self.policy["factory_abi_epoch"], 7)
@@ -73,7 +73,7 @@ class CompatibilityTests(unittest.TestCase):
     def test_changed_emitted_projection_schema_is_rejected(self):
         with tempfile.TemporaryDirectory() as directory:
             root = self.fixture(directory)
-            path = root / "tools/configure/emission.py"
+            path = root / "tools/configure/generation/emission.py"
             source = path.read_text()
             self.assertIn("RESOLVED_SCHEMA_VERSION = 2", source)
             path.write_text(source.replace("RESOLVED_SCHEMA_VERSION = 2",
@@ -98,7 +98,7 @@ class CompatibilityTests(unittest.TestCase):
     def test_supported_factory_code_generation_is_observed(self):
         with tempfile.TemporaryDirectory() as directory:
             root = self.fixture(directory)
-            path = root / "tools/configure/factory.py"
+            path = root / "tools/configure/generation/factory.py"
             path.write_text(path.read_text().replace(f"FACTORY_ABI_EPOCH = {self.epoch}", f"FACTORY_ABI_EPOCH = {self.epoch + 1}"))
             with self.assertRaisesRegex(ValueError, "factory.*epoch"):
                 compatibility.check(root)
@@ -232,8 +232,8 @@ class CompatibilityTests(unittest.TestCase):
         root = Path(directory)
         names = [compatibility.POLICY, "CMakeLists.txt", "tools/configure/authored.py",
                  "tools/configure/configure.py", "tools/configure/runtime.py",
-                 "tools/configure/ir.py", "tools/configure/emission.py",
-                 "tools/configure/assembly.schema.json", "tools/configure/factory.py", "cmake/package/package_source_sdk.py",
+                 "tools/configure/ir.py", "tools/configure/generation/emission.py",
+                 "tools/configure/assembly.schema.json", "tools/configure/generation/factory.py", "cmake/package/package_source_sdk.py",
                  "cmake/package/NexusConfigVersion.cmake.in", "tests/support/native/board/board.json",
                  "tests/support/native/soc.json", "tests/support/native/routes.json",
                  "boards/stm32f407_qiming_v31/board.json",

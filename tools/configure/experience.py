@@ -12,7 +12,8 @@ import os
 from pathlib import Path
 import sys
 
-from tools.configure import factory, selected_contracts, board_hardware, packages
+from tools.configure import selected_contracts, board_hardware, packages
+from tools.configure.generation import factory
 from tools.configure.ir import thaw
 from tools.configure.providers import maintained
 from tools.configure.providers.common import mode_traits, route_dma

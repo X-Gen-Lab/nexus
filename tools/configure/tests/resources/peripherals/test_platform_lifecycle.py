@@ -3,8 +3,9 @@ from dataclasses import replace
 import unittest
 from unittest.mock import patch
 
-from tools.configure import bindings, configure, runtime_power
-from tools.configure.calls import DirectCall
+from tools.configure import configure, runtime_power
+from tools.configure.generation import bindings
+from tools.configure.generation.calls import DirectCall
 from tools.configure.providers import for_selection
 from tools.configure.providers.common import ConfigurationError
 from tools.configure.tests.native_fixture import native_fixture

@@ -300,7 +300,7 @@ class ResolverTests(unittest.TestCase):
             self.assertFalse(any(ord(char) < 32 and char not in "\n\t"
                                  for char in text), path.name)
         # Inspect the MCU-specific runtime hooks as well as the Native bundle.
-        from tools.configure import bindings
+        from tools.configure.generation import bindings
         result = gate.resolve_ir(gate.ROOT /
             "tools/configure/assemblies/qiming-baremetal-empty.toml", test_support=native_fixture(gate.ROOT /
             "tools/configure/assemblies/qiming-baremetal-empty.toml"))

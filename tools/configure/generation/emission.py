@@ -184,8 +184,8 @@ def emit_bundle(result, output):
         raise ValueError("Duplicate generated build-selection variable")
     cmake.append('set(NEXUS_SELECTION_VARIABLES "' + ';'.join(names) + '")')
     write("selection.cmake", "\n".join(cmake) + "\n")
-    from tools.configure.bindings import emit
-    from tools.configure.factory import emit as emit_factory, emit_strong, emit_smbus
+    from tools.configure.generation.bindings import emit
+    from tools.configure.generation.factory import emit as emit_factory, emit_strong, emit_smbus
     factory_header, factory_source = emit_factory(result)
     write("nexus_factory.h", factory_header)
     write("nexus_factory_strong.h", emit_strong(result))

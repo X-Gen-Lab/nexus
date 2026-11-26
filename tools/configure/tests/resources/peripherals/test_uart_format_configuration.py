@@ -7,7 +7,8 @@ import re
 import tempfile
 import unittest
 
-from tools.configure import bindings, configure, factory, io_traits, uart_formats
+from tools.configure import configure, io_traits, uart_formats
+from tools.configure.generation import bindings, factory
 from tools.configure.providers import for_selection
 
 

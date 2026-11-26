@@ -18,12 +18,10 @@ import venv
 
 
 ROOT = Path(__file__).resolve().parents[2]
-PACKAGES = ("pre-commit", "clang-format", "gersemi")
+sys.path.insert(0, str(ROOT / "scripts/tools"))
+from tool_lock import PACKAGES, ToolLockError as InstallError, read_lock
+
 LOCK_NAME = "dependencies/development-tools.txt"
-PIN_PATTERN = re.compile(
-    r"(pre-commit|clang-format|gersemi)=="
-    r"((?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*))"
-)
 PROBE = """
 import importlib.metadata
 import json
@@ -42,38 +40,6 @@ print(json.dumps({
     'versions': versions,
 }))
 """
-
-
-class InstallError(Exception):
-    """An actionable prerequisite or validation failure."""
-
-
-def read_lock(path):
-    """Accept exactly one stable semantic-version pin per allowed package."""
-    try:
-        contents = path.read_text(encoding="utf-8")
-    except OSError as error:
-        raise InstallError(f"Cannot read tool lock {path}: {error}") from error
-    pins = {}
-    for number, raw in enumerate(contents.splitlines(), 1):
-        line = raw.strip()
-        if not line or line.startswith("#"):
-            continue
-        # pip treats an inline comment as such only after whitespace.
-        line = re.sub(r"\s+#.*$", "", line).strip()
-        match = PIN_PATTERN.fullmatch(line)
-        if not match:
-            raise InstallError(
-                f"Invalid tool lock {path}:{number}: expected an allowed name==X.Y.Z pin"
-            )
-        name, version = match.groups()
-        if name in pins:
-            raise InstallError(f"Duplicate tool pin {name} in {path}:{number}")
-        pins[name] = version
-    missing = set(PACKAGES) - set(pins)
-    if missing:
-        raise InstallError(f"Tool lock {path} is missing: {', '.join(sorted(missing))}")
-    return pins
 
 
 def venv_paths(directory, platform_name=None):

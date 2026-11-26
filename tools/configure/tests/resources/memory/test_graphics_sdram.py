@@ -3,10 +3,11 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from tools.configure import authored, bindings, emission
+from tools.configure import authored
+from tools.configure.generation import bindings, emission
 from tools.configure.tests.resources.peripherals import test_graphics_configuration as reference
-from tools.configure.calls import Symbol
-from tools.configure.static_ir import Flags
+from tools.configure.generation.calls import Symbol
+from tools.configure.generation.static_ir import Flags
 from tools.configure.tests.external_memory_fixture import construct
 
 

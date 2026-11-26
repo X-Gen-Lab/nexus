@@ -5,7 +5,8 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from tools.configure import authored, configure, bindings
+from tools.configure import authored, configure
+from tools.configure.generation import bindings
 from tools.configure.data_provider import DataProvider
 from tools.configure.providers import for_selection
 from tools.configure.tests.native_fixture import native_fixture

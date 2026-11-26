@@ -3,7 +3,7 @@ from collections.abc import Mapping
 from contextlib import contextmanager
 import re
 
-from tools.configure.calls import C_KEYWORDS as C11_KEYWORDS
+from tools.configure.generation.calls import C_KEYWORDS as C11_KEYWORDS
 from tools.configure.providers.common import ConfigurationError, fail
 
 IDENTIFIER = re.compile(r"[A-Za-z][A-Za-z0-9_-]{0,63}")

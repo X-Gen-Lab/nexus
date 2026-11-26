@@ -6,11 +6,12 @@
 | 入口 | 责任 |
 | --- | --- |
 | `style_gate.py`、`check_commit_message.py` | 完整staged格式、注释、文本与Conventional Commit |
-| `tdd_gate.py`、`native_contracts.py` | 精确index、完整工具域、真实Google／CTest发现与无过滤执行 |
+| `tdd_gate.py`、`native_contracts.py` | 精确 index、完整 Native 执行、选定工具模块与真实 Google／CTest 发现 |
 | `arch_compile.py`、`cortex_runtime.py` | 实际ARM CPU／ABI／指令与生产runtime闭包 |
 | `os_resources.py`、`os_wait_cost.py` | 明确ABI／布局的真实链接成本，不推断cycles |
 | SoC／provider runner | 手写精确装配、startup／资源／保留检查 |
 | vendor／toolchain检查 | 固定来源、许可、输入与实际工具身份 |
+| `qualification/memory_budget.py` | 私有预算拒绝与真实溢出验证，由公开 runner 复用 |
 
 缺工具、空范围、skip-only、陈旧报告都失败。本地hook与CI执行相同规则；存在本地
 政策不表示远端branch protection已开启。外部工具按已有lock预备，固件configure

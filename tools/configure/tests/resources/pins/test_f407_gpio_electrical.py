@@ -6,9 +6,10 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from tools.configure import bindings, configure as gate, experience
+from tools.configure import configure as gate, experience
+from tools.configure.generation import bindings
 from tools.configure.data_provider import DataProvider
-from tools.configure.static_ir import Declaration, IrqConnection
+from tools.configure.generation.static_ir import Declaration, IrqConnection
 
 
 class F407GpioElectricalTests(unittest.TestCase):

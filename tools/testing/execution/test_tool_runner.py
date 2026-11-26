@@ -7,6 +7,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
 import unittest
 from pathlib import Path
 from unittest.mock import patch
@@ -139,6 +140,9 @@ class ToolRunnerTests(unittest.TestCase):
             self.assertEqual(record.pop("workers"), 1)
             self.assertEqual(set(record.pop("modules")),
                              {"os/freertos/test_fixture.py"})
+            durations = record.pop("module_durations_seconds")
+            self.assertEqual(set(durations), {"os/freertos/test_fixture.py"})
+            self.assertGreaterEqual(record.pop("duration_seconds"), max(durations.values()))
             slowest = record.pop("slowest_tests")
             self.assertEqual(len(slowest), 1)
             self.assertIn("test_complete", slowest[0]["test"])
@@ -181,11 +185,35 @@ class ToolRunnerTests(unittest.TestCase):
         self.assertEqual(record["discovered"], 2)
         self.assertEqual(record["status"], "passed")
 
+    def test_directory_wall_time_includes_discovery_and_class_fixtures(self):
+        class Fixture(unittest.TestCase):
+            @classmethod
+            def setUpClass(cls):
+                time.sleep(0.02)
+
+            @classmethod
+            def tearDownClass(cls):
+                time.sleep(0.02)
+
+            def test_fast(self):
+                pass
+
+        def discovery(*args, **kwargs):
+            time.sleep(0.02)
+            return unittest.TestSuite([Fixture("test_fast")])
+
+        with patch("unittest.TestLoader.discover", side_effect=discovery), \
+                redirect_stderr(io.StringIO()):
+            record = execute("testing")
+        self.assertGreaterEqual(record["duration_seconds"], 0.06)
+        self.assertEqual(record["executed"], 1)
+        self.assertNotIn("module_durations_seconds", record)
+
     def test_slowest_cases_use_actual_result_durations_and_keep_only_ten(self):
         cases = [unittest.FunctionTestCase(lambda: None,
                                            description=f"case-{index}")
                  for index in range(12)]
-        times = [value for index in range(12) for value in (0, index + 1)]
+        times = [0, *[value for index in range(12) for value in (0, index + 1)], 20]
         with patch.object(run_tool_tests, "perf_counter", side_effect=times,
                           create=True):
             record = self.run_fixture(unittest.TestSuite(cases))
@@ -193,6 +221,7 @@ class ToolRunnerTests(unittest.TestCase):
                           for item in record["slowest_tests"]],
                          list(range(12, 2, -1)))
         self.assertTrue(all(item["test"] for item in record["slowest_tests"]))
+        self.assertEqual(record["duration_seconds"], 20)
 
     def test_class_setup_error_retains_empty_durations_and_actual_failure(self):
         class BrokenSetup(unittest.TestCase):
@@ -570,7 +599,7 @@ class ChangedDomainTests(unittest.TestCase):
         self.assertEqual(run_tool_tests.changed_suites([
             "core/src/time.c", "tools/dev/presets.py"]), ("testing",))
         self.assertEqual(run_tool_tests.changed_suites([
-            "io/src/gpio.c", "tools/configure/bindings.py"]),
+            "io/src/gpio.c", "tools/configure/generation/bindings.py"]),
             ("testing", "configure"))
 
     def test_complete_domains_follow_actual_changes_and_deletions(self):

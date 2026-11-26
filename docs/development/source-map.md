@@ -52,8 +52,8 @@ vendors/
 | 包、binding 与接入边界 | [接入指南](../guides/provider-porting.md)、[package loader](../../tools/configure/packages.py) |
 | 资料身份与已审适用范围 | 包内 `facts/review_profiles.json`、[ProfileSet](../../tools/configure/reference_profiles.py) |
 | 领域与私有值 | [DomainPolicies](../../tools/configure/domain_policies.py)、[IR](../../tools/configure/ir.py) |
-| 静态对象与 IRQ／endpoint 连接 | [StaticRecipe／StaticObjects](../../tools/configure/static_recipe.py)、[SharedIrq](../../tools/configure/shared_irq.py)、[ChildGroups](../../tools/configure/static_endpoints.py) |
-| 单层声明和值片段 | [StaticFragments](../../tools/configure/static_fragments.py) |
+| 静态对象与 IRQ／endpoint 连接 | [StaticRecipe／StaticObjects](../../tools/configure/generation/static_recipe.py)、[SharedIrq](../../tools/configure/generation/shared_irq.py)、[ChildGroups](../../tools/configure/generation/static_endpoints.py) |
+| 单层声明和值片段 | [StaticFragments](../../tools/configure/generation/static_fragments.py) |
 | 配置与构建 | [工具](../../tools/README.md)、[CMake](../../cmake/README.md) |
 | 模型、链接与执行证据 | [测试](../../tests/README.md)、[交付边界](../reference/platforms/index.md) |
 

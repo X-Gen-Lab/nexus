@@ -56,7 +56,7 @@ def _typed_argument(value):
     # Static values reuse call symbols. Import their closed set only after both
     # modules are initialized; accepting arbitrary render methods would reopen
     # an unchecked C-source escape.
-    from tools.configure.static_ir import (ArrayElementAddress, ConstantMacro,
+    from tools.configure.generation.static_ir import (ArrayElementAddress, ConstantMacro,
         Flags, PointerMemberAddress, Signed32, Unsigned64)
     return isinstance(value, (ArrayElementAddress, ConstantMacro, Flags,
                               PointerMemberAddress, Signed32, Unsigned64))

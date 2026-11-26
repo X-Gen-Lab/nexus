@@ -3,7 +3,8 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from tools.configure import bindings, configure
+from tools.configure import configure
+from tools.configure.generation import bindings
 from tools.configure.tests.f4_fixture import provider as f4_provider
 from tools.configure.tests.resources.peripherals import test_f407_block_configuration as fixtures
 from tools.configure.tests.native_fixture import native_fixture

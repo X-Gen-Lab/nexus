@@ -338,6 +338,7 @@ def execute(suite, files=None):
 def execute_directory(directory, suite, *, files=None, record_cases=False,
                       allow_empty_module=False):
     """Use the same admission for documentation's separate locked environment."""
+    started = perf_counter()
     loader = unittest.TestLoader()
     if files is None:
         tests = loader.discover(str(directory), pattern="test_*.py")
@@ -370,6 +371,7 @@ def execute_directory(directory, suite, *, files=None, record_cases=False,
               "expected_failures": len(result.expectedFailures),
               "unexpected_successes": len(result.unexpectedSuccesses),
               "slowest_tests": result.slowest_tests,
+              "duration_seconds": perf_counter() - started,
               "scope": "full-tool-domain" if files is None else "commit-tools",
               "qualification": False}
     if files is not None:

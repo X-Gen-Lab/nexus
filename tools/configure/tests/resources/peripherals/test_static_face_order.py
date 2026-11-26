@@ -6,9 +6,10 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from tools.configure import bindings, configure
+from tools.configure import configure
+from tools.configure.generation import bindings
 from tools.configure.providers import for_selection
-from tools.configure.static_recipe import StaticRecipe
+from tools.configure.generation.static_recipe import StaticRecipe
 
 
 class StaticFaceOrderTests(unittest.TestCase):

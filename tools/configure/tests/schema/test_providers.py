@@ -11,7 +11,7 @@ import tempfile
 import unittest
 
 from tools.configure.providers import descriptor, maintained
-from tools.configure import bindings
+from tools.configure.generation import bindings
 from tools.configure import configure as gate
 from tools.configure import selection as selection_rules
 

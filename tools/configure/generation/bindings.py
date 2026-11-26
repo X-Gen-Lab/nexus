@@ -1,15 +1,15 @@
 """Static faces and common lifecycle order; SoC modules emit hardware wiring."""
 from tools.configure.providers import for_selection
 from tools.configure.ir import ConfigurationIR
-from tools.configure.factory import (interface_type, public_include,
+from tools.configure.generation.factory import (interface_type, public_include,
                                      controller_class, controller_ordinals)
 from tools.configure import gpio_phase
 from tools.configure import enhanced_endpoints
 from tools.configure import coupled_assembly
 from tools.configure import stream_profiles, uart_formats
-from tools.configure.calls import DirectCall, InitializeSequence, Symbol
+from tools.configure.generation.calls import DirectCall, InitializeSequence, Symbol
 from tools.configure.providers.common import fail
-from tools.configure.static_ir import (ControllerPowerConnection, Declaration,
+from tools.configure.generation.static_ir import (ControllerPowerConnection, Declaration,
                                       IrqConnection)
 
 

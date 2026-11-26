@@ -7,7 +7,8 @@ import tempfile
 import unittest
 
 from tools.configure.policies.gpio_phase import GpioPhasePolicy
-from tools.configure import bindings, configure as gate
+from tools.configure import configure as gate
+from tools.configure.generation import bindings
 from tools.configure.tests.f4_fixture import provider
 
 

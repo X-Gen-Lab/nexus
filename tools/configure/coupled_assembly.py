@@ -5,8 +5,8 @@ admission, clocks, interrupts, waiting and rollback; this module adds no behavio
 """
 from dataclasses import replace
 
-from tools.configure.calls import Address, DirectCall, InitializeSequence, Symbol
-from tools.configure.static_ir import Array, Declaration, IrqConnection, Record
+from tools.configure.generation.calls import Address, DirectCall, InitializeSequence, Symbol
+from tools.configure.generation.static_ir import Array, Declaration, IrqConnection, Record
 
 
 def _name(domain):

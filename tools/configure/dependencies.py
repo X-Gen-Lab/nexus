@@ -8,8 +8,8 @@ import tomllib
 ROOT = Path(__file__).resolve().parents[2]
 COMMON = (
     "component_catalog",
-    "__init__", "bundle", "dependencies", "contracts", "sdk", "cpu", "kernel", "metadata", "factory", "ir", "records",
-    "providers/__init__", "providers/common", "calls",
+    "__init__", "bundle", "dependencies", "contracts", "sdk", "cpu", "kernel", "metadata", "generation/__init__", "generation/factory", "ir", "records",
+    "providers/__init__", "providers/common", "generation/calls",
     "validation", "resource_graph", "trigger_graph", "dma_topology", "io_traits",
     "selected_contracts",
     "enhanced_endpoints", "uart_formats", "stream_profiles", "usb_profiles",
@@ -17,17 +17,17 @@ COMMON = (
 )
 PLATFORM = (
     "device_graph", "pinmux", "policies/bxcan",
-    "providers/descriptor", "packages", "package_policy", "static_ir",
-    "data_provider", "static_recipe", "static_endpoints", "static_fragments",
-    "shared_irq", "domain_policies", "domain_bridge", "header_projection",
+    "providers/descriptor", "packages", "package_policy", "generation/static_ir",
+    "data_provider", "generation/static_recipe", "generation/static_endpoints", "generation/static_fragments",
+    "generation/shared_irq", "domain_policies", "domain_bridge", "generation/header_projection",
     "integration_package",
-    "configure", "selection", "onboarding", "authored", "bindings", "emission", "experience", "can", "memory",
+    "configure", "selection", "onboarding", "authored", "generation/bindings", "generation/emission", "experience", "can", "memory",
     "usb_device", "ethernet", "timer_advanced", "secondary_controllers", "coupled_io",
     "coupled_assembly",
     "fact_references", "reference_profiles", "device_view", "clocks", "physical_facts", "gpio_phase",
     "i2c_timing", "i2c_timing_selection", "pin_states", "runtime_power",
     "adc", "dac", "exti", "board_hardware", "gpio_electrical", "rtc",
-    "providers/hardware", "hardware_bindings", "platform_bindings", "startup_memory",
+    "providers/hardware", "hardware_bindings", "generation/platform_bindings", "startup_memory",
     "i2c_target", "spi_frames", "spi_connections", "uart_wires", "media_schema",
     "domains/__init__", "domains/pll_mnpq",
     "policies/adc_group", "policies/capture_audio", "policies/external_bus",

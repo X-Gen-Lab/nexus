@@ -2,7 +2,8 @@
 from tools.configure.tests.native_fixture import native_fixture
 import unittest
 
-from tools.configure import configure as gate, factory
+from tools.configure import configure as gate
+from tools.configure.generation import factory
 
 
 class UartValidatorFactoryTests(unittest.TestCase):

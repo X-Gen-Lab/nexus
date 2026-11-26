@@ -9,8 +9,8 @@ import subprocess
 import sys
 
 ROOT = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(ROOT / "scripts/setup"))
-import install_dev_tools
+sys.path.insert(0, str(ROOT / "scripts/tools"))
+import tool_lock
 EXCLUDED = {"vendors", "vendor", "ext", "build", ".venv", ".git"}
 
 
@@ -25,7 +25,7 @@ def owned_file(name):
 def _run(root, paths, mode):
     if not paths:
         return subprocess.CompletedProcess([], 0, "", "")
-    pins = install_dev_tools.read_lock(root / "dependencies/development-tools.txt")
+    pins = tool_lock.read_lock(root / "dependencies/development-tools.txt")
     try:
         version = importlib.metadata.version("gersemi")
     except importlib.metadata.PackageNotFoundError as error:

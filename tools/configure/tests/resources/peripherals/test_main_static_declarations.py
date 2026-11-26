@@ -3,10 +3,11 @@ import subprocess
 import sys
 import unittest
 
-from tools.configure import bindings, configure
+from tools.configure import configure
+from tools.configure.generation import bindings
 from tools.configure.data_provider import DataProvider
 from tools.configure.providers import for_selection
-from tools.configure.static_ir import Declaration, IrqConnection
+from tools.configure.generation.static_ir import Declaration, IrqConnection
 
 
 class MainStaticDeclarations(unittest.TestCase):

@@ -5,11 +5,12 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from tools.configure import bindings, configure as gate, factory
-from tools.configure.calls import Symbol
+from tools.configure import configure as gate
+from tools.configure.generation import bindings, factory
+from tools.configure.generation.calls import Symbol
 from tools.configure.data_provider import DataProvider
 from tools.configure.providers import for_selection
-from tools.configure.static_ir import Flags
+from tools.configure.generation.static_ir import Flags
 
 
 class F407CryptoTests(unittest.TestCase):

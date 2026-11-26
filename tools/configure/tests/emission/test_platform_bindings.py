@@ -6,20 +6,20 @@ import sys
 import unittest
 
 from tools.configure import configure
-from tools.configure.calls import DirectCall, InitializeSequence
-from tools.configure.static_ir import Declaration
+from tools.configure.generation.calls import DirectCall, InitializeSequence
+from tools.configure.generation.static_ir import Declaration
 
 
 class PlatformBindingTests(unittest.TestCase):
     def policy(self):
-        module = importlib.import_module("tools.configure.platform_bindings")
+        module = importlib.import_module("tools.configure.generation.platform_bindings")
         facts = configure.load(configure.ROOT /
             "soc/stm32/stm32f4/private/bindings/platform.json")
         return module.PlatformBindings.from_validated(facts["domains"]["platform"])
 
     def test_common_import_selects_no_family_adapter(self):
         result = subprocess.run([sys.executable, "-c", (
-            "import sys; import tools.configure.platform_bindings; "
+            "import sys; import tools.configure.generation.platform_bindings; "
             "assert 'tools.configure.stm32f4' not in sys.modules")],
             cwd=configure.ROOT, text=True, capture_output=True)
         self.assertEqual(result.returncode, 0, result.stderr)
@@ -52,7 +52,7 @@ class PlatformBindingTests(unittest.TestCase):
         self.assertEqual([node.name for node in nodes], ["s_nx_platform_lifecycle_config"])
 
     def test_package_owns_c_symbols_without_exposing_configuration_objects(self):
-        module = importlib.import_module("tools.configure.platform_bindings")
+        module = importlib.import_module("tools.configure.generation.platform_bindings")
         facts = configure.load(configure.ROOT /
             "soc/stm32/stm32f4/private/bindings/platform.json")["domains"]["platform"]
         changed = copy.deepcopy(facts)

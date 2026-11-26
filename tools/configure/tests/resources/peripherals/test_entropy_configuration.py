@@ -4,7 +4,8 @@ import json
 import tempfile
 import unittest
 
-from tools.configure import configure, factory, bindings, selected_contracts
+from tools.configure import configure, selected_contracts
+from tools.configure.generation import factory, bindings
 
 
 class EntropyConfiguration(unittest.TestCase):

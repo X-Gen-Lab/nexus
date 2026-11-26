@@ -2,7 +2,7 @@
 import unittest
 from types import SimpleNamespace
 
-from tools.configure import shared_irq
+from tools.configure.generation import shared_irq
 
 
 class IrqClaimTests(unittest.TestCase):

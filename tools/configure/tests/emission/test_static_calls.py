@@ -6,13 +6,13 @@ import subprocess
 import tempfile
 import unittest
 
-from tools.configure.calls import Address, DirectCall, Symbol
+from tools.configure.generation.calls import Address, DirectCall, Symbol
 from tools.configure.providers.common import Construction
 
 
 class StaticCallTests(unittest.TestCase):
     def test_fixed_array_addresses_and_explicit_constants_retain_c_types(self):
-        from tools.configure.static_ir import (ArrayElementAddress,
+        from tools.configure.generation.static_ir import (ArrayElementAddress,
             ConstantMacro, Flags, Signed32, Unsigned64)
         call = DirectCall("check", (ArrayElementAddress(Symbol("storage"), 1),
             Signed32(-1), Unsigned64(2**40),
@@ -40,7 +40,7 @@ int main(void) { return """ + call.render() + "; }\n"
             self.assertEqual(subprocess.run([str(path / "calls")]).returncode, 0)
 
     def test_initialize_sequence_is_typed_frozen_and_short_circuits_in_order(self):
-        from tools.configure.calls import InitializeSequence
+        from tools.configure.generation.calls import InitializeSequence
         calls = [DirectCall("nx_engine_prepare", (Address("state"),)),
                  DirectCall("nx_outer_prepare", (Address("outer"),))]
         sequence = InitializeSequence("prepare_outer", calls)
@@ -57,7 +57,7 @@ int main(void) { return """ + call.render() + "; }\n"
             sequence.function = "another"
 
     def test_initialize_sequence_rejects_arbitrary_code_and_unordered_calls(self):
-        from tools.configure.calls import InitializeSequence
+        from tools.configure.generation.calls import InitializeSequence
         for calls in ([], "nx_prepare()", {DirectCall("nx_prepare")},
                       ("nx_prepare()",), (DirectCall("nx_prepare"), "RCC->CR=0")):
             with self.subTest(calls=calls), self.assertRaises(ValueError):
@@ -124,7 +124,7 @@ int main(void) { return """ + call.render() + "; }\n"
     def test_call_source_is_in_configuration_and_sdk_input_closure(self):
         from tools.configure.dependencies import source_names
         for mode in ("platform", "runtime"):
-            self.assertIn("tools/configure/calls.py",
+            self.assertIn("tools/configure/generation/calls.py",
                           source_names(mode, 'stm32f4', sdk=True))
 
     def test_construction_rejects_legacy_initializer_and_stop_fragments(self):

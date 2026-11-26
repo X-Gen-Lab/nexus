@@ -8,7 +8,7 @@ from dataclasses import dataclass, field
 from typing import ClassVar
 from types import MappingProxyType
 
-from tools.configure.calls import Symbol
+from tools.configure.generation.calls import Symbol
 from tools.configure.providers.common import fail, integer, sequence
 from tools.configure.resource_graph import identifier
 

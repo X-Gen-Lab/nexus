@@ -5,10 +5,7 @@ import json
 import os
 from pathlib import Path
 
-try:
-    from . import arch_compile
-except ImportError:
-    import arch_compile
+from scripts.ci import arch_compile
 
 from tools.evidence.common import file_identity, fields, sha256_value
 

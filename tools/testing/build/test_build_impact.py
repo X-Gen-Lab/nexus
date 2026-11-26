@@ -141,7 +141,7 @@ class HardwareImpactTests(unittest.TestCase):
                 self.assertEqual(build_impact.plan_hardware(self.root, [name])["assemblies"],
                                  ["tools/configure/assemblies/alpha.toml"])
         for name in ("cmake/platform/Firmware.cmake", "CMakeLists.txt",
-                     "tools/configure/emission.py"):
+                     "tools/configure/generation/emission.py"):
             self.assertEqual(len(build_impact.plan_hardware(self.root, [name])["assemblies"]), 2)
 
     def test_real_target_dependencies_exclude_unselected_target_and_expire(self):

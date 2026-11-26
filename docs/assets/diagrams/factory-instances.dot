@@ -1,5 +1,5 @@
 // FIG-04 reference: source-backed, scoped engineering view.
-// Code basis: tools/configure/factory.py; tests/google/io/native_factory_test.cpp.
+// Code basis: tools/configure/generation/factory.py; tests/behavior/io/native_factory_test.cpp.
 // Relations and qualification limits: docs/reference/diagrams.md.
 digraph FactoryInstances {
     graph [newrank=true, rankdir=TB, bgcolor="white", pad=0.28, nodesep=0.42,

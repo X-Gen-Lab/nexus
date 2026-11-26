@@ -13,7 +13,7 @@ import unittest
 from unittest.mock import patch as mock_patch
 from tools.maintenance import cmsis_device_lock, source_catalogue
 
-from tools.testing.inventory_fixtures import write_files
+from tools.testing.support.inventory_fixtures import write_files
 
 ROOT = Path(__file__).resolve().parents[3]
 

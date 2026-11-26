@@ -4,7 +4,7 @@ import tempfile
 import unittest
 
 from tools.configure.configure import resolve_ir
-from tools.configure import bindings
+from tools.configure.generation import bindings
 from tools.configure.providers.common import ConfigurationError
 
 

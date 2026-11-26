@@ -165,7 +165,7 @@ class StyleGateTests(unittest.TestCase):
             "scripts/ci/style_gate.py", "scripts/ci/comment_style.py",
             "scripts/ci/check_commit_message.py", "scripts/tools/format.py",
             "scripts/tools/cmake_format.py",
-            "scripts/setup/install_dev_tools.py",
+            "scripts/tools/tool_lock.py",
             "tools/documentation/cli.py", "tools/documentation/check.py",
             "tools/documentation/build.py", "tools/documentation/diagrams.py",
             "tools/documentation/diagram_localization.py",

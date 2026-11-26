@@ -18,7 +18,8 @@ import tempfile
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from tools.configure import authored, configure, factory, packages, selected_contracts
+from tools.configure import authored, configure, packages, selected_contracts
+from tools.configure.generation import factory
 from tools.configure.data_provider import DataProvider
 from tools.configure.records import freeze
 from tools.configure.contracts import COMPONENTS, FACT_INTERFACE_KINDS

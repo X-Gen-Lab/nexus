@@ -3,7 +3,8 @@ import re
 import unittest
 from unittest.mock import patch
 
-from tools.configure import bindings, configure as gate
+from tools.configure import configure as gate
+from tools.configure.generation import bindings
 
 
 FIXTURES = (

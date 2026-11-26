@@ -3,10 +3,10 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 import re
 
-from tools.configure.calls import Address, DirectCall, Symbol
+from tools.configure.generation.calls import Address, DirectCall, Symbol
 from tools.configure.providers.common import fail, integer
-from tools.configure.static_ir import Array, Declaration, IrqConnection
-from tools.configure.static_recipe import _immutable, _path, _read
+from tools.configure.generation.static_ir import Array, Declaration, IrqConnection
+from tools.configure.generation.static_recipe import _immutable, _path, _read
 
 
 class IrqClaims:

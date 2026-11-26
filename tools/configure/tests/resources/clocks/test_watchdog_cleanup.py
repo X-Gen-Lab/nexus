@@ -2,7 +2,8 @@
 from tools.configure.tests.native_fixture import native_fixture
 import unittest
 
-from tools.configure import bindings, configure
+from tools.configure import configure
+from tools.configure.generation import bindings
 
 
 class WatchdogCleanupGenerationTests(unittest.TestCase):

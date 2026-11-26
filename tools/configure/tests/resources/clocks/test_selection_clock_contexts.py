@@ -6,7 +6,8 @@ from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
-from tools.configure import bindings, configure
+from tools.configure import configure
+from tools.configure.generation import bindings
 from tools.configure.policies.selection import SelectionPolicy
 from tools.configure.tests.resources.peripherals.test_selection_policy import facts
 from tools.configure.tests.f4_fixture import provider as f4_provider

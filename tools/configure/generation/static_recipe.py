@@ -9,9 +9,9 @@ from dataclasses import dataclass, fields, is_dataclass, replace
 import re
 from types import MappingProxyType
 
-from tools.configure.calls import Address, DirectCall, InitializeSequence, Symbol
+from tools.configure.generation.calls import Address, DirectCall, InitializeSequence, Symbol
 from tools.configure.providers.common import Construction
-from tools.configure.static_ir import (Array, ArrayElementAddress, ConstantMacro,
+from tools.configure.generation.static_ir import (Array, ArrayElementAddress, ConstantMacro,
     Declaration, Flags, IrqConnection, PointerMemberAddress, Record, Signed32,
     Unsigned64)
 
@@ -657,7 +657,7 @@ class StaticRecipe:
         if (any(not isinstance(role, str) or role not in roles - {"port", "face"}
                 for role in exports) or len(set(exports)) != len(exports)):
             raise ValueError("Static exports require distinct declared object roles")
-        from tools.configure.static_endpoints import ChildGroups, EndpointFaces
+        from tools.configure.generation.static_endpoints import ChildGroups, EndpointFaces
         return cls(value["state_type"], _parse(value["ops"], (), conversion="symbol")
             if "ops" in value else None,
             tuple(_Declaration.parse(declaration, roles) for declaration in declarations),

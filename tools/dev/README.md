@@ -106,9 +106,12 @@ python tools/dev/dev.py docs check
 `doctor` 只诊断所选工具和环境，不扫描全平台能力。`check` 执行格式与完整开发门禁。
 普通 commit hook 读取完整暂存区，运行全部 Native GoogleTest；普通固件实现改动不触发
 整套辅助工具域，公共头、声明事实和工具改动选择完整的相关测试模块，未知输入保守执行完整域。
-快速提交报告明确标记有限 scope，不能替代完整验收。合并前用 `check` 或 `--all` 执行
-完整工具域，独立执行其他 Native 模式、
-ARM 链接和独立 Source SDK 消费者。GoogleTest／GoogleMock 仅链接到主机测试。
+CI 与 SDK 使用同一个私有行为测试路径判断。只改这类测试时，CI 保持 Native 验证，
+跳过工具域，SDK 消费计划也跳过该输入。混合与未知输入保持保守的验证范围。
+快速提交报告明确标记有限 scope。`check` 执行整仓风格检查，再由 `tdd_gate.py --all`
+执行完整 Native 和 `testing`、`configure`、`ci` 三个常规工具域。按交付范围分别运行
+`integration`、`freertos`、文档、其他 Native 模式、ARM 链接和 Source SDK 消费者。
+GoogleTest／GoogleMock 仅链接到主机测试。
 
 `create` 创建外部工程；`timings` 直接汇总已有执行记录。普通 configure／build 不自动
 生成完整来源归档；需用于设备操作的精确映像身份时显式传入 `--record-provenance`。

@@ -6,7 +6,7 @@ import unittest
 from unittest.mock import patch
 
 from tools.configure import configure
-from tools.configure import factory
+from tools.configure.generation import factory
 from tools.configure import matrix
 
 

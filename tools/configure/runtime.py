@@ -16,7 +16,8 @@ from types import MappingProxyType
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from tools.configure import cpu, kernel, metadata, factory, bundle, dependencies, sdk
+from tools.configure import cpu, kernel, metadata, bundle, dependencies, sdk
+from tools.configure.generation import factory
 from tools.configure.ir import freeze
 
 

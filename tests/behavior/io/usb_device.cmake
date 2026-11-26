@@ -133,7 +133,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         "${nexus_google_root}/soc/stm32/stm32f4/usb/usb_host_transport_model.h"
     )
     set(usb_transport_tool
-        "${NEXUS_SOURCE_DIR}/tools/testing/instrument_usb_sdk.py"
+        "${NEXUS_SOURCE_DIR}/tools/testing/support/instrument_usb_sdk.py"
     )
     set(usb_transport_generated
         "${CMAKE_CURRENT_BINARY_DIR}/usb-host-transport-sdk"

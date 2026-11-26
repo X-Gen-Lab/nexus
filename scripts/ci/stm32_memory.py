@@ -15,11 +15,8 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
-try:
-    from . import arch_compile, memory_budget
-except ImportError:
-    import arch_compile
-    import memory_budget
+from scripts.ci import arch_compile
+from scripts.ci.qualification import memory_budget
 from tools.measurement.elf import Elf32
 from tools.measurement.resources import measure_data
 
@@ -132,7 +129,7 @@ def verify_inputs(inputs):
 
 def source_inputs(root):
     inputs = [root / "CMakeLists.txt", Path(__file__).resolve(),
-              root / "scripts/ci/memory_budget.py",
+              root / "scripts/ci/qualification/memory_budget.py",
               root / "scripts/ci/arch_compile.py"]
     for directory in ("arch", "core", "io", "os", "soc/stm32/stm32f4",
                       "boards/stm32f407_qiming_v31",

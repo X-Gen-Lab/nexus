@@ -2,7 +2,7 @@
 
 import unittest
 
-from tools.configure.calls import DirectCall
+from tools.configure.generation.calls import DirectCall
 from tools.configure.providers.common import Construction, ConfigurationError
 
 

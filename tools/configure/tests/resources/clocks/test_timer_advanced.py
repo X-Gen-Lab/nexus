@@ -64,7 +64,7 @@ class TimerAssemblyConfigurationTests(unittest.TestCase):
         return path
 
     def test_advanced_capture_selects_cc_vector_without_break_peer_claim(self):
-        from tools.configure import bindings
+        from tools.configure.generation import bindings
         for timer, vector, peer in (('TIM1', 'TIM1_CC', 'TIM9'),
                                      ('TIM8', 'TIM8_CC', 'TIM12')):
             for channel in range(1, 5):
@@ -96,7 +96,7 @@ class TimerAssemblyConfigurationTests(unittest.TestCase):
                     gate.resolve_ir(path)
 
     def test_small_capture_selects_exact_channel_and_shared_source_vector(self):
-        from tools.configure import bindings
+        from tools.configure.generation import bindings
         for timer, count, vector in (
                 ('TIM9', 2, 'TIM1_BRK_TIM9'), ('TIM10', 1, 'TIM1_UP_TIM10'),
                 ('TIM11', 1, 'TIM1_TRG_COM_TIM11'), ('TIM12', 2, 'TIM8_BRK_TIM12'),
@@ -145,7 +145,7 @@ class TimerAssemblyConfigurationTests(unittest.TestCase):
                     gate.resolve_ir(path)
 
     def test_capture_routes_derive_twelve_channels_and_exact_static_transports(self):
-        from tools.configure import bindings
+        from tools.configure.generation import bindings
         for controller in ('TIM3', 'TIM4', 'TIM5'):
             for channel in range(1, 5):
                 with self.subTest(controller=controller, channel=channel):
@@ -165,7 +165,7 @@ class TimerAssemblyConfigurationTests(unittest.TestCase):
                     self.assertEqual(len(result.controllers), 1)
 
     def test_advanced_routes_derive_all_six_pairs_and_preserve_break_peer(self):
-        from tools.configure import bindings
+        from tools.configure.generation import bindings
         for controller, peer in (('TIM1', 'TIM9'), ('TIM8', 'TIM12')):
             for channel in range(1, 4):
                 with self.subTest(controller=controller, channel=channel):
@@ -221,7 +221,7 @@ class TimerAssemblyConfigurationTests(unittest.TestCase):
         claims = {item.key for item in ir.claims}
         self.assertTrue({'irq:TIM1_BRK_TIM9', 'irq:TIM8_BRK_TIM12',
                          'controller:TIM9', 'controller:TIM12'} <= claims)
-        from tools.configure import bindings
+        from tools.configure.generation import bindings
         source = bindings.emit(ir)[1]
         self.assertIn('&nx_stm32_tim8_advanced_pwm_ops', source)
         self.assertIn('nx_stm32_tim8_advanced_cold_prepare', source)

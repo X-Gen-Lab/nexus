@@ -4,8 +4,8 @@ import json
 import unittest
 
 from tools.configure import configure, gpio_phase
-from tools.configure.calls import Symbol
-from tools.configure.static_ir import ArrayElementAddress, Declaration
+from tools.configure.generation.calls import Symbol
+from tools.configure.generation.static_ir import ArrayElementAddress, Declaration
 
 
 class GpioPhaseDeclarationTests(unittest.TestCase):

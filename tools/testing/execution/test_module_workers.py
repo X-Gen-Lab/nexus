@@ -1,5 +1,6 @@
 """Real complete module executions share a finite build allocation."""
 
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -55,6 +56,27 @@ class ToolWorkersTests(unittest.TestCase):
     def finish(self, proc):
         output, _ = proc.communicate(timeout=20)
         return proc.returncode, output
+
+    def test_module_wall_time_includes_import_and_class_fixtures(self):
+        (self.directory / "test_cost.py").write_text(
+            "import time, unittest\n"
+            "time.sleep(0.04)\n"
+            "class Contract(unittest.TestCase):\n"
+            "    @classmethod\n"
+            "    def setUpClass(cls): time.sleep(0.04)\n"
+            "    @classmethod\n"
+            "    def tearDownClass(cls): time.sleep(0.04)\n"
+            "    def test_fast(self): pass\n")
+        status, output = self.finish(self.start(1))
+        self.assertEqual(status, 0, output)
+        record = json.loads(self.report.read_text())
+        module = "tools/testing/test_cost.py"
+        duration = record["module_durations_seconds"][module]
+        self.assertGreaterEqual(duration, 0.12)
+        self.assertGreaterEqual(record["duration_seconds"], duration)
+        self.assertEqual(record["modules"], {module: hashlib.sha256(
+            json.dumps(["test_cost.Contract.test_fast"]).encode()).hexdigest()})
+        self.assertEqual(record["executed"], 1)
 
     def test_default_workers_inherit_the_callers_build_budget(self):
         for name in ("first", "second"):
@@ -142,6 +164,8 @@ self.assertEqual(os.environ['NEXUS_BUILD_JOBS'], '1')
         self.assertEqual(status, 0, output)
         result = json.loads(self.report.read_text())
         self.assertEqual(result["executed"], 1)
+        self.assertGreater(result["duration_seconds"], 0)
+        self.assertNotIn("module_durations_seconds", result)
 
     def test_unmarked_nested_fixture_is_outside_domain_discovery(self):
         self.module("owned", "self.assertEqual(2 + 2, 4)")

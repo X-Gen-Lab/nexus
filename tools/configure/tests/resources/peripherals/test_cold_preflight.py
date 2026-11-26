@@ -5,7 +5,8 @@ import tempfile
 import unittest
 
 from tools.configure.tests.assembly_fixture import render_toml
-from tools.configure import bindings, configure as gate
+from tools.configure import configure as gate
+from tools.configure.generation import bindings
 from tools.configure.data_provider import DataProvider
 from tools.configure.policies.gpio_phase import GpioPhasePolicy
 

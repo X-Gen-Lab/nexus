@@ -4,7 +4,8 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from tools.configure import configure, dependencies, factory
+from tools.configure import configure, dependencies
+from tools.configure.generation import factory
 
 
 class SelectedIoPlanTests(unittest.TestCase):

@@ -2,7 +2,8 @@
 from dataclasses import FrozenInstanceError
 import unittest
 
-from tools.configure import authored, contracts, factory, ir
+from tools.configure import authored, contracts, ir
+from tools.configure.generation import factory
 from tools.configure.providers.common import mode_traits
 
 

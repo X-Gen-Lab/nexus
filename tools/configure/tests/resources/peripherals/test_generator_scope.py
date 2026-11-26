@@ -11,10 +11,12 @@ from tools.configure.providers import descriptor
 class GeneratorScopeTests(unittest.TestCase):
     def test_common_sdk_seals_every_static_assembly_mechanism_it_imports(self):
         names = set(dependencies.source_names("platform", None, sdk=True))
-        required = {"tools/configure/" + name + ".py" for name in (
-            "static_ir", "calls", "static_recipe", "static_endpoints", "static_fragments",
-            "shared_irq", "data_provider", "hardware_bindings", "domain_bridge",
-            "domain_policies", "platform_bindings", "startup_memory", "header_projection")}
+        required = {"tools/configure/generation/" + name + ".py" for name in (
+            "__init__", "static_ir", "calls", "static_recipe", "static_endpoints",
+            "static_fragments", "shared_irq", "platform_bindings", "header_projection")}
+        required.update("tools/configure/" + name + ".py" for name in (
+            "data_provider", "hardware_bindings", "domain_bridge",
+            "domain_policies", "startup_memory"))
         self.assertFalse(required - names, "Unsealed configuration code: " +
                          ", ".join(sorted(required - names)))
 

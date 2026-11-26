@@ -124,8 +124,15 @@ class ArtifactBuildTests(unittest.TestCase):
                 self.assertTrue(artifact.is_file())
                 self.assertEqual(hashlib.sha256(artifacts[0].read_bytes()).hexdigest(),
                                  elf_digest)
-            for module in (*modules, "tools/configure/configure.py",
-                           "tools/configure/emission.py"):
+            declared_checkers = (*modules, "tools/configure/configure.py",
+                                 "tools/configure/generation/emission.py")
+            query = run("ninja", "-C", str(build), "-t", "query",
+                        "CMakeFiles/app.budget-inputs")
+            for module in declared_checkers:
+                self.assertIn(str(checker / module), query.stdout)
+            # The generated graph covers every input. Exercise execution for a
+            # checker and a resolver input without repeating the same recheck.
+            for module in (modules[0], declared_checkers[-1]):
                 with (checker / module).open("a") as file:
                     file.write("\n# Incremental contract input mutation.\n")
                 checked = compile_application()

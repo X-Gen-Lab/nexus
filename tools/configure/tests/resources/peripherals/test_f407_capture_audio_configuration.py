@@ -5,7 +5,8 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from tools.configure import bindings, factory, selected_contracts
+from tools.configure import selected_contracts
+from tools.configure.generation import bindings, factory
 from tools.configure import configure as gate
 from tools.configure.tests.f4_fixture import provider as f4_provider
 

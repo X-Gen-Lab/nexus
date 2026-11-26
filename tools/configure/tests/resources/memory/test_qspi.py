@@ -5,7 +5,8 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from tools.configure import bindings, configure, emission, factory
+from tools.configure import configure
+from tools.configure.generation import bindings, emission, factory
 from tools.configure.tests.external_memory_fixture import policy, construct
 
 

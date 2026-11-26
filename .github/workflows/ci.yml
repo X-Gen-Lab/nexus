@@ -24,6 +24,7 @@ jobs:
       code: ${{ steps.filter.outputs.code }}
       docs: ${{ steps.filter.outputs.docs }}
       workflows: ${{ steps.filter.outputs.workflows }}
+      tooling: ${{ steps.filter.outputs.tooling }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -52,7 +53,7 @@ jobs:
   tool-contracts:
     name: Tool Contracts
     needs: changes
-    if: needs.changes.outputs.code == 'true' || needs.changes.outputs.workflows == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    if: needs.changes.outputs.tooling == 'true' || needs.changes.outputs.workflows == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     uses: ./.github/workflows/enterprise-tools.yml
 
   docs:

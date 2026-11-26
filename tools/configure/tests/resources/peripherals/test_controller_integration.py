@@ -3,7 +3,8 @@ from tools.configure.tests.native_fixture import native_fixture
 from dataclasses import FrozenInstanceError, replace
 import unittest
 
-from tools.configure import bindings, configure as gate
+from tools.configure import configure as gate
+from tools.configure.generation import bindings
 from tools.configure.providers import for_selection
 from tools.configure.providers.common import owned_claims
 

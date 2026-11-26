@@ -7,7 +7,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 from fractions import Fraction
 
-from tools.configure.calls import Symbol
+from tools.configure.generation.calls import Symbol
 from tools.configure.providers.common import fail, integer, route_dma
 from tools.configure.records import freeze
 from tools.configure.resource_graph import identifier

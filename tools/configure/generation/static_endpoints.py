@@ -9,9 +9,9 @@ from dataclasses import dataclass
 import re
 from types import MappingProxyType
 
-from tools.configure.calls import Address, Symbol
-from tools.configure.static_ir import Declaration, Record
-from tools.configure.static_recipe import (
+from tools.configure.generation.calls import Address, Symbol
+from tools.configure.generation.static_ir import Declaration, Record
+from tools.configure.generation.static_recipe import (
     _Call, _Declaration, _fields, _immutable, _ordered, _parse, _path, _read, _uint)
 
 

@@ -10,10 +10,10 @@ import re
 from types import MappingProxyType
 
 from tools.configure import gpio_phase
-from tools.configure.calls import Address, DirectCall, Symbol
+from tools.configure.generation.calls import Address, DirectCall, Symbol
 from tools.configure.providers.common import fail
-from tools.configure.static_ir import ControllerPowerConnection, Flags
-from tools.configure.static_recipe import StaticObjects
+from tools.configure.generation.static_ir import ControllerPowerConnection, Flags
+from tools.configure.generation.static_recipe import StaticObjects
 
 
 def _fields(value, required, optional=()):

@@ -144,7 +144,8 @@ or filter cases inside selected modules.
 
 Before merge or delivery, independently execute the complete tool domains,
 relevant ARM links and Source SDK consumers. `--all` and `--tools all` always run
-the three regular domains; `dev.py check` is the full integration entry. Complete CI
+the three regular domains. `dev.py check` runs the same gate after a repository-wide
+style check. Complete CI
 also runs all four Native modes, without repeating tool tests per mode or the
 full Native execution in the tool job. A quick commit does not replace these
 results, and successful qualification reports are never cached.

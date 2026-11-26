@@ -5,7 +5,8 @@ import tempfile
 from types import SimpleNamespace
 import unittest
 
-from tools.configure import configure, emission
+from tools.configure import configure
+from tools.configure.generation import emission
 from tools.configure.data_provider import Binding
 from tools.configure.tests.schema.test_data_provider import software
 

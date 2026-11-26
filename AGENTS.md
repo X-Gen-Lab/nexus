@@ -153,8 +153,8 @@ Git 历史保留原始设计和结果，不代表当前支持范围或验收状�
   缺失或过期时扩大覆盖，完整支持扫描放在集成验证。
 - 合并或交付前独立执行完整常规工具域 `testing`、`configure`、`ci`、相关 ARM
   链接与实际输入的 SDK 消费者。`--all` 和 `--tools all` 不缩减这三个域；
-  `dev.py check` 是完整集成入口，快速提交不能替代它。`--tools none` 仅用于显式
-  分离的 Native 执行，不能绕过 hook。
+  `dev.py check` 执行整仓风格检查、完整 Native 和这三个工具域。集成、FreeRTOS、
+  文档及 SDK 各有独立入口。`--tools none` 仅用于显式分离的 Native 执行，不能绕过 hook。
 - 完整 CI 运行 `native-debug`、`native-release`、`native-asan`、`native-tsan`，另行
   执行 `integration`、`freertos`；文档 job 执行文档测试与严格双语构建。模式无关工具
   不随 Native 模式重复；工具 job 不重复完整 GoogleTest。全局能力与派生文档集中

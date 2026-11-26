@@ -5,7 +5,8 @@ import subprocess
 import tempfile
 import unittest
 
-from tools.configure import bindings, configure, factory, gpio_electrical
+from tools.configure import configure, gpio_electrical
+from tools.configure.generation import bindings, factory
 
 
 class GpioSignalFactoryTests(unittest.TestCase):

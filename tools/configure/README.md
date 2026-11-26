@@ -99,8 +99,8 @@ python -m tools.configure.packages --schema
 | `records.py`、`ir.py` | 前者只负责不可变值与审计投影；后者声明装配记录，Board 事实独立依赖前者，避免领域互相导入 |
 | `packages.py`、`data_provider.py` | 加载同一快照的包、事实和静态 binding，不维护 MCU Python 注册表 |
 | `domain_policies.py`、`policies/` | 通用领域校验；具体能力和限制由选中包的数据声明 |
-| `static_recipe.py`、`static_ir.py` | 有限类型化静态对象、连接、调用与 IRQ，不承载硬件算法 |
-| `emission.py` 等公共生成代码 | 精确静态配置、存储、face、factory 与固定连接 |
+| `generation/static_recipe.py`、`generation/static_ir.py` | 有限类型化静态对象、连接、调用与 IRQ，不承载硬件算法 |
+| `generation/emission.py` 等公共生成代码 | 精确静态配置、存储、face、factory 与固定连接 |
 | 根目录 `soc/stm32/stm32f4/` | 实际硬件 C、生命周期、时钟、IRQ／DMA 与私有 SDK |
 | `assemblies/` | 受维护 F407 软件参考，不是产品策略 |
 

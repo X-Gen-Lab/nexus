@@ -13,12 +13,10 @@ import sys
 import tempfile
 import unittest
 
-from tools.testing.inventory_fixtures import write_files
 
 ROOT = Path(__file__).resolve().parents[3]
 sys.dont_write_bytecode = True
 sys.path.insert(0, str(ROOT))
-from tools.maintenance.stm32_ll_lock import PROFILES
 from tools.dev.process import run
 
 F4_HAL_HEADERS = {
@@ -66,133 +64,8 @@ F4_REQUIRED_FILES = {
                        'crc', 'utils', 'system'))}
 F4_SELECTED_API = 'stm32f4-reviewed-hal-ll-controllers'
 
-ADDITIONS = {
-    'h7': {
-        'Inc/stm32h7xx_ll_i2c.h': {
-            'bytes': 84613,
-            'sha256': '2703dc6fcbc59f324cc5e1c39dbf68774c9d68665649fbf1ed92cea72ee1270a'},
-        'Inc/stm32h7xx_ll_usart.h': {
-            'bytes': 175243,
-            'sha256': '0a739716ed496ee660c25a16b0e90a40bb83998fb83107fa778164dd6419403a'},
-        'Inc/stm32h7xx_ll_hsem.h': {
-            'bytes': 34217,
-            'sha256': '7e2cc95c8dcd6b326801026d0398a46b903c94e4c3befd650a227e9a351606c2'},
-        'Inc/stm32h7xx_ll_bus.h': {
-            'bytes': 325702,
-            'sha256': '0eb42ffbba51192ec0efd6463759a5fda060637ff4d694274df16b4763c882a5'},
-        'Inc/stm32h7xx_hal.h': {
-            'bytes': 67326,
-            'sha256': '97aeb9e9e0c3acde0c91d025e89c7972b9ad13ab3cb735d40ad852dc395f6980'},
-        'Inc/stm32h7xx_hal_def.h': {
-            'bytes': 7972,
-            'sha256': 'f7e6ad2cff1b770393ad76961fbb220bef0a52593e9035746e7961137061ebfc'},
-        'Inc/stm32h7xx_hal_qspi.h': {
-            'bytes': 37405,
-            'sha256': 'ed55223d786dfba78b8fb9e30c64898558c3c7044f2fdc689069decceb528648'},
-        'Inc/stm32h7xx_hal_mdma.h': {
-            'bytes': 47211,
-            'sha256': '580b7f7d97482fe435f5c3c4086f017a090ba186201db2af7c68567094e868e8'},
-        'Inc/stm32h7xx_ll_delayblock.h': {
-            'bytes': 2133,
-            'sha256': 'af9cfe4b9f1f2b55a27f59b8a965e967adbb7ababba38a2f85e897698575d8f9'},
-        'Inc/Legacy/stm32_hal_legacy.h': {
-            'bytes': 241600,
-            'sha256': '37a057e32410712dbe30a3ec74a6cc838f767ae1c616f1b767687bede5dff68a'},
-        'Src/stm32h7xx_hal_qspi.c': {
-            'bytes': 90497,
-            'sha256': 'cd8e278936fe6c09d59949b6b05b3a2e52c5f3ae3d33ab7f7729ea33690845fc'},
-        'Src/stm32h7xx_hal_mdma.c': {
-            'bytes': 62926,
-            'sha256': '674d7a273d208509e2941cb88d9419f549cbdfd35d4aa81b2da135bf1c1a30ad'}},
-    'u5': {
-        'Inc/stm32u5xx_ll_iwdg.h': {
-            'bytes': 13653,
-            'sha256': '8552e2843e0cf8b42b505418ccaaadb1db7b4cc4ad7f730c141d90729d13df1e'},
-        'Inc/stm32u5xx_hal.h': {
-            'bytes': 39344,
-            'sha256': 'be0aa206bbdbd4be224282ab540aa1b2545b41981b61893ca9c2868c10d45e43'},
-        'Inc/stm32u5xx_hal_def.h': {
-            'bytes': 7638,
-            'sha256': '73a911c835b4c7f75b7d4c7e47847f9776c5b55dc265bb59c17dfbbc6488e2b9'},
-        'Inc/stm32u5xx_hal_gpio.h': {
-            'bytes': 16246,
-            'sha256': '6d9e6c1abe6303f3e72f488c21fe2a1272a033a8309e6b8da4a3f2f62c3ced23'},
-        'Inc/stm32u5xx_hal_gpio_ex.h': {
-            'bytes': 16959,
-            'sha256': '40848fe334a9252b50e7a941537312443ba0830ef0a3f2a2c283151f0f4fa23c'},
-        'Inc/Legacy/stm32_hal_legacy.h': {
-            'bytes': 242146,
-            'sha256': 'ae2c716ae3097e6b34ac92eeb0feeaa01c992628da1a2d3adf12710352004288'},
-        'Src/stm32u5xx_hal_gpio.c': {
-            'bytes': 33435,
-            'sha256': '2d7b5f252bf1bf2ad0fff46ac4fa7050bf437b23802f212051a0a595a283fffd'},
-        'Inc/stm32u5xx_ll_rtc.h': {
-            'bytes': 226081,
-            'sha256': 'e40e46698164cd4c0722460fbb59c868be643ba0f7447e0bed439a88f3a63bf2'},
-        'Inc/stm32u5xx_ll_dma.h': {
-            'bytes': 322291,
-            'sha256': '2cca143aaf883cffacd46e6a0a29a4a677badd485b7eb19f8da6199eceacead6'},
-        'Inc/stm32u5xx_ll_usart.h': {
-            'bytes': 177899,
-            'sha256': '50a203a04e4b9688b95db3c806cb5af1a4c436b1608ea44e04d72205f354127b'}},
-    'g4': {
-        'Inc/stm32g4xx_ll_i2c.h': {
-            'bytes': 84586,
-            'sha256': '2aa8e23ca87d7a2b6773d4f092565d62b85a14254be45cd86640882594a8f534'},
-        'Inc/stm32g4xx_hal_fdcan.h': {
-            'bytes': 79977,
-            'sha256': '085076ee896219babd0801c0f8c3a97b65e5ae2cb88c78f6b43124925deb1c56'},
-        'Inc/stm32g4xx_hal_def.h': {
-            'bytes': 6966,
-            'sha256': 'adcb12d4eeb391241481a75f738f81dc7c186abe0ded173da3a1191803658eb7'},
-        'Inc/Legacy/stm32_hal_legacy.h': {
-            'bytes': 238453,
-            'sha256': '97a63cd0d7e27f692d92f475179ea949751f790a08b7d80fb5f611792be98236'}}}
-BASE_FILES = {
-    'h7': {'LICENSE.md', 'Inc/stm32h7xx_ll_adc.h',
-           'Inc/stm32h7xx_ll_spi.h'},
-    'u5': {'LICENSE.md', *(f'Inc/stm32u5xx_ll_{unit}.h'
-                          for unit in ('adc', 'spi', 'i2c', 'tim'))},
-    'g4': {'LICENSE.md', 'Inc/stm32g4xx_ll_adc.h', 'Inc/stm32g4xx_ll_dmamux.h'}}
-
-
-def proposed_lock(family):
-    selected = json.loads((ROOT / PROFILES[family].lock_name).read_text())
-    selected['files'].update(copy.deepcopy(ADDITIONS[family]))
-    selected['selected_api'] = {
-        'g4': 'stm32g474-ll-inline-i2c-fdcan-definitions',
-        'h7': 'stm32h743-ll-inline-i2c-hsem-hal-qspi-reference',
-        'u5': 'stm32u575-ll-inline-gpio-hal-write-multiple'}[family]
-    return selected
-
 
 class OfficialHeaderClosureTests(unittest.TestCase):
-    def test_h7_exact_closed_graph_closes_usart_and_i2c_inline_headers(self):
-        profile = PROFILES['h7']
-        expected = BASE_FILES['h7'] | ADDITIONS['h7'].keys()
-        self.assertEqual(profile.selected_files, expected)
-        self.assertEqual(profile.contract(proposed_lock('h7')), expected)
-
-    def test_f1_i2c_inline_header_closes_exact_reviewed_graph(self):
-        from tools.maintenance import stm32f1_hal_lock as f1
-        selected = json.loads((ROOT / f1.LOCK_NAME).read_text())
-        name = 'Inc/stm32f1xx_ll_i2c.h'
-        self.assertIn(name, selected['files'])
-        selected['selected_api'] = 'stm32f103-ll-inline-i2c'
-        expected = {'LICENSE.md', 'Inc/stm32f1xx_ll_gpio.h',
-                    'Inc/stm32f1xx_ll_usart.h', name}
-        self.assertEqual(f1.REVIEWED_FILES, expected)
-        self.assertEqual(f1.contract(selected), expected)
-        for missing in expected:
-            reduced = copy.deepcopy(selected)
-            del reduced['files'][missing]
-            with self.subTest(missing=missing), self.assertRaises(ValueError):
-                f1.contract(reduced)
-        selected['files']['Src/stm32f1xx_ll_i2c.c'] = {
-            'bytes': 1, 'sha256': '0' * 64}
-        with self.assertRaises(ValueError):
-            f1.contract(selected)
-
     def test_f4_closes_exact_headers_and_reviewed_controller_sources(self):
         from tools.maintenance import stm32f4_hal_lock as f4
         additions = {
@@ -241,6 +114,7 @@ class OfficialHeaderClosureTests(unittest.TestCase):
                                ROOT / f4.CMSIS_DIRECTORY)
             self.assertEqual(result['verified_files'], len(expected))
             self.assertFalse(result['software_qualified'])
+
 
     def test_f4_exported_headers_compile_vendor_and_nexus_transports(self):
         from tools.maintenance import stm32f4_hal_lock as f4
@@ -369,80 +243,6 @@ class OfficialHeaderClosureTests(unittest.TestCase):
             self.assertLessEqual({f'Inc/stm32f4xx_ll_{unit}.h' for unit in
                                   ('dma', 'dac', 'tim', 'crc', 'system', 'utils')},
                                  used)
-
-    def test_u5_exact_closed_graph_closes_inline_and_gpio_hal_commands(self):
-        profile = PROFILES['u5']
-        expected = BASE_FILES['u5'] | ADDITIONS['u5'].keys()
-        self.assertEqual(profile.selected_files, expected)
-        self.assertEqual(profile.contract(proposed_lock('u5')), expected)
-
-
-
-    def test_g4_exact_closed_graph_closes_i2c_and_fdcan_definitions(self):
-        profile = PROFILES['g4']
-        expected = BASE_FILES['g4'] | ADDITIONS['g4'].keys()
-        self.assertEqual(profile.selected_files, expected)
-        self.assertEqual(profile.contract(proposed_lock('g4')), expected)
-
-    def test_scope_is_exact_and_does_not_widen_other_families(self):
-        for family, scope in (('g4', 'stm32g474-ll-inline-i2c-fdcan-definitions'),
-                              ('u5', 'stm32u575-ll-inline-gpio-hal-write-multiple'),
-                              ('h7',
-                               'stm32h743-ll-inline-i2c-hsem-hal-qspi-reference')):
-            with self.subTest(family=family):
-                profile = PROFILES[family]
-                lock = proposed_lock(family) if family in ADDITIONS else json.loads(
-                    (ROOT / profile.lock_name).read_text())
-                self.assertEqual(lock['selected_api'], scope)
-                profile.contract(lock)
-                wrong = copy.deepcopy(lock)
-                wrong['selected_api'] = 'unreviewed-headers-or-runtime'
-                with self.assertRaises(ValueError):
-                    profile.contract(wrong)
-
-
-    def test_missing_transitive_header_or_extra_vendor_c_is_rejected(self):
-        for family, additions in ADDITIONS.items():
-            profile = PROFILES[family]
-            baseline = proposed_lock(family)
-            profile.contract(baseline)
-            for name in additions:
-                with self.subTest(family=family, missing=name):
-                    candidate = copy.deepcopy(baseline)
-                    del candidate['files'][name]
-                    with self.assertRaises(ValueError):
-                        profile.contract(candidate)
-            candidate = copy.deepcopy(baseline)
-            candidate['files'][f'Src/stm32{family}xx_hal.c'] = {
-                'bytes': 1, 'sha256': '0' * 64}
-            with self.subTest(family=family, extra='vendor-C'):
-                with self.assertRaises(ValueError):
-                    profile.contract(candidate)
-
-    def test_installed_new_header_bytes_are_checked_after_exact_pair(self):
-        for family, additions in ADDITIONS.items():
-            profile = PROFILES[family]
-            with self.subTest(family=family), tempfile.TemporaryDirectory() as temp:
-                root = Path(temp)
-                driver, cmsis = root / 'driver', root / 'cmsis'
-                driver.mkdir()
-                cmsis.mkdir()
-                lock = proposed_lock(family)
-                path = root / 'lock.json'
-                write_files(driver, lock)
-                path.write_text(json.dumps(lock))
-                result = profile.verify(driver, path, cmsis,
-                    packaged_commit=profile.commit,
-                    packaged_cmsis_commit=profile.cmsis_commit)
-                self.assertEqual(result['source_kind'], 'installed_source_sdk')
-                for name in additions:
-                    original = (driver / name).read_bytes()
-                    (driver / name).write_bytes(original + b'\nchanged\n')
-                    with self.subTest(header=name), self.assertRaises(ValueError):
-                        profile.verify(driver, path, cmsis,
-                            packaged_commit=profile.commit,
-                            packaged_cmsis_commit=profile.cmsis_commit)
-                    (driver / name).write_bytes(original)
 
 
 

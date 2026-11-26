@@ -2,7 +2,7 @@
 """Check a derived support table against maintained facts and real assemblies.
 
 This report is not a configuration input or qualification record. It uses the
-production resolver and binding emitter, and records exact source definitions
+production resolver and selected static bindings, and records exact source definitions
 selected by existing software fixtures. It does not infer physical support.
 """
 
@@ -20,7 +20,7 @@ if __name__ == "__main__":
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
-from tools.configure import bindings, configure, documentation, matrix, packages  # noqa: E402
+from tools.configure import configure, packages  # noqa: E402
 from tools.evidence.common import file_identity, load_json, verify_file_identity  # noqa: E402
 
 DOCUMENT = "docs/reference/platforms/capabilities.md"
@@ -185,7 +185,7 @@ def selection(assembly, root=ROOT, *, test_support=False, evidence=()):
 
 def selection_evidence(path, typed, root, *, test_support):
     """Associate existing reports by observed bytes, never reported success."""
-    from tools.configure import emission
+    from tools.configure.generation import emission
     from tools.evidence.identity import (
         observe_git_source, resolved_identity, resolved_input_files, verify_sdk_package)
     from tools.measurement import resources
@@ -332,7 +332,7 @@ def _arm_images(report):
 
 def _associate_sdk_consumer(directory, report, typed, root, *, test_support):
     """Verify only the matching image, without replaying an SDK test plan."""
-    from tools.configure.emission import resolved_projection
+    from tools.configure.generation.emission import resolved_projection
     from tools.evidence import identity
     from tools.evidence.common import EvidenceError, regular_file
     from tools.measurement import resources
@@ -432,9 +432,23 @@ def source_ops(path, root=ROOT):
                              path, source, root)))
 
 
+def _checkout(root):
+    """Global maintenance needs authored fixtures, not a selected SDK payload."""
+    root = Path(root).resolve()
+    required = ('docs', 'tests/integration', 'cmake/package/verification',
+                'tools/configure/assemblies')
+    if ((root / '.nexus-source-sdk.json').exists()
+            or any(not (root / name).is_dir() for name in required)):
+        raise ValueError('Global capability maintenance requires a complete source checkout; '
+                         'use --assembly for selected SDK support')
+    return root
+
+
 def collect(root=ROOT):
     """Reject failed resolution or missing selected production definitions."""
-    root = root.resolve()
+    root = Path(root).resolve()
+    from tools.configure import matrix
+    from tools.configure.providers import for_selection
     facts = {}
     routes = {}
     declared = defaultdict(set)
@@ -505,21 +519,17 @@ def collect(root=ROOT):
         if (typed.provider_context.package is not None and
                 typed.provider_context.package.scope != "production"):
             raise ValueError("Production capability collection requires a production package")
-        result = typed.to_dict()
-        source = c_code(bindings.emit(typed)[1])
-        for item in result["controllers"]:
-            name = bindings.symbol(item["id"])
-            face_name = re.escape("s_nx_face_" + name)
-            matches = re.findall(
-                rf"\bstatic\s+const\s+nx_\w+_t\s+{face_name}"
-                r"\s*=\s*\{\s*&(?P<ops>nx_\w+_ops)\s*,", source)
-            if len(matches) != 1 or matches[0] not in exports:
+        provider = for_selection(typed)
+        for item in typed.controllers:
+            operations = provider.operations(item)
+            if (not isinstance(operations, str)
+                    or not re.fullmatch(r'nx_\w+_ops', operations)
+                    or operations not in exports):
                 raise ValueError("Selected ops has no production definition: "
-                                 + f"{fixture}:{name}")
-            key = (result["soc_family"], item["controller"],
-                   item["kind"], item["mode"])
+                                 + f"{fixture}:{item.id}")
+            key = (typed.soc_family, item.controller, item.kind, item.mode)
             selected[key]["fixtures"].add(fixture.relative_to(root).as_posix())
-            selected[key]["exports"].add(exports[matches[0]])
+            selected[key]["exports"].add(exports[operations])
     rows = []
     for family, parts in sorted(facts.items()):
         personalities = set()
@@ -602,7 +612,9 @@ def main(arguments=None, *, support_command=False):
                                test_support=args.test_support, evidence=args.evidence)
             print(json.dumps(result, indent=2, sort_keys=True))
             return 0
-        examples = documentation.check(args.root)
+        root = _checkout(args.root)
+        from tools.configure import documentation
+        examples = documentation.check(root)
         expected = render(collect(args.root))
         path = args.root / DOCUMENT
         document = path.read_text(encoding="utf-8")

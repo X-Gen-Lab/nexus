@@ -4,7 +4,7 @@ from pathlib import Path
 from types import SimpleNamespace
 import unittest
 
-from tools.configure.header_projection import HeaderProjection
+from tools.configure.generation.header_projection import HeaderProjection
 from tools.configure.ir import PadBindingIR
 from tools.configure.ir import ClockPlanIR
 from tools.configure.domains.pll_mnpq import PllMnpqPolicy

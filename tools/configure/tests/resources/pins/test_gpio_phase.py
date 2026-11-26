@@ -9,7 +9,8 @@ import unittest
 from unittest.mock import patch
 
 from tools.configure.tests.assembly_fixture import render_toml
-from tools.configure import bindings, configure as gate, gpio_phase
+from tools.configure import configure as gate, gpio_phase
+from tools.configure.generation import bindings
 from tools.configure.providers import for_selection
 
 
