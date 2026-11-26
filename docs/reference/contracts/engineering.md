@@ -38,14 +38,16 @@ C 合同使用 GoogleTest／GoogleMock，工具使用 Python unittest。
 
 安装开发工具后启用标准 pre-commit 和 commit-msg hook。不得跳过 hook 或自动暂存修复。
 提交检查读取完整暂存区，执行格式、注释、文档、工作流和行为检查。
-提交门禁只配置、构建一次，执行完整 Native GoogleTest 和受影响的完整工具测试模块。
+提交门禁只配置、构建一次，执行完整 Native CTest 和受影响的完整工具测试模块。
+hook 与 Native CI 共享同一 CTest 计划，并逐例核对未过滤的 GoogleTest 发现和 XML 身份。
 普通固件实现不触发整套辅助工具域；公共头和声明事实选择配置合同与一次全局支持检查。
 已修改的测试模块完整执行，已知工具实现按维护映射选择模块；未知路径或缺少已知覆盖
 保守执行完整域。提交报告明确标记 `commit-tools` 和 `qualification=false`，不冒充
 整域通过，也不按用例名称过滤。文档仍检查配置示例和双语完整性。
 
 合并或交付前独立执行完整工具域、相关 ARM 链接和 Source SDK 消费者。
-`--all` 与 `--tools all` 始终执行四个完整工具域。快速提交不能替代这些验收。
+`--all` 与 `--tools all` 始终执行 testing、configure、ci 三个常规工具域。
+快速提交不能替代这些验收。
 权威范围选择在 `tools/testing/run_tool_tests.py`，不能临时绕过或复用成功报告。
 
 ```sh
@@ -53,9 +55,10 @@ python tools/dev/dev.py check --preset native-debug
 python scripts/ci/tdd_gate.py --all --preset native-debug
 ```
 
-两条命令是合并前完整集成门禁的替代入口，不需要连续执行两遍。
-完整 CI 分别执行 testing、configure、ci、workflows、contracts、freertos 工具域，
-以及 native-debug、native-release、native-asan、native-tsan 的完整 CTest 计划。
+两条命令共用完整 Native 和三个常规工具域，`check` 先执行整仓风格检查。
+完整 CI 在三个常规工具域之外分别执行 integration 和 freertos，文档 job 执行文档用例
+和严格双语构建。工作流合同由 ci 域维护。Native 矩阵分别执行
+native-debug、native-release、native-asan、native-tsan 的完整 CTest 计划。
 Native 模式不重复执行与模式无关的工具测试。ARM 和迁移后的 SDK 消费者验证独立执行。
 
 `doctor` 只诊断所选工具和环境，不扫描全部装配、不生成维护报告。普通 configure／build

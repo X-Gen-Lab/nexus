@@ -29,10 +29,10 @@ OWNED = {"core", "io", "os", "components", "arch", "boards", "soc", "drivers",
 # Register models compile the production translation units separately with
 # their actual model defines. The compilation database is the scope authority.
 HOST_MODELS = {
-    "tests/contracts/os_freertos_runtime/posix_event.c":
-        "tests/contracts/os_freertos_runtime/posix_event.c",
-    "tests/contracts/os_freertos_runtime/posix_idle.c":
-        "tests/contracts/os_freertos_runtime/posix_idle.c",
+    "tests/integration/kernels/os_freertos_runtime/posix_event.c":
+        "tests/integration/kernels/os_freertos_runtime/posix_event.c",
+    "tests/integration/kernels/os_freertos_runtime/posix_idle.c":
+        "tests/integration/kernels/os_freertos_runtime/posix_idle.c",
 }
 
 # Required portable-C correctness profile. Advisory exclusions and their

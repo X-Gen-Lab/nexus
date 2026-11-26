@@ -77,7 +77,7 @@ BUS_WIDTH=2。直接响应和随后 CMD13 都检查 MMC 的 SWITCH_ERROR bit7，
 PB8／9（D4–5）、PC6／7（D6–7），全为 AF12。Board 必须明确授权完整路线。
 各实例只生成六或十份 pad descriptor／快照，不扩大全局最大数组；冷态 pin 收条
 覆盖十位，取消、排空和恢复失败仍保留精确未归还的 pin／clock 责任。新模式不会
-使现有六线 SD socket 自动成为八线 MMC。软件参考见 `tests/contracts/mmc8_assembly/`。
+使现有六线 SD socket 自动成为八线 MMC。软件参考见 `tests/integration/assemblies/mmc8_assembly/`。
 
 ## SDIO I/O functions
 

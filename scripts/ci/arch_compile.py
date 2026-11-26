@@ -513,7 +513,7 @@ def run(root: Path, compiler: str, output: Path) -> int:
         probe = recorder.output / 'atomic-probe.c'
         probe.write_text(ATOMIC_SOURCE, encoding='utf-8')
         report['atomic_probe'] = digest(probe)
-        nexus_probe = root / 'tests/contracts/arch_atomic_probe.c'
+        nexus_probe = root / 'tests/integration/arch/arch_atomic_probe.c'
         report['production_atomic_probe'] = digest(nexus_probe)
         report['production_atomic_header'] = digest(
             root / 'arch/include/nexus/arch/atomic.h')
@@ -630,7 +630,7 @@ def run(root: Path, compiler: str, output: Path) -> int:
             result['status'] = 'primitive_compile_passed'
         from tools.maintenance import cmsis_core_probe
         cmsis_core_probe.verify_core(root)
-        layout_source = root / 'tests/contracts/arch_cmsis_layout_probe.c'
+        layout_source = root / 'tests/integration/arch/arch_cmsis_layout_probe.c'
         layout = {'source': digest(layout_source),
                   'core_commit': cmsis_core_probe.CORE_COMMIT, 'profiles': []}
         report['cmsis_layout'] = layout

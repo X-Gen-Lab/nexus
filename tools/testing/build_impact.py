@@ -17,7 +17,7 @@ from tools.maintenance.source_catalogue import ALL_SOURCE_DEPENDENCIES, runtime_
 
 
 _ASSEMBLY_ROOTS = ("boards/", "tools/configure/assemblies/",
-                   "tests/contracts/", "cmake/package/verification/")
+                   "tests/integration/", "cmake/package/verification/")
 _SOURCE_SUFFIXES = {".c", ".h", ".s", ".inc", ".hpp", ".cpp"}
 _GRAPH = "nexus-target-inputs.json"
 
@@ -257,7 +257,7 @@ def plan_hardware(root, paths, *, base="HEAD"):
     modified = set(_git(root, "diff", "--no-renames", "--name-only", "--diff-filter=M",
                         "-z", tree, "--").decode().split("\0"))
     same_graph = all(PurePosixPath(path).suffix.lower() in _SOURCE_SUFFIXES and
-                     path in modified for path in paths)
+                     path in modified for path in names)
     graph, differences = {}, {}
     for path in names:
         owner = next((package for package in package_roots if

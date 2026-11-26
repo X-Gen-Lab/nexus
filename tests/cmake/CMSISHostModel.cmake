@@ -17,7 +17,7 @@ function(nexus_use_cmsis_host_model target)
     endif()
     get_filename_component(
         shim
-        "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../cmsis_host"
+        "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../support/arm/cmsis_host"
         ABSOLUTE
     )
     # Evaluate the final consumer's direct dependencies, after its MCU

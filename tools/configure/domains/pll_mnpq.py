@@ -9,7 +9,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 
 from tools.configure import clocks, usb_otg
-from tools.configure.calls import Symbol
+from tools.configure.generation.calls import Symbol
 from tools.configure.providers.common import fail, integer
 from tools.configure.records import freeze
 

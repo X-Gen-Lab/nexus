@@ -1,0 +1,521 @@
+"""Exercise target policy and incremental artifacts through real CMake builds."""
+
+from __future__ import annotations
+
+import json
+import os
+import shlex
+from pathlib import Path
+import shutil
+import subprocess
+import sys
+import tempfile
+import unittest
+
+
+ROOT = Path(__file__).resolve().parents[3]
+
+
+class BuildSystemTests(unittest.TestCase):
+    def setUp(self):
+        self.temporary = tempfile.TemporaryDirectory(prefix="Nexus build contract ")
+        self.addCleanup(self.temporary.cleanup)
+        self.source = Path(self.temporary.name) / "source with spaces"
+        self.source.mkdir()
+        self.build = Path(self.temporary.name) / "build with spaces"
+        self.cmake = shutil.which("cmake")
+        self.environment = os.environ.copy()
+        self.assertIsNotNone(self.cmake, "CMake is required for build contracts")
+
+    def run_command(self, *arguments, success=True):
+        completed = subprocess.run(arguments, capture_output=True, text=True,
+                                   env=self.environment,
+                                   timeout=120, check=False)
+        if success:
+            self.assertEqual(completed.returncode, 0,
+                             completed.stdout + completed.stderr)
+        else:
+            self.assertNotEqual(completed.returncode, 0,
+                                completed.stdout + completed.stderr)
+        return completed
+
+    def test_warm_build_tracks_soc_manifests_but_not_unselected_facts(self):
+        # Drive the production package lookup and CMake watcher in a small
+        # configure-only project; facts of unselected families stay private.
+        project = self.source
+        package = project / "soc/test/other"
+        package.mkdir(parents=True)
+        manifest = package / "package.json"
+        marker = project / "configure-count"
+        module = ROOT / "cmake/platform/Configure.cmake"
+        (project / "CMakeLists.txt").write_text(
+            'cmake_minimum_required(VERSION 3.31)\nproject(catalog NONE)\n'
+            f'include("{module.as_posix()}")\n'
+            '_nexus_watch_soc_manifests("${CMAKE_SOURCE_DIR}")\n'
+            f'execute_process(COMMAND "{sys.executable}" -B -c '
+            f'"import sys; sys.path.insert(0,r\'{ROOT.as_posix()}\'); '
+            f'from tools.configure import packages; packages.find(r\'{project.as_posix()}\','
+            f'\'selected\')" COMMAND_ERROR_IS_FATAL ANY)\n'
+            f'file(APPEND "{marker.as_posix()}" "x")\n')
+        self.run_command("cmake", "-S", str(project), "-B", str(self.build), "-G", "Ninja")
+        command = ("cmake", "--build", str(self.build))
+        self.run_command(*command)
+        manifest.write_text('{"family":"other"}')
+        self.run_command(*command)
+        self.assertEqual(marker.read_text(), "xx")
+        (package / "routes.json").write_text("{}")
+        self.run_command(*command)
+        self.assertEqual(marker.read_text(), "xx")
+        manifest.write_text('{"family":"selected"}')
+        self.run_command(*command, success=False)
+        manifest.unlink()
+        self.run_command(*command)
+        self.assertEqual(marker.read_text(), "xxx")
+
+    def fixture(self, *, optimization="Os", extra="", source=None):
+        """Separate the Nexus directory from the public helper's call site."""
+        platform = self.source / "platform"
+        platform.mkdir()
+        config = platform / "generated"
+        config.mkdir()
+        (config / "nexus_config.h").write_text("/* Contract configuration. */\n")
+        (config / "resolved.json").write_text('{"fixture": "target policy"}\n')
+        (platform / "owned.c").write_text(
+            "int nexus_contract_value(void);\n"
+            "int nexus_contract_value(void) { return 7; }\n")
+        (platform / "CMakeLists.txt").write_text(
+            f'set(NEXUS_SOURCE_DIR "{ROOT.as_posix()}")\n'
+            'set(NEXUS_CONFIG_DIR "${CMAKE_CURRENT_SOURCE_DIR}/generated")\n'
+            'set(NEXUS_CPU_ARCH native)\nset(NEXUS_ENUM_ABI native-int)\n'
+            'set(NEXUS_CPU_COMPILE_OPTIONS "")\n'
+            f'set(NEXUS_OPTIMIZATION "{optimization}")\n'
+            f'include("{ROOT.as_posix()}/cmake/platform/Options.cmake")\n'
+            f'include("{ROOT.as_posix()}/cmake/platform/Firmware.cmake")\n'
+            'add_library(nexus_arch INTERFACE)\n'
+            'add_library(Nexus::Arch ALIAS nexus_arch)\n'
+            'add_library(nexus_os_baremetal INTERFACE)\n'
+            'add_library(Nexus::OS ALIAS nexus_os_baremetal)\n'
+            'add_library(nexus_provider INTERFACE)\n'
+            'add_library(nexus_platform STATIC owned.c)\n'
+            'target_link_libraries(nexus_platform PRIVATE nexus_build_options '
+            'nexus_owned_warnings)\n'
+            'set_target_properties(nexus_platform PROPERTIES\n'
+            ' NEXUS_SOURCE_DIR "${NEXUS_SOURCE_DIR}"\n'
+            ' NEXUS_CONFIG_DIR "${NEXUS_CONFIG_DIR}"\n'
+            ' NEXUS_SOC_FAMILY native NEXUS_CPU_ARCH native\n'
+            ' NEXUS_BACKEND baremetal\n'
+            ' NEXUS_PROVIDER_TARGET nexus_provider\n'
+            ' NEXUS_COMPONENT_TARGETS "")\n'
+            'add_library(Nexus::Platform ALIAS nexus_platform)\n')
+        (self.source / "main.cpp").write_text(source or (
+            'extern "C" int nexus_contract_value(void);\n'
+            'int main() { return nexus_contract_value() == 7 ? 0 : 1; }\n'))
+        (self.source / "CMakeLists.txt").write_text(
+            'cmake_minimum_required(VERSION 3.31)\n'
+            'project(consumer LANGUAGES C CXX)\n'
+            'set(CMAKE_EXPORT_COMPILE_COMMANDS ON)\n'
+            'add_subdirectory(platform)\n'
+            'nexus_add_firmware(app SOURCES main.cpp)\n' + extra + '\n'
+            'file(GENERATE OUTPUT "${CMAKE_BINARY_DIR}/policy.txt" CONTENT '
+            '"$<TARGET_PROPERTY:app,INTERPROCEDURAL_OPTIMIZATION>\\n")\n')
+
+    def configure(self, *, generator="Ninja", arguments=(), success=True):
+        return self.run_command(self.cmake, "-S", str(self.source), "-B",
+                                str(self.build), "-G", generator, *arguments,
+                                success=success)
+
+    def build_application(self, *, success=True):
+        return self.run_command(self.cmake, "--build", str(self.build),
+                                "--target", "app", "--parallel", "2",
+                                success=success)
+
+    def application_compile_command(self):
+        commands = json.loads((self.build / "compile_commands.json").read_text())
+        return next(entry["command"] for entry in commands
+                    if entry["file"].endswith("main.cpp"))
+
+    def test_arm_toolchain_loads_without_optional_cpp_or_size(self):
+        # Model a C-only installation: the selected C/ASM tools are already known.
+        script = self.source / "toolchain-probe.cmake"
+        script.write_text(
+            'cmake_minimum_required(VERSION 3.31)\n'
+            'foreach(tool CMAKE_C_COMPILER CMAKE_ASM_COMPILER CMAKE_AR CMAKE_OBJCOPY)\n'
+            '  set(${tool} "${CMAKE_COMMAND}")\n'
+            'endforeach()\n'
+            'set(CMAKE_FIND_USE_CMAKE_SYSTEM_PATH FALSE)\n'
+            'set(CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH FALSE)\n'
+            f'include("{ROOT.as_posix()}/cmake/toolchains/arm-gcc.cmake")\n')
+        self.run_command(self.cmake, "-P", str(script))
+
+    def test_lto_policy_crosses_public_helper_directory_and_runs_cpp(self):
+        self.fixture(optimization="Os-lto")
+        self.configure()
+        self.assertEqual((self.build / "policy.txt").read_text().strip(), "ON")
+        self.assertIn("-flto", self.application_compile_command())
+        self.build_application()
+        self.run_command(str(self.build / "bin/app"))
+
+    def tls_fixture(self, optimization):
+        """Use the real TLS helper from a separate C11 composition directory."""
+        assembly_path = ROOT / "tests/support/native/assemblies/native-empty.toml"
+        assembly = assembly_path.read_text()
+        (self.source / "assembly.toml").write_text(assembly.replace(
+            'optimization = "Os"', f'optimization = "{optimization}"'))
+        (self.source / "main.c").write_text(
+            '#include "nexus/tls/storage.h"\n'
+            'static nx_tls_session_t session;\n'
+            'int main(void) {\n'
+            '    return nx_tls_abort(&session) == NX_SUCCESS ? 0 : 1;\n'
+            '}\n')
+        (self.source / "CMakeLists.txt").write_text(
+            'cmake_minimum_required(VERSION 3.31)\n'
+            'project(tls_policy_consumer LANGUAGES C)\n'
+            'set(CMAKE_EXPORT_COMPILE_COMMANDS ON)\n'
+            'set(NEXUS_ASSEMBLY_FILE\n'
+            '    "${CMAKE_CURRENT_SOURCE_DIR}/assembly.toml")\n'
+            'set(NEXUS_BUILD_TESTS OFF)\n'
+            'set(NEXUS_TEST_SUPPORT ON)\n'
+            'set(NEXUS_BUILD_WORKLOAD OFF)\n'
+            f'find_package(Nexus CONFIG REQUIRED PATHS "{ROOT.as_posix()}/cmake"\n'
+            '    NO_DEFAULT_PATH)\n'
+            'nexus_add_platform(ASSEMBLY "${NEXUS_ASSEMBLY_FILE}")\n'
+            'nexus_add_tls()\n'
+            'if(DEFINED CMAKE_POLICY_DEFAULT_CMP0069)\n'
+            '  message(FATAL_ERROR "TLS leaked a supplier policy default")\n'
+            'endif()\n'
+            'nexus_add_firmware(app SOURCES main.c\n'
+            '    LIBRARIES Nexus::TLSStorage)\n')
+
+    def tls_compiled_commands(self):
+        """Require executed supplier objects and the actual executable link."""
+        built = self.run_command(self.cmake, "--build", str(self.build),
+                                 "--target", "app", "--verbose",
+                                 "--parallel", "1")
+        self.run_command(str(self.build / "bin/app"))
+        database = self.build / "compile_commands.json"
+        commands = json.loads(database.read_text())
+        compiled = [entry for entry in commands
+                    if Path(entry["file"]).suffix == ".c"
+                    and (Path(entry["directory"]) / entry["output"]).is_file()]
+        supplier_root = ROOT / "ext/mbedtls"
+        supplier = [entry for entry in compiled
+                    if Path(entry["file"]).is_relative_to(supplier_root)]
+        self.assertTrue(supplier, "The actual TLS supplier was not compiled")
+        for name in ("ssl_tls.c", "psa_crypto.c"):
+            self.assertTrue(any(Path(entry["file"]).name == name
+                                for entry in supplier), name)
+        application = next(entry for entry in compiled
+                           if Path(entry["file"]) == self.source / "main.c")
+        links = [line for line in built.stdout.splitlines()
+                 if " -o bin/app " in line]
+        self.assertEqual(len(links), 1, built.stdout)
+        return supplier + [application], shlex.split(links[0])
+
+    def test_tls_supplier_lto_reaches_actual_c_commands_and_link(self):
+        self.tls_fixture("Os-lto")
+        self.configure(arguments=("-DCMAKE_BUILD_TYPE=Release",))
+        commands, link = self.tls_compiled_commands()
+        for entry in commands:
+            with self.subTest(source=entry["file"]):
+                arguments = shlex.split(entry["command"])
+                self.assertIn("-std=c11", arguments)
+                lto = any(flag.startswith("-flto") for flag in arguments)
+                self.assertTrue(lto, entry["command"])
+        self.assertTrue(any(flag.startswith("-flto") for flag in link), link)
+
+    def test_tls_supplier_no_lto_keeps_actual_c_commands_and_link_plain(self):
+        self.tls_fixture("Os")
+        self.configure(arguments=("-DCMAKE_BUILD_TYPE=Release",))
+        commands, link = self.tls_compiled_commands()
+        for entry in commands:
+            with self.subTest(source=entry["file"]):
+                arguments = shlex.split(entry["command"])
+                self.assertIn("-std=c11", arguments)
+                lto = any(flag.startswith("-flto") for flag in arguments)
+                self.assertFalse(lto, entry["command"])
+        self.assertFalse(any(flag.startswith("-flto") for flag in link), link)
+
+    def test_default_product_warnings_are_consumer_owned(self):
+        self.fixture(source="int main() { int unused = 3; return 0; }\n")
+        self.configure()
+        self.assertNotIn("-Werror", self.application_compile_command())
+        self.build_application()
+
+    def test_owned_platform_keeps_strict_warnings(self):
+        self.fixture()
+        (self.source / "platform/owned.c").write_text(
+            "int nexus_contract_value(void);\n"
+            "int nexus_contract_value(void) { int unused = 2; return 7; }\n")
+        self.configure()
+        completed = self.build_application(success=False)
+        self.assertIn("-Werror", completed.stdout + completed.stderr)
+        self.assertIn("unused", completed.stdout + completed.stderr)
+
+    def test_repository_workload_keeps_strict_owned_warning_policy(self):
+        self.run_command(self.cmake, "-S", str(ROOT), "-B", str(self.build),
+                         "-G", "Ninja", "-DNEXUS_BUILD_TESTS=OFF",
+                         "-DNEXUS_BUILD_WORKLOAD=ON",
+                         "-DNEXUS_TEST_SUPPORT=ON",
+                         f"-DNEXUS_ASSEMBLY_FILE={ROOT}/tests/support/native/"
+                         "assemblies/native-empty.toml")
+        commands = json.loads((self.build / "compile_commands.json").read_text())
+        command = next(entry["command"] for entry in commands
+                       if entry["file"] == str(ROOT / "tools/measurement/workload.c"))
+        self.assertIn("-Werror", command)
+        self.assertIn("-Wconversion", command)
+
+    def test_product_can_explicitly_enable_owned_strict_warnings(self):
+        self.fixture(extra="nexus_target_warnings(app STRICT)",
+                     source="int main() { int unused = 3; return 0; }\n")
+        self.configure()
+        self.assertIn("-Werror", self.application_compile_command())
+        completed = self.build_application(success=False)
+        self.assertIn("unused", completed.stdout + completed.stderr)
+
+    def test_og_profile_removes_conflicting_build_type_optimization(self):
+        self.fixture(optimization="Og")
+        self.configure()
+        command = self.application_compile_command()
+        self.assertIn("-Og", command)
+        self.assertNotIn("-Os", command)
+        self.build_application()
+
+    def test_unknown_firmware_argument_is_reported(self):
+        self.fixture(extra="nexus_add_firmware(other TYPO value SOURCES main.cpp)")
+        result = self.configure(success=False)
+        self.assertIn("unknown arguments", result.stdout + result.stderr)
+
+    def test_missing_firmware_keyword_value_is_reported(self):
+        self.fixture(extra="nexus_add_firmware(other SOURCES main.cpp LIBRARIES)")
+        result = self.configure(success=False)
+        self.assertIn("missing values", result.stdout + result.stderr)
+
+    def test_repeated_sources_keyword_is_rejected(self):
+        self.fixture(extra=(
+            "nexus_add_firmware(other SOURCES main.cpp SOURCES main.cpp)"))
+        result = self.configure(success=False)
+        self.assertIn("repeated SOURCES", result.stdout + result.stderr)
+
+    def test_repeated_libraries_keyword_is_rejected(self):
+        self.fixture(extra=("nexus_add_firmware(other SOURCES main.cpp "
+                            "LIBRARIES Nexus::Arch LIBRARIES Nexus::Arch)"))
+        result = self.configure(success=False)
+        self.assertIn("repeated LIBRARIES", result.stdout + result.stderr)
+
+    def test_duplicate_firmware_target_is_reported(self):
+        self.fixture(extra="nexus_add_firmware(app SOURCES main.cpp)")
+        result = self.configure(success=False)
+        self.assertIn("already exists", result.stdout + result.stderr)
+
+    def test_missing_platform_metadata_is_reported_before_linking(self):
+        self.fixture(extra=(
+            "set_property(TARGET nexus_platform PROPERTY NEXUS_BACKEND \"\")\n"
+            "nexus_add_firmware(other SOURCES main.cpp)"))
+        result = self.configure(success=False)
+        self.assertIn("Nexus::Platform is missing NEXUS_BACKEND",
+                      result.stdout + result.stderr)
+
+    def test_no_lto_profile_overrides_consumer_global_ipo_default(self):
+        self.fixture(extra="set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)\n"
+                     "nexus_add_firmware(other SOURCES main.cpp)\n"
+                     "get_target_property(policy other INTERPROCEDURAL_OPTIMIZATION)\n"
+                     "if(policy)\nmessage(FATAL_ERROR \"Leaked consumer IPO\")\nendif()")
+        self.configure()
+        self.assertEqual((self.build / "policy.txt").read_text().strip(), "OFF")
+
+    def cache_fixture(self):
+        self.fixture()
+        platform = self.source / "platform/CMakeLists.txt"
+        platform.write_text(platform.read_text().replace(
+            'set(NEXUS_CONFIG_DIR "${CMAKE_CURRENT_SOURCE_DIR}/generated")',
+            'set(NEXUS_CONFIG_DIR "${CMAKE_CURRENT_BINARY_DIR}/generated")\n'
+            'file(MAKE_DIRECTORY "${NEXUS_CONFIG_DIR}")\n'
+            'foreach(name nexus_config.h resolved.json)\n'
+            ' configure_file("${CMAKE_CURRENT_SOURCE_DIR}/generated/${name}"\n'
+            '  "${NEXUS_CONFIG_DIR}/${name}" COPYONLY)\n'
+            'endforeach()'))
+        tools = self.source / "mock tools"
+        tools.mkdir()
+        launcher = tools / "ccache"
+        log = self.source / "launcher.jsonl"
+        launcher.write_text(
+            '#!/usr/bin/env python3\n'
+            'import json, os, subprocess, sys\n'
+            'keys = ("CCACHE_DIR", "CCACHE_NAMESPACE", "CCACHE_COMPILERCHECK", '
+            '"CCACHE_SLOPPINESS", "CCACHE_HASHDIR")\n'
+            'values = {key: os.environ.get(key) for key in keys}\n'
+            'assert len(values["CCACHE_NAMESPACE"]) == 64\n'
+            'assert values["CCACHE_COMPILERCHECK"] == "content"\n'
+            'assert values["CCACHE_SLOPPINESS"] == ""\n'
+            'assert values["CCACHE_HASHDIR"] == "true"\n'
+            f'with open({str(log)!r}, "a") as stream:\n'
+            '    stream.write(json.dumps({"argv": sys.argv[1:], '
+            '"environment": values}) + "\\n")\n'
+            'raise SystemExit(subprocess.run(sys.argv[1:]).returncode)\n')
+        launcher.chmod(0o755)
+        self.environment["PATH"] = str(tools) + os.pathsep + self.environment["PATH"]
+        return log
+
+    def cache_environment(self):
+        return json.loads((self.build / "platform/build-policy/"
+                           "compiler-cache-environment.json").read_text())
+
+    def test_optional_cache_launcher_crosses_directories_with_strict_environment(self):
+        log = self.cache_fixture()
+        self.configure(arguments=("-DNEXUS_COMPILER_CACHE=ON",))
+        self.build_application()
+        invocations = [json.loads(line) for line in log.read_text().splitlines()]
+        self.assertTrue(any("main.cpp" in " ".join(item["argv"])
+                            for item in invocations))
+        self.assertTrue(any("owned.c" in " ".join(item["argv"])
+                            for item in invocations))
+
+    def test_optional_cache_survives_binary_directory_changes(self):
+        self.cache_fixture()
+        self.configure(arguments=("-DNEXUS_COMPILER_CACHE=ON",))
+        first = self.cache_environment()
+        self.build = Path(self.temporary.name) / "second build with spaces"
+        self.configure(arguments=("-DNEXUS_COMPILER_CACHE=ON",))
+        second = self.cache_environment()
+        self.assertEqual(first["CCACHE_DIR"], second["CCACHE_DIR"])
+        self.assertEqual(Path(first["CCACHE_DIR"]), self.source / "build/compiler-cache")
+        self.assertEqual(first["CCACHE_NAMESPACE"], second["CCACHE_NAMESPACE"])
+
+    def test_optional_cache_keeps_read_only_sdk_source_unchanged(self):
+        self.cache_fixture()
+        sdk = Path(self.temporary.name) / "read only SDK source"
+        for name in ("tools/__init__.py", "cmake/platform/Options.cmake",
+                     "cmake/platform/TargetPolicy.cmake", "tools/dev/cache.py",
+                     "tools/evidence/common.py", "dependencies/toolchains.lock.json",
+                     "dependencies/platform-compatibility.json"):
+            target = sdk / name
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(ROOT / name, target)
+        platform = self.source / "platform/CMakeLists.txt"
+        platform.write_text(platform.read_text().replace(
+            f'set(NEXUS_SOURCE_DIR "{ROOT.as_posix()}")',
+            f'set(NEXUS_SOURCE_DIR "{sdk.as_posix()}")').replace(
+                f'include("{ROOT.as_posix()}/cmake/platform/Options.cmake")',
+                f'include("{sdk.as_posix()}/cmake/platform/Options.cmake")'))
+        paths = [sdk, *sdk.rglob("*")]
+        before = {path.relative_to(sdk): path.read_bytes() if path.is_file() else None
+                  for path in paths}
+
+        def make_writable():
+            for path in paths:
+                path.chmod(0o755 if path.is_dir() else 0o644)
+
+        self.addCleanup(make_writable)
+        for path in paths:
+            path.chmod(0o555 if path.is_dir() else 0o444)
+        self.configure(arguments=("-DNEXUS_COMPILER_CACHE=ON",))
+        self.build_application()
+        self.assertEqual(Path(self.cache_environment()["CCACHE_DIR"]),
+                         self.source / "build/compiler-cache")
+        self.assertEqual(before, {
+            path.relative_to(sdk): path.read_bytes() if path.is_file() else None
+            for path in [sdk, *sdk.rglob("*")]})
+
+    def test_optional_cache_route_change_keeps_namespace(self):
+        self.cache_fixture()
+        self.configure(arguments=("-DNEXUS_COMPILER_CACHE=ON",))
+        first = self.cache_environment()
+        resolved = self.source / "platform/generated/resolved.json"
+        resolved.write_text('{"fixture": "another route"}\n')
+        self.configure(arguments=("-DNEXUS_COMPILER_CACHE=ON",))
+        self.assertEqual(first["CCACHE_NAMESPACE"],
+                         self.cache_environment()["CCACHE_NAMESPACE"])
+
+    def test_optional_cache_compile_flags_do_not_split_namespace(self):
+        self.cache_fixture()
+        self.configure(arguments=("-DNEXUS_COMPILER_CACHE=ON",))
+        first = self.cache_environment()
+        platform = self.source / "platform/CMakeLists.txt"
+        platform.write_text(platform.read_text().replace(
+            'set(NEXUS_OPTIMIZATION "Os")', 'set(NEXUS_OPTIMIZATION "O2")'))
+        self.configure(arguments=("-DNEXUS_COMPILER_CACHE=ON",))
+        self.assertEqual(first["CCACHE_NAMESPACE"],
+                         self.cache_environment()["CCACHE_NAMESPACE"])
+        self.assertIn("-O2", self.application_compile_command())
+
+    def test_optional_cache_keeps_explicit_directory_override(self):
+        self.cache_fixture()
+        directory = Path(self.temporary.name) / "explicit cache with spaces"
+        self.configure(arguments=("-DNEXUS_COMPILER_CACHE=ON",
+                                  f"-DNEXUS_COMPILER_CACHE_DIR={directory}"))
+        self.assertEqual(Path(self.cache_environment()["CCACHE_DIR"]), directory)
+
+    def test_firmware_requires_platform_before_reading_properties(self):
+        (self.source / "main.c").write_text("int main(void) { return 0; }\n")
+        (self.source / "CMakeLists.txt").write_text(
+            'cmake_minimum_required(VERSION 3.31)\nproject(consumer C)\n'
+            f'include("{ROOT.as_posix()}/cmake/platform/Firmware.cmake")\n'
+            'nexus_add_firmware(app SOURCES main.c)\n')
+        result = self.configure(success=False)
+        self.assertIn("requires a configured Nexus::Platform",
+                      result.stdout + result.stderr)
+
+    def test_second_platform_is_rejected_before_duplicate_targets(self):
+        self.fixture(extra="add_subdirectory(platform another-platform)")
+        result = self.configure(success=False)
+        self.assertIn("One build may contain only one resolved Nexus assembly",
+                      result.stdout + result.stderr)
+
+    def test_runtime_cannot_be_mixed_into_platform_graph(self):
+        self.fixture(extra=(
+            f'include("{ROOT.as_posix()}/cmake/platform/Runtime.cmake")\n'
+            'nexus_add_runtime(ASSEMBLY "missing-input.toml")'))
+        result = self.configure(success=False)
+        self.assertIn("One build may contain only one resolved Nexus assembly",
+                      result.stdout + result.stderr)
+
+    def invalid_sdk_fixture(self, override):
+        sdk = self.source / "invalid sdk"
+        (sdk / "cmake/package").mkdir(parents=True)
+        (sdk / ".nexus-source-sdk.json").write_text("{}\n")
+        shutil.copyfile(ROOT / "cmake/package/package_source_sdk.py",
+                        sdk / "cmake/package/package_source_sdk.py")
+        (self.source / "CMakeLists.txt").write_text(
+            'cmake_minimum_required(VERSION 3.31)\nproject(consumer C)\n'
+            'find_package(Python3 REQUIRED COMPONENTS Interpreter)\n'
+            f'set(NEXUS_SOURCE_DIR "{sdk.as_posix()}")\n' + override + '\n'
+            f'include("{ROOT.as_posix()}/cmake/platform/SDK.cmake")\n')
+
+    def test_normal_variable_cannot_skip_source_sdk_verification(self):
+        self.invalid_sdk_fixture(
+            'set(_nexus_verified_source_for_current_call "${NEXUS_SOURCE_DIR}")')
+        result = self.configure(success=False)
+        self.assertIn("Source SDK identity failed", result.stdout + result.stderr)
+
+    def test_cache_variable_cannot_skip_source_sdk_verification(self):
+        self.invalid_sdk_fixture(
+            'set(_nexus_verified_source_for_current_call '
+            '"${NEXUS_SOURCE_DIR}" CACHE STRING "")')
+        result = self.configure(success=False)
+        self.assertIn("Source SDK", result.stdout + result.stderr)
+
+    def test_source_package_verifies_bytes_before_configuration_modules(self):
+        sdk = self.source / "invalid sdk"
+        (sdk / "cmake/package").mkdir(parents=True)
+        (sdk / "cmake/platform").mkdir(parents=True)
+        (sdk / ".nexus-source-sdk.json").write_text("{}\n")
+        for name in ("cmake/NexusConfig.cmake", "cmake/platform/SDK.cmake",
+                     "cmake/platform/TargetPolicy.cmake",
+                     "cmake/package/package_source_sdk.py"):
+            shutil.copyfile(ROOT / name, sdk / name)
+        (self.source / "CMakeLists.txt").write_text(
+            'cmake_minimum_required(VERSION 3.31)\nproject(consumer C)\n'
+            f'set(NEXUS_ASSEMBLY_FILE "{self.source.as_posix()}/missing.toml")\n'
+            f'find_package(Nexus CONFIG REQUIRED PATHS "{sdk.as_posix()}/cmake"\n'
+            '    NO_DEFAULT_PATH)\n')
+        result = self.configure(success=False)
+        self.assertIn("Source SDK identity failed", result.stdout + result.stderr)
+
+    def test_unqualified_multiconfiguration_generator_is_rejected(self):
+        self.fixture()
+        result = self.configure(generator="Ninja Multi-Config", success=False)
+        self.assertIn("single-configuration Ninja", result.stdout + result.stderr)
+
+
+if __name__ == "__main__":
+    unittest.main()

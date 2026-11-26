@@ -2,7 +2,7 @@
 from collections.abc import Mapping
 from dataclasses import dataclass
 
-from tools.configure.calls import Symbol
+from tools.configure.generation.calls import Symbol
 from tools.configure.pinmux import NumericPinMuxPolicy
 from tools.configure.providers.common import fail, integer, normalize_resource
 from tools.configure.records import freeze

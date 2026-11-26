@@ -451,7 +451,7 @@ def _dma_region_facts(memory, *, flash=None, engine=None):
 
 def dma_region_declarations(name, result, include_flash=False, *, engine=None):
     """Describe exact static memory-domain records without C expressions."""
-    from tools.configure.static_ir import Array, Declaration, Record
+    from tools.configure.generation.static_ir import Array, Declaration, Record
     regions = dma_region_bindings(result, include_flash=include_flash, engine=engine)
     if not regions:
         return (), 0
@@ -466,9 +466,9 @@ def dma_region_declarations(name, result, include_flash=False, *, engine=None):
 
 def dma_region_bindings(result, include_flash=False, *, engine=None):
     """Freeze the same reviewed regions for static recipes and declarations."""
-    from tools.configure.calls import Symbol
+    from tools.configure.generation.calls import Symbol
     from tools.configure.ir import DmaMemoryBindingIR
-    from tools.configure.static_ir import Flags
+    from tools.configure.generation.static_ir import Flags
     regions = _dma_region_facts(result.memory,
         flash=result.flash if include_flash else None, engine=engine)
     return tuple(DmaMemoryBindingIR(region["origin"], region["size"],

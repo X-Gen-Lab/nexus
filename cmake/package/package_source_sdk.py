@@ -163,8 +163,6 @@ FREERTOS_REQUIRED_FILES = (
 
 MANIFEST = ".nexus-source-sdk.json"
 SDK_TOOL_FILES = (
-    'tools/configure/documentation.py',
-    'tools/configure/matrix.py',
     'scripts/ci/vendor_import_identity.py',
     'scripts/ci/verify_vendor_source.py',
     'scripts/validation/junit.py',
@@ -790,7 +788,7 @@ def _selected(name, root, profile, packages, configuration_files):
         if "native-time-" in name and not profile["host_support"]:
             return False
         return name in IO_EVOLUTION_VERIFICATION_FILES
-    if name.startswith(("dependencies/source/", "cmake/testing/", "cmake/presets/")):
+    if name.startswith(("dependencies/source/", "cmake/presets/")):
         return False
     return name in ROOT_FILES or name.split("/", 1)[0] in ROOT_DIRS
 
@@ -854,7 +852,7 @@ def check_selected_source_scope(selection, members, files):
     contracts = {name for package in selection.packages for name in package.verification_files}
     for name in files:
         safe_relative(name)
-        if name.startswith("tests/contracts/") and name not in contracts:
+        if name.startswith("tests/integration/") and name not in contracts:
             raise SDKError("Unselected package contract in SDK: " + name)
         if not name.startswith(("vendors/", "ext/")) and name not in members:
             raise SDKError("Unlisted platform source payload in SDK: " + name)

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Format owned C/C++ files using the repository's root .clang-format.
 
-All wrappers delegate here. Default/--all selection uses the Git index (including
+Default/--all selection uses the Git index (including
 new staged files). Relative --config/--files paths use the caller's working
 directory. Explicit files must belong to the configured owned roots; they never
 override exclusions and may be used in non-Git fixtures. Exit 0 means every file passed, 1
@@ -224,8 +224,6 @@ def print_config_info(root, config_path, files):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("mode", nargs="?", choices=("check",),
-                        help="Legacy wrapper alias for --check")
     parser.add_argument("-c", "--check", action="store_true",
                         help="Check only; do not modify files")
     parser.add_argument("-v", "--verbose", action="store_true")
@@ -252,7 +250,7 @@ def main(argv=None):
             print_config_info(root, config_path, files)
             return 0
         tool, version = check_tool(args.tool or default_tool(root), style_path)
-        check_only = args.check or args.mode == "check"
+        check_only = args.check
         print(f"{version}\nMode: {'Check' if check_only else 'Format'}; files: {len(files)}")
         if args.verbose:
             print_config_info(root, config_path, files)

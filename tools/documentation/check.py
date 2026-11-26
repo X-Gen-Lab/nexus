@@ -350,7 +350,8 @@ def external_links(urls, *, timeout=5, retries=1):
 
 
 def scan(root, *, check_diagrams=True, check_configuration=True,
-         check_navigation=True, external=False):
+         check_navigation=True, check_dependencies=True,
+         check_diagram_outputs=True, external=False):
     root = Path(root).resolve()
     errors, identifiers, urls, graph, config_records = [], {}, set(), {}, []
     pages = sources(root)
@@ -441,12 +442,14 @@ def scan(root, *, check_diagrams=True, check_configuration=True,
                     errors.append(row.get("diagram_id", "diagram")
                                   + ": required diagram not rendered")
                     continue
-            from tools.documentation import diagrams
-            errors.extend(diagrams.check(root, full=False)["errors"])
-    try:
-        dependencies(root, pages)
-    except (OSError, UnicodeError, ValueError) as error:
-        errors.append(str(error))
+            if check_diagram_outputs:
+                from tools.documentation import diagrams
+                errors.extend(diagrams.check(root, full=False)["errors"])
+    if check_dependencies:
+        try:
+            dependencies(root, pages)
+        except (OSError, UnicodeError, ValueError) as error:
+            errors.append(str(error))
     probes = external_links(urls) if external else []
     return {"schema_version": 1, "kind": "nexus_documentation_source_check",
             "status": "failed" if errors else "passed", "errors": errors,

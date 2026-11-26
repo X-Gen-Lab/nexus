@@ -8,7 +8,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass, field
 from types import MappingProxyType
 
-from tools.configure.calls import Symbol
+from tools.configure.generation.calls import Symbol
 from tools.configure.policies.bxcan import BxCanPolicy, BxCanTransport
 from tools.configure.ethernet import EthernetPolicy
 from tools.configure.providers.common import EndpointPolicy, fail, integer
@@ -355,7 +355,7 @@ class DomainPolicies:
             from tools.configure.policies.sai import SaiPolicy
             result["SAI"] = SaiPolicy.from_validated(value["sai"], pinmux=pinmux)
         if "platform" in value:
-            from tools.configure.platform_bindings import PlatformBindings
+            from tools.configure.generation.platform_bindings import PlatformBindings
             result["PLATFORM"] = PlatformBindings.from_validated(value["platform"])
         if "startup_memory" in value:
             from tools.configure.startup_memory import StartupMemoryPolicy
@@ -365,7 +365,7 @@ class DomainPolicies:
             from tools.configure.policies.packet import PacketPolicy
             result["PACKET"] = PacketPolicy.from_validated(value["packet"], pinmux=pinmux)
         if "headers" in value:
-            from tools.configure.header_projection import HeaderProjection
+            from tools.configure.generation.header_projection import HeaderProjection
             result["HEADER"] = HeaderProjection.from_validated(value["headers"])
         return cls(**result)
 

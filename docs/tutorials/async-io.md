@@ -43,5 +43,5 @@ factory 获取本身不分配或初始化硬件。
 
 当前模式与限制见[支持参考](../reference/platforms/support.md)，完整规则见
 [I/O 执行](../guides/io-execution.md)和[所有权](../explanation/ownership.md)。
-实现维护者可进一步查看 `tests/google/io/native_async_test.cpp` 的拒绝、取消和
+实现维护者可进一步查看 `tests/behavior/io/native_async_test.cpp` 的拒绝、取消和
 结清回归；这些回归不替代真实 DMA／线路时序测量。

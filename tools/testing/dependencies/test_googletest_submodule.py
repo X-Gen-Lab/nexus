@@ -1,0 +1,463 @@
+"""Exercise offline GoogleTest admission against real Git source boundaries."""
+from __future__ import annotations
+from dataclasses import replace
+import json
+import os
+from pathlib import Path
+import shutil
+import subprocess
+import tempfile
+import unittest
+from unittest.mock import patch
+from tools.maintenance import source_catalogue
+
+ROOT = Path(__file__).resolve().parents[3]
+ORIGIN = "https://github.com/google/googletest.git"
+FETCH = source_catalogue.dependency("googletest").fetch_url
+UPSTREAM_COMMIT = "6910c9d9165801d8827d628cb72eb7ea9dd538c5"
+
+
+class GoogleTestSubmoduleTests(unittest.TestCase):
+    def setUp(self):
+        self.temporary = tempfile.TemporaryDirectory(prefix="google source lock [fixture] ")
+        self.addCleanup(self.temporary.cleanup)
+        self.root = Path(self.temporary.name)
+        self.source = self.root / "ext/googletest"
+        self.source.mkdir(parents=True)
+        self.lock_path = self.root / "dependencies/googletest.lock.json"
+        self.lock_path.parent.mkdir()
+        self.git(self.root, "init", "--quiet")
+        self.git(self.source, "init", "--quiet")
+        self.git(self.source, "remote", "add", "origin", FETCH)
+        # Keep synthetic source contents, with a real reviewed upstream parent.
+        self.git(self.source, "fetch", "--quiet", "--depth=1",
+                 str(ROOT / "ext/googletest"), UPSTREAM_COMMIT)
+        self.git(self.source, "reset", "--soft", "FETCH_HEAD")
+        (self.source / "CMakeLists.txt").write_text(
+            "cmake_minimum_required(VERSION 3.31)\n"
+            "project(googletest-distribution LANGUAGES CXX)\n"
+            "set(GOOGLETEST_VERSION 1.16.0)\n"
+            "add_library(gmock_main INTERFACE)\n"
+            "add_library(GTest::gmock_main ALIAS gmock_main)\n")
+        (self.source / "LICENSE").write_text("Fixture notice\n")
+        self.git(self.source, "add", ".")
+        self.git(self.source, "commit", "--quiet", "-m", "source fixture")
+        self.lock = {"schema": 1, "name": "googletest", "version": "1.16.0",
+            "commit": self.git(self.source, "rev-parse", "HEAD"),
+            "upstream_commit": UPSTREAM_COMMIT,
+            "path": "ext/googletest", "url": ORIGIN,
+            "license": "BSD-3-Clause",
+            "scope": "host GoogleTest/GoogleMock targets only; "
+                     "no configure-time network"}
+        self.write_lock()
+        self.modules = self.root / ".gitmodules"
+        self.modules.write_text('[submodule "ext/googletest"]\n'
+            '\tpath = ext/googletest\n\turl = ' + FETCH + '\n')
+        self.git(self.root, "add", ".gitmodules", "dependencies", "ext/googletest")
+        self.git(self.root, "commit", "--quiet", "-m", "parent fixture")
+        self.git(self.root, "submodule", "absorbgitdirs", "ext/googletest")
+
+    def git(self, directory, *arguments, index=None):
+        environment = {key: value for key, value in os.environ.items()
+                       if not key.startswith("GIT_")}
+        if index is not None:
+            environment["GIT_INDEX_FILE"] = str(index)
+        environment.update({"GIT_AUTHOR_NAME": "GoogleTest fixture",
+            "GIT_AUTHOR_EMAIL": "fixture@example.invalid",
+            "GIT_COMMITTER_NAME": "GoogleTest fixture",
+            "GIT_COMMITTER_EMAIL": "fixture@example.invalid"})
+        result = subprocess.run(["git", "-C", str(directory), *arguments],
+            capture_output=True, text=True, env=environment, timeout=20)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        return result.stdout.strip()
+
+    def write_lock(self):
+        self.lock_path.write_text(json.dumps(self.lock, indent=2) + "\n")
+
+    def verify(self):
+        from tools.maintenance import googletest_lock
+        return googletest_lock.verify(self.source, self.lock_path)
+
+    def test_exact_clean_submodule_is_admitted_without_modifying_sources(self):
+        before = self.git(self.root, "status", "--porcelain")
+        result = self.verify()
+        self.assertEqual(result["commit"], self.lock["commit"])
+        self.assertEqual(result["source_kind"], "git_submodule")
+        self.assertEqual(before, self.git(self.root, "status", "--porcelain"))
+
+    def test_approved_fetch_origin_keeps_official_lock_provenance(self):
+        record = source_catalogue.dependency("googletest")
+        approved = replace(record,
+            fetch_url="https://github.com/Reviewed-Test/googletest.git")
+        records = tuple(approved if item == record else item
+                        for item in source_catalogue.ALL_DEPENDENCIES)
+        self.modules.write_text(self.modules.read_text().replace(
+            FETCH, approved.fetch_url))
+        self.git(self.source, "remote", "set-url", "origin", approved.fetch_url)
+        with patch.object(source_catalogue, "ALL_DEPENDENCIES", records):
+            self.assertEqual(self.verify()["commit"], self.lock["commit"])
+            self.assertEqual(self.lock["url"], approved.upstream_url)
+            self.git(self.source, "remote", "set-url", "origin", ORIGIN)
+            with self.assertRaisesRegex(ValueError, "origin"):
+                self.verify()
+
+    def test_uninitialized_directory_cannot_inherit_parent_git_identity(self):
+        (self.source / ".git").unlink()
+        with self.assertRaisesRegex(ValueError, "initializ"):
+            self.verify()
+
+    def test_wrong_checkout_commit_rejects(self):
+        (self.source / "changed.txt").write_text("changed source\n")
+        self.git(self.source, "add", ".")
+        self.git(self.source, "commit", "--quiet", "-m", "different source")
+        with self.assertRaisesRegex(ValueError, "commit"):
+            self.verify()
+
+    def test_wrong_parent_gitlink_rejects_even_when_checkout_matches_lock(self):
+        self.git(self.root, "update-index", "--cacheinfo", "160000",
+                 "a" * 40, "ext/googletest")
+        with self.assertRaisesRegex(ValueError, "gitlink"):
+            self.verify()
+
+    def test_parent_uses_active_commit_index_without_leaking_it_to_dependency(self):
+        alternate = self.root / "active-index"
+        shutil.copy2(self.root / ".git/index", alternate)
+        self.git(self.root, "update-index", "--cacheinfo", "160000",
+                 "a" * 40, "ext/googletest")
+        with patch.dict(os.environ, {"GIT_INDEX_FILE": str(alternate)}):
+            self.assertEqual(self.verify()["commit"], self.lock["commit"])
+        with self.assertRaisesRegex(ValueError, "gitlink"):
+            self.verify()
+
+    def test_initial_staged_submodule_works_before_first_parent_commit(self):
+        (self.source / "new.txt").write_text("reviewed update\n")
+        self.git(self.source, "add", ".")
+        self.git(self.source, "commit", "--quiet", "-m", "reviewed update")
+        self.lock["commit"] = self.git(self.source, "rev-parse", "HEAD")
+        self.write_lock()
+        self.git(self.root, "add", "ext/googletest", "dependencies")
+        self.assertEqual(self.verify()["commit"], self.lock["commit"])
+
+    def test_tracked_or_untracked_dependency_edits_reject(self):
+        for name in ("LICENSE", "untracked.cpp"):
+            with self.subTest(name=name):
+                path = self.source / name
+                before = path.read_bytes() if path.exists() else None
+                path.write_text("unreviewed edit\n")
+                try:
+                    with self.assertRaisesRegex(ValueError, "dirty"):
+                        self.verify()
+                finally:
+                    if before is None:
+                        path.unlink()
+                    else:
+                        path.write_bytes(before)
+
+    def test_changed_declaration_or_checkout_origin_rejects(self):
+        original = self.modules.read_text()
+        self.modules.write_text(original.replace(FETCH, "https://invalid.test/src"))
+        with self.assertRaisesRegex(ValueError, "origin"):
+            self.verify()
+        self.modules.write_text(original)
+        self.git(self.source, "remote", "set-url", "origin",
+                 "https://invalid.test/src")
+        with self.assertRaisesRegex(ValueError, "origin"):
+            self.verify()
+
+    def test_unknown_or_duplicate_lock_fields_reject(self):
+        self.lock["fallback"] = True
+        self.write_lock()
+        with self.assertRaisesRegex(ValueError, "fields"):
+            self.verify()
+        del self.lock["fallback"]
+        self.write_lock()
+        self.lock_path.write_text(self.lock_path.read_text().replace(
+            '"schema": 1', '"schema": 1, "schema": 1'))
+        with self.assertRaisesRegex(ValueError, "Duplicate JSON"):
+            self.verify()
+
+    def test_missing_or_unreviewed_upstream_base_rejects(self):
+        for upstream in (None, True, "main", "a" * 39, "a" * 40,
+                         self.lock["commit"]):
+            with self.subTest(upstream=upstream):
+                if upstream is None:
+                    self.lock.pop("upstream_commit")
+                else:
+                    self.lock["upstream_commit"] = upstream
+                self.write_lock()
+                with self.assertRaises(ValueError):
+                    self.verify()
+
+    def test_selected_commit_requires_reviewed_upstream_ancestor(self):
+        self.git(self.source, "checkout", "--quiet", "--orphan", "unrelated")
+        self.git(self.source, "commit", "--quiet", "-m", "unrelated source")
+        self.lock["commit"] = self.git(self.source, "rev-parse", "HEAD")
+        self.write_lock()
+        self.git(self.root, "add", "ext/googletest", "dependencies")
+        with self.assertRaisesRegex(ValueError, "upstream"):
+            self.verify()
+
+    def test_unsafe_path_or_different_release_rejects(self):
+        self.lock["path"] = "../googletest"
+        self.write_lock()
+        with self.assertRaises(ValueError):
+            self.verify()
+        self.lock["path"] = "ext/googletest"
+        self.lock["version"] = "1.17.0"
+        self.write_lock()
+        with self.assertRaisesRegex(ValueError, "version"):
+            self.verify()
+
+    def test_symlinked_sources_reject(self):
+        moved = self.source.with_name("real-googletest")
+        self.source.rename(moved)
+        self.source.symlink_to(moved, target_is_directory=True)
+        with self.assertRaisesRegex(ValueError, "regular"):
+            self.verify()
+
+    def configure(self, *, cross=False, ninja=False):
+        helper = self.root / "tests/cmake/GoogleTest.cmake"
+        helper.parent.mkdir(parents=True)
+        shutil.copy2(ROOT / "tests/cmake/GoogleTest.cmake", helper)
+        shutil.copy2(ROOT / "tests/cmake/GeneratedConfiguration.cmake",
+                     helper.with_name("GeneratedConfiguration.cmake"))
+        configuration = self.root / "cmake/platform/Configure.cmake"
+        configuration.parent.mkdir(parents=True)
+        shutil.copy2(ROOT / "cmake/platform/Configure.cmake", configuration)
+        verifier = self.root / "tools/maintenance/googletest_lock.py"
+        verifier.parent.mkdir(parents=True)
+        shutil.copy2(ROOT / "tools/maintenance/googletest_lock.py", verifier)
+        shutil.copy2(ROOT / "tools/maintenance/source_catalogue.py",
+                     verifier.with_name("source_catalogue.py"))
+        shutil.copy2(ROOT / "tools/maintenance/cmsis_device_lock.py",
+                     verifier.with_name("cmsis_device_lock.py"))
+        for name in ("common.py", "identity.py"):
+            helper = self.root / "tools/evidence" / name
+            helper.parent.mkdir(exist_ok=True)
+            shutil.copy2(ROOT / "tools/evidence" / name, helper)
+        metadata = self.root / "tools/configure/metadata.py"
+        metadata.parent.mkdir(parents=True)
+        shutil.copy2(ROOT / "tools/configure/metadata.py", metadata)
+        (self.root / "host.cpp").write_text("int main() { return 0; }\n")
+        (self.root / "CMakeLists.txt").write_text(
+            "cmake_minimum_required(VERSION 3.31)\n"
+            "project(host_admission NONE)\n"
+            'file(APPEND "${CMAKE_BINARY_DIR}/configure-count.txt" "configure\\n")\n'
+            "include(tests/cmake/GoogleTest.cmake)\n"
+            "nexus_host_google_test()\n"
+            "if(NOT TARGET GTest::gmock_main)\n"
+            '  message(FATAL_ERROR "Missing host framework target")\n'
+            "endif()\n"
+            "add_executable(host_smoke host.cpp)\n"
+            "target_compile_features(host_smoke PRIVATE cxx_std_17)\n"
+            "target_link_libraries(host_smoke PRIVATE GTest::gmock_main)\n")
+        command = [shutil.which("cmake"), "-S", str(self.root),
+                   "-B", str(self.root / "build")]
+        if ninja:
+            command += ["-G", "Ninja"]
+        if cross:
+            command.append("-DCMAKE_SYSTEM_NAME=Generic")
+        return subprocess.run(command, capture_output=True, text=True, timeout=60)
+
+    def build(self):
+        return subprocess.run([shutil.which("cmake"), "--build",
+            str(self.root / "build"), "--target", "host_smoke", "--parallel", "1"],
+            capture_output=True, text=True, timeout=60)
+
+    def configure_count(self):
+        return len((self.root / "build/configure-count.txt").read_text().splitlines())
+
+    def test_git_directory_observation_is_quiet_but_identity_changes_rerun(self):
+        from tools.evidence.identity import observe_git_source
+        directory = Path(self.git(self.source, "rev-parse", "--absolute-git-dir"))
+        self.git(self.source, "config", "--unset", "core.worktree")
+        (self.source / ".git").unlink()
+        shutil.move(directory, self.source / ".git")
+        directory = self.source / ".git"
+        result = self.configure(ninja=True)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual(self.configure_count(), 1)
+        self.assertTrue(observe_git_source(self.root)["dirty"])
+        built = self.build()
+        self.assertEqual(built.returncode, 0, built.stdout + built.stderr)
+        self.assertEqual(self.configure_count(), 1, built.stdout + built.stderr)
+        # Only real metadata files invalidate the graph; status lock churn does
+        # not. Identical-byte rewrites still require a fresh admission.
+        branch = self.git(self.source, "symbolic-ref", "HEAD")
+        for index, relative in enumerate(("HEAD", "index", branch, "config"), 2):
+            with self.subTest(metadata=relative):
+                (directory / relative).touch()
+                built = self.build()
+                self.assertEqual(built.returncode, 0, built.stdout + built.stderr)
+                self.assertEqual(self.configure_count(), index,
+                                 built.stdout + built.stderr)
+        self.git(self.source, "remote", "set-url", "origin", "https://invalid.test/src")
+        rejected = self.build()
+        self.assertNotEqual(rejected.returncode, 0, rejected.stdout + rejected.stderr)
+        self.assertIn("checkout origin differs", rejected.stdout + rejected.stderr)
+
+    def test_gitfile_redirect_cannot_reuse_the_previous_checkout_admission(self):
+        directory = Path(self.git(self.source, "rev-parse", "--absolute-git-dir"))
+        alternate = directory.with_name("alternate-googletest")
+        changed = self.git(self.source, "commit-tree", "HEAD^{tree}", "-p", "HEAD",
+                           "-m", "different commit with identical source tree")
+        shutil.copytree(directory, alternate)
+        (alternate / "HEAD").write_text(changed + "\n")
+        result = self.configure(ninja=True)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        marker = self.source / ".git"
+        marker.write_text("gitdir: " + str(alternate) + "\n")
+        self.assertEqual(self.git(self.source, "rev-parse", "HEAD"), changed)
+        rejected = self.build()
+        self.assertNotEqual(rejected.returncode, 0, rejected.stdout + rejected.stderr)
+        self.assertIn("checkout commit differs", rejected.stdout + rejected.stderr)
+
+    def test_packed_branch_advance_cannot_hide_a_new_loose_reference(self):
+        self.git(self.source, "pack-refs", "--all", "--prune")
+        result = self.configure(ninja=True)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        # HEAD and packed-refs retain their bytes. Only a new loose ref carries
+        # this commit, whose source tree deliberately remains identical.
+        branch = self.git(self.source, "symbolic-ref", "HEAD")
+        reference = Path(self.git(self.source, "rev-parse", "--git-path", branch))
+        if not reference.is_absolute():
+            reference = self.source / reference
+        self.assertFalse(reference.exists())
+        self.git(self.source, "commit", "--quiet", "--allow-empty", "-m",
+                 "advanced packed branch with identical source tree")
+        self.assertTrue(reference.is_file())
+        rejected = self.build()
+        self.assertNotEqual(rejected.returncode, 0, rejected.stdout + rejected.stderr)
+        self.assertIn("checkout commit differs", rejected.stdout + rejected.stderr)
+
+    def test_worktree_origin_and_common_directory_change_rerun_admission(self):
+        common = Path(self.git(self.source, "rev-parse", "--absolute-git-dir"))
+        linked = self.root / "linked-checkout"
+        self.git(self.source, "worktree", "add", "--quiet", "--detach",
+                 str(linked), self.lock["commit"])
+        original = self.root / "original-checkout"
+        self.source.rename(original)
+        self.git(self.root, "--git-dir=" + str(common),
+                 "--work-tree=" + str(original), "worktree", "move",
+                 str(linked), str(self.source))
+        worktree = Path(self.git(self.source, "rev-parse", "--absolute-git-dir"))
+        self.assertNotEqual(worktree, common)
+        result = self.configure(ninja=True)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.git(self.source, "remote", "set-url", "origin", "https://invalid.test/src")
+        rejected = self.build()
+        self.assertNotEqual(rejected.returncode, 0, rejected.stdout + rejected.stderr)
+        self.assertIn("checkout origin differs", rejected.stdout + rejected.stderr)
+
+        self.git(self.source, "remote", "set-url", "origin", FETCH)
+        restored = self.build()
+        self.assertEqual(restored.returncode, 0, restored.stdout + restored.stderr)
+        # Neither gitfile, HEAD nor index changes. The commondir file alone
+        # redirects origin/object lookup to another common Git directory.
+        alternate = common.with_name("alternate-common")
+        shutil.copytree(common, alternate)
+        self.git(self.root, "--git-dir=" + str(alternate), "config",
+                 "remote.origin.url", "https://invalid.test/src")
+        (worktree / "commondir").write_text(str(alternate) + "\n")
+        rejected = self.build()
+        self.assertNotEqual(rejected.returncode, 0, rejected.stdout + rejected.stderr)
+        self.assertIn("checkout origin differs", rejected.stdout + rejected.stderr)
+
+    def test_staging_an_unrelated_file_preserves_the_native_build_graph(self):
+        configured = self.configure(ninja=True)
+        self.assertEqual(configured.returncode, 0, configured.stderr)
+        self.assertEqual(self.build().returncode, 0)
+        (self.root / "driver.c").write_text("int unrelated;\n")
+        self.git(self.root, "add", "driver.c")
+        built = self.build()
+        self.assertEqual(built.returncode, 0, built.stdout + built.stderr)
+        self.assertEqual(self.configure_count(), 1, built.stdout + built.stderr)
+
+    def test_warm_build_checks_active_parent_index_and_unstaged_dependency_edits(self):
+        configured = self.configure(ninja=True)
+        self.assertEqual(configured.returncode, 0, configured.stderr)
+        self.assertEqual(self.build().returncode, 0)
+        alternate = self.root / "alternate-index"
+        shutil.copyfile(self.root / ".git/index", alternate)
+        self.git(self.root, "update-index", "--cacheinfo", "160000", "a" * 40,
+                 "ext/googletest", index=alternate)
+        with patch.dict(os.environ, {"GIT_INDEX_FILE": str(alternate)}):
+            result = self.build()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("parent index gitlink differs", result.stdout + result.stderr)
+        (self.source / "LICENSE").write_text("unreviewed source edit\n")
+        result = self.build()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("checkout is dirty", result.stdout + result.stderr)
+
+    def test_parent_index_gitlink_change_reruns_source_admission(self):
+        result = self.configure(ninja=True)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.git(self.root, "update-index", "--cacheinfo", "160000",
+                 "a" * 40, "ext/googletest")
+        rejected = self.build()
+        self.assertNotEqual(rejected.returncode, 0, rejected.stdout + rejected.stderr)
+        self.assertIn("parent index gitlink differs", rejected.stdout + rejected.stderr)
+
+    def test_shared_cmake_loads_verified_checkout_offline(self):
+        result = self.configure()
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("CMAKE_CXX_COMPILER", (self.root /
+            "build/CMakeCache.txt").read_text())
+        self.assertFalse((self.root / "build/_deps/googletest").exists())
+        build = subprocess.run([shutil.which("cmake"), "--build",
+            str(self.root / "build")], capture_output=True, text=True,
+            timeout=60)
+        self.assertEqual(build.returncode, 0, build.stdout + build.stderr)
+        binary = self.root / "build/host_smoke"
+        if os.name == "nt":
+            binary = binary.with_suffix(".exe")
+        run = subprocess.run([str(binary)], capture_output=True, text=True,
+                             timeout=10)
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        # A checkout switch changes Git metadata even when its CMake file is
+        # unchanged; the next ordinary build must rerun source admission.
+        (self.source / "LICENSE").write_text("different committed source\n")
+        self.git(self.source, "add", ".")
+        self.git(self.source, "commit", "--quiet", "-m", "unexpected switch")
+        rejected = subprocess.run([shutil.which("cmake"), "--build",
+            str(self.root / "build")], capture_output=True, text=True,
+            timeout=60)
+        self.assertNotEqual(rejected.returncode, 0,
+                            rejected.stdout + rejected.stderr)
+        self.assertIn("checkout commit differs", rejected.stderr)
+
+    def test_cmake_reports_actionable_uninitialized_failure_before_cpp_setup(self):
+        (self.source / ".git").unlink()
+        result = self.configure()
+        self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("prepare --scope native --allow-network", result.stderr)
+        self.assertNotIn("CMAKE_CXX_COMPILER:", (self.root /
+            "build/CMakeCache.txt").read_text())
+
+    def test_changed_transport_policy_reruns_admission_on_ordinary_build(self):
+        result = self.configure()
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        catalogue = self.root / "tools/maintenance/source_catalogue.py"
+        with catalogue.open("a") as stream:
+            stream.write('\nfrom dataclasses import replace\n'
+                'ALL_DEPENDENCIES = tuple(replace(item, fetch_url='
+                '"https://github.com/Reviewed-Test/googletest.git") '
+                'if item.identifier == "googletest" else item '
+                'for item in ALL_DEPENDENCIES)\n')
+        result = subprocess.run([shutil.which("cmake"), "--build",
+            str(self.root / "build")], capture_output=True, text=True,
+            timeout=60)
+        self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("origin declaration differs", result.stderr)
+
+    def test_cross_compiling_rejects_before_loading_the_framework(self):
+        result = self.configure(cross=True)
+        self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("host", result.stderr)
+        self.assertNotIn("CMAKE_CXX_COMPILER:", (self.root /
+            "build/CMakeCache.txt").read_text())
+
+
+if __name__ == "__main__":
+    unittest.main()

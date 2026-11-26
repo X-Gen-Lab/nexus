@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "nexus-component-source",
   "identifier": "lvgl",
-  "path": "vendors/lvgl",
+  "path": "ext/lvgl",
   "upstream_url": "https://github.com/lvgl/lvgl.git",
   "fetch_url": "https://github.com/X-Gen-Lab/lvgl.git",
   "commit": "c033a98afddd65aaafeebea625382a94020fe4a7",

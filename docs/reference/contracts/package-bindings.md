@@ -158,7 +158,7 @@ binding 可以选择一个 `static_recipe`，或用 `profiles` 映射已解析�
 
 ### 单层 StaticFragments
 
-[StaticFragments](../../../tools/configure/static_fragments.py)已接入生产 DataProvider。
+[StaticFragments](../../../tools/configure/generation/static_fragments.py)已接入生产 DataProvider。
 文件片段顶层 `static_fragments` 合入选中软件的 `software.static_fragments`，分为
 `declarations` 与 `values` 两库。每库在整个选中包内使用统一名字，重名拒绝，不允许
 后读覆盖。尚未使用的片段也检查有限语法；不据机制接入声称所有 F4 模式已采用。

@@ -13,11 +13,13 @@ from unittest.mock import patch
 from check_required_jobs import check_required_jobs, main, required_jobs
 
 
-def needs_for(code="false", docs="false", workflows="false"):
+def needs_for(code="false", docs="false", workflows="false", tooling=None):
     return {
         "changes": {
             "result": "success",
-            "outputs": {"code": code, "docs": docs, "workflows": workflows},
+            "outputs": {"code": code, "docs": docs, "workflows": workflows,
+                        "tooling": tooling if tooling is not None else
+                        str(code == "true" or workflows == "true").lower()},
         },
         "build-test": {"result": "skipped"},
         "code-quality": {"result": "success"},
@@ -52,6 +54,22 @@ class RequiredJobsTests(unittest.TestCase):
                     )
                     with self.subTest(event=event, flags=(code, docs, workflows), statuses=statuses):
                         self.assertEqual(check_required_jobs(needs, event).passed, should_pass)
+
+    def test_private_behavior_skip_keeps_required_jobs_strict(self):
+        for event in ("push", "pull_request", "schedule", "workflow_dispatch"):
+            for workflows in ("false", "true"):
+                needs = needs_for(code="true", workflows=workflows, tooling="false")
+                for name in ("build-test", "code-quality", "docs"):
+                    needs[name]["result"] = "success"
+                required = workflows == "true" or event in ("schedule", "workflow_dispatch")
+                with self.subTest(event=event, workflows=workflows):
+                    self.assertEqual(required_jobs(needs["changes"]["outputs"], event)
+                                     ["tool-contracts"], required)
+                for status in ("success", "skipped", "failure", "cancelled"):
+                    needs["tool-contracts"]["result"] = status
+                    expected = status == "success" or (status == "skipped" and not required)
+                    with self.subTest(event=event, workflows=workflows, status=status):
+                        self.assertEqual(check_required_jobs(needs, event).passed, expected)
 
     def test_documentation_failure_blocks_docs_only_change(self):
         needs = needs_for(docs="true")
@@ -88,7 +106,7 @@ class RequiredJobsTests(unittest.TestCase):
 
     def test_invalid_change_outputs_fail(self):
         original = needs_for()
-        for name in ("code", "docs", "workflows"):
+        for name in ("code", "docs", "workflows", "tooling"):
             for value in (None, True, False, 0, 1, "", "TRUE", [], {}):
                 needs = copy.deepcopy(original)
                 needs["changes"]["outputs"][name] = value
@@ -138,10 +156,11 @@ class RequiredJobsTests(unittest.TestCase):
         # Make divergence between workflow conditions and Python policy visible.
         workflow = Path(__file__).resolve().parents[2] / ".github/workflows/ci.yml"
         lines = workflow.read_text(encoding="utf-8").splitlines()
+        self.assertIn("      tooling: ${{ steps.filter.outputs.tooling }}", lines)
         expected = {
             "build-test": "needs.changes.outputs.code == 'true' || needs.changes.outputs.workflows == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'",
             "code-quality": None,
-            "tool-contracts": "needs.changes.outputs.code == 'true' || needs.changes.outputs.workflows == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'",
+            "tool-contracts": "needs.changes.outputs.tooling == 'true' || needs.changes.outputs.workflows == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'",
             "docs": "needs.changes.outputs.docs == 'true' || needs.changes.outputs.code == 'true' || needs.changes.outputs.workflows == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'",
         }
         for job, expression in expected.items():

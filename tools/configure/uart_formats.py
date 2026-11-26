@@ -1,6 +1,6 @@
 """Reviewed byte frames and an independent nine-bit IRQ personality."""
 from dataclasses import dataclass
-from tools.configure.calls import DirectCall, Symbol
+from tools.configure.generation.calls import DirectCall, Symbol
 
 from tools.configure.providers.common import fail, integer, mode_traits
 

@@ -84,7 +84,7 @@ scratch 本身会频繁擦写；产品评估更新次数、耐久、供电和复
 
 ## 软件验证与接入
 
-`tests/google/components/mcuboot_swap_test.cpp` 直接执行官方 `boot_go` 与实际签名
+`tests/behavior/components/protocols/mcuboot_swap_test.cpp` 直接执行官方 `boot_go` 与实际签名
 镜像：未申请候选、TEST 后 revert、TEST 后 confirm、永久更新、损坏签名、scratch
 重叠、失效 scope、copy 半写及 erase 半效应后重建。额外大镜像跨三个 image sectors，
 覆盖第三 sector 的部分 program 和恢复；不是只检查 API 状态枚举。
@@ -97,7 +97,7 @@ scratch 本身会频繁擦写；产品评估更新次数、耐久、供电和复
 源码参考入口：
 
 ```sh
-cmake -S tests/contracts/mcuboot_swap_link -B build/mcuboot-swap -G Ninja \
+cmake -S tests/integration/protocols/mcuboot_swap_link -B build/mcuboot-swap -G Ninja \
   -DNEXUS_PLATFORM_ROOT="$PWD" \
   -DCMAKE_TOOLCHAIN_FILE="$PWD/cmake/toolchains/arm-gcc.cmake"
 cmake --build build/mcuboot-swap --target mcuboot_swap_reference

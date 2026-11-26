@@ -49,7 +49,7 @@ capture／DCMI／DMA 继续使用已有公共 I/O，与 sensor control 各有一
 stop 为官方 driver 缺失的窄 C 补充：保留 COM2 drive bits、进入 standby 并读回。
 失败保持同一 binding；成功不关闭 XCLK／供电、不归还 SCCB，也不撤销其他 loan。
 
-`tests/google/components/ov2640_test.cpp` 实际编译官方 driver、兼容 Common 与桥接 C。
+`tests/behavior/components/devices/ov2640_test.cpp` 实际编译官方 driver、兼容 Common 与桥接 C。
 外部模型仅提供 SCCB、时间、wait；覆盖 table、exact identity、void callback
 错误、deadline、停止失败和独立实例。软件结果不声明 gapless video、JPEG、物理
 图像质量或 HIL；JPEG DMA padding 也不能作为码流长度。

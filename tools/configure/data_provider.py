@@ -8,11 +8,11 @@ from dataclasses import dataclass, field, fields as dataclass_fields
 import re
 from types import MappingProxyType
 
-from tools.configure.calls import Address, DirectCall, Symbol
+from tools.configure.generation.calls import Address, DirectCall, Symbol
 from tools.configure.domain_bridge import DomainBridge
 from tools.configure.records import freeze
 from tools.configure.providers import common
-from tools.configure.static_ir import Declaration, IrqConnection, Record
+from tools.configure.generation.static_ir import Declaration, IrqConnection, Record
 
 
 def _fields(value, required, optional=()):
@@ -39,7 +39,7 @@ class RecipeProfiles:
 
     @classmethod
     def create(cls, value, *, fragments=None):
-        from tools.configure.static_recipe import StaticRecipe
+        from tools.configure.generation.static_recipe import StaticRecipe
         if not isinstance(value, Mapping) or not value:
             common.fail("Static profiles require an explicit nonempty mapping")
         result = {}
@@ -214,7 +214,7 @@ class Binding:
         optional = {"validator", "limits", "controllers", "headers", "shared_irq", "profile_headers", "io_domains"}
         if "static_recipe" in value:
             _fields(value, required | {"static_recipe"}, optional)
-            from tools.configure.static_recipe import StaticRecipe
+            from tools.configure.generation.static_recipe import StaticRecipe
             recipe = StaticRecipe.from_validated(fragments.expand(value["static_recipe"])
                 if fragments is not None else value["static_recipe"])
         elif "profiles" in value:
@@ -266,7 +266,7 @@ class Binding:
                     any(type(bound) is not int for bound in bounds) or
                     not 0 <= bounds[0] <= bounds[1] <= common.UINT32_MAX):
                 common.fail("Binding limits require explicit uint32 bounds")
-        from tools.configure.shared_irq import SharedIrqGroup
+        from tools.configure.generation.shared_irq import SharedIrqGroup
         shared = (SharedIrqGroup.from_validated(value["shared_irq"])
                   if "shared_irq" in value else None)
         profile_headers = value.get("profile_headers", {})
@@ -349,7 +349,7 @@ class DataProvider(DomainBridge):
         raw = self.software["bindings"]
         if not isinstance(raw, list) or not raw:
             common.fail("Data provider requires at least one binding")
-        from tools.configure.static_fragments import StaticFragments
+        from tools.configure.generation.static_fragments import StaticFragments
         fragments = StaticFragments.from_validated(self.software.get("static_fragments", {}))
         bindings = tuple(Binding.create(item, fragments=fragments) for item in raw)
         for index, item in enumerate(bindings):
@@ -537,7 +537,7 @@ class DataProvider(DomainBridge):
 
     instance_declarations = staticmethod(lambda item, result: [])
     def shared_irqs(self, result):
-        from tools.configure.shared_irq import connections
+        from tools.configure.generation.shared_irq import connections
         selected = []
         for item in result.controllers:
             binding = self.binding(item.kind, item.mode, item.controller)

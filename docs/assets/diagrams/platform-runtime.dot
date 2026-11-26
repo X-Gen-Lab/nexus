@@ -1,5 +1,5 @@
 // FIG-33 current: runtime access, not the complete CMake dependency graph.
-// Code basis: tools/configure/factory.py; io/include/nexus/io; core; arch; os.
+// Code basis: tools/configure/generation/factory.py; io/include/nexus/io; core; arch; os.
 // Factory lookup and ordinary I/O are separate paths.
 digraph platformRuntime {
     graph [label="FIG-33 当前运行时访问\n实例查找与日常 I/O 是独立路径", fontname="Noto Sans CJK SC", fontsize=15, labelloc=t, rankdir=TB, bgcolor="white", pad=0.25, nodesep=0.35, ranksep=0.55];

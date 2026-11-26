@@ -70,7 +70,6 @@ jobs:
           .venv/bin/python tools/dev/dev.py configure --preset native-debug
       - name: Execute each tool domain once
         run: |
-          .venv/bin/python -B tools/testing/run_tool_tests.py --suite workflows --report build/quality/tools-workflows.json
           .venv/bin/python -B tools/testing/run_tool_tests.py --suite ci --report build/quality/tools-ci.json
           .venv/bin/python -B tools/testing/run_tool_tests.py --suite configure --report build/quality/tools-configure.json
           .venv/bin/python -B tools/testing/run_tool_tests.py --suite testing --report build/quality/tools-testing.json
@@ -82,7 +81,7 @@ jobs:
       - name: Execute tamper, budget, HIL and relocated SDK boundaries
         run: |
           mkdir -p build/quality
-          .venv/bin/python -B tools/testing/run_tool_tests.py --suite contracts --report build/quality/tools-contracts.json 2>&1 | tee build/quality/tool-contracts.log
+          .venv/bin/python -B tools/testing/run_tool_tests.py --suite integration --report build/quality/tools-integration.json 2>&1 | tee build/quality/tool-integration.log
           .venv/bin/python -B tools/testing/run_tool_tests.py --suite freertos --report build/quality/tools-freertos.json
         env:
           NEXUS_ARM_GCC: arm-none-eabi-gcc
@@ -93,13 +92,12 @@ jobs:
           name: tool-contracts
           path: |
             build/setup-dependencies.json
-            build/quality/tool-contracts.log
-            build/quality/tools-contracts.json
+            build/quality/tool-integration.log
+            build/quality/tools-integration.json
             build/quality/tools-freertos.json
             build/quality/tools-configure.json
             build/quality/tools-testing.json
             build/quality/tools-ci.json
-            build/quality/tools-workflows.json
             build/native-debug/tdd/
             build/native-debug/compile_commands.json
             build/native-debug/generated/

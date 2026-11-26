@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: a332f1cd8dd8486a1bf3497b8d855e7ac08f58ed136c0d59f46072420dc993ac\n"
+"X-Nexus-Source-SHA256: 884ed585973a457a881d949aa0c2994e8888698b0c61f8a3e14e7a410bc9dc8f\n"
 
 #: ../../../../../../docs/guides/app-configuration.md:8
 msgid "配置应用与增加 I/O"
@@ -89,6 +89,17 @@ msgstr ""
 " compact IDs; do not persist them for use across bundles."
 
 #: ../../../../../../docs/guides/app-configuration.md:60
+msgid ""
+"也可直接提供现有 SDK 消费报告 `source_sdk_consumer_verification`。查询匹配 ARM "
+"消费者的实际装配、封存源码、ELF 与构建收条，仅更新 `validation.installed_sdk`。 "
+"使用消费工程实际构建的 TOML。删除、移动或修改报告引用的产物后，旧报告无法关联。"
+msgstr ""
+"You can also provide an existing `source_sdk_consumer_verification` report. "
+"The query matches the ARM consumer's actual assembly, sealed source, ELF "
+"and build receipt, and updates only `validation.installed_sdk`. Use the "
+"TOML that the consumer actually built. Deleting, moving or changing the "
+"referenced artifacts prevents the old report from being associated."
+
 msgid "使用所选接口"
 msgstr "Use the selected interface"
 

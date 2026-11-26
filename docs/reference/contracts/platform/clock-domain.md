@@ -55,6 +55,10 @@ Standby 的复位、存储丢失及 RTC wake 握手由同一 RTC／电源 owner 
 ClockDomain 自身不发现遗漏消费者，不暂停调度器、不计算跨 STOP 时间，也不替代
 实际硬件关停与唤醒序列。当前不提供运行期 DVFS。
 
+ClockDomain 的 admission epoch 标记开关屏障，Core epoch 标记绝对时间。`nx_time_us_t`
+只保存时间数值，调用者必须在换代前结束旧期限。确认 System 与相关 Platform 恢复后，
+按新 Core 时间计算期限。有独立 elapsed bounds 的调用者可用 `nx_stm32_deadline_bridge`
+从匹配的 STOP 收条换算最早和最晚期限。成功 reopen 后旧屏障收条失效。
 
 ## 资格边界
 

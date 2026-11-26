@@ -116,12 +116,12 @@
 	path = vendors/st/lsm6dsox
 	url = https://github.com/X-Gen-Lab/lsm6dsox-pid.git
 
-[submodule "vendors/lvgl"]
-	path = vendors/lvgl
+[submodule "ext/lvgl"]
+	path = ext/lvgl
 	url = https://github.com/X-Gen-Lab/lvgl.git
 
-[submodule "vendors/CANopenNode"]
-	path = vendors/CANopenNode
+[submodule "ext/canopennode"]
+	path = ext/canopennode
 	url = https://github.com/X-Gen-Lab/CANopenNode.git
 
 [submodule "vendors/st/ov2640"]

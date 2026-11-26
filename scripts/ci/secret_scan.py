@@ -71,7 +71,10 @@ def validate_policy(policy):
         if (not isinstance(path, str) or not re.fullmatch(r"[\w./-]+", path)
                 or PurePosixPath(path).is_absolute()
                 or ".." in PurePosixPath(path).parts
-                or not path.startswith("tools/testing/test_")):
+                or path != PurePosixPath(path).as_posix()
+                or not path.startswith("tools/testing/")
+                or not re.fullmatch(r"test_[\w.-]*\.py",
+                                    PurePosixPath(path).name)):
             raise ValueError("Exact test source path required")
         if (not isinstance(item["function"], str)
                 or not re.fullmatch(r"test_[a-z_]+", item["function"])):

@@ -27,7 +27,7 @@ python cmake/package/package_source_sdk.py --source . --output /tmp/nexus-sdk
 输入根，安装验证使用 manifest 中记录的 `profile.packages`，不发现额外库存。
 
 每个选中家族的 `package.json` 在 `exports.verification_files` 列出随包交付的
-独立合同样本。该列表接受 `tests/contracts/` 下的精确文件。SDK 按所选包取并集。
+独立合同样本。该列表接受 `tests/integration/` 下的精确文件。SDK 按所选包取并集。
 家族声明 `facts.device_catalog` 时，打包器从目录内的供应商别名、路径和文件锁取得
 必备器件头与启动文件。增加同 IP 料号时维护家族事实；补充新的公开消费样本时，
 把样本加入该包的导出清单。可在搬迁后的 SDK 中用精确料号链接一个应用，再在独立
@@ -92,7 +92,7 @@ true 输出 metadata，`factory.strong` 未知并拒绝。旧 scalar getter 仍�
 MCU 输出 ELF／BIN／map／资源报告，ELF 绑定配置摘要和真实向量。精确 CPU facts
 决定指令、FPU、float／enum ABI，目标传递相同参数。C++ 消费采用自己的嵌入式
 runtime 策略，已测路径例如 `-fno-exceptions -fno-rtti`。
-`tests/contracts/test_source_sdk.py` 对真实包做含空格路径搬移、篡改／身份拒绝、
+`tests/integration/sdk/test_source_sdk.py` 对真实包做含空格路径搬移、篡改／身份拒绝、
 独立 Native C／C++ 执行及 F407 ARM startup／linker／资源检查；每次结果绑定实际
 执行的源码与消费者，不证明其他 MCU 家族或实板。
 
@@ -155,9 +155,9 @@ typed resolver／factory、维护 assembly 和来源 lock 属于 SDK；host goog
 
 当前版本化消费计划由 [consumer_profiles.py](../../tools/maintenance/consumer_profiles.py)
 唯一维护，枚举基础、所选模式及服务／器件／镜像／家族消费者。Native 消费者仅使用显式主机支撑；外置 provider 生命周期合同由完整检出的
-`tests/support/external_provider/` 维护，不属于安装 SDK 消费计划。ARM 消费者选择
+`tests/integration/providers/external_provider/` 维护，不属于安装 SDK 消费计划。ARM 消费者选择
 已声明的精确器件。每个源码／构建根和链接镜像都必须实际执行，计划结构本身不代表通过。
-家族消费者复用 `tests/contracts/stm32f4_family/` 的 HSI16／内部 CRC 装配与同一公共
+家族消费者复用 `tests/integration/assemblies/stm32f4_family/` 的 HSI16／内部 CRC 装配与同一公共
 consumer，新 IP 使用其各自已维护的软件装配。F407 借用 RX、Native／F407 MCUboot
 Control 及独立 F407 完整引导镜像沿同一计划维护，不在本页复制消费者计数或版本号。
 开发 SDK 的局部结果不能代替最终 clean-source 包的完整消费验证；历史结果保留

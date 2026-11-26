@@ -3,22 +3,64 @@
 
 import argparse
 import json
+import os
 from pathlib import Path
 import shutil
+import subprocess
 import sys
 import uuid
+import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
-from scripts.ci.tdd_gate import (
-    checked_binary, environment, validate_google_report,
-)
 from scripts.validation.junit import prepare_report, validate_junit
 from tools.dev.presets import binary_directory
 from tools.dev import process
 from tools.dev.build_lock import build_lock
 
+
+def validate_google_report(report, *, not_before_ns=None, expected_cases=None):
+    """Require completed GoogleTest cases in addition to valid fresh JUnit."""
+    evidence = validate_junit(report, not_before_ns=not_before_ns)
+    root = ET.parse(report).getroot()
+    if root.tag != "testsuites" or root.get("name") != "AllTests":
+        raise ValueError("Report is not the complete GoogleTest execution")
+    for case in root.iter("testcase"):
+        if case.get("status") != "run" or case.get("result") != "completed":
+            raise ValueError("GoogleTest case did not complete execution")
+    if evidence["skipped"]:
+        raise ValueError("GoogleTest contracts may not be skipped")
+    if expected_cases is not None and evidence["passed"] != expected_cases:
+        raise ValueError("GoogleTest execution differs from discovered cases")
+    return evidence
+
+
+def environment():
+    """Clean child test settings without changing the gate's commit index."""
+    result = {key: value for key, value in os.environ.items()
+              if not key.startswith("GTEST_")}
+    local = ROOT / ".venv" / ("Scripts" if os.name == "nt" else "bin")
+    result["PATH"] = str(local) + os.pathsep + result.get("PATH", "")
+    if result.get("SKIP") or result.get("NEXUS_SKIP_TDD"):
+        raise ValueError("A hook bypass setting cannot establish TDD evidence")
+    if any(name.startswith("GIT_") for name in result):
+        local = subprocess.run(["git", "rev-parse", "--local-env-vars"],
+                               cwd=ROOT, capture_output=True, text=True,
+                               check=True)
+        for name in local.stdout.splitlines():
+            result.pop(name, None)
+    return process.execution_environment(result)
+
+
+def checked_binary(name, build):
+    """Require regular, unaliased executable bytes in the selected build."""
+    path = Path(name)
+    if (not path.is_file() or
+            any(part.is_symlink() for part in (path, *path.parents)) or
+            not path.resolve().is_relative_to(Path(build).resolve())):
+        raise ValueError("GoogleTest binary is missing, symlink or outside build")
+    return path
 
 def execute(command, env, log):
     """Retain actual commands, output and exit codes for this CI execution."""
@@ -99,54 +141,46 @@ def ctest_names(plan, binaries, build):
     return set(names)
 
 
-def execute_native(args, build):
-    """Retain one build lease until all fresh runtime reports are published."""
-    output = build / "tdd"
-    output.mkdir(parents=True, exist_ok=True)
-    summary = output / "execution.json"
-    if args.observe_only and summary.exists():
-        summary.rename(output / (
-            "execution.before-observe-" + uuid.uuid4().hex + ".json"))
-    else:
-        summary.unlink(missing_ok=True)
+def runtime_results(preset, build, env, output, *, run,
+                    observe_only=False):
+    """Execute one complete CTest plan and validate every Google case identity."""
+    env = env.copy()
     google = output / "google"
     if google.is_symlink():
         raise ValueError("GoogleTest output directory must not "
                          "be a symlink")
-    if not args.observe_only:
+    if not observe_only:
         if google.exists():
             shutil.rmtree(google)
         google.mkdir()
     report = build / "ctest-results.xml"
-    if not args.observe_only:
+    if not observe_only:
         report.unlink(missing_ok=True)
-    env = environment()
     binaries = google_binaries(build)
-    if not args.observe_only:
+    if not observe_only:
         ctest = shutil.which("ctest", path=env["PATH"])
         if not ctest:
             raise ValueError("Missing maintained CTest executable")
-        plan = json.loads(execute(
+        plan = json.loads(run(
             [ctest, "--test-dir", str(build), "--show-only=json-v1"], env,
             output / "ctest-plan.txt"))
         planned = ctest_names(plan, binaries, build)
     discovered = {}
     for index, binary in enumerate(binaries):
-        listing = execute([str(binary), "--gtest_filter=*",
-                           "--gtest_list_tests"], env,
-                          output / f"discovery-{index}.txt")
+        listing = run([str(binary), "--gtest_filter=*", "--gtest_list_tests"],
+                      env, output / f"discovery-{index}.txt")
         discovered[binary] = discovered_cases(listing)
-    if args.observe_only:
+    if observe_only:
         print(f"Observed {sum(map(len, discovered.values()))} case names "
               f"using case-list processes; no test cases executed; "
               "qualification=false")
-        return 0
+        return None
     # CTest runs the complete runtime plan, including non-Google contracts.
     # GoogleTest's directory output names each report after its executable.
     env.update({"GTEST_OUTPUT": "xml:" + str(google) + "/",
                 "GTEST_REPEAT": "1", "GTEST_ALSO_RUN_DISABLED_TESTS": "1"})
     started = prepare_report(report)
-    execute([ctest, "--preset", args.preset, "--output-on-failure",
+    run([ctest, "--preset", preset, "--output-on-failure",
              "--no-tests=error", "--parallel", "1", "--output-junit",
              str(report)], env, output / "ctest-execution.txt")
     ctest_result = validate_junit(report, not_before_ns=started)
@@ -169,17 +203,35 @@ def execute_native(args, build):
             raise ValueError("GoogleTest execution differs from discovered "
                              "case identities: " + binary.name)
         results.append({"binary": binary.name, **evidence})
+    return {"passed": sum(result["passed"] for result in results),
+            "suites": results, "ctest": ctest_result}
+
+
+def execute_native(args, build):
+    """Retain one build lease until all fresh runtime reports are published."""
+    output = build / "tdd"
+    output.mkdir(parents=True, exist_ok=True)
+    summary = output / "execution.json"
+    if args.observe_only and summary.exists():
+        summary.rename(output / (
+            "execution.before-observe-" + uuid.uuid4().hex + ".json"))
+    else:
+        summary.unlink(missing_ok=True)
+    runtime = runtime_results(
+        args.preset, build, environment(), output, run=execute,
+        observe_only=args.observe_only)
+    if runtime is None:
+        return 0
     summary.write_text(json.dumps({
         "schema": 1, "kind": "development-contract-execution",
-        "preset": args.preset, "passed": sum(r["passed"] for r in results),
-        "suites": results, "ctest": ctest_result,
+        "preset": args.preset, **runtime,
         "scope": "Single complete Native runtime CTest and case-level "
                  "Google execution; mode-independent tools execute in "
                  "separate complete domains, not inferred here; "
                  "not historical TDD order or physical qualification",
     }, indent=2) + "\n")
-    print(f"Executed {ctest_result['passed']} CTest entries and "
-          f"{sum(r['passed'] for r in results)} GoogleTest cases once; "
+    print(f"Executed {runtime['ctest']['passed']} CTest entries and "
+          f"{runtime['passed']} GoogleTest cases once; "
           f"evidence: {summary}")
     return 0
 

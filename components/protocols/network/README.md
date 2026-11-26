@@ -206,7 +206,7 @@ source、不安全路径、固定闭包、观察期间修改、production origin
 Source SDK 范围及 symbolic CMake selector 拒绝。
 
 TCP client 模型另覆盖复制队列准入、接收背压、peer FIN、close／abort、有界推进、
-deadline 和共享池回收。[完整主机网络夹具](../../../tests/contracts/lwip_mqtt_interop/README.md)
+deadline 和共享池回收。[完整主机网络夹具](../../../tests/integration/protocols/lwip_mqtt_interop/README.md)
 通过测试专用透明密文 relay 将真实 lwIP／TCP／TLS／MQTT client 接到真实 Mosquitto：
 一条 TCP 通过两个独立 lwIP 进程的软件 Ethernet ports，另一条通过 relay 至 broker
 的非阻塞 host socket。TLS／mTLS 和 MQTT ACK 终止于 client／broker，relay 不解密

@@ -2,7 +2,7 @@
 """Check a derived support table against maintained facts and real assemblies.
 
 This report is not a configuration input or qualification record. It uses the
-production resolver and binding emitter, and records exact source definitions
+production resolver and selected static bindings, and records exact source definitions
 selected by existing software fixtures. It does not infer physical support.
 """
 
@@ -20,11 +20,16 @@ if __name__ == "__main__":
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
-from tools.configure import bindings, configure, documentation, matrix, packages  # noqa: E402
+from tools.configure import configure, packages  # noqa: E402
+from tools.evidence.common import file_identity, load_json, verify_file_identity  # noqa: E402
 
 DOCUMENT = "docs/reference/platforms/capabilities.md"
 START = "<!-- nexus-capabilities:start -->"
 END = "<!-- nexus-capabilities:end -->"
+EVIDENCE_AXES = {
+    "build_provenance": "arm_image",
+    "source_sdk_consumer_verification": "installed_sdk",
+}
 
 
 def os_selection(typed, data):
@@ -171,33 +176,48 @@ def selection(assembly, root=ROOT, *, test_support=False, evidence=()):
     if evidence:
         result["evidence"] = [selection_evidence(path, typed, root,
             test_support=test_support) for path in evidence]
-        if any(item["status"] == "identity_matched" for item in result["evidence"]):
-            validation["arm_image"] = "identity_matched"
+        for item in result["evidence"]:
+            axis = EVIDENCE_AXES.get(item["kind"])
+            if axis and item["status"] == "identity_matched":
+                validation[axis] = "identity_matched"
     return result
 
 
 def selection_evidence(path, typed, root, *, test_support):
     """Associate existing reports by observed bytes, never reported success."""
-    from tools.configure import emission
-    from tools.evidence.common import file_identity, load_json, verify_file_identity
+    from tools.configure.generation import emission
     from tools.evidence.identity import (
         observe_git_source, resolved_identity, resolved_input_files, verify_sdk_package)
     from tools.measurement import resources
     from tools.measurement.elf import Elf32
 
-    report_identity = file_identity(path)
-    report = load_json(path)
-    result = {"report": report_identity, "kind": report.get("kind"),
+    result = {"report": {"path": str(Path(path).absolute())}, "kind": None,
         "status": "not_assessed", "software_qualified": False,
         "identities": {"source": "not_recorded", "configuration": "not_assessed",
             "backend_modes": "not_assessed", "inputs": "not_assessed",
             "artifact": "not_assessed"},
         "reason": "unsupported_report_kind"}
-    if report.get("kind") not in ("elf_resource_budget", "build_provenance"):
-        return result
     try:
+        report_identity = file_identity(path)
+        result["report"] = report_identity
+        report = load_json(path)
+        kind = report.get("kind")
+        if not isinstance(kind, str):
+            return result
+        result["kind"] = kind
+        if kind not in EVIDENCE_AXES and kind != "elf_resource_budget":
+            return result
         if type(report.get("schema_version")) is not int or report["schema_version"] != 1:
             raise ValueError("unsupported evidence report schema")
+        if kind == "source_sdk_consumer_verification":
+            result["consumer"] = _associate_sdk_consumer(
+                Path(path).absolute().parent, report, typed, root,
+                test_support=test_support)
+            if file_identity(path) != report_identity:
+                raise ValueError("report changed during identity association")
+            result["identities"] = dict.fromkeys(result["identities"], "matched")
+            result.update(status="identity_matched", reason="identities_verified")
+            return result
         configuration = report.get("resolved", report.get("configuration"))
         resolved_path = verify_file_identity(configuration)
         resolved, resolved_file = resolved_identity(resolved_path,
@@ -256,6 +276,135 @@ def selection_evidence(path, typed, root, *, test_support):
     return result
 
 
+def _successful_build(directory, report, consumer, build):
+    """Bind the consumer's build receipt to its owned output directory."""
+    from tools.evidence.common import EvidenceError, regular_file, stream_digest
+
+    candidates = [entry for entry in report["commands"]
+                  if entry["consumer_index"] == consumer["consumer_index"]
+                  and entry["argv"][:3] == ["cmake", "--build", str(build)]]
+    if len(candidates) != 1:
+        raise EvidenceError("consumer has no unique build receipt")
+    entry, = candidates
+    relative = Path(entry["receipt"])
+    if relative.is_absolute() or ".." in relative.parts:
+        raise EvidenceError("consumer receipt is outside the observation")
+    path = directory / relative
+    before = file_identity(path)
+    receipt = load_json(path)
+    if (entry["exit_code"] != 0 or entry["withdrawal_complete"] is not True
+            or receipt["stage"] != "source-sdk-consumer"
+            or receipt["command"] != entry["argv"]
+            or receipt["outcome"] != "completed"
+            or receipt["withdrawal_complete"] is not True
+            or type(receipt["exit_code"]) is not int
+            or receipt["exit_code"] != 0
+            or type(receipt["child_returncode"]) is not int
+            or receipt["child_returncode"] != 0):
+        raise EvidenceError("consumer build did not complete successfully")
+    for key, output in (("stdout", "stdout.txt"), ("stderr", "stderr.txt")):
+        raw = regular_file(path.with_name(output), nonempty=False)
+        observed = receipt[key]
+        with raw.open("rb") as stream:
+            actual_sha256 = stream_digest(stream)
+        if (observed["path"] != str(raw)
+                or observed["bytes"] != raw.stat().st_size
+                or observed["sha256"] != actual_sha256):
+            raise EvidenceError("consumer build output has changed")
+    if file_identity(path) != before:
+        raise EvidenceError("consumer build receipt changed")
+
+
+def _arm_images(report):
+    for consumer in report["consumers"]:
+        if consumer["status"] != "passed":
+            continue
+        if "service_image" in consumer:
+            image = consumer["service_image"]
+            inputs = image["inputs"]
+            if image["runtime_executed"] is False and image["resources"]:
+                yield consumer, inputs["resolved"], inputs["elf"], image["resources"]
+        elif "selected_image" in consumer:
+            image = consumer["selected_image"]
+            if "artifacts" in image:
+                yield consumer, image["resolved"], image["artifacts"]["elf"], image["resources"]
+
+
+def _associate_sdk_consumer(directory, report, typed, root, *, test_support):
+    """Verify only the matching image, without replaying an SDK test plan."""
+    from tools.configure.generation.emission import resolved_projection
+    from tools.evidence import identity
+    from tools.evidence.common import EvidenceError, regular_file
+    from tools.measurement import resources
+
+    if (report["status"] != "passed"
+            or report["scope"] not in ("full-consumers", "selected-consumers")
+            or typed.cpu_profile.arch == "native"):
+        raise EvidenceError("requires a successful installed ARM consumer")
+    prefix = Path(report["prefix"])
+    if not prefix.is_absolute() or prefix.resolve() != prefix:
+        raise EvidenceError("noncanonical SDK prefix")
+    sdk = prefix / "share/nexus/src"
+    manifest_path = sdk / ".nexus-source-sdk.json"
+    if sdk != root:
+        source = identity.observe_git_source(root)
+        if (source["dirty"] or (source["commit"], source["tree"]) !=
+                (report["source_revision"], report["source_tree"])):
+            raise EvidenceError("SDK consumer source differs from the selected source")
+
+    expected = resolved_projection(typed)
+    for consumer, configuration, image, resource in _arm_images(report):
+        observed = Path(configuration["path"])
+        # A deleted unrelated consumer must not prevent querying another one.
+        if not observed.is_file() or load_json(observed) != expected:
+            continue
+        resolved = verify_file_identity(configuration)
+        actual, _ = identity.resolved_identity(resolved, allow_reference=test_support)
+        if actual != expected:
+            raise EvidenceError("SDK consumer configuration changed")
+        files = identity.resolved_input_files(resolved, actual)
+        if not any(entry["label"] == "dependencies/platform-compatibility.json"
+                   and Path(entry["file"]["path"]).parents[1] == sdk
+                   for entry in files):
+            raise EvidenceError("consumer configuration came from another source")
+        elf = verify_file_identity(image)
+        build = elf.parent.parent
+        if (not resolved.is_relative_to(build) or not build.is_relative_to(directory)
+                or regular_file(build / "resolved-config.txt").read_text() !=
+                str(resolved.parent)
+                or regular_file(build / "resolved-sdk.txt").read_text() != str(sdk)):
+            raise EvidenceError("consumer build does not bind this SDK and assembly")
+        manifest_before = file_identity(manifest_path)
+        manifest = identity.verify_sdk_package(sdk)
+        if (manifest["publishable"] is not True or manifest["source_dirty"] is not False
+                or (manifest["source_revision"], manifest["source_tree"]) !=
+                (report["source_revision"], report["source_tree"])):
+            raise EvidenceError("consumer source SDK identity differs")
+        resource_path = verify_file_identity(resource)
+        observed_budget = load_json(resource_path)
+        budget = verify_file_identity(observed_budget["budget"])
+
+        def read_inputs(path, *, allow_reference):
+            if path != resolved:
+                raise EvidenceError("consumer resource report changed its configuration")
+            return actual, configuration, files
+
+        measured = resources.measure(elf, resolved, budget, require_cpu=True,
+            allow_reference=test_support, read_inputs=read_inputs)
+        if measured != observed_budget or measured["status"] != "passed":
+            raise EvidenceError("consumer resource report differs from the actual ELF")
+        _successful_build(directory, report, consumer, build)
+        if (file_identity(manifest_path) != manifest_before
+                or file_identity(resolved) != configuration
+                or file_identity(elf) != image
+                or file_identity(resource_path) != resource
+                or identity.resolved_input_files(resolved, actual) != files):
+            raise EvidenceError("consumer inputs changed during identity association")
+        return {"name": consumer["name"], "elf": image,
+                "configuration": configuration, "sdk_manifest": manifest_before}
+    raise EvidenceError("report has no installed ARM image for this exact assembly")
+
+
 def c_code(source):
     """Remove comments and literals before examining exact C declarations."""
     return re.sub(r'/\*.*?\*/|//[^\n]*|"(?:\\.|[^"\\])*"|\'(?:\\.|[^\'\\])*\'',
@@ -283,9 +432,23 @@ def source_ops(path, root=ROOT):
                              path, source, root)))
 
 
+def _checkout(root):
+    """Global maintenance needs authored fixtures, not a selected SDK payload."""
+    root = Path(root).resolve()
+    required = ('docs', 'tests/integration', 'cmake/package/verification',
+                'tools/configure/assemblies')
+    if ((root / '.nexus-source-sdk.json').exists()
+            or any(not (root / name).is_dir() for name in required)):
+        raise ValueError('Global capability maintenance requires a complete source checkout; '
+                         'use --assembly for selected SDK support')
+    return root
+
+
 def collect(root=ROOT):
     """Reject failed resolution or missing selected production definitions."""
-    root = root.resolve()
+    root = Path(root).resolve()
+    from tools.configure import matrix
+    from tools.configure.providers import for_selection
     facts = {}
     routes = {}
     declared = defaultdict(set)
@@ -334,7 +497,7 @@ def collect(root=ROOT):
     selected = defaultdict(lambda: {"fixtures": set(), "exports": set()})
     assembly_paths = (root / "tools/configure/assemblies").glob("*.toml")
     contract_paths = []
-    for path in (root / "tests/contracts").rglob("*.toml"):
+    for path in (root / "tests/integration").rglob("*.toml"):
         # Authored inputs carry schema even outside the assembly directories.
         # Existing assembly directories retain strict validation if it is absent.
         if (path.parent.name.endswith("_assembly") or
@@ -356,21 +519,17 @@ def collect(root=ROOT):
         if (typed.provider_context.package is not None and
                 typed.provider_context.package.scope != "production"):
             raise ValueError("Production capability collection requires a production package")
-        result = typed.to_dict()
-        source = c_code(bindings.emit(typed)[1])
-        for item in result["controllers"]:
-            name = bindings.symbol(item["id"])
-            face_name = re.escape("s_nx_face_" + name)
-            matches = re.findall(
-                rf"\bstatic\s+const\s+nx_\w+_t\s+{face_name}"
-                r"\s*=\s*\{\s*&(?P<ops>nx_\w+_ops)\s*,", source)
-            if len(matches) != 1 or matches[0] not in exports:
+        provider = for_selection(typed)
+        for item in typed.controllers:
+            operations = provider.operations(item)
+            if (not isinstance(operations, str)
+                    or not re.fullmatch(r'nx_\w+_ops', operations)
+                    or operations not in exports):
                 raise ValueError("Selected ops has no production definition: "
-                                 + f"{fixture}:{name}")
-            key = (result["soc_family"], item["controller"],
-                   item["kind"], item["mode"])
+                                 + f"{fixture}:{item.id}")
+            key = (typed.soc_family, item.controller, item.kind, item.mode)
             selected[key]["fixtures"].add(fixture.relative_to(root).as_posix())
-            selected[key]["exports"].add(exports[matches[0]])
+            selected[key]["exports"].add(exports[operations])
     rows = []
     for family, parts in sorted(facts.items()):
         personalities = set()
@@ -453,7 +612,9 @@ def main(arguments=None, *, support_command=False):
                                test_support=args.test_support, evidence=args.evidence)
             print(json.dumps(result, indent=2, sort_keys=True))
             return 0
-        examples = documentation.check(args.root)
+        root = _checkout(args.root)
+        from tools.configure import documentation
+        examples = documentation.check(root)
         expected = render(collect(args.root))
         path = args.root / DOCUMENT
         document = path.read_text(encoding="utf-8")

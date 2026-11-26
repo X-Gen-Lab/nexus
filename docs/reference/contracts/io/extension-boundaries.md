@@ -48,7 +48,7 @@ or Board connection. Storage and execution progress stay caller-owned.
 `cipher.h` and `hash.h` expose separate two-pointer interfaces with shared
 read-only operations. The typed factory returns statically selected objects;
 neither lookup nor query acquires clocks or starts hardware. The F415ZG and
-F417ZG [software references](../../../../tests/contracts/stm32f4_crypto/f415zg.toml)
+F417ZG [software references](../../../../tests/integration/assemblies/stm32f4_crypto/f415zg.toml)
 select `irq-blocks` or the separately selected DMA mode for each IP. F405/F407 do not acquire these engines
 merely because the same vendor family library contains their implementation.
 

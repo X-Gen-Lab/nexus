@@ -1,0 +1,250 @@
+"""Reject an incomplete SDK manifest before opening its payload contents."""
+
+import importlib.util
+import json
+from pathlib import Path
+import tempfile
+import unittest
+from unittest.mock import patch as mock_patch
+
+ROOT = Path(__file__).resolve().parents[3]
+
+
+class SDKRequiredAdmissionTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        specification = importlib.util.spec_from_file_location(
+            "sdk_required_admission",
+            ROOT / "cmake/package/package_source_sdk.py")
+        cls.sdk = importlib.util.module_from_spec(specification)
+        specification.loader.exec_module(cls.sdk)
+
+    def setUp(self):
+        self.temporary = tempfile.TemporaryDirectory(prefix="SDK admission ")
+        self.addCleanup(self.temporary.cleanup)
+        self.root = Path(self.temporary.name) / "share/nexus/src"
+        self.root.mkdir(parents=True)
+        self.payload = self.root / "ordinary.c"
+        self.payload.write_bytes(b"reviewed payload bytes\n")
+        self.files = {"ordinary.c": self.sdk.digest(self.payload.read_bytes())}
+        self.identity = {
+            "schema": 3, "profile": self.sdk.source_profile(),
+            "kind": "nexus-installed-source-sdk",
+            "source_revision": "a" * 40, "source_tree": "b" * 40,
+            "publishable": True, "source_dirty": False,
+            "files_sha256": self.files, "dependencies": [],
+            "source_exports": {"members": ["ordinary.c"], "packages": []},
+            "reviewed_imports": [], "toolchains_lock_sha256": "c" * 64,
+            "snapshot_sha256": "", "package_files_sha256": {},
+        }
+
+    def write_manifest(self):
+        self.identity["snapshot_sha256"] = self.sdk.digest(json.dumps(
+            self.files, sort_keys=True, separators=(",", ":")).encode())
+        (self.root / self.sdk.MANIFEST).write_text(json.dumps(self.identity))
+
+    def complete_required_map(self):
+        # Portable rejection fixtures do not claim a complete installed SDK.
+        # Retain the actual policy; no vendor checkout or reduced checker graph.
+        for name in self.sdk.required_files(ROOT, self.identity["profile"]):
+            self.files[name] = self.sdk.digest(b"fixture placeholder")
+        # Selection admission reads the real supplier lock before payload
+        # traversal. Placeholder payload files remain deliberate rejection data.
+        name = "dependencies/stm32f4-hal.lock.json"
+        lock = self.root / name
+        lock.parent.mkdir(parents=True, exist_ok=True)
+        data = (ROOT / name).read_bytes()
+        lock.write_bytes(data)
+        self.files[name] = self.sdk.digest(data)
+        # Selection metadata is real payload: the installed verifier must not
+        # discover packages from its importing maintainer checkout.
+        selection = self.sdk.resolve_selection(ROOT, self.identity["profile"])
+        # Selected device files have published hashes checked before ordinary
+        # payload reads. The manifest can carry those identities without
+        # materializing vendor bytes in this early rejection fixture.
+        self.files.update(selection.device_inputs)
+        for package in selection.packages:
+            for source in package.inputs:
+                name = source.relative_to(ROOT).as_posix()
+                target = self.root / name
+                target.parent.mkdir(parents=True, exist_ok=True)
+                data = source.read_bytes()
+                target.write_bytes(data)
+                self.files[name] = self.sdk.digest(data)
+        self.identity["source_exports"] = self.sdk.source_export_declaration(
+            ROOT, self.files, selection=selection)
+
+    def test_missing_required_names_reject_without_opening_payload(self):
+        self.write_manifest()
+        reads = []
+        original_open = Path.open
+
+        def observe_open(path, *args, **kwargs):
+            if path == self.payload:
+                reads.append(path)
+            return original_open(path, *args, **kwargs)
+
+        with mock_patch.object(Path, "open", autospec=True,
+                               side_effect=observe_open):
+            with self.assertRaisesRegex(self.sdk.SDKError,
+                                        "missing required sources/licenses"):
+                self.sdk.verify(self.root)
+        self.assertEqual(reads, [],
+                         "An unqualified manifest opened payload bytes")
+
+    def test_complete_required_map_still_checks_payload_bytes(self):
+        self.complete_required_map()
+        self.write_manifest()
+        self.payload.write_bytes(b"changed bytes after manifest publication\n")
+        with self.assertRaisesRegex(self.sdk.SDKError,
+                                    "file identity changed: ordinary.c"):
+            self.sdk.verify(self.root)
+
+
+    def test_complete_required_map_still_checks_vendor_catalog_identities(self):
+        self.complete_required_map()
+        startup = "vendors/st/cmsis_device_f4/Source/Templates/gcc/startup_stm32f446xx.s"
+        self.files[startup] = self.sdk.digest(b"unexpected device startup")
+        self.write_manifest()
+        with self.assertRaisesRegex(self.sdk.SDKError,
+                                    "differs from its lock: .*startup_stm32f446xx"):
+            self.sdk.verify(self.root)
+
+    def test_qiming_device_omissions_reject_before_payload_reads(self):
+        paths = (
+            "boards/stm32f407zg_qiming_core/board.json",
+            "boards/stm32f407zg_qiming_v41/board.json",
+            "io/include/nexus/io/block.h", "io/src/api/block.c",
+            "soc/stm32/stm32f4/sdk/STM32FSMC.cmake",
+            "soc/stm32/stm32f4/sdk/STM32SDIO.cmake",
+            "soc/stm32/stm32f4/drivers/memory/fsmc.c",
+            "soc/stm32/stm32f4/drivers/memory/fsmc_boot.c",
+            "soc/stm32/stm32f4/system/sram_boot.c",
+            "soc/stm32/stm32f4/system/stm32f407_sram_boot.h",
+            "soc/stm32/stm32f4/drivers/memory/stm32f407_fsmc_profile.h",
+            "io/include/nexus/io/parallel16.h",
+            "io/include/nexus/io/memory_window.h",
+            "soc/stm32/stm32f4/drivers/rtc/rtc.c",
+            "soc/stm32/stm32f4/drivers/sdio/sdio.c",
+            "soc/stm32/stm32f4/drivers/timer/encoder.c",
+            "soc/stm32/stm32f4/drivers/adc/adc_injected.c",
+            "soc/stm32/stm32f4/drivers/watchdog/window_watchdog.c",
+            "soc/stm32/stm32f4/drivers/watchdog/stm32f407_window_watchdog.h",
+            "soc/stm32/stm32f4/system/reset.c",
+            "soc/stm32/stm32f4/drivers/exti/pvd.c",
+            "soc/stm32/stm32f4/drivers/exti/stm32f407_pvd.h",
+            "soc/stm32/stm32f4/drivers/exti/pvd.binding.json",
+            "soc/stm32/stm32f4/drivers/timer/advanced_pwm_tim8.c",
+            "soc/stm32/stm32f4/drivers/timer/timer_capture_tim3.c",
+            "soc/stm32/stm32f4/drivers/timer/timer_capture_tim5.c",
+            "soc/stm32/stm32f4/drivers/timer/stm32f407_timer_pins.h",
+            "soc/stm32/stm32f4/drivers/adc/stm32f4_adc_trigger.h",
+            "soc/stm32/stm32f4/drivers/timer/stm32f4_encoder.h",
+            "soc/stm32/stm32f4/drivers/timer/stm32f407_timer_hardware.h",
+            "soc/stm32/stm32f4/drivers/timer/encoder.binding.json",
+            "components/devices/at24c02/src/at24c02.c",
+            "components/devices/w25/src/w25.c",
+            "components/devices/ili9341/src/ili9341.c",
+            "components/devices/xpt2046/src/xpt2046.c",
+            "components/buses/software_spi/src/software_spi.c",
+            "components/buses/software_i2c/src/software_i2c.c",
+            "components/devices/infrared/src/infrared.c",
+            "components/buses/onewire/src/onewire.c",
+            "components/buses/onewire/src/crc8.c",
+            "components/devices/ds18b20/src/ds18b20.c")
+        self.assertTrue(set(paths).issubset(self.sdk.REQUIRED_FILES),
+                        "Qiming source SDK must close device dependencies")
+        self.complete_required_map()
+        for name in paths:
+            with self.subTest(missing=name):
+                original = self.files.pop(name)
+                try:
+                    self.write_manifest()
+                    reads = []
+                    original_read = Path.read_bytes
+
+                    def observe_read(path):
+                        if path != self.root / self.sdk.MANIFEST:
+                            reads.append(path)
+                        return original_read(path)
+
+                    with mock_patch.object(Path, "read_bytes", autospec=True,
+                                           side_effect=observe_read):
+                        with self.assertRaisesRegex(
+                                self.sdk.SDKError,
+                                "missing required sources/licenses"):
+                            self.sdk.verify(self.root)
+                        self.assertEqual(reads, [])
+                finally:
+                    self.files[name] = original
+
+    def test_complete_required_map_still_rejects_unsafe_payload_paths(self):
+        self.complete_required_map()
+        self.files = {"../outside.c": "d" * 64, **self.files}
+        self.identity["files_sha256"] = self.files
+        self.write_manifest()
+        with self.assertRaisesRegex(self.sdk.SDKError,
+                                    "Unsafe source SDK path"):
+            self.sdk.verify(self.root)
+
+    def test_window_watchdog_sdk_requires_its_actual_vendor_ll_header(self):
+        name = 'vendors/st/stm32f4_hal/Inc/stm32f4xx_ll_wwdg.h'
+        required = self.sdk.required_files(ROOT, self.identity['profile'])
+        self.assertTrue(name in required, 'Source SDK lacks the WWDG LL header')
+        self.complete_required_map()
+        self.files.pop(name)
+        self.write_manifest()
+        with self.assertRaisesRegex(self.sdk.SDKError,
+                                    'missing required sources/licenses'):
+            self.sdk.verify(self.root)
+
+    def test_family_reference_payload_is_exact_without_host_test_dependencies(self):
+        expected = {"tests/integration/assemblies/stm32f4_family/CMakeLists.txt",
+                    "tests/integration/assemblies/crc_assembly/consumer.c"}
+        expected.update(f"tests/integration/assemblies/stm32f4_family/f{chip}zg.toml"
+                        for chip in ("405", "407", "415", "417"))
+        expected.update(
+            f"tests/integration/assemblies/stm32f4_family/f{chip}zg-board/board.json"
+            for chip in ("405", "407", "415", "417"))
+        for stem in ("f411re", "f446ze", "f479ni"):
+            expected.add(f"tests/integration/assemblies/stm32f4_family/{stem}.toml")
+            expected.add(f"tests/integration/assemblies/stm32f4_family/{stem}-board/board.json")
+        profile = self.sdk.source_profile(host_support=False)
+        required = set(self.sdk.required_files(ROOT, profile))
+        self.assertTrue(expected <= required)
+        self.assertTrue(all(self.sdk.selected(name, root=ROOT, profile=profile)
+                            for name in expected))
+        for name in ("tests/behavior/f407_crc_test.cpp",
+                     "tests/integration/assemblies/stm32f4_family/unreviewed.c",
+                     "tests/support/native/soc.json"):
+            with self.subTest(name=name):
+                self.assertFalse(self.sdk.selected(name, root=ROOT,
+                                                   profile=profile))
+        self.complete_required_map()
+        self.files.pop("tests/integration/assemblies/stm32f4_family/f415zg-board/board.json")
+        self.write_manifest()
+        with self.assertRaisesRegex(self.sdk.SDKError,
+                                    "missing required sources/licenses"):
+            self.sdk.verify(self.root)
+
+    def test_schema_and_provenance_precede_required_name_admission(self):
+        for changes, message in (
+                ({"schema": 1}, "Unsupported installed source SDK identity"),
+                ({"source_revision": "invalid"}, "Invalid source Git identity"),
+                ({"publishable": "true"},
+                 "Invalid source SDK provenance flags"),
+                ({"source_dirty": True},
+                 "dirty source SDK cannot be publishable")):
+            with self.subTest(changes=changes):
+                original = dict(self.identity)
+                try:
+                    self.identity.update(changes)
+                    self.write_manifest()
+                    with self.assertRaisesRegex(self.sdk.SDKError, message):
+                        self.sdk.verify(self.root)
+                finally:
+                    self.identity = original
+
+
+if __name__ == "__main__":
+    unittest.main()

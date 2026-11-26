@@ -118,7 +118,7 @@ static void envelope(nx_stm32_freertos_stop_t* s, uint32_t before,
 static void restore(nx_stm32_freertos_stop_t* s,
                     const nx_freertos_lowpower_port_t* port,
                     const nx_freertos_tick_snapshot_t* tick, uint32_t expected,
-                    uint64_t measured_at, bool handed) {
+                    uint64_t measured_at, bool epoch_changed) {
     uint64_t now = port->now_us(port->context);
     if (now < measured_at)
         fail(s, NX_ERROR_IO);
@@ -145,12 +145,12 @@ static void restore(nx_stm32_freertos_stop_t* s,
      * never earlier. Both remain explicit in the caller's uncertainty receipt.
      */
     s->elapsed_max_us += origin - now;
-    s->discarded_phase_us = handed ? (uint32_t)(combined % period) : 0U;
+    s->discarded_phase_us = epoch_changed ? (uint32_t)(combined % period) : 0U;
     s->uncertainty_us =
         s->elapsed_max_us - s->elapsed_min_us + s->discarded_phase_us + 1U;
     if (origin > UINT64_MAX - period)
         fail(s, NX_ERROR_OVERFLOW);
-    if (handed) {
+    if (epoch_changed) {
         nx_timebase_stop_resume(port->context, origin + period);
     } else {
         uint64_t next = tick->time_us + (whole + 1U) * period - tick->phase_us;
@@ -191,11 +191,10 @@ bool nx_freertos_try_stop_idle(uint32_t expected_idle_ticks) {
     if (tick.phase_us >= period)
         fail(s, NX_ERROR_IO);
     s->result = nx_timebase_stop_handoff(port->context);
-    bool handed = s->result == NX_SUCCESS;
     uint64_t measured_at = port->now_us(port->context);
     if (measured_at < tick.time_us)
         fail(s, NX_ERROR_IO);
-    if (!handed)
+    if (s->result != NX_SUCCESS)
         goto exact_restore;
     uint32_t before = 0U, after = 0U;
     uint64_t pre_start = measured_at;
@@ -234,15 +233,16 @@ bool nx_freertos_try_stop_idle(uint32_t expected_idle_ticks) {
     if (s->elapsed_max_us > c->max_elapsed_us)
         fail(s, NX_ERROR_TIMEOUT);
     s->result = nx_stm32_rtc_idle_ack(c->rtc);
-    restore(s, port, &tick, expected_idle_ticks, measured_at, handed);
+    restore(s, port, &tick, expected_idle_ticks, measured_at, true);
     goto done;
 exact_restore:
+    /* A returned pre-STOP error leaves the paused phase in the old epoch. */
     measured_at = port->now_us(port->context);
     if (measured_at < tick.time_us)
         fail(s, NX_ERROR_IO);
     s->elapsed_min_us = measured_at - tick.time_us;
     s->elapsed_max_us = s->elapsed_min_us;
-    restore(s, port, &tick, expected_idle_ticks, measured_at, handed);
+    restore(s, port, &tick, expected_idle_ticks, measured_at, false);
 done:
     nx_arch_irq_restore(saved);
     return true;

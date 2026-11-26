@@ -1,0 +1,69 @@
+# One explicit source graph shared by the standalone and Linux Google plans.
+include_guard(GLOBAL)
+function(nexus_stm32_hal_reference target)
+    if(
+        NOT ARGC EQUAL 1
+        OR NOT TARGET "${target}"
+        OR CMAKE_CROSSCOMPILING
+        OR NOT CMAKE_SYSTEM_NAME STREQUAL "Linux"
+    )
+        message(FATAL_ERROR "HAL reference requires one Linux host executable")
+    endif()
+    set(fixture "${CMAKE_CURRENT_FUNCTION_LIST_DIR}")
+    get_filename_component(source "${fixture}/../../../.." ABSOLUTE)
+    include("${source}/soc/stm32/stm32f4/sdk/STM32Official.cmake")
+    include("${source}/cmake/platform/CMSISCore.cmake")
+    include("${source}/tests/cmake/CMSISHostModel.cmake")
+    set(official "${source}/vendors/st/stm32f4_hal")
+    set(device "${source}/vendors/st/cmsis_device_f4/Include")
+    nexus_cmsis_core_include(cmsis)
+    target_sources(${target} PRIVATE "${fixture}/adapter.c")
+    target_include_directories(${target} PRIVATE "${source}/core/include")
+    if(TARGET Nexus::Core)
+        target_link_libraries(${target} PRIVATE Nexus::Core)
+    else()
+        target_sources(
+            ${target}
+            PRIVATE "${source}/core/src/request.c" "${source}/core/src/time.c"
+        )
+    endif()
+    add_library(
+        ${target}_vendor
+        STATIC
+        "${official}/Src/stm32f4xx_hal_uart.c"
+        "${official}/Src/stm32f4xx_hal_dma.c"
+    )
+    nexus_stm32f4_official(${target}_vendor)
+    nexus_stm32f4_official(${target})
+    target_compile_features(${target}_vendor PRIVATE c_std_11)
+    target_compile_features(${target} PRIVATE cxx_std_17)
+    set_target_properties(${target}_vendor PROPERTIES C_EXTENSIONS OFF)
+    foreach(unit ${target}_vendor ${target})
+        target_compile_definitions(${unit} PRIVATE STM32F407xx)
+        target_include_directories(${unit} PRIVATE "${fixture}")
+        target_include_directories(
+            ${unit}
+            SYSTEM
+            PRIVATE "${device}" "${cmsis}"
+        )
+        nexus_use_cmsis_core(${unit})
+        nexus_use_cmsis_host_model(${unit})
+        target_compile_options(
+            ${unit}
+            PRIVATE
+                "-include${source}/tests/behavior/soc/stm32/stm32f4/shared/stm32_official_model.h"
+                -ffunction-sections
+                -fdata-sections
+        )
+    endforeach()
+    # These are upstream 32-bit register addresses in an unchanged vendor file.
+    target_compile_options(
+        ${target}_vendor
+        PRIVATE -Wno-int-to-pointer-cast -Wno-pointer-to-int-cast
+    )
+    if(TARGET nexus_build_options)
+        target_link_libraries(${target}_vendor PRIVATE nexus_build_options)
+    endif()
+    target_link_libraries(${target} PRIVATE ${target}_vendor)
+    target_link_options(${target} PRIVATE -Wl,--gc-sections)
+endfunction()

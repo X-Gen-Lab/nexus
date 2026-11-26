@@ -8,13 +8,13 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 from types import MappingProxyType
 
-from tools.configure.calls import Symbol
+from tools.configure.generation.calls import Symbol
 from tools.configure.ir import ExternalMemoryRegionIR
 from tools.configure.providers.common import fail, integer
-from tools.configure.static_ir import (
+from tools.configure.generation.static_ir import (
     Array, ArrayElementAddress, ConstantMacro, Declaration, Record,
 )
-from tools.configure.static_recipe import StaticObjects
+from tools.configure.generation.static_recipe import StaticObjects
 
 
 _REGION_FIELDS = ("start", "end", "data_load", "data_start", "data_end",

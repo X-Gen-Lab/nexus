@@ -21,6 +21,28 @@ class SDKChangeTests(unittest.TestCase):
                      "core/include/nexus/core.h", "soc/family/package.json"):
             self.assertIn(name, sdk_consumers.sdk_changes([private, name]))
 
+    def test_private_behavior_tests_do_not_requalify_the_sdk(self):
+        root = Path(__file__).resolve().parents[2]
+        behavior = ("tests/behavior/core/atomic_native_test.cpp",
+                    "tests/behavior/core/tests.cmake",
+                    "tests/behavior/CMakeLists.txt")
+        for name in behavior:
+            with self.subTest(path=name):
+                self.assertTrue((root / name).is_file())
+                self.assertEqual(sdk_consumers.sdk_changes([name]), [])
+        shared = ("tests/cmake/GooglePlan.cmake",
+                  "core/include/nexus/core/status.h",
+                  "tests/support/native/include/nexus/io/native/model.h",
+                  "cmake/package/verification/io_evolution/native-time-pair.toml",
+                  "tests/integration/assemblies/f407_pwm_adc/main.c")
+        for name in shared:
+            with self.subTest(path=name):
+                self.assertTrue((root / name).is_file())
+                self.assertEqual(sdk_consumers.sdk_changes([*behavior, name]), [name])
+        for name in ("future/new.build", "tests/behavior/future.generator"):
+            with self.subTest(path=name):
+                self.assertEqual(sdk_consumers.sdk_changes([*behavior, name]), [name])
+
     def test_fresh_sdk_is_moved_and_revision_checked_before_consumption(self):
         with tempfile.TemporaryDirectory() as parent:
             root = Path(parent) / "checkout"
@@ -31,7 +53,7 @@ class SDKChangeTests(unittest.TestCase):
             head = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root,
                                            text=True).strip()
             fixtures = Path(__file__).resolve().parents[2]
-            for name in ("cmake/package/verification", "tests/contracts"):
+            for name in ("cmake/package/verification", "tests/integration"):
                 for source in (fixtures / name).rglob("*.toml"):
                     target = root / source.relative_to(fixtures)
                     target.parent.mkdir(parents=True, exist_ok=True)

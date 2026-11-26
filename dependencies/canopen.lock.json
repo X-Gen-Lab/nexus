@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "nexus-component-source",
   "identifier": "canopen",
-  "path": "vendors/CANopenNode",
+  "path": "ext/canopennode",
   "upstream_url": "https://github.com/CANopenNode/CANopenNode.git",
   "fetch_url": "https://github.com/X-Gen-Lab/CANopenNode.git",
   "commit": "9b8beed8367241e96ac03f916cd5a500bcb2cf23",

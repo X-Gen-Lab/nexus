@@ -126,8 +126,8 @@ def source_inputs(root: Path) -> dict:
         'tools/configure/ir.py', 'tools/configure/providers/common.py',
         'os/include/nexus/os/wait.h', 'core/include/nexus/core/time.h',
         'core/include/nexus/core/status.h',
-        'tests/contracts/os_wait_cost/probe.c',
-        'tests/contracts/os_wait_cost/linker.ld')
+        'tests/integration/resources/os_wait_cost/probe.c',
+        'tests/integration/resources/os_wait_cost/linker.ld')
     return {name: arch_compile.digest(root / name) for name in names}
 
 
@@ -163,7 +163,7 @@ def run(root: Path, compiler: str, output: Path) -> int:
             recorder.execute([tool, '--version'], name + '-version',
                              nonempty=True)
         checked_profiles = set()
-        fixture = root / 'tests/contracts/os_wait_cost'
+        fixture = root / 'tests/integration/resources/os_wait_cost'
         for variant in matrix():
             profile = variant['profile']
             cpu = variant['facts']['cpu']

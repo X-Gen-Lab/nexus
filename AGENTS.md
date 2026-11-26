@@ -1,256 +1,207 @@
-# Nexus platform maintenance
+# Nexus 平台维护规范
 
-Nexus owns reusable embedded mechanisms. Applications, product roles, protocol
-register policy, workers, private PCB data, Flash reservations and recovery policy
-belong in external repositories. Application examples live in the public
-X-Gen-Lab/nexus-examples repository. Proprietary products, credentials and private
-PCB data stay in their owning repositories; public examples do not authorize
-publishing those inputs or their execution artifacts.
+本文件约束本仓库内的维护与开发。修改前阅读相关目录 README、
+[平台架构](docs/explanation/platform-architecture.md)、
+[公共合同](docs/reference/index.md)和
+[验证边界](docs/reference/platforms/qualification.md)。
+同一合同只维护一份权威定义；本文件规定维护约束，具体操作遵循所链接的手册。
+Git 历史保留原始设计和结果，不代表当前支持范围或验收状态。
 
-Codex owns platform maintenance. Named people and simulated team seats are not
-required. Preserve automated gates and independent
-agent review for high-risk changes; never invent GitHub CODEOWNERS accounts or
-claim remote branch protection from a local policy file.
+## 1. 仓库范围与维护职责
 
-Read [the architecture](docs/explanation/platform-architecture.md),
-[current contracts](docs/reference/index.md),
-[verification boundaries](docs/reference/platforms/qualification.md) and the relevant
-layer README before changing behavior. Git history retains original contracts and
-results; those records do not establish current support or qualification.
+- Nexus 负责可复用的嵌入式机制。应用任务、产品角色、协议寄存器策略、私有 PCB
+  数据、Flash 分区、认证、数据迁移和产品恢复策略由外部工程维护。
+- 公开示例位于 `X-Gen-Lab/nexus-examples`。私有产品、凭据、PCB 数据及其执行
+  产物不得因示例公开而发布。
+- Codex 负责平台维护，无需虚构人员、团队席位或 CODEOWNERS 账号。中断、生命周期、
+  持久化和并发等高风险修改须独立审查；本地规范不能证明 GitHub 分支保护已生效。
+- 当前生产 SoC 范围为 `soc/stm32/stm32f4`。按精确器件、封装、板卡和模式声明支持，
+  目录、SDK 头文件或 HAL 模块存在不构成支持证据。
+- 通用外部库位于 `ext/`，硬件与架构依赖位于 `vendors/`，Nexus 适配位于
+  `components/`。保留依赖来源、精确 gitlink、来源锁和许可证。已明确保留的库存
+  不得随平台精简删除；未选择的库存不进入默认准备、验证、编译或 SDK。
 
-## Architecture and configuration
+## 2. 平台架构与模块边界
 
-- The production SoC scope is STM32F4, under `soc/stm32/stm32f4`.
-  Exact parts select reviewed device, memory, clock and route facts; a family
-  directory or official HAL module does not establish part/mode support.
-  Keep all existing `vendors/`, gitlinks, source locks and license records.
-  Unselected inventory dependencies never enter default preparation, validation,
-  compilation or SDK payloads. Never remove them during platform pruning.
-- Board and SoC packages contain C11, necessary startup assembly and declarative
-  facts, with no Python modules. Host configuration code belongs in `tools/`.
-  F4 implementations and reviewed IP code belong in the F4 package; no extra
-  top-level MCU driver registry or runtime forwarding layer is required.
-  Native models belong in `tests/support/native` and require explicit test
-  support; they are not a second production SoC.
-- Keep the default C11 path statically assembled and allocation-free: Core,
-  Arch, SoC, typed I/O, optional OS/owner adapters, optional common components.
-- Maintain firmware hardware algorithms directly in C11 (with necessary Arch
-  assembly): register access/readback, admission, waiting, peripheral lifecycle,
-  rollback and recovery. Central host tools validate and generate static
-  configuration, storage, faces, factory and fixed connections. Generated thin
-  IRQ entries and explicit typed call ordering are permitted. Do not maintain
-  hardware algorithms as generated C strings or introduce a runtime register
-  script interpreter. Track remaining migration by complete selected paths,
-  including preflight, platform resources, shared owners and resume.
-- Prefer reviewed official HAL/LL/SPL for hardware operations and complete
-  transports that satisfy the selected mode. Vendor types and Handles stay
-  private. One live controller behavior domain has one hardware transport
-  owner; Nexus bridges admission, borrowing, deadlines, callbacks and full
-  withdrawal. Keep direct access only for an explicit SDK gap, erratum,
-  atomic contract or demonstrated budget. Evaluate the complete mode before
-  replacement; a TX-only fixture does not preserve a mode with RX duties.
-- Public device APIs use Nexus types and immutable interface faces. Vendor SDKs
-  and mutable provider state remain private. Instances share read-only typed
-  operations tables; callbacks receive the instance context, never the table.
-- A generated typed factory returns existing static objects by compact ID. It
-  never allocates, initializes hardware, acquires locks or discovers devices.
-  Do not introduce runtime name registries, maximum object pools, hidden workers,
-  mandatory OS locks or forwarding-only runtime layers. Controller and endpoint
-  identities remain separate; no endpoint substitutes for its controller.
-- SoC facts and Board `board.json` are machine-maintained JSON. One authored TOML
-  assembly resolves through a validated typed IR into one atomic bundle. CMake
-  targets own software dependencies. Do not introduce Kconfig/cache fallback,
-  competing configuration authorities or a second source build graph. Authored
-  platform input is TOML schema 2 only; reject legacy JSON assemblies. Production
-  resolution and emitters use immutable named records, without a mapping facade
-  or duplicate decision values. JSON facts and keyed immutable indexes remain
-  explicit leaf data; resolved JSON is a one-way audit/artifact projection.
-  Frozen historical evidence retains its original bytes and read-only verifiers;
-  that retention never reopens a legacy production configuration path.
-- Reject unknown fields, unsupported modes, resource conflicts and stale inputs.
-  Never repair configuration by silently selecting a different mode or Board.
-- Distinguish a chip capability from a reviewed PCB route and physical HIL.
-  Unknown PCB revisions and electrical facts stay explicit. Do not invent wiring.
-- Startup does not start a scheduler. Applications own tasks, wait adapters,
-  queue depths, stack/TCB storage and their shutdown sequence.
-- External CMake consumers discover Nexus with `find_package(Nexus CONFIG
-  REQUIRED)` and explicitly call `nexus_add_platform(ASSEMBLY ...)`, or the
-  mutually exclusive `nexus_add_runtime(ASSEMBLY ...)`. Discovery verifies the
-  selected source and loads APIs without creating an assembly. Source checkouts
-  and installed SDKs use one private production graph. Products do not force
-  platform test/workload switches. Select the toolchain before `project()`.
-  A build directory has one toolchain and assembly; multiple images from that
-  assembly keep separate startup OBJECT targets. Provider targets publish
-  `NEXUS_STARTUP_SOURCES` and `NEXUS_STARTUP_USAGE_TARGET`; Platform references
-  the provider through `NEXUS_PROVIDER_TARGET`. Vendor startup requirements
-  stay private. `Nexus::ABI` and the selected `Nexus::OS` are stable usage targets.
+- 固件使用 C11 和必要的启动汇编；C++17、GoogleTest、GoogleMock 仅用于主机测试
+  和外部 ABI 检查。Board、SoC 保存 C 实现与声明式事实，不放 Python 模块。
+  主机配置代码位于 `tools/`；Native 模型位于 `tests/support/native`，显式启用
+  测试支持，不作为第二个生产 SoC。
+- Core、Arch、SoC、typed I/O 的默认路径静态装配且无动态分配。OS、owner 适配和
+  通用组件按需选择。选定组件需要的内部动态分配须显式声明、限定预算，不能隐式
+  引入基础路径。
+- 寄存器访问与回读、准入、等待、启停、回滚和恢复算法直接使用 C 实现。主机工具
+  只校验并生成静态配置、存储、接口视图、factory 和固定连接；允许薄 IRQ 入口与
+  显式调用顺序。不得用生成 C 字符串或运行时寄存器脚本承载硬件算法。
+- 优先复用经审核、满足完整选定模式的官方 HAL／LL／SPL。SDK 缺口、勘误、原子
+  合同或已证明的资源预算才构成直接访问的理由。评估替换须覆盖完整模式，TX 路径
+  的验证不能替代 RX 职责。
+- 一个存活的控制器行为域只有一个硬件 transport owner。Nexus 负责准入、借用、
+  deadline、回调与完整撤回；厂商 Handle、SDK 类型及可变 provider 状态保持私有。
+  F4 实现与经核验的 IP 代码放在 F4 package 内，不另建顶层 MCU 驱动注册表。
+- 公共接口使用 Nexus 类型与不可变接口视图，同类实例共享只读 typed ops；回调接收
+  实例 context。controller 与 endpoint 分别标识，endpoint 不能冒充 controller。
+- typed factory 按紧凑 ID 返回已有静态对象，不分配、不初始化硬件、不加锁、不发现
+  设备。禁止运行时名称注册表、最大对象池、隐藏 worker、强制 OS 锁和纯转发层。
+- 装配只使用 TOML schema 2；SoC facts 与 `board.json` 使用机器维护的 JSON。
+  输入经校验后形成不可变具名 typed IR，再发布一个原子 bundle。生产 resolver 和
+  emitter 不暴露 mapping facade 或重复决策值；JSON facts 与不可变索引是叶数据，
+  resolved JSON 仅作单向审计产物。
+- 未知字段、未支持模式、资源冲突与过期输入必须拒绝，不静默换模式或板卡。
+  不增加 Kconfig、cache 回退、旧 JSON 装配或第二套配置权威。历史证据保留原始字节
+  和只读校验，不重新开放旧生产入口。
+- CMake target 是软件依赖的唯一权威，源码与已安装 SDK 使用同一私有生产目标图。
+  外部工程通过 `find_package(Nexus CONFIG REQUIRED)` 发现 API，再显式选择互斥的
+  `nexus_add_platform(ASSEMBLY ...)` 或 `nexus_add_runtime(ASSEMBLY ...)`。
+  发现包不自动创建装配，产品不强制打开平台测试开关。在 `project()` 前选择工具链；
+  每个构建目录只对应一套工具链和装配，多映像分别持有启动 OBJECT target。
+  provider 启动属性、ABI 与 OS 用法目标遵循[构建合同](docs/reference/contracts/build-system.md)。
+- 启动不启动调度器。应用拥有任务、等待适配、队列深度、栈／TCB 存储与关闭顺序。
+  芯片能力、PCB 接线与物理 HIL 分开记录；未知板卡修订和电气事实保持未知，不编造。
 
-## Ownership and correctness
+## 3. 编程原则执行
 
-- REJECTED admission has no retained references or residual hardware effects.
-  ACCEPTED transfers borrow request and buffers until acquire-observed SETTLED.
-- SETTLED is the provider's final access. Detach hardware/IRQ/queue references
-  before release-publication. Cancel, timeout or a failure to drain never revoke
-  a borrow; retain QUARANTINED storage and expose recovery responsibility.
-- Cross-task controls address stable slots and monotonically increasing epochs.
-  Drain controls and join observers before reclaiming a slot or request.
-- Use absolute monotonic deadlines in one domain. Save and restore incoming
-  interrupt masks. Keep peripheral drain, wire completion and request completion
-  distinct. Do not remove barriers or volatile reads needed by the contract.
-- Physical Flash drivers expose geometry. Products explicitly supply erase-aligned
-  regions. Persistence policy, authentication and migration remain external.
-- IRQ notification is a hint. The latched request predicate remains authoritative.
-  Validate the FreeRTOS syscall ceiling before any kernel ISR API.
+**每次代码变更都要体现以下原则。** 按实际涉及的职责应用，不为逐项达标增加结构、
+代码或报告。正确性、硬件顺序、内存所有权、实时性和资源预算是前提；满足这些约束后，
+选择最简单、直观且易维护的实现。
 
-## Tools, style and validation
+### KISS：简单至上
 
-Documentation changes follow the [content and diagram standards](docs/reference/contracts/documentation-standards.md)
-and [page templates](docs/reference/contracts/documentation-templates.md). Architecture pages
-include or reference diagrams that distinguish current implementation, target
-design and exact reference configurations. Review arrow meaning, ownership,
-failure paths and source identity; rendering does not establish correctness or
-hardware qualification. Preserve one authoritative contract and existing style.
+- 优先显式数据、直接控制流、小函数和清楚的状态转换，减少独立状态与所有权转换。
+- 新增中间层必须有明确职责或可验证的收益；不为减少行数隐藏控制流或资源成本。
+- 基础平台与驱动优先静态配置、静态存储和编译期选择。
+- 不以简化为由删除必要校验、错误传播、内存屏障、IRQ 撤回、DMA 排空和失败恢复。
+- 注释解释约束、原因和硬件顺序，避免逐行复述代码。
 
-The offline `nexus-docs` hook checks complete staged documentation inputs and
-production configuration examples without installing tools or using the network.
-Prepare the hash-locked documentation tuple explicitly with
-`python tools/documentation/install.py`; `dev.py docs test` executes the complete
-documentation suite using the same nonzero, no-skip result admission as other
-tool tests. Strict bilingual builds and whole-site translation checks use that tuple.
-Current site pages use Markdown/MyST with explicit id, type, audience and
-source_language metadata. Each page has one canonical source and a reviewed
-gettext catalog for the other language; same-language catalogs are rejected.
-Keep symbols, configuration keys and original evidence values intact. A stale,
-fuzzy or missing translation fails strict verification. Preview is explicitly
-unqualified. Only a fresh verify build of both en and zh_CN establishes complete
-documentation validation. Retired paths, labels, wrappers and formats have no
-aliases, redirects or conversion layer.
+### YAGNI：只实现当前所需
 
-Install commit tools with `python scripts/setup/install_dev_tools.py`, then
-`.venv/bin/python -m pip install -r dependencies/environment-tools.txt` (Windows:
-use `.venv/Scripts/python.exe`). This installs pre-commit and commit-msg hooks;
-no hook bypass or automatic staging is allowed. CI uses the same checks.
+- 仅实现明确需求、已选硬件能力及其必要基础，不为假设中的产品、MCU 或模式预留
+  状态、隐藏任务、万能注册表、插件框架或额外工具体系。
+- 扩展点对应真实变化需求，并说明资源与维护成本，不把所有可能性提前做完。
+- 清理废弃功能时同步清理入口、实现、配置、测试、打包与文档。
+- 清理依赖遵守第 1 节的库存保留约束；当前任务未使用不构成删除库存的依据。
 
-Use `python tools/dev/dev.py configure|build|test --preset <name>`; native CMake
-arguments pass through. `doctor` only diagnoses the selected tools and environment;
-it never scans all assemblies or runs maintenance tests. `check` runs full
-repository gates once. Ordinary configure/build keeps process logs and exit codes;
-use `--record-provenance` explicitly when preparing an identified image for device use.
-Managed `dev.py configure` owns this platform checkout; it rejects a different
-`-S` source root. External product projects use their explicit CMake commands.
-Fresh JUnit, nonzero tests and actual return codes are required. Missing tools,
-empty reports and skipped-only executions fail qualification.
+### DRY：统一事实与真实共同实现
 
-Managed configure/build/test/check, TDD, Native runtime and matrix entries share
-one kernel lock per canonical build directory. Hold it through all owned stages
-and report publication; independent directories may run in parallel. POSIX nested
-commands inherit actual descriptors, not a bypass setting. Same-thread
-composition is reentrant; other threads do not inherit ownership automatically.
-Descriptor inheritance delegates ownership within one orchestration. The parent
-must serialize child stages using the same build directory; children sharing
-one delegated descriptor are not mutually exclusive.
-Windows standalone commands use file locks. Nested managed execution on
-Windows is explicitly rejected. Direct CMake/Ninja/CTest do not participate:
-callers must keep those directories exclusive until the direct command finishes.
+- 同一事实、资源规则和公共合同只有一处权威定义，避免多处同步修改。
+- 主动识别重复决策和代码，确认共同语义后再抽象；优先共享经核验的算法、协议机制
+  和同一 IP 的公共行为。
+- 保留不同 IP、勘误、完成语义与恢复顺序的必要差异，不仅凭名称、寄存器相似或代码
+  形状合并实现。有独立故障路径或编译上下文的验证不视为重复。
 
-TDD is mandatory for new production behavior and defect fixes: write the
-regression/contract first, execute it and record the expected RED failure, then
-implement the smallest correct change, execute GREEN and refactor while keeping
-tests passing. New C API and provider tests use GoogleTest and GoogleMock on the
-host; Python tools retain stdlib unittest. Mock external dependencies and hardware
-ports, not the implementation under test. Verify rejection, cancellation, drain,
-overflow and instance isolation where the changed contract requires them.
+### SOLID：以明确边界实现可维护扩展
 
-Focused harnesses retain the maintained target's compiler, language standard,
-warning flags and defines from its actual `compile_commands.json` entry. A
-differently configured harness is narrower evidence and does not establish
-acceptance of that target.
+- **S：单一职责。** 按职责、状态所有权和变化原因组织模块，不按固定行数机械拆分。
+  配置工具负责校验与静态装配，provider 负责硬件行为，Platform 协调生命周期，
+  组件实现通用领域机制，外部产品拥有业务与恢复决策。
+- **O：开闭原则。** 常规实例与同 IP 变体优先使用 package、facts、binding 和现有
+  接口接入。新公共语义可以修改接口、IR、schema 和工具，并补齐验证；允许修正
+  现有设计，不为追求零修改增加转发层或复杂框架。
+- **L：里氏替换。** 同一接口的实现遵守一致的单位、错误、借用、完成、停止、恢复
+  和执行上下文合同。能力与限制显式声明；已声明能力必须兑现，不静默降级、伪造
+  成功或提前发布完成。
+- **I：接口隔离。** 按真实操作与能力提供窄接口，避免万能设备对象和胖接口。
+  简单同步操作不承担异步、流式、DMA 或 OS 状态成本；这些能力显式按需选择。
+  公共接口不暴露厂商 Handle、寄存器结构或私有可变状态。
+- **D：依赖倒置。** 通用组件依赖 Nexus 公共端口、类型与合同；具体实现持有 SDK
+  和寄存器细节。优先使用静态 `const ops + context`，依赖装配不引入堆分配、运行时
+  名称查找、隐藏任务或纯转发层。IRQ 与控制快环允许保持合同的、可审查的静态直达路径。
 
-Parallel TDD has an explicit handoff barrier: the test owner records the actual
-expected RED execution and snapshots the tested source and binary before
-releasing the implementation owner to change behavior. The implementation owner
-waits for that receipt, not a proposed test or a promised run. Reconstructed
-source is never contemporaneous evidence of an earlier RED execution. Disclose
-any draft that predates its tests; retain later genuine RED/GREEN fixes without
-rewriting the earlier chronology.
+### 抽象与性能判断
 
-`python scripts/ci/tdd_gate.py --all --preset native-debug` builds and runs
-all offline GoogleTest/GoogleMock contracts and the four complete tool domains.
-The gate checks the selected locked tools, configures once and builds once.
-It never reuses successful test reports. The ordinary commit hook reads the
-complete staged index, including deletions, and executes the full Native
-GoogleTest plan plus complete affected tool modules. Module planning is an
-explicit commit scope, not a filtered full-domain qualification: reports declare
-`commit-tools` and `qualification=false`. Changed test modules run in full;
-known implementation paths use the maintained module mappings. Physical
-changes also run the firmware target for the assemblies selected from the
-base and staged hardware inputs. The gate records its selection, fallback
-reasons and checked image identities. A missing or stale target dependency
-record expands hardware coverage. The complete support scan runs in integration.
-Unknown behavioral inputs or missing module coverage retain the broader scope.
+- 提取共享层前明确共同语义、必要差异和实际场景；必要的公共硬件合同可按职责与
+  可验证性建立，不机械要求先出现两份重复代码。
+- 评估热路径指令、调用次数、Flash、每实例 RAM、栈和确定性。收益须用相同条件下
+  的实际结果说明；常规修改复用已有工具，不为证明原则新增基准或报告框架。
 
-`tools/testing/run_tool_tests.py` owns this plan. Do not infer a smaller scope
-ad hoc or filter cases inside selected modules. `--all` and `--tools all` always
-execute the four complete tool domains. `dev.py check` is the full integration
-entry, not the ordinary commit scope. Before merge or delivery, run full domains,
-relevant ARM links and independent SDK consumers against their actual inputs;
-a quick commit pass cannot establish those results. `--tools none` is reserved
-for an explicitly separate Native execution, never a hook bypass.
+## 4. 所有权、并发与硬件正确性
 
-Independent CI owns all four Native runtime modes and the retained full tool
-suites. The tool job prepares its compiler/generated inputs without repeating
-the Native job's full GoogleTest execution. The testing domain owns one global
-capability/documentation scan; local peripheral tests do not repeat it. Never
-cache successful qualification, disable required cases or use runtime filters
-or shards to claim full acceptance.
+- `REJECTED` 不保留引用，也不遗留硬件副作用。`ACCEPTED` 借用 request 与缓冲区，
+  直到调用者以 acquire 语义观察到最终 `SETTLED`。
+- `SETTLED` 是 provider 的最后一次访问；release 发布前撤回硬件、IRQ 与队列引用。
+  取消、超时和排空失败不撤销借用；保留 `QUARANTINED` 存储并明确恢复责任。
+- 跨任务控制使用稳定 slot 与单调递增 epoch。回收 slot 或 request 前排空控制操作，
+  并等待观察者退出。
+- 使用同一单调时间域的绝对 deadline。保存并恢复传入中断掩码；区分 DMA 完成、
+  外设排空、线缆发送完成和请求完成，不删除合同需要的屏障与 volatile 回读。
+- IRQ 通知只是提示，锁存的 request 条件才是完成依据。调用 FreeRTOS ISR API 前
+  校验 syscall 中断优先级上限。
+- Flash 驱动暴露物理几何；产品显式提供擦除对齐区域，平台不隐含占用产品分区。
 
-The hook rejects differing unstaged/untracked behavior before and after execution
-and requires an unchanged Git index tree. Record actual RED/GREEN commands and
-failure reasons in the PR. Automation verifies execution, not historical order.
-C++17, GoogleTest and GoogleMock belong only in host tests; firmware stays C11.
+## 5. 修改、验证与协作流程
 
-Deliver one complete functional increment at a time: implementation, focused
-regressions, current documentation and the ordinary complete-index gates. Report
-the exact working behavior and remaining gaps; commit and test counts alone are
-not completion. Retain original evidence, but track it once in a compact archive
-or a recoverable artifact with an exact source and member manifest. Reference
-that copy instead of committing repeated before-images, transport archives and
-control bundles. Do not build new evidence frameworks for routine changes.
+- 安装、命令与完整验证范围遵循[开发流程](docs/development/workflow.md)和
+  [工程手册](docs/reference/contracts/engineering.md)。使用标准 pre-commit 与
+  commit-msg hook；不绕过、不自动暂存修复，不临时缩小门禁范围。
+- 新增生产行为和缺陷修复必须先写合同／回归，实际执行并保留预期 RED，再实现最小
+  正确变更、执行 GREEN、重构。C 使用 GoogleTest／GoogleMock，Python 工具使用
+  unittest；模拟外部硬件与内核端口，不模拟被测实现。纯文档与不改变行为的整理
+  使用相应检查和回归，不新增镜像实现的测试。
+- 并行 TDD 先由测试方执行真实 RED、保存所测源码与二进制身份，再交给实现方。
+  不以计划、承诺或事后重建冒充当时执行；如草稿早于测试，按真实顺序披露。
+- 覆盖所改合同的拒绝、取消、排空、溢出、隔离与恢复。聚焦 harness 继承实际
+  `compile_commands.json` 的编译器、标准、警告与宏；不同配置只能证明较窄范围。
+- 行为测试位于 `tests/behavior`，独立消费者与探针位于 `tests/integration`，共享
+  模型位于 `tests/support`。删除测试前说明废弃合同或等价独立覆盖，保留有意义的
+  故障与编译差异回归；不为缩减数量删验证，也不恢复退役工具以维持旧数量。
+- 普通提交读取完整暂存区及删除项，只配置、构建一次，执行完整 Native CTest、核对
+  未过滤的 GoogleTest 身份，并执行受影响的完整工具模块。暂存树必须保持不变；
+  行为性未暂存或未跟踪输入与提交不一致时拒绝验收。
+- 范围选择由 `tools/testing/run_tool_tests.py` 维护；未知行为输入或缺少已知覆盖时
+  扩大范围。提交结果明确为 `commit-tools`、`qualification=false`，不冒充整域验收，
+  不过滤所选模块内的用例。物理相关修改按基础与暂存输入选择 ARM 装配；依赖记录
+  缺失或过期时扩大覆盖，完整支持扫描放在集成验证。
+- 合并或交付前独立执行完整常规工具域 `testing`、`configure`、`ci`、相关 ARM
+  链接与实际输入的 SDK 消费者。`--all` 和 `--tools all` 不缩减这三个域；
+  `dev.py check` 执行整仓风格检查、完整 Native 和这三个工具域。集成、FreeRTOS、
+  文档及 SDK 各有独立入口。`--tools none` 仅用于显式分离的 Native 执行，不能绕过 hook。
+- 完整 CI 运行 `native-debug`、`native-release`、`native-asan`、`native-tsan`，另行
+  执行 `integration`、`freertos`；文档 job 执行文档测试与严格双语构建。模式无关工具
+  不随 Native 模式重复；工具 job 不重复完整 GoogleTest。全局能力与派生文档集中
+  扫描一次，局部外设测试不重复全平台扫描。
+- 复用已核验工具、依赖与正常增量产物，不缓存成功验收报告。输出须新鲜、非空，
+  使用真实退出码；缺失工具、跳过、空报告、旧报告或过滤／分片不能证明完整验收。
+- 并行任务分配互不冲突的修改范围，总并发受 CPU、内存与磁盘预算约束。托管命令
+  共用每个规范构建目录的内核锁，覆盖全部阶段与报告发布。不同目录可并行；同目录
+  不并发修改，委托描述符不替代子阶段串行。取消后排空所属进程再释放目录所有权。
+  直接 CMake／Ninja／CTest 由调用者保证独占；POSIX 委托与 Windows 嵌套限制见工程手册。
+- `doctor` 只诊断所选环境，不扫描全部装配或执行维护测试。普通 configure／build
+  保留必要日志；设备操作需要精确映像身份时显式使用 `--record-provenance`。
+  托管 `dev.py configure` 仅配置当前平台源码根，外部产品使用显式 CMake 命令。
 
-Apply the test-retention and execution rules in the
-[engineering handbook](docs/reference/contracts/engineering.md). Remove a test only
-after identifying its obsolete contract or equivalent independent coverage;
-preserve meaningful failure regressions. Move mode-independent Python and SDK
-checks to the explicit tool domains instead of repeating them in each Native
-preset. Keep all four Native C/Google modes and the ordinary complete-index
-commit gate. Shared contracts run once per meaningful implementation class;
-small compile-time variants retain their distinguishing IRQ, ABI and feature
-contracts instead of repeating the entire behavior suite. Analyze every distinct compiler context; bound concurrency and
-retain cancellation, diagnostics and fresh reports. Cache verified tool inputs,
-never successful test reports.
+## 6. 代码与文档风格
 
-Keep the existing `.clang-format`, `.editorconfig` and backslash Doxygen style:
-80 columns, four spaces, attached braces and type-attached pointer stars. Sources
-have file/brief/author/version/date/copyright; headers have file/brief/author and
-public context, deadline, ownership and failure contracts. Implementation comments
-explain invariants and hardware ordering. Do not duplicate declaration parameter
-lists in source definitions. New or changed files pass whole-file checks. Frozen
-historical debt may only shrink; never rebaseline new defects.
+- 以 `.clang-format`、`.editorconfig`、`.gersemirc` 和
+  [代码规范](docs/development/coding-standards.md)为准：C／C++ 与 CMake 四空格、
+  80 列目标、同行花括号、指针星号靠类型、反斜杠 Doxygen。其他格式按文件规则，
+  不把 C 的缩进要求强加给 YAML 或 Makefile。
+- C 源文件保留 file／brief／author／version／date／copyright；头文件保留
+  file／brief／author，并说明公共接口的上下文、deadline、所有权与失败合同。
+  实现注释解释不变量与硬件顺序，不重复声明的参数列表。
+- 新增与修改文件通过整文件检查；历史风格债务只能缩减，不为新问题重设基线。
+  并行交接前执行 `python scripts/ci/style_gate.py <changed-files>` 和相应行为检查，
+  记录真实结果；clang-format 通过不等于注释合同通过。
+- 本规范使用中文；代码标识符、配置键、协议名称和原始证据保持原文，现有代码注释
+  语言不因本次整理批量修改。
+- 文档遵循[内容与图示规范](docs/reference/contracts/documentation-standards.md)和
+  [页面模板](docs/reference/contracts/documentation-templates.md)。架构图区分当前
+  实现、目标设计和精确参考配置，核对箭头、所有权、失败路径与源码身份。
+- 站点采用 Markdown／MyST，一份正文对应一份经审核的另一语言 gettext 翻译，
+  元数据按文档规范维护，不创建同语言 catalog。陈旧、fuzzy 或缺失翻译不通过严格
+  验证。退役路径、标签、包装与格式不增加兼容别名或转换层。
+- 离线 `nexus-docs` hook 检查完整暂存文档与配置示例，不安装工具、不联网。工具准备
+  与精确命令见[文档维护](docs/development/documentation.md)。预览不具备验收资格；
+  本次 en 与 zh_CN 完整严格构建证明双语内容。文档工具行为变化时另执行完整文档
+  工具测试；纯正文和译文修改不重复该测试。
 
-Before a parallel handoff, run `python scripts/ci/style_gate.py <changed-files>`
-as well as the focused behavior checks. Clang-format alone does not check the
-repository's comment contracts. Record the actual commands and results before
-claiming that formatting and comments passed.
+## 7. 交付与结果边界
 
-Run the maintained host/model and tool boundary suites. Changes to interrupt,
-lifecycle, persistence or concurrency need meaningful failure-path regressions.
-Compile common components for maintained F4 parts. Native models establish software
-behavior, ARM ELF checks establish linking/resources, and physical station results
-establish hardware behavior. Never inherit old test counts or hardware status.
-
-Builds, tests, SDK checks and physical HIL have separate scopes. Preserve fresh
-raw failures and actual source/configuration identities in build outputs and PRs.
-Retired candidate, promotion, archive recovery and task-ledger engines are not
-platform runtime/build requirements. Never restore them merely to retain an old
-test count. No software result is a product release, safety certification or LTS
-promise. Physical tests remain `not_executed` until equipment executes them.
+- 交付一个完整、可审查的功能增量：实现、必要回归、当前文档与标准暂存门禁。
+  说明实际行为、验证范围和剩余限制，提交数量与测试数量不代表任务完成。
+- 记录真实命令、退出码、源码、配置、工具与映像身份；保留原始失败和取消结果。
+  原始证据保留一份紧凑归档或可恢复产物，带精确来源与成员清单，不重复提交前镜像、
+  传输包、控制包或另建证据／候选／晋级／任务台账框架。
+- Native 模型证明软件行为，ARM ELF 证明编译、链接与资源，独立 SDK 消费者证明
+  集成边界，物理站点证明实板行为。不能继承旧测试数量或硬件结论。
+- 软件结果不构成产品发布、安全认证或 LTS 承诺。本地 CI 不等于远端 Actions 状态或
+  服务端分支规则；设备未执行的物理测试保持 `not_executed`。

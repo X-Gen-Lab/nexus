@@ -37,7 +37,7 @@ VE 缺少 PF/PG，独立地址的旧 ZG SRAM 路线不能沿用；VE 可显式�
 地址/数据和 PB7/NL，或 PD7/NCE2 的 NAND2。NE1/NCE2、NE2/NCE3 共享 chip-select
 pad，配置拒绝相冲突的两个 personality。NAND3 需要 ZG 的 PG9。
 
-`tests/contracts/fsmc_assembly/` 是软件参考装配。它们没有指定真实存储器型号、PCB
+`tests/integration/assemblies/fsmc_assembly/` 是软件参考装配。它们没有指定真实存储器型号、PCB
 或测得时序，也不代表实板资格。时序字段使用官方 LL 的编码周期约定；调用者依据
 实际器件、电压、HCLK 和电气连接选择参数。器件自身的 PSRAM burst/configuration
 寄存器须与所选传输协议一致，不能由一份通用 pad 描述猜测。开启 NWAIT 可能使
@@ -144,7 +144,7 @@ ES0321 §2.3.4 要求保持共享 `FMC_BCR1.WFDIS=0`。FMC gate 关闭时不能�
 将 SDRAM 端点的 `mode` 设为 `graphics-owned`，并在所选 `display`／`image`
 控制器中用 `memory_window` 引用该端点 ID，才会建立图形连接。配置拒绝 CPU-only
 端点、未知引用和没有图形使用者的 `graphics-owned` 窗口。完整软件参考见
-[`stm32f4_graphics_sdram/combined.toml`](../../../../tests/contracts/stm32f4_graphics_sdram/combined.toml)。
+[`stm32f4_graphics_sdram/combined.toml`](../../../../tests/integration/assemblies/stm32f4_graphics_sdram/combined.toml)。
 RM0386 Rev6 §2.1.8–9 说明 LTDC／DMA2D 到 FMC 的总线路径，§12.8 规定 SDRAM
 控制器行为；芯片总线可达性本身不构成 Nexus 的权限或生命周期授权。
 

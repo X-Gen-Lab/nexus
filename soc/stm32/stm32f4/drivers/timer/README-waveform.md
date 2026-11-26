@@ -120,8 +120,8 @@ DMA TC／NDTR=0 只表示存储已经送入预装载寄存器。owner 先撤回 
 不能恢复丢失的 clock、DMA reset 或 System time epoch 历史。只允许复位已排空的
 独占 TIM，绝不复位共享 DMA1／2。
 
-维护程序 `tests/google/soc/f407_timer_waveform_test.cpp` 直接编译生产 C11 后端，硬件
+维护程序 `tests/behavior/soc/stm32/stm32f4/timer/f407_timer_waveform_test.cpp` 直接编译生产 C11 后端，硬件
 模型只提供 MMIO、IRQ、CPU 和时间边界；既有 `timer_advanced_test.cpp` 覆盖共享
 break 核心回归。配置与真实 ARM 软件参考由
-`tools/configure/tests/test_f407_timer_waveform_configuration.py` 及对应 contract fixture
+`tools/configure/tests/resources/clocks/test_f407_timer_waveform_configuration.py` 及对应 contract fixture
 验证。软件通过不等于电气波形、DMA 并发吞吐或外部功率电路的 HIL 资格。

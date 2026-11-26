@@ -77,7 +77,7 @@ GoogleTest／GoogleMock 使用真实锁定 v7／v8 端口类型，仅替换外�
 函数体，GoogleMock 仅替换指令、ISA、硬件和链接边界。它检查原始用户 START
 在恢复前拒绝，以及真实 MPU 写入、普通 RX 属性和 Flash 间隙／MMIO 的默认拒绝。
 
-`tests/contracts/os_mpu` 使用生产 Runtime 图和合成内存布局，不是 Board 链接
+`tests/integration/kernels/os_mpu` 使用生产 Runtime 图和合成内存布局，不是 Board 链接
 布局。`scripts/ci/os_mpu.py` 编译真实 ARM 端口，读 ELF 符号／表字节，检查代码／
 数据域、真实 SVC 立即数、原始 EXC_RETURN 转发、受保护启动标签和先检查再恢复
 的指令顺序，记录完整对象／系统调用栈大小，并执行缺 Idle 回调的负链接测试。

@@ -356,11 +356,11 @@ def main():
     if args.transport == "lwip-test-relay":
         source_root = Path(__file__).resolve().parents[2]
         fixture_sources = (
-            "tests/contracts/lwip_mqtt_interop/client.c",
-            "tests/contracts/lwip_mqtt_interop/transport.cpp",
-            "tests/contracts/lwip_mqtt_interop/fixture.h",
-            "tests/contracts/lwip_mqtt_interop/pcap.h",
-            "tests/google/support/lwip_frame_pair.h",
+            "tests/integration/protocols/lwip_mqtt_interop/client.c",
+            "tests/integration/protocols/lwip_mqtt_interop/transport.cpp",
+            "tests/integration/protocols/lwip_mqtt_interop/fixture.h",
+            "tests/integration/protocols/lwip_mqtt_interop/pcap.h",
+            "tests/support/network/lwip_frame_pair.h",
             "tools/testing/mqtt_tls_interop.py",
             "tools/evidence/common.py",
         )

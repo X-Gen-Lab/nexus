@@ -41,7 +41,7 @@ physical qualification.
 | Features | Unsupported CPU, port, ABI, security or MPU combinations fail at configuration. A host model cannot establish real kernel scheduling, physical IRQ priority or board timing. |
 
 `nx_wait_port_t` retains its direct callback ABI. The maintained
-[Wait cost models](../../../../tests/contracts/os_wait_cost/README.md) compare actual
+[Wait cost models](../../../../tests/integration/resources/os_wait_cost/README.md) compare actual
 linked alternatives. Backend integration must not create a second deadline
 helper, runtime device registry or another assembly authority.
 
@@ -74,7 +74,7 @@ receive output. Sleep and yield do not service devices or imply fairness.
    unsupported combinations. Integration changes require maintainer review;
    the probe cannot add a backend to production configuration.
 5. Create a strict probe declaration using the
-   [Native reference](../../../../tests/contracts/os_backend_probe/native.json).
+   [Native reference](../../../../tests/integration/kernels/os_backend_probe/native.json).
    Select `host`, `baremetal` or `kernel`; list exact Google case identities for
    each requirement. Kernel candidates add mask/ISR and real scheduler groups,
    a source lock path and actual retained static kernel API symbols.
@@ -117,5 +117,5 @@ this is not a recommended MCU stack size. POSIX library, process stack, test
 framework and sanitizer overhead must never be compared as embedded adapter cost.
 
 The native reference command and candidate options are documented beside the
-[probe fixture](../../../../tests/contracts/os_backend_probe/README.md). CI must retain
+[probe fixture](../../../../tests/integration/kernels/os_backend_probe/README.md). CI must retain
 raw logs, fresh XML and `report.json`; missing proof is a failed admission probe.

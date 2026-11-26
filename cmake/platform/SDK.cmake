@@ -37,7 +37,7 @@ if(
     if(NEXUS_BUILD_TESTS OR NEXUS_BUILD_WORKLOAD)
         message(
             FATAL_ERROR
-            "The installed source SDK excludes development tests/contracts and their dependencies; validate the complete pinned checkout separately"
+            "The installed source SDK excludes development tests/integration and their dependencies; validate the complete pinned checkout separately"
         )
     endif()
     # Publish the verified source scope for direct and package consumers.

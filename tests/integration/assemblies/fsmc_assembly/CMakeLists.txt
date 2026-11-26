@@ -1,0 +1,19 @@
+cmake_minimum_required(VERSION 3.31)
+project(fsmc_nand_public_consumer LANGUAGES C ASM)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+if(NOT NEXUS_SOURCE_ROOT OR NOT NEXUS_ASSEMBLY_FILE)
+    message(FATAL_ERROR "NAND fixture requires source root and assembly")
+endif()
+find_package(
+    Nexus
+    CONFIG
+    REQUIRED
+    PATHS "${NEXUS_SOURCE_ROOT}/cmake"
+    NO_DEFAULT_PATH
+)
+nexus_add_platform(ASSEMBLY "${NEXUS_ASSEMBLY_FILE}")
+nexus_add_firmware(fsmc_nand_fixture
+    SOURCES "${NEXUS_SOURCE_ROOT}/tests/integration/assemblies/fsmc_reference.c"
+)
+target_compile_definitions(fsmc_nand_fixture PRIVATE NX_REFERENCE_NAND=1)
+nexus_target_warnings(fsmc_nand_fixture STRICT)

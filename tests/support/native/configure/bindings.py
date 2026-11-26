@@ -1,6 +1,6 @@
 """Emit exact host model storage and wiring, without runtime hardware policy."""
 from tools.configure.ir import ControllerIR
-from tools.configure.calls import Address, DirectCall, Symbol
+from tools.configure.generation.calls import Address, DirectCall, Symbol
 
 from tools.configure.providers.common import Construction
 

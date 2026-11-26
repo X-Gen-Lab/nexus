@@ -7,10 +7,11 @@ schema-2 TOML，SoC／Board 事实仍是 JSON，原生 CMake 参数传给维护 
 
 | 目录 | 责任 |
 | --- | --- |
-| `ci/` | 格式、反斜杠 Doxygen、文本、提交消息、Actions、分析器、ARM 工具与供应商身份 |
+| `ci/` | 稳定 CI／hook 入口及其测试：格式、Actions、ARM、OS、供应商身份 |
+| `ci/qualification/` | ARM 资格检查内部共享的预算验证，不提供独立命令 |
 | `setup/` | 每个 clone 的工具和 Git hook 安装 |
 | `validation/` | 真实、最新、非空测试报告准入 |
-| `tools/` | 用户显式调用的格式化动作 |
+| `tools/` | Python 格式化命令与共享开发工具锁读取 |
 
 缺工具、零范围会失败。`scripts/tools/format.py` 显式调用才应用根格式；hook 只检查，
 不悄悄修改或暂存文件。在仓库根安装并检查 Native：

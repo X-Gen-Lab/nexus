@@ -7,8 +7,19 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from tools.configure import (
-    adc, board_hardware, dac, dma_topology, enhanced_endpoints, ethernet,
-    factory, resource_graph, timer_advanced, trigger_graph, usb_device, can)
+    adc,
+    board_hardware,
+    dac,
+    dma_topology,
+    enhanced_endpoints,
+    ethernet,
+    resource_graph,
+    timer_advanced,
+    trigger_graph,
+    usb_device,
+    can
+)
+from tools.configure.generation import factory
 from tools.configure.contracts import CONTROLLER_SELECTION_FIELDS, ENDPOINT_SELECTION_FIELDS
 from tools.configure.ir import (
     CanDomainIR, CanFilterIR, ClockPlanIR, ControllerIR, EndpointIR,
@@ -75,7 +86,7 @@ def resolve(assembly, *, root, soc, board, routes, bindings,
                   "ThreadX " + irq_profile.kernel_port)
     selected = []
     instance_ids = []
-    from tools.configure.shared_irq import IrqClaims
+    from tools.configure.generation.shared_irq import IrqClaims
     irq_claims = IrqClaims(claims, claim)
     for selection in sequence(controller_selections, "selected controllers"):
         location = (selection.get("id", "<unknown>") if isinstance(selection, dict)

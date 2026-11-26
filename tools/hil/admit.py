@@ -19,9 +19,6 @@ from tools.evidence.identity import check_identity, resolved_identity
 from tools.measurement.resources import measure
 
 
-# Physical promotion requires a reviewed tooling change, not fixture editing.
-SOFTWARE_REFERENCE_TARGETS = ()
-
 MAINTAINED_BOARD_TARGETS = (
     ("stm32f407zg-qiming-v31", "STM32F407ZGT6"),
     ("stm32f407ve-sky-qingchun", "STM32F407VET6"),
@@ -64,12 +61,6 @@ def validate_fixture(fixture: dict) -> None:
                 "maintained STM32F4 Board/part identity required")
     if any(target[0] == board for board, _ in SOFTWARE_REFERENCE_BOARD_TARGETS):
         require(target in SOFTWARE_REFERENCE_BOARD_TARGETS,
-                "software-reference Board/part identity cannot be relabelled")
-        require(fixture.get("scope") == "software_reference",
-                "target currently has only a software-reference HIL fixture")
-    if any(target[0] == board or target[1] == part
-           for board, part in SOFTWARE_REFERENCE_TARGETS):
-        require(target in SOFTWARE_REFERENCE_TARGETS,
                 "software-reference Board/part identity cannot be relabelled")
         require(fixture.get("scope") == "software_reference",
                 "target currently has only a software-reference HIL fixture")

@@ -93,7 +93,7 @@ FreeRTOS 的 `task_runtime.c` 实现内核启动、读时钟、延时与 yield�
 以下片段来自三后端实际共用的 C11 消费者：两步操作共用一个绝对预算，业务不包含
 内核分支。它不包含对象装配、内核启动和退出流程，不是完整 `main` 教程。
 
-```{literalinclude} ../../tests/google/os/portable_consumer.c
+```{literalinclude} ../../tests/behavior/os/portable_consumer.c
 :language: c
 :start-at: nx_result_t nx_portable_queue_exchange
 :end-at: }
@@ -240,8 +240,8 @@ shutdown。失败时保留尚未结清的引用，不把 timeout/cancel 当作�
 与 Secure 状态不得进入普通对象。报告分别列对象、栈、payload、内核全局状态、
 Flash 和总保留 RAM，不用单个 `sizeof` 代表整幅镜像。
 
-现有 [Wait 成本夹具](../../tests/contracts/os_wait_cost/README.md)与
-[资源夹具](../../tests/contracts/os_resources/README.md)是当前比较入口，不能
+现有 [Wait 成本夹具](../../tests/integration/resources/os_wait_cost/README.md)与
+[资源夹具](../../tests/integration/resources/os_resources/README.md)是当前比较入口，不能
 把其旧结果标成新 API 的证据。实际 IRQ 延迟、栈峰值、FP/MVE 保留和低功耗时间
 连续性仍需设备验证；本文不新增当前支持或 HIL 结论。
 

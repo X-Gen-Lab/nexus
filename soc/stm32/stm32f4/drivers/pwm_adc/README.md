@@ -98,9 +98,9 @@ session。显式 stop 后通过 cold close 和重新初始化建立新会话，�
 
 ## 验证与消费者
 
-- `tests/google/soc/f407_pwm_adc_test.cpp` 编译生产 C，以外部 MMIO／IRQ／时间叶模型
+- `tests/behavior/soc/stm32/stm32f4/pwm_adc/f407_pwm_adc_test.cpp` 编译生产 C，以外部 MMIO／IRQ／时间叶模型
   验证两模式、拒绝、取消、迟到 IRQ、覆盖、借用别名和部分失败。
-- `tests/contracts/f407_pwm_adc/` 与 `tests/contracts/f407_pwm_adc_loop/` 验证真实
+- `tests/integration/assemblies/f407_pwm_adc/` 与 `tests/integration/assemblies/f407_pwm_adc_loop/` 验证真实
   TOML、生成 factory 和 ARM 链接／预算；冷态链接消费者不执行实板快环。
 - 公共消费者继续通过 `nexus_factory_strong.h` 取得选定 face；有限与连续强类型
   namespace 分开。产品拥有任务、功率板、控制政策和实板测量。
@@ -179,6 +179,6 @@ callback 不保存临时 sample／plan，不调用 task-only I/O、OS、Flash �
 释放后，后续 ADC／优先级恢复失败仍可从原 receipt 重试，不重复热态准入。开启门钟
 后发现的外部 encoder 状态不会被 cold close 清除，只归还本次增加的门钟。
 
-`tests/google/soc/power_stage_test.cpp` 执行生产 C 和真实公共分发，只有物理 MMIO、
-CPU 与时间叶边界由模型提供。`tests/contracts/f407_power_stage/` 检查实际配置、
+`tests/behavior/soc/stm32/stm32f4/pwm_adc/power_stage_test.cpp` 执行生产 C 和真实公共分发，只有物理 MMIO、
+CPU 与时间叶边界由模型提供。`tests/integration/assemblies/f407_power_stage/` 检查实际配置、
 factory 和 ARM 链接。物理波形、采样精度、转矩、时延与保护测试仍为 `not_executed`。

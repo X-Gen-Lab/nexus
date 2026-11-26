@@ -3,7 +3,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass, replace
 from types import MappingProxyType
 
-from tools.configure.calls import Symbol
+from tools.configure.generation.calls import Symbol
 from tools.configure.pinmux import NumericPinMuxPolicy
 from tools.configure.providers.common import fail, integer
 from tools.configure.resource_graph import identifier, normalize_resource

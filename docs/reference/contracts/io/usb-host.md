@@ -67,4 +67,4 @@ Device／Host。一个 composite 独占 core、PHY、pins、clock 和 IRQ；OFF 
 VBUS 放电确认，才进行新角色的供电／cold prepare。切回 Device 等待至少 50 ms
 并确认实际 CMOD；inactive face 纯拒绝，旧 SETUP epoch 不跨角色复用。过流通过
 显式 service 进入同一撤回屏障；硬件限流与实际放电路径由外部电源 owner 提供。
-详见 `tests/contracts/usb_otg_assembly/README.md` 的软件信号合同。
+详见 `tests/integration/assemblies/usb_otg_assembly/README.md` 的软件信号合同。

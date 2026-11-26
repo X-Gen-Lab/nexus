@@ -108,7 +108,7 @@ F4 绑定在 `soc/stm32/stm32f4/drivers/usb/usb_device.c`；PIO 控制器机制�
 `soc/stm32/stm32f4/drivers/ip/dwc_otg_device/`。厂商寄存器布局与位定义来自锁定的
 `vendors/st/cmsis_device_f4/`，芯片资料身份由该家族的 `references.json` 固定。
 Native 外部 MMIO 模型位于 `tests/support/native/drivers/usb_device*`，只在测试
-配置中启用，不作为生产 SoC。公共组件与 F4 绑定分别由 `tests/google/usb_*`
+配置中启用，不作为生产 SoC。公共组件与 F4 绑定分别由 `tests/behavior/usb_*`
 测试和精确 ARM 装配验证；用例数与资源结论以当前提交的真实执行报告为准。
 
 当前精确芯片范围为 F407VE／ZG，板卡范围是启明 V3.1、ZG 核心板、V4.1 和

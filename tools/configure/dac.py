@@ -4,7 +4,7 @@ from dataclasses import dataclass
 import re
 from types import MappingProxyType
 
-from tools.configure.calls import Symbol
+from tools.configure.generation.calls import Symbol
 from tools.configure.providers.common import fail, integer, sequence
 
 

@@ -69,7 +69,7 @@ option(
 )
 if(NEXUS_BUILD_TESTS AND NEXUS_SOC_FAMILY STREQUAL "native")
     enable_testing()
-    add_subdirectory("${NEXUS_SOURCE_DIR}/tests/contracts" tests/contracts)
+    add_subdirectory("${NEXUS_SOURCE_DIR}/tests" tests)
 endif()
 if(NEXUS_BUILD_WORKLOAD)
     include("${NEXUS_SOURCE_DIR}/cmake/platform/Workload.cmake")
@@ -77,7 +77,7 @@ if(NEXUS_BUILD_WORKLOAD)
 endif()
 if(NEXUS_IO_EVOLUTION_FIXTURE)
     include(
-        "${NEXUS_SOURCE_DIR}/tests/contracts/io_evolution_assembly/fixture.cmake"
+        "${NEXUS_SOURCE_DIR}/tests/integration/assemblies/io_evolution_assembly/fixture.cmake"
     )
 endif()
 message(

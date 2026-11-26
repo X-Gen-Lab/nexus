@@ -321,7 +321,7 @@ class CortexCompilerExecutionTests(unittest.TestCase):
         root = Path(__file__).resolve().parents[2]
         selected = gate.tools(os.environ.get('NEXUS_ARM_GCC',
                                              'arm-none-eabi-gcc'))
-        source = root / 'tests/contracts/arch_cmsis_layout_probe.c'
+        source = root / 'tests/integration/arch/arch_cmsis_layout_probe.c'
         for cpu in gate.PROFILES:
             with self.subTest(cpu=cpu):
                 command = gate.cmsis_layout_command(

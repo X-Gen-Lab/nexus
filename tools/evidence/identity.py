@@ -175,7 +175,8 @@ def resolved_identity(path: Path, *, allow_reference: bool = False) -> tuple[dic
 
 def _verify_selected_projection(path: Path, resolved: dict, allow_reference: bool) -> None:
     """Retain full configuration identity without trusting edited output fields."""
-    from tools.configure import configure, emission, metadata
+    from tools.configure import configure, metadata
+    from tools.configure.generation import emission
 
     navigation = file_identity(path.parent / "input_paths.json")
     files = resolved_input_files(path, resolved)

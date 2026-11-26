@@ -7,9 +7,9 @@ from collections.abc import Mapping
 from dataclasses import dataclass, field
 from types import MappingProxyType
 
-from tools.configure.calls import Symbol
+from tools.configure.generation.calls import Symbol
 from tools.configure.providers.common import fail, integer, owned_claims
-from tools.configure.static_ir import Array, Declaration, Flags, Record
+from tools.configure.generation.static_ir import Array, Declaration, Flags, Record
 
 
 def _fields(value, required, optional=()):

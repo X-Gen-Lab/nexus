@@ -8,7 +8,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 import re
 
-from tools.configure.calls import Symbol
+from tools.configure.generation.calls import Symbol
 from tools.configure.pinmux import NumericPinMuxPolicy
 from tools.configure.providers.common import fail, integer, mode_traits
 from tools.configure.records import freeze

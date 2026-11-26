@@ -38,7 +38,20 @@ from tools.configure import device_graph, component_catalog, validation
 from tools.configure.contracts import (
     COMPONENTS, CONTROLLER_KINDS, CONTROLLER_SELECTION_FIELDS,
     ENDPOINT_SELECTION_FIELDS)
-from tools.configure import kernel, memory as memory_regions, metadata, factory, can, usb_device, ethernet, timer_advanced, secondary_controllers, fact_references, clocks, physical_facts
+from tools.configure import (
+    kernel,
+    memory as memory_regions,
+    metadata,
+    can,
+    usb_device,
+    ethernet,
+    timer_advanced,
+    secondary_controllers,
+    fact_references,
+    clocks,
+    physical_facts
+)
+from tools.configure.generation import factory
 from tools.configure.providers import descriptor, maintained
 from tools.configure.selection import (
     validate_clock_profiles, validate_interrupt_profile,
@@ -1251,7 +1264,7 @@ def resolve_ir(assembly_path, root=ROOT, *, input_paths=None,
 
 def generate(result, output):
     """Keep the generation entry point independent of bundle publication."""
-    from tools.configure.emission import emit_bundle
+    from tools.configure.generation.emission import emit_bundle
     return emit_bundle(result, output)
 
 

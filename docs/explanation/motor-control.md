@@ -72,14 +72,14 @@ Motor 输入区分 `sample_time_us`、`angle_time_us`、`observed_at_us` 和
 
 | 配置 | 选定采集与资源 | 边界 |
 | --- | --- | --- |
-| [control.toml](../../tests/contracts/f407_power_stage/control.toml) | TIM8、ADC1 三相加母线顺序 rank、TIM4 | 原始三相不是同时采样 |
-| [single.toml](../../tests/contracts/f407_power_stage/single.toml) | 单轴、ADC1 两路相电流，无必需母线／编码器 | 角度和母线必须由有效的独立来源提供 |
-| [dual.toml](../../tests/contracts/f407_power_stage/dual.toml) | TIM8／ADC1 与 TIM1／ADC2，各自顺序采集；共享 common／IRQ | 不是同 ADC 时分或单轴双 ADC 同时采样 |
-| [pair.toml](../../tests/contracts/f407_power_stage/pair.toml) | 单轴 ADC1＋ADC2 injected simultaneous，各一 rank、相同采样配置 | 独占共同域；无必需母线／编码器，不与独立 ADC2 轴混用 |
-| [center.toml](../../tests/contracts/f407_power_stage/center.toml) | TIM8 完整载波、下降段 CC4、更新 IRQ 门控 | 专用 center 路线；不推导双轴中心对齐或任意脉冲相移 |
-| [tdm.toml](../../tests/contracts/f407_power_stage/tdm.toml) | TIM8／TIM1 两轴中心对齐、相差半载波，共用 ADC1 | 固定双会话共同启动与显式容差；不与 simultaneous pair 组合，也不支持运行中加入 |
-| [dc.toml](../../tests/contracts/f407_power_stage/dc.toml) | 单轴 ADC1 单路母线分流、边沿对齐、每载波两次有效矢量采集 | 无脉冲相移；必须提供合法非零首计划，零电压退化不产生可观测窗口 |
-| [fast.toml](../../tests/contracts/f407_power_stage/fast.toml) | 20 kHz 载波与声明预算 | 配置与链接不证明实际 WCET 或物理运行 |
+| [control.toml](../../tests/integration/assemblies/f407_power_stage/control.toml) | TIM8、ADC1 三相加母线顺序 rank、TIM4 | 原始三相不是同时采样 |
+| [single.toml](../../tests/integration/assemblies/f407_power_stage/single.toml) | 单轴、ADC1 两路相电流，无必需母线／编码器 | 角度和母线必须由有效的独立来源提供 |
+| [dual.toml](../../tests/integration/assemblies/f407_power_stage/dual.toml) | TIM8／ADC1 与 TIM1／ADC2，各自顺序采集；共享 common／IRQ | 不是同 ADC 时分或单轴双 ADC 同时采样 |
+| [pair.toml](../../tests/integration/assemblies/f407_power_stage/pair.toml) | 单轴 ADC1＋ADC2 injected simultaneous，各一 rank、相同采样配置 | 独占共同域；无必需母线／编码器，不与独立 ADC2 轴混用 |
+| [center.toml](../../tests/integration/assemblies/f407_power_stage/center.toml) | TIM8 完整载波、下降段 CC4、更新 IRQ 门控 | 专用 center 路线；不推导双轴中心对齐或任意脉冲相移 |
+| [tdm.toml](../../tests/integration/assemblies/f407_power_stage/tdm.toml) | TIM8／TIM1 两轴中心对齐、相差半载波，共用 ADC1 | 固定双会话共同启动与显式容差；不与 simultaneous pair 组合，也不支持运行中加入 |
+| [dc.toml](../../tests/integration/assemblies/f407_power_stage/dc.toml) | 单轴 ADC1 单路母线分流、边沿对齐、每载波两次有效矢量采集 | 无脉冲相移；必须提供合法非零首计划，零电压退化不产生可观测窗口 |
+| [fast.toml](../../tests/integration/assemblies/f407_power_stage/fast.toml) | 20 kHz 载波与声明预算 | 配置与链接不证明实际 WCET 或物理运行 |
 
 `current_phase_mask` 标识真正测量的逻辑相位，未选槽填零不成为测量。只有
 `bus_valid`／`encoder_valid` 为真时，才能消费相应字段。`sample_at` 是计划触发
@@ -237,15 +237,15 @@ MCSDK 不是自有控制核的依赖，尚未接入的后端也不占位声明�
 
 | 当前能力 | 生产 C | 维护合同测试 | ARM／SDK 与消费者边界 |
 | --- | --- | --- | --- |
-| 标定身份、两／三相换算与单分流重构 | [Current](../../components/control/current/src/current.c) | [电流测试](../../tests/google/components/current_control_test.cpp) | [FOC SDK](../../cmake/package/verification/foc_control/README.md) 消费相电流；单分流另由外部 single consumer 消费 |
-| 电压决策与匹配周期 tracking | [Motor](../../components/control/motor/src/motor.c) | [电机测试](../../tests/google/components/motor_control_test.cpp) | 同一 FOC SDK consumer：Native 执行、F407 纯算法链接，不启动 PowerStage session |
-| 完整脉冲、采样窗口与最终量化电压 | [相电流规划](../../components/control/modulation/src/phase_shunt.c)、[单分流规划](../../components/control/modulation/src/single_shunt.c) | [调制测试](../../tests/google/components/modulation_control_test.cpp) | FOC SDK 选择 phase planner；外部 single consumer 选择 bus planner；未选 planner 不因此进入镜像 |
-| 有限命令、参考交接、连续反馈与 inhibit | [Axis](../../components/control/axis/src/axis.c)、[Drive](../../components/control/drive/src/drive.c) | [轴测试](../../tests/google/components/axis_control_test.cpp)、[交接测试](../../tests/google/components/drive_control_test.cpp) | FOC SDK 组合这条公共链；实际 Task／IRQ 分工由外部应用完成 |
+| 标定身份、两／三相换算与单分流重构 | [Current](../../components/control/current/src/current.c) | [电流测试](../../tests/behavior/components/control/current_control_test.cpp) | [FOC SDK](../../cmake/package/verification/foc_control/README.md) 消费相电流；单分流另由外部 single consumer 消费 |
+| 电压决策与匹配周期 tracking | [Motor](../../components/control/motor/src/motor.c) | [电机测试](../../tests/behavior/components/control/motor_control_test.cpp) | 同一 FOC SDK consumer：Native 执行、F407 纯算法链接，不启动 PowerStage session |
+| 完整脉冲、采样窗口与最终量化电压 | [相电流规划](../../components/control/modulation/src/phase_shunt.c)、[单分流规划](../../components/control/modulation/src/single_shunt.c) | [调制测试](../../tests/behavior/components/control/modulation_control_test.cpp) | FOC SDK 选择 phase planner；外部 single consumer 选择 bus planner；未选 planner 不因此进入镜像 |
+| 有限命令、参考交接、连续反馈与 inhibit | [Axis](../../components/control/axis/src/axis.c)、[Drive](../../components/control/drive/src/drive.c) | [轴测试](../../tests/behavior/components/control/axis_control_test.cpp)、[交接测试](../../tests/behavior/components/control/drive_control_test.cpp) | FOC SDK 组合这条公共链；实际 Task／IRQ 分工由外部应用完成 |
 | 消费／回生独立预算与实际限流 | [Drive](../../components/control/drive/src/drive.c) | 交接测试及外部双 PMSM 合同 | 外部 [双 PMSM SIL](https://github.com/X-Gen-Lab/nexus-examples/blob/eeed791310a1bb6e471d044f7f16f3f542dbe641/recipes/control/dual_motor_drive/sil.c) 实施预算；不是物理母线保护或功耗测量 |
-| F4 相电流、中心采集与独立 ADC 双轴 | [PowerStage owner](../../soc/stm32/stm32f4/drivers/pwm_adc/power_stage.c) | [生产 C 寄存器模型](../../tests/google/soc/power_stage_test.cpp) | 上表 control／single／fast／center／dual 为冷态 ARM fixture，不据此声称实板快环运行 |
-| 单轴双 ADC 同时采集 | [ADC pair](../../soc/stm32/stm32f4/drivers/pwm_adc/adc_pair.c) 与 PowerStage owner | [pair 测试](../../tests/google/soc/adc_pair_test.cpp)及寄存器模型 | `pair.toml` 同时进入 ARM fixture 和规范 Source SDK consumer，仍不测实际孔径 |
+| F4 相电流、中心采集与独立 ADC 双轴 | [PowerStage owner](../../soc/stm32/stm32f4/drivers/pwm_adc/power_stage.c) | [生产 C 寄存器模型](../../tests/behavior/soc/stm32/stm32f4/pwm_adc/power_stage_test.cpp) | 上表 control／single／fast／center／dual 为冷态 ARM fixture，不据此声称实板快环运行 |
+| 单轴双 ADC 同时采集 | [ADC pair](../../soc/stm32/stm32f4/drivers/pwm_adc/adc_pair.c) 与 PowerStage owner | [pair 测试](../../tests/behavior/soc/stm32/stm32f4/pwm_adc/adc_pair_test.cpp)及寄存器模型 | `pair.toml` 同时进入 ARM fixture 和规范 Source SDK consumer，仍不测实际孔径 |
 | 同 ADC 固定时隙双轴及共同退出 | PowerStage owner | 寄存器模型的时隙归属、共同启动与单轴退出合同 | `tdm.toml` 的 ARM／SDK 消费仅覆盖固定半载波参考，不开放 hot-join 或任意调度 |
-| DC-link 两观察、一次计算与完整提交 | [采集叶](../../soc/stm32/stm32f4/drivers/pwm_adc/single_shunt.c)、[周期组装](../../soc/stm32/stm32f4/drivers/pwm_adc/power_stage_dc.c)及 PowerStage owner | [采集测试](../../tests/google/soc/single_shunt_test.cpp)、[周期测试](../../tests/google/soc/power_stage_dc_test.cpp)及寄存器模型 | `dc.toml` 的 ARM／SDK 消费只开放无相移边沿 profile；非零首计划和实际控制组合另由外部 single consumer 检验 |
+| DC-link 两观察、一次计算与完整提交 | [采集叶](../../soc/stm32/stm32f4/drivers/pwm_adc/single_shunt.c)、[周期组装](../../soc/stm32/stm32f4/drivers/pwm_adc/power_stage_dc.c)及 PowerStage owner | [采集测试](../../tests/behavior/soc/stm32/stm32f4/pwm_adc/single_shunt_test.cpp)、[周期测试](../../tests/behavior/soc/stm32/stm32f4/pwm_adc/power_stage_dc_test.cpp)及寄存器模型 | `dc.toml` 的 ARM／SDK 消费只开放无相移边沿 profile；非零首计划和实际控制组合另由外部 single consumer 检验 |
 | 合格角度／母线来源、PMSM 与 CiA402 整机组合 | 外部 [控制组合](https://github.com/X-Gen-Lab/nexus-examples/blob/eeed791310a1bb6e471d044f7f16f3f542dbe641/recipes/control/motor_drive/control.c)、Task adapter 与 [CiA402 桥](https://github.com/X-Gen-Lab/nexus-examples/blob/eeed791310a1bb6e471d044f7f16f3f542dbe641/recipes/network/cia402_motor/cia402_motor.c) | 外部 [维护合同](https://github.com/X-Gen-Lab/nexus-examples/tree/eeed791310a1bb6e471d044f7f16f3f542dbe641/tests/apps/motor_control) | `motor_drive` phase／single 有 ARM consumer；独立双 PMSM 与 CiA402 整机合同在 Native 执行，不据此声明 F4 物理双轴或 CAN 网络通过 |
 
 Source SDK 的对应关系由[现有消费计划](../../tools/maintenance/consumer_profiles.py)
@@ -253,7 +253,7 @@ Source SDK 的对应关系由[现有消费计划](../../tools/maintenance/consum
 pair／tdm／dc 三个精确冷态装配。本表不另定义一份消费选择。
 
 ARM fixture 与 SDK 冷态 consumer 检验配置、公共接口、选编、链接和资源；
-[fixture main](../../tests/contracts/f407_power_stage/main.c) 不启动电驱 session。
+[fixture main](../../tests/integration/assemblies/f407_power_stage/main.c) 不启动电驱 session。
 寄存器模型执行真实 provider C，PMSM 模型执行控制组合；两者都不能证明真实
 开关、采样孔径、IRQ 延迟或电气保护。物理 HIL 仍为 `not_executed`。
 未列出的拓扑组合、固定相移 mapper、TDM 运行中加入及非 F4 provider 保持未开放。

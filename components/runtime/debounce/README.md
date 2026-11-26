@@ -18,6 +18,6 @@
 采样与分发复用已有 device/owner 和队列路径。长按、双击、连发、输入映射及故障
 处置由产品提供；去抖器不带这些策略，也不引入另一个输入 broker。
 
-GoogleTest 位于 `tests/google/components/common_debounce_test.cpp`，验证精确边界、
+GoogleTest 位于 `tests/behavior/components/runtime/common_debounce_test.cpp`，验证精确边界、
 抖动重启、非对称窗口、倒退拒绝、域上限和实例隔离。宿主结果不证明实物采样周期、
 GPIO 电气特性或输入器件的抖动参数。

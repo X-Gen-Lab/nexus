@@ -26,12 +26,12 @@ soc/stm32/stm32f4/
   private/
   sdk/
 boards/
-components/{algorithms,control,runtime,buses,devices,services,protocols}/
+components/{algorithms,control,runtime,buses,devices,services,protocols,ui}/
 os/{baremetal,freertos,threadx,native}/
-cmake/{platform,presets,toolchains,testing,package}/
+cmake/{platform,presets,toolchains,package}/
 tools/{configure,dev,documentation,evidence,hil,maintenance,measurement,schemas,testing}/
 scripts/{ci,setup,tools,validation}/
-tests/{google,contracts,support,cmake,cmsis_host}/
+tests/{behavior,integration,support,cmake}/
 docs/{tutorials,guides,explanation,reference,development}/
 dependencies/
 ext/
@@ -52,8 +52,8 @@ vendors/
 | 包、binding 与接入边界 | [接入指南](../guides/provider-porting.md)、[package loader](../../tools/configure/packages.py) |
 | 资料身份与已审适用范围 | 包内 `facts/review_profiles.json`、[ProfileSet](../../tools/configure/reference_profiles.py) |
 | 领域与私有值 | [DomainPolicies](../../tools/configure/domain_policies.py)、[IR](../../tools/configure/ir.py) |
-| 静态对象与 IRQ／endpoint 连接 | [StaticRecipe／StaticObjects](../../tools/configure/static_recipe.py)、[SharedIrq](../../tools/configure/shared_irq.py)、[ChildGroups](../../tools/configure/static_endpoints.py) |
-| 单层声明和值片段 | [StaticFragments](../../tools/configure/static_fragments.py) |
+| 静态对象与 IRQ／endpoint 连接 | [StaticRecipe／StaticObjects](../../tools/configure/generation/static_recipe.py)、[SharedIrq](../../tools/configure/generation/shared_irq.py)、[ChildGroups](../../tools/configure/generation/static_endpoints.py) |
+| 单层声明和值片段 | [StaticFragments](../../tools/configure/generation/static_fragments.py) |
 | 配置与构建 | [工具](../../tools/README.md)、[CMake](../../cmake/README.md) |
 | 模型、链接与执行证据 | [测试](../../tests/README.md)、[交付边界](../reference/platforms/index.md) |
 
@@ -83,7 +83,7 @@ Native 必须显式启用测试 scope，不进入生产系列目录或能力聚�
 
 公共头位于所属模块的 `include/nexus/`，实现与内部合同分别放在 `src/` 和
 `private/`；只在实际规模需要时增加子目录，不要求每个叶子拥有相同空层级。
-新组件加入既有七类之一并显式登记 CMake；新增同类器件优先维护精确事实和复用 C。
+新组件加入相应职责分类并显式登记 CMake；新增同类器件优先维护精确事实和复用 C。
 新增公共语义仍需同时审查接口、配置和验证，不假设任意硬件都能只填数据。
 
 `tools/` 维护可复用的主机能力，`scripts/` 提供安装和工程门禁入口，`.github/`

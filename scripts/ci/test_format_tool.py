@@ -166,7 +166,7 @@ class FormatToolTests(unittest.TestCase):
     def test_check_uses_root_style_and_preserves_tool_diagnostics(self):
         (self.root / "arch/.clang-format").write_text("BasedOnStyle: Google\n")
         status, _, error, run = self.invoke(
-            ["check", "--files", str(self.source)], self.tool_results(1, "formatting diagnostic"))
+            ["--check", "--files", str(self.source)], self.tool_results(1, "formatting diagnostic"))
         self.assertEqual(status, 1)
         self.assertIn("formatting diagnostic", error)
         command = run.call_args_list[-1].args[0]
@@ -215,15 +215,6 @@ class FormatToolTests(unittest.TestCase):
                              "int value = 1;\n")
         self.assertEqual(self.source.read_text(), "int value=1;\n")
 
-    @unittest.skipUnless(os.name == "posix", "Shell wrapper requires POSIX")
-    def test_shell_wrapper_preserves_foreign_working_directory_and_failure(self):
-        command = ["bash", str(REPO / "scripts/tools/format.sh"), "check", "--tool",
-                   "nexus-missing-clang-format", "--files",
-                   str(REPO / "arch/arm/cortex_m/nx_arch_cortex_m.c")]
-        result = subprocess.run(command, cwd=self.root, capture_output=True, text=True, timeout=30)
-        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
-        self.assertIn("nexus-missing-clang-format", result.stderr)
-        self.assertNotIn("Checked", result.stdout)
 
 
 if __name__ == "__main__":

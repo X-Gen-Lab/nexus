@@ -63,17 +63,17 @@ def validate_fixtures(root, assemblies, *, family=None, project=None):
     selected_project = None
     if project is not None:
         selected_project = source_path(root, project)
-        if not selected_project.is_relative_to(root / "tests/contracts"):
-            raise EvidenceError("project must be an owned tests/contracts directory")
+        if not selected_project.is_relative_to(root / "tests/integration"):
+            raise EvidenceError("project must be an owned tests/integration directory")
         owned_file(selected_project / "CMakeLists.txt")
     rows, seen = [], set()
     for value in assemblies:
         path = owned_file(source_path(root, value))
-        contract = path.is_relative_to(root / "tests/contracts")
+        contract = path.is_relative_to(root / "tests/integration")
         canonical = path.parent == root / "tools/configure/assemblies"
         if path.suffix != ".toml" or not (
                 contract or (selected_project is not None and canonical)):
-            raise EvidenceError("fixture must be an owned tests/contracts TOML "
+            raise EvidenceError("fixture must be an owned tests/integration TOML "
                                 "or explicit canonical input")
         if path in seen:
             raise EvidenceError("duplicate fixture cannot count as another execution")

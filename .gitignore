@@ -6,6 +6,10 @@ _build/
 out/
 cmake-build-*/
 nonexistent_build_dir/
+
+# Authored build-system tests are source, not build output.
+!tools/testing/build/
+!tools/testing/build/*.py
 /.ccache/
 
 # IDE

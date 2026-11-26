@@ -3,10 +3,24 @@
 `dev.py` 直接调用 CMake／CTest，保留真实退出码、日志与实际构建来源。
 产品应用、调度策略和私有板级数据放在外部仓库。
 
-`fault_decode.py` 在主机上校验并解码固定格式的保留故障记录。未提供 ELF 时只输出
-数值事实；提供 ELF 时，先核对应用嵌入的 16 字节 `nx_fault_build_id`，再调用
-`arm-none-eabi-addr2line` 解析 PC／LR。当前支持 F407 的小端 ARM ELF32 配置。
-构建标识应由应用保证每次构建唯一；标识和 CRC 都不提供认证。
+`fault_decode.py` 在主机上校验并解码固定 160 字节的保留故障记录。应用为每次构建
+分配唯一、非零的 16 字节标识，将 `const uint8_t nx_fault_build_id[16]` 保留在
+未剥离 ELF 的只读 LOAD 中，并将相同字节传给捕获入口。保存完整 ELF 和该次构建
+的来源记录。原始解码验证长度、提交字、CRC、版本、保留字段和标识。
+
+```sh
+python tools/dev/fault_decode.py fault.bin --elf firmware.elf \
+    --provenance build/target/quality/build-provenance.json
+```
+
+`--elf` 核对镜像内标识后才用 `arm-none-eabi-addr2line` 解析有效核心帧的 PC／LR。
+`--provenance` 进一步验证已保存的构建清单及原有文件，要求清单包含传入 ELF 的
+准确字节和已解析配置，输出 ELF 与配置的 SHA-256。`dev.py build --record-provenance`
+生成此格式。原始记录的 CRC 和构建标识用于损坏检查与匹配。
+
+`--redact` 只输出 `version`、`sequence`、`flags` 和 `build_id`，可以同时要求
+镜像及来源核对。它保留原始文件且不运行符号解析。原始记录、完整 JSON、ELF、
+构建清单与诊断日志的访问和披露由产品管理。
 
 ```sh
 python tools/dev/dev.py doctor --target native
@@ -92,9 +106,12 @@ python tools/dev/dev.py docs check
 `doctor` 只诊断所选工具和环境，不扫描全平台能力。`check` 执行格式与完整开发门禁。
 普通 commit hook 读取完整暂存区，运行全部 Native GoogleTest；普通固件实现改动不触发
 整套辅助工具域，公共头、声明事实和工具改动选择完整的相关测试模块，未知输入保守执行完整域。
-快速提交报告明确标记有限 scope，不能替代完整验收。合并前用 `check` 或 `--all` 执行
-完整工具域，独立执行其他 Native 模式、
-ARM 链接和独立 Source SDK 消费者。GoogleTest／GoogleMock 仅链接到主机测试。
+CI 与 SDK 使用同一个私有行为测试路径判断。只改这类测试时，CI 保持 Native 验证，
+跳过工具域，SDK 消费计划也跳过该输入。混合与未知输入保持保守的验证范围。
+快速提交报告明确标记有限 scope。`check` 执行整仓风格检查，再由 `tdd_gate.py --all`
+执行完整 Native 和 `testing`、`configure`、`ci` 三个常规工具域。按交付范围分别运行
+`integration`、`freertos`、文档、其他 Native 模式、ARM 链接和 Source SDK 消费者。
+GoogleTest／GoogleMock 仅链接到主机测试。
 
 `create` 创建外部工程；`timings` 直接汇总已有执行记录。普通 configure／build 不自动
 生成完整来源归档；需用于设备操作的精确映像身份时显式传入 `--record-provenance`。

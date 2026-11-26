@@ -8,7 +8,8 @@ import hashlib
 from pathlib import Path
 import tempfile
 
-from tools.configure import emission, selected_contracts
+from tools.configure import selected_contracts
+from tools.configure.generation import emission
 from tools.configure.providers import descriptor, for_selection
 from tools.configure.providers.common import fail
 

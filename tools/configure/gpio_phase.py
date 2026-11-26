@@ -9,8 +9,8 @@ from collections.abc import Mapping
 
 from tools.configure.providers import for_selection
 from tools.configure.providers.common import fail, owned_claims
-from tools.configure.calls import Symbol
-from tools.configure.static_ir import ArrayElementAddress
+from tools.configure.generation.calls import Symbol
+from tools.configure.generation.static_ir import ArrayElementAddress
 
 
 def selected_pins(result):

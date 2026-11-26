@@ -10,6 +10,7 @@ import tarfile
 import tempfile
 import unittest
 from unittest.mock import patch
+from urllib.error import HTTPError
 
 from tools.documentation import install
 
@@ -37,6 +38,15 @@ class DocumentationInstallTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "offline"):
                 install.fetch_blob(self.folder, locked, offline=True)
         network.assert_not_called()
+
+    def test_download_error_identifies_the_locked_archive(self):
+        locked = {"filename": "locked.whl", "sha256": "0" * 64,
+                  "size": 3, "url": "https://example.invalid/file"}
+        failure = HTTPError(locked["url"], 404, "Not Found", None, None)
+        with patch.object(install.urllib.request, "urlopen", side_effect=failure):
+            with self.assertRaisesRegex(ValueError, r"locked\.whl.*404"):
+                install.fetch_blob(self.folder, locked, offline=False)
+        self.assertEqual(list(self.folder.iterdir()), [])
 
     def test_existing_bad_blob_is_not_silently_redownloaded(self):
         archive = self.folder / "existing.whl"

@@ -170,7 +170,7 @@ loans。
 或寄存器 reset 外观当作过去借用已经退出。该合同只规定软件退出与帧发布边界，
 不建立 sensor 配置、电气连接或实测图像质量资格。
 
-`tests/contracts/f407_capture_audio/ve-frames-raw.toml` 与 `frame_session.c`
+`tests/integration/assemblies/f407_capture_audio/ve-frames-raw.toml` 与 `frame_session.c`
 组成完整的公共软件消费者：显式提供三个128B slot、8×8 RAW12 的16-bit容器布局、
 两个完整帧和绝对 deadline。输入源必须产生该声明的图像；夹具不猜测或配置 sensor。
 第一个已发布 consumer token 保留到 producer stop 成功后，再单独 release；
@@ -372,7 +372,7 @@ READY 仍留在原队列。连续 `base.transferred` 选择 RX 时统计已发�
 普通拒撤可在原 epoch 重试，丢失历史不能用恢复寄存器外观解除。SETTLED 是对
 session 和生产／消费权限的最后访问，不撤销先前独立的 RX consumer loans。
 
-`tests/contracts/stm32f4_sai/` 保留原四个有限 reference，并新增 F446 SAI2、F479
+`tests/integration/assemblies/stm32f4_sai/` 保留原四个有限 reference，并新增 F446 SAI2、F479
 稀疏 mask 的 master／slave duplex blocks。两个公共消费者分别覆盖布局和显式
 caller-owned session。GoogleTest 验证真实 C 的交接、欠供给、替换拒写、CT 竞态、
 epoch 与停止失败；ARM ELF／Source SDK 分别验证实际源码选择及外部消费。
@@ -381,13 +381,13 @@ PCB、codec、外部时钟、波形、FIFO 余量与持续负载仍须物理执�
 
 ## 装配与验证入口
 
-`tests/contracts/f407_capture_audio/` 是外部 software-only Board 夹具，覆盖 VE RAW12
+`tests/integration/assemblies/f407_capture_audio/` 是外部 software-only Board 夹具，覆盖 VE RAW12
 配 I2S2 duplex、ZG embedded RAW blocks 配 I2S3、ZG RAW14、JPEG 以及 I2S3 MCLK。
 `jpeg_blocks/ve-jpeg-blocks.toml` 复用 VE 软件路线，独立强类型消费者显式提供三个
 4096 B bank 并调用 start／service／acquire／release／stop；不增加其他有限夹具的 RAM。
-它们不修改公共 Board 的接线事实。`tools/configure/tests/test_f407_capture_audio_configuration.py`
+它们不修改公共 Board 的接线事实。`tools/configure/tests/resources/peripherals/test_f407_capture_audio_configuration.py`
 检查严格字段、typed IR、真实 claims、pure factory 及固定生命周期连接。
-`tests/google/soc/f407_capture_audio_test.cpp` 编译真实 C11 owner 和官方 DCMI cold Init，
+`tests/behavior/soc/stm32/stm32f4/audio_video/f407_capture_audio_test.cpp` 编译真实 C11 owner 和官方 DCMI cold Init，
 只替换 CPU／MMIO 边界；失败 drain、迟到 IRQ、CT 歧义、欠替代 buffer、原始借用及
 多实例共享时钟均在同一个完整程序中执行。模型结果、ARM ELF 和 HIL 分别验收；
 本软件工作不执行 HIL。

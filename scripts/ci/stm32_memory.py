@@ -15,11 +15,8 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
-try:
-    from . import arch_compile, memory_budget
-except ImportError:
-    import arch_compile
-    import memory_budget
+from scripts.ci import arch_compile
+from scripts.ci.qualification import memory_budget
 from tools.measurement.elf import Elf32
 from tools.measurement.resources import measure_data
 
@@ -132,13 +129,13 @@ def verify_inputs(inputs):
 
 def source_inputs(root):
     inputs = [root / "CMakeLists.txt", Path(__file__).resolve(),
-              root / "scripts/ci/memory_budget.py",
+              root / "scripts/ci/qualification/memory_budget.py",
               root / "scripts/ci/arch_compile.py"]
     for directory in ("arch", "core", "io", "os", "soc/stm32/stm32f4",
                       "boards/stm32f407_qiming_v31",
                       "boards/stm32f407ve_sky_qingchun", "cmake",
                       "tools/configure", "tools/measurement", "tools/evidence",
-                      "tests/contracts/stm32_memory"):
+                      "tests/integration/resources/stm32_memory"):
         inputs.extend(path for path in (root / directory).rglob("*")
             if path.is_file() and path.suffix in {
                 ".c", ".h", ".S", ".cmake", ".py", ".json", ".toml"})
@@ -166,7 +163,7 @@ def run(root, compiler, output, parallel=2):
         for name, tool in tools.items():
             recorder.execute([tool, "--version"], name + "-version", nonempty=True)
         report["source_inputs"] = source_inputs(root)
-        fixture = root / "tests/contracts/stm32_memory"
+        fixture = root / "tests/integration/resources/stm32_memory"
         for variant, (part, selected) in VARIANTS.items():
             build = output / variant
             recorder.execute([tools["cmake"], "-S", str(fixture), "-B", str(build),

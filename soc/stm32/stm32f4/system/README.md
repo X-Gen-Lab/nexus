@@ -77,7 +77,7 @@ source ready、PLL、总线、CSS、SSCG、所需 Flash latency 和 HSI reset tr
 三种精确器件策略保留直接 HSI16／AHB16／APB16、主 PLL 关闭的路径，并接纳下表
 的显式 HSI PLL 元组。它们仍使用 `clock = "custom"` 与完整
 `[clock_parameters]`，不会自动从型号推断最高频率。可构建的完整 CRC 装配见
-[器件软件参考](../../../../tests/contracts/stm32f4_family/README.md)。
+[器件软件参考](../../../../tests/integration/assemblies/stm32f4_family/README.md)。
 
 | 精确型号 | PLL M/N/P/Q | SYSCLK／AHB | APB1／APB2 | ADC 域（除 4 参考） | Flash wait states |
 | --- | --- | --- | --- | --- | --- |
@@ -239,7 +239,7 @@ APB 与前述 RUN 表一致，ADC 除4、声明 3.3 V、CSS 关闭、无 PLLSAI�
 
 RTC 的 BYPSHAD 读取、RSF／INIT 交接、DBP 即时读回与独立事件 receipt 复用真实 C
 实现。主机回归覆盖新料号的 Power admission、失败恢复以及 RTC/System/Platform
-共同路径。独立软件消费者见 [F4 Power 参考](../../../../tests/contracts/stm32f4_power/README.md)。
+共同路径。独立软件消费者见 [F4 Power 参考](../../../../tests/integration/assemblies/stm32f4_power/README.md)。
 软件构建不证明 LSE 精度、唤醒延迟、实际低功耗、VDD/VBAT 保留或复位行为。
 
 F479 的 ES0321 §2.2.13 要求 RTC Standby 唤醒后先清 SBF、再系统复位，才能可靠
@@ -395,11 +395,12 @@ Kernel 只补保守下界对应的完整 tick，并重建完整首 tick。旧部
 累计前次不确定度，不能把重置后的单次收条当成累计时间误差。
 
 失去 RTC／Core 计时证明、观察到超过声明的停钟时间或 SysTick 恢复失败时，保持
-mask 与 tick 责任并 fail-stop。普通准入拒绝恢复同一来源后返回收条；RTC ack 失败
-仍保持错误可观察。原 `nx_stm32_power_enter` 的未屏蔽 Thread 合同保持不变；私有
+mask 与 tick 责任并 fail-stop。暂停 tick 后、Core epoch 改变前如遭准入拒绝，从原
+时间域恢复同一个 SysTick 和剩余相位，再返回错误收条。RTC ack 失败仍保持错误可观察。原
+`nx_stm32_power_enter` 的未屏蔽 Thread 合同保持不变；私有
 `stm32f4_idle_power.h` 仅供持有审核 tick handoff 的 masked Idle 适配器使用。
 旧 Core epoch 的请求、deadline 和 RTC admission generation 不能直接复用。
 
-`tests/contracts/f407_freertos_stop/` 是真实配置和 ARM 链接消费者，不运行 scheduler
+`tests/integration/kernels/f407_freertos_stop/` 是真实配置和 ARM 链接消费者，不运行 scheduler
 或 STOP；模型测试分别验证 RTC 叶操作、tick handoff、Power 事务和实际 Idle 编排。
 物理功耗、LSE 漂移和唤醒延迟保持 `not_executed`。

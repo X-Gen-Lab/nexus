@@ -170,7 +170,7 @@ def execute(root: Path, recorder, tools: dict, variant: dict) -> dict:
     cmake = shutil.which('cmake')
     if cmake is None or shutil.which('ninja') is None:
         raise ValueError('Actual CMake and Ninja are required')
-    recorder.execute([cmake, '-S', str(root / 'tests/contracts/os_mpu'), '-B', str(build),
+    recorder.execute([cmake, '-S', str(root / 'tests/integration/kernels/os_mpu'), '-B', str(build),
                       '-G', 'Ninja', '-DCMAKE_TOOLCHAIN_FILE=' +
                       str(root / 'cmake/toolchains/arm-gcc.cmake'),
                       '-DCMAKE_C_COMPILER=' + tools['gcc'],
@@ -271,7 +271,7 @@ def missing_idle(root: Path, recorder, tools: dict, variant: dict) -> dict:
         stream.write('\n[os]\nprofile="minimal"\nmemory_protection=true\n')
     build = directory / 'build'
     cmake = shutil.which('cmake')
-    recorder.execute([cmake, '-S', str(root / 'tests/contracts/os_mpu'), '-B', str(build),
+    recorder.execute([cmake, '-S', str(root / 'tests/integration/kernels/os_mpu'), '-B', str(build),
                       '-G', 'Ninja', '-DCMAKE_TOOLCHAIN_FILE=' +
                       str(root / 'cmake/toolchains/arm-gcc.cmake'),
                       '-DCMAKE_C_COMPILER=' + tools['gcc'],
@@ -303,7 +303,7 @@ def missing_idle(root: Path, recorder, tools: dict, variant: dict) -> dict:
 def source_inputs(root: Path) -> list[dict]:
     inputs = {item['path']: item for item in cortex_runtime.source_inputs(root)}
     paths = [Path(__file__), root / 'os/freertos/mpu/prepare_port.py']
-    paths.extend(path for path in (root / 'tests/contracts/os_mpu').glob('*')
+    paths.extend(path for path in (root / 'tests/integration/kernels/os_mpu').glob('*')
                  if path.is_file())
     paths.extend((root / 'ext/freertos/include').glob('*.h'))
     paths.extend(root / 'ext/freertos' / name for name in ('tasks.c', 'queue.c', 'list.c'))

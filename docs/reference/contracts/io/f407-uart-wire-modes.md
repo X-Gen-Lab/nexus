@@ -43,7 +43,7 @@ SoC 私有 `nx_stm32_uart_wire_config_t`。PSC／guard 等原始参数属于显�
 ![FIG-04：静态 factory 与独立状态](../../../assets/diagrams/factory-instances.svg)
 
 此图沿用现有 factory／face／state 关系，不表示某块 PCB 已接入新线模式。
-完整软件资源参考为 `tests/contracts/uart_wire_assembly/six-wire-ve.toml` 和
+完整软件资源参考为 `tests/integration/assemblies/uart_wire_assembly/six-wire-ve.toml` 和
 `six-wire-zg.toml`：USART1 同步、USART2 Smartcard、USART3 RTS／CTS、UART4
 单线、UART5 LIN、USART6 IrDA；两个 Board package 明确为软件 fixture。
 

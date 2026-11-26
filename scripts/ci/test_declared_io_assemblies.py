@@ -9,7 +9,7 @@ from tools.configure import configure, packages
 from tools.maintenance import capabilities
 
 ROOT = Path(__file__).resolve().parents[2]
-FIXTURES = ROOT / "tests/contracts/declared_io_assembly"
+FIXTURES = ROOT / "tests/integration/assemblies/declared_io_assembly"
 GROUPS = {'f407', 've-duplex', 'f407-input', 've-duplex-continuous', 've-word-adc-can', 'f407-output', 've-rx-idle', 've-rx-continuous'}
 HISTORICAL_MODES = {'STM32F407ZGT6': {('GPIOE', 'input'), ('GPIOB', 'input'), ('GPIOG', 'output'), ('EXTI0', 'edge-event'), ('GPIOA', 'input'), ('GPIOA', 'output'), ('GPIOG', 'input')}}
 VE_MODES = {

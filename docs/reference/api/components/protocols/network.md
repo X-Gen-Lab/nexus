@@ -182,7 +182,7 @@ terminate TLS. Each lwIP process owns its own serialized stack and clock.
 [Editable DOT](../../../../assets/diagrams/lwip-tcp-tls-mqtt-host.dot) and the
 [network contract](../../../../../components/protocols/network/README.md) and
 [maintained relay
-fixture](../../../../../tests/contracts/lwip_mqtt_interop/README.md) define this
+fixture](../../../../../tests/integration/protocols/lwip_mqtt_interop/README.md) define this
 figure's source and lifetime boundaries.
 
 The host fixtures exercise actual pinned stack and protocol implementations with

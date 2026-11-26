@@ -77,6 +77,6 @@ HOLDING 可以保留命令超时原因并继续 step；反馈失效等硬错误�
 disable 只关闭算法准入。provider 的输出抑制、IRQ／DMA 撤回、借用 SETTLED 和
 使用者 join 仍由外部 owner 完成。故障只能在 DISABLED 中显式清除，清除后仍不使能。
 
-`tests/google/components/axis_control_test.cpp` 执行真实 C，检查接纳／采用、限制、
+`tests/behavior/components/control/axis_control_test.cpp` 执行真实 C，检查接纳／采用、限制、
 到位、参数完整性、周期绑定、超时及独立实例。主机行为不建立实板控制稳定性或
 最坏执行时间。物理 HIL 保持 `not_executed`。

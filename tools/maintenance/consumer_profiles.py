@@ -139,6 +139,24 @@ SERVICE_CONSUMERS = (
       for mode in ("pair", "tdm", "dc")),
 )
 NATIVE_TIME_SMOKES = frozenset({"native-time-pair", "native-time-empty"})
+F4_SCENARIO_DIRECTORIES = {
+    "f4_capture_audio": "assemblies/f407_capture_audio",
+    "f4_crypto": "assemblies/stm32f4_crypto",
+    "f4_family": "assemblies/stm32f4_family",
+    "f4_freertos_stop": "kernels/f407_freertos_stop",
+    "f4_gpio": "assemblies/stm32f4_family",
+    "f4_graphics": "assemblies/stm32f4_graphics",
+    "f4_graphics_sdram": "assemblies/stm32f4_graphics_sdram",
+    "f4_power": "assemblies/stm32f4_power",
+    "f4_power_stage": "assemblies/f407_power_stage",
+    "f4_pwm_adc": "assemblies/f407_pwm_adc",
+    "f4_pwm_adc_loop": "assemblies/f407_pwm_adc_loop",
+    "f4_qspi": "assemblies/stm32f4_qspi",
+    "f4_qspi_mapped": "assemblies/stm32f4_qspi",
+    "f4_sai": "assemblies/stm32f4_sai",
+    "f4_sdio_hs": "assemblies/stm32f4_sdio_hs",
+    "f4_sdram": "assemblies/stm32f4_sdram",
+}
 
 
 def selected_domain(specification):
@@ -159,16 +177,7 @@ def consumer_plan():
 
 def service_directory(sdk, specification):
     """Use the single owned scenario tree, including shared F4 references."""
-    if specification.scenario == "f4_gpio":
-        return Path(sdk) / "tests/contracts/stm32f4_family"
-    if specification.scenario == "f4_qspi_mapped":
-        return Path(sdk) / "tests/contracts/stm32f4_qspi"
-    if specification.scenario == "f4_capture_audio":
-        return Path(sdk) / "tests/contracts/f407_capture_audio"
-    if specification.scenario in {"f4_pwm_adc", "f4_pwm_adc_loop",
-                                  "f4_freertos_stop", "f4_power_stage"}:
-        return Path(sdk) / "tests/contracts" / specification.scenario.replace(
-            "f4_", "f407_", 1)
-    return (Path(sdk) / "tests/contracts" / ("stm32" + specification.scenario)
-            if specification.scenario.startswith("f4_") else
-            Path(sdk) / "cmake/package/verification" / specification.scenario)
+    scenario = specification.scenario
+    if scenario.startswith("f4_"):
+        return Path(sdk) / "tests/integration" / F4_SCENARIO_DIRECTORIES[scenario]
+    return Path(sdk) / "cmake/package/verification" / scenario

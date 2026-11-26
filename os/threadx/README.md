@@ -176,7 +176,7 @@ CMake 目标必须真实编译、链接使用 `_GNU_SOURCE`／`Threads::Threads`
 和两种 IRQ 策略，共四个正向组合；另执行缺外部 Tick 实现的负链接测试。
 它核对同地址强符号官方 PendSV
 别名、全部锁定已编译内核对象、解析后的策略、ELF 预算和精确证据身份。
-`tests/google/os/threadx.cmake` 选择独立真实 Linux 内核，各维护目标完整发现、
+`tests/behavior/os/threadx.cmake` 选择独立真实 Linux 内核，各维护目标完整发现、
 执行运行期／初始化／外部边界用例，并生成全新报告。Linux 信号合同还验证完整
 屏蔽状态恢复，以及等待前已真实排队的恢复信号。最终干净源码候选、SDK 与物理
 资格均独立于开发阶段执行。

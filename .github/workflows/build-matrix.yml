@@ -286,20 +286,20 @@ jobs:
           - stm32f4_family
         include:
           - fixture: stm32f4_family
-            project: tests/contracts/stm32f4_family
+            project: tests/integration/assemblies/stm32f4_family
             assemblies: |
-              tests/contracts/stm32f4_family/f405zg.toml
-              tests/contracts/stm32f4_family/f407zg.toml
-              tests/contracts/stm32f4_family/f411re.toml
-              tests/contracts/stm32f4_family/f415zg.toml
-              tests/contracts/stm32f4_family/f417zg.toml
-              tests/contracts/stm32f4_family/f446ze.toml
-              tests/contracts/stm32f4_family/f479ni.toml
+              tests/integration/assemblies/stm32f4_family/f405zg.toml
+              tests/integration/assemblies/stm32f4_family/f407zg.toml
+              tests/integration/assemblies/stm32f4_family/f411re.toml
+              tests/integration/assemblies/stm32f4_family/f415zg.toml
+              tests/integration/assemblies/stm32f4_family/f417zg.toml
+              tests/integration/assemblies/stm32f4_family/f446ze.toml
+              tests/integration/assemblies/stm32f4_family/f479ni.toml
           - fixture: stm32f4_gpio
-            project: tests/contracts/stm32f4_family/gpio
+            project: tests/integration/assemblies/stm32f4_family/gpio
             assemblies: |
-              tests/contracts/stm32f4_family/f407zg-gpio.toml
-              tests/contracts/stm32f4_family/f479ni-gpio.toml
+              tests/integration/assemblies/stm32f4_family/f407zg-gpio.toml
+              tests/integration/assemblies/stm32f4_family/f479ni-gpio.toml
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -315,7 +315,7 @@ jobs:
           PROVIDER_PROJECT: ${{ matrix.project || '' }}
           PROVIDER_ASSEMBLIES: ${{ matrix.assemblies || '' }}
         run: |
-          fixture="tests/contracts/$FIXTURE"
+          fixture="tests/integration/assemblies/$FIXTURE"
           arguments=()
           if [ -n "$PROVIDER_PROJECT" ]; then
             arguments+=(--project "$PROVIDER_PROJECT")

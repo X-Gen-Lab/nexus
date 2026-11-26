@@ -47,8 +47,8 @@ SETTLED。停止先撤回 QSPI 请求源，再观察 stream EN=0，清地址、�
 撤回 HAL 回调和缓冲指针；清理被拒绝时继续保留输入和请求。停止预算到期进入
 QUARANTINED，后续显式重试实际 join，不重放 page program 或重置共享 DMA2。
 两种模式的软件参考分别见
-[PIO 装配](../../../../tests/contracts/stm32f4_qspi/f479ni-qspi.toml) 与
-[编程 DMA 装配](../../../../tests/contracts/stm32f4_qspi/f479ni-qspi-dma.toml)。
+[PIO 装配](../../../../tests/integration/assemblies/stm32f4_qspi/f479ni-qspi.toml) 与
+[编程 DMA 装配](../../../../tests/integration/assemblies/stm32f4_qspi/f479ni-qspi-dma.toml)。
 
 取消或 deadline 阻止下一脉冲，不能撤销已发生的写擦；中途 ABORT 仍可能启动部分
 page program。请求／输入持续借用，直到控制器和器件实际退出并发布 SETTLED。
@@ -93,8 +93,8 @@ DDRM=0 并继续执行完整 FIFO／ABORT 退出。§2.4.2 的写入 dummy 问�
 6Bh 的 CCR／AR／DLR 必须在提供输出指针前全部读回一致；失败或超时的返回不得
 继续访问调用者输出，未完成的硬件清理仍保留原 owner。
 
-软件参考分别为 [Quad PIO 装配](../../../../tests/contracts/stm32f4_qspi/f479ni-qspi-quad.toml)
-和 [Quad Read＋program DMA 装配](../../../../tests/contracts/stm32f4_qspi/f479ni-qspi-quad-dma.toml)。
+软件参考分别为 [Quad PIO 装配](../../../../tests/integration/assemblies/stm32f4_qspi/f479ni-qspi-quad.toml)
+和 [Quad Read＋program DMA 装配](../../../../tests/integration/assemblies/stm32f4_qspi/f479ni-qspi-quad-dma.toml)。
 它们不启用 quad program、QPI／DDR、dual Flash、映射或 XIP。
 
 ES0321 §2.4.5 进一步要求
@@ -114,4 +114,4 @@ release 失败后，调用者已完成的 CPU 读取不得继续；保留 loan �
 release；若 epoch 已改变而旧 loan 未 join，必须保持隔离并由产品恢复或复位，不能
 回滚 epoch 使旧 token 复活。平台不承诺自动恢复。
 
-ES0321 §2.4.3 要求先完成状态读取、将 AR 置零，并在前一次 indirect read 后证明 ABORT／BUSY／FIFO 完整退出；此后不再写 DR，才进入映射。§2.4.4 的 timeout counter 和 timeout IRQ 始终禁用，最后一个 CPU reader 退出后经同 CPU 屏障和有界 ABORT 撤回映射，并读回实际 FMODE。§2.4.5 的间接阶段 aperture 禁令保持。调用者必须排除其他 DMA、调试器及外来 master；reader 标签不构成总线防火墙。软件参考见 [映射装配](../../../../tests/contracts/stm32f4_qspi/f479ni-qspi-map.toml)，不证明实装器件、PCB 或 HIL。
+ES0321 §2.4.3 要求先完成状态读取、将 AR 置零，并在前一次 indirect read 后证明 ABORT／BUSY／FIFO 完整退出；此后不再写 DR，才进入映射。§2.4.4 的 timeout counter 和 timeout IRQ 始终禁用，最后一个 CPU reader 退出后经同 CPU 屏障和有界 ABORT 撤回映射，并读回实际 FMODE。§2.4.5 的间接阶段 aperture 禁令保持。调用者必须排除其他 DMA、调试器及外来 master；reader 标签不构成总线防火墙。软件参考见 [映射装配](../../../../tests/integration/assemblies/stm32f4_qspi/f479ni-qspi-map.toml)，不证明实装器件、PCB 或 HIL。

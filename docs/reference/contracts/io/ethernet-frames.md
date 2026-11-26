@@ -214,7 +214,7 @@ does not substitute for physical DMA or complete concurrent-system qualification
 
 The F407 binding is `soc/stm32/stm32f4/drivers/ethernet/ethernet_frames.c`; the engine is
 `soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c`. Current GoogleTest
-cases under `tests/google/ethernet_frames_*` cover public, engine, F407, Native
+cases under `tests/behavior/ethernet_frames_*` cover public, engine, F407, Native
 and factory contracts. Factory tests exercise real System/GPIO/provider code
 against one clock/timer oracle and explicit DMA-visible addresses. Test counts
 and linked costs must come from the current commit's execution and ARM artifacts;

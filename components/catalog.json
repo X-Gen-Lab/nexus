@@ -168,7 +168,7 @@
     },
     {
       "id": "lvgl",
-      "entry": "components/protocols/lvgl/Select.cmake",
+      "entry": "components/ui/lvgl/Select.cmake",
       "target": "Nexus::LVGL"
     },
     {

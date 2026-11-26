@@ -11,7 +11,7 @@ import tomllib
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
-from tools.dev.change_paths import changed_paths, classify
+from tools.dev.change_paths import changed_paths, path_role
 from tools.maintenance.consumer_profiles import (SERVICE_CONSUMERS,
                                                  service_directory)
 from tools.maintenance.source_catalogue import ALL_SOURCE_DEPENDENCIES
@@ -25,9 +25,10 @@ DEVICE_INPUTS = ("components/devices/tmp117/src/", "cmake/package/verification/d
 
 def sdk_changes(paths):
     """Private MCU implementation uses its own ARM gate. Unknown inputs widen."""
-    classify(paths)
     selected = []
     for name in paths:
+        if path_role(name) == "behavior-test":
+            continue
         if name.startswith(DEVICE_INPUTS):
             selected.append(name)
             continue
@@ -37,7 +38,7 @@ def sdk_changes(paths):
         path = Path(name)
         if (name.startswith(("docs/", "scripts/ci/", ".github/", "tools/testing/")) or
                 path.suffix.lower() in {".md", ".rst"} or
-                name.startswith(("tools/configure/tests/", "tests/support/native/tests/")) or
+                name.startswith("tools/configure/tests/") or
                 (name.startswith(("soc/", "boards/", "arch/", "core/", "os/", "io/"))
                  and path.suffix.lower() in {".c", ".s", ".h", ".inc"} and
                  "include" not in path.parts)):

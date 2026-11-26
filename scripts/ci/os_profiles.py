@@ -156,8 +156,8 @@ def compare_costs(variants: list[dict]) -> dict:
 def source_inputs(root: Path) -> list[dict]:
     inputs = {item['path']: item for item in cortex_runtime.source_inputs(root)}
     paths = [root / 'tools/configure/kernel.py', Path(__file__),
-             root / 'tests/contracts/os_kernel_profile/CMakeLists.txt',
-             root / 'tests/contracts/os_kernel_profile/main.c']
+             root / 'tests/integration/kernels/os_kernel_profile/CMakeLists.txt',
+             root / 'tests/integration/kernels/os_kernel_profile/main.c']
     kernel_root = root / 'ext/freertos'
     paths.extend(kernel_root / name for name in ('tasks.c', 'queue.c', 'list.c'))
     paths.extend((kernel_root / 'include').glob('*.h'))
@@ -181,7 +181,7 @@ def execute_variant(root: Path, recorder, selected_tools: dict,
     if cmake is None or ninja is None:
         raise ValueError('Actual CMake and Ninja tools are required')
     recorder.execute([
-        cmake, '-S', str(root / 'tests/contracts/os_kernel_profile'), '-B',
+        cmake, '-S', str(root / 'tests/integration/kernels/os_kernel_profile'), '-B',
         str(build), '-G', 'Ninja',
         '-DCMAKE_TOOLCHAIN_FILE=' + str(root / 'cmake/toolchains/arm-gcc.cmake'),
         '-DCMAKE_C_COMPILER=' + selected_tools['gcc'],

@@ -243,7 +243,7 @@ CLUT/extra packed formats, watermark/suspend modes and additional exact parts
 remain outside this selected graphics slice.
 
 The maintained combined SRAM and
-[`graphics_sdram` consumers](../../../tests/contracts/stm32f4_graphics_sdram/CMakeLists.txt)
+[`graphics_sdram` consumers](../../../tests/integration/assemblies/stm32f4_graphics_sdram/CMakeLists.txt)
 use the fixture-local `sustained_sequence.c` with two static framebuffers.
 One explicit caller drives DMA2D fill, observes image SETTLED, submits display,
 and waits for the old display request's SETTLED before rendering into those

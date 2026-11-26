@@ -50,10 +50,13 @@ ctest --test-dir build/sdk-native --output-on-failure --no-tests=error
 
 ## 升级已有工程
 
-1. 保留应用源与 `.nexus-template.json`，取得下一份 SDK 及精确提交。
-2. 阅读对应变更和[源码接口兼容性](../reference/contracts/sdk-format.md)。
-3. 在新构建目录切换 `Nexus_DIR` 和期望提交，重新生成并编译全部相关对象。
-4. 执行产品需要的 Native、ARM 和硬件检查，再更新产品依赖锁。
+1. 保留应用源与 `.nexus-template.json`，记录旧 SDK、完整提交、profile、工具链和工件摘要，再核验下一份 SDK 的身份。
+2. 阅读对应变更和[源码接口兼容性](../reference/contracts/sdk-format.md)，检查 factory 代际、TOML schema、Board、后端和工具链。
+3. 用同一应用输入在独立目录分别构建旧版和候选版。通过 `Nexus_DIR` 和期望提交选择 SDK，重新生成并编译全部相关对象。
+4. 对照 ARM 资源报告，执行产品需要的 Native、ARM 和硬件检查，并在消费前后校验 SDK。验收完成后更新产品依赖锁。
+5. 在独立构建目录用上一份锁和 SDK 验证回退，保留其工件与复验记录。产品数据迁移和回退仍由产品决定。
+
+记录候选版本的兼容和验证范围。长期维护承诺需要明确支持窗口、修复回移和可重建依赖的证据。
 
 模板来源记录描述工程最初从哪里创建，不会自动改成新 SDK 身份。平台版本、factory
 接口代际、TOML schema、typed IR 与 SDK manifest schema 各自负责不同合同；相同

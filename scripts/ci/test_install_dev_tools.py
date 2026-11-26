@@ -154,6 +154,27 @@ class InstallDevToolsTests(unittest.TestCase):
         self.assertFalse(any("pip" in call for call in self.calls))
         self.assertIn("skipping pip", output)
 
+    def test_locked_linux_setup_installs_one_complete_hashed_closure(self):
+        self.installed = {name: None for name in self.pins}
+        lock = self.root / "dependencies/python-tools-linux-cp311.txt"
+        lock.touch()
+        with patch.object(INSTALLER.sys, "version_info", (3, 11, 1)):
+            result, created, _, error = self.invoke(["--skip-hooks", "--locked-linux"])
+        self.assertEqual((result, created, error), (0, 1, ""))
+        python, _ = INSTALLER.venv_paths(self.root / ".venv")
+        self.assertEqual([call for call in self.calls if "pip" in call], [
+            [str(python), "-m", "pip", "install", "--require-hashes",
+             "--only-binary=:all:", "--force-reinstall", "-r", str(lock)]])
+
+    def test_locked_linux_rejects_an_existing_venv_with_a_different_abi(self):
+        self.create_venv(self.root / ".venv")
+        self.python_version = [3, 12, 14]
+        with patch.object(INSTALLER.sys, "version_info", (3, 11, 1)):
+            result, created, _, error = self.invoke(["--skip-hooks", "--locked-linux"])
+        self.assertEqual((result, created), (1, 0))
+        self.assertIn("Python ABI", error)
+        self.assertFalse(any("pip" in call for call in self.calls))
+
     def test_matching_outer_tools_still_prime_isolated_hook_dependencies(self):
         self.create_venv(self.root / ".venv")
         result, created, _, error = self.invoke()
