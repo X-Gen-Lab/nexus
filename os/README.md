@@ -111,7 +111,7 @@ M55／M85 使用真实具备 MVE 上下文支持的上下文端口。`configENAB
 ## 宿主实现与持续等待
 
 FreeRTOS 宿主验证夹具保留锁定内核／POSIX 端口，使用自有
-`tests/contracts/os_freertos_runtime/posix_event.c`。端口先取消正在等待条件变量的 pthread，再发送信号并等待退出；上游事件支持缺少取消清理，可能留下锁住的
+`tests/integration/kernels/os_freertos_runtime/posix_event.c`。端口先取消正在等待条件变量的 pthread，再发送信号并等待退出；上游事件支持缺少取消清理，可能留下锁住的
 互斥量。自有等待在返回和取消时都解锁，避免重复任务等待退出死锁；
 此修正只作用于宿主，不改变 MCU 后端，也不建立 MCU 调度器资格。
 

@@ -22,7 +22,7 @@ sys.path.insert(0, str(ROOT))
 
 import arch_compile
 from os_wait_cost import prepare_output
-from scripts.ci.tdd_gate import environment, validate_google_report
+from scripts.ci.native_contracts import environment, validate_google_report
 from tools.configure import cpu as cpu_contract
 
 CASE = re.compile(r'[A-Za-z0-9_/]+\.[A-Za-z0-9_/]+')
@@ -239,7 +239,7 @@ def source_inputs(contract: Path, builds: list[Path]) -> dict:
              ROOT / 'scripts/ci/os_wait_cost.py', ROOT / 'scripts/ci/tdd_gate.py',
              ROOT / 'scripts/validation/junit.py', ROOT / 'CMakeLists.txt',
              ROOT / 'CMakePresets.json', contract}
-    for layer in ('core', 'arch', 'os', 'cmake', 'tools/configure', 'tests/google'):
+    for layer in ('core', 'arch', 'os', 'cmake', 'tools/configure', 'tests/behavior'):
         paths.update(path for path in (ROOT / layer).rglob('*')
                      if path.is_file() and path.suffix in {
                          '.c', '.h', '.cpp', '.cmake', '.py', '.toml', '.json'})

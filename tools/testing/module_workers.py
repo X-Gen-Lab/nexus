@@ -16,21 +16,16 @@ from tools.testing import run_tool_tests as runner
 
 def run(suite, files, jobs):
     requested = process.positive_integer(jobs, "module workers")
-    directory = runner.ROOT / runner.CI_SUITES[suite]
     if files is None:
-        # Discovery may delegate to nested packages and their load_tests hooks.
-        # Let unittest perform that whole discovery when a domain gains one.
-        if any(p.is_dir() and (p / "__init__.py").exists()
-               for p in directory.iterdir()):
+        selected = runner.discover_modules(suite)
+        if selected is None:
             return runner.execute(suite)
-        selected = sorted(p.relative_to(runner.ROOT).as_posix()
-                          for p in directory.glob("test_*.py"))
     else:
         selected = sorted(set(files))
-    if not selected or any(runner.module_domain(name) != suite or
-            (runner.ROOT / name).is_symlink() or
-            not (runner.ROOT / name).is_file() for name in selected):
+    if not selected:
         raise ValueError("Select existing test modules from one tool domain")
+    for name in selected:
+        runner.module_source(suite, name)
 
     allocation = process.parallel_jobs(os.environ, default=jobs)
     count = min(requested, allocation, len(selected))
@@ -51,7 +46,9 @@ def run(suite, files, jobs):
     def module(name):
         if cancel.is_set():
             return None
-        path = scratch / (Path(name).stem + ".json")
+        relative = Path(name).relative_to(runner.CI_SUITES[suite])
+        path = scratch / relative.with_suffix(".json")
+        path.parent.mkdir(parents=True, exist_ok=True)
         completed = process.run(
             [sys.executable, "-B", "-m", "tools.testing.module_workers",
              suite, name, str(path), "full" if files is None else "selected"],

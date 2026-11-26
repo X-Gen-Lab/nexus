@@ -120,7 +120,7 @@ CMSIS-Core v6.4.0 的 `core_cm0plus.h`、`core_cm7.h`、`core_cm23.h`、
 `core_cm33.h`、`core_cm55.h`、`core_cm85.h`、`m-profile/armv7m_mpu.h`、
 `m-profile/armv8m_mpu.h` 和 `m-profile/armv7m_cachel1.h` 是受审布局参考。
 私有 `registers.h` 集中已用当前域地址；
-`tests/contracts/arch_cmsis_layout_probe.c` 独立核对九核 MPU／SAU／Cache 字段。
+`tests/integration/arch/arch_cmsis_layout_probe.c` 独立核对九核 MPU／SAU／Cache 字段。
 编译门禁核对 CMSIS-Core 为锁定的精确版本、工作树干净，并检查真实 include 来源。生产目标保持
 Nexus 接口依赖边界；共享官方 Core 不改变上下文、所有权、屏蔽恢复或可选机制合同，
 也不建立新处理器／配置组合／物理支持。

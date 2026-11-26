@@ -11,7 +11,7 @@ import os_backend_probe as probe
 
 def reference():
     source = Path(__file__).resolve().parents[2]
-    return json.loads((source / 'tests/contracts/os_backend_probe/native.json')
+    return json.loads((source / 'tests/integration/kernels/os_backend_probe/native.json')
                       .read_text())
 
 

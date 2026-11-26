@@ -20,7 +20,7 @@ from tools.configure import configure
 
 
 ROOT = Path(__file__).resolve().parents[2]
-USB = ROOT / "tests/contracts/usb_assembly/stm32-zg.toml"
+USB = ROOT / "tests/integration/assemblies/usb_assembly/stm32-zg.toml"
 
 
 class LinkedBundleAdmission(unittest.TestCase):
@@ -185,6 +185,11 @@ class USBPackageSourceSelection(unittest.TestCase):
 
 
 class FixtureAdmission(unittest.TestCase):
+    def test_missing_authored_fixture_fails_closed(self):
+        with self.assertRaises(EvidenceError):
+            gate.validate_fixtures(ROOT, [
+                ROOT / "tests/integration/assemblies/stm32_assembly/missing.toml"])
+
     def test_unselected_inventory_does_not_mask_real_tool_admission(self):
         source = source_identity.observe_git_source(ROOT)
         path = 'vendors/st/cmsis_device_u5'
@@ -245,7 +250,7 @@ class FixtureAdmission(unittest.TestCase):
         self.assertEqual(USB.read_bytes(), before)
 
     def test_model_only_directory_is_not_an_assembly_graph(self):
-        with tempfile.TemporaryDirectory(dir=ROOT / "tests/contracts") as directory:
+        with tempfile.TemporaryDirectory(dir=ROOT / "tests/integration") as directory:
             path = Path(directory) / "fixture.toml"
             path.write_text('schema=2\n')
             with self.assertRaisesRegex(EvidenceError, "CMakeLists"):
@@ -255,11 +260,11 @@ class FixtureAdmission(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "fixture.toml"
             path.write_text('schema=2\n')
-            with self.assertRaisesRegex(EvidenceError, "contracts"):
+            with self.assertRaisesRegex(EvidenceError, "owned"):
                 gate.validate_fixtures(ROOT, [path])
 
     def test_symlink_input_is_refused_before_resolution(self):
-        with tempfile.TemporaryDirectory(dir=ROOT / "tests/contracts") as directory:
+        with tempfile.TemporaryDirectory(dir=ROOT / "tests/integration") as directory:
             path = Path(directory) / "alias.toml"
             path.symlink_to(USB)
             with self.assertRaisesRegex(EvidenceError, "symlink"):
@@ -270,7 +275,7 @@ class ExplicitProjectAdmission(unittest.TestCase):
     def setUp(self):
         self.assembly = ROOT / (
             "tools/configure/assemblies/qiming-baremetal-uart.toml")
-        self.project = ROOT / "tests/contracts/stm32_assembly"
+        self.project = ROOT / "tests/integration/assemblies/stm32_assembly"
 
     def test_canonical_input_uses_the_explicit_owned_project(self):
         before = self.assembly.read_bytes()
@@ -297,7 +302,7 @@ class ExplicitProjectAdmission(unittest.TestCase):
                 gate.validate_fixtures(ROOT, [self.assembly], project=project)
 
     def test_missing_and_symlink_project_are_rejected(self):
-        with tempfile.TemporaryDirectory(dir=ROOT / "tests/contracts") as directory:
+        with tempfile.TemporaryDirectory(dir=ROOT / "tests/integration") as directory:
             project = Path(directory)
             with self.assertRaisesRegex(EvidenceError, "CMakeLists"):
                 gate.validate_fixtures(ROOT, [self.assembly], project=project)
@@ -324,7 +329,7 @@ class ExplicitProjectAdmission(unittest.TestCase):
                 gate.validate_fixtures(ROOT, [source], project=self.project)
 
     def test_native_canonical_is_not_an_arm_fixture(self):
-        with tempfile.TemporaryDirectory(dir=ROOT / "tests/contracts") as directory:
+        with tempfile.TemporaryDirectory(dir=ROOT / "tests/integration") as directory:
             source = Path(directory) / "native.toml"
             source.write_text((ROOT / "tests/support/native/assemblies/native.toml").read_text())
             with self.assertRaisesRegex(EvidenceError, "host model"):
@@ -343,7 +348,7 @@ class ExplicitProjectAdmission(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             (root / "CMakeLists.txt").write_text("project(root)\n")
-            project = root / "tests/contracts/explicit"
+            project = root / "tests/integration/explicit"
             project.mkdir(parents=True)
             (project / "CMakeLists.txt").write_text("project(selected)\n")
             main = project / "main.c"
@@ -419,7 +424,7 @@ class ExplicitProjectAdmission(unittest.TestCase):
 
     def test_hardlinked_project_entry_cannot_authorize_a_source_graph(self):
         with tempfile.TemporaryDirectory(
-                dir=ROOT / "tests/contracts") as name:
+                dir=ROOT / "tests/integration") as name:
             project = Path(name)
             original = project / "selected.cmake"
             original.write_text("project(selected)\n")
@@ -432,7 +437,7 @@ class ExplicitProjectAdmission(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             (root / "CMakeLists.txt").write_text("project(root)\n")
-            project = root / "tests/contracts/explicit"
+            project = root / "tests/integration/explicit"
             project.mkdir(parents=True)
             (project / "CMakeLists.txt").write_text(
                 "project(selected)\n"
@@ -460,7 +465,7 @@ class ExplicitProjectAdmission(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             (root / "CMakeLists.txt").write_text("project(root)\n")
-            project = root / "tests/contracts/explicit"
+            project = root / "tests/integration/explicit"
             project.mkdir(parents=True)
             (project / "CMakeLists.txt").write_text("project(selected)\n")
             external = root / "outside"
@@ -699,7 +704,7 @@ class EmptySourceInputs(unittest.TestCase):
         vendor = self.root / "vendors/locked/component.h"
         vendor.parent.mkdir(parents=True)
         vendor.write_bytes(b"")
-        fixture = {"assembly": str(self.root / "tests/contracts/fixture/a.toml"),
+        fixture = {"assembly": str(self.root / "tests/integration/fixture/a.toml"),
                    "resolved": {"source_dependencies": [
                        {"path": "vendors/locked"}]}, "inputs": []}
         inputs = gate.source_inputs(self.root, [fixture])
@@ -722,7 +727,7 @@ class EmptySourceInputs(unittest.TestCase):
 
     def test_declared_missing_input_is_still_rejected(self):
         self.source.unlink()
-        fixture = {"assembly": str(self.root / "tests/contracts/fixture/a.toml"),
+        fixture = {"assembly": str(self.root / "tests/integration/fixture/a.toml"),
                    "resolved": {"source_dependencies": []},
                    "inputs": [{"path": str(self.source)}]}
         with self.assertRaisesRegex(EvidenceError, "missing"):

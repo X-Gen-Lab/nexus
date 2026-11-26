@@ -3,17 +3,27 @@
 保留配置、构建、依赖来源、SDK、资源测量、进程清理和 HIL 工装的真实故障回归。
 候选晋升、历史归档恢复和重复任务台账已退出当前维护范围。
 
+| 目录 | 维护内容 |
+| --- | --- |
+| `build/` | CMake 图、平台消费、来源闭包和实际编译选择 |
+| `dependencies/` | 来源锁、gitlink、供应商配对及依赖准备 |
+| `execution/` | 命令、构建锁、进程撤回、测试发现和报告准入 |
+| `measurement/` | ELF、资源预算、HIL 工装和测量身份 |
+| `sdk/` | 导出选择、包完整性、接口消费和精确来源 |
+
 ```sh
 python tools/testing/run_tool_tests.py --suite testing --report build/quality/tools-testing.json
 ```
 
-普通固件实现提交执行完整 Native GoogleTest，不触发整套辅助工具域。公共头、声明事实
+普通固件实现提交执行完整 Native CTest 与 GoogleTest 身份核对。公共头、声明事实
 和工具改动按 `run_tool_tests.py` 选择完整相关测试模块；未知或缺少已知覆盖则执行完整域。
 板级电气合同的完整测试模块在 `tools/configure/tests/__init__.py` 的
 `BOARD_FACT_CONTRACTS` 声明所用板级事实文件。新增专属合同只需在测试侧登记。
 提交范围标记 `commit-tools`、`qualification=false`；完整 `--all` 验收在合并前独立执行。
-完整 CI 分别运行 testing、configure、ci、
-workflows、contracts、freertos。工具测试不按 Native 编译模式重复。
+常规完整门禁运行 `testing`、`configure`、`ci` 三个工具域。工作流合同归入
+`scripts/ci/test_platform_ci.py`，由 `ci` 域执行。完整 CI 另行运行 `integration`
+和 `freertos`，文档用例及严格中英文构建由文档 job 执行。工具测试不按 Native
+编译模式重复。
 每次要求非空发现、完整执行、零跳过及真实返回码，旧报告不能建立本次通过。
 新增工具行为先记录 RED 再实现 GREEN。纯粹删除废弃功能不新增镜像式测试。
 testing 域集中执行一次全局能力和派生文档检查；局部外设测试不重复扫描整个平台。

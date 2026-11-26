@@ -16,16 +16,16 @@ physical Board wiring.
 
 ```sh
 python scripts/ci/provider_assemblies.py \
-    --fixture tests/contracts/usb_assembly/stm32-zg.toml \
+    --fixture tests/integration/assemblies/usb_assembly/stm32-zg.toml \
     --family stm32f4 \
     --compiler arm-none-eabi-gcc \
     --output build/provider-assemblies/usb-stm32
 ```
 
 Repeat `--fixture` for a reviewed list of authored TOMLs. Without `--project`,
-each TOML must remain in `tests/contracts` with its maintained sibling
+each TOML must remain in `tests/integration` with its maintained sibling
 `CMakeLists.txt`. An explicit `--project` instead binds the whole invocation to
-one existing CMake project under the checkout's `tests/contracts`; its TOMLs
+one existing CMake project under the checkout's `tests/integration`; its TOMLs
 may be owned contract fixtures or canonical schema-2 assemblies directly in
 `tools/configure/assemblies`. Each selection must resolve to an MCU configuration.
 The gate does not discover a project from the family or silently change modes.

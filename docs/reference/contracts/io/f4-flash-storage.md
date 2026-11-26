@@ -98,7 +98,7 @@ ICRST／DCRST 表示外来操作，必须在解锁前拒绝。脉冲结束后，
 到 RAM。deadline 不撤销物理脉冲，超时仍须等待实际 BSY 退出，再按真实清理结果
 归还责任。该模式的 C 路径和故障回归见
 [Flash provider](../../../../soc/stm32/stm32f4/drivers/flash/flash.c) 与
-[双 bank 模型](../../../../tests/google/soc/stm32_flash_bank_test.cpp)；它们不建立实板资格。
+[双 bank 模型](../../../../tests/behavior/soc/stm32/stm32f4/memory/stm32_flash_bank_test.cpp)；它们不建立实板资格。
 
 ## 外部总线与介质
 
@@ -136,7 +136,7 @@ SDIO_CK 下界与 ES0182 的按宽度计算的严格 FIFO 约束。最小合法�
 Board 授权完整十个 pad，按所选路线生成六或十份快照；SD memory 与 SDIO I/O
 functions 仍只接纳 1／4 位。MMC 在卡片 SWITCH 与 ready 检查成功后才提交主机宽度，
 失败不隐式降宽。精确命令、错误位与引脚合同沿用上述 SDIO 模块说明；
-`tests/contracts/mmc8_assembly/` 是软件参考，不声明现有开发板 SD socket 已接八线。
+`tests/integration/assemblies/mmc8_assembly/` 是软件参考，不声明现有开发板 SD socket 已接八线。
 
 ## F407 选定 37.5 MHz 高速 SDR
 
@@ -144,4 +144,4 @@ functions 仍只接纳 1／4 位。MMC 在卡片 SWITCH 与 ready 检查成功�
 
 高速装配仅使用裸机、四位 SDR 和显式 `protocol="sd-memory"` 或 `"mmc"`。C provider 完成 SD CMD6 high-speed 或 MMC HS52 协商及 ready 检查后才提交高速主机状态；MMC26 不得在 37.5 MHz 下使用。静态配置只连接只读 `high_speed` 选择，不生成卡片协议算法。USB、RNG、STOP／Standby 和可选 power 组合均不在该时钟配置的授权内，普通 Platform 冷停止仍必须完整可用。
 
-[SD DMA 参考](../../../../tests/contracts/stm32f4_sdio_hs/sd37-dma.toml) 和 [MMC IRQ 参考](../../../../tests/contracts/stm32f4_sdio_hs/mmc37-irq.toml) 通过强类型 factory 获取同一 block owner，显式 activate、有限异步 read、join、sync 和 stop。Source SDK 分别编译、链接并检查真实方法保留；软件结果不证明实际卡片支持、信号完整性、吞吐或 HIL。
+[SD DMA 参考](../../../../tests/integration/assemblies/stm32f4_sdio_hs/sd37-dma.toml) 和 [MMC IRQ 参考](../../../../tests/integration/assemblies/stm32f4_sdio_hs/mmc37-irq.toml) 通过强类型 factory 获取同一 block owner，显式 activate、有限异步 read、join、sync 和 stop。Source SDK 分别编译、链接并检查真实方法保留；软件结果不证明实际卡片支持、信号完整性、吞吐或 HIL。

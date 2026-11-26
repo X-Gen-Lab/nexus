@@ -58,8 +58,9 @@ Python production tools use stdlib unittest with the same actual RED/GREEN rule.
 python scripts/ci/tdd_gate.py --all --preset native-debug
 ```
 
-The full gate builds the pinned offline framework and executes discovered cases
-with fresh reports and no filters/shards. Empty, skipped, partial, stale or changed
+The full gate builds the pinned offline framework and executes the complete CTest
+catalogue, then verifies exact unfiltered GoogleTest identities and fresh XML.
+The commit hook and Native CI share that execution plan. Empty, skipped, partial, stale or changed
 inputs fail. The hook checks the staged tree remains unchanged; CI independently
 executes the gate. The framework is host-only C++17; firmware remains C11.
 Automation proves execution, while retained development logs document historical
@@ -71,10 +72,12 @@ The commit gate writes its selected hardware assemblies and expansion reasons to
 ## Run local validation when Actions is unavailable
 
 Use the same maintained entry points as CI. The complete TDD gate above runs
-Native GoogleTest and all four tool domains; independent runtime validation uses
+the complete Native CTest plan and the three regular tool domains, `testing`,
+`configure` and `ci`; independent runtime validation uses
 `native_contracts.py` after configuring and building each of `native-debug`,
-`native-release`, `native-asan` and `native-tsan`. The retained contract suite,
-strict bilingual documentation build and independent Source SDK consumers verify
+`native-release`, `native-asan` and `native-tsan`. Full CI also executes the
+separate `integration` and `freertos` scopes. Documentation tests, the
+strict bilingual build and independent Source SDK consumers verify
 their separate boundaries. See the [engineering handbook](../reference/contracts/engineering.md)
 for scope and concurrency rules.
 
@@ -130,7 +133,8 @@ mutations of the same build tree. Full gate discovery, actual exits, output
 identities and failure/cancellation retention remain mandatory.
 
 The commit gate configures and builds once for unchanged staged inputs, then runs
-all Native GoogleTest cases and complete affected tool modules. Known firmware
+the complete Native CTest plan, verifies exact GoogleTest identities and runs
+complete affected tool modules. Known firmware
 implementation changes need no auxiliary domain. Headers and declarative facts
 select configuration contracts and the single global support check. Changed test
 modules run in full; known tool implementations use maintained module mappings.
@@ -140,7 +144,7 @@ or filter cases inside selected modules.
 
 Before merge or delivery, independently execute the complete tool domains,
 relevant ARM links and Source SDK consumers. `--all` and `--tools all` always run
-the four full domains; `dev.py check` is the full integration entry. Complete CI
+the three regular domains; `dev.py check` is the full integration entry. Complete CI
 also runs all four Native modes, without repeating tool tests per mode or the
 full Native execution in the tool job. A quick commit does not replace these
 results, and successful qualification reports are never cached.

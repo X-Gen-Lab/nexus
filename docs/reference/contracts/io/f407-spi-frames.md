@@ -33,7 +33,7 @@ slave 为 MOSI；单线的数据脚在 master 为 MOSI、slave 为 MISO。
 只取得所选线制需要的三个或四个 pad；单线每请求在 SPE 关闭时选定方向。
 
 `spi_frames.c` 与 `spi_frames_cold.c` 只在选择 `irq-frames` 时选编。
-两个软件资源参考为 `tests/contracts/spi_frames_assembly/three-frames-ve.toml`
+两个软件资源参考为 `tests/integration/assemblies/spi_frames_assembly/three-frames-ve.toml`
 与 `three-frames-zg.toml`。这些 Board package 只声明硅片 pad，不建立 PCB 接线、
 外部电平、负载或设备资格。
 

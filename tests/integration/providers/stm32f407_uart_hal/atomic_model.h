@@ -1,0 +1,20 @@
+/**
+ * \file            atomic_model.h
+ * \brief           Host compiler bridge followed by the selected atomic port
+ * \author          Nexus Team
+ */
+#ifndef NX_F407_ATOMIC_CONTRACT_MODEL_H
+#define NX_F407_ATOMIC_CONTRACT_MODEL_H
+#include "../../../behavior/soc/stm32/stm32f4/shared/stm32_official_model.h"
+
+/* The selected atomic port must replace the host model atomic macros last. */
+#include "drivers/uart/stm32f407_hal_atomic.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
+void nx_atomic_vendor_enable_tx(USART_TypeDef* uart);
+void nx_atomic_vendor_disable_tx(USART_TypeDef* uart);
+#ifdef __cplusplus
+}
+#endif
+#endif

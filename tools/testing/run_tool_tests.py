@@ -2,6 +2,7 @@
 """Run real tool tests and reject empty, incomplete or skipped execution."""
 
 import argparse
+import ast
 import json
 import os
 from pathlib import Path
@@ -12,9 +13,9 @@ import unittest
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 SUITES = {"testing": "tools/testing", "configure": "tools/configure/tests",
-          "ci": "scripts/ci", "workflows": ".github/workflows"}
+          "ci": "scripts/ci"}
 # Full CI additionally owns standalone SDK/build contracts and the kernel overlay.
-CI_SUITES = {**SUITES, "contracts": "tests/contracts",
+CI_SUITES = {**SUITES, "integration": "tests/integration",
              "freertos": "os/freertos"}
 SCOPE_POLICY = {"tools/testing/run_tool_tests.py", "tools/dev/change_paths.py",
                 "scripts/ci/tdd_gate.py"}
@@ -23,19 +24,19 @@ SDK_TOOLS = {"cmake/package/package_source_sdk.py",
 SDK_FIXTURE_SUFFIXES = {".c", ".h", ".toml", ".json"}
 FIRMWARE_ROOTS = ("core/", "arch/", "os/", "io/", "soc/", "boards/",
                   "components/", "tests/")
-POLICY_TESTS = ("tools/testing/test_tool_runner.py",
-                "tools/testing/test_tdd_gate.py",
-                "tools/testing/test_tdd_preflight.py",
-                "tools/testing/test_staged_execution.py")
+POLICY_TESTS = ("tools/testing/execution/test_tool_runner.py",
+                "tools/testing/execution/test_tdd_gate.py",
+                "tools/testing/execution/test_tdd_preflight.py",
+                "tools/testing/execution/test_staged_execution.py")
 INSTALLER_TESTS = ("scripts/ci/test_install_dev_tools.py",
                    "scripts/ci/test_cmake_format.py")
-CMAKE_TESTS = ("tools/testing/test_cmake_helpers.py",
-               "tools/testing/test_io_source_selection.py",
-               "tools/configure/tests/test_incremental_consumer.py")
-FIRMWARE_RESOURCE_TESTS = ("tests/contracts/test_build_artifacts.py",
-                           "tests/contracts/test_measurement_resources.py")
-FACT_TESTS = ("tools/testing/test_build_impact.py",
-              "tools/configure/tests/test_resource_graph.py")
+CMAKE_TESTS = ("tools/testing/build/test_cmake_helpers.py",
+               "tools/testing/build/test_io_source_selection.py",
+               "tools/configure/tests/emission/test_incremental_consumer.py")
+FIRMWARE_RESOURCE_TESTS = ("tests/integration/resources/test_build_artifacts.py",
+                           "tests/integration/resources/test_measurement_resources.py")
+FACT_TESTS = ("tools/testing/build/test_build_impact.py",
+              "tools/configure/tests/resources/peripherals/test_resource_graph.py")
 DEVELOPMENT_INPUTS = {
     "dependencies/environment.lock.json", "dependencies/environment-tools.txt",
     "dependencies/development-tools.txt",
@@ -60,51 +61,52 @@ COMMIT_ALIASES = {
     "scripts/ci/check_commit_message.py": ("scripts/ci/test_commit_message.py",),
     ".editorconfig": ("scripts/ci/test_format_tool.py",
                        "scripts/ci/test_cmake_format.py"),
-    ".github/security/trufflehog.json": ("tools/testing/test_secret_scan.py",),
+    ".github/security/trufflehog.json": ("tools/testing/execution/test_secret_scan.py",),
     "docs/development/coding-standards.md": (
         "scripts/ci/test_comment_style.py", "scripts/ci/test_cmake_format.py"),
-    "tools/dev/dev.py": ("tools/testing/test_dev.py",
-                         "tools/testing/test_dev_efficiency.py",
-                         "tools/testing/test_build_workflow.py"),
-    "tools/dev/presets.py": ("tools/testing/test_build_workflow.py",
-                             "tools/testing/test_tdd_gate.py",
-                             "tools/testing/test_sdk_verification_call.py"),
-    "tools/dev/process.py": ("tools/testing/test_build_workflow.py",
-                             "tools/testing/test_process_resources.py",
-                             "tools/testing/test_module_workers.py"),
-    "tools/testing/run_tool_tests.py": POLICY_TESTS + ("tools/testing/test_module_workers.py",),
-    "cmake/package/verify_consumers.py": ("tools/testing/test_sdk_verification_call.py",),
-    "tools/dev/timings.py": ("tools/testing/test_dev_timings.py",),
-    "tools/dev/projects.py": ("tools/testing/test_dev_projects.py",),
+    "tools/dev/dev.py": ("tools/testing/execution/test_dev.py",
+                         "tools/testing/execution/test_dev_efficiency.py",
+                         "tools/testing/build/test_build_workflow.py"),
+    "tools/dev/presets.py": ("tools/testing/build/test_build_workflow.py",
+                             "tools/testing/execution/test_tdd_gate.py",
+                             "tools/testing/sdk/test_sdk_verification_call.py"),
+    "tools/dev/process.py": ("tools/testing/build/test_build_workflow.py",
+                             "tools/testing/measurement/test_process_resources.py",
+                             "tools/testing/execution/test_module_workers.py"),
+    "tools/testing/run_tool_tests.py": POLICY_TESTS + ("tools/testing/execution/test_module_workers.py",),
+    "cmake/package/verify_consumers.py": ("tools/testing/sdk/test_sdk_verification_call.py",),
+    "tools/dev/timings.py": ("tools/testing/execution/test_dev_timings.py",),
+    "tools/dev/projects.py": ("tools/testing/sdk/test_dev_projects.py",),
     **dict.fromkeys(("tools/measurement/resources.py", "tools/measurement/build_resources.py"),
                     FIRMWARE_RESOURCE_TESTS),
-    "tools/measurement/elf.py": FIRMWARE_RESOURCE_TESTS + ("tests/contracts/test_image_artifacts.py",),
-    "tools/testing/arm_links.py": ("tools/testing/test_affected_arm_links.py",
-                                  "tools/testing/test_tdd_gate.py"),
-    "scripts/ci/reference_matrix.py": (".github/workflows/test_platform_ci.py",),
-    "tools/measurement/compare.py": ("tests/contracts/test_measurement_compare.py",),
+    "tools/measurement/elf.py": FIRMWARE_RESOURCE_TESTS + ("tests/integration/resources/test_image_artifacts.py",),
+    "tools/testing/arm_links.py": ("tools/testing/execution/test_affected_arm_links.py",
+                                  "tools/testing/execution/test_tdd_gate.py"),
+    "scripts/ci/reference_matrix.py": ("scripts/ci/test_platform_ci.py",),
+    "tests/cmake/GooglePlan.cmake": ("tools/testing/build/test_google_plan.py",),
+    "tools/measurement/compare.py": ("tests/integration/resources/test_measurement_compare.py",),
     "tools/maintenance/capabilities.py": (
-        "tools/testing/test_maintenance.py",
-        "tools/testing/test_support_selection.py"),
-    "tests/support/external_provider/provider/nexus-soc.json": (
-        "tools/configure/tests/test_external_package.py",),
+        "tools/testing/execution/test_maintenance.py",
+        "tools/testing/execution/test_support_selection.py"),
+    "tests/integration/providers/external_provider/provider/nexus-soc.json": (
+        "tools/configure/tests/schema/test_external_package.py",),
     "cmake/package/package_source_sdk.py": (
-        "tools/testing/test_sdk_profile_policy.py",
-        "tools/testing/test_sdk_export_ownership.py"),
+        "tools/testing/sdk/test_sdk_profile_policy.py",
+        "tools/testing/sdk/test_sdk_export_ownership.py"),
     "tools/configure/coupled_assembly.py": (
-        "tools/configure/tests/test_power_stage_domains.py",
-        "tools/configure/tests/test_power_stage.py",
-        "tools/configure/tests/test_bindings.py",
-        "tools/configure/tests/test_controller_integration.py",
-        "tools/configure/tests/test_device_graph_stage.py",
-        "tools/configure/tests/test_static_ir.py",
-        "tools/configure/tests/test_static_calls.py",
-        "tools/configure/tests/test_platform_lifecycle.py",
-        "tools/configure/tests/test_factory_includes.py",
-        "tools/configure/tests/test_factory_features.py",
-        "tools/configure/tests/test_ir_unification.py",
-        "tools/configure/tests/test_runtime.py",
-        "tools/configure/tests/test_header_projection.py"),
+        "tools/configure/tests/resources/clocks/test_power_stage_domains.py",
+        "tools/configure/tests/resources/clocks/test_power_stage.py",
+        "tools/configure/tests/emission/test_bindings.py",
+        "tools/configure/tests/resources/peripherals/test_controller_integration.py",
+        "tools/configure/tests/resources/peripherals/test_device_graph_stage.py",
+        "tools/configure/tests/ir/test_static_ir.py",
+        "tools/configure/tests/emission/test_static_calls.py",
+        "tools/configure/tests/resources/peripherals/test_platform_lifecycle.py",
+        "tools/configure/tests/emission/test_factory_includes.py",
+        "tools/configure/tests/emission/test_factory_features.py",
+        "tools/configure/tests/ir/test_ir_unification.py",
+        "tools/configure/tests/emission/test_runtime.py",
+        "tools/configure/tests/emission/test_header_projection.py"),
 }
 
 
@@ -124,7 +126,7 @@ def changed_suites(names):
             # unknown fixture kinds retain the broad CMake policy below.
             selected.update(("testing", "configure"))
         elif name.startswith((".github/", "scripts/ci/")):
-            selected.update(("ci", "workflows", "testing"))
+            selected.update(("ci", "testing"))
         elif name.startswith("tools/configure/"):
             selected.update(("configure", "testing"))
         elif (name.startswith(("cmake/", "dependencies/", "scripts/setup/"))
@@ -152,11 +154,63 @@ def changed_suites(names):
 
 def module_domain(name):
     path = Path(name)
-    if (path.name.startswith("test_") and path.suffix == ".py"
-            and path.stem.isidentifier()):
-        return next((suite for suite, directory in CI_SUITES.items()
-                     if path.parent == Path(directory)), None)
+    if (path.is_absolute() or path.as_posix() != name
+            or not path.name.startswith("test_") or path.suffix != ".py"
+            or not path.stem.isidentifier()):
+        return None
+    for suite, directory in CI_SUITES.items():
+        if path.is_relative_to(directory):
+            relative = path.relative_to(directory)
+            if all(part.isidentifier() for part in relative.parts[:-1]):
+                return suite
     return None
+
+
+def package_directories(directory, path):
+    """Yield the declared package parents between a domain and its module."""
+    relative = path.relative_to(directory)
+    return (directory.joinpath(*relative.parts[:depth])
+            for depth in range(1, len(relative.parts)))
+
+
+def module_source(suite, name):
+    """Require a canonical module below its explicit discovery domain."""
+    directory = ROOT / CI_SUITES[suite]
+    source = ROOT / name
+    if (module_domain(name) != suite or not source.is_file()
+            or source.resolve() != source):
+        raise ValueError("Select existing test modules from one tool domain")
+    if any(not (package / "__init__.py").is_file()
+           for package in package_directories(directory, source)):
+        raise ValueError("Nested test modules require explicit packages")
+    return source
+
+
+def discover_modules(suite):
+    """List independent modules, deferring executable package setup to unittest."""
+    directory = ROOT / CI_SUITES[suite]
+    for path in directory.rglob("__init__.py"):
+        packages = tuple(package_directories(directory, path))
+        if not packages or not all(package.name.isidentifier()
+                and (package / "__init__.py").is_file() for package in packages):
+            continue
+        try:
+            statements = ast.parse(path.read_text()).body
+        except SyntaxError:
+            return None
+        if any(not (isinstance(statement, ast.Expr)
+                    and isinstance(statement.value, ast.Constant)
+                    and isinstance(statement.value.value, str))
+               for statement in statements):
+            return None
+    selected = []
+    for path in sorted(directory.rglob("test_*.py")):
+        if all((package / "__init__.py").is_file()
+               for package in package_directories(directory, path)):
+            name = path.relative_to(ROOT).as_posix()
+            module_source(suite, name)
+            selected.append(name)
+    return tuple(selected)
 
 
 def commit_tool_plan(names):
@@ -165,9 +219,14 @@ def commit_tool_plan(names):
     plan = {}
 
     def add(files):
-        if any(module_domain(name) is None or not (ROOT / name).is_file()
-               for name in files):
-            return False
+        for name in files:
+            suite = module_domain(name)
+            if suite is None:
+                return False
+            try:
+                module_source(suite, name)
+            except ValueError:
+                return False
         for name in files:
             suite = module_domain(name)
             if suite not in plan:
@@ -187,6 +246,8 @@ def commit_tool_plan(names):
         if not behavioral(name):
             continue
         files = COMMIT_ALIASES.get(name)
+        if files is None and name.startswith("tests/behavior/"):
+            continue
         if not (ROOT / name).is_file():
             domain = module_domain(name)
             if domain is not None:
@@ -198,7 +259,7 @@ def commit_tool_plan(names):
         if files is None and name.startswith((
                 "components/devices/tmp117/src/", "cmake/package/verification/device_tmp117/",
                 "cmake/package/verification/image_window/")):
-            files = ("tools/testing/test_sdk_device_image_policy.py",)
+            files = ("tools/testing/sdk/test_sdk_device_image_policy.py",)
         if files is None and domain is not None:
             if add((name,)):
                 continue
@@ -226,13 +287,17 @@ def commit_tool_plan(names):
                                    if name in inputs)
         if (files is None and name.startswith(".github/workflows/")
                 and Path(name).suffix in {".yml", ".yaml"}):
-            files = (".github/workflows/test_platform_ci.py",
+            files = ("scripts/ci/test_platform_ci.py",
                      "scripts/ci/test_lint_workflows.py",
                      "scripts/ci/test_action_pins.py")
         directory = NAMESPACE_TESTS.get(str(Path(name).parent))
         if files is None and directory is not None and Path(name).suffix == ".py":
-            candidate = str(Path(directory) / ("test_" + Path(name).stem + ".py"))
-            files = (candidate,) if (ROOT / candidate).is_file() else ()
+            domain = next((suite for suite, path in CI_SUITES.items()
+                           if path == directory), None)
+            modules = discover_modules(domain) if domain is not None else None
+            matches = tuple(module for module in modules or ()
+                            if Path(module).name == "test_" + Path(name).stem + ".py")
+            files = matches if len(matches) == 1 else ()
         if files and add(files):
             continue
         fallback(name, files or ())
@@ -278,12 +343,19 @@ def execute_directory(directory, suite, *, files=None, record_cases=False,
         tests = loader.discover(str(directory), pattern="test_*.py")
     else:
         selected = sorted(set(files))
-        if not selected or any(module_domain(name) != suite or
-                (ROOT / name).is_symlink() or not (ROOT / name).is_file()
-                for name in selected):
+        if not selected:
             raise ValueError("Select existing test modules from one tool domain")
-        tests = unittest.TestSuite(loader.discover(
-            str(directory), pattern=Path(name).name) for name in selected)
+        sources = [module_source(suite, name) for name in selected]
+        if str(directory) not in sys.path:
+            sys.path.insert(0, str(directory))
+        tests = unittest.TestSuite()
+        for source in sources:
+            name = ".".join(source.relative_to(directory).with_suffix("").parts)
+            cases = loader.loadTestsFromName(name)
+            module = sys.modules.get(name)
+            if module is not None and Path(module.__file__).resolve() != source:
+                raise ValueError("Test module was imported from another domain")
+            tests.addTests(cases)
     expected = tests.countTestCases()
     if expected == 0 and not allow_empty_module:
         raise ValueError("Tool suite discovers zero tests")

@@ -80,6 +80,6 @@ uncertainty 为 unknown；近期读回不能证明 aperture 或没丢样。TAGGE
 `Nexus::LSM6DSOXI2C`／`Nexus::LSM6DSOXSPI`，提供静态实例、端口和 config。算法
 继续通过 `Nexus::Algorithms` 消费，业务源码无需包含厂商头文件。
 
-`tests/google/components/lsm6dsox_test.cpp` 直接执行真实官方 C 与 Nexus adapter，覆盖
+`tests/behavior/components/devices/lsm6dsox_test.cpp` 直接执行真实官方 C 与 Nexus adapter，覆盖
 身份、复位、实际配置读回、SI 转换、溢出、失败停止、时钟和同步端口。姿态合同位于
 `common_attitude_test.cpp`；实际示例拥有独立消费者测试。物理 HIL 保持未执行。

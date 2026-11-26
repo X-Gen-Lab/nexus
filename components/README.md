@@ -96,6 +96,6 @@ UART owner 的独立 inner request 保证 provider 最后访问结束后才能�
 请求被接受后保持借用，直到 acquire 观察 `SETTLED`；取消、超时与失败排空不撤销
 借用。生产者、观察者、通知发布者与 executor 分别退出会合后，才能回收其存储。
 
-`tests/contracts` 与 GoogleTest／GoogleMock 维护并发提交、迟到取消／TC、隔离恢复、
+`tests/integration` 与 GoogleTest／GoogleMock 维护并发提交、迟到取消／TC、隔离恢复、
 中断持久化写入及畸形协议输入等回归。主机文件持久化不建立物理 Flash 掉电资格。
 组件的具体实现、执行记录与实板状态分别阅读，不从目录或 target 存在推断全部支持。

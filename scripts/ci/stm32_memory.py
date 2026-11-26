@@ -138,7 +138,7 @@ def source_inputs(root):
                       "boards/stm32f407_qiming_v31",
                       "boards/stm32f407ve_sky_qingchun", "cmake",
                       "tools/configure", "tools/measurement", "tools/evidence",
-                      "tests/contracts/stm32_memory"):
+                      "tests/integration/resources/stm32_memory"):
         inputs.extend(path for path in (root / directory).rglob("*")
             if path.is_file() and path.suffix in {
                 ".c", ".h", ".S", ".cmake", ".py", ".json", ".toml"})
@@ -166,7 +166,7 @@ def run(root, compiler, output, parallel=2):
         for name, tool in tools.items():
             recorder.execute([tool, "--version"], name + "-version", nonempty=True)
         report["source_inputs"] = source_inputs(root)
-        fixture = root / "tests/contracts/stm32_memory"
+        fixture = root / "tests/integration/resources/stm32_memory"
         for variant, (part, selected) in VARIANTS.items():
             build = output / variant
             recorder.execute([tools["cmake"], "-S", str(fixture), "-B", str(build),

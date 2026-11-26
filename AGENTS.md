@@ -177,11 +177,15 @@ any draft that predates its tests; retain later genuine RED/GREEN fixes without
 rewriting the earlier chronology.
 
 `python scripts/ci/tdd_gate.py --all --preset native-debug` builds and runs
-all offline GoogleTest/GoogleMock contracts and the four complete tool domains.
+the complete Native CTest plan, all GoogleTest/GoogleMock cases and the three
+regular tool domains: `testing`, `configure` and `ci`.
 The gate checks the selected locked tools, configures once and builds once.
 It never reuses successful test reports. The ordinary commit hook reads the
 complete staged index, including deletions, and executes the full Native
-GoogleTest plan plus complete affected tool modules. Module planning is an
+CTest plan plus complete affected tool modules. Both the hook and Native CI
+use the same CTest catalogue and require exact unfiltered GoogleTest identities.
+Behavior tests live in `tests/behavior`, independent consumers and probes in
+`tests/integration`, and shared models in `tests/support`. Module planning is an
 explicit commit scope, not a filtered full-domain qualification: reports declare
 `commit-tools` and `qualification=false`. Changed test modules run in full;
 known implementation paths use the maintained module mappings. Physical
@@ -193,14 +197,16 @@ Unknown behavioral inputs or missing module coverage retain the broader scope.
 
 `tools/testing/run_tool_tests.py` owns this plan. Do not infer a smaller scope
 ad hoc or filter cases inside selected modules. `--all` and `--tools all` always
-execute the four complete tool domains. `dev.py check` is the full integration
+execute the three regular tool domains. `dev.py check` is the full integration
 entry, not the ordinary commit scope. Before merge or delivery, run full domains,
 relevant ARM links and independent SDK consumers against their actual inputs;
 a quick commit pass cannot establish those results. `--tools none` is reserved
 for an explicitly separate Native execution, never a hook bypass.
 
 Independent CI owns all four Native runtime modes and the retained full tool
-suites. The tool job prepares its compiler/generated inputs without repeating
+suites. Full CI also runs the separate `integration` and `freertos` scopes;
+documentation tests and strict bilingual builds belong to the documentation job.
+The tool job prepares its compiler/generated inputs without repeating
 the Native job's full GoogleTest execution. The testing domain owns one global
 capability/documentation scan; local peripheral tests do not repeat it. Never
 cache successful qualification, disable required cases or use runtime filters

@@ -160,15 +160,17 @@ def consumer_plan():
 def service_directory(sdk, specification):
     """Use the single owned scenario tree, including shared F4 references."""
     if specification.scenario == "f4_gpio":
-        return Path(sdk) / "tests/contracts/stm32f4_family"
+        return Path(sdk) / "tests/integration/assemblies/stm32f4_family"
     if specification.scenario == "f4_qspi_mapped":
-        return Path(sdk) / "tests/contracts/stm32f4_qspi"
+        return Path(sdk) / "tests/integration/assemblies/stm32f4_qspi"
     if specification.scenario == "f4_capture_audio":
-        return Path(sdk) / "tests/contracts/f407_capture_audio"
+        return Path(sdk) / "tests/integration/assemblies/f407_capture_audio"
+    if specification.scenario == "f4_freertos_stop":
+        return Path(sdk) / "tests/integration/kernels/f407_freertos_stop"
     if specification.scenario in {"f4_pwm_adc", "f4_pwm_adc_loop",
-                                  "f4_freertos_stop", "f4_power_stage"}:
-        return Path(sdk) / "tests/contracts" / specification.scenario.replace(
+                                  "f4_power_stage"}:
+        return Path(sdk) / "tests/integration/assemblies" / specification.scenario.replace(
             "f4_", "f407_", 1)
-    return (Path(sdk) / "tests/contracts" / ("stm32" + specification.scenario)
+    return (Path(sdk) / "tests/integration/assemblies" / ("stm32" + specification.scenario)
             if specification.scenario.startswith("f4_") else
             Path(sdk) / "cmake/package/verification" / specification.scenario)

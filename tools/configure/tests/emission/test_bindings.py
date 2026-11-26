@@ -1,0 +1,130 @@
+"""Generated instance identities remain distinct from private role storage."""
+from tools.configure.tests.native_fixture import native_fixture
+import json
+from pathlib import Path
+import re
+import shutil
+import tempfile
+import unittest
+from unittest.mock import patch
+
+from tools.configure.tests.assembly_fixture import render_toml
+from tools.configure import bindings
+from tools.configure import configure as gate
+
+
+class BindingIdentityTests(unittest.TestCase):
+    def setUp(self):
+        self.temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temporary.cleanup)
+        self.root = Path(self.temporary.name)
+        self.assembly = self.root / "assembly.toml"
+        self.board = self.root / "board"
+        self.board.mkdir()
+
+    def fixture(self, filename):
+        path = gate.ROOT / filename
+        data = gate.load_assembly(path, test_support=native_fixture(path)).to_dict()
+        source = path.parent / data["board_package"] / "board.json"
+        shutil.copyfile(source, self.board / "board.json")
+        data["board_package"] = str(self.board)
+        return data
+
+    def write(self, data):
+        self.assembly.write_text(render_toml(data), encoding="utf-8")
+
+    def source(self, data):
+        self.write(data)
+        result = gate.resolve_ir(self.assembly, test_support=native_fixture(self.assembly))
+        return bindings.emit(result)[1]
+
+    def assert_unique_storage(self, source):
+        # A readonly face may have one tentative declaration before auxiliary
+        # context storage, followed by its definition. Count only definitions
+        # (plus uninitialized mutable storage), never that legal forward edge.
+        names = re.findall(
+            r"^static (?:(?:const )?\w+(?:\* const)? (s_\w+)(?=[^;\n]*=)|"
+            r"\w+ (s_\w+)(?=[^=\n]*;))",
+            source, re.MULTILINE)
+        names = [left or right for left, right in names]
+        self.assertEqual(len(names), len(set(names)), names)
+
+    def add_gpio(self, data, identity):
+        board_path = self.board / "board.json"
+        board = json.loads(board_path.read_text(encoding="utf-8"))
+        board["bindings"].append({"id": "independent-output",
+                                  "controller": "GPIOE",
+                                  "route": "gpio-pe4", "mask": 16,
+                                  "initial": 16})
+        board_path.write_text(json.dumps(board), encoding="utf-8")
+        data["controllers"].append({"id": identity,
+                                    "binding": "independent-output", "authored_kind": "gpio",
+                                    "mode": "output"})
+
+    def test_platform_state_names_remain_legal_instance_ids(self):
+        for filename in ('tools/configure/assemblies/qiming-baremetal.toml',):
+            with self.subTest(fixture=filename):
+                data = self.fixture(filename)
+                data["controllers"][0]["id"] = "started"
+                data["controllers"][1]["id"] = "initialized"
+                source = self.source(data)
+                self.assert_unique_storage(source)
+                self.assertRegex(source, r"static nx_stm32_gpio_state_t s_nx_port_started;")
+                self.assertRegex(source, r"static nx_stm32_uart_state_t s_nx_port_initialized;")
+                self.assertIn("static nx_platform_lifecycle_state_t "
+                              "s_nx_platform_lifecycle;", source)
+
+    def test_gpio_identity_does_not_alias_spi_child_cs_storage(self):
+        data = self.fixture("tests/integration/assemblies/stm32_assembly/ve-spi.toml")
+        data["devices"][0]["id"] = "sensor"
+        self.add_gpio(data, "sensor_cs")
+        source = self.source(data)
+        self.assert_unique_storage(source)
+        self.assertIn("static nx_stm32_gpio_state_t s_nx_port_sensor_cs;", source)
+        self.assertIn("static nx_stm32_gpio_state_t s_nx_cs_sensor = {0};", source)
+        self.assertIn(".endpoint = &s_nx_endpoint_sensor, "
+                      ".chip_select = &s_nx_cs_sensor,", source)
+        self.assertIn("nx_binding_sensor_cs = &s_nx_face_sensor_cs;", source)
+
+    def test_gpio_identity_does_not_alias_pwm_or_adc_storage(self):
+        for filename, identity, storage in (
+                ("ve-pwm.toml", "pwm0_idle", "s_nx_idle_pwm0"),
+                ("ve-adc.toml", "adc0_channels", "s_nx_adc_channels_adc0")):
+            with self.subTest(fixture=filename):
+                data = self.fixture(
+                    "tests/integration/assemblies/stm32_assembly/" + filename)
+                self.add_gpio(data, identity)
+                source = self.source(data)
+                self.assert_unique_storage(source)
+                self.assertIn("s_nx_port_" + identity, source)
+                self.assertIn(storage, source)
+
+    def test_shared_irq_storage_has_a_separate_role(self):
+        data = self.fixture("tests/integration/assemblies/stm32_assembly/ve-exti.toml")
+        self.add_gpio(data, "exti9_5_lines")
+        source = self.source(data)
+        self.assert_unique_storage(source)
+        self.assertIn("s_nx_port_exti9_5_lines", source)
+        self.assertIn("s_nx_irq_EXTI9_5_IRQHandler_ports[2]", source)
+        self.assertIn("{ &s_nx_port_edge5, &s_nx_port_edge6 }", source)
+
+    def test_repeated_generation_is_identical_and_failure_invalidates(self):
+        data = self.fixture("tools/configure/assemblies/qiming-baremetal.toml")
+        data["controllers"][0]["id"] = "started"
+        self.write(data)
+        output = self.root / "bundle"
+        gate.configure(self.assembly, output, test_support=native_fixture(self.assembly))
+        first = {path.name: path.read_bytes() for path in output.iterdir()}
+        gate.configure(self.assembly, output, test_support=native_fixture(self.assembly))
+        second = {path.name: path.read_bytes() for path in output.iterdir()}
+        self.assertEqual(first, second)
+        self.assert_unique_storage((output / "bindings.c").read_text())
+        with patch.object(gate, "generate", side_effect=RuntimeError("emit")):
+            with self.assertRaisesRegex(RuntimeError, "emit"):
+                gate.configure(self.assembly, output, test_support=native_fixture(self.assembly))
+        self.assertFalse(output.exists())
+        self.assertEqual(list(self.root.glob(".nexus-config-*")), [])
+
+
+if __name__ == "__main__":
+    unittest.main()

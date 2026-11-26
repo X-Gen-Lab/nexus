@@ -180,7 +180,7 @@ DMA 错误仍参与结果判定；最后一次观察不能因进入清理而被�
 
 ## 软件参考与边界
 
-完整软件装配位于 `tests/contracts/adc_group_assembly/`，涵盖 VE／ZG、双／三 ADC、
+完整软件装配位于 `tests/integration/assemblies/adc_group_assembly/`，涵盖 VE／ZG、双／三 ADC、
 同步／交错／注入和裸机／FreeRTOS。它们声明测试用片内路线，不能代替真实 PCB
 原理图。GoogleTest 执行真实 provider 与生成 factory 路径；ARM ELF 检查所选编译、
 链接与资源；Source SDK 检查外部消费闭包。各类证据独立记录，不继承旧计数。

@@ -162,13 +162,13 @@ controller registers remain compile-time specializations, with bounded channel
 selection and no scan of other channels. CMake compiles only selected wrappers.
 No per-instance dispatch table is added.
 
-The two `tests/contracts/multi_controller_assembly/*timer-channels*.toml`
+The two `tests/integration/assemblies/multi_controller_assembly/*timer-channels*.toml`
 references select three independent capture timers and both advanced timers on
 F407VE/baremetal and F407ZG/FreeRTOS. They exercise different channels and common
 break inputs without inventing PCB connections. Ring storage is supplied at
 capture start, not allocated by platform startup.
 
-The `tests/contracts/timer_advanced_inputs/` software references add TIM1/TIM8
+The `tests/integration/assemblies/timer_advanced_inputs/` software references add TIM1/TIM8
 capture and encoder as well as small-timer coverage. TIM2 remains the Core
 monotonic timer; TIM6/TIM7 have no capture channels. A software route is not PCB
 wiring or evidence of measured edges.

@@ -9,7 +9,7 @@
 
 ```sh
 python scripts/validation/junit.py --report build/native-debug/ctest-results.xml
-python -m unittest discover -s tests/contracts -p test_junit.py
+python -m unittest discover -s tests/integration -p test_junit.py
 ```
 
 Native、生产寄存器模型、ARM 链接／资源和物理 HIL 分别建立证据。

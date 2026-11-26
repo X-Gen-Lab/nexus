@@ -91,16 +91,16 @@ payload 链接于 primary origin＋512 字节，尾部保守预留 1024 字节�
 
 ## 独立 payload 链接参考
 
-[`payload.toml`](../../../tests/contracts/mcuboot_link/payload.toml) 与相邻
+[`payload.toml`](../../../tests/integration/protocols/mcuboot_link/payload.toml) 与相邻
 `payload-layout.json` 是维护的显式输入，不是配置工具运行后遗留的生成物。
 完整 boot 参考默认复用 SDK 的装配、布局与公开测试公钥；显式指定 payload 装配
 时，仅构建下方 target，验证 primary 执行窗口。准备 CMake、Ninja 和 ARM GCC 后，
 从仓库根执行：
 
 ```sh
-cmake -S tests/contracts/mcuboot_link -B build/mcuboot-payload -G Ninja \
+cmake -S tests/integration/protocols/mcuboot_link -B build/mcuboot-payload -G Ninja \
   -DNEXUS_PLATFORM_ROOT="$PWD" \
-  -DNEXUS_ASSEMBLY_FILE="$PWD/tests/contracts/mcuboot_link/payload.toml" \
+  -DNEXUS_ASSEMBLY_FILE="$PWD/tests/integration/protocols/mcuboot_link/payload.toml" \
   -DCMAKE_TOOLCHAIN_FILE="$PWD/cmake/toolchains/arm-gcc.cmake"
 cmake --build build/mcuboot-payload --target mcuboot_application_payload
 ```

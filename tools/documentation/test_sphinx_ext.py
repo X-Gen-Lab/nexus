@@ -289,10 +289,10 @@ class DocumentationSourceTests(unittest.TestCase):
             root = Path(temporary)
             page = root / 'docs/design/example.md'
             page.parent.mkdir(parents=True)
-            (root / 'tests/contracts').mkdir(parents=True)
-            result = sphinx_ext.rewrite_local_links('[tests](../../tests/contracts)', page,
+            (root / 'tests/integration').mkdir(parents=True)
+            result = sphinx_ext.rewrite_local_links('[tests](../../tests/integration)', page,
                                                     root / 'docs', root, 'a' * 40)
-            self.assertIn('/tree/' + 'a' * 40 + '/tests/contracts', result)
+            self.assertIn('/tree/' + 'a' * 40 + '/tests/integration', result)
 
     def test_local_data_link_becomes_sphinx_download_role(self):
         with tempfile.TemporaryDirectory() as temporary:

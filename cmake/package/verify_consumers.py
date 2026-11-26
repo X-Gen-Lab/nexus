@@ -305,13 +305,13 @@ def service_sources(sdk, specification):
             raise ValueError("F4 reference requires its canonical Board directory")
         name = (board / "board.json").as_posix()
         if specification.scenario == "f4_family":
-            consumer = Path(sdk) / "tests/contracts/crc_assembly/consumer.c"
+            consumer = Path(sdk) / "tests/integration/assemblies/crc_assembly/consumer.c"
         elif specification.scenario == "f4_gpio":
             consumer = verification / "gpio_consumer.c"
         elif (specification.scenario == "f4_graphics_sdram" or
               (specification.scenario == "f4_graphics" and
                specification.assembly != "image-only.toml")):
-            graphics = Path(sdk) / "tests/contracts/stm32f4_graphics"
+            graphics = Path(sdk) / "tests/integration/assemblies/stm32f4_graphics"
             return {"main.c": graphics / "sustained_consumer.c",
                     "sustained_sequence.c": graphics / "sustained_sequence.c",
                     "sustained_sequence.h": graphics / "sustained_sequence.h",

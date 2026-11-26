@@ -81,7 +81,7 @@ TOML 的 `[gpio.<id>]` 可显式设置 `active_high`，仅接受单 bit mask。
 读接口无法把未授权 bit 与实际 LOW 区分，不能用读取结果替代绑定校验。GPIO 初值
 与逻辑极性独立；软件 I2C／SPI／OneWire 继续使用所需的物理电平和开漏释放合同。
 
-以下是完整开发检出中[维护回归](../tests/google/core/polymorphic_mock_test.cpp)的绑定
+以下是完整开发检出中[维护回归](../tests/behavior/core/polymorphic_mock_test.cpp)的绑定
 片段，省略 mock 与断言，仅说明集成侧连接。Source SDK 不携带该测试；按包 manifest
 的源码提交到原仓库阅读。`port` 已初始化且授权测试 mask `8U`；该值不声明任何
 Board 接线。绑定与端口须覆盖所有使用者生命周期，调用者按返回值处理失败。

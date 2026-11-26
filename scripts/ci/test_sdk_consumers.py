@@ -31,7 +31,7 @@ class SDKChangeTests(unittest.TestCase):
             head = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root,
                                            text=True).strip()
             fixtures = Path(__file__).resolve().parents[2]
-            for name in ("cmake/package/verification", "tests/contracts"):
+            for name in ("cmake/package/verification", "tests/integration"):
                 for source in (fixtures / name).rglob("*.toml"):
                     target = root / source.relative_to(fixtures)
                     target.parent.mkdir(parents=True, exist_ok=True)

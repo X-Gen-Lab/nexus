@@ -112,7 +112,7 @@ def check_tick_entry(text):
 def source_inputs(root):
     paths = set()
     for layer in ('core', 'arch', 'io', 'os', 'soc', 'drivers', 'boards', 'tools/configure',
-                  'tests/contracts/os_threadx_runtime'):
+                  'tests/integration/kernels/os_threadx_runtime'):
         paths.update(path for path in (root / layer).rglob('*')
                      if path.is_file() and '__pycache__' not in path.parts and
                      (path.suffix in {'.c', '.h', '.S', '.s', '.py', '.json',
@@ -165,7 +165,7 @@ def execute_variant(root, recorder, tools, row):
     directory = recorder.output / row['name']
     assembly = write_inputs(root, directory / 'inputs', row)
     build = directory / 'build'
-    recorder.execute([tools['cmake'], '-S', str(root / 'tests/contracts/os_threadx_runtime'),
+    recorder.execute([tools['cmake'], '-S', str(root / 'tests/integration/kernels/os_threadx_runtime'),
                       '-B', str(build), '-G', 'Ninja',
                       '-DCMAKE_TOOLCHAIN_FILE=' + str(root / 'cmake/toolchains/arm-gcc.cmake'),
                       '-DCMAKE_C_COMPILER=' + tools['gcc'],

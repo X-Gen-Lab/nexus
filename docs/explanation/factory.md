@@ -127,8 +127,8 @@ The default-disabled option emits no diagnostic text or runtime lookup objects.
 Named ordinal constants alone occupy no runtime storage. See the actual
 [factory emitter](../../tools/configure/factory.py),
 [binding emitter](../../tools/configure/bindings.py),
-[configuration regressions](../../tools/configure/tests/test_factory_diagnostics.py)
-and [generated Native factory tests](../../tests/google/io/native_factory_test.cpp).
+[configuration regressions](../../tools/configure/tests/emission/test_factory_diagnostics.py)
+and [generated Native factory tests](../../tests/behavior/io/native_factory_test.cpp).
 These source/test locations are review entry points, not downloadable execution
 receipts or new-source software qualification.
 
@@ -152,12 +152,12 @@ changes mode or silently acquires execution ownership.
 
 This complete maintained assembly selects independent Native instances:
 
-The complete [host-model assembly](../../tests/contracts/native_assembly/multi.toml)
+The complete [host-model assembly](../../tests/integration/assemblies/native_assembly/multi.toml)
 is a test fixture, not a production Board. Resolve it explicitly:
 
 ```sh
 python tools/configure/configure.py check --test-support \
-  --assembly tests/contracts/native_assembly/multi.toml
+  --assembly tests/integration/assemblies/native_assembly/multi.toml
 ```
 
 The [async tutorial](../tutorials/async-io.md) runs the complete generated factory

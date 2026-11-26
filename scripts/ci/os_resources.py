@@ -368,11 +368,11 @@ def profile_comparisons(variants: list[dict]) -> list[dict]:
 
 def source_inputs(root: Path) -> list[dict]:
     result = {item['path']: item for item in os_profiles.source_inputs(root)}
-    for path in (Path(__file__), root / 'tests/contracts/os_resources/main.c',
-                 root / 'tests/contracts/os_resources/CMakeLists.txt',
-                 root / 'tests/contracts/os_resources/linker.ld',
-                 root / 'tests/contracts/os_resources/core_arch_probe.c',
-                 root / 'tests/contracts/os_resources/operation_probe.c'):
+    for path in (Path(__file__), root / 'tests/integration/resources/os_resources/main.c',
+                 root / 'tests/integration/resources/os_resources/CMakeLists.txt',
+                 root / 'tests/integration/resources/os_resources/linker.ld',
+                 root / 'tests/integration/resources/os_resources/core_arch_probe.c',
+                 root / 'tests/integration/resources/os_resources/operation_probe.c'):
         identity = compiler_gate.digest(path)
         result[identity['path']] = identity
     return [result[name] for name in sorted(result)]
@@ -476,7 +476,7 @@ def host_operation_counts(root, recorder, database):
         compiled.append(str(target))
         selected_flags = (compiler, flags)
     compiler, flags = selected_flags
-    source = root / 'tests/contracts/os_resources/operation_probe.c'
+    source = root / 'tests/integration/resources/os_resources/operation_probe.c'
     inputs.extend([compiler_gate.digest(source), compiler_gate.digest(Path(compiler))])
     target = recorder.output / 'operation-probe.o'
     recorder.execute([compiler, *flags, '-c', str(source), '-o', str(target)],
@@ -507,7 +507,7 @@ def execute_variant(root: Path, recorder, selected_tools: dict,
     if cmake is None or ninja is None:
         raise ValueError('Actual CMake and Ninja executables are required')
     recorder.execute([
-        cmake, '-S', str(root / 'tests/contracts/os_resources'), '-B', str(build),
+        cmake, '-S', str(root / 'tests/integration/resources/os_resources'), '-B', str(build),
         '-G', 'Ninja', '-DCMAKE_TOOLCHAIN_FILE=' +
         str(root / 'cmake/toolchains/arm-gcc.cmake'),
         '-DCMAKE_C_COMPILER=' + selected_tools['gcc'],

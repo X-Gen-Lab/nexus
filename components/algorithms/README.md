@@ -90,7 +90,7 @@ force。初始姿态、实际 dt、标定、坐标和样本配对来自应用；
 `Nexus::CMSISDSP` 中锁定的 upstream f32 dot、FIR、DF1 biquad 和固定 RFFT1024。
 详见 [selected profile](cmsis_dsp/README.md)。
 
-`tests/google/components/common_algorithms_test.cpp` 是真实 C 算法合同；
+`tests/behavior/components/algorithms/common_algorithms_test.cpp` 是真实 C 算法合同；
 `common_motion_test.cpp` 覆盖标定、角度、模数跨界、位置／速度溢出及轨迹边界。
 `common_attitude_test.cpp` 覆盖旋转约定、缩放归一化、已知 gyro 轨迹、倾角校正和失败
 原子性。

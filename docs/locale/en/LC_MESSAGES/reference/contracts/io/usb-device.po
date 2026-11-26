@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 78c2256c630d430932dbc97fa8c1dd122344f6e21bb7b7208c1147370d515b6e\n"
+"X-Nexus-Source-SHA256: 63073dcdd51235c50fd7f62f9e6a77b1fa199fb2eed10952cff3177aefa7bce3\n"
 
 #: ../../../../../../docs/reference/contracts/io/usb-device.md:9
 msgid "USB Device 传输与控制"
@@ -289,15 +289,15 @@ msgstr ""
 
 #: ../../../../../../docs/reference/contracts/io/usb-device.md:120
 msgid ""
-"软件参考位于 `tests/contracts/usb_iso_assembly/`，分别覆盖 FS 最大 IN、HS core 内置 PHY 的全速 "
-"OUT 和 ULPI HS DMA。这些 ISO 参考不验证远程唤醒，也不提供完整 USB 音视频 class "
+"软件参考位于 `tests/integration/assemblies/usb_iso_assembly/`，分别覆盖 FS 最大 IN、HS "
+"core 内置 PHY 的全速 OUT 和 ULPI HS DMA。这些 ISO 参考不验证远程唤醒，也不提供完整 USB 音视频 class "
 "或物理吞吐／时序资格；远程唤醒使用下述独立合同。"
 msgstr ""
-"Software references in `tests/contracts/usb_iso_assembly/` cover maximum FS "
-"IN, full-speed OUT on the HS core with its internal PHY, and ULPI HS DMA. "
-"These ISO references do not validate remote wake or provide a complete USB "
-"audio/video class or physical throughput/timing qualification; remote wake "
-"follows the separate contract below."
+"Software references in `tests/integration/assemblies/usb_iso_assembly/` "
+"cover maximum FS IN, full-speed OUT on the HS core with its internal PHY, "
+"and ULPI HS DMA. These ISO references do not validate remote wake or provide"
+" a complete USB audio/video class or physical throughput/timing "
+"qualification; remote wake follows the separate contract below."
 
 #: ../../../../../../docs/reference/contracts/io/usb-device.md:124
 msgid "非零 endpoint 显式 activation"

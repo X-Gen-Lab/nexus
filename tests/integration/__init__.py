@@ -1,0 +1,1 @@
+"""Maintained platform integration contracts."""

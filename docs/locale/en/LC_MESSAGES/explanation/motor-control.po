@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 0bba1033937d702b175ff70613289a22a349317b5fb6db32d3e238561807e388\n"
+"X-Nexus-Source-SHA256: 5622a6f7c7809ef366d995f5d19fb998d48aa89520ba12621296be19b43d29fc\n"
 
 #: ../../../../docs/explanation/motor-control.md:9
 msgid "电机计算、轴目标与硬件执行"
@@ -316,10 +316,10 @@ msgstr "Selected capture and resources"
 #: ../../../../docs/explanation/motor-control.md:0
 msgid ""
 "[control.toml](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/tests/contracts/f407_power_stage/control.toml)"
+"SOURCE/tests/integration/assemblies/f407_power_stage/control.toml)"
 msgstr ""
 "[control.toml](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/tests/contracts/f407_power_stage/control.toml)"
+"SOURCE/tests/integration/assemblies/f407_power_stage/control.toml)"
 
 #: ../../../../docs/explanation/motor-control.md:0
 msgid "TIM8、ADC1 三相加母线顺序 rank、TIM4"
@@ -332,10 +332,10 @@ msgstr "The raw phases are not simultaneous measurements"
 #: ../../../../docs/explanation/motor-control.md:0
 msgid ""
 "[single.toml](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/tests/contracts/f407_power_stage/single.toml)"
+"SOURCE/tests/integration/assemblies/f407_power_stage/single.toml)"
 msgstr ""
 "[single.toml](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/tests/contracts/f407_power_stage/single.toml)"
+"SOURCE/tests/integration/assemblies/f407_power_stage/single.toml)"
 
 #: ../../../../docs/explanation/motor-control.md:0
 msgid "单轴、ADC1 两路相电流，无必需母线／编码器"
@@ -348,10 +348,10 @@ msgstr "Angle and bus must come from valid independent sources"
 #: ../../../../docs/explanation/motor-control.md:0
 msgid ""
 "[dual.toml](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/tests/contracts/f407_power_stage/dual.toml)"
+"SOURCE/tests/integration/assemblies/f407_power_stage/dual.toml)"
 msgstr ""
 "[dual.toml](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/tests/contracts/f407_power_stage/dual.toml)"
+"SOURCE/tests/integration/assemblies/f407_power_stage/dual.toml)"
 
 #: ../../../../docs/explanation/motor-control.md:0
 msgid "TIM8／ADC1 与 TIM1／ADC2，各自顺序采集；共享 common／IRQ"
@@ -364,10 +364,10 @@ msgstr "Neither one-ADC time sharing nor single-axis simultaneous dual ADC"
 #: ../../../../docs/explanation/motor-control.md:0
 msgid ""
 "[pair.toml](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/tests/contracts/f407_power_stage/pair.toml)"
+"SOURCE/tests/integration/assemblies/f407_power_stage/pair.toml)"
 msgstr ""
 "[pair.toml](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/tests/contracts/f407_power_stage/pair.toml)"
+"SOURCE/tests/integration/assemblies/f407_power_stage/pair.toml)"
 
 #: ../../../../docs/explanation/motor-control.md:0
 msgid "单轴 ADC1＋ADC2 injected simultaneous，各一 rank、相同采样配置"
@@ -384,10 +384,10 @@ msgstr ""
 #: ../../../../docs/explanation/motor-control.md:0
 msgid ""
 "[center.toml](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/tests/contracts/f407_power_stage/center.toml)"
+"SOURCE/tests/integration/assemblies/f407_power_stage/center.toml)"
 msgstr ""
 "[center.toml](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/tests/contracts/f407_power_stage/center.toml)"
+"SOURCE/tests/integration/assemblies/f407_power_stage/center.toml)"
 
 #: ../../../../docs/explanation/motor-control.md:0
 msgid "TIM8 完整载波、下降段 CC4、更新 IRQ 门控"
@@ -402,10 +402,10 @@ msgstr ""
 #: ../../../../docs/explanation/motor-control.md:0
 msgid ""
 "[tdm.toml](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/tests/contracts/f407_power_stage/tdm.toml)"
+"SOURCE/tests/integration/assemblies/f407_power_stage/tdm.toml)"
 msgstr ""
 "[tdm.toml](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/tests/contracts/f407_power_stage/tdm.toml)"
+"SOURCE/tests/integration/assemblies/f407_power_stage/tdm.toml)"
 
 #: ../../../../docs/explanation/motor-control.md:0
 msgid "TIM8／TIM1 两轴中心对齐、相差半载波，共用 ADC1"
@@ -421,10 +421,10 @@ msgstr ""
 #: ../../../../docs/explanation/motor-control.md:0
 msgid ""
 "[dc.toml](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/tests/contracts/f407_power_stage/dc.toml)"
+"SOURCE/tests/integration/assemblies/f407_power_stage/dc.toml)"
 msgstr ""
 "[dc.toml](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/tests/contracts/f407_power_stage/dc.toml)"
+"SOURCE/tests/integration/assemblies/f407_power_stage/dc.toml)"
 
 #: ../../../../docs/explanation/motor-control.md:0
 msgid "单轴 ADC1 单路母线分流、边沿对齐、每载波两次有效矢量采集"
@@ -441,10 +441,10 @@ msgstr ""
 #: ../../../../docs/explanation/motor-control.md:0
 msgid ""
 "[fast.toml](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/tests/contracts/f407_power_stage/fast.toml)"
+"SOURCE/tests/integration/assemblies/f407_power_stage/fast.toml)"
 msgstr ""
 "[fast.toml](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/tests/contracts/f407_power_stage/fast.toml)"
+"SOURCE/tests/integration/assemblies/f407_power_stage/fast.toml)"
 
 #: ../../../../docs/explanation/motor-control.md:0
 msgid "20 kHz 载波与声明预算"
@@ -917,10 +917,10 @@ msgstr ""
 #: ../../../../docs/explanation/motor-control.md:0
 msgid ""
 "[电流测试](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/tests/google/components/current_control_test.cpp)"
+"SOURCE/tests/behavior/components/control/current_control_test.cpp)"
 msgstr ""
 "[Current tests](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/tests/google/components/current_control_test.cpp)"
+"SOURCE/tests/behavior/components/control/current_control_test.cpp)"
 
 #: ../../../../docs/explanation/motor-control.md:0
 msgid ""
@@ -948,10 +948,10 @@ msgstr ""
 #: ../../../../docs/explanation/motor-control.md:0
 msgid ""
 "[电机测试](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/tests/google/components/motor_control_test.cpp)"
+"SOURCE/tests/behavior/components/control/motor_control_test.cpp)"
 msgstr ""
 "[Motor tests](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/tests/google/components/motor_control_test.cpp)"
+"SOURCE/tests/behavior/components/control/motor_control_test.cpp)"
 
 #: ../../../../docs/explanation/motor-control.md:0
 msgid "同一 FOC SDK consumer：Native 执行、F407 纯算法链接，不启动 PowerStage session"
@@ -978,10 +978,11 @@ msgstr ""
 #: ../../../../docs/explanation/motor-control.md:0
 msgid ""
 "[调制测试](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/tests/google/components/modulation_control_test.cpp)"
+"SOURCE/tests/behavior/components/control/modulation_control_test.cpp)"
 msgstr ""
 "[Modulation tests](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
-"DOCUMENTATION-SOURCE/tests/google/components/modulation_control_test.cpp)"
+"DOCUMENTATION-"
+"SOURCE/tests/behavior/components/control/modulation_control_test.cpp)"
 
 #: ../../../../docs/explanation/motor-control.md:0
 msgid ""
@@ -1010,14 +1011,14 @@ msgstr ""
 #: ../../../../docs/explanation/motor-control.md:0
 msgid ""
 "[轴测试](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/tests/google/components/axis_control_test.cpp)、[交接测试](https://github.com/X-Gen-"
+"SOURCE/tests/behavior/components/control/axis_control_test.cpp)、[交接测试](https://github.com/X-Gen-"
 "Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/tests/google/components/drive_control_test.cpp)"
+"SOURCE/tests/behavior/components/control/drive_control_test.cpp)"
 msgstr ""
 "[Axis tests](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/tests/google/components/axis_control_test.cpp), [Handoff "
+"SOURCE/tests/behavior/components/control/axis_control_test.cpp), [Handoff "
 "tests](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/tests/google/components/drive_control_test.cpp)"
+"SOURCE/tests/behavior/components/control/drive_control_test.cpp)"
 
 #: ../../../../docs/explanation/motor-control.md:0
 msgid "FOC SDK 组合这条公共链；实际 Task／IRQ 分工由外部应用完成"
@@ -1068,10 +1069,11 @@ msgstr ""
 #: ../../../../docs/explanation/motor-control.md:0
 msgid ""
 "[生产 C 寄存器模型](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/tests/google/soc/power_stage_test.cpp)"
+"SOURCE/tests/behavior/soc/stm32/stm32f4/pwm_adc/power_stage_test.cpp)"
 msgstr ""
 "[Production C register model](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
-"DOCUMENTATION-SOURCE/tests/google/soc/power_stage_test.cpp)"
+"DOCUMENTATION-"
+"SOURCE/tests/behavior/soc/stm32/stm32f4/pwm_adc/power_stage_test.cpp)"
 
 #: ../../../../docs/explanation/motor-control.md:0
 msgid "上表 control／single／fast／center／dual 为冷态 ARM fixture，不据此声称实板快环运行"
@@ -1095,10 +1097,11 @@ msgstr ""
 #: ../../../../docs/explanation/motor-control.md:0
 msgid ""
 "[pair 测试](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/tests/google/soc/adc_pair_test.cpp)及寄存器模型"
+"SOURCE/tests/behavior/soc/stm32/stm32f4/pwm_adc/adc_pair_test.cpp)及寄存器模型"
 msgstr ""
 "[Pair tests](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/tests/google/soc/adc_pair_test.cpp) and the register model"
+"SOURCE/tests/behavior/soc/stm32/stm32f4/pwm_adc/adc_pair_test.cpp) and the "
+"register model"
 
 #: ../../../../docs/explanation/motor-control.md:0
 msgid "`pair.toml` 同时进入 ARM fixture 和规范 Source SDK consumer，仍不测实际孔径"
@@ -1146,14 +1149,15 @@ msgstr ""
 #: ../../../../docs/explanation/motor-control.md:0
 msgid ""
 "[采集测试](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/tests/google/soc/single_shunt_test.cpp)、[周期测试](https://github.com/X-Gen-"
+"SOURCE/tests/behavior/soc/stm32/stm32f4/pwm_adc/single_shunt_test.cpp)、[周期测试](https://github.com/X-Gen-"
 "Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/tests/google/soc/power_stage_dc_test.cpp)及寄存器模型"
+"SOURCE/tests/behavior/soc/stm32/stm32f4/pwm_adc/power_stage_dc_test.cpp)及寄存器模型"
 msgstr ""
 "[Capture tests](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/tests/google/soc/single_shunt_test.cpp), [Cycle "
-"tests](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/tests/google/soc/power_stage_dc_test.cpp) and the register model"
+"SOURCE/tests/behavior/soc/stm32/stm32f4/pwm_adc/single_shunt_test.cpp), "
+"[Cycle tests](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/tests/behavior/soc/stm32/stm32f4/pwm_adc/power_stage_dc_test.cpp) and"
+" the register model"
 
 #: ../../../../docs/explanation/motor-control.md:0
 msgid ""
@@ -1214,19 +1218,19 @@ msgstr ""
 msgid ""
 "ARM fixture 与 SDK 冷态 consumer 检验配置、公共接口、选编、链接和资源； [fixture "
 "main](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/tests/contracts/f407_power_stage/main.c) 不启动电驱 session。 寄存器模型执行真实 "
-"provider C，PMSM 模型执行控制组合；两者都不能证明真实 开关、采样孔径、IRQ 延迟或电气保护。物理 HIL 仍为 "
+"SOURCE/tests/integration/assemblies/f407_power_stage/main.c) 不启动电驱 session。 "
+"寄存器模型执行真实 provider C，PMSM 模型执行控制组合；两者都不能证明真实 开关、采样孔径、IRQ 延迟或电气保护。物理 HIL 仍为 "
 "`not_executed`。 未列出的拓扑组合、固定相移 mapper、TDM 运行中加入及非 F4 provider 保持未开放。"
 msgstr ""
 "ARM fixtures and cold SDK consumers check configuration, public interfaces, "
 "source selection, linking and resources; the [fixture "
 "main](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/tests/contracts/f407_power_stage/main.c) does not start a drive "
-"session. Register models execute real provider C, while PMSM models execute "
-"the control composition. Neither establishes actual switching, sampling "
-"apertures, IRQ latency or electrical protection. Physical HIL remains "
-"`not_executed`. Unlisted topology combinations, fixed-shift mappers, TDM hot"
-" join and non-F4 providers remain unexposed."
+"SOURCE/tests/integration/assemblies/f407_power_stage/main.c) does not start "
+"a drive session. Register models execute real provider C, while PMSM models "
+"execute the control composition. Neither establishes actual switching, "
+"sampling apertures, IRQ latency or electrical protection. Physical HIL "
+"remains `not_executed`. Unlisted topology combinations, fixed-shift mappers,"
+" TDM hot join and non-F4 providers remain unexposed."
 
 #: ../../../../docs/explanation/motor-control.md:261
 msgid ""

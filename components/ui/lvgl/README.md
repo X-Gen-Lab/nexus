@@ -63,6 +63,6 @@ ILI9341／XPT2046 消费可参考外部示例仓库 `recipes/ui`，触摸校准�
 
 精确来源见 `dependencies/lvgl.lock.json`。CMake 只编译固定源码列表；锁文件保留
 实际头闭包、MIT 原文和 TLSF 的 BSD-3-Clause 原文，不编译未选择的库存模块。
-`tests/google/components/lvgl_test.cpp` 执行真实上游分配器、控件、timer、软件 renderer
+`tests/behavior/components/ui/lvgl_test.cpp` 执行真实上游分配器、控件、timer、软件 renderer
 与退出，模型只提供 settled display/input 边界。独立消费者、ARM 成本和物理显示
 行为各有独立证据，软件测试不建立刷新率或 HIL 结论。

@@ -62,7 +62,7 @@ target_link_libraries(app PRIVATE Nexus::OS)
 Native 不提供 `priority` 或硬件 `isr_notify`；Host ThreadX 不提供硬件 `isr_notify`；
 裸机仅声明 `wait`，不能接纳要求 task-profile 的消费者。task-profile 是能力集合的
 说明，不是新增 TOML 字段。配置与源码仍沿同一目标图维护。实际回归入口为
-[`test_platform_entry.py`](../../tools/testing/test_platform_entry.py)，不能仅凭此片段
+[`test_platform_entry.py`](../../tools/testing/execution/test_platform_entry.py)，不能仅凭此片段
 宣称另一个后端或目标已验证。
 
 详细 port、IRQ ceiling、Tick 和错误语义集中在

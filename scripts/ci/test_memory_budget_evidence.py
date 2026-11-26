@@ -108,7 +108,7 @@ class MemoryBudgetEvidenceTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as name:
             output = Path(name)
             for family, preset, region in (('stm32', 'zg-ccm', 'ccm'),):
-                template = ROOT / 'tests/contracts' / (family + '_memory') / (preset + '.toml')
+                template = ROOT / 'tests/integration/resources' / (family + '_memory') / (preset + '.toml')
                 before = template.read_bytes()
                 selected = output / (region + '.toml')
                 self.gate().write_budget_assembly(template, selected, region)
@@ -120,7 +120,7 @@ class MemoryBudgetEvidenceTests(unittest.TestCase):
                 self.assertEqual(template.read_bytes(), before)
 
     def test_authored_overflow_input_rejects_invalid_region_and_occupied_output(self):
-        template = ROOT / 'tests/contracts/stm32_memory/zg-ccm.toml'
+        template = ROOT / 'tests/integration/resources/stm32_memory/zg-ccm.toml'
         with tempfile.TemporaryDirectory() as name:
             output = Path(name) / 'assembly.toml'
             with self.assertRaises(ValueError):

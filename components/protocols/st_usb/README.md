@@ -45,7 +45,7 @@ DeInit 在真实 drain 后执行一次；已停止后的 ClosePipe 只清理软�
 记录时，Init、DeInit、Requests 与 BgndProcess 必须齐全，初始化先检查这些 Core
 必需回调，再接触 transport 或 VBUS。
 
-`tests/contracts/st_usb_host_assembly` 编译真实 Core、私有接线和实际 F407 HCD。
+`tests/integration/assemblies/st_usb_host_assembly` 编译真实 Core、私有接线和实际 F407 HCD。
 它的 VBUS 回调拒绝开启未知开关；这份软件链接参考不虚构 PCB、电源、PHY reset、
 晶振精度或物理枚举证据。GoogleTest 使用真实官方 Core，替换外部 transport 边界；
 ARM ELF 证明静态装配和资源预算。物理 HIL 为 `not_executed`。

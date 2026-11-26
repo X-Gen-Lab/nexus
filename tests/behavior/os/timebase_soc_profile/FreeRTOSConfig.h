@@ -1,0 +1,10 @@
+/**
+ * \file            FreeRTOSConfig.h
+ * \brief           Exact test clock facts for optional SoC timer bindings
+ * \author          Nexus Team
+ */
+#ifndef NX_TIMEBASE_SOC_TEST_CONFIG_H
+#define NX_TIMEBASE_SOC_TEST_CONFIG_H
+#include "../../../integration/kernels/os_freertos_runtime/FreeRTOSConfig.h"
+#define configUSE_TICKLESS_IDLE 2
+#endif /* NX_TIMEBASE_SOC_TEST_CONFIG_H */

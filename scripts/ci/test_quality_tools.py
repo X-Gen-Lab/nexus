@@ -387,7 +387,7 @@ class RequiredAnalysisTests(unittest.TestCase):
                             expression)
 
     def test_owned_posix_event_support_is_analyzed(self):
-        support = self.root / "tests/contracts/os_freertos_runtime/posix_event.c"
+        support = self.root / "tests/integration/kernels/os_freertos_runtime/posix_event.c"
         support.parent.mkdir(parents=True)
         support.write_text("int event_support;\n")
         self.database([support])
@@ -395,10 +395,10 @@ class RequiredAnalysisTests(unittest.TestCase):
         self.assertEqual(len(selected), 1)
         self.assertEqual(selected[0]["nexus_analysis_scope"], "host-model")
         self.assertEqual(selected[0]["nexus_production_source"],
-                         "tests/contracts/os_freertos_runtime/posix_event.c")
+                         "tests/integration/kernels/os_freertos_runtime/posix_event.c")
 
     def test_owned_posix_idle_signal_progress_is_analyzed(self):
-        support = self.root / "tests/contracts/os_freertos_runtime/posix_idle.c"
+        support = self.root / "tests/integration/kernels/os_freertos_runtime/posix_idle.c"
         support.parent.mkdir(parents=True)
         support.write_text("int idle_support;\n")
         self.database([support])
@@ -406,13 +406,13 @@ class RequiredAnalysisTests(unittest.TestCase):
         self.assertEqual(len(selected), 1)
         self.assertEqual(selected[0]["nexus_analysis_scope"], "host-model")
         self.assertEqual(selected[0]["nexus_production_source"],
-                         "tests/contracts/os_freertos_runtime/posix_idle.c")
+                         "tests/integration/kernels/os_freertos_runtime/posix_idle.c")
 
     def test_register_models_use_actual_production_compilation_entries(self):
         source = self.root / "soc/stm32/stm32f4/drivers/uart/uart.c"
         source.parent.mkdir(parents=True)
         source.write_text("int production_driver;\n")
-        model = self.root / "tests/contracts/stm32_io_test.c"
+        model = self.root / "tests/integration/providers/stm32_io_test.c"
         model.parent.mkdir(parents=True)
         model.write_text("int model_test;\n")
         entries = [

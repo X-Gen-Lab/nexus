@@ -239,7 +239,7 @@ class STM32F4PrivateHeaderCompileTests(unittest.TestCase):
                     ROOT / "soc/stm32/stm32f4/drivers/ip/legacy_mac",
                     ROOT / "soc/stm32/stm32f4/drivers/ip/classic_can",
                     ROOT / "soc/stm32/stm32f4/drivers/ip/advanced_timer",
-                    ROOT / "tests/contracts/multi_controller",
+                    ROOT / "tests/integration/assemblies/multi_controller",
                     ROOT / "core/include", ROOT / "arch/include",
                     ROOT / "io/include", ROOT / "io/private",
                     ROOT / "components/protocols/usb_control/include",

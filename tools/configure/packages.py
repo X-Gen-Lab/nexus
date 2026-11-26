@@ -48,7 +48,7 @@ def _manifest_contract():
                           "items": root},
                 "exclude": {"type": "array", "uniqueItems": True, "items": relative},
                 "verification_files": {"type": "array", "uniqueItems": True,
-                    "items": {"allOf": [relative, {"pattern": "^tests/contracts/"}]}}}}),
+                    "items": {"allOf": [relative, {"pattern": "^tests/integration/"}]}}}}),
         "scope": (False, {"type": "string", "enum": ["production", "reference"]}),
         "binding_files": (False, {"type": "array", "uniqueItems": True,
                                   "items": relative}),
@@ -246,7 +246,7 @@ def load(path, *, read=None):
         fail("Package verification exports require a list of contract files")
     verification_files = frozenset(_relative(name).as_posix() for name in files)
     if (len(files) != len(verification_files) or
-            any(not name.startswith("tests/contracts/") for name in verification_files)):
+            any(not name.startswith("tests/integration/") for name in verification_files)):
         fail("Package verification exports must be unique contract files")
     if path.read_bytes() != raw:
         fail("Declarative package changed during metadata loading")

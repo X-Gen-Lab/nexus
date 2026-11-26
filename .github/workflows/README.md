@@ -7,7 +7,7 @@
 | 工作流 | 责任 |
 |---|---|
 | build-matrix.yml | 四种 Native CTest／GoogleTest 模式、Arch／OS 编译检查、F4 板卡与外设装配 |
-| enterprise-tools.yml | 六个完整工具域，覆盖配置、构建、依赖、SDK、预算和 HIL 工装 |
+| enterprise-tools.yml | testing／configure／ci 三个常规工具域，加 integration 与 freertos 独立范围，覆盖构建、依赖、SDK、预算和 HIL 工装 |
 | quality-checks.yml | 与 hook 共用格式和注释规则；在真实编译数据库上运行静态分析 |
 | docs-build.yml | 锁定工具、文档测试、Doxygen 和严格中英文站点构建 |
 | docs-publish.yml | 复用本次 Pages 制品部署；main 手动入口只构建文档一次再部署 |
@@ -32,7 +32,8 @@ Pages 专用制品发布。只有部署 job 授予 Pages／OIDC 写权限，PR �
 发布后核对线上中英文页面、搜索资源及源码提交身份，分别记录构建和公网验收。
 
 普通 commit hook 读取完整暂存区，先检查所需工具，配置和构建一次，再执行完整
-Native GoogleTest。普通固件实现不触发整套辅助工具域；公共头、声明事实和工具改动
+Native CTest。hook 与 Native CI 使用同一目录和计划，逐例核对 GoogleTest
+发现结果及 XML 身份。公共头、声明事实和工具改动
 选择完整相关测试模块，未知或缺少已知覆盖时保守执行完整域。提交报告不代表完整资格；
 合并前通过 `--all` 独立执行完整工具矩阵、相关 ARM 与 SDK 验证。
 CI 的完整 Native runtime 另由 `scripts/ci/native_contracts.py` 校验。
@@ -42,7 +43,7 @@ CI 的完整 Native runtime 另由 `scripts/ci/native_contracts.py` 校验。
 
 ARM 装配通过 `provider_assemblies.py` 检查实际来源、链接和预算。
 `declared_io_assembly` 与 I/O evolution 的精确配置保留真实编译入口。
-SDK 的文件闭包和独立消费由 contracts 工具域验证，不在各 Native 模式重复。
+SDK 的文件闭包和独立消费由 integration 工具域验证，不在各 Native 模式重复。
 四个 Board 的 HIL prepare 只准备未绑定工装，
 不能建立物理通过状态。
 

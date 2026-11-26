@@ -10,7 +10,7 @@ RAM、MSP 与 heap。`interfaces.py` 单独检查只读接口对象和共享操�
 | --- | --- | --- |
 | 最小 GPIO | [Qiming GPIO TOML](../configure/assemblies/qiming-baremetal-gpio.toml) 和 `NEXUS_WORKLOAD=gpio` | STM32F407ZGT6 Qiming v3.1、HSE8／PLL168、baremetal、`Os`，只选 LED 输出 |
 | 最小 UART | [Qiming UART TOML](../configure/assemblies/qiming-baremetal-uart.toml) 和 `NEXUS_WORKLOAD=uart` | 同型号、Board、时钟、后端和优化，USART1 `irq-byte-event`、32 个 RX event |
-| 完整网络 | [Qiming 网络参考](../../tests/contracts/f407_qiming_network/README.md) | STM32F407ZGT6、HSE8／PLL168、baremetal、`Os`，DP83848、copied-RX lwIP TCP、TLS、MQTT、8 KiB MSP |
+| 完整网络 | [Qiming 网络参考](../../tests/integration/assemblies/f407_qiming_network/README.md) | STM32F407ZGT6、HSE8／PLL168、baremetal、`Os`，DP83848、copied-RX lwIP TCP、TLS、MQTT、8 KiB MSP |
 | 完整 phase FOC | [例库 `motor_drive_reference`](https://github.com/X-Gen-Lab/nexus-examples/tree/main/recipes/control/motor_drive) | STM32F407ZGT6、HSE8／PLL168、baremetal、`Os`，phase 电流、PowerStage、编码器、Axis／Drive／Motor、2 KiB MSP，默认未 commissioning |
 
 GPIO 与 UART 各保留 2 KiB MSP。所有四项选定 `libc_heap_bytes = 0`，没有 RTOS

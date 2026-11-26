@@ -57,7 +57,7 @@ ES0182 Rev19 §2.9.4 要求反复进入 INIT 前完成真实同步。日历设�
 
 ## 辅助硬件接口
 
-时长唤醒能力通过 `[rtc.calendar]` 中的 `periodic_wakeup = true` 显式选编，默认关闭。未选时返回 `UNSUPPORTED`，F4 镜像不保留时长求解器；原生计数器集成操作仍可用。`tests/contracts/rtc_bypass_assembly/adopt-periodic.toml` 提供显式软件参考配置，不建立实板唤醒资格。
+时长唤醒能力通过 `[rtc.calendar]` 中的 `periodic_wakeup = true` 显式选编，默认关闭。未选时返回 `UNSUPPORTED`，F4 镜像不保留时长求解器；原生计数器集成操作仍可用。`tests/integration/assemblies/rtc_bypass_assembly/adopt-periodic.toml` 提供显式软件参考配置，不建立实板唤醒资格。
 
 普通周期唤醒使用 `nx_rtc_port_periodic_wakeup`，调用者给出微秒周期和允许的最大量化误差，零周期关闭。提供者选择计数器并返回 `nx_rtc_period_t` 的 ticks／ticks_per_second；该比例只描述名义周期，不证明振荡器精度、校准误差或中断送达时间。不可表示且超出容差的请求在写硬件前返回 `UNSUPPORTED`，输出保持不变。控制失败也不修改输出，原硬件清理责任仍由同一 RTC owner 持有。
 

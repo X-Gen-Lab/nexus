@@ -117,7 +117,7 @@ incomplete IN／OUT（bit20／21）只使已到机会的 active ISO borrow 进�
 incomplete。取消、超时、reset 和 stop 都继续实际 drain，失败仍保留 request／payload
 并可进入 QUARANTINED，不能强制释放借用。
 
-软件参考位于 `tests/contracts/usb_iso_assembly/`，分别覆盖 FS 最大 IN、HS core
+软件参考位于 `tests/integration/assemblies/usb_iso_assembly/`，分别覆盖 FS 最大 IN、HS core
 内置 PHY 的全速 OUT 和 ULPI HS DMA。这些 ISO 参考不验证远程唤醒，也不提供完整
 USB 音视频 class 或物理吞吐／时序资格；远程唤醒使用下述独立合同。
 

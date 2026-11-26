@@ -27,6 +27,6 @@ RUN-02 层次状态机为 `not_selected`：本 profile 不实现父状态回退�
 连续载荷复用已有 stream 的存储合同；组件不另建 event bus。超时由外部 Core
 deadline/周期辅助函数变为事件，ClockDomain 可用于外部域生命周期协作，不是强依赖。
 
-GoogleTest/GoogleMock 位于 `tests/google/components/common_fsm_test.cpp`，直接验证
+GoogleTest/GoogleMock 位于 `tests/behavior/components/runtime/common_fsm_test.cpp`，直接验证
 真实 C 的转换顺序、guard、重入拒绝、实例隔离和非法配置。构建、ARM 链接与物理执行
 分别由对应结果建立；FSM 不证明用户回调 WCET 或业务状态安全。

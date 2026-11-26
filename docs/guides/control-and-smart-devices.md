@@ -182,7 +182,7 @@ provisioning，也没有因此完成 TLS opaque-key 集成。精确模式、单�
 | `recipes/network`、`apps/network_gateway` | 路由与交付事实、独立传输会话、boot audit 和网关消费 |
 
 阅读示例时使用该仓库交付记录绑定的精确提交与 Nexus 依赖，不从 `main` 的后续变化
-继承资格。本仓库 `tests/contracts/f407_pwm_adc` 和 `f407_pwm_adc_loop` 提供真实
-TOML、typed factory 与 ARM 链接入口；`tests/contracts/f407_power_stage` 增加电驱
+继承资格。本仓库 `tests/integration/assemblies/f407_pwm_adc` 和 `f407_pwm_adc_loop` 提供真实
+TOML、typed factory 与 ARM 链接入口；`tests/integration/assemblies/f407_power_stage` 增加电驱
 软件路线。这些 cold consumer 不执行实板快环。
 Native 行为、ARM 链接与实板测量分别记录；物理 HIL 仍为 `not_executed`。

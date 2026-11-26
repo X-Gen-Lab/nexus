@@ -66,7 +66,7 @@ typed factory 和 controller owner；DMA 扩展状态只在选中时分配。精
 
 DS8626 Rev12 对应 F405／F407，DS8597 Rev10 对应 F415／F417；新增 F411、F446、
 F479 分别使用 DS10314、DS10693、DS11118。芯片、封装与所需 pad 分别校验，
-不把组的并集授权给单颗器件。[内部时钟／CRC 软件参考](../../../tests/contracts/stm32f4_family/README.md)
+不把组的并集授权给单颗器件。[内部时钟／CRC 软件参考](../../../tests/integration/assemblies/stm32f4_family/README.md)
 为精确器件建立基础入口，图形、音频等模式仍按各自合同与配置验证，不证明外部 PCB
 接线。System、预 C 内存与 handoff 使用所选硅片准入；资料、C 实现、模型、
 ARM／SDK 及物理资格分别判断。Board／SoC 没有 Python 插件，集中主机工具只校验
@@ -280,7 +280,7 @@ ES0182 §2.2.18 的 PC13／LSE 耦合独立于输出速度：晶振 LSE 的 ON �
 bypass 不受此项耦合限制。RTC 的晶振模式另外保留 PC13 静默责任，不能与 PC13
 GPIO／AF／EXTI 同时选择；LSE bypass 的板级授权与 RTC 生命周期由 RTC owner 维护。
 
-软件参考见 `tests/contracts/gpio_exti_assembly/`，分别选择 VE 裸机与 ZG FreeRTOS
+软件参考见 `tests/integration/assemblies/gpio_exti_assembly/`，分别选择 VE 裸机与 ZG FreeRTOS
 装配。它们验证静态实例、实际 ARM 链接、资源预算与方法保留，不证明调度器已经
 运行、真实边沿已经采集或 PCB 电气已经验收。事件仍按既有合同保留 COALESCED／LOSS，
 不提供自动消抖或精确物理边沿时间。
@@ -329,7 +329,7 @@ pad、TX／RX stream、IRQ 和 selector，HAL admission、接收引擎与资源�
 | UART5 | DMA1 stream7／0 | 4 | 42 MHz |
 | USART6 | DMA2 stream6／1 | 5 | 84 MHz |
 
-`tests/contracts/multi_controller_assembly/*uart6*.toml` 覆盖两种封装、裸机／FreeRTOS 和四种 RX DMA／duplex
+`tests/integration/assemblies/multi_controller_assembly/*uart6*.toml` 覆盖两种封装、裸机／FreeRTOS 和四种 RX DMA／duplex
 模式的六实例链接参考。每种模式共享一张只读 ops 表，六个 context 独立；不授权 PCB 接线。
 
 额外 byte/event 路线为 USART3 PB10/PB11 AF7、UART4 PA0/PA1 AF8、UART5 PC12/PD2
@@ -419,7 +419,7 @@ gate、临时观察 gate、TIM3 和 DMA IRQ 分开记录责任，复用现有状
 计，且必须包含整数个完整 scan。分辨率选择不证明实际信号的精度、有效位数或可达
 采样率。
 
-`tests/contracts/adc_external_assembly/` 提供两种密度的软件参考装配，使用三个
+`tests/integration/assemblies/adc_external_assembly/` 提供两种密度的软件参考装配，使用三个
 GPIO bank 的 16-rank 反向序列，以及 VE／ZG 的三转换器独立实例装配；不代表实际
 板卡接线。本节为独立转换器模式；同步／交错／注入组使用
 [ADC group](../../../docs/reference/contracts/io/f407-adc-groups.md) 的唯一组 owner，不能和
@@ -437,7 +437,7 @@ TIM1／8 为 168 MHz，其余为 84 MHz；ADC clock 仍为 21 MHz。
 personality 仍互斥。原配置选择存入 cold owner，在撤回失败后保留精确 timer 身份，
 重试不能误关原 TIM3 或另一个 timer。所选 Core timebase 不可重复取得，当前绑定为
 TIM2；EXTI11 暂未接入。
-软件参考为 `tests/contracts/multi_controller_assembly/*adc-timers*.toml`，不建立
+软件参考为 `tests/integration/assemblies/multi_controller_assembly/*adc-timers*.toml`，不建立
 物理采样资格、PWM 相位关系或硬件同步多 ADC 支持。
 
 F407 的 ADC1 内部通道 16 为温度、17 为 VREFINT、18 为 VBAT／2。pinless
@@ -613,7 +613,7 @@ stop 撤回触发与波形后安装所声明空闲码，完整 close 才关闭�
 配置回读或 gate 撤回失败继续保留 cleanup receipt，可由同一 owner 重试。Platform
 随后恢复选中引脚和 GPIO clock；完整释放不承诺持续驱动空闲电平。
 
-`tests/contracts/dac_assembly/` 提供 VE 左对齐／ZG 8 位软件参考、真实 factory 与 ARM
+`tests/integration/assemblies/dac_assembly/` 提供 VE 左对齐／ZG 8 位软件参考、真实 factory 与 ARM
 链接消费者；它们不授权任何实际 PCB。当前没有 DAC 实板或模拟负载资格，物理 HIL
 为 `not_executed`。已接入的 EXTI9 硬件事件必须来自显式 event owner；不接纳未知共享触发。
 
@@ -670,7 +670,7 @@ CRC 是有可变硬件状态的 controller，使用同一静态 typed factory �
 输入为明确的 32 位数值字，MSB 优先；初值为 0xffffffff，不反射、不做 final XOR。
 空序列返回初值，字节流的拼装和尾部补齐由调用方决定。每 16 个字检查进度，最后
 读取后再次检查 deadline；失败不发布部分签名，也不保留输入。输入／输出不得覆盖
-provider state、CRC 或其时钟控制寄存器。`tests/contracts/crc_assembly/` 提供 VE／ZG
+provider state、CRC 或其时钟控制寄存器。`tests/integration/assemblies/crc_assembly/` 提供 VE／ZG
 真实 factory 与 ARM／SDK 链接夹具，不能据此认定实板或吞吐资格。
 
 芯片身份是片内永久只读数据，`nx_chip_info_read` 直接查询，不建立实例、factory
@@ -717,7 +717,7 @@ CS／PWM inactive；完整 Platform release 再恢复选中原 pin field／latch
 不承诺持续驱动产品安全电平。最后一个 EXTI vector owner 才关闭 vector；已启 IWDG
 是阻止干净关闭的不可逆效果。
 
-`tests/contracts/stm32_model` 用官方寄存器结构和外部事件模型编译真实生产 C，覆盖
+`tests/integration/providers/stm32_model` 用官方寄存器结构和外部事件模型编译真实生产 C，覆盖
 时钟回滚、定时器回绕、GPIO 位掩码、UART TC／取消／迟到 IRQ／RX 丢失、SPI 复位／CS、
 I2C 接收／重复 START 自动清除／NACK／仲裁／STOP／恢复、Flash 边界与编程脉冲、
 IWDG 不可逆失败、EXTI 隔离及 PWM／ADC 错误。

@@ -102,9 +102,9 @@ def source_inputs(root: Path) -> list[dict]:
         'os/freertos/prepare_m7_integer.py',
         'os/freertos/mpu/prepare_port.py',
         'scripts/ci/cortex_runtime.py', 'scripts/ci/arch_compile.py',
-        'tests/contracts/cortex_runtime/CMakeLists.txt',
-        'tests/contracts/cortex_runtime/main.c',
-        'tests/contracts/cortex_runtime/linker.ld'))
+        'tests/integration/arch/cortex_runtime/CMakeLists.txt',
+        'tests/integration/arch/cortex_runtime/main.c',
+        'tests/integration/arch/cortex_runtime/linker.ld'))
     return [compiler_gate.digest(path) for path in sorted(paths)]
 
 
@@ -484,7 +484,7 @@ def execute_variant(root: Path, recorder, selected_tools, variant: dict) -> dict
                 raise ValueError('Missing selected CMSE compiler dependency')
             cmse_dependencies[name] = compiler_gate.digest(path.resolve())
     recorder.execute([
-        cmake, '-S', str(root / 'tests/contracts/cortex_runtime'), '-B',
+        cmake, '-S', str(root / 'tests/integration/arch/cortex_runtime'), '-B',
         str(build), '-G', 'Ninja',
         '-DCMAKE_TOOLCHAIN_FILE=' + str(root / 'cmake/toolchains/arm-gcc.cmake'),
         '-DCMAKE_C_COMPILER=' + selected_tools['gcc'],
@@ -551,7 +551,7 @@ def run(root: Path, compiler: str, output: Path) -> int:
         report['tools'] = {name: compiler_gate.digest(Path(path))
                            for name, path in selected_tools.items()}
         report['fixture'] = {
-            name: compiler_gate.digest(root / 'tests/contracts/cortex_runtime' / name)
+            name: compiler_gate.digest(root / 'tests/integration/arch/cortex_runtime' / name)
             for name in ('CMakeLists.txt', 'main.c', 'linker.ld')}
         report['runtime_entry'] = compiler_gate.digest(
             root / 'cmake/platform/Runtime.cmake')

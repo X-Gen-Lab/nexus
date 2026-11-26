@@ -220,7 +220,7 @@
                 }
               },
               {
-                "pattern": "^tests/contracts/"
+                "pattern": "^tests/integration/"
               }
             ]
           }

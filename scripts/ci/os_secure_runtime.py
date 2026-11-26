@@ -145,7 +145,7 @@ def execute(root: Path, recorder, tools: dict, pair: dict, sdk: Path | None,
             with assembly.open('a') as stream:
                 stream.write('\n[os]\nsecurity_model = "split"\n')
         build = directory / stage / 'build'
-        argv = [cmake, '-S', str(root / 'tests/contracts/os_secure_runtime'), '-B', str(build),
+        argv = [cmake, '-S', str(root / 'tests/integration/kernels/os_secure_runtime'), '-B', str(build),
                 '-G', 'Ninja', '-DCMAKE_TOOLCHAIN_FILE=' + str(root / 'cmake/toolchains/arm-gcc.cmake'),
                 '-DCMAKE_C_COMPILER=' + tools['gcc'], '-DPython3_EXECUTABLE=' + sys.executable,
                 '-DNEXUS_RUNTIME_ASSEMBLY=' + str(assembly), '-DNEXUS_SECURE_STAGE=' + stage]
@@ -220,7 +220,7 @@ def run(root: Path, compiler: str, output: Path, sdk: Path | None = None,
         tools = compiler_gate.tools(compiler)
         inputs = cortex_runtime.source_inputs(root)
         additional = [Path(__file__), root / 'tools/configure/kernel.py']
-        additional.extend((root / 'tests/contracts/os_secure_runtime').glob('*'))
+        additional.extend((root / 'tests/integration/kernels/os_secure_runtime').glob('*'))
         for core in (23, 33, 55, 85):
             for directory in (root / f'ext/freertos/portable/GCC/ARM_CM{core}/secure',
                               root / f'ext/freertos/portable/GCC/ARM_CM{core}/non_secure'):

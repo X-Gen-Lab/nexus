@@ -49,6 +49,6 @@ stop 先静音，再依手册顺序关闭 R1、R2、R3。失败保持绑定，�
 ## 验证与资料
 
 依据 `references.json` 记录的 WM8978 production datasheet Rev 4.5，选定模拟通路
-和控制序列直接用 C 实现。`tests/google/components/wm8978_test.cpp` 运行生产 C，
+和控制序列直接用 C 实现。`tests/behavior/components/devices/wm8978_test.cpp` 运行生产 C，
 覆盖真实 wire encoding、VMID 分阶段、stereo latch、mute、短传输、部分失败、
 deadline 和 clock rollback。测试模型不证明音质、爆音抑制或实际 I2S 电气行为。

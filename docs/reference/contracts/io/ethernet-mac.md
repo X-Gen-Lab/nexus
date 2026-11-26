@@ -156,7 +156,7 @@ printed31/physical33 and fixed BSP blob a35e981e8a549e1dbaf84bb4522b2f150bc5d51c
 show DP83848 address1, an external 50 MHz oscillator and P5/WiFi jumpers; pins
 PA1/2/7, PC1/4/5, PG11/13/14 AF11. PG routes do not authorize the VE100 package.
 PHY reset GPIO is unproved. The canonical ARM fixture uses the explicit software
-pin contract in `tests/contracts/ethernet_assembly/stm32-zg-board/`; it does not
+pin contract in `tests/integration/assemblies/ethernet_assembly/stm32-zg-board/`; it does not
 qualify an assembled PCB. Sky, the ZG core board and Qiming V4.1 do not inherit
 this V3.1 PHY route. In particular, V4.1 oscillator, PHY address and connector
 ambiguities remain recorded Board unknowns. Products must admit their own reviewed

@@ -35,7 +35,7 @@ completion, peripheral wire completion and borrow settlement remain separate.
 No cache contract is inferred from a retired chip reference.
 
 For a maintained whole-component example, use the
-[F407 network reference](../../tests/contracts/f407_qiming_network/README.md).
+[F407 network reference](../../tests/integration/assemblies/f407_qiming_network/README.md).
 It links the real selected MAC rings and RX payloads, DP83848, copied-RX lwIP
 TCP, TLS and MQTT under one baremetal assembly. Its resource report includes the
 8 KiB MSP reservation; there are no RTOS task stacks or libc heap in that exact

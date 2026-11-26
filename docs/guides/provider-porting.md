@@ -68,7 +68,7 @@ CMake 选择各承担什么差异。已有公共语义的同类器件应复用�
 时钟执行条件，再解析设备图，最后冻结唯一 IR 并原子发布；不维护另一份可变决定值。
 最小装配只生成所选接口和存储，生成源码字节数不能当作最终 Flash／RAM 成本。
 
-现有 [F4 同源消费参考](../../tests/contracts/stm32f4_family/README.md)使用同一
+现有 [F4 同源消费参考](../../tests/integration/assemblies/stm32f4_family/README.md)使用同一
 `gpio_consumer.c` 驱动 `status` 和 `aux`。F407 的软件 Board 授权 PG9／PB2，F479 的
 软件 Board 授权 PJ0／PK3。两份 TOML 选择逻辑极性并生成相同的接口类型，F479 的新路线
 复用已有 GPIO 实现。按该目录的 ARM 构建命令验证两份装配，同时用越权 pad 或路线验证
