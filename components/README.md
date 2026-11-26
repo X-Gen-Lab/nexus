@@ -19,6 +19,7 @@
 | `devices/` | [AT24C02](devices/at24c02/README.md)、[BMP280](devices/bmp280/README.md)、[DP83848](devices/dp83848/README.md)、[DS18B20](devices/ds18b20/README.md)、[ILI9341](devices/ili9341/README.md)、[红外](devices/infrared/README.md)、[TMP117](devices/tmp117/README.md)、[W25](devices/w25/README.md)、[XPT2046](devices/xpt2046/README.md) | 精确器件、接线、供电、校准、区域与恢复策略 |
 | `services/` | [Storage](services/storage/README.md)、[MappedStorage](services/mapped_storage/README.md)、[Settings](services/settings/README.md)、[Log](services/log/README.md)、[FAL](services/fal/README.md)、[FlashDB](services/flashdb/README.md)、[LittleFS](services/littlefs/README.md)、[FatFs](services/fatfs/README.md)、[诊断与故障 API](../docs/reference/api/components/services.md) | region／volume、schema、授权、维护窗口、耐久、观测新鲜度和日志去向 |
 | `protocols/` | [Modbus RTU](protocols/modbus/README.md)、[lwIP](protocols/network/README.md)、[TLS](protocols/tls/README.md)、[MQTT](protocols/mqtt/README.md)、[ST USB Host](protocols/st_usb/README.md)、[ST USB Device](protocols/st_usb_device/README.md)、[USB control](protocols/usb_control/README.md)、[MCUboot](protocols/mcuboot/README.md) | 寄存器表、网络执行进度、信任根、产品身份、布局与恢复 |
+| `ui/` | [LVGL 显示与输入桥接](ui/lvgl/README.md) | 页面、控件、GUI 执行者、arena、绘图 buffer 与实际显示／触摸端口 |
 
 `devices/` 包括输入设备解码；`infrared` 是 NEC 事件解码器，不代表具体接收器驱动。
 `runtime/` 的 [FSM](runtime/fsm/README.md)、[Periodic](runtime/periodic/README.md)、
@@ -47,7 +48,7 @@ owner。`protocols/` 还包括 [Modbus TCP](protocols/modbus_tcp/README.md)、
 | 精确角度与电源监测 | [AS5047P](devices/as5047p/README.md)、[INA226](devices/ina226/README.md) | 前者 SPI CS 电气时序；后者分流电阻与校准，不能代替 FOC 相电流采样 |
 | 六轴与 tagged FIFO | [LSM6DSOX](devices/lsm6dsox/README.md) | 配对、丢样边界、时间映射与标定；普通读取时间不是 aperture |
 | 模组网络 | [UARTByteStream](runtime/uart_stream/README.md)、[ESP-AT](devices/esp_at/README.md) | 唯一 UART owner、调用者复制缓冲、显式 service、信任与物理恢复 |
-| 设备网络与界面 | [CANopen](protocols/canopen/README.md)、[LVGL](protocols/lvgl/README.md) | OD 产品校验；一个 GUI owner、显式 arena/tile 和同步 settled 显示端口 |
+| 设备网络与界面 | [CANopen](protocols/canopen/README.md)、[LVGL](ui/lvgl/README.md) | OD 产品校验；一个 GUI owner、显式 arena/tile 和同步 settled 显示端口 |
 | 音视频控制 | [OV2640](devices/ov2640/README.md)、[WM8978](devices/wm8978/README.md) | 另行审核 capture/PCM 接线、时钟、缓冲、带宽和退出；控制线不等于数据线接入 |
 | 非导出密钥签名 | [ATECC608B](devices/atecc608b/README.md) | 已烧录且锁定的精确 slot、有限 wake/delay 与完整操作 scope；不选 provisioning 或自动 TLS 绑定 |
 | 试运行与回退 | [MCUboot scratch swap](protocols/mcuboot/swap/README.md) | 明确三 area、独立 boot 镜像、健康判断和显式 confirm；不与 overwrite 混链 |

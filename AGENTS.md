@@ -23,7 +23,9 @@ results; those records do not establish current support or qualification.
 - The production SoC scope is STM32F4, under `soc/stm32/stm32f4`.
   Exact parts select reviewed device, memory, clock and route facts; a family
   directory or official HAL module does not establish part/mode support.
-  Keep all existing `vendors/`, gitlinks, source locks and license records.
+  Put general external libraries in `ext/`, hardware and architecture support in
+  `vendors/`, and Nexus adapters in `components/`. Preserve dependency sources,
+  gitlinks, source locks and license records when organizing these directories.
   Unselected inventory dependencies never enter default preparation, validation,
   compilation or SDK payloads. Never remove them during platform pruning.
 - Board and SoC packages contain C11, necessary startup assembly and declarative

@@ -124,7 +124,7 @@ before returning, including errors. Deadline checks cannot preempt rendering
 or widget callbacks. Errors close GUI progress but do not erase the panel's
 recovery duties. Join all widget/event users before stop; successful stop
 invalidates widget pointers and releases arena/tile references. Display, touch
-and bus shutdown remain external. See the [selected GUI contract](../../../../../components/protocols/lvgl/README.md)
+and bus shutdown remain external. See the [selected GUI contract](../../../../../components/ui/lvgl/README.md)
 for pool-exhaustion fail-stop and complete scope.
 
 ## Separate local transfer from product update policy
@@ -212,6 +212,6 @@ qualification; hardware HIL remains `not_executed`.
 
 ### lvgl.h
 
-```{doxygenfile} components/protocols/lvgl/include/nexus/components/lvgl.h
+```{doxygenfile} components/ui/lvgl/include/nexus/components/lvgl.h
 :project: nexus
 ```

@@ -28,16 +28,20 @@ class SDKProfilePolicyTests(unittest.TestCase):
             spec.loader.exec_module(module)
             setattr(cls, name, module)
 
-    def test_drive_profile_retains_locked_canopen_source_without_default_cost(self):
+    def test_optional_ui_and_drive_sources_are_exported_only_when_selected(self):
         plain = self.packager.source_profile()
-        self.assertNotIn('vendors/CANopenNode',
-                         self.packager.runtime_dependency_closure(plain))
-        drive = self.packager.source_profile(components=('cia402',))
-        self.assertIn('vendors/CANopenNode',
-                      self.packager.runtime_dependency_closure(drive))
-        required = set(self.packager.required_files(ROOT, drive))
-        self.assertIn('vendors/CANopenNode/301/CO_NMT_Heartbeat.c', required)
-        self.assertIn('vendors/CANopenNode/LICENSE', required)
+        default_dependencies = self.packager.runtime_dependency_closure(plain)
+        for component, path, source, notice in (
+                ('cia402', 'ext/canopennode', '301/CO_NMT_Heartbeat.c', 'LICENSE'),
+                ('lvgl', 'ext/lvgl', 'src/core/lv_obj.c', 'LICENCE.txt')):
+            with self.subTest(component=component):
+                self.assertNotIn(path, default_dependencies)
+                profile = self.packager.source_profile(components=(component,))
+                self.assertIn(path,
+                              self.packager.runtime_dependency_closure(profile))
+                required = set(self.packager.required_files(ROOT, profile))
+                self.assertIn(path + '/' + source, required)
+                self.assertIn(path + '/' + notice, required)
 
     def test_native_controls_require_explicit_host_support_export(self):
         controls = ('model.h', 'rtc_lptim_model.h', 'spi_dma_model.h')

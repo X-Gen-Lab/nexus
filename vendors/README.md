@@ -1,8 +1,13 @@
 # 厂商 SDK 与来源边界
 
-本目录维护所选固件实现使用的厂商依赖。SoC target 私有选择 Device、startup 和
-HAL／LL／SPL；公共产品接口使用 Nexus 类型。一个目录或子模块存在，不表示对应
-芯片、全部外设或开发板已接入。
+本目录维护 CPU、SoC 和具体硬件器件配套的官方支持代码。SoC target 私有选择
+Device、startup 和 HAL／LL／SPL；公共产品接口使用 Nexus 类型。Arm 的 CMSIS-DSP
+和 CMSIS-NN 按架构配套库归入 `arm/`，由选定 profile 选择实际实现与编译要求。
+
+通用外部库归入 [ext/](../ext/README.md)，Nexus 自有适配归入
+[components/](../components/README.md)。归类依据是代码职责，官方来源、组织获取地址
+和精确版本由依赖锁记录。一个目录或子模块存在，不表示对应芯片、全部外设或开发板
+已接入。
 
 ## 当前依赖与许可证
 
