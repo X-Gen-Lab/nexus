@@ -12,7 +12,7 @@ class GeneratorScopeTests(unittest.TestCase):
     def test_common_sdk_seals_every_static_assembly_mechanism_it_imports(self):
         names = set(dependencies.source_names("platform", None, sdk=True))
         required = {"tools/configure/generation/" + name + ".py" for name in (
-            "__init__", "static_ir", "calls", "static_recipe", "static_endpoints",
+            "__init__", "static_ir", "calls", "static_terms", "static_recipe", "static_endpoints",
             "static_fragments", "shared_irq", "platform_bindings", "header_projection")}
         required.update("tools/configure/" + name + ".py" for name in (
             "data_provider", "hardware_bindings", "domain_bridge",

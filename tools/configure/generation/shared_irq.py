@@ -6,7 +6,7 @@ import re
 from tools.configure.generation.calls import Address, DirectCall, Symbol
 from tools.configure.providers.common import fail, integer
 from tools.configure.generation.static_ir import Array, Declaration, IrqConnection
-from tools.configure.generation.static_recipe import _immutable, _path, _read
+from tools.configure.generation.static_terms import _immutable, _path, _read
 
 
 class IrqClaims:

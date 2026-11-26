@@ -9,7 +9,6 @@ import unittest
 
 from tools.configure import configure
 from tools.configure.generation import bindings
-from tools.configure.generation.calls import DirectCall
 from tools.configure.generation.static_recipe import StaticRecipe
 
 

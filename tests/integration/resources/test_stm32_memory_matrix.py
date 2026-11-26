@@ -6,7 +6,8 @@ import sys
 import tempfile
 import unittest
 
-from scripts.ci import stm32_memory as memory_matrix, memory_budget
+from scripts.ci import stm32_memory as memory_matrix
+from scripts.ci.qualification import memory_budget
 
 
 class MemoryMatrixTests(unittest.TestCase):

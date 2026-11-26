@@ -14,12 +14,16 @@ class StaticBindingFactsTests(unittest.TestCase):
 
     def test_selected_pads_and_dma_retain_reviewed_c_leaf_identity(self):
         policy = BindingPolicy.from_validated(self.document())
-        pad, = policy.pad_bindings((freeze({"pin": "PA9", "af": 7,
-                                           "function": "tx"}),))
+        pads = policy.pad_bindings((freeze({"pin": "PA9", "af": 7,
+                                            "function": "tx"}),))
+        self.assertEqual(len(pads), 1, "PA9 TX must produce exactly one pad binding")
+        pad = pads[0]
         self.assertEqual((pad.identity, pad.registers, pad.port_index,
                           pad.number, pad.alternate), ("PA9", "GPIOA", 0, 9, 7))
-        dma, = policy.dma_bindings((DmaLaneIR("uart1", "USART1", "DMA2", 7, 4,
-                                            "dma:DMA2:stream7"),))
+        lanes = policy.dma_bindings((DmaLaneIR("uart1", "USART1", "DMA2", 7, 4,
+                                              "dma:DMA2:stream7"),))
+        self.assertEqual(len(lanes), 1, "USART1 DMA2 stream 7 must produce exactly one lane")
+        dma = lanes[0]
         self.assertEqual((dma.stream, dma.irq, dma.handler, dma.lane, dma.request),
                          ("DMA2_Stream7", "DMA2_Stream7_IRQn",
                           "DMA2_Stream7_IRQHandler", 7, 4))

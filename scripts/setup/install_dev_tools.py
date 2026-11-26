@@ -150,6 +150,7 @@ def main(arguments=None):
         lock = root / LOCK_NAME
         pins = read_lock(lock)
         locked_python = None
+        hashed_lock = None
         if args.locked_linux:
             locked_python = sys.version_info[:2]
             if (sys.platform != "linux" or platform.machine() != "x86_64" or
@@ -161,7 +162,7 @@ def main(arguments=None):
             check_hook_location(root)
         directory, python, formatter = ensure_venv(root)
         installed = inspect_venv(directory, python, root, expected_python=locked_python)
-        if args.locked_linux:
+        if hashed_lock is not None:
             run([python, "-m", "pip", "install", "--require-hashes",
                  "--only-binary=:all:", "--force-reinstall", "-r", hashed_lock], root)
             installed = inspect_venv(directory, python, root, expected_python=locked_python)

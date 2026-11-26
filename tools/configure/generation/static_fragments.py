@@ -65,7 +65,7 @@ class StaticFragments:
 
     @classmethod
     def from_validated(cls, value):
-        from tools.configure.generation.static_recipe import _Declaration, _parse
+        from tools.configure.generation.static_terms import _Declaration, _parse
         if not isinstance(value, Mapping) or set(value) - {"declarations", "values"}:
             raise ValueError("Static fragment library has unknown fields")
         _data(value)

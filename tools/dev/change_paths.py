@@ -21,7 +21,7 @@ CODEQL_PAGE = "docs/development/workflow.md"
 CODEQL_LOCALE = "docs/locale/zh_CN/LC_MESSAGES/development/workflow.po"
 _OID = re.compile(r"[0-9a-f]{40}")
 _FENCE = re.compile(r" {0,3}(`{3,}|~{3,})(.*)")
-_PROSE = re.compile(r"[\w \n.,:;!?()/'\-`#，。；：？！、（）《》、“”‘’／—]+")
+_PROSE = re.compile(r"[\w \n.,:;!?()/'\-`#，。；：？！、（）《》“”‘’／—]+")
 
 
 def _git(root, *arguments):

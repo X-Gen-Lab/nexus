@@ -11,7 +11,7 @@ from types import MappingProxyType
 
 from tools.configure.generation.calls import Address, Symbol
 from tools.configure.generation.static_ir import Declaration, Record
-from tools.configure.generation.static_recipe import (
+from tools.configure.generation.static_terms import (
     _Call, _Declaration, _fields, _immutable, _ordered, _parse, _path, _read, _uint)
 
 

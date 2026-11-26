@@ -171,7 +171,8 @@ class RuntimeAssemblyTests(unittest.TestCase):
 
 PLATFORM_ONLY = (
     "providers/descriptor", "packages", "package_policy", "generation/static_ir",
-    "data_provider", "generation/static_recipe", "generation/static_endpoints", "generation/static_fragments",
+    "data_provider", "generation/static_terms", "generation/static_recipe",
+    "generation/static_endpoints", "generation/static_fragments",
     "generation/shared_irq", "domain_policies", "domain_bridge", "generation/header_projection",
     "integration_package",
 )
