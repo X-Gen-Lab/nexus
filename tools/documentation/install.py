@@ -18,6 +18,7 @@ import shutil
 import subprocess
 import sys
 import tarfile
+import urllib.error
 import urllib.request
 import venv
 import zipfile
@@ -104,6 +105,8 @@ def fetch_blob(cache: Path, locked: dict, *, offline: bool) -> Path:
                 shutil.copyfileobj(source, destination)
         verify_blob(temporary, locked)
         temporary.replace(path)
+    except urllib.error.URLError as error:
+        raise ValueError(f"failed to download {path.name}: {error}") from error
     finally:
         temporary.unlink(missing_ok=True)
     return path
