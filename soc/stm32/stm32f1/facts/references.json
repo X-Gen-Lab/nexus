@@ -511,6 +511,7 @@
           "flash:poll-halfword",
           "gpio:input",
           "gpio:output",
+          "i2c:irq-write-messages",
           "i2c:poll-messages",
           "i2c_target:target-rx-irq",
           "i2c_target:target-tx-irq",
@@ -523,6 +524,7 @@
           "spi:short-poll",
           "timer_capture:edge-capture",
           "timer_pulse:one-pulse",
+          "uart:dma-duplex",
           "uart:dma-tx",
           "uart:irq-byte-event",
           "uart:irq-wire",
@@ -1066,14 +1068,16 @@
             "revisions": "AAAAAAAA",
             "assessment": "silicon_limit",
             "condition": "With parity enabled in full duplex, a data-register write can clear the receiver PE flag.",
-            "handling": "The initial 8N1 mode has no parity. The Smartcard owner serializes one TX character, preserves pending PE without RXNE, and observes complete RX before writing DR. Concurrent full-duplex parity behavior remains a silicon limit.",
+            "handling": "The initial 8N1 mode has no parity. The Smartcard owner serializes one TX character, preserves pending PE without RXNE, and observes complete RX before writing DR. Simultaneous USART2 DMA remains 8N1; its IRQ only observes RX/TX status. Concurrent full-duplex parity behavior remains a silicon limit.",
             "implementation": [
               "soc/stm32/stm32f1/facts/routes.json",
               "soc/stm32/stm32f1/drivers/uart/uart_word.c",
-              "soc/stm32/stm32f1/drivers/uart/uart.c"
+              "soc/stm32/stm32f1/drivers/uart/uart.c",
+              "soc/stm32/stm32f1/drivers/uart/uart_duplex.c"
             ],
             "regressions": [
-              "tests/behavior/soc/stm32/stm32f1/uart_smartcard/smartcard_test.cpp"
+              "tests/behavior/soc/stm32/stm32f1/uart_smartcard/smartcard_test.cpp",
+              "tests/behavior/soc/stm32/stm32f1/uart_rx_dma/uart_rx_dma_test.cpp"
             ]
           },
           {
@@ -2310,6 +2314,7 @@
         ],
         "maintained_modes": [
           "can:classic-irq",
+          "flash:read-only",
           "gpio:output",
           "uart:irq-byte-event",
           "usb_device:device-fs",
@@ -2502,6 +2507,7 @@
           "can:classic-irq",
           "eth:raw-mii",
           "eth:raw-rmii",
+          "flash:read-only",
           "gpio:output",
           "mdio:clause22",
           "spi:short-poll",

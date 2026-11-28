@@ -67,6 +67,7 @@ class SelectedContractAuthorityTests(unittest.TestCase):
             ("STM32F103RBT6", "SPI2", "spi", "short-poll"): ("spi2-pb13-pb14-pb15",),
             ("STM32F103RBT6", "SPI2", "spi", "dma"): ("spi2-pb13-pb14-pb15-dma",),
             ("STM32F103RBT6", "I2C1", "i2c", "poll-messages"): ("i2c1-pb6-pb7",),
+            ("STM32F103RBT6", "I2C1", "i2c", "irq-write-messages"): ("i2c1-pb6-pb7",),
             ("STM32F107VCT6", "SPI3", "spi", "short-poll"): ("spi3-pc10-pc11-pc12",),
         })
         f1_controls = {(row.part, row.controller, row.mode): row.reviewed_routes
@@ -83,6 +84,19 @@ class SelectedContractAuthorityTests(unittest.TestCase):
         self.assertEqual({key: f1_controls[key] for key in base_controls}, base_controls)
         self.assertTrue(all(not row.physical_qualified for row in rows))
         self.assertTrue(all(row.review_sources for row in rows))
+
+    def test_f103_irq_writer_qualifies_only_write_and_no_smbus_binding(self):
+        fixture = configure.ROOT / (
+            "tests/integration/assemblies/stm32f1_i2c_master_irq/f103rb-write.toml")
+        result, records = self.selected(fixture.relative_to(configure.ROOT))
+        self.assertEqual({record.fields["write_only"] for record in records}, {1})
+        self.assertEqual({record.fields["address_bits"] for record in records}, {7})
+        source = bindings.emit(result)[1]
+        self.assertEqual(source.count("nx_i2c_v1_irq(&s_nx_port_i2c1)"), 2)
+        self.assertIn("nx_stm32f1_i2c_irq_open(&s_nx_port_i2c1", source)
+        _, smbus = factory.emit_smbus(
+            replace(result, components=(*result.components, "smbus")))
+        self.assertNotIn("s_nx_smbus_binding_writer", smbus)
 
 
     def test_f103_tim1_adc_trigger_and_complementary_pwm_conflict(self):

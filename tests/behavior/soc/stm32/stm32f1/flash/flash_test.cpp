@@ -233,11 +233,66 @@ class F1Flash : public testing::Test {
             *bank(index).control = FLASH_CR_LOCK;
         }
         hardware.clock = clock_ready;
+#if !defined(STM32F105xC) && !defined(STM32F107xC)
         ASSERT_EQ(NX_SUCCESS,
                   nx_stm32f1_flash_prepare(&state, &geometry, 3300U));
+#endif
         ASSERT_EQ(0U, hardware.writes);
     }
 };
+
+#if defined(STM32F105xC) || defined(STM32F107xC)
+TEST_F(F1Flash, ConnectivityReadOnlyPublishesGeometryAndNoMutation) {
+    hardware.clock = 0U;
+    const nx_flash_port_t read_only{&nx_stm32f1_flash_read_only_ops, &state};
+    ASSERT_EQ(nx_stm32f1_flash_read_only_prepare(&state, &geometry),
+              NX_SUCCESS);
+    const auto* physical = nx_flash_port_geometry(&read_only);
+    ASSERT_EQ(physical, &geometry);
+    EXPECT_EQ(physical->size, 256U * 1024U);
+    nx_flash_sector_t last{};
+    ASSERT_EQ(nx_flash_geometry_sector_at(physical, 127U, &last), NX_SUCCESS);
+    EXPECT_EQ(last.offset, size - 2048U);
+    EXPECT_EQ(last.size, 2048U);
+    hardware.memory[size - 1U] = 0x2AU;
+    uint8_t output = 0xBBU;
+    EXPECT_EQ(nx_flash_port_read(&read_only, size - 1U, &output, 1U),
+              NX_SUCCESS);
+    EXPECT_EQ(output, 0x2AU);
+    EXPECT_EQ(nx_flash_port_read(&read_only, size, &output, 1U),
+              NX_ERROR_INVALID);
+    EXPECT_EQ(output, 0x2AU);
+    const uint8_t input[]{0x00U, 0x22U};
+    EXPECT_EQ(
+        nx_flash_port_program(&read_only, 0U, input, sizeof(input), 2000U),
+        NX_ERROR_UNSUPPORTED);
+    EXPECT_EQ(nx_flash_port_erase(&read_only, 0U, page, 2000U),
+              NX_ERROR_UNSUPPORTED);
+    EXPECT_EQ(nx_flash_port_recover(&read_only), NX_ERROR_UNSUPPORTED);
+    EXPECT_EQ(nx_stm32f1_flash_read_only_close(&state), NX_SUCCESS);
+    EXPECT_EQ(nx_flash_port_geometry(&read_only), nullptr);
+    EXPECT_EQ(0U, hardware.writes);
+}
+
+TEST_F(F1Flash, ConnectivityReadOnlyRejectsBusyWithoutChangingOutputOrOwner) {
+    *bank(0U).status = FLASH_SR_BSY;
+    EXPECT_EQ(nx_stm32f1_flash_read_only_prepare(&state, &geometry),
+              NX_ERROR_BUSY);
+    *bank(0U).status = 0U;
+    ASSERT_EQ(nx_stm32f1_flash_read_only_prepare(&state, &geometry),
+              NX_SUCCESS);
+    const nx_flash_port_t read_only{&nx_stm32f1_flash_read_only_ops, &state};
+    *bank(0U).status = FLASH_SR_BSY;
+    uint8_t output = 0xA5U;
+    EXPECT_EQ(nx_flash_port_read(&read_only, 0U, &output, 1U), NX_ERROR_BUSY);
+    EXPECT_EQ(output, 0xA5U);
+    EXPECT_EQ(nx_stm32f1_flash_read_only_close(&state), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_flash_port_geometry(&read_only), &geometry);
+    *bank(0U).status = 0U;
+    EXPECT_EQ(nx_stm32f1_flash_read_only_close(&state), NX_SUCCESS);
+    EXPECT_EQ(0U, hardware.writes);
+}
+#else
 
 #if defined(STM32F103xB)
 TEST_F(F1Flash, SnapshotDecodesLoadedOptionsAndPreservesTheFpec) {
@@ -586,4 +641,5 @@ TEST_F(F1Flash, ZgRecoveryNeverTakesOverTheOtherBank) {
     EXPECT_EQ(0U, hardware.bank_writes[0]);
     EXPECT_EQ(1U, hardware.launches);
 }
+#endif
 #endif

@@ -122,7 +122,7 @@ class CapabilityDocumentationTests(unittest.TestCase):
         for row in selected:
             with self.subTest(mode=row["mode"]):
                 self.assertEqual(row["exports"],
-                                 ["soc/stm32/stm32f4/drivers/ip/i2c_v1_async/i2c_v1_async.c"])
+                                 ["soc/stm32/common/i2c_v1_async/i2c_v1_async.c"])
 
     def test_can_exports_match_the_selected_family_controller(self):
         expected = {

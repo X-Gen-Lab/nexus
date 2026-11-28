@@ -61,6 +61,18 @@ void nx_stm32f1_uart_dma_irq(nx_stm32f1_uart_dma_t* state);
 void nx_stm32f1_uart_dma_usart_irq(nx_stm32f1_uart_dma_t* state);
 extern const nx_uart_ops_t nx_stm32f1_uart_dma_ops;
 
+#if defined(NEXUS_STM32F1_UART_DUPLEX)
+/** \brief Commit after the exact request and all peer aliases are checked. */
+nx_result_t nx_stm32f1_uart_tx_engine_commit(nx_stm32f1_uart_dma_t* state,
+                                             nx_uart_tx_request_t* request,
+                                             bool admitted,
+                                             const bool* peer_closing);
+nx_result_t nx_stm32f1_uart_tx_engine_cancel(void* context,
+                                             nx_uart_tx_request_t* request);
+void nx_stm32f1_uart_tx_engine_service(void* context);
+nx_result_t nx_stm32f1_uart_tx_engine_stop(void* context);
+#endif
+
 #ifdef __cplusplus
 }
 #endif

@@ -77,6 +77,7 @@
       "modes": {
         "USART2": {
           "modes": [
+            "dma-duplex",
             "dma-tx",
             "irq-byte-event",
             "rx-dma-idle",
@@ -216,6 +217,7 @@
         },
         "I2C1": {
           "modes": [
+            "irq-write-messages",
             "poll-messages"
           ],
           "interfaces": {
@@ -898,6 +900,22 @@
         "FLASH": {
           "modes": [
             "poll-halfword"
+          ]
+        }
+      }
+    },
+    "fpec-read-only-flash": {
+      "controllers": {
+        "FLASH": {
+          "kind": "flash",
+          "irq": [],
+          "pins": []
+        }
+      },
+      "modes": {
+        "FLASH": {
+          "modes": [
+            "read-only"
           ]
         }
       }

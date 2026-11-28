@@ -1,6 +1,6 @@
 /**
  * \file            instance.h
- * \brief           Private STM32F103 physical Flash owner
+ * \brief           Private STM32F1 physical Flash owner
  * \author          Nexus Team
  */
 #ifndef NX_STM32F1_FLASH_INSTANCE_H
@@ -27,9 +27,10 @@ typedef struct {
 } nx_stm32f1_flash_state_t;
 
 extern const nx_flash_ops_t nx_stm32f1_flash_ops;
+extern const nx_flash_ops_t nx_stm32f1_flash_read_only_ops;
 extern const nx_flash_maintenance_ops_t nx_stm32f1_flash_maintenance_ops;
 
-/** \brief Bind the complete geometry for a reviewed STM32F103.
+/** \brief Bind the complete geometry for a reviewed writable STM32F1.
  * \param[in,out] port: Unprepared, serialized owner.
  * \param[in] geometry: Stable read-only whole-Flash description.
  * \param[in] supply_mv: Board-supplied programming voltage assumption.
@@ -40,6 +41,21 @@ extern const nx_flash_maintenance_ops_t nx_stm32f1_flash_maintenance_ops;
 nx_result_t nx_stm32f1_flash_prepare(nx_stm32f1_flash_state_t* port,
                                      const nx_flash_geometry_t* geometry,
                                      uint32_t supply_mv);
+
+/** \brief Bind geometry and bounded reads with no Flash mutations.
+ * \param[in,out] port: Unprepared, serialized owner.
+ * \param[in] geometry: Stable read-only whole-Flash description.
+ * \return SUCCESS or rejection without MMIO writes.
+ */
+nx_result_t
+nx_stm32f1_flash_read_only_prepare(nx_stm32f1_flash_state_t* port,
+                                   const nx_flash_geometry_t* geometry);
+
+/** \brief Release the read-only lease after all consumers join.
+ * \param[in,out] port: Same serialized owner that admitted the geometry.
+ * \return SUCCESS or a rejection retaining the same owner. No MMIO writes.
+ */
+nx_result_t nx_stm32f1_flash_read_only_close(nx_stm32f1_flash_state_t* port);
 
 /** \brief Release the prepared owner once hardware cleanup is proven.
  * \param[in,out] port: Same serialized owner whose users have joined.

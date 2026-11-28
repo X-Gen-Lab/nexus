@@ -338,7 +338,7 @@ class RequiredAnalysisTests(unittest.TestCase):
     def test_shared_driver_in_actual_cmake_database_is_owned(self):
         self.assertIsNotNone(shutil.which("cmake"),
                              "CMake is required for the real database contract")
-        source = self.root / "soc/stm32/stm32f4/drivers/ip/i2c_v1_async/i2c_v1_async.c"
+        source = self.root / "soc/stm32/common/i2c_v1_async/i2c_v1_async.c"
         source.parent.mkdir(parents=True)
         source.write_text("int shared_driver;\n")
         external = self.root / "vendors/fixture/driver.c"
@@ -349,7 +349,7 @@ class RequiredAnalysisTests(unittest.TestCase):
             "project(shared_driver_analysis_scope C)\n"
             "set(CMAKE_EXPORT_COMPILE_COMMANDS ON)\n"
             "add_library(owned OBJECT components/sample.c "
-            "soc/stm32/stm32f4/drivers/ip/i2c_v1_async/i2c_v1_async.c)\n"
+            "soc/stm32/common/i2c_v1_async/i2c_v1_async.c)\n"
             "add_library(external OBJECT vendors/fixture/driver.c)\n")
         configured = subprocess.run(
             ["cmake", "-S", str(self.root), "-B", str(self.build)],
@@ -365,11 +365,11 @@ class RequiredAnalysisTests(unittest.TestCase):
                       if entry["file"] == str(source))
         self.assertEqual(driver["nexus_analysis_scope"], "production")
         self.assertEqual(driver["nexus_production_source"],
-                         "soc/stm32/stm32f4/drivers/ip/i2c_v1_async/i2c_v1_async.c")
+                         "soc/stm32/common/i2c_v1_async/i2c_v1_async.c")
         self.assertEqual(quality_tools.compilation_entry(driver), actual)
 
     def test_tidy_header_filter_includes_shared_driver_headers(self):
-        header = self.root / "soc/stm32/stm32f4/drivers/ip/i2c_v1_async/i2c_v1_async.h"
+        header = self.root / "soc/stm32/common/i2c_v1_async/i2c_v1_async.h"
         header.parent.mkdir(parents=True)
         header.write_text("extern int shared_driver;\n")
         self.assertEqual(quality_tools.run("tidy", self.root, self.build,

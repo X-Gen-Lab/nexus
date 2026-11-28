@@ -13,7 +13,7 @@ if(i2c_modes)
             nexus_soc_stm32f4
             PRIVATE
                 "${CMAKE_CURRENT_LIST_DIR}/i2c_async.c"
-                "${CMAKE_CURRENT_LIST_DIR}/../ip/i2c_v1_async/i2c_v1_async.c"
+                "${NEXUS_SOURCE_DIR}/soc/stm32/common/i2c_v1_async/i2c_v1_async.c"
         )
         target_compile_definitions(
             nexus_soc_stm32f4

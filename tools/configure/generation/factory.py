@@ -517,10 +517,14 @@ def emit_smbus(result):
         return "", ""
     from tools.configure.providers.common import mode_traits
     controllers = {item.id: item for item in result.controllers}
-    selected = [item for item in result.devices if item.kind == "i2c"
-                and item.options.address_bits == 7
-                and 0x08 <= item.options.address <= 0x77
-                and mode_traits("i2c", controllers[item.controller].mode).irq]
+    selected = []
+    for item in result.devices:
+        if (item.kind != "i2c" or item.options.address_bits != 7 or
+                not 0x08 <= item.options.address <= 0x77):
+            continue
+        shape = mode_traits("i2c", controllers[item.controller].mode)
+        if shape.irq and not shape.write_only:
+            selected.append(item)
     header = ["/**", " * \\file            nexus_smbus_factory.h",
         " * \\brief           Optional packet PEC bindings on existing I2C IDs.",
         " * \\author          Nexus Team", " */",
@@ -528,7 +532,7 @@ def emit_smbus(result):
         '#include "nexus_factory_strong.h"',
         '#include "nexus/components/smbus.h"',
         '#ifdef __cplusplus', 'extern "C" {', '#endif',
-        '/** \\brief Pure lookup; NULL for polling, ten-bit or invalid IDs.',
+        '/** \\brief Pure lookup; NULL for polling, write-only, ten-bit or invalid IDs.',
         ' * \\note Static borrowed metadata; no hardware access or initialization.',
         ' *       Faces and binding remain live through adapter stop. Addresses',
         ' *       derive from the same selected endpoint, without rediscovery.',

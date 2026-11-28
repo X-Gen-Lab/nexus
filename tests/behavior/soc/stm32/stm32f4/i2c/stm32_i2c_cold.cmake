@@ -10,10 +10,10 @@ foreach(clock default pll84)
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/i2c/i2c_async.c"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/i2c/i2c_cold.c"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio/gpio.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/i2c_v1_async/i2c_v1_async.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/common/i2c_v1_async/i2c_v1_async.c"
         LIBRARIES Nexus::IO
         INCLUDES
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/i2c_v1_async" "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/common/i2c_v1_async" "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
             "${NEXUS_SOURCE_DIR}/arch/include"
     )
     target_include_directories(

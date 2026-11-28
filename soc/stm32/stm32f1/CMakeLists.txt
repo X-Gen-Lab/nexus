@@ -53,6 +53,12 @@ if(NOT NEXUS_VENDOR_DEVICE_DEFINE STREQUAL "STM32F103xB")
             continue()
         endif()
         if(
+            NEXUS_EXACT_PART MATCHES "^STM32F10[57]VCT6$"
+            AND selection STREQUAL "flash/FLASH/read-only"
+        )
+            continue()
+        endif()
+        if(
             NEXUS_VENDOR_DEVICE_DEFINE STREQUAL "STM32F102xB"
             AND selection STREQUAL "usb_device/USB/device-pma"
         )
@@ -261,13 +267,20 @@ if("irq-wire" IN_LIST f1_uart)
         PRIVATE "NEXUS_STM32F1_UART_WIRE=(${f1_wire_mask})"
     )
 endif()
-if("dma-tx" IN_LIST f1_uart)
+if("dma-tx" IN_LIST f1_uart OR "dma-duplex" IN_LIST f1_uart)
     target_sources(nexus_soc_stm32f1 PRIVATE drivers/uart/uart_dma.c)
     target_link_libraries(nexus_soc_stm32f1 PRIVATE Nexus::IODMA)
 endif()
-if("rx-dma-idle" IN_LIST f1_uart)
+if("rx-dma-idle" IN_LIST f1_uart OR "dma-duplex" IN_LIST f1_uart)
     target_sources(nexus_soc_stm32f1 PRIVATE drivers/uart/uart_rx_dma.c)
     target_link_libraries(nexus_soc_stm32f1 PRIVATE Nexus::IOStream)
+endif()
+if("dma-duplex" IN_LIST f1_uart)
+    target_sources(nexus_soc_stm32f1 PRIVATE drivers/uart/uart_duplex.c)
+    target_compile_definitions(
+        nexus_soc_stm32f1
+        PRIVATE NEXUS_STM32F1_UART_DUPLEX=1
+    )
 endif()
 add_subdirectory(drivers/flash)
 add_subdirectory(drivers/crc)
@@ -397,6 +410,12 @@ if(f1_eth)
     target_include_directories(
         nexus_stm32f1_startup_usage
         INTERFACE "${NEXUS_SOURCE_DIR}/soc/stm32/common/dwmac"
+    )
+endif()
+if("irq-write-messages" IN_LIST f1_i2c)
+    target_include_directories(
+        nexus_stm32f1_startup_usage
+        INTERFACE "${CMAKE_CURRENT_LIST_DIR}/../common/i2c_v1_async"
     )
 endif()
 if("classic-irq" IN_LIST f1_can)

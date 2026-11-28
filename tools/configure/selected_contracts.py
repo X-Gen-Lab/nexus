@@ -167,7 +167,8 @@ def _format(item, provider, shape):
                       configured_max_hz=options.max_hz)
     elif kind == "i2c":
         # Zero identifies endpoint-owned widths on a mixed-width controller.
-        fields = dict(address_bits=0 if provider.ENDPOINT_POLICY.i2c_ten_bit else 7,
+        fields = dict(address_bits=0 if provider.ENDPOINT_POLICY.i2c_ten_bit
+                      and not shape.write_only else 7,
                       configured_max_hz=options.max_hz, nominal_hz=0)
     elif kind == "adc":
         fields = dict(storage_bits=16, signed_samples=0,
@@ -363,6 +364,8 @@ def describe(item, endpoint=None, *, public_class=None):
     formatted = _format(item, provider, shape)
     if target_direction is not None:
         formatted["fields"] = {**formatted["fields"], target_direction: 1}
+    if kind == "i2c" and shape.write_only:
+        formatted["fields"] = {**formatted["fields"], "write_only": 1}
     if endpoint is not None and kind == "i2c":
         formatted["fields"] = {**formatted["fields"],
                                "address_bits": endpoint.options.address_bits}

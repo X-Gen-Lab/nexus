@@ -29,7 +29,8 @@
       "bxcan",
       "dwc_otg_device",
       "dwc_otg_host",
-      "dwmac"
+      "dwmac",
+      "i2c_v1_async"
     ],
     "roots": [
       "."

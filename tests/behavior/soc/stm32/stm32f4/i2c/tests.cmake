@@ -16,7 +16,7 @@ nexus_google_test(nexus_stm32_i2c_register_test STM32F4_LL
         "${nexus_google_root}/soc/stm32/stm32f4/i2c/stm32_i2c_storage_model.c"
     LIBRARIES Nexus::IO
     INCLUDES
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/i2c_v1_async" "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/common/i2c_v1_async" "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
         "${NEXUS_SOURCE_DIR}/arch/include"
 )
 
@@ -44,9 +44,9 @@ target_compile_options(
 foreach(i2c_family generic stm32)
     set(i2c_target "nexus_${i2c_family}_i2c_async_test")
     nexus_google_test(${i2c_target} SOURCES "${nexus_google_root}/soc/stm32/stm32f4/i2c/i2c_async_register_test.cpp"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/i2c_v1_async/i2c_v1_async.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/common/i2c_v1_async/i2c_v1_async.c"
         LIBRARIES Nexus::IO Nexus::Arch
-        INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/i2c_v1_async"
+        INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/common/i2c_v1_async"
     )
     target_compile_options(
         ${i2c_target}

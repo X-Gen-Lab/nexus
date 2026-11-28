@@ -106,9 +106,10 @@ static bool reviewed_spans(const nx_flash_geometry_t* geometry) {
 #endif
 }
 
-nx_result_t nx_stm32f1_flash_prepare(nx_stm32f1_flash_state_t* port,
-                                     const nx_flash_geometry_t* geometry,
-                                     uint32_t supply_mv) {
+/** \brief Attach the compiled Flash geometry without touching FPEC commands. */
+static nx_result_t prepare(nx_stm32f1_flash_state_t* port,
+                           const nx_flash_geometry_t* geometry, bool writable,
+                           uint32_t supply_mv) {
     if (!task_context()) {
         return NX_ERROR_CONTEXT;
     }
@@ -121,7 +122,7 @@ nx_result_t nx_stm32f1_flash_prepare(nx_stm32f1_flash_state_t* port,
         return NX_ERROR_INVALID;
     }
     /* The reviewed devices share the inclusive 2.0–3.6 V program range. */
-    if (supply_mv < 2000U || supply_mv > 3600U) {
+    if (writable && (supply_mv < 2000U || supply_mv > 3600U)) {
         return NX_ERROR_UNSUPPORTED;
     }
     if (port->geometry != NULL || port->phase != NX_STM32F1_FLASH_IDLE ||
@@ -129,6 +130,33 @@ nx_result_t nx_stm32f1_flash_prepare(nx_stm32f1_flash_state_t* port,
         return NX_ERROR_BUSY;
     }
     port->geometry = geometry;
+    return NX_SUCCESS;
+}
+
+nx_result_t nx_stm32f1_flash_prepare(nx_stm32f1_flash_state_t* port,
+                                     const nx_flash_geometry_t* geometry,
+                                     uint32_t supply_mv) {
+    return prepare(port, geometry, true, supply_mv);
+}
+
+nx_result_t
+nx_stm32f1_flash_read_only_prepare(nx_stm32f1_flash_state_t* port,
+                                   const nx_flash_geometry_t* geometry) {
+    return prepare(port, geometry, false, 0U);
+}
+
+nx_result_t nx_stm32f1_flash_read_only_close(nx_stm32f1_flash_state_t* port) {
+    if (!task_context()) {
+        return NX_ERROR_CONTEXT;
+    }
+    if (port == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    if (port->geometry != NULL &&
+        (port->phase != NX_STM32F1_FLASH_IDLE || !locked_and_quiet())) {
+        return NX_ERROR_BUSY;
+    }
+    port->geometry = NULL;
     return NX_SUCCESS;
 }
 
@@ -319,6 +347,11 @@ static nx_result_t read(const void* context, uint32_t offset, void* data,
     }
     return NX_SUCCESS;
 }
+
+const nx_flash_ops_t nx_stm32f1_flash_read_only_ops = {
+    .geometry = geometry,
+    .read = read,
+};
 
 static bool expired(nx_time_us_t deadline) {
     return nx_deadline_expired(deadline, nx_time_now_us());

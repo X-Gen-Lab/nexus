@@ -58,7 +58,7 @@ The exact implementations and configured limits remain authoritative:
   remain bounded separately from task service and actual wire TC. No FIFO or
   linked-list DMA capability is inferred from another family's implementation.
 - SPI: `soc/*/*/drivers/spi*.c`; the finite DMA drain allowance is 200 microseconds.
-- I2C: `soc/stm32/stm32f4/drivers/ip/i2c_v1_async/i2c_v1_async.c` and the SoC wrappers; V1 async drain allowance
+- I2C: `soc/stm32/common/i2c_v1_async/i2c_v1_async.c` and the SoC wrappers; V1 async drain allowance
   is 1,000 microseconds. Polling STOP has separate finite work.
 - ADC/EXTI/timer: selected SoC driver and private state; scan, queue and channel
   limits come from resolved inputs or explicit caller storage.

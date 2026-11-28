@@ -40,10 +40,10 @@ foreach(multi_family stm32)
         "${NEXUS_SOC_SOURCE_${multi_soc}}/drivers/spi/spi.c"
         "${NEXUS_SOC_SOURCE_${multi_soc}}/drivers/spi/spi_dma.c"
         "${NEXUS_SOC_SOURCE_${multi_soc}}/drivers/i2c/i2c_async.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/i2c_v1_async/i2c_v1_async.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/common/i2c_v1_async/i2c_v1_async.c"
         LIBRARIES Nexus::IO Nexus::Arch
         INCLUDES "${multi_bundle}" "${NEXUS_SOURCE_DIR}/io/private"
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/i2c_v1_async"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/common/i2c_v1_async"
             "${NEXUS_SOC_SOURCE_${multi_soc}}"
             "${NEXUS_SOC_SOURCE_${multi_soc}}"
             "${NEXUS_SOURCE_DIR}/tests/support/arm/stm32f4"

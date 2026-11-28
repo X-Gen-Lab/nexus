@@ -29,7 +29,8 @@
       "bxcan",
       "dwc_otg_device",
       "dwc_otg_host",
-      "dwmac"
+      "dwmac",
+      "i2c_v1_async"
     ],
     "roots": [
       "."
@@ -40,6 +41,11 @@
       "__pycache__"
     ],
     "verification_files": [
+      "tests/integration/assemblies/stm32f1_i2c_master_irq/CMakeLists.txt",
+      "tests/integration/assemblies/stm32f1_i2c_master_irq/README.md",
+      "tests/integration/assemblies/stm32f1_i2c_master_irq/main.c",
+      "tests/integration/assemblies/stm32f1_i2c_master_irq/f103rb-write.toml",
+      "tests/integration/assemblies/stm32f1_buses/board/board.json",
       "tests/integration/assemblies/stm32f1_family/f103rb-baremetal.toml",
       "tests/integration/assemblies/stm32f1_family/f103rb-crystal-baremetal.toml",
       "tests/integration/assemblies/stm32f1_family/f103rb-crystal-board/board.json",
@@ -53,6 +59,10 @@
       "tests/integration/assemblies/stm32f1_flash/main.c",
       "tests/integration/assemblies/stm32f1_flash/f101rb.toml",
       "tests/integration/assemblies/stm32f1_flash/f102rb.toml",
+      "tests/integration/assemblies/stm32f1_flash/f105vc.toml",
+      "tests/integration/assemblies/stm32f1_flash/f107vc.toml",
+      "tests/integration/assemblies/stm32f1_family/f105vc-board/board.json",
+      "tests/integration/assemblies/stm32f1_family/f107vc-board/board.json",
       "tests/integration/assemblies/stm32f1_family/f100ze-board/board.json",
       "tests/integration/assemblies/stm32f1_flash/f100ze.toml",
       "tests/integration/assemblies/stm32f1_family/f101c6-board/board.json",
@@ -200,6 +210,13 @@
       "tests/integration/assemblies/stm32f1_uart_ports/f103rb-usart3.toml",
       "tests/integration/assemblies/stm32f1_uart_ports/usart3-board/board.json",
       "tests/integration/assemblies/stm32f1_uart_ports/main.c",
+      "tests/integration/assemblies/stm32f1_uart_rx_dma/CMakeLists.txt",
+      "tests/integration/assemblies/stm32f1_uart_rx_dma/main.c",
+      "tests/integration/assemblies/stm32f1_uart_rx_dma/README.md",
+      "tests/integration/assemblies/stm32f1_uart_rx_dma/f103rb-rx-dma.toml",
+      "tests/integration/assemblies/stm32f1_uart_rx_dma/software-board/board.json",
+      "tests/integration/assemblies/stm32f1_uart_rx_dma/f103rb-duplex.toml",
+      "tests/integration/assemblies/stm32f1_uart_rx_dma/duplex-board/board.json",
       "tests/integration/assemblies/stm32f1_fsmc/CMakeLists.txt",
       "tests/integration/assemblies/stm32f1_fsmc/main.c",
       "tests/integration/assemblies/stm32f1_fsmc/zg-sram.toml",
@@ -225,6 +242,7 @@
     "drivers/watchdog/binding.json",
     "drivers/crc/binding.json",
     "drivers/i2c/binding.json",
+    "drivers/i2c/master_irq.binding.json",
     "drivers/spi/binding.json",
     "drivers/pwm/binding.json",
     "drivers/adc/binding.json",

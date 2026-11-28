@@ -39,10 +39,17 @@ reference covers ordinary serialized I/O. Read-while-write concurrency,
 mass erase, option bytes, OTP, boot switching and board timing are outside
 this scope.
 
-The F105VC and F107VC retain their 2 KiB memory layout for link placement.
-PM0075 Table 5 and the pinned HAL specify 2 KiB pages. DS6014 Rev10 Table 29
-labels its erase timing for a 1 KiB page. The writable Flash provider stays
-outside those references until an authoritative 2 KiB operation budget is
-available.
+`f105vc.toml` and `f107vc.toml` select read-only Flash on HSI8. Both expose
+256 KiB at `0x08000000` with 128 physical 2 KiB pages through the same typed
+factory. The face supports bounded reads and geometry. It offers no program,
+erase, recovering writer, or maintenance operation. The FPEC remains locked,
+and the Board binding requires no programming voltage assumption.
+
+PM0075 Rev2 Table 5 and the pinned HAL specify 2 KiB pages. DS6014 Rev10
+Table 29 labels the 40 ms maximum for a 1 KiB page. ES022 Rev11 §2.2.8
+specifies delayed BSY after STRT. A writable profile requires an authoritative
+time bound for the exact 2 KiB page.
+
+[ST DS6014 Rev10](https://www.st.com/resource/en/datasheet/stm32f107vc.pdf) · [ST ES022 Rev11](https://www.st.com/resource/en/errata_sheet/es022-stm32f105xx-and-stm32f107xx-device-errata-stmicroelectronics.pdf)
 
 [ST PM0075 Rev2](https://www.st.com/resource/en/programming_manual/pm0075-stm32f10xxx-flash-memory-microcontrollers-stmicroelectronics.pdf) · [ST PM0063 Rev2](https://www.st.com/resource/en/programming_manual/pm0063-stm32f100xx-value-line-flash-programming-stmicroelectronics.pdf) · [ST PM0068 Rev2](https://www.st.com/resource/en/programming_manual/pm0068-stm32f10xxx-xldensity-flash-programming-stmicroelectronics.pdf)

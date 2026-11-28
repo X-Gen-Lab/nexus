@@ -1577,6 +1577,7 @@
         "gpioa-basic",
         "usart2-default-irq",
         "rm0008-connectivity-bxcan",
+        "fpec-read-only-flash",
         "rm0008-connectivity-dwc"
       ],
       "clock_policy": "rm0008-f105-f107-run"
@@ -1587,6 +1588,7 @@
         "gpioa-basic",
         "f107-usart2",
         "rm0008-connectivity-bxcan",
+        "fpec-read-only-flash",
         "rm0008-connectivity-dwc",
         "rm0008-f107-clause22",
         "rm0008-f107-mii",

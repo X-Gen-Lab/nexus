@@ -13,84 +13,7 @@
         "ops": "nx_stm32f1_flash_ops",
         "declarations": [
           {
-            "role": "flash_erase_spans",
-            "type": "nx_flash_erase_span_t",
-            "const": true,
-            "count": {
-              "length": "selected.physical_flash.erase_spans",
-              "limit": 2
-            },
-            "value": {
-              "map": {
-                "source": "selected.physical_flash.erase_spans",
-                "limit": 2,
-                "value": {
-                  "record": [
-                    [
-                      "offset",
-                      {
-                        "source": "entry.offset"
-                      }
-                    ],
-                    [
-                      "erase_bytes",
-                      {
-                        "source": "entry.erase_bytes"
-                      }
-                    ],
-                    [
-                      "count",
-                      {
-                        "source": "entry.count"
-                      }
-                    ]
-                  ]
-                }
-              }
-            }
-          },
-          {
-            "role": "flash_geometry",
-            "type": "nx_flash_geometry_t",
-            "const": true,
-            "value": {
-              "record": [
-                [
-                  "base_address",
-                  {
-                    "source": "selected.physical_flash.origin"
-                  }
-                ],
-                [
-                  "size",
-                  {
-                    "source": "selected.physical_flash.size"
-                  }
-                ],
-                [
-                  "program_unit",
-                  2
-                ],
-                [
-                  "erase_spans",
-                  {
-                    "ref": "flash_erase_spans",
-                    "as": "symbol"
-                  }
-                ],
-                [
-                  "erase_span_count",
-                  {
-                    "length": "selected.physical_flash.erase_spans",
-                    "limit": 2
-                  }
-                ],
-                [
-                  "program_flags",
-                  0
-                ]
-              ]
-            }
+            "use": "stm32f1-flash-geometry"
           },
           {
             "role": "flash_maintenance",
@@ -156,6 +79,136 @@
           3600
         ]
       }
+    },
+    {
+      "kind": "flash",
+      "mode": "read-only",
+      "implementation": "flash",
+      "headers": [
+        "drivers/flash/instance.h"
+      ],
+      "static_recipe": {
+        "state_type": "nx_stm32f1_flash_state_t",
+        "ops": "nx_stm32f1_flash_read_only_ops",
+        "declarations": [
+          {
+            "use": "stm32f1-flash-geometry"
+          }
+        ],
+        "calls": {
+          "prepare": {
+            "function": "nx_stm32f1_flash_read_only_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "ref": "flash_geometry",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32f1_flash_read_only_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "retain_on_failed_init": false
+      }
     }
-  ]
+  ],
+  "static_fragments": {
+    "declarations": {
+      "stm32f1-flash-geometry": [
+        {
+          "role": "flash_erase_spans",
+          "type": "nx_flash_erase_span_t",
+          "const": true,
+          "count": {
+            "length": "selected.physical_flash.erase_spans",
+            "limit": 2
+          },
+          "value": {
+            "map": {
+              "source": "selected.physical_flash.erase_spans",
+              "limit": 2,
+              "value": {
+                "record": [
+                  [
+                    "offset",
+                    {
+                      "source": "entry.offset"
+                    }
+                  ],
+                  [
+                    "erase_bytes",
+                    {
+                      "source": "entry.erase_bytes"
+                    }
+                  ],
+                  [
+                    "count",
+                    {
+                      "source": "entry.count"
+                    }
+                  ]
+                ]
+              }
+            }
+          }
+        },
+        {
+          "role": "flash_geometry",
+          "type": "nx_flash_geometry_t",
+          "const": true,
+          "value": {
+            "record": [
+              [
+                "base_address",
+                {
+                  "source": "selected.physical_flash.origin"
+                }
+              ],
+              [
+                "size",
+                {
+                  "source": "selected.physical_flash.size"
+                }
+              ],
+              [
+                "program_unit",
+                2
+              ],
+              [
+                "erase_spans",
+                {
+                  "ref": "flash_erase_spans",
+                  "as": "symbol"
+                }
+              ],
+              [
+                "erase_span_count",
+                {
+                  "length": "selected.physical_flash.erase_spans",
+                  "limit": 2
+                }
+              ],
+              [
+                "program_flags",
+                0
+              ]
+            ]
+          }
+        }
+      ]
+    }
+  }
 }

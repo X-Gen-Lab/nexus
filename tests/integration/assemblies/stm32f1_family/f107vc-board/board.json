@@ -8,6 +8,11 @@
   "clocks": {},
   "bindings": [
     {
+      "id": "flash0",
+      "controller": "FLASH",
+      "route": "flash-connectivity-read"
+    },
+    {
       "id": "led0",
       "controller": "GPIOA",
       "route": "gpio-pa5",

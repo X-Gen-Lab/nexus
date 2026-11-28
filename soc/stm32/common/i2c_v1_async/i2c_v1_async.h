@@ -224,6 +224,10 @@ nx_result_t nx_i2c_v1_initialize(nx_i2c_v1_state_t* state);
 void nx_i2c_v1_irq(nx_i2c_v1_state_t* state);
 /** \brief DMA terminal is separate from protocol completion and STOP drain. */
 void nx_i2c_v1_dma_irq(nx_i2c_v1_state_t* state, bool receive);
+#if defined(NX_I2C_V1_F1_WRITE_ONLY)
+/** \brief Prove local source/reset withdrawal while call loans remain held. */
+bool nx_i2c_v1_f1_retire_local(nx_i2c_v1_state_t* state);
+#endif
 #ifdef __cplusplus
 }
 #endif

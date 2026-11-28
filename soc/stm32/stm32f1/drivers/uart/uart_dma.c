@@ -296,16 +296,30 @@ static bool arm(nx_stm32f1_uart_dma_t* state,
     return nx_stm32f1_write_masked(&uart->CR3, USART_CR3_DMAT, USART_CR3_DMAT);
 }
 
-/** \brief Start only after the unique READY/QUEUED borrow is accepted. */
-static nx_result_t start(nx_stm32f1_uart_dma_t* state,
-                         nx_uart_tx_request_t* request, bool admitted) {
-    nx_result_t result = nx_stm32f1_uart_dma_validate(state, request);
-    if (result != NX_SUCCESS) {
-        return result;
-    }
+#if defined(NEXUS_STM32F1_UART_DUPLEX)
+#define TX_ENGINE
+#else
+#define TX_ENGINE static
+#endif
+
+/** \brief Accept only a prevalidated direct or adapter-owned request. */
+TX_ENGINE nx_result_t nx_stm32f1_uart_tx_engine_commit(
+    nx_stm32f1_uart_dma_t* state, nx_uart_tx_request_t* request, bool admitted,
+    const bool* peer_closing) {
     nx_arch_irq_state_t guard = nx_arch_irq_save();
-    result = admitted ? nx_request_transition(&request->base, NX_REQUEST_ACTIVE)
-                      : nx_request_admit(&request->base, NX_REQUEST_ACTIVE);
+#if defined(NEXUS_STM32F1_UART_DUPLEX)
+    /* RX can quarantine the shared vector after the task checks the pool. */
+    if (peer_closing != NULL && (state->closing || *peer_closing ||
+                                 !NX_STM32F1_IRQ_ENABLED(USART2_IRQn))) {
+        nx_arch_irq_restore(guard);
+        return NX_ERROR_STATE;
+    }
+#else
+    (void)peer_closing;
+#endif
+    nx_result_t result =
+        admitted ? nx_request_transition(&request->base, NX_REQUEST_ACTIVE)
+                 : nx_request_admit(&request->base, NX_REQUEST_ACTIVE);
     if (result == NX_SUCCESS) {
         state->active = request;
         state->phase = NX_STM32F1_DMA_MOVING;
@@ -318,20 +332,27 @@ static nx_result_t start(nx_stm32f1_uart_dma_t* state,
     nx_arch_irq_restore(guard);
     return result;
 }
+/** \brief Apply the legacy TX checks before admission. */
+static nx_result_t start(nx_stm32f1_uart_dma_t* state,
+                         nx_uart_tx_request_t* request, bool admitted) {
+    const nx_result_t result = nx_stm32f1_uart_dma_validate(state, request);
+    return result == NX_SUCCESS ? nx_stm32f1_uart_tx_engine_commit(
+                                      state, request, admitted, NULL)
+                                : result;
+}
 
-/** \brief Admit a single direct caller request. */
 static nx_result_t submit(void* context, nx_uart_tx_request_t* request) {
     return start(context, request, false);
 }
 
-/** \brief Transfer an already established adapter borrow. */
 static nx_result_t start_admitted(void* context,
                                   nx_uart_tx_request_t* request) {
     return start(context, request, true);
 }
 
 /** \brief Latch cancellation while preserving an already observed result. */
-static nx_result_t cancel(void* context, nx_uart_tx_request_t* request) {
+TX_ENGINE nx_result_t
+nx_stm32f1_uart_tx_engine_cancel(void* context, nx_uart_tx_request_t* request) {
     nx_stm32f1_uart_dma_t* state = context;
     if (request == NULL) {
         return NX_ERROR_INVALID;
@@ -381,7 +402,7 @@ static bool publication_ready(nx_stm32f1_uart_dma_t* state) {
 }
 
 /** \brief Check original sources once, then release-publish the request. */
-static void service(void* context) {
+TX_ENGINE void nx_stm32f1_uart_tx_engine_service(void* context) {
     nx_stm32f1_uart_dma_t* state = context;
     if (!nx_stm32f1_cold_context()) {
         return;
@@ -476,7 +497,7 @@ static nx_result_t read_events(void* context, nx_uart_rx_event_t* output,
 }
 
 /** \brief Public stop drains and detaches, retaining cold shared resources. */
-static nx_result_t stop(void* context) {
+TX_ENGINE nx_result_t nx_stm32f1_uart_tx_engine_stop(void* context) {
     nx_stm32f1_uart_dma_t* state = context;
     if (!nx_stm32f1_cold_context()) {
         return NX_ERROR_CONTEXT;
@@ -486,8 +507,8 @@ static nx_result_t stop(void* context) {
     }
     state->closing = true;
     if (state->active != NULL) {
-        (void)cancel(state, state->active);
-        service(state);
+        (void)nx_stm32f1_uart_tx_engine_cancel(state, state->active);
+        nx_stm32f1_uart_tx_engine_service(state);
         if (state->active != NULL) {
             return NX_ERROR_BUSY;
         }
@@ -518,7 +539,7 @@ nx_result_t nx_stm32f1_uart_dma_close(nx_stm32f1_uart_dma_t* state) {
     if (state == NULL) {
         return NX_ERROR_INVALID;
     }
-    const nx_result_t stopped = stop(state);
+    const nx_result_t stopped = nx_stm32f1_uart_tx_engine_stop(state);
     if (stopped != NX_SUCCESS || state->config == NULL) {
         return stopped;
     }
@@ -550,9 +571,9 @@ nx_result_t nx_stm32f1_uart_dma_close(nx_stm32f1_uart_dma_t* state) {
 const nx_uart_ops_t nx_stm32f1_uart_dma_ops = {
     .submit = submit,
     .start_admitted = start_admitted,
-    .cancel = cancel,
-    .service = service,
+    .cancel = nx_stm32f1_uart_tx_engine_cancel,
+    .service = nx_stm32f1_uart_tx_engine_service,
     .read_events = read_events,
     .read_bytes = read_bytes,
-    .stop = stop,
+    .stop = nx_stm32f1_uart_tx_engine_stop,
 };

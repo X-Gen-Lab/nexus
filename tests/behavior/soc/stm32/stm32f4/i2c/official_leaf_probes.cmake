@@ -1,13 +1,11 @@
 # Actual F4 LL data access executes with the selected production default.
-set(f4_i2c_engine
-    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/i2c_v1_async"
-)
+set(f4_i2c_engine "${NEXUS_SOURCE_DIR}/soc/stm32/common/i2c_v1_async")
 nexus_google_test(nexus_f4_i2c_official_leaf_test STM32F4_LL
     SOURCES "${nexus_google_root}/soc/stm32/stm32f4/i2c/i2c_official_leaf_test.cpp" "${nexus_google_root}/soc/stm32/stm32f4/i2c/i2c_official_leaf_probe.c"
         "${f4_i2c_engine}/i2c_v1_async.c"
     LIBRARIES Nexus::IO Nexus::Arch
     INCLUDES
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/i2c_v1_async" "${nexus_google_root}/soc/stm32/stm32f4/i2c" "${f4_i2c_engine}"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/common/i2c_v1_async" "${nexus_google_root}/soc/stm32/stm32f4/i2c" "${f4_i2c_engine}"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
 )
 target_include_directories(

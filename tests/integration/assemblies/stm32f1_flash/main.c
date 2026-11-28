@@ -25,7 +25,8 @@ int main(void) {
         nx_flash_geometry_sector_at(geometry, 0U, &first) == NX_SUCCESS &&
         (((geometry->size == 32U * 1024U || geometry->size == 128U * 1024U) &&
           first.size == 1024U) ||
-         (geometry->size == 512U * 1024U && first.size == 2048U) ||
+         ((geometry->size == 256U * 1024U || geometry->size == 512U * 1024U) &&
+          first.size == 2048U) ||
          (geometry->size == 1024U * 1024U && first.size == 2048U &&
           geometry->erase_span_count == 2U &&
           nx_flash_geometry_sector_at(geometry, 256U, &bank2_first) ==

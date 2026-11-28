@@ -8,6 +8,9 @@
  */
 #include "drivers/uart/uart_rx_dma.h"
 #include "system/platform.h"
+#if defined(NEXUS_STM32F1_UART_DUPLEX)
+#include "drivers/uart/uart_duplex.h"
+#endif
 #include <gtest/gtest.h>
 #include <sys/mman.h>
 
@@ -23,17 +26,22 @@ struct Vector {
     unsigned priority;
 };
 Vector dma_irq;
+Vector tx_irq;
 Vector uart_irq;
 bool refuse_dma_disable;
 bool refuse_dma_clear;
 bool refuse_dma_address_clear;
+bool refuse_idle_irq_disable;
 bool late_uart_error;
 bool sr_sampled;
 unsigned dr_reads;
 
 Vector& vector(IRQn_Type irq) {
-    EXPECT_TRUE(irq == DMA1_Channel6_IRQn || irq == USART2_IRQn);
-    return irq == DMA1_Channel6_IRQn ? dma_irq : uart_irq;
+    EXPECT_TRUE(irq == DMA1_Channel6_IRQn || irq == DMA1_Channel7_IRQn ||
+                irq == USART2_IRQn);
+    return irq == DMA1_Channel6_IRQn   ? dma_irq
+           : irq == DMA1_Channel7_IRQn ? tx_irq
+                                       : uart_irq;
 }
 
 void* map_at(uintptr_t address, size_t bytes) {
@@ -60,8 +68,9 @@ class F103ReceiveDma : public testing::Test {
 
         dma_irq = {false, false, false, 7U};
         uart_irq = {false, false, false, 11U};
+        tx_irq = {false, false, false, 9U};
         refuse_dma_disable = refuse_dma_clear = late_uart_error = false;
-        sr_sampled = refuse_dma_address_clear = false;
+        sr_sampled = refuse_dma_address_clear = refuse_idle_irq_disable = false;
         dr_reads = 0U;
         GPIOA->CRL = GPIOA->CRH = 0x44444444U;
         USART2->SR = USART_SR_TC | USART_SR_TXE;
@@ -123,10 +132,15 @@ extern "C" void nx_dma_model_write(volatile uint32_t* reg, uint32_t value) {
     if (reg == &DMA1->IFCR) {
         constexpr uint32_t lane6 =
             DMA_IFCR_CTCIF6 | DMA_IFCR_CHTIF6 | DMA_IFCR_CTEIF6;
-        EXPECT_EQ(0U, value & ~lane6);
+        constexpr uint32_t lane7 =
+            DMA_IFCR_CTCIF7 | DMA_IFCR_CHTIF7 | DMA_IFCR_CTEIF7;
+        EXPECT_EQ(0U, value & ~(lane6 | lane7));
+        EXPECT_TRUE((value & lane6) == 0U || (value & lane7) == 0U);
         auto* const isr = const_cast<volatile uint32_t*>(&DMA1->ISR);
         if (!refuse_dma_clear)
-            *isr &= ~(value | static_cast<uint32_t>(DMA_ISR_GIF6));
+            *isr &= ~(value | static_cast<uint32_t>((value & lane6) == 0U
+                                                        ? DMA_ISR_GIF7
+                                                        : DMA_ISR_GIF6));
         return;
     }
     if (reg == &DMA1_Channel6->CCR && (value & DMA_CCR_EN) == 0U &&
@@ -138,6 +152,9 @@ extern "C" void nx_dma_model_write(volatile uint32_t* reg, uint32_t value) {
             USART2->SR |= USART_SR_ORE;
     }
     if (reg == &DMA1_Channel6->CMAR && value == 0U && refuse_dma_address_clear)
+        return;
+    if (reg == &USART2->CR1 && (value & USART_CR1_IDLEIE) == 0U &&
+        (USART2->CR1 & USART_CR1_IDLEIE) != 0U && refuse_idle_irq_disable)
         return;
     *reg = value;
 }
@@ -164,6 +181,9 @@ extern "C" uint8_t nx_dma_model_rx(USART_TypeDef* reg) {
     return static_cast<uint8_t>(reg->DR);
 }
 
+extern "C" void nx_dma_model_tc_clear(USART_TypeDef* reg) {
+    reg->SR &= ~static_cast<uint32_t>(USART_SR_TC);
+}
 extern "C" bool nx_dma_model_irq_enabled(IRQn_Type irq) {
     return vector(irq).enabled;
 }
@@ -333,3 +353,207 @@ TEST_F(F103ReceiveDma, TargetWithdrawalFailureRetainsPartialBlockAndCount) {
     EXPECT_EQ(NX_SUCCESS, nx_uart_port_rx_stop(&face));
     EXPECT_EQ(NX_SUCCESS, nx_stm32f1_uart_rx_dma_close(&owner));
 }
+
+#if defined(NEXUS_STM32F1_UART_DUPLEX)
+namespace {
+class F103DuplexDma : public F103ReceiveDma {
+  protected:
+    nx_stm32f1_uart_duplex_t duplex{};
+    nx_stm32f1_uart_duplex_config_t wiring{};
+    nx_uart_tx_request_t tx{};
+    const nx_uart_port_t port{&nx_stm32f1_uart_duplex_ops, &duplex};
+
+    void Bind() {
+        region.permissions |= NX_DMA_MEMORY_READ;
+        wiring.tx = {config.uart,        DMA1,    DMA1_Channel7,
+                     DMA1_Channel7_IRQn, &region, 1U};
+        wiring.tx.uart.tx_registers = GPIOA;
+        wiring.tx.uart.tx_pin = 2U;
+        wiring.tx.uart.wire = NX_STM32F1_UART_WIRE_NONE;
+        wiring.rx_channel = DMA1_Channel6;
+        wiring.rx_irq = DMA1_Channel6_IRQn;
+        ASSERT_EQ(NX_SUCCESS, nx_stm32f1_uart_duplex_prepare(&duplex, &wiring));
+        nx_request_initialize(&tx.base);
+    }
+
+    void Transmit(const uint8_t* payload = reinterpret_cast<uint8_t*>(sram +
+                                                                      64U)) {
+        ASSERT_EQ(NX_SUCCESS, nx_uart_tx_prepare(&tx, payload, 4U, 1000U));
+        ASSERT_EQ(NX_SUCCESS, nx_uart_port_submit(&port, &tx));
+    }
+
+    void TxDmaComplete() {
+        DMA1_Channel7->CNDTR = 0U;
+        *const_cast<volatile uint32_t*>(&DMA1->ISR) |= DMA_ISR_TCIF7;
+        tx_irq.active = true;
+        nx_stm32f1_uart_duplex_tx_irq(&duplex);
+        tx_irq.active = false;
+    }
+
+    void UartInterrupt(uint32_t status) {
+        USART2->SR |= status;
+        uart_irq.active = true;
+        nx_stm32f1_uart_duplex_usart_irq(&duplex);
+        uart_irq.active = false;
+    }
+};
+} /* namespace */
+
+TEST_F(F103DuplexDma,
+       IndependentLanesShareOneUartAndWaitForFreshWireCompletion) {
+    Bind();
+    ASSERT_EQ(NX_SUCCESS, nx_uart_port_rx_start(&port, &stream));
+    Transmit();
+    EXPECT_EQ(USART_CR3_DMAR | USART_CR3_DMAT,
+              USART2->CR3 & (USART_CR3_DMAR | USART_CR3_DMAT));
+    EXPECT_EQ(0U, USART2->CR1 & USART_CR1_RXNEIE);
+    EXPECT_EQ(4U, DMA1_Channel6->CNDTR);
+    EXPECT_EQ(4U, DMA1_Channel7->CNDTR);
+    TxDmaComplete();
+    nx_uart_port_service(&port);
+    EXPECT_EQ(NX_REQUEST_DRAINING, nx_request_state(&tx.base));
+    EXPECT_NE(0U, DMA1_Channel6->CCR & DMA_CCR_EN);
+
+    DMA1_Channel6->CNDTR = 2U;
+    UartInterrupt(USART_SR_IDLE);
+    EXPECT_EQ(0U, dr_reads);
+    EXPECT_TRUE(uart_irq.enabled);
+    nx_uart_port_service(&port);
+    nx_stream_block_t rx{};
+    ASSERT_EQ(NX_SUCCESS, nx_stream_acquire(&stream, &rx));
+    EXPECT_EQ(2U, rx.length);
+    EXPECT_EQ(NX_STREAM_BOUNDARY_IDLE, rx.flags);
+    EXPECT_EQ(NX_REQUEST_DRAINING, nx_request_state(&tx.base));
+
+    UartInterrupt(USART_SR_TC);
+    nx_uart_port_service(&port);
+    nx_result_t result{};
+    size_t count{};
+    ASSERT_EQ(NX_SUCCESS, nx_request_result(&tx.base, &result, &count));
+    EXPECT_EQ(NX_SUCCESS, result);
+    EXPECT_EQ(4U, count);
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32f1_uart_duplex_close(&duplex));
+    ASSERT_EQ(NX_SUCCESS, nx_stream_release(&stream, &rx));
+    EXPECT_EQ(NX_SUCCESS, nx_stm32f1_uart_duplex_close(&duplex));
+    EXPECT_EQ(7U, dma_irq.priority);
+    EXPECT_EQ(9U, tx_irq.priority);
+    EXPECT_EQ(11U, uart_irq.priority);
+}
+TEST_F(F103DuplexDma, TxCancellationDoesNotWithdrawReceiveLane) {
+    Bind();
+    ASSERT_EQ(NX_SUCCESS, nx_uart_port_rx_start(&port, &stream));
+    Transmit();
+    DMA1_Channel7->CNDTR = 2U;
+    ASSERT_EQ(NX_SUCCESS, nx_uart_port_cancel(&port, &tx));
+    EXPECT_NE(0U, USART2->CR3 & USART_CR3_DMAR);
+    EXPECT_EQ(0U, USART2->CR3 & USART_CR3_DMAT);
+    EXPECT_EQ(NX_REQUEST_DRAINING, nx_request_state(&tx.base));
+    EXPECT_EQ(4U, DMA1_Channel6->CNDTR);
+    EXPECT_TRUE(uart_irq.enabled);
+    UartInterrupt(USART_SR_TC);
+    nx_uart_port_service(&port);
+    nx_result_t result{};
+    size_t size{};
+    ASSERT_EQ(NX_SUCCESS, nx_request_result(&tx.base, &result, &size));
+    EXPECT_EQ(NX_ERROR_CANCELLED, result);
+    EXPECT_EQ(0U, size);
+    EXPECT_NE(0U, DMA1_Channel6->CCR & DMA_CCR_EN);
+    EXPECT_EQ(NX_SUCCESS, nx_stm32f1_uart_duplex_close(&duplex));
+}
+
+TEST_F(F103DuplexDma, ReceiveFaultAndStopKeepTheTransmitVectorAndLoan) {
+    Bind();
+    ASSERT_EQ(NX_SUCCESS, nx_uart_port_rx_start(&port, &stream));
+    Transmit();
+    *const_cast<volatile uint32_t*>(&DMA1->ISR) |= DMA_ISR_TEIF6;
+    nx_stm32f1_uart_duplex_rx_irq(&duplex);
+    EXPECT_TRUE(uart_irq.enabled);
+    nx_uart_port_service(&port);
+    EXPECT_EQ(1U, stream.losses);
+    EXPECT_NE(0U, USART2->CR3 & USART_CR3_DMAT);
+    EXPECT_EQ(NX_REQUEST_ACTIVE, nx_request_state(&tx.base));
+    ASSERT_EQ(NX_SUCCESS, nx_uart_port_rx_stop(&port));
+    EXPECT_TRUE(uart_irq.enabled);
+    EXPECT_NE(0U, DMA1_Channel7->CCR & DMA_CCR_EN);
+    TxDmaComplete();
+    EXPECT_EQ(NX_REQUEST_DRAINING, nx_request_state(&tx.base));
+    UartInterrupt(USART_SR_TC);
+    nx_uart_port_service(&port);
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&tx.base));
+    EXPECT_EQ(NX_SUCCESS, nx_stm32f1_uart_duplex_close(&duplex));
+    EXPECT_EQ(NX_SUCCESS, nx_stm32f1_uart_duplex_prepare(&duplex, &wiring));
+    EXPECT_EQ(NX_SUCCESS, nx_stm32f1_uart_duplex_close(&duplex));
+}
+
+TEST_F(F103DuplexDma, BothAdmissionOrdersExcludeTheCompleteReceivePool) {
+    Bind();
+    Transmit(slots[1].data);
+    EXPECT_EQ(NX_ERROR_INVALID, nx_uart_port_rx_start(&port, &stream));
+    EXPECT_EQ(0U, DMA1_Channel6->CMAR);
+    TxDmaComplete();
+    UartInterrupt(USART_SR_TC);
+    nx_uart_port_service(&port);
+    ASSERT_EQ(NX_REQUEST_SETTLED, nx_request_state(&tx.base));
+
+    ASSERT_EQ(NX_SUCCESS, nx_uart_port_rx_start(&port, &stream));
+    ASSERT_EQ(NX_SUCCESS, nx_uart_tx_prepare(&tx, slots[1].data, 4U, 1000U));
+    EXPECT_EQ(NX_ERROR_INVALID, nx_uart_port_submit(&port, &tx));
+    EXPECT_EQ(NX_REQUEST_READY, nx_request_state(&tx.base));
+    EXPECT_EQ(0U, USART2->CR3 & USART_CR3_DMAT);
+    EXPECT_EQ(NX_SUCCESS, nx_stm32f1_uart_duplex_close(&duplex));
+}
+TEST_F(F103DuplexDma, StuckReceiverIrqQuarantinesSharedVectorUntilClose) {
+    Bind();
+    ASSERT_EQ(NX_SUCCESS, nx_uart_port_rx_start(&port, &stream));
+    Transmit();
+    refuse_idle_irq_disable = true;
+    UartInterrupt(USART_SR_IDLE);
+    EXPECT_FALSE(uart_irq.enabled);
+    EXPECT_NE(0U, USART2->CR3 & USART_CR3_DMAT);
+    EXPECT_EQ(NX_STREAM_SLOT_FILLING, slots[0].state);
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32f1_uart_duplex_close(&duplex));
+
+    refuse_idle_irq_disable = false;
+    USART2->SR |= USART_SR_TC;
+    nx_uart_port_service(&port);
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&tx.base));
+    EXPECT_EQ(0U, stream.outstanding);
+    EXPECT_EQ(NX_SUCCESS, nx_stm32f1_uart_duplex_close(&duplex));
+    EXPECT_EQ(11U, uart_irq.priority);
+}
+TEST_F(F103DuplexDma, ClosingGuardRejectsBeforeEitherDirectionBorrows) {
+    Bind();
+    const auto* payload = reinterpret_cast<const uint8_t*>(sram + 64U);
+    ASSERT_EQ(NX_SUCCESS, nx_uart_tx_prepare(&tx, payload, 4U, 1000U));
+    ASSERT_EQ(NX_SUCCESS, nx_stm32f1_uart_duplex_validate(&duplex, &tx));
+    /* Simulate the RX ISR shutting the shared vector after TX preflight. */
+    duplex.rx.closing = true;
+    uart_irq.enabled = false;
+    EXPECT_EQ(NX_ERROR_STATE, nx_stm32f1_uart_tx_engine_commit(
+                                  &duplex.tx, &tx, false, &duplex.rx.closing));
+    EXPECT_EQ(NX_REQUEST_READY, nx_request_state(&tx.base));
+    EXPECT_EQ(0U, DMA1_Channel7->CMAR);
+    /* A masked shared vector also cannot admit a new receive pool. */
+    duplex.rx.closing = false;
+    EXPECT_EQ(NX_ERROR_STATE, nx_uart_port_rx_start(&port, &stream));
+    EXPECT_EQ(0U, stream.outstanding);
+    EXPECT_EQ(0U, DMA1_Channel6->CMAR);
+    EXPECT_EQ(NX_SUCCESS, nx_stm32f1_uart_duplex_close(&duplex));
+}
+TEST_F(F103DuplexDma, PeerClosurePreventsReservingTheNextReceiveSlot) {
+    Bind();
+    ASSERT_EQ(NX_SUCCESS, nx_uart_port_rx_start(&port, &stream));
+    DMA1_Channel6->CNDTR = 0U;
+    *const_cast<volatile uint32_t*>(&DMA1->ISR) |= DMA_ISR_TCIF6;
+    nx_stm32f1_uart_duplex_rx_irq(&duplex);
+    duplex.tx.closing = true;
+    nx_stm32f1_uart_rx_engine_service(&duplex.rx, true, &duplex.tx.closing);
+    nx_stream_block_t rx{};
+    ASSERT_EQ(NX_SUCCESS, nx_stream_acquire(&stream, &rx));
+    EXPECT_EQ(4U, rx.length);
+    EXPECT_EQ(NX_STREAM_SLOT_FREE, slots[1].state);
+    EXPECT_EQ(0U, DMA1_Channel6->CMAR);
+    EXPECT_EQ(NX_SUCCESS, nx_stream_release(&stream, &rx));
+    EXPECT_EQ(NX_SUCCESS, nx_stm32f1_uart_duplex_close(&duplex));
+}
+#endif

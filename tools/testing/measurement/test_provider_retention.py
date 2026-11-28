@@ -719,7 +719,7 @@ static const nx_flash_port_t s_nx_flash_readonly_storage = {
         _, _, providers, _ = source_contracts()
         provider = providers["nx_i2c_v1_async_ops"]
         self.assertTrue(provider["source"]["path"].endswith(
-            "soc/stm32/stm32f4/drivers/ip/i2c_v1_async/i2c_v1_async.c"))
+            "soc/stm32/common/i2c_v1_async/i2c_v1_async.c"))
         self.assertEqual(provider["fields"]["recover"], "recover")
         self.assertIn("nx_i2c_v1_async_endpoint_ops", providers)
 

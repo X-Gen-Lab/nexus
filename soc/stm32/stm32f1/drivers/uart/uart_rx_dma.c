@@ -57,12 +57,45 @@ static bool vector_idle(IRQn_Type irq) {
            !NX_STM32F1_IRQ_ACTIVE(irq);
 }
 
+#if defined(NEXUS_STM32F1_UART_DUPLEX)
+#define RX_ENGINE
+#else
+#define RX_ENGINE static
+#endif
+
+static bool lane_available(void) {
+    const DMA_Channel_TypeDef* lane = DMA1_Channel6;
+    return lane->CCR == 0U && lane->CNDTR == 0U && lane->CPAR == 0U &&
+           lane->CMAR == 0U && (DMA1->ISR & DMA_EVENTS) == 0U;
+}
+
+RX_ENGINE nx_result_t nx_stm32f1_uart_rx_engine_admit(void) {
+    return vector_idle(DMA1_Channel6_IRQn) ? NX_SUCCESS : NX_ERROR_BUSY;
+}
+
+RX_ENGINE nx_result_t nx_stm32f1_uart_rx_engine_prepare(
+    nx_stm32f1_uart_rx_engine_t* rx, uint8_t priority) {
+    if (!source_clocks() || !lane_available() ||
+        !vector_idle(DMA1_Channel6_IRQn))
+        return NX_ERROR_BUSY;
+    rx->lane_owned = true;
+    rx->previous_priority =
+        (uint8_t)NX_STM32F1_IRQ_PRIORITY(DMA1_Channel6_IRQn);
+    rx->vector_owned = true;
+    NX_STM32F1_IRQ_SET_PRIORITY(DMA1_Channel6_IRQn, priority);
+    if (NX_STM32F1_IRQ_PRIORITY(DMA1_Channel6_IRQn) != priority)
+        return NX_ERROR_IO;
+    rx->live = true;
+    return NX_SUCCESS;
+}
+
 nx_result_t
 nx_stm32f1_uart_rx_dma_admit(const nx_stm32f1_uart_rx_dma_t* state,
                              const nx_stm32f1_uart_rx_dma_config_t* config) {
     if (state == NULL || config == NULL || config->dma != DMA1 ||
         config->channel != DMA1_Channel6 || config->irq != DMA1_Channel6_IRQn ||
         config->uart.profile != NX_UART_RX_BLOCKS ||
+        config->uart.tx_registers != NULL ||
         config->uart.clock_hz != 8000000U || config->regions == NULL ||
         config->region_count == 0U || config->region_count > 16U)
         return NX_ERROR_INVALID;
@@ -72,7 +105,7 @@ nx_stm32f1_uart_rx_dma_admit(const nx_stm32f1_uart_rx_dma_t* state,
         nx_stm32f1_uart_admit(&state->uart, &config->uart);
     if (result != NX_SUCCESS)
         return result;
-    return vector_idle(config->irq) ? NX_SUCCESS : NX_ERROR_BUSY;
+    return nx_stm32f1_uart_rx_engine_admit();
 }
 
 nx_result_t
@@ -89,33 +122,25 @@ nx_stm32f1_uart_rx_dma_prepare(nx_stm32f1_uart_rx_dma_t* state,
         !nx_stm32f1_write_masked(&RCC->AHBENR, RCC_AHBENR_DMA1EN,
                                  RCC_AHBENR_DMA1EN))
         return NX_ERROR_IO;
-    const DMA_Channel_TypeDef* lane = config->channel;
-    if (lane->CCR != 0U || lane->CNDTR != 0U || lane->CPAR != 0U ||
-        lane->CMAR != 0U || (config->dma->ISR & DMA_EVENTS) != 0U)
+    if (!lane_available())
         return NX_ERROR_BUSY;
-    state->lane_owned = true;
     result = nx_stm32f1_uart_prepare(&state->uart, &config->uart);
     if (result != NX_SUCCESS)
         return result;
-    NX_STM32F1_IRQ_DISABLE(config->uart.irq);
+    NX_STM32F1_IRQ_DISABLE(USART2_IRQn);
     nx_arch_dsb();
-    if (!vector_idle(config->uart.irq))
+    if (!vector_idle(USART2_IRQn))
         return NX_ERROR_IO;
-    state->previous_priority = (uint8_t)NX_STM32F1_IRQ_PRIORITY(config->irq);
-    state->vector_owned = true;
-    NX_STM32F1_IRQ_SET_PRIORITY(config->irq, config->uart.priority);
-    if (NX_STM32F1_IRQ_PRIORITY(config->irq) != config->uart.priority)
-        return NX_ERROR_IO;
-    state->live = true;
-    return NX_SUCCESS;
+    return nx_stm32f1_uart_rx_engine_prepare(&state->rx, config->uart.priority);
 }
 
 /** \brief Disable new USART requests before asking DMA to retire the loan. */
-static bool detach(const nx_stm32f1_uart_rx_dma_config_t* config) {
-    USART_TypeDef* uart = config->uart.registers;
-    DMA_Channel_TypeDef* lane = config->channel;
-    NX_STM32F1_IRQ_DISABLE(config->irq);
-    NX_STM32F1_IRQ_DISABLE(config->uart.irq);
+static bool detach(nx_stm32f1_uart_rx_engine_t* state, bool shared_vector) {
+    USART_TypeDef* uart = USART2;
+    DMA_Channel_TypeDef* lane = DMA1_Channel6;
+    NX_STM32F1_IRQ_DISABLE(DMA1_Channel6_IRQn);
+    if (!shared_vector)
+        NX_STM32F1_IRQ_DISABLE(USART2_IRQn);
     const bool request_off =
         (uart->CR3 & UART_DMA_CONTROL) == 0U ||
         nx_stm32f1_write_masked(&uart->CR3, UART_DMA_CONTROL, 0U);
@@ -125,10 +150,18 @@ static bool detach(const nx_stm32f1_uart_rx_dma_config_t* config) {
     const bool engine_off =
         (lane->CCR & DMA_CONTROL) == 0U ||
         nx_stm32f1_write_masked(&lane->CCR, DMA_CONTROL, 0U);
+    /* A stuck receiver IRQ can starve the shared executor. Quarantine the
+     * vector only on that fatal condition; until close, tasks may still drain.
+     */
+    if (shared_vector && ((uart->CR1 & USART_CR1_IDLEIE) != 0U ||
+                          (uart->CR3 & USART_CR3_EIE) != 0U)) {
+        NX_STM32F1_IRQ_DISABLE(USART2_IRQn);
+        state->closing = true;
+    }
     nx_arch_dsb();
     return request_off && receive_off && engine_off &&
-           !NX_STM32F1_IRQ_ENABLED(config->irq) &&
-           !NX_STM32F1_IRQ_ENABLED(config->uart.irq);
+           !NX_STM32F1_IRQ_ENABLED(DMA1_Channel6_IRQn) &&
+           (shared_vector || !NX_STM32F1_IRQ_ENABLED(USART2_IRQn));
 }
 
 /** \brief Withdraw retired DMA addresses while preserving the count receipt. */
@@ -140,22 +173,23 @@ static bool clear_lane_addresses(DMA_Channel_TypeDef* lane) {
 }
 
 /** \brief ES096 2.4.1 excludes CGIF and leaving any live pending publisher. */
-static bool retire_sources(const nx_stm32f1_uart_rx_dma_config_t* config) {
-    NX_STM32F1_WRITE(&config->dma->IFCR, DMA_ACK);
-    NX_STM32F1_IRQ_CLEAR(config->irq);
-    NX_STM32F1_IRQ_CLEAR(config->uart.irq);
+static bool retire_sources(bool shared_vector) {
+    NX_STM32F1_WRITE(&DMA1->IFCR, DMA_ACK);
+    NX_STM32F1_IRQ_CLEAR(DMA1_Channel6_IRQn);
+    if (!shared_vector)
+        NX_STM32F1_IRQ_CLEAR(USART2_IRQn);
     nx_arch_dsb();
-    return (config->dma->ISR & DMA_EVENTS) == 0U && vector_idle(config->irq) &&
-           vector_idle(config->uart.irq) &&
-           clear_lane_addresses(config->channel);
+    return (DMA1->ISR & DMA_EVENTS) == 0U && vector_idle(DMA1_Channel6_IRQn) &&
+           (shared_vector || vector_idle(USART2_IRQn)) &&
+           clear_lane_addresses(DMA1_Channel6);
 }
 
-static void observe_boundary(nx_stm32f1_uart_rx_dma_t* state) {
+static void observe_boundary(nx_stm32f1_uart_rx_engine_t* state,
+                             bool shared_vector) {
     if (state->pending || state->fill.data == NULL || !source_clocks())
         return;
-    const nx_stm32f1_uart_rx_dma_config_t* config = state->config;
-    const uint32_t status = NX_STM32F1_UART_STATUS(config->uart.registers);
-    const uint32_t events = config->dma->ISR;
+    const uint32_t status = NX_STM32F1_UART_STATUS(USART2);
+    const uint32_t events = DMA1->ISR;
     if ((status & (USART_SR_IDLE | UART_ERRORS)) == 0U &&
         (events & (DMA_ISR_TCIF6 | DMA_ISR_TEIF6)) == 0U)
         return;
@@ -164,31 +198,32 @@ static void observe_boundary(nx_stm32f1_uart_rx_dma_t* state) {
     state->fault =
         (status & UART_ERRORS) != 0U || (events & DMA_ISR_TEIF6) != 0U;
     state->pending = true;
-    (void)detach(config);
+    (void)detach(state, shared_vector);
 }
 
 /** \brief IRQ only retires hardware and records facts, task publishes. */
-void nx_stm32f1_uart_rx_dma_irq(nx_stm32f1_uart_rx_dma_t* state) {
+RX_ENGINE void nx_stm32f1_uart_rx_engine_irq(nx_stm32f1_uart_rx_engine_t* state,
+                                             bool shared_vector) {
     if (state == NULL || !state->live)
         return;
     const nx_arch_irq_state_t guard = nx_arch_irq_save();
-    observe_boundary(state);
+    observe_boundary(state, shared_vector);
     nx_arch_irq_restore(guard);
 }
 
 /** \brief Read DR only after the peripheral request, receiver and DMA stop. */
-static nx_result_t finish(nx_stm32f1_uart_rx_dma_t* state) {
+static nx_result_t finish(nx_stm32f1_uart_rx_engine_t* state,
+                          bool shared_vector) {
     if (!state->pending)
         return NX_SUCCESS;
-    const nx_stm32f1_uart_rx_dma_config_t* config = state->config;
-    if (!source_clocks() || !detach(config) ||
-        NX_STM32F1_IRQ_ACTIVE(config->irq) ||
-        NX_STM32F1_IRQ_ACTIVE(config->uart.irq))
+    if (!source_clocks() || !detach(state, shared_vector) ||
+        NX_STM32F1_IRQ_ACTIVE(DMA1_Channel6_IRQn) ||
+        NX_STM32F1_IRQ_ACTIVE(USART2_IRQn))
         return NX_ERROR_BUSY;
 
-    const uint32_t dma = config->dma->ISR;
-    const size_t remaining = config->channel->CNDTR;
-    USART_TypeDef* uart = config->uart.registers;
+    const uint32_t dma = DMA1->ISR;
+    const size_t remaining = DMA1_Channel6->CNDTR;
+    USART_TypeDef* uart = USART2;
     const uint32_t status = NX_STM32F1_UART_STATUS(uart);
     if ((status & UART_FACTS) != 0U)
         (void)NX_STM32F1_UART_RECEIVE(uart);
@@ -198,7 +233,7 @@ static nx_result_t finish(nx_stm32f1_uart_rx_dma_t* state) {
                    ((dma & DMA_ISR_TCIF6) != 0U && remaining != 0U) ||
                    remaining > state->fill.capacity;
     if ((NX_STM32F1_UART_STATUS(uart) & UART_FACTS) != 0U ||
-        !retire_sources(config))
+        !retire_sources(shared_vector))
         return NX_ERROR_BUSY;
 
     nx_result_t result;
@@ -221,12 +256,13 @@ static nx_result_t finish(nx_stm32f1_uart_rx_dma_t* state) {
 }
 
 /** \brief Reversible arm prepares one NORMAL byte DMA target. */
-static bool arm(const nx_stm32f1_uart_rx_dma_t* state) {
-    const nx_stm32f1_uart_rx_dma_config_t* config = state->config;
-    DMA_Channel_TypeDef* lane = config->channel;
-    USART_TypeDef* uart = config->uart.registers;
-    if (!source_clocks() || !vector_idle(config->irq) ||
-        !vector_idle(config->uart.irq) || (lane->CCR & DMA_CONTROL) != 0U ||
+static bool arm(const nx_stm32f1_uart_rx_engine_t* state, bool shared_vector) {
+    DMA_Channel_TypeDef* lane = DMA1_Channel6;
+    USART_TypeDef* uart = USART2;
+    if (!source_clocks() || !vector_idle(DMA1_Channel6_IRQn) ||
+        (!shared_vector && !vector_idle(USART2_IRQn)) ||
+        (shared_vector && !NX_STM32F1_IRQ_ENABLED(USART2_IRQn)) ||
+        (lane->CCR & DMA_CONTROL) != 0U ||
         (uart->CR3 & UART_DMA_CONTROL) != 0U ||
         (uart->CR1 & UART_IRQ_CONTROL) != 0U)
         return false;
@@ -239,51 +275,73 @@ static bool arm(const nx_stm32f1_uart_rx_dma_t* state) {
         !nx_stm32f1_write_masked(&lane->CNDTR, UINT16_MAX, count) ||
         !nx_stm32f1_write_masked(&lane->CCR, UINT16_MAX, DMA_MODE | DMA_CCR_EN))
         return false;
-    NX_STM32F1_IRQ_ENABLE(config->irq);
-    NX_STM32F1_IRQ_ENABLE(config->uart.irq);
+    NX_STM32F1_IRQ_ENABLE(DMA1_Channel6_IRQn);
+    if (!shared_vector)
+        NX_STM32F1_IRQ_ENABLE(USART2_IRQn);
     nx_arch_dsb();
-    return NX_STM32F1_IRQ_ENABLED(config->irq) &&
-           NX_STM32F1_IRQ_ENABLED(config->uart.irq) &&
+    return NX_STM32F1_IRQ_ENABLED(DMA1_Channel6_IRQn) &&
+           NX_STM32F1_IRQ_ENABLED(USART2_IRQn) &&
            nx_stm32f1_write_masked(&uart->CR3, UART_DMA_CONTROL,
                                    UART_DMA_CONTROL) &&
            nx_stm32f1_write_masked(&uart->CR1, UART_IRQ_CONTROL,
                                    UART_IRQ_CONTROL);
 }
 
-static nx_result_t reserve(nx_stm32f1_uart_rx_dma_t* state) {
+static nx_result_t reserve(nx_stm32f1_uart_rx_engine_t* state,
+                           bool shared_vector) {
     nx_result_t result = nx_stream_reserve(state->stream, &state->fill);
     if (result != NX_SUCCESS)
         return result;
-    if (!arm(state)) {
+    if (!arm(state, shared_vector)) {
         /* The accepted loan remains until both sources and IRQs retire. */
         state->fault = true;
         state->pending = true;
         if (source_clocks())
-            (void)detach(state->config);
+            (void)detach(state, shared_vector);
     }
     return NX_SUCCESS;
 }
 
-static bool independent(const nx_stm32f1_uart_rx_dma_t* state, const void* addr,
-                        size_t size) {
-    return !nx_io_dispatch_overlap(addr, size, state, sizeof(*state)) &&
-           !nx_io_dispatch_overlap(addr, size, state->config,
-                                   sizeof(*state->config)) &&
-           !nx_io_dispatch_overlap(addr, size, state->config->regions,
-                                   state->config->region_count *
-                                       sizeof(*state->config->regions));
+#if defined(NEXUS_STM32F1_UART_DUPLEX)
+/** \brief A whole receive pool remains reserved, including consumer loans. */
+bool nx_stm32f1_uart_stream_contains(const nx_stream_t* stream,
+                                     const void* address, size_t bytes) {
+    if (stream == NULL)
+        return false;
+    if (nx_io_dispatch_overlap(address, bytes, stream, sizeof(*stream)) ||
+        nx_io_dispatch_overlap(address, bytes, stream->slots,
+                               stream->count * sizeof(*stream->slots)))
+        return true;
+    for (size_t i = 0U; i < stream->count; ++i) {
+        if (nx_io_dispatch_overlap(address, bytes, stream->slots[i].data,
+                                   stream->slots[i].capacity))
+            return true;
+    }
+    return false;
+}
+#endif
+
+static bool independent(const nx_stm32f1_uart_rx_storage_t* storage,
+                        const void* addr, size_t size) {
+    return !nx_io_dispatch_overlap(addr, size, storage->owner,
+                                   storage->owner_size) &&
+           !nx_io_dispatch_overlap(addr, size, storage->config,
+                                   storage->config_size) &&
+           !nx_io_dispatch_overlap(addr, size, storage->regions,
+                                   storage->region_count *
+                                       sizeof(*storage->regions));
 }
 
-static nx_result_t validate_stream(const nx_stm32f1_uart_rx_dma_t* state,
+static nx_result_t validate_stream(const nx_stm32f1_uart_rx_storage_t* storage,
                                    const nx_stream_t* stream) {
     if (!nx_io_dispatch_span(stream, sizeof(*stream), _Alignof(nx_stream_t)) ||
-        !independent(state, stream, sizeof(*stream)) || stream->count == 0U ||
+        !independent(storage, stream, sizeof(*stream)) || stream->count == 0U ||
         stream->count > SIZE_MAX / sizeof(*stream->slots) || stream->stopping)
         return NX_ERROR_INVALID;
     const size_t slots_bytes = stream->count * sizeof(*stream->slots);
     if (!nx_io_dispatch_span(stream->slots, slots_bytes,
                              _Alignof(nx_stream_slot_t)) ||
-        !independent(state, stream->slots, slots_bytes) ||
+        !independent(storage, stream->slots, slots_bytes) ||
         nx_io_dispatch_overlap(stream, sizeof(*stream), stream->slots,
                                slots_bytes))
         return NX_ERROR_INVALID;
@@ -292,51 +350,78 @@ static nx_result_t validate_stream(const nx_stm32f1_uart_rx_dma_t* state,
     for (size_t i = 0U; i < stream->count; ++i) {
         const nx_stream_slot_t* slot = &stream->slots[i];
         if (slot->capacity > UINT16_MAX ||
-            !independent(state, slot->data, slot->capacity))
+            !independent(storage, slot->data, slot->capacity))
             return NX_ERROR_INVALID;
         const nx_result_t result = nx_dma_buffer_validate(
-            state->config->regions, state->config->region_count, slot->data,
-            slot->capacity, 1U, NX_DMA_FROM_DEVICE);
+            storage->regions, storage->region_count, slot->data, slot->capacity,
+            1U, NX_DMA_FROM_DEVICE);
         if (result != NX_SUCCESS)
             return result;
     }
+#if defined(NEXUS_STM32F1_UART_DUPLEX)
+    if (storage->tx != NULL &&
+        (nx_stm32f1_uart_stream_contains(stream, storage->tx,
+                                         sizeof(*storage->tx)) ||
+         nx_stm32f1_uart_stream_contains(stream, storage->tx->data,
+                                         storage->tx->length)))
+        return NX_ERROR_INVALID;
+#endif
     return NX_SUCCESS;
 }
 
-static nx_result_t rx_start(void* context, nx_stream_t* stream) {
-    nx_stm32f1_uart_rx_dma_t* state = context;
+RX_ENGINE nx_result_t nx_stm32f1_uart_rx_engine_start(
+    nx_stm32f1_uart_rx_engine_t* state, nx_stream_t* stream,
+    const nx_stm32f1_uart_rx_storage_t* storage, bool shared_vector) {
     if (!nx_stm32f1_cold_context())
         return NX_ERROR_CONTEXT;
     if (!state->live || state->closing || !source_clocks())
         return NX_ERROR_STATE;
     if (state->stream != NULL)
         return NX_ERROR_BUSY;
-    const nx_result_t valid = validate_stream(state, stream);
+    const nx_result_t valid = validate_stream(storage, stream);
     if (valid != NX_SUCCESS)
         return valid;
     const nx_arch_irq_state_t guard = nx_arch_irq_save();
+#if defined(NEXUS_STM32F1_UART_DUPLEX)
+    /* Recheck shared shutdown facts after the unmasked span walk. */
+    if (shared_vector && (state->closing || *storage->peer_closing ||
+                          !NX_STM32F1_IRQ_ENABLED(USART2_IRQn))) {
+        nx_arch_irq_restore(guard);
+        return NX_ERROR_STATE;
+    }
+#endif
     state->stream = stream;
-    const nx_result_t admitted = reserve(state);
+    const nx_result_t admitted = reserve(state, shared_vector);
     if (admitted != NX_SUCCESS)
         state->stream = NULL;
     nx_arch_irq_restore(guard);
     return admitted;
 }
 
-static void service(void* context) {
-    nx_stm32f1_uart_rx_dma_t* state = context;
+RX_ENGINE void
+nx_stm32f1_uart_rx_engine_service(nx_stm32f1_uart_rx_engine_t* state,
+                                  bool shared_vector,
+                                  const bool* peer_closing) {
     if (!nx_stm32f1_cold_context() || state->stream == NULL)
         return;
     const nx_arch_irq_state_t guard = nx_arch_irq_save();
-    observe_boundary(state);
-    if (finish(state) == NX_SUCCESS && state->fill.data == NULL &&
-        !state->closing && nx_stream_can_reserve(state->stream))
-        (void)reserve(state);
+#if defined(NEXUS_STM32F1_UART_DUPLEX)
+    if (shared_vector &&
+        (*peer_closing || !NX_STM32F1_IRQ_ENABLED(USART2_IRQn)))
+        state->closing = true;
+#else
+    (void)peer_closing;
+#endif
+    observe_boundary(state, shared_vector);
+    if (finish(state, shared_vector) == NX_SUCCESS &&
+        state->fill.data == NULL && !state->closing &&
+        nx_stream_can_reserve(state->stream))
+        (void)reserve(state, shared_vector);
     nx_arch_irq_restore(guard);
 }
 
-static nx_result_t rx_stop(void* context) {
-    nx_stm32f1_uart_rx_dma_t* state = context;
+RX_ENGINE nx_result_t nx_stm32f1_uart_rx_engine_stop(
+    nx_stm32f1_uart_rx_engine_t* state, bool shared_vector) {
     if (!nx_stm32f1_cold_context())
         return NX_ERROR_CONTEXT;
     if (state->stream == NULL)
@@ -344,10 +429,10 @@ static nx_result_t rx_stop(void* context) {
     const nx_arch_irq_state_t guard = nx_arch_irq_save();
     (void)nx_stream_stop(state->stream);
     if (state->fill.data != NULL) {
-        observe_boundary(state);
+        observe_boundary(state, shared_vector);
         state->pending = true;
     }
-    nx_result_t result = finish(state);
+    nx_result_t result = finish(state, shared_vector);
     if (result == NX_SUCCESS) {
         result = nx_stream_stop(state->stream);
         if (result == NX_SUCCESS)
@@ -357,26 +442,74 @@ static nx_result_t rx_stop(void* context) {
     return result;
 }
 
+/** \brief Withdraw the fixed lane and vector independently of USART2. */
+RX_ENGINE nx_result_t nx_stm32f1_uart_rx_engine_close(
+    nx_stm32f1_uart_rx_engine_t* rx, bool shared_vector) {
+    rx->closing = true;
+    const nx_result_t result =
+        nx_stm32f1_uart_rx_engine_stop(rx, shared_vector);
+    if (result != NX_SUCCESS)
+        return result;
+    if (rx->vector_owned) {
+        NX_STM32F1_IRQ_DISABLE(DMA1_Channel6_IRQn);
+        NX_STM32F1_IRQ_SET_PRIORITY(DMA1_Channel6_IRQn, rx->previous_priority);
+        nx_arch_dsb();
+        if (!vector_idle(DMA1_Channel6_IRQn) ||
+            NX_STM32F1_IRQ_PRIORITY(DMA1_Channel6_IRQn) !=
+                rx->previous_priority)
+            return NX_ERROR_IO;
+        rx->vector_owned = false;
+    }
+    if (rx->lane_owned) {
+        DMA_Channel_TypeDef* lane = DMA1_Channel6;
+        if (!dma_clock() || (lane->CCR & DMA_CONTROL) != 0U ||
+            !nx_stm32f1_write_masked(&lane->CCR, UINT16_MAX, 0U) ||
+            !nx_stm32f1_write_masked(&lane->CNDTR, UINT16_MAX, 0U) ||
+            !clear_lane_addresses(lane))
+            return NX_ERROR_IO;
+        rx->lane_owned = false;
+    }
+    rx->live = false;
+    return NX_SUCCESS;
+}
+
+void nx_stm32f1_uart_rx_dma_irq(nx_stm32f1_uart_rx_dma_t* state) {
+    if (state != NULL)
+        nx_stm32f1_uart_rx_engine_irq(&state->rx, false);
+}
+
+static nx_result_t rx_start(void* context, nx_stream_t* stream) {
+    nx_stm32f1_uart_rx_dma_t* state = context;
+    if (state->config == NULL)
+        return NX_ERROR_STATE;
+    const nx_stm32f1_uart_rx_storage_t storage = {
+        .regions = state->config->regions,
+        .region_count = state->config->region_count,
+        .owner = state,
+        .owner_size = sizeof(*state),
+        .config = state->config,
+        .config_size = sizeof(*state->config),
+    };
+    return nx_stm32f1_uart_rx_engine_start(&state->rx, stream, &storage, false);
+}
+
+static void service(void* context) {
+    nx_stm32f1_uart_rx_dma_t* state = context;
+    nx_stm32f1_uart_rx_engine_service(&state->rx, false, NULL);
+}
+
+static nx_result_t rx_stop(void* context) {
+    nx_stm32f1_uart_rx_dma_t* state = context;
+    return nx_stm32f1_uart_rx_engine_stop(&state->rx, false);
+}
+
 static nx_result_t stop(void* context) {
     nx_stm32f1_uart_rx_dma_t* state = context;
     if (!nx_stm32f1_cold_context())
         return NX_ERROR_CONTEXT;
-    state->closing = true;
-    const nx_result_t result = rx_stop(state);
-    if (result != NX_SUCCESS)
-        return result;
-    const nx_stm32f1_uart_rx_dma_config_t* config = state->config;
-    if (state->vector_owned) {
-        NX_STM32F1_IRQ_DISABLE(config->irq);
-        NX_STM32F1_IRQ_SET_PRIORITY(config->irq, state->previous_priority);
-        nx_arch_dsb();
-        if (!vector_idle(config->irq) ||
-            NX_STM32F1_IRQ_PRIORITY(config->irq) != state->previous_priority)
-            return NX_ERROR_IO;
-        state->vector_owned = false;
-    }
-    state->live = false;
-    return nx_stm32f1_uart_stop(&state->uart);
+    const nx_result_t result =
+        nx_stm32f1_uart_rx_engine_close(&state->rx, false);
+    return result == NX_SUCCESS ? nx_stm32f1_uart_stop(&state->uart) : result;
 }
 
 nx_result_t nx_stm32f1_uart_rx_dma_close(nx_stm32f1_uart_rx_dma_t* state) {
@@ -385,15 +518,6 @@ nx_result_t nx_stm32f1_uart_rx_dma_close(nx_stm32f1_uart_rx_dma_t* state) {
     const nx_result_t stopped = stop(state);
     if (stopped != NX_SUCCESS || state->config == NULL)
         return stopped;
-    if (state->lane_owned) {
-        DMA_Channel_TypeDef* lane = state->config->channel;
-        if (!dma_clock() || (lane->CCR & DMA_CONTROL) != 0U ||
-            !nx_stm32f1_write_masked(&lane->CCR, UINT16_MAX, 0U) ||
-            !nx_stm32f1_write_masked(&lane->CNDTR, UINT16_MAX, 0U) ||
-            !clear_lane_addresses(lane))
-            return NX_ERROR_IO;
-        state->lane_owned = false;
-    }
     const nx_result_t restored = nx_stm32f1_uart_close(&state->uart);
     if (restored != NX_SUCCESS)
         return restored;

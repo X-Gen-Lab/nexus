@@ -157,7 +157,7 @@ class SDKPublicCompileInputTests(unittest.TestCase):
 
     def test_shared_ip_includes_remain_private_after_relocation(self):
         for root in (self.sdk, ROOT):
-            directory = root / "soc/stm32/stm32f4/drivers/ip/i2c_v1_async"
+            directory = root / "soc/stm32/common/i2c_v1_async"
             for option, path in (("-I", directory),
                                  ("-isystem", directory),
                                  ("-include", directory / "i2c_v1_async.h")):

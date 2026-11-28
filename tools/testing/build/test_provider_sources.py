@@ -79,7 +79,8 @@ file(WRITE "${{CMAKE_CURRENT_BINARY_DIR}}/provider-dependencies.txt"
                 return set(), set()
             units = json.loads(database.read_text())
             provider_directory = ROOT / source_directory(family)
-            owned_directories = (provider_directory, ROOT / "io/src")
+            owned_directories = (provider_directory, provider_directory.parent / "common",
+                                 ROOT / "io/src")
             # Observe the actual build output; no provider-to-source registry
             # may decide which shared translation units the test can see.
             provider = {Path(unit["file"]).relative_to(ROOT).as_posix()
@@ -225,7 +226,7 @@ file(WRITE "${{CMAKE_CURRENT_BINARY_DIR}}/provider-dependencies.txt"
                             "platform_cold.c"}
                 self.assertEqual(provider,
                     self.private_sources(family, expected) |
-                    {"soc/stm32/stm32f4/drivers/ip/i2c_v1_async/i2c_v1_async.c"})
+                    {"soc/stm32/common/i2c_v1_async/i2c_v1_async.c"})
 
 
 

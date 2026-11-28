@@ -1249,7 +1249,7 @@
             "handling": "Current polling/IRQ/DMA controllers conservatively terminate as IO and enter bounded STOP/recovery instead of silently treating a possibly real bus error as successful data. This preserves explicit failure ownership but can cause false error/retry; it is not the official clear-and-continue availability workaround.",
             "implementation": [
               "soc/stm32/stm32f4/drivers/i2c/i2c.c",
-              "soc/stm32/stm32f4/drivers/ip/i2c_v1_async/i2c_v1_async.c"
+              "soc/stm32/common/i2c_v1_async/i2c_v1_async.c"
             ],
             "regressions": [
               "tests/behavior/soc/stm32/stm32f4/i2c/i2c_register_test.cpp",
@@ -1278,7 +1278,7 @@
             "handling": "Malformed peers can cause bounded timeout/IO, followed by joined SWRST recovery and bus-clear policy. Recovery does not replay a write with unknown external effect. CBUS or other non-I2C STOP rules are not supported.",
             "implementation": [
               "soc/stm32/stm32f4/drivers/i2c/i2c.c",
-              "soc/stm32/stm32f4/drivers/ip/i2c_v1_async/i2c_v1_async.c"
+              "soc/stm32/common/i2c_v1_async/i2c_v1_async.c"
             ],
             "regressions": [
               "tests/behavior/soc/stm32/stm32f4/i2c/i2c_register_test.cpp",
@@ -1294,8 +1294,8 @@
             "handling": "The reviewed standard-mode timing calculation caps actual frequency at88 kHz for repeated-START-capable controller operation; authored max_hz remains an upper bound. Fast mode is separate. Both7/10-bit and polling/IRQ/DMA modes must use the same actual timing constraint; peripheral-source clock proof alone is insufficient.",
             "implementation": [
               "soc/stm32/stm32f4/drivers/i2c/i2c.c",
-              "soc/stm32/stm32f4/drivers/ip/i2c_v1_async/i2c_v1_async.c",
-              "soc/stm32/stm32f4/drivers/ip/i2c_v1_async/i2c_v1_async.h"
+              "soc/stm32/common/i2c_v1_async/i2c_v1_async.c",
+              "soc/stm32/common/i2c_v1_async/i2c_v1_async.h"
             ],
             "regressions": [
               "tests/behavior/soc/stm32/stm32f4/i2c/i2c_register_test.cpp",

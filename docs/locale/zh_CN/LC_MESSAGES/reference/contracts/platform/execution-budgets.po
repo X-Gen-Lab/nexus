@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: c463dcd2b3d6ec1361ba6f62719a6d25aaef29dee4d0028a9e9d822cff4ec5a5\n"
+"X-Nexus-Source-SHA256: bf13ee80c4eda6e910004a56191088c78cd17bfb496374a1c6e5a7480d6fb5fb\n"
 
 #: ../../../../../../docs/reference/contracts/platform/execution-budgets.md:9
 msgid "SoC execution budgets"
@@ -352,11 +352,11 @@ msgstr "SPI：`soc/*/*/drivers/spi*.c`；有限 DMA drain 余量 200 微秒。"
 
 #: ../../../../../../docs/reference/contracts/platform/execution-budgets.md:61
 msgid ""
-"I2C: `soc/stm32/stm32f4/drivers/ip/i2c_v1_async/i2c_v1_async.c` and the SoC "
+"I2C: `soc/stm32/common/i2c_v1_async/i2c_v1_async.c` and the SoC "
 "wrappers; V1 async drain allowance is 1,000 microseconds. Polling STOP has "
 "separate finite work."
 msgstr ""
-"I2C：`soc/stm32/stm32f4/drivers/ip/i2c_v1_async/i2c_v1_async.c` 及 SoC 包装层；V1 "
+"I2C：`soc/stm32/common/i2c_v1_async/i2c_v1_async.c` 及 SoC 包装层；V1 "
 "异步排空余量为 1,000 微秒。轮询 STOP 有单独的有限工作量。"
 
 #: ../../../../../../docs/reference/contracts/platform/execution-budgets.md:63

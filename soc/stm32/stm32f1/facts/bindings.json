@@ -27,6 +27,20 @@
   },
   "mode_exclusions": [
     {
+      "device": "stm32f105xc",
+      "kind": "flash",
+      "option": "maintenance",
+      "equals": true,
+      "message": "Connectivity read-only Flash exposes no maintenance companion"
+    },
+    {
+      "device": "stm32f107xc",
+      "kind": "flash",
+      "option": "maintenance",
+      "equals": true,
+      "message": "Connectivity read-only Flash exposes no maintenance companion"
+    },
+    {
       "device": "stm32f103-md",
       "part": "STM32F103C8T6",
       "kind": "flash",

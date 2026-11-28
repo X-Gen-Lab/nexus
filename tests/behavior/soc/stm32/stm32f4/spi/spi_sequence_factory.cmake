@@ -86,7 +86,7 @@ foreach(sequence_family stm32)
             ${sequence_sources}
         LIBRARIES ${sequence_libraries} Nexus::SPIDMATransactionOwner
         INCLUDES
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/i2c_v1_async" ${sequence_owned_includes}
+        "${NEXUS_SOURCE_DIR}/soc/stm32/common/i2c_v1_async" ${sequence_owned_includes}
     )
     target_include_directories(
         ${sequence_target}

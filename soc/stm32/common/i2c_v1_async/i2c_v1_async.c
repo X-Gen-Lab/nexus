@@ -177,6 +177,13 @@ static void begin_drain(nx_i2c_v1_state_t* state, nx_result_t result) {
         }
         return;
     }
+    bool reset_start = false;
+#if defined(NX_I2C_V1_F1_WRITE_ONLY)
+    /* ES096 2.8.4. A failed START cannot be repaired by an ordinary STOP. */
+    reset_start = result != NX_SUCCESS && result != NX_ERROR_ARBITRATION &&
+                  (state->phase == NX_I2C_V1_START ||
+                   (state->registers[CTL0] & START) != 0U);
+#endif
     state->terminal = result;
     /* Any abort can leave receive pipeline/status residue. A later request
      * requires explicit local recovery, never an implicit replay or reset. */
@@ -191,13 +198,14 @@ static void begin_drain(nx_i2c_v1_state_t* state, nx_result_t result) {
     /* ARLO releases master ownership to another controller; never inject STOP
      * into that transaction. Successful receive already placed its sole STOP.
      */
-    if (result != NX_ERROR_ARBITRATION &&
+    if (!reset_start && result != NX_ERROR_ARBITRATION &&
         (state->registers[STAT1] & MASTER) != 0U &&
         (state->registers[CTL0] & STOP) == 0U) {
         state->registers[CTL0] &= ~START;
         state->registers[CTL0] |= STOP;
     }
-    if (nx_deadline_finite_after(nx_time_now_us(), 1000U,
+    if (reset_start ||
+        nx_deadline_finite_after(nx_time_now_us(), 1000U,
                                  &state->drain_deadline) != NX_SUCCESS) {
         /* An exhausted grace quarantines; it never releases an owned wire. */
         state->drain_deadline = 0U;
@@ -262,6 +270,14 @@ static nx_result_t start(void* context, nx_i2c_request_t* request,
         return result;
     }
     nx_i2c_v1_state_t* state = endpoint->port;
+#if defined(NX_I2C_V1_F1_WRITE_ONLY)
+    if (endpoint->address_bits != 7U)
+        return NX_ERROR_UNSUPPORTED;
+    for (size_t index = 0U; index < request->count; ++index) {
+        if (request->messages[index].read)
+            return NX_ERROR_UNSUPPORTED;
+    }
+#endif
     if (!state->initialized || state->stopping || state->faulted) {
         return NX_ERROR_STATE;
     }
@@ -393,6 +409,10 @@ nx_result_t nx_i2c_v1_initialize(nx_i2c_v1_state_t* state) {
         nx_arch_irq_is_masked()) {
         return NX_ERROR_CONTEXT;
     }
+#if defined(NX_I2C_V1_F1_WRITE_ONLY)
+    if (state->dma != NULL)
+        return NX_ERROR_UNSUPPORTED;
+#endif
     if (state->dma != NULL &&
         (!engine_valid(&state->dma->tx) || !engine_valid(&state->dma->rx) ||
          state->dma->tx.control == state->dma->rx.control ||
@@ -675,10 +695,14 @@ static void service(void* context) {
         }
         if (state->phase == NX_I2C_V1_DRAIN) {
             (void)error(state, state->registers[STAT0]);
+            bool reset_due = false;
+#if defined(NX_I2C_V1_F1_WRITE_ONLY)
+            reset_due = state->faulted && state->drain_deadline == 0U;
+#endif
             /* A START pending at cancellation may acquire master after the
              * initial drain attempt. Observe that late ownership and request
              * its STOP instead of releasing or spinning inside the IRQ. */
-            if (state->terminal != NX_ERROR_ARBITRATION &&
+            if (!reset_due && state->terminal != NX_ERROR_ARBITRATION &&
                 (state->registers[STAT1] & MASTER) != 0U &&
                 (state->registers[CTL0] & STOP) == 0U) {
                 state->registers[CTL0] &= ~START;
@@ -688,7 +712,22 @@ static void service(void* context) {
                 state->dma == NULL ||
                 ((*state->dma->tx.control | *state->dma->rx.control) &
                  (DMA_ENABLE | DMA_IRQS)) == 0U;
+#if defined(NX_I2C_V1_F1_WRITE_ONLY)
+            bool released = dma_idle && wire_idle(state);
+            if (reset_due || (!released && nx_deadline_expired(
+                                               state->drain_deadline, now))) {
+                if (state->terminal == NX_SUCCESS)
+                    state->terminal = NX_ERROR_IO;
+                state->faulted = true;
+                state->drain_deadline = 0U;
+                /* Local proof retires memory. Peer BUSY is checked on recover.
+                 */
+                released = nx_i2c_v1_f1_retire_local(state);
+            }
+            if (released) {
+#else
             if (dma_idle && wire_idle(state)) {
+#endif
                 nx_i2c_request_t* request = state->active;
                 nx_result_t result = state->terminal;
                 size_t transferred = state->transferred;

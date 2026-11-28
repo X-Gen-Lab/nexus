@@ -235,7 +235,8 @@
         }
       ],
       "modes": [
-        "poll-messages"
+        "poll-messages",
+        "irq-write-messages"
       ],
       "source": "RM0008 Rev21 Section 9.3.9 Table 55; DS5319 Rev20 Table 5; UM1724 Rev17 Table 27.",
       "clock_profiles": [
@@ -588,6 +589,40 @@
         "hsi8"
       ],
       "source": "DS5319 Rev20 Table 5; RM0008 Rev21 9.3.8, Table 78 and 27.3.13; ES096 Rev15 2.4.1, 2.4.2, 2.9.2."
+    },
+    {
+      "id": "usart2-pa2-pa3-duplex",
+      "variants": [
+        "STM32F103RBT6"
+      ],
+      "controller": "USART2",
+      "kind": "uart",
+      "pins": [
+        {
+          "pin": "PA2",
+          "function": "tx"
+        },
+        {
+          "pin": "PA3",
+          "function": "rx"
+        }
+      ],
+      "modes": [
+        "dma-duplex"
+      ],
+      "mode_dma": {
+        "dma-duplex": [
+          "DMA1:channel7",
+          "DMA1:channel6"
+        ]
+      },
+      "register_settings": {
+        "register:AFIO_MAPR/USART2_REMAP": 0
+      },
+      "source": "DS5319 Rev20 Table 5; RM0008 Rev21 \u00a79.3.8, Table 78 and \u00a727.3.13; ES096 Rev15 \u00a7\u00a72.4.1, 2.4.2, 2.9.2 and 2.9.3. USART2 finite 8N1 with independent lane ownership.",
+      "clock_profiles": [
+        "hsi8"
+      ]
     },
     {
       "id": "dac-pa4-ch1",
@@ -1830,6 +1865,23 @@
           "clock:PWR"
         ]
       }
+    },
+    {
+      "id": "flash-connectivity-read",
+      "variants": [
+        "STM32F105VCT6",
+        "STM32F107VCT6"
+      ],
+      "controller": "FLASH",
+      "kind": "flash",
+      "pins": [],
+      "modes": [
+        "read-only"
+      ],
+      "clock_profiles": [
+        "hsi8"
+      ],
+      "source": "PM0075 Rev2 Table 5 and Section 2.3.2; DS6014 Rev10 Table 2; ES022 Rev11 Section 2.2.1. Read-only while page erase timing remains unconfirmed."
     },
     {
       "id": "flash-f103c6-1k",

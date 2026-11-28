@@ -55,6 +55,7 @@ Flash-size 签名只用于容量检查。ES096 §2.2.2 的 DBGMCU 寄存器限�
 | F103RB 有限 DMA TX | DMA1 通道 7 送出有限 TX，RX 仍走 IRQ。先排空通道与 IRQ，再等 USART 真实 TC 结算 |
 | F103RB [RS485 组合](../../../tests/integration/assemblies/rs485_assembly/README.md) | USART2 有限 DMA TX、IRQ RX 与 PA5 显式 DE，复用 F4 公共适配器和消费者 |
 | F103RB [有限 DMA RX](../../../tests/integration/assemblies/stm32f1_uart_rx_dma/README.md) | PA3、DMA1 通道 6、调用者持有流块。按已观测 IDLE、满块或显式停止结算 |
+| F103RB [USART2 有限 DMA 同时收发](../../../tests/integration/assemblies/stm32f1_uart_rx_dma/f103rb-duplex.toml) | HSI8、PA2/PA3、8N1；通道 7 有限 TX 与通道 6 流式块 RX 独立结算，USART2 与引脚共同撤回 |
 | F103C6T6A、F100RBT6B [Flash 装配](../../../tests/integration/assemblies/stm32f1_flash/README.md) | 分别为 32 KiB 和 128 KiB 单 Bank。复用已审查的 1 KiB 页擦除、2 B 编程以及延迟 BSY 处理。用板级配置声明编程电压 |
 | F103RB 独立 [Flash 装配](../../../tests/integration/assemblies/stm32f1_flash/README.md) | 1 KiB 页，2 B 编程，显式板级编程电压，有界轮询及失败后的排空与重锁 |
 | F103ZE 独立 [Flash 装配](../../../tests/integration/assemblies/stm32f1_flash/README.md) | 512 KiB 单 Bank，2 KiB 页，2 B 编程 |

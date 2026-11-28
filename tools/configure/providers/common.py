@@ -292,7 +292,8 @@ class EndpointPolicy:
             width = device.get("address_bits", 7)
             if type(width) is not int or width not in (7, 10):
                 fail("I2C address_bits must be exactly 7 or 10")
-            if width == 10 and not self.i2c_ten_bit:
+            if width == 10 and (not self.i2c_ten_bit or
+                                mode_traits(kind, mode).write_only):
                 fail("I2C requires a reviewed 10-bit endpoint provider")
         if "lsb_first" in device:
             if type(device["lsb_first"]) is not bool:
@@ -481,6 +482,7 @@ class ModeTraits:
     continuous: bool = False
     bus_master: bool = False
     dma_irq: bool = True
+    write_only: bool = False
 
     @property
     def dma(self):
@@ -622,11 +624,13 @@ _MODE_TRAITS = MappingProxyType({
     ("i2c_target", "smbus-device"): ModeTraits(irq=True),
     ("i2c", "poll-messages"): ModeTraits(polling=True),
     ("i2c", "irq-messages"): ModeTraits(irq=True),
+    ("i2c", "irq-write-messages"): ModeTraits(irq=True, write_only=True),
     ("i2c", "dma-messages"): ModeTraits(
         irq=True, tx_dma=True, rx_dma=True),
     ("flash", "poll-byte"): ModeTraits(polling=True),
     ("flash", "poll-halfword"): ModeTraits(polling=True),
     ("flash", "poll-word"): ModeTraits(polling=True),
+    ("flash", "read-only"): ModeTraits(),
     ("watchdog", "independent"): ModeTraits(),
     ("watchdog", "window"): ModeTraits(),
     ("exti", "edge-event"): ModeTraits(irq=True),

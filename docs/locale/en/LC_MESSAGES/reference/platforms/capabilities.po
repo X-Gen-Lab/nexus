@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 494f0351546396ec87cdac4a589ebd7d247beb00ca913e38659dfc7a9d186f20\n"
+"X-Nexus-Source-SHA256: 1b0af0d0a01785e5e88c9f7c10a88edc496a8155d0b9cda39dd2671233660656\n"
 
 #: ../../../../../docs/reference/platforms/capabilities.md:9
 msgid "当前派生能力矩阵"
@@ -1600,10 +1600,6 @@ msgstr ""
 "`tests/integration/assemblies/multi_controller_assembly/stm32-zg-i2c-tenbit-"
 "freertos.toml`, "
 "`tests/integration/assemblies/stm32_assembly/zg-i2c-dma.toml`"
-
-#: ../../../../../docs/reference/platforms/capabilities.md:0
-msgid "`soc/stm32/stm32f4/drivers/ip/i2c_v1_async/i2c_v1_async.c`"
-msgstr "`soc/stm32/stm32f4/drivers/ip/i2c_v1_async/i2c_v1_async.c`"
 
 #: ../../../../../docs/reference/platforms/capabilities.md:0
 msgid "irq-messages"
@@ -5096,3 +5092,45 @@ msgid ""
 msgstr ""
 "`tests/integration/assemblies/stm32f1_i2c_target/f103rb-target-write-"
 "read.toml`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "read-only"
+msgstr "read-only"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`flash-connectivity-read`"
+msgstr "`flash-connectivity-read`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid ""
+"`tests/integration/assemblies/stm32f1_flash/f105vc.toml`, "
+"`tests/integration/assemblies/stm32f1_flash/f107vc.toml`"
+msgstr ""
+"`tests/integration/assemblies/stm32f1_flash/f105vc.toml`, "
+"`tests/integration/assemblies/stm32f1_flash/f107vc.toml`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "irq-write-messages"
+msgstr "irq-write-messages"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid ""
+"`tests/integration/assemblies/stm32f1_i2c_master_irq/f103rb-write.toml`"
+msgstr ""
+"`tests/integration/assemblies/stm32f1_i2c_master_irq/f103rb-write.toml`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`soc/stm32/common/i2c_v1_async/i2c_v1_async.c`"
+msgstr "`soc/stm32/common/i2c_v1_async/i2c_v1_async.c`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`usart2-pa2-pa3-duplex`"
+msgstr "`usart2-pa2-pa3-duplex`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`tests/integration/assemblies/stm32f1_uart_rx_dma/f103rb-duplex.toml`"
+msgstr "`tests/integration/assemblies/stm32f1_uart_rx_dma/f103rb-duplex.toml`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`soc/stm32/stm32f1/drivers/uart/uart_duplex.c`"
+msgstr "`soc/stm32/stm32f1/drivers/uart/uart_duplex.c`"

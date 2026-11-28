@@ -313,9 +313,18 @@ nx_result_t nx_stm32f1_uart_admit(const nx_stm32f1_uart_t* state,
         return NX_ERROR_INVALID;
     }
     if (config->profile == NX_UART_RX_BLOCKS) {
-        if (config->tx_registers != NULL || config->tx_pin != 0U ||
-            config->rx_storage != NULL || config->rx_capacity != 0U ||
-            config->frame != 0U) {
+#if defined(NEXUS_STM32F1_UART_DUPLEX)
+        const bool tx_valid = config->tx_registers == NULL
+                                  ? config->tx_pin == 0U
+                                  : config->registers == USART2 &&
+                                        config->tx_registers == GPIOA &&
+                                        config->tx_pin == 2U;
+#else
+        const bool tx_valid =
+            config->tx_registers == NULL && config->tx_pin == 0U;
+#endif
+        if (!tx_valid || config->rx_storage != NULL ||
+            config->rx_capacity != 0U || config->frame != 0U) {
             return NX_ERROR_INVALID;
         }
     } else {
@@ -447,7 +456,12 @@ nx_result_t nx_stm32f1_uart_prepare(nx_stm32f1_uart_t* state,
         (NX_STM32F1_UART_STATUS(registers) & receive_status(config)) != 0U) {
         return NX_ERROR_BUSY;
     }
-    const bool rx_only = config->profile == NX_UART_RX_BLOCKS;
+    const bool rx_blocks = config->profile == NX_UART_RX_BLOCKS;
+#if defined(NEXUS_STM32F1_UART_DUPLEX)
+    const bool rx_only = rx_blocks && config->tx_registers == NULL;
+#else
+    const bool rx_only = rx_blocks;
+#endif
     const bool flow = hardware_flow(config);
     const bool sir = irda(config);
     const bool card = smartcard(config);
@@ -510,7 +524,7 @@ nx_result_t nx_stm32f1_uart_prepare(nx_stm32f1_uart_t* state,
         config->baud;
     /* ES096 2.9.1: Smartcard consumes PE together with RXNE. */
     const uint32_t controls =
-        rx_only ? USART_CR1_UE
+        rx_blocks ? USART_CR1_UE | (rx_only ? 0U : USART_CR1_TE)
         : directional(config)
             ? USART_CR1_UE | RX_DIRECTION
             : UART_CONTROLS | (card ? USART_CR1_RXNEIE : RX_CONTROLS);
@@ -541,7 +555,7 @@ nx_result_t nx_stm32f1_uart_prepare(nx_stm32f1_uart_t* state,
          !nx_stm32f1_write_masked(&registers->GTPR,
                                   card ? CARD_GTPR_MASK : USART_GTPR_PSC,
                                   prescaler)) ||
-        (!rx_only && !nx_stm32f1_write_masked(&registers->CR3, cr3, cr3)) ||
+        (!rx_blocks && !nx_stm32f1_write_masked(&registers->CR3, cr3, cr3)) ||
         !nx_stm32f1_write_masked(&registers->CR1,
                                  UART_CONTROLS | RX_CONTROLS | FRAME_CONTROLS,
                                  controls | frame) ||
