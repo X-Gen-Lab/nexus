@@ -220,7 +220,13 @@ def measure_data(elf: Elf32, resolved: dict, budget: dict) -> tuple[dict, list]:
             raise EvidenceError("startup vector table differs from reviewed image")
     if "cortex_m_irq_vectors" in resolved:
         count = resolved["irq"]["external_count"]
-        if type(count) is not int or count < 0 or vector["size"] != 4 * (16 + count):
+        tail = resolved.get("startup_vector_tail", [])
+        if not isinstance(tail, list):
+            raise EvidenceError("invalid startup vector tail")
+        for word in tail:
+            integer(word, "startup vector tail word")
+        if (type(count) is not int or count < 0 or
+                vector["size"] != 4 * (16 + count + len(tail))):
             raise EvidenceError("linked startup vector count differs from the selected device")
         bindings = resolved["cortex_m_irq_vectors"]
         if not isinstance(bindings, dict):
@@ -232,6 +238,11 @@ def measure_data(elf: Elf32, resolved: dict, budget: dict) -> tuple[dict, list]:
             word, = struct.unpack_from("<I", elf.data, offset)
             if word != elf.symbols.get(handler):
                 raise EvidenceError(f"linked startup IRQ slot {number} differs from {handler}")
+        for index, expected in enumerate(tail):
+            offset = vector["offset"] + 4 * (16 + count + index)
+            word, = struct.unpack_from("<I", elf.data, offset)
+            if word != expected:
+                raise EvidenceError(f"linked startup vector tail word {index} differs from the selected device")
     stack, reset = struct.unpack_from("<II", elf.data, vector["offset"])
     if stack != elf.symbol("__nx_msp_end") or reset != elf.entry or reset != elf.symbol("Reset_Handler"):
         raise EvidenceError("physical reset vector differs from linked startup/MSP")

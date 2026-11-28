@@ -67,7 +67,7 @@ class HilAdmissionTests(unittest.TestCase):
                 "raw": self.identity} for name in admission["required_tests"]],
             "metrics": {"latency": {"value": 20, "unit": "us", "raw": self.identity}}}
 
-    def test_current_f4_templates_keep_exact_scope_and_remain_unqualified(self):
+    def test_current_templates_keep_exact_scope_and_remain_unqualified(self):
         fixtures = list(Path("tools/hil/fixtures").glob("*.json"))
         actual = [path for path in fixtures
                   if path.name != "station.template.json"]
@@ -76,6 +76,7 @@ class HilAdmissionTests(unittest.TestCase):
             ("stm32f407ve-sky-qingchun", "STM32F407VET6", None),
             ("stm32f407zg-qiming-core", "STM32F407ZGT6", "software_reference"),
             ("stm32f407zg-qiming-v41", "STM32F407ZGT6", "software_reference"),
+            ("stm32f103rb-nucleo", "STM32F103RBT6", "software_reference"),
         }
         observed = set()
         for path in actual:

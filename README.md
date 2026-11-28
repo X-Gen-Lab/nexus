@@ -17,6 +17,7 @@ Nexus 为 MCU 提供 C11 通用机制：Core、Arch、类型化 I/O、静态 fac
 | [Core](core/README.md) | 结果、单调 deadline、请求与存储借用 |
 | [Arch](arch/README.md) | CPU 原语、中断状态保存恢复与可选能力 |
 | [STM32F4](soc/stm32/stm32f4/README.md) | 启动、时钟、资源及官方 HAL／LL 适配 |
+| [STM32F1](soc/stm32/stm32f1/README.md) | F103RB／C8 的 Cortex-M3、HSI8 与按模式选编的外设 |
 | [Board](boards/README.md) | 精确料号、晶振、PCB 接线与电气条件 |
 | [I/O](io/README.md) | 公共接口、检查分派和硬件无关机制 |
 | [OS](os/README.md) | 可选裸机、FreeRTOS、ThreadX 与主机测试后端 |
@@ -54,7 +55,7 @@ python tools/dev/dev.py build --preset stm32-qiming-baremetal --parallel 4
 
 ## 支持和维护
 
-生产 SoC 为 STM32F4，按精确料号、Board、模式和后端核对
+生产 SoC 包包含 STM32F4 和 STM32F1，按精确料号、Board、模式和后端核对
 [支持范围](docs/reference/platforms/support.md)。厂商库中存在某模块不代表该模式已完成
 接入。`tests/support/native/` 是显式主机测试模型，不能建立硬件能力或物理资格。
 

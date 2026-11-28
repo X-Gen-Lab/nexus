@@ -204,6 +204,12 @@ def normalize_controller(selection, route, binding, hardware, provider, *,
         **({"stream_resolution": resolved_stream}
            if resolved_stream is not None else {}),
         **({"can_irqs": hardware["irq"]} if route["kind"] == "can" else {})}
+    if route["kind"] == "flash" and hasattr(provider, "binding"):
+        limits = provider.binding("flash", mode, route["controller"]).limits
+        bounds = limits.get("route_supply_mv")
+        if bounds is not None:
+            result["route_supply_mv"] = integer(binding.get("supply_mv"), *bounds,
+                                                context="Board route supply (mV)")
     if route["kind"] in {"capture", "audio"}:
         resolver = getattr(provider, "capture_audio_fields", None)
         if resolver is None:

@@ -24,13 +24,15 @@ MAINTAINED_BOARD_TARGETS = (
     ("stm32f407ve-sky-qingchun", "STM32F407VET6"),
     ("stm32f407zg-qiming-core", "STM32F407ZGT6"),
     ("stm32f407zg-qiming-v41", "STM32F407ZGT6"),
+    ("stm32f103rb-nucleo", "STM32F103RBT6"),
 )
 
-# These Boards share a part with the older reviewed V3.1 fixture. Lock their
-# exact Board identities without turning that part into a blanket prohibition.
+# Reference-only Boards cannot admit equipment. Some share their part with
+# an independently maintained fixture that does admit equipment.
 SOFTWARE_REFERENCE_BOARD_TARGETS = (
     ("stm32f407zg-qiming-core", "STM32F407ZGT6"),
     ("stm32f407zg-qiming-v41", "STM32F407ZGT6"),
+    ("stm32f103rb-nucleo", "STM32F103RBT6"),
 )
 
 
@@ -54,14 +56,14 @@ def validate_fixture(fixture: dict) -> None:
         require(fixture["scope"] == "software_reference",
                 "unknown preparation fixture scope")
     target = fixture["board"], fixture["part"]
-    require(target[1] in {part for _, part in MAINTAINED_BOARD_TARGETS},
-            "maintained STM32F4 part identity required")
     if any(target[0] == board for board, _ in MAINTAINED_BOARD_TARGETS):
         require(target in MAINTAINED_BOARD_TARGETS,
-                "maintained STM32F4 Board/part identity required")
-    if any(target[0] == board for board, _ in SOFTWARE_REFERENCE_BOARD_TARGETS):
-        require(target in SOFTWARE_REFERENCE_BOARD_TARGETS,
-                "software-reference Board/part identity cannot be relabelled")
+                "maintained Board/part identity required")
+    else:
+        require(target[1] in {part for board, part in MAINTAINED_BOARD_TARGETS
+                if (board, part) not in SOFTWARE_REFERENCE_BOARD_TARGETS},
+                "maintained part identity required")
+    if target in SOFTWARE_REFERENCE_BOARD_TARGETS:
         require(fixture.get("scope") == "software_reference",
                 "target currently has only a software-reference HIL fixture")
     require(fixture["required_tests"] == ["probe_identity", "flash_readback",

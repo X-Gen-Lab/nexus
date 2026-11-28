@@ -121,6 +121,7 @@ class VendorDeviceProfile:
     priority_bits: int
     external_irq_count: int
     irq_bindings: Mapping
+    startup_vector_tail: tuple[int, ...] = ()
 
 
 def vendor_irq_bindings(value, count):
@@ -168,7 +169,7 @@ def vendor_device_catalog(value):
         fields = {"id", "define", "header", "startup", "external_irq_count",
                   "last_external_irq", "nvic_priority_bits", "timebase_presence"}
         if (not isinstance(row, Mapping) or not fields.issubset(row) or
-                set(row) - fields - {"irq_bindings"}):
+                set(row) - fields - {"irq_bindings", "startup_vector_tail"}):
             fail("Vendor device catalog requires exact entry fields")
         macro, identifier = row["define"], row["id"]
         _catalog_identifier(identifier, "Vendor device catalog ID")
@@ -193,8 +194,11 @@ def vendor_device_catalog(value):
             _catalog_identifier(name, "Catalog timebase")
         bindings = (vendor_irq_bindings(row["irq_bindings"], count)
                     if "irq_bindings" in row else MappingProxyType({}))
+        # These literal words follow the last hardware slot and have no IRQ IDs.
+        tail = tuple(integer(word, context="Startup vector tail word") for word in
+                     sequence(row.get("startup_vector_tail", ()), "Startup vector tail"))
         entries[identifier] = VendorDeviceProfile(
-            identifier, macro, row["header"], row["startup"], bits, count, bindings)
+            identifier, macro, row["header"], row["startup"], bits, count, bindings, tail)
         macros.add(macro)
     if not entries or not isinstance(value["inputs"], Mapping) or not value["inputs"]:
         fail("Vendor device catalog entries and input identities are required")
@@ -592,6 +596,7 @@ _MODE_TRAITS = MappingProxyType({
     ("i2c", "dma-messages"): ModeTraits(
         irq=True, tx_dma=True, rx_dma=True),
     ("flash", "poll-byte"): ModeTraits(polling=True),
+    ("flash", "poll-halfword"): ModeTraits(polling=True),
     ("flash", "poll-word"): ModeTraits(polling=True),
     ("watchdog", "independent"): ModeTraits(),
     ("watchdog", "window"): ModeTraits(),

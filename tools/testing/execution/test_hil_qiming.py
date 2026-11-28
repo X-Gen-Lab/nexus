@@ -106,8 +106,18 @@ class QimingHilPreparationTests(unittest.TestCase):
                            item["properties"]["part"]["const"])
                           for item in targets},
                          set(SOFTWARE_REFERENCE_BOARD_TARGETS))
-        rule = schema["allOf"][-1]
-        self.assertEqual(set(rule["if"]["properties"]), {"board"})
+        rule, = (item for item in schema["allOf"]
+                 if item["then"].get("$ref") ==
+                 "#/$defs/software_reference_board_target")
+        conditions = rule["if"].get("anyOf", [rule["if"]])
+        properties = [condition["properties"] for condition in conditions]
+        limited_boards = {board for entry in properties
+                          for board in entry.get("board", {}).get("enum", [])}
+        limited_parts = {entry["part"]["const"] for entry in properties
+                         if "part" in entry}
+        self.assertEqual(limited_boards,
+                         {board for board, _ in SOFTWARE_REFERENCE_BOARD_TARGETS})
+        self.assertNotIn(self.fixture["part"], limited_parts)
         self.assertEqual(rule["then"]["required"], ["scope"])
 
 

@@ -1,5 +1,6 @@
 {
   "assemblies": [
+    "boards/stm32f103rb_nucleo/assemblies/minimal.toml",
     "boards/stm32f407zg_qiming_core/assemblies/can-loopback.toml",
     "boards/stm32f407zg_qiming_core/assemblies/display-touch-sram.toml",
     "boards/stm32f407zg_qiming_core/assemblies/display-touch.toml",

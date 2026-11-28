@@ -8,6 +8,7 @@ import unittest
 from unittest.mock import patch
 
 from tools.configure import configure as gate
+from tools.configure.generation.emission import resolved_projection
 from tools.configure.tests.f4_fixture import copy_package, load_f4_fixture
 from tools.configure.tests.device_fixture import load_authored_soc
 
@@ -90,6 +91,21 @@ class DeviceCatalogConfigurationTests(unittest.TestCase):
         self.assertNotEqual(before_inputs[CATALOG], after_inputs[CATALOG])
         self.assertEqual(after_inputs[CATALOG], hashlib.sha256(
             (self.root / CATALOG).read_bytes()).hexdigest())
+
+    def test_startup_tail_projects_raw_words_without_extending_nvic(self):
+        baseline = self.resolve()
+        self.assertNotIn("startup_vector_tail", resolved_projection(baseline))
+
+        def declare(catalog):
+            selected = next(item for item in catalog["devices"]
+                            if item["define"] == "STM32F407xx")
+            selected["startup_vector_tail"] = [0, 0xF108F85F]
+
+        self.update(CATALOG, declare)
+        result = self.resolve()
+        self.assertEqual(result.physical_part.device.startup_vector_tail, (0, 0xF108F85F))
+        self.assertEqual(resolved_projection(result)["startup_vector_tail"], [0, 0xF108F85F])
+        self.assertEqual(result.irq.external_count, baseline.irq.external_count)
 
     def test_normalized_irq_requires_the_same_selected_catalog_record(self):
         raw = load_authored_soc(self.root / SOC)

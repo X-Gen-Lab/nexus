@@ -8,11 +8,11 @@ source_language: zh_CN
 (reference.platforms.capabilities)=
 # 当前派生能力矩阵
 
-本表由维护工具读取当前 F4 事实、受审路线、四个 Board 包、实际软件装配和生成
+本表由维护工具读取当前 SoC 事实、受审路线、Board 包、实际软件装配和生成
 face 对应的生产 ops 定义生成。它不是另一份配置输入，也不建立编译、执行或实板
 资格。声明模式、允许 route 和本次选择分别核对，空列表示没有该类关联。
 
-生产聚合只包含解析后 scope 为 `production` 的包，当前为 `stm32f4`。
+生产聚合包含解析后 scope 为 `production` 的 STM32F4 和 STM32F1。
 Native 属于显式 host-test fixture，不计入生产 SoC 支持；`scope=reference` 的软件
 参考必须显式启用 test support，也不进入生产聚合。其他保留的 vendor SDK 不进入
 本表。精确限制见[支持](support.md)。
@@ -44,6 +44,10 @@ PCB、供电、跳线、波形、吞吐与时序需要真实 station 原件，�
 <!-- nexus-capabilities:start -->
 | SoC | 控制器 | 类别 | 模式 | 已审查 SoC 路线 | 已声明参考板卡 | 解析器夹具 | 所选生产源码 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
+| stm32f1 | FLASH | flash | poll-halfword | `flash-internal` | `stm32f103rb-nucleo` | `tests/integration/assemblies/stm32f1_flash/rb.toml` | `soc/stm32/stm32f1/drivers/flash/flash.c` |
+| stm32f1 | GPIOA | gpio | input | `gpio-pa0-input` | — | `tests/integration/assemblies/stm32f1_family/f103c8-baremetal.toml` | `soc/stm32/stm32f1/drivers/gpio/gpio.c` |
+| stm32f1 | GPIOA | gpio | output | `gpio-pa5` | `stm32f103rb-nucleo` | `tests/integration/assemblies/stm32f1_family/f103c8-baremetal.toml`, `tests/integration/assemblies/stm32f1_family/f103rb-baremetal.toml`, `tests/integration/assemblies/stm32f1_family/f103rb-freertos.toml` | `soc/stm32/stm32f1/drivers/gpio/gpio.c` |
+| stm32f1 | USART2 | uart | irq-byte-event | `usart2-pa2-pa3` | `stm32f103rb-nucleo` | `tests/integration/assemblies/stm32f1_family/f103c8-baremetal.toml`, `tests/integration/assemblies/stm32f1_family/f103rb-baremetal.toml`, `tests/integration/assemblies/stm32f1_family/f103rb-freertos.toml` | `soc/stm32/stm32f1/drivers/uart/uart.c` |
 | stm32f4 | ADC1 | adc | injected-shot | `adc1-ch0-pa0`, `adc1-ch1-pa1`, `adc1-ch10-pc0`, `adc1-ch11-pc1`, `adc1-ch12-pc2`, `adc1-ch13-pc3`, `adc1-ch14-pc4`, `adc1-ch15-pc5`, `adc1-ch2-pa2`, `adc1-ch3-pa3`, `adc1-ch4-pa4`, `adc1-ch5-pa5`, `adc1-ch6-pa6`, `adc1-ch7-pa7`, `adc1-ch8-pb0`, `adc1-ch9-pb1`, `adc1-internal`, `adc1-scan-external16`, `adc1-scan-pa0-pa1` | — | `tests/integration/assemblies/multi_controller_assembly/stm32-ve-adc-injected-baremetal.toml`, `tests/integration/assemblies/multi_controller_assembly/stm32-zg-adc-injected-freertos.toml` | `soc/stm32/stm32f4/drivers/adc/adc_injected.c` |
 | stm32f4 | ADC1 | adc | low-rate-scan | `adc1-ch0-pa0`, `adc1-ch1-pa1`, `adc1-ch10-pc0`, `adc1-ch11-pc1`, `adc1-ch12-pc2`, `adc1-ch13-pc3`, `adc1-ch14-pc4`, `adc1-ch15-pc5`, `adc1-ch2-pa2`, `adc1-ch3-pa3`, `adc1-ch4-pa4`, `adc1-ch5-pa5`, `adc1-ch6-pa6`, `adc1-ch7-pa7`, `adc1-ch8-pb0`, `adc1-ch9-pb1`, `adc1-internal`, `adc1-scan-external16`, `adc1-scan-pa0-pa1` | — | `tests/integration/assemblies/adc_external_assembly/ve-scan.toml`, `tests/integration/assemblies/adc_external_assembly/zg-scan.toml`, `tests/integration/assemblies/multi_controller_assembly/stm32-ve-adc-internal-baremetal.toml`, `tests/integration/assemblies/stm32_assembly/ve-adc-scan.toml`, `tests/integration/assemblies/stm32_assembly/zg-adc-scan.toml` | `soc/stm32/stm32f4/drivers/adc/adc.c` |
 | stm32f4 | ADC1 | adc | single-shot | `adc1-ch0-pa0`, `adc1-ch1-pa1`, `adc1-ch10-pc0`, `adc1-ch11-pc1`, `adc1-ch12-pc2`, `adc1-ch13-pc3`, `adc1-ch14-pc4`, `adc1-ch15-pc5`, `adc1-ch2-pa2`, `adc1-ch3-pa3`, `adc1-ch4-pa4`, `adc1-ch5-pa5`, `adc1-ch6-pa6`, `adc1-ch7-pa7`, `adc1-ch8-pb0`, `adc1-ch9-pb1`, `adc1-internal` | — | `tests/integration/assemblies/adc_external_assembly/ve-independent.toml`, `tests/integration/assemblies/adc_external_assembly/zg-independent.toml`, `tests/integration/assemblies/stm32_assembly/ve-adc.toml`, `tests/integration/assemblies/stm32_assembly/zg-adc.toml` | `soc/stm32/stm32f4/drivers/adc/adc.c` |

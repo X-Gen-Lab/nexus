@@ -67,11 +67,10 @@ def resolve(assembly, *, root, soc, board, routes, bindings,
     claims, claim_list, claim = resource_claims(provider)
     for record in reserved_claims(soc, board, provider):
         claim(**record)
-    if (binding_policy is not None and clock_plan is not None and
-            clock_plan.get("parameters") is not None):
+    if binding_policy is not None and clock_plan is not None:
         # The selected external oscillator owns its pads before System starts.
         # A Board reservation may restate this ownership, never release it.
-        source = clock_plan["parameters"]["source"]
+        source = clock_plan["input"]["source"]
         for resource in binding_policy.oscillator_resources(source):
             if normalize_resource(resource) not in claims:
                 claim(resource, "system-clock", source, clock_plan["profile"])

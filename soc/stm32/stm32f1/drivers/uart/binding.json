@@ -1,0 +1,218 @@
+{
+  "schema_version": 1,
+  "bindings": [
+    {
+      "kind": "uart",
+      "mode": "irq-byte-event",
+      "implementation": "uart",
+      "headers": [
+        "drivers/uart/instance.h"
+      ],
+      "static_recipe": {
+        "state_type": "nx_stm32f1_uart_t",
+        "declarations": [
+          {
+            "role": "rx_bytes",
+            "type": "uint8_t",
+            "const": false,
+            "count": {
+              "source": "item.options.rx_capacity"
+            },
+            "enabled": {
+              "source": "item.options.rx_profile",
+              "values": {
+                "bytes": true,
+                "events": false
+              }
+            }
+          },
+          {
+            "role": "rx_events",
+            "type": "nx_uart_rx_event_t",
+            "const": false,
+            "count": {
+              "source": "item.options.rx_capacity"
+            },
+            "enabled": {
+              "source": "item.options.rx_profile",
+              "values": {
+                "bytes": false,
+                "events": true
+              }
+            }
+          },
+          {
+            "role": "uart_config",
+            "type": "nx_stm32f1_uart_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "registers",
+                  {
+                    "source": "item.controller",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "tx_registers",
+                  {
+                    "source": "selected.named_pads.tx.registers",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "rx_registers",
+                  {
+                    "source": "selected.named_pads.rx.registers",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "irq",
+                  {
+                    "source": "selected.vector_bindings.0.irq",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "clock_hz",
+                  {
+                    "source": "selected.clock_hz"
+                  }
+                ],
+                [
+                  "baud",
+                  {
+                    "source": "item.options.baud"
+                  }
+                ],
+                [
+                  "rx_storage",
+                  {
+                    "source": "item.options.rx_profile",
+                    "values": {
+                      "bytes": {
+                        "ref": "rx_bytes",
+                        "as": "symbol"
+                      },
+                      "events": {
+                        "ref": "rx_events",
+                        "as": "symbol"
+                      }
+                    }
+                  }
+                ],
+                [
+                  "rx_capacity",
+                  {
+                    "source": "item.options.rx_capacity"
+                  }
+                ],
+                [
+                  "profile",
+                  {
+                    "source": "item.options.rx_profile",
+                    "values": {
+                      "bytes": "NX_UART_RX_BYTES",
+                      "events": "NX_UART_RX_EVENTS"
+                    },
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "tx_pin",
+                  {
+                    "source": "selected.named_pads.tx.number"
+                  }
+                ],
+                [
+                  "rx_pin",
+                  {
+                    "source": "selected.named_pads.rx.number"
+                  }
+                ],
+                [
+                  "priority",
+                  {
+                    "source": "item.options.irq.priority"
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "calls": {
+          "admit": [
+            {
+              "function": "nx_stm32f1_uart_admit",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "ref": "uart_config",
+                  "as": "address"
+                }
+              ]
+            }
+          ],
+          "prepare": {
+            "function": "nx_stm32f1_uart_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "ref": "uart_config",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32f1_uart_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "ops": "nx_stm32f1_uart_ops",
+        "retain_on_failed_init": true,
+        "irq": [
+          {
+            "name": {
+              "source": "selected.vector_bindings.0.handler",
+              "as": "symbol"
+            },
+            "calls": [
+              {
+                "function": "nx_stm32f1_uart_irq",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  }
+                ]
+              }
+            ],
+            "barrier": "nx_arch_dsb"
+          }
+        ]
+      },
+      "validator": "nx_stm32f1_uart_validate",
+      "limits": {
+        "baud": [
+          1200,
+          500000
+        ]
+      }
+    }
+  ]
+}

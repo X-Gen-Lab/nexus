@@ -7,36 +7,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 819fe5f1f1d1730ab00cf9fde98b23b3b4678307bb755cf384e5856ba7868d40\n"
+"X-Nexus-Source-SHA256: cf3b808b481c2ee9ba02ead03a51fed54250b85e788c4987abc093d63f1ad5fe\n"
 
 #: ../../../../../docs/reference/platforms/capabilities.md:9
 msgid "当前派生能力矩阵"
 msgstr "Current derived capability matrix"
-
-#: ../../../../../docs/reference/platforms/capabilities.md:11
-msgid ""
-"本表由维护工具读取当前 F4 事实、受审路线、四个 Board 包、实际软件装配和生成 face 对应的生产 ops "
-"定义生成。它不是另一份配置输入，也不建立编译、执行或实板 资格。声明模式、允许 route 和本次选择分别核对，空列表示没有该类关联。"
-msgstr ""
-"The maintenance tool derives this table from current F4 facts, reviewed "
-"routes, four Board packages, actual software assemblies and production ops "
-"definitions associated with generated faces. It is not another configuration"
-" input and establishes no compile, execution or physical-board "
-"qualification. Check declared modes, allowed routes and current selections "
-"separately; an empty column means no association of that kind."
-
-#: ../../../../../docs/reference/platforms/capabilities.md:15
-msgid ""
-"生产聚合只包含解析后 scope 为 `production` 的包，当前为 `stm32f4`。 Native 属于显式 host-test "
-"fixture，不计入生产 SoC 支持；`scope=reference` 的软件 参考必须显式启用 test "
-"support，也不进入生产聚合。其他保留的 vendor SDK 不进入 本表。精确限制见[支持](support.md)。"
-msgstr ""
-"Production aggregation includes only packages whose resolved scope is "
-"`production`, currently `stm32f4`. Native is an explicit host-test fixture "
-"and does not count as production SoC support. Software references with "
-"`scope=reference` require explicit test support and also remain outside "
-"production aggregation. Other retained vendor SDKs do not enter this table. "
-"See [support](support.md) for exact limits."
 
 #: ../../../../../docs/reference/platforms/capabilities.md:26
 msgid ""
@@ -4092,3 +4067,78 @@ msgstr ""
 "`tests/integration/assemblies/stm32f4_power/f446ze-adopt-retained.toml`, "
 "`tests/integration/assemblies/stm32f4_power/f479ni-adopt-retained.toml`, "
 "`tests/integration/kernels/f407_freertos_stop/stop.toml`"
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:11
+msgid ""
+"本表由维护工具读取当前 SoC 事实、受审路线、Board 包、实际软件装配和生成 face 对应的生产 ops "
+"定义生成。它不是另一份配置输入，也不建立编译、执行或实板 资格。声明模式、允许 route 和本次选择分别核对，空列表示没有该类关联。"
+msgstr ""
+"The maintenance tool generates this table from current SoC facts, reviewed "
+"routes, board packages, actual software assemblies, and production ops "
+"definitions selected by generated faces. It provides no new configuration "
+"input, build evidence, execution evidence, or physical qualification. Review"
+" declared modes, allowed routes, and actual selections independently. An "
+"empty column indicates no corresponding association."
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:15
+msgid ""
+"生产聚合包含解析后 scope 为 `production` 的 STM32F4 和 STM32F1。 Native 属于显式 host-test "
+"fixture，不计入生产 SoC 支持；`scope=reference` 的软件 参考必须显式启用 test "
+"support，也不进入生产聚合。其他保留的 vendor SDK 不进入 本表。精确限制见[支持](support.md)。"
+msgstr ""
+"The production aggregate includes the STM32F4 and STM32F1 packages that "
+"resolve to scope `production`. Native is an explicit host-test fixture "
+"outside production SoC support. Software references with `scope=reference` "
+"require explicit test support and stay outside this aggregate. Other "
+"retained vendor SDKs are outside this table. See [support](support.md) for "
+"exact restrictions."
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "stm32f1"
+msgstr "stm32f1"
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "poll-halfword"
+msgstr "poll-halfword"
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`stm32f103rb-nucleo`"
+msgstr "`stm32f103rb-nucleo`"
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`tests/integration/assemblies/stm32f1_flash/rb.toml`"
+msgstr "`tests/integration/assemblies/stm32f1_flash/rb.toml`"
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`soc/stm32/stm32f1/drivers/flash/flash.c`"
+msgstr "`soc/stm32/stm32f1/drivers/flash/flash.c`"
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`gpio-pa5`"
+msgstr "`gpio-pa5`"
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid ""
+"`tests/integration/assemblies/stm32f1_family/f103c8-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-freertos.toml`"
+msgstr ""
+"`tests/integration/assemblies/stm32f1_family/f103c8-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-freertos.toml`"
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`soc/stm32/stm32f1/drivers/gpio/gpio.c`"
+msgstr "`soc/stm32/stm32f1/drivers/gpio/gpio.c`"
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`soc/stm32/stm32f1/drivers/uart/uart.c`"
+msgstr "`soc/stm32/stm32f1/drivers/uart/uart.c`"
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`gpio-pa0-input`"
+msgstr "`gpio-pa0-input`"
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`tests/integration/assemblies/stm32f1_family/f103c8-baremetal.toml`"
+msgstr "`tests/integration/assemblies/stm32f1_family/f103c8-baremetal.toml`"

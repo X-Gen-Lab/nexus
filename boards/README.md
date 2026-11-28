@@ -1,7 +1,7 @@
 # 板级事实与接入
 
 Board 描述精确 SoC 与 PCB 的连接条件：晶振、已审 route、初始电平、保留资源、
-跳线与未知电气事实。它复用 [F4 支持包](../soc/stm32/stm32f4/README.md)，不复制驱动
+跳线与未知电气事实。它依赖所选的 [SoC 支持包](../soc/README.md)，不复制驱动
 或厂商库，不创建产品任务。
 
 | 当前包 | 精确型号与边界 |
@@ -10,8 +10,9 @@ Board 描述精确 SoC 与 PCB 的连接条件：晶振、已审 route、初始�
 | [启明独立核心板](stm32f407zg_qiming_core/README.md) | F407ZGT6；选装条件独立声明 |
 | [启明 V4.1](stm32f407zg_qiming_v41/README.md) | F407ZGT6；独立高配板与跳线身份 |
 | [天空星青春版](stm32f407ve_sky_qingchun/README.md) | F407VET6；不推广到 VG 高配板 |
+| [NUCLEO-F103RB](stm32f103rb_nucleo/README.md) | F103RBT6，默认选 HSI8，LD2 与 USART2 VCP 参考 |
 
-四个包具有不同来源和装配身份，不把核心板、V4.1 独立板或 V3.1 静默合并。Native
+各包具有独立来源和装配身份。Native
 不是 PCB，测试事实位于 `tests/support/native/board/`，不进入生产板卡目录。
 
 公开包通过 TOML 的 `board` 选择；私有 PCB 通过外部 `board_package` 选择。JSON

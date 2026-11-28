@@ -11,6 +11,32 @@ from tools.configure.tests.schema import test_data_package as data_fixture
 
 
 class PadFactResolutionTests(unittest.TestCase):
+    def test_fixed_route_resolves_without_a_numeric_alternate(self):
+        root = data_fixture.DataPackageTests.fixture(self)
+        bindings_path = root / "bindings.json"
+        bindings = json.loads(bindings_path.read_text())
+        bindings["pinmux_policy"] = {"encoding": "route-fixed"}
+        bindings_path.write_text(json.dumps(bindings))
+        routes_path = root / "routes.json"
+        facts = json.loads(routes_path.read_text())
+        for route in facts["routes"]:
+            for pin in route["pins"]:
+                pin.pop("af")
+        routes_path.write_text(json.dumps(facts))
+
+        result = configure.resolve_ir(root / "assembly.toml", test_support=True)
+        self.assertTrue(result.controllers[0].integration.pads)
+        self.assertTrue(all(pad.alternate is None for item in result.controllers
+                            for pad in item.integration.pads))
+        self.assertEqual({claim.key for claim in result.resource_plan.claims
+                          if claim.key.startswith("pin:") and claim.mode != "reserved"},
+                         {"pin:PA4", "pin:PA9", "pin:PA10"})
+
+        facts["routes"][0]["pins"][0]["af"] = 0
+        routes_path.write_text(json.dumps(facts))
+        with self.assertRaisesRegex(ValueError, "route pin.*af"):
+            configure.resolve_ir(root / "assembly.toml", test_support=True)
+
     def test_named_pad_routes_and_gpio_masks_use_explicit_coordinates(self):
         pads = {"IO_ENABLE": {"registers": "GPIO_A", "port_index": 3, "number": 11}}
         pinmux = NumericPinMuxPolicy.from_validated(

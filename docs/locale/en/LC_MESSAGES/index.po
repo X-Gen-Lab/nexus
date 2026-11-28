@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: b740f9fd3299f76960b680fa2c20c3489b16ca82dd12fd5c960961dcc55997ae\n"
+"X-Nexus-Source-SHA256: 171bafe9eddab73ff9bdc9ef6e8492400fefac101c4c776b41771615338898e4\n"
 
 #: ../../../../../../docs/index.md:9
 msgid "Nexus 嵌入式平台"
@@ -47,10 +47,6 @@ msgid "为已有板卡构建固件"
 msgstr "Build firmware for an existing board"
 
 #: ../../../../../../docs/index.md:0
-msgid "[F407 首次构建](tutorials/first-f407.md)"
-msgstr "[First F407 build](tutorials/first-f407.md)"
-
-#: ../../../../../../docs/index.md:0
 msgid "编写 TOML、连接设备与组件"
 msgstr "Write TOML and connect devices and components"
 
@@ -82,14 +78,22 @@ msgstr ""
 "[Maintenance workflow](development/workflow.md), [Documentation "
 "maintenance](development/documentation.md)"
 
-#: ../../../../../../docs/index.md:23
+#: ../../../../workspace/nexus/docs/index.md:23
 msgid ""
-"当前生产 SoC 为 "
-"STM32F4，板卡、精确料号、模式与限制由[支持参考](reference/platforms/support.md)维护。Native "
-"是显式主机测试模型。软件行为、ARM 链接、SDK 消费和物理 HIL 分别记录；当前物理 HIL 为 `not_executed`。"
+"当前生产 SoC 包包含 STM32F4 和 "
+"STM32F1。板卡、精确料号、模式与限制由[支持参考](reference/platforms/support.md)维护。Native "
+"是显式主机测试模型。软件行为、ARM 链接、SDK 消费和物理 HIL 分别记录，当前物理 HIL 为 `not_executed`。"
 msgstr ""
-"The current production SoC family is STM32F4. [Support "
-"reference](reference/platforms/support.md) owns boards, exact parts, modes "
-"and limitations. Native is an explicitly selected host test model. Software "
-"behavior, ARM linking, SDK consumption and physical HIL are recorded "
-"separately; current physical HIL is `not_executed`."
+"The production SoC packages are STM32F4 and STM32F1. The [support "
+"reference](reference/platforms/support.md) lists boards, exact parts, modes,"
+" and restrictions. Native is an explicit host test model. Software behavior,"
+" ARM linking, SDK consumption, and physical HIL have separate records. The "
+"current physical HIL status is `not_executed`."
+
+#: ../../../../workspace/nexus/docs/index.md:0
+msgid ""
+"[F407 首次构建](tutorials/first-f407.md)、[F103 "
+"独立参考](reference/platforms/support.md#stm32f1)"
+msgstr ""
+" [F407 first build](tutorials/first-f407.md) and [F103 independent "
+"reference](reference/platforms/support.md#stm32f1)"

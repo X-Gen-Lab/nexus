@@ -7,23 +7,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: fa2f879a30dfbb98a44c7b8414483a94735747d7cb8229920959ea5b4fcfeda6\n"
+"X-Nexus-Source-SHA256: cfe074e8b14e159c46c08e4641f0914dc09a519ad9c7182cae2490582d08d32a\n"
 
 #: ../../../../../docs/guides/control-and-smart-devices.md:9
 msgid "组合控制与智能器件"
 msgstr "Compose control and smart devices"
-
-#: ../../../../../docs/guides/control-and-smart-devices.md:11
-msgid ""
-"本指南帮助外部应用选择已有 I/O、算法和器件组件，明确执行者、存储、预算与退出。 当前生产 SoC 为 STM32F4；下述 PWM/ADC 路线仅是"
-" STM32F407ZGT6 的精确软件参考。 它不替产品选择功率板、控制稳定性、私有 PCB、存储分区或调度，也不建立实板资格。"
-msgstr ""
-"This guide helps external applications select existing I/O, algorithms and "
-"device components, with explicit executors, storage, budgets and shutdown. "
-"The current production SoC is STM32F4; the PWM/ADC route below is an exact "
-"STM32F407ZGT6 software reference. It does not select a power board, control "
-"stability, private PCB, storage partitions or scheduling for the product, or"
-" establish hardware qualification."
 
 #: ../../../../../docs/guides/control-and-smart-devices.md:15
 msgid "1. 先划分执行与资源"
@@ -806,3 +794,15 @@ msgstr ""
 "drive software route. These cold consumers do not execute a board fast loop."
 " Native behavior, ARM linking and board measurements are recorded "
 "separately; physical HIL remains `not_executed`."
+
+#: ../../../../workspace/nexus/docs/guides/control-and-smart-devices.md:11
+msgid ""
+"本指南帮助外部应用选择已有 I/O、算法和器件组件，明确执行者、存储、预算与退出。 本指南的 PWM/ADC 路线是 STM32F407ZGT6 "
+"的精确软件参考。 它不替产品选择功率板、控制稳定性、私有 PCB、存储分区或调度，也不建立实板资格。"
+msgstr ""
+"This guide helps an external application select existing I/O, algorithms, "
+"and device components and specify the executor, storage, budget, and "
+"shutdown. Its PWM/ADC route is an exact software reference for the "
+"STM32F407ZGT6. Power board selection, control stability, private PCB data, "
+"storage partitioning, and scheduling remain product responsibilities. The "
+"guide establishes no physical qualification."

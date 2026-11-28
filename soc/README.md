@@ -1,11 +1,12 @@
-# SoC：STM32F4 系列支持包
+# SoC 系列支持包
 
-当前生产入口只有 [STM32F4](stm32/stm32f4/README.md)。精确事实覆盖八个料号、
-七个器件视图；四个 F407 Board 与其他软件参考分别声明接线和模式。事实、源码、
+当前包为 [STM32F4](stm32/stm32f4/README.md) 和 [STM32F1](stm32/stm32f1/README.md)。
+F4 覆盖四个 F407 Board 及其他软件参考。F1 从 F103RB 和 F103C8 开始。
+各包分别声明接线和模式。事实、源码、
 ARM 链接与物理资格分开，不能由系列目录名或 SDK 宏推定全部支持。
 
 SoC 拥有启动、时钟、内存、IRQ／DMA、资源收条和控制器私有状态；公共产品接口使用
-Nexus 类型，官方 HAL／LL、Handle 与 Device 类型保持私有。F4 包以 `facts/` 保存
+Nexus 类型，官方 HAL／LL、Handle 与 Device 类型保持私有。系列包以 `facts/` 保存
 事实，`system/` 保存启动与系统机制，`drivers/<domain>/` 就近维护 binding、实例
 布局和 C 实现，`sdk/` 选择官方库。跨域共享实现留在包内，不增加运行时转发。
 

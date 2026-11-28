@@ -36,12 +36,19 @@ class SelectedContractAuthorityTests(unittest.TestCase):
                 self.assertFalse(result.physical_qualified)
 
 
-    def test_catalogue_keeps_exact_f4_parts_without_family_inference(self):
+    def test_catalogue_keeps_exact_parts_by_family(self):
         rows = matrix.support_catalogue(configure.ROOT)
-        self.assertEqual({row.part for row in rows}, {
-            "STM32F405ZGT6", "STM32F407VET6", "STM32F407ZGT6",
-            "STM32F411RET6", "STM32F415ZGT6", "STM32F417ZGT6",
-            "STM32F446ZET6", "STM32F479NIH6"})
+        parts = {}
+        for row in rows:
+            parts.setdefault(row.family, set()).add(row.part)
+        self.assertEqual(parts, {
+            "stm32f1": {"STM32F103C8T6", "STM32F103RBT6"},
+            "stm32f4": {
+                "STM32F405ZGT6", "STM32F407VET6", "STM32F407ZGT6",
+                "STM32F411RET6", "STM32F415ZGT6", "STM32F417ZGT6",
+                "STM32F446ZET6", "STM32F479NIH6",
+            },
+        })
         self.assertTrue(all(not row.physical_qualified for row in rows))
         self.assertTrue(all(row.review_sources for row in rows))
 

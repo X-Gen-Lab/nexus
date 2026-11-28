@@ -88,6 +88,13 @@ class GenericDeviceCatalogTests(unittest.TestCase):
         vendor_device_catalog(value)
         validate_vendor_device({"macro": "CHIP_CORE0", "startup": "vendor-reset.c"})
 
+    def test_startup_vector_tail_requires_uint32_words(self):
+        for words in (None, 0, [True], ["0xF108F85F"], [-1], [2 ** 32]):
+            value = catalog()
+            value["devices"][0]["startup_vector_tail"] = words
+            with self.subTest(words=words), self.assertRaisesRegex(ValueError, "vector tail"):
+                vendor_device_catalog(value)
+
     def test_exact_named_sdk_locks_cannot_be_laundered_through_another_alias(self):
         for mutate in (
             lambda value: value["source_lock"].update(chip_sdk="3" * 40, elsewhere="1" * 40),

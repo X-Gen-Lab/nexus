@@ -169,6 +169,7 @@ class HilReferenceAdmissionTests(unittest.TestCase):
     REFERENCES = (
         ("stm32f407zg_qiming_core", "stm32f407zg-qiming-core", "STM32F407ZGT6"),
         ("stm32f407zg_qiming_v41", "stm32f407zg-qiming-v41", "STM32F407ZGT6"),
+        ("stm32f103rb_nucleo", "stm32f103rb-nucleo", "STM32F103RBT6"),
     )
 
     def references(self):
@@ -212,6 +213,13 @@ class HilReferenceAdmissionTests(unittest.TestCase):
             fixture.pop("scope")
             with self.subTest(board=board), self.assertRaises(EvidenceError):
                 validate_fixture(fixture)
+
+    def test_f103_reference_part_cannot_admit_undeclared_boards(self):
+        fixture = json.loads(Path("tools/hil/fixtures/stm32f103rb_nucleo.json")
+                             .read_text())
+        fixture["board"] = "unreviewed-f103-board"
+        with self.assertRaises(EvidenceError):
+            validate_fixture(fixture)
 
     def test_reference_board_cannot_be_promoted_by_substituting_a_part(self):
         for _, board, _, fixture in self.references():

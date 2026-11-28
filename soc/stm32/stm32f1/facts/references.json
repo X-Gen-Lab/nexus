@@ -1,0 +1,175 @@
+{
+  "schema_version": 2,
+  "documents": {
+    "ds5319": {
+      "document_id": "DS5319",
+      "kind": "datasheet",
+      "revision": "20",
+      "document_date": "July 2025",
+      "url": "https://www.st.com/resource/en/datasheet/stm32f103rb.pdf",
+      "sha256": "1e54ce18e6c34c5b4a78986f26e245e143748c721009fc9af5953795c30686bc",
+      "bytes": 1965230,
+      "anchors": {
+        "device_features": "Table 2 p10; SRAM, timers and communication interfaces by exact variant",
+        "package_gpio": "Figures 6/8 pp24/26 and Table 5 pp28ff, LQFP64 and LQFP48",
+        "clock": "Section 2.3.7; HSI oscillator characteristics in Section 5.3.7"
+      }
+    },
+    "rm0008": {
+      "document_id": "RM0008",
+      "kind": "reference_manual",
+      "revision": "21",
+      "document_date": "February 2021",
+      "url": "https://www.st.com/resource/en/reference_manual/rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32-bit-mcus-stmicroelectronics.pdf",
+      "sha256": "4c1b8ac2729cc1f45a4685eea9e91e6139e24e58804fba21e27201dfcc2ad149",
+      "bytes": 13119424,
+      "anchors": {
+        "clock": "Section 7 low/medium/high/XL RCC; HSI SYSCLK and APB1/APB2",
+        "gpio": "Sections 9.1 and 9.4 CRL/CRH, BSRR and input/output behavior",
+        "uart_route": "Section 9.3.8 USART alternate function remapping",
+        "timebase": "Section 15, TIM2 general-purpose 16-bit counter",
+        "uart": "Section 27, USART, SR/DR flags, BRR and wire completion",
+        "identity": "Section 30.1.1 Flash size in the electronic signature"
+      }
+    },
+    "es096": {
+      "document_id": "ES096",
+      "kind": "errata",
+      "revision": "15",
+      "document_date": "March 2022",
+      "url": "https://www.st.com/resource/en/errata_sheet/es096-stm32f101x8b-stm32f102x8b-and-stm32f103x8b-mediumdensity-device-limitations-stmicroelectronics.pdf",
+      "sha256": "7bcdf58d8b602292d68abb59e181a4f44a038f215d8b01b0167f6d7139285490",
+      "bytes": 956332,
+      "anchors": {
+        "scope": "Tables 1-3 medium-density applicability and silicon revisions",
+        "review": "Selected HSI8 GPIO, USART and Flash operating boundaries, see software audit"
+      }
+    }
+  },
+  "package_review": [
+    {
+      "document": "ds5319",
+      "variants": [
+        "STM32F103RBT6",
+        "STM32F103C8T6"
+      ],
+      "status": "package_gpio_reviewed",
+      "scope": "Exact LQFP64 and LQFP48 bonded pads and selected default routes. Board wiring is separate."
+    }
+  ],
+  "device_reviews": [
+    {
+      "devices": [
+        "stm32f103-md"
+      ],
+      "manual": "rm0008",
+      "document": "es096",
+      "status": "software_audited_with_constraints",
+      "silicon_revision": "not_observed",
+      "mode_workarounds": "audited_with_constraints",
+      "hardware_qualification": "not_executed",
+      "identification": "ES096 Tables 1-3 and Section 2.2.2. The electronic Flash-size signature is a capacity check; physical device marking or debug observation gates revision claims.",
+      "software_audit": {
+        "profile": "es096-rev15-f103-md-hsi8",
+        "document_sha256": "7bcdf58d8b602292d68abb59e181a4f44a038f215d8b01b0167f6d7139285490",
+        "revision_order": [
+          "A",
+          "B",
+          "Z",
+          "1",
+          "Y",
+          "2",
+          "3",
+          "X"
+        ],
+        "maintained_modes": [
+          "flash:poll-halfword",
+          "gpio:input",
+          "gpio:output",
+          "uart:irq-byte-event"
+        ],
+        "items": [
+          {
+            "section": "2.1.2",
+            "title": "Cortex-M3 event register omission",
+            "revisions": "AAAAAAAA",
+            "assessment": "external_constraint",
+            "condition": "Interrupt pending before WFE may miss an event.",
+            "handling": "The reviewed software slice offers no WFE low-power policy.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/bindings.json"
+            ],
+            "regressions": []
+          },
+          {
+            "section": "2.2.1",
+            "title": "Flash read after WFI or WFE",
+            "revisions": "AAAAAAAA",
+            "assessment": "external_constraint",
+            "condition": "Sleep may disrupt reads when using two wait states and prefetch with the Flash interface clock gated.",
+            "handling": "The HSI8 run profile uses zero wait states and does not gate the Flash interface to sleep.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/clocks.json"
+            ],
+            "regressions": []
+          },
+          {
+            "section": "2.2.2",
+            "title": "DBGMCU debug registers inaccessible to user firmware",
+            "revisions": "NNNNNNNN",
+            "assessment": "silicon_limit",
+            "condition": "Ordinary firmware may observe zero for DBGMCU_IDCODE and DBGMCU_CR.",
+            "handling": "Flash-size halfword provides a capacity check. Physical revision and debug freeze belong to the external probe.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/soc.json"
+            ],
+            "regressions": []
+          },
+          {
+            "section": "2.2.11",
+            "title": "Flash memory BSY latency after STRT",
+            "revisions": "AAAAAAAA",
+            "assessment": "workaround",
+            "condition": "BSY can read clear on the first bus cycle after starting page erase.",
+            "handling": "Complete and read back the control write before polling status. The controller then requires EOP without an error flag and verifies the page.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/flash/flash.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/flash/flash_test.cpp"
+            ]
+          },
+          {
+            "section": "2.9.2",
+            "title": "USART idle frame detection at receiver clock deviation",
+            "revisions": "NNNNNNNN",
+            "assessment": "silicon_limit",
+            "condition": "Clock mismatch can prevent detection of IDLE.",
+            "handling": "The initial USART2 mode owns a byte IRQ ring; it does not depend on IDLE or promise gap timing.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/routes.json"
+            ],
+            "regressions": []
+          },
+          {
+            "section": "2.9.3",
+            "title": "USART transmit can clear receiver parity error",
+            "revisions": "AAAAAAAA",
+            "assessment": "silicon_limit",
+            "condition": "With parity enabled in full duplex, a data-register write can clear the receiver PE flag.",
+            "handling": "The initial USART2 mode uses 8N1. Production parity modes require a separate review.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/routes.json"
+            ],
+            "regressions": []
+          }
+        ]
+      }
+    }
+  ],
+  "limitations": [
+    "Source review covers GPIO, USART2 8N1 IRQ byte queue and opt-in halfword/page Flash under HSI8.",
+    "This audit indexes selected sections for the maintained slice; other ES096 sections and other F1 groups are not admitted by this profile.",
+    "No physical silicon cut, oscillator accuracy, board wiring, timings, DMA, remap, low-power or physical qualification is established."
+  ]
+}

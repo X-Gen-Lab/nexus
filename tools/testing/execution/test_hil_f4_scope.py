@@ -1,4 +1,4 @@
-"""Only maintained STM32F4 Board identities enter current HIL admission."""
+"""Maintained STM32F4 fixture scope survives family extensions."""
 
 import copy
 import json
@@ -34,7 +34,7 @@ class HilF4ScopeTests(unittest.TestCase):
                 fixture.update(board=board, part=part,
                                scope="software_reference")
                 with self.assertRaisesRegex(EvidenceError,
-                                            "maintained STM32F4"):
+                                            "maintained part identity"):
                     validate_fixture(fixture)
 
     def test_external_f4_board_can_prepare_without_claiming_physical_support(self):

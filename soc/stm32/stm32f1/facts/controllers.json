@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "controller_groups": {
+    "rm0008-f103-md": {
+      "controllers": {
+        "GPIOA": {
+          "kind": "gpio",
+          "irq": [],
+          "pins": [
+            "PA0",
+            "PA5"
+          ]
+        },
+        "USART2": {
+          "kind": "uart",
+          "irq": [
+            "USART2_IRQn"
+          ],
+          "pins": [
+            "PA2",
+            "PA3"
+          ],
+          "clock_domain": "apb1"
+        },
+        "FLASH": {
+          "kind": "flash",
+          "irq": [],
+          "pins": []
+        }
+      },
+      "modes": {
+        "GPIOA": {
+          "modes": [
+            "input",
+            "output"
+          ]
+        },
+        "USART2": {
+          "modes": [
+            "irq-byte-event"
+          ]
+        },
+        "FLASH": {
+          "modes": [
+            "poll-halfword"
+          ]
+        }
+      }
+    }
+  }
+}

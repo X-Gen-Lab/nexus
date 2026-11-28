@@ -16,7 +16,7 @@ class MaintainedMatrixTests(unittest.TestCase):
         contract = matrix.check_contracts()
         self.assertEqual(set(contract["kinds"]), configure.KINDS)
         self.assertEqual(contract["components"], sorted(matrix.COMPONENTS))
-        self.assertEqual(contract["families"], ["stm32f4"])
+        self.assertEqual(contract["families"], ["stm32f1", "stm32f4"])
 
     def test_shared_component_catalogue_drift_is_rejected(self):
         name = "components/catalog.json"
@@ -86,7 +86,7 @@ class MaintainedMatrixTests(unittest.TestCase):
         references = result["references"]
         self.assertTrue(references)
         self.assertEqual(len({item["assembly"] for item in references}), len(references))
-        self.assertEqual({item["family"] for item in references}, {"stm32f4"})
+        self.assertEqual({item["family"] for item in references}, {"stm32f1", "stm32f4"})
         for item in references:
             self.assertEqual(item["physical_status"], "not_executed")
             self.assertEqual(item["scope"], "public_reference")

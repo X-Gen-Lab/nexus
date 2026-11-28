@@ -592,7 +592,7 @@ class WorkflowContracts(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'directory'):
                 reference_matrix(root)
 
-    def test_f4_board_backend_link_profiles_have_actual_presets(self):
+    def test_board_backend_link_profiles_have_actual_presets(self):
         jobs = workflow('build-matrix.yml')['jobs']
         from scripts.ci.reference_matrix import reference_matrix
         rows = reference_matrix(ROOT)['include']
@@ -600,7 +600,8 @@ class WorkflowContracts(unittest.TestCase):
         self.assertTrue(all((ROOT / row['fixture']).is_file() for row in rows))
         self.assertEqual(selected, {
             'stm32-qiming-baremetal', 'stm32-qiming-freertos',
-            'stm32-sky-baremetal', 'stm32-sky-freertos'})
+            'stm32-sky-baremetal', 'stm32-sky-freertos',
+            'stm32-f103rb-baremetal', 'stm32-f103rb-freertos'})
         from tools.dev.presets import Presets
         presets = Presets(ROOT)
         configured = {name for name, (row, _) in
@@ -849,7 +850,8 @@ class WorkflowContracts(unittest.TestCase):
         self.assertEqual(selected, {
             'stm32_assembly', 'can_assembly', 'usb_assembly',
             'ethernet_assembly', 'timer_assembly', 'multi_controller_assembly',
-            'declared_io_assembly', 'stm32f4_family'})
+            'declared_io_assembly', 'stm32f4_family',
+            'stm32f1_family', 'stm32f1_flash'})
         for name in selected:
             self.assertTrue(list((ROOT / 'tests/integration/assemblies' / name).glob('*.toml')))
         commands = '\n'.join(step.get('run', '') for step in job['steps'])
@@ -896,7 +898,8 @@ class WorkflowContracts(unittest.TestCase):
         job = workflow('build-matrix.yml')['jobs']['controller-routes']
         step = next(step for step in job['steps'] if step.get('name') ==
                     'Link and audit each authored software assembly')
-        selections = {'stm32_assembly': [], 'can_assembly': []}
+        selections = {'stm32_assembly': [], 'can_assembly': [],
+                      'stm32f1_family': [], 'stm32f1_flash': []}
         authored_family = sorted('tests/integration/assemblies/stm32f4_family/' + path.name
             for path in (ROOT / 'tests/integration/assemblies/stm32f4_family').glob('*.toml'))
         selections.update(

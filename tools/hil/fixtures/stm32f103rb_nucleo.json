@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "kind": "hil_fixture",
+  "board": "stm32f103rb-nucleo",
+  "part": "STM32F103RBT6",
+  "scope": "software_reference",
+  "transport": "swd",
+  "probe_interfaces": ["stlink"],
+  "serial": {
+    "controller": "USART2",
+    "tx": "PA2",
+    "rx": "PA3",
+    "baudrate": 115200,
+    "electrical_mode": "ttl_3v3"
+  },
+  "required_tests": ["probe_identity", "flash_readback", "reset", "uart_echo"],
+  "physical_status": "not_executed",
+  "pending_qualification": [
+    {
+      "id": "tim2_wrap_under_load",
+      "fixture": "Measure the 16-bit TIM2 wrap and maximum IRQ service gap under UART load",
+      "budget": null,
+      "unit": "us"
+    },
+    {
+      "id": "gpio_start_and_stop",
+      "fixture": "Capture PA5 during reset, output admission and shutdown",
+      "budget": null,
+      "unit": "us"
+    },
+    {
+      "id": "uart_baud_and_drain",
+      "fixture": "Inspect actual MB1136 revision and VCP bridges; capture baud, final stop bit and IRQ retirement",
+      "budget": null,
+      "unit": "us"
+    }
+  ]
+}

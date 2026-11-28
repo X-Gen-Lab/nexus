@@ -7,24 +7,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: bd88c1edf72d1a932d71fe0bb449eede21ca90c70ccc39f75b0c904a24a1cb07\n"
+"X-Nexus-Source-SHA256: 2a56c5d2d79408b648aa31a2f7d23912cd08328811bf7a1e26aa14ccde6ecdb7\n"
 
 #: ../../../../../../../docs/development/source-map.md:9
 msgid "当前源码与维护边界"
 msgstr "Current source and maintenance boundaries"
-
-#: ../../../../../../../docs/development/source-map.md:11
-msgid ""
-"本页定位当前实现，不复制各目录的完整合同。生产 MCU 入口只有 STM32F4，精确 "
-"器件与模式以[支持范围](../reference/platforms/support.md)为准；F407 Board 与新增料号的软件 "
-"参考分别说明。其他 SDK 原位保留，目录、实现、执行记录和物理资格不相互替代。"
-msgstr ""
-"This page locates current implementations without copying each directory "
-"contract. STM32F4 is the sole production MCU entry; [support "
-"scope](../reference/platforms/support.md) defines exact devices and modes. "
-"F407 Boards and software references for added parts remain distinct. Other "
-"SDKs stay in place. Directories, implementation, execution records and "
-"physical qualification do not replace one another."
 
 #: ../../../../../../../docs/development/source-map.md:0
 msgid "维护问题"
@@ -401,3 +388,15 @@ msgstr ""
 " [qualification boundary](../reference/platforms/qualification.md) defines "
 "scope. This documentation map does not create a second test plan or build "
 "graph."
+
+#: ../../../../workspace/nexus/docs/development/source-map.md:11
+msgid ""
+"本页定位当前实现。生产 MCU 包包含 STM32F4 和 STM32F1，精确器件与模式以 "
+"[支持范围](../reference/platforms/support.md)为准。板卡与软件参考分别声明装配。 其他 SDK "
+"原位保留，执行记录与物理资格单独维护。"
+msgstr ""
+"This page maps the current source. The production MCU packages are STM32F4 "
+"and STM32F1. See the [support scope](../reference/platforms/support.md) for "
+"exact parts and modes. Boards and software references each declare their "
+"assembly. Other SDKs remain in inventory. Execution records and physical "
+"qualification are maintained separately."

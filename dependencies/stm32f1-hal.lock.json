@@ -33,5 +33,5 @@
   "release": "STM32CubeF1-v1.8.7-pinned-driver",
   "repository": "https://github.com/STMicroelectronics/stm32f1xx-hal-driver.git",
   "schema_version": 1,
-  "selected_api": "stm32f103-ll-inline-i2c"
+  "selected_api": "stm32f1-reviewed-inline-ll"
 }

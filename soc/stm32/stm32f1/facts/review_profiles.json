@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "datasheets": {
+    "DS5319": {
+      "revision": "20",
+      "sha256": "1e54ce18e6c34c5b4a78986f26e245e143748c721009fc9af5953795c30686bc",
+      "devices": [
+        "stm32f103-md"
+      ]
+    }
+  },
+  "manuals": {
+    "RM0008": {
+      "revision": "21",
+      "sha256": "4c1b8ac2729cc1f45a4685eea9e91e6139e24e58804fba21e27201dfcc2ad149",
+      "devices": [
+        "stm32f103-md"
+      ]
+    }
+  },
+  "errata": {
+    "es096-rev15-f103-md-hsi8": {
+      "document_id": "ES096",
+      "revision": "15",
+      "sha256": "7bcdf58d8b602292d68abb59e181a4f44a038f215d8b01b0167f6d7139285490",
+      "revision_order": [
+        "A",
+        "B",
+        "Z",
+        "1",
+        "Y",
+        "2",
+        "3",
+        "X"
+      ],
+      "sections": [
+        "2.1.2",
+        "2.2.1",
+        "2.2.2",
+        "2.2.11",
+        "2.9.2",
+        "2.9.3"
+      ],
+      "applicability": {
+        "2.1.2": "AAAAAAAA",
+        "2.2.1": "AAAAAAAA",
+        "2.2.2": "NNNNNNNN",
+        "2.2.11": "AAAAAAAA",
+        "2.9.2": "NNNNNNNN",
+        "2.9.3": "AAAAAAAA"
+      },
+      "devices": [
+        "stm32f103-md"
+      ],
+      "reference_manual": "RM0008",
+      "reviewed_revision_ids": [
+        0,
+        8192,
+        8193,
+        8195
+      ],
+      "mode_scope": [
+        "flash:poll-halfword",
+        "gpio:input",
+        "gpio:output",
+        "uart:irq-byte-event"
+      ],
+      "backends": [
+        "baremetal",
+        "freertos"
+      ],
+      "clock_policies": [
+        "rm0008-f103-md-hsi8"
+      ]
+    }
+  }
+}

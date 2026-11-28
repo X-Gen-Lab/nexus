@@ -12,8 +12,8 @@ Nexus 的 CPU 软件层支持 M0、M0+、M3、M4、M7、M23、M33、M55、M85。
 同一不可变 CPU profile 解析器驱动 Core、Arch、原子操作及裸机／FreeRTOS
 运行时配置；DSP、FPU、MVE、cache、MPU、DWT、security 和 SAU 均显式声明。
 选择内核不生成具体 SoC、Board、向量、启动、驱动、链接布局或 typed factory。
-当前生产 SoC 入口为 F4，[精确器件与模式](support.md)分别审查；保留其他系列
-SDK 不代表生产支持。实板 HIL 未执行。
+当前生产 SoC 包包含 STM32F4 和 STM32F1，[精确器件与模式](support.md)分别审查。
+实板 HIL 未执行。
 
 详细所有权、上下文与拒绝语义见 [Arch 契约](../contracts/arch.md)，
 OS 生命周期见 [OS 适配](../../../os/README.md)，精确整平台范围见

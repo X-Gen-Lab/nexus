@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "routes": [
+    {
+      "id": "gpio-pa0-input",
+      "variants": [
+        "STM32F103C8T6"
+      ],
+      "controller": "GPIOA",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PA0",
+          "function": "input"
+        }
+      ],
+      "modes": [
+        "input"
+      ],
+      "source": "DS5319 Rev20 Table 5 and Figure 8 LQFP48; RM0008 Rev21 Section 9.1.7 GPIO input."
+    },
+    {
+      "id": "gpio-pa5",
+      "variants": [
+        "STM32F103RBT6",
+        "STM32F103C8T6"
+      ],
+      "controller": "GPIOA",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PA5",
+          "function": "output"
+        }
+      ],
+      "modes": [
+        "output"
+      ],
+      "source": "DS5319 Rev20 Table 5 and Figures 6/8; RM0008 Rev21 Section 9."
+    },
+    {
+      "id": "usart2-pa2-pa3",
+      "variants": [
+        "STM32F103RBT6",
+        "STM32F103C8T6"
+      ],
+      "controller": "USART2",
+      "kind": "uart",
+      "pins": [
+        {
+          "pin": "PA2",
+          "function": "tx"
+        },
+        {
+          "pin": "PA3",
+          "function": "rx"
+        }
+      ],
+      "modes": [
+        "irq-byte-event"
+      ],
+      "source": "DS5319 Rev20 Table 5; RM0008 Rev21 Section 9.3.8 USART2_REMAP=0, Section 27 USART."
+    },
+    {
+      "id": "flash-internal",
+      "variants": [
+        "STM32F103RBT6",
+        "STM32F103C8T6"
+      ],
+      "controller": "FLASH",
+      "kind": "flash",
+      "pins": [],
+      "modes": [
+        "poll-halfword"
+      ],
+      "source": "PM0075 Rev2 Table 3 and Sections 2.3.3–2.3.4; ES096 Rev15 Section 2.2.11; DS5319 Rev20 Table 2."
+    }
+  ]
+}

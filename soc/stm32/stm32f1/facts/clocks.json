@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "clock_profiles": {
+    "hsi8": {
+      "source": "hsi",
+      "input_hz": 8000000,
+      "core_hz": 8000000,
+      "apb1_hz": 8000000,
+      "apb1_timer_hz": 8000000,
+      "apb2_hz": 8000000,
+      "flash_wait_states": 0
+    }
+  }
+}

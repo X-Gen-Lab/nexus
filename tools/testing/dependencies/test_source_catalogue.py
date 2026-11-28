@@ -88,6 +88,7 @@ class SourceCatalogueTests(unittest.TestCase):
     def test_runtime_scope_excludes_google_and_keeps_nested_sources_explicit(self):
         self.assertEqual({item.identifier for item in catalogue.SOURCE_DEPENDENCIES}, {
             "freertos", "cmsis_core", "stm32f4_cmsis", "stm32f4_hal",
+            "stm32f1_cmsis", "stm32f1_hal",
             "threadx", "lwip", "mbedtls", "coremqtt", "mcuboot",
             "stm32_usb_host", "stm32_usb_device", "flashdb", "littlefs",
             "fatfs", "sfud", "segger_rtt", "letter_shell", "cm_backtrace",

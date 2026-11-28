@@ -19,6 +19,19 @@ class SelectedDependencyTests(unittest.TestCase):
         self.assertEqual(catalogue.dependency("stm32h7_hal").path,
                          "vendors/st/stm32h7_hal")
 
+    def test_f1_suppliers_follow_the_selected_hardware_package(self):
+        from types import SimpleNamespace
+
+        f1 = SimpleNamespace(family="stm32f1", dependencies=(
+            ("cmsis_core", "cmsis_core"), ("device", "stm32f1_cmsis"),
+            ("hal", "stm32f1_hal")))
+        selected = catalogue.runtime_selection("stm32f1", backend="freertos",
+                                              package=f1)
+        self.assertEqual({item.identifier for item in selected}, {
+            "cmsis_core", "stm32f1_cmsis", "stm32f1_hal", "freertos"})
+        item = catalogue.dependency("stm32f1_hal")
+        self.assertEqual(item.paired_driver_checker, "stm32f1_hal_lock")
+
     def test_backend_and_component_dependencies_are_explicit(self):
         records = catalogue.runtime_selection("stm32f4", backend="freertos",
                                               components=("network",))

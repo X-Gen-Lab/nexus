@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "interface_version": 2,
+  "id": "stm32f1",
+  "family": "stm32f1",
+  "vendor": "stm32",
+  "source_directory": ".",
+  "facts": {
+    "soc": "facts/soc.json",
+    "routes": "facts/routes.json",
+    "device_catalog": "facts/devices.json",
+    "references": "facts/references.json",
+    "bindings": "facts/bindings.json",
+    "review_profiles": "facts/review_profiles.json",
+    "controllers": "facts/controllers.json",
+    "clocks": "facts/clocks.json"
+  },
+  "dependencies": {
+    "cmsis_core": "cmsis_core",
+    "cmsis_device_f1": "stm32f1_cmsis",
+    "hal_driver_f1": "stm32f1_hal"
+  },
+  "cmake": {
+    "entry": "CMakeLists.txt",
+    "target": "nexus_soc_stm32f1"
+  },
+  "exports": {
+    "roots": ["."],
+    "exclude": ["tests", "testing", "__pycache__"]
+  },
+  "binding_files": [
+    "system/binding.json",
+    "drivers/gpio/binding.json",
+    "drivers/uart/binding.json",
+    "drivers/flash/binding.json"
+  ]
+}

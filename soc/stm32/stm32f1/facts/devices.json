@@ -1,0 +1,225 @@
+{
+  "schema_version": 1,
+  "scope": "sdk_device_compile",
+  "sdk": {
+    "directory": "vendors/st/cmsis_device_f1",
+    "dependency": "cmsis_device_f1",
+    "commit": "c8e9a4a4f16b6d2cb2a2083cbe5161025280fb22",
+    "core_directory": "vendors/arm/CMSIS_6",
+    "core_dependency": "cmsis_core",
+    "core_commit": "af1b110e46a1720349f6f125e386e126767699bd"
+  },
+  "devices": [
+    {
+      "id": "stm32f103-md",
+      "define": "STM32F103xB",
+      "header": "Include/stm32f103xb.h",
+      "startup": "Source/Templates/gcc/startup_stm32f103xb.s",
+      "startup_vector_tail": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        4043896927
+      ],
+      "external_irq_count": 43,
+      "last_external_irq": {
+        "name": "USBWakeUp_IRQn",
+        "number": 42
+      },
+      "nvic_priority_bits": 4,
+      "timebase_presence": {
+        "TIM2": true,
+        "TIM5": false,
+        "LPTIM1": false
+      },
+      "irq_bindings": {
+        "WWDG_IRQn": {
+          "number": 0,
+          "handler": "WWDG_IRQHandler"
+        },
+        "PVD_IRQn": {
+          "number": 1,
+          "handler": "PVD_IRQHandler"
+        },
+        "TAMPER_IRQn": {
+          "number": 2,
+          "handler": "TAMPER_IRQHandler"
+        },
+        "RTC_IRQn": {
+          "number": 3,
+          "handler": "RTC_IRQHandler"
+        },
+        "FLASH_IRQn": {
+          "number": 4,
+          "handler": "FLASH_IRQHandler"
+        },
+        "RCC_IRQn": {
+          "number": 5,
+          "handler": "RCC_IRQHandler"
+        },
+        "EXTI0_IRQn": {
+          "number": 6,
+          "handler": "EXTI0_IRQHandler"
+        },
+        "EXTI1_IRQn": {
+          "number": 7,
+          "handler": "EXTI1_IRQHandler"
+        },
+        "EXTI2_IRQn": {
+          "number": 8,
+          "handler": "EXTI2_IRQHandler"
+        },
+        "EXTI3_IRQn": {
+          "number": 9,
+          "handler": "EXTI3_IRQHandler"
+        },
+        "EXTI4_IRQn": {
+          "number": 10,
+          "handler": "EXTI4_IRQHandler"
+        },
+        "DMA1_Channel1_IRQn": {
+          "number": 11,
+          "handler": "DMA1_Channel1_IRQHandler"
+        },
+        "DMA1_Channel2_IRQn": {
+          "number": 12,
+          "handler": "DMA1_Channel2_IRQHandler"
+        },
+        "DMA1_Channel3_IRQn": {
+          "number": 13,
+          "handler": "DMA1_Channel3_IRQHandler"
+        },
+        "DMA1_Channel4_IRQn": {
+          "number": 14,
+          "handler": "DMA1_Channel4_IRQHandler"
+        },
+        "DMA1_Channel5_IRQn": {
+          "number": 15,
+          "handler": "DMA1_Channel5_IRQHandler"
+        },
+        "DMA1_Channel6_IRQn": {
+          "number": 16,
+          "handler": "DMA1_Channel6_IRQHandler"
+        },
+        "DMA1_Channel7_IRQn": {
+          "number": 17,
+          "handler": "DMA1_Channel7_IRQHandler"
+        },
+        "ADC1_2_IRQn": {
+          "number": 18,
+          "handler": "ADC1_2_IRQHandler"
+        },
+        "USB_HP_CAN1_TX_IRQn": {
+          "number": 19,
+          "handler": "USB_HP_CAN1_TX_IRQHandler"
+        },
+        "USB_LP_CAN1_RX0_IRQn": {
+          "number": 20,
+          "handler": "USB_LP_CAN1_RX0_IRQHandler"
+        },
+        "CAN1_RX1_IRQn": {
+          "number": 21,
+          "handler": "CAN1_RX1_IRQHandler"
+        },
+        "CAN1_SCE_IRQn": {
+          "number": 22,
+          "handler": "CAN1_SCE_IRQHandler"
+        },
+        "EXTI9_5_IRQn": {
+          "number": 23,
+          "handler": "EXTI9_5_IRQHandler"
+        },
+        "TIM1_BRK_IRQn": {
+          "number": 24,
+          "handler": "TIM1_BRK_IRQHandler"
+        },
+        "TIM1_UP_IRQn": {
+          "number": 25,
+          "handler": "TIM1_UP_IRQHandler"
+        },
+        "TIM1_TRG_COM_IRQn": {
+          "number": 26,
+          "handler": "TIM1_TRG_COM_IRQHandler"
+        },
+        "TIM1_CC_IRQn": {
+          "number": 27,
+          "handler": "TIM1_CC_IRQHandler"
+        },
+        "TIM2_IRQn": {
+          "number": 28,
+          "handler": "TIM2_IRQHandler"
+        },
+        "TIM3_IRQn": {
+          "number": 29,
+          "handler": "TIM3_IRQHandler"
+        },
+        "TIM4_IRQn": {
+          "number": 30,
+          "handler": "TIM4_IRQHandler"
+        },
+        "I2C1_EV_IRQn": {
+          "number": 31,
+          "handler": "I2C1_EV_IRQHandler"
+        },
+        "I2C1_ER_IRQn": {
+          "number": 32,
+          "handler": "I2C1_ER_IRQHandler"
+        },
+        "I2C2_EV_IRQn": {
+          "number": 33,
+          "handler": "I2C2_EV_IRQHandler"
+        },
+        "I2C2_ER_IRQn": {
+          "number": 34,
+          "handler": "I2C2_ER_IRQHandler"
+        },
+        "SPI1_IRQn": {
+          "number": 35,
+          "handler": "SPI1_IRQHandler"
+        },
+        "SPI2_IRQn": {
+          "number": 36,
+          "handler": "SPI2_IRQHandler"
+        },
+        "USART1_IRQn": {
+          "number": 37,
+          "handler": "USART1_IRQHandler"
+        },
+        "USART2_IRQn": {
+          "number": 38,
+          "handler": "USART2_IRQHandler"
+        },
+        "USART3_IRQn": {
+          "number": 39,
+          "handler": "USART3_IRQHandler"
+        },
+        "EXTI15_10_IRQn": {
+          "number": 40,
+          "handler": "EXTI15_10_IRQHandler"
+        },
+        "RTC_Alarm_IRQn": {
+          "number": 41,
+          "handler": "RTC_Alarm_IRQHandler"
+        },
+        "USBWakeUp_IRQn": {
+          "number": 42,
+          "handler": "USBWakeUp_IRQHandler"
+        }
+      }
+    }
+  ],
+  "inputs": {
+    "Include/stm32f103xb.h": {
+      "bytes": 842883,
+      "sha256": "d9c7c613d9fea74220892b4fbc3e80617493acad82a04bafadab2b4a7198399c"
+    },
+    "Source/Templates/gcc/startup_stm32f103xb.s": {
+      "bytes": 9725,
+      "sha256": "a9a5fc7ed5ff617527dd98b3092830f4d17ed4bf57c99eac2c53bdb514ce138c"
+    }
+  }
+}

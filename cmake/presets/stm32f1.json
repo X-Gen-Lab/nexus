@@ -1,0 +1,35 @@
+{
+    "version": 6,
+    "vendor": {"nexus/reference-jobs": true},
+    "include": [
+        "base.json"
+    ],
+    "configurePresets": [
+        {
+            "name": "stm32-f103rb-baremetal",
+            "inherits": "nexus-arm",
+            "cacheVariables": {
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tests/integration/assemblies/stm32f1_family/f103rb-baremetal.toml",
+                "NEXUS_WORKLOAD": "uart"
+            }
+        },
+        {
+            "name": "stm32-f103rb-freertos",
+            "inherits": "nexus-arm",
+            "cacheVariables": {
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tests/integration/assemblies/stm32f1_family/f103rb-freertos.toml",
+                "NEXUS_WORKLOAD": "uart"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "stm32-f103rb-baremetal",
+            "configurePreset": "stm32-f103rb-baremetal"
+        },
+        {
+            "name": "stm32-f103rb-freertos",
+            "configurePreset": "stm32-f103rb-freertos"
+        }
+    ]
+}

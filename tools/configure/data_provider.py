@@ -316,8 +316,8 @@ class DataProvider(DomainBridge):
         from tools.configure.hardware_bindings import load_hardware
         from tools.configure.package_policy import BindingPolicy
         selected = binding_document(package, document, read=read)
-        from tools.configure.pinmux import NumericPinMuxPolicy
-        pinmux = NumericPinMuxPolicy.from_validated(selected.get("pinmux_policy"))
+        from tools.configure.pinmux import load_pinmux_policy
+        pinmux = load_pinmux_policy(selected.get("pinmux_policy"))
         policies = DomainPolicies.from_validated(package, soc, selected, pinmux=pinmux)
         hardware = load_hardware(package, read=read, pinmux=pinmux)
         from tools.configure.reference_profiles import ProfileSet

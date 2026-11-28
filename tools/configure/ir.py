@@ -1234,6 +1234,7 @@ class ControllerIR(Record):
     source_fields: tuple[str, ...]
     route_mask: int | None = None
     route_initial: int | None = None
+    route_supply_mv: int | None = None
     stream_fields: tuple[str, ...] = ()
     interface_kind: str | None = None
     integration: "ControllerIntegrationIR | None" = None
@@ -1252,7 +1253,7 @@ class ControllerIR(Record):
     def projection(self):
         result = {name: getattr(self, name) for name in (
             "id", "kind", "controller", "binding", "mode", "pins", "route",
-            "dma", "can_irqs", "interface_kind", "mask", "initial")}
+            "dma", "can_irqs", "interface_kind", "mask", "initial", "route_supply_mv")}
         result.update(option_projection(self.options))
         if isinstance(self.options, PinStateOptions):
             result["pin_state_resolution"] = {
@@ -1308,6 +1309,7 @@ class ControllerIR(Record):
                      tuple(values.get("can_irqs", ())), tuple(values),
                      route_mask=(None if hasattr(options, "mask") else values["mask"]),
                      route_initial=(None if hasattr(options, "initial") else values["initial"]),
+                     route_supply_mv=values.get("route_supply_mv"),
                      stream_fields=tuple(values.get("stream", ())),
                      interface_kind=values.get("interface_kind", values["kind"]))
         # The projection is deliberately exhaustive: a new resolved field must
@@ -1770,6 +1772,7 @@ class VendorDeviceIR:
     macro: str
     header: str
     startup: str
+    startup_vector_tail: tuple[int, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -1791,7 +1794,7 @@ class PadBindingIR:
     registers: str
     port_index: int
     number: int
-    alternate: int
+    alternate: int | None
     function: str
 
 
@@ -2012,6 +2015,9 @@ class ConfigurationIR(Record):
             result["pwm_shared_owners"] = self.pwm_shared_owners
         if self.external_memory:
             result["external_memory"] = self.external_memory
+        device = self.physical_part.device
+        if device is not None and device.startup_vector_tail:
+            result["startup_vector_tail"] = device.startup_vector_tail
         if self.provider_context is not None and self.provider_context.external:
             result["soc_package"] = self.provider_context.identity
         return result

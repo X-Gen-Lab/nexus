@@ -284,6 +284,8 @@ jobs:
           - multi_controller_assembly
           - declared_io_assembly
           - stm32f4_family
+          - stm32f1_family
+          - stm32f1_flash
         include:
           - fixture: stm32f4_family
             project: tests/integration/assemblies/stm32f4_family

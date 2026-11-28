@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "bindings": [],
+  "domains": {
+    "platform": {
+      "schema_version": 1,
+      "headers": ["system/platform.h"],
+      "roles": {},
+      "dma_clocks": {},
+      "objects": {
+        "platform": {
+          "symbols": {"config": "s_nx_platform_lifecycle_config"},
+          "declarations": [
+            {
+              "role": "config",
+              "type": "nx_stm32f1_platform_config_t",
+              "const": true,
+              "value": {
+                "record": [
+                  ["flash_bytes", {"source": "selected.flash_bytes", "as": "u32"}]
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "calls": {
+        "system_start": "nx_stm32f1_platform_system_start",
+        "resources_acquire": "nx_stm32f1_platform_no_resources",
+        "resources_resume": "nx_stm32f1_platform_no_resources",
+        "resources_release": "nx_stm32f1_platform_no_resources",
+        "system_release": "nx_stm32f1_platform_system_release"
+      },
+      "config_symbol": "s_nx_platform_lifecycle_config"
+    }
+  }
+}

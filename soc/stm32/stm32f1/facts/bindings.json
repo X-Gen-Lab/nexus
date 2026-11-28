@@ -1,0 +1,314 @@
+{
+  "schema_version": 1,
+  "custom_clock_profile": "custom",
+  "pinmux_policy": {
+    "encoding": "route-fixed"
+  },
+  "system": {
+    "oscillator_resources": {},
+    "timebase": {
+      "timer": "TIM2",
+      "irq": "TIM2_IRQn",
+      "gate": "RCC_APB1ENR_TIM2EN",
+      "reset": "RCC_APB1RSTR_TIM2RST",
+      "handler": "TIM2_IRQHandler",
+      "clock_domain": "apb1_timer",
+      "counter_bits": 16
+    }
+  },
+  "mode_exclusions": [
+    {
+      "device": "stm32f103-md",
+      "kind": "flash",
+      "option": "maintenance",
+      "equals": true,
+      "message": "Option-byte maintenance has no implementation in the selected STM32F103 Flash mode"
+    }
+  ],
+  "domains": {
+    "schema_version": 1,
+    "capabilities": {
+      "pin_electrical": true,
+      "public_formats": [
+        "uart"
+      ],
+      "flash_program_unit": 2,
+      "flash_input_alignment": 1
+    },
+    "clock": {
+      "model": "fixed-profile",
+      "reviews": {
+        "rm0008-f103-md-hsi8": [
+          "hsi8"
+        ]
+      }
+    }
+  },
+  "pads": {
+    "PA0": {
+      "registers": "GPIOA",
+      "port_index": 0,
+      "number": 0
+    },
+    "PA1": {
+      "registers": "GPIOA",
+      "port_index": 0,
+      "number": 1
+    },
+    "PA2": {
+      "registers": "GPIOA",
+      "port_index": 0,
+      "number": 2
+    },
+    "PA3": {
+      "registers": "GPIOA",
+      "port_index": 0,
+      "number": 3
+    },
+    "PA4": {
+      "registers": "GPIOA",
+      "port_index": 0,
+      "number": 4
+    },
+    "PA5": {
+      "registers": "GPIOA",
+      "port_index": 0,
+      "number": 5
+    },
+    "PA6": {
+      "registers": "GPIOA",
+      "port_index": 0,
+      "number": 6
+    },
+    "PA7": {
+      "registers": "GPIOA",
+      "port_index": 0,
+      "number": 7
+    },
+    "PA8": {
+      "registers": "GPIOA",
+      "port_index": 0,
+      "number": 8
+    },
+    "PA9": {
+      "registers": "GPIOA",
+      "port_index": 0,
+      "number": 9
+    },
+    "PA10": {
+      "registers": "GPIOA",
+      "port_index": 0,
+      "number": 10
+    },
+    "PA11": {
+      "registers": "GPIOA",
+      "port_index": 0,
+      "number": 11
+    },
+    "PA12": {
+      "registers": "GPIOA",
+      "port_index": 0,
+      "number": 12
+    },
+    "PA13": {
+      "registers": "GPIOA",
+      "port_index": 0,
+      "number": 13
+    },
+    "PA14": {
+      "registers": "GPIOA",
+      "port_index": 0,
+      "number": 14
+    },
+    "PA15": {
+      "registers": "GPIOA",
+      "port_index": 0,
+      "number": 15
+    },
+    "PB0": {
+      "registers": "GPIOB",
+      "port_index": 1,
+      "number": 0
+    },
+    "PB1": {
+      "registers": "GPIOB",
+      "port_index": 1,
+      "number": 1
+    },
+    "PB2": {
+      "registers": "GPIOB",
+      "port_index": 1,
+      "number": 2
+    },
+    "PB3": {
+      "registers": "GPIOB",
+      "port_index": 1,
+      "number": 3
+    },
+    "PB4": {
+      "registers": "GPIOB",
+      "port_index": 1,
+      "number": 4
+    },
+    "PB5": {
+      "registers": "GPIOB",
+      "port_index": 1,
+      "number": 5
+    },
+    "PB6": {
+      "registers": "GPIOB",
+      "port_index": 1,
+      "number": 6
+    },
+    "PB7": {
+      "registers": "GPIOB",
+      "port_index": 1,
+      "number": 7
+    },
+    "PB8": {
+      "registers": "GPIOB",
+      "port_index": 1,
+      "number": 8
+    },
+    "PB9": {
+      "registers": "GPIOB",
+      "port_index": 1,
+      "number": 9
+    },
+    "PB10": {
+      "registers": "GPIOB",
+      "port_index": 1,
+      "number": 10
+    },
+    "PB11": {
+      "registers": "GPIOB",
+      "port_index": 1,
+      "number": 11
+    },
+    "PB12": {
+      "registers": "GPIOB",
+      "port_index": 1,
+      "number": 12
+    },
+    "PB13": {
+      "registers": "GPIOB",
+      "port_index": 1,
+      "number": 13
+    },
+    "PB14": {
+      "registers": "GPIOB",
+      "port_index": 1,
+      "number": 14
+    },
+    "PB15": {
+      "registers": "GPIOB",
+      "port_index": 1,
+      "number": 15
+    },
+    "PC0": {
+      "registers": "GPIOC",
+      "port_index": 2,
+      "number": 0
+    },
+    "PC1": {
+      "registers": "GPIOC",
+      "port_index": 2,
+      "number": 1
+    },
+    "PC2": {
+      "registers": "GPIOC",
+      "port_index": 2,
+      "number": 2
+    },
+    "PC3": {
+      "registers": "GPIOC",
+      "port_index": 2,
+      "number": 3
+    },
+    "PC4": {
+      "registers": "GPIOC",
+      "port_index": 2,
+      "number": 4
+    },
+    "PC5": {
+      "registers": "GPIOC",
+      "port_index": 2,
+      "number": 5
+    },
+    "PC6": {
+      "registers": "GPIOC",
+      "port_index": 2,
+      "number": 6
+    },
+    "PC7": {
+      "registers": "GPIOC",
+      "port_index": 2,
+      "number": 7
+    },
+    "PC8": {
+      "registers": "GPIOC",
+      "port_index": 2,
+      "number": 8
+    },
+    "PC9": {
+      "registers": "GPIOC",
+      "port_index": 2,
+      "number": 9
+    },
+    "PC10": {
+      "registers": "GPIOC",
+      "port_index": 2,
+      "number": 10
+    },
+    "PC11": {
+      "registers": "GPIOC",
+      "port_index": 2,
+      "number": 11
+    },
+    "PC12": {
+      "registers": "GPIOC",
+      "port_index": 2,
+      "number": 12
+    },
+    "PC13": {
+      "registers": "GPIOC",
+      "port_index": 2,
+      "number": 13
+    },
+    "PC14": {
+      "registers": "GPIOC",
+      "port_index": 2,
+      "number": 14
+    },
+    "PC15": {
+      "registers": "GPIOC",
+      "port_index": 2,
+      "number": 15
+    },
+    "PD0": {
+      "registers": "GPIOD",
+      "port_index": 3,
+      "number": 0
+    },
+    "PD1": {
+      "registers": "GPIOD",
+      "port_index": 3,
+      "number": 1
+    },
+    "PD2": {
+      "registers": "GPIOD",
+      "port_index": 3,
+      "number": 2
+    }
+  },
+  "software": {
+    "enum_abi": "short-enums",
+    "backends": [
+      "baremetal",
+      "freertos"
+    ],
+    "headers": [],
+    "bindings": [],
+    "freertos_port": "GCC/ARM_CM3"
+  }
+}

@@ -175,7 +175,7 @@ class CapabilityDocumentationTests(unittest.TestCase):
 
     def test_native_models_require_explicit_scope_outside_production_matrix(self):
         rows = self.rows
-        self.assertEqual({row["family"] for row in rows}, {"stm32f4"})
+        self.assertEqual({row["family"] for row in rows}, {"stm32f1", "stm32f4"})
         fixture = ROOT / "cmake/package/verification/io_evolution/native-time-pair.toml"
         with self.assertRaisesRegex(ValueError, "explicit test support"):
             capabilities.selection(fixture, ROOT)

@@ -4,7 +4,7 @@ from dataclasses import dataclass, replace
 from types import MappingProxyType
 
 from tools.configure.generation.calls import Symbol
-from tools.configure.pinmux import NumericPinMuxPolicy
+from tools.configure.pinmux import NumericPinMuxPolicy, PinMuxPolicy, load_pinmux_policy
 from tools.configure.providers.common import fail, integer
 from tools.configure.resource_graph import identifier, normalize_resource
 
@@ -59,7 +59,7 @@ class ModeExclusion:
 @dataclass(frozen=True)
 class BindingPolicy:
     custom_clock_profile: str
-    pinmux_policy: NumericPinMuxPolicy
+    pinmux_policy: PinMuxPolicy
     oscillators: Mapping
     timebase: Timebase
     exclusions: tuple[ModeExclusion, ...]
@@ -75,10 +75,10 @@ class BindingPolicy:
                         "mode_exclusions"}, {"pinmux", "software", "hardware", "domains", "pads"})
         if type(value["schema_version"]) is not int or value["schema_version"] != 1:
             fail("Unsupported binding policy schema")
-        declared = NumericPinMuxPolicy.from_validated(value["pinmux_policy"])
+        declared = load_pinmux_policy(value["pinmux_policy"])
         pinmux = declared if pinmux is None else pinmux
-        if not isinstance(pinmux, NumericPinMuxPolicy) or pinmux != declared:
-            fail("Binding policy requires its selected numeric pinmux policy")
+        if type(pinmux) is not type(declared) or pinmux != declared:
+            fail("Binding policy requires its selected pinmux policy")
         profile = identifier(value["custom_clock_profile"], "Custom clock profile")
         system = value["system"]
         _fields(system, {"oscillator_resources", "timebase"})
@@ -99,6 +99,8 @@ class BindingPolicy:
         pinmux_rules = value.get("pinmux", {})
         if not isinstance(pinmux_rules, Mapping):
             fail("Pinmux constraints require a controller mapping")
+        if pinmux_rules and not isinstance(pinmux, NumericPinMuxPolicy):
+            fail("Controller numeric AF constraints require numeric pinmux")
         for controller, functions in pinmux_rules.items():
             Symbol(controller)
             if (not isinstance(functions, list) or not functions or
@@ -158,7 +160,7 @@ class BindingPolicy:
                 fail("Selected pad lacks a private static binding: " + pin["pin"])
             row = self.pad_facts[pin["pin"]]
             result.append(PadBindingIR(pin["pin"], row["registers"], row["port_index"],
-                row["number"], pin["af"], pin["function"]))
+                row["number"], self.pinmux_policy.alternate(pin), pin["function"]))
         return tuple(result)
 
     def dma_bindings(self, lanes):
@@ -215,7 +217,7 @@ class BindingPolicy:
 
     def validate_route(self, route):
         for pin in route["pins"]:
-            self.pinmux_policy.validate(pin["af"], "Route alternate selector")
+            self.pinmux_policy.alternate(pin, "Route alternate selector")
         allowed = self.pinmux.get(route["controller"])
         if allowed is not None and any(pin["af"] not in allowed
                                        for pin in route["pins"]):

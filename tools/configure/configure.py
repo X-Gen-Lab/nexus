@@ -492,7 +492,8 @@ def resolve_routes(routes_doc, soc, part, provider, *, controller_profiles=None)
         pins = sequence(route["pins"], "route pins")
         unique([pin.get("pin") for pin in pins], "route pins")
         for pin in pins:
-            obj(pin, {"pin", "function", "af"}, (), "route pin")
+            obj(pin, {"pin", "function"} | provider.PINMUX_POLICY.pin_fields,
+                (), "route pin")
             resource_graph.identifier(pin["pin"], "pin identity")
             pads = getattr(provider, "PAD_FACTS", {})
             if pin["pin"] not in pads:
@@ -503,7 +504,7 @@ def resolve_routes(routes_doc, soc, part, provider, *, controller_profiles=None)
                 available = soc["variants"][exact].get("pins")
                 if available is not None and pin["pin"] not in available:
                     fail(f"Pin {pin['pin']} does not exist on {exact}")
-            provider.PINMUX_POLICY.validate(pin["af"], "pin AF selector")
+            provider.PINMUX_POLICY.alternate(pin, "pin AF selector")
             text(pin["function"], "pin function")
         text(route["source"], "route source")
         routes[route["id"]] = route
@@ -904,7 +905,7 @@ def resolve_device_facts(soc, part, provider, *, catalog=None):
         provider = scope(soc)
     validate_soc(soc, part, provider, catalog_device=catalog_device)
     vendor_device = (VendorDeviceIR(catalog_device.macro, catalog_device.header,
-                                   catalog_device.startup)
+                                   catalog_device.startup, catalog_device.startup_vector_tail)
                      if catalog_device is not None else None)
     profiles = freeze(profiles)
     if profiles:

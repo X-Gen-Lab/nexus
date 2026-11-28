@@ -13,7 +13,7 @@ from tools.configure.policies.bxcan import BxCanPolicy, BxCanTransport
 from tools.configure.ethernet import EthernetPolicy
 from tools.configure.providers.common import EndpointPolicy, fail, integer
 from tools.configure.records import freeze
-from tools.configure.pinmux import NumericPinMuxPolicy
+from tools.configure.pinmux import PinMuxPolicy, load_pinmux_policy
 from tools.configure.stream_profiles import StreamGeometry
 from tools.configure.timer_advanced import TimerBinding, TimerPolicy, TimerRoute
 from tools.configure.uart_formats import UartFormatPolicy
@@ -226,7 +226,7 @@ def _dma(value):
 class DomainPolicies:
     """Selected protocol capabilities; absent facts grant no optional domain."""
 
-    PINMUX_POLICY: NumericPinMuxPolicy | None = None
+    PINMUX_POLICY: PinMuxPolicy | None = None
     UART_FORMATS: UartFormatPolicy = field(default_factory=UartFormatPolicy)
     STREAM_GEOMETRY: StreamGeometry | None = None
     CAN_INTEGRATION: BxCanPolicy | None = None
@@ -270,7 +270,7 @@ class DomainPolicies:
         """Load explicit domain data; never infer behavior from a vendor name."""
         del package
         if pinmux is None and "pinmux_policy" in bindings_document:
-            pinmux = NumericPinMuxPolicy.from_validated(bindings_document["pinmux_policy"])
+            pinmux = load_pinmux_policy(bindings_document["pinmux_policy"])
         value = bindings_document.get("domains")
         if value is None:
             return cls(PINMUX_POLICY=pinmux)
@@ -324,8 +324,13 @@ class DomainPolicies:
         result["shared_irqs"] = MappingProxyType({
             name: _names(items, "shared IRQ resources") for name, items in shared.items()})
         if "clock" in value:
-            from tools.configure.domains.pll_mnpq import PllMnpqPolicy
-            result["clock"] = PllMnpqPolicy.from_validated(value["clock"])
+            raw_clock = value["clock"]
+            if isinstance(raw_clock, Mapping) and raw_clock.get("model") == "fixed-profile":
+                from tools.configure.clocks import FixedProfilePolicy
+                result["clock"] = FixedProfilePolicy.from_validated(raw_clock)
+            else:
+                from tools.configure.domains.pll_mnpq import PllMnpqPolicy
+                result["clock"] = PllMnpqPolicy.from_validated(raw_clock)
         if "adc_group" in value:
             from tools.configure.policies.adc_group import AdcGroupPolicy
             result["ADC_GROUP"] = AdcGroupPolicy.from_validated(

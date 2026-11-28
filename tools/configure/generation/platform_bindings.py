@@ -87,14 +87,14 @@ class PlatformBindings:
     objects: Mapping
     calls: Mapping
     config_symbol: str
-    suspend: str
-    resume: str
+    suspend: str | None
+    resume: str | None
     retain_on_failed_resume: bool
 
     @classmethod
     def from_validated(cls, value):
         _fields(value, {"schema_version", "headers", "roles",
-            "dma_clocks", "objects", "calls", "config_symbol", "power"})
+            "dma_clocks", "objects", "calls", "config_symbol"}, {"power"})
         if type(value["schema_version"]) is not int or value["schema_version"] != 1:
             fail("Unsupported platform binding schema")
         headers = _names(value["headers"])
@@ -102,7 +102,7 @@ class PlatformBindings:
                ".." in name.split("/") for name in headers):
             fail("Platform headers require relative private C header names")
         roles = value["roles"]
-        _fields(roles, {"syscfg", "audio", "ethernet", "ethernet_frames", "power"})
+        _fields(roles, (), {"syscfg", "audio", "ethernet", "ethernet_frames", "power"})
         parsed_roles = {}
         for name, selections in roles.items():
             if not isinstance(selections, list):
@@ -115,27 +115,29 @@ class PlatformBindings:
             Symbol(engine)
             Symbol(mask)
         objects = value["objects"]
-        _fields(objects, {"state", "platform", "permanent_close", "can_close"})
+        _fields(objects, {"platform"}, {"state", "permanent_close", "can_close"})
         calls = value["calls"]
         _fields(calls, {"system_start", "resources_acquire", "resources_resume",
                         "resources_release", "system_release"})
         for name in (*calls.values(), value["config_symbol"]):
             Symbol(name)
-        power = value["power"]
-        _fields(power, {"suspend", "resume", "retain_on_failed_resume"})
-        Symbol(power["suspend"])
-        Symbol(power["resume"])
-        if type(power["retain_on_failed_resume"]) is not bool:
-            fail("Platform power retention requires an explicit boolean")
+        power = value.get("power", {})
+        if "power" in value or parsed_roles.get("power"):
+            _fields(power, {"suspend", "resume", "retain_on_failed_resume"})
+            Symbol(power["suspend"])
+            Symbol(power["resume"])
+            if type(power["retain_on_failed_resume"]) is not bool:
+                fail("Platform power retention requires an explicit boolean")
         return cls(headers, MappingProxyType(parsed_roles), MappingProxyType(dict(clocks)),
             MappingProxyType({name: StaticObjects.from_validated(group)
                               for name, group in objects.items()}),
             MappingProxyType(dict(calls)), value["config_symbol"],
-            power["suspend"], power["resume"], power["retain_on_failed_resume"])
+            power.get("suspend"), power.get("resume"),
+            power.get("retain_on_failed_resume", False))
 
     def _role(self, name, result):
         return any(rule.matches(item, result.part)
-                   for rule in self.roles[name] for item in result.controllers)
+                   for rule in self.roles.get(name, ()) for item in result.controllers)
 
     def selection(self, result):
         engines = sorted({lane.engine for item in result.controllers
@@ -164,15 +166,21 @@ class PlatformBindings:
             domain.split if domain is not None else 0, permanent)
 
     def state_declarations(self, result):
-        nodes = self.objects["state"].project(self.selection(result))
+        state = self.objects.get("state")
+        nodes = state.project(self.selection(result)) if state is not None else ()
         startup = getattr(result.provider_context.domain_policies, "EXTERNAL_MEMORY", None)
         return nodes + (tuple(startup.declarations(result)) if startup is not None else ())
 
     def platform_declarations(self, result):
         selected = self.selection(result)
-        return (*self.objects["permanent_close"].project(selected if selected.has_boot else None),
-                *self.objects["can_close"].project(selected if selected.has_can else None),
-                *self.objects["platform"].project(selected))
+        closing = []
+        for enabled, name in ((selected.has_boot, "permanent_close"),
+                              (selected.has_can, "can_close")):
+            if enabled:
+                if name not in self.objects:
+                    fail("Selected platform owner requires " + name)
+                closing.extend(self.objects[name].project(selected))
+        return (*closing, *self.objects["platform"].project(selected))
 
     def instance_declarations(self, item, result):
         """Device recipes own their endpoint state and public faces."""
@@ -206,4 +214,4 @@ class PlatformBindings:
             self.retain_on_failed_resume)
             for index, ordinal in enumerate(initialization_indices)
             for item in (result.controllers[ordinal],)
-            if any(rule.matches(item, result.part) for rule in self.roles["power"]))
+            if any(rule.matches(item, result.part) for rule in self.roles.get("power", ())))
