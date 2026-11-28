@@ -61,7 +61,10 @@ IRQ enum／number／handler。型号、封装、Flash、SRAM 域和 IRQ 表不�
 代替，厂商编译目录不扩大运行时模式支持。
 
 当前生产 SoC 包位于 `soc/stm32/stm32f4/` 和 `soc/stm32/stm32f1/`。
-领域 binding、实例布局与实现相邻。系列内部共享 IP 留在所属包内。
+领域 binding、实例布局与实现相邻。系列内部共享实现留在所属包内。跨系列只复用
+经核验的 IP 机制。`soc/stm32/common/` 当前包含 bxCAN 过滤和控制器引擎、
+DWC OTG Device／Host 传输和 DWMAC MAC 机制。各系列仍负责精确路由、时钟、
+IRQ 绑定和生命周期装配。
 Board／SoC 不放 Python 插件；声明式 package 由 `tools/configure/` 的通用
 DataProvider、领域政策、typed IR 与有限静态节点解析，不再加载家族 Python
 构造模块。顶层 `pads` 统一显式坐标；字段与同一快照合同见

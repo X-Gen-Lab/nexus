@@ -35,6 +35,14 @@ extern "C" {
      ((phase) ? NX_STM32F1_UART_SYNC_CPHA : 0U) |                              \
      ((last) ? NX_STM32F1_UART_SYNC_LBCL : 0U))
 
+/** \brief Pack Smartcard guard clocks and automatic parity NACK. */
+#define NX_STM32F1_UART_CARD_NACK (UINT16_C(1))
+#define NX_STM32F1_UART_CARD_OPTIONS(guard, nack)                              \
+    (((guard) << 1U) | ((nack) ? NX_STM32F1_UART_CARD_NACK : 0U))
+
+/** \brief Plain byte IRQ when another instance selects a wire protocol. */
+#define NX_STM32F1_UART_WIRE_NONE UINT8_MAX
+
 /** \brief Generated route, framing, clock and selected RX storage. */
 typedef struct {
     USART_TypeDef* registers;
@@ -51,7 +59,7 @@ typedef struct {
     uint8_t priority;
     uint8_t frame;
     uint8_t wire;
-    uint8_t wire_options;
+    uint16_t wire_options;
 } nx_stm32f1_uart_config_t;
 
 /** \brief Retained cold receipts and one IRQ TX / RX stream per instance. */

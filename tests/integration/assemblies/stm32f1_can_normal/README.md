@@ -24,3 +24,20 @@ RS 由板端电阻外拉至 3.3 V 并在固件运行前保持发送禁用。固�
 及 [TI SLOS346O §§8.10、10.4](https://www.ti.com/lit/ds/symlink/sn65hvd230.pdf)。
 当前软件证据为装配、ARM 链接与模型，载板实物、时钟、终端及外部总线行为
 待实板验证。
+
+## CANopenNode 装配
+
+`rb-canopen.toml` 选择 `canopen` 组件。产品代码用强类型 factory 取得同一个
+CAN1 owner，显式提供时钟、两个 OD 对象、四个 TX slot 和对齐的静态 arena。
+协议层使用组织锁定的 CANopenNode 301 实现。普通 `rb.toml` 只编译原有 CAN
+消费者。源码 SDK 可选 `--package stm32f1 --backend baremetal --component canopen`，
+然后用导出的 `rb-canopen.toml` 构建。
+
+参考节点 ID 为 10，heartbeat peer 为 11。F103RB 的硬件滤波把总线帧送到
+FIFO0，软件只消费标准 DATA 的 NMT `0x000`、peer heartbeat `0x70b`、
+SDO `0x60a` 和 RPDO `0x20a`。对外发送 Boot-up／heartbeat `0x70a`、
+SDO 响应 `0x58a` 与 TPDO `0x18a`。本参考最多观察 250 ms。进入
+Operational 后复制一次暂存值作为 TPDO 测试回显，应用对象不驱动设备。
+
+先停 CANopen，确认接受的 CAN 请求已撤回，再停 Platform。失败时保留静态
+对象及控制器所有权供独立恢复流程使用。参考未执行物理互通。

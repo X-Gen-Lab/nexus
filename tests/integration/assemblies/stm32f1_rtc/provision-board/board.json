@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "id": "stm32f103rb-rtc-provision-software",
+  "soc": "STM32F103RBT6",
+  "soc_family": "stm32f1",
+  "source_revision": "Documentary F103RBT6 PC14/PC15 LSE32768 software reference with blank backup domain",
+  "physical_pcb_revision": null,
+  "clocks": {
+    "lse_hz": 32768
+  },
+  "bindings": [
+    {
+      "id": "rtc0",
+      "controller": "RTC",
+      "route": "rtc-lse-crystal-provision"
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14",
+    "PA15",
+    "PB3",
+    "PB4",
+    "PD0",
+    "PD1"
+  ],
+  "unknowns": [
+    "Crystal, PCB revision, backup rail, cold startup margin and VBAT retention have not been measured."
+  ],
+  "provenance": [
+    {
+      "scope": "RTCSEL sticky backup ownership and RTC_DIV/PRL behavior.",
+      "url": "https://www.st.com/resource/en/reference_manual/rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32-bit-mcus-stmicroelectronics.pdf",
+      "file": "rm0008.pdf",
+      "sha256": "4c1b8ac2729cc1f45a4685eea9e91e6139e24e58804fba21e27201dfcc2ad149",
+      "pages": [
+        118,
+        485,
+        489,
+        490
+      ]
+    },
+    {
+      "scope": "LSE oscillator characteristics, board loading and startup conditions.",
+      "url": "https://www.st.com/resource/en/datasheet/stm32f103rb.pdf",
+      "file": "stm32f103rb.pdf",
+      "sha256": "1e54ce18e6c34c5b4a78986f26e245e143748c721009fc9af5953795c30686bc",
+      "pages": [
+        53
+      ]
+    },
+    {
+      "scope": "LSE first-start limitations and board constraints.",
+      "url": "https://www.st.com/resource/en/errata_sheet/es096-stm32f101x8b-stm32f102x8b-and-stm32f103x8b-mediumdensity-device-limitations-stmicroelectronics.pdf",
+      "file": "es096.pdf",
+      "sha256": "7bcdf58d8b602292d68abb59e181a4f44a038f215d8b01b0167f6d7139285490",
+      "pages": [
+        8,
+        9
+      ]
+    }
+  ],
+  "backend_support": [
+    "baremetal"
+  ]
+}

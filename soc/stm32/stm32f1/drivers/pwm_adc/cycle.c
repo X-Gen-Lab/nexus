@@ -31,7 +31,17 @@
 #define TIMER_DONE (TIM_SR_UIF | TIM_SR_CC4IF)
 #define ADC_DONE   (ADC_SR_JSTRT | ADC_SR_JEOC)
 
-enum { WINDOW_WAITING, WINDOW_CAPTURED, WINDOW_FAULT };
+#if defined(NX_STM32F1_CYCLE_THREE_LEGS)
+enum { CYCLE_LEGS = 3U };
+#else
+enum { CYCLE_LEGS = 1U };
+#endif
+
+enum {
+    SAMPLE_MAX = 0x0fffU,
+    CAPTURE_FAULT = UINT16_MAX - 1U,
+    CAPTURE_PENDING = UINT16_MAX,
+};
 
 enum { ADC_GATE = 1U, ADC_CONFIG = 2U, UPDATE_PRIORITY = 4U, LIVE = 8U };
 
@@ -141,9 +151,9 @@ static bool writable(const void* p, size_t bytes) {
 }
 
 static bool readable_duty(const uint32_t* duty) {
-    return writable(duty, sizeof(*duty)) ||
-           in_region(duty, sizeof(*duty), FLASH_BASE,
-                     FLASH_BASE + UINT32_C(131072));
+    const size_t bytes = CYCLE_LEGS * sizeof(*duty);
+    return writable(duty, bytes) ||
+           in_region(duty, bytes, FLASH_BASE, FLASH_BASE + UINT32_C(131072));
 }
 
 /** \brief Remove PWM drive and ADC trigger before releasing any request. */
@@ -179,11 +189,6 @@ static bool drain(nx_stm32f1_cycle_t* state, bool complete) {
 static nx_result_t finish(nx_stm32f1_cycle_t* state) {
     nx_pwm_adc_request_t* r = state->request;
     bool complete = state->terminal == NX_SUCCESS;
-    const uint32_t raw = complete && adc_ready() ? ADC1->JDR1 : 0U;
-    if (complete && raw > 0x0fffU) {
-        complete = false;
-        state->terminal = NX_ERROR_IO;
-    }
     const bool quiet = drain(state, complete);
     if (!quiet) {
         state->terminal = NX_ERROR_IO;
@@ -197,7 +202,7 @@ static nx_result_t finish(nx_stm32f1_cycle_t* state) {
     }
     state->fault = state->fault || !complete;
     if (complete)
-        *r->samples = (uint16_t)raw;
+        *r->samples = state->capture;
     const nx_result_t result = state->terminal;
     state->request = NULL;
     nx_request_settle(&r->base, result, complete ? 1U : 0U);
@@ -214,25 +219,28 @@ static nx_result_t submit(void* context, nx_pwm_adc_request_t* r) {
         return NX_ERROR_BUSY;
     if (!writable(r, sizeof(*r)) ||
         !independent(state, r, sizeof(*r), _Alignof(nx_pwm_adc_request_t)) ||
-        r->sample_count != 1U || r->frame.channel_count != 1U ||
+        r->sample_count != 1U || r->frame.channel_count != CYCLE_LEGS ||
         r->frame.trigger_ticks != state->config->phase ||
         !writable(r->samples, sizeof(*r->samples)) ||
         !readable_duty(r->frame.duty_ticks) ||
         !independent(state, r->samples, sizeof(*r->samples),
                      _Alignof(uint16_t)) ||
-        !independent(state, r->frame.duty_ticks, sizeof(uint32_t),
+        !independent(state, r->frame.duty_ticks, CYCLE_LEGS * sizeof(uint32_t),
                      _Alignof(uint32_t)) ||
         nx_io_dispatch_overlap(r, sizeof(*r), r->samples,
                                sizeof(*r->samples)) ||
         nx_io_dispatch_overlap(r, sizeof(*r), r->frame.duty_ticks,
-                               sizeof(uint32_t)) ||
+                               CYCLE_LEGS * sizeof(uint32_t)) ||
         nx_io_dispatch_overlap(r->samples, sizeof(*r->samples),
-                               r->frame.duty_ticks, sizeof(uint32_t)))
+                               r->frame.duty_ticks,
+                               CYCLE_LEGS * sizeof(uint32_t)))
         return NX_ERROR_INVALID;
     const uint32_t max =
         state->config->phase - state->config->pwm.deadtime_ticks;
-    if (*r->frame.duty_ticks >= max)
-        return NX_ERROR_INVALID;
+    for (size_t leg = 0U; leg < CYCLE_LEGS; ++leg) {
+        if (r->frame.duty_ticks[leg] >= max)
+            return NX_ERROR_INVALID;
+    }
     if (!nx_stm32f1_system_live() || !adc_ready() || ADC1->CR2 != ADC_IDLE ||
         !converter_configured(state) || !vector_idle(UPDATE) ||
         !vector_idle(ADC1_2_IRQn) || !vector_idle(TIM1_CC_IRQn))
@@ -245,14 +253,14 @@ static nx_result_t submit(void* context, nx_pwm_adc_request_t* r) {
         return result;
     state->request = r;
     state->terminal = NX_ERROR_BUSY;
-    state->completed = WINDOW_WAITING;
+    state->capture = CAPTURE_PENDING;
     WRITE_REG(ADC1->SR, 0U);
     WRITE_REG(ADC1->CR2, ADC_ARMED);
     NX_F1_CYCLE_IRQ(EnableIRQ, UPDATE);
     nx_arch_dsb();
     if (ADC1->SR != 0U || ADC1->CR2 != ADC_ARMED ||
         NX_F1_CYCLE_IRQ(GetEnableIRQ, UPDATE) == 0U ||
-        nx_stm32f1_advanced_pwm_one_pulse(&state->pwm, *r->frame.duty_ticks,
+        nx_stm32f1_advanced_pwm_one_pulse(&state->pwm, r->frame.duty_ticks,
                                           state->config->phase) != NX_SUCCESS ||
         (TIM1->CR1 & TIM_CR1_CEN) == 0U || TIM1->CNT >= state->config->phase) {
         state->terminal = NX_ERROR_IO;
@@ -269,6 +277,7 @@ static nx_result_t service(void* context) {
         return NX_SUCCESS;
     if (state->terminal == NX_ERROR_BUSY) {
         const uint32_t timer_flags = TIM1->SR;
+        const uint16_t capture = state->capture;
         if (!nx_stm32f1_system_live() || !adc_ready() ||
             ADC1->CR2 != ADC_ARMED || state->pwm.fault ||
             (timer_flags & TIM_SR_BIF) != 0U)
@@ -276,11 +285,10 @@ static nx_result_t service(void* context) {
         else if (nx_deadline_expired(state->request->base.deadline,
                                      nx_time_now_us()))
             state->terminal = NX_ERROR_TIMEOUT;
-        else if (state->completed == WINDOW_WAITING)
+        else if (capture == CAPTURE_PENDING)
             return NX_ERROR_BUSY;
         else
-            state->terminal =
-                state->completed == WINDOW_CAPTURED ? NX_SUCCESS : NX_ERROR_IO;
+            state->terminal = capture <= SAMPLE_MAX ? NX_SUCCESS : NX_ERROR_IO;
     }
     return finish(state);
 }
@@ -360,7 +368,7 @@ static nx_result_t status(const void* context, nx_pwm_adc_state_t* out) {
          nx_io_dispatch_overlap(out, sizeof(*out), r->samples,
                                 sizeof(*r->samples)) ||
          nx_io_dispatch_overlap(out, sizeof(*out), r->frame.duty_ticks,
-                                sizeof(uint32_t))))
+                                CYCLE_LEGS * sizeof(uint32_t))))
         return NX_ERROR_INVALID;
     *out = (nx_pwm_adc_state_t){
         .format = {.sample_stride = 2U,
@@ -378,7 +386,7 @@ static nx_result_t status(const void* context, nx_pwm_adc_state_t* out) {
         .trigger_ticks = state->config->phase,
         .deadtime_ticks = state->config->pwm.deadtime_ticks,
         .deadtime_hz = state->config->pwm.tick_hz,
-        .pwm_channels = 1U,
+        .pwm_channels = CYCLE_LEGS,
         .max_samples = 1U,
         .running = (TIM1->CR1 & TIM_CR1_CEN) != 0U,
         .fault = state->fault || state->pwm.fault,
@@ -399,15 +407,18 @@ void nx_stm32f1_cycle_update_irq(nx_stm32f1_cycle_t* state) {
         NX_STM32F1_WRITE(&TIM1->BDTR, TIM1->BDTR & ~(uint32_t)TIM_BDTR_MOE);
         NX_STM32F1_WRITE(&TIM1->DIER, TIM1->DIER & ~(uint32_t)TIM_DIER_UIE);
         nx_arch_dsb();
-        /* Snapshot only once; a later JEOC must not repair a short window. */
-        const bool complete = (TIM1->CR1 & TIM_CR1_CEN) == 0U &&
-                              (TIM1->SR & TIMER_DONE) == TIMER_DONE &&
-                              adc_ready() &&
-                              (ADC1->SR & ADC_DONE) == ADC_DONE &&
-                              (TIM1->BDTR & TIM_BDTR_MOE) == 0U &&
-                              (TIM1->DIER & TIM_DIER_UIE) == 0U;
-        if (state->completed == WINDOW_WAITING)
-            state->completed = complete ? WINDOW_CAPTURED : WINDOW_FAULT;
+        if (state->capture == CAPTURE_PENDING) {
+            const bool complete = (TIM1->CR1 & TIM_CR1_CEN) == 0U &&
+                                  (TIM1->SR & TIMER_DONE) == TIMER_DONE &&
+                                  adc_ready() && ADC1->CR2 == ADC_ARMED &&
+                                  (ADC1->SR & ADC_DONE) == ADC_DONE &&
+                                  (TIM1->BDTR & TIM_BDTR_MOE) == 0U &&
+                                  (TIM1->DIER & TIM_DIER_UIE) == 0U;
+            /* One aligned store joins the result with the update observation.
+             */
+            const uint32_t raw = complete ? ADC1->JDR1 : CAPTURE_FAULT;
+            state->capture = raw <= SAMPLE_MAX ? (uint16_t)raw : CAPTURE_FAULT;
+        }
     }
 }
 

@@ -7,6 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "drivers/adc/instance.h"
+#include "drivers/adc/internal.h"
 #include "drivers/adc/trigger_dma.h"
 #include "nexus/arch/arch.h"
 #include <gtest/gtest.h>
@@ -22,6 +23,8 @@ DMA_Channel_TypeDef f103_adc_model_lane{};
 static struct {
     nx_time_us_t now;
     nx_time_us_t powered_at;
+    nx_time_us_t thermal_at;
+    unsigned thermal_enables;
     nx_time_us_t reset_until;
     nx_time_us_t cal_until;
     nx_time_us_t conversion_until;
@@ -36,11 +39,16 @@ static struct {
     bool hold_cal;
     bool hold_conversion;
     bool hold_power_down;
+    bool hold_sensor_on;
+    bool block_vref;
     bool hold_eoc;
     bool hold_dma_disable;
     bool transfer_error;
+    bool partial_frame;
+    bool late_transfer_error;
     bool finish_while_starting;
     unsigned triggers;
+    uint32_t dma_ranks;
     nx_time_us_t transfer_at;
     volatile uint16_t* stage;
     TIM_TypeDef* trigger_timer;
@@ -48,6 +56,20 @@ static struct {
     bool adc_completes_first;
     nx_time_us_t timer_done_at;
 } bus;
+
+static void transfer_frame() {
+    bus.stage[0] = static_cast<uint16_t>(0x800U + bus.triggers);
+    if (bus.dma_ranks == 2U) {
+        DMA1->ISR |= DMA_ISR_HTIF1;
+        if (bus.partial_frame) {
+            DMA1_Channel1->CNDTR = 1U;
+            return;
+        }
+        bus.stage[1] = static_cast<uint16_t>(0x900U + bus.triggers);
+    }
+    DMA1_Channel1->CNDTR = 0U;
+    DMA1->ISR |= DMA_ISR_TCIF1;
+}
 
 extern "C" uint32_t f103_adc_model_read(const volatile uint32_t* reg) {
     if (reg == &ADC1->DR) {
@@ -63,6 +85,13 @@ extern "C" void f103_adc_model_write(volatile uint32_t* reg, uint32_t value) {
     ++bus.writes;
     if (reg == &ADC1->CR2) {
         const uint32_t old = ADC1->CR2;
+        if ((old & ADC_CR2_TSVREFE) != 0U && (value & ADC_CR2_TSVREFE) == 0U &&
+            bus.hold_sensor_on)
+            return;
+        if ((old & ADC_CR2_TSVREFE) == 0U && (value & ADC_CR2_TSVREFE) != 0U) {
+            bus.thermal_at = bus.now;
+            ++bus.thermal_enables;
+        }
         if ((old & ADC_CR2_ADON) != 0U && (value & ADC_CR2_ADON) == 0U &&
             bus.hold_power_down) {
             return;
@@ -93,6 +122,12 @@ extern "C" void f103_adc_model_write(volatile uint32_t* reg, uint32_t value) {
             EXPECT_EQ(0U, value & (ADC_CR2_CONT | ADC_CR2_JEXTTRIG |
                                    ADC_CR2_JSWSTART | ADC_CR2_DMA));
             EXPECT_EQ(0U, ADC1->SR & ADC_SR_EOC);
+            if ((old & ADC_CR2_TSVREFE) != 0U) {
+                EXPECT_GE(bus.now - bus.thermal_at, 12U);
+                EXPECT_TRUE(ADC1->SQR3 == 16U || ADC1->SQR3 == 17U);
+                EXPECT_EQ(0U, ADC1->CR1);
+                EXPECT_EQ(0U, ADC1->SQR1);
+            }
             ++bus.starts;
             bus.conversion_until = bus.now + 10U;
         } else if (value == old && (value & ADC_CR2_ADON) != 0U) {
@@ -120,8 +155,11 @@ extern "C" void f103_adc_model_write(volatile uint32_t* reg, uint32_t value) {
         DMA1->ISR &= ~value;
         return;
     } else if (reg == &DMA1_Channel1->CCR && (*reg & DMA_CCR_EN) != 0U &&
-               (value & DMA_CCR_EN) == 0U && bus.hold_dma_disable) {
-        return;
+               (value & DMA_CCR_EN) == 0U) {
+        if (bus.hold_dma_disable)
+            return;
+        if (bus.late_transfer_error)
+            DMA1->ISR |= DMA_ISR_TEIF1;
     } else if ((reg == &TIM3->CR1 || reg == &TIM1->CR1) &&
                (value & TIM_CR1_CEN) != 0U) {
         TIM_TypeDef* timer = reg == &TIM1->CR1 ? TIM1 : TIM3;
@@ -136,7 +174,11 @@ extern "C" void f103_adc_model_write(volatile uint32_t* reg, uint32_t value) {
             EXPECT_EQ(0U, timer->BDTR);
         }
         EXPECT_NE(0U, DMA1_Channel1->CCR & DMA_CCR_EN);
-        EXPECT_EQ(1U, DMA1_Channel1->CNDTR);
+        EXPECT_EQ(bus.dma_ranks, DMA1_Channel1->CNDTR);
+        EXPECT_EQ(bus.dma_ranks == 2U,
+                  (DMA1_Channel1->CCR & DMA_CCR_MINC) != 0U);
+        EXPECT_EQ(DMA_CCR_PSIZE_0 | DMA_CCR_MSIZE_0,
+                  DMA1_Channel1->CCR & (DMA_CCR_PSIZE | DMA_CCR_MSIZE));
         EXPECT_EQ(static_cast<uint32_t>(reinterpret_cast<uintptr_t>(bus.stage)),
                   DMA1_Channel1->CMAR);
         EXPECT_EQ(static_cast<uint32_t>(reinterpret_cast<uintptr_t>(&ADC1->DR)),
@@ -151,9 +193,7 @@ extern "C" void f103_adc_model_write(volatile uint32_t* reg, uint32_t value) {
             timer->CR1 = value & ~static_cast<uint32_t>(TIM_CR1_CEN);
             timer->SR = TIM_SR_UIF |
                         (tim1 && !bus.skip_compare_flag ? TIM_SR_CC1IF : 0U);
-            DMA1_Channel1->CNDTR = 0U;
-            DMA1->ISR |= DMA_ISR_TCIF1;
-            *bus.stage = static_cast<uint16_t>(0x800U + bus.triggers);
+            transfer_frame();
             bus.transfer_at = 0U;
             return;
         }
@@ -186,7 +226,15 @@ extern "C" nx_time_us_t nx_time_now_us(void) {
     if (!bus.hold_conversion && bus.conversion_until != 0U &&
         bus.now >= bus.conversion_until) {
         ADC1->SR |= ADC_SR_EOC;
-        ADC1->DR = 0x8a0U + bus.starts;
+        if ((ADC1->CR2 & ADC_CR2_TSVREFE) != 0U) {
+            if (ADC1->SQR3 == 17U && bus.block_vref) {
+                ADC1->SR &= ~static_cast<uint32_t>(ADC_SR_EOC);
+            } else {
+                ADC1->DR = (ADC1->SQR3 == 16U ? 0x500U : 0x600U) + bus.starts;
+            }
+        } else {
+            ADC1->DR = 0x8a0U + bus.starts;
+        }
         bus.conversion_until = 0U;
     }
     if (!bus.hold_conversion && bus.transfer_at != 0U &&
@@ -197,9 +245,7 @@ extern "C" nx_time_us_t nx_time_now_us(void) {
         if (bus.transfer_error) {
             DMA1->ISR |= DMA_ISR_TEIF1;
         } else {
-            *bus.stage = static_cast<uint16_t>(0x800U + bus.triggers);
-            DMA1_Channel1->CNDTR = 0U;
-            DMA1->ISR |= DMA_ISR_TCIF1;
+            transfer_frame();
         }
     }
     if (bus.timer_done_at != 0U && bus.now >= bus.timer_done_at) {
@@ -233,8 +279,10 @@ extern "C" void nx_arch_dsb(void) {
 
 class F103Adc : public testing::Test {
   protected:
+#if !defined(NX_STM32F1_ADC_SCAN_DMA)
     nx_stm32f1_adc_t state{};
     const nx_adc_port_t port{&nx_stm32f1_adc_ops, &state};
+#endif
 
     void SetUp() override {
         bus = {};
@@ -251,11 +299,14 @@ class F103Adc : public testing::Test {
         ADC1->SR = 0U;
     }
 
+#if !defined(NX_STM32F1_ADC_SCAN_DMA)
     nx_result_t prepare(uint32_t code = 5U) {
         return nx_stm32f1_adc_prepare(&state, 8000000U, 3300U, code);
     }
+#endif
 };
 
+#if !defined(NX_STM32F1_ADC_SCAN_DMA)
 TEST_F(F103Adc, CalibratesOnceThenReportsRegularRawSamplesAndExactTiming) {
     ASSERT_EQ(NX_SUCCESS, prepare());
     EXPECT_EQ(1U, bus.calibrations);
@@ -396,6 +447,7 @@ class F103AdcTrigger : public F103Adc {
         memory = {reinterpret_cast<uintptr_t>(&triggered.sample), 2U,
                   NX_DMA_MEMORY_WRITE};
         bus.stage = &triggered.sample;
+        bus.dma_ranks = 1U;
     }
 
     nx_result_t prepare_trigger(bool tim1 = false) {
@@ -533,3 +585,224 @@ TEST_F(F103AdcTrigger, Tim1FastDmaResultStillWaitsForTimerUpdate) {
     EXPECT_NE(0U, TIM1->SR & TIM_SR_UIF);
     EXPECT_EQ(0U, TIM1->CR1 & TIM_CR1_CEN);
 }
+
+#else
+class F103AdcScan : public F103Adc {
+  protected:
+    nx_stm32f1_adc_scan_dma_t scan{};
+    const nx_adc_port_t face{&nx_stm32f1_adc_scan_dma_ops, &scan};
+    nx_dma_memory_region_t memory{};
+
+    void SetUp() override {
+        F103Adc::SetUp();
+        RCC->AHBENR = RCC->APB1ENR = RCC->APB1RSTR = 0U;
+        *TIM3 = {};
+        TIM3->ARR = UINT16_MAX;
+        *DMA1 = {};
+        *DMA1_Channel1 = {};
+        memory = {reinterpret_cast<uintptr_t>(&scan.sample[0]),
+                  sizeof(scan.sample), NX_DMA_MEMORY_WRITE};
+        bus.stage = scan.sample;
+        bus.dma_ranks = 2U;
+    }
+
+    nx_result_t prepare_scan() {
+        return nx_stm32f1_adc_scan_dma_prepare(&scan, 8000000U, 3300U, 5U, 3U,
+                                               &memory, 1U);
+    }
+
+    void TearDown() override {
+        bus.hold_dma_disable = false;
+        EXPECT_EQ(NX_SUCCESS, nx_stm32f1_adc_scan_dma_close(&scan));
+    }
+};
+
+TEST_F(F103AdcScan, ProgramsTwoRanksAndPublishesEachFullFreshFrame) {
+    ASSERT_EQ(NX_SUCCESS, prepare_scan());
+    EXPECT_EQ(ADC_CR1_SCAN, ADC1->CR1);
+    EXPECT_EQ(ADC_SQR1_L_0, ADC1->SQR1);
+    EXPECT_EQ(1U << ADC_SQR3_SQ2_Pos, ADC1->SQR3);
+    EXPECT_EQ(5U | (3U << ADC_SMPR2_SMP1_Pos), ADC1->SMPR2);
+    EXPECT_EQ(0U, GPIOA->CRL & 0xffU);
+    nx_adc_sequence_info_t timing;
+    ASSERT_EQ(NX_SUCCESS, nx_adc_port_sequence_info(&face, &timing));
+    EXPECT_EQ(2U, timing.channel_count);
+    EXPECT_EQ(109U, timing.scan_ticks);
+    EXPECT_EQ(4000000U, timing.ticks_per_second);
+    nx_adc_info_t info;
+    ASSERT_EQ(NX_SUCCESS, nx_adc_port_info(&face, &info));
+    EXPECT_EQ(2U, info.channel_count);
+    unsigned delivered = 0U;
+    for (; delivered < 2U; ++delivered) {
+        uint16_t values[2] = {};
+        size_t count = 0U;
+        ASSERT_EQ(NX_SUCCESS, nx_adc_port_sample(&face, values, 2U,
+                                                 bus.now + 100U, &count));
+        EXPECT_EQ(2U, count);
+        EXPECT_EQ(0x801U + delivered, values[0]);
+        EXPECT_EQ(0x901U + delivered, values[1]);
+        EXPECT_EQ(0U, DMA1_Channel1->CMAR);
+    }
+    EXPECT_EQ(2U, bus.triggers);
+    EXPECT_EQ(1U, bus.calibrations);
+    EXPECT_EQ(0U, bus.samples_read);
+}
+
+TEST_F(F103AdcScan, PartialFrameRetainsDmaWithoutPublishingEitherSample) {
+    ASSERT_EQ(NX_SUCCESS, prepare_scan());
+    bus.partial_frame = true;
+    bus.hold_dma_disable = true;
+    uint16_t values[2] = {11U, 22U};
+    size_t count = 42U;
+    EXPECT_EQ(NX_ERROR_IO,
+              nx_adc_port_sample(&face, values, 2U, bus.now + 60U, &count));
+    EXPECT_EQ(0U, count);
+    EXPECT_EQ(11U, values[0]);
+    EXPECT_EQ(22U, values[1]);
+    EXPECT_EQ(1U, DMA1_Channel1->CNDTR);
+    EXPECT_NE(0U, DMA1_Channel1->CMAR);
+    EXPECT_EQ(0U, ADC1->CR2);
+    EXPECT_EQ(NX_ERROR_IO, nx_stm32f1_adc_scan_dma_close(&scan));
+    bus.hold_dma_disable = false;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32f1_adc_scan_dma_close(&scan));
+    EXPECT_EQ(0U, DMA1_Channel1->CMAR);
+}
+
+TEST_F(F103AdcScan, LateDmaErrorSuppressesACompleteFrame) {
+    ASSERT_EQ(NX_SUCCESS, prepare_scan());
+    bus.late_transfer_error = true;
+    uint16_t values[2] = {13U, 23U};
+    size_t count = 1U;
+    EXPECT_EQ(NX_ERROR_IO,
+              nx_adc_port_sample(&face, values, 2U, bus.now + 100U, &count));
+    EXPECT_EQ(0U, count);
+    EXPECT_EQ(13U, values[0]);
+    EXPECT_EQ(23U, values[1]);
+    EXPECT_EQ(0U, DMA1_Channel1->CMAR);
+}
+
+TEST_F(F103AdcScan, RequiresBothStaticHalfwordsAndFullCallerCapacity) {
+    memory.size = sizeof(uint16_t);
+    EXPECT_EQ(NX_ERROR_PERMISSION, prepare_scan());
+    EXPECT_EQ(0U, bus.writes);
+    memory.size = sizeof(scan.sample);
+    ASSERT_EQ(NX_SUCCESS, prepare_scan());
+    uint16_t value = 12U;
+    size_t count = 0U;
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_adc_port_sample(&face, &value, 1U, bus.now + 100U, &count));
+    EXPECT_EQ(0U, bus.triggers);
+    EXPECT_EQ(12U, value);
+}
+#endif
+
+namespace {
+class F103InternalAdc : public testing::Test {
+  protected:
+    nx_stm32f1_adc_internal_t owner{};
+    const nx_adc_port_t port{&nx_stm32f1_adc_internal_ops, &owner};
+
+    void SetUp() override {
+        bus = {};
+        bus.live = bus.irq_idle = true;
+        f103_adc_model_adc = {};
+        f103_adc_model_rcc = {};
+        RCC->CR = RCC_CR_HSION | RCC_CR_HSIRDY | (16U << RCC_CR_HSITRIM_Pos);
+        GPIOA->CRL = 0x44444444U;
+    }
+
+    void TearDown() override {
+        bus.hold_sensor_on = false;
+        EXPECT_EQ(NX_SUCCESS, nx_stm32f1_adc_internal_close(&owner));
+    }
+
+    nx_result_t prepare() {
+        return nx_stm32f1_adc_internal_prepare(&owner, 8000000U, 3300U);
+    }
+};
+
+TEST_F(F103InternalAdc,
+       KeepsSensorOffBetweenRequestsAndPublishesOrderedRawPair) {
+    ASSERT_EQ(NX_SUCCESS, prepare());
+    EXPECT_EQ(1U, bus.calibrations);
+    EXPECT_EQ(0U, bus.thermal_enables);
+    EXPECT_EQ(0U, RCC->APB2ENR & RCC_APB2ENR_IOPAEN);
+    nx_adc_info_t info{};
+    nx_adc_sequence_info_t clocks{};
+    ASSERT_EQ(NX_SUCCESS, nx_adc_port_info(&port, &info));
+    ASSERT_EQ(NX_SUCCESS, nx_adc_port_sequence_info(&port, &clocks));
+    EXPECT_EQ(12U, info.resolution_bits);
+    EXPECT_EQ(2U, info.channel_count);
+    EXPECT_EQ(168U, clocks.scan_ticks);
+    EXPECT_EQ(4000000U, clocks.ticks_per_second);
+    for (unsigned sequence : {1U, 3U}) {
+        uint16_t sample[] = {22U, 33U, 44U};
+        size_t count = 9U;
+        ASSERT_EQ(NX_SUCCESS, nx_adc_port_sample(&port, sample, 3U,
+                                                 bus.now + 100U, &count));
+        EXPECT_EQ(2U, count);
+        EXPECT_EQ(0x500U + sequence, sample[0]);
+        EXPECT_EQ(0x601U + sequence, sample[1]);
+        EXPECT_EQ(44U, sample[2]);
+        EXPECT_EQ(0U, ADC1->CR2 & (ADC_CR2_TSVREFE | ADC_CR2_EXTTRIG));
+    }
+    EXPECT_EQ(2U, bus.thermal_enables);
+    EXPECT_EQ(4U, bus.samples_read);
+    EXPECT_EQ(0x44444444U, GPIOA->CRL);
+}
+
+TEST_F(F103InternalAdc, InheritedSensorBitIsNotResetOrCleared) {
+    ADC1->CR2 = ADC_CR2_TSVREFE;
+    EXPECT_EQ(NX_ERROR_BUSY, prepare());
+    EXPECT_EQ(0U, bus.resets);
+    EXPECT_EQ(NX_SUCCESS, nx_stm32f1_adc_internal_close(&owner));
+    EXPECT_EQ(ADC_CR2_TSVREFE, ADC1->CR2);
+    EXPECT_EQ(0U, RCC->APB2ENR);
+}
+
+TEST_F(F103InternalAdc,
+       RejectsClockDividerFactoryTrimAndForeignIrqBeforeWrites) {
+    const uint32_t factory = RCC->CR;
+    RCC->CFGR = RCC_CFGR_ADCPRE_DIV4;
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED, prepare());
+    RCC->CFGR = 0U;
+    RCC->CR = factory & ~static_cast<uint32_t>(RCC_CR_HSITRIM);
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED, prepare());
+    RCC->CR = factory;
+    bus.irq_idle = false;
+    EXPECT_EQ(NX_ERROR_BUSY, prepare());
+    EXPECT_EQ(0U, bus.writes);
+}
+
+TEST_F(F103InternalAdc, SecondRankTimeoutNeverPublishesTheFirstRank) {
+    ASSERT_EQ(NX_SUCCESS, prepare());
+    bus.block_vref = true;
+    uint16_t samples[] = {11U, 22U};
+    size_t count{};
+    EXPECT_EQ(NX_ERROR_TIMEOUT,
+              nx_adc_port_sample(&port, samples, 2U, bus.now + 70U, &count));
+    EXPECT_EQ(1U, bus.samples_read);
+    EXPECT_EQ(0U, count);
+    EXPECT_EQ(11U, samples[0]);
+    EXPECT_EQ(22U, samples[1]);
+    EXPECT_EQ(0U, ADC1->CR2);
+}
+
+TEST_F(F103InternalAdc, FailedSensorStopRetainsADC1AndSuppressesBothSamples) {
+    ASSERT_EQ(NX_SUCCESS, prepare());
+    bus.hold_sensor_on = true;
+    uint16_t samples[] = {11U, 22U};
+    size_t count{};
+    EXPECT_EQ(NX_ERROR_IO,
+              nx_adc_port_sample(&port, samples, 2U, bus.now + 100U, &count));
+    EXPECT_EQ(2U, bus.samples_read);
+    EXPECT_EQ(0U, count);
+    EXPECT_EQ(11U, samples[0]);
+    EXPECT_EQ(22U, samples[1]);
+    EXPECT_EQ(NX_ERROR_IO, nx_stm32f1_adc_internal_close(&owner));
+    EXPECT_NE(0U, RCC->APB2ENR & RCC_APB2ENR_ADC1EN);
+    bus.hold_sensor_on = false;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32f1_adc_internal_close(&owner));
+    EXPECT_EQ(0U, RCC->APB2ENR);
+}
+} /* namespace */

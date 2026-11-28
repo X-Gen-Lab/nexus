@@ -11,6 +11,10 @@
 #include "link.h"
 #include "pma_device.h"
 #include <array>
+#if defined(NX_TEST_PMA_ST_DEVICE)
+#include "st_bulk.h"
+#endif
+
 #include <gtest/gtest.h>
 
 namespace {
@@ -896,6 +900,65 @@ TEST_F(Stm32F103UsbDevice,
     EXPECT_EQ(observed[1].kind, NX_USB_EVENT_RESET);
 }
 
+TEST_F(Stm32F103UsbDevice, KeepsAdmissionClosedBetweenSe0AndReset) {
+    attach_device();
+    publish_setup(5U, 41U);
+    std::array<nx_usb_event_t, 2U> observed{};
+    size_t count = 0U;
+    ASSERT_EQ(nx_usb_device_read_events(&port, observed.data(), observed.size(),
+                                        &count),
+              NX_SUCCESS);
+
+    nx_usb_request_t packet{};
+    nx_request_initialize(&packet.base);
+    ASSERT_EQ(nx_usb_in_prepare(&packet, nullptr, 0U, NX_USB_STATUS, 1U,
+                                model_now + 50U),
+              NX_SUCCESS);
+    registers.ISTR = USB_ISTR_SUSP;
+    EXPECT_EQ(nx_usb_endpoint_submit(&in, &packet), NX_ERROR_STATE);
+    ASSERT_EQ(nx_usb_device_service(&port), NX_SUCCESS);
+    publish_bus(USB_ISTR_WKUP, 0U);
+    EXPECT_EQ(registers.CNTR & USB_CNTR_FSUSP, 0U);
+    nx_usb_device_state_t snapshot{};
+    ASSERT_EQ(nx_usb_device_state(&port, &snapshot), NX_SUCCESS);
+    EXPECT_TRUE(snapshot.suspended);
+    EXPECT_EQ(nx_usb_device_address(&port, 1U, 41U), NX_ERROR_STATE);
+    EXPECT_EQ(nx_usb_endpoint_submit(&in, &packet), NX_ERROR_STATE);
+    EXPECT_EQ(nx_usb_endpoint_stall(&out, true), NX_ERROR_STATE);
+    EXPECT_EQ(nx_request_state(&packet.base), NX_REQUEST_READY);
+
+    registers.EP0R = 0U;
+    registers.DADDR = 0U;
+    publish_bus(USB_ISTR_RESET, USB_FNR_RXDP);
+    ASSERT_EQ(nx_usb_device_state(&port, &snapshot), NX_SUCCESS);
+    EXPECT_FALSE(snapshot.suspended);
+    ASSERT_EQ(nx_usb_device_read_events(&port, observed.data(), observed.size(),
+                                        &count),
+              NX_SUCCESS);
+    ASSERT_EQ(count, 2U);
+    EXPECT_EQ(observed[0].kind, NX_USB_EVENT_SUSPEND);
+    EXPECT_EQ(observed[1].kind, NX_USB_EVENT_RESET);
+}
+
+TEST_F(Stm32F103UsbDevice, Se0WithoutResetReturnsToSuspendUntilNewWake) {
+    attach_device();
+    publish_bus(USB_ISTR_SUSP, USB_FNR_RXDP);
+    publish_bus(USB_ISTR_WKUP, 0U);
+    registers.FNR = USB_FNR_RXDM;
+    ASSERT_EQ(nx_usb_device_service(&port), NX_SUCCESS);
+    EXPECT_NE(registers.CNTR & USB_CNTR_FSUSP, 0U);
+    publish_bus(USB_ISTR_WKUP, USB_FNR_RXDM);
+    EXPECT_EQ(registers.CNTR & USB_CNTR_FSUSP, 0U);
+    std::array<nx_usb_event_t, 2U> observed{};
+    size_t count = 0U;
+    ASSERT_EQ(nx_usb_device_read_events(&port, observed.data(), observed.size(),
+                                        &count),
+              NX_SUCCESS);
+    ASSERT_EQ(count, 2U);
+    EXPECT_EQ(observed[0].kind, NX_USB_EVENT_SUSPEND);
+    EXPECT_EQ(observed[1].kind, NX_USB_EVENT_RESUME);
+}
+
 TEST_F(Stm32F103UsbDevice, StopJoinsActualNvicAndRetainsLoanWhileActive) {
     nvic.IPR[NX_STM32F1_USB_LP_IRQ] = 0xA0U;
     attach_device();
@@ -1178,5 +1241,136 @@ TEST_P(Stm32F103UsbEp1, ExpiredOutRetainsCallerMemoryUntilHardwareWithdraws) {
 
 INSTANTIATE_TEST_SUITE_P(SingleBuffered, Stm32F103UsbEp1,
                          ::testing::Values(USB_EP_BULK, USB_EP_INTERRUPT));
+#endif
+
+#if defined(NX_TEST_PMA_ST_DEVICE)
+class Stm32F103StUsbDevice : public Stm32F103UsbDevice {
+  protected:
+    nx_stm32f1_usb_pma_endpoint_face_t f1_in{&device, true, 1U};
+    nx_stm32f1_usb_pma_endpoint_face_t f1_out{&device, false, 1U};
+    nx_usb_endpoint_port_t bulk_in{&nx_stm32f1_usb_pma_endpoint_ops, &f1_in};
+    nx_usb_endpoint_port_t bulk_out{&nx_stm32f1_usb_pma_endpoint_ops, &f1_out};
+    nx_usb_activation_port_t activation{&nx_stm32f1_usb_pma_ep1_activation_ops,
+                                        &device};
+    const nx_usb_endpoint_profile_t endpoints[4]{
+        {&in, 64U, 0U, true, NX_USB_PROFILE_CONTROL},
+        {&out, 64U, 0U, false, NX_USB_PROFILE_CONTROL},
+        {&bulk_in, 64U, 1U, true, NX_USB_PROFILE_BULK},
+        {&bulk_out, 64U, 1U, false, NX_USB_PROFILE_BULK}};
+    const nx_usb_device_profile_t profile{&port,
+                                          endpoints,
+                                          4U,
+                                          48000000U,
+                                          0U,
+                                          0U,
+                                          8U,
+                                          NX_USB_PROFILE_DEVICE,
+                                          NX_USB_PROFILE_FULL_SPEED,
+                                          NX_USB_PROFILE_INTERNAL_FS,
+                                          NX_USB_PROFILE_PACKET_MEMORY,
+                                          {nullptr, nullptr}};
+
+    void SetUp() override {
+        Stm32F103UsbDevice::SetUp();
+        model_ep1 = &registers.EP1R;
+    }
+
+    void TearDown() override {
+        model_ep1 = nullptr;
+        Stm32F103UsbDevice::TearDown();
+    }
+
+    void setup_request(uint8_t type, uint8_t request, uint16_t value,
+                       uint16_t length) {
+        pma[128U] = static_cast<uint16_t>((request << 8U) | type);
+        pma[130U] = value;
+        pma[132U] = 0U;
+        pma[134U] = length;
+        pma[6U] = 0x8408U;
+        registers.EP0R = USB_EP_CONTROL | both_nak | setup_flags;
+        registers.ISTR = USB_ISTR_CTR;
+        ASSERT_EQ(nx_test_pma_st_step(), NX_SUCCESS);
+        /* ENUMERATED precedes the first SETUP. */
+        ASSERT_EQ(nx_test_pma_st_step(), NX_SUCCESS);
+    }
+
+    void acknowledged_ep0_in() {
+        registers.EP0R =
+            (registers.EP0R & static_cast<uint16_t>(~USB_EPTX_STAT)) |
+            USB_EP_TX_NAK | USB_EP_CTR_TX;
+        registers.ISTR = USB_ISTR_CTR;
+        ASSERT_EQ(nx_test_pma_st_step(), NX_SUCCESS);
+    }
+
+    void acknowledged_ep0_out() {
+        pma[6U] = 0x8400U;
+        registers.EP0R =
+            (registers.EP0R & static_cast<uint16_t>(~USB_EPRX_STAT)) |
+            USB_EP_RX_NAK | USB_EP_CTR_RX;
+        registers.ISTR = USB_ISTR_CTR;
+        ASSERT_EQ(nx_test_pma_st_step(), NX_SUCCESS);
+    }
+};
+
+TEST_F(Stm32F103StUsbDevice, RunsOfficialEnumerationVendorEchoAndReset) {
+    attach_device();
+    nx_usb_device_profile_t invalid = profile;
+    invalid.fifo_words = 320U;
+    EXPECT_EQ(nx_usb_profile_validate(&invalid), NX_ERROR_INVALID);
+    ASSERT_EQ(nx_test_pma_st_start(&profile, &activation), NX_SUCCESS);
+    setup_request(0U, 5U, 41U, 0U);
+    EXPECT_EQ(registers.DADDR & USB_DADDR_ADD, 0U);
+    acknowledged_ep0_in();
+    EXPECT_EQ(registers.DADDR & USB_DADDR_ADD, 41U);
+
+    setup_request(0x80U, 6U, 0x0200U, 32U);
+    EXPECT_EQ(pma[2U], 32U);
+    EXPECT_EQ(pma[64U], 0x0209U);
+    EXPECT_EQ(pma[70U], 0xC000U);
+    acknowledged_ep0_in();
+    EXPECT_EQ(registers.EP0R & USB_EPRX_STAT, USB_EP_RX_VALID);
+    EXPECT_EQ(registers.EP0R & USB_EPTX_STAT, USB_EP_TX_STALL);
+    acknowledged_ep0_out();
+    EXPECT_EQ(device.link.endpoint.phase, NX_STM32F1_EP0_IDLE);
+
+    setup_request(0U, 9U, 1U, 0U);
+    EXPECT_EQ(registers.EP1R & both_nak, both_nak);
+    nx_usb_request_t early{};
+    nx_request_initialize(&early.base);
+    ASSERT_EQ(nx_usb_in_prepare(&early, nullptr, 0U, NX_USB_DATA, 0U,
+                                model_now + 50U),
+              NX_SUCCESS);
+    EXPECT_EQ(nx_usb_endpoint_submit(&bulk_in, &early), NX_ERROR_STATE);
+    acknowledged_ep0_in();
+    EXPECT_EQ(registers.EP1R & USB_EPRX_STAT, USB_EP_RX_VALID);
+    pma[256U] = 0x0201U;
+    pma[258U] = 0x0003U;
+    pma[14U] = 0x8403U;
+    registers.EP1R = 1U | both_nak | USB_EP_CTR_RX;
+    registers.ISTR = USB_ISTR_CTR | 1U;
+    ASSERT_EQ(nx_test_pma_st_step(), NX_SUCCESS);
+    EXPECT_EQ(registers.EP1R & USB_EPTX_STAT, USB_EP_TX_VALID);
+    EXPECT_EQ(pma[10U], 3U);
+    EXPECT_EQ(pma[192U], 0x0201U);
+    EXPECT_EQ(pma[194U] & 0xffU, 3U);
+    registers.EP1R = 1U | both_nak | USB_EP_CTR_TX;
+    registers.ISTR = USB_ISTR_CTR | 1U;
+    ASSERT_EQ(nx_test_pma_st_step(), NX_SUCCESS);
+    EXPECT_EQ(registers.EP1R & USB_EPRX_STAT, USB_EP_RX_VALID);
+
+    registers.EP0R = 0U;
+    registers.EP1R = USB_EP_CTR_RX;
+    registers.DADDR = 0U;
+    registers.ISTR = USB_ISTR_RESET | USB_ISTR_CTR | 1U;
+    ASSERT_EQ(nx_test_pma_st_step(), NX_SUCCESS);
+    EXPECT_EQ(registers.EP1R & (ctr_mask | both_nak), 0);
+    EXPECT_EQ(nx_test_pma_st_stop(), NX_ERROR_BUSY);
+    ASSERT_NE(registers.CNTR & USB_CNTR_FRES, 0U);
+    /* Force reset disables both STAT fields in silicon. */
+    registers.EP0R = 0U;
+    ASSERT_EQ(nx_test_pma_st_stop(), NX_SUCCESS);
+    EXPECT_FALSE(board.pullup);
+    EXPECT_EQ(rcc.APB1ENR & RCC_APB1ENR_USBEN, 0U);
+}
 #endif
 } /* namespace */

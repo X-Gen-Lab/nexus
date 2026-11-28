@@ -35,7 +35,8 @@
                 "lin": false,
                 "asynchronous": false,
                 "irda": false,
-                "synchronous": false
+                "synchronous": false,
+                "smartcard": false
               }
             }
           },
@@ -53,7 +54,8 @@
                 "lin": true,
                 "asynchronous": true,
                 "irda": true,
-                "synchronous": true
+                "synchronous": true,
+                "smartcard": true
               }
             }
           },
@@ -157,7 +159,8 @@
                         }
                       },
                       "irda": "NX_UART_WIRE_IRDA",
-                      "synchronous": "NX_UART_WIRE_SYNCHRONOUS"
+                      "synchronous": "NX_UART_WIRE_SYNCHRONOUS",
+                      "smartcard": "NX_UART_WIRE_SMARTCARD"
                     }
                   }
                 ],
@@ -200,6 +203,17 @@
                           },
                           {
                             "source": "item.options.wire.last_bit_clock"
+                          }
+                        ]
+                      },
+                      "smartcard": {
+                        "macro": "NX_STM32F1_UART_CARD_OPTIONS",
+                        "args": [
+                          {
+                            "source": "item.options.wire.guard_time"
+                          },
+                          {
+                            "source": "item.options.wire.smartcard_nack"
                           }
                         ]
                       }

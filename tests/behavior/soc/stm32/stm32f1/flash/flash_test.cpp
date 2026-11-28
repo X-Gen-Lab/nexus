@@ -8,26 +8,25 @@
  */
 #include "drivers/flash/instance.h"
 #include "nexus/arch/arch.h"
+#include "stm32f1xx_hal_flash_ex.h"
 #include <algorithm>
 #include <array>
 #include <cstdint>
 #include <gtest/gtest.h>
 #include <new>
 
-#if defined(STM32F103xG)
-constexpr uint32_t page = 2048U;
-constexpr uint32_t bank_size = 512U * 1024U;
-constexpr uint32_t size = 2U * bank_size;
-#elif defined(STM32F103xE)
-constexpr uint32_t page = 2048U;
-constexpr uint32_t size = 512U * 1024U;
-constexpr uint32_t alternate_size = size;
+constexpr uint32_t page = FLASH_PAGE_SIZE;
+#if defined(FLASH_BANK2_END)
+constexpr uint32_t bank_size = FLASH_BANK1_END + 1U - FLASH_BASE;
+constexpr uint32_t size = FLASH_BANK2_END + 1U - FLASH_BASE;
+#elif defined(STM32F103xB)
+constexpr uint32_t size = 64U * 1024U;
+constexpr uint32_t alternate_size = FLASH_BANK1_END + 1U - FLASH_BASE;
 #else
-constexpr uint32_t page = 1024U;
-constexpr uint32_t size = 64U * page;
-constexpr uint32_t alternate_size = 128U * page;
+constexpr uint32_t size = FLASH_BANK1_END + 1U - FLASH_BASE;
+constexpr uint32_t alternate_size = size;
 #endif
-#if defined(STM32F103xG)
+#if defined(FLASH_BANK2_END)
 constexpr nx_flash_erase_span_t spans[]{{0U, page, bank_size / page},
                                         {bank_size, page, bank_size / page}};
 #else
@@ -41,6 +40,7 @@ constexpr nx_time_us_t future = 10000U;
 struct Model {
     FLASH_TypeDef flash{};
     alignas(2) std::array<uint8_t, size> memory{};
+    nx_flash_maintenance_snapshot_t snapshot{};
     uint32_t clock{};
     unsigned writes{};
     std::array<unsigned, std::size(spans)> bank_writes{};
@@ -76,7 +76,7 @@ struct Bank {
 };
 
 static Bank bank(unsigned index) {
-#if defined(STM32F103xG)
+#if defined(FLASH_BANK2_END)
     if (index == 1U) {
         return {&hardware.flash.SR2, &hardware.flash.CR2, &hardware.flash.KEYR2,
                 &hardware.flash.AR2};
@@ -89,7 +89,7 @@ static Bank bank(unsigned index) {
 }
 
 static unsigned register_bank(const volatile uint32_t* reg) {
-#if defined(STM32F103xG)
+#if defined(FLASH_BANK2_END)
     const Bank second = bank(1U);
     if (reg == second.status || reg == second.control || reg == second.key ||
         reg == second.address) {
@@ -155,7 +155,7 @@ extern "C" void nx_f1_flash_model_write(volatile uint32_t* reg,
             *selected.address - static_cast<uint32_t>(FLASH_BASE);
         ASSERT_LT(offset, size);
         ASSERT_EQ(0U, offset % page);
-#if defined(STM32F103xG)
+#if defined(FLASH_BANK2_END)
         EXPECT_EQ(index, offset / bank_size);
 #endif
         ++hardware.launches;
@@ -172,7 +172,7 @@ extern "C" void nx_f1_flash_model_store(volatile uint16_t* address,
                                         uint16_t value) {
     unsigned index = 0U;
     auto* bytes = reinterpret_cast<volatile uint8_t*>(address);
-#if defined(STM32F103xG)
+#if defined(FLASH_BANK2_END)
     index = static_cast<unsigned>((bytes - hardware.memory.data()) / bank_size);
 #endif
     const Bank selected = bank(index);
@@ -193,6 +193,10 @@ extern "C" bool nx_f1_flash_model_irq_idle(void) {
 
 extern "C" uint32_t nx_f1_flash_model_clock(void) {
     return hardware.clock;
+}
+
+extern "C" uintptr_t nx_f1_flash_model_sram_start(void) {
+    return reinterpret_cast<uintptr_t>(&hardware.snapshot);
 }
 
 extern "C" bool nx_arch_is_privileged(void) {
@@ -235,6 +239,101 @@ class F1Flash : public testing::Test {
     }
 };
 
+#if defined(STM32F103xB)
+TEST_F(F1Flash, SnapshotDecodesLoadedOptionsAndPreservesTheFpec) {
+    const nx_flash_maintenance_port_t maintenance{
+        &nx_stm32f1_flash_maintenance_ops, &state};
+    const nx_flash_erase_span_t exact_span{0U, page, alternate_size / page};
+    const nx_flash_geometry_t exact{
+        FLASH_BASE, alternate_size, 2U, &exact_span, 1U, 0U};
+    ASSERT_EQ(NX_SUCCESS, nx_stm32f1_flash_close(&state));
+    ASSERT_EQ(NX_SUCCESS, nx_stm32f1_flash_prepare(&state, &exact, 3300U));
+    hardware.flash.OBR = FLASH_OBR_RDPRT | FLASH_OBR_nRST_STDBY;
+    hardware.flash.WRPR = UINT32_MAX & ~(UINT32_C(1) << 7U);
+    auto& snapshot = hardware.snapshot;
+    EXPECT_EQ(NX_SUCCESS,
+              nx_flash_maintenance_snapshot(&maintenance, &snapshot));
+    EXPECT_EQ(128U, snapshot.sector_count);
+    EXPECT_EQ(NX_FLASH_READ_PROTECTED, snapshot.options.read_protection);
+    EXPECT_EQ(UINT32_C(0xf000000f), snapshot.options.write_protected_sectors);
+    EXPECT_EQ(NX_FLASH_BROWNOUT_UNKNOWN, snapshot.options.brownout);
+    EXPECT_TRUE(snapshot.options.hardware_watchdog);
+    EXPECT_TRUE(snapshot.options.reset_on_stop);
+    EXPECT_FALSE(snapshot.options.reset_on_standby);
+    EXPECT_FALSE(snapshot.power_on_reset_required);
+    EXPECT_EQ(0U, snapshot.otp_bytes);
+    EXPECT_EQ(0U, snapshot.otp_block_bytes);
+    EXPECT_EQ(0U, snapshot.otp_locked_blocks);
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED,
+              nx_flash_maintenance_set_options(&maintenance, &snapshot.options,
+                                               UINT32_MAX, future));
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED,
+              nx_flash_maintenance_otp_program(&maintenance, 0U, &snapshot, 1U,
+                                               UINT32_MAX, future));
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED,
+              nx_flash_maintenance_otp_read(&maintenance, 0U, &snapshot, 1U));
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED, nx_flash_maintenance_otp_lock(
+                                        &maintenance, 0U, UINT32_MAX, future));
+    EXPECT_EQ(0U, hardware.writes);
+    EXPECT_EQ(0U, hardware.launches);
+}
+
+TEST_F(F1Flash, SnapshotRejectsUnrepresentableOrInvalidProtection) {
+    const nx_flash_maintenance_port_t maintenance{
+        &nx_stm32f1_flash_maintenance_ops, &state};
+    hardware.flash.OBR =
+        FLASH_OBR_IWDG_SW | FLASH_OBR_nRST_STOP | FLASH_OBR_nRST_STDBY;
+    hardware.flash.WRPR = UINT32_MAX;
+    auto& snapshot = hardware.snapshot;
+    ASSERT_EQ(NX_SUCCESS,
+              nx_flash_maintenance_snapshot(&maintenance, &snapshot));
+    EXPECT_EQ(64U, snapshot.sector_count);
+    EXPECT_EQ(0U, snapshot.options.write_protected_sectors);
+    EXPECT_EQ(NX_FLASH_READ_OPEN, snapshot.options.read_protection);
+    EXPECT_FALSE(snapshot.options.hardware_watchdog);
+    EXPECT_FALSE(snapshot.options.reset_on_stop);
+    EXPECT_FALSE(snapshot.options.reset_on_standby);
+
+    hardware.flash.WRPR &= ~(UINT32_C(1) << 8U);
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED,
+              nx_flash_maintenance_snapshot(&maintenance, &snapshot));
+    hardware.flash.OBR |= FLASH_OBR_OPTERR;
+    EXPECT_EQ(NX_ERROR_IO,
+              nx_flash_maintenance_snapshot(&maintenance, &snapshot));
+    EXPECT_EQ(64U, snapshot.sector_count);
+    EXPECT_EQ(0U, snapshot.options.write_protected_sectors);
+    EXPECT_EQ(0U, hardware.writes);
+}
+
+TEST_F(F1Flash, SnapshotRequiresAnIdlePreparedOwnerAndPrivateOutput) {
+    const nx_flash_maintenance_port_t maintenance{
+        &nx_stm32f1_flash_maintenance_ops, &state};
+    hardware.flash.WRPR = UINT32_MAX;
+    auto& snapshot = hardware.snapshot;
+    hardware.masked = true;
+    EXPECT_EQ(NX_ERROR_CONTEXT,
+              nx_flash_maintenance_snapshot(&maintenance, &snapshot));
+    hardware.masked = false;
+    hardware.flash.SR = FLASH_SR_BSY;
+    EXPECT_EQ(NX_ERROR_BUSY,
+              nx_flash_maintenance_snapshot(&maintenance, &snapshot));
+    hardware.flash.SR = 0U;
+    hardware.flash.CR = FLASH_CR_LOCK | FLASH_CR_OPTWRE;
+    EXPECT_EQ(NX_ERROR_BUSY,
+              nx_flash_maintenance_snapshot(&maintenance, &snapshot));
+    hardware.flash.CR = FLASH_CR_LOCK;
+    EXPECT_EQ(
+        NX_ERROR_INVALID,
+        nx_flash_maintenance_snapshot(
+            &maintenance, reinterpret_cast<nx_flash_maintenance_snapshot_t*>(
+                              &hardware.flash)));
+    ASSERT_EQ(NX_SUCCESS, nx_stm32f1_flash_close(&state));
+    EXPECT_EQ(NX_ERROR_STATE,
+              nx_flash_maintenance_snapshot(&maintenance, &snapshot));
+    EXPECT_EQ(0U, hardware.writes);
+}
+#endif
+
 TEST_F(F1Flash, GeometryAndBoundsDoNotAuthorizeAnErase) {
     EXPECT_EQ(&geometry, nx_flash_port_geometry(&face));
     EXPECT_EQ(NX_ERROR_INVALID, nx_flash_port_erase(&face, 1U, page, future));
@@ -263,7 +362,7 @@ TEST_F(F1Flash, NeedsHsiAndSoleControllerBeforeAWrite) {
 
 TEST_F(F1Flash, MatchesTheCompiledDensityGroupAndSupply) {
     ASSERT_EQ(NX_SUCCESS, nx_stm32f1_flash_close(&state));
-#if defined(STM32F103xG)
+#if defined(FLASH_BANK2_END)
     const nx_flash_geometry_t alternate_geometry = geometry;
 #else
     const nx_flash_erase_span_t alternate_span{0U, page, alternate_size / page};
@@ -291,18 +390,19 @@ TEST_F(F1Flash, MatchesTheCompiledDensityGroupAndSupply) {
     EXPECT_EQ(NX_SUCCESS, nx_stm32f1_flash_close(&state));
 }
 
-#if defined(STM32F103xE)
-TEST_F(F1Flash, ZeRejectsSmallerHighDensityCapacity) {
+#if !defined(FLASH_BANK2_END)
+TEST_F(F1Flash, RejectsSmallerUnreviewedSingleBankCapacity) {
     ASSERT_EQ(NX_SUCCESS, nx_stm32f1_flash_close(&state));
-    const nx_flash_erase_span_t smaller{0U, page, 128U};
-    const nx_flash_geometry_t wrong{FLASH_BASE, 256U * 1024U, 2U,
+    constexpr uint32_t smaller_size = size / 2U;
+    const nx_flash_erase_span_t smaller{0U, page, smaller_size / page};
+    const nx_flash_geometry_t wrong{FLASH_BASE, smaller_size, 2U,
                                     &smaller,   1U,           0U};
     EXPECT_EQ(NX_ERROR_INVALID,
               nx_stm32f1_flash_prepare(&state, &wrong, 3300U));
     EXPECT_EQ(0U, hardware.writes);
 }
 
-TEST_F(F1Flash, ZeProgramsAndErasesAtTheLastSingleBankPage) {
+TEST_F(F1Flash, ProgramsAndErasesAtTheLastSingleBankPage) {
     constexpr uint32_t last_page = size - page;
     hardware.memory[last_page - 1U] = 0U;
     const std::array<uint8_t, 2U> data{0x29U, 0xa8U};
@@ -311,7 +411,7 @@ TEST_F(F1Flash, ZeProgramsAndErasesAtTheLastSingleBankPage) {
     EXPECT_EQ(data[0], hardware.memory[size - 2U]);
     EXPECT_EQ(data[1], hardware.memory[size - 1U]);
     ASSERT_EQ(NX_SUCCESS, nx_flash_port_erase(&face, last_page, page, future));
-    EXPECT_EQ(UINT32_C(0x0807f800), hardware.flash.AR);
+    EXPECT_EQ(geometry.base_address + last_page, hardware.flash.AR);
     EXPECT_EQ(UINT8_MAX, hardware.memory[last_page]);
     EXPECT_EQ(UINT8_MAX, hardware.memory[size - 1U]);
     EXPECT_EQ(0U, hardware.memory[last_page - 1U]);
@@ -396,7 +496,7 @@ TEST_F(F1Flash, FailureToRelockRetainsOwnerUntilRecovery) {
     EXPECT_EQ(1U, hardware.launches);
 }
 
-#if defined(STM32F103xG)
+#if defined(FLASH_BANK2_END)
 TEST_F(F1Flash, ZgRequiresTheExactTwoBankLayout) {
     ASSERT_EQ(NX_SUCCESS, nx_stm32f1_flash_close(&state));
     const nx_flash_erase_span_t merged{0U, page, size / page};

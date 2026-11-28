@@ -28,24 +28,88 @@
   "mode_exclusions": [
     {
       "device": "stm32f103-md",
+      "part": "STM32F103C8T6",
       "kind": "flash",
       "option": "maintenance",
       "equals": true,
-      "message": "Option-byte maintenance has no implementation in the selected STM32F103 Flash mode"
+      "message": "Option-byte observation has no reviewed software assembly for the selected part"
+    },
+    {
+      "device": "stm32f103-ld",
+      "kind": "flash",
+      "option": "maintenance",
+      "equals": true,
+      "message": "Option-byte observation has no reviewed software assembly for the selected part"
     },
     {
       "device": "stm32f103-hd",
       "kind": "flash",
       "option": "maintenance",
       "equals": true,
-      "message": "Option-byte maintenance has no implementation in the selected STM32F103 Flash mode"
+      "message": "Option-byte observation has no reviewed software assembly for the selected part"
     },
     {
       "device": "stm32f103-xl",
       "kind": "flash",
       "option": "maintenance",
       "equals": true,
-      "message": "Option-byte maintenance has no implementation in the selected STM32F103 Flash mode"
+      "message": "Option-byte observation has no reviewed software assembly for the selected part"
+    },
+    {
+      "device": "stm32f101xb",
+      "kind": "flash",
+      "option": "maintenance",
+      "equals": true,
+      "message": "Option-byte observation has no reviewed software assembly for the selected part"
+    },
+    {
+      "device": "stm32f102xb",
+      "kind": "flash",
+      "option": "maintenance",
+      "equals": true,
+      "message": "Option-byte observation has no reviewed software assembly for the selected part"
+    },
+    {
+      "device": "stm32f100xe",
+      "kind": "flash",
+      "option": "maintenance",
+      "equals": true,
+      "message": "Option-byte observation has no reviewed software assembly for the selected part"
+    },
+    {
+      "device": "stm32f101x6",
+      "kind": "flash",
+      "option": "maintenance",
+      "equals": true,
+      "message": "Option-byte observation has no reviewed software assembly for the selected part"
+    },
+    {
+      "device": "stm32f101xe",
+      "kind": "flash",
+      "option": "maintenance",
+      "equals": true,
+      "message": "Option-byte observation has no reviewed software assembly for the selected part"
+    },
+    {
+      "device": "stm32f101xg",
+      "kind": "flash",
+      "option": "maintenance",
+      "equals": true,
+      "message": "Option-byte observation has no reviewed software assembly for the selected part"
+    },
+    {
+      "device": "stm32f102x6",
+      "kind": "flash",
+      "option": "maintenance",
+      "equals": true,
+      "message": "Option-byte observation has no reviewed software assembly for the selected part"
+    },
+    {
+      "device": "stm32f100xb",
+      "kind": "flash",
+      "option": "maintenance",
+      "equals": true,
+      "message": "Option-byte observation has no reviewed software assembly for the selected part"
     },
     {
       "device": "stm32f103-md",
@@ -88,20 +152,6 @@
       "option": "calls_os",
       "equals": true,
       "message": "TIM4 capture interrupts cannot call the OS"
-    },
-    {
-      "device": "stm32f103-md",
-      "kind": "encoder",
-      "option": "counting",
-      "equals": "x2-a",
-      "message": "STM32F103 TIM3 encoder maintains only the reviewed x4 counting mode"
-    },
-    {
-      "device": "stm32f103-md",
-      "kind": "encoder",
-      "option": "counting",
-      "equals": "x2-b",
-      "message": "STM32F103 TIM3 encoder maintains only the reviewed x4 counting mode"
     },
     {
       "device": "stm32f103-hd",
@@ -149,6 +199,10 @@
         "DMA1:channel1": {
           "channel": "DMA1_Channel1",
           "irq": "DMA1_Channel1_IRQn"
+        },
+        "DMA2:channel4": {
+          "channel": "DMA2_Channel4",
+          "irq": "DMA2_Channel4_5_IRQn"
         }
       },
       "transfers": {
@@ -177,6 +231,9 @@
         },
         "I2S2": {
           "tx": "DMA1:channel5"
+        },
+        "SDIO": {
+          "rx": "DMA2:channel4"
         }
       }
     },
@@ -189,7 +246,8 @@
         "spi",
         "uart",
         "dac",
-        "audio"
+        "audio",
+        "eth"
       ],
       "classic_can_mailboxes": 3,
       "flash_program_unit": 2,
@@ -205,7 +263,8 @@
       "reviews": {
         "rm0008-f103-md-run": [
           "hsi8",
-          "hse8-mco-pll72"
+          "hse8-mco-pll72",
+          "hse8-crystal-pll72"
         ],
         "rm0008-f103-hsi8": [
           "hsi8"
@@ -229,6 +288,14 @@
     },
     "endpoints": {
       "spi_transaction": true,
+      "spi_dma": {
+        "controllers": ["SPI2"],
+        "mode": "dma"
+      },
+      "spi_dma_owner": {
+        "contains": "nx_stm32f1_spi_dma_owner_contains",
+        "attach_wake": "nx_stm32f1_spi_dma_owner_attach_wake"
+      },
       "i2c_ten_bit": true
     },
     "limits": {
@@ -417,7 +484,8 @@
             "lin",
             "asynchronous",
             "irda",
-            "synchronous"
+            "synchronous",
+            "smartcard"
           ],
           "flows": [
             "none",
@@ -426,16 +494,143 @@
         }
       },
       "irda_max_baud": 115200,
-      "smartcard_prescaler_max": 255,
+      "smartcard_prescaler_max": 1,
       "lin_max_baud": 20000,
       "receive_profiles": {
         "half-duplex": "bytes",
         "lin": "events",
         "asynchronous": "events",
         "irda": "events",
-        "synchronous": "events"
+        "synchronous": "events",
+        "smartcard": "events"
       },
       "irda_normal_only": true
+    },
+    "ethernet": {
+      "controller": "ETH_MAC",
+      "irq": 61,
+      "interrupt": "ETH_IRQn",
+      "clock_hz": 72000000,
+      "pins": [
+        [
+          "PC1",
+          "mdc"
+        ],
+        [
+          "PA2",
+          "mdio"
+        ],
+        [
+          "PA1",
+          "ref-clk"
+        ],
+        [
+          "PD8",
+          "crs-dv"
+        ],
+        [
+          "PD9",
+          "rxd0"
+        ],
+        [
+          "PD10",
+          "rxd1"
+        ],
+        [
+          "PB11",
+          "tx-en"
+        ],
+        [
+          "PB12",
+          "txd0"
+        ],
+        [
+          "PB13",
+          "txd1"
+        ]
+      ],
+      "mii_pins": [
+        [
+          "PC1",
+          "mdc"
+        ],
+        [
+          "PA2",
+          "mdio"
+        ],
+        [
+          "PA1",
+          "rx-clk"
+        ],
+        [
+          "PD8",
+          "rx-dv"
+        ],
+        [
+          "PB10",
+          "rx-er"
+        ],
+        [
+          "PD9",
+          "rxd0"
+        ],
+        [
+          "PD10",
+          "rxd1"
+        ],
+        [
+          "PD11",
+          "rxd2"
+        ],
+        [
+          "PD12",
+          "rxd3"
+        ],
+        [
+          "PC3",
+          "tx-clk"
+        ],
+        [
+          "PB11",
+          "tx-en"
+        ],
+        [
+          "PB12",
+          "txd0"
+        ],
+        [
+          "PB13",
+          "txd1"
+        ],
+        [
+          "PC2",
+          "txd2"
+        ],
+        [
+          "PB8",
+          "txd3"
+        ],
+        [
+          "PA0",
+          "crs"
+        ],
+        [
+          "PA3",
+          "col"
+        ]
+      ],
+      "resources": [
+        "peripheral:ETH",
+        "clock:ETH_AHB",
+        "clock:DMA2",
+        "irq:ETH_IRQn"
+      ],
+      "alternate": null,
+      "memory_region": "sram",
+      "modes": [
+        "raw-mii",
+        "raw-rmii"
+      ]
     }
   },
   "pads": {

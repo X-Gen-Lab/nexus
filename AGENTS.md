@@ -39,7 +39,9 @@ Git 历史保留原始设计和结果，不代表当前支持范围或验收状�
   的验证不能替代 RX 职责。
 - 一个存活的控制器行为域只有一个硬件 transport owner。Nexus 负责准入、借用、
   deadline、回调与完整撤回；厂商 Handle、SDK 类型及可变 provider 状态保持私有。
-  F4 实现与经核验的 IP 代码放在 F4 package 内，不另建顶层 MCU 驱动注册表。
+  系列私有实现放在所属 SoC 包。经核验可跨 STM32 系列复用的 IP 实现放在
+  `soc/stm32/common/`，各包维护自己的时钟、引脚、IRQ 绑定和启停装配。
+  不另建顶层 MCU 驱动注册表。
 - 公共接口使用 Nexus 类型与不可变接口视图，同类实例共享只读 typed ops；回调接收
   实例 context。controller 与 endpoint 分别标识，endpoint 不能冒充 controller。
 - typed factory 按紧凑 ID 返回已有静态对象，不分配、不初始化硬件、不加锁、不发现

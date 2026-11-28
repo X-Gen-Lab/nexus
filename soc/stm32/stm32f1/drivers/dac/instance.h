@@ -1,6 +1,6 @@
 /**
  * \file            instance.h
- * \brief           Private F100xB DAC1 direct owner and immutable operations.
+ * \brief           Private STM32F1 DAC direct owner and immutable operations.
  * \author          Nexus Team
  */
 #ifndef NEXUS_STM32F1_DAC_INSTANCE_H

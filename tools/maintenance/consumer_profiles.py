@@ -3,7 +3,9 @@
 from dataclasses import dataclass
 from pathlib import Path
 
-CONSUMER_POLICY = "nexus-sdk-consumers-v35"
+CONSUMER_POLICY = "nexus-sdk-consumers-v36"
+DEFAULT_CONSUMER_PACKAGES = ("stm32f4",)
+FULL_CONSUMER_PACKAGES = ("stm32f1", *DEFAULT_CONSUMER_PACKAGES)
 BASE_CONSUMERS = (("native", False, "native"), ("stm32", True, "stm32"))
 MODERN_CONSUMERS = ()
 SELECTED_CONSUMERS = (
@@ -138,8 +140,11 @@ SERVICE_CONSUMERS = (
                        f"arm-power-stage-{mode}", True, "f4_power_stage")
       for mode in ("pair", "tdm", "dc")),
 )
+F103RB_CONSUMER = ServiceConsumer("f103rb family", "f103rb-baremetal.toml",
+                                  "arm-family-f103rb", True, "f1_family")
 NATIVE_TIME_SMOKES = frozenset({"native-time-pair", "native-time-empty"})
-F4_SCENARIO_DIRECTORIES = {
+REFERENCE_SCENARIO_DIRECTORIES = {
+    "f1_family": "assemblies/stm32f1_family",
     "f4_capture_audio": "assemblies/f407_capture_audio",
     "f4_crypto": "assemblies/stm32f4_crypto",
     "f4_family": "assemblies/stm32f4_family",
@@ -167,17 +172,22 @@ def selected_domain(specification):
             else "arm-provider")
 
 
-def consumer_plan():
-    """The producer and transport consume this one ordered policy."""
-    return (tuple(("base", item) for item in BASE_CONSUMERS)
-            + tuple(("modern", item) for item in MODERN_CONSUMERS)
-            + tuple(("selected", item) for item in SELECTED_CONSUMERS)
-            + tuple(("services", item) for item in SERVICE_CONSUMERS))
+def consumer_plan(packages=DEFAULT_CONSUMER_PACKAGES, *, host_support=True):
+    """Select one ordered consumer plan from the exported packages and host support."""
+    f4 = "stm32f4" in packages
+    return (tuple(("base", item) for item in BASE_CONSUMERS
+                  if (f4 if item[1] else host_support))
+            + tuple(("modern", item) for item in MODERN_CONSUMERS if f4)
+            + tuple(("selected", item) for item in SELECTED_CONSUMERS
+                    if (host_support if item[2] in NATIVE_TIME_SMOKES else f4))
+            + tuple(("services", item) for item in SERVICE_CONSUMERS
+                    if (f4 if item.arm else host_support))
+            + ((("services", F103RB_CONSUMER),) if "stm32f1" in packages else ()))
 
 
 def service_directory(sdk, specification):
-    """Use the single owned scenario tree, including shared F4 references."""
+    """Use the owned integration fixture or the SDK-specific public composition."""
     scenario = specification.scenario
-    if scenario.startswith("f4_"):
-        return Path(sdk) / "tests/integration" / F4_SCENARIO_DIRECTORIES[scenario]
+    if scenario in REFERENCE_SCENARIO_DIRECTORIES:
+        return Path(sdk) / "tests/integration" / REFERENCE_SCENARIO_DIRECTORIES[scenario]
     return Path(sdk) / "cmake/package/verification" / scenario

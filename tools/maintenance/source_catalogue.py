@@ -198,7 +198,7 @@ ALL_DEPENDENCIES = (
         "https://github.com/lwip-tcpip/lwip.git",
         "https://github.com/X-Gen-Lab/lwip.git",
         "runtime", "COPYING", "dependencies/lwip.lock.json",
-        component_profiles=('network', 'network-loaned-rx')),
+        component_profiles=('network', 'network-loaned-rx', 'network-ipv4')),
     SourceDependency("mbedtls", "ext/mbedtls",
         "https://github.com/Mbed-TLS/mbedtls.git",
         "https://github.com/X-Gen-Lab/mbedtls.git",
@@ -411,7 +411,7 @@ def runtime_selection(family, *, backend, components=(), test_support=False,
             any(not isinstance(value, str) for value in components) or
             len(set(components)) != len(components) or
             not set(components).issubset(COMPONENTS | {
-                "network", "network-loaned-rx", "tls", "mqtt", "mcuboot"})):
+                "network", "network-loaned-rx", "network-ipv4", "tls", "mqtt", "mcuboot"})):
         raise ValueError("Unsupported component dependency selection")
     identifiers = {identifier for _, identifier in dependencies}
     declared = {item.identifier: item for item in ALL_SOURCE_DEPENDENCIES}

@@ -41,20 +41,39 @@
 #define MODE_SHIFT(line)          (4U * ((line) % 8U))
 #define GPIO_MODE(line, mode)     ((uint32_t)(mode) << MODE_SHIFT(line))
 #define MODE_REGISTER(port, line) ((line) < 8U ? &(port)->CRL : &(port)->CRH)
-#define MAIN_PIN                  PIN(MAIN_LINE)
-#define COMP_PIN                  PIN(COMP_LINE)
-#define BREAK_PIN                 PIN(BREAK_LINE)
-#define MAIN_FIELD                GPIO_MODE(MAIN_LINE, GPIO_CRL_MODE0 | GPIO_CRL_CNF0)
-#define COMP_FIELD                GPIO_MODE(COMP_LINE, GPIO_CRL_MODE0 | GPIO_CRL_CNF0)
-#define MAIN_IDLE                 GPIO_MODE(MAIN_LINE, GPIO_CRL_MODE0_1)
-#define COMP_IDLE                 GPIO_MODE(COMP_LINE, GPIO_CRL_MODE0_1)
-#define MAIN_TIMER                GPIO_MODE(MAIN_LINE, GPIO_CRL_MODE0_1 | GPIO_CRL_CNF0_1)
-#define COMP_TIMER                GPIO_MODE(COMP_LINE, GPIO_CRL_MODE0_1 | GPIO_CRL_CNF0_1)
-#define BREAK_PULL                GPIO_MODE(BREAK_LINE, GPIO_CRL_CNF0_1)
-#define TIMER_HZ                  UINT32_C(8000000)
-#define OUTPUTS                   (TIM_CCER_CC1E | TIM_CCER_CC1NE)
-#define BASE_PROTECTION           (TIM_BDTR_BKE | TIM_BDTR_OSSI | TIM_BDTR_OSSR)
-#define PWM_MODE                  (LL_TIM_OCMODE_PWM1 | TIM_CCMR1_OC1PE)
+#if defined(NX_STM32F1_CYCLE_THREE_LEGS)
+#if !defined(STM32F103xB) || !defined(NX_STM32F1_PWM_ADC_OWNER)
+#error "Three output pairs require the F103RB finite TIM1/ADC1 owner"
+#endif
+#define LEGS(value, stride)                                                    \
+    ((value) | ((value) << (stride)) | ((value) << (2U * (stride))))
+#else
+#define LEGS(value, stride) (value)
+#endif
+#define MAIN_PIN        LEGS(PIN(MAIN_LINE), 1U)
+#define COMP_PIN        LEGS(PIN(COMP_LINE), 1U)
+#define BREAK_PIN       PIN(BREAK_LINE)
+#define BREAK_PULL      GPIO_MODE(BREAK_LINE, GPIO_CRL_CNF0_1)
+#define OUTPUT_FIELD    (GPIO_CRL_MODE0 | GPIO_CRL_CNF0)
+#define OUTPUT_IDLE     GPIO_CRL_MODE0_1
+#define OUTPUT_TIMER    (GPIO_CRL_MODE0_1 | GPIO_CRL_CNF0_1)
+#define MAIN_FIELD      LEGS(GPIO_MODE(MAIN_LINE, OUTPUT_FIELD), 4U)
+#define COMP_FIELD      LEGS(GPIO_MODE(COMP_LINE, OUTPUT_FIELD), 4U)
+#define MAIN_IDLE       LEGS(GPIO_MODE(MAIN_LINE, OUTPUT_IDLE), 4U)
+#define COMP_IDLE       LEGS(GPIO_MODE(COMP_LINE, OUTPUT_IDLE), 4U)
+#define MAIN_TIMER      LEGS(GPIO_MODE(MAIN_LINE, OUTPUT_TIMER), 4U)
+#define COMP_TIMER      LEGS(GPIO_MODE(COMP_LINE, OUTPUT_TIMER), 4U)
+#define TIMER_HZ        UINT32_C(8000000)
+#define OUTPUTS         LEGS((TIM_CCER_CC1E | TIM_CCER_CC1NE), 4U)
+#define BASE_PROTECTION (TIM_BDTR_BKE | TIM_BDTR_OSSI | TIM_BDTR_OSSR)
+#define PWM_MODE        (LL_TIM_OCMODE_PWM1 | TIM_CCMR1_OC1PE)
+#if defined(NX_STM32F1_CYCLE_THREE_LEGS)
+#define PWM_CCMR1 (PWM_MODE | (PWM_MODE << 8U))
+#define PWM_CCMR2 PWM_MODE
+#else
+#define PWM_CCMR1 PWM_MODE
+#define PWM_CCMR2 0U
+#endif
 
 _Static_assert((COMP_LINE < 8U) == (BREAK_LINE < 8U),
                "The complementary output and break share one pad register");
@@ -172,8 +191,8 @@ static bool fixed_base(const nx_stm32f1_advanced_pwm_t* state, uint32_t mode) {
            APWM_TIMER->PSC == 0U &&
            (APWM_TIMER->CR1 & ~(uint32_t)TIM_CR1_CEN) == mode &&
            APWM_TIMER->CR2 == 0U && APWM_TIMER->SMCR == 0U &&
-           APWM_TIMER->RCR == 0U && APWM_TIMER->CCMR1 == PWM_MODE &&
-           APWM_TIMER->CCMR2 == 0U &&
+           APWM_TIMER->RCR == 0U && APWM_TIMER->CCMR1 == PWM_CCMR1 &&
+           APWM_TIMER->CCMR2 == PWM_CCMR2 &&
            (break_control() & ~(uint32_t)TIM_BDTR_MOE) == protection;
 }
 
@@ -250,7 +269,10 @@ nx_result_t nx_stm32f1_advanced_pwm_prepare(
     }
     LL_TIM_SetAutoReload(APWM_TIMER, config->period_ticks - 1U);
     LL_TIM_EnableARRPreload(APWM_TIMER);
-    NX_STM32F1_WRITE(&APWM_TIMER->CCMR1, PWM_MODE);
+    NX_STM32F1_WRITE(&APWM_TIMER->CCMR1, PWM_CCMR1);
+#if defined(NX_STM32F1_CYCLE_THREE_LEGS)
+    NX_STM32F1_WRITE(&APWM_TIMER->CCMR2, PWM_CCMR2);
+#endif
     NX_STM32F1_WRITE(&APWM_TIMER->BDTR,
                      BASE_PROTECTION | config->deadtime_ticks);
     if (!fixed_base(state, TIM_CR1_ARPE) || APWM_TIMER->CCER != 0U ||
@@ -419,10 +441,19 @@ static nx_result_t start(void* context) {
 
 #if defined(NX_STM32F1_PWM_ADC_OWNER)
 nx_result_t nx_stm32f1_advanced_pwm_one_pulse(nx_stm32f1_advanced_pwm_t* state,
-                                              uint32_t duty, uint32_t phase) {
-    nx_result_t result = set_duty(state, duty);
+                                              const uint32_t* duties,
+                                              uint32_t phase) {
+    nx_result_t result = set_duty(state, duties[0]);
     if (result != NX_SUCCESS)
         return result;
+#if defined(NX_STM32F1_CYCLE_THREE_LEGS)
+    /* Load one complete stopped frame before the single common update. */
+    NX_STM32F1_WRITE(&APWM_TIMER->CCR2, duties[1]);
+    NX_STM32F1_WRITE(&APWM_TIMER->CCR3, duties[2]);
+    nx_arch_dsb();
+    if (APWM_TIMER->CCR2 != duties[1] || APWM_TIMER->CCR3 != duties[2])
+        return NX_ERROR_IO;
+#endif
     const uint32_t mode = TIM_CR1_ARPE | TIM_CR1_OPM;
     NX_STM32F1_WRITE(&APWM_TIMER->CCR4, phase);
     nx_arch_dsb();

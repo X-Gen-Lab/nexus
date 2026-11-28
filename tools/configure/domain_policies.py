@@ -167,15 +167,22 @@ def _usb_pma(value, pinmux):
 
 def _ethernet(value, pinmux):
     _fields(value, {"controller", "irq", "clock_hz", "pins", "resources",
-                    "alternate", "memory_region"}, {"mii_pins"})
+                    "alternate", "memory_region"}, {"mii_pins", "modes", "interrupt"})
     Symbol(value["controller"])
     Symbol(value["memory_region"])
+    modes = _names(value.get("modes", ("raw-rmii", "raw-mii")), "Ethernet modes")
+    if not modes or not set(modes) <= {"raw-rmii", "raw-mii"}:
+        fail("Ethernet requires its reviewed raw port modes")
+    interrupt = value.get("interrupt")
+    if interrupt is not None:
+        Symbol(interrupt)
     return EthernetPolicy(value["controller"],
         integer(value["irq"], context="Domain Ethernet IRQ"),
         integer(value["clock_hz"], 1, context="Domain Ethernet clock"),
         _pins(value["pins"], 2, pinmux), _names(value["resources"], "Ethernet resources"),
         pinmux.validate(value["alternate"], "Domain Ethernet alternate selector"),
-        value["memory_region"], _pins(value.get("mii_pins", ()), 2, pinmux))
+        value["memory_region"], _pins(value.get("mii_pins", ()), 2, pinmux),
+        modes, interrupt)
 
 
 def _timers(values, pinmux):

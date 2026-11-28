@@ -81,6 +81,9 @@ HIL 的原始 trace、测量和 OS 记录分别准入。某个 packet／timer／
 不提供设备 ready、PHY／cache coherence、波形、唤醒或掉电证明。已退出生产选择的
 GD32、G474、H743 和 U575 历史记录按原固定源码读取，不用于当前 F407 工装。
 
+STM32F103RB 另有离线准备 fixture。STM32F103RB、STM32F103ZE 和 STM32F107 的
+镜像、接线、复位、断电和通过条件见 [STM32F1 实板交接](stm32f1-handoff.md)。
+
 ## 通用测量与前后比较
 
 `measure.py plan` 绑定 fixture／resolved build 生成七项通用 cases，不需 station，

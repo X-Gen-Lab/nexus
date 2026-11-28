@@ -24,6 +24,13 @@ typedef struct {
  */
 nx_result_t nx_stm32f1_rtc_prepare(nx_stm32f1_rtc_t* state);
 
+/** \brief Opt in to one blank-domain LSE and divider provisioning attempt.
+ * \note A committed RTCSEL remains sticky on partial failure. No reset,
+ *       counter seed, comparator or backup-data writes are authorized.
+ */
+nx_result_t nx_stm32f1_rtc_provision(nx_stm32f1_rtc_t* state,
+                                     uint32_t timeout_us, uint32_t poll_limit);
+
 /** \brief Restore only the interface effects added by this owner. */
 nx_result_t nx_stm32f1_rtc_close(nx_stm32f1_rtc_t* state);
 

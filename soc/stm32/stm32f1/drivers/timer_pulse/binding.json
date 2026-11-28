@@ -1,0 +1,139 @@
+{
+  "schema_version": 1,
+  "bindings": [
+    {
+      "kind": "timer_pulse",
+      "mode": "one-pulse",
+      "implementation": "tim3_pulse",
+      "static_recipe": {
+        "state_type": "nx_stm32f1_tim3_pulse_t",
+        "ops": "nx_stm32f1_tim3_pulse_ops",
+        "declarations": [],
+        "calls": {
+          "admit": [],
+          "prepare": {
+            "function": "nx_stm32f1_tim3_pulse_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "source": "item.options.tick_hz"
+              },
+              {
+                "source": "item.options.period_ticks"
+              },
+              {
+                "source": "item.options.irq.priority"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32f1_tim3_pulse_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "retain_on_failed_init": true,
+        "irq": [
+          {
+            "name": {
+              "source": "selected.vector_bindings.0.handler",
+              "as": "symbol"
+            },
+            "calls": [
+              {
+                "function": "nx_stm32f1_tim3_pulse_irq",
+                "args": []
+              }
+            ],
+            "barrier": "nx_arch_dsb"
+          }
+        ]
+      },
+      "headers": [
+        "drivers/timer_pulse/instance.h"
+      ],
+      "controllers": [
+        "TIM3"
+      ],
+      "limits": {
+        "tick_hz": [
+          1000000,
+          1000000
+        ],
+        "period_ticks": [
+          2,
+          65536
+        ]
+      }
+    }
+  ],
+  "domains": {
+    "waveform": {
+      "modes": {
+        "timer_pulse": "one-pulse"
+      },
+      "controllers": {
+        "TIM3": {
+          "counter_bits": 16,
+          "native_bits": 16,
+          "advanced": false,
+          "master": false,
+          "clock_domain": "apb1_hz",
+          "divided_clock_multiplier": 2,
+          "dma": [],
+          "itr_sources": [],
+          "channel_count": 4,
+          "controller_irq": true
+        }
+      },
+      "routes": [
+        {
+          "id": "tim3-pa6-one-pulse",
+          "controller": "TIM3",
+          "kind": "timer_pulse",
+          "channels": [
+            1
+          ],
+          "pins": [
+            [
+              "PA6",
+              "ch1",
+              null
+            ]
+          ],
+          "complementary": false,
+          "internal_trigger": false,
+          "period_max": 65536,
+          "default_master": "none"
+        }
+      ],
+      "deadtime_ranges": [
+        [
+          0,
+          0,
+          1
+        ]
+      ],
+      "master_modes": [
+        "none"
+      ],
+      "sync_modes": [
+        "none"
+      ],
+      "prescaler_max": 65536,
+      "poll_limit_max": 1,
+      "burst_base": 11,
+      "burst_items": 6,
+      "internal_master_modes": []
+    }
+  }
+}

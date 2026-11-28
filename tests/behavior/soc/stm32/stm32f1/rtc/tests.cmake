@@ -20,7 +20,7 @@ target_include_directories(
 )
 target_compile_definitions(
     stm32f103_rtc_backup_contracts
-    PRIVATE STM32F103xB NX_STM32F1_RTC_RAW_ALARM
+    PRIVATE STM32F103xB NX_STM32F1_RTC_RAW_ALARM NX_STM32F1_RTC_PROVISION
 )
 target_compile_options(
     stm32f103_rtc_backup_contracts

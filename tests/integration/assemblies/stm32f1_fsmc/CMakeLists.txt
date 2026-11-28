@@ -8,7 +8,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(NEXUS_ASSEMBLY_FILE
     "${CMAKE_CURRENT_LIST_DIR}/zg-sram.toml"
     CACHE FILEPATH
-    "FSMC SRAM provider fixture assembly"
+    "FSMC SRAM or CN16 provider fixture assembly"
 )
 
 if(NEXUS_SOURCE_ROOT)

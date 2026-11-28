@@ -45,6 +45,16 @@ nexus_f1_system_contract(
     NEXUS_CLOCK_APB1_TIMER_HZ=72000000U
     NEXUS_CLOCK_FLASH_WAIT_STATES=2U
 )
+nexus_f1_system_contract(
+    nexus_stm32f1_crystal72_test
+    STM32F103xB
+    NEXUS_CLOCK_SOURCE_HSE=1
+    NEXUS_CLOCK_HSE_BYPASS=0
+    NEXUS_CLOCK_APB1_HZ=36000000U
+    NEXUS_CLOCK_APB2_HZ=72000000U
+    NEXUS_CLOCK_APB1_TIMER_HZ=72000000U
+    NEXUS_CLOCK_FLASH_WAIT_STATES=2U
+)
 nexus_f1_system_contract(nexus_stm32f1_connectivity_timebase_test STM32F105xC)
 
 nexus_f1_system_contract(
@@ -82,6 +92,7 @@ nexus_f1_system_contract(
 )
 
 include("${CMAKE_CURRENT_LIST_DIR}/handoff.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/fault.cmake")
 nexus_f1_system_contract(nexus_stm32f103_stop_test STM32F103xB TEST_F1_STOP=1)
 target_link_libraries(nexus_stm32f103_stop_test PRIVATE Nexus::ClockDomain)
 target_sources(
@@ -96,5 +107,22 @@ target_compile_definitions(
 get_target_property(f1_stop_config Nexus::Config NEXUS_CONFIG_DIR)
 target_include_directories(
     nexus_stm32f103_stop_test
+    PRIVATE "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f1/include" "${f1_stop_config}"
+)
+
+nexus_f1_system_contract(nexus_stm32f103_standby_test STM32F103xB TEST_F1_STANDBY=1)
+target_link_libraries(nexus_stm32f103_standby_test PRIVATE Nexus::ClockDomain)
+target_sources(
+    nexus_stm32f103_standby_test
+    PRIVATE
+        "${CMAKE_CURRENT_LIST_DIR}/standby_test.cpp"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f1/system/standby.c"
+)
+target_compile_definitions(
+    nexus_stm32f103_standby_test
+    PRIVATE NX_STM32F1_STANDBY_OWNER=1
+)
+target_include_directories(
+    nexus_stm32f103_standby_test
     PRIVATE "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f1/include" "${f1_stop_config}"
 )

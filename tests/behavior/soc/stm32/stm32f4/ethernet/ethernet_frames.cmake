@@ -9,7 +9,7 @@ foreach(eth_frames_family common stm32)
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c"
         LIBRARIES Nexus::IO Nexus::Arch
         INCLUDES
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/legacy_mac" "${NEXUS_SOURCE_DIR}/io/private"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/legacy_mac" "${NEXUS_SOURCE_DIR}/soc/stm32/common/dwmac" "${NEXUS_SOURCE_DIR}/io/private"
     )
     target_compile_options(
         ${eth_frames_target}
@@ -51,7 +51,7 @@ nexus_google_test(nexus_ethernet_frames_native_test
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c"
     LIBRARIES Nexus::NativeModel Nexus::Arch
     INCLUDES
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/legacy_mac" "${NEXUS_SOURCE_DIR}/tests/support/native/drivers"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/legacy_mac" "${NEXUS_SOURCE_DIR}/soc/stm32/common/dwmac" "${NEXUS_SOURCE_DIR}/tests/support/native/drivers"
         "${NEXUS_SOURCE_DIR}/io/private"
 )
 target_compile_definitions(

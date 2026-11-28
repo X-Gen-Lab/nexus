@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "id": "stm32f107vc-mb784-c01-mii-software",
+  "soc": "STM32F107VCT6",
+  "soc_family": "stm32f1",
+  "source_revision": "UM0600 Rev5, MB784 schematic C.1, external X1 for MII PHY",
+  "physical_pcb_revision": "MB784 C.1",
+  "clocks": {
+    "hse_hz": 25000000,
+    "hse_bypass": false
+  },
+  "bindings": [
+    {
+      "id": "mac",
+      "controller": "ETH_MAC",
+      "route": "eth-mii-mb784-remapped",
+      "requires": {
+        "phy_wiring": "mb784-mii-x1"
+      }
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14",
+    "PA15",
+    "PA8",
+    "PB3",
+    "PB4",
+    "PC14",
+    "PC15"
+  ],
+  "unknowns": [
+    "External X1 and fitted jumper state must be verified before use.",
+    "No physical frame or teardown has been executed."
+  ],
+  "provenance": [
+    {
+      "scope": "MCU X3 25 MHz, DP83848CVV MDC and MDIO, external X1, MII jumpers and remapped RX topology.",
+      "url": "https://www.tme.eu/Document/aece8c709b198489a4f26cf104594d1a/CD00212441.pdf",
+      "file": "CD00212441.pdf",
+      "sha256": "372ddf08a69e34173eaa1a5446033e9884c61e1ea6165c19144df3554da4d82b",
+      "pages": [
+        11,
+        15,
+        17,
+        34,
+        35
+      ]
+    }
+  ],
+  "backend_support": [
+    "baremetal"
+  ],
+  "hardware_options": {
+    "phy_wiring": [
+      "unknown",
+      "mb784-mii-x1"
+    ]
+  }
+}

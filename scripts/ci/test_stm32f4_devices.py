@@ -236,6 +236,7 @@ class STM32F4PrivateHeaderCompileTests(unittest.TestCase):
         includes = (ROOT, ROOT / "soc/stm32/stm32f4",
                     ROOT / "soc/stm32/stm32f4/sdk/hal_config/usb",
                     ROOT / "soc/stm32/common/dwc_otg_device",
+                    ROOT / "soc/stm32/common/dwmac",
                     ROOT / "soc/stm32/stm32f4/drivers/ip/legacy_mac",
                     ROOT / "soc/stm32/common/bxcan",
                     ROOT / "soc/stm32/stm32f4/drivers/ip/advanced_timer",

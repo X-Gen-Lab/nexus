@@ -37,6 +37,14 @@ def _profile(item, result, *, fallback=False):
         lines.append(f'    {{ &s_nx_device_{endpoint}, {maximum}U, '
                      f'{options.number}U, {str(options.direction == "in").lower()}, '
                      f'{transfer} }},')
+    if item.mode in usb_pma.MODES:
+        lines += ['};', f'static const nx_usb_device_profile_t {identity} = {{',
+                  f'    &s_nx_face_{name}, {array}, {len(children)}U,',
+                  f'    48000000U, 0U, 0U, {item.options.pma_layout.table_bytes // 8}U,',
+                  '    NX_USB_PROFILE_DEVICE, NX_USB_PROFILE_FULL_SPEED,',
+                  '    NX_USB_PROFILE_INTERNAL_FS, NX_USB_PROFILE_PACKET_MEMORY,',
+                  '    { NULL, NULL }', '};']
+        return lines
     ulpi = usb_otg.device_mode(item.mode) == "device-hs-ulpi"
     selected = selected_usb_factory(item)
     frequency = str(selected.clock_hz) + "U"
@@ -58,7 +66,9 @@ def _profile(item, result, *, fallback=False):
 
 def emit(result):
     """Bind validated endpoints and their two explicit ULPI speed profiles."""
-    controllers = [item for item in result.controllers if item.kind == "usb_device" and item.mode not in usb_pma.MODES]
+    needs_pma_profile = "st-usb-device" in result.components
+    controllers = [item for item in result.controllers if item.kind == "usb_device"
+                   and (item.mode not in usb_pma.MODES or needs_pma_profile)]
     if not result.factory.capabilities or not controllers:
         return [], []
     header = ['#include "nexus/io/usb_profile.h"',

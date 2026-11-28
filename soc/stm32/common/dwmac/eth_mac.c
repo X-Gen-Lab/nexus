@@ -335,8 +335,14 @@ static void close_tx(nx_eth_mac_t* mac, nx_result_t terminal,
         mac->snapshot.link.up = false;
     write_reg(mac, DMA_CONTROL, read_reg(mac, DMA_CONTROL) & ~DMA_TX);
     write_reg(mac, MAC_CONTROL, read_reg(mac, MAC_CONTROL) & ~8U);
+#ifdef NX_ETH_RESET_RETIRE
+    mac->snapshot.closing = true;
+    write_reg(mac, DMA_CONTROL, read_reg(mac, DMA_CONTROL) & ~DMA_RX);
+    write_reg(mac, MAC_CONTROL, read_reg(mac, MAC_CONTROL) & ~4U);
+#endif
     nx_arch_dsb();
 }
+#ifndef NX_ETH_RESET_RETIRE
 static bool tx_quiet(nx_eth_mac_t* mac) {
     if ((read_reg(mac, DMA_CONTROL) & DMA_TX) != 0U ||
         (read_reg(mac, DMA_STATUS) & TX_PROCESS) != 0U ||
@@ -354,6 +360,7 @@ static bool tx_quiet(nx_eth_mac_t* mac) {
     return (read_reg(mac, DMA_CONTROL) & DMA_FLUSH) == 0U &&
            (read_reg(mac, MAC_DEBUG) & TX_DEBUG) == 0U;
 }
+#endif
 static void progress_tx(nx_eth_mac_t* mac, nx_time_us_t now) {
     if (mac->snapshot.pending_tx == 0U)
         return;
@@ -376,11 +383,13 @@ static void progress_tx(nx_eth_mac_t* mac, nx_time_us_t now) {
     bool completed = (status & OWN) == 0U && slot->terminal == NX_SUCCESS;
     if (!completed && mac->tx_closing) {
         (void)nx_request_transition(&request->base, NX_REQUEST_DRAINING);
+#ifndef NX_ETH_RESET_RETIRE
         if (tx_quiet(mac)) {
             NX_ETH_DESCRIPTOR_STATUS(d, status & ~OWN);
             nx_arch_dsb();
             completed = (d->status & OWN) == 0U;
         }
+#endif
         if (!completed && nx_deadline_expired(mac->drain_deadline, now))
             (void)nx_request_transition(&request->base, NX_REQUEST_QUARANTINED);
     }
@@ -484,6 +493,9 @@ void nx_eth_mac_irq(nx_eth_mac_t* mac) {
     nx_time_us_t now = nx_time_now_us();
     progress(mac, now);
     bool more_tx = mac->snapshot.pending_tx != 0U &&
+#ifdef NX_ETH_RESET_RETIRE
+                   !mac->tx_closing &&
+#endif
                    mac->tx_slots[mac->tx_consumer].request != NULL &&
                    (mac->tx_descriptors[mac->tx_consumer].status & OWN) == 0U;
     bool more_rx = !mac->snapshot.closing && mac->snapshot.link.up &&
@@ -690,6 +702,13 @@ static nx_result_t apply_link(void* context, const nx_eth_link_t* link) {
         return NX_ERROR_INVALID;
     if (!mac->snapshot.started || mac->snapshot.closing)
         return NX_ERROR_STATE;
+#ifdef NX_ETH_RESET_RETIRE
+    if (link->up && !link->full_duplex)
+        return NX_ERROR_UNSUPPORTED;
+    if (link->up && mac->snapshot.link.up &&
+        mac->snapshot.link.speed_mbps != link->speed_mbps)
+        return NX_ERROR_BUSY;
+#endif
     nx_arch_irq_state_t guard = nx_arch_irq_save();
     if (!link->up) {
         mac->snapshot.link = *link;
@@ -710,12 +729,18 @@ static nx_result_t apply_link(void* context, const nx_eth_link_t* link) {
      * The owner first applies link-down and observes both engines idle.
      * Reopening drained TX in the same mode leaves live RX untouched. */
     bool mode_quiet =
-        unchanged || ((read_reg(mac, DMA_STATUS) & DMA_PROCESS) == 0U &&
-                      (read_reg(mac, DMA_CONTROL) & (DMA_TX | DMA_RX)) == 0U &&
-                      (read_reg(mac, MAC_CONTROL) & 12U) == 0U &&
-                      (read_reg(mac, MAC_DEBUG) & (TX_DEBUG | RX_DEBUG)) == 0U);
+        unchanged ||
+        ((read_reg(mac, DMA_STATUS) & DMA_PROCESS) == 0U &&
+         (read_reg(mac, DMA_CONTROL) & (DMA_TX | DMA_RX)) == 0U &&
+         (read_reg(mac, MAC_CONTROL) & 12U) == 0U
+#ifndef NX_ETH_RESET_RETIRE
+         && (read_reg(mac, MAC_DEBUG) & (TX_DEBUG | RX_DEBUG)) == 0U
+#endif
+        );
     if (!mode_quiet || mac->snapshot.pending_tx != 0U ||
+#ifndef NX_ETH_RESET_RETIRE
         (mac->tx_closing && !tx_quiet(mac)) ||
+#endif
         (read_reg(mac, DMA_STATUS) & TX_PROCESS) != 0U) {
         nx_arch_irq_restore(guard);
         return NX_ERROR_BUSY;
@@ -737,6 +762,97 @@ static nx_result_t apply_link(void* context, const nx_eth_link_t* link) {
     nx_arch_irq_restore(guard);
     return valid ? NX_SUCCESS : NX_ERROR_IO;
 }
+#ifdef NX_ETH_RESET_RETIRE
+/** \brief Advance request states without changing the DMA's storage lease. */
+static void track_reset_retirement(nx_eth_mac_t* mac, nx_time_us_t now) {
+    if (mac->snapshot.pending_tx == 0U)
+        return;
+    const bool expired = nx_deadline_expired(mac->drain_deadline, now);
+    for (size_t index = 0U; index < mac->tx_count; ++index) {
+        nx_eth_tx_request_t* request = mac->tx_slots[index].request;
+        if (request != NULL) {
+            (void)nx_request_transition(&request->base, NX_REQUEST_DRAINING);
+            if (expired)
+                (void)nx_request_transition(&request->base,
+                                            NX_REQUEST_QUARANTINED);
+        }
+    }
+}
+
+/** \brief A successful core reset releases both descriptor tables together. */
+static nx_result_t stop_with_reset(nx_eth_mac_t* mac) {
+    nx_arch_irq_state_t guard = nx_arch_irq_save();
+    const nx_time_us_t now = nx_time_now_us();
+    mac->snapshot.closing = true;
+    if ((read_reg(mac, DMA_BUS) & 1U) != 0U) {
+        track_reset_retirement(mac, now);
+        nx_arch_irq_restore(guard);
+        return NX_ERROR_BUSY;
+    }
+    const uint32_t status = read_reg(mac, DMA_STATUS);
+    mac->snapshot.fatal_bus_error |= (status & DMA_FATAL) != 0U;
+    mac->snapshot.transmit_underflow |= (status & 0x20U) != 0U;
+    close_tx(mac, NX_ERROR_CANCELLED, now);
+    track_reset_retirement(mac, now);
+    write_reg(mac, DMA_INTERRUPTS, 0U);
+    nx_arch_dsb();
+    bool quiet = mac->snapshot.held_rx == 0U && mac->wake_publishers == 0U &&
+                 (read_reg(mac, DMA_STATUS) & DMA_PROCESS) == 0U &&
+                 (read_reg(mac, DMA_CONTROL) & (DMA_TX | DMA_RX)) == 0U &&
+                 (read_reg(mac, MAC_CONTROL) & 12U) == 0U &&
+                 (read_reg(mac, DMA_INTERRUPTS) & DMA_SOURCES) == 0U &&
+                 (read_reg(mac, MDIO_CONTROL) & 1U) == 0U;
+    nx_arch_irq_restore(guard);
+    if (!quiet)
+        return NX_ERROR_BUSY;
+    if (mac->irq_control != NULL) {
+        nx_result_t joined = mac->irq_control(mac, false);
+        if (joined != NX_SUCCESS)
+            return joined;
+    }
+    if (mac->wake_publishers != 0U)
+        return NX_ERROR_BUSY;
+    mac->snapshot.started = false;
+    if (read_reg(mac, DMA_RX_TABLE) != 0U ||
+        read_reg(mac, DMA_TX_TABLE) != 0U) {
+        /* ES022 §2.14.9: do not flush. Confirm the reset effect on table
+         * addresses before touching any borrowed descriptor or TX buffer. */
+        write_reg(mac, DMA_BUS, read_reg(mac, DMA_BUS) | 1U);
+        nx_arch_dsb();
+        return NX_ERROR_BUSY;
+    }
+    const bool io_fault = !mac->snapshot.link.up ||
+                          mac->snapshot.fatal_bus_error ||
+                          mac->snapshot.transmit_underflow;
+    for (size_t index = 0U; index < mac->tx_count; ++index) {
+        nx_eth_tx_slot_t* slot = &mac->tx_slots[index];
+        nx_eth_tx_request_t* request = slot->request;
+        mac->tx_descriptors[index].buffer = 0U;
+        mac->tx_descriptors[index].control = 0U;
+        NX_ETH_DESCRIPTOR_STATUS(&mac->tx_descriptors[index], 0U);
+        slot->request = NULL;
+        if (request != NULL) {
+            const nx_result_t result =
+                slot->terminal == NX_SUCCESS
+                    ? (io_fault ? NX_ERROR_IO : NX_ERROR_CANCELLED)
+                    : slot->terminal;
+            nx_request_settle(&request->base, result, 0U);
+        }
+        slot->terminal = NX_SUCCESS;
+    }
+    for (size_t index = 0U; index < mac->rx_count; ++index) {
+        NX_ETH_DESCRIPTOR_STATUS(&mac->rx_descriptors[index], 0U);
+        mac->rx_slots[index].state = NX_ETH_RX_DMA;
+    }
+    nx_arch_dsb();
+    mac->snapshot.pending_tx = 0U;
+    mac->snapshot.link.up = false;
+    mac->rx_consumer = mac->rx_ready_tail = SIZE_MAX;
+    mac->wake = NULL;
+    mac->retained = false;
+    return NX_SUCCESS;
+}
+#endif
 static nx_result_t stop(void* context) {
     nx_eth_mac_t* mac = context;
     if (!task_context())
@@ -747,6 +863,9 @@ static nx_result_t stop(void* context) {
         return NX_SUCCESS;
     if (mac->tx_descriptors == NULL || mac->rx_descriptors == NULL)
         return NX_ERROR_STATE;
+#ifdef NX_ETH_RESET_RETIRE
+    return stop_with_reset(mac);
+#else
     nx_arch_irq_state_t guard = nx_arch_irq_save();
     mac->snapshot.closing = true;
     close_tx(mac, NX_ERROR_CANCELLED, nx_time_now_us());
@@ -809,6 +928,7 @@ static nx_result_t stop(void* context) {
     mac->snapshot.link.up = false;
     mac->retained = false;
     return NX_SUCCESS;
+#endif
 }
 static nx_result_t attach_wake(void* context, const nx_irq_wake_t* wake,
                                uint8_t syscall_ceiling) {

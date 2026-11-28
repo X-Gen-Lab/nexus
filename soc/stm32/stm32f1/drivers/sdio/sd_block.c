@@ -10,6 +10,9 @@
 #include "drivers/sdio/instance.h"
 #include "private/hardware.h"
 #include "system/platform.h"
+#if defined(NX_STM32F1_SDIO_RX_DMA)
+#include <string.h>
+#endif
 
 #define DATA_PIN          (UINT32_C(1) << 8U)
 #define CLOCK_PIN         (UINT32_C(1) << 12U)
@@ -19,6 +22,10 @@
 #define COMMAND_CONFIG    UINT32_C(0x00000A00)
 #define R1_ERRORS         UINT32_C(0xFFFFE008)
 #define OCR_3V3           UINT32_C(0x00300000)
+#if defined(NX_STM32F1_SDIO_4BIT)
+#define WIDE_DATA_PINS   (UINT32_C(7) << 9U)
+#define WIDE_DATA_CONFIG UINT32_C(0x0000AAA0)
+#endif
 
 enum {
     CARD_CLOCK_SETTLE_US = 2001U,
@@ -144,6 +151,33 @@ static nx_result_t power_up_card(nx_stm32f1_sdio_block_t* state,
     return NX_ERROR_TIMEOUT;
 }
 
+#if defined(NX_STM32F1_SDIO_4BIT)
+static nx_result_t set_width(nx_stm32f1_sdio_block_t* state, bool wide,
+                             nx_time_us_t deadline) {
+    uint32_t status;
+    const uint32_t address = (uint32_t)state->rca << 16U;
+    nx_result_t result = short_response(state, 55U, address, &status, deadline);
+    if (result != NX_SUCCESS)
+        return result;
+    if ((status & (R1_ERRORS | SD_APP_CMD)) != SD_APP_CMD)
+        return NX_ERROR_IO;
+
+    /* A lost response cannot disprove a bus change on the card. */
+    if (wide)
+        state->wide_receipt = true;
+    result = short_response(state, 6U, wide ? 2U : 0U, &status, deadline);
+    if (result != NX_SUCCESS)
+        return result;
+    if ((status & R1_ERRORS) != 0U)
+        return NX_ERROR_IO;
+
+    result = nx_stm32f1_sdio_set_width(&state->host, wide, deadline);
+    if (result == NX_SUCCESS && !wide)
+        state->wide_receipt = false;
+    return result;
+}
+#endif
+
 static nx_result_t identify_card(nx_stm32f1_sdio_block_t* state,
                                  nx_time_us_t deadline) {
     nx_stm32f1_sdio_reply_t reply;
@@ -167,6 +201,11 @@ static nx_result_t identify_card(nx_stm32f1_sdio_block_t* state,
     if ((reply.words[0] >> 30U) != 1U || ((reply.words[1] >> 16U) & 15U) != 9U)
         return NX_ERROR_UNSUPPORTED;
     uint32_t c_size = ((reply.words[1] & 63U) << 16U) | (reply.words[2] >> 16U);
+#if defined(NX_STM32F1_SDIO_4BIT)
+    /* SD Physical Layer v9.10 §5.3.3: SDHC CSD v2 capacity bounds. */
+    if (state->wide_requested && (c_size < 0x1010U || c_size > 0xFF5FU))
+        return NX_ERROR_UNSUPPORTED;
+#endif
     /* SDHC CSD v2: class 4, 512-byte writes and no CSD write protection. */
     const bool writable = state->allow_write && c_size >= 0xFFFU &&
                           c_size <= 0xFFFFU &&
@@ -179,6 +218,13 @@ static nx_result_t identify_card(nx_stm32f1_sdio_block_t* state,
     if ((status & R1_ERRORS) != 0U)
         return NX_ERROR_IO;
     result = card_ready(state, ACCEPT_TRANSFER, deadline);
+#if defined(NX_STM32F1_SDIO_4BIT)
+    if (result == NX_SUCCESS && state->wide_requested) {
+        result = set_width(state, true, deadline);
+        if (result == NX_SUCCESS)
+            result = card_ready(state, ACCEPT_TRANSFER, deadline);
+    }
+#endif
     if (result == NX_SUCCESS)
         state->geometry = (nx_block_geometry_t){
             .block_count = ((uint64_t)c_size + 1U) * UINT64_C(1024),
@@ -256,6 +302,23 @@ static nx_block_io_result_t read_sector(void* context, uint64_t first,
         return (nx_block_io_result_t){NX_ERROR_INVALID, 0U};
 
     state->state = NX_BLOCK_ACTIVE;
+#if defined(NX_STM32F1_SDIO_4BIT)
+    if (state->wide_requested && !nx_stm32f1_sdio_four_bit_ready()) {
+        state->state = NX_BLOCK_UNCERTAIN;
+        return (nx_block_io_result_t){NX_ERROR_IO, 0U};
+    }
+#endif
+#if defined(NX_STM32F1_SDIO_RX_DMA)
+    if (state->host.dma_ready) {
+        const nx_result_t received = nx_stm32f1_sdio_read_sector(
+            &state->host, (uint32_t)first, state->dma_sector,
+            SECTOR_BYTES / sizeof(uint32_t), deadline);
+        outcome = transfer_finished(state, received, deadline);
+        if (outcome.result == NX_SUCCESS)
+            memcpy(data, state->dma_sector, SECTOR_BYTES);
+        return outcome;
+    }
+#endif
     return transfer_finished(
         state,
         nx_stm32f1_sdio_read_sector(&state->host, (uint32_t)first, data,
@@ -280,6 +343,12 @@ static nx_block_io_result_t write_sector(void* context, uint64_t first,
         return (nx_block_io_result_t){NX_ERROR_INVALID, 0U};
 
     state->state = NX_BLOCK_ACTIVE;
+#if defined(NX_STM32F1_SDIO_4BIT)
+    if (state->wide_requested != nx_stm32f1_sdio_four_bit_ready()) {
+        state->state = NX_BLOCK_UNCERTAIN;
+        return (nx_block_io_result_t){NX_ERROR_IO, 0U};
+    }
+#endif
     return transfer_finished(
         state,
         nx_stm32f1_sdio_write_sector(&state->host, (uint32_t)first, data,
@@ -310,6 +379,11 @@ static nx_result_t sync(void* context, nx_time_us_t deadline) {
         return NX_ERROR_STATE;
     state->state = NX_BLOCK_ACTIVE;
     result = nx_stm32f1_sdio_quiesce(&state->host, deadline);
+#if defined(NX_STM32F1_SDIO_4BIT)
+    if (result == NX_SUCCESS && state->wide_requested &&
+        !nx_stm32f1_sdio_four_bit_ready())
+        result = NX_ERROR_IO;
+#endif
     if (result == NX_SUCCESS)
         result = card_ready(state, ACCEPT_TRANSFER, deadline);
     state->state = result == NX_SUCCESS ? NX_BLOCK_READY : NX_BLOCK_UNCERTAIN;
@@ -325,9 +399,17 @@ static nx_result_t stop(void* context, nx_time_us_t deadline) {
     state->state = NX_BLOCK_ACTIVE;
     if (state->rca != 0U && !state->removed) {
         result = nx_stm32f1_sdio_quiesce(&state->host, deadline);
+        uint32_t accepted = ACCEPT_TRANSFER | ACCEPT_STANDBY;
+#if defined(NX_STM32F1_SDIO_4BIT)
+        if (state->wide_receipt)
+            accepted = ACCEPT_TRANSFER;
+#endif
         if (result == NX_SUCCESS)
-            result =
-                card_ready(state, ACCEPT_TRANSFER | ACCEPT_STANDBY, deadline);
+            result = card_ready(state, accepted, deadline);
+#if defined(NX_STM32F1_SDIO_4BIT)
+        if (result == NX_SUCCESS && state->wide_receipt)
+            result = set_width(state, false, deadline);
+#endif
         if (result == NX_SUCCESS)
             result = nx_stm32f1_sdio_command(
                 &state->host, 7U, 0U, NX_STM32F1_SDIO_NONE, NULL, deadline);
@@ -339,6 +421,9 @@ static nx_result_t stop(void* context, nx_time_us_t deadline) {
     if (result == NX_SUCCESS)
         result = nx_stm32f1_sdio_close(&state->host, deadline);
     if (result == NX_SUCCESS) {
+#if defined(NX_STM32F1_SDIO_4BIT)
+        state->wide_receipt = false;
+#endif
         state->rca = 0U;
         state->geometry.block_count = 0U;
         state->state = NX_BLOCK_STOPPED;
@@ -384,7 +469,12 @@ const nx_block_ops_t nx_stm32f1_sdio_block_write_ops = {.geometry = geometry,
                                                         .media_removed =
                                                             media_removed};
 
-nx_result_t nx_stm32f1_sdio_block_prepare(nx_stm32f1_sdio_block_t* state) {
+#if defined(NX_STM32F1_SDIO_4BIT)
+static nx_result_t prepare_block(nx_stm32f1_sdio_block_t* state, bool wide)
+#else
+nx_result_t nx_stm32f1_sdio_block_prepare(nx_stm32f1_sdio_block_t* state)
+#endif
+{
     if (state == NULL)
         return NX_ERROR_INVALID;
     if (!nx_stm32f1_cold_context())
@@ -396,8 +486,16 @@ nx_result_t nx_stm32f1_sdio_block_prepare(nx_stm32f1_sdio_block_t* state) {
     if ((RCC->AHBENR & RCC_AHBENR_SDIOEN) != 0U)
         return NX_ERROR_BUSY;
 
-    nx_result_t result = nx_stm32f1_pads_capture(
-        &state->port_c, GPIOC, DATA_PIN | CLOCK_PIN | DETECT_PIN);
+    uint16_t data_pins = DATA_PIN | CLOCK_PIN | DETECT_PIN;
+    uint32_t pad_config = DATA_CLOCK_CONFIG;
+#if defined(NX_STM32F1_SDIO_4BIT)
+    if (wide) {
+        data_pins |= WIDE_DATA_PINS;
+        pad_config |= WIDE_DATA_CONFIG;
+    }
+#endif
+    nx_result_t result =
+        nx_stm32f1_pads_capture(&state->port_c, GPIOC, data_pins);
     if (result == NX_SUCCESS) {
         /* ES0340: SDIO also conflicts with AF outputs on unused PC9/PC10. */
         const uint32_t config = GPIOC->CRH;
@@ -407,17 +505,40 @@ nx_result_t nx_stm32f1_sdio_block_prepare(nx_stm32f1_sdio_block_t* state) {
         result = nx_stm32f1_pads_capture(&state->port_d, GPIOD, COMMAND_PIN);
     }
     if (result == NX_SUCCESS)
-        result = nx_stm32f1_pads_apply(&state->port_c, 0U, DATA_CLOCK_CONFIG,
+        result = nx_stm32f1_pads_apply(&state->port_c, 0U, pad_config,
                                        state->port_c.latch);
     if (result == NX_SUCCESS)
         result = nx_stm32f1_pads_apply(&state->port_d, COMMAND_CONFIG, 0U,
                                        state->port_d.latch);
     if (result == NX_SUCCESS) {
         state->allow_write = false;
+#if defined(NX_STM32F1_SDIO_4BIT)
+        state->wide_requested = wide;
+        state->wide_receipt = false;
+#endif
         state->state = NX_BLOCK_STOPPED;
     }
     return result;
 }
+
+#if defined(NX_STM32F1_SDIO_4BIT)
+nx_result_t nx_stm32f1_sdio_block_prepare(nx_stm32f1_sdio_block_t* state) {
+    return prepare_block(state, false);
+}
+
+nx_result_t
+nx_stm32f1_sdio_block_prepare_four_bit(nx_stm32f1_sdio_block_t* state) {
+    return prepare_block(state, true);
+}
+
+nx_result_t
+nx_stm32f1_sdio_block_prepare_four_bit_write(nx_stm32f1_sdio_block_t* state) {
+    nx_result_t result = nx_stm32f1_sdio_block_prepare_four_bit(state);
+    if (result == NX_SUCCESS)
+        state->allow_write = true;
+    return result;
+}
+#endif
 
 nx_result_t
 nx_stm32f1_sdio_block_prepare_write(nx_stm32f1_sdio_block_t* state) {
@@ -426,6 +547,15 @@ nx_stm32f1_sdio_block_prepare_write(nx_stm32f1_sdio_block_t* state) {
         state->allow_write = true;
     return result;
 }
+
+#if defined(NX_STM32F1_SDIO_RX_DMA)
+nx_result_t
+nx_stm32f1_sdio_block_prepare_four_bit_dma(nx_stm32f1_sdio_block_t* state) {
+    nx_result_t result = nx_stm32f1_sdio_block_prepare_four_bit(state);
+    return result == NX_SUCCESS ? nx_stm32f1_sdio_dma_prepare(&state->host)
+                                : result;
+}
+#endif
 
 nx_result_t nx_stm32f1_sdio_block_close(nx_stm32f1_sdio_block_t* state) {
     if (state == NULL)
@@ -444,6 +574,11 @@ nx_result_t nx_stm32f1_sdio_block_close(nx_stm32f1_sdio_block_t* state) {
     }
 
     state->state = NX_BLOCK_UNAVAILABLE;
+#if defined(NX_STM32F1_SDIO_RX_DMA)
+    const nx_result_t released = nx_stm32f1_sdio_dma_release(&state->host);
+    if (released != NX_SUCCESS)
+        return released;
+#endif
     nx_result_t result = nx_stm32f1_pads_restore(&state->port_d);
     if (result == NX_SUCCESS)
         result = nx_stm32f1_pads_restore(&state->port_c);

@@ -117,7 +117,14 @@ def resolve(assembly, *, root, soc, board, routes, bindings,
                      f"allowed: {', '.join(route['modes'])}")
             for field, expected in route.get("required_options", {}).items():
                 actual = selection.get(field)
-                if type(actual) is not type(expected) or actual != expected:
+                if isinstance(expected, (list, tuple)):
+                    matches = (isinstance(actual, (list, tuple)) and
+                               len(actual) == len(expected) and
+                               all(type(a) is type(e) and a == e
+                                   for a, e in zip(actual, expected)))
+                else:
+                    matches = type(actual) is type(expected) and actual == expected
+                if not matches:
                     fail(f"Route {route['id']} requires {field} = {expected!r}")
             profiles = route.get("clock_profiles")
             if profiles is not None and (clock_plan is None or
@@ -129,7 +136,8 @@ def resolve(assembly, *, root, soc, board, routes, bindings,
                 rtc.validate_board(selection, board)
             if binding_policy is not None:
                 binding_policy.validate_selection(
-                    soc["variants"][part].get("device"), route["kind"], selection)
+                    soc["variants"][part].get("device"), route["kind"],
+                    selection, part=part)
             validate_selection(selection, route, provider, ram["size"],
                                clock=clock, clock_plan=clock_plan)
             route = adc.selected_route(selection, route, provider)
@@ -210,7 +218,8 @@ def resolve(assembly, *, root, soc, board, routes, bindings,
             if traits.dma:
                 for dma in route_dma(route, mode):
                     claim("dma:" + dma, name, mode, route["id"])
-                    claim(provider.dma_irq(dma), name, mode, route["id"])
+                    if traits.dma_irq:
+                        claim(provider.dma_irq(dma), name, mode, route["id"])
             selected.append(normalize_controller(
                 selection, route, binding, hardware, provider, clock=clock,
                 clock_plan=clock_plan, clock_profile=assembly.clock_profile,

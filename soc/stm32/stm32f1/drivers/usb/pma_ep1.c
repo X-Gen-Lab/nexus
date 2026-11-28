@@ -7,6 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "pma_ep1.h"
+#include "lp.h"
 #include "nexus/arch/arch.h"
 
 enum {
@@ -67,6 +68,14 @@ static bool inactive_source(uint16_t observed, const direction_t* dir) {
            (observed & dir->status) != dir->valid;
 }
 
+/** \brief Recognize the exact standard configuration status phase. */
+static bool configuration_pending(const nx_stm32f1_ep0_t* control) {
+    return control->phase == NX_STM32F1_EP0_STATUS_IN &&
+           control->setup.request_type == 0U && control->setup.request == 9U &&
+           control->setup.index == 0U && control->setup.length == 0U &&
+           control->setup.value <= UINT8_MAX;
+}
+
 static nx_result_t activate(void* context, uint64_t epoch, uint8_t address,
                             bool active) {
     nx_stm32f1_usb_pma_device_t* state = context;
@@ -75,16 +84,24 @@ static nx_result_t activate(void* context, uint64_t epoch, uint8_t address,
     if (address != DATA_EP && address != (0x80U | DATA_EP))
         return NX_ERROR_INVALID;
     const nx_stm32f1_ep0_t* control = &state->link.endpoint;
-    if (!state->attached || state->closing || !control->observed_full_speed ||
-        control->phase != NX_STM32F1_EP0_IDLE ||
-        epoch != control->setup.epoch ||
-        (state->config->link.endpoint.registers->CNTR & USB_CNTR_FSUSP) != 0U ||
-        (state->config->link.endpoint.registers->ISTR & USB_ISTR_RESET) != 0U)
+    if (!state->attached || state->closing || epoch != control->setup.epoch ||
+        !nx_stm32f1_usb_lp_ready(control)) {
         return NX_ERROR_STATE;
+    }
     const bool in = (address & 0x80U) != 0U;
     const direction_t* dir = &directions[in];
     volatile uint16_t* reg = ep1(state);
     const uint16_t observed = *reg;
+    const bool already_disabled = (observed & (dir->status | dir->ctr)) == 0U &&
+                                  state->ep1[in].request == NULL;
+    if (!active && already_disabled)
+        return NX_SUCCESS;
+    /* SET_CONFIGURATION may open the endpoints into NAK before its ACK. */
+    const bool configuring = configuration_pending(control) &&
+                             (!active || control->setup.value != 0U);
+    if (!control->observed_full_speed ||
+        (control->phase != NX_STM32F1_EP0_IDLE && !configuring))
+        return NX_ERROR_STATE;
     if (state->ep1[in].request != NULL || !inactive_source(observed, dir))
         return NX_ERROR_BUSY;
     if (((observed & dir->status) != 0U) == active)
@@ -120,8 +137,10 @@ nx_result_t nx_stm32f1_usb_ep1_submit(nx_stm32f1_usb_pma_device_t* state,
         request->length > (in ? layout->tx_capacity : layout->rx_capacity) ||
         (in ? request->out != NULL : request->in != NULL))
         return NX_ERROR_INVALID;
-    if ((config->link.endpoint.registers->ISTR & USB_ISTR_RESET) != 0U)
+    if ((config->link.endpoint.registers->ISTR & USB_ISTR_RESET) != 0U ||
+        configuration_pending(&state->link.endpoint)) {
         return NX_ERROR_STATE;
+    }
     const direction_t* dir = &directions[in];
     nx_stm32f1_ep0_loan_t* loan = &state->ep1[in];
     volatile uint16_t* reg = ep1(state);

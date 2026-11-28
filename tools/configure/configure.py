@@ -458,9 +458,13 @@ def resolve_routes(routes_doc, soc, part, provider, *, controller_profiles=None)
             fields = contract.selected_fields if contract is not None else set()
             options = obj(route["required_options"], set(), fields,
                           "route required options")
-            if not options or any(type(value) not in (bool, int, str)
-                                  for value in options.values()):
-                fail("Route required options must name scalar controller values")
+            def finite_value(value):
+                scalar = (bool, int, str)
+                return type(value) in scalar or (
+                    type(value) is list and 0 < len(value) <= 16 and
+                    all(type(entry) in scalar for entry in value))
+            if not options or any(not finite_value(value) for value in options.values()):
+                fail("Route required options must name scalars or bounded scalar sequences")
         if "clock_profiles" in route:
             profiles = [text(name, "route clock profile") for name in
                         sequence(route["clock_profiles"], "route clock profiles")]

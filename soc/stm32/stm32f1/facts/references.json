@@ -42,7 +42,10 @@
         "can_packet_sram_and_loopback": "Sections 23.2, 24.2, 24.5.3 and 24.8; dedicated SRAM, silent internal loopback and exact bit timing.",
         "dac": "Sections 12.3 and 12.5, direct DAC output; reviewed without trigger, DMA or waveform generation.",
         "usb_pma": "Sections 23.3\u201323.5, EP0 reset CTR, LP IRQ20, PMA/USB-CAN exclusivity and FSUSP",
-        "afio_usart2_remap": "Section 9.3.8/Table 53 and section 9.4.2 connectivity line. USART2_REMAP bit 3, SWJ_CFG write-only; 111 has no effect."
+        "afio_usart2_remap": "Section 9.3.8/Table 53 and section 9.4.2 connectivity line. USART2_REMAP bit 3, SWJ_CFG write-only; 111 has no effect.",
+        "wwdg_early_warning": "Sections 6.4.1, 7.1.1, 7.1.3 and 20.6.2-20.6.3: system reset retention, backup data and reset-only EWI.",
+        "spi3_connectivity_remap": "Table 57 and sections 9.3.11, 9.4.2 and 25: dedicated SPI3_REMAP and SWJ ownership.",
+        "adc3_polling": "Sections 7.3.4 and 7.3.7, APB2 reset and clock bit 15; section 11.7 Table 69 SWSTART and independent regular conversion."
       }
     },
     "es096": {
@@ -102,7 +105,8 @@
       "anchors": {
         "package_gpio": "Figure 5 p27 and Table 5 p31 onward, LQFP144",
         "device_features": "Table 2 part data",
-        "adc": "Section 5.3.19 and Tables 59-60: ADC clock, reference, calibration and external impedance limits"
+        "adc": "Section 5.3.19 and Tables 59-60: ADC clock, reference, calibration and external impedance limits",
+        "adc3_pa3": "Table 5 LQFP144 pin 37 PA3/ADC123_IN3, and Tables 59-60 analog electrical limits."
       }
     },
     "es0340": {
@@ -159,7 +163,8 @@
         "pinout": "Figure 4 p23 and Table 4 pp24ff",
         "hsi": "Table 23 p50",
         "ordering": "Ordering information scheme, internal code B",
-        "flash": "Table 27 halfword/page timing and programming supply."
+        "flash": "Table 27 halfword/page timing and programming supply.",
+        "cec": "Table 4 LQFP64 pin 61 PB8 (CEC default), pin 29 PB10 (remap)."
       }
     },
     "ds5318": {
@@ -173,7 +178,8 @@
       "anchors": {
         "memory": "Table 2 p11",
         "pinout": "Figure 4 p22 and Table 4 pp24ff",
-        "hsi": "Table 23 p49"
+        "hsi": "Table 23 p49",
+        "flash": "Table 27 p51"
       }
     },
     "ds5933": {
@@ -187,7 +193,8 @@
       "anchors": {
         "memory": "Table 2 p10",
         "pinout": "Figure 4 p20 and Table 4 pp21ff",
-        "hsi": "Table 23 p45"
+        "hsi": "Table 23 p45",
+        "flash": "Table 27 p47"
       }
     },
     "ds6014": {
@@ -203,7 +210,8 @@
         "pinout": "Figure 3 p25 and Table 5 pp27ff",
         "hsi": "Table 24 p52",
         "clock": "Tables 27 and 28 p53 for the three PLLs",
-        "usart2_pd5_pd6": "Table 5, LQFP100 pins 86 (PD5 USART2_TX) and 87 (PD6 USART2_RX)."
+        "usart2_pd5_pd6": "Table 5, LQFP100 pins 86 (PD5 USART2_TX) and 87 (PD6 USART2_RX).",
+        "spi3_pc9_pc12": "Table 5, LQFP100 pins 66 (GPIO CS), 78 (SPI3_SCK), 79 (SPI3_MISO), and 80 (SPI3_MOSI)."
       }
     },
     "rm0041": {
@@ -219,7 +227,8 @@
         "clock_extra": "Section 6.3.11 RCC_CFGR2",
         "pinmux": "Section 7.3.5 USART2 remap",
         "timebase": "Section 13 TIM2 16-bit",
-        "dac": "Sections 11.3 and 11.5, direct DAC without trigger, one APB1 cycle to transfer holding data."
+        "dac": "Sections 11.3 and 11.5, direct DAC without trigger, one APB1 cycle to transfer holding data.",
+        "cec": "Table 47 default route; Section 24.3.1 open-drain line; Sections 24.7.2 and 24.7.7-24.9.5 prescaler, frame IRQs and idle withdrawal."
       }
     },
     "es093": {
@@ -251,7 +260,8 @@
         "hsi": "Sections 2.1.2 and 2.2.1",
         "clock_transition": "Section 2.2.10 switching/restarting PLL after nontrivial HSE input",
         "uart": "Sections 2.3.6 and 2.9.2\u20133",
-        "future_usb_ethernet": "Chapters 2.13\u20132.14, including Ethernet DMA with WFI/WFE"
+        "future_usb_ethernet": "Chapters 2.13\u20132.14, including Ethernet DMA with WFI/WFE",
+        "spi3_polling": "Sections 2.10.1 and 2.10.2 require CRC to be active, which is excluded by this master SPI mode."
       }
     },
     "ds5944": {
@@ -265,7 +275,8 @@
       "anchors": {
         "memory": "Table 2 p11",
         "pins": "Figure 3 p23 and Table 4 p25 onward",
-        "hsi": "Table 24 p54"
+        "hsi": "Table 24 p54",
+        "flash": "Table 28 p56"
       }
     },
     "ds5935": {
@@ -279,7 +290,8 @@
       "anchors": {
         "memory": "Table 2 p11",
         "pins": "Figure 4 p21 and Table 4 p23 onward",
-        "hsi": "Table 23 p47"
+        "hsi": "Table 23 p47",
+        "flash": "Table 27 p49"
       }
     },
     "ds5791": {
@@ -293,7 +305,8 @@
       "anchors": {
         "memory": "Table 2 p11",
         "pins": "Figure 3 p23 and Table 5 p25 onward",
-        "hsi": "Table 25 p56"
+        "hsi": "Table 25 p56",
+        "flash": "Table 29 p58"
       }
     },
     "ds6557": {
@@ -308,7 +321,8 @@
         "memory": "Table 2 p11 and embedded Flash chapter",
         "pins": "Figure 3 p23 and Table 5 p25 onward",
         "hsi": "Table 25 p54",
-        "mpu": "Memory protection unit supports eight areas"
+        "mpu": "Memory protection unit supports eight areas",
+        "flash": "Table 29 p56"
       }
     },
     "ds5934": {
@@ -322,7 +336,8 @@
       "anchors": {
         "memory": "Table 2",
         "pins": "Figure 3 p20 and Table 4 p21 onward",
-        "hsi": "Table 23 p44"
+        "hsi": "Table 23 p44",
+        "flash": "Table 27 p46"
       }
     },
     "es0136": {
@@ -481,6 +496,8 @@
           "X"
         ],
         "maintained_modes": [
+          "adc:internal-scan",
+          "adc:sequential-scan-dma",
           "adc:single-shot",
           "adc:single-trigger-dma",
           "advanced_pwm:complementary-pwm",
@@ -496,12 +513,16 @@
           "gpio:output",
           "i2c:poll-messages",
           "i2c_target:target-rx-irq",
+          "i2c_target:target-tx-irq",
+          "i2c_target:target-write-read-irq",
           "pwm:fixed-pwm",
           "pwm_adc:finite-injected",
           "rtc:backup-adopt",
+          "rtc:backup-provision",
           "spi:dma",
           "spi:short-poll",
           "timer_capture:edge-capture",
+          "timer_pulse:one-pulse",
           "uart:dma-tx",
           "uart:irq-byte-event",
           "uart:irq-wire",
@@ -591,7 +612,7 @@
             "revisions": "AAAAAAAA",
             "assessment": "external_constraint",
             "condition": "The crystal can fail to start on first backup domain power-on in harsh environments.",
-            "handling": "Adopt only the exact reviewed LSE route and a running retained RTC. Require LSERDY and fresh APB synchronization; crystal startup and VBAT retention remain outside the software reference.",
+            "handling": "The adopted route requires a running LSE and fresh APB synchronization. Explicit provisioning bounds failure by time and polls, retains an already selected clock and leaves backup data intact. Crystal startup margin, VBAT retention and the field PCB workaround require hardware qualification.",
             "implementation": [
               "soc/stm32/stm32f1/drivers/rtc/counter.c"
             ],
@@ -771,7 +792,8 @@
             "handling": "The reviewed ADC1 PA0 path uses regular single-shot conversions only, with JEXTTRIG and injected auto conversion disabled.",
             "implementation": [
               "soc/stm32/stm32f1/drivers/adc/adc.c",
-              "soc/stm32/stm32f1/drivers/pwm_adc/cycle.c"
+              "soc/stm32/stm32f1/drivers/pwm_adc/cycle.c",
+              "soc/stm32/stm32f1/drivers/adc/internal.c"
             ],
             "regressions": [
               "tests/behavior/soc/stm32/stm32f1/adc/adc_test.cpp"
@@ -798,10 +820,11 @@
             "revisions": "NNNNNNNN",
             "assessment": "excluded_mode",
             "condition": "Consecutive compare events can be lost in toggle mode or center-aligned compare interrupts.",
-            "handling": "Use up-counting PWM1 with preloaded duty. No CCR interrupts, toggle output or compare triggers are published.",
+            "handling": "Periodic PWM uses PWM1 and the fixed one-pulse route uses PWM2 with an unchanged CCR while running. No compare interrupts, toggle output or compare triggers are published.",
             "implementation": [
               "soc/stm32/stm32f1/drivers/advanced_pwm/advanced_pwm.c",
-              "soc/stm32/stm32f1/drivers/pwm_adc/cycle.c"
+              "soc/stm32/stm32f1/drivers/pwm_adc/cycle.c",
+              "soc/stm32/stm32f1/drivers/timer_pulse/tim3.c"
             ],
             "regressions": [
               "tests/behavior/soc/stm32/stm32f1/advanced_pwm/advanced_pwm_test.cpp"
@@ -813,7 +836,7 @@
             "revisions": "PPPPPPPP",
             "assessment": "silicon_limit",
             "condition": "External counter reset can extend the inactive PWM interval with OCREF clear.",
-            "handling": "TIM3 CH1 fixed PWM has no slave reset or OCREF clear path.",
+            "handling": "TIM3 CH1 fixed PWM and one-pulse routes have no slave reset or OCREF clear path.",
             "implementation": [
               "soc/stm32/stm32f1/drivers/pwm/pwm.c"
             ],
@@ -913,7 +936,7 @@
             "revisions": "AAAAAAAA",
             "assessment": "workaround",
             "condition": "Late software handling can duplicate, miss or introduce bytes.",
-            "handling": "Hold SCL where ACK/STOP ordering requires a dedicated window and wait for BTF for longer reads and controller writes. I2C1 target receive keeps stretching enabled and rejects an observed BTF missed EV2 window.",
+            "handling": "Hold SCL where ACK/STOP ordering requires a dedicated window and wait for BTF for longer reads and controller writes. I2C1 target receive rejects a missed EV2 window. Target modes keep stretching enabled. The combined target mode requires a drained RX phase before its second local match. Transmit feeds one byte on EV1, then waits for BTF or terminal AF.",
             "implementation": [
               "soc/stm32/stm32f1/drivers/i2c/i2c.c",
               "soc/stm32/stm32f1/drivers/i2c/target.c"
@@ -984,7 +1007,7 @@
             "revisions": "AAAAAAAA",
             "assessment": "silicon_limit",
             "condition": "Slave transmit with no clock stretching can miss data timing without OVR.",
-            "handling": "I2C1 target is receive-only with stretching enabled. The polling controller mode owns the separate master route.",
+            "handling": "I2C1 has separately selected receive-only and transmit-only targets. Transmit keeps NOSTRETCH clear and does not prefetch in TXE. The peer must accept clock stretching.",
             "implementation": [
               "soc/stm32/stm32f1/facts/routes.json",
               "soc/stm32/stm32f1/drivers/i2c/target.c"
@@ -1005,6 +1028,20 @@
             ],
             "regressions": [
               "tests/behavior/soc/stm32/stm32f1/i2c/i2c_test.cpp"
+            ]
+          },
+          {
+            "section": "2.9.1",
+            "title": "Early clearing of the parity error flag",
+            "revisions": "AAAAAAAA",
+            "assessment": "workaround",
+            "condition": "Reading DR before RXNE can leave a parity error reasserting until the stop bit.",
+            "handling": "Smartcard disables the independent parity interrupt and waits for RXNE before reading DR. A pending early PE blocks a queued data-register write.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/uart/uart.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/uart_smartcard/smartcard_test.cpp"
             ]
           },
           {
@@ -1029,12 +1066,15 @@
             "revisions": "AAAAAAAA",
             "assessment": "silicon_limit",
             "condition": "With parity enabled in full duplex, a data-register write can clear the receiver PE flag.",
-            "handling": "The initial USART2 mode uses 8N1. Production parity modes require a separate review.",
+            "handling": "The initial 8N1 mode has no parity. The Smartcard owner serializes one TX character, preserves pending PE without RXNE, and observes complete RX before writing DR. Concurrent full-duplex parity behavior remains a silicon limit.",
             "implementation": [
               "soc/stm32/stm32f1/facts/routes.json",
-              "soc/stm32/stm32f1/drivers/uart/uart_word.c"
+              "soc/stm32/stm32f1/drivers/uart/uart_word.c",
+              "soc/stm32/stm32f1/drivers/uart/uart.c"
             ],
-            "regressions": []
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/uart_smartcard/smartcard_test.cpp"
+            ]
           },
           {
             "section": "2.9.5",
@@ -1301,10 +1341,14 @@
         ],
         "maintained_modes": [
           "adc:simultaneous-scan-dma",
+          "adc:single-shot",
           "advanced_pwm:complementary-pwm",
           "audio:master-tx",
           "block:sdio-poll",
+          "block:sdio-poll-4bit",
+          "block:sdio-poll-4bit-write",
           "block:sdio-poll-write",
+          "block:sdio-rx-dma-poll",
           "dac:direct",
           "flash:poll-halfword",
           "gpio:output",
@@ -1366,7 +1410,7 @@
             "title": "SDIO with TIM8",
             "revisions": "AAAAAA",
             "assessment": "workaround",
-            "condition": "TIM8_CH4 output conflicts with SDIO in 1-bit mode.",
+            "condition": "TIM8_CH4 output conflicts with SDIO in 1-bit and 4-bit modes.",
             "handling": "Reserve PC9 even in 1-bit mode and reject inherited alternate output mode during cold prepare. TIM8 exposes only CH1 and rejects configurations enabling other channels.",
             "implementation": [
               "soc/stm32/stm32f1/facts/routes.json",
@@ -1441,11 +1485,13 @@
             "handling": "Only the channel's individual HTIF, TCIF and TEIF W1C bits are written. DMA register accesses are aligned 32-bit words.",
             "implementation": [
               "soc/stm32/stm32f1/drivers/audio/i2s2.c",
-              "soc/stm32/stm32f1/drivers/adc/dual_dma.c"
+              "soc/stm32/stm32f1/drivers/adc/dual_dma.c",
+              "soc/stm32/stm32f1/drivers/sdio/transport.c"
             ],
             "regressions": [
               "tests/behavior/soc/stm32/stm32f1/i2s2/i2s2_test.cpp",
-              "tests/behavior/soc/stm32/stm32f1/adc/dual_dma_test.cpp"
+              "tests/behavior/soc/stm32/stm32f1/adc/dual_dma_test.cpp",
+              "tests/behavior/soc/stm32/stm32f1/sdio/transport_test.cpp"
             ]
           },
           {
@@ -1661,7 +1707,7 @@
             "revisions": "AAAAAA",
             "assessment": "workaround",
             "condition": "TX underrun may corrupt data without TXUNDERR when six parent cycles are at least one data-word transfer.",
-            "handling": "Read-only remains the default. Explicit single-bit CMD24 verifies the 8 MHz parents and divide-by-22 host clock, requires the positive block CRC result, and confirms card readiness.",
+            "handling": "Explicit CMD24 validates both 8 MHz parents and the divide-by-22 host. In four-line mode six parent cycles are 0.75 microseconds and one wire word lasts 22 microseconds. Both modes require the block CRC result and card readiness.",
             "implementation": [
               "soc/stm32/stm32f1/drivers/sdio/transport.c"
             ],
@@ -1696,6 +1742,7 @@
           "flash:poll-halfword",
           "gpio:output",
           "memory_window:cpu-window",
+          "parallel16:8080-16",
           "uart:irq-byte-event"
         ],
         "items": [
@@ -1975,6 +2022,7 @@
           "X"
         ],
         "maintained_modes": [
+          "flash:poll-halfword",
           "gpio:output",
           "uart:irq-byte-event"
         ],
@@ -2014,6 +2062,20 @@
               "soc/stm32/stm32f1/facts/soc.json"
             ],
             "regressions": []
+          },
+          {
+            "section": "2.2.11",
+            "title": "Flash memory BSY latency after STRT",
+            "revisions": "AAAAAAAA",
+            "assessment": "workaround",
+            "condition": "BSY can read clear on the first bus cycle after starting page erase.",
+            "handling": "Complete and read back the control write before polling status. The controller then requires EOP without an error flag and verifies the page.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/flash/flash.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/flash/flash_test.cpp"
+            ]
           },
           {
             "title": "USART TX pin remains owned during receive-only use",
@@ -2077,6 +2139,7 @@
           "X"
         ],
         "maintained_modes": [
+          "flash:poll-halfword",
           "gpio:output",
           "uart:irq-byte-event",
           "usb_device:device-pma"
@@ -2117,6 +2180,20 @@
               "soc/stm32/stm32f1/facts/soc.json"
             ],
             "regressions": []
+          },
+          {
+            "section": "2.2.11",
+            "title": "Flash memory BSY latency after STRT",
+            "revisions": "AAAAAA",
+            "assessment": "workaround",
+            "condition": "BSY can read clear on the first bus cycle after starting page erase.",
+            "handling": "Complete and read back the control write before polling status. The controller then requires EOP without an error flag and verifies the page.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/flash/flash.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/flash/flash_test.cpp"
+            ]
           },
           {
             "title": "USART TX pin remains owned during receive-only use",
@@ -2423,11 +2500,15 @@
         ],
         "maintained_modes": [
           "can:classic-irq",
+          "eth:raw-mii",
+          "eth:raw-rmii",
           "gpio:output",
           "mdio:clause22",
+          "spi:short-poll",
           "uart:irq-byte-event",
           "usb_device:device-fs",
-          "usb_host:host-fs"
+          "usb_host:host-fs",
+          "usb_host:host-fs-bulk"
         ],
         "items": [
           {
@@ -2503,6 +2584,34 @@
               "soc/stm32/stm32f1/facts/routes.json"
             ],
             "regressions": []
+          },
+          {
+            "section": "2.10.1",
+            "title": "CRC still sensitive to communication clock when SPI is in slave mode even with NSS high",
+            "revisions": "AA",
+            "assessment": "excluded_mode",
+            "condition": "SPI slave with CRC enabled.",
+            "handling": "SPI3 short polling is master PIO with CRC disabled.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/spi/spi.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/spi/spi_test.cpp"
+            ]
+          },
+          {
+            "section": "2.10.2",
+            "title": "SPI CRC may be corrupted during a transfer on a shared DMA channel",
+            "revisions": "AA",
+            "assessment": "excluded_mode",
+            "condition": "SPI CRC enabled with PIO and a competing DMA transfer.",
+            "handling": "SPI3 short polling is master PIO with CRC disabled.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/spi/spi.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/spi/spi_test.cpp"
+            ]
           },
           {
             "section": "2.12.1",
@@ -2590,6 +2699,81 @@
             "regressions": [
               "tests/behavior/soc/stm32/stm32f1/usb/connectivity_test.cpp"
             ]
+          },
+          {
+            "section": "2.14.1",
+            "revisions": "AA",
+            "title": "Half-duplex Store-and-Forward underflow",
+            "condition": "Half-duplex abort or collision",
+            "handling": "The reviewed raw MII mode only admits a full-duplex link.",
+            "assessment": "workaround",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/ethernet/raw.c",
+              "soc/stm32/common/dwmac/eth_mac.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f4/ethernet/ethernet_mac_test.cpp"
+            ]
+          },
+          {
+            "section": "2.14.5",
+            "revisions": "AA",
+            "title": "Collision after transmitter withdrawal",
+            "condition": "Half-duplex transmission during MAC shutdown",
+            "handling": "Full-duplex mode is required and active speed changes are rejected.",
+            "assessment": "workaround",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/ethernet/raw.c",
+              "soc/stm32/common/dwmac/eth_mac.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f4/ethernet/ethernet_mac_test.cpp"
+            ]
+          },
+          {
+            "section": "2.14.9",
+            "revisions": "AA",
+            "title": "TX FIFO flush may leave MAC stuck",
+            "condition": "Flush immediately after TX completion",
+            "handling": "Use the documented core software reset and verify both descriptor base addresses before releasing any ownership.",
+            "assessment": "workaround",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/ethernet/raw.c",
+              "soc/stm32/common/dwmac/eth_mac.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f4/ethernet/ethernet_mac_test.cpp"
+            ]
+          },
+          {
+            "section": "2.14.10",
+            "revisions": "AA",
+            "title": "Transmission corruption while FIFO is changing state",
+            "condition": "Threshold-mode TX",
+            "handling": "Use Store-and-Forward from initialization and retain it throughout the session.",
+            "assessment": "workaround",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/ethernet/raw.c",
+              "soc/stm32/common/dwmac/eth_mac.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f4/ethernet/ethernet_mac_test.cpp"
+            ]
+          },
+          {
+            "section": "2.14.11",
+            "revisions": "AA",
+            "title": "Ethernet DMA stalls after WFI/WFE",
+            "condition": "MAC is the only clocked AHB DMA master",
+            "handling": "Acquire and retain the exclusive DMA2 clock while the MAC owns any descriptor or buffer.",
+            "assessment": "workaround",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/ethernet/raw.c",
+              "soc/stm32/common/dwmac/eth_mac.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f4/ethernet/ethernet_mac_test.cpp"
+            ]
           }
         ]
       }
@@ -2612,6 +2796,7 @@
           "A"
         ],
         "maintained_modes": [
+          "flash:poll-halfword",
           "gpio:output",
           "uart:irq-byte-event"
         ],
@@ -2627,6 +2812,20 @@
               "soc/stm32/stm32f1/facts/bindings.json"
             ],
             "regressions": []
+          },
+          {
+            "section": "2.2.7",
+            "title": "Flash memory BSY latency after STRT",
+            "revisions": "A",
+            "assessment": "workaround",
+            "condition": "BSY can read clear on the first bus cycle after starting page erase.",
+            "handling": "Complete and read back the control write before polling status. The controller then requires EOP without an error flag and verifies the page.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/flash/flash.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/flash/flash_test.cpp"
+            ]
           },
           {
             "title": "USART TX pin remains owned during receive-only use",
@@ -2686,6 +2885,7 @@
           "1"
         ],
         "maintained_modes": [
+          "flash:poll-halfword",
           "gpio:output",
           "uart:irq-byte-event"
         ],
@@ -2725,6 +2925,20 @@
               "soc/stm32/stm32f1/facts/soc.json"
             ],
             "regressions": []
+          },
+          {
+            "section": "2.2.10",
+            "title": "Flash memory BSY latency after STRT",
+            "revisions": "AA",
+            "assessment": "workaround",
+            "condition": "BSY can read clear on the first bus cycle after starting page erase.",
+            "handling": "Complete and read back the control write before polling status. The controller then requires EOP without an error flag and verifies the page.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/flash/flash.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/flash/flash_test.cpp"
+            ]
           },
           {
             "title": "USART TX pin remains owned during receive-only use",
@@ -2788,6 +3002,7 @@
           "X"
         ],
         "maintained_modes": [
+          "flash:poll-halfword",
           "gpio:output",
           "uart:irq-byte-event"
         ],
@@ -2827,6 +3042,20 @@
               "soc/stm32/stm32f1/facts/soc.json"
             ],
             "regressions": []
+          },
+          {
+            "section": "2.2.10",
+            "title": "Flash memory BSY latency after STRT",
+            "revisions": "AAAAAA",
+            "assessment": "workaround",
+            "condition": "BSY can read clear on the first bus cycle after starting page erase.",
+            "handling": "Complete and read back the control write before polling status. The controller then requires EOP without an error flag and verifies the page.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/flash/flash.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/flash/flash_test.cpp"
+            ]
           },
           {
             "title": "USART TX pin remains owned during receive-only use",
@@ -2886,6 +3115,7 @@
           "A"
         ],
         "maintained_modes": [
+          "flash:poll-halfword",
           "gpio:output",
           "uart:irq-byte-event"
         ],
@@ -2925,6 +3155,20 @@
               "soc/stm32/stm32f1/facts/soc.json"
             ],
             "regressions": []
+          },
+          {
+            "section": "2.2.8",
+            "title": "Flash memory BSY latency after STRT",
+            "revisions": "AA",
+            "assessment": "workaround",
+            "condition": "BSY can read clear on the first bus cycle after starting page erase.",
+            "handling": "Complete and read back the control write before polling status. The controller then requires EOP without an error flag and verifies the page.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/flash/flash.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/flash/flash_test.cpp"
+            ]
           },
           {
             "title": "USART TX pin remains owned during receive-only use",
@@ -2984,6 +3228,7 @@
           "1"
         ],
         "maintained_modes": [
+          "flash:poll-halfword",
           "gpio:output",
           "uart:irq-byte-event"
         ],
@@ -3023,6 +3268,20 @@
               "soc/stm32/stm32f1/facts/soc.json"
             ],
             "regressions": []
+          },
+          {
+            "section": "2.2.10",
+            "title": "Flash memory BSY latency after STRT",
+            "revisions": "AA",
+            "assessment": "workaround",
+            "condition": "BSY can read clear on the first bus cycle after starting page erase.",
+            "handling": "Complete and read back the control write before polling status. The controller then requires EOP without an error flag and verifies the page.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/flash/flash.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/flash/flash_test.cpp"
+            ]
           },
           {
             "title": "USART TX pin remains owned during receive-only use",

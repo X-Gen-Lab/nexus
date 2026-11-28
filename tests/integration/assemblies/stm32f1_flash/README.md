@@ -8,6 +8,13 @@ the geometry and the first and last physical bytes.
 | `c6.toml` | STM32F103C6T6A | 32 KiB | 1 KiB | PM0075 Table 2, DS5936 Tables 2 and 28, ES0348 §2.2.10 |
 | `rb.toml` | STM32F103RBT6 | 128 KiB | 1 KiB | PM0075 Table 3, DS5319 Table 28, ES096 §2.2.11 |
 | `f100rb.toml` | STM32F100RBT6B | 128 KiB | 1 KiB | PM0063 Table 2, DS6517 Tables 2 and 27, ES093 §2.2.8 |
+| `f101rb.toml` | STM32F101RBT6 | 128 KiB | 1 KiB | PM0075 Table 3, DS5318 Tables 2 and 27, ES096 §2.2.11 |
+| `f102rb.toml` | STM32F102RBT6 | 128 KiB | 1 KiB | PM0075 Table 3, DS5933 Tables 2 and 27, ES096 §2.2.11 |
+| `f101c6.toml` | STM32F101C6T6A | 32 KiB | 1 KiB | PM0075 Table 2, DS5935 Table 27, ES0348 §2.2.10 |
+| `f102c6.toml` | STM32F102C6T6A | 32 KiB | 1 KiB | PM0075 Table 2, DS5934 Table 27, ES0348 §2.2.10 |
+| `f101ze.toml` | STM32F101ZET6 | 512 KiB | 2 KiB | PM0075 Table 4, DS5791 Table 29, ES0340 §2.2.10 |
+| `f100ze.toml` | STM32F100ZET6B | 512 KiB | 2 KiB | PM0063 Table 3, DS5944 Table 28, ES0136 §2.2.7 |
+| `f101zg.toml` | STM32F101ZGT6 | 1024 KiB | 2 KiB | PM0068 Table 1, DS6557 Table 29, ES0346 §2.2.8 |
 | `ze.toml` | STM32F103ZET6 | 512 KiB | 2 KiB | PM0075 Table 4, DS5792 Table 29, ES0340 §2.2.10 |
 | `zg.toml` | STM32F103ZGT6 | 1024 KiB | 2 KiB | PM0068 Table 1 and §§1.3, 2.3, DS6558 Table 29, ES0346 §2.2.8 |
 
@@ -18,7 +25,7 @@ timebase requires overflow service within 65.536 ms. Budget for Flash
 execution stalls when choosing a watchdog or interrupt latency limit.
 Products declare their own writable regions.
 
-The ZG Bank 1 spans `0x08000000–0x0807FFFF`. Bank 2 spans
+For F101ZG and F103ZG, Bank 1 spans `0x08000000–0x0807FFFF`. Bank 2 spans
 `0x08080000–0x080FFFFF`. Reads may cross this boundary when both banks are
 idle. A program or erase call must stay in one bank. Split a larger write
 region at offset `0x80000`. A cross-bank request returns
@@ -31,5 +38,11 @@ errors, delayed BSY, the Bank boundary and retained ownership. The software
 reference covers ordinary serialized I/O. Read-while-write concurrency,
 mass erase, option bytes, OTP, boot switching and board timing are outside
 this scope.
+
+The F105VC and F107VC retain their 2 KiB memory layout for link placement.
+PM0075 Table 5 and the pinned HAL specify 2 KiB pages. DS6014 Rev10 Table 29
+labels its erase timing for a 1 KiB page. The writable Flash provider stays
+outside those references until an authoritative 2 KiB operation budget is
+available.
 
 [ST PM0075 Rev2](https://www.st.com/resource/en/programming_manual/pm0075-stm32f10xxx-flash-memory-microcontrollers-stmicroelectronics.pdf) · [ST PM0063 Rev2](https://www.st.com/resource/en/programming_manual/pm0063-stm32f100xx-value-line-flash-programming-stmicroelectronics.pdf) · [ST PM0068 Rev2](https://www.st.com/resource/en/programming_manual/pm0068-stm32f10xxx-xldensity-flash-programming-stmicroelectronics.pdf)

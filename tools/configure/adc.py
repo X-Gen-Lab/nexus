@@ -37,6 +37,17 @@ def validate_selection(selection, route, provider):
     channels = sequence(selection["channels"], "ADC channels")
     internal = getattr(provider, "ADC_INTERNAL_CHANNELS", {}).get(
         route["controller"], ())
+    if selection["mode"] == "internal-scan":
+        exact = route.get("required_options", {})
+        internal = tuple(sequence(exact.get("channels", ()), "ADC internal route ranks"))
+        if (route["pins"] or not internal or len(internal) > 16 or
+                len(set(internal)) != len(internal) or
+                tuple(channels) != internal or "sample_times" not in exact or
+                tuple(sequence(selection["sample_times"], "ADC sample_times")) !=
+                tuple(sequence(exact["sample_times"], "ADC internal route sample times"))):
+            fail("Internal ADC requires its exact pad-free ordered sequence and sampling")
+        for channel in internal:
+            integer(channel, 0, 31, "ADC internal route channel")
     for channel in channels:
         integer(channel, 0, max((15, *internal)), "ADC channel")
     mapping = _pin_channels(route, provider)
@@ -76,6 +87,9 @@ def validate_selection(selection, route, provider):
     if (selection["mode"] in {"single-shot", "single-trigger-dma", "low-rate-scan"} and
             (selection["mode"] != "low-rate-scan") != (len(channels) == 1)):
         fail("ADC mode contradicts its reviewed channel count")
+    if selection["mode"] == "sequential-scan-dma" and (
+            len(channels) < 2 or tuple(channels) != tuple(mapping.values())):
+        fail("Sequential ADC requires all route channels once and in order")
     if selection["mode"] == "simultaneous-scan-dma" and (
             len(channels) != 2 or tuple(channels) != tuple(mapping.values()) or
             samples[0] != samples[1]):

@@ -68,5 +68,46 @@ class F103RtcConfigurationTests(unittest.TestCase):
                          ("adopt-retained", "occurrences", 1))
 
 
+class F103RtcProvisioningConfigurationTests(unittest.TestCase):
+    def test_provision_retains_read_only_backup_and_claims_its_dormant_irqs(self):
+        result = gate.resolve_ir(FIXTURE / "provision.toml")
+        selected, = result.controllers
+        self.assertEqual(selected.mode, "backup-provision")
+        self.assertIsNone(selected.options.initial)
+        self.assertEqual((selected.options.timeout_us, selected.options.poll_limit),
+                         (10000000, 8000000))
+        rtc, = selected_contracts.for_configuration(result)
+        self.assertEqual((rtc.unit, rtc.word_bits, rtc.features),
+                         ("words", (16,), ("POLLING",)))
+        resources = {claim.key for claim in result.resource_plan.claims}
+        self.assertTrue({"domain:backup", "clock:LSE", "clock:RTC", "irq:RTC",
+                         "irq:RTC_Alarm", "exti:line:17"} <= resources)
+
+    def test_declared_budgets_seed_and_lse_crystal_constraints(self):
+        fixture = FIXTURE / "provision.toml"
+        text = fixture.read_text()
+        source = json.loads((FIXTURE / "provision-board/board.json").read_text())
+        cases = (
+            (text.replace("timeout_us = 10000000", ""), {}, "timeout_us and poll_limit"),
+            (text.replace("poll_limit = 8000000", "poll_limit = 20000001"), {}, "poll_limit"),
+            (text + "\nallow_set = true", {}, "timeout_us and poll_limit only"),
+            (text + "\ninitial = { year=26, month=1, day=1, weekday=1, hour=0, minute=0, second=0 }",
+             {}, "timeout_us and poll_limit only"),
+            (text, {"clocks": {"lse_hz": 32768, "lse_bypass": True}}, "LSE crystal"),
+            (text, {"reserved_resources": ["exti:line:17"]}, "Resource conflict exti:line:17"),
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            folder = Path(tmp)
+            board = folder / "provision-board/board.json"
+            assembly = folder / "fixture.toml"
+            board.parent.mkdir()
+            for authored, overrides, reason in cases:
+                with self.subTest(reason=reason), self.assertRaisesRegex(
+                        gate.ConfigurationError, reason):
+                    board.write_text(json.dumps({**source, **overrides}))
+                    assembly.write_text(authored)
+                    gate.resolve_ir(assembly)
+
+
 if __name__ == "__main__":
     unittest.main()

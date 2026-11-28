@@ -1,0 +1,24 @@
+schema = 2
+board_package = "board-lcd"
+backend = "baremetal"
+clock = "hsi8"
+optimization = "Os"
+
+[hardware]
+cn16_wiring = "fsmc-8080"
+
+[memory]
+main_stack_bytes = 2048
+flash_load_limit_bytes = 24576
+static_ram_limit_bytes = 6144
+libc_heap_bytes = 0
+
+[external_bus.banked]
+binding = "fsmc0"
+mode = "async16"
+
+[parallel16.panel]
+controller = "banked"
+binding = "cn16"
+read_timing = { address_setup = 2, address_hold = 1, data_setup = 8, bus_turn = 2 }
+write_timing = { address_setup = 2, address_hold = 1, data_setup = 8, bus_turn = 2 }

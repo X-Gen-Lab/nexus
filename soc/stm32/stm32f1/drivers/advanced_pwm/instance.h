@@ -33,7 +33,7 @@ typedef struct {
     volatile bool fault;
 } nx_stm32f1_advanced_pwm_t;
 
-/** \brief Prepare one isolated timer pair with GPIO idle and break armed. */
+/** \brief Prepare the selected timer outputs with GPIO idle and break armed. */
 nx_result_t
 nx_stm32f1_advanced_pwm_prepare(nx_stm32f1_advanced_pwm_t* state,
                                 const nx_stm32f1_advanced_pwm_config_t* config);
@@ -48,7 +48,8 @@ void nx_stm32f1_advanced_pwm_irq(nx_stm32f1_advanced_pwm_t* state);
 
 #if defined(NX_STM32F1_PWM_ADC_OWNER)
 nx_result_t nx_stm32f1_advanced_pwm_one_pulse(nx_stm32f1_advanced_pwm_t* state,
-                                              uint32_t duty, uint32_t phase);
+                                              const uint32_t* duties,
+                                              uint32_t phase);
 #endif
 
 extern const nx_advanced_pwm_ops_t nx_stm32f1_advanced_pwm_ops;

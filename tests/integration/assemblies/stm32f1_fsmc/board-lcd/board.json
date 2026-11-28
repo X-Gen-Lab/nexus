@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "id": "stm3210e-eval-mb672-d06-cn16",
+  "soc": "STM32F103ZGT6",
+  "soc_family": "stm32f1",
+  "source_revision": "MB672 D06 sheet 8 and UM0488 Rev7 section 5.17",
+  "physical_pcb_revision": "MB672-F103ZGT6-D06",
+  "clocks": {},
+  "bindings": [
+    {
+      "id": "fsmc0",
+      "controller": "FSMC",
+      "route": "fsmc-async16"
+    },
+    {
+      "id": "cn16",
+      "controller": "FSMC",
+      "route": "fsmc-ne4-cn16-lcd",
+      "requires": {
+        "cn16_wiring": "fsmc-8080"
+      }
+    }
+  ],
+  "reserved_resources": [],
+  "unknowns": [
+    "CN16 parallel select population, panel identity and timing are not physically verified.",
+    "The LCD controller protocol and backlight belong to the application."
+  ],
+  "provenance": [
+    {
+      "scope": "STM3210E-EVAL CN16 connection and LCD interface",
+      "url": "https://www.st.com/resource/en/user_manual/um0488-evaluation-board-with-stm32f103zx-mcu-stmicroelectronics.pdf",
+      "file": "um0488.pdf",
+      "sha256": "ce21519322ffa2f16fbae49516399dd19854d5fe86db1e9cebdbefc3bb36400f",
+      "pages": [
+        18,
+        19
+      ]
+    },
+    {
+      "scope": "MB672 D06 sheet 8 CN16 and R77/R80 connectivity",
+      "url": "https://www.st.com/resource/en/schematic_pack/mb672-f103zgt6-d06_schematic.pdf",
+      "file": "mb672-f103zgt6-d06_schematic.pdf",
+      "sha256": "a0a76fb9effe61d09c3ee5231a78f0f912b4ef3d18480dc032e3868bd6ff3d5f",
+      "pages": [
+        8
+      ]
+    }
+  ],
+  "backend_support": [
+    "baremetal"
+  ],
+  "hardware_options": {
+    "cn16_wiring": [
+      "unknown",
+      "fsmc-8080"
+    ]
+  }
+}

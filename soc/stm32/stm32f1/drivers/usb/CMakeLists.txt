@@ -23,7 +23,7 @@ if("device-pma" IN_LIST f1_usb OR f1_pma_ep1)
     target_link_libraries(nexus_soc_stm32f1 PRIVATE Nexus::IOUSBDevice)
 endif()
 
-if("host-fs" IN_LIST f1_usb_host)
+if(f1_usb_host)
     set(host_core "${NEXUS_SOURCE_DIR}/soc/stm32/common/dwc_otg_host")
     set(host_hal_config "${CMAKE_CURRENT_LIST_DIR}/../../sdk/hal_config/usb")
     add_library(
@@ -60,6 +60,18 @@ if("host-fs" IN_LIST f1_usb_host)
         PRIVATE "${host_core}" "${host_hal_config}"
     )
     target_compile_definitions(nexus_soc_stm32f1 PRIVATE NX_STM32F1_USB_HOST=1)
+    if(f1_usb_host_core)
+        target_compile_definitions(
+            nexus_soc_stm32f1
+            PRIVATE NX_STM32F1_USB_HOST_CORE=1
+        )
+    elseif(f1_usb_host_bulk)
+        target_compile_definitions(
+            nexus_soc_stm32f1
+            PRIVATE NX_STM32F1_USB_HOST_BULK=1
+        )
+    endif()
+
     target_link_libraries(
         nexus_soc_stm32f1
         PRIVATE Nexus::IOUSBHost Nexus::IODMA

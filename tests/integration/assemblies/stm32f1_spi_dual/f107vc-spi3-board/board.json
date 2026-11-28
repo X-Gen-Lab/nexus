@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "id": "stm32f107vc-spi3-connectivity-software",
+  "soc": "STM32F107VCT6",
+  "soc_family": "stm32f1",
+  "source_revision": "DS6014 Rev10 Table 5 and RM0008 Rev21 Table 57, external SPI software reference",
+  "physical_pcb_revision": null,
+  "clocks": {
+    "hse_hz": 25000000,
+    "hse_bypass": false
+  },
+  "bindings": [
+    {
+      "id": "spi3",
+      "controller": "SPI3",
+      "route": "spi3-pc10-pc11-pc12"
+    },
+    {
+      "id": "spi3-cs",
+      "controller": "GPIOC",
+      "route": "gpio-pc9-spi3-cs",
+      "initial": 512,
+      "mask": 512,
+      "electrical": {
+        "mode": "output",
+        "output_type": "push-pull",
+        "initial": 512
+      }
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14",
+    "PA15",
+    "PB3",
+    "PB4",
+    "PD0",
+    "PD1",
+    "PC14",
+    "PC15"
+  ],
+  "unknowns": [
+    "No PCB or 25 MHz crystal observed.",
+    "External SPI target, shared voltage and ground, and a CS pull-up are assumed by this software reference."
+  ],
+  "provenance": [
+    "https://www.st.com/resource/en/datasheet/stm32f107vc.pdf",
+    "https://www.st.com/resource/en/reference_manual/rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32-bit-mcus-stmicroelectronics.pdf"
+  ],
+  "backend_support": [
+    "baremetal"
+  ]
+}

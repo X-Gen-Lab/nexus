@@ -1,6 +1,6 @@
 /**
  * \file            target.h
- * \brief           Private F103 I2C1 target receive owner.
+ * \brief           Private F103 I2C1 finite target owner.
  * \author          Nexus Team
  */
 #ifndef NEXUS_STM32F1_I2C_TARGET_H
@@ -19,7 +19,7 @@ typedef struct {
     nx_i2c_target_request_t* active;
     uint64_t generation;
     uint32_t faults;
-    nx_result_t terminal;
+    uint16_t received;
     uint16_t count;
     uint8_t address;
     uint8_t prior_event_priority;
@@ -28,6 +28,7 @@ typedef struct {
     bool vectors_owned;
     bool live;
     bool closing;
+    nx_result_t terminal;
 } nx_stm32f1_i2c_target_t;
 
 extern const nx_i2c_target_ops_t nx_stm32f1_i2c_target_ops;

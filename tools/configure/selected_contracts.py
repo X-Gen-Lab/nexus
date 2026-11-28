@@ -238,14 +238,14 @@ def describe(item, endpoint=None, *, public_class=None):
         fail("Selected endpoint differs from its actual controller")
     kind = item.kind
     nominal_kind, nominal_mode = kind, item.mode
-    target_receive_only = False
+    target_direction = None
     if kind == "external_bus" and endpoint is not None:
         nominal_kind = selected
         nominal_mode = ("8080-16" if selected=="parallel16" else endpoint.options.mode)
         shape = mode_traits(nominal_kind, nominal_mode)
     limits = {}
     if kind == "rtc":
-        if item.mode == "backup-adopt":
+        if item.mode in {"backup-adopt", "backup-provision"}:
             limits.update(unit="words", unit_bytes=2, buffer_alignment=4,
                           max_transfer_units=1, word_bits=(16,))
         else:
@@ -295,8 +295,13 @@ def describe(item, endpoint=None, *, public_class=None):
                       max_messages="NX_I2C_BOUNDED_MAX_MESSAGES")
     elif kind == "i2c_target":
         binding = provider.binding(kind, item.mode, item.controller)
-        target_receive_only = binding.i2c_target_receive_only
-        spans = 1 if target_receive_only else 2
+        if item.mode == "target-tx-irq":
+            target_direction = "transmit_only"
+        elif item.mode == "target-rx-irq" or binding.i2c_target_receive_only:
+            target_direction = "receive_only"
+        elif item.mode == "target-write-read-irq":
+            target_direction = "write_read_only"
+        spans = 1 if target_direction in {"receive_only", "transmit_only"} else 2
         limits.update(max_transfer_units=256 * spans, max_segment_units=256,
                       max_segments=spans, max_total_units=256 * spans)
     elif kind == "pwm_adc" and item.mode in {
@@ -356,8 +361,8 @@ def describe(item, endpoint=None, *, public_class=None):
     if selected_limits is not None:
         limits.update(selected_limits(item, shape))
     formatted = _format(item, provider, shape)
-    if target_receive_only:
-        formatted["fields"] = {**formatted["fields"], "receive_only": 1}
+    if target_direction is not None:
+        formatted["fields"] = {**formatted["fields"], target_direction: 1}
     if endpoint is not None and kind == "i2c":
         formatted["fields"] = {**formatted["fields"],
                                "address_bits": endpoint.options.address_bits}

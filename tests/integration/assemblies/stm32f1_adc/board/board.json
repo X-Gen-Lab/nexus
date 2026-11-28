@@ -16,6 +16,11 @@
       "id": "adc1-pa0-tim1",
       "controller": "ADC1",
       "route": "adc1-pa0-tim1-cc1"
+    },
+    {
+      "id": "adc1-pa0-pa1",
+      "controller": "ADC1",
+      "route": "adc1-pa0-pa1-tim3"
     }
   ],
   "reserved_resources": [
@@ -68,7 +73,7 @@
       ]
     },
     {
-      "scope": "Exact PA0/A0 pin exposure. The fixture uses a 3.3 V nominal reference.",
+      "scope": "Exact PA0/A0 and PA1/A1 pin exposure. The fixture uses a 3.3 V nominal reference.",
       "url": "https://www.st.com/resource/en/user_manual/um1724-stm32-nucleo64-boards-mb1136-stmicroelectronics.pdf",
       "file": "um1724-stm32-nucleo64-boards-mb1136-stmicroelectronics.pdf",
       "sha256": "576d9bee3bc32c8ee70bf0d77cf9494cec06ea7c1d9ff98eebf2738cb9314a14",
@@ -83,7 +88,9 @@
       ],
       "nets": [
         "PA0/A0/CN8-1",
-        "PA0/CN7-28"
+        "PA0/CN7-28",
+        "PA1/A1/CN8-2",
+        "PA1/CN7-30"
       ]
     }
   ],

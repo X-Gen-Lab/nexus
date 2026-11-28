@@ -41,13 +41,16 @@ FLASH_TypeDef f1_test_flash;
 TIM_TypeDef f1_test_timer;
 NVIC_Type f1_test_nvic;
 
-#if defined(TEST_F1_STOP)
+#if defined(TEST_F1_STOP) || defined(TEST_F1_STANDBY)
 AFIO_TypeDef f1_test_afio;
 EXTI_TypeDef f1_test_exti;
 PWR_TypeDef f1_test_power;
 RTC_TypeDef f1_test_rtc;
 SCB_Type f1_test_scb{};
 SysTick_Type f1_test_systick{};
+#endif
+
+#if defined(TEST_F1_STOP)
 const nx_exti_ops_t nx_stm32f1_exti_ops{};
 unsigned platform_suspend_calls;
 nx_result_t platform_suspend_status;
@@ -286,6 +289,8 @@ TEST_F(F103Timebase, SwitchesOnlyAfterFlashAndBusAreSafe) {
     EXPECT_EQ(SystemCoreClock, sysclk);
     EXPECT_EQ(f1_test_timer.PSC, timer_prescaler);
     EXPECT_NE(f1_test_rcc.CR & RCC_CR_HSION, 0U);
+    const uint32_t bypass = NEXUS_CLOCK_HSE_BYPASS ? RCC_CR_HSEBYP : 0U;
+    EXPECT_EQ(f1_test_rcc.CR & RCC_CR_HSEBYP, bypass);
     ASSERT_EQ(nx_stm32f1_platform_system_release(&rb, true), NX_SUCCESS);
     EXPECT_EQ(SystemCoreClock, 8000000U);
     EXPECT_EQ(f1_test_rcc.CFGR, 0U);
@@ -651,6 +656,11 @@ uint16_t f1_test_flash_kib() {
 }
 
 void f1_test_write(volatile uint32_t* reg, uint32_t value) {
+#if defined(TEST_F1_STANDBY)
+    if (f1_test_standby_write(reg, value)) {
+        return;
+    }
+#endif
 #if defined(TEST_F1_STOP)
     if (reg == &SCB->SCR && deep_stuck && (value & SCB_SCR_SLEEPDEEP_Msk) == 0U)
         return;

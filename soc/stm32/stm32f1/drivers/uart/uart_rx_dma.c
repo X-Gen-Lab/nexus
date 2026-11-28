@@ -131,6 +131,14 @@ static bool detach(const nx_stm32f1_uart_rx_dma_config_t* config) {
            !NX_STM32F1_IRQ_ENABLED(config->uart.irq);
 }
 
+/** \brief Withdraw retired DMA addresses while preserving the count receipt. */
+static bool clear_lane_addresses(DMA_Channel_TypeDef* lane) {
+    NX_STM32F1_WRITE(&lane->CPAR, 0U);
+    NX_STM32F1_WRITE(&lane->CMAR, 0U);
+    nx_arch_dsb();
+    return lane->CPAR == 0U && lane->CMAR == 0U;
+}
+
 /** \brief ES096 2.4.1 excludes CGIF and leaving any live pending publisher. */
 static bool retire_sources(const nx_stm32f1_uart_rx_dma_config_t* config) {
     NX_STM32F1_WRITE(&config->dma->IFCR, DMA_ACK);
@@ -138,7 +146,8 @@ static bool retire_sources(const nx_stm32f1_uart_rx_dma_config_t* config) {
     NX_STM32F1_IRQ_CLEAR(config->uart.irq);
     nx_arch_dsb();
     return (config->dma->ISR & DMA_EVENTS) == 0U && vector_idle(config->irq) &&
-           vector_idle(config->uart.irq);
+           vector_idle(config->uart.irq) &&
+           clear_lane_addresses(config->channel);
 }
 
 static void observe_boundary(nx_stm32f1_uart_rx_dma_t* state) {
@@ -381,8 +390,7 @@ nx_result_t nx_stm32f1_uart_rx_dma_close(nx_stm32f1_uart_rx_dma_t* state) {
         if (!dma_clock() || (lane->CCR & DMA_CONTROL) != 0U ||
             !nx_stm32f1_write_masked(&lane->CCR, UINT16_MAX, 0U) ||
             !nx_stm32f1_write_masked(&lane->CNDTR, UINT16_MAX, 0U) ||
-            !nx_stm32f1_write_masked(&lane->CPAR, UINT32_MAX, 0U) ||
-            !nx_stm32f1_write_masked(&lane->CMAR, UINT32_MAX, 0U))
+            !clear_lane_addresses(lane))
             return NX_ERROR_IO;
         state->lane_owned = false;
     }

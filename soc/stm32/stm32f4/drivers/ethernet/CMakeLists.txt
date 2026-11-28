@@ -7,7 +7,7 @@ if(eth_modes)
         nexus_soc_stm32f4
         PRIVATE
             "${CMAKE_CURRENT_LIST_DIR}/ethernet.c"
-            "${CMAKE_CURRENT_LIST_DIR}/../ip/legacy_mac/eth_mac.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/common/dwmac/eth_mac.c"
     )
 endif()
 if(eth_frames_modes)

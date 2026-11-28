@@ -1,6 +1,6 @@
 /**
  * \file            fsmc.c
- * \brief           STM32F1 asynchronous SRAM setup and exclusive CPU lease.
+ * \brief           STM32F1 asynchronous bank setup and exclusive CPU lease.
  * \author          Nexus Team
  * \version         1.0.0
  * \date            2026-11-28
@@ -11,12 +11,22 @@
 #include "stm32f1xx_ll_fsmc.h"
 #include "system/platform.h"
 
-#define NX_F1_FSMC_BANK FSMC_NORSRAM_BANK3
+#if defined(NX_STM32F1_FSMC_LCD)
+#define NX_F1_FSMC_BANK        FSMC_NORSRAM_BANK4
+#define NX_F1_FSMC_ADDRESS     NX_STM32F1_FSMC_LCD_COMMAND
+#define NX_F1_FSMC_BYTES       4U
+#define NX_F1_FSMC_MIN_ADDRESS 2U
+#define NX_F1_FSMC_MIN_DATA    8U
+#else
+#define NX_F1_FSMC_BANK        FSMC_NORSRAM_BANK3
+#define NX_F1_FSMC_ADDRESS     UINT32_C(0x68000000)
+#define NX_F1_FSMC_BYTES       UINT32_C(0x100000)
+#define NX_F1_FSMC_MIN_ADDRESS 1U
+#define NX_F1_FSMC_MIN_DATA    3U
+#endif
 #define NX_F1_FSMC_CONTROL                                                     \
     (UINT32_C(0x80) | FSMC_NORSRAM_MEM_BUS_WIDTH_16 |                          \
      FSMC_WRITE_OPERATION_ENABLE)
-#define NX_F1_FSMC_ADDRESS UINT32_C(0x68000000)
-#define NX_F1_FSMC_BYTES   UINT32_C(0x100000)
 
 #ifndef NX_STM32F1_FSMC_IRQ_IDLE
 #define NX_STM32F1_FSMC_IRQ_IDLE()                                             \
@@ -28,10 +38,11 @@
 static bool timing_supported(const nx_stm32f1_fsmc_config_t* config) {
     nx_stm32f1_fsmc_timing_t read = config->read_timing;
     nx_stm32f1_fsmc_timing_t write = config->write_timing;
-    return read.address_setup >= 1U && read.address_setup <= 15U &&
-           read.address_hold >= 1U && read.address_hold <= 15U &&
-           read.data_setup >= 3U && read.bus_turn >= 1U &&
-           read.bus_turn <= 15U && read.address_setup == write.address_setup &&
+    return read.address_setup >= NX_F1_FSMC_MIN_ADDRESS &&
+           read.address_setup <= 15U && read.address_hold >= 1U &&
+           read.address_hold <= 15U && read.data_setup >= NX_F1_FSMC_MIN_DATA &&
+           read.bus_turn >= 1U && read.bus_turn <= 15U &&
+           read.address_setup == write.address_setup &&
            read.address_hold == write.address_hold &&
            read.data_setup == write.data_setup &&
            read.bus_turn == write.bus_turn;

@@ -20,6 +20,12 @@ int main(void) {
 #if defined(NX_ADC_REF_PAIR)
     const nx_adc_port_t* analog = nx_factory_adc_ref(NX_ADC_REF_PAIR);
     enum { CHANNELS = 2U, SCAN_TICKS = 41U };
+#elif defined(NX_ADC_REF_SCAN)
+    const nx_adc_port_t* analog = nx_factory_adc_ref(NX_ADC_REF_SCAN);
+    enum { CHANNELS = 2U, SCAN_TICKS = 109U };
+#elif defined(NX_ADC_REF_INTERNAL)
+    const nx_adc_port_t* analog = nx_factory_adc_ref(NX_ADC_REF_INTERNAL);
+    enum { CHANNELS = 2U, SCAN_TICKS = 168U };
 #else
     const nx_adc_port_t* analog = nx_factory_adc_ref(NX_ADC_REF_ANALOG);
     enum { CHANNELS = 1U, SCAN_TICKS = 68U };

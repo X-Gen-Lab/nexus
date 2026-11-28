@@ -93,7 +93,11 @@ class EthernetMac : public testing::Test {
         mac.rx_slots = rxslots;
         mac.tx_count = mac.rx_count = 2;
         mac.drain_timeout_us = 1000;
-        mac.hclk_hz = 168000000;
+#ifdef NX_ETH_RESET_RETIRE
+        mac.hclk_hz = 72000000U;
+#else
+        mac.hclk_hz = 168000000U;
+#endif
         mac.address[0] = 2;
         mac.address[5] = 1;
         mac.irq_policy = {NX_IRQ_KERNEL_NONE, 82, 4, 0};
@@ -214,6 +218,7 @@ TEST_F(EthernetMac, HeldReceiveLoanIsNeverOverwrittenAtRingWrap) {
     EXPECT_EQ(own, rx[0].status & own);
     EXPECT_EQ(NX_ERROR_STATE, nx_eth_port_release(&port, &first));
 }
+#ifndef NX_ETH_RESET_RETIRE
 TEST_F(EthernetMac, CancellationWaitsForActualEngineAndFifoDrain) {
     Start();
     ASSERT_EQ(NX_SUCCESS, nx_eth_port_submit(&port, &request));
@@ -779,3 +784,109 @@ TEST_F(EthernetMac, FailedTableWithdrawalCannotReborrowDiscardedQueueHead) {
     hold_table_clear = false;
     EXPECT_EQ(NX_SUCCESS, nx_eth_port_stop(&port));
 }
+
+#else
+TEST_F(EthernetMac, F107CancelRetainsTxUntilResetClearsBothTables) {
+    Start();
+    EXPECT_EQ(NX_SUCCESS, nx_eth_port_submit(&port, &request));
+    const uint32_t before = tx[0].buffer;
+    ASSERT_NE(0U, before);
+    EXPECT_EQ(NX_SUCCESS, nx_eth_port_cancel(&port, &request));
+    EXPECT_EQ(NX_REQUEST_DRAINING, nx_request_state(&request.base));
+    EXPECT_EQ(before, tx[0].buffer);
+    EXPECT_EQ(NX_ERROR_BUSY, nx_eth_port_stop(&port));
+    EXPECT_EQ(1U, regs[0x1000U / 4U] & 1U);
+    regs[0x1000U / 4U] &= ~1U;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_eth_port_stop(&port));
+    EXPECT_EQ(before, tx[0].buffer);
+    EXPECT_NE(NX_REQUEST_SETTLED, nx_request_state(&request.base));
+    regs[0x1000U / 4U] &= ~1U;
+    regs[0x100cU / 4U] = 0U;
+    regs[0x1010U / 4U] = 0U;
+    ASSERT_EQ(NX_SUCCESS, nx_eth_port_stop(&port));
+    EXPECT_EQ(0U, tx[0].buffer);
+    nx_result_t result = NX_SUCCESS;
+    size_t transferred = 1U;
+    ASSERT_EQ(NX_SUCCESS,
+              nx_request_result(&request.base, &result, &transferred));
+    EXPECT_EQ(NX_ERROR_CANCELLED, result);
+    EXPECT_EQ(0U, transferred);
+    EXPECT_EQ(NX_SUCCESS, nx_eth_port_stop(&port));
+}
+
+TEST_F(EthernetMac, F107ClosingTxDoesNotTailChainBeforeTaskReset) {
+    Start();
+    static unsigned pending;
+    pending = 0U;
+    mac.pend_irq = [](nx_eth_mac_t*) { ++pending; };
+    ASSERT_EQ(NX_SUCCESS, nx_eth_port_submit(&port, &request));
+    ASSERT_EQ(NX_SUCCESS, nx_eth_port_cancel(&port, &request));
+    tx[0].status &= ~own;
+    nx_eth_mac_irq(&mac);
+    EXPECT_EQ(0U, pending);
+    EXPECT_EQ(NX_REQUEST_DRAINING, nx_request_state(&request.base));
+}
+
+TEST_F(EthernetMac, F107LinkDownSettlesUnservicedTransmitAsIo) {
+    Start();
+    ASSERT_EQ(NX_SUCCESS, nx_eth_port_submit(&port, &request));
+    const nx_eth_link_t disconnected{};
+    ASSERT_EQ(NX_SUCCESS, nx_eth_port_apply_link(&port, &disconnected));
+    ASSERT_EQ(NX_ERROR_BUSY, nx_eth_port_stop(&port));
+    regs[0x1000U / 4U] &= ~1U;
+    regs[0x100cU / 4U] = 0U;
+    regs[0x1010U / 4U] = 0U;
+    ASSERT_EQ(NX_SUCCESS, nx_eth_port_stop(&port));
+    EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&request.base));
+    EXPECT_EQ(NX_ERROR_IO, request.base.result);
+}
+
+TEST_F(EthernetMac, F107StuckResetQuarantinesWithoutReturningTx) {
+    Start();
+    ASSERT_EQ(NX_SUCCESS, nx_eth_port_submit(&port, &request));
+    const uint32_t borrowed = tx[0].buffer;
+    ASSERT_EQ(NX_ERROR_BUSY, nx_eth_port_stop(&port));
+    now += mac.drain_timeout_us;
+    ASSERT_EQ(NX_ERROR_BUSY, nx_eth_port_stop(&port));
+    EXPECT_EQ(NX_REQUEST_QUARANTINED, nx_request_state(&request.base));
+    EXPECT_EQ(borrowed, tx[0].buffer);
+}
+
+TEST_F(EthernetMac, F107HeldLoanReturnsWithoutRearmingDuringShutdown) {
+    Start();
+    Receive(0U);
+    nx_eth_rx_frame_t loan{};
+    ASSERT_EQ(NX_SUCCESS, nx_eth_port_acquire(&port, &loan));
+    EXPECT_EQ(NX_ERROR_BUSY, nx_eth_port_stop(&port));
+    EXPECT_EQ(0U, regs[0x1000U / 4U] & 1U);
+    ASSERT_EQ(NX_SUCCESS, nx_eth_port_release(&port, &loan));
+    EXPECT_EQ(0U, rx[0].status & own);
+    EXPECT_EQ(NX_ERROR_BUSY, nx_eth_port_stop(&port));
+    regs[0x1000U / 4U] &= ~1U;
+    regs[0x100cU / 4U] = 0U;
+    regs[0x1010U / 4U] = 0U;
+    ASSERT_EQ(NX_SUCCESS, nx_eth_port_stop(&port));
+    EXPECT_EQ(NX_ERROR_STATE, nx_eth_port_release(&port, &loan));
+}
+
+TEST_F(EthernetMac, F107OnlyFullDuplexAndNoLiveSpeedMutation) {
+    ASSERT_EQ(NX_SUCCESS, Initialize());
+    nx_eth_link_t link{true, false, 100};
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED, nx_eth_port_apply_link(&port, &link));
+    link.full_duplex = true;
+    ASSERT_EQ(NX_SUCCESS, nx_eth_port_apply_link(&port, &link));
+    link.speed_mbps = 10;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_eth_port_apply_link(&port, &link));
+}
+
+TEST_F(EthernetMac, F107IgnoresUnsupportedMacDebugAndNeverFlushes) {
+    regs[0x34U / 4U] = UINT32_MAX;
+    Start();
+    ASSERT_EQ(NX_SUCCESS, nx_eth_port_submit(&port, &request));
+    EXPECT_EQ(NX_SUCCESS, nx_eth_port_cancel(&port, &request));
+    EXPECT_EQ(NX_ERROR_BUSY, nx_eth_port_stop(&port));
+    EXPECT_EQ(0U, regs[ctl / 4U] & 0x100000U);
+    EXPECT_EQ(UINT32_MAX, regs[0x34U / 4U]);
+}
+
+#endif

@@ -99,3 +99,86 @@ class F103SimultaneousAdcConfigurationTests(unittest.TestCase):
                         original, reserved_resources=reservations)))
                     assembly.write_text(content)
                     gate.resolve_ir(assembly)
+
+
+class F103Adc3ConfigurationTests(unittest.TestCase):
+    def test_pa3_polling_reserves_adc_group_without_dma_or_interrupt(self):
+        result = gate.resolve_ir(ADC / "f103ze-adc3.toml")
+        face, = result.controllers
+        self.assertEqual((face.controller, face.mode, face.options.channels),
+                         ("ADC3", "single-shot", (3,)))
+        self.assertFalse(face.dma)
+        self.assertIsNone(face.integration.irq)
+        claims = {claim.key for claim in result.resource_plan.claims
+                  if claim.owner == "analog"}
+        self.assertEqual(claims, {"pin:PA3", "controller:ADC1", "controller:ADC2",
+                                  "controller:ADC3", "irq:ADC3"})
+        caps, = selected_contracts.for_configuration(result)
+        self.assertEqual(caps.features, ("POLLING",))
+
+    def test_rejects_wrong_channel_or_a_second_converter_owner(self):
+        original = (ADC / "f103ze-adc3.toml").read_text().replace(
+            'board_package = "ze-pair-board"',
+            f'board_package = "{ADC / "ze-pair-board"}"')
+        adc2 = (ADC / "f103ze-adc2.toml").read_text().split("[adc.analog]", 1)[1]
+        cases = (
+            (original.replace("channels = [3]", "channels = [2]"), "ADC channel"),
+            (original + "\n[adc.second]" + adc2, "Resource conflict controller:ADC2"),
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "adc3.toml"
+            for contents, reason in cases:
+                with self.subTest(reason=reason), self.assertRaisesRegex(
+                        gate.ConfigurationError, reason):
+                    path.write_text(contents)
+                    gate.resolve_ir(path)
+
+
+class F103InternalAdcConfigurationTests(unittest.TestCase):
+    def test_raw_pair_claims_sensor_switch_without_gpio_or_dma(self):
+        result = gate.resolve_ir(ADC / "f103rb-internal.toml")
+        face, = result.controllers
+        self.assertEqual((face.mode, face.options.channels, face.options.sample_times),
+                         ("internal-scan", (16, 17), (6, 6)))
+        claims = {claim.key for claim in result.resource_plan.claims
+                  if claim.owner == "internal"}
+        self.assertEqual(claims, {"controller:ADC1", "clock:ADC1_INTERNAL",
+                                  "irq:ADC1_2"})
+        caps, = selected_contracts.for_configuration(result)
+        self.assertEqual(caps.features, ("POLLING",))
+        self.assertEqual(caps.max_transfer_units, 2)
+
+    def test_order_sample_clock_and_sensor_ownership_checks(self):
+        text = (ADC / "f103rb-internal.toml").read_text()
+        original = json.loads((ADC / "rb-internal-board/board.json").read_text())
+        cases = (
+            (text.replace("[16, 17]", "[17, 16]"), {}, "requires channels"),
+            (text.replace("[6, 6]", "[5, 6]"), {}, "requires sample_times"),
+            (text.replace("[6, 6]", "[6, true]"), {}, "requires sample_times"),
+            (text, {"reserved_resources": ["clock:ADC1_INTERNAL"]},
+             "Resource conflict clock:ADC1_INTERNAL"),
+            (text.replace('"hsi8"', '"hse8-mco-pll72"'),
+             {"clocks": {"hse_hz": 8000000, "hse_bypass": True}},
+             "requires clock profile hsi8"),
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            assembly = root / "internal.toml"
+            board = root / "rb-internal-board/board.json"
+            board.parent.mkdir()
+            for selected, changes, reason in cases:
+                with self.subTest(reason=reason), self.assertRaisesRegex(
+                        gate.ConfigurationError, reason):
+                    assembly.write_text(selected)
+                    board.write_text(json.dumps({**original, **changes}))
+                    gate.resolve_ir(assembly)
+
+    def test_external_pa0_route_cannot_consume_internal_channel(self):
+        text = (ADC / "f103rb-adc.toml").read_text()
+        text = text.replace('board_package = "board"',
+                            f'board_package = "{ADC / "board"}"')
+        with tempfile.TemporaryDirectory() as tmp:
+            assembly = Path(tmp) / "wrong-channel.toml"
+            assembly.write_text(text.replace("channels = [0]", "channels = [16]"))
+            with self.assertRaisesRegex(gate.ConfigurationError, "ADC channel"):
+                gate.resolve_ir(assembly)

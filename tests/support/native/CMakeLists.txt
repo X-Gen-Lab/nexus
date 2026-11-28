@@ -38,6 +38,7 @@ set(native_ip "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip")
 set(native_ip_includes
     "${NEXUS_SOURCE_DIR}/soc/stm32/common/bxcan"
     "${native_ip}/legacy_mac"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/common/dwmac"
     "${NEXUS_SOURCE_DIR}/soc/stm32/common/dwc_otg_device"
 )
 add_library(nexus_native_startup_usage INTERFACE)
@@ -83,7 +84,7 @@ target_sources(
 add_library(
     nexus_eth_native_engine
     OBJECT
-    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/common/dwmac/eth_mac.c"
 )
 target_include_directories(
     nexus_eth_native_engine

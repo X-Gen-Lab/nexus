@@ -11,5 +11,17 @@ if("finite-injected" IN_LIST f1_pwm_adc)
         nexus_soc_stm32f1
         PRIVATE NX_STM32F1_PWM_ADC_OWNER=1
     )
+    file(READ "${NEXUS_CONFIG_DIR}/resolved.json" coupled_assembly)
+    string(JSON controller_count LENGTH "${coupled_assembly}" controllers)
+    math(EXPR last_controller "${controller_count} - 1")
+    foreach(index RANGE 0 ${last_controller})
+        string(JSON route GET "${coupled_assembly}" controllers ${index} route)
+        if(route STREQUAL "tim1-cc4-adc1-finite-three-legs")
+            target_compile_definitions(
+                nexus_soc_stm32f1
+                PRIVATE NX_STM32F1_CYCLE_THREE_LEGS=1
+            )
+        endif()
+    endforeach()
     target_link_libraries(nexus_soc_stm32f1 PRIVATE Nexus::IOPWMADC)
 endif()

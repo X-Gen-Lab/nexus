@@ -24,6 +24,13 @@ typedef struct {
     uint16_t rca;
     bool removed;
     bool allow_write;
+#if defined(NX_STM32F1_SDIO_RX_DMA)
+    uint32_t dma_sector[128];
+#endif
+#if defined(NX_STM32F1_SDIO_4BIT)
+    bool wide_requested;
+    bool wide_receipt;
+#endif
 } nx_stm32f1_sdio_block_t;
 
 /** \brief Acquire the exact 1-bit socket pads without probing its card. */
@@ -33,6 +40,20 @@ nx_result_t nx_stm32f1_sdio_block_close(nx_stm32f1_sdio_block_t* state);
 
 /** \brief Acquire a socket explicitly allowed to request CMD24 writes. */
 nx_result_t nx_stm32f1_sdio_block_prepare_write(nx_stm32f1_sdio_block_t* state);
+
+#if defined(NX_STM32F1_SDIO_4BIT)
+/** \brief Acquire all four data pads for a read-only SDHC session. */
+nx_result_t
+nx_stm32f1_sdio_block_prepare_four_bit(nx_stm32f1_sdio_block_t* state);
+/** \brief Acquire the four-lane socket with explicit CMD24 admission. */
+nx_result_t
+nx_stm32f1_sdio_block_prepare_four_bit_write(nx_stm32f1_sdio_block_t* state);
+#endif
+
+#if defined(NX_STM32F1_SDIO_RX_DMA)
+nx_result_t
+nx_stm32f1_sdio_block_prepare_four_bit_dma(nx_stm32f1_sdio_block_t* state);
+#endif
 
 extern const nx_block_ops_t nx_stm32f1_sdio_block_ops;
 extern const nx_block_ops_t nx_stm32f1_sdio_block_write_ops;

@@ -91,6 +91,32 @@
                 ]
               ]
             }
+          },
+          {
+            "role": "flash_maintenance",
+            "type": "nx_flash_maintenance_port_t",
+            "const": true,
+            "enabled": {
+              "source": "item.options.maintenance",
+              "as": "bool"
+            },
+            "value": {
+              "record": [
+                [
+                  "ops",
+                  {
+                    "address": "nx_stm32f1_flash_maintenance_ops"
+                  }
+                ],
+                [
+                  "context",
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  }
+                ]
+              ]
+            }
           }
         ],
         "calls": {

@@ -202,6 +202,89 @@
             "irq:TIM1_CC",
             "clock:TIM1"
           ]
+        },
+        {
+          "id": "tim1-cc4-adc1-finite-three-legs",
+          "controller": "PWM_ADC1",
+          "timer": "TIM1",
+          "adc": "ADC1",
+          "modes": [
+            "finite-injected"
+          ],
+          "dma": [],
+          "pins": [
+            [
+              "PA8",
+              "ch1",
+              null
+            ],
+            [
+              "PB13",
+              "ch1n",
+              null
+            ],
+            [
+              "PB12",
+              "bkin",
+              null
+            ],
+            [
+              "PA1",
+              "adc1",
+              null
+            ],
+            [
+              "PA9",
+              "ch2",
+              null
+            ],
+            [
+              "PA10",
+              "ch3",
+              null
+            ],
+            [
+              "PB14",
+              "ch2n",
+              null
+            ],
+            [
+              "PB15",
+              "ch3n",
+              null
+            ]
+          ],
+          "channels": [
+            1
+          ],
+          "sample_cycles": [
+            2,
+            8,
+            14,
+            29,
+            42,
+            56,
+            72,
+            240
+          ],
+          "conversion_cycles": 13,
+          "timer_clock_domain": "apb2_timer",
+          "adc_clock_domain": "apb2",
+          "adc_clock_divider": 2,
+          "clock_multiplier": 1,
+          "prescaler_max": 1,
+          "period_max": 65535,
+          "complementary_deadtime_max": 127,
+          "trigger_event": "compare4",
+          "trigger_route": "TIM1:CC4:ADC1:JEXTSEL001",
+          "resources": [
+            "controller:TIM1",
+            "controller:ADC1",
+            "timer:TIM1",
+            "irq:ADC1_2",
+            "irq:TIM1_CC",
+            "clock:TIM1"
+          ]
         }
       ]
     }

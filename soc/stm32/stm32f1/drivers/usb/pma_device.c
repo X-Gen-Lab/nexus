@@ -377,12 +377,18 @@ static nx_result_t snapshot(void* context, nx_usb_device_state_t* output) {
     return NX_SUCCESS;
 }
 
+/** \brief Only an established active link may expose new packet effects. */
+static bool packet_admission(const nx_stm32f1_usb_pma_device_t* state) {
+    return state->attached && !state->closing &&
+           nx_stm32f1_usb_lp_ready(&state->link.endpoint);
+}
+
 static nx_result_t address(void* context, uint64_t epoch, uint8_t value) {
     nx_stm32f1_usb_pma_device_t* state = context;
     if (!task_context()) {
         return NX_ERROR_CONTEXT;
     }
-    return state->attached && !state->closing
+    return packet_admission(state)
                ? nx_stm32f1_usb_ep0_address(&state->link.endpoint, epoch, value)
                : NX_ERROR_STATE;
 }
@@ -395,8 +401,7 @@ static nx_result_t submit(void* context, nx_usb_request_t* request) {
     if (!task_context()) {
         return NX_ERROR_CONTEXT;
     }
-    if (!state->attached || state->closing ||
-        (state->config->link.endpoint.registers->CNTR & USB_CNTR_FSUSP) != 0U) {
+    if (!packet_admission(state)) {
         return NX_ERROR_STATE;
     }
     if (!independent(state, request, sizeof(*request),
@@ -447,20 +452,15 @@ static nx_result_t stall(void* context, bool stalled) {
     if (!task_context()) {
         return NX_ERROR_CONTEXT;
     }
+    if (!packet_admission(state)) {
+        return NX_ERROR_STATE;
+    }
 #if defined(NX_STM32F1_USB_PMA_EP1)
-    if (face->number == 1U)
-        return state->attached && !state->closing &&
-                       (state->config->link.endpoint.registers->ISTR &
-                        USB_ISTR_RESET) == 0U &&
-                       (state->config->link.endpoint.registers->CNTR &
-                        USB_CNTR_FSUSP) == 0U
-                   ? nx_stm32f1_usb_ep1_stall(state, face->in, stalled)
-                   : NX_ERROR_STATE;
+    if (face->number == 1U) {
+        return nx_stm32f1_usb_ep1_stall(state, face->in, stalled);
+    }
 #endif
-    return state->attached && !state->closing
-               ? nx_stm32f1_usb_ep0_stall(&state->link.endpoint, face->in,
-                                          stalled)
-               : NX_ERROR_STATE;
+    return nx_stm32f1_usb_ep0_stall(&state->link.endpoint, face->in, stalled);
 }
 
 const nx_usb_device_ops_t nx_stm32f1_usb_pma_device_ops = {

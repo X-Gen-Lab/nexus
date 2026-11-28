@@ -1,6 +1,6 @@
 /**
  * \file            trigger_dma.c
- * \brief           F103RB one timer-triggered regular result through DMA1.
+ * \brief           F103RB finite timer-triggered regular results through DMA1
  * \author          Nexus Team
  * \version         1.0.0
  * \date            2026-11-28
@@ -41,6 +41,18 @@ static bool vectors_idle(bool tim1) {
 #define DMA_HALFWORDS     (DMA_CCR_PSIZE_0 | DMA_CCR_MSIZE_0)
 #define TIM_ONE_PULSE     (TIM_CR1_OPM | TIM_CR1_URS)
 
+#if defined(NX_STM32F1_ADC_SCAN_DMA)
+typedef nx_stm32f1_adc_scan_dma_t adc_dma_state_t;
+#define DMA_RANKS     2U
+#define ADC_DMA_CLOSE nx_stm32f1_adc_scan_dma_close
+#else
+typedef nx_stm32f1_adc_trigger_dma_t adc_dma_state_t;
+#define DMA_RANKS     1U
+#define ADC_DMA_CLOSE nx_stm32f1_adc_trigger_dma_close
+#endif
+
+#define DMA_WIDTH (DMA_HALFWORDS | (DMA_RANKS == 2U ? DMA_CCR_MINC : 0U))
+
 enum {
     TIMER_GATE = 1U,
     TIMER_OWNED = 2U,
@@ -77,7 +89,7 @@ static const trigger_timer_t tim3_update = {TIM3,
                                             TIM_SR_UIF};
 
 static const trigger_timer_t* trigger_timer(bool tim1) {
-    return tim1 ? &tim1_compare : &tim3_update;
+    return DMA_RANKS == 1U && tim1 ? &tim1_compare : &tim3_update;
 }
 
 static bool timer_idle(const trigger_timer_t* trigger) {
@@ -140,10 +152,19 @@ static bool timer_prepare(const trigger_timer_t* trigger) {
     return timer_prepared(trigger) && timer->CNT == 0U && timer->SR == 0U;
 }
 
-nx_result_t nx_stm32f1_adc_trigger_dma_prepare(
-    nx_stm32f1_adc_trigger_dma_t* state, uint32_t apb2_hz,
-    uint32_t reference_mv, uint32_t sample_code,
-    const nx_dma_memory_region_t* regions, size_t region_count, bool tim1) {
+#if defined(NX_STM32F1_ADC_SCAN_DMA)
+nx_result_t nx_stm32f1_adc_scan_dma_prepare(
+    adc_dma_state_t* state, uint32_t apb2_hz, uint32_t reference_mv,
+    uint32_t sample_code, uint32_t second_code,
+    const nx_dma_memory_region_t* regions, size_t region_count) {
+    const bool tim1 = false;
+#else
+nx_result_t
+nx_stm32f1_adc_trigger_dma_prepare(adc_dma_state_t* state, uint32_t apb2_hz,
+                                   uint32_t reference_mv, uint32_t sample_code,
+                                   const nx_dma_memory_region_t* regions,
+                                   size_t region_count, bool tim1) {
+#endif
     if (!nx_stm32f1_cold_context())
         return NX_ERROR_CONTEXT;
     if (state == NULL || region_count == 0U || region_count > 16U)
@@ -177,8 +198,14 @@ nx_result_t nx_stm32f1_adc_trigger_dma_prepare(
     }
     if (!lane_idle())
         return NX_ERROR_BUSY;
+#if defined(NX_STM32F1_ADC_SCAN_DMA)
+    result = nx_stm32f1_adc_prepare_scan(&state->adc, apb2_hz, reference_mv,
+                                         sample_code, second_code,
+                                         &state->scan_ticks);
+#else
     result =
         nx_stm32f1_adc_prepare(&state->adc, apb2_hz, reference_mv, sample_code);
+#endif
     if (result != NX_SUCCESS)
         return result;
     state->effects |= TIMER_OWNED;
@@ -189,7 +216,7 @@ nx_result_t nx_stm32f1_adc_trigger_dma_prepare(
 }
 
 /** \brief Disable the event then its source before withdrawing the DMA lane. */
-static bool drain(nx_stm32f1_adc_trigger_dma_t* state, bool complete) {
+static bool drain(adc_dma_state_t* state, bool complete) {
     const trigger_timer_t* trigger = trigger_timer(state->tim1);
     if (!clocks_live(trigger) ||
         !nx_stm32f1_write_masked(&trigger->registers->CR1, TIM_CR1_CEN, 0U))
@@ -202,6 +229,9 @@ static bool drain(nx_stm32f1_adc_trigger_dma_t* state, bool complete) {
         !nx_stm32f1_write_masked(&DMA1_Channel1->CCR, DMA_CCR_EN, 0U))
         return false;
 
+#if defined(NX_STM32F1_ADC_SCAN_DMA)
+    const bool clean = !complete || (DMA1->ISR & DMA_ISR_TEIF1) == 0U;
+#endif
     /* ES096 §2.4.1: acknowledge the three individual events, never GIF1. */
     NX_STM32F1_WRITE(&DMA1->IFCR, DMA_CLEAR);
     NX_STM32F1_WRITE(&DMA1_Channel1->CCR, 0U);
@@ -212,11 +242,14 @@ static bool drain(nx_stm32f1_adc_trigger_dma_t* state, bool complete) {
     if (!lane_idle())
         return false;
     state->effects &= (uint8_t)~ARMED;
+#if defined(NX_STM32F1_ADC_SCAN_DMA)
+    return clean;
+#else
     return true;
+#endif
 }
 
-nx_result_t
-nx_stm32f1_adc_trigger_dma_close(nx_stm32f1_adc_trigger_dma_t* state) {
+nx_result_t ADC_DMA_CLOSE(adc_dma_state_t* state) {
     if (!nx_stm32f1_cold_context())
         return NX_ERROR_CONTEXT;
     if (state == NULL)
@@ -248,8 +281,16 @@ nx_stm32f1_adc_trigger_dma_close(nx_stm32f1_adc_trigger_dma_t* state) {
     return NX_SUCCESS;
 }
 
-static bool independent(const nx_stm32f1_adc_trigger_dma_t* state,
-                        const void* ptr, size_t bytes, size_t align) {
+static const nx_adc_ops_t* selected_ops(void) {
+#if defined(NX_STM32F1_ADC_SCAN_DMA)
+    return &nx_stm32f1_adc_scan_dma_ops;
+#else
+    return &nx_stm32f1_adc_trigger_dma_ops;
+#endif
+}
+
+static bool independent(const adc_dma_state_t* state, const void* ptr,
+                        size_t bytes, size_t align) {
     return nx_io_dispatch_span(ptr, bytes, align) &&
            !nx_io_dispatch_overlap(ptr, bytes, state, sizeof(*state)) &&
            !nx_io_dispatch_overlap(ptr, bytes, (void*)PERIPH_BASE,
@@ -259,12 +300,11 @@ static bool independent(const nx_stm32f1_adc_trigger_dma_t* state,
            !nx_io_dispatch_overlap(ptr, bytes, TIM1, sizeof(*TIM1)) &&
            !nx_io_dispatch_overlap(ptr, bytes, DMA1_Channel1,
                                    sizeof(*DMA1_Channel1)) &&
-           !nx_io_dispatch_overlap(ptr, bytes, &nx_stm32f1_adc_trigger_dma_ops,
-                                   sizeof(nx_stm32f1_adc_trigger_dma_ops));
+           !nx_io_dispatch_overlap(ptr, bytes, selected_ops(),
+                                   sizeof(nx_adc_ops_t));
 }
 
-static bool arm(nx_stm32f1_adc_trigger_dma_t* state,
-                const trigger_timer_t* trigger) {
+static bool arm(adc_dma_state_t* state, const trigger_timer_t* trigger) {
     TIM_TypeDef* timer = trigger->registers;
     const uint32_t armed = trigger->selection | ADC_TRIGGER_FLAGS;
     const uint32_t source = (uint32_t)(uintptr_t)&ADC1->DR;
@@ -274,12 +314,12 @@ static bool arm(nx_stm32f1_adc_trigger_dma_t* state,
     WRITE_REG(ADC1->SR, 0U);
     NX_STM32F1_WRITE(&DMA1_Channel1->CPAR, source);
     NX_STM32F1_WRITE(&DMA1_Channel1->CMAR, destination);
-    NX_STM32F1_WRITE(&DMA1_Channel1->CNDTR, 1U);
-    NX_STM32F1_WRITE(&DMA1_Channel1->CCR, DMA_HALFWORDS);
+    NX_STM32F1_WRITE(&DMA1_Channel1->CNDTR, DMA_RANKS);
+    NX_STM32F1_WRITE(&DMA1_Channel1->CCR, DMA_WIDTH);
     nx_arch_dsb();
     if (timer->CNT != 0U || timer->SR != 0U || READ_REG(ADC1->SR) != 0U ||
         DMA1_Channel1->CPAR != source || DMA1_Channel1->CMAR != destination ||
-        DMA1_Channel1->CNDTR != 1U || DMA1_Channel1->CCR != DMA_HALFWORDS ||
+        DMA1_Channel1->CNDTR != DMA_RANKS || DMA1_Channel1->CCR != DMA_WIDTH ||
         !nx_stm32f1_write_masked(&DMA1_Channel1->CCR, DMA_CCR_EN, DMA_CCR_EN))
         return false;
     WRITE_REG(ADC1->CR2, armed);
@@ -318,10 +358,10 @@ static nx_result_t result_before(const trigger_timer_t* trigger,
 
 static nx_result_t sample(void* context, uint16_t* values, size_t capacity,
                           nx_time_us_t deadline, size_t* count) {
-    nx_stm32f1_adc_trigger_dma_t* state = context;
+    adc_dma_state_t* state = context;
     if (!nx_stm32f1_cold_context())
         return NX_ERROR_CONTEXT;
-    if (state == NULL || capacity == 0U ||
+    if (state == NULL || capacity < DMA_RANKS ||
         capacity > SIZE_MAX / sizeof(*values) ||
         !independent(state, values, capacity * sizeof(*values),
                      _Alignof(uint16_t)) ||
@@ -344,43 +384,69 @@ static nx_result_t sample(void* context, uint16_t* values, size_t capacity,
         READ_REG(ADC1->CR2) != ADC_IDLE || !timer_prepared(trigger))
         return NX_ERROR_IO;
 
+#if defined(NX_STM32F1_ADC_SCAN_DMA)
+    if (ADC1->CR1 != ADC_CR1_SCAN || ADC1->SQR1 != ADC_SQR1_L_0 ||
+        ADC1->SQR3 != (1U << ADC_SQR3_SQ2_Pos))
+        return NX_ERROR_IO;
+#endif
     state->effects |= ARMED;
     nx_result_t result =
         arm(state, trigger) ? result_before(trigger, deadline) : NX_ERROR_IO;
     if (!drain(state, result == NX_SUCCESS))
         result = NX_ERROR_IO;
     if (result == NX_SUCCESS) {
-        const uint16_t value = state->sample;
-        if (value <= 0xfffU &&
-            !nx_deadline_expired(deadline, nx_time_now_us())) {
-            *values = value;
-            *count = 1U;
+#if defined(NX_STM32F1_ADC_SCAN_DMA)
+        const uint16_t captured[] = {state->sample[0], state->sample[1]};
+        const bool valid = captured[0] <= 0xfffU && captured[1] <= 0xfffU;
+#else
+        const uint16_t captured[] = {state->sample};
+        const bool valid = captured[0] <= 0xfffU;
+#endif
+        if (valid && !nx_deadline_expired(deadline, nx_time_now_us())) {
+            for (size_t rank = 0U; rank < DMA_RANKS; ++rank)
+                values[rank] = captured[rank];
+            *count = DMA_RANKS;
             return NX_SUCCESS;
         }
-        result = value > 0xfffU ? NX_ERROR_IO : NX_ERROR_TIMEOUT;
+        result = valid ? NX_ERROR_TIMEOUT : NX_ERROR_IO;
     }
     state->effects |= FAULTED;
     return result;
 }
 
 static nx_result_t info(const void* context, nx_adc_info_t* out) {
-    const nx_stm32f1_adc_trigger_dma_t* state = context;
-    return state != NULL && independent(state, out, sizeof(*out),
-                                        _Alignof(nx_adc_info_t))
-               ? nx_stm32f1_adc_info(&state->adc, out,
-                                     &nx_stm32f1_adc_trigger_dma_ops)
-               : NX_ERROR_INVALID;
+    const adc_dma_state_t* state = context;
+    if (state == NULL ||
+        !independent(state, out, sizeof(*out), _Alignof(nx_adc_info_t)))
+        return NX_ERROR_INVALID;
+    const nx_result_t result =
+        nx_stm32f1_adc_info(&state->adc, out, selected_ops());
+    if (DMA_RANKS > 1U && result == NX_SUCCESS)
+        out->channel_count = DMA_RANKS;
+    return result;
 }
 
 static nx_result_t sequence_info(const void* context,
                                  nx_adc_sequence_info_t* out) {
-    const nx_stm32f1_adc_trigger_dma_t* state = context;
-    return state != NULL && independent(state, out, sizeof(*out),
-                                        _Alignof(nx_adc_sequence_info_t))
-               ? nx_stm32f1_adc_sequence_info(&state->adc, out,
-                                              &nx_stm32f1_adc_trigger_dma_ops)
-               : NX_ERROR_INVALID;
+    const adc_dma_state_t* state = context;
+    if (state == NULL || !independent(state, out, sizeof(*out),
+                                      _Alignof(nx_adc_sequence_info_t)))
+        return NX_ERROR_INVALID;
+    const nx_result_t result =
+        nx_stm32f1_adc_sequence_info(&state->adc, out, selected_ops());
+#if defined(NX_STM32F1_ADC_SCAN_DMA)
+    if (result == NX_SUCCESS) {
+        out->channel_count = DMA_RANKS;
+        out->scan_ticks = state->scan_ticks;
+    }
+#endif
+    return result;
 }
 
+#if defined(NX_STM32F1_ADC_SCAN_DMA)
+const nx_adc_ops_t nx_stm32f1_adc_scan_dma_ops = {
+    .info = info, .sample = sample, .sequence_info = sequence_info};
+#else
 const nx_adc_ops_t nx_stm32f1_adc_trigger_dma_ops = {
     .info = info, .sample = sample, .sequence_info = sequence_info};
+#endif

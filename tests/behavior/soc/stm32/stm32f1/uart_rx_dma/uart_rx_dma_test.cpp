@@ -26,6 +26,7 @@ Vector dma_irq;
 Vector uart_irq;
 bool refuse_dma_disable;
 bool refuse_dma_clear;
+bool refuse_dma_address_clear;
 bool late_uart_error;
 bool sr_sampled;
 unsigned dr_reads;
@@ -60,7 +61,7 @@ class F103ReceiveDma : public testing::Test {
         dma_irq = {false, false, false, 7U};
         uart_irq = {false, false, false, 11U};
         refuse_dma_disable = refuse_dma_clear = late_uart_error = false;
-        sr_sampled = false;
+        sr_sampled = refuse_dma_address_clear = false;
         dr_reads = 0U;
         GPIOA->CRL = GPIOA->CRH = 0x44444444U;
         USART2->SR = USART_SR_TC | USART_SR_TXE;
@@ -136,6 +137,8 @@ extern "C" void nx_dma_model_write(volatile uint32_t* reg, uint32_t value) {
         if (late_uart_error)
             USART2->SR |= USART_SR_ORE;
     }
+    if (reg == &DMA1_Channel6->CMAR && value == 0U && refuse_dma_address_clear)
+        return;
     *reg = value;
 }
 
@@ -304,5 +307,29 @@ TEST_F(F103ReceiveDma, StopDetachesAnEmptyFillWithoutPublishingAFakeBoundary) {
     EXPECT_EQ(0U, USART2->CR3 & USART_CR3_DMAR);
     EXPECT_FALSE(uart_irq.enabled);
     EXPECT_FALSE(dma_irq.enabled);
+    EXPECT_EQ(NX_SUCCESS, nx_stm32f1_uart_rx_dma_close(&owner));
+}
+
+TEST_F(F103ReceiveDma, TargetWithdrawalFailureRetainsPartialBlockAndCount) {
+    Prepare();
+    Start();
+    refuse_dma_address_clear = true;
+    Signal(0U, USART_SR_IDLE, 2U);
+    nx_uart_port_service(&face);
+    nx_stream_block_t block{};
+    EXPECT_EQ(NX_ERROR_EMPTY, nx_stream_acquire(&stream, &block));
+    EXPECT_EQ(NX_STREAM_SLOT_FILLING, slots[0].state);
+    EXPECT_EQ(sram, DMA1_Channel6->CMAR);
+    EXPECT_EQ(2U, DMA1_Channel6->CNDTR);
+    EXPECT_EQ(NX_ERROR_BUSY, nx_uart_port_rx_stop(&face));
+
+    refuse_dma_address_clear = false;
+    nx_uart_port_service(&face);
+    ASSERT_EQ(NX_SUCCESS, nx_stream_acquire(&stream, &block));
+    EXPECT_EQ(2U, block.length);
+    EXPECT_EQ(NX_STREAM_BOUNDARY_IDLE, block.flags);
+    EXPECT_EQ(0U, DMA1_Channel6->CMAR | DMA1_Channel6->CPAR);
+    ASSERT_EQ(NX_SUCCESS, nx_stream_release(&stream, &block));
+    EXPECT_EQ(NX_SUCCESS, nx_uart_port_rx_stop(&face));
     EXPECT_EQ(NX_SUCCESS, nx_stm32f1_uart_rx_dma_close(&owner));
 }

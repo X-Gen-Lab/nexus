@@ -22,6 +22,14 @@ nexus_target_warnings(nexus_stm32f1_encoder_consumer STRICT)
 find_package(Python3 3.11 REQUIRED COMPONENTS Interpreter)
 get_target_property(fixture_source Nexus::Config NEXUS_SOURCE_DIR)
 get_target_property(fixture_config Nexus::Platform NEXUS_CONFIG_DIR)
+file(READ "${fixture_config}/resolved.json" fixture_resolved)
+string(JSON fixture_counting GET "${fixture_resolved}" controllers 0 counting)
+string(REPLACE "-" "_" fixture_mode "${fixture_counting}")
+string(TOUPPER "${fixture_mode}" fixture_mode)
+target_compile_definitions(
+    nexus_stm32f1_encoder_consumer
+    PRIVATE "EXPECTED_ENCODER_MODE=NX_ENCODER_MODE_${fixture_mode}"
+)
 set(retention_check "${fixture_source}/tools/measurement/retention.py")
 set(retention_report "${CMAKE_CURRENT_BINARY_DIR}/bin/provider-retention.json")
 set_property(

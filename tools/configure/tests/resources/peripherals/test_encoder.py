@@ -139,13 +139,24 @@ class F103EncoderConfigurationTests(unittest.TestCase):
                         with self.assertRaisesRegex(ValueError, r'Resource conflict controller:TIM3'):
                             gate.resolve_ir(assembly)
 
-    def test_unreviewed_x2_and_nonexclusive_options_reject(self):
+    def test_x2_modes_reuse_the_same_exact_static_routes(self):
+        baseline = gate.resolve_ir(self.reference / 'f103rb-tim3.toml')
+        for mode in ('x2-a', 'x2-b'):
+            with self.subTest(mode=mode):
+                path = self.reference / f'f103rb-tim3-{mode}.toml'
+                result = gate.resolve_ir(path)
+                encoder, = result.controllers
+                self.assertEqual((encoder.controller, encoder.options.counting),
+                                 ('TIM3', mode))
+                self.assertEqual(result.claims, baseline.claims)
+
+    def test_unknown_modes_and_nonexclusive_options_reject(self):
         authored = (self.reference / 'f103rb-tim3.toml').read_text()
         authored = authored.replace('board_package = "board"',
                                     f'board_package = {json.dumps(str(self.reference / "board"))}')
         with tempfile.TemporaryDirectory() as temporary:
             assembly = Path(temporary) / 'unsupported.toml'
-            for existing, rejected in (('"x4"', '"x2-a"'), ('"x4"', '"x2-b"'),
+            for existing, rejected in (('"x4"', '"x1"'),
                                        ('exclusive = true', 'exclusive = false')):
                 with self.subTest(option=rejected):
                     assembly.write_text(authored.replace(existing, rejected))

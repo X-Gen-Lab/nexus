@@ -512,7 +512,8 @@
     {
       "kind": "usb_host",
       "modes": [
-        "host-fs"
+        "host-fs",
+        "host-fs-bulk"
       ],
       "implementation": "usb_host",
       "headers": [
@@ -742,7 +743,8 @@
         }
       },
       "host_modes": {
-        "host-fs": "NX_STM32_USB_FS_INTERNAL"
+        "host-fs": "NX_STM32_USB_FS_INTERNAL",
+        "host-fs-bulk": "NX_STM32_USB_FS_INTERNAL"
       },
       "admission": {
         "device": {
@@ -779,6 +781,39 @@
         },
         "host": {
           "host-fs": {
+            "controller": "OTG_FS",
+            "pins": [
+              [
+                "PA9",
+                "vbus",
+                null
+              ],
+              [
+                "PA11",
+                "dm",
+                null
+              ],
+              [
+                "PA12",
+                "dp",
+                null
+              ]
+            ],
+            "engines": [
+              "pio"
+            ],
+            "ulpi_clock_hz": 0,
+            "minimum_core_hz": 14200000,
+            "channel_count": 1,
+            "fifo_words": 320,
+            "dma_reserved_words": 0,
+            "fifo_minima": {
+              "rx": 64,
+              "nonperiodic": 16,
+              "periodic": 16
+            }
+          },
+          "host-fs-bulk": {
             "controller": "OTG_FS",
             "pins": [
               [

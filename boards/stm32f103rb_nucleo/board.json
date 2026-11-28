@@ -24,10 +24,23 @@
       "route": "usart2-pa2-pa3"
     },
     {
+      "id": "uart1",
+      "controller": "USART1",
+      "route": "usart1-pa9-pa10"
+    },
+    {
       "id": "flash0",
       "controller": "FLASH",
       "route": "flash-internal",
       "supply_mv": 3300
+    },
+    {
+      "id": "watchdog-warning",
+      "controller": "WWDG",
+      "route": "wwdg-early-warning",
+      "requires": {
+        "backup_word": "wwdg-early-warning-dr1"
+      }
     }
   ],
   "reserved_resources": [
@@ -44,7 +57,9 @@
   "unknowns": [
     "Physical PCB revision and solder bridges have not been inspected.",
     "Verify the USART2 PA2/PA3 virtual COM wiring and the PA5 LED load on the actual board.",
-    "No external clock is declared; HSI baud rate and physical timings have not been measured."
+    "No external clock is declared; HSI baud rate and physical timings have not been measured.",
+    "The optional watchdog witness requires application ownership of BKP_DR1. Backup supply and warning-to-reset timing are unobserved.",
+    "USART1 PA9/D8 and PA10/D2 require an external 3.3 V serial peer. Verify its wiring and timing on hardware."
   ],
   "provenance": [
     {
@@ -54,9 +69,12 @@
       "sha256": "576d9bee3bc32c8ee70bf0d77cf9494cec06ea7c1d9ff98eebf2738cb9314a14",
       "pages": [21, 22, 23, 24, 25, 26, 27, 28, 40],
       "components": ["U4", "LD2", "SB21", "SB13", "SB14", "SB62", "SB63", "ST-LINK"],
-      "nets": ["+3.3V", "PA5/D13", "PA2/USART2_TX", "PA3/USART2_RX"]
+      "nets": ["+3.3V", "PA5/D13", "PA2/USART2_TX", "PA3/USART2_RX", "PA9/D8/USART1_TX", "PA10/D2/USART1_RX"]
     }
   ],
+  "hardware_options": {
+    "backup_word": ["unassigned", "wwdg-early-warning-dr1"]
+  },
   "backend_support": [
     "baremetal",
     "freertos"

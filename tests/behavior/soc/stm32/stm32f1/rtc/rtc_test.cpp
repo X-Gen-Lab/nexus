@@ -44,6 +44,10 @@ bool drop_exti_ack;
 bool drop_vector_disable;
 bool pass_target_at_route;
 unsigned comparator_writes;
+unsigned bdcr_writes;
+unsigned divider_writes;
+unsigned lse_delay;
+bool freeze_rtoff;
 
 class RetainedRtc : public testing::Test {
   protected:
@@ -68,7 +72,9 @@ class RetainedRtc : public testing::Test {
         vector_priority = 2U;
         vector_enabled = vector_pending = vector_active = false;
         drop_exti_ack = drop_vector_disable = pass_target_at_route = false;
-        comparator_writes = 0U;
+        comparator_writes = bdcr_writes = divider_writes = 0U;
+        lse_delay = 0U;
+        freeze_rtoff = false;
     }
 };
 } /* namespace */
@@ -110,7 +116,10 @@ extern "C" void nx_f1_rtc_model_clear(IRQn_Type irq) {
 extern "C" uint32_t nx_f1_rtc_model_read(volatile const uint32_t* reg) {
     EXPECT_NE(reg, &RTC->ALRH);
     EXPECT_NE(reg, &RTC->ALRL);
-    if (reg == &RTC->CRL && rtoff_delay != 0U && --rtoff_delay == 0U)
+    EXPECT_NE(reg, &RTC->PRLH);
+    EXPECT_NE(reg, &RTC->PRLL);
+    if (reg == &RTC->CRL && !freeze_rtoff && rtoff_delay != 0U &&
+        --rtoff_delay == 0U)
         RTC->CRL |= RTC_CRL_RTOFF;
     if (reg == &RTC->CRL && crl_writes != 0U && ++crl_reads == sync_at) {
         RTC->CRL |= RTC_CRL_RSF;
@@ -136,6 +145,8 @@ extern "C" void nx_f1_rtc_model_write(volatile uint32_t* reg, uint32_t value) {
         EXPECT_EQ(gates, RCC->APB1ENR & gates);
         EXPECT_NE(0U, PWR->CR & PWR_CR_DBP);
         EXPECT_NE(0U, RTC->CRL & RTC_CRL_RTOFF);
+        if ((value & RTC_CRL_RSF) == 0U)
+            crl_reads = 0U;
         const bool committing =
             (*reg & RTC_CRL_CNF) != 0U && (value & RTC_CRL_CNF) == 0U;
         *reg = (*reg & RTC_CRL_RTOFF) | (*reg & value & (flags | RTC_CRL_RSF)) |
@@ -144,6 +155,28 @@ extern "C" void nx_f1_rtc_model_write(volatile uint32_t* reg, uint32_t value) {
             *reg &= ~static_cast<uint32_t>(RTC_CRL_RTOFF);
             rtoff_delay = 3U;
         }
+    } else if (reg == &RCC->BDCR) {
+        ++bdcr_writes;
+        EXPECT_EQ(0U, value & RCC_BDCR_BDRST);
+        EXPECT_NE(0U, PWR->CR & PWR_CR_DBP);
+        const auto sticky = static_cast<uint32_t>(RCC_BDCR_RTCSEL);
+        if ((*reg & sticky) != 0U)
+            value = (value & ~sticky) | (*reg & sticky);
+        if ((value & RCC_BDCR_LSEON) == 0U)
+            value &= ~static_cast<uint32_t>(RCC_BDCR_LSERDY);
+        if ((*reg & RCC_BDCR_RTCEN) == 0U && (value & RCC_BDCR_RTCEN) != 0U) {
+            EXPECT_NE(0U, value & RCC_BDCR_LSERDY);
+            RTC->CRL |= RTC_CRL_RTOFF;
+        }
+        *reg = value;
+    } else if (reg == &RTC->PRLH || reg == &RTC->PRLL) {
+        EXPECT_NE(0U, RTC->CRL & RTC_CRL_CNF);
+        EXPECT_NE(0U, RTC->CRL & RTC_CRL_RTOFF);
+        EXPECT_NE(0U, PWR->CR & PWR_CR_DBP);
+        ++divider_writes;
+        *reg = value;
+    } else if (reg == &RTC->CNTH || reg == &RTC->CNTL) {
+        ADD_FAILURE() << "Unexpected RTC time seed";
     } else if (reg == &RTC->ALRH || reg == &RTC->ALRL) {
         EXPECT_NE(0U, RTC->CRL & RTC_CRL_CNF);
         EXPECT_NE(0U, RTC->CRL & RTC_CRL_RTOFF);
@@ -197,6 +230,10 @@ extern "C" bool nx_stm32f1_system_live(void) {
     return clock_live;
 }
 extern "C" nx_time_us_t nx_time_now_us(void) {
+    if ((RCC->BDCR & RCC_BDCR_LSEON) != 0U && lse_delay != 0U &&
+        --lse_delay == 0U)
+        RCC->BDCR |= RCC_BDCR_LSERDY;
+
     return ticks++;
 }
 
@@ -429,3 +466,111 @@ TEST_F(RetainedAlarm, ClosingRetainsOwnershipUntilInterruptIsDrained) {
     EXPECT_EQ(2U, vector_priority);
     EXPECT_EQ(RCC_APB1ENR_TIM2EN, RCC->APB1ENR);
 }
+
+namespace {
+class BlankRtc : public RetainedRtc {
+  protected:
+    void SetUp() override {
+        RetainedRtc::SetUp();
+        RCC->BDCR = 0U;
+        RTC->CRL = flags;
+        lse_delay = 3U;
+    }
+};
+
+TEST_F(BlankRtc, PowersBlankLseAndWritesOnlyTheDividerThenReadoptsOwnReceipt) {
+    ASSERT_EQ(NX_SUCCESS, nx_stm32f1_rtc_provision(&state, 100U, 100U));
+    EXPECT_EQ(oscillator, RCC->BDCR);
+    EXPECT_EQ(2U, divider_writes);
+    EXPECT_EQ(32767U, RTC->PRLL);
+    EXPECT_EQ(0U, RTC->PRLH);
+    EXPECT_EQ(flags, RTC->CRL & flags);
+    EXPECT_EQ(0U, PWR->CR & PWR_CR_DBP);
+    EXPECT_EQ(0U, comparator_writes);
+    ASSERT_EQ(NX_SUCCESS, nx_stm32f1_rtc_close(&state));
+    EXPECT_EQ(oscillator, RCC->BDCR);
+    EXPECT_EQ(RCC_APB1ENR_TIM2EN, RCC->APB1ENR);
+
+    BKP->DR1 = 0x527U;
+    crl_reads = 0U;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32f1_rtc_provision(&state, 100U, 100U));
+    EXPECT_EQ(2U, divider_writes);
+    uint32_t value{};
+    EXPECT_EQ(NX_SUCCESS, nx_rtc_port_backup_read(&face, 0U, &value));
+    EXPECT_EQ(0x527U, value);
+    EXPECT_EQ(NX_SUCCESS, nx_stm32f1_rtc_close(&state));
+}
+
+TEST_F(BlankRtc, ColdProvisionRefusesAlreadyRunningDomainWithoutWrites) {
+    RCC->BDCR = oscillator;
+    BKP->DR1 = 0x427U;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32f1_rtc_provision(&state, 100U, 100U));
+    EXPECT_EQ(0U, reg_writes);
+    EXPECT_EQ(0x427U, BKP->DR1);
+}
+
+TEST_F(BlankRtc, StoredBackupWordBlocksProvisionBeforeLse) {
+    BKP->DR9 = 0x442U;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32f1_rtc_provision(&state, 100U, 100U));
+    EXPECT_EQ(0x442U, BKP->DR9);
+    EXPECT_EQ(0U, bdcr_writes);
+    EXPECT_EQ(RCC_APB1ENR_TIM2EN, RCC->APB1ENR);
+}
+
+TEST_F(BlankRtc, InheritedAlarmLineAndVectorArePreservedBeforeEffects) {
+    EXTI->PR = alarm_line;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32f1_rtc_provision(&state, 100U, 100U));
+    EXPECT_EQ(alarm_line, EXTI->PR);
+    EXPECT_EQ(0U, reg_writes);
+    EXTI->PR = 0U;
+    vector_enabled = true;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32f1_rtc_provision(&state, 100U, 100U));
+    EXPECT_TRUE(vector_enabled);
+    EXPECT_EQ(0U, reg_writes);
+}
+
+TEST_F(BlankRtc, LseTimeoutRollsBackOnlyTheOwnedAttempt) {
+    lse_delay = 0U;
+    EXPECT_EQ(NX_ERROR_TIMEOUT, nx_stm32f1_rtc_provision(&state, 100U, 4U));
+    EXPECT_EQ(0U, RCC->BDCR);
+    EXPECT_EQ(0U, divider_writes);
+    EXPECT_EQ(0U, PWR->CR & PWR_CR_DBP);
+    EXPECT_EQ(RCC_APB1ENR_TIM2EN, RCC->APB1ENR);
+}
+
+TEST_F(BlankRtc, RelockRefusalWithdrawsTheClockWithoutGrantingAdoption) {
+    dbp_stop_drops = 2U;
+    PWR->CR = PWR_CR_PLS_LEV2;
+    EXTI->PR = foreign_line;
+    const uint32_t sticky = oscillator & ~static_cast<uint32_t>(RCC_BDCR_RTCEN);
+
+    EXPECT_EQ(NX_ERROR_IO, nx_stm32f1_rtc_provision(&state, 100U, 100U));
+    EXPECT_EQ(sticky, RCC->BDCR);
+    EXPECT_EQ(PWR_CR_DBP | PWR_CR_PLS_LEV2, PWR->CR);
+    EXPECT_EQ(gates | RCC_APB1ENR_TIM2EN, RCC->APB1ENR);
+
+    ASSERT_EQ(NX_SUCCESS, nx_stm32f1_rtc_close(&state));
+    EXPECT_EQ(sticky, RCC->BDCR);
+    EXPECT_EQ(PWR_CR_PLS_LEV2, PWR->CR);
+    EXPECT_EQ(RCC_APB1ENR_TIM2EN, RCC->APB1ENR);
+    EXPECT_EQ(foreign_line, EXTI->PR);
+    EXPECT_EQ(2U, divider_writes);
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32f1_rtc_provision(&state, 100U, 100U));
+    EXPECT_EQ(2U, divider_writes);
+}
+
+TEST_F(BlankRtc, PartialStickyClockRetainsConfigurationUntilSafeWithdrawal) {
+    freeze_rtoff = true;
+    EXPECT_EQ(NX_ERROR_IO, nx_stm32f1_rtc_provision(&state, 100U, 100U));
+    EXPECT_EQ(oscillator, RCC->BDCR);
+    EXPECT_NE(0U, PWR->CR & PWR_CR_DBP);
+    EXPECT_EQ(NX_ERROR_IO, nx_stm32f1_rtc_close(&state));
+
+    freeze_rtoff = false;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32f1_rtc_close(&state));
+    EXPECT_EQ(oscillator & ~static_cast<uint32_t>(RCC_BDCR_RTCEN), RCC->BDCR);
+    EXPECT_EQ(0U, PWR->CR & PWR_CR_DBP);
+    EXPECT_EQ(RCC_APB1ENR_TIM2EN, RCC->APB1ENR);
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32f1_rtc_provision(&state, 100U, 100U));
+}
+} /* namespace */

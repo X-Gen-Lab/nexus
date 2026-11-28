@@ -1,6 +1,6 @@
 /**
  * \file            transport.h
- * \brief           Private STM32F103ZE one-bit SDIO polling transport
+ * \brief           Private STM32F103ZE single-sector SDIO transport
  * \author          Nexus Team
  */
 #ifndef NEXUS_STM32F1_SDIO_TRANSPORT_H
@@ -25,6 +25,11 @@ typedef struct {
 
 typedef struct {
     uint8_t phase;
+#if defined(NX_STM32F1_SDIO_RX_DMA)
+    bool dma_ready;
+    bool dma_gate_owned;
+    bool dma_armed;
+#endif
 } nx_stm32f1_sdio_t;
 
 /** \brief Acquire a reset host and start its 1-bit identification clock.
@@ -46,7 +51,8 @@ nx_result_t nx_stm32f1_sdio_command(nx_stm32f1_sdio_t* host, uint8_t index,
 
 /** \brief Receive one 512-byte CMD17 transfer from a selected SD card.
  * \note The caller supplies the already translated SDSC/SDHC command address.
- *       The buffer is unretained. Its bytes are unspecified on failure.
+ *       In DMA mode the supplied buffer must be owned provider storage and
+ *       stay live until withdrawal. In PIO mode the input is unretained.
  *       A failed started operation requires host close before another command.
  */
 nx_result_t nx_stm32f1_sdio_read_sector(nx_stm32f1_sdio_t* host,
@@ -74,6 +80,20 @@ nx_result_t nx_stm32f1_sdio_quiesce(nx_stm32f1_sdio_t* host,
  */
 nx_result_t nx_stm32f1_sdio_close(nx_stm32f1_sdio_t* host,
                                   nx_time_us_t deadline);
+
+#if defined(NX_STM32F1_SDIO_RX_DMA)
+/** \brief Own and retire only the dedicated normal-transfer channel. */
+nx_result_t nx_stm32f1_sdio_dma_prepare(nx_stm32f1_sdio_t* host);
+nx_result_t nx_stm32f1_sdio_dma_release(nx_stm32f1_sdio_t* host);
+#endif
+
+#if defined(NX_STM32F1_SDIO_4BIT)
+/** \brief Confirm the selected clock and four-lane controller mode. */
+bool nx_stm32f1_sdio_four_bit_ready(void);
+/** \brief Change the host bus width only while both state machines are idle. */
+nx_result_t nx_stm32f1_sdio_set_width(nx_stm32f1_sdio_t* host, bool wide,
+                                      nx_time_us_t deadline);
+#endif
 
 #ifdef __cplusplus
 }

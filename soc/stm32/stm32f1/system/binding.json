@@ -26,7 +26,8 @@
         ]
       },
       "dma_clocks": {
-        "DMA1": "RCC_AHBENR_DMA1EN"
+        "DMA1": "RCC_AHBENR_DMA1EN",
+        "DMA2": "RCC_AHBENR_DMA2EN"
       },
       "objects": {
         "platform": {

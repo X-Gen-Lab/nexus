@@ -57,13 +57,17 @@ class SelectedContractAuthorityTests(unittest.TestCase):
                 "STM32F446ZET6", "STM32F479NIH6",
             },
         })
-        f1_buses = {(row.part, row.kind, row.mode): row.reviewed_routes
-                    for row in rows if row.family == "stm32f1"
-                    and row.kind in {"spi", "i2c"} and row.reviewed_route_available}
+        f1_buses = {
+            (row.part, row.controller, row.kind, row.mode): row.reviewed_routes
+            for row in rows if row.family == "stm32f1"
+            and row.kind in {"spi", "i2c"} and row.reviewed_route_available
+        }
         self.assertEqual(f1_buses, {
-            ("STM32F103RBT6", "spi", "short-poll"): ("spi2-pb13-pb14-pb15",),
-            ("STM32F103RBT6", "spi", "dma"): ("spi2-pb13-pb14-pb15-dma",),
-            ("STM32F103RBT6", "i2c", "poll-messages"): ("i2c1-pb6-pb7",),
+            ("STM32F103RBT6", "SPI1", "spi", "short-poll"): ("spi1-pa5-pa6-pa7",),
+            ("STM32F103RBT6", "SPI2", "spi", "short-poll"): ("spi2-pb13-pb14-pb15",),
+            ("STM32F103RBT6", "SPI2", "spi", "dma"): ("spi2-pb13-pb14-pb15-dma",),
+            ("STM32F103RBT6", "I2C1", "i2c", "poll-messages"): ("i2c1-pb6-pb7",),
+            ("STM32F107VCT6", "SPI3", "spi", "short-poll"): ("spi3-pc10-pc11-pc12",),
         })
         f1_controls = {(row.part, row.controller, row.mode): row.reviewed_routes
                        for row in rows if row.family == "stm32f1"

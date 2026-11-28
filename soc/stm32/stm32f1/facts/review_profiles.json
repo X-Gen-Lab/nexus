@@ -172,6 +172,7 @@
         "2.8.5",
         "2.8.6",
         "2.8.7",
+        "2.9.1",
         "2.9.2",
         "2.9.3",
         "2.9.5",
@@ -219,6 +220,7 @@
         "2.8.5": "AAAAAAAA",
         "2.8.6": "AAAAAAAA",
         "2.8.7": "AAAAAAAA",
+        "2.9.1": "AAAAAAAA",
         "2.9.2": "NNNNNNNN",
         "2.9.3": "AAAAAAAA",
         "2.9.5": "NNNNNNNN",
@@ -242,6 +244,8 @@
         8195
       ],
       "mode_scope": [
+        "adc:internal-scan",
+        "adc:sequential-scan-dma",
         "adc:single-shot",
         "adc:single-trigger-dma",
         "advanced_pwm:complementary-pwm",
@@ -257,12 +261,16 @@
         "gpio:output",
         "i2c:poll-messages",
         "i2c_target:target-rx-irq",
+        "i2c_target:target-tx-irq",
+        "i2c_target:target-write-read-irq",
         "pwm:fixed-pwm",
         "pwm_adc:finite-injected",
         "rtc:backup-adopt",
+        "rtc:backup-provision",
         "spi:dma",
         "spi:short-poll",
         "timer_capture:edge-capture",
+        "timer_pulse:one-pulse",
         "uart:dma-tx",
         "uart:irq-byte-event",
         "uart:irq-wire",
@@ -406,10 +414,14 @@
       ],
       "mode_scope": [
         "adc:simultaneous-scan-dma",
+        "adc:single-shot",
         "advanced_pwm:complementary-pwm",
         "audio:master-tx",
         "block:sdio-poll",
+        "block:sdio-poll-4bit",
+        "block:sdio-poll-4bit-write",
         "block:sdio-poll-write",
+        "block:sdio-rx-dma-poll",
         "dac:direct",
         "flash:poll-halfword",
         "gpio:output",
@@ -465,6 +477,7 @@
         "flash:poll-halfword",
         "gpio:output",
         "memory_window:cpu-window",
+        "parallel16:8080-16",
         "uart:irq-byte-event"
       ],
       "backends": [
@@ -542,6 +555,7 @@
         "2.1.2",
         "2.2.1",
         "2.2.2",
+        "2.2.11",
         "2.3.9",
         "2.9.2",
         "2.9.3"
@@ -550,6 +564,7 @@
         "2.1.2": "AAAAAAAA",
         "2.2.1": "AAAAAAAA",
         "2.2.2": "NNNNNNNN",
+        "2.2.11": "AAAAAAAA",
         "2.3.9": "AAAAAAAA",
         "2.9.2": "NNNNNNNN",
         "2.9.3": "AAAAAAAA"
@@ -565,6 +580,7 @@
         8195
       ],
       "mode_scope": [
+        "flash:poll-halfword",
         "gpio:output",
         "uart:irq-byte-event"
       ],
@@ -591,6 +607,7 @@
         "2.1.2",
         "2.2.1",
         "2.2.2",
+        "2.2.11",
         "2.3.9",
         "2.9.2",
         "2.9.3",
@@ -603,6 +620,7 @@
         "2.1.2": "AAAAAA",
         "2.2.1": "AAAAAA",
         "2.2.2": "NNNNNN",
+        "2.2.11": "AAAAAA",
         "2.3.9": "AAAAAA",
         "2.9.2": "NNNNNN",
         "2.9.3": "AAAAAA",
@@ -620,6 +638,7 @@
         8195
       ],
       "mode_scope": [
+        "flash:poll-halfword",
         "gpio:output",
         "uart:irq-byte-event",
         "usb_device:device-pma"
@@ -703,12 +722,19 @@
         "2.3.6",
         "2.9.2",
         "2.9.3",
+        "2.10.1",
+        "2.10.2",
         "2.12.1",
         "2.13.1",
         "2.13.2",
         "2.13.3",
         "2.13.4",
-        "2.13.5"
+        "2.13.5",
+        "2.14.1",
+        "2.14.5",
+        "2.14.9",
+        "2.14.10",
+        "2.14.11"
       ],
       "applicability": {
         "2.1.2": "AA",
@@ -717,12 +743,19 @@
         "2.3.6": "AA",
         "2.9.2": "NN",
         "2.9.3": "AA",
+        "2.10.1": "AA",
+        "2.10.2": "AA",
         "2.12.1": "NN",
         "2.13.1": "AA",
         "2.13.2": "AA",
         "2.13.3": "AA",
         "2.13.4": "AA",
-        "2.13.5": "NN"
+        "2.13.5": "NN",
+        "2.14.1": "AA",
+        "2.14.5": "AA",
+        "2.14.9": "AA",
+        "2.14.10": "AA",
+        "2.14.11": "AA"
       },
       "devices": [
         "stm32f107xc"
@@ -733,11 +766,15 @@
       ],
       "mode_scope": [
         "can:classic-irq",
+        "eth:raw-mii",
+        "eth:raw-rmii",
         "gpio:output",
         "mdio:clause22",
+        "spi:short-poll",
         "uart:irq-byte-event",
         "usb_device:device-fs",
-        "usb_host:host-fs"
+        "usb_host:host-fs",
+        "usb_host:host-fs-bulk"
       ],
       "backends": [
         "baremetal"
@@ -755,12 +792,14 @@
       ],
       "sections": [
         "2.1.2",
+        "2.2.7",
         "2.3.8",
         "2.10.1",
         "2.10.2"
       ],
       "applicability": {
         "2.1.2": "A",
+        "2.2.7": "A",
         "2.3.8": "A",
         "2.10.1": "N",
         "2.10.2": "A"
@@ -773,6 +812,7 @@
         4096
       ],
       "mode_scope": [
+        "flash:poll-halfword",
         "gpio:output",
         "uart:irq-byte-event"
       ],
@@ -795,6 +835,7 @@
         "2.1.2",
         "2.2.1",
         "2.2.2",
+        "2.2.10",
         "2.3.6",
         "2.9.2",
         "2.9.3"
@@ -803,6 +844,7 @@
         "2.1.2": "AA",
         "2.2.1": "AA",
         "2.2.2": "NN",
+        "2.2.10": "AA",
         "2.3.6": "AA",
         "2.9.2": "NN",
         "2.9.3": "AA"
@@ -815,6 +857,7 @@
         4096
       ],
       "mode_scope": [
+        "flash:poll-halfword",
         "gpio:output",
         "uart:irq-byte-event"
       ],
@@ -841,6 +884,7 @@
         "2.1.2",
         "2.2.1",
         "2.2.2",
+        "2.2.10",
         "2.3.13",
         "2.10.2",
         "2.10.3"
@@ -849,6 +893,7 @@
         "2.1.2": "AAAAAA",
         "2.2.1": "AAAAAA",
         "2.2.2": "NNNNNN",
+        "2.2.10": "AAAAAA",
         "2.3.13": "AAAAAA",
         "2.10.2": "NNNNNN",
         "2.10.3": "AAAAAA"
@@ -862,6 +907,7 @@
         4099
       ],
       "mode_scope": [
+        "flash:poll-halfword",
         "gpio:output",
         "uart:irq-byte-event"
       ],
@@ -884,6 +930,7 @@
         "2.1.2",
         "2.2.1",
         "2.2.2",
+        "2.2.8",
         "2.3.9",
         "2.10.2",
         "2.10.3"
@@ -892,6 +939,7 @@
         "2.1.2": "AA",
         "2.2.1": "AA",
         "2.2.2": "NN",
+        "2.2.8": "AA",
         "2.3.9": "AA",
         "2.10.2": "NN",
         "2.10.3": "AA"
@@ -904,6 +952,7 @@
         4096
       ],
       "mode_scope": [
+        "flash:poll-halfword",
         "gpio:output",
         "uart:irq-byte-event"
       ],
@@ -926,6 +975,7 @@
         "2.1.2",
         "2.2.1",
         "2.2.2",
+        "2.2.10",
         "2.3.6",
         "2.9.2",
         "2.9.3"
@@ -934,6 +984,7 @@
         "2.1.2": "AA",
         "2.2.1": "AA",
         "2.2.2": "NN",
+        "2.2.10": "AA",
         "2.3.6": "AA",
         "2.9.2": "NN",
         "2.9.3": "AA"
@@ -946,6 +997,7 @@
         4096
       ],
       "mode_scope": [
+        "flash:poll-halfword",
         "gpio:output",
         "uart:irq-byte-event"
       ],

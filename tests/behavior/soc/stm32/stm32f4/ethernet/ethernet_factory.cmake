@@ -26,10 +26,10 @@ foreach(eth_family stm32)
     nexus_google_test(${eth_target} SOURCES "${nexus_google_root}/soc/stm32/stm32f4/ethernet/ethernet_factory_test.cpp"
         "${eth_bundle}/bindings.c"
         "${NEXUS_SOC_SOURCE_${eth_soc}}/drivers/ethernet/ethernet.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/common/dwmac/eth_mac.c"
         LIBRARIES Nexus::IO Nexus::Arch
         INCLUDES
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/legacy_mac" "${eth_bundle}" "${NEXUS_SOURCE_DIR}/io/private"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/common/dwmac" "${eth_bundle}" "${NEXUS_SOURCE_DIR}/io/private"
             "${NEXUS_SOURCE_DIR}/tests/support/native/drivers"
             "${NEXUS_SOC_SOURCE_${eth_soc}}"
     )

@@ -168,7 +168,12 @@ static bool pipe_valid(const nx_stm32_usb_host_t* state,
            state->config->nonperiodic_fifo_words < words)))) {
         return false;
     }
-#if defined(NX_STM32F1_USB_HOST)
+#if defined(NX_STM32F1_USB_HOST_BULK)
+    if (pipe->speed != NX_USB_HOST_FULL_SPEED ||
+        (pipe->transfer != NX_USB_HOST_CONTROL &&
+         pipe->transfer != NX_USB_HOST_BULK))
+        return false;
+#elif defined(NX_STM32F1_USB_HOST)
     if (pipe->transfer != NX_USB_HOST_CONTROL ||
         pipe->speed != NX_USB_HOST_FULL_SPEED ||
         (pipe->endpoint_address & 0x0FU) != 0U)
@@ -402,6 +407,9 @@ nx_stm32_usb_host_initialize(nx_stm32_usb_host_t* state,
             return NX_ERROR_BUSY;
         }
     }
+#if defined(NX_STM32F1_USB_HOST_VIEWS)
+    memset(state->logical_pipes, 0, sizeof(state->logical_pipes));
+#endif
     memset(&state->hal, 0, sizeof(state->hal));
     state->config = config;
     state->clock_receipt = config->phy == NX_STM32_USB_HS_ULPI ? 3U : 1U;
@@ -576,10 +584,37 @@ static nx_result_t ready(const nx_stm32_usb_host_t* state) {
 
 /** \brief Boundary-only mapping; IRQ and retained requests use physical slots.
  */
+static uint8_t logical_count(const nx_stm32_usb_host_t* state) {
+#if defined(NX_STM32F1_USB_HOST_VIEWS)
+    (void)state;
+    return NX_STM32F1_USB_HOST_VIEWS;
+#else
+    return state->config->channel_count;
+#endif
+}
+
 static uint8_t physical_pipe(const nx_stm32_usb_host_t* state, uint8_t pipe) {
+#if defined(NX_STM32F1_USB_HOST_VIEWS)
+    (void)state;
+    (void)pipe;
+    return 0U;
+#else
     return state->config->pipe_channels == NULL
                ? pipe
                : state->config->pipe_channels[pipe];
+#endif
+}
+
+static const nx_usb_host_pipe_t*
+configured_pipe(const nx_stm32_usb_host_t* state, uint8_t logical) {
+#if defined(NX_STM32F1_USB_HOST_VIEWS)
+    const nx_usb_host_pipe_t* selected = &state->logical_pipes[logical];
+    return selected->max_packet != 0U ? selected : NULL;
+#else
+    const nx_stm32_usb_host_channel_t* channel =
+        &state->config->channels[physical_pipe(state, logical)];
+    return channel->configured ? &channel->pipe : NULL;
+#endif
 }
 
 /** \brief The selected HCD accesses whole words and DMA owns a zero-OUT word.
@@ -602,7 +637,7 @@ static nx_result_t requirements(const void* context,
         return status;
     const nx_stm32_usb_host_config_t* config = state->config;
     const size_t bytes = sizeof(*output);
-    if (pipe_id >= config->channel_count || output == NULL ||
+    if (pipe_id >= logical_count(state) || output == NULL ||
         (uintptr_t)output % _Alignof(nx_usb_host_storage_requirements_t) !=
             0U ||
         config->region_count > SIZE_MAX / sizeof(*config->regions) ||
@@ -617,11 +652,10 @@ static nx_result_t requirements(const void* context,
         (config->pipe_channels != NULL &&
          overlap(output, bytes, config->pipe_channels, config->channel_count)))
         return NX_ERROR_INVALID;
-    const nx_stm32_usb_host_channel_t* channel =
-        &config->channels[physical_pipe(state, pipe_id)];
-    if (!channel->configured)
+    const nx_usb_host_pipe_t* pipe = configured_pipe(state, pipe_id);
+    if (pipe == NULL)
         return NX_ERROR_STATE;
-    if (length > channel->pipe.max_packet)
+    if (length > pipe->max_packet)
         return NX_ERROR_INVALID;
     for (uint8_t i = 0U; i < config->channel_count; ++i) {
         const nx_usb_host_request_t* request = config->channels[i].request;
@@ -631,22 +665,12 @@ static nx_result_t requirements(const void* context,
             return NX_ERROR_INVALID;
     }
     *output = (nx_usb_host_storage_requirements_t){
-        packet_capacity(state, &channel->pipe, length), config->dma ? 4U : 1U};
+        packet_capacity(state, pipe, length), config->dma ? 4U : 1U};
     return NX_SUCCESS;
 }
 
-/** \brief Channel targets are copied, never retained as external metadata. */
-static nx_result_t open_channel(void* context, uint8_t number,
-                                const nx_usb_host_pipe_t* pipe) {
-    nx_stm32_usb_host_t* state = context;
-    nx_result_t status = ready(state);
-    if (status != NX_SUCCESS) {
-        return status;
-    }
-    if (number >= state->config->channel_count || !pipe_valid(state, pipe)) {
-        return NX_ERROR_INVALID;
-    }
-    number = physical_pipe(state, number);
+static nx_result_t open_physical(nx_stm32_usb_host_t* state, uint8_t number,
+                                 const nx_usb_host_pipe_t* pipe) {
     nx_stm32_usb_host_channel_t* channel = &state->config->channels[number];
     if (channel->request != NULL || (channel_registers(state, number)->HCCHAR &
                                      USB_OTG_HCCHAR_CHENA) != 0U) {
@@ -663,17 +687,12 @@ static nx_result_t open_channel(void* context, uint8_t number,
     return NX_SUCCESS;
 }
 
+#if defined(NX_STM32F1_USB_HOST_VIEWS)
+static bool channel_idle(nx_stm32_usb_host_t* state, uint8_t number);
+#endif
+
 /** \brief Closing an idle channel joins only its selected interrupt source. */
-static nx_result_t close_channel(void* context, uint8_t number) {
-    nx_stm32_usb_host_t* state = context;
-    nx_result_t status = ready(state);
-    if (status != NX_SUCCESS) {
-        return status;
-    }
-    if (number >= state->config->channel_count) {
-        return NX_ERROR_INVALID;
-    }
-    number = physical_pipe(state, number);
+static nx_result_t close_physical(nx_stm32_usb_host_t* state, uint8_t number) {
     nx_stm32_usb_host_channel_t* channel = &state->config->channels[number];
     USB_OTG_HostChannelTypeDef* registers = channel_registers(state, number);
     if (channel->request != NULL ||
@@ -681,14 +700,111 @@ static nx_result_t close_channel(void* context, uint8_t number) {
         return NX_ERROR_BUSY;
     }
     nx_arch_irq_state_t key = nx_arch_irq_save();
+#if defined(NX_STM32F1_USB_HOST_VIEWS)
+    if (!channel_idle(state, number)) {
+        nx_arch_irq_restore(key);
+        return NX_ERROR_BUSY;
+    }
+#endif
+    const uint32_t mask = 1U << number;
     NX_USB_HOST_WRITE(registers->HCINTMSK, 0U);
     NX_USB_HOST_WRITE(host_registers(state)->HAINTMSK,
-                      host_registers(state)->HAINTMSK & ~(1U << number));
+                      host_registers(state)->HAINTMSK & ~mask);
+#if defined(NX_STM32F1_USB_HOST_VIEWS)
+    NX_USB_HOST_WRITE(registers->HCINT, registers->HCINT & 0x7FFU);
+    nx_arch_dsb();
+    if (registers->HCINTMSK != 0U ||
+        (host_registers(state)->HAINTMSK & mask) != 0U ||
+        (registers->HCINT & 0x7FFU) != 0U || !channel_idle(state, number)) {
+        nx_arch_irq_restore(key);
+        return NX_ERROR_BUSY;
+    }
+#else
     NX_USB_HOST_WRITE(registers->HCDMA, 0U);
+#endif
     state->hal.hc[number].xfer_buff = NULL;
     channel->configured = false;
     nx_arch_irq_restore(key);
     return NX_SUCCESS;
+}
+
+#if defined(NX_STM32F1_USB_HOST_VIEWS)
+/** \brief Reuse the wire channel only after its previous pipe has joined. */
+static nx_result_t bind_logical_pipe(nx_stm32_usb_host_t* state, uint8_t id,
+                                     const nx_usb_host_pipe_t* pipe) {
+    const nx_stm32_usb_host_channel_t* channel = state->config->channels;
+    if (channel->configured && state->bound_pipe == id &&
+        channel->pipe.device_address == pipe->device_address &&
+#if defined(NX_STM32F1_USB_HOST_BULK)
+        channel->pipe.endpoint_address == pipe->endpoint_address &&
+#endif
+        channel->pipe.max_packet == pipe->max_packet)
+        return NX_SUCCESS;
+    if (channel->configured) {
+        nx_result_t closed = close_physical(state, 0U);
+        if (closed != NX_SUCCESS)
+            return closed;
+    }
+    nx_result_t result = open_physical(state, 0U, pipe);
+    if (result == NX_SUCCESS)
+        state->bound_pipe = id;
+    return result;
+}
+#endif
+
+/** \brief Logical targets are copied, never retained as external metadata. */
+static nx_result_t open_channel(void* context, uint8_t number,
+                                const nx_usb_host_pipe_t* pipe) {
+    nx_stm32_usb_host_t* state = context;
+    nx_result_t status = ready(state);
+    if (status != NX_SUCCESS)
+        return status;
+    if (number >= logical_count(state) || !pipe_valid(state, pipe))
+        return NX_ERROR_INVALID;
+#if defined(NX_STM32F1_USB_HOST_VIEWS)
+    if ((pipe->endpoint_address >> 7U) != (number & 1U))
+        return NX_ERROR_INVALID;
+#if defined(NX_STM32F1_USB_HOST_BULK)
+    const bool bulk = number >= 2U;
+    if (bulk != (pipe->transfer == NX_USB_HOST_BULK) ||
+        (bulk && pipe->device_address == 0U) ||
+        (!bulk && (pipe->endpoint_address & 0x0FU) != 0U))
+        return NX_ERROR_INVALID;
+    for (uint8_t i = 0; i < NX_STM32F1_USB_HOST_VIEWS; ++i) {
+        const nx_usb_host_pipe_t* other = &state->logical_pipes[i];
+        if (i != number && other->device_address != 0U &&
+            pipe->device_address != 0U &&
+            other->device_address != pipe->device_address)
+            return NX_ERROR_INVALID;
+    }
+#endif
+    if (state->config->channels->request != NULL)
+        return NX_ERROR_BUSY;
+    state->logical_pipes[number] = *pipe;
+    return NX_SUCCESS;
+#else
+    return open_physical(state, physical_pipe(state, number), pipe);
+#endif
+}
+
+static nx_result_t close_channel(void* context, uint8_t number) {
+    nx_stm32_usb_host_t* state = context;
+    nx_result_t status = ready(state);
+    if (status != NX_SUCCESS)
+        return status;
+    if (number >= logical_count(state))
+        return NX_ERROR_INVALID;
+#if defined(NX_STM32F1_USB_HOST_VIEWS)
+    if (state->config->channels->configured && state->bound_pipe == number) {
+        status = close_physical(state, 0U);
+        if (status != NX_SUCCESS)
+            return status;
+    }
+    state->logical_pipes[number] = (nx_usb_host_pipe_t){0};
+    return NX_SUCCESS;
+#else
+    return close_physical(state, physical_pipe(state, number));
+#endif
 }
 
 /** \brief Admission checks all spans before the one ACCEPTED publication. */
@@ -699,22 +815,23 @@ static nx_result_t submit(void* context, uint8_t number,
     if (status != NX_SUCCESS) {
         return status;
     }
-    if (number >= state->config->channel_count || request == NULL) {
+    if (number >= logical_count(state) || request == NULL) {
         return NX_ERROR_INVALID;
     }
-    number = physical_pipe(state, number);
+    const uint8_t logical = number;
+    const nx_usb_host_pipe_t* pipe = configured_pipe(state, logical);
+    number = physical_pipe(state, logical);
     nx_stm32_usb_host_channel_t* channel = &state->config->channels[number];
-    const bool in = (channel->pipe.endpoint_address & 0x80U) != 0U;
-    if (!channel->configured || request->length > channel->pipe.max_packet ||
-        (channel->pipe.transfer == NX_USB_HOST_ISOCHRONOUS && request->data1)) {
+    if (pipe == NULL || request->length > pipe->max_packet ||
+        (pipe->transfer == NX_USB_HOST_ISOCHRONOUS && request->data1)) {
         return NX_ERROR_INVALID;
     }
-    size_t extent = packet_capacity(state, &channel->pipe, request->length);
+    const bool in = (pipe->endpoint_address & 0x80U) != 0U;
+    const size_t extent = packet_capacity(state, pipe, request->length);
     if (request->capacity < extent ||
         (extent != 0U && request->bytes == NULL) ||
-        (request->setup &&
-         (in || channel->pipe.transfer != NX_USB_HOST_CONTROL ||
-          request->length != 8U)) ||
+        (request->setup && (in || pipe->transfer != NX_USB_HOST_CONTROL ||
+                            request->length != 8U)) ||
         overlap(request, sizeof(*request), state, sizeof(*state)) ||
         overlap(request, sizeof(*request), state->config,
                 sizeof(*state->config)) ||
@@ -765,8 +882,8 @@ static nx_result_t submit(void* context, uint8_t number,
     if (!state->config->dma && !in) {
         /* The pinned PIO writer immediately copies a complete packet. An
          * empty queue or partial FIFO budget cannot be ACCEPTED safely. */
-        const bool periodic = channel->pipe.transfer == NX_USB_HOST_INTERRUPT ||
-                              channel->pipe.transfer == NX_USB_HOST_ISOCHRONOUS;
+        const bool periodic = pipe->transfer == NX_USB_HOST_INTERRUPT ||
+                              pipe->transfer == NX_USB_HOST_ISOCHRONOUS;
         const uint32_t available = periodic ? host_registers(state)->HPTXSTS
                                             : state->hal.Instance->HNPTXSTS;
         if ((available & 0xFFFFU) < extent / 4U ||
@@ -775,6 +892,21 @@ static nx_result_t submit(void* context, uint8_t number,
             return NX_ERROR_BUSY;
         }
     }
+#if defined(NX_STM32F1_USB_HOST_VIEWS)
+    if (state->snapshot.closing || !nx_stm32f1_usb_host_power_ready()) {
+        nx_arch_irq_restore(key);
+        return NX_ERROR_STATE;
+    }
+    if (nx_request_state(&request->base) != NX_REQUEST_READY) {
+        nx_arch_irq_restore(key);
+        return NX_ERROR_STATE;
+    }
+    status = bind_logical_pipe(state, logical, pipe);
+    if (status != NX_SUCCESS) {
+        nx_arch_irq_restore(key);
+        return status;
+    }
+#endif
     status = nx_request_admit(&request->base, NX_REQUEST_ACTIVE);
     if (status != NX_SUCCESS) {
         nx_arch_irq_restore(key);
@@ -799,9 +931,9 @@ static nx_result_t submit(void* context, uint8_t number,
     /* IN already reserves one MPS. HCD drains that complete admitted extent;
      * request.length remains the caller's overflow/reporting boundary. */
     const uint16_t wire_length =
-        in ? channel->pipe.max_packet : (uint16_t)request->length;
+        in ? pipe->max_packet : (uint16_t)request->length;
     HAL_StatusTypeDef submitted;
-    if (channel->pipe.transfer == NX_USB_HOST_CONTROL && !request->setup) {
+    if (pipe->transfer == NX_USB_HOST_CONTROL && !request->setup) {
         /* The pinned HAL forces DATA1 for every unsplit control IN and for
          * zero OUT. Nexus submits one packet with an explicit PID, including
          * DATA0 after the first packet. Keep official LL as the wire owner. */
@@ -824,7 +956,7 @@ static nx_result_t submit(void* context, uint8_t number,
 #endif
     } else {
         submitted = HAL_HCD_HC_SubmitRequest(
-            &state->hal, number, in ? 1U : 0U, (uint8_t)channel->pipe.transfer,
+            &state->hal, number, in ? 1U : 0U, (uint8_t)pipe->transfer,
             (uint8_t)(request->setup ? 0U : 1U), bytes, wire_length, 0U);
     }
     if (submitted != HAL_OK) {
@@ -843,9 +975,13 @@ static nx_result_t cancel(void* context, uint8_t number,
         return NX_ERROR_CONTEXT;
     }
     if (state == NULL || state->config == NULL ||
-        number >= state->config->channel_count || request == NULL) {
+        number >= logical_count(state) || request == NULL) {
         return NX_ERROR_INVALID;
     }
+#if defined(NX_STM32F1_USB_HOST_VIEWS)
+    if (state->bound_pipe != number)
+        return NX_ERROR_INVALID;
+#endif
     number = physical_pipe(state, number);
     if (state->config->channels[number].request != request) {
         return NX_ERROR_INVALID;

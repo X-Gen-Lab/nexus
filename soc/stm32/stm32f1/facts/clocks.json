@@ -23,6 +23,18 @@
       "flash_wait_states": 2,
       "pll48_hz": 48000000
     },
+    "hse8-crystal-pll72": {
+      "source": "hse",
+      "input_hz": 8000000,
+      "hse_bypass": false,
+      "core_hz": 72000000,
+      "apb1_hz": 36000000,
+      "apb1_timer_hz": 72000000,
+      "apb2_hz": 72000000,
+      "apb2_timer_hz": 72000000,
+      "flash_wait_states": 2,
+      "pll48_hz": 48000000
+    },
     "hse25-crystal-pll72": {
       "source": "hse",
       "input_hz": 25000000,

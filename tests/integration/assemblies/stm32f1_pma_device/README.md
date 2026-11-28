@@ -32,12 +32,16 @@ PMA 分配唯一所有者。配置不提供 DWC 的 FIFO、SETUP 决策或端点
 排空，再释放设备 gate。Platform 停止时还恢复四个板级引脚。USB 重新接入使用
 下一次受控平台启动，外接适配器保持硬件默认不上拉。
 
-本参考为自供电。SUSPEND 将 USB 置于 FSUSP，系统和 USB 48 MHz 时钟保留。
-RESUME 表示在 WKUP 时采样到 K 状态，要求在主机 K 状态结束前及时调用
-service。ES096 §2.12.1 允许旧 K 状态引出假唤醒，保留物理证据边界。
-无需 EXTI18／IRQ42 唤醒，未提供远程唤醒、USB 总线供电低功耗、Class 或非零端点。
-ES096 §2.12.4 要求至少 13 MHz APB1，本配置为名义 36 MHz。线路、真实枚举、
-USB suspend 电流和时序等待实板验证。
+本参考为自供电。SUSPEND 保留系统和 USB 48 MHz 时钟。按 RM0008 Rev 21
+§23.4.5 与表 172，WKUP 期间观察到 SE0 时清除硬件 FSUSP，让控制器接收后续
+RESET。软件继续对外报告挂起，并拒绝新包、地址暂存和端点状态变更。真实 RESET
+负责撤回旧请求。SE0 消失而且没有 RESET 或新 K-state WKUP 时，回到 FSUSP。
+已有请求仍由真实 CTR、复位或停机排空。
+
+RESUME 表示在 WKUP 时采样到 K 状态，需要及时调用 service。ES096 §2.12.1
+说明旧 K 状态也可能触发 WKUP。此自供电配置保留连接，无 FRES 低功耗补救要求。
+无需 EXTI18／IRQ42 唤醒。物理时序、远程唤醒和 USB 总线供电低功耗均不在
+本软件参考范围。ES096 §2.12.4 要求至少 13 MHz APB1，本配置为名义 36 MHz。
 
 [ES096 Rev 15 §2.12](https://www.st.com/resource/en/errata_sheet/es096-stm32f101x8b-stm32f102x8b-and-stm32f103x8b-mediumdensity-device-limitations-stmicroelectronics.pdf)
 
@@ -66,9 +70,23 @@ EP0 装配只选编原有控制端点。
 `bInterval` 通告，由 USB 主机调度。代码按同样的 LP20 和硬件 CTR 推进。
 [RM0008 Rev 21 §23.3.4、§23.5.2 与表 174／175](https://www.st.com/resource/en/reference_manual/rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32-bit-mcus-stmicroelectronics.pdf)
 
-产品完成当前 EP0 控制事务后，用同一个控制 epoch 显式启用 `0x81` 和
-`0x01`。USB 描述符、SET_CONFIGURATION 和 Class 仍由产品负责。发送以
+产品使用当前控制 epoch 显式开启 `0x81` 和 `0x01`。标准 SET_CONFIGURATION
+的 STATUS IN 等待态允许将 EP1 置于 NAK，数据接纳等到该控制事务结算。
+USB 描述符、SET_CONFIGURATION 和 Class 归产品负责。发送以
 硬件 CTR ACK 结算，接收报告实际字节数。及时调用 service 推进两个方向。
 取消和超时仍须等待实际 CTR、总线复位或设备停止确认后才能复用请求和缓冲。
 复位撤回两个方向的请求，下一次配置需要重新激活。板级 USB 枚举、吞吐和
 实物停止证据仍为 `not_executed`。
+
+## 可选 ST Device Core
+
+`f103rb-st-device.toml` 选择锁定版本的三个官方 ST Device Core 源文件。
+ST Core 通过原有 Nexus USB 接口使用 PMA。生成的 profile 明确选择
+Packet Memory，FIFO 字段均为零。纯 PMA 装配无需该 profile 和 ST 源码。
+自供电夹具明确设置 Core 的 GET_STATUS 电源位。
+
+私有 vendor class 仅实现单包 Bulk 回显。描述符声明 EP1 IN／OUT，class
+在 SET_CONFIGURATION 的 STATUS IN 确认后才开始接收。Native 模型让实际
+Core 和实际 F103 PMA 驱动一起完成地址提交、配置描述符、短包回显和复位排空。
+VID/PID 留空供软件验证。CDC ACM 需要额外 EP2 IN 和专用 class 存储，实物
+枚举、吞吐和主机驱动兼容性仍需验证。

@@ -14,7 +14,8 @@
 #if defined(NEXUS_CLOCK_HSE_BYPASS)
 #if !defined(NEXUS_CLOCK_SOURCE_HSE)
 #error "An F1 HSE profile requires the reviewed external source"
-#elif NEXUS_CLOCK_HSE_BYPASS == 1 && defined(STM32F103xB)
+#elif defined(STM32F103xB) &&                                                  \
+    (NEXUS_CLOCK_HSE_BYPASS == 0 || NEXUS_CLOCK_HSE_BYPASS == 1)
 #define NX_STM32F1_PROFILE_CORE_HZ  72000000U
 #define NX_STM32F1_PROFILE_INPUT_HZ 8000000U
 #elif NEXUS_CLOCK_HSE_BYPASS == 0 &&                                           \

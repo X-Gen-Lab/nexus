@@ -131,6 +131,21 @@ def emit_bundle(result, output):
              'set(NEXUS_REQUIRED_IO_DOMAINS "' +
              ';'.join(result.required_io_domains) + '")',
              'set(NEXUS_SELECTED_COMPONENTS "' + ';'.join(result.components) + '")']
+    choices, reserved_pins, clock = "", "", ""
+    if result.hardware is not None and result.hardware.selected:
+        choices = ";".join(f"{item.option}={item.value}"
+                           for item in result.hardware.selected)
+        safe_pin = re.compile(r"pin:[A-Za-z0-9_.-]+")
+        safe_owner = re.compile(r"[A-Za-z0-9_.-]+")
+        reserved_pins = ";".join(f"{claim.key}={claim.owner}" for claim in result.claims
+            if claim.mode == "reserved" and safe_pin.fullmatch(claim.key)
+            and safe_owner.fullmatch(claim.owner))
+        clock = result.clock_profile
+        if not safe_owner.fullmatch(clock):
+            raise ValueError("Invalid selected clock profile identity")
+    cmake.extend((f'set(NEXUS_SELECTED_BOARD_HARDWARE "{choices}")',
+                  f'set(NEXUS_BOARD_RESERVED_PINS "{reserved_pins}")',
+                  f'set(NEXUS_SELECTED_CLOCK_PROFILE "{clock}")'))
     if context is None or not context.external or provider.MODEL:
         cmake.append("set(NEXUS_DISCOVER_SOC_PACKAGES ON)")
     package = context.package if context is not None else None

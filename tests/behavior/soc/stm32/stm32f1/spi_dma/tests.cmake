@@ -19,7 +19,10 @@ target_include_directories(
         "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f1/Include"
         "${NEXUS_SOURCE_DIR}/vendors/st/stm32f1_hal/Inc"
 )
-target_compile_definitions(stm32f103_spi_dma_contracts PRIVATE STM32F103xB)
+target_compile_definitions(
+    stm32f103_spi_dma_contracts
+    PRIVATE STM32F103xB NX_STM32F1_SPI_DMA_SEQUENCE=1
+)
 target_compile_options(
     stm32f103_spi_dma_contracts
     PRIVATE "-include${CMAKE_CURRENT_LIST_DIR}/model.h"

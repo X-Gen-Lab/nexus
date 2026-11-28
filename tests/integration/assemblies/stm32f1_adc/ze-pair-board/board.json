@@ -11,6 +11,16 @@
       "id": "analog",
       "controller": "ADC1",
       "route": "adc12-pa1-pa2-regular"
+    },
+    {
+      "id": "analog2",
+      "controller": "ADC2",
+      "route": "adc2-pa2-in2"
+    },
+    {
+      "id": "analog3",
+      "controller": "ADC3",
+      "route": "adc3-pa3-in3"
     }
   ],
   "reserved_resources": [],
@@ -52,6 +62,7 @@
     }
   ],
   "unknowns": [
-    "PA1 and PA2 are separate in-range analog inputs. VDDA, VREF+, source impedance, aperture skew and PCB routing remain unmeasured."
+    "PA1 and PA2 are separate in-range analog inputs. VDDA, VREF+, source impedance, aperture skew and PCB routing remain unmeasured.",
+    "Independent ADC3 selects external PA3 and depends on unmeasured input impedance, level and reference accuracy."
   ]
 }

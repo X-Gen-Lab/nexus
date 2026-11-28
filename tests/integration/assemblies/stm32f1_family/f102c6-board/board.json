@@ -22,6 +22,12 @@
       "id": "uart2",
       "controller": "USART2",
       "route": "usart2-pa2-pa3-irq"
+    },
+    {
+      "id": "flash0",
+      "controller": "FLASH",
+      "route": "flash-access-low-1k",
+      "supply_mv": 3300
     }
   ],
   "reserved_resources": [
@@ -36,7 +42,8 @@
     "PC15"
   ],
   "unknowns": [
-    "The GPIO output and serial routes are software test inputs. No physical PCB or connected loads are claimed."
+    "The GPIO output and serial routes are software test inputs. No physical PCB or connected loads are claimed.",
+    "Flash supply is nominal. The rail voltage and silicon cut have not been measured."
   ],
   "provenance": [
     "https://www.st.com/resource/en/datasheet/stm32f102c6.pdf"

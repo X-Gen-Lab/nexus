@@ -1,4 +1,4 @@
-# Link only the reviewed SRAM LL engine when its controller is selected.
+# Link the reviewed asynchronous LL engine and selected endpoint.
 if("async16" IN_LIST f1_fsmc)
     add_library(
         nexus_stm32f1_fsmc_ll
@@ -24,8 +24,15 @@ if("async16" IN_LIST f1_fsmc)
         nexus_soc_stm32f1
         PRIVATE fsmc.c "$<TARGET_OBJECTS:nexus_stm32f1_fsmc_ll>"
     )
-    target_link_libraries(
-        nexus_soc_stm32f1
-        PRIVATE Nexus::IOExternalBus Nexus::IOMemoryWindow
-    )
+    target_link_libraries(nexus_soc_stm32f1 PRIVATE Nexus::IOExternalBus)
+    if("parallel16" IN_LIST NEXUS_SELECTED_KINDS)
+        target_sources(nexus_soc_stm32f1 PRIVATE lcd.c)
+        target_compile_definitions(
+            nexus_soc_stm32f1
+            PRIVATE NX_STM32F1_FSMC_LCD=1
+        )
+        target_link_libraries(nexus_soc_stm32f1 PRIVATE Nexus::IOParallel16)
+    else()
+        target_link_libraries(nexus_soc_stm32f1 PRIVATE Nexus::IOMemoryWindow)
+    endif()
 endif()

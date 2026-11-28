@@ -44,6 +44,34 @@
             "irq:WWDG_IRQn"
           ],
           "pins": []
+        },
+        "USART1": {
+          "kind": "uart",
+          "irq": [
+            "USART1_IRQn"
+          ],
+          "irq_numbers": {
+            "USART1_IRQn": 37
+          },
+          "pins": [
+            "PA9",
+            "PA10"
+          ],
+          "clock_domain": "apb2"
+        },
+        "USART3": {
+          "kind": "uart",
+          "irq": [
+            "USART3_IRQn"
+          ],
+          "irq_numbers": {
+            "USART3_IRQn": 39
+          },
+          "pins": [
+            "PB10",
+            "PB11"
+          ],
+          "clock_domain": "apb1"
         }
       },
       "modes": {
@@ -74,6 +102,16 @@
         "WWDG": {
           "modes": [
             "window"
+          ]
+        },
+        "USART1": {
+          "modes": [
+            "irq-byte-event"
+          ]
+        },
+        "USART3": {
+          "modes": [
+            "irq-byte-event"
           ]
         }
       }
@@ -182,7 +220,9 @@
           ],
           "interfaces": {
             "i2c_target": [
-              "target-rx-irq"
+              "target-rx-irq",
+              "target-tx-irq",
+              "target-write-read-irq"
             ]
           }
         },
@@ -218,7 +258,8 @@
             "ADC1_2_IRQn"
           ],
           "pins": [
-            "PA0"
+            "PA0",
+            "PA1"
           ],
           "clock_domain": "apb2"
         },
@@ -295,13 +336,18 @@
           "interfaces": {
             "encoder": [
               "quadrature"
+            ],
+            "timer_pulse": [
+              "one-pulse"
             ]
           }
         },
         "ADC1": {
           "modes": [
             "single-shot",
-            "single-trigger-dma"
+            "single-trigger-dma",
+            "sequential-scan-dma",
+            "internal-scan"
           ]
         },
         "EXTI13": {
@@ -323,7 +369,8 @@
         },
         "RTC": {
           "modes": [
-            "backup-adopt"
+            "backup-adopt",
+            "backup-provision"
           ]
         },
         "TIM4": {
@@ -339,7 +386,8 @@
           "kind": "dac",
           "irq": [],
           "pins": [
-            "PA4"
+            "PA4",
+            "PA5"
           ],
           "clock_domain": "apb1"
         }
@@ -414,6 +462,9 @@
           "interfaces": {
             "memory_window": [
               "cpu-window"
+            ],
+            "parallel16": [
+              "8080-16"
             ]
           }
         }
@@ -454,7 +505,11 @@
             "PA8",
             "PB13",
             "PB12",
-            "PA1"
+            "PA1",
+            "PA9",
+            "PA10",
+            "PB14",
+            "PB15"
           ],
           "clock_domain": "apb2_timer",
           "resources": [
@@ -605,7 +660,8 @@
           ],
           "interfaces": {
             "usb_host": [
-              "host-fs"
+              "host-fs",
+              "host-fs-bulk"
             ]
           }
         }
@@ -644,6 +700,9 @@
           "irq": [],
           "pins": [
             "PC8",
+            "PC9",
+            "PC10",
+            "PC11",
             "PC12",
             "PD2",
             "PC13"
@@ -654,7 +713,10 @@
         "SDIO": {
           "modes": [
             "sdio-poll",
-            "sdio-poll-write"
+            "sdio-poll-write",
+            "sdio-poll-4bit",
+            "sdio-poll-4bit-write",
+            "sdio-rx-dma-poll"
           ]
         }
       }
@@ -788,12 +850,38 @@
             "PA2"
           ],
           "clock_domain": "apb2"
+        },
+        "ADC2": {
+          "kind": "adc",
+          "irq": [],
+          "pins": [
+            "PA2"
+          ],
+          "clock_domain": "apb2"
+        },
+        "ADC3": {
+          "kind": "adc",
+          "irq": [],
+          "pins": [
+            "PA3"
+          ],
+          "clock_domain": "apb2"
         }
       },
       "modes": {
         "ADC1": {
           "modes": [
             "simultaneous-scan-dma"
+          ]
+        },
+        "ADC2": {
+          "modes": [
+            "single-shot"
+          ]
+        },
+        "ADC3": {
+          "modes": [
+            "single-shot"
           ]
         }
       }
@@ -853,6 +941,90 @@
         "USART2": {
           "modes": [
             "irq-byte-event"
+          ]
+        }
+      }
+    },
+    "rm0008-f107-mii": {
+      "controllers": {
+        "ETH_MAC": {
+          "kind": "eth",
+          "irq": [
+            "ETH_IRQn"
+          ],
+          "irq_numbers": {
+            "ETH_IRQn": 61
+          },
+          "clock_hz": 72000000,
+          "clock_domain": "core",
+          "pins": [
+            "PC1",
+            "PA2",
+            "PA1",
+            "PD8",
+            "PD9",
+            "PD10",
+            "PB11",
+            "PB12",
+            "PB13",
+            "PB10",
+            "PD11",
+            "PD12",
+            "PC3",
+            "PC2",
+            "PB8",
+            "PA0",
+            "PA3"
+          ],
+          "resources": [
+            "peripheral:ETH",
+            "clock:ETH_AHB",
+            "clock:DMA2",
+            "irq:ETH_IRQn"
+          ]
+        }
+      },
+      "modes": {
+        "ETH_MAC": {
+          "modes": [
+            "raw-mii",
+            "raw-rmii"
+          ]
+        }
+      }
+    },
+    "rm0008-f107-spi3": {
+      "controllers": {
+        "SPI3": {
+          "kind": "spi",
+          "irq": [
+            "SPI3_IRQn"
+          ],
+          "pins": [
+            "PC10",
+            "PC11",
+            "PC12"
+          ],
+          "clock_domain": "apb1",
+          "max_hz": 4500000
+        },
+        "GPIOC": {
+          "kind": "gpio",
+          "irq": [],
+          "pins": [
+            "PC9"
+          ]
+        }
+      },
+      "modes": {
+        "SPI3": {
+          "modes": [
+            "short-poll"
+          ]
+        },
+        "GPIOC": {
+          "modes": [
+            "output"
           ]
         }
       }

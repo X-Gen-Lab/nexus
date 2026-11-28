@@ -34,6 +34,7 @@ REVIEWED_FILES = frozenset({
     "Inc/Legacy/stm32_hal_legacy.h",
     "Inc/stm32f1xx_hal.h",
     "Inc/stm32f1xx_hal_def.h",
+    "Inc/stm32f1xx_hal_flash_ex.h",
     "Inc/stm32f1xx_ll_fsmc.h",
     "Src/stm32f1xx_ll_fsmc.c",
     "Inc/stm32f1xx_ll_adc.h",

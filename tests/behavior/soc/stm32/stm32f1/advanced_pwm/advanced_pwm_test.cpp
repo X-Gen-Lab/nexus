@@ -87,6 +87,9 @@ constexpr uint32_t timer_reset = RCC_APB2RSTR_TIM1RST;
 constexpr uint32_t protection =
     TIM_BDTR_BKE | TIM_BDTR_OSSI | TIM_BDTR_OSSR | 8U;
 static bool enabled, pending, active, mask, inject_break, refuse_detach;
+#if defined(NX_STM32F1_CYCLE_THREE_LEGS)
+static bool refuse_third_compare;
+#endif
 static uint32_t irq_priority;
 static unsigned writes;
 
@@ -133,10 +136,20 @@ extern "C" void f1_apwm_write(volatile uint32_t* reg, uint32_t value) {
     if (reg == &MODELED_TIMER->CCER && value == 0U && refuse_detach) {
         return;
     }
+#if defined(NX_STM32F1_CYCLE_THREE_LEGS)
+    if (reg == &TIM1->CCR3 && refuse_third_compare)
+        return;
+#endif
     *reg = value;
     if (reg == &MODELED_TIMER->BDTR) {
         EXPECT_EQ(0U, value & (TIM_BDTR_AOE | TIM_BDTR_LOCK));
         if ((value & TIM_BDTR_MOE) != 0U) {
+#if defined(NX_STM32F1_CYCLE_THREE_LEGS)
+            EXPECT_FALSE(refuse_third_compare);
+            EXPECT_EQ(0x555U, MODELED_TIMER->CCER);
+            EXPECT_EQ(0xAAAU, MODELED_MAIN_MODES & 0xFFFU);
+            EXPECT_EQ(0xAAA8U, MODELED_OTHER_MODES >> 16U);
+#endif
             EXPECT_EQ(pair, MODELED_TIMER->CCER & pair);
             EXPECT_EQ(0xaU, (MODELED_MAIN_MODES >> main_shift) & 0xfU);
             EXPECT_EQ(0xaU, (MODELED_OTHER_MODES >> comp_shift) & 0xfU);
@@ -208,6 +221,7 @@ extern "C" void nx_arch_irq_restore(nx_arch_irq_state_t state) {
     mask = state.value != 0U;
 }
 
+#if !defined(NX_STM32F1_CYCLE_THREE_LEGS)
 class F1AdvancedPwm : public testing::Test {
   protected:
     nx_stm32f1_advanced_pwm_t owner{};
@@ -340,8 +354,16 @@ TEST_F(F1AdvancedPwm, Tim8OwnsOnlyItsGateAndUsesNoAfioRemap) {
 }
 #endif
 
+#endif
+
 #if defined(TEST_F1_CYCLE)
 namespace {
+#if defined(NX_STM32F1_CYCLE_THREE_LEGS)
+constexpr size_t leg_count = 3U;
+#else
+constexpr size_t leg_count = 1U;
+#endif
+
 class F103Cycle : public testing::Test {
   protected:
     nx_stm32f1_cycle_config_t config{
@@ -350,8 +372,9 @@ class F103Cycle : public testing::Test {
     const nx_pwm_adc_t port{&nx_stm32f1_cycle_ops, &owner};
     nx_pwm_adc_request_t request{};
     uint16_t value = 0xffffU;
-    uint32_t duty = 256U;
-    nx_pwm_group_frame_t frame{&duty, 1U, 512U};
+    uint32_t duties[leg_count] = {256U};
+    uint32_t& duty = duties[0];
+    nx_pwm_group_frame_t frame{duties, leg_count, 512U};
 
     void SetUp() override {
         f1_apwm_tim = {};
@@ -360,6 +383,9 @@ class F103Cycle : public testing::Test {
         f1_apwm_rcc = {};
         f1_apwm_afio = {};
         f1_apwm_adc = {};
+#if defined(NX_STM32F1_CYCLE_THREE_LEGS)
+        refuse_third_compare = false;
+#endif
         for (unsigned i = 0U; i < 43U; ++i) {
             cycle_active[i] = cycle_pending[i] = cycle_enabled[i] = false;
             cycle_priority[i] = 0U;
@@ -424,11 +450,13 @@ TEST_F(F103Cycle, PublishesEachNewInteriorCompareAndConversionAfterDrain) {
     for (uint16_t raw :
          {static_cast<uint16_t>(13U), static_cast<uint16_t>(42U)}) {
         submit();
+        EXPECT_EQ(duty, TIM1->CCR1);
         EXPECT_EQ(NX_ERROR_BUSY, nx_pwm_adc_service(&port));
         cycle(true, true, raw);
         ASSERT_EQ(NX_SUCCESS, nx_pwm_adc_service(&port));
         settled(NX_SUCCESS, 1U);
         EXPECT_EQ(raw, value);
+        duty = raw;
     }
 }
 
@@ -449,6 +477,26 @@ TEST_F(F103Cycle, ConversionOverrunAtFinalUpdateIsAFault) {
     cycle(true, false, 0U);
     ADC1->SR = ADC_SR_JSTRT | ADC_SR_JEOC;
     ADC1->JDR1 = 19U;
+    ASSERT_EQ(NX_SUCCESS, nx_pwm_adc_service(&port));
+    settled(NX_ERROR_IO, 0U);
+    EXPECT_EQ(0xffffU, value);
+}
+
+TEST_F(F103Cycle, ANewRegisterValueCannotReplaceTheJoinedSample) {
+    ASSERT_EQ(NX_SUCCESS, nx_stm32f1_cycle_prepare(&owner, &config));
+    submit();
+    cycle(true, true, 174U);
+    ADC1->JDR1 = 693U;
+    ASSERT_EQ(NX_SUCCESS, nx_pwm_adc_service(&port));
+    settled(NX_SUCCESS, 1U);
+    EXPECT_EQ(174U, value);
+}
+
+TEST_F(F103Cycle, CorrectedDataCannotRepairAnInvalidJoinedSample) {
+    ASSERT_EQ(NX_SUCCESS, nx_stm32f1_cycle_prepare(&owner, &config));
+    submit();
+    cycle(true, true, 0x1000U);
+    ADC1->JDR1 = 817U;
     ASSERT_EQ(NX_SUCCESS, nx_pwm_adc_service(&port));
     settled(NX_ERROR_IO, 0U);
     EXPECT_EQ(0xffffU, value);
@@ -500,6 +548,64 @@ TEST_F(F103Cycle, OutOfRegionSampleIsRejectedBeforeArming) {
     EXPECT_FALSE(cycle_enabled[TIM1_UP_IRQn]);
     EXPECT_EQ(9U, outside);
 }
+
+#if defined(NX_STM32F1_CYCLE_THREE_LEGS)
+TEST_F(F103Cycle, ThreeDutiesArePrimedAndAllSixOutputsWithdrawTogether) {
+    constexpr uint32_t outputs = TIM_CCER_CC1E | TIM_CCER_CC1NE |
+                                 TIM_CCER_CC2E | TIM_CCER_CC2NE |
+                                 TIM_CCER_CC3E | TIM_CCER_CC3NE;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32f1_cycle_prepare(&owner, &config));
+    nx_pwm_adc_state_t observed{};
+    f1_cycle_ram_begin = reinterpret_cast<uintptr_t>(&observed);
+    f1_cycle_ram_end = f1_cycle_ram_begin + sizeof(observed);
+    ASSERT_EQ(NX_SUCCESS, nx_pwm_adc_state(&port, &observed));
+    EXPECT_EQ(3U, observed.pwm_channels);
+    EXPECT_EQ(1U, observed.max_samples);
+    f1_cycle_ram_begin = reinterpret_cast<uintptr_t>(this);
+    f1_cycle_ram_end = f1_cycle_ram_begin + sizeof(*this);
+
+    duties[1] = 110U;
+    duties[2] = 330U;
+    submit();
+    EXPECT_EQ(outputs, TIM1->CCER);
+    EXPECT_EQ(duties[0], TIM1->CCR1);
+    EXPECT_EQ(110U, TIM1->CCR2);
+    EXPECT_EQ(330U, TIM1->CCR3);
+    EXPECT_EQ(0xAAAU, GPIOA->CRH & 0xFFFU);
+    EXPECT_EQ(0xAAA8U, GPIOB->CRH >> 16U);
+    EXPECT_EQ(0U, TIM1->BDTR & TIM_BDTR_AOE);
+    cycle(true, true, 337U);
+    ASSERT_EQ(NX_SUCCESS, nx_pwm_adc_service(&port));
+    settled(NX_SUCCESS, 1U);
+    EXPECT_EQ(337U, value);
+    EXPECT_EQ(0U, TIM1->CCER);
+    EXPECT_EQ(0x222U, GPIOA->CRH & 0xFFFU);
+    EXPECT_EQ(0x2228U, GPIOB->CRH >> 16U);
+}
+
+TEST_F(F103Cycle, LastLegOutOfWindowIsRejectedBeforeOutputArm) {
+    ASSERT_EQ(NX_SUCCESS, nx_stm32f1_cycle_prepare(&owner, &config));
+    duties[2] = config.phase;
+    ASSERT_EQ(NX_SUCCESS, nx_pwm_adc_prepare(&request, &value, 1U, &frame,
+                                             cycle_time + 1000U));
+    EXPECT_EQ(NX_ERROR_INVALID, nx_pwm_adc_submit(&port, &request));
+    EXPECT_EQ(NX_REQUEST_READY, nx_request_state(&request.base));
+    EXPECT_EQ(0U, TIM1->CCER | TIM1->CCR1 | TIM1->CCR2 | TIM1->CCR3);
+    EXPECT_EQ(0U, TIM1->BDTR & TIM_BDTR_MOE);
+    EXPECT_FALSE(cycle_enabled[TIM1_UP_IRQn]);
+}
+TEST_F(F103Cycle, RejectedThirdCompareWriteNeverPublishesGateEnable) {
+    ASSERT_EQ(NX_SUCCESS, nx_stm32f1_cycle_prepare(&owner, &config));
+    duties[2] = 346U;
+    refuse_third_compare = true;
+    ASSERT_EQ(NX_SUCCESS, nx_pwm_adc_prepare(&request, &value, 1U, &frame,
+                                             cycle_time + 1000U));
+    ASSERT_EQ(NX_SUCCESS, nx_pwm_adc_submit(&port, &request));
+    settled(NX_ERROR_IO, 0U);
+    EXPECT_EQ(0U, TIM1->CCER | (TIM1->BDTR & TIM_BDTR_MOE));
+    EXPECT_EQ(0xffffU, value);
+}
+#endif
 
 TEST_F(F103Cycle, ForeignAdcOwnerRemainsUntouched) {
     RCC->APB2ENR |= RCC_APB2ENR_ADC2EN;

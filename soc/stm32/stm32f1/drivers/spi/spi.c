@@ -48,12 +48,20 @@ typedef struct {
 
 /** \brief Select the bus gate from the admitted controller identity. */
 static spi_gate_t clock_gate(const SPI_TypeDef* registers) {
+#if defined(STM32F107xC)
+    if (registers == SPI3)
+        return (spi_gate_t){&RCC->APB1ENR, RCC_APB1ENR_SPI3EN};
+#endif
     return registers == SPI1 ? (spi_gate_t){&RCC->APB2ENR, RCC_APB2ENR_SPI1EN}
                              : (spi_gate_t){&RCC->APB1ENR, RCC_APB1ENR_SPI2EN};
 }
 
 /** \brief Select only the controller's dedicated reset bit. */
 static spi_gate_t reset_gate(const SPI_TypeDef* registers) {
+#if defined(STM32F107xC)
+    if (registers == SPI3)
+        return (spi_gate_t){&RCC->APB1RSTR, RCC_APB1RSTR_SPI3RST};
+#endif
     return registers == SPI1
                ? (spi_gate_t){&RCC->APB2RSTR, RCC_APB2RSTR_SPI1RST}
                : (spi_gate_t){&RCC->APB1RSTR, RCC_APB1RSTR_SPI2RST};
@@ -61,6 +69,12 @@ static spi_gate_t reset_gate(const SPI_TypeDef* registers) {
 
 /** \brief Match one of the fixed, reviewed controller and CS routes. */
 static bool route_valid(const nx_stm32f1_spi_config_t* config) {
+#if defined(STM32F107xC)
+    if (config->registers == SPI3)
+        return config->gpio == GPIOC && config->sck == 10U &&
+               config->miso == 11U && config->mosi == 12U && config->cs == 9U &&
+               config->clock_hz == 36000000U;
+#endif
     if (config->registers == SPI1) {
         return config->gpio == GPIOA && config->sck == 5U &&
                config->miso == 6U && config->mosi == 7U && config->cs == 4U &&
@@ -83,6 +97,36 @@ static nx_result_t prepare_spi1_route(nx_stm32f1_spi_t* state) {
     return (AFIO->MAPR & AFIO_MAPR_SPI1_REMAP) == 0U ? NX_SUCCESS
                                                      : NX_ERROR_BUSY;
 }
+
+#if defined(STM32F107xC)
+/** \brief Match the official LL SWJ=111 no-effect write and verify SPI3 only.
+ */
+static bool set_spi3_remap(bool enabled) {
+    const uint32_t desired = enabled ? AFIO_MAPR_SPI3_REMAP : 0U;
+    const nx_arch_irq_state_t key = nx_arch_irq_save();
+    const uint32_t previous = AFIO->MAPR;
+    if ((previous & AFIO_MAPR_SPI3_REMAP) != desired) {
+        NX_STM32F1_WRITE(&AFIO->MAPR,
+                         (previous & ~(uint32_t)AFIO_MAPR_SPI3_REMAP) |
+                             AFIO_MAPR_SWJ_CFG | desired);
+        nx_arch_dsb();
+    }
+    const bool valid = (AFIO->MAPR & AFIO_MAPR_SPI3_REMAP) == desired;
+    nx_arch_irq_restore(key);
+    return valid;
+}
+
+static nx_result_t prepare_spi3_route(nx_stm32f1_spi_t* state) {
+    state->afio_gate_added = (RCC->APB2ENR & RCC_APB2ENR_AFIOEN) == 0U;
+    if (state->afio_gate_added &&
+        !nx_stm32f1_write_masked(&RCC->APB2ENR, RCC_APB2ENR_AFIOEN,
+                                 RCC_APB2ENR_AFIOEN))
+        return NX_ERROR_IO;
+    state->remap_added = (AFIO->MAPR & AFIO_MAPR_SPI3_REMAP) == 0U;
+    return !state->remap_added || set_spi3_remap(true) ? NX_SUCCESS
+                                                       : NX_ERROR_IO;
+}
+#endif
 
 /** \brief Validate the exact reviewed pads before any hardware effect. */
 nx_result_t nx_stm32f1_spi_admit(const nx_stm32f1_spi_t* state,
@@ -145,7 +189,27 @@ nx_result_t nx_stm32f1_spi_prepare(nx_stm32f1_spi_t* state,
         return result;
     }
     const uint32_t alternate = GPIO_CRL_CNF0_1 | LL_GPIO_SPEED_FREQ_HIGH;
-    /* Both routes place CS/SCK/MISO/MOSI in slots four through seven. */
+#if defined(STM32F107xC)
+    if (registers == SPI3) {
+        /* Verify floating pads before moving the AF owner from the JTAG pins.
+         */
+        if ((state->pads.high & 0x000FFFF0U) != 0x00044440U) {
+            state->pads.captured = false;
+            return NX_ERROR_BUSY;
+        }
+        result = prepare_spi3_route(state);
+        if (result != NX_SUCCESS)
+            return result;
+        const uint32_t fields =
+            (LL_GPIO_SPEED_FREQ_LOW << 4U) | (alternate << 8U) |
+            (LL_GPIO_MODE_FLOATING << 12U) | (alternate << 16U);
+        result = nx_stm32f1_pads_apply(&state->pads, 0U, fields,
+                                       state->pads.latch | (1U << config->cs));
+        state->live = result == NX_SUCCESS;
+        return result;
+    }
+#endif
+    /* SPI1 and SPI2 have CS/SCK/MISO/MOSI in slots four through seven. */
     const uint32_t fields = (LL_GPIO_SPEED_FREQ_LOW << 16U) |
                             (alternate << 20U) |
                             (LL_GPIO_MODE_FLOATING << 24U) | (alternate << 28U);
@@ -244,6 +308,11 @@ nx_result_t nx_stm32f1_spi_close(nx_stm32f1_spi_t* state) {
         return NX_ERROR_IO;
     }
     state->gate_added = false;
+#if defined(STM32F107xC)
+    if (state->remap_added && !set_spi3_remap(false))
+        return NX_ERROR_IO;
+    state->remap_added = false;
+#endif
     if (state->afio_gate_added &&
         !nx_stm32f1_write_masked(&RCC->APB2ENR, RCC_APB2ENR_AFIOEN, 0U)) {
         return NX_ERROR_IO;

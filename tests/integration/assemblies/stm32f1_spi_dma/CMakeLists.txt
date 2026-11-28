@@ -8,7 +8,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(NEXUS_ASSEMBLY_FILE
     "${CMAKE_CURRENT_LIST_DIR}/f103rb-spi-dma.toml"
     CACHE FILEPATH
-    "Watchdog provider fixture assembly"
+    "SPI finite DMA provider fixture assembly"
 )
 
 if(NEXUS_SOURCE_ROOT)

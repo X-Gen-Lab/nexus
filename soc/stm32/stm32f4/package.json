@@ -28,7 +28,8 @@
     "vendor_shared": [
       "bxcan",
       "dwc_otg_device",
-      "dwc_otg_host"
+      "dwc_otg_host",
+      "dwmac"
     ],
     "roots": [
       "."

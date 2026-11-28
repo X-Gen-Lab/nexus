@@ -33,7 +33,7 @@ class UsbFactoryBindingTests(unittest.TestCase):
                      EndpointIR("control-in", "usb", "usb-fs-endpoint", "usb_device",
                          UsbFifoEndpointOptions(1, 0, "in", "control", 64, 96, 32), ()))
         result = SimpleNamespace(controllers=(item, *owners), devices=endpoints,
-            factory=SimpleNamespace(capabilities=True),
+            components=(), factory=SimpleNamespace(capabilities=True),
             provider_context=SimpleNamespace(provider=SimpleNamespace(soc={"controllers": {
                 "USB_CORE": {"clock_hz": 48000000, "fifo_words": 768, "endpoint_numbers": 5}}})))
         item.integration = SimpleNamespace(constants=MappingProxyType(policy.binding_values(item, configuration=result)))

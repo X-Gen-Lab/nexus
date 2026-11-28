@@ -1,4 +1,4 @@
-# STM3210E-EVAL SRAM reference
+# STM3210E-EVAL SRAM and CN16 reference
 
 The MB672-F103ZGT6-D06 board connects U1, an IS61WV51216BLL-10MLI
 512K × 16 asynchronous SRAM, to FSMC NE3. A 1 MiB CPU data window begins at
@@ -27,5 +27,22 @@ executable memory, allocation, NOR, NAND and display modes require their
 own admission.
 
 [ST UM0488 Rev7](https://www.st.com/resource/en/user_manual/um0488-evaluation-board-with-stm32f103zx-mcu-stmicroelectronics.pdf)
-· [MB672 D06 schematic, sheet 6](https://www.st.com/resource/en/schematic_pack/mb672-f103zgt6-d06_schematic.pdf)
+· [MB672 D06 schematic, sheets 6 and 8](https://www.st.com/resource/en/schematic_pack/mb672-f103zgt6-d06_schematic.pdf)
 · [ISSI SRAM datasheet](https://www.issi.com/WW/pdf/61-64WV51216.pdf)
+
+## CN16 8080-16
+
+`zg-lcd.toml` selects CN16 on STM3210E-EVAL MB672 D06 with the
+`cn16_wiring = "fsmc-8080"` declaration. Sheet 8 shows PG12/NE4 through
+R77 to CS, PD5/NWE through R80 to WR, PD4/NOE to RD, and PF0/A0 to RS.
+UM0488 section 5.17 also identifies bank 4. Its Table 14 CS row lists
+bank 3, which the D06 schematic assigns to SRAM. Check PCB population,
+including R77/R80 and the optional serial straps, before hardware use.
+
+The selected 16-bit CPU command and data addresses are `0x6C000000`
+and `0x6C000002`. The same FSMC owner configures the selected bank with
+HSI8 and one conservative read/write timing. Other board chip selects
+stay high until withdrawal. The synchronous `nx_parallel16_endpoint_t`
+uses finite deadlines and returns settled word counts. The fixture
+leaves panel initialization, protocol and timing measurement to the
+actual module integration.

@@ -44,10 +44,14 @@ class ModeExclusion:
     option: str
     equals: bool | int | str
     message: str
+    part: str | None = None
 
     @classmethod
     def create(cls, value):
-        _fields(value, cls.__dataclass_fields__)
+        _fields(value, ("device", "kind", "option", "equals", "message"),
+                ("part",))
+        if "part" in value:
+            identifier(value["part"], "Mode exclusion exact part")
         for name in ("device", "kind", "option"):
             identifier(value[name], "Mode exclusion " + name)
         if type(value["equals"]) not in {bool, int, str}:
@@ -224,10 +228,11 @@ class BindingPolicy:
         """A reviewed profile can override the source-wide pad identity."""
         return self.oscillators.get(profile, self.oscillators.get(source, ()))
 
-    def validate_selection(self, device, kind, options):
+    def validate_selection(self, device, kind, options, *, part=None):
         for rule in self.exclusions:
             actual = options.get(rule.option)
             if (rule.device == device and rule.kind == kind and
+                    (rule.part is None or rule.part == part) and
                     type(actual) is type(rule.equals) and actual == rule.equals):
                 fail(rule.message)
 

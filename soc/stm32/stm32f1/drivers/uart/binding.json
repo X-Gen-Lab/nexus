@@ -162,6 +162,21 @@
                       }
                     ]
                   }
+                ],
+                [
+                  "wire",
+                  {
+                    "source": "item.controller",
+                    "values": {
+                      "USART1": {
+                        "symbol": "NX_STM32F1_UART_WIRE_NONE"
+                      },
+                      "USART2": 0,
+                      "USART3": {
+                        "symbol": "NX_STM32F1_UART_WIRE_NONE"
+                      }
+                    }
+                  }
                 ]
               ]
             }

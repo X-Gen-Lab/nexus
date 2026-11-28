@@ -363,6 +363,7 @@ static void reset_control(nx_stm32f1_ep0_t* state) {
     state->remaining = 0U;
     state->config = NULL;
     state->observed_full_speed = false;
+    state->reset_candidate = false;
     withdrawn(&state->in);
     withdrawn(&state->out);
 }
@@ -437,7 +438,8 @@ nx_result_t nx_stm32f1_usb_ep0_snapshot(const nx_stm32f1_ep0_t* state,
     output->lost_events = 0U;
     output->started = (address & USB_DADDR_EF) != 0U;
     output->closing = (control & USB_CNTR_FRES) != 0U;
-    output->suspended = (control & USB_CNTR_FSUSP) != 0U;
+    output->suspended =
+        state->reset_candidate || (control & USB_CNTR_FSUSP) != 0U;
     output->control_pending = state->phase != NX_STM32F1_EP0_IDLE;
     output->address = (uint8_t)(address & USB_DADDR_ADD);
     output->speed = state->observed_full_speed ? NX_USB_DEVICE_FULL_SPEED
@@ -462,7 +464,12 @@ nx_result_t nx_stm32f1_usb_ep0_stall(nx_stm32f1_ep0_t* state, bool in,
         return NX_ERROR_BUSY;
     }
     write_endpoint(state, snapshot, 0U, mask, stalled ? stall : nak);
-    if (stalled) {
+    /* A final DATA IN guard leaves the armed STATUS OUT direction live. */
+    const bool status_out_guard = in &&
+                                  state->phase == NX_STM32F1_EP0_STATUS_OUT &&
+                                  state->out.request != NULL &&
+                                  state->out.request->stage == NX_USB_STATUS;
+    if (stalled && !status_out_guard) {
         state->phase = NX_STM32F1_EP0_IDLE;
         state->remaining = 0U;
         state->address_pending = false;

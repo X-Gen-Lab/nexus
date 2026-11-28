@@ -151,3 +151,15 @@ class UsbPmaConfigurationTests(unittest.TestCase):
                                                  'transfer = "bulk"', 1))
         with self.assertRaisesRegex(ValueError, "endpoint number and transfer"):
             gate.resolve_ir(self.assembly)
+
+    def test_only_selected_st_core_requests_a_pma_packet_profile(self):
+        out = self.directory / "st-device"
+        gate.configure(FIXTURE / "f103rb-st-device.toml", out)
+        header = (out / "nexus_factory.h").read_text()
+        code = (out / "bindings.c").read_text()
+        self.assertIn("nx_factory_usb_profile", header)
+        self.assertIn("NX_USB_PROFILE_PACKET_MEMORY", code)
+        self.assertIn("48000000U, 0U, 0U, 8U", code)
+        gate.configure(FIXTURE / "f103rb-bulk.toml", self.directory / "no-core")
+        self.assertNotIn("nx_factory_usb_profile",
+                         (self.directory / "no-core/nexus_factory.h").read_text())

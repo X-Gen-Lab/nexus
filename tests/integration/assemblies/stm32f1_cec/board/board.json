@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "id": "stm32f100rb-cec-software-reference",
+  "soc": "STM32F100RBT6B",
+  "soc_family": "stm32f1",
+  "source_revision": "software reference with external 27 kOhm pull-up",
+  "physical_pcb_revision": null,
+  "clocks": {},
+  "bindings": [],
+  "reserved_resources": [
+    "PA13",
+    "PA14",
+    "PB8",
+    "controller:CEC",
+    "irq:CEC"
+  ],
+  "unknowns": [
+    "This is a software fixture. PB8 requires a 27 kOhm pull-up to 3.3 V and electrically compliant CEC wiring.",
+    "Fitted transceiver protection, line capacitance and peer address assignment are not observed."
+  ],
+  "provenance": [
+    "https://www.st.com/resource/en/datasheet/stm32f100rb.pdf",
+    "https://www.st.com/resource/en/reference_manual/rm0041-stm32f100xx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf"
+  ],
+  "backend_support": [
+    "baremetal"
+  ]
+}

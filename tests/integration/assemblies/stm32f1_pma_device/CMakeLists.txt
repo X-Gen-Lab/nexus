@@ -16,11 +16,28 @@ if(NEXUS_SOURCE_ROOT)
 endif()
 find_package(Nexus CONFIG REQUIRED)
 nexus_add_platform(ASSEMBLY "${NEXUS_ASSEMBLY_FILE}")
-nexus_add_firmware(nexus_f1_pma_usb SOURCES main.c)
+get_target_property(fixture_source Nexus::Config NEXUS_SOURCE_DIR)
+if(TARGET Nexus::STUSBDevice)
+    nexus_add_firmware(nexus_f1_pma_usb SOURCES st_main.c st_bulk.c)
+    target_include_directories(
+        nexus_f1_pma_usb
+        PRIVATE "${fixture_source}/components/protocols/st_usb_device/private"
+    )
+    target_include_directories(
+        nexus_f1_pma_usb
+        SYSTEM
+        PRIVATE "${fixture_source}/vendors/st/usb_device/Core/Inc"
+    )
+    target_compile_definitions(
+        nexus_st_usb_device_core
+        PRIVATE USBD_SELF_POWERED=1U
+    )
+else()
+    nexus_add_firmware(nexus_f1_pma_usb SOURCES main.c)
+endif()
 nexus_target_warnings(nexus_f1_pma_usb STRICT)
 
 find_package(Python3 3.11 REQUIRED COMPONENTS Interpreter)
-get_target_property(fixture_source Nexus::Config NEXUS_SOURCE_DIR)
 get_target_property(fixture_config Nexus::Platform NEXUS_CONFIG_DIR)
 set(retention_check "${fixture_source}/tools/measurement/retention.py")
 set(retention_report "${CMAKE_CURRENT_BINARY_DIR}/bin/provider-retention.json")

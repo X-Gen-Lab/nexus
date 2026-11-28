@@ -8,6 +8,7 @@
  */
 #include "drivers/ethernet/mdio.h"
 #include "dispatch_checks.h"
+#include "drivers/ethernet/ethernet_clock.h"
 #include "private/hardware.h"
 #include "stm32f1xx_ll_gpio.h"
 #include "system/clock_profile.h"
@@ -32,24 +33,6 @@ _Static_assert(ETH_MACMIIAR_CR_DIV42 == 0U && 72000000U / 42U < 2500000U,
 
 enum { MAC_GATE_OWNED = 1U, CHECK_IDLE = 2U, LIVE = 4U };
 
-/** \brief Verify the clock feeding SMI independently of cached SystemCoreClock.
- */
-static bool clock_ready(void) {
-    const uint32_t sources = RCC_CR_HSEON | RCC_CR_HSERDY | RCC_CR_PLLON |
-                             RCC_CR_PLLRDY | RCC_CR_PLL2ON | RCC_CR_PLL2RDY;
-    const uint32_t cfgr_mask =
-        RCC_CFGR_SWS | RCC_CFGR_HPRE | RCC_CFGR_PLLSRC | RCC_CFGR_PLLMULL;
-    const uint32_t pll_mask = RCC_CFGR2_PREDIV1 | RCC_CFGR2_PREDIV2 |
-                              RCC_CFGR2_PLL2MUL | RCC_CFGR2_PREDIV1SRC;
-    const uint32_t pll = RCC_CFGR2_PREDIV1_DIV5 | RCC_CFGR2_PREDIV2_DIV5 |
-                         RCC_CFGR2_PLL2MUL8 | RCC_CFGR2_PREDIV1SRC_PLL2;
-    return nx_stm32f1_system_live() &&
-           (RCC->CR & (sources | RCC_CR_HSEBYP)) == sources &&
-           (RCC->CFGR & cfgr_mask) ==
-               (RCC_CFGR_SWS_PLL | RCC_CFGR_PLLSRC | RCC_CFGR_PLLMULL9) &&
-           (RCC->CFGR2 & pll_mask) == pll;
-}
-
 /** \brief Admit only the isolated AHB station-management register interface. */
 static bool mac_access(void) {
     return (RCC->AHBENR & MAC_GATES) == RCC_AHBENR_ETHMACEN &&
@@ -70,7 +53,7 @@ nx_result_t nx_stm32f1_mdio_prepare(nx_stm32f1_mdio_t* state) {
     if (!nx_stm32f1_cold_context()) {
         return NX_ERROR_CONTEXT;
     }
-    if (state->effects != 0U || !clock_ready()) {
+    if (state->effects != 0U || !nx_stm32f1_ethernet_clock_ready()) {
         return NX_ERROR_STATE;
     }
     if ((RCC->AHBENR & MAC_GATES) != 0U ||
@@ -136,7 +119,8 @@ static nx_result_t transfer(nx_stm32f1_mdio_t* state, uint8_t phy, uint8_t reg,
     if (!nx_stm32f1_cold_context()) {
         return NX_ERROR_CONTEXT;
     }
-    if ((state->effects & LIVE) == 0U || !clock_ready() || !mac_access()) {
+    if ((state->effects & LIVE) == 0U || !nx_stm32f1_ethernet_clock_ready() ||
+        !mac_access()) {
         return NX_ERROR_STATE;
     }
     if (!write &&
@@ -169,7 +153,7 @@ static nx_result_t transfer(nx_stm32f1_mdio_t* state, uint8_t phy, uint8_t reg,
             return NX_ERROR_STATE;
         }
     } while ((ETH->MACMIIAR & ETH_MACMIIAR_MB) != 0U);
-    if (!clock_ready()) {
+    if (!nx_stm32f1_ethernet_clock_ready()) {
         return NX_ERROR_STATE;
     }
     if (nx_deadline_expired(deadline, nx_time_now_us())) {

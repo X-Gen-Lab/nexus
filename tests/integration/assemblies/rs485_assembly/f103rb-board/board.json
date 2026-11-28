@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "id": "stm32f103rb-rs485-software-reference",
+  "soc": "STM32F103RBT6",
+  "soc_family": "stm32f1",
+  "source_revision": "DS5319 Rev20 Table 5 and MAX3485E 3.3 V half-duplex external reference",
+  "physical_pcb_revision": null,
+  "clocks": {},
+  "bindings": [
+    {
+      "id": "rs485-de",
+      "controller": "GPIOA",
+      "route": "gpio-pa5",
+      "initial": 0,
+      "mask": 32,
+      "electrical": {
+        "mode": "output",
+        "initial": 0
+      },
+      "requires": {
+        "rs485_wiring": "max3485e-direction-pa5"
+      }
+    },
+    {
+      "id": "uart2",
+      "controller": "USART2",
+      "route": "usart2-pa2-pa3",
+      "requires": {
+        "rs485_wiring": "max3485e-direction-pa5"
+      }
+    }
+  ],
+  "reserved_resources": ["PA13", "PA14", "PA15", "PB3", "PB4"],
+  "unknowns": [
+    "External 3.3 V MAX3485E: PA2 to DI, RO to PA3, and PA5 drives tied DE and active-low RE.",
+    "The reference assumes an external PA5 pull-down and PA3 pull-up for idle during reset or receiver disable. PCB, bias, termination, transceiver timing and bus operation have not been observed."
+  ],
+  "provenance": [
+    "https://www.st.com/resource/en/datasheet/stm32f103rb.pdf",
+    "https://www.analog.com/media/en/technical-documentation/data-sheets/MAX3483E-MAX3491E.pdf"
+  ],
+  "hardware_options": {
+    "rs485_wiring": ["unknown", "max3485e-direction-pa5"]
+  },
+  "backend_support": ["baremetal"]
+}

@@ -1,6 +1,6 @@
 /**
  * \file            target_test.cpp
- * \brief           Receive-only F103 target and source withdrawal model.
+ * \brief           F103 target and source withdrawal model.
  * \author          Nexus Team
  * \version         1.0.0
  * \date            2026-11-28
@@ -27,6 +27,10 @@ bool sr1_seen;
 bool refuse_reset;
 unsigned sr2_reads;
 unsigned data_reads;
+#if defined(NX_STM32F1_I2C_TARGET_TX) ||                                       \
+    defined(NX_STM32F1_I2C_TARGET_WRITE_READ)
+unsigned data_writes;
+#endif
 nx_time_us_t now;
 
 Vector& vector(IRQn_Type irq) {
@@ -39,7 +43,13 @@ class F103Target : public testing::Test {
     nx_stm32f1_i2c_target_t target{};
     nx_i2c_target_request_t request{};
     const nx_i2c_target_port_t port{&nx_stm32f1_i2c_target_ops, &target};
+#if defined(NX_STM32F1_I2C_TARGET_TX) ||                                       \
+    defined(NX_STM32F1_I2C_TARGET_WRITE_READ)
+    static constexpr uint8_t tx[] = {0x21U, 0xA2U};
+#endif
+#if !defined(NX_STM32F1_I2C_TARGET_TX)
     uint8_t rx[2]{};
+#endif
 
     void SetUp() override {
         f103_i2c = {};
@@ -53,20 +63,48 @@ class F103Target : public testing::Test {
         error = {0U, 0U, 0U, 8U};
         sr1_seen = refuse_reset = false;
         sr2_reads = data_reads = 0U;
+#if defined(NX_STM32F1_I2C_TARGET_TX) ||                                       \
+    defined(NX_STM32F1_I2C_TARGET_WRITE_READ)
+        data_writes = 0U;
+#endif
         now = 10U;
         nx_request_initialize(&request.base);
     }
     void start() {
         ASSERT_EQ(nx_stm32f1_i2c_target_open(&target, 0x52U), NX_SUCCESS);
+#if defined(NX_STM32F1_I2C_TARGET_TX)
+        ASSERT_EQ(nx_i2c_target_prepare(&port, &request, nullptr, 0U, tx,
+                                        sizeof(tx), NX_I2C_TARGET_TRANSMIT,
+                                        100U),
+                  NX_SUCCESS);
+        ASSERT_EQ(nx_i2c_target_submit(&port, &request), NX_SUCCESS);
+        ASSERT_EQ(f103_i2c.CR1, I2C_CR1_PE | I2C_CR1_ACK);
+        ASSERT_EQ(f103_i2c.CR2, 8U | (irq_sources & ~I2C_CR2_ITBUFEN));
+#elif defined(NX_STM32F1_I2C_TARGET_WRITE_READ)
+        ASSERT_EQ(nx_i2c_target_prepare(&port, &request, rx, sizeof(rx), tx,
+                                        sizeof(tx), NX_I2C_TARGET_WRITE_READ,
+                                        100U),
+                  NX_SUCCESS);
+        ASSERT_EQ(nx_i2c_target_submit(&port, &request), NX_SUCCESS);
+        ASSERT_EQ(f103_i2c.CR1, I2C_CR1_PE | I2C_CR1_ACK);
+        ASSERT_EQ(f103_i2c.CR2, 8U | irq_sources);
+#else
         ASSERT_EQ(nx_i2c_target_prepare(&port, &request, rx, 2U, nullptr, 0U,
                                         NX_I2C_TARGET_RECEIVE, 100U),
                   NX_SUCCESS);
         ASSERT_EQ(nx_i2c_target_submit(&port, &request), NX_SUCCESS);
         ASSERT_EQ(f103_i2c.CR1, I2C_CR1_PE | I2C_CR1_ACK);
         ASSERT_EQ(f103_i2c.CR2, 8U | irq_sources);
+#endif
         ASSERT_EQ(event.priority, 0U);
         ASSERT_EQ(error.priority, 0U);
     }
+#if defined(NX_STM32F1_I2C_TARGET_WRITE_READ)
+    void receive_first() {
+        pulse(I2C_SR1_ADDR, I2C_SR2_BUSY);
+        pulse(I2C_SR1_RXNE, I2C_SR2_BUSY, 0x37U);
+    }
+#endif
     void pulse(uint32_t status, uint32_t sr2, uint8_t word = 0U) {
         f103_i2c.SR1 = status;
         f103_i2c.SR2 = sr2;
@@ -83,6 +121,234 @@ class F103Target : public testing::Test {
     }
 };
 
+#if defined(NX_STM32F1_I2C_TARGET_WRITE_READ)
+TEST_F(F103Target, RepeatedAddressSwitchesPublishersAndSettlesBothCounts) {
+    ASSERT_NO_FATAL_FAILURE(start());
+    receive_first();
+    pulse(I2C_SR1_RXNE, I2C_SR2_BUSY, 0x64U);
+    pulse(I2C_SR1_ADDR | I2C_SR1_TXE, I2C_SR2_BUSY | I2C_SR2_TRA);
+    EXPECT_EQ(tx[0], f103_i2c.DR);
+    EXPECT_EQ(f103_i2c.CR2, 8U | (irq_sources & ~I2C_CR2_ITBUFEN));
+    pulse(I2C_SR1_TXE, I2C_SR2_BUSY | I2C_SR2_TRA);
+    EXPECT_EQ(1U, data_writes);
+    pulse(I2C_SR1_BTF, I2C_SR2_BUSY | I2C_SR2_TRA);
+    EXPECT_EQ(tx[1], f103_i2c.DR);
+    pulse(I2C_SR1_AF, I2C_SR2_BUSY | I2C_SR2_TRA);
+    EXPECT_EQ(NX_REQUEST_DRAINING, nx_request_state(&request.base));
+    event.pending = error.pending = 1U;
+    nx_i2c_target_service(&port);
+    result(NX_SUCCESS, 4U);
+    EXPECT_EQ(2U, request.rx_received);
+    EXPECT_EQ(2U, request.tx_completed);
+    EXPECT_EQ(0x37U, rx[0]);
+    EXPECT_EQ(0x64U, rx[1]);
+    EXPECT_EQ(2U, request.address_phases);
+    EXPECT_EQ(0U, request.faults | event.enabled | error.enabled |
+                      event.pending | error.pending);
+    EXPECT_EQ(NX_SUCCESS, nx_stm32f1_i2c_target_close(&target));
+}
+
+TEST_F(F103Target, StopBeforeRepeatedStartPublishesOnlyReceivePrefix) {
+    ASSERT_NO_FATAL_FAILURE(start());
+    receive_first();
+    pulse(I2C_SR1_STOPF | I2C_SR1_RXNE, 0U, 0x91U);
+    nx_i2c_target_service(&port);
+    result(NX_ERROR_IO, 2U);
+    EXPECT_EQ(2U, request.rx_received);
+    EXPECT_EQ(0U, request.tx_completed | data_writes);
+    EXPECT_EQ(NX_I2C_TARGET_PROTOCOL_ERROR, request.faults);
+}
+
+TEST_F(F103Target, AmbiguousAddressNeverLoadsTransmitPayload) {
+    ASSERT_NO_FATAL_FAILURE(start());
+    receive_first();
+    pulse(I2C_SR1_ADDR | I2C_SR1_RXNE, I2C_SR2_BUSY | I2C_SR2_TRA);
+    nx_i2c_target_service(&port);
+    result(NX_ERROR_IO, 1U);
+    EXPECT_EQ(1U, data_reads);
+    EXPECT_EQ(0U, data_writes);
+    EXPECT_EQ(1U, request.address_phases);
+    EXPECT_EQ(NX_I2C_TARGET_PROTOCOL_ERROR, request.faults);
+}
+
+TEST_F(F103Target, WrongDirectionAndEmptyReceiveCannotStartTransmit) {
+    ASSERT_NO_FATAL_FAILURE(start());
+    pulse(I2C_SR1_ADDR, I2C_SR2_BUSY | I2C_SR2_TRA);
+    nx_i2c_target_service(&port);
+    result(NX_ERROR_IO, 0U);
+    EXPECT_EQ(0U, request.address_phases);
+    ASSERT_EQ(NX_SUCCESS, nx_i2c_target_recover(&port));
+    ASSERT_EQ(nx_i2c_target_prepare(&port, &request, rx, sizeof(rx), tx,
+                                    sizeof(tx), NX_I2C_TARGET_WRITE_READ, 100U),
+              NX_SUCCESS);
+    ASSERT_EQ(NX_SUCCESS, nx_i2c_target_submit(&port, &request));
+    pulse(I2C_SR1_ADDR, I2C_SR2_BUSY);
+    pulse(I2C_SR1_ADDR, I2C_SR2_BUSY | I2C_SR2_TRA);
+    nx_i2c_target_service(&port);
+    result(NX_ERROR_IO, 0U);
+    EXPECT_EQ(1U, request.address_phases);
+    EXPECT_EQ(0U, data_writes);
+}
+
+TEST_F(F103Target, ReceiveAddressWithStaleTxeDoesNotRearm) {
+    ASSERT_NO_FATAL_FAILURE(start());
+    pulse(I2C_SR1_ADDR | I2C_SR1_TXE, I2C_SR2_BUSY);
+    nx_i2c_target_service(&port);
+    result(NX_ERROR_IO, 0U);
+    EXPECT_EQ(0U, request.address_phases | data_reads | data_writes);
+    EXPECT_EQ(NX_I2C_TARGET_PROTOCOL_ERROR, request.faults);
+}
+
+TEST_F(F103Target, ThirdMatchedAddressIsNotAValidCompletion) {
+    ASSERT_NO_FATAL_FAILURE(start());
+    receive_first();
+    pulse(I2C_SR1_ADDR, I2C_SR2_BUSY | I2C_SR2_TRA);
+    pulse(I2C_SR1_BTF, I2C_SR2_BUSY | I2C_SR2_TRA);
+    pulse(I2C_SR1_ADDR, I2C_SR2_BUSY);
+    nx_i2c_target_service(&port);
+    result(NX_ERROR_IO, 2U);
+    EXPECT_EQ(1U, request.rx_received);
+    EXPECT_EQ(1U, request.tx_completed);
+    EXPECT_EQ(2U, request.address_phases);
+    EXPECT_EQ(NX_I2C_TARGET_PROTOCOL_ERROR, request.faults);
+}
+
+TEST_F(F103Target, EarlyNackRetainsBothPrefixesUntilWithdrawn) {
+    ASSERT_NO_FATAL_FAILURE(start());
+    receive_first();
+    pulse(I2C_SR1_ADDR, I2C_SR2_BUSY | I2C_SR2_TRA);
+    pulse(I2C_SR1_AF, I2C_SR2_BUSY | I2C_SR2_TRA);
+    refuse_reset = true;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_i2c_target_stop(&port));
+    EXPECT_EQ(NX_REQUEST_QUARANTINED, nx_request_state(&request.base));
+    refuse_reset = false;
+    error.running = 1U;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32f1_i2c_target_close(&target));
+    error.running = 0U;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32f1_i2c_target_close(&target));
+    result(NX_ERROR_IO, 2U);
+    EXPECT_EQ(1U, request.rx_received);
+    EXPECT_EQ(1U, request.tx_completed);
+    EXPECT_EQ(NX_I2C_TARGET_PROTOCOL_ERROR, request.faults);
+}
+#elif defined(NX_STM32F1_I2C_TARGET_TX)
+TEST_F(F103Target, FinalNackConfirmsTheOnlyInFlightByteAndDrainsBothVectors) {
+    ASSERT_NO_FATAL_FAILURE(start());
+    pulse(I2C_SR1_ADDR | I2C_SR1_TXE, I2C_SR2_BUSY | I2C_SR2_TRA);
+    EXPECT_EQ(tx[0], f103_i2c.DR);
+    pulse(I2C_SR1_TXE, I2C_SR2_BUSY | I2C_SR2_TRA);
+    EXPECT_EQ(1U, data_writes);
+    pulse(I2C_SR1_BTF | I2C_SR1_TXE, I2C_SR2_BUSY | I2C_SR2_TRA);
+    EXPECT_EQ(tx[1], f103_i2c.DR);
+    pulse(I2C_SR1_AF | I2C_SR1_TXE, I2C_SR2_BUSY | I2C_SR2_TRA);
+    EXPECT_EQ(NX_REQUEST_DRAINING, nx_request_state(&request.base));
+    EXPECT_EQ(0U, f103_i2c.SR1 & I2C_SR1_AF);
+    event.pending = error.pending = 1U;
+    nx_i2c_target_service(&port);
+    result(NX_SUCCESS, 2U);
+    EXPECT_EQ(2U, request.tx_completed);
+    EXPECT_EQ(0U, request.rx_received | request.faults);
+    EXPECT_EQ(0x52U, request.matched_address);
+    EXPECT_EQ(1U, request.address_phases);
+    EXPECT_EQ(2U, data_writes);
+    EXPECT_EQ(0U, data_reads | event.pending | error.pending | event.enabled |
+                      error.enabled);
+    EXPECT_EQ(NX_SUCCESS, nx_stm32f1_i2c_target_close(&target));
+}
+
+TEST_F(F103Target, EarlyNackAndExtraAckReportOnlyConfirmedPayload) {
+    ASSERT_NO_FATAL_FAILURE(start());
+    pulse(I2C_SR1_ADDR, I2C_SR2_BUSY | I2C_SR2_TRA);
+    pulse(I2C_SR1_AF | I2C_SR1_BTF, I2C_SR2_BUSY | I2C_SR2_TRA);
+    nx_i2c_target_service(&port);
+    result(NX_ERROR_IO, 1U);
+    EXPECT_EQ(1U, request.tx_completed);
+    EXPECT_EQ(NX_I2C_TARGET_PROTOCOL_ERROR, request.faults);
+    ASSERT_EQ(NX_SUCCESS, nx_i2c_target_recover(&port));
+    ASSERT_EQ(NX_SUCCESS,
+              nx_i2c_target_prepare(&port, &request, nullptr, 0U, tx,
+                                    sizeof(tx), NX_I2C_TARGET_TRANSMIT, 100U));
+    ASSERT_EQ(NX_SUCCESS, nx_i2c_target_submit(&port, &request));
+    pulse(I2C_SR1_ADDR, I2C_SR2_BUSY | I2C_SR2_TRA);
+    pulse(I2C_SR1_BTF, I2C_SR2_BUSY | I2C_SR2_TRA);
+    pulse(I2C_SR1_BTF, I2C_SR2_BUSY | I2C_SR2_TRA);
+    nx_i2c_target_service(&port);
+    result(NX_ERROR_IO, 2U);
+    EXPECT_EQ(2U, request.tx_completed);
+    EXPECT_EQ(NX_I2C_TARGET_PROTOCOL_ERROR, request.faults);
+    EXPECT_EQ(3U, data_writes);
+}
+
+TEST_F(F103Target, OverrunOutranksNackAndDoesNotAcceptTheInFlightByte) {
+    ASSERT_NO_FATAL_FAILURE(start());
+    pulse(I2C_SR1_ADDR, I2C_SR2_BUSY | I2C_SR2_TRA);
+    pulse(I2C_SR1_BTF, I2C_SR2_BUSY | I2C_SR2_TRA);
+    pulse(I2C_SR1_OVR | I2C_SR1_AF, I2C_SR2_BUSY | I2C_SR2_TRA);
+    nx_i2c_target_service(&port);
+    result(NX_ERROR_IO, 1U);
+    EXPECT_EQ(1U, request.tx_completed);
+    EXPECT_EQ(NX_I2C_TARGET_OVERRUN, request.faults);
+    EXPECT_EQ(2U, data_writes);
+}
+
+TEST_F(F103Target, TargetWriteAddressAndUnprovenStopRejectWithoutDataAccess) {
+    ASSERT_NO_FATAL_FAILURE(start());
+    pulse(I2C_SR1_ADDR | I2C_SR1_RXNE, I2C_SR2_BUSY);
+    nx_i2c_target_service(&port);
+    result(NX_ERROR_IO, 0U);
+    EXPECT_EQ(0U, request.tx_completed | data_reads | data_writes);
+    EXPECT_EQ(NX_I2C_TARGET_PROTOCOL_ERROR, request.faults);
+    ASSERT_EQ(NX_SUCCESS, nx_i2c_target_recover(&port));
+    ASSERT_EQ(NX_SUCCESS,
+              nx_i2c_target_prepare(&port, &request, nullptr, 0U, tx,
+                                    sizeof(tx), NX_I2C_TARGET_TRANSMIT, 100U));
+    ASSERT_EQ(NX_SUCCESS, nx_i2c_target_submit(&port, &request));
+    pulse(I2C_SR1_ADDR, I2C_SR2_BUSY | I2C_SR2_TRA);
+    pulse(I2C_SR1_STOPF, 0U);
+    nx_i2c_target_service(&port);
+    result(NX_ERROR_IO, 0U);
+    EXPECT_EQ(NX_I2C_TARGET_PROTOCOL_ERROR, request.faults);
+    EXPECT_EQ(1U, data_writes);
+}
+
+TEST_F(F103Target, TimeoutAndExplicitStopRetainUntilResetAndIrqsDrain) {
+    ASSERT_NO_FATAL_FAILURE(start());
+    pulse(I2C_SR1_ADDR, I2C_SR2_BUSY | I2C_SR2_TRA);
+    now = 100U;
+    refuse_reset = true;
+    nx_i2c_target_service(&port);
+    EXPECT_EQ(NX_REQUEST_QUARANTINED, nx_request_state(&request.base));
+    EXPECT_EQ(NX_ERROR_BUSY, nx_i2c_target_stop(&port));
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32f1_i2c_target_close(&target));
+    EXPECT_NE(0U, RCC->APB1ENR & RCC_APB1ENR_I2C1EN);
+    pulse(I2C_SR1_BTF, I2C_SR2_BUSY | I2C_SR2_TRA);
+    EXPECT_EQ(1U, data_writes);
+    refuse_reset = false;
+    error.running = 1U;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32f1_i2c_target_close(&target));
+    EXPECT_EQ(NX_REQUEST_QUARANTINED, nx_request_state(&request.base));
+    error.running = 0U;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32f1_i2c_target_close(&target));
+    result(NX_ERROR_TIMEOUT, 0U);
+    EXPECT_EQ(9U, event.priority);
+    EXPECT_EQ(8U, error.priority);
+    EXPECT_EQ(0U, RCC->APB1ENR & RCC_APB1ENR_I2C1EN);
+}
+
+TEST_F(F103Target, ExplicitEarlyStopSettlesCancelledThenRetainsLowLineOwner) {
+    ASSERT_NO_FATAL_FAILURE(start());
+    pulse(I2C_SR1_ADDR, I2C_SR2_BUSY | I2C_SR2_TRA);
+    f103_i2c_gpio.IDR = 0U;
+    EXPECT_EQ(NX_SUCCESS, nx_i2c_target_stop(&port));
+    result(NX_ERROR_CANCELLED, 0U);
+    EXPECT_EQ(NX_ERROR_IO, nx_stm32f1_i2c_target_close(&target));
+    EXPECT_NE(0U, RCC->APB1ENR & RCC_APB1ENR_I2C1EN);
+    EXPECT_EQ(1U, data_writes);
+    f103_i2c_gpio.IDR = wires;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32f1_i2c_target_close(&target));
+    EXPECT_EQ(0U, RCC->APB1ENR & RCC_APB1ENR_I2C1EN);
+}
+#else
 TEST_F(F103Target, ReceiveStopDrainsSourceAndPreservesExactValidPrefix) {
     ASSERT_NO_FATAL_FAILURE(start());
     pulse(I2C_SR1_ADDR, I2C_SR2_BUSY);
@@ -173,6 +439,7 @@ TEST_F(F103Target, TimeoutRetainsUntilResetAndActualVectorsQuiesce) {
     result(NX_ERROR_TIMEOUT, 1U);
     EXPECT_EQ(nx_stm32f1_i2c_target_close(&target), NX_SUCCESS);
 }
+#endif
 } /* namespace */
 
 extern "C" {
@@ -216,6 +483,17 @@ void f103_i2c_write(volatile uint32_t* field, uint32_t value) {
             f103_i2c.SR1 &= ~static_cast<uint32_t>(I2C_SR1_STOPF);
             sr1_seen = false;
         }
+#if defined(NX_STM32F1_I2C_TARGET_TX) ||                                       \
+    defined(NX_STM32F1_I2C_TARGET_WRITE_READ)
+    } else if (field == &f103_i2c.SR1) {
+        f103_i2c.SR1 &= value;
+        return;
+    } else if (field == &f103_i2c.DR) {
+        EXPECT_EQ(0U, f103_i2c.SR1 & I2C_SR1_ADDR);
+        EXPECT_NE(0U, f103_i2c.SR2 & I2C_SR2_TRA);
+        ++data_writes;
+        f103_i2c.SR1 &= ~(uint32_t)(I2C_SR1_BTF | I2C_SR1_TXE);
+#endif
     } else if (field == &f103_i2c_gpio.BSRR) {
         f103_i2c_gpio.ODR =
             (f103_i2c_gpio.ODR & ~(value >> 16U)) | (value & 0xFFFFU);

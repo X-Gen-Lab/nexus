@@ -21,7 +21,24 @@ typedef struct {
     bool tim1;
 } nx_stm32f1_adc_trigger_dma_t;
 
+/** \brief DMA gives one complete two-rank regular scan back to the caller. */
+typedef struct {
+    nx_stm32f1_adc_t adc;
+    volatile uint16_t sample[2];
+    uint16_t scan_ticks;
+    uint8_t effects;
+    bool tim1;
+} nx_stm32f1_adc_scan_dma_t;
+
+extern const nx_adc_ops_t nx_stm32f1_adc_scan_dma_ops;
 extern const nx_adc_ops_t nx_stm32f1_adc_trigger_dma_ops;
+
+/** \brief Acquire ADC1 PA0/PA1 with TIM3 and DMA1 channel 1. */
+nx_result_t nx_stm32f1_adc_scan_dma_prepare(
+    nx_stm32f1_adc_scan_dma_t* state, uint32_t apb2_hz, uint32_t reference_mv,
+    uint32_t first, uint32_t second, const nx_dma_memory_region_t* regions,
+    size_t region_count);
+nx_result_t nx_stm32f1_adc_scan_dma_close(nx_stm32f1_adc_scan_dma_t* state);
 
 /** \brief Acquire the exact ADC1 PA0, selected one-shot timer and DMA1
  * channel 1. */

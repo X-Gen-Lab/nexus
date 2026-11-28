@@ -787,7 +787,7 @@ class SDKConsumerParallelTests(unittest.TestCase):
         shutil.copytree(ROOT / controls, self.sdk / controls)
         identity_path = self.sdk / '.nexus-source-sdk.json'
         identity = json.loads(identity_path.read_text())
-        identity.update(profile={'host_support': True}, files_sha256={
+        identity.update(profile={'packages': ['stm32f4'], 'host_support': True}, files_sha256={
             path.relative_to(self.sdk).as_posix(): file_identity(path)['sha256']
             for path in self.sdk.rglob('*') if path.is_file() and path != identity_path})
         identity_path.write_text(json.dumps(identity))

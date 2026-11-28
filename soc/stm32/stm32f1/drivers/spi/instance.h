@@ -36,6 +36,9 @@ typedef struct {
     bool active;
     bool selected;
     bool fault;
+#if defined(STM32F107xC)
+    bool remap_added;
+#endif
 } nx_stm32f1_spi_t;
 
 /** \brief Immutable endpoint profile, separate from the bus execution state. */

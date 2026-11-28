@@ -250,6 +250,31 @@ class F103ReceiveTargetConfigurationTests(unittest.TestCase):
         self.assertIn("I2C1_EV_IRQHandler", code)
         self.assertIn("I2C1_ER_IRQHandler", code)
 
+    def test_transmit_only_contributes_one_span_and_two_direct_irq_handlers(self):
+        result = gate.resolve_ir(self.reference / "f103rb-target-tx.toml")
+        item, = result.controllers
+        record = selected_contracts.describe(item)
+        self.assertEqual((record.max_transfer_units, record.max_segment_units,
+                          record.max_segments, record.max_total_units),
+                         (256, 256, 1, 256))
+        self.assertEqual(record.fields["transmit_only"], 1)
+        self.assertNotIn("receive_only", record.fields)
+        self.assertFalse(record.physical_qualified)
+        code = bindings.emit(result)[1]
+        self.assertEqual(code.count("nx_stm32f1_i2c_target_irq(&s_nx_port_target)"), 2)
+
+    def test_write_read_contributes_two_spans_with_a_distinct_direction(self):
+        result = gate.resolve_ir(self.reference / "f103rb-target-write-read.toml")
+        item, = result.controllers
+        record = selected_contracts.describe(item)
+        self.assertEqual((record.max_transfer_units, record.max_segment_units,
+                          record.max_segments, record.max_total_units),
+                         (512, 256, 2, 512))
+        self.assertEqual(record.fields["write_read_only"], 1)
+        self.assertFalse(record.physical_qualified)
+        self.assertEqual(bindings.emit(result)[1].count(
+            "nx_stm32f1_i2c_target_irq(&s_nx_port_target)"), 2)
+
     def test_exact_limits_and_the_polling_controller_conflict(self):
         text = (self.reference / "f103rb-target.toml").read_text()
         board = gate.load(self.reference / "board/board.json")

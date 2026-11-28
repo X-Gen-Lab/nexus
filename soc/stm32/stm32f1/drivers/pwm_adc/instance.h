@@ -25,9 +25,9 @@ typedef struct {
     nx_stm32f1_pads_t analog;
     nx_pwm_adc_request_t* request;
     nx_result_t terminal;
+    volatile uint16_t capture;
     uint8_t update_priority;
     uint8_t effects;
-    volatile uint8_t completed;
     bool fault;
     bool stopped;
 } nx_stm32f1_cycle_t;

@@ -30,6 +30,13 @@ APB2 为 36 MHz。F102RB 的 HCLK 和 APB2 为 48 MHz，APB1 为 24 MHz，TIM2 �
 48 MHz。F102RB 装配选择独立的名义 48 MHz USB 时钟分频，USB 外设时钟保持关闭。
 两套 8 MHz 晶体参考的物理 PCB 与频率准确度待实物核验。
 
+`f103rb-crystal-baremetal.toml` 选择 STM32F103RBT6、PD0／OSC_IN 与
+PD1／OSC_OUT 的 8 MHz 晶体。PLL ×9，HCLK／APB2 为 72 MHz，APB1 为
+36 MHz，TIM2 时钟为 72 MHz。系统沿用 HSE 稳定确认、Flash 两个等待周期、
+CSS 和有界回到 HSI8 的路径。接线依据
+[DS5319 Rev 20 表 5、表 22 与图 24](https://www.st.com/resource/en/datasheet/stm32f103rb.pdf)。
+参考板需装配晶体及匹配的负载网络。NUCLEO 的出厂 MCO 旁路需选择原独立装配。
+
 `f103rb-7e2-baremetal.toml` 使用相同的公共 UART 接口和 PA2／PA3，选择七位数据、
 偶校验和两个停止位。UART IRQ 在上交接收值前去掉硬件校验位。七位带校验、
 八位无校验与八位带校验各支持一或两个停止位。有限 DMA 保持默认 8N1。

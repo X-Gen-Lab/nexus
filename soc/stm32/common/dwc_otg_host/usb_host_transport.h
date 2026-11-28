@@ -10,6 +10,17 @@
 #include "nexus/io/dma.h"
 #include "nexus/io/usb_host.h"
 #include "nexus/io/wake.h"
+#if defined(NX_STM32F1_USB_HOST_BULK) && defined(NX_STM32F1_USB_HOST_CORE)
+#error "Select only one STM32F1 USB Host logical pipe layout"
+#endif
+#if defined(NX_STM32F1_USB_HOST_BULK)
+#define NX_STM32F1_USB_HOST_VIEWS 4U
+#elif defined(NX_STM32F1_USB_HOST_CORE)
+#define NX_STM32F1_USB_HOST_VIEWS 2U
+#endif
+#if defined(NX_STM32F1_USB_HOST_VIEWS) && !defined(NX_STM32F1_USB_HOST)
+#error "Logical pipe views require the single-channel STM32F1 transport"
+#endif
 #ifndef USE_HAL_HCD_REGISTER_CALLBACKS
 #define USE_HAL_HCD_REGISTER_CALLBACKS 1U
 #elif USE_HAL_HCD_REGISTER_CALLBACKS != 1U
@@ -69,6 +80,10 @@ typedef struct {
     uint32_t publishers;
     uint32_t zero_word;
     uint8_t clock_receipt;
+#if defined(NX_STM32F1_USB_HOST_VIEWS)
+    nx_usb_host_pipe_t logical_pipes[NX_STM32F1_USB_HOST_VIEWS];
+    uint8_t bound_pipe;
+#endif
 } nx_stm32_usb_host_t;
 
 extern const nx_usb_host_ops_t nx_stm32_usb_host_ops;

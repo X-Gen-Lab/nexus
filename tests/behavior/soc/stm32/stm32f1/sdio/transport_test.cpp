@@ -15,6 +15,8 @@
 
 RCC_TypeDef nx_sdio_rcc;
 SDIO_TypeDef nx_sdio_registers;
+DMA_TypeDef nx_sdio_dma;
+DMA_Channel_TypeDef nx_sdio_dma_channel;
 GPIO_TypeDef nx_sdio_gpio_c;
 GPIO_TypeDef nx_sdio_gpio_d;
 
@@ -30,6 +32,11 @@ bool hold_data;
 bool freeze_time;
 bool system_live;
 bool blocked_icr;
+bool blocked_width;
+bool blocked_dma_disable;
+bool dma_transfer_error;
+bool dma_card_crc;
+uint32_t* dma_target;
 uint32_t generated_words;
 uint32_t words_read;
 std::vector<uint32_t> output_words;
@@ -67,6 +74,11 @@ class F1Sdio : public testing::Test {
     void SetUp() override {
         nx_sdio_rcc = {};
         nx_sdio_registers = {};
+        nx_sdio_dma = {};
+        nx_sdio_dma_channel = {};
+        blocked_dma_disable = dma_transfer_error = false;
+        dma_card_crc = true;
+        dma_target = nullptr;
         nx_sdio_gpio_c = {};
         nx_sdio_gpio_d = {};
         GPIOC->CRH = 0x44444444U;
@@ -76,6 +88,7 @@ class F1Sdio : public testing::Test {
         scripted = lose_detect_after_status = false;
         detect_clock_start = reset_command_at = 0U;
         RCC->AHBENR = RCC_AHBENR_DMA2EN;
+        blocked_width = false;
         pending_flags = 0U;
         pending_response = 0U;
         final_data_flags = SDIO_STA_DBCKEND;
@@ -311,14 +324,56 @@ class F1SdBlock : public F1Sdio {
         generated_words = words_per_sector;
     }
 
-    void init_write(uint32_t wp = 0U) {
-        ASSERT_EQ(nx_stm32f1_sdio_block_prepare_write(&block), NX_SUCCESS);
+    void init_wide() {
+        ASSERT_EQ(nx_stm32f1_sdio_block_prepare_four_bit(&block), NX_SUCCESS);
+        scripted = true;
+        init();
+        program[8].response2 = 9U << 16U;
+        program[8].response3 = 0x1fff0000U;
+    }
+
+    void init_dma() {
+        RCC->AHBENR = 0U;
+        ASSERT_EQ(nx_stm32f1_sdio_block_prepare_four_bit_dma(&block),
+                  NX_SUCCESS);
+        EXPECT_NE(RCC->AHBENR & RCC_AHBENR_DMA2EN, 0U);
+        scripted = true;
+        dma_target = block.dma_sector;
+        init();
+        program[8].response2 = 9U << 16U;
+        program[8].response3 = 0x1fff0000U;
+        width_command(true);
+        ready_command(transfer_ready);
+        ASSERT_EQ(nx_block_port_activate(&port, 5000U), NX_SUCCESS);
+    }
+
+    void stop_dma_commands() {
+        ready_command(transfer_ready);
+        width_command(false);
+        program.push_back({7U, 0U, SDIO_STA_CMDSENT, 0U, 0U, 0U});
+        ready_command((3U << 9U) | (1U << 8U));
+    }
+
+    void width_command(bool wide, uint32_t flags = SDIO_STA_CMDREND) {
+        program.push_back(
+            {55U, rca_address, SDIO_STA_CMDREND, 1U << 5U, 0U, 0U});
+        program.push_back({6U, wide ? 2U : 0U, flags, transfer_ready, 0U, 0U});
+    }
+
+    void init_write(uint32_t wp = 0U, bool wide = false) {
+        ASSERT_EQ(wide ? nx_stm32f1_sdio_block_prepare_four_bit_write(&block)
+                       : nx_stm32f1_sdio_block_prepare_write(&block),
+                  NX_SUCCESS);
         scripted = true;
         init();
         /* SDHC C_SIZE=0x1fff, CCC class 4 and WRITE_BL_LEN=9. */
         program[8].response2 = (1U << 24U) | (9U << 16U);
         program[8].response3 = 0x1fff0000U;
         program[8].response4 = (9U << 22U) | wp;
+        if (wide) {
+            width_command(true);
+            ready_command(transfer_ready);
+        }
         ASSERT_EQ(nx_block_port_activate(&writable, 5000U), NX_SUCCESS);
     }
 
@@ -388,6 +443,116 @@ TEST_F(F1SdBlock, NegotiatesV2AndReturnsOneConfirmedReadOnlySector) {
     EXPECT_EQ(RCC->APB2ENR, 0U);
 }
 
+TEST_F(F1SdBlock, SwitchesCardBeforeHostAndWithdrawsBothBeforeDeselect) {
+    init_wide();
+    EXPECT_EQ(GPIOC->CRH & 0xFFFFU, 0xAAAAU);
+    width_command(true);
+    ready_command(transfer_ready);
+    ASSERT_EQ(nx_block_port_activate(&port, 5000U), NX_SUCCESS);
+    ASSERT_NE(nx_block_port_geometry(&port), nullptr);
+    EXPECT_FALSE(nx_block_port_geometry(&port)->writable);
+    EXPECT_EQ(SDIO->CLKCR, ready_clock | SDIO_CLKCR_WIDBUS_0);
+    read_commands(17U);
+    EXPECT_EQ(nx_block_port_read(&port, 17U, output, sizeof(output), 1U, 6000U)
+                  .completed_blocks,
+              1U);
+    ready_command(transfer_ready);
+    width_command(false);
+    program.push_back({7U, 0U, SDIO_STA_CMDSENT, 0U, 0U, 0U});
+    ready_command((3U << 9U) | (1U << 8U));
+    EXPECT_EQ(nx_block_port_stop(&port, 7000U), NX_SUCCESS);
+    EXPECT_EQ(command_cursor, program.size());
+    EXPECT_EQ(SDIO->CLKCR, 0U);
+    EXPECT_EQ(nx_stm32f1_sdio_block_close(&block), NX_SUCCESS);
+    EXPECT_EQ(GPIOC->CRH, 0x44444444U);
+}
+
+TEST_F(F1SdBlock, LostWidthResponseKeepsCardReceiptThroughStopRetry) {
+    init_wide();
+    width_command(true, SDIO_STA_CCRCFAIL);
+    EXPECT_EQ(nx_block_port_activate(&port, 5000U), NX_ERROR_IO);
+    EXPECT_EQ(nx_block_port_state(&port), NX_BLOCK_UNCERTAIN);
+    EXPECT_EQ(nx_block_port_geometry(&port), nullptr);
+    EXPECT_EQ(SDIO->CLKCR, ready_clock);
+
+    ready_command(transfer_ready);
+    width_command(false, SDIO_STA_CTIMEOUT);
+    EXPECT_EQ(nx_block_port_stop(&port, 6000U), NX_ERROR_TIMEOUT);
+    EXPECT_NE(RCC->AHBENR & RCC_AHBENR_SDIOEN, 0U);
+    EXPECT_EQ(command_cursor, program.size());
+
+    ready_command(transfer_ready);
+    width_command(false);
+    program.push_back({7U, 0U, SDIO_STA_CMDSENT, 0U, 0U, 0U});
+    ready_command((3U << 9U) | (1U << 8U));
+    EXPECT_EQ(nx_block_port_stop(&port, 7000U), NX_SUCCESS);
+    EXPECT_EQ(command_cursor, program.size());
+    EXPECT_EQ(nx_block_port_state(&port), NX_BLOCK_STOPPED);
+}
+
+TEST_F(F1SdBlock, FailedHostWidthRestoreRetriesBeforeReleasingOwnership) {
+    init_wide();
+    width_command(true);
+    ready_command(transfer_ready);
+    ASSERT_EQ(nx_block_port_activate(&port, 5000U), NX_SUCCESS);
+
+    ready_command(transfer_ready);
+    width_command(false);
+    blocked_width = true;
+    EXPECT_EQ(nx_block_port_stop(&port, 6000U), NX_ERROR_IO);
+    EXPECT_EQ(nx_block_port_state(&port), NX_BLOCK_UNCERTAIN);
+    EXPECT_EQ(SDIO->CLKCR, ready_clock | SDIO_CLKCR_WIDBUS_0);
+    EXPECT_EQ(command_cursor, program.size());
+
+    blocked_width = false;
+    ready_command(transfer_ready);
+    width_command(false);
+    program.push_back({7U, 0U, SDIO_STA_CMDSENT, 0U, 0U, 0U});
+    ready_command((3U << 9U) | (1U << 8U));
+    EXPECT_EQ(nx_block_port_stop(&port, 7000U), NX_SUCCESS);
+    EXPECT_EQ(command_cursor, program.size());
+    EXPECT_EQ(SDIO->CLKCR, 0U);
+}
+
+TEST_F(F1SdBlock, FailedHostWidthReadbackAndConfirmedRemovalCloseOnlyHost) {
+    init_wide();
+    width_command(true);
+    blocked_width = true;
+    EXPECT_EQ(nx_block_port_activate(&port, 5000U), NX_ERROR_IO);
+    EXPECT_EQ(nx_block_port_state(&port), NX_BLOCK_UNCERTAIN);
+    EXPECT_EQ(nx_block_port_geometry(&port), nullptr);
+    EXPECT_EQ(SDIO->CLKCR, ready_clock);
+
+    EXPECT_EQ(nx_block_port_media_removed(&port), NX_ERROR_STATE);
+    GPIOC->IDR = detect_pin;
+    EXPECT_EQ(nx_block_port_media_removed(&port), NX_SUCCESS);
+    EXPECT_EQ(nx_block_port_stop(&port, 6000U), NX_SUCCESS);
+    EXPECT_EQ(command_cursor, program.size());
+    EXPECT_EQ(SDIO->CLKCR, 0U);
+    EXPECT_EQ(RCC->AHBENR & RCC_AHBENR_SDIOEN, 0U);
+}
+
+TEST_F(F1SdBlock, RejectsUnacknowledgedCmd55BeforeChangingWidth) {
+    init_wide();
+    program.push_back({55U, rca_address, SDIO_STA_CMDREND, 0U, 0U, 0U});
+    EXPECT_EQ(nx_block_port_activate(&port, 5000U), NX_ERROR_IO);
+    EXPECT_EQ(nx_block_port_state(&port), NX_BLOCK_UNCERTAIN);
+    EXPECT_EQ(SDIO->CLKCR, ready_clock);
+    stop_commands();
+    EXPECT_EQ(nx_block_port_stop(&port, 6000U), NX_SUCCESS);
+    EXPECT_EQ(command_cursor, program.size());
+}
+
+TEST_F(F1SdBlock, FourLineProfileRejectsSdxcBeforeSelectingIt) {
+    init_wide();
+    program[8].response3 = 0xffff0000U;
+    program.resize(9U);
+    EXPECT_EQ(nx_block_port_activate(&port, 5000U), NX_ERROR_UNSUPPORTED);
+    EXPECT_EQ(nx_block_port_geometry(&port), nullptr);
+    EXPECT_EQ(command_cursor, program.size());
+    EXPECT_EQ(SDIO->CLKCR, ready_clock);
+}
+
 TEST_F(F1SdBlock, Cmd24ConfirmsOnlyAfterAcceptedBlockAndProgrammingReady) {
     ASSERT_NO_FATAL_FAILURE(init_write());
     ASSERT_NE(nx_block_port_geometry(&writable), nullptr);
@@ -410,6 +575,156 @@ TEST_F(F1SdBlock, Cmd24ConfirmsOnlyAfterAcceptedBlockAndProgrammingReady) {
     EXPECT_EQ(output_words.back(), 0x5aU);
     EXPECT_EQ(SDIO->DCTRL, 0U);
     EXPECT_EQ(SDIO->MASK, 0U);
+}
+
+TEST_F(F1SdBlock, FourLineDmaAcquiresOnlyItsFixedLane) {
+    DMA2->ISR = DMA_ISR_TCIF5;
+    EXPECT_EQ(nx_stm32f1_sdio_block_prepare_four_bit_dma(&block), NX_SUCCESS);
+    EXPECT_EQ(nx_block_port_state(&port), NX_BLOCK_STOPPED);
+    EXPECT_EQ(nx_stm32f1_sdio_block_close(&block), NX_SUCCESS);
+    EXPECT_EQ(RCC->AHBENR, RCC_AHBENR_DMA2EN);
+    EXPECT_EQ(DMA2->ISR, DMA_ISR_TCIF5);
+}
+
+TEST_F(F1SdBlock, FourLineDmaCopiesOnlyAfterWholeBlockAndSafeWithdrawal) {
+    ASSERT_NO_FATAL_FAILURE(init_dma());
+    DMA2->ISR = DMA_ISR_TCIF5;
+    read_commands(17U);
+    const auto read =
+        nx_block_port_read(&port, 17U, output, sizeof(output), 1U, 7000U);
+    EXPECT_EQ(read.result, NX_SUCCESS);
+    EXPECT_EQ(read.completed_blocks, 1U);
+    for (unsigned i = 0U; i < words_per_sector; ++i) {
+        EXPECT_EQ(output[4U * i], static_cast<uint8_t>(i));
+        EXPECT_EQ(output[4U * i + 1U], 0x33U);
+    }
+    EXPECT_EQ(DMA2_Channel4->CMAR, 0U);
+    EXPECT_EQ(DMA2_Channel4->CCR, 0U);
+    EXPECT_EQ(DMA2->ISR, DMA_ISR_TCIF5);
+    EXPECT_EQ(words_read, 0U);
+    EXPECT_EQ(SDIO->MASK | SDIO->DCTRL, 0U);
+    stop_dma_commands();
+    EXPECT_EQ(nx_block_port_stop(&port, 8000U), NX_SUCCESS);
+    EXPECT_EQ(nx_stm32f1_sdio_block_close(&block), NX_SUCCESS);
+    EXPECT_EQ(RCC->AHBENR, 0U);
+}
+
+TEST_F(F1SdBlock, DmaErrorAndStuckDisableNeverRetainThePublicBuffer) {
+    ASSERT_NO_FATAL_FAILURE(init_dma());
+    program.push_back({17U, 18U, SDIO_STA_CMDREND, transfer_ready, 0U, 0U});
+    dma_transfer_error = true;
+    blocked_dma_disable = true;
+    output[0] = 0x5aU;
+    const auto read =
+        nx_block_port_read(&port, 18U, output, sizeof(output), 1U, 7000U);
+    EXPECT_EQ(read.result, NX_ERROR_IO);
+    EXPECT_EQ(read.completed_blocks, 0U);
+    EXPECT_EQ(output[0], 0x5aU);
+    EXPECT_EQ(nx_block_port_state(&port), NX_BLOCK_UNCERTAIN);
+    EXPECT_EQ(nx_block_port_stop(&port, 8000U), NX_ERROR_IO);
+    constexpr uint32_t gates = RCC_AHBENR_DMA2EN | RCC_AHBENR_SDIOEN;
+    EXPECT_EQ(RCC->AHBENR & gates, gates);
+    EXPECT_EQ(SDIO->DCTRL, 0U);
+    EXPECT_NE(DMA2_Channel4->CCR & DMA_CCR_EN, 0U);
+    EXPECT_EQ(DMA2_Channel4->CMAR,
+              static_cast<uint32_t>(reinterpret_cast<uintptr_t>(dma_target)));
+    EXPECT_EQ(command_cursor, program.size());
+    blocked_dma_disable = false;
+    stop_dma_commands();
+    EXPECT_EQ(nx_block_port_stop(&port, 9000U), NX_SUCCESS);
+    EXPECT_EQ(output[0], 0x5aU);
+    EXPECT_EQ(command_cursor, program.size());
+    EXPECT_EQ(nx_stm32f1_sdio_block_close(&block), NX_SUCCESS);
+    EXPECT_EQ(RCC->AHBENR, 0U);
+}
+
+TEST_F(F1SdBlock, DmaCounterAndTcAloneCannotPublishTheBlock) {
+    ASSERT_NO_FATAL_FAILURE(init_dma());
+    program.push_back({17U, 7U, SDIO_STA_CMDREND, transfer_ready, 0U, 0U});
+    dma_card_crc = false;
+    output[0] = 0x5aU;
+    const auto read =
+        nx_block_port_read(&port, 7U, output, sizeof(output), 1U, 7000U);
+    EXPECT_EQ(read.result, NX_ERROR_TIMEOUT);
+    EXPECT_EQ(read.completed_blocks, 0U);
+    EXPECT_EQ(output[0], 0x5aU);
+    EXPECT_EQ(nx_block_port_state(&port), NX_BLOCK_UNCERTAIN);
+    stop_dma_commands();
+    EXPECT_EQ(nx_block_port_stop(&port, 8000U), NX_SUCCESS);
+    EXPECT_EQ(command_cursor, program.size());
+}
+
+TEST_F(F1SdBlock, FourLineCmd24ConfirmsWholeBlockThenReturnsToSingleLine) {
+    ASSERT_NO_FATAL_FAILURE(init_write(0U, true));
+    ASSERT_TRUE(nx_block_port_geometry(&writable)->writable);
+    EXPECT_EQ(SDIO->CLKCR, ready_clock | SDIO_CLKCR_WIDBUS_0);
+    write_command(42U);
+    ready_command(7U << 9U);
+    ready_command(transfer_ready);
+    output[0] = 0x11U;
+    output[508] = 0x5aU;
+    const auto done =
+        nx_block_port_write(&writable, 42U, output, sizeof(output), 1U, 7000U);
+    EXPECT_EQ(done.result, NX_SUCCESS);
+    EXPECT_EQ(done.completed_blocks, 1U);
+    ASSERT_EQ(output_words.size(), words_per_sector);
+    EXPECT_EQ(output_words.front(), 0x11U);
+    EXPECT_EQ(output_words.back(), 0x5aU);
+
+    ready_command(transfer_ready);
+    width_command(false);
+    program.push_back({7U, 0U, SDIO_STA_CMDSENT, 0U, 0U, 0U});
+    ready_command((3U << 9U) | (1U << 8U));
+    EXPECT_EQ(nx_block_port_stop(&writable, 8000U), NX_SUCCESS);
+    EXPECT_EQ(command_cursor, program.size());
+    EXPECT_EQ(SDIO->CLKCR, 0U);
+}
+
+TEST_F(F1SdBlock, FourLineUnderrunRetainsNoProgressThroughStopRetry) {
+    ASSERT_NO_FATAL_FAILURE(init_write(0U, true));
+    write_command(2U);
+    fail_after_words = 12U;
+    const auto failed =
+        nx_block_port_write(&writable, 2U, output, sizeof(output), 1U, 7000U);
+    EXPECT_EQ(failed.result, NX_ERROR_IO);
+    EXPECT_EQ(failed.completed_blocks, 0U);
+    EXPECT_EQ(output_words.size(), 12U);
+    EXPECT_EQ(nx_block_port_state(&writable), NX_BLOCK_UNCERTAIN);
+    EXPECT_EQ(
+        nx_block_port_write(&writable, 2U, output, sizeof(output), 1U, 7500U)
+            .result,
+        NX_ERROR_STATE);
+
+    ready_command(7U << 9U);
+    ready_command(transfer_ready);
+    width_command(false, SDIO_STA_CTIMEOUT);
+    EXPECT_EQ(nx_block_port_stop(&writable, 8000U), NX_ERROR_TIMEOUT);
+    EXPECT_EQ(SDIO->CLKCR, ready_clock | SDIO_CLKCR_WIDBUS_0);
+    EXPECT_NE(RCC->AHBENR & RCC_AHBENR_SDIOEN, 0U);
+    EXPECT_EQ(command_cursor, program.size());
+
+    ready_command(transfer_ready);
+    width_command(false);
+    program.push_back({7U, 0U, SDIO_STA_CMDSENT, 0U, 0U, 0U});
+    ready_command((3U << 9U) | (1U << 8U));
+    EXPECT_EQ(nx_block_port_stop(&writable, 9000U), NX_SUCCESS);
+    EXPECT_EQ(command_cursor, program.size());
+    EXPECT_EQ(output_words.size(), 12U);
+    EXPECT_EQ(SDIO->CLKCR, 0U);
+}
+
+TEST_F(F1SdBlock, FourLineDataEndWithoutCrcTokenCannotConfirmProgress) {
+    ASSERT_NO_FATAL_FAILURE(init_write(0U, true));
+    write_command(7U);
+    send_result_flags = 0U;
+    const auto failed =
+        nx_block_port_write(&writable, 7U, output, sizeof(output), 1U, 7000U);
+    EXPECT_EQ(failed.result, NX_ERROR_TIMEOUT);
+    EXPECT_EQ(failed.completed_blocks, 0U);
+    EXPECT_EQ(output_words.size(), words_per_sector);
+    EXPECT_EQ(SDIO->DCOUNT, 0U);
+    EXPECT_EQ(command_cursor, program.size());
+    EXPECT_EQ(nx_block_port_state(&writable), NX_BLOCK_UNCERTAIN);
 }
 
 TEST_F(F1SdBlock, WriteProtectionRefusesBeforeAnyCommand) {
@@ -564,8 +879,26 @@ extern "C" nx_time_us_t nx_time_now_us(void) {
 
 extern "C" void nx_sdio_model_write(volatile uint32_t* reg, uint32_t value) {
     ++writes;
-    if (reg == &SDIO->CLKCR && (value & SDIO_CLKCR_CLKEN) != 0U)
-        detect_clock_start = now;
+    if (reg == &DMA2_Channel4->CCR && (value & DMA_CCR_EN) == 0U &&
+        (DMA2_Channel4->CCR & DMA_CCR_EN) != 0U) {
+        EXPECT_EQ(SDIO->DCTRL, 0U);
+        if (blocked_dma_disable)
+            return;
+    }
+    if (reg == &DMA2->IFCR) {
+        EXPECT_EQ(value, DMA_IFCR_CTCIF4 | DMA_IFCR_CHTIF4 | DMA_IFCR_CTEIF4);
+        DMA2->ISR &= ~value;
+    }
+    if (reg == &SDIO->CLKCR && (value & SDIO_CLKCR_CLKEN) != 0U) {
+        if (((value ^ SDIO->CLKCR) & SDIO_CLKCR_WIDBUS_0) != 0U) {
+            EXPECT_EQ(writer_last_command, 6U);
+            EXPECT_EQ(SDIO->ARG, (value & SDIO_CLKCR_WIDBUS_0) != 0U ? 2U : 0U);
+            if (blocked_width)
+                return;
+        }
+        if (SDIO->CLKCR == 0U)
+            detect_clock_start = now;
+    }
     if (reg == &SDIO->ICR && !blocked_icr)
         SDIO->STA &= ~value;
     if (reg == &SDIO->CMD && (value & SDIO_CMD_CPSMEN) != 0U) {
@@ -580,6 +913,9 @@ extern "C" void nx_sdio_model_write(volatile uint32_t* reg, uint32_t value) {
                 EXPECT_EQ(SDIO->ARG, next.arg);
                 if (command == 0U)
                     reset_command_at = now;
+                if (command == 7U && next.arg == 0U) {
+                    EXPECT_EQ(SDIO->CLKCR, ready_clock);
+                }
                 if (command == 13U && lose_detect_after_status)
                     GPIOC->IDR = detect_pin;
                 pending_flags = next.flags;
@@ -599,9 +935,38 @@ extern "C" void nx_sdio_model_write(volatile uint32_t* reg, uint32_t value) {
             if (command == 17U) {
                 words_read = 0U;
                 SDIO->DCOUNT = 512U;
-                SDIO->STA |= SDIO_STA_RXACT;
-                if (generated_words != 0U)
-                    SDIO->STA |= SDIO_STA_RXDAVL;
+                if ((SDIO->DCTRL & SDIO_DCTRL_DMAEN) != 0U) {
+                    ASSERT_NE(dma_target, nullptr);
+                    EXPECT_EQ(SDIO->CLKCR, ready_clock | SDIO_CLKCR_WIDBUS_0);
+                    EXPECT_EQ(DMA2_Channel4->CCR, DMA_CCR_EN | DMA_CCR_MINC |
+                                                      DMA_CCR_PSIZE_1 |
+                                                      DMA_CCR_MSIZE_1);
+                    EXPECT_EQ(DMA2_Channel4->CNDTR, words_per_sector);
+                    EXPECT_EQ(DMA2_Channel4->CMAR,
+                              static_cast<uint32_t>(
+                                  reinterpret_cast<uintptr_t>(dma_target)));
+                    EXPECT_EQ(DMA2_Channel4->CPAR,
+                              static_cast<uint32_t>(
+                                  reinterpret_cast<uintptr_t>(&SDIO->FIFO)));
+                    dma_target[0] = 0x3300U;
+                    if (dma_transfer_error) {
+                        DMA2->ISR |= DMA_ISR_TEIF4;
+                        SDIO->STA |= SDIO_STA_RXACT;
+                    } else {
+                        for (unsigned i = 0U; i < words_per_sector; ++i)
+                            dma_target[i] = 0x3300U | i;
+                        DMA2_Channel4->CNDTR = 0U;
+                        DMA2->ISR |= DMA_ISR_TCIF4;
+                        SDIO->DCOUNT = 0U;
+                        SDIO->STA |= SDIO_STA_DATAEND;
+                        if (dma_card_crc)
+                            SDIO->STA |= SDIO_STA_DBCKEND;
+                    }
+                } else {
+                    SDIO->STA |= SDIO_STA_RXACT;
+                    if (generated_words != 0U)
+                        SDIO->STA |= SDIO_STA_RXDAVL;
+                }
             }
         }
     } else if (reg == &SDIO->CMD && !hold_command) {

@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "id": "stm32f103rb-tim1-adc1-three-leg-software",
+  "soc": "STM32F103RBT6",
+  "soc_family": "stm32f1",
+  "source_revision": "DS5319 Rev20 Table 5, disconnected LQFP64 software reference",
+  "physical_pcb_revision": null,
+  "clocks": {},
+  "bindings": [
+    {
+      "id": "cycle",
+      "controller": "PWM_ADC1",
+      "route": "tim1-cc4-adc1-finite-three-legs",
+      "supply_mv": 3300
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14",
+    "PA15",
+    "PB3",
+    "PB4"
+  ],
+  "backend_support": [
+    "baremetal"
+  ],
+  "provenance": [
+    "https://www.st.com/resource/en/datasheet/stm32f103rb.pdf",
+    "https://www.st.com/resource/en/reference_manual/rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32-bit-mcus-stmicroelectronics.pdf",
+    "https://www.st.com/resource/en/errata_sheet/es096-stm32f101x8b-stm32f102x8b-and-stm32f103x8b-mediumdensity-device-errata-stmicroelectronics.pdf"
+  ],
+  "unknowns": [
+    "PA8/PA9/PA10 and PB13/PB14/PB15 are disconnected software reference signals.",
+    "PB12 needs an independent active-low break input and PA1 an in-range analog witness.",
+    "Gate-driver polarity and propagation, blanking, physical isolation and timer interrupt latency have not been tested."
+  ]
+}

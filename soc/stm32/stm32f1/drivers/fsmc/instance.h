@@ -1,6 +1,6 @@
 /**
  * \file            instance.h
- * \brief           Private STM32F1 asynchronous SRAM bank owner.
+ * \brief           Private STM32F1 asynchronous bank owner.
  * \author          Nexus Team
  */
 #ifndef NEXUS_STM32F1_FSMC_INSTANCE_H
@@ -9,6 +9,11 @@
 #include "drivers/gpio/instance.h"
 #include "nexus/io/external_bus.h"
 #include "nexus/io/memory_window.h"
+#include "nexus/io/parallel16.h"
+
+/* On a 16-bit bus, CN16 RS on FSMC_A0 is CPU address bit 1. */
+#define NX_STM32F1_FSMC_LCD_COMMAND UINT32_C(0x6c000000)
+#define NX_STM32F1_FSMC_LCD_DATA    UINT32_C(0x6c000002)
 
 #ifdef __cplusplus
 extern "C" {
@@ -48,7 +53,7 @@ typedef struct {
     bool prepared;
 } nx_stm32f1_fsmc_t;
 
-/** \brief Acquire the selected NE3 bank under fixed HSI8 ownership. */
+/** \brief Acquire the selected NE bank under fixed HSI8 ownership. */
 nx_result_t nx_stm32f1_fsmc_prepare(nx_stm32f1_fsmc_t* bus,
                                     const nx_stm32f1_fsmc_config_t* config);
 
@@ -57,6 +62,7 @@ nx_result_t nx_stm32f1_fsmc_stop(nx_stm32f1_fsmc_t* bus);
 
 extern const nx_external_bus_ops_t nx_stm32f1_fsmc_ops;
 extern const nx_memory_window_ops_t nx_stm32f1_fsmc_window_ops;
+extern const nx_parallel16_ops_t nx_stm32f1_fsmc_parallel16_ops;
 
 #ifdef __cplusplus
 }

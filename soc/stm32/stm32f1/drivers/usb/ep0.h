@@ -45,6 +45,7 @@ typedef struct {
     uint8_t staged_address;
     bool address_pending;
     bool observed_full_speed;
+    bool reset_candidate;
 } nx_stm32f1_ep0_t;
 
 /**

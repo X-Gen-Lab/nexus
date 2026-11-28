@@ -18,6 +18,18 @@ find_package(Nexus CONFIG REQUIRED)
 nexus_add_platform(ASSEMBLY "${NEXUS_ASSEMBLY_FILE}")
 nexus_add_firmware(nexus_stm32f1_i2c_target_consumer SOURCES main.c)
 nexus_target_warnings(nexus_stm32f1_i2c_target_consumer STRICT)
+nexus_controller_modes(target_modes i2c_target)
+if("target-tx-irq" IN_LIST target_modes)
+    target_compile_definitions(
+        nexus_stm32f1_i2c_target_consumer
+        PRIVATE NX_F1_TARGET_TX_FIXTURE=1
+    )
+elseif("target-write-read-irq" IN_LIST target_modes)
+    target_compile_definitions(
+        nexus_stm32f1_i2c_target_consumer
+        PRIVATE NX_F1_TARGET_WRITE_READ_FIXTURE=1
+    )
+endif()
 
 find_package(Python3 3.11 REQUIRED COMPONENTS Interpreter)
 get_target_property(fixture_source Nexus::Config NEXUS_SOURCE_DIR)

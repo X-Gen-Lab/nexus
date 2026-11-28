@@ -1,0 +1,27 @@
+# Full-SWJ-preserving STM32F107VC SPI3 software reference.
+schema = 2
+board_package = "f107vc-spi3-board"
+backend = "baremetal"
+clock = "hse25-crystal-pll72"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+flash_load_limit_bytes = 24576
+static_ram_limit_bytes = 6144
+libc_heap_bytes = 0
+
+[spi.spi3]
+binding = "spi3"
+mode = "short-poll"
+max_hz = 4500000
+
+[spi_device.spi3_target]
+driver = "spi-transaction"
+controller = "spi3"
+cs_binding = "spi3-cs"
+mode = 0
+max_hz = 4500000
+
+[factory]
+capabilities = true

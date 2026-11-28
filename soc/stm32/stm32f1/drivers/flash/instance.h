@@ -7,6 +7,7 @@
 #define NX_STM32F1_FLASH_INSTANCE_H
 
 #include "nexus/io/flash.h"
+#include "nexus/io/flash_maintenance.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -26,6 +27,7 @@ typedef struct {
 } nx_stm32f1_flash_state_t;
 
 extern const nx_flash_ops_t nx_stm32f1_flash_ops;
+extern const nx_flash_maintenance_ops_t nx_stm32f1_flash_maintenance_ops;
 
 /** \brief Bind the complete geometry for a reviewed STM32F103.
  * \param[in,out] port: Unprepared, serialized owner.

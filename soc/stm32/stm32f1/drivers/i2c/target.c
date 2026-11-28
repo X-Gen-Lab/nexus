@@ -1,6 +1,6 @@
 /**
  * \file            target.c
- * \brief           F103 I2C1 finite receive-only target with IRQ settlement.
+ * \brief           F103 I2C1 finite target with IRQ settlement.
  * \author          Nexus Team
  * \version         1.0.0
  * \date            2026-11-28
@@ -12,15 +12,29 @@
 #include "system/platform.h"
 
 #if !defined(STM32F103xB)
-#error "I2C1 target reception is reviewed only for STM32F103xB"
+#error "I2C1 target operation is reviewed only for STM32F103xB"
 #endif
 
 #define I2C_FREQ_MHZ 8U
 #define I2C_BAUD     80000U
 #define LINES        (GPIO_IDR_IDR6 | GPIO_IDR_IDR7)
-#define PUBLISHERS   (I2C_CR2_ITEVTEN | I2C_CR2_ITERREN | I2C_CR2_ITBUFEN)
+#define TX_IRQS      (I2C_CR2_ITEVTEN | I2C_CR2_ITERREN)
+#define PUBLISHERS   (TX_IRQS | I2C_CR2_ITBUFEN)
+#if defined(NX_STM32F1_I2C_TARGET_TX)
+#define TARGET_DIRECTION NX_I2C_TARGET_TRANSMIT
+#define ARMED_IRQS       TX_IRQS
+#define AF_ERROR         0U
+#elif defined(NX_STM32F1_I2C_TARGET_WRITE_READ)
+#define TARGET_DIRECTION NX_I2C_TARGET_WRITE_READ
+#define ARMED_IRQS       PUBLISHERS
+#define AF_ERROR         0U
+#else
+#define TARGET_DIRECTION NX_I2C_TARGET_RECEIVE
+#define ARMED_IRQS       PUBLISHERS
+#define AF_ERROR         I2C_SR1_AF
+#endif
 #define I2C_ERRORS                                                             \
-    (I2C_SR1_BERR | I2C_SR1_ARLO | I2C_SR1_OVR | I2C_SR1_AF | I2C_SR1_TIMEOUT)
+    (I2C_SR1_BERR | I2C_SR1_ARLO | I2C_SR1_OVR | AF_ERROR | I2C_SR1_TIMEOUT)
 
 _Static_assert(I2C1_EV_IRQn == 31 && I2C1_ER_IRQn == 32,
                "Exact STM32F103 SVT vector identities");
@@ -114,13 +128,37 @@ static bool independent(const nx_stm32f1_i2c_target_t* state, const void* ptr,
 }
 
 static bool request_shape(const nx_stm32f1_i2c_target_t* state,
-                          const nx_i2c_target_request_t* request, uint8_t* rx,
-                          size_t bytes) {
+                          const nx_i2c_target_request_t* request,
+                          const uint8_t* rx, size_t rx_bytes, const uint8_t* tx,
+                          size_t tx_bytes) {
+#if defined(NX_STM32F1_I2C_TARGET_WRITE_READ)
+    return rx_bytes != 0U && rx_bytes <= NX_I2C_TARGET_MAX_BYTES &&
+           tx_bytes != 0U && tx_bytes <= NX_I2C_TARGET_MAX_BYTES &&
+           independent(state, request, sizeof(*request),
+                       _Alignof(nx_i2c_target_request_t)) &&
+           independent(state, rx, rx_bytes, 1U) &&
+           independent(state, tx, tx_bytes, 1U) &&
+           !nx_io_dispatch_overlap(request, sizeof(*request), rx, rx_bytes) &&
+           !nx_io_dispatch_overlap(request, sizeof(*request), tx, tx_bytes) &&
+           !nx_io_dispatch_overlap(rx, rx_bytes, tx, tx_bytes);
+#else
+#if defined(NX_STM32F1_I2C_TARGET_TX)
+    if (rx != NULL || rx_bytes != 0U)
+        return false;
+    const uint8_t* payload = tx;
+    const size_t bytes = tx_bytes;
+#else
+    if (tx != NULL || tx_bytes != 0U)
+        return false;
+    const uint8_t* payload = rx;
+    const size_t bytes = rx_bytes;
+#endif
     return bytes != 0U && bytes <= NX_I2C_TARGET_MAX_BYTES &&
            independent(state, request, sizeof(*request),
                        _Alignof(nx_i2c_target_request_t)) &&
-           independent(state, rx, bytes, 1U) &&
-           !nx_io_dispatch_overlap(request, sizeof(*request), rx, bytes);
+           independent(state, payload, bytes, 1U) &&
+           !nx_io_dispatch_overlap(request, sizeof(*request), payload, bytes);
+#endif
 }
 
 static nx_result_t
@@ -137,11 +175,11 @@ prepare_request(void* context, nx_i2c_target_request_t* request, uint8_t* rx,
     if (state->active != NULL) {
         return NX_ERROR_BUSY;
     }
-    if (direction != NX_I2C_TARGET_RECEIVE) {
+    if (direction != TARGET_DIRECTION) {
         return NX_ERROR_UNSUPPORTED;
     }
-    if (tx != NULL || tx_length != 0U || deadline == NX_DEADLINE_NEVER ||
-        !request_shape(state, request, rx, length)) {
+    if (deadline == NX_DEADLINE_NEVER ||
+        !request_shape(state, request, rx, length, tx, tx_length)) {
         return NX_ERROR_INVALID;
     }
     if (nx_deadline_expired(deadline, nx_time_now_us())) {
@@ -156,8 +194,8 @@ prepare_request(void* context, nx_i2c_target_request_t* request, uint8_t* rx,
     request->time_epoch = state->generation;
     request->rx = rx;
     request->rx_capacity = length;
-    request->tx = NULL;
-    request->tx_length = 0U;
+    request->tx = tx;
+    request->tx_length = tx_length;
     request->direction = direction;
     request->rx_received = request->tx_completed = 0U;
     request->faults = request->matched_address = request->address_phases = 0U;
@@ -181,7 +219,8 @@ static void end_request(nx_stm32f1_i2c_target_t* state, nx_result_t result) {
     }
 }
 
-/** \brief Use clock stretching and the highest IRQ priority for ES096 EV2. */
+/** \brief Use clock stretching and the highest IRQ priority for ES096 byte
+ * windows. */
 static bool arm(uint8_t address) {
     const uint32_t oar = (1U << 14U) | ((uint32_t)address << 1U);
     WRITE_REG(I2C1->CR1, 0U);
@@ -201,10 +240,10 @@ static bool arm(uint8_t address) {
         NVIC_GetEnableIRQ(I2C1_ER_IRQn) == 0U) {
         return false;
     }
-    WRITE_REG(I2C1->CR2, I2C_FREQ_MHZ | PUBLISHERS);
+    WRITE_REG(I2C1->CR2, I2C_FREQ_MHZ | ARMED_IRQS);
     WRITE_REG(I2C1->CR1, I2C_CR1_PE | I2C_CR1_ACK);
     nx_arch_dsb();
-    return READ_REG(I2C1->CR2) == (I2C_FREQ_MHZ | PUBLISHERS) &&
+    return READ_REG(I2C1->CR2) == (I2C_FREQ_MHZ | ARMED_IRQS) &&
            READ_REG(I2C1->CR1) == (I2C_CR1_PE | I2C_CR1_ACK);
 }
 
@@ -227,10 +266,10 @@ static nx_result_t submit(void* context, nx_i2c_target_request_t* request) {
         request->time_epoch != state->generation) {
         return NX_ERROR_STATE;
     }
-    if (request->direction != NX_I2C_TARGET_RECEIVE || request->tx != NULL ||
-        request->tx_length != 0U ||
+    if (request->direction != TARGET_DIRECTION ||
         request->base.deadline == NX_DEADLINE_NEVER ||
-        !request_shape(state, request, request->rx, request->rx_capacity)) {
+        !request_shape(state, request, request->rx, request->rx_capacity,
+                       request->tx, request->tx_length)) {
         return NX_ERROR_INVALID;
     }
     if (nx_deadline_expired(request->base.deadline, nx_time_now_us())) {
@@ -248,6 +287,9 @@ static nx_result_t submit(void* context, nx_i2c_target_request_t* request) {
     if (accepted == NX_SUCCESS) {
         state->active = request;
         state->count = state->phases = 0U;
+#if defined(NX_STM32F1_I2C_TARGET_WRITE_READ)
+        state->received = 0U;
+#endif
         state->faults = 0U;
         state->terminal = NX_ERROR_BUSY;
         if (!arm(state->address)) {
@@ -264,6 +306,85 @@ static void receive_fault(nx_stm32f1_i2c_target_t* state, uint32_t flag,
     state->faults |= flag;
     end_request(state, result);
 }
+
+#if defined(NX_STM32F1_I2C_TARGET_TX) ||                                       \
+    defined(NX_STM32F1_I2C_TARGET_WRITE_READ)
+/** \brief Keep one byte in the pipeline until BTF or terminal AF proves it. */
+static void transmit_irq(nx_stm32f1_i2c_target_t* state, uint32_t status) {
+    const nx_i2c_target_request_t* request = state->active;
+#if defined(NX_STM32F1_I2C_TARGET_TX)
+    if ((status & I2C_SR1_ADDR) != 0U) {
+        const uint32_t address_status = READ_REG(I2C1->SR2);
+        if ((address_status & I2C_SR2_TRA) == 0U || state->phases != 0U ||
+            (status &
+             (I2C_SR1_STOPF | I2C_SR1_RXNE | I2C_SR1_AF | I2C_SR1_BTF)) != 0U) {
+            receive_fault(state, NX_I2C_TARGET_PROTOCOL_ERROR, NX_ERROR_IO);
+            return;
+        }
+        /* EV3_1 stretches SCL until the first DR store after clearing ADDR. */
+        state->phases = 1U;
+        WRITE_REG(I2C1->DR, request->tx[0]);
+        return;
+    }
+#endif
+    if ((status & I2C_SR1_RXNE) != 0U ||
+        ((status & I2C_SR1_STOPF) != 0U && (status & I2C_SR1_AF) == 0U)) {
+        receive_fault(state, NX_I2C_TARGET_PROTOCOL_ERROR, NX_ERROR_IO);
+        return;
+    }
+    if ((status & (I2C_SR1_AF | I2C_SR1_BTF)) == 0U)
+        return;
+    const bool nack = (status & I2C_SR1_AF) != 0U;
+    if (nack)
+        WRITE_REG(I2C1->SR1, ~(uint32_t)I2C_SR1_AF);
+    if (state->phases == 0U || state->count >= request->tx_length) {
+        receive_fault(state, NX_I2C_TARGET_PROTOCOL_ERROR, NX_ERROR_IO);
+        return;
+    }
+    ++state->count;
+    const bool complete = state->count == request->tx_length;
+    if (nack && complete) {
+        end_request(state, NX_SUCCESS);
+    } else if (nack || complete) {
+        receive_fault(state, NX_I2C_TARGET_PROTOCOL_ERROR, NX_ERROR_IO);
+    } else {
+        /* No TXE prefetch. Empty DR at BTF stretches the next ACK window. */
+        WRITE_REG(I2C1->DR, request->tx[state->count]);
+    }
+}
+#endif
+
+#if defined(NX_STM32F1_I2C_TARGET_WRITE_READ)
+/** \brief Admit only W then R at the local address, with EV2 already drained.
+ */
+static void exchange_address(nx_stm32f1_i2c_target_t* state, uint32_t status) {
+    const bool transmit = (READ_REG(I2C1->SR2) & I2C_SR2_TRA) != 0U;
+    if ((status & (I2C_SR1_RXNE | I2C_SR1_BTF | I2C_SR1_STOPF | I2C_SR1_AF)) !=
+            0U ||
+        (!transmit && (status & I2C_SR1_TXE) != 0U)) {
+        receive_fault(state, NX_I2C_TARGET_PROTOCOL_ERROR, NX_ERROR_IO);
+        return;
+    }
+    if (state->phases == 0U && !transmit) {
+        state->phases = 1U;
+        return;
+    }
+    if (state->phases != 1U || !transmit || state->count == 0U) {
+        receive_fault(state, NX_I2C_TARGET_PROTOCOL_ERROR, NX_ERROR_IO);
+        return;
+    }
+    /* The first DR write ends address stretching. Mask TXE before release. */
+    WRITE_REG(I2C1->CR2, I2C_FREQ_MHZ | TX_IRQS);
+    if (READ_REG(I2C1->CR2) != (I2C_FREQ_MHZ | TX_IRQS)) {
+        end_request(state, NX_ERROR_IO);
+        return;
+    }
+    state->received = state->count;
+    state->count = 0U;
+    state->phases = 2U;
+    WRITE_REG(I2C1->DR, state->active->tx[0]);
+}
+#endif
 
 void nx_stm32f1_i2c_target_irq(nx_stm32f1_i2c_target_t* state) {
     if (state == NULL || state->active == NULL ||
@@ -286,10 +407,27 @@ void nx_stm32f1_i2c_target_irq(nx_stm32f1_i2c_target_t* state) {
             (((status & I2C_SR1_ARLO) != 0U) ? NX_I2C_TARGET_ARBITRATION : 0U) |
             (((status & I2C_SR1_TIMEOUT) != 0U) ? NX_I2C_TARGET_CLOCK_TIMEOUT
                                                 : 0U) |
-            (((status & I2C_SR1_AF) != 0U) ? NX_I2C_TARGET_PROTOCOL_ERROR : 0U);
+            (((status & AF_ERROR) != 0U) ? NX_I2C_TARGET_PROTOCOL_ERROR : 0U);
         end_request(state, NX_ERROR_IO);
         return;
     }
+#if defined(NX_STM32F1_I2C_TARGET_TX)
+    transmit_irq(state, status);
+#else
+#if defined(NX_STM32F1_I2C_TARGET_WRITE_READ)
+    if ((status & I2C_SR1_ADDR) != 0U) {
+        exchange_address(state, status);
+        return;
+    }
+    if (state->phases == 2U) {
+        transmit_irq(state, status);
+        return;
+    }
+    if ((status & I2C_SR1_AF) != 0U) {
+        receive_fault(state, NX_I2C_TARGET_PROTOCOL_ERROR, NX_ERROR_IO);
+        return;
+    }
+#else
     if ((status & I2C_SR1_ADDR) != 0U) {
         const uint32_t address_status = READ_REG(I2C1->SR2);
         if ((address_status & I2C_SR2_TRA) != 0U || state->phases != 0U ||
@@ -299,6 +437,7 @@ void nx_stm32f1_i2c_target_irq(nx_stm32f1_i2c_target_t* state) {
         }
         state->phases = 1U;
     }
+#endif
     if ((status & I2C_SR1_TXE) != 0U) {
         receive_fault(state, NX_I2C_TARGET_PROTOCOL_ERROR, NX_ERROR_IO);
         return;
@@ -320,12 +459,17 @@ void nx_stm32f1_i2c_target_irq(nx_stm32f1_i2c_target_t* state) {
         state->active->rx[state->count++] = (uint8_t)READ_REG(I2C1->DR);
     }
     if ((status & I2C_SR1_STOPF) != 0U) {
+#if defined(NX_STM32F1_I2C_TARGET_WRITE_READ)
+        receive_fault(state, NX_I2C_TARGET_PROTOCOL_ERROR, NX_ERROR_IO);
+#else
         if (state->phases == 1U) {
             end_request(state, NX_SUCCESS);
         } else {
             receive_fault(state, NX_I2C_TARGET_PROTOCOL_ERROR, NX_ERROR_IO);
         }
+#endif
     }
+#endif
 }
 
 /** \brief Thread alone can settle after both publishers and reset agree. */
@@ -353,13 +497,26 @@ static void service(void* context) {
                     result = NX_ERROR_TIMEOUT;
                 }
             }
+#if defined(NX_STM32F1_I2C_TARGET_WRITE_READ)
+            const bool switched = state->phases == 2U;
+            request->rx_received = switched ? state->received : state->count;
+            request->tx_completed = switched ? state->count : 0U;
+#elif defined(NX_STM32F1_I2C_TARGET_TX)
+            request->tx_completed = state->count;
+#else
             request->rx_received = state->count;
+#endif
             request->faults = state->faults;
             request->matched_address =
                 state->phases != 0U ? state->address : 0U;
             request->address_phases = state->phases;
             state->active = NULL;
+#if defined(NX_STM32F1_I2C_TARGET_WRITE_READ)
+            nx_request_settle(&request->base, result,
+                              request->rx_received + request->tx_completed);
+#else
             nx_request_settle(&request->base, result, state->count);
+#endif
         } else {
             (void)nx_request_transition(&state->active->base,
                                         NX_REQUEST_QUARANTINED);

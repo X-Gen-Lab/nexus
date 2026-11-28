@@ -3,7 +3,11 @@
   "bindings": [
     {
       "kind": "i2c_target",
-      "mode": "target-rx-irq",
+      "modes": [
+        "target-rx-irq",
+        "target-tx-irq",
+        "target-write-read-irq"
+      ],
       "implementation": "i2c_target",
       "controllers": [
         "I2C1"
@@ -11,7 +15,6 @@
       "headers": [
         "drivers/i2c/target.h"
       ],
-      "i2c_target_receive_only": true,
       "limits": {
         "address_bits": [
           7,

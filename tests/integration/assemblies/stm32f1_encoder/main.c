@@ -22,7 +22,7 @@ int main(void) {
                        nx_encoder_read(encoder, &sample) == NX_SUCCESS &&
                        sample.count <= UINT16_MAX &&
                        nx_encoder_state(encoder, &state) == NX_SUCCESS &&
-                       state.mode == NX_ENCODER_MODE_X4 &&
+                       state.mode == EXPECTED_ENCODER_MODE &&
                        state.counter_bits == 16U && state.running;
     const nx_result_t stopped = nx_encoder_stop(encoder);
     const nx_result_t closed = nx_platform_stop();

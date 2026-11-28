@@ -1,0 +1,15 @@
+# Baremetal F103RB proof with PA0 reserved for the independent WKUP circuit.
+schema = 2
+board_package = "board"
+backend = "baremetal"
+clock = "hsi8"
+optimization = "Os"
+
+[hardware]
+standby_wakeup = "pa0-wkup"
+
+[memory]
+main_stack_bytes = 2048
+flash_load_limit_bytes = 24576
+static_ram_limit_bytes = 6144
+libc_heap_bytes = 0

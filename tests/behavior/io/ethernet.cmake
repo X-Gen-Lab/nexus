@@ -3,10 +3,10 @@ nexus_google_test(nexus_ethernet_api_test SOURCES "${nexus_google_root}/soc/stm3
     LIBRARIES Nexus::IO
 )
 nexus_google_test(nexus_ethernet_mac_test SOURCES "${nexus_google_root}/soc/stm32/stm32f4/ethernet/ethernet_mac_test.cpp"
-    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/common/dwmac/eth_mac.c"
     LIBRARIES Nexus::IO Nexus::Arch
     INCLUDES
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/legacy_mac" "${NEXUS_SOURCE_DIR}/io/private"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/common/dwmac" "${NEXUS_SOURCE_DIR}/io/private"
 )
 target_compile_options(
     nexus_ethernet_mac_test
@@ -17,10 +17,10 @@ target_compile_options(
 foreach(eth_family stm32)
     set(eth_target "nexus_${eth_family}_ethernet_test")
     nexus_google_test(${eth_target} SOURCES "${nexus_google_root}/soc/stm32/stm32f4/ethernet/ethernet_mac_test.cpp"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/common/dwmac/eth_mac.c"
         LIBRARIES Nexus::IO Nexus::Arch
         INCLUDES
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/legacy_mac" "${NEXUS_SOURCE_DIR}/io/private"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/common/dwmac" "${NEXUS_SOURCE_DIR}/io/private"
     )
     target_compile_options(
         ${eth_target}
@@ -53,7 +53,7 @@ endforeach()
 nexus_google_test(nexus_ethernet_native_test SOURCES "${nexus_google_root}/soc/stm32/stm32f4/ethernet/ethernet_native_test.cpp"
     LIBRARIES Nexus::NativeModel Nexus::Arch
     INCLUDES
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/legacy_mac" "${NEXUS_SOURCE_DIR}/tests/support/native/drivers"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/legacy_mac" "${NEXUS_SOURCE_DIR}/soc/stm32/common/dwmac" "${NEXUS_SOURCE_DIR}/tests/support/native/drivers"
         "${NEXUS_SOURCE_DIR}/io/private"
 )
 nexus_google_test(nexus_dp83848_test SOURCES "${nexus_google_root}/components/devices/dp83848_test.cpp"

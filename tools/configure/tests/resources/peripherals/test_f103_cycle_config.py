@@ -52,3 +52,20 @@ class F103PwmAdcConfigurationTests(unittest.TestCase):
                     manifest.write_text(json.dumps(
                         dict(board, bindings=board["bindings"] + additions)))
                     gate.resolve_ir(assembly)
+
+
+class F103ThreeLegConfigurationTests(unittest.TestCase):
+    def test_route_claims_every_leg_and_one_adc_sample(self):
+        result = gate.resolve_ir(
+            gate.ROOT / "tests/integration/assemblies/stm32f1_pwm_adc/f103rb-three-legs.toml")
+        face, = result.controllers
+        self.assertEqual((face.mode, face.options.channels, face.dma),
+                         ("finite-injected", (1,), ()))
+        owned = {claim.key for claim in result.resource_plan.claims
+                 if claim.owner == "three"}
+        self.assertTrue({
+            "pin:PA8", "pin:PA9", "pin:PA10",
+            "pin:PB12", "pin:PB13", "pin:PB14", "pin:PB15", "pin:PA1",
+            "controller:TIM1", "controller:ADC1",
+            "register:AFIO_MAPR/TIM1_REMAP",
+        } <= owned)

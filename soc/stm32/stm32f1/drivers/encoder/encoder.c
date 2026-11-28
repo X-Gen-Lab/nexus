@@ -19,6 +19,20 @@ enum { AFIO_GATE = 1U, TIMER_GATE = 2U, LIVE = 4U };
 enum { PHASE_PINS = (1U << 6U) | (1U << 7U) };
 #define PHASE_ENABLES (TIM_CCER_CC1E | TIM_CCER_CC2E)
 
+#ifndef NX_STM32F1_ENCODER_MODE
+#define NX_STM32F1_ENCODER_MODE NX_ENCODER_MODE_X4
+#endif
+
+/* The locked F1 LL header resolves the transposed x2 prose in RM0008. */
+_Static_assert((uint32_t)NX_ENCODER_MODE_X2_A == LL_TIM_ENCODERMODE_X2_TI1 &&
+                   (uint32_t)NX_ENCODER_MODE_X2_B ==
+                       LL_TIM_ENCODERMODE_X2_TI2 &&
+                   (uint32_t)NX_ENCODER_MODE_X4 == LL_TIM_ENCODERMODE_X4_TI12,
+               "STM32F1 encoder logical phase must match the LL selector");
+_Static_assert(NX_STM32F1_ENCODER_MODE >= NX_ENCODER_MODE_X2_A &&
+                   NX_STM32F1_ENCODER_MODE <= NX_ENCODER_MODE_X4,
+               "An exact STM32F1 encoder counting mode is required");
+
 /** \brief Return only a temporary AFIO clock taken by this instance. */
 static bool release_afio(nx_stm32f1_encoder_t* state) {
     if ((state->effects & AFIO_GATE) != 0U) {
@@ -47,7 +61,8 @@ static bool withdraw(void) {
            (TIM3->CCER & PHASE_ENABLES) == 0U && TIM3->DIER == 0U;
 }
 
-/** \brief Program direct TI1/TI2, independent qualification and x4 counting. */
+/** \brief Program direct TI1/TI2, independent qualification and selected
+ * counting. */
 static bool configure_timer(const nx_stm32f1_encoder_config_t* config) {
     const uint32_t inputs = TIM_CCMR1_CC1S_0 | TIM_CCMR1_CC2S_0 |
                             ((uint32_t)config->filter_a << TIM_CCMR1_IC1F_Pos) |
@@ -56,10 +71,10 @@ static bool configure_timer(const nx_stm32f1_encoder_config_t* config) {
                               (config->invert_b ? TIM_CCER_CC2P : 0U);
     NX_STM32F1_WRITE(&TIM3->CCMR1, inputs);
     NX_STM32F1_WRITE(&TIM3->CCER, polarity);
-    LL_TIM_SetEncoderMode(TIM3, LL_TIM_ENCODERMODE_X4_TI12);
+    LL_TIM_SetEncoderMode(TIM3, (uint32_t)NX_STM32F1_ENCODER_MODE);
     nx_arch_dsb();
     return TIM3->CCMR1 == inputs && TIM3->CCER == polarity &&
-           TIM3->SMCR == LL_TIM_ENCODERMODE_X4_TI12 && TIM3->CR1 == 0U &&
+           TIM3->SMCR == (uint32_t)NX_STM32F1_ENCODER_MODE && TIM3->CR1 == 0U &&
            TIM3->CR2 == 0U && TIM3->DIER == 0U && TIM3->CCMR2 == 0U &&
            TIM3->CNT == 0U && TIM3->PSC == 0U && TIM3->ARR == UINT16_MAX;
 }
@@ -234,7 +249,7 @@ static nx_result_t describe(const void* context, nx_encoder_state_t* output) {
     }
     *output = (nx_encoder_state_t){
         .filter_clock_hz = 8000000U,
-        .mode = NX_ENCODER_MODE_X4,
+        .mode = NX_STM32F1_ENCODER_MODE,
         .counter_bits = 16U,
         .filter_a = filters[state->config->filter_a],
         .filter_b = filters[state->config->filter_b],

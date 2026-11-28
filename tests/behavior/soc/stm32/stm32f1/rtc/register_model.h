@@ -58,4 +58,6 @@ void nx_f1_rtc_model_write(volatile uint32_t* reg, uint32_t value);
 #define BKP                          (&nx_f1_rtc_model_bkp)
 #define NX_STM32F1_RTC_READ(reg)     nx_f1_rtc_model_read((reg))
 #define NX_STM32F1_WRITE(reg, value) nx_f1_rtc_model_write((reg), (value))
+#define NX_STM32F1_RTC_PROVISION_IRQS_IDLE()                                   \
+    (!nx_f1_rtc_model_get_enable(RTC_Alarm_IRQn))
 #endif

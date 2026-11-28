@@ -35,6 +35,11 @@
 
 enum { OWN_GATES = 1U, OWN_DBP = 2U, LIVE = 4U };
 
+#ifdef NX_STM32F1_RTC_PROVISION
+enum { OWN_LSE_ATTEMPT = 8U, OWN_RTC_CONFIG = 16U, PROVISIONED = 32U };
+static nx_result_t release_provision(nx_stm32f1_rtc_t* state);
+#endif
+
 _Static_assert(offsetof(BKP_TypeDef, DR10) - offsetof(BKP_TypeDef, DR1) ==
                    (BKP_WORDS - 1U) * sizeof(uint32_t),
                "RM0008 F103xB backup words are contiguous APB registers");
@@ -78,6 +83,11 @@ nx_result_t nx_stm32f1_rtc_close(nx_stm32f1_rtc_t* state) {
         return NX_ERROR_INVALID;
 
     state->effects &= (uint8_t)~LIVE;
+#ifdef NX_STM32F1_RTC_PROVISION
+    const nx_result_t provision = release_provision(state);
+    if (provision != NX_SUCCESS)
+        return provision;
+#endif
     if ((state->effects & OWN_DBP) != 0U) {
         if ((RCC->APB1ENR & RCC_APB1ENR_PWREN) == 0U ||
             (RCC->APB1RSTR & RCC_APB1RSTR_PWRRST) != 0U || !write_access(false))
@@ -87,7 +97,11 @@ nx_result_t nx_stm32f1_rtc_close(nx_stm32f1_rtc_t* state) {
     if ((state->effects & OWN_GATES) != 0U &&
         !nx_stm32f1_write_masked(&RCC->APB1ENR, GATES, 0U))
         return NX_ERROR_IO;
+#ifdef NX_STM32F1_RTC_PROVISION
+    state->effects &= PROVISIONED;
+#else
     state->effects = 0U;
+#endif
     return NX_SUCCESS;
 }
 
@@ -147,6 +161,197 @@ nx_result_t nx_stm32f1_rtc_prepare(nx_stm32f1_rtc_t* state) {
     state->effects |= LIVE;
     return NX_SUCCESS;
 }
+
+#ifdef NX_STM32F1_RTC_PROVISION
+
+#ifndef NX_STM32F1_RTC_PROVISION_IRQS_IDLE
+#define NX_STM32F1_RTC_PROVISION_IRQS_IDLE()                                   \
+    (NVIC_GetEnableIRQ(RTC_IRQn) == 0U &&                                      \
+     NVIC_GetPendingIRQ(RTC_IRQn) == 0U && NVIC_GetActive(RTC_IRQn) == 0U &&   \
+     NVIC_GetEnableIRQ(RTC_Alarm_IRQn) == 0U &&                                \
+     NVIC_GetPendingIRQ(RTC_Alarm_IRQn) == 0U &&                               \
+     NVIC_GetActive(RTC_Alarm_IRQn) == 0U)
+#endif
+
+#define RTC_EXTI_ALARM_LINE (UINT32_C(1) << 17U)
+#define LSE_STATE           (RCC_BDCR_LSEON | RCC_BDCR_LSERDY)
+#define LSE_WAIT_MAX_US     UINT32_C(120000000)
+#define LSE_WAIT_MAX_POLLS  UINT32_C(20000000)
+#define ONE_SECOND_RELOAD   UINT32_C(32767)
+
+static bool blank_backup_words(void) {
+    if ((BKP->CR | BKP->RTCCR | BKP->CSR) != 0U)
+        return false;
+    const uintptr_t first = (uintptr_t)BKP + offsetof(BKP_TypeDef, DR1);
+    for (unsigned index = 0U; index < BKP_WORDS; ++index) {
+        const uintptr_t word = first + index * sizeof(uint32_t);
+        if ((NX_STM32F1_RTC_READ((volatile const uint32_t*)word) &
+             UINT16_MAX) != 0U)
+            return false;
+    }
+    return true;
+}
+
+static bool owned_backup_access(void) {
+    return interfaces_live() && (PWR->CR & PWR_CR_DBP) != 0U &&
+           (RCC->BDCR & RCC_BDCR_BDRST) == 0U;
+}
+
+/** \brief A stopped oscillator or a sticky source never implies BDRST. */
+static bool backup_clock(uint32_t mask, uint32_t value) {
+    return owned_backup_access() &&
+           nx_stm32f1_write_masked(&RCC->BDCR, mask, value);
+}
+
+static nx_result_t wait_lse(bool ready, nx_time_us_t until, uint32_t limit) {
+    for (uint32_t count = 0U; count < limit; ++count) {
+        if (!owned_backup_access() || !nx_stm32f1_system_live())
+            return NX_ERROR_IO;
+        if (nx_deadline_expired(until, nx_time_now_us()))
+            break;
+        if (((RCC->BDCR & RCC_BDCR_LSERDY) != 0U) == ready)
+            return NX_SUCCESS;
+    }
+    return NX_ERROR_TIMEOUT;
+}
+
+static nx_result_t settle_configuration(nx_time_us_t until) {
+    nx_result_t result = wait_control(RTC_CRL_RTOFF, until);
+    if (result == NX_SUCCESS &&
+        (NX_STM32F1_RTC_READ(&RTC->CRL) & RTC_CRL_CNF) != 0U) {
+        NX_STM32F1_WRITE(&RTC->CRL, RTC_FLAGS | RTC_CRL_RSF);
+        nx_arch_dsb();
+        if ((NX_STM32F1_RTC_READ(&RTC->CRL) & RTC_CRL_CNF) != 0U)
+            return NX_ERROR_IO;
+        result = wait_control(RTC_CRL_RTOFF, until);
+    }
+    return result;
+}
+
+/** \brief Withdraw only the unfinished provisioning authority. */
+static nx_result_t release_provision(nx_stm32f1_rtc_t* state) {
+    if ((state->effects & OWN_LSE_ATTEMPT) == 0U)
+        return NX_SUCCESS;
+    if (!owned_backup_access())
+        return NX_ERROR_IO;
+    const nx_time_us_t until = nx_deadline_after(nx_time_now_us(), SYNC_US);
+    if ((state->effects & OWN_RTC_CONFIG) != 0U) {
+        if (settle_configuration(until) != NX_SUCCESS)
+            return NX_ERROR_IO;
+        state->effects &= (uint8_t)~OWN_RTC_CONFIG;
+    }
+    const uint32_t selected = RCC->BDCR & RCC_BDCR_RTCSEL;
+    if (selected == RCC_BDCR_RTCSEL_LSE) {
+        /* RTCSEL is write-once in this domain. Leave the source observable
+         * and prevent adopt from consuming a partially initialized RTC. */
+        if (!backup_clock(RCC_BDCR_RTCEN, 0U))
+            return NX_ERROR_IO;
+    } else if (selected != 0U ||
+               !backup_clock(RCC_BDCR_LSEON | RCC_BDCR_RTCEN, 0U) ||
+               wait_lse(false, until, SYNC_POLLS) != NX_SUCCESS) {
+        return NX_ERROR_IO;
+    }
+    state->effects &= (uint8_t)~OWN_LSE_ATTEMPT;
+    return NX_SUCCESS;
+}
+
+static nx_result_t configure_divider(nx_stm32f1_rtc_t* state) {
+    const nx_time_us_t until = nx_deadline_after(nx_time_now_us(), SYNC_US);
+    nx_result_t result = wait_control(RTC_CRL_RTOFF, until);
+    if (result != NX_SUCCESS)
+        return result;
+    if ((NX_STM32F1_RTC_READ(&RTC->CRL) & RTC_CRL_CNF) != 0U)
+        return NX_ERROR_BUSY;
+
+    NX_STM32F1_WRITE(&RTC->CRL, RTC_FLAGS);
+    nx_arch_dsb();
+    result = wait_control(RTC_CRL_RSF, until);
+    if (result != NX_SUCCESS)
+        return result;
+
+    if ((NX_STM32F1_RTC_READ(&RTC->CRH) &
+         (RTC_CRH_OWIE | RTC_CRH_ALRIE | RTC_CRH_SECIE)) != 0U)
+        return NX_ERROR_BUSY;
+
+    state->effects |= OWN_RTC_CONFIG;
+    NX_STM32F1_WRITE(&RTC->CRL, RTC_FLAGS | RTC_CRL_RSF | RTC_CRL_CNF);
+    nx_arch_dsb();
+    if ((NX_STM32F1_RTC_READ(&RTC->CRL) & RTC_CRL_CNF) == 0U)
+        return NX_ERROR_IO;
+    /* RM0008 §18.4.3: PRL is write-only. RTOFF attests the request settled.
+     * No counter, comparator or backup word is written. */
+    NX_STM32F1_WRITE(&RTC->PRLH, 0U);
+    NX_STM32F1_WRITE(&RTC->PRLL, ONE_SECOND_RELOAD);
+    result = settle_configuration(until);
+    if (result != NX_SUCCESS)
+        return result;
+    state->effects &= (uint8_t)~OWN_RTC_CONFIG;
+    return NX_SUCCESS;
+}
+
+nx_result_t nx_stm32f1_rtc_provision(nx_stm32f1_rtc_t* state,
+                                     uint32_t timeout_us, uint32_t poll_limit) {
+    if (!nx_stm32f1_cold_context())
+        return NX_ERROR_CONTEXT;
+    if (!storage(state, sizeof(*state), _Alignof(nx_stm32f1_rtc_t)) ||
+        timeout_us == 0U || timeout_us > LSE_WAIT_MAX_US || poll_limit == 0U ||
+        poll_limit > LSE_WAIT_MAX_POLLS)
+        return NX_ERROR_INVALID;
+
+    if (state->effects == PROVISIONED) {
+        /* Same Platform owner after an explicit stop/suspend; a fresh
+         * application never silently assumes an existing clock was its own. */
+        state->effects = 0U;
+        const nx_result_t result = nx_stm32f1_rtc_prepare(state);
+        state->effects |= PROVISIONED;
+        return result;
+    }
+    if (state->effects != 0U || (RCC->APB1ENR & GATES) != 0U ||
+        (RCC->APB1RSTR & RESETS) != 0U || RCC->BDCR != 0U ||
+        !NX_STM32F1_RTC_PROVISION_IRQS_IDLE() ||
+        ((EXTI->IMR | EXTI->EMR | EXTI->RTSR | EXTI->FTSR | EXTI->PR) &
+         RTC_EXTI_ALARM_LINE) != 0U)
+        return NX_ERROR_BUSY;
+    if (!nx_stm32f1_system_live())
+        return NX_ERROR_STATE;
+    nx_time_us_t until;
+    nx_result_t result =
+        nx_deadline_finite_after(nx_time_now_us(), timeout_us, &until);
+    if (result != NX_SUCCESS)
+        return result;
+
+    state->effects = OWN_GATES;
+    if (!nx_stm32f1_write_masked(&RCC->APB1ENR, GATES, GATES))
+        return unwind(state, NX_ERROR_IO);
+    if ((PWR->CR & (PWR_CR_DBP | PWR_CR_PVDE)) != 0U || !blank_backup_words())
+        return unwind(state, NX_ERROR_BUSY);
+    state->effects |= OWN_DBP;
+    if (!write_access(true))
+        return unwind(state, NX_ERROR_IO);
+
+    state->effects |= OWN_LSE_ATTEMPT;
+    if (!backup_clock(RCC_BDCR_LSEON, RCC_BDCR_LSEON))
+        return unwind(state, NX_ERROR_IO);
+    result = wait_lse(true, until, poll_limit);
+    if (result != NX_SUCCESS)
+        return unwind(state, result);
+    if (RCC->BDCR != LSE_STATE ||
+        !backup_clock(RCC_BDCR_RTCSEL | RCC_BDCR_RTCEN,
+                      RCC_BDCR_RTCSEL_LSE | RCC_BDCR_RTCEN) ||
+        !retained_clock())
+        return unwind(state, NX_ERROR_IO);
+
+    result = configure_divider(state);
+    if (result != NX_SUCCESS)
+        return unwind(state, result);
+    if (!write_access(false))
+        return unwind(state, NX_ERROR_IO);
+    /* Commit adopt authority only after restoring backup write protection. */
+    state->effects &= (uint8_t) ~(OWN_DBP | OWN_LSE_ATTEMPT);
+    state->effects |= PROVISIONED | LIVE;
+    return NX_SUCCESS;
+}
+#endif
 
 static bool rtc_ready(void) {
     return interfaces_live() && retained_clock() &&

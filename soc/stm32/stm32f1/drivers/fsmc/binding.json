@@ -88,6 +88,8 @@
                             "FSMC_NBL0": false,
                             "FSMC_NBL1": false,
                             "FSMC_NE3": false,
+                            "FSMC_NE4": false,
+                            "FSMC_SRAM_DISABLED": true,
                             "FSMC_NAND_DISABLED": true,
                             "FSMC_NOR_DISABLED": true,
                             "FSMC_LCD_DISABLED": true
@@ -122,13 +124,23 @@
                   [
                     "address",
                     {
-                      "source": "selected_children.0.options.address"
+                      "optional": "selected_children.0.options.address",
+                      "value": {
+                        "source": "selected_children.0.options.address"
+                      },
+                      "default": {
+                        "source": "selected_children.0.options.command_address"
+                      }
                     }
                   ],
                   [
                     "bytes",
                     {
-                      "source": "selected_children.0.options.bytes"
+                      "optional": "selected_children.0.options.bytes",
+                      "value": {
+                        "source": "selected_children.0.options.bytes"
+                      },
+                      "default": 4
                     }
                   ],
                   [
@@ -218,6 +230,24 @@
                   }
                 },
                 "declarations": []
+              },
+              "parallel16-endpoint": {
+                "parents": {
+                  "parent_port": "port"
+                },
+                "calls": {
+                  "prepare": [],
+                  "close": []
+                },
+                "face": {
+                  "type": "nx_parallel16_endpoint_t",
+                  "ops": "nx_stm32f1_fsmc_parallel16_ops",
+                  "context": {
+                    "ref": "parent_port",
+                    "as": "address"
+                  }
+                },
+                "declarations": []
               }
             }
           },
@@ -252,8 +282,7 @@
         }
       },
       "io_domains": [
-        "external_bus",
-        "memory_window"
+        "external_bus"
       ]
     }
   ],
@@ -311,6 +340,17 @@
           "bank": 3,
           "address": 1744830464,
           "bytes": 1048576
+        },
+        "fsmc-ne4-cn16-lcd": {
+          "controller": "FSMC",
+          "kind": "parallel16",
+          "modes": [
+            "8080-16"
+          ],
+          "protocol": "parallel16",
+          "bank": 4,
+          "command_address": 1811939328,
+          "data_address": 1811939330
         }
       },
       "packages": {

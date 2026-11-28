@@ -10,6 +10,61 @@ from tools.configure import configure as gate
 from tools.configure.generation import bindings
 
 
+F107 = gate.ROOT / "tests/integration/assemblies/stm32f1_eth_mii"
+
+
+class F107EthernetConfigurationTests(unittest.TestCase):
+    def test_raw_modes_use_exact_pins_and_distinct_media_select(self):
+        cases = (("f107vc.toml", "raw-mii", 17, 0, "true"),
+                 ("f107vc-rmii.toml", "raw-rmii", 9, 1, "false"))
+        for filename, mode, count, interface, mii in cases:
+            with self.subTest(mode=mode):
+                ir = gate.resolve_ir(F107 / filename)
+                controller, = ir.controllers
+                self.assertEqual((controller.controller, controller.mode),
+                                 ("ETH_MAC", mode))
+                self.assertEqual(len(controller.pins), count)
+                if mode == "raw-rmii":
+                    self.assertEqual({(pin["pin"], pin["function"])
+                                      for pin in controller.pins},
+                                     {("PC1", "mdc"), ("PA2", "mdio"),
+                                      ("PA1", "ref-clk"), ("PD8", "crs-dv"),
+                                      ("PD9", "rxd0"), ("PD10", "rxd1"),
+                                      ("PB11", "tx-en"), ("PB12", "txd0"),
+                                      ("PB13", "txd1")})
+                claims = {claim.key: dict(claim.attributes)
+                          for claim in ir.claims}
+                self.assertEqual(claims["register:AFIO_MAPR/ETH_REMAP"]["value"], 1)
+                self.assertEqual(claims["register:AFIO_MAPR/MII_RMII_SEL"]["value"],
+                                 interface)
+                self.assertIn("clock:DMA2", claims)
+                self.assertIn("irq:ETH", claims)
+                self.assertIn(".mii = " + mii, bindings.emit(ir)[1])
+                self.assertFalse(ir.physical_qualified)
+
+    def test_rmii_requires_board_route_explicit_clock_wiring_and_exclusive_pads(self):
+        source = (F107 / "f107vc-rmii.toml").read_text().replace(
+            'board_package = "board-rmii"',
+            'board_package = ' + json.dumps(str(F107 / "board-rmii")))
+        cases = (('"mb784-rmii-u2"', '"unknown"', "requires"),
+                 ('mode = "raw-rmii"', 'mode = "raw-mii"', "route|mode"),
+                 ('clock = "hse25-crystal-pll72"', 'clock = "hsi8"', "clock"))
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / "assembly.toml"
+            for original, replacement, message in cases:
+                with self.subTest(message=message):
+                    path.write_text(source.replace(original, replacement))
+                    with self.assertRaisesRegex(ValueError, message):
+                        gate.resolve_ir(path)
+            board = gate.load(F107 / "board-rmii/board.json")
+            board["reserved_resources"].append("PD8")
+            (path.parent / "board.json").write_text(json.dumps(board))
+            path.write_text(source.replace(json.dumps(str(F107 / "board-rmii")),
+                                           '"."'))
+            with self.assertRaisesRegex(ValueError, "PD8"):
+                gate.resolve_ir(path)
+
+
 class EthernetConfigurationTests(unittest.TestCase):
     def test_mii_exact_ve_zg_route_is_complete_without_fitted_phy_claim(self):
         for part in ('STM32F407VET6', 'STM32F407ZGT6'):

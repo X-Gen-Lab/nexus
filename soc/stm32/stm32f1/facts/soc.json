@@ -1556,7 +1556,8 @@
       "part_prefix": "STM32F101RB",
       "controller_groups": [
         "gpioa-basic",
-        "usart2-default-irq"
+        "usart2-default-irq",
+        "fpec-main-flash"
       ],
       "clock_policy": "rm0008-f101-md-run"
     },
@@ -1565,7 +1566,8 @@
       "controller_groups": [
         "gpioa-basic",
         "usart2-default-irq",
-        "rm0008-f102-md-pma"
+        "rm0008-f102-md-pma",
+        "fpec-main-flash"
       ],
       "clock_policy": "rm0008-f102-md-run"
     },
@@ -1586,7 +1588,9 @@
         "f107-usart2",
         "rm0008-connectivity-bxcan",
         "rm0008-connectivity-dwc",
-        "rm0008-f107-clause22"
+        "rm0008-f107-clause22",
+        "rm0008-f107-mii",
+        "rm0008-f107-spi3"
       ],
       "clock_policy": "rm0008-f105-f107-run"
     },
@@ -1594,7 +1598,8 @@
       "part_prefix": "STM32F100ZE",
       "controller_groups": [
         "gpioa-basic",
-        "usart2-default-irq"
+        "usart2-default-irq",
+        "fpec-main-flash"
       ],
       "clock_policy": "stm32f1-hsi8"
     },
@@ -1602,7 +1607,8 @@
       "part_prefix": "STM32F101C6",
       "controller_groups": [
         "gpioa-basic",
-        "usart2-default-irq"
+        "usart2-default-irq",
+        "fpec-main-flash"
       ],
       "clock_policy": "stm32f1-hsi8"
     },
@@ -1610,7 +1616,8 @@
       "part_prefix": "STM32F101ZE",
       "controller_groups": [
         "gpioa-basic",
-        "usart2-default-irq"
+        "usart2-default-irq",
+        "fpec-main-flash"
       ],
       "clock_policy": "stm32f1-hsi8"
     },
@@ -1618,7 +1625,8 @@
       "part_prefix": "STM32F101ZG",
       "controller_groups": [
         "gpioa-basic",
-        "usart2-default-irq"
+        "usart2-default-irq",
+        "fpec-main-flash"
       ],
       "clock_policy": "stm32f1-hsi8",
       "cpu_features": {
@@ -1630,7 +1638,8 @@
       "part_prefix": "STM32F102C6",
       "controller_groups": [
         "gpioa-basic",
-        "usart2-default-irq"
+        "usart2-default-irq",
+        "fpec-main-flash"
       ],
       "clock_policy": "stm32f1-hsi8"
     }

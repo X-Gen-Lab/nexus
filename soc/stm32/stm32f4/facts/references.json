@@ -1746,7 +1746,7 @@
             "condition": "Automatic checksum insertion parses IPv6 packets lacking TCP/UDP/ICMP and can modify unrelated payload.",
             "handling": "Raw mode disables offload. Advanced frame requests explicitly choose checksum intent, so the protocol owner must request NONE for unsupported IPv6 payloads/extension layouts; FULL is not a generic repair for arbitrary Ethernet bytes. Peer/network stack validation is independent of DMA completion.",
             "implementation": [
-              "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c",
+              "soc/stm32/common/dwmac/eth_mac.c",
               "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c",
               "docs/reference/contracts/io/ethernet-frames.md"
             ],
@@ -1763,7 +1763,7 @@
             "condition": "IPv6 hop-by-hop/extension order is invalid but the MAC accepts it and reports a good checksum.",
             "handling": "A hardware checksum-valid status is only a checksum hint. The protocol/network stack must parse and reject invalid IPv6 extension ordering before dispatching payload; neither raw frames nor the advanced RX loan claims semantic IPv6 validity.",
             "implementation": [
-              "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c",
+              "soc/stm32/common/dwmac/eth_mac.c",
               "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c",
               "docs/reference/contracts/io/ethernet-frames.md"
             ],
@@ -1780,7 +1780,7 @@
             "condition": "TxFIFO flush is issued one cycle after transmission completes and wedges the MAC.",
             "handling": "Raw withdrawal checks actual empty TxFIFO before FTF; advanced withdrawal uses stopped/reset-owned recovery instead of a flush while live. Failure retains descriptors/borrowers until actual stop/reset evidence.",
             "implementation": [
-              "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c",
+              "soc/stm32/common/dwmac/eth_mac.c",
               "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c",
               "docs/reference/contracts/io/ethernet-frames.md"
             ],
@@ -1797,7 +1797,7 @@
             "condition": "Near-equal DMA/MAC Tx rates repeatedly empty the TxFIFO without an underrun indication.",
             "handling": "Both raw and advanced MAC cold configuration force transmit Store-and-Forward. Descriptor completion is not substituted for that controller mode.",
             "implementation": [
-              "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c",
+              "soc/stm32/common/dwmac/eth_mac.c",
               "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c",
               "docs/reference/contracts/io/ethernet-frames.md"
             ],
@@ -1814,7 +1814,7 @@
             "condition": "Threshold-mode RX overflow on a penultimate word corrupts status and following frames.",
             "handling": "Both MAC providers force receive Store-and-Forward and reject incomplete/error descriptor chains before loan/copy publication.",
             "implementation": [
-              "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c",
+              "soc/stm32/common/dwmac/eth_mac.c",
               "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c",
               "docs/reference/contracts/io/ethernet-frames.md"
             ],
@@ -1831,7 +1831,7 @@
             "condition": "Successive writes to affected MAC/PTP registers arrive within four RX/TX clock cycles.",
             "handling": "Affected MAC/PTP writes are serialized through bounded clock-domain settle observations, with the configured PHY reference-clock contract. Repeated writes/readback alone are not treated as elapsed RX/TX clocks; missing clock/timeout retains ownership and fails.",
             "implementation": [
-              "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c",
+              "soc/stm32/common/dwmac/eth_mac.c",
               "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c",
               "docs/reference/contracts/io/ethernet-frames.md"
             ],
@@ -1848,7 +1848,7 @@
             "condition": "Global-unicast PMT wake is combined with inverse/hash destination filtering.",
             "handling": "No PMT remote-wakeup or global-unicast wake mode is exposed by the current MAC providers; ordinary VLAN/filter capability does not imply PMT support.",
             "implementation": [
-              "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c",
+              "soc/stm32/common/dwmac/eth_mac.c",
               "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c",
               "docs/reference/contracts/io/ethernet-frames.md"
             ],
@@ -1865,7 +1865,7 @@
             "condition": "Missed-frame/FIFO counters roll over twice between reads and clear their sticky overflow indication.",
             "handling": "Software ring drop/ownership counters remain separate. No API claims an exact monotonic total reconstructed from sparse DMAMFBOCR reads; a product requiring those hardware counters must sample them often enough for its measured worst-case ingress/drop rate.",
             "implementation": [
-              "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c",
+              "soc/stm32/common/dwmac/eth_mac.c",
               "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c",
               "docs/reference/contracts/io/ethernet-frames.md"
             ],
@@ -1879,7 +1879,7 @@
             "condition": "MAC control frame0x8808 plus receive checksum offload without extended status gives misleading IP status.",
             "handling": "Raw offload is disabled. Advanced consumers must classify EtherType before interpreting checksum hints; control frames and unsupported protocol layouts cannot use a hardware good-IP hint as protocol validity. Software must ignore the affected RDES0 IP status for those frames.",
             "implementation": [
-              "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c",
+              "soc/stm32/common/dwmac/eth_mac.c",
               "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c",
               "docs/reference/contracts/io/ethernet-frames.md"
             ],
@@ -1896,7 +1896,7 @@
             "condition": "Receive checksum offload in cut-through mode gives incomplete payload-checksum error detail.",
             "handling": "Both receive engines use Store-and-Forward; descriptor error-summary/drop logic does not depend on a missing individual checksum bit. Cut-through mode is not selectable.",
             "implementation": [
-              "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c",
+              "soc/stm32/common/dwmac/eth_mac.c",
               "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c",
               "docs/reference/contracts/io/ethernet-frames.md"
             ],
@@ -1913,7 +1913,7 @@
             "condition": "Giant frames pass the Store-and-Forward hardware error-drop filter.",
             "handling": "RX validates the last-descriptor frame length and descriptor integrity against the actual buffer/wire limit before copying or publishing a loan. Giant or invalid chains are recycled/dropped in software and never trusted merely because the MAC accepted them.",
             "implementation": [
-              "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c",
+              "soc/stm32/common/dwmac/eth_mac.c",
               "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c",
               "docs/reference/contracts/io/ethernet-frames.md"
             ],
@@ -1930,7 +1930,7 @@
             "condition": "Automatic hardware pause generation depends on an unavailable4096-byte RxFIFO.",
             "handling": "Automatic pause/flow-control mode is not exposed or used as a no-loss guarantee. Software buffer availability and observed overflow/drop events govern backpressure; a future pause policy must send frames intentionally rather than enable a nonexistent automatic mechanism.",
             "implementation": [
-              "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c",
+              "soc/stm32/common/dwmac/eth_mac.c",
               "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c",
               "docs/reference/contracts/io/ethernet-frames.md"
             ],

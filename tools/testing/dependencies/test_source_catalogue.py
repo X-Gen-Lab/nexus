@@ -152,6 +152,9 @@ class SourceCatalogueTests(unittest.TestCase):
                          "https://github.com/X-Gen-Lab/lwip.git")
         self.assertEqual(item.notice, "COPYING")
         self.assertEqual(item.source_lock, "dependencies/lwip.lock.json")
+        dependencies = catalogue.runtime_selection(
+            "stm32f1", backend="baremetal", components=("network-ipv4",), root=ROOT)
+        self.assertIn(item, dependencies)
         modules = catalogue.declared_modules((ROOT / ".gitmodules").read_bytes())
         self.assertEqual(modules[item.path], item.fetch_url)
 

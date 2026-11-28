@@ -8,7 +8,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(NEXUS_ASSEMBLY_FILE
     "${CMAKE_CURRENT_LIST_DIR}/f100rb-dac.toml"
     CACHE FILEPATH
-    "DAC1 provider fixture assembly"
+    "Direct DAC provider fixture assembly"
 )
 
 if(NEXUS_SOURCE_ROOT)
@@ -22,6 +22,12 @@ nexus_target_warnings(nexus_stm32f1_dac_consumer STRICT)
 find_package(Python3 3.11 REQUIRED COMPONENTS Interpreter)
 get_target_property(fixture_source Nexus::Config NEXUS_SOURCE_DIR)
 get_target_property(fixture_config Nexus::Platform NEXUS_CONFIG_DIR)
+file(READ "${fixture_config}/resolved.json" fixture_resolved)
+string(JSON selected_channel GET "${fixture_resolved}" controllers 0 channels 0)
+target_compile_definitions(
+    nexus_stm32f1_dac_consumer
+    PRIVATE FIXTURE_DAC_CHANNEL=${selected_channel}
+)
 set(retention_check "${fixture_source}/tools/measurement/retention.py")
 set(retention_report "${CMAKE_CURRENT_BINARY_DIR}/bin/provider-retention.json")
 set_property(

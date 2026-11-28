@@ -3322,39 +3322,90 @@
               ]
             },
             "else": {
-              "not": {
-                "anyOf": [
-                  {
-                    "required": [
-                      "allow_set"
-                    ]
-                  },
-                  {
-                    "required": [
-                      "initial"
-                    ]
-                  },
-                  {
-                    "required": [
-                      "lse_bypass"
-                    ]
-                  },
-                  {
-                    "required": [
-                      "periodic_wakeup"
-                    ]
-                  },
-                  {
-                    "required": [
-                      "poll_limit"
-                    ]
-                  },
-                  {
-                    "required": [
-                      "timeout_us"
-                    ]
+              "if": {
+                "properties": {
+                  "mode": {
+                    "const": "backup-provision"
                   }
+                },
+                "required": [
+                  "mode"
                 ]
+              },
+              "then": {
+                "properties": {
+                  "timeout_us": {
+                    "maximum": 120000000,
+                    "description": "Time interval in microseconds; not a measured hardware guarantee."
+                  },
+                  "poll_limit": {
+                    "maximum": 20000000
+                  }
+                },
+                "required": [
+                  "poll_limit",
+                  "timeout_us"
+                ],
+                "not": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "allow_set"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "initial"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "lse_bypass"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "periodic_wakeup"
+                      ]
+                    }
+                  ]
+                }
+              },
+              "else": {
+                "not": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "allow_set"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "initial"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "lse_bypass"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "periodic_wakeup"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "poll_limit"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "timeout_us"
+                      ]
+                    }
+                  ]
+                }
               }
             }
           },

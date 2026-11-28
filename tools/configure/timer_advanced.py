@@ -102,11 +102,16 @@ def validate_soc(soc, provider):
 
 def selected_hardware(route, hardware, provider):
     """Select IRQ ownership from the existing exact personality policy."""
+    waveform = getattr(provider, "WAVEFORM", None)
+    is_waveform = waveform is not None and route["kind"] in waveform.KINDS
+    if is_waveform and waveform.controllers[route["controller"]].get("controller_irq", False):
+        if len(hardware["irq"]) != 1:
+            fail("Timer waveform requires one dedicated controller IRQ")
+        return hardware
     policy = getattr(provider, 'TIMER_ADVANCED', None)
     if policy is None:
         return hardware
-    waveform = getattr(provider, "WAVEFORM", None)
-    if waveform is not None and route["kind"] in waveform.KINDS:
+    if is_waveform:
         facts = policy.binding('advanced_pwm', route['controller'])
         if facts is None:
             return {**hardware, 'irq': [], 'irq_numbers': []}

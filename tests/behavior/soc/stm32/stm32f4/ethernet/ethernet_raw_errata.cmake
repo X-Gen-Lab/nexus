@@ -1,9 +1,9 @@
 # D2 proposed initial real runtime RED against unchanged raw production.
 nexus_google_test(nexus_ethernet_raw_errata_test SOURCES "${nexus_google_root}/soc/stm32/stm32f4/ethernet/ethernet_raw_errata_test.cpp"
-    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/common/dwmac/eth_mac.c"
     LIBRARIES Nexus::IO Nexus::Arch
     INCLUDES
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/legacy_mac" "${NEXUS_SOURCE_DIR}/io/private"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/common/dwmac" "${NEXUS_SOURCE_DIR}/io/private"
 )
 target_compile_options(
     nexus_ethernet_raw_errata_test
@@ -14,10 +14,10 @@ target_compile_options(
 foreach(eth_family stm32)
     set(eth_target "nexus_${eth_family}_ethernet_raw_errata_test")
     nexus_google_test(${eth_target} SOURCES "${nexus_google_root}/soc/stm32/stm32f4/ethernet/ethernet_raw_errata_test.cpp"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/common/dwmac/eth_mac.c"
         LIBRARIES Nexus::IO Nexus::Arch
         INCLUDES
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/legacy_mac" "${NEXUS_SOURCE_DIR}/io/private"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/common/dwmac" "${NEXUS_SOURCE_DIR}/io/private"
     )
     target_compile_options(
         ${eth_target}

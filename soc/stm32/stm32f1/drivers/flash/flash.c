@@ -8,24 +8,22 @@
  */
 #include "drivers/flash/instance.h"
 #include "nexus/arch/arch.h"
-#include "stm32f1xx.h"
+#include "stm32f1xx_hal_flash_ex.h"
 
-#if defined(STM32F103x6) || defined(STM32F103xB) || defined(STM32F100xB)
-#define NX_F1_FLASH_PAGE_BYTES 1024U
-#elif defined(STM32F103xE) || defined(STM32F103xG)
-#define NX_F1_FLASH_PAGE_BYTES 2048U
-#else
-#error "The selected Flash controller requires a reviewed STM32F1 geometry"
+#if !defined(FLASH_PAGE_SIZE) || !defined(FLASH_BANK1_END)
+#error "The selected Flash controller requires an official FPEC geometry"
 #endif
+_Static_assert(FLASH_PAGE_SIZE == 1024U || FLASH_PAGE_SIZE == 2048U,
+               "Ordinary FPEC requires 1 KiB or 2 KiB pages");
 
-#if defined(STM32F103xG)
+#if defined(FLASH_BANK2_END)
 #define NX_F1_FLASH_BANKS      2U
 #define NX_F1_FLASH_BANK_BYTES (512U * 1024U)
 #define NX_F1_FLASH_REG(bank2, name)                                           \
     ((bank2) ? &NX_F1_FLASH_REGISTERS->name##2 : &NX_F1_FLASH_REGISTERS->name)
 _Static_assert(FLASH_BANK1_END + 1U - FLASH_BASE == NX_F1_FLASH_BANK_BYTES &&
                    FLASH_BANK2_END - FLASH_BANK1_END == NX_F1_FLASH_BANK_BYTES,
-               "F103 XL bank boundaries must match CMSIS");
+               "F1 XL bank boundaries must match CMSIS");
 _Static_assert(FLASH_SR_BSY == FLASH_SR2_BSY && FLASH_SR_EOP == FLASH_SR2_EOP &&
                    FLASH_SR_PGERR == FLASH_SR2_PGERR &&
                    FLASH_SR_WRPRTERR == FLASH_SR2_WRPRTERR &&
@@ -33,7 +31,7 @@ _Static_assert(FLASH_SR_BSY == FLASH_SR2_BSY && FLASH_SR_EOP == FLASH_SR2_EOP &&
                    FLASH_CR_PER == FLASH_CR2_PER &&
                    FLASH_CR_STRT == FLASH_CR2_STRT &&
                    FLASH_CR_LOCK == FLASH_CR2_LOCK,
-               "Both F103 XL banks must share the ordinary FPEC bit positions");
+               "Both F1 XL banks must share the ordinary FPEC bit positions");
 #else
 #define NX_F1_FLASH_BANKS 1U
 #define NX_F1_FLASH_REG(bank2, name)                                           \
@@ -49,7 +47,8 @@ _Static_assert(FLASH_SR_BSY == FLASH_SR2_BSY && FLASH_SR_EOP == FLASH_SR2_EOP &&
 #define NX_F1_FLASH_IRQ_IDLE()                                                 \
     (NVIC_GetEnableIRQ(FLASH_IRQn) == 0U &&                                    \
      NVIC_GetActive(FLASH_IRQn) == 0U && NVIC_GetPendingIRQ(FLASH_IRQn) == 0U)
-#define NX_F1_FLASH_CLOCK() (RCC->CR)
+#define NX_F1_FLASH_CLOCK()    (RCC->CR)
+#define NX_F1_FLASH_SRAM_START ((uintptr_t)SRAM_BASE)
 #endif
 
 #define NX_F1_FLASH_FLAGS         (FLASH_SR_PGERR | FLASH_SR_WRPRTERR | FLASH_SR_EOP)
@@ -75,7 +74,7 @@ static bool locked_and_quiet(void) {
 }
 
 static bool bank2_at(uint32_t offset) {
-#if defined(STM32F103xG)
+#if defined(FLASH_BANK2_END)
     return offset >= NX_F1_FLASH_BANK_BYTES;
 #else
     (void)offset;
@@ -84,27 +83,24 @@ static bool bank2_at(uint32_t offset) {
 }
 
 static bool reviewed_capacity(uint32_t bytes) {
-#if defined(STM32F103x6)
-    return bytes == 32U * 1024U;
+#if defined(FLASH_BANK2_END)
+    return bytes == FLASH_BANK2_END + 1U - FLASH_BASE;
 #elif defined(STM32F103xB)
-    return bytes == 64U * 1024U || bytes == 128U * 1024U;
-#elif defined(STM32F100xB)
-    return bytes == 128U * 1024U;
-#elif defined(STM32F103xE)
-    return bytes == 512U * 1024U;
+    /* The reviewed C8 and RB share this CMSIS device header. */
+    return bytes == 64U * 1024U || bytes == FLASH_BANK1_END + 1U - FLASH_BASE;
 #else
-    return bytes == NX_F1_FLASH_BANKS * NX_F1_FLASH_BANK_BYTES;
+    return bytes == FLASH_BANK1_END + 1U - FLASH_BASE;
 #endif
 }
 
 static bool reviewed_spans(const nx_flash_geometry_t* geometry) {
     if (geometry->erase_span_count != NX_F1_FLASH_BANKS ||
-        geometry->erase_spans[0].erase_bytes != NX_F1_FLASH_PAGE_BYTES) {
+        geometry->erase_spans[0].erase_bytes != FLASH_PAGE_SIZE) {
         return false;
     }
-#if defined(STM32F103xG)
+#if defined(FLASH_BANK2_END)
     return geometry->erase_spans[1].offset == NX_F1_FLASH_BANK_BYTES &&
-           geometry->erase_spans[1].erase_bytes == NX_F1_FLASH_PAGE_BYTES;
+           geometry->erase_spans[1].erase_bytes == FLASH_PAGE_SIZE;
 #else
     return true;
 #endif
@@ -231,6 +227,77 @@ static bool buffer(const nx_stm32f1_flash_state_t* port, const void* data,
             !overlaps(data, length, NX_F1_FLASH_REGISTERS,
                       sizeof(*NX_F1_FLASH_REGISTERS)));
 }
+
+#if defined(STM32F103xB)
+static nx_result_t
+maintenance_snapshot(void* context, nx_flash_maintenance_snapshot_t* snapshot) {
+    const nx_stm32f1_flash_state_t* port = context;
+    if (!task_context()) {
+        return NX_ERROR_CONTEXT;
+    }
+    if (port == NULL || port->geometry == NULL) {
+        return NX_ERROR_STATE;
+    }
+    const uintptr_t address = (uintptr_t)snapshot;
+    const uintptr_t ram_start = NX_F1_FLASH_SRAM_START;
+    /* DS5319: both reviewed medium-density parts have 20 KiB of SRAM. */
+    if (address < ram_start ||
+        address - ram_start > 20U * 1024U - sizeof(*snapshot) ||
+        address % _Alignof(nx_flash_maintenance_snapshot_t) != 0U ||
+        !buffer(port, snapshot, sizeof(*snapshot))) {
+        return NX_ERROR_INVALID;
+    }
+    if (port->phase != NX_STM32F1_FLASH_IDLE || !locked_and_quiet()) {
+        return NX_ERROR_BUSY;
+    }
+
+    const uint32_t options = NX_F1_FLASH_READ(&NX_F1_FLASH_REGISTERS->OBR);
+    if ((options & FLASH_OBR_OPTERR) != 0U) {
+        return NX_ERROR_IO;
+    }
+
+    /* PM0075 §2.4 and Table 9: one active-low WRP bit per four 1-KiB pages.
+     * Read protection also protects pages 0–3. Publish complete observations
+     * only when the API's per-page bitmap can represent them.
+     */
+    const uint32_t pages = port->geometry->size / FLASH_PAGE_SIZE;
+    const uint32_t groups = UINT32_MAX >> (32U - pages / 4U);
+    const bool protected = (options & FLASH_OBR_RDPRT) != 0U;
+    uint32_t write_groups =
+        ~NX_F1_FLASH_READ(&NX_F1_FLASH_REGISTERS->WRPR) & groups;
+    if (protected) {
+        write_groups |= 1U;
+    }
+    if (write_groups > UINT8_MAX) {
+        return NX_ERROR_UNSUPPORTED;
+    }
+    uint32_t pages_protected = 0U;
+    for (uint32_t group = 0U; write_groups != 0U; ++group) {
+        if ((write_groups & 1U) != 0U) {
+            pages_protected |= UINT32_C(15) << (4U * group);
+        }
+        write_groups >>= 1U;
+    }
+    *snapshot = (nx_flash_maintenance_snapshot_t){
+        .options =
+            {
+                .read_protection =
+                    protected ? NX_FLASH_READ_PROTECTED : NX_FLASH_READ_OPEN,
+                .write_protected_sectors = pages_protected,
+                .brownout = NX_FLASH_BROWNOUT_UNKNOWN,
+                .hardware_watchdog = (options & FLASH_OBR_IWDG_SW) == 0U,
+                .reset_on_stop = (options & FLASH_OBR_nRST_STOP) == 0U,
+                .reset_on_standby = (options & FLASH_OBR_nRST_STDBY) == 0U,
+            },
+        .sector_count = pages,
+    };
+    return NX_SUCCESS;
+}
+
+const nx_flash_maintenance_ops_t nx_stm32f1_flash_maintenance_ops = {
+    .snapshot = maintenance_snapshot,
+};
+#endif
 
 static nx_result_t read(const void* context, uint32_t offset, void* data,
                         size_t length) {
@@ -373,8 +440,7 @@ static nx_result_t erase(void* context, uint32_t offset, size_t length,
                          nx_time_us_t deadline) {
     nx_stm32f1_flash_state_t* port = context;
     if (!range(port, offset, length) || length == 0U ||
-        offset % NX_F1_FLASH_PAGE_BYTES != 0U ||
-        length % NX_F1_FLASH_PAGE_BYTES != 0U) {
+        offset % FLASH_PAGE_SIZE != 0U || length % FLASH_PAGE_SIZE != 0U) {
         return NX_ERROR_INVALID;
     }
     const bool bank2 = bank2_at(offset);
@@ -386,7 +452,7 @@ static nx_result_t erase(void* context, uint32_t offset, size_t length,
         return result;
     }
     for (uint32_t page = offset; page < offset + length;
-         page += NX_F1_FLASH_PAGE_BYTES) {
+         page += FLASH_PAGE_SIZE) {
         if (!clock_ready() || !clear_status(bank2) ||
             !control(bank2, FLASH_CR_PER)) {
             result = NX_ERROR_IO;
@@ -411,7 +477,7 @@ static nx_result_t erase(void* context, uint32_t offset, size_t length,
         if (result != NX_SUCCESS) {
             break;
         }
-        for (uint32_t index = 0U; index < NX_F1_FLASH_PAGE_BYTES; ++index) {
+        for (uint32_t index = 0U; index < FLASH_PAGE_SIZE; ++index) {
             if (NX_F1_FLASH_MEMORY[page + index] != UINT8_MAX) {
                 result = NX_ERROR_IO;
                 break;

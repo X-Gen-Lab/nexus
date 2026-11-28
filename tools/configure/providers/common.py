@@ -480,6 +480,7 @@ class ModeTraits:
     rx_dma: bool = False
     continuous: bool = False
     bus_master: bool = False
+    dma_irq: bool = True
 
     @property
     def dma(self):
@@ -532,12 +533,16 @@ _MODE_TRAITS = MappingProxyType({
     ("parallel16", "8080-16"): ModeTraits(polling=True),
     ("block", "sdio-poll"): ModeTraits(polling=True),
     ("block", "sdio-poll-write"): ModeTraits(polling=True),
+    ("block", "sdio-poll-4bit"): ModeTraits(polling=True),
+    ("block", "sdio-poll-4bit-write"): ModeTraits(polling=True),
+    ("block", "sdio-rx-dma-poll"): ModeTraits(polling=True, rx_dma=True, dma_irq=False),
     ("block", "sdio-irq"): ModeTraits(irq=True),
     ("block", "sdio-dma"): ModeTraits(irq=True, tx_dma=True, rx_dma=True),
     ("rtc", "calendar-alarm"): ModeTraits(),
     ("rtc", "retained-calendar-alarm"): ModeTraits(),
     ("rtc", "adopt-retained"): ModeTraits(polling=True),
     ("rtc", "backup-adopt"): ModeTraits(polling=True),
+    ("rtc", "backup-provision"): ModeTraits(polling=True),
     ("rtc", "provision-empty"): ModeTraits(polling=True),
     ("lptim", "counter16-oneshot"): ModeTraits(),
     ("lptim", "irq-counter16-oneshot"): ModeTraits(irq=True),
@@ -577,6 +582,7 @@ _MODE_TRAITS = MappingProxyType({
     ("usb_device", "device-hs-fs"): ModeTraits(irq=True),
     ("usb_device", "device-hs-ulpi"): ModeTraits(irq=True),
     ("usb_host", "host-fs"): ModeTraits(irq=True),
+    ("usb_host", "host-fs-bulk"): ModeTraits(irq=True),
     ("usb_host", "host-hs-fs"): ModeTraits(irq=True),
     ("usb_host", "host-hs-ulpi"): ModeTraits(irq=True),
     ("can", "classic-irq"): ModeTraits(irq=True),
@@ -611,6 +617,8 @@ _MODE_TRAITS = MappingProxyType({
         irq=True, tx_dma=True, rx_dma=True),
     ("i2c_target", "target-irq"): ModeTraits(irq=True),
     ("i2c_target", "target-rx-irq"): ModeTraits(irq=True),
+    ("i2c_target", "target-tx-irq"): ModeTraits(irq=True),
+    ("i2c_target", "target-write-read-irq"): ModeTraits(irq=True),
     ("i2c_target", "smbus-device"): ModeTraits(irq=True),
     ("i2c", "poll-messages"): ModeTraits(polling=True),
     ("i2c", "irq-messages"): ModeTraits(irq=True),
@@ -628,7 +636,9 @@ _MODE_TRAITS = MappingProxyType({
     ("exti", "pvd-events"): ModeTraits(irq=True),
     ("pwm", "fixed-pwm"): ModeTraits(),
     ("pwm", "shared-fixed-pwm"): ModeTraits(),
+    ("adc", "internal-scan"): ModeTraits(polling=True),
     ("adc", "single-shot"): ModeTraits(polling=True),
+    ("adc", "sequential-scan-dma"): ModeTraits(polling=True, rx_dma=True),
     ("adc", "single-trigger-dma"): ModeTraits(polling=True, rx_dma=True),
     ("adc", "simultaneous-scan-dma"): ModeTraits(polling=True, rx_dma=True),
     ("adc", "low-rate-scan"): ModeTraits(polling=True),

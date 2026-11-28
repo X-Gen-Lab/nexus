@@ -34,6 +34,9 @@ bool nx_stm32f1_usb_lp_interrupt(USB_TypeDef* registers);
 /** \brief Mask selected LP sources; CPU owner excludes top-half writes. */
 void nx_stm32f1_usb_lp_mask(USB_TypeDef* registers);
 bool nx_stm32f1_usb_lp_pending(const USB_TypeDef* registers);
+
+/** \brief True only before any latched bus transition suspends admission. */
+bool nx_stm32f1_usb_lp_ready(const nx_stm32f1_ep0_t* endpoint);
 /** \brief Rearm the selected masks, including newly pending events. */
 nx_result_t nx_stm32f1_usb_lp_rearm(const nx_stm32f1_ep0_t* endpoint);
 

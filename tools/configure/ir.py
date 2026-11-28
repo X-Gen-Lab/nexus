@@ -1218,7 +1218,9 @@ def mode_options(values):
     if kind == "lptim":
         return LptimOptions(values["tick_hz"], irq)
     if kind == "rtc":
-        from tools.configure.rtc import POLICY_MODES
+        from tools.configure.rtc import BACKUP_PROVISION, POLICY_MODES
+        if values["mode"] == BACKUP_PROVISION:
+            return RtcOptions(False, values["timeout_us"], values["poll_limit"], None)
         if values["mode"] in POLICY_MODES:
             initial = (values["initial"]
                        if values["mode"] == "provision-empty" else None)

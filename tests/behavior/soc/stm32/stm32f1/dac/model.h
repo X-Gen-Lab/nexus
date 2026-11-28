@@ -1,6 +1,6 @@
 /**
  * \file            model.h
- * \brief           F100 DAC, GPIO and RCC register model.
+ * \brief           STM32F1 DAC, GPIO and RCC register model.
  * \author          Nexus Team
  */
 #ifndef NX_STM32F1_DAC_MODEL_H
@@ -13,7 +13,7 @@ extern "C" {
 extern DAC_TypeDef model_dac;
 extern RCC_TypeDef model_rcc;
 extern GPIO_TypeDef model_gpio;
-void f100_dac_model_write(volatile uint32_t* reg, uint32_t value);
+void f1_dac_model_write(volatile uint32_t* reg, uint32_t value);
 #ifdef __cplusplus
 }
 #endif
@@ -25,5 +25,5 @@ void f100_dac_model_write(volatile uint32_t* reg, uint32_t value);
 #define RCC   (&model_rcc)
 #define GPIOA (&model_gpio)
 #define NX_STM32F1_WRITE(reg, value)                                           \
-    f100_dac_model_write((reg), (uint32_t)(value))
+    f1_dac_model_write((reg), (uint32_t)(value))
 #endif

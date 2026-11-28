@@ -1,6 +1,6 @@
 /**
  * \file            uart.c
- * \brief           F1 USART2 IRQ data path and checked hardware withdrawal.
+ * \brief           F1 USART IRQ data path and checked hardware withdrawal.
  * \author          Nexus Team
  * \version         1.0.0
  * \date            2026-11-28
@@ -36,6 +36,12 @@
 #define UART_CLOCK_HZ NEXUS_CLOCK_APB1_HZ
 #else
 #define UART_CLOCK_HZ 8000000U
+#endif
+
+#if defined(NEXUS_CLOCK_APB2_HZ)
+#define UART1_CLOCK_HZ NEXUS_CLOCK_APB2_HZ
+#else
+#define UART1_CLOCK_HZ 8000000U
 #endif
 
 #define RX_ERRORS                                                              \
@@ -83,7 +89,7 @@ static bool half_duplex(const nx_stm32f1_uart_config_t* config) {
            config->wire == NX_UART_WIRE_HALF_DUPLEX;
 }
 
-#define IRDA_TX_CRL_MASK (UINT32_C(0xf) << 8U)
+#define TX_CRL_MASK      (UINT32_C(0xf) << 8U)
 #define IRDA_TX_PARKED   ((uint32_t)LL_GPIO_SPEED_FREQ_LOW << 8U)
 #define IRDA_TX_AF       ((uint32_t)(GPIO_CRL_CNF0_1 | LL_GPIO_SPEED_FREQ_LOW) << 8U)
 #define IRDA_RX_GUARD_US UINT32_C(10000)
@@ -96,20 +102,49 @@ static bool irda(const nx_stm32f1_uart_config_t* config) {
 #define SYNC_CONTROLS                                                          \
     ((uint32_t)(USART_CR2_CLKEN | USART_CR2_CPOL | USART_CR2_CPHA |            \
                 USART_CR2_LBCL))
-#define CK_PAD      (UINT32_C(1) << 4U)
-#define CK_CRL_MASK (UINT32_C(0xf) << 16U)
-#define CK_PARKED   ((uint32_t)LL_GPIO_SPEED_FREQ_LOW << 16U)
-#define CK_AF       ((uint32_t)(GPIO_CRL_CNF0_1 | LL_GPIO_SPEED_FREQ_LOW) << 16U)
+#define CK_PAD       (UINT32_C(1) << 4U)
+#define CK_CRL_MASK  (UINT32_C(0xf) << 16U)
+#define CK_PARKED    ((uint32_t)LL_GPIO_SPEED_FREQ_LOW << 16U)
+#define CK_AF(speed) ((uint32_t)(GPIO_CRL_CNF0_1 | (speed)) << 16U)
+#define CARD_TX_PARKED                                                         \
+    ((uint32_t)(GPIO_CRL_CNF0_0 | LL_GPIO_SPEED_FREQ_LOW) << 8U)
+#define CARD_TX_AF                                                             \
+    ((uint32_t)(GPIO_CRL_CNF0_1 | GPIO_CRL_CNF0_0 | LL_GPIO_SPEED_FREQ_LOW)    \
+     << 8U)
+#define CARD_APB1_HZ   UINT32_C(8000000)
+#define CARD_PSC       UINT32_C(1)
+#define CARD_GTPR_MASK ((uint32_t)(USART_GTPR_GT | USART_GTPR_PSC))
 
 static bool synchronous(const nx_stm32f1_uart_config_t* config) {
     return UART_WIRE_ENABLED(NX_UART_WIRE_SYNCHRONOUS) &&
            config->wire == NX_UART_WIRE_SYNCHRONOUS;
 }
 
-/** \brief Park CK at its preloaded idle polarity during cold transitions. */
-static bool sync_clock_pad(bool enabled) {
+static bool smartcard(const nx_stm32f1_uart_config_t* config) {
+    return UART_WIRE_ENABLED(NX_UART_WIRE_SMARTCARD) &&
+           config->wire == NX_UART_WIRE_SMARTCARD;
+}
+
+static bool owns_clock(const nx_stm32f1_uart_config_t* config) {
+    return synchronous(config) || smartcard(config);
+}
+
+static uint32_t card_guard(const nx_stm32f1_uart_config_t* config) {
+    return (uint32_t)config->wire_options >> 1U;
+}
+
+/** \brief Park CK at its preloaded idle level during cold transitions. */
+static bool clock_pad(bool enabled, bool card) {
+    const uint32_t speed =
+        card ? LL_GPIO_SPEED_FREQ_MEDIUM : LL_GPIO_SPEED_FREQ_LOW;
     return nx_stm32f1_write_masked(&GPIOA->CRL, CK_CRL_MASK,
-                                   enabled ? CK_AF : CK_PARKED);
+                                   enabled ? CK_AF(speed) : CK_PARKED);
+}
+
+/** \brief Release the open-drain line before withdrawing the USART. */
+static bool card_data_pad(bool enabled) {
+    return nx_stm32f1_write_masked(&GPIOA->CRL, TX_CRL_MASK,
+                                   enabled ? CARD_TX_AF : CARD_TX_PARKED);
 }
 
 static bool directional(const nx_stm32f1_uart_config_t* config) {
@@ -119,11 +154,18 @@ static bool directional(const nx_stm32f1_uart_config_t* config) {
 /** \brief Keep the SIR output low while configuring or removing its encoder. */
 static bool irda_tx_pad(bool encoder) {
     const uint32_t mode = encoder ? IRDA_TX_AF : IRDA_TX_PARKED;
-    return nx_stm32f1_write_masked(&GPIOA->CRL, IRDA_TX_CRL_MASK, mode);
+    return nx_stm32f1_write_masked(&GPIOA->CRL, TX_CRL_MASK, mode);
 }
 
 static uint32_t cr3_controls(const nx_stm32f1_uart_config_t* config) {
-    return USART_CR3_EIE | (half_duplex(config) ? USART_CR3_HDSEL : 0U) |
+    const uint32_t card =
+        smartcard(config)
+            ? USART_CR3_SCEN |
+                  ((config->wire_options & NX_STM32F1_UART_CARD_NACK)
+                       ? USART_CR3_NACK
+                       : 0U)
+            : 0U;
+    return USART_CR3_EIE | card | (half_duplex(config) ? USART_CR3_HDSEL : 0U) |
            (irda(config) ? USART_CR3_IREN : 0U) |
            (hardware_flow(config) ? USART_CR3_CTSE | USART_CR3_RTSE : 0U);
 }
@@ -169,17 +211,78 @@ static bool uses_remap(const nx_stm32f1_uart_config_t* config) {
 #endif
 }
 
+/** \brief Only an assembly selecting USART1 includes its cold route. */
+static bool uses_usart1(const nx_stm32f1_uart_config_t* config) {
+#ifdef NEXUS_STM32F1_UART1
+    return config->registers == USART1;
+#else
+    (void)config;
+    return false;
+#endif
+}
+
+/** \brief Only an assembly selecting USART3 includes its cold route. */
+static bool uses_usart3(const nx_stm32f1_uart_config_t* config) {
+#ifdef NEXUS_STM32F1_UART3
+    return config->registers == USART3;
+#else
+    (void)config;
+    return false;
+#endif
+}
+
+/** \brief Resolve the fixed RCC enable field from the admitted instance. */
+static volatile uint32_t* uart_gate(const nx_stm32f1_uart_config_t* config,
+                                    uint32_t* mask) {
+    if (uses_usart1(config)) {
+        *mask = RCC_APB2ENR_USART1EN;
+        return &RCC->APB2ENR;
+    }
+#ifdef NEXUS_STM32F1_UART3
+    *mask = uses_usart3(config) ? RCC_APB1ENR_USART3EN : RCC_APB1ENR_USART2EN;
+#else
+    *mask = RCC_APB1ENR_USART2EN;
+#endif
+    return &RCC->APB1ENR;
+}
+
 /** \brief Reject invalid or overlapping storage before a hardware loan. */
 nx_result_t nx_stm32f1_uart_admit(const nx_stm32f1_uart_t* state,
                                   const nx_stm32f1_uart_config_t* config) {
+    if (state == NULL || config == NULL) {
+        return NX_ERROR_INVALID;
+    }
     const bool remap = uses_remap(config);
-    if (state == NULL || config == NULL || config->registers != USART2 ||
-        config->irq != USART2_IRQn || config->clock_hz != UART_CLOCK_HZ ||
-        (half_duplex(config)
-             ? (config->rx_registers != NULL || config->rx_pin != 0U ||
-                config->profile != NX_UART_RX_BYTES || config->frame != 0U)
+    const bool first = uses_usart1(config);
+    const bool third = uses_usart3(config);
+    GPIO_TypeDef* const bank = third ? GPIOB : GPIOA;
+    const unsigned rx = third ? 11U : first ? 10U : 3U;
+    const unsigned tx = third ? 10U : first ? 9U : 2U;
+#ifdef NEXUS_STM32F1_UART3
+    if (third &&
+        (config->irq != USART3_IRQn || config->clock_hz != UART_CLOCK_HZ ||
+         config->wire != NX_STM32F1_UART_WIRE_NONE ||
+         config->profile == NX_UART_RX_BLOCKS)) {
+        return NX_ERROR_INVALID;
+    }
+#endif
+    if ((first ? (config->irq != USART1_IRQn ||
+                  config->clock_hz != UART1_CLOCK_HZ ||
+                  config->wire != NX_STM32F1_UART_WIRE_NONE ||
+                  config->frame != 0U || config->profile == NX_UART_RX_BLOCKS)
+               : (!third &&
+                  (config->registers != USART2 || config->irq != USART2_IRQn ||
+                   config->clock_hz != UART_CLOCK_HZ))) ||
+        ((half_duplex(config) || smartcard(config))
+             ? (config->rx_registers != NULL || config->rx_pin != 0U)
              : (!remap &&
-                (config->rx_registers != GPIOA || config->rx_pin != 3U))) ||
+                (config->rx_registers != bank || config->rx_pin != rx))) ||
+        (half_duplex(config) &&
+         (config->profile != NX_UART_RX_BYTES || config->frame != 0U)) ||
+        (smartcard(config) &&
+         (config->profile != NX_UART_RX_EVENTS || config->frame != 0U ||
+          config->clock_hz != CARD_APB1_HZ ||
+          card_guard(config) > UINT8_MAX)) ||
         config->baud < 1200U || config->baud > 500000U ||
         config->priority >= (1U << __NVIC_PRIO_BITS) ||
         (config->frame & 0xF0U) != 0U ||
@@ -188,7 +291,7 @@ nx_result_t nx_stm32f1_uart_admit(const nx_stm32f1_uart_t* state,
          (config->frame & NX_STM32F1_UART_PARITY) == 0U)) {
         return NX_ERROR_INVALID;
     }
-    if (UART_WIRE &&
+    if (UART_WIRE && !first && !third &&
         ((lin(config) &&
           (config->profile != NX_UART_RX_EVENTS || config->frame != 0U ||
            config->baud > 20000U ||
@@ -205,7 +308,7 @@ nx_result_t nx_stm32f1_uart_admit(const nx_stm32f1_uart_t* state,
            config->wire_options >
                (NX_STM32F1_UART_SYNC_CPOL | NX_STM32F1_UART_SYNC_CPHA |
                 NX_STM32F1_UART_SYNC_LBCL))) ||
-         config->wire > NX_UART_WIRE_IRDA ||
+         config->wire > NX_UART_WIRE_SMARTCARD ||
          !UART_WIRE_ENABLED(config->wire))) {
         return NX_ERROR_INVALID;
     }
@@ -221,7 +324,7 @@ nx_result_t nx_stm32f1_uart_admit(const nx_stm32f1_uart_t* state,
                                      ? 1U
                                      : _Alignof(nx_uart_rx_event_t);
         if ((!remap &&
-             (config->tx_registers != GPIOA || config->tx_pin != 2U)) ||
+             (config->tx_registers != bank || config->tx_pin != tx)) ||
             (config->profile != NX_UART_RX_BYTES &&
              config->profile != NX_UART_RX_EVENTS) ||
             config->rx_capacity == 0U ||
@@ -245,7 +348,7 @@ nx_result_t nx_stm32f1_uart_admit(const nx_stm32f1_uart_t* state,
     }
     /* ES096 2.3.2/2.3.3: USART2 CK depends on SPI1. An external owner
      * may have left SPI1 clocked even when the assembly excludes it. */
-    return (synchronous(config) && (RCC->APB2ENR & RCC_APB2ENR_SPI1EN) != 0U) ||
+    return (owns_clock(config) && (RCC->APB2ENR & RCC_APB2ENR_SPI1EN) != 0U) ||
                    NX_STM32F1_IRQ_ENABLED(config->irq) ||
                    NX_STM32F1_IRQ_PENDING(config->irq) ||
                    NX_STM32F1_IRQ_ACTIVE(config->irq)
@@ -262,7 +365,14 @@ static nx_result_t check_default_route(nx_stm32f1_uart_t* state) {
         !nx_stm32f1_write_masked(&RCC->APB2ENR, gate, gate)) {
         return NX_ERROR_IO;
     }
-    const bool remapped = (AFIO->MAPR & AFIO_MAPR_USART2_REMAP) != 0U;
+    uint32_t field = uses_usart1(state->config) ? AFIO_MAPR_USART1_REMAP
+                                                : AFIO_MAPR_USART2_REMAP;
+#ifdef NEXUS_STM32F1_UART3
+    if (uses_usart3(state->config)) {
+        field = AFIO_MAPR_USART3_REMAP;
+    }
+#endif
+    const bool remapped = (AFIO->MAPR & field) != 0U;
     if (state->afio_gate_added &&
         !nx_stm32f1_write_masked(&RCC->APB2ENR, gate, 0U)) {
         return NX_ERROR_IO;
@@ -324,10 +434,11 @@ nx_result_t nx_stm32f1_uart_prepare(nx_stm32f1_uart_t* state,
             return result;
         }
     }
-    const uint32_t gate = RCC_APB1ENR_USART2EN;
-    state->usart_gate_added = (RCC->APB1ENR & gate) == 0U;
+    uint32_t gate;
+    volatile uint32_t* enabled = uart_gate(config, &gate);
+    state->usart_gate_added = (*enabled & gate) == 0U;
     if (state->usart_gate_added &&
-        !nx_stm32f1_write_masked(&RCC->APB1ENR, gate, gate)) {
+        !nx_stm32f1_write_masked(enabled, gate, gate)) {
         return NX_ERROR_IO;
     }
     USART_TypeDef* registers = config->registers;
@@ -339,14 +450,19 @@ nx_result_t nx_stm32f1_uart_prepare(nx_stm32f1_uart_t* state,
     const bool rx_only = config->profile == NX_UART_RX_BLOCKS;
     const bool flow = hardware_flow(config);
     const bool sir = irda(config);
-    const bool clocked = synchronous(config);
+    const bool card = smartcard(config);
+    const bool clocked = owns_clock(config);
+    const bool single_line = half_duplex(config) || card;
+    const bool third = uses_usart3(config);
+    const bool high_bank = uses_usart1(config) || third;
+    const unsigned bank_offset = high_bank ? 8U : 0U;
     const unsigned tx = config->tx_pin;
     const unsigned rx = config->rx_pin;
     const uint16_t pins =
-        (uint16_t)((half_duplex(config) ? 0U : 1U << rx) |
-                   (rx_only ? 0U : 1U << tx) | (flow ? CTS_PAD | RTS_PAD : 0U) |
-                   (clocked ? CK_PAD : 0U));
-    result = nx_stm32f1_pads_capture(&state->pads, remap ? GPIOD : GPIOA, pins);
+        (uint16_t)((single_line ? 0U : 1U << rx) | (rx_only ? 0U : 1U << tx) |
+                   (flow ? CTS_PAD | RTS_PAD : 0U) | (clocked ? CK_PAD : 0U));
+    GPIO_TypeDef* const bank = third ? GPIOB : remap ? GPIOD : GPIOA;
+    result = nx_stm32f1_pads_capture(&state->pads, bank, pins);
     if (result != NX_SUCCESS) {
         return result;
     }
@@ -364,12 +480,14 @@ nx_result_t nx_stm32f1_uart_prepare(nx_stm32f1_uart_t* state,
                              (half_duplex(config) ? LL_GPIO_OUTPUT_OPENDRAIN
                                                   : LL_GPIO_OUTPUT_PUSHPULL);
     const uint32_t rx_mode = sir ? GPIO_CRL_CNF0_1 : LL_GPIO_MODE_FLOATING;
-    const uint32_t crl = (half_duplex(config) ? 0U : rx_mode << (4U * rx)) |
-                         (rx_only ? 0U
-                          : sir   ? IRDA_TX_PARKED
-                                  : tx_mode << (4U * tx)) |
-                         (flow ? GPIO_CRL_CNF0_1 | RTS_HIGH_MODE : 0U) |
-                         (clocked ? CK_PARKED : 0U);
+    const uint32_t pin_modes =
+        (single_line ? 0U : rx_mode << (4U * (rx - bank_offset))) |
+        (rx_only ? 0U
+         : sir   ? IRDA_TX_PARKED
+         : card  ? CARD_TX_PARKED
+                 : tx_mode << (4U * (tx - bank_offset))) |
+        (flow ? GPIO_CRL_CNF0_1 | RTS_HIGH_MODE : 0U) |
+        (clocked ? CK_PARKED : 0U);
     /* The hardware flow pins park inactive. SIR TX idles low and RX high. */
     uint32_t latch = state->pads.latch | (rx_only ? 0U : 1U << tx) |
                      (flow ? CTS_PAD | RTS_PAD : 0U);
@@ -378,9 +496,11 @@ nx_result_t nx_stm32f1_uart_prepare(nx_stm32f1_uart_t* state,
     if (clocked)
         latch =
             (latch & ~CK_PAD) |
-            ((config->wire_options & NX_STM32F1_UART_SYNC_CPOL) != 0U ? CK_PAD
-                                                                      : 0U);
-    result = nx_stm32f1_pads_apply(&state->pads, crl, 0U, latch);
+            (!card && (config->wire_options & NX_STM32F1_UART_SYNC_CPOL) != 0U
+                 ? CK_PAD
+                 : 0U);
+    result = nx_stm32f1_pads_apply(&state->pads, high_bank ? 0U : pin_modes,
+                                   high_bank ? pin_modes : 0U, latch);
     if (result != NX_SUCCESS) {
         return result;
     }
@@ -388,11 +508,14 @@ nx_result_t nx_stm32f1_uart_prepare(nx_stm32f1_uart_t* state,
     const uint32_t divisor =
         (config->clock_hz + (sir ? config->baud - 1U : config->baud / 2U)) /
         config->baud;
-    const uint32_t controls = rx_only ? USART_CR1_UE
-                              : directional(config)
-                                  ? USART_CR1_UE | RX_DIRECTION
-                                  : UART_CONTROLS | RX_CONTROLS;
+    /* ES096 2.9.1: Smartcard consumes PE together with RXNE. */
+    const uint32_t controls =
+        rx_only ? USART_CR1_UE
+        : directional(config)
+            ? USART_CR1_UE | RX_DIRECTION
+            : UART_CONTROLS | (card ? USART_CR1_RXNEIE : RX_CONTROLS);
     const uint32_t frame =
+        (card ? USART_CR1_M | USART_CR1_PCE : 0U) |
         ((config->frame & NX_STM32F1_UART_WORD9) ? USART_CR1_M : 0U) |
         ((config->frame & NX_STM32F1_UART_PARITY) ? USART_CR1_PCE : 0U) |
         ((config->frame & NX_STM32F1_UART_ODD) ? USART_CR1_PS : 0U);
@@ -406,17 +529,24 @@ nx_result_t nx_stm32f1_uart_prepare(nx_stm32f1_uart_t* state,
      * then enable TE and RE together before exposing CK on PA4. */
     if (clocked)
         cr2 |= USART_CR2_CLKEN |
-               ((uint32_t)config->wire_options << USART_CR2_LBCL_Pos);
+               (card ? USART_CR2_STOP
+                     : (uint32_t)config->wire_options << USART_CR2_LBCL_Pos);
+    const uint32_t prescaler =
+        card ? CARD_PSC | (card_guard(config) << USART_GTPR_GT_Pos)
+             : (sir ? 1U : 0U);
     const uint32_t cr3 = cr3_controls(config);
     if (!nx_stm32f1_write_masked(&registers->BRR, UINT16_MAX, divisor) ||
         (cr2 != 0U && !nx_stm32f1_write_masked(&registers->CR2, cr2, cr2)) ||
-        (sir &&
-         !nx_stm32f1_write_masked(&registers->GTPR, USART_GTPR_PSC, 1U)) ||
+        (prescaler != 0U &&
+         !nx_stm32f1_write_masked(&registers->GTPR,
+                                  card ? CARD_GTPR_MASK : USART_GTPR_PSC,
+                                  prescaler)) ||
         (!rx_only && !nx_stm32f1_write_masked(&registers->CR3, cr3, cr3)) ||
         !nx_stm32f1_write_masked(&registers->CR1,
                                  UART_CONTROLS | RX_CONTROLS | FRAME_CONTROLS,
                                  controls | frame) ||
-        (sir && !irda_tx_pad(true)) || (clocked && !sync_clock_pad(true))) {
+        (sir && !irda_tx_pad(true)) || (card && !card_data_pad(true)) ||
+        (clocked && !clock_pad(true, card))) {
         return NX_ERROR_IO;
     }
     state->previous_priority = (uint8_t)NX_STM32F1_IRQ_PRIORITY(config->irq);
@@ -467,6 +597,7 @@ nx_result_t nx_stm32f1_uart_validate(void* context,
         return NX_ERROR_BUSY;
     }
     if (!independent(state, request, sizeof(*request)) ||
+        (smartcard(state->config) && request->length != 1U) ||
         (!lin_break(state, request) &&
          (request->length == 0U ||
           !nx_io_dispatch_span(request->data, request->length, 1U) ||
@@ -512,7 +643,7 @@ static nx_result_t begin_tx(nx_stm32f1_uart_t* state,
     nx_arch_irq_state_t mask = nx_arch_irq_save();
     USART_TypeDef* registers = state->config->registers;
     const nx_stm32f1_uart_config_t* config = state->config;
-    if (directional(config) &&
+    if ((directional(config) || smartcard(config)) &&
         ((GPIOA->IDR &
           (1U << (irda(config) ? config->rx_pin : config->tx_pin))) == 0U ||
          (NX_STM32F1_UART_STATUS(registers) & RX_STATUS) != 0U)) {
@@ -563,8 +694,11 @@ static void drain(nx_stm32f1_uart_t* state, nx_result_t terminal,
     state->wire_done = state->sent == 0U && !lin_break(state, state->active);
     (void)nx_request_transition(&state->active->base, NX_REQUEST_DRAINING);
     const uint32_t frame = state->config->frame;
-    const uint32_t frame_bits = 10U + ((frame & NX_STM32F1_UART_WORD9) != 0U) +
-                                ((frame & NX_STM32F1_UART_STOP2) != 0U);
+    const uint32_t frame_bits =
+        smartcard(state->config)
+            ? 12U + card_guard(state->config)
+            : 10U + ((frame & NX_STM32F1_UART_WORD9) != 0U) +
+                  ((frame & NX_STM32F1_UART_STOP2) != 0U);
     const uint32_t grace_us =
         2000000U * frame_bits / state->config->baud + 100U;
     if (nx_deadline_finite_after(now, grace_us, &state->drain_deadline) !=
@@ -698,13 +832,28 @@ static void mark_complete(nx_stm32f1_uart_t* state, nx_time_us_t now) {
             state->terminal = NX_ERROR_IO;
     }
     if (!release_tx(state, !optical_turnaround)) {
-        if (UART_WIRE) {
+        if (UART_WIRE && !uses_usart1(state->config)) {
             NX_STM32F1_IRQ_DISABLE(state->config->irq);
             if (state->terminal == NX_SUCCESS)
                 state->terminal = NX_ERROR_IO;
         }
         state->closing = true;
     }
+}
+
+/** \brief Associate a framing-only condition with the sole TX character. */
+static bool card_nack(nx_stm32f1_uart_t* state, uint32_t status) {
+    if (!smartcard(state->config) || state->active == NULL ||
+        state->wire_done || state->sent == 0U ||
+        (status & RX_STATUS) != USART_SR_FE) {
+        return false;
+    }
+    /* RM0008 27.3.11: peer NACK does not start a receive frame. */
+    (void)NX_STM32F1_UART_RECEIVE(state->config->registers);
+    if (state->terminal == NX_SUCCESS) {
+        drain(state, NX_ERROR_NACK, nx_time_now_us());
+    }
+    return true;
 }
 
 /** \brief Observe one SR, one DR receive and at most one TX byte per IRQ. */
@@ -716,7 +865,16 @@ static void uart_irq(nx_stm32f1_uart_t* state, uint8_t payload) {
     const uint32_t sr = NX_STM32F1_UART_STATUS(registers);
     const uint32_t cr1 = registers->CR1;
     const uint32_t received = sr & receive_status(state->config);
-    const bool rx = received != 0U && (cr1 & RX_CONTROLS) != 0U;
+    const bool pending_parity =
+        smartcard(state->config) &&
+        (sr & (USART_SR_PE | USART_SR_RXNE)) == USART_SR_PE;
+    /* ES096 2.9.1/2.9.3: preserve PE until RXNE, including a queued TX. */
+    if (pending_parity && state->active != NULL && state->sent == 0U &&
+        !state->wire_done && state->terminal == NX_SUCCESS) {
+        drain(state, NX_ERROR_BUSY, nx_time_now_us());
+    }
+    const bool rx = !pending_parity && !card_nack(state, sr) &&
+                    received != 0U && (cr1 & RX_CONTROLS) != 0U;
     if (rx) {
         receive(state, received, payload);
     }
@@ -774,9 +932,12 @@ static void uart_service(void* context) {
     const bool breaking = lin_break(state, active);
     if (!state->wire_done && (state->sent != 0U || breaking) &&
         (!breaking || (registers->CR1 & USART_CR1_SBK) == 0U) &&
-        (state->terminal != NX_SUCCESS || state->sent == active->length) &&
-        (NX_STM32F1_UART_STATUS(registers) & USART_SR_TC) != 0U) {
-        mark_complete(state, now);
+        (state->terminal != NX_SUCCESS || state->sent == active->length)) {
+        const uint32_t status = NX_STM32F1_UART_STATUS(registers);
+        (void)card_nack(state, status);
+        if ((status & USART_SR_TC) != 0U) {
+            mark_complete(state, now);
+        }
     }
     if (!state->wire_done && state->terminal == NX_SUCCESS &&
         nx_deadline_expired(active->base.deadline, now)) {
@@ -944,23 +1105,28 @@ nx_result_t nx_stm32f1_uart_stop(nx_stm32f1_uart_t* state) {
     state->live = false;
     nx_arch_irq_restore(mask);
     if (state->controls_owned) {
-        const bool clocked = synchronous(config);
+        const bool card = smartcard(config);
+        const bool clocked = owns_clock(config);
         const uint32_t cr2 =
             (lin(config) ? LIN_CONTROLS : 0U) | (clocked ? SYNC_CONTROLS : 0U) |
-            ((config->frame & NX_STM32F1_UART_STOP2) != 0U ? USART_CR2_STOP
-                                                           : 0U);
+            (card || (config->frame & NX_STM32F1_UART_STOP2) != 0U
+                 ? USART_CR2_STOP
+                 : 0U);
         const uint32_t cr3 = cr3_controls(config);
         const bool sir = irda(config);
         if ((sir && !irda_tx_pad(false)) ||
-            (clocked && !sync_clock_pad(false)) ||
+            (clocked && !clock_pad(false, card)) ||
+            (card && !card_data_pad(false)) ||
             !nx_stm32f1_write_masked(&registers->CR1,
                                      UART_CONTROLS | RX_CONTROLS |
                                          TX_INTERRUPTS | FRAME_CONTROLS,
                                      0U) ||
             (cr2 != 0U && !nx_stm32f1_write_masked(&registers->CR2, cr2, 0U)) ||
             !nx_stm32f1_write_masked(&registers->CR3, cr3, 0U) ||
-            (sir &&
-             !nx_stm32f1_write_masked(&registers->GTPR, USART_GTPR_PSC, 0U)) ||
+            ((sir || card) &&
+             !nx_stm32f1_write_masked(&registers->GTPR,
+                                      card ? CARD_GTPR_MASK : USART_GTPR_PSC,
+                                      0U)) ||
             !nx_stm32f1_write_masked(&registers->BRR, UINT16_MAX, 0U)) {
             return NX_ERROR_IO;
         }
@@ -1008,9 +1174,12 @@ nx_result_t nx_stm32f1_uart_close(nx_stm32f1_uart_t* state) {
     if (restored != NX_SUCCESS) {
         return restored;
     }
-    if (state->usart_gate_added &&
-        !nx_stm32f1_write_masked(&RCC->APB1ENR, RCC_APB1ENR_USART2EN, 0U)) {
-        return NX_ERROR_IO;
+    if (state->usart_gate_added) {
+        uint32_t gate;
+        volatile uint32_t* enabled = uart_gate(state->config, &gate);
+        if (!nx_stm32f1_write_masked(enabled, gate, 0U)) {
+            return NX_ERROR_IO;
+        }
     }
     if (state->afio_gate_added &&
         !nx_stm32f1_write_masked(&RCC->APB2ENR, RCC_APB2ENR_AFIOEN, 0U)) {

@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "id": "stm32f103rb-usart3-wire-reference",
+  "soc": "STM32F103RBT6",
+  "soc_family": "stm32f1",
+  "source_revision": "software-reference-v1",
+  "physical_pcb_revision": null,
+  "clocks": {},
+  "bindings": [
+    {
+      "id": "uart3",
+      "controller": "USART3",
+      "route": "usart3-pb10-pb11"
+    },
+    {
+      "id": "uart2",
+      "controller": "USART2",
+      "route": "usart2-pa2-pa3"
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14"
+  ],
+  "unknowns": [
+    "External 3.3 V UART wiring, pin loading and physical board revision have not been observed."
+  ],
+  "provenance": [
+    "https://www.st.com/resource/en/datasheet/stm32f103rb.pdf",
+    "https://www.st.com/resource/en/reference_manual/rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32-bit-mcus-stmicroelectronics.pdf"
+  ],
+  "backend_support": [
+    "baremetal"
+  ]
+}

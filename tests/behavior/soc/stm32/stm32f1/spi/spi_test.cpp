@@ -1,7 +1,9 @@
 /**
  * \file            spi_test.cpp
- * \brief           Exact F103 SPI1 and SPI2 polling, tail and CS recovery
- * tests. \author          Nexus Team \version         1.0.0 \date 2026-11-28
+ * \brief           STM32F1 SPI polling, routing and CS recovery.
+ * \author          Nexus Team
+ * \version         1.0.0
+ * \date            2026-11-28
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "drivers/spi/instance.h"
@@ -25,6 +27,10 @@ bool blocked_cs_release;
 bool blocked_afio_release;
 SPI_TypeDef* last_registers;
 unsigned mapr_writes;
+#if defined(STM32F107xC)
+constexpr uint32_t spi3_select_pin = 1U << 9U;
+bool blocked_remap;
+#endif
 nx_time_us_t now;
 uint16_t last_word;
 uint32_t last_controls;
@@ -51,6 +57,11 @@ class F1Spi : public testing::Test {
         GPIOA->CRL = GPIOA->CRH = UINT32_C(0x44444444);
         GPIOB->CRL = GPIOB->CRH = UINT32_C(0x44444444);
         SPI1->SR = SPI2->SR = SPI_SR_TXE;
+#if defined(STM32F107xC)
+        GPIOC->CRL = GPIOC->CRH = UINT32_C(0x44444444);
+        SPI3->SR = SPI_SR_TXE;
+        blocked_remap = false;
+#endif
         RCC->CR = RCC_CR_HSION | RCC_CR_HSIRDY;
         stuck_busy = blocked_reset = blocked_cs_release = false;
         blocked_afio_release = false;
@@ -253,6 +264,82 @@ TEST_F(F1Spi, StuckWireAndResetHoldSelectionUntilExplicitRecovery) {
     EXPECT_NE(GPIOB->ODR & select_pin, 0U);
     EXPECT_EQ(frames, transmitted);
 }
+#if defined(STM32F107xC)
+TEST_F(F1Spi, Spi3RemapPreservesDebugAndSharesBothTransactionWidths) {
+    const nx_stm32f1_spi_config_t route{SPI3, GPIOC, 36000000U, 10U,
+                                        11U,  12U,   9U};
+    const uint32_t original =
+        AFIO_MAPR_USART2_REMAP | AFIO_MAPR_SWJ_CFG_NOJNTRST;
+    AFIO->MAPR = original;
+    GPIOC->ODR = spi3_select_pin;
+    ASSERT_EQ(nx_stm32f1_spi_prepare(&bus, &route), NX_SUCCESS);
+    EXPECT_EQ(AFIO->MAPR, original | AFIO_MAPR_SPI3_REMAP);
+    EXPECT_EQ(RCC->APB1ENR, RCC_APB1ENR_SPI3EN);
+    EXPECT_EQ(GPIOC->CRH, UINT32_C(0x444B4B24));
+    EXPECT_EQ(GPIOB->CRL, UINT32_C(0x44444444));
+    EXPECT_EQ(GPIOA->CRH, UINT32_C(0x44444444));
+    nx_stm32f1_spi_endpoint_t device{&bus, GPIOC, 4500000U, 9U, 0U, false};
+    const nx_spi_transaction_endpoint_t target{&nx_stm32f1_spi_transaction_ops,
+                                               &device};
+    const uint8_t tx8 = 0xABU;
+    uint8_t rx8 = 0U;
+    const uint16_t tx16 = 0x9BCDU;
+    uint16_t rx16 = 0U;
+    const nx_spi_segment_t byte{&tx8, &rx8, 1U, 0U};
+    const nx_spi_segment_t word{&tx16, &rx16, 1U, 0U};
+    size_t completed = 0U;
+    ASSERT_EQ(
+        nx_spi_transaction_transfer(&target, &byte, 1U, 8U, 1000U, &completed),
+        NX_SUCCESS);
+    EXPECT_EQ(completed, 1U);
+    EXPECT_EQ(last_registers, SPI3);
+    EXPECT_EQ(last_width, 8U);
+    EXPECT_EQ(rx8, tx8 ^ 0xA5U);
+    ASSERT_EQ(
+        nx_spi_transaction_transfer(&target, &word, 1U, 16U, 1000U, &completed),
+        NX_SUCCESS);
+    EXPECT_EQ(last_width, 16U);
+    EXPECT_EQ(last_controls & (SPI_CR1_CRCEN | SPI_CR1_BIDIMODE), 0U);
+    EXPECT_EQ(SPI3->CR2, 0U);
+    EXPECT_EQ(rx16, tx16 ^ 0xA5A5U);
+    EXPECT_EQ(selects, 2U);
+    EXPECT_EQ(deselects, 2U);
+    EXPECT_EQ(SPI2->CR1, 0U);
+    EXPECT_EQ(SPI3->CR1 & SPI_CR1_SPE, 0U);
+    ASSERT_EQ(nx_stm32f1_spi_close(&bus), NX_SUCCESS);
+    EXPECT_EQ(AFIO->MAPR, original);
+    EXPECT_EQ(mapr_writes, 2U);
+    EXPECT_EQ(RCC->APB1ENR, 0U);
+    EXPECT_EQ(RCC->APB2ENR, 0U);
+    EXPECT_EQ(GPIOC->CRH, UINT32_C(0x44444444));
+}
+
+TEST_F(F1Spi, Spi3RemapAndGatesSurviveFailedCloseForRetry) {
+    const nx_stm32f1_spi_config_t route{SPI3, GPIOC, 36000000U, 10U,
+                                        11U,  12U,   9U};
+    const uint32_t original =
+        AFIO_MAPR_ETH_REMAP | AFIO_MAPR_SWJ_CFG_JTAGDISABLE;
+    AFIO->MAPR = original;
+    blocked_remap = true;
+    EXPECT_EQ(nx_stm32f1_spi_prepare(&bus, &route), NX_ERROR_IO);
+    EXPECT_EQ(AFIO->MAPR, original);
+    EXPECT_EQ(GPIOC->CRH, UINT32_C(0x44444444));
+    EXPECT_EQ(nx_stm32f1_spi_close(&bus), NX_SUCCESS);
+    EXPECT_EQ(RCC->APB2ENR, 0U);
+
+    blocked_remap = false;
+    ASSERT_EQ(nx_stm32f1_spi_prepare(&bus, &route), NX_SUCCESS);
+    blocked_remap = true;
+    EXPECT_EQ(nx_stm32f1_spi_close(&bus), NX_ERROR_IO);
+    EXPECT_EQ(AFIO->MAPR, original | AFIO_MAPR_SPI3_REMAP);
+    EXPECT_NE(RCC->APB2ENR & RCC_APB2ENR_AFIOEN, 0U);
+    blocked_remap = false;
+    ASSERT_EQ(nx_stm32f1_spi_close(&bus), NX_SUCCESS);
+    EXPECT_EQ(AFIO->MAPR, original);
+    EXPECT_EQ(RCC->APB1ENR, 0U);
+    EXPECT_EQ(RCC->APB2ENR, 0U);
+}
+#endif
 } /* namespace */
 
 extern "C" {
@@ -265,6 +352,15 @@ nx_time_us_t nx_time_now_us(void) {
 void nx_spi_model_write(volatile uint32_t* reg, uint32_t value) {
     if (reg == &AFIO->MAPR) {
         ++mapr_writes;
+#if defined(STM32F107xC)
+        EXPECT_EQ(value & AFIO_MAPR_SWJ_CFG, AFIO_MAPR_SWJ_CFG);
+        EXPECT_EQ((value ^ *reg) & ~(AFIO_MAPR_SWJ_CFG | AFIO_MAPR_SPI3_REMAP),
+                  0U);
+        if (blocked_remap)
+            return;
+        value = (value & ~static_cast<uint32_t>(AFIO_MAPR_SWJ_CFG)) |
+                (*reg & AFIO_MAPR_SWJ_CFG);
+#endif
     }
     if (reg == &RCC->APB2ENR && blocked_afio_release &&
         (value & RCC_APB2ENR_AFIOEN) == 0U) {
@@ -284,6 +380,15 @@ void nx_spi_model_write(volatile uint32_t* reg, uint32_t value) {
         SPI2->SR = SPI_SR_TXE;
         tail_ticks = 0U;
     }
+#if defined(STM32F107xC)
+    if (reg == &RCC->APB1RSTR && (value & RCC_APB1RSTR_SPI3RST) != 0U) {
+        if (blocked_reset)
+            return;
+        SPI3->CR1 = SPI3->CR2 = SPI3->I2SCFGR = 0U;
+        SPI3->SR = SPI_SR_TXE;
+        tail_ticks = 0U;
+    }
+#endif
     if (reg == &RCC->APB2RSTR && (value & RCC_APB2RSTR_SPI1RST) != 0U) {
         if (blocked_reset) {
             return;
@@ -300,6 +405,16 @@ void nx_spi_model_bsrr(GPIO_TypeDef* reg, uint32_t value) {
     }
     const uint32_t previous = reg->ODR;
     reg->ODR = (previous & ~(value >> 16U)) | (value & 0xFFFFU);
+#if defined(STM32F107xC)
+    if (reg == GPIOC && ((previous ^ reg->ODR) & spi3_select_pin) != 0U) {
+        if ((reg->ODR & spi3_select_pin) != 0U) {
+            EXPECT_EQ(SPI3->SR & SPI_SR_BSY, 0U);
+            ++deselects;
+        } else {
+            ++selects;
+        }
+    }
+#endif
     if (reg == GPIOB && ((previous ^ reg->ODR) & select_pin) != 0U) {
         if ((reg->ODR & select_pin) != 0U) {
             EXPECT_EQ(SPI2->SR & SPI_SR_BSY, 0U);
@@ -317,11 +432,18 @@ uint32_t nx_spi_model_status(SPI_TypeDef* reg) {
     return reg->SR;
 }
 void nx_spi_model_send(SPI_TypeDef* reg, uint16_t value, uint8_t bits) {
-    ASSERT_TRUE(reg == SPI1 || reg == SPI2);
-    if (reg == SPI1) {
+#if defined(STM32F107xC)
+    if (reg == SPI3) {
+        EXPECT_EQ(GPIOC->ODR & spi3_select_pin, 0U);
+        EXPECT_NE(RCC->APB1ENR & RCC_APB1ENR_SPI3EN, 0U);
+        EXPECT_NE(AFIO->MAPR & AFIO_MAPR_SPI3_REMAP, 0U);
+    } else
+#endif
+        if (reg == SPI1) {
         EXPECT_EQ(GPIOA->ODR & spi1_select_pin, 0U);
         EXPECT_NE(GPIOB->ODR & select_pin, 0U);
     } else {
+        EXPECT_EQ(reg, SPI2);
         EXPECT_EQ(GPIOB->ODR & select_pin, 0U);
         if ((RCC->APB2ENR & RCC_APB2ENR_SPI1EN) != 0U) {
             EXPECT_NE(GPIOA->ODR & spi1_select_pin, 0U);

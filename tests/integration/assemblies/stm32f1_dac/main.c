@@ -22,9 +22,9 @@ int main(void) {
         nx_dac_port_info(output, &info) == NX_SUCCESS &&
         info.code_bits == 12U && info.maximum_code == 4095U &&
         nx_dac_port_start(output, 0U, deadline) == NX_SUCCESS &&
-        nx_dac_port_write(output, NX_DAC_CHANNEL_1, 512U) == NX_SUCCESS &&
+        nx_dac_port_write(output, FIXTURE_DAC_CHANNEL, 512U) == NX_SUCCESS &&
         nx_dac_port_state(output, &state) == NX_SUCCESS &&
-        state.output_codes[0] == 512U;
+        state.output_codes[FIXTURE_DAC_CHANNEL - 1] == 512U;
     const nx_result_t parked = nx_dac_port_stop(output, deadline);
     const nx_result_t stopped = nx_platform_stop();
     return operation && parked == NX_SUCCESS && stopped == NX_SUCCESS ? 0 : 2;

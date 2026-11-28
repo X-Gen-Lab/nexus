@@ -8,6 +8,7 @@
 
 #include "stm32f1xx.h"
 #include <stdbool.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -20,6 +21,7 @@ void nx_f1_flash_model_write(volatile uint32_t* reg, uint32_t value);
 void nx_f1_flash_model_store(volatile uint16_t* address, uint16_t value);
 bool nx_f1_flash_model_irq_idle(void);
 uint32_t nx_f1_flash_model_clock(void);
+uintptr_t nx_f1_flash_model_sram_start(void);
 
 #ifdef __cplusplus
 }
@@ -33,5 +35,6 @@ uint32_t nx_f1_flash_model_clock(void);
     nx_f1_flash_model_store((address), (value))
 #define NX_F1_FLASH_IRQ_IDLE() nx_f1_flash_model_irq_idle()
 #define NX_F1_FLASH_CLOCK()    nx_f1_flash_model_clock()
+#define NX_F1_FLASH_SRAM_START (nx_f1_flash_model_sram_start())
 
 #endif /* NX_TEST_STM32F1_FLASH_MODEL_H */

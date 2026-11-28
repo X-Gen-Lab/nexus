@@ -1,6 +1,6 @@
 /**
  * \file            main.c
- * \brief           Consume an exclusive external SRAM CPU loan.
+ * \brief           Consume the selected FSMC SRAM or CN16 endpoint.
  * \author          Nexus Team
  * \version         1.0.0
  * \date            2026-11-28
@@ -9,6 +9,23 @@
 #include "nexus_bindings.h"
 #include "nexus_factory_strong.h"
 
+#if defined(NX_PARALLEL16_REF_PANEL)
+int main(void) {
+    nx_platform_start_result_t started = nx_platform_start();
+    if (started.primary != NX_SUCCESS || started.cleanup != NX_SUCCESS)
+        return 1;
+    const nx_external_bus_port_t* bus =
+        nx_factory_external_bus_ref(NX_EXTERNAL_BUS_REF_BANKED);
+    const nx_parallel16_endpoint_t* panel =
+        nx_factory_parallel16_ref(NX_PARALLEL16_REF_PANEL);
+    /* Exercise the selected face without issuing a panel command. */
+    const bool valid =
+        nx_external_bus_port_state(bus) == NX_EXTERNAL_BUS_PREPARED &&
+        nx_parallel16_endpoint_command(panel, 0U, nx_time_now_us()) ==
+            NX_ERROR_TIMEOUT;
+    return nx_platform_stop() == NX_SUCCESS && valid ? 0 : 2;
+}
+#else
 static volatile bool exercise_memory;
 
 int main(void) {
@@ -43,3 +60,4 @@ int main(void) {
     }
     return nx_platform_stop() == NX_SUCCESS && valid ? 0 : 2;
 }
+#endif

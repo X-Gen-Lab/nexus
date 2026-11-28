@@ -11,7 +11,9 @@
 #include "lp.h"
 
 enum {
-    LP_SOURCES = USB_ISTR_RESET | USB_ISTR_CTR | USB_ISTR_SUSP | USB_ISTR_WKUP,
+    LINK_TRANSITIONS = USB_ISTR_RESET | USB_ISTR_SUSP | USB_ISTR_WKUP,
+    LP_SOURCES = LINK_TRANSITIONS | USB_ISTR_CTR,
+    LINE_BITS = USB_FNR_RXDP | USB_FNR_RXDM,
     LP_MASK = USB_CNTR_RESETM | USB_CNTR_CTRM | USB_CNTR_SUSPM | USB_CNTR_WKUPM,
     INTERRUPT_MASK = USB_CNTR_ESOFM | USB_CNTR_SOFM | USB_CNTR_RESETM |
                      USB_CNTR_SUSPM | USB_CNTR_WKUPM | USB_CNTR_ERRM |
@@ -32,6 +34,16 @@ void nx_stm32f1_usb_lp_mask(USB_TypeDef* registers) {
 
 bool nx_stm32f1_usb_lp_pending(const USB_TypeDef* registers) {
     return (registers->ISTR & LP_SOURCES) != 0U;
+}
+
+bool nx_stm32f1_usb_lp_ready(const nx_stm32f1_ep0_t* endpoint) {
+    if (endpoint->config == NULL) {
+        return false;
+    }
+    const USB_TypeDef* registers = endpoint->config->registers;
+    return !endpoint->reset_candidate &&
+           (registers->CNTR & USB_CNTR_FSUSP) == 0U &&
+           (registers->ISTR & LINK_TRANSITIONS) == 0U;
 }
 
 nx_result_t nx_stm32f1_usb_lp_rearm(const nx_stm32f1_ep0_t* endpoint) {
@@ -80,25 +92,36 @@ typedef enum {
 } lp_observation_t;
 
 /** \brief Keep System clocks live and acknowledge actual bus states only. */
-static lp_observation_t link_event(USB_TypeDef* registers, uint16_t status) {
+static lp_observation_t link_event(nx_stm32f1_ep0_t* endpoint, uint16_t status,
+                                   uint16_t line) {
+    USB_TypeDef* registers = endpoint->config->registers;
     const uint16_t control = registers->CNTR;
+    const bool suspended =
+        endpoint->reset_candidate || (control & USB_CNTR_FSUSP) != 0U;
     if ((status & USB_ISTR_SUSP) != 0U) {
-        registers->CNTR = (uint16_t)(control | USB_CNTR_FSUSP);
+        if (!endpoint->reset_candidate) {
+            registers->CNTR = (uint16_t)(control | USB_CNTR_FSUSP);
+        }
         clear_flags(registers, USB_ISTR_SUSP);
-        return (control & USB_CNTR_FSUSP) != 0U ? LP_PACKET : LP_SUSPEND;
+        return suspended ? LP_PACKET : LP_SUSPEND;
     }
-    const uint16_t line = registers->FNR & (USB_FNR_RXDP | USB_FNR_RXDM);
-    /*
-     * RM0008 Table 172 distinguishes a real K-state resume, SE0 reset
-     * and noise. RESET has its own later latch. In the self-powered
-     * selection the clock stays live and LP_MODE is never set.
-     */
-    const bool suspended = (control & USB_CNTR_FSUSP) != 0U;
-    if (suspended && (line == 0U || line == USB_FNR_RXDM)) {
+    /* RM0008 Table 172: FSUSP clears on SE0 so the core can collect
+     * RESET, while packet admission waits for the actual discriminant. */
+    const bool waking = (status & USB_ISTR_WKUP) != 0U;
+    const bool resume = suspended && waking && line == USB_FNR_RXDM;
+    if (resume || (suspended && waking && line == 0U)) {
+        endpoint->reset_candidate = !resume;
         registers->CNTR = (uint16_t)(control & ~USB_CNTR_FSUSP);
+    } else if (endpoint->reset_candidate && line != 0U) {
+        /* The line left SE0 without a visible RESET or fresh observed K wake.
+         */
+        registers->CNTR = (uint16_t)(control | USB_CNTR_FSUSP);
+        endpoint->reset_candidate = false;
     }
-    clear_flags(registers, USB_ISTR_WKUP);
-    return suspended && line == USB_FNR_RXDM ? LP_RESUME : LP_PACKET;
+    if (waking) {
+        clear_flags(registers, USB_ISTR_WKUP);
+    }
+    return resume ? LP_RESUME : LP_PACKET;
 }
 
 /** \brief Service one source and describe only evidence handled here. */
@@ -125,9 +148,12 @@ static nx_result_t lp_step(nx_stm32f1_ep0_t* endpoint, nx_time_us_t now,
         return NX_SUCCESS;
     }
     if ((status & USB_ISTR_CTR) == 0U &&
-        (status & (USB_ISTR_SUSP | USB_ISTR_WKUP)) != 0U) {
-        *observation = link_event(registers, status);
-        return NX_SUCCESS;
+        ((status & LINK_TRANSITIONS) != 0U || endpoint->reset_candidate)) {
+        const uint16_t line = registers->FNR & LINE_BITS;
+        if ((status & LINK_TRANSITIONS) != 0U || line != 0U) {
+            *observation = link_event(endpoint, status, line);
+            return NX_SUCCESS;
+        }
     }
     if ((status & USB_ISTR_CTR) != 0U && (status & USB_ISTR_EP_ID) != 0U) {
         return NX_ERROR_IO;

@@ -3,7 +3,7 @@
   "id": "stm32f103ze-dac-software",
   "soc": "STM32F103ZET6",
   "soc_family": "stm32f1",
-  "source_revision": "DS5792 Rev13 Table 5 and Table 63 and RM0008, exact PA4 DAC_OUT1 software reference",
+  "source_revision": "DS5792 Rev13 Table 5 and Table 63 and RM0008, exact PA4 DAC_OUT1 and PA5 DAC_OUT2 software reference",
   "physical_pcb_revision": null,
   "clocks": {},
   "bindings": [
@@ -11,6 +11,11 @@
       "id": "dac1",
       "controller": "DAC",
       "route": "dac-pa4-ch1"
+    },
+    {
+      "id": "dac2",
+      "controller": "DAC",
+      "route": "dac-pa5-ch2"
     }
   ],
   "reserved_resources": [

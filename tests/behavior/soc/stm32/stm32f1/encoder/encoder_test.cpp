@@ -63,6 +63,71 @@ class F103Encoder : public testing::Test {
     }
 };
 
+#if defined(NX_TEST_F103_ENCODER_X2)
+/** \brief Apply Table 85 to one filtered transition using the written SMS. */
+static void transition(bool old_a, bool old_b, bool a, bool b) {
+    ASSERT_NE(old_a != a, old_b != b);
+    if ((TIM3->CR1 & TIM_CR1_CEN) == 0U ||
+        (TIM3->CCER & phase_enables) != phase_enables)
+        return;
+    const bool a_edge = old_a != a;
+    const bool b_edge = old_b != b;
+    const uint32_t sms = TIM3->SMCR & TIM_SMCR_SMS;
+    if ((a_edge && sms != 1U && sms != 3U) ||
+        (b_edge && sms != 2U && sms != 3U))
+        return;
+    const bool up = a_edge ? a != b : a == b;
+    const uint32_t increment = up ? 1U : UINT16_MAX;
+    TIM3->CNT = (TIM3->CNT + increment) & UINT16_MAX;
+}
+
+TEST_F(F103Encoder, CountsBothSelectedPhaseEdgesAndWrapsInEachDirection) {
+    constexpr nx_encoder_mode_t mode = NX_STM32F1_ENCODER_MODE;
+    constexpr bool a_selected = mode == NX_ENCODER_MODE_X2_A;
+    const nx_stm32f1_encoder_config_t phases{3U, 14U, false, false};
+    ASSERT_EQ(nx_stm32f1_encoder_prepare(&owner, &phases), NX_SUCCESS);
+    EXPECT_EQ(TIM3->SMCR, a_selected ? 1U : 2U);
+    EXPECT_EQ(TIM3->CCMR1, 0xE131U);
+    EXPECT_EQ(TIM3->DIER, 0U);
+    ASSERT_EQ(nx_encoder_start(&port), NX_SUCCESS);
+    EXPECT_EQ(TIM3->CCER & phase_enables, phase_enables);
+    nx_encoder_state_t state{};
+    ASSERT_EQ(nx_encoder_state(&port, &state), NX_SUCCESS);
+    EXPECT_EQ(state.mode, mode);
+    EXPECT_EQ(state.counter_bits, 16U);
+    EXPECT_TRUE(state.running);
+    nx_encoder_sample_t position{};
+    TIM3->CNT = UINT16_MAX;
+    transition(false, false, true, false);
+    ASSERT_EQ(nx_encoder_read(&port, &position), NX_SUCCESS);
+    EXPECT_EQ(position.count, a_selected ? 0U : UINT16_MAX);
+    transition(true, false, true, true);
+    ASSERT_EQ(nx_encoder_read(&port, &position), NX_SUCCESS);
+    EXPECT_EQ(position.count, 0U);
+    transition(true, true, false, true);
+    ASSERT_EQ(nx_encoder_read(&port, &position), NX_SUCCESS);
+    EXPECT_EQ(position.count, a_selected ? 1U : 0U);
+    transition(false, true, false, false);
+    ASSERT_EQ(nx_encoder_read(&port, &position), NX_SUCCESS);
+    EXPECT_EQ(position.count, 1U);
+    transition(false, false, false, true);
+    transition(false, true, true, true);
+    transition(true, true, true, false);
+    transition(true, false, false, false);
+    ASSERT_EQ(nx_encoder_read(&port, &position), NX_SUCCESS);
+    EXPECT_EQ(position.count, UINT16_MAX);
+    EXPECT_EQ(position.observed_at, observed_time);
+
+    ASSERT_EQ(nx_encoder_stop(&port), NX_SUCCESS);
+    transition(false, false, true, false);
+    EXPECT_EQ(TIM3->CNT, UINT16_MAX);
+    ASSERT_EQ(nx_encoder_start(&port), NX_SUCCESS);
+    EXPECT_EQ(TIM3->CNT, UINT16_MAX);
+    ASSERT_EQ(nx_stm32f1_encoder_close(&owner), NX_SUCCESS);
+    EXPECT_EQ(GPIOA->CRL, original_pads);
+    EXPECT_EQ(RCC->APB1ENR, RCC_APB1ENR_TIM2EN);
+}
+#else
 TEST_F(F103Encoder, AppliesInputOnlyQuadratureAndDescribesBothFilters) {
     ASSERT_EQ(nx_stm32f1_encoder_prepare(&owner, &config), NX_SUCCESS);
     EXPECT_EQ(GPIOA->CRL, 0x44114444U);
@@ -171,6 +236,7 @@ TEST_F(F103Encoder, FailedColdResetStillAllowsTheOwnedSourcesToBeWithdrawn) {
     EXPECT_EQ(RCC->APB1ENR, RCC_APB1ENR_TIM2EN);
     EXPECT_EQ(GPIOA->CRL, original_pads);
 }
+#endif
 } /* namespace */
 
 extern "C" bool nx_stm32f1_system_live(void) {
