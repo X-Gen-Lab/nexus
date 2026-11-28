@@ -71,6 +71,46 @@ class ResourceGraphTests(unittest.TestCase):
                 graph.resolve([first, {**second, "attributes": attrs}],
                               shared=shared)
 
+    def test_gpio_and_uart_routes_keep_distinct_pad_and_register_authority(self):
+        from tools.configure import configure
+
+        fixture = (configure.ROOT / "tests/integration/assemblies/stm32f1_family"
+                   / "f103rb-baremetal.toml")
+        resolved = configure.resolve_ir(fixture, configure.ROOT)
+        key = "register:AFIO_MAPR/USART2_REMAP"
+        value = [record for record in resolved.claims if record.key == key]
+        self.assertEqual(len(value), 1)
+        self.assertEqual(value[0].policy, "compatible")
+        self.assertEqual(value[0].attributes, (("value", 0),))
+        routes = {record.key for record in resolved.claims if record.owner == value[0].owner}
+        self.assertIn("pin:PA2", routes)
+        self.assertIn("pin:PA3", routes)
+        self.assertNotIn("pin:PA5", routes)
+
+    def test_register_field_compatible_claims_never_escape_their_scope(self):
+        key = "register:AFIO_MAPR/USART2_REMAP"
+        first = claim(key, "reset-route", policy="compatible", attributes={"value": 0})
+        second = {**first, "owner": "another-default-consumer"}
+        shared = {key: ("value",)}
+        self.assertEqual(len(graph.resolve([first, second], shared=shared).claims), 2)
+        opposite = {**second, "attributes": {"value": 1}}
+        for records in ([first, opposite], [opposite, first],
+                        [claim("register:AFIO_MAPR", "bootloader"), first],
+                        [claim(key, "bootloader"), first]):
+            with self.subTest(records=records), self.assertRaises(ValueError) as conflict:
+                graph.resolve(records, shared=shared)
+            self.assertEqual(conflict.exception.details["resource"], key)
+            self.assertEqual(conflict.exception.details["code"], "resource_conflict")
+
+    def test_register_field_requires_a_named_field_and_bounded_integer(self):
+        key = "register:AFIO_MAPR/USART2_REMAP"
+        graph.validate_register_settings({key: 0})
+        for values in ({key: True}, {key: -1}, {key: 1 << 32},
+                       {"register:AFIO_MAPR": 1}, {"pin:PA2": 0}, [],
+                       {"register:AFIO_MAPR/USART2_REMAP/child": 1}):
+            with self.subTest(values=values), self.assertRaisesRegex(ValueError, "register"):
+                graph.validate_register_settings(values)
+
     def test_boolean_is_not_an_integer_configuration_match(self):
         shared = {"controller:T/base": ("value",)}
         with self.assertRaises(ValueError):

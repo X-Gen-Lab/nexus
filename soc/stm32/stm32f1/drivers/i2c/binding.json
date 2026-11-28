@@ -79,6 +79,13 @@
                           "source": "item.child.options.address",
                           "as": "u32"
                         }
+                      ],
+                      [
+                        "address_bits",
+                        {
+                          "source": "item.child.options.address_bits",
+                          "as": "u32"
+                        }
                       ]
                     ]
                   }

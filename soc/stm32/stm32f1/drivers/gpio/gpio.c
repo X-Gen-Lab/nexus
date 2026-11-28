@@ -34,6 +34,16 @@ static uint32_t gpio_gate(const GPIO_TypeDef* registers) {
         return RCC_APB2ENR_IOPEEN;
     }
 #endif
+#if defined(GPIOF) && defined(RCC_APB2ENR_IOPFEN)
+    if (registers == GPIOF) {
+        return RCC_APB2ENR_IOPFEN;
+    }
+#endif
+#if defined(GPIOG) && defined(RCC_APB2ENR_IOPGEN)
+    if (registers == GPIOG) {
+        return RCC_APB2ENR_IOPGEN;
+    }
+#endif
     return 0U;
 }
 

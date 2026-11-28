@@ -9,7 +9,7 @@ from dataclasses import dataclass
 
 from tools.configure import board_hardware
 from tools.configure.contracts import SERIAL_FLASH_FIELDS
-from tools.configure.pinmux import NumericPinMuxPolicy
+from tools.configure.pinmux import FixedRoutePinMuxPolicy, NumericPinMuxPolicy
 from tools.configure.providers.common import fail, integer
 from tools.configure.records import freeze
 from . import graphics, parallel_memory, sdram, serial_nor
@@ -31,8 +31,12 @@ def _names(values, label):
 def _controller(value, *, pinmux):
     common = {"ip", "modes", "max_hclk_hz", "contexts"}
     ip = value.get("ip") if isinstance(value, Mapping) else None
+    fixed = isinstance(pinmux, FixedRoutePinMuxPolicy)
+    if fixed and ip != "async-banked-v1":
+        fail("Fixed-route pinmux supports asynchronous banked memory")
     if ip == "async-banked-v1":
-        _fields(value, common | {"alternate", "max_burst_hz", "signal_prefix",
+        selector = set() if fixed else {"alternate"}
+        _fields(value, common | selector | {"max_burst_hz", "signal_prefix",
             "chip_selects", "nand_chip_selects", "nand_latches", "window_origin", "bank_stride",
             "nand_origin", "nand_stride", "nand_window_bytes"})
         if not isinstance(value["signal_prefix"], str) or not value["signal_prefix"]:
@@ -172,8 +176,8 @@ class ExternalBusPolicy:
 
     @classmethod
     def from_validated(cls, value, *, pinmux):
-        if not isinstance(pinmux, NumericPinMuxPolicy):
-            fail("External memory requires a selected numeric pinmux policy")
+        if not isinstance(pinmux, (NumericPinMuxPolicy, FixedRoutePinMuxPolicy)):
+            fail("External memory requires a fixed-route or numeric pinmux policy")
         _fields(value, {"schema_version", "controllers", "endpoints"}, {"graphics", "packages"})
         if type(value["schema_version"]) is not int or value["schema_version"] != 1:
             fail("Unsupported external-memory policy schema")
@@ -185,6 +189,8 @@ class ExternalBusPolicy:
         for endpoint in endpoints.values():
             _endpoint(endpoint, controllers)
         if "graphics" in value:
+            if not isinstance(pinmux, NumericPinMuxPolicy):
+                fail("Graphics requires a selected numeric pinmux policy")
             _graphics(value["graphics"], controllers, pinmux=pinmux)
         packages = value.get("packages", {})
         if not isinstance(packages, Mapping):

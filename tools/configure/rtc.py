@@ -12,7 +12,7 @@ CALENDAR_FIELDS = ("year", "month", "day", "weekday", "hour", "minute", "second"
 
 def validate_board(selection, board):
     """A bypass input never inherits a PCB crystal's source identity."""
-    if selection["mode"] not in POLICY_MODES:
+    if selection["mode"] not in POLICY_MODES | {"backup-adopt"}:
         return
     if board["clocks"].get("lse_hz") != 32768:
         fail("RTC requires exact Board LSE32768 source facts")

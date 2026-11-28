@@ -4,7 +4,7 @@ One selected assembly owns its filter domain, exact receive rings and pin leases
 The emitted C calls the real common controller directly; no runtime registry,
 forwarding face, protocol retry policy or inferred transceiver is introduced.
 """
-from tools.configure.providers.common import fail, integer
+from tools.configure.providers.common import CAN_FIXED_POLL_MODES, fail, integer
 from tools.configure.policies import bxcan
 from tools.configure.policies.bxcan import BxCanPolicy
 
@@ -18,8 +18,16 @@ OPERATIONS = {"normal": "NX_CAN_NORMAL", "loopback": "NX_CAN_LOOPBACK",
 
 
 def validate_soc(soc, provider):
-    if soc.get("can_domain") is None and not any(
-            item["kind"] == "can" for item in soc["controllers"].values()):
+    needs_irq_domain = soc.get("can_domain") is not None
+    for name, item in soc["controllers"].items():
+        if item["kind"] != "can":
+            continue
+        if set(item["modes"]) <= CAN_FIXED_POLL_MODES:
+            if item["irq"] or item.get("irq_sources"):
+                fail("Fixed CAN polling cannot publish IRQ bindings: " + name)
+        else:
+            needs_irq_domain = True
+    if not needs_irq_domain:
         return
     policy = provider.CAN_INTEGRATION
     if not isinstance(policy, BxCanPolicy):
@@ -28,6 +36,12 @@ def validate_soc(soc, provider):
 
 
 def validate_selection(selection, provider, ram_size, *, clock_hz=None):
+    if selection["mode"] in CAN_FIXED_POLL_MODES:
+        authored = FIELDS & selection.keys()
+        if authored:
+            fail("Fixed CAN polling options belong to the selected provider: "
+                 + ", ".join(sorted(authored)))
+        return
     required = FIELDS - {"calls_os"}
     if not required.issubset(selection):
         fail("CAN requires timing, operation, bounded ring/drain and IRQ priority")

@@ -141,9 +141,11 @@
         "2.1.2",
         "2.2.1",
         "2.2.2",
+        "2.2.6",
         "2.2.8",
         "2.2.11",
         "2.2.12",
+        "2.3.1",
         "2.3.5",
         "2.3.6",
         "2.3.7",
@@ -164,12 +166,14 @@
         "2.9.2",
         "2.9.3",
         "2.10.1",
-        "2.10.2"
+        "2.10.2",
+        "2.11.1"
       ],
       "applicability": {
         "2.1.2": "AAAAAAAA",
         "2.2.1": "AAAAAAAA",
         "2.2.2": "NNNNNNNN",
+        "2.2.6": "AAAAAAAA",
         "2.2.8": "AAAAAAAA",
         "2.2.11": "AAAAAAAA",
         "2.2.12": "AAAAAAAA",
@@ -193,7 +197,9 @@
         "2.9.2": "NNNNNNNN",
         "2.9.3": "AAAAAAAA",
         "2.10.1": "AAAAAAAA",
-        "2.10.2": "AAAAAAAA"
+        "2.10.2": "AAAAAAAA",
+        "2.11.1": "NNNNNNNN",
+        "2.3.1": "AAAAAAAA"
       },
       "devices": [
         "stm32f103-md"
@@ -207,6 +213,8 @@
       ],
       "mode_scope": [
         "adc:single-shot",
+        "can:classic-poll",
+        "can:classic-poll-normal",
         "crc:crc32-words",
         "exti:edge-event",
         "exti:pvd-level",
@@ -215,10 +223,14 @@
         "gpio:output",
         "i2c:poll-messages",
         "pwm:fixed-pwm",
+        "rtc:backup-adopt",
+        "spi:dma",
         "spi:short-poll",
         "uart:dma-tx",
         "uart:irq-byte-event",
-        "watchdog:independent"
+        "uart:rx-dma-idle",
+        "watchdog:independent",
+        "watchdog:window"
       ],
       "backends": [
         "baremetal",
@@ -287,6 +299,7 @@
         "2.1.2",
         "2.2.1",
         "2.2.2",
+        "2.2.10",
         "2.3.13",
         "2.10.2",
         "2.10.3"
@@ -295,6 +308,7 @@
         "2.1.2": "AAAAAA",
         "2.2.1": "AAAAAA",
         "2.2.2": "NNNNNN",
+        "2.2.10": "AAAAAA",
         "2.3.13": "AAAAAA",
         "2.10.2": "NNNNNN",
         "2.10.3": "AAAAAA"
@@ -308,6 +322,8 @@
         4099
       ],
       "mode_scope": [
+        "dac:direct",
+        "flash:poll-halfword",
         "gpio:output",
         "uart:irq-byte-event"
       ],
@@ -330,7 +346,10 @@
         "2.1.2",
         "2.2.1",
         "2.2.2",
+        "2.2.8",
         "2.3.9",
+        "2.5.1",
+        "2.5.2",
         "2.10.2",
         "2.10.3"
       ],
@@ -338,9 +357,12 @@
         "2.1.2": "AA",
         "2.2.1": "AA",
         "2.2.2": "NN",
+        "2.2.8": "AA",
         "2.3.9": "AA",
         "2.10.2": "NN",
-        "2.10.3": "AA"
+        "2.10.3": "AA",
+        "2.5.1": "NN",
+        "2.5.2": "NN"
       },
       "devices": [
         "stm32f103-xl"
@@ -350,7 +372,11 @@
         4096
       ],
       "mode_scope": [
+        "dac:direct",
+        "external_bus:async16",
+        "flash:poll-halfword",
         "gpio:output",
+        "memory_window:cpu-window",
         "uart:irq-byte-event"
       ],
       "backends": [
@@ -389,7 +415,8 @@
       ],
       "mode_scope": [
         "gpio:output",
-        "uart:irq-byte-event"
+        "uart:irq-byte-event",
+        "dac:direct"
       ],
       "backends": [
         "baremetal"
@@ -496,7 +523,7 @@
         "stm32f1-hsi8"
       ]
     },
-    "es022-rev11-f105xc-hsi8": {
+    "es022-rev11-f105xc-run": {
       "document_id": "ES022",
       "revision": "11",
       "sha256": "1597acc5dd8f028193a1d19f6f9f85468c6a925f3886367ac661364b30e2e749",
@@ -535,10 +562,10 @@
         "baremetal"
       ],
       "clock_policies": [
-        "stm32f1-hsi8"
+        "rm0008-f105-f107-run"
       ]
     },
-    "es022-rev11-f107xc-hsi8": {
+    "es022-rev11-f107xc-run": {
       "document_id": "ES022",
       "revision": "11",
       "sha256": "1597acc5dd8f028193a1d19f6f9f85468c6a925f3886367ac661364b30e2e749",
@@ -577,7 +604,7 @@
         "baremetal"
       ],
       "clock_policies": [
-        "stm32f1-hsi8"
+        "rm0008-f105-f107-run"
       ]
     },
     "es0136-rev7-f100xe-hsi8": {

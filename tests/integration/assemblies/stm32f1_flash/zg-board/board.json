@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "id": "stm32f103zg-flash-software-reference",
+  "soc": "STM32F103ZGT6",
+  "soc_family": "stm32f1",
+  "source_revision": "software-reference-v1",
+  "physical_pcb_revision": null,
+  "clocks": {},
+  "bindings": [
+    {
+      "id": "flash0",
+      "controller": "FLASH",
+      "route": "flash-internal-xl",
+      "supply_mv": 3300
+    }
+  ],
+  "reserved_resources": [],
+  "unknowns": [
+    "Nominal supply is a configuration assumption. Physical silicon cut, PCB revision and supply have not been observed."
+  ],
+  "provenance": [
+    "https://www.st.com/resource/en/datasheet/stm32f103zg.pdf",
+    "https://www.st.com/resource/en/programming_manual/pm0068-stm32f10xxx-xldensity-flash-programming-stmicroelectronics.pdf",
+    "https://www.st.com/resource/en/errata_sheet/es0346-stm32f101xfg-and-stm32f103xfg-xldensity-device-errata-stmicroelectronics.pdf"
+  ],
+  "backend_support": [
+    "baremetal"
+  ]
+}

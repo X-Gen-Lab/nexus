@@ -36,6 +36,59 @@
         },
         "retain_on_failed_init": false
       }
+    },
+    {
+      "kind": "watchdog",
+      "mode": "window",
+      "implementation": "window_watchdog",
+      "static_recipe": {
+        "state_type": "nx_stm32f1_wwdg_t",
+        "ops": "nx_stm32f1_wwdg_ops",
+        "declarations": [],
+        "calls": {
+          "admit": [
+            {
+              "function": "nx_stm32f1_wwdg_admit",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "source": "item.options.window_ticks"
+                }
+              ]
+            }
+          ],
+          "prepare": {
+            "function": "nx_stm32f1_wwdg_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "source": "item.options.window_ticks"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32f1_wwdg_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "retain_on_failed_init": true
+      },
+      "headers": [
+        "drivers/watchdog/window_watchdog.h"
+      ]
     }
   ]
 }

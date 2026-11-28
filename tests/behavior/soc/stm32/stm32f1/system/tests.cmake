@@ -22,6 +22,19 @@ function(nexus_f1_system_contract target device)
 endfunction()
 
 nexus_f1_system_contract(nexus_stm32f1_timebase_test STM32F103xB)
+
+target_sources(
+    nexus_stm32f1_timebase_test
+    PRIVATE "${NEXUS_SOURCE_DIR}/arch/arm/cortex_m/nx_arch_sleep.c"
+)
+target_include_directories(
+    nexus_stm32f1_timebase_test
+    PRIVATE "${NEXUS_SOURCE_DIR}/tests/behavior/arch/arm/cortex_m"
+)
+target_compile_definitions(
+    nexus_stm32f1_timebase_test
+    PRIVATE NEXUS_ARCH_SLEEP_MODEL=1
+)
 nexus_f1_system_contract(
     nexus_stm32f1_hse72_test
     STM32F103xB
@@ -33,3 +46,15 @@ nexus_f1_system_contract(
     NEXUS_CLOCK_FLASH_WAIT_STATES=2U
 )
 nexus_f1_system_contract(nexus_stm32f1_connectivity_timebase_test STM32F105xC)
+
+nexus_f1_system_contract(
+    nexus_stm32f1_connectivity_pll72_test
+    STM32F105xC
+    NEXUS_CLOCK_SOURCE_HSE=1
+    NEXUS_CLOCK_HSE_BYPASS=0
+    NEXUS_CLOCK_APB1_HZ=36000000U
+    NEXUS_CLOCK_APB2_HZ=72000000U
+    NEXUS_CLOCK_APB1_TIMER_HZ=72000000U
+    NEXUS_CLOCK_FLASH_WAIT_STATES=2U
+    NEXUS_CLOCK_PLL48_HZ=48000000U
+)

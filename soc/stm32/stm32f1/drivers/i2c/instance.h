@@ -21,7 +21,8 @@ typedef struct {
 
 typedef struct {
     nx_stm32f1_i2c_t* port;
-    uint8_t address;
+    uint16_t address;
+    uint8_t address_bits;
 } nx_stm32f1_i2c_endpoint_t;
 
 extern const nx_i2c_ops_t nx_stm32f1_i2c_ops;

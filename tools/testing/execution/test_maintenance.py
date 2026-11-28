@@ -124,14 +124,24 @@ class CapabilityDocumentationTests(unittest.TestCase):
                 self.assertEqual(row["exports"],
                                  ["soc/stm32/stm32f4/drivers/ip/i2c_v1_async/i2c_v1_async.c"])
 
-    def test_can_exports_use_the_shared_production_controller(self):
-        selected = [row for row in self.rows if row["kind"] == "can"]
-        self.assertEqual(len(selected), 2)
-        for row in selected:
-            with self.subTest(controller=row["controller"]):
-                self.assertEqual(row["exports"], [
-                    "soc/stm32/stm32f4/drivers/ip/classic_can/can_controller.c"])
-                self.assertTrue(row["fixtures"])
+    def test_can_exports_match_the_selected_family_controller(self):
+        expected = {
+            ("stm32f4", "CAN1", "classic-irq"):
+                "soc/stm32/stm32f4/drivers/ip/classic_can/can_controller.c",
+            ("stm32f4", "CAN2", "classic-irq"):
+                "soc/stm32/stm32f4/drivers/ip/classic_can/can_controller.c",
+            ("stm32f1", "CAN1", "classic-poll"):
+                "soc/stm32/stm32f1/drivers/can/can.c",
+            ("stm32f1", "CAN1", "classic-poll-normal"):
+                "soc/stm32/stm32f1/drivers/can/can.c",
+        }
+        selected = {(row["family"], row["controller"], row["mode"]): row
+                    for row in self.rows if row["kind"] == "can"}
+        for key, source in expected.items():
+            with self.subTest(selection=key):
+                self.assertIn(key, selected)
+                self.assertEqual(selected[key]["exports"], [source])
+                self.assertTrue(selected[key]["fixtures"])
 
     def test_selected_timer_faces_preserve_exact_modes_and_source_paths(self):
         selected = [row for row in self.rows

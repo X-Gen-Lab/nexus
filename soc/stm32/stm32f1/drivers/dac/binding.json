@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "bindings": [
+    {
+      "kind": "dac",
+      "mode": "direct",
+      "implementation": "dac",
+      "static_recipe": {
+        "state_type": "nx_stm32f1_dac_t",
+        "declarations": [],
+        "calls": {
+          "prepare": {
+            "function": "nx_stm32f1_dac_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "source": "item.options.format",
+                "as": "symbol",
+                "values": {
+                  "u8": "NX_DAC_FORMAT_U8",
+                  "u12-right": "NX_DAC_FORMAT_U12_RIGHT",
+                  "u12-left": "NX_DAC_FORMAT_U12_LEFT"
+                }
+              },
+              {
+                "source": "item.options.idle_codes.0"
+              },
+              {
+                "source": "item.options.output_buffer"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32f1_dac_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "retain_on_failed_init": true,
+        "ops": "nx_stm32f1_dac_ops"
+      },
+      "headers": [
+        "drivers/dac/instance.h"
+      ]
+    }
+  ]
+}

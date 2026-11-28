@@ -130,6 +130,19 @@ def conflict(key, previous, current, reason="Resource conflict"):
          claims=[json_value(asdict(previous)), json_value(asdict(current))])
 
 
+def validate_register_settings(values):
+    """A hardware route may require the value of one readable field."""
+    if not isinstance(values, Mapping):
+        fail("Route register settings require a mapping")
+    for key, value in values.items():
+        identifier(key, "register setting identity")
+        register, _, field = key.partition("/")
+        namespace, _, name = register.partition(":")
+        if namespace != "register" or not name or not field or "/" in field:
+            fail("Route register settings require register:<name>/<field>")
+        number(value, 0, (1 << 32) - 1, "register setting value")
+
+
 def resolve(records, *, aliases=None, shared=None):
     """Resolve validated fact aliases and explicit compatible subresources.
 

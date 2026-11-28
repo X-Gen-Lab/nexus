@@ -26,13 +26,20 @@ CMSIS_DIRECTORY = "vendors/st/cmsis_device_f1"
 LOCK_NAME = "dependencies/stm32f1-hal.lock.json"
 CMSIS_LOCK_NAME = "dependencies/stm32f1.lock.json"
 REVIEWED_FILES = frozenset({
+    "Inc/Legacy/stm32_hal_legacy.h",
+    "Inc/stm32f1xx_hal.h",
+    "Inc/stm32f1xx_hal_def.h",
+    "Inc/stm32f1xx_ll_fsmc.h",
+    "Src/stm32f1xx_ll_fsmc.c",
     "Inc/stm32f1xx_ll_adc.h",
+    "Inc/stm32f1xx_ll_dac.h",
     "Inc/stm32f1xx_ll_exti.h",
     "Inc/stm32f1xx_ll_tim.h",
     "Inc/stm32f1xx_ll_crc.h",
     "Inc/stm32f1xx_ll_spi.h",
     "Inc/stm32f1xx_ll_iwdg.h",
     "Inc/stm32f1xx_ll_utils.h",
+    "Inc/stm32f1xx_ll_wwdg.h",
     "Inc/stm32f1xx_ll_gpio.h", "Inc/stm32f1xx_ll_i2c.h",
     "Inc/stm32f1xx_ll_usart.h", "LICENSE.md",
 })
@@ -55,7 +62,7 @@ def contract(lock):
             or lock["commit"] != COMMIT or lock["repository"] != ORIGIN
             or lock["pairing"] != PAIRING
             or lock["release"] != "STM32CubeF1-v1.8.7-pinned-driver"
-            or lock["selected_api"] != "stm32f1-reviewed-inline-ll"):
+            or lock["selected_api"] != "stm32f1-reviewed-ll"):
         raise ValueError("Exact official STM32CubeF1 pairing required")
     if lock["license"] != {"path": "LICENSE.md", "expression": "BSD-3-Clause"}:
         raise ValueError("Original reviewed STM32F1 notice required")

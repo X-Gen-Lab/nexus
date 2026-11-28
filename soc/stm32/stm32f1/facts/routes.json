@@ -78,7 +78,10 @@
           "DMA1:channel7"
         ]
       },
-      "source": "DS5319 Rev20 Table 5; RM0008 Rev21 Section 9.3.8 USART2_REMAP=0, Table 78 DMA1 channel 7 and Section 27 USART."
+      "register_settings": {
+        "register:AFIO_MAPR/USART2_REMAP": 0
+      },
+      "source": "DS5319 Rev20 Table 5; RM0008 Rev21 Sections 9.3.8 and 9.4.2 USART2_REMAP=0, Table 78 DMA1 channel 7 and Section 27 USART."
     },
     {
       "id": "flash-internal",
@@ -93,6 +96,38 @@
         "poll-halfword"
       ],
       "source": "PM0075 Rev2 Table 3 and Sections 2.3.3\u20132.3.4; ES096 Rev15 Section 2.2.11; DS5319 Rev20 Table 2."
+    },
+    {
+      "id": "flash-internal-2k",
+      "variants": [
+        "STM32F103ZET6"
+      ],
+      "controller": "FLASH",
+      "kind": "flash",
+      "pins": [],
+      "modes": [
+        "poll-halfword"
+      ],
+      "clock_profiles": [
+        "hsi8"
+      ],
+      "source": "PM0075 Rev2 Table 4 and Sections 2.3.3-2.3.4; DS5792 Rev13 Table 29; ES0340 Rev17 Section 2.2.10."
+    },
+    {
+      "id": "flash-internal-xl",
+      "variants": [
+        "STM32F103ZGT6"
+      ],
+      "controller": "FLASH",
+      "kind": "flash",
+      "pins": [],
+      "modes": [
+        "poll-halfword"
+      ],
+      "clock_profiles": [
+        "hsi8"
+      ],
+      "source": "PM0068 Rev2 Table 1 and Sections 1.3, 2.3.2-2.3.4, 3.9-3.12; DS6558 Rev4 Table 29; ES0346 Rev7 Section 2.2.8."
     },
     {
       "id": "iwdg",
@@ -312,6 +347,378 @@
         "hsi8"
       ],
       "source": "RM0008 Rev21 sections 5.2 and 5.4 PWR PLS/PVDO, and 10.2.5 EXTI line 16; ES096 Rev15 section 2.2.8."
+    },
+    {
+      "id": "wwdg",
+      "variants": [
+        "STM32F103RBT6"
+      ],
+      "controller": "WWDG",
+      "kind": "watchdog",
+      "pins": [],
+      "modes": [
+        "window"
+      ],
+      "source": "RM0008 Rev21 Sections 20.3, 20.5 and 20.6 pp500-506; DS5319 Rev20 Table 24; ES096 Rev15 Section 2.2.2.",
+      "clock_profiles": [
+        "hsi8"
+      ]
+    },
+    {
+      "id": "can1-silent-loopback",
+      "variants": [
+        "STM32F103RBT6"
+      ],
+      "controller": "CAN1",
+      "kind": "can",
+      "pins": [],
+      "modes": [
+        "classic-poll"
+      ],
+      "clock_profiles": [
+        "hsi8"
+      ],
+      "source": "RM0008 Rev21 sections 23.2, 24.2, 24.5.3 and 24.8 and ES096 Rev15 section 2.11.1."
+    },
+    {
+      "id": "rtc-lse-crystal-backup",
+      "variants": [
+        "STM32F103RBT6"
+      ],
+      "controller": "RTC",
+      "kind": "rtc",
+      "pins": [],
+      "modes": [
+        "backup-adopt"
+      ],
+      "resources": [
+        "pin:PC14",
+        "pin:PC15",
+        "clock:LSE",
+        "clock:RTC"
+      ],
+      "clock_profiles": [
+        "hsi8"
+      ],
+      "source": "RM0008 Rev21 sections 5.4.1, 6.1\u20136.3 and 18.3\u201318.4; ES096 Rev15 section 2.2.6. Previously provisioned RTC and LSE crystal only, no alarm or wakeup ownership."
+    },
+    {
+      "id": "usart2-pa3-rx",
+      "variants": [
+        "STM32F103RBT6"
+      ],
+      "controller": "USART2",
+      "kind": "uart",
+      "pins": [
+        {
+          "pin": "PA3",
+          "function": "rx"
+        }
+      ],
+      "modes": [
+        "rx-dma-idle"
+      ],
+      "mode_dma": {
+        "rx-dma-idle": [
+          "DMA1:channel6"
+        ]
+      },
+      "register_settings": {
+        "register:AFIO_MAPR/USART2_REMAP": 0
+      },
+      "clock_profiles": [
+        "hsi8"
+      ],
+      "source": "DS5319 Rev20 Table 5; RM0008 Rev21 9.3.8, Table 78 and 27.3.13; ES096 Rev15 2.4.1, 2.4.2, 2.9.2."
+    },
+    {
+      "id": "dac-pa4-ch1",
+      "variants": [
+        "STM32F100RBT6B",
+        "STM32F103ZET6",
+        "STM32F103ZGT6"
+      ],
+      "controller": "DAC",
+      "kind": "dac",
+      "pins": [
+        {
+          "pin": "PA4",
+          "function": "out1"
+        }
+      ],
+      "modes": [
+        "direct"
+      ],
+      "clock_profiles": [
+        "hsi8"
+      ],
+      "source": "DS6329 Rev9 Tables 5 and 46; DS5792 Rev13 Tables 5 and 63; DS6558 Rev4 Tables 5 and 66. RM0041 section 11.3 and RM0008 section 12.3 direct DAC."
+    },
+    {
+      "id": "can1-pa11-pa12-rs-pc2",
+      "variants": [
+        "STM32F103RBT6"
+      ],
+      "controller": "CAN1",
+      "kind": "can",
+      "pins": [
+        {
+          "pin": "PA11",
+          "function": "rx"
+        },
+        {
+          "pin": "PA12",
+          "function": "tx"
+        },
+        {
+          "pin": "PC2",
+          "function": "transceiver-rs"
+        }
+      ],
+      "modes": [
+        "classic-poll-normal"
+      ],
+      "clock_profiles": [
+        "hse8-mco-pll72"
+      ],
+      "source": "RM0008 Rev21 sections 9.3.3, 24.6.1 and 24.7.7; ES096 Rev15 sections 2.3.1 and 2.11.1.",
+      "register_settings": {
+        "register:AFIO_MAPR/CAN_REMAP": 0
+      }
+    },
+    {
+      "id": "fsmc-async16",
+      "variants": [
+        "STM32F103ZGT6"
+      ],
+      "controller": "FSMC",
+      "kind": "external_bus",
+      "pins": [],
+      "modes": [
+        "async16"
+      ],
+      "source": "STM3210E-EVAL MB672-F103ZGT6-D06 sheet 6 U1; UM0488 Rev7 Section 5.18 and Table 31; RM0008 Rev21 Section 21.5.4."
+    },
+    {
+      "id": "spi2-pb13-pb14-pb15-dma",
+      "variants": [
+        "STM32F103RBT6"
+      ],
+      "controller": "SPI2",
+      "kind": "spi",
+      "pins": [
+        {
+          "pin": "PB13",
+          "function": "sck"
+        },
+        {
+          "pin": "PB14",
+          "function": "miso"
+        },
+        {
+          "pin": "PB15",
+          "function": "mosi"
+        }
+      ],
+      "modes": [
+        "dma"
+      ],
+      "source": "RM0008 Rev21 Table 78 and 25.3.11, DS5319 Rev20 Table 5; ES096 2.4.1, 2.4.2 and 2.10.2.",
+      "clock_profiles": [
+        "hsi8"
+      ],
+      "mode_dma": {
+        "dma": [
+          "DMA1:channel5",
+          "DMA1:channel4"
+        ]
+      }
+    },
+    {
+      "id": "fsmc-ne3-is61wv51216bll",
+      "variants": [
+        "STM32F103ZGT6"
+      ],
+      "controller": "FSMC",
+      "kind": "memory_window",
+      "pins": [
+        {
+          "pin": "PF0",
+          "function": "FSMC_A0"
+        },
+        {
+          "pin": "PF1",
+          "function": "FSMC_A1"
+        },
+        {
+          "pin": "PF2",
+          "function": "FSMC_A2"
+        },
+        {
+          "pin": "PF3",
+          "function": "FSMC_A3"
+        },
+        {
+          "pin": "PF4",
+          "function": "FSMC_A4"
+        },
+        {
+          "pin": "PF5",
+          "function": "FSMC_A5"
+        },
+        {
+          "pin": "PF12",
+          "function": "FSMC_A6"
+        },
+        {
+          "pin": "PF13",
+          "function": "FSMC_A7"
+        },
+        {
+          "pin": "PF14",
+          "function": "FSMC_A8"
+        },
+        {
+          "pin": "PF15",
+          "function": "FSMC_A9"
+        },
+        {
+          "pin": "PG0",
+          "function": "FSMC_A10"
+        },
+        {
+          "pin": "PG1",
+          "function": "FSMC_A11"
+        },
+        {
+          "pin": "PG2",
+          "function": "FSMC_A12"
+        },
+        {
+          "pin": "PG3",
+          "function": "FSMC_A13"
+        },
+        {
+          "pin": "PG4",
+          "function": "FSMC_A14"
+        },
+        {
+          "pin": "PG5",
+          "function": "FSMC_A15"
+        },
+        {
+          "pin": "PD11",
+          "function": "FSMC_A16"
+        },
+        {
+          "pin": "PD12",
+          "function": "FSMC_A17"
+        },
+        {
+          "pin": "PD13",
+          "function": "FSMC_A18"
+        },
+        {
+          "pin": "PD14",
+          "function": "FSMC_D0"
+        },
+        {
+          "pin": "PD15",
+          "function": "FSMC_D1"
+        },
+        {
+          "pin": "PD0",
+          "function": "FSMC_D2"
+        },
+        {
+          "pin": "PD1",
+          "function": "FSMC_D3"
+        },
+        {
+          "pin": "PE7",
+          "function": "FSMC_D4"
+        },
+        {
+          "pin": "PE8",
+          "function": "FSMC_D5"
+        },
+        {
+          "pin": "PE9",
+          "function": "FSMC_D6"
+        },
+        {
+          "pin": "PE10",
+          "function": "FSMC_D7"
+        },
+        {
+          "pin": "PE11",
+          "function": "FSMC_D8"
+        },
+        {
+          "pin": "PE12",
+          "function": "FSMC_D9"
+        },
+        {
+          "pin": "PE13",
+          "function": "FSMC_D10"
+        },
+        {
+          "pin": "PE14",
+          "function": "FSMC_D11"
+        },
+        {
+          "pin": "PE15",
+          "function": "FSMC_D12"
+        },
+        {
+          "pin": "PD8",
+          "function": "FSMC_D13"
+        },
+        {
+          "pin": "PD9",
+          "function": "FSMC_D14"
+        },
+        {
+          "pin": "PD10",
+          "function": "FSMC_D15"
+        },
+        {
+          "pin": "PD4",
+          "function": "FSMC_NOE"
+        },
+        {
+          "pin": "PD5",
+          "function": "FSMC_NWE"
+        },
+        {
+          "pin": "PE0",
+          "function": "FSMC_NBL0"
+        },
+        {
+          "pin": "PE1",
+          "function": "FSMC_NBL1"
+        },
+        {
+          "pin": "PG10",
+          "function": "FSMC_NE3"
+        },
+        {
+          "pin": "PD7",
+          "function": "FSMC_NAND_DISABLED"
+        },
+        {
+          "pin": "PG9",
+          "function": "FSMC_NOR_DISABLED"
+        },
+        {
+          "pin": "PG12",
+          "function": "FSMC_LCD_DISABLED"
+        }
+      ],
+      "modes": [
+        "cpu-window"
+      ],
+      "source": "STM3210E-EVAL MB672-F103ZGT6-D06 sheet 6 U1; UM0488 Rev7 Section 5.18 and Table 31; RM0008 Rev21 Section 21.5.4."
     }
   ]
 }

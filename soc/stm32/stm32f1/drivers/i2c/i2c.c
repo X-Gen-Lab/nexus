@@ -423,7 +423,58 @@ static nx_result_t check_storage(const nx_stm32f1_i2c_endpoint_t* endpoint,
 
 static bool valid_endpoint(const nx_stm32f1_i2c_endpoint_t* endpoint) {
     return endpoint != NULL && endpoint->port != NULL &&
-           endpoint->address >= 0x08U && endpoint->address <= 0x77U;
+           ((endpoint->address_bits == 7U && endpoint->address >= 0x08U &&
+             endpoint->address <= 0x77U) ||
+            (endpoint->address_bits == 10U && endpoint->address <= 0x3ffU));
+}
+
+/** \brief Select the endpoint and leave ADDR for the common data phase.
+ * \note RM0008 EV5/EV9 followed by a writer ADDR. A standalone 10-bit
+ * read needs an internal repeated START. An already addressed same target
+ * accepts the read header after the previous message's repeated START.
+ */
+static nx_result_t address_phase(const nx_stm32f1_i2c_endpoint_t* endpoint,
+                                 const nx_i2c_message_t* message,
+                                 bool already_selected, nx_time_us_t deadline,
+                                 bool* awaiting_start) {
+    const uint32_t mode = message->read && message->length == 2U
+                              ? I2C_CR1_ACK | I2C_CR1_POS
+                              : I2C_CR1_ACK;
+    const uint32_t direction = message->read ? 1U : 0U;
+    if (endpoint->address_bits == 7U) {
+        command(mode);
+        WRITE_REG(I2C1->DR, ((uint32_t)endpoint->address << 1U) | direction);
+        return wait_event(I2C_SR1_ADDR, deadline);
+    }
+
+    const uint32_t header = 0xf0U | (((uint32_t)endpoint->address >> 7U) & 6U);
+    if (message->read && already_selected) {
+        command(mode);
+        WRITE_REG(I2C1->DR, header | 1U);
+        return wait_event(I2C_SR1_ADDR, deadline);
+    }
+    command(I2C_CR1_ACK);
+    WRITE_REG(I2C1->DR, header);
+    nx_result_t result = wait_event(I2C_SR1_ADD10, deadline);
+    if (result != NX_SUCCESS)
+        return result;
+    WRITE_REG(I2C1->DR, endpoint->address & 0xffU);
+    result = wait_event(I2C_SR1_ADDR, deadline);
+    if (result != NX_SUCCESS || !message->read)
+        return result;
+
+    /* The preliminary EV6 was transmitter-side. Release it before START,
+     * then configure ACK/POS after SB for the actual receiver EV6. */
+    clear_address();
+    *awaiting_start = true;
+    command(I2C_CR1_START | I2C_CR1_ACK);
+    result = wait_event(I2C_SR1_SB, deadline);
+    if (result != NX_SUCCESS)
+        return result;
+    *awaiting_start = false;
+    command(mode);
+    WRITE_REG(I2C1->DR, header | 1U);
+    return wait_event(I2C_SR1_ADDR, deadline);
 }
 
 static nx_result_t transaction(void* context, nx_i2c_message_t* messages,
@@ -466,14 +517,8 @@ static nx_result_t transaction(void* context, nx_i2c_message_t* messages,
         }
         awaiting_start = false;
         const nx_i2c_message_t* message = &messages[index];
-        const uint32_t mode = message->read && message->length == 2U
-                                  ? I2C_CR1_ACK | I2C_CR1_POS
-                                  : I2C_CR1_ACK;
-        command(mode);
-        const uint8_t address = (uint8_t)((uint32_t)endpoint->address * 2U +
-                                          (message->read ? 1U : 0U));
-        WRITE_REG(I2C1->DR, address);
-        result = wait_event(I2C_SR1_ADDR, deadline);
+        result = address_phase(endpoint, message, index != 0U, deadline,
+                               &awaiting_start);
         if (result != NX_SUCCESS) {
             break;
         }

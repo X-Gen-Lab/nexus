@@ -467,6 +467,9 @@ def owned_claims(result, owners):
             owners.intersection(claim.owner.split(";")))
 
 
+CAN_FIXED_POLL_MODES = frozenset(("classic-poll", "classic-poll-normal"))
+
+
 @dataclass(frozen=True)
 class ModeTraits:
     """Execution shape only; provider mode tables still establish support."""
@@ -533,6 +536,7 @@ _MODE_TRAITS = MappingProxyType({
     ("rtc", "calendar-alarm"): ModeTraits(),
     ("rtc", "retained-calendar-alarm"): ModeTraits(),
     ("rtc", "adopt-retained"): ModeTraits(polling=True),
+    ("rtc", "backup-adopt"): ModeTraits(polling=True),
     ("rtc", "provision-empty"): ModeTraits(polling=True),
     ("lptim", "counter16-oneshot"): ModeTraits(),
     ("lptim", "irq-counter16-oneshot"): ModeTraits(irq=True),
@@ -570,6 +574,8 @@ _MODE_TRAITS = MappingProxyType({
     ("usb_host", "host-hs-fs"): ModeTraits(irq=True),
     ("usb_host", "host-hs-ulpi"): ModeTraits(irq=True),
     ("can", "classic-irq"): ModeTraits(irq=True),
+    ("can", "classic-poll"): ModeTraits(),
+    ("can", "classic-poll-normal"): ModeTraits(),
     ("gpio", "input"): ModeTraits(),
     ("gpio", "output"): ModeTraits(),
     ("gpio", "named-states"): ModeTraits(),

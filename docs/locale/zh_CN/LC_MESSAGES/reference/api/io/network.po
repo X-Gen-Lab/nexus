@@ -131,14 +131,14 @@ msgstr "成功；非经典帧返回 INVALID；借用期间返回 STATE。"
 msgid "Admit one frame within the selected provider's finite TX capacity."
 msgstr "在所选 provider 的有限 TX 容量内接纳一帧。"
 
-#: ../../../../../../docs/reference/api/io/network.md:20
+#: ../../../../../../workspace/nexus/docs/reference/api/io/network.md:20
 msgid ""
 "Serialized privileged task owner, incoming IRQ masks clear. REJECTED retains"
-" nothing. Success requires proven on-wire completion and withdrawal of all "
-"hardware references before settlement."
+" nothing. Successful settlement requires the selected mode's completion and "
+"withdrawal of all hardware references. Normal mode requires on-wire "
+"completion. Internal loopback proves controller completion inside that loop."
 msgstr ""
-"由串行特权任务 owner 调用，进入时 IRQ 须已处于未屏蔽状态。REJECTED "
-"不保留任何引用。成功要求先证明线上完成并撤回全部硬件引用，再结清请求。"
+"由单一特权任务串行操作，进入时中断屏蔽状态须清除。拒绝请求时不保留任何引用。成功结算前须确认所选模式已完成，并撤回所有硬件引用。正常模式须确认总线上发送完成。内部回环仅验证控制器在环内完成。"
 
 #: ../../../../../../docs/reference/api/io/network.md:20
 msgid "[in] Stable immutable face and private storage."
@@ -148,9 +148,9 @@ msgstr "[in] 稳定且不可变的接口及私有存储。"
 msgid "[inout] READY value request, kept alive until SETTLED."
 msgstr "[inout] READY 值请求，保持存活直到 SETTLED。"
 
-#: ../../../../../../docs/reference/api/io/network.md:20
-msgid "Success means ACCEPTED, not on-wire completion; other results reject."
-msgstr "成功表示 ACCEPTED，不表示已完成线上发送；其他结果均为拒绝。"
+#: ../../../../../../workspace/nexus/docs/reference/api/io/network.md:20
+msgid "Success means ACCEPTED. All other results reject the request."
+msgstr "成功表示请求已接受。其他结果均表示请求被拒绝。"
 
 #: ../../../../../../docs/reference/api/io/network.md:20
 msgid "Request abort without revoking a borrowed request."

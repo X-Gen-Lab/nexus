@@ -11,7 +11,7 @@ from dataclasses import dataclass, field
 from types import MappingProxyType
 
 from tools.configure.providers import for_selection
-from tools.configure.providers.common import fail, mode_traits
+from tools.configure.providers.common import CAN_FIXED_POLL_MODES, fail, mode_traits
 
 
 ENDPOINT_DRIVERS = MappingProxyType({
@@ -192,7 +192,9 @@ def _format(item, provider, shape):
         if type(mailboxes) is not int or mailboxes <= 0:
             fail("CAN traits require a reviewed physical mailbox topology")
         fields = dict(classic_payload_bytes=8, hardware_tx_mailboxes=mailboxes)
-        source = "irq_observation"
+        abort = "request"
+        source = ("service_observation" if item.mode in CAN_FIXED_POLL_MODES
+                  else "irq_observation")
     elif kind in {"eth", "eth_frames"}:
         enhanced = kind == "eth_frames"
         fields = dict(vlan=int(enhanced), scatter_gather=int(enhanced))
@@ -241,7 +243,11 @@ def describe(item, endpoint=None, *, public_class=None):
         shape = mode_traits(nominal_kind, nominal_mode)
     limits = {}
     if kind == "rtc":
-        limits.update(unit="occurrences", max_transfer_units=1)
+        if item.mode == "backup-adopt":
+            limits.update(unit="words", unit_bytes=2, buffer_alignment=4,
+                          max_transfer_units=1, word_bits=(16,))
+        else:
+            limits.update(unit="occurrences", max_transfer_units=1)
     elif kind == "lptim":
         limits.update(unit="ticks", max_transfer_units=65536)
     elif kind == "block":

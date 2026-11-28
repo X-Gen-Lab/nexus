@@ -28,13 +28,27 @@
           "kind": "crc",
           "pins": [],
           "irq": []
+        },
+        "WWDG": {
+          "kind": "watchdog",
+          "irq": [
+            "WWDG_IRQn"
+          ],
+          "irq_numbers": {
+            "WWDG_IRQn": 0
+          },
+          "resources": [
+            "irq:WWDG_IRQn"
+          ],
+          "pins": []
         }
       },
       "modes": {
         "USART2": {
           "modes": [
             "dma-tx",
-            "irq-byte-event"
+            "irq-byte-event",
+            "rx-dma-idle"
           ]
         },
         "FLASH": {
@@ -50,6 +64,27 @@
         "CRC": {
           "modes": [
             "crc32-words"
+          ]
+        },
+        "WWDG": {
+          "modes": [
+            "window"
+          ]
+        }
+      }
+    },
+    "f103-flash": {
+      "controllers": {
+        "FLASH": {
+          "kind": "flash",
+          "irq": [],
+          "pins": []
+        }
+      },
+      "modes": {
+        "FLASH": {
+          "modes": [
+            "poll-halfword"
           ]
         }
       }
@@ -145,7 +180,8 @@
         },
         "SPI2": {
           "modes": [
-            "short-poll"
+            "short-poll",
+            "dma"
           ]
         }
       }
@@ -192,7 +228,29 @@
           "pins": [],
           "resources": [
             "exti:line:16",
-            "pwr:pvd"
+            "pwr:control"
+          ]
+        },
+        "CAN1": {
+          "kind": "can",
+          "irq": [],
+          "pins": [
+            "PA11",
+            "PA12",
+            "PC2"
+          ],
+          "clock_domain": "apb1",
+          "resources": [
+            "memory:usb-can-pma"
+          ]
+        },
+        "RTC": {
+          "kind": "rtc",
+          "irq": [],
+          "pins": [],
+          "resources": [
+            "pwr:control",
+            "domain:backup"
           ]
         }
       },
@@ -216,6 +274,103 @@
           "modes": [
             "pvd-level"
           ]
+        },
+        "CAN1": {
+          "modes": [
+            "classic-poll",
+            "classic-poll-normal"
+          ]
+        },
+        "RTC": {
+          "modes": [
+            "backup-adopt"
+          ]
+        }
+      }
+    },
+    "dac-direct": {
+      "controllers": {
+        "DAC": {
+          "kind": "dac",
+          "irq": [],
+          "pins": [
+            "PA4"
+          ],
+          "clock_domain": "apb1"
+        }
+      },
+      "modes": {
+        "DAC": {
+          "modes": [
+            "direct"
+          ]
+        }
+      }
+    },
+    "f103-xl-fsmc": {
+      "controllers": {
+        "FSMC": {
+          "kind": "external_bus",
+          "irq": [
+            "FSMC_IRQn"
+          ],
+          "pins": [
+            "PF0",
+            "PF1",
+            "PF2",
+            "PF3",
+            "PF4",
+            "PF5",
+            "PF12",
+            "PF13",
+            "PF14",
+            "PF15",
+            "PG0",
+            "PG1",
+            "PG2",
+            "PG3",
+            "PG4",
+            "PG5",
+            "PD11",
+            "PD12",
+            "PD13",
+            "PD14",
+            "PD15",
+            "PD0",
+            "PD1",
+            "PE7",
+            "PE8",
+            "PE9",
+            "PE10",
+            "PE11",
+            "PE12",
+            "PE13",
+            "PE14",
+            "PE15",
+            "PD8",
+            "PD9",
+            "PD10",
+            "PD4",
+            "PD5",
+            "PE0",
+            "PE1",
+            "PG10",
+            "PD7",
+            "PG9",
+            "PG12"
+          ]
+        }
+      },
+      "modes": {
+        "FSMC": {
+          "modes": [
+            "async16"
+          ],
+          "interfaces": {
+            "memory_window": [
+              "cpu-window"
+            ]
+          }
         }
       }
     }

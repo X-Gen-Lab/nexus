@@ -1,6 +1,6 @@
 /**
  * \file            platform.c
- * \brief           Cold F103 clock ownership and 16-bit monotonic timebase.
+ * \brief           Cold F1 clock ownership and 16-bit monotonic timebase.
  * \author          Nexus Team
  * \version         1.0.0
  * \date            2026-11-28
@@ -10,8 +10,8 @@
 #include "nexus/core/fault.h"
 #include "nexus/core/time.h"
 #include "nexus/io/watchdog.h"
-#include "nexus_config.h"
 #include "private/hardware.h"
+#include "system/clock_profile.h"
 
 #ifndef NX_STM32F1_FLASH_KIB
 #define NX_STM32F1_FLASH_KIB() (*(volatile const uint16_t*)FLASHSIZE_BASE)
@@ -32,17 +32,12 @@ static bool active;
 static uint8_t boot_reset_causes;
 static bool reset_captured;
 
-/* Select the PLL72 owner only for the reviewed bypass plan. */
-#if defined(NEXUS_CLOCK_HSE_BYPASS) && NEXUS_CLOCK_HSE_BYPASS == 1
-#if !defined(STM32F103xB) || !defined(NEXUS_CLOCK_SOURCE_HSE)
-#error "F103 HSE72 requires the reviewed xB 8 MHz bypass input"
-#endif
-#define NX_STM32F1_HSE72 1
+#if defined(NX_STM32F1_HSE72)
 _Static_assert(
     NEXUS_CLOCK_APB1_HZ == 36000000U && NEXUS_CLOCK_APB2_HZ == 72000000U &&
         NEXUS_CLOCK_APB1_TIMER_HZ == 72000000U &&
         NEXUS_CLOCK_FLASH_WAIT_STATES == 2U,
-    "F103 PLL72 bus timing and Flash latency must match the clock owner");
+    "F1 PLL72 bus timing and Flash latency must match the clock owner");
 #define TIMER_PRESCALER 71U
 #else
 #define TIMER_PRESCALER 7U
@@ -106,7 +101,20 @@ static bool hsi8_ready(void) {
 #if defined(NX_STM32F1_HSE72)
 enum { CLOCK_CONFIG = 8U, CLOCK_READY_POLLS = 80000U };
 
+#if defined(NX_STM32F1_CONNECTIVITY_PLL2)
+_Static_assert(NEXUS_CLOCK_PLL48_HZ == 48000000U,
+               "The connectivity PLL VCO divided by three supplies 48 MHz");
+#define PLL_FIELDS                                                             \
+    (RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE | RCC_CFGR_PLLMULL | RCC_CFGR_OTGFSPRE)
+#define PLL2_FIELDS                                                            \
+    (RCC_CFGR2_PREDIV1 | RCC_CFGR2_PREDIV2 | RCC_CFGR2_PLL2MUL |               \
+     RCC_CFGR2_PREDIV1SRC)
+#define PLL2_SETTINGS                                                          \
+    (RCC_CFGR2_PREDIV1_DIV5 | RCC_CFGR2_PREDIV2_DIV5 | RCC_CFGR2_PLL2MUL8 |    \
+     RCC_CFGR2_PREDIV1SRC_PLL2)
+#else
 #define PLL_FIELDS (RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE | RCC_CFGR_PLLMULL)
+#endif
 #define BUS_FIELDS                                                             \
     (RCC_CFGR_HPRE | RCC_CFGR_PPRE1 | RCC_CFGR_PPRE2 | RCC_CFGR_ADCPRE)
 #define PLL72_SETTINGS                                                         \
@@ -114,9 +122,14 @@ enum { CLOCK_CONFIG = 8U, CLOCK_READY_POLLS = 80000U };
      RCC_CFGR_ADCPRE_DIV6)
 
 static bool clock_idle(void) {
-    const uint32_t clock_irqs = RCC_CIR_LSIRDYIE | RCC_CIR_LSERDYIE |
-                                RCC_CIR_HSIRDYIE | RCC_CIR_HSERDYIE |
-                                RCC_CIR_PLLRDYIE | RCC_CIR_CSSF;
+    uint32_t clock_irqs = RCC_CIR_LSIRDYIE | RCC_CIR_LSERDYIE |
+                          RCC_CIR_HSIRDYIE | RCC_CIR_HSERDYIE |
+                          RCC_CIR_PLLRDYIE | RCC_CIR_CSSF;
+#if defined(NX_STM32F1_CONNECTIVITY_PLL2)
+    if (RCC->AHBRSTR != 0U)
+        return false;
+    clock_irqs |= RCC_CIR_PLL2RDYIE | RCC_CIR_PLL3RDYIE;
+#endif
     const uint32_t flash_state = FLASH_ACR_LATENCY | FLASH_ACR_HLFCYA |
                                  FLASH_ACR_PRFTBE | FLASH_ACR_PRFTBS;
     return RCC->AHBENR == (RCC_AHBENR_FLITFEN | RCC_AHBENR_SRAMEN) &&
@@ -144,8 +157,9 @@ static bool clock_wait(volatile const uint32_t* reg, uint32_t mask,
  * safe. */
 static nx_result_t clock_start(void) {
     effects |= CLOCK_CONFIG;
-    /* Set bypass while HSE is off. Retain HSION for CSS and Flash writes. */
-    if (!nx_stm32f1_write_masked(&RCC->CR, RCC_CR_HSEBYP, RCC_CR_HSEBYP) ||
+    /* Select the reviewed HSE input while HSE is off. Keep HSI enabled. */
+    const uint32_t bypass = NEXUS_CLOCK_HSE_BYPASS ? RCC_CR_HSEBYP : 0U;
+    if (!nx_stm32f1_write_masked(&RCC->CR, RCC_CR_HSEBYP, bypass) ||
         !nx_stm32f1_write_masked(&RCC->CR, RCC_CR_HSEON, RCC_CR_HSEON))
         return NX_ERROR_IO;
     if (!clock_wait(&RCC->CR, RCC_CR_HSERDY, RCC_CR_HSERDY))
@@ -154,8 +168,16 @@ static nx_result_t clock_start(void) {
     if (!nx_stm32f1_write_masked(&RCC->CR, RCC_CR_CSSON, RCC_CR_CSSON) ||
         !nx_stm32f1_write_masked(&FLASH->ACR, FLASH_ACR_LATENCY, 2U) ||
         !nx_stm32f1_write_masked(&RCC->CFGR, PLL_FIELDS | BUS_FIELDS,
-                                 PLL72_SETTINGS) ||
-        !nx_stm32f1_write_masked(&RCC->CR, RCC_CR_PLLON, RCC_CR_PLLON))
+                                 PLL72_SETTINGS))
+        return NX_ERROR_IO;
+#if defined(NX_STM32F1_CONNECTIVITY_PLL2)
+    if (!nx_stm32f1_write_masked(&RCC->CFGR2, PLL2_FIELDS, PLL2_SETTINGS) ||
+        !nx_stm32f1_write_masked(&RCC->CR, RCC_CR_PLL2ON, RCC_CR_PLL2ON))
+        return NX_ERROR_IO;
+    if (!clock_wait(&RCC->CR, RCC_CR_PLL2RDY, RCC_CR_PLL2RDY))
+        return NX_ERROR_TIMEOUT;
+#endif
+    if (!nx_stm32f1_write_masked(&RCC->CR, RCC_CR_PLLON, RCC_CR_PLLON))
         return NX_ERROR_IO;
     if (!clock_wait(&RCC->CR, RCC_CR_PLLRDY, RCC_CR_PLLRDY))
         return NX_ERROR_TIMEOUT;
@@ -170,6 +192,12 @@ static nx_result_t clock_start(void) {
 
 /** \brief Restore the proven HSI clock before retiring the high-speed path. */
 static nx_result_t clock_stop(void) {
+#if defined(NX_STM32F1_CONNECTIVITY_PLL2)
+    if (RCC->AHBENR != (RCC_AHBENR_FLITFEN | RCC_AHBENR_SRAMEN) ||
+        RCC->AHBRSTR != 0U ||
+        (RCC->CR & (RCC_CR_PLL3ON | RCC_CR_PLL3RDY)) != 0U)
+        return NX_ERROR_BUSY;
+#endif
     const uint32_t hsi = RCC_CR_HSION | RCC_CR_HSIRDY;
     if ((RCC->CR & hsi) != hsi)
         return NX_ERROR_IO;
@@ -184,6 +212,18 @@ static nx_result_t clock_stop(void) {
         return NX_ERROR_IO;
     if (!clock_wait(&RCC->CR, RCC_CR_PLLRDY, 0U))
         return NX_ERROR_TIMEOUT;
+#if defined(NX_STM32F1_CONNECTIVITY_PLL2)
+    /* Disconnect the stopped main PLL from PLL2 before retiring PLL2.
+     * HSI drives SYSCLK directly throughout, without starting the PLL on HSI/2.
+     */
+    if (!nx_stm32f1_write_masked(&RCC->CFGR, RCC_CFGR_PLLSRC, 0U) ||
+        !nx_stm32f1_write_masked(&RCC->CR, RCC_CR_PLL2ON, 0U))
+        return NX_ERROR_IO;
+    if (!clock_wait(&RCC->CR, RCC_CR_PLL2RDY, 0U))
+        return NX_ERROR_TIMEOUT;
+    if (!nx_stm32f1_write_masked(&RCC->CFGR2, PLL2_FIELDS, 0U))
+        return NX_ERROR_IO;
+#endif
     if (!nx_stm32f1_write_masked(&RCC->CR, RCC_CR_HSEON, 0U))
         return NX_ERROR_IO;
     if (!clock_wait(&RCC->CR, RCC_CR_HSERDY, 0U))

@@ -6,16 +6,14 @@
  * \date            2026-11-28
  * \copyright       Copyright (c) 2026 Nexus Team
  */
-#include "nexus_config.h"
-#include "stm32f1xx.h"
+#include "system/clock_profile.h"
 
-#if defined(NEXUS_CLOCK_SOURCE_HSE)
-#if !defined(STM32F103xB) || !defined(NEXUS_CLOCK_HSE_BYPASS) ||               \
-    NEXUS_CLOCK_HSE_BYPASS != 1
-#error "STM32F1 HSE startup requires the reviewed xB 8 MHz bypass path"
-#endif
+#if defined(NX_STM32F1_CONNECTIVITY_PLL2)
+_Static_assert(NEXUS_CORE_HZ == 72000000U && NEXUS_CLOCK_INPUT_HZ == 25000000U,
+               "Connectivity startup requires the reviewed 25 MHz PLL2 plan");
+#elif defined(NX_STM32F1_HSE72)
 _Static_assert(NEXUS_CORE_HZ == 72000000U && NEXUS_CLOCK_INPUT_HZ == 8000000U,
-               "STM32F1 HSE startup requires the reviewed PLL72 plan");
+               "F103 startup requires the reviewed 8 MHz bypass plan");
 #elif defined(NEXUS_CLOCK_SOURCE_HSI)
 _Static_assert(NEXUS_CORE_HZ == 8000000U && NEXUS_CLOCK_INPUT_HZ == 8000000U,
                "STM32F1 HSI startup requires the reviewed HSI8 plan");

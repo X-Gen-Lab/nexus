@@ -61,6 +61,7 @@ class SelectedContractAuthorityTests(unittest.TestCase):
                     and row.kind in {"spi", "i2c"} and row.reviewed_route_available}
         self.assertEqual(f1_buses, {
             ("STM32F103RBT6", "spi", "short-poll"): ("spi2-pb13-pb14-pb15",),
+            ("STM32F103RBT6", "spi", "dma"): ("spi2-pb13-pb14-pb15-dma",),
             ("STM32F103RBT6", "i2c", "poll-messages"): ("i2c1-pb6-pb7",),
         })
         f1_controls = {(row.part, row.controller, row.mode): row.reviewed_routes

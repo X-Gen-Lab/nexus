@@ -11,6 +11,7 @@ from typing import ClassVar, TYPE_CHECKING
 from tools.configure.resource_graph import ResourceClaimIR, ResourcePlanIR
 from tools.configure.trigger_graph import TriggerPlanIR
 from tools.configure.dma_topology import DmaLaneIR, DmaTopologyIR
+from tools.configure.providers.common import CAN_FIXED_POLL_MODES
 from tools.configure.records import Record, freeze, thaw
 
 if TYPE_CHECKING:
@@ -1071,6 +1072,8 @@ def mode_options(values):
                                 "drain_timeout_us", "poll_limit", "exclusive",
                                 "message_ram_words")), irq)
     if kind == "can":
+        if values["mode"] in CAN_FIXED_POLL_MODES:
+            return NoOptions()
         return CanOptions(values["operation"], values["event_capacity"],
                           values["bitrate"], CanTimingOptions(**values["timing"]),
                           irq, values["drain_timeout_us"], values["poll_limit"],

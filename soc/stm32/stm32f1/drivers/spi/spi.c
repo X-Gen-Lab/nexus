@@ -104,7 +104,7 @@ nx_result_t nx_stm32f1_spi_prepare(nx_stm32f1_spi_t* state,
 }
 
 /** \brief Override only the selected active-low CS and confirm its latch. */
-static bool select_cs(nx_stm32f1_spi_t* state, bool active) {
+bool nx_stm32f1_spi_select_cs(nx_stm32f1_spi_t* state, bool active) {
     GPIO_TypeDef* gpio = state->config->gpio;
     const uint32_t mask = 1U << state->config->cs;
     if (active) {
@@ -148,7 +148,7 @@ static nx_result_t recover(void* context) {
     if (!state->live) {
         return NX_ERROR_STATE;
     }
-    if (!reset_spi(state->config) || !select_cs(state, false)) {
+    if (!reset_spi(state->config) || !nx_stm32f1_spi_select_cs(state, false)) {
         state->fault = true;
         return NX_ERROR_IO;
     }
@@ -173,7 +173,8 @@ nx_result_t nx_stm32f1_spi_close(nx_stm32f1_spi_t* state) {
     }
     if (state->peripheral_owned) {
         if (!reset_spi(state->config) ||
-            ((state->live || state->selected) && !select_cs(state, false))) {
+            ((state->live || state->selected) &&
+             !nx_stm32f1_spi_select_cs(state, false))) {
             state->fault = true;
             return NX_ERROR_IO;
         }
@@ -231,7 +232,7 @@ static nx_result_t finish(nx_stm32f1_spi_t* state, uint32_t hz, uint8_t bits,
     } else if ((NX_STM32F1_SPI_STATUS(registers) & SPI_SR_RXNE) != 0U) {
         (void)NX_STM32F1_SPI_RECEIVE(registers, bits);
     }
-    if (!idle || !select_cs(state, false)) {
+    if (!idle || !nx_stm32f1_spi_select_cs(state, false)) {
         state->fault = true;
         return NX_ERROR_IO;
     }
@@ -301,7 +302,7 @@ static nx_result_t exchange(const nx_stm32f1_spi_endpoint_t* endpoint,
     nx_arch_dsb();
     if (registers->CR1 != controls ||
         !nx_stm32f1_write_masked(&registers->CR1, SPI_CR1_SPE, SPI_CR1_SPE) ||
-        !select_cs(state, true)) {
+        !nx_stm32f1_spi_select_cs(state, true)) {
         result = NX_ERROR_IO;
     }
     for (size_t phase = 0U; result == NX_SUCCESS && phase < count; ++phase) {

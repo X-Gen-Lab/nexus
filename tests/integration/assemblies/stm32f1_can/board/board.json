@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "id": "stm32f103rb-can-loopback-software",
+  "soc": "STM32F103RBT6",
+  "soc_family": "stm32f1",
+  "source_revision": "F103RB bxCAN internal silent-loopback software fixture",
+  "physical_pcb_revision": null,
+  "clocks": {},
+  "bindings": [
+    {
+      "id": "can-loopback",
+      "controller": "CAN1",
+      "route": "can1-silent-loopback"
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14",
+    "PA15",
+    "PB3",
+    "PB4",
+    "PD0",
+    "PD1",
+    "PC14",
+    "PC15"
+  ],
+  "unknowns": [
+    "The physical device revision, oscillator tolerance and CAN bus behavior have not been measured.",
+    "CAN uses silent internal loopback and no external transceiver or CAN pin."
+  ],
+  "provenance": [
+    {
+      "scope": "Dedicated USB and CAN packet memory and silent internal loopback.",
+      "url": "https://www.st.com/resource/en/reference_manual/rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32-bit-mcus-stmicroelectronics.pdf",
+      "file": "rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32-bit-mcus-stmicroelectronics.pdf",
+      "sha256": "4c1b8ac2729cc1f45a4685eea9e91e6139e24e58804fba21e27201dfcc2ad149",
+      "pages": [
+        622,
+        654,
+        659,
+        671
+      ]
+    }
+  ],
+  "backend_support": [
+    "baremetal"
+  ]
+}

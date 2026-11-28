@@ -49,7 +49,8 @@ class CanFactContracts(unittest.TestCase):
                 "remote": False, "match_remote": True}
 
     def resolve(self, soc, split, filters):
-        selected = [{"id": f"bus{index}", "kind": "can", "controller": name}
+        selected = [{"id": f"bus{index}", "kind": "can", "mode": "classic-irq",
+                    "controller": name}
                     for index, name in enumerate(soc["can_domain"]["controllers"])]
         claims = []
         result = can.resolve_domain({"split": split, "filters": filters}, selected,

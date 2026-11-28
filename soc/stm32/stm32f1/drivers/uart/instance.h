@@ -55,6 +55,7 @@ nx_result_t nx_stm32f1_uart_admit(const nx_stm32f1_uart_t* state,
                                   const nx_stm32f1_uart_config_t* config);
 nx_result_t nx_stm32f1_uart_prepare(nx_stm32f1_uart_t* state,
                                     const nx_stm32f1_uart_config_t* config);
+nx_result_t nx_stm32f1_uart_stop(nx_stm32f1_uart_t* state);
 nx_result_t nx_stm32f1_uart_close(nx_stm32f1_uart_t* state);
 nx_result_t nx_stm32f1_uart_validate(void* context,
                                      const nx_uart_tx_request_t* request);

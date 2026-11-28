@@ -16,7 +16,8 @@ extern "C" {
  * \brief           Wait once with configurable exceptions already masked.
  * \return          OK after wake, CONTEXT or UNSUPPORTED without sleeping.
  * \note            Privileged Thread mode, incoming PRIMASK=1, BASEPRI and
- *                  FAULTMASK clear. SCR.SLEEPDEEP must be clear. The caller
+ *                  FAULTMASK clear. SCR.SLEEPDEEP and SCR.SLEEPONEXIT must
+ *                  be clear for Sleep-now. The caller
  *                  owns the final readiness check and timer/wake source. WFI
  *                  wakes for a pending enabled interrupt despite PRIMASK; the
  *                  interrupt runs after the caller restores its saved mask.
@@ -31,6 +32,7 @@ nx_arch_result_t nx_arch_wait_for_interrupt(void);
  * \param[out]      slept: True only when WFI was executed.
  * \return          OK, INVALID, CONTEXT or UNSUPPORTED.
  * \note            Privileged Thread mode with all incoming masks clear.
+ *                  Uses the same Sleep-now conditions when WFI is needed.
  *                  Saves PRIMASK, performs acquire observation under that
  *                  mask, optionally sleeps, and restores the exact mask.
  *                  Publishers must be same-CPU configurable IRQs or Threads;

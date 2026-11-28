@@ -71,7 +71,7 @@ def resolve(assembly, *, root, soc, board, routes, bindings,
         # The selected external oscillator owns its pads before System starts.
         # A Board reservation may restate this ownership, never release it.
         source = clock_plan["input"]["source"]
-        for resource in binding_policy.oscillator_resources(source):
+        for resource in binding_policy.oscillator_resources(source, clock_plan["profile"]):
             if normalize_resource(resource) not in claims:
                 claim(resource, "system-clock", source, clock_plan["profile"])
     if backend == "freertos":
@@ -87,6 +87,7 @@ def resolve(assembly, *, root, soc, board, routes, bindings,
     instance_ids = []
     from tools.configure.generation.shared_irq import IrqClaims
     irq_claims = IrqClaims(claims, claim)
+    register_sharing = {}
     for selection in sequence(controller_selections, "selected controllers"):
         location = (selection.get("id", "<unknown>") if isinstance(selection, dict)
                     else "<invalid>")
@@ -188,6 +189,11 @@ def resolve(assembly, *, root, soc, board, routes, bindings,
                              *route.get("mode_resources", {}).get(mode, ())):
                 if normalize_resource(resource) not in domain_keys:
                     claim(resource, name, mode, route["id"])
+            for key, value in route.get("register_settings", {}).items():
+                register_sharing[key] = ("value",)
+                claim_list.append({"key": key, "owner": name, "mode": mode,
+                    "source": route["id"], "policy": "compatible",
+                    "attributes": {"value": value}})
             if route["kind"] == "adc_group":
                 for resource in adc.group_trigger_resources(selection, provider):
                     claim(resource, name, mode, route["id"])
@@ -287,8 +293,8 @@ def resolve(assembly, *, root, soc, board, routes, bindings,
     aliases = {"controller:" + item["controller"]:
                "ip:" + item["controller"] + "/control"
                for item in selected if item["kind"] == "external_bus"}
-    resources = resource_graph.resolve(claim_list, shared=pwm_sharing,
-                                       aliases=aliases)
+    resources = resource_graph.resolve(claim_list,
+        shared={**pwm_sharing, **register_sharing}, aliases=aliases)
     adc_group = provider.ADC_GROUP
     triggers = trigger_graph.resolve_fixed(
         selected, adc_triggers=getattr(provider, "ADC_TRIGGERS", None),

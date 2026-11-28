@@ -18,12 +18,12 @@
             "const": true,
             "count": {
               "length": "selected.physical_flash.erase_spans",
-              "limit": 1
+              "limit": 2
             },
             "value": {
               "map": {
                 "source": "selected.physical_flash.erase_spans",
-                "limit": 1,
+                "limit": 2,
                 "value": {
                   "record": [
                     [
@@ -82,7 +82,7 @@
                   "erase_span_count",
                   {
                     "length": "selected.physical_flash.erase_spans",
-                    "limit": 1
+                    "limit": 2
                   }
                 ],
                 [

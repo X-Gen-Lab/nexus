@@ -7,7 +7,7 @@ from tools.configure.providers.common import fail, integer
 from tools.configure.validation import identity, obj, unique
 
 
-_FIXED_DOMAINS = ("core", "apb1", "apb2", "apb1_timer", "apb2_timer")
+_FIXED_DOMAINS = ("core", "apb1", "apb2", "apb1_timer", "apb2_timer", "pll48")
 
 
 def clock_parameters_schema(record):

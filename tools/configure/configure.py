@@ -440,7 +440,7 @@ def resolve_routes(routes_doc, soc, part, provider, *, controller_profiles=None)
     for route in sequence(routes_doc["routes"], "routes"):
         obj(route, {"id", "variants", "controller", "kind", "pins", "modes",
                     "source"}, {"resources", "dma", "mode_dma", "mode_resources",
-                                "clock_profiles"}, "route")
+                                "clock_profiles", "register_settings"}, "route")
         identity(route["id"], "route id")
         if route["id"] in routes:
             fail(f"Duplicate route id: {route['id']}")
@@ -489,6 +489,7 @@ def resolve_routes(routes_doc, soc, part, provider, *, controller_profiles=None)
                 provider.dma_irq(text(dma, "mode-specific DMA resource"))
         for resource in sequence(route.get("resources", []), "route resources"):
             validate_resource_fact(resource, provider, "route resource")
+        resource_graph.validate_register_settings(route.get("register_settings", {}))
         mode_resources = obj(route.get("mode_resources", {}), set(), set(route["modes"]),
                              "mode-specific resources")
         for mode, resources in mode_resources.items():

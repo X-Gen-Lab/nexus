@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: a74003a18d8ec1675d5a4f03bf9451342125961e6d85cf9ab4b7e2ae167892e3\n"
+"X-Nexus-Source-SHA256: 0b824522cb1803a5ef8679774f468b0c38d7076f7e02748c968204e824e3f06f\n"
 
 #: ../../../../../docs/reference/platforms/capabilities.md:9
 msgid "当前派生能力矩阵"
@@ -4106,10 +4106,6 @@ msgid "`stm32f103rb-nucleo`"
 msgstr "`stm32f103rb-nucleo`"
 
 #: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
-msgid "`tests/integration/assemblies/stm32f1_flash/rb.toml`"
-msgstr "`tests/integration/assemblies/stm32f1_flash/rb.toml`"
-
-#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
 msgid "`soc/stm32/stm32f1/drivers/flash/flash.c`"
 msgstr "`soc/stm32/stm32f1/drivers/flash/flash.c`"
 
@@ -4202,52 +4198,6 @@ msgid "`soc/stm32/stm32f1/drivers/exti/exti.c`"
 msgstr "`soc/stm32/stm32f1/drivers/exti/exti.c`"
 
 #: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
-msgid ""
-"`tests/integration/assemblies/stm32f1_family/f100rb-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f100ze-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f101c6-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f101rb-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f101ze-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f101zg-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f102c6-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f102rb-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f103c6-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f103c8-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f103rb-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f103rb-dma-tx.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f103rb-freertos.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f103rb-mco-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f103rb-mco-freertos.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f103rb-offset-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f103ze-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f103zg-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f105vc-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f107vc-baremetal.toml`, "
-"`tests/integration/kernels/os_threadx_runtime/f103rb-threadx.toml`"
-msgstr ""
-"`tests/integration/assemblies/stm32f1_family/f100rb-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f100ze-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f101c6-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f101rb-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f101ze-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f101zg-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f102c6-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f102rb-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f103c6-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f103c8-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f103rb-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f103rb-dma-tx.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f103rb-freertos.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f103rb-mco-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f103rb-mco-freertos.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f103rb-offset-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f103ze-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f103zg-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f105vc-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f107vc-baremetal.toml`, "
-"`tests/integration/kernels/os_threadx_runtime/f103rb-threadx.toml`"
-
-#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
 msgid "PVD"
 msgstr "PVD"
 
@@ -4275,7 +4225,185 @@ msgstr "`tests/integration/assemblies/stm32f1_pwm/f103rb-pwm.toml`"
 msgid "`soc/stm32/stm32f1/drivers/pwm/pwm.c`"
 msgstr "`soc/stm32/stm32f1/drivers/pwm/pwm.c`"
 
-#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+#: ../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "classic-poll"
+msgstr "classic-poll"
+
+#: ../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`can1-silent-loopback`"
+msgstr "`can1-silent-loopback`"
+
+#: ../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`tests/integration/assemblies/stm32f1_can/rb.toml`"
+msgstr "`tests/integration/assemblies/stm32f1_can/rb.toml`"
+
+#: ../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`soc/stm32/stm32f1/drivers/can/can.c`"
+msgstr "`soc/stm32/stm32f1/drivers/can/can.c`"
+
+#: ../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`flash-internal`, `flash-internal-2k`, `flash-internal-xl`"
+msgstr "`flash-internal`, `flash-internal-2k`, `flash-internal-xl`"
+
+#: ../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid ""
+"`tests/integration/assemblies/stm32f1_flash/rb.toml`, "
+"`tests/integration/assemblies/stm32f1_flash/ze.toml`, "
+"`tests/integration/assemblies/stm32f1_flash/zg.toml`"
+msgstr ""
+"`tests/integration/assemblies/stm32f1_flash/rb.toml`, "
+"`tests/integration/assemblies/stm32f1_flash/ze.toml`, "
+"`tests/integration/assemblies/stm32f1_flash/zg.toml`"
+
+#: ../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "backup-adopt"
+msgstr "backup-adopt"
+
+#: ../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`rtc-lse-crystal-backup`"
+msgstr "`rtc-lse-crystal-backup`"
+
+#: ../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`tests/integration/assemblies/stm32f1_rtc/rb.toml`"
+msgstr "`tests/integration/assemblies/stm32f1_rtc/rb.toml`"
+
+#: ../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`soc/stm32/stm32f1/drivers/rtc/counter.c`"
+msgstr "`soc/stm32/stm32f1/drivers/rtc/counter.c`"
+
+#: ../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`usart2-pa3-rx`"
+msgstr "`usart2-pa3-rx`"
+
+#: ../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`tests/integration/assemblies/stm32f1_uart_rx_dma/f103rb-rx-dma.toml`"
+msgstr "`tests/integration/assemblies/stm32f1_uart_rx_dma/f103rb-rx-dma.toml`"
+
+#: ../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`soc/stm32/stm32f1/drivers/uart/uart_rx_dma.c`"
+msgstr "`soc/stm32/stm32f1/drivers/uart/uart_rx_dma.c`"
+
+#: ../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`tests/integration/assemblies/stm32f1_window_watchdog/rb-window.toml`"
+msgstr "`tests/integration/assemblies/stm32f1_window_watchdog/rb-window.toml`"
+
+#: ../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`soc/stm32/stm32f1/drivers/watchdog/window_watchdog.c`"
+msgstr "`soc/stm32/stm32f1/drivers/watchdog/window_watchdog.c`"
+
+#: ../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "classic-poll-normal"
+msgstr "classic-poll-normal"
+
+#: ../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`can1-pa11-pa12-rs-pc2`"
+msgstr "`can1-pa11-pa12-rs-pc2`"
+
+#: ../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`tests/integration/assemblies/stm32f1_can_normal/rb.toml`"
+msgstr "`tests/integration/assemblies/stm32f1_can_normal/rb.toml`"
+
+#: ../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`dac-pa4-ch1`"
+msgstr "`dac-pa4-ch1`"
+
+#: ../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid ""
+"`tests/integration/assemblies/stm32f1_dac/f100rb-dac.toml`, "
+"`tests/integration/assemblies/stm32f1_dac/f103ze-dac.toml`, "
+"`tests/integration/assemblies/stm32f1_dac/f103zg-dac.toml`"
+msgstr ""
+"`tests/integration/assemblies/stm32f1_dac/f100rb-dac.toml`, "
+"`tests/integration/assemblies/stm32f1_dac/f103ze-dac.toml`, "
+"`tests/integration/assemblies/stm32f1_dac/f103zg-dac.toml`"
+
+#: ../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`soc/stm32/stm32f1/drivers/dac/dac.c`"
+msgstr "`soc/stm32/stm32f1/drivers/dac/dac.c`"
+
+#: ../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`tests/integration/assemblies/stm32f1_fsmc/zg-sram.toml`"
+msgstr "`tests/integration/assemblies/stm32f1_fsmc/zg-sram.toml`"
+
+#: ../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`soc/stm32/stm32f1/drivers/fsmc/fsmc.c`"
+msgstr "`soc/stm32/stm32f1/drivers/fsmc/fsmc.c`"
+
+#: ../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`fsmc-ne3-is61wv51216bll`"
+msgstr "`fsmc-ne3-is61wv51216bll`"
+
+#: ../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid ""
+"`tests/integration/assemblies/stm32f1_family/f100rb-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f100ze-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f101c6-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f101rb-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f101ze-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f101zg-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f102c6-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f102rb-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103c6-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103c8-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-dma-tx.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-freertos.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-mco-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-mco-freertos.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-offset-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103ze-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103zg-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f105vc-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f105vc-hse25-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f107vc-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f107vc-hse25-baremetal.toml`, "
+"`tests/integration/kernels/os_threadx_runtime/f103rb-threadx.toml`"
+msgstr ""
+"`tests/integration/assemblies/stm32f1_family/f100rb-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f100ze-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f101c6-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f101rb-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f101ze-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f101zg-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f102c6-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f102rb-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103c6-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103c8-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-dma-tx.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-freertos.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-mco-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-mco-freertos.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-offset-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103ze-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103zg-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f105vc-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f105vc-hse25-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f107vc-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f107vc-hse25-baremetal.toml`, "
+"`tests/integration/kernels/os_threadx_runtime/f103rb-threadx.toml`"
+
+#: ../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid ""
+"`tests/integration/assemblies/stm32f1_buses/f103rb-buses.toml`, "
+"`tests/integration/assemblies/stm32f1_i2c_10bit/f103rb-i2c-10bit.toml`"
+msgstr ""
+"`tests/integration/assemblies/stm32f1_buses/f103rb-buses.toml`, "
+"`tests/integration/assemblies/stm32f1_i2c_10bit/f103rb-i2c-10bit.toml`"
+
+#: ../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`spi2-pb13-pb14-pb15-dma`"
+msgstr "`spi2-pb13-pb14-pb15-dma`"
+
+#: ../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`tests/integration/assemblies/stm32f1_spi_dma/f103rb-spi-dma.toml`"
+msgstr "`tests/integration/assemblies/stm32f1_spi_dma/f103rb-spi-dma.toml`"
+
+#: ../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`soc/stm32/stm32f1/drivers/spi/spi_dma.c`"
+msgstr "`soc/stm32/stm32f1/drivers/spi/spi_dma.c`"
+
+#: ../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
 msgid ""
 "`tests/integration/assemblies/stm32f1_family/f100rb-baremetal.toml`, "
 "`tests/integration/assemblies/stm32f1_family/f100ze-baremetal.toml`, "
@@ -4295,7 +4423,9 @@ msgid ""
 "`tests/integration/assemblies/stm32f1_family/f103ze-baremetal.toml`, "
 "`tests/integration/assemblies/stm32f1_family/f103zg-baremetal.toml`, "
 "`tests/integration/assemblies/stm32f1_family/f105vc-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f105vc-hse25-baremetal.toml`, "
 "`tests/integration/assemblies/stm32f1_family/f107vc-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f107vc-hse25-baremetal.toml`, "
 "`tests/integration/kernels/os_threadx_runtime/f103rb-threadx.toml`"
 msgstr ""
 "`tests/integration/assemblies/stm32f1_family/f100rb-baremetal.toml`, "
@@ -4316,5 +4446,7 @@ msgstr ""
 "`tests/integration/assemblies/stm32f1_family/f103ze-baremetal.toml`, "
 "`tests/integration/assemblies/stm32f1_family/f103zg-baremetal.toml`, "
 "`tests/integration/assemblies/stm32f1_family/f105vc-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f105vc-hse25-baremetal.toml`, "
 "`tests/integration/assemblies/stm32f1_family/f107vc-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f107vc-hse25-baremetal.toml`, "
 "`tests/integration/kernels/os_threadx_runtime/f103rb-threadx.toml`"

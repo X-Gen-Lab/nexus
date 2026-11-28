@@ -52,6 +52,7 @@ nx_result_t nx_stm32f1_spi_admit(const nx_stm32f1_spi_t* state,
 nx_result_t nx_stm32f1_spi_prepare(nx_stm32f1_spi_t* state,
                                    const nx_stm32f1_spi_config_t* config);
 nx_result_t nx_stm32f1_spi_close(nx_stm32f1_spi_t* state);
+bool nx_stm32f1_spi_select_cs(nx_stm32f1_spi_t* state, bool active);
 extern const nx_spi_ops_t nx_stm32f1_spi_ops;
 extern const nx_spi_endpoint_ops_t nx_stm32f1_spi_endpoint_ops;
 extern const nx_spi_transaction_ops_t nx_stm32f1_spi_transaction_ops;

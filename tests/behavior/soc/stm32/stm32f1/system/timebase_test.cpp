@@ -14,10 +14,19 @@
 #include "register_model.h"
 #include "system/platform.h"
 
+#if defined(NEXUS_ARCH_SLEEP_MODEL)
+#include "arch_sleep_model.h"
+#include "nexus/arch/arch.h"
+#include "nexus/arch/sleep.h"
+#endif
+
 #include <cstring>
 
-#if defined(NEXUS_CLOCK_HSE_BYPASS) && NEXUS_CLOCK_HSE_BYPASS == 1
+#if defined(NEXUS_CLOCK_HSE_BYPASS)
 #define TEST_HSE72 1
+#if NEXUS_CLOCK_HSE_BYPASS == 0
+#define TEST_PLL2 1
+#endif
 #endif
 
 RCC_TypeDef f1_test_rcc;
@@ -32,12 +41,24 @@ constexpr nx_stm32f1_platform_config_t c8{64U * 1024U};
 uint16_t flash_kib;
 bool init_update;
 bool disable_irq;
+#if defined(NEXUS_ARCH_SLEEP_MODEL)
+uint32_t sleep_control;
+unsigned wfi_count;
+#endif
 #if defined(TEST_HSE72)
 extern "C" uint32_t SystemCoreClock;
 constexpr uint32_t timer_prescaler = 71U;
 bool hse_present;
 bool allow_hsi_switch;
 bool safe_pll_switch;
+#if defined(TEST_PLL2)
+bool pll2_locks;
+bool pll_locks;
+bool pll2_stops;
+constexpr uint32_t pll2_config = RCC_CFGR2_PREDIV1_DIV5 |
+                                 RCC_CFGR2_PREDIV2_DIV5 | RCC_CFGR2_PLL2MUL8 |
+                                 RCC_CFGR2_PREDIV1SRC_PLL2;
+#endif
 #else
 constexpr uint32_t timer_prescaler = 7U;
 #endif
@@ -60,10 +81,17 @@ class F103Timebase : public testing::Test {
         flash_kib = 128U;
         init_update = true;
         disable_irq = true;
+#if defined(NEXUS_ARCH_SLEEP_MODEL)
+        sleep_control = 0U;
+        wfi_count = 0U;
+#endif
 #if defined(TEST_HSE72)
         hse_present = true;
         allow_hsi_switch = true;
         safe_pll_switch = false;
+#endif
+#if defined(TEST_PLL2)
+        pll2_locks = pll_locks = pll2_stops = true;
 #endif
     }
 
@@ -72,9 +100,64 @@ class F103Timebase : public testing::Test {
 #if defined(TEST_HSE72)
         allow_hsi_switch = true;
 #endif
+#if defined(TEST_PLL2)
+        pll2_stops = true;
+#endif
         EXPECT_EQ(nx_stm32f1_platform_system_release(&rb, true), NX_SUCCESS);
     }
 };
+
+#if defined(NEXUS_ARCH_SLEEP_MODEL)
+TEST_F(F103Timebase, ShallowWfiPreservesTheLiveTim2EpochAndClockOwners) {
+    ASSERT_EQ(NX_SUCCESS, nx_stm32f1_platform_system_start(&rb).primary);
+    const uint32_t clock = RCC->CR;
+    const uint32_t dividers = RCC->CFGR;
+    const uint32_t backup = RCC->BDCR;
+    const uint32_t ahb = RCC->AHBENR;
+    const uint32_t apb = RCC->APB1ENR;
+
+    uint32_t sequence = 0U;
+    bool slept = true;
+    TIM2->CNT = 65534U;
+    ASSERT_EQ(65534U, nx_time_now_us());
+    ASSERT_EQ(NX_ARCH_OK, nx_arch_idle_if_unchanged(&sequence, 1U, &slept));
+    EXPECT_FALSE(slept);
+    EXPECT_EQ(0U, wfi_count);
+
+    ASSERT_EQ(NX_ARCH_OK, nx_arch_idle_if_unchanged(&sequence, 0U, &slept));
+    EXPECT_TRUE(slept);
+    EXPECT_EQ(1U, wfi_count);
+    EXPECT_EQ(0U, nx_arch_irq_masks().primask);
+    EXPECT_NE(0U, TIM2->SR & TIM_SR_UIF);
+    EXPECT_EQ(65540U, nx_time_now_us());
+    TIM2_IRQHandler();
+    EXPECT_EQ(65540U, nx_time_now_us());
+    EXPECT_TRUE(nx_stm32f1_system_live());
+    EXPECT_EQ(clock, RCC->CR);
+    EXPECT_EQ(dividers, RCC->CFGR);
+    EXPECT_EQ(backup, RCC->BDCR);
+    EXPECT_EQ(ahb, RCC->AHBENR);
+    EXPECT_EQ(apb, RCC->APB1ENR);
+    EXPECT_EQ(0U, RCC->APB1ENR & (RCC_APB1ENR_PWREN | RCC_APB1ENR_BKPEN));
+}
+
+TEST_F(F103Timebase, ShallowWfiRefusesInheritedSleepOnExitOrDeepSleep) {
+    ASSERT_EQ(NX_SUCCESS, nx_stm32f1_platform_system_start(&rb).primary);
+    const uint32_t sequence = 0U;
+    constexpr uint32_t alternate_modes[] = {SCB_SCR_SLEEPONEXIT_Msk,
+                                            SCB_SCR_SLEEPDEEP_Msk};
+    for (const uint32_t mode : alternate_modes) {
+        sleep_control = mode;
+        bool slept = true;
+        EXPECT_EQ(NX_ARCH_UNSUPPORTED,
+                  nx_arch_idle_if_unchanged(&sequence, 0U, &slept));
+        EXPECT_FALSE(slept);
+        EXPECT_EQ(mode, sleep_control);
+        EXPECT_EQ(0U, nx_arch_irq_masks().primask);
+    }
+    EXPECT_EQ(0U, wfi_count);
+}
+#endif
 
 TEST_F(F103Timebase, WrongDensityDoesNotAcquireTimer) {
     EXPECT_EQ(nx_stm32f1_platform_system_start(&c8).primary, NX_ERROR_IO);
@@ -165,7 +248,7 @@ TEST_F(F103Timebase, SwitchesOnlyAfterFlashAndBusAreSafe) {
     EXPECT_EQ(f1_test_flash.ACR & FLASH_ACR_LATENCY, 0U);
 }
 
-TEST_F(F103Timebase, AbsentMcoReturnsToHsiBeforePublishing) {
+TEST_F(F103Timebase, AbsentHseReturnsToHsiBeforePublishing) {
     hse_present = false;
     const auto result = nx_stm32f1_platform_system_start(&rb);
     EXPECT_EQ(result.primary, NX_ERROR_TIMEOUT);
@@ -189,6 +272,76 @@ TEST_F(F103Timebase, FailedReturnToHsiRetainsPllAndFlashWaitStates) {
     EXPECT_EQ(nx_stm32f1_platform_system_start(&rb).primary, NX_ERROR_STATE);
     allow_hsi_switch = true;
     EXPECT_EQ(nx_stm32f1_platform_system_release(&rb, true), NX_SUCCESS);
+}
+#endif
+
+#if defined(TEST_PLL2)
+TEST_F(F103Timebase, LinksBothPllsWithoutOpeningOtgClock) {
+    const uint32_t ahb_idle = RCC->AHBENR;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32f1_platform_system_start(&rb).primary);
+    EXPECT_EQ(pll2_config, RCC->CFGR2);
+    EXPECT_EQ(0U, RCC->CR & (RCC_CR_HSEBYP | RCC_CR_PLL3ON | RCC_CR_PLL3RDY));
+    EXPECT_NE(0U, RCC->CR & RCC_CR_PLL2RDY);
+    EXPECT_EQ(0U, RCC->CFGR & RCC_CFGR_OTGFSPRE);
+    EXPECT_EQ(ahb_idle, RCC->AHBENR);
+    ASSERT_EQ(NX_SUCCESS, nx_stm32f1_platform_system_release(&rb, true));
+    EXPECT_EQ(0U, RCC->CFGR2);
+    EXPECT_EQ(0U, RCC->CR & (RCC_CR_HSEON | RCC_CR_PLLON | RCC_CR_PLL2ON));
+}
+
+TEST_F(F103Timebase, FailureOfEitherPllRestoresHsiAndClockFields) {
+    for (const bool pll2_fail : {true, false}) {
+        pll2_locks = !pll2_fail;
+        pll_locks = pll2_fail;
+        const auto result = nx_stm32f1_platform_system_start(&rb);
+        EXPECT_EQ(NX_ERROR_TIMEOUT, result.primary);
+        EXPECT_EQ(NX_SUCCESS, result.cleanup);
+        EXPECT_EQ(0U, result.remaining_effects);
+        EXPECT_EQ(0U, RCC->CFGR);
+        EXPECT_EQ(0U, RCC->CFGR2);
+        EXPECT_EQ(0U, RCC->APB1ENR);
+        EXPECT_FALSE(nx_stm32f1_system_live());
+    }
+}
+
+TEST_F(F103Timebase, LatePll2WithdrawalRetainsHseAndCanRetry) {
+    ASSERT_EQ(NX_SUCCESS, nx_stm32f1_platform_system_start(&rb).primary);
+    const uint32_t ahb_idle = RCC->AHBENR;
+    RCC->AHBENR = ahb_idle | RCC_AHBENR_OTGFSEN;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32f1_platform_system_release(&rb, true));
+    EXPECT_EQ(RCC_CFGR_SWS_PLL, RCC->CFGR & RCC_CFGR_SWS);
+    EXPECT_EQ(ahb_idle | RCC_AHBENR_OTGFSEN, RCC->AHBENR);
+    RCC->AHBENR = ahb_idle;
+
+    pll2_stops = false;
+    EXPECT_EQ(NX_ERROR_TIMEOUT, nx_stm32f1_platform_system_release(&rb, true));
+    EXPECT_EQ(RCC_CFGR_SWS_HSI, RCC->CFGR & RCC_CFGR_SWS);
+    EXPECT_EQ(0U, RCC->CR & (RCC_CR_PLLON | RCC_CR_PLLRDY));
+    EXPECT_NE(0U, RCC->CR & RCC_CR_HSEON);
+    EXPECT_EQ(pll2_config, RCC->CFGR2);
+    EXPECT_FALSE(nx_stm32f1_system_live());
+    pll2_stops = true;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32f1_platform_system_release(&rb, true));
+    EXPECT_EQ(0U, RCC->CFGR2);
+}
+
+TEST_F(F103Timebase, RefusesForeignOtgGateResetOrReadyIrq) {
+    const uint32_t reset = RCC->CR;
+    const uint32_t ahb_idle = RCC->AHBENR;
+    RCC->AHBENR = ahb_idle | RCC_AHBENR_OTGFSEN;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32f1_platform_system_start(&rb).primary);
+    EXPECT_EQ(ahb_idle | RCC_AHBENR_OTGFSEN, RCC->AHBENR);
+    EXPECT_EQ(reset, RCC->CR);
+    RCC->AHBENR = ahb_idle;
+    RCC->AHBRSTR = RCC_AHBRSTR_OTGFSRST;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32f1_platform_system_start(&rb).primary);
+    EXPECT_EQ(RCC_AHBRSTR_OTGFSRST, RCC->AHBRSTR);
+    EXPECT_EQ(reset, RCC->CR);
+    RCC->AHBRSTR = 0U;
+    RCC->CIR = RCC_CIR_PLL3RDYIE;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32f1_platform_system_start(&rb).primary);
+    EXPECT_EQ(RCC_CIR_PLL3RDYIE, RCC->CIR);
+    EXPECT_EQ(reset, RCC->CR);
 }
 #endif
 
@@ -216,6 +369,23 @@ TEST_F(F103Timebase, RejectsNonResetExternalClockPrescaler) {
 #endif
 } /* namespace */
 
+#if defined(NEXUS_ARCH_SLEEP_MODEL)
+uint32_t nx_arch_sleep_model_control(void) {
+    return sleep_control;
+}
+void nx_arch_sleep_model_wfi(void) {
+    EXPECT_EQ(1U, nx_arch_irq_masks().primask);
+    const uint32_t memory_clocks = RCC_AHBENR_FLITFEN | RCC_AHBENR_SRAMEN;
+    EXPECT_EQ(memory_clocks, RCC->AHBENR & memory_clocks);
+    EXPECT_NE(0U, RCC->APB1ENR & RCC_APB1ENR_TIM2EN);
+    EXPECT_NE(0U, TIM2->CR1 & TIM_CR1_CEN);
+    EXPECT_NE(0U, TIM2->DIER & TIM_DIER_UIE);
+    ++wfi_count;
+    TIM2->CNT = 4U;
+    TIM2->SR |= TIM_SR_UIF;
+}
+#endif
+
 uint16_t f1_test_flash_kib() {
     return flash_kib;
 }
@@ -232,11 +402,26 @@ void f1_test_write(volatile uint32_t* reg, uint32_t value) {
             ready |= RCC_CR_HSIRDY;
         if (hse_present && (value & RCC_CR_HSEON) != 0U)
             ready |= RCC_CR_HSERDY;
-        if ((ready & RCC_CR_HSERDY) != 0U && (value & RCC_CR_PLLON) != 0U)
+        uint32_t ready_mask = RCC_CR_HSIRDY | RCC_CR_HSERDY | RCC_CR_PLLRDY;
+        bool main_source_ready = (ready & RCC_CR_HSERDY) != 0U;
+#if defined(TEST_PLL2)
+        ready_mask |= RCC_CR_PLL2RDY;
+        if ((value & RCC_CR_PLL2ON) != 0U) {
+            EXPECT_EQ(pll2_config, RCC->CFGR2);
+            if (main_source_ready && pll2_locks)
+                ready |= RCC_CR_PLL2RDY;
+        } else if ((*reg & RCC_CR_PLL2ON) != 0U) {
+            EXPECT_EQ(0U, value & RCC_CR_PLLON);
+            EXPECT_EQ(0U, RCC->CFGR & RCC_CFGR_PLLSRC);
+            EXPECT_EQ(RCC_CFGR_SWS_HSI, RCC->CFGR & RCC_CFGR_SWS);
+        }
+        if (!pll2_stops)
+            ready |= *reg & static_cast<uint32_t>(RCC_CR_PLL2RDY);
+        main_source_ready = (ready & RCC_CR_PLL2RDY) != 0U && pll_locks;
+#endif
+        if (main_source_ready && (value & RCC_CR_PLLON) != 0U)
             ready |= RCC_CR_PLLRDY;
-        *reg = (value & ~static_cast<uint32_t>(RCC_CR_HSIRDY | RCC_CR_HSERDY |
-                                               RCC_CR_PLLRDY)) |
-               ready;
+        *reg = (value & ~ready_mask) | ready;
         return;
     }
     if (reg == &RCC->CFGR) {

@@ -287,11 +287,20 @@ jobs:
           - stm32f1_family
           - stm32f1_flash
           - stm32f1_watchdog
+          - stm32f1_window_watchdog
           - stm32f1_buses
           - stm32f1_pwm
           - stm32f1_adc
           - stm32f1_exti
           - stm32f1_pvd
+          - stm32f1_can
+          - stm32f1_rtc
+          - stm32f1_uart_rx_dma
+          - stm32f1_dac
+          - stm32f1_spi_dma
+          - stm32f1_can_normal
+          - stm32f1_fsmc
+          - stm32f1_i2c_10bit
         include:
           - fixture: stm32f4_family
             project: tests/integration/assemblies/stm32f4_family

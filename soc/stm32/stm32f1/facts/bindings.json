@@ -9,6 +9,10 @@
       "hse": [
         "pin:PD0",
         "pin:PD1"
+      ],
+      "hse25-crystal-pll72": [
+        "pin:OSC_IN",
+        "pin:OSC_OUT"
       ]
     },
     "timebase": {
@@ -28,6 +32,20 @@
       "option": "maintenance",
       "equals": true,
       "message": "Option-byte maintenance has no implementation in the selected STM32F103 Flash mode"
+    },
+    {
+      "device": "stm32f103-hd",
+      "kind": "flash",
+      "option": "maintenance",
+      "equals": true,
+      "message": "Option-byte maintenance has no implementation in the selected STM32F103 Flash mode"
+    },
+    {
+      "device": "stm32f103-xl",
+      "kind": "flash",
+      "option": "maintenance",
+      "equals": true,
+      "message": "Option-byte maintenance has no implementation in the selected STM32F103 Flash mode"
     }
   ],
   "domains": {
@@ -38,11 +56,40 @@
         "DMA1:channel7": {
           "channel": "DMA1_Channel7",
           "irq": "DMA1_Channel7_IRQn"
+        },
+        "DMA1:channel6": {
+          "channel": "DMA1_Channel6",
+          "irq": "DMA1_Channel6_IRQn"
+        },
+        "DMA1:channel4": {
+          "channel": "DMA1_Channel4",
+          "irq": "DMA1_Channel4_IRQn"
+        },
+        "DMA1:channel5": {
+          "channel": "DMA1_Channel5",
+          "irq": "DMA1_Channel5_IRQn"
         }
       },
       "transfers": {
         "USART2": {
-          "tx": "DMA1:channel7"
+          "tx": "DMA1:channel7",
+          "rx": "DMA1:channel6"
+        },
+        "I2C1": {
+          "tx": "DMA1:channel6",
+          "rx": "DMA1:channel7"
+        },
+        "SPI2": {
+          "tx": "DMA1:channel5",
+          "rx": "DMA1:channel4"
+        },
+        "USART1": {
+          "tx": "DMA1:channel4",
+          "rx": "DMA1:channel5"
+        },
+        "I2C2": {
+          "tx": "DMA1:channel4",
+          "rx": "DMA1:channel5"
         }
       }
     },
@@ -50,15 +97,20 @@
       "pin_electrical": true,
       "public_formats": [
         "adc",
+        "can",
         "i2c",
         "spi",
-        "uart"
+        "uart",
+        "dac"
       ],
+      "classic_can_mailboxes": 1,
       "flash_program_unit": 2,
       "flash_input_alignment": 1,
       "offset_image_alignment": 512,
       "offset_image_vector_symbol": "g_pfnVectors",
-      "offset_image_parts": ["STM32F103RBT6"]
+      "offset_image_parts": [
+        "STM32F103RBT6"
+      ]
     },
     "clock": {
       "model": "fixed-profile",
@@ -72,11 +124,16 @@
         ],
         "stm32f1-hsi8": [
           "hsi8"
+        ],
+        "rm0008-f105-f107-run": [
+          "hsi8",
+          "hse25-crystal-pll72"
         ]
       }
     },
     "endpoints": {
-      "spi_transaction": true
+      "spi_transaction": true,
+      "i2c_ten_bit": true
     },
     "limits": {
       "i2c_hz": [
@@ -84,6 +141,11 @@
         80000
       ],
       "pwm_period": 65535
+    },
+    "dac_triggers": {
+      "none": {
+        "kind": "none"
+      }
     }
   },
   "pads": {

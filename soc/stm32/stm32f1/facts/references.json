@@ -34,8 +34,12 @@
         "identity": "Section 30.1.1 Flash size in the electronic signature",
         "dma": "Table 78 p282 wires USART2 TX to DMA1 channel 7",
         "serial_buses": "Sections 9.3.9, 9.3.10, 26 and 28; actual default I2C1 and SPI2 routes",
+        "i2c_ten_bit": "Section 26.3.3, Figures 273-277 and Section 26.6.7: EV5, EV9 and EV6 ordering",
         "control": "Table 44 and section 15.3.9 TIM3 CH1 PWM; 11.3, 11.4 and 11.12 ADC1; 9.4.6 and 10.3 EXTI13",
-        "pvd": "Sections 5.2, 5.4 and 10.2.5 for raw PVD polling, PLS and PVDO"
+        "pvd": "Sections 5.2, 5.4 and 10.2.5 for raw PVD polling, PLS and PVDO",
+        "wwdg": "Sections 20.3 and 20.6, Table 98: PCLK1 prescale, one-way activation and feed window",
+        "can_packet_sram_and_loopback": "Sections 23.2, 24.2, 24.5.3 and 24.8; dedicated SRAM, silent internal loopback and exact bit timing.",
+        "dac": "Sections 12.3 and 12.5, direct DAC output; reviewed without trigger, DMA or waveform generation."
       }
     },
     "es096": {
@@ -52,7 +56,8 @@
         "dma": "Sections 2.4.1 and 2.4.2 cover individual flag clears and 32-bit DMA register access",
         "serial_buses": "Sections 2.3.5 to 2.3.7, 2.8.1 to 2.8.7 and 2.10.1 to 2.10.2",
         "control": "Review 2.5.1 for ADC1_IN0, and 2.6.4 and 2.6.7 for TIM3 fixed PWM",
-        "pvd": "Section 2.2.8 excludes WFE-based PVD wake"
+        "pvd": "Section 2.2.8 excludes WFE-based PVD wake",
+        "wwdg": "Section 2.2.2: DBGMCU unavailable to firmware; no standalone WWDG limitation listed"
       }
     },
     "ds5936": {
@@ -104,7 +109,7 @@
       "bytes": 886926,
       "anchors": {
         "scope": "p1 Table 2 Z/1/Y/2/3/X",
-        "review": "Selected HSI8 system and GPIO/USART2 operating boundaries, see software audit"
+        "review": "Selected HSI8 system, GPIO/USART2 and single-bank Flash operating boundaries, see software audit"
       }
     },
     "ds6558": {
@@ -117,7 +122,8 @@
       "bytes": 2229015,
       "anchors": {
         "package_gpio": "Figure 4 p26 and Table 5 p29 onward, LQFP144",
-        "device_features": "Table 2 part data"
+        "device_features": "Table 2 part data",
+        "flash": "Section 2.3.3 dual bank organization; Table 29 ordinary halfwords, 2 KiB page erase and programming supply"
       }
     },
     "es0346": {
@@ -130,7 +136,7 @@
       "bytes": 839479,
       "anchors": {
         "scope": "p1 Table 2 1/A",
-        "review": "Selected HSI8 system and GPIO/USART2 operating boundaries, see software audit"
+        "review": "Selected HSI8 system, GPIO/USART2 and ordinary Flash bank boundaries, see software audit"
       }
     },
     "ds6517": {
@@ -203,7 +209,8 @@
         "hsi": "Sections 6.2.2 and 6.3.1\u20132",
         "clock_extra": "Section 6.3.11 RCC_CFGR2",
         "pinmux": "Section 7.3.5 USART2 remap",
-        "timebase": "Section 13 TIM2 16-bit"
+        "timebase": "Section 13 TIM2 16-bit",
+        "dac": "Sections 11.3 and 11.5, direct DAC without trigger, one APB1 cycle to transfer holding data."
       }
     },
     "es093": {
@@ -465,6 +472,8 @@
         ],
         "maintained_modes": [
           "adc:single-shot",
+          "can:classic-poll",
+          "can:classic-poll-normal",
           "crc:crc32-words",
           "exti:edge-event",
           "exti:pvd-level",
@@ -473,10 +482,14 @@
           "gpio:output",
           "i2c:poll-messages",
           "pwm:fixed-pwm",
+          "rtc:backup-adopt",
+          "spi:dma",
           "spi:short-poll",
           "uart:dma-tx",
           "uart:irq-byte-event",
-          "watchdog:independent"
+          "uart:rx-dma-idle",
+          "watchdog:independent",
+          "watchdog:window"
         ],
         "items": [
           {
@@ -512,9 +525,26 @@
             "handling": "Flash-size halfword provides a capacity check. Physical revision and debug freeze belong to the external probe.",
             "implementation": [
               "soc/stm32/stm32f1/facts/soc.json",
-              "soc/stm32/stm32f1/drivers/watchdog/watchdog.c"
+              "soc/stm32/stm32f1/drivers/watchdog/watchdog.c",
+              "soc/stm32/stm32f1/drivers/watchdog/window_watchdog.c"
             ],
-            "regressions": []
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/window_watchdog/window_watchdog_test.cpp"
+            ]
+          },
+          {
+            "section": "2.2.6",
+            "title": "LSE startup in harsh environments",
+            "revisions": "AAAAAAAA",
+            "assessment": "external_constraint",
+            "condition": "The crystal can fail to start on first backup domain power-on in harsh environments.",
+            "handling": "Adopt only the exact reviewed LSE route and a running retained RTC. Require LSERDY and fresh APB synchronization; crystal startup and VBAT retention remain outside the software reference.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/rtc/counter.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/rtc/rtc_test.cpp"
+            ]
           },
           {
             "section": "2.2.8",
@@ -556,6 +586,20 @@
             ],
             "regressions": [
               "tests/behavior/soc/stm32/stm32f1/watchdog/watchdog_test.cpp"
+            ]
+          },
+          {
+            "section": "2.3.1",
+            "title": "USART1 RTS and CAN TX alternate output",
+            "revisions": "AAAAAAAA",
+            "assessment": "external_constraint",
+            "condition": "PA12 has its CAN TX path selected when CAN is not clocked but USART1 is.",
+            "handling": "The reference Board claims PA12, requires CAN remap 00 and rejects a foreign active USART1 before changing pads. The transceiver stays disabled until CAN and routing acknowledge.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/can/normal.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/can/can_normal_test.cpp"
             ]
           },
           {
@@ -602,10 +646,14 @@
             "condition": "A simultaneous transfer error and whole-channel flag clear may leave the channel enabled and hide TEIF.",
             "handling": "Withdraw the USART DMA request, disable and verify the channel, inspect late TEIF, then clear individual TCIF, HTIF and TEIF flags with an aligned 32-bit IFCR write. Section 2.4.2 requires aligned 32-bit DMA register accesses.",
             "implementation": [
-              "soc/stm32/stm32f1/drivers/uart/uart_dma.c"
+              "soc/stm32/stm32f1/drivers/uart/uart_dma.c",
+              "soc/stm32/stm32f1/drivers/uart/uart_rx_dma.c",
+              "soc/stm32/stm32f1/drivers/spi/spi_dma.c"
             ],
             "regressions": [
-              "tests/behavior/soc/stm32/stm32f1/uart_dma_test.cpp"
+              "tests/behavior/soc/stm32/stm32f1/uart_dma_test.cpp",
+              "tests/behavior/soc/stm32/stm32f1/uart_rx_dma/uart_rx_dma_test.cpp",
+              "tests/behavior/soc/stm32/stm32f1/spi_dma/spi_dma_test.cpp"
             ]
           },
           {
@@ -726,7 +774,7 @@
             "revisions": "AAAAAAAA",
             "assessment": "silicon_limit",
             "condition": "The hardware cannot satisfy every SMBus v2.0 acknowledgment contract.",
-            "handling": "The admitted mode is a seven-bit I2C polling controller without SMBus.",
+            "handling": "The admitted mode is I2C master polling with separate seven- and ten-bit endpoints. SMBus is outside this mode.",
             "implementation": [
               "soc/stm32/stm32f1/facts/routes.json"
             ],
@@ -793,11 +841,14 @@
             "revisions": "NNNNNNNN",
             "assessment": "silicon_limit",
             "condition": "Clock mismatch can prevent detection of IDLE.",
-            "handling": "The initial USART2 mode owns a byte IRQ ring; it does not depend on IDLE or promise gap timing.",
+            "handling": "The initial USART2 mode owns a byte IRQ ring; it does not depend on IDLE or promise gap timing. Finite DMA reports observed IDLE as advisory and also retires on full count or caller-owned stop.",
             "implementation": [
-              "soc/stm32/stm32f1/facts/routes.json"
+              "soc/stm32/stm32f1/facts/routes.json",
+              "soc/stm32/stm32f1/drivers/uart/uart_rx_dma.c"
             ],
-            "regressions": []
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/uart_rx_dma/uart_rx_dma_test.cpp"
+            ]
           },
           {
             "section": "2.9.3",
@@ -829,11 +880,28 @@
             "revisions": "AAAAAAAA",
             "assessment": "silicon_limit",
             "condition": "Simultaneous DMA traffic on a shared request channel can corrupt SPI CRC.",
-            "handling": "SPI2 short-poll claims neither DMA nor hardware CRC.",
+            "handling": "SPI2 short-poll claims neither DMA nor hardware CRC. SPI2 finite DMA has CRCEN disabled and exclusively leases both wired channels.",
             "implementation": [
-              "soc/stm32/stm32f1/facts/routes.json"
+              "soc/stm32/stm32f1/facts/routes.json",
+              "soc/stm32/stm32f1/drivers/spi/spi_dma.c"
             ],
-            "regressions": []
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/spi_dma/spi_dma_test.cpp"
+            ]
+          },
+          {
+            "section": "2.11.1",
+            "title": "bxCAN time-triggered communication mode not supported",
+            "revisions": "NNNNNNNN",
+            "assessment": "silicon_limit",
+            "condition": "The CAN_MCR TTCM bit must remain clear. Hardware time-triggered timestamps are unavailable.",
+            "handling": "Fixed internal silent loopback leaves TTCM clear and timestamps the event when the task consumes the FIFO.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/can/can.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/can/can_test.cpp"
+            ]
           }
         ]
       }
@@ -959,6 +1027,8 @@
           "X"
         ],
         "maintained_modes": [
+          "dac:direct",
+          "flash:poll-halfword",
           "gpio:output",
           "uart:irq-byte-event"
         ],
@@ -998,6 +1068,20 @@
               "soc/stm32/stm32f1/facts/soc.json"
             ],
             "regressions": []
+          },
+          {
+            "section": "2.2.10",
+            "title": "Flash memory BSY latency after STRT",
+            "revisions": "AAAAAA",
+            "assessment": "workaround",
+            "condition": "The first status read after STRT can precede the BSY assertion.",
+            "handling": "Read back the control register before polling BSY, require a fresh EOP and verify the selected 2 KiB single-bank page.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/flash/flash.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/flash/flash_test.cpp"
+            ]
           },
           {
             "title": "USART TX pin remains owned during receive-only use",
@@ -1057,7 +1141,11 @@
           "A"
         ],
         "maintained_modes": [
+          "dac:direct",
+          "external_bus:async16",
+          "flash:poll-halfword",
           "gpio:output",
+          "memory_window:cpu-window",
           "uart:irq-byte-event"
         ],
         "items": [
@@ -1098,6 +1186,20 @@
             "regressions": []
           },
           {
+            "section": "2.2.8",
+            "title": "Flash BSY is delayed one bus cycle after STRT",
+            "revisions": "AA",
+            "assessment": "workaround",
+            "condition": "The first immediate status read can miss BSY after launching a page erase.",
+            "handling": "The driver accesses the selected Bank 1 or Bank 2 control register after STRT before polling that bank's status to quiescence. PM0068 Rev2 separates the banks; each call programs or erases within one bank.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/flash/flash.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/flash/flash_test.cpp"
+            ]
+          },
+          {
             "title": "USART TX pin remains owned during receive-only use",
             "assessment": "external_constraint",
             "condition": "When the USART is enabled, clearing TE can still hold the alternate-function TX line high.",
@@ -1108,6 +1210,34 @@
             "regressions": [],
             "section": "2.3.9",
             "revisions": "AA"
+          },
+          {
+            "section": "2.5.1",
+            "title": "Extra reads after synchronous FSMC burst",
+            "revisions": "NN",
+            "assessment": "excluded_mode",
+            "condition": "Synchronous bursts may issue unused extra reads.",
+            "handling": "The reviewed SRAM bank uses asynchronous Mode 1 with no burst or clock output.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/fsmc/fsmc.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/fsmc/fsmc_test.cpp"
+            ]
+          },
+          {
+            "section": "2.5.2",
+            "title": "Extra clock after synchronous FSMC write",
+            "revisions": "NN",
+            "assessment": "excluded_mode",
+            "condition": "Synchronous writes may generate an extra clock when CLKDIV is 1.",
+            "handling": "The reviewed SRAM bank uses asynchronous Mode 1 with no burst or clock output.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/fsmc/fsmc.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/fsmc/fsmc_test.cpp"
+            ]
           },
           {
             "section": "2.10.2",
@@ -1155,6 +1285,7 @@
           "Z"
         ],
         "maintained_modes": [
+          "dac:direct",
           "gpio:output",
           "uart:irq-byte-event"
         ],
@@ -1428,7 +1559,7 @@
       "hardware_qualification": "not_executed",
       "identification": "ES022 Tables 1\u20133 identify the exact silicon group. The linked Flash-size signature checks capacity. Physical marking or a probe is needed to observe the cut.",
       "software_audit": {
-        "profile": "es022-rev11-f105xc-hsi8",
+        "profile": "es022-rev11-f105xc-run",
         "document_sha256": "1597acc5dd8f028193a1d19f6f9f85468c6a925f3886367ac661364b30e2e749",
         "revision_order": [
           "2",
@@ -1457,7 +1588,7 @@
             "revisions": "AA",
             "assessment": "external_constraint",
             "condition": "Sleep may disrupt reads when using two wait states and prefetch with the Flash interface clock gated.",
-            "handling": "The HSI8 run profile uses zero wait states and does not gate the Flash interface to sleep.",
+            "handling": "HSI8 uses zero wait states. The PLL72 profile requires the Flash interface gate and retains it.",
             "implementation": [
               "soc/stm32/stm32f1/facts/clocks.json"
             ],
@@ -1467,11 +1598,13 @@
             "title": "PLL relock after switching its clock source to HSI divided by two",
             "assessment": "external_constraint",
             "condition": "After certain HSE or PLL2 paths, selecting HSI/2 for the main PLL can prevent lock.",
-            "handling": "The reviewed run plan uses HSI directly and leaves the connectivity PLLs off.",
+            "handling": "The PLL72 profile uses the exact HSE via PLL2 path. Withdrawal confirms direct HSI before stopping the main PLL. The main PLL is never started from HSI/2.",
             "implementation": [
               "soc/stm32/stm32f1/system/platform.c"
             ],
-            "regressions": [],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/system/timebase_test.cpp"
+            ],
             "section": "2.2.10",
             "revisions": "AA"
           },
@@ -1526,7 +1659,7 @@
       "hardware_qualification": "not_executed",
       "identification": "ES022 Tables 1\u20133 identify the exact silicon group. The linked Flash-size signature checks capacity. Physical marking or a probe is needed to observe the cut.",
       "software_audit": {
-        "profile": "es022-rev11-f107xc-hsi8",
+        "profile": "es022-rev11-f107xc-run",
         "document_sha256": "1597acc5dd8f028193a1d19f6f9f85468c6a925f3886367ac661364b30e2e749",
         "revision_order": [
           "2",
@@ -1555,7 +1688,7 @@
             "revisions": "AA",
             "assessment": "external_constraint",
             "condition": "Sleep may disrupt reads when using two wait states and prefetch with the Flash interface clock gated.",
-            "handling": "The HSI8 run profile uses zero wait states and does not gate the Flash interface to sleep.",
+            "handling": "HSI8 uses zero wait states. The PLL72 profile requires the Flash interface gate and retains it.",
             "implementation": [
               "soc/stm32/stm32f1/facts/clocks.json"
             ],
@@ -1565,11 +1698,13 @@
             "title": "PLL relock after switching its clock source to HSI divided by two",
             "assessment": "external_constraint",
             "condition": "After certain HSE or PLL2 paths, selecting HSI/2 for the main PLL can prevent lock.",
-            "handling": "The reviewed run plan uses HSI directly and leaves the connectivity PLLs off.",
+            "handling": "The PLL72 profile uses the exact HSE via PLL2 path. Withdrawal confirms direct HSI before stopping the main PLL. The main PLL is never started from HSI/2.",
             "implementation": [
               "soc/stm32/stm32f1/system/platform.c"
             ],
-            "regressions": [],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/system/timebase_test.cpp"
+            ],
             "section": "2.2.10",
             "revisions": "AA"
           },

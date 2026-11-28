@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "bindings": [
+    {
+      "kind": "can",
+      "mode": "classic-poll",
+      "implementation": "can",
+      "headers": [
+        "drivers/can/instance.h"
+      ],
+      "static_recipe": {
+        "state_type": "nx_stm32f1_can_t",
+        "declarations": [],
+        "calls": {
+          "admit": [
+            {
+              "function": "nx_stm32f1_can_admit",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ],
+          "prepare": {
+            "function": "nx_stm32f1_can_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32f1_can_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "retain_on_failed_init": true,
+        "ops": "nx_stm32f1_can_ops"
+      }
+    },
+    {
+      "kind": "can",
+      "mode": "classic-poll-normal",
+      "implementation": "can",
+      "headers": [
+        "drivers/can/normal.h"
+      ],
+      "static_recipe": {
+        "state_type": "nx_stm32f1_can_normal_t",
+        "declarations": [],
+        "calls": {
+          "admit": [
+            {
+              "function": "nx_stm32f1_can_normal_admit",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ],
+          "prepare": {
+            "function": "nx_stm32f1_can_normal_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32f1_can_normal_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "retain_on_failed_init": true,
+        "ops": "nx_stm32f1_can_ops"
+      }
+    }
+  ]
+}

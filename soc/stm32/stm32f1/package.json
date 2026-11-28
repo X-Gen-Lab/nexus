@@ -46,6 +46,10 @@
     "drivers/pwm/binding.json",
     "drivers/adc/binding.json",
     "drivers/exti/binding.json",
-    "drivers/pvd/binding.json"
+    "drivers/pvd/binding.json",
+    "drivers/can/binding.json",
+    "drivers/rtc/binding.json",
+    "drivers/dac/binding.json",
+    "drivers/fsmc/binding.json"
   ]
 }

@@ -220,8 +220,9 @@ class BindingPolicy:
         names.extend(sorted(active - set(names)))
         return self.vector_bindings(tuple((name, None) for name in names))
 
-    def oscillator_resources(self, source):
-        return self.oscillators.get(source, ())
+    def oscillator_resources(self, source, profile=None):
+        """A reviewed profile can override the source-wide pad identity."""
+        return self.oscillators.get(profile, self.oscillators.get(source, ()))
 
     def validate_selection(self, device, kind, options):
         for rule in self.exclusions:

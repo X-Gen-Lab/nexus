@@ -259,6 +259,36 @@ TEST_F(F1Drivers, UartPreservesEventLossBoundary) {
     EXPECT_EQ(nx_stm32f1_uart_close(&uart), NX_SUCCESS);
 }
 
+TEST_F(F1Drivers, UartDefaultRouteNeverWritesMaprOrBorrowsAnOwnedAfioGate) {
+    constexpr uint32_t unrelated = AFIO_MAPR_I2C1_REMAP;
+    constexpr uint32_t debug_readback[] = {0U, AFIO_MAPR_SWJ_CFG_JTAGDISABLE,
+                                           AFIO_MAPR_SWJ_CFG};
+    for (const uint32_t raw : debug_readback) {
+        const uint32_t before = unrelated | raw;
+        AFIO->MAPR = before;
+        RCC->APB2ENR = raw == 0U ? 0U : RCC_APB2ENR_AFIOEN;
+        const uint32_t gates = RCC->APB2ENR;
+        blocked_register = &AFIO->MAPR;
+        ASSERT_EQ(nx_stm32f1_uart_prepare(&uart, &uart_config), NX_SUCCESS);
+        EXPECT_EQ(AFIO->MAPR, before);
+        EXPECT_EQ(RCC->APB2ENR & RCC_APB2ENR_AFIOEN, gates);
+        ASSERT_EQ(nx_stm32f1_uart_close(&uart), NX_SUCCESS);
+        EXPECT_EQ(RCC->APB2ENR, gates);
+        EXPECT_EQ(AFIO->MAPR, before);
+    }
+
+    constexpr uint32_t foreign = AFIO_MAPR_USART2_REMAP | AFIO_MAPR_SWJ_CFG;
+    AFIO->MAPR = foreign;
+    RCC->APB2ENR = 0U;
+    const uint32_t gpio_before = GPIOA->CRL;
+    EXPECT_EQ(nx_stm32f1_uart_prepare(&uart, &uart_config), NX_ERROR_BUSY);
+    EXPECT_EQ(AFIO->MAPR, foreign);
+    EXPECT_EQ(RCC->APB2ENR, 0U);
+    EXPECT_EQ(RCC->APB1ENR, 0U);
+    EXPECT_EQ(GPIOA->CRL, gpio_before);
+    EXPECT_EQ(USART2->CR1, 0U);
+}
+
 TEST_F(F1Drivers, UartRejectsExistingVectorAndNondefaultRemap) {
     irq_pending = true;
     EXPECT_EQ(nx_stm32f1_uart_prepare(&uart, &uart_config), NX_ERROR_BUSY);
@@ -302,6 +332,7 @@ void nx_f1_model_gpio_bsrr(GPIO_TypeDef* registers, uint32_t value) {
     registers->ODR = (registers->ODR & ~(value >> 16U)) | (value & 0xffffU);
 }
 void nx_f1_model_write(volatile uint32_t* registers, uint32_t value) {
+    EXPECT_NE(registers, &AFIO->MAPR);
     if (registers != blocked_register) {
         *registers = value;
     }

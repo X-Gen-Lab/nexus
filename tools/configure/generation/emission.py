@@ -96,7 +96,8 @@ def emit_bundle(result, output):
         header.insert(7, f'#define NEXUS_HSE_HZ {result.clock["input_hz"]}u')
     if "hse_bypass" in result.clock:
         header.append(f'#define NEXUS_CLOCK_HSE_BYPASS {int(result.clock["hse_bypass"])}')
-    for field in ("apb1_hz", "apb2_hz", "apb1_timer_hz", "apb2_timer_hz", "flash_wait_states"):
+    for field in ("apb1_hz", "apb2_hz", "apb1_timer_hz", "apb2_timer_hz",
+                  "pll48_hz", "flash_wait_states"):
         if field in result.clock:
             header.append(f'#define NEXUS_CLOCK_{field.upper()} {result.clock[field]}u')
     provider = for_selection(result)

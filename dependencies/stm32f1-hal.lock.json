@@ -1,6 +1,18 @@
 {
   "commit": "fee494a92b5ad331f92ad21f76c66a5cb83773ee",
   "files": {
+    "Inc/Legacy/stm32_hal_legacy.h": {
+      "bytes": 237664,
+      "sha256": "583cd8373bde87cbf384a9153b7c8ba9c456139baebb248bffe7116c926e2286"
+    },
+    "Inc/stm32f1xx_hal.h": {
+      "bytes": 11091,
+      "sha256": "cc3851d46bc92478fe355f8b1fedd013deaa70da5e8e4136ce5cbb2536519803"
+    },
+    "Inc/stm32f1xx_hal_def.h": {
+      "bytes": 7425,
+      "sha256": "377e7fc68715cfb6d09715e9d77bd5cee09e79f00479f502d3191016c3c388dd"
+    },
     "Inc/stm32f1xx_ll_adc.h": {
       "bytes": 228411,
       "sha256": "fe109e162ec888be59a63f8a0e424c53d98f18ea0066ab55cb6851b7005fa9ee"
@@ -9,9 +21,17 @@
       "bytes": 5332,
       "sha256": "b18138e2d95e4a1b475f803e1101c5c8a8f7695daa238a457e8cc67a9dbc18f2"
     },
+    "Inc/stm32f1xx_ll_dac.h": {
+      "bytes": 63104,
+      "sha256": "4694dd5e6161e3141d73add1c1038e5ed17f8d080c3efd7d646ecfd88addc27c"
+    },
     "Inc/stm32f1xx_ll_exti.h": {
       "bytes": 31206,
       "sha256": "9f816072941e79763cbc048fe03bf803fd81bf0a0ade876d74a49be8620bfde5"
+    },
+    "Inc/stm32f1xx_ll_fsmc.h": {
+      "bytes": 40002,
+      "sha256": "0a808446ca60b01993b95944bd4ce442ecdf32d35bb8f6b74e5e606906cb52fb"
     },
     "Inc/stm32f1xx_ll_gpio.h": {
       "bytes": 88034,
@@ -41,9 +61,17 @@
       "bytes": 8610,
       "sha256": "decb7156d26dc56db7ed76c06c71533ca579905b80824b178749a03a2f224a1b"
     },
+    "Inc/stm32f1xx_ll_wwdg.h": {
+      "bytes": 10172,
+      "sha256": "ef04923836a8f0549c904d2bdca3b0cc975f34302aff440a5732f04a7cd8c6c2"
+    },
     "LICENSE.md": {
       "bytes": 1485,
       "sha256": "dff179cfe1405dc3381dc6865bf4a5173b35605b65694d73356b01aaec1f09f1"
+    },
+    "Src/stm32f1xx_ll_fsmc.c": {
+      "bytes": 38325,
+      "sha256": "0b13290f746e9b35d4f7da9c3829294d4f871e183b5a206841412052d868a47a"
     }
   },
   "kind": "nexus-reviewed-official-driver",
@@ -61,5 +89,5 @@
   "release": "STM32CubeF1-v1.8.7-pinned-driver",
   "repository": "https://github.com/STMicroelectronics/stm32f1xx-hal-driver.git",
   "schema_version": 1,
-  "selected_api": "stm32f1-reviewed-inline-ll"
+  "selected_api": "stm32f1-reviewed-ll"
 }

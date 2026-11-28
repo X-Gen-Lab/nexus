@@ -55,27 +55,37 @@ static size_t rx_stride(const nx_stm32f1_uart_config_t* config) {
 nx_result_t nx_stm32f1_uart_admit(const nx_stm32f1_uart_t* state,
                                   const nx_stm32f1_uart_config_t* config) {
     if (state == NULL || config == NULL || config->registers != USART2 ||
-        config->irq != USART2_IRQn || config->tx_registers != GPIOA ||
-        config->rx_registers != GPIOA || config->tx_pin != 2U ||
+        config->irq != USART2_IRQn || config->rx_registers != GPIOA ||
         config->rx_pin != 3U || config->clock_hz != UART_CLOCK_HZ ||
         config->baud < 1200U || config->baud > 500000U ||
-        config->priority >= (1U << __NVIC_PRIO_BITS) ||
-        config->rx_capacity == 0U ||
-        (config->profile != NX_UART_RX_EVENTS &&
-         config->profile != NX_UART_RX_BYTES)) {
+        config->priority >= (1U << __NVIC_PRIO_BITS)) {
         return NX_ERROR_INVALID;
     }
-    const size_t stride = rx_stride(config);
-    const size_t alignment =
-        config->profile == NX_UART_RX_BYTES ? 1U : _Alignof(nx_uart_rx_event_t);
-    if (config->rx_capacity > SIZE_MAX / stride ||
-        !nx_io_dispatch_span(config->rx_storage, config->rx_capacity * stride,
-                             alignment) ||
-        nx_io_dispatch_overlap(config->rx_storage, config->rx_capacity * stride,
-                               state, sizeof(*state)) ||
-        nx_io_dispatch_overlap(config->rx_storage, config->rx_capacity * stride,
-                               config, sizeof(*config))) {
-        return NX_ERROR_INVALID;
+    if (config->profile == NX_UART_RX_BLOCKS) {
+        if (config->tx_registers != NULL || config->tx_pin != 0U ||
+            config->rx_storage != NULL || config->rx_capacity != 0U) {
+            return NX_ERROR_INVALID;
+        }
+    } else {
+        const size_t stride = rx_stride(config);
+        const size_t alignment = config->profile == NX_UART_RX_BYTES
+                                     ? 1U
+                                     : _Alignof(nx_uart_rx_event_t);
+        if (config->tx_registers != GPIOA || config->tx_pin != 2U ||
+            (config->profile != NX_UART_RX_BYTES &&
+             config->profile != NX_UART_RX_EVENTS) ||
+            config->rx_capacity == 0U ||
+            config->rx_capacity > SIZE_MAX / stride ||
+            !nx_io_dispatch_span(config->rx_storage,
+                                 config->rx_capacity * stride, alignment) ||
+            nx_io_dispatch_overlap(config->rx_storage,
+                                   config->rx_capacity * stride, state,
+                                   sizeof(*state)) ||
+            nx_io_dispatch_overlap(config->rx_storage,
+                                   config->rx_capacity * stride, config,
+                                   sizeof(*config))) {
+            return NX_ERROR_INVALID;
+        }
     }
     if (!nx_stm32f1_cold_context()) {
         return NX_ERROR_CONTEXT;
@@ -138,30 +148,33 @@ nx_result_t nx_stm32f1_uart_prepare(nx_stm32f1_uart_t* state,
         (NX_STM32F1_UART_STATUS(registers) & RX_STATUS) != 0U) {
         return NX_ERROR_BUSY;
     }
+    const bool rx_only = config->profile == NX_UART_RX_BLOCKS;
     const unsigned tx = config->tx_pin;
     const unsigned rx = config->rx_pin;
-    const uint16_t pins = (uint16_t)((1U << tx) | (1U << rx));
-    result = nx_stm32f1_pads_capture(&state->pads, config->tx_registers, pins);
+    const uint16_t pins = (uint16_t)((1U << rx) | (rx_only ? 0U : 1U << tx));
+    result = nx_stm32f1_pads_capture(&state->pads, config->rx_registers, pins);
     if (result != NX_SUCCESS) {
         return result;
     }
     const uint32_t tx_mode =
         GPIO_CRL_CNF0_1 | LL_GPIO_SPEED_FREQ_LOW | LL_GPIO_OUTPUT_PUSHPULL;
-    const uint32_t crl =
-        (tx_mode << (4U * tx)) | (LL_GPIO_MODE_FLOATING << (4U * rx));
-    result = nx_stm32f1_pads_apply(&state->pads, crl, 0U,
-                                   state->pads.latch | (1U << tx));
+    const uint32_t crl = (LL_GPIO_MODE_FLOATING << (4U * rx)) |
+                         (rx_only ? 0U : tx_mode << (4U * tx));
+    const uint32_t latch = state->pads.latch | (rx_only ? 0U : 1U << tx);
+    result = nx_stm32f1_pads_apply(&state->pads, crl, 0U, latch);
     if (result != NX_SUCCESS) {
         return result;
     }
     state->controls_owned = true;
     const uint32_t divisor =
         (config->clock_hz + config->baud / 2U) / config->baud;
+    const uint32_t controls =
+        rx_only ? USART_CR1_UE : UART_CONTROLS | RX_CONTROLS;
     if (!nx_stm32f1_write_masked(&registers->BRR, UINT16_MAX, divisor) ||
-        !nx_stm32f1_write_masked(&registers->CR3, USART_CR3_EIE,
-                                 USART_CR3_EIE) ||
+        (!rx_only && !nx_stm32f1_write_masked(&registers->CR3, USART_CR3_EIE,
+                                              USART_CR3_EIE)) ||
         !nx_stm32f1_write_masked(&registers->CR1, UART_CONTROLS | RX_CONTROLS,
-                                 UART_CONTROLS | RX_CONTROLS)) {
+                                 controls)) {
         return NX_ERROR_IO;
     }
     state->previous_priority = (uint8_t)NX_STM32F1_IRQ_PRIORITY(config->irq);
@@ -534,8 +547,7 @@ static nx_result_t uart_read_events(void* context, nx_uart_rx_event_t* events,
 }
 
 /** \brief Stop request loads and isolate RX, keeping cold resource receipts. */
-static nx_result_t uart_stop(void* context) {
-    nx_stm32f1_uart_t* state = context;
+nx_result_t nx_stm32f1_uart_stop(nx_stm32f1_uart_t* state) {
     if (state == NULL) {
         return NX_ERROR_INVALID;
     }
@@ -598,7 +610,7 @@ static nx_result_t uart_stop(void* context) {
 
 /** \brief Release cold receipts in the Platform's reverse acquisition order. */
 nx_result_t nx_stm32f1_uart_close(nx_stm32f1_uart_t* state) {
-    nx_result_t stopped = uart_stop(state);
+    nx_result_t stopped = nx_stm32f1_uart_stop(state);
     if (stopped != NX_SUCCESS || state->config == NULL) {
         return stopped;
     }
@@ -616,6 +628,10 @@ nx_result_t nx_stm32f1_uart_close(nx_stm32f1_uart_t* state) {
     }
     *state = (nx_stm32f1_uart_t){0};
     return NX_SUCCESS;
+}
+
+static nx_result_t uart_stop(void* context) {
+    return nx_stm32f1_uart_stop(context);
 }
 
 const nx_uart_ops_t nx_stm32f1_uart_ops = {

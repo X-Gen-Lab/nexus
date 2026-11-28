@@ -29,7 +29,10 @@ GPIO 和 USART2 IRQ。精确料号、外部 IRQ、内存、编译宏与授权路
 factory。应用用相同的公共 Cortex-M、GPIO、UART 和 OS 接口消费装配。
 
 HSI8 是名义复位输入。RB 的独立 MCO 软件参考允许 8 MHz 旁路输入、PLL72 和 CSS。
-实际板卡须按 MB1136 修订核对焊桥。TIM2 为 16 位计数器。
+实际板卡须按 MB1136 修订核对焊桥。F105VC 和 F107VC 各有独立的 25 MHz 晶体
+软件装配，名义 PLL2 40 MHz、HCLK 72 MHz、APB1 36 MHz 和 OTG 时钟 48 MHz。
+高频档先确认时钟和 Flash 等待周期，再启动时基。关闭先切回 HSI，再撤回 PLL。
+TIM2 为 16 位计数器。
 1 MHz 计数时必须在 65.536 ms 内服务溢出，包含 IRQ 屏蔽与其它会
 延迟服务的硬件作用。独占时基与 FreeRTOS CM3 的 SysTick 分开。
 Flash-size 签名只用于容量检查。ES096 §2.2.2 的 DBGMCU 寄存器限制
@@ -38,17 +41,28 @@ Flash-size 签名只用于容量检查。ES096 §2.2.2 的 DBGMCU 寄存器限�
 | 软件装配 | 可用接口与限制 |
 | --- | --- |
 | NUCLEO-F103RB 裸机和 FreeRTOS | PA5 逻辑输出，PA2／PA3 USART2 8N1 IRQ，字节或事件接收，显式停止和排空 |
-| C6／ZE／ZG 裸机软件参考 | HSI8、GPIO 输出与 USART2 IRQ。Flash 写擦和高阶外设尚未在这些料号开放 |
+| C6／ZE／ZG 裸机软件参考 | HSI8、GPIO 输出与 USART2 IRQ。ZE 和 ZG 的独立 Flash 装配另列 |
 | F103C8 裸机软件参考 | GPIO 输出、PA0 上拉输入、USART2 IRQ、硬件 CRC32 字与 96 位 UID |
 | F103RB 有限 DMA TX | DMA1 通道 7 送出有限 TX，RX 仍走 IRQ。先排空通道与 IRQ，再等 USART 真实 TC 结算 |
+| F103RB [有限 DMA RX](../../../tests/integration/assemblies/stm32f1_uart_rx_dma/README.md) | PA3、DMA1 通道 6、调用者持有流块。按已观测 IDLE、满块或显式停止结算 |
 | F103RB 独立 [Flash 装配](../../../tests/integration/assemblies/stm32f1_flash/README.md) | 1 KiB 页，2 B 编程，显式板级编程电压，有界轮询及失败后的排空与重锁 |
+| F103ZE 独立 [Flash 装配](../../../tests/integration/assemblies/stm32f1_flash/README.md) | 512 KiB 单 Bank，2 KiB 页，2 B 编程 |
+| F103ZG 独立 [Flash 装配](../../../tests/integration/assemblies/stm32f1_flash/README.md) | 两个 512 KiB Bank，2 KiB 页，单次写入或擦除限于一个物理 Bank |
 | F103RB 独立 [IWDG 装配](../../../tests/integration/assemblies/stm32f1_watchdog/README.md) | 先确认 LSI 与寄存器同步。发出启动密钥后保留喂狗与关闭责任，直到复位 |
 | F103RB [组合总线](../../../tests/integration/assemblies/stm32f1_buses/README.md) | HSI8，SPI2 短轮询、8／16 位事务，I²C1 七位 80 kHz 轮询和 repeated START |
+| F103RB [I²C1 7 位与 10 位端点](../../../tests/integration/assemblies/stm32f1_i2c_10bit/f103rb-i2c-10bit.toml) | HSI8，PB6/PB7，80 kHz。两种地址共用一个控制器和有界轮询事务 |
 | F103RB [ADC1](../../../tests/integration/assemblies/stm32f1_adc/README.md) | PA0、4 MHz ADC 时钟，校准后的规则单次 12 位采样 |
 | F103RB [TIM3](../../../tests/integration/assemblies/stm32f1_pwm/README.md) | PA6、CH1、8 MHz 定时器，边沿对齐 PWM 和明确的停止电平 |
 | F103RB [按键 EXTI](../../../tests/integration/assemblies/stm32f1_exti/README.md) | B1 PC13 的独立软件装配，原始电平与边沿事件 |
 | F103RB [PVD](../../../tests/integration/assemblies/stm32f1_pvd/README.md) | 选定阈值编码和轮询电平，启动与关闭管理 PWR 门控 |
 | F103RB [ThreadX 软件参考](../../../tests/integration/kernels/os_threadx_runtime/README.md) | Cortex-M3 soft-float，HSI8，1 kHz SysTick 和 BASEPRI |
+| F103RB [窗口看门狗](../../../tests/integration/assemblies/stm32f1_window_watchdog/README.md) | HSI8，应用显式激活和刷新，保持不可逆启动责任 |
+| F103RB [CAN1 静默内回环](../../../tests/integration/assemblies/stm32f1_can/README.md) | 裸机、HSI8、名义 500 kbit/s，有限发送与 FIFO0 轮询 |
+| F103RB [RTC 接管](../../../tests/integration/assemblies/stm32f1_rtc/README.md) | 只读取由外部预先配置的 LSE RTC 的备份字，与 PVD 装配互斥 |
+| F103RB [CAN1 外部载板软件参考](../../../tests/integration/assemblies/stm32f1_can_normal/README.md) | 裸机、HSE72，SN65HVD230DR，500 kbit/s，TX/RX 轮询和显式收发器停机 |
+| STM3210E-EVAL MB672 D06 [FSMC SRAM 装配](../../../tests/integration/assemblies/stm32f1_fsmc/README.md) | F103ZG 的 NE3，独占 1 MiB CPU 窗口与安全回收 |
+| F103RB [SPI2 有限 DMA](../../../tests/integration/assemblies/stm32f1_spi_dma/f103rb-spi-dma.toml) | HSI8，8 位模式 0，1 MHz。DMA1 通道 5 TX 和通道 4 RX，处理完成后排空并撤销片选 |
+| F100RB／F103ZE／F103ZG [DAC1 直接输出](../../../tests/integration/assemblies/stm32f1_dac/README.md) | 同一 PA4 输出实现，8 位及两种 12 位数字格式，显式启动和空闲码 |
 
 x6／xB 的 IRQ 槽数为 43，xE／xG 为 60。链接验证单独校验官方向量保留项与 BootRAM 尾部。
 具体模式以装配和能力矩阵为准。

@@ -22,6 +22,9 @@ static constexpr uint32_t scl = 1U << 6U;
 static constexpr uint32_t sda = 1U << 7U;
 static constexpr uint32_t lines = scl | sda;
 static constexpr uint8_t address = 0x49U;
+static constexpr uint16_t long_address = 0x2abU;
+static constexpr uint8_t long_write = 0xf4U;
+static constexpr uint8_t long_read = 0xf5U;
 
 static struct {
     nx_time_us_t now;
@@ -37,6 +40,14 @@ static struct {
     uint32_t nack_tx_index;
     uint32_t late_error;
     uint32_t controls_after_loss;
+    uint32_t lost_start_index;
+    uint32_t nack_address_index;
+    uint32_t arbitration_address_index;
+    uint32_t add10_reads;
+    size_t address_count;
+    std::array<uint8_t, 16> address_bytes;
+    bool ten_bit;
+    bool ten_selected;
     size_t read_length;
     bool arbitration;
     bool lose_start;
@@ -46,7 +57,9 @@ static struct {
 } bus;
 
 extern "C" uint32_t f103_i2c_read(const volatile uint32_t* field) {
-    if (field == &I2C1->SR2 && (I2C1->SR1 & I2C_SR1_ADDR) != 0U) {
+    if (field == &I2C1->SR1 && (I2C1->SR1 & I2C_SR1_ADD10) != 0U) {
+        ++bus.add10_reads;
+    } else if (field == &I2C1->SR2 && (I2C1->SR1 & I2C_SR1_ADDR) != 0U) {
         EXPECT_GT(bus.address_reads, 0U);
         if (bus.read_direction) {
             const bool held = (GPIOB->IDR & scl) == 0U;
@@ -94,7 +107,7 @@ extern "C" void f103_i2c_write(volatile uint32_t* field, uint32_t value) {
         }
         if ((value & I2C_CR1_START) != 0U) {
             ++bus.starts;
-            if (!bus.lose_start) {
+            if (!bus.lose_start && bus.starts != bus.lost_start_index) {
                 I2C1->SR1 = I2C_SR1_SB | I2C_SR1_RXNE;
                 I2C1->SR2 = I2C_SR2_BUSY | I2C_SR2_MSL;
                 value &= ~(uint32_t)I2C_CR1_START;
@@ -107,9 +120,38 @@ extern "C" void f103_i2c_write(volatile uint32_t* field, uint32_t value) {
                 value &= ~(uint32_t)I2C_CR1_STOP;
             }
             bus.read_direction = false;
+            bus.ten_selected = false;
         }
     } else if (field == &I2C1->DR) {
-        if ((I2C1->SR1 & I2C_SR1_SB) != 0U) {
+        const bool start = (I2C1->SR1 & I2C_SR1_SB) != 0U;
+        const bool low_address = (I2C1->SR1 & I2C_SR1_ADD10) != 0U;
+        if (bus.ten_bit && (start || low_address)) {
+            ASSERT_LT(bus.address_count, bus.address_bytes.size());
+            bus.address_bytes[bus.address_count++] =
+                static_cast<uint8_t>(value);
+            if (bus.address_count == bus.nack_address_index) {
+                I2C1->SR1 = I2C_SR1_AF;
+            } else if (bus.address_count == bus.arbitration_address_index) {
+                I2C1->SR1 = I2C_SR1_ARLO;
+                I2C1->SR2 = 0U;
+            } else if (low_address) {
+                EXPECT_GT(bus.add10_reads, 0U);
+                EXPECT_EQ(long_address & 0xffU, value);
+                bus.ten_selected = true;
+                ++bus.address_writes;
+                I2C1->SR1 = I2C_SR1_ADDR;
+            } else if (value == long_read) {
+                EXPECT_TRUE(bus.ten_selected);
+                bus.read_direction = true;
+                ++bus.address_reads;
+                I2C1->SR1 = I2C_SR1_ADDR;
+            } else {
+                EXPECT_EQ(long_write, value);
+                bus.read_direction = false;
+                bus.add10_reads = 0U;
+                I2C1->SR1 = I2C_SR1_ADD10;
+            }
+        } else if (start) {
             EXPECT_EQ(address, value >> 1U);
             bus.read_direction = (value & 1U) != 0U;
             if (bus.read_direction) {
@@ -165,9 +207,15 @@ extern "C" void nx_arch_dsb(void) {
 class F103I2C : public testing::Test {
   protected:
     nx_stm32f1_i2c_t state{};
-    nx_stm32f1_i2c_endpoint_t addressed{&state, address};
+    nx_stm32f1_i2c_endpoint_t addressed{&state, address, 7U};
     const nx_i2c_port_t controller{&nx_stm32f1_i2c_ops, &state};
     const nx_i2c_endpoint_t face{&nx_stm32f1_i2c_endpoint_ops, &addressed};
+
+    void use_ten_bit() {
+        bus.ten_bit = true;
+        addressed.address = long_address;
+        addressed.address_bits = 10U;
+    }
 
     void SetUp() override {
         bus = {};
@@ -361,4 +409,82 @@ TEST_F(F103I2C, KeepsPeripheralInResetWhileExternalLineRemainsLow) {
     GPIOB->IDR |= sda;
     EXPECT_EQ(NX_SUCCESS, nx_stm32f1_i2c_close(&state));
     EXPECT_EQ(0U, RCC->APB1ENR & RCC_APB1ENR_I2C1EN);
+}
+
+TEST_F(F103I2C, TenBitStandaloneReadUsesWriteHeaderLowAndRepeatedReadHeader) {
+    use_ten_bit();
+    uint8_t output[2]{};
+    bus.read_length = sizeof(output);
+    auto message = nx_i2c_message_read(output, sizeof(output));
+    size_t progress = 99U;
+    ASSERT_EQ(NX_SUCCESS, nx_i2c_endpoint_transaction(
+                              &face, &message, 1U, bus.now + 400U, &progress));
+    EXPECT_EQ(2U, progress);
+    EXPECT_EQ(2U, bus.starts);
+    EXPECT_EQ(1U, bus.stops);
+    EXPECT_EQ(3U, bus.address_count);
+    EXPECT_EQ(long_write, bus.address_bytes[0]);
+    EXPECT_EQ(0xabU, bus.address_bytes[1]);
+    EXPECT_EQ(long_read, bus.address_bytes[2]);
+    EXPECT_EQ(0x30U, output[0]);
+    EXPECT_EQ(0x31U, output[1]);
+}
+
+TEST_F(F103I2C, TenBitCombinedWriteReadDoesNotRepeatTheLowAddress) {
+    use_ten_bit();
+    const uint8_t offset = 5U;
+    uint8_t output = 0U;
+    bus.read_length = 1U;
+    nx_i2c_message_t messages[] = {nx_i2c_message_write(&offset, 1U),
+                                   nx_i2c_message_read(&output, 1U)};
+    size_t progress = 99U;
+    ASSERT_EQ(NX_SUCCESS, nx_i2c_endpoint_transaction(
+                              &face, messages, 2U, bus.now + 400U, &progress));
+    EXPECT_EQ(2U, progress);
+    EXPECT_EQ(2U, bus.starts);
+    EXPECT_EQ(1U, bus.stops);
+    EXPECT_EQ(3U, bus.address_count);
+    EXPECT_EQ(long_write, bus.address_bytes[0]);
+    EXPECT_EQ(0xabU, bus.address_bytes[1]);
+    EXPECT_EQ(long_read, bus.address_bytes[2]);
+}
+
+TEST_F(F103I2C, TenBitAddressNacksNeverCountAsPayloadBytes) {
+    use_ten_bit();
+    uint8_t output = 0U;
+    bus.read_length = 1U;
+    auto message = nx_i2c_message_read(&output, 1U);
+    for (const uint32_t rejection : {1U, 2U, 3U}) {
+        bus.address_count = 0U;
+        bus.nack_address_index = rejection;
+        size_t progress = 91U;
+        EXPECT_EQ(NX_ERROR_NACK,
+                  nx_i2c_endpoint_transaction(&face, &message, 1U,
+                                              bus.now + 400U, &progress));
+        EXPECT_EQ(rejection, bus.address_count);
+        EXPECT_EQ(0U, progress);
+    }
+    EXPECT_EQ(3U, bus.stops);
+}
+
+TEST_F(F103I2C, TenBitRepeatedStartTimeoutAndArbitrationLossAreIndependent) {
+    use_ten_bit();
+    uint8_t output = 0U;
+    bus.read_length = 1U;
+    auto message = nx_i2c_message_read(&output, 1U);
+    size_t progress = 99U;
+    bus.arbitration_address_index = 3U;
+    ASSERT_EQ(NX_ERROR_ARBITRATION,
+              nx_i2c_endpoint_transaction(&face, &message, 1U, bus.now + 400U,
+                                          &progress));
+    EXPECT_EQ(0U, bus.stops);
+    bus.arbitration_address_index = 0U;
+    bus.address_count = 0U;
+    bus.lost_start_index = bus.starts + 2U;
+    ASSERT_EQ(NX_ERROR_TIMEOUT,
+              nx_i2c_endpoint_transaction(&face, &message, 1U, bus.now + 40U,
+                                          &progress));
+    EXPECT_EQ(1U, bus.resets);
+    EXPECT_EQ(0U, bus.stops);
+    EXPECT_EQ(0U, progress);
 }

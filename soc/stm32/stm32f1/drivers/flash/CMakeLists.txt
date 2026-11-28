@@ -1,4 +1,4 @@
-# Select the reviewed page-oriented F103xB FPEC implementation.
+# Select the reviewed F103 FPEC implementation.
 nexus_controller_modes(flash_modes flash)
 if("poll-halfword" IN_LIST flash_modes)
     target_sources(

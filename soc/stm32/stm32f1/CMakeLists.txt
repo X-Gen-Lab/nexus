@@ -31,13 +31,31 @@ endif()
 if(NOT NEXUS_VENDOR_DEVICE_DEFINE STREQUAL "STM32F103xB")
     foreach(selection IN LISTS NEXUS_SELECTED_CONTROLLERS)
         if(
+            NEXUS_VENDOR_DEVICE_DEFINE MATCHES "^STM32F103x[EG]$"
+            AND selection STREQUAL "flash/FLASH/poll-halfword"
+        )
+            continue()
+        endif()
+        if(
+            NEXUS_VENDOR_DEVICE_DEFINE MATCHES "^(STM32F100xB|STM32F103x[EG])$"
+            AND selection STREQUAL "dac/DAC/direct"
+        )
+            continue()
+        endif()
+        if(
+            NEXUS_VENDOR_DEVICE_DEFINE STREQUAL "STM32F103xG"
+            AND selection STREQUAL "external_bus/FSMC/async16"
+        )
+            continue()
+        endif()
+        if(
             NOT selection
                 MATCHES
                 "^(gpio/[^/]+/(input|output)|uart/USART2/irq-byte-event)$"
         )
             message(
                 FATAL_ERROR
-                "${selection} requires the reviewed STM32F103xB profile"
+                "${selection} is unavailable for ${NEXUS_VENDOR_DEVICE_DEFINE}"
             )
         endif()
     endforeach()
@@ -75,7 +93,21 @@ nexus_controller_modes(f1_spi spi)
 nexus_controller_modes(f1_adc adc)
 nexus_controller_modes(f1_exti exti)
 nexus_controller_modes(f1_pwm pwm)
-if(f1_gpio OR f1_uart OR f1_i2c OR f1_spi OR f1_adc OR f1_exti OR f1_pwm)
+nexus_controller_modes(f1_dac dac)
+nexus_controller_modes(f1_can can)
+nexus_controller_modes(f1_fsmc external_bus)
+if(
+    f1_gpio
+    OR f1_uart
+    OR f1_i2c
+    OR f1_spi
+    OR f1_adc
+    OR f1_exti
+    OR f1_pwm
+    OR f1_dac
+    OR f1_fsmc
+    OR "classic-poll-normal" IN_LIST f1_can
+)
     target_sources(nexus_soc_stm32f1 PRIVATE drivers/gpio/gpio.c)
     target_link_libraries(nexus_soc_stm32f1 PRIVATE Nexus::IOGPIO)
 endif()
@@ -87,6 +119,10 @@ if("dma-tx" IN_LIST f1_uart)
     target_sources(nexus_soc_stm32f1 PRIVATE drivers/uart/uart_dma.c)
     target_link_libraries(nexus_soc_stm32f1 PRIVATE Nexus::IODMA)
 endif()
+if("rx-dma-idle" IN_LIST f1_uart)
+    target_sources(nexus_soc_stm32f1 PRIVATE drivers/uart/uart_rx_dma.c)
+    target_link_libraries(nexus_soc_stm32f1 PRIVATE Nexus::IOStream)
+endif()
 add_subdirectory(drivers/flash)
 add_subdirectory(drivers/crc)
 add_subdirectory(drivers/identity)
@@ -97,6 +133,7 @@ add_subdirectory(drivers/adc)
 add_subdirectory(drivers/exti)
 add_subdirectory(drivers/pwm)
 add_subdirectory(drivers/pvd)
+add_subdirectory(drivers/can)
 
 # Only the image's startup and generated bindings consume these requirements.
 add_library(nexus_stm32f1_startup_usage INTERFACE)
@@ -126,3 +163,6 @@ set_property(
             "${CMAKE_CURRENT_LIST_DIR}/system/startup.c"
             "${CMAKE_CURRENT_LIST_DIR}/system/runtime.c"
 )
+add_subdirectory(drivers/rtc)
+add_subdirectory(drivers/dac)
+add_subdirectory(drivers/fsmc)

@@ -1512,7 +1512,9 @@
       "part_prefix": "STM32F103ZE",
       "controller_groups": [
         "gpioa-basic",
-        "usart2-default-irq"
+        "usart2-default-irq",
+        "f103-flash",
+        "dac-direct"
       ],
       "clock_policy": "rm0008-f103-hsi8"
     },
@@ -1520,7 +1522,10 @@
       "part_prefix": "STM32F103ZG",
       "controller_groups": [
         "gpioa-basic",
-        "usart2-default-irq"
+        "usart2-default-irq",
+        "f103-flash",
+        "f103-xl-fsmc",
+        "dac-direct"
       ],
       "clock_policy": "rm0008-f103-hsi8",
       "cpu_features": {
@@ -1532,7 +1537,8 @@
       "part_prefix": "STM32F100RB",
       "controller_groups": [
         "gpioa-basic",
-        "usart2-default-irq"
+        "usart2-default-irq",
+        "dac-direct"
       ],
       "clock_policy": "stm32f1-hsi8"
     },
@@ -1558,7 +1564,7 @@
         "gpioa-basic",
         "usart2-default-irq"
       ],
-      "clock_policy": "stm32f1-hsi8"
+      "clock_policy": "rm0008-f105-f107-run"
     },
     "stm32f107xc": {
       "part_prefix": "STM32F107VC",
@@ -1566,7 +1572,7 @@
         "gpioa-basic",
         "usart2-default-irq"
       ],
-      "clock_policy": "stm32f1-hsi8"
+      "clock_policy": "rm0008-f105-f107-run"
     },
     "stm32f100xe": {
       "part_prefix": "STM32F100ZE",

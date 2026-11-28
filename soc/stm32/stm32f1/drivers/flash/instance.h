@@ -1,6 +1,6 @@
 /**
  * \file            instance.h
- * \brief           Private STM32F103xB physical Flash owner
+ * \brief           Private STM32F103 physical Flash owner
  * \author          Nexus Team
  */
 #ifndef NX_STM32F1_FLASH_INSTANCE_H
@@ -22,11 +22,12 @@ typedef enum {
 typedef struct {
     const nx_flash_geometry_t* geometry;
     nx_stm32f1_flash_phase_t phase;
+    bool bank2;
 } nx_stm32f1_flash_state_t;
 
 extern const nx_flash_ops_t nx_stm32f1_flash_ops;
 
-/** \brief Bind the complete geometry for an authorized STM32F103xB part.
+/** \brief Bind the complete geometry for a reviewed STM32F103.
  * \param[in,out] port: Unprepared, serialized owner.
  * \param[in] geometry: Stable read-only whole-Flash description.
  * \param[in] supply_mv: Board-supplied programming voltage assumption.
