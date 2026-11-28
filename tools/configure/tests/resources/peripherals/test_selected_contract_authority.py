@@ -6,6 +6,7 @@ Platform GoogleTests, linked resource measurements or physical qualification.
 from tools.configure.tests.native_fixture import native_fixture
 from dataclasses import FrozenInstanceError, replace
 import importlib
+import json
 from pathlib import Path
 import tempfile
 import unittest
@@ -36,20 +37,93 @@ class SelectedContractAuthorityTests(unittest.TestCase):
                 self.assertFalse(result.physical_qualified)
 
 
-    def test_catalogue_keeps_exact_f4_parts_without_family_inference(self):
+    def test_catalogue_keeps_exact_parts_by_family(self):
         rows = matrix.support_catalogue(configure.ROOT)
-        self.assertEqual({row.part for row in rows}, {
-            "STM32F405ZGT6", "STM32F407VET6", "STM32F407ZGT6",
-            "STM32F411RET6", "STM32F415ZGT6", "STM32F417ZGT6",
-            "STM32F446ZET6", "STM32F479NIH6"})
+        parts = {}
+        for row in rows:
+            parts.setdefault(row.family, set()).add(row.part)
+        self.assertEqual(parts, {
+            "stm32f1": {
+                "STM32F100RBT6B", "STM32F100ZET6B",
+                "STM32F101C6T6A", "STM32F101RBT6", "STM32F101ZET6",
+                "STM32F101ZGT6", "STM32F102C6T6A", "STM32F102RBT6",
+                "STM32F103C6T6A", "STM32F103C8T6", "STM32F103RBT6",
+                "STM32F103ZET6", "STM32F103ZGT6", "STM32F105VCT6",
+                "STM32F107VCT6",
+            },
+            "stm32f4": {
+                "STM32F405ZGT6", "STM32F407VET6", "STM32F407ZGT6",
+                "STM32F411RET6", "STM32F415ZGT6", "STM32F417ZGT6",
+                "STM32F446ZET6", "STM32F479NIH6",
+            },
+        })
+        f1_buses = {
+            (row.part, row.controller, row.kind, row.mode): row.reviewed_routes
+            for row in rows if row.family == "stm32f1"
+            and row.kind in {"spi", "i2c"} and row.reviewed_route_available
+        }
+        self.assertEqual(f1_buses, {
+            ("STM32F103RBT6", "SPI1", "spi", "short-poll"): ("spi1-pa5-pa6-pa7",),
+            ("STM32F103RBT6", "SPI2", "spi", "short-poll"): ("spi2-pb13-pb14-pb15",),
+            ("STM32F103RBT6", "SPI2", "spi", "dma"): ("spi2-pb13-pb14-pb15-dma",),
+            ("STM32F103RBT6", "I2C1", "i2c", "poll-messages"): ("i2c1-pb6-pb7",),
+            ("STM32F103RBT6", "I2C1", "i2c", "irq-write-messages"): ("i2c1-pb6-pb7",),
+            ("STM32F107VCT6", "SPI3", "spi", "short-poll"): ("spi3-pc10-pc11-pc12",),
+        })
+        f1_controls = {(row.part, row.controller, row.mode): row.reviewed_routes
+                       for row in rows if row.family == "stm32f1"
+                       and row.kind in {"pwm", "adc", "exti"} and row.reviewed_route_available}
+        base_controls = {
+            ("STM32F103RBT6", "TIM3", "fixed-pwm"): ("tim3-pa6-ch1",),
+            ("STM32F103RBT6", "ADC1", "single-shot"): ("adc1-pa0-in0",),
+            ("STM32F103RBT6", "ADC1", "single-trigger-dma"): (
+                "adc1-pa0-in0", "adc1-pa0-tim1-cc1"),
+            ("STM32F103RBT6", "EXTI13", "edge-event"): ("exti13-pc13",),
+            ("STM32F103RBT6", "PVD", "pvd-level"): ("pvd-level",),
+        }
+        self.assertEqual({key: f1_controls[key] for key in base_controls}, base_controls)
         self.assertTrue(all(not row.physical_qualified for row in rows))
         self.assertTrue(all(row.review_sources for row in rows))
+
+    def test_f103_irq_writer_qualifies_only_write_and_no_smbus_binding(self):
+        fixture = configure.ROOT / (
+            "tests/integration/assemblies/stm32f1_i2c_master_irq/f103rb-write.toml")
+        result, records = self.selected(fixture.relative_to(configure.ROOT))
+        self.assertEqual({record.fields["write_only"] for record in records}, {1})
+        self.assertEqual({record.fields["address_bits"] for record in records}, {7})
+        source = bindings.emit(result)[1]
+        self.assertEqual(source.count("nx_i2c_v1_irq(&s_nx_port_i2c1)"), 2)
+        self.assertIn("nx_stm32f1_i2c_irq_open(&s_nx_port_i2c1", source)
+        _, smbus = factory.emit_smbus(
+            replace(result, components=(*result.components, "smbus")))
+        self.assertNotIn("s_nx_smbus_binding_writer", smbus)
+
+
+    def test_f103_tim1_adc_trigger_and_complementary_pwm_conflict(self):
+        fixtures = configure.ROOT / "tests/integration/assemblies"
+        adc = fixtures / "stm32f1_adc"
+        pwm = fixtures / "stm32f1_advanced_pwm"
+        board = configure.load(adc / "board/board.json")
+        board["bindings"].extend(configure.load(pwm / "board/board.json")["bindings"])
+        header = "[advanced_pwm.pair]"
+        pwm_section = header + (pwm / "f103rb-tim1.toml").read_text().split(header, 1)[1]
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            (root / "board").mkdir()
+            (root / "board/board.json").write_text(json.dumps(board))
+            assembly = root / "f103rb-adc-pwm.toml"
+            assembly.write_text((adc / "f103rb-trigger-dma.toml").read_text() + "\n" + pwm_section)
+            configure.resolve_ir(assembly)
+            assembly.write_text((adc / "f103rb-tim1-trigger-dma.toml").read_text() + "\n" + pwm_section)
+            with self.assertRaisesRegex(ValueError, r"Resource conflict controller:TIM1"):
+                configure.resolve_ir(assembly)
 
 
     def test_unrouted_f407ve_ethernet_is_not_inherited_from_the_zg_route(self):
         rows = matrix.support_catalogue(configure.ROOT)
         ethernet = {row.part: row for row in rows
-                    if row.controller == "ETH" and row.mode == "raw-rmii"}
+                    if row.family == "stm32f4" and row.controller == "ETH"
+                    and row.mode == "raw-rmii"}
         self.assertEqual(set(ethernet), {
             "STM32F407VET6", "STM32F407ZGT6", "STM32F417ZGT6"})
         self.assertFalse(ethernet["STM32F407VET6"].reviewed_route_available)

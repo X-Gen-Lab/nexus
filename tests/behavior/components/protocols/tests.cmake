@@ -16,6 +16,19 @@ if(TARGET Nexus::LwIP)
     )
 endif()
 
+if(TARGET Nexus::LwIPIPv4Storage)
+    set(f107_reference
+        "${NEXUS_SOURCE_DIR}/tests/integration/assemblies/stm32f1_lwip_ipv4"
+    )
+    nexus_google_test(
+        f107_lwip_ipv4_contracts
+        SOURCES "${nexus_google_root}/components/protocols/f107_lwip_ipv4_test.cpp"
+                "${f107_reference}/raw_frames.c"
+        INCLUDES "${f107_reference}"
+        LIBRARIES Nexus::LwIPIPv4Storage
+    )
+endif()
+
 # Actual raw TCP peers own separate lwIP global states on the maintained host.
 if(TARGET Nexus::LwIP AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
     nexus_google_test(nexus_network_tcp_pair_test

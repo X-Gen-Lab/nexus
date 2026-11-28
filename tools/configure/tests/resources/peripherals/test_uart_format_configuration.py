@@ -52,6 +52,28 @@ class UARTFormatConfiguration(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "frame.*provider|provider.*frame"):
             uart_formats.validate(selection, {"controller": "UART0"}, provider)
 
+    def test_f1_static_frame_selects_payload_aware_irq_only_for_parity(self):
+        family = configure.ROOT / "tests/integration/assemblies/stm32f1_family"
+        formatted = (family / "f103rb-7e2-baremetal.toml").read_text()
+        path = self.root / "f103rb.toml"
+        for bits, parity in ((7, "even"), (7, "odd"), (8, "even"),
+                             (8, "odd"), (8, "none")):
+            with self.subTest(bits=bits, parity=parity):
+                path.write_text(formatted.replace("data_bits = 7", f"data_bits = {bits}")
+                                .replace('parity = "even"', f'parity = "{parity}"'))
+                result = configure.resolve_ir(path)
+                function = ("nx_stm32f1_uart_irq" if parity == "none" else
+                            "nx_stm32f1_uart_parity_irq")
+                self.assertIn(function + "(", bindings.emit(result)[1])
+
+        for bits, diagnostic in ((7, "does not support 7-bit"),
+                                 (9, "Nine-bit words require")):
+            with self.subTest(rejected_bits=bits):
+                path.write_text(formatted.replace("data_bits = 7", f"data_bits = {bits}")
+                                .replace('parity = "even"', 'parity = "none"'))
+                with self.assertRaisesRegex(ValueError, diagnostic):
+                    configure.resolve_ir(path)
+
     def test_selected_word_vector_probe_has_one_sidecar_and_real_build_fact(self):
         for family, vector in (('f407', 'USART1'),):
             with self.subTest(family=family):

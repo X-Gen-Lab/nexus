@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "id": "stm32f103rb-pvd-software",
+  "soc": "STM32F103RBT6",
+  "soc_family": "stm32f1",
+  "source_revision": "NUCLEO-F103RB raw PVD internal software fixture",
+  "physical_pcb_revision": null,
+  "clocks": {},
+  "bindings": [
+    {
+      "id": "pvd",
+      "controller": "PVD",
+      "route": "pvd-level"
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14",
+    "PA15",
+    "PB3",
+    "PB4",
+    "PD0",
+    "PD1",
+    "PC14",
+    "PC15"
+  ],
+  "unknowns": [
+    "Chip revision and supply trip points have not been measured.",
+    "The selected code is a raw selector; this fixture assigns no nominal millivolts."
+  ],
+  "provenance": [
+    {
+      "scope": "Official MB1136 manual connections and stock configuration only; physical hardware is not observed.",
+      "url": "https://www.st.com/resource/en/user_manual/um1724-stm32-nucleo64-boards-mb1136-stmicroelectronics.pdf",
+      "file": "um1724-stm32-nucleo64-boards-mb1136-stmicroelectronics.pdf",
+      "sha256": "576d9bee3bc32c8ee70bf0d77cf9494cec06ea7c1d9ff98eebf2738cb9314a14",
+      "pages": [
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        40
+      ],
+      "components": [
+        "U4",
+        "LD2",
+        "SB21",
+        "SB13",
+        "SB14",
+        "SB62",
+        "SB63",
+        "ST-LINK"
+      ],
+      "nets": [
+        "+3.3V",
+        "PA5/D13",
+        "PA2/USART2_TX",
+        "PA3/USART2_RX"
+      ]
+    },
+    {
+      "scope": "Internal PVD polling comparator. No external pin claim.",
+      "url": "https://www.st.com/resource/en/reference_manual/rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32-bit-mcus-stmicroelectronics.pdf"
+    }
+  ],
+  "backend_support": [
+    "baremetal",
+    "freertos"
+  ]
+}

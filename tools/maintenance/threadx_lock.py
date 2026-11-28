@@ -22,10 +22,10 @@ from tools.configure.metadata import fields, parse_json, snapshot  # noqa: E402
 from tools.maintenance import source_catalogue  # noqa: E402
 
 ORIGIN = "https://github.com/eclipse-threadx/threadx.git"
-PORTS = frozenset({"linux", "cortex_m4"})
-# These official M4 helpers are not composed by the reviewed GNU port: Nexus
+PORTS = frozenset({"linux", "cortex_m3", "cortex_m4"})
+# These official Cortex-M helpers are not composed by the reviewed GNU port: Nexus
 # owns bootstrap/exception entry and uses the selected interrupt-control path.
-M4_UNUSED = frozenset({"tx_misra.S", "tx_thread_interrupt_disable.S",
+CORTEX_M_UNUSED = frozenset({"tx_misra.S", "tx_thread_interrupt_disable.S",
                        "tx_thread_interrupt_restore.S"})
 HEX40 = re.compile(r"[0-9a-f]{40}")
 HEX64 = re.compile(r"[0-9a-f]{64}")
@@ -92,19 +92,21 @@ def contract(lock):
     common = path_list(lock["common"], "common/src", ".c", 185)
     fields(lock["ports"], PORTS, "ThreadX ports")
     linux = path_list(lock["ports"]["linux"], "ports/linux/gnu/src", ".c", 8)
+    m3 = path_list(lock["ports"]["cortex_m3"], "ports/cortex_m3/gnu/src", ".S", 7)
     m4 = path_list(lock["ports"]["cortex_m4"], "ports/cortex_m4/gnu/src", ".S", 7)
-    if not isinstance(lock["headers"], list) or len(lock["headers"]) != 14:
+    if not isinstance(lock["headers"], list) or len(lock["headers"]) != 15:
         raise ValueError("Reviewed ThreadX header closure changed")
     headers = set(lock["headers"])
-    if len(headers) != 14:
+    if len(headers) != 15:
         raise ValueError("Duplicate ThreadX header")
     for name in headers:
         relative(name)
         if (PurePosixPath(name).parent.as_posix() not in
-                {"common/inc", "ports/linux/gnu/inc", "ports/cortex_m4/gnu/inc"} or
+                {"common/inc", "ports/linux/gnu/inc",
+                 "ports/cortex_m3/gnu/inc", "ports/cortex_m4/gnu/inc"} or
                 not name.endswith(".h")):
             raise ValueError("Unsupported ThreadX header family")
-    selected = common | linux | m4 | headers
+    selected = common | linux | m3 | m4 | headers
     if not isinstance(lock["files"], dict) or set(lock["files"]) != selected:
         raise ValueError("ThreadX identities must close the entire source graph")
     for record in lock["files"].values():
@@ -120,7 +122,7 @@ def contract(lock):
             not isinstance(notice["sha256"], str) or
             not HEX64.fullmatch(notice["sha256"])):
         raise ValueError("Reviewed original ThreadX MIT notice identity required")
-    fields(lock["definitions"], {"all", "linux", "cortex_m4_basepri"},
+    fields(lock["definitions"], {"all", "linux", "cortex_m3_basepri", "cortex_m4_basepri"},
            "ThreadX definitions")
     for values in lock["definitions"].values():
         if (not isinstance(values, list) or not values or
@@ -156,7 +158,9 @@ def verify(source, lock_path, port, *, packaged_commit=None):
             ("common/inc", {x for x in lock["headers"] if x.startswith("common/")}, frozenset()),
             ("ports/linux/gnu/src", set(lock["ports"]["linux"]), frozenset()),
             ("ports/linux/gnu/inc", {"ports/linux/gnu/inc/tx_port.h"}, frozenset()),
-            ("ports/cortex_m4/gnu/src", set(lock["ports"]["cortex_m4"]), M4_UNUSED),
+            ("ports/cortex_m3/gnu/src", set(lock["ports"]["cortex_m3"]), CORTEX_M_UNUSED),
+            ("ports/cortex_m3/gnu/inc", {"ports/cortex_m3/gnu/inc/tx_port.h"}, frozenset()),
+            ("ports/cortex_m4/gnu/src", set(lock["ports"]["cortex_m4"]), CORTEX_M_UNUSED),
             ("ports/cortex_m4/gnu/inc", {"ports/cortex_m4/gnu/inc/tx_port.h"}, frozenset())):
         actual = {prefix + "/" + p.name for p in directory(source, prefix).iterdir()
                   if p.name not in unused}

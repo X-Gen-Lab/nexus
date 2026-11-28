@@ -3,8 +3,9 @@ from collections.abc import Mapping
 from dataclasses import dataclass, replace
 from types import MappingProxyType
 
+from tools.configure.domains.fixed_channel_dma import FixedChannelDmaPolicy
 from tools.configure.generation.calls import Symbol
-from tools.configure.pinmux import NumericPinMuxPolicy
+from tools.configure.pinmux import NumericPinMuxPolicy, PinMuxPolicy, load_pinmux_policy
 from tools.configure.providers.common import fail, integer
 from tools.configure.resource_graph import identifier, normalize_resource
 
@@ -43,10 +44,14 @@ class ModeExclusion:
     option: str
     equals: bool | int | str
     message: str
+    part: str | None = None
 
     @classmethod
     def create(cls, value):
-        _fields(value, cls.__dataclass_fields__)
+        _fields(value, ("device", "kind", "option", "equals", "message"),
+                ("part",))
+        if "part" in value:
+            identifier(value["part"], "Mode exclusion exact part")
         for name in ("device", "kind", "option"):
             identifier(value[name], "Mode exclusion " + name)
         if type(value["equals"]) not in {bool, int, str}:
@@ -59,7 +64,7 @@ class ModeExclusion:
 @dataclass(frozen=True)
 class BindingPolicy:
     custom_clock_profile: str
-    pinmux_policy: NumericPinMuxPolicy
+    pinmux_policy: PinMuxPolicy
     oscillators: Mapping
     timebase: Timebase
     exclusions: tuple[ModeExclusion, ...]
@@ -68,17 +73,18 @@ class BindingPolicy:
     dma_facts: Mapping
     irq_facts: Mapping
     controller_irqs: Mapping
+    fixed_dma: FixedChannelDmaPolicy | None = None
 
     @classmethod
-    def from_validated(cls, value, *, pinmux=None):
+    def from_validated(cls, value, *, pinmux=None, fixed_dma=None):
         _fields(value, {"schema_version", "custom_clock_profile", "pinmux_policy", "system",
                         "mode_exclusions"}, {"pinmux", "software", "hardware", "domains", "pads"})
         if type(value["schema_version"]) is not int or value["schema_version"] != 1:
             fail("Unsupported binding policy schema")
-        declared = NumericPinMuxPolicy.from_validated(value["pinmux_policy"])
+        declared = load_pinmux_policy(value["pinmux_policy"])
         pinmux = declared if pinmux is None else pinmux
-        if not isinstance(pinmux, NumericPinMuxPolicy) or pinmux != declared:
-            fail("Binding policy requires its selected numeric pinmux policy")
+        if type(pinmux) is not type(declared) or pinmux != declared:
+            fail("Binding policy requires its selected pinmux policy")
         profile = identifier(value["custom_clock_profile"], "Custom clock profile")
         system = value["system"]
         _fields(system, {"oscillator_resources", "timebase"})
@@ -99,6 +105,8 @@ class BindingPolicy:
         pinmux_rules = value.get("pinmux", {})
         if not isinstance(pinmux_rules, Mapping):
             fail("Pinmux constraints require a controller mapping")
+        if pinmux_rules and not isinstance(pinmux, NumericPinMuxPolicy):
+            fail("Controller numeric AF constraints require numeric pinmux")
         for controller, functions in pinmux_rules.items():
             Symbol(controller)
             if (not isinstance(functions, list) or not functions or
@@ -134,13 +142,15 @@ class BindingPolicy:
                 fail("DMA status bank requires an explicit L/H identity")
             integer(row["flag_shift"], 0, 31, "DMA flag shift")
             dma[name] = MappingProxyType(dict(row))
+        if dma and fixed_dma is not None:
+            fail("Stream and fixed channel DMA bindings cannot both own one package")
         return cls(profile, pinmux, MappingProxyType(oscillators),
                    Timebase.create(system["timebase"]),
                    tuple(ModeExclusion.create(item) for item in exclusions),
                    MappingProxyType({key: tuple(items)
                                      for key, items in pinmux_rules.items()}),
                    MappingProxyType(pads), MappingProxyType(dma),
-                   MappingProxyType({}), MappingProxyType({}))
+                   MappingProxyType({}), MappingProxyType({}), fixed_dma)
 
     def with_irq_bindings(self, bindings, controllers):
         """Reference the selected catalog's IRQ owner without another author."""
@@ -158,11 +168,22 @@ class BindingPolicy:
                 fail("Selected pad lacks a private static binding: " + pin["pin"])
             row = self.pad_facts[pin["pin"]]
             result.append(PadBindingIR(pin["pin"], row["registers"], row["port_index"],
-                row["number"], pin["af"], pin["function"]))
+                row["number"], self.pinmux_policy.alternate(pin), pin["function"]))
         return tuple(result)
 
     def dma_bindings(self, lanes):
-        from tools.configure.ir import DmaBindingIR
+        from tools.configure.ir import DmaBindingIR, FixedDmaBindingIR
+        if self.fixed_dma is not None:
+            result = []
+            for lane in lanes:
+                channel = self.fixed_dma.channel(lane.physical_key)
+                key = normalize_resource("irq:" + channel.irq).removeprefix("irq:")
+                vector = self.irq_facts.get(key)
+                if vector is None or vector.enum != channel.irq:
+                    fail("Selected DMA channel lacks a reviewed startup binding")
+                result.append(FixedDmaBindingIR(lane.lane, channel.engine,
+                    channel.channel, channel.irq, vector.handler))
+            return tuple(result)
         if not self.dma_facts:
             return ()
         result = []
@@ -203,19 +224,21 @@ class BindingPolicy:
         names.extend(sorted(active - set(names)))
         return self.vector_bindings(tuple((name, None) for name in names))
 
-    def oscillator_resources(self, source):
-        return self.oscillators.get(source, ())
+    def oscillator_resources(self, source, profile=None):
+        """A reviewed profile can override the source-wide pad identity."""
+        return self.oscillators.get(profile, self.oscillators.get(source, ()))
 
-    def validate_selection(self, device, kind, options):
+    def validate_selection(self, device, kind, options, *, part=None):
         for rule in self.exclusions:
             actual = options.get(rule.option)
             if (rule.device == device and rule.kind == kind and
+                    (rule.part is None or rule.part == part) and
                     type(actual) is type(rule.equals) and actual == rule.equals):
                 fail(rule.message)
 
     def validate_route(self, route):
         for pin in route["pins"]:
-            self.pinmux_policy.validate(pin["af"], "Route alternate selector")
+            self.pinmux_policy.alternate(pin, "Route alternate selector")
         allowed = self.pinmux.get(route["controller"])
         if allowed is not None and any(pin["af"] not in allowed
                                        for pin in route["pins"]):

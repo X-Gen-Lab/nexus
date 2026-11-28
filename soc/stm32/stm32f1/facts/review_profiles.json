@@ -1,0 +1,1016 @@
+{
+  "schema_version": 1,
+  "datasheets": {
+    "DS5319": {
+      "revision": "20",
+      "sha256": "1e54ce18e6c34c5b4a78986f26e245e143748c721009fc9af5953795c30686bc",
+      "devices": [
+        "stm32f103-md"
+      ]
+    },
+    "DS5936": {
+      "revision": "7",
+      "sha256": "31ab1fe3de6e6cf3e97ce9a2329794edc012d7e6ec52f8a69af672562d8363cd",
+      "devices": [
+        "stm32f103-ld"
+      ]
+    },
+    "DS5792": {
+      "revision": "13",
+      "sha256": "c61db5e362b62f2fa8307d6bd07728e8a6adab0f453653aa7eace4b1cfc848bc",
+      "devices": [
+        "stm32f103-hd"
+      ]
+    },
+    "DS6558": {
+      "revision": "4",
+      "sha256": "69897f9cf77df3f06f68d4dc085848bb6a595ba3d2d64011ac28c4852c6b3d0f",
+      "devices": [
+        "stm32f103-xl"
+      ]
+    },
+    "DS6517": {
+      "revision": "9",
+      "sha256": "360e3be010cabad4ad70d33107c689ab5c47c53e5a83adb0ea55954f9e180998",
+      "devices": [
+        "stm32f100xb"
+      ]
+    },
+    "DS5318": {
+      "revision": "17",
+      "sha256": "860032e75b7a7da11935c474ee08fb80778a93a5882ae7658f91ca6044c8fbe5",
+      "devices": [
+        "stm32f101xb"
+      ]
+    },
+    "DS5933": {
+      "revision": "7",
+      "sha256": "276652841a00ce34151f1898fcca4637cd5431b3a13af5c215555c6b3fa9c96a",
+      "devices": [
+        "stm32f102xb"
+      ]
+    },
+    "DS6014": {
+      "revision": "10",
+      "sha256": "ca4bad652e5eb36d504c70cfd482c494307ce460b2d6b6f3fb3c45e0bd871d12",
+      "devices": [
+        "stm32f105xc",
+        "stm32f107xc"
+      ]
+    },
+    "DS5944": {
+      "revision": "11",
+      "sha256": "37ac4e5d049f3b5ddbfb508402091dec5ceb0f37505fc54f247eeecc816b082f",
+      "devices": [
+        "stm32f100xe"
+      ]
+    },
+    "DS5935": {
+      "revision": "6",
+      "sha256": "a0484b8e7d5434bfe43c683984bcc8c6cb9918c2c28011dc8d2b74ff37322535",
+      "devices": [
+        "stm32f101x6"
+      ]
+    },
+    "DS5791": {
+      "revision": "9",
+      "sha256": "1828693b7ac44c2e023a6fa04186c21f170d2a3333f479da1ab0a2605f425e60",
+      "devices": [
+        "stm32f101xe"
+      ]
+    },
+    "DS6557": {
+      "revision": "5",
+      "sha256": "e5abb35fc7fda921e64f3463b8f3342ebb1153edf6365ec61fb88c30e1d1be96",
+      "devices": [
+        "stm32f101xg"
+      ]
+    },
+    "DS5934": {
+      "revision": "6",
+      "sha256": "0045b6f265d9902419fb9bbc90ca4e3af0e4e89b988c5f569ea14a6c7ad53748",
+      "devices": [
+        "stm32f102x6"
+      ]
+    }
+  },
+  "manuals": {
+    "RM0008": {
+      "revision": "21",
+      "sha256": "4c1b8ac2729cc1f45a4685eea9e91e6139e24e58804fba21e27201dfcc2ad149",
+      "devices": [
+        "stm32f103-md",
+        "stm32f103-ld",
+        "stm32f103-hd",
+        "stm32f103-xl",
+        "stm32f101xb",
+        "stm32f102xb",
+        "stm32f105xc",
+        "stm32f107xc",
+        "stm32f101x6",
+        "stm32f101xe",
+        "stm32f101xg",
+        "stm32f102x6"
+      ]
+    },
+    "RM0041": {
+      "revision": "6",
+      "sha256": "c841a7ef2290fece2154dd35434faacd575a4475a425b870b2f21fc83e63b3d3",
+      "devices": [
+        "stm32f100xb",
+        "stm32f100xe"
+      ]
+    }
+  },
+  "errata": {
+    "es096-rev15-f103-md-run": {
+      "document_id": "ES096",
+      "revision": "15",
+      "sha256": "7bcdf58d8b602292d68abb59e181a4f44a038f215d8b01b0167f6d7139285490",
+      "revision_order": [
+        "A",
+        "B",
+        "Z",
+        "1",
+        "Y",
+        "2",
+        "3",
+        "X"
+      ],
+      "sections": [
+        "2.1.2",
+        "2.2.1",
+        "2.2.2",
+        "2.2.3",
+        "2.2.4",
+        "2.2.6",
+        "2.2.8",
+        "2.2.11",
+        "2.2.12",
+        "2.3.1",
+        "2.3.2",
+        "2.3.3",
+        "2.3.5",
+        "2.3.6",
+        "2.3.7",
+        "2.3.8",
+        "2.4.1",
+        "2.5.1",
+        "2.6.1",
+        "2.6.3",
+        "2.6.4",
+        "2.6.5",
+        "2.6.6",
+        "2.6.7",
+        "2.7.1",
+        "2.7.2",
+        "2.7.3",
+        "2.8.1",
+        "2.8.2",
+        "2.8.3",
+        "2.8.4",
+        "2.8.5",
+        "2.8.6",
+        "2.8.7",
+        "2.9.1",
+        "2.9.2",
+        "2.9.3",
+        "2.9.5",
+        "2.9.6",
+        "2.10.1",
+        "2.10.2",
+        "2.11.1",
+        "2.12.1",
+        "2.12.2",
+        "2.12.3",
+        "2.12.4"
+      ],
+      "applicability": {
+        "2.1.2": "AAAAAAAA",
+        "2.2.1": "AAAAAAAA",
+        "2.2.2": "NNNNNNNN",
+        "2.2.3": "AAAAAAAA",
+        "2.2.4": "AAAAAAAA",
+        "2.2.6": "AAAAAAAA",
+        "2.2.8": "AAAAAAAA",
+        "2.2.11": "AAAAAAAA",
+        "2.2.12": "AAAAAAAA",
+        "2.3.1": "AAAAAAAA",
+        "2.3.2": "NNNNNNNN",
+        "2.3.3": "AAAAAAAA",
+        "2.3.5": "AAAAAAAA",
+        "2.3.6": "AAAAAAAA",
+        "2.3.7": "AAAAAAAA",
+        "2.3.8": "AAAAAAAA",
+        "2.4.1": "AAAAAAAA",
+        "2.5.1": "NNNNNNNN",
+        "2.6.1": "PPPPPPPP",
+        "2.6.3": "NNNNNNNN",
+        "2.6.4": "PPPPPPPP",
+        "2.6.5": "AAAAAAAA",
+        "2.6.6": "NNNNNNNN",
+        "2.6.7": "NNNNNNNN",
+        "2.7.1": "AAAAAAAA",
+        "2.7.2": "AAAAAAAA",
+        "2.7.3": "AAAAAAAA",
+        "2.8.1": "AAAAAAAA",
+        "2.8.2": "AAAAAAAA",
+        "2.8.3": "AAAAAAAA",
+        "2.8.4": "AAAAAAAA",
+        "2.8.5": "AAAAAAAA",
+        "2.8.6": "AAAAAAAA",
+        "2.8.7": "AAAAAAAA",
+        "2.9.1": "AAAAAAAA",
+        "2.9.2": "NNNNNNNN",
+        "2.9.3": "AAAAAAAA",
+        "2.9.5": "NNNNNNNN",
+        "2.9.6": "AAAAAAAA",
+        "2.10.1": "AAAAAAAA",
+        "2.10.2": "AAAAAAAA",
+        "2.11.1": "NNNNNNNN",
+        "2.12.1": "AAAAAAAA",
+        "2.12.2": "AAAAAAAA",
+        "2.12.3": "NNNNNNNN",
+        "2.12.4": "AAAAAAAA"
+      },
+      "devices": [
+        "stm32f103-md"
+      ],
+      "reference_manual": "RM0008",
+      "reviewed_revision_ids": [
+        0,
+        8192,
+        8193,
+        8195
+      ],
+      "mode_scope": [
+        "adc:internal-scan",
+        "adc:sequential-scan-dma",
+        "adc:single-shot",
+        "adc:single-trigger-dma",
+        "advanced_pwm:complementary-pwm",
+        "can:classic-poll",
+        "can:classic-poll-normal",
+        "crc:crc32-words",
+        "encoder:quadrature",
+        "exti:edge-event",
+        "exti:pvd-level",
+        "exti:stop-wake",
+        "flash:poll-halfword",
+        "gpio:input",
+        "gpio:output",
+        "i2c:irq-write-messages",
+        "i2c:poll-messages",
+        "i2c_target:target-rx-irq",
+        "i2c_target:target-tx-irq",
+        "i2c_target:target-write-read-irq",
+        "pwm:fixed-pwm",
+        "pwm_adc:finite-injected",
+        "rtc:backup-adopt",
+        "rtc:backup-provision",
+        "spi:dma",
+        "spi:short-poll",
+        "timer_capture:edge-capture",
+        "timer_pulse:one-pulse",
+        "uart:dma-duplex",
+        "uart:dma-tx",
+        "uart:irq-byte-event",
+        "uart:irq-wire",
+        "uart:irq-words",
+        "uart:rx-dma-idle",
+        "usb_device:device-pma",
+        "usb_device:device-pma-bulk",
+        "usb_device:device-pma-interrupt",
+        "watchdog:independent",
+        "watchdog:window"
+      ],
+      "backends": [
+        "baremetal",
+        "freertos",
+        "threadx"
+      ],
+      "clock_policies": [
+        "rm0008-f103-md-run"
+      ]
+    },
+    "es0348-rev10-f103-ld-hsi8": {
+      "document_id": "ES0348",
+      "revision": "10",
+      "sha256": "58f35f7cac7dd9470dd4fcdfd58b4b547707e0b58981cb91c8af379e5ede923c",
+      "revision_order": [
+        "A",
+        "1"
+      ],
+      "sections": [
+        "2.1.2",
+        "2.2.1",
+        "2.2.2",
+        "2.2.10",
+        "2.3.6",
+        "2.9.2",
+        "2.9.3"
+      ],
+      "applicability": {
+        "2.1.2": "AA",
+        "2.2.1": "AA",
+        "2.2.2": "NN",
+        "2.2.10": "AA",
+        "2.3.6": "AA",
+        "2.9.2": "NN",
+        "2.9.3": "AA"
+      },
+      "devices": [
+        "stm32f103-ld"
+      ],
+      "reference_manual": "RM0008",
+      "reviewed_revision_ids": [
+        4096
+      ],
+      "mode_scope": [
+        "flash:poll-halfword",
+        "gpio:output",
+        "uart:irq-byte-event"
+      ],
+      "backends": [
+        "baremetal"
+      ],
+      "clock_policies": [
+        "rm0008-f103-hsi8"
+      ]
+    },
+    "es0340-rev17-f103-hd-hsi8": {
+      "document_id": "ES0340",
+      "revision": "17",
+      "sha256": "724fed9df69ff5b3469aa00a591ca39f3534234ad129273bd6f11ab9e2f11d8c",
+      "revision_order": [
+        "Z",
+        "1",
+        "Y",
+        "2",
+        "3",
+        "X"
+      ],
+      "sections": [
+        "2.1.2",
+        "2.2.1",
+        "2.2.2",
+        "2.2.10",
+        "2.3.6",
+        "2.3.7",
+        "2.3.8",
+        "2.3.12",
+        "2.3.13",
+        "2.4.1",
+        "2.6.1",
+        "2.7.1",
+        "2.7.3",
+        "2.7.4",
+        "2.10.2",
+        "2.10.3",
+        "2.11.3",
+        "2.12.1",
+        "2.12.2",
+        "2.12.3",
+        "2.13.1",
+        "2.13.2",
+        "2.13.3",
+        "2.13.4",
+        "2.13.5",
+        "2.13.6"
+      ],
+      "applicability": {
+        "2.1.2": "AAAAAA",
+        "2.2.1": "AAAAAA",
+        "2.2.2": "NNNNNN",
+        "2.2.10": "AAAAAA",
+        "2.3.6": "AAAAAA",
+        "2.3.7": "AAAAAA",
+        "2.3.8": "AAAAAA",
+        "2.3.12": "AAAAAA",
+        "2.3.13": "AAAAAA",
+        "2.4.1": "AAAAAA",
+        "2.6.1": "NNNNNN",
+        "2.7.1": "PPPPPP",
+        "2.7.3": "NNNNNN",
+        "2.7.4": "PPPPPP",
+        "2.10.2": "NNNNNN",
+        "2.10.3": "AAAAAA",
+        "2.11.3": "A-----",
+        "2.12.1": "AAAAAA",
+        "2.12.2": "AAAAAA",
+        "2.12.3": "AAAAAA",
+        "2.13.1": "AAAAAA",
+        "2.13.2": "NNNNNN",
+        "2.13.3": "AAAAAA",
+        "2.13.4": "NNNNNN",
+        "2.13.5": "AAAAAA",
+        "2.13.6": "AAAAAA"
+      },
+      "devices": [
+        "stm32f103-hd"
+      ],
+      "reference_manual": "RM0008",
+      "reviewed_revision_ids": [
+        4097,
+        4099
+      ],
+      "mode_scope": [
+        "adc:simultaneous-scan-dma",
+        "adc:single-shot",
+        "advanced_pwm:complementary-pwm",
+        "audio:master-tx",
+        "block:sdio-poll",
+        "block:sdio-poll-4bit",
+        "block:sdio-poll-4bit-write",
+        "block:sdio-poll-write",
+        "block:sdio-rx-dma-poll",
+        "dac:direct",
+        "flash:poll-halfword",
+        "gpio:output",
+        "uart:irq-byte-event"
+      ],
+      "backends": [
+        "baremetal"
+      ],
+      "clock_policies": [
+        "rm0008-f103-hsi8"
+      ]
+    },
+    "es0346-rev7-f103-xl-hsi8": {
+      "document_id": "ES0346",
+      "revision": "7",
+      "sha256": "26e737cfc59e50af73315d0784732da62447f0e5dada151e25d8ee3ddedaaa78",
+      "revision_order": [
+        "1",
+        "A"
+      ],
+      "sections": [
+        "2.1.2",
+        "2.2.1",
+        "2.2.2",
+        "2.2.8",
+        "2.3.9",
+        "2.5.1",
+        "2.5.2",
+        "2.10.2",
+        "2.10.3"
+      ],
+      "applicability": {
+        "2.1.2": "AA",
+        "2.2.1": "AA",
+        "2.2.2": "NN",
+        "2.2.8": "AA",
+        "2.3.9": "AA",
+        "2.10.2": "NN",
+        "2.10.3": "AA",
+        "2.5.1": "NN",
+        "2.5.2": "NN"
+      },
+      "devices": [
+        "stm32f103-xl"
+      ],
+      "reference_manual": "RM0008",
+      "reviewed_revision_ids": [
+        4096
+      ],
+      "mode_scope": [
+        "dac:direct",
+        "external_bus:async16",
+        "flash:poll-halfword",
+        "gpio:output",
+        "memory_window:cpu-window",
+        "parallel16:8080-16",
+        "uart:irq-byte-event"
+      ],
+      "backends": [
+        "baremetal"
+      ],
+      "clock_policies": [
+        "rm0008-f103-hsi8"
+      ]
+    },
+    "es093-rev8-f100xb-hsi8": {
+      "document_id": "ES093",
+      "revision": "8",
+      "sha256": "6e553ddfd67631068d6781735ba8db7f202e67d49b65082013c4a3773b09e8fc",
+      "revision_order": [
+        "1",
+        "Z"
+      ],
+      "sections": [
+        "2.1.2",
+        "2.2.8",
+        "2.3.8",
+        "2.6.1",
+        "2.6.3",
+        "2.6.7",
+        "2.9.1",
+        "2.9.2"
+      ],
+      "applicability": {
+        "2.1.2": "AA",
+        "2.2.8": "AA",
+        "2.3.8": "AA",
+        "2.6.1": "PP",
+        "2.6.3": "NN",
+        "2.6.7": "NN",
+        "2.9.1": "NN",
+        "2.9.2": "AA"
+      },
+      "devices": [
+        "stm32f100xb"
+      ],
+      "reference_manual": "RM0041",
+      "reviewed_revision_ids": [
+        4097
+      ],
+      "mode_scope": [
+        "dac:direct",
+        "flash:poll-halfword",
+        "gpio:input",
+        "gpio:output",
+        "pwm:fixed-pwm",
+        "uart:irq-byte-event"
+      ],
+      "backends": [
+        "baremetal"
+      ],
+      "clock_policies": [
+        "stm32f1-hsi8"
+      ]
+    },
+    "es096-rev15-f101xb-hsi8": {
+      "document_id": "ES096",
+      "revision": "15",
+      "sha256": "7bcdf58d8b602292d68abb59e181a4f44a038f215d8b01b0167f6d7139285490",
+      "revision_order": [
+        "A",
+        "B",
+        "Z",
+        "1",
+        "Y",
+        "2",
+        "3",
+        "X"
+      ],
+      "sections": [
+        "2.1.2",
+        "2.2.1",
+        "2.2.2",
+        "2.2.11",
+        "2.3.9",
+        "2.9.2",
+        "2.9.3"
+      ],
+      "applicability": {
+        "2.1.2": "AAAAAAAA",
+        "2.2.1": "AAAAAAAA",
+        "2.2.2": "NNNNNNNN",
+        "2.2.11": "AAAAAAAA",
+        "2.3.9": "AAAAAAAA",
+        "2.9.2": "NNNNNNNN",
+        "2.9.3": "AAAAAAAA"
+      },
+      "devices": [
+        "stm32f101xb"
+      ],
+      "reference_manual": "RM0008",
+      "reviewed_revision_ids": [
+        0,
+        8192,
+        8193,
+        8195
+      ],
+      "mode_scope": [
+        "flash:poll-halfword",
+        "gpio:output",
+        "uart:irq-byte-event"
+      ],
+      "backends": [
+        "baremetal"
+      ],
+      "clock_policies": [
+        "rm0008-f101-md-run"
+      ]
+    },
+    "es096-rev15-f102xb-hsi8": {
+      "document_id": "ES096",
+      "revision": "15",
+      "sha256": "7bcdf58d8b602292d68abb59e181a4f44a038f215d8b01b0167f6d7139285490",
+      "revision_order": [
+        "A",
+        "1",
+        "Y",
+        "2",
+        "3",
+        "X"
+      ],
+      "sections": [
+        "2.1.2",
+        "2.2.1",
+        "2.2.2",
+        "2.2.11",
+        "2.3.9",
+        "2.9.2",
+        "2.9.3",
+        "2.12.1",
+        "2.12.2",
+        "2.12.3",
+        "2.12.4"
+      ],
+      "applicability": {
+        "2.1.2": "AAAAAA",
+        "2.2.1": "AAAAAA",
+        "2.2.2": "NNNNNN",
+        "2.2.11": "AAAAAA",
+        "2.3.9": "AAAAAA",
+        "2.9.2": "NNNNNN",
+        "2.9.3": "AAAAAA",
+        "2.12.1": "AAAAAA",
+        "2.12.2": "AAAAAA",
+        "2.12.3": "NNNNNN",
+        "2.12.4": "AAAAAA"
+      },
+      "devices": [
+        "stm32f102xb"
+      ],
+      "reference_manual": "RM0008",
+      "reviewed_revision_ids": [
+        0,
+        8195
+      ],
+      "mode_scope": [
+        "flash:poll-halfword",
+        "gpio:output",
+        "uart:irq-byte-event",
+        "usb_device:device-pma"
+      ],
+      "backends": [
+        "baremetal"
+      ],
+      "clock_policies": [
+        "rm0008-f102-md-run"
+      ]
+    },
+    "es022-rev11-f105xc-run": {
+      "document_id": "ES022",
+      "revision": "11",
+      "sha256": "1597acc5dd8f028193a1d19f6f9f85468c6a925f3886367ac661364b30e2e749",
+      "revision_order": [
+        "2",
+        "Z"
+      ],
+      "sections": [
+        "2.1.2",
+        "2.2.1",
+        "2.2.10",
+        "2.3.6",
+        "2.9.2",
+        "2.9.3",
+        "2.12.1",
+        "2.13.1",
+        "2.13.2",
+        "2.13.3",
+        "2.13.4",
+        "2.13.5"
+      ],
+      "applicability": {
+        "2.1.2": "AA",
+        "2.2.1": "AA",
+        "2.2.10": "AA",
+        "2.3.6": "AA",
+        "2.9.2": "NN",
+        "2.9.3": "AA",
+        "2.12.1": "NN",
+        "2.13.1": "AA",
+        "2.13.2": "AA",
+        "2.13.3": "AA",
+        "2.13.4": "AA",
+        "2.13.5": "NN"
+      },
+      "devices": [
+        "stm32f105xc"
+      ],
+      "reference_manual": "RM0008",
+      "reviewed_revision_ids": [
+        4097
+      ],
+      "mode_scope": [
+        "can:classic-irq",
+        "flash:read-only",
+        "gpio:output",
+        "uart:irq-byte-event",
+        "usb_device:device-fs",
+        "usb_host:host-fs"
+      ],
+      "backends": [
+        "baremetal"
+      ],
+      "clock_policies": [
+        "rm0008-f105-f107-run"
+      ]
+    },
+    "es022-rev11-f107xc-run": {
+      "document_id": "ES022",
+      "revision": "11",
+      "sha256": "1597acc5dd8f028193a1d19f6f9f85468c6a925f3886367ac661364b30e2e749",
+      "revision_order": [
+        "2",
+        "Z"
+      ],
+      "sections": [
+        "2.1.2",
+        "2.2.1",
+        "2.2.10",
+        "2.3.6",
+        "2.9.2",
+        "2.9.3",
+        "2.10.1",
+        "2.10.2",
+        "2.12.1",
+        "2.13.1",
+        "2.13.2",
+        "2.13.3",
+        "2.13.4",
+        "2.13.5",
+        "2.14.1",
+        "2.14.5",
+        "2.14.9",
+        "2.14.10",
+        "2.14.11"
+      ],
+      "applicability": {
+        "2.1.2": "AA",
+        "2.2.1": "AA",
+        "2.2.10": "AA",
+        "2.3.6": "AA",
+        "2.9.2": "NN",
+        "2.9.3": "AA",
+        "2.10.1": "AA",
+        "2.10.2": "AA",
+        "2.12.1": "NN",
+        "2.13.1": "AA",
+        "2.13.2": "AA",
+        "2.13.3": "AA",
+        "2.13.4": "AA",
+        "2.13.5": "NN",
+        "2.14.1": "AA",
+        "2.14.5": "AA",
+        "2.14.9": "AA",
+        "2.14.10": "AA",
+        "2.14.11": "AA"
+      },
+      "devices": [
+        "stm32f107xc"
+      ],
+      "reference_manual": "RM0008",
+      "reviewed_revision_ids": [
+        4097
+      ],
+      "mode_scope": [
+        "can:classic-irq",
+        "eth:raw-mii",
+        "eth:raw-rmii",
+        "flash:read-only",
+        "gpio:output",
+        "mdio:clause22",
+        "spi:short-poll",
+        "uart:irq-byte-event",
+        "usb_device:device-fs",
+        "usb_host:host-fs",
+        "usb_host:host-fs-bulk"
+      ],
+      "backends": [
+        "baremetal"
+      ],
+      "clock_policies": [
+        "rm0008-f105-f107-run"
+      ]
+    },
+    "es0136-rev7-f100xe-hsi8": {
+      "document_id": "ES0136",
+      "revision": "7",
+      "sha256": "06e943b853660f361c4efc9bdd5c3ae2c2ef23ddfd090de3b93b8758461febd7",
+      "revision_order": [
+        "A"
+      ],
+      "sections": [
+        "2.1.2",
+        "2.2.7",
+        "2.3.8",
+        "2.10.1",
+        "2.10.2"
+      ],
+      "applicability": {
+        "2.1.2": "A",
+        "2.2.7": "A",
+        "2.3.8": "A",
+        "2.10.1": "N",
+        "2.10.2": "A"
+      },
+      "devices": [
+        "stm32f100xe"
+      ],
+      "reference_manual": "RM0041",
+      "reviewed_revision_ids": [
+        4096
+      ],
+      "mode_scope": [
+        "flash:poll-halfword",
+        "gpio:output",
+        "uart:irq-byte-event"
+      ],
+      "backends": [
+        "baremetal"
+      ],
+      "clock_policies": [
+        "stm32f1-hsi8"
+      ]
+    },
+    "es0348-rev10-f101x6-hsi8": {
+      "document_id": "ES0348",
+      "revision": "10",
+      "sha256": "58f35f7cac7dd9470dd4fcdfd58b4b547707e0b58981cb91c8af379e5ede923c",
+      "revision_order": [
+        "A",
+        "1"
+      ],
+      "sections": [
+        "2.1.2",
+        "2.2.1",
+        "2.2.2",
+        "2.2.10",
+        "2.3.6",
+        "2.9.2",
+        "2.9.3"
+      ],
+      "applicability": {
+        "2.1.2": "AA",
+        "2.2.1": "AA",
+        "2.2.2": "NN",
+        "2.2.10": "AA",
+        "2.3.6": "AA",
+        "2.9.2": "NN",
+        "2.9.3": "AA"
+      },
+      "devices": [
+        "stm32f101x6"
+      ],
+      "reference_manual": "RM0008",
+      "reviewed_revision_ids": [
+        4096
+      ],
+      "mode_scope": [
+        "flash:poll-halfword",
+        "gpio:output",
+        "uart:irq-byte-event"
+      ],
+      "backends": [
+        "baremetal"
+      ],
+      "clock_policies": [
+        "stm32f1-hsi8"
+      ]
+    },
+    "es0340-rev17-f101xe-hsi8": {
+      "document_id": "ES0340",
+      "revision": "17",
+      "sha256": "724fed9df69ff5b3469aa00a591ca39f3534234ad129273bd6f11ab9e2f11d8c",
+      "revision_order": [
+        "Z",
+        "1",
+        "Y",
+        "2",
+        "3",
+        "X"
+      ],
+      "sections": [
+        "2.1.2",
+        "2.2.1",
+        "2.2.2",
+        "2.2.10",
+        "2.3.13",
+        "2.10.2",
+        "2.10.3"
+      ],
+      "applicability": {
+        "2.1.2": "AAAAAA",
+        "2.2.1": "AAAAAA",
+        "2.2.2": "NNNNNN",
+        "2.2.10": "AAAAAA",
+        "2.3.13": "AAAAAA",
+        "2.10.2": "NNNNNN",
+        "2.10.3": "AAAAAA"
+      },
+      "devices": [
+        "stm32f101xe"
+      ],
+      "reference_manual": "RM0008",
+      "reviewed_revision_ids": [
+        4097,
+        4099
+      ],
+      "mode_scope": [
+        "flash:poll-halfword",
+        "gpio:output",
+        "uart:irq-byte-event"
+      ],
+      "backends": [
+        "baremetal"
+      ],
+      "clock_policies": [
+        "stm32f1-hsi8"
+      ]
+    },
+    "es0346-rev7-f101xg-hsi8": {
+      "document_id": "ES0346",
+      "revision": "7",
+      "sha256": "26e737cfc59e50af73315d0784732da62447f0e5dada151e25d8ee3ddedaaa78",
+      "revision_order": [
+        "1",
+        "A"
+      ],
+      "sections": [
+        "2.1.2",
+        "2.2.1",
+        "2.2.2",
+        "2.2.8",
+        "2.3.9",
+        "2.10.2",
+        "2.10.3"
+      ],
+      "applicability": {
+        "2.1.2": "AA",
+        "2.2.1": "AA",
+        "2.2.2": "NN",
+        "2.2.8": "AA",
+        "2.3.9": "AA",
+        "2.10.2": "NN",
+        "2.10.3": "AA"
+      },
+      "devices": [
+        "stm32f101xg"
+      ],
+      "reference_manual": "RM0008",
+      "reviewed_revision_ids": [
+        4096
+      ],
+      "mode_scope": [
+        "flash:poll-halfword",
+        "gpio:output",
+        "uart:irq-byte-event"
+      ],
+      "backends": [
+        "baremetal"
+      ],
+      "clock_policies": [
+        "stm32f1-hsi8"
+      ]
+    },
+    "es0348-rev10-f102x6-hsi8": {
+      "document_id": "ES0348",
+      "revision": "10",
+      "sha256": "58f35f7cac7dd9470dd4fcdfd58b4b547707e0b58981cb91c8af379e5ede923c",
+      "revision_order": [
+        "A",
+        "1"
+      ],
+      "sections": [
+        "2.1.2",
+        "2.2.1",
+        "2.2.2",
+        "2.2.10",
+        "2.3.6",
+        "2.9.2",
+        "2.9.3"
+      ],
+      "applicability": {
+        "2.1.2": "AA",
+        "2.2.1": "AA",
+        "2.2.2": "NN",
+        "2.2.10": "AA",
+        "2.3.6": "AA",
+        "2.9.2": "NN",
+        "2.9.3": "AA"
+      },
+      "devices": [
+        "stm32f102x6"
+      ],
+      "reference_manual": "RM0008",
+      "reviewed_revision_ids": [
+        4096
+      ],
+      "mode_scope": [
+        "flash:poll-halfword",
+        "gpio:output",
+        "uart:irq-byte-event"
+      ],
+      "backends": [
+        "baremetal"
+      ],
+      "clock_policies": [
+        "stm32f1-hsi8"
+      ]
+    }
+  }
+}

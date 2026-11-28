@@ -18,7 +18,8 @@
     "part": {
       "enum": [
         "STM32F407ZGT6",
-        "STM32F407VET6"
+        "STM32F407VET6",
+        "STM32F103RBT6"
       ]
     },
     "transport": {
@@ -133,16 +134,25 @@
   "allOf": [
     {
       "if": {
-        "properties": {
-          "board": {
-            "enum": [
-              "stm32f407zg-qiming-core",
-              "stm32f407zg-qiming-v41"
-            ]
+        "anyOf": [
+          {
+            "properties": {
+              "board": {
+                "enum": [
+                  "stm32f407zg-qiming-core",
+                  "stm32f407zg-qiming-v41",
+                  "stm32f103rb-nucleo"
+                ]
+              }
+            },
+            "required": ["board"]
+          },
+          {
+            "properties": {
+              "part": {"const": "STM32F103RBT6"}
+            },
+            "required": ["part"]
           }
-        },
-        "required": [
-          "board"
         ]
       },
       "then": {
@@ -188,6 +198,13 @@
             "board",
             "part"
           ]
+        },
+        {
+          "properties": {
+            "board": {"const": "stm32f103rb-nucleo"},
+            "part": {"const": "STM32F103RBT6"}
+          },
+          "required": ["board", "part"]
         }
       ]
     }

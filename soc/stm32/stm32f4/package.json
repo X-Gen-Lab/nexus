@@ -25,6 +25,13 @@
     "target": "nexus_soc_stm32f4"
   },
   "exports": {
+    "vendor_shared": [
+      "bxcan",
+      "dwc_otg_device",
+      "dwc_otg_host",
+      "dwmac",
+      "i2c_v1_async"
+    ],
     "roots": [
       "."
     ],

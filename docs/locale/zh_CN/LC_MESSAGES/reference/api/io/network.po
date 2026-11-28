@@ -131,14 +131,14 @@ msgstr "成功；非经典帧返回 INVALID；借用期间返回 STATE。"
 msgid "Admit one frame within the selected provider's finite TX capacity."
 msgstr "在所选 provider 的有限 TX 容量内接纳一帧。"
 
-#: ../../../../../../docs/reference/api/io/network.md:20
+#: ../../../../../../workspace/nexus/docs/reference/api/io/network.md:20
 msgid ""
 "Serialized privileged task owner, incoming IRQ masks clear. REJECTED retains"
-" nothing. Success requires proven on-wire completion and withdrawal of all "
-"hardware references before settlement."
+" nothing. Successful settlement requires the selected mode's completion and "
+"withdrawal of all hardware references. Normal mode requires on-wire "
+"completion. Internal loopback proves controller completion inside that loop."
 msgstr ""
-"由串行特权任务 owner 调用，进入时 IRQ 须已处于未屏蔽状态。REJECTED "
-"不保留任何引用。成功要求先证明线上完成并撤回全部硬件引用，再结清请求。"
+"由单一特权任务串行操作，进入时中断屏蔽状态须清除。拒绝请求时不保留任何引用。成功结算前须确认所选模式已完成，并撤回所有硬件引用。正常模式须确认总线上发送完成。内部回环仅验证控制器在环内完成。"
 
 #: ../../../../../../docs/reference/api/io/network.md:20
 msgid "[in] Stable immutable face and private storage."
@@ -148,9 +148,9 @@ msgstr "[in] 稳定且不可变的接口及私有存储。"
 msgid "[inout] READY value request, kept alive until SETTLED."
 msgstr "[inout] READY 值请求，保持存活直到 SETTLED。"
 
-#: ../../../../../../docs/reference/api/io/network.md:20
-msgid "Success means ACCEPTED, not on-wire completion; other results reject."
-msgstr "成功表示 ACCEPTED，不表示已完成线上发送；其他结果均为拒绝。"
+#: ../../../../../../workspace/nexus/docs/reference/api/io/network.md:20
+msgid "Success means ACCEPTED. All other results reject the request."
+msgstr "成功表示请求已接受。其他结果均表示请求被拒绝。"
 
 #: ../../../../../../docs/reference/api/io/network.md:20
 msgid "Request abort without revoking a borrowed request."
@@ -658,11 +658,14 @@ msgstr "关闭 TX 准入并排空共享 TX 引擎，不重放传输。"
 #: ../../../../../../docs/reference/api/io/network.md:32
 msgid ""
 "Task owner. Cancel is controller-wide: other pending TX requests also become"
-" CANCELLED. It never revokes a borrow. Stuck sources quarantine. Apply a "
-"confirmed link again after successful drain to reopen TX."
+" CANCELLED. It never revokes a borrow. Stuck sources quarantine. For a "
+"provider with TX-only drain, apply a confirmed link again to reopen TX. A "
+"reset-backed provider closes both directions. Return RX loans, finish stop, "
+"and restart its platform session to reopen."
 msgstr ""
-"任务所有者。取消作用于整个控制器：其他待处理 TX 请求也变为 "
-"CANCELLED。绝不撤销借用。源卡住时进入隔离。成功排空后，重新应用已确认的链路事实，才重新开放 TX。"
+"任务所有者。取消作用于整个控制器，其他待处理 TX 请求也变为 CANCELLED。借用始终有效。硬件源无法撤回时，进入隔离状态。若后端只排空 "
+"TX，重新应用已确认的链路状态即可重新开放 TX。依靠复位完成排空的后端 会关闭收发两条路径。归还借用的 RX "
+"缓冲区，完成停止并重新启动平台会话后才能恢复收发。"
 
 #: ../../../../../../docs/reference/api/io/network.md:32
 msgid "[in] Serialized task-owner face."
@@ -749,19 +752,21 @@ msgid ""
 "Task owner; changing speed/duplex first requires explicit link-down and "
 "observed idle TX/RX engines and FIFOs. BUSY keeps the old mode. Reapplying "
 "an unchanged up fact is idempotent. Link-down closes admission and drains "
-"pending TX with IO; later up requires real quiescence. This is not a PHY "
-"power/reset/electrical proof."
+"pending TX with IO. A reset-backed provider requires complete stop and "
+"platform restart before applying the next up observation. The caller owns "
+"PHY power and reset."
 msgstr ""
-"任务所有者；更改速率或双工模式前，必须显式 link-down，并观察到 TX/RX 引擎及 FIFO 空闲。BUSY 保留旧模式。重新应用未改变的 "
-"up 事实是幂等操作。link-down 关闭准入，以 IO 排空待处理 TX；后续 up 要求真实静止。这不构成 PHY 电源、复位或电气证明。"
+"任务所有者。更改速率或双工模式前，必须显式设置链路断开，并确认 TX/RX 引擎及 FIFO 空闲。BUSY "
+"保留旧模式。重复应用未改变的链路连通状态是幂等操作。链路断开会关闭准入，并以 IO 结算待处理 TX "
+"请求。若后端依靠复位完成排空，必须先完整停止并重启平台，再应用下一次观察到的链路连通状态。调用者负责 PHY 电源与复位。"
 
 #: ../../../../../../docs/reference/api/io/network.md:32
 msgid "[in] Observed up/speed/duplex fact, never a guess."
 msgstr "[in] 已观察的 up、速率及双工事实，绝非猜测。"
 
 #: ../../../../../../docs/reference/api/io/network.md:32
-msgid "Success, BUSY until real drain, or STATE/IO/context error."
-msgstr "成功；真实排空前返回 BUSY；或返回 STATE/IO/上下文错误。"
+msgid "Success, BUSY until real drain, or UNSUPPORTED/STATE/IO/context."
+msgstr "成功。实际排空前返回 BUSY。其他结果为 UNSUPPORTED、STATE、IO 或执行上下文错误。"
 
 #: ../../../../../../docs/reference/api/io/network.md:32
 msgid "Close admission and withdraw MAC/DMA/IRQ sources with readback."

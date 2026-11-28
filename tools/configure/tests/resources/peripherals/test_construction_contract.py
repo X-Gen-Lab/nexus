@@ -23,7 +23,10 @@ class ConstructionContractTests(unittest.TestCase):
 
     def test_every_family_returns_explicit_immutable_construction(self):
         seen = set()
-        for relative in ("tests/support/native/assemblies/native.toml", "tools/configure/assemblies/qiming-baremetal.toml",):
+        for relative in (
+                "tests/support/native/assemblies/native.toml",
+                "tools/configure/assemblies/qiming-baremetal.toml",
+                "tests/integration/assemblies/stm32f1_family/f103rb-baremetal.toml"):
             with self.subTest(relative=relative):
                 result = self.resolve(relative)
                 seen.add(result.soc_family)

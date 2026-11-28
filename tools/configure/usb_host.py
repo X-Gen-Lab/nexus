@@ -26,8 +26,9 @@ def validate_selection(selection, route, provider):
         fail("USB Host requires explicit channels/FIFOs/DMA/power/IRQ/budgets")
     controller, pins = capability["controller"], capability["pins"]
     channels, words = capability["channel_count"], capability["fifo_words"]
+    pinmux = provider.PINMUX_POLICY
     if (route["controller"] != controller or
-            tuple((pin["pin"], pin["function"], pin["af"])
+            tuple((pin["pin"], pin["function"], pinmux.alternate(pin))
                   for pin in route["pins"]) != pins):
         fail("USB Host route differs from the exact selected PHY pads")
     integer(selection["channel_count"], 1, channels, "USB Host channels")

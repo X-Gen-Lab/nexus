@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "id": "stm3210e-eval-mb672-d06",
+  "soc": "STM32F103ZGT6",
+  "soc_family": "stm32f1",
+  "source_revision": "UM0488-Rev7-MB672-D06",
+  "physical_pcb_revision": "MB672-F103ZGT6-D06",
+  "clocks": {},
+  "bindings": [
+    {
+      "id": "fsmc0",
+      "controller": "FSMC",
+      "route": "fsmc-async16"
+    },
+    {
+      "id": "sram0",
+      "controller": "FSMC",
+      "route": "fsmc-ne3-is61wv51216bll"
+    }
+  ],
+  "reserved_resources": [],
+  "unknowns": [
+    "Physical PCB population, signal integrity and timing have not been measured."
+  ],
+  "provenance": [
+    "https://www.st.com/resource/en/user_manual/um0488-evaluation-board-with-stm32f103zx-mcu-stmicroelectronics.pdf",
+    "https://www.st.com/resource/en/schematic_pack/mb672-f103zgt6-d06_schematic.pdf",
+    "https://www.issi.com/WW/pdf/61-64WV51216.pdf"
+  ],
+  "backend_support": [
+    "baremetal"
+  ]
+}

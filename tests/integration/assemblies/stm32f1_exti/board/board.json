@@ -1,0 +1,131 @@
+{
+  "schema_version": 1,
+  "id": "stm32f103rb-nucleo-b1",
+  "soc": "STM32F103RBT6",
+  "soc_family": "stm32f1",
+  "source_revision": "MB1136 C-03/C-04/C-05 documentary B1 PC13 and SB17 ON",
+  "physical_pcb_revision": null,
+  "clocks": {},
+  "bindings": [
+    {
+      "id": "b1",
+      "controller": "EXTI13",
+      "route": "exti13-pc13",
+      "electrical": {
+        "mode": "edge-event",
+        "pull": "none"
+      }
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14",
+    "PA15",
+    "PB3",
+    "PB4",
+    "PD0",
+    "PD1",
+    "PC14",
+    "PC15"
+  ],
+  "unknowns": [
+    "The board revision, SB17 state and button polarity have not been observed on a station.",
+    "Mechanical bounce is visible to the consumer; there is no debounce stage."
+  ],
+  "provenance": [
+    {
+      "scope": "Official MB1136 manual connections and stock configuration only; physical hardware is not observed.",
+      "url": "https://www.st.com/resource/en/user_manual/um1724-stm32-nucleo64-boards-mb1136-stmicroelectronics.pdf",
+      "file": "um1724-stm32-nucleo64-boards-mb1136-stmicroelectronics.pdf",
+      "sha256": "576d9bee3bc32c8ee70bf0d77cf9494cec06ea7c1d9ff98eebf2738cb9314a14",
+      "pages": [
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        40
+      ],
+      "components": [
+        "U4",
+        "LD2",
+        "SB21",
+        "SB13",
+        "SB14",
+        "SB62",
+        "SB63",
+        "ST-LINK"
+      ],
+      "nets": [
+        "+3.3V",
+        "PA5/D13",
+        "PA2/USART2_TX",
+        "PA3/USART2_RX"
+      ]
+    },
+    {
+      "url": "https://www.st.com/resource/en/schematic_pack/mb1136-default-c03_schematic.pdf",
+      "sha256": "71117604b6a4ce7935902c022ac99a8474f26e2f7c235c505e35e60703a13ccb",
+      "file": "mb1136-default-c03_schematic.pdf",
+      "pages": [
+        3
+      ],
+      "scope": "Documented active-low B1 on PC13 with SB17 closed and R30 external pull-up.",
+      "components": [
+        "B1",
+        "SB17",
+        "R30",
+        "U4"
+      ],
+      "nets": [
+        "PC13/B1",
+        "VDD"
+      ]
+    },
+    {
+      "url": "https://www.st.com/resource/en/schematic_pack/mb1136-default-c04_schematic.pdf",
+      "sha256": "401f40ca598b008050e7749b5847e93ca8aa83e9a0bae4cbcbe7a016159e57c1",
+      "file": "mb1136-default-c04_schematic.pdf",
+      "pages": [
+        3
+      ],
+      "scope": "Documented active-low B1 on PC13 with SB17 closed and R30 external pull-up.",
+      "components": [
+        "B1",
+        "SB17",
+        "R30",
+        "U4"
+      ],
+      "nets": [
+        "PC13/B1",
+        "VDD"
+      ]
+    },
+    {
+      "url": "https://www.st.com/resource/en/schematic_pack/mb1136-default-c05_schematic.pdf",
+      "sha256": "7f8795e66e692fe72125bc69613284676ebb6f5e63f0da4e053f1e184771cd26",
+      "file": "mb1136-default-c05_schematic.pdf",
+      "pages": [
+        3
+      ],
+      "scope": "Documented active-low B1 on PC13 with SB17 closed and R30 external pull-up.",
+      "components": [
+        "B1",
+        "SB17",
+        "R30",
+        "U4"
+      ],
+      "nets": [
+        "PC13/B1",
+        "VDD"
+      ]
+    }
+  ],
+  "backend_support": [
+    "baremetal",
+    "freertos"
+  ]
+}

@@ -1,0 +1,19 @@
+schema = 2
+board_package = "rb-internal-board"
+backend = "baremetal"
+clock = "hsi8"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+flash_load_limit_bytes = 24576
+static_ram_limit_bytes = 6144
+libc_heap_bytes = 0
+
+[adc.internal]
+binding = "internal"
+mode = "internal-scan"
+channels = [16, 17]
+sample_times = [6, 6]
+reference_mv = 3300
+resolution_bits = 12

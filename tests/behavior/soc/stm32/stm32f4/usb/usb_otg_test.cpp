@@ -164,7 +164,7 @@ class UsbOtgCold : public testing::Test {
     nx_stm32_platform_pin_config_t pins[2] = {{GPIOA, &saved[0], 0U, 11U},
                                               {GPIOA, &saved[1], 0U, 12U}};
     nx_stm32_platform_pin_config_t different_pins[2] = {};
-    nx_stm32_usb_endpoint_config_t plan[4] = {
+    nx_usb_endpoint_config_t plan[4] = {
         {0U, true, NX_USB_PROFILE_CONTROL, 64U, 128U, 32U},
         {0U, false, NX_USB_PROFILE_CONTROL, 64U, 0U, 0U},
         {1U, true, NX_USB_PROFILE_BULK, 64U, 160U, 32U},

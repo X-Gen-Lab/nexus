@@ -113,19 +113,20 @@ class ThreadXLockTests(unittest.TestCase):
             self.assertFalse(os.path.samefile(first, second))
         self.assertEqual(snapshot(), before)
 
-    def test_real_git_source_and_both_ports_verify_without_changes(self):
+    def test_real_git_source_and_all_ports_verify_without_changes(self):
         before = self.git("status", "--porcelain")
-        for port in ("linux", "cortex_m4"):
-            result = self.verify(port)
-            self.assertEqual(result["commit"], self.lock["commit"])
-            self.assertEqual(result["verified_files"], 215)
+        for port in ("linux", "cortex_m3", "cortex_m4"):
+            with self.subTest(port=port):
+                result = self.verify(port)
+                self.assertEqual(result["commit"], self.lock["commit"])
+                self.assertEqual(result["verified_files"], len(self.lock["files"]) + 1)
         self.assertEqual(self.git("status", "--porcelain"), before)
 
     def test_actual_root_official_checkout_is_hash_verified(self):
         result = threadx_lock.verify(ROOT / "ext/threadx",
                                      ROOT / "dependencies/threadx.lock.json",
-                                     "cortex_m4")
-        self.assertEqual(result["verified_files"], 215)
+                                     "cortex_m3")
+        self.assertEqual(result["verified_files"], len(self.lock["files"]) + 1)
 
     def test_approved_transport_preserves_official_release_pair(self):
         item = source_catalogue.dependency("threadx")
@@ -290,7 +291,8 @@ class ThreadXLockTests(unittest.TestCase):
                    "--port", "linux"]
         passed = subprocess.run(command, capture_output=True, text=True, timeout=20)
         self.assertEqual(passed.returncode, 0, passed.stderr)
-        self.assertEqual(json.loads(passed.stdout)["verified_files"], 215)
+        self.assertEqual(json.loads(passed.stdout)["verified_files"],
+                         len(self.lock["files"]) + 1)
         (self.source / self.lock["common"][0]).write_bytes(b"changed")
         failed = subprocess.run(command, capture_output=True, text=True, timeout=20)
         self.assertNotEqual(failed.returncode, 0)

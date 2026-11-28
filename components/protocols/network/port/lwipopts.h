@@ -17,9 +17,15 @@
 #define LWIP_ARP             1
 #define LWIP_ETHERNET        1
 #define LWIP_ICMP            1
-#define LWIP_RAW             1
-#define LWIP_UDP             1
-#define LWIP_TCP             1
+#if defined(NEXUS_LWIP_IPV4_ONLY)
+#define LWIP_RAW 0
+#define LWIP_UDP 0
+#define LWIP_TCP 0
+#else
+#define LWIP_RAW 1
+#define LWIP_UDP 1
+#define LWIP_TCP 1
+#endif
 #if defined(NEXUS_LWIP_MANAGED)
 #define LWIP_DHCP           1
 #define LWIP_DNS            1
@@ -44,12 +50,17 @@
 #endif
 #define MEM_LIBC_MALLOC 0
 #define MEMP_MEM_MALLOC 0
-#define MEM_SIZE        16384
+#if defined(NEXUS_LWIP_IPV4_ONLY)
+#define MEM_SIZE       4096
+#define PBUF_POOL_SIZE 4
+#else
+#define MEM_SIZE 16384
 #if defined(NEXUS_LWIP_LOANED_RX)
 #define NEXUS_LWIP_RX_CUSTOM_PBUFS 1
 #define PBUF_POOL_SIZE             2
 #else
 #define PBUF_POOL_SIZE 24
+#endif
 #endif
 #define PBUF_POOL_BUFSIZE       512
 #define MEMP_NUM_PBUF           16

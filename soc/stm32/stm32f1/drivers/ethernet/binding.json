@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "bindings": [
+    {
+      "kind": "mdio",
+      "mode": "clause22",
+      "implementation": "mdio",
+      "headers": [
+        "drivers/ethernet/mdio.h"
+      ],
+      "static_recipe": {
+        "state_type": "nx_stm32f1_mdio_t",
+        "ops": "nx_stm32f1_mdio_ops",
+        "declarations": [],
+        "calls": {
+          "prepare": {
+            "function": "nx_stm32f1_mdio_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32f1_mdio_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "retain_on_failed_init": true
+      }
+    }
+  ]
+}

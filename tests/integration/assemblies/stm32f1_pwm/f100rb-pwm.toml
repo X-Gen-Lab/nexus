@@ -1,0 +1,35 @@
+schema = 2
+board_package = "f100rb-board"
+backend = "baremetal"
+clock = "hsi8"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+flash_load_limit_bytes = 24576
+static_ram_limit_bytes = 6144
+libc_heap_bytes = 0
+
+[pwm.waveform]
+binding = "tim15-ch1"
+mode = "fixed-pwm"
+tick_hz = 1000000
+period_ticks = 1000
+duty_ticks = 250
+
+[pwm.waveform16]
+binding = "tim16-ch1"
+mode = "fixed-pwm"
+tick_hz = 1000000
+period_ticks = 800
+duty_ticks = 300
+
+[pwm.waveform17]
+binding = "tim17-ch1"
+mode = "fixed-pwm"
+tick_hz = 1000000
+period_ticks = 600
+duty_ticks = 350
+
+[factory]
+capabilities = true

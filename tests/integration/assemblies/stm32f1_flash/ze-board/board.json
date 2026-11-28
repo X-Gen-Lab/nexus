@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "id": "stm32f103ze-flash-software-reference",
+  "soc": "STM32F103ZET6",
+  "soc_family": "stm32f1",
+  "source_revision": "software-reference-v1",
+  "physical_pcb_revision": null,
+  "clocks": {},
+  "bindings": [
+    {
+      "id": "flash0",
+      "controller": "FLASH",
+      "route": "flash-internal-2k",
+      "supply_mv": 3300
+    }
+  ],
+  "reserved_resources": [],
+  "unknowns": [
+    "Nominal supply is a configuration assumption. Physical silicon cut, PCB revision and supply have not been observed."
+  ],
+  "provenance": [
+    "https://www.st.com/resource/en/datasheet/stm32f103ze.pdf",
+    "https://www.st.com/resource/en/errata_sheet/es0340-stm32f101xcde-stm32f103xcde-device-errata-stmicroelectronics.pdf"
+  ],
+  "backend_support": [
+    "baremetal"
+  ]
+}

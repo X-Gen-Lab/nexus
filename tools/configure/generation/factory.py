@@ -75,7 +75,7 @@ def classes(result):
     result = _typed(result)
     records = [(kind, "port", [item for item in result.controllers
                               if controller_class(item) == kind])
-               for kind in KINDS]
+               for kind in KINDS if kind != "mdio"]
     for kind in ("uart_word", "spi_dma_transaction", "spi_frames", "pin_state",
                  "pwm_adc_loop", "power_stage"):
         instances = [item for item in result.controllers
@@ -99,7 +99,7 @@ def classes(result):
         if instances:
             records.append((name, "endpoint", instances))
     records.append(("mdio", "port", [item for item in result.controllers
-                                    if item.kind in {"eth", "eth_frames"}]))
+                                    if item.kind in {"mdio", "eth", "eth_frames"}]))
     return [record for record in records if record[2]]
 
 
@@ -333,6 +333,7 @@ def emit(result):
             name = symbol(instance.id)
             pointer = (f"nx_device_{name}" if shape == "endpoint"
                        else f"g_nx_mdio_binding_{name}" if class_name == "mdio"
+                       and instance.kind != "mdio"
                        else f"nx_binding_{name}")
             source += [f"        case {prefix}{name.upper()}:", f"            return {pointer};"]
         source += ["        default:", "            return NULL;", "    }", "}"]
@@ -516,10 +517,14 @@ def emit_smbus(result):
         return "", ""
     from tools.configure.providers.common import mode_traits
     controllers = {item.id: item for item in result.controllers}
-    selected = [item for item in result.devices if item.kind == "i2c"
-                and item.options.address_bits == 7
-                and 0x08 <= item.options.address <= 0x77
-                and mode_traits("i2c", controllers[item.controller].mode).irq]
+    selected = []
+    for item in result.devices:
+        if (item.kind != "i2c" or item.options.address_bits != 7 or
+                not 0x08 <= item.options.address <= 0x77):
+            continue
+        shape = mode_traits("i2c", controllers[item.controller].mode)
+        if shape.irq and not shape.write_only:
+            selected.append(item)
     header = ["/**", " * \\file            nexus_smbus_factory.h",
         " * \\brief           Optional packet PEC bindings on existing I2C IDs.",
         " * \\author          Nexus Team", " */",
@@ -527,7 +532,7 @@ def emit_smbus(result):
         '#include "nexus_factory_strong.h"',
         '#include "nexus/components/smbus.h"',
         '#ifdef __cplusplus', 'extern "C" {', '#endif',
-        '/** \\brief Pure lookup; NULL for polling, ten-bit or invalid IDs.',
+        '/** \\brief Pure lookup; NULL for polling, write-only, ten-bit or invalid IDs.',
         ' * \\note Static borrowed metadata; no hardware access or initialization.',
         ' *       Faces and binding remain live through adapter stop. Addresses',
         ' *       derive from the same selected endpoint, without rediscovery.',

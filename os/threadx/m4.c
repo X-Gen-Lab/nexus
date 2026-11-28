@@ -1,6 +1,6 @@
 /**
  * \file            m4.c
- * \brief           Reviewed Cortex-M4 bootstrap and explicit Tick setup
+ * \brief           Reviewed Cortex-M3/M4 bootstrap and explicit Tick setup
  * \author          Nexus Team
  * \version         1.0.0
  * \date            2026-10-11
@@ -15,8 +15,9 @@
 #define NX_TX_REGISTER(address) nx_threadx_m4_model_register(address)
 #define NX_TX_DISABLE()         nx_threadx_m4_model_disable()
 #else
-#if !defined(__ARM_ARCH_7EM__)
-#error "Maintained ThreadX bootstrap requires the Cortex-M4 GNU port"
+#if !defined(__ARM_ARCH_7EM__) && !defined(__ARM_ARCH_7M__)
+#error                                                                         \
+    "Maintained ThreadX bootstrap requires the Cortex-M3 or Cortex-M4 GNU port"
 #endif
 #define NX_TX_REGISTER(address) ((volatile uint32_t*)(uintptr_t)(address))
 #define NX_TX_DISABLE()         __asm__ volatile("cpsid i" ::: "memory")

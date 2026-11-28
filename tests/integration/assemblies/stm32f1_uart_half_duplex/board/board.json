@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "id": "stm32f103rb-usart2-single-wire",
+  "soc": "STM32F103RBT6",
+  "soc_family": "stm32f1",
+  "source_revision": "DS5319 Rev20 Table 5 and RM0008 Rev21 27.3.10, USART2 PA2 software reference",
+  "physical_pcb_revision": null,
+  "clocks": {},
+  "bindings": [
+    {
+      "id": "single-wire-uart2",
+      "controller": "USART2",
+      "route": "usart2-pa2-one-wire"
+    }
+  ],
+  "reserved_resources": ["PA13", "PA14", "PA15", "PB3", "PB4", "PD0", "PD1", "PC14", "PC15"],
+  "unknowns": [
+    "External pull-up, bus loading, peer turnaround and Board bridge routing are unobserved."
+  ],
+  "provenance": [
+    "https://www.st.com/resource/en/datasheet/stm32f103rb.pdf"
+  ],
+  "backend_support": [
+    "baremetal"
+  ]
+}

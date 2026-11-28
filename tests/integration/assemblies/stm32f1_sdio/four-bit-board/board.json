@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "id": "stm32f103ze-sdio-4bit-software",
+  "soc": "STM32F103ZET6",
+  "soc_family": "stm32f1",
+  "source_revision": "F103ZET6 software reference for an externally wired 3.3 V four-data-line SDHC socket",
+  "physical_pcb_revision": null,
+  "clocks": {},
+  "bindings": [
+    {
+      "id": "sd0",
+      "controller": "SDIO",
+      "route": "sdio-pc8-11-pc12-pd2-pc13"
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14",
+    "PA15",
+    "PB3",
+    "PB4"
+  ],
+  "unknowns": [
+    "The external 3.3 V socket requires CMD and DAT0 through DAT3 pull-ups and a mechanically debounced active-low PC13 card-detect input.",
+    "PCB routing, socket wiring, card population and signal integrity have not been observed."
+  ],
+  "provenance": [
+    "https://www.st.com/resource/en/datasheet/stm32f103ze.pdf",
+    "https://www.st.com/resource/en/reference_manual/rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32-bit-mcus-stmicroelectronics.pdf",
+    "https://www.st.com/resource/en/errata_sheet/es0340-stm32f101xcde-stm32f103xcde-highdensity-device-errata-stmicroelectronics.pdf",
+    "https://www.sdcard.org/downloads/pls/"
+  ],
+  "backend_support": [
+    "baremetal"
+  ]
+}

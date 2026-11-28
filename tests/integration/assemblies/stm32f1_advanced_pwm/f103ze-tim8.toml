@@ -1,0 +1,26 @@
+schema = 2
+board_package = "f103ze-board"
+backend = "baremetal"
+clock = "hsi8"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+flash_load_limit_bytes = 24576
+static_ram_limit_bytes = 6144
+libc_heap_bytes = 0
+
+[advanced_pwm.pair]
+binding = "pwm0"
+mode = "complementary-pwm"
+period_ticks = 800
+tick_hz = 8000000
+deadtime_ticks = 8
+break_active_high = false
+idle_high = false
+idle_complement_high = false
+exclusive = true
+
+[advanced_pwm.pair.irq]
+priority = 5
+calls_os = false

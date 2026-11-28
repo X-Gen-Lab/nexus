@@ -1,0 +1,37 @@
+# Software test harness for the NUCLEO-F103RB Morpho connector.
+schema = 2
+board_package = "board"
+backend = "baremetal"
+clock = "hsi8"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+flash_load_limit_bytes = 24576
+static_ram_limit_bytes = 6144
+libc_heap_bytes = 0
+
+[spi.spi2]
+binding = "spi2"
+mode = "short-poll"
+max_hz = 1000000
+
+[spi_device.fixture_spi]
+driver = "spi-transaction"
+controller = "spi2"
+cs_binding = "spi2-cs"
+mode = 0
+max_hz = 1000000
+
+[i2c.i2c1]
+binding = "i2c1"
+mode = "poll-messages"
+max_hz = 80000
+
+[i2c_device.fixture_i2c]
+driver = "i2c-endpoint"
+controller = "i2c1"
+address = 80
+
+[factory]
+capabilities = true

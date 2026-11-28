@@ -31,7 +31,7 @@ static bool separate(const nx_stm32_usb_otg_t* state, const void* p,
 /** \brief Both active and inactive selected storage survive composite reset. */
 static bool device_storage(const nx_stm32_usb_otg_t* state,
                            nx_usb_endpoint_t* endpoints, size_t count,
-                           const nx_stm32_usb_endpoint_config_t* plan,
+                           const nx_usb_endpoint_config_t* plan,
                            nx_usb_event_t* events, size_t capacity,
                            const nx_stm32_platform_pin_config_t* pins,
                            uint8_t pin_count, const void* clock,
@@ -508,7 +508,7 @@ device_remote_storage(const nx_stm32_usb_otg_t* state,
                       const nx_usb_remote_wakeup_request_t* request) {
     const nx_stm32_usb_otg_config_t* config = state->config;
     const nx_stm32_platform_pin_config_t* pins;
-    const nx_stm32_usb_endpoint_config_t* plan;
+    const nx_usb_endpoint_config_t* plan;
     size_t count;
     uint8_t pin_count;
     if (config->device_fs != NULL) {
@@ -740,8 +740,7 @@ static bool host_query_external(const nx_stm32_usb_otg_t* state,
     const nx_stm32_usb_hs_cold_config_t* hs = config->device_hs;
     const nx_usb_endpoint_t* endpoints =
         fs != NULL ? fs->endpoints : hs->endpoints;
-    const nx_stm32_usb_endpoint_config_t* plan =
-        fs != NULL ? fs->plan : hs->plan;
+    const nx_usb_endpoint_config_t* plan = fs != NULL ? fs->plan : hs->plan;
     const nx_usb_event_t* events = fs != NULL ? fs->events : hs->events;
     const size_t count = fs != NULL ? fs->endpoint_count : hs->endpoint_count;
     const size_t capacity = fs != NULL ? fs->capacity : hs->capacity;

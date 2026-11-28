@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "id": "stm32f100rb-pwm-software-reference",
+  "soc": "STM32F100RBT6B",
+  "soc_family": "stm32f1",
+  "source_revision": "DS6517-Rev9-RM0041-Rev6",
+  "physical_pcb_revision": null,
+  "clocks": {},
+  "bindings": [
+    {
+      "id": "tim15-ch1",
+      "controller": "TIM15",
+      "route": "tim15-pa2-ch1",
+      "mask": 4,
+      "initial": 0
+    },
+    {
+      "id": "tim16-ch1",
+      "controller": "TIM16",
+      "route": "tim16-pb8-ch1",
+      "mask": 256,
+      "initial": 0
+    },
+    {
+      "id": "tim17-ch1",
+      "controller": "TIM17",
+      "route": "tim17-pb9-ch1",
+      "mask": 512,
+      "initial": 0
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14",
+    "PA15",
+    "PB3",
+    "PB4",
+    "PD0",
+    "PD1"
+  ],
+  "unknowns": [
+    "F100RB LQFP64 software reference; carrier, loads and output electrical timing are unobserved."
+  ],
+  "provenance": [
+    "https://www.st.com/resource/en/datasheet/stm32f100rb.pdf",
+    "https://www.st.com/resource/en/reference_manual/rm0041-stm32f100xx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf",
+    "https://www.st.com/resource/en/errata_sheet/es093-stm32f100x4-stm32f100x6-stm32f100x8-and-stm32f100xb-low-and-mediumdensity-value-line-device-errata-stmicroelectronics.pdf"
+  ],
+  "backend_support": [
+    "baremetal"
+  ]
+}

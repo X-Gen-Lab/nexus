@@ -50,7 +50,8 @@ target_compile_options(
         -fdata-sections
         "-include${nexus_google_root}/soc/stm32/stm32f4/memory/f407_sram_boot_model.h"
 )
+# Keep the host image and its upward-growing heap above fixed MCU mappings.
 target_link_options(
     nexus_f407_sram_boot_test
-    PRIVATE -no-pie -Wl,--gc-sections -Wl,-Ttext-segment=0x60000000
+    PRIVATE -no-pie -Wl,--gc-sections -Wl,-Ttext-segment=0x70000000
 )

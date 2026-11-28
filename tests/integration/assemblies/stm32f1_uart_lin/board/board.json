@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "id": "stm32f103rb-usart2-lin",
+  "soc": "STM32F103RBT6",
+  "soc_family": "stm32f1",
+  "source_revision": "DS5319 Rev20 Table 5 and RM0008 Rev21 27.3.8, PA2/PA3 with external LIN transceiver",
+  "physical_pcb_revision": null,
+  "clocks": {},
+  "bindings": [
+    {
+      "id": "lin-uart2",
+      "controller": "USART2",
+      "route": "usart2-pa2-pa3-lin"
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14",
+    "PA15",
+    "PB3",
+    "PB4",
+    "PD0",
+    "PD1",
+    "PC14",
+    "PC15"
+  ],
+  "unknowns": [
+    "Transceiver, bus loading, peer timing and Board bridge routing are unobserved."
+  ],
+  "provenance": [
+    "https://www.st.com/resource/en/datasheet/stm32f103rb.pdf"
+  ],
+  "backend_support": [
+    "baremetal"
+  ]
+}

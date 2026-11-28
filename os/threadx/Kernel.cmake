@@ -3,7 +3,7 @@ include_guard(GLOBAL)
 
 function(nexus_add_threadx_kernel target port tick_hz basepri)
     if(
-        NOT port MATCHES "^(linux|cortex_m4)$"
+        NOT port MATCHES "^(linux|cortex_m[34])$"
         OR NOT tick_hz MATCHES "^[1-9][0-9]*$"
         OR NOT basepri MATCHES "^[0-9]+$"
     )

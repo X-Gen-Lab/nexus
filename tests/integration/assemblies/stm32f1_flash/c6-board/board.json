@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "id": "stm32f103c6-flash-software-reference",
+  "soc": "STM32F103C6T6A",
+  "soc_family": "stm32f1",
+  "source_revision": "software-reference-v1",
+  "physical_pcb_revision": null,
+  "clocks": {},
+  "bindings": [
+    {
+      "id": "flash0",
+      "controller": "FLASH",
+      "route": "flash-f103c6-1k",
+      "supply_mv": 3300
+    }
+  ],
+  "reserved_resources": [],
+  "unknowns": [
+    "Nominal supply is a configuration assumption. Physical silicon cut, PCB revision and supply have not been observed."
+  ],
+  "provenance": [
+    "https://www.st.com/resource/en/datasheet/stm32f103c6.pdf",
+    "https://www.st.com/resource/en/errata_sheet/es0348-stm32f101x46-stm32f102x46-stm32f103x46-device-errata-stmicroelectronics.pdf"
+  ],
+  "backend_support": [
+    "baremetal"
+  ]
+}

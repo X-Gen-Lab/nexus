@@ -11,7 +11,7 @@ from dataclasses import dataclass, field
 from types import MappingProxyType
 
 from tools.configure.providers import for_selection
-from tools.configure.providers.common import fail, mode_traits
+from tools.configure.providers.common import CAN_FIXED_POLL_MODES, fail, mode_traits
 
 
 ENDPOINT_DRIVERS = MappingProxyType({
@@ -167,7 +167,8 @@ def _format(item, provider, shape):
                       configured_max_hz=options.max_hz)
     elif kind == "i2c":
         # Zero identifies endpoint-owned widths on a mixed-width controller.
-        fields = dict(address_bits=0 if provider.ENDPOINT_POLICY.i2c_ten_bit else 7,
+        fields = dict(address_bits=0 if provider.ENDPOINT_POLICY.i2c_ten_bit
+                      and not shape.write_only else 7,
                       configured_max_hz=options.max_hz, nominal_hz=0)
     elif kind == "adc":
         fields = dict(storage_bits=16, signed_samples=0,
@@ -191,8 +192,11 @@ def _format(item, provider, shape):
         mailboxes = getattr(provider, "CLASSIC_CAN_MAILBOXES", None)
         if type(mailboxes) is not int or mailboxes <= 0:
             fail("CAN traits require a reviewed physical mailbox topology")
-        fields = dict(classic_payload_bytes=8, hardware_tx_mailboxes=mailboxes)
-        source = "irq_observation"
+        exposed = 1 if item.mode in CAN_FIXED_POLL_MODES else mailboxes
+        fields = dict(classic_payload_bytes=8, hardware_tx_mailboxes=exposed)
+        abort = "request"
+        source = ("service_observation" if item.mode in CAN_FIXED_POLL_MODES
+                  else "irq_observation")
     elif kind in {"eth", "eth_frames"}:
         enhanced = kind == "eth_frames"
         fields = dict(vlan=int(enhanced), scatter_gather=int(enhanced))
@@ -235,13 +239,18 @@ def describe(item, endpoint=None, *, public_class=None):
         fail("Selected endpoint differs from its actual controller")
     kind = item.kind
     nominal_kind, nominal_mode = kind, item.mode
+    target_direction = None
     if kind == "external_bus" and endpoint is not None:
         nominal_kind = selected
         nominal_mode = ("8080-16" if selected=="parallel16" else endpoint.options.mode)
         shape = mode_traits(nominal_kind, nominal_mode)
     limits = {}
     if kind == "rtc":
-        limits.update(unit="occurrences", max_transfer_units=1)
+        if item.mode in {"backup-adopt", "backup-provision"}:
+            limits.update(unit="words", unit_bytes=2, buffer_alignment=4,
+                          max_transfer_units=1, word_bits=(16,))
+        else:
+            limits.update(unit="occurrences", max_transfer_units=1)
     elif kind == "lptim":
         limits.update(unit="ticks", max_transfer_units=65536)
     elif kind == "block":
@@ -286,18 +295,25 @@ def describe(item, endpoint=None, *, public_class=None):
         limits.update(max_transfer_units="NX_I2C_BOUNDED_MAX_MESSAGE_BYTES",
                       max_messages="NX_I2C_BOUNDED_MAX_MESSAGES")
     elif kind == "i2c_target":
-        # One WRITE_READ request has two bounded direction spans; address
-        # phases are not independent messages or caller payload bytes.
-        limits.update(max_transfer_units=512, max_segment_units=256,
-                      max_segments=2, max_total_units=512)
+        binding = provider.binding(kind, item.mode, item.controller)
+        if item.mode == "target-tx-irq":
+            target_direction = "transmit_only"
+        elif item.mode == "target-rx-irq" or binding.i2c_target_receive_only:
+            target_direction = "receive_only"
+        elif item.mode == "target-write-read-irq":
+            target_direction = "write_read_only"
+        spans = 1 if target_direction in {"receive_only", "transmit_only"} else 2
+        limits.update(max_transfer_units=256 * spans, max_segment_units=256,
+                      max_segments=spans, max_total_units=256 * spans)
     elif kind == "pwm_adc" and item.mode in {
             "injected-control", "injected-power-stage"}:
         limits.update(unit="cycles", unit_bytes=None, buffer_alignment=2,
                       max_transfer_units=None, word_bits=(12,))
     elif kind in {"adc", "pwm_adc"}:
         count = len(item.options.channels)
-        bound = ("UINT16_MAX" if kind == "pwm_adc" else
-                 f"UINT16_MAX - UINT16_MAX % {count}U" if shape.dma else count)
+        bound = (1 if item.mode == "finite-injected" else
+                 "UINT16_MAX" if kind == "pwm_adc" else
+                 f"UINT16_MAX - UINT16_MAX % {count}U" if shape.block_stream else count)
         limits.update(unit="samples", unit_bytes=2, buffer_alignment=2,
                       max_transfer_units=bound)
     elif kind == "adc_group":
@@ -346,6 +362,10 @@ def describe(item, endpoint=None, *, public_class=None):
     if selected_limits is not None:
         limits.update(selected_limits(item, shape))
     formatted = _format(item, provider, shape)
+    if target_direction is not None:
+        formatted["fields"] = {**formatted["fields"], target_direction: 1}
+    if kind == "i2c" and shape.write_only:
+        formatted["fields"] = {**formatted["fields"], "write_only": 1}
     if endpoint is not None and kind == "i2c":
         formatted["fields"] = {**formatted["fields"],
                                "address_bits": endpoint.options.address_bits}

@@ -20,7 +20,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from tools.configure.metadata import load_policy  # noqa: E402
 from tools.dev import process  # noqa: E402
 from tools.evidence.common import file_identity, regular_file  # noqa: E402
-from tools.maintenance.consumer_profiles import (BASE_CONSUMERS, MODERN_CONSUMERS,
+from tools.maintenance.consumer_profiles import (BASE_CONSUMERS, F103RB_CONSUMER,
+                                     FULL_CONSUMER_PACKAGES, MODERN_CONSUMERS,
                                      SELECTED_CONSUMERS, SERVICE_CONSUMERS,
                                      ServiceConsumer, consumer_plan, service_directory,
                                      selected_domain, NATIVE_TIME_SMOKES)  # noqa: E402
@@ -287,7 +288,7 @@ def prepare_consumer(prefix, directory, name, run_checked, *, fixture=False,
 def service_profile(specification):
     """Accept exactly one immutable entry from the reviewed transport plan."""
     if (not isinstance(specification, ServiceConsumer)
-            or specification not in SERVICE_CONSUMERS):
+            or specification not in (*SERVICE_CONSUMERS, F103RB_CONSUMER)):
         raise ValueError("Service consumer differs from the canonical plan")
     return specification
 
@@ -295,6 +296,8 @@ def service_profile(specification):
 def service_sources(sdk, specification):
     """Return only the exact reviewed scenario's authored consumer sources."""
     verification = service_directory(sdk, specification)
+    if specification == F103RB_CONSUMER:
+        return {"main.c": verification / "main.c"}
     if specification.scenario.startswith("f4_"):
         authored = tomllib.loads((verification / specification.assembly).read_text())
         board = PurePosixPath(authored["board_package"])
@@ -392,6 +395,7 @@ def prepare_service_consumer(prefix, directory, specification, run_checked, *,
     boot = specification.scenario in {"mcuboot_boot", "mcuboot_swap"}
     (source / "private_headers.c").write_text(
         '#if __has_include("stm32f4xx.h") || '
+        '__has_include("stm32f1xx.h") || '
         '__has_include("gd32f4xx.h") || __has_include("provider.h")\n'
         '#error Private hardware state leaked into the public consumer\n'
         '#endif\n'
@@ -416,6 +420,7 @@ def prepare_service_consumer(prefix, directory, specification, run_checked, *,
         "device_tmp117": "Nexus::TMP117I2C",
         "smbus": "Nexus::SMBus",
         "image_window": "",
+        "f1_family": "",
         "f4_family": "",
         "f4_gpio": "",
         "f4_crypto": "",
@@ -921,6 +926,11 @@ def service_symbols(specification):
         return frozenset({"nx_platform_start", "nx_platform_stop",
                           "nx_factory_gpio_signal", "nx_gpio_signal_write",
                           "nx_stm32_gpio_ops"})
+    if specification == F103RB_CONSUMER:
+        return frozenset({"nx_platform_start", "nx_platform_stop",
+                          "nx_factory_gpio_signal", "nx_gpio_signal_write",
+                          "nx_factory_uart", "nx_uart_port_submit",
+                          "nx_stm32f1_gpio_ops", "nx_stm32f1_uart_ops"})
     if specification.scenario == "f4_family":
         return frozenset({"nx_platform_start", "nx_platform_stop",
                           "nx_chip_info_read", "nx_factory_crc",
@@ -1068,6 +1078,10 @@ def service_scope(specification):
                 "software routes; ARM C11 link, resources and method retention "
                 "only. No physical Board, output waveform, startup execution, "
                 "measured timing or HIL qualification.")
+    if specification == F103RB_CONSUMER:
+        return ("STM32F103RBT6 baremetal with GPIO and USART2 IRQ. "
+                "Cortex-M3 C11 link, retained methods and image resources. "
+                "Physical startup and I/O were not executed.")
     if specification.scenario == "f4_family":
         return ("Selected exact F4 internal HSI16/CRC C11 link, "
                 "resources and method retention only. No external PCB, "
@@ -1150,15 +1164,21 @@ def check_service_compiles(commands, public, sdk, resolved, specification):
                         argv[index + 1].split("=")[0] == "NEXUS_LWIP_LOANED_RX")
                     for index, argument in enumerate(argv))):
             raise ValueError("Service private inputs leaked into product")
-    expected = {"-mcpu=cortex-m4", "-mthumb", "-mfpu=fpv4-sp-d16",
-                "-mfloat-abi=hard", "-fshort-enums"} if specification.arm else set()
+    f1 = specification == F103RB_CONSUMER
+    family, cpu, fpu, float_abi = (("stm32f1", "cortex-m3", "none", "soft") if f1 else
+                                  ("stm32f4", "cortex-m4", "fpv4-sp-d16", "hard"))
+    expected = set()
+    if specification.arm:
+        expected.update({f"-mcpu={cpu}", "-mthumb", f"-mfloat-abi={float_abi}", "-fshort-enums"})
+        if fpu != "none":
+            expected.add(f"-mfpu={fpu}")
     if (resolved.get("enum_abi") != ("short-enums" if specification.arm
                                     else "native-int")):
         raise ValueError("Service enum ABI differs from its profile")
-    if specification.arm and (resolved.get("soc_family") != "stm32f4" or
-            resolved.get("cpu", {}).get("arch") != "cortex-m4" or
-            resolved["cpu"].get("float_abi") != "hard" or
-            resolved["cpu"].get("fpu") != "fpv4-sp-d16"):
+    if specification.arm and (resolved.get("soc_family") != family or
+            resolved.get("cpu", {}).get("arch") != cpu or
+            resolved["cpu"].get("float_abi") != float_abi or
+            resolved["cpu"].get("fpu") != fpu):
         raise ValueError("Service CPU ABI differs from its profile")
     for entry in commands:
         if Path(entry["file"]).suffix in {".cpp", ".cc", ".cxx", ".C"}:
@@ -1207,6 +1227,9 @@ def check_service_image(sdk, source, build, specification, run_checked):
         raise ValueError("Service configuration directory is not canonical")
     inputs.update(resolved=config / "resolved.json", bindings=config / "bindings.c")
     resolved = json.loads((config / "resolved.json").read_text())
+    if specification == F103RB_CONSUMER and (
+            resolved.get("part") != "STM32F103RBT6" or resolved.get("backend") != "baremetal"):
+        raise ValueError("F103RB reference resolved a different part or backend")
     if specification.scenario.startswith("f4_"):
         board = next(path for name, path in canonical_sources.items()
                      if name.endswith("/board.json"))
@@ -1493,12 +1516,7 @@ def main(argv=None):
                         help="select a named consumer; repeat for multiple chains")
     args = parser.parse_args(argv)
     try:
-        full_plan = consumer_plan()
-        if args.changed_path:
-            plan, selection_reason = consumers_for_changes(full_plan, args.changed_path)
-        else:
-            plan = select_consumers(full_plan, args.consumer)
-            selection_reason = "explicit consumer name" if args.consumer else "complete plan"
+        select_consumers(consumer_plan(FULL_CONSUMER_PACKAGES), args.consumer)
         args.parallel = process.parallel_jobs(os.environ, requested=args.parallel)
     except ValueError as error:
         parser.error(str(error))
@@ -1508,9 +1526,7 @@ def main(argv=None):
               "prefix": str(prefix), "status": "failed",
               "physical_status": "not_executed", "commands": records,
               "selected_images": [], "service_images": [],
-              "parallel_jobs": args.parallel,
-              "scope": "selected-consumers" if args.consumer or len(plan) < len(full_plan) else "full-consumers",
-              "selection_reason": selection_reason}
+              "parallel_jobs": args.parallel}
     output_prepared = False
     cancel = threading.Event()
     failure_lock = threading.Lock()
@@ -1585,6 +1601,18 @@ def main(argv=None):
             raise ValueError(
                 "Formal consumer verification requires a publishable committed "
                 "source SDK")
+        profile = identity["profile"]
+        full_plan = consumer_plan(profile["packages"], host_support=profile["host_support"])
+        if not full_plan:
+            raise ValueError("Installed source SDK has no maintained public consumer")
+        if args.changed_path:
+            plan, selection_reason = consumers_for_changes(full_plan, args.changed_path)
+        else:
+            plan = select_consumers(full_plan, args.consumer)
+            selection_reason = "explicit consumer name" if args.consumer else "complete plan"
+        report["scope"] = ("selected-consumers" if args.consumer or len(plan) < len(full_plan)
+                           else "full-consumers")
+        report["selection_reason"] = selection_reason
         report["source_revision"] = identity["source_revision"]
         report["source_tree"] = identity["source_tree"]
         results = [None] * len(plan)

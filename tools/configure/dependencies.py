@@ -12,7 +12,7 @@ COMMON = (
     "providers/__init__", "providers/common", "generation/calls",
     "validation", "resource_graph", "trigger_graph", "dma_topology", "io_traits",
     "selected_contracts",
-    "enhanced_endpoints", "uart_formats", "stream_profiles", "usb_profiles",
+    "enhanced_endpoints", "uart_formats", "stream_profiles", "usb_profiles", "usb_pma",
     "usb_host", "usb_otg",
 )
 PLATFORM = (
@@ -30,7 +30,7 @@ PLATFORM = (
     "adc", "dac", "exti", "board_hardware", "gpio_electrical", "rtc",
     "providers/hardware", "hardware_bindings", "generation/platform_bindings", "startup_memory",
     "i2c_target", "spi_frames", "spi_connections", "uart_wires", "media_schema",
-    "domains/__init__", "domains/pll_mnpq",
+    "domains/__init__", "domains/fixed_channel_dma", "domains/pll_mnpq",
     "policies/adc_group", "policies/capture_audio", "policies/external_bus",
     "policies/gpio_phase", "policies/graphics", "policies/parallel_memory",
     "policies/sdram", "policies/serial_nor", "policies/selection",

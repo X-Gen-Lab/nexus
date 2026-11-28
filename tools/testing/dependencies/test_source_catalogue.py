@@ -88,6 +88,7 @@ class SourceCatalogueTests(unittest.TestCase):
     def test_runtime_scope_excludes_google_and_keeps_nested_sources_explicit(self):
         self.assertEqual({item.identifier for item in catalogue.SOURCE_DEPENDENCIES}, {
             "freertos", "cmsis_core", "stm32f4_cmsis", "stm32f4_hal",
+            "stm32f1_cmsis", "stm32f1_hal",
             "threadx", "lwip", "mbedtls", "coremqtt", "mcuboot",
             "stm32_usb_host", "stm32_usb_device", "flashdb", "littlefs",
             "fatfs", "sfud", "segger_rtt", "letter_shell", "cm_backtrace",
@@ -151,6 +152,9 @@ class SourceCatalogueTests(unittest.TestCase):
                          "https://github.com/X-Gen-Lab/lwip.git")
         self.assertEqual(item.notice, "COPYING")
         self.assertEqual(item.source_lock, "dependencies/lwip.lock.json")
+        dependencies = catalogue.runtime_selection(
+            "stm32f1", backend="baremetal", components=("network-ipv4",), root=ROOT)
+        self.assertIn(item, dependencies)
         modules = catalogue.declared_modules((ROOT / ".gitmodules").read_bytes())
         self.assertEqual(modules[item.path], item.fetch_url)
 

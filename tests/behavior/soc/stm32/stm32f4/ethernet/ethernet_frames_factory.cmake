@@ -36,7 +36,7 @@ foreach(eth_frames_family stm32)
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c"
         LIBRARIES Nexus::IO Nexus::Arch
         INCLUDES
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/legacy_mac" "${eth_frames_bundle}" "${NEXUS_SOURCE_DIR}/io/private"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/legacy_mac" "${NEXUS_SOURCE_DIR}/soc/stm32/common/dwmac" "${eth_frames_bundle}" "${NEXUS_SOURCE_DIR}/io/private"
             "${NEXUS_SOC_SOURCE_${eth_frames_soc}}"
             "${NEXUS_SOC_SOURCE_${eth_frames_soc}}"
     )

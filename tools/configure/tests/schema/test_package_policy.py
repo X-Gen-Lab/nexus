@@ -39,6 +39,19 @@ class PackagePolicyTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Reviewed maintenance"):
             selected.validate_selection("part", "flash", {"maintenance": True})
 
+    def test_exclusion_can_narrow_one_exact_part_in_a_device_group(self):
+        selected = self.policy(mode_exclusions=[{
+            "device": "f103-medium", "part": "STM32F103C8T6", "kind": "flash",
+            "option": "maintenance", "equals": True,
+            "message": "Exact part has no option observation"}])
+        selected.validate_selection("f103-medium", "flash", {"maintenance": True},
+                                    part="STM32F103RBT6")
+        selected.validate_selection("f103-medium", "flash", {"maintenance": False},
+                                    part="STM32F103C8T6")
+        with self.assertRaisesRegex(ValueError, "no option observation"):
+            selected.validate_selection("f103-medium", "flash", {"maintenance": True},
+                                        part="STM32F103C8T6")
+
     def test_timebase_generates_only_restricted_symbols(self):
         selected = self.policy()
         lines = selected.header_lines("NEXUS_STM32")

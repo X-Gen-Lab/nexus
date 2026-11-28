@@ -28,11 +28,19 @@ def fail(message, **details):
     raise ConfigurationError(message, **details)
 
 
+def fixed_dma_channel(value):
+    """Decode a canonical wired DMA channel with no request selector."""
+    match = re.fullmatch(r"dma:(DMA[1-9][0-9]*):channel([1-9][0-9]*)", value)
+    return (match[1], int(match[2])) if match is not None else None
+
+
 def normalize_resource(value):
     timer = re.fullmatch(r"(?:timer:|controller:)?(TIM[0-9]+|TIMER[0-9]+)", value)
     if timer is not None:
         return "controller:" + timer[1]
     if value.startswith("dma:"):
+        if fixed_dma_channel(value) is not None:
+            return value
         channel = re.fullmatch(r"dma:(GPDMA1):channel(0|[1-9][0-9]*)"
                                r"(?::request(0|[1-9][0-9]*))?", value)
         if channel is not None:
@@ -121,6 +129,7 @@ class VendorDeviceProfile:
     priority_bits: int
     external_irq_count: int
     irq_bindings: Mapping
+    startup_vector_tail: tuple[int, ...] = ()
 
 
 def vendor_irq_bindings(value, count):
@@ -168,7 +177,7 @@ def vendor_device_catalog(value):
         fields = {"id", "define", "header", "startup", "external_irq_count",
                   "last_external_irq", "nvic_priority_bits", "timebase_presence"}
         if (not isinstance(row, Mapping) or not fields.issubset(row) or
-                set(row) - fields - {"irq_bindings"}):
+                set(row) - fields - {"irq_bindings", "startup_vector_tail"}):
             fail("Vendor device catalog requires exact entry fields")
         macro, identifier = row["define"], row["id"]
         _catalog_identifier(identifier, "Vendor device catalog ID")
@@ -193,8 +202,11 @@ def vendor_device_catalog(value):
             _catalog_identifier(name, "Catalog timebase")
         bindings = (vendor_irq_bindings(row["irq_bindings"], count)
                     if "irq_bindings" in row else MappingProxyType({}))
+        # These literal words follow the last hardware slot and have no IRQ IDs.
+        tail = tuple(integer(word, context="Startup vector tail word") for word in
+                     sequence(row.get("startup_vector_tail", ()), "Startup vector tail"))
         entries[identifier] = VendorDeviceProfile(
-            identifier, macro, row["header"], row["startup"], bits, count, bindings)
+            identifier, macro, row["header"], row["startup"], bits, count, bindings, tail)
         macros.add(macro)
     if not entries or not isinstance(value["inputs"], Mapping) or not value["inputs"]:
         fail("Vendor device catalog entries and input identities are required")
@@ -280,7 +292,8 @@ class EndpointPolicy:
             width = device.get("address_bits", 7)
             if type(width) is not int or width not in (7, 10):
                 fail("I2C address_bits must be exactly 7 or 10")
-            if width == 10 and not self.i2c_ten_bit:
+            if width == 10 and (not self.i2c_ten_bit or
+                                mode_traits(kind, mode).write_only):
                 fail("I2C requires a reviewed 10-bit endpoint provider")
         if "lsb_first" in device:
             if type(device["lsb_first"]) is not bool:
@@ -455,6 +468,9 @@ def owned_claims(result, owners):
             owners.intersection(claim.owner.split(";")))
 
 
+CAN_FIXED_POLL_MODES = frozenset(("classic-poll", "classic-poll-normal"))
+
+
 @dataclass(frozen=True)
 class ModeTraits:
     """Execution shape only; provider mode tables still establish support."""
@@ -465,6 +481,8 @@ class ModeTraits:
     rx_dma: bool = False
     continuous: bool = False
     bus_master: bool = False
+    dma_irq: bool = True
+    write_only: bool = False
 
     @property
     def dma(self):
@@ -516,11 +534,17 @@ _MODE_TRAITS = MappingProxyType({
     ("memory_window", "graphics-owned"): ModeTraits(),
     ("parallel16", "8080-16"): ModeTraits(polling=True),
     ("block", "sdio-poll"): ModeTraits(polling=True),
+    ("block", "sdio-poll-write"): ModeTraits(polling=True),
+    ("block", "sdio-poll-4bit"): ModeTraits(polling=True),
+    ("block", "sdio-poll-4bit-write"): ModeTraits(polling=True),
+    ("block", "sdio-rx-dma-poll"): ModeTraits(polling=True, rx_dma=True, dma_irq=False),
     ("block", "sdio-irq"): ModeTraits(irq=True),
     ("block", "sdio-dma"): ModeTraits(irq=True, tx_dma=True, rx_dma=True),
     ("rtc", "calendar-alarm"): ModeTraits(),
     ("rtc", "retained-calendar-alarm"): ModeTraits(),
     ("rtc", "adopt-retained"): ModeTraits(polling=True),
+    ("rtc", "backup-adopt"): ModeTraits(polling=True),
+    ("rtc", "backup-provision"): ModeTraits(polling=True),
     ("rtc", "provision-empty"): ModeTraits(polling=True),
     ("lptim", "counter16-oneshot"): ModeTraits(),
     ("lptim", "irq-counter16-oneshot"): ModeTraits(irq=True),
@@ -533,6 +557,7 @@ _MODE_TRAITS = MappingProxyType({
         irq=True, rx_dma=True, block_stream=True, continuous=True),
     ("adc_group", "regular-auto-injected"): ModeTraits(irq=True, rx_dma=True),
     ("adc_group", "injected-sequence"): ModeTraits(irq=True),
+    ("pwm_adc", "finite-injected"): ModeTraits(irq=True),
     ("pwm_adc", "finite-regular-dma"): ModeTraits(irq=True, rx_dma=True),
     ("pwm_adc", "injected-control"): ModeTraits(irq=True, continuous=True),
     ("pwm_adc", "injected-power-stage"): ModeTraits(irq=True, continuous=True),
@@ -546,18 +571,25 @@ _MODE_TRAITS = MappingProxyType({
     ("advanced_pwm", "complementary-pwm"): ModeTraits(irq=True),
     ("eth", "raw-rmii"): ModeTraits(irq=True, bus_master=True),
     ("eth", "raw-mii"): ModeTraits(irq=True, bus_master=True),
+    ("mdio", "clause22"): ModeTraits(polling=True),
     ("eth_frames", "rmii-vlan-sg-ptp"): ModeTraits(irq=True, bus_master=True),
     ("eth_frames", "mii-vlan-sg-ptp"): ModeTraits(irq=True, bus_master=True),
     ("usb_device", "device-fs"): ModeTraits(irq=True),
+    ("usb_device", "device-pma"): ModeTraits(irq=True),
+    ("usb_device", "device-pma-bulk"): ModeTraits(irq=True),
+    ("usb_device", "device-pma-interrupt"): ModeTraits(irq=True),
     ("usb_device", "otg-fs"): ModeTraits(irq=True),
     ("usb_device", "otg-hs-fs"): ModeTraits(irq=True),
     ("usb_device", "otg-hs-ulpi"): ModeTraits(irq=True),
     ("usb_device", "device-hs-fs"): ModeTraits(irq=True),
     ("usb_device", "device-hs-ulpi"): ModeTraits(irq=True),
     ("usb_host", "host-fs"): ModeTraits(irq=True),
+    ("usb_host", "host-fs-bulk"): ModeTraits(irq=True),
     ("usb_host", "host-hs-fs"): ModeTraits(irq=True),
     ("usb_host", "host-hs-ulpi"): ModeTraits(irq=True),
     ("can", "classic-irq"): ModeTraits(irq=True),
+    ("can", "classic-poll"): ModeTraits(),
+    ("can", "classic-poll-normal"): ModeTraits(),
     ("gpio", "input"): ModeTraits(),
     ("gpio", "output"): ModeTraits(),
     ("gpio", "named-states"): ModeTraits(),
@@ -586,22 +618,33 @@ _MODE_TRAITS = MappingProxyType({
     ("spi", "dma-full-duplex"): ModeTraits(
         irq=True, tx_dma=True, rx_dma=True),
     ("i2c_target", "target-irq"): ModeTraits(irq=True),
+    ("i2c_target", "target-rx-irq"): ModeTraits(irq=True),
+    ("i2c_target", "target-tx-irq"): ModeTraits(irq=True),
+    ("i2c_target", "target-write-read-irq"): ModeTraits(irq=True),
     ("i2c_target", "smbus-device"): ModeTraits(irq=True),
     ("i2c", "poll-messages"): ModeTraits(polling=True),
     ("i2c", "irq-messages"): ModeTraits(irq=True),
+    ("i2c", "irq-write-messages"): ModeTraits(irq=True, write_only=True),
     ("i2c", "dma-messages"): ModeTraits(
         irq=True, tx_dma=True, rx_dma=True),
     ("flash", "poll-byte"): ModeTraits(polling=True),
+    ("flash", "poll-halfword"): ModeTraits(polling=True),
     ("flash", "poll-word"): ModeTraits(polling=True),
+    ("flash", "read-only"): ModeTraits(),
     ("watchdog", "independent"): ModeTraits(),
     ("watchdog", "window"): ModeTraits(),
     ("exti", "edge-event"): ModeTraits(irq=True),
+    ("exti", "stop-wake"): ModeTraits(irq=True),
     ("exti", "hardware-event"): ModeTraits(),
     ("exti", "pvd-level"): ModeTraits(polling=True),
     ("exti", "pvd-events"): ModeTraits(irq=True),
     ("pwm", "fixed-pwm"): ModeTraits(),
     ("pwm", "shared-fixed-pwm"): ModeTraits(),
+    ("adc", "internal-scan"): ModeTraits(polling=True),
     ("adc", "single-shot"): ModeTraits(polling=True),
+    ("adc", "sequential-scan-dma"): ModeTraits(polling=True, rx_dma=True),
+    ("adc", "single-trigger-dma"): ModeTraits(polling=True, rx_dma=True),
+    ("adc", "simultaneous-scan-dma"): ModeTraits(polling=True, rx_dma=True),
     ("adc", "low-rate-scan"): ModeTraits(polling=True),
     ("adc", "injected-shot"): ModeTraits(polling=True),
     ("adc", "trigger-dma"): ModeTraits(

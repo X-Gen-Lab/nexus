@@ -1,0 +1,243 @@
+{
+  "schema_version": 1,
+  "bindings": [],
+  "domains": {
+    "platform": {
+      "schema_version": 1,
+      "headers": [
+        "system/platform.h"
+      ],
+      "roles": {
+        "power": [
+          {
+            "kinds": [
+              "exti"
+            ],
+            "modes": [
+              "stop-wake"
+            ],
+            "controllers": [
+              "EXTI13"
+            ],
+            "parts": [
+              "STM32F103RBT6"
+            ]
+          }
+        ]
+      },
+      "dma_clocks": {
+        "DMA1": "RCC_AHBENR_DMA1EN",
+        "DMA2": "RCC_AHBENR_DMA2EN"
+      },
+      "objects": {
+        "platform": {
+          "symbols": {
+            "config": "s_nx_platform_lifecycle_config"
+          },
+          "declarations": [
+            {
+              "role": "config",
+              "type": "nx_stm32f1_platform_config_t",
+              "const": true,
+              "value": {
+                "record": [
+                  [
+                    "flash_bytes",
+                    {
+                      "source": "selected.flash_bytes",
+                      "as": "u32"
+                    }
+                  ]
+                ]
+              }
+            }
+          ]
+        },
+        "state": {
+          "symbols": {
+            "can_filters": "s_nx_can_filters",
+            "can_domain": "s_nx_can_domain"
+          },
+          "declarations": [
+            {
+              "role": "can_filters",
+              "type": "nx_can_filter_t",
+              "const": true,
+              "value": {
+                "map": {
+                  "source": "selected.filters",
+                  "limit": 28,
+                  "value": {
+                    "record": [
+                      [
+                        "id",
+                        {
+                          "source": "entry.id",
+                          "as": "u32"
+                        }
+                      ],
+                      [
+                        "mask",
+                        {
+                          "source": "entry.mask",
+                          "as": "u32"
+                        }
+                      ],
+                      [
+                        "format",
+                        {
+                          "source": "entry.format",
+                          "as": "symbol",
+                          "values": {
+                            "standard": {
+                              "symbol": "NX_CAN_STANDARD"
+                            },
+                            "extended": {
+                              "symbol": "NX_CAN_EXTENDED"
+                            }
+                          }
+                        }
+                      ],
+                      [
+                        "tag",
+                        {
+                          "source": "entry.tag",
+                          "as": "u32"
+                        }
+                      ],
+                      [
+                        "bank",
+                        {
+                          "source": "entry.bank",
+                          "as": "u32"
+                        }
+                      ],
+                      [
+                        "controller",
+                        {
+                          "source": "entry.controller_index",
+                          "as": "u32"
+                        }
+                      ],
+                      [
+                        "fifo",
+                        {
+                          "source": "entry.fifo",
+                          "as": "u32"
+                        }
+                      ],
+                      [
+                        "match_index",
+                        {
+                          "source": "entry.match_index",
+                          "as": "u32"
+                        }
+                      ],
+                      [
+                        "remote",
+                        {
+                          "source": "entry.remote",
+                          "as": "bool"
+                        }
+                      ],
+                      [
+                        "match_remote",
+                        {
+                          "source": "entry.match_remote",
+                          "as": "bool"
+                        }
+                      ]
+                    ]
+                  }
+                }
+              },
+              "enabled": {
+                "source": "selected.has_filters",
+                "as": "bool"
+              },
+              "count": {
+                "source": "selected.filter_count",
+                "as": "u32"
+              }
+            },
+            {
+              "role": "can_domain",
+              "type": "nx_can_filter_domain_t",
+              "const": false,
+              "value": {
+                "record": [
+                  [
+                    "filters",
+                    {
+                      "optional": "selected.filters_present",
+                      "value": {
+                        "ref": "can_filters",
+                        "as": "symbol"
+                      },
+                      "default": null
+                    }
+                  ],
+                  [
+                    "filter_count",
+                    {
+                      "source": "selected.filter_count",
+                      "as": "u32"
+                    }
+                  ],
+                  [
+                    "split",
+                    {
+                      "source": "selected.can_split",
+                      "as": "u32"
+                    }
+                  ]
+                ]
+              },
+              "enabled": {
+                "source": "selected.has_can",
+                "as": "bool"
+              }
+            }
+          ]
+        },
+        "can_close": {
+          "symbols": {
+            "can_domain": "s_nx_can_domain",
+            "can_close": "nx_platform_can_close"
+          },
+          "declarations": [],
+          "sequences": [
+            {
+              "role": "can_close",
+              "sequence": [
+                {
+                  "function": "nx_stm32f1_connectivity_can_domain_close",
+                  "args": [
+                    {
+                      "ref": "can_domain",
+                      "as": "address"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "calls": {
+        "system_start": "nx_stm32f1_platform_system_start",
+        "resources_acquire": "nx_stm32f1_platform_no_resources",
+        "resources_resume": "nx_stm32f1_platform_no_resources",
+        "resources_release": "nx_stm32f1_platform_no_resources",
+        "system_release": "nx_stm32f1_platform_system_release",
+        "resources_release_can": "nx_platform_can_close"
+      },
+      "config_symbol": "s_nx_platform_lifecycle_config",
+      "power": {
+        "suspend": "nx_stm32f1_stop_wake_suspend",
+        "resume": "nx_stm32f1_stop_wake_resume",
+        "retain_on_failed_resume": true
+      }
+    }
+  }
+}

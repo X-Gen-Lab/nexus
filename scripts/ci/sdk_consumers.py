@@ -12,8 +12,8 @@ import tomllib
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 from tools.dev.change_paths import changed_paths, path_role
-from tools.maintenance.consumer_profiles import (SERVICE_CONSUMERS,
-                                                 service_directory)
+from tools.maintenance.consumer_profiles import (FULL_CONSUMER_PACKAGES,
+                                                 SERVICE_CONSUMERS, service_directory)
 from tools.maintenance.source_catalogue import ALL_SOURCE_DEPENDENCIES
 
 # These suppliers are selected by consumer CMake helpers or provider modes.
@@ -71,11 +71,19 @@ def verify_checkout(root, head, changes, output, *, allow_network=False, run=sub
         directory = Path(temporary)
         exported, relocated = directory / "export", directory / "relocated sdk"
         python = sys.executable
-        run([python, "-B", "tools/dev/dependencies.py", "prepare", "--scope", "sdk",
-             *profile, "--report", str(directory / "dependencies.json"),
-             *(["--allow-network"] if allow_network else [])], cwd=root, check=True)
+        prepare = [python, "-B", "tools/dev/dependencies.py", "prepare", "--scope", "sdk"]
+        network = ["--allow-network"] if allow_network else []
+        run([*prepare, *profile, "--report", str(directory / "dependencies.json"),
+             *network], cwd=root, check=True)
+        package_options = []
+        if not minimal:
+            run([*prepare, "--family", "stm32f1", "--backend", "baremetal",
+                 "--report", str(directory / "dependencies-stm32f1.json"),
+                 *network], cwd=root, check=True)
+            for package in FULL_CONSUMER_PACKAGES:
+                package_options.extend(("--package", package))
         run([python, "-B", "cmake/package/package_source_sdk.py", "--source", str(root),
-             "--output", str(exported), *profile], cwd=root, check=True)
+             "--output", str(exported), *profile, *package_options], cwd=root, check=True)
         exported.rename(relocated)
         identity = json.loads((relocated / "share/nexus/src/.nexus-source-sdk.json").read_bytes())
         if (identity.get("source_revision") != head or identity.get("source_dirty") is not False

@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "bindings": [
+    {
+      "kind": "rtc",
+      "mode": "backup-adopt",
+      "implementation": "rtc",
+      "static_recipe": {
+        "state_type": "nx_stm32f1_rtc_t",
+        "ops": "nx_stm32f1_rtc_backup_ops",
+        "declarations": [],
+        "calls": {
+          "admit": [],
+          "prepare": {
+            "function": "nx_stm32f1_rtc_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32f1_rtc_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "retain_on_failed_init": true
+      },
+      "headers": [
+        "drivers/rtc/instance.h"
+      ]
+    },
+    {
+      "kind": "rtc",
+      "mode": "backup-provision",
+      "implementation": "rtc",
+      "static_recipe": {
+        "state_type": "nx_stm32f1_rtc_t",
+        "ops": "nx_stm32f1_rtc_backup_ops",
+        "declarations": [],
+        "calls": {
+          "admit": [],
+          "prepare": {
+            "function": "nx_stm32f1_rtc_provision",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "source": "item.options.timeout_us",
+                "as": "u32"
+              },
+              {
+                "source": "item.options.poll_limit",
+                "as": "u32"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32f1_rtc_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "retain_on_failed_init": true
+      },
+      "headers": [
+        "drivers/rtc/instance.h"
+      ]
+    }
+  ]
+}

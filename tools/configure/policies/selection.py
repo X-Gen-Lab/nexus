@@ -217,22 +217,12 @@ class SelectionPolicy:
                     any(pin.get("af") != value["alternate"] for pin in pins)):
                 fail("I2C target route differs from its reviewed alternate pads")
         elif kind == "encoder":
+            from tools.configure.timer_advanced import validate_encoder
+            validate_encoder(selection, route)
             alternate = self.data["encoder"]["controllers"].get(controller)
-            pins = route["pins"]
-            if (alternate is None or len(pins) != 2 or
-                    tuple(pin["function"] for pin in pins) != ("ti1", "ti2") or
-                    pins[0]["pin"] == pins[1]["pin"] or
-                    any(pin.get("af") != alternate for pin in pins)):
+            if (alternate is None or
+                    any(pin.get("af") != alternate for pin in route["pins"])):
                 fail("Encoder requires distinct reviewed TI1/TI2 alternate-function pads")
-            if selection.get("counting") not in {"x2-a", "x2-b", "x4"}:
-                fail("Encoder counting must select x2-a, x2-b or x4")
-            for field in ("filter_a", "filter_b"):
-                integer(selection[field], 0, 15, "Encoder " + field)
-            for field in ("invert_a", "invert_b", "exclusive"):
-                if type(selection[field]) is not bool:
-                    fail("Encoder " + field + " must be boolean")
-            if not selection["exclusive"]:
-                fail("Encoder requires an exclusive controller owner")
         elif kind == "block":
             self._block(selection, route)
         elif kind == "flash" and type(selection.get("maintenance", False)) is not bool:

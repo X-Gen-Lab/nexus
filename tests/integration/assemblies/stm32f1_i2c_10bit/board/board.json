@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "id": "stm32f103rb-i2c1-address-width-reference",
+  "soc": "STM32F103RBT6",
+  "soc_family": "stm32f1",
+  "source_revision": "UM1724 Rev17, MB1136 NUCLEO-F103RB Morpho, software test harness",
+  "physical_pcb_revision": null,
+  "clocks": {},
+  "bindings": [
+    {
+      "id": "i2c1",
+      "controller": "I2C1",
+      "route": "i2c1-pb6-pb7"
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14",
+    "PA15",
+    "PB3",
+    "PB4",
+    "PD0",
+    "PD1",
+    "PC14",
+    "PC15"
+  ],
+  "unknowns": [
+    "Exact external targets, pull-ups and waveform are not qualified."
+  ],
+  "provenance": [
+    {
+      "scope": "Official MB1136 NUCLEO-F103RB Morpho connector assignments only.",
+      "url": "https://www.st.com/resource/en/user_manual/um1724-stm32-nucleo64-boards-mb1136-stmicroelectronics.pdf",
+      "file": "um1724-stm32-nucleo64-boards-mb1136-stmicroelectronics.pdf",
+      "sha256": "576d9bee3bc32c8ee70bf0d77cf9494cec06ea7c1d9ff98eebf2738cb9314a14",
+      "pages": [
+        27,
+        40,
+        57
+      ],
+      "components": [
+        "CN7",
+        "CN10",
+        "U4",
+        "SB15"
+      ],
+      "nets": [
+        "PB6/CN10-17",
+        "PB7/CN7-21"
+      ]
+    }
+  ],
+  "backend_support": [
+    "baremetal"
+  ]
+}

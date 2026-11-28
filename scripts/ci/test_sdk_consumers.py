@@ -9,6 +9,7 @@ import tomllib
 import unittest
 
 from scripts.ci import sdk_consumers
+from tools.maintenance.consumer_profiles import consumer_plan
 
 
 class SDKChangeTests(unittest.TestCase):
@@ -42,6 +43,18 @@ class SDKChangeTests(unittest.TestCase):
         for name in ("future/new.build", "tests/behavior/future.generator"):
             with self.subTest(path=name):
                 self.assertEqual(sdk_consumers.sdk_changes([*behavior, name]), [name])
+
+    def test_f103rb_service_admitted_only_with_its_package(self):
+        f4 = consumer_plan()
+        dual = consumer_plan(("stm32f1", "stm32f4"))
+        f1 = consumer_plan(("stm32f1",), host_support=False)
+        self.assertEqual(len(f1), 1)
+        kind, profile = f1[0]
+        self.assertEqual(kind, "services")
+        self.assertEqual(profile.name, "f103rb family")
+        self.assertEqual(profile.assembly, "f103rb-baremetal.toml")
+        self.assertTrue(profile.arm)
+        self.assertEqual(dual, f4 + f1)
 
     def test_fresh_sdk_is_moved_and_revision_checked_before_consumption(self):
         with tempfile.TemporaryDirectory() as parent:
@@ -78,8 +91,15 @@ class SDKChangeTests(unittest.TestCase):
             self.assertIn("--changed-path", actions[-1])
             self.assertIn(device[0], actions[-1])
             self.assertFalse(any("--component" in call for call in actions[:2]))
+            self.assertFalse(any("stm32f1" in call for call in actions))
             actions.clear()
             sdk_consumers.verify_checkout(root, head, None, Path(parent) / "full", run=run)
+            f1_prepare, = [call for call in actions if "--family" in call]
+            self.assertEqual(f1_prepare[f1_prepare.index("--family") + 1], "stm32f1")
+            self.assertEqual(f1_prepare[f1_prepare.index("--backend") + 1], "baremetal")
+            publisher, = [call for call in actions if "cmake/package/package_source_sdk.py" in call]
+            self.assertEqual([publisher[index + 1] for index, flag in enumerate(publisher)
+                              if flag == "--package"], ["stm32f1", "stm32f4"])
             required = {"mcuboot", "mqtt", "network", "network-loaned-rx",
                         "st-usb-device", "st-usb-host", "tls"}
             consumers = (Path(__file__).resolve().parents[2] /
@@ -90,7 +110,7 @@ class SDKChangeTests(unittest.TestCase):
                     required.update(tomllib.loads(path.read_text())["components"])
             path = consumers.parent / "mcuboot_swap/assembly.toml"
             required.update(tomllib.loads(path.read_text())["components"])
-            for call in actions[:2]:
+            for call in (call for call in actions[:3] if "--family" not in call):
                 components = {call[index + 1] for index, item in enumerate(call)
                               if item == "--component"}
                 self.assertEqual(components, required)
@@ -104,7 +124,7 @@ class SDKChangeTests(unittest.TestCase):
             actions.clear()
             sdk_consumers.verify_checkout(root, head, None,
                                          Path(parent) / "changed", run=run)
-            for call in actions[:2]:
+            for call in (call for call in actions[:3] if "--family" not in call):
                 components = {call[index + 1] for index, item in enumerate(call)
                               if item == "--component"}
                 self.assertEqual(components,

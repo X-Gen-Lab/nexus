@@ -39,7 +39,7 @@ foreach(i2c_pair_family stm32)
         nexus_google_test(${i2c_pair_target} ${i2c_pair_official}
             SOURCES "${nexus_google_root}/soc/stm32/stm32f4/i2c/i2c_pair_factory_test.cpp"
             "${i2c_pair_bundle}/bindings.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/i2c_v1_async/i2c_v1_async.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/common/i2c_v1_async/i2c_v1_async.c"
             "${NEXUS_SOC_SOURCE_${i2c_pair_soc}}/drivers/i2c/i2c_async.c"
             "${NEXUS_SOC_SOURCE_${i2c_pair_soc}}/drivers/gpio/gpio.c"
             "${NEXUS_SOC_SOURCE_${i2c_pair_soc}}/system/platform_cold.c"
@@ -49,7 +49,7 @@ foreach(i2c_pair_family stm32)
             LIBRARIES Nexus::IO Nexus::Arch
             INCLUDES "${i2c_pair_bundle}"
                 "${NEXUS_SOURCE_DIR}/tests/support/arm/stm32f4"
-                "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/i2c_v1_async"
+                "${NEXUS_SOURCE_DIR}/soc/stm32/common/i2c_v1_async"
                                 "${NEXUS_SOC_SOURCE_${i2c_pair_soc}}"
         )
         if(i2c_pair_mode STREQUAL "irq")

@@ -1,0 +1,17 @@
+schema = 2
+board_package = "provision-board"
+backend = "baremetal"
+clock = "hsi8"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+flash_load_limit_bytes = 24576
+static_ram_limit_bytes = 6144
+libc_heap_bytes = 0
+
+[rtc.backup]
+binding = "rtc0"
+mode = "backup-provision"
+timeout_us = 10000000
+poll_limit = 8000000

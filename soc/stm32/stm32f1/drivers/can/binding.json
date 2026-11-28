@@ -1,0 +1,302 @@
+{
+  "schema_version": 1,
+  "bindings": [
+    {
+      "kind": "can",
+      "mode": "classic-poll",
+      "implementation": "can",
+      "headers": [
+        "drivers/can/instance.h"
+      ],
+      "static_recipe": {
+        "state_type": "nx_stm32f1_can_t",
+        "declarations": [],
+        "calls": {
+          "admit": [
+            {
+              "function": "nx_stm32f1_can_admit",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ],
+          "prepare": {
+            "function": "nx_stm32f1_can_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32f1_can_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "retain_on_failed_init": true,
+        "ops": "nx_stm32f1_can_ops"
+      }
+    },
+    {
+      "kind": "can",
+      "mode": "classic-poll-normal",
+      "implementation": "can",
+      "headers": [
+        "drivers/can/normal.h"
+      ],
+      "static_recipe": {
+        "state_type": "nx_stm32f1_can_normal_t",
+        "declarations": [],
+        "calls": {
+          "admit": [
+            {
+              "function": "nx_stm32f1_can_normal_admit",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ],
+          "prepare": {
+            "function": "nx_stm32f1_can_normal_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32f1_can_normal_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "retain_on_failed_init": true,
+        "ops": "nx_stm32f1_can_ops"
+      }
+    },
+    {
+      "kind": "can",
+      "mode": "classic-irq",
+      "implementation": "can",
+      "static_recipe": {
+        "state_type": "nx_can_controller_t",
+        "declarations": [
+          {
+            "role": "can_events",
+            "type": "nx_can_event_t",
+            "const": false,
+            "count": {
+              "source": "item.options.event_capacity"
+            }
+          },
+          {
+            "role": "can_config",
+            "type": "nx_stm32f1_connectivity_can_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "domain",
+                  {
+                    "address": "s_nx_can_domain"
+                  }
+                ],
+                [
+                  "events",
+                  {
+                    "ref": "can_events",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "capacity",
+                  {
+                    "source": "item.options.event_capacity"
+                  }
+                ],
+                [
+                  "timing",
+                  {
+                    "record": [
+                      [
+                        "bitrate",
+                        {
+                          "source": "item.options.bitrate"
+                        }
+                      ],
+                      [
+                        "prescaler",
+                        {
+                          "source": "item.options.timing.prescaler"
+                        }
+                      ],
+                      [
+                        "segment1",
+                        {
+                          "source": "item.options.timing.segment1"
+                        }
+                      ],
+                      [
+                        "segment2",
+                        {
+                          "source": "item.options.timing.segment2"
+                        }
+                      ],
+                      [
+                        "sjw",
+                        {
+                          "source": "item.options.timing.sjw"
+                        }
+                      ]
+                    ]
+                  }
+                ],
+                [
+                  "irq_policy",
+                  {
+                    "record": [
+                      [
+                        "kernel",
+                        {
+                          "source": "selected.kernel_policy",
+                          "as": "symbol"
+                        }
+                      ],
+                      [
+                        "external_irq_count",
+                        {
+                          "source": "selected.irq_profile.external_count"
+                        }
+                      ],
+                      [
+                        "priority_bits",
+                        {
+                          "source": "selected.irq_profile.priority_bits"
+                        }
+                      ],
+                      [
+                        "syscall_ceiling",
+                        {
+                          "source": "selected.irq_profile.syscall_priority",
+                          "default": 0
+                        }
+                      ]
+                    ]
+                  }
+                ],
+                [
+                  "drain_timeout_us",
+                  {
+                    "source": "item.options.drain_timeout_us"
+                  }
+                ],
+                [
+                  "poll_limit",
+                  {
+                    "source": "item.options.poll_limit"
+                  }
+                ],
+                [
+                  "index",
+                  {
+                    "source": "selected.constants.controller_index"
+                  }
+                ],
+                [
+                  "priority",
+                  {
+                    "source": "item.options.irq.priority"
+                  }
+                ],
+                [
+                  "fifo_order",
+                  {
+                    "source": "item.options.fifo_order"
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "calls": {
+          "prepare": {
+            "function": "nx_stm32f1_connectivity_can_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "ref": "can_config",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32f1_connectivity_can_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "irq": [
+          {
+            "map": {
+              "source": "selected.vector_bindings",
+              "limit": 4,
+              "value": {
+                "name": {
+                  "source": "entry.handler",
+                  "as": "symbol"
+                },
+                "calls": [
+                  {
+                    "function": "nx_can_controller_irq",
+                    "args": [
+                      {
+                        "ref": "port",
+                        "as": "address"
+                      }
+                    ]
+                  }
+                ],
+                "barrier": "nx_arch_dsb"
+              }
+            }
+          }
+        ],
+        "retain_on_failed_init": true,
+        "ops": "nx_classic_can_ops"
+      },
+      "headers": [
+        "drivers/can/connectivity.h"
+      ]
+    }
+  ]
+}

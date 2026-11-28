@@ -88,6 +88,20 @@ class ClockSourceContractTests(unittest.TestCase):
             with self.subTest(board=board), self.assertRaises(ValueError):
                 clocks.match_board(profile, board)
 
+    def test_external_input_bypass_is_explicit_at_the_same_frequency(self):
+        from tools.configure import clocks
+        value = {"source": "hse", "input_hz": 8000000, "core_hz": 72000000}
+        profile = clocks.normalize({**value, "hse_bypass": True})
+        clocks.match_board(profile, {"hse_hz": 8000000, "hse_bypass": True})
+        for wiring in (None, False, 1):
+            board = {"hse_hz": 8000000}
+            if wiring is not None:
+                board["hse_bypass"] = wiring
+            with self.subTest(wiring=wiring), self.assertRaisesRegex(ValueError, "bypass"):
+                clocks.match_board(profile, board)
+        with self.assertRaisesRegex(ValueError, "bypass"):
+            clocks.normalize({**value, "source": "hsi", "hse_bypass": True})
+
     def test_dual_authority_unknown_source_and_noninteger_input_fail_closed(self):
         from tools.configure import clocks
         valid = {"source": "hsi", "input_hz": 64000000, "core_hz": 64000000}

@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "id": "stm32f103rb-pa0-wkup-reference",
+  "soc": "STM32F103RBT6",
+  "soc_family": "stm32f1",
+  "source_revision": "DS5319 Rev20 Table 5, standalone software reference",
+  "physical_pcb_revision": null,
+  "clocks": {},
+  "bindings": [],
+  "reserved_resources": [
+    {
+      "key": "pin:PA0",
+      "owner": "standby-pa0"
+    },
+    "PA13",
+    "PA14",
+    "PA15",
+    "PB3",
+    "PB4"
+  ],
+  "backend_support": [
+    "baremetal"
+  ],
+  "unknowns": [
+    "Connect PA0 to a separately reviewed externally biased-low WKUP circuit within the pad supply limits. No WKUP circuit, revision, voltage or actual sleep transition has been observed."
+  ],
+  "provenance": [
+    {
+      "scope": "LQFP64 pin 14, PA0 WKUP alternate use. Software reference only.",
+      "file": "stm32f103c8.pdf",
+      "url": "https://www.st.com/resource/en/datasheet/stm32f103c8.pdf",
+      "sha256": "1e54ce18e6c34c5b4a78986f26e245e143748c721009fc9af5953795c30686bc",
+      "pages": [
+        29
+      ],
+      "components": [
+        "STM32F103RBT6"
+      ],
+      "nets": [
+        "PA0-WKUP"
+      ]
+    }
+  ],
+  "hardware_options": {
+    "standby_wakeup": [
+      "pa0-wkup"
+    ]
+  }
+}

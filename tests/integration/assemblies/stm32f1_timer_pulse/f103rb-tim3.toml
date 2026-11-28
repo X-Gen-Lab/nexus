@@ -1,0 +1,27 @@
+schema = 2
+board_package = "board"
+backend = "baremetal"
+clock = "hsi8"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+flash_load_limit_bytes = 24576
+static_ram_limit_bytes = 6144
+libc_heap_bytes = 0
+
+[timer_pulse.waveform]
+binding = "pulse0"
+mode = "one-pulse"
+tick_hz = 1000000
+period_ticks = 1000
+deadtime_ticks = 0
+exclusive = true
+break_active_high = false
+idle_high = false
+idle_complement_high = false
+poll_limit = 1
+irq = { priority = 5 }
+
+[factory]
+capabilities = true

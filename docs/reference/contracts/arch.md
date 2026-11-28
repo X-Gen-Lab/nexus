@@ -190,6 +190,6 @@ restore、查询和 barrier 也分别检查，不能用同一目标内另一个�
 这些软件检查仍不测量 exclusive 重试次数、IRQ 延迟或最坏执行周期。
 
 每次验证绑定实际源码、配置、工具与产物，范围见[验证边界](../platforms/qualification.md)。
-当前生产SoC入口为F4，精确器件与模式见[支持范围](../platforms/support.md)。
+生产 SoC 包包含 STM32F4 和 STM32F1，精确器件与模式见[支持范围](../platforms/support.md)。
 通用M7 Cache和其他CPU原语按自身软件范围验证，不建立相应SoC支持。
 物理HIL为`not_executed`，编译不升级产品资格。

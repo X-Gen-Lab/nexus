@@ -113,11 +113,12 @@ ALL_DEPENDENCIES = (
     SourceDependency("stm32f1_cmsis", "vendors/st/cmsis_device_f1",
         "https://github.com/STMicroelectronics/cmsis-device-f1.git",
         "https://github.com/X-Gen-Lab/cmsis-device-f1.git",
-        "inventory", "License.md", "dependencies/stm32f1.lock.json"),
+        "runtime", "License.md", "dependencies/stm32f1.lock.json"),
     SourceDependency("stm32f1_hal", "vendors/st/stm32f1_hal",
         "https://github.com/STMicroelectronics/stm32f1xx-hal-driver.git",
         "https://github.com/X-Gen-Lab/stm32f1xx-hal-driver.git",
-        "inventory", "LICENSE.md", "dependencies/stm32f1-hal.lock.json"),
+        "runtime", "LICENSE.md", "dependencies/stm32f1-hal.lock.json",
+        paired_driver_checker="stm32f1_hal_lock"),
     SourceDependency("freertos", "ext/freertos",
         "https://github.com/FreeRTOS/FreeRTOS-Kernel.git",
         "https://github.com/X-Gen-Lab/FreeRTOS-Kernel.git",
@@ -197,7 +198,7 @@ ALL_DEPENDENCIES = (
         "https://github.com/lwip-tcpip/lwip.git",
         "https://github.com/X-Gen-Lab/lwip.git",
         "runtime", "COPYING", "dependencies/lwip.lock.json",
-        component_profiles=('network', 'network-loaned-rx')),
+        component_profiles=('network', 'network-loaned-rx', 'network-ipv4')),
     SourceDependency("mbedtls", "ext/mbedtls",
         "https://github.com/Mbed-TLS/mbedtls.git",
         "https://github.com/X-Gen-Lab/mbedtls.git",
@@ -410,7 +411,7 @@ def runtime_selection(family, *, backend, components=(), test_support=False,
             any(not isinstance(value, str) for value in components) or
             len(set(components)) != len(components) or
             not set(components).issubset(COMPONENTS | {
-                "network", "network-loaned-rx", "tls", "mqtt", "mcuboot"})):
+                "network", "network-loaned-rx", "network-ipv4", "tls", "mqtt", "mcuboot"})):
         raise ValueError("Unsupported component dependency selection")
     identifiers = {identifier for _, identifier in dependencies}
     declared = {item.identifier: item for item in ALL_SOURCE_DEPENDENCIES}

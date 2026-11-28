@@ -1,0 +1,28 @@
+schema = 2
+board_package = "../../../../boards/stm32vldiscovery_mb913_c02"
+backend = "baremetal"
+clock = "hsi8"
+
+[factory]
+capabilities = true
+
+[memory]
+main_stack_bytes = 1024
+static_ram_limit_bytes = 3072
+flash_load_limit_bytes = 16384
+libc_heap_bytes = 0
+
+[gpio.user]
+binding = "user"
+mode = "input"
+active_high = true
+
+[gpio.blue]
+binding = "blue"
+mode = "output"
+active_high = true
+
+[gpio.green]
+binding = "green"
+mode = "output"
+active_high = true

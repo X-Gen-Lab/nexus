@@ -179,7 +179,8 @@ def image_window(resolved: dict) -> dict:
         raise EvidenceError("selected Flash image leaves physical Flash")
     if "kind" in selected and selected["kind"] != "image":
         raise EvidenceError("selected Flash layout is not an image")
-    from tools.configure.memory import flash_erase_boundary, flash_erase_spans
+    from tools.configure.memory import (flash_erase_boundary, flash_erase_spans,
+                                        offset_image_contract)
     spans = physical.get("erase_spans")
     if "erase_blocks" in physical:
         raise EvidenceError("invalid physical Flash erase geometry")
@@ -228,9 +229,8 @@ def image_window(resolved: dict) -> dict:
             parts = load_json(facts).get("variants", {})
         except (OSError, KeyError, TypeError, ValueError) as error:
             raise EvidenceError("image offset has no reviewed startup") from error
-        alignment = getattr(profile, "OFFSET_IMAGE_ALIGNMENT", None)
-        symbol = getattr(profile, "OFFSET_IMAGE_VECTOR_SYMBOL", None)
         part = resolved.get("part")
+        alignment, symbol = offset_image_contract(profile, part)
         if (type(alignment) is not int or alignment < 128 or
                 alignment & (alignment - 1) or
                 not isinstance(symbol, str) or not symbol or

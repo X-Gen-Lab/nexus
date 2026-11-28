@@ -112,10 +112,12 @@ nx_result_t nx_can_tx_prepare(nx_can_tx_request_t* request,
  * \brief Admit one frame within the selected provider's finite TX capacity.
  * \param[in] port: Stable immutable face and private storage.
  * \param[in,out] request: READY value request, kept alive until SETTLED.
- * \return Success means ACCEPTED, not on-wire completion; other results reject.
+ * \return Success means ACCEPTED. All other results reject the request.
  * \note Serialized privileged task owner, incoming IRQ masks clear. REJECTED
- *       retains nothing. Success requires proven on-wire completion and
- *       withdrawal of all hardware references before settlement.
+ *       retains nothing. Successful settlement requires the selected mode's
+ *       completion and withdrawal of all hardware references. Normal mode
+ *       requires on-wire completion. Internal loopback proves controller
+ *       completion inside that loop.
  */
 nx_result_t nx_can_port_submit(const nx_can_port_t* port,
                                nx_can_tx_request_t* request);

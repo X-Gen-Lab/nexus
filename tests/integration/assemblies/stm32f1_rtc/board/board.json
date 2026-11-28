@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "id": "stm32f103rb-rtc-software",
+  "soc": "STM32F103RBT6",
+  "soc_family": "stm32f1",
+  "source_revision": "F103RBT6 software reference with a nominal 32768 Hz LSE crystal and previously provisioned RTC",
+  "physical_pcb_revision": null,
+  "clocks": {
+    "lse_hz": 32768
+  },
+  "bindings": [
+    {
+      "id": "rtc0",
+      "controller": "RTC",
+      "route": "rtc-lse-crystal-backup"
+    },
+    {
+      "id": "pvd",
+      "controller": "PVD",
+      "route": "pvd-level"
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14",
+    "PA15",
+    "PB3",
+    "PB4",
+    "PD0",
+    "PD1"
+  ],
+  "unknowns": [
+    "Physical PCB revision, the fitted oscillator, backup supply and retained configuration have not been observed.",
+    "This software reference assumes a running LSE crystal and a previously configured RTC; it supplies no provisioning."
+  ],
+  "provenance": [
+    {
+      "scope": "RTC backup domain and crystal route. This entry declares software reference conditions only.",
+      "url": "https://www.st.com/resource/en/reference_manual/rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32-bit-mcus-stmicroelectronics.pdf"
+    }
+  ],
+  "backend_support": [
+    "baremetal"
+  ]
+}

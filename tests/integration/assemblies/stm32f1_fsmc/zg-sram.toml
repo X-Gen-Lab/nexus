@@ -1,0 +1,22 @@
+schema = 2
+board_package = "board"
+backend = "baremetal"
+clock = "hsi8"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+flash_load_limit_bytes = 24576
+static_ram_limit_bytes = 6144
+libc_heap_bytes = 0
+
+[external_bus.banked]
+binding = "fsmc0"
+mode = "async16"
+
+[memory_window.work_sram]
+controller = "banked"
+binding = "sram0"
+mode = "cpu-window"
+read_timing = { address_setup = 1, address_hold = 1, data_setup = 3, bus_turn = 1 }
+write_timing = { address_setup = 1, address_hold = 1, data_setup = 3, bus_turn = 1 }

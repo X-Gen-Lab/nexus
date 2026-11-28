@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "id": "stm32f103rb-hse8-crystal-software",
+  "soc": "STM32F103RBT6",
+  "soc_family": "stm32f1",
+  "source_revision": "DS5319 Rev20 Tables 5 and 22, Figure 24, LQFP64 8 MHz quartz software reference",
+  "physical_pcb_revision": null,
+  "clocks": {
+    "hse_hz": 8000000,
+    "hse_bypass": false
+  },
+  "bindings": [
+    {
+      "id": "led0",
+      "controller": "GPIOA",
+      "route": "gpio-pa5",
+      "initial": 0,
+      "mask": 32,
+      "electrical": {
+        "mode": "output",
+        "initial": 0
+      }
+    },
+    {
+      "id": "uart2",
+      "controller": "USART2",
+      "route": "usart2-pa2-pa3"
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14",
+    "PA15",
+    "PB3",
+    "PB4",
+    "PC14",
+    "PC15"
+  ],
+  "unknowns": [
+    "The GPIO output and serial routes are software test inputs. No physical PCB or connected loads are claimed.",
+    "PD0/OSC_IN and PD1/OSC_OUT require a populated 8 MHz quartz and matched load network. Startup and physical frequency remain unverified."
+  ],
+  "provenance": [
+    "https://www.st.com/resource/en/datasheet/stm32f103rb.pdf"
+  ],
+  "backend_support": [
+    "baremetal"
+  ]
+}

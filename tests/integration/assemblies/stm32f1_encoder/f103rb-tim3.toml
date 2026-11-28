@@ -1,0 +1,24 @@
+schema = 2
+board_package = "board"
+backend = "baremetal"
+clock = "hsi8"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+flash_load_limit_bytes = 24576
+static_ram_limit_bytes = 6144
+libc_heap_bytes = 0
+
+[encoder.position]
+binding = "position"
+mode = "quadrature"
+counting = "x4"
+filter_a = 3
+filter_b = 3
+invert_a = false
+invert_b = false
+exclusive = true
+
+[factory]
+capabilities = true

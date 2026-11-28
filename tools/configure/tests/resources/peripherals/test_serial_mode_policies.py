@@ -64,11 +64,17 @@ class SerialModePolicies(unittest.TestCase):
         facts = SimpleNamespace(vector="ADV", irq=8)
         timer = SimpleNamespace(binding=lambda kind, controller:
                                 facts if kind == "advanced_pwm" else None)
+        route = {"kind": "pwm_group", "controller": "TIMER_A"}
+        waveform = SimpleNamespace(KINDS={"pwm_group"},
+                                   controllers={"TIMER_A": {}})
         selected = SimpleNamespace(PREFIX="unrelated", TIMER_ADVANCED=timer,
-                                   WAVEFORM=SimpleNamespace(KINDS={"pwm_group"}))
+                                   WAVEFORM=waveform)
         self.assertEqual(timer_advanced.selected_hardware(
-            {"kind": "pwm_group", "controller": "TIMER_A"},
-            {"kind": "counter", "irq": []}, selected)["irq"], ["ADV"])
+            route, {"kind": "counter", "irq": []}, selected)["irq"], ["ADV"])
+        waveform.controllers["TIMER_A"]["controller_irq"] = True
+        hardware = {"kind": "counter", "irq": ["DEDICATED"], "irq_numbers": [9]}
+        self.assertIs(timer_advanced.selected_hardware(route, hardware, selected),
+                      hardware)
 
     def test_policy_rejects_unknown_serial_facts(self):
         path = ROOT / "soc/stm32/stm32f4/private/bindings/selection_policy.json"

@@ -215,8 +215,8 @@ def load_hardware(package, *, read=None, pinmux=None):
 
     bindings_document = document("bindings")
     if pinmux is None:
-        from tools.configure.pinmux import NumericPinMuxPolicy
-        pinmux = NumericPinMuxPolicy.from_validated(bindings_document.get("pinmux_policy"))
+        from tools.configure.pinmux import load_pinmux_policy
+        pinmux = load_pinmux_policy(bindings_document.get("pinmux_policy"))
     if "hardware" not in bindings_document:
         empty = MappingProxyType({})
         return HardwareFacts(empty, empty, empty, empty, empty, empty, empty,

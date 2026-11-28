@@ -17,9 +17,11 @@ class EthernetPolicy:
     clock_hz: int
     pins: tuple
     resources: tuple
-    alternate: int
+    alternate: int | None
     memory_region: str
     mii_pins: tuple = ()
+    modes: tuple[str, ...] = ("raw-rmii", "raw-mii")
+    interrupt: str | None = None
 
 
 FIELDS = {"tx_count", "rx_count", "rx_storage_bytes", "address",
@@ -34,16 +36,20 @@ def validate_soc(soc, provider):
     hardware = getattr(provider, "ETHERNET", None)
     expected = hardware.controller if hardware is not None else None
     if actual != {expected}:
-        fail("Ethernet controller differs from the reviewed RMII implementation")
+        fail("Ethernet controller differs from its reviewed implementation")
     item = soc["controllers"][expected]
+    vector = hardware.interrupt or expected
+    numbers = item.get("irq_numbers")
+    if isinstance(numbers, dict):
+        numbers = [numbers.get(vector)] if set(numbers) == {vector} else None
     pins = list(dict.fromkeys(pin for pin, _ in
                              hardware.pins + hardware.mii_pins))
-    if (item["modes"] != ["raw-rmii", "raw-mii"] or item["irq"] != [expected] or
-            item.get("irq_numbers") != [hardware.irq] or
+    if (item["modes"] != list(hardware.modes) or item["irq"] != [vector] or
+            numbers != [hardware.irq] or
             type(item.get("clock_hz")) is not int or item["clock_hz"] != hardware.clock_hz or
             item["pins"] != pins or
             item.get("resources") != list(hardware.resources)):
-        fail("Ethernet RMII IRQ, HCLK, pins or lease facts differ from the SDK")
+        fail("Ethernet IRQ, HCLK, pins or lease facts differ from the SDK")
 
 
 def validate_selection(selection, route, provider, ram_size):
@@ -80,8 +86,8 @@ def validate_selection(selection, route, provider, ram_size):
     if (hardware is None or route["controller"] != hardware.controller or
             [(pin["pin"], pin["function"]) for pin in route["pins"]]
             != list(pins) or
-            any(pin["af"] != hardware.alternate for pin in route["pins"])):
-        fail("Ethernet requires its exact reviewed AF11 MII or RMII pad route")
+            any(pin.get("af") != hardware.alternate for pin in route["pins"])):
+        fail("Ethernet requires its exact reviewed MII or RMII pad route")
 
 
 def resolve_counter_domains(controllers):

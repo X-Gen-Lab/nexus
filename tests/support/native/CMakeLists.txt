@@ -36,9 +36,10 @@ target_include_directories(
 )
 set(native_ip "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip")
 set(native_ip_includes
-    "${native_ip}/classic_can"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/common/bxcan"
     "${native_ip}/legacy_mac"
-    "${native_ip}/dwc_otg_device"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/common/dwmac"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/common/dwc_otg_device"
 )
 add_library(nexus_native_startup_usage INTERFACE)
 target_include_directories(
@@ -56,7 +57,7 @@ target_include_directories(nexus_io_native PRIVATE ${native_ip_includes})
 add_library(
     nexus_can_native_engine
     OBJECT
-    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/classic_can/can_controller.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/common/bxcan/can_controller.c"
 )
 target_include_directories(
     nexus_can_native_engine
@@ -83,7 +84,7 @@ target_sources(
 add_library(
     nexus_eth_native_engine
     OBJECT
-    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/common/dwmac/eth_mac.c"
 )
 target_include_directories(
     nexus_eth_native_engine
@@ -134,7 +135,7 @@ target_sources(
 add_library(
     nexus_usb_native_engine
     OBJECT
-    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/dwc_otg_device/usb_device_controller.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/common/dwc_otg_device/usb_device_controller.c"
 )
 target_include_directories(
     nexus_usb_native_engine

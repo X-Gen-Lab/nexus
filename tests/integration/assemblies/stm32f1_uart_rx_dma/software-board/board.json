@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "id": "stm32f103rb-usart2-rx-dma-reference",
+  "soc": "STM32F103RBT6",
+  "soc_family": "stm32f1",
+  "source_revision": "software-reference-v1",
+  "physical_pcb_revision": null,
+  "clocks": {},
+  "bindings": [
+    {
+      "id": "uart2_rx",
+      "controller": "USART2",
+      "route": "usart2-pa3-rx"
+    }
+  ],
+  "reserved_resources": [],
+  "unknowns": [
+    "PA3 is the exact software reference input. External transmitter tolerance, traffic and idle framing are not qualified."
+  ],
+  "provenance": [
+    "https://www.st.com/resource/en/reference_manual/rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf",
+    "https://www.st.com/resource/en/errata_sheet/es096-stm32f101x8b-stm32f102x8b-and-stm32f103x8b-mediumdensity-device-limitations-stmicroelectronics.pdf"
+  ],
+  "backend_support": [
+    "baremetal"
+  ]
+}

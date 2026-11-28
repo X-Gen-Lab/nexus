@@ -1,7 +1,7 @@
-"""Link the actual locked ThreadX kernel on two F4 Boards and two IRQ policies.
+"""Link the locked ThreadX kernel on reviewed Cortex-M3 and Cortex-M4 Boards.
 
-Four positive ELF/resource checks and a precise missing external-Tick rejection
-are software evidence. They never establish physical execution, IRQ/FPU timing,
+ELF/resource checks and a precise missing external-Tick rejection are software
+evidence. They never establish physical execution, IRQ/FPU timing,
 stack peaks, an installed SDK or a complete clean product qualification.
 """
 from __future__ import annotations
@@ -16,6 +16,8 @@ import sys
 
 import arch_compile as compiler_gate
 
+from tools.measurement.elf import Elf32
+
 REQUIRED_SYMBOLS = frozenset({
     'PendSV_Handler', '__tx_PendSVHandler', 'SysTick_Handler',
     '_tx_timer_interrupt', '_tx_thread_schedule', 'nx_os_run',
@@ -26,10 +28,14 @@ REQUIRED_SYMBOLS = frozenset({
 
 def matrix():
     rows = [{'name': board + '-' + mask, 'board': board, 'mask': mask,
-             'rejection': False} for board in ('qiming', 'sky')
+             'port': 'cortex_m4', 'rejection': False} for board in ('qiming', 'sky')
             for mask in ('basepri', 'primask')]
-    rows.append({'name': 'qiming-external-missing', 'board': 'qiming',
-                 'mask': 'basepri', 'rejection': True})
+    rows.extend((
+        {'name': 'qiming-external-missing', 'board': 'qiming', 'mask': 'basepri',
+         'port': 'cortex_m4', 'rejection': True},
+        {'name': 'f103rb-basepri', 'board': 'f103rb', 'mask': 'basepri',
+         'port': 'cortex_m3', 'rejection': False},
+    ))
     return tuple(rows)
 
 
@@ -43,13 +49,19 @@ def output_path(output):
 
 
 def write_inputs(root, directory, row):
+    directory.mkdir(parents=True, exist_ok=True)
+    assembly = directory / 'assembly.toml'
+    if row['port'] == 'cortex_m3':
+        fixture = root / 'tests/integration/kernels/os_threadx_runtime'
+        package = 'f103rb-threadx-board'
+        shutil.copytree(fixture / package, directory / package)
+        shutil.copyfile(fixture / 'f103rb-threadx.toml', assembly)
+        return assembly
     source = root / 'tools/configure/assemblies' / (
         row['board'] + '-freertos-empty.toml')
     text = source.read_text(encoding='utf-8')
     if text.count('backend = "freertos"') != 1 or '[os]' in text:
         raise ValueError('Reviewed empty assembly has unexpected policy')
-    directory.mkdir(parents=True, exist_ok=True)
-    assembly = directory / 'assembly.toml'
     text = text.replace('backend = "freertos"', 'backend = "threadx"')
     text += '\n[os]\ninterrupt_mask = ' + json.dumps(row['mask']) + '\n'
     if row['rejection']:
@@ -109,6 +121,29 @@ def check_tick_entry(text):
         raise ValueError('ThreadX SysTick must call the kernel then final DSB before return')
 
 
+def check_cm3_context(elf, stack, restore):
+    """Verify linked IRQ owners, ABI and alignment of the hardware frame."""
+    vectors = next((section for section in elf.sections
+                    if section['name'] == '.isr_vector'), None)
+    if vectors is None or vectors['size'] < 55 * 4:
+        raise ValueError('F103 ThreadX vector table is incomplete')
+    for index, name in ((0, '__nx_msp_end'), (14, 'PendSV_Handler'),
+                        (15, 'SysTick_Handler'), (44, 'TIM2_IRQHandler'),
+                        (54, 'USART2_IRQHandler')):
+        value, = elf.unpack('<I', vectors['offset'] + index * 4)
+        if value != elf.symbol(name) or (index == 0 and value % 8):
+            raise ValueError('F103 ThreadX vector ownership or MSP alignment differs')
+    construction = (r'\bbic\.w\s+r2, r2, #7\b', r'\bsub\.w\s+r2, r2, #68\b')
+    # Restoring EXC_RETURN and R4-R11 consumes 36 bytes of the 68-byte frame.
+    # PSP then points at the eight-byte-aligned hardware frame.
+    resumption = (r'\bldr\.w\s+lr, \[ip\], #4',
+                  r'\bldmia\.w\s+ip!, \{r4, r5, r6, r7, r8, r9, sl, fp\}',
+                  r'\bmsr\s+PSP, ip', r'\bbx\s+lr')
+    if (re.search('.*?'.join(construction), stack, re.S) is None or
+            re.search('.*?'.join(resumption), restore, re.S) is None):
+        raise ValueError('F103 ThreadX initial or restored stack frame differs')
+
+
 def source_inputs(root):
     paths = set()
     for layer in ('core', 'arch', 'io', 'os', 'soc', 'drivers', 'boards', 'tools/configure',
@@ -120,7 +155,7 @@ def source_inputs(root):
                       path.name == 'CMakeLists.txt'))
     for name in ('CMakeLists.txt', 'dependencies/threadx.lock.json',
                  'dependencies/platform-compatibility.json',
-                 'tools/maintenance/threadx_lock.py',
+                 'tools/maintenance/threadx_lock.py', 'tools/measurement/elf.py',
                  'cmake/platform/Configure.cmake', 'cmake/platform/Options.cmake',
                  'cmake/platform/Firmware.cmake', 'cmake/platform/TargetPolicy.cmake',
                  'cmake/platform/SDK.cmake', 'cmake/toolchains/arm-gcc.cmake',
@@ -133,7 +168,7 @@ def source_inputs(root):
 def compiled_kernel(root, build, row, resolved):
     lock = json.loads((root / 'dependencies/threadx.lock.json').read_text())
     expected = {str(root / 'ext/threadx' / path)
-                for path in lock['common'] + lock['ports']['cortex_m4']}
+                for path in lock['common'] + lock['ports'][row['port']]}
     database = json.loads((build / 'compile_commands.json').read_text())
     actual = []
     objects = []
@@ -201,8 +236,24 @@ def execute_variant(root, recorder, tools, row):
     resolved_path = build / 'nexus/generated/resolved.json'
     resolved = json.loads(resolved_path.read_text())
     if (resolved['backend'] != 'threadx' or
-            resolved['kernel_profile']['interrupt_mask'] != row['mask']):
+            resolved['kernel_profile']['interrupt_mask'] != row['mask'] or
+            resolved['kernel_profile']['kernel_port'] != row['port'] + '/gnu'):
         raise ValueError('Actual resolution differs from authored ThreadX policy')
+    if row['port'] == 'cortex_m3':
+        image = Elf32(elf.read_bytes(), float_abi='soft')
+        stack = recorder.execute(
+            [tools['objdump'], '-d', '--disassemble=_tx_thread_stack_build', str(elf)],
+            row['name'] + '-stack-entry', nonempty=True)
+        owners = [symbol['value'] for symbol in image.defined_symbols
+                  if symbol['name'] == '__tx_ts_restore']
+        if len(owners) != 1:
+            raise ValueError('Expected one official Cortex-M3 context restore')
+        address = owners[0]
+        restore = recorder.execute(
+            [tools['objdump'], '-d', '--start-address=' + str(address),
+             '--stop-address=' + str(address + 48), str(elf)],
+            row['name'] + '-context-restore', nonempty=True)
+        check_cm3_context(image, stack, restore)
     objects = compiled_kernel(root, build, row, resolved)
     return {**row, 'status': 'arm_link_passed', 'physical_status': 'not_executed',
             'assembly': compiler_gate.digest(assembly), 'elf': compiler_gate.digest(elf),

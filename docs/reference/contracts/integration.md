@@ -60,15 +60,18 @@ controller groups；物理事实与软件模式分开。`facts/devices.json` 记
 IRQ enum／number／handler。型号、封装、Flash、SRAM 域和 IRQ 表不能被家族字符串
 代替，厂商编译目录不扩大运行时模式支持。
 
-当前生产 SoC 入口只有 `soc/stm32/stm32f4/`；领域 binding、实例布局与实现相邻，
-私有共享 IP 位于其 `drivers/ip/`，跨域共享合同与片段保留在 `private/`。
+当前生产 SoC 包位于 `soc/stm32/stm32f4/` 和 `soc/stm32/stm32f1/`。
+领域 binding、实例布局与实现相邻。系列内部共享实现留在所属包内。跨系列只复用
+经核验的 IP 机制。`soc/stm32/common/` 当前包含 bxCAN 过滤和控制器引擎、
+DWC OTG Device／Host 传输和 DWMAC MAC 机制。各系列仍负责精确路由、时钟、
+IRQ 绑定和生命周期装配。
 Board／SoC 不放 Python 插件；声明式 package 由 `tools/configure/` 的通用
 DataProvider、领域政策、typed IR 与有限静态节点解析，不再加载家族 Python
 构造模块。顶层 `pads` 统一显式坐标；字段与同一快照合同见
 [接入指南](../../guides/provider-porting.md)。Native 仅在
 `tests/support/native/`，必须显式启用测试 scope；不会进入生产支持枚举。
 CPU 实现按 ISA 位于 `arch/arm/cortex_m/` 或 `arch/native/`，公共头路径保持稳定。
-默认生成入口连接 Core 的手写 C 整平台生命周期和 F4 的 System／共享资源 C 协调器。
+默认生成入口连接 Core 的手写 C 整平台生命周期和所选包的 System／共享资源 C 协调器。
 主机保留事实校验与有限静态连接，不维护寄存器级硬件算法或驱动状态机；固定生命周期
 调用与通用错误传播仍由 typed 节点连接，只维护一套配置实现。实际生成 factory、
 C 模型与 ARM 镜像分别验收，不能用目录调整或源码存在

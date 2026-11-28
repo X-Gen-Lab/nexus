@@ -7,7 +7,7 @@ from types import MappingProxyType, SimpleNamespace
 import unittest
 
 from tools.configure.ir import (EndpointIR, IrqOptions, PadBindingIR,
-    UsbDeviceOptions, UsbEndpointOptions, UsbHostOptions, UsbOtgPowerOptions,
+    UsbDeviceOptions, UsbFifoEndpointOptions, UsbHostOptions, UsbOtgPowerOptions,
     EthernetOptions, EthernetFramesOptions)
 from tools.configure.policies.packet import PacketPolicy
 from tools.configure.generation.static_fragments import StaticFragments
@@ -96,7 +96,7 @@ class PacketStaticRecipesTests(unittest.TestCase):
     def test_device_modes_preserve_selected_dma_remote_and_managed_storage(self):
         irq = IrqOptions(5, False)
         child = EndpointIR("control-out", "usb", "usb-fs-endpoint", "usb_device",
-            UsbEndpointOptions(0, 0, "out", "control", 64, 0, 0), ())
+            UsbFifoEndpointOptions(0, 0, "out", "control", 64, 0, 0), ())
         for mode in ("device-fs", "device-hs-fs", "device-hs-ulpi",
                      "otg-fs", "otg-hs-fs", "otg-hs-ulpi"):
             managed = mode.startswith("otg-")
@@ -152,7 +152,7 @@ class PacketStaticRecipesTests(unittest.TestCase):
 
     def test_default_pio_device_has_no_remote_or_dma_runtime_storage(self):
         child = EndpointIR("control-out", "usb", "usb-fs-endpoint", "usb_device",
-            UsbEndpointOptions(0, 0, "out", "control", 64, 0, 0), ())
+            UsbFifoEndpointOptions(0, 0, "out", "control", 64, 0, 0), ())
         options = UsbDeviceOptions(8, 96, False, 100, 1000, 5000, IrqOptions(5, False))
         _, source = self.build(Selected("usb", "usb_device", "device-fs", "OTG_FS", options),
                                (child,))

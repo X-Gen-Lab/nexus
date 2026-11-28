@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "id": "stm32f103zg-dac-software",
+  "soc": "STM32F103ZGT6",
+  "soc_family": "stm32f1",
+  "source_revision": "DS6558 Rev4 Table 5 and Table 66 and RM0008, exact PA4 DAC_OUT1 software reference",
+  "physical_pcb_revision": null,
+  "clocks": {},
+  "bindings": [
+    {
+      "id": "dac1",
+      "controller": "DAC",
+      "route": "dac-pa4-ch1"
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14",
+    "PA15",
+    "PB3",
+    "PB4",
+    "PD0",
+    "PD1",
+    "PC14",
+    "PC15"
+  ],
+  "unknowns": [
+    "Software reference. Analog reference supply, load, wiring and timing are unobserved."
+  ],
+  "provenance": [
+    "https://www.st.com/resource/en/datasheet/stm32f103zg.pdf"
+  ],
+  "backend_support": [
+    "baremetal"
+  ]
+}

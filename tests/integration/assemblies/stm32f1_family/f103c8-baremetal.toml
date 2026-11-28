@@ -1,0 +1,44 @@
+# Bonded package and image capacity fixture without a physical Board claim.
+schema = 2
+board_package = "c8-board"
+backend = "baremetal"
+clock = "hsi8"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+flash_load_limit_bytes = 24576
+static_ram_limit_bytes = 6144
+libc_heap_bytes = 0
+
+[gpio.status]
+binding = "led0"
+mode = "output"
+active_high = true
+speed = "low"
+
+[gpio.sense]
+binding = "sense0"
+mode = "input"
+active_high = true
+pull = "up"
+
+[uart.console]
+binding = "uart2"
+mode = "irq"
+baud = 115200
+
+[uart.console.rx]
+format = "bytes"
+capacity = 32
+
+[uart.console.irq]
+priority = 5
+calls_os = false
+
+[crc.integrity]
+binding = "crc0"
+mode = "crc32-words"
+
+[factory]
+capabilities = true

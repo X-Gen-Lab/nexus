@@ -8,9 +8,9 @@ source_language: zh_CN
 (development.source-map)=
 # 当前源码与维护边界
 
-本页定位当前实现，不复制各目录的完整合同。生产 MCU 入口只有 STM32F4，精确
-器件与模式以[支持范围](../reference/platforms/support.md)为准；F407 Board 与新增料号的软件
-参考分别说明。其他 SDK 原位保留，目录、实现、执行记录和物理资格不相互替代。
+本页定位当前实现。生产 MCU 包包含 STM32F4 和 STM32F1，精确器件与模式以
+[支持范围](../reference/platforms/support.md)为准。板卡与软件参考分别声明装配。
+其他 SDK 原位保留，执行记录与物理资格单独维护。
 
 ```text
 core/
@@ -25,6 +25,7 @@ soc/stm32/stm32f4/
   drivers/ip/
   private/
   sdk/
+soc/stm32/stm32f1/
 boards/
 components/{algorithms,control,runtime,buses,devices,services,protocols,ui}/
 os/{baremetal,freertos,threadx,native}/

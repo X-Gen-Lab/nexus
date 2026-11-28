@@ -8,6 +8,7 @@ import unittest
 from unittest.mock import patch
 
 from tools.configure import configure as gate
+from tools.configure.generation.emission import resolved_projection
 from tools.configure.tests.f4_fixture import copy_package, load_f4_fixture
 from tools.configure.tests.device_fixture import load_authored_soc
 
@@ -90,6 +91,54 @@ class DeviceCatalogConfigurationTests(unittest.TestCase):
         self.assertNotEqual(before_inputs[CATALOG], after_inputs[CATALOG])
         self.assertEqual(after_inputs[CATALOG], hashlib.sha256(
             (self.root / CATALOG).read_bytes()).hexdigest())
+
+    def test_startup_tail_projects_raw_words_without_extending_nvic(self):
+        baseline = self.resolve()
+        self.assertNotIn("startup_vector_tail", resolved_projection(baseline))
+
+        def declare(catalog):
+            selected = next(item for item in catalog["devices"]
+                            if item["define"] == "STM32F407xx")
+            selected["startup_vector_tail"] = [0, 0xF108F85F]
+
+        self.update(CATALOG, declare)
+        result = self.resolve()
+        self.assertEqual(result.physical_part.device.startup_vector_tail, (0, 0xF108F85F))
+        self.assertEqual(resolved_projection(result)["startup_vector_tail"], [0, 0xF108F85F])
+        self.assertEqual(result.irq.external_count, baseline.irq.external_count)
+
+    def test_mpu_override_applies_only_to_the_selected_catalog_device(self):
+        before = self.resolve()
+        self.assertEqual(before.cpu_profile.definitions["NEXUS_ARCH_MPU_VERSION"], 7)
+
+        def declare(soc):
+            selected = soc["variants"]["STM32F407VET6"]["device"]
+            soc["device_profiles"][selected]["cpu_features"] = {
+                "mpu_version": 0, "mpu_regions": 0}
+
+        self.update(SOC, declare)
+        after = self.resolve()
+        self.assertEqual(after.cpu_profile.definitions["NEXUS_ARCH_MPU_VERSION"], 0)
+        self.assertEqual(after.cpu_profile.definitions["NEXUS_CPU_MPU_REGIONS"], 0)
+        self.assertEqual(after.cpu_profile.compile_options, before.cpu_profile.compile_options)
+
+        raw = load_authored_soc(self.root / SOC)
+        other = next(part for part, variant in raw["variants"].items()
+                     if variant["device"] != raw["variants"]["STM32F407VET6"]["device"])
+        resolved = gate.catalog_soc_facts(raw, other, gate.load(self.root / CATALOG))
+        self.assertEqual(resolved.soc["cpu"]["mpu_version"], 7)
+        self.assertEqual(resolved.soc["cpu"]["mpu_regions"], 8)
+
+    def test_invalid_unselected_cpu_profile_is_rejected(self):
+        def declare(soc):
+            selected = soc["variants"]["STM32F407VET6"]["device"]
+            other = next(device for device in soc["device_profiles"] if device != selected)
+            soc["device_profiles"][other]["cpu_features"] = {
+                "mpu_version": 7, "mpu_regions": 3}
+
+        self.update(SOC, declare)
+        with self.assertRaisesRegex(gate.ConfigurationError, "MPU region count"):
+            self.resolve()
 
     def test_normalized_irq_requires_the_same_selected_catalog_record(self):
         raw = load_authored_soc(self.root / SOC)

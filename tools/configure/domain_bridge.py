@@ -56,6 +56,10 @@ class DomainBridge:
         clock = self._clock()
         if clock is None:
             common.fail("Selected package declares no timer clock domain")
+        if isinstance(clock, clocks.FixedProfilePolicy):
+            domain = self.soc["controllers"].get(controller, {}).get("clock_domain")
+            if domain in {"apb1_timer", "apb2_timer"}:
+                return domain
         return clock.timer_domain(controller)
 
     def controller_clock_domain(self, plan, controller):
@@ -114,6 +118,9 @@ class DomainBridge:
             domains.WAVEFORM.validate(selection, route)
         if domains.SELECTION is not None:
             domains.SELECTION.validate(selection, route, self.hardware_facts)
+        elif kind == "encoder":
+            from tools.configure.timer_advanced import validate_encoder
+            validate_encoder(selection, route)
 
     def validate_mode_context(self, selection, route, *, backend, clock_profile,
                               part=None, clock_plan=None, kernel_profile=None):
@@ -130,13 +137,28 @@ class DomainBridge:
                 kernel_profile=kernel_profile)
 
     def validate_dma_resource(self, resource):
+        fixed = self.FIXED_CHANNEL_DMA
+        if fixed is not None:
+            lane = fixed.channel(resource)
+            return lane.engine, lane.lane, None
         return common.validate_dma_resource(resource, self.DMA_TOPOLOGY)
 
+    def dma_physical_key(self, resource):
+        if self.FIXED_CHANNEL_DMA is None:
+            common.fail("Named DMA identities require an explicit channel topology")
+        self.FIXED_CHANNEL_DMA.channel(resource)
+        return resource
+
     def dma_irq(self, resource):
+        if self.FIXED_CHANNEL_DMA is not None:
+            return self.FIXED_CHANNEL_DMA.irq(resource)
         return common.dma_irq(resource, self.DMA_VECTOR, self.DMA_TOPOLOGY)
 
     def validate_dma(self, route, mode, normalize):
         del normalize
+        if self.FIXED_CHANNEL_DMA is not None:
+            self.FIXED_CHANNEL_DMA.validate_route(route, mode)
+            return
         kind = route["kind"]
         paths = tuple(common.route_dma(route, mode))
         traits = common.mode_traits(kind, mode)

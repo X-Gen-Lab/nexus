@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "id": "stm32f103ze-tim8-logic-reference",
+  "soc": "STM32F103ZET6",
+  "soc_family": "stm32f1",
+  "source_revision": "DS5792 Rev13 Table 5 LQFP144 logic-only reference",
+  "physical_pcb_revision": null,
+  "clocks": {},
+  "bindings": [
+    {
+      "id": "pwm0",
+      "controller": "TIM8",
+      "route": "tim8-pc6-pa7-pa6"
+    }
+  ],
+  "reserved_resources": [],
+  "backend_support": [
+    "baremetal"
+  ],
+  "provenance": [
+    "https://www.st.com/resource/en/datasheet/stm32f103ze.pdf",
+    "https://www.st.com/resource/en/reference_manual/cd00171190-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf"
+  ],
+  "unknowns": [
+    "Logic-only reference. PC6 and PA7 are inactive low. PA6 BKIN must be actively driven high to admit output enable.",
+    "No carrier, energized load, electrical signal, silicon cut, or break response latency has been observed."
+  ]
+}

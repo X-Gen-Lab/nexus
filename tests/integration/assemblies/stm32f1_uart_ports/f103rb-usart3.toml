@@ -1,0 +1,28 @@
+schema = 2
+board_package = "usart3-board"
+backend = "baremetal"
+clock = "hsi8"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+flash_load_limit_bytes = 16384
+static_ram_limit_bytes = 4096
+
+[uart.external]
+binding = "uart3"
+mode = "irq"
+baud = 57600
+rx = { format = "bytes", capacity = 16 }
+irq = { priority = 6 }
+
+[uart.console]
+binding = "uart2"
+mode = "irq"
+baud = 115200
+rx = { format = "bytes", capacity = 16 }
+irq = { priority = 5 }
+
+[factory]
+capabilities = true

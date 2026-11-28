@@ -26,7 +26,9 @@ def facts():
 
 class UsbPacketCapabilityTests(unittest.TestCase):
     def provider(self):
-        return SimpleNamespace(PREFIX="another_vendor", PACKET=PacketPolicy.from_validated(facts(), pinmux=f4_pinmux()))
+        pinmux = f4_pinmux()
+        return SimpleNamespace(PREFIX="another_vendor", PINMUX_POLICY=pinmux,
+                               PACKET=PacketPolicy.from_validated(facts(), pinmux=pinmux))
 
     @staticmethod
     def route():

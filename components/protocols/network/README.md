@@ -35,6 +35,12 @@ netif／adapter 布局。这个后端存储头依赖锁定 profile，避免最�
 FreeRTOS task 或协作主循环；全部 raw API、回调、adapter 和 timer 操作都在同一个
 不可重入上下文。不创建 OS lock、socket API 或 Netconn API。
 
+TOML 选择 `network-ipv4` 可使用同一复制适配器的最小 IPv4 配置。装配单元
+链接 `Nexus::LwIPIPv4Storage`，使用 NO_SYS、ARP／ICMP、4 KiB 静态堆和四个
+512 字节 pbuf pool。它关闭 TCP、UDP、原始 IP PCB 和 DHCP／DNS，因此初始化
+无需随机回调。该配置和其他 lwIP profile 具有独立的构建身份。F107 MB784
+软件示例展示连续帧接口如何接入这一配置。
+
 参考 profile 提供 Ethernet II、ARP、IPv4、ICMP、UDP、TCP，不启用 DHCP、DNS、
 IPv6、VLAN delivery 或 IP fragmentation／reassembly。可选 Nexus TLS／MQTT 使用
 上层 byte interface，不选 lwIP 内建 TLS／socket 集成。产品提供 address、mask、

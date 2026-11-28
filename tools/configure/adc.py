@@ -1,8 +1,33 @@
 """Selected ADC sequence policy and graph-local reviewed group decisions."""
 
+import re
+
+from tools.configure.pinmux import FixedRoutePinMuxPolicy
 from tools.configure.providers.common import fail, integer, mode_traits, sequence
 
 RESOLUTION_BITS = (6, 8, 10, 12)
+
+
+def _pin_channels(route, provider):
+    """Read channel authority from the selected pin-routing contract."""
+    if isinstance(getattr(provider, "PINMUX_POLICY", None), FixedRoutePinMuxPolicy):
+        channels = {}
+        for pin in route["pins"]:
+            role = re.fullmatch(r"in([0-9]|1[0-5])", pin["function"])
+            if role is None:
+                fail("Fixed ADC route requires an explicit analog channel role")
+            channels[pin["pin"]] = int(role[1])
+        return channels
+    mapping = getattr(provider, "ADC_PIN_CHANNELS", None)
+    if mapping is None:
+        return None
+    channels = {}
+    for pin in route["pins"]:
+        key = (route["controller"], pin["pin"])
+        if key not in mapping:
+            fail("ADC controller/pin lacks a reviewed channel mapping")
+        channels[pin["pin"]] = mapping[key]
+    return channels
 
 
 def validate_selection(selection, route, provider):
@@ -12,18 +37,23 @@ def validate_selection(selection, route, provider):
     channels = sequence(selection["channels"], "ADC channels")
     internal = getattr(provider, "ADC_INTERNAL_CHANNELS", {}).get(
         route["controller"], ())
+    if selection["mode"] == "internal-scan":
+        exact = route.get("required_options", {})
+        internal = tuple(sequence(exact.get("channels", ()), "ADC internal route ranks"))
+        if (route["pins"] or not internal or len(internal) > 16 or
+                len(set(internal)) != len(internal) or
+                tuple(channels) != internal or "sample_times" not in exact or
+                tuple(sequence(selection["sample_times"], "ADC sample_times")) !=
+                tuple(sequence(exact["sample_times"], "ADC internal route sample times"))):
+            fail("Internal ADC requires its exact pad-free ordered sequence and sampling")
+        for channel in internal:
+            integer(channel, 0, 31, "ADC internal route channel")
     for channel in channels:
         integer(channel, 0, max((15, *internal)), "ADC channel")
-    mapping = getattr(provider, "ADC_PIN_CHANNELS", None)
+    mapping = _pin_channels(route, provider)
     if mapping is None:
         fail("ADC controller/pin lacks a reviewed channel mapping")
-    expected = []
-    for pin in route["pins"]:
-        key = (route["controller"], pin["pin"])
-        if key not in mapping:
-            fail("ADC controller/pin lacks a reviewed channel mapping")
-        expected.append(mapping[key])
-    expected.extend(internal)
+    expected = {*mapping.values(), *internal}
     if not set(channels).issubset(expected) or not channels or len(channels) > 16:
         fail("ADC channel sequence differs from reviewed analog pins")
     samples = sequence(selection["sample_times"], "ADC sample_times")
@@ -45,21 +75,28 @@ def validate_selection(selection, route, provider):
     if bits not in RESOLUTION_BITS or bits not in supported:
         fail("ADC resolution_bits lacks a maintained provider mode")
     selection["resolution_bits"] = bits
+    shape = mode_traits("adc", selection["mode"])
     triggers = getattr(provider, "ADC_TRIGGERS", None)
-    if mode_traits("adc", selection["mode"]).dma and triggers is not None:
+    if shape.block_stream and shape.dma and triggers is not None:
         trigger = selection.get("trigger", "tim3-trgo")
         if type(trigger) is not str or trigger not in triggers:
             fail("ADC trigger lacks a reviewed independently owned timer event")
         selection["trigger"] = trigger
     elif "trigger" in selection:
         fail("ADC trigger requires a maintained timer-DMA mode")
-    if (selection["mode"] in {"single-shot", "low-rate-scan"} and
-            (selection["mode"] == "single-shot") != (len(channels) == 1)):
+    if (selection["mode"] in {"single-shot", "single-trigger-dma", "low-rate-scan"} and
+            (selection["mode"] != "low-rate-scan") != (len(channels) == 1)):
         fail("ADC mode contradicts its reviewed channel count")
-    if (mode_traits("adc", selection["mode"]).dma and
-            "irq_priority" not in selection):
+    if selection["mode"] == "sequential-scan-dma" and (
+            len(channels) < 2 or tuple(channels) != tuple(mapping.values())):
+        fail("Sequential ADC requires all route channels once and in order")
+    if selection["mode"] == "simultaneous-scan-dma" and (
+            len(channels) != 2 or tuple(channels) != tuple(mapping.values()) or
+            samples[0] != samples[1]):
+        fail("Simultaneous ADC requires both route channels in order with equal sample times")
+    if shape.irq and "irq_priority" not in selection:
         fail("ADC trigger-dma requires an explicit IRQ priority")
-    if (not mode_traits("adc", selection["mode"]).dma and
+    if (not shape.irq and
             ({"irq_priority", "calls_os"} & selection.keys())):
         fail("Polling ADC has no IRQ options")
 
@@ -75,8 +112,10 @@ def selected_route(selection, route, provider):
         if provider.ADC_GROUP is None:
             fail("ADC group has no maintained provider")
         return provider.ADC_GROUP.selected_route(selection, route)
-    mapping = getattr(provider, "ADC_PIN_CHANNELS", None)
-    if route["kind"] != "adc" or mapping is None:
+    if route["kind"] != "adc":
+        return route
+    mapping = _pin_channels(route, provider)
+    if mapping is None:
         return route
     channels = frozenset(selection["channels"])
     resources = list(route.get("resources", ()))
@@ -85,7 +124,7 @@ def selected_route(selection, route, provider):
         resources += ["controller:" + timer, "timer:" + timer]
     return {**route, "resources": resources,
             "pins": [pin for pin in route["pins"]
-                     if mapping[(route["controller"], pin["pin"])] in channels]}
+                     if mapping[pin["pin"]] in channels]}
 
 
 def group_trigger_resources(selection, provider):

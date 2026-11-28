@@ -1,0 +1,28 @@
+schema = 2
+board_package = "../stm32f1_eth_mii/board"
+backend = "baremetal"
+clock = "hse25-crystal-pll72"
+components = ["network"]
+
+[factory]
+capabilities = true
+
+[hardware]
+phy_wiring = "mb784-mii-x1"
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+static_ram_limit_bytes = 53248
+flash_load_limit_bytes = 114688
+
+[eth.lan]
+binding = "mac"
+mode = "raw-mii"
+tx_count = 1
+rx_count = 2
+rx_storage_bytes = 1520
+address = [2, 12, 52, 0, 0, 1]
+init_timeout_us = 5000
+drain_timeout_us = 5000
+irq = {priority=5, calls_os=false}

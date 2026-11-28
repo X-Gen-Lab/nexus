@@ -167,6 +167,46 @@ class ImageReservationTests(unittest.TestCase):
         with self.assertRaisesRegex(EvidenceError, "erase geometry"):
             image_window(resolved)
 
+    def test_f103rb_vector_reservation_keeps_exact_page_owner(self):
+        fixture = configure.ROOT / "tests/integration/assemblies/stm32f1_family"
+        selected = configure.resolve_ir(fixture / "f103rb-offset-baremetal.toml")
+        self.assertEqual(selected.layout.origin, 0x08004000)
+        self.assertEqual(selected.layout.size, 64 * 1024)
+        self.assertEqual(selected.flash["erase_spans"][0]["erase_bytes"], 1024)
+        self.assertEqual(selected.image_origin, 0x08004200)
+        self.assertEqual(selected.image_size, 64000)
+        self.assertEqual(image_window(selected.to_dict()), {
+            "origin": 0x08004200, "size": 64000, "vector_alignment": 512,
+            "vector_symbol": "g_pfnVectors"})
+        self.assertIn("g_pfnVectors == ADDR(.isr_vector)", memory.linker(selected))
+        for part in ("STM32F103C8T6", []):
+            resolved = selected.to_dict()
+            resolved["part"] = part
+            with self.subTest(part=part), self.assertRaisesRegex(EvidenceError, "reviewed startup"):
+                image_window(resolved)
+
+    def test_f103_c8_does_not_inherit_f103rb_offset_review(self):
+        fixture = configure.ROOT / "tests/integration/assemblies/stm32f1_family"
+        text = (fixture / "f103c8-baremetal.toml").read_text()
+        text = text.replace('board_package = "c8-board"',
+                            "board_package = " + json.dumps(str(fixture / "c8-board")))
+        path = self.root / "assembly.toml"
+        path.write_text(text.replace("[memory]", "[memory]\nimage_prefix_bytes = 512"))
+        with self.assertRaisesRegex(configure.ConfigurationError, "reviewed SoC startup"):
+            configure.resolve_ir(path)
+
+    def test_f103rb_region_boundary_is_a_whole_flash_page(self):
+        fixture = configure.ROOT / "tests/integration/assemblies/stm32f1_family"
+        data = json.loads((fixture / "f103rb-offset-layout.json").read_text())
+        image = data["regions"][1]
+        image["origin"] += 512
+        image["size"] -= 512
+        (self.root / "f103rb-offset-layout.json").write_text(json.dumps(data))
+        assembly = self.root / "assembly.toml"
+        assembly.write_text((fixture / "f103rb-offset-baremetal.toml").read_text())
+        with self.assertRaisesRegex(configure.ConfigurationError, "erase boundaries"):
+            configure.resolve_ir(assembly)
+
     def test_editor_schema_and_help_share_the_authored_fields(self):
         schema = authored.editor_schema()
         properties = schema["properties"]["memory"]["properties"]

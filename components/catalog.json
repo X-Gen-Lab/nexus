@@ -77,6 +77,11 @@
       "target": "Nexus::LwIP"
     },
     {
+      "id": "network-ipv4",
+      "entry": "components/protocols/network/Select.cmake",
+      "target": "Nexus::LwIPIPv4"
+    },
+    {
       "id": "network-loaned-rx",
       "entry": "components/protocols/network/Select.cmake",
       "target": "Nexus::LwIPLoanedRX"

@@ -5,6 +5,7 @@ import re
 from types import MappingProxyType
 
 from tools.configure.generation.calls import Symbol
+from tools.configure.pinmux import FixedRoutePinMuxPolicy
 from tools.configure.providers.common import fail, integer, sequence
 
 
@@ -52,6 +53,23 @@ def _trigger(sources, alias, label="trigger"):
     return sources[alias]
 
 
+def _pin_channels(route, provider):
+    """Resolve DAC channel authority from reviewed wiring and its pinmux."""
+    if isinstance(getattr(provider, "PINMUX_POLICY", None), FixedRoutePinMuxPolicy):
+        channels = {}
+        for pin in route["pins"]:
+            role = re.fullmatch(r"out([12])", pin["function"])
+            if role is None:
+                fail("Fixed DAC route requires an explicit analog channel role")
+            channels[pin["pin"]] = int(role[1])
+        return channels
+    mapping = getattr(provider, "DAC_PIN_CHANNELS", None)
+    if mapping is None:
+        fail("DAC provider lacks a reviewed channel/pad map")
+    return {pin["pin"]: mapping.get((route["controller"], pin["pin"]))
+            for pin in route["pins"]}
+
+
 def validate_selection(selection, route, provider):
     """Validate all raw values before the resolver acquires any resources."""
     required = {"channels", "format", "idle_codes", "output_buffer", "trigger"}
@@ -62,11 +80,7 @@ def validate_selection(selection, route, provider):
             any(type(channel) is not int or channel not in (1, 2)
                 for channel in channels) or len(set(channels)) != len(channels)):
         fail("DAC channels must select unique physical channel 1 and/or 2")
-    mapping = getattr(provider, "DAC_PIN_CHANNELS", None)
-    if mapping is None:
-        fail("DAC provider lacks a reviewed channel/pad map")
-    authorized = {mapping.get((route["controller"], pin["pin"]))
-                  for pin in route["pins"]}
+    authorized = set(_pin_channels(route, provider).values())
     if None in authorized or not set(channels).issubset(authorized):
         fail("DAC channels exceed the Board-authorized analog pads")
     data_format = selection["format"]
@@ -122,9 +136,8 @@ def selected_route(selection, route, provider):
     if route["kind"] != "dac":
         return route
     chosen = frozenset(selection["channels"])
-    pins = [pin for pin in route["pins"]
-            if provider.DAC_PIN_CHANNELS[(route["controller"], pin["pin"])]
-            in chosen]
+    channels = _pin_channels(route, provider)
+    pins = [pin for pin in route["pins"] if channels[pin["pin"]] in chosen]
     resources = list(route.get("resources", ()))
     sources = getattr(provider, "DAC_TRIGGERS", {})
     trigger = _trigger(sources, selection["trigger"])

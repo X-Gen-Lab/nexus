@@ -42,7 +42,7 @@ nexus_google_test(nexus_stm32_i2c_poll_factory_test STM32F4_LL
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/gpio/gpio.c"
     LIBRARIES Nexus::IO
     INCLUDES
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/i2c_v1_async" "${f407_poll_bundle}"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/common/i2c_v1_async" "${f407_poll_bundle}"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
         "${NEXUS_SOURCE_DIR}/tests/support/arm/stm32f4"
         "${NEXUS_SOURCE_DIR}/arch/include"

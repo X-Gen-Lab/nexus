@@ -1,0 +1,23 @@
+schema = 2
+board_package = "zg-board"
+backend = "baremetal"
+clock = "hsi8"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+flash_load_limit_bytes = 12288
+static_ram_limit_bytes = 4096
+
+[dac.output]
+binding = "dac1"
+mode = "direct"
+channels = [1]
+format = "u12-right"
+idle_codes = [0]
+output_buffer = true
+trigger = "none"
+
+[factory]
+capabilities = true

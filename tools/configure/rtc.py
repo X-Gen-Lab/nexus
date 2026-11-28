@@ -5,6 +5,8 @@ from tools.configure.providers.common import fail, integer
 
 
 POLICY_MODES = frozenset(("adopt-retained", "provision-empty"))
+BACKUP_PROVISION = "backup-provision"
+BACKUP_LIMITS = {"timeout_us": 120000000, "poll_limit": 20000000}
 OPTION_FIELDS = frozenset(("allow_set", "timeout_us", "poll_limit", "initial",
                            "lse_bypass", "periodic_wakeup"))
 CALENDAR_FIELDS = ("year", "month", "day", "weekday", "hour", "minute", "second")
@@ -12,10 +14,12 @@ CALENDAR_FIELDS = ("year", "month", "day", "weekday", "hour", "minute", "second"
 
 def validate_board(selection, board):
     """A bypass input never inherits a PCB crystal's source identity."""
-    if selection["mode"] not in POLICY_MODES:
+    if selection["mode"] not in POLICY_MODES | {"backup-adopt", BACKUP_PROVISION}:
         return
     if board["clocks"].get("lse_hz") != 32768:
         fail("RTC requires exact Board LSE32768 source facts")
+    if selection["mode"] == BACKUP_PROVISION and board["clocks"].get("lse_bypass", False):
+        fail("Backup provisioning requires the declared 32768 Hz LSE crystal")
     if selection.get("lse_bypass", False) != board["clocks"].get(
             "lse_bypass", False):
         fail("RTC bypass source differs from the Board oscillator facts")
@@ -32,6 +36,12 @@ def selected_resources(selection, provider):
 
 def validate_selection(selection):
     """Old raw-calendar modes cannot inherit a different backup policy."""
+    if selection["mode"] == BACKUP_PROVISION:
+        if (selection.keys() & OPTION_FIELDS) != BACKUP_LIMITS.keys():
+            fail("RTC backup provisioning requires timeout_us and poll_limit only")
+        for field, maximum in BACKUP_LIMITS.items():
+            integer(selection[field], 1, maximum, "RTC backup provisioning " + field)
+        return
     if selection["mode"] not in POLICY_MODES:
         if OPTION_FIELDS & selection.keys():
             fail("RTC selected mode does not accept initialization options")
@@ -87,8 +97,15 @@ def editor_schema(schema):
         {"if": {"properties": {"mode": {"enum": sorted(POLICY_MODES)}},
                 "required": ["mode"]},
          "then": {"required": ["allow_set", "timeout_us", "poll_limit"]},
-         "else": {"not": {"anyOf": [{"required": [name]}
-                                      for name in sorted(OPTION_FIELDS)]}}},
+         "else": {"if": {"properties": {"mode": {"const": BACKUP_PROVISION}},
+                         "required": ["mode"]},
+                  "then": {"properties": {name: {"maximum": value}
+                                          for name, value in BACKUP_LIMITS.items()},
+                           "required": sorted(BACKUP_LIMITS),
+                           "not": {"anyOf": [{"required": [name]} for name in
+                                            sorted(OPTION_FIELDS - BACKUP_LIMITS.keys())]}},
+                  "else": {"not": {"anyOf": [{"required": [name]}
+                                              for name in sorted(OPTION_FIELDS)]}}}},
         {"if": {"properties": {"mode": {"const": "provision-empty"}},
                 "required": ["mode"]},
          "then": {"required": ["initial"]},

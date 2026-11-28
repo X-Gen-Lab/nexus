@@ -22,12 +22,22 @@ _ALLOWED = MappingProxyType({
 def validate_policy(value):
     """Validate explicit controller capabilities without copying route pads."""
     from collections.abc import Mapping
-    if (not isinstance(value, Mapping) or set(value) != {
-            "controllers", "irda_max_baud", "smartcard_prescaler_max"} or
+    fields = {"controllers", "irda_max_baud", "smartcard_prescaler_max"}
+    if (not isinstance(value, Mapping) or not fields.issubset(value) or
+            set(value) - fields - {"lin_max_baud", "receive_profiles", "irda_normal_only"} or
             not isinstance(value["controllers"], Mapping)):
         fail("UART wire policy requires controller and protocol limits")
     integer(value["irda_max_baud"], 1, context="IrDA maximum baud")
     integer(value["smartcard_prescaler_max"], 1, 255, "Smartcard maximum prescaler")
+    if "lin_max_baud" in value:
+        integer(value["lin_max_baud"], 1, context="LIN maximum baud")
+    if type(value.get("irda_normal_only", False)) is not bool:
+        fail("IrDA normal-only policy must be boolean")
+    profiles = value.get("receive_profiles", {})
+    if (not isinstance(profiles, Mapping) or
+            any(protocol not in PROTOCOLS or profile not in ("bytes", "events")
+                for protocol, profile in profiles.items())):
+        fail("UART wire receive profiles must name reviewed protocols and storage")
     for controller, facts in value["controllers"].items():
         from tools.configure.generation.calls import Symbol
         Symbol(controller)
@@ -42,8 +52,10 @@ def validate_policy(value):
 
 
 def _policy(provider, controller):
-    selected = getattr(provider, "SELECTION", None)
-    facts = selected.data.get("serial_modes", {}).get("uart_wire") if selected else None
+    facts = getattr(provider, "UART_WIRE", None)
+    if facts is None:
+        selected = getattr(provider, "SELECTION", None)
+        facts = selected.data.get("serial_modes", {}).get("uart_wire") if selected else None
     if facts is None or controller not in facts["controllers"]:
         fail("UART wire controller has no reviewed protocol policy")
     return facts, facts["controllers"][controller]
@@ -74,10 +86,16 @@ def validate(selection, route, provider):
             fail("UART wire " + field + " must be boolean")
     for field in ("prescaler", "guard_time", "lin_break_bits"):
         integer(wire[field], 0, 255, "UART wire " + field)
-    if protocol == "lin" and wire["lin_break_bits"] not in (10, 11):
-        fail("LIN requires an explicit 10/11-bit break detection threshold")
+    if protocol == "lin":
+        if wire["lin_break_bits"] not in (10, 11):
+            fail("LIN requires an explicit 10/11-bit break detection threshold")
+        if "lin_max_baud" in policy and selection["baud"] > policy["lin_max_baud"]:
+            fail("LIN baud exceeds the selected protocol limit")
     if protocol == "irda":
         integer(wire["prescaler"], 1, 255, "IrDA prescaler")
+        if policy.get("irda_normal_only", False) and (
+                wire["irda_low_power"] or wire["prescaler"] != 1):
+            fail("IrDA requires normal power and prescaler 1")
         if selection["baud"] > policy["irda_max_baud"]:
             fail("IrDA baud exceeds the selected protocol limit")
     if protocol == "smartcard":
@@ -95,6 +113,9 @@ def validate(selection, route, provider):
     if (tuple(pin["function"] for pin in pins) != tuple(roles) or
             len({pin["pin"] for pin in pins}) != len(pins)):
         fail("UART wire requires its exact ordered data/clock/flow roles")
+    receive = policy.get("receive_profiles", {}).get(protocol)
+    if receive is not None and selection.get("rx_profile") != receive:
+        fail("UART wire protocol requires " + receive + " receive storage")
     selection["wire"] = wire
 
 

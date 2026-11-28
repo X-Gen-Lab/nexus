@@ -20,7 +20,9 @@ nx_arch_result_t nx_arch_wait_for_interrupt(void) {
     if (masks.primask != 1u || masks.basepri != 0 || masks.faultmask != 0) {
         return NX_ARCH_CONTEXT;
     }
-    if ((nx_arch_sleep_control() & (1u << 2)) != 0) {
+    /* Retain Thread control after the wake IRQ as well as shallow clocks. */
+    const uint32_t sleep_now_blockers = (1u << 1) | (1u << 2);
+    if ((nx_arch_sleep_control() & sleep_now_blockers) != 0) {
         return NX_ARCH_UNSUPPORTED;
     }
     /* PRIMASK keeps a configurable IRQ from running between the caller's

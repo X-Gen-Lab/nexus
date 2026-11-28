@@ -3322,39 +3322,90 @@
               ]
             },
             "else": {
-              "not": {
-                "anyOf": [
-                  {
-                    "required": [
-                      "allow_set"
-                    ]
-                  },
-                  {
-                    "required": [
-                      "initial"
-                    ]
-                  },
-                  {
-                    "required": [
-                      "lse_bypass"
-                    ]
-                  },
-                  {
-                    "required": [
-                      "periodic_wakeup"
-                    ]
-                  },
-                  {
-                    "required": [
-                      "poll_limit"
-                    ]
-                  },
-                  {
-                    "required": [
-                      "timeout_us"
-                    ]
+              "if": {
+                "properties": {
+                  "mode": {
+                    "const": "backup-provision"
                   }
+                },
+                "required": [
+                  "mode"
                 ]
+              },
+              "then": {
+                "properties": {
+                  "timeout_us": {
+                    "maximum": 120000000,
+                    "description": "Time interval in microseconds; not a measured hardware guarantee."
+                  },
+                  "poll_limit": {
+                    "maximum": 20000000
+                  }
+                },
+                "required": [
+                  "poll_limit",
+                  "timeout_us"
+                ],
+                "not": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "allow_set"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "initial"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "lse_bypass"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "periodic_wakeup"
+                      ]
+                    }
+                  ]
+                }
+              },
+              "else": {
+                "not": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "allow_set"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "initial"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "lse_bypass"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "periodic_wakeup"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "poll_limit"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "timeout_us"
+                      ]
+                    }
+                  ]
+                }
               }
             }
           },
@@ -4392,6 +4443,27 @@
             "maximum": 62,
             "default": 1,
             "description": "Minimum WWDG counter decrements before feeding; the hardware divider is selected at enable."
+          }
+        },
+        "required": [
+          "binding",
+          "mode"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "mdio": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "binding": {
+            "type": "string",
+            "description": "Exact reviewed Board binding; no route fallback."
+          },
+          "mode": {
+            "type": "string",
+            "description": "Explicit maintained mode; the product owns service and shutdown."
           }
         },
         "required": [

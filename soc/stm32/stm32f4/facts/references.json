@@ -1249,7 +1249,7 @@
             "handling": "Current polling/IRQ/DMA controllers conservatively terminate as IO and enter bounded STOP/recovery instead of silently treating a possibly real bus error as successful data. This preserves explicit failure ownership but can cause false error/retry; it is not the official clear-and-continue availability workaround.",
             "implementation": [
               "soc/stm32/stm32f4/drivers/i2c/i2c.c",
-              "soc/stm32/stm32f4/drivers/ip/i2c_v1_async/i2c_v1_async.c"
+              "soc/stm32/common/i2c_v1_async/i2c_v1_async.c"
             ],
             "regressions": [
               "tests/behavior/soc/stm32/stm32f4/i2c/i2c_register_test.cpp",
@@ -1278,7 +1278,7 @@
             "handling": "Malformed peers can cause bounded timeout/IO, followed by joined SWRST recovery and bus-clear policy. Recovery does not replay a write with unknown external effect. CBUS or other non-I2C STOP rules are not supported.",
             "implementation": [
               "soc/stm32/stm32f4/drivers/i2c/i2c.c",
-              "soc/stm32/stm32f4/drivers/ip/i2c_v1_async/i2c_v1_async.c"
+              "soc/stm32/common/i2c_v1_async/i2c_v1_async.c"
             ],
             "regressions": [
               "tests/behavior/soc/stm32/stm32f4/i2c/i2c_register_test.cpp",
@@ -1294,8 +1294,8 @@
             "handling": "The reviewed standard-mode timing calculation caps actual frequency at88 kHz for repeated-START-capable controller operation; authored max_hz remains an upper bound. Fast mode is separate. Both7/10-bit and polling/IRQ/DMA modes must use the same actual timing constraint; peripheral-source clock proof alone is insufficient.",
             "implementation": [
               "soc/stm32/stm32f4/drivers/i2c/i2c.c",
-              "soc/stm32/stm32f4/drivers/ip/i2c_v1_async/i2c_v1_async.c",
-              "soc/stm32/stm32f4/drivers/ip/i2c_v1_async/i2c_v1_async.h"
+              "soc/stm32/common/i2c_v1_async/i2c_v1_async.c",
+              "soc/stm32/common/i2c_v1_async/i2c_v1_async.h"
             ],
             "regressions": [
               "tests/behavior/soc/stm32/stm32f4/i2c/i2c_register_test.cpp",
@@ -1604,7 +1604,7 @@
             "condition": "bxCAN TTCM would expose unsupported time-triggered transmission and timestamp values.",
             "handling": "The classic controller keeps TTCM clear and does not promise hardware timestamps; host observation time is a separate clock fact. No CAN-FD or time-triggered mode is inferred from the generic API.",
             "implementation": [
-              "soc/stm32/stm32f4/drivers/ip/classic_can/can_controller.c",
+              "soc/stm32/common/bxcan/can_controller.c",
               "soc/stm32/stm32f4/drivers/can/can.c"
             ],
             "regressions": [
@@ -1620,7 +1620,7 @@
             "condition": "An OTG_FS Device FIFO write is interrupted by accesses to endpoint-specific registers.",
             "handling": "PIO device FIFO writes and controller-state access occur under the same IRQ critical section and unique serialized owner. External direct OTG register access and reentrant class calls are forbidden while this owner is active.",
             "implementation": [
-              "soc/stm32/stm32f4/drivers/ip/dwc_otg_device/usb_device_controller.c",
+              "soc/stm32/common/dwc_otg_device/usb_device_controller.c",
               "soc/stm32/stm32f4/drivers/usb/usb_device.c",
               "docs/reference/contracts/io/usb-lifecycle.md"
             ],
@@ -1637,7 +1637,7 @@
             "condition": "An FS host reaches a low-speed device through a hub.",
             "handling": "The maintained host contract supports direct root-port peers only; hub/split-transaction topology is not exposed. No capacitance workaround or universal hub support is claimed.",
             "implementation": [
-              "soc/stm32/stm32f4/drivers/usb/usb_host.c",
+              "soc/stm32/common/dwc_otg_host/usb_host.c",
               "docs/reference/contracts/io/usb-lifecycle.md"
             ],
             "regressions": [
@@ -1652,7 +1652,7 @@
             "condition": "Multiple IN channels halt while an undersized RxFIFO still contains the last packet/status.",
             "handling": "HAL host initialization reserves RxFIFO space beyond two maximum packets plus status, and the serialized channel owner bounds halt/drain. No exact-one-packet FIFO profile is admitted.",
             "implementation": [
-              "soc/stm32/stm32f4/drivers/usb/usb_host.c",
+              "soc/stm32/common/dwc_otg_host/usb_host.c",
               "docs/reference/contracts/io/usb-lifecycle.md"
             ],
             "regressions": [
@@ -1667,7 +1667,7 @@
             "condition": "IN-only host operation has no TxFIFO allocated.",
             "handling": "Host initialization always assigns nonperiodic and periodic TxFIFO space as well as RxFIFO; IN-only channel use cannot remove those shared FIFO reservations.",
             "implementation": [
-              "soc/stm32/stm32f4/drivers/usb/usb_host.c",
+              "soc/stm32/common/dwc_otg_host/usb_host.c",
               "docs/reference/contracts/io/usb-lifecycle.md"
             ],
             "regressions": [
@@ -1682,7 +1682,7 @@
             "condition": "A host channel is disabled immediately after enable, before hardware starts and can emit CHH.",
             "handling": "The owner keeps the transfer active through bounded channel halt, observing actual enable/count state and using bounded controller recovery when CHH cannot be obtained; it does not settle a request solely because HAL_HC_Halt returned. No guaranteed immediate-CHH behavior is assumed.",
             "implementation": [
-              "soc/stm32/stm32f4/drivers/usb/usb_host.c",
+              "soc/stm32/common/dwc_otg_host/usb_host.c",
               "docs/reference/contracts/io/usb-lifecycle.md"
             ],
             "regressions": [
@@ -1697,7 +1697,7 @@
             "condition": "Immediate DCFG DAD/PFIVL readback is not reliable after programming.",
             "handling": "Address state is retained in the controller owner and applied in its control-transfer phase; immediate DAD/PFIVL equality is not used as a device-address success oracle. Readback of unrelated core state does not prove these fields.",
             "implementation": [
-              "soc/stm32/stm32f4/drivers/ip/dwc_otg_device/usb_device_controller.c",
+              "soc/stm32/common/dwc_otg_device/usb_device_controller.c",
               "soc/stm32/stm32f4/drivers/usb/usb_device.c",
               "docs/reference/contracts/io/usb-lifecycle.md"
             ],
@@ -1714,7 +1714,7 @@
             "condition": "An OTG_HS Device FIFO write is interrupted by endpoint-register access.",
             "handling": "The shared device owner serializes HAL/PIO controller effects in IRQ critical sections; the selected HS DMA path additionally prevents this FIFO-write interleaving. DMA selection does not relax unique controller ownership or buffer reachability.",
             "implementation": [
-              "soc/stm32/stm32f4/drivers/ip/dwc_otg_device/usb_device_controller.c",
+              "soc/stm32/common/dwc_otg_device/usb_device_controller.c",
               "soc/stm32/stm32f4/drivers/usb/usb_device.c",
               "docs/reference/contracts/io/usb-lifecycle.md"
             ],
@@ -1731,7 +1731,7 @@
             "condition": "The HS core uses its internal full-speed interface to reach a low-speed peer through a hub.",
             "handling": "HS-FS and HS-ULPI software references retain the same direct-root-only host topology restriction; an external hub stack cannot inherit the current support claim.",
             "implementation": [
-              "soc/stm32/stm32f4/drivers/usb/usb_host.c",
+              "soc/stm32/common/dwc_otg_host/usb_host.c",
               "docs/reference/contracts/io/usb-lifecycle.md"
             ],
             "regressions": [
@@ -1746,7 +1746,7 @@
             "condition": "Automatic checksum insertion parses IPv6 packets lacking TCP/UDP/ICMP and can modify unrelated payload.",
             "handling": "Raw mode disables offload. Advanced frame requests explicitly choose checksum intent, so the protocol owner must request NONE for unsupported IPv6 payloads/extension layouts; FULL is not a generic repair for arbitrary Ethernet bytes. Peer/network stack validation is independent of DMA completion.",
             "implementation": [
-              "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c",
+              "soc/stm32/common/dwmac/eth_mac.c",
               "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c",
               "docs/reference/contracts/io/ethernet-frames.md"
             ],
@@ -1763,7 +1763,7 @@
             "condition": "IPv6 hop-by-hop/extension order is invalid but the MAC accepts it and reports a good checksum.",
             "handling": "A hardware checksum-valid status is only a checksum hint. The protocol/network stack must parse and reject invalid IPv6 extension ordering before dispatching payload; neither raw frames nor the advanced RX loan claims semantic IPv6 validity.",
             "implementation": [
-              "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c",
+              "soc/stm32/common/dwmac/eth_mac.c",
               "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c",
               "docs/reference/contracts/io/ethernet-frames.md"
             ],
@@ -1780,7 +1780,7 @@
             "condition": "TxFIFO flush is issued one cycle after transmission completes and wedges the MAC.",
             "handling": "Raw withdrawal checks actual empty TxFIFO before FTF; advanced withdrawal uses stopped/reset-owned recovery instead of a flush while live. Failure retains descriptors/borrowers until actual stop/reset evidence.",
             "implementation": [
-              "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c",
+              "soc/stm32/common/dwmac/eth_mac.c",
               "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c",
               "docs/reference/contracts/io/ethernet-frames.md"
             ],
@@ -1797,7 +1797,7 @@
             "condition": "Near-equal DMA/MAC Tx rates repeatedly empty the TxFIFO without an underrun indication.",
             "handling": "Both raw and advanced MAC cold configuration force transmit Store-and-Forward. Descriptor completion is not substituted for that controller mode.",
             "implementation": [
-              "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c",
+              "soc/stm32/common/dwmac/eth_mac.c",
               "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c",
               "docs/reference/contracts/io/ethernet-frames.md"
             ],
@@ -1814,7 +1814,7 @@
             "condition": "Threshold-mode RX overflow on a penultimate word corrupts status and following frames.",
             "handling": "Both MAC providers force receive Store-and-Forward and reject incomplete/error descriptor chains before loan/copy publication.",
             "implementation": [
-              "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c",
+              "soc/stm32/common/dwmac/eth_mac.c",
               "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c",
               "docs/reference/contracts/io/ethernet-frames.md"
             ],
@@ -1831,7 +1831,7 @@
             "condition": "Successive writes to affected MAC/PTP registers arrive within four RX/TX clock cycles.",
             "handling": "Affected MAC/PTP writes are serialized through bounded clock-domain settle observations, with the configured PHY reference-clock contract. Repeated writes/readback alone are not treated as elapsed RX/TX clocks; missing clock/timeout retains ownership and fails.",
             "implementation": [
-              "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c",
+              "soc/stm32/common/dwmac/eth_mac.c",
               "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c",
               "docs/reference/contracts/io/ethernet-frames.md"
             ],
@@ -1848,7 +1848,7 @@
             "condition": "Global-unicast PMT wake is combined with inverse/hash destination filtering.",
             "handling": "No PMT remote-wakeup or global-unicast wake mode is exposed by the current MAC providers; ordinary VLAN/filter capability does not imply PMT support.",
             "implementation": [
-              "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c",
+              "soc/stm32/common/dwmac/eth_mac.c",
               "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c",
               "docs/reference/contracts/io/ethernet-frames.md"
             ],
@@ -1865,7 +1865,7 @@
             "condition": "Missed-frame/FIFO counters roll over twice between reads and clear their sticky overflow indication.",
             "handling": "Software ring drop/ownership counters remain separate. No API claims an exact monotonic total reconstructed from sparse DMAMFBOCR reads; a product requiring those hardware counters must sample them often enough for its measured worst-case ingress/drop rate.",
             "implementation": [
-              "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c",
+              "soc/stm32/common/dwmac/eth_mac.c",
               "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c",
               "docs/reference/contracts/io/ethernet-frames.md"
             ],
@@ -1879,7 +1879,7 @@
             "condition": "MAC control frame0x8808 plus receive checksum offload without extended status gives misleading IP status.",
             "handling": "Raw offload is disabled. Advanced consumers must classify EtherType before interpreting checksum hints; control frames and unsupported protocol layouts cannot use a hardware good-IP hint as protocol validity. Software must ignore the affected RDES0 IP status for those frames.",
             "implementation": [
-              "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c",
+              "soc/stm32/common/dwmac/eth_mac.c",
               "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c",
               "docs/reference/contracts/io/ethernet-frames.md"
             ],
@@ -1896,7 +1896,7 @@
             "condition": "Receive checksum offload in cut-through mode gives incomplete payload-checksum error detail.",
             "handling": "Both receive engines use Store-and-Forward; descriptor error-summary/drop logic does not depend on a missing individual checksum bit. Cut-through mode is not selectable.",
             "implementation": [
-              "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c",
+              "soc/stm32/common/dwmac/eth_mac.c",
               "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c",
               "docs/reference/contracts/io/ethernet-frames.md"
             ],
@@ -1913,7 +1913,7 @@
             "condition": "Giant frames pass the Store-and-Forward hardware error-drop filter.",
             "handling": "RX validates the last-descriptor frame length and descriptor integrity against the actual buffer/wire limit before copying or publishing a loan. Giant or invalid chains are recycled/dropped in software and never trusted merely because the MAC accepted them.",
             "implementation": [
-              "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c",
+              "soc/stm32/common/dwmac/eth_mac.c",
               "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c",
               "docs/reference/contracts/io/ethernet-frames.md"
             ],
@@ -1930,7 +1930,7 @@
             "condition": "Automatic hardware pause generation depends on an unavailable4096-byte RxFIFO.",
             "handling": "Automatic pause/flow-control mode is not exposed or used as a no-loss guarantee. Software buffer availability and observed overflow/drop events govern backpressure; a future pause policy must send frames intentionally rather than enable a nonexistent automatic mechanism.",
             "implementation": [
-              "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c",
+              "soc/stm32/common/dwmac/eth_mac.c",
               "soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_frames_mac.c",
               "docs/reference/contracts/io/ethernet-frames.md"
             ],

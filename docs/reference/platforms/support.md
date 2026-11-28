@@ -8,7 +8,7 @@ source_language: zh_CN
 (reference.platforms.support)=
 # 精确平台支持
 
-生产系列入口是STM32F4。精确料号、器件视图、四个F407 Board及模式分别说明；厂商SDK库存不参与默认支持。芯片存在、公开接口和配置通过不证明实板已运行。
+生产系列包括 STM32F4 和 STM32F1。支持范围按精确料号、器件视图、板卡和模式定义。厂商 SDK 库存不参与默认支持，实板状态单独记录。
 
 ## 型号、Board 与 OS 边界
 
@@ -22,6 +22,8 @@ source_language: zh_CN
 | STM32F479NIH6 | TFBGA216、2 MiB Flash、320 KiB 主 SRAM、64 KiB CPU-only CCM；显式 HSI168 RUN，并保留 direct HSI16；按精确模式开放 FMC／SAI／LTDC／DMA2D／QuadSPI，PLLSAI 共享 M。GPIO 软件参考仅开放 PJ0／PK3 的 input／output、baremetal，不推广到其它 J／K pad 或 PCB。普通 Flash 写擦覆盖两个物理 bank，OPTCR1 维护不受支持 |
 | 启明 ZG Board | [V3.1](../../../boards/stm32f407_qiming_v31/README.md)、[独立核心板](../../../boards/stm32f407zg_qiming_core/README.md)、[V4.1](../../../boards/stm32f407zg_qiming_v41/README.md) 是三个独立来源和装配身份 |
 | 天空星 VE Board | [天空星青春版](../../../boards/stm32f407ve_sky_qingchun/README.md)；不推广到 VG 高配板或其他 PCB 修订 |
+| STM32F103RBT6 | LQFP64、128 KiB Flash、20 KiB SRAM。以 [NUCLEO-F103RB](../../../boards/stm32f103rb_nucleo/README.md) 参考的 PA5 与 USART2 VCP 路线验证裸机和 FreeRTOS CM3 |
+| STM32F103C8T6 | LQFP48、64 KiB Flash、20 KiB SRAM。[独立 ARM 装配](../../../tests/integration/assemblies/stm32f1_family/README.md)使用同一 C 应用核对封装与链接容量，板级接线仅作软件参考 |
 | 裸机 | 显式选择 `baremetal`；启动不创建调度器或产品任务，调用者推进 service 与停止 |
 | FreeRTOS | 静态任务／队列／等待适配；按所选 assembly、实际 IRQ syscall ceiling 和执行上下文接入 |
 | ThreadX | 已维护的 M4 适配子集与明确消费者；不继承所有 FreeRTOS 模式组合 |
@@ -29,12 +31,30 @@ source_language: zh_CN
 
 引脚、AF、DMA、IRQ、Flash 几何和资源冲突只在
 [SoC 事实](../../../soc/stm32/stm32f4/facts/soc.json)、
-[路线](../../../soc/stm32/stm32f4/facts/routes.json)、[Board 包](../../../boards/README.md)及
+[F4 路线](../../../soc/stm32/stm32f4/facts/routes.json)、
+[F1 资料与实现](../../../soc/stm32/stm32f1/README.md)、[Board 包](../../../boards/README.md)及
 实际 provider 中维护。本页不复制第二份 pin／DMA 表。软件 fixture 只声明测试路线；
 原理图、元件实装、跳线、电压和晶振事实仍须由精确 Board 授权。
 
 OS 的静态对象、权限、IRQ 和退出要求见 [OS 合同](../contracts/os/execution.md)与
 [后端入口](../../../os/README.md)。选择一个后端不自动验证每种外设／低功耗组合。
+
+(stm32f1)=
+### STM32F1
+
+F1 的 15 个精确料号覆盖官方 14 个 CMSIS 器件选择器。基础软件参考使用 Cortex-M3
+soft-float、HSI8、1 MHz TIM2、GPIO 和 USART2 8N1 IRQ。每个料号独立验证封装、
+向量、内存与实际 ARM 链接。F103RB 的 MCO 旁路软件参考提供 PLL72；选定的中密度
+组合另外开放有限 UART DMA TX、Flash 页操作、CRC／UID、IWDG、SPI2 与 I²C1。
+具体料号和模式见[派生矩阵](capabilities.md)。物理 HIL 为 `not_executed`。
+
+F103RB 独立 HSI8 参考覆盖 ADC1 PA0 单次采样、TIM3 CH1 PA6 PWM、
+B1 PC13 EXTI 和 PVD 阈值电平。独立 ThreadX 参考使用 Cortex-M3 soft-float、
+1 kHz SysTick 与 BASEPRI。外设和内核模式分别按精确装配验证。
+
+从仓库根使用 `stm32-f103rb-baremetal` 或 `stm32-f103rb-freertos` preset。
+引脚、电气约束以及独立 C／C++ 消费者的构建命令见
+[F1 实现与验证](../../../soc/stm32/stm32f1/README.md)。
 
 F405／F407 共用 DS8626 Rev12，F415／F417 共用 DS8597 Rev10；经典四款器件复用
 67 项共同控制器事实，ETH／DCMI 只由 F407／F417 选择，基础 CRYP／HASH 限定

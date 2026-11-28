@@ -18,6 +18,15 @@ static bool metadata(const void* pointer, size_t bytes, size_t alignment) {
 
 /** \brief Exact core and PHY tuples keep HS internal FS distinct from ULPI. */
 static bool facts(const nx_usb_device_profile_t* p) {
+    if (p->engine == NX_USB_PROFILE_PACKET_MEMORY) {
+        return p->fifo_words == 0U && p->rx_fifo_words == 0U &&
+               p->endpoint_numbers > 0U && p->endpoint_numbers <= 8U &&
+               p->endpoint_count <= (size_t)p->endpoint_numbers * 2U &&
+               p->role == NX_USB_PROFILE_DEVICE &&
+               p->phy == NX_USB_PROFILE_INTERNAL_FS &&
+               p->phy_clock_hz == NX_USB_FS_PHY_CLOCK_HZ &&
+               p->speed == NX_USB_PROFILE_FULL_SPEED;
+    }
     const bool fs = p->fifo_words == 320U && p->endpoint_numbers == 4U;
     const bool hs = p->fifo_words == 1024U && p->endpoint_numbers == 6U;
     if ((!fs && !hs) || p->endpoint_count > (size_t)p->endpoint_numbers * 2U ||
@@ -45,16 +54,22 @@ nx_result_t nx_usb_profile_validate(const nx_usb_device_profile_t* p) {
         p->port->context == NULL ||
         !metadata(p->port->ops, sizeof(*p->port->ops),
                   _Alignof(nx_usb_device_ops_t)) ||
-        !metadata(p->setup_decision.ops, sizeof(*p->setup_decision.ops),
-                  _Alignof(nx_usb_setup_decision_ops_t)) ||
-        p->setup_decision.context != p->port->context ||
-        p->setup_decision.ops->reject == NULL ||
         p->port->ops->service == NULL || p->port->ops->state == NULL ||
         p->endpoints == NULL || p->endpoint_count < 2U ||
         p->endpoint_count > 12U ||
         !metadata(p->endpoints, p->endpoint_count * sizeof(*p->endpoints),
                   _Alignof(nx_usb_endpoint_profile_t)) ||
         !facts(p)) {
+        return NX_ERROR_INVALID;
+    }
+    const bool packet_memory = p->engine == NX_USB_PROFILE_PACKET_MEMORY;
+    const nx_usb_setup_decision_port_t* decision = &p->setup_decision;
+    if (decision->ops != NULL
+            ? (!metadata(decision->ops, sizeof(*decision->ops),
+                         _Alignof(nx_usb_setup_decision_ops_t)) ||
+               decision->context != p->port->context ||
+               decision->ops->reject == NULL)
+            : (!packet_memory || decision->context != NULL)) {
         return NX_ERROR_INVALID;
     }
     uint16_t seen = 0U;
@@ -92,7 +107,7 @@ nx_result_t nx_usb_profile_validate(const nx_usb_device_profile_t* p) {
                 return NX_ERROR_INVALID;
             }
         } else if (ep->transfer == NX_USB_PROFILE_ISOCHRONOUS) {
-            if (ep->max_packet == 0U ||
+            if (packet_memory || ep->max_packet == 0U ||
                 ep->max_packet >
                     (p->speed == NX_USB_PROFILE_HIGH_SPEED ? 1024U : 1023U)) {
                 return NX_ERROR_INVALID;
@@ -119,7 +134,8 @@ nx_result_t nx_usb_profile_validate(const nx_usb_device_profile_t* p) {
     size_t packet_words = ((size_t)largest_out + 3U) / 4U + 1U;
     size_t minimum_rx =
         11U + packet_words * (iso_out_count > 1U ? 2U : 1U) + out_count;
-    return (seen & 3U) == 3U && p->rx_fifo_words >= minimum_rx
+    return (seen & 3U) == 3U &&
+                   (packet_memory || p->rx_fifo_words >= minimum_rx)
                ? NX_SUCCESS
                : NX_ERROR_INVALID;
 }

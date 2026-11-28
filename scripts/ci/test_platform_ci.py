@@ -592,7 +592,7 @@ class WorkflowContracts(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'directory'):
                 reference_matrix(root)
 
-    def test_f4_board_backend_link_profiles_have_actual_presets(self):
+    def test_board_backend_link_profiles_have_actual_presets(self):
         jobs = workflow('build-matrix.yml')['jobs']
         from scripts.ci.reference_matrix import reference_matrix
         rows = reference_matrix(ROOT)['include']
@@ -600,7 +600,8 @@ class WorkflowContracts(unittest.TestCase):
         self.assertTrue(all((ROOT / row['fixture']).is_file() for row in rows))
         self.assertEqual(selected, {
             'stm32-qiming-baremetal', 'stm32-qiming-freertos',
-            'stm32-sky-baremetal', 'stm32-sky-freertos'})
+            'stm32-sky-baremetal', 'stm32-sky-freertos',
+            'stm32-f103rb-baremetal', 'stm32-f103rb-freertos'})
         from tools.dev.presets import Presets
         presets = Presets(ROOT)
         configured = {name for name, (row, _) in
@@ -849,7 +850,20 @@ class WorkflowContracts(unittest.TestCase):
         self.assertEqual(selected, {
             'stm32_assembly', 'can_assembly', 'usb_assembly',
             'ethernet_assembly', 'timer_assembly', 'multi_controller_assembly',
-            'declared_io_assembly', 'stm32f4_family'})
+            'declared_io_assembly', 'stm32f4_family',
+            'stm32f1_family', 'stm32f1_vldiscovery', 'stm32f1_flash',
+            'stm32f1_flash_observe', 'stm32f1_watchdog',
+            'stm32f1_buses', 'stm32f1_pwm', 'stm32f1_adc',
+            'stm32f1_exti', 'stm32f1_stop', 'stm32f1_pvd', 'stm32f1_window_watchdog', 'stm32f1_wwdg_early_warning',
+            'stm32f1_can', 'stm32f1_rtc', 'stm32f1_uart_rx_dma', 'stm32f1_dac',
+            'stm32f1_spi_dma', 'stm32f1_can_normal', 'stm32f1_fsmc',
+            'stm32f1_i2c_10bit', 'stm32f1_i2c_target', 'stm32f1_i2c_master_irq',
+            'stm32f1_advanced_pwm', 'stm32f1_pwm_adc', 'stm32f1_can_connectivity',
+            'stm32f1_timer_capture', 'stm32f1_timer_pulse', 'stm32f1_i2s2', 'stm32f1_connectivity_dwc',
+            'stm32f1_sdio', 'stm32f1_encoder', 'stm32f1_uart9n1',
+            'stm32f1_pma_device', 'stm32f1_spi_dual', 'stm32f1_uart_half_duplex',
+            'stm32f1_uart_lin', 'stm32f1_uart_flow', 'stm32f1_uart_irda', 'stm32f1_uart_sync', 'stm32f1_uart_smartcard', 'stm32f1_uart_ports', 'stm32f1_uart_remap', 'rs485_assembly', 'stm32f1_mdio', 'stm32f1_eth_mii',
+            'stm32f1_connectivity_host', 'stm32f1_lwip_ipv4'})
         for name in selected:
             self.assertTrue(list((ROOT / 'tests/integration/assemblies' / name).glob('*.toml')))
         commands = '\n'.join(step.get('run', '') for step in job['steps'])
@@ -896,7 +910,26 @@ class WorkflowContracts(unittest.TestCase):
         job = workflow('build-matrix.yml')['jobs']['controller-routes']
         step = next(step for step in job['steps'] if step.get('name') ==
                     'Link and audit each authored software assembly')
-        selections = {'stm32_assembly': [], 'can_assembly': []}
+        selections = {'stm32_assembly': [], 'can_assembly': [],
+                      'stm32f1_family': [], 'stm32f1_flash': [],
+                      'stm32f1_flash_observe': [],
+                      'stm32f1_watchdog': [], 'stm32f1_buses': [],
+                      'stm32f1_pwm': [], 'stm32f1_adc': [], 'stm32f1_exti': [], 'stm32f1_stop': [],
+                      'stm32f1_pvd': [], 'stm32f1_window_watchdog': [], 'stm32f1_wwdg_early_warning': [],
+                      'stm32f1_can': [], 'stm32f1_rtc': [], 'stm32f1_uart_rx_dma': [], 'stm32f1_vldiscovery': [],
+                      'stm32f1_dac': [], 'stm32f1_spi_dma': [], 'stm32f1_can_normal': [],
+                      'stm32f1_fsmc': [], 'stm32f1_i2c_10bit': [], 'stm32f1_i2c_target': [],
+                      'stm32f1_i2c_master_irq': [],
+                      'stm32f1_advanced_pwm': [], 'stm32f1_pwm_adc': [], 'stm32f1_can_connectivity': [],
+                      'stm32f1_timer_capture': [], 'stm32f1_timer_pulse': [], 'stm32f1_i2s2': [],
+                      'stm32f1_connectivity_dwc': [], 'stm32f1_sdio': [],
+                      'stm32f1_encoder': [], 'stm32f1_uart9n1': [], 'stm32f1_pma_device': [],
+                      'stm32f1_spi_dual': [], 'stm32f1_uart_half_duplex': [],
+                      'stm32f1_uart_lin': [], 'stm32f1_uart_flow': [], 'stm32f1_uart_irda': [],
+                      'stm32f1_uart_sync': [], 'stm32f1_uart_smartcard': [],
+                      'stm32f1_uart_ports': [], 'stm32f1_uart_remap': [], 'rs485_assembly': [],
+                      'stm32f1_mdio': [], 'stm32f1_eth_mii': [], 'stm32f1_connectivity_host': [],
+                      'stm32f1_lwip_ipv4': []}
         authored_family = sorted('tests/integration/assemblies/stm32f4_family/' + path.name
             for path in (ROOT / 'tests/integration/assemblies/stm32f4_family').glob('*.toml'))
         selections.update(

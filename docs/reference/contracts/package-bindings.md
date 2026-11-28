@@ -101,6 +101,10 @@ SoC 的 CAN 控制器事实通过 `clock_domain` 引用所选 ClockPlan 域。CA
 CAN 频率。已有 UART／SPI 的事实继续按原领域合同校验。需要共享
 时钟来源的约束属于具体 IP，时钟频率相等不代替时钟域身份相同。
 
+路线可以用 `clock_profiles` 限定已审运行档位。配置在静态装配时核对名称与选定
+时钟计划。器件目录可用 `startup_vector_tail` 声明官方启动表在外部 IRQ 之后的
+32 位字。链接检查校验字值和完整表长，外部 IRQ 槽数独立取自器件事实。
+
 CAN 的公开帧与借用合同保持独立；bxCAN 的时序范围、mailbox/FIFO、bank/split 和
 FMI 属于明确的 IP policy。控制器事实的 `irq_sources` 将逻辑原因映射至已审物理
 IRQ，不能仅按列表序号推导语义。多个原因引用同一向量时，所选绑定必须提供对应的

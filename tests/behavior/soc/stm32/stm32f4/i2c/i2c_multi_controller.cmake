@@ -4,14 +4,14 @@ foreach(i2c_multi_family stm32f4)
     set(i2c_multi_target "nexus_${i2c_multi_family}_i2c_multi_controller_test")
     nexus_google_test(${i2c_multi_target} SOURCES "${nexus_google_root}/soc/stm32/stm32f4/i2c/i2c_multi_controller_test.cpp"
         "${nexus_google_root}/soc/stm32/stm32f4/i2c/i2c_instruction_barrier_model.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/i2c_v1_async/i2c_v1_async.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/common/i2c_v1_async/i2c_v1_async.c"
         "${NEXUS_SOC_SOURCE_${i2c_multi_family}}/drivers/i2c/i2c_async.c"
         "${NEXUS_SOC_SOURCE_${i2c_multi_family}}/drivers/i2c/i2c_cold.c"
         "${NEXUS_SOC_SOURCE_${i2c_multi_family}}/drivers/gpio/gpio.c"
         LIBRARIES Nexus::IO
         INCLUDES "${NEXUS_SOURCE_DIR}/tests/integration/assemblies/multi_controller"
             "${NEXUS_SOURCE_DIR}/tests/support/arm/stm32f4"
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/i2c_v1_async"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/common/i2c_v1_async"
             "${NEXUS_SOC_SOURCE_${i2c_multi_family}}"
             "${NEXUS_SOC_SOURCE_${i2c_multi_family}}"
             "${NEXUS_SOURCE_DIR}/arch/include"

@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "id": "stm32f103rb-adc-software",
+  "soc": "STM32F103RBT6",
+  "soc_family": "stm32f1",
+  "source_revision": "UM1724 Rev17, MB1136 NUCLEO-F103RB external analog software fixture",
+  "physical_pcb_revision": null,
+  "clocks": {},
+  "bindings": [
+    {
+      "id": "adc1-pa0",
+      "controller": "ADC1",
+      "route": "adc1-pa0-in0"
+    },
+    {
+      "id": "adc1-pa0-tim1",
+      "controller": "ADC1",
+      "route": "adc1-pa0-tim1-cc1"
+    },
+    {
+      "id": "adc1-pa0-pa1",
+      "controller": "ADC1",
+      "route": "adc1-pa0-pa1-tim3"
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14",
+    "PA15",
+    "PB3",
+    "PB4",
+    "PD0",
+    "PD1",
+    "PC14",
+    "PC15"
+  ],
+  "unknowns": [
+    "PCB revision, VREF and the analog source have not been measured.",
+    "PA0 requires an external analog source and a common return."
+  ],
+  "provenance": [
+    {
+      "scope": "Official MB1136 manual connections and stock configuration only; physical hardware is not observed.",
+      "url": "https://www.st.com/resource/en/user_manual/um1724-stm32-nucleo64-boards-mb1136-stmicroelectronics.pdf",
+      "file": "um1724-stm32-nucleo64-boards-mb1136-stmicroelectronics.pdf",
+      "sha256": "576d9bee3bc32c8ee70bf0d77cf9494cec06ea7c1d9ff98eebf2738cb9314a14",
+      "pages": [
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        40
+      ],
+      "components": [
+        "U4",
+        "LD2",
+        "SB21",
+        "SB13",
+        "SB14",
+        "SB62",
+        "SB63",
+        "ST-LINK"
+      ],
+      "nets": [
+        "+3.3V",
+        "PA5/D13",
+        "PA2/USART2_TX",
+        "PA3/USART2_RX"
+      ]
+    },
+    {
+      "scope": "Exact PA0/A0 and PA1/A1 pin exposure. The fixture uses a 3.3 V nominal reference.",
+      "url": "https://www.st.com/resource/en/user_manual/um1724-stm32-nucleo64-boards-mb1136-stmicroelectronics.pdf",
+      "file": "um1724-stm32-nucleo64-boards-mb1136-stmicroelectronics.pdf",
+      "sha256": "576d9bee3bc32c8ee70bf0d77cf9494cec06ea7c1d9ff98eebf2738cb9314a14",
+      "pages": [
+        40,
+        57
+      ],
+      "components": [
+        "CN8",
+        "CN7",
+        "U4"
+      ],
+      "nets": [
+        "PA0/A0/CN8-1",
+        "PA0/CN7-28",
+        "PA1/A1/CN8-2",
+        "PA1/CN7-30"
+      ]
+    }
+  ],
+  "backend_support": [
+    "baremetal",
+    "freertos"
+  ]
+}

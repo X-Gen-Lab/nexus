@@ -6,7 +6,7 @@ foreach(clock_family stm32f4)
         "${NEXUS_SOC_SOURCE_${clock_family}}/drivers/usb/usb_clock.c"
         LIBRARIES Nexus::Core
         INCLUDES
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/dwc_otg_device" "${NEXUS_SOC_SOURCE_${clock_family}}"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/common/dwc_otg_device" "${NEXUS_SOC_SOURCE_${clock_family}}"
             "${NEXUS_SOURCE_DIR}/arch/include"
             "${NEXUS_SOURCE_DIR}/io/include"
             "${NEXUS_SOURCE_DIR}/io/private"
@@ -34,7 +34,7 @@ nexus_google_test(nexus_stm32f4_usb_hs_clock_test
         "${NEXUS_SOC_SOURCE_stm32f4}/drivers/usb/usb_hs_clock.c"
     LIBRARIES Nexus::Core
     INCLUDES
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/dwc_otg_device" "${NEXUS_SOC_SOURCE_stm32f4}"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/common/dwc_otg_device" "${NEXUS_SOC_SOURCE_stm32f4}"
         "${NEXUS_SOURCE_DIR}/io/include" "${NEXUS_SOURCE_DIR}/arch/include"
 )
 target_compile_options(

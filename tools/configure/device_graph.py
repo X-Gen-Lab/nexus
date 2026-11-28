@@ -67,12 +67,11 @@ def resolve(assembly, *, root, soc, board, routes, bindings,
     claims, claim_list, claim = resource_claims(provider)
     for record in reserved_claims(soc, board, provider):
         claim(**record)
-    if (binding_policy is not None and clock_plan is not None and
-            clock_plan.get("parameters") is not None):
+    if binding_policy is not None and clock_plan is not None:
         # The selected external oscillator owns its pads before System starts.
         # A Board reservation may restate this ownership, never release it.
-        source = clock_plan["parameters"]["source"]
-        for resource in binding_policy.oscillator_resources(source):
+        source = clock_plan["input"]["source"]
+        for resource in binding_policy.oscillator_resources(source, clock_plan["profile"]):
             if normalize_resource(resource) not in claims:
                 claim(resource, "system-clock", source, clock_plan["profile"])
     if backend == "freertos":
@@ -88,6 +87,7 @@ def resolve(assembly, *, root, soc, board, routes, bindings,
     instance_ids = []
     from tools.configure.generation.shared_irq import IrqClaims
     irq_claims = IrqClaims(claims, claim)
+    register_sharing = {}
     for selection in sequence(controller_selections, "selected controllers"):
         location = (selection.get("id", "<unknown>") if isinstance(selection, dict)
                     else "<invalid>")
@@ -115,12 +115,29 @@ def resolve(assembly, *, root, soc, board, routes, bindings,
             if mode not in route["modes"]:
                 fail(f"Unsupported mode {mode} for {selection['binding']}; "
                      f"allowed: {', '.join(route['modes'])}")
+            for field, expected in route.get("required_options", {}).items():
+                actual = selection.get(field)
+                if isinstance(expected, (list, tuple)):
+                    matches = (isinstance(actual, (list, tuple)) and
+                               len(actual) == len(expected) and
+                               all(type(a) is type(e) and a == e
+                                   for a, e in zip(actual, expected)))
+                else:
+                    matches = type(actual) is type(expected) and actual == expected
+                if not matches:
+                    fail(f"Route {route['id']} requires {field} = {expected!r}")
+            profiles = route.get("clock_profiles")
+            if profiles is not None and (clock_plan is None or
+                                         clock_plan["profile"] not in profiles):
+                fail(f"Route {route['id']} requires clock profile "
+                     + ", ".join(profiles))
             if route["kind"] == "rtc":
                 from tools.configure import rtc
                 rtc.validate_board(selection, board)
             if binding_policy is not None:
                 binding_policy.validate_selection(
-                    soc["variants"][part].get("device"), route["kind"], selection)
+                    soc["variants"][part].get("device"), route["kind"],
+                    selection, part=part)
             validate_selection(selection, route, provider, ram["size"],
                                clock=clock, clock_plan=clock_plan)
             route = adc.selected_route(selection, route, provider)
@@ -184,6 +201,11 @@ def resolve(assembly, *, root, soc, board, routes, bindings,
                              *route.get("mode_resources", {}).get(mode, ())):
                 if normalize_resource(resource) not in domain_keys:
                     claim(resource, name, mode, route["id"])
+            for key, value in route.get("register_settings", {}).items():
+                register_sharing[key] = ("value",)
+                claim_list.append({"key": key, "owner": name, "mode": mode,
+                    "source": route["id"], "policy": "compatible",
+                    "attributes": {"value": value}})
             if route["kind"] == "adc_group":
                 for resource in adc.group_trigger_resources(selection, provider):
                     claim(resource, name, mode, route["id"])
@@ -196,7 +218,8 @@ def resolve(assembly, *, root, soc, board, routes, bindings,
             if traits.dma:
                 for dma in route_dma(route, mode):
                     claim("dma:" + dma, name, mode, route["id"])
-                    claim(provider.dma_irq(dma), name, mode, route["id"])
+                    if traits.dma_irq:
+                        claim(provider.dma_irq(dma), name, mode, route["id"])
             selected.append(normalize_controller(
                 selection, route, binding, hardware, provider, clock=clock,
                 clock_plan=clock_plan, clock_profile=assembly.clock_profile,
@@ -269,7 +292,7 @@ def resolve(assembly, *, root, soc, board, routes, bindings,
                 chip_selects=chip_selects, claim=claim, obj=obj)
     unique(device_ids + instance_ids, "assembly instance IDs")
     unique([c_id(name).upper() for name in device_ids + instance_ids], "generated C identifiers")
-    usb_device.complete_plan(selected, endpoint_selections, claim)
+    usb_device.complete_plan(selected, endpoint_selections, claim, provider)
     for controller in selected:
         children = [item for item in endpoint_selections if item["controller"] == controller["id"]]
         if controller["kind"] == "external_bus":
@@ -283,8 +306,8 @@ def resolve(assembly, *, root, soc, board, routes, bindings,
     aliases = {"controller:" + item["controller"]:
                "ip:" + item["controller"] + "/control"
                for item in selected if item["kind"] == "external_bus"}
-    resources = resource_graph.resolve(claim_list, shared=pwm_sharing,
-                                       aliases=aliases)
+    resources = resource_graph.resolve(claim_list,
+        shared={**pwm_sharing, **register_sharing}, aliases=aliases)
     adc_group = provider.ADC_GROUP
     triggers = trigger_graph.resolve_fixed(
         selected, adc_triggers=getattr(provider, "ADC_TRIGGERS", None),

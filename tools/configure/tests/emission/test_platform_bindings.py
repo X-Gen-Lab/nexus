@@ -51,6 +51,27 @@ class PlatformBindingTests(unittest.TestCase):
         nodes = policy.platform_declarations(result)
         self.assertEqual([node.name for node in nodes], ["s_nx_platform_lifecycle_config"])
 
+    def test_minimal_platform_does_not_declare_unused_owners(self):
+        module = importlib.import_module("tools.configure.generation.platform_bindings")
+        facts = configure.load(configure.ROOT /
+            "soc/stm32/stm32f4/private/bindings/platform.json")["domains"]["platform"]
+        facts["roles"] = {}
+        facts["dma_clocks"] = {}
+        del facts["power"]
+        objects = facts["objects"]["platform"]
+        objects["symbols"] = {"config": facts["config_symbol"]}
+        objects["declarations"] = [{"role": "config", "type": "platform_config_t",
+            "const": True, "value": {"record": [["flash_bytes",
+                {"source": "selected.flash_bytes", "as": "u32"}]]}}]
+        facts["objects"] = {"platform": objects}
+        result = configure.resolve_ir(configure.ROOT /
+            "tools/configure/assemblies/qiming-baremetal-empty.toml")
+        policy = module.PlatformBindings.from_validated(facts)
+        self.assertEqual(policy.state_declarations(result), ())
+        nodes = policy.platform_declarations(result)
+        self.assertEqual([node.name for node in nodes], [facts["config_symbol"]])
+        self.assertEqual(policy.platform_power_controllers(result, []), ())
+
     def test_package_owns_c_symbols_without_exposing_configuration_objects(self):
         module = importlib.import_module("tools.configure.generation.platform_bindings")
         facts = configure.load(configure.ROOT /

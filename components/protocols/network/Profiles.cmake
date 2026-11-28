@@ -41,7 +41,13 @@ function(nexus_lwip_profile suffix adapter_alias tcp_alias loaned)
         message(FATAL_ERROR "Invalid private lwIP profile arguments")
     endif()
     set(profile_sources ${nexus_lwip_sources})
-    if(managed)
+    if(NOT tcp_alias)
+        list(
+            FILTER profile_sources
+            EXCLUDE
+            REGEX "/core/(tcp[^/]*|udp|raw)[.]c$"
+        )
+    elseif(managed)
         list(
             APPEND profile_sources
             "${nexus_lwip_source}/src/core/dns.c"
@@ -62,7 +68,10 @@ function(nexus_lwip_profile suffix adapter_alias tcp_alias loaned)
         PUBLIC nexus_abi_options
         PRIVATE nexus_build_options
     )
-    if(loaned)
+    if(NOT tcp_alias)
+        target_compile_definitions("${vendor}" PUBLIC NEXUS_LWIP_IPV4_ONLY=1)
+        set(profile copied_ipv4)
+    elseif(loaned)
         target_compile_definitions(
             "${vendor}"
             PUBLIC LWIP_SUPPORT_CUSTOM_PBUF=1 NEXUS_LWIP_LOANED_RX=1
@@ -106,31 +115,35 @@ function(nexus_lwip_profile suffix adapter_alias tcp_alias loaned)
     target_link_libraries("${storage}" INTERFACE "${adapter}" "${vendor}")
     add_library("Nexus::${adapter_alias}Storage" ALIAS "${storage}")
 
-    # TCP uses the same source and the selected adapter's exact layout.
-    add_library(
-        "${tcp}"
-        STATIC
-        EXCLUDE_FROM_ALL
-        "${network_dir}/src/lwip_tcp.c"
-    )
-    nexus_apply_target_policy("${tcp}")
-    target_include_directories("${tcp}" PUBLIC "${network_dir}/include")
-    target_link_libraries(
-        "${tcp}"
-        PUBLIC nexus_io_contract
-        PRIVATE
-            "${adapter}"
-            "${vendor}"
-            nexus_build_options
-            nexus_owned_warnings
-    )
-    add_library("Nexus::${tcp_alias}" ALIAS "${tcp}")
-    add_library("${tcp_storage}" INTERFACE)
-    target_link_libraries("${tcp_storage}" INTERFACE "${tcp}" "${vendor}")
-    add_library("Nexus::${tcp_alias}Storage" ALIAS "${tcp_storage}")
+    set(profile_targets "${adapter}")
+    if(tcp_alias)
+        # TCP uses the same source and the selected adapter's exact layout.
+        add_library(
+            "${tcp}"
+            STATIC
+            EXCLUDE_FROM_ALL
+            "${network_dir}/src/lwip_tcp.c"
+        )
+        nexus_apply_target_policy("${tcp}")
+        target_include_directories("${tcp}" PUBLIC "${network_dir}/include")
+        target_link_libraries(
+            "${tcp}"
+            PUBLIC nexus_io_contract
+            PRIVATE
+                "${adapter}"
+                "${vendor}"
+                nexus_build_options
+                nexus_owned_warnings
+        )
+        add_library("Nexus::${tcp_alias}" ALIAS "${tcp}")
+        add_library("${tcp_storage}" INTERFACE)
+        target_link_libraries("${tcp_storage}" INTERFACE "${tcp}" "${vendor}")
+        add_library("Nexus::${tcp_alias}Storage" ALIAS "${tcp_storage}")
+        list(APPEND profile_targets "${tcp}")
+    endif()
     # PRIVATE vendor links do not propagate a consumer's compatibility label.
     # Carry the selected ABI fact through ordinary adapter/TCP public targets.
-    foreach(profile_target IN ITEMS "${adapter}" "${tcp}")
+    foreach(profile_target IN LISTS profile_targets)
         set_property(
             TARGET "${profile_target}"
             PROPERTY INTERFACE_NEXUS_LWIP_RX_PROFILE "${profile}"

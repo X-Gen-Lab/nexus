@@ -52,6 +52,22 @@ class PackageTests(unittest.TestCase):
         with self.assertRaises(TypeError):
             selected.facts["soc"] = "other.json"
 
+    def test_shared_exports_stay_inside_the_same_vendor_common_tree(self):
+        shared = self.package.parent / "common/bxcan"
+        shared.mkdir(parents=True)
+        mechanism = shared / "controller.c"
+        mechanism.write_text("")
+        self.value["exports"]["vendor_shared"] = ["bxcan"]
+        self.write()
+        selected = self.load()
+        self.assertTrue(selected.exports(mechanism))
+        self.assertFalse(selected.exports(self.root / "soc/other/common/controller.c"))
+        for rejected in ("../family", "unreviewed"):
+            self.value["exports"]["vendor_shared"] = [rejected]
+            self.write()
+            with self.assertRaises(ValueError):
+                self.load()
+
     def test_discovery_reads_only_declarative_manifests(self):
         from tools.configure import packages
         (self.package / "__init__.py").write_text("raise RuntimeError('imported')")

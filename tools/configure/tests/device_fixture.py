@@ -3,6 +3,7 @@ from pathlib import Path
 
 from tools.configure import configure as gate
 from tools.configure import packages
+from tools.configure.data_provider import DataProvider
 
 
 def package_for_fact(path):
@@ -37,7 +38,7 @@ def load_soc_facts(path, *, part=None):
     """Read the authored package slots before testing the normalized validator."""
     package = package_for_fact(path)
     facts = load_authored_soc(path)
-    if facts["id"] == "stm32f4":
+    if package is not None and "device_catalog" in package.facts:
         catalog = gate.load(package.fact("device_catalog"))
         facts = gate.catalog_soc_facts(
             facts, part or next(iter(facts["variants"])), catalog).soc
@@ -51,17 +52,21 @@ def validate_soc_facts(soc, part, provider=None):
     belongs to the independent locked device gate and C compile assertions.
     """
     selected = None
-    if soc["id"] == "stm32f4" and (provider is None or
-            "irq" not in getattr(provider, "soc", {"irq": None})):
-        from tools.configure.tests.f4_fixture import provider as exact_provider
-        baseline = gate.load(gate.ROOT / "soc/stm32/stm32f4/facts/soc.json")
-        reviewed = part if part in baseline["variants"] else next(
-            iter(baseline["variants"]))
-        # The expected CPU/IRQ contract comes from unmodified package bytes,
-        # never from the deliberately corrupted facts under test.
-        provider = exact_provider(reviewed)
-    if soc["id"] == "stm32f4" and part in soc["variants"]:
-        path = gate.ROOT / "soc/stm32/stm32f4/facts/devices.json"
-        devices = gate.vendor_device_catalog(gate.load(path))
-        selected = devices.get(soc["variants"][part].get("device"))
+    package = (None if soc["id"] == "native" else
+               packages.find(gate.ROOT, soc["id"]))
+    if package is not None and "device_catalog" in package.facts:
+        read = packages.FactReader()
+        catalog = read(package.fact("device_catalog"))
+        if provider is None or "irq" not in getattr(provider, "soc", {"irq": None}):
+            baseline = packages.read_soc(package, read=read)
+            reviewed = part if part in baseline["variants"] else next(
+                iter(baseline["variants"]))
+            provider = DataProvider.from_package(
+                package, baseline, read(package.fact("bindings")), read=read)
+            # Keep expected CPU and IRQ facts separate from test mutations.
+            provider = gate.resolve_device_facts(
+                baseline, reviewed, provider, catalog=catalog).provider
+        if part in soc["variants"]:
+            devices = gate.vendor_device_catalog(catalog)
+            selected = devices.get(soc["variants"][part].get("device"))
     return gate.validate_soc(soc, part, provider, catalog_device=selected)

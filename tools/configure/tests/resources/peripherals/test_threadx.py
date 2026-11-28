@@ -43,11 +43,26 @@ class ThreadXPolicyTests(unittest.TestCase):
                 self.assertEqual(profile.float_abi, abi)
 
     def test_other_cores_remain_arch_contracts_not_threadx_ports(self):
-        for arch in ("cortex-m0", "cortex-m0plus", "cortex-m3", "cortex-m7",
+        for arch in ("cortex-m0", "cortex-m0plus", "cortex-m7",
                      "cortex-m23", "cortex-m33", "cortex-m55", "cortex-m85"):
             with self.subTest(arch=arch), self.assertRaisesRegex(
                     ValueError, "ThreadX.*port"):
                 self.profile(arch)
+
+    def test_f103rb_uses_exact_m3_systick_and_basepri(self):
+        fixture = ROOT / "tests/integration/kernels/os_threadx_runtime"
+        result = gate.resolve_ir(fixture / "f103rb-threadx.toml")
+        self.assertEqual(result.part, "STM32F103RBT6")
+        self.assertEqual(result.cpu_profile.arch, "cortex-m3")
+        self.assertEqual(result.cpu_profile.float_abi, "soft")
+        self.assertEqual(result.kernel.kernel_port, "cortex_m3/gnu")
+        self.assertEqual(result.kernel.tick_reload, 7999)
+        self.assertEqual(result.kernel.stack_alignment_bytes, 8)
+        self.assertEqual(result.kernel.definitions["NEXUS_THREADX_BASEPRI"], 80)
+        for choices, diagnostic in (({"tick_source": "external"}, "SysTick"),
+                                    ({"interrupt_mask": "primask"}, "BASEPRI")):
+            with self.subTest(choices=choices), self.assertRaisesRegex(ValueError, diagnostic):
+                self.resolve(choices, arch="cortex-m3", hz=8000000)
 
     def test_default_m4_policy_uses_real_static_port_facts(self):
         policy = self.resolve()

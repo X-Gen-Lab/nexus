@@ -7,11 +7,13 @@
 #define NEXUS_ST_USB_DEVICE_CONF_H
 #include <stdint.h>
 #include <string.h>
-#define USBD_MAX_NUM_INTERFACES       4U
-#define USBD_MAX_NUM_CONFIGURATION    1U
-#define USBD_MAX_SUPPORTED_CLASS      1U
-#define USBD_LPM_ENABLED              0U
-#define USBD_SELF_POWERED             0U
+#define USBD_MAX_NUM_INTERFACES    4U
+#define USBD_MAX_NUM_CONFIGURATION 1U
+#define USBD_MAX_SUPPORTED_CLASS   1U
+#define USBD_LPM_ENABLED           0U
+#ifndef USBD_SELF_POWERED
+#define USBD_SELF_POWERED 0U
+#endif
 #define USBD_DEBUG_LEVEL              0U
 #define USBD_SUPPORT_USER_STRING_DESC 0U
 #define USBD_CLASS_USER_STRING_DESC   0U

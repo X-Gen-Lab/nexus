@@ -1022,7 +1022,8 @@ class DeveloperWorkflowTests(unittest.TestCase):
         self.assertEqual({name for name in names
                           if not name.startswith(("native-", "fixture-"))},
                          {"stm32-qiming-baremetal", "stm32-qiming-freertos",
-                          "stm32-sky-baremetal", "stm32-sky-freertos"})
+                          "stm32-sky-baremetal", "stm32-sky-freertos",
+                          "stm32-f103rb-baremetal", "stm32-f103rb-freertos"})
         for row in configurations:
             self.assertIn(row["name"], builds)
             selected = selected_configure(dev.ROOT, row["name"])

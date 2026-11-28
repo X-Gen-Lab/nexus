@@ -27,7 +27,8 @@ typedef enum {
 } nx_usb_profile_phy_t;
 typedef enum {
     NX_USB_PROFILE_PIO,
-    NX_USB_PROFILE_AHB_DMA
+    NX_USB_PROFILE_AHB_DMA,
+    NX_USB_PROFILE_PACKET_MEMORY
 } nx_usb_profile_engine_t;
 /* Selected kinds, independent of controller EPTYP encodings. */
 typedef enum {
@@ -92,8 +93,10 @@ typedef struct {
  *                  a finite remaining deadline of at most one second and
  *                  never retries a missed opportunity. ULPI ISO submission
  *                  requires an observed speed; FS fallback caps MPS at 1023.
- *                  External descriptors own interval and synchronization;
- *                  this profile does not schedule a periodic stream.
+ *                  Packet-memory engines use zero FIFO fields and a
+ *                  selected FS PIO endpoint plan. Their setup-decision face
+ *                  may be absent. External descriptors own interval and
+ * synchronization; this profile does not schedule a periodic stream.
  */
 nx_result_t nx_usb_profile_validate(const nx_usb_device_profile_t* profile);
 /**

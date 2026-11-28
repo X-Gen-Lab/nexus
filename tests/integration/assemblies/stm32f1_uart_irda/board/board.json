@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "id": "stm32f103rb-usart2-irda",
+  "soc": "STM32F103RBT6",
+  "soc_family": "stm32f1",
+  "source_revision": "DS5319 Rev20 Table 5 and RM0008 Rev21 27.3.12, PA2/PA3 to external optical transceiver",
+  "physical_pcb_revision": null,
+  "clocks": {},
+  "bindings": [
+    {
+      "id": "irda-uart2",
+      "controller": "USART2",
+      "route": "usart2-pa2-pa3-irda"
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14",
+    "PA15",
+    "PB3",
+    "PB4",
+    "PD0",
+    "PD1",
+    "PC14",
+    "PC15"
+  ],
+  "unknowns": [
+    "Transceiver polarity, optical timing, clocks and peer receive setup are unobserved."
+  ],
+  "provenance": [
+    "https://www.st.com/resource/en/datasheet/stm32f103rb.pdf"
+  ],
+  "backend_support": [
+    "baremetal"
+  ]
+}

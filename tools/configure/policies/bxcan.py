@@ -9,7 +9,7 @@ from typing import ClassVar
 from types import MappingProxyType
 
 from tools.configure.generation.calls import Symbol
-from tools.configure.providers.common import fail, integer, sequence
+from tools.configure.providers.common import CAN_FIXED_POLL_MODES, fail, integer, sequence
 from tools.configure.resource_graph import identifier
 
 FILTER_FIELDS = {"controller", "bank", "id", "mask", "format", "fifo",
@@ -46,13 +46,15 @@ class BxCanTransport:
 class BxCanPolicy:
     """One explicitly selected IP; reasons bind to physical vectors in facts."""
     fifo_order_supported: bool = True
+    operations: tuple[str, ...] = ("normal", "loopback", "silent-loopback")
     transports: Mapping = field(default_factory=lambda: MappingProxyType({}))
     irq_roles: ClassVar[tuple[str, ...]] = ("tx", "rx0", "rx1", "error")
 
     def validate_soc(self, soc, owners):
         names, _ = domain_topology(soc)
         actual = {name for name, item in soc["controllers"].items()
-                  if item["kind"] == "can"}
+                  if item["kind"] == "can" and
+                  not set(item["modes"]) <= CAN_FIXED_POLL_MODES}
         if actual != set(names) or names != owners:
             fail("CAN domain differs from the selected SoC topology")
         for name in names:
@@ -109,7 +111,8 @@ def domain_topology(soc):
 
 
 def resolve_domain(authored, selected, soc, provider, claim, claims):
-    ports = {item["id"]: item for item in selected if item["kind"] == "can"}
+    ports = {item["id"]: item for item in selected
+             if item["kind"] == "can" and item["mode"] == "classic-irq"}
     if not ports:
         if authored is not None:
             fail("CAN domain requires a selected CAN controller")

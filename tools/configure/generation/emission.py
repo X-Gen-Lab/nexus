@@ -94,6 +94,12 @@ def emit_bundle(result, output):
                    "#define NX_IO_CYCLE_PROBES 1", "#endif"]
     if result.clock["source"] == "hse":
         header.insert(7, f'#define NEXUS_HSE_HZ {result.clock["input_hz"]}u')
+    if "hse_bypass" in result.clock:
+        header.append(f'#define NEXUS_CLOCK_HSE_BYPASS {int(result.clock["hse_bypass"])}')
+    for field in ("apb1_hz", "apb2_hz", "apb1_timer_hz", "apb2_timer_hz",
+                  "pll48_hz", "flash_wait_states"):
+        if field in result.clock:
+            header.append(f'#define NEXUS_CLOCK_{field.upper()} {result.clock[field]}u')
     provider = for_selection(result)
     header.extend(provider.configuration_header(result))
     context = result.provider_context
@@ -125,6 +131,21 @@ def emit_bundle(result, output):
              'set(NEXUS_REQUIRED_IO_DOMAINS "' +
              ';'.join(result.required_io_domains) + '")',
              'set(NEXUS_SELECTED_COMPONENTS "' + ';'.join(result.components) + '")']
+    choices, reserved_pins, clock = "", "", ""
+    if result.hardware is not None and result.hardware.selected:
+        choices = ";".join(f"{item.option}={item.value}"
+                           for item in result.hardware.selected)
+        safe_pin = re.compile(r"pin:[A-Za-z0-9_.-]+")
+        safe_owner = re.compile(r"[A-Za-z0-9_.-]+")
+        reserved_pins = ";".join(f"{claim.key}={claim.owner}" for claim in result.claims
+            if claim.mode == "reserved" and safe_pin.fullmatch(claim.key)
+            and safe_owner.fullmatch(claim.owner))
+        clock = result.clock_profile
+        if not safe_owner.fullmatch(clock):
+            raise ValueError("Invalid selected clock profile identity")
+    cmake.extend((f'set(NEXUS_SELECTED_BOARD_HARDWARE "{choices}")',
+                  f'set(NEXUS_BOARD_RESERVED_PINS "{reserved_pins}")',
+                  f'set(NEXUS_SELECTED_CLOCK_PROFILE "{clock}")'))
     if context is None or not context.external or provider.MODEL:
         cmake.append("set(NEXUS_DISCOVER_SOC_PACKAGES ON)")
     package = context.package if context is not None else None

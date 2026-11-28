@@ -8,9 +8,10 @@ from dataclasses import dataclass
 from types import MappingProxyType
 
 from tools.configure.generation.calls import Symbol
-from tools.configure.pinmux import NumericPinMuxPolicy
+from tools.configure.pinmux import FixedRoutePinMuxPolicy, NumericPinMuxPolicy
 from tools.configure.providers.common import fail, integer
 from tools.configure.records import freeze
+from tools.configure import usb_pma
 
 
 def _fields(value, required, optional=()):
@@ -81,8 +82,8 @@ class PacketPolicy:
 
     @classmethod
     def from_validated(cls, value, *, pinmux):
-        if not isinstance(pinmux, NumericPinMuxPolicy):
-            fail("Packet policy requires a selected numeric pinmux policy")
+        if not isinstance(pinmux, (NumericPinMuxPolicy, FixedRoutePinMuxPolicy)):
+            fail("Packet policy requires a selected pinmux policy")
         _fields(value, {"schema_version", "usb_modes", "host_modes", "dma_alignment",
                         "setup_slots", "setup_bytes"}, {"ethernet_memory", "admission", "faces"})
         if type(value["schema_version"]) is not int or value["schema_version"] != 1:
@@ -208,6 +209,12 @@ class PacketPolicy:
                 rx_storage_extent=integer(item.options.rx_count * item.options.rx_storage_bytes,
                     1, context="Ethernet RX storage extent"),
                 mii=item.mode in {"raw-mii", "mii-vlan-sg-ptp"})
+        if item.mode in usb_pma.MODES:
+            entries = tuple(PacketEndpointBinding(child, None, False)
+                            for child in configuration.devices
+                            if child.controller == item.id)
+            endpoints = MappingProxyType({entry.child.id: entry for entry in entries})
+            return PacketBinding(endpoints=endpoints, entries=entries)
         options = item.options
         host = options if item.kind == "usb_host" else options.host
         host_dma = host is not None and host.engine == "dma"

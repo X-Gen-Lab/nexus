@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "id": "stm32f103rb-mb1136-c03-sn65hvd230dr",
+  "soc": "STM32F103RBT6",
+  "soc_family": "stm32f1",
+  "source_revision": "MB1136 C-03 ST-LINK MCO plus software-reference CAN carrier, TI SLOS346O",
+  "physical_pcb_revision": null,
+  "clocks": {
+    "hse_hz": 8000000,
+    "hse_bypass": true
+  },
+  "bindings": [
+    {
+      "id": "can-bus",
+      "controller": "CAN1",
+      "route": "can1-pa11-pa12-rs-pc2",
+      "requires": {
+        "can_transceiver": "sn65hvd230dr-3v3-rs-pc2"
+      }
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14",
+    "PA15",
+    "PB3",
+    "PB4",
+    "PD0",
+    "PD1",
+    "PC14",
+    "PC15"
+  ],
+  "unknowns": [
+    "Software reference for a specific MB1136 C-03 with factory MCO routes. Physical board, bus and clock accuracy are unverified.",
+    "Requires SN65HVD230DR VCC=3.3 V, D=PA12, R=PA11, RS=PC2 plus a board-populated pull-up to 3.3 V. Use an appropriate actively acknowledging bench peer.",
+    "CAN_H/CAN_L termination, common ground, electrical state and ingress are unverified."
+  ],
+  "provenance": [
+    {
+      "scope": "Official MB1136 manual connections and stock configuration only; physical hardware is not observed.",
+      "url": "https://www.st.com/resource/en/user_manual/um1724-stm32-nucleo64-boards-mb1136-stmicroelectronics.pdf",
+      "file": "um1724-stm32-nucleo64-boards-mb1136-stmicroelectronics.pdf",
+      "sha256": "576d9bee3bc32c8ee70bf0d77cf9494cec06ea7c1d9ff98eebf2738cb9314a14",
+      "pages": [
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        40,
+        57
+      ],
+      "components": [
+        "U4",
+        "LD2",
+        "SB21",
+        "SB13",
+        "SB14",
+        "SB62",
+        "SB63",
+        "ST-LINK",
+        "SB55",
+        "SB54",
+        "SB16",
+        "SB50",
+        "R35",
+        "R37"
+      ],
+      "nets": [
+        "+3.3V",
+        "PA5/D13",
+        "PA2/USART2_TX",
+        "PA3/USART2_RX",
+        "PD0/OSC_IN",
+        "ST-LINK MCO"
+      ]
+    },
+    {
+      "scope": "Exact reference transceiver pinout, rail, RS standby and maximum wake delay.",
+      "url": "https://www.ti.com/lit/ds/symlink/sn65hvd230.pdf",
+      "file": "sn65hvd230.pdf",
+      "sha256": "e98fc0c59168c035d7958111924dae7e21e46ab45bdfd6400aef048299d6d716",
+      "pages": [
+        5,
+        8,
+        12,
+        20,
+        22,
+        23
+      ]
+    }
+  ],
+  "backend_support": [
+    "baremetal"
+  ],
+  "hardware_options": {
+    "can_transceiver": [
+      "none",
+      "sn65hvd230dr-3v3-rs-pc2"
+    ]
+  }
+}

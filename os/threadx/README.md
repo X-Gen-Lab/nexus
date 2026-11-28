@@ -2,8 +2,9 @@
 
 本后端使用官方 Eclipse ThreadX 内核。受审来源为 `v6.5.2.202603_rel`，
 提交 `93387b0a60382a29579bbad5045c68328e3751df`，保留原 MIT 许可。
-当前集成范围为 Linux GNU 宿主端口，以及 STM32F4 所选配置的 Cortex-M4
-GNU 端口。器件与模式以[平台支持](../../docs/reference/platforms/support.md)为准。
+当前集成范围包括 Linux GNU、所选 STM32F4 Cortex-M4 GNU 配置，以及
+STM32F103RB HSI8 的 Cortex-M3 GNU 软件参考。板卡和策略见
+[ThreadX 选择合同](../../docs/reference/contracts/os/threadx.md)。
 当前适配器尚未实现其他 Cortex 配置组合、MPU／TrustZone 任务隔离、
 无节拍空闲、直接通知槽位和运行中调度器停机；Arch、FreeRTOS 的支持范围独立维护。
 
@@ -16,7 +17,7 @@ GNU 端口。器件与模式以[平台支持](../../docs/reference/platforms/sup
 独立的真实内核验证夹具，与 FreeRTOS 的宿主验证方式相同。
 
 本目录的 `CMakeLists.txt` 选择内核和端口；`threadx.c` 实现静态对象与等待，
-`m4.c`、`m4_vectors.S` 负责 M4 启动和向量连接。上层关系见
+`m4.c`、`m4_vectors.S` 负责 M3／M4 启动和向量连接。上层关系见
 [FIG-08：等待、唤醒与停机](../../docs/assets/diagrams/wait-wake-shutdown.svg)
 及 [OS 总览](../README.md)。图不表示本后端支持全部 OS 功能或已通过实板验收。
 
@@ -91,13 +92,16 @@ Nexus 创建的任务不使用时间片，满足此合同。外部调用者须�
 `nx_os_now_us` 使用 Core 连续单调时钟，`sleep_until` 保持同一有限预算，`yield`
 不承诺公平、低优先级进度或设备 service。
 
-## Cortex-M4 集成
+## Cortex-M3 和 Cortex-M4 集成
 
-使用锁定的 `ports/cortex_m4/gnu` C／汇编头和该端口 CMake 列出的全部七个上游
-汇编源。官方调度对象在同一裸函数入口拥有强符号 `PendSV_Handler` 和
-`__tx_PendSVHandler` 两个别名；额外包装会导致冲突或改变异常栈帧。
-`m4_vectors.S` 只把 SysTick 连接到真实 `_tx_timer_interrupt`。此端口不需要
-SVC，保留端口真实的浮点上下文处理。
+每个端口使用其锁定的 C／汇编头和上游 CMake 列出的七个汇编源。
+官方调度对象在同一裸函数入口拥有 `PendSV_Handler` 和
+`__tx_PendSVHandler` 两个强符号。`m4_vectors.S` 直接连接
+`_tx_timer_interrupt`。M4F 的浮点上下文由其上游端口处理。
+
+F103RB 软件参考使用 HSI8、1 kHz SysTick、BASEPRI 和软浮点 ABI。
+TIM2 继续提供独立的单调截止时间域。链接门禁核对真实向量、栈对齐
+及通过选定端口恢复 PSP 的指令。板卡行为需实测。
 
 `m4.c` 提供 `_tx_initialize_low_level`，替代上游示例，消费已解析的
 `NEXUS_CORE_HZ`、`NEXUS_OS_TICK_HZ`、`NEXUS_OS_SYSTICK_RELOAD`、
@@ -114,7 +118,7 @@ PendSV 使用最低已实现优先级；SysTick 使用选定内核上限，PRIMA
 非特权或中断已屏蔽上下文、不兼容优先级分组，以及 BASEPRI 下高于系统调用
 上限的 IRQ 优先级。Native 无法声称处于硬件 ISR，返回 false。
 
-显式外部 Tick 要求产品提供强符号 `nx_threadx_external_tick_setup(tick_hz)`。
+M4 的显式外部 Tick 要求产品提供强符号 `nx_threadx_external_tick_setup(tick_hz)`。
 缺实现必须链接失败；建立失败保留效果并保持停机。此钩子绑定处于正确内核上限
 的真实有界周期 IRQ，不替代所选 SoC 的 Core 连续单调截止时间域。
 默认配置在 ISR 中处理定时器回调，不创建隐藏定时器任务或栈，因此

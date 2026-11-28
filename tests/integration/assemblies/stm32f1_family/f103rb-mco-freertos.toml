@@ -1,0 +1,34 @@
+# The application explicitly starts a task using the same GPIO and UART faces.
+schema = 2
+board_package = "rb-mco-board"
+backend = "freertos"
+clock = "hse8-mco-pll72"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+flash_load_limit_bytes = 40960
+static_ram_limit_bytes = 12288
+libc_heap_bytes = 0
+
+[gpio.status]
+binding = "led0"
+mode = "output"
+active_high = true
+speed = "low"
+
+[uart.console]
+binding = "uart2"
+mode = "irq"
+baud = 115200
+
+[uart.console.rx]
+format = "bytes"
+capacity = 32
+
+[uart.console.irq]
+priority = 5
+calls_os = false
+
+[factory]
+capabilities = true

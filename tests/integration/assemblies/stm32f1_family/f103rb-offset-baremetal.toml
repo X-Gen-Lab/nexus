@@ -1,0 +1,37 @@
+# F103RB relocated image software link fixture.
+schema = 2
+board = "stm32f103rb_nucleo"
+backend = "baremetal"
+clock = "hsi8"
+layout = "f103rb-offset-layout.json"
+optimization = "Os"
+
+[memory]
+image_prefix_bytes = 512
+image_suffix_bytes = 1024
+main_stack_bytes = 2048
+flash_load_limit_bytes = 24576
+static_ram_limit_bytes = 6144
+libc_heap_bytes = 0
+
+[gpio.status]
+binding = "led0"
+mode = "output"
+active_high = true
+speed = "low"
+
+[uart.console]
+binding = "uart2"
+mode = "irq"
+baud = 115200
+
+[uart.console.rx]
+format = "bytes"
+capacity = 32
+
+[uart.console.irq]
+priority = 5
+calls_os = false
+
+[factory]
+capabilities = true

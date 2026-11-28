@@ -6,6 +6,6 @@ if(can_modes)
         nexus_soc_stm32f4
         PRIVATE
             "${CMAKE_CURRENT_LIST_DIR}/can.c"
-            "${CMAKE_CURRENT_LIST_DIR}/../ip/classic_can/can_controller.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/common/bxcan/can_controller.c"
     )
 endif()

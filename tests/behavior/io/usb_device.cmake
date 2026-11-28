@@ -2,13 +2,13 @@
 nexus_google_test(nexus_usb_device_test SOURCES "${nexus_google_root}/io/usb_device_test.cpp"
     LIBRARIES Nexus::NativeModel Nexus::Arch
     INCLUDES
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/dwc_otg_device" "${NEXUS_SOURCE_DIR}/tests/support/native/drivers"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/common/dwc_otg_device" "${NEXUS_SOURCE_DIR}/tests/support/native/drivers"
         "${NEXUS_SOURCE_DIR}/io/private"
 )
 nexus_google_test(nexus_usb_device_dma_test SOURCES "${nexus_google_root}/io/usb_device_dma_test.cpp"
     LIBRARIES Nexus::NativeModel Nexus::Arch
     INCLUDES
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/dwc_otg_device" "${NEXUS_SOURCE_DIR}/tests/support/native/drivers"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/common/dwc_otg_device" "${NEXUS_SOURCE_DIR}/tests/support/native/drivers"
         "${NEXUS_SOURCE_DIR}/io/private"
 )
 foreach(usb_family stm32f4)
@@ -18,7 +18,7 @@ foreach(usb_family stm32f4)
         "${NEXUS_SOC_SOURCE_${usb_family}}/drivers/usb/usb_clock.c"
         LIBRARIES Nexus::NativeModel Nexus::Arch
         INCLUDES
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/dwc_otg_device" "${NEXUS_SOURCE_DIR}/tests/support/native/drivers"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/common/dwc_otg_device" "${NEXUS_SOURCE_DIR}/tests/support/native/drivers"
             "${NEXUS_SOURCE_DIR}/io/private"
             "${NEXUS_SOC_SOURCE_${usb_family}}"
     )
@@ -55,9 +55,10 @@ nexus_google_test(nexus_usb_role_test SOURCES "${nexus_google_root}/io/usb_role_
 )
 nexus_google_test(nexus_stm32_usb_host_hal_test STM32F4_LL
     SOURCES "${nexus_google_root}/soc/stm32/stm32f4/usb/usb_host_hal_test.cpp"
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/usb/usb_host.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/common/dwc_otg_host/usb_host.c"
     LIBRARIES Nexus::IOUSBHost Nexus::NativeModel Nexus::Arch
     INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/common/dwc_otg_host"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/sdk/hal_config/usb"
 )
 target_compile_definitions(
@@ -85,7 +86,7 @@ nexus_google_test(nexus_stm32_usb_hs_cold_test
         "${NEXUS_SOC_SOURCE_stm32f4}/drivers/usb/usb_hs_clock.c"
     LIBRARIES Nexus::NativeModel Nexus::Arch
     INCLUDES
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/dwc_otg_device" "${NEXUS_SOURCE_DIR}/tests/support/native/drivers"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/common/dwc_otg_device" "${NEXUS_SOURCE_DIR}/tests/support/native/drivers"
         "${NEXUS_SOC_SOURCE_stm32f4}"
 )
 target_compile_options(
@@ -129,6 +130,9 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     find_package(Python3 3.11 REQUIRED COMPONENTS Interpreter)
     set(usb_transport_target nexus_stm32_usb_host_transport_test)
     set(usb_transport_vendor "${usb_transport_target}_vendor")
+    set(usb_transport_shared
+        "${NEXUS_SOURCE_DIR}/soc/stm32/common/dwc_otg_host"
+    )
     set(usb_transport_model
         "${nexus_google_root}/soc/stm32/stm32f4/usb/usb_host_transport_model.h"
     )
@@ -156,9 +160,10 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     )
     nexus_google_test(${usb_transport_target} STM32F4_LL
         SOURCES "${nexus_google_root}/soc/stm32/stm32f4/usb/usb_host_transport_test.cpp"
-            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/usb/usb_host.c"
+            "${usb_transport_shared}/usb_host.c"
         LIBRARIES Nexus::IOUSBHost Nexus::NativeModel Nexus::Arch
         INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4"
+            "${usb_transport_shared}"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/sdk/hal_config/usb"
     )
     target_compile_definitions(${usb_transport_target} PRIVATE STM32F407xx)

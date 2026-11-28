@@ -1,5 +1,7 @@
 {
   "assemblies": [
+    "boards/stm3210c_eval_mb784_c01/assemblies/phy-management.toml",
+    "boards/stm32f103rb_nucleo/assemblies/minimal.toml",
     "boards/stm32f407zg_qiming_core/assemblies/can-loopback.toml",
     "boards/stm32f407zg_qiming_core/assemblies/display-touch-sram.toml",
     "boards/stm32f407zg_qiming_core/assemblies/display-touch.toml",
@@ -27,6 +29,7 @@
     "boards/stm32f407zg_qiming_v41/assemblies/sram-window.toml",
     "boards/stm32f407zg_qiming_v41/assemblies/touch-nor.toml",
     "boards/stm32f407zg_qiming_v41/assemblies/usb-device.toml",
+    "boards/stm32vldiscovery_mb913_c02/assemblies/user-led.toml",
     "tools/configure/assemblies/qiming-baremetal-empty.toml",
     "tools/configure/assemblies/qiming-baremetal-gpio.toml",
     "tools/configure/assemblies/qiming-baremetal-uart-dma.toml",

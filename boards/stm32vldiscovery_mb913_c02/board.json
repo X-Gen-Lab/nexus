@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "id": "stm32vldiscovery-mb913-c02",
+  "soc": "STM32F100RBT6B",
+  "soc_family": "stm32f1",
+  "source_revision": "UM0919 Rev2 Figure 12 MB913 schematic C.2",
+  "physical_pcb_revision": "MB913 C.2",
+  "clocks": {},
+  "bindings": [
+    {
+      "id": "user",
+      "controller": "GPIOA",
+      "route": "f100rb-user-pa0",
+      "mask": 1
+    },
+    {
+      "id": "blue",
+      "controller": "GPIOC",
+      "route": "f100rb-led-pc8",
+      "mask": 256,
+      "initial": 0,
+      "electrical": {
+        "mode": "output",
+        "initial": 0
+      }
+    },
+    {
+      "id": "green",
+      "controller": "GPIOC",
+      "route": "f100rb-led-pc9",
+      "mask": 512,
+      "initial": 0,
+      "electrical": {
+        "mode": "output",
+        "initial": 0
+      }
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14",
+    "PA15",
+    "PB2",
+    "PB3",
+    "PB4",
+    "PC14",
+    "PC15",
+    "PD0",
+    "PD1"
+  ],
+  "unknowns": [
+    "Physical board revision, installed solder bridges and HSI tolerance are unobserved.",
+    "No external UART or debugger virtual COM port is selected."
+  ],
+  "provenance": [
+    {
+      "scope": "Board pinout, user LEDs, USER button and stock schematic.",
+      "url": "https://www.st.com/resource/en/user_manual/um0919-stm32vldiscovery-stm32-value-line-discovery-stmicroelectronics.pdf",
+      "file": "um0919-stm32vldiscovery-stm32-value-line-discovery-stmicroelectronics.pdf",
+      "sha256": "1d7ea9e7fa1f2f1b4d2a2250dcb2b74e373d6d3efee8af04df4c627ebb368a14",
+      "pages": [
+        5,
+        11,
+        12,
+        14,
+        15,
+        20
+      ]
+    }
+  ],
+  "backend_support": [
+    "baremetal"
+  ]
+}

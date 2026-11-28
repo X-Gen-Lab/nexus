@@ -1,0 +1,19 @@
+schema = 2
+board = "stm32f103rb_nucleo"
+backend = "baremetal"
+clock = "hsi8"
+optimization = "Os"
+
+[hardware]
+backup_word = "wwdg-early-warning-dr1"
+
+[memory]
+main_stack_bytes = 2048
+flash_load_limit_bytes = 24576
+static_ram_limit_bytes = 6144
+libc_heap_bytes = 0
+
+[watchdog.wwdg]
+binding = "watchdog-warning"
+mode = "window"
+window_ticks = 3

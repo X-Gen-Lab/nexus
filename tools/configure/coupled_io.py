@@ -3,7 +3,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 
 from tools.configure.generation.calls import Symbol
-from tools.configure.pinmux import NumericPinMuxPolicy
+from tools.configure.pinmux import FixedRoutePinMuxPolicy, NumericPinMuxPolicy
 from tools.configure.providers.common import fail, integer, normalize_resource
 from tools.configure.records import freeze
 
@@ -22,8 +22,8 @@ class CoupledIoPolicy:
 
     @classmethod
     def from_validated(cls, value, *, pinmux):
-        if not isinstance(pinmux, NumericPinMuxPolicy):
-            fail("Coupled I/O requires a selected numeric pinmux policy")
+        if not isinstance(pinmux, (NumericPinMuxPolicy, FixedRoutePinMuxPolicy)):
+            fail("Coupled I/O requires an explicit pinmux policy")
         if not isinstance(value, Mapping) or set(value) != {"routes"}:
             fail("Coupled I/O requires explicit route records")
         routes = {}
@@ -34,7 +34,8 @@ class CoupledIoPolicy:
             "resources"}
         for row in value["routes"]:
             if (not isinstance(row, Mapping) or not required.issubset(row) or
-                    set(row) - required - {"power_stage"}):
+                    set(row) - required - {"power_stage", "adc_clock_divider",
+                                           "complementary_deadtime_max"}):
                 fail("Coupled I/O route requires exact named facts")
             if row["id"] in routes:
                 fail("Duplicate coupled I/O route")
@@ -58,7 +59,12 @@ class CoupledIoPolicy:
                 integer(channel, 0, 31, "Coupled channel")
             for cycles in row["sample_cycles"]:
                 integer(cycles, 1, context="Coupled sample cycles")
+            for field in ("adc_clock_divider", "complementary_deadtime_max"):
+                if field in row:
+                    integer(row[field], 1, context="Coupled " + field)
             if "power_stage" in row:
+                if "complementary_deadtime_max" in row:
+                    fail("Power stage and finite-window deadtime facts are exclusive")
                 power = row["power_stage"]
                 required_power = {"minimum_deadtime_ticks", "deadtime_ranges",
                     "tick_multiple", "guard_us", "capture", "hardware", "domain",
@@ -193,7 +199,7 @@ class CoupledIoPolicy:
 
     def route(self, route):
         row = self.routes.get(route["id"])
-        pins = tuple((pin["pin"], pin["function"], pin["af"])
+        pins = tuple((pin["pin"], pin["function"], pin.get("af"))
                      for pin in route["pins"])
         if (row is None or route["kind"] != "pwm_adc" or
                 row["controller"] != route["controller"] or pins != row["pins"]):
@@ -218,6 +224,9 @@ class CoupledIoPolicy:
         power = row.get("power_stage")
         if power is not None:
             self._validate_power_stage(selected, power, period)
+        elif "complementary_deadtime_max" in row:
+            integer(selected["deadtime_ticks"], 1,
+                    row["complementary_deadtime_max"], "Coupled deadtime")
         elif selected["deadtime_ticks"] != 0:
             fail("Selected non-complementary coupled route uses zero deadtime")
         if tuple(selected["channels"]) != row["channels"]:
@@ -335,12 +344,20 @@ class CoupledIoPolicy:
             adc = plan["domains"][row["adc_clock_domain"]]["nominal_hz"]
         except KeyError:
             fail("Coupled I/O clock plan lacks its declared domains")
+        divider = row.get("adc_clock_divider", 1)
+        if adc % divider or adc < divider:
+            fail("Coupled converter clock must preserve its declared divider")
+        adc //= divider
         tick = selected["tick_hz"]
         if timer % tick or not 1 <= timer // tick <= row["prescaler_max"]:
             fail("Coupled tick must exactly divide its timer clock")
         cycles = _conversion_cycles(row, selected["sample_times"])
         if cycles * tick >= selected["period_ticks"] * adc:
             fail("Coupled ADC scan does not fit within one PWM period")
+        if (selected["mode"] == "finite-injected" and
+                (selected["period_ticks"] - selected["trigger_ticks"]) * adc
+                <= cycles * tick):
+            fail("Coupled injected conversion exceeds its remaining PWM window")
         if "power_stage" in row:
             power = row["power_stage"]
             deadtime_ticks = (selected["deadtime_ticks"] * tick + timer - 1) // timer
@@ -385,7 +402,8 @@ class CoupledIoPolicy:
         from tools.configure.ir import PowerStageDcIR, PowerStagePairIR
         row = self.route(route)
         power = row["power_stage"]
-        adc = clock_plan["domains"][row["adc_clock_domain"]]["nominal_hz"]
+        adc = (clock_plan["domains"][row["adc_clock_domain"]]["nominal_hz"]
+               // row.get("adc_clock_divider", 1))
         cycles = _conversion_cycles(row, selected["sample_times"])
         span = (cycles * 1000000 + adc - 1) // adc
         to_ticks = lambda us: (us * selected["tick_hz"] + 999999) // 1000000

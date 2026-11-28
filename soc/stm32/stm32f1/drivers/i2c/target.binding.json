@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "bindings": [
+    {
+      "kind": "i2c_target",
+      "modes": [
+        "target-rx-irq",
+        "target-tx-irq",
+        "target-write-read-irq"
+      ],
+      "implementation": "i2c_target",
+      "controllers": [
+        "I2C1"
+      ],
+      "headers": [
+        "drivers/i2c/target.h"
+      ],
+      "limits": {
+        "address_bits": [
+          7,
+          7
+        ],
+        "second_address": [
+          0,
+          0
+        ],
+        "max_hz": [
+          80000,
+          80000
+        ],
+        "irq_priority": [
+          0,
+          0
+        ]
+      },
+      "static_recipe": {
+        "state_type": "nx_stm32f1_i2c_target_t",
+        "ops": "nx_stm32f1_i2c_target_ops",
+        "calls": {
+          "admit": [],
+          "prepare": {
+            "function": "nx_stm32f1_i2c_target_open",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "source": "item.options.own_address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32f1_i2c_target_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "irq": [
+          {
+            "map": {
+              "source": "selected.vector_bindings",
+              "limit": 2,
+              "value": {
+                "name": {
+                  "source": "entry.handler",
+                  "as": "symbol"
+                },
+                "calls": [
+                  {
+                    "function": "nx_stm32f1_i2c_target_irq",
+                    "args": [
+                      {
+                        "ref": "port",
+                        "as": "address"
+                      }
+                    ]
+                  }
+                ],
+                "barrier": "nx_arch_dsb"
+              }
+            }
+          }
+        ],
+        "retain_on_failed_init": true,
+        "declarations": []
+      }
+    }
+  ]
+}

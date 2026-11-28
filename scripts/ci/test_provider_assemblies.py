@@ -83,7 +83,7 @@ class USBRemoteCompileSelection(unittest.TestCase):
     def setUp(self):
         self.macro = "NEXUS_STM32F4_USB_REMOTE_WAKEUP"
         self.device = ROOT / (
-            "soc/stm32/stm32f4/drivers/ip/dwc_otg_device/usb_device_controller.c")
+            "soc/stm32/common/dwc_otg_device/usb_device_controller.c")
         self.resolved = deepcopy(self.fixtures[1]["resolved"])
 
     def entry(self, flags=(), *, source=None, owner="nexus_soc_stm32f4"):

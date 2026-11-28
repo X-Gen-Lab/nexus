@@ -47,9 +47,11 @@ target_include_directories(
     PUBLIC "${CMAKE_CURRENT_LIST_DIR}/include"
 )
 set(stm32_ip_includes
-    "${CMAKE_CURRENT_LIST_DIR}/drivers/ip/i2c_v1_async"
-    "${CMAKE_CURRENT_LIST_DIR}/drivers/ip/classic_can"
-    "${CMAKE_CURRENT_LIST_DIR}/drivers/ip/dwc_otg_device"
+    "${CMAKE_CURRENT_LIST_DIR}/../common/i2c_v1_async"
+    "${CMAKE_CURRENT_LIST_DIR}/../common/bxcan"
+    "${CMAKE_CURRENT_LIST_DIR}/../common/dwc_otg_device"
+    "${CMAKE_CURRENT_LIST_DIR}/../common/dwc_otg_host"
+    "${CMAKE_CURRENT_LIST_DIR}/../common/dwmac"
     "${CMAKE_CURRENT_LIST_DIR}/drivers/ip/legacy_mac"
     "${CMAKE_CURRENT_LIST_DIR}/drivers/ip/advanced_timer"
 )

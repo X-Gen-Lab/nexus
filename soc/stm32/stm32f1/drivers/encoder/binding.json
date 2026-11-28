@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "bindings": [
+    {
+      "kind": "encoder",
+      "mode": "quadrature",
+      "implementation": "encoder",
+      "static_recipe": {
+        "state_type": "nx_stm32f1_encoder_t",
+        "ops": "nx_stm32f1_encoder_ops",
+        "declarations": [
+          {
+            "role": "encoder_config",
+            "type": "nx_stm32f1_encoder_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "filter_a",
+                  {
+                    "source": "item.options.filter_a"
+                  }
+                ],
+                [
+                  "filter_b",
+                  {
+                    "source": "item.options.filter_b"
+                  }
+                ],
+                [
+                  "invert_a",
+                  {
+                    "source": "item.options.invert_a"
+                  }
+                ],
+                [
+                  "invert_b",
+                  {
+                    "source": "item.options.invert_b"
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "calls": {
+          "admit": [],
+          "prepare": {
+            "function": "nx_stm32f1_encoder_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "ref": "encoder_config",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32f1_encoder_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "retain_on_failed_init": true
+      },
+      "headers": [
+        "drivers/encoder/instance.h"
+      ]
+    }
+  ]
+}

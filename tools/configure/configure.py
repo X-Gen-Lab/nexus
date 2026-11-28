@@ -36,7 +36,8 @@ from tools.configure.ir import (
 from tools.configure import resource_graph, trigger_graph, dma_topology, board_hardware, gpio_electrical
 from tools.configure import device_graph, component_catalog, validation
 from tools.configure.contracts import (
-    COMPONENTS, CONTROLLER_KINDS, CONTROLLER_SELECTION_FIELDS,
+    COMPONENTS, CONTROLLER_CONTRACTS, CONTROLLER_KINDS,
+    CONTROLLER_SELECTION_FIELDS,
     ENDPOINT_SELECTION_FIELDS)
 from tools.configure import (
     kernel,
@@ -439,7 +440,9 @@ def resolve_routes(routes_doc, soc, part, provider, *, controller_profiles=None)
     routes = {}
     for route in sequence(routes_doc["routes"], "routes"):
         obj(route, {"id", "variants", "controller", "kind", "pins", "modes",
-                    "source"}, {"resources", "dma", "mode_dma", "mode_resources"}, "route")
+                    "source"}, {"resources", "dma", "mode_dma", "mode_resources",
+                                "clock_profiles", "register_settings",
+                                "required_options"}, "route")
         identity(route["id"], "route id")
         if route["id"] in routes:
             fail(f"Duplicate route id: {route['id']}")
@@ -450,6 +453,25 @@ def resolve_routes(routes_doc, soc, part, provider, *, controller_profiles=None)
                 text(value, f"route {field}")
         if not route["variants"] or not route["modes"]:
             fail("Route must have exact variants and maintained modes")
+        if "required_options" in route:
+            contract = CONTROLLER_CONTRACTS.get(route["kind"])
+            fields = contract.selected_fields if contract is not None else set()
+            options = obj(route["required_options"], set(), fields,
+                          "route required options")
+            def finite_value(value):
+                scalar = (bool, int, str)
+                return type(value) in scalar or (
+                    type(value) is list and 0 < len(value) <= 16 and
+                    all(type(entry) in scalar for entry in value))
+            if not options or any(not finite_value(value) for value in options.values()):
+                fail("Route required options must name scalars or bounded scalar sequences")
+        if "clock_profiles" in route:
+            profiles = [text(name, "route clock profile") for name in
+                        sequence(route["clock_profiles"], "route clock profiles")]
+            unique(profiles, "route clock profiles")
+            if not profiles or any(name not in soc["clock_profiles"]
+                                   for name in profiles):
+                fail(f"Route {route['id']} requires reviewed clock profiles")
         if any(value not in soc["variants"] for value in route["variants"]):
             fail(f"Route {route['id']} has unknown exact variant")
         profiles = ([soc["controllers"]] if not controller_profiles else
@@ -481,6 +503,7 @@ def resolve_routes(routes_doc, soc, part, provider, *, controller_profiles=None)
                 provider.dma_irq(text(dma, "mode-specific DMA resource"))
         for resource in sequence(route.get("resources", []), "route resources"):
             validate_resource_fact(resource, provider, "route resource")
+        resource_graph.validate_register_settings(route.get("register_settings", {}))
         mode_resources = obj(route.get("mode_resources", {}), set(), set(route["modes"]),
                              "mode-specific resources")
         for mode, resources in mode_resources.items():
@@ -492,7 +515,8 @@ def resolve_routes(routes_doc, soc, part, provider, *, controller_profiles=None)
         pins = sequence(route["pins"], "route pins")
         unique([pin.get("pin") for pin in pins], "route pins")
         for pin in pins:
-            obj(pin, {"pin", "function", "af"}, (), "route pin")
+            obj(pin, {"pin", "function"} | provider.PINMUX_POLICY.pin_fields,
+                (), "route pin")
             resource_graph.identifier(pin["pin"], "pin identity")
             pads = getattr(provider, "PAD_FACTS", {})
             if pin["pin"] not in pads:
@@ -503,7 +527,7 @@ def resolve_routes(routes_doc, soc, part, provider, *, controller_profiles=None)
                 available = soc["variants"][exact].get("pins")
                 if available is not None and pin["pin"] not in available:
                     fail(f"Pin {pin['pin']} does not exist on {exact}")
-            provider.PINMUX_POLICY.validate(pin["af"], "pin AF selector")
+            provider.PINMUX_POLICY.alternate(pin, "pin AF selector")
             text(pin["function"], "pin function")
         text(route["source"], "route source")
         routes[route["id"]] = route
@@ -766,11 +790,9 @@ def _resolve_flash_layout(layout_name, assembly_directory, physical_flash, read,
     suffix = memory_budget.image_suffix_bytes if memory_budget else 0
     if prefix + suffix >= owner.size:
         fail("Image reservations exhaust the selected physical Flash owner")
-    if (prefix or suffix) and (not isinstance(vector_symbol, str) or
-                               not vector_symbol):
-        fail("Image reservation requires an explicitly reviewed SoC startup")
     if owner.origin != physical_flash["origin"] or prefix or suffix:
-        if offset_alignment is None:
+        if (offset_alignment is None or
+                not isinstance(vector_symbol, str) or not vector_symbol):
             fail("Image offset or reservation requires an explicitly reviewed SoC startup")
         integer(offset_alignment, 128, context="image vector alignment")
         if (offset_alignment & (offset_alignment - 1) or
@@ -873,12 +895,28 @@ def catalog_soc_facts(soc, part, catalog):
         fail("Device catalog source identity differs from SoC source lock")
     # These local derived facts are not another authored IRQ authority.
     profiles = device_view.controller_profiles(soc)
-    for name, controllers in profiles.items():
-        device_view.validate_controller_irqs(controllers, devices[name].irq_bindings)
-    controllers = profiles[variants[part]["device"]]
     normalized = {key: value for key, value in soc.items()
                   if key not in {"device_profiles", "controller_groups"}}
-    if not any(item["kind"] == "can" for item in controllers.values()):
+    for name, controllers in profiles.items():
+        device = devices[name]
+        device_view.validate_controller_irqs(controllers, device.irq_bindings)
+        profile = soc["device_profiles"][name]
+        if "cpu_features" in profile:
+            features = obj(profile["cpu_features"], {"mpu_version", "mpu_regions"},
+                           (), "Device CPU features")
+            common = obj(soc.get("cpu"), cpu_profiles.CPU_FIELDS,
+                         cpu_profiles.CPU_OPTIONAL_FIELDS, "CPU facts")
+            if bool(features["mpu_version"]) != bool(features["mpu_regions"]):
+                fail("Device MPU version and region count must describe one capability")
+            cpu = {**common, **features}
+            irq = {"priority_bits": device.priority_bits,
+                   "external_count": device.external_irq_count}
+            cpu_profiles.resolve(cpu, irq, "baremetal")
+            if name == selected.identifier:
+                normalized["cpu"] = cpu
+    controllers = profiles[selected.identifier]
+    if not any(item["kind"] == "can" and "classic-irq" in item["modes"]
+               for item in controllers.values()):
         normalized.pop("can_domain", None)
     normalized.update(controllers=controllers,
                       clock_policy=soc["device_profiles"][selected.identifier]["clock_policy"],
@@ -904,7 +942,7 @@ def resolve_device_facts(soc, part, provider, *, catalog=None):
         provider = scope(soc)
     validate_soc(soc, part, provider, catalog_device=catalog_device)
     vendor_device = (VendorDeviceIR(catalog_device.macro, catalog_device.header,
-                                   catalog_device.startup)
+                                   catalog_device.startup, catalog_device.startup_vector_tail)
                      if catalog_device is not None else None)
     profiles = freeze(profiles)
     if profiles:
@@ -1187,11 +1225,11 @@ def _resolve(assembly_path, root=ROOT, *, input_paths=None, test_support=False,
         if external_memory_policy is not None else ())
     inputs = [assembly_path, *facts.inputs, policy_path, catalogue_path]
     inputs.extend(selected_graph.inputs)
+    alignment, vector = (memory_regions.offset_image_contract(provider, part)
+                         if not facts.provider_context.external else (None, None))
     selected_layout = _resolve_flash_layout(
         assembly.layout, assembly_path.parent, variant["flash"], read,
-        offset_alignment=getattr(provider, "OFFSET_IMAGE_ALIGNMENT", None),
-        vector_symbol=(getattr(provider, "OFFSET_IMAGE_VECTOR_SYMBOL", None)
-                       if not facts.provider_context.external else None),
+        offset_alignment=alignment, vector_symbol=vector,
         memory_budget=selected_memory.budget)
     if selected_layout.input_path is not None:
         inputs.append(selected_layout.input_path)

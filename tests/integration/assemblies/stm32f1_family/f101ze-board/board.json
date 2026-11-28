@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "id": "stm32f101ze-software-reference",
+  "soc": "STM32F101ZET6",
+  "soc_family": "stm32f1",
+  "source_revision": "software-reference-v1",
+  "physical_pcb_revision": null,
+  "clocks": {},
+  "bindings": [
+    {
+      "id": "led0",
+      "controller": "GPIOA",
+      "route": "gpio-pa5",
+      "initial": 0,
+      "mask": 32,
+      "electrical": {
+        "mode": "output",
+        "initial": 0
+      }
+    },
+    {
+      "id": "uart2",
+      "controller": "USART2",
+      "route": "usart2-pa2-pa3-irq"
+    },
+    {
+      "id": "flash0",
+      "controller": "FLASH",
+      "route": "flash-internal-2k",
+      "supply_mv": 3300
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14",
+    "PA15",
+    "PB3",
+    "PB4",
+    "PC14",
+    "PC15"
+  ],
+  "unknowns": [
+    "The GPIO output and serial routes are software test inputs. No physical PCB or connected loads are claimed.",
+    "Flash supply is nominal. The rail voltage and silicon cut have not been measured."
+  ],
+  "provenance": [
+    "https://www.st.com/resource/en/datasheet/stm32f101ze.pdf"
+  ],
+  "backend_support": [
+    "baremetal"
+  ]
+}

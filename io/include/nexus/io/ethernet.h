@@ -105,7 +105,9 @@ nx_result_t nx_eth_port_submit(const nx_eth_port_t* port,
  * \return Success requests drain; STATE for a foreign request.
  * \note Task owner. Cancel is controller-wide: other pending TX requests also
  *       become CANCELLED. It never revokes a borrow. Stuck sources quarantine.
- *       Apply a confirmed link again after successful drain to reopen TX.
+ *       For a provider with TX-only drain, apply a confirmed link again to
+ *       reopen TX. A reset-backed provider closes both directions. Return
+ *       RX loans, finish stop, and restart its platform session to reopen.
  */
 nx_result_t nx_eth_port_cancel(const nx_eth_port_t* port,
                                nx_eth_tx_request_t* request);
@@ -140,12 +142,13 @@ nx_result_t nx_eth_port_state(const nx_eth_port_t* port, nx_eth_state_t* state);
  * \brief Apply external PHY observations, not auto-negotiate or invent link.
  * \param[in] port: Serialized task-owner face.
  * \param[in] link: Observed up/speed/duplex fact, never a guess.
- * \return Success, BUSY until real drain, or STATE/IO/context error.
+ * \return Success, BUSY until real drain, or UNSUPPORTED/STATE/IO/context.
  * \note Task owner; changing speed/duplex first requires explicit link-down
  *       and observed idle TX/RX engines and FIFOs. BUSY keeps the old mode.
  *       Reapplying an unchanged up fact is idempotent. Link-down
- *       closes admission and drains pending TX with IO; later up requires real
- *       quiescence. This is not a PHY power/reset/electrical proof.
+ *       closes admission and drains pending TX with IO. A reset-backed
+ *       provider requires complete stop and platform restart before applying
+ *       the next up observation. The caller owns PHY power and reset.
  */
 nx_result_t nx_eth_port_apply_link(const nx_eth_port_t* port,
                                    const nx_eth_link_t* link);

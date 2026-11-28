@@ -1,0 +1,293 @@
+{
+  "schema_version": 1,
+  "bindings": [
+    {
+      "kind": "uart",
+      "mode": "irq-wire",
+      "implementation": "uart",
+      "headers": [
+        "drivers/uart/instance.h"
+      ],
+      "validator": "nx_stm32f1_uart_validate",
+      "limits": {
+        "baud": [
+          1200,
+          115200
+        ]
+      },
+      "controllers": [
+        "USART2"
+      ],
+      "static_recipe": {
+        "state_type": "nx_stm32f1_uart_t",
+        "declarations": [
+          {
+            "role": "rx_bytes",
+            "type": "uint8_t",
+            "const": false,
+            "count": {
+              "source": "item.options.rx_capacity"
+            },
+            "enabled": {
+              "source": "item.options.wire.protocol",
+              "values": {
+                "half-duplex": true,
+                "lin": false,
+                "asynchronous": false,
+                "irda": false,
+                "synchronous": false,
+                "smartcard": false
+              }
+            }
+          },
+          {
+            "role": "rx_events",
+            "type": "nx_uart_rx_event_t",
+            "const": false,
+            "count": {
+              "source": "item.options.rx_capacity"
+            },
+            "enabled": {
+              "source": "item.options.wire.protocol",
+              "values": {
+                "half-duplex": false,
+                "lin": true,
+                "asynchronous": true,
+                "irda": true,
+                "synchronous": true,
+                "smartcard": true
+              }
+            }
+          },
+          {
+            "role": "uart_config",
+            "type": "nx_stm32f1_uart_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "registers",
+                  {
+                    "source": "item.controller",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "tx_registers",
+                  {
+                    "source": "selected.named_pads.tx.registers",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "irq",
+                  {
+                    "source": "selected.vector_bindings.0.irq",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "clock_hz",
+                  {
+                    "source": "selected.clock_hz"
+                  }
+                ],
+                [
+                  "baud",
+                  {
+                    "source": "item.options.baud"
+                  }
+                ],
+                [
+                  "rx_storage",
+                  {
+                    "source": "item.options.rx_profile",
+                    "values": {
+                      "bytes": {
+                        "ref": "rx_bytes",
+                        "as": "symbol"
+                      },
+                      "events": {
+                        "ref": "rx_events",
+                        "as": "symbol"
+                      }
+                    }
+                  }
+                ],
+                [
+                  "rx_capacity",
+                  {
+                    "source": "item.options.rx_capacity"
+                  }
+                ],
+                [
+                  "profile",
+                  {
+                    "source": "item.options.rx_profile",
+                    "values": {
+                      "events": "NX_UART_RX_EVENTS",
+                      "bytes": "NX_UART_RX_BYTES"
+                    },
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "tx_pin",
+                  {
+                    "source": "selected.named_pads.tx.number"
+                  }
+                ],
+                [
+                  "priority",
+                  {
+                    "source": "item.options.irq.priority"
+                  }
+                ],
+                [
+                  "wire",
+                  {
+                    "source": "item.options.wire.protocol",
+                    "as": "symbol",
+                    "values": {
+                      "lin": "NX_UART_WIRE_LIN",
+                      "half-duplex": "NX_UART_WIRE_HALF_DUPLEX",
+                      "asynchronous": {
+                        "source": "item.options.wire.flow",
+                        "as": "symbol",
+                        "values": {
+                          "rts-cts": "NX_UART_WIRE_ASYNCHRONOUS"
+                        }
+                      },
+                      "irda": "NX_UART_WIRE_IRDA",
+                      "synchronous": "NX_UART_WIRE_SYNCHRONOUS",
+                      "smartcard": "NX_UART_WIRE_SMARTCARD"
+                    }
+                  }
+                ],
+                [
+                  "rx_registers",
+                  {
+                    "source": "selected.named_pads.rx.registers",
+                    "as": "symbol",
+                    "default": {
+                      "symbol": "NULL"
+                    }
+                  }
+                ],
+                [
+                  "rx_pin",
+                  {
+                    "source": "selected.named_pads.rx.number",
+                    "default": 0
+                  }
+                ],
+                [
+                  "wire_options",
+                  {
+                    "source": "item.options.wire.protocol",
+                    "values": {
+                      "half-duplex": 0,
+                      "asynchronous": 0,
+                      "irda": 0,
+                      "lin": {
+                        "source": "item.options.wire.lin_break_bits"
+                      },
+                      "synchronous": {
+                        "macro": "NX_STM32F1_UART_SYNC_OPTIONS",
+                        "args": [
+                          {
+                            "source": "item.options.wire.clock_polarity"
+                          },
+                          {
+                            "source": "item.options.wire.clock_phase"
+                          },
+                          {
+                            "source": "item.options.wire.last_bit_clock"
+                          }
+                        ]
+                      },
+                      "smartcard": {
+                        "macro": "NX_STM32F1_UART_CARD_OPTIONS",
+                        "args": [
+                          {
+                            "source": "item.options.wire.guard_time"
+                          },
+                          {
+                            "source": "item.options.wire.smartcard_nack"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "calls": {
+          "admit": [
+            {
+              "function": "nx_stm32f1_uart_admit",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "ref": "uart_config",
+                  "as": "address"
+                }
+              ]
+            }
+          ],
+          "prepare": {
+            "function": "nx_stm32f1_uart_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "ref": "uart_config",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32f1_uart_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "ops": "nx_stm32f1_uart_ops",
+        "retain_on_failed_init": true,
+        "irq": [
+          {
+            "name": {
+              "source": "selected.vector_bindings.0.handler",
+              "as": "symbol"
+            },
+            "calls": [
+              {
+                "function": "nx_stm32f1_uart_irq",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  }
+                ]
+              }
+            ],
+            "barrier": "nx_arch_dsb"
+          }
+        ]
+      }
+    }
+  ]
+}

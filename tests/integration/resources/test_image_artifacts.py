@@ -34,7 +34,8 @@ class ImageArtifactTests(unittest.TestCase):
             self.root = Path(temporary.name)
 
     def fixture(self, *, offset=0x20000, size=0x20000, outside=None,
-                family="stm32f4", vector_prefix=False, irq_slot=None, irq_count=1):
+                family="stm32f4", vector_prefix=False, irq_slot=None, irq_count=1,
+                vector_tail=(), expected_tail=None):
         compiler = os.environ.get("NEXUS_ARM_GCC") or shutil.which("arm-none-eabi-gcc")
         self.assertIsNotNone(compiler, "Prepared ARM compiler required")
         path = self.root / "image"
@@ -54,10 +55,13 @@ class ImageArtifactTests(unittest.TestCase):
         if irq_slot is not None:
             resolved["irq"] = {"external_count": irq_count}
             resolved["cortex_m_irq_vectors"] = {"Reviewed_IRQHandler": 0}
+            if expected_tail is not None:
+                resolved["startup_vector_tail"] = expected_tail
             text = text.replace("void Reset_Handler(void);",
                 "void Reset_Handler(void);\nvoid Reviewed_IRQHandler(void) {}")
+            tail = "".join(f", (const void*){word}U" for word in vector_tail)
             text = text.replace("&__nx_msp_end, Reset_Handler}",
-                f"&__nx_msp_end, Reset_Handler, [16] = {irq_slot}}}")
+                f"&__nx_msp_end, Reset_Handler, [16] = {irq_slot}{tail}}}")
         if vector_prefix:
             text = text.replace(
                 "const void* const g_pfnVectors[]",
@@ -153,6 +157,27 @@ class ImageArtifactTests(unittest.TestCase):
                 self.root = base / str(index)
                 self.root.mkdir()
                 elf, config, budget, _ = self.fixture(irq_slot=slot, irq_count=count)
+                if message is None:
+                    self.assertEqual(resources.measure(elf, config, budget)["status"], "passed")
+                else:
+                    with self.assertRaisesRegex(EvidenceError, message):
+                        resources.measure(elf, config, budget)
+
+    def test_startup_tail_checks_linked_words_without_growing_the_irq_range(self):
+        base = self.root
+        tail = (0, 0xF108F85F)
+        for name, count, expected, message in (
+                ("reviewed", 1, list(tail), None),
+                ("incorrect-word", 1, [0, 0], "startup vector tail word 1"),
+                ("undeclared", 1, None, "startup vector count"),
+                ("malformed", 1, [False, tail[1]], "invalid startup vector tail"),
+                ("irq-count", 2, list(tail), "startup vector count")):
+            with self.subTest(name=name):
+                self.root = base / name
+                self.root.mkdir()
+                elf, config, budget, _ = self.fixture(
+                    irq_slot="Reviewed_IRQHandler", irq_count=count,
+                    vector_tail=tail, expected_tail=expected)
                 if message is None:
                     self.assertEqual(resources.measure(elf, config, budget)["status"], "passed")
                 else:

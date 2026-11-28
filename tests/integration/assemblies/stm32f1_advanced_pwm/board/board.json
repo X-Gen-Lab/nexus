@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "id": "stm32f103rb-tim1-morpho-reference",
+  "soc": "STM32F103RBT6",
+  "soc_family": "stm32f1",
+  "source_revision": "UM1724-Rev17-TIM1-Morpho",
+  "physical_pcb_revision": null,
+  "clocks": {},
+  "bindings": [
+    {
+      "id": "pwm0",
+      "controller": "TIM1",
+      "route": "tim1-pa8-pb13-pb12"
+    }
+  ],
+  "reserved_resources": [],
+  "backend_support": [
+    "baremetal"
+  ],
+  "provenance": [
+    "https://www.st.com/resource/en/user_manual/um1724-stm32-nucleo64-boards-mb1136-stmicroelectronics.pdf",
+    "https://www.st.com/resource/en/reference_manual/rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32-bit-mcus-stmicroelectronics.pdf"
+  ],
+  "unknowns": [
+    "Bench logic reference only. Fitting, physical inactive levels, pad timing and external power-stage behavior are unmeasured.",
+    "BKIN on CN10-16 is pulled internally toward active low. The test requires a driven inactive-high BKIN for any output enable."
+  ]
+}

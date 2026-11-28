@@ -1,10 +1,11 @@
-"""Finite numeric pinmux selectors declared by the selected package.
+"""Static pin routing encodings declared by the selected package.
 
 The policy validates static connection values only. It does not select routes,
 operate registers or grant support for another pinmux encoding.
 """
 from collections.abc import Mapping
 from dataclasses import dataclass
+from typing import ClassVar
 
 from tools.configure.providers.common import fail, integer
 
@@ -14,6 +15,7 @@ class NumericPinMuxPolicy:
     """An immutable, explicit selector set without a vendor-derived default."""
 
     selectors: tuple[int, ...]
+    pin_fields: ClassVar[frozenset[str]] = frozenset({"af"})
 
     def __post_init__(self):
         if (not isinstance(self.selectors, (tuple, list)) or
@@ -41,3 +43,35 @@ class NumericPinMuxPolicy:
         if value not in self.selectors:
             fail(f"{context} is not declared by the selected pinmux policy")
         return value
+
+    def alternate(self, pin, context="Pinmux selector"):
+        return self.validate(pin["af"], context)
+
+
+@dataclass(frozen=True)
+class FixedRoutePinMuxPolicy:
+    """A physical route whose pads have no independent AF selectors."""
+
+    pin_fields: ClassVar[frozenset[str]] = frozenset()
+
+    def validate(self, value, context="Pinmux selector"):
+        if value is not None:
+            fail(f"{context} cannot declare a numeric AF on a fixed route")
+        return None
+
+    def alternate(self, pin, context="Pinmux selector"):
+        if "af" in pin:
+            fail(f"{context} cannot declare a numeric AF on a fixed route")
+        return self.validate(None, context)
+
+
+PinMuxPolicy = NumericPinMuxPolicy | FixedRoutePinMuxPolicy
+
+
+def load_pinmux_policy(facts) -> PinMuxPolicy:
+    """Select one reviewed encoding from the declared finite package facts."""
+    if isinstance(facts, Mapping) and facts.get("encoding") == "route-fixed":
+        if set(facts) != {"encoding"}:
+            fail("Fixed-route pinmux policy requires only its encoding")
+        return FixedRoutePinMuxPolicy()
+    return NumericPinMuxPolicy.from_validated(facts)

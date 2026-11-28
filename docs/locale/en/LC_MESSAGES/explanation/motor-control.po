@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 5622a6f7c7809ef366d995f5d19fb998d48aa89520ba12621296be19b43d29fc\n"
+"X-Nexus-Source-SHA256: 06626441eea29555ddb75c970f78a6281359b1ead6055ff7da23038db2bae4f9\n"
 
 #: ../../../../docs/explanation/motor-control.md:9
 msgid "电机计算、轴目标与硬件执行"
@@ -23,16 +23,6 @@ msgstr ""
 "This page describes the current software contracts and their costs; a "
 "software reference does not qualify any power board, motor or physical "
 "controller."
-
-#: ../../../../docs/explanation/motor-control.md:15
-msgid ""
-"当前生产接入范围限定为 STM32F4。GD32F470 与其他非 F4 MCU 不在本轮实现范围； 保留厂商依赖库存和公共接口边界，不建立占位 "
-"provider，也不据此声称跨厂商验证。"
-msgstr ""
-"Production integration is currently limited to STM32F4. GD32F470 and other "
-"non-F4 MCUs are outside this implementation scope. Vendor inventory "
-"dependencies and public interface boundaries remain; no placeholder provider"
-" or cross-vendor qualification is claimed."
 
 #: ../../../../docs/explanation/motor-control.md:18
 msgid "![FIG-35：电机与轴控制的调用和退出责任](../assets/diagrams/motor-control.svg)"
@@ -1242,3 +1232,10 @@ msgstr ""
 "devices.md). Authoritative public declarations are in the [motor and axis "
 "API](../reference/api/components/control.md) and [coupled sampling "
 "API](../reference/api/io/analog.md)."
+
+#: ../../../../workspace/nexus/docs/explanation/motor-control.md:15
+msgid "本文的电机控制硬件路线限定为 STM32F4。GD32F470 和其他 MCU 的电机路线等待独立接入和验证。"
+msgstr ""
+"The motor-control hardware routes described here are scoped to STM32F4. "
+"Motor-control routes for GD32F470 and other MCUs await separate integration "
+"and verification."

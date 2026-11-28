@@ -98,6 +98,72 @@ class EncoderConfigurationTests(unittest.TestCase):
             gate.resolve_ir(path)
 
 
+class F103EncoderConfigurationTests(unittest.TestCase):
+    fixtures = gate.ROOT / 'tests/integration/assemblies'
+    reference = fixtures / 'stm32f1_encoder'
+
+    def test_exact_f103_route_has_no_irq_or_dma_and_generates_static_c(self):
+        path = self.reference / 'f103rb-tim3.toml'
+        result = gate.resolve_ir(path)
+        encoder, = result.controllers
+        self.assertEqual((encoder.controller, encoder.options.counting), ('TIM3', 'x4'))
+        self.assertFalse(any(claim.owner == 'position' and
+                             claim.key.startswith(('irq:', 'dma:')) for claim in result.claims))
+        with tempfile.TemporaryDirectory() as temporary:
+            generated = Path(temporary) / 'generated'
+            gate.configure(path, generated)
+            self.assertIn('nx_stm32f1_encoder_prepare(', (generated / 'bindings.c').read_text())
+
+    def test_counter_excludes_pwm_and_adc_timer3_but_coexists_with_adc_timer1(self):
+        path = self.reference / 'f103rb-tim3.toml'
+        adc = self.fixtures / 'stm32f1_adc'
+        pwm = self.fixtures / 'stm32f1_pwm'
+        board = gate.load(self.reference / 'board/board.json')
+        for fixture in (adc, pwm):
+            board['bindings'].extend(gate.load(fixture / 'board/board.json')['bindings'])
+        cases = ((adc / 'f103rb-trigger-dma.toml', '[adc.analog]', False),
+                 (adc / 'f103rb-tim1-trigger-dma.toml', '[adc.analog]', True),
+                 (pwm / 'f103rb-pwm.toml', '[pwm.waveform]', False))
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            (root / 'board').mkdir()
+            (root / 'board/board.json').write_text(json.dumps(board))
+            assembly = root / 'combined.toml'
+            for fixture, header, independent in cases:
+                with self.subTest(fixture=fixture.name):
+                    section = header + fixture.read_text().split(header, 1)[1].split('[factory]', 1)[0]
+                    assembly.write_text(path.read_text() + '\n' + section)
+                    if independent:
+                        gate.resolve_ir(assembly)
+                    else:
+                        with self.assertRaisesRegex(ValueError, r'Resource conflict controller:TIM3'):
+                            gate.resolve_ir(assembly)
+
+    def test_x2_modes_reuse_the_same_exact_static_routes(self):
+        baseline = gate.resolve_ir(self.reference / 'f103rb-tim3.toml')
+        for mode in ('x2-a', 'x2-b'):
+            with self.subTest(mode=mode):
+                path = self.reference / f'f103rb-tim3-{mode}.toml'
+                result = gate.resolve_ir(path)
+                encoder, = result.controllers
+                self.assertEqual((encoder.controller, encoder.options.counting),
+                                 ('TIM3', mode))
+                self.assertEqual(result.claims, baseline.claims)
+
+    def test_unknown_modes_and_nonexclusive_options_reject(self):
+        authored = (self.reference / 'f103rb-tim3.toml').read_text()
+        authored = authored.replace('board_package = "board"',
+                                    f'board_package = {json.dumps(str(self.reference / "board"))}')
+        with tempfile.TemporaryDirectory() as temporary:
+            assembly = Path(temporary) / 'unsupported.toml'
+            for existing, rejected in (('"x4"', '"x1"'),
+                                       ('exclusive = true', 'exclusive = false')):
+                with self.subTest(option=rejected):
+                    assembly.write_text(authored.replace(existing, rejected))
+                    with self.assertRaisesRegex(ValueError, r'[Ee]ncoder'):
+                        gate.resolve_ir(assembly)
+
+
 
 if __name__ == '__main__':
     unittest.main()

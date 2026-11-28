@@ -535,7 +535,9 @@ class SourceSDKThreadXSelectionTests(unittest.TestCase):
         lock = json.loads((ROOT / "dependencies/threadx.lock.json").read_text())
         selected = source_sdk.dependency_entries(ROOT, "ext/threadx")
         self.assertEqual(set(selected), set(lock["files"]) | {lock["license"]["path"]})
-        self.assertEqual(len(selected), 215)
+        self.assertIn("ports/cortex_m3/gnu/src/tx_thread_schedule.S", selected)
+        self.assertIn("ports/cortex_m4/gnu/src/tx_thread_schedule.S", selected)
+        self.assertIn("ports/linux/gnu/src/tx_thread_schedule.c", selected)
         self.assertNotIn("ports/cortex_m7/gnu/src/tx_thread_schedule.S", selected)
 
     def test_approved_origin_declaration_is_required_and_packaged(self):
@@ -1495,17 +1497,17 @@ class SourceSDKTests(unittest.TestCase):
             'core/src/fault.c',
             'core/include/nexus/core/fault.h',
             'io/include/nexus/io/usb_device.h',
-            'soc/stm32/stm32f4/drivers/ip/dwc_otg_device/usb_device_controller.c',
-            'soc/stm32/stm32f4/drivers/ip/dwc_otg_device/usb_device_controller.h',
+            'soc/stm32/common/dwc_otg_device/usb_device_controller.c',
+            'soc/stm32/common/dwc_otg_device/usb_device_controller.h',
             'tests/support/native/drivers/usb_device_access.h',
             'io/include/nexus/io/ethernet.h',
-            'soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c',
-            'soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.h',
+            'soc/stm32/common/dwmac/eth_mac.c',
+            'soc/stm32/common/dwmac/eth_mac.h',
             'io/include/nexus/io/mdio.h',
             'soc/stm32/stm32f4/drivers/usb/usb_device.c',
             'soc/stm32/stm32f4/drivers/can/stm32f407_can.h',
-            'soc/stm32/stm32f4/drivers/ip/classic_can/can_controller.c',
-            'soc/stm32/stm32f4/drivers/ip/classic_can/can_controller.h',
+            'soc/stm32/common/bxcan/can_controller.c',
+            'soc/stm32/common/bxcan/can_controller.h',
             'io/include/nexus/io/advanced_pwm.h',
             'soc/stm32/stm32f4/drivers/ip/advanced_timer/timer_advanced_controller.h',
             'os/freertos/timebase_lowpower.c',

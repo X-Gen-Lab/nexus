@@ -1,0 +1,29 @@
+schema = 2
+board_package = "f103rb-board"
+backend = "baremetal"
+clock = "hsi8"
+optimization = "Os"
+
+[hardware]
+rs485_wiring = "max3485e-direction-pa5"
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+static_ram_limit_bytes = 6144
+flash_load_limit_bytes = 24576
+
+[gpio.direction]
+binding = "rs485-de"
+mode = "output"
+active_high = true
+
+[uart.serial2]
+binding = "uart2"
+mode = "dma-tx"
+baud = 115200
+rx = { format = "events", capacity = 32 }
+irq = { priority = 5, calls_os = false }
+
+[factory]
+capabilities = true

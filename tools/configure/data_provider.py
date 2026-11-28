@@ -202,6 +202,7 @@ class Binding:
     shared_irq: object | None = None
     profile_headers: Mapping | None = None
     io_domains: tuple[str, ...] = ()
+    i2c_target_receive_only: bool = False
 
     @classmethod
     def create(cls, value, *, fragments=None):
@@ -211,7 +212,8 @@ class Binding:
             common.fail("Binding declares exactly one mode or modes list")
         mode_field = "mode" if "mode" in value else "modes"
         required.add(mode_field)
-        optional = {"validator", "limits", "controllers", "headers", "shared_irq", "profile_headers", "io_domains"}
+        optional = {"validator", "limits", "controllers", "headers", "shared_irq",
+                    "profile_headers", "io_domains", "i2c_target_receive_only"}
         if "static_recipe" in value:
             _fields(value, required | {"static_recipe"}, optional)
             from tools.configure.generation.static_recipe import StaticRecipe
@@ -236,6 +238,10 @@ class Binding:
             if (not isinstance(name, str) or
                     re.fullmatch(r"[a-z][a-z0-9_-]*", name) is None):
                 common.fail("Binding kind and mode require ordinary identifiers")
+        receive_only = value.get("i2c_target_receive_only", False)
+        if (type(receive_only) is not bool or
+                ("i2c_target_receive_only" in value and value["kind"] != "i2c_target")):
+            common.fail("Receive-only metadata requires a boolean I2C target binding")
         controllers = value.get("controllers", ())
         if (not isinstance(controllers, (tuple, list)) or
                 len(set(controllers)) != len(controllers)):
@@ -282,7 +288,7 @@ class Binding:
             value.get("close"), fields, storage, value.get("irq"),
             value.get("validator"), freeze(limits), value.get("admit"), recipe,
             tuple(controllers), _headers(value.get("headers", [])), shared, profile_headers,
-            tuple(io_domains))
+            tuple(io_domains), receive_only)
 
     def headers_for(self, item):
         headers = self.headers
@@ -316,15 +322,17 @@ class DataProvider(DomainBridge):
         from tools.configure.hardware_bindings import load_hardware
         from tools.configure.package_policy import BindingPolicy
         selected = binding_document(package, document, read=read)
-        from tools.configure.pinmux import NumericPinMuxPolicy
-        pinmux = NumericPinMuxPolicy.from_validated(selected.get("pinmux_policy"))
+        from tools.configure.pinmux import load_pinmux_policy
+        pinmux = load_pinmux_policy(selected.get("pinmux_policy"))
         policies = DomainPolicies.from_validated(package, soc, selected, pinmux=pinmux)
         hardware = load_hardware(package, read=read, pinmux=pinmux)
         from tools.configure.reference_profiles import ProfileSet
         profiles = (ProfileSet.from_validated(read(package.fact("review_profiles")))
                     if "review_profiles" in package.facts else None)
         return cls(package, soc, selected["software"], policies, hardware,
-                   BindingPolicy.from_validated(selected, pinmux=pinmux), profiles)
+                   BindingPolicy.from_validated(selected, pinmux=pinmux,
+                                                fixed_dma=policies.FIXED_CHANNEL_DMA),
+                   profiles)
 
     def __post_init__(self):
         _fields(self.software, {"enum_abi", "backends", "headers", "bindings"},

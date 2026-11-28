@@ -7,36 +7,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 819fe5f1f1d1730ab00cf9fde98b23b3b4678307bb755cf384e5856ba7868d40\n"
+"X-Nexus-Source-SHA256: 1b0af0d0a01785e5e88c9f7c10a88edc496a8155d0b9cda39dd2671233660656\n"
 
 #: ../../../../../docs/reference/platforms/capabilities.md:9
 msgid "当前派生能力矩阵"
 msgstr "Current derived capability matrix"
-
-#: ../../../../../docs/reference/platforms/capabilities.md:11
-msgid ""
-"本表由维护工具读取当前 F4 事实、受审路线、四个 Board 包、实际软件装配和生成 face 对应的生产 ops "
-"定义生成。它不是另一份配置输入，也不建立编译、执行或实板 资格。声明模式、允许 route 和本次选择分别核对，空列表示没有该类关联。"
-msgstr ""
-"The maintenance tool derives this table from current F4 facts, reviewed "
-"routes, four Board packages, actual software assemblies and production ops "
-"definitions associated with generated faces. It is not another configuration"
-" input and establishes no compile, execution or physical-board "
-"qualification. Check declared modes, allowed routes and current selections "
-"separately; an empty column means no association of that kind."
-
-#: ../../../../../docs/reference/platforms/capabilities.md:15
-msgid ""
-"生产聚合只包含解析后 scope 为 `production` 的包，当前为 `stm32f4`。 Native 属于显式 host-test "
-"fixture，不计入生产 SoC 支持；`scope=reference` 的软件 参考必须显式启用 test "
-"support，也不进入生产聚合。其他保留的 vendor SDK 不进入 本表。精确限制见[支持](support.md)。"
-msgstr ""
-"Production aggregation includes only packages whose resolved scope is "
-"`production`, currently `stm32f4`. Native is an explicit host-test fixture "
-"and does not count as production SoC support. Software references with "
-"`scope=reference` require explicit test support and also remain outside "
-"production aggregation. Other retained vendor SDKs do not enter this table. "
-"See [support](support.md) for exact limits."
 
 #: ../../../../../docs/reference/platforms/capabilities.md:26
 msgid ""
@@ -519,10 +494,6 @@ msgstr ""
 "`tests/integration/assemblies/declared_io_assembly/ve-word-adc-can.toml`"
 
 #: ../../../../../docs/reference/platforms/capabilities.md:0
-msgid "`soc/stm32/stm32f4/drivers/ip/classic_can/can_controller.c`"
-msgstr "`soc/stm32/stm32f4/drivers/ip/classic_can/can_controller.c`"
-
-#: ../../../../../docs/reference/platforms/capabilities.md:0
 msgid "CAN2"
 msgstr "CAN2"
 
@@ -833,10 +804,6 @@ msgid ""
 msgstr ""
 "`tests/integration/assemblies/ethernet_assembly/stm32-zg-freertos.toml`, "
 "`tests/integration/assemblies/ethernet_assembly/stm32-zg.toml`"
-
-#: ../../../../../docs/reference/platforms/capabilities.md:0
-msgid "`soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c`"
-msgstr "`soc/stm32/stm32f4/drivers/ip/legacy_mac/eth_mac.c`"
 
 #: ../../../../../docs/reference/platforms/capabilities.md:0
 msgid "eth_frames"
@@ -1635,10 +1602,6 @@ msgstr ""
 "`tests/integration/assemblies/stm32_assembly/zg-i2c-dma.toml`"
 
 #: ../../../../../docs/reference/platforms/capabilities.md:0
-msgid "`soc/stm32/stm32f4/drivers/ip/i2c_v1_async/i2c_v1_async.c`"
-msgstr "`soc/stm32/stm32f4/drivers/ip/i2c_v1_async/i2c_v1_async.c`"
-
-#: ../../../../../docs/reference/platforms/capabilities.md:0
 msgid "irq-messages"
 msgstr "irq-messages"
 
@@ -2163,8 +2126,8 @@ msgstr ""
 "`tests/integration/assemblies/usb_iso_assembly/ve-fs-max-in.toml`"
 
 #: ../../../../../docs/reference/platforms/capabilities.md:0
-msgid "`soc/stm32/stm32f4/drivers/ip/dwc_otg_device/usb_device_controller.c`"
-msgstr "`soc/stm32/stm32f4/drivers/ip/dwc_otg_device/usb_device_controller.c`"
+msgid "`soc/stm32/common/dwc_otg_device/usb_device_controller.c`"
+msgstr "`soc/stm32/common/dwc_otg_device/usb_device_controller.c`"
 
 #: ../../../../../docs/reference/platforms/capabilities.md:0
 msgid "otg-fs"
@@ -2197,10 +2160,6 @@ msgid ""
 msgstr ""
 "`tests/integration/assemblies/st_usb_host_assembly/stm32-ve-fs.toml`, "
 "`tests/integration/assemblies/usb_host_assembly/stm32-ve-fs.toml`"
-
-#: ../../../../../docs/reference/platforms/capabilities.md:0
-msgid "`soc/stm32/stm32f4/drivers/usb/usb_host.c`"
-msgstr "`soc/stm32/stm32f4/drivers/usb/usb_host.c`"
 
 #: ../../../../../docs/reference/platforms/capabilities.md:0
 msgid "OTG_HS"
@@ -4092,3 +4051,1086 @@ msgstr ""
 "`tests/integration/assemblies/stm32f4_power/f446ze-adopt-retained.toml`, "
 "`tests/integration/assemblies/stm32f4_power/f479ni-adopt-retained.toml`, "
 "`tests/integration/kernels/f407_freertos_stop/stop.toml`"
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:11
+msgid ""
+"本表由维护工具读取当前 SoC 事实、受审路线、Board 包、实际软件装配和生成 face 对应的生产 ops "
+"定义生成。它不是另一份配置输入，也不建立编译、执行或实板 资格。声明模式、允许 route 和本次选择分别核对，空列表示没有该类关联。"
+msgstr ""
+"The maintenance tool generates this table from current SoC facts, reviewed "
+"routes, board packages, actual software assemblies, and production ops "
+"definitions selected by generated faces. It provides no new configuration "
+"input, build evidence, execution evidence, or physical qualification. Review"
+" declared modes, allowed routes, and actual selections independently. An "
+"empty column indicates no corresponding association."
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:15
+msgid ""
+"生产聚合包含解析后 scope 为 `production` 的 STM32F4 和 STM32F1。 Native 属于显式 host-test "
+"fixture，不计入生产 SoC 支持；`scope=reference` 的软件 参考必须显式启用 test "
+"support，也不进入生产聚合。其他保留的 vendor SDK 不进入 本表。精确限制见[支持](support.md)。"
+msgstr ""
+"The production aggregate includes the STM32F4 and STM32F1 packages that "
+"resolve to scope `production`. Native is an explicit host-test fixture "
+"outside production SoC support. Software references with `scope=reference` "
+"require explicit test support and stay outside this aggregate. Other "
+"retained vendor SDKs are outside this table. See [support](support.md) for "
+"exact restrictions."
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "stm32f1"
+msgstr "stm32f1"
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "poll-halfword"
+msgstr "poll-halfword"
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`stm32f103rb-nucleo`"
+msgstr "`stm32f103rb-nucleo`"
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`soc/stm32/stm32f1/drivers/flash/flash.c`"
+msgstr "`soc/stm32/stm32f1/drivers/flash/flash.c`"
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`soc/stm32/stm32f1/drivers/gpio/gpio.c`"
+msgstr "`soc/stm32/stm32f1/drivers/gpio/gpio.c`"
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`soc/stm32/stm32f1/drivers/uart/uart.c`"
+msgstr "`soc/stm32/stm32f1/drivers/uart/uart.c`"
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`tests/integration/assemblies/stm32f1_family/f103c8-baremetal.toml`"
+msgstr "`tests/integration/assemblies/stm32f1_family/f103c8-baremetal.toml`"
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`soc/stm32/stm32f1/drivers/crc/crc.c`"
+msgstr "`soc/stm32/stm32f1/drivers/crc/crc.c`"
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`gpio-pb12-cs`"
+msgstr "`gpio-pb12-cs`"
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`i2c1-pb6-pb7`"
+msgstr "`i2c1-pb6-pb7`"
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`soc/stm32/stm32f1/drivers/i2c/i2c.c`"
+msgstr "`soc/stm32/stm32f1/drivers/i2c/i2c.c`"
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`tests/integration/assemblies/stm32f1_watchdog/rb.toml`"
+msgstr "`tests/integration/assemblies/stm32f1_watchdog/rb.toml`"
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`soc/stm32/stm32f1/drivers/watchdog/watchdog.c`"
+msgstr "`soc/stm32/stm32f1/drivers/watchdog/watchdog.c`"
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`soc/stm32/stm32f1/drivers/spi/spi.c`"
+msgstr "`soc/stm32/stm32f1/drivers/spi/spi.c`"
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`soc/stm32/stm32f1/drivers/uart/uart_dma.c`"
+msgstr "`soc/stm32/stm32f1/drivers/uart/uart_dma.c`"
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`adc1-pa0-in0`"
+msgstr "`adc1-pa0-in0`"
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`tests/integration/assemblies/stm32f1_adc/f103rb-adc.toml`"
+msgstr "`tests/integration/assemblies/stm32f1_adc/f103rb-adc.toml`"
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`soc/stm32/stm32f1/drivers/adc/adc.c`"
+msgstr "`soc/stm32/stm32f1/drivers/adc/adc.c`"
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`exti13-pc13`"
+msgstr "`exti13-pc13`"
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`tests/integration/assemblies/stm32f1_exti/f103rb-button.toml`"
+msgstr "`tests/integration/assemblies/stm32f1_exti/f103rb-button.toml`"
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`soc/stm32/stm32f1/drivers/exti/exti.c`"
+msgstr "`soc/stm32/stm32f1/drivers/exti/exti.c`"
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "PVD"
+msgstr "PVD"
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`pvd-level`"
+msgstr "`pvd-level`"
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`tests/integration/assemblies/stm32f1_pvd/rb.toml`"
+msgstr "`tests/integration/assemblies/stm32f1_pvd/rb.toml`"
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`soc/stm32/stm32f1/drivers/pvd/pvd.c`"
+msgstr "`soc/stm32/stm32f1/drivers/pvd/pvd.c`"
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`tim3-pa6-ch1`"
+msgstr "`tim3-pa6-ch1`"
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`tests/integration/assemblies/stm32f1_pwm/f103rb-pwm.toml`"
+msgstr "`tests/integration/assemblies/stm32f1_pwm/f103rb-pwm.toml`"
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`soc/stm32/stm32f1/drivers/pwm/pwm.c`"
+msgstr "`soc/stm32/stm32f1/drivers/pwm/pwm.c`"
+
+#: ../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "classic-poll"
+msgstr "classic-poll"
+
+#: ../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`can1-silent-loopback`"
+msgstr "`can1-silent-loopback`"
+
+#: ../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`tests/integration/assemblies/stm32f1_can/rb.toml`"
+msgstr "`tests/integration/assemblies/stm32f1_can/rb.toml`"
+
+#: ../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`soc/stm32/stm32f1/drivers/can/can.c`"
+msgstr "`soc/stm32/stm32f1/drivers/can/can.c`"
+
+#: ../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "backup-adopt"
+msgstr "backup-adopt"
+
+#: ../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`rtc-lse-crystal-backup`"
+msgstr "`rtc-lse-crystal-backup`"
+
+#: ../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`tests/integration/assemblies/stm32f1_rtc/rb.toml`"
+msgstr "`tests/integration/assemblies/stm32f1_rtc/rb.toml`"
+
+#: ../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`soc/stm32/stm32f1/drivers/rtc/counter.c`"
+msgstr "`soc/stm32/stm32f1/drivers/rtc/counter.c`"
+
+#: ../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`usart2-pa3-rx`"
+msgstr "`usart2-pa3-rx`"
+
+#: ../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`tests/integration/assemblies/stm32f1_uart_rx_dma/f103rb-rx-dma.toml`"
+msgstr "`tests/integration/assemblies/stm32f1_uart_rx_dma/f103rb-rx-dma.toml`"
+
+#: ../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`soc/stm32/stm32f1/drivers/uart/uart_rx_dma.c`"
+msgstr "`soc/stm32/stm32f1/drivers/uart/uart_rx_dma.c`"
+
+#: ../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`soc/stm32/stm32f1/drivers/watchdog/window_watchdog.c`"
+msgstr "`soc/stm32/stm32f1/drivers/watchdog/window_watchdog.c`"
+
+#: ../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "classic-poll-normal"
+msgstr "classic-poll-normal"
+
+#: ../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`can1-pa11-pa12-rs-pc2`"
+msgstr "`can1-pa11-pa12-rs-pc2`"
+
+#: ../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`soc/stm32/stm32f1/drivers/dac/dac.c`"
+msgstr "`soc/stm32/stm32f1/drivers/dac/dac.c`"
+
+#: ../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`soc/stm32/stm32f1/drivers/fsmc/fsmc.c`"
+msgstr "`soc/stm32/stm32f1/drivers/fsmc/fsmc.c`"
+
+#: ../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`fsmc-ne3-is61wv51216bll`"
+msgstr "`fsmc-ne3-is61wv51216bll`"
+
+#: ../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid ""
+"`tests/integration/assemblies/stm32f1_buses/f103rb-buses.toml`, "
+"`tests/integration/assemblies/stm32f1_i2c_10bit/f103rb-i2c-10bit.toml`"
+msgstr ""
+"`tests/integration/assemblies/stm32f1_buses/f103rb-buses.toml`, "
+"`tests/integration/assemblies/stm32f1_i2c_10bit/f103rb-i2c-10bit.toml`"
+
+#: ../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`spi2-pb13-pb14-pb15-dma`"
+msgstr "`spi2-pb13-pb14-pb15-dma`"
+
+#: ../../nexus-f1-advanced-assembly/docs/reference/platforms/capabilities.md:0
+msgid "single-trigger-dma"
+msgstr "single-trigger-dma"
+
+#: ../../nexus-f1-advanced-assembly/docs/reference/platforms/capabilities.md:0
+msgid "`adc1-pa0-in0`, `adc1-pa0-tim1-cc1`"
+msgstr "`adc1-pa0-in0`, `adc1-pa0-tim1-cc1`"
+
+#: ../../nexus-f1-advanced-assembly/docs/reference/platforms/capabilities.md:0
+msgid ""
+"`tests/integration/assemblies/stm32f1_adc/f103rb-tim1-trigger-dma.toml`, "
+"`tests/integration/assemblies/stm32f1_adc/f103rb-trigger-dma.toml`"
+msgstr ""
+"`tests/integration/assemblies/stm32f1_adc/f103rb-tim1-trigger-dma.toml`, "
+"`tests/integration/assemblies/stm32f1_adc/f103rb-trigger-dma.toml`"
+
+#: ../../nexus-f1-advanced-assembly/docs/reference/platforms/capabilities.md:0
+msgid "`soc/stm32/stm32f1/drivers/adc/trigger_dma.c`"
+msgstr "`soc/stm32/stm32f1/drivers/adc/trigger_dma.c`"
+
+#: ../../nexus-f1-advanced-assembly/docs/reference/platforms/capabilities.md:0
+msgid "`can1-connectivity-silent`"
+msgstr "`can1-connectivity-silent`"
+
+#: ../../nexus-f1-advanced-assembly/docs/reference/platforms/capabilities.md:0
+msgid ""
+"`tests/integration/assemblies/stm32f1_can_connectivity/f105vc.toml`, "
+"`tests/integration/assemblies/stm32f1_can_connectivity/f107vc.toml`"
+msgstr ""
+"`tests/integration/assemblies/stm32f1_can_connectivity/f105vc.toml`, "
+"`tests/integration/assemblies/stm32f1_can_connectivity/f107vc.toml`"
+
+#: ../../nexus-f1-advanced-assembly/docs/reference/platforms/capabilities.md:0
+msgid "`soc/stm32/common/bxcan/can_controller.c`"
+msgstr "`soc/stm32/common/bxcan/can_controller.c`"
+
+#: ../../nexus-f1-advanced-assembly/docs/reference/platforms/capabilities.md:0
+msgid "`can2-connectivity-silent`"
+msgstr "`can2-connectivity-silent`"
+
+#: ../../nexus-f1-advanced-assembly/docs/reference/platforms/capabilities.md:0
+msgid "`tim1-pa8-pb13-pb12`"
+msgstr "`tim1-pa8-pb13-pb12`"
+
+#: ../../nexus-f1-advanced-assembly/docs/reference/platforms/capabilities.md:0
+msgid "`tests/integration/assemblies/stm32f1_advanced_pwm/f103rb-tim1.toml`"
+msgstr "`tests/integration/assemblies/stm32f1_advanced_pwm/f103rb-tim1.toml`"
+
+#: ../../nexus-f1-advanced-assembly/docs/reference/platforms/capabilities.md:0
+msgid "`soc/stm32/stm32f1/drivers/advanced_pwm/advanced_pwm.c`"
+msgstr "`soc/stm32/stm32f1/drivers/advanced_pwm/advanced_pwm.c`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "TIM15"
+msgstr "TIM15"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "TIM16"
+msgstr "TIM16"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "TIM17"
+msgstr "TIM17"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`i2s2-pb12-pb13-pb15`"
+msgstr "`i2s2-pb12-pb13-pb15`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`otg-fs-sensed-pa9-pa11-pa12`"
+msgstr "`otg-fs-sensed-pa9-pa11-pa12`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`sdio-pc8-pc12-pd2-pc13`"
+msgstr "`sdio-pc8-pc12-pd2-pc13`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`soc/stm32/stm32f1/drivers/audio/i2s2.c`"
+msgstr "`soc/stm32/stm32f1/drivers/audio/i2s2.c`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`soc/stm32/stm32f1/drivers/sdio/sd_block.c`"
+msgstr "`soc/stm32/stm32f1/drivers/sdio/sd_block.c`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`soc/stm32/stm32f1/drivers/timer_capture/tim4.c`"
+msgstr "`soc/stm32/stm32f1/drivers/timer_capture/tim4.c`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid ""
+"`tests/integration/assemblies/stm32f1_connectivity_dwc/f105vc.toml`, "
+"`tests/integration/assemblies/stm32f1_connectivity_dwc/f107vc.toml`"
+msgstr ""
+"`tests/integration/assemblies/stm32f1_connectivity_dwc/f105vc.toml`, "
+"`tests/integration/assemblies/stm32f1_connectivity_dwc/f107vc.toml`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`tests/integration/assemblies/stm32f1_i2s2/f103ze-i2s2.toml`"
+msgstr "`tests/integration/assemblies/stm32f1_i2s2/f103ze-i2s2.toml`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`tests/integration/assemblies/stm32f1_pwm/f100rb-pwm.toml`"
+msgstr "`tests/integration/assemblies/stm32f1_pwm/f100rb-pwm.toml`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`tests/integration/assemblies/stm32f1_sdio/ze-1bit.toml`"
+msgstr "`tests/integration/assemblies/stm32f1_sdio/ze-1bit.toml`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`tests/integration/assemblies/stm32f1_timer_capture/f103rb-tim4.toml`"
+msgstr "`tests/integration/assemblies/stm32f1_timer_capture/f103rb-tim4.toml`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`tim15-pa2-ch1`"
+msgstr "`tim15-pa2-ch1`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`tim16-pb8-ch1`"
+msgstr "`tim16-pb8-ch1`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`tim17-pb9-ch1`"
+msgstr "`tim17-pb9-ch1`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`tim4-ch1-pb6`"
+msgstr "`tim4-ch1-pb6`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`soc/stm32/stm32f1/drivers/encoder/encoder.c`"
+msgstr "`soc/stm32/stm32f1/drivers/encoder/encoder.c`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`soc/stm32/stm32f1/drivers/uart/uart_word.c`"
+msgstr "`soc/stm32/stm32f1/drivers/uart/uart_word.c`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`tests/integration/assemblies/stm32f1_uart9n1/f103rb-uart9n1.toml`"
+msgstr "`tests/integration/assemblies/stm32f1_uart9n1/f103rb-uart9n1.toml`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`usart2-pa2-pa3-words`"
+msgstr "`usart2-pa2-pa3-words`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "USB"
+msgstr "USB"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`gpio-pa4-spi1-cs`, `gpio-pa5`"
+msgstr "`gpio-pa4-spi1-cs`, `gpio-pa5`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`soc/stm32/stm32f1/drivers/usb/pma_device.c`"
+msgstr "`soc/stm32/stm32f1/drivers/usb/pma_device.c`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`spi1-pa5-pa6-pa7`"
+msgstr "`spi1-pa5-pa6-pa7`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`tests/integration/assemblies/stm32f1_advanced_pwm/f103ze-tim8.toml`"
+msgstr "`tests/integration/assemblies/stm32f1_advanced_pwm/f103ze-tim8.toml`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid ""
+"`tests/integration/assemblies/stm32f1_buses/f103rb-buses.toml`, "
+"`tests/integration/assemblies/stm32f1_spi_dual/f103rb-spi-dual.toml`"
+msgstr ""
+"`tests/integration/assemblies/stm32f1_buses/f103rb-buses.toml`, "
+"`tests/integration/assemblies/stm32f1_spi_dual/f103rb-spi-dual.toml`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid ""
+"`tests/integration/assemblies/stm32f1_pma_device/f102rb.toml`, "
+"`tests/integration/assemblies/stm32f1_pma_device/f103rb.toml`"
+msgstr ""
+"`tests/integration/assemblies/stm32f1_pma_device/f102rb.toml`, "
+"`tests/integration/assemblies/stm32f1_pma_device/f103rb.toml`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`tests/integration/assemblies/stm32f1_spi_dual/f103rb-spi-dual.toml`"
+msgstr "`tests/integration/assemblies/stm32f1_spi_dual/f103rb-spi-dual.toml`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`tim8-pc6-pa7-pa6`"
+msgstr "`tim8-pc6-pa7-pa6`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`usb-pma-pa0-pa1-pa11-pa12`, `usb-pma-pa0-pa1-pa11-pa12-crystal`"
+msgstr "`usb-pma-pa0-pa1-pa11-pa12`, `usb-pma-pa0-pa1-pa11-pa12-crystal`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "device-pma"
+msgstr "device-pma"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`adc12-pa1-pa2-regular`"
+msgstr "`adc12-pa1-pa2-regular`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`eth-clause22-pc1-pa2`"
+msgstr "`eth-clause22-pc1-pa2`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`otg-fs-guarded-host-pa9-pa11-pa12`"
+msgstr "`otg-fs-guarded-host-pa9-pa11-pa12`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`soc/stm32/common/dwc_otg_host/usb_host.c`"
+msgstr "`soc/stm32/common/dwc_otg_host/usb_host.c`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`soc/stm32/stm32f1/drivers/adc/dual_dma.c`"
+msgstr "`soc/stm32/stm32f1/drivers/adc/dual_dma.c`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`soc/stm32/stm32f1/drivers/ethernet/mdio.c`"
+msgstr "`soc/stm32/stm32f1/drivers/ethernet/mdio.c`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`tests/integration/assemblies/stm32f1_adc/f103ze-pair.toml`"
+msgstr "`tests/integration/assemblies/stm32f1_adc/f103ze-pair.toml`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "clause22"
+msgstr "clause22"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "mdio"
+msgstr "mdio"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "simultaneous-scan-dma"
+msgstr "simultaneous-scan-dma"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`i2c1-target-pb6-pb7`"
+msgstr "`i2c1-target-pb6-pb7`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`soc/stm32/stm32f1/drivers/i2c/target.c`"
+msgstr "`soc/stm32/stm32f1/drivers/i2c/target.c`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`stm3210c-eval-mb784-c01`"
+msgstr "`stm3210c-eval-mb784-c01`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`tests/integration/assemblies/stm32f1_i2c_target/f103rb-target.toml`"
+msgstr "`tests/integration/assemblies/stm32f1_i2c_target/f103rb-target.toml`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "target-rx-irq"
+msgstr "target-rx-irq"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`exti13-pc13-stop`"
+msgstr "`exti13-pc13-stop`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`f100rb-user-pa0`, `gpio-pa0-input`"
+msgstr "`f100rb-user-pa0`, `gpio-pa0-input`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`stm32vldiscovery-mb913-c02`"
+msgstr "`stm32vldiscovery-mb913-c02`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid ""
+"`tests/integration/assemblies/stm32f1_family/f103c8-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_vldiscovery/mb913-c02.toml`"
+msgstr ""
+"`tests/integration/assemblies/stm32f1_family/f103c8-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_vldiscovery/mb913-c02.toml`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`tests/integration/assemblies/stm32f1_sdio/ze-1bit-write.toml`"
+msgstr "`tests/integration/assemblies/stm32f1_sdio/ze-1bit-write.toml`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`tests/integration/assemblies/stm32f1_stop/f103rb-stop.toml`"
+msgstr "`tests/integration/assemblies/stm32f1_stop/f103rb-stop.toml`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`tests/integration/assemblies/stm32f1_vldiscovery/mb913-c02.toml`"
+msgstr "`tests/integration/assemblies/stm32f1_vldiscovery/mb913-c02.toml`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`usb-pma-pa0-pa1-pa11-pa12`"
+msgstr "`usb-pma-pa0-pa1-pa11-pa12`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "device-pma-bulk"
+msgstr "device-pma-bulk"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "sdio-poll-write"
+msgstr "sdio-poll-write"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "stop-wake"
+msgstr "stop-wake"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`f107-usart2-pd5-pd6`, `usart2-pa2-pa3`, `usart2-pa2-pa3-irq`"
+msgstr "`f107-usart2-pd5-pd6`, `usart2-pa2-pa3`, `usart2-pa2-pa3-irq`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`soc/stm32/stm32f1/drivers/pwm_adc/cycle.c`"
+msgstr "`soc/stm32/stm32f1/drivers/pwm_adc/cycle.c`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`stm3210c-eval-mb784-c01`, `stm32f103rb-nucleo`"
+msgstr "`stm3210c-eval-mb784-c01`, `stm32f103rb-nucleo`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid ""
+"`tests/integration/assemblies/stm32f1_mdio/f107vc.toml`, "
+"`tests/integration/assemblies/stm32f1_mdio/mb784-c01.toml`, "
+"`tests/integration/assemblies/stm32f1_uart_remap/mb784-c01.toml`"
+msgstr ""
+"`tests/integration/assemblies/stm32f1_mdio/f107vc.toml`, "
+"`tests/integration/assemblies/stm32f1_mdio/mb784-c01.toml`, "
+"`tests/integration/assemblies/stm32f1_uart_remap/mb784-c01.toml`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid ""
+"`tests/integration/assemblies/stm32f1_pma_device/f103rb-interrupt.toml`"
+msgstr ""
+"`tests/integration/assemblies/stm32f1_pma_device/f103rb-interrupt.toml`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "device-pma-interrupt"
+msgstr "device-pma-interrupt"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "finite-injected"
+msgstr "finite-injected"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`adc1-temp-vrefint`"
+msgstr "`adc1-temp-vrefint`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`soc/stm32/stm32f1/drivers/adc/internal.c`"
+msgstr "`soc/stm32/stm32f1/drivers/adc/internal.c`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`tests/integration/assemblies/stm32f1_adc/f103rb-internal.toml`"
+msgstr "`tests/integration/assemblies/stm32f1_adc/f103rb-internal.toml`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid ""
+"`tests/integration/assemblies/stm32f1_pma_device/f103rb-bulk.toml`, "
+"`tests/integration/assemblies/stm32f1_pma_device/f103rb-st-device.toml`"
+msgstr ""
+"`tests/integration/assemblies/stm32f1_pma_device/f103rb-bulk.toml`, "
+"`tests/integration/assemblies/stm32f1_pma_device/f103rb-st-device.toml`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid ""
+"`tests/integration/assemblies/stm32f1_uart_flow/f103rb-flow.toml`, "
+"`tests/integration/assemblies/stm32f1_uart_half_duplex/f103rb-half-"
+"duplex.toml`, `tests/integration/assemblies/stm32f1_uart_irda/f103rb-"
+"irda.toml`, `tests/integration/assemblies/stm32f1_uart_lin/f103rb-lin.toml`,"
+" `tests/integration/assemblies/stm32f1_uart_smartcard/f103rb-"
+"smartcard.toml`, `tests/integration/assemblies/stm32f1_uart_sync/f103rb-"
+"sync.toml`"
+msgstr ""
+"`tests/integration/assemblies/stm32f1_uart_flow/f103rb-flow.toml`, "
+"`tests/integration/assemblies/stm32f1_uart_half_duplex/f103rb-half-"
+"duplex.toml`, `tests/integration/assemblies/stm32f1_uart_irda/f103rb-"
+"irda.toml`, `tests/integration/assemblies/stm32f1_uart_lin/f103rb-lin.toml`,"
+" `tests/integration/assemblies/stm32f1_uart_smartcard/f103rb-"
+"smartcard.toml`, `tests/integration/assemblies/stm32f1_uart_sync/f103rb-"
+"sync.toml`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid ""
+"`tests/integration/assemblies/stm32f1_window_watchdog/rb-window.toml`, "
+"`tests/integration/assemblies/stm32f1_wwdg_early_warning/rb.toml`"
+msgstr ""
+"`tests/integration/assemblies/stm32f1_window_watchdog/rb-window.toml`, "
+"`tests/integration/assemblies/stm32f1_wwdg_early_warning/rb.toml`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid ""
+"`usart2-pa2-one-wire`, `usart2-pa2-pa3-irda`, `usart2-pa2-pa3-lin`, "
+"`usart2-pa2-pa3-pa0-pa1-flow`, `usart2-pa2-pa3-pa4-sync`, "
+"`usart2-pa2-pa4-smartcard`"
+msgstr ""
+"`usart2-pa2-one-wire`, `usart2-pa2-pa3-irda`, `usart2-pa2-pa3-lin`, "
+"`usart2-pa2-pa3-pa0-pa1-flow`, `usart2-pa2-pa3-pa4-sync`, "
+"`usart2-pa2-pa4-smartcard`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`wwdg`, `wwdg-early-warning`"
+msgstr "`wwdg`, `wwdg-early-warning`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "internal-scan"
+msgstr "internal-scan"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "ETH_MAC"
+msgstr "ETH_MAC"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`eth-mii-mb784-remapped`"
+msgstr "`eth-mii-mb784-remapped`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`soc/stm32/common/dwmac/eth_mac.c`"
+msgstr "`soc/stm32/common/dwmac/eth_mac.c`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid ""
+"`tests/integration/assemblies/rs485_assembly/f103rb-dma.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-dma-tx.toml`"
+msgstr ""
+"`tests/integration/assemblies/rs485_assembly/f103rb-dma.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-dma-tx.toml`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid ""
+"`tests/integration/assemblies/stm32f1_can_normal/rb-canopen.toml`, "
+"`tests/integration/assemblies/stm32f1_can_normal/rb.toml`"
+msgstr ""
+"`tests/integration/assemblies/stm32f1_can_normal/rb-canopen.toml`, "
+"`tests/integration/assemblies/stm32f1_can_normal/rb.toml`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`eth-rmii-mb784-remapped`"
+msgstr "`eth-rmii-mb784-remapped`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`tests/integration/assemblies/stm32f1_eth_mii/f107vc-rmii.toml`"
+msgstr "`tests/integration/assemblies/stm32f1_eth_mii/f107vc-rmii.toml`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "backup-provision"
+msgstr "backup-provision"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`rtc-lse-crystal-provision`"
+msgstr "`rtc-lse-crystal-provision`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`tests/integration/assemblies/stm32f1_rtc/provision.toml`"
+msgstr "`tests/integration/assemblies/stm32f1_rtc/provision.toml`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "sdio-poll-4bit"
+msgstr "sdio-poll-4bit"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`sdio-pc8-11-pc12-pd2-pc13`"
+msgstr "`sdio-pc8-11-pc12-pd2-pc13`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`tests/integration/assemblies/stm32f1_sdio/ze-4bit.toml`"
+msgstr "`tests/integration/assemblies/stm32f1_sdio/ze-4bit.toml`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`adc2-pa2-in2`"
+msgstr "`adc2-pa2-in2`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`tests/integration/assemblies/stm32f1_adc/f103ze-adc2.toml`"
+msgstr "`tests/integration/assemblies/stm32f1_adc/f103ze-adc2.toml`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid ""
+"`tests/integration/assemblies/stm32f1_fsmc/zg-lcd.toml`, "
+"`tests/integration/assemblies/stm32f1_fsmc/zg-sram.toml`"
+msgstr ""
+"`tests/integration/assemblies/stm32f1_fsmc/zg-lcd.toml`, "
+"`tests/integration/assemblies/stm32f1_fsmc/zg-sram.toml`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`fsmc-ne4-cn16-lcd`"
+msgstr "`fsmc-ne4-cn16-lcd`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`tim3-pa6-one-pulse`"
+msgstr "`tim3-pa6-one-pulse`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`tests/integration/assemblies/stm32f1_timer_pulse/f103rb-tim3.toml`"
+msgstr "`tests/integration/assemblies/stm32f1_timer_pulse/f103rb-tim3.toml`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`soc/stm32/stm32f1/drivers/timer_pulse/tim3.c`"
+msgstr "`soc/stm32/stm32f1/drivers/timer_pulse/tim3.c`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`tests/integration/assemblies/stm32f1_uart_ports/f103rb-ports.toml`"
+msgstr "`tests/integration/assemblies/stm32f1_uart_ports/f103rb-ports.toml`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid ""
+"`tests/integration/assemblies/stm32f1_connectivity_host/f105vc.toml`, "
+"`tests/integration/assemblies/stm32f1_connectivity_host/f107vc-st-"
+"host.toml`, "
+"`tests/integration/assemblies/stm32f1_connectivity_host/f107vc.toml`"
+msgstr ""
+"`tests/integration/assemblies/stm32f1_connectivity_host/f105vc.toml`, "
+"`tests/integration/assemblies/stm32f1_connectivity_host/f107vc-st-"
+"host.toml`, "
+"`tests/integration/assemblies/stm32f1_connectivity_host/f107vc.toml`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "sdio-poll-4bit-write"
+msgstr "sdio-poll-4bit-write"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`tests/integration/assemblies/stm32f1_sdio/ze-4bit-write.toml`"
+msgstr "`tests/integration/assemblies/stm32f1_sdio/ze-4bit-write.toml`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "sequential-scan-dma"
+msgstr "sequential-scan-dma"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`adc1-pa0-pa1-tim3`"
+msgstr "`adc1-pa0-pa1-tim3`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`tests/integration/assemblies/stm32f1_adc/f103rb-scan-dma.toml`"
+msgstr "`tests/integration/assemblies/stm32f1_adc/f103rb-scan-dma.toml`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`tests/integration/assemblies/stm32f1_uart_ports/f103rb-usart3.toml`"
+msgstr "`tests/integration/assemblies/stm32f1_uart_ports/f103rb-usart3.toml`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`f100rb-led-pc8`, `f100rb-led-pc9`, `gpio-pc9-spi3-cs`"
+msgstr "`f100rb-led-pc8`, `f100rb-led-pc9`, `gpio-pc9-spi3-cs`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`spi3-pc10-pc11-pc12`"
+msgstr "`spi3-pc10-pc11-pc12`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`tests/integration/assemblies/stm32f1_spi_dual/f107vc-spi3.toml`"
+msgstr "`tests/integration/assemblies/stm32f1_spi_dual/f107vc-spi3.toml`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`adc3-pa3-in3`"
+msgstr "`adc3-pa3-in3`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`tests/integration/assemblies/stm32f1_adc/f103ze-adc3.toml`"
+msgstr "`tests/integration/assemblies/stm32f1_adc/f103ze-adc3.toml`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid ""
+"`flash-access-low-1k`, `flash-f100rb-1k`, `flash-f100ze-2k`, "
+"`flash-f101rb-1k`, `flash-f102rb-1k`, `flash-f103c6-1k`, `flash-internal`, "
+"`flash-internal-2k`, `flash-internal-xl`"
+msgstr ""
+"`flash-access-low-1k`, `flash-f100rb-1k`, `flash-f100ze-2k`, "
+"`flash-f101rb-1k`, `flash-f102rb-1k`, `flash-f103c6-1k`, `flash-internal`, "
+"`flash-internal-2k`, `flash-internal-xl`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid ""
+"`tests/integration/assemblies/stm32f1_flash/c6.toml`, "
+"`tests/integration/assemblies/stm32f1_flash/f100rb.toml`, "
+"`tests/integration/assemblies/stm32f1_flash/f100ze.toml`, "
+"`tests/integration/assemblies/stm32f1_flash/f101c6.toml`, "
+"`tests/integration/assemblies/stm32f1_flash/f101rb.toml`, "
+"`tests/integration/assemblies/stm32f1_flash/f101ze.toml`, "
+"`tests/integration/assemblies/stm32f1_flash/f101zg.toml`, "
+"`tests/integration/assemblies/stm32f1_flash/f102c6.toml`, "
+"`tests/integration/assemblies/stm32f1_flash/f102rb.toml`, "
+"`tests/integration/assemblies/stm32f1_flash/rb.toml`, "
+"`tests/integration/assemblies/stm32f1_flash/ze.toml`, "
+"`tests/integration/assemblies/stm32f1_flash/zg.toml`, "
+"`tests/integration/assemblies/stm32f1_flash_observe/rb.toml`"
+msgstr ""
+"`tests/integration/assemblies/stm32f1_flash/c6.toml`, "
+"`tests/integration/assemblies/stm32f1_flash/f100rb.toml`, "
+"`tests/integration/assemblies/stm32f1_flash/f100ze.toml`, "
+"`tests/integration/assemblies/stm32f1_flash/f101c6.toml`, "
+"`tests/integration/assemblies/stm32f1_flash/f101rb.toml`, "
+"`tests/integration/assemblies/stm32f1_flash/f101ze.toml`, "
+"`tests/integration/assemblies/stm32f1_flash/f101zg.toml`, "
+"`tests/integration/assemblies/stm32f1_flash/f102c6.toml`, "
+"`tests/integration/assemblies/stm32f1_flash/f102rb.toml`, "
+"`tests/integration/assemblies/stm32f1_flash/rb.toml`, "
+"`tests/integration/assemblies/stm32f1_flash/ze.toml`, "
+"`tests/integration/assemblies/stm32f1_flash/zg.toml`, "
+"`tests/integration/assemblies/stm32f1_flash_observe/rb.toml`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid ""
+"`tests/integration/assemblies/stm32f1_eth_mii/f107vc.toml`, "
+"`tests/integration/assemblies/stm32f1_lwip_ipv4/f107vc-network.toml`, "
+"`tests/integration/assemblies/stm32f1_lwip_ipv4/f107vc.toml`"
+msgstr ""
+"`tests/integration/assemblies/stm32f1_eth_mii/f107vc.toml`, "
+"`tests/integration/assemblies/stm32f1_lwip_ipv4/f107vc-network.toml`, "
+"`tests/integration/assemblies/stm32f1_lwip_ipv4/f107vc.toml`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "target-tx-irq"
+msgstr "target-tx-irq"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid ""
+"`tests/integration/assemblies/stm32f1_i2c_target/f103rb-target-tx.toml`"
+msgstr ""
+"`tests/integration/assemblies/stm32f1_i2c_target/f103rb-target-tx.toml`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`tim1-cc4-adc1-finite`, `tim1-cc4-adc1-finite-three-legs`"
+msgstr "`tim1-cc4-adc1-finite`, `tim1-cc4-adc1-finite-three-legs`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid ""
+"`tests/integration/assemblies/stm32f1_pwm_adc/f103rb-cycle.toml`, "
+"`tests/integration/assemblies/stm32f1_pwm_adc/f103rb-three-legs.toml`"
+msgstr ""
+"`tests/integration/assemblies/stm32f1_pwm_adc/f103rb-cycle.toml`, "
+"`tests/integration/assemblies/stm32f1_pwm_adc/f103rb-three-legs.toml`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "sdio-rx-dma-poll"
+msgstr "sdio-rx-dma-poll"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`tests/integration/assemblies/stm32f1_sdio/ze-4bit-rx-dma.toml`"
+msgstr "`tests/integration/assemblies/stm32f1_sdio/ze-4bit-rx-dma.toml`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid ""
+"`tests/integration/assemblies/stm32f1_spi_dma/f103rb-spi-dma-"
+"transaction.toml`, `tests/integration/assemblies/stm32f1_spi_dma/f103rb-spi-"
+"dma.toml`"
+msgstr ""
+"`tests/integration/assemblies/stm32f1_spi_dma/f103rb-spi-dma-"
+"transaction.toml`, `tests/integration/assemblies/stm32f1_spi_dma/f103rb-spi-"
+"dma.toml`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid ""
+"`io/src/mechanisms/spi_dma_sequence.c`, "
+"`soc/stm32/stm32f1/drivers/spi/spi_dma.c`"
+msgstr ""
+"`io/src/mechanisms/spi_dma_sequence.c`, "
+"`soc/stm32/stm32f1/drivers/spi/spi_dma.c`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid ""
+"`tests/integration/assemblies/stm32f1_encoder/f103rb-tim3-x2-a.toml`, "
+"`tests/integration/assemblies/stm32f1_encoder/f103rb-tim3-x2-b.toml`, "
+"`tests/integration/assemblies/stm32f1_encoder/f103rb-tim3.toml`"
+msgstr ""
+"`tests/integration/assemblies/stm32f1_encoder/f103rb-tim3-x2-a.toml`, "
+"`tests/integration/assemblies/stm32f1_encoder/f103rb-tim3-x2-b.toml`, "
+"`tests/integration/assemblies/stm32f1_encoder/f103rb-tim3.toml`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`dac-pa4-ch1`, `dac-pa5-ch2`"
+msgstr "`dac-pa4-ch1`, `dac-pa5-ch2`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid ""
+"`tests/integration/assemblies/stm32f1_dac/f100rb-dac.toml`, "
+"`tests/integration/assemblies/stm32f1_dac/f103ze-dac.toml`, "
+"`tests/integration/assemblies/stm32f1_dac/f103ze-dac2.toml`, "
+"`tests/integration/assemblies/stm32f1_dac/f103zg-dac.toml`"
+msgstr ""
+"`tests/integration/assemblies/stm32f1_dac/f100rb-dac.toml`, "
+"`tests/integration/assemblies/stm32f1_dac/f103ze-dac.toml`, "
+"`tests/integration/assemblies/stm32f1_dac/f103ze-dac2.toml`, "
+"`tests/integration/assemblies/stm32f1_dac/f103zg-dac.toml`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid ""
+"`tests/integration/assemblies/rs485_assembly/f103rb-dma.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f100rb-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f100ze-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f101c6-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f101rb-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f101rb-hse8-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f101ze-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f101zg-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f102c6-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f102rb-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f102rb-hse8-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103c6-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103c8-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-7e2-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-crystal-baremetal.toml`,"
+" `tests/integration/assemblies/stm32f1_family/f103rb-dma-tx.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-freertos.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-mco-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-mco-freertos.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-offset-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103ze-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103zg-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f105vc-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f105vc-hse25-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f107vc-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f107vc-hse25-baremetal.toml`, "
+"`tests/integration/kernels/os_threadx_runtime/f103rb-threadx.toml`"
+msgstr ""
+"`tests/integration/assemblies/rs485_assembly/f103rb-dma.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f100rb-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f100ze-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f101c6-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f101rb-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f101rb-hse8-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f101ze-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f101zg-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f102c6-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f102rb-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f102rb-hse8-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103c6-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103c8-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-7e2-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-crystal-baremetal.toml`,"
+" `tests/integration/assemblies/stm32f1_family/f103rb-dma-tx.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-freertos.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-mco-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-mco-freertos.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-offset-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103ze-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103zg-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f105vc-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f105vc-hse25-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f107vc-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f107vc-hse25-baremetal.toml`, "
+"`tests/integration/kernels/os_threadx_runtime/f103rb-threadx.toml`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "host-fs-bulk"
+msgstr "host-fs-bulk"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid ""
+"`tests/integration/assemblies/stm32f1_connectivity_host/f107vc-bulk.toml`"
+msgstr ""
+"`tests/integration/assemblies/stm32f1_connectivity_host/f107vc-bulk.toml`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid ""
+"`tests/integration/assemblies/stm32f1_family/f100rb-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f100ze-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f101c6-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f101rb-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f101rb-hse8-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f101ze-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f101zg-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f102c6-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f102rb-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f102rb-hse8-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103c6-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103c8-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-7e2-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-crystal-baremetal.toml`,"
+" `tests/integration/assemblies/stm32f1_family/f103rb-freertos.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-mco-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-mco-freertos.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-offset-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103ze-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103zg-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f105vc-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f105vc-hse25-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f107vc-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f107vc-hse25-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_uart_ports/f103rb-ports.toml`, "
+"`tests/integration/assemblies/stm32f1_uart_ports/f103rb-usart3.toml`, "
+"`tests/integration/assemblies/stm32f1_uart_remap/mb784-c01.toml`, "
+"`tests/integration/kernels/os_threadx_runtime/f103rb-threadx.toml`"
+msgstr ""
+"`tests/integration/assemblies/stm32f1_family/f100rb-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f100ze-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f101c6-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f101rb-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f101rb-hse8-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f101ze-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f101zg-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f102c6-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f102rb-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f102rb-hse8-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103c6-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103c8-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-7e2-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-crystal-baremetal.toml`,"
+" `tests/integration/assemblies/stm32f1_family/f103rb-freertos.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-mco-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-mco-freertos.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-offset-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103ze-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103zg-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f105vc-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f105vc-hse25-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f107vc-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f107vc-hse25-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_uart_ports/f103rb-ports.toml`, "
+"`tests/integration/assemblies/stm32f1_uart_ports/f103rb-usart3.toml`, "
+"`tests/integration/assemblies/stm32f1_uart_remap/mb784-c01.toml`, "
+"`tests/integration/kernels/os_threadx_runtime/f103rb-threadx.toml`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "target-write-read-irq"
+msgstr "target-write-read-irq"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid ""
+"`tests/integration/assemblies/stm32f1_i2c_target/f103rb-target-write-"
+"read.toml`"
+msgstr ""
+"`tests/integration/assemblies/stm32f1_i2c_target/f103rb-target-write-"
+"read.toml`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "read-only"
+msgstr "read-only"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`flash-connectivity-read`"
+msgstr "`flash-connectivity-read`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid ""
+"`tests/integration/assemblies/stm32f1_flash/f105vc.toml`, "
+"`tests/integration/assemblies/stm32f1_flash/f107vc.toml`"
+msgstr ""
+"`tests/integration/assemblies/stm32f1_flash/f105vc.toml`, "
+"`tests/integration/assemblies/stm32f1_flash/f107vc.toml`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "irq-write-messages"
+msgstr "irq-write-messages"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid ""
+"`tests/integration/assemblies/stm32f1_i2c_master_irq/f103rb-write.toml`"
+msgstr ""
+"`tests/integration/assemblies/stm32f1_i2c_master_irq/f103rb-write.toml`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`soc/stm32/common/i2c_v1_async/i2c_v1_async.c`"
+msgstr "`soc/stm32/common/i2c_v1_async/i2c_v1_async.c`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`usart2-pa2-pa3-duplex`"
+msgstr "`usart2-pa2-pa3-duplex`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`tests/integration/assemblies/stm32f1_uart_rx_dma/f103rb-duplex.toml`"
+msgstr "`tests/integration/assemblies/stm32f1_uart_rx_dma/f103rb-duplex.toml`"
+
+#: ../../../../../docs/reference/platforms/capabilities.md:0
+msgid "`soc/stm32/stm32f1/drivers/uart/uart_duplex.c`"
+msgstr "`soc/stm32/stm32f1/drivers/uart/uart_duplex.c`"

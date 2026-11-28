@@ -74,7 +74,7 @@ foreach(
         ${target}
         PRIVATE
             "${stm32_root}"
-            "${stm32_root}/drivers/ip/i2c_v1_async"
+            "${stm32_root}/../common/i2c_v1_async"
             "${NEXUS_SOURCE_DIR}/io/private"
             "${NEXUS_SOURCE_DIR}/arch/include"
     )

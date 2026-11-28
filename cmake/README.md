@@ -14,7 +14,7 @@ python scripts/tools/cmake_format.py
 
 第二条命令显式格式化自有文件；vendor、依赖和构建输出不参与。普通提交使用同一检查。
 
-当前生产 provider 为 `nexus_soc_stm32f4`，具体实现由精确器件和模式事实限定。器件宏与
+生产 provider 由装配选择 STM32F4 或 STM32F1 包，具体实现由精确器件和模式事实限定。器件宏与
 startup 从型号事实导出；官方 HAL／LL、Device 和 Handle 保持私有。未选模块不参与
 编译，section GC 再移除未引用函数，两者分别验证。
 
@@ -64,7 +64,7 @@ ARM 工具链在应用启用 CXX 时解析交叉 C++ 编译器。纯 C/ASM 工�
 | `platform/CMakeLists.txt` | 源码与安装 SDK 共用的私有生产图 |
 | `platform/*.cmake` | 装配、目标策略、ABI、Provider、固件与 CPU runtime |
 | `package/` | 可移位源码 SDK、导出和实际消费验证 |
-| `presets/` | F4 工程与显式主机测试 preset |
+| `presets/` | STM32 工程与显式主机测试 preset |
 | `toolchains/` | 编译器选择；CPU 事实仍由严格配置决定 |
 
 全部 vendor 留在仓库，默认构建只准备并验证选中依赖，不要求其他 SDK 已初始化。

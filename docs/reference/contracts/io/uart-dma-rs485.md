@@ -128,7 +128,7 @@ RS485 必须选择可写输出，接收输入信号不授予 DE 写权限。
 和 validator；查询不启动硬件。完整资源配置见
 [Qiming RS485 装配](../../../../boards/stm32f407zg_qiming_v41/assemblies/rs485-transport.toml)，
 公共 C 消费入口见
-[维护的 ARM 链接夹具](../../../../tests/integration/assemblies/qiming_rs485_assembly/controller_main.c)。
+[维护的 ARM 链接夹具](../../../../tests/integration/assemblies/rs485_assembly/controller_main.c)。
 集成侧检查两个 UART 字段和 signal 均非 NULL，再启动 Platform、初始化 adapter、
 提交与推进。手工绑定也必须保证 signal 的唯一 bit 属于端口授权视图，并保持绑定
 有效直到完整停止；组件不根据物理 pin 名或 GPIO 初值重新解释极性。

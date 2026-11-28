@@ -75,13 +75,15 @@ class TimerWaveformPolicy:
         controllers = {}
         for name, row in value["controllers"].items():
             Symbol(name)
-            _fields(row, {"counter_bits", "native_bits", "channel_count", "advanced", "master",
-                          "clock_domain", "divided_clock_multiplier", "dma", "itr_sources"})
+            fields = {"counter_bits", "native_bits", "channel_count", "advanced", "master",
+                      "clock_domain", "divided_clock_multiplier", "dma", "itr_sources"}
+            _fields(row, fields | ({"controller_irq"} & row.keys()))
             for key in ("counter_bits", "native_bits"):
                 integer(row[key], 1, 32, "Timer waveform " + key)
             integer(row["channel_count"], 1, 32, "Timer waveform channel count")
             for key in ("advanced", "master"):
                 _boolean(row[key])
+            _boolean(row.get("controller_irq", False))
             Symbol(row["clock_domain"])
             integer(row["divided_clock_multiplier"], 1, context="Timer clock multiplier")
             for key in ("dma", "itr_sources"):
@@ -144,7 +146,7 @@ class TimerWaveformPolicy:
 
     def _route(self, route):
         facts = self.routes.get(route["id"])
-        actual = tuple((pin["pin"], pin["function"], pin["af"]) for pin in route["pins"])
+        actual = tuple((pin["pin"], pin["function"], pin.get("af")) for pin in route["pins"])
         if (facts is None or route["kind"] != facts["kind"] or
                 route["controller"] != facts["controller"] or actual != facts["pins"]):
             fail("Timer waveform requires its exact reviewed channel/pad route")

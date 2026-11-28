@@ -10,7 +10,10 @@ from tools.configure.providers import descriptor
 
 
 ROOT = Path(__file__).resolve().parents[5]
-DIRECTORIES = {'stm32f4': 'soc/stm32/stm32f4'}
+DIRECTORIES = {
+    'stm32f1': 'soc/stm32/stm32f1',
+    'stm32f4': 'soc/stm32/stm32f4',
+}
 
 
 class SourceLayoutTests(unittest.TestCase):

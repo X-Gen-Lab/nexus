@@ -1,0 +1,292 @@
+{
+  "schema_version": 1,
+  "bindings": [
+    {
+      "kind": "pwm_adc",
+      "mode": "finite-injected",
+      "controllers": [
+        "PWM_ADC1"
+      ],
+      "implementation": "pwm_adc",
+      "headers": [
+        "drivers/pwm_adc/instance.h"
+      ],
+      "static_recipe": {
+        "state_type": "nx_stm32f1_cycle_t",
+        "ops": "nx_stm32f1_cycle_ops",
+        "declarations": [
+          {
+            "role": "config",
+            "type": "nx_stm32f1_cycle_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "pwm",
+                  {
+                    "record": [
+                      [
+                        "period_ticks",
+                        {
+                          "source": "item.options.period_ticks"
+                        }
+                      ],
+                      [
+                        "tick_hz",
+                        {
+                          "source": "item.options.tick_hz"
+                        }
+                      ],
+                      [
+                        "deadtime_ticks",
+                        {
+                          "source": "item.options.deadtime_ticks"
+                        }
+                      ],
+                      [
+                        "priority",
+                        {
+                          "source": "item.options.irq.priority"
+                        }
+                      ]
+                    ]
+                  }
+                ],
+                [
+                  "phase",
+                  {
+                    "source": "item.options.trigger_ticks"
+                  }
+                ],
+                [
+                  "sample",
+                  {
+                    "source": "item.options.sample_times.0"
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "calls": {
+          "admit": [],
+          "prepare": {
+            "function": "nx_stm32f1_cycle_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "ref": "config",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32f1_cycle_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "retain_on_failed_init": true,
+        "irq": [
+          {
+            "name": {
+              "source": "selected.vector_bindings.0.handler",
+              "as": "symbol"
+            },
+            "calls": [
+              {
+                "function": "nx_stm32f1_cycle_break_irq",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  }
+                ]
+              }
+            ],
+            "barrier": "nx_arch_dsb"
+          },
+          {
+            "name": {
+              "source": "selected.vector_bindings.1.handler",
+              "as": "symbol"
+            },
+            "calls": [
+              {
+                "function": "nx_stm32f1_cycle_update_irq",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  }
+                ]
+              }
+            ],
+            "barrier": "nx_arch_dsb"
+          }
+        ]
+      }
+    }
+  ],
+  "domains": {
+    "coupled_io": {
+      "routes": [
+        {
+          "id": "tim1-cc4-adc1-finite",
+          "controller": "PWM_ADC1",
+          "timer": "TIM1",
+          "adc": "ADC1",
+          "modes": [
+            "finite-injected"
+          ],
+          "dma": [],
+          "pins": [
+            [
+              "PA8",
+              "ch1",
+              null
+            ],
+            [
+              "PB13",
+              "ch1n",
+              null
+            ],
+            [
+              "PB12",
+              "bkin",
+              null
+            ],
+            [
+              "PA1",
+              "adc1",
+              null
+            ]
+          ],
+          "channels": [
+            1
+          ],
+          "sample_cycles": [
+            2,
+            8,
+            14,
+            29,
+            42,
+            56,
+            72,
+            240
+          ],
+          "conversion_cycles": 13,
+          "timer_clock_domain": "apb2_timer",
+          "adc_clock_domain": "apb2",
+          "adc_clock_divider": 2,
+          "clock_multiplier": 1,
+          "prescaler_max": 1,
+          "period_max": 65535,
+          "complementary_deadtime_max": 127,
+          "trigger_event": "compare4",
+          "trigger_route": "TIM1:CC4:ADC1:JEXTSEL001",
+          "resources": [
+            "controller:TIM1",
+            "controller:ADC1",
+            "timer:TIM1",
+            "irq:ADC1_2",
+            "irq:TIM1_CC",
+            "clock:TIM1"
+          ]
+        },
+        {
+          "id": "tim1-cc4-adc1-finite-three-legs",
+          "controller": "PWM_ADC1",
+          "timer": "TIM1",
+          "adc": "ADC1",
+          "modes": [
+            "finite-injected"
+          ],
+          "dma": [],
+          "pins": [
+            [
+              "PA8",
+              "ch1",
+              null
+            ],
+            [
+              "PB13",
+              "ch1n",
+              null
+            ],
+            [
+              "PB12",
+              "bkin",
+              null
+            ],
+            [
+              "PA1",
+              "adc1",
+              null
+            ],
+            [
+              "PA9",
+              "ch2",
+              null
+            ],
+            [
+              "PA10",
+              "ch3",
+              null
+            ],
+            [
+              "PB14",
+              "ch2n",
+              null
+            ],
+            [
+              "PB15",
+              "ch3n",
+              null
+            ]
+          ],
+          "channels": [
+            1
+          ],
+          "sample_cycles": [
+            2,
+            8,
+            14,
+            29,
+            42,
+            56,
+            72,
+            240
+          ],
+          "conversion_cycles": 13,
+          "timer_clock_domain": "apb2_timer",
+          "adc_clock_domain": "apb2",
+          "adc_clock_divider": 2,
+          "clock_multiplier": 1,
+          "prescaler_max": 1,
+          "period_max": 65535,
+          "complementary_deadtime_max": 127,
+          "trigger_event": "compare4",
+          "trigger_route": "TIM1:CC4:ADC1:JEXTSEL001",
+          "resources": [
+            "controller:TIM1",
+            "controller:ADC1",
+            "timer:TIM1",
+            "irq:ADC1_2",
+            "irq:TIM1_CC",
+            "clock:TIM1"
+          ]
+        }
+      ]
+    }
+  }
+}

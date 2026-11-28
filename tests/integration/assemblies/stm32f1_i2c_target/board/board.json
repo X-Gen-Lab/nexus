@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "id": "stm32f103rb-i2c1-target-software",
+  "soc": "STM32F103RBT6",
+  "soc_family": "stm32f1",
+  "source_revision": "UM1724 Rev17 external I2C1 target reference",
+  "physical_pcb_revision": null,
+  "clocks": {},
+  "bindings": [
+    {
+      "id": "i2c1-target",
+      "controller": "I2C1",
+      "route": "i2c1-target-pb6-pb7"
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14",
+    "PA15",
+    "PB3",
+    "PB4",
+    "PD0",
+    "PD1",
+    "PC14",
+    "PC15"
+  ],
+  "unknowns": [
+    "PB6/PB7 need external pull-ups and a clock-stretch-aware I2C master. Actual IRQ latency, bus timing and wiring are not measured."
+  ],
+  "provenance": [
+    {
+      "scope": "Exact PB6/PB7 connector exposure for a clock-stretch-aware I2C target. Electrical behavior is unobserved.",
+      "url": "https://www.st.com/resource/en/user_manual/um1724-stm32-nucleo64-boards-mb1136-stmicroelectronics.pdf",
+      "file": "um1724-stm32-nucleo64-boards-mb1136-stmicroelectronics.pdf",
+      "sha256": "576d9bee3bc32c8ee70bf0d77cf9494cec06ea7c1d9ff98eebf2738cb9314a14",
+      "pages": [
+        27,
+        40,
+        57
+      ],
+      "components": [
+        "CN7",
+        "CN10",
+        "U4",
+        "SB15"
+      ],
+      "nets": [
+        "PB6/CN10-17",
+        "PB7/CN7-21"
+      ]
+    }
+  ],
+  "backend_support": [
+    "baremetal"
+  ]
+}

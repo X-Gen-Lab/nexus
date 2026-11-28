@@ -13,11 +13,12 @@ from tools.configure.policies.bxcan import BxCanPolicy, BxCanTransport
 from tools.configure.ethernet import EthernetPolicy
 from tools.configure.providers.common import EndpointPolicy, fail, integer
 from tools.configure.records import freeze
-from tools.configure.pinmux import NumericPinMuxPolicy
+from tools.configure.pinmux import FixedRoutePinMuxPolicy, PinMuxPolicy, load_pinmux_policy
 from tools.configure.stream_profiles import StreamGeometry
 from tools.configure.timer_advanced import TimerBinding, TimerPolicy, TimerRoute
 from tools.configure.uart_formats import UartFormatPolicy
 from tools.configure.usb_device import UsbDevicePolicy
+from tools.configure.usb_pma import EP1_TRANSFERS, PmaEp1Layout, PmaLayout, PmaPolicy
 
 
 def _fields(value, required, optional=()):
@@ -87,7 +88,7 @@ def _uart(value):
 def _can(value, soc):
     if not isinstance(value, Mapping) or "transport" not in value:
         fail("CAN policy requires explicit reviewed transport bindings")
-    _fields(value, {"model", "fifo_order_supported", "transport"})
+    _fields(value, {"model", "fifo_order_supported", "transport"}, {"operations"})
     if value["model"] != "bxcan":
         fail("Unsupported CAN IP policy model")
     from tools.configure.policies.bxcan import domain_topology
@@ -95,35 +96,93 @@ def _can(value, soc):
     transports = value["transport"]
     if not isinstance(transports, Mapping) or set(transports) != set(controllers):
         fail("CAN transport must cover the exact physical controllers")
+    allowed = _names(value.get("operations", ["normal", "loopback", "silent-loopback"]),
+                     "CAN reviewed operations")
+    if not allowed or not set(allowed) <= {"normal", "loopback", "silent-loopback"}:
+        fail("CAN reviewed operations contain an unknown mode")
     return controllers, BxCanPolicy(
-        fifo_order_supported=_boolean(value["fifo_order_supported"], "CAN FIFO order"),
+        operations=allowed, fifo_order_supported=_boolean(value["fifo_order_supported"], "CAN FIFO order"),
         transports=MappingProxyType({name: BxCanTransport.from_validated(row)
                                     for name, row in transports.items()}))
 
 
 def _usb(value, pinmux):
     _fields(value, {"controller", "irq", "clock_hz", "fifo_words",
-                    "endpoint_numbers", "pins", "resources"})
+                    "endpoint_numbers", "pins", "resources"},
+            {"modes", "irq_name", "vbus_sensing", "control_only"})
     Symbol(value["controller"])
+    modes = _names(value.get("modes", ["device-fs", "otg-fs"]), "USB device modes")
+    if not modes or not set(modes) <= {"device-fs", "otg-fs"}:
+        fail("USB FS requires reviewed Device or managed role modes")
+    irq_name = value.get("irq_name")
+    if irq_name is not None:
+        Symbol(irq_name)
     return UsbDevicePolicy(value["controller"],
         integer(value["irq"], context="Domain USB IRQ"),
         integer(value["clock_hz"], 1, context="Domain USB clock"),
         integer(value["fifo_words"], 1, context="Domain USB FIFO words"),
         integer(value["endpoint_numbers"], 1, context="Domain USB endpoint numbers"),
-        _pins(value["pins"], 3, pinmux), _names(value["resources"], "USB resources"))
+        _pins(value["pins"], 3, pinmux), _names(value["resources"], "USB resources"),
+        modes, irq_name, _boolean(value.get("vbus_sensing", False), "USB VBUS sensing"),
+        _boolean(value.get("control_only", False), "USB control only"))
+
+
+def _usb_pma(value, pinmux):
+    _fields(value, set(PmaPolicy.__dataclass_fields__) - {"ep1_layout"},
+            {"ep1_layout"})
+    Symbol(value["controller"])
+    Symbol(value["irq_name"])
+    raw = value["layout"]
+    _fields(raw, PmaLayout.__dataclass_fields__)
+    layout = PmaLayout(*(integer(raw[member], 1, 512, "USB PMA " + member)
+                         for member in PmaLayout.__dataclass_fields__))
+    if (layout.table_bytes % 8 or layout.max_packet != 64 or
+            layout.tx_offset % 2 or layout.rx_offset % 2 or
+            not layout.table_bytes <= layout.tx_offset or
+            layout.tx_offset + layout.max_packet > layout.rx_offset or
+            layout.rx_offset + layout.max_packet > layout.bytes):
+        fail("USB PMA requires aligned, nonoverlapping packet ranges")
+    ep1 = value.get("ep1_layout")
+    extension = None
+    if ep1 is not None:
+        _fields(ep1, PmaEp1Layout.__dataclass_fields__)
+        Symbol(ep1["activation_ops"])
+        tx = integer(ep1["tx_offset"], 1, layout.bytes, "USB PMA EP1 TX offset")
+        rx = integer(ep1["rx_offset"], 1, layout.bytes, "USB PMA EP1 RX offset")
+        size = integer(ep1["max_packet"], 64, 64, "USB PMA EP1 packet bytes")
+        if (tx % 2 or rx % 2 or tx < layout.rx_offset + layout.max_packet or
+                tx + size > rx or rx + size > layout.bytes):
+            fail("USB PMA EP1 layout may not overlap another endpoint")
+        transfers = _names(ep1["transfers"], "USB PMA EP1 transfers", empty=False)
+        if not set(transfers) <= set(EP1_TRANSFERS.values()):
+            fail("USB PMA EP1 transfers must use reviewed single-buffer types")
+        extension = PmaEp1Layout(tx, rx, size, ep1["activation_ops"], transfers)
+    return PmaPolicy(value["controller"], value["irq_name"],
+        integer(value["irq"], context="USB PMA IRQ"),
+        *(integer(value[member], 1, context="USB PMA " + member)
+          for member in ("usb_hz", "core_hz", "apb1_hz")),
+        _pins(value["pins"], 2, pinmux),
+        _names(value["resources"], "USB PMA resources", empty=False), layout, extension)
 
 
 def _ethernet(value, pinmux):
     _fields(value, {"controller", "irq", "clock_hz", "pins", "resources",
-                    "alternate", "memory_region"}, {"mii_pins"})
+                    "alternate", "memory_region"}, {"mii_pins", "modes", "interrupt"})
     Symbol(value["controller"])
     Symbol(value["memory_region"])
+    modes = _names(value.get("modes", ("raw-rmii", "raw-mii")), "Ethernet modes")
+    if not modes or not set(modes) <= {"raw-rmii", "raw-mii"}:
+        fail("Ethernet requires its reviewed raw port modes")
+    interrupt = value.get("interrupt")
+    if interrupt is not None:
+        Symbol(interrupt)
     return EthernetPolicy(value["controller"],
         integer(value["irq"], context="Domain Ethernet IRQ"),
         integer(value["clock_hz"], 1, context="Domain Ethernet clock"),
         _pins(value["pins"], 2, pinmux), _names(value["resources"], "Ethernet resources"),
         pinmux.validate(value["alternate"], "Domain Ethernet alternate selector"),
-        value["memory_region"], _pins(value.get("mii_pins", ()), 2, pinmux))
+        value["memory_region"], _pins(value.get("mii_pins", ()), 2, pinmux),
+        modes, interrupt)
 
 
 def _timers(values, pinmux):
@@ -132,7 +191,7 @@ def _timers(values, pinmux):
     bindings, keys = [], set()
     for value in values:
         _fields(value, {"kind", "controller", "vector", "irq", "clock_hz",
-                        "routes", "resources"})
+                        "routes", "resources"}, {"clock_profiles"})
         if value["kind"] not in {"timer_capture", "advanced_pwm"}:
             fail("Domain timer kind has no maintained public contract")
         for name in ("controller", "vector"):
@@ -147,7 +206,10 @@ def _timers(values, pinmux):
         for route in value["routes"]:
             _fields(route, {"channel", "pins"})
             channel = integer(route["channel"], 1, 4, "Domain timer channel")
-            pins = _pins(route["pins"], 3, pinmux)
+            fixed = isinstance(pinmux, FixedRoutePinMuxPolicy)
+            pins = _pins(route["pins"], 2 if fixed else 3, pinmux)
+            if fixed:
+                pins = tuple((*pin, None) for pin in pins)
             connection = channel, pins
             if connection in connections:
                 fail("Duplicate domain timer channel route")
@@ -156,7 +218,8 @@ def _timers(values, pinmux):
         bindings.append(TimerBinding(value["kind"], value["controller"],
             value["vector"], integer(value["irq"], context="Domain timer IRQ"),
             integer(value["clock_hz"], 1, context="Domain timer clock"),
-            tuple(routes), _names(value["resources"], "timer resources")))
+            tuple(routes), _names(value["resources"], "timer resources"),
+            _names(value.get("clock_profiles", ()), "timer clock profiles")))
     return TimerPolicy(tuple(bindings))
 
 
@@ -183,14 +246,14 @@ def _endpoints(value):
     return EndpointPolicy(**result)
 
 
-def _capabilities(value):
+def _capabilities(value, soc):
     booleans = {"pin_electrical": "PIN_ELECTRICAL", "timebase_alarm": "TIMEBASE_ALARM",
                 "spi_requires_endpoint": "SPI_REQUIRES_ENDPOINT"}
     positive = {"flash_program_unit": "FLASH_PROGRAM_UNIT",
                 "flash_input_alignment": "FLASH_INPUT_ALIGNMENT",
                 "offset_image_alignment": "OFFSET_IMAGE_ALIGNMENT"}
     _fields(value, (), {*booleans, *positive, "offset_image_vector_symbol",
-                        "public_formats", "classic_can_mailboxes"})
+                        "offset_image_parts", "public_formats", "classic_can_mailboxes"})
     result = {booleans[name]: _boolean(item, name) if name in booleans else item
               for name, item in value.items() if name in booleans}
     for name, target in positive.items():
@@ -199,6 +262,12 @@ def _capabilities(value):
     if "offset_image_vector_symbol" in value:
         Symbol(value["offset_image_vector_symbol"])
         result["OFFSET_IMAGE_VECTOR_SYMBOL"] = value["offset_image_vector_symbol"]
+    if "offset_image_parts" in value:
+        parts = _names(value["offset_image_parts"], "offset image parts", empty=False)
+        if (not {"offset_image_alignment", "offset_image_vector_symbol"} <= value.keys() or
+                not set(parts) <= soc.get("variants", {}).keys()):
+            fail("Domain offset images require reviewed exact parts and vector facts")
+        result["OFFSET_IMAGE_PARTS"] = frozenset(parts)
     if "public_formats" in value:
         result["PUBLIC_FORMATS"] = frozenset(_names(value["public_formats"], "public formats"))
     if "classic_can_mailboxes" in value:
@@ -226,12 +295,14 @@ def _dma(value):
 class DomainPolicies:
     """Selected protocol capabilities; absent facts grant no optional domain."""
 
-    PINMUX_POLICY: NumericPinMuxPolicy | None = None
+    PINMUX_POLICY: PinMuxPolicy | None = None
+    UART_WIRE: Mapping | None = None
     UART_FORMATS: UartFormatPolicy = field(default_factory=UartFormatPolicy)
     STREAM_GEOMETRY: StreamGeometry | None = None
     CAN_INTEGRATION: BxCanPolicy | None = None
     CAN_CONTROLLERS: tuple[str, ...] = ()
     USB_DEVICE: UsbDevicePolicy | None = None
+    USB_PMA: tuple[PmaPolicy, ...] = ()
     USB_CONTROLLER: str | None = None
     ETHERNET: EthernetPolicy | None = None
     ETH_CONTROLLER: str | None = None
@@ -260,8 +331,10 @@ class DomainPolicies:
     FLASH_INPUT_ALIGNMENT: int = 1
     OFFSET_IMAGE_ALIGNMENT: int = 1
     OFFSET_IMAGE_VECTOR_SYMBOL: str | None = None
+    OFFSET_IMAGE_PARTS: frozenset[str] | None = None
     DMA_VECTOR: str | None = None
     DMA_TOPOLOGY: tuple = (frozenset(), (), ())
+    FIXED_CHANNEL_DMA: object | None = None
     shared_irqs: Mapping = field(default_factory=lambda: MappingProxyType({}))
     clock: object | None = None
 
@@ -270,12 +343,12 @@ class DomainPolicies:
         """Load explicit domain data; never infer behavior from a vendor name."""
         del package
         if pinmux is None and "pinmux_policy" in bindings_document:
-            pinmux = NumericPinMuxPolicy.from_validated(bindings_document["pinmux_policy"])
+            pinmux = load_pinmux_policy(bindings_document["pinmux_policy"])
         value = bindings_document.get("domains")
         if value is None:
             return cls(PINMUX_POLICY=pinmux)
-        _fields(value, {"schema_version"}, {"uart_formats", "stream_geometry",
-            "can", "usb_device", "ethernet", "timers", "endpoints", "limits",
+        _fields(value, {"schema_version"}, {"uart_formats", "uart_wire", "stream_geometry",
+            "can", "usb_device", "usb_pma", "ethernet", "timers", "endpoints", "limits",
             "capabilities", "dma", "shared_irqs", "clock", "adc_group",
             "capture_audio", "external_bus", "gpio_phase", "sai", "waveform",
             "selection", "platform", "startup_memory", "packet", "headers",
@@ -285,6 +358,10 @@ class DomainPolicies:
         result = {"PINMUX_POLICY": pinmux}
         if "uart_formats" in value:
             result["UART_FORMATS"] = _uart(value["uart_formats"])
+        if "uart_wire" in value:
+            from tools.configure import uart_wires
+            uart_wires.validate_policy(value["uart_wire"])
+            result["UART_WIRE"] = freeze(value["uart_wire"])
         if "stream_geometry" in value:
             geometry = value["stream_geometry"]
             _fields(geometry, StreamGeometry.__dataclass_fields__)
@@ -298,6 +375,14 @@ class DomainPolicies:
         if "usb_device" in value:
             result["USB_DEVICE"] = _usb(value["usb_device"], pinmux)
             result["USB_CONTROLLER"] = result["USB_DEVICE"].controller
+        if "usb_pma" in value:
+            rows = value["usb_pma"]
+            if not isinstance(rows, (tuple, list)) or not rows:
+                fail("USB PMA requires one or more reviewed policies")
+            profiles = tuple(_usb_pma(row, pinmux) for row in rows)
+            if len({(row.controller, row.irq_name) for row in profiles}) != len(profiles):
+                fail("Duplicate USB PMA controller and IRQ identity")
+            result["USB_PMA"] = profiles
         if "ethernet" in value:
             result["ETHERNET"] = _ethernet(value["ethernet"], pinmux)
             result["ETH_CONTROLLER"] = result["ETHERNET"].controller
@@ -315,17 +400,27 @@ class DomainPolicies:
                     integer(item, context="Domain " + name)
             result["LIMITS"] = freeze(limits)
         if "capabilities" in value:
-            result.update(_capabilities(value["capabilities"]))
+            result.update(_capabilities(value["capabilities"], soc))
         if "dma" in value:
-            result["DMA_VECTOR"], result["DMA_TOPOLOGY"] = _dma(value["dma"])
+            raw_dma = value["dma"]
+            if isinstance(raw_dma, Mapping) and raw_dma.get("encoding") == "fixed-channel":
+                from tools.configure.domains.fixed_channel_dma import FixedChannelDmaPolicy
+                result["FIXED_CHANNEL_DMA"] = FixedChannelDmaPolicy.from_validated(raw_dma)
+            else:
+                result["DMA_VECTOR"], result["DMA_TOPOLOGY"] = _dma(raw_dma)
         shared = value.get("shared_irqs", {})
         if not isinstance(shared, Mapping):
             fail("Shared IRQ facts require a domain mapping")
         result["shared_irqs"] = MappingProxyType({
             name: _names(items, "shared IRQ resources") for name, items in shared.items()})
         if "clock" in value:
-            from tools.configure.domains.pll_mnpq import PllMnpqPolicy
-            result["clock"] = PllMnpqPolicy.from_validated(value["clock"])
+            raw_clock = value["clock"]
+            if isinstance(raw_clock, Mapping) and raw_clock.get("model") == "fixed-profile":
+                from tools.configure.clocks import FixedProfilePolicy
+                result["clock"] = FixedProfilePolicy.from_validated(raw_clock)
+            else:
+                from tools.configure.domains.pll_mnpq import PllMnpqPolicy
+                result["clock"] = PllMnpqPolicy.from_validated(raw_clock)
         if "adc_group" in value:
             from tools.configure.policies.adc_group import AdcGroupPolicy
             result["ADC_GROUP"] = AdcGroupPolicy.from_validated(
@@ -380,7 +475,7 @@ class DomainPolicies:
         if item.kind in {"timer_capture", "advanced_pwm"}:
             binding = (self.TIMER_ADVANCED.binding(item.kind, item.controller)
                        if self.TIMER_ADVANCED is not None else None)
-            pins = tuple((pin["pin"], pin["function"], pin["af"]) for pin in item.pins)
+            pins = tuple((pin["pin"], pin["function"], pin.get("af")) for pin in item.pins)
             route = binding.route(pins) if binding is not None else None
             if route is None:
                 fail("Selected timer has no admitted domain channel route")
@@ -388,8 +483,12 @@ class DomainPolicies:
         if item.kind == "pwm":
             if configuration is None or len(item.pins) != 1:
                 fail("Selected PWM channel requires its physical binding context")
-            provider = configuration.provider_context.provider
-            channel = provider.PWM_PIN_CHANNELS.get((item.controller, item.pins[0]["pin"]))
+            pin, = item.pins
+            if isinstance(self.PINMUX_POLICY, FixedRoutePinMuxPolicy):
+                channel = {"ch1": 1, "ch2": 2, "ch3": 3, "ch4": 4}.get(pin["function"])
+            else:
+                provider = configuration.provider_context.provider
+                channel = provider.PWM_PIN_CHANNELS.get((item.controller, pin["pin"]))
             if channel is None:
                 fail("Selected PWM route has no reviewed channel")
             values["channel"] = channel

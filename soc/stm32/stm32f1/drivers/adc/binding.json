@@ -1,0 +1,460 @@
+{
+  "schema_version": 1,
+  "bindings": [
+    {
+      "kind": "adc",
+      "mode": "single-shot",
+      "controllers": [
+        "ADC1",
+        "ADC2",
+        "ADC3"
+      ],
+      "implementation": "adc",
+      "headers": [
+        "drivers/adc/instance.h"
+      ],
+      "limits": {
+        "reference_mv": [
+          2400,
+          3600
+        ],
+        "resolution_bits": [
+          12,
+          12
+        ]
+      },
+      "static_recipe": {
+        "state_type": "nx_stm32f1_adc_t",
+        "ops": "nx_stm32f1_adc_ops",
+        "declarations": [],
+        "calls": {
+          "prepare": {
+            "function": "nx_stm32f1_adc_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "source": "selected.clock_hz",
+                "as": "u32"
+              },
+              {
+                "source": "item.options.reference_mv",
+                "as": "u32"
+              },
+              {
+                "source": "item.options.sample_times.0",
+                "as": "u32"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32f1_adc_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "retain_on_failed_init": true
+      }
+    },
+    {
+      "kind": "adc",
+      "mode": "single-trigger-dma",
+      "controllers": [
+        "ADC1"
+      ],
+      "implementation": "adc",
+      "headers": [
+        "drivers/adc/trigger_dma.h"
+      ],
+      "limits": {
+        "reference_mv": [
+          2400,
+          3600
+        ],
+        "resolution_bits": [
+          12,
+          12
+        ]
+      },
+      "static_recipe": {
+        "state_type": "nx_stm32f1_adc_trigger_dma_t",
+        "ops": "nx_stm32f1_adc_trigger_dma_ops",
+        "declarations": [
+          {
+            "role": "dma_regions",
+            "type": "nx_dma_memory_region_t",
+            "const": true,
+            "count": {
+              "length": "selected.memory_regions",
+              "limit": 16
+            },
+            "value": {
+              "map": {
+                "source": "selected.memory_regions",
+                "limit": 16,
+                "value": {
+                  "record": [
+                    [
+                      "begin",
+                      {
+                        "source": "entry.begin"
+                      }
+                    ],
+                    [
+                      "size",
+                      {
+                        "source": "entry.size"
+                      }
+                    ],
+                    [
+                      "permissions",
+                      {
+                        "source": "entry.permissions",
+                        "as": "static"
+                      }
+                    ]
+                  ]
+                }
+              }
+            }
+          }
+        ],
+        "calls": {
+          "prepare": {
+            "function": "nx_stm32f1_adc_trigger_dma_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "source": "selected.clock_hz",
+                "as": "u32"
+              },
+              {
+                "source": "item.options.reference_mv",
+                "as": "u32"
+              },
+              {
+                "source": "item.options.sample_times.0",
+                "as": "u32"
+              },
+              {
+                "ref": "dma_regions",
+                "as": "symbol"
+              },
+              {
+                "length": "selected.memory_regions",
+                "limit": 16
+              },
+              {
+                "source": "item.route",
+                "values": {
+                  "adc1-pa0-in0": false,
+                  "adc1-pa0-tim1-cc1": true
+                }
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32f1_adc_trigger_dma_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "retain_on_failed_init": true
+      }
+    },
+    {
+      "kind": "adc",
+      "mode": "sequential-scan-dma",
+      "controllers": [
+        "ADC1"
+      ],
+      "implementation": "adc",
+      "headers": [
+        "drivers/adc/trigger_dma.h"
+      ],
+      "limits": {
+        "reference_mv": [
+          2400,
+          3600
+        ],
+        "resolution_bits": [
+          12,
+          12
+        ]
+      },
+      "static_recipe": {
+        "state_type": "nx_stm32f1_adc_scan_dma_t",
+        "ops": "nx_stm32f1_adc_scan_dma_ops",
+        "declarations": [
+          {
+            "role": "dma_regions",
+            "type": "nx_dma_memory_region_t",
+            "const": true,
+            "count": {
+              "length": "selected.memory_regions",
+              "limit": 16
+            },
+            "value": {
+              "map": {
+                "source": "selected.memory_regions",
+                "limit": 16,
+                "value": {
+                  "record": [
+                    [
+                      "begin",
+                      {
+                        "source": "entry.begin"
+                      }
+                    ],
+                    [
+                      "size",
+                      {
+                        "source": "entry.size"
+                      }
+                    ],
+                    [
+                      "permissions",
+                      {
+                        "source": "entry.permissions",
+                        "as": "static"
+                      }
+                    ]
+                  ]
+                }
+              }
+            }
+          }
+        ],
+        "calls": {
+          "prepare": {
+            "function": "nx_stm32f1_adc_scan_dma_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "source": "selected.clock_hz",
+                "as": "u32"
+              },
+              {
+                "source": "item.options.reference_mv",
+                "as": "u32"
+              },
+              {
+                "source": "item.options.sample_times.0",
+                "as": "u32"
+              },
+              {
+                "source": "item.options.sample_times.1",
+                "as": "u32"
+              },
+              {
+                "ref": "dma_regions",
+                "as": "symbol"
+              },
+              {
+                "length": "selected.memory_regions",
+                "limit": 16
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32f1_adc_scan_dma_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "retain_on_failed_init": true
+      }
+    },
+    {
+      "kind": "adc",
+      "mode": "simultaneous-scan-dma",
+      "controllers": [
+        "ADC1"
+      ],
+      "implementation": "adc",
+      "headers": [
+        "drivers/adc/dual_dma.h"
+      ],
+      "limits": {
+        "reference_mv": [
+          2400,
+          3600
+        ],
+        "resolution_bits": [
+          12,
+          12
+        ]
+      },
+      "static_recipe": {
+        "state_type": "nx_stm32f1_adc_dual_dma_t",
+        "ops": "nx_stm32f1_adc_dual_dma_ops",
+        "declarations": [
+          {
+            "role": "dma_regions",
+            "type": "nx_dma_memory_region_t",
+            "const": true,
+            "count": {
+              "length": "selected.memory_regions",
+              "limit": 16
+            },
+            "value": {
+              "map": {
+                "source": "selected.memory_regions",
+                "limit": 16,
+                "value": {
+                  "record": [
+                    [
+                      "begin",
+                      {
+                        "source": "entry.begin"
+                      }
+                    ],
+                    [
+                      "size",
+                      {
+                        "source": "entry.size"
+                      }
+                    ],
+                    [
+                      "permissions",
+                      {
+                        "source": "entry.permissions",
+                        "as": "static"
+                      }
+                    ]
+                  ]
+                }
+              }
+            }
+          }
+        ],
+        "calls": {
+          "prepare": {
+            "function": "nx_stm32f1_adc_dual_dma_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "source": "selected.clock_hz",
+                "as": "u32"
+              },
+              {
+                "source": "item.options.reference_mv",
+                "as": "u32"
+              },
+              {
+                "source": "item.options.sample_times.0",
+                "as": "u32"
+              },
+              {
+                "ref": "dma_regions",
+                "as": "symbol"
+              },
+              {
+                "length": "selected.memory_regions",
+                "limit": 16
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32f1_adc_dual_dma_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "retain_on_failed_init": true
+      }
+    },
+    {
+      "kind": "adc",
+      "mode": "internal-scan",
+      "controllers": [
+        "ADC1"
+      ],
+      "implementation": "adc",
+      "headers": [
+        "drivers/adc/internal.h"
+      ],
+      "limits": {
+        "reference_mv": [
+          2400,
+          3600
+        ],
+        "resolution_bits": [
+          12,
+          12
+        ]
+      },
+      "static_recipe": {
+        "state_type": "nx_stm32f1_adc_internal_t",
+        "ops": "nx_stm32f1_adc_internal_ops",
+        "declarations": [],
+        "calls": {
+          "prepare": {
+            "function": "nx_stm32f1_adc_internal_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "source": "selected.clock_hz",
+                "as": "u32"
+              },
+              {
+                "source": "item.options.reference_mv",
+                "as": "u32"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32f1_adc_internal_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "retain_on_failed_init": true
+      }
+    }
+  ]
+}

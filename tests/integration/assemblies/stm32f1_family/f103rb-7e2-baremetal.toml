@@ -1,0 +1,40 @@
+# NUCLEO-F103RB software integration. The PCB and UART path are not exercised.
+schema = 2
+board = "stm32f103rb_nucleo"
+backend = "baremetal"
+clock = "hsi8"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+flash_load_limit_bytes = 24576
+static_ram_limit_bytes = 6144
+libc_heap_bytes = 0
+
+[gpio.status]
+binding = "led0"
+mode = "output"
+active_high = true
+speed = "low"
+
+[uart.console]
+binding = "uart2"
+mode = "irq"
+baud = 115200
+
+[uart.console.frame]
+data_bits = 7
+parity = "even"
+stop_bits = 2
+flow = "none"
+
+[uart.console.rx]
+format = "bytes"
+capacity = 32
+
+[uart.console.irq]
+priority = 5
+calls_os = false
+
+[factory]
+capabilities = true

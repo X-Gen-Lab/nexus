@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "bindings": [
+    {
+      "kind": "pwm",
+      "mode": "fixed-pwm",
+      "implementation": "pwm",
+      "controllers": [
+        "TIM3",
+        "TIM15",
+        "TIM16",
+        "TIM17"
+      ],
+      "headers": [
+        "drivers/pwm/instance.h"
+      ],
+      "limits": {
+        "tick_hz": [
+          1000000,
+          1000000
+        ],
+        "period_ticks": [
+          2,
+          65535
+        ]
+      },
+      "static_recipe": {
+        "state_type": "nx_stm32f1_pwm_t",
+        "ops": "nx_stm32f1_pwm_ops",
+        "declarations": [
+          {
+            "role": "pwm_config",
+            "type": "nx_stm32f1_pwm_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "registers",
+                  {
+                    "source": "item.controller",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "gpio",
+                  {
+                    "source": "selected.pads.0.registers",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "clock_hz",
+                  {
+                    "source": "selected.clock_hz",
+                    "as": "u32"
+                  }
+                ],
+                [
+                  "period_ticks",
+                  {
+                    "source": "item.options.period_ticks",
+                    "as": "u32"
+                  }
+                ],
+                [
+                  "duty_ticks",
+                  {
+                    "source": "item.options.duty_ticks",
+                    "as": "u32"
+                  }
+                ],
+                [
+                  "tick_hz",
+                  {
+                    "source": "item.options.tick_hz",
+                    "as": "u32"
+                  }
+                ],
+                [
+                  "inactive_latch",
+                  {
+                    "source": "item.route_initial",
+                    "as": "u32"
+                  }
+                ],
+                [
+                  "pin",
+                  {
+                    "source": "selected.pads.0.number",
+                    "as": "u32"
+                  }
+                ],
+                [
+                  "channel",
+                  {
+                    "source": "selected.constants.channel",
+                    "as": "u32"
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "calls": {
+          "prepare": {
+            "function": "nx_stm32f1_pwm_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "ref": "pwm_config",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32f1_pwm_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "retain_on_failed_init": true
+      }
+    }
+  ]
+}

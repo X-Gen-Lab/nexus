@@ -1,0 +1,1059 @@
+{
+  "schema_version": 1,
+  "controller_groups": {
+    "rm0008-f103-md": {
+      "controllers": {
+        "USART2": {
+          "kind": "uart",
+          "irq": [
+            "USART2_IRQn"
+          ],
+          "pins": [
+            "PA2",
+            "PA3",
+            "PA0",
+            "PA1",
+            "PA4"
+          ],
+          "clock_domain": "apb1"
+        },
+        "FLASH": {
+          "kind": "flash",
+          "irq": [],
+          "pins": []
+        },
+        "IWDG": {
+          "kind": "watchdog",
+          "irq": [],
+          "pins": []
+        },
+        "CRC": {
+          "kind": "crc",
+          "pins": [],
+          "irq": []
+        },
+        "WWDG": {
+          "kind": "watchdog",
+          "irq": [
+            "WWDG_IRQn"
+          ],
+          "irq_numbers": {
+            "WWDG_IRQn": 0
+          },
+          "resources": [
+            "irq:WWDG_IRQn"
+          ],
+          "pins": []
+        },
+        "USART1": {
+          "kind": "uart",
+          "irq": [
+            "USART1_IRQn"
+          ],
+          "irq_numbers": {
+            "USART1_IRQn": 37
+          },
+          "pins": [
+            "PA9",
+            "PA10"
+          ],
+          "clock_domain": "apb2"
+        },
+        "USART3": {
+          "kind": "uart",
+          "irq": [
+            "USART3_IRQn"
+          ],
+          "irq_numbers": {
+            "USART3_IRQn": 39
+          },
+          "pins": [
+            "PB10",
+            "PB11"
+          ],
+          "clock_domain": "apb1"
+        }
+      },
+      "modes": {
+        "USART2": {
+          "modes": [
+            "dma-duplex",
+            "dma-tx",
+            "irq-byte-event",
+            "rx-dma-idle",
+            "irq-words",
+            "irq-wire"
+          ]
+        },
+        "FLASH": {
+          "modes": [
+            "poll-halfword"
+          ]
+        },
+        "IWDG": {
+          "modes": [
+            "independent"
+          ]
+        },
+        "CRC": {
+          "modes": [
+            "crc32-words"
+          ]
+        },
+        "WWDG": {
+          "modes": [
+            "window"
+          ]
+        },
+        "USART1": {
+          "modes": [
+            "irq-byte-event"
+          ]
+        },
+        "USART3": {
+          "modes": [
+            "irq-byte-event"
+          ]
+        }
+      }
+    },
+    "gpioa-basic": {
+      "controllers": {
+        "GPIOA": {
+          "kind": "gpio",
+          "irq": [],
+          "pins": [
+            "PA0",
+            "PA4",
+            "PA5"
+          ]
+        }
+      },
+      "modes": {
+        "GPIOA": {
+          "modes": [
+            "input",
+            "output"
+          ]
+        }
+      }
+    },
+    "usart2-default-irq": {
+      "controllers": {
+        "USART2": {
+          "kind": "uart",
+          "irq": [
+            "USART2_IRQn"
+          ],
+          "pins": [
+            "PA2",
+            "PA3"
+          ],
+          "clock_domain": "apb1"
+        }
+      },
+      "modes": {
+        "USART2": {
+          "modes": [
+            "irq-byte-event"
+          ]
+        }
+      }
+    },
+    "rm0008-f103-md-default-buses": {
+      "controllers": {
+        "GPIOB": {
+          "kind": "gpio",
+          "irq": [],
+          "pins": [
+            "PB12"
+          ]
+        },
+        "I2C1": {
+          "kind": "i2c",
+          "irq": [
+            "I2C1_EV_IRQn",
+            "I2C1_ER_IRQn"
+          ],
+          "pins": [
+            "PB6",
+            "PB7"
+          ],
+          "clock_domain": "apb1",
+          "max_hz": 80000
+        },
+        "SPI2": {
+          "kind": "spi",
+          "irq": [
+            "SPI2_IRQn"
+          ],
+          "pins": [
+            "PB13",
+            "PB14",
+            "PB15"
+          ],
+          "clock_domain": "apb1",
+          "max_hz": 4000000
+        },
+        "SPI1": {
+          "kind": "spi",
+          "irq": [
+            "SPI1_IRQn"
+          ],
+          "pins": [
+            "PA5",
+            "PA6",
+            "PA7"
+          ],
+          "clock_domain": "apb2",
+          "max_hz": 4000000
+        }
+      },
+      "modes": {
+        "GPIOB": {
+          "modes": [
+            "output"
+          ]
+        },
+        "I2C1": {
+          "modes": [
+            "irq-write-messages",
+            "poll-messages"
+          ],
+          "interfaces": {
+            "i2c_target": [
+              "target-rx-irq",
+              "target-tx-irq",
+              "target-write-read-irq"
+            ]
+          }
+        },
+        "SPI2": {
+          "modes": [
+            "short-poll",
+            "dma"
+          ]
+        },
+        "SPI1": {
+          "modes": [
+            "short-poll"
+          ]
+        }
+      }
+    },
+    "rm0008-f103-md-controls": {
+      "controllers": {
+        "TIM3": {
+          "kind": "pwm",
+          "irq": [
+            "TIM3_IRQn"
+          ],
+          "pins": [
+            "PA6",
+            "PA7"
+          ],
+          "clock_domain": "apb1_timer"
+        },
+        "ADC1": {
+          "kind": "adc",
+          "irq": [
+            "ADC1_2_IRQn"
+          ],
+          "pins": [
+            "PA0",
+            "PA1"
+          ],
+          "clock_domain": "apb2"
+        },
+        "EXTI13": {
+          "kind": "exti",
+          "irq": [
+            "EXTI15_10_IRQn"
+          ],
+          "pins": [
+            "PC13"
+          ],
+          "resources": [
+            "exti:line:13"
+          ]
+        },
+        "PVD": {
+          "kind": "exti",
+          "irq": [
+            "PVD_IRQn"
+          ],
+          "pins": [],
+          "resources": [
+            "exti:line:16",
+            "pwr:control"
+          ]
+        },
+        "CAN1": {
+          "kind": "can",
+          "irq": [],
+          "pins": [
+            "PA11",
+            "PA12",
+            "PC2"
+          ],
+          "clock_domain": "apb1",
+          "resources": [
+            "memory:usb-can-pma"
+          ]
+        },
+        "RTC": {
+          "kind": "rtc",
+          "irq": [],
+          "pins": [],
+          "resources": [
+            "pwr:control",
+            "domain:backup"
+          ]
+        },
+        "TIM4": {
+          "kind": "timer_capture",
+          "irq": [
+            "TIM4_IRQn"
+          ],
+          "irq_numbers": [
+            30
+          ],
+          "pins": [
+            "PB6"
+          ],
+          "clock_hz": 8000000,
+          "clock_domain": "apb1_timer",
+          "resources": [
+            "timer:TIM4",
+            "exti:line:6",
+            "irq:EXTI9_5_IRQn"
+          ]
+        }
+      },
+      "modes": {
+        "TIM3": {
+          "modes": [
+            "fixed-pwm"
+          ],
+          "interfaces": {
+            "encoder": [
+              "quadrature"
+            ],
+            "timer_pulse": [
+              "one-pulse"
+            ]
+          }
+        },
+        "ADC1": {
+          "modes": [
+            "single-shot",
+            "single-trigger-dma",
+            "sequential-scan-dma",
+            "internal-scan"
+          ]
+        },
+        "EXTI13": {
+          "modes": [
+            "edge-event",
+            "stop-wake"
+          ]
+        },
+        "PVD": {
+          "modes": [
+            "pvd-level"
+          ]
+        },
+        "CAN1": {
+          "modes": [
+            "classic-poll",
+            "classic-poll-normal"
+          ]
+        },
+        "RTC": {
+          "modes": [
+            "backup-adopt",
+            "backup-provision"
+          ]
+        },
+        "TIM4": {
+          "modes": [
+            "edge-capture"
+          ]
+        }
+      }
+    },
+    "dac-direct": {
+      "controllers": {
+        "DAC": {
+          "kind": "dac",
+          "irq": [],
+          "pins": [
+            "PA4",
+            "PA5"
+          ],
+          "clock_domain": "apb1"
+        }
+      },
+      "modes": {
+        "DAC": {
+          "modes": [
+            "direct"
+          ]
+        }
+      }
+    },
+    "f103-xl-fsmc": {
+      "controllers": {
+        "FSMC": {
+          "kind": "external_bus",
+          "irq": [
+            "FSMC_IRQn"
+          ],
+          "pins": [
+            "PF0",
+            "PF1",
+            "PF2",
+            "PF3",
+            "PF4",
+            "PF5",
+            "PF12",
+            "PF13",
+            "PF14",
+            "PF15",
+            "PG0",
+            "PG1",
+            "PG2",
+            "PG3",
+            "PG4",
+            "PG5",
+            "PD11",
+            "PD12",
+            "PD13",
+            "PD14",
+            "PD15",
+            "PD0",
+            "PD1",
+            "PE7",
+            "PE8",
+            "PE9",
+            "PE10",
+            "PE11",
+            "PE12",
+            "PE13",
+            "PE14",
+            "PE15",
+            "PD8",
+            "PD9",
+            "PD10",
+            "PD4",
+            "PD5",
+            "PE0",
+            "PE1",
+            "PG10",
+            "PD7",
+            "PG9",
+            "PG12"
+          ]
+        }
+      },
+      "modes": {
+        "FSMC": {
+          "modes": [
+            "async16"
+          ],
+          "interfaces": {
+            "memory_window": [
+              "cpu-window"
+            ],
+            "parallel16": [
+              "8080-16"
+            ]
+          }
+        }
+      }
+    },
+    "f103-md-tim1": {
+      "controllers": {
+        "TIM1": {
+          "kind": "advanced_pwm",
+          "irq": [
+            "TIM1_BRK_IRQn"
+          ],
+          "irq_numbers": [
+            24
+          ],
+          "pins": [
+            "PA8",
+            "PB13",
+            "PB12"
+          ],
+          "clock_domain": "apb2_timer",
+          "clock_hz": 8000000,
+          "resources": [
+            "clock:TIM1"
+          ]
+        },
+        "PWM_ADC1": {
+          "kind": "pwm_adc",
+          "irq": [
+            "TIM1_BRK_IRQn",
+            "TIM1_UP_IRQn"
+          ],
+          "irq_numbers": [
+            24,
+            25
+          ],
+          "pins": [
+            "PA8",
+            "PB13",
+            "PB12",
+            "PA1",
+            "PA9",
+            "PA10",
+            "PB14",
+            "PB15"
+          ],
+          "clock_domain": "apb2_timer",
+          "resources": [
+            "controller:TIM1",
+            "controller:ADC1",
+            "timer:TIM1",
+            "irq:ADC1_2",
+            "irq:TIM1_CC",
+            "clock:TIM1"
+          ]
+        }
+      },
+      "modes": {
+        "TIM1": {
+          "modes": [
+            "complementary-pwm"
+          ]
+        },
+        "PWM_ADC1": {
+          "modes": [
+            "finite-injected"
+          ]
+        }
+      }
+    },
+    "rm0008-connectivity-bxcan": {
+      "controllers": {
+        "CAN1": {
+          "kind": "can",
+          "irq": [
+            "CAN1_TX_IRQn",
+            "CAN1_RX0_IRQn",
+            "CAN1_RX1_IRQn",
+            "CAN1_SCE_IRQn"
+          ],
+          "irq_sources": {
+            "tx": "CAN1_TX_IRQn",
+            "rx0": "CAN1_RX0_IRQn",
+            "rx1": "CAN1_RX1_IRQn",
+            "error": "CAN1_SCE_IRQn"
+          },
+          "pins": [],
+          "clock_domain": "apb1"
+        },
+        "CAN2": {
+          "kind": "can",
+          "irq": [
+            "CAN2_TX_IRQn",
+            "CAN2_RX0_IRQn",
+            "CAN2_RX1_IRQn",
+            "CAN2_SCE_IRQn"
+          ],
+          "irq_sources": {
+            "tx": "CAN2_TX_IRQn",
+            "rx0": "CAN2_RX0_IRQn",
+            "rx1": "CAN2_RX1_IRQn",
+            "error": "CAN2_SCE_IRQn"
+          },
+          "pins": [],
+          "clock_domain": "apb1"
+        }
+      },
+      "modes": {
+        "CAN1": {
+          "modes": [
+            "classic-irq"
+          ]
+        },
+        "CAN2": {
+          "modes": [
+            "classic-irq"
+          ]
+        }
+      }
+    },
+    "rm0041-f100xb-pwm": {
+      "controllers": {
+        "TIM15": {
+          "kind": "pwm",
+          "pins": [
+            "PA2"
+          ],
+          "irq": [],
+          "clock_domain": "apb2_timer"
+        },
+        "TIM16": {
+          "kind": "pwm",
+          "pins": [
+            "PB8"
+          ],
+          "irq": [],
+          "clock_domain": "apb2_timer"
+        },
+        "TIM17": {
+          "kind": "pwm",
+          "pins": [
+            "PB9"
+          ],
+          "irq": [],
+          "clock_domain": "apb2_timer"
+        }
+      },
+      "modes": {
+        "TIM15": {
+          "modes": [
+            "fixed-pwm"
+          ]
+        },
+        "TIM16": {
+          "modes": [
+            "fixed-pwm"
+          ]
+        },
+        "TIM17": {
+          "modes": [
+            "fixed-pwm"
+          ]
+        }
+      }
+    },
+    "rm0008-connectivity-dwc": {
+      "controllers": {
+        "OTG_FS": {
+          "kind": "usb_device",
+          "irq": [
+            "OTG_FS_IRQn"
+          ],
+          "pins": [
+            "PA9",
+            "PA11",
+            "PA12"
+          ],
+          "resources": [
+            "clock:USBFS48"
+          ],
+          "irq_numbers": [
+            67
+          ],
+          "clock_hz": 48000000,
+          "fifo_words": 320,
+          "endpoint_numbers": 4
+        }
+      },
+      "modes": {
+        "OTG_FS": {
+          "modes": [
+            "device-fs"
+          ],
+          "interfaces": {
+            "usb_host": [
+              "host-fs",
+              "host-fs-bulk"
+            ]
+          }
+        }
+      }
+    },
+    "f103-ze-i2s2": {
+      "controllers": {
+        "I2S2": {
+          "kind": "audio",
+          "irq": [
+            "SPI2_IRQn"
+          ],
+          "pins": [
+            "PB12",
+            "PB13",
+            "PB15"
+          ],
+          "clock_domain": "core",
+          "resources": [
+            "controller:SPI2"
+          ]
+        }
+      },
+      "modes": {
+        "I2S2": {
+          "modes": [
+            "master-tx"
+          ]
+        }
+      }
+    },
+    "f103-hd-sdio": {
+      "controllers": {
+        "SDIO": {
+          "kind": "block",
+          "irq": [],
+          "pins": [
+            "PC8",
+            "PC9",
+            "PC10",
+            "PC11",
+            "PC12",
+            "PD2",
+            "PC13"
+          ]
+        }
+      },
+      "modes": {
+        "SDIO": {
+          "modes": [
+            "sdio-poll",
+            "sdio-poll-write",
+            "sdio-poll-4bit",
+            "sdio-poll-4bit-write",
+            "sdio-rx-dma-poll"
+          ]
+        }
+      }
+    },
+    "rm0008-f103-md-pma": {
+      "controllers": {
+        "USB": {
+          "kind": "usb_device",
+          "irq": [
+            "USB_LP_CAN1_RX0_IRQn"
+          ],
+          "pins": [
+            "PA0",
+            "PA1",
+            "PA11",
+            "PA12"
+          ],
+          "resources": [
+            "clock:USBFS48",
+            "memory:usb-can-pma"
+          ],
+          "irq_numbers": [
+            20
+          ],
+          "clock_hz": 48000000,
+          "pma_bytes": 512
+        }
+      },
+      "modes": {
+        "USB": {
+          "modes": [
+            "device-pma",
+            "device-pma-bulk",
+            "device-pma-interrupt"
+          ]
+        }
+      }
+    },
+    "rm0008-f102-md-pma": {
+      "controllers": {
+        "USB": {
+          "kind": "usb_device",
+          "irq": [
+            "USB_LP_IRQn"
+          ],
+          "pins": [
+            "PA0",
+            "PA1",
+            "PA11",
+            "PA12"
+          ],
+          "resources": [
+            "clock:USBFS48",
+            "memory:usb-pma"
+          ],
+          "irq_numbers": [
+            20
+          ],
+          "clock_hz": 48000000,
+          "pma_bytes": 512
+        }
+      },
+      "modes": {
+        "USB": {
+          "modes": [
+            "device-pma"
+          ]
+        }
+      }
+    },
+    "f103-hd-tim8": {
+      "controllers": {
+        "TIM8": {
+          "kind": "advanced_pwm",
+          "irq": [
+            "TIM8_BRK_IRQn"
+          ],
+          "irq_numbers": [
+            43
+          ],
+          "pins": [
+            "PC6",
+            "PA7",
+            "PA6"
+          ],
+          "clock_domain": "apb2_timer",
+          "clock_hz": 8000000,
+          "resources": [
+            "clock:TIM8"
+          ]
+        }
+      },
+      "modes": {
+        "TIM8": {
+          "modes": [
+            "complementary-pwm"
+          ]
+        }
+      }
+    },
+    "rm0008-f107-clause22": {
+      "controllers": {
+        "ETH": {
+          "kind": "mdio",
+          "irq": [],
+          "pins": [
+            "PC1",
+            "PA2"
+          ],
+          "resources": [
+            "peripheral:ETH"
+          ],
+          "clock_domain": "core"
+        }
+      },
+      "modes": {
+        "ETH": {
+          "modes": [
+            "clause22"
+          ]
+        }
+      }
+    },
+    "f103-hd-adc-pair": {
+      "controllers": {
+        "ADC1": {
+          "kind": "adc",
+          "irq": [],
+          "pins": [
+            "PA1",
+            "PA2"
+          ],
+          "clock_domain": "apb2"
+        },
+        "ADC2": {
+          "kind": "adc",
+          "irq": [],
+          "pins": [
+            "PA2"
+          ],
+          "clock_domain": "apb2"
+        },
+        "ADC3": {
+          "kind": "adc",
+          "irq": [],
+          "pins": [
+            "PA3"
+          ],
+          "clock_domain": "apb2"
+        }
+      },
+      "modes": {
+        "ADC1": {
+          "modes": [
+            "simultaneous-scan-dma"
+          ]
+        },
+        "ADC2": {
+          "modes": [
+            "single-shot"
+          ]
+        },
+        "ADC3": {
+          "modes": [
+            "single-shot"
+          ]
+        }
+      }
+    },
+    "fpec-main-flash": {
+      "controllers": {
+        "FLASH": {
+          "kind": "flash",
+          "irq": [],
+          "pins": []
+        }
+      },
+      "modes": {
+        "FLASH": {
+          "modes": [
+            "poll-halfword"
+          ]
+        }
+      }
+    },
+    "fpec-read-only-flash": {
+      "controllers": {
+        "FLASH": {
+          "kind": "flash",
+          "irq": [],
+          "pins": []
+        }
+      },
+      "modes": {
+        "FLASH": {
+          "modes": [
+            "read-only"
+          ]
+        }
+      }
+    },
+    "rm0041-f100xb-gpioc-user-leds": {
+      "controllers": {
+        "GPIOC": {
+          "kind": "gpio",
+          "irq": [],
+          "pins": [
+            "PC8",
+            "PC9"
+          ]
+        }
+      },
+      "modes": {
+        "GPIOC": {
+          "modes": [
+            "output"
+          ]
+        }
+      }
+    },
+    "f107-usart2": {
+      "controllers": {
+        "USART2": {
+          "kind": "uart",
+          "irq": [
+            "USART2_IRQn"
+          ],
+          "pins": [
+            "PA2",
+            "PA3",
+            "PD5",
+            "PD6"
+          ],
+          "clock_domain": "apb1"
+        }
+      },
+      "modes": {
+        "USART2": {
+          "modes": [
+            "irq-byte-event"
+          ]
+        }
+      }
+    },
+    "rm0008-f107-mii": {
+      "controllers": {
+        "ETH_MAC": {
+          "kind": "eth",
+          "irq": [
+            "ETH_IRQn"
+          ],
+          "irq_numbers": {
+            "ETH_IRQn": 61
+          },
+          "clock_hz": 72000000,
+          "clock_domain": "core",
+          "pins": [
+            "PC1",
+            "PA2",
+            "PA1",
+            "PD8",
+            "PD9",
+            "PD10",
+            "PB11",
+            "PB12",
+            "PB13",
+            "PB10",
+            "PD11",
+            "PD12",
+            "PC3",
+            "PC2",
+            "PB8",
+            "PA0",
+            "PA3"
+          ],
+          "resources": [
+            "peripheral:ETH",
+            "clock:ETH_AHB",
+            "clock:DMA2",
+            "irq:ETH_IRQn"
+          ]
+        }
+      },
+      "modes": {
+        "ETH_MAC": {
+          "modes": [
+            "raw-mii",
+            "raw-rmii"
+          ]
+        }
+      }
+    },
+    "rm0008-f107-spi3": {
+      "controllers": {
+        "SPI3": {
+          "kind": "spi",
+          "irq": [
+            "SPI3_IRQn"
+          ],
+          "pins": [
+            "PC10",
+            "PC11",
+            "PC12"
+          ],
+          "clock_domain": "apb1",
+          "max_hz": 4500000
+        },
+        "GPIOC": {
+          "kind": "gpio",
+          "irq": [],
+          "pins": [
+            "PC9"
+          ]
+        }
+      },
+      "modes": {
+        "SPI3": {
+          "modes": [
+            "short-poll"
+          ]
+        },
+        "GPIOC": {
+          "modes": [
+            "output"
+          ]
+        }
+      }
+    }
+  },
+  "can_domain": {
+    "primary": "CAN1",
+    "controllers": [
+      "CAN1",
+      "CAN2"
+    ],
+    "filter_banks": 28
+  }
+}

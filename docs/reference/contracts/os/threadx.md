@@ -27,19 +27,20 @@ policy, not another source graph.
 
 ## Maintained selection scope
 
-The first platform bindings accept the actual Board identities:
+The maintained software assemblies use these Board identities.
 
 | Board identity | SoC family | Port |
 | --- | --- | --- |
 | `native-reference` | Explicit host-test scope | Linux GNU |
 | `stm32f407zg-qiming-v31` | STM32F407 | Cortex-M4 GNU |
 | `stm32f407ve-sky-qingchun` | STM32F407 | Cortex-M4 GNU |
+| `stm32f103rb-threadx-software` | STM32F103RB HSI8 software reference | Cortex-M3 GNU |
 
-Directory names are not Board identities. Unknown Board/SoC pairings are rejected.
-CPU-only runtime assemblies may select explicit Native or Cortex-M4/M4F CPU
-facts; they do not establish a SoC, board route or physical qualification.
-Cortex-M0/M0+/M3/M7/M23/M33/M55/M85 remain rejected for this ThreadX backend;
-their separate Arch/FreeRTOS support is unaffected.
+The resolver checks the Board identity and its explicit backend declaration.
+CPU-only runtime assemblies can select Native, Cortex-M3 or Cortex-M4/M4F
+profiles. Board assemblies supply the SoC, route and startup facts.
+The F103RB software reference uses HSI8, SysTick at 1 kHz, BASEPRI and the
+Cortex-M3 soft-float ABI. Its physical qualification is pending.
 
 ## Authoring
 
@@ -119,17 +120,16 @@ remain separately qualified.
 ## Repeatable software gate
 
 `python scripts/ci/os_threadx.py --compiler arm-none-eabi-gcc --output <fresh-dir>`
-executes the production platform graph for the two maintained MCU Boards with
-BASEPRI and PRIMASK. Each ELF retains the real task, queue, close, notification,
-join, timer and scheduling entry points; the two official PendSV aliases must
-resolve to the same strong instruction entry. Every official common/M4 source
-must have a real compiled object and the same numeric C/ASM policy. The gate
-retains the exact ELF/BIN/map, resource report, authored/resolved configuration,
-compiler database, command results and pre/post source identities.
+links two M4 Boards with BASEPRI and PRIMASK, and the F103RB reference with
+BASEPRI. Each ELF retains the actual task, queue, close, notification, join,
+timer and scheduling entries. The official PendSV aliases resolve to the same
+strong entry. Every selected kernel source has a compiled object with the
+resolved C and ASM policy. The F103RB check also verifies vector ownership and
+the alignment of the initial hardware frame restored through PSP. The gate
+retains each ELF, BIN, map, budget, configuration, compiler database and log.
 
-The four positive Board/mask builds are separate from a fifth build that must
-fail specifically at the ELF link for the absent strong
-external-Tick provider. Unrelated compiler failures, an existing ELF, weak or
+Five Board and mask combinations link successfully. The M4 external Tick case must
+fail at the ELF link for the absent strong external-Tick provider. Unrelated compiler failures, an existing ELF, weak or
 missing retained entries, host/dynamic symbols, stale output and source changes
 fail qualification. No command in this gate flashes or executes an MCU.
 `configured_backends` in the compatibility policy lists available selection

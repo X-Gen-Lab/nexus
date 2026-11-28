@@ -63,7 +63,7 @@ def os_selection(typed, data):
         restrictions.append(
             "Privileged unmasked Thread execution; ISR APIs require the selected ceiling.")
     if backend == "threadx":
-        restrictions.append("ThreadX physical scope is Cortex-M4; no tickless port is maintained.")
+        restrictions.append("ThreadX uses a fixed-rate kernel tick.")
     if protected:
         restrictions.append(
             "Restricted tasks own protected metadata, stack and reviewed user regions.")
@@ -453,6 +453,7 @@ def collect(root=ROOT):
     routes = {}
     declared = defaultdict(set)
     exports = {}
+    production_sources = set((root / "io/src").rglob("*.c"))
     for view in matrix.package_views(root):
         family = view.package.family
         facts[family] = {part.part: part.facts.device for part in view.parts}
@@ -460,19 +461,11 @@ def collect(root=ROOT):
         for part in view.parts:
             route_index.update(part.routes)
         routes[family] = route_index
-        # These are owned source definitions, not a reconstruction of CMake's
-        # selected target graph and never execution or physical evidence.
-        sources = {source for directory in view.package.export_roots
-                   for source in directory.rglob("*.c") if view.package.exports(source)}
-        for source in sorted(sources):
-            for symbol in source_ops(source, root):
-                if symbol in exports:
-                    raise ValueError(f"Duplicate ops definition: {symbol}")
-                exports[symbol] = source.relative_to(root).as_posix()
-    # Shared algorithms keep one real readonly table across SoC wrappers.
-    # Read actual production definitions, never expand provider-name guesses.
-    shared_sources = set((root / "io/src").rglob("*.c"))
-    for source in sorted(shared_sources):
+        production_sources.update(
+            source for directory in view.package.export_roots
+            for source in directory.rglob("*.c") if view.package.exports(source))
+    # Several packages can export one shared provider source. Scan each file once.
+    for source in sorted(production_sources):
         for symbol in source_ops(source, root):
             if symbol in exports:
                 raise ValueError(f"Duplicate ops definition: {symbol}")

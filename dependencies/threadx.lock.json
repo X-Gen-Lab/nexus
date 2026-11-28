@@ -1,5 +1,6 @@
 {
   "bootstrap_replacement": {
+    "cortex_m3": "owned os/threadx/m4.c and m4_vectors.S supply Cortex-M3 SysTick and bootstrap",
     "cortex_m4": "owned os/threadx/m4.c replaces sample bootstrap; owned m4_vectors.S exact exception entry",
     "linux": "build-local reviewed prepare_linux.py derivative replaces only original tx_initialize_low_level.c"
   },
@@ -197,6 +198,10 @@
       "TX_TIMER_PROCESS_IN_ISR",
       "TX_MAX_PRIORITIES=32",
       "TX_TIMER_TICKS_PER_SECOND=resolved exact frequency"
+    ],
+    "cortex_m3_basepri": [
+      "TX_PORT_USE_BASEPRI",
+      "TX_PORT_BASEPRI=encoded numeric literal identical C and ASM"
     ],
     "cortex_m4_basepri": [
       "TX_PORT_USE_BASEPRI",
@@ -997,6 +1002,38 @@
       "bytes": 5286,
       "sha256": "6192b53a14cae68063ce673c9b0d9f4946472683ef7d21604bb6ebe403a1a06d"
     },
+    "ports/cortex_m3/gnu/inc/tx_port.h": {
+      "bytes": 32475,
+      "sha256": "33f9bd7cb6495f38a3ac6e843d1b17e6e87997b7bb49d8b688d260ae5a60e3ec"
+    },
+    "ports/cortex_m3/gnu/src/tx_thread_context_restore.S": {
+      "bytes": 4416,
+      "sha256": "84ad3bf2caf584100eaaaaab29814fb8f49029f7204cac8374b7617925abbb22"
+    },
+    "ports/cortex_m3/gnu/src/tx_thread_context_save.S": {
+      "bytes": 4328,
+      "sha256": "2594d30bdf2495eefce323bdae7be671b4316b1f85763cf7766fd45c873b9a02"
+    },
+    "ports/cortex_m3/gnu/src/tx_thread_interrupt_control.S": {
+      "bytes": 4494,
+      "sha256": "0ff0f43dfd91949fa1cd2024e9c5d644e886ffcfba3f6c3c5e60c5bfd668e9a7"
+    },
+    "ports/cortex_m3/gnu/src/tx_thread_schedule.S": {
+      "bytes": 15313,
+      "sha256": "02a2b7a95158d18c7323132246b4edd1d08e9e885d43bb4b75f20c00efb17a53"
+    },
+    "ports/cortex_m3/gnu/src/tx_thread_stack_build.S": {
+      "bytes": 7461,
+      "sha256": "84aa6320242bef5cd4039bd960e6acd6fcc1dfff36f3bbf459af2e8a54d2aa0e"
+    },
+    "ports/cortex_m3/gnu/src/tx_thread_system_return.S": {
+      "bytes": 5650,
+      "sha256": "48d153be710867b0eb0dfc6634d44635e82ab9a5ffe9f49155fe301a56f651f5"
+    },
+    "ports/cortex_m3/gnu/src/tx_timer_interrupt.S": {
+      "bytes": 11861,
+      "sha256": "12515a26e5bee5d7b42d90c0fe66a5bed3ae969a31c0c04e0b0aa422549b2a46"
+    },
     "ports/cortex_m4/gnu/inc/tx_port.h": {
       "bytes": 32475,
       "sha256": "9fbcdbfb384b005cedad0f044aefabcca8b62196557c847474ebb8de5ec47381"
@@ -1080,7 +1117,8 @@
     "common/inc/tx_trace.h",
     "common/inc/tx_user_sample.h",
     "ports/cortex_m4/gnu/inc/tx_port.h",
-    "ports/linux/gnu/inc/tx_port.h"
+    "ports/linux/gnu/inc/tx_port.h",
+    "ports/cortex_m3/gnu/inc/tx_port.h"
   ],
   "kind": "nexus-threadx-source-lock",
   "license": {
@@ -1090,6 +1128,15 @@
     "sha256": "4dc83ba591696918e00aaceff4f3aa6766fc1cf44f212abdee2786f7a2faf1d8"
   },
   "ports": {
+    "cortex_m3": [
+      "ports/cortex_m3/gnu/src/tx_thread_context_restore.S",
+      "ports/cortex_m3/gnu/src/tx_thread_context_save.S",
+      "ports/cortex_m3/gnu/src/tx_thread_interrupt_control.S",
+      "ports/cortex_m3/gnu/src/tx_thread_schedule.S",
+      "ports/cortex_m3/gnu/src/tx_thread_stack_build.S",
+      "ports/cortex_m3/gnu/src/tx_thread_system_return.S",
+      "ports/cortex_m3/gnu/src/tx_timer_interrupt.S"
+    ],
     "cortex_m4": [
       "ports/cortex_m4/gnu/src/tx_thread_context_restore.S",
       "ports/cortex_m4/gnu/src/tx_thread_context_save.S",
