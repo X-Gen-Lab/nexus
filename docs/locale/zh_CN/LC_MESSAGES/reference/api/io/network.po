@@ -658,11 +658,14 @@ msgstr "关闭 TX 准入并排空共享 TX 引擎，不重放传输。"
 #: ../../../../../../docs/reference/api/io/network.md:32
 msgid ""
 "Task owner. Cancel is controller-wide: other pending TX requests also become"
-" CANCELLED. It never revokes a borrow. Stuck sources quarantine. Apply a "
-"confirmed link again after successful drain to reopen TX."
+" CANCELLED. It never revokes a borrow. Stuck sources quarantine. For a "
+"provider with TX-only drain, apply a confirmed link again to reopen TX. A "
+"reset-backed provider closes both directions. Return RX loans, finish stop, "
+"and restart its platform session to reopen."
 msgstr ""
-"任务所有者。取消作用于整个控制器：其他待处理 TX 请求也变为 "
-"CANCELLED。绝不撤销借用。源卡住时进入隔离。成功排空后，重新应用已确认的链路事实，才重新开放 TX。"
+"任务所有者。取消作用于整个控制器，其他待处理 TX 请求也变为 CANCELLED。借用始终有效。硬件源无法撤回时，进入隔离状态。若后端只排空 "
+"TX，重新应用已确认的链路状态即可重新开放 TX。依靠复位完成排空的后端 会关闭收发两条路径。归还借用的 RX "
+"缓冲区，完成停止并重新启动平台会话后才能恢复收发。"
 
 #: ../../../../../../docs/reference/api/io/network.md:32
 msgid "[in] Serialized task-owner face."
@@ -749,19 +752,21 @@ msgid ""
 "Task owner; changing speed/duplex first requires explicit link-down and "
 "observed idle TX/RX engines and FIFOs. BUSY keeps the old mode. Reapplying "
 "an unchanged up fact is idempotent. Link-down closes admission and drains "
-"pending TX with IO; later up requires real quiescence. This is not a PHY "
-"power/reset/electrical proof."
+"pending TX with IO. A reset-backed provider requires complete stop and "
+"platform restart before applying the next up observation. The caller owns "
+"PHY power and reset."
 msgstr ""
-"任务所有者；更改速率或双工模式前，必须显式 link-down，并观察到 TX/RX 引擎及 FIFO 空闲。BUSY 保留旧模式。重新应用未改变的 "
-"up 事实是幂等操作。link-down 关闭准入，以 IO 排空待处理 TX；后续 up 要求真实静止。这不构成 PHY 电源、复位或电气证明。"
+"任务所有者。更改速率或双工模式前，必须显式设置链路断开，并确认 TX/RX 引擎及 FIFO 空闲。BUSY "
+"保留旧模式。重复应用未改变的链路连通状态是幂等操作。链路断开会关闭准入，并以 IO 结算待处理 TX "
+"请求。若后端依靠复位完成排空，必须先完整停止并重启平台，再应用下一次观察到的链路连通状态。调用者负责 PHY 电源与复位。"
 
 #: ../../../../../../docs/reference/api/io/network.md:32
 msgid "[in] Observed up/speed/duplex fact, never a guess."
 msgstr "[in] 已观察的 up、速率及双工事实，绝非猜测。"
 
 #: ../../../../../../docs/reference/api/io/network.md:32
-msgid "Success, BUSY until real drain, or STATE/IO/context error."
-msgstr "成功；真实排空前返回 BUSY；或返回 STATE/IO/上下文错误。"
+msgid "Success, BUSY until real drain, or UNSUPPORTED/STATE/IO/context."
+msgstr "成功。实际排空前返回 BUSY。其他结果为 UNSUPPORTED、STATE、IO 或执行上下文错误。"
 
 #: ../../../../../../docs/reference/api/io/network.md:32
 msgid "Close admission and withdraw MAC/DMA/IRQ sources with readback."
