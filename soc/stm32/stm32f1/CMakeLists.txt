@@ -5,11 +5,42 @@ include("${NEXUS_SOURCE_DIR}/cmake/platform/ControllerModes.cmake")
 
 if(
     NOT NEXUS_CPU_ARCH STREQUAL "cortex-m3"
-    OR NOT NEXUS_VENDOR_DEVICE_DEFINE STREQUAL "STM32F103xB"
-    OR NOT NEXUS_VENDOR_DEVICE_HEADER
-    OR NOT NEXUS_VENDOR_DEVICE_STARTUP
+    OR NOT NEXUS_CPU_FPU STREQUAL "none"
+    OR NOT NEXUS_FLOAT_ABI STREQUAL "soft"
+    OR NOT NEXUS_VENDOR_DEVICE_DEFINE
+        MATCHES
+        "^(STM32F100x[BE]|STM32F10[13]x[6BEG]|STM32F102x[6B]|STM32F10[57]xC)$"
 )
-    message(FATAL_ERROR "STM32F1 requires the reviewed Cortex-M3 xB profile")
+    message(
+        FATAL_ERROR
+        "STM32F1 requires a reviewed Cortex-M3 device and soft ABI"
+    )
+endif()
+string(TOLOWER "${NEXUS_VENDOR_DEVICE_DEFINE}" f1_device_stem)
+if(
+    NOT NEXUS_VENDOR_DEVICE_HEADER STREQUAL "Include/${f1_device_stem}.h"
+    OR NOT NEXUS_VENDOR_DEVICE_STARTUP
+        STREQUAL
+        "Source/Templates/gcc/startup_${f1_device_stem}.s"
+)
+    message(
+        FATAL_ERROR
+        "STM32F1 device, header and startup must use the same density"
+    )
+endif()
+if(NOT NEXUS_VENDOR_DEVICE_DEFINE STREQUAL "STM32F103xB")
+    foreach(selection IN LISTS NEXUS_SELECTED_CONTROLLERS)
+        if(
+            NOT selection
+                MATCHES
+                "^(gpio/[^/]+/(input|output)|uart/USART2/irq-byte-event)$"
+        )
+            message(
+                FATAL_ERROR
+                "${selection} requires the reviewed STM32F103xB profile"
+            )
+        endif()
+    endforeach()
 endif()
 set(f1_device "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f1")
 set(f1_hal "${NEXUS_SOURCE_DIR}/vendors/st/stm32f1_hal")
@@ -39,7 +70,9 @@ nexus_use_cmsis_core(nexus_soc_stm32f1)
 
 nexus_controller_modes(f1_gpio gpio)
 nexus_controller_modes(f1_uart uart)
-if(f1_gpio OR f1_uart)
+nexus_controller_modes(f1_i2c i2c)
+nexus_controller_modes(f1_spi spi)
+if(f1_gpio OR f1_uart OR f1_i2c OR f1_spi)
     target_sources(nexus_soc_stm32f1 PRIVATE drivers/gpio/gpio.c)
     target_link_libraries(nexus_soc_stm32f1 PRIVATE Nexus::IOGPIO)
 endif()
@@ -47,7 +80,16 @@ if(f1_uart)
     target_sources(nexus_soc_stm32f1 PRIVATE drivers/uart/uart.c)
     target_link_libraries(nexus_soc_stm32f1 PRIVATE Nexus::IOUART)
 endif()
+if("dma-tx" IN_LIST f1_uart)
+    target_sources(nexus_soc_stm32f1 PRIVATE drivers/uart/uart_dma.c)
+    target_link_libraries(nexus_soc_stm32f1 PRIVATE Nexus::IODMA)
+endif()
 add_subdirectory(drivers/flash)
+add_subdirectory(drivers/crc)
+add_subdirectory(drivers/identity)
+add_subdirectory(drivers/watchdog)
+add_subdirectory(drivers/i2c)
+add_subdirectory(drivers/spi)
 
 # Only the image's startup and generated bindings consume these requirements.
 add_library(nexus_stm32f1_startup_usage INTERFACE)

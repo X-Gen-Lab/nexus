@@ -439,7 +439,8 @@ def resolve_routes(routes_doc, soc, part, provider, *, controller_profiles=None)
     routes = {}
     for route in sequence(routes_doc["routes"], "routes"):
         obj(route, {"id", "variants", "controller", "kind", "pins", "modes",
-                    "source"}, {"resources", "dma", "mode_dma", "mode_resources"}, "route")
+                    "source"}, {"resources", "dma", "mode_dma", "mode_resources",
+                                "clock_profiles"}, "route")
         identity(route["id"], "route id")
         if route["id"] in routes:
             fail(f"Duplicate route id: {route['id']}")
@@ -450,6 +451,13 @@ def resolve_routes(routes_doc, soc, part, provider, *, controller_profiles=None)
                 text(value, f"route {field}")
         if not route["variants"] or not route["modes"]:
             fail("Route must have exact variants and maintained modes")
+        if "clock_profiles" in route:
+            profiles = [text(name, "route clock profile") for name in
+                        sequence(route["clock_profiles"], "route clock profiles")]
+            unique(profiles, "route clock profiles")
+            if not profiles or any(name not in soc["clock_profiles"]
+                                   for name in profiles):
+                fail(f"Route {route['id']} requires reviewed clock profiles")
         if any(value not in soc["variants"] for value in route["variants"]):
             fail(f"Route {route['id']} has unknown exact variant")
         profiles = ([soc["controllers"]] if not controller_profiles else
@@ -874,11 +882,26 @@ def catalog_soc_facts(soc, part, catalog):
         fail("Device catalog source identity differs from SoC source lock")
     # These local derived facts are not another authored IRQ authority.
     profiles = device_view.controller_profiles(soc)
-    for name, controllers in profiles.items():
-        device_view.validate_controller_irqs(controllers, devices[name].irq_bindings)
-    controllers = profiles[variants[part]["device"]]
     normalized = {key: value for key, value in soc.items()
                   if key not in {"device_profiles", "controller_groups"}}
+    for name, controllers in profiles.items():
+        device = devices[name]
+        device_view.validate_controller_irqs(controllers, device.irq_bindings)
+        profile = soc["device_profiles"][name]
+        if "cpu_features" in profile:
+            features = obj(profile["cpu_features"], {"mpu_version", "mpu_regions"},
+                           (), "Device CPU features")
+            common = obj(soc.get("cpu"), cpu_profiles.CPU_FIELDS,
+                         cpu_profiles.CPU_OPTIONAL_FIELDS, "CPU facts")
+            if bool(features["mpu_version"]) != bool(features["mpu_regions"]):
+                fail("Device MPU version and region count must describe one capability")
+            cpu = {**common, **features}
+            irq = {"priority_bits": device.priority_bits,
+                   "external_count": device.external_irq_count}
+            cpu_profiles.resolve(cpu, irq, "baremetal")
+            if name == selected.identifier:
+                normalized["cpu"] = cpu
+    controllers = profiles[selected.identifier]
     if not any(item["kind"] == "can" for item in controllers.values()):
         normalized.pop("can_domain", None)
     normalized.update(controllers=controllers,

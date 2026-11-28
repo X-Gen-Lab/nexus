@@ -6,7 +6,7 @@
       "schema_version": 1,
       "headers": ["system/platform.h"],
       "roles": {},
-      "dma_clocks": {},
+      "dma_clocks": {"DMA1": "RCC_AHBENR_DMA1EN"},
       "objects": {
         "platform": {
           "symbols": {"config": "s_nx_platform_lifecycle_config"},

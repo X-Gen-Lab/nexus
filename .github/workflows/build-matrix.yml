@@ -286,6 +286,8 @@ jobs:
           - stm32f4_family
           - stm32f1_family
           - stm32f1_flash
+          - stm32f1_watchdog
+          - stm32f1_buses
         include:
           - fixture: stm32f4_family
             project: tests/integration/assemblies/stm32f4_family

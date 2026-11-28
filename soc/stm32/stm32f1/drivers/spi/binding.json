@@ -1,0 +1,255 @@
+{
+  "schema_version": 1,
+  "bindings": [
+    {
+      "kind": "spi",
+      "mode": "short-poll",
+      "implementation": "spi",
+      "controllers": [
+        "SPI2"
+      ],
+      "headers": [
+        "drivers/spi/instance.h"
+      ],
+      "static_recipe": {
+        "state_type": "nx_stm32f1_spi_t",
+        "ops": "nx_stm32f1_spi_ops",
+        "declarations": [
+          {
+            "role": "spi_config",
+            "type": "nx_stm32f1_spi_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "registers",
+                  {
+                    "source": "item.controller",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "gpio",
+                  {
+                    "source": "selected.named_pads.sck.registers",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "clock_hz",
+                  {
+                    "source": "selected.clock_hz"
+                  }
+                ],
+                [
+                  "sck",
+                  {
+                    "source": "selected.named_pads.sck.number"
+                  }
+                ],
+                [
+                  "miso",
+                  {
+                    "source": "selected.named_pads.miso.number"
+                  }
+                ],
+                [
+                  "mosi",
+                  {
+                    "source": "selected.named_pads.mosi.number"
+                  }
+                ],
+                [
+                  "cs",
+                  {
+                    "source": "selected.constants.spi.endpoints.0.cs.number"
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "calls": {
+          "admit": [
+            {
+              "function": "nx_stm32f1_spi_admit",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "ref": "spi_config",
+                  "as": "address"
+                }
+              ]
+            }
+          ],
+          "prepare": {
+            "function": "nx_stm32f1_spi_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "ref": "spi_config",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32f1_spi_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "retain_on_failed_init": true,
+        "child_groups": {
+          "limit": 1,
+          "bindings": "selected.constants.spi.endpoint_bindings",
+          "cases": {
+            "spi-endpoint": {
+              "parents": {
+                "controller": "port"
+              },
+              "declarations": [
+                {
+                  "role": "endpoint",
+                  "type": "nx_stm32f1_spi_endpoint_t",
+                  "const": false,
+                  "value": {
+                    "record": [
+                      [
+                        "port",
+                        {
+                          "ref": "controller",
+                          "as": "address"
+                        }
+                      ],
+                      [
+                        "cs_gpio",
+                        {
+                          "source": "item.binding.cs.registers",
+                          "as": "symbol"
+                        }
+                      ],
+                      [
+                        "max_hz",
+                        {
+                          "source": "item.child.options.max_hz"
+                        }
+                      ],
+                      [
+                        "cs_pin",
+                        {
+                          "source": "item.binding.cs.number"
+                        }
+                      ],
+                      [
+                        "mode",
+                        {
+                          "source": "item.child.options.mode"
+                        }
+                      ],
+                      [
+                        "lsb_first",
+                        {
+                          "source": "item.child.options.lsb_first"
+                        }
+                      ]
+                    ]
+                  }
+                }
+              ],
+              "calls": {
+                "prepare": [],
+                "close": []
+              },
+              "face": {
+                "type": "nx_spi_endpoint_t",
+                "ops": "nx_stm32f1_spi_endpoint_ops",
+                "context": {
+                  "ref": "endpoint",
+                  "as": "address"
+                }
+              }
+            },
+            "spi-transaction": {
+              "parents": {
+                "controller": "port"
+              },
+              "declarations": [
+                {
+                  "role": "endpoint",
+                  "type": "nx_stm32f1_spi_endpoint_t",
+                  "const": false,
+                  "value": {
+                    "record": [
+                      [
+                        "port",
+                        {
+                          "ref": "controller",
+                          "as": "address"
+                        }
+                      ],
+                      [
+                        "cs_gpio",
+                        {
+                          "source": "item.binding.cs.registers",
+                          "as": "symbol"
+                        }
+                      ],
+                      [
+                        "max_hz",
+                        {
+                          "source": "item.child.options.max_hz"
+                        }
+                      ],
+                      [
+                        "cs_pin",
+                        {
+                          "source": "item.binding.cs.number"
+                        }
+                      ],
+                      [
+                        "mode",
+                        {
+                          "source": "item.child.options.mode"
+                        }
+                      ],
+                      [
+                        "lsb_first",
+                        {
+                          "source": "item.child.options.lsb_first"
+                        }
+                      ]
+                    ]
+                  }
+                }
+              ],
+              "calls": {
+                "prepare": [],
+                "close": []
+              },
+              "face": {
+                "type": "nx_spi_transaction_endpoint_t",
+                "ops": "nx_stm32f1_spi_transaction_ops",
+                "context": {
+                  "ref": "endpoint",
+                  "as": "address"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

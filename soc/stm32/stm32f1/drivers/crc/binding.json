@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "bindings": [
+    {
+      "kind": "crc",
+      "mode": "crc32-words",
+      "implementation": "crc",
+      "headers": [
+        "drivers/crc/instance.h"
+      ],
+      "static_recipe": {
+        "state_type": "nx_stm32f1_crc_t",
+        "ops": "nx_stm32f1_crc_ops",
+        "declarations": [],
+        "calls": {
+          "prepare": {
+            "function": "nx_stm32f1_crc_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32f1_crc_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "retain_on_failed_init": true
+      }
+    }
+  ]
+}

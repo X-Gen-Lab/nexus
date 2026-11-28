@@ -11,6 +11,11 @@
 #include "nexus_config.h"
 #include "nexus_factory_strong.h"
 
+#if defined(NX_CRC_REF_INTEGRITY)
+#include "nexus/io/chip.h"
+#include "nexus/io/crc.h"
+#endif
+
 #if defined(NEXUS_BACKEND_FREERTOS)
 #include "nexus/os/storage.h"
 #endif
@@ -33,6 +38,22 @@ static nx_result_t exercise(void) {
                                  &sense);
     if (result != NX_SUCCESS) {
         return result;
+    }
+#endif
+#if defined(NX_CRC_REF_INTEGRITY)
+    const uint32_t word = UINT32_C(0x12345678);
+    uint32_t signature;
+    result = nx_crc_port_compute(
+        nx_factory_crc_ref(NX_CRC_REF_INTEGRITY), &word, 1U,
+        nx_deadline_after(nx_time_now_us(), 1000U), &signature);
+    if (result != NX_SUCCESS || signature != UINT32_C(0xDF8A8A2B)) {
+        return result == NX_SUCCESS ? NX_ERROR_IO : result;
+    }
+    uint8_t uid[12];
+    size_t uid_bytes;
+    result = nx_chip_uid_read(uid, sizeof(uid), &uid_bytes);
+    if (result != NX_SUCCESS || uid_bytes != sizeof(uid)) {
+        return result == NX_SUCCESS ? NX_ERROR_IO : result;
     }
 #endif
     uint8_t byte;

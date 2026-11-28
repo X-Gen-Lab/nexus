@@ -29,20 +29,48 @@ class Stm32F1PairTests(unittest.TestCase):
                 target.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copyfile(ROOT / name, target)
 
-    def verify_pair(self, cmsis_commit=driver_lock.CMSIS_COMMIT):
+    def verify_pair(self, cmsis_commit=driver_lock.CMSIS_COMMIT, **options):
         return driver_lock.verify(self.hal, self.root / driver_lock.LOCK_NAME,
                                   self.cmsis, packaged_commit=driver_lock.COMMIT,
-                                  packaged_cmsis_commit=cmsis_commit)
+                                  packaged_cmsis_commit=cmsis_commit, **options)
 
     def test_exact_pair_verifies_both_file_closures(self):
         evidence = self.verify_pair()
-        self.assertEqual(evidence["verified_files"], 9)
+        expected = sum(len(json.loads((self.root / lock).read_bytes())["files"])
+                       for lock in (driver_lock.LOCK_NAME,
+                                    driver_lock.CMSIS_LOCK_NAME))
+        self.assertEqual(evidence["verified_files"], expected)
         self.assertIn(str(self.root / driver_lock.CMSIS_LOCK_NAME),
                       evidence["configure_inputs"])
 
     def test_packaged_pair_rejects_wrong_device_commit(self):
         with self.assertRaisesRegex(ValueError, "both paired commits"):
             self.verify_pair("0" * 40)
+
+    def test_family_device_lock_rejects_partial_header_startup_pair(self):
+        path = self.root / driver_lock.CMSIS_LOCK_NAME
+        original = json.loads(path.read_bytes())
+        for member in ("Include/stm32f103xe.h",
+                       "Source/Templates/gcc/startup_stm32f103xe.s"):
+            with self.subTest(member=member):
+                changed = dict(original, files=dict(original["files"]))
+                del changed["files"][member]
+                path.write_text(json.dumps(changed))
+                with self.assertRaisesRegex(ValueError, "reviewed device graph"):
+                    self.verify_pair()
+
+    def test_both_selected_files_required_even_if_optional_otherwise(self):
+        path = self.root / driver_lock.CMSIS_LOCK_NAME
+        original = json.loads(path.read_bytes())
+        selected = ("Include/stm32f103xe.h",
+                    "Source/Templates/gcc/startup_stm32f103xe.s")
+        self.verify_pair(selected_device_files=selected)
+        for member in selected:
+            del original["files"][member]
+        path.write_text(json.dumps(original))
+        self.verify_pair()
+        with self.assertRaisesRegex(ValueError, "header and startup must be locked"):
+            self.verify_pair(selected_device_files=selected)
 
     def test_rejects_device_bytes_changed_after_individual_device_proof(self):
         part = self.cmsis / "Include/stm32f103xb.h"

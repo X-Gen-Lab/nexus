@@ -8,6 +8,7 @@
  */
 #include "dispatch_checks.h"
 #include "instance.h"
+#include "nexus_config.h"
 #include "private/hardware.h"
 #include "stm32f1xx_ll_gpio.h"
 #include "stm32f1xx_ll_usart.h"
@@ -31,6 +32,12 @@
 #define NX_STM32F1_IRQ_CLEAR(irq)               NVIC_ClearPendingIRQ(irq)
 #endif
 
+#if defined(NEXUS_CLOCK_APB1_HZ)
+#define UART_CLOCK_HZ NEXUS_CLOCK_APB1_HZ
+#else
+#define UART_CLOCK_HZ 8000000U
+#endif
+
 #define RX_ERRORS                                                              \
     ((uint32_t)(USART_SR_PE | USART_SR_FE | USART_SR_NE | USART_SR_ORE))
 #define RX_STATUS     (RX_ERRORS | USART_SR_RXNE)
@@ -50,7 +57,7 @@ nx_result_t nx_stm32f1_uart_admit(const nx_stm32f1_uart_t* state,
     if (state == NULL || config == NULL || config->registers != USART2 ||
         config->irq != USART2_IRQn || config->tx_registers != GPIOA ||
         config->rx_registers != GPIOA || config->tx_pin != 2U ||
-        config->rx_pin != 3U || config->clock_hz != 8000000U ||
+        config->rx_pin != 3U || config->clock_hz != UART_CLOCK_HZ ||
         config->baud < 1200U || config->baud > 500000U ||
         config->priority >= (1U << __NVIC_PRIO_BITS) ||
         config->rx_capacity == 0U ||

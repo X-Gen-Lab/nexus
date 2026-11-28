@@ -36,5 +36,9 @@ capacity = 32
 priority = 5
 calls_os = false
 
+[crc.integrity]
+binding = "crc0"
+mode = "crc32-words"
+
 [factory]
 capabilities = true

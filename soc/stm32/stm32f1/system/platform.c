@@ -1,6 +1,6 @@
 /**
  * \file            platform.c
- * \brief           Reset HSI8, cold TIM2 lease and 16-bit monotonic timebase.
+ * \brief           Cold F103 clock ownership and 16-bit monotonic timebase.
  * \author          Nexus Team
  * \version         1.0.0
  * \date            2026-11-28
@@ -9,6 +9,7 @@
 #include "system/platform.h"
 #include "nexus/core/fault.h"
 #include "nexus/core/time.h"
+#include "nexus_config.h"
 #include "private/hardware.h"
 
 #ifndef NX_STM32F1_FLASH_KIB
@@ -28,10 +29,37 @@ static uint8_t effects;
 static uint8_t priority_before;
 static bool active;
 
+/* Select the PLL72 owner only for the reviewed bypass plan. */
+#if defined(NEXUS_CLOCK_HSE_BYPASS) && NEXUS_CLOCK_HSE_BYPASS == 1
+#if !defined(STM32F103xB) || !defined(NEXUS_CLOCK_SOURCE_HSE)
+#error "F103 HSE72 requires the reviewed xB 8 MHz bypass input"
+#endif
+#define NX_STM32F1_HSE72 1
+_Static_assert(
+    NEXUS_CLOCK_APB1_HZ == 36000000U && NEXUS_CLOCK_APB2_HZ == 72000000U &&
+        NEXUS_CLOCK_APB1_TIMER_HZ == 72000000U &&
+        NEXUS_CLOCK_FLASH_WAIT_STATES == 2U,
+    "F103 PLL72 bus timing and Flash latency must match the clock owner");
+#define TIMER_PRESCALER 71U
+#else
+#define TIMER_PRESCALER 7U
+#endif
+
 uint32_t SystemCoreClock = 8000000U;
 
 /** \brief Prove the fixed reset clock without changing foreign sources. */
 static bool hsi8_ready(void) {
+    const uint32_t clock_sources = RCC->CR;
+#if defined(RCC_CR_PLL2ON)
+    const uint32_t auxiliary =
+        RCC_CR_PLL2ON | RCC_CR_PLL2RDY | RCC_CR_PLL3ON | RCC_CR_PLL3RDY;
+    if ((clock_sources & auxiliary) != 0U)
+        return false;
+#endif
+#if defined(RCC_CFGR2_PREDIV1)
+    if (RCC->CFGR2 != 0U)
+        return false;
+#endif
     const uint32_t active_clock = RCC_CR_HSION | RCC_CR_HSIRDY | RCC_CR_HSITRIM;
     const uint32_t hsi8 =
         RCC_CR_HSION | RCC_CR_HSIRDY | (16U << RCC_CR_HSITRIM_Pos);
@@ -40,9 +68,114 @@ static bool hsi8_ready(void) {
                                      RCC_CR_PLLON | RCC_CR_PLLRDY;
     const uint32_t bus_dividers = RCC_CFGR_SW | RCC_CFGR_SWS | RCC_CFGR_HPRE |
                                   RCC_CFGR_PPRE1 | RCC_CFGR_PPRE2;
-    return (RCC->CR & (active_clock | foreign_sources)) == hsi8 &&
-           (RCC->CFGR & bus_dividers) == 0U && (FLASH->SR & FLASH_SR_BSY) == 0U;
+    /* PM0075 admits half-cycle access only below 8 MHz. Require the
+     * selected zero-wait profile without changing an inherited Flash mode. */
+#if defined(FLASH_ACR_LATENCY)
+    const uint32_t flash_timing = FLASH_ACR_HLFCYA | FLASH_ACR_LATENCY;
+#else
+    const uint32_t flash_timing = FLASH_ACR_HLFCYA;
+#endif
+    return (clock_sources & (active_clock | foreign_sources)) == hsi8 &&
+           (RCC->CFGR & bus_dividers) == 0U &&
+           (FLASH->ACR & flash_timing) == 0U &&
+           (FLASH->SR & FLASH_SR_BSY) == 0U;
 }
+
+#if defined(NX_STM32F1_HSE72)
+enum { CLOCK_CONFIG = 8U, CLOCK_READY_POLLS = 80000U };
+
+#define PLL_FIELDS (RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE | RCC_CFGR_PLLMULL)
+#define BUS_FIELDS                                                             \
+    (RCC_CFGR_HPRE | RCC_CFGR_PPRE1 | RCC_CFGR_PPRE2 | RCC_CFGR_ADCPRE)
+#define PLL72_SETTINGS                                                         \
+    (RCC_CFGR_PLLSRC | RCC_CFGR_PLLMULL9 | RCC_CFGR_PPRE1_DIV2 |               \
+     RCC_CFGR_ADCPRE_DIV6)
+
+static bool clock_idle(void) {
+    const uint32_t clock_irqs = RCC_CIR_LSIRDYIE | RCC_CIR_LSERDYIE |
+                                RCC_CIR_HSIRDYIE | RCC_CIR_HSERDYIE |
+                                RCC_CIR_PLLRDYIE | RCC_CIR_CSSF;
+    const uint32_t flash_state = FLASH_ACR_LATENCY | FLASH_ACR_HLFCYA |
+                                 FLASH_ACR_PRFTBE | FLASH_ACR_PRFTBS;
+    return RCC->AHBENR == (RCC_AHBENR_FLITFEN | RCC_AHBENR_SRAMEN) &&
+           RCC->APB1ENR == 0U && RCC->APB2ENR == 0U && RCC->APB1RSTR == 0U &&
+           RCC->APB2RSTR == 0U &&
+           (RCC->CFGR & (PLL_FIELDS | BUS_FIELDS | RCC_CFGR_MCO)) == 0U &&
+           (RCC->CIR & clock_irqs) == 0U &&
+           (FLASH->ACR & flash_state) == (FLASH_ACR_PRFTBE | FLASH_ACR_PRFTBS);
+}
+
+/** \brief Wait for a hardware acknowledgement before using its clock.
+ * \note This bounded iteration budget does not consume a timer epoch.
+ */
+static bool clock_wait(volatile const uint32_t* reg, uint32_t mask,
+                       uint32_t expected) {
+    unsigned remaining = CLOCK_READY_POLLS;
+    while ((*reg & mask) != expected) {
+        if (--remaining == 0U)
+            return false;
+    }
+    return true;
+}
+
+/** \brief Switch sources only after the dividers and Flash wait states are
+ * safe. */
+static nx_result_t clock_start(void) {
+    effects |= CLOCK_CONFIG;
+    /* Set bypass while HSE is off. Retain HSION for CSS and Flash writes. */
+    if (!nx_stm32f1_write_masked(&RCC->CR, RCC_CR_HSEBYP, RCC_CR_HSEBYP) ||
+        !nx_stm32f1_write_masked(&RCC->CR, RCC_CR_HSEON, RCC_CR_HSEON))
+        return NX_ERROR_IO;
+    if (!clock_wait(&RCC->CR, RCC_CR_HSERDY, RCC_CR_HSERDY))
+        return NX_ERROR_TIMEOUT;
+
+    if (!nx_stm32f1_write_masked(&RCC->CR, RCC_CR_CSSON, RCC_CR_CSSON) ||
+        !nx_stm32f1_write_masked(&FLASH->ACR, FLASH_ACR_LATENCY, 2U) ||
+        !nx_stm32f1_write_masked(&RCC->CFGR, PLL_FIELDS | BUS_FIELDS,
+                                 PLL72_SETTINGS) ||
+        !nx_stm32f1_write_masked(&RCC->CR, RCC_CR_PLLON, RCC_CR_PLLON))
+        return NX_ERROR_IO;
+    if (!clock_wait(&RCC->CR, RCC_CR_PLLRDY, RCC_CR_PLLRDY))
+        return NX_ERROR_TIMEOUT;
+    if (!nx_stm32f1_write_masked(&RCC->CFGR, RCC_CFGR_SW, RCC_CFGR_SW_PLL))
+        return NX_ERROR_IO;
+    if (!clock_wait(&RCC->CFGR, RCC_CFGR_SWS, RCC_CFGR_SWS_PLL))
+        return NX_ERROR_TIMEOUT;
+    nx_arch_isb();
+    SystemCoreClock = 72000000U;
+    return NX_SUCCESS;
+}
+
+/** \brief Restore the proven HSI clock before retiring the high-speed path. */
+static nx_result_t clock_stop(void) {
+    const uint32_t hsi = RCC_CR_HSION | RCC_CR_HSIRDY;
+    if ((RCC->CR & hsi) != hsi)
+        return NX_ERROR_IO;
+    if (!nx_stm32f1_write_masked(&RCC->CFGR, RCC_CFGR_SW, RCC_CFGR_SW_HSI))
+        return NX_ERROR_IO;
+    if (!clock_wait(&RCC->CFGR, RCC_CFGR_SWS, RCC_CFGR_SWS_HSI))
+        return NX_ERROR_TIMEOUT;
+    nx_arch_isb();
+    SystemCoreClock = 8000000U;
+
+    if (!nx_stm32f1_write_masked(&RCC->CR, RCC_CR_CSSON | RCC_CR_PLLON, 0U))
+        return NX_ERROR_IO;
+    if (!clock_wait(&RCC->CR, RCC_CR_PLLRDY, 0U))
+        return NX_ERROR_TIMEOUT;
+    if (!nx_stm32f1_write_masked(&RCC->CR, RCC_CR_HSEON, 0U))
+        return NX_ERROR_IO;
+    if (!clock_wait(&RCC->CR, RCC_CR_HSERDY, 0U))
+        return NX_ERROR_TIMEOUT;
+    if (!nx_stm32f1_write_masked(&RCC->CR, RCC_CR_HSEBYP, 0U) ||
+        !nx_stm32f1_write_masked(&RCC->CFGR, PLL_FIELDS | BUS_FIELDS, 0U) ||
+        !nx_stm32f1_write_masked(&FLASH->ACR, FLASH_ACR_LATENCY, 0U) ||
+        !hsi8_ready() || !clock_idle())
+        return NX_ERROR_IO;
+
+    effects &= (uint8_t)~CLOCK_CONFIG;
+    return NX_SUCCESS;
+}
+#endif
 
 /** \brief Reject a retained timer configuration before generating any event. */
 static bool timer_idle(void) {
@@ -57,7 +190,7 @@ static bool timer_idle(void) {
 /** \brief Finish setup by loading the prescaler while the counter is stopped.
  */
 static nx_result_t start_timer(void) {
-    if (!nx_stm32f1_write_masked(&TIM2->PSC, UINT16_MAX, 7U) ||
+    if (!nx_stm32f1_write_masked(&TIM2->PSC, UINT16_MAX, TIMER_PRESCALER) ||
         !nx_stm32f1_write_masked(&TIM2->CR2, TIM_CR2_MMS, TIM_CR2_MMS_0))
         return NX_ERROR_IO;
 
@@ -142,6 +275,10 @@ static nx_result_t release_system(void) {
             return NX_ERROR_IO;
         effects &= (uint8_t)~TIMER_GATE;
     }
+#if defined(NX_STM32F1_HSE72)
+    if ((effects & CLOCK_CONFIG) != 0U)
+        return clock_stop();
+#endif
     return NX_SUCCESS;
 }
 
@@ -174,7 +311,21 @@ nx_stm32f1_platform_system_start(const nx_stm32f1_platform_config_t* config) {
         result.primary = NX_ERROR_BUSY;
         return result;
     }
+#if defined(NX_STM32F1_HSE72)
+    if (!clock_idle()) {
+        result.primary = NX_ERROR_BUSY;
+        return result;
+    }
+    result.primary = clock_start();
+    if (result.primary != NX_SUCCESS) {
+        result.cleanup = release_system();
+        result.remaining_effects = effects;
+        return result;
+    }
+    effects |= TIMER_GATE;
+#else
     effects = TIMER_GATE;
+#endif
     if (!nx_stm32f1_write_masked(&RCC->APB1ENR, RCC_APB1ENR_TIM2EN,
                                  RCC_APB1ENR_TIM2EN)) {
         result.primary = NX_ERROR_IO;
@@ -253,3 +404,18 @@ void TIM2_IRQHandler(void) {
         elapsed_us += TIMER_PERIOD_US;
     nx_arch_dsb();
 }
+
+#if defined(NX_STM32F1_HSE72)
+void NMI_Handler(void);
+
+/** \brief CSS may switch to HSI in hardware; the old epoch cannot resume. */
+void NMI_Handler(void) {
+    (void)nx_arch_irq_save();
+    active = false;
+    NX_STM32F1_WRITE(&RCC->CIR, RCC_CIR_CSSC);
+    nx_arch_dsb();
+    nx_fault_observe(NX_FAULT_PLATFORM, NX_ERROR_IO, __FILE__, __LINE__);
+    for (;;) {
+    }
+}
+#endif

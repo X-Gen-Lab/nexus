@@ -8,10 +8,13 @@
 | 装配 | Flash 上限 | SRAM 上限 |
 | --- | ---: | ---: |
 | `f103rb-baremetal.toml` | 24 KiB | 6 KiB |
+| `f103rb-dma-tx.toml` | 24 KiB | 6 KiB |
 | `f103rb-freertos.toml` | 40 KiB | 12 KiB |
 | `f103c8-baremetal.toml` | 24 KiB | 6 KiB |
 
 SRAM 上限含 2 KiB MSP，libc heap 为零。FreeRTOS 应用任务使用 1 KiB 调用者栈。
+DMA 装配复用同一个应用和 USART2 公共接口。发送使用 DMA1 通道 7，接收仍由
+USART2 中断处理。发送直到 DMA 通道停止且串口完成发送后才归还缓冲区。
 C8 软件夹具用同一个应用核对封装、Flash 容量及额外上拉输入的静态装配。选中依赖和锁定工具链准备完成后，
 用以下入口构建。每份装配使用独立输出。
 

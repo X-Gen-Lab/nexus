@@ -3,6 +3,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass, replace
 from types import MappingProxyType
 
+from tools.configure.domains.fixed_channel_dma import FixedChannelDmaPolicy
 from tools.configure.generation.calls import Symbol
 from tools.configure.pinmux import NumericPinMuxPolicy, PinMuxPolicy, load_pinmux_policy
 from tools.configure.providers.common import fail, integer
@@ -68,9 +69,10 @@ class BindingPolicy:
     dma_facts: Mapping
     irq_facts: Mapping
     controller_irqs: Mapping
+    fixed_dma: FixedChannelDmaPolicy | None = None
 
     @classmethod
-    def from_validated(cls, value, *, pinmux=None):
+    def from_validated(cls, value, *, pinmux=None, fixed_dma=None):
         _fields(value, {"schema_version", "custom_clock_profile", "pinmux_policy", "system",
                         "mode_exclusions"}, {"pinmux", "software", "hardware", "domains", "pads"})
         if type(value["schema_version"]) is not int or value["schema_version"] != 1:
@@ -136,13 +138,15 @@ class BindingPolicy:
                 fail("DMA status bank requires an explicit L/H identity")
             integer(row["flag_shift"], 0, 31, "DMA flag shift")
             dma[name] = MappingProxyType(dict(row))
+        if dma and fixed_dma is not None:
+            fail("Stream and fixed channel DMA bindings cannot both own one package")
         return cls(profile, pinmux, MappingProxyType(oscillators),
                    Timebase.create(system["timebase"]),
                    tuple(ModeExclusion.create(item) for item in exclusions),
                    MappingProxyType({key: tuple(items)
                                      for key, items in pinmux_rules.items()}),
                    MappingProxyType(pads), MappingProxyType(dma),
-                   MappingProxyType({}), MappingProxyType({}))
+                   MappingProxyType({}), MappingProxyType({}), fixed_dma)
 
     def with_irq_bindings(self, bindings, controllers):
         """Reference the selected catalog's IRQ owner without another author."""
@@ -164,7 +168,18 @@ class BindingPolicy:
         return tuple(result)
 
     def dma_bindings(self, lanes):
-        from tools.configure.ir import DmaBindingIR
+        from tools.configure.ir import DmaBindingIR, FixedDmaBindingIR
+        if self.fixed_dma is not None:
+            result = []
+            for lane in lanes:
+                channel = self.fixed_dma.channel(lane.physical_key)
+                key = normalize_resource("irq:" + channel.irq).removeprefix("irq:")
+                vector = self.irq_facts.get(key)
+                if vector is None or vector.enum != channel.irq:
+                    fail("Selected DMA channel lacks a reviewed startup binding")
+                result.append(FixedDmaBindingIR(lane.lane, channel.engine,
+                    channel.channel, channel.irq, vector.handler))
+            return tuple(result)
         if not self.dma_facts:
             return ()
         result = []

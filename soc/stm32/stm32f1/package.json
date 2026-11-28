@@ -25,13 +25,23 @@
     "target": "nexus_soc_stm32f1"
   },
   "exports": {
-    "roots": ["."],
-    "exclude": ["tests", "testing", "__pycache__"]
+    "roots": [
+      "."
+    ],
+    "exclude": [
+      "tests",
+      "testing",
+      "__pycache__"
+    ]
   },
   "binding_files": [
     "system/binding.json",
     "drivers/gpio/binding.json",
     "drivers/uart/binding.json",
-    "drivers/flash/binding.json"
+    "drivers/flash/binding.json",
+    "drivers/watchdog/binding.json",
+    "drivers/crc/binding.json",
+    "drivers/i2c/binding.json",
+    "drivers/spi/binding.json"
   ]
 }

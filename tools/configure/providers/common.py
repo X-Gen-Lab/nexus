@@ -28,11 +28,19 @@ def fail(message, **details):
     raise ConfigurationError(message, **details)
 
 
+def fixed_dma_channel(value):
+    """Decode a canonical wired DMA channel with no request selector."""
+    match = re.fullmatch(r"dma:(DMA[1-9][0-9]*):channel([1-9][0-9]*)", value)
+    return (match[1], int(match[2])) if match is not None else None
+
+
 def normalize_resource(value):
     timer = re.fullmatch(r"(?:timer:|controller:)?(TIM[0-9]+|TIMER[0-9]+)", value)
     if timer is not None:
         return "controller:" + timer[1]
     if value.startswith("dma:"):
+        if fixed_dma_channel(value) is not None:
+            return value
         channel = re.fullmatch(r"dma:(GPDMA1):channel(0|[1-9][0-9]*)"
                                r"(?::request(0|[1-9][0-9]*))?", value)
         if channel is not None:

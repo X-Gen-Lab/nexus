@@ -42,9 +42,11 @@ OS 的静态对象、权限、IRQ 和退出要求见 [OS 合同](../contracts/os
 (stm32f1)=
 ### STM32F1
 
-F1 首批装配使用 Cortex-M3 soft-float、HSI8、1 MHz TIM2、GPIO 和 USART2 8N1
-字节 IRQ。Flash 页操作由单独的装配选择。已审精确能力见[派生矩阵](capabilities.md)，
-实体板时钟、串口焊桥、时序和闪存行为的 HIL 状态为 `not_executed`。
+F1 的 15 个精确料号覆盖官方 14 个 CMSIS 器件选择器。基础软件参考使用 Cortex-M3
+soft-float、HSI8、1 MHz TIM2、GPIO 和 USART2 8N1 IRQ。每个料号独立验证封装、
+向量、内存与实际 ARM 链接。F103RB 的 MCO 旁路软件参考提供 PLL72；选定的中密度
+组合另外开放有限 UART DMA TX、Flash 页操作、CRC／UID、IWDG、SPI2 与 I²C1。
+具体料号和模式见[派生矩阵](capabilities.md)。物理 HIL 为 `not_executed`。
 
 从仓库根使用 `stm32-f103rb-baremetal` 或 `stm32-f103rb-freertos` preset。
 引脚、电气约束以及独立 C／C++ 消费者的构建命令见

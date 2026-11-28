@@ -31,6 +31,11 @@
       "electrical": {
         "mode": "input"
       }
+    },
+    {
+      "id": "crc0",
+      "controller": "CRC",
+      "route": "crc-internal"
     }
   ],
   "reserved_resources": [

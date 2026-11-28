@@ -26,6 +26,10 @@ CMSIS_DIRECTORY = "vendors/st/cmsis_device_f1"
 LOCK_NAME = "dependencies/stm32f1-hal.lock.json"
 CMSIS_LOCK_NAME = "dependencies/stm32f1.lock.json"
 REVIEWED_FILES = frozenset({
+    "Inc/stm32f1xx_ll_crc.h",
+    "Inc/stm32f1xx_ll_spi.h",
+    "Inc/stm32f1xx_ll_iwdg.h",
+    "Inc/stm32f1xx_ll_utils.h",
     "Inc/stm32f1xx_ll_gpio.h", "Inc/stm32f1xx_ll_i2c.h",
     "Inc/stm32f1xx_ll_usart.h", "LICENSE.md",
 })
@@ -64,7 +68,7 @@ def contract(lock):
 
 
 def verify(source, lock_path, cmsis_source, *, packaged_commit=None,
-           packaged_cmsis_commit=None):
+           packaged_cmsis_commit=None, selected_device_files=()):
     """Verify a clean checkout or use the commits of an admitted Source SDK."""
     source = Path(source).absolute()
     cmsis = Path(cmsis_source).absolute()
@@ -92,6 +96,8 @@ def verify(source, lock_path, cmsis_source, *, packaged_commit=None,
     raw, device_identity = cmsis_device_lock.stable_snapshot(cmsis_lock)
     device_record = parse_json(raw)
     device_names = cmsis_device_lock.contract(device_record)
+    if not set(selected_device_files).issubset(device_names):
+        raise ValueError("Selected STM32F1 header and startup must be locked")
     if device_record["commit"] != CMSIS_COMMIT:
         raise ValueError("Device source lock is outside the reviewed F1 pairing")
     observed = {lock_path: identity, cmsis_lock: device_identity}
@@ -128,6 +134,8 @@ def main(arguments=None):
     parser.add_argument("--source", required=True, type=Path)
     parser.add_argument("--lock", required=True, type=Path)
     parser.add_argument("--cmsis-source", required=True, type=Path)
+    parser.add_argument("--device", nargs=2, default=(),
+                        metavar=("HEADER", "STARTUP"))
     options = parser.parse_args(arguments)
     try:
         source = options.source.absolute()
@@ -142,7 +150,8 @@ def main(arguments=None):
                 "packaged_commit": dependencies[DIRECTORY],
                 "packaged_cmsis_commit": dependencies[CMSIS_DIRECTORY],
             }
-        result = verify(source, options.lock, options.cmsis_source, **packaged)
+        result = verify(source, options.lock, options.cmsis_source,
+                        selected_device_files=options.device, **packaged)
         if packaged:
             result["configure_inputs"].append(str(manifest_path))
     except (OSError, ValueError, TypeError, KeyError, IndexError, ImportError) as error:

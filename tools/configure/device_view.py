@@ -86,7 +86,8 @@ def controller_profiles(soc):
     for device, profile in profiles.items():
         if (not isinstance(profile, dict) or
                 not {"controller_groups", "clock_policy"}.issubset(profile) or
-                set(profile) - {"controller_groups", "clock_policy", "part_prefix"}):
+                set(profile) - {"controller_groups", "clock_policy", "part_prefix",
+                                "cpu_features"}):
             fail("Device profile requires explicit controller groups and clock policy")
         if "part_prefix" in profile and (
                 not isinstance(profile["part_prefix"], str) or

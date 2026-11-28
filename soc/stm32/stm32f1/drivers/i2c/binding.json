@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "bindings": [
+    {
+      "kind": "i2c",
+      "mode": "poll-messages",
+      "controllers": [
+        "I2C1"
+      ],
+      "implementation": "i2c",
+      "headers": [
+        "drivers/i2c/instance.h"
+      ],
+      "limits": {
+        "max_hz": [
+          80000,
+          80000
+        ]
+      },
+      "static_recipe": {
+        "state_type": "nx_stm32f1_i2c_t",
+        "ops": "nx_stm32f1_i2c_ops",
+        "declarations": [],
+        "calls": {
+          "prepare": {
+            "function": "nx_stm32f1_i2c_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "source": "selected.clock_hz",
+                "as": "u32"
+              },
+              {
+                "source": "item.options.max_hz",
+                "as": "u32"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32f1_i2c_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "retain_on_failed_init": true,
+        "child_groups": {
+          "limit": 64,
+          "cases": {
+            "i2c-endpoint": {
+              "parents": {
+                "parent_port": "port"
+              },
+              "declarations": [
+                {
+                  "role": "endpoint",
+                  "type": "nx_stm32f1_i2c_endpoint_t",
+                  "const": false,
+                  "value": {
+                    "record": [
+                      [
+                        "port",
+                        {
+                          "ref": "parent_port",
+                          "as": "address"
+                        }
+                      ],
+                      [
+                        "address",
+                        {
+                          "source": "item.child.options.address",
+                          "as": "u32"
+                        }
+                      ]
+                    ]
+                  }
+                }
+              ],
+              "calls": {
+                "prepare": [],
+                "close": []
+              },
+              "face": {
+                "type": "nx_i2c_endpoint_t",
+                "ops": "nx_stm32f1_i2c_endpoint_ops",
+                "context": {
+                  "ref": "endpoint",
+                  "as": "address"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

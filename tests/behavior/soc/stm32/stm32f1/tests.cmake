@@ -28,3 +28,8 @@ target_compile_options(
 
 include("${CMAKE_CURRENT_LIST_DIR}/system/tests.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/flash/flash.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/watchdog/watchdog.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/uart_dma.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/crc/tests.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/i2c/i2c.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/spi/tests.cmake")

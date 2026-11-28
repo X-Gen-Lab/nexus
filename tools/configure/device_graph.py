@@ -114,6 +114,11 @@ def resolve(assembly, *, root, soc, board, routes, bindings,
             if mode not in route["modes"]:
                 fail(f"Unsupported mode {mode} for {selection['binding']}; "
                      f"allowed: {', '.join(route['modes'])}")
+            profiles = route.get("clock_profiles")
+            if profiles is not None and (clock_plan is None or
+                                         clock_plan["profile"] not in profiles):
+                fail(f"Route {route['id']} requires clock profile "
+                     + ", ".join(profiles))
             if route["kind"] == "rtc":
                 from tools.configure import rtc
                 rtc.validate_board(selection, board)

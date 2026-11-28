@@ -324,7 +324,9 @@ class DataProvider(DomainBridge):
         profiles = (ProfileSet.from_validated(read(package.fact("review_profiles")))
                     if "review_profiles" in package.facts else None)
         return cls(package, soc, selected["software"], policies, hardware,
-                   BindingPolicy.from_validated(selected, pinmux=pinmux), profiles)
+                   BindingPolicy.from_validated(selected, pinmux=pinmux,
+                                                fixed_dma=policies.FIXED_CHANNEL_DMA),
+                   profiles)
 
     def __post_init__(self):
         _fields(self.software, {"enum_abi", "backends", "headers", "bindings"},

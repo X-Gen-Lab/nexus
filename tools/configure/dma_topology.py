@@ -9,6 +9,7 @@ SETTLED before reclaiming descriptors or payloads.
 from dataclasses import asdict, dataclass
 import re
 
+from tools.configure.providers.common import fixed_dma_channel
 from tools.configure.resource_graph import fail, identifier, json_value, number, record
 
 
@@ -21,7 +22,7 @@ class DmaLaneIR:
     controller: str
     engine: str
     lane: int
-    request: int
+    request: int | None
     physical_key: str
 
 
@@ -108,7 +109,6 @@ def resolve_selected(selected, provider):
             engine, lane, request = provider.validate_dma_resource(
                 "dma:" + path)
             number(lane, 0, 65535, "DMA physical lane")
-            number(request, 0, 65535, "DMA request selector")
             if type(engine) is str:
                 # Named engines need an explicit family physical-identity hook;
                 # channel-based GPDMA is never reinterpreted as a DMA stream.
@@ -125,6 +125,8 @@ def resolve_selected(selected, provider):
                 number(engine, 0, 255, "DMA engine")
                 engine_name = f"DMA{engine}"
                 physical = f"dma:{engine_name}:stream{lane}"
+            if request is not None or fixed_dma_channel(physical) != (engine, lane):
+                number(request, 0, 65535, "DMA request selector")
             if physical in occupied:
                 fail(f"DMA physical lane conflict: {physical}")
             occupied.add(physical)

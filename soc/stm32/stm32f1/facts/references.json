@@ -12,7 +12,8 @@
       "anchors": {
         "device_features": "Table 2 p10; SRAM, timers and communication interfaces by exact variant",
         "package_gpio": "Figures 6/8 pp24/26 and Table 5 pp28ff, LQFP64 and LQFP48",
-        "clock": "Section 2.3.7; HSI oscillator characteristics in Section 5.3.7"
+        "clock": "Section 2.3.7; HSI oscillator characteristics in Section 5.3.7",
+        "iwdg": "Table 25, LSI timing characterization at VDD = 3.0 V"
       }
     },
     "rm0008": {
@@ -24,12 +25,15 @@
       "sha256": "4c1b8ac2729cc1f45a4685eea9e91e6139e24e58804fba21e27201dfcc2ad149",
       "bytes": 13119424,
       "anchors": {
-        "clock": "Section 7 low/medium/high/XL RCC; HSI SYSCLK and APB1/APB2",
+        "clock": "Section 7 low/medium/high/XL RCC; HSI8, HSE bypass, PLL72, CSS and APB clocks",
         "gpio": "Sections 9.1 and 9.4 CRL/CRH, BSRR and input/output behavior",
         "uart_route": "Section 9.3.8 USART alternate function remapping",
         "timebase": "Section 15, TIM2 general-purpose 16-bit counter",
+        "iwdg": "Section 19 and Table 96, independent watchdog and nominal 40 kHz bounds",
         "uart": "Section 27, USART, SR/DR flags, BRR and wire completion",
-        "identity": "Section 30.1.1 Flash size in the electronic signature"
+        "identity": "Section 30.1.1 Flash size in the electronic signature",
+        "dma": "Table 78 p282 wires USART2 TX to DMA1 channel 7",
+        "serial_buses": "Sections 9.3.9, 9.3.10, 26 and 28; actual default I2C1 and SPI2 routes"
       }
     },
     "es096": {
@@ -42,7 +46,276 @@
       "bytes": 956332,
       "anchors": {
         "scope": "Tables 1-3 medium-density applicability and silicon revisions",
-        "review": "Selected HSI8 GPIO, USART and Flash operating boundaries, see software audit"
+        "review": "Selected fixed-run GPIO, USART, Flash and IWDG operating boundaries, see software audit",
+        "dma": "Sections 2.4.1 and 2.4.2 cover individual flag clears and 32-bit DMA register access",
+        "serial_buses": "Sections 2.3.5 to 2.3.7, 2.8.1 to 2.8.7 and 2.10.1 to 2.10.2"
+      }
+    },
+    "ds5936": {
+      "document_id": "DS5936",
+      "kind": "datasheet",
+      "revision": "7",
+      "document_date": "June 2015",
+      "url": "https://www.st.com/resource/en/datasheet/stm32f103c6.pdf",
+      "sha256": "31ab1fe3de6e6cf3e97ce9a2329794edc012d7e6ec52f8a69af672562d8363cd",
+      "bytes": 2068410,
+      "anchors": {
+        "package_gpio": "Figure 5 p24 and Table 5 p26 onward, LQFP48",
+        "device_features": "p11 Table 2 per-part memory and peripherals overrides conflicting family prose on p10"
+      }
+    },
+    "es0348": {
+      "document_id": "ES0348",
+      "kind": "errata",
+      "revision": "10",
+      "document_date": "June 2022",
+      "url": "https://www.st.com/resource/en/errata_sheet/es0348-stm32f101x46-stm32f102x46-stm32f103x46-device-errata-stmicroelectronics.pdf",
+      "sha256": "58f35f7cac7dd9470dd4fcdfd58b4b547707e0b58981cb91c8af379e5ede923c",
+      "bytes": 633319,
+      "anchors": {
+        "scope": "p1 Table 2 A/1 revision id 0x1000",
+        "review": "Selected HSI8 system and GPIO/USART2 operating boundaries, see software audit"
+      }
+    },
+    "ds5792": {
+      "document_id": "DS5792",
+      "kind": "datasheet",
+      "revision": "13",
+      "document_date": "July 2018",
+      "url": "https://www.st.com/resource/en/datasheet/stm32f103ze.pdf",
+      "sha256": "c61db5e362b62f2fa8307d6bd07728e8a6adab0f453653aa7eace4b1cfc848bc",
+      "bytes": 3282238,
+      "anchors": {
+        "package_gpio": "Figure 5 p27 and Table 5 p31 onward, LQFP144",
+        "device_features": "Table 2 part data"
+      }
+    },
+    "es0340": {
+      "document_id": "ES0340",
+      "kind": "errata",
+      "revision": "17",
+      "document_date": "June 2022",
+      "url": "https://www.st.com/resource/en/errata_sheet/es0340-stm32f101xcde-stm32f103xcde-device-errata-stmicroelectronics.pdf",
+      "sha256": "724fed9df69ff5b3469aa00a591ca39f3534234ad129273bd6f11ab9e2f11d8c",
+      "bytes": 886926,
+      "anchors": {
+        "scope": "p1 Table 2 Z/1/Y/2/3/X",
+        "review": "Selected HSI8 system and GPIO/USART2 operating boundaries, see software audit"
+      }
+    },
+    "ds6558": {
+      "document_id": "DS6558",
+      "kind": "datasheet",
+      "revision": "4",
+      "document_date": "May 2015",
+      "url": "https://www.st.com/resource/en/datasheet/stm32f103zg.pdf",
+      "sha256": "69897f9cf77df3f06f68d4dc085848bb6a595ba3d2d64011ac28c4852c6b3d0f",
+      "bytes": 2229015,
+      "anchors": {
+        "package_gpio": "Figure 4 p26 and Table 5 p29 onward, LQFP144",
+        "device_features": "Table 2 part data"
+      }
+    },
+    "es0346": {
+      "document_id": "ES0346",
+      "kind": "errata",
+      "revision": "7",
+      "document_date": "July 2022",
+      "url": "https://www.st.com/resource/en/errata_sheet/es0346-stm32f101xfg-and-stm32f103xfg-xldensity-device-errata-stmicroelectronics.pdf",
+      "sha256": "26e737cfc59e50af73315d0784732da62447f0e5dada151e25d8ee3ddedaaa78",
+      "bytes": 839479,
+      "anchors": {
+        "scope": "p1 Table 2 1/A",
+        "review": "Selected HSI8 system and GPIO/USART2 operating boundaries, see software audit"
+      }
+    },
+    "ds6517": {
+      "document_id": "DS6517",
+      "kind": "datasheet",
+      "revision": "9",
+      "document_date": "November 2016",
+      "url": "https://www.st.com/resource/en/datasheet/stm32f100rb.pdf",
+      "sha256": "360e3be010cabad4ad70d33107c689ab5c47c53e5a83adb0ea55954f9e180998",
+      "bytes": 1828268,
+      "anchors": {
+        "memory": "Table 2 p11",
+        "pinout": "Figure 4 p23 and Table 4 pp24ff",
+        "hsi": "Table 23 p50",
+        "ordering": "Ordering information scheme, internal code B"
+      }
+    },
+    "ds5318": {
+      "document_id": "DS5318",
+      "kind": "datasheet",
+      "revision": "17",
+      "document_date": "June 2015",
+      "url": "https://www.st.com/resource/en/datasheet/stm32f101rb.pdf",
+      "sha256": "860032e75b7a7da11935c474ee08fb80778a93a5882ae7658f91ca6044c8fbe5",
+      "bytes": 1772372,
+      "anchors": {
+        "memory": "Table 2 p11",
+        "pinout": "Figure 4 p22 and Table 4 pp24ff",
+        "hsi": "Table 23 p49"
+      }
+    },
+    "ds5933": {
+      "document_id": "DS5933",
+      "kind": "datasheet",
+      "revision": "7",
+      "document_date": "August 2019",
+      "url": "https://www.st.com/resource/en/datasheet/stm32f102rb.pdf",
+      "sha256": "276652841a00ce34151f1898fcca4637cd5431b3a13af5c215555c6b3fa9c96a",
+      "bytes": 1591902,
+      "anchors": {
+        "memory": "Table 2 p10",
+        "pinout": "Figure 4 p20 and Table 4 pp21ff",
+        "hsi": "Table 23 p45"
+      }
+    },
+    "ds6014": {
+      "document_id": "DS6014",
+      "kind": "datasheet",
+      "revision": "10",
+      "document_date": "March 2017",
+      "url": "https://www.st.com/resource/en/datasheet/stm32f107vc.pdf",
+      "sha256": "ca4bad652e5eb36d504c70cfd482c494307ce460b2d6b6f3fb3c45e0bd871d12",
+      "bytes": 2189218,
+      "anchors": {
+        "memory": "Table 2 p10",
+        "pinout": "Figure 3 p25 and Table 5 pp27ff",
+        "hsi": "Table 24 p52",
+        "clock": "Tables 27 and 28 p53 for the three PLLs"
+      }
+    },
+    "rm0041": {
+      "document_id": "RM0041",
+      "kind": "reference_manual",
+      "revision": "6",
+      "document_date": "December 2022",
+      "url": "https://www.st.com/resource/en/reference_manual/rm0041-stm32f100xx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf",
+      "sha256": "c841a7ef2290fece2154dd35434faacd575a4475a425b870b2f21fc83e63b3d3",
+      "bytes": 8498335,
+      "anchors": {
+        "hsi": "Sections 6.2.2 and 6.3.1\u20132",
+        "clock_extra": "Section 6.3.11 RCC_CFGR2",
+        "pinmux": "Section 7.3.5 USART2 remap",
+        "timebase": "Section 13 TIM2 16-bit"
+      }
+    },
+    "es093": {
+      "document_id": "ES093",
+      "kind": "errata",
+      "revision": "8",
+      "document_date": "July 2022",
+      "url": "https://www.st.com/resource/en/errata_sheet/es093-stm32f100x4-stm32f100x6-stm32f100x8-and-stm32f100xb-low-and-mediumdensity-value-line-device-errata-stmicroelectronics.pdf",
+      "sha256": "6e553ddfd67631068d6781735ba8db7f202e67d49b65082013c4a3773b09e8fc",
+      "bytes": 580071,
+      "anchors": {
+        "scope": "Tables 1\u20133, internal code B and revision order 1/Z",
+        "hsi": "Section 2.1.2 WFE",
+        "uart": "Sections 2.3.8 and 2.9.1\u20132",
+        "uid": "Section 2.2.3 restricts UID before date code 045"
+      }
+    },
+    "es022": {
+      "document_id": "ES022",
+      "kind": "errata",
+      "revision": "11",
+      "document_date": "June 2022",
+      "url": "https://www.st.com/resource/en/errata_sheet/es022-stm32f105xx-stm32f107xx-device-errata-stmicroelectronics.pdf",
+      "sha256": "1597acc5dd8f028193a1d19f6f9f85468c6a925f3886367ac661364b30e2e749",
+      "bytes": 439088,
+      "anchors": {
+        "scope": "Tables 1\u20133, revision order 2/Z",
+        "hsi": "Sections 2.1.2 and 2.2.1",
+        "clock_transition": "Section 2.2.10 switching/restarting PLL after nontrivial HSE input",
+        "uart": "Sections 2.3.6 and 2.9.2\u20133",
+        "future_usb_ethernet": "Chapters 2.13\u20132.14, including Ethernet DMA with WFI/WFE"
+      }
+    },
+    "ds5944": {
+      "document_id": "DS5944",
+      "kind": "datasheet",
+      "revision": "11",
+      "document_date": "October 2018",
+      "url": "https://www.st.com/resource/en/datasheet/stm32f100ze.pdf",
+      "sha256": "37ac4e5d049f3b5ddbfb508402091dec5ceb0f37505fc54f247eeecc816b082f",
+      "bytes": 1888416,
+      "anchors": {
+        "memory": "Table 2 p11",
+        "pins": "Figure 3 p23 and Table 4 p25 onward",
+        "hsi": "Table 24 p54"
+      }
+    },
+    "ds5935": {
+      "document_id": "DS5935",
+      "kind": "datasheet",
+      "revision": "6",
+      "document_date": "September 2015",
+      "url": "https://www.st.com/resource/en/datasheet/stm32f101c6.pdf",
+      "sha256": "a0484b8e7d5434bfe43c683984bcc8c6cb9918c2c28011dc8d2b74ff37322535",
+      "bytes": 1533125,
+      "anchors": {
+        "memory": "Table 2 p11",
+        "pins": "Figure 4 p21 and Table 4 p23 onward",
+        "hsi": "Table 23 p47"
+      }
+    },
+    "ds5791": {
+      "document_id": "DS5791",
+      "kind": "datasheet",
+      "revision": "9",
+      "document_date": "May 2015",
+      "url": "https://www.st.com/resource/en/datasheet/stm32f101ze.pdf",
+      "sha256": "1828693b7ac44c2e023a6fa04186c21f170d2a3333f479da1ab0a2605f425e60",
+      "bytes": 1900156,
+      "anchors": {
+        "memory": "Table 2 p11",
+        "pins": "Figure 3 p23 and Table 5 p25 onward",
+        "hsi": "Table 25 p56"
+      }
+    },
+    "ds6557": {
+      "document_id": "DS6557",
+      "kind": "datasheet",
+      "revision": "5",
+      "document_date": "December 2016",
+      "url": "https://www.st.com/resource/en/datasheet/stm32f101zg.pdf",
+      "sha256": "e5abb35fc7fda921e64f3463b8f3342ebb1153edf6365ec61fb88c30e1d1be96",
+      "bytes": 1843255,
+      "anchors": {
+        "memory": "Table 2 p11 and embedded Flash chapter",
+        "pins": "Figure 3 p23 and Table 5 p25 onward",
+        "hsi": "Table 25 p54",
+        "mpu": "Memory protection unit supports eight areas"
+      }
+    },
+    "ds5934": {
+      "document_id": "DS5934",
+      "kind": "datasheet",
+      "revision": "6",
+      "document_date": "August 2019",
+      "url": "https://www.st.com/resource/en/datasheet/stm32f102c6.pdf",
+      "sha256": "0045b6f265d9902419fb9bbc90ca4e3af0e4e89b988c5f569ea14a6c7ad53748",
+      "bytes": 1430836,
+      "anchors": {
+        "memory": "Table 2",
+        "pins": "Figure 3 p20 and Table 4 p21 onward",
+        "hsi": "Table 23 p44"
+      }
+    },
+    "es0136": {
+      "document_id": "ES0136",
+      "kind": "errata",
+      "revision": "7",
+      "document_date": "August 2022",
+      "url": "https://www.st.com/resource/en/errata_sheet/es0136-stm32f100xc-stm32f100xd-and-stm32f100xe-highdensity-value-line-device-errata-stmicroelectronics.pdf",
+      "sha256": "06e943b853660f361c4efc9bdd5c3ae2c2ef23ddfd090de3b93b8758461febd7",
+      "bytes": 572768,
+      "anchors": {
+        "scope": "Tables 1\u20133 exact internal code B and silicon A",
+        "baseline": "\u00a72.1.2 WFE, \u00a72.3.8 TX adoption, \u00a72.10.1 idle and \u00a72.10.2 parity",
+        "flash": "\u00a72.2.7 post-STRT BSY latency outside selected baseline"
       }
     }
   },
@@ -55,6 +328,110 @@
       ],
       "status": "package_gpio_reviewed",
       "scope": "Exact LQFP64 and LQFP48 bonded pads and selected default routes. Board wiring is separate."
+    },
+    {
+      "document": "ds5936",
+      "variants": [
+        "STM32F103C6T6A"
+      ],
+      "status": "package_gpio_reviewed",
+      "scope": "Bonded LQFP48 pads in Figure 5 p24 and Table 5 p26 onward, LQFP48. No carrier wiring is claimed."
+    },
+    {
+      "document": "ds5792",
+      "variants": [
+        "STM32F103ZET6"
+      ],
+      "status": "package_gpio_reviewed",
+      "scope": "Bonded LQFP144 pads in Figure 5 p27 and Table 5 p31 onward, LQFP144. No carrier wiring is claimed."
+    },
+    {
+      "document": "ds6558",
+      "variants": [
+        "STM32F103ZGT6"
+      ],
+      "status": "package_gpio_reviewed",
+      "scope": "Bonded LQFP144 pads in Figure 4 p26 and Table 5 p29 onward, LQFP144. No carrier wiring is claimed."
+    },
+    {
+      "document": "ds6517",
+      "variants": [
+        "STM32F100RBT6B"
+      ],
+      "status": "package_gpio_reviewed",
+      "scope": "Exact LQFP64 bonded pins. PA2 and PA3 use the default USART2 route, and PA5 is a GPIO output."
+    },
+    {
+      "document": "ds5318",
+      "variants": [
+        "STM32F101RBT6"
+      ],
+      "status": "package_gpio_reviewed",
+      "scope": "Exact LQFP64 bonded pins. PA2 and PA3 use the default USART2 route, and PA5 is a GPIO output."
+    },
+    {
+      "document": "ds5933",
+      "variants": [
+        "STM32F102RBT6"
+      ],
+      "status": "package_gpio_reviewed",
+      "scope": "Exact LQFP64 bonded pins. PA2 and PA3 use the default USART2 route, and PA5 is a GPIO output."
+    },
+    {
+      "document": "ds6014",
+      "variants": [
+        "STM32F105VCT6"
+      ],
+      "status": "package_gpio_reviewed",
+      "scope": "Exact LQFP100 bonded pins. PA2 and PA3 use the default USART2 route, and PA5 is a GPIO output."
+    },
+    {
+      "document": "ds6014",
+      "variants": [
+        "STM32F107VCT6"
+      ],
+      "status": "package_gpio_reviewed",
+      "scope": "Exact LQFP100 bonded pins. PA2 and PA3 use the default USART2 route, and PA5 is a GPIO output."
+    },
+    {
+      "document": "ds5944",
+      "variants": [
+        "STM32F100ZET6B"
+      ],
+      "status": "package_gpio_reviewed",
+      "scope": "Exact LQFP144 bonded pads. Default USART2 uses PA2 and PA3. PA5 is the GPIO output route."
+    },
+    {
+      "document": "ds5935",
+      "variants": [
+        "STM32F101C6T6A"
+      ],
+      "status": "package_gpio_reviewed",
+      "scope": "Exact LQFP48 bonded pads. Default USART2 uses PA2 and PA3. PA5 is the GPIO output route."
+    },
+    {
+      "document": "ds5791",
+      "variants": [
+        "STM32F101ZET6"
+      ],
+      "status": "package_gpio_reviewed",
+      "scope": "Exact LQFP144 bonded pads. Default USART2 uses PA2 and PA3. PA5 is the GPIO output route."
+    },
+    {
+      "document": "ds6557",
+      "variants": [
+        "STM32F101ZGT6"
+      ],
+      "status": "package_gpio_reviewed",
+      "scope": "Exact LQFP144 bonded pads. Default USART2 uses PA2 and PA3. PA5 is the GPIO output route."
+    },
+    {
+      "document": "ds5934",
+      "variants": [
+        "STM32F102C6T6A"
+      ],
+      "status": "package_gpio_reviewed",
+      "scope": "Exact LQFP48 bonded pads. Default USART2 uses PA2 and PA3. PA5 is the GPIO output route."
     }
   ],
   "device_reviews": [
@@ -70,7 +447,7 @@
       "hardware_qualification": "not_executed",
       "identification": "ES096 Tables 1-3 and Section 2.2.2. The electronic Flash-size signature is a capacity check; physical device marking or debug observation gates revision claims.",
       "software_audit": {
-        "profile": "es096-rev15-f103-md-hsi8",
+        "profile": "es096-rev15-f103-md-run",
         "document_sha256": "7bcdf58d8b602292d68abb59e181a4f44a038f215d8b01b0167f6d7139285490",
         "revision_order": [
           "A",
@@ -83,8 +460,717 @@
           "X"
         ],
         "maintained_modes": [
+          "crc:crc32-words",
           "flash:poll-halfword",
           "gpio:input",
+          "gpio:output",
+          "i2c:poll-messages",
+          "spi:short-poll",
+          "uart:dma-tx",
+          "uart:irq-byte-event",
+          "watchdog:independent"
+        ],
+        "items": [
+          {
+            "section": "2.1.2",
+            "title": "Cortex-M3 event register omission",
+            "revisions": "AAAAAAAA",
+            "assessment": "external_constraint",
+            "condition": "Interrupt pending before WFE may miss an event.",
+            "handling": "The reviewed software slice offers no WFE low-power policy.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/bindings.json"
+            ],
+            "regressions": []
+          },
+          {
+            "section": "2.2.1",
+            "title": "Flash read after WFI or WFE",
+            "revisions": "AAAAAAAA",
+            "assessment": "external_constraint",
+            "condition": "Sleep may disrupt reads when using two wait states and prefetch with the Flash interface clock gated.",
+            "handling": "HSI8 uses zero wait states. PLL72 requires the Flash interface gate and retains it. The reviewed run path leaves Stop and Standby outside this scope.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/clocks.json"
+            ],
+            "regressions": []
+          },
+          {
+            "section": "2.2.2",
+            "title": "DBGMCU debug registers inaccessible to user firmware",
+            "revisions": "NNNNNNNN",
+            "assessment": "silicon_limit",
+            "condition": "Ordinary firmware may observe zero for DBGMCU_IDCODE and DBGMCU_CR.",
+            "handling": "Flash-size halfword provides a capacity check. Physical revision and debug freeze belong to the external probe.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/soc.json",
+              "soc/stm32/stm32f1/drivers/watchdog/watchdog.c"
+            ],
+            "regressions": []
+          },
+          {
+            "section": "2.2.11",
+            "title": "Flash memory BSY latency after STRT",
+            "revisions": "AAAAAAAA",
+            "assessment": "workaround",
+            "condition": "BSY can read clear on the first bus cycle after starting page erase.",
+            "handling": "Complete and read back the control write before polling status. The controller then requires EOP without an error flag and verifies the page.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/flash/flash.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/flash/flash_test.cpp"
+            ]
+          },
+          {
+            "section": "2.2.12",
+            "title": "LSI clock stabilization time",
+            "revisions": "AAAAAAAA",
+            "assessment": "workaround",
+            "condition": "The oscillator can remain outside the specified frequency range after LSIRDY asserts.",
+            "handling": "Wait 128 nominal microseconds after LSIRDY on the selected HSI8 timebase. Observe an owned clock request and settle it before irreversible activation.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/watchdog/watchdog.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/watchdog/watchdog_test.cpp"
+            ]
+          },
+          {
+            "section": "2.3.5",
+            "title": "SPI2 master and USART3 synchronous clock",
+            "revisions": "AAAAAAAA",
+            "assessment": "external_constraint",
+            "condition": "SPI2 software NSS prevents the synchronous USART3 clock on PB12.",
+            "handling": "The short-poll profile uses PB12 as software CS. No USART3 synchronous controller is admitted.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/routes.json"
+            ],
+            "regressions": []
+          },
+          {
+            "section": "2.3.6",
+            "title": "I2C2 SMBA and SPI2 NSS share PB12",
+            "revisions": "AAAAAAAA",
+            "assessment": "external_constraint",
+            "condition": "I2C2 enabled can take ownership of PB12 when it is an alternate function output.",
+            "handling": "SPI2 uses a GPIO software CS. The fixture selects I2C1 and no I2C2 controller.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/routes.json"
+            ],
+            "regressions": []
+          },
+          {
+            "section": "2.3.7",
+            "title": "Remapped SPI1 master and I2C1 SMBA conflict",
+            "revisions": "AAAAAAAA",
+            "assessment": "external_constraint",
+            "condition": "Remapped SPI1 PB5 MOSI conflicts with I2C1 SMBA when both peripheral clocks are on.",
+            "handling": "The closed software slice uses SPI2 and the default I2C1. No SPI1 remap is defined.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/routes.json"
+            ],
+            "regressions": []
+          },
+          {
+            "section": "2.4.1",
+            "title": "DMA channel disable and transfer error when clearing the global flag",
+            "revisions": "AAAAAAAA",
+            "assessment": "workaround",
+            "condition": "A simultaneous transfer error and whole-channel flag clear may leave the channel enabled and hide TEIF.",
+            "handling": "Withdraw the USART DMA request, disable and verify the channel, inspect late TEIF, then clear individual TCIF, HTIF and TEIF flags with an aligned 32-bit IFCR write. Section 2.4.2 requires aligned 32-bit DMA register accesses.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/uart/uart_dma.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/uart_dma_test.cpp"
+            ]
+          },
+          {
+            "section": "2.7.1",
+            "title": "RVU remains set at low APB clock frequency",
+            "revisions": "AAAAAAAA",
+            "assessment": "workaround",
+            "condition": "An APB frequency below twice the IWDG clock can prevent the reload update flag from clearing.",
+            "handling": "Admit the live HSI8 / APB1 8 MHz clock before activation. Bound the RVU wait and retain the irreversible owner on failure.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/watchdog/watchdog.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/watchdog/watchdog_test.cpp"
+            ]
+          },
+          {
+            "section": "2.7.2",
+            "title": "PVU remains set at low APB clock frequency",
+            "revisions": "AAAAAAAA",
+            "assessment": "workaround",
+            "condition": "An APB frequency below twice the IWDG clock can prevent the prescaler update flag from clearing.",
+            "handling": "Require the same reviewed APB1 clock and wait for both PVU and RVU before verifying the nominal settings.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/watchdog/watchdog.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/watchdog/watchdog_test.cpp"
+            ]
+          },
+          {
+            "section": "2.7.3",
+            "title": "RVU and PVU remain set in Stop mode",
+            "revisions": "AAAAAAAA",
+            "assessment": "workaround",
+            "condition": "Entering Stop immediately after updating the watchdog registers can leave update flags pending.",
+            "handling": "Wait for both shadow flags in Run and retain irreversible effects on failure. This mode does not expose Stop.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/watchdog/watchdog.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/watchdog/watchdog_test.cpp"
+            ]
+          },
+          {
+            "section": "2.8.1",
+            "title": "I2C byte events must precede the next transfer",
+            "revisions": "AAAAAAAA",
+            "assessment": "workaround",
+            "condition": "Late software handling can duplicate, miss or introduce bytes.",
+            "handling": "Hold SCL where ACK/STOP ordering requires a dedicated window and wait for BTF for longer reads and controller writes.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/i2c/i2c.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/i2c/i2c_test.cpp"
+            ]
+          },
+          {
+            "section": "2.8.2",
+            "title": "I2C receive data may corrupt around STOP",
+            "revisions": "AAAAAAAA",
+            "assessment": "workaround",
+            "condition": "Delayed final DR reads can corrupt the final received byte.",
+            "handling": "The two-byte and longer receive paths hold SCL across the critical DR/STOP sequence.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/i2c/i2c.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/i2c/i2c_test.cpp"
+            ]
+          },
+          {
+            "section": "2.8.3",
+            "title": "SMBus cannot always NACK an invalid payload",
+            "revisions": "AAAAAAAA",
+            "assessment": "silicon_limit",
+            "condition": "The hardware cannot satisfy every SMBus v2.0 acknowledgment contract.",
+            "handling": "The admitted mode is a seven-bit I2C polling controller without SMBus.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/routes.json"
+            ],
+            "regressions": []
+          },
+          {
+            "section": "2.8.4",
+            "title": "Misplaced I2C STOP inhibits a new START",
+            "revisions": "AAAAAAAA",
+            "assessment": "workaround",
+            "condition": "A misplaced STOP can stall SB detection or make an attempted START report BERR.",
+            "handling": "Bound the wait for SB. A failed pending START enters a local reset using CR1.SWRST; the owner must explicitly recover.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/i2c/i2c.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/i2c/i2c_test.cpp"
+            ]
+          },
+          {
+            "section": "2.8.5",
+            "title": "I2C repeated START timing at 88 to 100 kHz",
+            "revisions": "AAAAAAAA",
+            "assessment": "workaround",
+            "condition": "Master standard mode can violate repeated START setup when a target stretches or the SCL rise exceeds the rated margin.",
+            "handling": "Admit the exact nominal 80 kHz HSI8 profile, with APB1-8MHz CR2 FREQ 8, CCR 50 and TRISE 9.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/i2c/i2c.c",
+              "soc/stm32/stm32f1/drivers/i2c/binding.json"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/i2c/i2c_test.cpp"
+            ]
+          },
+          {
+            "section": "2.8.6",
+            "title": "I2C slave data valid time can be late",
+            "revisions": "AAAAAAAA",
+            "assessment": "silicon_limit",
+            "condition": "Slave transmit with no clock stretching can miss data timing without OVR.",
+            "handling": "The slice admits only the polling master role.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/routes.json"
+            ],
+            "regressions": []
+          },
+          {
+            "section": "2.8.7",
+            "title": "Analog I2C filters can hold BUSY after local reset",
+            "revisions": "AAAAAAAA",
+            "assessment": "external_constraint",
+            "condition": "A stuck analog filter needs externally safe electrical transitions before reset can clear BUSY.",
+            "handling": "Local recovery uses CR1.SWRST and verified idle lines. Persistent BUSY remains an error; this fixture does not issue unqualified GPIO recovery pulses.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/i2c/i2c.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/i2c/i2c_test.cpp"
+            ]
+          },
+          {
+            "section": "2.9.2",
+            "title": "USART idle frame detection at receiver clock deviation",
+            "revisions": "NNNNNNNN",
+            "assessment": "silicon_limit",
+            "condition": "Clock mismatch can prevent detection of IDLE.",
+            "handling": "The initial USART2 mode owns a byte IRQ ring; it does not depend on IDLE or promise gap timing.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/routes.json"
+            ],
+            "regressions": []
+          },
+          {
+            "section": "2.9.3",
+            "title": "USART transmit can clear receiver parity error",
+            "revisions": "AAAAAAAA",
+            "assessment": "silicon_limit",
+            "condition": "With parity enabled in full duplex, a data-register write can clear the receiver PE flag.",
+            "handling": "The initial USART2 mode uses 8N1. Production parity modes require a separate review.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/routes.json"
+            ],
+            "regressions": []
+          },
+          {
+            "section": "2.10.1",
+            "title": "SPI slave CRC may accumulate even with NSS high",
+            "revisions": "AAAAAAAA",
+            "assessment": "silicon_limit",
+            "condition": "The SPI slave CRC can observe the shared clock while the slave is unselected.",
+            "handling": "This mode selects controller polling without hardware CRC or slave operation.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/spi/spi.c"
+            ],
+            "regressions": []
+          },
+          {
+            "section": "2.10.2",
+            "title": "SPI CRC is sensitive to another device on the same DMA channel",
+            "revisions": "AAAAAAAA",
+            "assessment": "silicon_limit",
+            "condition": "Simultaneous DMA traffic on a shared request channel can corrupt SPI CRC.",
+            "handling": "SPI2 short-poll claims neither DMA nor hardware CRC.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/routes.json"
+            ],
+            "regressions": []
+          }
+        ]
+      }
+    },
+    {
+      "devices": [
+        "stm32f103-ld"
+      ],
+      "manual": "rm0008",
+      "document": "es0348",
+      "status": "software_audited_with_constraints",
+      "silicon_revision": "not_observed",
+      "mode_workarounds": "audited_with_constraints",
+      "hardware_qualification": "not_executed",
+      "identification": "ES0348 Tables 1\u20133 and Section 2.2.2. Flash-size signature only establishes capacity. Identify the actual marking and silicon cut externally.",
+      "software_audit": {
+        "profile": "es0348-rev10-f103-ld-hsi8",
+        "document_sha256": "58f35f7cac7dd9470dd4fcdfd58b4b547707e0b58981cb91c8af379e5ede923c",
+        "revision_order": [
+          "A",
+          "1"
+        ],
+        "maintained_modes": [
+          "gpio:output",
+          "uart:irq-byte-event"
+        ],
+        "items": [
+          {
+            "section": "2.1.2",
+            "title": "Cortex-M3 event register omission",
+            "revisions": "AA",
+            "assessment": "external_constraint",
+            "condition": "Interrupt pending before WFE may miss an event.",
+            "handling": "The reviewed software slice offers no WFE low-power policy.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/bindings.json"
+            ],
+            "regressions": []
+          },
+          {
+            "section": "2.2.1",
+            "title": "Flash read after WFI or WFE",
+            "revisions": "AA",
+            "assessment": "external_constraint",
+            "condition": "Sleep may disrupt reads when using two wait states and prefetch with the Flash interface clock gated.",
+            "handling": "The HSI8 run profile uses zero wait states and does not gate the Flash interface to sleep.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/clocks.json"
+            ],
+            "regressions": []
+          },
+          {
+            "section": "2.2.2",
+            "title": "DBGMCU debug registers inaccessible to user firmware",
+            "revisions": "NN",
+            "assessment": "silicon_limit",
+            "condition": "Ordinary firmware may observe zero for DBGMCU_IDCODE and DBGMCU_CR.",
+            "handling": "Flash-size halfword provides a capacity check. Physical revision and debug freeze belong to the external probe.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/soc.json"
+            ],
+            "regressions": []
+          },
+          {
+            "title": "USART TX pin remains owned during receive-only use",
+            "assessment": "external_constraint",
+            "condition": "When the USART is enabled, clearing TE can still hold the alternate-function TX line high.",
+            "handling": "The reviewed USART2 mode owns both TX and RX for the whole activation; an alternate driver cannot take PA2 from it.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/routes.json"
+            ],
+            "regressions": [],
+            "section": "2.3.6",
+            "revisions": "AA"
+          },
+          {
+            "section": "2.9.2",
+            "title": "USART idle frame detection at receiver clock deviation",
+            "revisions": "NN",
+            "assessment": "silicon_limit",
+            "condition": "Clock mismatch can prevent detection of IDLE.",
+            "handling": "The initial USART2 mode owns a byte IRQ ring; it does not depend on IDLE or promise gap timing.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/routes.json"
+            ],
+            "regressions": []
+          },
+          {
+            "section": "2.9.3",
+            "title": "USART transmit can clear receiver parity error",
+            "revisions": "AA",
+            "assessment": "silicon_limit",
+            "condition": "With parity enabled in full duplex, a data-register write can clear the receiver PE flag.",
+            "handling": "The initial USART2 mode uses 8N1. Production parity modes require a separate review.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/routes.json"
+            ],
+            "regressions": []
+          }
+        ]
+      }
+    },
+    {
+      "devices": [
+        "stm32f103-hd"
+      ],
+      "manual": "rm0008",
+      "document": "es0340",
+      "status": "software_audited_with_constraints",
+      "silicon_revision": "not_observed",
+      "mode_workarounds": "audited_with_constraints",
+      "hardware_qualification": "not_executed",
+      "identification": "ES0340 Tables 1\u20133 and Section 2.2.2. Flash-size signature only establishes capacity. Identify the actual marking and silicon cut externally.",
+      "software_audit": {
+        "profile": "es0340-rev17-f103-hd-hsi8",
+        "document_sha256": "724fed9df69ff5b3469aa00a591ca39f3534234ad129273bd6f11ab9e2f11d8c",
+        "revision_order": [
+          "Z",
+          "1",
+          "Y",
+          "2",
+          "3",
+          "X"
+        ],
+        "maintained_modes": [
+          "gpio:output",
+          "uart:irq-byte-event"
+        ],
+        "items": [
+          {
+            "section": "2.1.2",
+            "title": "Cortex-M3 event register omission",
+            "revisions": "AAAAAA",
+            "assessment": "external_constraint",
+            "condition": "Interrupt pending before WFE may miss an event.",
+            "handling": "The reviewed software slice offers no WFE low-power policy.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/bindings.json"
+            ],
+            "regressions": []
+          },
+          {
+            "section": "2.2.1",
+            "title": "Flash read after WFI or WFE",
+            "revisions": "AAAAAA",
+            "assessment": "external_constraint",
+            "condition": "Sleep may disrupt reads when using two wait states and prefetch with the Flash interface clock gated.",
+            "handling": "The HSI8 run profile uses zero wait states and does not gate the Flash interface to sleep.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/clocks.json"
+            ],
+            "regressions": []
+          },
+          {
+            "section": "2.2.2",
+            "title": "DBGMCU debug registers inaccessible to user firmware",
+            "revisions": "NNNNNN",
+            "assessment": "silicon_limit",
+            "condition": "Ordinary firmware may observe zero for DBGMCU_IDCODE and DBGMCU_CR.",
+            "handling": "Flash-size halfword provides a capacity check. Physical revision and debug freeze belong to the external probe.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/soc.json"
+            ],
+            "regressions": []
+          },
+          {
+            "title": "USART TX pin remains owned during receive-only use",
+            "assessment": "external_constraint",
+            "condition": "When the USART is enabled, clearing TE can still hold the alternate-function TX line high.",
+            "handling": "The reviewed USART2 mode owns both TX and RX for the whole activation; an alternate driver cannot take PA2 from it.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/routes.json"
+            ],
+            "regressions": [],
+            "section": "2.3.13",
+            "revisions": "AAAAAA"
+          },
+          {
+            "section": "2.10.2",
+            "title": "USART idle frame detection at receiver clock deviation",
+            "revisions": "NNNNNN",
+            "assessment": "silicon_limit",
+            "condition": "Clock mismatch can prevent detection of IDLE.",
+            "handling": "The initial USART2 mode owns a byte IRQ ring; it does not depend on IDLE or promise gap timing.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/routes.json"
+            ],
+            "regressions": []
+          },
+          {
+            "section": "2.10.3",
+            "title": "USART transmit can clear receiver parity error",
+            "revisions": "AAAAAA",
+            "assessment": "silicon_limit",
+            "condition": "With parity enabled in full duplex, a data-register write can clear the receiver PE flag.",
+            "handling": "The initial USART2 mode uses 8N1. Production parity modes require a separate review.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/routes.json"
+            ],
+            "regressions": []
+          }
+        ]
+      }
+    },
+    {
+      "devices": [
+        "stm32f103-xl"
+      ],
+      "manual": "rm0008",
+      "document": "es0346",
+      "status": "software_audited_with_constraints",
+      "silicon_revision": "not_observed",
+      "mode_workarounds": "audited_with_constraints",
+      "hardware_qualification": "not_executed",
+      "identification": "ES0346 Tables 1\u20133 and Section 2.2.2. Flash-size signature only establishes capacity. Identify the actual marking and silicon cut externally.",
+      "software_audit": {
+        "profile": "es0346-rev7-f103-xl-hsi8",
+        "document_sha256": "26e737cfc59e50af73315d0784732da62447f0e5dada151e25d8ee3ddedaaa78",
+        "revision_order": [
+          "1",
+          "A"
+        ],
+        "maintained_modes": [
+          "gpio:output",
+          "uart:irq-byte-event"
+        ],
+        "items": [
+          {
+            "section": "2.1.2",
+            "title": "Cortex-M3 event register omission",
+            "revisions": "AA",
+            "assessment": "external_constraint",
+            "condition": "Interrupt pending before WFE may miss an event.",
+            "handling": "The reviewed software slice offers no WFE low-power policy.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/bindings.json"
+            ],
+            "regressions": []
+          },
+          {
+            "section": "2.2.1",
+            "title": "Flash read after WFI or WFE",
+            "revisions": "AA",
+            "assessment": "external_constraint",
+            "condition": "Sleep may disrupt reads when using two wait states and prefetch with the Flash interface clock gated.",
+            "handling": "The HSI8 run profile uses zero wait states and does not gate the Flash interface to sleep.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/clocks.json"
+            ],
+            "regressions": []
+          },
+          {
+            "section": "2.2.2",
+            "title": "DBGMCU debug registers inaccessible to user firmware",
+            "revisions": "NN",
+            "assessment": "silicon_limit",
+            "condition": "Ordinary firmware may observe zero for DBGMCU_IDCODE and DBGMCU_CR.",
+            "handling": "Flash-size halfword provides a capacity check. Physical revision and debug freeze belong to the external probe.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/soc.json"
+            ],
+            "regressions": []
+          },
+          {
+            "title": "USART TX pin remains owned during receive-only use",
+            "assessment": "external_constraint",
+            "condition": "When the USART is enabled, clearing TE can still hold the alternate-function TX line high.",
+            "handling": "The reviewed USART2 mode owns both TX and RX for the whole activation; an alternate driver cannot take PA2 from it.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/routes.json"
+            ],
+            "regressions": [],
+            "section": "2.3.9",
+            "revisions": "AA"
+          },
+          {
+            "section": "2.10.2",
+            "title": "USART idle frame detection at receiver clock deviation",
+            "revisions": "NN",
+            "assessment": "silicon_limit",
+            "condition": "Clock mismatch can prevent detection of IDLE.",
+            "handling": "The initial USART2 mode owns a byte IRQ ring; it does not depend on IDLE or promise gap timing.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/routes.json"
+            ],
+            "regressions": []
+          },
+          {
+            "section": "2.10.3",
+            "title": "USART transmit can clear receiver parity error",
+            "revisions": "AA",
+            "assessment": "silicon_limit",
+            "condition": "With parity enabled in full duplex, a data-register write can clear the receiver PE flag.",
+            "handling": "The initial USART2 mode uses 8N1. Production parity modes require a separate review.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/routes.json"
+            ],
+            "regressions": []
+          }
+        ]
+      }
+    },
+    {
+      "devices": [
+        "stm32f100xb"
+      ],
+      "manual": "rm0041",
+      "document": "es093",
+      "status": "software_audited_with_constraints",
+      "silicon_revision": "not_observed",
+      "mode_workarounds": "audited_with_constraints",
+      "hardware_qualification": "not_executed",
+      "identification": "ES093 Tables 1\u20133 identify the exact silicon group. The linked Flash-size signature checks capacity. Physical marking or a probe is needed to observe the cut.",
+      "software_audit": {
+        "profile": "es093-rev8-f100xb-hsi8",
+        "document_sha256": "6e553ddfd67631068d6781735ba8db7f202e67d49b65082013c4a3773b09e8fc",
+        "revision_order": [
+          "1",
+          "Z"
+        ],
+        "maintained_modes": [
+          "gpio:output",
+          "uart:irq-byte-event"
+        ],
+        "items": [
+          {
+            "section": "2.1.2",
+            "title": "Cortex-M3 event register omission",
+            "revisions": "AA",
+            "assessment": "external_constraint",
+            "condition": "Interrupt pending before WFE may miss an event.",
+            "handling": "The reviewed software slice offers no WFE low-power policy.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/bindings.json"
+            ],
+            "regressions": []
+          },
+          {
+            "title": "USART TX pin remains owned during receive-only use",
+            "assessment": "external_constraint",
+            "condition": "When the USART is enabled, clearing TE can still hold the alternate-function TX line high.",
+            "handling": "The reviewed USART2 mode owns both TX and RX for the whole activation; an alternate driver cannot take PA2 from it.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/routes.json"
+            ],
+            "regressions": [],
+            "section": "2.3.8",
+            "revisions": "AA"
+          },
+          {
+            "section": "2.9.1",
+            "title": "USART idle frame detection at receiver clock deviation",
+            "revisions": "NN",
+            "assessment": "silicon_limit",
+            "condition": "Clock mismatch can prevent detection of IDLE.",
+            "handling": "The initial USART2 mode owns a byte IRQ ring; it does not depend on IDLE or promise gap timing.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/routes.json"
+            ],
+            "regressions": []
+          },
+          {
+            "section": "2.9.2",
+            "title": "USART transmit can clear receiver parity error",
+            "revisions": "AA",
+            "assessment": "silicon_limit",
+            "condition": "With parity enabled in full duplex, a data-register write can clear the receiver PE flag.",
+            "handling": "The initial USART2 mode uses 8N1. Production parity modes require a separate review.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/routes.json"
+            ],
+            "regressions": []
+          }
+        ]
+      }
+    },
+    {
+      "devices": [
+        "stm32f101xb"
+      ],
+      "manual": "rm0008",
+      "document": "es096",
+      "status": "software_audited_with_constraints",
+      "silicon_revision": "not_observed",
+      "mode_workarounds": "audited_with_constraints",
+      "hardware_qualification": "not_executed",
+      "identification": "ES096 Tables 1\u20133 identify the exact silicon group. The linked Flash-size signature checks capacity. Physical marking or a probe is needed to observe the cut.",
+      "software_audit": {
+        "profile": "es096-rev15-f101xb-hsi8",
+        "document_sha256": "7bcdf58d8b602292d68abb59e181a4f44a038f215d8b01b0167f6d7139285490",
+        "revision_order": [
+          "A",
+          "B",
+          "Z",
+          "1",
+          "Y",
+          "2",
+          "3",
+          "X"
+        ],
+        "maintained_modes": [
           "gpio:output",
           "uart:irq-byte-event"
         ],
@@ -126,18 +1212,16 @@
             "regressions": []
           },
           {
-            "section": "2.2.11",
-            "title": "Flash memory BSY latency after STRT",
-            "revisions": "AAAAAAAA",
-            "assessment": "workaround",
-            "condition": "BSY can read clear on the first bus cycle after starting page erase.",
-            "handling": "Complete and read back the control write before polling status. The controller then requires EOP without an error flag and verifies the page.",
+            "title": "USART TX pin remains owned during receive-only use",
+            "assessment": "external_constraint",
+            "condition": "When the USART is enabled, clearing TE can still hold the alternate-function TX line high.",
+            "handling": "The reviewed USART2 mode owns both TX and RX for the whole activation; an alternate driver cannot take PA2 from it.",
             "implementation": [
-              "soc/stm32/stm32f1/drivers/flash/flash.c"
+              "soc/stm32/stm32f1/facts/routes.json"
             ],
-            "regressions": [
-              "tests/behavior/soc/stm32/stm32f1/flash/flash_test.cpp"
-            ]
+            "regressions": [],
+            "section": "2.3.9",
+            "revisions": "AAAAAAAA"
           },
           {
             "section": "2.9.2",
@@ -165,11 +1249,782 @@
           }
         ]
       }
+    },
+    {
+      "devices": [
+        "stm32f102xb"
+      ],
+      "manual": "rm0008",
+      "document": "es096",
+      "status": "software_audited_with_constraints",
+      "silicon_revision": "not_observed",
+      "mode_workarounds": "audited_with_constraints",
+      "hardware_qualification": "not_executed",
+      "identification": "ES096 Tables 1\u20133 identify the exact silicon group. The linked Flash-size signature checks capacity. Physical marking or a probe is needed to observe the cut.",
+      "software_audit": {
+        "profile": "es096-rev15-f102xb-hsi8",
+        "document_sha256": "7bcdf58d8b602292d68abb59e181a4f44a038f215d8b01b0167f6d7139285490",
+        "revision_order": [
+          "A",
+          "1",
+          "Y",
+          "2",
+          "3",
+          "X"
+        ],
+        "maintained_modes": [
+          "gpio:output",
+          "uart:irq-byte-event"
+        ],
+        "items": [
+          {
+            "section": "2.1.2",
+            "title": "Cortex-M3 event register omission",
+            "revisions": "AAAAAA",
+            "assessment": "external_constraint",
+            "condition": "Interrupt pending before WFE may miss an event.",
+            "handling": "The reviewed software slice offers no WFE low-power policy.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/bindings.json"
+            ],
+            "regressions": []
+          },
+          {
+            "section": "2.2.1",
+            "title": "Flash read after WFI or WFE",
+            "revisions": "AAAAAA",
+            "assessment": "external_constraint",
+            "condition": "Sleep may disrupt reads when using two wait states and prefetch with the Flash interface clock gated.",
+            "handling": "The HSI8 run profile uses zero wait states and does not gate the Flash interface to sleep.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/clocks.json"
+            ],
+            "regressions": []
+          },
+          {
+            "section": "2.2.2",
+            "title": "DBGMCU debug registers inaccessible to user firmware",
+            "revisions": "NNNNNN",
+            "assessment": "silicon_limit",
+            "condition": "Ordinary firmware may observe zero for DBGMCU_IDCODE and DBGMCU_CR.",
+            "handling": "Flash-size halfword provides a capacity check. Physical revision and debug freeze belong to the external probe.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/soc.json"
+            ],
+            "regressions": []
+          },
+          {
+            "title": "USART TX pin remains owned during receive-only use",
+            "assessment": "external_constraint",
+            "condition": "When the USART is enabled, clearing TE can still hold the alternate-function TX line high.",
+            "handling": "The reviewed USART2 mode owns both TX and RX for the whole activation; an alternate driver cannot take PA2 from it.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/routes.json"
+            ],
+            "regressions": [],
+            "section": "2.3.9",
+            "revisions": "AAAAAA"
+          },
+          {
+            "section": "2.9.2",
+            "title": "USART idle frame detection at receiver clock deviation",
+            "revisions": "NNNNNN",
+            "assessment": "silicon_limit",
+            "condition": "Clock mismatch can prevent detection of IDLE.",
+            "handling": "The initial USART2 mode owns a byte IRQ ring; it does not depend on IDLE or promise gap timing.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/routes.json"
+            ],
+            "regressions": []
+          },
+          {
+            "section": "2.9.3",
+            "title": "USART transmit can clear receiver parity error",
+            "revisions": "AAAAAA",
+            "assessment": "silicon_limit",
+            "condition": "With parity enabled in full duplex, a data-register write can clear the receiver PE flag.",
+            "handling": "The initial USART2 mode uses 8N1. Production parity modes require a separate review.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/routes.json"
+            ],
+            "regressions": []
+          }
+        ]
+      }
+    },
+    {
+      "devices": [
+        "stm32f105xc"
+      ],
+      "manual": "rm0008",
+      "document": "es022",
+      "status": "software_audited_with_constraints",
+      "silicon_revision": "not_observed",
+      "mode_workarounds": "audited_with_constraints",
+      "hardware_qualification": "not_executed",
+      "identification": "ES022 Tables 1\u20133 identify the exact silicon group. The linked Flash-size signature checks capacity. Physical marking or a probe is needed to observe the cut.",
+      "software_audit": {
+        "profile": "es022-rev11-f105xc-hsi8",
+        "document_sha256": "1597acc5dd8f028193a1d19f6f9f85468c6a925f3886367ac661364b30e2e749",
+        "revision_order": [
+          "2",
+          "Z"
+        ],
+        "maintained_modes": [
+          "gpio:output",
+          "uart:irq-byte-event"
+        ],
+        "items": [
+          {
+            "section": "2.1.2",
+            "title": "Cortex-M3 event register omission",
+            "revisions": "AA",
+            "assessment": "external_constraint",
+            "condition": "Interrupt pending before WFE may miss an event.",
+            "handling": "The reviewed software slice offers no WFE low-power policy.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/bindings.json"
+            ],
+            "regressions": []
+          },
+          {
+            "section": "2.2.1",
+            "title": "Flash read after WFI or WFE",
+            "revisions": "AA",
+            "assessment": "external_constraint",
+            "condition": "Sleep may disrupt reads when using two wait states and prefetch with the Flash interface clock gated.",
+            "handling": "The HSI8 run profile uses zero wait states and does not gate the Flash interface to sleep.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/clocks.json"
+            ],
+            "regressions": []
+          },
+          {
+            "title": "PLL relock after switching its clock source to HSI divided by two",
+            "assessment": "external_constraint",
+            "condition": "After certain HSE or PLL2 paths, selecting HSI/2 for the main PLL can prevent lock.",
+            "handling": "The reviewed run plan uses HSI directly and leaves the connectivity PLLs off.",
+            "implementation": [
+              "soc/stm32/stm32f1/system/platform.c"
+            ],
+            "regressions": [],
+            "section": "2.2.10",
+            "revisions": "AA"
+          },
+          {
+            "title": "USART TX pin remains owned during receive-only use",
+            "assessment": "external_constraint",
+            "condition": "When the USART is enabled, clearing TE can still hold the alternate-function TX line high.",
+            "handling": "The reviewed USART2 mode owns both TX and RX for the whole activation; an alternate driver cannot take PA2 from it.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/routes.json"
+            ],
+            "regressions": [],
+            "section": "2.3.6",
+            "revisions": "AA"
+          },
+          {
+            "section": "2.9.2",
+            "title": "USART idle frame detection at receiver clock deviation",
+            "revisions": "NN",
+            "assessment": "silicon_limit",
+            "condition": "Clock mismatch can prevent detection of IDLE.",
+            "handling": "The initial USART2 mode owns a byte IRQ ring; it does not depend on IDLE or promise gap timing.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/routes.json"
+            ],
+            "regressions": []
+          },
+          {
+            "section": "2.9.3",
+            "title": "USART transmit can clear receiver parity error",
+            "revisions": "AA",
+            "assessment": "silicon_limit",
+            "condition": "With parity enabled in full duplex, a data-register write can clear the receiver PE flag.",
+            "handling": "The initial USART2 mode uses 8N1. Production parity modes require a separate review.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/routes.json"
+            ],
+            "regressions": []
+          }
+        ]
+      }
+    },
+    {
+      "devices": [
+        "stm32f107xc"
+      ],
+      "manual": "rm0008",
+      "document": "es022",
+      "status": "software_audited_with_constraints",
+      "silicon_revision": "not_observed",
+      "mode_workarounds": "audited_with_constraints",
+      "hardware_qualification": "not_executed",
+      "identification": "ES022 Tables 1\u20133 identify the exact silicon group. The linked Flash-size signature checks capacity. Physical marking or a probe is needed to observe the cut.",
+      "software_audit": {
+        "profile": "es022-rev11-f107xc-hsi8",
+        "document_sha256": "1597acc5dd8f028193a1d19f6f9f85468c6a925f3886367ac661364b30e2e749",
+        "revision_order": [
+          "2",
+          "Z"
+        ],
+        "maintained_modes": [
+          "gpio:output",
+          "uart:irq-byte-event"
+        ],
+        "items": [
+          {
+            "section": "2.1.2",
+            "title": "Cortex-M3 event register omission",
+            "revisions": "AA",
+            "assessment": "external_constraint",
+            "condition": "Interrupt pending before WFE may miss an event.",
+            "handling": "The reviewed software slice offers no WFE low-power policy.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/bindings.json"
+            ],
+            "regressions": []
+          },
+          {
+            "section": "2.2.1",
+            "title": "Flash read after WFI or WFE",
+            "revisions": "AA",
+            "assessment": "external_constraint",
+            "condition": "Sleep may disrupt reads when using two wait states and prefetch with the Flash interface clock gated.",
+            "handling": "The HSI8 run profile uses zero wait states and does not gate the Flash interface to sleep.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/clocks.json"
+            ],
+            "regressions": []
+          },
+          {
+            "title": "PLL relock after switching its clock source to HSI divided by two",
+            "assessment": "external_constraint",
+            "condition": "After certain HSE or PLL2 paths, selecting HSI/2 for the main PLL can prevent lock.",
+            "handling": "The reviewed run plan uses HSI directly and leaves the connectivity PLLs off.",
+            "implementation": [
+              "soc/stm32/stm32f1/system/platform.c"
+            ],
+            "regressions": [],
+            "section": "2.2.10",
+            "revisions": "AA"
+          },
+          {
+            "title": "USART TX pin remains owned during receive-only use",
+            "assessment": "external_constraint",
+            "condition": "When the USART is enabled, clearing TE can still hold the alternate-function TX line high.",
+            "handling": "The reviewed USART2 mode owns both TX and RX for the whole activation; an alternate driver cannot take PA2 from it.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/routes.json"
+            ],
+            "regressions": [],
+            "section": "2.3.6",
+            "revisions": "AA"
+          },
+          {
+            "section": "2.9.2",
+            "title": "USART idle frame detection at receiver clock deviation",
+            "revisions": "NN",
+            "assessment": "silicon_limit",
+            "condition": "Clock mismatch can prevent detection of IDLE.",
+            "handling": "The initial USART2 mode owns a byte IRQ ring; it does not depend on IDLE or promise gap timing.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/routes.json"
+            ],
+            "regressions": []
+          },
+          {
+            "section": "2.9.3",
+            "title": "USART transmit can clear receiver parity error",
+            "revisions": "AA",
+            "assessment": "silicon_limit",
+            "condition": "With parity enabled in full duplex, a data-register write can clear the receiver PE flag.",
+            "handling": "The initial USART2 mode uses 8N1. Production parity modes require a separate review.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/routes.json"
+            ],
+            "regressions": []
+          }
+        ]
+      }
+    },
+    {
+      "devices": [
+        "stm32f100xe"
+      ],
+      "manual": "rm0041",
+      "document": "es0136",
+      "status": "software_audited_with_constraints",
+      "silicon_revision": "not_observed",
+      "mode_workarounds": "audited_with_constraints",
+      "hardware_qualification": "not_executed",
+      "identification": "ES0136 Tables 1\u20133 identify the exact silicon group. Flash size verifies capacity. Observe the silicon cut separately.",
+      "software_audit": {
+        "profile": "es0136-rev7-f100xe-hsi8",
+        "document_sha256": "06e943b853660f361c4efc9bdd5c3ae2c2ef23ddfd090de3b93b8758461febd7",
+        "revision_order": [
+          "A"
+        ],
+        "maintained_modes": [
+          "gpio:output",
+          "uart:irq-byte-event"
+        ],
+        "items": [
+          {
+            "section": "2.1.2",
+            "title": "Cortex-M3 event register omission",
+            "revisions": "A",
+            "assessment": "external_constraint",
+            "condition": "Interrupt pending before WFE may miss an event.",
+            "handling": "The reviewed software slice offers no WFE low-power policy.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/bindings.json"
+            ],
+            "regressions": []
+          },
+          {
+            "title": "USART TX pin remains owned during receive-only use",
+            "assessment": "external_constraint",
+            "condition": "When the USART is enabled, clearing TE can still hold the alternate-function TX line high.",
+            "handling": "The reviewed USART2 mode owns both TX and RX for the whole activation; an alternate driver cannot take PA2 from it.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/routes.json"
+            ],
+            "regressions": [],
+            "section": "2.3.8",
+            "revisions": "A"
+          },
+          {
+            "section": "2.10.1",
+            "title": "USART idle frame detection at receiver clock deviation",
+            "revisions": "N",
+            "assessment": "silicon_limit",
+            "condition": "Clock mismatch can prevent detection of IDLE.",
+            "handling": "The initial USART2 mode owns a byte IRQ ring; it does not depend on IDLE or promise gap timing.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/routes.json"
+            ],
+            "regressions": []
+          },
+          {
+            "section": "2.10.2",
+            "title": "USART transmit can clear receiver parity error",
+            "revisions": "A",
+            "assessment": "silicon_limit",
+            "condition": "With parity enabled in full duplex, a data-register write can clear the receiver PE flag.",
+            "handling": "The initial USART2 mode uses 8N1. Production parity modes require a separate review.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/routes.json"
+            ],
+            "regressions": []
+          }
+        ]
+      }
+    },
+    {
+      "devices": [
+        "stm32f101x6"
+      ],
+      "manual": "rm0008",
+      "document": "es0348",
+      "status": "software_audited_with_constraints",
+      "silicon_revision": "not_observed",
+      "mode_workarounds": "audited_with_constraints",
+      "hardware_qualification": "not_executed",
+      "identification": "ES0348 Tables 1\u20133 identify the exact silicon group. Flash size verifies capacity. Observe the silicon cut separately.",
+      "software_audit": {
+        "profile": "es0348-rev10-f101x6-hsi8",
+        "document_sha256": "58f35f7cac7dd9470dd4fcdfd58b4b547707e0b58981cb91c8af379e5ede923c",
+        "revision_order": [
+          "A",
+          "1"
+        ],
+        "maintained_modes": [
+          "gpio:output",
+          "uart:irq-byte-event"
+        ],
+        "items": [
+          {
+            "section": "2.1.2",
+            "title": "Cortex-M3 event register omission",
+            "revisions": "AA",
+            "assessment": "external_constraint",
+            "condition": "Interrupt pending before WFE may miss an event.",
+            "handling": "The reviewed software slice offers no WFE low-power policy.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/bindings.json"
+            ],
+            "regressions": []
+          },
+          {
+            "section": "2.2.1",
+            "title": "Flash read after WFI or WFE",
+            "revisions": "AA",
+            "assessment": "external_constraint",
+            "condition": "Sleep may disrupt reads when using two wait states and prefetch with the Flash interface clock gated.",
+            "handling": "The HSI8 run profile uses zero wait states and does not gate the Flash interface to sleep.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/clocks.json"
+            ],
+            "regressions": []
+          },
+          {
+            "section": "2.2.2",
+            "title": "DBGMCU debug registers inaccessible to user firmware",
+            "revisions": "NN",
+            "assessment": "silicon_limit",
+            "condition": "Ordinary firmware may observe zero for DBGMCU_IDCODE and DBGMCU_CR.",
+            "handling": "Flash-size halfword provides a capacity check. Physical revision and debug freeze belong to the external probe.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/soc.json"
+            ],
+            "regressions": []
+          },
+          {
+            "title": "USART TX pin remains owned during receive-only use",
+            "assessment": "external_constraint",
+            "condition": "When the USART is enabled, clearing TE can still hold the alternate-function TX line high.",
+            "handling": "The reviewed USART2 mode owns both TX and RX for the whole activation; an alternate driver cannot take PA2 from it.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/routes.json"
+            ],
+            "regressions": [],
+            "section": "2.3.6",
+            "revisions": "AA"
+          },
+          {
+            "section": "2.9.2",
+            "title": "USART idle frame detection at receiver clock deviation",
+            "revisions": "NN",
+            "assessment": "silicon_limit",
+            "condition": "Clock mismatch can prevent detection of IDLE.",
+            "handling": "The initial USART2 mode owns a byte IRQ ring; it does not depend on IDLE or promise gap timing.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/routes.json"
+            ],
+            "regressions": []
+          },
+          {
+            "section": "2.9.3",
+            "title": "USART transmit can clear receiver parity error",
+            "revisions": "AA",
+            "assessment": "silicon_limit",
+            "condition": "With parity enabled in full duplex, a data-register write can clear the receiver PE flag.",
+            "handling": "The initial USART2 mode uses 8N1. Production parity modes require a separate review.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/routes.json"
+            ],
+            "regressions": []
+          }
+        ]
+      }
+    },
+    {
+      "devices": [
+        "stm32f101xe"
+      ],
+      "manual": "rm0008",
+      "document": "es0340",
+      "status": "software_audited_with_constraints",
+      "silicon_revision": "not_observed",
+      "mode_workarounds": "audited_with_constraints",
+      "hardware_qualification": "not_executed",
+      "identification": "ES0340 Tables 1\u20133 identify the exact silicon group. Flash size verifies capacity. Observe the silicon cut separately.",
+      "software_audit": {
+        "profile": "es0340-rev17-f101xe-hsi8",
+        "document_sha256": "724fed9df69ff5b3469aa00a591ca39f3534234ad129273bd6f11ab9e2f11d8c",
+        "revision_order": [
+          "Z",
+          "1",
+          "Y",
+          "2",
+          "3",
+          "X"
+        ],
+        "maintained_modes": [
+          "gpio:output",
+          "uart:irq-byte-event"
+        ],
+        "items": [
+          {
+            "section": "2.1.2",
+            "title": "Cortex-M3 event register omission",
+            "revisions": "AAAAAA",
+            "assessment": "external_constraint",
+            "condition": "Interrupt pending before WFE may miss an event.",
+            "handling": "The reviewed software slice offers no WFE low-power policy.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/bindings.json"
+            ],
+            "regressions": []
+          },
+          {
+            "section": "2.2.1",
+            "title": "Flash read after WFI or WFE",
+            "revisions": "AAAAAA",
+            "assessment": "external_constraint",
+            "condition": "Sleep may disrupt reads when using two wait states and prefetch with the Flash interface clock gated.",
+            "handling": "The HSI8 run profile uses zero wait states and does not gate the Flash interface to sleep.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/clocks.json"
+            ],
+            "regressions": []
+          },
+          {
+            "section": "2.2.2",
+            "title": "DBGMCU debug registers inaccessible to user firmware",
+            "revisions": "NNNNNN",
+            "assessment": "silicon_limit",
+            "condition": "Ordinary firmware may observe zero for DBGMCU_IDCODE and DBGMCU_CR.",
+            "handling": "Flash-size halfword provides a capacity check. Physical revision and debug freeze belong to the external probe.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/soc.json"
+            ],
+            "regressions": []
+          },
+          {
+            "title": "USART TX pin remains owned during receive-only use",
+            "assessment": "external_constraint",
+            "condition": "When the USART is enabled, clearing TE can still hold the alternate-function TX line high.",
+            "handling": "The reviewed USART2 mode owns both TX and RX for the whole activation; an alternate driver cannot take PA2 from it.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/routes.json"
+            ],
+            "regressions": [],
+            "section": "2.3.13",
+            "revisions": "AAAAAA"
+          },
+          {
+            "section": "2.10.2",
+            "title": "USART idle frame detection at receiver clock deviation",
+            "revisions": "NNNNNN",
+            "assessment": "silicon_limit",
+            "condition": "Clock mismatch can prevent detection of IDLE.",
+            "handling": "The initial USART2 mode owns a byte IRQ ring; it does not depend on IDLE or promise gap timing.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/routes.json"
+            ],
+            "regressions": []
+          },
+          {
+            "section": "2.10.3",
+            "title": "USART transmit can clear receiver parity error",
+            "revisions": "AAAAAA",
+            "assessment": "silicon_limit",
+            "condition": "With parity enabled in full duplex, a data-register write can clear the receiver PE flag.",
+            "handling": "The initial USART2 mode uses 8N1. Production parity modes require a separate review.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/routes.json"
+            ],
+            "regressions": []
+          }
+        ]
+      }
+    },
+    {
+      "devices": [
+        "stm32f101xg"
+      ],
+      "manual": "rm0008",
+      "document": "es0346",
+      "status": "software_audited_with_constraints",
+      "silicon_revision": "not_observed",
+      "mode_workarounds": "audited_with_constraints",
+      "hardware_qualification": "not_executed",
+      "identification": "ES0346 Tables 1\u20133 identify the exact silicon group. Flash size verifies capacity. Observe the silicon cut separately.",
+      "software_audit": {
+        "profile": "es0346-rev7-f101xg-hsi8",
+        "document_sha256": "26e737cfc59e50af73315d0784732da62447f0e5dada151e25d8ee3ddedaaa78",
+        "revision_order": [
+          "1",
+          "A"
+        ],
+        "maintained_modes": [
+          "gpio:output",
+          "uart:irq-byte-event"
+        ],
+        "items": [
+          {
+            "section": "2.1.2",
+            "title": "Cortex-M3 event register omission",
+            "revisions": "AA",
+            "assessment": "external_constraint",
+            "condition": "Interrupt pending before WFE may miss an event.",
+            "handling": "The reviewed software slice offers no WFE low-power policy.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/bindings.json"
+            ],
+            "regressions": []
+          },
+          {
+            "section": "2.2.1",
+            "title": "Flash read after WFI or WFE",
+            "revisions": "AA",
+            "assessment": "external_constraint",
+            "condition": "Sleep may disrupt reads when using two wait states and prefetch with the Flash interface clock gated.",
+            "handling": "The HSI8 run profile uses zero wait states and does not gate the Flash interface to sleep.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/clocks.json"
+            ],
+            "regressions": []
+          },
+          {
+            "section": "2.2.2",
+            "title": "DBGMCU debug registers inaccessible to user firmware",
+            "revisions": "NN",
+            "assessment": "silicon_limit",
+            "condition": "Ordinary firmware may observe zero for DBGMCU_IDCODE and DBGMCU_CR.",
+            "handling": "Flash-size halfword provides a capacity check. Physical revision and debug freeze belong to the external probe.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/soc.json"
+            ],
+            "regressions": []
+          },
+          {
+            "title": "USART TX pin remains owned during receive-only use",
+            "assessment": "external_constraint",
+            "condition": "When the USART is enabled, clearing TE can still hold the alternate-function TX line high.",
+            "handling": "The reviewed USART2 mode owns both TX and RX for the whole activation; an alternate driver cannot take PA2 from it.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/routes.json"
+            ],
+            "regressions": [],
+            "section": "2.3.9",
+            "revisions": "AA"
+          },
+          {
+            "section": "2.10.2",
+            "title": "USART idle frame detection at receiver clock deviation",
+            "revisions": "NN",
+            "assessment": "silicon_limit",
+            "condition": "Clock mismatch can prevent detection of IDLE.",
+            "handling": "The initial USART2 mode owns a byte IRQ ring; it does not depend on IDLE or promise gap timing.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/routes.json"
+            ],
+            "regressions": []
+          },
+          {
+            "section": "2.10.3",
+            "title": "USART transmit can clear receiver parity error",
+            "revisions": "AA",
+            "assessment": "silicon_limit",
+            "condition": "With parity enabled in full duplex, a data-register write can clear the receiver PE flag.",
+            "handling": "The initial USART2 mode uses 8N1. Production parity modes require a separate review.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/routes.json"
+            ],
+            "regressions": []
+          }
+        ]
+      }
+    },
+    {
+      "devices": [
+        "stm32f102x6"
+      ],
+      "manual": "rm0008",
+      "document": "es0348",
+      "status": "software_audited_with_constraints",
+      "silicon_revision": "not_observed",
+      "mode_workarounds": "audited_with_constraints",
+      "hardware_qualification": "not_executed",
+      "identification": "ES0348 Tables 1\u20133 identify the exact silicon group. Flash size verifies capacity. Observe the silicon cut separately.",
+      "software_audit": {
+        "profile": "es0348-rev10-f102x6-hsi8",
+        "document_sha256": "58f35f7cac7dd9470dd4fcdfd58b4b547707e0b58981cb91c8af379e5ede923c",
+        "revision_order": [
+          "A",
+          "1"
+        ],
+        "maintained_modes": [
+          "gpio:output",
+          "uart:irq-byte-event"
+        ],
+        "items": [
+          {
+            "section": "2.1.2",
+            "title": "Cortex-M3 event register omission",
+            "revisions": "AA",
+            "assessment": "external_constraint",
+            "condition": "Interrupt pending before WFE may miss an event.",
+            "handling": "The reviewed software slice offers no WFE low-power policy.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/bindings.json"
+            ],
+            "regressions": []
+          },
+          {
+            "section": "2.2.1",
+            "title": "Flash read after WFI or WFE",
+            "revisions": "AA",
+            "assessment": "external_constraint",
+            "condition": "Sleep may disrupt reads when using two wait states and prefetch with the Flash interface clock gated.",
+            "handling": "The HSI8 run profile uses zero wait states and does not gate the Flash interface to sleep.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/clocks.json"
+            ],
+            "regressions": []
+          },
+          {
+            "section": "2.2.2",
+            "title": "DBGMCU debug registers inaccessible to user firmware",
+            "revisions": "NN",
+            "assessment": "silicon_limit",
+            "condition": "Ordinary firmware may observe zero for DBGMCU_IDCODE and DBGMCU_CR.",
+            "handling": "Flash-size halfword provides a capacity check. Physical revision and debug freeze belong to the external probe.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/soc.json"
+            ],
+            "regressions": []
+          },
+          {
+            "title": "USART TX pin remains owned during receive-only use",
+            "assessment": "external_constraint",
+            "condition": "When the USART is enabled, clearing TE can still hold the alternate-function TX line high.",
+            "handling": "The reviewed USART2 mode owns both TX and RX for the whole activation; an alternate driver cannot take PA2 from it.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/routes.json"
+            ],
+            "regressions": [],
+            "section": "2.3.6",
+            "revisions": "AA"
+          },
+          {
+            "section": "2.9.2",
+            "title": "USART idle frame detection at receiver clock deviation",
+            "revisions": "NN",
+            "assessment": "silicon_limit",
+            "condition": "Clock mismatch can prevent detection of IDLE.",
+            "handling": "The initial USART2 mode owns a byte IRQ ring; it does not depend on IDLE or promise gap timing.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/routes.json"
+            ],
+            "regressions": []
+          },
+          {
+            "section": "2.9.3",
+            "title": "USART transmit can clear receiver parity error",
+            "revisions": "AA",
+            "assessment": "silicon_limit",
+            "condition": "With parity enabled in full duplex, a data-register write can clear the receiver PE flag.",
+            "handling": "The initial USART2 mode uses 8N1. Production parity modes require a separate review.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/routes.json"
+            ],
+            "regressions": []
+          }
+        ]
+      }
     }
   ],
   "limitations": [
-    "Source review covers GPIO, USART2 8N1 IRQ byte queue and opt-in halfword/page Flash under HSI8.",
+    "IWDG activation is reviewed under HSI8 only. Its board supply does not admit DS5319 Table 25 oscillator bounds, and this mode exposes no Stop path.",
+    "Source review covers GPIO, USART2 8N1 IRQ byte queue and opt-in halfword/page Flash under HSI8 or the reviewed 8 MHz MCO bypass and PLL72.",
     "This audit indexes selected sections for the maintained slice; other ES096 sections and other F1 groups are not admitted by this profile.",
-    "No physical silicon cut, oscillator accuracy, board wiring, timings, DMA, remap, low-power or physical qualification is established."
+    "No physical silicon cut, oscillator accuracy, board wiring, timings, DMA, remap, low-power or physical qualification is established.",
+    "Low-, high- and XL-density software references select GPIO output, USART2 IRQ and HSI8. Additional modes require their exact package and errata reviews.",
+    "F100, F101, F102, F105 and F107 exact software references select HSI8, GPIO output and USART2 IRQ byte events.",
+    "F100 high-density, F101 low/high/XL-density and F102 low-density software references select HSI8, GPIO output and USART2 IRQ byte events."
   ]
 }

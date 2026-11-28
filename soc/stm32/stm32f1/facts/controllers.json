@@ -3,14 +3,6 @@
   "controller_groups": {
     "rm0008-f103-md": {
       "controllers": {
-        "GPIOA": {
-          "kind": "gpio",
-          "irq": [],
-          "pins": [
-            "PA0",
-            "PA5"
-          ]
-        },
         "USART2": {
           "kind": "uart",
           "irq": [
@@ -26,6 +18,51 @@
           "kind": "flash",
           "irq": [],
           "pins": []
+        },
+        "IWDG": {
+          "kind": "watchdog",
+          "irq": [],
+          "pins": []
+        },
+        "CRC": {
+          "kind": "crc",
+          "pins": [],
+          "irq": []
+        }
+      },
+      "modes": {
+        "USART2": {
+          "modes": [
+            "dma-tx",
+            "irq-byte-event"
+          ]
+        },
+        "FLASH": {
+          "modes": [
+            "poll-halfword"
+          ]
+        },
+        "IWDG": {
+          "modes": [
+            "independent"
+          ]
+        },
+        "CRC": {
+          "modes": [
+            "crc32-words"
+          ]
+        }
+      }
+    },
+    "gpioa-basic": {
+      "controllers": {
+        "GPIOA": {
+          "kind": "gpio",
+          "irq": [],
+          "pins": [
+            "PA0",
+            "PA5"
+          ]
         }
       },
       "modes": {
@@ -34,15 +71,81 @@
             "input",
             "output"
           ]
-        },
+        }
+      }
+    },
+    "usart2-default-irq": {
+      "controllers": {
+        "USART2": {
+          "kind": "uart",
+          "irq": [
+            "USART2_IRQn"
+          ],
+          "pins": [
+            "PA2",
+            "PA3"
+          ],
+          "clock_domain": "apb1"
+        }
+      },
+      "modes": {
         "USART2": {
           "modes": [
             "irq-byte-event"
           ]
+        }
+      }
+    },
+    "rm0008-f103-md-default-buses": {
+      "controllers": {
+        "GPIOB": {
+          "kind": "gpio",
+          "irq": [],
+          "pins": [
+            "PB12"
+          ]
         },
-        "FLASH": {
+        "I2C1": {
+          "kind": "i2c",
+          "irq": [
+            "I2C1_EV_IRQn",
+            "I2C1_ER_IRQn"
+          ],
+          "pins": [
+            "PB6",
+            "PB7"
+          ],
+          "clock_domain": "apb1",
+          "max_hz": 80000
+        },
+        "SPI2": {
+          "kind": "spi",
+          "irq": [
+            "SPI2_IRQn"
+          ],
+          "pins": [
+            "PB13",
+            "PB14",
+            "PB15"
+          ],
+          "clock_domain": "apb1",
+          "max_hz": 4000000
+        }
+      },
+      "modes": {
+        "GPIOB": {
           "modes": [
-            "poll-halfword"
+            "output"
+          ]
+        },
+        "I2C1": {
+          "modes": [
+            "poll-messages"
+          ]
+        },
+        "SPI2": {
+          "modes": [
+            "short-poll"
           ]
         }
       }

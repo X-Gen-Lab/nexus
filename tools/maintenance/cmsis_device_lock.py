@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Verify fixed reviewed official CMSIS-device source and original notices.
 
-Only each selected part's explicitly reviewed original upstream files belong
+Only explicitly reviewed original upstream files belong
 to the component source closure. A clean full Git checkout establishes its official provenance;
 an installed source SDK requires independent full-manifest verification instead.
 Neither source proof qualifies a driver, a firmware image or a physical Board.
@@ -33,6 +33,7 @@ REVIEWED_DEVICES = {
         "directory": "vendors/st/cmsis_device_f1",
         "lock_name": "dependencies/stm32f1.lock.json",
         "license_path": "License.md",
+        "paired_stems": r"stm32f1[0-9]{2}x[0-9a-z]",
         "files": frozenset({
             "Include/stm32f103xb.h", "Include/stm32f1xx.h",
             "Include/system_stm32f1xx.h",
@@ -94,8 +95,19 @@ def contract(lock):
     if (lock["repository"] != review["origin"] or
             lock["commit"] != review["commit"]):
         raise ValueError("Reviewed official origin, part and commit required")
-    if (not isinstance(lock["files"], dict) or
-            set(lock["files"]) != review["files"]):
+    if not isinstance(lock["files"], dict):
+        raise ValueError("Identities must close the reviewed device graph")
+    names = set(lock["files"])
+    selected = set(review["files"])
+    if pattern := review.get("paired_stems"):
+        # A family can review additional official device views in its lock.
+        # Only complete header/startup pairs can extend the original closure.
+        for name in names:
+            match = re.fullmatch(r"Include/(" + pattern + r")\.h", name)
+            if match is not None:
+                selected.update((name,
+                    f"Source/Templates/gcc/startup_{match[1]}.s"))
+    if names != selected:
         raise ValueError("Identities must close the reviewed device graph")
     for record in lock["files"].values():
         fields(record, {"bytes", "sha256"}, "CMSIS-device file identity")

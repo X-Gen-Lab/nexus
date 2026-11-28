@@ -213,6 +213,320 @@
           500000
         ]
       }
+    },
+    {
+      "kind": "uart",
+      "mode": "dma-tx",
+      "implementation": "uart",
+      "headers": [
+        "drivers/uart/uart_dma.h"
+      ],
+      "static_recipe": {
+        "state_type": "nx_stm32f1_uart_dma_t",
+        "declarations": [
+          {
+            "role": "rx_bytes",
+            "type": "uint8_t",
+            "const": false,
+            "count": {
+              "source": "item.options.rx_capacity"
+            },
+            "enabled": {
+              "source": "item.options.rx_profile",
+              "values": {
+                "bytes": true,
+                "events": false
+              }
+            }
+          },
+          {
+            "role": "rx_events",
+            "type": "nx_uart_rx_event_t",
+            "const": false,
+            "count": {
+              "source": "item.options.rx_capacity"
+            },
+            "enabled": {
+              "source": "item.options.rx_profile",
+              "values": {
+                "bytes": false,
+                "events": true
+              }
+            }
+          },
+          {
+            "role": "dma_regions",
+            "type": "nx_dma_memory_region_t",
+            "const": true,
+            "count": {
+              "length": "selected.readable_regions",
+              "limit": 16
+            },
+            "value": {
+              "map": {
+                "source": "selected.readable_regions",
+                "limit": 16,
+                "value": {
+                  "record": [
+                    [
+                      "begin",
+                      {
+                        "source": "entry.begin"
+                      }
+                    ],
+                    [
+                      "size",
+                      {
+                        "source": "entry.size"
+                      }
+                    ],
+                    [
+                      "permissions",
+                      {
+                        "source": "entry.permissions",
+                        "as": "static"
+                      }
+                    ]
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "role": "uart_config",
+            "type": "nx_stm32f1_uart_dma_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "uart",
+                  {
+                    "record": [
+                      [
+                        "registers",
+                        {
+                          "source": "item.controller",
+                          "as": "symbol"
+                        }
+                      ],
+                      [
+                        "tx_registers",
+                        {
+                          "source": "selected.named_pads.tx.registers",
+                          "as": "symbol"
+                        }
+                      ],
+                      [
+                        "rx_registers",
+                        {
+                          "source": "selected.named_pads.rx.registers",
+                          "as": "symbol"
+                        }
+                      ],
+                      [
+                        "irq",
+                        {
+                          "source": "selected.vector_bindings.0.irq",
+                          "as": "symbol"
+                        }
+                      ],
+                      [
+                        "clock_hz",
+                        {
+                          "source": "selected.clock_hz"
+                        }
+                      ],
+                      [
+                        "baud",
+                        {
+                          "source": "item.options.baud"
+                        }
+                      ],
+                      [
+                        "rx_storage",
+                        {
+                          "source": "item.options.rx_profile",
+                          "values": {
+                            "bytes": {
+                              "ref": "rx_bytes",
+                              "as": "symbol"
+                            },
+                            "events": {
+                              "ref": "rx_events",
+                              "as": "symbol"
+                            }
+                          }
+                        }
+                      ],
+                      [
+                        "rx_capacity",
+                        {
+                          "source": "item.options.rx_capacity"
+                        }
+                      ],
+                      [
+                        "profile",
+                        {
+                          "source": "item.options.rx_profile",
+                          "values": {
+                            "bytes": "NX_UART_RX_BYTES",
+                            "events": "NX_UART_RX_EVENTS"
+                          },
+                          "as": "symbol"
+                        }
+                      ],
+                      [
+                        "tx_pin",
+                        {
+                          "source": "selected.named_pads.tx.number"
+                        }
+                      ],
+                      [
+                        "rx_pin",
+                        {
+                          "source": "selected.named_pads.rx.number"
+                        }
+                      ],
+                      [
+                        "priority",
+                        {
+                          "source": "item.options.irq.priority"
+                        }
+                      ]
+                    ]
+                  }
+                ],
+                [
+                  "dma",
+                  {
+                    "source": "selected.dma_bindings.0.registers",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "channel",
+                  {
+                    "source": "selected.dma_bindings.0.channel",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "irq",
+                  {
+                    "source": "selected.dma_bindings.0.irq",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "regions",
+                  {
+                    "ref": "dma_regions",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "region_count",
+                  {
+                    "length": "selected.readable_regions",
+                    "limit": 16
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "calls": {
+          "admit": [
+            {
+              "function": "nx_stm32f1_uart_dma_admit",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "ref": "uart_config",
+                  "as": "address"
+                }
+              ]
+            }
+          ],
+          "prepare": {
+            "function": "nx_stm32f1_uart_dma_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "ref": "uart_config",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32f1_uart_dma_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "ops": "nx_stm32f1_uart_dma_ops",
+        "retain_on_failed_init": true,
+        "irq": [
+          {
+            "name": {
+              "source": "selected.vector_bindings.0.handler",
+              "as": "symbol"
+            },
+            "calls": [
+              {
+                "function": "nx_stm32f1_uart_dma_usart_irq",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  }
+                ]
+              }
+            ],
+            "barrier": "nx_arch_dsb"
+          },
+          {
+            "name": {
+              "source": "selected.dma_bindings.0.handler",
+              "as": "symbol"
+            },
+            "calls": [
+              {
+                "function": "nx_stm32f1_uart_dma_irq",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  }
+                ]
+              }
+            ],
+            "barrier": "nx_arch_dsb"
+          }
+        ]
+      },
+      "validator": "nx_stm32f1_uart_dma_validate",
+      "limits": {
+        "baud": [
+          1200,
+          500000
+        ]
+      },
+      "io_domains": [
+        "dma"
+      ]
     }
   ]
 }

@@ -8,7 +8,8 @@ function(nexus_stm32f1_official)
             "${NEXUS_SOURCE_DIR}/tools/maintenance/stm32f1_hal_lock.py" --source
             "${f1_hal}" --lock
             "${NEXUS_SOURCE_DIR}/dependencies/stm32f1-hal.lock.json"
-            --cmsis-source "${f1_device}"
+            --cmsis-source "${f1_device}" --device
+            "${NEXUS_VENDOR_DEVICE_HEADER}" "${NEXUS_VENDOR_DEVICE_STARTUP}"
         RESULT_VARIABLE result
         ERROR_VARIABLE error
         OUTPUT_VARIABLE identity

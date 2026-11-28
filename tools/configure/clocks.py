@@ -47,7 +47,7 @@ def normalize(profile):
     legacy = "hse_hz" in profile
     inputs = {"hse_hz"} if legacy else {"source", "input_hz"}
     if ((required | inputs) - set(profile) or
-            set(profile) - required - inputs - numeric):
+            set(profile) - required - inputs - numeric - {"hse_bypass"}):
         fail("Clock profile requires one exact source/input identity")
     source = "hse" if legacy else profile["source"]
     if not isinstance(source, str) or source not in {"hse", "hsi", "msis", "model"}:
@@ -55,6 +55,11 @@ def normalize(profile):
     frequency = profile["hse_hz"] if legacy else profile["input_hz"]
     normalized = {"source": source,
                   "input_hz": integer(frequency, 1, context="Clock input Hz")}
+    if "hse_bypass" in profile:
+        bypass = profile["hse_bypass"]
+        if source != "hse" or type(bypass) is not bool:
+            fail("HSE bypass requires the external source and an explicit boolean")
+        normalized["hse_bypass"] = bypass
     for key in required | numeric:
         if key in profile:
             normalized[key] = integer(profile[key],
@@ -134,12 +139,14 @@ def plan(profile_name, profile):
 def validate_board(clocks):
     """Internal oscillators are SoC facts; external oscillator data is optional."""
     if not isinstance(clocks, Mapping) or set(clocks) - {
-            "hse_hz", "lse_hz", "lse_bypass"}:
+            "hse_hz", "hse_bypass", "lse_hz", "lse_bypass"}:
         fail("Board clocks require reviewed external oscillator facts")
     for name, frequency in clocks.items():
-        if name == "lse_bypass":
-            if type(frequency) is not bool or "lse_hz" not in clocks:
-                fail("Board LSE bypass requires explicit boolean and frequency")
+        if name.endswith("_bypass"):
+            oscillator = name.removesuffix("_bypass")
+            if type(frequency) is not bool or oscillator + "_hz" not in clocks:
+                fail("Board " + oscillator.upper() +
+                     " bypass requires explicit boolean and frequency")
             continue
         integer(frequency, 1, context="Board " + name)
 
@@ -150,6 +157,8 @@ def match_board(profile, clocks):
     if (profile["source"] == "hse" and
             profile["input_hz"] != clocks.get("hse_hz")):
         fail("Clock profile does not match the Board oscillator")
+    if "hse_bypass" in profile and profile["hse_bypass"] != clocks.get("hse_bypass"):
+        fail("Clock profile does not match the Board HSE bypass")
 
 
 def controller_frequency(clock, controller, provider):

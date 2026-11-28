@@ -851,7 +851,8 @@ class WorkflowContracts(unittest.TestCase):
             'stm32_assembly', 'can_assembly', 'usb_assembly',
             'ethernet_assembly', 'timer_assembly', 'multi_controller_assembly',
             'declared_io_assembly', 'stm32f4_family',
-            'stm32f1_family', 'stm32f1_flash'})
+            'stm32f1_family', 'stm32f1_flash', 'stm32f1_watchdog',
+            'stm32f1_buses'})
         for name in selected:
             self.assertTrue(list((ROOT / 'tests/integration/assemblies' / name).glob('*.toml')))
         commands = '\n'.join(step.get('run', '') for step in job['steps'])
@@ -899,7 +900,8 @@ class WorkflowContracts(unittest.TestCase):
         step = next(step for step in job['steps'] if step.get('name') ==
                     'Link and audit each authored software assembly')
         selections = {'stm32_assembly': [], 'can_assembly': [],
-                      'stm32f1_family': [], 'stm32f1_flash': []}
+                      'stm32f1_family': [], 'stm32f1_flash': [],
+                      'stm32f1_watchdog': [], 'stm32f1_buses': []}
         authored_family = sorted('tests/integration/assemblies/stm32f4_family/' + path.name
             for path in (ROOT / 'tests/integration/assemblies/stm32f4_family').glob('*.toml'))
         selections.update(

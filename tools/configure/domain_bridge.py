@@ -130,13 +130,28 @@ class DomainBridge:
                 kernel_profile=kernel_profile)
 
     def validate_dma_resource(self, resource):
+        fixed = self.FIXED_CHANNEL_DMA
+        if fixed is not None:
+            lane = fixed.channel(resource)
+            return lane.engine, lane.lane, None
         return common.validate_dma_resource(resource, self.DMA_TOPOLOGY)
 
+    def dma_physical_key(self, resource):
+        if self.FIXED_CHANNEL_DMA is None:
+            common.fail("Named DMA identities require an explicit channel topology")
+        self.FIXED_CHANNEL_DMA.channel(resource)
+        return resource
+
     def dma_irq(self, resource):
+        if self.FIXED_CHANNEL_DMA is not None:
+            return self.FIXED_CHANNEL_DMA.irq(resource)
         return common.dma_irq(resource, self.DMA_VECTOR, self.DMA_TOPOLOGY)
 
     def validate_dma(self, route, mode, normalize):
         del normalize
+        if self.FIXED_CHANNEL_DMA is not None:
+            self.FIXED_CHANNEL_DMA.validate_route(route, mode)
+            return
         kind = route["kind"]
         paths = tuple(common.route_dma(route, mode))
         traits = common.mode_traits(kind, mode)

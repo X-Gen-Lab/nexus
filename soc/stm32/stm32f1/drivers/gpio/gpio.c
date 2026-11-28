@@ -15,7 +15,7 @@
 #define NX_STM32F1_GPIO_BSRR(reg, value) ((reg)->BSRR = (value))
 #endif
 
-/** \brief Find the exact APB2 gate for a medium-density F103 GPIO bank. */
+/** \brief Find the APB2 gate supplied by the selected F103 device header. */
 static uint32_t gpio_gate(const GPIO_TypeDef* registers) {
     if (registers == GPIOA) {
         return RCC_APB2ENR_IOPAEN;
@@ -29,7 +29,12 @@ static uint32_t gpio_gate(const GPIO_TypeDef* registers) {
     if (registers == GPIOD) {
         return RCC_APB2ENR_IOPDEN;
     }
-    return registers == GPIOE ? RCC_APB2ENR_IOPEEN : 0U;
+#if defined(GPIOE) && defined(RCC_APB2ENR_IOPEEN)
+    if (registers == GPIOE) {
+        return RCC_APB2ENR_IOPEEN;
+    }
+#endif
+    return 0U;
 }
 
 /** \brief Expand eight pin bits into the corresponding CRL/CRH fields. */

@@ -23,7 +23,20 @@
       "id": "gpio-pa5",
       "variants": [
         "STM32F103RBT6",
-        "STM32F103C8T6"
+        "STM32F103C8T6",
+        "STM32F103C6T6A",
+        "STM32F103ZET6",
+        "STM32F103ZGT6",
+        "STM32F100RBT6B",
+        "STM32F101RBT6",
+        "STM32F102RBT6",
+        "STM32F105VCT6",
+        "STM32F107VCT6",
+        "STM32F100ZET6B",
+        "STM32F101C6T6A",
+        "STM32F101ZET6",
+        "STM32F101ZGT6",
+        "STM32F102C6T6A"
       ],
       "controller": "GPIOA",
       "kind": "gpio",
@@ -36,7 +49,7 @@
       "modes": [
         "output"
       ],
-      "source": "DS5319 Rev20 Table 5 and Figures 6/8; RM0008 Rev21 Section 9."
+      "source": "DS5319 Rev20 Table 5 and Figures 6/8; RM0008 Rev21 Section 9; DS5936 Rev7, DS5792 Rev13 and DS6558 Rev4 Table 5 for the additional exact F103 packages. DS6517 Rev9, DS5318 Rev17 and DS5933 Rev7 Table 4, and DS6014 Rev10 Table 5 cover the additional packages. Also reviewed DS5944 Rev11 and DS5935 Rev6 Table 4, DS5791 Rev9 and DS6557 Rev5 Table 5, and DS5934 Rev6 Table 4."
     },
     {
       "id": "usart2-pa2-pa3",
@@ -57,9 +70,15 @@
         }
       ],
       "modes": [
+        "dma-tx",
         "irq-byte-event"
       ],
-      "source": "DS5319 Rev20 Table 5; RM0008 Rev21 Section 9.3.8 USART2_REMAP=0, Section 27 USART."
+      "mode_dma": {
+        "dma-tx": [
+          "DMA1:channel7"
+        ]
+      },
+      "source": "DS5319 Rev20 Table 5; RM0008 Rev21 Section 9.3.8 USART2_REMAP=0, Table 78 DMA1 channel 7 and Section 27 USART."
     },
     {
       "id": "flash-internal",
@@ -73,7 +92,147 @@
       "modes": [
         "poll-halfword"
       ],
-      "source": "PM0075 Rev2 Table 3 and Sections 2.3.3–2.3.4; ES096 Rev15 Section 2.2.11; DS5319 Rev20 Table 2."
+      "source": "PM0075 Rev2 Table 3 and Sections 2.3.3\u20132.3.4; ES096 Rev15 Section 2.2.11; DS5319 Rev20 Table 2."
+    },
+    {
+      "id": "iwdg",
+      "variants": [
+        "STM32F103RBT6",
+        "STM32F103C8T6"
+      ],
+      "controller": "IWDG",
+      "kind": "watchdog",
+      "pins": [],
+      "modes": [
+        "independent"
+      ],
+      "source": "RM0008 Rev21 Section 19 and Table 96; DS5319 Rev20 Table 25; ES096 Rev15 Sections 2.2.2, 2.2.12, 2.7.1\u20132.7.3.",
+      "clock_profiles": [
+        "hsi8"
+      ]
+    },
+    {
+      "id": "crc-internal",
+      "variants": [
+        "STM32F103RBT6",
+        "STM32F103C8T6"
+      ],
+      "controller": "CRC",
+      "kind": "crc",
+      "pins": [],
+      "modes": [
+        "crc32-words"
+      ],
+      "source": "RM0008 Rev21 Sections 4.2\u20134.4; DS5319 Rev20."
+    },
+    {
+      "id": "usart2-pa2-pa3-irq",
+      "variants": [
+        "STM32F103C6T6A",
+        "STM32F103ZET6",
+        "STM32F103ZGT6",
+        "STM32F100RBT6B",
+        "STM32F101RBT6",
+        "STM32F102RBT6",
+        "STM32F105VCT6",
+        "STM32F107VCT6",
+        "STM32F100ZET6B",
+        "STM32F101C6T6A",
+        "STM32F101ZET6",
+        "STM32F101ZGT6",
+        "STM32F102C6T6A"
+      ],
+      "controller": "USART2",
+      "kind": "uart",
+      "pins": [
+        {
+          "pin": "PA2",
+          "function": "tx"
+        },
+        {
+          "pin": "PA3",
+          "function": "rx"
+        }
+      ],
+      "modes": [
+        "irq-byte-event"
+      ],
+      "source": "DS5936 Rev7, DS5792 Rev13 and DS6558 Rev4 Table 5. RM0008 Rev21 Section 9.3.8 USART2_REMAP=0 and Section 27 USART. DS6517 Rev9, DS5318 Rev17 and DS5933 Rev7 Table 4, and DS6014 Rev10 Table 5 cover the additional packages. RM0041 Rev6 Section 7.3.5 supplies the F100 USART2 default routing. Also reviewed DS5944 Rev11 and DS5935 Rev6 Table 4, DS5791 Rev9 and DS6557 Rev5 Table 5, and DS5934 Rev6 Table 4."
+    },
+    {
+      "id": "gpio-pb12-cs",
+      "variants": [
+        "STM32F103RBT6"
+      ],
+      "controller": "GPIOB",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PB12",
+          "function": "output"
+        }
+      ],
+      "modes": [
+        "output"
+      ],
+      "source": "DS5319 Rev20 Table 5, LQFP64; UM1724 Rev17 Table 27 CN10-16.",
+      "clock_profiles": [
+        "hsi8"
+      ]
+    },
+    {
+      "id": "i2c1-pb6-pb7",
+      "variants": [
+        "STM32F103RBT6"
+      ],
+      "controller": "I2C1",
+      "kind": "i2c",
+      "pins": [
+        {
+          "pin": "PB6",
+          "function": "scl"
+        },
+        {
+          "pin": "PB7",
+          "function": "sda"
+        }
+      ],
+      "modes": [
+        "poll-messages"
+      ],
+      "source": "RM0008 Rev21 Section 9.3.9 Table 55; DS5319 Rev20 Table 5; UM1724 Rev17 Table 27.",
+      "clock_profiles": [
+        "hsi8"
+      ]
+    },
+    {
+      "id": "spi2-pb13-pb14-pb15",
+      "variants": [
+        "STM32F103RBT6"
+      ],
+      "controller": "SPI2",
+      "kind": "spi",
+      "pins": [
+        {
+          "pin": "PB13",
+          "function": "sck"
+        },
+        {
+          "pin": "PB14",
+          "function": "miso"
+        },
+        {
+          "pin": "PB15",
+          "function": "mosi"
+        }
+      ],
+      "modes": [
+        "short-poll"
+      ],
+      "source": "DS5319 Rev20 Table 5, LQFP64; RM0008 Rev21 Section 28; UM1724 Rev17 Table 27.",
+      "clock_profiles": [
+        "hsi8"
+      ]
     }
   ]
 }

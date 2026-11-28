@@ -42,12 +42,26 @@ class SelectedContractAuthorityTests(unittest.TestCase):
         for row in rows:
             parts.setdefault(row.family, set()).add(row.part)
         self.assertEqual(parts, {
-            "stm32f1": {"STM32F103C8T6", "STM32F103RBT6"},
+            "stm32f1": {
+                "STM32F100RBT6B", "STM32F100ZET6B",
+                "STM32F101C6T6A", "STM32F101RBT6", "STM32F101ZET6",
+                "STM32F101ZGT6", "STM32F102C6T6A", "STM32F102RBT6",
+                "STM32F103C6T6A", "STM32F103C8T6", "STM32F103RBT6",
+                "STM32F103ZET6", "STM32F103ZGT6", "STM32F105VCT6",
+                "STM32F107VCT6",
+            },
             "stm32f4": {
                 "STM32F405ZGT6", "STM32F407VET6", "STM32F407ZGT6",
                 "STM32F411RET6", "STM32F415ZGT6", "STM32F417ZGT6",
                 "STM32F446ZET6", "STM32F479NIH6",
             },
+        })
+        f1_buses = {(row.part, row.kind, row.mode): row.reviewed_routes
+                    for row in rows if row.family == "stm32f1"
+                    and row.kind in {"spi", "i2c"} and row.reviewed_route_available}
+        self.assertEqual(f1_buses, {
+            ("STM32F103RBT6", "spi", "short-poll"): ("spi2-pb13-pb14-pb15",),
+            ("STM32F103RBT6", "i2c", "poll-messages"): ("i2c1-pb6-pb7",),
         })
         self.assertTrue(all(not row.physical_qualified for row in rows))
         self.assertTrue(all(row.review_sources for row in rows))

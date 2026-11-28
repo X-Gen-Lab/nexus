@@ -1816,6 +1816,17 @@ class DmaBindingIR:
 
 
 @dataclass(frozen=True)
+class FixedDmaBindingIR:
+    """A wired physical channel projected through the selected IRQ table."""
+
+    lane: int
+    registers: str
+    channel: str
+    irq: str
+    handler: str
+
+
+@dataclass(frozen=True)
 class InterruptBindingIR:
     """Reviewed CMSIS enum and independent startup handler identity."""
     irq: str
@@ -1852,7 +1863,7 @@ class ControllerIntegrationIR:
     pins: tuple[Mapping, ...]
     hardware: "ControllerBinding | None"
     pads: tuple[PadBindingIR, ...] = ()
-    dma_bindings: tuple[DmaBindingIR, ...] = ()
+    dma_bindings: tuple[DmaBindingIR | FixedDmaBindingIR, ...] = ()
     vector_bindings: tuple[InterruptBindingIR, ...] = ()
     kernel_bound: bool = False
     kernel_policy: str = "NX_IRQ_KERNEL_NONE"
@@ -2127,10 +2138,6 @@ def coherent_controller_ir(item, result, provider):
     policy = context.binding_policy
     if policy is None or len(selected.dma_bindings) != len(lanes):
         raise ValueError("Controller integration lacks its selected DMA binding policy")
-    for lane, binding in zip(lanes, selected.dma_bindings):
-        facts = policy.dma_facts.get(lane.physical_key)
-        if (facts is None or any(getattr(binding, name) != getattr(lane, name)
-                                for name in ("engine", "lane", "request", "physical_key")) or
-                any(getattr(binding, name) != value for name, value in facts.items())):
-            raise ValueError("Controller integration DMA leaves differ from the selected route facts")
+    if selected.dma_bindings != policy.dma_bindings(lanes):
+        raise ValueError("Controller integration DMA leaves differ from the selected route facts")
     return item

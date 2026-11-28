@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "bindings": [
+    {
+      "kind": "watchdog",
+      "mode": "independent",
+      "implementation": "watchdog",
+      "headers": [
+        "drivers/watchdog/instance.h"
+      ],
+      "static_recipe": {
+        "state_type": "nx_stm32f1_watchdog_state_t",
+        "ops": "nx_stm32f1_watchdog_ops",
+        "declarations": [],
+        "calls": {
+          "prepare": {
+            "function": "nx_stm32f1_watchdog_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32f1_watchdog_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "retain_on_failed_init": false
+      }
+    }
+  ]
+}

@@ -262,6 +262,7 @@ class DomainPolicies:
     OFFSET_IMAGE_VECTOR_SYMBOL: str | None = None
     DMA_VECTOR: str | None = None
     DMA_TOPOLOGY: tuple = (frozenset(), (), ())
+    FIXED_CHANNEL_DMA: object | None = None
     shared_irqs: Mapping = field(default_factory=lambda: MappingProxyType({}))
     clock: object | None = None
 
@@ -317,7 +318,12 @@ class DomainPolicies:
         if "capabilities" in value:
             result.update(_capabilities(value["capabilities"]))
         if "dma" in value:
-            result["DMA_VECTOR"], result["DMA_TOPOLOGY"] = _dma(value["dma"])
+            raw_dma = value["dma"]
+            if isinstance(raw_dma, Mapping) and raw_dma.get("encoding") == "fixed-channel":
+                from tools.configure.domains.fixed_channel_dma import FixedChannelDmaPolicy
+                result["FIXED_CHANNEL_DMA"] = FixedChannelDmaPolicy.from_validated(raw_dma)
+            else:
+                result["DMA_VECTOR"], result["DMA_TOPOLOGY"] = _dma(raw_dma)
         shared = value.get("shared_irqs", {})
         if not isinstance(shared, Mapping):
             fail("Shared IRQ facts require a domain mapping")
