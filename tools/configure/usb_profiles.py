@@ -1,6 +1,6 @@
 """Selected USB-specific ROM profiles, separate from generic packet limits."""
 
-from tools.configure import usb_otg
+from tools.configure import usb_otg, usb_pma
 from tools.configure.providers.common import fail
 
 
@@ -58,7 +58,7 @@ def _profile(item, result, *, fallback=False):
 
 def emit(result):
     """Bind validated endpoints and their two explicit ULPI speed profiles."""
-    controllers = [item for item in result.controllers if item.kind == "usb_device"]
+    controllers = [item for item in result.controllers if item.kind == "usb_device" and item.mode not in usb_pma.MODES]
     if not result.factory.capabilities or not controllers:
         return [], []
     header = ['#include "nexus/io/usb_profile.h"',
@@ -104,7 +104,7 @@ def emit(result):
 def emit_activation(result):
     """Expose selected controller operations independently of ROM metadata."""
     controllers = [item for item in result.controllers
-                   if item.kind == "usb_device"]
+                   if item.kind == "usb_device" and item.mode != usb_pma.MODE]
     if not controllers:
         return [], []
     header = ['#include "nexus/io/usb_activation.h"']
@@ -116,7 +116,9 @@ def emit_activation(result):
     source = []
     for item in controllers:
         name = item.id.replace("-", "_")
-        activation_ops = selected_usb_factory(item).activation_ops
+        activation_ops = (item.options.ep1_layout.activation_ops
+                          if item.mode in usb_pma.EP1_TRANSFERS else
+                          selected_usb_factory(item).activation_ops)
         source += ['static const nx_usb_activation_port_t '
                    f's_nx_usb_activation_{name} = {{',
                    f'    &{activation_ops}, &s_nx_port_{name}', '};']

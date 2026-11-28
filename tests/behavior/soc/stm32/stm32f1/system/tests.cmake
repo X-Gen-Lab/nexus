@@ -58,3 +58,43 @@ nexus_f1_system_contract(
     NEXUS_CLOCK_FLASH_WAIT_STATES=2U
     NEXUS_CLOCK_PLL48_HZ=48000000U
 )
+
+nexus_f1_system_contract(
+    nexus_stm32f101_hse36_test
+    STM32F101xB
+    NEXUS_CLOCK_SOURCE_HSE=1
+    NEXUS_CLOCK_HSE_BYPASS=0
+    NEXUS_CLOCK_APB1_HZ=36000000U
+    NEXUS_CLOCK_APB2_HZ=36000000U
+    NEXUS_CLOCK_APB1_TIMER_HZ=36000000U
+    NEXUS_CLOCK_FLASH_WAIT_STATES=1U
+)
+nexus_f1_system_contract(
+    nexus_stm32f102_hse48_test
+    STM32F102xB
+    NEXUS_CLOCK_SOURCE_HSE=1
+    NEXUS_CLOCK_HSE_BYPASS=0
+    NEXUS_CLOCK_APB1_HZ=24000000U
+    NEXUS_CLOCK_APB2_HZ=48000000U
+    NEXUS_CLOCK_APB1_TIMER_HZ=48000000U
+    NEXUS_CLOCK_FLASH_WAIT_STATES=1U
+    NEXUS_CLOCK_PLL48_HZ=48000000U
+)
+
+include("${CMAKE_CURRENT_LIST_DIR}/handoff.cmake")
+nexus_f1_system_contract(nexus_stm32f103_stop_test STM32F103xB TEST_F1_STOP=1)
+target_link_libraries(nexus_stm32f103_stop_test PRIVATE Nexus::ClockDomain)
+target_sources(
+    nexus_stm32f103_stop_test
+    PRIVATE "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f1/system/stop.c"
+)
+target_compile_definitions(
+    nexus_stm32f103_stop_test
+    PRIVATE NX_STM32F1_STOP_OWNER=1
+)
+
+get_target_property(f1_stop_config Nexus::Config NEXUS_CONFIG_DIR)
+target_include_directories(
+    nexus_stm32f103_stop_test
+    PRIVATE "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f1/include" "${f1_stop_config}"
+)

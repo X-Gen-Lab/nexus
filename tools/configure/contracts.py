@@ -137,6 +137,8 @@ CONTROLLER_CONTRACTS = MappingProxyType({
             'address', 'calls_os', 'drain_timeout_us', 'init_timeout_us',
             'irq_priority', 'rx_count', 'rx_storage_bytes', 'tx_count',
         )), 'ethernet'),
+    'mdio': ControllerContract(frozenset(('binding', 'mode')), frozenset(),
+                               'mdio'),
     'timer_capture': ControllerContract(
         frozenset((
             'binding', 'edge', 'exclusive', 'filter', 'irq', 'mode',

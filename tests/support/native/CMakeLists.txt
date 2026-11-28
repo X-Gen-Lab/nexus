@@ -38,7 +38,7 @@ set(native_ip "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip")
 set(native_ip_includes
     "${NEXUS_SOURCE_DIR}/soc/stm32/common/bxcan"
     "${native_ip}/legacy_mac"
-    "${native_ip}/dwc_otg_device"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/common/dwc_otg_device"
 )
 add_library(nexus_native_startup_usage INTERFACE)
 target_include_directories(
@@ -134,7 +134,7 @@ target_sources(
 add_library(
     nexus_usb_native_engine
     OBJECT
-    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/dwc_otg_device/usb_device_controller.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/common/dwc_otg_device/usb_device_controller.c"
 )
 target_include_directories(
     nexus_usb_native_engine

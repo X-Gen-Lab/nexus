@@ -5,7 +5,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from tools.configure import authored
+from tools.configure import authored, selected_contracts
 from tools.configure.generation import bindings, factory
 from tools.configure import configure as gate
 from tools.configure.tests.f4_fixture import provider
@@ -229,6 +229,53 @@ class I2cTargetConfigurationTests(unittest.TestCase):
                     gate.ConfigurationError, "route|AF4|pad"):
                 self.provider.validate_selection(
                     {"mode": "target-irq"}, changed)
+
+
+class F103ReceiveTargetConfigurationTests(unittest.TestCase):
+    fixtures = gate.ROOT / "tests/integration/assemblies"
+    reference = fixtures / "stm32f1_i2c_target"
+
+    def test_receive_only_contributes_one_span_and_two_direct_irq_handlers(self):
+        result = gate.resolve_ir(self.reference / "f103rb-target.toml")
+        item, = result.controllers
+        record = selected_contracts.describe(item)
+        self.assertEqual((record.max_transfer_units, record.max_segment_units,
+                          record.max_segments, record.max_total_units),
+                         (256, 256, 1, 256))
+        self.assertEqual(record.fields["receive_only"], 1)
+        self.assertFalse(record.physical_qualified)
+        code = bindings.emit(result)[1]
+        self.assertIn("nx_stm32f1_i2c_target_open(&s_nx_port_target, 82u)", code)
+        self.assertEqual(code.count("nx_stm32f1_i2c_target_irq(&s_nx_port_target)"), 2)
+        self.assertIn("I2C1_EV_IRQHandler", code)
+        self.assertIn("I2C1_ER_IRQHandler", code)
+
+    def test_exact_limits_and_the_polling_controller_conflict(self):
+        text = (self.reference / "f103rb-target.toml").read_text()
+        board = gate.load(self.reference / "board/board.json")
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "board").mkdir()
+            board_path = root / "board/board.json"
+            board_path.write_text(json.dumps(board))
+            assembly = root / "target.toml"
+            for existing, unsupported, diagnostic in (
+                    ("address_bits = 7", "address_bits = 10", "address_bits"),
+                    ("second_address = 0", "second_address = 83", "second_address"),
+                    ("priority = 0", "priority = 5", "irq_priority"),
+                    ("max_hz = 80000", "max_hz = 100000", "max_hz"),
+                    ("pec = false", "pec = true", "SMBus")):
+                with self.subTest(option=unsupported):
+                    assembly.write_text(text.replace(existing, unsupported))
+                    with self.assertRaisesRegex(ValueError, diagnostic):
+                        gate.resolve_ir(assembly)
+            board["bindings"].append({"id": "master", "controller": "I2C1",
+                                       "route": "i2c1-pb6-pb7"})
+            board_path.write_text(json.dumps(board))
+            assembly.write_text(text + '\n[i2c.master]\nbinding = "master"\n'
+                                'mode = "poll-messages"\nmax_hz = 80000\n')
+            with self.assertRaisesRegex(ValueError, "Resource conflict controller:I2C1"):
+                gate.resolve_ir(assembly)
 
 
 if __name__ == "__main__":

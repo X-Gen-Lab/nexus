@@ -15,7 +15,7 @@ typedef struct {
     nx_stm32_usb_hs_clock_state_t* clock;
     const nx_stm32_platform_pin_config_t* pins;
     nx_usb_endpoint_t* endpoints;
-    const nx_stm32_usb_endpoint_config_t* plan;
+    const nx_usb_endpoint_config_t* plan;
     nx_usb_event_t* events;
     size_t endpoint_count;
     size_t capacity;
@@ -160,7 +160,7 @@ nx_stm32_usb_hs_cold_prepare(nx_usb_controller_t* port,
         &nx_stm32_usb_hs_clock_ops, config->clock, sizeof(*config->clock)};
     for (size_t i = 0U; i < config->endpoint_count; ++i) {
         nx_usb_endpoint_t* endpoint = &config->endpoints[i];
-        const nx_stm32_usb_endpoint_config_t* selected = &config->plan[i];
+        const nx_usb_endpoint_config_t* selected = &config->plan[i];
         memset(endpoint, 0, sizeof(*endpoint));
         endpoint->number = selected->number;
         endpoint->in = selected->in;

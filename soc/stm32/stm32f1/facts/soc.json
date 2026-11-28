@@ -1497,7 +1497,8 @@
         "rm0008-f103-md",
         "rm0008-f103-md-default-buses",
         "rm0008-f103-md-controls",
-        "f103-md-tim1"
+        "f103-md-tim1",
+        "rm0008-f103-md-pma"
       ],
       "clock_policy": "rm0008-f103-md-run"
     },
@@ -1505,7 +1506,8 @@
       "part_prefix": "STM32F103C6",
       "controller_groups": [
         "gpioa-basic",
-        "usart2-default-irq"
+        "usart2-default-irq",
+        "fpec-main-flash"
       ],
       "clock_policy": "rm0008-f103-hsi8"
     },
@@ -1514,8 +1516,12 @@
       "controller_groups": [
         "gpioa-basic",
         "usart2-default-irq",
-        "f103-flash",
-        "dac-direct"
+        "dac-direct",
+        "f103-ze-i2s2",
+        "f103-hd-sdio",
+        "f103-hd-tim8",
+        "f103-hd-adc-pair",
+        "fpec-main-flash"
       ],
       "clock_policy": "rm0008-f103-hsi8"
     },
@@ -1524,7 +1530,7 @@
       "controller_groups": [
         "gpioa-basic",
         "usart2-default-irq",
-        "f103-flash",
+        "fpec-main-flash",
         "f103-xl-fsmc",
         "dac-direct"
       ],
@@ -1539,7 +1545,10 @@
       "controller_groups": [
         "gpioa-basic",
         "usart2-default-irq",
-        "dac-direct"
+        "dac-direct",
+        "rm0041-f100xb-pwm",
+        "fpec-main-flash",
+        "rm0041-f100xb-gpioc-user-leds"
       ],
       "clock_policy": "stm32f1-hsi8"
     },
@@ -1549,22 +1558,24 @@
         "gpioa-basic",
         "usart2-default-irq"
       ],
-      "clock_policy": "stm32f1-hsi8"
+      "clock_policy": "rm0008-f101-md-run"
     },
     "stm32f102xb": {
       "part_prefix": "STM32F102RB",
       "controller_groups": [
         "gpioa-basic",
-        "usart2-default-irq"
+        "usart2-default-irq",
+        "rm0008-f102-md-pma"
       ],
-      "clock_policy": "stm32f1-hsi8"
+      "clock_policy": "rm0008-f102-md-run"
     },
     "stm32f105xc": {
       "part_prefix": "STM32F105VC",
       "controller_groups": [
         "gpioa-basic",
         "usart2-default-irq",
-        "rm0008-connectivity-bxcan"
+        "rm0008-connectivity-bxcan",
+        "rm0008-connectivity-dwc"
       ],
       "clock_policy": "rm0008-f105-f107-run"
     },
@@ -1572,8 +1583,10 @@
       "part_prefix": "STM32F107VC",
       "controller_groups": [
         "gpioa-basic",
-        "usart2-default-irq",
-        "rm0008-connectivity-bxcan"
+        "f107-usart2",
+        "rm0008-connectivity-bxcan",
+        "rm0008-connectivity-dwc",
+        "rm0008-f107-clause22"
       ],
       "clock_policy": "rm0008-f105-f107-run"
     },

@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "id": "stm32f105vc-hse25-usb-a-software",
+  "soc": "STM32F105VCT6",
+  "soc_family": "stm32f1",
+  "source_revision": "RM0008 Rev21 Table 30, \u00a728 Host and the exact guarded carrier software reference",
+  "physical_pcb_revision": null,
+  "clocks": {
+    "hse_hz": 25000000,
+    "hse_bypass": false
+  },
+  "bindings": [
+    {
+      "id": "usb-a",
+      "controller": "OTG_FS",
+      "route": "otg-fs-guarded-host-pa9-pa11-pa12",
+      "requires": {
+        "usb_host_power": "external-guarded-pb0-pb1-pb10"
+      }
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14",
+    "PA15",
+    "PB3",
+    "PB4",
+    "PC14",
+    "PC15"
+  ],
+  "unknowns": [
+    "Board, 25 MHz crystal and 5 V rail have not been observed.",
+    "Requires a host-only USB A connector, translated PA9 VBUS sensing, high-active PB0 external enable, PB1 fault active low, PB10 VBUS-good active high and hardware overcurrent shutdown."
+  ],
+  "provenance": [
+    "https://www.st.com/resource/en/datasheet/stm32f107vc.pdf"
+  ],
+  "backend_support": [
+    "baremetal"
+  ],
+  "hardware_options": {
+    "usb_host_power": [
+      "absent",
+      "external-guarded-pb0-pb1-pb10"
+    ]
+  }
+}

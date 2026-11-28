@@ -157,6 +157,8 @@ class CapabilityDocumentationTests(unittest.TestCase):
             ("stm32f4", "TIM1", "advanced_pwm", "complementary-pwm"),
             ("stm32f4", "TIM8", "advanced_pwm", "complementary-pwm"),
             ("stm32f1", "TIM1", "advanced_pwm", "complementary-pwm"),
+            ("stm32f1", "TIM4", "timer_capture", "edge-capture"),
+            ("stm32f1", "TIM8", "advanced_pwm", "complementary-pwm"),
         }
         self.assertEqual({(row["family"], row["controller"], row["kind"],
                            row["mode"]) for row in selected}, expected)
@@ -164,8 +166,10 @@ class CapabilityDocumentationTests(unittest.TestCase):
             with self.subTest(controller=row["controller"], kind=row["kind"]):
                 self.assertTrue(row["fixtures"])
                 if row["family"] == "stm32f1":
+                    name = ("timer_capture/tim4" if row["kind"] == "timer_capture"
+                            else "advanced_pwm/advanced_pwm")
                     self.assertEqual(row["exports"], [
-                        "soc/stm32/stm32f1/drivers/advanced_pwm/advanced_pwm.c"])
+                        f"soc/stm32/stm32f1/drivers/{name}.c"])
                     continue
                 if row["kind"] == "timer_capture" and row["controller"] != "TIM4":
                     name = "timer_capture_" + row["controller"].lower()

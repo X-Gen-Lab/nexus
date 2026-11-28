@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "id": "stm32f107vc-hse25-usb-b-software",
+  "soc": "STM32F107VCT6",
+  "soc_family": "stm32f1",
+  "source_revision": "RM0008 Table 30 and reviewed 25 MHz carrier software reference",
+  "physical_pcb_revision": null,
+  "clocks": {
+    "hse_hz": 25000000,
+    "hse_bypass": false
+  },
+  "bindings": [
+    {
+      "id": "usb-b",
+      "controller": "OTG_FS",
+      "route": "otg-fs-sensed-pa9-pa11-pa12",
+      "requires": {
+        "usb_device_wiring": "pa9-vbus-pa11-pa12"
+      }
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14",
+    "PA15",
+    "PB3",
+    "PB4",
+    "PC14",
+    "PC15"
+  ],
+  "unknowns": [
+    "The GPIO output and serial routes are software test inputs. No physical PCB or connected loads are claimed.",
+    "The 25 MHz crystal, PCB and oscillator timing have not been observed.",
+    "Dedicated USB B-device connector, PA9 actual VBUS sense, PA11 DM, PA12 DP; physical power and signal integrity not executed."
+  ],
+  "provenance": [
+    "https://www.st.com/resource/en/datasheet/stm32f107vc.pdf"
+  ],
+  "backend_support": [
+    "baremetal"
+  ],
+  "hardware_options": {
+    "usb_device_wiring": [
+      "absent",
+      "pa9-vbus-pa11-pa12"
+    ]
+  }
+}

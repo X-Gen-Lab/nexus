@@ -76,6 +76,10 @@ def validate_selection(selection, route, provider):
     if (selection["mode"] in {"single-shot", "single-trigger-dma", "low-rate-scan"} and
             (selection["mode"] != "low-rate-scan") != (len(channels) == 1)):
         fail("ADC mode contradicts its reviewed channel count")
+    if selection["mode"] == "simultaneous-scan-dma" and (
+            len(channels) != 2 or tuple(channels) != tuple(mapping.values()) or
+            samples[0] != samples[1]):
+        fail("Simultaneous ADC requires both route channels in order with equal sample times")
     if shape.irq and "irq_priority" not in selection:
         fail("ADC trigger-dma requires an explicit IRQ priority")
     if (not shape.irq and

@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "bindings": [
+    {
+      "kind": "uart",
+      "mode": "irq-words",
+      "implementation": "uart_word",
+      "headers": [
+        "drivers/uart/word.h"
+      ],
+      "limits": {
+        "baud": [
+          1200,
+          500000
+        ]
+      },
+      "io_domains": [
+        "uart_word"
+      ],
+      "static_recipe": {
+        "state_type": "nx_stm32f1_uart_word_t",
+        "ops": "nx_stm32f1_uart_word_ops",
+        "declarations": [
+          {
+            "role": "rx_words",
+            "type": "uint16_t",
+            "const": false,
+            "count": {
+              "source": "item.options.rx_capacity"
+            }
+          },
+          {
+            "role": "word_config",
+            "type": "nx_stm32f1_uart_word_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "storage",
+                  {
+                    "ref": "rx_words",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "capacity",
+                  {
+                    "source": "item.options.rx_capacity"
+                  }
+                ],
+                [
+                  "clock_hz",
+                  {
+                    "source": "selected.clock_hz"
+                  }
+                ],
+                [
+                  "baud",
+                  {
+                    "source": "item.options.baud"
+                  }
+                ],
+                [
+                  "priority",
+                  {
+                    "source": "item.options.irq.priority"
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "calls": {
+          "admit": [
+            {
+              "function": "nx_stm32f1_uart_word_admit",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "ref": "word_config",
+                  "as": "address"
+                }
+              ]
+            }
+          ],
+          "prepare": {
+            "function": "nx_stm32f1_uart_word_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "ref": "word_config",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32f1_uart_word_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "irq": [
+          {
+            "name": {
+              "source": "selected.vector_bindings.0.handler",
+              "as": "symbol"
+            },
+            "calls": [
+              {
+                "function": "nx_stm32f1_uart_word_irq",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  }
+                ]
+              }
+            ],
+            "barrier": "nx_arch_dsb"
+          }
+        ],
+        "retain_on_failed_init": true
+      }
+    }
+  ]
+}

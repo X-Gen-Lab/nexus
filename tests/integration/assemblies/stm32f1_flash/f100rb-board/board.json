@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "id": "stm32f100rb-flash-software-reference",
+  "soc": "STM32F100RBT6B",
+  "soc_family": "stm32f1",
+  "source_revision": "software-reference-v1",
+  "physical_pcb_revision": null,
+  "clocks": {},
+  "bindings": [
+    {
+      "id": "flash0",
+      "controller": "FLASH",
+      "route": "flash-f100rb-1k",
+      "supply_mv": 3300
+    }
+  ],
+  "reserved_resources": [],
+  "unknowns": [
+    "Nominal supply is a configuration assumption. Physical silicon cut, PCB revision and supply have not been observed."
+  ],
+  "provenance": [
+    "https://www.st.com/resource/en/datasheet/stm32f100rb.pdf",
+    "https://www.st.com/resource/en/errata_sheet/es093-stm32f100x4-stm32f100x6-stm32f100x8-and-stm32f100xb-low-and-mediumdensity-value-line-device-errata-stmicroelectronics.pdf"
+  ],
+  "backend_support": [
+    "baremetal"
+  ]
+}

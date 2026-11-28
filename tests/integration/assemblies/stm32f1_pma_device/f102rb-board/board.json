@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "id": "stm32f102rb-hse8-pma-reference",
+  "soc": "STM32F102RBT6",
+  "soc_family": "stm32f1",
+  "source_revision": "DS5933 Rev7 Figure 4, Tables 4, 8 and 42, RM0008 Rev21 \u00a723 and the reviewed self-powered carrier",
+  "physical_pcb_revision": null,
+  "clocks": {
+    "hse_hz": 8000000,
+    "hse_bypass": false
+  },
+  "bindings": [
+    {
+      "id": "usb-b-pma",
+      "controller": "USB",
+      "route": "usb-pma-pa0-pa1-pa11-pa12-crystal",
+      "requires": {
+        "usb_device_wiring": "self-powered-pa0-pa1-pa11-pa12"
+      }
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14",
+    "PA15",
+    "PB3",
+    "PB4",
+    "PD0",
+    "PD1",
+    "PC14",
+    "PC15"
+  ],
+  "unknowns": [
+    "Exact F102 carrier has not been inspected. The nominal 8 MHz crystal and its load are only software premises.",
+    "A self-powered USB B-device connector, VBUS voltage translation and external D+ pull-up switch default off are required. Electrical timing and attachment were not executed."
+  ],
+  "provenance": [
+    "https://www.st.com/resource/en/datasheet/stm32f102rb.pdf"
+  ],
+  "backend_support": [
+    "baremetal"
+  ],
+  "hardware_options": {
+    "usb_device_wiring": [
+      "absent",
+      "self-powered-pa0-pa1-pa11-pa12"
+    ]
+  }
+}

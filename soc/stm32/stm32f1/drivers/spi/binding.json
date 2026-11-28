@@ -6,6 +6,7 @@
       "mode": "short-poll",
       "implementation": "spi",
       "controllers": [
+        "SPI1",
         "SPI2"
       ],
       "headers": [
@@ -31,7 +32,7 @@
                 [
                   "gpio",
                   {
-                    "source": "selected.named_pads.sck.registers",
+                    "source": "selected.constants.spi.endpoints.0.cs.registers",
                     "as": "symbol"
                   }
                 ],
@@ -323,7 +324,7 @@
                       [
                         "gpio",
                         {
-                          "source": "selected.named_pads.sck.registers",
+                          "source": "selected.constants.spi.endpoints.0.cs.registers",
                           "as": "symbol"
                         }
                       ],

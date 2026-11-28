@@ -18,7 +18,10 @@ target_include_directories(
     SYSTEM
     PRIVATE "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f1/Include"
 )
-target_compile_definitions(stm32f103_rtc_backup_contracts PRIVATE STM32F103xB)
+target_compile_definitions(
+    stm32f103_rtc_backup_contracts
+    PRIVATE STM32F103xB NX_STM32F1_RTC_RAW_ALARM
+)
 target_compile_options(
     stm32f103_rtc_backup_contracts
     PRIVATE "-include${CMAKE_CURRENT_LIST_DIR}/register_model.h"

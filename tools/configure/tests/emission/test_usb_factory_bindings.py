@@ -5,7 +5,7 @@ import unittest
 
 from tools.configure import usb_otg, usb_profiles
 from tools.configure.ir import (EndpointIR, IrqOptions, UsbDeviceOptions,
-    UsbEndpointOptions, UsbHostOptions, UsbOtgPowerOptions)
+    UsbFifoEndpointOptions, UsbHostOptions, UsbOtgPowerOptions)
 from tools.configure.policies.packet import PacketPolicy
 
 
@@ -29,9 +29,9 @@ class UsbFactoryBindingTests(unittest.TestCase):
         owners = tuple(SimpleNamespace(id=name, kind="gpio", mask=1 << index)
                        for index, name in enumerate(("supply", "present", "fault"))) if managed else ()
         endpoints = (EndpointIR("control-out", "usb", "usb-fs-endpoint", "usb_device",
-                         UsbEndpointOptions(0, 0, "out", "control", 64, 0, 0), ()),
+                         UsbFifoEndpointOptions(0, 0, "out", "control", 64, 0, 0), ()),
                      EndpointIR("control-in", "usb", "usb-fs-endpoint", "usb_device",
-                         UsbEndpointOptions(1, 0, "in", "control", 64, 96, 32), ()))
+                         UsbFifoEndpointOptions(1, 0, "in", "control", 64, 96, 32), ()))
         result = SimpleNamespace(controllers=(item, *owners), devices=endpoints,
             factory=SimpleNamespace(capabilities=True),
             provider_context=SimpleNamespace(provider=SimpleNamespace(soc={"controllers": {

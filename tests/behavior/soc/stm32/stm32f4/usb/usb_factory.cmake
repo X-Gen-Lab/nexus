@@ -97,7 +97,7 @@ foreach(usb_family stm32)
             "${NEXUS_SOC_SOURCE_${usb_soc}}/drivers/usb/usb_clock.c"
             LIBRARIES Nexus::NativeModel Nexus::Arch
             INCLUDES
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/dwc_otg_device" "${usb_bundle}" "${NEXUS_SOURCE_DIR}/io/private"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/common/dwc_otg_device" "${usb_bundle}" "${NEXUS_SOURCE_DIR}/io/private"
                 "${NEXUS_SOURCE_DIR}/tests/support/native/drivers"
                 "${NEXUS_SOC_SOURCE_${usb_soc}}"
         )

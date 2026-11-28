@@ -54,6 +54,30 @@ void f1_test_clear_pending_irq(IRQn_Type irq);
 #define NX_STM32F1_WRITE(reg, value) f1_test_write((reg), (value))
 #define NX_STM32F1_FLASH_KIB()       f1_test_flash_kib()
 
+#if defined(TEST_F1_STOP)
+extern AFIO_TypeDef f1_test_afio;
+extern EXTI_TypeDef f1_test_exti;
+extern PWR_TypeDef f1_test_power;
+extern RTC_TypeDef f1_test_rtc;
+extern SCB_Type f1_test_scb;
+extern SysTick_Type f1_test_systick;
+void f1_test_stop_wait(void);
+
+#undef AFIO
+#undef EXTI
+#undef PWR
+#undef RTC
+#undef SCB
+#undef SysTick
+#define AFIO                   (&f1_test_afio)
+#define EXTI                   (&f1_test_exti)
+#define PWR                    (&f1_test_power)
+#define RTC                    (&f1_test_rtc)
+#define SCB                    (&f1_test_scb)
+#define SysTick                (&f1_test_systick)
+#define NX_STM32F1_STOP_WAIT() f1_test_stop_wait()
+#endif
+
 #ifdef __cplusplus
 }
 #endif

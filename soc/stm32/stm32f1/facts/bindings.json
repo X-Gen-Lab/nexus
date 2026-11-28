@@ -67,6 +67,62 @@
       "option": "idle_complement_high",
       "equals": true,
       "message": "TIM1 reference requires active-low BKIN and both idle outputs low"
+    },
+    {
+      "device": "stm32f103-md",
+      "kind": "timer_capture",
+      "option": "edge",
+      "equals": "falling",
+      "message": "TIM4 capture maintains only the reviewed rising edge"
+    },
+    {
+      "device": "stm32f103-md",
+      "kind": "timer_capture",
+      "option": "edge",
+      "equals": "both",
+      "message": "TIM4 capture maintains only the reviewed rising edge"
+    },
+    {
+      "device": "stm32f103-md",
+      "kind": "timer_capture",
+      "option": "calls_os",
+      "equals": true,
+      "message": "TIM4 capture interrupts cannot call the OS"
+    },
+    {
+      "device": "stm32f103-md",
+      "kind": "encoder",
+      "option": "counting",
+      "equals": "x2-a",
+      "message": "STM32F103 TIM3 encoder maintains only the reviewed x4 counting mode"
+    },
+    {
+      "device": "stm32f103-md",
+      "kind": "encoder",
+      "option": "counting",
+      "equals": "x2-b",
+      "message": "STM32F103 TIM3 encoder maintains only the reviewed x4 counting mode"
+    },
+    {
+      "device": "stm32f103-hd",
+      "kind": "advanced_pwm",
+      "option": "break_active_high",
+      "equals": true,
+      "message": "TIM8 reference requires active-low BKIN and both idle outputs low"
+    },
+    {
+      "device": "stm32f103-hd",
+      "kind": "advanced_pwm",
+      "option": "idle_high",
+      "equals": true,
+      "message": "TIM8 reference requires active-low BKIN and both idle outputs low"
+    },
+    {
+      "device": "stm32f103-hd",
+      "kind": "advanced_pwm",
+      "option": "idle_complement_high",
+      "equals": true,
+      "message": "TIM8 reference requires active-low BKIN and both idle outputs low"
     }
   ],
   "domains": {
@@ -118,6 +174,9 @@
         },
         "ADC1": {
           "rx": "DMA1:channel1"
+        },
+        "I2S2": {
+          "tx": "DMA1:channel5"
         }
       }
     },
@@ -129,7 +188,8 @@
         "i2c",
         "spi",
         "uart",
-        "dac"
+        "dac",
+        "audio"
       ],
       "classic_can_mailboxes": 3,
       "flash_program_unit": 2,
@@ -156,6 +216,14 @@
         "rm0008-f105-f107-run": [
           "hsi8",
           "hse25-crystal-pll72"
+        ],
+        "rm0008-f101-md-run": [
+          "hsi8",
+          "hse8-crystal-pll36"
+        ],
+        "rm0008-f102-md-run": [
+          "hsi8",
+          "hse8-crystal-pll48"
         ]
       }
     },
@@ -201,6 +269,173 @@
           }
         }
       }
+    },
+    "timers": [
+      {
+        "kind": "advanced_pwm",
+        "controller": "TIM1",
+        "vector": "TIM1_BRK_IRQn",
+        "irq": 24,
+        "clock_hz": 8000000,
+        "routes": [
+          {
+            "channel": 1,
+            "pins": [
+              [
+                "PA8",
+                "output"
+              ],
+              [
+                "PB13",
+                "complement"
+              ],
+              [
+                "PB12",
+                "break"
+              ]
+            ]
+          }
+        ],
+        "resources": [
+          "clock:TIM1"
+        ]
+      },
+      {
+        "kind": "timer_capture",
+        "controller": "TIM4",
+        "vector": "TIM4_IRQn",
+        "irq": 30,
+        "clock_hz": 8000000,
+        "clock_profiles": [
+          "hsi8"
+        ],
+        "routes": [
+          {
+            "channel": 1,
+            "pins": [
+              [
+                "PB6",
+                "capture"
+              ]
+            ]
+          }
+        ],
+        "resources": [
+          "timer:TIM4",
+          "exti:line:6",
+          "irq:EXTI9_5_IRQn"
+        ]
+      },
+      {
+        "kind": "advanced_pwm",
+        "controller": "TIM8",
+        "vector": "TIM8_BRK_IRQn",
+        "irq": 43,
+        "clock_hz": 8000000,
+        "routes": [
+          {
+            "channel": 1,
+            "pins": [
+              [
+                "PC6",
+                "output"
+              ],
+              [
+                "PA7",
+                "complement"
+              ],
+              [
+                "PA6",
+                "break"
+              ]
+            ]
+          }
+        ],
+        "resources": [
+          "clock:TIM8"
+        ],
+        "clock_profiles": [
+          "hsi8"
+        ]
+      }
+    ],
+    "capture_audio": {
+      "mechanism": "i2s-system-clock-v1",
+      "controllers": [
+        "I2S2"
+      ],
+      "source": "hsi",
+      "nominal_hz": 8000000,
+      "sample_rate_hz": [
+        8000,
+        96000
+      ],
+      "prescaler": [
+        4,
+        511
+      ],
+      "format": {
+        "standard": "philips",
+        "sample_bits": 16,
+        "slot_bits": 16,
+        "cpol_high": false
+      }
+    },
+    "uart_formats": {
+      "words": [
+        "USART2"
+      ],
+      "irq_probe": false,
+      "byte_frames": [
+        [
+          7,
+          "even"
+        ],
+        [
+          7,
+          "odd"
+        ],
+        [
+          8,
+          "none"
+        ],
+        [
+          8,
+          "even"
+        ],
+        [
+          8,
+          "odd"
+        ]
+      ]
+    },
+    "uart_wire": {
+      "controllers": {
+        "USART2": {
+          "protocols": [
+            "half-duplex",
+            "lin",
+            "asynchronous",
+            "irda",
+            "synchronous"
+          ],
+          "flows": [
+            "none",
+            "rts-cts"
+          ]
+        }
+      },
+      "irda_max_baud": 115200,
+      "smartcard_prescaler_max": 255,
+      "lin_max_baud": 20000,
+      "receive_profiles": {
+        "half-duplex": "bytes",
+        "lin": "events",
+        "asynchronous": "events",
+        "irda": "events",
+        "synchronous": "events"
+      },
+      "irda_normal_only": true
     }
   },
   "pads": {

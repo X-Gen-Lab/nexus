@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "id": "stm32f103rb-nucleo-mco-pma-reference",
+  "soc": "STM32F103RBT6",
+  "soc_family": "stm32f1",
+  "source_revision": "UM1724 Rev17 \u00a77.9.1, MB1136 C-02 or later with the factory ST-LINK MCO route",
+  "physical_pcb_revision": null,
+  "clocks": {
+    "hse_hz": 8000000,
+    "hse_bypass": true
+  },
+  "bindings": [
+    {
+      "id": "usb-b-pma",
+      "controller": "USB",
+      "route": "usb-pma-pa0-pa1-pa11-pa12",
+      "requires": {
+        "usb_device_wiring": "self-powered-pa0-pa1-pa11-pa12"
+      }
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14",
+    "PA15",
+    "PB3",
+    "PB4",
+    "PD0",
+    "PD1",
+    "PC14",
+    "PC15"
+  ],
+  "unknowns": [
+    "Exact physical PCB revision, MCO waveform and solder bridges have not been inspected.",
+    "Requires 8 MHz ST-LINK MCO with SB55 open, SB54 closed, SB16 and SB50 closed and R35/R37 absent. Clock accuracy is unmeasured.",
+    "Target externally powered. Connector, VBUS level translation, hardware default-off pull-up switch and wiring are software reference assumptions."
+  ],
+  "provenance": [
+    {
+      "scope": "Official MB1136 manual connections and stock configuration only; physical hardware is not observed.",
+      "url": "https://www.st.com/resource/en/user_manual/um1724-stm32-nucleo64-boards-mb1136-stmicroelectronics.pdf",
+      "file": "um1724-stm32-nucleo64-boards-mb1136-stmicroelectronics.pdf",
+      "sha256": "576d9bee3bc32c8ee70bf0d77cf9494cec06ea7c1d9ff98eebf2738cb9314a14",
+      "pages": [
+        26,
+        27,
+        40,
+        41
+      ],
+      "components": [
+        "U4",
+        "ST-LINK",
+        "CN7",
+        "CN10",
+        "SB55",
+        "SB54",
+        "SB16",
+        "SB50",
+        "R35",
+        "R37"
+      ],
+      "nets": [
+        "+3.3V",
+        "PA0",
+        "PA1",
+        "PA11",
+        "PA12",
+        "PD0/OSC_IN",
+        "ST-LINK MCO"
+      ]
+    }
+  ],
+  "backend_support": [
+    "baremetal"
+  ],
+  "hardware_options": {
+    "usb_device_wiring": [
+      "absent",
+      "self-powered-pa0-pa1-pa11-pa12"
+    ]
+  }
+}

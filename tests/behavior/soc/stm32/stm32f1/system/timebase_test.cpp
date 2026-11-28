@@ -20,11 +20,18 @@
 #include "nexus/arch/sleep.h"
 #endif
 
+#if defined(TEST_F1_STOP)
+#include "nexus/arch/arch.h"
+#include "nexus/components/clock_domain_owner.h"
+#include "nexus_bindings.h"
+#include "system/stop_internal.h"
+#endif
+
 #include <cstring>
 
 #if defined(NEXUS_CLOCK_HSE_BYPASS)
-#define TEST_HSE72 1
-#if NEXUS_CLOCK_HSE_BYPASS == 0
+#define TEST_HSE_PLL 1
+#if defined(STM32F105xC) || defined(STM32F107xC)
 #define TEST_PLL2 1
 #endif
 #endif
@@ -33,6 +40,23 @@ RCC_TypeDef f1_test_rcc;
 FLASH_TypeDef f1_test_flash;
 TIM_TypeDef f1_test_timer;
 NVIC_Type f1_test_nvic;
+
+#if defined(TEST_F1_STOP)
+AFIO_TypeDef f1_test_afio;
+EXTI_TypeDef f1_test_exti;
+PWR_TypeDef f1_test_power;
+RTC_TypeDef f1_test_rtc;
+SCB_Type f1_test_scb{};
+SysTick_Type f1_test_systick{};
+const nx_exti_ops_t nx_stm32f1_exti_ops{};
+unsigned platform_suspend_calls;
+nx_result_t platform_suspend_status;
+
+extern "C" nx_result_t nx_platform_suspend(void) {
+    ++platform_suspend_calls;
+    return platform_suspend_status;
+}
+#endif
 
 namespace {
 constexpr nx_stm32f1_platform_config_t rb{128U * 1024U};
@@ -45,9 +69,29 @@ bool disable_irq;
 uint32_t sleep_control;
 unsigned wfi_count;
 #endif
-#if defined(TEST_HSE72)
+#if defined(TEST_HSE_PLL)
 extern "C" uint32_t SystemCoreClock;
-constexpr uint32_t timer_prescaler = 71U;
+#if defined(STM32F101xB)
+constexpr uint32_t sysclk = 36000000U;
+constexpr uint32_t flash_latency = 1U;
+constexpr uint32_t clock_fields = RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE_HSE_DIV2 |
+                                  RCC_CFGR_PLLMULL9 | RCC_CFGR_ADCPRE_DIV4;
+constexpr uint32_t extra_clock_fields = 0U;
+#elif defined(STM32F102xB)
+constexpr uint32_t sysclk = 48000000U;
+constexpr uint32_t flash_latency = 1U;
+constexpr uint32_t clock_fields = RCC_CFGR_PLLSRC | RCC_CFGR_PLLMULL6 |
+                                  RCC_CFGR_PPRE1_DIV2 | RCC_CFGR_ADCPRE_DIV4 |
+                                  RCC_CFGR_USBPRE;
+constexpr uint32_t extra_clock_fields = RCC_CFGR_USBPRE;
+#else
+constexpr uint32_t sysclk = 72000000U;
+constexpr uint32_t flash_latency = 2U;
+constexpr uint32_t clock_fields = RCC_CFGR_PLLSRC | RCC_CFGR_PLLMULL9 |
+                                  RCC_CFGR_PPRE1_DIV2 | RCC_CFGR_ADCPRE_DIV6;
+constexpr uint32_t extra_clock_fields = 0U;
+#endif
+constexpr uint32_t timer_prescaler = sysclk / 1000000U - 1U;
 bool hse_present;
 bool allow_hsi_switch;
 bool safe_pll_switch;
@@ -85,7 +129,7 @@ class F103Timebase : public testing::Test {
         sleep_control = 0U;
         wfi_count = 0U;
 #endif
-#if defined(TEST_HSE72)
+#if defined(TEST_HSE_PLL)
         hse_present = true;
         allow_hsi_switch = true;
         safe_pll_switch = false;
@@ -97,7 +141,7 @@ class F103Timebase : public testing::Test {
 
     void TearDown() override {
         disable_irq = true;
-#if defined(TEST_HSE72)
+#if defined(TEST_HSE_PLL)
         allow_hsi_switch = true;
 #endif
 #if defined(TEST_PLL2)
@@ -235,12 +279,12 @@ TEST_F(F103Timebase, FailedVectorWithdrawalRetainsClockUntilRetry) {
     EXPECT_EQ(NVIC_GetPriority(TIM2_IRQn), 6U);
     EXPECT_EQ(nx_stm32f1_platform_system_start(&rb).primary, NX_SUCCESS);
 }
-#if defined(TEST_HSE72)
+#if defined(TEST_HSE_PLL)
 TEST_F(F103Timebase, SwitchesOnlyAfterFlashAndBusAreSafe) {
     ASSERT_EQ(nx_stm32f1_platform_system_start(&rb).primary, NX_SUCCESS);
     EXPECT_TRUE(safe_pll_switch);
-    EXPECT_EQ(SystemCoreClock, 72000000U);
-    EXPECT_EQ(f1_test_timer.PSC, 71U);
+    EXPECT_EQ(SystemCoreClock, sysclk);
+    EXPECT_EQ(f1_test_timer.PSC, timer_prescaler);
     EXPECT_NE(f1_test_rcc.CR & RCC_CR_HSION, 0U);
     ASSERT_EQ(nx_stm32f1_platform_system_release(&rb, true), NX_SUCCESS);
     EXPECT_EQ(SystemCoreClock, 8000000U);
@@ -267,11 +311,26 @@ TEST_F(F103Timebase, FailedReturnToHsiRetainsPllAndFlashWaitStates) {
     EXPECT_EQ(f1_test_rcc.CFGR & RCC_CFGR_SWS, RCC_CFGR_SWS_PLL);
     EXPECT_NE(f1_test_rcc.CR & RCC_CR_PLLON, 0U);
     EXPECT_NE(f1_test_rcc.CR & RCC_CR_HSEON, 0U);
-    EXPECT_EQ(f1_test_flash.ACR & FLASH_ACR_LATENCY, 2U);
+    EXPECT_EQ(f1_test_flash.ACR & FLASH_ACR_LATENCY, flash_latency);
     EXPECT_FALSE(nx_stm32f1_system_live());
     EXPECT_EQ(nx_stm32f1_platform_system_start(&rb).primary, NX_ERROR_STATE);
     allow_hsi_switch = true;
     EXPECT_EQ(nx_stm32f1_platform_system_release(&rb, true), NX_SUCCESS);
+}
+#endif
+
+#if defined(STM32F102xB) && defined(TEST_HSE_PLL)
+TEST_F(F103Timebase, RetainsPll48UntilUsbGateIsReleased) {
+    ASSERT_EQ(nx_stm32f1_platform_system_start(&rb).primary, NX_SUCCESS);
+    EXPECT_EQ(RCC->APB1ENR & RCC_APB1ENR_USBEN, 0U);
+    EXPECT_NE(RCC->CFGR & RCC_CFGR_USBPRE, 0U);
+    RCC->APB1ENR = RCC->APB1ENR | RCC_APB1ENR_USBEN;
+    EXPECT_EQ(nx_stm32f1_platform_system_release(&rb, true), NX_ERROR_BUSY);
+    EXPECT_NE(RCC->CFGR & RCC_CFGR_USBPRE, 0U);
+    EXPECT_NE(RCC->CR & RCC_CR_PLLRDY, 0U);
+    RCC->APB1ENR = RCC->APB1ENR & ~static_cast<uint32_t>(RCC_APB1ENR_USBEN);
+    EXPECT_EQ(nx_stm32f1_platform_system_release(&rb, true), NX_SUCCESS);
+    EXPECT_EQ(RCC->CFGR & RCC_CFGR_USBPRE, 0U);
 }
 #endif
 
@@ -367,6 +426,189 @@ TEST_F(F103Timebase, RejectsNonResetExternalClockPrescaler) {
     EXPECT_EQ(RCC->APB1ENR, 0U);
 }
 #endif
+#if defined(TEST_F1_STOP)
+constexpr uint32_t wake_line = 1U << 13U;
+constexpr uint32_t wake_vector = 1U << (EXTI15_10_IRQn - 32U);
+unsigned stop_waits;
+bool signal_at_wait;
+bool signal_at_arm;
+bool clock_lost;
+bool deep_stuck;
+
+class F103Stop : public F103Timebase {
+  protected:
+    nx_clock_domain_t domain{};
+    nx_clock_barrier_t barrier{};
+    nx_stm32f1_exti_config_t wake_config{};
+    nx_stm32f1_exti_t wake{};
+
+    void SetUp() override {
+        F103Timebase::SetUp();
+        SCB->SCR = SCB->ICSR = SCB->SHCSR = 0U;
+        SysTick->LOAD = SysTick->VAL = 0U;
+        f1_test_afio = {};
+        f1_test_exti = {};
+        f1_test_power = {};
+        f1_test_rtc = {};
+        stop_waits = 0U;
+        platform_suspend_calls = 0U;
+        platform_suspend_status = NX_SUCCESS;
+        signal_at_wait = true;
+        signal_at_arm = false;
+        clock_lost = false;
+        deep_stuck = false;
+        FLASH->OBR = FLASH_OBR_IWDG_SW | FLASH_OBR_nRST_STOP;
+        ASSERT_EQ(NX_SUCCESS, nx_stm32f1_platform_system_start(&rb).primary);
+        ASSERT_EQ(NX_SUCCESS, nx_clock_domain_construct(&domain, 1U));
+        ASSERT_EQ(NX_SUCCESS, nx_clock_domain_close(&domain, &barrier));
+        wake_config.gpio = GPIOC;
+        wake_config.line = 13U;
+        wake_config.gpio_index = 2U;
+        wake_config.edge = NX_EXTI_FALLING;
+        wake.config = &wake_config;
+        wake.live = wake.line_owned = wake.vector_owned = true;
+        RCC->APB2ENR = RCC_APB2ENR_AFIOEN | RCC_APB2ENR_IOPCEN;
+        AFIO->EXTICR[3] = AFIO_EXTICR4_EXTI13_PC;
+        EXTI->FTSR = EXTI->IMR = wake_line;
+        NVIC->ISER[1] = wake_vector;
+        TIM2->CNT = 37U;
+    }
+};
+
+TEST_F(F103Stop, PublicOwnerSuspendsBeforeArmingAndResumesOnlyAfterWithdrawal) {
+    const nx_exti_port_t port{&nx_stm32f1_exti_ops, &wake};
+    const auto observed = nx_stm32f103_stop_enter(barrier, &port);
+    EXPECT_EQ(1U, platform_suspend_calls);
+    EXPECT_TRUE(observed.platform_suspended);
+    EXPECT_TRUE(observed.resume_ready);
+    EXPECT_TRUE(observed.wake_pending);
+    EXPECT_EQ(NX_SUCCESS, observed.status);
+    EXPECT_EQ(NX_SUCCESS, observed.cleanup);
+    EXPECT_EQ(observed.previous_epoch + 1U, observed.current_epoch);
+    EXPECT_EQ(0U, RCC->APB1ENR & RCC_APB1ENR_PWREN);
+    EXPECT_EQ(NX_SUCCESS, nx_stm32f1_stop_wake_resume(&wake));
+}
+
+TEST_F(F103Stop, PublicOwnerPreservesThePlatformPartialSuspendContract) {
+    const nx_exti_port_t port{&nx_stm32f1_exti_ops, &wake};
+    platform_suspend_status = NX_ERROR_BUSY;
+    const auto observed = nx_stm32f103_stop_enter(barrier, &port);
+    EXPECT_EQ(1U, platform_suspend_calls);
+    EXPECT_EQ(NX_ERROR_BUSY, observed.status);
+    EXPECT_FALSE(observed.platform_suspended);
+    EXPECT_FALSE(observed.resume_ready);
+    EXPECT_EQ(37U, nx_time_now_us());
+    EXPECT_EQ(0U, stop_waits);
+    EXPECT_EQ(0U, RCC->APB1ENR & RCC_APB1ENR_PWREN);
+}
+
+TEST_F(F103Stop, PublicResumeCannotContinueAfterFailedTimeRestore) {
+    const nx_exti_port_t port{&nx_stm32f1_exti_ops, &wake};
+    clock_lost = true;
+    const auto observed = nx_stm32f103_stop_enter(barrier, &port);
+    EXPECT_TRUE(observed.platform_suspended);
+    EXPECT_FALSE(observed.resume_ready);
+    EXPECT_EQ(NX_ERROR_IO, observed.cleanup);
+    EXPECT_EQ(NX_ERROR_STATE, nx_stm32f1_stop_wake_resume(&wake));
+    EXPECT_EQ(NX_SUCCESS, nx_clock_domain_quiescent(barrier));
+    EXPECT_EQ(0U, RCC->APB1ENR & RCC_APB1ENR_PWREN);
+    EXPECT_EQ(wake_line, EXTI->PR);
+}
+
+TEST_F(F103Stop, RefusesResumeWhenSleepdeepCannotBeWithdrawn) {
+    const nx_exti_port_t port{&nx_stm32f1_exti_ops, &wake};
+    deep_stuck = true;
+    const auto observed = nx_stm32f103_stop_enter(barrier, &port);
+    EXPECT_TRUE(observed.platform_suspended);
+    EXPECT_FALSE(observed.resume_ready);
+    EXPECT_EQ(NX_ERROR_IO, observed.cleanup);
+    EXPECT_GT(observed.current_epoch, observed.previous_epoch);
+    EXPECT_EQ(NX_ERROR_STATE, nx_stm32f1_stop_wake_resume(&wake));
+    EXPECT_EQ(NX_SUCCESS, nx_clock_domain_quiescent(barrier));
+}
+
+TEST_F(F103Stop, AdvancesEpochBeforeTheWakeIrqCanRun) {
+    const auto observed = nx_stm32f1_stop_hsi8(barrier, &wake);
+    ASSERT_EQ(NX_SUCCESS, observed.status);
+    EXPECT_EQ(NX_SUCCESS, observed.cleanup);
+    EXPECT_EQ(37U, observed.before_us);
+    EXPECT_EQ(observed.previous_epoch + 1U, observed.current_epoch);
+    EXPECT_TRUE(observed.wait_issued);
+    EXPECT_TRUE(observed.wake_pending);
+    EXPECT_EQ(1U, stop_waits);
+    EXPECT_EQ(0U, SCB->SCR);
+    EXPECT_EQ(0U, nx_arch_irq_masks().primask);
+    EXPECT_EQ(wake_line, EXTI->PR);
+    EXPECT_EQ(wake_vector, NVIC->ISPR[1]);
+    EXPECT_TRUE(nx_stm32f1_system_live());
+    EXPECT_EQ(NX_SUCCESS, nx_clock_domain_quiescent(barrier));
+}
+
+TEST_F(F103Stop, RefusesRetainedConsumerAndUnconsumedWake) {
+    ASSERT_EQ(NX_SUCCESS, nx_clock_domain_reopen(barrier));
+    nx_clock_lease_t loan{};
+    ASSERT_EQ(NX_SUCCESS, nx_clock_domain_acquire(&domain, &loan));
+    ASSERT_EQ(NX_SUCCESS, nx_clock_domain_close(&domain, &barrier));
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32f1_stop_hsi8(barrier, &wake).status);
+    ASSERT_EQ(NX_SUCCESS, nx_clock_domain_release(&domain, &loan));
+    EXTI->PR = wake_line;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32f1_stop_hsi8(barrier, &wake).status);
+    EXPECT_EQ(wake_line, EXTI->PR);
+    EXPECT_EQ(37U, nx_time_now_us());
+    EXPECT_EQ(0U, stop_waits);
+}
+
+TEST_F(F103Stop, RefusesActiveDmaAndPreservesRtcAndSystemPendingFlags) {
+    RCC->AHBENR = RCC->AHBENR | RCC_AHBENR_DMA1EN;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32f1_stop_hsi8(barrier, &wake).status);
+    RCC->AHBENR = RCC_AHBENR_SRAMEN | RCC_AHBENR_FLITFEN;
+    RTC->CRL = RTC_CRL_ALRF;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32f1_stop_hsi8(barrier, &wake).status);
+    EXPECT_EQ(RTC_CRL_ALRF, RTC->CRL);
+    RTC->CRL = 0U;
+    SCB->ICSR = SCB_ICSR_PENDSTSET_Msk;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32f1_stop_hsi8(barrier, &wake).status);
+    EXPECT_EQ(SCB_ICSR_PENDSTSET_Msk, SCB->ICSR);
+    EXPECT_EQ(0U, stop_waits);
+}
+
+TEST_F(F103Stop, LateReadyEdgeSkipsWfiAndPreservesItsPendingWitness) {
+    signal_at_arm = true;
+    const auto observed = nx_stm32f1_stop_hsi8(barrier, &wake);
+    EXPECT_EQ(NX_ERROR_BUSY, observed.status);
+    EXPECT_EQ(NX_SUCCESS, observed.cleanup);
+    EXPECT_FALSE(observed.wait_issued);
+    EXPECT_TRUE(observed.wake_pending);
+    EXPECT_EQ(0U, stop_waits);
+    EXPECT_EQ(observed.previous_epoch + 1U, observed.current_epoch);
+    EXPECT_EQ(wake_line, EXTI->PR);
+    EXPECT_EQ(wake_vector, NVIC->ISPR[1]);
+    EXPECT_TRUE(nx_stm32f1_system_live());
+}
+
+TEST_F(F103Stop, WaitWithoutExpectedEdgeDoesNotReportAWakeup) {
+    signal_at_wait = false;
+    const auto observed = nx_stm32f1_stop_hsi8(barrier, &wake);
+    EXPECT_EQ(NX_SUCCESS, observed.status);
+    EXPECT_TRUE(observed.wait_issued);
+    EXPECT_FALSE(observed.wake_pending);
+    EXPECT_EQ(observed.previous_epoch + 1U, observed.current_epoch);
+    EXPECT_TRUE(nx_stm32f1_system_live());
+}
+
+TEST_F(F103Stop, FailedHsiRestoreRetainsWakeEvidenceAndClosedDomain) {
+    clock_lost = true;
+    const auto observed = nx_stm32f1_stop_hsi8(barrier, &wake);
+    EXPECT_EQ(NX_ERROR_IO, observed.cleanup);
+    EXPECT_EQ(0U, observed.current_epoch);
+    EXPECT_FALSE(nx_stm32f1_system_live());
+    EXPECT_EQ(NX_SUCCESS, nx_clock_domain_quiescent(barrier));
+    EXPECT_EQ(wake_line, EXTI->PR);
+    EXPECT_EQ(wake_vector, NVIC->ISPR[1]);
+    EXPECT_EQ(0U, NVIC->ISER[1] & wake_vector);
+    EXPECT_EQ(0U, nx_arch_irq_masks().primask);
+}
+#endif
 } /* namespace */
 
 #if defined(NEXUS_ARCH_SLEEP_MODEL)
@@ -386,16 +628,47 @@ void nx_arch_sleep_model_wfi(void) {
 }
 #endif
 
+#if defined(TEST_F1_STOP)
+void f1_test_stop_wait(void) {
+    EXPECT_EQ(1U, nx_arch_irq_masks().primask);
+    EXPECT_NE(0U, SCB->SCR & SCB_SCR_SLEEPDEEP_Msk);
+    EXPECT_EQ(0U, RCC->APB1ENR & RCC_APB1ENR_TIM2EN);
+    EXPECT_EQ(0U, NVIC_GetEnableIRQ(TIM2_IRQn));
+    EXPECT_NE(0U, RCC->AHBENR & RCC_AHBENR_FLITFEN);
+    ++stop_waits;
+    if (signal_at_wait) {
+        EXTI->PR = wake_line;
+        NVIC->ISPR[1] = wake_vector;
+    }
+    if (clock_lost) {
+        RCC->CR = RCC->CR & ~static_cast<uint32_t>(RCC_CR_HSIRDY);
+    }
+}
+#endif
+
 uint16_t f1_test_flash_kib() {
     return flash_kib;
 }
 
 void f1_test_write(volatile uint32_t* reg, uint32_t value) {
+#if defined(TEST_F1_STOP)
+    if (reg == &SCB->SCR && deep_stuck && (value & SCB_SCR_SLEEPDEEP_Msk) == 0U)
+        return;
+    if (reg == &SCB->SCR && signal_at_arm &&
+        (value & SCB_SCR_SLEEPDEEP_Msk) != 0U) {
+        EXTI->PR = wake_line;
+        NVIC->ISPR[1] = wake_vector;
+    }
+    if (reg == &NVIC->ICER[1]) {
+        NVIC->ISER[1] = NVIC->ISER[1] & ~value;
+        return;
+    }
+#endif
     if (reg == &TIM2->SR) {
         *reg &= value;
         return;
     }
-#if defined(TEST_HSE72)
+#if defined(TEST_HSE_PLL)
     if (reg == &RCC->CR) {
         uint32_t ready = 0U;
         if ((value & RCC_CR_HSION) != 0U)
@@ -430,10 +703,11 @@ void f1_test_write(volatile uint32_t* reg, uint32_t value) {
             (RCC->CR & RCC_CR_PLLRDY) != 0U) {
             source = RCC_CFGR_SWS_PLL;
             safe_pll_switch =
-                (FLASH->ACR & FLASH_ACR_LATENCY) == 2U &&
-                (value & RCC_CFGR_PPRE1) == RCC_CFGR_PPRE1_DIV2 &&
-                (value & (RCC_CFGR_HPRE | RCC_CFGR_PPRE2)) == 0U &&
-                (value & RCC_CFGR_ADCPRE) == RCC_CFGR_ADCPRE_DIV6 &&
+                (FLASH->ACR & FLASH_ACR_LATENCY) == flash_latency &&
+                (value &
+                 (RCC_CFGR_HPRE | RCC_CFGR_PPRE1 | RCC_CFGR_PPRE2 |
+                  RCC_CFGR_ADCPRE | RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE |
+                  RCC_CFGR_PLLMULL | extra_clock_fields)) == clock_fields &&
                 (RCC->CR & RCC_CR_CSSON) != 0U;
         } else if ((value & RCC_CFGR_SW) == RCC_CFGR_SW_HSI &&
                    allow_hsi_switch) {

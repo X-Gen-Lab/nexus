@@ -6,7 +6,10 @@
       "mode": "fixed-pwm",
       "implementation": "pwm",
       "controllers": [
-        "TIM3"
+        "TIM3",
+        "TIM15",
+        "TIM16",
+        "TIM17"
       ],
       "headers": [
         "drivers/pwm/instance.h"

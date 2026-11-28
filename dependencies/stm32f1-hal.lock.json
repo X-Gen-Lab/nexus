@@ -13,6 +13,10 @@
       "bytes": 7425,
       "sha256": "377e7fc68715cfb6d09715e9d77bd5cee09e79f00479f502d3191016c3c388dd"
     },
+    "Inc/stm32f1xx_hal_hcd.h": {
+      "bytes": 12257,
+      "sha256": "61050636eee90df55f8b4accfd8aae5f85dca72a41482fe01826f82eed61a0fc"
+    },
     "Inc/stm32f1xx_ll_adc.h": {
       "bytes": 228411,
       "sha256": "fe109e162ec888be59a63f8a0e424c53d98f18ea0066ab55cb6851b7005fa9ee"
@@ -57,6 +61,10 @@
       "bytes": 99185,
       "sha256": "8684e487827c318256ba7ae36841bd2c7fa2438c0cc5c8aa36b555f607873e77"
     },
+    "Inc/stm32f1xx_ll_usb.h": {
+      "bytes": 25525,
+      "sha256": "c7f57fbfed1c0472db4821bd5e2a448fa4f07c565269d126d51a50c96fa7d9d1"
+    },
     "Inc/stm32f1xx_ll_utils.h": {
       "bytes": 8610,
       "sha256": "decb7156d26dc56db7ed76c06c71533ca579905b80824b178749a03a2f224a1b"
@@ -69,9 +77,17 @@
       "bytes": 1485,
       "sha256": "dff179cfe1405dc3381dc6865bf4a5173b35605b65694d73356b01aaec1f09f1"
     },
+    "Src/stm32f1xx_hal_hcd.c": {
+      "bytes": 47772,
+      "sha256": "c64d91279fc1da34342794bb66cf554d381a730695d48a491b9f1954e379fc6f"
+    },
     "Src/stm32f1xx_ll_fsmc.c": {
       "bytes": 38325,
       "sha256": "0b13290f746e9b35d4f7da9c3829294d4f871e183b5a206841412052d868a47a"
+    },
+    "Src/stm32f1xx_ll_usb.c": {
+      "bytes": 79339,
+      "sha256": "f5608c9990138df7c314c13aee4a895b4e033fc96fc060a93f6d52c43b19a37d"
     }
   },
   "kind": "nexus-reviewed-official-driver",
@@ -89,5 +105,5 @@
   "release": "STM32CubeF1-v1.8.7-pinned-driver",
   "repository": "https://github.com/STMicroelectronics/stm32f1xx-hal-driver.git",
   "schema_version": 1,
-  "selected_api": "stm32f1-reviewed-ll"
+  "selected_api": "stm32f1-reviewed-ll-and-hcd"
 }

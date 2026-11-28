@@ -36,7 +36,8 @@ from tools.configure.ir import (
 from tools.configure import resource_graph, trigger_graph, dma_topology, board_hardware, gpio_electrical
 from tools.configure import device_graph, component_catalog, validation
 from tools.configure.contracts import (
-    COMPONENTS, CONTROLLER_KINDS, CONTROLLER_SELECTION_FIELDS,
+    COMPONENTS, CONTROLLER_CONTRACTS, CONTROLLER_KINDS,
+    CONTROLLER_SELECTION_FIELDS,
     ENDPOINT_SELECTION_FIELDS)
 from tools.configure import (
     kernel,
@@ -440,7 +441,8 @@ def resolve_routes(routes_doc, soc, part, provider, *, controller_profiles=None)
     for route in sequence(routes_doc["routes"], "routes"):
         obj(route, {"id", "variants", "controller", "kind", "pins", "modes",
                     "source"}, {"resources", "dma", "mode_dma", "mode_resources",
-                                "clock_profiles", "register_settings"}, "route")
+                                "clock_profiles", "register_settings",
+                                "required_options"}, "route")
         identity(route["id"], "route id")
         if route["id"] in routes:
             fail(f"Duplicate route id: {route['id']}")
@@ -451,6 +453,14 @@ def resolve_routes(routes_doc, soc, part, provider, *, controller_profiles=None)
                 text(value, f"route {field}")
         if not route["variants"] or not route["modes"]:
             fail("Route must have exact variants and maintained modes")
+        if "required_options" in route:
+            contract = CONTROLLER_CONTRACTS.get(route["kind"])
+            fields = contract.selected_fields if contract is not None else set()
+            options = obj(route["required_options"], set(), fields,
+                          "route required options")
+            if not options or any(type(value) not in (bool, int, str)
+                                  for value in options.values()):
+                fail("Route required options must name scalar controller values")
         if "clock_profiles" in route:
             profiles = [text(name, "route clock profile") for name in
                         sequence(route["clock_profiles"], "route clock profiles")]

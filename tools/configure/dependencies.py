@@ -12,7 +12,7 @@ COMMON = (
     "providers/__init__", "providers/common", "generation/calls",
     "validation", "resource_graph", "trigger_graph", "dma_topology", "io_traits",
     "selected_contracts",
-    "enhanced_endpoints", "uart_formats", "stream_profiles", "usb_profiles",
+    "enhanced_endpoints", "uart_formats", "stream_profiles", "usb_profiles", "usb_pma",
     "usb_host", "usb_otg",
 )
 PLATFORM = (

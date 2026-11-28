@@ -1,0 +1,109 @@
+{
+  "schema_version": 1,
+  "id": "stm32f103rb-nucleo-dual-spi-reference",
+  "soc": "STM32F103RBT6",
+  "soc_family": "stm32f1",
+  "source_revision": "UM1724 Rev17 Tables 12 and 27, NUCLEO-F103RB Arduino and Morpho software reference",
+  "physical_pcb_revision": null,
+  "clocks": {},
+  "bindings": [
+    {
+      "id": "spi1-cs",
+      "controller": "GPIOA",
+      "route": "gpio-pa4-spi1-cs",
+      "initial": 16,
+      "mask": 16,
+      "electrical": {
+        "mode": "output",
+        "output_type": "push-pull",
+        "initial": 16
+      }
+    },
+    {
+      "id": "spi1",
+      "controller": "SPI1",
+      "route": "spi1-pa5-pa6-pa7"
+    },
+    {
+      "id": "spi2-cs",
+      "controller": "GPIOB",
+      "route": "gpio-pb12-cs",
+      "initial": 4096,
+      "mask": 4096,
+      "electrical": {
+        "mode": "output",
+        "output_type": "push-pull",
+        "initial": 4096
+      }
+    },
+    {
+      "id": "spi2",
+      "controller": "SPI2",
+      "route": "spi2-pb13-pb14-pb15"
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14",
+    "PA15",
+    "PB3",
+    "PB4",
+    "PD0",
+    "PD1",
+    "PC14",
+    "PC15"
+  ],
+  "unknowns": [
+    "Actual PCB revision, load and SCK/MISO/MOSI timing have not been measured.",
+    "PA5 also connects to LD2 on the stock board. Review SB21 and the effect of the LED load before hardware use.",
+    "Software reference assumes externally wired active-low SPI targets with shared ground."
+  ],
+  "provenance": [
+    {
+      "scope": "Table 12 D13 PA5, D12 PA6, D11 PA7 and A2 PA4; board LED wiring is documentary.",
+      "url": "https://www.st.com/resource/en/user_manual/um1724-stm32-nucleo64-boards-mb1136-stmicroelectronics.pdf",
+      "file": "um1724-stm32-nucleo64-boards-mb1136-stmicroelectronics.pdf",
+      "sha256": "576d9bee3bc32c8ee70bf0d77cf9494cec06ea7c1d9ff98eebf2738cb9314a14",
+      "pages": [
+        28,
+        40
+      ],
+      "components": [
+        "U4",
+        "LD2",
+        "SB21",
+        "CN5",
+        "CN8"
+      ],
+      "nets": [
+        "PA4/A2",
+        "PA5/D13",
+        "PA6/D12",
+        "PA7/D11"
+      ]
+    },
+    {
+      "scope": "Table 27 locates SPI2 pads PB12 through PB15 on CN10.",
+      "url": "https://www.st.com/resource/en/user_manual/um1724-stm32-nucleo64-boards-mb1136-stmicroelectronics.pdf",
+      "file": "um1724-stm32-nucleo64-boards-mb1136-stmicroelectronics.pdf",
+      "sha256": "576d9bee3bc32c8ee70bf0d77cf9494cec06ea7c1d9ff98eebf2738cb9314a14",
+      "pages": [
+        57
+      ],
+      "components": [
+        "CN10",
+        "U4"
+      ],
+      "nets": [
+        "PB12",
+        "PB13",
+        "PB14",
+        "PB15"
+      ]
+    }
+  ],
+  "backend_support": [
+    "baremetal",
+    "freertos"
+  ]
+}

@@ -24,6 +24,16 @@ F105VC 与 F107VC 的 HSI8 装配之外，还可选择 `f105vc-hse25-baremetal.t
 路径，得到 72 MHz 系统时钟及名义 48 MHz OTG 时钟。各软件装配消费 GPIO 与
 USART2，实际 PCB、晶体和外设时序待实物核验。
 
+Cortex-M3 Access Line 选用 `f101rb-hse8-baremetal.toml` 和
+`f102rb-hse8-baremetal.toml` 验证额定时钟与既有 USART2。F101RB 的 HCLK、APB1、
+APB2 为 36 MHz。F102RB 的 HCLK 和 APB2 为 48 MHz，APB1 为 24 MHz，TIM2 使用
+48 MHz。F102RB 装配选择独立的名义 48 MHz USB 时钟分频，USB 外设时钟保持关闭。
+两套 8 MHz 晶体参考的物理 PCB 与频率准确度待实物核验。
+
+`f103rb-7e2-baremetal.toml` 使用相同的公共 UART 接口和 PA2／PA3，选择七位数据、
+偶校验和两个停止位。UART IRQ 在上交接收值前去掉硬件校验位。七位带校验、
+八位无校验与八位带校验各支持一或两个停止位。有限 DMA 保持默认 8N1。
+
 C8 软件夹具用同一个应用核对封装、Flash 容量及额外上拉输入的静态装配。选中依赖和锁定工具链准备完成后，
 用以下入口构建。每份装配使用独立输出。
 

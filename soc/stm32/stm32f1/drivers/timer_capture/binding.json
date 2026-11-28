@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "bindings": [
+    {
+      "kind": "timer_capture",
+      "mode": "edge-capture",
+      "implementation": "tim4_capture",
+      "static_recipe": {
+        "state_type": "nx_stm32f1_tim4_capture_t",
+        "ops": "nx_stm32f1_tim4_capture_ops",
+        "declarations": [],
+        "calls": {
+          "admit": [],
+          "prepare": {
+            "function": "nx_stm32f1_tim4_capture_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "source": "item.options.tick_hz"
+              },
+              {
+                "source": "item.options.irq.priority"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32f1_tim4_capture_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "retain_on_failed_init": true,
+        "irq": [
+          {
+            "name": {
+              "source": "selected.vector_bindings.0.handler",
+              "as": "symbol"
+            },
+            "calls": [
+              {
+                "function": "nx_stm32f1_tim4_capture_irq",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  }
+                ]
+              }
+            ],
+            "barrier": "nx_arch_dsb"
+          }
+        ]
+      },
+      "headers": [
+        "drivers/timer_capture/instance.h"
+      ],
+      "controllers": [
+        "TIM4"
+      ],
+      "limits": {
+        "tick_hz": [
+          1000000,
+          1000000
+        ],
+        "filter": [
+          0,
+          0
+        ]
+      }
+    }
+  ]
+}

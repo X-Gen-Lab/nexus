@@ -26,6 +26,11 @@ CMSIS_DIRECTORY = "vendors/st/cmsis_device_f1"
 LOCK_NAME = "dependencies/stm32f1-hal.lock.json"
 CMSIS_LOCK_NAME = "dependencies/stm32f1.lock.json"
 REVIEWED_FILES = frozenset({
+    "Inc/stm32f1xx_hal_hcd.h",
+    "Inc/stm32f1xx_ll_usb.h",
+    "Src/stm32f1xx_hal_hcd.c",
+    "Src/stm32f1xx_ll_usb.c",
+
     "Inc/Legacy/stm32_hal_legacy.h",
     "Inc/stm32f1xx_hal.h",
     "Inc/stm32f1xx_hal_def.h",
@@ -62,18 +67,18 @@ def contract(lock):
             or lock["commit"] != COMMIT or lock["repository"] != ORIGIN
             or lock["pairing"] != PAIRING
             or lock["release"] != "STM32CubeF1-v1.8.7-pinned-driver"
-            or lock["selected_api"] != "stm32f1-reviewed-ll"):
+            or lock["selected_api"] != "stm32f1-reviewed-ll-and-hcd"):
         raise ValueError("Exact official STM32CubeF1 pairing required")
     if lock["license"] != {"path": "LICENSE.md", "expression": "BSD-3-Clause"}:
         raise ValueError("Original reviewed STM32F1 notice required")
     if not isinstance(lock["files"], dict) or set(lock["files"]) != REVIEWED_FILES:
-        raise ValueError("STM32F1 source lock must close the reviewed LL graph")
+        raise ValueError("STM32F1 source lock must close the reviewed LL/HCD graph")
     for record in lock["files"].values():
-        fields(record, {"bytes", "sha256"}, "STM32F1 LL file identity")
+        fields(record, {"bytes", "sha256"}, "STM32F1 driver file identity")
         if (type(record["bytes"]) is not int or record["bytes"] <= 0
                 or not isinstance(record["sha256"], str)
                 or not re.fullmatch(r"[0-9a-f]{64}", record["sha256"])):
-            raise ValueError("Invalid STM32F1 LL file identity")
+            raise ValueError("Invalid STM32F1 driver file identity")
     return REVIEWED_FILES
 
 

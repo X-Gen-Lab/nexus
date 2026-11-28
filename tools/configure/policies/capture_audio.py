@@ -60,12 +60,107 @@ def boolean(value, name):
 
 
 @dataclass(frozen=True)
+class SystemClockI2sPolicy:
+    """Finite stereo I2S over a reviewed direct system clock and pad route."""
+
+    controllers: tuple[str, ...]
+    source: str
+    nominal_hz: int
+    sample_rates: tuple[int, int]
+    prescaler: tuple[int, int]
+    format: Mapping
+
+    @classmethod
+    def from_validated(cls, value):
+        _fields(value, {"mechanism", "controllers", "source", "nominal_hz",
+                        "sample_rate_hz", "prescaler", "format"})
+        controllers = value["controllers"]
+        if (not isinstance(controllers, (tuple, list)) or not controllers
+                or any(type(controller) is not str for controller in controllers)
+                or len(set(controllers)) != len(controllers)):
+            fail("System-clock I2S requires distinct controller identities")
+        for controller in controllers:
+            Symbol(controller)
+        source = value["source"]
+        if type(source) is not str or not source:
+            fail("System-clock I2S requires a named direct source")
+        nominal = integer(value["nominal_hz"], 1, context="I2S SYSCLK Hz")
+        sample_rates = _bounds(value["sample_rate_hz"], "I2S sample rate")
+        prescaler = _bounds(value["prescaler"], "I2S prescaler")
+        if prescaler[0] < 4 or prescaler[1] > 511:
+            fail("System-clock I2S divider must use 2×I2SDIV + ODD in [4,511]")
+        wire = value["format"]
+        _fields(wire, {"standard", "sample_bits", "slot_bits", "cpol_high"})
+        if (wire["standard"] not in ("philips", "msb", "lsb")
+                or type(wire["sample_bits"]) is not int
+                or wire["sample_bits"] not in (16, 24, 32)
+                or type(wire["slot_bits"]) is not int
+                or wire["slot_bits"] not in (16, 32)
+                or wire["sample_bits"] > wire["slot_bits"]):
+            fail("System-clock I2S requires a reviewed stereo word format")
+        boolean(wire["cpol_high"], "I2S clock polarity")
+        return cls(tuple(controllers), source, nominal, sample_rates, prescaler,
+                   freeze(wire))
+
+    def validate(self, selection, route):
+        if (route["kind"] != "audio" or route["controller"] not in self.controllers
+                or selection["mode"] != "master-tx"):
+            fail("System-clock I2S requires a reviewed finite master-tx route")
+        for field, value in self.format.items():
+            chosen = selection.get(field)
+            if type(chosen) is not type(value) or chosen != value:
+                fail("System-clock I2S requires the reviewed " + field)
+        if selection.get("mclk") is not False or selection.get("calls_os", False):
+            fail("System-clock I2S uses no MCLK or OS interrupt calls")
+        if ({"pll_n", "pll_r", "max_sample_rate_hz", "max_service_gap_us"}
+                & selection.keys()):
+            fail("System-clock I2S has no auxiliary PLL or continuous session")
+        budget = selection.get("poll_limit", 1)
+        if type(budget) is not int or budget != 1:
+            fail("System-clock I2S performs one bounded drain observation per service")
+        integer(selection.get("sample_rate_hz"), *self.sample_rates,
+                "I2S requested sample rate")
+        integer(selection.get("max_error_ppm"), 0, 100000, "I2S max error ppm")
+        if tuple(pin["function"] for pin in route["pins"]) != ("ws", "ck", "sd"):
+            fail("System-clock I2S requires exactly WS, CK and SD")
+
+    def resolve_fields(self, selection, route, clock, clock_plan):
+        if (clock_plan is None or clock_plan.get("parameters") is not None
+                or clock["source"] != self.source
+                or clock["input_hz"] != self.nominal_hz
+                or clock["core_hz"] != self.nominal_hz):
+            fail("I2S requires the reviewed direct SYSCLK profile")
+        target = selection["sample_rate_hz"]
+        base = Fraction(self.nominal_hz, 2 * self.format["slot_bits"])
+        low, high = self.prescaler
+        floor = base // target
+        neighbours = {max(low, min(high, item)) for item in (floor, floor + 1)}
+        divider = min(neighbours, key=lambda item: (abs(base / item - target), item))
+        actual = base / divider
+        if actual > self.sample_rates[1]:
+            fail("I2S actual sample rate exceeds the electrical limit")
+        if abs(actual - target) * 1000000 > target * selection["max_error_ppm"]:
+            fail("I2S actual sample rate exceeds the explicit ppm bound")
+        return dict(pll_n=0, pll_r=0, pll_input_hz=0, pll_m=0, pll_hse=False,
+                    divider=divider // 2, odd=bool(divider & 1), poll_limit=1,
+                    rate_numerator=actual.numerator, rate_denominator=actual.denominator)
+
+    def dma_paths(self, route, mode):
+        paths = tuple(route_dma(route, mode))
+        if len(paths) != 1:
+            fail("System-clock I2S requires one wired TX DMA lane")
+        return paths
+
+
+@dataclass(frozen=True)
 class CaptureAudioPolicy:
     capture: Mapping
     audio: Mapping
 
     @classmethod
     def from_validated(cls, value, *, pinmux):
+        if isinstance(value, Mapping) and value.get("mechanism") == "i2s-system-clock-v1":
+            return SystemClockI2sPolicy.from_validated(value)
         if not isinstance(pinmux, NumericPinMuxPolicy):
             fail("Capture/audio requires its selected numeric pinmux policy")
         _fields(value, {"mechanism", "capture", "audio"})

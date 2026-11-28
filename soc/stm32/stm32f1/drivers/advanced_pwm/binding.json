@@ -5,7 +5,8 @@
       "kind": "advanced_pwm",
       "mode": "complementary-pwm",
       "controllers": [
-        "TIM1"
+        "TIM1",
+        "TIM8"
       ],
       "implementation": "advanced_pwm",
       "headers": [
@@ -112,56 +113,32 @@
         },
         "irq": [
           {
-            "name": "TIM1_BRK_IRQHandler",
-            "calls": [
-              {
-                "function": "nx_stm32f1_advanced_pwm_irq",
-                "args": [
+            "map": {
+              "source": "selected.vector_bindings",
+              "limit": 1,
+              "value": {
+                "name": {
+                  "source": "entry.handler",
+                  "as": "symbol"
+                },
+                "calls": [
                   {
-                    "ref": "port",
-                    "as": "address"
+                    "function": "nx_stm32f1_advanced_pwm_irq",
+                    "args": [
+                      {
+                        "ref": "port",
+                        "as": "address"
+                      }
+                    ]
                   }
-                ]
+                ],
+                "barrier": "nx_arch_dsb"
               }
-            ],
-            "barrier": "nx_arch_dsb"
+            }
           }
         ],
         "retain_on_failed_init": true
       }
     }
-  ],
-  "domains": {
-    "timers": [
-      {
-        "kind": "advanced_pwm",
-        "controller": "TIM1",
-        "vector": "TIM1_BRK_IRQn",
-        "irq": 24,
-        "clock_hz": 8000000,
-        "routes": [
-          {
-            "channel": 1,
-            "pins": [
-              [
-                "PA8",
-                "output"
-              ],
-              [
-                "PB13",
-                "complement"
-              ],
-              [
-                "PB12",
-                "break"
-              ]
-            ]
-          }
-        ],
-        "resources": [
-          "clock:TIM1"
-        ]
-      }
-    ]
-  }
+  ]
 }

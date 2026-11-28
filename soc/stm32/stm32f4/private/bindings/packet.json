@@ -544,7 +544,7 @@
       "packet-endpoint-plan": [
         {
           "role": "usb_plan",
-          "type": "nx_stm32_usb_endpoint_config_t",
+          "type": "nx_usb_endpoint_config_t",
           "const": true,
           "value": {
             "map": {

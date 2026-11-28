@@ -1,0 +1,20 @@
+schema = 2
+board_package = ".."
+backend = "baremetal"
+clock = "hsi8"
+
+[memory]
+main_stack_bytes = 1024
+libc_heap_bytes = 0
+static_ram_limit_bytes = 3072
+flash_load_limit_bytes = 16384
+
+[gpio.user]
+binding = "user"
+mode = "input"
+active_high = true
+
+[gpio.status]
+binding = "blue"
+mode = "output"
+active_high = true

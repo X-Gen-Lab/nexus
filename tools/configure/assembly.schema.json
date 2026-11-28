@@ -4400,6 +4400,27 @@
         ],
         "additionalProperties": false
       }
+    },
+    "mdio": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "binding": {
+            "type": "string",
+            "description": "Exact reviewed Board binding; no route fallback."
+          },
+          "mode": {
+            "type": "string",
+            "description": "Explicit maintained mode; the product owns service and shutdown."
+          }
+        },
+        "required": [
+          "binding",
+          "mode"
+        ],
+        "additionalProperties": false
+      }
     }
   },
   "required": [

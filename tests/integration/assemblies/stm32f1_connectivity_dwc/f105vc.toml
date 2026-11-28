@@ -1,0 +1,44 @@
+# STM32F105VCT6 software integration. Hardware wiring remains unverified.
+schema = 2
+board_package = "f105vc-board"
+backend = "baremetal"
+clock = "hse25-crystal-pll72"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+flash_load_limit_bytes = 24576
+static_ram_limit_bytes = 6144
+libc_heap_bytes = 0
+
+[factory]
+capabilities = true
+
+[hardware]
+usb_device_wiring = "pa9-vbus-pa11-pa12"
+
+[usb_device.fs]
+binding = "usb-b"
+mode = "device-fs"
+event_capacity = 8
+rx_fifo_words = 64
+vbus_sensing = true
+poll_limit = 128
+drain_timeout_us = 1000
+clock_timeout_us = 5000
+irq = {priority = 5, calls_os = false}
+
+[usb_endpoint.control_in]
+controller = "fs"
+number = 0
+direction = "in"
+transfer = "control"
+max_packet = 64
+fifo_words = 16
+
+[usb_endpoint.control_out]
+controller = "fs"
+number = 0
+direction = "out"
+transfer = "control"
+max_packet = 64

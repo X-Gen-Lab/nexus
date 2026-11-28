@@ -1620,7 +1620,7 @@
             "condition": "An OTG_FS Device FIFO write is interrupted by accesses to endpoint-specific registers.",
             "handling": "PIO device FIFO writes and controller-state access occur under the same IRQ critical section and unique serialized owner. External direct OTG register access and reentrant class calls are forbidden while this owner is active.",
             "implementation": [
-              "soc/stm32/stm32f4/drivers/ip/dwc_otg_device/usb_device_controller.c",
+              "soc/stm32/common/dwc_otg_device/usb_device_controller.c",
               "soc/stm32/stm32f4/drivers/usb/usb_device.c",
               "docs/reference/contracts/io/usb-lifecycle.md"
             ],
@@ -1637,7 +1637,7 @@
             "condition": "An FS host reaches a low-speed device through a hub.",
             "handling": "The maintained host contract supports direct root-port peers only; hub/split-transaction topology is not exposed. No capacitance workaround or universal hub support is claimed.",
             "implementation": [
-              "soc/stm32/stm32f4/drivers/usb/usb_host.c",
+              "soc/stm32/common/dwc_otg_host/usb_host.c",
               "docs/reference/contracts/io/usb-lifecycle.md"
             ],
             "regressions": [
@@ -1652,7 +1652,7 @@
             "condition": "Multiple IN channels halt while an undersized RxFIFO still contains the last packet/status.",
             "handling": "HAL host initialization reserves RxFIFO space beyond two maximum packets plus status, and the serialized channel owner bounds halt/drain. No exact-one-packet FIFO profile is admitted.",
             "implementation": [
-              "soc/stm32/stm32f4/drivers/usb/usb_host.c",
+              "soc/stm32/common/dwc_otg_host/usb_host.c",
               "docs/reference/contracts/io/usb-lifecycle.md"
             ],
             "regressions": [
@@ -1667,7 +1667,7 @@
             "condition": "IN-only host operation has no TxFIFO allocated.",
             "handling": "Host initialization always assigns nonperiodic and periodic TxFIFO space as well as RxFIFO; IN-only channel use cannot remove those shared FIFO reservations.",
             "implementation": [
-              "soc/stm32/stm32f4/drivers/usb/usb_host.c",
+              "soc/stm32/common/dwc_otg_host/usb_host.c",
               "docs/reference/contracts/io/usb-lifecycle.md"
             ],
             "regressions": [
@@ -1682,7 +1682,7 @@
             "condition": "A host channel is disabled immediately after enable, before hardware starts and can emit CHH.",
             "handling": "The owner keeps the transfer active through bounded channel halt, observing actual enable/count state and using bounded controller recovery when CHH cannot be obtained; it does not settle a request solely because HAL_HC_Halt returned. No guaranteed immediate-CHH behavior is assumed.",
             "implementation": [
-              "soc/stm32/stm32f4/drivers/usb/usb_host.c",
+              "soc/stm32/common/dwc_otg_host/usb_host.c",
               "docs/reference/contracts/io/usb-lifecycle.md"
             ],
             "regressions": [
@@ -1697,7 +1697,7 @@
             "condition": "Immediate DCFG DAD/PFIVL readback is not reliable after programming.",
             "handling": "Address state is retained in the controller owner and applied in its control-transfer phase; immediate DAD/PFIVL equality is not used as a device-address success oracle. Readback of unrelated core state does not prove these fields.",
             "implementation": [
-              "soc/stm32/stm32f4/drivers/ip/dwc_otg_device/usb_device_controller.c",
+              "soc/stm32/common/dwc_otg_device/usb_device_controller.c",
               "soc/stm32/stm32f4/drivers/usb/usb_device.c",
               "docs/reference/contracts/io/usb-lifecycle.md"
             ],
@@ -1714,7 +1714,7 @@
             "condition": "An OTG_HS Device FIFO write is interrupted by endpoint-register access.",
             "handling": "The shared device owner serializes HAL/PIO controller effects in IRQ critical sections; the selected HS DMA path additionally prevents this FIFO-write interleaving. DMA selection does not relax unique controller ownership or buffer reachability.",
             "implementation": [
-              "soc/stm32/stm32f4/drivers/ip/dwc_otg_device/usb_device_controller.c",
+              "soc/stm32/common/dwc_otg_device/usb_device_controller.c",
               "soc/stm32/stm32f4/drivers/usb/usb_device.c",
               "docs/reference/contracts/io/usb-lifecycle.md"
             ],
@@ -1731,7 +1731,7 @@
             "condition": "The HS core uses its internal full-speed interface to reach a low-speed peer through a hub.",
             "handling": "HS-FS and HS-ULPI software references retain the same direct-root-only host topology restriction; an external hub stack cannot inherit the current support claim.",
             "implementation": [
-              "soc/stm32/stm32f4/drivers/usb/usb_host.c",
+              "soc/stm32/common/dwc_otg_host/usb_host.c",
               "docs/reference/contracts/io/usb-lifecycle.md"
             ],
             "regressions": [

@@ -1,0 +1,26 @@
+schema = 2
+board_package = "board"
+backend = "baremetal"
+clock = "hsi8"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+flash_load_limit_bytes = 24576
+static_ram_limit_bytes = 6144
+
+[audio.sound]
+binding = "i2s2"
+mode = "master-tx"
+standard = "philips"
+sample_bits = 16
+slot_bits = 16
+cpol_high = false
+mclk = false
+sample_rate_hz = 16000
+max_error_ppm = 23438
+irq = { priority = 5, calls_os = false }
+
+[factory]
+capabilities = true

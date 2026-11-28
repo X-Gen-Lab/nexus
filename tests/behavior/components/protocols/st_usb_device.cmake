@@ -4,7 +4,7 @@ nexus_google_test(nexus_st_usb_device_stack_test
     SOURCES "${nexus_google_root}/components/protocols/st_usb_device_stack_test.cpp" "${nexus_google_root}/components/protocols/st_usb_device_dcd_test.cpp"
     LIBRARIES Nexus::STUSBDevice Nexus::NativeModel Nexus::Arch
     INCLUDES
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/dwc_otg_device" "${NEXUS_SOURCE_DIR}/components/protocols/st_usb_device/private"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/common/dwc_otg_device" "${NEXUS_SOURCE_DIR}/components/protocols/st_usb_device/private"
         "${NEXUS_SOURCE_DIR}/tests/support/native/drivers"
 )
 target_include_directories(

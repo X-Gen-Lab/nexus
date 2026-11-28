@@ -26,7 +26,9 @@
   },
   "exports": {
     "vendor_shared": [
-      "bxcan"
+      "bxcan",
+      "dwc_otg_device",
+      "dwc_otg_host"
     ],
     "roots": [
       "."
@@ -35,6 +37,64 @@
       "tests",
       "testing",
       "__pycache__"
+    ],
+    "verification_files": [
+      "tests/integration/assemblies/stm32f1_i2s2/CMakeLists.txt",
+      "tests/integration/assemblies/stm32f1_i2s2/board/board.json",
+      "tests/integration/assemblies/stm32f1_i2s2/f103ze-i2s2.toml",
+      "tests/integration/assemblies/stm32f1_i2s2/main.c",
+      "tests/integration/assemblies/stm32f1_sdio/CMakeLists.txt",
+      "tests/integration/assemblies/stm32f1_sdio/README.md",
+      "tests/integration/assemblies/stm32f1_sdio/board/board.json",
+      "tests/integration/assemblies/stm32f1_sdio/main.c",
+      "tests/integration/assemblies/stm32f1_sdio/ze-1bit.toml",
+      "tests/integration/assemblies/stm32f1_sdio/ze-1bit-write.toml",
+      "tests/integration/assemblies/stm32f1_connectivity_dwc/CMakeLists.txt",
+      "tests/integration/assemblies/stm32f1_connectivity_dwc/main.c",
+      "tests/integration/assemblies/stm32f1_connectivity_dwc/f105vc.toml",
+      "tests/integration/assemblies/stm32f1_connectivity_dwc/f105vc-board/board.json",
+      "tests/integration/assemblies/stm32f1_connectivity_dwc/f107vc.toml",
+      "tests/integration/assemblies/stm32f1_connectivity_dwc/f107vc-board/board.json",
+      "tests/integration/assemblies/stm32f1_handoff/CMakeLists.txt",
+      "tests/integration/assemblies/stm32f1_handoff/README.md",
+      "tests/integration/assemblies/stm32f1_handoff/app.c",
+      "tests/integration/assemblies/stm32f1_handoff/boot.c",
+      "tests/integration/assemblies/stm32f1_handoff/boot.toml",
+      "tests/integration/assemblies/stm32f1_handoff/boot-layout.json",
+      "tests/integration/assemblies/stm32f1_handoff/verify_pair.py",
+      "tests/integration/assemblies/stm32f1_family/f103rb-offset-baremetal.toml",
+      "tests/integration/assemblies/stm32f1_family/f103rb-offset-layout.json",
+      "tests/integration/assemblies/stm32f1_mdio/CMakeLists.txt",
+      "tests/integration/assemblies/stm32f1_mdio/main.c",
+      "tests/integration/assemblies/stm32f1_mdio/f107vc.toml",
+      "tests/integration/assemblies/stm32f1_mdio/mb784-c01.toml",
+      "tests/integration/assemblies/stm32f1_mdio/board/board.json",
+      "tests/integration/assemblies/stm32f1_adc/CMakeLists.txt",
+      "tests/integration/assemblies/stm32f1_adc/main.c",
+      "tests/integration/assemblies/stm32f1_adc/f103ze-pair.toml",
+      "tests/integration/assemblies/stm32f1_adc/ze-pair-board/board.json",
+      "tests/integration/assemblies/stm32f1_connectivity_host/CMakeLists.txt",
+      "tests/integration/assemblies/stm32f1_connectivity_host/main.c",
+      "tests/integration/assemblies/stm32f1_connectivity_host/f105vc.toml",
+      "tests/integration/assemblies/stm32f1_connectivity_host/f105vc-board/board.json",
+      "tests/integration/assemblies/stm32f1_connectivity_host/f107vc.toml",
+      "tests/integration/assemblies/stm32f1_connectivity_host/f107vc-board/board.json",
+      "tests/integration/assemblies/stm32f1_i2c_target/CMakeLists.txt",
+      "tests/integration/assemblies/stm32f1_i2c_target/README.md",
+      "tests/integration/assemblies/stm32f1_i2c_target/main.c",
+      "tests/integration/assemblies/stm32f1_i2c_target/f103rb-target.toml",
+      "tests/integration/assemblies/stm32f1_i2c_target/board/board.json",
+      "tests/integration/assemblies/stm32f1_stop/CMakeLists.txt",
+      "tests/integration/assemblies/stm32f1_stop/board/board.json",
+      "tests/integration/assemblies/stm32f1_stop/f103rb-stop.toml",
+      "tests/integration/assemblies/stm32f1_stop/main.c",
+      "tests/integration/assemblies/stm32f1_vldiscovery/CMakeLists.txt",
+      "tests/integration/assemblies/stm32f1_vldiscovery/main.c",
+      "tests/integration/assemblies/stm32f1_vldiscovery/mb913-c02.toml",
+      "tests/integration/assemblies/stm32f1_pwm_adc/CMakeLists.txt",
+      "tests/integration/assemblies/stm32f1_pwm_adc/board/board.json",
+      "tests/integration/assemblies/stm32f1_pwm_adc/f103rb-cycle.toml",
+      "tests/integration/assemblies/stm32f1_pwm_adc/main.c"
     ]
   },
   "binding_files": [
@@ -54,6 +114,16 @@
     "drivers/rtc/binding.json",
     "drivers/dac/binding.json",
     "drivers/fsmc/binding.json",
-    "drivers/advanced_pwm/binding.json"
+    "drivers/advanced_pwm/binding.json",
+    "drivers/timer_capture/binding.json",
+    "drivers/audio/binding.json",
+    "drivers/usb/binding.json",
+    "drivers/sdio/binding.json",
+    "drivers/encoder/binding.json",
+    "drivers/uart/uart_word.binding.json",
+    "drivers/uart/uart_wire.binding.json",
+    "drivers/ethernet/binding.json",
+    "drivers/i2c/target.binding.json",
+    "drivers/pwm_adc/binding.json"
   ]
 }

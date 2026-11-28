@@ -52,11 +52,12 @@ class ConnectivityClockTests(unittest.TestCase):
                     facts.write_text(json.dumps(board | changes))
                     gate.resolve_ir(file)
 
-    def test_hsi_and_f103_mco_do_not_expose_connectivity_output(self):
-        for assembly in ("f105vc-baremetal.toml", "f107vc-baremetal.toml",
-                         "f103rb-mco-baremetal.toml"):
-            with self.subTest(assembly=assembly):
-                result = gate.resolve_ir(FAMILY / assembly)
-                self.assertNotIn("pll48", result.clock_plan.domains)
-        resources = {claim.key for claim in result.resource_plan.claims}
+    def test_hsi_omits_pll48_and_f103_mco_provides_usb_clock(self):
+        for part in ("f105vc", "f107vc"):
+            with self.subTest(part=part):
+                hsi = gate.resolve_ir(FAMILY / f"{part}-baremetal.toml")
+                self.assertNotIn("pll48", hsi.clock_plan.domains)
+        mco = gate.resolve_ir(FAMILY / "f103rb-mco-baremetal.toml")
+        self.assertEqual(48000000, mco.clock_plan.domains["pll48"].nominal_hz)
+        resources = {claim.key for claim in mco.resource_plan.claims}
         self.assertTrue({"pin:PD0", "pin:PD1"} <= resources)

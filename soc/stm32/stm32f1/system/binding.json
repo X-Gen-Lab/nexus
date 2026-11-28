@@ -7,7 +7,24 @@
       "headers": [
         "system/platform.h"
       ],
-      "roles": {},
+      "roles": {
+        "power": [
+          {
+            "kinds": [
+              "exti"
+            ],
+            "modes": [
+              "stop-wake"
+            ],
+            "controllers": [
+              "EXTI13"
+            ],
+            "parts": [
+              "STM32F103RBT6"
+            ]
+          }
+        ]
+      },
       "dma_clocks": {
         "DMA1": "RCC_AHBENR_DMA1EN"
       },
@@ -214,7 +231,12 @@
         "system_release": "nx_stm32f1_platform_system_release",
         "resources_release_can": "nx_platform_can_close"
       },
-      "config_symbol": "s_nx_platform_lifecycle_config"
+      "config_symbol": "s_nx_platform_lifecycle_config",
+      "power": {
+        "suspend": "nx_stm32f1_stop_wake_suspend",
+        "resume": "nx_stm32f1_stop_wake_resume",
+        "retain_on_failed_resume": true
+      }
     }
   }
 }

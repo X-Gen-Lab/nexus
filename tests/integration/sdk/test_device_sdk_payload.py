@@ -38,10 +38,12 @@ class DeviceSDKPayloadTests(unittest.TestCase):
         root = "soc/stm32/stm32f4/drivers/ip/"
         required = {root + name for name in (
             "i2c_v1_async/i2c_v1_async.c", "i2c_v1_async/i2c_v1_async.h",
-            "classic_can/can_controller.c", "classic_can/can_controller.h",
-            "dwc_otg_device/usb_device_controller.c", "dwc_otg_device/usb_device_controller.h",
             "legacy_mac/eth_mac.c", "legacy_mac/eth_frames_mac.c",
             "advanced_timer/timer_capture_impl.h", "advanced_timer/advanced_pwm_impl.h")}
+        required.update("soc/stm32/common/" + name for name in (
+            "bxcan/can_controller.c", "bxcan/can_controller.h",
+            "dwc_otg_device/usb_device_controller.c",
+            "dwc_otg_device/usb_device_controller.h"))
         self.assertLessEqual(required, set(sdk.REQUIRED_FILES))
         self.assertTrue(all(sdk.selected(name) for name in required))
 

@@ -105,7 +105,7 @@ FIFO，已撤回的 PIO 执行者不再拥有 caller buffer；下一次 cold cor
 ## 实现位置与验收边界
 
 F4 绑定在 `soc/stm32/stm32f4/drivers/usb/usb_device.c`；PIO 控制器机制在
-`soc/stm32/stm32f4/drivers/ip/dwc_otg_device/`。厂商寄存器布局与位定义来自锁定的
+`soc/stm32/common/dwc_otg_device/`。厂商寄存器布局与位定义来自锁定的
 `vendors/st/cmsis_device_f4/`，芯片资料身份由该家族的 `references.json` 固定。
 Native 外部 MMIO 模型位于 `tests/support/native/drivers/usb_device*`，只在测试
 配置中启用，不作为生产 SoC。公共组件与 F4 绑定分别由 `tests/behavior/usb_*`

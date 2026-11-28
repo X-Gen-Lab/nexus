@@ -75,7 +75,7 @@ def classes(result):
     result = _typed(result)
     records = [(kind, "port", [item for item in result.controllers
                               if controller_class(item) == kind])
-               for kind in KINDS]
+               for kind in KINDS if kind != "mdio"]
     for kind in ("uart_word", "spi_dma_transaction", "spi_frames", "pin_state",
                  "pwm_adc_loop", "power_stage"):
         instances = [item for item in result.controllers
@@ -99,7 +99,7 @@ def classes(result):
         if instances:
             records.append((name, "endpoint", instances))
     records.append(("mdio", "port", [item for item in result.controllers
-                                    if item.kind in {"eth", "eth_frames"}]))
+                                    if item.kind in {"mdio", "eth", "eth_frames"}]))
     return [record for record in records if record[2]]
 
 
@@ -333,6 +333,7 @@ def emit(result):
             name = symbol(instance.id)
             pointer = (f"nx_device_{name}" if shape == "endpoint"
                        else f"g_nx_mdio_binding_{name}" if class_name == "mdio"
+                       and instance.kind != "mdio"
                        else f"nx_binding_{name}")
             source += [f"        case {prefix}{name.upper()}:", f"            return {pointer};"]
         source += ["        default:", "            return NULL;", "    }", "}"]

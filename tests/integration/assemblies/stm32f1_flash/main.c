@@ -23,7 +23,8 @@ int main(void) {
     const bool valid =
         geometry != NULL && geometry->program_unit == 2U &&
         nx_flash_geometry_sector_at(geometry, 0U, &first) == NX_SUCCESS &&
-        ((geometry->size == 128U * 1024U && first.size == 1024U) ||
+        (((geometry->size == 32U * 1024U || geometry->size == 128U * 1024U) &&
+          first.size == 1024U) ||
          (geometry->size == 512U * 1024U && first.size == 2048U) ||
          (geometry->size == 1024U * 1024U && first.size == 2048U &&
           geometry->erase_span_count == 2U &&

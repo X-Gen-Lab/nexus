@@ -14,3 +14,20 @@ RTC 分频、计数、闹钟配置与十个 16 位数据字保持原样。
 日历、写入、闹钟和唤醒返回 `NX_ERROR_UNSUPPORTED`。
 
 [ST 参考手册 RM0008](https://www.st.com/resource/en/reference_manual/rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32-bit-mcus-stmicroelectronics.pdf)
+
+## 私有原始计数闹钟
+
+在 GNU Arm 构建中选 `-DNEXUS_F1_RAW_ALARM_PROBE=ON` 编译并链接
+`nexus_f103_rtc_alarm`。此固定测试工程独占 RTC、BKP、PWR 和 EXTI17，
+根据 RM0008 §18.3.5 在观测到计数推进后更新比较值。它使用专用
+`RTC_Alarm_IRQHandler`，并保持 RTC 全局中断禁用。
+
+闹钟目标用原始 32 位计数表达。设置时要求至少四个计数的提前量、
+距离小于半个计数范围，并排查编程期间已越过目标的情况。触发后分两步
+回收。专用 ISR 屏蔽自身，前台核对 RTC 和 EXTI17 均已挂起，再按顺序
+确认事件并撤除路由。
+
+比较寄存器只写。成功更新后的值会留在 RTC 中，停止只解除 IRQ 交付。
+测试工程保留分频、计数、备份数据和其他 EXTI 线。它要求已配置的 LSE
+RTC、空闲闹钟路径和运行中的 TIM2 单调时钟。固件运行预算按该测试
+工程设定，平台接口仍暴露 `backup-adopt`，物理触发时序和保持未测量。

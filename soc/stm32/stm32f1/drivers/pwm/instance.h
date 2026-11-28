@@ -32,6 +32,7 @@ typedef struct {
     nx_stm32f1_pads_t pads;
     uint16_t duty;
     uint8_t effects;
+    uint8_t gate_shift;
 } nx_stm32f1_pwm_t;
 
 nx_result_t nx_stm32f1_pwm_prepare(nx_stm32f1_pwm_t* state,

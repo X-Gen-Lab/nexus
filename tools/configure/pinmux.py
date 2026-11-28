@@ -54,10 +54,15 @@ class FixedRoutePinMuxPolicy:
 
     pin_fields: ClassVar[frozenset[str]] = frozenset()
 
+    def validate(self, value, context="Pinmux selector"):
+        if value is not None:
+            fail(f"{context} cannot declare a numeric AF on a fixed route")
+        return None
+
     def alternate(self, pin, context="Pinmux selector"):
         if "af" in pin:
             fail(f"{context} cannot declare a numeric AF on a fixed route")
-        return None
+        return self.validate(None, context)
 
 
 PinMuxPolicy = NumericPinMuxPolicy | FixedRoutePinMuxPolicy

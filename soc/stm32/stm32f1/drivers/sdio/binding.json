@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "bindings": [
+    {
+      "kind": "block",
+      "mode": "sdio-poll",
+      "controllers": [
+        "SDIO"
+      ],
+      "implementation": "sdio",
+      "headers": [
+        "drivers/sdio/instance.h"
+      ],
+      "static_recipe": {
+        "state_type": "nx_stm32f1_sdio_block_t",
+        "ops": "nx_stm32f1_sdio_block_ops",
+        "declarations": [],
+        "calls": {
+          "prepare": {
+            "function": "nx_stm32f1_sdio_block_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32f1_sdio_block_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "retain_on_failed_init": true
+      }
+    },
+    {
+      "kind": "block",
+      "mode": "sdio-poll-write",
+      "controllers": [
+        "SDIO"
+      ],
+      "implementation": "sdio",
+      "headers": [
+        "drivers/sdio/instance.h"
+      ],
+      "static_recipe": {
+        "state_type": "nx_stm32f1_sdio_block_t",
+        "ops": "nx_stm32f1_sdio_block_write_ops",
+        "declarations": [],
+        "calls": {
+          "prepare": {
+            "function": "nx_stm32f1_sdio_block_prepare_write",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32f1_sdio_block_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "retain_on_failed_init": true
+      }
+    }
+  ]
+}

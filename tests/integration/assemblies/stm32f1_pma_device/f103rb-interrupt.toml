@@ -1,0 +1,53 @@
+# Self-powered F103RB USB FS EP0 and EP1 Interrupt software reference with external VBUS and pull-up controls.
+schema = 2
+board_package = "rb-board"
+backend = "baremetal"
+clock = "hse8-mco-pll72"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+flash_load_limit_bytes = 24576
+static_ram_limit_bytes = 6144
+libc_heap_bytes = 0
+
+[factory]
+capabilities = true
+
+[hardware]
+usb_device_wiring = "self-powered-pa0-pa1-pa11-pa12"
+
+[usb_device.fs]
+binding = "usb-b-pma"
+mode = "device-pma-interrupt"
+event_capacity = 4
+clock_timeout_us = 1000
+irq = {priority = 5, calls_os = false}
+
+[usb_endpoint.control_in]
+controller = "fs"
+number = 0
+direction = "in"
+transfer = "control"
+max_packet = 64
+
+[usb_endpoint.control_out]
+controller = "fs"
+number = 0
+direction = "out"
+transfer = "control"
+max_packet = 64
+
+[usb_endpoint.data_in]
+controller = "fs"
+number = 1
+direction = "in"
+transfer = "interrupt"
+max_packet = 64
+
+[usb_endpoint.data_out]
+controller = "fs"
+number = 1
+direction = "out"
+transfer = "interrupt"
+max_packet = 64

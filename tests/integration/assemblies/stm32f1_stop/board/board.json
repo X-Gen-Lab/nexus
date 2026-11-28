@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "id": "stm32f103rb-nucleo-stop",
+  "soc": "STM32F103RBT6",
+  "soc_family": "stm32f1",
+  "source_revision": "Documentary MB1136 C-03 B1 PC13 with SB17 closed",
+  "physical_pcb_revision": null,
+  "clocks": {},
+  "bindings": [
+    {
+      "id": "b1",
+      "controller": "EXTI13",
+      "route": "exti13-pc13-stop",
+      "electrical": {
+        "mode": "stop-wake",
+        "pull": "none"
+      }
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14",
+    "PA15",
+    "PB3",
+    "PB4",
+    "PD0",
+    "PD1",
+    "PC14",
+    "PC15"
+  ],
+  "unknowns": [
+    "The board revision, SB17 state and button polarity have not been observed on a station.",
+    "Mechanical bounce is visible to the consumer; there is no debounce stage."
+  ],
+  "provenance": [
+    {
+      "scope": "UM1724 sections 7.7 and 7.11 document the B1 button and SB17.",
+      "url": "https://www.st.com/resource/en/user_manual/um1724-stm32-nucleo64-boards-mb1136-stmicroelectronics.pdf",
+      "file": "um1724-stm32-nucleo64-boards-mb1136-stmicroelectronics.pdf",
+      "sha256": "576d9bee3bc32c8ee70bf0d77cf9494cec06ea7c1d9ff98eebf2738cb9314a14",
+      "pages": [
+        24,
+        27
+      ]
+    },
+    {
+      "url": "https://www.st.com/resource/en/schematic_pack/mb1136-default-c03_schematic.pdf",
+      "sha256": "71117604b6a4ce7935902c022ac99a8474f26e2f7c235c505e35e60703a13ccb",
+      "file": "mb1136-default-c03_schematic.pdf",
+      "pages": [
+        3
+      ],
+      "scope": "Documented active-low B1 on PC13 with SB17 closed and R30 external pull-up.",
+      "components": [
+        "B1",
+        "SB17",
+        "R30",
+        "U4"
+      ],
+      "nets": [
+        "PC13/B1",
+        "VDD"
+      ]
+    }
+  ],
+  "backend_support": [
+    "baremetal"
+  ]
+}

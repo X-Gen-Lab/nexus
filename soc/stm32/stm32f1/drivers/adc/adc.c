@@ -8,6 +8,7 @@
  */
 #include "dispatch_checks.h"
 #include "drivers/adc/instance.h"
+#include "drivers/adc/regular_calibration.h"
 #include "private/hardware.h"
 #include "stm32f1xx_ll_adc.h"
 #include "system/platform.h"
@@ -33,14 +34,8 @@ enum {
     ADC_LIVE = 4U,
     ADC_ACTIVE = 8U,
     ADC_FAULTED = 16U,
-    POWER_SETTLE_US = 4U,
-    CALIBRATION_BUDGET_US = 256U,
     POLL_LIMIT = 4096U
 };
-
-/* RM0008 sampling windows plus DS5319 Table 47's 12.5 SAR cycles. */
-static const uint8_t conversion_ticks[] = {14U, 20U, 26U, 41U,
-                                           54U, 68U, 84U, 252U};
 
 static bool clock_ready(void) {
     const uint32_t fields =
@@ -56,68 +51,6 @@ static bool reset_owned_adc(void) {
            READ_REG(ADC1->SR) == 0U;
 }
 
-static bool power_down(void) {
-    /* ADON=0 aborts conversion and calibration without any output loan. */
-    WRITE_REG(ADC1->CR2, 0U);
-    nx_arch_dsb();
-    return READ_REG(ADC1->CR2) == 0U;
-}
-
-static bool power_settled(void) {
-    const nx_time_us_t start = nx_time_now_us();
-    for (unsigned i = 0U; i < POLL_LIMIT; ++i) {
-        if (nx_time_now_us() - start >= POWER_SETTLE_US) {
-            return true;
-        }
-    }
-    return false;
-}
-
-static bool calibration_finished(uint32_t flag, nx_time_us_t deadline) {
-    for (unsigned i = 0U; i < POLL_LIMIT; ++i) {
-        if ((READ_REG(ADC1->CR2) & flag) == 0U) {
-            return !nx_deadline_expired(deadline, nx_time_now_us());
-        }
-        if (nx_deadline_expired(deadline, nx_time_now_us())) {
-            break;
-        }
-    }
-    return false;
-}
-
-static nx_result_t calibrate(void) {
-    nx_time_us_t deadline;
-    nx_result_t result = nx_deadline_finite_after(
-        nx_time_now_us(), CALIBRATION_BUDGET_US, &deadline);
-    if (result != NX_SUCCESS) {
-        return result;
-    }
-    LL_ADC_Enable(ADC1);
-    nx_arch_dsb();
-    if (READ_REG(ADC1->CR2) != ADC_READY_CONFIG) {
-        return NX_ERROR_IO;
-    }
-    /* Four nominal microseconds cover tSTAB and two ADC cycles at 4 MHz. */
-    if (!power_settled() || nx_deadline_expired(deadline, nx_time_now_us())) {
-        return NX_ERROR_TIMEOUT;
-    }
-    SET_BIT(ADC1->CR2, ADC_CR2_RSTCAL);
-    nx_arch_dsb();
-    if (!calibration_finished(ADC_CR2_RSTCAL, deadline)) {
-        return NX_ERROR_TIMEOUT;
-    }
-    LL_ADC_StartCalibration(ADC1);
-    nx_arch_dsb();
-    if (!calibration_finished(ADC_CR2_CAL, deadline)) {
-        return NX_ERROR_TIMEOUT;
-    }
-    WRITE_REG(ADC1->SR, 0U);
-    nx_arch_dsb();
-    return READ_REG(ADC1->CR2) == ADC_READY_CONFIG && READ_REG(ADC1->SR) == 0U
-               ? NX_SUCCESS
-               : NX_ERROR_IO;
-}
-
 nx_result_t nx_stm32f1_adc_prepare(nx_stm32f1_adc_t* state, uint32_t apb2_hz,
                                    uint32_t reference_mv,
                                    uint32_t sample_code) {
@@ -125,7 +58,7 @@ nx_result_t nx_stm32f1_adc_prepare(nx_stm32f1_adc_t* state, uint32_t apb2_hz,
         return NX_ERROR_CONTEXT;
     }
     if (state == NULL || reference_mv < 2400U || reference_mv > 3600U ||
-        sample_code >= sizeof(conversion_ticks)) {
+        sample_code >= sizeof(nx_stm32f1_adc_regular_ticks)) {
         return NX_ERROR_INVALID;
     }
     if (apb2_hz != APB2_CLOCK_HZ || !nx_stm32f1_system_live() ||
@@ -168,12 +101,12 @@ nx_result_t nx_stm32f1_adc_prepare(nx_stm32f1_adc_t* state, uint32_t apb2_hz,
         READ_REG(ADC1->SQR1) != 0U || READ_REG(ADC1->SQR3) != 0U) {
         return NX_ERROR_IO;
     }
-    result = calibrate();
+    result = nx_stm32f1_adc_calibrate(ADC1, ADC_READY_CONFIG);
     if (result != NX_SUCCESS) {
-        return power_down() ? result : NX_ERROR_IO;
+        return nx_stm32f1_adc_power_down(ADC1) ? result : NX_ERROR_IO;
     }
     state->reference_mv = (uint16_t)reference_mv;
-    state->conversion_ticks = conversion_ticks[sample_code];
+    state->conversion_ticks = nx_stm32f1_adc_regular_ticks[sample_code];
     state->effects |= ADC_LIVE;
     return NX_SUCCESS;
 }
@@ -190,7 +123,7 @@ nx_result_t nx_stm32f1_adc_close(nx_stm32f1_adc_t* state) {
     }
     state->effects &= (uint8_t)~ADC_LIVE;
     if ((state->effects & ADC_REGISTERS) != 0U) {
-        if (!power_down() || !reset_owned_adc()) {
+        if (!nx_stm32f1_adc_power_down(ADC1) || !reset_owned_adc()) {
             return NX_ERROR_IO;
         }
         state->effects &= (uint8_t)~ADC_REGISTERS;
@@ -248,7 +181,7 @@ nx_result_t nx_stm32f1_adc_sequence_info(const void* context,
 
 static nx_result_t fail_sample(nx_stm32f1_adc_t* state, nx_result_t result) {
     state->effects |= ADC_FAULTED;
-    const bool stopped = power_down();
+    const bool stopped = nx_stm32f1_adc_power_down(ADC1);
     state->effects &= (uint8_t)~ADC_ACTIVE;
     return stopped ? result : NX_ERROR_IO;
 }

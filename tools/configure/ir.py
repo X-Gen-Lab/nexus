@@ -8,6 +8,8 @@ from dataclasses import dataclass, fields, replace
 from types import MappingProxyType
 from typing import ClassVar, TYPE_CHECKING
 
+from tools.configure import usb_pma
+from tools.configure.usb_pma import PmaEp1Layout, PmaLayout
 from tools.configure.resource_graph import ResourceClaimIR, ResourcePlanIR
 from tools.configure.trigger_graph import TriggerPlanIR
 from tools.configure.dma_topology import DmaLaneIR, DmaTopologyIR
@@ -601,6 +603,20 @@ class UsbDeviceOptions:
 
 
 @dataclass(frozen=True)
+class UsbPmaDeviceOptions:
+    event_capacity: int
+    clock_timeout_us: int
+    irq: IrqOptions
+    pma_layout: PmaLayout
+
+
+@dataclass(frozen=True)
+class UsbPmaEp1DeviceOptions(UsbPmaDeviceOptions):
+    ep1_layout: PmaEp1Layout
+    ep1_transfer: str
+
+
+@dataclass(frozen=True)
 class UsbOtgPowerOptions:
     source: str
     present: str
@@ -636,6 +652,10 @@ class UsbEndpointOptions:
     direction: str
     transfer: str
     max_packet: int
+
+
+@dataclass(frozen=True)
+class UsbFifoEndpointOptions(UsbEndpointOptions):
     fifo_start: int
     fifo_words: int
 
@@ -958,7 +978,7 @@ class ImageOptions:
 
 ControllerOptions = (DisplayOptions | ImageOptions | CaptureOptions | AudioOptions | SaiOptions | GpioOptions | BlockOptions | FlashOptions | PinStateOptions | UartOptions | SpiOptions | I2cOptions | I2cTargetOptions |
                      ExtiOptions | ExtiHardwareOptions | PvdOptions | PvdEventsOptions | PwmOptions | PwmGroupOptions | TimerWaveformOptions | EncoderOptions | AdcOptions | DacOptions | CanOptions |
-                     UsbDeviceOptions | UsbHostOptions | EthernetOptions | EthernetFramesOptions |
+                     UsbDeviceOptions | UsbPmaDeviceOptions | UsbPmaEp1DeviceOptions | UsbHostOptions | EthernetOptions | EthernetFramesOptions |
                      TimerCaptureOptions |
                      AdvancedPwmOptions | PwmAdcOptions | PwmAdcLoopOptions | PowerStageOptions | CanFdOptions |
                      AdcGroupOptions | LptimOptions | RtcOptions | ExternalBusOptions |
@@ -1079,6 +1099,13 @@ def mode_options(values):
                           irq, values["drain_timeout_us"], values["poll_limit"],
                           values["fifo_order"])
     if kind == "usb_device":
+        if values["mode"] in usb_pma.EP1_TRANSFERS:
+            return UsbPmaEp1DeviceOptions(values["event_capacity"],
+                values["clock_timeout_us"], irq, values["pma_layout"],
+                values["ep1_layout"], usb_pma.EP1_TRANSFERS[values["mode"]])
+        if values["mode"] == usb_pma.MODE:
+            return UsbPmaDeviceOptions(values["event_capacity"],
+                values["clock_timeout_us"], irq, values["pma_layout"])
         return UsbDeviceOptions(*(values[key] for key in (
             "event_capacity", "rx_fifo_words", "vbus_sensing", "poll_limit",
             "drain_timeout_us", "clock_timeout_us")), irq,
@@ -1203,7 +1230,7 @@ def mode_options(values):
                               values.get("periodic_wakeup", False))
     if kind == "watchdog" and values["mode"] == "window":
         return WindowWatchdogOptions(values.get("window_ticks", 1))
-    if kind in {"watchdog", "rtc", "crc", "entropy"}:
+    if kind in {"watchdog", "rtc", "crc", "entropy", "mdio"}:
         return NoOptions()
     raise ValueError(f"Unmaintained controller decision: {kind}")
 
@@ -1558,7 +1585,7 @@ class EndpointIR(Record):
     kind: str
     options: (SpiEndpointOptions | SpiTransactionEndpointOptions |
               SpiDMATransactionEndpointOptions |
-              I2cEndpointOptions | UsbEndpointOptions |
+              I2cEndpointOptions | UsbEndpointOptions | UsbFifoEndpointOptions |
               MemoryWindowOptions | SdramWindowOptions | Parallel16Options |
               FlashAsyncOptions | QspiFlashOptions | QspiMappedOptions | NandOptions)
     source_fields: tuple[str, ...]
@@ -1598,9 +1625,13 @@ class EndpointIR(Record):
                                          values.get("model_bytes"),
                                          values.get("address_bits", 7))
         elif kind == "usb_device":
-            options = UsbEndpointOptions(values["endpoint_index"], *(values[key]
-                for key in ("number", "direction", "transfer", "max_packet",
-                            "fifo_start", "fifo_words")))
+            fields = ("number", "direction", "transfer", "max_packet")
+            fields = (values["endpoint_index"], *(values[key] for key in fields))
+            if controller.mode in usb_pma.MODES:
+                options = UsbEndpointOptions(*fields)
+            else:
+                options = UsbFifoEndpointOptions(*fields, values["fifo_start"],
+                                            values["fifo_words"])
         elif kind == "external_bus" and controller.mode in {
                 "qspi-indirect-sdr", "qspi-indirect-dma"}:
             if values["driver"] == "mapped_storage-endpoint":

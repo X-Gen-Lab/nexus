@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "id": "stm32f103rb-nucleo-d10-tim4",
+  "soc": "STM32F103RBT6",
+  "soc_family": "stm32f1",
+  "source_revision": "UM1724 Rev17 Table 12 NUCLEO-F103RB CN5 pin 3",
+  "physical_pcb_revision": null,
+  "clocks": {},
+  "bindings": [
+    {
+      "id": "d10",
+      "controller": "TIM4",
+      "route": "tim4-ch1-pb6"
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14",
+    "PA15",
+    "PB3",
+    "PB4",
+    "PD0",
+    "PD1",
+    "PC14",
+    "PC15"
+  ],
+  "unknowns": [
+    "The actual PCB revision and D10 wiring have not been observed on a station.",
+    "The external source must drive PB6 with compatible logic levels and share ground."
+  ],
+  "provenance": [
+    {
+      "scope": "UM1724 Table 12 identifies D10 at CN5 pin 3 as PB6 TIM4_CH1.",
+      "url": "https://www.st.com/resource/en/user_manual/um1724-stm32-nucleo64-boards-mb1136-stmicroelectronics.pdf",
+      "file": "um1724-stm32-nucleo64-boards-mb1136-stmicroelectronics.pdf",
+      "sha256": "576d9bee3bc32c8ee70bf0d77cf9494cec06ea7c1d9ff98eebf2738cb9314a14",
+      "pages": [40],
+      "components": ["U4", "CN5"],
+      "nets": ["PB6/D10", "GND"]
+    }
+  ],
+  "backend_support": ["baremetal"]
+}

@@ -1,6 +1,6 @@
 /**
  * \file            spi.c
- * \brief           F103 SPI2 short-poll, independent CS and verified tail.
+ * \brief           F103 SPI short-poll, independent CS and verified tail.
  * \author          Nexus Team
  * \version         1.0.0
  * \date            2026-11-28
@@ -41,13 +41,53 @@
 #define SPI_ERRORS         ((uint32_t)(SPI_SR_OVR | SPI_SR_MODF))
 #define SPI_POLL_MAX_WORDS 256U
 
-/** \brief Validate the exact reviewed SPI2 pins before any hardware effect. */
+typedef struct {
+    volatile uint32_t* reg;
+    uint32_t mask;
+} spi_gate_t;
+
+/** \brief Select the bus gate from the admitted controller identity. */
+static spi_gate_t clock_gate(const SPI_TypeDef* registers) {
+    return registers == SPI1 ? (spi_gate_t){&RCC->APB2ENR, RCC_APB2ENR_SPI1EN}
+                             : (spi_gate_t){&RCC->APB1ENR, RCC_APB1ENR_SPI2EN};
+}
+
+/** \brief Select only the controller's dedicated reset bit. */
+static spi_gate_t reset_gate(const SPI_TypeDef* registers) {
+    return registers == SPI1
+               ? (spi_gate_t){&RCC->APB2RSTR, RCC_APB2RSTR_SPI1RST}
+               : (spi_gate_t){&RCC->APB1RSTR, RCC_APB1RSTR_SPI2RST};
+}
+
+/** \brief Match one of the fixed, reviewed controller and CS routes. */
+static bool route_valid(const nx_stm32f1_spi_config_t* config) {
+    if (config->registers == SPI1) {
+        return config->gpio == GPIOA && config->sck == 5U &&
+               config->miso == 6U && config->mosi == 7U && config->cs == 4U &&
+               config->clock_hz == 8000000U;
+    }
+    return config->registers == SPI2 && config->gpio == GPIOB &&
+           config->sck == 13U && config->miso == 14U && config->mosi == 15U &&
+           config->cs == 12U &&
+           (config->clock_hz == 8000000U || config->clock_hz == 36000000U);
+}
+
+/** \brief Check the unremapped SPI1 route using the shared AFIO gate. */
+static nx_result_t prepare_spi1_route(nx_stm32f1_spi_t* state) {
+    state->afio_gate_added = (RCC->APB2ENR & RCC_APB2ENR_AFIOEN) == 0U;
+    if (state->afio_gate_added &&
+        !nx_stm32f1_write_masked(&RCC->APB2ENR, RCC_APB2ENR_AFIOEN,
+                                 RCC_APB2ENR_AFIOEN)) {
+        return NX_ERROR_IO;
+    }
+    return (AFIO->MAPR & AFIO_MAPR_SPI1_REMAP) == 0U ? NX_SUCCESS
+                                                     : NX_ERROR_BUSY;
+}
+
+/** \brief Validate the exact reviewed pads before any hardware effect. */
 nx_result_t nx_stm32f1_spi_admit(const nx_stm32f1_spi_t* state,
                                  const nx_stm32f1_spi_config_t* config) {
-    if (state == NULL || config == NULL || config->registers != SPI2 ||
-        config->gpio != GPIOB || config->sck != 13U || config->miso != 14U ||
-        config->mosi != 15U || config->cs != 12U ||
-        (config->clock_hz != 8000000U && config->clock_hz != 36000000U)) {
+    if (state == NULL || config == NULL || !route_valid(config)) {
         return NX_ERROR_INVALID;
     }
     if (!nx_stm32f1_cold_context()) {
@@ -56,29 +96,42 @@ nx_result_t nx_stm32f1_spi_admit(const nx_stm32f1_spi_t* state,
     return state->config == NULL ? NX_SUCCESS : NX_ERROR_STATE;
 }
 
-/** \brief Claim only this APB1 gate and its fixed pads, with CS preloaded high.
- */
+/** \brief Claim the selected SPI gate and pads, with CS preloaded high. */
 nx_result_t nx_stm32f1_spi_prepare(nx_stm32f1_spi_t* state,
                                    const nx_stm32f1_spi_config_t* config) {
     nx_result_t result = nx_stm32f1_spi_admit(state, config);
     if (result != NX_SUCCESS) {
         return result;
     }
-    if (!nx_stm32f1_system_live()) {
+    SPI_TypeDef* registers = config->registers;
+    const bool spi1 = registers == SPI1;
+    const uint32_t hsi = RCC_CR_HSION | RCC_CR_HSIRDY;
+    if (!nx_stm32f1_system_live() ||
+        (spi1 &&
+         ((RCC->CR & hsi) != hsi || (RCC->CFGR & (RCC_CFGR_SWS | RCC_CFGR_HPRE |
+                                                  RCC_CFGR_PPRE2)) != 0U))) {
         return NX_ERROR_STATE;
     }
     state->config = config;
-    const uint32_t gate = RCC_APB1ENR_SPI2EN;
-    state->gate_added = (RCC->APB1ENR & gate) == 0U;
+    if (spi1) {
+        result = prepare_spi1_route(state);
+        if (result != NX_SUCCESS) {
+            return result;
+        }
+    }
+    const spi_gate_t gate = clock_gate(registers);
+    state->gate_added = (*gate.reg & gate.mask) == 0U;
     if (state->gate_added &&
-        !nx_stm32f1_write_masked(&RCC->APB1ENR, gate, gate)) {
+        !nx_stm32f1_write_masked(gate.reg, gate.mask, gate.mask)) {
         return NX_ERROR_IO;
     }
-    SPI_TypeDef* registers = config->registers;
+    const spi_gate_t reset = reset_gate(registers);
+    if ((*reset.reg & reset.mask) != 0U) {
+        return NX_ERROR_BUSY;
+    }
     const uint32_t status = NX_STM32F1_SPI_STATUS(registers);
     if (registers->CR1 != 0U || registers->CR2 != 0U ||
-        registers->I2SCFGR != 0U ||
-        (RCC->APB1RSTR & RCC_APB1RSTR_SPI2RST) != 0U ||
+        (!spi1 && registers->I2SCFGR != 0U) ||
         (status & (SPI_SR_BSY | SPI_SR_RXNE | SPI_ERRORS)) != 0U) {
         return NX_ERROR_BUSY;
     }
@@ -92,12 +145,12 @@ nx_result_t nx_stm32f1_spi_prepare(nx_stm32f1_spi_t* state,
         return result;
     }
     const uint32_t alternate = GPIO_CRL_CNF0_1 | LL_GPIO_SPEED_FREQ_HIGH;
-    const uint32_t fields =
-        (LL_GPIO_SPEED_FREQ_LOW << (4U * (config->cs - 8U))) |
-        (alternate << (4U * (config->sck - 8U))) |
-        (LL_GPIO_MODE_FLOATING << (4U * (config->miso - 8U))) |
-        (alternate << (4U * (config->mosi - 8U)));
-    result = nx_stm32f1_pads_apply(&state->pads, 0U, fields,
+    /* Both routes place CS/SCK/MISO/MOSI in slots four through seven. */
+    const uint32_t fields = (LL_GPIO_SPEED_FREQ_LOW << 16U) |
+                            (alternate << 20U) |
+                            (LL_GPIO_MODE_FLOATING << 24U) | (alternate << 28U);
+    result = nx_stm32f1_pads_apply(&state->pads, spi1 ? fields : 0U,
+                                   spi1 ? 0U : fields,
                                    state->pads.latch | (1U << config->cs));
     state->live = result == NX_SUCCESS;
     return result;
@@ -120,18 +173,18 @@ bool nx_stm32f1_spi_select_cs(nx_stm32f1_spi_t* state, bool active) {
     return true;
 }
 
-/** \brief Reset only SPI2 and prove its transmitter disabled and idle. */
+/** \brief Reset the selected controller and prove its transmitter idle. */
 static bool reset_spi(const nx_stm32f1_spi_config_t* config) {
-    volatile uint32_t* resets = &RCC->APB1RSTR;
-    const uint32_t bit = RCC_APB1RSTR_SPI2RST;
-    if ((RCC->APB1ENR & RCC_APB1ENR_SPI2EN) == 0U ||
-        !nx_stm32f1_write_masked(resets, bit, bit) ||
-        !nx_stm32f1_write_masked(resets, bit, 0U)) {
+    SPI_TypeDef* registers = config->registers;
+    const spi_gate_t gate = clock_gate(registers);
+    const spi_gate_t reset = reset_gate(registers);
+    if ((*gate.reg & gate.mask) == 0U ||
+        !nx_stm32f1_write_masked(reset.reg, reset.mask, reset.mask) ||
+        !nx_stm32f1_write_masked(reset.reg, reset.mask, 0U)) {
         return false;
     }
-    SPI_TypeDef* registers = config->registers;
     return registers->CR1 == 0U && registers->CR2 == 0U &&
-           registers->I2SCFGR == 0U &&
+           (registers == SPI1 || registers->I2SCFGR == 0U) &&
            (NX_STM32F1_SPI_STATUS(registers) & (SPI_SR_BSY | SPI_ERRORS)) == 0U;
 }
 
@@ -185,8 +238,14 @@ nx_result_t nx_stm32f1_spi_close(nx_stm32f1_spi_t* state) {
     if (restored != NX_SUCCESS) {
         return restored;
     }
+    const spi_gate_t gate = clock_gate(state->config->registers);
     if (state->gate_added &&
-        !nx_stm32f1_write_masked(&RCC->APB1ENR, RCC_APB1ENR_SPI2EN, 0U)) {
+        !nx_stm32f1_write_masked(gate.reg, gate.mask, 0U)) {
+        return NX_ERROR_IO;
+    }
+    state->gate_added = false;
+    if (state->afio_gate_added &&
+        !nx_stm32f1_write_masked(&RCC->APB2ENR, RCC_APB2ENR_AFIOEN, 0U)) {
         return NX_ERROR_IO;
     }
     *state = (nx_stm32f1_spi_t){0};
@@ -362,7 +421,8 @@ static nx_result_t ready(const nx_stm32f1_spi_endpoint_t* endpoint,
     if (deadline == NX_DEADLINE_NEVER) {
         return NX_ERROR_UNSUPPORTED;
     }
-    return (RCC->APB1ENR & RCC_APB1ENR_SPI2EN) != 0U ? NX_SUCCESS : NX_ERROR_IO;
+    const spi_gate_t gate = clock_gate(state->config->registers);
+    return (*gate.reg & gate.mask) != 0U ? NX_SUCCESS : NX_ERROR_IO;
 }
 
 /** \brief Byte-span endpoint permits exactly in-place exchange. */

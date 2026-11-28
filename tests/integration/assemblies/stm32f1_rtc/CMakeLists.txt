@@ -15,6 +15,37 @@ if(NEXUS_SOURCE_ROOT)
     set(Nexus_DIR "${NEXUS_SOURCE_ROOT}/cmake")
 endif()
 find_package(Nexus CONFIG REQUIRED)
+option(
+    NEXUS_F1_RAW_ALARM_PROBE
+    "Build the fixed F103RB private RTC alarm reference"
+    OFF
+)
+if(NEXUS_F1_RAW_ALARM_PROBE)
+    nexus_add_platform(ASSEMBLY "${CMAKE_CURRENT_LIST_DIR}/raw-alarm.toml")
+    get_target_property(fixture_source Nexus::Config NEXUS_SOURCE_DIR)
+    set(f1_dir "${fixture_source}/soc/stm32/stm32f1")
+    nexus_add_firmware(
+        nexus_f103_rtc_alarm
+        SOURCES raw_alarm.c "${f1_dir}/drivers/rtc/counter.c"
+    )
+    nexus_target_warnings(nexus_f103_rtc_alarm STRICT)
+    nexus_use_cmsis_core(nexus_f103_rtc_alarm)
+    target_include_directories(
+        nexus_f103_rtc_alarm
+        PRIVATE "${f1_dir}" "${fixture_source}/io/private"
+    )
+    target_include_directories(
+        nexus_f103_rtc_alarm
+        SYSTEM
+        PRIVATE "${fixture_source}/vendors/st/cmsis_device_f1/Include"
+    )
+    target_compile_definitions(
+        nexus_f103_rtc_alarm
+        PRIVATE STM32F103xB NX_STM32F1_RTC_RAW_ALARM
+    )
+    return()
+endif()
+
 nexus_add_platform(ASSEMBLY "${NEXUS_ASSEMBLY_FILE}")
 nexus_add_firmware(nexus_f103_rtc_consumer SOURCES main.c)
 nexus_target_warnings(nexus_f103_rtc_consumer STRICT)

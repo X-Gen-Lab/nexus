@@ -225,6 +225,14 @@ extern "C" nx_time_us_t nx_time_now_us(void) {
     return now;
 }
 
+TEST_F(F103SpiDma, Spi1CannotAcquireSpi2FixedDmaChannels) {
+    config.spi = {SPI1, GPIOA, 8000000U, 5U, 6U, 7U, 4U};
+    EXPECT_EQ(nx_stm32f1_spi_dma_admit(&owner, &config), NX_ERROR_INVALID);
+    EXPECT_EQ(nx_stm32f1_spi_dma_prepare(&owner, &config), NX_ERROR_INVALID);
+    EXPECT_EQ(RCC->AHBENR & RCC_AHBENR_DMA1EN, 0U);
+    EXPECT_EQ(RCC->APB2ENR & RCC_APB2ENR_SPI1EN, 0U);
+}
+
 TEST_F(F103SpiDma, RequiresTheExactPairAndWritableReceiveDomain) {
     config.rx = DMA1_Channel3;
     EXPECT_EQ(NX_ERROR_INVALID, nx_stm32f1_spi_dma_prepare(&owner, &config));

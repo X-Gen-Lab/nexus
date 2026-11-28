@@ -1,11 +1,13 @@
-# STM32F103 internal Flash references
+# STM32F1 internal Flash references
 
 These opt-in HSI8 assemblies link one physical Flash port. The consumer reads
 the geometry and the first and last physical bytes.
 
 | Assembly | Device | Capacity | Page size | Reference |
 | --- | --- | ---: | ---: | --- |
+| `c6.toml` | STM32F103C6T6A | 32 KiB | 1 KiB | PM0075 Table 2, DS5936 Tables 2 and 28, ES0348 §2.2.10 |
 | `rb.toml` | STM32F103RBT6 | 128 KiB | 1 KiB | PM0075 Table 3, DS5319 Table 28, ES096 §2.2.11 |
+| `f100rb.toml` | STM32F100RBT6B | 128 KiB | 1 KiB | PM0063 Table 2, DS6517 Tables 2 and 27, ES093 §2.2.8 |
 | `ze.toml` | STM32F103ZET6 | 512 KiB | 2 KiB | PM0075 Table 4, DS5792 Table 29, ES0340 §2.2.10 |
 | `zg.toml` | STM32F103ZGT6 | 1024 KiB | 2 KiB | PM0068 Table 1 and §§1.3, 2.3, DS6558 Table 29, ES0346 §2.2.8 |
 
@@ -30,4 +32,4 @@ reference covers ordinary serialized I/O. Read-while-write concurrency,
 mass erase, option bytes, OTP, boot switching and board timing are outside
 this scope.
 
-[ST PM0068 Rev2](https://www.st.com/resource/en/programming_manual/pm0068-stm32f10xxx-xldensity-flash-programming-stmicroelectronics.pdf)
+[ST PM0075 Rev2](https://www.st.com/resource/en/programming_manual/pm0075-stm32f10xxx-flash-memory-microcontrollers-stmicroelectronics.pdf) · [ST PM0063 Rev2](https://www.st.com/resource/en/programming_manual/pm0063-stm32f100xx-value-line-flash-programming-stmicroelectronics.pdf) · [ST PM0068 Rev2](https://www.st.com/resource/en/programming_manual/pm0068-stm32f10xxx-xldensity-flash-programming-stmicroelectronics.pdf)

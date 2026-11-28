@@ -10,7 +10,7 @@ from tools.configure.records import freeze
 CONTROLLER_REQUIRED = frozenset(("kind", "irq", "pins"))
 CONTROLLER_OPTIONAL = frozenset((
     "resources", "max_hz", "irq_numbers", "channel_count", "clock_hz",
-    "clock_domain", "irq_sources", "fifo_words", "endpoint_numbers", "message_ram_words"))
+    "clock_domain", "irq_sources", "fifo_words", "pma_bytes", "endpoint_numbers", "message_ram_words"))
 
 
 @dataclass(frozen=True)

@@ -27,6 +27,7 @@ class TimerBinding:
     clock_hz: int
     routes: tuple
     resources: tuple
+    clock_profiles: tuple = ()
 
     def route(self, pins):
         return next((route for route in self.routes if route.pins == pins), None)
@@ -44,6 +45,25 @@ class TimerPolicy:
 
 
 KINDS = {"timer_capture", "advanced_pwm"}
+
+
+def validate_encoder(selection, route):
+    """Apply the public quadrature choices to the selected hardware route."""
+    pins = route["pins"]
+    if (len(pins) != 2 or tuple(pin["function"] for pin in pins) != ("ti1", "ti2") or
+            pins[0]["pin"] == pins[1]["pin"]):
+        fail("Encoder requires distinct reviewed TI1/TI2 pads")
+    if selection.get("counting") not in ("x2-a", "x2-b", "x4"):
+        fail("Encoder counting must select x2-a, x2-b or x4")
+    for field in ("filter_a", "filter_b"):
+        integer(selection.get(field), 0, 15, "Encoder " + field)
+    for field in ("invert_a", "invert_b", "exclusive"):
+        if type(selection.get(field)) is not bool:
+            fail("Encoder " + field + " must be boolean")
+    if not selection["exclusive"]:
+        fail("Encoder requires an exclusive controller owner")
+
+
 CAPTURE_FIELDS = {"tick_hz", "edge", "filter", "exclusive", "irq_priority", "calls_os"}
 ADVANCED_FIELDS = {"tick_hz", "period_ticks", "deadtime_ticks", "break_active_high",
                    "idle_high", "idle_complement_high", "exclusive", "irq_priority", "calls_os"}
@@ -109,6 +129,9 @@ def validate_selection(selection, route, provider, *, clock_plan=None):
     actual = tuple((pin["pin"], pin["function"], pin.get("af")) for pin in route["pins"])
     if facts is None or facts.route(actual) is None:
         fail("Timer selection differs from the reviewed exclusive pad route")
+    if facts.clock_profiles and (clock_plan is None or
+                                 clock_plan["profile"] not in facts.clock_profiles):
+        fail("Timer requires a reviewed clock profile")
     tick = integer(selection["tick_hz"], 1, context="Timer tick_hz")
     frequency = facts.clock_hz
     domain = getattr(provider, "timer_clock_domain", None)

@@ -12,6 +12,9 @@
 #include "nexus/io/watchdog.h"
 #include "private/hardware.h"
 #include "system/clock_profile.h"
+#if defined(NX_STM32F1_STOP_OWNER)
+#include "system/stop_internal.h"
+#endif
 
 #ifndef NX_STM32F1_FLASH_KIB
 #define NX_STM32F1_FLASH_KIB() (*(volatile const uint16_t*)FLASHSIZE_BASE)
@@ -32,13 +35,15 @@ static bool active;
 static uint8_t boot_reset_causes;
 static bool reset_captured;
 
-#if defined(NX_STM32F1_HSE72)
-_Static_assert(
-    NEXUS_CLOCK_APB1_HZ == 36000000U && NEXUS_CLOCK_APB2_HZ == 72000000U &&
-        NEXUS_CLOCK_APB1_TIMER_HZ == 72000000U &&
-        NEXUS_CLOCK_FLASH_WAIT_STATES == 2U,
-    "F1 PLL72 bus timing and Flash latency must match the clock owner");
-#define TIMER_PRESCALER 71U
+#if defined(NX_STM32F1_STOP_OWNER)
+#if !defined(STM32F103xB) || defined(NX_STM32F1_PROFILE_CORE_HZ)
+#error "F1 STOP owner requires the exact Cortex-M3 HSI8 software reference"
+#endif
+static uint64_t time_epoch;
+#endif
+
+#if defined(NX_STM32F1_PROFILE_CORE_HZ)
+#define TIMER_PRESCALER (NX_STM32F1_PROFILE_CORE_HZ / 1000000U - 1U)
 #else
 #define TIMER_PRESCALER 7U
 #endif
@@ -98,28 +103,54 @@ static bool hsi8_ready(void) {
            (FLASH->SR & FLASH_SR_BSY) == 0U;
 }
 
-#if defined(NX_STM32F1_HSE72)
+#if defined(NX_STM32F1_PROFILE_CORE_HZ)
 enum { CLOCK_CONFIG = 8U, CLOCK_READY_POLLS = 80000U };
 
+#define MAIN_PLL_FIELDS (RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE | RCC_CFGR_PLLMULL)
 #if defined(NX_STM32F1_CONNECTIVITY_PLL2)
 _Static_assert(NEXUS_CLOCK_PLL48_HZ == 48000000U,
                "The connectivity PLL VCO divided by three supplies 48 MHz");
-#define PLL_FIELDS                                                             \
-    (RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE | RCC_CFGR_PLLMULL | RCC_CFGR_OTGFSPRE)
+#define PLL_FIELDS (MAIN_PLL_FIELDS | RCC_CFGR_OTGFSPRE)
 #define PLL2_FIELDS                                                            \
     (RCC_CFGR2_PREDIV1 | RCC_CFGR2_PREDIV2 | RCC_CFGR2_PLL2MUL |               \
      RCC_CFGR2_PREDIV1SRC)
 #define PLL2_SETTINGS                                                          \
     (RCC_CFGR2_PREDIV1_DIV5 | RCC_CFGR2_PREDIV2_DIV5 | RCC_CFGR2_PLL2MUL8 |    \
      RCC_CFGR2_PREDIV1SRC_PLL2)
+#elif defined(STM32F102xB)
+_Static_assert(NEXUS_CLOCK_PLL48_HZ == 48000000U,
+               "The F102 USB prescaler selects the undivided 48 MHz PLL");
+#define PLL_FIELDS (MAIN_PLL_FIELDS | RCC_CFGR_USBPRE)
 #else
-#define PLL_FIELDS (RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE | RCC_CFGR_PLLMULL)
+#define PLL_FIELDS MAIN_PLL_FIELDS
 #endif
 #define BUS_FIELDS                                                             \
     (RCC_CFGR_HPRE | RCC_CFGR_PPRE1 | RCC_CFGR_PPRE2 | RCC_CFGR_ADCPRE)
-#define PLL72_SETTINGS                                                         \
+
+#if defined(STM32F101xB)
+#define APB1_HZ       36000000U
+#define FLASH_LATENCY 1U
+#define RUN_CLOCK_SETTINGS                                                     \
+    (RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE_HSE_DIV2 | RCC_CFGR_PLLMULL9 |        \
+     RCC_CFGR_ADCPRE_DIV4)
+#elif defined(STM32F102xB)
+#define APB1_HZ       24000000U
+#define FLASH_LATENCY 1U
+#define RUN_CLOCK_SETTINGS                                                     \
+    (RCC_CFGR_PLLSRC | RCC_CFGR_PLLMULL6 | RCC_CFGR_PPRE1_DIV2 |               \
+     RCC_CFGR_ADCPRE_DIV4 | RCC_CFGR_USBPRE)
+#else
+#define APB1_HZ       36000000U
+#define FLASH_LATENCY 2U
+#define RUN_CLOCK_SETTINGS                                                     \
     (RCC_CFGR_PLLSRC | RCC_CFGR_PLLMULL9 | RCC_CFGR_PPRE1_DIV2 |               \
      RCC_CFGR_ADCPRE_DIV6)
+#endif
+_Static_assert(NEXUS_CLOCK_APB1_HZ == APB1_HZ &&
+                   NEXUS_CLOCK_APB2_HZ == NX_STM32F1_PROFILE_CORE_HZ &&
+                   NEXUS_CLOCK_APB1_TIMER_HZ == NX_STM32F1_PROFILE_CORE_HZ &&
+                   NEXUS_CLOCK_FLASH_WAIT_STATES == FLASH_LATENCY,
+               "Selected STM32F1 bus timing must match the clock owner");
 
 static bool clock_idle(void) {
     uint32_t clock_irqs = RCC_CIR_LSIRDYIE | RCC_CIR_LSERDYIE |
@@ -166,9 +197,10 @@ static nx_result_t clock_start(void) {
         return NX_ERROR_TIMEOUT;
 
     if (!nx_stm32f1_write_masked(&RCC->CR, RCC_CR_CSSON, RCC_CR_CSSON) ||
-        !nx_stm32f1_write_masked(&FLASH->ACR, FLASH_ACR_LATENCY, 2U) ||
+        !nx_stm32f1_write_masked(&FLASH->ACR, FLASH_ACR_LATENCY,
+                                 FLASH_LATENCY) ||
         !nx_stm32f1_write_masked(&RCC->CFGR, PLL_FIELDS | BUS_FIELDS,
-                                 PLL72_SETTINGS))
+                                 RUN_CLOCK_SETTINGS))
         return NX_ERROR_IO;
 #if defined(NX_STM32F1_CONNECTIVITY_PLL2)
     if (!nx_stm32f1_write_masked(&RCC->CFGR2, PLL2_FIELDS, PLL2_SETTINGS) ||
@@ -186,12 +218,17 @@ static nx_result_t clock_start(void) {
     if (!clock_wait(&RCC->CFGR, RCC_CFGR_SWS, RCC_CFGR_SWS_PLL))
         return NX_ERROR_TIMEOUT;
     nx_arch_isb();
-    SystemCoreClock = 72000000U;
+    SystemCoreClock = NX_STM32F1_PROFILE_CORE_HZ;
     return NX_SUCCESS;
 }
 
 /** \brief Restore the proven HSI clock before retiring the high-speed path. */
 static nx_result_t clock_stop(void) {
+#if defined(STM32F102xB)
+    /* RM0008 forbids clearing USBPRE while USB retains its clock. */
+    if ((RCC->APB1ENR & RCC_APB1ENR_USBEN) != 0U)
+        return NX_ERROR_BUSY;
+#endif
 #if defined(NX_STM32F1_CONNECTIVITY_PLL2)
     if (RCC->AHBENR != (RCC_AHBENR_FLITFEN | RCC_AHBENR_SRAMEN) ||
         RCC->AHBRSTR != 0U ||
@@ -337,7 +374,7 @@ static nx_result_t release_system(void) {
             return NX_ERROR_IO;
         effects &= (uint8_t)~TIMER_GATE;
     }
-#if defined(NX_STM32F1_HSE72)
+#if defined(NX_STM32F1_PROFILE_CORE_HZ)
     if ((effects & CLOCK_CONFIG) != 0U)
         return clock_stop();
 #endif
@@ -359,6 +396,12 @@ nx_stm32f1_platform_system_start(const nx_stm32f1_platform_config_t* config) {
         result.primary = NX_ERROR_STATE;
         return result;
     }
+#if defined(NX_STM32F1_STOP_OWNER)
+    if (time_epoch == UINT64_MAX) {
+        result.primary = NX_ERROR_EXHAUSTED;
+        return result;
+    }
+#endif
     /* ES096 2.2.2 excludes ordinary DBGMCU reads. The size halfword is a
      * density check only. Physical part and cut belonging remain external. */
     if ((uint32_t)NX_STM32F1_FLASH_KIB() * 1024U != config->flash_bytes) {
@@ -374,7 +417,7 @@ nx_stm32f1_platform_system_start(const nx_stm32f1_platform_config_t* config) {
         return result;
     }
     capture_reset_cause();
-#if defined(NX_STM32F1_HSE72)
+#if defined(NX_STM32F1_PROFILE_CORE_HZ)
     if (!clock_idle()) {
         result.primary = NX_ERROR_BUSY;
         return result;
@@ -398,6 +441,10 @@ nx_stm32f1_platform_system_start(const nx_stm32f1_platform_config_t* config) {
         effects |= TIMER_REGISTERS;
         elapsed_us = 0U;
         result.primary = start_timer();
+#if defined(NX_STM32F1_STOP_OWNER)
+        if (result.primary == NX_SUCCESS)
+            ++time_epoch;
+#endif
     }
     if (result.primary != NX_SUCCESS) {
         result.cleanup = release_system();
@@ -405,6 +452,47 @@ nx_stm32f1_platform_system_start(const nx_stm32f1_platform_config_t* config) {
     }
     return result;
 }
+
+#if defined(NX_STM32F1_STOP_OWNER)
+bool nx_stm32f1_stop_time_ready(void) {
+    return active && time_epoch != 0U && time_epoch != UINT64_MAX &&
+           effects == (TIMER_GATE | TIMER_REGISTERS | TIMER_VECTOR) &&
+           hsi8_ready();
+}
+
+nx_result_t nx_stm32f1_stop_time_suspend(nx_stm32f1_stop_receipt_t* receipt) {
+    if (!nx_stm32f1_write_masked(&TIM2->CR1, TIM_CR1_CEN, 0U))
+        return NX_ERROR_IO;
+    /* Freeze CNT first. A final UIF racing the mask is included before the
+     * retired owner's pending vector is removed. */
+    receipt->previous_epoch = time_epoch;
+    receipt->before_us = nx_time_now_us();
+    return release_system();
+}
+
+nx_result_t nx_stm32f1_stop_time_restore(nx_stm32f1_stop_receipt_t* receipt) {
+    if (effects != 0U || !hsi8_ready() ||
+        (RCC->APB1ENR & RCC_APB1ENR_TIM2EN) != 0U ||
+        (RCC->APB1RSTR & RCC_APB1RSTR_TIM2RST) != 0U ||
+        NVIC_GetEnableIRQ(TIM2_IRQn) != 0U ||
+        NVIC_GetPendingIRQ(TIM2_IRQn) != 0U || NVIC_GetActive(TIM2_IRQn) != 0U)
+        return NX_ERROR_IO;
+    effects = TIMER_GATE;
+    if (!nx_stm32f1_write_masked(&RCC->APB1ENR, RCC_APB1ENR_TIM2EN,
+                                 RCC_APB1ENR_TIM2EN))
+        return NX_ERROR_IO;
+    if (!timer_idle())
+        return NX_ERROR_IO;
+    effects |= TIMER_REGISTERS;
+    elapsed_us = 0U;
+    const nx_result_t result = start_timer();
+    if (result == NX_SUCCESS) {
+        receipt->current_epoch = ++time_epoch;
+        receipt->after_us = nx_time_now_us();
+    }
+    return result;
+}
+#endif
 
 nx_result_t
 nx_stm32f1_platform_no_resources(const nx_stm32f1_platform_config_t* config) {
@@ -468,7 +556,7 @@ void TIM2_IRQHandler(void) {
     nx_arch_dsb();
 }
 
-#if defined(NX_STM32F1_HSE72)
+#if defined(NX_STM32F1_PROFILE_CORE_HZ)
 void NMI_Handler(void);
 
 /** \brief CSS may switch to HSI in hardware; the old epoch cannot resume. */

@@ -183,7 +183,7 @@ class UsbConfigurationTests(unittest.TestCase):
         self.assertIn(".resources_release = nx_platform_resources_release,",
                       source)
         self.assertIn("static const nx_stm32_usb_cold_config_t", source)
-        self.assertIn("static const nx_stm32_usb_endpoint_config_t", source)
+        self.assertIn("static const nx_usb_endpoint_config_t", source)
         self.assertNotIn("nx_stm32_usb_clock_start(", source)
         self.assertNotIn("nx_stm32_pin_restore(", source)
 
@@ -253,3 +253,33 @@ class UsbConfigurationTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ConnectivityUsbDeviceTests(unittest.TestCase):
+    def test_exact_sensed_ep0_bindings_reject_out_of_scope_options(self):
+        import shutil
+
+        fixture = gate.ROOT / "tests/integration/assemblies/stm32f1_connectivity_dwc"
+        source = (fixture / "f105vc.toml").read_text(encoding="utf-8")
+        for part in ("f105vc", "f107vc"):
+            result = gate.resolve_ir(fixture / (part + ".toml")).to_dict()
+            claims = {claim["key"] for claim in result["resource_plan"]["claims"]}
+            self.assertLessEqual({"pin:PA9", "pin:PA11", "pin:PA12", "clock:USBFS48"}, claims)
+            self.assertNotIn("memory:usb-can-pma", claims)
+
+        cases = (
+            (source.replace('pa9-vbus-pa11-pa12', 'absent'), "Board hardware requirement"),
+            (source.replace('hse25-crystal-pll72', 'hsi8'), "requires clock profile"),
+            (source.replace('vbus_sensing = true', 'vbus_sensing = false'), "VBUS sensing"),
+            (source.replace('number = 0', 'number = 1').replace('transfer = "control"', 'transfer = "bulk"'),
+             "only EP0"),
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            shutil.copytree(fixture / "f105vc-board", root / "f105vc-board")
+            assembly = root / "case.toml"
+            for contents, cause in cases:
+                with self.subTest(cause=cause):
+                    assembly.write_text(contents, encoding="utf-8")
+                    with self.assertRaisesRegex(gate.ConfigurationError, cause):
+                        gate.resolve_ir(assembly)

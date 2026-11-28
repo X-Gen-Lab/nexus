@@ -46,6 +46,8 @@ nx_result_t nx_stm32f1_exti_admit(const nx_stm32f1_exti_t* state,
 nx_result_t nx_stm32f1_exti_prepare(nx_stm32f1_exti_t* state,
                                     const nx_stm32f1_exti_config_t* config);
 nx_result_t nx_stm32f1_exti_close(nx_stm32f1_exti_t* state);
+nx_result_t nx_stm32f1_stop_wake_suspend(nx_stm32f1_exti_t* state);
+nx_result_t nx_stm32f1_stop_wake_resume(nx_stm32f1_exti_t* state);
 void nx_stm32f1_exti_irq(nx_stm32f1_exti_t* state);
 extern const nx_exti_ops_t nx_stm32f1_exti_ops;
 

@@ -1,0 +1,28 @@
+schema = 2
+board_package = "../../../../boards/stm3210c_eval_mb784_c01"
+backend = "baremetal"
+clock = "hse25-crystal-pll72"
+
+[factory]
+capabilities = true
+
+[hardware]
+phy_management_wiring = "pc1-pa2-external-phy"
+usart2_wiring = "cn6-rs232"
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+static_ram_limit_bytes = 4096
+flash_load_limit_bytes = 16384
+
+[mdio.phy]
+binding = "station-management"
+mode = "clause22"
+
+[uart.console]
+binding = "console-rs232"
+mode = "irq"
+baud = 115200
+rx = { format = "bytes", capacity = 32 }
+irq = { priority = 5, calls_os = false }

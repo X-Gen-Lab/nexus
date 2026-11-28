@@ -9,7 +9,7 @@ if(usb_device_modes)
         PRIVATE
             "${CMAKE_CURRENT_LIST_DIR}/usb_device.c"
             "${CMAKE_CURRENT_LIST_DIR}/usb_clock.c"
-            "${CMAKE_CURRENT_LIST_DIR}/../ip/dwc_otg_device/usb_device_controller.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/common/dwc_otg_device/usb_device_controller.c"
     )
     if(
         "device-hs-fs" IN_LIST usb_device_modes
@@ -32,7 +32,7 @@ if(usb_device_modes)
             nexus_soc_stm32f4
             PRIVATE
                 "${CMAKE_CURRENT_LIST_DIR}/usb_otg.c"
-                "${CMAKE_CURRENT_LIST_DIR}/usb_host.c"
+                "${NEXUS_SOURCE_DIR}/soc/stm32/common/dwc_otg_host/usb_host.c"
                 "${CMAKE_CURRENT_LIST_DIR}/usb_hs_clock.c"
         )
         target_link_libraries(
@@ -46,7 +46,7 @@ if(usb_host_modes)
     set(stm32_usb_host_hal ON)
     target_sources(
         nexus_soc_stm32f4
-        PRIVATE "${CMAKE_CURRENT_LIST_DIR}/usb_host.c"
+        PRIVATE "${NEXUS_SOURCE_DIR}/soc/stm32/common/dwc_otg_host/usb_host.c"
     )
 endif()
 if(stm32_usb_host_hal)

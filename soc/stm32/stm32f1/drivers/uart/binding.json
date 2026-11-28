@@ -137,6 +137,31 @@
                   {
                     "source": "item.options.irq.priority"
                   }
+                ],
+                [
+                  "frame",
+                  {
+                    "macro": "NX_STM32F1_UART_FRAME",
+                    "args": [
+                      {
+                        "source": "item.options.frame.data_bits",
+                        "default": 8
+                      },
+                      {
+                        "source": "item.options.frame.parity",
+                        "values": {
+                          "none": 0,
+                          "even": 2,
+                          "odd": 6
+                        },
+                        "default": 0
+                      },
+                      {
+                        "source": "item.options.frame.stop_bits",
+                        "default": 1
+                      }
+                    ]
+                  }
                 ]
               ]
             }
@@ -193,7 +218,18 @@
             },
             "calls": [
               {
-                "function": "nx_stm32f1_uart_irq",
+                "function": {
+                  "source": "item.options.frame.parity",
+                  "as": "symbol",
+                  "values": {
+                    "none": "nx_stm32f1_uart_irq",
+                    "even": "nx_stm32f1_uart_parity_irq",
+                    "odd": "nx_stm32f1_uart_parity_irq"
+                  },
+                  "default": {
+                    "symbol": "nx_stm32f1_uart_irq"
+                  }
+                },
                 "args": [
                   {
                     "ref": "port",

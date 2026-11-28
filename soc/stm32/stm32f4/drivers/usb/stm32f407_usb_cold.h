@@ -12,22 +12,12 @@
 #include "system/stm32f407_packet_cold.h"
 #include <string.h>
 
-/** \brief Readonly endpoint properties, never a second mutable endpoint. */
-typedef struct {
-    uint8_t number;
-    bool in;
-    uint8_t transfer;
-    uint16_t max_packet;
-    uint16_t fifo_start;
-    uint16_t fifo_words;
-} nx_stm32_usb_endpoint_config_t;
-
 /** \brief Static FS storage and exact selected finite cold policy. */
 typedef struct {
     nx_stm32_usb_clock_state_t* clock;
     const nx_stm32_platform_pin_config_t* pins;
     nx_usb_endpoint_t* endpoints;
-    const nx_stm32_usb_endpoint_config_t* plan;
+    const nx_usb_endpoint_config_t* plan;
     nx_usb_event_t* events;
     size_t endpoint_count;
     size_t capacity;
@@ -160,7 +150,7 @@ nx_stm32_usb_cold_prepare(nx_usb_controller_t* port,
     port->remote = config->remote;
     for (size_t i = 0U; i < config->endpoint_count; ++i) {
         nx_usb_endpoint_t* endpoint = &config->endpoints[i];
-        const nx_stm32_usb_endpoint_config_t* selected = &config->plan[i];
+        const nx_usb_endpoint_config_t* selected = &config->plan[i];
         memset(endpoint, 0, sizeof(*endpoint));
         endpoint->number = selected->number;
         endpoint->in = selected->in;

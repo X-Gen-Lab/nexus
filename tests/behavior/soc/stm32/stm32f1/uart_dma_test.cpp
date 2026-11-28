@@ -72,7 +72,10 @@ class F1UartDma : public testing::Test {
                        NX_UART_RX_BYTES,
                        2U,
                        3U,
-                       5U};
+                       5U,
+                       0U,
+                       0U,
+                       0U};
         config.dma = DMA1;
         config.channel = DMA1_Channel7;
         config.irq = DMA1_Channel7_IRQn;

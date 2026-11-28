@@ -1,6 +1,6 @@
 /**
  * \file            pwm.c
- * \brief           STM32F103 TIM3 CH1 fixed-base PWM on PA6.
+ * \brief           STM32F1 fixed-base single-channel PWM.
  * \author          Nexus Team
  * \version         1.0.0
  * \date            2026-11-28
@@ -12,10 +12,53 @@
 #include "stm32f1xx_ll_tim.h"
 #include "system/platform.h"
 
-#define PA6_MASK  (UINT32_C(1) << 6U)
-#define PA6_FIELD (GPIO_CRL_MODE6 | GPIO_CRL_CNF6)
-#define PA6_IDLE  GPIO_CRL_MODE6_1
-#define PA6_TIMER (GPIO_CRL_MODE6_1 | GPIO_CRL_CNF6_1)
+typedef struct {
+    TIM_TypeDef* timer;
+    GPIO_TypeDef* gpio;
+    uint32_t remap;
+    uint8_t pin;
+    uint8_t gate_shift;
+} pwm_route_t;
+
+#if defined(STM32F100xB)
+#define PWM_GATE_REGISTER  (&RCC->APB2ENR)
+#define PWM_RESET_REGISTER (&RCC->APB2RSTR)
+#define PWM_REMAP_REGISTER (&AFIO->MAPR2)
+#define PWM_BUS_DIVIDER    RCC_CFGR_PPRE2
+static const pwm_route_t routes[] = {
+    {TIM15, GPIOA, AFIO_MAPR2_TIM15_REMAP, 2U, RCC_APB2ENR_TIM15EN_Pos},
+    {TIM16, GPIOB, AFIO_MAPR2_TIM16_REMAP, 8U, RCC_APB2ENR_TIM16EN_Pos},
+    {TIM17, GPIOB, AFIO_MAPR2_TIM17_REMAP, 9U, RCC_APB2ENR_TIM17EN_Pos},
+};
+_Static_assert(RCC_APB2ENR_TIM15EN_Pos == RCC_APB2RSTR_TIM15RST_Pos &&
+                   RCC_APB2ENR_TIM16EN_Pos == RCC_APB2RSTR_TIM16RST_Pos &&
+                   RCC_APB2ENR_TIM17EN_Pos == RCC_APB2RSTR_TIM17RST_Pos,
+               "Value Line PWM reset and enable bits must match");
+#else
+#define PWM_GATE_REGISTER  (&RCC->APB1ENR)
+#define PWM_RESET_REGISTER (&RCC->APB1RSTR)
+#define PWM_REMAP_REGISTER (&AFIO->MAPR)
+#define PWM_BUS_DIVIDER    RCC_CFGR_PPRE1
+static const pwm_route_t routes[] = {
+    {TIM3, GPIOA, AFIO_MAPR_TIM3_REMAP, 6U, RCC_APB1ENR_TIM3EN_Pos},
+};
+_Static_assert(RCC_APB1ENR_TIM3EN_Pos == RCC_APB1RSTR_TIM3RST_Pos,
+               "TIM3 reset and enable bits must match");
+#endif
+
+static const pwm_route_t*
+reviewed_route(const nx_stm32f1_pwm_config_t* config) {
+    if (config != NULL) {
+        for (size_t i = 0U; i < sizeof(routes) / sizeof(routes[0]); ++i) {
+            const pwm_route_t* route = &routes[i];
+            if (config->registers == route->timer &&
+                config->gpio == route->gpio && config->pin == route->pin) {
+                return route;
+            }
+        }
+    }
+    return NULL;
+}
 
 enum {
     AFIO_OWNED = 1U,
@@ -36,57 +79,92 @@ static bool release_afio(nx_stm32f1_pwm_t* state) {
     return true;
 }
 
-/** \brief Reset only the timer bank acquired by this canonical owner. */
-static bool reset_timer(void) {
-    const uint32_t mask = RCC_APB1RSTR_TIM3RST;
-    return nx_stm32f1_write_masked(&RCC->APB1RSTR, mask, mask) &&
-           nx_stm32f1_write_masked(&RCC->APB1RSTR, mask, 0U);
+/** \brief Reset only the selected timer and verify both clock transitions. */
+static bool reset_timer(uint32_t mask) {
+    return nx_stm32f1_write_masked(PWM_RESET_REGISTER, mask, mask) &&
+           nx_stm32f1_write_masked(PWM_RESET_REGISTER, mask, 0U);
 }
 
-/** \brief Switch the owned pin between low GPIO and timer output. */
-static bool connect_pin(bool alternate) {
-    return nx_stm32f1_write_masked(&GPIOA->CRL, PA6_FIELD,
-                                   alternate ? PA6_TIMER : PA6_IDLE);
+static uint32_t gpio_mode(uint8_t pin, bool alternate) {
+    return (alternate ? 0xAU : 0x2U) << (4U * ((uint32_t)pin % 8U));
 }
 
-/** \brief Park the wire first; a stopped timer could otherwise hold it high. */
+/** \brief Switch one preloaded low latch between GPIO and the timer. */
+static bool connect_pin(const nx_stm32f1_pwm_config_t* cfg, bool alternate) {
+    volatile uint32_t* reg = cfg->pin < 8U ? &cfg->gpio->CRL : &cfg->gpio->CRH;
+    const uint32_t mask = 0xFU << (4U * ((uint32_t)cfg->pin % 8U));
+    return nx_stm32f1_write_masked(reg, mask, gpio_mode(cfg->pin, alternate));
+}
+
+/** \brief Value Line timers gate the output globally through BDTR.MOE. */
+static bool master_output(TIM_TypeDef* timer, bool enabled) {
+#if defined(STM32F100xB)
+    const uint32_t value = enabled ? TIM_BDTR_MOE : 0U;
+    NX_STM32F1_WRITE(&timer->BDTR, value);
+    nx_arch_dsb();
+    (void)timer->BDTR;
+    return timer->BDTR == value;
+#else
+    (void)timer;
+    (void)enabled;
+    return true;
+#endif
+}
+
+/** \brief Park the wire first; a stopped counter could hold an active level. */
 static bool park_output(const nx_stm32f1_pwm_t* state) {
+    const nx_stm32f1_pwm_config_t* config = state->config;
     if (state->pads.captured &&
-        ((GPIOA->ODR & PA6_MASK) != 0U || !connect_pin(false))) {
+        ((config->gpio->ODR & (1U << config->pin)) != 0U ||
+         !connect_pin(config, false))) {
+#if defined(STM32F100xB)
+        if ((*PWM_GATE_REGISTER & (1U << state->gate_shift)) != 0U) {
+            (void)master_output(config->registers, false);
+        }
+#endif
         return false;
     }
-    if ((RCC->APB1ENR & RCC_APB1ENR_TIM3EN) == 0U) {
+    if ((*PWM_GATE_REGISTER & (1U << state->gate_shift)) == 0U) {
         return true;
     }
-    return nx_stm32f1_write_masked(&TIM3->CCER, TIM_CCER_CC1E, 0U) &&
-           nx_stm32f1_write_masked(&TIM3->CR1, TIM_CR1_CEN, 0U);
+    TIM_TypeDef* timer = config->registers;
+    return master_output(timer, false) &&
+           nx_stm32f1_write_masked(&timer->CCER, TIM_CCER_CC1E, 0U) &&
+           nx_stm32f1_write_masked(&timer->CR1, TIM_CR1_CEN, 0U);
 }
 
 /** \brief Load the fixed timebase with output, IRQ and slave functions off. */
 static bool configure_timer(const nx_stm32f1_pwm_config_t* config) {
+    TIM_TypeDef* timer = config->registers;
     const uint32_t prescaler = config->clock_hz / config->tick_hz - 1U;
     const uint32_t period = config->period_ticks - 1U;
     const uint32_t compare_mode = LL_TIM_OCMODE_PWM1 | TIM_CCMR1_OC1PE;
-    LL_TIM_SetPrescaler(TIM3, prescaler);
-    LL_TIM_SetAutoReload(TIM3, period);
-    LL_TIM_OC_SetCompareCH1(TIM3, config->duty_ticks);
-    LL_TIM_EnableARRPreload(TIM3);
-    NX_STM32F1_WRITE(&TIM3->CCMR1, compare_mode);
+    LL_TIM_SetPrescaler(timer, prescaler);
+    LL_TIM_SetAutoReload(timer, period);
+    LL_TIM_OC_SetCompareCH1(timer, config->duty_ticks);
+    LL_TIM_EnableARRPreload(timer);
+    NX_STM32F1_WRITE(&timer->CCMR1, compare_mode);
     nx_arch_dsb();
-    return TIM3->PSC == prescaler && TIM3->ARR == period &&
-           TIM3->CCR1 == config->duty_ticks && TIM3->CR1 == TIM_CR1_ARPE &&
-           TIM3->CCMR1 == compare_mode && TIM3->CCER == 0U &&
-           TIM3->SMCR == 0U && TIM3->DIER == 0U;
+    return timer->PSC == prescaler && timer->ARR == period &&
+           timer->CCR1 == config->duty_ticks && timer->CR1 == TIM_CR1_ARPE &&
+           timer->CCMR1 == compare_mode && timer->CCER == 0U &&
+           timer->DIER == 0U &&
+#if defined(STM32F100xB)
+           timer->BDTR == 0U && timer->RCR == 0U &&
+           (timer != TIM15 || timer->SMCR == 0U);
+#else
+           timer->SMCR == 0U;
+#endif
 }
 
-/** \brief Admit the fixed reset route and take the sole TIM3 owner. */
+/** \brief Admit the fixed reset route and take the selected timer owner. */
 nx_result_t nx_stm32f1_pwm_prepare(nx_stm32f1_pwm_t* state,
                                    const nx_stm32f1_pwm_config_t* config) {
     if (!nx_stm32f1_cold_context()) {
         return NX_ERROR_CONTEXT;
     }
-    if (state == NULL || config == NULL || config->registers != TIM3 ||
-        config->gpio != GPIOA || config->pin != 6U || config->channel != 1U ||
+    const pwm_route_t* route = reviewed_route(config);
+    if (state == NULL || route == NULL || config->channel != 1U ||
         config->inactive_latch != 0U || config->period_ticks <= 1U ||
         config->period_ticks > UINT16_MAX ||
         config->duty_ticks > config->period_ticks || config->tick_hz == 0U ||
@@ -95,15 +173,17 @@ nx_result_t nx_stm32f1_pwm_prepare(nx_stm32f1_pwm_t* state,
         return NX_ERROR_INVALID;
     }
     if (config->clock_hz != 8000000U || !nx_stm32f1_system_live() ||
-        (RCC->CFGR & (RCC_CFGR_SWS | RCC_CFGR_HPRE | RCC_CFGR_PPRE1)) !=
+        (RCC->CFGR & (RCC_CFGR_SWS | RCC_CFGR_HPRE | PWM_BUS_DIVIDER)) !=
             RCC_CFGR_SWS_HSI) {
         return NX_ERROR_UNSUPPORTED;
     }
-    if (state->config != NULL || (RCC->APB1ENR & RCC_APB1ENR_TIM3EN) != 0U ||
-        (RCC->APB1RSTR & RCC_APB1RSTR_TIM3RST) != 0U) {
+    const uint32_t gate = 1U << route->gate_shift;
+    if (state->config != NULL || (*PWM_GATE_REGISTER & gate) != 0U ||
+        (*PWM_RESET_REGISTER & gate) != 0U) {
         return NX_ERROR_BUSY;
     }
     state->config = config;
+    state->gate_shift = route->gate_shift;
     if ((RCC->APB2ENR & RCC_APB2ENR_AFIOEN) == 0U) {
         state->effects |= AFIO_OWNED;
         if (!nx_stm32f1_write_masked(&RCC->APB2ENR, RCC_APB2ENR_AFIOEN,
@@ -111,7 +191,7 @@ nx_result_t nx_stm32f1_pwm_prepare(nx_stm32f1_pwm_t* state,
             return NX_ERROR_IO;
         }
     }
-    const bool remapped = (AFIO->MAPR & AFIO_MAPR_TIM3_REMAP) != 0U;
+    const bool remapped = (*PWM_REMAP_REGISTER & route->remap) != 0U;
     if (!release_afio(state)) {
         return NX_ERROR_IO;
     }
@@ -120,17 +200,21 @@ nx_result_t nx_stm32f1_pwm_prepare(nx_stm32f1_pwm_t* state,
         return NX_ERROR_UNSUPPORTED;
     }
 
-    nx_result_t result = nx_stm32f1_pads_capture(&state->pads, GPIOA, PA6_MASK);
+    const uint16_t pin_mask = (uint16_t)(1U << route->pin);
+    nx_result_t result =
+        nx_stm32f1_pads_capture(&state->pads, route->gpio, pin_mask);
     if (result == NX_SUCCESS) {
-        result = nx_stm32f1_pads_apply(&state->pads, PA6_IDLE, 0U, 0U);
+        const uint32_t idle = gpio_mode(route->pin, false);
+        result =
+            nx_stm32f1_pads_apply(&state->pads, route->pin < 8U ? idle : 0U,
+                                  route->pin < 8U ? 0U : idle, 0U);
     }
     if (result != NX_SUCCESS) {
         return result;
     }
     state->effects |= TIMER_OWNED;
-    if (!nx_stm32f1_write_masked(&RCC->APB1ENR, RCC_APB1ENR_TIM3EN,
-                                 RCC_APB1ENR_TIM3EN) ||
-        !reset_timer() || !configure_timer(config)) {
+    if (!nx_stm32f1_write_masked(PWM_GATE_REGISTER, gate, gate) ||
+        !reset_timer(gate) || !configure_timer(config)) {
         return NX_ERROR_IO;
     }
     state->duty = (uint16_t)config->duty_ticks;
@@ -149,8 +233,9 @@ nx_result_t nx_stm32f1_pwm_close(nx_stm32f1_pwm_t* state) {
     }
     state->effects &= (uint8_t)~LIVE;
     if ((state->effects & TIMER_OWNED) != 0U) {
-        if (!park_output(state) || !reset_timer() ||
-            !nx_stm32f1_write_masked(&RCC->APB1ENR, RCC_APB1ENR_TIM3EN, 0U)) {
+        const uint32_t gate = 1U << state->gate_shift;
+        if (!park_output(state) || !reset_timer(gate) ||
+            !nx_stm32f1_write_masked(PWM_GATE_REGISTER, gate, 0U)) {
             return NX_ERROR_IO;
         }
         state->effects &= (uint8_t) ~(TIMER_OWNED | RUNNING);
@@ -163,6 +248,7 @@ nx_result_t nx_stm32f1_pwm_close(nx_stm32f1_pwm_t* state) {
         state->config = NULL;
         state->duty = 0U;
         state->effects = 0U;
+        state->gate_shift = 0U;
     }
     return result;
 }
@@ -178,10 +264,11 @@ static nx_result_t set(void* context, uint32_t period_ticks,
         duty_ticks > period_ticks) {
         return NX_ERROR_INVALID;
     }
-    if ((RCC->APB1ENR & RCC_APB1ENR_TIM3EN) != 0U) {
-        LL_TIM_OC_SetCompareCH1(TIM3, duty_ticks);
+    if ((*PWM_GATE_REGISTER & (1U << state->gate_shift)) != 0U) {
+        TIM_TypeDef* timer = state->config->registers;
+        LL_TIM_OC_SetCompareCH1(timer, duty_ticks);
         nx_arch_dsb();
-        if (LL_TIM_OC_GetCompareCH1(TIM3) == duty_ticks) {
+        if (LL_TIM_OC_GetCompareCH1(timer) == duty_ticks) {
             state->duty = (uint16_t)duty_ticks;
             return NX_SUCCESS;
         }
@@ -191,18 +278,18 @@ static nx_result_t set(void* context, uint32_t period_ticks,
 }
 
 /** \brief Acknowledge a fresh preload update before connecting the output. */
-static bool load_preloads(void) {
-    LL_TIM_ClearFlag_UPDATE(TIM3);
+static bool load_preloads(TIM_TypeDef* timer) {
+    LL_TIM_ClearFlag_UPDATE(timer);
     nx_arch_dsb();
-    if (LL_TIM_IsActiveFlag_UPDATE(TIM3) != 0U) {
+    if (LL_TIM_IsActiveFlag_UPDATE(timer) != 0U) {
         return false;
     }
-    /* EGR is write-only. The reviewed APB1/timer clock is HSI8. */
-    NX_STM32F1_WRITE(&TIM3->EGR, TIM_EGR_UG);
+    /* EGR is write-only. The reviewed APB/timer clock is HSI8. */
+    NX_STM32F1_WRITE(&timer->EGR, TIM_EGR_UG);
     nx_arch_dsb();
     for (unsigned samples = 0U; samples < 16U; ++samples) {
-        if (LL_TIM_IsActiveFlag_UPDATE(TIM3) != 0U) {
-            LL_TIM_ClearFlag_UPDATE(TIM3);
+        if (LL_TIM_IsActiveFlag_UPDATE(timer) != 0U) {
+            LL_TIM_ClearFlag_UPDATE(timer);
             return true;
         }
     }
@@ -222,15 +309,17 @@ static nx_result_t start(void* context) {
     if ((state->effects & RUNNING) != 0U) {
         return NX_SUCCESS;
     }
-    if ((RCC->APB1ENR & RCC_APB1ENR_TIM3EN) != 0U && load_preloads()) {
+    TIM_TypeDef* timer = state->config->registers;
+    if ((*PWM_GATE_REGISTER & (1U << state->gate_shift)) != 0U &&
+        load_preloads(timer)) {
         const uint32_t end = state->config->period_ticks - 1U;
-        LL_TIM_SetCounter(TIM3, end);
+        LL_TIM_SetCounter(timer, end);
         nx_arch_dsb();
-        if (LL_TIM_GetCounter(TIM3) == end &&
-            nx_stm32f1_write_masked(&TIM3->CCER, TIM_CCER_CC1E,
+        if (LL_TIM_GetCounter(timer) == end &&
+            nx_stm32f1_write_masked(&timer->CCER, TIM_CCER_CC1E,
                                     TIM_CCER_CC1E) &&
-            connect_pin(true) &&
-            nx_stm32f1_write_masked(&TIM3->CR1, TIM_CR1_CEN, TIM_CR1_CEN)) {
+            master_output(timer, true) && connect_pin(state->config, true) &&
+            nx_stm32f1_write_masked(&timer->CR1, TIM_CR1_CEN, TIM_CR1_CEN)) {
             state->effects |= RUNNING;
             return NX_SUCCESS;
         }

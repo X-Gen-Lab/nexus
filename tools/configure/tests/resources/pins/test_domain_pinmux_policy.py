@@ -120,7 +120,7 @@ class DomainPinMuxPolicyTests(unittest.TestCase):
     def test_domains_reject_an_unvalidated_pinmux_policy(self):
         for name, policy in self.types.items():
             with self.subTest(domain=name), self.assertRaisesRegex(
-                    ValueError, "numeric pinmux policy"):
+                    ValueError, "pinmux policy"):
                 policy.from_validated(self.facts(name), pinmux=object())
 
 

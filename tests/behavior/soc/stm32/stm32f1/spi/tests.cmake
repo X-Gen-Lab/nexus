@@ -1,4 +1,4 @@
-# Exercise the selected STM32F1 SPI2 byte and transaction owners.
+# Exercise the selected STM32F1 SPI byte and transaction owners.
 # Author: Nexus Team
 set(f1_spi_dir "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f1")
 nexus_google_test(

@@ -70,10 +70,11 @@ static bool lane_clear(const DMA_Channel_TypeDef* lane) {
 nx_result_t
 nx_stm32f1_spi_dma_admit(const nx_stm32f1_spi_dma_t* state,
                          const nx_stm32f1_spi_dma_config_t* config) {
-    if (state == NULL || config == NULL || config->spi.clock_hz != 8000000U ||
-        config->dma != DMA1 || config->rx != DMA1_Channel4 ||
-        config->tx != DMA1_Channel5 || config->regions == NULL ||
-        config->region_count == 0U || config->region_count > 16U ||
+    if (state == NULL || config == NULL || config->spi.registers != SPI2 ||
+        config->spi.clock_hz != 8000000U || config->dma != DMA1 ||
+        config->rx != DMA1_Channel4 || config->tx != DMA1_Channel5 ||
+        config->regions == NULL || config->region_count == 0U ||
+        config->region_count > 16U ||
         config->priority >= (1U << __NVIC_PRIO_BITS))
         return NX_ERROR_INVALID;
     if (state->config != NULL)

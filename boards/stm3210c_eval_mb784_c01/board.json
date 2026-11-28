@@ -1,0 +1,112 @@
+{
+  "schema_version": 1,
+  "id": "stm3210c-eval-mb784-c01",
+  "soc": "STM32F107VCT6",
+  "soc_family": "stm32f1",
+  "source_revision": "UM0600 Rev5, MB784 schematic C.1, external X1 for MII PHY, JP16 selects CN6 RS-232",
+  "physical_pcb_revision": "MB784 C.1",
+  "clocks": {
+    "hse_hz": 25000000,
+    "hse_bypass": false
+  },
+  "bindings": [
+    {
+      "id": "station-management",
+      "controller": "ETH",
+      "route": "eth-clause22-pc1-pa2",
+      "requires": {
+        "phy_management_wiring": "pc1-pa2-external-phy"
+      }
+    },
+    {
+      "id": "console-rs232",
+      "controller": "USART2",
+      "route": "f107-usart2-pd5-pd6",
+      "requires": {
+        "usart2_wiring": "cn6-rs232"
+      }
+    }
+  ],
+  "reserved_resources": [
+    "PA0",
+    "PA1",
+    "PA13",
+    "PA14",
+    "PA15",
+    "PA3",
+    "PA8",
+    "PB10",
+    "PB11",
+    "PB12",
+    "PB13",
+    "PB3",
+    "PB4",
+    "PB8",
+    "PC14",
+    "PC15",
+    "PC2",
+    "PC3",
+    "PD10",
+    "PD11",
+    "PD12",
+    "PD8",
+    "PD9"
+  ],
+  "unknowns": [
+    "The Board permits Clause 22 only. No Ethernet data pins are enabled.",
+    "Fitted jumpers, PHY address straps and MDIO timing require board observation.",
+    "RS-232 line selection assumes JP16 in the RS-232 position and JP18/JP19 open. Fitted jumpers and serial timing remain physically unobserved."
+  ],
+  "provenance": [
+    {
+      "scope": "MCU X3 25 MHz, DP83848CVV MDC and MDIO, external X1, MII jumpers and remapped RX topology.",
+      "url": "https://www.tme.eu/Document/aece8c709b198489a4f26cf104594d1a/CD00212441.pdf",
+      "file": "CD00212441.pdf",
+      "sha256": "372ddf08a69e34173eaa1a5446033e9884c61e1ea6165c19144df3554da4d82b",
+      "pages": [
+        11,
+        15,
+        17,
+        34,
+        35
+      ]
+    },
+    {
+      "scope": "USART2 PD5/PD6 and CN6; JP16 selects the RS-232 receiver; JP18/JP19 disconnect ISP straps.",
+      "url": "https://www.tme.eu/Document/aece8c709b198489a4f26cf104594d1a/CD00212441.pdf",
+      "file": "CD00212441.pdf",
+      "sha256": "372ddf08a69e34173eaa1a5446033e9884c61e1ea6165c19144df3554da4d82b",
+      "pages": [
+        13,
+        25,
+        41
+      ],
+      "components": [
+        "JP16",
+        "JP18",
+        "JP19",
+        "CN6",
+        "ST3241EBPR"
+      ],
+      "nets": [
+        "PD5",
+        "PD6",
+        "RS232/IrDA_TX",
+        "RS232/IrDA_RX"
+      ]
+    }
+  ],
+  "backend_support": [
+    "baremetal"
+  ],
+  "hardware_options": {
+    "phy_management_wiring": [
+      "unknown",
+      "pc1-pa2-external-phy"
+    ],
+    "usart2_wiring": [
+      "unknown",
+      "cn6-rs232"
+    ]
+  }
+}

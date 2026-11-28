@@ -6,7 +6,7 @@ physical qualification. Selected endpoints are separate static typed identities.
 from dataclasses import dataclass
 
 from tools.configure.providers.common import fail, integer
-from tools.configure import usb_otg
+from tools.configure import usb_otg, usb_pma
 
 
 @dataclass(frozen=True)
@@ -20,6 +20,10 @@ class UsbDevicePolicy:
     endpoint_numbers: int
     pins: tuple
     resources: tuple
+    modes: tuple = ("device-fs", "otg-fs")
+    irq_name: str | None = None
+    vbus_sensing: bool = False
+    control_only: bool = False
 
 
 FIELDS = {"event_capacity", "rx_fifo_words", "vbus_sensing", "poll_limit",
@@ -32,6 +36,11 @@ def validate_soc(soc, provider):
     """Compare declared resources with the actual maintained SDK FS binding."""
     actual = {name for name, item in soc["controllers"].items()
               if item["kind"] == "usb_device"}
+    for name in tuple(actual):
+        pma = usb_pma.selected(provider, name)
+        if pma is not None:
+            usb_pma.validate_controller(soc["controllers"][name], pma)
+            actual.remove(name)
     if not actual:
         return
     hardware = getattr(provider, "USB_DEVICE", None)
@@ -39,7 +48,8 @@ def validate_soc(soc, provider):
     if actual != {expected}:
         fail("USB controller differs from the maintained internal FS PHY")
     item = soc["controllers"][expected]
-    if (item["modes"] != ["device-fs", "otg-fs"] or item["irq"] != [expected] or
+    if (tuple(item["modes"]) != hardware.modes or
+            item["irq"] != [hardware.irq_name or expected] or
             item.get("irq_numbers") != [hardware.irq] or
             item["pins"] != [pin for pin, _, _ in hardware.pins] or
             any(type(item.get(key)) is not int or item[key] != value
@@ -53,6 +63,8 @@ def validate_soc(soc, provider):
 
 
 def validate_selection(selection, route, provider, ram_size):
+    if selection["mode"] in usb_pma.MODES:
+        return usb_pma.validate_selection(selection, route, provider, ram_size)
     if not (FIELDS - {"calls_os"}).issubset(selection):
         fail("USB requires an explicit ring, FIFO, VBUS policy, finite budgets and IRQ")
     integer(selection["event_capacity"], 1, min(4096, ram_size // 64),
@@ -80,8 +92,10 @@ def validate_selection(selection, route, provider, ram_size):
         integer(selection[key], 1, context="USB " + key)
     if type(selection["vbus_sensing"]) is not bool:
         fail("USB vbus_sensing requires an explicit boolean")
-    if selection["vbus_sensing"]:
-        fail("USB VBUS electrical route is not reviewed for this binding")
+    hardware = getattr(provider, "USB_DEVICE", None)
+    sensed = hardware is not None and route["controller"] == hardware.controller and hardware.vbus_sensing
+    if selection["vbus_sensing"] != sensed:
+        fail("USB VBUS sensing must match its reviewed electrical route")
     if hs:
         if (capability is None or route["controller"] != capability["controller"] or
                 tuple((pin["pin"], pin["function"], pin["af"])
@@ -95,11 +109,11 @@ def validate_selection(selection, route, provider, ram_size):
         return
     if not managed and {"ulpi_clock_hz", "electrical_handover"} & selection.keys():
         fail("USB FS does not select an HS PHY handover")
-    hardware = getattr(provider, "USB_DEVICE", None)
+    pinmux = provider.PINMUX_POLICY
     if (hardware is None or route["controller"] != hardware.controller or
-            tuple((pin["pin"], pin["function"], pin["af"])
+            tuple((pin["pin"], pin["function"], pinmux.alternate(pin))
                   for pin in route["pins"]) != hardware.pins):
-        fail("USB FS requires its reviewed internal PHY PA11/PA12 AF10 route")
+        fail("USB FS requires its reviewed internal PHY route")
 
 
 def endpoint(device, controller=None):
@@ -110,6 +124,8 @@ def endpoint(device, controller=None):
         fail("USB endpoint requires exact number/direction/type/packet fields")
     if device["driver"] != "usb-fs-endpoint":
         fail("USB endpoint has no maintained FS packet provider")
+    if controller is not None and controller["mode"] in usb_pma.MODES:
+        return usb_pma.endpoint(device, controller["mode"])
     mode = usb_otg.device_mode(controller["mode"]) if controller is not None else "device-fs"
     hs = mode in {"device-hs-fs", "device-hs-ulpi"}
     ulpi = mode == "device-hs-ulpi"
@@ -142,16 +158,23 @@ def endpoint(device, controller=None):
     return {**device, "fifo_words": device.get("fifo_words", 0), "fifo_start": 0}
 
 
-def complete_plan(selected, devices, claim):
+def complete_plan(selected, devices, claim, provider=None):
     """Require both EP0 directions and resolve one nonoverlapping FIFO plan."""
     usb_otg.validate_power_links(selected)
     for controller in selected:
         if controller["kind"] != "usb_device":
             continue
         children = [item for item in devices if item["controller"] == controller["id"]]
+        if controller["mode"] in usb_pma.MODES:
+            usb_pma.complete_plan(controller, children, claim)
+            continue
         hs = usb_otg.device_mode(controller["mode"]) != "device-fs"
         if not 2 <= len(children) <= (12 if hs else 8):
             fail("USB requires exactly selected directions, including EP0 IN/OUT")
+        hardware = getattr(provider, "USB_DEVICE", None)
+        if (hardware is not None and hardware.control_only and
+                any(item["number"] != 0 for item in children)):
+            fail("USB Device route currently admits only EP0 IN/OUT")
         keys = {(item["number"], item["direction"]) for item in children}
         if len(keys) != len(children) or not {(0, "in"), (0, "out")}.issubset(keys):
             fail("USB endpoint directions must be unique and include EP0 IN/OUT")

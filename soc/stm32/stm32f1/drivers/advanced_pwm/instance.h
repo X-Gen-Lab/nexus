@@ -1,6 +1,6 @@
 /**
  * \file            instance.h
- * \brief           Private F103 TIM1 CH1 complementary output owner.
+ * \brief           Private F103 CH1 complementary output owner.
  * \author          Nexus Team
  */
 #ifndef NEXUS_STM32F1_ADVANCED_PWM_INSTANCE_H
@@ -33,7 +33,7 @@ typedef struct {
     volatile bool fault;
 } nx_stm32f1_advanced_pwm_t;
 
-/** \brief Prepare one isolated TIM1 pair with GPIO idle and break armed. */
+/** \brief Prepare one isolated timer pair with GPIO idle and break armed. */
 nx_result_t
 nx_stm32f1_advanced_pwm_prepare(nx_stm32f1_advanced_pwm_t* state,
                                 const nx_stm32f1_advanced_pwm_config_t* config);
@@ -41,9 +41,15 @@ nx_stm32f1_advanced_pwm_prepare(nx_stm32f1_advanced_pwm_t* state,
 /** \brief Prove output withdrawal and return the exact cold leases. */
 nx_result_t nx_stm32f1_advanced_pwm_close(nx_stm32f1_advanced_pwm_t* state);
 
-/** \brief Latch the TIM1 break and mask its interrupt until explicit recovery.
+/** \brief Latch the selected timer break and mask its interrupt until explicit
+ * recovery.
  */
 void nx_stm32f1_advanced_pwm_irq(nx_stm32f1_advanced_pwm_t* state);
+
+#if defined(NX_STM32F1_PWM_ADC_OWNER)
+nx_result_t nx_stm32f1_advanced_pwm_one_pulse(nx_stm32f1_advanced_pwm_t* state,
+                                              uint32_t duty, uint32_t phase);
+#endif
 
 extern const nx_advanced_pwm_ops_t nx_stm32f1_advanced_pwm_ops;
 

@@ -118,6 +118,9 @@ class DomainBridge:
             domains.WAVEFORM.validate(selection, route)
         if domains.SELECTION is not None:
             domains.SELECTION.validate(selection, route, self.hardware_facts)
+        elif kind == "encoder":
+            from tools.configure.timer_advanced import validate_encoder
+            validate_encoder(selection, route)
 
     def validate_mode_context(self, selection, route, *, backend, clock_profile,
                               part=None, clock_plan=None, kernel_profile=None):

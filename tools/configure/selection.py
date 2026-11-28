@@ -2,6 +2,7 @@
 
 from collections.abc import Mapping
 
+from tools.configure import usb_pma
 from tools.configure.contracts import CONTROLLER_CONTRACTS
 from tools.configure.providers.common import (
     UINT32_MAX, cpu_abi, fail, integer, mode_traits, route_dma)
@@ -172,8 +173,11 @@ def normalize_controller(selection, route, binding, hardware, provider, *,
         policy.validate_graphics_clock(selection, route, clock_plan)
     if route["kind"] in {"usb_device", "usb_host"}:
         from tools.configure import usb_host
-        usb_host.validate_clock(route["controller"], clock["core_hz"],
-            provider=provider, kind=route["kind"], mode=selection["mode"])
+        if selection["mode"] in usb_pma.MODES:
+            usb_pma.resolve_clock(provider, route["controller"], clock)
+        else:
+            usb_host.validate_clock(route["controller"], clock["core_hz"],
+                provider=provider, kind=route["kind"], mode=selection["mode"])
     resolved_timing = None
     if route["kind"] == "uart" and selection["mode"] == "irq-wire":
         from tools.configure import uart_wires
@@ -204,6 +208,11 @@ def normalize_controller(selection, route, binding, hardware, provider, *,
         **({"stream_resolution": resolved_stream}
            if resolved_stream is not None else {}),
         **({"can_irqs": hardware["irq"]} if route["kind"] == "can" else {})}
+    if route["kind"] == "usb_device" and mode in usb_pma.MODES:
+        policy = usb_pma.selected(provider, route["controller"])
+        result["pma_layout"] = policy.layout
+        if mode in usb_pma.EP1_TRANSFERS:
+            result["ep1_layout"] = policy.ep1_layout
     if route["kind"] == "flash" and hasattr(provider, "binding"):
         limits = provider.binding("flash", mode, route["controller"]).limits
         bounds = limits.get("route_supply_mv")

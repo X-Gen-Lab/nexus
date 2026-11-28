@@ -1,9 +1,7 @@
 /**
  * \file            main.c
- * \brief           Exercise the typed F103RB TIM1 complementary PWM contract.
- * \author          Nexus Team
- * \version         1.0.0
- * \date            2026-11-28
+ * \brief           Exercise the typed F103 TIM1/TIM8 complementary PWM
+ * contract. \author          Nexus Team \version         1.0.0 \date 2026-11-28
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "nexus_bindings.h"

@@ -1,6 +1,6 @@
 /**
  * \file            flash.c
- * \brief           STM32F103 FPEC halfword program and page erase
+ * \brief           STM32F1 FPEC halfword program and page erase
  * \author          Nexus Team
  * \version         1.0.0
  * \date            2026-11-28
@@ -10,12 +10,12 @@
 #include "nexus/arch/arch.h"
 #include "stm32f1xx.h"
 
-#if defined(STM32F103xB)
+#if defined(STM32F103x6) || defined(STM32F103xB) || defined(STM32F100xB)
 #define NX_F1_FLASH_PAGE_BYTES 1024U
 #elif defined(STM32F103xE) || defined(STM32F103xG)
 #define NX_F1_FLASH_PAGE_BYTES 2048U
 #else
-#error "The selected Flash controller requires a reviewed STM32F103 geometry"
+#error "The selected Flash controller requires a reviewed STM32F1 geometry"
 #endif
 
 #if defined(STM32F103xG)
@@ -84,8 +84,12 @@ static bool bank2_at(uint32_t offset) {
 }
 
 static bool reviewed_capacity(uint32_t bytes) {
-#if defined(STM32F103xB)
+#if defined(STM32F103x6)
+    return bytes == 32U * 1024U;
+#elif defined(STM32F103xB)
     return bytes == 64U * 1024U || bytes == 128U * 1024U;
+#elif defined(STM32F100xB)
+    return bytes == 128U * 1024U;
 #elif defined(STM32F103xE)
     return bytes == 512U * 1024U;
 #else
@@ -120,8 +124,7 @@ nx_result_t nx_stm32f1_flash_prepare(nx_stm32f1_flash_state_t* port,
         geometry->program_flags != 0U || !reviewed_spans(geometry)) {
         return NX_ERROR_INVALID;
     }
-    /* DS5319, DS5792 and DS6558 specify an inclusive 2.0–3.6 V program range.
-     */
+    /* The reviewed devices share the inclusive 2.0–3.6 V program range. */
     if (supply_mv < 2000U || supply_mv > 3600U) {
         return NX_ERROR_UNSUPPORTED;
     }
@@ -341,7 +344,8 @@ static nx_result_t program(void* context, uint32_t offset, const void* data,
         }
         volatile uint16_t* address =
             (volatile uint16_t*)(NX_F1_FLASH_MEMORY + offset + index);
-        /* PM0075 and PM0068 §2.3.3 allow a zero pulse on a non-erased halfword.
+        /* PM0075, PM0068 and PM0063 §2.3.3 allow a zero pulse on a non-erased
+         * halfword.
          */
         if ((*address != UINT16_MAX && value != 0U) || !clock_ready() ||
             !clear_status(bank2) || !control(bank2, FLASH_CR_PG)) {
@@ -399,7 +403,8 @@ static nx_result_t erase(void* context, uint32_t offset, size_t length,
         NX_F1_FLASH_WRITE(NX_F1_FLASH_REG(bank2, CR),
                           FLASH_CR_PER | FLASH_CR_STRT);
         nx_arch_dsb();
-        /* ES096 §2.2.11, ES0340 §2.2.10, ES0346 §2.2.8 delay BSY. */
+        /* The device errata require a separate bus access before reading BSY.
+         */
         (void)NX_F1_FLASH_READ(NX_F1_FLASH_REG(bank2, CR));
         nx_arch_dsb();
         result = pulse(bank2, deadline);

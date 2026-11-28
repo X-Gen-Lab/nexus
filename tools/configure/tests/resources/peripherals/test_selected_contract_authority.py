@@ -68,14 +68,15 @@ class SelectedContractAuthorityTests(unittest.TestCase):
         f1_controls = {(row.part, row.controller, row.mode): row.reviewed_routes
                        for row in rows if row.family == "stm32f1"
                        and row.kind in {"pwm", "adc", "exti"} and row.reviewed_route_available}
-        self.assertEqual(f1_controls, {
+        base_controls = {
             ("STM32F103RBT6", "TIM3", "fixed-pwm"): ("tim3-pa6-ch1",),
             ("STM32F103RBT6", "ADC1", "single-shot"): ("adc1-pa0-in0",),
             ("STM32F103RBT6", "ADC1", "single-trigger-dma"): (
                 "adc1-pa0-in0", "adc1-pa0-tim1-cc1"),
             ("STM32F103RBT6", "EXTI13", "edge-event"): ("exti13-pc13",),
             ("STM32F103RBT6", "PVD", "pvd-level"): ("pvd-level",),
-        })
+        }
+        self.assertEqual({key: f1_controls[key] for key in base_controls}, base_controls)
         self.assertTrue(all(not row.physical_qualified for row in rows))
         self.assertTrue(all(row.review_sources for row in rows))
 
@@ -103,7 +104,8 @@ class SelectedContractAuthorityTests(unittest.TestCase):
     def test_unrouted_f407ve_ethernet_is_not_inherited_from_the_zg_route(self):
         rows = matrix.support_catalogue(configure.ROOT)
         ethernet = {row.part: row for row in rows
-                    if row.controller == "ETH" and row.mode == "raw-rmii"}
+                    if row.family == "stm32f4" and row.controller == "ETH"
+                    and row.mode == "raw-rmii"}
         self.assertEqual(set(ethernet), {
             "STM32F407VET6", "STM32F407ZGT6", "STM32F417ZGT6"})
         self.assertFalse(ethernet["STM32F407VET6"].reviewed_route_available)

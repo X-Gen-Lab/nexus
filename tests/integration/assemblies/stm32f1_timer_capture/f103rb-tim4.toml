@@ -1,0 +1,27 @@
+# NUCLEO-F103RB Arduino D10, with an externally driven 3.3 V signal.
+schema = 2
+board_package = "board"
+backend = "baremetal"
+clock = "hsi8"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+flash_load_limit_bytes = 24576
+static_ram_limit_bytes = 6144
+libc_heap_bytes = 0
+
+[timer_capture.input]
+binding = "d10"
+mode = "edge-capture"
+tick_hz = 1000000
+edge = "rising"
+filter = 0
+exclusive = true
+
+[timer_capture.input.irq]
+priority = 5
+calls_os = false
+
+[factory]
+capabilities = true

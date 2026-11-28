@@ -1,6 +1,6 @@
 /**
  * \file            instance.h
- * \brief           Private F103 IRQ USART binding and single-owner state.
+ * \brief           Private STM32F1 IRQ USART binding and single-owner state.
  * \author          Nexus Team
  */
 #ifndef NEXUS_STM32F1_UART_INSTANCE_H
@@ -8,12 +8,34 @@
 
 #include "drivers/gpio/instance.h"
 #include "nexus/io/uart.h"
+#include "nexus/io/uart_wire.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/** \brief Generated default route, clock and profile-specific RX storage. */
+/** \brief Encoded wire facts in the otherwise unused configuration padding. */
+#define NX_STM32F1_UART_WORD9  1U
+#define NX_STM32F1_UART_PARITY 2U
+#define NX_STM32F1_UART_ODD    4U
+#define NX_STM32F1_UART_STOP2  8U
+
+/** \brief Encode the reviewed payload/parity/stop facts for immutable C. */
+#define NX_STM32F1_UART_FRAME(bits, parity, stop)                              \
+    (((bits) == 8U && (parity) != 0U ? NX_STM32F1_UART_WORD9 : 0U) |           \
+     (parity) | ((stop) == 2U ? NX_STM32F1_UART_STOP2 : 0U))
+
+#define NX_STM32F1_UART_SYNC_LBCL 1U
+#define NX_STM32F1_UART_SYNC_CPHA 2U
+#define NX_STM32F1_UART_SYNC_CPOL 4U
+
+/** \brief Encode the three USART clock options for immutable C. */
+#define NX_STM32F1_UART_SYNC_OPTIONS(polarity, phase, last)                    \
+    (((polarity) ? NX_STM32F1_UART_SYNC_CPOL : 0U) |                           \
+     ((phase) ? NX_STM32F1_UART_SYNC_CPHA : 0U) |                              \
+     ((last) ? NX_STM32F1_UART_SYNC_LBCL : 0U))
+
+/** \brief Generated route, framing, clock and selected RX storage. */
 typedef struct {
     USART_TypeDef* registers;
     GPIO_TypeDef* tx_registers;
@@ -27,6 +49,9 @@ typedef struct {
     uint8_t tx_pin;
     uint8_t rx_pin;
     uint8_t priority;
+    uint8_t frame;
+    uint8_t wire;
+    uint8_t wire_options;
 } nx_stm32f1_uart_config_t;
 
 /** \brief Retained cold receipts and one IRQ TX / RX stream per instance. */
@@ -49,6 +74,9 @@ typedef struct {
     bool controls_owned;
     bool usart_gate_added;
     bool afio_gate_added;
+#if defined(STM32F107xC)
+    bool remap_owned;
+#endif
 } nx_stm32f1_uart_t;
 
 nx_result_t nx_stm32f1_uart_admit(const nx_stm32f1_uart_t* state,
@@ -60,6 +88,7 @@ nx_result_t nx_stm32f1_uart_close(nx_stm32f1_uart_t* state);
 nx_result_t nx_stm32f1_uart_validate(void* context,
                                      const nx_uart_tx_request_t* request);
 void nx_stm32f1_uart_irq(nx_stm32f1_uart_t* state);
+void nx_stm32f1_uart_parity_irq(nx_stm32f1_uart_t* state);
 extern const nx_uart_ops_t nx_stm32f1_uart_ops;
 
 #ifdef __cplusplus

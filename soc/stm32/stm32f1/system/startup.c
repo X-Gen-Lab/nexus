@@ -8,12 +8,10 @@
  */
 #include "system/clock_profile.h"
 
-#if defined(NX_STM32F1_CONNECTIVITY_PLL2)
-_Static_assert(NEXUS_CORE_HZ == 72000000U && NEXUS_CLOCK_INPUT_HZ == 25000000U,
-               "Connectivity startup requires the reviewed 25 MHz PLL2 plan");
-#elif defined(NX_STM32F1_HSE72)
-_Static_assert(NEXUS_CORE_HZ == 72000000U && NEXUS_CLOCK_INPUT_HZ == 8000000U,
-               "F103 startup requires the reviewed 8 MHz bypass plan");
+#if defined(NX_STM32F1_PROFILE_CORE_HZ)
+_Static_assert(NEXUS_CORE_HZ == NX_STM32F1_PROFILE_CORE_HZ &&
+                   NEXUS_CLOCK_INPUT_HZ == NX_STM32F1_PROFILE_INPUT_HZ,
+               "STM32F1 startup requires the reviewed external clock plan");
 #elif defined(NEXUS_CLOCK_SOURCE_HSI)
 _Static_assert(NEXUS_CORE_HZ == 8000000U && NEXUS_CLOCK_INPUT_HZ == 8000000U,
                "STM32F1 HSI startup requires the reviewed HSI8 plan");

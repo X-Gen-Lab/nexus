@@ -115,6 +115,10 @@ def resolve(assembly, *, root, soc, board, routes, bindings,
             if mode not in route["modes"]:
                 fail(f"Unsupported mode {mode} for {selection['binding']}; "
                      f"allowed: {', '.join(route['modes'])}")
+            for field, expected in route.get("required_options", {}).items():
+                actual = selection.get(field)
+                if type(actual) is not type(expected) or actual != expected:
+                    fail(f"Route {route['id']} requires {field} = {expected!r}")
             profiles = route.get("clock_profiles")
             if profiles is not None and (clock_plan is None or
                                          clock_plan["profile"] not in profiles):
@@ -279,7 +283,7 @@ def resolve(assembly, *, root, soc, board, routes, bindings,
                 chip_selects=chip_selects, claim=claim, obj=obj)
     unique(device_ids + instance_ids, "assembly instance IDs")
     unique([c_id(name).upper() for name in device_ids + instance_ids], "generated C identifiers")
-    usb_device.complete_plan(selected, endpoint_selections, claim)
+    usb_device.complete_plan(selected, endpoint_selections, claim, provider)
     for controller in selected:
         children = [item for item in endpoint_selections if item["controller"] == controller["id"]]
         if controller["kind"] == "external_bus":

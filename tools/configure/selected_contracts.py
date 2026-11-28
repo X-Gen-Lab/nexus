@@ -238,6 +238,7 @@ def describe(item, endpoint=None, *, public_class=None):
         fail("Selected endpoint differs from its actual controller")
     kind = item.kind
     nominal_kind, nominal_mode = kind, item.mode
+    target_receive_only = False
     if kind == "external_bus" and endpoint is not None:
         nominal_kind = selected
         nominal_mode = ("8080-16" if selected=="parallel16" else endpoint.options.mode)
@@ -293,17 +294,19 @@ def describe(item, endpoint=None, *, public_class=None):
         limits.update(max_transfer_units="NX_I2C_BOUNDED_MAX_MESSAGE_BYTES",
                       max_messages="NX_I2C_BOUNDED_MAX_MESSAGES")
     elif kind == "i2c_target":
-        # One WRITE_READ request has two bounded direction spans; address
-        # phases are not independent messages or caller payload bytes.
-        limits.update(max_transfer_units=512, max_segment_units=256,
-                      max_segments=2, max_total_units=512)
+        binding = provider.binding(kind, item.mode, item.controller)
+        target_receive_only = binding.i2c_target_receive_only
+        spans = 1 if target_receive_only else 2
+        limits.update(max_transfer_units=256 * spans, max_segment_units=256,
+                      max_segments=spans, max_total_units=256 * spans)
     elif kind == "pwm_adc" and item.mode in {
             "injected-control", "injected-power-stage"}:
         limits.update(unit="cycles", unit_bytes=None, buffer_alignment=2,
                       max_transfer_units=None, word_bits=(12,))
     elif kind in {"adc", "pwm_adc"}:
         count = len(item.options.channels)
-        bound = ("UINT16_MAX" if kind == "pwm_adc" else
+        bound = (1 if item.mode == "finite-injected" else
+                 "UINT16_MAX" if kind == "pwm_adc" else
                  f"UINT16_MAX - UINT16_MAX % {count}U" if shape.block_stream else count)
         limits.update(unit="samples", unit_bytes=2, buffer_alignment=2,
                       max_transfer_units=bound)
@@ -353,6 +356,8 @@ def describe(item, endpoint=None, *, public_class=None):
     if selected_limits is not None:
         limits.update(selected_limits(item, shape))
     formatted = _format(item, provider, shape)
+    if target_receive_only:
+        formatted["fields"] = {**formatted["fields"], "receive_only": 1}
     if endpoint is not None and kind == "i2c":
         formatted["fields"] = {**formatted["fields"],
                                "address_bits": endpoint.options.address_bits}

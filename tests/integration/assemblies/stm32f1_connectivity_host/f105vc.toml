@@ -1,0 +1,32 @@
+# Exact Connectivity USB FS Host software reference.
+schema = 2
+board_package = "f105vc-board"
+backend = "baremetal"
+clock = "hse25-crystal-pll72"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+flash_load_limit_bytes = 32768
+static_ram_limit_bytes = 6144
+libc_heap_bytes = 0
+
+[factory]
+capabilities = true
+
+[hardware]
+usb_host_power = "external-guarded-pb0-pb1-pb10"
+
+[usb_host.link]
+binding = "usb-a"
+mode = "host-fs"
+channel_count = 1
+rx_fifo_words = 128
+nonperiodic_fifo_words = 96
+periodic_fifo_words = 64
+engine = "pio"
+ulpi_clock_hz = 0
+drain_timeout_us = 2000
+init_timeout_us = 200000
+electrical_handover = "external-owner"
+irq = {priority = 5, calls_os = false}

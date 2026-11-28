@@ -1,0 +1,22 @@
+schema = 2
+board_package = "board"
+backend = "baremetal"
+clock = "hsi8"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+flash_load_limit_bytes = 16384
+static_ram_limit_bytes = 4096
+
+[uart.link]
+binding = "irda-uart2"
+mode = "irq-wire"
+baud = 115200
+rx = { format = "events", capacity = 32 }
+irq = { priority = 5 }
+wire = { protocol = "irda", prescaler = 1, irda_low_power = false }
+
+[factory]
+capabilities = true

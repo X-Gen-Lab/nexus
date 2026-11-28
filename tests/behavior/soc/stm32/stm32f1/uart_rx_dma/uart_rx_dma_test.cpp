@@ -64,9 +64,11 @@ class F103ReceiveDma : public testing::Test {
         dr_reads = 0U;
         GPIOA->CRL = GPIOA->CRH = 0x44444444U;
         USART2->SR = USART_SR_TC | USART_SR_TXE;
-        config.uart = {USART2,  nullptr, GPIOA, USART2_IRQn,       8000000U,
-                       115200U, nullptr, 0U,    NX_UART_RX_BLOCKS, 0U,
-                       3U,      5U};
+        config.uart = {USART2,      nullptr,  GPIOA,
+                       USART2_IRQn, 8000000U, 115200U,
+                       nullptr,     0U,       NX_UART_RX_BLOCKS,
+                       0U,          3U,       5U,
+                       0U,          0U,       0U};
         config.dma = DMA1;
         config.channel = DMA1_Channel6;
         config.irq = DMA1_Channel6_IRQn;

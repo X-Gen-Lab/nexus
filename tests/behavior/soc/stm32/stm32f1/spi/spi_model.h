@@ -1,6 +1,6 @@
 /**
  * \file            spi_model.h
- * \brief           F103 SPI2 and GPIO latch external register model.
+ * \brief           F103 SPI and GPIO latch external register model.
  * \author          Nexus Team
  */
 #ifndef NEXUS_TEST_F1_SPI_MODEL_H

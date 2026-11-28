@@ -1,6 +1,6 @@
 /**
  * \file            instance.h
- * \brief           Private fixed-route SPI2 short-poll owners and endpoint.
+ * \brief           Private fixed-route SPI short-poll owners and endpoint.
  * \author          Nexus Team
  */
 #ifndef NEXUS_STM32F1_SPI_INSTANCE_H
@@ -14,10 +14,10 @@
 extern "C" {
 #endif
 
-/** \brief Generated SPI2 route and one explicitly wired active-low select. */
+/** \brief Generated SPI route and one explicitly wired active-low select. */
 typedef struct {
     SPI_TypeDef* registers;
-    GPIO_TypeDef* gpio;
+    GPIO_TypeDef* gpio; /* Exact shared GPIO bank, projected from the CS. */
     uint32_t clock_hz;
     uint8_t sck;
     uint8_t miso;
@@ -30,6 +30,7 @@ typedef struct {
     const nx_stm32f1_spi_config_t* config;
     nx_stm32f1_pads_t pads;
     bool gate_added;
+    bool afio_gate_added;
     bool peripheral_owned;
     bool live;
     bool active;

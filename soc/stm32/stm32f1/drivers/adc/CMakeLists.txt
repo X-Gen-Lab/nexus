@@ -12,3 +12,10 @@ if("single-trigger-dma" IN_LIST adc_modes)
     )
     target_link_libraries(nexus_soc_stm32f1 PRIVATE Nexus::IODMA)
 endif()
+if("simultaneous-scan-dma" IN_LIST adc_modes)
+    target_sources(
+        nexus_soc_stm32f1
+        PRIVATE "${CMAKE_CURRENT_LIST_DIR}/dual_dma.c"
+    )
+    target_link_libraries(nexus_soc_stm32f1 PRIVATE Nexus::IOADC Nexus::IODMA)
+endif()

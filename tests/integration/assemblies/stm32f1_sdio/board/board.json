@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "id": "stm32f103ze-sdio-1bit-software",
+  "soc": "STM32F103ZET6",
+  "soc_family": "stm32f1",
+  "source_revision": "F103ZET6 software SD memory reference with an externally biased active-low card-detect input",
+  "physical_pcb_revision": null,
+  "clocks": {},
+  "bindings": [
+    {
+      "id": "sd0",
+      "controller": "SDIO",
+      "route": "sdio-pc8-pc12-pd2-pc13"
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14",
+    "PA15",
+    "PB3",
+    "PB4"
+  ],
+  "unknowns": [
+    "This assembly assumes a stable dedicated 3.3 V supply, external CMD, DAT and detect pull-ups, and mechanically debounced active-low PC13 card detect.",
+    "PCB routing, socket wiring, card population and signal integrity have not been observed."
+  ],
+  "provenance": [
+    "https://www.st.com/resource/en/datasheet/stm32f103ze.pdf",
+    "https://www.st.com/resource/en/reference_manual/rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32-bit-mcus-stmicroelectronics.pdf",
+    "https://www.st.com/resource/en/errata_sheet/es0340-stm32f101xcde-stm32f103xcde-highdensity-device-errata-stmicroelectronics.pdf",
+    "https://www.sdcard.org/downloads/pls/"
+  ],
+  "backend_support": [
+    "baremetal"
+  ]
+}

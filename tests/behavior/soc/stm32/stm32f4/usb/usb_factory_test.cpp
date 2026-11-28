@@ -16,7 +16,7 @@ namespace {
 using UsbColdConfig = nx_stm32_usb_cold_config_t;
 using UsbClockState = nx_stm32_usb_clock_state_t;
 using UsbPinConfig = nx_stm32_platform_pin_config_t;
-using UsbEndpointPlan = nx_stm32_usb_endpoint_config_t;
+using UsbEndpointPlan = nx_usb_endpoint_config_t;
 constexpr auto UsbColdPrepare = nx_stm32_usb_cold_prepare;
 constexpr auto UsbColdClose = nx_stm32_usb_cold_close;
 } /* namespace */

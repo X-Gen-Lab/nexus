@@ -10,80 +10,89 @@
         "ops": "nx_stm32f1_exti_ops",
         "declarations": [
           {
-            "role": "events",
-            "type": "nx_exti_event_t",
-            "const": false,
-            "count": {
-              "source": "item.options.event_capacity"
-            }
-          },
-          {
-            "role": "control_config",
-            "type": "nx_stm32f1_exti_config_t",
-            "const": true,
-            "value": {
-              "record": [
-                [
-                  "gpio",
-                  {
-                    "source": "selected.pads.0.registers",
-                    "as": "symbol"
-                  }
-                ],
-                [
-                  "storage",
-                  {
-                    "ref": "events",
-                    "as": "symbol"
-                  }
-                ],
-                [
-                  "capacity",
-                  {
-                    "source": "item.options.event_capacity"
-                  }
-                ],
-                [
-                  "edge",
-                  {
-                    "source": "item.options.edge",
-                    "as": "symbol",
-                    "values": {
-                      "rising": "NX_EXTI_RISING",
-                      "falling": "NX_EXTI_FALLING",
-                      "both": "NX_EXTI_BOTH"
-                    }
-                  }
-                ],
-                [
-                  "gpio_index",
-                  {
-                    "source": "selected.pads.0.port_index"
-                  }
-                ],
-                [
-                  "line",
-                  {
-                    "source": "selected.pads.0.number"
-                  }
-                ],
-                [
-                  "priority",
-                  {
-                    "source": "item.options.irq.priority"
-                  }
-                ],
-                [
-                  "pull",
-                  {
-                    "source": "item.options.pull",
-                    "values": {
-                      "none": 0
-                    }
-                  }
-                ]
+            "use": "pc13-edge-config"
+          }
+        ],
+        "calls": {
+          "admit": [
+            {
+              "function": "nx_stm32f1_exti_admit",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "ref": "control_config",
+                  "as": "address"
+                }
               ]
             }
+          ],
+          "prepare": {
+            "function": "nx_stm32f1_exti_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "ref": "control_config",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32f1_exti_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "retain_on_failed_init": true,
+        "irq": [
+          {
+            "name": {
+              "source": "selected.vector_bindings.0.handler",
+              "as": "symbol"
+            },
+            "calls": [
+              {
+                "function": "nx_stm32f1_exti_irq",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  }
+                ]
+              }
+            ],
+            "barrier": "nx_arch_dsb"
+          }
+        ]
+      },
+      "headers": [
+        "drivers/exti/instance.h"
+      ],
+      "controllers": [
+        "EXTI13"
+      ]
+    },
+    {
+      "kind": "exti",
+      "mode": "stop-wake",
+      "implementation": "exti",
+      "static_recipe": {
+        "state_type": "nx_stm32f1_exti_t",
+        "ops": "nx_stm32f1_exti_ops",
+        "declarations": [
+          {
+            "use": "pc13-edge-config"
           }
         ],
         "calls": {
@@ -156,5 +165,87 @@
         "EXTI13"
       ]
     }
-  ]
+  ],
+  "static_fragments": {
+    "declarations": {
+      "pc13-edge-config": [
+        {
+          "role": "events",
+          "type": "nx_exti_event_t",
+          "const": false,
+          "count": {
+            "source": "item.options.event_capacity"
+          }
+        },
+        {
+          "role": "control_config",
+          "type": "nx_stm32f1_exti_config_t",
+          "const": true,
+          "value": {
+            "record": [
+              [
+                "gpio",
+                {
+                  "source": "selected.pads.0.registers",
+                  "as": "symbol"
+                }
+              ],
+              [
+                "storage",
+                {
+                  "ref": "events",
+                  "as": "symbol"
+                }
+              ],
+              [
+                "capacity",
+                {
+                  "source": "item.options.event_capacity"
+                }
+              ],
+              [
+                "edge",
+                {
+                  "source": "item.options.edge",
+                  "as": "symbol",
+                  "values": {
+                    "rising": "NX_EXTI_RISING",
+                    "falling": "NX_EXTI_FALLING",
+                    "both": "NX_EXTI_BOTH"
+                  }
+                }
+              ],
+              [
+                "gpio_index",
+                {
+                  "source": "selected.pads.0.port_index"
+                }
+              ],
+              [
+                "line",
+                {
+                  "source": "selected.pads.0.number"
+                }
+              ],
+              [
+                "priority",
+                {
+                  "source": "item.options.irq.priority"
+                }
+              ],
+              [
+                "pull",
+                {
+                  "source": "item.options.pull",
+                  "values": {
+                    "none": 0
+                  }
+                }
+              ]
+            ]
+          }
+        }
+      ]
+    }
+  }
 }

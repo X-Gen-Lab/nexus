@@ -1,0 +1,186 @@
+{
+  "schema_version": 1,
+  "bindings": [
+    {
+      "kind": "audio",
+      "controllers": [
+        "I2S2"
+      ],
+      "modes": [
+        "master-tx"
+      ],
+      "implementation": "i2s2",
+      "headers": [
+        "drivers/audio/i2s2.h"
+      ],
+      "static_recipe": {
+        "state_type": "nx_stm32f1_i2s2_t",
+        "ops": "nx_stm32f1_i2s2_ops",
+        "declarations": [
+          {
+            "role": "dma_regions",
+            "type": "nx_dma_memory_region_t",
+            "const": true,
+            "value": {
+              "map": {
+                "source": "selected.readable_regions",
+                "limit": 16,
+                "value": {
+                  "record": [
+                    [
+                      "begin",
+                      {
+                        "source": "entry.begin"
+                      }
+                    ],
+                    [
+                      "size",
+                      {
+                        "source": "entry.size"
+                      }
+                    ],
+                    [
+                      "permissions",
+                      {
+                        "source": "entry.permissions",
+                        "as": "static"
+                      }
+                    ]
+                  ]
+                }
+              }
+            },
+            "count": {
+              "length": "selected.readable_regions",
+              "limit": 16
+            }
+          },
+          {
+            "role": "config",
+            "type": "nx_stm32f1_i2s2_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "regions",
+                  {
+                    "ref": "dma_regions",
+                    "as": "symbol"
+                  }
+                ],
+                [
+                  "region_count",
+                  {
+                    "length": "selected.readable_regions",
+                    "limit": 16
+                  }
+                ],
+                [
+                  "rate",
+                  {
+                    "record": [
+                      [
+                        "numerator_hz",
+                        {
+                          "source": "item.options.rate_numerator",
+                          "as": "u64"
+                        }
+                      ],
+                      [
+                        "denominator",
+                        {
+                          "source": "item.options.rate_denominator",
+                          "as": "u64"
+                        }
+                      ]
+                    ]
+                  }
+                ],
+                [
+                  "divider",
+                  {
+                    "source": "item.options.divider"
+                  }
+                ],
+                [
+                  "odd",
+                  {
+                    "source": "item.options.odd"
+                  }
+                ],
+                [
+                  "priority",
+                  {
+                    "source": "item.options.irq.priority"
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "calls": {
+          "admit": [
+            {
+              "function": "nx_stm32f1_i2s2_admit",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "ref": "config",
+                  "as": "address"
+                }
+              ]
+            }
+          ],
+          "prepare": {
+            "function": "nx_stm32f1_i2s2_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "ref": "config",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32f1_i2s2_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "irq": [
+          {
+            "name": {
+              "source": "selected.dma_bindings.0.handler",
+              "as": "symbol"
+            },
+            "calls": [
+              {
+                "function": "nx_stm32f1_i2s2_irq",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  }
+                ]
+              }
+            ],
+            "barrier": "nx_arch_dsb"
+          }
+        ],
+        "retain_on_failed_init": true
+      }
+    }
+  ]
+}

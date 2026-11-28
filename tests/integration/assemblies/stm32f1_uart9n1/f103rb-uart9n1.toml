@@ -1,0 +1,22 @@
+schema = 2
+board_package = "board"
+backend = "baremetal"
+clock = "hsi8"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+flash_load_limit_bytes = 16384
+static_ram_limit_bytes = 4096
+
+[uart.link]
+binding = "external-uart2"
+mode = "irq-words"
+baud = 115200
+rx = { format = "words", capacity = 32 }
+irq = { priority = 5 }
+frame = { data_bits = 9, parity = "none", stop_bits = 1, flow = "none" }
+
+[factory]
+capabilities = true

@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "regions": [
+    {"id": "boot", "kind": "image", "origin": 134217728, "size": 16384},
+    {"id": "application-slot", "kind": "data", "origin": 134234112, "size": 65536},
+    {"id": "upper-reserved", "kind": "data", "origin": 134299648, "size": 49152}
+  ]
+}

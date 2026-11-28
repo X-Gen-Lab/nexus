@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "id": "stm32f101rb-hse8-software",
+  "soc": "STM32F101RBT6",
+  "soc_family": "stm32f1",
+  "source_revision": "DS5318 Rev17 Table 8 exact LQFP64 8 MHz crystal software reference",
+  "physical_pcb_revision": null,
+  "clocks": {
+    "hse_hz": 8000000,
+    "hse_bypass": false
+  },
+  "bindings": [
+    {
+      "id": "led0",
+      "controller": "GPIOA",
+      "route": "gpio-pa5",
+      "initial": 0,
+      "mask": 32,
+      "electrical": {
+        "mode": "output",
+        "initial": 0
+      }
+    },
+    {
+      "id": "uart2",
+      "controller": "USART2",
+      "route": "usart2-pa2-pa3-irq"
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14",
+    "PA15",
+    "PB3",
+    "PB4",
+    "PC14",
+    "PC15"
+  ],
+  "unknowns": [
+    "The GPIO output and serial routes are software test inputs. No physical PCB or connected loads are claimed.",
+    "The 8 MHz crystal and its load, startup, clock accuracy and physical PCB are unverified."
+  ],
+  "provenance": [
+    "https://www.st.com/resource/en/datasheet/stm32f101rb.pdf"
+  ],
+  "backend_support": [
+    "baremetal"
+  ]
+}

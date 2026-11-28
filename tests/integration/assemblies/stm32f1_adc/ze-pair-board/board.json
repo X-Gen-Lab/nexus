@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "id": "stm32f103ze-dual-adc-software",
+  "soc": "STM32F103ZET6",
+  "soc_family": "stm32f1",
+  "source_revision": "DS5792 Rev13 Table 5 LQFP144 analog software reference",
+  "physical_pcb_revision": null,
+  "clocks": {},
+  "bindings": [
+    {
+      "id": "analog",
+      "controller": "ADC1",
+      "route": "adc12-pa1-pa2-regular"
+    }
+  ],
+  "reserved_resources": [],
+  "backend_support": [
+    "baremetal"
+  ],
+  "provenance": [
+    {
+      "scope": "Exact LQFP144 pinout and analog electrical limits.",
+      "url": "https://www.st.com/resource/en/datasheet/stm32f103ze.pdf",
+      "file": "stm32f103ze.pdf",
+      "sha256": "c61db5e362b62f2fa8307d6bd07728e8a6adab0f453653aa7eace4b1cfc848bc",
+      "pages": [
+        32,
+        106,
+        107
+      ]
+    },
+    {
+      "scope": "Regular simultaneous conversion and the DMA1 Channel 1 request.",
+      "url": "https://www.st.com/resource/en/reference_manual/rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32-bit-mcus-stmicroelectronics.pdf",
+      "file": "rm0008.pdf",
+      "sha256": "4c1b8ac2729cc1f45a4685eea9e91e6139e24e58804fba21e27201dfcc2ad149",
+      "pages": [
+        230,
+        281
+      ]
+    },
+    {
+      "scope": "DMA individual flags and exclusion of injected PA0 behavior.",
+      "url": "https://www.st.com/resource/en/errata_sheet/es0340-stm32f101xcde-stm32f103xcde-device-errata-stmicroelectronics.pdf",
+      "file": "es0340.pdf",
+      "sha256": "724fed9df69ff5b3469aa00a591ca39f3534234ad129273bd6f11ab9e2f11d8c",
+      "pages": [
+        2,
+        14,
+        15
+      ]
+    }
+  ],
+  "unknowns": [
+    "PA1 and PA2 are separate in-range analog inputs. VDDA, VREF+, source impedance, aperture skew and PCB routing remain unmeasured."
+  ]
+}

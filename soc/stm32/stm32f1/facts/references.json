@@ -13,7 +13,8 @@
         "device_features": "Table 2 p10; SRAM, timers and communication interfaces by exact variant",
         "package_gpio": "Figures 6/8 pp24/26 and Table 5 pp28ff, LQFP64 and LQFP48",
         "clock": "Section 2.3.7; HSI oscillator characteristics in Section 5.3.7",
-        "iwdg": "Table 25, LSI timing characterization at VDD = 3.0 V"
+        "iwdg": "Table 25, LSI timing characterization at VDD = 3.0 V",
+        "usb_pma": "Tables 5 and 44, exact PA11/PA12 pins and transceiver startup"
       }
     },
     "rm0008": {
@@ -39,7 +40,9 @@
         "pvd": "Sections 5.2, 5.4 and 10.2.5 for raw PVD polling, PLS and PVDO",
         "wwdg": "Sections 20.3 and 20.6, Table 98: PCLK1 prescale, one-way activation and feed window",
         "can_packet_sram_and_loopback": "Sections 23.2, 24.2, 24.5.3 and 24.8; dedicated SRAM, silent internal loopback and exact bit timing.",
-        "dac": "Sections 12.3 and 12.5, direct DAC output; reviewed without trigger, DMA or waveform generation."
+        "dac": "Sections 12.3 and 12.5, direct DAC output; reviewed without trigger, DMA or waveform generation.",
+        "usb_pma": "Sections 23.3\u201323.5, EP0 reset CTR, LP IRQ20, PMA/USB-CAN exclusivity and FSUSP",
+        "afio_usart2_remap": "Section 9.3.8/Table 53 and section 9.4.2 connectivity line. USART2_REMAP bit 3, SWJ_CFG write-only; 111 has no effect."
       }
     },
     "es096": {
@@ -70,7 +73,8 @@
       "bytes": 2068410,
       "anchors": {
         "package_gpio": "Figure 5 p24 and Table 5 p26 onward, LQFP48",
-        "device_features": "p11 Table 2 per-part memory and peripherals overrides conflicting family prose on p10"
+        "device_features": "p11 Table 2 per-part memory and peripherals overrides conflicting family prose on p10",
+        "flash": "Table 28 halfword/page timing and programming supply."
       }
     },
     "es0348": {
@@ -83,7 +87,8 @@
       "bytes": 633319,
       "anchors": {
         "scope": "p1 Table 2 A/1 revision id 0x1000",
-        "review": "Selected HSI8 system and GPIO/USART2 operating boundaries, see software audit"
+        "review": "Selected HSI8 system and GPIO/USART2 operating boundaries, see software audit",
+        "flash": "Section 2.2.10: delay sampling BSY after page-erase STRT."
       }
     },
     "ds5792": {
@@ -96,7 +101,8 @@
       "bytes": 3282238,
       "anchors": {
         "package_gpio": "Figure 5 p27 and Table 5 p31 onward, LQFP144",
-        "device_features": "Table 2 part data"
+        "device_features": "Table 2 part data",
+        "adc": "Section 5.3.19 and Tables 59-60: ADC clock, reference, calibration and external impedance limits"
       }
     },
     "es0340": {
@@ -109,7 +115,8 @@
       "bytes": 886926,
       "anchors": {
         "scope": "p1 Table 2 Z/1/Y/2/3/X",
-        "review": "Selected HSI8 system, GPIO/USART2 and single-bank Flash operating boundaries, see software audit"
+        "review": "Selected HSI8 system, GPIO/USART2 and single-bank Flash operating boundaries, see software audit",
+        "sdio": "Sections 2.3.6-2.3.8 cover unused-pin conflicts and Sections 2.13.1-2.13.6 constrain the SDIO host."
       }
     },
     "ds6558": {
@@ -151,7 +158,8 @@
         "memory": "Table 2 p11",
         "pinout": "Figure 4 p23 and Table 4 pp24ff",
         "hsi": "Table 23 p50",
-        "ordering": "Ordering information scheme, internal code B"
+        "ordering": "Ordering information scheme, internal code B",
+        "flash": "Table 27 halfword/page timing and programming supply."
       }
     },
     "ds5318": {
@@ -194,7 +202,8 @@
         "memory": "Table 2 p10",
         "pinout": "Figure 3 p25 and Table 5 pp27ff",
         "hsi": "Table 24 p52",
-        "clock": "Tables 27 and 28 p53 for the three PLLs"
+        "clock": "Tables 27 and 28 p53 for the three PLLs",
+        "usart2_pd5_pd6": "Table 5, LQFP100 pins 86 (PD5 USART2_TX) and 87 (PD6 USART2_RX)."
       }
     },
     "rm0041": {
@@ -225,7 +234,8 @@
         "scope": "Tables 1\u20133, internal code B and revision order 1/Z",
         "hsi": "Section 2.1.2 WFE",
         "uart": "Sections 2.3.8 and 2.9.1\u20132",
-        "uid": "Section 2.2.3 restricts UID before date code 045"
+        "uid": "Section 2.2.3 restricts UID before date code 045",
+        "flash": "Section 2.2.8: delay sampling BSY after page-erase STRT."
       }
     },
     "es022": {
@@ -378,7 +388,7 @@
         "STM32F101RBT6"
       ],
       "status": "package_gpio_reviewed",
-      "scope": "Exact LQFP64 bonded pins. PA2 and PA3 use the default USART2 route, and PA5 is a GPIO output."
+      "scope": "Exact LQFP64 bonded pins. PA2 and PA3 use the default USART2 route, and PA5 is a GPIO output. DS5318 Tables 8 and 26 admit the reviewed 8 MHz crystal divided by two and multiplied by nine. APB1 and APB2 run at 36 MHz."
     },
     {
       "document": "ds5933",
@@ -386,7 +396,7 @@
         "STM32F102RBT6"
       ],
       "status": "package_gpio_reviewed",
-      "scope": "Exact LQFP64 bonded pins. PA2 and PA3 use the default USART2 route, and PA5 is a GPIO output."
+      "scope": "Exact LQFP64 bonded pins. PA2 and PA3 use the default USART2 route, and PA5 is a GPIO output. DS5933 Figure 2 and Table 8 require 24 MHz APB1 at 48 MHz HCLK. The selected USB prescaler supplies nominal PLL48 without enabling the peripheral."
     },
     {
       "document": "ds6014",
@@ -477,19 +487,29 @@
           "can:classic-poll",
           "can:classic-poll-normal",
           "crc:crc32-words",
+          "encoder:quadrature",
           "exti:edge-event",
           "exti:pvd-level",
+          "exti:stop-wake",
           "flash:poll-halfword",
           "gpio:input",
           "gpio:output",
           "i2c:poll-messages",
+          "i2c_target:target-rx-irq",
           "pwm:fixed-pwm",
+          "pwm_adc:finite-injected",
           "rtc:backup-adopt",
           "spi:dma",
           "spi:short-poll",
+          "timer_capture:edge-capture",
           "uart:dma-tx",
           "uart:irq-byte-event",
+          "uart:irq-wire",
+          "uart:irq-words",
           "uart:rx-dma-idle",
+          "usb_device:device-pma",
+          "usb_device:device-pma-bulk",
+          "usb_device:device-pma-interrupt",
           "watchdog:independent",
           "watchdog:window"
         ],
@@ -512,11 +532,14 @@
             "revisions": "AAAAAAAA",
             "assessment": "external_constraint",
             "condition": "Sleep may disrupt reads when using two wait states and prefetch with the Flash interface clock gated.",
-            "handling": "HSI8 uses zero wait states. PLL72 requires the Flash interface gate and retains it. The reviewed run path leaves Stop and Standby outside this scope.",
+            "handling": "HSI8 uses zero wait states. PLL72 retains the Flash interface gate. The dedicated HSI8 STOP mode keeps that gate open and issues WFI only.",
             "implementation": [
-              "soc/stm32/stm32f1/facts/clocks.json"
+              "soc/stm32/stm32f1/facts/clocks.json",
+              "soc/stm32/stm32f1/system/stop.c"
             ],
-            "regressions": []
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/system/timebase_test.cpp"
+            ]
           },
           {
             "section": "2.2.2",
@@ -532,6 +555,34 @@
             ],
             "regressions": [
               "tests/behavior/soc/stm32/stm32f1/window_watchdog/window_watchdog_test.cpp"
+            ]
+          },
+          {
+            "section": "2.2.3",
+            "title": "Debug STOP with pending SysTick",
+            "revisions": "AAAAAAAA",
+            "assessment": "excluded_mode",
+            "condition": "Enabled SysTick interrupt during debug STOP wakes the system.",
+            "handling": "The baremetal STOP owner admits only idle SysTick and no pending tick.",
+            "implementation": [
+              "soc/stm32/stm32f1/system/stop.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/system/timebase_test.cpp"
+            ]
+          },
+          {
+            "section": "2.2.4",
+            "title": "Debug STOP with WFE",
+            "revisions": "AAAAAAAA",
+            "assessment": "excluded_mode",
+            "condition": "Sequential instructions after WFE can be skipped with debug STOP enabled.",
+            "handling": "The dedicated falling-edge interrupt owner only enters WFI.",
+            "implementation": [
+              "soc/stm32/stm32f1/system/stop.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/system/timebase_test.cpp"
             ]
           },
           {
@@ -605,6 +656,40 @@
             ]
           },
           {
+            "section": "2.3.2",
+            "title": "SPI1 slave and USART2 synchronous clock",
+            "revisions": "NNNNNNNN",
+            "assessment": "external_constraint",
+            "condition": "With both peripheral clocks enabled, SPI1 slave disables USART2 CK on alternate-function PA4. No silicon workaround is given.",
+            "handling": "SPI1 admits only master polling and configures PA4 as a software GPIO chip select. The synchronous USART2 route exclusively claims SPI1. Cold admission rejects a boot-enabled SPI1 clock before modifying pads or USART configuration.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/spi/spi.c",
+              "soc/stm32/stm32f1/drivers/uart/uart.c",
+              "soc/stm32/stm32f1/facts/routes.json"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/spi/spi_test.cpp",
+              "tests/behavior/soc/stm32/stm32f1/uart_sync/sync_test.cpp"
+            ]
+          },
+          {
+            "section": "2.3.3",
+            "title": "SPI1 master and USART2 synchronous clock",
+            "revisions": "AAAAAAAA",
+            "assessment": "external_constraint",
+            "condition": "With both peripheral clocks enabled, SPI1 master using software NSS prevents USART2 CK on PA4. The documented workaround changes SPI1 SSOE.",
+            "handling": "The SPI1 endpoint leases PA4 as GPIO output. Its synchronous USART2 alternate-function mode is outside the selected assembly. The synchronous USART2 route exclusively claims SPI1. Cold admission rejects a boot-enabled SPI1 clock before modifying pads or USART configuration.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/spi/spi.c",
+              "soc/stm32/stm32f1/drivers/uart/uart.c",
+              "soc/stm32/stm32f1/facts/routes.json"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/spi/spi_test.cpp",
+              "tests/behavior/soc/stm32/stm32f1/uart_sync/sync_test.cpp"
+            ]
+          },
+          {
             "section": "2.3.5",
             "title": "SPI2 master and USART3 synchronous clock",
             "revisions": "AAAAAAAA",
@@ -634,11 +719,28 @@
             "revisions": "AAAAAAAA",
             "assessment": "external_constraint",
             "condition": "Remapped SPI1 PB5 MOSI conflicts with I2C1 SMBA when both peripheral clocks are on.",
-            "handling": "The closed software slice uses SPI2 and the default I2C1. No SPI1 remap is defined.",
+            "handling": "The default SPI1 route requires remap bit zero both in configuration and hardware. A preexisting remap rejects before claiming the SPI1 clock or pads.",
             "implementation": [
-              "soc/stm32/stm32f1/facts/routes.json"
+              "soc/stm32/stm32f1/facts/routes.json",
+              "soc/stm32/stm32f1/drivers/spi/spi.c"
             ],
-            "regressions": []
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/spi/spi_test.cpp"
+            ]
+          },
+          {
+            "section": "2.3.8",
+            "title": "I2C1 and TIM3_CH2 remapped",
+            "revisions": "AAAAAAAA",
+            "assessment": "silicon_limit",
+            "condition": "Partial TIM3 remap makes alternate output PB5 contend with I2C1 SMBA.",
+            "handling": "Quadrature uses the default PA6/PA7 route with both phases as inputs. The cold admission reads and rejects nondefault TIM3 remap.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/encoder/encoder.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/encoder/encoder_test.cpp"
+            ]
           },
           {
             "section": "2.4.1",
@@ -668,7 +770,8 @@
             "condition": "Injected operation can couple a voltage glitch to ADC input 0.",
             "handling": "The reviewed ADC1 PA0 path uses regular single-shot conversions only, with JEXTTRIG and injected auto conversion disabled.",
             "implementation": [
-              "soc/stm32/stm32f1/drivers/adc/adc.c"
+              "soc/stm32/stm32f1/drivers/adc/adc.c",
+              "soc/stm32/stm32f1/drivers/pwm_adc/cycle.c"
             ],
             "regressions": [
               "tests/behavior/soc/stm32/stm32f1/adc/adc_test.cpp"
@@ -682,7 +785,8 @@
             "condition": "Automatic output enable can reassert MOE after loss of a system break condition.",
             "handling": "Keep AOE zero, require explicit recovery with outputs off and recheck BKIN and BIF before and after the separate start.",
             "implementation": [
-              "soc/stm32/stm32f1/drivers/advanced_pwm/advanced_pwm.c"
+              "soc/stm32/stm32f1/drivers/advanced_pwm/advanced_pwm.c",
+              "soc/stm32/stm32f1/drivers/pwm_adc/cycle.c"
             ],
             "regressions": [
               "tests/behavior/soc/stm32/stm32f1/advanced_pwm/advanced_pwm_test.cpp"
@@ -696,7 +800,8 @@
             "condition": "Consecutive compare events can be lost in toggle mode or center-aligned compare interrupts.",
             "handling": "Use up-counting PWM1 with preloaded duty. No CCR interrupts, toggle output or compare triggers are published.",
             "implementation": [
-              "soc/stm32/stm32f1/drivers/advanced_pwm/advanced_pwm.c"
+              "soc/stm32/stm32f1/drivers/advanced_pwm/advanced_pwm.c",
+              "soc/stm32/stm32f1/drivers/pwm_adc/cycle.c"
             ],
             "regressions": [
               "tests/behavior/soc/stm32/stm32f1/advanced_pwm/advanced_pwm_test.cpp"
@@ -714,6 +819,36 @@
             ],
             "regressions": [
               "tests/behavior/soc/stm32/stm32f1/pwm/pwm_test.cpp"
+            ]
+          },
+          {
+            "section": "2.6.5",
+            "title": "Missing capture flag",
+            "revisions": "AAAAAAAA",
+            "assessment": "workaround",
+            "condition": "An edge concurrent with a CCR1 read may clear CC1IF without setting CC1OF.",
+            "handling": "Use the PB6 EXTI6 witness around the CCR1 read. Keep its shared NVIC vector disabled and report observed loss without estimating a physical edge count. The TIM3 encoder reads CNT only and never consumes CCR or capture flags.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/timer_capture/tim4.c",
+              "soc/stm32/stm32f1/drivers/encoder/encoder.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/timer_capture/capture_test.cpp",
+              "tests/behavior/soc/stm32/stm32f1/encoder/encoder_test.cpp"
+            ]
+          },
+          {
+            "section": "2.6.6",
+            "title": "Overcapture detected too early",
+            "revisions": "NNNNNNNN",
+            "assessment": "silicon_limit",
+            "condition": "CC1OF can report overcapture although both samples were retained.",
+            "handling": "Treat the hardware flag as an observable incident; the public capture API does not promise an exact count of lost edges.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/timer_capture/tim4.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/timer_capture/capture_test.cpp"
             ]
           },
           {
@@ -778,12 +913,14 @@
             "revisions": "AAAAAAAA",
             "assessment": "workaround",
             "condition": "Late software handling can duplicate, miss or introduce bytes.",
-            "handling": "Hold SCL where ACK/STOP ordering requires a dedicated window and wait for BTF for longer reads and controller writes.",
+            "handling": "Hold SCL where ACK/STOP ordering requires a dedicated window and wait for BTF for longer reads and controller writes. I2C1 target receive keeps stretching enabled and rejects an observed BTF missed EV2 window.",
             "implementation": [
-              "soc/stm32/stm32f1/drivers/i2c/i2c.c"
+              "soc/stm32/stm32f1/drivers/i2c/i2c.c",
+              "soc/stm32/stm32f1/drivers/i2c/target.c"
             ],
             "regressions": [
-              "tests/behavior/soc/stm32/stm32f1/i2c/i2c_test.cpp"
+              "tests/behavior/soc/stm32/stm32f1/i2c/i2c_test.cpp",
+              "tests/behavior/soc/stm32/stm32f1/i2c/target_test.cpp"
             ]
           },
           {
@@ -847,11 +984,14 @@
             "revisions": "AAAAAAAA",
             "assessment": "silicon_limit",
             "condition": "Slave transmit with no clock stretching can miss data timing without OVR.",
-            "handling": "The slice admits only the polling master role.",
+            "handling": "I2C1 target is receive-only with stretching enabled. The polling controller mode owns the separate master route.",
             "implementation": [
-              "soc/stm32/stm32f1/facts/routes.json"
+              "soc/stm32/stm32f1/facts/routes.json",
+              "soc/stm32/stm32f1/drivers/i2c/target.c"
             ],
-            "regressions": []
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/i2c/target_test.cpp"
+            ]
           },
           {
             "section": "2.8.7",
@@ -876,7 +1016,8 @@
             "handling": "The initial USART2 mode owns a byte IRQ ring; it does not depend on IDLE or promise gap timing. Finite DMA reports observed IDLE as advisory and also retires on full count or caller-owned stop.",
             "implementation": [
               "soc/stm32/stm32f1/facts/routes.json",
-              "soc/stm32/stm32f1/drivers/uart/uart_rx_dma.c"
+              "soc/stm32/stm32f1/drivers/uart/uart_rx_dma.c",
+              "soc/stm32/stm32f1/drivers/uart/uart_word.c"
             ],
             "regressions": [
               "tests/behavior/soc/stm32/stm32f1/uart_rx_dma/uart_rx_dma_test.cpp"
@@ -890,9 +1031,38 @@
             "condition": "With parity enabled in full duplex, a data-register write can clear the receiver PE flag.",
             "handling": "The initial USART2 mode uses 8N1. Production parity modes require a separate review.",
             "implementation": [
-              "soc/stm32/stm32f1/facts/routes.json"
+              "soc/stm32/stm32f1/facts/routes.json",
+              "soc/stm32/stm32f1/drivers/uart/uart_word.c"
             ],
             "regressions": []
+          },
+          {
+            "section": "2.9.5",
+            "title": "Break transmission disregards nCTS",
+            "revisions": "NNNNNNNN",
+            "assessment": "excluded_mode",
+            "condition": "A requested hardware break can transmit without the peer asserting nCTS.",
+            "handling": "RTS/CTS accepts byte requests only. The separate LIN personality leaves CTSE disabled.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/uart/uart.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/uart_flow/flow_test.cpp"
+            ]
+          },
+          {
+            "section": "2.9.6",
+            "title": "An RTS protocol violation can assert ready while RDR is full",
+            "revisions": "AAAAAAAA",
+            "assessment": "workaround",
+            "condition": "The partner sends another frame while nRTS is inactive and the earlier RDR word is unconsumed.",
+            "handling": "The IRQ parks PA1 inactive before reading DR after ORE or before using the last event slot. It preserves the ordered receive prefix and reports lost data. Behavior before the ISR observes the violation remains a physical limitation.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/uart/uart.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/uart_flow/flow_test.cpp"
+            ]
           },
           {
             "section": "2.10.1",
@@ -912,7 +1082,7 @@
             "revisions": "AAAAAAAA",
             "assessment": "silicon_limit",
             "condition": "Simultaneous DMA traffic on a shared request channel can corrupt SPI CRC.",
-            "handling": "SPI2 short-poll claims neither DMA nor hardware CRC. SPI2 finite DMA has CRCEN disabled and exclusively leases both wired channels.",
+            "handling": "SPI1 and SPI2 short-poll use no DMA requests or hardware CRC. SPI2 finite DMA has CRCEN disabled and exclusively leases both wired channels.",
             "implementation": [
               "soc/stm32/stm32f1/facts/routes.json",
               "soc/stm32/stm32f1/drivers/spi/spi_dma.c"
@@ -933,6 +1103,62 @@
             ],
             "regressions": [
               "tests/behavior/soc/stm32/stm32f1/can/can_test.cpp"
+            ]
+          },
+          {
+            "section": "2.12.1",
+            "title": "False wakeup due to an old K state",
+            "revisions": "AAAAAAAA",
+            "assessment": "external_constraint",
+            "condition": "A pending RESUME signal can survive until FSUSP and raise WKUP early.",
+            "handling": "Self-powered reference retains all clocks and makes no suspend-current claim. LP service distinguishes sampled J, K and SE0. It does not use a forced reset as a power workaround.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/usb/lp.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/usb/ep0_test.cpp"
+            ]
+          },
+          {
+            "section": "2.12.2",
+            "title": "ESOF desynchronization after local resume signaling",
+            "revisions": "AAAAAAAA",
+            "assessment": "excluded_mode",
+            "condition": "Locally driven resume may generate a premature suspend.",
+            "handling": "The selected PMA face has no local remote wakeup/RESUME method.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/usb/pma_device.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/usb/ep0_test.cpp"
+            ]
+          },
+          {
+            "section": "2.12.3",
+            "title": "Software cannot use the received CRC16 bytes",
+            "revisions": "NNNNNNNN",
+            "assessment": "workaround",
+            "condition": "Stored CRC bytes can be corrupted although hardware verification still works.",
+            "handling": "PMA reads only the validated payload count. Wire CRC bytes are not exposed.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/usb/pma.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/usb/pma_test.cpp"
+            ]
+          },
+          {
+            "section": "2.12.4",
+            "title": "Incorrect full-packet RX count with slow APB1",
+            "revisions": "AAAAAAAA",
+            "assessment": "workaround",
+            "condition": "Exactly full OUT packets can report one byte less if APB1 is below 13 MHz.",
+            "handling": "Selected exact PLL supplies 36 MHz APB1 and the cold C lease rejects a different divider. The selected EP1 shares the same bounded APB1 and exact 64-byte PMA block.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/usb/link.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/usb/ep0_test.cpp"
             ]
           }
         ]
@@ -957,6 +1183,7 @@
           "1"
         ],
         "maintained_modes": [
+          "flash:poll-halfword",
           "gpio:output",
           "uart:irq-byte-event"
         ],
@@ -996,6 +1223,20 @@
               "soc/stm32/stm32f1/facts/soc.json"
             ],
             "regressions": []
+          },
+          {
+            "section": "2.2.10",
+            "title": "Flash erase BSY assertion is delayed",
+            "revisions": "AA",
+            "assessment": "workaround",
+            "condition": "Immediately sampling BSY after setting STRT may observe zero before erasure starts.",
+            "handling": "Complete the control write and a separate control-register read before polling. Verify a fresh EOP and the erased page.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/flash/flash.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/flash/flash_test.cpp"
+            ]
           },
           {
             "title": "USART TX pin remains owned during receive-only use",
@@ -1059,6 +1300,11 @@
           "X"
         ],
         "maintained_modes": [
+          "adc:simultaneous-scan-dma",
+          "advanced_pwm:complementary-pwm",
+          "audio:master-tx",
+          "block:sdio-poll",
+          "block:sdio-poll-write",
           "dac:direct",
           "flash:poll-halfword",
           "gpio:output",
@@ -1116,6 +1362,65 @@
             ]
           },
           {
+            "section": "2.3.6",
+            "title": "SDIO with TIM8",
+            "revisions": "AAAAAA",
+            "assessment": "workaround",
+            "condition": "TIM8_CH4 output conflicts with SDIO in 1-bit mode.",
+            "handling": "Reserve PC9 even in 1-bit mode and reject inherited alternate output mode during cold prepare. TIM8 exposes only CH1 and rejects configurations enabling other channels.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/routes.json",
+              "soc/stm32/stm32f1/drivers/sdio/sd_block.c",
+              "soc/stm32/stm32f1/drivers/advanced_pwm/advanced_pwm.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/sdio/transport_test.cpp",
+              "tests/behavior/soc/stm32/stm32f1/advanced_pwm/advanced_pwm_test.cpp"
+            ]
+          },
+          {
+            "section": "2.3.7",
+            "title": "SDIO and TIM3 remap",
+            "revisions": "AAAAAA",
+            "assessment": "workaround",
+            "condition": "Fully remapped TIM3_CH4 output conflicts with SDIO_D1.",
+            "handling": "Reserve PC9 for the entire SDIO lease.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/routes.json",
+              "soc/stm32/stm32f1/drivers/sdio/sd_block.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/sdio/transport_test.cpp"
+            ]
+          },
+          {
+            "section": "2.3.8",
+            "title": "SDIO with USART3 and UART4",
+            "revisions": "AAAAAA",
+            "assessment": "workaround",
+            "condition": "Partially remapped USART3_TX and UART4_TX conflict with SDIO_D2 in 1-bit mode.",
+            "handling": "Reserve PC10 for the entire SDIO lease and reject inherited alternate output mode.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/routes.json",
+              "soc/stm32/stm32f1/drivers/sdio/sd_block.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/sdio/transport_test.cpp"
+            ]
+          },
+          {
+            "section": "2.3.12",
+            "title": "I2S2 WS conflicts with synchronous USART3 CK after use",
+            "revisions": "AAAAAA",
+            "assessment": "external_constraint",
+            "condition": "A previously used I2S2 can still drive PB12 in alternate-function output after its clock is gated.",
+            "handling": "Synchronous USART3 is outside this assembly. A future owner transition requires the ES0340 SPI2 reset after clock withdrawal.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/controllers.json"
+            ],
+            "regressions": []
+          },
+          {
             "title": "USART TX pin remains owned during receive-only use",
             "assessment": "external_constraint",
             "condition": "When the USART is enabled, clearing TE can still hold the alternate-function TX line high.",
@@ -1126,6 +1431,78 @@
             "regressions": [],
             "section": "2.3.13",
             "revisions": "AAAAAA"
+          },
+          {
+            "section": "2.4.1",
+            "title": "DMA global flag clear can lose an active transfer error",
+            "revisions": "AAAAAA",
+            "assessment": "workaround",
+            "condition": "CGIFx writes clear all flags and may lose an error during a live channel transfer.",
+            "handling": "Only the channel's individual HTIF, TCIF and TEIF W1C bits are written. DMA register accesses are aligned 32-bit words.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/audio/i2s2.c",
+              "soc/stm32/stm32f1/drivers/adc/dual_dma.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/i2s2/i2s2_test.cpp",
+              "tests/behavior/soc/stm32/stm32f1/adc/dual_dma_test.cpp"
+            ]
+          },
+          {
+            "section": "2.6.1",
+            "title": "PA0 disturbance during injected conversion",
+            "revisions": "NNNNNN",
+            "assessment": "excluded_mode",
+            "condition": "Any injected sequence can couple a disturbance to PA0.",
+            "handling": "Only regular simultaneous external PA1 and PA2 are admitted. No injected trigger or PA0 acquisition is configured.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/adc/dual_dma.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/adc/dual_dma_test.cpp"
+            ]
+          },
+          {
+            "section": "2.7.1",
+            "revisions": "PPPPPP",
+            "title": "Automatic output can re-enable after a system break",
+            "assessment": "excluded_mode",
+            "condition": "An AOE-controlled cycle can automatically rearm after a system break.",
+            "handling": "AOE remains clear so only explicit software start can arm MOE.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/advanced_pwm/advanced_pwm.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/advanced_pwm/advanced_pwm_test.cpp"
+            ]
+          },
+          {
+            "section": "2.7.3",
+            "revisions": "NNNNNN",
+            "title": "Consecutive compare event can be missed",
+            "assessment": "excluded_mode",
+            "condition": "Toggle output and center-aligned compare event sequences can miss an event.",
+            "handling": "Use edge-aligned PWM1 without a compare event consumer.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/advanced_pwm/advanced_pwm.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/advanced_pwm/advanced_pwm_test.cpp"
+            ]
+          },
+          {
+            "section": "2.7.4",
+            "revisions": "PPPPPP",
+            "title": "Output compare clear may not follow external counter reset",
+            "assessment": "excluded_mode",
+            "condition": "External reset can extend OCREF clear through an extra PWM period.",
+            "handling": "No external reset mode and no OCREF clear function is selected.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/advanced_pwm/advanced_pwm.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/advanced_pwm/advanced_pwm_test.cpp"
+            ]
           },
           {
             "section": "2.10.2",
@@ -1150,6 +1527,147 @@
               "soc/stm32/stm32f1/facts/routes.json"
             ],
             "regressions": []
+          },
+          {
+            "section": "2.11.3",
+            "title": "SPI2 or I2S2 slave modes can assert TXE prematurely",
+            "revisions": "A-----",
+            "assessment": "excluded_mode",
+            "condition": "Cut Z can signal TXE twice before RXNE, corrupting transmitted data in slave modes.",
+            "handling": "Only I2S2 master transmit is admitted; no slave DMA path is present.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/controllers.json",
+              "soc/stm32/stm32f1/drivers/audio/i2s2.c"
+            ],
+            "regressions": [
+              "tools/configure/tests/resources/peripherals/test_system_clock_i2s.py"
+            ]
+          },
+          {
+            "section": "2.12.1",
+            "title": "PCM long frame synchronisation with 16-bit payload in 32-bit slot",
+            "revisions": "AAAAAA",
+            "assessment": "external_constraint",
+            "condition": "An I2S master using 16-bit data in a 32-bit PCM long slot generates WS every 16 bits.",
+            "handling": "The software route admits Philips stereo 16-bit slots only.",
+            "implementation": [
+              "soc/stm32/stm32f1/facts/bindings.json"
+            ],
+            "regressions": [
+              "tools/configure/tests/resources/peripherals/test_system_clock_i2s.py"
+            ]
+          },
+          {
+            "section": "2.12.2",
+            "title": "I2S slave mode start requires a known WS level",
+            "revisions": "AAAAAA",
+            "assessment": "external_constraint",
+            "condition": "In slave mode starting at the wrong WS level can prevent proper synchronisation.",
+            "handling": "SPI2 is owned exclusively by the finite I2S master-transmitter mode.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/audio/i2s2.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/i2s2/i2s2_test.cpp"
+            ]
+          },
+          {
+            "section": "2.12.3",
+            "title": "Slave mode synchronization can be lost on SCK or WS glitches",
+            "revisions": "AAAAAA",
+            "assessment": "external_constraint",
+            "condition": "A slave cannot detect loss of alignment after an unexpected edge.",
+            "handling": "The selected master owns CK and WS and does not depend on external slave synchronization.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/audio/i2s2.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/i2s2/i2s2_test.cpp"
+            ]
+          },
+          {
+            "section": "2.13.1",
+            "title": "Limited multibyte I/O support",
+            "revisions": "AAAAAA",
+            "assessment": "silicon_limit",
+            "condition": "SDIO I/O function transfer can fail.",
+            "handling": "The selected mode uses SD memory CMD17 exclusively.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/sdio/transport.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/sdio/transport_test.cpp"
+            ]
+          },
+          {
+            "section": "2.13.2",
+            "title": "Hardware flow control corruption",
+            "revisions": "NNNNNN",
+            "assessment": "silicon_limit",
+            "condition": "Hardware flow control may corrupt data.",
+            "handling": "Clock control keeps HWFC_EN clear. The receiver verifies FIFO, CRC and timeout.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/sdio/transport.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/sdio/transport_test.cpp"
+            ]
+          },
+          {
+            "section": "2.13.3",
+            "title": "CRC-less response flags",
+            "revisions": "AAAAAA",
+            "assessment": "workaround",
+            "condition": "The controller may set CCRCFAIL for a response without CRC.",
+            "handling": "Only OCR R3 accepts CCRCFAIL. Responses with CRC require controller CRC proof and applicable command index.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/sdio/transport.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/sdio/transport_test.cpp"
+            ]
+          },
+          {
+            "section": "2.13.4",
+            "title": "Negative clock edge corruption",
+            "revisions": "NNNNNN",
+            "assessment": "silicon_limit",
+            "condition": "Negative edge clock mode may corrupt response or data.",
+            "handling": "The fixed identification clock keeps NEGEDGE clear during the session.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/sdio/transport.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/sdio/transport_test.cpp"
+            ]
+          },
+          {
+            "section": "2.13.5",
+            "title": "CE-ATA busy management",
+            "revisions": "AAAAAA",
+            "assessment": "silicon_limit",
+            "condition": "CE-ATA has a separate busy response hazard.",
+            "handling": "The selected mode uses only the SD memory protocol.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/sdio/transport.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/sdio/transport_test.cpp"
+            ]
+          },
+          {
+            "section": "2.13.6",
+            "title": "Absent TX underrun evidence",
+            "revisions": "AAAAAA",
+            "assessment": "workaround",
+            "condition": "TX underrun may corrupt data without TXUNDERR when six parent cycles are at least one data-word transfer.",
+            "handling": "Read-only remains the default. Explicit single-bit CMD24 verifies the 8 MHz parents and divide-by-22 host clock, requires the positive block CRC result, and confirms card readiness.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/sdio/transport.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/sdio/transport_test.cpp"
+            ]
           }
         ]
       }
@@ -1318,7 +1836,10 @@
         ],
         "maintained_modes": [
           "dac:direct",
+          "flash:poll-halfword",
+          "gpio:input",
           "gpio:output",
+          "pwm:fixed-pwm",
           "uart:irq-byte-event"
         ],
         "items": [
@@ -1335,6 +1856,20 @@
             "regressions": []
           },
           {
+            "section": "2.2.8",
+            "title": "Flash erase BSY assertion is delayed",
+            "revisions": "AA",
+            "assessment": "workaround",
+            "condition": "Immediately sampling BSY after setting STRT may observe zero before erasure starts.",
+            "handling": "Complete the control write and a separate control-register read before polling. Verify a fresh EOP and the erased page.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/flash/flash.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/flash/flash_test.cpp"
+            ]
+          },
+          {
             "title": "USART TX pin remains owned during receive-only use",
             "assessment": "external_constraint",
             "condition": "When the USART is enabled, clearing TE can still hold the alternate-function TX line high.",
@@ -1345,6 +1880,48 @@
             "regressions": [],
             "section": "2.3.8",
             "revisions": "AA"
+          },
+          {
+            "section": "2.6.1",
+            "title": "Automatic output can reenable following system break",
+            "revisions": "PP",
+            "assessment": "excluded_mode",
+            "condition": "AOE can restore master output automatically after a system break.",
+            "handling": "AOE stays clear; C controls only MOE for the selected single output.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/pwm/pwm.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/pwm/valueline_test.cpp"
+            ]
+          },
+          {
+            "section": "2.6.3",
+            "title": "Consecutive compare events may be missed",
+            "revisions": "NN",
+            "assessment": "excluded_mode",
+            "condition": "Toggle outputs and some center-aligned compare sequences can lose an event.",
+            "handling": "Use edge-aligned PWM1 with preload and no compare-event consumer.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/pwm/pwm.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/pwm/valueline_test.cpp"
+            ]
+          },
+          {
+            "section": "2.6.7",
+            "title": "External OCREF clear can persist at full duty",
+            "revisions": "NN",
+            "assessment": "excluded_mode",
+            "condition": "External output clear can keep OCREF inactive after a full-duty request.",
+            "handling": "No OCREF clear or external clear input is enabled in the fixed profile.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/pwm/pwm.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/pwm/valueline_test.cpp"
+            ]
           },
           {
             "section": "2.9.1",
@@ -1501,7 +2078,8 @@
         ],
         "maintained_modes": [
           "gpio:output",
-          "uart:irq-byte-event"
+          "uart:irq-byte-event",
+          "usb_device:device-pma"
         ],
         "items": [
           {
@@ -1575,6 +2153,62 @@
               "soc/stm32/stm32f1/facts/routes.json"
             ],
             "regressions": []
+          },
+          {
+            "section": "2.12.1",
+            "title": "False wakeup due to an old K state",
+            "revisions": "AAAAAA",
+            "assessment": "external_constraint",
+            "condition": "A pending RESUME signal can survive until FSUSP and raise WKUP early.",
+            "handling": "Self-powered reference retains all clocks and makes no suspend-current claim. LP service distinguishes sampled J, K and SE0. It does not use a forced reset as a power workaround.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/usb/lp.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/usb/ep0_test.cpp"
+            ]
+          },
+          {
+            "section": "2.12.2",
+            "title": "ESOF desynchronization after local resume signaling",
+            "revisions": "AAAAAA",
+            "assessment": "excluded_mode",
+            "condition": "Locally driven resume may generate a premature suspend.",
+            "handling": "The selected PMA face has no local remote wakeup/RESUME method.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/usb/pma_device.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/usb/ep0_test.cpp"
+            ]
+          },
+          {
+            "section": "2.12.3",
+            "title": "Software cannot use the received CRC16 bytes",
+            "revisions": "NNNNNN",
+            "assessment": "workaround",
+            "condition": "Stored CRC bytes can be corrupted although hardware verification still works.",
+            "handling": "PMA reads only the validated payload count. Wire CRC bytes are not exposed.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/usb/pma.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/usb/pma_test.cpp"
+            ]
+          },
+          {
+            "section": "2.12.4",
+            "title": "Incorrect full-packet RX count with slow APB1",
+            "revisions": "AAAAAA",
+            "assessment": "workaround",
+            "condition": "Exactly full OUT packets can report one byte less if APB1 is below 13 MHz.",
+            "handling": "Selected exact PLL supplies 24 MHz APB1 and the cold C lease rejects a different divider.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/usb/link.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/usb/ep0_test.cpp"
+            ]
           }
         ]
       }
@@ -1600,7 +2234,9 @@
         "maintained_modes": [
           "can:classic-irq",
           "gpio:output",
-          "uart:irq-byte-event"
+          "uart:irq-byte-event",
+          "usb_device:device-fs",
+          "usb_host:host-fs"
         ],
         "items": [
           {
@@ -1691,6 +2327,78 @@
             "regressions": [
               "tests/behavior/soc/stm32/stm32f1/can/connectivity_test.cpp"
             ]
+          },
+          {
+            "section": "2.13.1",
+            "title": "Rx FIFO overwrite on simultaneous channel disable",
+            "revisions": "AA",
+            "assessment": "workaround",
+            "condition": "Host may overwrite received data during simultaneous IN channel halt.",
+            "handling": "One active host channel. RX FIFO holds at least two 64-byte packets and two status words.",
+            "implementation": [
+              "soc/stm32/common/dwc_otg_host/usb_host.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/usb/connectivity_host_test.cpp"
+            ]
+          },
+          {
+            "section": "2.13.2",
+            "title": "Host IN requires a configured Tx FIFO",
+            "revisions": "AA",
+            "assessment": "workaround",
+            "condition": "FS core checks a Tx FIFO while admitting IN.",
+            "handling": "The configured nonperiodic Tx FIFO always holds one 64-byte packet.",
+            "implementation": [
+              "soc/stm32/common/dwc_otg_host/usb_host.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/usb/connectivity_host_test.cpp"
+            ]
+          },
+          {
+            "section": "2.13.3",
+            "title": "Immediate halt may miss the channel-halted interrupt",
+            "revisions": "AA",
+            "assessment": "workaround",
+            "condition": "An immediate halt after CHENA can omit the expected CHH.",
+            "handling": "Hold early cancellation until an actual wire source is observed. Join IRQ and require CHENA, AHB and FIFO readbacks. Verified one-attempt behavior locally.",
+            "implementation": [
+              "soc/stm32/common/dwc_otg_host/usb_host.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/usb/connectivity_host_test.cpp"
+            ]
+          },
+          {
+            "section": "2.13.4",
+            "title": "USB device configuration register read latency",
+            "revisions": "AA",
+            "assessment": "workaround",
+            "condition": "Reading DCFG immediately after adjusting DAD or PFIVL can report invalid data.",
+            "handling": "The common DWC engine inserts the ordered AHB read interval before observing DAD.",
+            "implementation": [
+              "soc/stm32/common/dwc_otg_device/usb_device_controller.c",
+              "soc/stm32/stm32f1/drivers/usb/connectivity_device.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/usb/connectivity_test.cpp"
+            ]
+          },
+          {
+            "section": "2.13.5",
+            "title": "Minimum HCLK frequency for Device operation",
+            "revisions": "NN",
+            "assessment": "silicon_limit",
+            "condition": "OTG FS peripheral operation requires HCLK at or above 14.2 MHz.",
+            "handling": "Only the reviewed HCLK72/PLL48 System profile is admitted. The cold adapter verifies live RCC before enabling OTG FS.",
+            "implementation": [
+              "soc/stm32/common/dwc_otg_device/usb_device_controller.c",
+              "soc/stm32/stm32f1/drivers/usb/connectivity_device.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/usb/connectivity_test.cpp"
+            ]
           }
         ]
       }
@@ -1716,7 +2424,10 @@
         "maintained_modes": [
           "can:classic-irq",
           "gpio:output",
-          "uart:irq-byte-event"
+          "mdio:clause22",
+          "uart:irq-byte-event",
+          "usb_device:device-fs",
+          "usb_host:host-fs"
         ],
         "items": [
           {
@@ -1761,7 +2472,7 @@
             "title": "USART TX pin remains owned during receive-only use",
             "assessment": "external_constraint",
             "condition": "When the USART is enabled, clearing TE can still hold the alternate-function TX line high.",
-            "handling": "The reviewed USART2 mode owns both TX and RX for the whole activation; an alternate driver cannot take PA2 from it.",
+            "handling": "Both TX/RX remain owned while USART2 is enabled. The default route owns PA2/PA3; MB784 C.1 remaps to PD5/PD6 and leaves PA2 available for MDIO.",
             "implementation": [
               "soc/stm32/stm32f1/facts/routes.json"
             ],
@@ -1806,6 +2517,78 @@
             ],
             "regressions": [
               "tests/behavior/soc/stm32/stm32f1/can/connectivity_test.cpp"
+            ]
+          },
+          {
+            "section": "2.13.1",
+            "title": "Rx FIFO overwrite on simultaneous channel disable",
+            "revisions": "AA",
+            "assessment": "workaround",
+            "condition": "Host may overwrite received data during simultaneous IN channel halt.",
+            "handling": "One active host channel. RX FIFO holds at least two 64-byte packets and two status words.",
+            "implementation": [
+              "soc/stm32/common/dwc_otg_host/usb_host.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/usb/connectivity_host_test.cpp"
+            ]
+          },
+          {
+            "section": "2.13.2",
+            "title": "Host IN requires a configured Tx FIFO",
+            "revisions": "AA",
+            "assessment": "workaround",
+            "condition": "FS core checks a Tx FIFO while admitting IN.",
+            "handling": "The configured nonperiodic Tx FIFO always holds one 64-byte packet.",
+            "implementation": [
+              "soc/stm32/common/dwc_otg_host/usb_host.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/usb/connectivity_host_test.cpp"
+            ]
+          },
+          {
+            "section": "2.13.3",
+            "title": "Immediate halt may miss the channel-halted interrupt",
+            "revisions": "AA",
+            "assessment": "workaround",
+            "condition": "An immediate halt after CHENA can omit the expected CHH.",
+            "handling": "Hold early cancellation until an actual wire source is observed. Join IRQ and require CHENA, AHB and FIFO readbacks. Verified one-attempt behavior locally.",
+            "implementation": [
+              "soc/stm32/common/dwc_otg_host/usb_host.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/usb/connectivity_host_test.cpp"
+            ]
+          },
+          {
+            "section": "2.13.4",
+            "title": "USB device configuration register read latency",
+            "revisions": "AA",
+            "assessment": "workaround",
+            "condition": "Reading DCFG immediately after adjusting DAD or PFIVL can report invalid data.",
+            "handling": "The common DWC engine inserts the ordered AHB read interval before observing DAD.",
+            "implementation": [
+              "soc/stm32/common/dwc_otg_device/usb_device_controller.c",
+              "soc/stm32/stm32f1/drivers/usb/connectivity_device.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/usb/connectivity_test.cpp"
+            ]
+          },
+          {
+            "section": "2.13.5",
+            "title": "Minimum HCLK frequency for Device operation",
+            "revisions": "NN",
+            "assessment": "silicon_limit",
+            "condition": "OTG FS peripheral operation requires HCLK at or above 14.2 MHz.",
+            "handling": "Only the reviewed HCLK72/PLL48 System profile is admitted. The cold adapter verifies live RCC before enabling OTG FS.",
+            "implementation": [
+              "soc/stm32/common/dwc_otg_device/usb_device_controller.c",
+              "soc/stm32/stm32f1/drivers/usb/connectivity_device.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/usb/connectivity_test.cpp"
             ]
           }
         ]
