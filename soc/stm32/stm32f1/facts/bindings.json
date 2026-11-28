@@ -49,12 +49,16 @@
     "capabilities": {
       "pin_electrical": true,
       "public_formats": [
+        "adc",
         "i2c",
         "spi",
         "uart"
       ],
       "flash_program_unit": 2,
-      "flash_input_alignment": 1
+      "flash_input_alignment": 1,
+      "offset_image_alignment": 512,
+      "offset_image_vector_symbol": "g_pfnVectors",
+      "offset_image_parts": ["STM32F103RBT6"]
     },
     "clock": {
       "model": "fixed-profile",
@@ -78,7 +82,8 @@
       "i2c_hz": [
         80000,
         80000
-      ]
+      ],
+      "pwm_period": 65535
     }
   },
   "pads": {
@@ -647,7 +652,8 @@
     "enum_abi": "short-enums",
     "backends": [
       "baremetal",
-      "freertos"
+      "freertos",
+      "threadx"
     ],
     "headers": [],
     "bindings": [],

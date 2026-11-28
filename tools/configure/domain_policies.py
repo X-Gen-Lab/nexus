@@ -13,7 +13,7 @@ from tools.configure.policies.bxcan import BxCanPolicy, BxCanTransport
 from tools.configure.ethernet import EthernetPolicy
 from tools.configure.providers.common import EndpointPolicy, fail, integer
 from tools.configure.records import freeze
-from tools.configure.pinmux import PinMuxPolicy, load_pinmux_policy
+from tools.configure.pinmux import FixedRoutePinMuxPolicy, PinMuxPolicy, load_pinmux_policy
 from tools.configure.stream_profiles import StreamGeometry
 from tools.configure.timer_advanced import TimerBinding, TimerPolicy, TimerRoute
 from tools.configure.uart_formats import UartFormatPolicy
@@ -183,14 +183,14 @@ def _endpoints(value):
     return EndpointPolicy(**result)
 
 
-def _capabilities(value):
+def _capabilities(value, soc):
     booleans = {"pin_electrical": "PIN_ELECTRICAL", "timebase_alarm": "TIMEBASE_ALARM",
                 "spi_requires_endpoint": "SPI_REQUIRES_ENDPOINT"}
     positive = {"flash_program_unit": "FLASH_PROGRAM_UNIT",
                 "flash_input_alignment": "FLASH_INPUT_ALIGNMENT",
                 "offset_image_alignment": "OFFSET_IMAGE_ALIGNMENT"}
     _fields(value, (), {*booleans, *positive, "offset_image_vector_symbol",
-                        "public_formats", "classic_can_mailboxes"})
+                        "offset_image_parts", "public_formats", "classic_can_mailboxes"})
     result = {booleans[name]: _boolean(item, name) if name in booleans else item
               for name, item in value.items() if name in booleans}
     for name, target in positive.items():
@@ -199,6 +199,12 @@ def _capabilities(value):
     if "offset_image_vector_symbol" in value:
         Symbol(value["offset_image_vector_symbol"])
         result["OFFSET_IMAGE_VECTOR_SYMBOL"] = value["offset_image_vector_symbol"]
+    if "offset_image_parts" in value:
+        parts = _names(value["offset_image_parts"], "offset image parts", empty=False)
+        if (not {"offset_image_alignment", "offset_image_vector_symbol"} <= value.keys() or
+                not set(parts) <= soc.get("variants", {}).keys()):
+            fail("Domain offset images require reviewed exact parts and vector facts")
+        result["OFFSET_IMAGE_PARTS"] = frozenset(parts)
     if "public_formats" in value:
         result["PUBLIC_FORMATS"] = frozenset(_names(value["public_formats"], "public formats"))
     if "classic_can_mailboxes" in value:
@@ -260,6 +266,7 @@ class DomainPolicies:
     FLASH_INPUT_ALIGNMENT: int = 1
     OFFSET_IMAGE_ALIGNMENT: int = 1
     OFFSET_IMAGE_VECTOR_SYMBOL: str | None = None
+    OFFSET_IMAGE_PARTS: frozenset[str] | None = None
     DMA_VECTOR: str | None = None
     DMA_TOPOLOGY: tuple = (frozenset(), (), ())
     FIXED_CHANNEL_DMA: object | None = None
@@ -316,7 +323,7 @@ class DomainPolicies:
                     integer(item, context="Domain " + name)
             result["LIMITS"] = freeze(limits)
         if "capabilities" in value:
-            result.update(_capabilities(value["capabilities"]))
+            result.update(_capabilities(value["capabilities"], soc))
         if "dma" in value:
             raw_dma = value["dma"]
             if isinstance(raw_dma, Mapping) and raw_dma.get("encoding") == "fixed-channel":
@@ -399,8 +406,12 @@ class DomainPolicies:
         if item.kind == "pwm":
             if configuration is None or len(item.pins) != 1:
                 fail("Selected PWM channel requires its physical binding context")
-            provider = configuration.provider_context.provider
-            channel = provider.PWM_PIN_CHANNELS.get((item.controller, item.pins[0]["pin"]))
+            pin, = item.pins
+            if isinstance(self.PINMUX_POLICY, FixedRoutePinMuxPolicy):
+                channel = {"ch1": 1, "ch2": 2, "ch3": 3, "ch4": 4}.get(pin["function"])
+            else:
+                provider = configuration.provider_context.provider
+                channel = provider.PWM_PIN_CHANNELS.get((item.controller, pin["pin"]))
             if channel is None:
                 fail("Selected PWM route has no reviewed channel")
             values["channel"] = channel

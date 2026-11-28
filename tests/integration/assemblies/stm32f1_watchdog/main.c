@@ -17,10 +17,13 @@ int main(void) {
     }
     const nx_watchdog_port_t* port =
         nx_factory_watchdog_ref(NX_WATCHDOG_REF_IWDG);
+    if ((nx_reset_cause() & NX_RESET_BROWNOUT) != 0U) {
+        return 2;
+    }
     nx_watchdog_state_t state;
     const nx_result_t result = nx_watchdog_port_state(port, &state);
     if (result != NX_SUCCESS) {
-        return 2;
+        return 3;
     }
-    return !state.enabled && nx_platform_stop() == NX_SUCCESS ? 0 : 3;
+    return !state.enabled && nx_platform_stop() == NX_SUCCESS ? 0 : 4;
 }

@@ -775,11 +775,9 @@ def _resolve_flash_layout(layout_name, assembly_directory, physical_flash, read,
     suffix = memory_budget.image_suffix_bytes if memory_budget else 0
     if prefix + suffix >= owner.size:
         fail("Image reservations exhaust the selected physical Flash owner")
-    if (prefix or suffix) and (not isinstance(vector_symbol, str) or
-                               not vector_symbol):
-        fail("Image reservation requires an explicitly reviewed SoC startup")
     if owner.origin != physical_flash["origin"] or prefix or suffix:
-        if offset_alignment is None:
+        if (offset_alignment is None or
+                not isinstance(vector_symbol, str) or not vector_symbol):
             fail("Image offset or reservation requires an explicitly reviewed SoC startup")
         integer(offset_alignment, 128, context="image vector alignment")
         if (offset_alignment & (offset_alignment - 1) or
@@ -1211,11 +1209,11 @@ def _resolve(assembly_path, root=ROOT, *, input_paths=None, test_support=False,
         if external_memory_policy is not None else ())
     inputs = [assembly_path, *facts.inputs, policy_path, catalogue_path]
     inputs.extend(selected_graph.inputs)
+    alignment, vector = (memory_regions.offset_image_contract(provider, part)
+                         if not facts.provider_context.external else (None, None))
     selected_layout = _resolve_flash_layout(
         assembly.layout, assembly_path.parent, variant["flash"], read,
-        offset_alignment=getattr(provider, "OFFSET_IMAGE_ALIGNMENT", None),
-        vector_symbol=(getattr(provider, "OFFSET_IMAGE_VECTOR_SYMBOL", None)
-                       if not facts.provider_context.external else None),
+        offset_alignment=alignment, vector_symbol=vector,
         memory_budget=selected_memory.budget)
     if selected_layout.input_path is not None:
         inputs.append(selected_layout.input_path)

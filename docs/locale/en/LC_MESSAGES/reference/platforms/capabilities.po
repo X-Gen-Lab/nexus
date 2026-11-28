@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 847d74fe989f5c716701f6da80b7c51a74cc6aa45139bcdda1bc8a46346c1498\n"
+"X-Nexus-Source-SHA256: a74003a18d8ec1675d5a4f03bf9451342125961e6d85cf9ab4b7e2ae167892e3\n"
 
 #: ../../../../../docs/reference/platforms/capabilities.md:9
 msgid "当前派生能力矩阵"
@@ -4138,48 +4138,6 @@ msgid "`soc/stm32/stm32f1/drivers/crc/crc.c`"
 msgstr "`soc/stm32/stm32f1/drivers/crc/crc.c`"
 
 #: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
-msgid ""
-"`tests/integration/assemblies/stm32f1_family/f100rb-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f100ze-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f101c6-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f101rb-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f101ze-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f101zg-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f102c6-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f102rb-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f103c6-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f103c8-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f103rb-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f103rb-dma-tx.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f103rb-freertos.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f103rb-mco-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f103rb-mco-freertos.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f103ze-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f103zg-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f105vc-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f107vc-baremetal.toml`"
-msgstr ""
-"`tests/integration/assemblies/stm32f1_family/f100rb-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f100ze-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f101c6-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f101rb-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f101ze-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f101zg-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f102c6-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f102rb-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f103c6-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f103c8-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f103rb-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f103rb-dma-tx.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f103rb-freertos.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f103rb-mco-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f103rb-mco-freertos.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f103ze-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f103zg-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f105vc-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f107vc-baremetal.toml`"
-
-#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
 msgid "`gpio-pb12-cs`"
 msgstr "`gpio-pb12-cs`"
 
@@ -4220,6 +4178,104 @@ msgid "`usart2-pa2-pa3`, `usart2-pa2-pa3-irq`"
 msgstr "`usart2-pa2-pa3`, `usart2-pa2-pa3-irq`"
 
 #: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`adc1-pa0-in0`"
+msgstr "`adc1-pa0-in0`"
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`tests/integration/assemblies/stm32f1_adc/f103rb-adc.toml`"
+msgstr "`tests/integration/assemblies/stm32f1_adc/f103rb-adc.toml`"
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`soc/stm32/stm32f1/drivers/adc/adc.c`"
+msgstr "`soc/stm32/stm32f1/drivers/adc/adc.c`"
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`exti13-pc13`"
+msgstr "`exti13-pc13`"
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`tests/integration/assemblies/stm32f1_exti/f103rb-button.toml`"
+msgstr "`tests/integration/assemblies/stm32f1_exti/f103rb-button.toml`"
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`soc/stm32/stm32f1/drivers/exti/exti.c`"
+msgstr "`soc/stm32/stm32f1/drivers/exti/exti.c`"
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid ""
+"`tests/integration/assemblies/stm32f1_family/f100rb-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f100ze-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f101c6-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f101rb-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f101ze-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f101zg-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f102c6-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f102rb-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103c6-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103c8-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-dma-tx.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-freertos.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-mco-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-mco-freertos.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-offset-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103ze-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103zg-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f105vc-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f107vc-baremetal.toml`, "
+"`tests/integration/kernels/os_threadx_runtime/f103rb-threadx.toml`"
+msgstr ""
+"`tests/integration/assemblies/stm32f1_family/f100rb-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f100ze-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f101c6-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f101rb-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f101ze-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f101zg-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f102c6-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f102rb-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103c6-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103c8-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-dma-tx.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-freertos.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-mco-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-mco-freertos.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-offset-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103ze-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103zg-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f105vc-baremetal.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f107vc-baremetal.toml`, "
+"`tests/integration/kernels/os_threadx_runtime/f103rb-threadx.toml`"
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "PVD"
+msgstr "PVD"
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`pvd-level`"
+msgstr "`pvd-level`"
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`tests/integration/assemblies/stm32f1_pvd/rb.toml`"
+msgstr "`tests/integration/assemblies/stm32f1_pvd/rb.toml`"
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`soc/stm32/stm32f1/drivers/pvd/pvd.c`"
+msgstr "`soc/stm32/stm32f1/drivers/pvd/pvd.c`"
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`tim3-pa6-ch1`"
+msgstr "`tim3-pa6-ch1`"
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`tests/integration/assemblies/stm32f1_pwm/f103rb-pwm.toml`"
+msgstr "`tests/integration/assemblies/stm32f1_pwm/f103rb-pwm.toml`"
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
+msgid "`soc/stm32/stm32f1/drivers/pwm/pwm.c`"
+msgstr "`soc/stm32/stm32f1/drivers/pwm/pwm.c`"
+
+#: ../../../../workspace/nexus/docs/reference/platforms/capabilities.md:0
 msgid ""
 "`tests/integration/assemblies/stm32f1_family/f100rb-baremetal.toml`, "
 "`tests/integration/assemblies/stm32f1_family/f100ze-baremetal.toml`, "
@@ -4235,10 +4291,12 @@ msgid ""
 "`tests/integration/assemblies/stm32f1_family/f103rb-freertos.toml`, "
 "`tests/integration/assemblies/stm32f1_family/f103rb-mco-baremetal.toml`, "
 "`tests/integration/assemblies/stm32f1_family/f103rb-mco-freertos.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-offset-baremetal.toml`, "
 "`tests/integration/assemblies/stm32f1_family/f103ze-baremetal.toml`, "
 "`tests/integration/assemblies/stm32f1_family/f103zg-baremetal.toml`, "
 "`tests/integration/assemblies/stm32f1_family/f105vc-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f107vc-baremetal.toml`"
+"`tests/integration/assemblies/stm32f1_family/f107vc-baremetal.toml`, "
+"`tests/integration/kernels/os_threadx_runtime/f103rb-threadx.toml`"
 msgstr ""
 "`tests/integration/assemblies/stm32f1_family/f100rb-baremetal.toml`, "
 "`tests/integration/assemblies/stm32f1_family/f100ze-baremetal.toml`, "
@@ -4254,7 +4312,9 @@ msgstr ""
 "`tests/integration/assemblies/stm32f1_family/f103rb-freertos.toml`, "
 "`tests/integration/assemblies/stm32f1_family/f103rb-mco-baremetal.toml`, "
 "`tests/integration/assemblies/stm32f1_family/f103rb-mco-freertos.toml`, "
+"`tests/integration/assemblies/stm32f1_family/f103rb-offset-baremetal.toml`, "
 "`tests/integration/assemblies/stm32f1_family/f103ze-baremetal.toml`, "
 "`tests/integration/assemblies/stm32f1_family/f103zg-baremetal.toml`, "
 "`tests/integration/assemblies/stm32f1_family/f105vc-baremetal.toml`, "
-"`tests/integration/assemblies/stm32f1_family/f107vc-baremetal.toml`"
+"`tests/integration/assemblies/stm32f1_family/f107vc-baremetal.toml`, "
+"`tests/integration/kernels/os_threadx_runtime/f103rb-threadx.toml`"

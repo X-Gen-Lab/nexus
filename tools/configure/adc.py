@@ -1,8 +1,33 @@
 """Selected ADC sequence policy and graph-local reviewed group decisions."""
 
+import re
+
+from tools.configure.pinmux import FixedRoutePinMuxPolicy
 from tools.configure.providers.common import fail, integer, mode_traits, sequence
 
 RESOLUTION_BITS = (6, 8, 10, 12)
+
+
+def _pin_channels(route, provider):
+    """Read channel authority from the selected pin-routing contract."""
+    if isinstance(getattr(provider, "PINMUX_POLICY", None), FixedRoutePinMuxPolicy):
+        channels = {}
+        for pin in route["pins"]:
+            role = re.fullmatch(r"in([0-9]|1[0-5])", pin["function"])
+            if role is None:
+                fail("Fixed ADC route requires an explicit analog channel role")
+            channels[pin["pin"]] = int(role[1])
+        return channels
+    mapping = getattr(provider, "ADC_PIN_CHANNELS", None)
+    if mapping is None:
+        return None
+    channels = {}
+    for pin in route["pins"]:
+        key = (route["controller"], pin["pin"])
+        if key not in mapping:
+            fail("ADC controller/pin lacks a reviewed channel mapping")
+        channels[pin["pin"]] = mapping[key]
+    return channels
 
 
 def validate_selection(selection, route, provider):
@@ -14,16 +39,10 @@ def validate_selection(selection, route, provider):
         route["controller"], ())
     for channel in channels:
         integer(channel, 0, max((15, *internal)), "ADC channel")
-    mapping = getattr(provider, "ADC_PIN_CHANNELS", None)
+    mapping = _pin_channels(route, provider)
     if mapping is None:
         fail("ADC controller/pin lacks a reviewed channel mapping")
-    expected = []
-    for pin in route["pins"]:
-        key = (route["controller"], pin["pin"])
-        if key not in mapping:
-            fail("ADC controller/pin lacks a reviewed channel mapping")
-        expected.append(mapping[key])
-    expected.extend(internal)
+    expected = {*mapping.values(), *internal}
     if not set(channels).issubset(expected) or not channels or len(channels) > 16:
         fail("ADC channel sequence differs from reviewed analog pins")
     samples = sequence(selection["sample_times"], "ADC sample_times")
@@ -75,8 +94,10 @@ def selected_route(selection, route, provider):
         if provider.ADC_GROUP is None:
             fail("ADC group has no maintained provider")
         return provider.ADC_GROUP.selected_route(selection, route)
-    mapping = getattr(provider, "ADC_PIN_CHANNELS", None)
-    if route["kind"] != "adc" or mapping is None:
+    if route["kind"] != "adc":
+        return route
+    mapping = _pin_channels(route, provider)
+    if mapping is None:
         return route
     channels = frozenset(selection["channels"])
     resources = list(route.get("resources", ()))
@@ -85,7 +106,7 @@ def selected_route(selection, route, provider):
         resources += ["controller:" + timer, "timer:" + timer]
     return {**route, "resources": resources,
             "pins": [pin for pin in route["pins"]
-                     if mapping[(route["controller"], pin["pin"])] in channels]}
+                     if mapping[pin["pin"]] in channels]}
 
 
 def group_trigger_resources(selection, provider):

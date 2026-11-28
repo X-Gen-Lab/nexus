@@ -9,6 +9,7 @@
 #include <gtest/gtest.h>
 
 #include "nexus/core/time.h"
+#include "nexus/io/watchdog.h"
 #include "nexus_config.h"
 #include "register_model.h"
 #include "system/platform.h"
@@ -50,6 +51,7 @@ class F103Timebase : public testing::Test {
         f1_test_timer = {};
         f1_test_rcc.CR =
             RCC_CR_HSION | RCC_CR_HSIRDY | (16U << RCC_CR_HSITRIM_Pos);
+        f1_test_rcc.CSR = RCC_CSR_PORRSTF | RCC_CSR_SFTRSTF | RCC_CSR_WWDGRSTF;
         f1_test_rcc.AHBENR = RCC_AHBENR_FLITFEN | RCC_AHBENR_SRAMEN;
 #if defined(FLASH_ACR_PRFTBE)
         f1_test_flash.ACR = FLASH_ACR_PRFTBE | FLASH_ACR_PRFTBS;
@@ -97,6 +99,20 @@ TEST_F(F103Timebase, RejectsForeignFlashTimingBeforeAcquiringTimer) {
         EXPECT_EQ(0U, RCC->APB1ENR);
         EXPECT_FALSE(nx_stm32f1_system_live());
     }
+}
+
+TEST_F(F103Timebase, ResetCauseRemainsLatchedAcrossPlatformRestart) {
+    constexpr uint32_t raw =
+        RCC_CSR_PORRSTF | RCC_CSR_SFTRSTF | RCC_CSR_WWDGRSTF;
+    constexpr uint32_t reported =
+        NX_RESET_POWER_ON | NX_RESET_SOFTWARE | NX_RESET_WWDG;
+    ASSERT_EQ(nx_stm32f1_platform_system_start(&rb).primary, NX_SUCCESS);
+    EXPECT_EQ(RCC->CSR, raw);
+    EXPECT_EQ(nx_reset_cause(), reported);
+    ASSERT_EQ(nx_stm32f1_platform_system_release(&rb, true), NX_SUCCESS);
+    RCC->CSR = RCC_CSR_PINRSTF | RCC_CSR_IWDGRSTF | RCC_CSR_LPWRRSTF;
+    ASSERT_EQ(nx_stm32f1_platform_system_start(&rb).primary, NX_SUCCESS);
+    EXPECT_EQ(nx_reset_cause(), reported);
 }
 
 TEST_F(F103Timebase, CountsPendingWrapBeforeAndAfterInterruptOnce) {

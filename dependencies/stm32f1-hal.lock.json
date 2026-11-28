@@ -1,9 +1,17 @@
 {
   "commit": "fee494a92b5ad331f92ad21f76c66a5cb83773ee",
   "files": {
+    "Inc/stm32f1xx_ll_adc.h": {
+      "bytes": 228411,
+      "sha256": "fe109e162ec888be59a63f8a0e424c53d98f18ea0066ab55cb6851b7005fa9ee"
+    },
     "Inc/stm32f1xx_ll_crc.h": {
       "bytes": 5332,
       "sha256": "b18138e2d95e4a1b475f803e1101c5c8a8f7695daa238a457e8cc67a9dbc18f2"
+    },
+    "Inc/stm32f1xx_ll_exti.h": {
+      "bytes": 31206,
+      "sha256": "9f816072941e79763cbc048fe03bf803fd81bf0a0ade876d74a49be8620bfde5"
     },
     "Inc/stm32f1xx_ll_gpio.h": {
       "bytes": 88034,
@@ -20,6 +28,10 @@
     "Inc/stm32f1xx_ll_spi.h": {
       "bytes": 63517,
       "sha256": "aa8d53561d7617de21e1caf4de8a8ad8502b9a9a74e37b5366a81e984dffdf0f"
+    },
+    "Inc/stm32f1xx_ll_tim.h": {
+      "bytes": 164048,
+      "sha256": "827944611b0f0cfa031f2a0c752bc73e173055b540fe971d3480e810dfceaa2e"
     },
     "Inc/stm32f1xx_ll_usart.h": {
       "bytes": 99185,

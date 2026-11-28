@@ -5,7 +5,7 @@ function(nexus_f1_system_contract target device)
     nexus_google_test(${target}
         SOURCES "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/timebase_test.cpp"
             "${system_package}/system/platform.c"
-        LIBRARIES Nexus::Arch Nexus::Core
+        LIBRARIES Nexus::Arch Nexus::Core Nexus::IOWatchdog
         INCLUDES "${system_package}"
     )
     target_include_directories(

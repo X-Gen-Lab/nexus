@@ -233,6 +233,85 @@
       "clock_profiles": [
         "hsi8"
       ]
+    },
+    {
+      "id": "tim3-pa6-ch1",
+      "variants": [
+        "STM32F103RBT6"
+      ],
+      "controller": "TIM3",
+      "kind": "pwm",
+      "clock_profiles": [
+        "hsi8"
+      ],
+      "pins": [
+        {
+          "pin": "PA6",
+          "function": "ch1"
+        }
+      ],
+      "modes": [
+        "fixed-pwm"
+      ],
+      "source": "RM0008 Rev21 Table 44, Section 9.4.2, Section 15.3.9 and DS5319 Rev20 Table 5."
+    },
+    {
+      "id": "adc1-pa0-in0",
+      "variants": [
+        "STM32F103RBT6"
+      ],
+      "controller": "ADC1",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PA0",
+          "function": "in0"
+        }
+      ],
+      "modes": [
+        "single-shot"
+      ],
+      "source": "DS5319 Rev20 Table 5 and Tables 47\u201348; RM0008 Rev21 sections 11.3, 11.4 and 11.12; UM1724 Rev17 Table 12 PA0 A0.",
+      "clock_profiles": [
+        "hsi8"
+      ]
+    },
+    {
+      "id": "exti13-pc13",
+      "variants": [
+        "STM32F103RBT6"
+      ],
+      "controller": "EXTI13",
+      "kind": "exti",
+      "pins": [
+        {
+          "pin": "PC13",
+          "function": "input"
+        }
+      ],
+      "modes": [
+        "edge-event"
+      ],
+      "source": "DS5319 Rev20 Table 5; RM0008 Rev21 sections 9.4.6 and 10.3; UM1724 Rev17 sections 7.7 and 7.11/Table 10.",
+      "clock_profiles": [
+        "hsi8"
+      ]
+    },
+    {
+      "id": "pvd-level",
+      "variants": [
+        "STM32F103RBT6"
+      ],
+      "controller": "PVD",
+      "kind": "exti",
+      "pins": [],
+      "modes": [
+        "pvd-level"
+      ],
+      "clock_profiles": [
+        "hsi8"
+      ],
+      "source": "RM0008 Rev21 sections 5.2 and 5.4 PWR PLS/PVDO, and 10.2.5 EXTI line 16; ES096 Rev15 section 2.2.8."
     }
   ]
 }

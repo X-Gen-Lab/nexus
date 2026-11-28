@@ -26,6 +26,9 @@ CMSIS_DIRECTORY = "vendors/st/cmsis_device_f1"
 LOCK_NAME = "dependencies/stm32f1-hal.lock.json"
 CMSIS_LOCK_NAME = "dependencies/stm32f1.lock.json"
 REVIEWED_FILES = frozenset({
+    "Inc/stm32f1xx_ll_adc.h",
+    "Inc/stm32f1xx_ll_exti.h",
+    "Inc/stm32f1xx_ll_tim.h",
     "Inc/stm32f1xx_ll_crc.h",
     "Inc/stm32f1xx_ll_spi.h",
     "Inc/stm32f1xx_ll_iwdg.h",

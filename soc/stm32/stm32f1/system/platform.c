@@ -9,6 +9,7 @@
 #include "system/platform.h"
 #include "nexus/core/fault.h"
 #include "nexus/core/time.h"
+#include "nexus/io/watchdog.h"
 #include "nexus_config.h"
 #include "private/hardware.h"
 
@@ -28,6 +29,8 @@ static uint64_t elapsed_us;
 static uint8_t effects;
 static uint8_t priority_before;
 static bool active;
+static uint8_t boot_reset_causes;
+static bool reset_captured;
 
 /* Select the PLL72 owner only for the reviewed bypass plan. */
 #if defined(NEXUS_CLOCK_HSE_BYPASS) && NEXUS_CLOCK_HSE_BYPASS == 1
@@ -46,6 +49,25 @@ _Static_assert(
 #endif
 
 uint32_t SystemCoreClock = 8000000U;
+
+static void capture_reset_cause(void) {
+    if (reset_captured)
+        return;
+    const uint32_t flags = RCC->CSR;
+    /* F1 PORRSTF is the combined POR/PDR flag. There is no separate BOR bit. */
+    boot_reset_causes =
+        (uint8_t)(((flags & RCC_CSR_PORRSTF) ? NX_RESET_POWER_ON : 0U) |
+                  ((flags & RCC_CSR_PINRSTF) ? NX_RESET_PIN : 0U) |
+                  ((flags & RCC_CSR_SFTRSTF) ? NX_RESET_SOFTWARE : 0U) |
+                  ((flags & RCC_CSR_IWDGRSTF) ? NX_RESET_IWDG : 0U) |
+                  ((flags & RCC_CSR_WWDGRSTF) ? NX_RESET_WWDG : 0U) |
+                  ((flags & RCC_CSR_LPWRRSTF) ? NX_RESET_LOW_POWER : 0U));
+    reset_captured = true;
+}
+
+uint32_t nx_reset_cause(void) {
+    return boot_reset_causes;
+}
 
 /** \brief Prove the fixed reset clock without changing foreign sources. */
 static bool hsi8_ready(void) {
@@ -311,6 +333,7 @@ nx_stm32f1_platform_system_start(const nx_stm32f1_platform_config_t* config) {
         result.primary = NX_ERROR_BUSY;
         return result;
     }
+    capture_reset_cause();
 #if defined(NX_STM32F1_HSE72)
     if (!clock_idle()) {
         result.primary = NX_ERROR_BUSY;

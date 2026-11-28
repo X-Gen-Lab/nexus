@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 3088c69a165744104cd5f22057c72d10c9480c32976a26a8d5d94b0c26b6cf5b\n"
+"X-Nexus-Source-SHA256: c139cfb197185f8cc139df47dcbc7d104a8dac484ae23e076d5ce532cb2bab58\n"
 
 #: ../../../../../../docs/reference/platforms/support.md:9
 msgid "精确平台支持"
@@ -1350,3 +1350,14 @@ msgstr ""
 "verification](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/soc/stm32/stm32f1/README.md) for pins, electrical constraints, and "
 "build commands for the independent C and C++ consumer."
+
+#: ../lines-integration/docs/reference/platforms/support.md:51
+msgid ""
+"F103RB 独立 HSI8 参考覆盖 ADC1 PA0 单次采样、TIM3 CH1 PA6 PWM、 B1 PC13 EXTI 和 PVD "
+"阈值电平。独立 ThreadX 参考使用 Cortex-M3 soft-float、 1 kHz SysTick 与 "
+"BASEPRI。外设和内核模式分别按精确装配验证。"
+msgstr ""
+"Independent F103RB HSI8 references cover ADC1 PA0 single conversion, TIM3 "
+"CH1 PA6 PWM, B1 PC13 EXTI, and PVD threshold level. The separate ThreadX "
+"reference uses Cortex-M3 soft-float, a 1 kHz SysTick, and BASEPRI. "
+"Peripheral and kernel modes are verified against their exact assemblies."

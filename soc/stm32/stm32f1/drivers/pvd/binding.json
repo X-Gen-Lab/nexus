@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "bindings": [
+    {
+      "kind": "exti",
+      "mode": "pvd-level",
+      "implementation": "pvd",
+      "static_recipe": {
+        "state_type": "nx_stm32f1_pvd_t",
+        "declarations": [],
+        "calls": {
+          "admit": [
+            {
+              "function": "nx_stm32f1_pvd_admit",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                },
+                {
+                  "source": "item.options.threshold_code"
+                }
+              ]
+            }
+          ],
+          "prepare": {
+            "function": "nx_stm32f1_pvd_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "source": "item.options.threshold_code"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32f1_pvd_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "retain_on_failed_init": true,
+        "ops": "nx_stm32f1_pvd_ops"
+      },
+      "headers": [
+        "drivers/pvd/instance.h"
+      ]
+    }
+  ]
+}

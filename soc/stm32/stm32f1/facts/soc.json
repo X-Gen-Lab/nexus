@@ -1495,7 +1495,8 @@
       "controller_groups": [
         "gpioa-basic",
         "rm0008-f103-md",
-        "rm0008-f103-md-default-buses"
+        "rm0008-f103-md-default-buses",
+        "rm0008-f103-md-controls"
       ],
       "clock_policy": "rm0008-f103-md-run"
     },

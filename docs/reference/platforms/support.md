@@ -48,6 +48,10 @@ soft-float、HSI8、1 MHz TIM2、GPIO 和 USART2 8N1 IRQ。每个料号独立验
 组合另外开放有限 UART DMA TX、Flash 页操作、CRC／UID、IWDG、SPI2 与 I²C1。
 具体料号和模式见[派生矩阵](capabilities.md)。物理 HIL 为 `not_executed`。
 
+F103RB 独立 HSI8 参考覆盖 ADC1 PA0 单次采样、TIM3 CH1 PA6 PWM、
+B1 PC13 EXTI 和 PVD 阈值电平。独立 ThreadX 参考使用 Cortex-M3 soft-float、
+1 kHz SysTick 与 BASEPRI。外设和内核模式分别按精确装配验证。
+
 从仓库根使用 `stm32-f103rb-baremetal` 或 `stm32-f103rb-freertos` preset。
 引脚、电气约束以及独立 C／C++ 消费者的构建命令见
 [F1 实现与验证](../../../soc/stm32/stm32f1/README.md)。

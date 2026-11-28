@@ -326,6 +326,16 @@ def _extra_sections(regions):
 
 
 
+def offset_image_contract(provider, part):
+    """Return vector facts only within the package's exact declared scope."""
+    selected = getattr(provider, "OFFSET_IMAGE_PARTS", None)
+    symbol = getattr(provider, "OFFSET_IMAGE_VECTOR_SYMBOL", None)
+    if (symbol is None or not isinstance(part, str) or
+            (selected is not None and part not in selected)):
+        return None, None
+    return getattr(provider, "OFFSET_IMAGE_ALIGNMENT", None), symbol
+
+
 def linker(result):
     ram = next(region for region in result.memory if region["linker"])
     flash_origin = result.image_origin
@@ -350,9 +360,9 @@ def linker(result):
     if (flash_origin != result.flash["origin"] or
             result.memory_budget.image_prefix_bytes or
             result.memory_budget.image_suffix_bytes):
-        profile = for_selection(result)
-        alignment = profile.OFFSET_IMAGE_ALIGNMENT
-        symbol = profile.OFFSET_IMAGE_VECTOR_SYMBOL
+        alignment, symbol = offset_image_contract(for_selection(result), result.part)
+        if alignment is None or symbol is None:
+            raise ValueError("Executable image has no reviewed vector contract")
         vector_assertions = (
             '    ASSERT(ADDR(.isr_vector) == ORIGIN(FLASH), '
             '"image vectors must begin at the image origin")\n'

@@ -63,7 +63,7 @@ def os_selection(typed, data):
         restrictions.append(
             "Privileged unmasked Thread execution; ISR APIs require the selected ceiling.")
     if backend == "threadx":
-        restrictions.append("ThreadX physical scope is Cortex-M4; no tickless port is maintained.")
+        restrictions.append("ThreadX uses a fixed-rate kernel tick.")
     if protected:
         restrictions.append(
             "Restricted tasks own protected metadata, stack and reviewed user regions.")

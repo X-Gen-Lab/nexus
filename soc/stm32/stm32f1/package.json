@@ -42,6 +42,10 @@
     "drivers/watchdog/binding.json",
     "drivers/crc/binding.json",
     "drivers/i2c/binding.json",
-    "drivers/spi/binding.json"
+    "drivers/spi/binding.json",
+    "drivers/pwm/binding.json",
+    "drivers/adc/binding.json",
+    "drivers/exti/binding.json",
+    "drivers/pvd/binding.json"
   ]
 }

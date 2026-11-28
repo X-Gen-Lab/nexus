@@ -63,6 +63,15 @@ class SelectedContractAuthorityTests(unittest.TestCase):
             ("STM32F103RBT6", "spi", "short-poll"): ("spi2-pb13-pb14-pb15",),
             ("STM32F103RBT6", "i2c", "poll-messages"): ("i2c1-pb6-pb7",),
         })
+        f1_controls = {(row.part, row.controller, row.mode): row.reviewed_routes
+                       for row in rows if row.family == "stm32f1"
+                       and row.kind in {"pwm", "adc", "exti"} and row.reviewed_route_available}
+        self.assertEqual(f1_controls, {
+            ("STM32F103RBT6", "TIM3", "fixed-pwm"): ("tim3-pa6-ch1",),
+            ("STM32F103RBT6", "ADC1", "single-shot"): ("adc1-pa0-in0",),
+            ("STM32F103RBT6", "EXTI13", "edge-event"): ("exti13-pc13",),
+            ("STM32F103RBT6", "PVD", "pvd-level"): ("pvd-level",),
+        })
         self.assertTrue(all(not row.physical_qualified for row in rows))
         self.assertTrue(all(row.review_sources for row in rows))
 

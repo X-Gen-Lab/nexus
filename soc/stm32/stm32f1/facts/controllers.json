@@ -149,6 +149,75 @@
           ]
         }
       }
+    },
+    "rm0008-f103-md-controls": {
+      "controllers": {
+        "TIM3": {
+          "kind": "pwm",
+          "irq": [
+            "TIM3_IRQn"
+          ],
+          "pins": [
+            "PA6"
+          ],
+          "clock_domain": "apb1_timer"
+        },
+        "ADC1": {
+          "kind": "adc",
+          "irq": [
+            "ADC1_2_IRQn"
+          ],
+          "pins": [
+            "PA0"
+          ],
+          "clock_domain": "apb2"
+        },
+        "EXTI13": {
+          "kind": "exti",
+          "irq": [
+            "EXTI15_10_IRQn"
+          ],
+          "pins": [
+            "PC13"
+          ],
+          "resources": [
+            "exti:line:13"
+          ]
+        },
+        "PVD": {
+          "kind": "exti",
+          "irq": [
+            "PVD_IRQn"
+          ],
+          "pins": [],
+          "resources": [
+            "exti:line:16",
+            "pwr:pvd"
+          ]
+        }
+      },
+      "modes": {
+        "TIM3": {
+          "modes": [
+            "fixed-pwm"
+          ]
+        },
+        "ADC1": {
+          "modes": [
+            "single-shot"
+          ]
+        },
+        "EXTI13": {
+          "modes": [
+            "edge-event"
+          ]
+        },
+        "PVD": {
+          "modes": [
+            "pvd-level"
+          ]
+        }
+      }
     }
   }
 }

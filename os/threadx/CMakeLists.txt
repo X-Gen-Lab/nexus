@@ -7,6 +7,11 @@ elseif(
     AND NEXUS_CPU_ARCH STREQUAL "cortex-m4"
 )
     set(threadx_port cortex_m4)
+elseif(
+    NEXUS_THREADX_PORT STREQUAL "cortex_m3/gnu"
+    AND NEXUS_CPU_ARCH STREQUAL "cortex-m3"
+)
+    set(threadx_port cortex_m3)
 else()
     message(FATAL_ERROR "Unsupported reviewed ThreadX CPU port")
 endif()
@@ -23,7 +28,7 @@ target_link_libraries(
     PUBLIC nexus_os_wait nx_threadx_kernel
     PRIVATE nexus_arch nexus_owned_warnings nexus_build_options
 )
-if(threadx_port STREQUAL "cortex_m4")
+if(NOT threadx_port STREQUAL "linux")
     # IRQ entries must precede archives containing weak startup handlers.
     add_library(nx_threadx_bootstrap OBJECT m4.c m4_vectors.S)
     target_link_libraries(

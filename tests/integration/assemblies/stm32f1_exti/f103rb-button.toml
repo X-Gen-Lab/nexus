@@ -1,0 +1,25 @@
+# Stock MB1136 B1 on PC13, using the board's external pull-up.
+schema = 2
+board_package = "board"
+backend = "baremetal"
+clock = "hsi8"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+flash_load_limit_bytes = 24576
+static_ram_limit_bytes = 6144
+libc_heap_bytes = 0
+
+[exti.button]
+binding = "b1"
+mode = "edge-event"
+edge = "falling"
+event_capacity = 8
+
+[exti.button.irq]
+priority = 5
+calls_os = false
+
+[factory]
+capabilities = true

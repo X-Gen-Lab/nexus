@@ -111,8 +111,12 @@ def resolve(cpu, irq, backend, *, enum_abi=None):
             {"native", "baremetal", "threadx"} if native else
             {"baremetal", "freertos", "threadx"}):
         fail("CPU and OS backend contradict each other")
-    if backend == "threadx" and arch not in {"native", "cortex-m4"}:
-        fail("Unsupported maintained ThreadX CPU port")
+    threadx_port = None
+    if backend == "threadx":
+        from tools.configure import threadx
+        threadx_port = threadx.PORTS.get(arch)
+        if threadx_port is None:
+            fail("Unsupported maintained ThreadX CPU port")
     if enum_abi is None:
         enum_abi = "native-int" if native else "short-enums"
     if enum_abi != ("native-int" if native else "short-enums"):
@@ -185,7 +189,7 @@ def resolve(cpu, irq, backend, *, enum_abi=None):
             port = f"GCC/ARM_CM{arch[8:]}_NTZ/non_secure"
     if backend == "threadx":
         ceiling = 0 if native else kernel.default_syscall(profile.basepri, bits)
-        port = "linux/gnu" if native else "cortex_m4/gnu"
+        port = threadx_port
     irq_result = {"priority_bits": bits, "maximum_priority": maximum,
                   "syscall_priority": ceiling, "kernel_port": port,
                   "external_count": count,

@@ -33,7 +33,9 @@
         "uart": "Section 27, USART, SR/DR flags, BRR and wire completion",
         "identity": "Section 30.1.1 Flash size in the electronic signature",
         "dma": "Table 78 p282 wires USART2 TX to DMA1 channel 7",
-        "serial_buses": "Sections 9.3.9, 9.3.10, 26 and 28; actual default I2C1 and SPI2 routes"
+        "serial_buses": "Sections 9.3.9, 9.3.10, 26 and 28; actual default I2C1 and SPI2 routes",
+        "control": "Table 44 and section 15.3.9 TIM3 CH1 PWM; 11.3, 11.4 and 11.12 ADC1; 9.4.6 and 10.3 EXTI13",
+        "pvd": "Sections 5.2, 5.4 and 10.2.5 for raw PVD polling, PLS and PVDO"
       }
     },
     "es096": {
@@ -48,7 +50,9 @@
         "scope": "Tables 1-3 medium-density applicability and silicon revisions",
         "review": "Selected fixed-run GPIO, USART, Flash and IWDG operating boundaries, see software audit",
         "dma": "Sections 2.4.1 and 2.4.2 cover individual flag clears and 32-bit DMA register access",
-        "serial_buses": "Sections 2.3.5 to 2.3.7, 2.8.1 to 2.8.7 and 2.10.1 to 2.10.2"
+        "serial_buses": "Sections 2.3.5 to 2.3.7, 2.8.1 to 2.8.7 and 2.10.1 to 2.10.2",
+        "control": "Review 2.5.1 for ADC1_IN0, and 2.6.4 and 2.6.7 for TIM3 fixed PWM",
+        "pvd": "Section 2.2.8 excludes WFE-based PVD wake"
       }
     },
     "ds5936": {
@@ -460,11 +464,15 @@
           "X"
         ],
         "maintained_modes": [
+          "adc:single-shot",
           "crc:crc32-words",
+          "exti:edge-event",
+          "exti:pvd-level",
           "flash:poll-halfword",
           "gpio:input",
           "gpio:output",
           "i2c:poll-messages",
+          "pwm:fixed-pwm",
           "spi:short-poll",
           "uart:dma-tx",
           "uart:irq-byte-event",
@@ -507,6 +515,20 @@
               "soc/stm32/stm32f1/drivers/watchdog/watchdog.c"
             ],
             "regressions": []
+          },
+          {
+            "section": "2.2.8",
+            "title": "PVD and USB wakeup events",
+            "revisions": "AAAAAAAA",
+            "assessment": "silicon_limit",
+            "condition": "A PVD EXTI event cannot wake the core from WFE-based sleep as described.",
+            "handling": "The maintained HSI8 PVD route reads the comparator level through PWR only. It admits no IRQ, event wake or millivolt claim.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/pvd/pvd.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/pvd/pvd_test.cpp"
+            ]
           },
           {
             "section": "2.2.11",
@@ -584,6 +606,48 @@
             ],
             "regressions": [
               "tests/behavior/soc/stm32/stm32f1/uart_dma_test.cpp"
+            ]
+          },
+          {
+            "section": "2.5.1",
+            "title": "ADC1 injected conversion can disturb PA0",
+            "revisions": "NNNNNNNN",
+            "assessment": "silicon_limit",
+            "condition": "Injected operation can couple a voltage glitch to ADC input 0.",
+            "handling": "The reviewed ADC1 PA0 path uses regular single-shot conversions only, with JEXTTRIG and injected auto conversion disabled.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/adc/adc.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/adc/adc_test.cpp"
+            ]
+          },
+          {
+            "section": "2.6.4",
+            "title": "External timer counter reset and OCREF clear",
+            "revisions": "PPPPPPPP",
+            "assessment": "silicon_limit",
+            "condition": "External counter reset can extend the inactive PWM interval with OCREF clear.",
+            "handling": "TIM3 CH1 fixed PWM has no slave reset or OCREF clear path.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/pwm/pwm.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/pwm/pwm_test.cpp"
+            ]
+          },
+          {
+            "section": "2.6.7",
+            "title": "General timer 100 percent PWM after OCREF clear",
+            "revisions": "NNNNNNNN",
+            "assessment": "silicon_limit",
+            "condition": "An OCREF clear action can suppress full duty indefinitely.",
+            "handling": "TIM3 CH1 fixed PWM does not enable OCREF clear, and every admitted full-duty value fits in CCR1.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/pwm/pwm.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/pwm/pwm_test.cpp"
             ]
           },
           {
@@ -2025,6 +2089,8 @@
     "No physical silicon cut, oscillator accuracy, board wiring, timings, DMA, remap, low-power or physical qualification is established.",
     "Low-, high- and XL-density software references select GPIO output, USART2 IRQ and HSI8. Additional modes require their exact package and errata reviews.",
     "F100, F101, F102, F105 and F107 exact software references select HSI8, GPIO output and USART2 IRQ byte events.",
-    "F100 high-density, F101 low/high/XL-density and F102 low-density software references select HSI8, GPIO output and USART2 IRQ byte events."
+    "F100 high-density, F101 low/high/XL-density and F102 low-density software references select HSI8, GPIO output and USART2 IRQ byte events.",
+    "The exact F103RB HSI8 control slice uses TIM3 CH1 on PA6, ADC1 regular sampling of PA0, and EXTI13 PC13 IRQ events with the documented B1 wiring.",
+    "PVD polling on the exact F103RB HSI8 fixture supplies a raw threshold code and comparator state. Electrical trip points and wake behavior require separate qualification."
   ]
 }

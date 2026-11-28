@@ -9,16 +9,16 @@ class ThreadXGateTest(unittest.TestCase):
     def gate(self):
         return importlib.import_module('os_threadx')
 
-    def test_f4_board_policy_links_and_one_distinct_missing_hook(self):
+    def test_m3_and_m4_policy_links_and_one_distinct_missing_hook(self):
         rows = self.gate().matrix()
-        self.assertEqual(len(rows), 5)
-        self.assertEqual(len({row['name'] for row in rows}), 5)
+        self.assertEqual(len(rows), 6)
+        self.assertEqual(len({row['name'] for row in rows}), 6)
         self.assertEqual(sum(row['rejection'] for row in rows), 1)
         self.assertEqual({(row['board'], row['mask']) for row in rows
                           if not row['rejection']},
                          {(board, mask) for board in
                           ('qiming', 'sky') for mask in
-                          ('basepri', 'primask')})
+                          ('basepri', 'primask')} | {('f103rb', 'basepri')})
 
     def test_negative_requires_exact_link_failure_and_no_elf(self):
         text = ('FAILED: bin/nexus_threadx_runtime.elf\n'
@@ -136,6 +136,15 @@ class ThreadXGateTest(unittest.TestCase):
             self.assertEqual(text.count('backend = "threadx"'), 1)
             self.assertIn('interrupt_mask = "primask"', text)
             self.assertIn('board = "stm32f407_qiming_v31"', text)
+
+    def test_authored_m3_inputs_preserve_board_package_and_port(self):
+        root = Path(__file__).resolve().parents[2]
+        row = next(row for row in self.gate().matrix() if row['board'] == 'f103rb')
+        self.assertEqual(row['port'], 'cortex_m3')
+        with tempfile.TemporaryDirectory() as temporary:
+            assembly = self.gate().write_inputs(root, Path(temporary), row)
+            self.assertIn('board_package = "f103rb-threadx-board"', assembly.read_text())
+            self.assertTrue((assembly.parent / 'f103rb-threadx-board/board.json').is_file())
 
     def test_source_snapshot_detects_new_configure_files(self):
         gate = self.gate()

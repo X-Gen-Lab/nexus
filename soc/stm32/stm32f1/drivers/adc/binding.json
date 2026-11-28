@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "bindings": [
+    {
+      "kind": "adc",
+      "mode": "single-shot",
+      "controllers": [
+        "ADC1"
+      ],
+      "implementation": "adc",
+      "headers": [
+        "drivers/adc/instance.h"
+      ],
+      "limits": {
+        "reference_mv": [
+          2400,
+          3600
+        ],
+        "resolution_bits": [
+          12,
+          12
+        ]
+      },
+      "static_recipe": {
+        "state_type": "nx_stm32f1_adc_t",
+        "ops": "nx_stm32f1_adc_ops",
+        "declarations": [],
+        "calls": {
+          "prepare": {
+            "function": "nx_stm32f1_adc_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "source": "selected.clock_hz",
+                "as": "u32"
+              },
+              {
+                "source": "item.options.reference_mv",
+                "as": "u32"
+              },
+              {
+                "source": "item.options.sample_times.0",
+                "as": "u32"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32f1_adc_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "retain_on_failed_init": true
+      }
+    }
+  ]
+}

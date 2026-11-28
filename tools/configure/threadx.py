@@ -5,6 +5,8 @@ from tools.configure.ir import ThreadXKernelProfileIR
 from tools.configure.providers.common import fail, integer
 
 
+PORTS = {"native": "linux/gnu", "cortex-m3": "cortex_m3/gnu",
+         "cortex-m4": "cortex_m4/gnu"}
 FIELDS = frozenset({"tick_source", "tick_hz", "max_priorities",
                     "interrupt_mask", "syscall_priority"})
 
@@ -13,14 +15,14 @@ def validate_platform(board, cpu):
     support = board.get("backend_support", ()) if isinstance(board, Mapping) else ()
     if not isinstance(support, (list, tuple)) or "threadx" not in support:
         fail("Unsupported maintained ThreadX platform")
-    port = {"native": "linux/gnu", "cortex-m4": "cortex_m4/gnu"}.get(cpu.arch)
+    port = PORTS.get(cpu.arch)
     if cpu.backend != "threadx" or port is None or cpu.irq.kernel_port != port:
         fail("Unsupported maintained ThreadX CPU port")
 
 
 def resolve(choices, cpu, clock_hz):
     """Bind immutable static-object policy to one actual reviewed GNU port."""
-    if cpu.backend != "threadx" or cpu.arch not in {"native", "cortex-m4"}:
+    if cpu.backend != "threadx" or cpu.arch not in PORTS:
         fail("Unsupported maintained ThreadX CPU port")
     if choices is None:
         choices = {}
@@ -37,6 +39,8 @@ def resolve(choices, cpu, clock_hz):
             fail("ThreadX Linux requires the reviewed monotonic host Tick")
     elif not isinstance(source, str) or source not in {"systick", "external"}:
         fail("Unsupported ThreadX tick source")
+    if cpu.arch == "cortex-m3" and source != "systick":
+        fail("ThreadX Cortex-M3 requires the reviewed SysTick source")
     tick_hz = choices.get("tick_hz", 1000)
     integer(tick_hz, 1, 1000000, "ThreadX Tick Hz")
     if native and 1000000000 % tick_hz:
@@ -47,6 +51,8 @@ def resolve(choices, cpu, clock_hz):
     if not isinstance(mask, str) or mask not in (
             {"none"} if native else {"basepri", "primask"}):
         fail("Unsupported ThreadX interrupt mask")
+    if cpu.arch == "cortex-m3" and mask != "basepri":
+        fail("ThreadX Cortex-M3 requires the reviewed BASEPRI policy")
     ceiling = choices.get("syscall_priority", 5 if mask == "basepri" else 0)
     integer(ceiling, 1 if mask == "basepri" else 0,
             cpu.irq.maximum_priority if mask == "basepri" else 0,
@@ -75,7 +81,7 @@ def resolve(choices, cpu, clock_hz):
         "tick_hz": tick_hz, "tick_reload": reload,
         "max_priorities": priorities, "syscall_priority": ceiling,
         "interrupt_mask": mask, "kernel_policy": mask,
-        "kernel_port": "linux/gnu" if native else "cortex_m4/gnu",
+        "kernel_port": PORTS[cpu.arch],
         "timer_process_in_isr": True, "min_stack_bytes": 200,
         "stack_alignment_bytes": 8, "definitions": definitions,
     })

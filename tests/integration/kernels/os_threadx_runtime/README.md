@@ -19,8 +19,9 @@ timer source，仅模拟 libc clock／wait、scheduler／timer IRQ 边界；独�
 tool、object／ELF。失败编译不是行为 RED；前实现快照说明修正 fixture 才得到真实
 RED 的阶段。dirty 开发不资格化 clean candidate，M4 Board link 和实板工位另记。
 
-CMake 链接实际选定平台、固定 kernel、真实 vector／startup、task／queue／notify／
-close／join。启明、天空星两块维护 M4F Board 分别构建 BASEPRI／PRIMASK。缺 `external_tick.c`
+CMake 链接实际平台、锁定内核、真实向量及 OS 服务。启明和天空星 M4F
+分别构建 BASEPRI 与 PRIMASK。F103RB HSI8 软件参考构建 BASEPRI／SysTick，
+并核对 PendSV、SysTick、TIM2、USART2 及 PSP 恢复对齐。缺 `external_tick.c`
 的负链接必须因 strong provider symbol 失败；加入它仅得到返回 UNSUPPORTED 的
 provider，不虚构周期时钟。固件只链接／测预算，不刷写。retention-only main 不是
 产品启动／错误处理示范，产品须检查每次初始化并提供安全失败和清理策略。

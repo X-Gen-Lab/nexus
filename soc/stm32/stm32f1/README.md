@@ -44,6 +44,11 @@ Flash-size 签名只用于容量检查。ES096 §2.2.2 的 DBGMCU 寄存器限�
 | F103RB 独立 [Flash 装配](../../../tests/integration/assemblies/stm32f1_flash/README.md) | 1 KiB 页，2 B 编程，显式板级编程电压，有界轮询及失败后的排空与重锁 |
 | F103RB 独立 [IWDG 装配](../../../tests/integration/assemblies/stm32f1_watchdog/README.md) | 先确认 LSI 与寄存器同步。发出启动密钥后保留喂狗与关闭责任，直到复位 |
 | F103RB [组合总线](../../../tests/integration/assemblies/stm32f1_buses/README.md) | HSI8，SPI2 短轮询、8／16 位事务，I²C1 七位 80 kHz 轮询和 repeated START |
+| F103RB [ADC1](../../../tests/integration/assemblies/stm32f1_adc/README.md) | PA0、4 MHz ADC 时钟，校准后的规则单次 12 位采样 |
+| F103RB [TIM3](../../../tests/integration/assemblies/stm32f1_pwm/README.md) | PA6、CH1、8 MHz 定时器，边沿对齐 PWM 和明确的停止电平 |
+| F103RB [按键 EXTI](../../../tests/integration/assemblies/stm32f1_exti/README.md) | B1 PC13 的独立软件装配，原始电平与边沿事件 |
+| F103RB [PVD](../../../tests/integration/assemblies/stm32f1_pvd/README.md) | 选定阈值编码和轮询电平，启动与关闭管理 PWR 门控 |
+| F103RB [ThreadX 软件参考](../../../tests/integration/kernels/os_threadx_runtime/README.md) | Cortex-M3 soft-float，HSI8，1 kHz SysTick 和 BASEPRI |
 
 x6／xB 的 IRQ 槽数为 43，xE／xG 为 60。链接验证单独校验官方向量保留项与 BootRAM 尾部。
 具体模式以装配和能力矩阵为准。
