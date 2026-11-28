@@ -103,3 +103,33 @@ class CanExternalAssembly(unittest.TestCase):
                 encoding="utf-8")
             with self.assertRaisesRegex(gate.ConfigurationError, "Unknown Board binding"):
                 gate.resolve_ir(assembly)
+
+
+class CanConnectivityAssembly(unittest.TestCase):
+    def test_connectivity_keeps_unique_irqs_and_refuses_external_mode(self):
+        fixture = gate.ROOT / "tests/integration/assemblies/stm32f1_can_connectivity"
+        for name in ("f105vc", "f107vc"):
+            with self.subTest(part=name):
+                assembly = fixture / (name + ".toml")
+                result = gate.resolve_ir(assembly).to_dict()
+                self.assertEqual(result["can_controllers"], ["CAN1", "CAN2"])
+                self.assertEqual(result["can_domain"]["split"], 14)
+                filters = result["can_domain"]["filters"]
+                self.assertEqual([(row["bank"], row["fifo"]) for row in filters],
+                                 [(0, 0), (14, 1)])
+                claims = {item["key"] for item in result["resource_plan"]["claims"]}
+                self.assertIn("can:filter-domain", claims)
+                self.assertNotIn("memory:usb-can-pma", claims)
+                self.assertNotIn("pin:PA11", claims)
+
+        with tempfile.TemporaryDirectory() as directory:
+            work = Path(directory)
+            shutil.copytree(fixture / "f105vc-board", work / "f105vc-board")
+            assembly = work / "f105vc.toml"
+            assembly.write_text(
+                (fixture / "f105vc.toml").read_text(encoding="utf-8").replace(
+                    'operation="silent-loopback"', 'operation="normal"'),
+                encoding="utf-8")
+            with self.assertRaisesRegex(gate.ConfigurationError,
+                                        "outside the reviewed provider modes"):
+                gate.resolve_ir(assembly)

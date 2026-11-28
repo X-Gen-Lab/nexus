@@ -64,21 +64,21 @@ def validate_selection(selection, route, provider):
     if bits not in RESOLUTION_BITS or bits not in supported:
         fail("ADC resolution_bits lacks a maintained provider mode")
     selection["resolution_bits"] = bits
+    shape = mode_traits("adc", selection["mode"])
     triggers = getattr(provider, "ADC_TRIGGERS", None)
-    if mode_traits("adc", selection["mode"]).dma and triggers is not None:
+    if shape.block_stream and shape.dma and triggers is not None:
         trigger = selection.get("trigger", "tim3-trgo")
         if type(trigger) is not str or trigger not in triggers:
             fail("ADC trigger lacks a reviewed independently owned timer event")
         selection["trigger"] = trigger
     elif "trigger" in selection:
         fail("ADC trigger requires a maintained timer-DMA mode")
-    if (selection["mode"] in {"single-shot", "low-rate-scan"} and
-            (selection["mode"] == "single-shot") != (len(channels) == 1)):
+    if (selection["mode"] in {"single-shot", "single-trigger-dma", "low-rate-scan"} and
+            (selection["mode"] != "low-rate-scan") != (len(channels) == 1)):
         fail("ADC mode contradicts its reviewed channel count")
-    if (mode_traits("adc", selection["mode"]).dma and
-            "irq_priority" not in selection):
+    if shape.irq and "irq_priority" not in selection:
         fail("ADC trigger-dma requires an explicit IRQ priority")
-    if (not mode_traits("adc", selection["mode"]).dma and
+    if (not shape.irq and
             ({"irq_priority", "calls_os"} & selection.keys())):
         fail("Polling ADC has no IRQ options")
 

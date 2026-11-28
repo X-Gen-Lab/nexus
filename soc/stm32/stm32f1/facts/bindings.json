@@ -46,6 +46,27 @@
       "option": "maintenance",
       "equals": true,
       "message": "Option-byte maintenance has no implementation in the selected STM32F103 Flash mode"
+    },
+    {
+      "device": "stm32f103-md",
+      "kind": "advanced_pwm",
+      "option": "break_active_high",
+      "equals": true,
+      "message": "TIM1 reference requires active-low BKIN and both idle outputs low"
+    },
+    {
+      "device": "stm32f103-md",
+      "kind": "advanced_pwm",
+      "option": "idle_high",
+      "equals": true,
+      "message": "TIM1 reference requires active-low BKIN and both idle outputs low"
+    },
+    {
+      "device": "stm32f103-md",
+      "kind": "advanced_pwm",
+      "option": "idle_complement_high",
+      "equals": true,
+      "message": "TIM1 reference requires active-low BKIN and both idle outputs low"
     }
   ],
   "domains": {
@@ -68,6 +89,10 @@
         "DMA1:channel5": {
           "channel": "DMA1_Channel5",
           "irq": "DMA1_Channel5_IRQn"
+        },
+        "DMA1:channel1": {
+          "channel": "DMA1_Channel1",
+          "irq": "DMA1_Channel1_IRQn"
         }
       },
       "transfers": {
@@ -90,6 +115,9 @@
         "I2C2": {
           "tx": "DMA1:channel4",
           "rx": "DMA1:channel5"
+        },
+        "ADC1": {
+          "rx": "DMA1:channel1"
         }
       }
     },
@@ -103,7 +131,7 @@
         "uart",
         "dac"
       ],
-      "classic_can_mailboxes": 1,
+      "classic_can_mailboxes": 3,
       "flash_program_unit": 2,
       "flash_input_alignment": 1,
       "offset_image_alignment": 512,
@@ -145,6 +173,33 @@
     "dac_triggers": {
       "none": {
         "kind": "none"
+      }
+    },
+    "can": {
+      "model": "bxcan",
+      "fifo_order_supported": true,
+      "operations": [
+        "silent-loopback"
+      ],
+      "transport": {
+        "CAN1": {
+          "clock_domain": "apb1",
+          "irq_sources": {
+            "tx": "CAN1_TX_IRQn",
+            "rx0": "CAN1_RX0_IRQn",
+            "rx1": "CAN1_RX1_IRQn",
+            "error": "CAN1_SCE_IRQn"
+          }
+        },
+        "CAN2": {
+          "clock_domain": "apb1",
+          "irq_sources": {
+            "tx": "CAN2_TX_IRQn",
+            "rx0": "CAN2_RX0_IRQn",
+            "rx1": "CAN2_RX1_IRQn",
+            "error": "CAN2_SCE_IRQn"
+          }
+        }
       }
     }
   },

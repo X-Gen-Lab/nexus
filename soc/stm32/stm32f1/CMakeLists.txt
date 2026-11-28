@@ -31,6 +31,12 @@ endif()
 if(NOT NEXUS_VENDOR_DEVICE_DEFINE STREQUAL "STM32F103xB")
     foreach(selection IN LISTS NEXUS_SELECTED_CONTROLLERS)
         if(
+            NEXUS_VENDOR_DEVICE_DEFINE MATCHES "^STM32F10[57]xC$"
+            AND selection MATCHES "^can/CAN[12]/classic-irq$"
+        )
+            continue()
+        endif()
+        if(
             NEXUS_VENDOR_DEVICE_DEFINE MATCHES "^STM32F103x[EG]$"
             AND selection STREQUAL "flash/FLASH/poll-halfword"
         )
@@ -93,6 +99,7 @@ nexus_controller_modes(f1_spi spi)
 nexus_controller_modes(f1_adc adc)
 nexus_controller_modes(f1_exti exti)
 nexus_controller_modes(f1_pwm pwm)
+nexus_controller_modes(f1_advanced_pwm advanced_pwm)
 nexus_controller_modes(f1_dac dac)
 nexus_controller_modes(f1_can can)
 nexus_controller_modes(f1_fsmc external_bus)
@@ -104,6 +111,7 @@ if(
     OR f1_adc
     OR f1_exti
     OR f1_pwm
+    OR f1_advanced_pwm
     OR f1_dac
     OR f1_fsmc
     OR "classic-poll-normal" IN_LIST f1_can
@@ -132,6 +140,7 @@ add_subdirectory(drivers/spi)
 add_subdirectory(drivers/adc)
 add_subdirectory(drivers/exti)
 add_subdirectory(drivers/pwm)
+add_subdirectory(drivers/advanced_pwm)
 add_subdirectory(drivers/pvd)
 add_subdirectory(drivers/can)
 
@@ -150,6 +159,14 @@ target_compile_definitions(
     nexus_stm32f1_startup_usage
     INTERFACE ${NEXUS_VENDOR_DEVICE_DEFINE}
 )
+if("classic-irq" IN_LIST f1_can)
+    target_include_directories(
+        nexus_stm32f1_startup_usage
+        INTERFACE
+            "${NEXUS_SOURCE_DIR}/soc/stm32/common/bxcan"
+            "${NEXUS_SOURCE_DIR}/io/private"
+    )
+endif()
 nexus_use_cmsis_core(nexus_stm32f1_startup_usage)
 set_property(
     TARGET nexus_soc_stm32f1

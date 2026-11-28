@@ -56,6 +56,8 @@ def validate_selection(selection, provider, ram_size, *, clock_hz=None):
     policy = provider.CAN_INTEGRATION
     if not isinstance(policy, BxCanPolicy):
         fail("CAN requires an explicit reviewed IP policy")
+    if selection["operation"] not in policy.operations:
+        fail("CAN operation is outside the reviewed provider modes")
     if selection["fifo_order"] and not policy.fifo_order_supported:
         fail("CAN fifo_order is unsupported by this exact provider")
     policy.validate_timing(selection["timing"], selection["bitrate"], clock_hz)

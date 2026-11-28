@@ -6,8 +6,9 @@ nexus_google_test(
     SOURCES
         "${CMAKE_CURRENT_LIST_DIR}/adc_test.cpp"
         "${f1_package}/drivers/adc/adc.c"
+        "${f1_package}/drivers/adc/trigger_dma.c"
         "${f1_package}/drivers/gpio/gpio.c"
-    LIBRARIES Nexus::IOADC Nexus::IOGPIO
+    LIBRARIES Nexus::IOADC Nexus::IOGPIO Nexus::IODMA
     INCLUDES
         "${f1_package}"
         "${NEXUS_SOURCE_DIR}/io/private"

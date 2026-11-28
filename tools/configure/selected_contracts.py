@@ -191,7 +191,8 @@ def _format(item, provider, shape):
         mailboxes = getattr(provider, "CLASSIC_CAN_MAILBOXES", None)
         if type(mailboxes) is not int or mailboxes <= 0:
             fail("CAN traits require a reviewed physical mailbox topology")
-        fields = dict(classic_payload_bytes=8, hardware_tx_mailboxes=mailboxes)
+        exposed = 1 if item.mode in CAN_FIXED_POLL_MODES else mailboxes
+        fields = dict(classic_payload_bytes=8, hardware_tx_mailboxes=exposed)
         abort = "request"
         source = ("service_observation" if item.mode in CAN_FIXED_POLL_MODES
                   else "irq_observation")
@@ -303,7 +304,7 @@ def describe(item, endpoint=None, *, public_class=None):
     elif kind in {"adc", "pwm_adc"}:
         count = len(item.options.channels)
         bound = ("UINT16_MAX" if kind == "pwm_adc" else
-                 f"UINT16_MAX - UINT16_MAX % {count}U" if shape.dma else count)
+                 f"UINT16_MAX - UINT16_MAX % {count}U" if shape.block_stream else count)
         limits.update(unit="samples", unit_bytes=2, buffer_alignment=2,
                       max_transfer_units=bound)
     elif kind == "adc_group":

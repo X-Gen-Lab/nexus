@@ -233,7 +233,7 @@ class HeaderProjection:
                 fail("Duplicate selected timer pin owner")
             owners.add(identity)
             binding = provider.TIMER_ADVANCED.binding(item.kind, item.controller)
-            route = binding.route(tuple((pin["pin"], pin["function"], pin["af"])
+            route = binding.route(tuple((pin["pin"], pin["function"], pin.get("af"))
                                   for pin in item.pins)) if binding is not None else None
             if route is None or item.integration is None:
                 fail("Selected timer route differs from its reviewed pin facts")

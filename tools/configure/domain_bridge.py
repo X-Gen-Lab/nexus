@@ -56,6 +56,10 @@ class DomainBridge:
         clock = self._clock()
         if clock is None:
             common.fail("Selected package declares no timer clock domain")
+        if isinstance(clock, clocks.FixedProfilePolicy):
+            domain = self.soc["controllers"].get(controller, {}).get("clock_domain")
+            if domain in {"apb1_timer", "apb2_timer"}:
+                return domain
         return clock.timer_domain(controller)
 
     def controller_clock_domain(self, plan, controller):

@@ -7,12 +7,17 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "drivers/adc/instance.h"
+#include "drivers/adc/trigger_dma.h"
 #include "nexus/arch/arch.h"
 #include <gtest/gtest.h>
 
 ADC_TypeDef f103_adc_model_adc{};
 GPIO_TypeDef f103_adc_model_gpio{};
 RCC_TypeDef f103_adc_model_rcc{};
+TIM_TypeDef f103_adc_model_tim{};
+TIM_TypeDef f103_adc_model_tim1{};
+DMA_TypeDef f103_adc_model_dma{};
+DMA_Channel_TypeDef f103_adc_model_lane{};
 
 static struct {
     nx_time_us_t now;
@@ -32,6 +37,16 @@ static struct {
     bool hold_conversion;
     bool hold_power_down;
     bool hold_eoc;
+    bool hold_dma_disable;
+    bool transfer_error;
+    bool finish_while_starting;
+    unsigned triggers;
+    nx_time_us_t transfer_at;
+    volatile uint16_t* stage;
+    TIM_TypeDef* trigger_timer;
+    bool skip_compare_flag;
+    bool adc_completes_first;
+    nx_time_us_t timer_done_at;
 } bus;
 
 extern "C" uint32_t f103_adc_model_read(const volatile uint32_t* reg) {
@@ -100,6 +115,54 @@ extern "C" void f103_adc_model_write(volatile uint32_t* reg, uint32_t value) {
         ADC1->SQR1 = 0U;
         ADC1->SQR2 = 0U;
         ADC1->SQR3 = 0U;
+    } else if (reg == &DMA1->IFCR) {
+        EXPECT_EQ(0U, value & DMA_IFCR_CGIF1);
+        DMA1->ISR &= ~value;
+        return;
+    } else if (reg == &DMA1_Channel1->CCR && (*reg & DMA_CCR_EN) != 0U &&
+               (value & DMA_CCR_EN) == 0U && bus.hold_dma_disable) {
+        return;
+    } else if ((reg == &TIM3->CR1 || reg == &TIM1->CR1) &&
+               (value & TIM_CR1_CEN) != 0U) {
+        TIM_TypeDef* timer = reg == &TIM1->CR1 ? TIM1 : TIM3;
+        const bool tim1 = timer == TIM1;
+        bus.trigger_timer = timer;
+        EXPECT_EQ(TIM_CR1_OPM, value & TIM_CR1_OPM);
+        EXPECT_EQ(tim1 ? 0U : TIM_CR2_MMS_1, timer->CR2 & TIM_CR2_MMS);
+        EXPECT_EQ(0U, timer->DIER);
+        if (tim1) {
+            EXPECT_EQ(2U, timer->CCR1);
+            EXPECT_EQ(0U, timer->CCER);
+            EXPECT_EQ(0U, timer->BDTR);
+        }
+        EXPECT_NE(0U, DMA1_Channel1->CCR & DMA_CCR_EN);
+        EXPECT_EQ(1U, DMA1_Channel1->CNDTR);
+        EXPECT_EQ(static_cast<uint32_t>(reinterpret_cast<uintptr_t>(bus.stage)),
+                  DMA1_Channel1->CMAR);
+        EXPECT_EQ(static_cast<uint32_t>(reinterpret_cast<uintptr_t>(&ADC1->DR)),
+                  DMA1_Channel1->CPAR);
+        EXPECT_EQ(static_cast<uint32_t>(ADC_CR2_ADON | ADC_CR2_DMA |
+                                        ADC_CR2_EXTTRIG |
+                                        (tim1 ? 0U : ADC_CR2_EXTSEL_2)),
+                  ADC1->CR2);
+        ++bus.triggers;
+        bus.transfer_at = bus.now + 12U;
+        if (bus.finish_while_starting) {
+            timer->CR1 = value & ~static_cast<uint32_t>(TIM_CR1_CEN);
+            timer->SR = TIM_SR_UIF |
+                        (tim1 && !bus.skip_compare_flag ? TIM_SR_CC1IF : 0U);
+            DMA1_Channel1->CNDTR = 0U;
+            DMA1->ISR |= DMA_ISR_TCIF1;
+            *bus.stage = static_cast<uint16_t>(0x800U + bus.triggers);
+            bus.transfer_at = 0U;
+            return;
+        }
+    } else if (reg == &RCC->APB1RSTR && (value & RCC_APB1RSTR_TIM3RST) != 0U) {
+        *TIM3 = {};
+        TIM3->ARR = UINT16_MAX;
+    } else if (reg == &RCC->APB2RSTR && (value & RCC_APB2RSTR_TIM1RST) != 0U) {
+        *TIM1 = {};
+        TIM1->ARR = UINT16_MAX;
     } else if (reg == &GPIOA->BSRR) {
         GPIOA->ODR = (GPIOA->ODR | (value & UINT16_MAX)) & ~(value >> 16U);
     }
@@ -125,6 +188,27 @@ extern "C" nx_time_us_t nx_time_now_us(void) {
         ADC1->SR |= ADC_SR_EOC;
         ADC1->DR = 0x8a0U + bus.starts;
         bus.conversion_until = 0U;
+    }
+    if (!bus.hold_conversion && bus.transfer_at != 0U &&
+        bus.now >= bus.transfer_at &&
+        (bus.trigger_timer->CR1 & TIM_CR1_CEN) != 0U) {
+        bus.timer_done_at = bus.now + (bus.adc_completes_first ? 2U : 0U);
+        bus.transfer_at = 0U;
+        if (bus.transfer_error) {
+            DMA1->ISR |= DMA_ISR_TEIF1;
+        } else {
+            *bus.stage = static_cast<uint16_t>(0x800U + bus.triggers);
+            DMA1_Channel1->CNDTR = 0U;
+            DMA1->ISR |= DMA_ISR_TCIF1;
+        }
+    }
+    if (bus.timer_done_at != 0U && bus.now >= bus.timer_done_at) {
+        auto* timer = bus.trigger_timer;
+        timer->CR1 &= ~static_cast<uint32_t>(TIM_CR1_CEN);
+        timer->SR =
+            TIM_SR_UIF |
+            (timer == TIM1 && !bus.skip_compare_flag ? TIM_SR_CC1IF : 0U);
+        bus.timer_done_at = 0U;
     }
     return bus.now;
 }
@@ -291,4 +375,161 @@ TEST_F(F103Adc, AfterCompletedSampleStopFailurePreservesItsCount) {
               nx_adc_port_sample(&port, &output, 1U, bus.now + 100U, &count));
     bus.hold_power_down = false;
     EXPECT_EQ(NX_SUCCESS, nx_stm32f1_adc_close(&state));
+}
+
+class F103AdcTrigger : public F103Adc {
+  protected:
+    nx_stm32f1_adc_trigger_dma_t triggered{};
+    nx_adc_port_t face{&nx_stm32f1_adc_trigger_dma_ops, &triggered};
+    nx_dma_memory_region_t memory{};
+    void SetUp() override {
+        F103Adc::SetUp();
+        RCC->AHBENR = 0U;
+        RCC->APB1ENR = 0U;
+        RCC->APB1RSTR = 0U;
+        *TIM3 = {};
+        TIM3->ARR = UINT16_MAX;
+        *TIM1 = {};
+        TIM1->ARR = UINT16_MAX;
+        *DMA1 = {};
+        *DMA1_Channel1 = {};
+        memory = {reinterpret_cast<uintptr_t>(&triggered.sample), 2U,
+                  NX_DMA_MEMORY_WRITE};
+        bus.stage = &triggered.sample;
+    }
+
+    nx_result_t prepare_trigger(bool tim1 = false) {
+        return nx_stm32f1_adc_trigger_dma_prepare(&triggered, 8000000U, 3300U,
+                                                  5U, &memory, 1U, tim1);
+    }
+
+    void TearDown() override {
+        bus.hold_dma_disable = false;
+        EXPECT_EQ(NX_SUCCESS, nx_stm32f1_adc_trigger_dma_close(&triggered));
+    }
+};
+
+TEST_F(F103AdcTrigger, CalibratesOnceAndStartsDmaBeforeTheOnePulseTrigger) {
+    ASSERT_EQ(NX_SUCCESS, prepare_trigger());
+    uint16_t sample = 0U;
+    size_t count = 0U;
+    for (unsigned shot = 1U; shot <= 2U; ++shot) {
+        bus.finish_while_starting = shot == 2U;
+        ASSERT_EQ(NX_SUCCESS, nx_adc_port_sample(&face, &sample, 1U,
+                                                 bus.now + 100U, &count));
+        EXPECT_EQ(1U, count);
+        EXPECT_EQ(0x800U + shot, sample);
+        EXPECT_EQ(0U, DMA1_Channel1->CCR);
+        EXPECT_EQ(0U, DMA1_Channel1->CMAR);
+    }
+    EXPECT_EQ(2U, bus.triggers);
+    EXPECT_EQ(1U, bus.calibrations);
+    EXPECT_EQ(0U, bus.starts);
+    EXPECT_EQ(0U, bus.samples_read);
+}
+
+TEST_F(F103AdcTrigger, TransferErrorDoesNotPublishAStagedValue) {
+    ASSERT_EQ(NX_SUCCESS, prepare_trigger());
+    bus.transfer_error = true;
+    uint16_t sample = 77U;
+    size_t count = 2U;
+    EXPECT_EQ(NX_ERROR_IO,
+              nx_adc_port_sample(&face, &sample, 1U, bus.now + 100U, &count));
+    EXPECT_EQ(77U, sample);
+    EXPECT_EQ(0U, count);
+    EXPECT_EQ(0U, ADC1->CR2);
+    EXPECT_EQ(0U, DMA1_Channel1->CCR & DMA_CCR_EN);
+}
+
+TEST_F(F103AdcTrigger, TimeoutHoldsOneStaticDestinationUntilLaneStops) {
+    ASSERT_EQ(NX_SUCCESS, prepare_trigger());
+    bus.hold_conversion = true;
+    bus.hold_dma_disable = true;
+    uint16_t sample = 91U;
+    size_t count = 2U;
+    EXPECT_EQ(NX_ERROR_IO,
+              nx_adc_port_sample(&face, &sample, 1U, bus.now + 20U, &count));
+    EXPECT_EQ(91U, sample);
+    EXPECT_EQ(0U, count);
+    EXPECT_NE(0U, DMA1_Channel1->CMAR);
+    EXPECT_EQ(0U, ADC1->CR2);
+    EXPECT_EQ(NX_ERROR_IO, nx_stm32f1_adc_trigger_dma_close(&triggered));
+    EXPECT_NE(0U, RCC->AHBENR & RCC_AHBENR_DMA1EN);
+    bus.hold_dma_disable = false;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32f1_adc_trigger_dma_close(&triggered));
+    EXPECT_EQ(0U, DMA1_Channel1->CMAR);
+    EXPECT_EQ(0U, RCC->AHBENR & RCC_AHBENR_DMA1EN);
+}
+
+TEST_F(F103AdcTrigger, RejectsForeignTimerAndPreservesAValidSharedDmaGate) {
+    RCC->APB1ENR = RCC_APB1ENR_TIM3EN;
+    EXPECT_EQ(NX_ERROR_BUSY, prepare_trigger());
+    EXPECT_EQ(0U, bus.writes);
+    RCC->APB1ENR = 0U;
+    RCC->AHBENR = RCC_AHBENR_DMA1EN;
+    ASSERT_EQ(NX_SUCCESS, prepare_trigger());
+    EXPECT_EQ(NX_SUCCESS, nx_stm32f1_adc_trigger_dma_close(&triggered));
+    EXPECT_EQ(RCC_AHBENR_DMA1EN, RCC->AHBENR);
+}
+
+TEST_F(F103AdcTrigger, RequiresTheWholeStaticSampleInDmaVisibleSram) {
+    memory.size = 1U;
+    EXPECT_EQ(NX_ERROR_PERMISSION, prepare_trigger());
+    EXPECT_EQ(0U, bus.writes);
+}
+
+TEST_F(F103AdcTrigger, Tim1CompareTriggersOneRegularResultWithoutOutputs) {
+    ASSERT_EQ(NX_SUCCESS, prepare_trigger(true));
+    uint16_t output = 0x1234U;
+    size_t count = 0U;
+    EXPECT_NE(0U, RCC->APB2ENR & RCC_APB2ENR_TIM1EN);
+    EXPECT_EQ(0U, RCC->APB1ENR & RCC_APB1ENR_TIM3EN);
+    EXPECT_EQ(2U, TIM1->CCR1);
+    ASSERT_EQ(NX_SUCCESS,
+              nx_adc_port_sample(&face, &output, 1U, bus.now + 100U, &count));
+    EXPECT_EQ(1U, count);
+    EXPECT_EQ(0x801U, output);
+    EXPECT_EQ(0U, TIM1->BDTR);
+    EXPECT_EQ(0U, TIM1->CCER);
+    EXPECT_NE(0U, TIM1->SR & TIM_SR_CC1IF);
+    EXPECT_EQ(0U, bus.starts);
+    EXPECT_EQ(NX_SUCCESS, nx_stm32f1_adc_trigger_dma_close(&triggered));
+    EXPECT_EQ(0U, RCC->APB2ENR & RCC_APB2ENR_TIM1EN);
+}
+
+TEST_F(F103AdcTrigger, Tim1RejectsAForeignOutputOrUnprovenCompare) {
+    RCC->APB2ENR = RCC_APB2ENR_TIM1EN;
+    EXPECT_EQ(NX_ERROR_BUSY, prepare_trigger(true));
+    EXPECT_EQ(0U, bus.writes);
+    RCC->APB2ENR = 0U;
+    ASSERT_EQ(NX_SUCCESS, prepare_trigger(true));
+    TIM1->CCER = TIM_CCER_CC1E;
+    uint16_t output = 42U;
+    size_t count = 1U;
+    EXPECT_EQ(NX_ERROR_IO,
+              nx_adc_port_sample(&face, &output, 1U, bus.now + 100U, &count));
+    EXPECT_EQ(0U, bus.triggers);
+    TIM1->CCER = 0U;
+    bus.skip_compare_flag = true;
+    EXPECT_EQ(NX_ERROR_IO,
+              nx_adc_port_sample(&face, &output, 1U, bus.now + 100U, &count));
+    EXPECT_EQ(1U, bus.triggers);
+    EXPECT_EQ(0U, count);
+    EXPECT_EQ(42U, output);
+    EXPECT_EQ(0U, DMA1_Channel1->CMAR);
+    EXPECT_EQ(0U, ADC1->CR2);
+}
+
+TEST_F(F103AdcTrigger, Tim1FastDmaResultStillWaitsForTimerUpdate) {
+    ASSERT_EQ(NX_SUCCESS, prepare_trigger(true));
+    bus.adc_completes_first = true;
+    uint16_t output = 0U;
+    size_t count = 0U;
+    ASSERT_EQ(NX_SUCCESS,
+              nx_adc_port_sample(&face, &output, 1U, bus.now + 100U, &count));
+    EXPECT_EQ(1U, count);
+    EXPECT_EQ(0x801U, output);
+    EXPECT_EQ(0U, bus.timer_done_at);
+    EXPECT_NE(0U, TIM1->SR & TIM_SR_UIF);
+    EXPECT_EQ(0U, TIM1->CR1 & TIM_CR1_CEN);
 }

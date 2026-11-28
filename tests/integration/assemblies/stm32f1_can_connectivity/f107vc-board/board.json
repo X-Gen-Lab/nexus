@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "id": "stm32f107vc-dual-can-software",
+  "soc": "STM32F107VCT6",
+  "soc_family": "stm32f1",
+  "source_revision": "RM0008 Rev21 bxCAN Connectivity line software reference, HSI8",
+  "physical_pcb_revision": null,
+  "clocks": {},
+  "bindings": [
+    {
+      "id": "can1",
+      "controller": "CAN1",
+      "route": "can1-connectivity-silent"
+    },
+    {
+      "id": "can2",
+      "controller": "CAN2",
+      "route": "can2-connectivity-silent"
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14",
+    "PA15",
+    "PB3",
+    "PB4",
+    "PC14",
+    "PC15"
+  ],
+  "unknowns": [
+    "Internal silent loopback only. No MCU pad, transceiver, bus clock tolerance or physical qualification established."
+  ],
+  "provenance": [
+    "https://www.st.com/resource/en/datasheet/stm32f107vc.pdf",
+    {
+      "scope": "Dual CAN primary shared bank storage, silent loopback and filter ownership.",
+      "url": "https://www.st.com/resource/en/reference_manual/rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32-bit-mcus-stmicroelectronics.pdf",
+      "file": "rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32-bit-mcus-stmicroelectronics.pdf",
+      "sha256": "4c1b8ac2729cc1f45a4685eea9e91e6139e24e58804fba21e27201dfcc2ad149",
+      "pages": [
+        654,
+        655,
+        656,
+        659,
+        670,
+        671,
+        691
+      ]
+    }
+  ],
+  "backend_support": [
+    "baremetal"
+  ]
+}

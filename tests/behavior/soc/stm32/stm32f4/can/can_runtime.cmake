@@ -2,7 +2,7 @@
 nexus_google_test(nexus_can_controller_test SOURCES "${nexus_google_root}/soc/stm32/stm32f4/can/can_controller_test.cpp"
     LIBRARIES Nexus::NativeModel Nexus::Arch
     INCLUDES
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/classic_can" "${NEXUS_SOURCE_DIR}/tests/support/native/drivers"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/common/bxcan" "${NEXUS_SOURCE_DIR}/tests/support/native/drivers"
         "${NEXUS_SOURCE_DIR}/io/private"
 )
 foreach(can_family stm32)
@@ -10,7 +10,7 @@ foreach(can_family stm32)
     nexus_google_test(${can_target} SOURCES "${nexus_google_root}/soc/stm32/stm32f4/can/can_soc_test.cpp"
         LIBRARIES Nexus::NativeModel Nexus::Arch
         INCLUDES
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/classic_can" "${NEXUS_SOURCE_DIR}/tests/support/native/drivers"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/common/bxcan" "${NEXUS_SOURCE_DIR}/tests/support/native/drivers"
             "${NEXUS_SOURCE_DIR}/io/private"
     )
     target_compile_options(

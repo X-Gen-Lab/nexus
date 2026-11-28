@@ -25,6 +25,10 @@ class PackageSupportCatalogueTests(unittest.TestCase):
             target = owner / path.relative_to(package.source_directory)
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(path, target)
+        for scope in package.export_roots:
+            if not scope.is_relative_to(package.source_directory):
+                relative = scope.relative_to(package.source_directory.parent)
+                shutil.copytree(scope, owner.parent / relative, dirs_exist_ok=True)
         copied = owner / "package.json"
         if rename:
             value = json.loads(copied.read_text())

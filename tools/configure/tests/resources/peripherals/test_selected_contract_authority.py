@@ -6,6 +6,7 @@ Platform GoogleTests, linked resource measurements or physical qualification.
 from tools.configure.tests.native_fixture import native_fixture
 from dataclasses import FrozenInstanceError, replace
 import importlib
+import json
 from pathlib import Path
 import tempfile
 import unittest
@@ -70,11 +71,33 @@ class SelectedContractAuthorityTests(unittest.TestCase):
         self.assertEqual(f1_controls, {
             ("STM32F103RBT6", "TIM3", "fixed-pwm"): ("tim3-pa6-ch1",),
             ("STM32F103RBT6", "ADC1", "single-shot"): ("adc1-pa0-in0",),
+            ("STM32F103RBT6", "ADC1", "single-trigger-dma"): (
+                "adc1-pa0-in0", "adc1-pa0-tim1-cc1"),
             ("STM32F103RBT6", "EXTI13", "edge-event"): ("exti13-pc13",),
             ("STM32F103RBT6", "PVD", "pvd-level"): ("pvd-level",),
         })
         self.assertTrue(all(not row.physical_qualified for row in rows))
         self.assertTrue(all(row.review_sources for row in rows))
+
+
+    def test_f103_tim1_adc_trigger_and_complementary_pwm_conflict(self):
+        fixtures = configure.ROOT / "tests/integration/assemblies"
+        adc = fixtures / "stm32f1_adc"
+        pwm = fixtures / "stm32f1_advanced_pwm"
+        board = configure.load(adc / "board/board.json")
+        board["bindings"].extend(configure.load(pwm / "board/board.json")["bindings"])
+        header = "[advanced_pwm.pair]"
+        pwm_section = header + (pwm / "f103rb-tim1.toml").read_text().split(header, 1)[1]
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            (root / "board").mkdir()
+            (root / "board/board.json").write_text(json.dumps(board))
+            assembly = root / "f103rb-adc-pwm.toml"
+            assembly.write_text((adc / "f103rb-trigger-dma.toml").read_text() + "\n" + pwm_section)
+            configure.resolve_ir(assembly)
+            assembly.write_text((adc / "f103rb-tim1-trigger-dma.toml").read_text() + "\n" + pwm_section)
+            with self.assertRaisesRegex(ValueError, r"Resource conflict controller:TIM1"):
+                configure.resolve_ir(assembly)
 
 
     def test_unrouted_f407ve_ethernet_is_not_inherited_from_the_zg_route(self):

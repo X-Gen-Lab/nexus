@@ -262,7 +262,8 @@
         },
         "ADC1": {
           "modes": [
-            "single-shot"
+            "single-shot",
+            "single-trigger-dma"
           ]
         },
         "EXTI13": {
@@ -373,6 +374,94 @@
           }
         }
       }
+    },
+    "f103-md-tim1": {
+      "controllers": {
+        "TIM1": {
+          "kind": "advanced_pwm",
+          "irq": [
+            "TIM1_BRK_IRQn"
+          ],
+          "irq_numbers": [
+            24
+          ],
+          "pins": [
+            "PA8",
+            "PB13",
+            "PB12"
+          ],
+          "clock_domain": "apb2_timer",
+          "clock_hz": 8000000,
+          "resources": [
+            "clock:TIM1"
+          ]
+        }
+      },
+      "modes": {
+        "TIM1": {
+          "modes": [
+            "complementary-pwm"
+          ]
+        }
+      }
+    },
+    "rm0008-connectivity-bxcan": {
+      "controllers": {
+        "CAN1": {
+          "kind": "can",
+          "irq": [
+            "CAN1_TX_IRQn",
+            "CAN1_RX0_IRQn",
+            "CAN1_RX1_IRQn",
+            "CAN1_SCE_IRQn"
+          ],
+          "irq_sources": {
+            "tx": "CAN1_TX_IRQn",
+            "rx0": "CAN1_RX0_IRQn",
+            "rx1": "CAN1_RX1_IRQn",
+            "error": "CAN1_SCE_IRQn"
+          },
+          "pins": [],
+          "clock_domain": "apb1"
+        },
+        "CAN2": {
+          "kind": "can",
+          "irq": [
+            "CAN2_TX_IRQn",
+            "CAN2_RX0_IRQn",
+            "CAN2_RX1_IRQn",
+            "CAN2_SCE_IRQn"
+          ],
+          "irq_sources": {
+            "tx": "CAN2_TX_IRQn",
+            "rx0": "CAN2_RX0_IRQn",
+            "rx1": "CAN2_RX1_IRQn",
+            "error": "CAN2_SCE_IRQn"
+          },
+          "pins": [],
+          "clock_domain": "apb1"
+        }
+      },
+      "modes": {
+        "CAN1": {
+          "modes": [
+            "classic-irq"
+          ]
+        },
+        "CAN2": {
+          "modes": [
+            "classic-irq"
+          ]
+        }
+      }
     }
+  },
+  "can_domain": {
+    "primary": "CAN1",
+    "controllers": [
+      "CAN1",
+      "CAN2"
+    ],
+    "filter_banks": 28
   }
 }

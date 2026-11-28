@@ -25,6 +25,9 @@
     "target": "nexus_soc_stm32f1"
   },
   "exports": {
+    "vendor_shared": [
+      "bxcan"
+    ],
     "roots": [
       "."
     ],
@@ -50,6 +53,7 @@
     "drivers/can/binding.json",
     "drivers/rtc/binding.json",
     "drivers/dac/binding.json",
-    "drivers/fsmc/binding.json"
+    "drivers/fsmc/binding.json",
+    "drivers/advanced_pwm/binding.json"
   ]
 }

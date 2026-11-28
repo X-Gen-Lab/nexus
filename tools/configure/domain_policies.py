@@ -87,7 +87,7 @@ def _uart(value):
 def _can(value, soc):
     if not isinstance(value, Mapping) or "transport" not in value:
         fail("CAN policy requires explicit reviewed transport bindings")
-    _fields(value, {"model", "fifo_order_supported", "transport"})
+    _fields(value, {"model", "fifo_order_supported", "transport"}, {"operations"})
     if value["model"] != "bxcan":
         fail("Unsupported CAN IP policy model")
     from tools.configure.policies.bxcan import domain_topology
@@ -95,8 +95,12 @@ def _can(value, soc):
     transports = value["transport"]
     if not isinstance(transports, Mapping) or set(transports) != set(controllers):
         fail("CAN transport must cover the exact physical controllers")
+    allowed = _names(value.get("operations", ["normal", "loopback", "silent-loopback"]),
+                     "CAN reviewed operations")
+    if not allowed or not set(allowed) <= {"normal", "loopback", "silent-loopback"}:
+        fail("CAN reviewed operations contain an unknown mode")
     return controllers, BxCanPolicy(
-        fifo_order_supported=_boolean(value["fifo_order_supported"], "CAN FIFO order"),
+        operations=allowed, fifo_order_supported=_boolean(value["fifo_order_supported"], "CAN FIFO order"),
         transports=MappingProxyType({name: BxCanTransport.from_validated(row)
                                     for name, row in transports.items()}))
 
@@ -147,7 +151,10 @@ def _timers(values, pinmux):
         for route in value["routes"]:
             _fields(route, {"channel", "pins"})
             channel = integer(route["channel"], 1, 4, "Domain timer channel")
-            pins = _pins(route["pins"], 3, pinmux)
+            fixed = isinstance(pinmux, FixedRoutePinMuxPolicy)
+            pins = _pins(route["pins"], 2 if fixed else 3, pinmux)
+            if fixed:
+                pins = tuple((*pin, None) for pin in pins)
             connection = channel, pins
             if connection in connections:
                 fail("Duplicate domain timer channel route")
@@ -398,7 +405,7 @@ class DomainPolicies:
         if item.kind in {"timer_capture", "advanced_pwm"}:
             binding = (self.TIMER_ADVANCED.binding(item.kind, item.controller)
                        if self.TIMER_ADVANCED is not None else None)
-            pins = tuple((pin["pin"], pin["function"], pin["af"]) for pin in item.pins)
+            pins = tuple((pin["pin"], pin["function"], pin.get("af")) for pin in item.pins)
             route = binding.route(pins) if binding is not None else None
             if route is None:
                 fail("Selected timer has no admitted domain channel route")

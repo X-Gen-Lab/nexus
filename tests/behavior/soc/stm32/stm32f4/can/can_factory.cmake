@@ -24,7 +24,7 @@ foreach(can_family stm32)
     nexus_google_test(${can_target} SOURCES "${nexus_google_root}/soc/stm32/stm32f4/can/can_factory_test.cpp"
         "${can_bundle}/bindings.c" LIBRARIES Nexus::NativeModel Nexus::Arch
         INCLUDES
-        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f4/drivers/ip/classic_can" "${can_bundle}" "${NEXUS_SOURCE_DIR}/io/private"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/common/bxcan" "${can_bundle}" "${NEXUS_SOURCE_DIR}/io/private"
             "${NEXUS_SOURCE_DIR}/tests/support/native/drivers"
     )
     target_compile_options(

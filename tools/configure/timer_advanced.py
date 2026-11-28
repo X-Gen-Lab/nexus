@@ -106,7 +106,7 @@ def validate_selection(selection, route, provider, *, clock_plan=None):
         fail("Timer requires explicit clock, mode, safe policy, exclusive owner and IRQ")
     policy = getattr(provider, "TIMER_ADVANCED", None)
     facts = policy.binding(kind, route['controller']) if policy is not None else None
-    actual = tuple((pin["pin"], pin["function"], pin["af"]) for pin in route["pins"])
+    actual = tuple((pin["pin"], pin["function"], pin.get("af")) for pin in route["pins"])
     if facts is None or facts.route(actual) is None:
         fail("Timer selection differs from the reviewed exclusive pad route")
     tick = integer(selection["tick_hz"], 1, context="Timer tick_hz")

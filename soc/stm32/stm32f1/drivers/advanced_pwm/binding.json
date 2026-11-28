@@ -1,0 +1,167 @@
+{
+  "schema_version": 1,
+  "bindings": [
+    {
+      "kind": "advanced_pwm",
+      "mode": "complementary-pwm",
+      "controllers": [
+        "TIM1"
+      ],
+      "implementation": "advanced_pwm",
+      "headers": [
+        "drivers/advanced_pwm/instance.h"
+      ],
+      "io_domains": [
+        "advanced_pwm"
+      ],
+      "limits": {
+        "tick_hz": [
+          8000000,
+          8000000
+        ],
+        "period_ticks": [
+          64,
+          65535
+        ],
+        "deadtime_ticks": [
+          1,
+          127
+        ]
+      },
+      "static_recipe": {
+        "state_type": "nx_stm32f1_advanced_pwm_t",
+        "ops": "nx_stm32f1_advanced_pwm_ops",
+        "declarations": [
+          {
+            "role": "timer_config",
+            "type": "nx_stm32f1_advanced_pwm_config_t",
+            "const": true,
+            "value": {
+              "record": [
+                [
+                  "period_ticks",
+                  {
+                    "source": "item.options.period_ticks"
+                  }
+                ],
+                [
+                  "tick_hz",
+                  {
+                    "source": "item.options.tick_hz"
+                  }
+                ],
+                [
+                  "deadtime_ticks",
+                  {
+                    "source": "item.options.deadtime_ticks"
+                  }
+                ],
+                [
+                  "priority",
+                  {
+                    "source": "item.options.irq.priority"
+                  }
+                ],
+                [
+                  "active_high",
+                  {
+                    "source": "item.options.break_active_high"
+                  }
+                ],
+                [
+                  "idle_high",
+                  {
+                    "source": "item.options.idle_high"
+                  }
+                ],
+                [
+                  "idle_complement_high",
+                  {
+                    "source": "item.options.idle_complement_high"
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "calls": {
+          "prepare": {
+            "function": "nx_stm32f1_advanced_pwm_prepare",
+            "args": [
+              {
+                "ref": "port",
+                "as": "address"
+              },
+              {
+                "ref": "timer_config",
+                "as": "address"
+              }
+            ]
+          },
+          "close": [
+            {
+              "function": "nx_stm32f1_advanced_pwm_close",
+              "args": [
+                {
+                  "ref": "port",
+                  "as": "address"
+                }
+              ]
+            }
+          ]
+        },
+        "irq": [
+          {
+            "name": "TIM1_BRK_IRQHandler",
+            "calls": [
+              {
+                "function": "nx_stm32f1_advanced_pwm_irq",
+                "args": [
+                  {
+                    "ref": "port",
+                    "as": "address"
+                  }
+                ]
+              }
+            ],
+            "barrier": "nx_arch_dsb"
+          }
+        ],
+        "retain_on_failed_init": true
+      }
+    }
+  ],
+  "domains": {
+    "timers": [
+      {
+        "kind": "advanced_pwm",
+        "controller": "TIM1",
+        "vector": "TIM1_BRK_IRQn",
+        "irq": 24,
+        "clock_hz": 8000000,
+        "routes": [
+          {
+            "channel": 1,
+            "pins": [
+              [
+                "PA8",
+                "output"
+              ],
+              [
+                "PB13",
+                "complement"
+              ],
+              [
+                "PB12",
+                "break"
+              ]
+            ]
+          }
+        ],
+        "resources": [
+          "clock:TIM1"
+        ]
+      }
+    ]
+  }
+}

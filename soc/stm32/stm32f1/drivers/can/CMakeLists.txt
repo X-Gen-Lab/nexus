@@ -14,3 +14,14 @@ if("classic-poll-normal" IN_LIST f1_can)
         PRIVATE "${CMAKE_CURRENT_LIST_DIR}/normal.c"
     )
 endif()
+if("classic-irq" IN_LIST f1_can)
+    set(bxcan "${NEXUS_SOURCE_DIR}/soc/stm32/common/bxcan")
+    target_sources(
+        nexus_soc_stm32f1
+        PRIVATE
+            "${CMAKE_CURRENT_LIST_DIR}/connectivity.c"
+            "${bxcan}/can_controller.c"
+    )
+    target_include_directories(nexus_soc_stm32f1 PRIVATE "${bxcan}")
+    target_link_libraries(nexus_soc_stm32f1 PRIVATE Nexus::IOCAN)
+endif()

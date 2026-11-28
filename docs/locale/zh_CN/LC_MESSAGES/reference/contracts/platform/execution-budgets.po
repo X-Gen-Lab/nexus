@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 45f00be8a517ed087416b0e98af6c1185de8101e34a6e604181264b5c858451c\n"
+"X-Nexus-Source-SHA256: c463dcd2b3d6ec1361ba6f62719a6d25aaef29dee4d0028a9e9d822cff4ec5a5\n"
 
 #: ../../../../../../docs/reference/contracts/platform/execution-budgets.md:9
 msgid "SoC execution budgets"
@@ -369,12 +369,12 @@ msgstr ""
 #: ../../../../../../docs/reference/contracts/platform/execution-budgets.md:65
 msgid ""
 "CAN/USB/Ethernet: "
-"`soc/stm32/stm32f4/drivers/ip/classic_can/can_controller.c`, "
+"`soc/stm32/common/bxcan/can_controller.c`, "
 "`usb_device_controller.c` and `eth_mac.c`; poll/drain limits and selected "
 "capacities are validated at cold admission. IRQ notification remains a hint,"
 " never a replacement for predicates."
 msgstr ""
-"CAN/USB/Ethernet：`soc/stm32/stm32f4/drivers/ip/classic_can/can_controller.c`、`usb_device_controller.c`"
+"CAN/USB/Ethernet：`soc/stm32/common/bxcan/can_controller.c`、`usb_device_controller.c`"
 " 与 `eth_mac.c`；轮询/排空上限和所选容量在冷态接纳时验证。IRQ 通知始终只是提示，不能替代谓词判断。"
 
 #: ../../../../../../docs/reference/contracts/platform/execution-budgets.md:69

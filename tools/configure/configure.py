@@ -901,7 +901,8 @@ def catalog_soc_facts(soc, part, catalog):
             if name == selected.identifier:
                 normalized["cpu"] = cpu
     controllers = profiles[selected.identifier]
-    if not any(item["kind"] == "can" for item in controllers.values()):
+    if not any(item["kind"] == "can" and "classic-irq" in item["modes"]
+               for item in controllers.values()):
         normalized.pop("can_domain", None)
     normalized.update(controllers=controllers,
                       clock_policy=soc["device_profiles"][selected.identifier]["clock_policy"],

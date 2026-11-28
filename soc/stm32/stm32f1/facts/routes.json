@@ -304,12 +304,54 @@
         }
       ],
       "modes": [
-        "single-shot"
+        "single-shot",
+        "single-trigger-dma"
       ],
-      "source": "DS5319 Rev20 Table 5 and Tables 47\u201348; RM0008 Rev21 sections 11.3, 11.4 and 11.12; UM1724 Rev17 Table 12 PA0 A0.",
+      "source": "DS5319 Rev20 Table 5 and Tables 47\u201348; RM0008 Rev21 sections 11.3, 11.4 and 11.12; UM1724 Rev17 Table 12 PA0 A0. RM0008 Rev21 Table 67 and Figure 50: TIM3 Update TRGO to ADC1, DMA1 ch1. ES096 Rev15 Sections 2.4.1 and 2.6.2.",
       "clock_profiles": [
         "hsi8"
-      ]
+      ],
+      "mode_dma": {
+        "single-trigger-dma": [
+          "DMA1:channel1"
+        ]
+      },
+      "mode_resources": {
+        "single-trigger-dma": [
+          "controller:TIM3"
+        ]
+      }
+    },
+    {
+      "id": "adc1-pa0-tim1-cc1",
+      "variants": [
+        "STM32F103RBT6"
+      ],
+      "controller": "ADC1",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PA0",
+          "function": "in0"
+        }
+      ],
+      "modes": [
+        "single-trigger-dma"
+      ],
+      "source": "RM0008 Rev21 Table 67 and Section 14.3.7: TIM1_CC1 regular ADC1 EXTSEL=000; CC1 compare internal, CCER, MOE and DIER held off. Figure 50: ADC1 to DMA1 channel 1; DS5319 Rev20 Table 5 and Tables 47\u201348; ES096 Rev15 Sections 2.4.1, 2.5.1 and 2.6.3.",
+      "clock_profiles": [
+        "hsi8"
+      ],
+      "mode_dma": {
+        "single-trigger-dma": [
+          "DMA1:channel1"
+        ]
+      },
+      "mode_resources": {
+        "single-trigger-dma": [
+          "controller:TIM1"
+        ]
+      }
     },
     {
       "id": "exti13-pc13",
@@ -719,6 +761,69 @@
         "cpu-window"
       ],
       "source": "STM3210E-EVAL MB672-F103ZGT6-D06 sheet 6 U1; UM0488 Rev7 Section 5.18 and Table 31; RM0008 Rev21 Section 21.5.4."
+    },
+    {
+      "id": "tim1-pa8-pb13-pb12",
+      "variants": [
+        "STM32F103RBT6"
+      ],
+      "controller": "TIM1",
+      "kind": "advanced_pwm",
+      "pins": [
+        {
+          "pin": "PA8",
+          "function": "output"
+        },
+        {
+          "pin": "PB13",
+          "function": "complement"
+        },
+        {
+          "pin": "PB12",
+          "function": "break"
+        }
+      ],
+      "modes": [
+        "complementary-pwm"
+      ],
+      "clock_profiles": [
+        "hsi8"
+      ],
+      "source": "DS5319 Rev20 Table 5; RM0008 Rev21 Table 46 TIM1_REMAP=00, Sections 14.3.11-12 and 14.4.18; ES096 Rev15 Sections 2.6.1 and 2.6.3."
+    },
+    {
+      "id": "can1-connectivity-silent",
+      "variants": [
+        "STM32F105VCT6",
+        "STM32F107VCT6"
+      ],
+      "controller": "CAN1",
+      "kind": "can",
+      "pins": [],
+      "modes": [
+        "classic-irq"
+      ],
+      "clock_profiles": [
+        "hsi8"
+      ],
+      "source": "RM0008 Rev21 \u00a7\u00a724.2, 24.3, 24.6.3, 24.8 and 24.9.4; ES022 Rev11 \u00a72.12.1."
+    },
+    {
+      "id": "can2-connectivity-silent",
+      "variants": [
+        "STM32F105VCT6",
+        "STM32F107VCT6"
+      ],
+      "controller": "CAN2",
+      "kind": "can",
+      "pins": [],
+      "modes": [
+        "classic-irq"
+      ],
+      "clock_profiles": [
+        "hsi8"
+      ],
+      "source": "RM0008 Rev21 \u00a7\u00a724.2, 24.3, 24.6.3, 24.8 and 24.9.4; ES022 Rev11 \u00a72.12.1."
     }
   ]
 }

@@ -1496,7 +1496,8 @@
         "gpioa-basic",
         "rm0008-f103-md",
         "rm0008-f103-md-default-buses",
-        "rm0008-f103-md-controls"
+        "rm0008-f103-md-controls",
+        "f103-md-tim1"
       ],
       "clock_policy": "rm0008-f103-md-run"
     },
@@ -1562,7 +1563,8 @@
       "part_prefix": "STM32F105VC",
       "controller_groups": [
         "gpioa-basic",
-        "usart2-default-irq"
+        "usart2-default-irq",
+        "rm0008-connectivity-bxcan"
       ],
       "clock_policy": "rm0008-f105-f107-run"
     },
@@ -1570,7 +1572,8 @@
       "part_prefix": "STM32F107VC",
       "controller_groups": [
         "gpioa-basic",
-        "usart2-default-irq"
+        "usart2-default-irq",
+        "rm0008-connectivity-bxcan"
       ],
       "clock_policy": "rm0008-f105-f107-run"
     },

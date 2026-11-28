@@ -118,7 +118,8 @@ class PlatformBindings:
         _fields(objects, {"platform"}, {"state", "permanent_close", "can_close"})
         calls = value["calls"]
         _fields(calls, {"system_start", "resources_acquire", "resources_resume",
-                        "resources_release", "system_release"})
+                        "resources_release", "system_release"},
+                {"resources_release_can"})
         for name in (*calls.values(), value["config_symbol"]):
             Symbol(name)
         power = value.get("power", {})
@@ -202,6 +203,9 @@ class PlatformBindings:
         return self._call("resources_resume")
 
     def platform_resources_release(self, result):
+        with_can = self.calls.get("resources_release_can")
+        if result.can_domain is not None and with_can is not None:
+            return DirectCall(with_can)
         return self._call("resources_release")
 
     def platform_system_release(self, result, started):

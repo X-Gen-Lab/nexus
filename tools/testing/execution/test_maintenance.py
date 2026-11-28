@@ -127,9 +127,13 @@ class CapabilityDocumentationTests(unittest.TestCase):
     def test_can_exports_match_the_selected_family_controller(self):
         expected = {
             ("stm32f4", "CAN1", "classic-irq"):
-                "soc/stm32/stm32f4/drivers/ip/classic_can/can_controller.c",
+                "soc/stm32/common/bxcan/can_controller.c",
             ("stm32f4", "CAN2", "classic-irq"):
-                "soc/stm32/stm32f4/drivers/ip/classic_can/can_controller.c",
+                "soc/stm32/common/bxcan/can_controller.c",
+            ("stm32f1", "CAN1", "classic-irq"):
+                "soc/stm32/common/bxcan/can_controller.c",
+            ("stm32f1", "CAN2", "classic-irq"):
+                "soc/stm32/common/bxcan/can_controller.c",
             ("stm32f1", "CAN1", "classic-poll"):
                 "soc/stm32/stm32f1/drivers/can/can.c",
             ("stm32f1", "CAN1", "classic-poll-normal"):
@@ -152,12 +156,17 @@ class CapabilityDocumentationTests(unittest.TestCase):
         } | {
             ("stm32f4", "TIM1", "advanced_pwm", "complementary-pwm"),
             ("stm32f4", "TIM8", "advanced_pwm", "complementary-pwm"),
+            ("stm32f1", "TIM1", "advanced_pwm", "complementary-pwm"),
         }
         self.assertEqual({(row["family"], row["controller"], row["kind"],
                            row["mode"]) for row in selected}, expected)
         for row in selected:
             with self.subTest(controller=row["controller"], kind=row["kind"]):
                 self.assertTrue(row["fixtures"])
+                if row["family"] == "stm32f1":
+                    self.assertEqual(row["exports"], [
+                        "soc/stm32/stm32f1/drivers/advanced_pwm/advanced_pwm.c"])
+                    continue
                 if row["kind"] == "timer_capture" and row["controller"] != "TIM4":
                     name = "timer_capture_" + row["controller"].lower()
                 elif row["kind"] == "advanced_pwm" and row["controller"] == "TIM8":

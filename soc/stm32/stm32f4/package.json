@@ -25,6 +25,9 @@
     "target": "nexus_soc_stm32f4"
   },
   "exports": {
+    "vendor_shared": [
+      "bxcan"
+    ],
     "roots": [
       "."
     ],

@@ -621,6 +621,7 @@ _MODE_TRAITS = MappingProxyType({
     ("pwm", "fixed-pwm"): ModeTraits(),
     ("pwm", "shared-fixed-pwm"): ModeTraits(),
     ("adc", "single-shot"): ModeTraits(polling=True),
+    ("adc", "single-trigger-dma"): ModeTraits(polling=True, rx_dma=True),
     ("adc", "low-rate-scan"): ModeTraits(polling=True),
     ("adc", "injected-shot"): ModeTraits(polling=True),
     ("adc", "trigger-dma"): ModeTraits(

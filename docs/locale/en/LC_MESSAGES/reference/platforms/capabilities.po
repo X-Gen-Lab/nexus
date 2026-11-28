@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 0b824522cb1803a5ef8679774f468b0c38d7076f7e02748c968204e824e3f06f\n"
+"X-Nexus-Source-SHA256: 50c0b7777b016c7a95b163a06c0640545fb8a7d945402461041210642c662712\n"
 
 #: ../../../../../docs/reference/platforms/capabilities.md:9
 msgid "当前派生能力矩阵"
@@ -492,10 +492,6 @@ msgstr ""
 "`tests/integration/assemblies/can_assembly/stm32-both.toml`, "
 "`tests/integration/assemblies/can_assembly/stm32-first.toml`, "
 "`tests/integration/assemblies/declared_io_assembly/ve-word-adc-can.toml`"
-
-#: ../../../../../docs/reference/platforms/capabilities.md:0
-msgid "`soc/stm32/stm32f4/drivers/ip/classic_can/can_controller.c`"
-msgstr "`soc/stm32/stm32f4/drivers/ip/classic_can/can_controller.c`"
 
 #: ../../../../../docs/reference/platforms/capabilities.md:0
 msgid "CAN2"
@@ -4450,3 +4446,55 @@ msgstr ""
 "`tests/integration/assemblies/stm32f1_family/f107vc-baremetal.toml`, "
 "`tests/integration/assemblies/stm32f1_family/f107vc-hse25-baremetal.toml`, "
 "`tests/integration/kernels/os_threadx_runtime/f103rb-threadx.toml`"
+
+#: ../../nexus-f1-advanced-assembly/docs/reference/platforms/capabilities.md:0
+msgid "single-trigger-dma"
+msgstr "single-trigger-dma"
+
+#: ../../nexus-f1-advanced-assembly/docs/reference/platforms/capabilities.md:0
+msgid "`adc1-pa0-in0`, `adc1-pa0-tim1-cc1`"
+msgstr "`adc1-pa0-in0`, `adc1-pa0-tim1-cc1`"
+
+#: ../../nexus-f1-advanced-assembly/docs/reference/platforms/capabilities.md:0
+msgid ""
+"`tests/integration/assemblies/stm32f1_adc/f103rb-tim1-trigger-dma.toml`, "
+"`tests/integration/assemblies/stm32f1_adc/f103rb-trigger-dma.toml`"
+msgstr ""
+"`tests/integration/assemblies/stm32f1_adc/f103rb-tim1-trigger-dma.toml`, "
+"`tests/integration/assemblies/stm32f1_adc/f103rb-trigger-dma.toml`"
+
+#: ../../nexus-f1-advanced-assembly/docs/reference/platforms/capabilities.md:0
+msgid "`soc/stm32/stm32f1/drivers/adc/trigger_dma.c`"
+msgstr "`soc/stm32/stm32f1/drivers/adc/trigger_dma.c`"
+
+#: ../../nexus-f1-advanced-assembly/docs/reference/platforms/capabilities.md:0
+msgid "`can1-connectivity-silent`"
+msgstr "`can1-connectivity-silent`"
+
+#: ../../nexus-f1-advanced-assembly/docs/reference/platforms/capabilities.md:0
+msgid ""
+"`tests/integration/assemblies/stm32f1_can_connectivity/f105vc.toml`, "
+"`tests/integration/assemblies/stm32f1_can_connectivity/f107vc.toml`"
+msgstr ""
+"`tests/integration/assemblies/stm32f1_can_connectivity/f105vc.toml`, "
+"`tests/integration/assemblies/stm32f1_can_connectivity/f107vc.toml`"
+
+#: ../../nexus-f1-advanced-assembly/docs/reference/platforms/capabilities.md:0
+msgid "`soc/stm32/common/bxcan/can_controller.c`"
+msgstr "`soc/stm32/common/bxcan/can_controller.c`"
+
+#: ../../nexus-f1-advanced-assembly/docs/reference/platforms/capabilities.md:0
+msgid "`can2-connectivity-silent`"
+msgstr "`can2-connectivity-silent`"
+
+#: ../../nexus-f1-advanced-assembly/docs/reference/platforms/capabilities.md:0
+msgid "`tim1-pa8-pb13-pb12`"
+msgstr "`tim1-pa8-pb13-pb12`"
+
+#: ../../nexus-f1-advanced-assembly/docs/reference/platforms/capabilities.md:0
+msgid "`tests/integration/assemblies/stm32f1_advanced_pwm/f103rb-tim1.toml`"
+msgstr "`tests/integration/assemblies/stm32f1_advanced_pwm/f103rb-tim1.toml`"
+
+#: ../../nexus-f1-advanced-assembly/docs/reference/platforms/capabilities.md:0
+msgid "`soc/stm32/stm32f1/drivers/advanced_pwm/advanced_pwm.c`"
+msgstr "`soc/stm32/stm32f1/drivers/advanced_pwm/advanced_pwm.c`"

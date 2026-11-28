@@ -208,31 +208,34 @@ nx_result_t nx_stm32f1_adc_close(nx_stm32f1_adc_t* state) {
 }
 
 static bool output_span(const nx_stm32f1_adc_t* state, const void* output,
-                        size_t bytes, size_t alignment) {
+                        size_t bytes, size_t alignment,
+                        const nx_adc_ops_t* ops) {
     return nx_io_dispatch_span(output, bytes, alignment) &&
            !nx_io_dispatch_overlap(output, bytes, state, sizeof(*state)) &&
            !nx_io_dispatch_overlap(output, bytes, ADC1, sizeof(*ADC1)) &&
            !nx_io_dispatch_overlap(output, bytes, GPIOA, sizeof(*GPIOA)) &&
            !nx_io_dispatch_overlap(output, bytes, RCC, sizeof(*RCC)) &&
-           !nx_io_dispatch_overlap(output, bytes, &nx_stm32f1_adc_ops,
-                                   sizeof(nx_stm32f1_adc_ops));
+           !nx_io_dispatch_overlap(output, bytes, ops, sizeof(*ops));
 }
 
-static nx_result_t info(const void* context, nx_adc_info_t* output) {
+nx_result_t nx_stm32f1_adc_info(const void* context, nx_adc_info_t* output,
+                                const nx_adc_ops_t* ops) {
     const nx_stm32f1_adc_t* state = context;
     if (state == NULL || (state->effects & ADC_LIVE) == 0U ||
-        !output_span(state, output, sizeof(*output), _Alignof(nx_adc_info_t))) {
+        !output_span(state, output, sizeof(*output), _Alignof(nx_adc_info_t),
+                     ops)) {
         return NX_ERROR_INVALID;
     }
     *output = (nx_adc_info_t){12U, state->reference_mv, 1U};
     return NX_SUCCESS;
 }
 
-static nx_result_t sequence_info(const void* context,
-                                 nx_adc_sequence_info_t* output) {
+nx_result_t nx_stm32f1_adc_sequence_info(const void* context,
+                                         nx_adc_sequence_info_t* output,
+                                         const nx_adc_ops_t* ops) {
     const nx_stm32f1_adc_t* state = context;
     if (state == NULL || !output_span(state, output, sizeof(*output),
-                                      _Alignof(nx_adc_sequence_info_t))) {
+                                      _Alignof(nx_adc_sequence_info_t), ops)) {
         return NX_ERROR_INVALID;
     }
     if ((state->effects & ADC_LIVE) == 0U) {
@@ -259,8 +262,9 @@ static nx_result_t sample(void* context, uint16_t* samples, size_t capacity,
     if (state == NULL || capacity == 0U ||
         capacity > SIZE_MAX / sizeof(*samples) ||
         !output_span(state, samples, capacity * sizeof(*samples),
-                     _Alignof(uint16_t)) ||
-        !output_span(state, count, sizeof(*count), _Alignof(size_t)) ||
+                     _Alignof(uint16_t), &nx_stm32f1_adc_ops) ||
+        !output_span(state, count, sizeof(*count), _Alignof(size_t),
+                     &nx_stm32f1_adc_ops) ||
         nx_io_dispatch_overlap(samples, capacity * sizeof(*samples), count,
                                sizeof(*count))) {
         return NX_ERROR_INVALID;
@@ -319,6 +323,15 @@ static nx_result_t sample(void* context, uint16_t* samples, size_t capacity,
         return NX_SUCCESS;
     }
     return fail_sample(state, NX_ERROR_TIMEOUT);
+}
+
+static nx_result_t info(const void* context, nx_adc_info_t* out) {
+    return nx_stm32f1_adc_info(context, out, &nx_stm32f1_adc_ops);
+}
+
+static nx_result_t sequence_info(const void* context,
+                                 nx_adc_sequence_info_t* out) {
+    return nx_stm32f1_adc_sequence_info(context, out, &nx_stm32f1_adc_ops);
 }
 
 const nx_adc_ops_t nx_stm32f1_adc_ops = {

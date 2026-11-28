@@ -472,6 +472,8 @@
         ],
         "maintained_modes": [
           "adc:single-shot",
+          "adc:single-trigger-dma",
+          "advanced_pwm:complementary-pwm",
           "can:classic-poll",
           "can:classic-poll-normal",
           "crc:crc32-words",
@@ -648,12 +650,14 @@
             "implementation": [
               "soc/stm32/stm32f1/drivers/uart/uart_dma.c",
               "soc/stm32/stm32f1/drivers/uart/uart_rx_dma.c",
-              "soc/stm32/stm32f1/drivers/spi/spi_dma.c"
+              "soc/stm32/stm32f1/drivers/spi/spi_dma.c",
+              "soc/stm32/stm32f1/drivers/adc/trigger_dma.c"
             ],
             "regressions": [
               "tests/behavior/soc/stm32/stm32f1/uart_dma_test.cpp",
               "tests/behavior/soc/stm32/stm32f1/uart_rx_dma/uart_rx_dma_test.cpp",
-              "tests/behavior/soc/stm32/stm32f1/spi_dma/spi_dma_test.cpp"
+              "tests/behavior/soc/stm32/stm32f1/spi_dma/spi_dma_test.cpp",
+              "tests/behavior/soc/stm32/stm32f1/adc/adc_test.cpp"
             ]
           },
           {
@@ -668,6 +672,34 @@
             ],
             "regressions": [
               "tests/behavior/soc/stm32/stm32f1/adc/adc_test.cpp"
+            ]
+          },
+          {
+            "section": "2.6.1",
+            "title": "Automatic PWM output can reenable after system break",
+            "revisions": "PPPPPPPP",
+            "assessment": "workaround",
+            "condition": "Automatic output enable can reassert MOE after loss of a system break condition.",
+            "handling": "Keep AOE zero, require explicit recovery with outputs off and recheck BKIN and BIF before and after the separate start.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/advanced_pwm/advanced_pwm.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/advanced_pwm/advanced_pwm_test.cpp"
+            ]
+          },
+          {
+            "section": "2.6.3",
+            "title": "Consecutive compare events may be missed",
+            "revisions": "NNNNNNNN",
+            "assessment": "excluded_mode",
+            "condition": "Consecutive compare events can be lost in toggle mode or center-aligned compare interrupts.",
+            "handling": "Use up-counting PWM1 with preloaded duty. No CCR interrupts, toggle output or compare triggers are published.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/advanced_pwm/advanced_pwm.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/advanced_pwm/advanced_pwm_test.cpp"
             ]
           },
           {
@@ -1566,6 +1598,7 @@
           "Z"
         ],
         "maintained_modes": [
+          "can:classic-irq",
           "gpio:output",
           "uart:irq-byte-event"
         ],
@@ -1643,6 +1676,21 @@
               "soc/stm32/stm32f1/facts/routes.json"
             ],
             "regressions": []
+          },
+          {
+            "section": "2.12.1",
+            "title": "bxCAN time-triggered communication is unavailable",
+            "revisions": "NN",
+            "assessment": "silicon_limit",
+            "condition": "The time-triggered communication mode and associated hardware timestamps are unavailable.",
+            "handling": "The common bxCAN engine clears TTCM. This internal-only fixture keeps SILM/LBKM enabled and uses IRQ observation timestamps.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/can/connectivity.c",
+              "soc/stm32/common/bxcan/can_controller.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/can/connectivity_test.cpp"
+            ]
           }
         ]
       }
@@ -1666,6 +1714,7 @@
           "Z"
         ],
         "maintained_modes": [
+          "can:classic-irq",
           "gpio:output",
           "uart:irq-byte-event"
         ],
@@ -1743,6 +1792,21 @@
               "soc/stm32/stm32f1/facts/routes.json"
             ],
             "regressions": []
+          },
+          {
+            "section": "2.12.1",
+            "title": "bxCAN time-triggered communication is unavailable",
+            "revisions": "NN",
+            "assessment": "silicon_limit",
+            "condition": "The time-triggered communication mode and associated hardware timestamps are unavailable.",
+            "handling": "The common bxCAN engine clears TTCM. This internal-only fixture keeps SILM/LBKM enabled and uses IRQ observation timestamps.",
+            "implementation": [
+              "soc/stm32/stm32f1/drivers/can/connectivity.c",
+              "soc/stm32/common/bxcan/can_controller.c"
+            ],
+            "regressions": [
+              "tests/behavior/soc/stm32/stm32f1/can/connectivity_test.cpp"
+            ]
           }
         ]
       }

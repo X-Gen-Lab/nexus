@@ -1,6 +1,7 @@
 """Authored configuration and typed factory behavioral contracts."""
 from tools.configure.tests.native_fixture import native_fixture, with_native_support
 from tools.configure.tests.assembly_fixture import render_toml
+from tools.configure.tests.f4_fixture import copy_shared_exports
 from tools.configure.providers.descriptor import source_directory, maintained
 from contextlib import redirect_stdout
 from dataclasses import FrozenInstanceError
@@ -45,12 +46,14 @@ flash_load_limit_bytes = 65536
         return gate.resolve_ir(self.assembly, self.root, test_support=True)
 
     def copy_soc_package(self, family):
-        package = self.root / source_directory(family)
+        relative = source_directory(family)
+        package = self.root / relative
         package.mkdir(parents=True, exist_ok=True)
         for fact_path in maintained(family).fact_files:
             destination = self.root / fact_path
             destination.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(gate.ROOT / fact_path, destination)
+        copy_shared_exports(gate.ROOT / relative, package)
         if family == "gd32f470":
             vendor = "vendors/gigadevice/gd32f4xx"
             if not (self.root / vendor).exists():

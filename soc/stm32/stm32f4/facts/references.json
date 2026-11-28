@@ -1604,7 +1604,7 @@
             "condition": "bxCAN TTCM would expose unsupported time-triggered transmission and timestamp values.",
             "handling": "The classic controller keeps TTCM clear and does not promise hardware timestamps; host observation time is a separate clock fact. No CAN-FD or time-triggered mode is inferred from the generic API.",
             "implementation": [
-              "soc/stm32/stm32f4/drivers/ip/classic_can/can_controller.c",
+              "soc/stm32/common/bxcan/can_controller.c",
               "soc/stm32/stm32f4/drivers/can/can.c"
             ],
             "regressions": [

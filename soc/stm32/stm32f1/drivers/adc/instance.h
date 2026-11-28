@@ -23,6 +23,13 @@ typedef struct {
 
 extern const nx_adc_ops_t nx_stm32f1_adc_ops;
 
+/** \brief Copy selected physical format for either ADC1 acquisition mode. */
+nx_result_t nx_stm32f1_adc_info(const void* context, nx_adc_info_t* output,
+                                const nx_adc_ops_t* ops);
+nx_result_t nx_stm32f1_adc_sequence_info(const void* context,
+                                         nx_adc_sequence_info_t* output,
+                                         const nx_adc_ops_t* ops);
+
 /** \brief Acquire and calibrate ADC1 under HSI8 with APB2/1, ADC /2.
  * \param[in,out] state: Single zero-initialized cold owner.
  * \param[in] apb2_hz: Declared APB2 rate; must match the fixed HSI8 route.

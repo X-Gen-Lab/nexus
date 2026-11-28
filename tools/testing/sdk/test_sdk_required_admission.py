@@ -64,6 +64,8 @@ class SDKRequiredAdmissionTests(unittest.TestCase):
         # materializing vendor bytes in this early rejection fixture.
         self.files.update(selection.device_inputs)
         for package in selection.packages:
+            for scope in package.export_roots:
+                (self.root / scope.relative_to(ROOT)).mkdir(parents=True, exist_ok=True)
             for source in package.inputs:
                 name = source.relative_to(ROOT).as_posix()
                 target = self.root / name

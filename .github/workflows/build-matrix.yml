@@ -301,6 +301,8 @@ jobs:
           - stm32f1_can_normal
           - stm32f1_fsmc
           - stm32f1_i2c_10bit
+          - stm32f1_advanced_pwm
+          - stm32f1_can_connectivity
         include:
           - fixture: stm32f4_family
             project: tests/integration/assemblies/stm32f4_family

@@ -46,6 +46,7 @@ class BxCanTransport:
 class BxCanPolicy:
     """One explicitly selected IP; reasons bind to physical vectors in facts."""
     fifo_order_supported: bool = True
+    operations: tuple[str, ...] = ("normal", "loopback", "silent-loopback")
     transports: Mapping = field(default_factory=lambda: MappingProxyType({}))
     irq_roles: ClassVar[tuple[str, ...]] = ("tx", "rx0", "rx1", "error")
 

@@ -11,6 +11,11 @@
       "id": "adc1-pa0",
       "controller": "ADC1",
       "route": "adc1-pa0-in0"
+    },
+    {
+      "id": "adc1-pa0-tim1",
+      "controller": "ADC1",
+      "route": "adc1-pa0-tim1-cc1"
     }
   ],
   "reserved_resources": [

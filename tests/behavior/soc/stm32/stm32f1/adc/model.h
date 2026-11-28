@@ -15,6 +15,10 @@ extern "C" {
 extern ADC_TypeDef f103_adc_model_adc;
 extern GPIO_TypeDef f103_adc_model_gpio;
 extern RCC_TypeDef f103_adc_model_rcc;
+extern TIM_TypeDef f103_adc_model_tim;
+extern TIM_TypeDef f103_adc_model_tim1;
+extern DMA_TypeDef f103_adc_model_dma;
+extern DMA_Channel_TypeDef f103_adc_model_lane;
 uint32_t f103_adc_model_read(const volatile uint32_t* reg);
 void f103_adc_model_write(volatile uint32_t* reg, uint32_t value);
 bool f103_adc_model_irq_idle(void);
@@ -25,18 +29,27 @@ bool f103_adc_model_irq_idle(void);
 #undef ADC1
 #undef GPIOA
 #undef RCC
+#undef TIM3
+#undef TIM1
+#undef DMA1
+#undef DMA1_Channel1
 #undef READ_REG
 #undef READ_BIT
 #undef WRITE_REG
 #undef MODIFY_REG
 #undef SET_BIT
 #undef CLEAR_BIT
-#define ADC1                  (&f103_adc_model_adc)
-#define GPIOA                 (&f103_adc_model_gpio)
-#define RCC                   (&f103_adc_model_rcc)
-#define READ_REG(reg)         f103_adc_model_read(&(reg))
-#define READ_BIT(reg, mask)   (READ_REG(reg) & (mask))
-#define WRITE_REG(reg, value) f103_adc_model_write(&(reg), (uint32_t)(value))
+#define ADC1                                 (&f103_adc_model_adc)
+#define GPIOA                                (&f103_adc_model_gpio)
+#define TIM1                                 (&f103_adc_model_tim1)
+#define TIM3                                 (&f103_adc_model_tim)
+#define DMA1                                 (&f103_adc_model_dma)
+#define DMA1_Channel1                        (&f103_adc_model_lane)
+#define NX_STM32F1_ADC_TRIGGER_IRQ_IDLE(...) f103_adc_model_irq_idle()
+#define RCC                                  (&f103_adc_model_rcc)
+#define READ_REG(reg)                        f103_adc_model_read(&(reg))
+#define READ_BIT(reg, mask)                  (READ_REG(reg) & (mask))
+#define WRITE_REG(reg, value)                f103_adc_model_write(&(reg), (uint32_t)(value))
 #define MODIFY_REG(reg, clear, value)                                          \
     WRITE_REG(reg, (READ_REG(reg) & ~(uint32_t)(clear)) | (value))
 #define SET_BIT(reg, bits)        MODIFY_REG(reg, 0U, bits)

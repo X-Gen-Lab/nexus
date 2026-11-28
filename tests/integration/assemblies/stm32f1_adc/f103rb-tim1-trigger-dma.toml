@@ -1,0 +1,22 @@
+schema = 2
+board_package = "board"
+backend = "baremetal"
+clock = "hsi8"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+flash_load_limit_bytes = 24576
+static_ram_limit_bytes = 6144
+libc_heap_bytes = 0
+
+[adc.analog]
+binding = "adc1-pa0-tim1"
+mode = "single-trigger-dma"
+channels = [0]
+sample_times = [5]
+reference_mv = 3300
+resolution_bits = 12
+
+[factory]
+capabilities = true

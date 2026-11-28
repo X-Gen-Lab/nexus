@@ -8,6 +8,7 @@
       "apb1_hz": 8000000,
       "apb1_timer_hz": 8000000,
       "apb2_hz": 8000000,
+      "apb2_timer_hz": 8000000,
       "flash_wait_states": 0
     },
     "hse8-mco-pll72": {

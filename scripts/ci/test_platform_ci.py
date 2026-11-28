@@ -856,7 +856,7 @@ class WorkflowContracts(unittest.TestCase):
             'stm32f1_exti', 'stm32f1_pvd', 'stm32f1_window_watchdog',
             'stm32f1_can', 'stm32f1_rtc', 'stm32f1_uart_rx_dma', 'stm32f1_dac',
             'stm32f1_spi_dma', 'stm32f1_can_normal', 'stm32f1_fsmc',
-            'stm32f1_i2c_10bit'})
+            'stm32f1_i2c_10bit', 'stm32f1_advanced_pwm', 'stm32f1_can_connectivity'})
         for name in selected:
             self.assertTrue(list((ROOT / 'tests/integration/assemblies' / name).glob('*.toml')))
         commands = '\n'.join(step.get('run', '') for step in job['steps'])
@@ -910,7 +910,8 @@ class WorkflowContracts(unittest.TestCase):
                       'stm32f1_pvd': [], 'stm32f1_window_watchdog': [],
                       'stm32f1_can': [], 'stm32f1_rtc': [], 'stm32f1_uart_rx_dma': [],
                       'stm32f1_dac': [], 'stm32f1_spi_dma': [], 'stm32f1_can_normal': [],
-                      'stm32f1_fsmc': [], 'stm32f1_i2c_10bit': []}
+                      'stm32f1_fsmc': [], 'stm32f1_i2c_10bit': [],
+                      'stm32f1_advanced_pwm': [], 'stm32f1_can_connectivity': []}
         authored_family = sorted('tests/integration/assemblies/stm32f4_family/' + path.name
             for path in (ROOT / 'tests/integration/assemblies/stm32f4_family').glob('*.toml'))
         selections.update(

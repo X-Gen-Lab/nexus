@@ -47,6 +47,7 @@ def _manifest_contract():
                 "roots": {"type": "array", "minItems": 1, "uniqueItems": True,
                           "items": root},
                 "exclude": {"type": "array", "uniqueItems": True, "items": relative},
+                "vendor_shared": {"type": "array", "uniqueItems": True, "items": relative},
                 "verification_files": {"type": "array", "uniqueItems": True,
                     "items": {"allOf": [relative, {"pattern": "^tests/integration/"}]}}}}),
         "scope": (False, {"type": "string", "enum": ["production", "reference"]}),
@@ -231,12 +232,22 @@ def load(path, *, read=None):
     if not isinstance(target, str) or _C_IDENTIFIER.fullmatch(target) is None:
         fail("Declarative package CMake target must be an ordinary identifier")
     cmake_entry = _contained(source, entry)
-    exports = _record(value["exports"], {"roots", "exclude"}, {"verification_files"})
+    exports = _record(value["exports"], {"roots", "exclude"},
+                      {"verification_files", "vendor_shared"})
     if (not isinstance(exports["roots"], list) or not exports["roots"] or
             not isinstance(exports["exclude"], list)):
         fail("Declarative package exports require roots and explicit exclusions")
     roots = tuple(_contained(source, _relative(name, allow_root=True),
                              directory=True) for name in exports["roots"])
+    shared = exports.get("vendor_shared", [])
+    if not isinstance(shared, list):
+        fail("Declarative shared exports require an explicit list")
+    if shared:
+        if source != path.parent or source.parent.parent.name != "soc":
+            fail("Shared exports require a canonical SoC vendor package")
+        vendor_common = _contained(source.parent, Path("common"), directory=True)
+        roots += tuple(_contained(vendor_common, _relative(name), directory=True)
+                       for name in shared)
     excludes = tuple(_contained(source, _relative(name), exists=False)
                      for name in exports["exclude"])
     if len(set(roots)) != len(roots) or len(set(excludes)) != len(excludes):

@@ -52,8 +52,18 @@ def copy_package(root, source_root=_ROOT):
     """Copy the actual data package for isolated, no-vendor-I/O fact tests."""
     relative = Path("soc/stm32/stm32f4")
     destination = Path(root) / relative
-    shutil.copytree(Path(source_root) / relative, destination)
+    actual = Path(source_root) / relative
+    shutil.copytree(actual, destination)
+    copy_shared_exports(actual, destination)
     return destination
+
+
+def copy_shared_exports(source, destination):
+    """Retain same-vendor source scopes declared by a copied test package."""
+    for scope in load(source / "package.json").export_roots:
+        if not scope.is_relative_to(source):
+            shutil.copytree(scope, destination.parent / scope.relative_to(source.parent),
+                            dirs_exist_ok=True)
 
 
 def f4_pinmux(root=_ROOT):
